@@ -1,0 +1,151 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { applyHit, armorOf, damagePerClick, maxHp, mitigate, newFight, regen, stepFight } from '../src/lib/combat';
+import { monsterStats } from '../src/lib/monsters';
+import { INITIAL_CHARACTER_STATS, CLICK_LIMIT } from '../src/config/gameConfig';
+import { MONSTERS } from '../src/config/combatConfig';
+import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import { calculateCombatStats } from '../src/utils/gameUtils';
+import type { CharacterStats } from '../src/types/game';
+
+const freshStats = (): CharacterStats => {
+	const stats = { ...INITIAL_CHARACTER_STATS };
+	return Object.assign(stats, calculateCombatStats(stats));
+};
+
+const rat = (tier = 1) => newFight({ id: 1, type: 'rat', tier });
+const king = () => newFight({ id: 2, type: 'ratKing', tier: 1 });
+const noRng = () => 0;
+
+test('maxHp is 101 for a fresh character with the starter kit', () => {
+	assert.equal(maxHp(freshStats(), STARTER_EQUIPMENT), 101);
+});
+
+test('maxHp includes gear and set bonuses', () => {
+	assert.equal(maxHp(freshStats(), { chest: 'rattatui_tunic' }), 101 + 8);
+});
+
+test('damagePerClick is 2 with the wooden sword, 1 without a weapon, 3 with the fang blade', () => {
+	assert.equal(damagePerClick(STARTER_EQUIPMENT), 2);
+	assert.equal(damagePerClick({}), 1);
+	assert.equal(damagePerClick({ mainHand: 'rattatui_fang_blade' }), 3);
+});
+
+test('armorOf sums gear armor', () => {
+	assert.equal(armorOf(STARTER_EQUIPMENT), 2);
+});
+
+test('mitigate: armor 2 turns 4 into 4, armor 40 halves 10 to 5, never below 1', () => {
+	assert.equal(mitigate(4, 2), 4);
+	assert.equal(mitigate(10, 40), 5);
+	assert.equal(mitigate(1, 1000), 1);
+	assert.equal(mitigate(4, 0), 4);
+});
+
+test('rat stats: T1 100 HP, T5 506 HP, attack grows per tier', () => {
+	assert.equal(monsterStats('rat', 1).maxHp, 100);
+	assert.equal(monsterStats('rat', 5).maxHp, 506);
+	assert.ok(monsterStats('rat', 5).attack > monsterStats('rat', 1).attack);
+	assert.equal(monsterStats('ratKing', 3).maxHp, 1000);
+	assert.equal(monsterStats('ratKing', 3).attackIntervalSec, MONSTERS.ratKing.attackIntervalSec);
+});
+
+test('newFight starts active at full HP; only the king has a timer', () => {
+	const r = rat(5);
+	assert.equal(r.phase, 'active');
+	assert.equal(r.monsterHp, 506);
+	assert.equal(r.monsterMaxHp, 506);
+	assert.equal(r.timeLeftSec, null);
+	assert.equal(king().timeLeftSec, 60);
+	assert.equal(king().monsterHp, 1000);
+});
+
+test('applyHit lowers HP, reports the kill, and ignores finished fights', () => {
+	const r = applyHit(rat(), 2);
+	assert.equal(r.fight.monsterHp, 98);
+	assert.equal(r.killed, false);
+	const dead = applyHit({ ...rat(), monsterHp: 2 }, 2);
+	assert.equal(dead.killed, true);
+	assert.equal(dead.fight.monsterHp, 0);
+	const done = applyHit({ ...rat(), phase: 'won' }, 2);
+	assert.equal(done.fight.monsterHp, 100);
+	assert.equal(done.killed, false);
+});
+
+test('stepFight: a rat deals one mitigated hit every 2 s', () => {
+	let fight = rat();
+	let hp = 101;
+	let r = stepFight(fight, 1, hp, 2, noRng);
+	assert.equal(r.playerHp, 101);
+	assert.deepEqual(r.events, []);
+	r = stepFight(r.fight, 1, r.playerHp, 2, noRng);
+	assert.equal(r.playerHp, 97);
+	assert.deepEqual(r.events, [{ kind: 'hurt', amount: 4 }]);
+	fight = r.fight;
+	hp = r.playerHp;
+	r = stepFight(fight, 1, hp, 2, noRng);
+	assert.equal(r.playerHp, 97);
+});
+
+test('stepFight clamps dt: a 300 s step yields at most one attack', () => {
+	const r = stepFight(rat(), 300, 101, 2, noRng);
+	assert.ok(r.events.filter((e) => e.kind === 'hurt').length <= 1);
+	assert.ok(r.playerHp >= 97);
+	assert.equal(r.fight.phase, 'active');
+});
+
+test('potion cooldown counts down only in steps and stops at 0', () => {
+	let r = stepFight({ ...rat(), potionCd: 2 }, 1, 101, 2, noRng);
+	assert.equal(r.fight.potionCd, 1);
+	r = stepFight(r.fight, 1, r.playerHp, 2, noRng);
+	r = stepFight(r.fight, 1, r.playerHp, 2, noRng);
+	assert.equal(r.fight.potionCd, 0);
+});
+
+test('knockout when hp hits 0', () => {
+	const r = stepFight({ ...rat(), attackTimer: 1.5 }, 1, 3, 2, noRng);
+	assert.equal(r.fight.phase, 'knockedOut');
+	assert.equal(r.playerHp, 0);
+	assert.deepEqual(r.events.at(-1), { kind: 'knockedOut' });
+	const after = stepFight(r.fight, 1, 0, 2, noRng);
+	assert.deepEqual(after.events, []);
+});
+
+test('king times out after 60 s of steps and sets a taunt from the config', () => {
+	let fight = king();
+	let hp = 1000; // never knocked out in this test
+	let last = stepFight(fight, 1, hp, 2, noRng);
+	for (let i = 1; i < 61 && last.fight.phase === 'active'; i++) {
+		fight = last.fight;
+		hp = last.playerHp;
+		last = stepFight(fight, 1, hp, 2, noRng);
+	}
+	assert.equal(last.fight.phase, 'timeout');
+	assert.equal(last.fight.taunt, MONSTERS.ratKing.taunts[0]);
+	assert.deepEqual(last.events.at(-1), { kind: 'timeout' });
+});
+
+test('king: starter-kit damage over the 60 s limit stays below max HP', () => {
+	let fight = king();
+	let hp = maxHp(freshStats(), STARTER_EQUIPMENT);
+	const start = hp;
+	for (let i = 0; i < 70 && fight.phase === 'active'; i++) {
+		const r = stepFight(fight, 1, hp, armorOf(STARTER_EQUIPMENT), noRng);
+		fight = r.fight;
+		hp = r.playerHp;
+	}
+	assert.equal(fight.phase, 'timeout');
+	assert.ok(hp > 0 && hp < start);
+});
+
+test('regen stops at max and ignores bad input', () => {
+	assert.equal(regen(50, 101, 10), 60);
+	assert.equal(regen(100, 101, 5), 101);
+	assert.equal(regen(50, 101, -5), 50);
+	assert.equal(regen(50, 101, NaN), 50);
+});
+
+test('CLICK_LIMIT is the burst/sustain model the king invariant relies on', () => {
+	assert.equal(CLICK_LIMIT.capacity, 8);
+	assert.equal(CLICK_LIMIT.refillPerSec, 5);
+});
