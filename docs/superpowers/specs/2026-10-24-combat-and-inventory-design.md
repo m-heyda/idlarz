@@ -48,7 +48,7 @@ src/components/game/ItemSlot.tsx, ItemTooltip.tsx, Bag.tsx
 ```
 
 Store (`gameStore.ts`) gains thin actions that validate, call these modules and `set()`:
-`startFight(monsterId)`, `hitMonster(input: ClickInput)`, `leaveFight()`, `usePotion(bagIndex)`, `equipItem(bagIndex)`, `unequipItem(slot)`, `moveBagItem(from, to)`, plus the monster/regen/fight steps inside `tick()`.
+`startFight(monsterId)`, `hitMonster(input: ClickInput)`, `leaveFight()`, `drinkPotion(bagIndex)` (not `usePotion`: the react-hooks lint rule treats `use*` as a hook), `equipItem(bagIndex)`, `unequipItem(slot)`, `moveBagItem(from, to)`, plus the monster/regen/fight steps inside `tick()`.
 `tick()` order becomes: resources -> XP -> castle timer -> chests -> **monsters (spawn, age, evolve)** -> **fight step or regen** -> level/stat points -> one `set()`.
 
 ## 4. Data model and persistence
