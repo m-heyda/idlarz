@@ -114,6 +114,12 @@ export const EQUIPMENT_PIXEL_ICONS: Record<string, PixelIconName> = {
 	ring2: 'equip_ring',
 };
 
+// Monster type -> map / fight sprite (placeholders until the rat art exists)
+export const MONSTER_PIXEL_ICONS: Record<'rat' | 'ratKing', PixelIconName> = {
+	rat: 'animal_chicken',
+	ratKing: 'animal_pig',
+};
+
 // Farm animal id -> sprite
 export const ANIMAL_PIXEL_ICONS: Record<string, PixelIconName> = {
 	chicken: 'animal_chicken',

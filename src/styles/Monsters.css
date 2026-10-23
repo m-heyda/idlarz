@@ -1,0 +1,64 @@
+/* Monsters on the map: sit on their tile like the bonus chest, but red-glowing and clickable to start a fight */
+
+.tile-monster {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 11;
+	width: 40px;
+	height: 40px;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.tile-monster-img {
+	display: block;
+	image-rendering: pixelated;
+	filter: drop-shadow(0 0 3px #ff4a3a) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.5));
+	animation: monster-bob 0.9s steps(2) infinite alternate;
+}
+
+.tile-monster[data-king='true'] {
+	width: 48px;
+	height: 48px;
+}
+
+.tile-monster[data-king='true'] .tile-monster-img {
+	transform: scale(1.2);
+	filter: drop-shadow(0 0 4px #ffd860) drop-shadow(0 0 8px rgba(255, 190, 60, 0.9));
+}
+
+.tile-monster-tier {
+	position: absolute;
+	right: -4px;
+	bottom: -2px;
+	min-width: 16px;
+	height: 16px;
+	padding: 0 3px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.7rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff6e0;
+	background: #7a1a14;
+	border: 1px solid #1a0604;
+	box-shadow: inset 1px 1px 0 #c8483c, inset -1px -1px 0 #4a0e0a;
+}
+
+.tile-has-monster {
+	cursor: pointer;
+}
+
+@keyframes monster-bob {
+	to {
+		transform: translateY(-2px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.tile-monster-img {
+		animation: none;
+	}
+}

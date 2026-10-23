@@ -1,6 +1,11 @@
 import React, { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, MAX_CATCHUP_SEC } from '@/config/gameConfig';
+import { RATTATUI_SET } from '@/config/itemCatalog';
+import { addToBag } from '@/lib/inventory';
+import { maxHp } from '@/lib/combat';
+import { pickSpawnTile } from '@/lib/monsters';
+import type { MonsterType } from '@/types/game';
 
 const GameDebug: React.FC = () => {
 	const { playerName, setPlayerName, tiles, addResources, resources } =
@@ -89,6 +94,35 @@ const GameDebug: React.FC = () => {
 		}
 	};
 
+	const handleSpawnMonster = (type: MonsterType) => {
+		const state = useGameStore.getState();
+		if (type === 'ratKing' && state.monsters.some((m) => m.type === 'ratKing')) {
+			alert('There is already a Rat King on the map.');
+			return;
+		}
+		const spot = pickSpawnTile(state.tiles, state.monsters, Math.random);
+		if (!spot) {
+			alert('No free owned tile for a monster. Buy more tiles first!');
+			return;
+		}
+		useGameStore.setState({
+			monsters: [...state.monsters, { id: state.nextMonsterId, type, tier: 1, ...spot, ageSec: 0 }],
+			nextMonsterId: state.nextMonsterId + 1,
+		});
+	};
+
+	const handleGiveSet = () => {
+		useGameStore.setState((state) => {
+			let bag = state.bag;
+			for (const id of [...RATTATUI_SET.pieces, 'rattatui_ring']) bag = addToBag(bag, id, 1).bag;
+			return { bag: addToBag(bag, 'potion_minor', 5).bag };
+		});
+	};
+
+	const handleHeal = () => {
+		useGameStore.setState((state) => ({ playerHp: maxHp(state.characterStats, state.equipment) }));
+	};
+
 	// Dev only: expose the store on window for manual testing in the console (never in production builds)
 	useEffect(() => {
 		if (process.env.NODE_ENV === 'development') {
@@ -170,6 +204,26 @@ const GameDebug: React.FC = () => {
 					onClick={handleSpawnChest}
 					className='bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-md text-xs'>
 					Spawn Chest
+				</button>
+				<button
+					onClick={() => handleSpawnMonster('rat')}
+					className='bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded-md text-xs'>
+					Spawn Rat
+				</button>
+				<button
+					onClick={() => handleSpawnMonster('ratKing')}
+					className='bg-amber-700 hover:bg-amber-800 text-white px-2 py-1 rounded-md text-xs'>
+					Spawn Rat King
+				</button>
+				<button
+					onClick={handleGiveSet}
+					className='bg-emerald-700 hover:bg-emerald-800 text-white px-2 py-1 rounded-md text-xs'>
+					Give Rattatui set
+				</button>
+				<button
+					onClick={handleHeal}
+					className='bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded-md text-xs'>
+					Heal
 				</button>
 				<button
 					onClick={handleCastleUp}

@@ -31,9 +31,31 @@ import PixelIcon from './PixelIcon';
 import CastleSprite from './CastleSprite';
 import { BIOME_PIXEL_ICONS, BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
 import { TileStatus } from './TileStatus';
+import MonsterSprite from './MonsterSprite';
+import { monsterAt, monsterStats, tierSecondsLeft } from '@/lib/monsters';
+import { MONSTERS } from '@/config/combatConfig';
 import CastleUpgradeDialog from './CastleUpgradeDialog';
 import BuildingSelectionDialog from './BuildingSelectionDialog';
 import { useMapTipLayer } from './MapTipLayer';
+
+/** Hover card of a monster: tier, HP, time to the next tier and the call to fight. Reads the age at render time. */
+const MonsterTip: React.FC<{ id: number; type: 'rat' | 'ratKing'; tier: number }> = ({ id, type, tier }) => {
+	const monster = useGameStore.getState().monsters.find((m) => m.id === id);
+	const nextTier = monster ? tierSecondsLeft(monster) : null;
+	return (
+		<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs'>
+			<div className='px-tip-title'>
+				{MONSTERS[type].label}
+				{type === 'rat' ? ` - Tier ${tier}` : ''} - {monsterStats(type, tier).maxHp} HP
+			</div>
+			{nextTier !== null && (
+				<div className='px-tip-muted'>Grows stronger in {Math.max(1, Math.ceil(nextTier / 60))} min</div>
+			)}
+			{type === 'ratKing' && <div className='px-tip-muted'>Beat it within 60 seconds</div>}
+			<div className='text-[#f0d27a]'>Click to fight</div>
+		</div>
+	);
+};
 
 const Tile: React.FC<TileProps> = ({
 	biome,
@@ -60,6 +82,13 @@ const Tile: React.FC<TileProps> = ({
 	const upgradeGroundsTile = useGameStore((state) => state.upgradeGroundsTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
+	const startFight = useGameStore((state) => state.startFight);
+	// string selector: the tile re-renders when its monster appears, changes tier or leaves, not on every tick
+	const monsterKey = useGameStore((state) => {
+		const m = monsterAt(state.monsters, x, y);
+		return m ? `${m.id}:${m.type}:${m.tier}` : '';
+	});
+	const [monsterId, monsterType, monsterTier] = monsterKey ? monsterKey.split(':') : [];
 	const isBiomeSelectionActive = useGameStore(
 		(state) => state.biomeSelectionActive
 	);
@@ -121,6 +150,12 @@ const Tile: React.FC<TileProps> = ({
 		// First priority: If in biome selection mode, handle selection
 		if (isBiomeSelectionActive && pendingTileCoords) {
 			selectBiome(biome);
+			return;
+		}
+
+		// A monster on this tile: clicking it opens the fight (no tile tap, no chest)
+		if (isOwned && monsterKey) {
+			if (startFight(Number(monsterId))) audioManager.playSound('click');
 			return;
 		}
 
@@ -226,7 +261,8 @@ const Tile: React.FC<TileProps> = ({
 						'group hover:z-20': true,
 						'opacity-75 border-2 border-red-500': isShaking,
 						'cursor-pointer':
-							isOwned && (biome === 'castle' || biome === 'grounds' || hasChest),
+							isOwned && (biome === 'castle' || biome === 'grounds' || hasChest || !!monsterKey),
+						'tile-has-monster': isOwned && !!monsterKey,
 						'castle-tile': isOwned && biome === 'castle',
 						'castle-max-tile': isOwned && isGlowingCastle,
 						'border-2 border-amber-400': isOwned && hasChest,
@@ -307,6 +343,10 @@ const Tile: React.FC<TileProps> = ({
 						</span>
 					)}
 
+					{isOwned && monsterKey && (
+						<MonsterSprite type={monsterType as 'rat' | 'ratKing'} tier={Number(monsterTier)} />
+					)}
+
 					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && (
 						<span className='tile-chest-wrap'>
@@ -336,6 +376,9 @@ const Tile: React.FC<TileProps> = ({
 				(isOwned || isAdjacent) &&
 				createPortal(
 					<div className='absolute' style={{ left: x * TILE_SIZE, top: y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }}>
+						{isOwned && monsterKey && (
+							<MonsterTip id={Number(monsterId)} type={monsterType as 'rat' | 'ratKing'} tier={Number(monsterTier)} />
+						)}
 						{isOwned && hasChest && showChestTooltip && (
 							<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs text-[#f0d27a]'>
 								Click to collect bonus gold <ResourceIcon resource='gold' />
