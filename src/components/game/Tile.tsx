@@ -294,9 +294,9 @@ const Tile: React.FC<TileProps> = ({
 						</span>
 					)}
 
-					{/* Bonus cash bag on the tile */}
+					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && (
-						<PixelIcon name='cash_bag' alt='Bonus gold' className='tile-bag' />
+						<PixelIcon name='bonus_chest' alt='Bonus gold' className='tile-chest' />
 					)}
 
 					{/* Chest tooltip */}

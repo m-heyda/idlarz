@@ -1,4 +1,4 @@
-"""Map sprites: one icon per biome (32x32), the bonus cash bag (24x24) and the XP orb (40x40).
+"""Map sprites: one icon per biome (32x32), the bonus treasure chest (32x32) and the XP orb (40x40).
 Same ray-cast look as the rest of the set, just smaller canvases for the 48px map tiles."""
 import math
 from render3d import Scene, Prim, rot, vnoise, between, I3
@@ -128,23 +128,26 @@ def grounds():
     return sc.render()
 
 
-# ----------------------------------------------------------------- bonus cash bag (24x24)
-def cash_bag():
-    sc = _scene(8.6, (12, 20), size=24)
-    _P(sc, 'ell', (0, 0, 0.8), (0.95, 0.9, 0.82), 'pleather', I3, None, 1)                   # sack
-    _P(sc, 'ell', (0, 0, 1.45), (0.5, 0.5, 0.4), 'pleather', I3, None, 2)                    # neck
-    for k in range(5):                                                                        # ruffle
-        a = math.radians(k * 72 + 20)
-        _P(sc, 'ell', (0.42 * math.cos(a), 0.42 * math.sin(a), 1.85), (0.26, 0.26, 0.24), 'pleather',
-           rot(20 * math.sin(a), -20 * math.cos(a), 0), None, 3 + k)
-    _P(sc, 'cyl', (0, 0, 1.5), (0.58, 0.09), 'cloth')                                         # tie
-    f = sc.f
-    c = (-0.35, -0.35, 0.8)
-    sc.add(between('cyl', (c[0] + f[0] * 0.1, c[1] + f[1] * 0.1, c[2] + f[2] * 0.1 + 0.25),
-                   (c[0] - f[0] * 0.2, c[1] - f[1] * 0.2, c[2] - f[2] * 0.2 + 0.25), (0.5,), 'gold', None, (0, 0, 1)))
-    _P(sc, 'cyl', (0.2, 0.1, 2.1), (0.36, 0.08), 'gold', rot(25, 0, 20), coin_tex)           # coin peeking out
+# ----------------------------------------------------------------- bonus treasure chest (32x32)
+def bonus_chest():
+    sc = Scene(MATS, size=32, scale=8.0, origin=(16, 23), yaw=18.0, pitch=28.0)
+    _P(sc, 'box', (0, 0, 0.45), (1.2, 0.75, 0.45), 'leather', I3, None, 1)                    # body
+    _P(sc, 'cyl', (0, 0, 0.9), (0.75, 1.2), 'pleather', rot(0, 90, 0), None, 2)               # arched lid (axis along x)
+    for sx in (-0.8, 0.8):                                                                      # iron straps round body + lid
+        _P(sc, 'box', (sx, 0, 0.45), (0.1, 0.79, 0.47), 'steel', I3, None, 3)
+        _P(sc, 'cyl', (sx, 0, 0.9), (0.8, 0.1), 'steel', rot(0, 90, 0), None, 4)
+    _P(sc, 'box', (0, 0, 0.1), (1.24, 0.79, 0.1), 'steel', I3, None, 5)                        # base rim
+    for x in (-0.4, 0.4):                                                                       # plank seams
+        _P(sc, 'box', (x, -0.76, 0.45), (0.025, 0.02, 0.4), 'dark')
+    _P(sc, 'box', (0, -0.78, 0.82), (0.26, 0.06, 0.3), 'glow')                                   # lock plate
+    _P(sc, 'box', (0, -0.84, 0.78), (0.05, 0.03, 0.1), 'dark')                                   # keyhole
+    for sx in (-1.2, 1.2):                                                                       # gold corner studs
+        _P(sc, 'ell', (sx, -0.75, 0.12), (0.12, 0.12, 0.12), 'gold')
+    _P(sc, 'cyl', (-1.0, -1.2, 0.05), (0.32, 0.07), 'gold', rot(0, 0, 0), coin_tex)             # coins spilled in front
+    _P(sc, 'cyl', (-0.45, -1.45, 0.05), (0.28, 0.07), 'gold', rot(0, 0, 0), coin_tex)
+    _P(sc, 'cyl', (-0.85, -1.3, 0.16), (0.3, 0.07), 'gold', rot(18, 0, 10), coin_tex)
     img = sc.render()
-    fx.glint(img, 3, 3, 2)
+    fx.glint(img, 24, 6, 2)
     return img
 
 
@@ -183,5 +186,5 @@ SPRITES = {
     'unknown': unknown_mark,
     'biome_forest': forest, 'biome_plains': plains, 'biome_hills': hills, 'biome_swamp': swamp,
     'biome_tundra': tundra, 'biome_lake': lake, 'biome_coast': coast, 'biome_grounds': grounds,
-    'cash_bag': cash_bag, 'xp': xp_orb,
+    'bonus_chest': bonus_chest, 'xp': xp_orb,
 }

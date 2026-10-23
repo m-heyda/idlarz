@@ -7,7 +7,7 @@ interface LevelOrbProps {
 	level?: number | string;
 	/** Integer multiple of the 24px sprite */
 	scale?: number;
-	/** Pins the green notify dot to the orb (e.g. unassigned stat points) */
+	/** Pins the notify dot to the orb (e.g. unassigned stat points) */
 	notify?: boolean;
 	notifyLabel?: string;
 	className?: string;
@@ -25,7 +25,7 @@ const LevelOrb: React.FC<LevelOrbProps> = ({ level, scale = 1, notify, notifyLab
 		role='img'
 		aria-label={level === undefined ? 'Level' : `Level ${level}`}>
 		{level !== undefined && <span className='level-orb-num'>{level}</span>}
-		<NotifyDot show={notify} label={notifyLabel} />
+		<NotifyDot show={!!notify} label={notifyLabel} />
 	</span>
 );
 

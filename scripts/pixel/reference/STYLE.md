@@ -70,17 +70,18 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
     floating "?" mark that glows on hover. Calm on purpose so the "?" stays the focus.
   - *Fog of war*: chunky low-res clouds (48px/64px art shown at 3x, 3 flat alpha bands, no outlines, no dither), two layers
     drifting opposite ways and breathing.
-  - *Pickups*: bonus gold is a bobbing cash bag (24px, gold glow). Castle level and grounds level use pixel plaques/stars.
+  - *Pickups*: bonus gold is a bobbing treasure chest (`bonus_chest`, 32px, gold glow). Castle level and grounds level use pixel plaques/stars.
 - **Castle** (`castle_1`-`castle_6`, `sprites_castle.py`): seen from above (ray-cast at pitch 78), every level a full 48px tile on a
   paved plinth, growing with each upgrade - crenellated keep with timber roof, keep + round watchtower, keep + two towers and a
   gate wall, walled courtyard with four crowned corner towers, fortress with tall watchtowers / central tower / gold trim, and the
   **max-level grand castle**: gold roofs, gilded bands, glowing windows, crystal spire. Max level is a 4-frame sheet
   (`castle_6_anim`, flags wave, crystal pulses) with a pulsing golden glow, a golden aura on the tile and sparkles rising.
   The upgrade dialog previews current -> next castle. Reference: `castle-levels.png`.
-- **Buildings** (`building_*`, `sprites_buildings.py`, 40px): thatched farm cottage with crops + haystack, mine with a timbered
-  tunnel and coal cart, lumber mill with a saw blade and log pile, striped-awning market stall, stone forge with glowing fire
-  + anvil + chimney smoke, gear workshop with a floating XP orb. The same sprite is the picker icon and the tile graphic. A
-  converted grounds tile switches to a packed-earth cobble ground (`ground_yard`) and carries the shining star.
+- **Buildings** (`building_*`, `sprites_buildings.py`, 48px, top-down like the castle so each fills its tile): thatched farm
+  cottage with crop rows + haystack, mine with a timbered shaft, rails and coal cart, lumber mill with a flat saw bench and log
+  pile, striped-awning market stall with fruit crates, stone forge with glowing coals + anvil + chimney smoke, gear workshop with a
+  big cog and a floating XP orb. The same sprite is the picker icon and the tile graphic. A converted grounds tile switches to a
+  packed-earth cobble ground (`ground_yard`) and carries the shining star.
 - **Loading screen** (`LoadingScreen.tsx`): a rotating rune circle drawn as smooth SVG and pixelated by an SVG block filter
   (`feFlood` + `feTile` + `feMorphology` = a 6px grid, applied inside the SVG so the pixels re-form every frame), the castle
   growing through its six levels (`castle_loading` strip, stepped), drifting fog, rising sparks, an emerald block sweeping

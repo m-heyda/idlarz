@@ -17,7 +17,7 @@ export const PIXEL_ICON_SIZES = {
 	menu_farm: [40, 40],
 	level_orb: [24, 24],
 	xp: [40, 40],
-	cash_bag: [24, 24],
+	bonus_chest: [32, 32],
 	unknown: [12, 16],
 	// portraits: full figure per hero class, head-and-shoulders bust for the header, the merchant
 	hero_warrior: [56, 80],
@@ -54,13 +54,13 @@ export const PIXEL_ICON_SIZES = {
 	biome_lake: [32, 32],
 	biome_coast: [32, 32],
 	biome_grounds: [32, 32],
-	// grounds buildings (picker icon + tile graphic)
-	building_farm: [40, 40],
-	building_mine: [40, 40],
-	building_lumbermill: [40, 40],
-	building_market: [40, 40],
-	building_blacksmith: [40, 40],
-	building_workshop: [40, 40],
+	// grounds buildings, seen from above: picker icon + full-tile graphic
+	building_farm: [48, 48],
+	building_mine: [48, 48],
+	building_lumbermill: [48, 48],
+	building_market: [48, 48],
+	building_blacksmith: [48, 48],
+	building_workshop: [48, 48],
 	// farm animals
 	animal_chicken: [40, 40],
 	animal_pig: [40, 40],

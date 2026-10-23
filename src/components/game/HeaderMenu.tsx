@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber } from '@/utils/formatters';
-import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
+import { ANIMALS, BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
+import { calculateAnimalCost } from '@/utils/gameUtils';
 import PixelIcon from './PixelIcon';
 import LevelOrb from './LevelOrb';
+import NotifyDot from './NotifyDot';
 import CharacterPortrait from './CharacterPortrait';
 import EditableName from './EditableName';
 
@@ -23,7 +25,13 @@ const HeaderMenu: React.FC = () => {
 		showFarmWindow,
 		toggleFarmWindow,
 		characterStats,
+		farmLevels,
 	} = useGameStore((state) => state);
+
+	// Something on the farm is affordable: a new animal or an upgrade
+	const farmAffordable = ANIMALS.some(
+		(animal) => resources.food >= calculateAnimalCost(animal, farmLevels[animal.id] || 0)
+	);
 
 	const [levelUpActive, setLevelUpActive] = useState(false);
 
@@ -69,6 +77,8 @@ const HeaderMenu: React.FC = () => {
 			title: 'Farm',
 			active: showFarmWindow,
 			onClick: toggleFarmWindow,
+			notify: farmAffordable,
+			notifyLabel: 'An animal or upgrade is affordable',
 		},
 	] as const;
 
@@ -116,6 +126,7 @@ const HeaderMenu: React.FC = () => {
 					title={button.title}
 					onClick={button.onClick}>
 					<PixelIcon name={button.icon} alt={button.title} />
+					<NotifyDot show={'notify' in button && button.notify} label={'notifyLabel' in button ? button.notifyLabel : undefined} />
 				</div>
 			))}
 		</div>

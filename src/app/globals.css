@@ -1296,18 +1296,18 @@ body {
 	}
 }
 
-/* --- Bonus cash bag --- */
-.tile-bag {
+/* --- Bonus treasure chest --- */
+.tile-chest {
 	position: absolute;
 	right: 1px;
 	bottom: 1px;
 	z-index: 10;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 0 4px rgba(255, 200, 60, 0.85));
-	animation: bag-bob 1.2s steps(2) infinite alternate;
+	animation: chest-bob 1.2s steps(2) infinite alternate;
 }
 
-@keyframes bag-bob {
+@keyframes chest-bob {
 	to {
 		transform: translateY(-2px);
 	}
@@ -1319,7 +1319,7 @@ body {
 	.tile-unknown,
 	.tile-unknown::before,
 	.unknown-mark,
-	.tile-bag {
+	.tile-chest {
 		animation: none;
 	}
 }
@@ -1420,60 +1420,36 @@ body {
 	}
 }
 
-/* --- Notify dot: universal green "needs attention" marker, pinned to the top-right of a positioned parent --- */
+/* --- Notify dot: universal, understated "needs attention" marker, pinned to the top-right of a positioned parent --- */
 .notify-dot {
 	position: absolute;
-	top: -3px;
-	right: -3px;
+	top: -2px;
+	right: -2px;
 	z-index: 8;
-	width: 10px;
-	height: 10px;
+	width: 8px;
+	height: 8px;
 	border-radius: 50%;
 	pointer-events: none;
-	background: radial-gradient(circle at 35% 30%, #d8ffd0 0 1.5px, #5eea6a 2.5px, #1fa23a 100%);
-	box-shadow: 0 0 0 2px #0a1a0c, 0 0 6px 1px rgba(80, 255, 110, 0.7);
-	animation: notify-pulse 1.4s ease-in-out infinite;
-}
-
-.notify-dot::after {
-	content: '';
-	position: absolute;
-	inset: -2px;
-	border-radius: 50%;
-	border: 2px solid rgba(94, 234, 106, 0.8);
-	animation: notify-ring 1.4s ease-out infinite;
+	background: radial-gradient(circle at 35% 30%, #ffe2b0 0 1px, #ff9a2e 2px, #c9600e 100%);
+	box-shadow: 0 0 0 1.5px #1c0e04, 0 0 4px rgba(255, 150, 50, 0.5);
+	animation: notify-pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes notify-pulse {
 	50% {
-		transform: scale(1.12);
+		transform: scale(0.82);
+		opacity: 0.8;
 	}
 }
 
-@keyframes notify-ring {
-	from {
-		transform: scale(1);
-		opacity: 0.9;
-	}
-	to {
-		transform: scale(2.2);
-		opacity: 0;
-	}
+/* sits inside the corner of a header slot frame */
+.pixel-slot .notify-dot {
+	top: 4px;
+	right: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.notify-dot,
-	.notify-dot::after {
+	.notify-dot {
 		animation: none;
 	}
-}
-
-/* Map zoom scales the whole tile layer; tooltips counter-scale so text stays one readable size */
-.map-tip {
-	scale: calc(1 / var(--map-zoom, 1));
-	transform-origin: top center;
-}
-
-.map-tip-up {
-	transform-origin: bottom center;
 }
