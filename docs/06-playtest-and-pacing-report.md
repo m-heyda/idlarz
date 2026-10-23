@@ -41,19 +41,35 @@ From [generated/sim-milestones.md](generated/sim-milestones.md) (game time until
 
 | milestone | idle | casual (1 click/s, 3 h/day) | hardcore (4 clicks/s, 8 h/day) | autoclicker (20 clicks/s, 24 h/day) |
 | --- | --- | --- | --- | --- |
-| 16 tiles | 3.7 h | 3.7 h | 3.7 h | 0.8 h |
-| castle 2 | 20 h | 20 h | 19 h | 20 h |
-| castle 3 | 2.8 d | 3.0 d | 2.2 d | 1.8 d |
-| castle 4 | 7.2 d | 6.5 d | 5.0 d | 3.8 d |
-| castle 5 | 16.5 d | 15.1 d | 12.3 d | 9.9 d |
-| 40 tiles | 34.5 d | 31.2 d | 14.7 d | 10.3 d |
-| **finished** (castle 6 + best click + 40 tiles) | **35.8 d** | **32.8 d** | **28.3 d** | **26.8 d** |
+| 16 tiles | 3.7 h | 3.7 h | 3.7 h | 0.7 h |
+| castle 2 | 20 h | 20 h | 19 h | 16 h |
+| castle 3 | 2.8 d | 3.1 d | 2.5 d | 1.7 d |
+| castle 4 | 7.2 d | 6.3 d | 5.0 d | 3.9 d |
+| castle 5 | 16.5 d | 15.3 d | 11.9 d | 10.6 d |
+| 40 tiles | 34.5 d | 31.8 d | 13.5 d | 9.8 d |
+| **finished** (castle 6 + best click + 40 tiles) | **35.8 d** | **33.2 d** | **27.4 d** | **28.6 d** |
 
-For comparison the old parameters give 25.4 / 22.9 / 13.3 / **2.2** days for the same four bots. The auto-clicker went from 2.2 days to 26.8 days (≈ hardcore), while a dedicated human is ≈ 21 % faster than someone who never clicks. The autoclicker's early lead (16 tiles in 0.8 h) comes from the full long-run bucket at the start and from playing from midnight; the hardcore profile does not start until 07:00.
+For comparison the old parameters give 25.4 / 22.9 / 13.3 / **2.2** days for the same four bots. The auto-clicker went from 2.2 days to 28.6 days (≈ hardcore), while a dedicated human is ≈ 23 % faster than someone who never clicks. With 3 seeds (random biomes, critters, chests) the hardcore finish ranges 23.9–29.6 d (median 27.4) and the auto-clicker 24.2–28.6 d (median 27.2), so differences below about 10 % are noise. The autoclicker's early lead (16 tiles in 0.8 h) comes from the full long-run bucket at the start and from playing from midnight; the hardcore profile does not start until 07:00.
 
-## 4. Caveats and what is not decided
+## 4. Endgame results (castle 7–10 and Rebirth)
 
-- The bots are one plausible strategy (castle-first, top up missing resources with gold, sell surplus). They do not play critters, tile taps or the class picker. Numbers are good for *comparing changes*, not as absolute truth ([04 B7](04-unfinished-and-known-issues.md)).
-- 4 weeks is the active-player target chosen for this pass; idle ≈ 5 weeks. The gap between active and idle is modest by design of the castle timers (5 d 5 h of mandatory waiting).
+Castle 7–10 take 3 d, 4 d, 5 d and 7 d to build (24 d 5 h in total with levels 2–6) and cost about 1.6× the previous step. Time until the milestone, game time, from the same sim:
+
+| milestone | idle | casual | hardcore | autoclicker |
+| --- | --- | --- | --- | --- |
+| castle 6 | 35.8 d | 33.2 d | 27.4 d | 28.6 d |
+| castle 7 | 51.0 d | 47.3 d | 39.8 d | 37.9 d |
+| castle 8 | 68.4 d | 63.4 d | 54.6 d | 50.0 d |
+| castle 9 | 88.8 d | 82.7 d | 71.0 d | 64.3 d |
+| castle 10 | 115.3 d | 106.7 d | 92.3 d | 82.5 d |
+
+Over 3 seeds the hardcore castle 10 is 82.8–92.3 d (median 90.9); the auto-clicker is about 10 % faster later because it plays 24 h a day and the late castle costs are mostly waiting plus the larger gold income. Target for the dedicated player was 70–100 d.
+
+**Rebirth** (hardcore bot that rebirths at castle 6, 40+ tiles, and spends all points greedily): first run 27.4 d → 9 points, then castle 6 again after **20.2 d** (74 % of the first run), 15.7 d (run 3), 12.3 d (run 4). A bot that plays all the way to castle 10 first gets 51 points and reaches castle 6 in **8.8 d** on the second run (tiles 40 in 3.5 d). So rebirth is worth it early for about a quarter off the next run, and a late rebirth is a big boost but only after about three months. The shop is the soft cap: after the points are spent the only gain per extra point is the +5 % income.
+
+## 5. Caveats and what is not decided
+
+- The bots are one plausible strategy (castle-first, top up missing resources with gold, sell surplus). They tap tiles (about one click in eight), catch about half of the golden map critters and some farm critters, and buy Legacy upgrades, but they do not use the class picker. Numbers are good for *comparing changes*, not as absolute truth ([04 B7](04-unfinished-and-known-issues.md)).
+- 4 weeks is the active-player target chosen for this pass; idle ≈ 5 weeks. The gap between active and idle is modest by design of the castle timers (5 d 5 h of mandatory waiting to castle 6).
 - Remaining balance questions (levels/stat points, chest relevance, merchant depth, endgame) are in [05 §1](05-balance-backlog-and-roadmap.md).
 - The old browser playtest numbers (tile purchase times, stockpiles) were measured on the pre-rebalance game and are kept only as the motivation above.

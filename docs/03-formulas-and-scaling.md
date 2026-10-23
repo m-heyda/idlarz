@@ -45,11 +45,11 @@ base[r]  = BASE_GENERATION_RATES[r]                                 gold 0.1, xp
          + 0.5 × (C − 1)   (r = xp only; CASTLE_UPGRADE.xpBonus)
          + Σ animals (r = meat only)
 
-modifiers[r] = 0.2 × 2^(C − 1)                    castle, all resources
+modifiers[r] = castleModifier(C)                    castle, all resources (§4)
              + stat modifiers                       2.5 % per point, see 02 §11 (XP: +0.2 %/INT, +0.25 %/CHA)
              + 0.05 × plainsTiles                   (r = meat only)
 
-total[r] = base[r] × (1 + modifiers[r])
+total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × legacyPointsEarned)     (second factor only after a Rebirth, §9)
 ```
 
 The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Everything is additive inside the single `(1 + Σ)`.
@@ -59,9 +59,10 @@ The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Ev
 ## 4. Castle
 
 ```
-modifier(C)        = 0.2 × 2^(C−1)        → +20 %, +40 %, +80 %, +160 %, +320 %, +640 %
+castleModifier(C)  = 0.2 × 2^(C−1)   for C ≤ 6  → +20 %, +40 %, +80 %, +160 %, +320 %, +640 %
+                   = 6.4 + 3.2 × (C−6)  for C > 6  → +960 %, +1280 %, +1600 %, +1920 %      (lateLevelStep)
 xp/s (flat)        = 0.5 × (C − 1)
-upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[C−1] (tick-counted)
+upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[C−1] × (1 − 0.05 × MasterBuilders) (tick-counted)
 ```
 
 | Upgrade | Build time | gold | wood | stone | coal | food | meat |
@@ -71,6 +72,12 @@ upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[
 | 3→4 | 12 h | 5 M | 500 K | 500 K | 250 K | 1 M | 200 K |
 | 4→5 | 1 d 12 h | 20 M | 2 M | 2 M | 1 M | 10 M | 500 K |
 | 5→6 | 3 d | 100 M | 10 M | 10 M | 5 M | 50 M | 2.5 M |
+| 6→7 | 3 d | 150 M | 15 M | 15 M | 8 M | 80 M | 4 M |
+| 7→8 | 4 d | 240 M | 24 M | 24 M | 13 M | 128 M | 6.4 M |
+| 8→9 | 5 d | 384 M | 38 M | 38 M | 20 M | 205 M | 10 M |
+| 9→10 | 7 d | 614 M | 61 M | 61 M | 33 M | 328 M | 16 M |
+
+Build time to level 6 is 5 d 5 h, to level 10 24 d 5 h (before Legacy discounts). Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
 
 ## 5. Farm animals
 
@@ -98,7 +105,8 @@ click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s, ≤ 5 waiting
 building cost = floor({500 gold, 250 wood, 150 stone} × 1.6^(buildings already built))
-critter gift = max(min, ~10 s of that resource's income)  (×2 golden)
+critter gift = max(min, N s of that resource's income)  (×2 golden); N = 10 on the farm, 5 on the map (AMBIENT_LIFE.giftSeconds)
+             cooldown: farm 8 s, map 20 s, both gated by the click limiter, amount computed in the store
 ```
 
 Click limiter: burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
@@ -110,3 +118,24 @@ Click limiter: burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refi
 ## 8. What the pacing looks like
 
 From `npm run sim` (bot players, real store; see [06](06-playtest-and-pacing-report.md)): castle 2 ≈ 19 h, castle 3 ≈ 2–3 d, castle 4 ≈ 5–7 d, castle 5 ≈ 12–16 d, castle 6 ≈ 27–36 d, with the dedicated human about 20 % faster than a player who never clicks, and a 20-clicks/s auto-clicker no better than a dedicated human.
+
+## 9. Rebirth and Legacy
+
+```
+available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 20 (REBIRTH.minTiles), no castle upgrade running
+points      = floor(4.5 × (C − 5) × sqrt(n / 10))                     REBIRTH.gain
+income      × (1 + 0.05 × legacyEarned)                                folded into the modifiers, spending never lowers it
+shop cost   = ceil(base × 1.4^level)        base: thrift 2, builders 3, mastery 2, provisions 2; max level 10
+thrift      : tile and building cost × (1 − 0.02 × level), summed with the Charisma discount, capped at 45 %
+builders    : castle build time × (1 − 0.05 × level)
+mastery     : click power × (1 + 0.10 × level)
+provisions  : start each run with level × (1500 gold, 400 wood, 400 stone)
+```
+
+| castle | 20 tiles | 40 tiles | 60 tiles |
+| --- | --- | --- | --- |
+| 6 | 6 | 9 | 11 |
+| 8 | 19 | 27 | 33 |
+| 10 | 31 | 45 | 55 |
+
+Conservation rule used by the save check: `legacyPoints + Σ shop spending = legacyEarned`, and `rebirths = 0` implies `legacyEarned = 0` ([07 §3](07-security-and-exploits.md)). More tables in [generated/balance-tables.md](generated/balance-tables.md).
