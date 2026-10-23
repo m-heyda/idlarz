@@ -290,6 +290,10 @@ export interface GameState {
 	setPlayerClass: (playerClass: PlayerClassId) => void;
 	addResources: (resourceToAdd: Partial<Resources>) => void;
 	collectChest: (x: number, y: number) => boolean;
+	startFight: (monsterId: number) => boolean;
+	hitMonster: (input: ClickInput) => { damage: number; killed: boolean } | null;
+	leaveFight: () => void;
+	drinkPotion: (bagIndex: number) => boolean;
 	equipItem: (bagIndex: number) => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;
