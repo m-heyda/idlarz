@@ -19,7 +19,6 @@ import {
 	TILE_RESOURCE_COST,
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
-	ADJACENCY_BONUS,
 } from '@/config/gameConfig';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatNumber, formatTime } from '@/utils/formatters';
@@ -69,7 +68,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Tiles &amp; Biomes</h3>
 				<p className='text-[#d8c8a0] mb-2'>
 					Every tile you buy becomes a biome and produces resources per second. Same-biome neighbours boost each
-					other by +{pct(ADJACENCY_BONUS)} per neighbour (up to four). Every 4th purchase (when you own 3, 7, 11 ...
+					other by +{pct(SCALING_CONFIG.adjacencyBonus)} per neighbour (up to four). Every 4th purchase (when you own 3, 7, 11 ...
 					tiles) lets you choose the biome instead of rolling one.
 				</p>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-2'>

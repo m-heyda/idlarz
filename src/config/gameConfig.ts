@@ -21,19 +21,20 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
 	charisma: 5,
 	// Points to spent
 	availablePoints: 0,
-	// Combat stats - calculated from base stats
-	physicalAtk: 5, // Base + Strength (5)
-	magicAtk: 5, // Base + Intelligence (5)
-	hp: 15.25, // Base + (Vitality * 3) + (Charisma * 0.25) = 0 + 15 + 0.25
-	mp: 10, // Base + (Intelligence * 2) = 0 + 10
-	def: 8.75, // Base + Dexterity + (Strength * 0.5) + (Vitality * 0.5) + (Charisma * 0.25) = 0 + 5 + 2.5 + 2.5 + 1.25
-	magicDef: 8.25, // Base + Intelligence + (Vitality * 0.5) + (Charisma * 0.25) = 0 + 5 + 2.5 + 1.25
-	luck: 5, // Base + Charisma (5)
-	critChance: 3.75, // Base + (Dexterity * 0.25) + (Charisma * 0.5) = 0 + 1.25 + 2.5
-	critDmgMultiplier: 103, // Base 100% + Strength + (Dexterity * 0.5) + (Charisma * 0.5) = 100 + 5 + 2.5 + 2.5
-	atkSpeedIncrease: 1.25, // Base + (Dexterity * 0.25) = 0 + 1.25
-	xpGainMultiplier: 2.25, // Base + (Intelligence * 0.2) + (Charisma * 0.25) = 0 + 1 + 1.25
-	tileCostDiscount: Math.min(5 * 0.005, 0.25) * 100, // +0.5% per charisma point, capped at 25%
+	// Derived stats (HP, attack, crit, XP gain, tile discount ...) start at 0 here and are always filled in by
+	// calculateCombatStats() (createInitialData, addStatPoint, sanitizeSave), so there is one formula only.
+	physicalAtk: 0,
+	magicAtk: 0,
+	hp: 0,
+	mp: 0,
+	def: 0,
+	magicDef: 0,
+	luck: 0,
+	critChance: 0,
+	critDmgMultiplier: 0,
+	atkSpeedIncrease: 0,
+	xpGainMultiplier: 0,
+	tileCostDiscount: 0,
 	reputation: 1000, // Base reputation value
 };
 
@@ -44,12 +45,10 @@ export const GRID_CENTER_X = Math.floor(GRID_SIZE / 2);
 export const GRID_CENTER_Y = Math.floor(GRID_HEIGHT / 2);
 
 export const TILE_SIZE = 48; // Balanced for visibility
-export const VIEWPORT_SIZE = 25; // currently unused
 
 // Game Constants
 export const TICK_RATE = 100; // 10 times per second
 export const BASE_TILE_COST = 55; // Base cost for first tile purchase
-export const ADJACENCY_BONUS = 0.25; // 25% bonus for adjacent same biomes
 
 // XP calculation constants - Exponential XP system
 export const BASE_XP_PER_TILE = 125;
@@ -92,7 +91,7 @@ export const SCALING_CONFIG = {
 					Math.max(ownedTiles - SCALING_CONFIG.lateTiles, 0)
 				)
 		),
-	adjacencyBonus: ADJACENCY_BONUS,
+	adjacencyBonus: 0.25, // +25% output per same-biome neighbour
 };
 
 // Which biome a random purchase turns up. Everything weighs 1 unless listed; water clusters and gets a shore:

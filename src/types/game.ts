@@ -50,7 +50,6 @@ export interface BiomeInfo {
 	resourceIcons: string[];
 	unique?: boolean;
 	upgradeable?: boolean;
-	maxLevel?: number;
 	description?: string;
 }
 
@@ -157,7 +156,6 @@ export interface GameState {
 	tiles: Tile[][];
 	resources: Resources;
 	resourceRates: ResourceRates;
-	resourceModifiers: Resources;
 	level: {
 		level: number;
 		progress: number;

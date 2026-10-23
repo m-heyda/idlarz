@@ -11,12 +11,10 @@ import {
 	MERCHANT_RESOURCE_PRICES,
 } from '@/config/gameConfig';
 import { cn } from '@/lib/utils';
+import type { MerchantTab } from '@/types/game';
 import PixelModal from '../../PixelModal';
 import PixelIcon from '../../PixelIcon';
 import ResourceIcon from '../../ResourceIcon';
-
-// Merchant tab options
-type MerchantTab = 'exchange' | 'buy' | 'upgrade' | 'quests' | 'gambling';
 
 // Extracted component for tab content placeholders
 interface PlaceholderTabContentProps {

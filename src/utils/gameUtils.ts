@@ -162,11 +162,6 @@ export const calculateLevel = (
 	return { level, progress };
 };
 
-// Selector to check if name needs to be set
-export const isDefaultPlayerName = (name: string): boolean => {
-	return name === 'Explorer';
-};
-
 export const countAdjacentSameBiomes = (
 	tiles: GameState['tiles'],
 	x: number,
@@ -196,27 +191,6 @@ export const countAdjacentSameBiomes = (
 	}, 0);
 };
 
-// Validate grid state to ensure it matches our expectations
-export const validateGrid = (grid: unknown): grid is Tile[][] => {
-	if (!Array.isArray(grid) || grid.length !== GRID_HEIGHT) return false;
-
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		if (!Array.isArray(grid[y]) || grid[y].length !== GRID_SIZE) return false;
-		for (let x = 0; x < GRID_SIZE; x++) {
-			const tile = grid[y][x];
-			if (!tile || typeof tile !== 'object') return false;
-			if (typeof tile.isOwned !== 'boolean') return false;
-			if (!Object.keys(BIOMES).includes(tile.biome)) return false;
-		}
-	}
-
-	// Ensure castle exists at center
-	const centerTile = grid[GRID_CENTER_Y][GRID_CENTER_X];
-	if (!centerTile.isOwned || centerTile.biome !== 'castle') return false;
-
-	return true;
-};
-
 export const createInitialGrid = (): Tile[][] => {
 	const grid = Array(GRID_HEIGHT)
 		.fill(null)
@@ -241,18 +215,6 @@ export const createInitialGrid = (): Tile[][] => {
 };
 
 // Resource Management
-export const canAffordCost = (
-	resources: Resources,
-	cost: number | Resources
-): boolean => {
-	if (typeof cost === 'number') {
-		return resources.gold >= cost;
-	}
-	return Object.entries(cost).every(
-		([resource, amount]) => resources[resource as keyof Resources] >= amount
-	);
-};
-
 // Calculate stat-based resource modifiers
 export const calculateStatResourceModifiers = (
 	stats: CharacterStats

@@ -90,7 +90,6 @@ export const createInitialData = () => {
 		tiles: grid,
 		resources: { ...INITIAL_RESOURCES },
 		resourceRates: rates,
-		resourceModifiers: rates.modifiers,
 		level: calculateLevel(0),
 		previousLevel: 0,
 		playerName: DEFAULT_PLAYER_NAME,
@@ -159,7 +158,6 @@ const createGameSlice = (
 			tiles: newTiles,
 			resources,
 			resourceRates: newRates,
-			resourceModifiers: newRates.modifiers,
 			characterStats: {
 				...state.characterStats,
 				reputation: state.characterStats.reputation + 100,
@@ -201,7 +199,6 @@ const createGameSlice = (
 				farmLevels: newFarmLevels,
 				resources: { ...state.resources, food: state.resources.food - cost },
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 			});
 			return true;
 		},
@@ -233,7 +230,6 @@ const createGameSlice = (
 			set({
 				characterStats: newStats,
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 			});
 		},
 
@@ -345,7 +341,6 @@ const createGameSlice = (
 				tiles: updatedTiles,
 				resources: subtractBundle(state.resources, cost),
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 			});
 			return true;
 		},
@@ -513,7 +508,6 @@ const createGameSlice = (
 			set({
 				resources: newResources,
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 				level: { level, progress },
 				previousLevel: state.level.level,
 				characterStats: newCharacterStats,
@@ -645,7 +639,6 @@ export const useGameStore = create(
 				...current,
 				...saved,
 				resourceRates: rates,
-				resourceModifiers: rates.modifiers,
 				isHydrated: true,
 			};
 		},
