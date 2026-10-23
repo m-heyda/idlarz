@@ -3,7 +3,7 @@
 	position: absolute;
 	width: 0;
 	height: 0;
-	z-index: 15; /* above ordinary tiles, below a hovered tile (z-20) and with it its tooltip */
+	z-index: 22; /* above a hovered tile (z-20), so tile hover never hides a critter */
 	pointer-events: none;
 	animation: amb-life var(--life) linear both;
 }
@@ -68,24 +68,15 @@
 	}
 }
 
-/* the one that carries a gift: golden glow and a roomier hit area. It is rendered twice: the 'art' layer is the
-   picture (under tooltips like every critter), the 'hit' layer is an invisible twin on top that takes the click,
-   because a hovered tile (z-20) would otherwise swallow it. */
+/* the one that carries a gift: golden glow, a roomier hit area, clickable */
+.amb-critter[data-gift='true'] {
+	z-index: 25; /* clickable: must stay above the hovered tile or it would swallow the click */
+}
+
 .amb-critter[data-gift='true'] .amb-move {
-	padding: 12px;
-}
-
-.amb-critter[data-layer='hit'] {
-	z-index: 25;
-}
-
-.amb-critter[data-layer='hit'] .amb-move {
 	pointer-events: auto;
 	cursor: pointer;
-}
-
-.amb-critter[data-layer='hit'] .amb-sprite {
-	visibility: hidden;
+	padding: 12px;
 }
 
 .amb-critter[data-gift='true'] .amb-sprite {

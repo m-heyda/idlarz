@@ -51,13 +51,10 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 		<>
 			{critters.map((c) => {
 				const sheet = CRITTER_SHEETS[c.type];
-				// A golden critter is drawn twice: the picture sits under the tile tooltips like every critter, and an
-				// invisible twin on top takes the click (a hovered tile would otherwise swallow it).
-				return (c.golden ? ['art', 'hit'] : ['art']).map((layer) => (
+				return (
 					<div
-						key={`${c.id}-${layer}`}
+						key={c.id}
 						className='amb-critter'
-						data-layer={layer}
 						data-gift={c.golden}
 						data-type={c.type}
 						style={
@@ -72,10 +69,10 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 						}>
 						<div
 							className='amb-move'
-							role={layer === 'hit' ? 'button' : undefined}
-							aria-label={layer === 'hit' ? 'Golden critter - click for a gift' : undefined}
+							role={c.golden ? 'button' : undefined}
+							aria-label={c.golden ? 'Golden critter - click for a gift' : undefined}
 							onClick={(e) => {
-								if (layer !== 'hit' || !c.golden || !e.isTrusted) return;
+								if (!c.golden || !e.isTrusted) return;
 								const gift = claimCritterGift(
 									{ source: 'map', type: c.type, golden: true },
 									{ eventId: e.nativeEvent.timeStamp, now: performance.now(), trusted: e.nativeEvent.isTrusted }
@@ -101,7 +98,7 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 							/>
 						</div>
 					</div>
-				));
+				);
 			})}
 		</>
 	);
