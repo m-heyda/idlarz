@@ -1,3 +1,4 @@
+import type { PixelIconName } from '@/config/pixelIcons';
 import type { Equipment, EquipmentRarity, EquipmentSlot, ItemDef, ItemStats } from '@/types/game';
 
 // Every item in the game. Saves store item ids only (see sanitizeSave), so stats here are the single source of truth.
@@ -27,11 +28,15 @@ const rattatui = (
 	stats: ItemStats,
 	description: string
 ): ItemDef =>
-	gear(`rattatui_${suffix}`, `Rattatui ${name}`, slot, rarity, stats, { set: 'rattatui', description });
+	gear(`rattatui_${suffix}`, `Rattatui ${name}`, slot, rarity, stats, {
+		set: 'rattatui',
+		description,
+		icon: `item_rattatui_${suffix}` as PixelIconName,
+	});
 
 const ITEMS: ItemDef[] = [
-	gear('wooden_sword', 'Wooden Sword', 'mainHand', 'common', { damage: 2 }, { description: 'A simple training sword.' }),
-	gear('wooden_shield', 'Wooden Shield', 'offHand', 'common', { armor: 2 }, { description: 'Simple defensive gear.' }),
+	gear('wooden_sword', 'Wooden Sword', 'mainHand', 'common', { damage: 2 }, { description: 'A simple training sword.', icon: 'item_wooden_sword' }),
+	gear('wooden_shield', 'Wooden Shield', 'offHand', 'common', { armor: 2 }, { description: 'Simple defensive gear.', icon: 'item_wooden_shield' }),
 	{
 		id: 'potion_minor',
 		name: 'Minor Healing Potion',
@@ -39,6 +44,7 @@ const ITEMS: ItemDef[] = [
 		consumable: { healHp: 35 },
 		stackMax: 20,
 		sellValue: 20,
+		icon: 'item_potion_hp',
 		description: 'Restores 35 health. Can be drunk in the middle of a fight.',
 	},
 	rattatui('cap', 'Cap', 'head', 'uncommon', { armor: 3, maxHp: 4 }, 'Stitched from the fur of a very brave rat.'),

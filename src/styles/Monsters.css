@@ -15,16 +15,15 @@
 	display: block;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 0 3px #ff4a3a) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.5));
-	animation: monster-bob 0.9s steps(2) infinite alternate;
+	animation: monster-frames var(--frame-ms) steps(1) infinite, monster-bob 0.9s steps(2) infinite alternate;
 }
 
 .tile-monster[data-king='true'] {
-	width: 48px;
-	height: 48px;
+	width: 56px;
+	height: 56px;
 }
 
 .tile-monster[data-king='true'] .tile-monster-img {
-	transform: scale(1.2);
 	filter: drop-shadow(0 0 4px #ffd860) drop-shadow(0 0 8px rgba(255, 190, 60, 0.9));
 }
 
@@ -53,12 +52,31 @@
 
 @keyframes monster-bob {
 	to {
-		transform: translateY(-2px);
+		translate: 0 -2px;
+	}
+}
+
+/* the 2-frame idle sheet (shared by the map sprite and the fight modal) */
+.monster-art {
+	display: block;
+	flex-shrink: 0;
+	background-repeat: no-repeat;
+	image-rendering: pixelated;
+	animation: monster-frames var(--frame-ms) steps(1) infinite;
+}
+
+@keyframes monster-frames {
+	0% {
+		background-position-x: 0;
+	}
+	50% {
+		background-position-x: calc(var(--sheet-w) / -2);
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.tile-monster-img {
+	.tile-monster-img,
+	.monster-art {
 		animation: none;
 	}
 }

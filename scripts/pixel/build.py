@@ -31,6 +31,7 @@ import sprites_equipment  # noqa: E402
 import sprites_farm  # noqa: E402
 import sprites_map  # noqa: E402
 import sprites_menu  # noqa: E402
+import sprites_monsters  # noqa: E402
 import sprites_meadow  # noqa: E402
 import sprites_props  # noqa: E402
 import sprites_resources  # noqa: E402
@@ -50,6 +51,8 @@ SPRITES = {
     'equip_chest': sprites_equipment.chest, 'equip_mainHand': sprites_equipment.mainhand,
     'equip_offHand': sprites_equipment.offhand, 'equip_legs': sprites_equipment.legs,
     'equip_feet': sprites_equipment.feet, 'equip_ring': sprites_equipment.ring,
+    'equip_shoulder': sprites_equipment.shoulder, 'equip_hands': sprites_equipment.hands,
+    'equip_cape': sprites_equipment.cape, 'equip_charm': sprites_equipment.charm,
     **sprites_characters.SPRITES,
     **sprites_animals.SPRITES,
     **sprites_farm.SPRITES,
@@ -58,6 +61,7 @@ SPRITES = {
     **sprites_castle.SPRITES,
     **sprites_buildings.SPRITES,
     **sprites_menu.SPRITES,
+    **sprites_monsters.SPRITES,
 }
 
 UI = {

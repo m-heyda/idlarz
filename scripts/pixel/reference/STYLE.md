@@ -55,6 +55,15 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
 - **Equipment slots**: `equip_head/neck/chest/mainHand/offHand/legs/feet/ring` - kettle hat, amulet, cuirass, sword,
   round shield, greaves, boots, ring. Empty = dim grayscale silhouette, filled = glowing slot frame.
 - **Animals**: `animal_chicken/pig/cow/deer`.
+- **Monsters** (`sprites_monsters.py`): `monster_rat` (2-frame idle sheet, 2 x 40x40) and `monster_ratking` (2 x 56x56, crowned, red cape,
+  fur collar). Same 3/4 view as the farm animals, head to the lower-left; grey-brown fur ramp (`rat_fur`), pink ears/paws/tail (`rat_pink`),
+  cream buck teeth, one glowing red eye. Shown through `MonsterArt` (CSS sheet animation, 520 ms per frame) on the map tile (red glow, tier badge)
+  and in the fight modal (3-5x).
+- **Slots and items**: four more empty-slot silhouettes (`equip_shoulder/hands/cape/charm`: pauldrons, gauntlet, cloak with clasp, bead on a cord).
+  Item icons are `item_*` 40px sprites: `item_potion_hp` (red flask, cork), the wooden starter kit (`item_wooden_sword/shield`) and the 12
+  **Rattatui** set icons (`item_rattatui_<piece>`), which are the slot icons re-skinned through `_skin()` in `sprites_monsters.py`
+  (steel -> `rat_fur`, gold -> `rat_tan`, cloth -> `rat_pink`, leather -> `rat_fur_dk`, shield face -> `cheese`; the fang blade is bone).
+  New materials: `rat_fur`, `rat_fur_dk`, `rat_pink`, `rat_tan`, `cheese`, `glass`.
 - **Character HUD** (`LevelDetails.tsx`): 144x112 stone alcove scene shown at 2x - the hero (class sprite, idle bob, double-click = class picker) standing on the floor under a name plate (double-click = rename),
   two flickering torches (3-frame strip), HP/MP flasks flanking him, stony XP bar along the floor with a flowing emerald
   fill and 10% ticks, level on the purple orb. Flask scale is an integer (`--s`).

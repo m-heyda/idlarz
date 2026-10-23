@@ -2,12 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { COMBAT, MONSTERS } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
-import { MONSTER_PIXEL_ICONS } from '@/config/pixelIcons';
 import { maxHp } from '@/lib/combat';
 import { COMBAT_EVENT, type CombatFx } from '@/lib/combatFx';
 import audioManager from '@/utils/audioManager';
 import PixelModal from '../PixelModal';
-import PixelIcon from '../PixelIcon';
+import MonsterArt from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
 import ResourceIcon from '../ResourceIcon';
 import '@/styles/Fight.css';
@@ -137,7 +136,6 @@ const FightView: React.FC = () => {
 	return (
 		<PixelModal
 			title={title}
-			icon={<PixelIcon name={MONSTER_PIXEL_ICONS[fight.type]} alt='' scale={1} />}
 			size='md'
 			closeOnBackdrop={!active}
 			onClose={leaveFight}>
@@ -159,7 +157,7 @@ const FightView: React.FC = () => {
 						onClick={hit}
 						aria-label={`Hit the ${def.label}`}>
 						<span key={hitTick} className='fight-sprite' data-hit={hitTick > 0}>
-							<PixelIcon name={MONSTER_PIXEL_ICONS[fight.type]} alt='' scale={fight.type === 'ratKing' ? 4 : 3} />
+							<MonsterArt type={fight.type} scale={fight.type === 'ratKing' ? 4 : 5} />
 						</span>
 						{bursts.map((b) => (
 							<span key={b.id} className='fight-burst' aria-hidden>
