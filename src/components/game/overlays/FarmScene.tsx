@@ -4,7 +4,7 @@ import { ANIMALS } from '@/config/gameConfig';
 import { ANIMAL_PIXEL_ICONS } from '@/config/pixelIcons';
 import { calculateAnimalCost } from '@/utils/gameUtils';
 import { formatNumber } from '@/utils/formatters';
-import { Animal } from '@/types/game';
+import { Animal, ClickInput } from '@/types/game';
 import PixelIcon from '../PixelIcon';
 import LevelOrb from '../LevelOrb';
 import ResourceIcon from '../ResourceIcon';
@@ -65,7 +65,7 @@ interface FarmSceneProps {
 	/** animal id that was just bought / upgraded (plays a little burst) */
 	celebrate: string | null;
 	/** a bonus critter was clicked (cursor position for the popup) */
-	onCatchCritter: (critter: Critter, x: number, y: number) => void;
+	onCatchCritter: (critter: Critter, x: number, y: number, input: ClickInput) => void;
 }
 
 /**

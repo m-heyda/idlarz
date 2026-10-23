@@ -27,7 +27,7 @@ The order follows leverage and risk — remove the exploit-like multipliers firs
 | 1 | **Click limiter** (burst 8, 5/s, long-run ≈1.5/s) + only trusted clicks on the **map** + click power 50–180 % of gold/s (was ×2–×16) | the single biggest lever (1); autoclickers can no longer beat a dedicated human, fast humans are never limited |
 | 2 | **Meat 15 → 1 gold**, animals **stack** (each purchase adds one animal) | removes the gold fountain (2) and makes later animal purchases matter |
 | 3 | **Castle**: costs ×10, **timed builds** (1 h … 72 h, tick-counted), castle XP bonus implemented | the finish line can no longer be bought in one go (3); timers survive clock edits |
-| 4 | **Tiles**: cost curve ×1.45/tile to 20 then ×1.27 (was ×1.42 everywhere, tile 40 = 95 M → 10.8 M), **extra wood/stone/coal/food from larger territories**, biome yield ×1.3 | tiles stay a meaningful long-term sink and finally give wood/stone/coal/food a use (4, 5) |
+| 4 | **Tiles**: cost curve ×1.45/tile to 20, ×1.27 to 40, ×1.17 after (was ×1.42 everywhere, tile 40 = 95 M → 10.8 M), **extra wood/stone/coal/food from larger territories**, biome yield ×1.3 | tiles stay a meaningful long-term sink and finally give wood/stone/coal/food a use (4, 5) |
 | 5 | **Buildings cost resources** (×1.6 each), Blacksmith 0.1 → 0.07 | a choice instead of a free pick |
 | 6 | **Chest timer pauses at the cap**, reward 10–60 min, +0.5 %/Luck; **farm critters** 45 s → ~10 s gifts, 20–40 s apart, one at a time, real clicks only | removes two easy bonuses (6) |
 | 7 | **T1**: the hidden +10 % gold / +25 % XP modifier removed (modifiers start at 0); castle output has a single source of truth | honest numbers; part of the intended slowdown |
@@ -37,23 +37,44 @@ Tuning method: `npm run sim` (bots on the real store) — first reproduce the ol
 
 ## 3. Result (sim, new parameters)
 
-From [generated/sim-milestones.md](generated/sim-milestones.md) (game time until the milestone is first reached):
+From [generated/sim-milestones.md](generated/sim-milestones.md) (median of 3 seeds; game time until the milestone is first reached):
 
 | milestone | idle | casual (1 click/s, 3 h/day) | hardcore (4 clicks/s, 8 h/day) | autoclicker (20 clicks/s, 24 h/day) |
 | --- | --- | --- | --- | --- |
-| 16 tiles | 3.7 h | 3.7 h | 3.7 h | 0.8 h |
-| castle 2 | 20 h | 20 h | 19 h | 20 h |
-| castle 3 | 2.8 d | 3.0 d | 2.2 d | 1.8 d |
-| castle 4 | 7.2 d | 6.5 d | 5.0 d | 3.8 d |
-| castle 5 | 16.5 d | 15.1 d | 12.3 d | 9.9 d |
-| 40 tiles | 34.5 d | 31.2 d | 14.7 d | 10.3 d |
-| **finished** (castle 6 + best click + 40 tiles) | **35.8 d** | **32.8 d** | **28.3 d** | **26.8 d** |
+| 16 tiles | 4.6 h | 4.6 h | 4.6 h | 0.8 h |
+| castle 2 | 21 h | 20 h | 17 h | 13 h |
+| castle 3 | 2.6 d | 2.3 d | 2.2 d | 1.7 d |
+| castle 4 | 7.6 d | 6.5 d | 4.9 d | 3.8 d |
+| castle 5 | 18.2 d | 16.3 d | 13.2 d | 10.2 d |
+| 40 tiles | 22.4 d | 19.9 d | 13.8 d | 9.2 d |
+| **finished** (castle 6 + best click + 40 tiles) | **39.5 d** | **35.7 d** | **31.8 d** (27.1–44.5) | **24.2 d** (23.0–34.8) |
 
-For comparison the old parameters give 25.4 / 22.9 / 13.3 / **2.2** days for the same four bots. The auto-clicker went from 2.2 days to 26.8 days (≈ hardcore), while a dedicated human is ≈ 21 % faster than someone who never clicks. The autoclicker's early lead (16 tiles in 0.8 h) comes from the full long-run bucket at the start and from playing from midnight; the hardcore profile does not start until 07:00.
+For comparison the old parameters give 25.4 / 22.9 / 13.3 / **2.2** days for the same four bots, so the auto-clicker went from 2.2 days to about 3.5 weeks and a dedicated human is about 20 % faster than someone who never clicks.
 
-## 4. Caveats and what is not decided
+Two things to know when reading the numbers:
 
-- The bots are one plausible strategy (castle-first, top up missing resources with gold, sell surplus). They do not play critters, tile taps or the class picker. Numbers are good for *comparing changes*, not as absolute truth ([04 B7](04-unfinished-and-known-issues.md)).
-- 4 weeks is the active-player target chosen for this pass; idle ≈ 5 weeks. The gap between active and idle is modest by design of the castle timers (5 d 5 h of mandatory waiting).
+- **Biome luck now dominates the spread.** The Coast biome and water clustering (merged from the biome work) make some seeds end up with a lot of lake and coast and little wood/stone, so a single seed can be 40 % slower (hardcore range 27–45 d). That is why the table uses 3 seeds and shows ranges; differences below ~15 % are noise.
+- **The auto-clicker is faster than the hardcore bot (24 d vs 32 d)**, which is more than the ~1.06× the limiter alone gave before the biome change (28.6 d vs 27.4 d on the same seed). The long-run click allowance is the same for both; what the 24 h bot adds is perfect attention (it buys tiles, tops up and starts the castle the moment it can, around the clock). That is the "player who never sleeps" case rather than a click exploit, and it is listed in [05](05-balance-backlog-and-roadmap.md) (BL1 / BL11) for the next balance pass.
+
+## 4. Endgame results (castle 7–10 and Rebirth)
+
+Castle 7–10 take 3 d, 4 d, 5 d and 7 d to build (24 d 5 h in total with levels 2–6) and cost about 1.6× the previous step. Median of 3 seeds, game time:
+
+| milestone | idle | casual | hardcore | autoclicker |
+| --- | --- | --- | --- | --- |
+| castle 6 | 39.5 d | 35.7 d | 31.8 d | 24.2 d |
+| castle 7 | 56.4 d | 51.7 d | 45.8 d | 35.5 d |
+| castle 8 | 75.0 d | 69.0 d | 60.8 d | 48.3 d |
+| castle 9 | 96.0 d | 88.8 d | 77.9 d | 62.4 d |
+| castle 10 | 123.6 d | 114.0 d | 99.9 d (86.0–117.2) | 82.7 d (78.1–88.7) |
+
+Target for the dedicated player was 70–100 d for castle 10.
+
+**Rebirth** (hardcore bot that rebirths at castle 6 with 40+ tiles and spends all points greedily): first run 31.8 d → 9 points, then castle 6 again after **21.4 d** (67 % of the first run, 20.1–29.5 across seeds), 15.9 d (run 3), 12.2 d (run 4). A bot that plays all the way to castle 10 first earns 55 points and reaches castle 6 in **9.3 d** on the second run. So an early rebirth is worth about a third off the next run, and a late rebirth is a big boost but only after about three months. The shop is the soft cap: once the points are spent the only gain per extra point is the +5 % income.
+
+## 5. Caveats and what is not decided
+
+- The bots are one plausible strategy (castle-first, top up missing resources with gold, sell surplus). They tap tiles (about one click in eight), catch about half of the golden map critters and some farm critters, and buy Legacy upgrades, but they do not use the class picker. Numbers are good for *comparing changes*, not as absolute truth ([04 B7](04-unfinished-and-known-issues.md)).
+- 4 weeks was the active-player target chosen for this pass; after the Coast/water-clustering change the dedicated bot's median is 4.5 weeks (idle ≈ 5.5). Re-tune with the sim before moving the numbers again. The gap between active and idle is modest by design of the castle timers (5 d 5 h of mandatory waiting to castle 6).
 - Remaining balance questions (levels/stat points, chest relevance, merchant depth, endgame) are in [05 §1](05-balance-backlog-and-roadmap.md).
 - The old browser playtest numbers (tile purchase times, stockpiles) were measured on the pre-rebalance game and are kept only as the motivation above.

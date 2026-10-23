@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FARM_BONUS, FarmCritterType } from '@/config/gameConfig';
+import type { ClickInput } from '@/types/game';
 import { PixelIconName } from '@/config/pixelIcons';
 import { PEN } from './farmGeometry';
 import PixelIcon from '../PixelIcon';
@@ -122,7 +123,7 @@ export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>)
 
 interface MeadowCritterProps {
 	critter: Critter;
-	onCatch: (critter: Critter, x: number, y: number) => void;
+	onCatch: (critter: Critter, x: number, y: number, input: ClickInput) => void;
 	onExpire: (id: number) => void;
 }
 
@@ -162,7 +163,11 @@ export const MeadowCritter: React.FC<MeadowCritterProps> = ({ critter, onCatch, 
 					// Gifts are for real clicks only (a script cannot farm the meadow)
 					if (caught.current || !e.isTrusted) return;
 					caught.current = true;
-					onCatch(critter, e.clientX, e.clientY);
+					onCatch(critter, e.clientX, e.clientY, {
+						eventId: e.nativeEvent.timeStamp,
+						now: performance.now(),
+						trusted: e.nativeEvent.isTrusted,
+					});
 					onExpire(critter.id);
 				}}>
 				<span className='mc-gift'>

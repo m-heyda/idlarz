@@ -5,6 +5,7 @@ import { useGameStore } from '@/stores/gameStore';
 import {
 	calculateTileCost,
 	canAffordBundle,
+	effectiveTileDiscount,
 	countOwnedTiles,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
@@ -31,12 +32,14 @@ export const TileStatus = memo(
 		const tiles = useGameStore((state) => state.tiles);
 		const resources = useGameStore((state) => state.resources);
 		const characterStats = useGameStore((state) => state.characterStats);
+		const prestige = useGameStore((state) => state.prestige);
+		const discount = effectiveTileDiscount(characterStats, prestige);
 
 		const { cost, tilesUntilManualSelection, canManuallySelect } = useMemo(() => {
 			const ownedTilesCount = countOwnedTiles(tiles);
 			const discountedCost = calculateTileCost(
 				ownedTilesCount,
-				characterStats.tileCostDiscount
+				discount
 			);
 			const tilesUntilManualSelection = (3 - (ownedTilesCount % 4)) % 4;
 			const canManuallySelect = tilesUntilManualSelection === 0;
@@ -46,7 +49,7 @@ export const TileStatus = memo(
 				tilesUntilManualSelection,
 				canManuallySelect,
 			};
-		}, [tiles, characterStats.tileCostDiscount]);
+		}, [tiles, discount]);
 
 		if (isOwned) {
 			const biomeInfo = BIOMES[biome];
@@ -66,9 +69,9 @@ export const TileStatus = memo(
 					<div className='flex flex-wrap items-center gap-1 mb-2'>
 						<span className={canAfford ? 'text-green-400' : 'text-red-400'}>Cost:</span>
 						<CostList cost={tileCostAsResources(cost)} />
-						{characterStats.tileCostDiscount > 0 && (
+						{discount > 0 && (
 							<span className='text-amber-400 text-xs ml-1'>
-								(-{characterStats.tileCostDiscount.toFixed(2)}%)
+								(-{discount.toFixed(2)}%)
 							</span>
 						)}
 					</div>

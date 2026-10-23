@@ -24,6 +24,8 @@ const main = async () => {
 	const names = args.filter((a) => !a.startsWith('--'));
 	// --set Path.to.value=1.5   (tuning experiments without touching the config files)
 	const overrides = args.filter((a) => a.startsWith('--set=')).map((a) => a.slice(6));
+	const maxDays = args.find((a) => a.startsWith('--maxdays='));
+	if (maxDays) MAX_DAYS = Number(maxDays.slice(10));
 
 	const cfg = await import('../src/config/gameConfig');
 	const utils = await import('../src/utils/gameUtils');
@@ -39,28 +41,44 @@ const main = async () => {
 	const PROFILES: Record<string, Profile> = {
 		idle: { cps: 0, windows: [] },
 		casual: { cps: 1, windows: [[19, 22]] },
-		hardcore: {
-			cps: 4,
-			windows: [
-				[7, 9],
-				[12, 13],
-				[18, 23],
-			],
-		},
+		hardcore: { cps: 4, windows: HARDCORE_WINDOWS },
 		autoclicker: { cps: 20, windows: [[0, 24]] },
+		// the dedicated player who rebirths as early as possible / after pushing the castle to the end
+		'hardcore-rebirth6': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 3 },
+		'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
 	};
 	const selected = names.length ? names : Object.keys(PROFILES);
 
+	const seedsArg = args.find((a) => a.startsWith('--seeds='));
+	const seeds = seedsArg ? Math.max(1, Number(seedsArg.slice(8))) : 1;
+
 	const results: Record<string, Milestones> = {};
+	const spreads: Record<string, Record<string, [number, number]>> = {};
 	for (const name of selected) {
 		const profile = PROFILES[name];
 		if (!profile) throw new Error(`unknown profile ${name}`);
 		const started = Date.now();
-		results[name] = runProfile(name, profile, { cfg, utils, store: useGameStore }, legacy);
-		console.error(`${name}: done in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+		const runs: Milestones[] = [];
+		for (let seed = 0; seed < seeds; seed++) {
+			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore }, legacy, seed));
+		}
+		// median per milestone, plus the min-max over seeds
+		results[name] = {};
+		spreads[name] = {};
+		const keys = new Set(runs.flatMap((r) => Object.keys(r)));
+		keys.forEach((key) => {
+			const values = runs.map((r) => r[key]).filter((v): v is number => v != null).sort((a, b) => a - b);
+			if (values.length < Math.ceil(runs.length / 2)) {
+				results[name][key] = null;
+				return;
+			}
+			results[name][key] = values[Math.floor((values.length - 1) / 2)];
+			spreads[name][key] = [values[0], values[values.length - 1]];
+		});
+		console.error(`${name}: done in ${((Date.now() - started) / 1000).toFixed(1)}s (${seeds} seed${seeds > 1 ? 's' : ''})`);
 	}
 
-	const md = renderMarkdown(results, legacy);
+	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
 	console.log(md);
 	if (!legacy) {
 		const target = resolve(
@@ -78,6 +96,8 @@ const main = async () => {
 interface Profile {
 	cps: number; // intended clicks per second while active
 	windows: [number, number][]; // hours of the day the player is actively playing
+	rebirthAtCastle?: number; // rebirth as soon as the castle reaches this level (and keep playing the next run)
+	rebirths?: number; // how many rebirths to simulate (default 1 when rebirthAtCastle is set)
 }
 
 type Milestones = Record<string, number | null>; // key -> game day (fractional), null if never
@@ -88,7 +108,14 @@ interface Ctx {
 	store: typeof import('../src/stores/gameStore').useGameStore;
 }
 
-const MAX_DAYS = 200;
+const HARDCORE_WINDOWS: [number, number][] = [
+	[7, 9],
+	[12, 13],
+	[18, 23],
+];
+let MAX_DAYS = 300;
+const FINE_STEP_DAYS = 45; // 20 s steps for the first weeks, coarser afterwards (keeps long runs fast)
+const FIRST_FINISH_CASTLE = 6; // the first finish line (castle 6 + best click + 40 tiles) is unchanged by castle levels 7-10
 
 const mulberry32 = (seed: number) => () => {
 	seed = (seed + 0x6d2b79f5) | 0;
@@ -97,22 +124,31 @@ const mulberry32 = (seed: number) => () => {
 	return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): Milestones {
+function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, seed = 0): Milestones {
 	const { cfg, utils, store } = ctx;
 	const realRandom = Math.random;
-	Math.random = mulberry32(12345);
+	Math.random = mulberry32(12345 + seed * 7919);
 
 	const api = () => store.getState();
 	api().resetGame();
 
 	const milestones: Milestones = {};
+	let run = 1; // 1 = first run; after a rebirth keys get an `rN.` prefix and are relative to the rebirth
+	let runStart = 0;
 	const mark = (key: string, t: number) => {
-		if (milestones[key] == null) milestones[key] = t / 86400;
+		const k = run === 1 ? key : `r${run}.${key}`;
+		if (milestones[k] == null) milestones[k] = (t - runStart) / 86400;
 	};
 	const TILE_MARKS = [10, 16, 20, 25, 30, 35, 40, 50];
 
 	let t = 0; // game seconds
 	let eventId = 0;
+	let giftClock = 0;
+	let ownedTiles: [number, number][] = [];
+	const refreshOwned = () => {
+		ownedTiles = [];
+		api().tiles.forEach((row, y) => row.forEach((tile, x) => tile.isOwned && ownedTiles.push([x, y])));
+	};
 	let frontier: [number, number] | null = null;
 	let frontierDirty = true;
 	let buildingCursor = 0;
@@ -180,6 +216,14 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			s = api();
 		}
 
+		// Legacy shop: spend points as they come, Master Builders first
+		for (let guard = 0; guard < 50; guard++) {
+			const order: ('builders' | 'thrift' | 'mastery' | 'provisions')[] = ['builders', 'thrift', 'mastery', 'provisions'];
+			const target = order.find((id) => (s.prestige.upgrades[id] ?? 0) <= (s.prestige.upgrades.builders ?? 0));
+			if (!target || !api().buyLegacyUpgrade(target)) break;
+			s = api();
+		}
+
 		// Stat points -> Charisma / Intelligence
 		while (s.characterStats.availablePoints > 0) {
 			api().addStatPoint(
@@ -224,7 +268,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			for (let x = 0; x < cfg.GRID_SIZE; x++) {
 				const tile = s.tiles[y][x];
 				if (tile.isOwned && tile.biome === 'grounds' && !tile.building) {
-					const bc = utils.calculateBuildingCost(s.tiles);
+					const bc = utils.calculateBuildingCost(s.tiles, s.prestige);
 					if (utils.canAffordBundle(s.resources, bc) && s.resources.gold > (bc.gold ?? 0) * 3) {
 						if (api().upgradeGroundsTile(x, y, BUILD_ORDER[buildingCursor % BUILD_ORDER.length])) {
 							buildingCursor++;
@@ -243,7 +287,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			}
 			if (!frontier) break;
 			const owned = utils.countOwnedTiles(s.tiles);
-			const cost = utils.calculateTileCost(owned, s.characterStats.tileCostDiscount);
+			const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige));
 			const bundle = utils.tileCostAsResources(cost);
 			if (!utils.canAffordBundle(s.resources, bundle)) {
 				if (!topUp(bundle)) break;
@@ -280,7 +324,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 		const need: Record<string, number> = { ...((castle.upgradeCost ?? {}) as Record<string, number>) };
 		const owned = utils.countOwnedTiles(s.tiles);
 		for (let k = 0; k < 3; k++) {
-			const c = utils.calculateTileCost(owned + k, s.characterStats.tileCostDiscount);
+			const c = utils.calculateTileCost(owned + k, utils.effectiveTileDiscount(s.characterStats, s.prestige));
 			Object.entries(c.resources).forEach(([r, v]) => {
 				need[r] = Math.max(need[r] ?? 0, (v ?? 0) * 1.1);
 			});
@@ -301,7 +345,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 		const s = api();
 		const castle = s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level ?? 1;
 		return (
-			castle >= cfg.CASTLE_UPGRADE.maxLevel &&
+			castle >= FIRST_FINISH_CASTLE &&
 			s.clickLevel >= cfg.CLICK_LADDER.length - 1 &&
 			utils.countOwnedTiles(s.tiles) >= 40
 		);
@@ -319,26 +363,67 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			);
 		}
 		const active = isActive(t);
-		const step = active ? 20 : 120;
+		const step = active ? (t < FINE_STEP_DAYS * 86400 ? 20 : 60) : 120;
+
+		// Bonus critters: a golden map critter now and then (about half are caught), farm-window critters rarely
+		if (active) {
+			giftClock += step;
+			if (giftClock >= 90) {
+				giftClock = 0;
+				if (Math.random() < 0.5) {
+					const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
+					api().claimCritterGift({ source: 'map', type, golden: true }, { eventId: ++eventId, now: t * 1000, trusted: true });
+				}
+			}
+			if (Math.random() < (step / 30) * 0.1 * 0.7) {
+				const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
+				api().claimCritterGift({ source: 'farm', type, golden: Math.random() < 0.12 }, { eventId: ++eventId, now: t * 1000, trusted: true });
+			}
+		}
 
 		// Clicks during the step (each one is a separate physical click for the limiter)
 		if (active && profile.cps > 0) {
-			const n = Math.floor(profile.cps * step);
+			// Attempts above what the limiter could ever pay are skipped (they would all be denied anyway)
+			const n = Math.min(Math.floor(profile.cps * step), Math.ceil(cfg.CLICK_LIMIT.refillPerSec * 1.2 * step));
 			const gap = (step * 1000) / Math.max(n, 1);
+			if (ownedTiles.length === 0 || frontierDirty) refreshOwned();
 			for (let i = 0; i < n; i++) {
-				api().clickForGold({ eventId: ++eventId, now: t * 1000 + i * gap, trusted: true });
+				const input = { eventId: ++eventId, now: t * 1000 + i * gap, trusted: true };
+				api().clickForGold(input);
+				// about one click in eight lands on an owned tile and taps it too (same click, same token)
+				if (i % 8 === 0 && ownedTiles.length) {
+					const [tx, ty] = ownedTiles[Math.floor(Math.random() * ownedTiles.length)];
+					api().tapTile(tx, ty, input);
+				}
 			}
 		}
 		api().tick(step * 1000);
 		t += step;
 
-		if (t - lastDecision >= (active ? 20 : 120)) {
+		if (t - lastDecision >= step) {
 			lastDecision = t;
 			decide(active);
 			const lvl = api().level.level;
 			[10, 20, 30].forEach((n) => lvl >= n && mark(`level${n}`, t));
-			if (finished()) {
-				mark('finished', t);
+			if (finished()) mark('finished', t);
+			const castleNow = api().tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level ?? 1;
+			const totalRebirths = profile.rebirthAtCastle ? profile.rebirths ?? 1 : 0;
+			if (profile.rebirthAtCastle && run <= totalRebirths && castleNow >= profile.rebirthAtCastle && !api().castleUpgrade) {
+				mark('rebirth', t);
+				const before = api().prestige.legacyEarned;
+				if (api().rebirth()) {
+					milestones[`legacy${run}`] = api().prestige.legacyEarned - before;
+					run++;
+					runStart = t;
+					frontierDirty = true;
+					picks = 0;
+					buildingCursor = 0;
+				}
+			}
+			if (totalRebirths > 0) {
+				if (run > totalRebirths && milestones[`r${run}.finished`] != null) break;
+			} else if (castleNow >= cfg.CASTLE_UPGRADE.maxLevel) {
+				mark(`castle${cfg.CASTLE_UPGRADE.maxLevel}`, t);
 				break;
 			}
 		}
@@ -371,13 +456,21 @@ const ORDER = [
 	'tiles40',
 	'tiles50',
 	'castle6',
+	'castle7',
+	'castle8',
+	'castle9',
+	'castle10',
 	'level10',
 	'level20',
 	'level30',
 	'finished',
 ];
 
-function renderMarkdown(results: Record<string, Milestones>, legacy: boolean): string {
+function renderMarkdown(
+	results: Record<string, Milestones>,
+	legacy: boolean,
+	spreads?: Record<string, Record<string, [number, number]>>
+): string {
 	const names = Object.keys(results);
 	const fmt = (d: number | null | undefined) =>
 		d == null ? '—' : d < 1 ? `${(d * 24).toFixed(1)} h` : `${d.toFixed(1)} d`;
@@ -386,13 +479,29 @@ function renderMarkdown(results: Record<string, Milestones>, legacy: boolean): s
 	lines.push('');
 	lines.push(
 		'> Generated by `npm run sim` (scripts/sim.ts): the real game store driven by a bot with a seeded RNG. ' +
-			'Time to first reach each milestone, in game time. "finished" = castle 6 + max click power + 40 tiles.'
+			'Time to first reach each milestone, in game time. "finished" = castle 6 + max click power + 40 tiles; the run continues to the last castle level.'
 	);
 	lines.push('');
 	lines.push(`| milestone | ${names.join(' | ')} |`);
 	lines.push(`| --- | ${names.map(() => '---').join(' | ')} |`);
-	ORDER.forEach((key) => {
-		lines.push(`| ${key} | ${names.map((n) => fmt(results[n][key])).join(' | ')} |`);
+	// after a rebirth only the headline milestones of each further run are listed
+	const extraKeys = Array.from(
+		new Set(
+			names.flatMap((n) =>
+				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(legacy[0-9]+|rebirth|r[0-9]+[.](castle6|tiles40|finished))$/.test(k))
+			)
+		)
+	).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
+	[...ORDER, ...extraKeys].forEach((key) => {
+		if (!names.some((n) => results[n][key] != null) && !ORDER.includes(key)) return;
+		const isCount = key.startsWith('legacy');
+		const cell = (n: string) => {
+			if (isCount) return String(results[n][key] ?? '—');
+			const spread = spreads?.[n]?.[key];
+			const base = fmt(results[n][key]);
+			return spread && results[n][key] != null ? `${base} (${fmt(spread[0])} - ${fmt(spread[1])})` : base;
+		};
+		lines.push(`| ${key} | ${names.map(cell).join(' | ')} |`);
 	});
 	lines.push('');
 	lines.push(

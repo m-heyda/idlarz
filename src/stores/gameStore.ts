@@ -9,8 +9,10 @@ import {
 	ANIMALS,
 	BIOMES,
 	BUILDINGS,
+	AMBIENT_LIFE,
 	CASTLE_UPGRADE,
 	CHEST,
+	FARM_BONUS,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
 	EMPTY_BIOMES,
@@ -18,13 +20,15 @@ import {
 	GRID_SIZE,
 	INITIAL_CHARACTER_STATS,
 	INITIAL_INVENTORY_ITEMS,
-	INITIAL_RESOURCES,
+	LEGACY_UPGRADES,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
+	REBIRTH,
 	RESOURCE_CAP,
 	SPECIAL_SINGLE_TYPE_BIOMES,
 	TILE_TAP,
+	type LegacyUpgradeId,
 } from '@/config/gameConfig';
 import {
 	calculateAnimalCost,
@@ -39,7 +43,13 @@ import {
 	castleUpgradeDuration,
 	countOwnedTiles,
 	createInitialGrid,
+	EMPTY_PRESTIGE,
+	effectiveTileDiscount,
 	getRandomBiome,
+	legacyEffect,
+	legacyGain,
+	legacyUpgradeCost,
+	startingResources,
 	subtractBundle,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
@@ -50,7 +60,10 @@ import type {
 	BiomeType,
 	CharacterStats,
 	ClickInput,
+	CritterGift,
 	GameState,
+	GiftResult,
+	PrestigeState,
 	Resources,
 	TapResult,
 	Tile,
@@ -58,6 +71,9 @@ import type {
 
 // Last tap time per tile (not persisted) - enforces TILE_TAP.cooldownMs
 const lastTapAt: Record<string, number> = {};
+
+// Last accepted critter gift per source (not persisted) - enforces the gift cooldowns
+const lastGiftAt: Record<string, number> = {};
 
 // Shared by the gold click and the tile tap: one token per physical click
 const clickLimiter = createClickLimiter();
@@ -81,16 +97,15 @@ const neighbours = (x: number, y: number) => [
 ];
 
 /** All game data of a brand-new game (no actions). */
-export const createInitialData = () => {
+export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
 	const grid = createInitialGrid();
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
-	const rates = calculateResourceRates(grid, stats, {});
+	const rates = calculateResourceRates(grid, stats, {}, prestige);
 	return {
 		tiles: grid,
-		resources: { ...INITIAL_RESOURCES },
+		resources: startingResources(prestige),
 		resourceRates: rates,
-		resourceModifiers: rates.modifiers,
 		level: calculateLevel(0),
 		previousLevel: 0,
 		playerName: DEFAULT_PLAYER_NAME,
@@ -107,6 +122,7 @@ export const createInitialData = () => {
 		biomeSelectionActive: false,
 		pendingTileCoords: null,
 		selectableBiomes: null,
+		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
 		clickLevel: 0,
 		castleUpgrade: null,
 		playSeconds: 0,
@@ -137,7 +153,7 @@ const createGameSlice = (
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = countOwnedTiles(state.tiles);
-		const cost = calculateTileCost(owned, state.characterStats.tileCostDiscount);
+		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige));
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
 
@@ -147,7 +163,8 @@ const createGameSlice = (
 		const newRates = calculateResourceRates(
 			newTiles,
 			state.characterStats,
-			state.farmLevels
+			state.farmLevels,
+				state.prestige
 		);
 
 		const xpGain =
@@ -159,7 +176,6 @@ const createGameSlice = (
 			tiles: newTiles,
 			resources,
 			resourceRates: newRates,
-			resourceModifiers: newRates.modifiers,
 			characterStats: {
 				...state.characterStats,
 				reputation: state.characterStats.reputation + 100,
@@ -177,7 +193,56 @@ const createGameSlice = (
 		resetGame: () => {
 			clickLimiter.reset();
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
+			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			set({ ...createInitialData(), isHydrated: true });
+		},
+
+		// Rebirth: restart with the Legacy bonus. Keeps name, class, play time and all Legacy.
+		rebirth: () => {
+			const state = get();
+			const castle = findCastle(state.tiles);
+			if (!castle || (castle.tile.level ?? 1) < REBIRTH.minCastleLevel || state.castleUpgrade) return false;
+			const ownedTiles = countOwnedTiles(state.tiles);
+			if (ownedTiles < REBIRTH.minTiles) return false;
+			const gain = legacyGain(castle.tile.level ?? 1, ownedTiles);
+			if (gain < 1) return false;
+
+			const prestige: PrestigeState = {
+				...state.prestige,
+				rebirths: state.prestige.rebirths + 1,
+				legacyPoints: state.prestige.legacyPoints + gain,
+				legacyEarned: state.prestige.legacyEarned + gain,
+			};
+			clickLimiter.reset();
+			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
+			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
+			set({
+				...createInitialData(prestige),
+				playerName: state.playerName,
+				playerClass: state.playerClass,
+				playSeconds: state.playSeconds,
+				isHydrated: true,
+			});
+			return true;
+		},
+
+		// Spend Legacy points on a permanent shop upgrade
+		buyLegacyUpgrade: (id: LegacyUpgradeId) => {
+			const state = get();
+			const def = LEGACY_UPGRADES[id];
+			if (!def) return false;
+			const level = state.prestige.upgrades[id] ?? 0;
+			if (level >= def.maxLevel) return false;
+			const cost = legacyUpgradeCost(id, level);
+			if (state.prestige.legacyPoints < cost) return false;
+			set({
+				prestige: {
+					...state.prestige,
+					legacyPoints: state.prestige.legacyPoints - cost,
+					upgrades: { ...state.prestige.upgrades, [id]: level + 1 },
+				},
+			});
+			return true;
 		},
 
 		// Buy one more animal of a kind (each purchase adds one animal)
@@ -194,14 +259,14 @@ const createGameSlice = (
 			const newRates = calculateResourceRates(
 				state.tiles,
 				state.characterStats,
-				newFarmLevels
+				newFarmLevels,
+				state.prestige
 			);
 
 			set({
 				farmLevels: newFarmLevels,
 				resources: { ...state.resources, food: state.resources.food - cost },
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 			});
 			return true;
 		},
@@ -227,13 +292,13 @@ const createGameSlice = (
 			const newRates = calculateResourceRates(
 				state.tiles,
 				newStats,
-				state.farmLevels
+				state.farmLevels,
+				state.prestige
 			);
 
 			set({
 				characterStats: newStats,
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 			});
 		},
 
@@ -250,7 +315,7 @@ const createGameSlice = (
 			if (!isAdjacent) return false;
 
 			const owned = countOwnedTiles(state.tiles);
-			const cost = calculateTileCost(owned, state.characterStats.tileCostDiscount);
+			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige));
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
 			// Every 4th owned count (3, 7, 11 ...) the player picks the biome; payment happens on selection
@@ -318,7 +383,7 @@ const createGameSlice = (
 				resources: subtractBundle(state.resources, castle.tile.upgradeCost),
 				castleUpgrade: {
 					toLevel: castle.tile.level + 1,
-					remainingSec: castleUpgradeDuration(castle.tile.level),
+					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige),
 				},
 			});
 			return true;
@@ -330,7 +395,7 @@ const createGameSlice = (
 			if (!tile || !tile.isOwned || tile.biome !== 'grounds') return false;
 			if (tile.building || !(buildingType in BUILDINGS)) return false;
 
-			const cost = calculateBuildingCost(state.tiles);
+			const cost = calculateBuildingCost(state.tiles, state.prestige);
 			if (!canAffordBundle(state.resources, cost)) return false;
 
 			const updatedTiles = state.tiles.map((row) => [...row]);
@@ -338,14 +403,14 @@ const createGameSlice = (
 			const newRates = calculateResourceRates(
 				updatedTiles,
 				state.characterStats,
-				state.farmLevels
+				state.farmLevels,
+				state.prestige
 			);
 
 			set({
 				tiles: updatedTiles,
 				resources: subtractBundle(state.resources, cost),
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 			});
 			return true;
 		},
@@ -386,13 +451,39 @@ const createGameSlice = (
 		clickForGold: (input: ClickInput) => {
 			if (!clickLimiter.take(input)) return 0;
 			const state = get();
-			const power = CLICK_LADDER[state.clickLevel]?.power ?? CLICK_LADDER[0].power;
+			const power =
+				(CLICK_LADDER[state.clickLevel]?.power ?? CLICK_LADDER[0].power) *
+				(1 + legacyEffect(state.prestige, 'mastery'));
 			const gold = state.resourceRates.total.gold * power;
 			if (!(gold > 0)) return 0;
 			set({
 				resources: { ...state.resources, gold: state.resources.gold + gold },
 			});
 			return gold;
+		},
+
+		// A bonus critter was clicked (farm meadow or map): a few seconds of that resource's income.
+		// The amount is computed here from the current rates (the UI cannot name its own reward), the click must be a real
+		// one that passes the shared limiter, and each source has a cooldown.
+		claimCritterGift: (gift: CritterGift, input: ClickInput): GiftResult | null => {
+			const def = FARM_BONUS.critters[gift?.type];
+			if (!def || (gift.source !== 'farm' && gift.source !== 'map')) return null;
+			if (!clickLimiter.take(input)) return null;
+
+			const cooldown =
+				gift.source === 'farm' ? AMBIENT_LIFE.farmGiftCooldownMs : AMBIENT_LIFE.giftCooldownMs;
+			if (input.now - (lastGiftAt[gift.source] ?? -Infinity) < cooldown) return null;
+
+			const state = get();
+			const seconds = gift.source === 'farm' ? def.seconds : AMBIENT_LIFE.giftSeconds;
+			const rate = state.resourceRates.total[def.resource] ?? 0;
+			let amount = Math.max(def.min, rate * seconds);
+			if (gift.golden) amount *= FARM_BONUS.goldenMultiplier;
+			amount = Math.round(amount * 10) / 10;
+
+			lastGiftAt[gift.source] = input.now;
+			get().addResources({ [def.resource]: amount });
+			return { resource: def.resource, amount };
 		},
 
 		// Tapping an owned tile yields a slice of its own output (per-tile cooldown + the shared click limiter)
@@ -466,7 +557,8 @@ const createGameSlice = (
 						newRates = calculateResourceRates(
 							newTiles,
 							state.characterStats,
-							state.farmLevels
+							state.farmLevels,
+				state.prestige
 						);
 					}
 					newCastleUpgrade = null;
@@ -513,7 +605,6 @@ const createGameSlice = (
 			set({
 				resources: newResources,
 				resourceRates: newRates,
-				resourceModifiers: newRates.modifiers,
 				level: { level, progress },
 				previousLevel: state.level.level,
 				characterStats: newCharacterStats,
@@ -640,12 +731,16 @@ export const useGameStore = create(
 		merge: (persisted, current) => {
 			const saved = persisted as PersistedGame | undefined;
 			if (!saved) return { ...current, isHydrated: true };
-			const rates = calculateResourceRates(saved.tiles, saved.characterStats, saved.farmLevels);
+			const rates = calculateResourceRates(
+				saved.tiles,
+				saved.characterStats,
+				saved.farmLevels,
+				saved.prestige
+			);
 			return {
 				...current,
 				...saved,
 				resourceRates: rates,
-				resourceModifiers: rates.modifiers,
 				isHydrated: true,
 			};
 		},

@@ -19,7 +19,11 @@ import {
 	BIOME_YIELD,
 	BUILDING_COST,
 	CHARACTER_STAT_CONFIG,
+	INITIAL_RESOURCES,
+	LEGACY_UPGRADES,
+	REBIRTH,
 	TILE_RESOURCE_COST,
+	type LegacyUpgradeId,
 } from '@/config/gameConfig';
 import {
 	Animal,
@@ -27,6 +31,7 @@ import {
 	CharacterStats,
 	GameState,
 	ResourceRates,
+	PrestigeState,
 	Resources,
 	Tile,
 	TileCost,
@@ -162,11 +167,6 @@ export const calculateLevel = (
 	return { level, progress };
 };
 
-// Selector to check if name needs to be set
-export const isDefaultPlayerName = (name: string): boolean => {
-	return name === 'Explorer';
-};
-
 export const countAdjacentSameBiomes = (
 	tiles: GameState['tiles'],
 	x: number,
@@ -196,27 +196,6 @@ export const countAdjacentSameBiomes = (
 	}, 0);
 };
 
-// Validate grid state to ensure it matches our expectations
-export const validateGrid = (grid: unknown): grid is Tile[][] => {
-	if (!Array.isArray(grid) || grid.length !== GRID_HEIGHT) return false;
-
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		if (!Array.isArray(grid[y]) || grid[y].length !== GRID_SIZE) return false;
-		for (let x = 0; x < GRID_SIZE; x++) {
-			const tile = grid[y][x];
-			if (!tile || typeof tile !== 'object') return false;
-			if (typeof tile.isOwned !== 'boolean') return false;
-			if (!Object.keys(BIOMES).includes(tile.biome)) return false;
-		}
-	}
-
-	// Ensure castle exists at center
-	const centerTile = grid[GRID_CENTER_Y][GRID_CENTER_X];
-	if (!centerTile.isOwned || centerTile.biome !== 'castle') return false;
-
-	return true;
-};
-
 export const createInitialGrid = (): Tile[][] => {
 	const grid = Array(GRID_HEIGHT)
 		.fill(null)
@@ -241,18 +220,6 @@ export const createInitialGrid = (): Tile[][] => {
 };
 
 // Resource Management
-export const canAffordCost = (
-	resources: Resources,
-	cost: number | Resources
-): boolean => {
-	if (typeof cost === 'number') {
-		return resources.gold >= cost;
-	}
-	return Object.entries(cost).every(
-		([resource, amount]) => resources[resource as keyof Resources] >= amount
-	);
-};
-
 // Calculate stat-based resource modifiers
 export const calculateStatResourceModifiers = (
 	stats: CharacterStats
@@ -341,7 +308,8 @@ export const calculateTotalMeatProduction = (
 export const calculateResourceRates = (
 	tiles: Tile[][],
 	characterStats?: CharacterStats,
-	farmLevels: Record<string, number> = {}
+	farmLevels: Record<string, number> = {},
+	prestige?: PrestigeState
 ): ResourceRates => {
 	const base = { ...BASE_GENERATION_RATES };
 	const modifiers: Resources = { gold: 0, wood: 0, stone: 0, coal: 0, food: 0, meat: 0, xp: 0 };
@@ -401,23 +369,12 @@ export const calculateResourceRates = (
 			}
 		}
 	}
-	let castleModifier = 0;
-	if (castleLevel > 0) {
-		if (CASTLE_UPGRADE.doublePerLevel) {
-			// Base is 20% at level 1, doubles with each level
-			// Level 1 = 0.2, Level 2 = 0.4, Level 3 = 0.8, Level 4 = 1.6, etc.
-			castleModifier =
-				CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, castleLevel - 1);
-		} else {
-			// Fallback to linear growth (20% per level)
-			castleModifier = castleLevel * CASTLE_UPGRADE.baseResourceMultiplier;
-		}
-	}
+	const castleBonus = castleModifier(castleLevel);
 
 	// Add the castle modifier to all resources
 	Object.keys(modifiers).forEach((resource) => {
 		const key = resource as keyof Resources;
-		modifiers[key] += castleModifier;
+		modifiers[key] += castleBonus;
 	});
 
 	// Castle levels above 1 add flat XP/s
@@ -439,9 +396,13 @@ export const calculateResourceRates = (
 		});
 	}
 
+	// Legacy income bonus multiplies everything; it is folded into the modifiers so tooltips stay consistent
+	const legacyMultiplier = legacyIncomeMultiplier(prestige);
+
 	// Calculate total rates
 	Object.keys(total).forEach((resource) => {
 		const key = resource as keyof Resources;
+		modifiers[key] = (1 + modifiers[key]) * legacyMultiplier - 1;
 		total[key] = base[key] * (1 + modifiers[key]);
 	});
 
@@ -569,8 +530,12 @@ export const countBuildings = (tiles: Tile[][]): number => {
 };
 
 /** Cost of the next building: base cost x growth^(buildings already built). */
-export const calculateBuildingCost = (tiles: Tile[][]): Partial<Resources> => {
-	const factor = Math.pow(BUILDING_COST.growth, countBuildings(tiles));
+export const calculateBuildingCost = (
+	tiles: Tile[][],
+	prestige?: PrestigeState
+): Partial<Resources> => {
+	const factor =
+		Math.pow(BUILDING_COST.growth, countBuildings(tiles)) * (1 - legacyEffect(prestige, 'thrift'));
 	const cost: Partial<Resources> = {};
 	Object.entries(BUILDING_COST.base).forEach(([resource, amount]) => {
 		cost[resource as keyof Resources] = Math.floor((amount || 0) * factor);
@@ -578,6 +543,67 @@ export const calculateBuildingCost = (tiles: Tile[][]): Partial<Resources> => {
 	return cost;
 };
 
+/**
+ * Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each
+ * level up to `doublingUntil`, then a fixed step per level (so levels 7-10 stay a long climb, not an explosion).
+ */
+export const castleModifier = (level: number): number => {
+	const lvl = Math.max(1, Math.floor(level));
+	const doubled = Math.min(lvl, CASTLE_UPGRADE.doublingUntil);
+	let bonus = CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, doubled - 1);
+	if (lvl > CASTLE_UPGRADE.doublingUntil) {
+		bonus += CASTLE_UPGRADE.lateLevelStep * (lvl - CASTLE_UPGRADE.doublingUntil);
+	}
+	return bonus;
+};
+
 /** Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`. */
-export const castleUpgradeDuration = (fromLevel: number): number =>
-	CASTLE_UPGRADE.durationsSec[fromLevel - 1] ?? 0;
+export const castleUpgradeDuration = (fromLevel: number, prestige?: PrestigeState): number =>
+	Math.floor((CASTLE_UPGRADE.durationsSec[fromLevel - 1] ?? 0) * (1 - legacyEffect(prestige, 'builders')));
+
+// ---------------------------------------------------------------------------
+// Rebirth / Legacy
+
+export const EMPTY_PRESTIGE: PrestigeState = { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: {} };
+
+export const legacyLevel = (prestige: PrestigeState | undefined, id: LegacyUpgradeId): number =>
+	prestige?.upgrades?.[id] ?? 0;
+
+/** Effect of a shop upgrade as a fraction (or, for Provisions, as a number of starting bundles). */
+export const legacyEffect = (prestige: PrestigeState | undefined, id: LegacyUpgradeId): number =>
+	legacyLevel(prestige, id) * LEGACY_UPGRADES[id].effectPerLevel;
+
+/** Cost in Legacy points of buying the next level of an upgrade, given its current level. */
+export const legacyUpgradeCost = (id: LegacyUpgradeId, currentLevel: number): number =>
+	Math.ceil(LEGACY_UPGRADES[id].baseCost * Math.pow(LEGACY_UPGRADES[id].costGrowth, currentLevel));
+
+/** Points spent on shop levels so far. */
+export const legacySpent = (upgrades: PrestigeState['upgrades']): number => {
+	let spent = 0;
+	(Object.keys(LEGACY_UPGRADES) as LegacyUpgradeId[]).forEach((id) => {
+		for (let level = 0; level < (upgrades[id] ?? 0); level++) spent += legacyUpgradeCost(id, level);
+	});
+	return spent;
+};
+
+export const legacyIncomeMultiplier = (prestige: PrestigeState | undefined): number =>
+	1 + REBIRTH.incomePerPoint * (prestige?.legacyEarned ?? 0);
+
+/** Percent off tile cost: Charisma plus Thrift, capped. */
+export const effectiveTileDiscount = (
+	stats: Pick<CharacterStats, 'tileCostDiscount'>,
+	prestige: PrestigeState | undefined
+): number =>
+	Math.min(stats.tileCostDiscount + legacyEffect(prestige, 'thrift') * 100, REBIRTH.discountCapPercent);
+
+/** Resources a new run starts with: the usual start plus the Provisions bundles. */
+export const startingResources = (prestige: PrestigeState | undefined): Resources => {
+	const out: Resources = { ...INITIAL_RESOURCES };
+	const bundles = legacyEffect(prestige, 'provisions');
+	Object.entries(LEGACY_UPGRADES.provisions.bundle).forEach(([resource, amount]) => {
+		out[resource as keyof Resources] += (amount || 0) * bundles;
+	});
+	return out;
+};
+
+export const legacyGain = (castleLevel: number, tiles: number): number => REBIRTH.gain(castleLevel, tiles);

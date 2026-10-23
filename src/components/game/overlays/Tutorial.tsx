@@ -10,6 +10,8 @@ import {
 	CASTLE_UPGRADE,
 	CHARACTER_STAT_CONFIG,
 	CHEST,
+	LEGACY_UPGRADES,
+	REBIRTH,
 	CLICK_LADDER,
 	CLICK_LIMIT,
 	FARM_BONUS,
@@ -19,10 +21,10 @@ import {
 	TILE_RESOURCE_COST,
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
-	ADJACENCY_BONUS,
 } from '@/config/gameConfig';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatNumber, formatTime } from '@/utils/formatters';
+import { castleModifier } from '@/utils/gameUtils';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
 
@@ -44,8 +46,9 @@ const Res: React.FC<{ r: string; children?: React.ReactNode }> = ({ r, children 
 
 const Tutorial: React.FC = () => {
 	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty');
-	const castleStart = CASTLE_UPGRADE.baseResourceMultiplier;
-	const castleMax = castleStart * Math.pow(2, CASTLE_UPGRADE.maxLevel - 1);
+	const castleStart = castleModifier(1);
+	const castleAtDoublingEnd = castleModifier(CASTLE_UPGRADE.doublingUntil);
+	const castleMax = castleModifier(CASTLE_UPGRADE.maxLevel);
 	const stat = CHARACTER_STAT_CONFIG;
 	const resourceTargets = (s: keyof typeof stat.resourceTargets) =>
 		stat.resourceTargets[s].map((r) => r[0].toUpperCase() + r.slice(1)).join(' & ');
@@ -69,7 +72,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Tiles &amp; Biomes</h3>
 				<p className='text-[#d8c8a0] mb-2'>
 					Every tile you buy becomes a biome and produces resources per second. Same-biome neighbours boost each
-					other by +{pct(ADJACENCY_BONUS)} per neighbour (up to four). Every 4th purchase (when you own 3, 7, 11 ...
+					other by +{pct(SCALING_CONFIG.adjacencyBonus)} per neighbour (up to four). Every 4th purchase (when you own 3, 7, 11 ...
 					tiles) lets you choose the biome instead of rolling one.
 				</p>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
@@ -145,10 +148,23 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Castle</h3>
 				<p className='text-[#d8c8a0]'>
 					The castle gives a bonus to <b>all</b> resources: +{pct(castleStart)} at level 1, doubling with every level
-					up to +{pct(castleMax)} at level {CASTLE_UPGRADE.maxLevel}. Upgrades cost resources and take real
-					time ({formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in
-					total); the castle keeps its current bonus while it is being built. From level 2 it also produces +
+					up to +{pct(castleAtDoublingEnd)} at level {CASTLE_UPGRADE.doublingUntil}, then +
+					{pct(CASTLE_UPGRADE.lateLevelStep)} more per level up to +{pct(castleMax)} at level{' '}
+					{CASTLE_UPGRADE.maxLevel}. Upgrades cost resources and take real time (
+					{formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in total); the
+					castle keeps its current bonus while it is being built. From level 2 it also produces +
 					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1.
+				</p>
+			</section>
+
+			<section>
+				<h3 className='px-h'>Rebirth &amp; Legacy</h3>
+				<p className='text-[#d8c8a0]'>
+					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles you can
+					Rebirth from the Legacy window: the map, resources, castle, farm and level start again, and you keep your name,
+					hero and Legacy. Every Legacy point is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
+					the shop ({Object.values(LEGACY_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
+					at the moment of rebirth give more points, so pushing on to level {CASTLE_UPGRADE.maxLevel} first pays.
 				</p>
 			</section>
 

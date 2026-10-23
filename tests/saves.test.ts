@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo, setResources, owned } from './helpers';
 import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
 import { decryptText, encryptText, exportSave, parseSave } from '../src/lib/saveVault';
-import { GRID_CENTER_X, GRID_CENTER_Y, RESOURCE_CAP } from '../src/config/gameConfig';
+import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 
 /** A plain JSON copy of a (valid) persisted game, as it would come out of a save file. */
 const snapshot = () => JSON.parse(JSON.stringify(pickPersisted(api())));
@@ -40,7 +40,7 @@ test('tampered saves are rejected', () => {
 	rejects((r) => (r.characterStats.strength += 50), 'extra strength points');
 	rejects((r) => (r.characterStats.availablePoints += 50), 'extra available points');
 	rejects((r) => (r.characterStats.charisma = 2.5), 'fractional stat');
-	rejects((r) => (r.tiles[GRID_CENTER_Y][GRID_CENTER_X].level = 7), 'castle above max level');
+	rejects((r) => (r.tiles[GRID_CENTER_Y][GRID_CENTER_X].level = CASTLE_UPGRADE.maxLevel + 1), 'castle above max level');
 	rejects((r) => (r.tiles[GRID_CENTER_Y][GRID_CENTER_X].level = 0), 'castle level 0');
 	rejects((r) => (r.tiles[0][0] = { biome: 'forest', isOwned: true }), 'territory not connected to the castle');
 	rejects((r) => (r.tiles[0][1] = { biome: 'castle', isOwned: true, level: 1 }), 'second castle');

@@ -128,7 +128,7 @@ XP to go from level L to L+1 = `floor(750 × 1.3^(L-1))`. One stat point per lev
 
 ## 3. Castle
 
-Resource modifier at level L = `0.2 × 2^(L-1)` (added to **every** resource). Flat XP: +0.5/s per level above 1. Max level 6; each upgrade is a timed build paid up front.
+Resource modifier: +20% at level 1, doubling each level up to level 6, then +320% per level (added to **every** resource). Flat XP: +0.5/s per level above 1. Max level 10; each upgrade is a timed build paid up front.
 
 | Upgrade | Build time | Modifier after | gold | wood | stone | coal | food | meat |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -137,8 +137,12 @@ Resource modifier at level L = `0.2 × 2^(L-1)` (added to **every** resource). F
 | 3 → 4 | 12h 0m | +160% | 5.00M | 500.00K | 500.00K | 250.00K | 1.00M | 200.00K |
 | 4 → 5 | 1d 12h | +320% | 20.00M | 2.00M | 2.00M | 1.00M | 10.00M | 500.00K |
 | 5 → 6 | 3d 0h | +640% | 100.00M | 10.00M | 10.00M | 5.00M | 50.00M | 2.50M |
+| 6 → 7 | 3d 0h | +960% | 150.00M | 15.00M | 15.00M | 8.00M | 80.00M | 4.00M |
+| 7 → 8 | 4d 0h | +1280% | 240.00M | 24.00M | 24.00M | 13.00M | 128.00M | 6.40M |
+| 8 → 9 | 5d 0h | +1600% | 384.00M | 38.00M | 38.00M | 20.00M | 205.00M | 10.00M |
+| 9 → 10 | 7d 0h | +1920% | 614.00M | 61.00M | 61.00M | 33.00M | 328.00M | 16.00M |
 
-Total build time: 5d 5h. (`upgradeCosts` has 4 further rows that are unreachable while max level is 6.)
+Total build time to level 10: 24d 5h (to level 6: 5d 5h).
 
 ## 4. Farm animals
 
@@ -279,18 +283,18 @@ Derived stats for the starting stats (all 5):
 
 | Stat | calculateCombatStats() | INITIAL_CHARACTER_STATS |
 | --- | --- | --- |
-| physicalAtk | 5 | 5 |
-| magicAtk | 5 | 5 |
-| hp | 16.25 | 15.25 |
-| mp | 10 | 10 |
-| def | 11.25 | 8.75 |
-| magicDef | 8.75 | 8.25 |
-| luck | 5 | 5 |
-| critChance | 3.75 | 3.75 |
-| critDmgMultiplier | 110 | 103 |
-| atkSpeedIncrease | 1.25 | 1.25 |
-| xpGainMultiplier | 2.25 | 2.25 |
-| tileCostDiscount | 2.5 | 2.5 |
+| physicalAtk | 5 | 0 |
+| magicAtk | 5 | 0 |
+| hp | 16.25 | 0 |
+| mp | 10 | 0 |
+| def | 11.25 | 0 |
+| magicDef | 8.75 | 0 |
+| luck | 5 | 0 |
+| critChance | 3.75 | 0 |
+| critDmgMultiplier | 110 | 0 |
+| atkSpeedIncrease | 1.25 | 0 |
+| xpGainMultiplier | 2.25 | 0 |
+| tileCostDiscount | 2.5 | 0 |
 
 ## 7. Rates of a brand-new game
 
@@ -302,7 +306,7 @@ Derived stats for the starting stats (all 5):
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
 | food | 0 | 0.05 | 0.050 | 45.0% | 0.072 |
 | meat | 0 | 0 | 0.000 | 20.0% | 0.000 |
-| xp | 0.25 | 0.5 | 0.750 | 22.3% | 0.917 |
+| xp | 0.25 | 0.5 | 0.750 | 22.2% | 0.917 |
 
 ## 8. Click power and merchant
 
@@ -320,3 +324,24 @@ Derived stats for the starting stats (all 5):
 | coal | 1 | 2 |
 | food | 0.75 | 1.5 |
 | meat | 1 | 2 |
+
+## 9. Rebirth and Legacy
+
+Rebirth needs castle level ≥ 6 and ≥ 20 tiles. Legacy points = `floor(4.5 × (castle − 5) × sqrt(tiles / 10))`; each point earned is +5% income for ever.
+
+| castle level | 20 tiles | 30 tiles | 40 tiles | 50 tiles | 60 tiles | 80 tiles |
+| --- | --- | --- | --- | --- | --- | --- |
+| 6 | 6 | 7 | 9 | 10 | 11 | 12 |
+| 7 | 12 | 15 | 18 | 20 | 22 | 25 |
+| 8 | 19 | 23 | 27 | 30 | 33 | 38 |
+| 9 | 25 | 31 | 36 | 40 | 44 | 50 |
+| 10 | 31 | 38 | 45 | 50 | 55 | 63 |
+
+Shop (cost in points of the next level, by current level):
+
+| upgrade | effect per level | max | cost at level 0 | cost at level 1 | cost at level 2 | cost at level 3 | cost at level 5 | cost at level 9 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Thrift | 2% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Master Builders | 5% | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Click Mastery | 10% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Provisions | 1500 gold + 400 wood + 400 stone | 10 | 2 | 3 | 4 | 6 | 11 | 42 |

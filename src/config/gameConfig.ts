@@ -21,19 +21,20 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
 	charisma: 5,
 	// Points to spent
 	availablePoints: 0,
-	// Combat stats - calculated from base stats
-	physicalAtk: 5, // Base + Strength (5)
-	magicAtk: 5, // Base + Intelligence (5)
-	hp: 15.25, // Base + (Vitality * 3) + (Charisma * 0.25) = 0 + 15 + 0.25
-	mp: 10, // Base + (Intelligence * 2) = 0 + 10
-	def: 8.75, // Base + Dexterity + (Strength * 0.5) + (Vitality * 0.5) + (Charisma * 0.25) = 0 + 5 + 2.5 + 2.5 + 1.25
-	magicDef: 8.25, // Base + Intelligence + (Vitality * 0.5) + (Charisma * 0.25) = 0 + 5 + 2.5 + 1.25
-	luck: 5, // Base + Charisma (5)
-	critChance: 3.75, // Base + (Dexterity * 0.25) + (Charisma * 0.5) = 0 + 1.25 + 2.5
-	critDmgMultiplier: 103, // Base 100% + Strength + (Dexterity * 0.5) + (Charisma * 0.5) = 100 + 5 + 2.5 + 2.5
-	atkSpeedIncrease: 1.25, // Base + (Dexterity * 0.25) = 0 + 1.25
-	xpGainMultiplier: 2.25, // Base + (Intelligence * 0.2) + (Charisma * 0.25) = 0 + 1 + 1.25
-	tileCostDiscount: Math.min(5 * 0.005, 0.25) * 100, // +0.5% per charisma point, capped at 25%
+	// Derived stats (HP, attack, crit, XP gain, tile discount ...) start at 0 here and are always filled in by
+	// calculateCombatStats() (createInitialData, addStatPoint, sanitizeSave), so there is one formula only.
+	physicalAtk: 0,
+	magicAtk: 0,
+	hp: 0,
+	mp: 0,
+	def: 0,
+	magicDef: 0,
+	luck: 0,
+	critChance: 0,
+	critDmgMultiplier: 0,
+	atkSpeedIncrease: 0,
+	xpGainMultiplier: 0,
+	tileCostDiscount: 0,
 	reputation: 1000, // Base reputation value
 };
 
@@ -44,12 +45,10 @@ export const GRID_CENTER_X = Math.floor(GRID_SIZE / 2);
 export const GRID_CENTER_Y = Math.floor(GRID_HEIGHT / 2);
 
 export const TILE_SIZE = 48; // Balanced for visibility
-export const VIEWPORT_SIZE = 25; // currently unused
 
 // Game Constants
 export const TICK_RATE = 100; // 10 times per second
 export const BASE_TILE_COST = 55; // Base cost for first tile purchase
-export const ADJACENCY_BONUS = 0.25; // 25% bonus for adjacent same biomes
 
 // XP calculation constants - Exponential XP system
 export const BASE_XP_PER_TILE = 125;
@@ -92,7 +91,7 @@ export const SCALING_CONFIG = {
 					Math.max(ownedTiles - SCALING_CONFIG.lateTiles, 0)
 				)
 		),
-	adjacencyBonus: ADJACENCY_BONUS,
+	adjacencyBonus: 0.25, // +25% output per same-biome neighbour
 };
 
 // Which biome a random purchase turns up. Everything weighs 1 unless listed; water clusters and gets a shore:
@@ -332,71 +331,24 @@ export const CASTLE_RANGE = { radius: 1 };
 
 // Exponential castle upgrade system
 export const CASTLE_UPGRADE = {
-	maxLevel: 6, // Increased from 5
-	baseResourceMultiplier: 0.2, // 20% base modifier at level 1
-	doublePerLevel: true, // Multiply by 2 for each level
+	maxLevel: 10,
+	baseResourceMultiplier: 0.2, // +20% to every resource at level 1
+	doublingUntil: 6, // the bonus doubles with every level up to this level ...
+	lateLevelStep: 3.2, // ... then grows linearly by this much per level (level 10 = +1920%)
+	glowFromLevel: 6, // from this level the castle is drawn animated and glowing, stronger with every level
 	xpBonus: 0.5, // Additional flat XP/s for every castle level above 1
 	// Real upgrade time in seconds, indexed by the level being left (1 -> 2 is index 0). Counted by the tick loop.
-	durationsSec: [3600, 14400, 43200, 129600, 259200],
+	durationsSec: [3600, 14400, 43200, 129600, 259200, 259200, 345600, 432000, 604800],
 	upgradeCosts: [
 		{ gold: 350000, wood: 50000, stone: 50000 },
 		{ gold: 1000000, wood: 150000, stone: 150000, coal: 100000 },
-		{
-			gold: 5000000,
-			wood: 500000,
-			stone: 500000,
-			coal: 250000,
-			food: 1000000,
-			meat: 200000,
-		},
-		{
-			gold: 20000000,
-			wood: 2000000,
-			stone: 2000000,
-			coal: 1000000,
-			food: 10000000,
-			meat: 500000,
-		},
-		{
-			gold: 100000000,
-			wood: 10000000,
-			stone: 10000000,
-			coal: 5000000,
-			food: 50000000,
-			meat: 2500000,
-		},
-		{
-			gold: 500000000,
-			wood: 50000000,
-			stone: 50000000,
-			coal: 25000000,
-			food: 250000000,
-			meat: 10000000,
-		},
-		{
-			gold: 2500000000,
-			wood: 250000000,
-			stone: 250000000,
-			coal: 100000000,
-			food: 1000000000,
-			meat: 50000000,
-		},
-		{
-			gold: 10000000000,
-			wood: 1000000000,
-			stone: 1000000000,
-			coal: 500000000,
-			food: 5000000000,
-			meat: 250000000,
-		},
-		{
-			gold: 50000000000,
-			wood: 5000000000,
-			stone: 5000000000,
-			coal: 2500000000,
-			food: 25000000000,
-			meat: 1000000000,
-		},
+		{ gold: 5000000, wood: 500000, stone: 500000, coal: 250000, food: 1000000, meat: 200000 },
+		{ gold: 20000000, wood: 2000000, stone: 2000000, coal: 1000000, food: 10000000, meat: 500000 },
+		{ gold: 100000000, wood: 10000000, stone: 10000000, coal: 5000000, food: 50000000, meat: 2500000 },
+		{ gold: 150000000, wood: 15000000, stone: 15000000, coal: 8000000, food: 80000000, meat: 4000000 },
+		{ gold: 240000000, wood: 24000000, stone: 24000000, coal: 13000000, food: 128000000, meat: 6400000 },
+		{ gold: 384000000, wood: 38000000, stone: 38000000, coal: 20000000, food: 205000000, meat: 10000000 },
+		{ gold: 614000000, wood: 61000000, stone: 61000000, coal: 33000000, food: 328000000, meat: 16000000 },
 	],
 };
 
@@ -703,4 +655,78 @@ export const CHARACTER_STAT_CONFIG = {
 	tileDiscountCapPercent: 25,
 	// Plains: meat modifier per owned Plains tile (fraction)
 	plainsMeatModifier: 0.05,
+};
+
+// Rebirth: restart with a permanent Legacy bonus. Available once the castle reaches `minCastleLevel`.
+export const REBIRTH = {
+	minCastleLevel: 6,
+	minTiles: 20, // a rebirth also needs this much territory (no cheap rebirth with a tiny map)
+	gainScale: 4.5, // Legacy points = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
+	incomePerPoint: 0.05, // +5% of all income per Legacy point ever earned (spending points never lowers it)
+	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile
+	// Legacy points granted for a rebirth with this castle level and territory
+	gain: (castleLevel: number, tiles: number) =>
+		Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * Math.sqrt(Math.max(0, tiles) / 10)),
+};
+
+// The Legacy shop: permanent upgrades bought with unspent Legacy points. The N+1-th level costs
+// ceil(baseCost x costGrowth^N) points.
+export const LEGACY_UPGRADES = {
+	thrift: {
+		label: 'Thrift',
+		maxLevel: 10,
+		baseCost: 2,
+		costGrowth: 1.4,
+		effectPerLevel: 0.02, // -2% tile and building cost per level
+	},
+	builders: {
+		label: 'Master Builders',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.05, // -5% castle build time per level
+	},
+	mastery: {
+		label: 'Click Mastery',
+		maxLevel: 10,
+		baseCost: 2,
+		costGrowth: 1.4,
+		effectPerLevel: 0.1, // +10% gold per click per level
+	},
+	provisions: {
+		label: 'Provisions',
+		maxLevel: 10,
+		baseCost: 2,
+		costGrowth: 1.4,
+		effectPerLevel: 1, // levels of the starting bundle below
+		bundle: { gold: 1500, wood: 400, stone: 400 } as Partial<Resources>, // per level, given at the start of every run
+	},
+} as const;
+
+export type LegacyUpgradeId = keyof typeof LEGACY_UPGRADES;
+
+// Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
+// Purely decorative, except the rare golden one, which can be clicked for a small gift (see claimCritterGift).
+export const AMBIENT_LIFE = {
+	spawnMinMs: 4000,
+	spawnMaxMs: 9000,
+	maxAlive: 5,
+	lifeMinMs: 6000,
+	lifeMaxMs: 10000,
+	roamTiles: 1.5, // how far a critter strays from where it appears
+	giftChance: 1 / 12, // share of critters that carry a gift
+	giftSeconds: 5, // a map gift is worth this many seconds of that resource's income (x goldenMultiplier)
+	giftCooldownMs: 20000, // at most one map gift per this long
+	farmGiftCooldownMs: 8000, // same for the farm meadow critters
+	// which critter likes which biome
+	byBiome: {
+		forest: ['butterfly', 'bee'],
+		plains: ['bee', 'butterfly'],
+		swamp: ['ladybug'],
+		hills: ['rabbit'],
+		tundra: ['rabbit'],
+		lake: ['butterfly'],
+		coast: ['butterfly', 'bee'],
+		grounds: ['rabbit', 'ladybug'],
+	} as Record<string, readonly ('butterfly' | 'bee' | 'ladybug' | 'rabbit')[]>,
 };

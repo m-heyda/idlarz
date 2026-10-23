@@ -1,4 +1,5 @@
 import React, { memo, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { TileProps } from '@/types/game';
 import {
 	GRID_SIZE,
@@ -10,12 +11,14 @@ import {
 	TILE_TAP,
 	CASTLE_UPGRADE,
 	CASTLE_RANGE,
+	TILE_SIZE,
 } from '@/config/gameConfig';
 import '@/styles/Buildings.css';
 import { useGameStore } from '@/stores/gameStore';
 import {
 	calculateTileCost,
 	canAffordBundle,
+	effectiveTileDiscount,
 	countOwnedTiles,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
@@ -30,6 +33,7 @@ import { BIOME_PIXEL_ICONS, BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config
 import { TileStatus } from './TileStatus';
 import CastleUpgradeDialog from './CastleUpgradeDialog';
 import BuildingSelectionDialog from './BuildingSelectionDialog';
+import { useMapTipLayer } from './MapTipLayer';
 
 const Tile: React.FC<TileProps> = ({
 	biome,
@@ -52,6 +56,7 @@ const Tile: React.FC<TileProps> = ({
 	const buyTile = useGameStore((state) => state.buyTile);
 	const resources = useGameStore((state) => state.resources);
 	const characterStats = useGameStore((state) => state.characterStats);
+	const prestige = useGameStore((state) => state.prestige);
 	const upgradeGroundsTile = useGameStore((state) => state.upgradeGroundsTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
@@ -64,6 +69,8 @@ const Tile: React.FC<TileProps> = ({
 	const [showCastleDialog, setShowCastleDialog] = useState(false);
 	const [showBuildingDialog, setShowBuildingDialog] = useState(false);
 	const [showChestTooltip, setShowChestTooltip] = useState(false);
+	const [hovered, setHovered] = useState(false);
+	const tipLayer = useMapTipLayer();
 	const [tapped, setTapped] = useState(false);
 	const [cooling, setCooling] = useState(false);
 
@@ -92,7 +99,7 @@ const Tile: React.FC<TileProps> = ({
 
 	const hasBuilding = biome === 'grounds' && !!building && (level ?? 1) > 1;
 	const castleLevel = tiles?.[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1;
-	const isMaxCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.maxLevel;
+	const isGlowingCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.glowFromLevel;
 
 	// Owned neighbours of the castle get gold sparkles: they are inside the castle's range
 	const inCastleRange =
@@ -104,8 +111,8 @@ const Tile: React.FC<TileProps> = ({
 	const ownedTilesCount = useMemo(() => countOwnedTiles(tiles), [tiles]);
 
 	const tileCost = useMemo(
-		() => calculateTileCost(ownedTilesCount, characterStats.tileCostDiscount),
-		[ownedTilesCount, characterStats.tileCostDiscount]
+		() => calculateTileCost(ownedTilesCount, effectiveTileDiscount(characterStats, prestige)),
+		[ownedTilesCount, characterStats, prestige]
 	);
 
 	const canAfford = canAffordBundle(resources, tileCostAsResources(tileCost));
@@ -214,14 +221,14 @@ const Tile: React.FC<TileProps> = ({
 							!isOwned && isAdjacent && !canAfford,
 						'border border-purple-400': biome === 'castle',
 						'border-2 border-amber-300':
-							(tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 0) === 10 &&
+							(tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 0) >= CASTLE_UPGRADE.maxLevel &&
 							biome === 'castle',
 						'group hover:z-20': true,
 						'opacity-75 border-2 border-red-500': isShaking,
 						'cursor-pointer':
 							isOwned && (biome === 'castle' || biome === 'grounds' || hasChest),
 						'castle-tile': isOwned && biome === 'castle',
-						'castle-max-tile': isOwned && isMaxCastle,
+						'castle-max-tile': isOwned && isGlowingCastle,
 						'border-2 border-amber-400': isOwned && hasChest,
 						'tile-cooldown': cooling,
 					},
@@ -233,8 +240,14 @@ const Tile: React.FC<TileProps> = ({
 					...({ '--cd': `${TILE_TAP.cooldownMs}ms` } as React.CSSProperties),
 				}}
 				onClick={handleClick}
-				onMouseEnter={() => hasChest && setShowChestTooltip(true)}
-				onMouseLeave={() => setShowChestTooltip(false)}
+				onMouseEnter={() => {
+					setHovered(true);
+					if (hasChest) setShowChestTooltip(true);
+				}}
+				onMouseLeave={() => {
+					setHovered(false);
+					setShowChestTooltip(false);
+				}}
 				role='button'>
 				<div
 					className={cn(
@@ -302,13 +315,6 @@ const Tile: React.FC<TileProps> = ({
 						</span>
 					)}
 
-					{/* Chest tooltip */}
-					{isOwned && hasChest && showChestTooltip && (
-						<div className='map-tip map-tip-up absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max z-[60] px-tooltip text-xs text-[#f0d27a]'>
-							Click to collect bonus gold <ResourceIcon resource='gold' />
-						</div>
-					)}
-					
 					{hasBuilding && (
 						<span
 							className='tile-building'
@@ -322,35 +328,48 @@ const Tile: React.FC<TileProps> = ({
 					)}
 				</div>
 
-				{(isOwned || isAdjacent) && (
-					<div className='map-tip absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px] opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
-						<div className='px-tooltip break-words'>
-							<TileStatus
-								biome={biome}
-								isOwned={isOwned}
-								isAdjacent={isAdjacent}
-								level={level}
-								x={x}
-								y={y}
-							/>
-						</div>
-					</div>
-				)}
 			</div>
 
-			{/* Castle Upgrade Dialog */}
-			{showCastleDialog && (
-				<CastleUpgradeDialog onClose={() => setShowCastleDialog(false)} />
-			)}
+			{/* Tooltips live in the map's tooltip layer (above the ambient critters), anchored to this tile */}
+			{tipLayer &&
+				hovered &&
+				(isOwned || isAdjacent) &&
+				createPortal(
+					<div className='absolute' style={{ left: x * TILE_SIZE, top: y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }}>
+						{isOwned && hasChest && showChestTooltip && (
+							<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs text-[#f0d27a]'>
+								Click to collect bonus gold <ResourceIcon resource='gold' />
+							</div>
+						)}
+						<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>
+							<div className='px-tooltip break-words'>
+								<TileStatus
+									biome={biome}
+									isOwned={isOwned}
+									isAdjacent={isAdjacent}
+									level={level}
+									x={x}
+									y={y}
+								/>
+							</div>
+						</div>
+					</div>,
+					tipLayer
+				)}
 
-			{/* Building Selection Dialog */}
-			{showBuildingDialog && (
-				<BuildingSelectionDialog
-					isOpen={showBuildingDialog}
-					onClose={() => setShowBuildingDialog(false)}
-					onSelect={handleBuildingSelect}
-				/>
-			)}
+			{/* Dialogs go to <body>: inside the map they would be scaled and panned together with the tiles */}
+			{showCastleDialog &&
+				createPortal(<CastleUpgradeDialog onClose={() => setShowCastleDialog(false)} />, document.body)}
+
+			{showBuildingDialog &&
+				createPortal(
+					<BuildingSelectionDialog
+						isOpen={showBuildingDialog}
+						onClose={() => setShowBuildingDialog(false)}
+						onSelect={handleBuildingSelect}
+					/>,
+					document.body
+				)}
 		</>
 	);
 };

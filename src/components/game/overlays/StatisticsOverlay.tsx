@@ -8,7 +8,7 @@ import CollapsibleSection from '../CollapsibleSection';
 import { countOwnedTiles, getStatDescription } from '@/utils/gameUtils';
 import { formatNumber, formatRate } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
-import { CASTLE_BASE_RATES } from '@/config/gameConfig';
+import { CASTLE_BASE_RATES, REBIRTH } from '@/config/gameConfig';
 
 const StatisticsOverlay: React.FC = () => {
 	const {
@@ -20,6 +20,7 @@ const StatisticsOverlay: React.FC = () => {
 		level,
 		resources,
 		characterStats,
+		prestige,
 	} = useGameStore();
 
 	// Store previous level to detect level ups
@@ -270,6 +271,12 @@ const StatisticsOverlay: React.FC = () => {
 									<span className='text-[#d8c8a0]'>Gold:</span>
 									<span className='text-yellow-400'>
 										{formatNumber(resources.gold)}
+									</span>
+								</div>
+								<div className='flex justify-between'>
+									<span className='text-[#d8c8a0]'>Rebirths:</span>
+									<span className='text-purple-300'>
+										{prestige.rebirths} (+{(prestige.legacyEarned * REBIRTH.incomePerPoint * 100).toFixed(0)}% income)
 									</span>
 								</div>
 								<div className='flex justify-between'>

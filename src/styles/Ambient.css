@@ -1,0 +1,99 @@
+/* Wandering critters on the map. Decorative: they never take clicks, except the golden gift one. */
+.amb-critter {
+	position: absolute;
+	width: 0;
+	height: 0;
+	z-index: 22; /* above a hovered tile (z-20), so tile hover never hides a critter */
+	pointer-events: none;
+	animation: amb-life var(--life) linear both;
+}
+
+@keyframes amb-life {
+	0% {
+		opacity: 0;
+	}
+	12% {
+		opacity: 1;
+	}
+	82% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.amb-move {
+	position: absolute;
+	left: 0;
+	top: 0;
+	transform: translate(-50%, -50%);
+	animation: amb-wander var(--life) ease-in-out both;
+}
+
+.amb-critter[data-type='rabbit'] .amb-move {
+	animation-timing-function: steps(14);
+}
+
+@keyframes amb-wander {
+	0% {
+		translate: 0 0;
+	}
+	30% {
+		translate: calc(var(--dx) * 0.6) calc(var(--dy) * -0.5);
+	}
+	65% {
+		translate: var(--dx) var(--dy);
+	}
+	100% {
+		translate: calc(var(--dx) * 1.3) calc(var(--dy) * 0.4);
+	}
+}
+
+.amb-sprite {
+	display: block;
+	background-repeat: no-repeat;
+	image-rendering: pixelated;
+	scale: var(--f) 1;
+	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.2));
+	animation: amb-frames var(--frame-ms) steps(1) infinite;
+}
+
+@keyframes amb-frames {
+	0% {
+		background-position-x: 0;
+	}
+	50% {
+		background-position-x: calc(var(--sheet-w) / -2);
+	}
+}
+
+/* the one that carries a gift: golden glow, a roomier hit area, clickable */
+.amb-critter[data-gift='true'] {
+	z-index: 25; /* clickable: must stay above the hovered tile or it would swallow the click */
+}
+
+.amb-critter[data-gift='true'] .amb-move {
+	pointer-events: auto;
+	cursor: pointer;
+	padding: 12px;
+}
+
+.amb-critter[data-gift='true'] .amb-sprite {
+	animation: amb-frames var(--frame-ms) steps(1) infinite, amb-glow 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes amb-glow {
+	from {
+		filter: drop-shadow(0 0 2px #ffe27a) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.2));
+	}
+	to {
+		filter: drop-shadow(0 0 9px #fff0a0) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.2));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.amb-critter {
+		display: none;
+	}
+}

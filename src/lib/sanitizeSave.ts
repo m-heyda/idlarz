@@ -13,18 +13,23 @@ import {
 	GRID_SIZE,
 	INITIAL_CHARACTER_STATS,
 	INITIAL_RESOURCES,
+	LEGACY_UPGRADES,
 	RESOURCE_CAP,
+	type LegacyUpgradeId,
 } from '@/config/gameConfig';
 import {
 	calculateCombatStats,
 	calculateLevel,
 	calculateXpGain,
 	castleUpgradeDuration,
+	EMPTY_PRESTIGE,
+	legacySpent,
 } from '@/utils/gameUtils';
 import type {
 	CastleUpgradeState,
 	CharacterStats,
 	GameState,
+	PrestigeState,
 	Resources,
 	Tile,
 } from '@/types/game';
@@ -41,6 +46,7 @@ export const PERSISTED_KEYS = [
 	'farmLevels',
 	'clickLevel',
 	'castleUpgrade',
+	'prestige',
 	'playSeconds',
 	'chestSpawnTimer',
 	'activeChests',
@@ -245,6 +251,29 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		castleUpgrade = { toLevel, remainingSec: remaining };
 	}
 
+	// ---- Rebirth / Legacy (optional so saves from before it existed stay valid) -----------------------------
+	let prestige: PrestigeState = { ...EMPTY_PRESTIGE, upgrades: {} };
+	if (raw.prestige !== undefined) {
+		if (!isObject(raw.prestige)) return fail('prestige');
+		const rebirths = int(raw.prestige.rebirths, 0, 10000);
+		const legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
+		const legacyEarned = int(raw.prestige.legacyEarned, 0, 1_000_000);
+		if (rebirths === null || legacyPoints === null || legacyEarned === null) return fail('prestige numbers');
+		const upgrades: PrestigeState['upgrades'] = {};
+		if (!isObject(raw.prestige.upgrades)) return fail('prestige upgrades');
+		for (const [id, lvl] of Object.entries(raw.prestige.upgrades)) {
+			if (!(id in LEGACY_UPGRADES)) return fail('unknown legacy upgrade');
+			const level = int(lvl, 0, LEGACY_UPGRADES[id as LegacyUpgradeId].maxLevel);
+			if (level === null) return fail('legacy upgrade level');
+			if (level > 0) upgrades[id as LegacyUpgradeId] = level;
+		}
+		// Points are conserved: everything earned is either still unspent or paid for shop levels
+		if (legacyPoints + legacySpent(upgrades) !== legacyEarned) return fail('legacy points do not add up');
+		if ((rebirths === 0) !== (legacyEarned === 0)) return fail('rebirths and legacy disagree');
+		if (legacyEarned < rebirths) return fail('too few legacy points for the rebirths');
+		prestige = { rebirths, legacyPoints, legacyEarned, upgrades };
+	}
+
 	const chestSpawnTimer = num(raw.chestSpawnTimer, 0, CHEST.intervalSec);
 	const playSeconds = num(raw.playSeconds, 0, 1e9);
 	const lastChestReward = num(raw.lastChestReward ?? 0);
@@ -279,6 +308,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			farmLevels,
 			clickLevel,
 			castleUpgrade,
+			prestige,
 			playSeconds,
 			chestSpawnTimer,
 			activeChests: chests,

@@ -11,7 +11,7 @@ import {
 	MERCHANT_RESOURCE_PRICES,
 	TILE_RESOURCE_COST,
 } from '../src/config/gameConfig';
-import { calculateTileCost, calculateBuildingCost } from '../src/utils/gameUtils';
+import { calculateTileCost, calculateBuildingCost, effectiveTileDiscount } from '../src/utils/gameUtils';
 import type { Resources } from '../src/types/game';
 
 const SELLABLE = Object.keys(MERCHANT_RESOURCE_PRICES) as (keyof typeof MERCHANT_RESOURCE_PRICES)[];
@@ -139,7 +139,7 @@ test('tile cost: extra resources are required from the configured tile count and
 	const first = TILE_RESOURCE_COST[0];
 	growTo(first.from);
 	assert.equal(owned(), first.from);
-	const cost = calculateTileCost(owned(), api().characterStats.tileCostDiscount);
+	const cost = calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, api().prestige));
 	assert.ok((cost.resources[first.resource] ?? 0) > 0);
 	// enough gold, but none of the required resource
 	setResources({ gold: 1e12, wood: 0, stone: 0, coal: 0, food: 0 });

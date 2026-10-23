@@ -23,10 +23,11 @@ const BuildingSelectionDialog: FC<BuildingSelectionDialogProps> = ({
 }) => {
 	const tiles = useGameStore((state) => state.tiles);
 	const resources = useGameStore((state) => state.resources);
+	const prestige = useGameStore((state) => state.prestige);
 
 	if (!isOpen) return null;
 
-	const cost = calculateBuildingCost(tiles);
+	const cost = calculateBuildingCost(tiles, prestige);
 	const canAfford = canAffordBundle(resources, cost);
 
 	const handleSelect = (buildingType: string) => {

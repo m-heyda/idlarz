@@ -4,13 +4,13 @@ Exact rules as implemented. Constants live in [`src/config/gameConfig.ts`](../sr
 
 ## 1. The loop in one paragraph
 
-You start with a castle on a 50×50 map and 125 gold. Gold, other resources and XP trickle in every second. Gold (plus wood/stone/coal later) buys **adjacent unexplored tiles**, each of which becomes a biome and adds income. The **castle** is a big timed upgrade that multiplies everything. **Farm animals** turn food into meat, the **merchant** converts anything into gold (and back, at a loss), **clicking the map** and **chests** add active bonuses, and every **level** gives a stat point. Finishing = castle 6, best click power and ~40+ tiles; the target pace for an active player is ~4 weeks ([06](06-playtest-and-pacing-report.md)).
+You start with a castle on a 50×50 map and 125 gold. Gold, other resources and XP trickle in every second. Gold (plus wood/stone/coal later) buys **adjacent unexplored tiles**, each of which becomes a biome and adds income. The **castle** is a big timed upgrade that multiplies everything. **Farm animals** turn food into meat, the **merchant** converts anything into gold (and back, at a loss), **clicking the map** and **chests** add active bonuses, and every **level** gives a stat point. First finish line = castle 6, best click power and ~40+ tiles (about 4 weeks for an active player, [06](06-playtest-and-pacing-report.md)). After that the game continues with castle levels 7–10 and **Rebirth** (§13), which restarts the map for permanent Legacy bonuses.
 
 ## 2. Map & buying tiles
 
 - Grid 50×50, castle at (25, 25) owned from the start; drag to pan.
 - A tile can be bought only if it is **4-neighbour adjacent** to an owned tile and you can pay its whole cost: gold, plus **extra resources from larger territories** (`TILE_RESOURCE_COST`: wood + stone from the 15th owned tile, coal from 30, food from 40). Charisma discounts every part of the cost (0.5 %/point, max 25 %). The hover card and the biome picker show all costs, green when affordable.
-- Cost curve: ×1.45 per owned tile up to 20 tiles, ×1.27 per tile after that ([03 §1](03-formulas-and-scaling.md#1-tile-cost)).
+- Cost curve: ×1.45 per owned tile up to 20 tiles, ×1.27 up to 40, ×1.17 per tile after that ([03 §1](03-formulas-and-scaling.md#1-tile-cost)).
 - Not enough → shake + `wrong` sound. Success → `purchase` sound, XP, +100 reputation.
 - **Biome assignment**: random (weighted) among the 8 non-special biomes, except when `owned % 4 === 3` (owned = 3, 7, 11 … because the castle counts): then you **choose**. Nothing is charged until you choose; cancel is free; only offered biomes are accepted. **Weights** (`BIOME_SPAWN`): every biome 1, Coast 0.6; next to an owned Lake, Lake and Coast ×3; next to an owned Coast, Lake and Coast ×2 - so water clusters into bays with beaches. Water/coast are placeholders for later mechanics (fishing huts etc.).
 - Name prompt + tutorial at exactly 2 owned tiles while the name is still `Explorer`.
@@ -39,15 +39,15 @@ Gold, wood, stone, coal, food, meat, xp. All except gold/xp can be sold to the m
 
 ## 5. Castle
 
-- Max level 6. **Each upgrade is a timed build**: resources are paid up front, then the castle works for 1 h, 4 h, 12 h, 36 h and 72 h (5 d 5 h in total). It keeps its current bonus meanwhile and only one upgrade runs at a time. The timer is advanced by the game tick (never by the system clock), is saved, and is shown in the castle dialog and its tooltip.
-- Effect of level L: **+0.2 × 2^(L−1)** to the modifier of every resource (+20 % … +640 %), plus **+0.5 XP/s per level above 1** (flat).
-- Costs: see [03 §4](03-formulas-and-scaling.md#4-castle) (gold, wood, stone, coal from level 2→3, food + meat from 3→4).
+- Max level 10. **Each upgrade is a timed build**: resources are paid up front, then the castle works for 1 h, 4 h, 12 h, 36 h and 72 h (levels 2–6, 5 d 5 h in total), then 3 d, 4 d, 5 d and 7 d for levels 7–10 (24 d 5 h in total). Master Builders (Legacy) shortens these times. It keeps its current bonus meanwhile and only one upgrade runs at a time. The timer is advanced by the game tick (never by the system clock), is saved, and is shown in the castle dialog and its tooltip.
+- Effect of level L: the modifier of every resource doubles each level up to 6 (+20 % … +640 %), then grows by a flat +320 % per level (+960 % at 7 … +1920 % at 10), plus **+0.5 XP/s per level above 1** (flat). The castle sprite glows brighter from level 6 on, and level 10 gets sparks and the gold border.
+- Costs: see [03 §4](03-formulas-and-scaling.md#4-castle) (gold, wood, stone, coal from level 2→3, food + meat from 3→4; levels 7–10 cost about 1.6× the previous step).
 
 ## 6. Farm
 
 - Each purchase adds **one more animal** of that kind (production = base × count). First cost in food: chicken 10 K, deer 50 K, pig 200 K, cow 1 M; each next one of the same kind costs ×1.5 / 1.6 / 1.7 / 1.8 more.
 - Meat income = `Σ production × (1 + castle modifier + 0.05 × Plains tiles)`.
-- While the Farm window is open a critter wanders by every 20–40 s (one at a time, 10 s lifetime): click it for a gift of ~10 s of that resource's income (golden ones ×2).
+- While the Farm window is open a critter wanders by every 20–40 s (one at a time, 10 s lifetime): click it for a gift (golden ones ×2). The store decides the amount (about 10 s of income, never less than the critter's minimum) and enforces an 8 s cooldown for the window; the click limiter applies.
 
 ## 7. Merchant
 
@@ -84,4 +84,18 @@ All text in tooltips and the tutorial comes from `CHARACTER_STAT_CONFIG`. Other 
 
 ## 12. UI surfaces
 
-Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and the **hidden save tools** (press Control five times): export / import / reset ([07](07-security-and-exploits.md)).
+Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and the **hidden save tools** (press Control five times): export / import / reset ([07](07-security-and-exploits.md)). Also Settings, Legacy (rebirth + shop) and the re-openable tutorial.
+
+## 13. Rebirth and Legacy
+
+- Available when the castle is level 6 or more and you own at least 20 tiles (and no castle upgrade is running). The **Legacy** button in the header (visible from castle 6, or after the first rebirth) opens the dialog.
+- **Legacy points** gained = `floor(4.5 × (castle level − 5) × sqrt(tiles / 10))`, for example castle 6 / 40 tiles = 9, castle 10 / 50 tiles = 50 ([03 §9](03-formulas-and-scaling.md#9-rebirth-and-legacy)). The dialog shows the preview before you confirm.
+- **Resets**: map, resources, castle, animals, buildings, level / XP / stat points, click upgrades, chests, the castle timer. **Keeps**: name, class, play time, all Legacy progress, settings.
+- **Permanent bonus**: +5 % of total income for every Legacy point *earned* (spending points never lowers income).
+- **Shop** (spend points, ten levels each, price grows ×1.4 per level): *Thrift* −2 % tile and building cost per level; *Master Builders* −5 % castle build time; *Click Mastery* +10 % click power; *Provisions* start each run with a bundle of gold, wood and stone. The Thrift discount and Charisma share one cap of 45 %.
+- Expected pace (sim, [06](06-playtest-and-pacing-report.md)): the second run reaches castle 6 in about 70 % of the first run's time, later runs get shorter but flatten.
+
+## 14. Settings and ambient life
+
+- **Settings** (header): sound on/off, volume, ambient life on/off, buttons for Save tools (same as Control ×5) and the tutorial. Stored in the browser (`idlarz-settings`), separate from the game save.
+- **Ambient life**: every 4–9 s a butterfly, bee, ladybug or rabbit (chosen by biome; Coast gets butterflies and bees) wanders over an owned tile in view for 6–10 s. About 1 in 12 is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Off in Settings, with a hidden tab, or with reduced-motion.

@@ -10,7 +10,7 @@ import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import NamePrompt from '@/components/game/overlays/NamePrompt';
 import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/gameConfig';
-import { calculateTileCost } from '@/utils/gameUtils';
+import { calculateTileCost, effectiveTileDiscount } from '@/utils/gameUtils';
 import MerchantOverlay from '@/components/game/overlays/Merchant/MerchantOverlay';
 import FarmOverlay from '@/components/game/overlays/FarmOverlay';
 import GameHeader from '@/components/game/GameHeader';
@@ -19,6 +19,10 @@ import ChestNotification from '@/components/game/overlays/ChestNotification';
 import FloatingText from '@/components/game/FloatingText';
 import ClassPickerDialog from '@/components/game/ClassPickerDialog';
 import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
+import SettingsDialog from '@/components/game/overlays/SettingsDialog';
+import LegacyDialog from '@/components/game/overlays/LegacyDialog';
+import TutorialDialog from '@/components/game/overlays/TutorialDialog';
+import { useSettingsStore } from '@/stores/settingsStore';
 import TabLockOverlay from '@/components/game/overlays/TabLockOverlay';
 import { useSingleTab } from '@/hooks/useSingleTab';
 import { useCtrlSequence } from '@/hooks/useCtrlSequence';
@@ -29,6 +33,8 @@ export default function Home() {
 	const isHydrated = useGameStore((state) => state.isHydrated);
 	const { status: tabStatus, takeOver } = useSingleTab();
 	const toggleSaveMenu = useUiStore((state) => state.toggleSaveMenu);
+	const loadSettings = useSettingsStore((state) => state.load);
+	useEffect(() => loadSettings(), [loadSettings]);
 	// Hidden shortcut: Control x5 within 2.5 s opens the save tools (export / import / reset)
 	useCtrlSequence(5, 2500, toggleSaveMenu);
 	const lastChestReward = useGameStore((state) => state.lastChestReward);
@@ -48,12 +54,13 @@ export default function Home() {
 	const cancelBiomeSelection = useGameStore((state) => state.cancelBiomeSelection);
 	const pendingTileCoords = useGameStore((state) => state.pendingTileCoords);
 	const characterStats = useGameStore((state) => state.characterStats);
+	const prestige = useGameStore((state) => state.prestige);
 	const tiles = useGameStore((state) => state.tiles);
 	const [clickPosition, setClickPosition] = React.useState<{x: number, y: number} | undefined>(undefined);
 	
 	const tileCost = calculateTileCost(
 		tiles.flat().filter((tile) => tile.isOwned).length,
-		characterStats.tileCostDiscount
+		effectiveTileDiscount(characterStats, prestige)
 	);
 
 	useEffect(() => {
@@ -129,6 +136,9 @@ export default function Home() {
 			<NamePrompt />
 			<GameDebug />
 			<SaveMenuDialog />
+			<SettingsDialog />
+			<LegacyDialog />
+			<TutorialDialog />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}
 			<ChestNotification 
 				show={showChestNotification} 
