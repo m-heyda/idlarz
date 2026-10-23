@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "sim": "tsx scripts/sim.ts",
     "test": "tsx --test \"tests/**/*.test.ts\"",
     "report": "tsx scripts/balance-report.ts"
