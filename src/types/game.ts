@@ -1,5 +1,6 @@
 import { BIOMES } from '@/config/gameConfig';
 import type { PlayerClassId } from '@/config/playerClasses';
+import type { LegacyUpgradeId } from '@/config/gameConfig';
 
 export type BiomeType = keyof typeof BIOMES;
 
@@ -146,6 +147,14 @@ export interface TileCost {
 	resources: Partial<Resources>;
 }
 
+// Rebirth / Legacy (kept across rebirths)
+export interface PrestigeState {
+	rebirths: number;
+	legacyPoints: number; // unspent
+	legacyEarned: number; // ever earned; drives the income bonus. earned = unspent + cost of all shop levels
+	upgrades: Partial<Record<LegacyUpgradeId, number>>;
+}
+
 export interface TapResult {
 	items: { resource: keyof Resources; amount: number }[];
 	lucky: boolean;
@@ -174,6 +183,7 @@ export interface GameState {
 	biomeSelectionActive: boolean;
 	pendingTileCoords: { x: number; y: number } | null;
 	selectableBiomes: BiomeType[] | null;
+	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
 	castleUpgrade: CastleUpgradeState | null;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
@@ -189,6 +199,8 @@ export interface GameState {
 	buyResource: (resource: keyof Resources, amount: number) => boolean;
 	clickForGold: (input: ClickInput) => number;
 	resetGame: () => void;
+	rebirth: () => boolean;
+	buyLegacyUpgrade: (id: LegacyUpgradeId) => boolean;
 	selectBiome: (biome: BiomeType) => boolean;
 	cancelBiomeSelection: () => void;
 	upgradeCastle: () => boolean;

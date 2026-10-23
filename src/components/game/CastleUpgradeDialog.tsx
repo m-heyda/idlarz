@@ -19,6 +19,7 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 	const resources = useGameStore((state) => state.resources);
 	const upgradeCastle = useGameStore((state) => state.upgradeCastle);
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
+	const prestige = useGameStore((state) => state.prestige);
 
 	// Safely get castle level from the center tile
 	const centerX = Math.floor(tiles[0].length / 2);
@@ -71,7 +72,7 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 	const nextXpBonus = CASTLE_UPGRADE.xpBonus * castleLevel;
 	const afterNextXpBonus = CASTLE_UPGRADE.xpBonus * (castleLevel + 1);
 
-	const duration = castleUpgradeDuration(castleLevel);
+	const duration = castleUpgradeDuration(castleLevel, prestige);
 
 	const CostGrid: React.FC<{ costs: Partial<Record<string, number>>; muted?: boolean }> = ({
 		costs,

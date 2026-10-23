@@ -16,6 +16,7 @@ import { useGameStore } from '@/stores/gameStore';
 import {
 	calculateTileCost,
 	canAffordBundle,
+	effectiveTileDiscount,
 	countOwnedTiles,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
@@ -52,6 +53,7 @@ const Tile: React.FC<TileProps> = ({
 	const buyTile = useGameStore((state) => state.buyTile);
 	const resources = useGameStore((state) => state.resources);
 	const characterStats = useGameStore((state) => state.characterStats);
+	const prestige = useGameStore((state) => state.prestige);
 	const upgradeGroundsTile = useGameStore((state) => state.upgradeGroundsTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
@@ -104,8 +106,8 @@ const Tile: React.FC<TileProps> = ({
 	const ownedTilesCount = useMemo(() => countOwnedTiles(tiles), [tiles]);
 
 	const tileCost = useMemo(
-		() => calculateTileCost(ownedTilesCount, characterStats.tileCostDiscount),
-		[ownedTilesCount, characterStats.tileCostDiscount]
+		() => calculateTileCost(ownedTilesCount, effectiveTileDiscount(characterStats, prestige)),
+		[ownedTilesCount, characterStats, prestige]
 	);
 
 	const canAfford = canAffordBundle(resources, tileCostAsResources(tileCost));

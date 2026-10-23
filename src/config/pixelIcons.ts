@@ -15,6 +15,8 @@ export const PIXEL_ICON_SIZES = {
 	menu_character: [40, 40],
 	menu_merchant: [40, 40],
 	menu_farm: [40, 40],
+	menu_settings: [40, 40],
+	menu_legacy: [40, 40],
 	level_orb: [24, 24],
 	xp: [40, 40],
 	bonus_chest: [24, 24],

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, MAX_CATCHUP_SEC } from '@/config/gameConfig';
 
 const GameDebug: React.FC = () => {
 	const { playerName, setPlayerName, tiles, addResources, resources } =
@@ -88,6 +89,32 @@ const GameDebug: React.FC = () => {
 		}
 	};
 
+	// Dev only: expose the store on window for manual testing in the console (never in production builds)
+	useEffect(() => {
+		if (process.env.NODE_ENV === 'development') {
+			(window as unknown as { __game?: typeof useGameStore }).__game = useGameStore;
+		}
+	}, []);
+
+	// Dev shortcuts for testing the late game quickly
+	const handleCastleUp = () => {
+		useGameStore.setState((state) => {
+			const tiles = state.tiles.map((row) => [...row]);
+			const castle = tiles[GRID_CENTER_Y][GRID_CENTER_X];
+			const level = Math.min((castle.level ?? 1) + 1, CASTLE_UPGRADE.maxLevel);
+			tiles[GRID_CENTER_Y][GRID_CENTER_X] = {
+				...castle,
+				level,
+				upgradeCost: level < CASTLE_UPGRADE.maxLevel ? { ...CASTLE_UPGRADE.upgradeCosts[level - 1] } : undefined,
+			};
+			return { tiles, castleUpgrade: null };
+		});
+	};
+
+	const handleFastForward = () => {
+		for (let i = 0; i < 12; i++) useGameStore.getState().tick(MAX_CATCHUP_SEC * 1000);
+	};
+
 	if (process.env.NODE_ENV !== 'development') return null;
 
 	return (
@@ -143,6 +170,16 @@ const GameDebug: React.FC = () => {
 					onClick={handleSpawnChest}
 					className='bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-md text-xs'>
 					Spawn Chest
+				</button>
+				<button
+					onClick={handleCastleUp}
+					className='bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-md text-xs'>
+					Castle +1 level
+				</button>
+				<button
+					onClick={handleFastForward}
+					className='bg-teal-600 hover:bg-teal-700 text-white px-2 py-1 rounded-md text-xs'>
+					+1 hour
 				</button>
 			</div>
 		</div>

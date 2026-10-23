@@ -30,6 +30,7 @@ import sprites_characters  # noqa: E402
 import sprites_equipment  # noqa: E402
 import sprites_farm  # noqa: E402
 import sprites_map  # noqa: E402
+import sprites_menu  # noqa: E402
 import sprites_meadow  # noqa: E402
 import sprites_props  # noqa: E402
 import sprites_resources  # noqa: E402
@@ -56,6 +57,7 @@ SPRITES = {
     **sprites_map.SPRITES,
     **sprites_castle.SPRITES,
     **sprites_buildings.SPRITES,
+    **sprites_menu.SPRITES,
 }
 
 UI = {

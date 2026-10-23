@@ -656,3 +656,51 @@ export const CHARACTER_STAT_CONFIG = {
 	// Plains: meat modifier per owned Plains tile (fraction)
 	plainsMeatModifier: 0.05,
 };
+
+// Rebirth: restart with a permanent Legacy bonus. Available once the castle reaches `minCastleLevel`.
+export const REBIRTH = {
+	minCastleLevel: 6,
+	minTiles: 20, // a rebirth also needs this much territory (no cheap rebirth with a tiny map)
+	gainScale: 4.5, // Legacy points = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
+	incomePerPoint: 0.05, // +5% of all income per Legacy point ever earned (spending points never lowers it)
+	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile
+	// Legacy points granted for a rebirth with this castle level and territory
+	gain: (castleLevel: number, tiles: number) =>
+		Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * Math.sqrt(Math.max(0, tiles) / 10)),
+};
+
+// The Legacy shop: permanent upgrades bought with unspent Legacy points. The N+1-th level costs
+// ceil(baseCost x costGrowth^N) points.
+export const LEGACY_UPGRADES = {
+	thrift: {
+		label: 'Thrift',
+		maxLevel: 10,
+		baseCost: 2,
+		costGrowth: 1.4,
+		effectPerLevel: 0.02, // -2% tile and building cost per level
+	},
+	builders: {
+		label: 'Master Builders',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.05, // -5% castle build time per level
+	},
+	mastery: {
+		label: 'Click Mastery',
+		maxLevel: 10,
+		baseCost: 2,
+		costGrowth: 1.4,
+		effectPerLevel: 0.1, // +10% gold per click per level
+	},
+	provisions: {
+		label: 'Provisions',
+		maxLevel: 10,
+		baseCost: 2,
+		costGrowth: 1.4,
+		effectPerLevel: 1, // levels of the starting bundle below
+		bundle: { gold: 1500, wood: 400, stone: 400 } as Partial<Resources>, // per level, given at the start of every run
+	},
+} as const;
+
+export type LegacyUpgradeId = keyof typeof LEGACY_UPGRADES;

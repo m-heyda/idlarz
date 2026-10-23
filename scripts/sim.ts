@@ -41,15 +41,11 @@ const main = async () => {
 	const PROFILES: Record<string, Profile> = {
 		idle: { cps: 0, windows: [] },
 		casual: { cps: 1, windows: [[19, 22]] },
-		hardcore: {
-			cps: 4,
-			windows: [
-				[7, 9],
-				[12, 13],
-				[18, 23],
-			],
-		},
+		hardcore: { cps: 4, windows: HARDCORE_WINDOWS },
 		autoclicker: { cps: 20, windows: [[0, 24]] },
+		// the dedicated player who rebirths as early as possible / after pushing the castle to the end
+		'hardcore-rebirth6': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 3 },
+		'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
 	};
 	const selected = names.length ? names : Object.keys(PROFILES);
 
@@ -80,6 +76,8 @@ const main = async () => {
 interface Profile {
 	cps: number; // intended clicks per second while active
 	windows: [number, number][]; // hours of the day the player is actively playing
+	rebirthAtCastle?: number; // rebirth as soon as the castle reaches this level (and keep playing the next run)
+	rebirths?: number; // how many rebirths to simulate (default 1 when rebirthAtCastle is set)
 }
 
 type Milestones = Record<string, number | null>; // key -> game day (fractional), null if never
@@ -90,6 +88,11 @@ interface Ctx {
 	store: typeof import('../src/stores/gameStore').useGameStore;
 }
 
+const HARDCORE_WINDOWS: [number, number][] = [
+	[7, 9],
+	[12, 13],
+	[18, 23],
+];
 let MAX_DAYS = 300;
 const FINE_STEP_DAYS = 45; // 20 s steps for the first weeks, coarser afterwards (keeps long runs fast)
 const FIRST_FINISH_CASTLE = 6; // the first finish line (castle 6 + best click + 40 tiles) is unchanged by castle levels 7-10
@@ -110,8 +113,11 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 	api().resetGame();
 
 	const milestones: Milestones = {};
+	let run = 1; // 1 = first run; after a rebirth keys get an `rN.` prefix and are relative to the rebirth
+	let runStart = 0;
 	const mark = (key: string, t: number) => {
-		if (milestones[key] == null) milestones[key] = t / 86400;
+		const k = run === 1 ? key : `r${run}.${key}`;
+		if (milestones[k] == null) milestones[k] = (t - runStart) / 86400;
 	};
 	const TILE_MARKS = [10, 16, 20, 25, 30, 35, 40, 50];
 
@@ -184,6 +190,14 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			s = api();
 		}
 
+		// Legacy shop: spend points as they come, Master Builders first
+		for (let guard = 0; guard < 50; guard++) {
+			const order: ('builders' | 'thrift' | 'mastery' | 'provisions')[] = ['builders', 'thrift', 'mastery', 'provisions'];
+			const target = order.find((id) => (s.prestige.upgrades[id] ?? 0) <= (s.prestige.upgrades.builders ?? 0));
+			if (!target || !api().buyLegacyUpgrade(target)) break;
+			s = api();
+		}
+
 		// Stat points -> Charisma / Intelligence
 		while (s.characterStats.availablePoints > 0) {
 			api().addStatPoint(
@@ -228,7 +242,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			for (let x = 0; x < cfg.GRID_SIZE; x++) {
 				const tile = s.tiles[y][x];
 				if (tile.isOwned && tile.biome === 'grounds' && !tile.building) {
-					const bc = utils.calculateBuildingCost(s.tiles);
+					const bc = utils.calculateBuildingCost(s.tiles, s.prestige);
 					if (utils.canAffordBundle(s.resources, bc) && s.resources.gold > (bc.gold ?? 0) * 3) {
 						if (api().upgradeGroundsTile(x, y, BUILD_ORDER[buildingCursor % BUILD_ORDER.length])) {
 							buildingCursor++;
@@ -247,7 +261,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			}
 			if (!frontier) break;
 			const owned = utils.countOwnedTiles(s.tiles);
-			const cost = utils.calculateTileCost(owned, s.characterStats.tileCostDiscount);
+			const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige));
 			const bundle = utils.tileCostAsResources(cost);
 			if (!utils.canAffordBundle(s.resources, bundle)) {
 				if (!topUp(bundle)) break;
@@ -284,7 +298,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 		const need: Record<string, number> = { ...((castle.upgradeCost ?? {}) as Record<string, number>) };
 		const owned = utils.countOwnedTiles(s.tiles);
 		for (let k = 0; k < 3; k++) {
-			const c = utils.calculateTileCost(owned + k, s.characterStats.tileCostDiscount);
+			const c = utils.calculateTileCost(owned + k, utils.effectiveTileDiscount(s.characterStats, s.prestige));
 			Object.entries(c.resources).forEach(([r, v]) => {
 				need[r] = Math.max(need[r] ?? 0, (v ?? 0) * 1.1);
 			});
@@ -343,7 +357,23 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 			const lvl = api().level.level;
 			[10, 20, 30].forEach((n) => lvl >= n && mark(`level${n}`, t));
 			if (finished()) mark('finished', t);
-			if ((api().tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level ?? 1) >= cfg.CASTLE_UPGRADE.maxLevel) {
+			const castleNow = api().tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level ?? 1;
+			const totalRebirths = profile.rebirthAtCastle ? profile.rebirths ?? 1 : 0;
+			if (profile.rebirthAtCastle && run <= totalRebirths && castleNow >= profile.rebirthAtCastle && !api().castleUpgrade) {
+				mark('rebirth', t);
+				const before = api().prestige.legacyEarned;
+				if (api().rebirth()) {
+					milestones[`legacy${run}`] = api().prestige.legacyEarned - before;
+					run++;
+					runStart = t;
+					frontierDirty = true;
+					picks = 0;
+					buildingCursor = 0;
+				}
+			}
+			if (totalRebirths > 0) {
+				if (run > totalRebirths && milestones[`r${run}.finished`] != null) break;
+			} else if (castleNow >= cfg.CASTLE_UPGRADE.maxLevel) {
 				mark(`castle${cfg.CASTLE_UPGRADE.maxLevel}`, t);
 				break;
 			}
@@ -401,8 +431,18 @@ function renderMarkdown(results: Record<string, Milestones>, legacy: boolean): s
 	lines.push('');
 	lines.push(`| milestone | ${names.join(' | ')} |`);
 	lines.push(`| --- | ${names.map(() => '---').join(' | ')} |`);
-	ORDER.forEach((key) => {
-		lines.push(`| ${key} | ${names.map((n) => fmt(results[n][key])).join(' | ')} |`);
+	// after a rebirth only the headline milestones of each further run are listed
+	const extraKeys = Array.from(
+		new Set(
+			names.flatMap((n) =>
+				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(legacy[0-9]+|rebirth|r[0-9]+[.](castle6|tiles40|finished))$/.test(k))
+			)
+		)
+	).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
+	[...ORDER, ...extraKeys].forEach((key) => {
+		if (!names.some((n) => results[n][key] != null) && !ORDER.includes(key)) return;
+		const isCount = key.startsWith('legacy');
+		lines.push(`| ${key} | ${names.map((n) => (isCount ? String(results[n][key] ?? '—') : fmt(results[n][key]))).join(' | ')} |`);
 	});
 	lines.push('');
 	lines.push(

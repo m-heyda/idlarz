@@ -10,6 +10,8 @@ import {
 	CASTLE_UPGRADE,
 	CHARACTER_STAT_CONFIG,
 	CHEST,
+	LEGACY_UPGRADES,
+	REBIRTH,
 	CLICK_LADDER,
 	CLICK_LIMIT,
 	FARM_BONUS,
@@ -152,6 +154,17 @@ const Tutorial: React.FC = () => {
 					{formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in total); the
 					castle keeps its current bonus while it is being built. From level 2 it also produces +
 					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1.
+				</p>
+			</section>
+
+			<section>
+				<h3 className='px-h'>Rebirth &amp; Legacy</h3>
+				<p className='text-[#d8c8a0]'>
+					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles you can
+					Rebirth from the Legacy window: the map, resources, castle, farm and level start again, and you keep your name,
+					hero and Legacy. Every Legacy point is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
+					the shop ({Object.values(LEGACY_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
+					at the moment of rebirth give more points, so pushing on to level {CASTLE_UPGRADE.maxLevel} first pays.
 				</p>
 			</section>
 

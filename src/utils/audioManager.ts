@@ -3,10 +3,14 @@ class AudioManager {
   private static instance: AudioManager;
   private sounds: Map<string, HTMLAudioElement>;
   private loadedSounds: Map<string, boolean>;
+  private baseVolumes: Map<string, number>;
+  private master = 1;
+  private muted = false;
 
   private constructor() {
     this.sounds = new Map();
     this.loadedSounds = new Map();
+    this.baseVolumes = new Map();
   }
 
   public static getInstance(): AudioManager {
@@ -21,7 +25,8 @@ class AudioManager {
 
     const audio = new Audio();
     audio.preload = 'auto';
-    audio.volume = volume;
+    this.baseVolumes.set(key, volume);
+    audio.volume = volume * this.master;
 
     audio.addEventListener('canplaythrough', () => {
       this.loadedSounds.set(key, true);
@@ -41,6 +46,7 @@ class AudioManager {
     const audio = this.sounds.get(key);
     const isLoaded = this.loadedSounds.get(key);
 
+    if (this.muted) return;
     if (audio && isLoaded) {
       const playPromise = audio.play();
       
@@ -58,6 +64,18 @@ class AudioManager {
           });
       }
     }
+  }
+
+  /** Master volume 0..1 (multiplies every sound's own volume) and mute, from the Settings dialog. */
+  public setMasterVolume(volume: number): void {
+    this.master = Math.min(1, Math.max(0, Number.isFinite(volume) ? volume : 1));
+    this.sounds.forEach((audio, key) => {
+      audio.volume = (this.baseVolumes.get(key) ?? 0.3) * this.master;
+    });
+  }
+
+  public setMuted(muted: boolean): void {
+    this.muted = muted;
   }
 
   public isLoaded(key: string): boolean {
