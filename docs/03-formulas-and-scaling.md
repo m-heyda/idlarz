@@ -117,7 +117,7 @@ Click limiter: burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refi
 
 ## 8. What the pacing looks like
 
-From `npm run sim` (bot players, real store; see [06](06-playtest-and-pacing-report.md)): castle 2 ≈ 19 h, castle 3 ≈ 2–3 d, castle 4 ≈ 5–7 d, castle 5 ≈ 12–16 d, castle 6 ≈ 27–36 d, with the dedicated human about 20 % faster than a player who never clicks, and a 20-clicks/s auto-clicker no better than a dedicated human.
+From `npm run sim` (bot players, real store; see [06](06-playtest-and-pacing-report.md)): castle 2 ≈ 17–21 h, castle 3 ≈ 2–3 d, castle 4 ≈ 5–8 d, castle 5 ≈ 13–18 d, castle 6 ≈ 32–40 d, castle 10 ≈ 100–125 d, with the dedicated human about 20 % faster than a player who never clicks. The 24 h/day auto-clicker bot is faster still (castle 6 ≈ 24 d) because it also manages the economy around the clock, see [06 §3](06-playtest-and-pacing-report.md).
 
 ## 9. Rebirth and Legacy
 

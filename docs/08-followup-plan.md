@@ -17,7 +17,7 @@ Everything that was **not** part of the endgame / settings / ambient batch, orde
 
 ## Phase B — balance (one topic per PR, each re-runs the sim)
 
-B1 active-vs-idle gap (BL1) · B2 levels and stat points (BL2) · B3 chests and tile taps (BL3) · B4 animal engine (BL4) · B5 sinks (BL5) · B6 merchant saturation (BL6) · B7 biome specialisation (BL8) · B8 first ten minutes: check the tutorial flow, first tile at ~1 min, first animal before the first castle upgrade · B9 more Legacy shop shapes (BL9, BL10).
+B1 active-vs-idle gap (BL1) · B2 levels and stat points (BL2) · B3 chests and tile taps (BL3) · B4 animal engine (BL4) · B5 sinks (BL5) · B6 merchant saturation (BL6) · B7 biome specialisation (BL8) · B8 first ten minutes: check the tutorial flow, first tile at ~1 min, first animal before the first castle upgrade · B9 more Legacy shop shapes (BL9, BL10) · B10 biome luck and the 24 h player (BL11): do this first, it decides how stable the other sim comparisons are.
 
 Rule for every B item: change one parameter group, run `npm run sim -- --seeds=3`, compare with `docs/generated/sim-milestones.md`, keep the dedicated profile's first finish at 4 weeks ± 15 % and castle 10 between 70 and 100 days.
 

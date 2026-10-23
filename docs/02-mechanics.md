@@ -10,7 +10,7 @@ You start with a castle on a 50×50 map and 125 gold. Gold, other resources and 
 
 - Grid 50×50, castle at (25, 25) owned from the start; drag to pan.
 - A tile can be bought only if it is **4-neighbour adjacent** to an owned tile and you can pay its whole cost: gold, plus **extra resources from larger territories** (`TILE_RESOURCE_COST`: wood + stone from the 15th owned tile, coal from 30, food from 40). Charisma discounts every part of the cost (0.5 %/point, max 25 %). The hover card and the biome picker show all costs, green when affordable.
-- Cost curve: ×1.45 per owned tile up to 20 tiles, ×1.27 per tile after that ([03 §1](03-formulas-and-scaling.md#1-tile-cost)).
+- Cost curve: ×1.45 per owned tile up to 20 tiles, ×1.27 up to 40, ×1.17 per tile after that ([03 §1](03-formulas-and-scaling.md#1-tile-cost)).
 - Not enough → shake + `wrong` sound. Success → `purchase` sound, XP, +100 reputation.
 - **Biome assignment**: random (weighted) among the 8 non-special biomes, except when `owned % 4 === 3` (owned = 3, 7, 11 … because the castle counts): then you **choose**. Nothing is charged until you choose; cancel is free; only offered biomes are accepted. **Weights** (`BIOME_SPAWN`): every biome 1, Coast 0.6; next to an owned Lake, Lake and Coast ×3; next to an owned Coast, Lake and Coast ×2 - so water clusters into bays with beaches. Water/coast are placeholders for later mechanics (fishing huts etc.).
 - Name prompt + tutorial at exactly 2 owned tiles while the name is still `Explorer`.
@@ -98,4 +98,4 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 ## 14. Settings and ambient life
 
 - **Settings** (header): sound on/off, volume, ambient life on/off, buttons for Save tools (same as Control ×5) and the tutorial. Stored in the browser (`idlarz-settings`), separate from the game save.
-- **Ambient life**: every 4–9 s a butterfly, bee, ladybug or rabbit (chosen by biome) wanders over an owned tile in view for 6–10 s. About 1 in 12 is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Off in Settings, with a hidden tab, or with reduced-motion.
+- **Ambient life**: every 4–9 s a butterfly, bee, ladybug or rabbit (chosen by biome; Coast gets butterflies and bees) wanders over an owned tile in view for 6–10 s. About 1 in 12 is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Off in Settings, with a hidden tab, or with reduced-motion.
