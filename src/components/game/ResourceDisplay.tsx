@@ -117,8 +117,8 @@ const ResourceDisplay: React.FC = () => {
 						</div>
 
 						{/* Tooltip */}
-						<div className='absolute top-full left-1/2 -translate-x-1/2 mt-1 opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
-							<div className='px-tooltip whitespace-nowrap text-sm min-w-[200px]'>
+						<div className='absolute top-full left-1/2 -translate-x-1/2 mt-1 w-max opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
+							<div className='px-tooltip text-sm min-w-[200px]'>
 								<div className='px-tip-title mb-1'>{resourceInfo.label}</div>
 								<div className='px-tip-muted text-xs mb-2'>
 									{resourceInfo.description}

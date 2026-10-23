@@ -294,16 +294,18 @@ const Tile: React.FC<TileProps> = ({
 						</span>
 					)}
 
-					{/* Bonus cash bag on the tile */}
+					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && (
-						<PixelIcon name='cash_bag' alt='Bonus gold' className='tile-bag' />
+						<span className='tile-chest-wrap'>
+							<PixelIcon name='bonus_chest' alt='Bonus gold' className='tile-chest' />
+							<i className='chest-twinkle' aria-hidden />
+						</span>
 					)}
 
 					{/* Chest tooltip */}
 					{isOwned && hasChest && showChestTooltip && (
-						<div className='absolute -top-11 left-1/2 -translate-x-1/2 z-[60] px-tooltip whitespace-nowrap text-xs flex items-center gap-1 text-[#f0d27a]'>
-							Click to collect bonus gold
-							<ResourceIcon resource='gold' />
+						<div className='map-tip map-tip-up absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max z-[60] px-tooltip text-xs text-[#f0d27a]'>
+							Click to collect bonus gold <ResourceIcon resource='gold' />
 						</div>
 					)}
 					
@@ -321,8 +323,8 @@ const Tile: React.FC<TileProps> = ({
 				</div>
 
 				{(isOwned || isAdjacent) && (
-					<div className='absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
-						<div className='px-tooltip whitespace-nowrap'>
+					<div className='map-tip absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px] opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
+						<div className='px-tooltip break-words'>
 							<TileStatus
 								biome={biome}
 								isOwned={isOwned}

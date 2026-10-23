@@ -76,8 +76,8 @@ const LevelDetails: React.FC = () => {
 						{pct}% · {formatNumber(currentXp)} / {formatNumber(xpForNextLevel)}
 					</div>
 				</div>
-				<div className='absolute left-1/2 top-full -translate-x-1/2 mt-2 z-[60] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150'>
-					<div className='px-tooltip whitespace-nowrap'>
+				<div className='absolute left-1/2 top-full -translate-x-1/2 mt-2 w-max z-[60] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150'>
+					<div className='px-tooltip'>
 						<LevelUpTimer resourceRates={resourceRates} resources={resources} level={level} />
 					</div>
 				</div>

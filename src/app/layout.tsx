@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-// Pixelify Sans (Google Fonts, OFL) - self-hosted via the fontsource package; exposes the
-// "Pixelify Sans Variable" family used by --font-pixel in globals.css
-import "@fontsource-variable/pixelify-sans";
+// Mozilla Headline (Google Fonts, OFL) - self-hosted via the fontsource package; exposes the
+// "Mozilla Headline Variable" family used by --font-pixel in globals.css
+import "@fontsource-variable/mozilla-headline";
 import "./globals.css";
 
 export const metadata: Metadata = {

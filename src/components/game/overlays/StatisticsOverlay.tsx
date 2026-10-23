@@ -114,7 +114,7 @@ const StatisticsOverlay: React.FC = () => {
 													<span className='text-blue-400 font-medium'>
 														{value}
 													</span>
-													<div className='absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity duration-200'>
+													<div className='absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity duration-200'>
 														<div className='px-tooltip min-w-[240px]'>
 															<div className='space-y-2'>
 																<div className='px-tip-title'>
