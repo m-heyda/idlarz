@@ -238,8 +238,13 @@ export interface GameState {
 	playerName: string;
 	playerClass: PlayerClassId;
 	characterStats: CharacterStats;
-	equipment: Record<string, never>; // replaced in the persisted-equipment task
-	inventory: never[];
+	equipment: Equipment;
+	bag: BagSlot[];
+	playerHp: number;
+	monsters: Monster[];
+	monsterSpawnTimer: number;
+	nextMonsterId: number;
+	fight: FightState | null; // transient: never saved
 	farmLevels: Record<string, number>;
 	showCharacterWindow: boolean;
 	showStatisticsWindow: boolean;
@@ -285,6 +290,9 @@ export interface GameState {
 	setPlayerClass: (playerClass: PlayerClassId) => void;
 	addResources: (resourceToAdd: Partial<Resources>) => void;
 	collectChest: (x: number, y: number) => boolean;
+	equipItem: (bagIndex: number) => boolean;
+	unequipItem: (slot: EquipmentSlot) => boolean;
+	moveBagItem: (from: number, to: number) => boolean;
 	// Tap an owned tile: grants a slice of its output. Returns null while on cooldown / nothing to give.
 	tapTile: (x: number, y: number, input?: ClickInput) => TapResult | null;
 }

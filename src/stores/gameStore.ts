@@ -53,6 +53,9 @@ import {
 	tileCostAsResources,
 } from '@/utils/gameUtils';
 import { createClickLimiter } from '@/lib/clickLimiter';
+import { maxHp } from '@/lib/combat';
+import { equipFromBag, moveSlot, starterBag, unequip } from '@/lib/inventory';
+import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markVaultReady, SAVE_NAME, SAVE_VERSION, vaultStorage } from '@/lib/saveVault';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type {
@@ -60,8 +63,11 @@ import type {
 	CharacterStats,
 	ClickInput,
 	CritterGift,
+	EquipmentSlot,
+	FightState,
 	GameState,
 	GiftResult,
+	Monster,
 	PrestigeState,
 	Resources,
 	TapResult,
@@ -100,6 +106,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
 	const grid = createInitialGrid();
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
+	const equipment = { ...STARTER_EQUIPMENT };
 	const rates = calculateResourceRates(grid, stats, {}, prestige);
 	return {
 		tiles: grid,
@@ -110,8 +117,13 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
 		playerName: DEFAULT_PLAYER_NAME,
 		playerClass: DEFAULT_PLAYER_CLASS,
 		characterStats: stats,
-		equipment: {} as Record<string, never>,
-		inventory: [] as never[],
+		equipment,
+		bag: starterBag(),
+		playerHp: maxHp(stats, equipment),
+		monsters: [] as Monster[],
+		monsterSpawnTimer: 0,
+		nextMonsterId: 1,
+		fight: null as FightState | null,
 		farmLevels: {} as Record<string, number>,
 		showCharacterWindow: false,
 		showStatisticsWindow: false,
@@ -215,8 +227,13 @@ const createGameSlice = (
 			clickLimiter.reset();
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
+			const fresh = createInitialData(prestige);
 			set({
-				...createInitialData(prestige),
+				...fresh,
+				// gear is character progression: it survives a rebirth (HP is refilled)
+				equipment: state.equipment,
+				bag: state.bag,
+				playerHp: maxHp(fresh.characterStats, state.equipment),
 				playerName: state.playerName,
 				playerClass: state.playerClass,
 				playSeconds: state.playSeconds,
@@ -483,6 +500,42 @@ const createGameSlice = (
 			lastGiftAt[gift.source] = input.now;
 			get().addResources({ [def.resource]: amount });
 			return { resource: def.resource, amount };
+		},
+
+		// Gear actions: refused while a fight is open; max HP can drop when gear comes off, so playerHp follows it down
+		equipItem: (bagIndex: number) => {
+			const state = get();
+			if (state.fight) return false;
+			const result = equipFromBag(state.bag, state.equipment, bagIndex);
+			if (!result) return false;
+			set({
+				bag: result.bag,
+				equipment: result.equipment,
+				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
+			});
+			return true;
+		},
+
+		unequipItem: (slot: EquipmentSlot) => {
+			const state = get();
+			if (state.fight) return false;
+			const result = unequip(state.bag, state.equipment, slot);
+			if (!result) return false;
+			set({
+				bag: result.bag,
+				equipment: result.equipment,
+				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
+			});
+			return true;
+		},
+
+		moveBagItem: (from: number, to: number) => {
+			const state = get();
+			if (state.fight || from === to) return false;
+			const inRange = (i: number) => Number.isInteger(i) && i >= 0 && i < state.bag.length;
+			if (!inRange(from) || !inRange(to)) return false;
+			set({ bag: moveSlot(state.bag, from, to) });
+			return true;
 		},
 
 		// Tapping an owned tile yields a slice of its own output (per-tile cooldown + the shared click limiter)

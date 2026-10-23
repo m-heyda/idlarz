@@ -17,6 +17,11 @@ import {
 	RESOURCE_CAP,
 	type LegacyUpgradeId,
 } from '@/config/gameConfig';
+import { COMBAT } from '@/config/combatConfig';
+import { EQUIPMENT_LAYOUT, ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
+import { maxHp } from '@/lib/combat';
+import { starterBag } from '@/lib/inventory';
+import { tierFor } from '@/lib/monsters';
 import {
 	calculateCombatStats,
 	calculateLevel,
@@ -26,9 +31,13 @@ import {
 	legacySpent,
 } from '@/utils/gameUtils';
 import type {
+	BagSlot,
 	CastleUpgradeState,
 	CharacterStats,
+	Equipment,
+	EquipmentSlot,
 	GameState,
+	Monster,
 	PrestigeState,
 	Resources,
 	Tile,
@@ -53,6 +62,12 @@ export const PERSISTED_KEYS = [
 	'lastChestReward',
 	'lastChestGoldRate',
 	'lastChestMinutesAwarded',
+	'equipment',
+	'bag',
+	'playerHp',
+	'monsters',
+	'monsterSpawnTimer',
+	'nextMonsterId',
 ] as const;
 
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]>;
@@ -86,6 +101,9 @@ const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'ch
 const RESOURCE_KEYS = Object.keys(INITIAL_RESOURCES) as (keyof Resources)[];
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
+const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
+const MONSTER_KEYS = new Set(['id', 'type', 'tier', 'x', 'y', 'ageSec']);
+const BAG_ENTRY_KEYS = new Set(['id', 'qty']);
 /** Level-ups are awarded by the tick, so a save written a moment after a purchase can be a few points behind. */
 const POINT_TOLERANCE = 5;
 
@@ -228,6 +246,80 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	};
 	Object.assign(characterStats, calculateCombatStats(characterStats));
 
+
+	// ---- gear, bag, HP, monsters (all optional: a save from before combat gets the starter kit) ------------------
+	let equipment: Equipment;
+	let bag: BagSlot[];
+	if (raw.equipment === undefined && raw.bag === undefined) {
+		equipment = { ...STARTER_EQUIPMENT };
+		bag = starterBag();
+	} else {
+		if (raw.equipment === undefined || raw.bag === undefined) return fail('equipment and bag belong together');
+		if (!isObject(raw.equipment)) return fail('equipment');
+		equipment = {};
+		for (const [slot, id] of Object.entries(raw.equipment)) {
+			if (!GEAR_SLOTS.has(slot)) return fail('equipment slot');
+			const def = typeof id === 'string' ? ITEM_CATALOG[id] : undefined;
+			if (!def || !def.slot || def.consumable) return fail('equipped item');
+			const fits = def.slot === slot || (def.slot === 'ring' && (slot === 'ring1' || slot === 'ring2'));
+			if (!fits) return fail('equipped item in the wrong slot');
+			equipment[slot as EquipmentSlot] = id as string;
+		}
+		if (!Array.isArray(raw.bag) || raw.bag.length !== COMBAT.bagSize) return fail('bag size');
+		bag = [];
+		for (const entry of raw.bag) {
+			if (entry === null) {
+				bag.push(null);
+				continue;
+			}
+			if (!isObject(entry)) return fail('bag entry');
+			for (const key of Object.keys(entry)) if (!BAG_ENTRY_KEYS.has(key)) return fail('bag entry key');
+			const def = typeof entry.id === 'string' ? ITEM_CATALOG[entry.id] : undefined;
+			if (!def) return fail('bag item');
+			const qty = int(entry.qty, 1, def.stackMax ?? 1);
+			if (qty === null) return fail('bag quantity');
+			bag.push({ id: def.id, qty });
+		}
+	}
+
+	const maxPlayerHp = maxHp(characterStats, equipment);
+	let playerHp = maxPlayerHp;
+	if (raw.playerHp !== undefined) {
+		const v = num(raw.playerHp, 0, maxPlayerHp);
+		if (v === null) return fail('player hp');
+		playerHp = v;
+	}
+
+	const nextMonsterId = raw.nextMonsterId === undefined ? 1 : int(raw.nextMonsterId, 1, 1e9);
+	if (nextMonsterId === null) return fail('next monster id');
+	const monsterSpawnTimer = raw.monsterSpawnTimer === undefined ? 0 : num(raw.monsterSpawnTimer, 0, COMBAT.spawn.intervalSec);
+	if (monsterSpawnTimer === null) return fail('monster spawn timer');
+	const monsters: Monster[] = [];
+	if (raw.monsters !== undefined) {
+		if (!Array.isArray(raw.monsters) || raw.monsters.length > COMBAT.maxMonsters) return fail('monsters');
+		const ids = new Set<number>();
+		const spots = new Set<string>();
+		let kings = 0;
+		for (const m of raw.monsters) {
+			if (!isObject(m)) return fail('monster shape');
+			for (const key of Object.keys(m)) if (!MONSTER_KEYS.has(key)) return fail('monster key');
+			const id = int(m.id, 1, nextMonsterId - 1);
+			const x = int(m.x, 0, GRID_SIZE - 1);
+			const y = int(m.y, 0, GRID_HEIGHT - 1);
+			const ageSec = num(m.ageSec, 0, 1e8);
+			if (id === null || x === null || y === null || ageSec === null) return fail('monster numbers');
+			if (m.type !== 'rat' && m.type !== 'ratKing') return fail('monster type');
+			if (m.tier !== tierFor(m.type, ageSec)) return fail('monster tier');
+			const tile = tiles[y][x];
+			if (!tile.isOwned || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
+			if (ids.has(id) || spots.has(`${x},${y}`)) return fail('duplicate monster');
+			ids.add(id);
+			spots.add(`${x},${y}`);
+			if (m.type === 'ratKing' && ++kings > 1) return fail('more than one king');
+			monsters.push({ id, type: m.type, tier: m.tier, x, y, ageSec });
+		}
+	}
+
 	// ---- farm, click power, castle timer, misc -------------------------------------------------------
 	if (!isObject(raw.farmLevels)) return fail('farm');
 	const farmLevels: Record<string, number> = {};
@@ -315,6 +407,12 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			lastChestReward,
 			lastChestGoldRate,
 			lastChestMinutesAwarded,
+			equipment,
+			bag,
+			playerHp,
+			monsters,
+			monsterSpawnTimer,
+			nextMonsterId,
 		},
 	};
 };
