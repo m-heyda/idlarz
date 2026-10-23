@@ -3,8 +3,6 @@ import {
 	BiomeInfo,
 	BiomeType,
 	CharacterStats,
-	EquipmentRarity,
-	EquipmentSlot,
 	Resources, // Added Resources import
 } from '@/types/game';
 
@@ -504,69 +502,6 @@ export const EQUIPMENT_RARITY_COLORS = {
 	epic: 'border-purple-500',
 	legendary: 'border-orange-500',
 };
-
-export const EQUIPMENT_SLOT_INFO = {
-	head: { label: 'Head' },
-	neck: { label: 'Neck' },
-	chest: { label: 'Chest' },
-	mainHand: { label: 'Main Hand' },
-	offHand: { label: 'Off Hand' },
-	legs: { label: 'Legs' },
-	feet: { label: 'Feet' },
-	ring1: { label: 'Ring 1' },
-	ring2: { label: 'Ring 2' },
-};
-
-export const INITIAL_INVENTORY_ITEMS = [
-	{
-		id: 'wooden-sword',
-		name: 'Wooden Sword',
-		slot: 'mainHand' as EquipmentSlot,
-		stats: { gold: 0.05 },
-		description: 'A simple training sword',
-		rarity: 'common' as EquipmentRarity,
-	},
-	{
-		id: 'leather-cap',
-		name: 'Leather Cap',
-		slot: 'head' as EquipmentSlot,
-		stats: { wood: 0.1 },
-		description: 'Basic head protection',
-		rarity: 'common' as EquipmentRarity,
-	},
-	{
-		id: 'steel-breastplate',
-		name: 'Steel Breastplate',
-		slot: 'chest' as EquipmentSlot,
-		stats: { gold: 0.1, stone: 0.2 },
-		description: 'Solid protection for your torso',
-		rarity: 'uncommon' as EquipmentRarity,
-	},
-	{
-		id: 'gold-ring',
-		name: 'Gold Ring',
-		slot: 'ring1' as EquipmentSlot,
-		stats: { gold: 0.2 },
-		description: 'Increases gold generation',
-		rarity: 'rare' as EquipmentRarity,
-	},
-	{
-		id: 'leather-boots',
-		name: 'Leather Boots',
-		slot: 'feet' as EquipmentSlot,
-		stats: { food: 0.1 },
-		description: 'Comfortable footwear',
-		rarity: 'common' as EquipmentRarity,
-	},
-	{
-		id: 'wooden-shield',
-		name: 'Wooden Shield',
-		slot: 'offHand' as EquipmentSlot,
-		stats: { wood: 0.15 },
-		description: 'Simple defensive gear',
-		rarity: 'common' as EquipmentRarity,
-	},
-];
 
 // Tile tapping: clicking an owned tile also yields a small slice of that tile's own output.
 // A tap = `seconds` worth of the tile's per-second production, with a per-tile cooldown so

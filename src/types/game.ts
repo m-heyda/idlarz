@@ -1,6 +1,7 @@
 import { BIOMES } from '@/config/gameConfig';
 import type { PlayerClassId } from '@/config/playerClasses';
 import type { LegacyUpgradeId } from '@/config/gameConfig';
+import type { PixelIconName } from '@/config/pixelIcons';
 
 export type BiomeType = keyof typeof BIOMES;
 
@@ -65,14 +66,18 @@ export interface Tile {
 
 export type EquipmentSlot =
 	| 'head'
-	| 'neck'
+	| 'shoulder'
 	| 'chest'
-	| 'mainHand'
-	| 'offHand'
+	| 'hands'
 	| 'legs'
 	| 'feet'
+	| 'neck'
+	| 'cape'
 	| 'ring1'
-	| 'ring2';
+	| 'ring2'
+	| 'charm'
+	| 'mainHand'
+	| 'offHand';
 
 export type EquipmentRarity =
 	| 'common'
@@ -81,17 +86,66 @@ export type EquipmentRarity =
 	| 'epic'
 	| 'legendary';
 
-export type Equipment = {
-	[key in EquipmentSlot]?: Item;
-};
+export interface ItemStats {
+	damage?: number;
+	armor?: number;
+	maxHp?: number;
+}
 
-export interface Item {
+/** Static definition of an item; saves only ever store the `id`. */
+export interface ItemDef {
 	id: string;
 	name: string;
-	slot: EquipmentSlot;
-	stats: Partial<Resources>;
+	/** Gear slot; 'ring' fits ring1 or ring2. Consumables have none. */
+	slot?: EquipmentSlot | 'ring';
+	rarity: EquipmentRarity;
+	stats?: ItemStats;
+	set?: string;
 	description?: string;
-	rarity?: EquipmentRarity;
+	consumable?: { healHp: number };
+	stackMax?: number;
+	sellValue: number;
+	icon?: PixelIconName;
+}
+
+/** Equipped item ids by slot */
+export type Equipment = Partial<Record<EquipmentSlot, string>>;
+
+export type BagSlot = { id: string; qty: number } | null;
+
+export type MonsterType = 'rat' | 'ratKing';
+
+export interface Monster {
+	id: number;
+	type: MonsterType;
+	tier: number;
+	x: number;
+	y: number;
+	ageSec: number;
+}
+
+export interface KillSummary {
+	gold: number;
+	xp: number;
+	items: { id: string; qty: number }[];
+	/** Gold paid for drops that did not fit into the bag */
+	convertedGold: number;
+}
+
+export type FightPhase = 'active' | 'won' | 'knockedOut' | 'timeout';
+
+export interface FightState {
+	monsterId: number;
+	type: MonsterType;
+	tier: number;
+	monsterHp: number;
+	monsterMaxHp: number;
+	attackTimer: number;
+	timeLeftSec: number | null;
+	potionCd: number;
+	phase: FightPhase;
+	summary: KillSummary | null;
+	taunt: string | null;
 }
 
 export interface TileProps {
@@ -184,8 +238,8 @@ export interface GameState {
 	playerName: string;
 	playerClass: PlayerClassId;
 	characterStats: CharacterStats;
-	equipment: Equipment;
-	inventory: Item[];
+	equipment: Record<string, never>; // replaced in the persisted-equipment task
+	inventory: never[];
 	farmLevels: Record<string, number>;
 	showCharacterWindow: boolean;
 	showStatisticsWindow: boolean;
