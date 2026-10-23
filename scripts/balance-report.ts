@@ -19,6 +19,9 @@ import {
 	CASTLE_UPGRADE,
 	CHARACTER_STAT_CONFIG,
 	CLICK_LADDER,
+	LEGACY_UPGRADES,
+	REBIRTH,
+	type LegacyUpgradeId,
 	INITIAL_CHARACTER_STATS,
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
@@ -33,7 +36,10 @@ import {
 	calculateStatResourceModifiers,
 	calculateTileCost,
 	calculateXpGain,
+	castleModifier,
 	createInitialGrid,
+	legacyGain,
+	legacyUpgradeCost,
 } from '../src/utils/gameUtils';
 import { formatTime } from '../src/utils/formatters';
 import type { Resources } from '../src/types/game';
@@ -117,7 +123,7 @@ line();
 line('## 3. Castle');
 line();
 line(
-	`Resource modifier at level L = \`${CASTLE_UPGRADE.baseResourceMultiplier} × 2^(L-1)\` (added to **every** resource). ` +
+	`Resource modifier: +${CASTLE_UPGRADE.baseResourceMultiplier * 100}% at level 1, doubling each level up to level ${CASTLE_UPGRADE.doublingUntil}, then +${CASTLE_UPGRADE.lateLevelStep * 100}% per level (added to **every** resource). ` +
 		`Flat XP: +${CASTLE_UPGRADE.xpBonus}/s per level above 1. Max level ${CASTLE_UPGRADE.maxLevel}; each upgrade is a timed build paid up front.`
 );
 line();
@@ -129,14 +135,14 @@ line();
 		rows.push([
 			`${from} → ${from + 1}`,
 			formatTime(CASTLE_UPGRADE.durationsSec[i]),
-			`+${(CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, from) * 100).toFixed(0)}%`,
+			`+${(castleModifier(from + 1) * 100).toFixed(0)}%`,
 			...RES.map((k) => (cost[k] ? fmt(cost[k] as number) : '—')),
 		]);
 	});
 	table(['Upgrade', 'Build time', 'Modifier after', ...RES], rows);
 	line(
-		`Total build time: ${formatTime(CASTLE_UPGRADE.durationsSec.slice(0, CASTLE_UPGRADE.maxLevel - 1).reduce((a, b) => a + b, 0))}. ` +
-			`(\`upgradeCosts\` has ${CASTLE_UPGRADE.upgradeCosts.length - (CASTLE_UPGRADE.maxLevel - 1)} further rows that are unreachable while max level is ${CASTLE_UPGRADE.maxLevel}.)`
+		`Total build time to level ${CASTLE_UPGRADE.maxLevel}: ${formatTime(CASTLE_UPGRADE.durationsSec.slice(0, CASTLE_UPGRADE.maxLevel - 1).reduce((a, b) => a + b, 0))} ` +
+			`(to level 6: ${formatTime(CASTLE_UPGRADE.durationsSec.slice(0, 5).reduce((a, b) => a + b, 0))}).`
 	);
 	line();
 }
@@ -245,6 +251,36 @@ table(
 	['Resource', 'sells for', `costs (x${MERCHANT_BUY_MULTIPLIER})`],
 	Object.entries(MERCHANT_RESOURCE_PRICES).map(([r, p]) => [r, p, p * MERCHANT_BUY_MULTIPLIER])
 );
+
+// ---------------------------------------------------------------------------
+line('## 9. Rebirth and Legacy');
+line();
+line(
+	`Rebirth needs castle level ≥ ${REBIRTH.minCastleLevel} and ≥ ${REBIRTH.minTiles} tiles. Legacy points = \`floor(${REBIRTH.gainScale} × (castle − 5) × sqrt(tiles / 10))\`; ` +
+		`each point earned is +${REBIRTH.incomePerPoint * 100}% income for ever.`
+);
+line();
+{
+	const tilesList = [20, 30, 40, 50, 60, 80];
+	table(
+		['castle level', ...tilesList.map((n) => `${n} tiles`)],
+		[6, 7, 8, 9, 10].map((c) => [c, ...tilesList.map((n) => legacyGain(c, n))])
+	);
+	const ids = Object.keys(LEGACY_UPGRADES) as LegacyUpgradeId[];
+	line('Shop (cost in points of the next level, by current level):');
+	line();
+	table(
+		['upgrade', 'effect per level', 'max', ...[0, 1, 2, 3, 5, 9].map((l) => `cost at level ${l}`)],
+		ids.map((id) => [
+			LEGACY_UPGRADES[id].label,
+			id === 'provisions'
+				? Object.entries(LEGACY_UPGRADES.provisions.bundle).map(([r, v]) => `${fmt(v as number)} ${r}`).join(' + ')
+				: `${LEGACY_UPGRADES[id].effectPerLevel * 100}%`,
+			LEGACY_UPGRADES[id].maxLevel,
+			...[0, 1, 2, 3, 5, 9].map((l) => legacyUpgradeCost(id, l)),
+		])
+	);
+}
 
 const target = resolve(
 	dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')),

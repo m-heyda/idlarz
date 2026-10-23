@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber } from '@/utils/formatters';
-import { ANIMALS, FARM_BONUS } from '@/config/gameConfig';
+import { ANIMALS } from '@/config/gameConfig';
+import type { ClickInput } from '@/types/game';
 import { queueTileTap } from '@/lib/floatText';
 import type { Critter } from './MeadowLayer';
 import { ANIMAL_PIXEL_ICONS } from '@/config/pixelIcons';
@@ -99,8 +100,7 @@ const FarmOverlay: React.FC = () => {
 	const purchaseAnimal = useGameStore((state) => state.purchaseAnimal);
 	const showFarmWindow = useGameStore((state) => state.showFarmWindow);
 	const setShowFarmWindow = useGameStore((state) => state.setShowFarmWindow);
-	const addResources = useGameStore((state) => state.addResources);
-	const resourceRates = useGameStore((state) => state.resourceRates);
+	const claimCritterGift = useGameStore((state) => state.claimCritterGift);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [celebrate, setCelebrate] = useState<string | null>(null);
 
@@ -132,14 +132,10 @@ const FarmOverlay: React.FC = () => {
 
 	// A meadow critter was clicked: gift = some seconds of that resource's income (bigger if golden).
 	// The amount rides the click's cursor popup together with the usual click gold.
-	const catchCritter = (critter: Critter) => {
-		const def = FARM_BONUS.critters[critter.type];
-		const rate = resourceRates.total[def.resource] ?? 0;
-		let amount = Math.max(def.min, rate * def.seconds);
-		if (critter.golden) amount *= FARM_BONUS.goldenMultiplier;
-		amount = Math.round(amount * 10) / 10;
-		addResources({ [def.resource]: amount });
-		queueTileTap([{ resource: def.resource, amount }], critter.golden);
+	const catchCritter = (critter: Critter, _x: number, _y: number, input: ClickInput) => {
+		const gift = claimCritterGift({ source: 'farm', type: critter.type, golden: critter.golden }, input);
+		if (!gift) return;
+		queueTileTap([{ resource: gift.resource, amount: gift.amount }], critter.golden);
 		audioManager.playSound('click');
 	};
 

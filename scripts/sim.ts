@@ -49,16 +49,36 @@ const main = async () => {
 	};
 	const selected = names.length ? names : Object.keys(PROFILES);
 
+	const seedsArg = args.find((a) => a.startsWith('--seeds='));
+	const seeds = seedsArg ? Math.max(1, Number(seedsArg.slice(8))) : 1;
+
 	const results: Record<string, Milestones> = {};
+	const spreads: Record<string, Record<string, [number, number]>> = {};
 	for (const name of selected) {
 		const profile = PROFILES[name];
 		if (!profile) throw new Error(`unknown profile ${name}`);
 		const started = Date.now();
-		results[name] = runProfile(name, profile, { cfg, utils, store: useGameStore }, legacy);
-		console.error(`${name}: done in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+		const runs: Milestones[] = [];
+		for (let seed = 0; seed < seeds; seed++) {
+			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore }, legacy, seed));
+		}
+		// median per milestone, plus the min-max over seeds
+		results[name] = {};
+		spreads[name] = {};
+		const keys = new Set(runs.flatMap((r) => Object.keys(r)));
+		keys.forEach((key) => {
+			const values = runs.map((r) => r[key]).filter((v): v is number => v != null).sort((a, b) => a - b);
+			if (values.length < Math.ceil(runs.length / 2)) {
+				results[name][key] = null;
+				return;
+			}
+			results[name][key] = values[Math.floor((values.length - 1) / 2)];
+			spreads[name][key] = [values[0], values[values.length - 1]];
+		});
+		console.error(`${name}: done in ${((Date.now() - started) / 1000).toFixed(1)}s (${seeds} seed${seeds > 1 ? 's' : ''})`);
 	}
 
-	const md = renderMarkdown(results, legacy);
+	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
 	console.log(md);
 	if (!legacy) {
 		const target = resolve(
@@ -104,10 +124,10 @@ const mulberry32 = (seed: number) => () => {
 	return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): Milestones {
+function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, seed = 0): Milestones {
 	const { cfg, utils, store } = ctx;
 	const realRandom = Math.random;
-	Math.random = mulberry32(12345);
+	Math.random = mulberry32(12345 + seed * 7919);
 
 	const api = () => store.getState();
 	api().resetGame();
@@ -123,6 +143,12 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 
 	let t = 0; // game seconds
 	let eventId = 0;
+	let giftClock = 0;
+	let ownedTiles: [number, number][] = [];
+	const refreshOwned = () => {
+		ownedTiles = [];
+		api().tiles.forEach((row, y) => row.forEach((tile, x) => tile.isOwned && ownedTiles.push([x, y])));
+	};
 	let frontier: [number, number] | null = null;
 	let frontierDirty = true;
 	let buildingCursor = 0;
@@ -339,13 +365,36 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean): 
 		const active = isActive(t);
 		const step = active ? (t < FINE_STEP_DAYS * 86400 ? 20 : 60) : 120;
 
+		// Bonus critters: a golden map critter now and then (about half are caught), farm-window critters rarely
+		if (active) {
+			giftClock += step;
+			if (giftClock >= 90) {
+				giftClock = 0;
+				if (Math.random() < 0.5) {
+					const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
+					api().claimCritterGift({ source: 'map', type, golden: true }, { eventId: ++eventId, now: t * 1000, trusted: true });
+				}
+			}
+			if (Math.random() < (step / 30) * 0.1 * 0.7) {
+				const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
+				api().claimCritterGift({ source: 'farm', type, golden: Math.random() < 0.12 }, { eventId: ++eventId, now: t * 1000, trusted: true });
+			}
+		}
+
 		// Clicks during the step (each one is a separate physical click for the limiter)
 		if (active && profile.cps > 0) {
 			// Attempts above what the limiter could ever pay are skipped (they would all be denied anyway)
 			const n = Math.min(Math.floor(profile.cps * step), Math.ceil(cfg.CLICK_LIMIT.refillPerSec * 1.2 * step));
 			const gap = (step * 1000) / Math.max(n, 1);
+			if (ownedTiles.length === 0 || frontierDirty) refreshOwned();
 			for (let i = 0; i < n; i++) {
-				api().clickForGold({ eventId: ++eventId, now: t * 1000 + i * gap, trusted: true });
+				const input = { eventId: ++eventId, now: t * 1000 + i * gap, trusted: true };
+				api().clickForGold(input);
+				// about one click in eight lands on an owned tile and taps it too (same click, same token)
+				if (i % 8 === 0 && ownedTiles.length) {
+					const [tx, ty] = ownedTiles[Math.floor(Math.random() * ownedTiles.length)];
+					api().tapTile(tx, ty, input);
+				}
 			}
 		}
 		api().tick(step * 1000);
@@ -417,7 +466,11 @@ const ORDER = [
 	'finished',
 ];
 
-function renderMarkdown(results: Record<string, Milestones>, legacy: boolean): string {
+function renderMarkdown(
+	results: Record<string, Milestones>,
+	legacy: boolean,
+	spreads?: Record<string, Record<string, [number, number]>>
+): string {
 	const names = Object.keys(results);
 	const fmt = (d: number | null | undefined) =>
 		d == null ? '—' : d < 1 ? `${(d * 24).toFixed(1)} h` : `${d.toFixed(1)} d`;
@@ -442,7 +495,13 @@ function renderMarkdown(results: Record<string, Milestones>, legacy: boolean): s
 	[...ORDER, ...extraKeys].forEach((key) => {
 		if (!names.some((n) => results[n][key] != null) && !ORDER.includes(key)) return;
 		const isCount = key.startsWith('legacy');
-		lines.push(`| ${key} | ${names.map((n) => (isCount ? String(results[n][key] ?? '—') : fmt(results[n][key]))).join(' | ')} |`);
+		const cell = (n: string) => {
+			if (isCount) return String(results[n][key] ?? '—');
+			const spread = spreads?.[n]?.[key];
+			const base = fmt(results[n][key]);
+			return spread && results[n][key] != null ? `${base} (${fmt(spread[0])} - ${fmt(spread[1])})` : base;
+		};
+		lines.push(`| ${key} | ${names.map(cell).join(' | ')} |`);
 	});
 	lines.push('');
 	lines.push(

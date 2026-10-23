@@ -9,6 +9,8 @@ import React, {
 import { useGameStore } from '@/stores/gameStore';
 import { GRID_SIZE, GRID_HEIGHT, TILE_SIZE } from '@/config/gameConfig';
 import Tile from './Tile';
+import AmbientLife from './AmbientLife';
+import type { Viewport } from '@/lib/ambientLife';
 import CastleRange from './CastleRange';
 
 interface Position {
@@ -220,6 +222,16 @@ const Grid: React.FC = () => {
 		};
 	}, [animate]);
 
+	// Which tiles are on screen right now (read by the ambient critters when they pick a spot)
+	const viewportRef = useRef<Viewport>({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
+	viewportRef.current = {
+		minX: Math.floor(-position.x / TILE_SIZE),
+		maxX: Math.ceil((-position.x + windowSize.x) / TILE_SIZE),
+		minY: Math.floor(-position.y / TILE_SIZE),
+		maxY: Math.ceil((-position.y + windowSize.y) / TILE_SIZE),
+	};
+	const getViewport = useCallback(() => viewportRef.current, []);
+
 	const visibleTiles = useMemo(() => {
 		if (!tiles) return [];
 
@@ -303,6 +315,7 @@ const Grid: React.FC = () => {
 					'--map-zoom': zoom,
 				} as React.CSSProperties}>
 				{visibleTiles}
+				<AmbientLife getViewport={getViewport} />
 				<CastleRange />
 			</div>
 		</div>

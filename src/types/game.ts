@@ -155,6 +155,18 @@ export interface PrestigeState {
 	upgrades: Partial<Record<LegacyUpgradeId, number>>;
 }
 
+// A bonus critter that was clicked (farm meadow or map)
+export interface CritterGift {
+	source: 'farm' | 'map';
+	type: 'butterfly' | 'bee' | 'ladybug' | 'rabbit';
+	golden: boolean;
+}
+
+export interface GiftResult {
+	resource: keyof Resources;
+	amount: number;
+}
+
 export interface TapResult {
 	items: { resource: keyof Resources; amount: number }[];
 	lucky: boolean;
@@ -201,6 +213,7 @@ export interface GameState {
 	resetGame: () => void;
 	rebirth: () => boolean;
 	buyLegacyUpgrade: (id: LegacyUpgradeId) => boolean;
+	claimCritterGift: (gift: CritterGift, input: ClickInput) => GiftResult | null;
 	selectBiome: (biome: BiomeType) => boolean;
 	cancelBiomeSelection: () => void;
 	upgradeCastle: () => boolean;

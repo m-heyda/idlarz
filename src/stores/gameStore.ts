@@ -9,8 +9,10 @@ import {
 	ANIMALS,
 	BIOMES,
 	BUILDINGS,
+	AMBIENT_LIFE,
 	CASTLE_UPGRADE,
 	CHEST,
+	FARM_BONUS,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
 	EMPTY_BIOMES,
@@ -58,7 +60,9 @@ import type {
 	BiomeType,
 	CharacterStats,
 	ClickInput,
+	CritterGift,
 	GameState,
+	GiftResult,
 	PrestigeState,
 	Resources,
 	TapResult,
@@ -67,6 +71,9 @@ import type {
 
 // Last tap time per tile (not persisted) - enforces TILE_TAP.cooldownMs
 const lastTapAt: Record<string, number> = {};
+
+// Last accepted critter gift per source (not persisted) - enforces the gift cooldowns
+const lastGiftAt: Record<string, number> = {};
 
 // Shared by the gold click and the tile tap: one token per physical click
 const clickLimiter = createClickLimiter();
@@ -186,6 +193,7 @@ const createGameSlice = (
 		resetGame: () => {
 			clickLimiter.reset();
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
+			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
@@ -207,6 +215,7 @@ const createGameSlice = (
 			};
 			clickLimiter.reset();
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
+			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			set({
 				...createInitialData(prestige),
 				playerName: state.playerName,
@@ -451,6 +460,30 @@ const createGameSlice = (
 				resources: { ...state.resources, gold: state.resources.gold + gold },
 			});
 			return gold;
+		},
+
+		// A bonus critter was clicked (farm meadow or map): a few seconds of that resource's income.
+		// The amount is computed here from the current rates (the UI cannot name its own reward), the click must be a real
+		// one that passes the shared limiter, and each source has a cooldown.
+		claimCritterGift: (gift: CritterGift, input: ClickInput): GiftResult | null => {
+			const def = FARM_BONUS.critters[gift?.type];
+			if (!def || (gift.source !== 'farm' && gift.source !== 'map')) return null;
+			if (!clickLimiter.take(input)) return null;
+
+			const cooldown =
+				gift.source === 'farm' ? AMBIENT_LIFE.farmGiftCooldownMs : AMBIENT_LIFE.giftCooldownMs;
+			if (input.now - (lastGiftAt[gift.source] ?? -Infinity) < cooldown) return null;
+
+			const state = get();
+			const seconds = gift.source === 'farm' ? def.seconds : AMBIENT_LIFE.giftSeconds;
+			const rate = state.resourceRates.total[def.resource] ?? 0;
+			let amount = Math.max(def.min, rate * seconds);
+			if (gift.golden) amount *= FARM_BONUS.goldenMultiplier;
+			amount = Math.round(amount * 10) / 10;
+
+			lastGiftAt[gift.source] = input.now;
+			get().addResources({ [def.resource]: amount });
+			return { resource: def.resource, amount };
 		},
 
 		// Tapping an owned tile yields a slice of its own output (per-tile cooldown + the shared click limiter)

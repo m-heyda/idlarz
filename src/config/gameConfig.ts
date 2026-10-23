@@ -704,3 +704,28 @@ export const LEGACY_UPGRADES = {
 } as const;
 
 export type LegacyUpgradeId = keyof typeof LEGACY_UPGRADES;
+
+// Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
+// Purely decorative, except the rare golden one, which can be clicked for a small gift (see claimCritterGift).
+export const AMBIENT_LIFE = {
+	spawnMinMs: 4000,
+	spawnMaxMs: 9000,
+	maxAlive: 5,
+	lifeMinMs: 6000,
+	lifeMaxMs: 10000,
+	roamTiles: 1.5, // how far a critter strays from where it appears
+	giftChance: 1 / 12, // share of critters that carry a gift
+	giftSeconds: 5, // a map gift is worth this many seconds of that resource's income (x goldenMultiplier)
+	giftCooldownMs: 20000, // at most one map gift per this long
+	farmGiftCooldownMs: 8000, // same for the farm meadow critters
+	// which critter likes which biome
+	byBiome: {
+		forest: ['butterfly', 'bee'],
+		plains: ['bee', 'butterfly'],
+		swamp: ['ladybug'],
+		hills: ['rabbit'],
+		tundra: ['rabbit'],
+		lake: ['butterfly'],
+		grounds: ['rabbit', 'ladybug'],
+	} as Record<string, readonly ('butterfly' | 'bee' | 'ladybug' | 'rabbit')[]>,
+};
