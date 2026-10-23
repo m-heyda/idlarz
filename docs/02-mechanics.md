@@ -8,7 +8,7 @@ You start with a castle on a 50×50 map and 125 gold. Gold, other resources and 
 
 ## 2. Map & buying tiles
 
-- Grid 50×50, castle at (25, 25) owned from the start; drag to pan.
+- Grid 50×50, castle at (25, 25) owned from the start; drag to pan, mouse wheel to zoom (four fixed steps).
 - A tile can be bought only if it is **4-neighbour adjacent** to an owned tile and you can pay its whole cost: gold, plus **extra resources from larger territories** (`TILE_RESOURCE_COST`: wood + stone from the 15th owned tile, coal from 30, food from 40). Charisma discounts every part of the cost (0.5 %/point, max 25 %). The hover card and the biome picker show all costs, green when affordable.
 - Cost curve: ×1.45 per owned tile up to 20 tiles, ×1.27 up to 40, ×1.17 per tile after that ([03 §1](03-formulas-and-scaling.md#1-tile-cost)).
 - Not enough → shake + `wrong` sound. Success → `purchase` sound, XP, +100 reputation.
@@ -64,7 +64,7 @@ Gold, wood, stone, coal, food, meat, xp. All except gold/xp can be sold to the m
 
 ## 9. Chests
 
-A chest appears on a random owned non-castle tile every 10 min (the timer only runs while fewer than 5 chests wait). Collect it by clicking the tile: reward = `passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`. Chests are saved with the map.
+A chest appears on a random owned non-castle tile every 10 min (the timer only runs while fewer than 5 chests wait). The chest is drawn as a glowing, gently bobbing treasure chest on the tile. Collect it by clicking the tile: reward = `passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`. Chests are saved with the map.
 
 ## 10. XP, levels and stat points
 
@@ -84,7 +84,7 @@ All text in tooltips and the tutorial comes from `CHARACTER_STAT_CONFIG`. Other 
 
 ## 12. UI surfaces
 
-Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and the **hidden save tools** (press Control five times): export / import / reset ([07](07-security-and-exploits.md)). Also Settings, Legacy (rebirth + shop) and the re-openable tutorial.
+Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and the **hidden save tools** (press Control five times): export / import / reset ([07](07-security-and-exploits.md)). Also Settings, Legacy (rebirth + shop) and the re-openable tutorial. A small orange **notify dot** on the level orb (unspent stat points) and on the Farm button (an animal or upgrade is affordable) marks things that need attention.
 
 ## 13. Rebirth and Legacy
 
