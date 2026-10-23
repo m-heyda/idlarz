@@ -3,7 +3,7 @@
 	position: absolute;
 	width: 0;
 	height: 0;
-	z-index: 4;
+	z-index: 22; /* above a hovered tile (z-20), so tile hover never hides a critter */
 	pointer-events: none;
 	animation: amb-life var(--life) linear both;
 }
@@ -70,7 +70,7 @@
 
 /* the one that carries a gift: golden glow, a roomier hit area, clickable */
 .amb-critter[data-gift='true'] {
-	z-index: 7;
+	z-index: 25; /* clickable: must stay above the hovered tile or it would swallow the click */
 }
 
 .amb-critter[data-gift='true'] .amb-move {

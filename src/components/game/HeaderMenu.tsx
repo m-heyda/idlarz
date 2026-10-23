@@ -70,7 +70,14 @@ const HeaderMenu: React.FC = () => {
 		setPrevAvailablePoints(characterStats.availablePoints);
 	}, [characterStats.availablePoints, prevAvailablePoints, levelUpActive]);
 
-	const menuButtons: { icon: PixelIconName; title: string; active: boolean; onClick: () => void }[] = [
+	const menuButtons: {
+		icon: PixelIconName;
+		title: string;
+		active: boolean;
+		onClick: () => void;
+		notify?: boolean;
+		notifyLabel?: string;
+	}[] = [
 		{
 			icon: 'menu_character',
 			title: 'Character',
@@ -153,7 +160,7 @@ const HeaderMenu: React.FC = () => {
 					title={button.title}
 					onClick={button.onClick}>
 					<PixelIcon name={button.icon} alt={button.title} />
-					<NotifyDot show={'notify' in button && button.notify} label={'notifyLabel' in button ? button.notifyLabel : undefined} />
+					<NotifyDot show={!!button.notify} label={button.notifyLabel} />
 				</div>
 			))}
 		</div>

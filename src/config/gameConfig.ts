@@ -726,6 +726,7 @@ export const AMBIENT_LIFE = {
 		hills: ['rabbit'],
 		tundra: ['rabbit'],
 		lake: ['butterfly'],
+		coast: ['butterfly', 'bee'],
 		grounds: ['rabbit', 'ladybug'],
 	} as Record<string, readonly ('butterfly' | 'bee' | 'ladybug' | 'rabbit')[]>,
 };
