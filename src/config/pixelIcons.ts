@@ -100,6 +100,10 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 // Equipment slot -> its pixel icon (both ring slots share one sprite)
 export const EQUIPMENT_PIXEL_ICONS: Record<string, PixelIconName> = {
 	head: 'equip_head',
+	shoulder: 'equip_chest', // placeholder until the shoulder / hands / cape / charm sprites exist
+	hands: 'equip_offHand',
+	cape: 'equip_neck',
+	charm: 'equip_ring',
 	neck: 'equip_neck',
 	chest: 'equip_chest',
 	mainHand: 'equip_mainHand',

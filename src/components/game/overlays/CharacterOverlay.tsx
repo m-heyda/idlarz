@@ -1,21 +1,136 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { useUiStore } from '@/stores/uiStore';
+import { COMBAT } from '@/config/combatConfig';
+import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL } from '@/config/itemCatalog';
+import { armorOf, damagePerClick, maxHp } from '@/lib/combat';
+import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
+import type { EquipmentSlot } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import PixelModal from '../PixelModal';
 import PixelIcon from '../PixelIcon';
+import ItemSlot from '../ItemSlot';
+import Bag from '../Bag';
 
-// Temporary shell: the paper doll and bag come with the character window rework.
+const ABILITY_HINT = 'Ability slot - skills are coming soon';
+
 const CharacterOverlay: React.FC = () => {
-	const { showCharacterWindow, toggleCharacterWindow } = useGameStore();
-	if (!showCharacterWindow) return null;
+	const show = useGameStore((state) => state.showCharacterWindow);
+	const toggleCharacterWindow = useGameStore((state) => state.toggleCharacterWindow);
+	const toggleStatisticsWindow = useGameStore((state) => state.toggleStatisticsWindow);
+	const equipment = useGameStore((state) => state.equipment);
+	const characterStats = useGameStore((state) => state.characterStats);
+	const equipItem = useGameStore((state) => state.equipItem);
+	const unequipItem = useGameStore((state) => state.unequipItem);
+	const openClassDialog = useUiStore((state) => state.openClassDialog);
+	const [notice, setNotice] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (!notice) return;
+		const timer = setTimeout(() => setNotice(null), 2200);
+		return () => clearTimeout(timer);
+	}, [notice]);
+
+	if (!show) return null;
+
+	const blocked = () => (useGameStore.getState().fight ? 'Finish the fight first' : null);
+
+	const takeOff = (slot: EquipmentSlot) => {
+		if (!equipment[slot]) return;
+		if (!unequipItem(slot)) setNotice(blocked() ?? 'Your bag is full');
+	};
+
+	const dropOnSlot = () => {
+		const drag = getDrag();
+		clearDrag();
+		if (drag?.kind === 'bag' && !equipItem(drag.index)) setNotice(blocked() ?? 'Cannot equip that');
+	};
+
+	const gearSlot = (slot: EquipmentSlot) => (
+		<ItemSlot
+			key={slot}
+			slot={slot}
+			label={EQUIPMENT_SLOT_LABEL[slot]}
+			itemId={equipment[slot]}
+			equipped
+			draggable
+			onClick={() => takeOff(slot)}
+			onDragStart={() => setDrag({ kind: 'equip', slot })}
+			onDrop={dropOnSlot}
+		/>
+	);
+
+	const armor = armorOf(equipment);
+	const mitigation = Math.round((armor / (armor + COMBAT.armorK)) * 100);
+
 	return (
 		<PixelModal
 			title='Character'
 			icon={<PixelIcon name='menu_character' alt='' />}
 			size='lg'
 			onClose={toggleCharacterWindow}>
-			<div className='px-panel'>
-				<LevelDetails />
+			<div className='flex gap-5 h-full'>
+				{/* Paper doll: hero scene between the slot columns, weapon and shield below */}
+				<div className='px-panel overflow-y-auto shrink-0'>
+					<div className='inv-doll'>
+						<div className='inv-col'>{EQUIPMENT_LAYOUT.left.map(gearSlot)}</div>
+						<LevelDetails />
+						<div className='inv-col'>{EQUIPMENT_LAYOUT.right.map(gearSlot)}</div>
+					</div>
+
+					<div className='inv-bottom'>
+						{gearSlot('mainHand')}
+						<div className='inv-center'>
+							<div className='inv-readouts'>
+								<div className='inv-readout'>
+									<span className='inv-readout-label'>Damage</span>
+									<span className='inv-readout-value'>{damagePerClick(equipment)}</span>
+								</div>
+								<div className='inv-readout' title={`${mitigation}% less damage taken`}>
+									<span className='inv-readout-label'>Armor</span>
+									<span className='inv-readout-value'>{armor}</span>
+								</div>
+								<div className='inv-readout'>
+									<span className='inv-readout-label'>Max HP</span>
+									<span className='inv-readout-value'>{maxHp(characterStats, equipment)}</span>
+								</div>
+							</div>
+							<div className='inv-abilities'>
+								<ItemSlot locked label={ABILITY_HINT} />
+								<ItemSlot locked label={ABILITY_HINT} />
+							</div>
+						</div>
+						{gearSlot('offHand')}
+					</div>
+
+					<div className='flex justify-center gap-3 mt-4'>
+						<button className='px-btn px-btn-sm' onClick={openClassDialog}>
+							Class
+						</button>
+						<button
+							className='px-btn px-btn-sm'
+							onClick={() => {
+								toggleCharacterWindow();
+								toggleStatisticsWindow();
+							}}>
+							Stats
+						</button>
+					</div>
+				</div>
+
+				{/* Bag */}
+				<div className='px-panel flex-1 min-w-[360px] overflow-y-auto relative'>
+					<div className='px-h text-center'>Items Bag</div>
+					<Bag onNotice={setNotice} />
+					<div className='px-tip-muted text-xs text-center mt-3'>
+						Double-click or right-click to equip or drink. Drag to rearrange.
+					</div>
+					{notice && (
+						<div className='px-toast absolute left-1/2 bottom-3 -translate-x-1/2 px-3 py-1 text-sm text-[#f0d27a] whitespace-nowrap'>
+							{notice}
+						</div>
+					)}
+				</div>
 			</div>
 		</PixelModal>
 	);

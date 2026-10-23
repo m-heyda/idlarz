@@ -7,6 +7,7 @@ import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import CharacterPortrait from './CharacterPortrait';
 import EditableName from './EditableName';
 import LevelOrb from './LevelOrb';
+import { maxHp } from '@/lib/combat';
 
 type FlaskKind = 'hp' | 'mp';
 
@@ -41,7 +42,8 @@ const Flask: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({
  * and a stony XP bar along the floor with the level on a gem. Shared by the Character and Statistics windows.
  */
 const LevelDetails: React.FC = () => {
-	const { resources, level, resourceRates, characterStats, playerClass } = useGameStore();
+	const { resources, level, resourceRates, characterStats, playerClass, playerHp, equipment } = useGameStore();
+	const hpMax = maxHp(characterStats, equipment);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
 	const xpForNextLevel = Math.floor(
@@ -66,7 +68,7 @@ const LevelDetails: React.FC = () => {
 				<CharacterPortrait scale={2} />
 			</div>
 
-			<Flask kind='hp' value={characterStats.hp} max={characterStats.hp} />
+			<Flask kind='hp' value={Math.floor(playerHp)} max={hpMax} />
 			<Flask kind='mp' value={characterStats.mp} max={characterStats.mp} />
 
 			<div className='group'>

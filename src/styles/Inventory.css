@@ -1,0 +1,138 @@
+/* Inventory: item frames, the bag grid and the paper doll of the Character window */
+
+.inv-slot {
+	position: relative;
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: url('/pixel/ui/slot_frame.png') no-repeat;
+	image-rendering: pixelated;
+	cursor: default;
+}
+
+.inv-slot[data-filled='true'] {
+	cursor: pointer;
+}
+
+.inv-slot[data-equipped='true'] {
+	background-image: url('/pixel/ui/slot_frame_active.png');
+}
+
+.inv-slot[data-over='true'] {
+	outline: 2px solid #f0d27a;
+	outline-offset: -2px;
+}
+
+.inv-slot[data-locked='true'] {
+	opacity: 0.55;
+}
+
+.inv-icon {
+	filter: drop-shadow(0 0 3px var(--glow, transparent));
+}
+
+.inv-qty {
+	position: absolute;
+	right: 4px;
+	bottom: 2px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff6e0;
+	text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+	pointer-events: none;
+}
+
+/* a plain padlock drawn with two blocks: shackle above, body below */
+.inv-lock {
+	position: absolute;
+	width: 16px;
+	height: 14px;
+	background: #6a5a48;
+	box-shadow: 0 0 0 2px #1a1208;
+	pointer-events: none;
+}
+
+.inv-lock::before {
+	content: '';
+	position: absolute;
+	left: 3px;
+	top: -9px;
+	width: 10px;
+	height: 8px;
+	border: 2px solid #a89878;
+	border-bottom: 0;
+}
+
+.inv-bag {
+	display: grid;
+	grid-template-columns: repeat(6, 48px);
+	gap: 6px;
+	justify-content: center;
+}
+
+.inv-doll {
+	display: grid;
+	grid-template-columns: 48px 288px 48px;
+	gap: 14px;
+	align-items: center;
+	justify-content: center;
+}
+
+.inv-col {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.inv-bottom {
+	display: grid;
+	grid-template-columns: 48px 1fr 48px;
+	gap: 14px;
+	align-items: center;
+	justify-content: center;
+	max-width: 416px;
+	margin: 14px auto 0;
+}
+
+.inv-center {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+
+.inv-readouts {
+	display: flex;
+	gap: 16px;
+	justify-content: center;
+}
+
+.inv-readout {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	line-height: 1.1;
+}
+
+.inv-readout-label {
+	font-size: 0.75rem;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #a89878;
+}
+
+.inv-readout-value {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #f0d27a;
+	text-shadow: 0 2px 0 #1a0e04;
+}
+
+.inv-abilities {
+	display: flex;
+	gap: 8px;
+}

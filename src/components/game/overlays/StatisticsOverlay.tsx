@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { maxHp } from '@/lib/combat';
 import { CharacterStats } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import PixelModal from '../PixelModal';
@@ -21,6 +22,8 @@ const StatisticsOverlay: React.FC = () => {
 		resources,
 		characterStats,
 		prestige,
+		playerHp,
+		equipment,
 	} = useGameStore();
 
 	// Store previous level to detect level ups
@@ -156,7 +159,7 @@ const StatisticsOverlay: React.FC = () => {
 									<div className='flex justify-between items-center'>
 										<span className='text-[#d8c8a0]'>HP:</span>
 										<span className='text-green-400 font-medium'>
-											{characterStats.hp}
+											{Math.floor(playerHp)} / {maxHp(characterStats, equipment)}
 										</span>
 									</div>
 									<div className='flex justify-between items-center'>
