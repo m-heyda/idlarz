@@ -38,13 +38,13 @@ export const PIXEL_ICON_SIZES = {
 	equip_legs: [40, 40],
 	equip_feet: [40, 40],
 	equip_ring: [40, 40],
-	// castle by upgrade level (grows each level; 6 is the animated max)
-	castle_1: [32, 32],
-	castle_2: [32, 32],
-	castle_3: [40, 40],
+	// castle by upgrade level, seen from above; every level fills its 48px tile (6 is the animated max)
+	castle_1: [48, 48],
+	castle_2: [48, 48],
+	castle_3: [48, 48],
 	castle_4: [48, 48],
-	castle_5: [56, 56],
-	castle_6: [72, 72],
+	castle_5: [48, 48],
+	castle_6: [48, 48],
 	// map: one icon per biome
 	biome_forest: [32, 32],
 	biome_plains: [32, 32],

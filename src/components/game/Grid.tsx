@@ -27,6 +27,12 @@ const FRAME_MS = 8; // converts px/ms to px/frame (tuned so a flick travels ~80x
 const FRICTION = 0.9; // per-frame velocity decay while flinging
 const FLING_MAX_IDLE_MS = 100; // releasing after pausing longer than this does not fling
 const VISIBLE_PADDING = 2;
+// Wheel zoom. Stepped (not continuous) so the pixel art stays crisp; the range is kept narrow enough that tiles stay
+// readable (0.75 = 36px tiles) and sprites never get blurry-big (2 = a clean 2x).
+const ZOOM_LEVELS = [0.75, 1, 1.5, 2];
+const DEFAULT_ZOOM = 1;
+const WHEEL_STEP_PX = 50; // accumulated wheel delta needed for one zoom step
+const WHEEL_LOCKOUT_MS = 140; // swallow trackpad inertia after a step
 
 const Grid: React.FC = () => {
 	const tiles = useGameStore((state) => state.tiles);
@@ -38,6 +44,9 @@ const Grid: React.FC = () => {
 	const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
 	const [windowSize, setWindowSize] = useState<Position>({ x: 800, y: 600 });
 	const animationFrameRef = useRef<number | null>(null);
+	const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+	const zoomRef = useRef(DEFAULT_ZOOM);
+	const wheelAccRef = useRef({ delta: 0, lockedUntil: 0 });
 
 	useEffect(() => {
 		const updateWindowSize = () => {
@@ -71,9 +80,9 @@ const Grid: React.FC = () => {
 	}, []);
 
 	const getBoundedPosition = useCallback(
-		(pos: Position): Position => {
-			const gridWidth = GRID_SIZE * TILE_SIZE;
-			const gridHeight = GRID_HEIGHT * TILE_SIZE;
+		(pos: Position, z: number = zoomRef.current): Position => {
+			const gridWidth = GRID_SIZE * TILE_SIZE * z;
+			const gridHeight = GRID_HEIGHT * TILE_SIZE * z;
 
 			// Calculate maximum allowed movement to keep grid visible
 			const minX = -(gridWidth - windowSize.x); // Don't allow dragging past right edge
@@ -88,6 +97,49 @@ const Grid: React.FC = () => {
 		},
 		[windowSize]
 	);
+
+	// Wheel zoom around the cursor. Native listener: React's onWheel is passive and cannot stop the page zooming.
+	useEffect(() => {
+		const el = gridRef.current;
+		if (!el) return;
+		const onWheel = (e: WheelEvent) => {
+			e.preventDefault();
+			const acc = wheelAccRef.current;
+			const now = performance.now();
+			if (now < acc.lockedUntil) return;
+			acc.delta += e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+			if (Math.abs(acc.delta) < WHEEL_STEP_PX) return;
+			const dir = acc.delta < 0 ? 1 : -1; // wheel up zooms in
+			acc.delta = 0;
+			acc.lockedUntil = now + WHEEL_LOCKOUT_MS;
+
+			// never zoom out so far that the world no longer covers the screen
+			const minZoom = Math.max(
+				windowSize.x / (GRID_SIZE * TILE_SIZE),
+				windowSize.y / (GRID_HEIGHT * TILE_SIZE)
+			);
+			const levels = ZOOM_LEVELS.filter((l) => l >= minZoom);
+			if (levels.length === 0) return;
+			const from = zoomRef.current;
+			const idx = levels.indexOf(from);
+			const base = idx === -1 ? levels.findIndex((l) => l >= from) : idx;
+			const next = levels[Math.max(0, Math.min(levels.length - 1, (base === -1 ? levels.length - 1 : base) + dir))];
+			if (next === from) return;
+
+			zoomRef.current = next;
+			setZoom(next);
+			velocityRef.current = { x: 0, y: 0 };
+			const ratio = next / from;
+			setPosition((prev) =>
+				getBoundedPosition(
+					{ x: e.clientX - (e.clientX - prev.x) * ratio, y: e.clientY - (e.clientY - prev.y) * ratio },
+					next
+				)
+			);
+		};
+		el.addEventListener('wheel', onWheel, { passive: false });
+		return () => el.removeEventListener('wheel', onWheel);
+	}, [windowSize, getBoundedPosition, tiles]);
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent | React.TouchEvent) => {
@@ -171,21 +223,22 @@ const Grid: React.FC = () => {
 	const visibleTiles = useMemo(() => {
 		if (!tiles) return [];
 
+		const tilePx = TILE_SIZE * zoom;
 		const startX = Math.max(
 			0,
-			Math.floor(-position.x / TILE_SIZE) - VISIBLE_PADDING
+			Math.floor(-position.x / tilePx) - VISIBLE_PADDING
 		);
 		const endX = Math.min(
 			GRID_SIZE,
-			Math.ceil((-position.x + windowSize.x) / TILE_SIZE) + VISIBLE_PADDING
+			Math.ceil((-position.x + windowSize.x) / tilePx) + VISIBLE_PADDING
 		);
 		const startY = Math.max(
 			0,
-			Math.floor(-position.y / TILE_SIZE) - VISIBLE_PADDING
+			Math.floor(-position.y / tilePx) - VISIBLE_PADDING
 		);
 		const endY = Math.min(
 			GRID_HEIGHT,
-			Math.ceil((-position.y + windowSize.y) / TILE_SIZE) + VISIBLE_PADDING
+			Math.ceil((-position.y + windowSize.y) / tilePx) + VISIBLE_PADDING
 		);
 
 		const visible: JSX.Element[] = [];
@@ -212,7 +265,7 @@ const Grid: React.FC = () => {
 			}
 		}
 		return visible;
-	}, [position.x, position.y, windowSize, tiles]);
+	}, [position.x, position.y, windowSize, tiles, zoom]);
 
 	if (!tiles) {
 		return (
@@ -243,10 +296,12 @@ const Grid: React.FC = () => {
 			<div
 				className='absolute'
 				style={{
-					transform: `translate(${position.x}px, ${position.y}px)`,
+					transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
+					transformOrigin: '0 0',
 					width: GRID_SIZE * TILE_SIZE,
 					height: GRID_HEIGHT * TILE_SIZE,
-				}}>
+					'--map-zoom': zoom,
+				} as React.CSSProperties}>
 				{visibleTiles}
 				<CastleRange />
 			</div>

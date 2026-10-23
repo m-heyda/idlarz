@@ -301,7 +301,7 @@ const Tile: React.FC<TileProps> = ({
 
 					{/* Chest tooltip */}
 					{isOwned && hasChest && showChestTooltip && (
-						<div className='absolute -top-11 left-1/2 -translate-x-1/2 z-[60] px-tooltip whitespace-nowrap text-xs flex items-center gap-1 text-[#f0d27a]'>
+						<div className='map-tip map-tip-up absolute -top-11 left-1/2 -translate-x-1/2 z-[60] px-tooltip whitespace-nowrap text-xs flex items-center gap-1 text-[#f0d27a]'>
 							Click to collect bonus gold
 							<ResourceIcon resource='gold' />
 						</div>
@@ -321,7 +321,7 @@ const Tile: React.FC<TileProps> = ({
 				</div>
 
 				{(isOwned || isAdjacent) && (
-					<div className='absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
+					<div className='map-tip absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
 						<div className='px-tooltip whitespace-nowrap'>
 							<TileStatus
 								biome={biome}

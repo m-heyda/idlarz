@@ -87,6 +87,8 @@ const HeaderMenu: React.FC = () => {
 						<EditableName className='pixel-name' />
 						<LevelOrb
 							level={level.level}
+							notify={characterStats.availablePoints > 0}
+							notifyLabel={`${characterStats.availablePoints} unassigned stat points`}
 							className={levelUpActive ? 'animate-pulse-ring' : undefined}
 						/>
 					</div>

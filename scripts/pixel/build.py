@@ -192,12 +192,12 @@ def reference_sheets(sprites, ui, bg):
             big = upscale(icon, 2 if name == 'mystery' else 1)
             sheet.alpha_composite(big, (12 + i * (cell + 12) + 48 + (48 - big.size[0]) // 2, 12 + 48 + (48 - big.size[1]) // 2))
     sheet.save(os.path.join(REFERENCE, 'map-tiles.png'))
-    # castle levels 1-6 side by side, bottom aligned, at 2x
+    # castle levels 1-6 side by side (top-down, 48px each) at 2x
     lv = [sprites[f'castle_{i}'] for i in range(1, 7)]
-    sheet = Image.new('RGBA', (sum(im.size[0] * 2 + 16 for im in lv) + 16, 72 * 2 + 32), (60, 36, 100, 255))
+    sheet = Image.new('RGBA', (sum(im.size[0] * 2 + 16 for im in lv) + 16, 48 * 2 + 32), (60, 36, 100, 255))
     x = 16
     for im in lv:
-        sheet.alpha_composite(upscale(im, 2), (x, 16 + 72 * 2 - im.size[1] * 2))
+        sheet.alpha_composite(upscale(im, 2), (x, 16))
         x += im.size[0] * 2 + 16
     sheet.save(os.path.join(REFERENCE, 'castle-levels.png'))
     # UI parts at 3x on a dark ground
@@ -226,11 +226,10 @@ def main():
     if not only or 'castle_6_anim' in only:
         sprites_castle.sheet_max().save(os.path.join(PUB, 'icons', 'castle_6_anim.png'))
     if not only or 'castle_loading' in only:
-        # loading screen: the castle growing through its six levels (72px cells, bottom aligned)
-        cells = Image.new('RGBA', (72 * 6, 72), (0, 0, 0, 0))
+        # loading screen: the castle growing through its six levels (48px cells)
+        cells = Image.new('RGBA', (48 * 6, 48), (0, 0, 0, 0))
         for i in range(6):
-            im = sprites_castle.build(i + 1, 0)
-            cells.alpha_composite(im, (i * 72 + (72 - im.size[0]) // 2, 72 - im.size[1]))
+            cells.alpha_composite(sprites_castle.build(i + 1, 0), (i * 48, 0))
         cells.save(os.path.join(PUB, 'icons', 'castle_loading.png'))
     if not only or 'level_orb_shine' in only:
         sprites_props.level_orb_sheet().save(os.path.join(PUB, 'icons', 'level_orb_shine.png'))

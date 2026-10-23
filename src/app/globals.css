@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Pixelify Sans reads small at Tailwind's default sizes, so nudge the text scale up a notch */
+/* Slightly larger text scale than Tailwind's default: the game UI is dense and sits on a dark pixel map */
 @theme {
 	--text-xs: 0.8125rem;
 	--text-sm: 0.9375rem;
@@ -13,7 +13,7 @@
 :root {
 	--background: #ffffff;
 	--foreground: #000000;
-	--font-pixel: 'Pixelify Sans Variable', 'Pixelify Sans', Georgia, serif;
+	--font-pixel: 'Mozilla Headline Variable', 'Mozilla Headline', system-ui, sans-serif;
 	--px-gold: #f0d27a;
 	--px-bronze: #c08a30;
 	--px-ink: #0a0605;
@@ -347,6 +347,11 @@ body {
 
 .castle-tile {
 	z-index: 10;
+}
+
+/* the range wash (z-12) must never cover the castle's own tooltip */
+.castle-tile:hover {
+	z-index: 30;
 }
 
 /* ======================================================================================
@@ -1319,12 +1324,12 @@ body {
 	}
 }
 
-/* --- Castle: grows with each upgrade; the max level overflows its tile with glow + animation --- */
+/* --- Castle: top-down, fills its tile; grows towers with each upgrade, the max level glows + animates --- */
 .castle-sprite {
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	transform: translate(-50%, -56%);
+	transform: translate(-50%, -50%);
 	z-index: 5;
 	image-rendering: pixelated;
 	pointer-events: none; /* overflow must not block clicks on the neighbouring tiles */
@@ -1340,15 +1345,15 @@ body {
 }
 
 .castle-max {
-	width: 72px;
-	height: 72px;
-	background: url('/pixel/icons/castle_6_anim.png') 0 0 / 288px 72px no-repeat;
+	width: 48px;
+	height: 48px;
+	background: url('/pixel/icons/castle_6_anim.png') 0 0 / 192px 48px no-repeat;
 	animation: castle-anim 0.9s steps(4) infinite, castle-glow 2.6s ease-in-out infinite alternate;
 }
 
 @keyframes castle-anim {
 	to {
-		background-position-x: -288px;
+		background-position-x: -192px;
 	}
 }
 
@@ -1413,4 +1418,62 @@ body {
 	.castle-spark {
 		animation: none;
 	}
+}
+
+/* --- Notify dot: universal green "needs attention" marker, pinned to the top-right of a positioned parent --- */
+.notify-dot {
+	position: absolute;
+	top: -3px;
+	right: -3px;
+	z-index: 8;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	pointer-events: none;
+	background: radial-gradient(circle at 35% 30%, #d8ffd0 0 1.5px, #5eea6a 2.5px, #1fa23a 100%);
+	box-shadow: 0 0 0 2px #0a1a0c, 0 0 6px 1px rgba(80, 255, 110, 0.7);
+	animation: notify-pulse 1.4s ease-in-out infinite;
+}
+
+.notify-dot::after {
+	content: '';
+	position: absolute;
+	inset: -2px;
+	border-radius: 50%;
+	border: 2px solid rgba(94, 234, 106, 0.8);
+	animation: notify-ring 1.4s ease-out infinite;
+}
+
+@keyframes notify-pulse {
+	50% {
+		transform: scale(1.12);
+	}
+}
+
+@keyframes notify-ring {
+	from {
+		transform: scale(1);
+		opacity: 0.9;
+	}
+	to {
+		transform: scale(2.2);
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.notify-dot,
+	.notify-dot::after {
+		animation: none;
+	}
+}
+
+/* Map zoom scales the whole tile layer; tooltips counter-scale so text stays one readable size */
+.map-tip {
+	scale: calc(1 / var(--map-zoom, 1));
+	transform-origin: top center;
+}
+
+.map-tip-up {
+	transform-origin: bottom center;
 }
