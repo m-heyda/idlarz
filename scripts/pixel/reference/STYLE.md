@@ -70,7 +70,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
     floating "?" mark that glows on hover. Calm on purpose so the "?" stays the focus.
   - *Fog of war*: chunky low-res clouds (48px/64px art shown at 3x, 3 flat alpha bands, no outlines, no dither), two layers
     drifting opposite ways and breathing.
-  - *Pickups*: bonus gold is a bobbing treasure chest (`bonus_chest`, 32px, gold glow). Castle level and grounds level use pixel plaques/stars.
+  - *Pickups*: bonus gold is a bobbing treasure chest (`bonus_chest`, 24px, gold glow). Castle level and grounds level use pixel plaques/stars.
 - **Castle** (`castle_1`-`castle_6`, `sprites_castle.py`): seen from above (ray-cast at pitch 78), every level a full 48px tile on a
   paved plinth, growing with each upgrade - crenellated keep with timber roof, keep + round watchtower, keep + two towers and a
   gate wall, walled courtyard with four crowned corner towers, fortress with tall watchtowers / central tower / gold trim, and the

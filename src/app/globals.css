@@ -1453,3 +1453,13 @@ body {
 		animation: none;
 	}
 }
+
+/* Map zoom scales the whole tile layer; tooltips counter-scale so text stays one readable size */
+.map-tip {
+	scale: calc(1 / var(--map-zoom, 1));
+	transform-origin: top center;
+}
+
+.map-tip-up {
+	transform-origin: bottom center;
+}

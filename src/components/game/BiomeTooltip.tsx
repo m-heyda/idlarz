@@ -87,8 +87,8 @@ export const BiomeTooltip = memo(
 				
 				{/* Display building info for upgraded grounds */}
 				{biome === 'grounds' && level === 2 && buildingInfo && (
-					<div className='mb-2 text-purple-300 font-semibold text-xs flex items-center gap-1'>
-						<PixelIcon name={BUILDING_PIXEL_ICONS[buildingInfo.name]} alt='' scale={0.5} />
+					<div className='mb-2 text-purple-300 font-semibold text-xs flex items-start gap-1'>
+						<PixelIcon name={BUILDING_PIXEL_ICONS[buildingInfo.name]} alt='' scale={0.5} className='mt-px' />
 						<span>Grounds level 2 with {buildingInfo.label}</span>
 					</div>
 				)}
@@ -106,7 +106,7 @@ export const BiomeTooltip = memo(
 
 					return (
 						<div key={resource} className='flex flex-col gap-1'>
-							<div className='flex items-center gap-1'>
+							<div className='flex flex-wrap items-center gap-x-1'>
 								<ResourceIcon resource={resource} />
 
 								<span className='text-gray-400 font-semibold'>
@@ -138,7 +138,7 @@ export const BiomeTooltip = memo(
 							const effectiveRate = scaledRate * adjacencyMultiplier;
 							
 							return (
-								<div key={`building-${resource}`} className='flex items-center gap-1 text-xs'>
+								<div key={`building-${resource}`} className='flex flex-wrap items-center gap-x-1 text-xs'>
 									<ResourceIcon resource={resource} />
 									<span className='text-green-400 font-semibold'>
 										+{formatRate(scaledRate)}

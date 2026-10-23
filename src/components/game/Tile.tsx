@@ -321,8 +321,8 @@ const Tile: React.FC<TileProps> = ({
 				</div>
 
 				{(isOwned || isAdjacent) && (
-					<div className='map-tip absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
-						<div className='px-tooltip whitespace-nowrap'>
+					<div className='map-tip absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px] opacity-0 group-hover:opacity-100 pointer-events-none z-[60] transition-opacity duration-150'>
+						<div className='px-tooltip break-words'>
 							<TileStatus
 								biome={biome}
 								isOwned={isOwned}

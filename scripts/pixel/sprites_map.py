@@ -1,4 +1,4 @@
-"""Map sprites: one icon per biome (32x32), the bonus treasure chest (32x32) and the XP orb (40x40).
+"""Map sprites: one icon per biome (32x32), the bonus treasure chest (24x24) and the XP orb (40x40).
 Same ray-cast look as the rest of the set, just smaller canvases for the 48px map tiles."""
 import math
 from render3d import Scene, Prim, rot, vnoise, between, I3
@@ -128,26 +128,25 @@ def grounds():
     return sc.render()
 
 
-# ----------------------------------------------------------------- bonus treasure chest (32x32)
+# ----------------------------------------------------------------- bonus treasure chest (24x24)
 def bonus_chest():
-    sc = Scene(MATS, size=32, scale=8.0, origin=(16, 23), yaw=18.0, pitch=28.0)
+    """Deliberately plain: wooden box, round lid, two iron straps, gold lock, and a hard black outline so it reads
+    at a glance on any ground."""
+    sc = Scene(MATS, size=24, scale=6.6, origin=(12, 17), yaw=14.0, pitch=28.0, dither=0.0)
     _P(sc, 'box', (0, 0, 0.45), (1.2, 0.75, 0.45), 'leather', I3, None, 1)                    # body
-    _P(sc, 'cyl', (0, 0, 0.9), (0.75, 1.2), 'pleather', rot(0, 90, 0), None, 2)               # arched lid (axis along x)
-    for sx in (-0.8, 0.8):                                                                      # iron straps round body + lid
-        _P(sc, 'box', (sx, 0, 0.45), (0.1, 0.79, 0.47), 'steel', I3, None, 3)
-        _P(sc, 'cyl', (sx, 0, 0.9), (0.8, 0.1), 'steel', rot(0, 90, 0), None, 4)
-    _P(sc, 'box', (0, 0, 0.1), (1.24, 0.79, 0.1), 'steel', I3, None, 5)                        # base rim
-    for x in (-0.4, 0.4):                                                                       # plank seams
-        _P(sc, 'box', (x, -0.76, 0.45), (0.025, 0.02, 0.4), 'dark')
-    _P(sc, 'box', (0, -0.78, 0.82), (0.26, 0.06, 0.3), 'glow')                                   # lock plate
-    _P(sc, 'box', (0, -0.84, 0.78), (0.05, 0.03, 0.1), 'dark')                                   # keyhole
-    for sx in (-1.2, 1.2):                                                                       # gold corner studs
-        _P(sc, 'ell', (sx, -0.75, 0.12), (0.12, 0.12, 0.12), 'gold')
-    _P(sc, 'cyl', (-1.0, -1.2, 0.05), (0.32, 0.07), 'gold', rot(0, 0, 0), coin_tex)             # coins spilled in front
-    _P(sc, 'cyl', (-0.45, -1.45, 0.05), (0.28, 0.07), 'gold', rot(0, 0, 0), coin_tex)
-    _P(sc, 'cyl', (-0.85, -1.3, 0.16), (0.3, 0.07), 'gold', rot(18, 0, 10), coin_tex)
-    img = sc.render()
-    fx.glint(img, 24, 6, 2)
+    _P(sc, 'cyl', (0, 0, 0.9), (0.75, 1.2), 'pleather', rot(0, 90, 0), None, 2)               # round lid (axis along x)
+    for sx in (-0.7, 0.7):                                                                      # iron straps
+        _P(sc, 'box', (sx, 0, 0.45), (0.16, 0.8, 0.47), 'steel', I3, None, 3)
+        _P(sc, 'cyl', (sx, 0, 0.9), (0.8, 0.16), 'steel', rot(0, 90, 0), None, 4)
+    _P(sc, 'box', (0, -0.78, 0.8), (0.3, 0.06, 0.32), 'glow')                                    # gold lock
+    img = sc.render(outline=False)
+    # hard black outline round the whole silhouette
+    w, h = img.size
+    px = img.load()
+    edge = [(x, y) for y in range(h) for x in range(w) if px[x, y][3] == 0 and any(
+        0 <= x + dx < w and 0 <= y + dy < h and px[x + dx, y + dy][3] for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+    for x, y in edge:
+        px[x, y] = (8, 5, 4, 255)
     return img
 
 
