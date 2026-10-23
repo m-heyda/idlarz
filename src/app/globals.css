@@ -1508,3 +1508,21 @@ body {
 .map-tip-up {
 	transform-origin: bottom center;
 }
+
+/* Tooltips are drawn here (above the ambient critters, below the header and dialogs); they never take the mouse */
+.map-tip-layer {
+	position: absolute;
+	inset: 0;
+	z-index: 30;
+	pointer-events: none;
+}
+
+.map-tip-in {
+	animation: map-tip-in 150ms ease-out both;
+}
+
+@keyframes map-tip-in {
+	from {
+		opacity: 0;
+	}
+}

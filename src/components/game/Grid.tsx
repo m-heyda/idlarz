@@ -10,6 +10,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { GRID_SIZE, GRID_HEIGHT, TILE_SIZE } from '@/config/gameConfig';
 import Tile from './Tile';
 import AmbientLife from './AmbientLife';
+import { MapTipLayerContext } from './MapTipLayer';
 import type { Viewport } from '@/lib/ambientLife';
 import CastleRange from './CastleRange';
 
@@ -223,6 +224,7 @@ const Grid: React.FC = () => {
 	}, [animate]);
 
 	// Which tiles are on screen right now (read by the ambient critters when they pick a spot)
+	const [tipLayer, setTipLayer] = useState<HTMLElement | null>(null);
 	const viewportRef = useRef<Viewport>({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
 	viewportRef.current = {
 		minX: Math.floor(-position.x / TILE_SIZE),
@@ -314,9 +316,10 @@ const Grid: React.FC = () => {
 					height: GRID_HEIGHT * TILE_SIZE,
 					'--map-zoom': zoom,
 				} as React.CSSProperties}>
-				{visibleTiles}
+				<MapTipLayerContext.Provider value={tipLayer}>{visibleTiles}</MapTipLayerContext.Provider>
 				<AmbientLife getViewport={getViewport} />
 				<CastleRange />
+				<div ref={setTipLayer} className='map-tip-layer' />
 			</div>
 		</div>
 	);
