@@ -24,7 +24,6 @@ const CastleRange: React.FC = () => {
 			<i className='range-corner tr' />
 			<i className='range-corner bl' />
 			<i className='range-corner br' />
-			<span className='range-label'>Castle range</span>
 		</div>
 	);
 };

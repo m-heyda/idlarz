@@ -107,25 +107,6 @@
 	transform: scale(-1, -1);
 }
 
-.range-label {
-	position: absolute;
-	top: -26px;
-	left: 50%;
-	transform: translateX(-50%);
-	padding: 1px 10px;
-	font-family: var(--font-pixel);
-	font-size: 0.7rem;
-	font-weight: 700;
-	letter-spacing: 2px;
-	text-transform: uppercase;
-	white-space: nowrap;
-	color: #d9c2f5;
-	text-shadow: 0 2px 0 #1a0640;
-	background: rgba(24, 8, 52, 0.7);
-	border: 1px solid rgba(138, 68, 224, 0.7);
-	opacity: 0.85;
-}
-
 /* gold twinkles above owned tiles in range: 6-frame strip (11px frames at 2x) floating upward */
 .range-sparks {
 	position: absolute;

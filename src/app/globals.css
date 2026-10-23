@@ -1223,7 +1223,6 @@ body {
 .tile-unknown {
 	background: #0a0f26 url('/pixel/bg/mystery.png') 0 0 / 48px 48px;
 	image-rendering: pixelated;
-	overflow: hidden;
 	animation: mystery-drift 18s steps(48) infinite;
 
 	&::before {
@@ -1237,9 +1236,23 @@ body {
 		animation: mystery-drift-b 28s steps(72) infinite reverse;
 	}
 
+	/* hover glow is an overlay, not a filter, so the cost tooltip (a child) is not washed out */
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: rgba(150, 190, 255, 0.22);
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+
 	&:hover {
-		filter: brightness(1.45) saturate(1.2);
 		animation-duration: 5s;
+
+		&::after {
+			opacity: 1;
+		}
 
 		&::before {
 			opacity: 0.7;

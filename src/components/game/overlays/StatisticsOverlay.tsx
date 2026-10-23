@@ -4,6 +4,7 @@ import { CharacterStats } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import PixelModal from '../PixelModal';
 import CharacterPortrait from '../CharacterPortrait';
+import CollapsibleSection from '../CollapsibleSection';
 import { countOwnedTiles, getStatDescription } from '@/utils/gameUtils';
 import { formatNumber, formatRate } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
@@ -82,10 +83,7 @@ const StatisticsOverlay: React.FC = () => {
 							)}
 
 							{/* Base Stats with Add Buttons */}
-							<div className='space-y-3 mb-6'>
-								<h3 className='px-h'>
-									Base Stats
-								</h3>
+							<CollapsibleSection id='base-stats' title='Base Stats' className='mb-6'>
 								{Object.entries(characterStats)
 									.filter(([statKey]) =>
 										[
@@ -149,13 +147,10 @@ const StatisticsOverlay: React.FC = () => {
 											</div>
 										);
 									})}
-							</div>
+							</CollapsibleSection>
 
 							{/* Combat Stats */}
-							<div className='space-y-3 mb-6'>
-								<h3 className='px-h'>
-									Combat Stats
-								</h3>
+							<CollapsibleSection id='combat-stats' title='Combat Stats' className='mb-6'>
 								<div className='grid grid-cols-2 gap-x-4 gap-y-2 text-xs'>
 									<div className='flex justify-between items-center'>
 										<span className='text-[#d8c8a0]'>HP:</span>
@@ -201,13 +196,10 @@ const StatisticsOverlay: React.FC = () => {
 										</span>
 									</div>
 								</div>
-							</div>
+							</CollapsibleSection>
 
 							{/* Bonus Stats */}
-							<div className='space-y-3'>
-								<h3 className='px-h'>
-									Bonus Stats
-								</h3>
+							<CollapsibleSection id='bonus-stats' title='Bonus Stats'>
 								<div className='grid grid-cols-2 gap-x-4 gap-y-2 text-xs'>
 									<div className='flex justify-between items-center'>
 										<span className='text-[#d8c8a0]'>Crit Chance:</span>
@@ -251,7 +243,7 @@ const StatisticsOverlay: React.FC = () => {
 										</span>
 									</div>
 								</div>
-							</div>
+							</CollapsibleSection>
 						</div>
 					</div>
 
