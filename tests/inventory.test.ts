@@ -87,8 +87,8 @@ test('equipFromBag fills an empty slot and frees the bag slot', () => {
 });
 
 test('two rings go to ring1 then ring2, a third swaps ring1', () => {
-	let bag = addToBag(emptyBag(), 'rattatui_ring', 3).bag;
-	let eq: Equipment = {};
+	const bag = addToBag(emptyBag(), 'rattatui_ring', 3).bag;
+	const eq: Equipment = {};
 	let r = equipFromBag(bag, eq, 0)!;
 	assert.equal(r.equipment.ring1, 'rattatui_ring');
 	assert.equal(r.equipment.ring2, undefined);
@@ -97,7 +97,6 @@ test('two rings go to ring1 then ring2, a third swaps ring1', () => {
 	r = equipFromBag(r.bag, r.equipment, 2)!;
 	assert.equal(r.equipment.ring1, 'rattatui_ring');
 	assert.equal(r.bag.filter((s) => s?.id === 'rattatui_ring').length, 1);
-	bag = r.bag;
 });
 
 test('equipFromBag rejects consumables, empty slots and bad indexes', () => {
