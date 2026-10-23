@@ -296,14 +296,16 @@ const Tile: React.FC<TileProps> = ({
 
 					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && (
-						<PixelIcon name='bonus_chest' alt='Bonus gold' className='tile-chest' />
+						<span className='tile-chest-wrap'>
+							<PixelIcon name='bonus_chest' alt='Bonus gold' className='tile-chest' />
+							<i className='chest-twinkle' aria-hidden />
+						</span>
 					)}
 
 					{/* Chest tooltip */}
 					{isOwned && hasChest && showChestTooltip && (
-						<div className='map-tip map-tip-up absolute -top-11 left-1/2 -translate-x-1/2 z-[60] px-tooltip whitespace-nowrap text-xs flex items-center gap-1 text-[#f0d27a]'>
-							Click to collect bonus gold
-							<ResourceIcon resource='gold' />
+						<div className='map-tip map-tip-up absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max z-[60] px-tooltip text-xs text-[#f0d27a]'>
+							Click to collect bonus gold <ResourceIcon resource='gold' />
 						</div>
 					)}
 					

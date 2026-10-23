@@ -11,7 +11,6 @@ from materials import MATS
 import fx
 
 SIZE = 48
-SIZES = {lv: SIZE for lv in range(1, 7)}
 WALL = 'wallstone'
 PAVE = 'stone'
 CAM = dict(yaw=0.0, pitch=78.0)        # looking almost straight down; front faces show as a thin strip
