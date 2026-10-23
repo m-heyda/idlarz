@@ -1,0 +1,245 @@
+/* Fight modal: monster stage, HP bars with a delayed trail, blood burst, damage numbers, shake on hurt */
+
+.fight-body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 4px 8px 8px;
+}
+
+.fight-body[data-shake='true'] {
+	animation: fight-shake 0.32s steps(8) 1;
+}
+
+@keyframes fight-shake {
+	0% { transform: translate(0, 0); }
+	12% { transform: translate(-8px, 2px); }
+	25% { transform: translate(7px, -3px); }
+	37% { transform: translate(-6px, 3px); }
+	50% { transform: translate(5px, -2px); }
+	62% { transform: translate(-4px, 1px); }
+	75% { transform: translate(3px, -1px); }
+	100% { transform: translate(0, 0); }
+}
+
+.fight-hurt-flash {
+	position: absolute;
+	inset: -8px;
+	z-index: 5;
+	pointer-events: none;
+	opacity: 0;
+	box-shadow: inset 0 0 40px 10px rgba(220, 30, 20, 0.75);
+	transition: opacity 0.35s ease-out;
+}
+
+.fight-hurt-flash[data-on='true'] {
+	opacity: 1;
+	transition: none;
+}
+
+.fight-timer {
+	text-align: center;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #f0d27a;
+}
+
+.fight-timer[data-low='true'] {
+	color: #ff6a5a;
+}
+
+/* --- bars --- */
+.fight-bar {
+	position: relative;
+	height: 26px;
+	background: #120a06;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c, inset 0 0 0 2px #2a1a0c;
+	overflow: hidden;
+}
+
+.fight-bar-trail,
+.fight-bar-fill {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+}
+
+.fight-bar-trail {
+	background: #f2e8d0;
+	transition: width 0.5s ease-in 0.35s;
+}
+
+.fight-bar-fill {
+	background: linear-gradient(#e0483c 0 35%, #b02a22 35% 100%);
+	transition: width 0.12s steps(6);
+	box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
+}
+
+.fight-bar[data-kind='player'] .fight-bar-fill {
+	background: linear-gradient(#6adc5a 0 35%, #38a030 35% 100%);
+}
+
+.fight-bar[data-kind='player'] .fight-bar-trail {
+	background: #d8f0b8;
+}
+
+.fight-bar-text {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.8rem;
+	font-weight: 700;
+	color: #fff6e0;
+	text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+}
+
+/* --- stage --- */
+.fight-stage {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 260px;
+	background: radial-gradient(closest-side, rgba(90, 40, 30, 0.45), transparent);
+}
+
+.fight-monster {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 220px;
+	height: 220px;
+	background: none;
+	border: 0;
+	cursor: crosshair;
+	user-select: none;
+}
+
+.fight-monster:disabled {
+	cursor: default;
+	opacity: 0.55;
+}
+
+.fight-sprite {
+	display: block;
+	image-rendering: pixelated;
+	filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.5));
+}
+
+.fight-sprite[data-hit='true'] {
+	animation: fight-hit 0.16s steps(4) 1;
+}
+
+@keyframes fight-hit {
+	0% { transform: scale(0.9) rotate(-3deg); filter: brightness(2.2) saturate(0.3); }
+	100% { transform: scale(1) rotate(0); filter: none; }
+}
+
+.fight-burst {
+	position: absolute;
+	left: 50%;
+	top: 45%;
+	pointer-events: none;
+}
+
+.fight-burst i {
+	position: absolute;
+	background: #b01810;
+	box-shadow: inset -1px -1px 0 #6a0a06;
+	animation: fight-blood 0.6s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+}
+
+@keyframes fight-blood {
+	0% { transform: translate(0, 0); opacity: 1; }
+	70% { opacity: 1; }
+	100% { transform: translate(var(--dx), calc(var(--dy) + 90px)); opacity: 0; }
+}
+
+.fight-number {
+	position: absolute;
+	top: 28%;
+	z-index: 6;
+	font-size: 1.5rem;
+	font-weight: 700;
+	pointer-events: none;
+	text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000;
+	animation: fight-float 0.9s ease-out forwards;
+}
+
+.fight-number[data-kind='dmg'] { color: #ffe27a; }
+.fight-number[data-kind='hurt'] { color: #ff6a5a; top: 70%; }
+.fight-number[data-kind='heal'] { color: #7aff8a; top: 70%; }
+
+@keyframes fight-float {
+	0% { transform: translateY(0); opacity: 1; }
+	100% { transform: translateY(-48px); opacity: 0; }
+}
+
+.fight-result {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 8;
+	min-width: 300px;
+	padding: 8px 14px;
+	transform: translate(-50%, -50%);
+}
+
+/* --- actions --- */
+.fight-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.fight-potions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.fight-potion {
+	position: relative;
+}
+
+.fight-hotkey {
+	position: absolute;
+	left: 4px;
+	top: 2px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: #f0d27a;
+	text-shadow: 1px 1px 0 #000;
+	pointer-events: none;
+}
+
+.fight-cooldown {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fight-body[data-shake='true'],
+	.fight-sprite[data-hit='true'],
+	.fight-number {
+		animation: none;
+	}
+	.fight-burst {
+		display: none;
+	}
+	.fight-sprite[data-hit='true'] {
+		filter: brightness(1.8);
+	}
+}

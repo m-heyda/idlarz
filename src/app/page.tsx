@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import Grid from '@/components/game/Grid';
 import CharacterOverlay from '@/components/game/overlays/CharacterOverlay';
+import FightModal from '@/components/game/overlays/FightModal';
 import StatisticsOverlay from '@/components/game/overlays/StatisticsOverlay';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
@@ -127,6 +128,7 @@ export default function Home() {
 			<Grid />
 			<FloatingText />
 			<CharacterOverlay />
+			<FightModal />
 			<StatisticsOverlay />
 			<MerchantOverlay />
 			<FarmOverlay />
