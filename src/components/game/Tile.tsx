@@ -92,7 +92,7 @@ const Tile: React.FC<TileProps> = ({
 
 	const hasBuilding = biome === 'grounds' && !!building && (level ?? 1) > 1;
 	const castleLevel = tiles?.[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1;
-	const isMaxCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.maxLevel;
+	const isGlowingCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.glowFromLevel;
 
 	// Owned neighbours of the castle get gold sparkles: they are inside the castle's range
 	const inCastleRange =
@@ -214,14 +214,14 @@ const Tile: React.FC<TileProps> = ({
 							!isOwned && isAdjacent && !canAfford,
 						'border border-purple-400': biome === 'castle',
 						'border-2 border-amber-300':
-							(tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 0) === 10 &&
+							(tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 0) >= CASTLE_UPGRADE.maxLevel &&
 							biome === 'castle',
 						'group hover:z-20': true,
 						'opacity-75 border-2 border-red-500': isShaking,
 						'cursor-pointer':
 							isOwned && (biome === 'castle' || biome === 'grounds' || hasChest),
 						'castle-tile': isOwned && biome === 'castle',
-						'castle-max-tile': isOwned && isMaxCastle,
+						'castle-max-tile': isOwned && isGlowingCastle,
 						'border-2 border-amber-400': isOwned && hasChest,
 						'tile-cooldown': cooling,
 					},

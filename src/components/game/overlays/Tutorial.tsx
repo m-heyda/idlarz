@@ -22,6 +22,7 @@ import {
 } from '@/config/gameConfig';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatNumber, formatTime } from '@/utils/formatters';
+import { castleModifier } from '@/utils/gameUtils';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
 
@@ -43,8 +44,9 @@ const Res: React.FC<{ r: string; children?: React.ReactNode }> = ({ r, children 
 
 const Tutorial: React.FC = () => {
 	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty');
-	const castleStart = CASTLE_UPGRADE.baseResourceMultiplier;
-	const castleMax = castleStart * Math.pow(2, CASTLE_UPGRADE.maxLevel - 1);
+	const castleStart = castleModifier(1);
+	const castleAtDoublingEnd = castleModifier(CASTLE_UPGRADE.doublingUntil);
+	const castleMax = castleModifier(CASTLE_UPGRADE.maxLevel);
 	const stat = CHARACTER_STAT_CONFIG;
 	const resourceTargets = (s: keyof typeof stat.resourceTargets) =>
 		stat.resourceTargets[s].map((r) => r[0].toUpperCase() + r.slice(1)).join(' & ');
@@ -144,9 +146,11 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Castle</h3>
 				<p className='text-[#d8c8a0]'>
 					The castle gives a bonus to <b>all</b> resources: +{pct(castleStart)} at level 1, doubling with every level
-					up to +{pct(castleMax)} at level {CASTLE_UPGRADE.maxLevel}. Upgrades cost resources and take real
-					time ({formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in
-					total); the castle keeps its current bonus while it is being built. From level 2 it also produces +
+					up to +{pct(castleAtDoublingEnd)} at level {CASTLE_UPGRADE.doublingUntil}, then +
+					{pct(CASTLE_UPGRADE.lateLevelStep)} more per level up to +{pct(castleMax)} at level{' '}
+					{CASTLE_UPGRADE.maxLevel}. Upgrades cost resources and take real time (
+					{formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in total); the
+					castle keeps its current bonus while it is being built. From level 2 it also produces +
 					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1.
 				</p>
 			</section>

@@ -1387,8 +1387,11 @@ body {
 }
 
 .castle-max {
+	--tier: 0;
+	--grow: calc(1 + var(--tier) * 0.06); /* 1.00 at the first glowing level, 1.24 at level 10 */
 	width: 48px;
 	height: 48px;
+	scale: var(--grow);
 	background: url('/pixel/icons/castle_6_anim.png') 0 0 / 192px 48px no-repeat;
 	animation: castle-anim 0.9s steps(4) infinite, castle-glow 2.6s ease-in-out infinite alternate;
 }
@@ -1401,10 +1404,10 @@ body {
 
 @keyframes castle-glow {
 	from {
-		filter: drop-shadow(0 0 3px rgba(255, 200, 80, 0.4)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35));
+		filter: drop-shadow(0 0 calc(3px + var(--tier) * 1px) rgba(255, 200, 80, 0.4)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35));
 	}
 	to {
-		filter: drop-shadow(0 0 12px rgba(255, 224, 120, 0.95)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35));
+		filter: drop-shadow(0 0 calc(12px + var(--tier) * 3px) rgba(255, 224, 120, 0.95)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35));
 	}
 }
 

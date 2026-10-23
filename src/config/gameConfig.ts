@@ -331,71 +331,24 @@ export const CASTLE_RANGE = { radius: 1 };
 
 // Exponential castle upgrade system
 export const CASTLE_UPGRADE = {
-	maxLevel: 6, // Increased from 5
-	baseResourceMultiplier: 0.2, // 20% base modifier at level 1
-	doublePerLevel: true, // Multiply by 2 for each level
+	maxLevel: 10,
+	baseResourceMultiplier: 0.2, // +20% to every resource at level 1
+	doublingUntil: 6, // the bonus doubles with every level up to this level ...
+	lateLevelStep: 3.2, // ... then grows linearly by this much per level (level 10 = +1920%)
+	glowFromLevel: 6, // from this level the castle is drawn animated and glowing, stronger with every level
 	xpBonus: 0.5, // Additional flat XP/s for every castle level above 1
 	// Real upgrade time in seconds, indexed by the level being left (1 -> 2 is index 0). Counted by the tick loop.
-	durationsSec: [3600, 14400, 43200, 129600, 259200],
+	durationsSec: [3600, 14400, 43200, 129600, 259200, 259200, 345600, 432000, 604800],
 	upgradeCosts: [
 		{ gold: 350000, wood: 50000, stone: 50000 },
 		{ gold: 1000000, wood: 150000, stone: 150000, coal: 100000 },
-		{
-			gold: 5000000,
-			wood: 500000,
-			stone: 500000,
-			coal: 250000,
-			food: 1000000,
-			meat: 200000,
-		},
-		{
-			gold: 20000000,
-			wood: 2000000,
-			stone: 2000000,
-			coal: 1000000,
-			food: 10000000,
-			meat: 500000,
-		},
-		{
-			gold: 100000000,
-			wood: 10000000,
-			stone: 10000000,
-			coal: 5000000,
-			food: 50000000,
-			meat: 2500000,
-		},
-		{
-			gold: 500000000,
-			wood: 50000000,
-			stone: 50000000,
-			coal: 25000000,
-			food: 250000000,
-			meat: 10000000,
-		},
-		{
-			gold: 2500000000,
-			wood: 250000000,
-			stone: 250000000,
-			coal: 100000000,
-			food: 1000000000,
-			meat: 50000000,
-		},
-		{
-			gold: 10000000000,
-			wood: 1000000000,
-			stone: 1000000000,
-			coal: 500000000,
-			food: 5000000000,
-			meat: 250000000,
-		},
-		{
-			gold: 50000000000,
-			wood: 5000000000,
-			stone: 5000000000,
-			coal: 2500000000,
-			food: 25000000000,
-			meat: 1000000000,
-		},
+		{ gold: 5000000, wood: 500000, stone: 500000, coal: 250000, food: 1000000, meat: 200000 },
+		{ gold: 20000000, wood: 2000000, stone: 2000000, coal: 1000000, food: 10000000, meat: 500000 },
+		{ gold: 100000000, wood: 10000000, stone: 10000000, coal: 5000000, food: 50000000, meat: 2500000 },
+		{ gold: 150000000, wood: 15000000, stone: 15000000, coal: 8000000, food: 80000000, meat: 4000000 },
+		{ gold: 240000000, wood: 24000000, stone: 24000000, coal: 13000000, food: 128000000, meat: 6400000 },
+		{ gold: 384000000, wood: 38000000, stone: 38000000, coal: 20000000, food: 205000000, meat: 10000000 },
+		{ gold: 614000000, wood: 61000000, stone: 61000000, coal: 33000000, food: 328000000, meat: 16000000 },
 	],
 };
 

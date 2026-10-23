@@ -12,32 +12,38 @@ interface CastleSpriteProps {
 	className?: string;
 }
 
-// Sparkles that drift up around the max-level castle
+// Sparkles that drift up around a glowing castle (more of them the higher the level)
 const SPARKS = [
 	{ x: '18%', d: '0s' },
 	{ x: '46%', d: '0.9s' },
 	{ x: '74%', d: '1.7s' },
 	{ x: '32%', d: '2.3s' },
+	{ x: '60%', d: '0.4s' },
+	{ x: '10%', d: '1.3s' },
+	{ x: '84%', d: '2.1s' },
 ];
 
+/** 0 for the first glowing level, +1 for every level above it. */
+export const castleTier = (level: number) => Math.max(0, level - CASTLE_UPGRADE.glowFromLevel);
+
 /**
- * The castle for a given upgrade level. Each level is a bigger, grander sprite; the max level is a
- * 72px animated sheet (waving flags, pulsing crystal) with a golden glow that overflows the tile.
+ * The castle for a given upgrade level. Levels 1-5 are ever bigger sprites; from `glowFromLevel` on it is the
+ * 72px animated sheet (waving flags, pulsing crystal) whose glow, size and sparkles grow with each further level.
  */
 const CastleSprite: React.FC<CastleSpriteProps> = ({ level, variant = 'tile', className }) => {
-	const isMax = level >= CASTLE_UPGRADE.maxLevel;
+	const glowing = level >= CASTLE_UPGRADE.glowFromLevel;
 	const inline = variant === 'inline';
 
-	if (isMax) {
+	if (glowing) {
+		const tier = castleTier(level);
 		return (
-			<span className={cn('castle-sprite castle-max', inline && 'castle-inline', className)}>
-				{!inline && SPARKS.map((s) => (
-					<i
-						key={s.x}
-						className='castle-spark'
-						style={{ '--x': s.x, '--d': s.d } as React.CSSProperties}
-					/>
-				))}
+			<span
+				className={cn('castle-sprite castle-max', inline && 'castle-inline', className)}
+				style={{ '--tier': tier } as React.CSSProperties}>
+				{!inline &&
+					SPARKS.slice(0, Math.min(SPARKS.length, 4 + Math.ceil(tier / 2))).map((s) => (
+						<i key={s.x} className='castle-spark' style={{ '--x': s.x, '--d': s.d } as React.CSSProperties} />
+					))}
 			</span>
 		);
 	}

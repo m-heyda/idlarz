@@ -363,23 +363,12 @@ export const calculateResourceRates = (
 			}
 		}
 	}
-	let castleModifier = 0;
-	if (castleLevel > 0) {
-		if (CASTLE_UPGRADE.doublePerLevel) {
-			// Base is 20% at level 1, doubles with each level
-			// Level 1 = 0.2, Level 2 = 0.4, Level 3 = 0.8, Level 4 = 1.6, etc.
-			castleModifier =
-				CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, castleLevel - 1);
-		} else {
-			// Fallback to linear growth (20% per level)
-			castleModifier = castleLevel * CASTLE_UPGRADE.baseResourceMultiplier;
-		}
-	}
+	const castleBonus = castleModifier(castleLevel);
 
 	// Add the castle modifier to all resources
 	Object.keys(modifiers).forEach((resource) => {
 		const key = resource as keyof Resources;
-		modifiers[key] += castleModifier;
+		modifiers[key] += castleBonus;
 	});
 
 	// Castle levels above 1 add flat XP/s
@@ -538,6 +527,20 @@ export const calculateBuildingCost = (tiles: Tile[][]): Partial<Resources> => {
 		cost[resource as keyof Resources] = Math.floor((amount || 0) * factor);
 	});
 	return cost;
+};
+
+/**
+ * Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each
+ * level up to `doublingUntil`, then a fixed step per level (so levels 7-10 stay a long climb, not an explosion).
+ */
+export const castleModifier = (level: number): number => {
+	const lvl = Math.max(1, Math.floor(level));
+	const doubled = Math.min(lvl, CASTLE_UPGRADE.doublingUntil);
+	let bonus = CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, doubled - 1);
+	if (lvl > CASTLE_UPGRADE.doublingUntil) {
+		bonus += CASTLE_UPGRADE.lateLevelStep * (lvl - CASTLE_UPGRADE.doublingUntil);
+	}
+	return bonus;
 };
 
 /** Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`. */

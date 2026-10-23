@@ -7,12 +7,11 @@ import {
 	SCALING_CONFIG,
 	RESOURCE_ICONS,
 	BIOME_YIELD,
-	CASTLE_UPGRADE,
 	BUILDINGS,
 	BuildingType,
 } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
-import { calculateTileTapYield } from '@/utils/gameUtils';
+import { calculateTileTapYield, castleModifier } from '@/utils/gameUtils';
 import { formatTime } from '@/utils/formatters';
 import { TILE_TAP } from '@/config/gameConfig';
 import ResourceIcon from './ResourceIcon';
@@ -157,11 +156,7 @@ export const BiomeTooltip = memo(
 				{biome === 'castle' && level && level > 1 && (
 					<div className='mt-2 text-purple-400 text-xs'>
 						Castle Bonus:{' '}
-						{Math.round(
-							CASTLE_UPGRADE.baseResourceMultiplier *
-								Math.pow(2, level - 1) *
-								100
-						)}
+						{Math.round(castleModifier(level) * 100)}
 						% all resource generation
 					</div>
 				)}

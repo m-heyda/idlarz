@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { CASTLE_UPGRADE } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber, formatTime } from '@/utils/formatters';
-import { castleUpgradeDuration } from '@/utils/gameUtils';
+import { castleModifier, castleUpgradeDuration } from '@/utils/gameUtils';
 import audioManager from '@/utils/audioManager';
 import PixelModal from './PixelModal';
 import ResourceIcon from './ResourceIcon';
@@ -61,22 +61,10 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 		}
 	};
 
-	// Calculate resource generation multiplier based on current level
-	const currentMultiplier = CASTLE_UPGRADE.doublePerLevel
-		? CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, castleLevel - 1)
-		: CASTLE_UPGRADE.baseResourceMultiplier * castleLevel;
-
-	// Next level multiplier if applicable
-	const nextMultiplier =
-		!isMaxLevel && CASTLE_UPGRADE.doublePerLevel
-			? CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, castleLevel)
-			: CASTLE_UPGRADE.baseResourceMultiplier * (castleLevel + 1);
-
-	// After next level multiplier if applicable
-	const afterNextMultiplier =
-		!isNextToMaxLevel && CASTLE_UPGRADE.doublePerLevel
-			? CASTLE_UPGRADE.baseResourceMultiplier * Math.pow(2, castleLevel + 1)
-			: CASTLE_UPGRADE.baseResourceMultiplier * (castleLevel + 2);
+	// Bonus to all resources now, after the next upgrade and after the one after that
+	const currentMultiplier = castleModifier(castleLevel);
+	const nextMultiplier = castleModifier(castleLevel + 1);
+	const afterNextMultiplier = castleModifier(castleLevel + 2);
 
 	// Flat XP/s granted by the castle: xpBonus for every level above 1
 	const currentXpBonus = CASTLE_UPGRADE.xpBonus * (castleLevel - 1);
