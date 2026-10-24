@@ -135,7 +135,7 @@ def header_divider(h=56):
     return add_outline(img)
 
 
-def header_xp_frame(w=96):
+def header_xp_frame(w=80):
     """Slim bronze XP bar frame used in the header profile."""
     img = Image.new('RGBA', (w, 10), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)

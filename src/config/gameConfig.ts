@@ -126,43 +126,87 @@ export const RESOURCE_ICONS = {
 	gems: '💎',
 };
 
+// What the header tooltips say about each currency: what it is, what it is for and where it comes from.
 export const HEADER_DISPLAYED_RESOURCES_INFO = {
 	gold: {
 		icon: RESOURCE_ICONS.gold,
 		label: 'Gold',
-		description: 'Used to purchase new tiles',
+		description: 'The coin of the realm.',
+		usedFor: 'Buying map tiles, buildings, castle upgrades, click power and everything at the merchant.',
+		source: 'The castle and most land, every click on the map, and selling goods to the merchant.',
 	},
 	wood: {
 		icon: RESOURCE_ICONS.wood,
 		label: 'Wood',
-		description: 'Basic construction material',
+		description: 'Basic construction material.',
+		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Hen House and Pen Expansion.',
+		source: 'Forest and swamp tiles. Sells to the merchant.',
 	},
 	stone: {
 		icon: RESOURCE_ICONS.stone,
 		label: 'Stone',
-		description: 'Durable building material',
+		description: 'Durable building material.',
+		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Dairy and Pen Expansion.',
+		source: 'Hills tiles. Sells to the merchant.',
 	},
 	coal: {
 		icon: RESOURCE_ICONS.coal,
 		label: 'Coal',
-		description: 'Advanced fuel source',
+		description: 'Fuel for heavy industry.',
+		usedFor: 'Part of the price of tiles (from the 30th), castle upgrades from level 3 and the Tannery.',
+		source: 'Tundra and hills tiles. Sells to the merchant.',
 	},
 	food: {
 		icon: RESOURCE_ICONS.food,
 		label: 'Food',
-		description: 'Sustains population growth',
+		description: 'Sustains your people and your animals.',
+		usedFor: 'Buying farm animals, Feed Trough, Pen Expansion, tiles (from the 40th) and castle upgrades from level 4.',
+		source: 'Plains, lake and coast tiles. Sells to the merchant.',
 	},
 	meat: {
 		icon: RESOURCE_ICONS.meat,
 		label: 'Meat',
-		description: 'Produced by farm animals',
+		description: 'Produced by farm animals.',
+		usedFor: 'Castle upgrades from level 4; sell the rest to the merchant.',
+		source: 'Every animal on the farm (boosted by Feed Trough and the plains bonus).',
+	},
+	eggs: {
+		icon: RESOURCE_ICONS.eggs,
+		label: 'Eggs',
+		description: 'A farm product laid by chickens.',
+		usedFor: 'Hen House upgrades; sell the rest to the merchant.',
+		source: 'Chickens on the farm. Cannot be bought.',
+	},
+	milk: {
+		icon: RESOURCE_ICONS.milk,
+		label: 'Milk',
+		description: 'A farm product from cows.',
+		usedFor: 'Dairy upgrades; sell the rest to the merchant.',
+		source: 'Cows on the farm. Cannot be bought.',
+	},
+	hide: {
+		icon: RESOURCE_ICONS.hide,
+		label: 'Hide',
+		description: 'A farm product from deer and pigs.',
+		usedFor: 'Tannery upgrades; sell the rest to the merchant.',
+		source: 'Deer and pigs on the farm. Cannot be bought.',
 	},
 	xp: {
 		icon: RESOURCE_ICONS.xp,
 		label: 'XP',
-		description: 'Get bigger boi!',
+		description: 'Experience: fills the level bar next to your name.',
+		usedFor: 'Every level gives stat points to spend on the Stats tab.',
+		source: 'The castle, buying tiles and your stats.',
 	},
 } as const;
+
+// The rebirth currency (not a resource: it lives in the prestige state)
+export const GEMS_INFO = {
+	label: 'Gems',
+	description: 'The rebirth currency.',
+	usedFor: 'Permanent upgrades in the Legacy window; they survive every rebirth.',
+	source: 'Rebirthing from castle level 6: the higher your castle and income, the more you get.',
+};
 
 // The castle's own per-second output (single source of truth: BIOMES.castle reads from it).
 export const CASTLE_BASE_RATES = {

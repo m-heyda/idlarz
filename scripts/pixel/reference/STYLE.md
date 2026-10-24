@@ -141,10 +141,11 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   a **buy card** (owned/limit, yield, Buy / x10 / Max) above it; unowned = pale silhouette with price tag. A stats readout sits top-left, the upgrade shelf along the bottom (collapsible).
 - **Level-up** (`LevelUpNotification.tsx`): white flash, pixelated god-rays (SVG block filter, 6px grid), orb pop, stepped
   shockwave rings, crimson banner (`banner_left/mid/right`, 3x) with dropping letters, spark burst, points earned.
-- **Header**: one compact row on the cracked-stone bar with the bronze/iron edge: player card (48px portrait frame, name, purple level orb,
-  96px bronze XP bar), then every currency as a small chip (24px icon = the 40px sprite at 0.6, value over rate; eggs/milk/hide and Gems only appear
-  once you have them), then three 48px slot buttons (Menu = maroon journal with a gold sigil and purple orb, Legacy, Settings; active glows gold).
-  Chips wrap to a second row when narrow; the real height is published as `--header-h`. Twinkling coin.
+- **Header**: one slim row (about 56px with the bronze edge) in the manner of old city-builder bars: player card (40px portrait frame `slot_frame_s`, the purple level orb pinned to its
+  corner like a badge, name, 80px bronze XP bar), then every currency as a bare **pill** (24px icon = the 40px sprite at 0.6 + the amount, nothing else) inside bronze-edged groups
+  (gold | wood stone coal | food meat | eggs milk hide | gems), then three 40px slot buttons (Menu = maroon journal with a gold sigil and purple orb, Legacy, Settings; active glows gold).
+  All detail lives in the hover tooltip: icon, exact amount, what it is, what it is *used for*, where it *comes from*, per second / minute / hour, base rate, modifier and what the merchant pays
+  (texts in `HEADER_DISPLAYED_RESOURCES_INFO` / `GEMS_INFO`). Groups wrap onto a second row when narrow; the real height is published as `--header-h`. Never clip-path a group (it would clip the tooltips). Twinkling coin.
 - **Backgrounds**: cracked dark stone tile (`bg/crack.png`) for header/modals. Fog drift distance must equal one tile period.
 
 ## UI kit (windows, dialogs, tooltips)

@@ -11,8 +11,8 @@ import NotifyDot from './NotifyDot';
 import CharacterPortrait from './CharacterPortrait';
 import EditableName from './EditableName';
 
-// Inner width of the XP frame sprite (96px wide, 3px border each side)
-const XP_BAR_INNER_PX = 90;
+// Inner width of the XP frame sprite (80px wide, 3px border each side)
+const XP_BAR_INNER_PX = 74;
 
 /** Portrait, name, level orb and XP bar. A click opens the Stats tab; double-click renames / picks the class. */
 export const PlayerCard: React.FC = () => {
@@ -59,18 +59,18 @@ export const PlayerCard: React.FC = () => {
 			onClick={handleProfileClick}
 			onDoubleClick={cancelClick}>
 			<span className='pixel-avatar'>
-				<CharacterPortrait variant='bust' />
-			</span>
-			<div className='flex flex-col text-[#ecdcb4] items-start justify-center select-none gap-1'>
-				<div className='flex items-center gap-2'>
-					<EditableName className='pixel-name' />
+				<CharacterPortrait variant='bust' scale={0.8} />
+				<span className='pixel-avatar-orb'>
 					<LevelOrb
 						level={level.level}
 						notify={availablePoints > 0}
 						notifyLabel={`${availablePoints} unassigned stat points`}
 						className={levelUpActive ? 'animate-pulse-ring' : undefined}
 					/>
-				</div>
+				</span>
+			</span>
+			<div className='flex flex-col text-[#ecdcb4] items-start justify-center select-none gap-1 ml-1'>
+				<EditableName className='pixel-name' />
 				<div className='pixel-xp' title={`XP: ${formatNumber(into)} / ${formatNumber(needed)} (${formatNumber(xp)} in total)`}>
 					<div className='pixel-xp-fill' style={{ width: `${Math.round(level.progress * XP_BAR_INNER_PX)}px` }} />
 				</div>
@@ -135,7 +135,7 @@ export const HeaderButtons: React.FC = () => {
 					data-active={button.active}
 					title={button.title}
 					onClick={button.onClick}>
-					<PixelIcon name={button.icon} alt={button.title} />
+					<PixelIcon name={button.icon} alt={button.title} scale={0.8} />
 					<NotifyDot show={!!button.notify} label={button.notifyLabel} />
 				</div>
 			))}

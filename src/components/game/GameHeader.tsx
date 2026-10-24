@@ -23,12 +23,12 @@ const GameHeader: React.FC = () => {
 
 	return (
 		<div ref={ref} className='pixel-header fixed top-0 left-0 right-0 z-50'>
-			<div className='max-w-[96%] mx-auto px-3 py-1'>
-				<div className='flex items-center gap-4'>
-					<div className='pixel-divider-right shrink-0 pr-5'>
+			<div className='max-w-[98%] mx-auto px-2 py-1'>
+				<div className='flex items-center gap-3'>
+					<div className='pixel-divider-right shrink-0 pr-4'>
 						<PlayerCard />
 					</div>
-					<div className='flex flex-wrap items-center gap-x-4 gap-y-1 flex-1 min-w-0'>
+					<div className='flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0'>
 						<ResourceDisplay />
 					</div>
 					<HeaderButtons />

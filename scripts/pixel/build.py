@@ -76,6 +76,7 @@ SPRITES = {
 UI = {
     'frame_modal': ui_art.frame_modal, 'frame_panel': ui_art.frame_panel, 'frame_tip': ui_art.frame_tip,
     'slot_frame': lambda: ui_art.slot_frame(False), 'slot_frame_active': lambda: ui_art.slot_frame(True),
+    'slot_frame_s': lambda: ui_art.slot_frame(False, 40), 'slot_frame_s_active': lambda: ui_art.slot_frame(True, 40),
     'header_edge': ui_art.header_edge, 'header_divider': ui_art.header_divider,
     'header_xp_frame': ui_art.header_xp_frame, 'header_xp_fill': ui_art.header_xp_fill,
     'bar_frame': ui_art.bar_frame, 'bar_fill': ui_art.bar_fill,
