@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, setResources, owned, store } from './helpers';
 import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
-import { decryptText, encryptText, exportSave, parseSave } from '../src/lib/saveVault';
+import { decodeSave, encodeSave } from '../src/lib/saveFormat';
 import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { COMBAT } from '../src/config/combatConfig';
@@ -29,6 +29,31 @@ test('a normally played game passes validation unchanged', () => {
 		assert.equal(result.state.resources.gold, raw.resources.gold);
 		assert.equal(result.state.tiles.flat().filter((t) => t.isOwned).length, owned());
 	}
+});
+
+test('a real new game (castle + free ring) saves and loads; an old castle-only save loads with its own count', () => {
+	api().resetGame(); // not freshGame(): keep the starting ring
+	assert.equal(api().freeTiles, 9);
+	const fresh = sanitizeSave(snapshot());
+	assert.equal(fresh.ok, true, fresh.ok ? '' : fresh.reason);
+	if (fresh.ok) assert.equal(fresh.state.freeTiles, 9);
+
+	freshGame(); // castle only
+	growTo(6);
+	const legacy = snapshot();
+	delete legacy.freeTiles; // a save from before the starting ring
+	const loaded = sanitizeSave(legacy);
+	assert.equal(loaded.ok, true, loaded.ok ? '' : loaded.reason);
+	if (loaded.ok) assert.equal(loaded.state.freeTiles, 1);
+});
+
+test('free tiles cannot be forged: only 1 or 9, and 9 needs the whole ring owned', () => {
+	freshGame();
+	growTo(4);
+	rejects((r) => (r.freeTiles = 9), 'free ring claimed without owning it');
+	rejects((r) => (r.freeTiles = 5), 'odd free tile count');
+	rejects((r) => (r.freeTiles = 0), 'zero free tiles');
+	rejects((r) => (r.freeTiles = 1.5), 'fractional free tiles');
 });
 
 test('tampered saves are rejected', () => {
@@ -99,45 +124,24 @@ test('a save one level-up behind (written between a purchase and the next tick) 
 	assert.equal(sanitizeSave(snapshot()).ok, true);
 });
 
-test('encrypt/decrypt round trip, and any edit of the ciphertext is detected', async () => {
-	const text = JSON.stringify({ hello: 'world', n: 12345, nested: { a: [1, 2, 3] } });
-	const envelope = await encryptText(text);
-	assert.ok(envelope.startsWith('IDLZ1.'));
-	assert.ok(!envelope.includes('world'));
-	assert.equal(await decryptText(envelope), text);
-	assert.notEqual(await encryptText(text), envelope, 'fresh IV every time');
-
-	const body = envelope.slice(6);
-	const flipped = envelope.slice(0, 6) + body.slice(0, 40) + (body[40] === 'A' ? 'B' : 'A') + body.slice(41);
-	await assert.rejects(() => decryptText(flipped));
-	await assert.rejects(() => decryptText(envelope.slice(0, envelope.length - 8)));
-	await assert.rejects(() => decryptText('plain json {"gold": 1e15}'));
-	await assert.rejects(() => decryptText(''));
-});
-
-test('export -> parse accepts a real save and rejects edited / foreign ones', async () => {
+test('export -> decode accepts a real save and rejects edited / foreign ones', () => {
 	freshGame();
 	growTo(9);
 	api().tick(30_000);
-	const file = await exportSave(pickPersisted(api()));
-	const parsed = await parseSave(file);
+	const file = encodeSave(pickPersisted(api()));
+	const parsed = decodeSave(file);
 	assert.equal(parsed.ok, true, parsed.ok ? '' : parsed.reason);
-	if (parsed.ok) assert.equal(parsed.state.tiles.flat().filter((t) => t.isOwned).length, owned());
+	if (parsed.ok) assert.equal(parsed.state.tiles.flat().filter((t: { isOwned: boolean }) => t.isOwned).length, owned());
 
-	// swap one character for a different one (a fixed 'x' is a no-op 1 time in 64 and made this test flaky)
-	const bad = await parseSave(file.slice(0, 50) + (file[50] === 'x' ? 'y' : 'x') + file.slice(51));
+	// swap one character for a different one: the check code catches it
+	const bad = decodeSave(file.slice(0, 50) + (file[50] === 'x' ? 'y' : 'x') + file.slice(51));
 	assert.equal(bad.ok, false);
-	assert.equal((await parseSave('{"state":{}}')).ok, false);
+	assert.equal(decodeSave('{"state":{}}').ok, false);
 
-	// a perfectly encrypted file whose content is impossible is rejected by validation
+	// a well-formed file whose content is impossible is rejected by validation
 	const forged = snapshot();
 	forged.resources.gold = 1e300;
-	const forgedFile = await encryptText(JSON.stringify({ v: 12, savedAt: 'x', state: forged }));
-	assert.equal((await parseSave(forgedFile)).ok, false);
-
-	// wrong save version
-	const old = await encryptText(JSON.stringify({ v: 11, savedAt: 'x', state: snapshot() }));
-	assert.equal((await parseSave(old)).ok, false);
+	assert.equal(decodeSave(encodeSave(forged)).ok, false);
 });
 
 // ---- combat / inventory state ------------------------------------------------------------------------------------
@@ -272,4 +276,18 @@ test('a chest cannot share a tile with a monster', () => {
 		return { tiles, activeChests: 1 };
 	});
 	assert.equal(sanitizeSave(snapshot()).ok, false);
+});
+
+test('a played game that started with the free ring passes validation (tiles, buildings, chests)', () => {
+	api().resetGame(); // keep the starting ring
+	growTo(30);
+	store.setState((s) => {
+		const tiles = s.tiles.map((row) => [...row]);
+		const spot = tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+		tiles[spot.y][spot.x] = { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 };
+		return { tiles };
+	});
+	api().tick(60_000);
+	const result = sanitizeSave(snapshot());
+	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });

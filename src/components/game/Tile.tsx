@@ -20,17 +20,15 @@ import {
 	calculateTileCost,
 	canAffordBundle,
 	effectiveTileDiscount,
-	countOwnedTiles,
+	economyTiles,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 import audioManager from '@/utils/audioManager';
 import { queueTileTap } from '@/lib/floatText';
-import { blendKey, openSides, parseBlendKey } from '@/utils/biomeBlend';
-import ResourceIcon from './ResourceIcon';
 import PixelIcon from './PixelIcon';
 import CastleSprite from './CastleSprite';
-import { BIOME_PIXEL_ICONS, BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
+import { BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
 import { TileStatus } from './TileStatus';
 import MonsterSprite from './MonsterSprite';
 import { monsterAt, monsterStats, tierSecondsLeft } from '@/lib/monsters';
@@ -68,14 +66,6 @@ const Tile: React.FC<TileProps> = ({
 	building,
 }) => {
 	const tiles = useGameStore((state) => state.tiles);
-	// string selectors: re-render only when this tile's own transitions / open sides change
-	const blendStr = useGameStore((state) => blendKey(state.tiles, x, y));
-	const open = useGameStore((state) => openSides(state.tiles, x, y));
-	const blendPieces = useMemo(() => parseBlendKey(blendStr), [blendStr]);
-	// lake waves animate from mount: start every lake tile at the shared phase so neighbours never show a seam
-	const [lakeDelay] = useState(() =>
-		typeof performance === 'undefined' ? 0 : -((performance.now() / 1000) % 9)
-	);
 	const buyTile = useGameStore((state) => state.buyTile);
 	const resources = useGameStore((state) => state.resources);
 	const characterStats = useGameStore((state) => state.characterStats);
@@ -140,7 +130,8 @@ const Tile: React.FC<TileProps> = ({
 		Math.abs(x - GRID_CENTER_X) <= CASTLE_RANGE.radius &&
 		Math.abs(y - GRID_CENTER_Y) <= CASTLE_RANGE.radius;
 
-	const ownedTilesCount = useMemo(() => countOwnedTiles(tiles), [tiles]);
+	const freeTiles = useGameStore((state) => state.freeTiles);
+	const ownedTilesCount = useMemo(() => economyTiles(tiles, freeTiles), [tiles, freeTiles]);
 
 	const tileCost = useMemo(
 		() => calculateTileCost(ownedTilesCount, effectiveTileDiscount(characterStats, prestige)),
@@ -241,8 +232,6 @@ const Tile: React.FC<TileProps> = ({
 		setShowBuildingDialog(false);
 	};
 
-	const farAwayTile = !isOwned && !isAdjacent;
-
 	return (
 		<>
 			<div
@@ -251,15 +240,14 @@ const Tile: React.FC<TileProps> = ({
 					'absolute transition-all duration-200 ease-in-out select-none',
 					{
 						'opacity-100': isOwned,
+						// the ground itself is drawn by TerrainLayer; a tile is a transparent hit area with its overlays
 						'tile-unknown': !isOwned && isAdjacent,
-						[`tile-ground tile-ground-${hasBuilding || isFortress ? 'yard' : biome} tile-owned`]: isOwned,
-						'opacity-75': farAwayTile,
-						'hover:z-10 cursor-pointer border border-gray-800':
+						'tile-owned': isOwned,
+						'hover:z-10 cursor-pointer border border-transparent':
 							!isOwned && isAdjacent,
-						'hover:border-green-800': !isOwned && isAdjacent && canAfford,
-						'hover:border-red-800 cursor-not-allowed':
+						'hover:border-green-700': !isOwned && isAdjacent && canAfford,
+						'hover:border-red-700 cursor-not-allowed':
 							!isOwned && isAdjacent && !canAfford,
-						'border border-purple-400': biome === 'castle' && !isFortress,
 						'border-2 border-amber-300':
 							(tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 0) >= CASTLE_UPGRADE.maxLevel &&
 							biome === 'castle' &&
@@ -272,14 +260,11 @@ const Tile: React.FC<TileProps> = ({
 						'castle-tile': isOwned && biome === 'castle',
 						'castle-max-tile': isOwned && isGlowingCastle && !isFortress,
 						'tile-fortress': isOwned && isFortress,
-						'border-2 border-amber-400': isOwned && hasChest,
 						'tile-cooldown': cooling,
-					},
-					open.split('').map((side) => `open-${side}`)
+					}
 				)}
 				style={{
 					...style,
-					...(biome === 'lake' && isOwned ? { animationDelay: `${lakeDelay.toFixed(2)}s` } : null),
 					...({ '--cd': `${TILE_TAP.cooldownMs}ms` } as React.CSSProperties),
 				}}
 				onClick={handleClick}
@@ -297,34 +282,9 @@ const Tile: React.FC<TileProps> = ({
 						'w-full h-full flex items-center justify-center relative',
 						{ 'tile-tapped': tapped }
 					)}>
-					{blendPieces.map((b) =>
-						b.ground.startsWith('shore-') || b.ground.startsWith('curb-') ? (
-							<span
-								key={b.piece}
-								className='tile-trim'
-								aria-hidden
-								style={{ backgroundImage: `url('/pixel/bg/${b.ground}_${b.piece}_${b.variant}.png')` }}
-							/>
-						) : (
-							<span
-								key={b.piece}
-								className='tile-blend'
-								aria-hidden
-								style={
-									{
-										'--src': `url('/pixel/bg/${b.ground === 'mystery' ? 'mystery' : `ground_${b.ground}`}.png')`,
-										'--mask': `url('/pixel/bg/blend_${b.piece}_${b.variant}.png')`,
-									} as React.CSSProperties
-								}
-							/>
-						)
-					)}
 					{isOwned && biome === 'castle' && <CastleSprite level={castleLevel} />}
-					{isOwned && !hasBuilding && BIOME_PIXEL_ICONS[biome] && (
-						<PixelIcon name={BIOME_PIXEL_ICONS[biome]!} alt={biome} className='tile-icon' />
-					)}
 					{!isOwned && isAdjacent && (
-						<PixelIcon name='unknown' alt='Unexplored' scale={2} className='unknown-mark' />
+						<PixelIcon name='unknown' alt='Unexplored' className='unknown-mark' />
 					)}
 					{biome === 'castle' && (
 						<span className='tile-badge'>{castleLevel}</span>
@@ -357,7 +317,7 @@ const Tile: React.FC<TileProps> = ({
 					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && (
 						<span className='tile-chest-wrap'>
-							<PixelIcon name='bonus_chest' alt='Bonus gold' className='tile-chest' />
+							<PixelIcon name='chest_map' alt='Treasure chest' className='tile-chest' />
 							<i className='chest-twinkle' aria-hidden />
 						</span>
 					)}
@@ -388,7 +348,7 @@ const Tile: React.FC<TileProps> = ({
 						)}
 						{isOwned && hasChest && showChestTooltip && (
 							<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs text-[#f0d27a]'>
-								Click to collect bonus gold <ResourceIcon resource='gold' />
+								Click to open the treasure chest
 							</div>
 						)}
 						<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>

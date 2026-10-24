@@ -439,7 +439,17 @@ export type BuildingType =
 	| 'lumbermill'
 	| 'market'
 	| 'blacksmith'
-	| 'workshop';
+	| 'workshop'
+	| 'lumbercamp'
+	| 'quarry'
+	| 'fishinghut'
+	| 'hunterslodge'
+	| 'tavern'
+	| 'tower'
+	| 'well'
+	| 'alchemylab'
+	| 'stonecraft'
+	| 'barracks';
 
 export interface Building {
 	name: BuildingType;
@@ -496,6 +506,18 @@ export const BUILDINGS: Record<BuildingType, Building> = {
 			xp: 0.2,
 		},
 	},
+	// Round 2 buildings: every output is an existing resource (tuning notes in docs/05)
+	lumbercamp: { name: 'lumbercamp', label: 'Lumber Camp', resourceGeneration: { wood: 0.18 } },
+	quarry: { name: 'quarry', label: 'Quarry', resourceGeneration: { stone: 0.25 } },
+	fishinghut: { name: 'fishinghut', label: 'Fishing Hut', resourceGeneration: { food: 0.16, gold: 0.05 } },
+	// Meat used to be farm-only; the Hunter's Lodge is the one other source (small, so farms stay the main supply)
+	hunterslodge: { name: 'hunterslodge', label: "Hunter's Lodge", resourceGeneration: { meat: 0.15 } },
+	tavern: { name: 'tavern', label: 'Tavern', resourceGeneration: { food: 0.12, xp: 0.08 } },
+	tower: { name: 'tower', label: 'Tower', resourceGeneration: { stone: 0.08, xp: 0.12 } },
+	well: { name: 'well', label: 'Well', resourceGeneration: { food: 0.15 } },
+	alchemylab: { name: 'alchemylab', label: 'Alchemy Lab', resourceGeneration: { xp: 0.12, gold: 0.08 } },
+	stonecraft: { name: 'stonecraft', label: 'Stone Craft', resourceGeneration: { stone: 0.15, gold: 0.08 } },
+	barracks: { name: 'barracks', label: 'Barracks', resourceGeneration: { gold: 0.1, xp: 0.1 } },
 };
 
 // Equipment and items configuration
@@ -566,6 +588,26 @@ export const CHEST = {
 	minMinutes: 10,
 	maxMinutes: 60,
 	luckBonusPerPoint: 0.005,
+
+	// Where chests appear: every eligible tile weighs 1, plus these bonuses (see src/lib/chests.ts)
+	placement: {
+		frontierBonus: 3, // a tile touching land you have not bought yet
+		distanceStep: 4, // +1 per this many tiles (Chebyshev) from the castle, so far land is worth visiting
+		nearbyRadius: 2, // another chest this close makes a tile much less likely ...
+		nearbyFactor: 0.3, // ... times this
+	},
+
+	// What a chest holds: relative chances (they need not sum to 100)
+	rewards: { gold: 50, bundle: 25, xp: 12, boost: 10, item: 3 } as Record<'gold' | 'bundle' | 'xp' | 'boost' | 'item', number>,
+	boostMultiplier: 1.5, // the "lucky chest": gold x this
+	bundle: {
+		resources: ['wood', 'stone', 'coal', 'food'] as ('wood' | 'stone' | 'coal' | 'food')[],
+		count: [1, 2] as [number, number], // how many of them
+		minutes: [10, 30] as [number, number], // of that resource's income each
+		floor: 25, // at least this much, so a slow resource still pays something
+	},
+	xp: { minutes: [10, 30] as [number, number], floor: 60 },
+	luckRewardBonusPerPoint: 0.01, // each Luck point shifts this share of the gold weight into boost and item chances
 };
 
 // Buildings on Grounds tiles cost resources; each further building costs `growth` times more.
@@ -657,15 +699,20 @@ export const AMBIENT_LIFE = {
 	giftSeconds: 5, // a map gift is worth this many seconds of that resource's income (x goldenMultiplier)
 	giftCooldownMs: 20000, // at most one map gift per this long
 	farmGiftCooldownMs: 8000, // same for the farm meadow critters
-	// which critter likes which biome
+	// which critter likes which biome (a name twice = twice as common). Fish only swim where the lake has water on all four
+	// sides, and fish, frogs, crabs, goats and wolves are decoration only: the golden gift critters are the four from FARM_BONUS.
 	byBiome: {
-		forest: ['butterfly', 'bee'],
+		forest: ['butterfly', 'bee', 'wolf'],
 		plains: ['bee', 'butterfly'],
-		swamp: ['ladybug'],
-		hills: ['rabbit'],
+		swamp: ['ladybug', 'frog', 'frog'],
+		hills: ['rabbit', 'goat', 'goat'],
 		tundra: ['rabbit'],
-		lake: ['butterfly'],
-		coast: ['butterfly', 'bee'],
+		lake: ['fish', 'fish', 'butterfly'],
+		coast: ['butterfly', 'bee', 'crab', 'crab'],
 		grounds: ['rabbit', 'ladybug'],
-	} as Record<string, readonly ('butterfly' | 'bee' | 'ladybug' | 'rabbit')[]>,
+	} as Record<string, readonly AmbientCritterType[]>,
+	// how far a critter strays, as a share of roamTiles (swimmers and crawlers stay close to where they appear)
+	roamScale: { fish: 0.35, frog: 0.45, crab: 0.5, goat: 0.8, wolf: 1 } as Record<string, number>,
 };
+
+export type AmbientCritterType = 'butterfly' | 'bee' | 'ladybug' | 'rabbit' | 'fish' | 'frog' | 'crab' | 'goat' | 'wolf';

@@ -15,6 +15,7 @@ import { MapTipLayerContext } from './MapTipLayer';
 import type { Viewport } from '@/lib/ambientLife';
 import CastleRange from './CastleRange';
 import CastleFortress from './CastleFortress';
+import TerrainLayer from './TerrainLayer';
 
 interface Position {
 	x: number;
@@ -318,6 +319,7 @@ const Grid: React.FC = () => {
 					height: GRID_HEIGHT * TILE_SIZE,
 					'--map-zoom': zoom,
 				} as React.CSSProperties}>
+				<TerrainLayer />
 				<MapTipLayerContext.Provider value={tipLayer}>{visibleTiles}</MapTipLayerContext.Provider>
 				<AmbientLife getViewport={getViewport} />
 				{castleLevelOf(tiles) >= CASTLE_FORTRESS.fromLevel ? (

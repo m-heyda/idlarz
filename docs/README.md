@@ -1,6 +1,6 @@
 # Idle Explorer — design & technical docs
 
-Live build: https://idlarz.vercel.app · Stack: Next.js 15.5 (App Router) · React 19 · Tailwind 4 · Zustand 5 · encrypted IndexedDB saves.
+Live build: https://idlarz.vercel.app · Stack: Next.js 15.5 (App Router) · React 19 · Tailwind 4 · Zustand 5 · localStorage text saves with export / import.
 
 These documents describe the game **as the code behaves**. Numbers are traceable to a file; the large tables and the pacing numbers are generated from the real config so they can be refreshed after tuning.
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store } from './helpers';
 import { CASTLE_FORTRESS, CASTLE_RANGE, GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
 import { castleLevelOf, fortressWallTier, isInWard, monstersOutsideWard } from '../src/lib/castleWard';
-import { groundOf } from '../src/utils/biomeBlend';
+import { groundOf } from '../src/utils/terrain';
 import { pickSpawnTile } from '../src/lib/monsters';
 import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';

@@ -102,3 +102,47 @@ test('rebirth and full reset clear the gift cooldowns', () => {
 	assert.equal(store.getState().tiles[GRID_CENTER_Y][GRID_CENTER_X].level, 1);
 	assert.equal(GRID_CENTER_X, 25);
 });
+
+test('a built-on tile hosts the critters of its foundation biome (swamp plot -> ladybugs and frogs only, never the grounds rabbit)', () => {
+	const tiles = emptyGrid();
+	for (let y = 11; y <= 13; y++) for (let x = 6; x <= 8; x++) tiles[y][x] = { biome: 'swamp', isOwned: true };
+	tiles[12][7] = { biome: 'grounds', isOwned: true, building: 'farm', level: 2 };
+	const hosts = new Set<string>();
+	for (let i = 0; i < 400; i++) {
+		const c = pickAmbientCritter(tiles, WHOLE_MAP, () => (i * 0.6180339 + 0.1) % 1)!;
+		if (Math.floor(c.x / TILE_SIZE) === 7 && Math.floor(c.y / TILE_SIZE) === 12) hosts.add(c.type);
+	}
+	assert.ok(hosts.size > 0, 'the plot hosts critters');
+	for (const t of hosts) assert.ok(['frog', 'ladybug'].includes(t), `${t} lives on a swamp foundation`);
+});
+
+test('fish only swim in open water, and only the four farm critters can carry a gift', () => {
+	const pond = emptyGrid();
+	for (let y = 10; y <= 14; y++) for (let x = 5; x <= 9; x++) pond[y][x] = { biome: 'lake', isOwned: true } as Tile;
+	const rim = new Set<string>();
+	const inner = new Set<string>();
+	for (let i = 0; i < 1500; i++) {
+		const c = pickAmbientCritter(pond, WHOLE_MAP, seq(((i * 0.6180339) % 1), ((i * 0.3819) % 1), 0.37, 0.61, 0.2, 0.9, 0.4))!;
+		const tx = Math.floor(c.x / TILE_SIZE);
+		const ty = Math.floor(c.y / TILE_SIZE);
+		const interior = tx > 5 && tx < 9 && ty > 10 && ty < 14;
+		(interior ? inner : rim).add(c.type);
+		if (!['butterfly', 'bee', 'ladybug', 'rabbit'].includes(c.type)) assert.equal(c.golden, false, `${c.type} never carries a gift`);
+	}
+	assert.ok(inner.has('fish'), 'fish swim in the middle of the lake');
+	assert.equal(rim.has('fish'), false, 'no fish on a lake tile that touches the shore');
+});
+
+test('swamp frogs, coast crabs, hill goats and forest wolves exist and stay close to where they appear', () => {
+	for (const [biome, type] of [['swamp', 'frog'], ['coast', 'crab'], ['hills', 'goat'], ['forest', 'wolf']] as const) {
+		const tiles = emptyGrid();
+		tiles[12][7] = { biome, isOwned: true } as Tile;
+		const seen = new Set<string>();
+		for (let i = 0; i < 200; i++) {
+			const c = pickAmbientCritter(tiles, WHOLE_MAP, () => ((i * 0.61803) % 1))!;
+			seen.add(c.type);
+			if (c.type === type) assert.ok(Math.abs(c.dx) <= AMBIENT_LIFE.roamTiles * TILE_SIZE * AMBIENT_LIFE.roamScale[type] + 1e-9);
+		}
+		assert.ok(seen.has(type), `${biome} has ${type}s`);
+	}
+});

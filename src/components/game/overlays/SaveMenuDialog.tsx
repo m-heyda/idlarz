@@ -1,15 +1,22 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
-import { commitImport, exportSave, parseSave, resetSave } from '@/lib/saveVault';
+import {
+	commitImport,
+	exportSaveText,
+	getDamagedSave,
+	getSaveInfo,
+	parseSaveText,
+	resetSave,
+	type SaveInfo,
+} from '@/lib/saveStorage';
 import { formatTime } from '@/utils/formatters';
+import { GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
 import { countOwnedTiles } from '@/utils/gameUtils';
 import PixelModal from '../PixelModal';
 
-type Message = { kind: 'ok' | 'error'; text: string };
-
-const MAX_FILE_BYTES = 5_000_000;
+const MAX_FILE_BYTES = 3_000_000;
 
 const stamp = () => {
 	const d = new Date();
@@ -17,71 +24,112 @@ const stamp = () => {
 	return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
 };
 
+const ago = (time: number | null): string => {
+	if (time === null) return 'not yet';
+	const sec = Math.max(0, Math.round((Date.now() - time) / 1000));
+	if (sec < 10) return 'just now';
+	if (sec < 90) return `${sec} s ago`;
+	return `${Math.round(sec / 60)} min ago`;
+};
+
+const copyText = async (text: string, fallbackTarget: HTMLTextAreaElement | null): Promise<boolean> => {
+	try {
+		await navigator.clipboard.writeText(text);
+		return true;
+	} catch {
+		fallbackTarget?.select();
+		try {
+			return document.execCommand('copy');
+		} catch {
+			return false;
+		}
+	}
+};
+
+type Parsed =
+	| { kind: 'none' }
+	| { kind: 'ok'; state: PersistedGame; savedAt: number | null }
+	| { kind: 'error'; reason: string };
+
 /**
- * Hidden save tools (press Control five times quickly). Export downloads the encrypted save, Import validates
- * a save file before replacing the current progress, Reset wipes the stored save.
+ * Save & backup: the game saves itself in this browser; here the player can see that it works, copy the whole save
+ * as one line of text (or a file) and load such a line back, or start over.
  */
-const SaveMenuDialog: React.FC = () => {
-	const open = useUiStore((state) => state.saveMenuOpen);
+const SaveDialogBody: React.FC = () => {
 	const close = useUiStore((state) => state.closeSaveMenu);
-	const [message, setMessage] = useState<Message | null>(null);
-	const [pendingImport, setPendingImport] = useState<PersistedGame | null>(null);
+	const [info, setInfo] = useState<SaveInfo | null>(null);
+	const [exportText] = useState(() => exportSaveText(pickPersisted(useGameStore.getState())));
+	const [note, setNote] = useState<string | null>(null);
+	const [importText, setImportText] = useState('');
+	const [parsed, setParsed] = useState<Parsed>({ kind: 'none' });
 	const [confirmReset, setConfirmReset] = useState(false);
 	const [busy, setBusy] = useState(false);
 	const fileRef = useRef<HTMLInputElement>(null);
+	const exportRef = useRef<HTMLTextAreaElement>(null);
 
-	if (!open) return null;
+	useEffect(() => {
+		let alive = true;
+		void getSaveInfo().then((value) => alive && setInfo(value));
+		return () => {
+			alive = false;
+		};
+	}, []);
 
-	const handleClose = () => {
-		setMessage(null);
-		setPendingImport(null);
-		setConfirmReset(false);
-		close();
+	// Check pasted text as it arrives; an older answer must not overwrite a newer one
+	useEffect(() => {
+		if (!importText.trim()) {
+			setParsed({ kind: 'none' });
+			return;
+		}
+		let alive = true;
+		void parseSaveText(importText).then((result) => {
+			if (!alive) return;
+			setParsed(
+				result.ok
+					? { kind: 'ok', state: result.state, savedAt: result.savedAt }
+					: { kind: 'error', reason: result.reason }
+			);
+		});
+		return () => {
+			alive = false;
+		};
+	}, [importText]);
+
+	const handleCopy = async () => {
+		setNote((await copyText(exportText, exportRef.current)) ? 'Copied. Keep it somewhere safe.' : 'Could not copy; select the text and copy it by hand.');
 	};
 
-	const handleExport = async () => {
-		setBusy(true);
-		try {
-			const text = await exportSave(pickPersisted(useGameStore.getState()));
-			const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
-			const link = document.createElement('a');
-			link.href = url;
-			link.download = `idlarz-${stamp()}.sav`;
-			link.click();
-			URL.revokeObjectURL(url);
-			setMessage({ kind: 'ok', text: 'Save exported.' });
-		} catch {
-			setMessage({ kind: 'error', text: 'Export failed.' });
-		} finally {
-			setBusy(false);
-		}
+	const handleDownload = () => {
+		const url = URL.createObjectURL(new Blob([exportText], { type: 'text/plain' }));
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `idlarz-${stamp()}.sav`;
+		link.click();
+		URL.revokeObjectURL(url);
+		setNote('Save file downloaded.');
 	};
 
 	const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		e.target.value = '';
 		if (!file) return;
-		setPendingImport(null);
 		if (file.size > MAX_FILE_BYTES) {
-			setMessage({ kind: 'error', text: 'That file is too large to be a save.' });
+			setParsed({ kind: 'error', reason: 'That file is too large to be a save.' });
 			return;
 		}
-		setBusy(true);
-		const result = await parseSave(await file.text());
-		setBusy(false);
-		if (result.ok) {
-			setMessage(null);
-			setPendingImport(result.state);
-		} else {
-			setMessage({ kind: 'error', text: result.reason });
-		}
+		setImportText(await file.text());
 	};
 
 	const confirmImport = async () => {
-		if (!pendingImport) return;
+		if (parsed.kind !== 'ok') return;
 		setBusy(true);
-		await commitImport(pendingImport);
-		window.location.reload();
+		try {
+			commitImport(parsed.state);
+			window.location.reload();
+		} catch (e) {
+			setBusy(false);
+			setParsed({ kind: 'error', reason: (e as Error).message });
+		}
 	};
 
 	const confirmResetGame = async () => {
@@ -90,40 +138,51 @@ const SaveMenuDialog: React.FC = () => {
 		window.location.reload();
 	};
 
-	return (
-		<PixelModal title='Save Tools' size='sm' onClose={handleClose}>
-			<p className='text-sm text-[#a89878] mb-4'>
-				Your progress is stored encrypted in this browser. Export it to back it up or move it to another
-				browser.
-			</p>
+	const copyDamaged = async () => {
+		const text = getDamagedSave();
+		setNote(text && (await copyText(text, null)) ? 'Damaged save copied.' : 'Nothing to copy.');
+	};
 
-			{message && (
-				<div
-					className={`px-card mb-3 text-sm ${message.kind === 'ok' ? 'text-green-400' : 'text-red-400'}`}>
-					{message.text}
+	const ok = parsed.kind === 'ok' ? parsed.state : null;
+
+	return (
+		<PixelModal title='Save & Backup' size='sm' onClose={close}>
+			<div className='px-card mb-3 text-sm'>
+				<div className='text-[#ecdcb4]'>
+					Autosaved in this browser: <span className='text-green-400'>{ago(info?.savedAt ?? null)}</span>
+					{info && info.bytes > 0 && <span className='text-[#a89878]'> ({Math.max(1, Math.round(info.bytes / 1024))} KB)</span>}
+				</div>
+				{info?.persisted === true && <div className='text-xs text-green-400'>Browser storage is protected from clean-up.</div>}
+				{info?.persisted === false && (
+					<div className='text-xs text-amber-300'>
+						The browser may clear this save if space runs low. Copy it below now and then.
+					</div>
+				)}
+				{info?.error && (
+					<div className='text-xs text-red-400'>
+						The browser refuses to store the save ({info.error === 'full' ? 'storage full' : 'storage blocked'}). Copy it
+						below to keep your progress.
+					</div>
+				)}
+			</div>
+
+			{info?.loadProblem && (
+				<div className='px-card mb-3 text-sm'>
+					<div className='text-amber-300'>{info.loadProblem}</div>
+					{getDamagedSave() && (
+						<button className='px-btn px-btn-sm mt-2' onClick={copyDamaged}>
+							Copy damaged save
+						</button>
+					)}
 				</div>
 			)}
 
-			{pendingImport ? (
-				<div className='px-card mb-3 text-sm'>
-					<div className='px-h'>Replace current progress?</div>
-					<div className='text-[#d8c8a0] mb-3'>
-						Save file: level {pendingImport.level.level}, castle {pendingImport.tiles[25][25].level ?? 1},{' '}
-						{countOwnedTiles(pendingImport.tiles)} tiles, {formatTime(pendingImport.playSeconds)} played.
-					</div>
-					<div className='flex justify-between'>
-						<button className='px-btn px-btn-red' disabled={busy} onClick={() => setPendingImport(null)}>
-							Cancel
-						</button>
-						<button className='px-btn' disabled={busy} onClick={confirmImport}>
-							Import and reload
-						</button>
-					</div>
-				</div>
-			) : confirmReset ? (
+			{note && <div className='px-card mb-3 text-sm text-green-400'>{note}</div>}
+
+			{confirmReset ? (
 				<div className='px-card mb-3 text-sm'>
 					<div className='px-h'>Delete all progress?</div>
-					<div className='text-[#d8c8a0] mb-3'>This cannot be undone. Export first if you might want it back.</div>
+					<div className='text-[#d8c8a0] mb-3'>This cannot be undone. Copy your save first if you might want it back.</div>
 					<div className='flex justify-between'>
 						<button className='px-btn' disabled={busy} onClick={() => setConfirmReset(false)}>
 							Cancel
@@ -134,21 +193,77 @@ const SaveMenuDialog: React.FC = () => {
 					</div>
 				</div>
 			) : (
-				<div className='flex flex-col gap-3'>
-					<button className='px-btn' disabled={busy} onClick={handleExport}>
-						Export save
-					</button>
-					<button className='px-btn' disabled={busy} onClick={() => fileRef.current?.click()}>
-						Import save
-					</button>
-					<input ref={fileRef} type='file' accept='.sav,text/plain' className='hidden' onChange={handleFile} />
-					<button className='px-btn px-btn-red' disabled={busy} onClick={() => setConfirmReset(true)}>
+				<>
+					<div className='px-card mb-3 text-sm'>
+						<div className='px-h'>Export</div>
+						<p className='text-[#a89878] mb-2'>Your whole game as one line of text. Paste it back here to restore it, on this or another browser.</p>
+						<textarea
+							ref={exportRef}
+							readOnly
+							rows={3}
+							value={exportText}
+							onFocus={(e) => e.currentTarget.select()}
+							aria-label='Save text'
+							className='px-input text-xs break-all resize-none mb-2'
+						/>
+						<div className='flex gap-2'>
+							<button className='px-btn px-btn-sm' onClick={handleCopy}>
+								Copy
+							</button>
+							<button className='px-btn px-btn-sm' onClick={handleDownload}>
+								Download file
+							</button>
+						</div>
+					</div>
+
+					<div className='px-card mb-3 text-sm'>
+						<div className='px-h'>Import</div>
+						<textarea
+							rows={3}
+							value={importText}
+							onChange={(e) => setImportText(e.target.value)}
+							placeholder='Paste a save here (IDLZ2.…)'
+							aria-label='Paste a save'
+							className='px-input text-xs break-all resize-none mb-2'
+						/>
+						<button className='px-btn px-btn-sm' disabled={busy} onClick={() => fileRef.current?.click()}>
+							Open file…
+						</button>
+						<input ref={fileRef} type='file' accept='.sav,.txt,text/plain' className='hidden' onChange={handleFile} />
+
+						{parsed.kind === 'error' && <div className='text-red-400 mt-2'>{parsed.reason}</div>}
+						{ok && (
+							<div className='mt-3'>
+								<div className='px-h'>Replace current progress?</div>
+								<div className='text-[#d8c8a0] mb-3'>
+									Level {ok.level.level}, castle {ok.tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1}, {countOwnedTiles(ok.tiles)} tiles,{' '}
+									{formatTime(ok.playSeconds)} played
+									{parsed.kind === 'ok' && parsed.savedAt ? `, saved ${new Date(parsed.savedAt).toLocaleString()}` : ''}.
+								</div>
+								<div className='flex justify-between'>
+									<button className='px-btn px-btn-red' disabled={busy} onClick={() => setImportText('')}>
+										Cancel
+									</button>
+									<button className='px-btn' disabled={busy} onClick={confirmImport}>
+										Import and reload
+									</button>
+								</div>
+							</div>
+						)}
+					</div>
+
+					<button className='px-btn px-btn-red w-full' disabled={busy} onClick={() => setConfirmReset(true)}>
 						Reset game
 					</button>
-				</div>
+				</>
 			)}
 		</PixelModal>
 	);
+};
+
+const SaveMenuDialog: React.FC = () => {
+	const open = useUiStore((state) => state.saveMenuOpen);
+	return open ? <SaveDialogBody /> : null;
 };
 
 export default SaveMenuDialog;

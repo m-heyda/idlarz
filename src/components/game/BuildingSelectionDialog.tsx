@@ -46,15 +46,15 @@ const BuildingSelectionDialog: FC<BuildingSelectionDialogProps> = ({
 				<CostList cost={cost} />
 			</div>
 
-			<div className='grid grid-cols-2 gap-3'>
+			<div className='grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[58vh] overflow-y-auto pr-1'>
 				{Object.values(BUILDINGS).map((building) => (
 					<button
 						key={building.name}
 						onClick={() => handleSelect(building.name)}
 						disabled={!canAfford}
-						className='px-card flex items-start gap-3 text-left cursor-pointer hover:brightness-125 transition disabled:opacity-50 disabled:cursor-not-allowed'>
-						<div className='tile-ground tile-ground-yard shrink-0 w-[48px] h-[48px] flex items-center justify-center'>
-							<PixelIcon name={BUILDING_PIXEL_ICONS[building.name]} alt={building.label} className='tile-icon' />
+						className='px-card flex items-start gap-3 text-left pt-4 cursor-pointer hover:brightness-125 transition disabled:opacity-50 disabled:cursor-not-allowed'>
+						<div className='tile-ground tile-ground-plains shrink-0 w-[48px] h-[48px] relative overflow-visible'>
+							<PixelIcon name={BUILDING_PIXEL_ICONS[building.name]} alt={building.label} className='absolute bottom-0 left-0 max-w-none' />
 						</div>
 						<div className='flex-1'>
 							<span className='px-tip-title block'>{building.label}</span>

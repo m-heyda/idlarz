@@ -2,7 +2,8 @@
 
   public/pixel/icons/  sprites (resources, menu, equipment, portraits, animals, gold shine strip)
   public/pixel/ui/     frames, header chrome, HP/MP flask parts, stone XP bar, hero scene
-  public/pixel/bg/     cracked-stone header tile, fog mist, biome grounds, edge-blend masks, shore + kerb trims
+  public/pixel/bg/     cracked-stone header tile, fog mist, biome ground swatches (dialogs, farm stage)
+  public/pixel/terrain/ dual-grid map terrain: textures, shape atlases, sprite atlas (+ src/config/terrainAtlas.json)
   scripts/pixel/previews/  contact sheets for review (git-ignored)
   --refs                   also refresh the curated images in scripts/pixel/reference/
 
@@ -20,12 +21,12 @@ render3d.DEFAULTS.update(rim=True, dither=0.2)       # the house look: rim light
 from PIL import Image  # noqa: E402
 import fx  # noqa: E402
 import fog  # noqa: E402
-import blend_art  # noqa: E402
 import ground_art  # noqa: E402
 import ui_art  # noqa: E402
 import sprites_animals  # noqa: E402
 import sprites_buildings  # noqa: E402
 import sprites_castle  # noqa: E402
+import sprites_chest  # noqa: E402
 import sprites_characters  # noqa: E402
 import sprites_equipment  # noqa: E402
 import sprites_farm  # noqa: E402
@@ -36,7 +37,9 @@ import sprites_monsters  # noqa: E402
 import sprites_meadow  # noqa: E402
 import sprites_props  # noqa: E402
 import sprites_resources  # noqa: E402
-import trim_art  # noqa: E402
+import terrain_art  # noqa: E402
+import terrain_build  # noqa: E402
+import terrain_preview  # noqa: E402
 from common import upscale  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -46,6 +49,9 @@ PREVIEW = os.path.join(HERE, 'previews')
 SPRITES = {
     'gold': sprites_resources.gold, 'wood': sprites_resources.wood, 'stone': sprites_resources.stone,
     'coal': sprites_resources.coal, 'food': sprites_resources.bread, 'meat': sprites_resources.meat,
+    # reserved late-game art (no game resource yet, see docs/05): iron, fish, mana, ability shard, random-item box
+    'res_iron': sprites_resources.iron, 'res_fish': sprites_resources.fish, 'res_mana': sprites_resources.mana,
+    'res_shard': sprites_resources.shard, 'res_mystery': sprites_resources.mystery,
     'menu_character': sprites_props.helm, 'menu_merchant': sprites_props.pouch, 'menu_farm': sprites_props.barn,
     'level_orb': sprites_props.level_orb,
     'equip_head': sprites_equipment.head, 'equip_neck': sprites_equipment.neck,
@@ -62,6 +68,7 @@ SPRITES = {
     **sprites_castle.SPRITES,
     **sprites_fortress.SPRITES,
     **sprites_buildings.SPRITES,
+    **sprites_chest.SPRITES,
     **sprites_menu.SPRITES,
     **sprites_monsters.SPRITES,
 }
@@ -82,10 +89,8 @@ BG = {
     'crack': fog.crack_tile,
     'fog_a': ground_art.fog,
     'fog_b': lambda: ground_art.fog(size=64, seed=11, tint=(110, 170, 190), thresholds=(0.44, 0.52, 0.60), alphas=(10, 22, 36)),
-    'mystery': ground_art.mystery,
-    **{f'ground_{name}': fn for name, fn in ground_art.GROUNDS.items()},
-    **blend_art.MASKS,
-    **trim_art.TRIMS,
+    **{f'ground_{name}': (lambda n=name: terrain_art.texture(n))      # swatches for dialogs / the farm stage
+       for name in ('forest', 'plains', 'hills', 'swamp', 'tundra', 'lake', 'coast', 'grounds', 'castle', 'yard')},
 }
 
 
@@ -105,7 +110,7 @@ def save_group(folder, makers, only):
 def gold_shine():
     """6-frame twinkle strip (40x40 each) for the header coin; glints swell and fade out of phase."""
     base = sprites_resources.gold_base()
-    spots = fx.find_highlights(base, sprites_resources.GOLD_HI, n=2, min_dist=11)
+    spots = fx.find_highlights(base, sprites_resources.NUGGET_HI, n=2, min_dist=11)
     frames = fx.shine_frames(base, [(x - 1, y - 1) for x, y in spots])
     strip = Image.new('RGBA', (40 * len(frames), 40), (0, 0, 0, 0))
     for i, f in enumerate(frames):
@@ -113,13 +118,15 @@ def gold_shine():
     return strip
 
 
-def contact_sheet(imgs, path, k=5, cols=6):
-    cw = 56 * k + 16
+def contact_sheet(imgs, path, k=5, cols=6, bg=(150, 133, 117, 255)):
+    """Sprites at k x on a flat colour, one cell per sprite (the cell fits the biggest one)."""
+    cw = max(56, max(im.size[0] for im in imgs.values())) * k + 16
+    ch = max(56, max(im.size[1] for im in imgs.values())) * k + 16
     rows = -(-len(imgs) // cols)
-    sheet = Image.new('RGBA', (cw * cols, cw * rows), (150, 133, 117, 255))
+    sheet = Image.new('RGBA', (cw * cols, ch * rows), bg)
     for i, im in enumerate(imgs.values()):
         big = upscale(im, k)
-        sheet.alpha_composite(big, ((i % cols) * cw + (cw - big.size[0]) // 2, (i // cols) * cw + (cw - big.size[1]) // 2))
+        sheet.alpha_composite(big, ((i % cols) * cw + (cw - big.size[0]) // 2, (i // cols) * ch + (ch - big.size[1]) // 2))
     sheet.save(path)
 
 
@@ -173,7 +180,12 @@ def hero_hud_composite(sprites, ui):
 
 def reference_sheets(sprites, ui, bg):
     os.makedirs(REFERENCE, exist_ok=True)
+    for stale in ('biome-blend.png', 'map-tiles.png'):
+        if os.path.exists(os.path.join(REFERENCE, stale)):
+            os.remove(os.path.join(REFERENCE, stale))
     contact_sheet(small_sprites(sprites), os.path.join(REFERENCE, 'icons.png'), k=4, cols=6)
+    # the 16 town buildings (48x60, no ground) on meadow green; the foundation pads are shown in map-terrain.png
+    contact_sheet({n: im for n, im in sprites.items() if n.startswith('building_')}, os.path.join(REFERENCE, 'town.png'), k=3, cols=4, bg=(88, 140, 60, 255))
     hero_hud_composite(sprites, ui).save(os.path.join(REFERENCE, 'hero-hud.png'))
     # fog: two layers over the map colour, tiled
     sheet = Image.new('RGBA', (384, 256), (7, 10, 18, 255))
@@ -185,21 +197,10 @@ def reference_sheets(sprites, ui, bg):
     shine = Image.new('RGBA', (strip.size[0] * 3, strip.size[1] * 3), (26, 19, 15, 255))
     shine.alpha_composite(upscale(strip, 3))
     shine.save(os.path.join(REFERENCE, 'gold-shine.png'))
-    # map: each biome ground + the unexplored tile as a 3x3 patch at 2x, with its icon on the middle tile
-    names = [n for n in ground_art.GROUNDS if n not in ('empty', 'yard')] + ['mystery']
-    cell = 48 * 3
-    sheet = Image.new('RGBA', (len(names) * (cell + 12) + 12, cell + 24), (20, 16, 14, 255))
-    for i, name in enumerate(names):
-        key = 'mystery' if name == 'mystery' else f'ground_{name}'
-        tile = upscale(bg[key], 2)
-        for a in range(3):
-            for b in range(3):
-                sheet.alpha_composite(tile, (12 + i * (cell + 12) + a * 48, 12 + b * 48))
-        icon = sprites.get('unknown' if name == 'mystery' else ('castle_3' if name == 'castle' else f'biome_{name}'))
-        if icon is not None:
-            big = upscale(icon, 2 if name == 'mystery' else 1)
-            sheet.alpha_composite(big, (12 + i * (cell + 12) + 48 + (48 - big.size[0]) // 2, 12 + 48 + (48 - big.size[1]) // 2))
-    sheet.save(os.path.join(REFERENCE, 'map-tiles.png'))
+    # map: the dual-grid terrain sample island (organic edges, depth tiers, sprites, docks)
+    m, images, _ = terrain_build.manifest()
+    terrain_preview.render_world(terrain_preview.make_layout(), m, images).save(os.path.join(REFERENCE, 'map-terrain.png'))
+    terrain_preview.sprite_sheet(images).save(os.path.join(REFERENCE, 'map-sprites.png'))
     # castle levels 1-6 side by side (top-down, 48px each) at 2x
     lv = [sprites[f'castle_{i}'] for i in range(1, 7)]
     sheet = Image.new('RGBA', (sum(im.size[0] * 2 + 16 for im in lv) + 16, 48 * 2 + 32), (60, 36, 100, 255))
@@ -246,10 +247,10 @@ def main():
 
     if small_sprites(sprites):
         contact_sheet(small_sprites(sprites), os.path.join(PREVIEW, 'sprites.png'))
-    blend_art.preview_sheet(rim=True).save(os.path.join(PREVIEW, 'biome-blend.png'))
+    if not only or 'terrain' in only:
+        terrain_build.write_all(verbose=False)
     if refs:
         reference_sheets(sprites, ui, bg)
-        blend_art.preview_sheet(rim=True).save(os.path.join(REFERENCE, 'biome-blend.png'))
     if not only:
         # drop stale files AFTER writing, so a running dev server never serves a half-empty folder (images would 404 until reload)
         for folder in ('icons', 'ui', 'bg'):

@@ -7,7 +7,6 @@ import {
 } from '@/config/playerClasses';
 import {
 	ANIMALS,
-	BIOMES,
 	BUILDINGS,
 	AMBIENT_LIFE,
 	CASTLE_UPGRADE,
@@ -15,7 +14,6 @@ import {
 	FARM_BONUS,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
-	EMPTY_BIOMES,
 	GRID_HEIGHT,
 	GRID_SIZE,
 	INITIAL_CHARACTER_STATS,
@@ -25,7 +23,6 @@ import {
 	MERCHANT_RESOURCE_PRICES,
 	REBIRTH,
 	RESOURCE_CAP,
-	SPECIAL_SINGLE_TYPE_BIOMES,
 	TILE_TAP,
 	type LegacyUpgradeId,
 } from '@/config/gameConfig';
@@ -42,9 +39,10 @@ import {
 	castleUpgradeDuration,
 	countOwnedTiles,
 	createInitialGrid,
+	economyTiles,
 	EMPTY_PRESTIGE,
 	effectiveTileDiscount,
-	getRandomBiome,
+	STARTER_FREE_TILES,
 	legacyEffect,
 	legacyGain,
 	legacyUpgradeCost,
@@ -52,16 +50,18 @@ import {
 	subtractBundle,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
+import { biomeVerdicts, rollBiome } from '@/utils/biomeRules';
+import { pickChestSpot, rollChestLoot, type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
 import { applyHit, armorOf, damagePerClick, maxHp, newFight, regen, stepFight } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
 import { addToBag, equipFromBag, moveSlot, removeFromBag, starterBag, unequip } from '@/lib/inventory';
-import { castleLevelOf, isInWard, monstersOutsideWard } from '@/lib/castleWard';
+import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { rollKillLoot } from '@/lib/loot';
 import { advanceMonsters, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
-import { markVaultReady, SAVE_NAME, SAVE_VERSION, vaultStorage } from '@/lib/saveVault';
+import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type {
 	BiomeType,
@@ -106,9 +106,17 @@ const neighbours = (x: number, y: number) => [
 	[x, y + 1],
 ];
 
+/** A tiny seeded generator: the server and the first client render must start from the same world. */
+const seededRandom = (seed: number) => () => {
+	seed = (seed + 0x6d2b79f5) | 0;
+	let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+	t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+	return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
 /** All game data of a brand-new game (no actions). */
-export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
-	const grid = createInitialGrid();
+export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () => number = Math.random) => {
+	const grid = createInitialGrid(random);
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
 	const equipment = { ...STARTER_EQUIPMENT };
@@ -138,15 +146,14 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
 		biomeSelectionActive: false,
 		pendingTileCoords: null,
 		selectableBiomes: null,
+		freeTiles: STARTER_FREE_TILES,
 		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
 		clickLevel: 0,
 		castleUpgrade: null,
 		playSeconds: 0,
 		chestSpawnTimer: 0,
 		activeChests: 0,
-		lastChestReward: 0,
-		lastChestGoldRate: 0,
-		lastChestMinutesAwarded: 0,
+		lastChestLoot: null as ChestLoot | null, // what the last chest held (transient: only drives the toast)
 	};
 };
 
@@ -168,7 +175,7 @@ const createGameSlice = (
 	/** Shared tail of buyTile / selectBiome: charge, claim the tile, award XP + reputation. */
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
-		const owned = countOwnedTiles(state.tiles);
+		const owned = economyTiles(state.tiles, state.freeTiles);
 		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige));
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
@@ -204,7 +211,9 @@ const createGameSlice = (
 	};
 
 	return {
-		...createInitialData(),
+		// A fixed placeholder world: it is rendered on the server and before the save is read, so it must not be
+		// random (that broke hydration). `merge` below replaces it with a random one for a player without a save.
+		...createInitialData(EMPTY_PRESTIGE, seededRandom(1)),
 
 		resetGame: () => {
 			clickLimiter.reset();
@@ -218,7 +227,7 @@ const createGameSlice = (
 			const state = get();
 			const castle = findCastle(state.tiles);
 			if (!castle || (castle.tile.level ?? 1) < REBIRTH.minCastleLevel || state.castleUpgrade) return false;
-			const ownedTiles = countOwnedTiles(state.tiles);
+			const ownedTiles = economyTiles(state.tiles, state.freeTiles);
 			if (ownedTiles < REBIRTH.minTiles) return false;
 			const gain = legacyGain(castle.tile.level ?? 1, ownedTiles);
 			if (gain < 1) return false;
@@ -335,27 +344,22 @@ const createGameSlice = (
 			);
 			if (!isAdjacent) return false;
 
-			const owned = countOwnedTiles(state.tiles);
+			const owned = economyTiles(state.tiles, state.freeTiles);
+			const purchased = owned - 1;
 			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige));
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
-			// Every 4th owned count (3, 7, 11 ...) the player picks the biome; payment happens on selection
+			// Every 4th tile (3, 7, 11 ... counted as before) the player picks the biome among what the rules allow; payment happens on selection
 			if (owned % 4 === 3) {
-				const availableBiomes = Object.keys(BIOMES).filter(
-					(name) =>
-						!SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) &&
-						!EMPTY_BIOMES.includes(name as BiomeType)
-				) as BiomeType[];
-
 				set({
 					biomeSelectionActive: true,
 					pendingTileCoords: { x, y },
-					selectableBiomes: availableBiomes,
+					selectableBiomes: biomeVerdicts(state.tiles, x, y, purchased),
 				});
 				return true;
 			}
 
-			return completePurchase(x, y, getRandomBiome(state.tiles, x, y));
+			return completePurchase(x, y, rollBiome(state.tiles, x, y, purchased));
 		},
 
 		selectBiome: (biome: BiomeType) => {
@@ -363,8 +367,7 @@ const createGameSlice = (
 			if (
 				!state.biomeSelectionActive ||
 				!state.pendingTileCoords ||
-				!state.selectableBiomes ||
-				!state.selectableBiomes.includes(biome)
+				!state.selectableBiomes?.some((v) => v.biome === biome && v.allowed)
 			) {
 				return false;
 			}
@@ -436,34 +439,32 @@ const createGameSlice = (
 			return true;
 		},
 
-		// Collect a chest: reward = passive gold/s x random minutes, plus a small bonus per Luck
+		// Collect a chest: gold (passive gold/s x random minutes), a lucky x1.5 gold chest, a bundle of resources, XP or a
+		// gear piece - see src/lib/chests.ts. Luck improves the odds and the gold.
 		collectChest: (x: number, y: number) => {
 			const state = get();
 			const tile = state.tiles[y]?.[x];
 			if (!tile || !tile.isOwned || !tile.hasChest) return false;
 
-			const goldIncomeRate = state.resourceRates.total.gold;
-			const minSec = CHEST.minMinutes * 60;
-			const maxSec = CHEST.maxMinutes * 60;
-			const randomTimeInSeconds =
-				Math.floor(Math.random() * (maxSec - minSec + 1)) + minSec;
-			const luck = 1 + state.characterStats.luck * CHEST.luckBonusPerPoint;
-			const goldReward = Math.floor(goldIncomeRate * randomTimeInSeconds * luck);
+			const loot = rollChestLoot({ rates: state.resourceRates.total, luck: state.characterStats.luck, bag: state.bag });
 
 			const newTiles = [...state.tiles];
 			newTiles[y] = [...newTiles[y]];
 			newTiles[y][x] = { ...newTiles[y][x], hasChest: false };
 
+			const resources = { ...state.resources };
+			let bag = state.bag;
+			if (loot.kind === 'gold' || loot.kind === 'boost') resources.gold += loot.gold;
+			else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
+			else if (loot.kind === 'xp') resources.xp += loot.xp;
+			else bag = addToBag(bag, loot.itemId, 1).bag;
+
 			set({
 				tiles: newTiles,
 				activeChests: Math.max(0, state.activeChests - 1),
-				resources: {
-					...state.resources,
-					gold: state.resources.gold + goldReward,
-				},
-				lastChestReward: goldReward,
-				lastChestGoldRate: goldIncomeRate,
-				lastChestMinutesAwarded: randomTimeInSeconds / 60,
+				resources,
+				bag,
+				lastChestLoot: loot,
 			});
 			return true;
 		},
@@ -712,18 +713,9 @@ const createGameSlice = (
 				if (newChestSpawnTimer >= CHEST.intervalSec) {
 					newChestSpawnTimer = 0;
 					const monsterSpots = new Set(state.monsters.map((m) => `${m.x},${m.y}`));
-					const wardLevel = castleLevelOf(newTiles);
-					const eligibleTiles: { x: number; y: number }[] = [];
-					newTiles.forEach((row, y) => {
-						row.forEach((tile, x) => {
-							if (tile.isOwned && tile.biome !== 'castle' && !tile.hasChest && !monsterSpots.has(`${x},${y}`) && !isInWard(x, y, wardLevel)) {
-								eligibleTiles.push({ x, y });
-							}
-						});
-					});
-					if (eligibleTiles.length > 0) {
-						const { x, y } =
-							eligibleTiles[Math.floor(Math.random() * eligibleTiles.length)];
+					const spot = pickChestSpot(newTiles, monsterSpots, castleLevelOf(newTiles));
+					if (spot) {
+						const { x, y } = spot;
 						newTiles = newTiles === state.tiles ? [...state.tiles] : newTiles;
 						newTiles[y] = [...newTiles[y]];
 						newTiles[y][x] = { ...newTiles[y][x], hasChest: true };
@@ -907,15 +899,15 @@ const createGameSlice = (
 
 export const useGameStore = create(
 	persist<GameState, [], [], PersistedGame>((set, get) => createGameSlice(set, get), {
-		name: SAVE_NAME,
-		version: SAVE_VERSION,
-		// Encrypted IndexedDB vault (already validated by sanitizeSave when it is read)
-		storage: vaultStorage,
+		name: PERSIST_NAME,
+		version: PERSIST_VERSION,
+		// One text line in localStorage (decoded and validated by sanitizeSave when it is read)
+		storage: saveStorage,
 		// Only game data is saved; rates, UI flags and actions are rebuilt on load
 		partialize: (state) => pickPersisted(state),
 		merge: (persisted, current) => {
 			const saved = persisted as PersistedGame | undefined;
-			if (!saved) return { ...current, isHydrated: true };
+			if (!saved) return { ...current, ...createInitialData(), isHydrated: true };
 			const rates = calculateResourceRates(
 				saved.tiles,
 				saved.characterStats,
@@ -932,6 +924,6 @@ export const useGameStore = create(
 			};
 		},
 		// From here on changes are written (nothing is saved before the first load has finished)
-		onRehydrateStorage: () => () => markVaultReady(),
+		onRehydrateStorage: () => () => markSaveReady(),
 	})
 );

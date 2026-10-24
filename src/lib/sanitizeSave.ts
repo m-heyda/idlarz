@@ -30,7 +30,9 @@ import {
 	castleUpgradeDuration,
 	EMPTY_PRESTIGE,
 	legacySpent,
+	STARTER_FREE_TILES,
 } from '@/utils/gameUtils';
+import { RING } from '@/utils/biomeRules';
 import type {
 	BagSlot,
 	CastleUpgradeState,
@@ -57,12 +59,10 @@ export const PERSISTED_KEYS = [
 	'clickLevel',
 	'castleUpgrade',
 	'prestige',
+	'freeTiles',
 	'playSeconds',
 	'chestSpawnTimer',
 	'activeChests',
-	'lastChestReward',
-	'lastChestGoldRate',
-	'lastChestMinutesAwarded',
 	'equipment',
 	'bag',
 	'playerHp',
@@ -98,7 +98,7 @@ const int = (v: unknown, min: number, max: number): number | null => {
 	return n !== null && Number.isInteger(n) ? n : null;
 };
 
-const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
+export const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 const RESOURCE_KEYS = Object.keys(INITIAL_RESOURCES) as (keyof Resources)[];
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
@@ -202,6 +202,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	}
 	if (seen.size !== owned) return fail('disconnected territory');
 
+	// Tiles that cost nothing: just the castle in a save from before the starting ring, the castle + its 8 neighbours otherwise
+	const freeTiles = raw.freeTiles === undefined ? 1 : int(raw.freeTiles, 1, STARTER_FREE_TILES);
+	if (freeTiles === null || (freeTiles !== 1 && freeTiles !== STARTER_FREE_TILES)) return fail('free tiles');
+	if (freeTiles === STARTER_FREE_TILES && !RING.every(([dx, dy]) => tiles[GRID_CENTER_Y + dy][GRID_CENTER_X + dx].isOwned)) {
+		return fail('starting ring not owned');
+	}
+	const purchasedOwned = owned - freeTiles + 1; // as the economy counts (castle + purchases)
+
 	const castleLevel = tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1;
 
 	// ---- resources, XP and level ----------------------------------------------------------------
@@ -213,7 +221,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		resources[key] = v;
 	}
 	let minXp = 0;
-	for (let k = 2; k <= owned; k++) minXp += calculateXpGain(k);
+	for (let k = 2; k <= purchasedOwned; k++) minXp += calculateXpGain(k);
 	if (resources.xp < minXp * 0.999) return fail('xp does not cover owned tiles');
 	const level = calculateLevel(resources.xp);
 
@@ -243,7 +251,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		...INITIAL_CHARACTER_STATS,
 		...base,
 		availablePoints: available + (expectedTotal - total),
-		reputation: INITIAL_CHARACTER_STATS.reputation + 100 * (owned - 1),
+		reputation: INITIAL_CHARACTER_STATS.reputation + 100 * (purchasedOwned - 1),
 	};
 	Object.assign(characterStats, calculateCombatStats(characterStats));
 
@@ -370,18 +378,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 
 	const chestSpawnTimer = num(raw.chestSpawnTimer, 0, CHEST.intervalSec);
 	const playSeconds = num(raw.playSeconds, 0, 1e9);
-	const lastChestReward = num(raw.lastChestReward ?? 0);
-	const lastChestGoldRate = num(raw.lastChestGoldRate ?? 0);
-	const lastChestMinutesAwarded = num(raw.lastChestMinutesAwarded ?? 0);
-	if (
-		chestSpawnTimer === null ||
-		playSeconds === null ||
-		lastChestReward === null ||
-		lastChestGoldRate === null ||
-		lastChestMinutesAwarded === null
-	) {
-		return fail('timers');
-	}
+	if (chestSpawnTimer === null || playSeconds === null) return fail('timers');
 
 	const rawName = typeof raw.playerName === 'string' ? raw.playerName.trim().slice(0, 9) : '';
 	const playerClass: PlayerClassId =
@@ -403,12 +400,10 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			clickLevel,
 			castleUpgrade,
 			prestige,
+			freeTiles,
 			playSeconds,
 			chestSpawnTimer,
 			activeChests: chests,
-			lastChestReward,
-			lastChestGoldRate,
-			lastChestMinutesAwarded,
 			equipment,
 			bag,
 			playerHp,

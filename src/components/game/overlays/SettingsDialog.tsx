@@ -4,7 +4,6 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import audioManager from '@/utils/audioManager';
 import PixelModal from '../PixelModal';
 import PixelIcon from '../PixelIcon';
-import { SAVE_VERSION } from '@/lib/saveVault';
 
 const Row: React.FC<{ label: string; hint?: string; children: React.ReactNode }> = ({ label, hint, children }) => (
 	<div className='px-card flex items-center justify-between gap-4 mb-3'>
@@ -67,7 +66,7 @@ const SettingsDialog: React.FC = () => {
 						close();
 						toggleSaveMenu();
 					}}>
-					Save tools (export / import)
+					Save & backup (export / import)
 				</button>
 				<button
 					className='px-btn'
@@ -79,7 +78,7 @@ const SettingsDialog: React.FC = () => {
 				</button>
 			</div>
 
-			<p className='text-xs text-[#7a6a52] mt-4 text-center'>Save format v{SAVE_VERSION}. Progress is stored encrypted in this browser.</p>
+			<p className='text-xs text-[#7a6a52] mt-4 text-center'>Progress saves automatically in this browser. Export a copy to keep it safe.</p>
 		</PixelModal>
 	);
 };

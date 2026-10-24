@@ -207,10 +207,17 @@ test('chests: the spawn timer pauses at the cap, collecting needs a real chest, 
 	for (let t = 0; t < CHEST.intervalSec; t += MAX_CATCHUP_SEC) api().tick(MAX_CATCHUP_SEC * 1000);
 	assert.equal(api().activeChests, 1);
 	const spot = api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.hasChest)!;
-	setResources({ gold: 0 });
+	setResources({ gold: 0, wood: 0, stone: 0, coal: 0, food: 0 });
+	const xpBefore = api().resources.xp;
+	const bagBefore = JSON.stringify(api().bag);
 	assert.equal(api().collectChest(spot.x, spot.y), true);
 	assert.equal(api().collectChest(spot.x, spot.y), false); // gone
-	assert.ok(api().resources.gold > 0);
+	const loot = api().lastChestLoot;
+	assert.ok(loot, 'what was inside is remembered for the toast');
+	const r = api().resources;
+	const gained =
+		r.gold > 0 || r.wood > 0 || r.stone > 0 || r.coal > 0 || r.food > 0 || r.xp > xpBefore || JSON.stringify(api().bag) !== bagBefore;
+	assert.ok(gained, `a ${loot!.kind} chest pays something`);
 	assert.equal(api().activeChests, 0);
 });
 

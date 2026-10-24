@@ -64,7 +64,8 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 		{ rebirths: s.prestige.rebirths, points: s.prestige.legacyPoints, earned: s.prestige.legacyEarned },
 		{ rebirths: 1, points: expected, earned: expected }
 	);
-	assert.equal(owned(), 1);
+	assert.equal(owned(), 9, 'a rebirth starts with the castle and its 8 free neighbours');
+	assert.equal(s.freeTiles, 9);
 	assert.equal(s.tiles[GRID_CENTER_Y][GRID_CENTER_X].level, 1);
 	assert.equal(s.clickLevel, 0);
 	assert.deepEqual(s.farmLevels, {});
