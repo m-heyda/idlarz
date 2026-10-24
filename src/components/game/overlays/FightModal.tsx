@@ -213,6 +213,7 @@ const FightView: React.FC = () => {
 								<div className='text-center'>
 									<div className='px-h'>Knocked out</div>
 									<div className='text-sm'>The {def.label} shrugs it off. You wake up a little later.</div>
+									{fight.taunt && <div className='text-sm italic mt-1'>&ldquo;{fight.taunt}&rdquo;</div>}
 								</div>
 							)}
 							{fight.phase === 'timeout' && (

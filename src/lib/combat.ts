@@ -45,6 +45,11 @@ export const applyHit = (fight: FightState, damage: number): { fight: FightState
 	return { fight: { ...fight, monsterHp }, killed: monsterHp === 0 };
 };
 
+const pickTaunt = (rng: () => number): string => {
+	const taunts = MONSTERS.ratKing.taunts;
+	return taunts[Math.floor(rng() * taunts.length) % taunts.length];
+};
+
 export type CombatEvent = { kind: 'hurt'; amount: number } | { kind: 'knockedOut' } | { kind: 'timeout' };
 
 /**
@@ -80,11 +85,11 @@ export const stepFight = (
 		timeLeftSec: fight.timeLeftSec === null ? null : Math.max(0, fight.timeLeftSec - dt),
 	};
 	if (hp === 0) {
-		next = { ...next, phase: 'knockedOut' };
+		// the King gloats about a knockout as well as about a timeout
+		next = { ...next, phase: 'knockedOut', taunt: fight.type === 'ratKing' ? pickTaunt(rng) : null };
 		events.push({ kind: 'knockedOut' });
 	} else if (next.timeLeftSec === 0) {
-		const taunts = MONSTERS.ratKing.taunts;
-		next = { ...next, phase: 'timeout', taunt: taunts[Math.floor(rng() * taunts.length) % taunts.length] };
+		next = { ...next, phase: 'timeout', taunt: pickTaunt(rng) };
 		events.push({ kind: 'timeout' });
 	}
 	return { fight: next, playerHp: hp, events };

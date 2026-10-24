@@ -61,7 +61,11 @@ const ITEMS: ItemDef[] = [
 	rattatui('buckler', 'Buckler', 'offHand', 'rare', { armor: 5, maxHp: 4 }, 'A cheese-wheel shield with a metal rim.'),
 ];
 
-export const ITEM_CATALOG: Record<string, ItemDef> = Object.fromEntries(ITEMS.map((item) => [item.id, item]));
+// No prototype: `ITEM_CATALOG['constructor']` must be undefined, or a forged save could name an item that is not one
+export const ITEM_CATALOG: Record<string, ItemDef> = Object.assign(
+	Object.create(null) as Record<string, ItemDef>,
+	Object.fromEntries(ITEMS.map((item) => [item.id, item]))
+);
 
 /** Beta-tester set: one piece per slot (the ring fits both ring slots, so 12 items fill 13 slots). */
 export const RATTATUI_SET = {

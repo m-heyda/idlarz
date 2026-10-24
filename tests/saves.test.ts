@@ -238,6 +238,12 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.monsters.push({ ...r.monsters[0], ...spot(1) }), (r.nextMonsterId = 5)), 'duplicate monster ids');
 	bad((r) => (r.monsters[0].id = 5), 'monster id not below nextMonsterId');
 	bad((r) => (r.monsters[0].ageSec = -1), 'negative monster age');
+	bad((r) => (r.bag[0] = { id: 'constructor', qty: 1 }), 'object prototype name as a bag item');
+	bad((r) => (r.bag[0] = { id: '__proto__', qty: 1 }), '__proto__ as a bag item');
+	bad((r) => (r.bag[0] = { id: 'toString', qty: 1 }), 'toString as a bag item');
+	bad((r) => (r.equipment.head = 'constructor'), 'object prototype name as equipped item');
+	bad((r) => (r.equipment.neck = 'hasOwnProperty'), 'hasOwnProperty as equipped item');
+	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].biome = 'constructor'), 'object prototype name as a biome');
 	bad((r) => (r.monsterSpawnTimer = COMBAT.spawn.intervalSec + 1), 'spawn timer out of range');
 	bad((r) => (r.nextMonsterId = 0), 'nextMonsterId 0');
 });

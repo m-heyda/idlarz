@@ -6,6 +6,7 @@ import { GRID_CENTER_X, GRID_CENTER_Y, REBIRTH } from '../src/config/gameConfig'
 import { ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
 import { maxHp } from '../src/lib/combat';
+import { pickPersisted } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
 
 let seq = 0;
@@ -286,4 +287,14 @@ test('the monster being fought does not age', () => {
 	api().leaveFight();
 	run(60);
 	assert.equal(api().monsters[0].ageSec, 60);
+});
+
+test('loading a save (tab take-over / reload) drops a stale open fight', () => {
+	withMonster();
+	api().startFight(1);
+	const merge = store.persist.getOptions().merge!;
+	const saved = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const merged = merge(saved, api()) as ReturnType<typeof api>;
+	assert.equal(merged.fight, null);
+	assert.equal(merged.isHydrated, true);
 });

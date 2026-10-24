@@ -155,6 +155,8 @@ const Tile: React.FC<TileProps> = ({
 
 		// A monster on this tile: clicking it opens the fight (no tile tap, no chest)
 		if (isOwned && monsterKey) {
+			// starting a fight is not a map click: keep it from reaching the window-level gold click listener
+			e.stopPropagation();
 			if (startFight(Number(monsterId))) audioManager.playSound('click');
 			return;
 		}

@@ -131,7 +131,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			const t = row[x];
 			if (!isObject(t)) return fail('tile shape');
 			for (const key of Object.keys(t)) if (!TILE_KEYS.has(key)) return fail('tile key');
-			if (typeof t.biome !== 'string' || !(t.biome in BIOMES)) return fail('tile biome');
+			if (typeof t.biome !== 'string' || !Object.prototype.hasOwnProperty.call(BIOMES, t.biome)) return fail('tile biome');
 			if (typeof t.isOwned !== 'boolean') return fail('tile owned');
 
 			const isCenter = x === GRID_CENTER_X && y === GRID_CENTER_Y;

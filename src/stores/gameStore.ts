@@ -921,6 +921,8 @@ export const useGameStore = create(
 			return {
 				...current,
 				...saved,
+				// an open fight belongs to the tab that opened it: after a reload or a tab take-over it is stale
+				fight: null,
 				resourceRates: rates,
 				isHydrated: true,
 			};

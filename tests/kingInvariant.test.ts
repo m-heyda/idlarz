@@ -6,13 +6,46 @@ import { CLICK_LIMIT } from '../src/config/gameConfig';
 import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import { createClickLimiter } from '../src/lib/clickLimiter';
 
-const bestWeaponDamage = () =>
-	Math.max(...Object.values(ITEM_CATALOG).filter((i) => i.slot === 'mainHand').map((i) => i.stats?.damage ?? 0));
+import { EQUIPMENT_LAYOUT, RATTATUI_SET } from '../src/config/itemCatalog';
+import { COMBAT } from '../src/config/combatConfig';
+import type { EquipmentSlot } from '../src/types/game';
 
-test('best possible clicks x best weapon damage stay below the Rat King HP', () => {
+const SLOTS: EquipmentSlot[] = [...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom];
+
+/**
+ * An upper bound for the damage of one click with any loadout the catalog allows: the best item of every slot
+ * (a 'ring' item fits both ring slots) plus the damage of every set bonus. Gear damage is summed over ALL slots,
+ * not just the weapon, so a damage ring or a set bonus with damage must show up here.
+ */
+const maxDamagePerClick = (): number => {
+	let total = 0;
+	for (const slot of SLOTS) {
+		const fits = Object.values(ITEM_CATALOG).filter(
+			(i) => i.slot === slot || (i.slot === 'ring' && (slot === 'ring1' || slot === 'ring2'))
+		);
+		total += Math.max(0, ...fits.map((i) => i.stats?.damage ?? 0));
+	}
+	for (const bonus of Object.values(RATTATUI_SET.bonuses)) total += bonus.damage ?? 0;
+	return Math.max(1, total);
+};
+
+test('no single item exceeds the weapon damage cap', () => {
+	for (const def of Object.values(ITEM_CATALOG)) {
+		assert.ok((def.stats?.damage ?? 0) <= COMBAT.maxWeaponDamage, def.id);
+	}
+});
+
+test('the best possible loadout (every slot, set bonuses included) cannot exceed the damage cap', () => {
+	assert.ok(
+		maxDamagePerClick() <= COMBAT.maxWeaponDamage,
+		`best loadout deals ${maxDamagePerClick()} per click, cap is ${COMBAT.maxWeaponDamage}`
+	);
+});
+
+test('best possible clicks x best possible damage stay below the Rat King HP', () => {
 	// formula from the constants
 	const maxClicks = CLICK_LIMIT.capacity + CLICK_LIMIT.refillPerSec * MONSTERS.ratKing.timeLimitSec;
-	assert.ok(maxClicks * bestWeaponDamage() < MONSTERS.ratKing.hp, `${maxClicks} x ${bestWeaponDamage()}`);
+	assert.ok(maxClicks * maxDamagePerClick() < MONSTERS.ratKing.hp, `${maxClicks} x ${maxDamagePerClick()}`);
 
 	// and the real limiter, hammered by a bot clicking every 5 ms for the whole minute
 	const limiter = createClickLimiter();
@@ -20,7 +53,7 @@ test('best possible clicks x best weapon damage stay below the Rat King HP', () 
 	for (let t = 0, id = 1; t <= MONSTERS.ratKing.timeLimitSec * 1000; t += 5, id++) {
 		if (limiter.take({ eventId: id, now: t, trusted: true })) accepted++;
 	}
-	assert.ok(accepted * bestWeaponDamage() < MONSTERS.ratKing.hp, `${accepted} accepted clicks`);
+	assert.ok(accepted * maxDamagePerClick() < MONSTERS.ratKing.hp, `${accepted} accepted clicks`);
 });
 
 test('a starter-kit king fight ends by timeout, not by knockout', () => {

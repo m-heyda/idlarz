@@ -111,6 +111,15 @@ test('knockout when hp hits 0', () => {
 	assert.deepEqual(after.events, []);
 });
 
+test('a knockout by the Rat King taunts too; a rat stays silent', () => {
+	const k = stepFight({ ...king(), attackTimer: 3 }, 1, 2, 2, noRng);
+	assert.equal(k.fight.phase, 'knockedOut');
+	assert.equal(k.fight.taunt, MONSTERS.ratKing.taunts[0]);
+	const r = stepFight({ ...rat(), attackTimer: 1.5 }, 1, 2, 2, noRng);
+	assert.equal(r.fight.phase, 'knockedOut');
+	assert.equal(r.fight.taunt, null);
+});
+
 test('king times out after 60 s of steps and sets a taunt from the config', () => {
 	let fight = king();
 	let hp = 1000; // never knocked out in this test

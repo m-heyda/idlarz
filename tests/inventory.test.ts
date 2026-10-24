@@ -53,6 +53,15 @@ test('addToBag reports overflow when all 36 slots are full', () => {
 	assert.equal(unknown.added, 0);
 });
 
+test('addToBag rejects object prototype names as item ids', () => {
+	for (const id of ['constructor', '__proto__', 'toString', 'hasOwnProperty']) {
+		const r = addToBag(emptyBag(), id, 1);
+		assert.equal(r.added, 0, id);
+		assert.equal(r.overflow, 1, id);
+		assert.ok(r.bag.every((s) => s === null), id);
+	}
+});
+
 test('gear never stacks', () => {
 	const r = addToBag(emptyBag(), 'wooden_sword', 3);
 	assert.equal(r.added, 3);
