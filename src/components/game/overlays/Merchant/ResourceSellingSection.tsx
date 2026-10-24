@@ -12,6 +12,8 @@ interface ResourceSellingSectionProps {
 	maxAmount: number;
 	currentAmount: number;
 	goldValue: number;
+	/** Haggler bonus on the unit price (1 = none) */
+	priceMultiplier?: number;
 	onAmountChange: (
 		resource: keyof typeof MERCHANT_RESOURCE_PRICES,
 		amount: number
@@ -25,6 +27,7 @@ export const ResourceSellingSection: React.FC<ResourceSellingSectionProps> = ({
 	maxAmount,
 	currentAmount,
 	goldValue,
+	priceMultiplier = 1,
 	onAmountChange,
 	onSell,
 	onSellAll,
@@ -47,7 +50,7 @@ export const ResourceSellingSection: React.FC<ResourceSellingSectionProps> = ({
 				</div>
 				<div className='text-right'>
 					<div className='text-yellow-400 font-medium text-sm'>
-						<span className='inline-flex items-center gap-1'>{MERCHANT_RESOURCE_PRICES[resource]} <ResourceIcon resource='gold' /> each</span>
+						<span className='inline-flex items-center gap-1'>{formatNumber(MERCHANT_RESOURCE_PRICES[resource] * priceMultiplier)} <ResourceIcon resource='gold' /> each</span>
 					</div>
 					<div className='text-xs text-[#a89878]'>
 						Available: {formatNumber(maxAmount)}

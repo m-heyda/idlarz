@@ -1,10 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { maxHp } from '@/lib/combat';
 import { CharacterStats } from '@/types/game';
 import LevelDetails from '../LevelDetails';
-import PixelModal from '../PixelModal';
-import CharacterPortrait from '../CharacterPortrait';
 import CollapsibleSection from '../CollapsibleSection';
 import { countOwnedTiles, getStatDescription } from '@/utils/gameUtils';
 import { formatNumber, formatRate } from '@/utils/formatters';
@@ -13,8 +11,6 @@ import { CASTLE_BASE_RATES, REBIRTH } from '@/config/gameConfig';
 
 const StatisticsOverlay: React.FC = () => {
 	const {
-		showStatisticsWindow,
-		toggleStatisticsWindow,
 		addStatPoint,
 		resourceRates,
 		tiles,
@@ -26,17 +22,6 @@ const StatisticsOverlay: React.FC = () => {
 		equipment,
 	} = useGameStore();
 
-	// Store previous level to detect level ups
-	const prevLevelRef = useRef(level.level);
-
-	// Check for level up and play sound
-	useEffect(() => {
-		if (level.level > prevLevelRef.current) {
-			audioManager.playSound('fanfare');
-		}
-		prevLevelRef.current = level.level;
-	}, [level.level]);
-
 	// Custom stat point allocation with sound
 	const handleAddStatPoint = (stat: keyof CharacterStats) => {
 		if (characterStats.availablePoints > 0) {
@@ -44,8 +29,6 @@ const StatisticsOverlay: React.FC = () => {
 			audioManager.playSound('click');
 		}
 	};
-
-	if (!showStatisticsWindow) return null;
 
 	const totalOwnedTiles = countOwnedTiles(tiles);
 
@@ -64,11 +47,6 @@ const StatisticsOverlay: React.FC = () => {
 	};
 
 	return (
-		<PixelModal
-			title='Statistics'
-			icon={<CharacterPortrait variant='bust' interactive={false} />}
-			size='lg'
-			onClose={toggleStatisticsWindow}>
 				<div className='grid grid-cols-6 gap-6 h-full'>
 					<div className='col-span-2 px-panel min-w-[200px]'>
 						<LevelDetails />
@@ -518,7 +496,6 @@ const StatisticsOverlay: React.FC = () => {
 						</div>
 					</div>
 				</div>
-		</PixelModal>
 	);
 };
 

@@ -18,7 +18,7 @@ interface ItemSlotProps {
 	equipped?: boolean;
 	locked?: boolean;
 	draggable?: boolean;
-	onClick?: () => void;
+	onClick?: (event: React.MouseEvent) => void;
 	onDoubleClick?: () => void;
 	onContextMenu?: () => void;
 	onDragStart?: () => void;

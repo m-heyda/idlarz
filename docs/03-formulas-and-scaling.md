@@ -83,24 +83,41 @@ Build time to level 6 is 5 d 5 h, to level 10 24 d 5 h (before Legacy discounts)
 
 ```
 cost of the N-th animal of a kind = floor(baseCost × costScaling^(N−1))   food
-meat/s of N animals               = baseProduction × N
+meat/s of N animals               = baseProduction × N × (1 + 0.02 × pen) × (1 + 0.05 × feed)
+product/s of N animals            = perSec × N × (1 + 0.02 × pen) × (1 + 0.10 × coop|dairy|tannery)
 meat total                        = base × (1 + castle modifier + 0.05 × plainsTiles)
+products total                    = base × (1 + castle modifier)          (eggs, milk, hide)
+cap per kind                      = 12 + 4 × pen level
+upgrade cost (level N → N+1)      = ceil(base × growth^N) per resource
 ```
 
-| Animal | first cost | cost × | meat/s each |
-| --- | --- | --- | --- |
-| Chicken | 10 K | 1.5 | 0.2 |
-| Deer | 50 K | 1.6 | 0.5 |
-| Pig | 200 K | 1.7 | 1 |
-| Cow | 1 M | 1.8 | 2 |
+| Animal | first cost | cost × | meat/s each | product/s each |
+| --- | --- | --- | --- | --- |
+| Chicken | 10 K | 1.5 | 0.2 | 0.02 eggs |
+| Deer | 50 K | 1.6 | 0.5 | 0.025 hide |
+| Pig | 200 K | 1.7 | 1 | 0.05 hide |
+| Cow | 1 M | 1.8 | 2 | 0.15 milk |
+
+| Upgrade | per level | levels | base cost | cost × |
+| --- | --- | --- | --- | --- |
+| Feed Trough | +5 % meat | 10 | 20 K food | 1.8 |
+| Hen House | +10 % eggs | 10 | 4 K wood + 40 eggs | 1.7 |
+| Dairy | +10 % milk | 10 | 4 K stone + 30 milk | 1.7 |
+| Tannery | +10 % hide | 10 | 3 K coal + 20 hide | 1.7 |
+| Pen Expansion | +2 % all farm output, +4 animals per kind | 8 | 50 K food + 10 K wood + 10 K stone | 2 |
+
+A product sells for 3 / 4 / 6 gold (eggs / milk / hide), which is 25–40 % of the meat value of the animal that makes it.
 
 Payback (food valued at its sell price 0.75, meat at 1) is ≈ 10 h for the first chicken and grows with each extra animal (generated §4).
 
 ## 6. Merchant, clicks, chests, buildings
 
 ```
-sell:  gold = floor(amount × price)        wood .5, stone .5, coal 1, food .75, meat 1
-buy:   gold = ceil(amount × price × 2)
+sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .5, stone .5, coal 1, food .75, meat 1, eggs 3, milk 4, hide 6
+buy:   gold = ceil(amount × price × 2)                         wood, stone, coal, food, meat only
+item:  sell = floor(sellValue × qty × Haggler)   common 8, uncommon 90, rare 250, epic 700, legendary 2000, potion 20
+       shop price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
+bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s, ≤ 5 waiting
@@ -154,10 +171,11 @@ tier         = min(5, 1 + floor(age / 1800 s))                                  
 rewards      : rewardSec = 90 × 1.5^(t−1)
                gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
-drops        : Rattatui piece 8 % + 1 % per tier above 1; potion 25 % + 3 % per tier   (tier 1: 90 s of income, tier 5: ~456 s)
+drops        : rat: plain gear 8 % + 1 % per tier above 1; potion 25 % + 3 % per tier   (tier 1: 90 s of income, tier 5: ~456 s)
+               Rat King: 1 Rattatui piece (missing ones first) + 40 % a second one + 2 potions
 spawn        : first rat 120 s after 5 owned tiles, then 900 s; max 8; Rat King check every 600 s of age after tier 5 (7200 s), 35 %
-Rat King     : 1000 HP, attack 5 every 3.5 s, 60 s limit (a starter-kit player takes ~85 damage in that minute)
-king invariant: (8 + 5/s × 60 s) clicks × 3 damage = 924 < 1000
+Rat King     : 450 HP, attack 4 every 3.5 s, 75 s limit (a player who never clicks takes ~82 damage in that time and times out)
+king bounds  : starter sword: (8 + 5/s × 75 s) = 383 clicks × 2 = 766 >= 1.25 × 450, best loadout (3/click): 150 clicks = 28 s at the 5/s cap, never under 20 s
 ```
 
 | Rattatui piece | Slot | Rarity | Armor | Max HP | Damage |

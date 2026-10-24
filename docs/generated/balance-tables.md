@@ -248,6 +248,25 @@ Every purchase adds one animal (production = `baseProduction × count`). Cost (f
 | 19 | 39.35B | 88.53B | 38.00 | 170774.3d |
 | 20 | 70.82B | 159.35B | 40.00 | 307393.8d |
 
+### Farm products and upgrades
+
+The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal also yields a product; once sold it is worth about a third of its meat.
+
+| Animal | product | per second each | sells for | gold/s each (sold) | meat gold/s each | share of meat |
+| --- | --- | --- | --- | --- | --- | --- |
+| Chicken | eggs | 0.02 | 3 | 0.060 | 0.20 | 30% |
+| Deer | hide | 0.025 | 6 | 0.150 | 0.50 | 30% |
+| Pig | hide | 0.05 | 6 | 0.300 | 1.00 | 30% |
+| Cow | milk | 0.15 | 4 | 0.600 | 2.00 | 30% |
+
+| Upgrade | effect per level | max level | cost of level 1 | cost of the last level |
+| --- | --- | --- | --- | --- |
+| Feed Trough | +5% meat | 10 | 20.00K food | 3.97M food |
+| Hen House | +10% eggs | 10 | 4000 wood + 40.00 eggs | 474.35K wood + 4744 eggs |
+| Dairy | +10% milk | 10 | 4000 stone + 30.00 milk | 474.35K stone + 3558 milk |
+| Tannery | +10% hide | 10 | 3000 coal + 20.00 hide | 355.76K coal + 2372 hide |
+| Pen Expansion | +2% farm output, +4 animals per kind | 8 | 50.00K food + 10.00K wood + 10.00K stone | 6.40M food + 1.28M wood + 1.28M stone |
+
 ## 5. Biomes and buildings
 
 Per-second output of one tile before adjacency and modifiers (already multiplied by BIOME_YIELD.scale = 1.3; the castle is not scaled).
@@ -300,12 +319,15 @@ Derived stats for the starting stats (all 5):
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 0.200 | 45.0% | 0.290 |
-| wood | 0 | 0.05 | 0.050 | 45.0% | 0.072 |
+| gold | 0.1 | 0.1 | 1.630 | 45.0% | 2.364 |
+| wood | 0 | 0.05 | 0.440 | 45.0% | 0.638 |
 | stone | 0 | 0.1 | 0.100 | 32.5% | 0.133 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 0.050 | 45.0% | 0.072 |
-| meat | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| food | 0 | 0.05 | 3.950 | 45.0% | 5.728 |
+| meat | 0 | 0 | 0.000 | 55.0% | 0.000 |
+| eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| hide | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | xp | 0.25 | 0.5 | 0.750 | 22.2% | 0.917 |
 
 ## 8. Click power and merchant
@@ -324,6 +346,27 @@ Derived stats for the starting stats (all 5):
 | coal | 1 | 2 |
 | food | 0.75 | 1.5 |
 | meat | 1 | 2 |
+| eggs | 3 | not for sale |
+| milk | 4 | not for sale |
+| hide | 6 | not for sale |
+
+### Merchant bonuses and gear shop
+
+| Bonus | effect per level | max level | price of level 1 | price of the last level |
+| --- | --- | --- | --- | --- |
+| Haggler | +3% gold from everything you sell | 10 | 100.00K | 32.27M |
+| Bulk Discount | -1% tile and building cost | 8 | 250.00K | 45.03M |
+| Lucky Charm | +2 Luck for chests and kills | 10 | 150.00K | 48.40M |
+| Pack Rat | +4 bag slots | 4 | 500.00K | 13.50M |
+
+| Item | rarity | sells for | shop price | shop / sell |
+| --- | --- | --- | --- | --- |
+| Minor Healing Potion | common | 20 | 80.00 | 4.0x |
+| Leather Cap | common | 8 | 400 | 50.0x |
+| Leather Gloves | common | 8 | 400 | 50.0x |
+| Leather Boots | common | 8 | 450 | 56.3x |
+| Leather Vest | common | 8 | 800 | 100.0x |
+| Iron Sword | uncommon | 90 | 6000 | 66.7x |
 
 ## 9. Rebirth and Legacy
 

@@ -371,6 +371,37 @@ def reeds():
     return _sprite(['.t...t..t.', '.t...t..t.', '.s.t.s..s.', '.s.s.s.ss.', 'ss.s.ss.s.', 'ssssssssss'], dict(t='#8a5a30', s='#7a9a3a'), '#445a1e')
 
 
+def _bare(rows, colors):
+    """A tiny sprite without the 1px outline (flowers read better as bare dots)."""
+    img = Image.new('RGBA', (len(rows[0]), len(rows)), (0, 0, 0, 0))
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch in colors:
+                img.putpixel((x, y), C(colors[ch]))
+    return img
+
+
+def tiny_flower(kind=0):
+    petal = ['#f6f2e8', '#f4d84a', '#ee86a6', '#a98ae8'][kind]
+    heart = ['#f0b030', '#e8802a', '#fff0a0', '#f4ecb0'][kind]
+    return _bare(['.p.', 'php', '.p.', '.g.'], dict(p=petal, h=heart, g='#3f8a30'))
+
+
+def tuft():
+    return _bare(['h.h', 'ghg', 'ggg'], dict(h='#86cc5c', g='#3f8a30'))
+
+
+def fallen_log(kind=0):
+    """A dead tree lying on its side: grey-brown trunk, a broken limb or two, a pale cut end, a patch of moss."""
+    colors = dict(b='#7a6a54', h='#9c8a70', d='#52463a', r='#bca67e', m='#5f7d36')
+    rows = [
+        ['....h.........', '....b.....h...', 'rrhbbhbbbbbbbb', 'rlrbbbbbmmbbbd', '.rrdddddddddd.'],
+        ['..h.......h......h..', '..b......hb.....hb..', '..bb....hbb....bb...', 'rrhbbbhbbbbbbbbbbbbd', 'rlrbbbbbbmmbbbbdbbd.', '.rrddddddddddddddd..'],
+    ][kind]
+    colors['l'] = '#8a7658'
+    return _sprite(rows, colors, '#2e2418')
+
+
 def stump():
     return _sprite(['.rrrr.', 'rrllrr', 'rrrrrr', '.bbbb.', '.bbbb.'], dict(r='#a07a4a', l='#c49a62', b='#7a5636'), '#3c2a16')
 
@@ -554,4 +585,15 @@ PROPS = {
     'mist': dict(edge=[0.45, 0.4, 0.15], deep=[0.45, 0.4, 0.15],
                  opts=[('sea_rock', (sea_rock, 0), 4, 0), ('sea_rock2', (sea_rock, 1), 3, 0), ('islet', (islet, 0), 1, 0), ('floe', (ice_floe, 0), 2, 0),
                        ('floe2', (ice_floe, 1), 2, 0)]),
+}
+
+
+# Tiny decorations laid down by a second hash pass (terrain_logic.tile_decor / terrain.ts decorSprites), so the props above never move.
+# Same shape as PROPS; counts may go to 4.
+DECOR = {
+    'plains': dict(edge=[0.2, 0.3, 0.28, 0.14, 0.08], deep=[0.2, 0.3, 0.28, 0.14, 0.08],
+                   opts=[('fl_w', (tiny_flower, 0), 3, 0), ('fl_y', (tiny_flower, 1), 3, 0), ('fl_p', (tiny_flower, 2), 2, 0),
+                         ('fl_v', (tiny_flower, 3), 2, 0), ('tuft', (tuft,), 2, 0)]),
+    'swamp': dict(edge=[0.8, 0.2], deep=[0.58, 0.42],
+                  opts=[('fallen', (fallen_log, 0), 3, 0), ('fallen2', (fallen_log, 1), 2, 0)]),
 }

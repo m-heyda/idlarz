@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
 	ATLAS,
+	CELL,
+	decorSprites,
 	MAX_DEPTH,
 	RANK,
 	allPads,
@@ -120,9 +122,47 @@ test('sprites: deterministic, never on grounds without props, and every sprite i
 test('props stay in bounds: density is sparse, trees and rocks are never drawn on neighbouring grounds', () => {
 	const rows = Array(20).fill('P'.repeat(20));
 	const g = buildGroundGrid(grid(rows));
-	const sprites = allSprites(g);
-	assert.ok(sprites.length > 20 && sprites.length < 20 * 20 * 2.5, `placed ${sprites.length} sprites on 400 plains tiles`);
+	let props = 0;
+	for (let y = 0; y < 20; y++) for (let x = 0; x < 20; x++) props += tileSprites(g, x, y).length;
+	assert.ok(props > 20 && props < 20 * 20 * 2.5, `placed ${props} props on 400 plains tiles`);
 });
+
+test('decor: tiny flowers on plains, fallen trees on swamps, nothing elsewhere, never under props or on buildings', () => {
+	const plains = buildGroundGrid(grid(Array(20).fill('P'.repeat(20))));
+	let flowers = 0;
+	for (let y = 0; y < 20; y++)
+		for (let x = 0; x < 20; x++) {
+			const props = tileSprites(plains, x, y);
+			const decor = decorSprites(plains, x, y, props);
+			flowers += decor.length;
+			assert.deepEqual(decor, decorSprites(plains, x, y, props), 'deterministic');
+			for (const d of decor) {
+				const [, , dw, dh] = ATLAS.sprites[d.id];
+				for (const p of props) {
+					const [, , pw, ph] = ATLAS.sprites[p.id];
+					const apart = d.x + dw + 2 <= p.x || p.x + pw + 2 <= d.x || d.bottom <= p.bottom - ph - 2 || p.bottom <= d.bottom - dh - 2;
+					assert.ok(apart, `decor ${d.id} overlaps prop ${p.id} at ${x},${y}`);
+				}
+				assert.ok(d.x >= x * CELL && d.x + dw <= (x + 1) * CELL && d.bottom - dh >= y * CELL && d.bottom <= (y + 1) * CELL, 'inside its tile');
+			}
+		}
+	assert.ok(flowers > 200 && flowers < 400 * 2, `placed ${flowers} decor sprites on 400 plains tiles`);
+
+	const swamp = buildGroundGrid(grid(Array(12).fill('S'.repeat(12))));
+	let logs = 0;
+	for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) logs += decorSprites(swamp, x, y, tileSprites(swamp, x, y)).length;
+	assert.ok(logs > 10 && logs < 12 * 12 * 0.8, `placed ${logs} fallen trees on 144 swamp tiles`);
+
+	for (const ground of ['L', 'H', 'F', 'T', 'B']) {
+		const g = buildGroundGrid(grid(Array(6).fill(ground.repeat(6))));
+		for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) assert.deepEqual(decorSprites(g, x, y, []), [], `no decor on ${ground}`);
+	}
+
+	const tiles = grid(['PPP', 'PYP', 'PPP']);
+	const withBuilding = allSprites(buildGroundGrid(tiles), undefined, builtSet(tiles));
+	assert.equal(withBuilding.filter((s) => s.x >= CELL && s.x < 2 * CELL && s.bottom > CELL && s.bottom <= 2 * CELL).length, 0);
+});
+
 
 test('the terrain key ignores chest toggles and changes when ground changes', () => {
 	const a = grid(['FF', 'FP']);

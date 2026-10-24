@@ -46,7 +46,7 @@ test('rat stats: T1 100 HP, T5 506 HP, attack grows per tier', () => {
 	assert.equal(monsterStats('rat', 1).maxHp, 100);
 	assert.equal(monsterStats('rat', 5).maxHp, 506);
 	assert.ok(monsterStats('rat', 5).attack > monsterStats('rat', 1).attack);
-	assert.equal(monsterStats('ratKing', 3).maxHp, 1000);
+	assert.equal(monsterStats('ratKing', 3).maxHp, MONSTERS.ratKing.hp);
 	assert.equal(monsterStats('ratKing', 3).attackIntervalSec, MONSTERS.ratKing.attackIntervalSec);
 });
 
@@ -56,8 +56,8 @@ test('newFight starts active at full HP; only the king has a timer', () => {
 	assert.equal(r.monsterHp, 506);
 	assert.equal(r.monsterMaxHp, 506);
 	assert.equal(r.timeLeftSec, null);
-	assert.equal(king().timeLeftSec, 60);
-	assert.equal(king().monsterHp, 1000);
+	assert.equal(king().timeLeftSec, MONSTERS.ratKing.timeLimitSec);
+	assert.equal(king().monsterHp, MONSTERS.ratKing.hp);
 });
 
 test('applyHit lowers HP, reports the kill, and ignores finished fights', () => {
@@ -120,11 +120,11 @@ test('a knockout by the Rat King taunts too; a rat stays silent', () => {
 	assert.equal(r.fight.taunt, null);
 });
 
-test('king times out after 60 s of steps and sets a taunt from the config', () => {
+test('king times out after the time limit of steps and sets a taunt from the config', () => {
 	let fight = king();
 	let hp = 1000; // never knocked out in this test
 	let last = stepFight(fight, 1, hp, 2, noRng);
-	for (let i = 1; i < 61 && last.fight.phase === 'active'; i++) {
+	for (let i = 1; i <= MONSTERS.ratKing.timeLimitSec + 1 && last.fight.phase === 'active'; i++) {
 		fight = last.fight;
 		hp = last.playerHp;
 		last = stepFight(fight, 1, hp, 2, noRng);
@@ -134,11 +134,11 @@ test('king times out after 60 s of steps and sets a taunt from the config', () =
 	assert.deepEqual(last.events.at(-1), { kind: 'timeout' });
 });
 
-test('king: starter-kit damage over the 60 s limit stays below max HP', () => {
+test('king: starter-kit damage over the whole time limit stays below max HP', () => {
 	let fight = king();
 	let hp = maxHp(freshStats(), STARTER_EQUIPMENT);
 	const start = hp;
-	for (let i = 0; i < 70 && fight.phase === 'active'; i++) {
+	for (let i = 0; i < MONSTERS.ratKing.timeLimitSec + 10 && fight.phase === 'active'; i++) {
 		const r = stepFight(fight, 1, hp, armorOf(STARTER_EQUIPMENT), noRng);
 		fight = r.fight;
 		hp = r.playerHp;

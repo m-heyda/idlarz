@@ -120,45 +120,93 @@ export const RESOURCE_ICONS = {
 	food: '🌾',
 	meat: '🥩',
 	xp: '✨',
+	eggs: '🥚',
+	milk: '🥛',
+	hide: '🟫',
+	gems: '💎',
 };
 
+// What the header tooltips say about each currency: what it is, what it is for and where it comes from.
 export const HEADER_DISPLAYED_RESOURCES_INFO = {
 	gold: {
 		icon: RESOURCE_ICONS.gold,
 		label: 'Gold',
-		description: 'Used to purchase new tiles',
+		description: 'The coin of the realm.',
+		usedFor: 'Buying map tiles, buildings, castle upgrades, click power and everything at the merchant.',
+		source: 'The castle and most land, every click on the map, and selling goods to the merchant.',
 	},
 	wood: {
 		icon: RESOURCE_ICONS.wood,
 		label: 'Wood',
-		description: 'Basic construction material',
+		description: 'Basic construction material.',
+		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Hen House and Pen Expansion.',
+		source: 'Forest and swamp tiles. Sells to the merchant.',
 	},
 	stone: {
 		icon: RESOURCE_ICONS.stone,
 		label: 'Stone',
-		description: 'Durable building material',
+		description: 'Durable building material.',
+		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Dairy and Pen Expansion.',
+		source: 'Hills tiles. Sells to the merchant.',
 	},
 	coal: {
 		icon: RESOURCE_ICONS.coal,
 		label: 'Coal',
-		description: 'Advanced fuel source',
+		description: 'Fuel for heavy industry.',
+		usedFor: 'Part of the price of tiles (from the 30th), castle upgrades from level 3 and the Tannery.',
+		source: 'Tundra and hills tiles. Sells to the merchant.',
 	},
 	food: {
 		icon: RESOURCE_ICONS.food,
 		label: 'Food',
-		description: 'Sustains population growth',
+		description: 'Sustains your people and your animals.',
+		usedFor: 'Buying farm animals, Feed Trough, Pen Expansion, tiles (from the 40th) and castle upgrades from level 4.',
+		source: 'Plains, lake and coast tiles. Sells to the merchant.',
 	},
 	meat: {
 		icon: RESOURCE_ICONS.meat,
 		label: 'Meat',
-		description: 'Produced by farm animals',
+		description: 'Produced by farm animals.',
+		usedFor: 'Castle upgrades from level 4; sell the rest to the merchant.',
+		source: 'Every animal on the farm (boosted by Feed Trough and the plains bonus).',
+	},
+	eggs: {
+		icon: RESOURCE_ICONS.eggs,
+		label: 'Eggs',
+		description: 'A farm product laid by chickens.',
+		usedFor: 'Hen House upgrades; sell the rest to the merchant.',
+		source: 'Chickens on the farm. Cannot be bought.',
+	},
+	milk: {
+		icon: RESOURCE_ICONS.milk,
+		label: 'Milk',
+		description: 'A farm product from cows.',
+		usedFor: 'Dairy upgrades; sell the rest to the merchant.',
+		source: 'Cows on the farm. Cannot be bought.',
+	},
+	hide: {
+		icon: RESOURCE_ICONS.hide,
+		label: 'Hide',
+		description: 'A farm product from deer and pigs.',
+		usedFor: 'Tannery upgrades; sell the rest to the merchant.',
+		source: 'Deer and pigs on the farm. Cannot be bought.',
 	},
 	xp: {
 		icon: RESOURCE_ICONS.xp,
 		label: 'XP',
-		description: 'Get bigger boi!',
+		description: 'Experience: fills the level bar next to your name.',
+		usedFor: 'Every level gives stat points to spend on the Stats tab.',
+		source: 'The castle, buying tiles and your stats.',
 	},
 } as const;
+
+// The rebirth currency (not a resource: it lives in the prestige state)
+export const GEMS_INFO = {
+	label: 'Gems',
+	description: 'The rebirth currency.',
+	usedFor: 'Permanent upgrades in the Legacy window; they survive every rebirth.',
+	source: 'Rebirthing from castle level 6: the higher your castle and income, the more you get.',
+};
 
 // The castle's own per-second output (single source of truth: BIOMES.castle reads from it).
 export const CASTLE_BASE_RATES = {
@@ -168,6 +216,9 @@ export const CASTLE_BASE_RATES = {
 	coal: 0,
 	food: 0.05,
 	meat: 0,
+	eggs: 0,
+	milk: 0,
+	hide: 0,
 	xp: 0.5,
 };
 
@@ -309,6 +360,9 @@ export const INITIAL_RESOURCES = {
 	coal: 0,
 	food: 0,
 	meat: 0,
+	eggs: 0,
+	milk: 0,
+	hide: 0,
 	xp: 0,
 };
 
@@ -320,6 +374,9 @@ export const BASE_GENERATION_RATES = {
 	coal: 0,
 	food: 0,
 	meat: 0, // Meat can only be generated through the farm
+	eggs: 0, // so are eggs, milk and hide
+	milk: 0,
+	hide: 0,
 	xp: 0.25, // Base XP generation rate increased
 };
 
@@ -362,7 +419,67 @@ export const MERCHANT_RESOURCE_PRICES = {
 	coal: 1,
 	food: 0.75,
 	meat: 1,
+	// farm products sell for more than the meat they come with
+	eggs: 3,
+	milk: 4,
+	hide: 6,
 };
+
+// Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
+// starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
+export const MERCHANT_UPGRADES = {
+	haggler: {
+		label: 'Haggler',
+		description: (n: number) => `+${Math.round(n * 3)}% gold from everything you sell`,
+		maxLevel: 10,
+		effectPerLevel: 0.03, // gold from selling resources and items
+		baseCost: 100000,
+		costGrowth: 1.9,
+	},
+	bulk: {
+		label: 'Bulk Discount',
+		description: (n: number) => `-${n}% tile and building cost`,
+		maxLevel: 8,
+		effectPerLevel: 1, // percentage points, added to Charisma and Thrift (REBIRTH.discountCapPercent still caps the sum)
+		baseCost: 250000,
+		costGrowth: 2.1,
+	},
+	charm: {
+		label: 'Lucky Charm',
+		description: (n: number) => `+${n * 2} Luck for chests and kills`,
+		maxLevel: 10,
+		effectPerLevel: 2, // Luck
+		baseCost: 150000,
+		costGrowth: 1.9,
+	},
+	packrat: {
+		label: 'Pack Rat',
+		description: (n: number) => `+${n * 4} bag slots`,
+		maxLevel: 4,
+		effectPerLevel: 4, // bag slots
+		baseCost: 500000,
+		costGrowth: 3,
+	},
+} as const;
+
+export type MerchantUpgradeId = keyof typeof MERCHANT_UPGRADES;
+
+// Plain gear and potions the merchant sells (gold). Every price is at least 3x the item's sell value (x1.3 for a maxed Haggler),
+// so buying and selling can never print gold: tests/economy.test.ts checks it for every entry.
+export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = [
+	{ id: 'potion_minor', price: 80 },
+	{ id: 'leather_cap', price: 400 },
+	{ id: 'leather_gloves', price: 400 },
+	{ id: 'leather_boots', price: 450 },
+	{ id: 'leather_vest', price: 800 },
+	{ id: 'iron_sword', price: 6000 },
+];
+
+// Farm products: shown on the farm and at the merchant, not in the header row
+export const FARM_PRODUCT_KEYS = ['eggs', 'milk', 'hide'] as const;
+
+// Only these can be bought back (as resource packs); farm products are earned on the farm, never bought
+export const MERCHANT_BUYABLE = ['wood', 'stone', 'coal', 'food', 'meat'] as const;
 
 // Buying resources from the merchant costs this many times the sell price
 export const MERCHANT_BUY_MULTIPLIER = 2;
@@ -376,6 +493,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 10000, // Starting at 10k food as requested
 		costScaling: 1.5, // Each purchase costs 1.5x more than the previous one
 		baseProduction: 0.2, // meat per second per animal; each purchase adds one more animal
+		product: { resource: 'eggs', perSec: 0.02 },
 	},
 	{
 		id: 'deer',
@@ -384,6 +502,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 50000,
 		costScaling: 1.6,
 		baseProduction: 0.5,
+		product: { resource: 'hide', perSec: 0.025 },
 	},
 	{
 		id: 'pig',
@@ -392,6 +511,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 200000,
 		costScaling: 1.7,
 		baseProduction: 1,
+		product: { resource: 'hide', perSec: 0.05 },
 	},
 	{
 		id: 'cow',
@@ -400,8 +520,63 @@ export const ANIMALS: Animal[] = [
 		baseCost: 1000000,
 		costScaling: 1.8,
 		baseProduction: 2,
+		product: { resource: 'milk', perSec: 0.15 },
 	},
 ];
+
+// The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
+// once sold). Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
+export const FARM = {
+	baseCap: 12, // animals of one kind the pen holds before it is expanded
+	unitsDrawn: 6, // most sprites drawn per kind in the pen (the count badge carries on)
+};
+
+// Pen Expansion: per level, every animal kind may hold `capPerLevel` more animals and all farm output grows
+export const FARM_PEN = { outputPerLevel: 0.02, capPerLevel: 4 };
+
+export const FARM_UPGRADES = {
+	feed: {
+		label: 'Feed Trough',
+		description: (n: number) => `+${Math.round(n * 5)}% meat`,
+		maxLevel: 10,
+		effectPerLevel: 0.05, // meat
+		cost: { food: 20000 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.8,
+	},
+	coop: {
+		label: 'Hen House',
+		description: (n: number) => `+${Math.round(n * 10)}% eggs`,
+		maxLevel: 10,
+		effectPerLevel: 0.1, // eggs
+		cost: { wood: 4000, eggs: 40 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.7,
+	},
+	dairy: {
+		label: 'Dairy',
+		description: (n: number) => `+${Math.round(n * 10)}% milk`,
+		maxLevel: 10,
+		effectPerLevel: 0.1, // milk
+		cost: { stone: 4000, milk: 30 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.7,
+	},
+	tannery: {
+		label: 'Tannery',
+		description: (n: number) => `+${Math.round(n * 10)}% hide`,
+		maxLevel: 10,
+		effectPerLevel: 0.1, // hide
+		cost: { coal: 3000, hide: 20 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.7,
+	},
+	pen: {
+		label: 'Pen Expansion',
+		description: (n: number) => `+${Math.round(n * FARM_PEN.outputPerLevel * 100)}% farm output, +${n * FARM_PEN.capPerLevel} animals per kind`,
+		maxLevel: 8,
+		effectPerLevel: FARM_PEN.outputPerLevel,
+		cost: { food: 50000, wood: 10000, stone: 10000 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 2,
+	},
+} as const;
+export type FarmUpgradeId = keyof typeof FARM_UPGRADES;
 
 // Resource display information
 export const MERCHANT_RESOURCE_INFO = {
@@ -429,6 +604,21 @@ export const MERCHANT_RESOURCE_INFO = {
 		label: 'Meat',
 		description: 'A source of protein for a healthy diet.',
 		priceDescription: 'High demand for a nutritious meal.',
+	},
+	eggs: {
+		label: 'Eggs',
+		description: 'Fresh from the coop.',
+		priceDescription: 'Bakers pay well for fresh eggs.',
+	},
+	milk: {
+		label: 'Milk',
+		description: 'Creamy and cold from the dairy.',
+		priceDescription: 'A town favourite at breakfast.',
+	},
+	hide: {
+		label: 'Hide',
+		description: 'Tanned leather from the farm.',
+		priceDescription: 'Craftsmen always need good leather.',
 	},
 };
 
@@ -543,9 +733,9 @@ export const TILE_TAP = {
 // it leaves (lifetimeMs) for a gift worth `seconds` of that resource's income (at least `min`).
 export const FARM_BONUS = {
 	lifetimeMs: 10000,
-	firstDelayMs: 15000,
-	minGapMs: 20000,
-	maxGapMs: 40000,
+	firstDelayMs: 45000, // rare on purpose: a visit is a treat, not a chore
+	minGapMs: 60000,
+	maxGapMs: 120000,
 	maxActive: 1,
 	goldenChance: 0.12,
 	goldenMultiplier: 2,
@@ -638,7 +828,7 @@ export const CHARACTER_STAT_CONFIG = {
 	plainsMeatModifier: 0.05,
 };
 
-// Rebirth: restart with a permanent Legacy bonus. Available once the castle reaches `minCastleLevel`.
+// Rebirth: restart with a permanent bonus paid in Gems (the Legacy points). Available once the castle reaches `minCastleLevel`.
 export const REBIRTH = {
 	minCastleLevel: 6,
 	minTiles: 20, // a rebirth also needs this much territory (no cheap rebirth with a tiny map)
@@ -650,7 +840,7 @@ export const REBIRTH = {
 		Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * Math.sqrt(Math.max(0, tiles) / 10)),
 };
 
-// The Legacy shop: permanent upgrades bought with unspent Legacy points. The N+1-th level costs
+// The Legacy shop: permanent upgrades bought with unspent Gems. The N+1-th level costs
 // ceil(baseCost x costGrowth^N) points.
 export const LEGACY_UPGRADES = {
 	thrift: {
@@ -689,9 +879,10 @@ export type LegacyUpgradeId = keyof typeof LEGACY_UPGRADES;
 // Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
 // Purely decorative, except the rare golden one, which can be clicked for a small gift (see claimCritterGift).
 export const AMBIENT_LIFE = {
-	spawnMinMs: 4000,
-	spawnMaxMs: 9000,
-	maxAlive: 5,
+	firstSpawnMs: 6000, // the first critter shows up this long after the map opens
+	spawnMinMs: 14000,
+	spawnMaxMs: 30000,
+	maxAlive: 3,
 	lifeMinMs: 6000,
 	lifeMaxMs: 10000,
 	roamTiles: 1.5, // how far a critter strays from where it appears

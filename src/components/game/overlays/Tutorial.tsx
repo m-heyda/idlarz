@@ -63,7 +63,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Game Basics</h3>
 				<p className='text-[#d8c8a0]'>
 					Grow your realm: buy tiles next to your territory, upgrade the castle, farm animals, trade with the
-					merchant and spend stat points. Everything produces resources every second, even while you are
+					merchant and spend stat points. The journal button in the top bar opens the Menu: Character, Stats, Merchant and Farm are its tabs. Everything produces resources every second, even while you are
 					away from the keyboard (the tab must stay open). Progress is saved automatically in this browser.
 				</p>
 			</section>
@@ -164,7 +164,7 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0]'>
 					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles you can
 					Rebirth from the Legacy window: the map, resources, castle, farm and level start again, and you keep your name,
-					hero and Legacy. Every Legacy point is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
+					hero and Gems. Every Gem is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
 					the shop ({Object.values(LEGACY_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
 					at the moment of rebirth give more points, so pushing on to level {CASTLE_UPGRADE.maxLevel} first pays.
 				</p>
@@ -173,8 +173,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Farm</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Buy animals with <Res r='food'>food</Res>. Each purchase adds one more animal, which produces meat
-					every second; the next one of the same kind costs more.
+					Buy animals with <Res r='food'>food</Res>: hover an animal for its card (Buy, x10 or Max). Each animal
+					produces meat every second plus a farm product (<Res r='eggs'>eggs</Res>, <Res r='milk'>milk</Res> or{' '}
+					<Res r='hide'>hide</Res>) you can sell or spend on the upgrades along the bottom; the next one of the same
+					kind costs more, and the pen holds a limited number of each kind.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
 					{ANIMALS.map((a) => (
@@ -190,7 +192,7 @@ const Tutorial: React.FC = () => {
 					))}
 				</div>
 				<p className='text-[#a89878] text-xs mt-2'>
-					While the Farm window is open, a critter wanders by now and then: click it for a gift worth about{' '}
+					While the Farm tab of the Menu is open, a critter wanders by now and then: click it for a gift worth about{' '}
 					{FARM_BONUS.critters.butterfly.seconds} seconds of that resource&apos;s income.
 				</p>
 			</section>
@@ -198,8 +200,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Merchant</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Sell resources for gold; buying costs {MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and
-					forth never gains anything.
+					Sell resources, farm products and spare gear from your bag for gold; buying resources costs{' '}
+					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. Buy Goods has
+					click power, permanent bonuses (Haggler, Bulk Discount, Lucky Charm, Pack Rat) and plain gear and potions.
+					Rattatui gear is not for sale: the Rat King drops it.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-5 gap-2'>
 					{Object.entries(MERCHANT_RESOURCE_PRICES).map(([r, price]) => (

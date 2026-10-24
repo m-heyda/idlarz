@@ -33,8 +33,9 @@ export const TileStatus = memo(
 		const resources = useGameStore((state) => state.resources);
 		const characterStats = useGameStore((state) => state.characterStats);
 		const prestige = useGameStore((state) => state.prestige);
+		const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 		const freeTiles = useGameStore((state) => state.freeTiles);
-		const discount = effectiveTileDiscount(characterStats, prestige);
+		const discount = effectiveTileDiscount(characterStats, prestige, merchantUpgrades);
 
 		const { cost, tilesUntilManualSelection, canManuallySelect } = useMemo(() => {
 			const ownedTilesCount = economyTiles(tiles, freeTiles);

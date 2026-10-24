@@ -6,7 +6,7 @@ export const COMBAT = {
 	knockoutHpFraction: 0.3, // HP restored (as a share of max) after a knockout
 	armorK: 40, // mitigation = armor / (armor + armorK)
 	fightStepClampSec: 1, // a fight step never advances more than this (throttled tabs freeze fights instead of fast-forwarding them)
-	maxWeaponDamage: 3, // MVP cap: keeps the Rat King unkillable (see tests/kingInvariant.test.ts)
+	maxWeaponDamage: 3, // no single item deals more, so the Rat King always takes a real fight (see tests/kingInvariant.test.ts)
 	bagSize: 36,
 	maxMonsters: 8,
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
@@ -18,10 +18,15 @@ export const COMBAT = {
 	tierIntervalSec: 1800, // a rat gains a tier every 30 min on the map
 	maxTier: 5,
 	drops: {
-		setPieceBase: 0.08,
-		setPieceTierBonus: 0.01,
+		basicGearBase: 0.08, // a rat can drop one piece of plain gear (never a Rattatui piece)
+		basicGearTierBonus: 0.01,
 		potionBase: 0.25,
 		potionTierBonus: 0.03,
+		king: {
+			setPieces: 1, // the Rat King always drops this many Rattatui pieces, preferring ones you do not own yet
+			extraPieceChance: 0.4, // and one more piece with this chance
+			potions: 2,
+		},
 	},
 	rewards: { minGold: 10, minXp: 5 },
 };
@@ -39,11 +44,11 @@ export const MONSTERS = {
 	},
 	ratKing: {
 		label: 'Rat King',
-		hp: 1000,
-		attack: 5,
+		hp: 450, // beatable with the starter sword (2 per click) in about 45 s of steady clicking at the 5 clicks/s limiter cap
+		attack: 4,
 		attackIntervalSec: 3.5, // tuned so the timer, not the player's HP, is the normal way to lose
 		rewardSec: 3600,
-		timeLimitSec: 60,
+		timeLimitSec: 75,
 		evolveChance: 0.35, // rolled every evolveCheckSec once a rat has reached the last tier
 		evolveCheckSec: 600,
 		taunts: [

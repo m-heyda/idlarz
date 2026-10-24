@@ -25,7 +25,7 @@ Rule for every B item: change one parameter group, run `npm run sim -- --seeds=3
 
 Order matters because each step needs the previous one.
 
-1. ~~**C1 Equipment and inventory**~~ **done** (combat, monsters, items, bag, Character window; rebirth keeps gear). Next steps and the longer roadmap (stat rework, monster families, skills, item upgrades and selling) are in [superpowers/specs/2026-10-24-combat-and-inventory-design.md](superpowers/specs/2026-10-24-combat-and-inventory-design.md) §13.
+1. ~~**C1 Equipment and inventory**~~ **done** (combat, monsters, items, bag, Character window; rebirth keeps gear). Next steps and the longer roadmap (stat rework, monster families, skills, item upgrades; selling is done) are in [superpowers/specs/2026-10-24-combat-and-inventory-design.md](superpowers/specs/2026-10-24-combat-and-inventory-design.md) §13.
 2. **C2 Upgrade items** (U2, M): gold/resource sink; ties to the merchant.
 3. **C3 Quests** (U3, L): early guidance, item rewards, tracking in the store.
 4. **C4 Building levels / demolish** (U13, M): another resource sink (BL5).

@@ -44,6 +44,16 @@ def collect():
                 images[ids[key]] = props.cached(*build)
             opts.append([ids[key], weight, min_depth])
         table[ground] = {'edge': _thousandths(spec['edge']), 'deep': _thousandths(spec['deep']), 'opts': opts}
+    decor = {}
+    for ground, spec in props.DECOR.items():                       # after the props, so their ids never shift
+        opts = []
+        for name, build, weight, min_depth in spec['opts']:
+            key = (build[0], tuple(id(v) if isinstance(v, dict) else v for v in build[1:]))
+            if key not in ids:
+                ids[key] = f'p{len(ids)}'
+                images[ids[key]] = props.cached(*build)
+            opts.append([ids[key], weight, min_depth])
+        decor[ground] = {'edge': _thousandths(spec['edge']), 'deep': _thousandths(spec['deep']), 'opts': opts}
     for d in 'nesw':
         for length in (22, 26, 30):
             for barrel in (0, 1):
@@ -52,7 +62,32 @@ def collect():
         images[pid] = make()
     images['boat_h'] = props.cached(props.boat, False)
     images['boat_v'] = props.cached(props.boat, True)
-    return images, table
+    return images, table, decor
+
+
+def water_spots():
+    """Where a ripple fits inside the swamp pools: per 48px block of the (4x4 block) deep-swamp texture, up to 6 local
+    centres whose 13x5 box is all water and sits in the middle of the tile (the part its own dual-cell blobs always cover)."""
+    p = art.PAL['swamp_d1']
+    img = art.tex_swamp(1)
+    px = img.load()
+    tex = art.TEX
+    water = {tuple(art.C(p[k])) for k in ('water', 'water2', 'water_lt')}
+    wet = [[tuple(px[x, y]) in water for x in range(tex)] for y in range(tex)]
+    blocks = []
+    for by in range(tex // CELL):
+        for bx in range(tex // CELL):
+            cand = [(lx, ly) for ly in range(14, CELL - 14) for lx in range(12, CELL - 12)
+                    if all(wet[(by * CELL + ly + dy) % tex][(bx * CELL + lx + dx) % tex] for dx in range(-6, 7) for dy in range(-2, 3))]
+            cand.sort(key=lambda c: hash32(bx * CELL + c[0], by * CELL + c[1], 800))
+            keep = []
+            for c in cand:
+                if all((c[0] - k[0]) ** 2 + (c[1] - k[1]) ** 2 >= 14 * 14 for k in keep):
+                    keep.append(c)
+                if len(keep) == 6:
+                    break
+            blocks.append([list(c) for c in keep])
+    return {'swamp': blocks}
 
 
 def pack(images):
@@ -125,9 +160,9 @@ def build_parity(m):
 
 
 def manifest():
-    images, table = collect()
+    images, table, decor = collect()
     atlas, rects = pack(images)
-    m = {'cell': CELL, 'tex': art.TEX, 'styles': STYLES, 'square': SQUARE, 'sprites': rects, 'props': table}
+    m = {'cell': CELL, 'tex': art.TEX, 'styles': STYLES, 'square': SQUARE, 'sprites': rects, 'props': table, 'decor': decor, 'water': water_spots()}
     return m, images, atlas
 
 

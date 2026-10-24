@@ -78,3 +78,19 @@ Target for the dedicated player was 70–100 d for castle 10.
 - 4 weeks was the active-player target chosen for this pass; after the Coast/water-clustering change the dedicated bot's median is 4.5 weeks (idle ≈ 5.5). Re-tune with the sim before moving the numbers again. The gap between active and idle is modest by design of the castle timers (5 d 5 h of mandatory waiting to castle 6).
 - Remaining balance questions (levels/stat points, chest relevance, merchant depth, endgame) are in [05 §1](05-balance-backlog-and-roadmap.md).
 - The old browser playtest numbers (tile purchase times, stockpiles) were measured on the pre-rebalance game and are kept only as the motivation above.
+
+## 6. Round 3 check: farm products and upgrades, merchant bonuses, rarer critters
+
+What changed for the economy: every animal also yields eggs, milk or hide (sold for 3 / 4 / 6 gold, 25-40 % of the animal's meat value), five farm upgrades (Feed +5 % meat per level, Hen House / Dairy / Tannery +10 %, Pen Expansion +2 % output and +4 animals per kind), a pen limit of 12 per kind, and far fewer critters (farm every 60-120 s instead of 20-40 s, map every 14-30 s instead of 4-9 s). The sim bot buys the farm upgrades when it has resources to spare and sells the products it does not need; it does **not** buy the merchant bonuses (Haggler, Bulk Discount, Lucky Charm, Pack Rat) and does not fight.
+
+Hardcore bot, game time (3 seeds, median and range). The unchanged game (re-measured today at the start of this work) against this version:
+
+| milestone | before | after |
+| --- | --- | --- |
+| castle 6 | 29.1 d (23.4-32.2) | 21.5 d (19.8-25.3) |
+| castle 8 | 47.3 d (45.6-56.3) | 40.3 d (37.0-46.3) |
+| castle 10 | 75.0 d (73.6-94.9) | 63.3 d (62.8-74.4) |
+
+A 6-seed check to day 70 gave castle 6 at 23.4 d against 22.2 d and castle 8 at 45.6 d against 41.6 d, so most of the early gap is seed noise; the new mechanics add roughly 8-10 % to income in the late game (the same run with every new mechanic switched off, `--set=` overrides, reached castle 10 at 68.8 d). That is inside the 10-15 % budget for this round, and the dedicated player now needs a bit under 10 weeks for castle 10 (the earlier target was 70-100 d, and the table in section 4 was measured before the free starting ring). If it needs to slow down again, lower `FARM_UPGRADES.*.effectPerLevel` first, then the product sell prices in `MERCHANT_RESOURCE_PRICES`.
+
+Rebirth, same bots: the second run reaches castle 6 in 14.2 d after a first run of 21.5 d (66 %), and in 7.3 d after a castle-10 first run.

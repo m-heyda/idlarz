@@ -1,5 +1,5 @@
 import { CHEST, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
-import { ITEM_CATALOG, RATTATUI_SET } from '@/config/itemCatalog';
+import { BASIC_GEAR, ITEM_CATALOG } from '@/config/itemCatalog';
 import { addToBag } from '@/lib/inventory';
 import { isInWard } from '@/lib/castleWard';
 import type { BagSlot, Resources, Tile } from '@/types/game';
@@ -64,8 +64,8 @@ export interface ChestContext {
 
 const between = (random: () => number, [lo, hi]: [number, number]) => lo + random() * (hi - lo);
 
-/** Chest items: the Rattatui set pieces (the only gear that exists beyond the starter kit). */
-export const CHEST_ITEMS = RATTATUI_SET.pieces.filter((id) => ITEM_CATALOG[id] && ITEM_CATALOG[id].rarity !== 'common');
+/** Chest items: plain gear and potions. The Rattatui set drops only from the Rat King. */
+export const CHEST_ITEMS: string[] = [...BASIC_GEAR, 'potion_minor'].filter((id) => !!ITEM_CATALOG[id]);
 
 /** Relative chances with Luck shifted from plain gold toward the lucky chest and the item. */
 export function rewardWeights(luck: number): Record<keyof typeof CHEST.rewards, number> {

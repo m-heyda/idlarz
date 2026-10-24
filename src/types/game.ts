@@ -1,6 +1,6 @@
 import { BIOMES } from '@/config/gameConfig';
 import type { PlayerClassId } from '@/config/playerClasses';
-import type { LegacyUpgradeId } from '@/config/gameConfig';
+import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config/gameConfig';
 import type { PixelIconName } from '@/config/pixelIcons';
 
 export type BiomeType = keyof typeof BIOMES;
@@ -12,6 +12,9 @@ export interface Resources {
 	coal: number;
 	food: number;
 	meat: number;
+	eggs: number; // farm products: produced by animals, sold to the merchant, spent on farm upgrades
+	milk: number;
+	hide: number;
 	xp: number;
 }
 
@@ -180,7 +183,10 @@ export interface Animal {
 	baseCost: number;
 	costScaling: number;
 	baseProduction: number; // meat/s per animal; every purchase adds one more animal
+	product: { resource: FarmProduct; perSec: number }; // a farm product trickling out of every animal
 }
+
+export type FarmProduct = 'eggs' | 'milk' | 'hide';
 
 // One physical click, as seen by the click limiter. `eventId` is shared by every handler of the same DOM event.
 export interface ClickInput {
@@ -249,11 +255,9 @@ export interface GameState {
 	monsterSpawnTimer: number;
 	nextMonsterId: number;
 	fight: FightState | null; // transient: never saved
-	farmLevels: Record<string, number>;
-	showCharacterWindow: boolean;
-	showStatisticsWindow: boolean;
-	showMerchantWindow: boolean;
-	showFarmWindow: boolean;
+	farmLevels: Record<string, number>; // animals owned per kind
+	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
+	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
 	isHydrated: boolean;
 	biomeSelectionActive: boolean;
 	pendingTileCoords: { x: number; y: number } | null;
@@ -279,14 +283,14 @@ export interface GameState {
 	selectBiome: (biome: BiomeType) => boolean;
 	cancelBiomeSelection: () => void;
 	upgradeCastle: () => boolean;
-	purchaseAnimal: (animalId: string) => boolean;
+	purchaseAnimal: (animalId: string, count?: number | 'max') => number; // animals bought
+	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;
+	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;
+	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
+	sellJunk: (maxRarity: EquipmentRarity) => { gold: number; count: number };
+	buyItem: (id: string, qty?: number) => boolean;
 	upgradeGroundsTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
-	toggleCharacterWindow: () => void;
-	toggleStatisticsWindow: () => void;
-	toggleMerchantWindow: () => void;
-	toggleFarmWindow: () => void;
-	setShowFarmWindow: (show: boolean) => void;
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
 	addStatPoint: (stat: keyof CharacterStats) => void;
 	setPlayerName: (name: string) => void;

@@ -16,6 +16,7 @@ import type { Viewport } from '@/lib/ambientLife';
 import CastleRange from './CastleRange';
 import CastleFortress from './CastleFortress';
 import TerrainLayer from './TerrainLayer';
+import WaterLayer from './WaterLayer';
 
 interface Position {
 	x: number;
@@ -237,6 +238,15 @@ const Grid: React.FC = () => {
 	};
 	const getViewport = useCallback(() => viewportRef.current, []);
 
+	// Tile range on screen (one tile of slack): the water ripples render only inside it
+	const tilePx = TILE_SIZE * zoom;
+	const waterRange = {
+		minX: Math.max(0, Math.floor(-position.x / tilePx) - 1),
+		maxX: Math.min(GRID_SIZE, Math.ceil((-position.x + windowSize.x) / tilePx) + 1),
+		minY: Math.max(0, Math.floor(-position.y / tilePx) - 1),
+		maxY: Math.min(GRID_HEIGHT, Math.ceil((-position.y + windowSize.y) / tilePx) + 1),
+	};
+
 	const visibleTiles = useMemo(() => {
 		if (!tiles) return [];
 
@@ -320,6 +330,7 @@ const Grid: React.FC = () => {
 					'--map-zoom': zoom,
 				} as React.CSSProperties}>
 				<TerrainLayer />
+				<WaterLayer minX={waterRange.minX} maxX={waterRange.maxX} minY={waterRange.minY} maxY={waterRange.maxY} />
 				<MapTipLayerContext.Provider value={tipLayer}>{visibleTiles}</MapTipLayerContext.Provider>
 				<AmbientLife getViewport={getViewport} />
 				{castleLevelOf(tiles) >= CASTLE_FORTRESS.fromLevel ? (

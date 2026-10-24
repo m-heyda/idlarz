@@ -25,7 +25,7 @@ const territory = (r: number): Tile[][] => {
 		for (let x = -r; x <= r; x++) g[GRID_CENTER_Y + y][GRID_CENTER_X + x] = { biome: x === 0 && y === 0 ? 'castle' : 'plains', isOwned: true, ...(x === 0 && y === 0 ? { level: 1 } : {}) };
 	return g;
 };
-const rates = (over: Partial<Resources> = {}): Resources => ({ gold: 2, wood: 1, stone: 1, coal: 0.5, food: 1, meat: 0, xp: 1, ...over });
+const rates = (over: Partial<Resources> = {}): Resources => ({ gold: 2, wood: 1, stone: 1, coal: 0.5, food: 1, meat: 0, eggs: 0, milk: 0, hide: 0, xp: 1, ...over });
 
 test('chest spot: only owned tiles, never the castle, a building, a monster or another chest', () => {
 	const g = territory(2);
@@ -99,7 +99,8 @@ test('chest loot: gold is minutes of income (like before), a lucky chest pays x1
 		} else if (loot.kind === 'xp') {
 			assert.ok(loot.xp >= CHEST.xp.floor);
 		} else {
-			assert.ok(CHEST_ITEMS.includes(loot.itemId) && ITEM_CATALOG[loot.itemId].rarity !== 'common');
+			assert.ok(CHEST_ITEMS.includes(loot.itemId));
+			assert.notEqual(ITEM_CATALOG[loot.itemId].set, 'rattatui', 'chests never hold Rattatui pieces');
 		}
 	}
 });
@@ -114,8 +115,10 @@ test('chest loot: luck moves weight from plain gold to lucky chests and items', 
 
 test('chest loot: an item that does not fit in a full bag becomes gold', () => {
 	let bag: BagSlot[] = emptyBag();
-	bag = bag.map((_, i) => ({ id: CHEST_ITEMS[i % CHEST_ITEMS.length], qty: 1 })); // gear does not stack: every slot used
-	assert.equal(addToBag(bag, CHEST_ITEMS[0], 1).added, 0);
+	const gear = CHEST_ITEMS.filter((id) => !ITEM_CATALOG[id].consumable); // gear does not stack: every slot used
+	bag = bag.map((_, i) => ({ id: gear[i % gear.length], qty: 1 }));
+	for (const id of CHEST_ITEMS.filter((i) => !ITEM_CATALOG[i].consumable)) assert.equal(addToBag(bag, id, 1).added, 0);
+	assert.equal(addToBag(bag, 'potion_minor', 1).added, 0);
 	for (let i = 0; i < 4000; i++) {
 		const loot = rollChestLoot({ rates: rates(), luck: 100, bag }, rng(i));
 		assert.notEqual(loot.kind, 'item');

@@ -54,7 +54,7 @@ src/
 │   ├── useSingleTab.ts       Web Lock: one tab owns the game
 │   └── useCtrlSequence.ts    Control ×5 detector (shortcut to Save & Backup)
 └── components/game/          Grid (pan + stepped wheel zoom), TerrainLayer (canvas ground), Tile (transparent hit area + overlays), TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
-    │                         building), header (HeaderMenu, LevelOrb, NotifyDot), AmbientLife (decorative critters + rare golden gift),
+    │                         building), header (GameHeader: PlayerCard + HeaderButtons in HeaderMenu, ResourceDisplay chips, LevelOrb, NotifyDot), Menu window (MenuOverlay + PixelTabs: Character, Stats, Merchant, Farm tabs; state in `uiStore` `menuOpen`/`menuTab`), WaterLayer (ripples), AmbientLife (decorative critters + rare golden gift),
     │                         CastleRange (violet 3x3 area, castle < 7) / CastleFortress (walls, gate, corner towers, castle 7+), MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
     └── overlays/             Statistics, Character (paper doll + bag), FightModal, Farm (+scene/critters), Merchant, NamePrompt + Tutorial,
                               SettingsDialog, LegacyDialog (rebirth + shop), TutorialDialog, SaveMenuDialog,
@@ -69,7 +69,7 @@ tests/                        clickLimiter, economy (exploit/behaviour), saves (
 
 ## State (`GameState`)
 
-Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots), `playerHp`, `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
+Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Gems = Legacy points earned/unspent, shop levels; optional in saves), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots, plus 4 per Pack Rat level), `playerHp`, `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
 
 ## The loop
 
@@ -85,7 +85,7 @@ Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `p
 
 Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a token from the same limiter (one token per physical click, trusted clicks only).
 
-`ResourceDisplay` registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold` (and the tile's `onClick` calls `tapTile` for the same event); both ask the shared limiter with the event's `timeStamp` as id, so one physical click costs one token. Catching a critter gift (`claimCritterGift`, map or farm window) goes through the same limiter and also has a per-source cooldown; the amount is always computed by the store.
+`useClickIncome` (called by `GameHeader`) registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold` (and the tile's `onClick` calls `tapTile` for the same event); both ask the shared limiter with the event's `timeStamp` as id, so one physical click costs one token. Catching a critter gift (`claimCritterGift`, map or farm window) goes through the same limiter and also has a per-source cooldown; the amount is always computed by the store.
 
 ## Rebirth
 
@@ -103,7 +103,7 @@ Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a
 - **Biome rules and chests**: `src/config/biomeRules.ts` (numbers) + `src/utils/biomeRules.ts` (unlocks, conflicts, clustering, picker verdicts, the starting ring) decide what a purchase becomes; `src/lib/chests.ts` decides where chests appear and what they hold. Both are pure with an injectable `random()`. The free starting ring is `GameState.freeTiles`; costs use `economyTiles()` (see [02](02-mechanics.md)).
 - **Foundations**: a built-on grounds tile resolves to the biome around it (`foundation()` in `terrain.ts`, ported to `terrain_logic.py` and covered by the parity fixture) and gets a pad decal (`terrain_pads.py`, drawn under the sprites); building tiles carry no props.
 - Tile tooltips are portalled into `MapTipLayer`, a layer above the critters, because every tile is its own stacking context.
-- `NotifyDot` is the one "needs attention" marker (a soft orange dot). It is used on header controls only: unspent stat points on the level orb and an affordable farm animal or upgrade on the Farm button.
+- `NotifyDot` is the one "needs attention" marker (a soft orange dot). It is used on header controls and the Menu tabs: unspent stat points (level orb, Stats tab) and an affordable farm animal or upgrade (Farm tab); the Menu button shows either (`useMenuAttention`).
 - Font: Mozilla Headline (self-hosted via `@fontsource-variable/mozilla-headline`, exposed as `--font-pixel`).
 - Every visible `Tile` subscribes to `tiles` and `resources`, so tiles re-render on each tick; fine for the current viewport, the first thing to optimise if it grows ([05](05-balance-backlog-and-roadmap.md)).
 - Tutorial, stat tooltips and cost lists are generated from config constants, so they cannot drift from the rules.

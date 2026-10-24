@@ -8,7 +8,7 @@ const STORAGE_KEY = 'idlarz-settings';
 export interface SettingsState {
 	soundEnabled: boolean;
 	volume: number; // 0..1
-	ambientLife: boolean; // wandering critters on the map
+	ambientLife: boolean; // wandering critters and water ripples on the map
 	loaded: boolean;
 	setSoundEnabled: (value: boolean) => void;
 	setVolume: (value: number) => void;

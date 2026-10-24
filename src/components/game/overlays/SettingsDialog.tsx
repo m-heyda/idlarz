@@ -50,7 +50,7 @@ const SettingsDialog: React.FC = () => {
 				/>
 			</Row>
 
-			<Row label='Critters on the map' hint='Butterflies, bees and rabbits wander over your land'>
+			<Row label='Life on the map' hint='Critters wander over your land and ripples play on the water'>
 				<button
 					className={`px-btn px-btn-sm ${ambientLife ? '' : 'px-btn-gray'}`}
 					onClick={() => setAmbientLife(!ambientLife)}

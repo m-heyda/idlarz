@@ -7,6 +7,7 @@ import { formatNumber } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import PixelModal from '../PixelModal';
 import PixelIcon from '../PixelIcon';
+import GemIcon from '../GemIcon';
 
 const pct = (n: number, digits = 0) => `${(n * 100).toFixed(digits)}%`;
 
@@ -21,7 +22,7 @@ const shopText: Record<LegacyUpgradeId, (levels: number) => string> = {
 
 /**
  * Rebirth and the Legacy shop. A rebirth restarts the run (map, resources, castle, farm, level) in exchange for
- * Legacy points: permanent income and shop upgrades.
+ * Gems (the Legacy points): permanent income and shop upgrades.
  */
 const LegacyDialog: React.FC = () => {
 	const open = useUiStore((state) => state.legacyOpen);
@@ -74,8 +75,10 @@ const LegacyDialog: React.FC = () => {
 					<div className='text-green-400 text-lg'>+{pct(legacyIncomeMultiplier(prestige) - 1)}</div>
 				</div>
 				<div>
-					<div className='text-[#a89878]'>Legacy points</div>
-					<div className='text-purple-300 text-lg'>{prestige.legacyPoints}</div>
+					<div className='text-[#a89878]'>Gems</div>
+					<div className='text-green-300 text-lg flex items-center justify-center gap-1'>
+						<GemIcon /> {prestige.legacyPoints}
+					</div>
 				</div>
 			</div>
 
@@ -83,9 +86,9 @@ const LegacyDialog: React.FC = () => {
 				<div className='px-card mb-3 text-sm'>
 					<div className='px-h'>Rebirth now?</div>
 					<p className='text-[#d8c8a0] mb-2'>
-						You gain <b className='text-purple-300'>{gain}</b> Legacy points (+{pct(gain * REBIRTH.incomePerPoint)} income
+						You gain <b className='text-green-300'>{gain}</b> Gems (+{pct(gain * REBIRTH.incomePerPoint)} income
 						for ever). The map, resources, castle, farm, level and stat points start again. Your name, hero,
-						Legacy and shop upgrades stay.
+						Gems and shop upgrades stay.
 					</p>
 					<div className='flex justify-between'>
 						<button className='px-btn' onClick={() => setConfirming(false)}>
@@ -100,7 +103,7 @@ const LegacyDialog: React.FC = () => {
 				<div className='px-card mb-3 text-sm'>
 					<div className='px-h'>Rebirth</div>
 					<p className='text-[#d8c8a0] mb-2'>
-						Start over with a permanent bonus. A rebirth gives about {gain} Legacy point{gain === 1 ? '' : 's'} now; a
+						Start over with a permanent bonus. A rebirth gives about {gain} Gem{gain === 1 ? '' : 's'} now; a
 						higher castle level and more tiles give more (castle level {CASTLE_UPGRADE.maxLevel} is the best you can do).
 					</p>
 					<div className='mb-3'>
@@ -113,14 +116,14 @@ const LegacyDialog: React.FC = () => {
 					</div>
 					<div className='flex justify-center'>
 						<button className='px-btn px-btn-gold' disabled={!canRebirth} onClick={() => setConfirming(true)}>
-							Rebirth for {gain} point{gain === 1 ? '' : 's'}
+							Rebirth for {gain} Gem{gain === 1 ? '' : 's'}
 						</button>
 					</div>
 				</div>
 			)}
 
 			<div className='px-card text-sm'>
-				<div className='px-h'>Legacy shop</div>
+				<div className='px-h'>Gem shop</div>
 				<div className='flex flex-col gap-2'>
 					{(Object.keys(LEGACY_UPGRADES) as LegacyUpgradeId[]).map((id) => {
 						const def = LEGACY_UPGRADES[id];
@@ -142,7 +145,7 @@ const LegacyDialog: React.FC = () => {
 									onClick={() => {
 										if (buyLegacyUpgrade(id)) audioManager.playSound('purchase');
 									}}>
-									{maxed ? 'Max' : `${cost} pts`}
+									{maxed ? 'Max' : <><GemIcon /> {cost}</>}
 								</button>
 							</div>
 						);
