@@ -173,5 +173,5 @@ SPRITES = {
     'unknown': unknown_mark,
     'biome_forest': forest, 'biome_plains': plains, 'biome_hills': hills, 'biome_swamp': swamp,
     'biome_tundra': tundra, 'biome_lake': lake, 'biome_coast': coast, 'biome_grounds': grounds,
-    'bonus_chest': bonus_chest, 'xp': xp_orb,
+    'xp': xp_orb,
 }

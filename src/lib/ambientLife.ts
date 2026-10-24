@@ -1,5 +1,6 @@
 import { AMBIENT_LIFE, GRID_HEIGHT, GRID_SIZE, TILE_SIZE } from '@/config/gameConfig';
 import type { Tile } from '@/types/game';
+import { foundationBiome } from '@/utils/terrain';
 
 export type AmbientType = 'butterfly' | 'bee' | 'ladybug' | 'rabbit';
 
@@ -31,7 +32,7 @@ export const nextSpawnDelay = (rng: () => number = Math.random) =>
 	between(rng, AMBIENT_LIFE.spawnMinMs, AMBIENT_LIFE.spawnMaxMs);
 
 /**
- * Picks a random owned tile in view (the castle excluded) and a critter that likes its biome.
+ * Picks a random owned tile in view (the castle excluded) and a critter that likes its biome (or its foundation biome).
  * Returns null when nothing in view can host one. Pure apart from the id counter, so it is easy to test.
  */
 export const pickAmbientCritter = (
@@ -48,7 +49,8 @@ export const pickAmbientCritter = (
 		for (let x = minX; x <= maxX; x++) {
 			const tile = tiles[y]?.[x];
 			if (!tile?.isOwned || tile.biome === 'castle') continue;
-			const types = AMBIENT_LIFE.byBiome[tile.biome];
+			// a built-on tile stands on its neighbours' biome (snowy foundation -> rabbits, meadow -> bees)
+			const types = AMBIENT_LIFE.byBiome[foundationBiome(tiles, x, y)];
 			if (types?.length) candidates.push({ x, y, types });
 		}
 	}

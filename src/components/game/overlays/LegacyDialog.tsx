@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
 import { LEGACY_UPGRADES, REBIRTH, CASTLE_UPGRADE, type LegacyUpgradeId } from '@/config/gameConfig';
-import { castleModifier, countOwnedTiles, legacyGain, legacyIncomeMultiplier, legacyUpgradeCost } from '@/utils/gameUtils';
+import { castleModifier, economyTiles, legacyGain, legacyIncomeMultiplier, legacyUpgradeCost } from '@/utils/gameUtils';
 import { formatNumber } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import PixelModal from '../PixelModal';
@@ -27,6 +27,7 @@ const LegacyDialog: React.FC = () => {
 	const open = useUiStore((state) => state.legacyOpen);
 	const close = useUiStore((state) => state.closeLegacy);
 	const tiles = useGameStore((state) => state.tiles);
+	const freeTiles = useGameStore((state) => state.freeTiles);
 	const prestige = useGameStore((state) => state.prestige);
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
 	const rebirth = useGameStore((state) => state.rebirth);
@@ -35,7 +36,7 @@ const LegacyDialog: React.FC = () => {
 
 	if (!open) return null;
 
-	const ownedTiles = countOwnedTiles(tiles);
+	const ownedTiles = economyTiles(tiles, freeTiles); // purchases + 1: the free starting ring does not count
 	const castleLevel = tiles[25]?.[25]?.level ?? 1;
 	const gain = legacyGain(castleLevel, ownedTiles);
 	const levelOk = castleLevel >= REBIRTH.minCastleLevel;

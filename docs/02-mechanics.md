@@ -4,16 +4,41 @@ Exact rules as implemented. Constants live in [`src/config/gameConfig.ts`](../sr
 
 ## 1. The loop in one paragraph
 
-You start with a castle on a 50×50 map and 125 gold. Gold, other resources and XP trickle in every second. Gold (plus wood/stone/coal later) buys **adjacent unexplored tiles**, each of which becomes a biome and adds income. The **castle** is a big timed upgrade that multiplies everything. **Farm animals** turn food into meat, the **merchant** converts anything into gold (and back, at a loss), **clicking the map** and **chests** add active bonuses, every **level** gives a stat point, and **monsters** on your land can be fought for XP, gold and gear (§15). First finish line = castle 6, best click power and ~40+ tiles (about 4 weeks for an active player, [06](06-playtest-and-pacing-report.md)). After that the game continues with castle levels 7–10 and **Rebirth** (§13), which restarts the map for permanent Legacy bonuses.
+You start with a castle and its eight neighbouring tiles on a 50×50 map, and 125 gold. Gold, other resources and XP trickle in every second. Gold (plus wood/stone/coal later) buys **adjacent unexplored tiles**, each of which becomes a biome and adds income. The **castle** is a big timed upgrade that multiplies everything. **Farm animals** turn food into meat, the **merchant** converts anything into gold (and back, at a loss), **clicking the map** and **chests** add active bonuses, every **level** gives a stat point, and **monsters** on your land can be fought for XP, gold and gear (§15). First finish line = castle 6, best click power and ~40+ tiles (about 4 weeks for an active player, [06](06-playtest-and-pacing-report.md)). After that the game continues with castle levels 7–10 and **Rebirth** (§13), which restarts the map for permanent Legacy bonuses.
 
 ## 2. Map & buying tiles
 
-- Grid 50×50, castle at (25, 25) owned from the start; drag to pan, mouse wheel to zoom (four fixed steps).
-- A tile can be bought only if it is **4-neighbour adjacent** to an owned tile and you can pay its whole cost: gold, plus **extra resources from larger territories** (`TILE_RESOURCE_COST`: wood + stone from the 15th owned tile, coal from 30, food from 40). Charisma discounts every part of the cost (0.5 %/point, max 25 %). The hover card and the biome picker show all costs, green when affordable.
+- Grid 50×50, castle at (25, 25) and its 8 neighbours owned from the start (see *Starting land* below); drag to pan, mouse wheel to zoom (four fixed steps).
+- A tile can be bought only if it is **4-neighbour adjacent** to an owned tile and you can pay its whole cost: gold, plus **extra resources from larger territories** (`TILE_RESOURCE_COST`: wood + stone from the 15th tile, coal from 30, food from 40; tiles are counted as the **economy count**, see below). Charisma discounts every part of the cost (0.5 %/point, max 25 %). The hover card and the biome picker show all costs, green when affordable.
 - Cost curve: ×1.45 per owned tile up to 20 tiles, ×1.27 up to 40, ×1.17 per tile after that ([03 §1](03-formulas-and-scaling.md#1-tile-cost)).
 - Not enough → shake + `wrong` sound. Success → `purchase` sound, XP, +100 reputation.
-- **Biome assignment**: random (weighted) among the 8 non-special biomes, except when `owned % 4 === 3` (owned = 3, 7, 11 … because the castle counts): then you **choose**. Nothing is charged until you choose; cancel is free; only offered biomes are accepted. **Weights** (`BIOME_SPAWN`): every biome 1, Coast 0.6; next to an owned Lake, Lake and Coast ×3; next to an owned Coast, Lake and Coast ×2 - so water clusters into bays with beaches. Water/coast are placeholders for later mechanics (fishing huts etc.).
+- **Biome assignment**: a purchase turns into a biome by the **placement rules** below. Every 4th purchase (economy count 3, 7, 11 …) you **choose** among the biomes the rules allow; nothing is charged until you choose, cancel is free, a blocked biome is rejected.
 - Name prompt + tutorial at exactly 2 owned tiles while the name is still `Explorer`.
+
+### Starting land and the economy count
+
+A new game (and every rebirth) starts with the castle **and its 8 neighbours owned**. The ring is generated from the basic biomes (`BIOME_RULES.startRing`): plains 5 / forest 3 / hills 2 / lake 2 by weight, each ring tile continues the previous one 50 % of the time, so the ring forms a few patches; at least 3 plains and never more than 3 of any other biome. These 8 tiles are free (`GameState.freeTiles` = 9; an old save keeps 1).
+
+Tile cost, the extra resource costs, XP per tile, the 4th-tile biome pick and the rebirth requirements all use the **economy count** `economyTiles = owned − freeTiles + 1` (purchases + the castle), so the first purchase still costs 55 gold and the curve is unchanged. Statistics, monster spawning and the map use the real owned count. A save is checked for this (`freeTiles` is 1, or 9 with the whole ring owned).
+
+### Biome placement rules (`src/config/biomeRules.ts`, logic in `src/utils/biomeRules.ts`)
+
+All numbers live in one config file; the rules apply to new purchases only (existing maps are not touched). "Purchased" = tiles bought so far.
+
+1. **Unlocks.** Plains, Forest, Hills, Lake and Grounds are available from the start. **Swamp** after 6 purchases, **Tundra** after 10. **Coast** only ever beside water (rule 3).
+2. **Conflicts** (checked against all 8 neighbours that are owned): **Tundra ↔ Swamp**, **Tundra ↔ Coast** and **Hills ↔ Coast** may never touch. **Plains and Grounds are neutral** and always fit, so the picker always offers at least those two.
+3. **Coast needs a Lake or Coast** among the 8 neighbours.
+4. **Clustering (random purchases).** The candidates are the unlocked biomes the rules allow. First, with a chance of `base + 10 × (extra same-biome 4-neighbours)` (capped at 90 %), the tile **copies** one of its 4-neighbour biomes that is a candidate (never Grounds, so building lots stay rare). Base chances: Forest 60, Hills 55, Lake 50, Swamp 55, Tundra 65, Plains 45, Coast 40. Otherwise it rolls by the old weights (`BIOME_SPAWN`: every biome 1, Coast 0.6, water likelier beside water).
+5. **The picker** lists every biome: blocked ones are greyed out with the reason ("Unlocks after 6 tiles", "Not next to Tundra", "Needs water nearby"), and a biome that continues an adjoining area is tagged "Extends Forest". `selectBiome` re-checks the choice.
+
+| Biome | Unlocks | May not touch | Needs |
+| --- | --- | --- | --- |
+| Plains, Grounds | start | - | - |
+| Forest, Lake | start | - | - |
+| Hills | start | Coast | - |
+| Swamp | 6 purchases | Tundra | - |
+| Tundra | 10 purchases | Swamp, Coast | - |
+| Coast | start | Tundra, Hills | Lake or Coast nearby |
 
 ## 3. Biomes, adjacency, buildings
 
@@ -31,11 +56,13 @@ You start with a castle on a 50×50 map and 125 gold. Gold, other resources and 
 
 (Config values × `BIOME_YIELD.scale` = 1.3.) **Adjacency**: each owned same-biome 4-neighbour adds +25 % to that tile's output, including its building.
 
-**Grounds + buildings**: click an owned Grounds tile once to pick a permanent building. Buildings now **cost resources** (500 gold, 250 wood, 150 stone for the first, ×1.6 for every further one) and the dialog shows the price. Building output (×1.3 yield scale, plus adjacency): Farm food 0.2 · Mine stone/coal 0.2 · Lumber Mill wood 0.2 · Market gold 0.2 · Blacksmith 0.07 of all five · Workshop xp 0.2.
+**Grounds + buildings**: click an owned Grounds tile once to pick a permanent building (16 to choose from). Buildings **cost resources** (500 gold, 250 wood, 150 stone for the first, ×1.6 for every further one) and the dialog shows the price. Output (config values, ×1.3 yield scale plus adjacency): Farm food 0.2 · Mine stone/coal 0.2 · Lumber Mill wood 0.2 · Market gold 0.2 · Blacksmith 0.07 of all five · Workshop xp 0.2 · Lumber Camp wood 0.18 · Quarry stone 0.25 · Fishing Hut food 0.16 + gold 0.05 · Hunter's Lodge meat 0.15 · Tavern food 0.12 + xp 0.08 · Tower stone 0.08 + xp 0.12 · Well food 0.15 · Alchemy Lab xp 0.12 + gold 0.08 · Stone Craft stone 0.15 + gold 0.08 · Barracks gold 0.1 + xp 0.1. Every output is an existing resource; the ten newer buildings are first-pass numbers (see BL13 in [05](05-balance-backlog-and-roadmap.md)). The Hunter's Lodge is the only source of meat besides the Farm's animals.
+
+**Foundation**: a built-on Grounds tile is drawn on the biome around it - the most common land biome among its 8 neighbours (a lake counts as coast; ties go hills > forest > tundra > swamp > plains > coast; nothing around = plains) - with a small worked-ground pad in that biome's style (earth and cobbles, forest litter, gravel, plank walkway over mud, trampled snow, sand and planks). A farm beside tundra stands in snow. Ambient critters on such a tile are those of its foundation biome. The sprite is 48×60 and its roof rises over the tile above.
 
 ## 4. Resources
 
-Gold, wood, stone, coal, food, meat, xp. All except gold/xp can be sold to the merchant; all except xp can be bought (at 2× the sell price). The header hides xp (it is the level bar). No stockpile can exceed 10¹⁵.
+Gold, wood, stone, coal (drawn as charcoal "fuel"), food, meat, xp. All except gold/xp can be sold to the merchant; all except xp can be bought (at 2× the sell price). The header hides xp (it is the level bar). No stockpile can exceed 10¹⁵. **Reserved art** (not resources yet, nothing produces or spends them): iron, fish, mana, ability shard and the random-item box exist as icons (`RESERVED_RESOURCES` in `pixelIcons.ts`) for a later end-game / rebirth system ([05](05-balance-backlog-and-roadmap.md) BL14).
 
 ## 5. Castle
 
@@ -65,7 +92,9 @@ Gold, wood, stone, coal, food, meat, xp. All except gold/xp can be sold to the m
 
 ## 9. Chests
 
-A chest appears on a random owned non-castle tile every 10 min (the timer only runs while fewer than 5 chests wait; from castle level 7 never inside the castle's ward and never on a monster tile). The chest is drawn as a glowing, gently bobbing treasure chest on the tile. Collect it by clicking the tile: reward = `passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`. Chests are saved with the map.
+A chest appears every 10 min (the timer only runs while fewer than 5 chests wait). **Where** (`pickChestSpot`): any owned tile except the castle, a building, a monster, another chest and (from castle level 7) the castle's ward; each tile weighs 1, **+3 if it touches land you have not bought**, +1 per 4 tiles of distance from the castle, ×0.3 if another chest is within 2 tiles - so chests lean toward the edge of your land and spread out. It is drawn as a banded wooden chest on a small grass patch with a soft glow and one twinkle. Chests are saved with the map.
+
+**What is inside** (`rollChestLoot`, chances in `CHEST.rewards`): **gold** 50 % (`passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`, as before) · **resource bundle** 25 % (1–2 of wood, stone, coal, food, each 10–30 min of its income, at least 25) · **XP** 12 % (10–30 min of XP income, at least 60) · **lucky chest** 10 % (gold ×1.5) · **gear** 3 % (a random uncommon-or-better Rattatui piece into the bag; a full bag turns it into gold). Each Luck point shifts 1 % of the gold chance into lucky chests (80 %) and gear (20 %). A toast shows what was found; the last result is not saved.
 
 ## 10. XP, levels and stat points
 

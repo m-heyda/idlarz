@@ -53,10 +53,38 @@ def cell_layers(g, cx, cy):
     return out
 
 
+# Foundation of a building tile: the land biome most common among its 8 neighbours (a lake counts as coast, so a
+# lakeside plot stands on sand); ties go to the earlier entry; no land around -> plains.
+FOUNDATION_ORDER = ('hills', 'forest', 'tundra', 'swamp', 'plains', 'coast')
+PAD_VARIANTS = 2
+
+
+def foundation(owned, x, y):
+    h, w = len(owned), len(owned[0])
+    counts = dict.fromkeys(FOUNDATION_ORDER, 0)
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            nx, ny = x + dx, y + dy
+            if (dx or dy) and 0 <= nx < w and 0 <= ny < h:
+                name = owned[ny][nx]
+                name = 'coast' if name == 'lake' else name
+                if name in counts:
+                    counts[name] += 1
+    best = max(counts.values())
+    if best == 0:
+        return 'plains'
+    return next(b for b in FOUNDATION_ORDER if counts[b] == best)
+
+
 def ground_grid(owned):
-    """owned: rows of ground name or None -> adds 'mist' for unowned tiles 4-adjacent to an owned one."""
+    """owned: rows of ground name or None ('building' = a built-on grounds tile, which takes its neighbours' biome as
+    foundation) -> adds 'mist' for unowned tiles 4-adjacent to an owned one."""
     h, w = len(owned), len(owned[0])
     g = [row[:] for row in owned]
+    for y in range(h):
+        for x in range(w):
+            if owned[y][x] == 'building':
+                g[y][x] = foundation(owned, x, y)
     for y in range(h):
         for x in range(w):
             if owned[y][x] is None and any(0 <= x + dx < w and 0 <= y + dy < h and owned[y + dy][x + dx] is not None
@@ -183,10 +211,25 @@ def dock_at(m, g, x, y):
     return out
 
 
-def all_sprites(m, g):
+def all_pads(owned):
+    """[(pad_id, world_x, world_y)] top-left corners of the 48x48 foundation pads (drawn under every sprite)."""
+    out = []
+    for y, row in enumerate(owned):
+        for x, name in enumerate(row):
+            if name == 'building':
+                out.append((f'pad_{foundation(owned, x, y)}_{hash32(x, y, 600) % PAD_VARIANTS}', x * CELL, y * CELL))
+    return out
+
+
+def built_set(owned):
+    """Coordinates of building tiles (they carry no props: the building stands there)."""
+    return {(x, y) for y, row in enumerate(owned) for x, name in enumerate(row) if name == 'building'}
+
+
+def all_sprites(m, g, built=None):
     """Every sprite of the map as (sprite_id, world_x, world_y_bottom), in draw order (bottom edge, then x)."""
     items = []
     for y in range(len(g)):
         for x in range(len(g[0])):
-            items += tile_sprites(m, g, x, y) + dock_at(m, g, x, y)
+            items += ([] if built and (x, y) in built else tile_sprites(m, g, x, y)) + dock_at(m, g, x, y)
     return sorted(items, key=lambda it: (it[2], it[1]))

@@ -1,4 +1,4 @@
-import { ATLAS, CELL, allSprites, cellLayers, type GroundGrid } from '@/utils/terrain';
+import { ATLAS, CELL, allSprites, cellLayers, type GroundGrid, type Placed } from '@/utils/terrain';
 
 /**
  * Draws the whole map terrain onto one canvas (1 canvas px = 1 art px = 1 world px, scaled by the world div's CSS
@@ -51,7 +51,7 @@ const FALLBACK: Record<string, string> = {
 	forest: '#317433', hills: '#709046', lake: '#35a6d8', yard: '#928068', castle: '#6045a0',
 };
 
-export function drawTerrain(canvas: HTMLCanvasElement, assets: TerrainAssets | null, g: GroundGrid): void {
+export function drawTerrain(canvas: HTMLCanvasElement, assets: TerrainAssets | null, g: GroundGrid, pads: Placed[] = [], built?: Set<string>): void {
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return;
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -122,7 +122,7 @@ export function drawTerrain(canvas: HTMLCanvasElement, assets: TerrainAssets | n
 		}
 	}
 
-	for (const s of allSprites(g)) {
+	for (const s of [...pads, ...allSprites(g, undefined, built)]) {                   // foundation pads first, then sprites bottom edge first
 		const [sx, sy, sw, sh] = ATLAS.sprites[s.id];
 		ctx.drawImage(assets.props, sx, sy, sw, sh, s.x, s.bottom - sh, sw, sh);
 	}

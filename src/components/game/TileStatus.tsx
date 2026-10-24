@@ -6,7 +6,7 @@ import {
 	calculateTileCost,
 	canAffordBundle,
 	effectiveTileDiscount,
-	countOwnedTiles,
+	economyTiles,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
 import { BiomeTooltip } from './BiomeTooltip';
@@ -33,10 +33,11 @@ export const TileStatus = memo(
 		const resources = useGameStore((state) => state.resources);
 		const characterStats = useGameStore((state) => state.characterStats);
 		const prestige = useGameStore((state) => state.prestige);
+		const freeTiles = useGameStore((state) => state.freeTiles);
 		const discount = effectiveTileDiscount(characterStats, prestige);
 
 		const { cost, tilesUntilManualSelection, canManuallySelect } = useMemo(() => {
-			const ownedTilesCount = countOwnedTiles(tiles);
+			const ownedTilesCount = economyTiles(tiles, freeTiles);
 			const discountedCost = calculateTileCost(
 				ownedTilesCount,
 				discount
@@ -49,7 +50,7 @@ export const TileStatus = memo(
 				tilesUntilManualSelection,
 				canManuallySelect,
 			};
-		}, [tiles, discount]);
+		}, [tiles, discount, freeTiles]);
 
 		if (isOwned) {
 			const biomeInfo = BIOMES[biome];

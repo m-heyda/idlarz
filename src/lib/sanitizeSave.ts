@@ -30,7 +30,9 @@ import {
 	castleUpgradeDuration,
 	EMPTY_PRESTIGE,
 	legacySpent,
+	STARTER_FREE_TILES,
 } from '@/utils/gameUtils';
+import { RING } from '@/utils/biomeRules';
 import type {
 	BagSlot,
 	CastleUpgradeState,
@@ -57,6 +59,7 @@ export const PERSISTED_KEYS = [
 	'clickLevel',
 	'castleUpgrade',
 	'prestige',
+	'freeTiles',
 	'playSeconds',
 	'chestSpawnTimer',
 	'activeChests',
@@ -202,6 +205,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	}
 	if (seen.size !== owned) return fail('disconnected territory');
 
+	// Tiles that cost nothing: just the castle in a save from before the starting ring, the castle + its 8 neighbours otherwise
+	const freeTiles = raw.freeTiles === undefined ? 1 : int(raw.freeTiles, 1, STARTER_FREE_TILES);
+	if (freeTiles === null || (freeTiles !== 1 && freeTiles !== STARTER_FREE_TILES)) return fail('free tiles');
+	if (freeTiles === STARTER_FREE_TILES && !RING.every(([dx, dy]) => tiles[GRID_CENTER_Y + dy][GRID_CENTER_X + dx].isOwned)) {
+		return fail('starting ring not owned');
+	}
+	const purchasedOwned = owned - freeTiles + 1; // as the economy counts (castle + purchases)
+
 	const castleLevel = tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1;
 
 	// ---- resources, XP and level ----------------------------------------------------------------
@@ -213,7 +224,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		resources[key] = v;
 	}
 	let minXp = 0;
-	for (let k = 2; k <= owned; k++) minXp += calculateXpGain(k);
+	for (let k = 2; k <= purchasedOwned; k++) minXp += calculateXpGain(k);
 	if (resources.xp < minXp * 0.999) return fail('xp does not cover owned tiles');
 	const level = calculateLevel(resources.xp);
 
@@ -243,7 +254,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		...INITIAL_CHARACTER_STATS,
 		...base,
 		availablePoints: available + (expectedTotal - total),
-		reputation: INITIAL_CHARACTER_STATS.reputation + 100 * (owned - 1),
+		reputation: INITIAL_CHARACTER_STATS.reputation + 100 * (purchasedOwned - 1),
 	};
 	Object.assign(characterStats, calculateCombatStats(characterStats));
 
@@ -403,6 +414,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			clickLevel,
 			castleUpgrade,
 			prestige,
+			freeTiles,
 			playSeconds,
 			chestSpawnTimer,
 			activeChests: chests,

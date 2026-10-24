@@ -60,19 +60,51 @@ export function hash32(x: number, y: number, salt = 0): number {
 
 const rankOf = (g: string) => RANK.indexOf(g as Ground);
 
-/** The ground an owned tile is drawn with; null when it is not owned. */
+/** The ground an owned tile is drawn with; null when it is not owned. A built-on grounds tile is still `grounds` here: the grid resolves its foundation. */
 export function groundOf(tile: Tile | undefined): Ground | null {
 	if (!tile || !tile.isOwned) return null;
 	if (tile.biome === 'castle' && (tile.level ?? 1) >= CASTLE_FORTRESS.fromLevel) return 'yard'; // the fortress stands on cobbles
-	if (tile.biome === 'grounds' && tile.building && (tile.level ?? 1) > 1) return 'yard';
 	return rankOf(tile.biome) > 0 ? (tile.biome as Ground) : null;
+}
+
+/** A grounds tile with a building above level 1. */
+export const isBuilt = (tile: Tile | undefined): boolean => !!tile && tile.isOwned && tile.biome === 'grounds' && !!tile.building && (tile.level ?? 1) > 1;
+
+type OwnedName = Ground | 'building' | null;
+
+/** Foundation of a building tile: the land biome most common among its 8 neighbours (a lake counts as coast, so a lakeside
+ * plot stands on sand); ties go to the earlier entry; no land around -> plains. */
+export const FOUNDATION_ORDER = ['hills', 'forest', 'tundra', 'swamp', 'plains', 'coast'] as const;
+const PAD_VARIANTS = 2;
+
+function foundation(owned: OwnedName[][], x: number, y: number): Ground {
+	const counts: Record<string, number> = { hills: 0, forest: 0, tundra: 0, swamp: 0, plains: 0, coast: 0 };
+	for (let dy = -1; dy <= 1; dy++)
+		for (let dx = -1; dx <= 1; dx++) {
+			if (!dx && !dy) continue;
+			const n = owned[y + dy]?.[x + dx];
+			const name = n === 'lake' ? 'coast' : n;
+			if (name && name in counts) counts[name]++;
+		}
+	const best = Math.max(...Object.values(counts));
+	if (best === 0) return 'plains';
+	return FOUNDATION_ORDER.find((b) => counts[b] === best) as Ground;
+}
+
+const ownedNames = (tiles: Tile[][]): OwnedName[][] => tiles.map((row) => row.map((t) => (isBuilt(t) ? 'building' : groundOf(t))));
+
+/** The biome a tile's ground belongs to for the eye: its own, or (built-on tiles) the foundation biome. */
+export function foundationBiome(tiles: Tile[][], x: number, y: number): string {
+	const t = tiles[y]?.[x];
+	return isBuilt(t) ? foundation(ownedNames(tiles), x, y) : (t?.biome ?? 'empty');
 }
 
 /** Ground per tile; unowned tiles 4-adjacent to an owned one become 'mist' (the buyable ring), the rest stay null. */
 export function buildGroundGrid(tiles: Tile[][] | undefined): GroundGrid {
 	if (!tiles) return [];
-	const owned = tiles.map((row) => row.map((t) => groundOf(t)));
-	return owned.map((row, y) =>
+	const owned = ownedNames(tiles);
+	const resolved: GroundGrid = owned.map((row, y) => row.map((g, x) => (g === 'building' ? foundation(owned, x, y) : g)));
+	return resolved.map((row, y) =>
 		row.map((g, x) =>
 			g ??
 			(SIDES.some(([dx, dy]) => owned[y + dy]?.[x + dx] != null) ? ('mist' as Ground) : null)
@@ -80,11 +112,33 @@ export function buildGroundGrid(tiles: Tile[][] | undefined): GroundGrid {
 	);
 }
 
-/** One character per tile: changes only when the drawn terrain changes (not on chest toggles, resources, ...). */
+/** Foundation pads (48x48 worked-ground decals) under building tiles; `bottom` is the pad's bottom edge in world px. */
+export function allPads(tiles: Tile[][] | undefined): Placed[] {
+	if (!tiles) return [];
+	const owned = ownedNames(tiles);
+	const out: Placed[] = [];
+	owned.forEach((row, y) =>
+		row.forEach((name, x) => {
+			if (name === 'building') out.push({ id: `pad_${foundation(owned, x, y)}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
+		})
+	);
+	return out;
+}
+
+/** One character per tile: changes only when the drawn terrain changes (not on chest toggles, resources, ...). Built-on tiles are upper case. */
 export function terrainKey(tiles: Tile[][] | undefined): string {
 	if (!tiles) return '';
-	return buildGroundGrid(tiles)
-		.map((row) => row.map((g) => (g ? String.fromCharCode(97 + rankOf(g)) : '.')).join(''))
+	const g = buildGroundGrid(tiles);
+	return g
+		.map((row, y) =>
+			row
+				.map((gr, x) => {
+					if (!gr) return '.';
+					const c = String.fromCharCode(97 + rankOf(gr));
+					return isBuilt(tiles[y][x]) ? c.toUpperCase() : c;
+				})
+				.join('')
+		)
 		.join('/');
 }
 
@@ -272,9 +326,17 @@ export function dockAt(g: GroundGrid, x: number, y: number, m: TerrainAtlas = AT
 	return out;
 }
 
+/** Coordinates ("x,y") of building tiles: they carry no props, the building stands there. */
+export function builtSet(tiles: Tile[][] | undefined): Set<string> {
+	const out = new Set<string>();
+	tiles?.forEach((row, y) => row.forEach((t, x) => isBuilt(t) && out.add(`${x},${y}`)));
+	return out;
+}
+
 /** Every sprite of the map in draw order (bottom edge, then x). */
-export function allSprites(g: GroundGrid, m: TerrainAtlas = ATLAS): Placed[] {
+export function allSprites(g: GroundGrid, m: TerrainAtlas = ATLAS, built?: Set<string>): Placed[] {
 	const items: Placed[] = [];
-	for (let y = 0; y < g.length; y++) for (let x = 0; x < g[0].length; x++) items.push(...tileSprites(g, x, y, m), ...dockAt(g, x, y, m));
+	for (let y = 0; y < g.length; y++)
+		for (let x = 0; x < g[0].length; x++) items.push(...(built?.has(`${x},${y}`) ? [] : tileSprites(g, x, y, m)), ...dockAt(g, x, y, m));
 	return items.sort((a, b) => a.bottom - b.bottom || a.x - b.x);
 }

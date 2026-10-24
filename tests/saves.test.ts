@@ -31,6 +31,31 @@ test('a normally played game passes validation unchanged', () => {
 	}
 });
 
+test('a real new game (castle + free ring) saves and loads; an old castle-only save loads with its own count', () => {
+	api().resetGame(); // not freshGame(): keep the starting ring
+	assert.equal(api().freeTiles, 9);
+	const fresh = sanitizeSave(snapshot());
+	assert.equal(fresh.ok, true, fresh.ok ? '' : fresh.reason);
+	if (fresh.ok) assert.equal(fresh.state.freeTiles, 9);
+
+	freshGame(); // castle only
+	growTo(6);
+	const legacy = snapshot();
+	delete legacy.freeTiles; // a save from before the starting ring
+	const loaded = sanitizeSave(legacy);
+	assert.equal(loaded.ok, true, loaded.ok ? '' : loaded.reason);
+	if (loaded.ok) assert.equal(loaded.state.freeTiles, 1);
+});
+
+test('free tiles cannot be forged: only 1 or 9, and 9 needs the whole ring owned', () => {
+	freshGame();
+	growTo(4);
+	rejects((r) => (r.freeTiles = 9), 'free ring claimed without owning it');
+	rejects((r) => (r.freeTiles = 5), 'odd free tile count');
+	rejects((r) => (r.freeTiles = 0), 'zero free tiles');
+	rejects((r) => (r.freeTiles = 1.5), 'fractional free tiles');
+});
+
 test('tampered saves are rejected', () => {
 	freshGame();
 	growTo(10);
@@ -272,4 +297,18 @@ test('a chest cannot share a tile with a monster', () => {
 		return { tiles, activeChests: 1 };
 	});
 	assert.equal(sanitizeSave(snapshot()).ok, false);
+});
+
+test('a played game that started with the free ring passes validation (tiles, buildings, chests)', () => {
+	api().resetGame(); // keep the starting ring
+	growTo(30);
+	store.setState((s) => {
+		const tiles = s.tiles.map((row) => [...row]);
+		const spot = tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+		tiles[spot.y][spot.x] = { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 };
+		return { tiles };
+	});
+	api().tick(60_000);
+	const result = sanitizeSave(snapshot());
+	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });

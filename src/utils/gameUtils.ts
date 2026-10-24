@@ -1,12 +1,9 @@
 import {
 	BIOMES,
-	BIOME_SPAWN,
 	CASTLE_UPGRADE,
 	GRID_SIZE,
 	GRID_HEIGHT,
 	BASE_GENERATION_RATES,
-	SPECIAL_SINGLE_TYPE_BIOMES,
-	EMPTY_BIOMES,
 	ANIMALS,
 	BASE_XP_PER_TILE,
 	BASE_XP_PER_LEVEL,
@@ -36,6 +33,7 @@ import {
 	Tile,
 	TileCost,
 } from '@/types/game';
+import { RING, generateStartRing } from '@/utils/biomeRules';
 
 /**
  * Counts the total number of owned tiles in the grid
@@ -196,8 +194,20 @@ export const countAdjacentSameBiomes = (
 	}, 0);
 };
 
-export const createInitialGrid = (): Tile[][] => {
-	const grid = Array(GRID_HEIGHT)
+/** Tiles that did not cost anything: the castle (1) in an old save, the castle and its 8 neighbours in a new game. */
+export const STARTER_FREE_TILES = 9;
+
+/**
+ * Owned-tile count as the economy sees it: purchases + 1 (the old castle-only start). Tile cost, XP per tile, the extra
+ * resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting ring does not
+ * make the first purchases expensive. Pass the state's `freeTiles`.
+ */
+export const economyTiles = (tiles: { isOwned: boolean }[][], freeTiles: number): number =>
+	countOwnedTiles(tiles) - freeTiles + 1;
+
+/** A new map: the castle at the centre and its 8 neighbours already owned, generated from the basic biomes. */
+export const createInitialGrid = (random: () => number = Math.random): Tile[][] => {
+	const grid: Tile[][] = Array(GRID_HEIGHT)
 		.fill(null)
 		.map(() =>
 			Array(GRID_SIZE)
@@ -215,6 +225,11 @@ export const createInitialGrid = (): Tile[][] => {
 		level: 1,
 		upgradeCost: CASTLE_UPGRADE.upgradeCosts[0],
 	} as Tile;
+
+	const ring = generateStartRing(random);
+	RING.forEach(([dx, dy], i) => {
+		grid[GRID_CENTER_Y + dy][GRID_CENTER_X + dx] = { biome: ring[i], isOwned: true };
+	});
 
 	return grid;
 };
@@ -407,36 +422,6 @@ export const calculateResourceRates = (
 	});
 
 	return { base, modifiers, total };
-};
-
-// Biome Generation: a random purchase picks a biome by weight; water and shores cluster around existing water
-export const getRandomBiome = (
-	tiles?: Tile[][],
-	x = 0,
-	y = 0,
-	random: () => number = Math.random
-): BiomeType => {
-	const BIOMES_TO_EXCLUDE = [...SPECIAL_SINGLE_TYPE_BIOMES, ...EMPTY_BIOMES];
-	const available = Object.keys(BIOMES).filter((name) => !BIOMES_TO_EXCLUDE.includes(name as BiomeType));
-
-	const around = tiles
-		? ([[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]] as const).map(([ax, ay]) => tiles[ay]?.[ax])
-		: [];
-	const nearLake = around.some((t) => t?.isOwned && t.biome === 'lake');
-	const nearCoast = around.some((t) => t?.isOwned && t.biome === 'coast');
-
-	const weights = available.map((name) => {
-		let w = BIOME_SPAWN.weights[name] ?? 1;
-		if (nearLake) w *= BIOME_SPAWN.nearLake[name] ?? 1;
-		if (nearCoast) w *= BIOME_SPAWN.nearCoast[name] ?? 1;
-		return w;
-	});
-	let roll = random() * weights.reduce((a, b) => a + b, 0);
-	for (let i = 0; i < available.length; i++) {
-		roll -= weights[i];
-		if (roll < 0) return available[i] as BiomeType;
-	}
-	return available[available.length - 1] as BiomeType;
 };
 
 // Per-second output of one owned tile (biome + building, adjacency bonus, global modifiers).

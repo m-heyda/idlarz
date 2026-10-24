@@ -71,9 +71,11 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Tiles &amp; Biomes</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Every tile you buy becomes a biome and produces resources per second. Same-biome neighbours boost each
-					other by +{pct(SCALING_CONFIG.adjacencyBonus)} per neighbour (up to four). Every 4th purchase (when you own 3, 7, 11 ...
-					tiles) lets you choose the biome instead of rolling one.
+					You start with the castle and its eight neighbours already yours. Every tile you buy becomes a biome and
+					produces resources per second. Same-biome neighbours boost each other by +{pct(SCALING_CONFIG.adjacencyBonus)} per
+					neighbour (up to four). New land tends to continue the biome next to it, so areas grow into forests, lakes and ridges.
+					Every 4th purchase lets you choose the biome instead of rolling one - but some biomes are blocked by their neighbours
+					(Tundra never touches Swamp or Coast, Hills never touch Coast, Coast needs water) or unlock later (Swamp, Tundra).
 				</p>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
 					{biomes.map((b) => (
@@ -216,8 +218,10 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Chests</h3>
 				<p className='text-[#d8c8a0]'>
 					A chest appears on one of your tiles every {formatTime(CHEST.intervalSec)} (up to {CHEST.max} wait for you).
-					Click it for {CHEST.minMinutes}-{CHEST.maxMinutes} minutes&apos; worth of your passive gold income; each point
-					of Luck (from Charisma) adds +{pct(CHEST.luckBonusPerPoint, 1)}.
+					Click it to open it: usually {CHEST.minMinutes}-{CHEST.maxMinutes} minutes&apos; worth of your passive gold
+					income, sometimes a lucky x{CHEST.boostMultiplier} chest, a bundle of wood, stone, coal or food, a burst of XP, or
+					even a piece of gear. Chests like the edge of your land. Each point of Luck (from Charisma) adds
+					+{pct(CHEST.luckBonusPerPoint, 1)} gold and makes the lucky chest and gear likelier.
 				</p>
 			</section>
 

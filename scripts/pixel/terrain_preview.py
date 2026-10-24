@@ -11,7 +11,7 @@ import terrain_logic as logic
 from terrain_field import hash32, CELL
 
 NAMES = {'P': 'plains', 'F': 'forest', 'L': 'lake', 'H': 'hills', 'S': 'swamp', 'T': 'tundra', 'B': 'coast',
-         'G': 'grounds', 'Y': 'yard', 'C': 'castle'}
+         'G': 'grounds', 'Y': 'building', 'W': 'yard', 'C': 'castle'}
 
 
 def make_layout(W=30, H=20):
@@ -71,7 +71,9 @@ def render_world(layout, m, images, sprites=True, marks=True):
                 world.paste(tex, (ox + pad, oy + pad), body)
                 world.alpha_composite(rim, (ox + pad, oy + pad))
     if sprites:
-        for sid, sx, sbottom in logic.all_sprites(m, g):
+        for pid, px, py in logic.all_pads(owned):
+            world.alpha_composite(images[pid], (px + pad, py + pad))
+        for sid, sx, sbottom in logic.all_sprites(m, g, logic.built_set(owned)):
             sp = images[sid]
             world.alpha_composite(sp, (sx + pad, sbottom - sp.size[1] + pad))
     if marks:

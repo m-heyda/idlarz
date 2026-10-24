@@ -7,6 +7,8 @@
 
 import { useGameStore } from '../src/stores/gameStore';
 import { INITIAL_RESOURCES, GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
+import { calculateResourceRates } from '../src/utils/gameUtils';
+import { RING } from '../src/utils/biomeRules';
 import type { Resources } from '../src/types/game';
 
 useGameStore.persist.setOptions({
@@ -16,9 +18,27 @@ useGameStore.persist.setOptions({
 export const store = useGameStore;
 export const api = () => useGameStore.getState();
 
-/** Fresh game, optionally with extra resources. */
+/**
+ * The pre-ring start most economy tests were written for: the castle alone, one free tile. (A real new game owns the
+ * castle and its 8 neighbours; that is covered in biomeSpawn.test.ts.)
+ */
+export const classicStart = () => {
+	const s = api();
+	const tiles = s.tiles.map((row) => [...row]);
+	RING.forEach(([dx, dy]) => {
+		tiles[GRID_CENTER_Y + dy][GRID_CENTER_X + dx] = { biome: 'empty', isOwned: false };
+	});
+	useGameStore.setState({
+		tiles,
+		freeTiles: 1,
+		resourceRates: calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige),
+	});
+};
+
+/** Fresh game (castle only, see classicStart), optionally with extra resources. */
 export const freshGame = (extra: Partial<Resources> = {}) => {
 	api().resetGame();
+	classicStart();
 	if (Object.keys(extra).length) {
 		const r = { ...INITIAL_RESOURCES, ...extra };
 		useGameStore.setState({ resources: r });

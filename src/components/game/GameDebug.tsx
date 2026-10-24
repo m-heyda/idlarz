@@ -1,3 +1,5 @@
+import { pickChestSpot } from '@/lib/chests';
+import { castleLevelOf } from '@/lib/castleWard';
 import React, { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, MAX_CATCHUP_SEC } from '@/config/gameConfig';
@@ -62,36 +64,20 @@ const GameDebug: React.FC = () => {
 	};
 
 	const handleSpawnChest = () => {
-		// Find a random owned tile that's not a castle to spawn a chest on
-		const eligibleTiles: { x: number; y: number }[] = [];
-		tiles.forEach((row, y) => {
-			row.forEach((tile, x) => {
-				if (tile.isOwned && tile.biome !== 'castle' && !tile.hasChest) {
-					eligibleTiles.push({ x, y });
-				}
-			});
-		});
-		
-		if (eligibleTiles.length > 0) {
-			const randomIndex = Math.floor(Math.random() * eligibleTiles.length);
-			const { x, y } = eligibleTiles[randomIndex];
-			
-			// Access the gameStore state to spawn a chest
-			useGameStore.setState((state) => {
-				const newTiles = [...state.tiles];
-				newTiles[y] = [...newTiles[y]];
-				newTiles[y][x] = { ...newTiles[y][x], hasChest: true };
-				
-				return {
-					tiles: newTiles,
-					activeChests: state.activeChests + 1
-				};
-			});
-			
-			alert(`Chest spawned at tile (${x}, ${y})`);
-		} else {
+		// the same placement rule as the timed spawn (frontier-leaning, spread out, never on the castle ward / buildings / monsters)
+		const state = useGameStore.getState();
+		const spot = pickChestSpot(state.tiles, new Set(state.monsters.map((m) => `${m.x},${m.y}`)), castleLevelOf(state.tiles));
+		if (!spot) {
 			alert('No eligible tiles for chest spawning. Buy more tiles first!');
+			return;
 		}
+		useGameStore.setState((st) => {
+			const newTiles = [...st.tiles];
+			newTiles[spot.y] = [...newTiles[spot.y]];
+			newTiles[spot.y][spot.x] = { ...newTiles[spot.y][spot.x], hasChest: true };
+			return { tiles: newTiles, activeChests: st.activeChests + 1 };
+		});
+		alert(`Chest spawned at tile (${spot.x}, ${spot.y})`);
 	};
 
 	const handleSpawnMonster = (type: MonsterType) => {

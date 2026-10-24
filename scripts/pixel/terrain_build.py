@@ -11,6 +11,7 @@ import os
 from PIL import Image
 import terrain_art as art
 import terrain_logic as logic
+import terrain_pads as pads
 import terrain_props as props
 from terrain_field import CELL, hash32
 
@@ -47,6 +48,8 @@ def collect():
         for length in (22, 26, 30):
             for barrel in (0, 1):
                 images[f'pier_{d}_{length}_{barrel}'] = props.cached(props.pier, d, length, bool(barrel))
+    for pid, make in pads.PADS.items():
+        images[pid] = make()
     images['boat_h'] = props.cached(props.boat, False)
     images['boat_v'] = props.cached(props.boat, True)
     return images, table
@@ -86,22 +89,22 @@ def parity_layout():
     rows = [
         '.............................',
         '.TTTTTTT..HHHHHHHHH..........',
-        '.TTTTTTTHHHHHHHHHHHH.........',
+        '.TTTTYTTHHHHHHHHHHHH.........',
         '.TTTTTTPPHHHHHHHHHPP..SSS....',
-        '.TTTPPPPPPHHHHHHPPPPPSSSSS...',
-        '..PPPPPPPFFFFFFPPPPPPSSSSS...',
+        '.TTTPPPPPPHHHHHHPPPPPSYSSS...',
+        '..PPPPPPPFFYFFFPPPPPPSSSSS...',
         '..PPPPGGPFFFFFFFPPPPPSSSS....',
         '.BBPPPGYPFFFFFFFPPPPPSSS.....',
-        '.BBBPPPPPPFFFFFPPPPPPPP......',
+        '.BBBPPPPPPFFFWFPPPPPPPP......',
         '.BLLBPPPPPPCPPPPPPPPBBB......',
-        '.LLLLBPPPPPPPPPPPBBBBLL......',
+        '.LLLLBPPPPPPPPPPPBBYBLL......',
         '.LLLLLLBBBBBBBBBBBLLLLL......',
         '.LLLLLLLLLLLLLLLLLLLLLL......',
         '..LLLLLLLLLLLLLLLLLLLL.......',
         '.............................',
     ]
-    names = {'T': 'tundra', 'H': 'hills', 'P': 'plains', 'S': 'swamp', 'F': 'forest', 'G': 'grounds', 'Y': 'yard',
-             'B': 'coast', 'L': 'lake', 'C': 'castle'}
+    names = {'T': 'tundra', 'H': 'hills', 'P': 'plains', 'S': 'swamp', 'F': 'forest', 'G': 'grounds', 'Y': 'building',
+             'W': 'yard', 'B': 'coast', 'L': 'lake', 'C': 'castle'}
     return rows, names
 
 
@@ -116,7 +119,8 @@ def build_parity(m):
         'depth': [[logic.depth(g, x, y) for x in range(len(g[0]))] for y in range(len(g))],
         'cells': [[cx, cy, [list(layer) for layer in logic.cell_layers(g, cx, cy)]]
                   for cy in range(len(g) + 1) for cx in range(len(g[0]) + 1)],
-        'sprites': [list(s) for s in logic.all_sprites(m, g)],
+        'sprites': [list(s) for s in logic.all_sprites(m, g, logic.built_set(owned))],
+        'pads': [list(p) for p in logic.all_pads(owned)],
     }
 
 

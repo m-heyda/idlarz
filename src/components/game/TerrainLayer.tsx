@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { GRID_SIZE, GRID_HEIGHT, TILE_SIZE } from '@/config/gameConfig';
-import { buildGroundGrid, terrainKey } from '@/utils/terrain';
+import { allPads, buildGroundGrid, builtSet, terrainKey } from '@/utils/terrain';
 import { drawTerrain, loadTerrainAssets, type TerrainAssets } from '@/lib/terrainRenderer';
 
 /**
@@ -29,7 +29,7 @@ const TerrainLayer: React.FC = () => {
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas || !tilesRef.current) return;
-		const raf = requestAnimationFrame(() => drawTerrain(canvas, assets, buildGroundGrid(tilesRef.current)));
+		const raf = requestAnimationFrame(() => drawTerrain(canvas, assets, buildGroundGrid(tilesRef.current), allPads(tilesRef.current), builtSet(tilesRef.current)));
 		return () => cancelAnimationFrame(raf);
 	}, [key, assets]);
 

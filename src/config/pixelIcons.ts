@@ -20,6 +20,13 @@ export const PIXEL_ICON_SIZES = {
 	level_orb: [24, 24],
 	xp: [40, 40],
 	bonus_chest: [24, 24],
+	chest_map: [40, 40], // the map pickup: chest on a grass patch
+	// reserved late-game art (no game resource yet, see RESERVED_RESOURCES below)
+	res_iron: [40, 40],
+	res_fish: [40, 40],
+	res_mana: [40, 40],
+	res_shard: [40, 40],
+	res_mystery: [40, 40],
 	unknown: [11, 14],
 	// portraits: full figure per hero class, head-and-shoulders bust for the header, the merchant
 	hero_warrior: [56, 80],
@@ -93,13 +100,23 @@ export const PIXEL_ICON_SIZES = {
 	biome_lake: [32, 32],
 	biome_coast: [32, 32],
 	biome_grounds: [32, 32],
-	// grounds buildings, seen from above: picker icon + full-tile graphic
-	building_farm: [48, 48],
-	building_mine: [48, 48],
-	building_lumbermill: [48, 48],
-	building_market: [48, 48],
-	building_blacksmith: [48, 48],
-	building_workshop: [48, 48],
+	// grounds buildings, 3/4 view on a transparent 48x60 canvas anchored at the tile bottom (the foundation is terrain art)
+	building_farm: [48, 60],
+	building_mine: [48, 60],
+	building_lumbermill: [48, 60],
+	building_market: [48, 60],
+	building_blacksmith: [48, 60],
+	building_workshop: [48, 60],
+	building_lumbercamp: [48, 60],
+	building_quarry: [48, 60],
+	building_fishinghut: [48, 60],
+	building_hunterslodge: [48, 60],
+	building_tavern: [48, 60],
+	building_tower: [48, 60],
+	building_well: [48, 60],
+	building_alchemylab: [48, 60],
+	building_stonecraft: [48, 60],
+	building_barracks: [48, 60],
 	// farm animals
 	animal_chicken: [40, 40],
 	animal_pig: [40, 40],
@@ -188,6 +205,16 @@ export const BUILDING_PIXEL_ICONS: Record<string, PixelIconName> = {
 	market: 'building_market',
 	blacksmith: 'building_blacksmith',
 	workshop: 'building_workshop',
+	lumbercamp: 'building_lumbercamp',
+	quarry: 'building_quarry',
+	fishinghut: 'building_fishinghut',
+	hunterslodge: 'building_hunterslodge',
+	tavern: 'building_tavern',
+	tower: 'building_tower',
+	well: 'building_well',
+	alchemylab: 'building_alchemylab',
+	stonecraft: 'building_stonecraft',
+	barracks: 'building_barracks',
 };
 
 // Soft working-glow colour per building (a converted tile's workstation glows in this tone)
@@ -198,4 +225,24 @@ export const BUILDING_GLOW: Record<string, string> = {
 	market: '#ffd84a',
 	blacksmith: '#ff8a3c',
 	workshop: '#b27aff',
+	lumbercamp: '#c8e070',
+	quarry: '#c4cce0',
+	fishinghut: '#58c4f8',
+	hunterslodge: '#e08a5a',
+	tavern: '#ffc060',
+	tower: '#7aa8ff',
+	well: '#8adcff',
+	alchemylab: '#d070ff',
+	stonecraft: '#b8c4d8',
+	barracks: '#ff7a7a',
+};
+
+// Art-only resources for a later end-game / rebirth system (see docs/05). They are NOT in `Resources` or
+// RESOURCE_PIXEL_ICONS on purpose: nothing in the game produces or spends them yet.
+export const RESERVED_RESOURCES: Record<string, PixelIconName> = {
+	iron: 'res_iron',
+	fish: 'res_fish',
+	mana: 'res_mana',
+	abilityShard: 'res_shard',
+	randomItem: 'res_mystery',
 };

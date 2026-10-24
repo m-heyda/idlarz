@@ -4,11 +4,14 @@ import {
 	ATLAS,
 	MAX_DEPTH,
 	RANK,
+	allPads,
 	allSprites,
 	buildGroundGrid,
+	builtSet,
 	cellLayers,
 	depth,
 	groundOf,
+	foundationBiome,
 	hash32,
 	terrainKey,
 	tileSprites,
@@ -20,7 +23,7 @@ import parity from './fixtures/terrain-parity.json';
 const NAMES: Record<string, { biome: BiomeType; building?: string; level?: number }> = {
 	T: { biome: 'tundra' }, H: { biome: 'hills' }, P: { biome: 'plains' }, S: { biome: 'swamp' }, F: { biome: 'forest' },
 	G: { biome: 'grounds' }, Y: { biome: 'grounds', building: 'farm', level: 2 }, B: { biome: 'coast' }, L: { biome: 'lake' },
-	C: { biome: 'castle' },
+	C: { biome: 'castle' }, W: { biome: 'castle', level: 7 },
 };
 const grid = (rows: string[]): Tile[][] =>
 	rows.map((row) => [...row].map((c) => (c in NAMES ? { ...NAMES[c], isOwned: true } : { biome: 'empty' as BiomeType, isOwned: false })));
@@ -37,12 +40,15 @@ test('tile depth, dual-cell layers and sprite placement match the Python logic o
 		for (let cx = 0; cx <= g[0].length; cx++)
 			cells.push([cx, cy, cellLayers(g, cx, cy).map((l) => [l.style, l.mask, l.variant])]);
 	assert.deepEqual(cells, parity.cells);
-	assert.deepEqual(allSprites(g).map((s) => [s.id, s.x, s.bottom]), parity.sprites);
+	const tiles = grid(parity.layout);
+	assert.deepEqual(allSprites(g, undefined, builtSet(tiles)).map((s) => [s.id, s.x, s.bottom]), parity.sprites);
+	assert.deepEqual(allPads(tiles).map((p) => [p.id, p.x, p.bottom - 48]), parity.pads);
 });
 
-test('yard rule: grounds with a building above level 1 is a yard; unowned and empty are no ground', () => {
-	assert.equal(groundOf({ biome: 'grounds', isOwned: true, building: 'farm', level: 2 }), 'yard');
-	assert.equal(groundOf({ biome: 'grounds', isOwned: true, building: 'farm', level: 1 }), 'grounds');
+test('yard rule: the fortress is cobbled; unowned and empty are no ground; a building keeps the grounds tile until the grid resolves it', () => {
+	assert.equal(groundOf({ biome: 'castle', isOwned: true, level: 7 }), 'yard');
+	assert.equal(groundOf({ biome: 'castle', isOwned: true, level: 6 }), 'castle');
+	assert.equal(groundOf({ biome: 'grounds', isOwned: true, building: 'farm', level: 2 }), 'grounds');
 	assert.equal(groundOf({ biome: 'grounds', isOwned: true, level: 3 }), 'grounds');
 	assert.equal(groundOf({ biome: 'forest', isOwned: false }), null);
 	assert.equal(groundOf({ biome: 'empty', isOwned: true }), null);
@@ -68,11 +74,26 @@ test('layers: a lone ground fills, a differing corner adds a rank-masked shape',
 	assert.deepEqual(cellLayers(g3, 1, 1).map((l) => [l.style, l.mask]), [['plains', 15], ['forest', 2]]);
 });
 
+test('foundation: a building tile takes the most common land biome around it (lake counts as coast, ties by order, none -> plains)', () => {
+	const g1 = buildGroundGrid(grid(['TTT', 'TYT', 'TTT']));
+	assert.equal(g1[1][1], 'tundra');
+	const g2 = buildGroundGrid(grid(['LLL', 'LYL', 'LLL']));
+	assert.equal(g2[1][1], 'coast');
+	const g3 = buildGroundGrid(grid(['FFH', 'PYH', 'PPH']));
+	assert.equal(g3[1][1], 'hills'); // 3 plains vs 3 hills vs 2 forest: the earlier entry (hills) wins the tie
+	const g4 = buildGroundGrid(grid(['GGG', 'GYG', 'GGG']));
+	assert.equal(g4[1][1], 'plains');
+	const tiles = grid(['TTT', 'TYT', 'TTT']);
+	assert.equal(foundationBiome(tiles, 1, 1), 'tundra');
+	assert.deepEqual(allPads(tiles).map((p) => p.id.replace(/_\d$/, '')), ['pad_tundra']);
+	assert.equal(allSprites(buildGroundGrid(tiles), undefined, builtSet(tiles)).filter((s) => s.x >= 48 && s.x < 96 && s.bottom > 48 && s.bottom <= 96).length, 0);
+});
+
 test('lake outranks every land biome and yard / castle outrank the lake (square kerb on the shore)', () => {
 	assert.ok(RANK.indexOf('lake') > RANK.indexOf('hills'));
 	assert.ok(RANK.indexOf('yard') > RANK.indexOf('lake'));
 	assert.ok(RANK.indexOf('castle') > RANK.indexOf('yard'));
-	const g = buildGroundGrid(grid(['LL', 'LY']));
+	const g = buildGroundGrid(grid(['LL', 'LW']));
 	assert.deepEqual(cellLayers(g, 1, 1).map((l) => [l.style, l.mask]), [['lake', 15], ['yard', 8]]);
 });
 
@@ -111,13 +132,13 @@ test('the terrain key ignores chest toggles and changes when ground changes', ()
 	assert.equal(terrainKey(b), key);
 	b[1][1].biome = 'lake';
 	assert.notEqual(terrainKey(b), key);
-	const c = grid(['GG', 'GG']);
-	const yardKey = (() => {
+	const c = grid(['GG', 'PP']);
+	const builtKey = (() => {
 		c[0][0].building = 'farm';
 		c[0][0].level = 2;
 		return terrainKey(c);
 	})();
-	assert.notEqual(yardKey, terrainKey(grid(['GG', 'GG'])));
+	assert.notEqual(builtKey, terrainKey(grid(['GG', 'PP'])));
 });
 
 test('manifest: every style has an atlas entry and every prop references a sprite', () => {

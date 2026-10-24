@@ -11,7 +11,7 @@ import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import NamePrompt from '@/components/game/overlays/NamePrompt';
 import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/gameConfig';
-import { calculateTileCost, effectiveTileDiscount } from '@/utils/gameUtils';
+import { calculateTileCost, economyTiles, effectiveTileDiscount } from '@/utils/gameUtils';
 import MerchantOverlay from '@/components/game/overlays/Merchant/MerchantOverlay';
 import FarmOverlay from '@/components/game/overlays/FarmOverlay';
 import GameHeader from '@/components/game/GameHeader';
@@ -38,16 +38,11 @@ export default function Home() {
 	useEffect(() => loadSettings(), [loadSettings]);
 	// Hidden shortcut: Control x5 within 2.5 s opens the save tools (export / import / reset)
 	useCtrlSequence(5, 2500, toggleSaveMenu);
-	const lastChestReward = useGameStore((state) => state.lastChestReward);
-	const lastChestGoldRate = useGameStore((state) => state.lastChestGoldRate);
-	const lastChestMinutesAwarded = useGameStore((state) => state.lastChestMinutesAwarded);
+	const lastChestLoot = useGameStore((state) => state.lastChestLoot);
 	// Monotonic clock: changing the system clock must not change game speed
 	const lastTickTime = useRef(performance.now());
 	const [showChestNotification, setShowChestNotification] = useState(false);
-	const [chestRewardAmount, setChestRewardAmount] = useState(0);
-	const [minutesAwarded, setMinutesAwarded] = useState(0);
-	const [goldPerSecond, setGoldPerSecond] = useState(0);
-	const prevLastChestRewardRef = useRef(0);
+	const shownLootRef = useRef<typeof lastChestLoot>(null);
 
 	const biomeSelectionActive = useGameStore((state) => state.biomeSelectionActive);
 	const selectableBiomes = useGameStore((state) => state.selectableBiomes);
@@ -57,10 +52,11 @@ export default function Home() {
 	const characterStats = useGameStore((state) => state.characterStats);
 	const prestige = useGameStore((state) => state.prestige);
 	const tiles = useGameStore((state) => state.tiles);
+	const freeTiles = useGameStore((state) => state.freeTiles);
 	const [clickPosition, setClickPosition] = React.useState<{x: number, y: number} | undefined>(undefined);
 	
 	const tileCost = calculateTileCost(
-		tiles.flat().filter((tile) => tile.isOwned).length,
+		economyTiles(tiles, freeTiles),
 		effectiveTileDiscount(characterStats, prestige)
 	);
 
@@ -97,28 +93,13 @@ export default function Home() {
 	}, [biomeSelectionActive, pendingTileCoords]);
 
 	useEffect(() => {
-		// Only proceed if there's a real change (not just initial value)
-		// and if the reward is greater than zero
-		if (lastChestReward > 0 && lastChestReward !== prevLastChestRewardRef.current) {
-			// Update the notification values
-			setChestRewardAmount(lastChestReward);
-			setGoldPerSecond(lastChestGoldRate);
-			setMinutesAwarded(lastChestMinutesAwarded);
-			
-			// Show the notification
-			setShowChestNotification(true);
-			
-			// Store the current value for future comparison
-			prevLastChestRewardRef.current = lastChestReward;
-			
-			// Auto-hide after 3 seconds
-			const timer = setTimeout(() => {
-				setShowChestNotification(false);
-			}, 3000);
-			
-			return () => clearTimeout(timer);
-		}
-	}, [lastChestReward, lastChestGoldRate, lastChestMinutesAwarded]);
+		// A new chest result (a fresh object every time one is opened) shows the toast for 3 seconds
+		if (!lastChestLoot || lastChestLoot === shownLootRef.current) return;
+		shownLootRef.current = lastChestLoot;
+		setShowChestNotification(true);
+		const timer = setTimeout(() => setShowChestNotification(false), 3000);
+		return () => clearTimeout(timer);
+	}, [lastChestLoot]);
 
 	return (
 		<main className='h-screen w-screen overflow-hidden relative'>
@@ -142,17 +123,11 @@ export default function Home() {
 			<LegacyDialog />
 			<TutorialDialog />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}
-			<ChestNotification 
-				show={showChestNotification} 
-				amount={chestRewardAmount} 
-				goldPerSecond={goldPerSecond}
-				minutesAwarded={minutesAwarded}
-				onClose={() => setShowChestNotification(false)}
-			/>
+			<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
 			{/* Biome Selection Dialog */}
 			{biomeSelectionActive && selectableBiomes && (
 				<BiomeSelectionDialog
-					availableBiomes={selectableBiomes}
+					verdicts={selectableBiomes}
 					onSelect={selectBiome}
 					onCancel={cancelBiomeSelection}
 					cost={tileCost}

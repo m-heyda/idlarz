@@ -226,6 +226,10 @@ export interface TapResult {
 	lucky: boolean;
 }
 
+export type { BiomeVerdict } from '@/utils/biomeRules';
+import type { BiomeVerdict } from '@/utils/biomeRules';
+import type { ChestLoot } from '@/lib/chests';
+
 export interface GameState {
 	previousLevel: number;
 	tiles: Tile[][];
@@ -253,7 +257,8 @@ export interface GameState {
 	isHydrated: boolean;
 	biomeSelectionActive: boolean;
 	pendingTileCoords: { x: number; y: number } | null;
-	selectableBiomes: BiomeType[] | null;
+	selectableBiomes: BiomeVerdict[] | null; // what the biome picker offers (blocked ones carry the reason)
+	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
 	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
 	castleUpgrade: CastleUpgradeState | null;
@@ -263,6 +268,7 @@ export interface GameState {
 	lastChestReward: number;
 	lastChestGoldRate: number;
 	lastChestMinutesAwarded: number;
+	lastChestLoot: ChestLoot | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods
 	buyTile: (x: number, y: number) => boolean;

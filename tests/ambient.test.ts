@@ -102,3 +102,15 @@ test('rebirth and full reset clear the gift cooldowns', () => {
 	assert.equal(store.getState().tiles[GRID_CENTER_Y][GRID_CENTER_X].level, 1);
 	assert.equal(GRID_CENTER_X, 25);
 });
+
+test('a built-on tile hosts the critters of its foundation biome (swamp plot -> ladybugs only, never the grounds rabbit)', () => {
+	const tiles = emptyGrid();
+	for (let y = 11; y <= 13; y++) for (let x = 6; x <= 8; x++) tiles[y][x] = { biome: 'swamp', isOwned: true };
+	tiles[12][7] = { biome: 'grounds', isOwned: true, building: 'farm', level: 2 };
+	const hosts = new Set<string>();
+	for (let i = 0; i < 400; i++) {
+		const c = pickAmbientCritter(tiles, WHOLE_MAP, () => (i * 0.6180339 + 0.1) % 1)!;
+		if (Math.floor(c.x / TILE_SIZE) === 7 && Math.floor(c.y / TILE_SIZE) === 12) hosts.add(c.type);
+	}
+	assert.deepEqual([...hosts], ['ladybug']);
+});

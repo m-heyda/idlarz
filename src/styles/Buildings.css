@@ -1,56 +1,49 @@
-/* Converted tiles: the workstation itself glows softly in its own colour (no badge on top). */
+/* Converted tiles: a 48x60 building sprite stands on its tile (anchored at the bottom, the roof rises over the tile above),
+   with a faint work-glow on the foundation in its own colour. The ground itself is terrain art (TerrainLayer pads). */
 
 .tile-building {
 	--glow: #ffd860;
 	position: relative;
 	display: flex;
-	align-items: center;
+	align-items: flex-end;
 	justify-content: center;
 	width: 100%;
 	height: 100%;
+	pointer-events: none;
 }
 
 .tile-building::before {
 	content: '';
 	position: absolute;
-	inset: 4px;
+	left: 6px;
+	right: 6px;
+	bottom: 4px;
+	height: 26px;
 	border-radius: 50%;
 	background: radial-gradient(closest-side, var(--glow) 0%, transparent 100%);
-	opacity: 0.45;
-	filter: blur(5px);
+	opacity: 0.22;
+	filter: blur(6px);
 	pointer-events: none;
-	animation: building-halo 2.8s ease-in-out infinite alternate;
+	animation: building-halo 3.2s ease-in-out infinite alternate;
 }
 
 .tile-building > img {
 	position: relative;
-	filter: drop-shadow(0 0 2px var(--glow)) drop-shadow(0 0 7px var(--glow)) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.4));
-	animation: building-pulse 2.8s ease-in-out infinite alternate;
+	flex: none;
+	filter: drop-shadow(0 0 2px color-mix(in srgb, var(--glow) 55%, transparent));
 }
 
 @keyframes building-halo {
 	from {
-		opacity: 0.22;
-		transform: scale(0.9);
+		opacity: 0.12;
 	}
 	to {
-		opacity: 0.6;
-		transform: scale(1.1);
-	}
-}
-
-@keyframes building-pulse {
-	from {
-		filter: drop-shadow(0 0 1px var(--glow)) drop-shadow(0 0 4px var(--glow)) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.4));
-	}
-	to {
-		filter: drop-shadow(0 0 2px var(--glow)) drop-shadow(0 0 10px var(--glow)) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.4));
+		opacity: 0.3;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.tile-building::before,
-	.tile-building > img {
+	.tile-building::before {
 		animation: none;
 	}
 }

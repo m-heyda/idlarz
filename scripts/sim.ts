@@ -286,7 +286,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 				frontierDirty = false;
 			}
 			if (!frontier) break;
-			const owned = utils.countOwnedTiles(s.tiles);
+			const owned = utils.economyTiles(s.tiles, s.freeTiles);
 			const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige));
 			const bundle = utils.tileCostAsResources(cost);
 			if (!utils.canAffordBundle(s.resources, bundle)) {
@@ -311,7 +311,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 			frontierDirty = true;
 			s = api();
-			const ownedNow = utils.countOwnedTiles(s.tiles);
+			const ownedNow = utils.economyTiles(s.tiles, s.freeTiles);
 			TILE_MARKS.forEach((n) => ownedNow >= n && mark(`tiles${n}`, t));
 		}
 
@@ -322,7 +322,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	const sellExcess = (s: ReturnType<typeof api>) => {
 		const castle = s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X];
 		const need: Record<string, number> = { ...((castle.upgradeCost ?? {}) as Record<string, number>) };
-		const owned = utils.countOwnedTiles(s.tiles);
+		const owned = utils.economyTiles(s.tiles, s.freeTiles);
 		for (let k = 0; k < 3; k++) {
 			const c = utils.calculateTileCost(owned + k, utils.effectiveTileDiscount(s.characterStats, s.prestige));
 			Object.entries(c.resources).forEach(([r, v]) => {
@@ -347,7 +347,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		return (
 			castle >= FIRST_FINISH_CASTLE &&
 			s.clickLevel >= cfg.CLICK_LADDER.length - 1 &&
-			utils.countOwnedTiles(s.tiles) >= 40
+			utils.economyTiles(s.tiles, s.freeTiles) >= 40
 		);
 	};
 
@@ -359,7 +359,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const s = api();
 			const r = s.resourceRates.total;
 			console.error(
-				`[${name}] day ${lastTraceDay} tiles ${utils.countOwnedTiles(s.tiles)} castle ${s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level} up=${s.castleUpgrade ? Math.round(s.castleUpgrade.remainingSec / 3600) + 'h' : '-'} lvl ${s.level.level} click${s.clickLevel} gold ${Math.round(s.resources.gold)} (+${r.gold.toFixed(1)}/s) wood ${Math.round(s.resources.wood)} stone ${Math.round(s.resources.stone)} coal ${Math.round(s.resources.coal)} food ${Math.round(s.resources.food)} (+${r.food.toFixed(1)}) meat ${Math.round(s.resources.meat)} (+${r.meat.toFixed(1)}) farm ${JSON.stringify(s.farmLevels)}`
+				`[${name}] day ${lastTraceDay} tiles ${utils.economyTiles(s.tiles, s.freeTiles)} castle ${s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level} up=${s.castleUpgrade ? Math.round(s.castleUpgrade.remainingSec / 3600) + 'h' : '-'} lvl ${s.level.level} click${s.clickLevel} gold ${Math.round(s.resources.gold)} (+${r.gold.toFixed(1)}/s) wood ${Math.round(s.resources.wood)} stone ${Math.round(s.resources.stone)} coal ${Math.round(s.resources.coal)} food ${Math.round(s.resources.food)} (+${r.food.toFixed(1)}) meat ${Math.round(s.resources.meat)} (+${r.meat.toFixed(1)}) farm ${JSON.stringify(s.farmLevels)}`
 			);
 		}
 		const active = isActive(t);

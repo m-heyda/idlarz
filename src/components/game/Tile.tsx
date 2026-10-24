@@ -20,13 +20,12 @@ import {
 	calculateTileCost,
 	canAffordBundle,
 	effectiveTileDiscount,
-	countOwnedTiles,
+	economyTiles,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 import audioManager from '@/utils/audioManager';
 import { queueTileTap } from '@/lib/floatText';
-import ResourceIcon from './ResourceIcon';
 import PixelIcon from './PixelIcon';
 import CastleSprite from './CastleSprite';
 import { BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
@@ -131,7 +130,8 @@ const Tile: React.FC<TileProps> = ({
 		Math.abs(x - GRID_CENTER_X) <= CASTLE_RANGE.radius &&
 		Math.abs(y - GRID_CENTER_Y) <= CASTLE_RANGE.radius;
 
-	const ownedTilesCount = useMemo(() => countOwnedTiles(tiles), [tiles]);
+	const freeTiles = useGameStore((state) => state.freeTiles);
+	const ownedTilesCount = useMemo(() => economyTiles(tiles, freeTiles), [tiles, freeTiles]);
 
 	const tileCost = useMemo(
 		() => calculateTileCost(ownedTilesCount, effectiveTileDiscount(characterStats, prestige)),
@@ -260,7 +260,6 @@ const Tile: React.FC<TileProps> = ({
 						'castle-tile': isOwned && biome === 'castle',
 						'castle-max-tile': isOwned && isGlowingCastle && !isFortress,
 						'tile-fortress': isOwned && isFortress,
-						'border-2 border-amber-400': isOwned && hasChest,
 						'tile-cooldown': cooling,
 					}
 				)}
@@ -318,7 +317,7 @@ const Tile: React.FC<TileProps> = ({
 					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && (
 						<span className='tile-chest-wrap'>
-							<PixelIcon name='bonus_chest' alt='Bonus gold' className='tile-chest' />
+							<PixelIcon name='chest_map' alt='Treasure chest' className='tile-chest' />
 							<i className='chest-twinkle' aria-hidden />
 						</span>
 					)}
@@ -349,7 +348,7 @@ const Tile: React.FC<TileProps> = ({
 						)}
 						{isOwned && hasChest && showChestTooltip && (
 							<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs text-[#f0d27a]'>
-								Click to collect bonus gold <ResourceIcon resource='gold' />
+								Click to open the treasure chest
 							</div>
 						)}
 						<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>
