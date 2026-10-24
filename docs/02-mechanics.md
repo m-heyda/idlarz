@@ -4,7 +4,7 @@ Exact rules as implemented. Constants live in [`src/config/gameConfig.ts`](../sr
 
 ## 1. The loop in one paragraph
 
-You start with a castle on a 50×50 map and 125 gold. Gold, other resources and XP trickle in every second. Gold (plus wood/stone/coal later) buys **adjacent unexplored tiles**, each of which becomes a biome and adds income. The **castle** is a big timed upgrade that multiplies everything. **Farm animals** turn food into meat, the **merchant** converts anything into gold (and back, at a loss), **clicking the map** and **chests** add active bonuses, and every **level** gives a stat point. First finish line = castle 6, best click power and ~40+ tiles (about 4 weeks for an active player, [06](06-playtest-and-pacing-report.md)). After that the game continues with castle levels 7–10 and **Rebirth** (§13), which restarts the map for permanent Legacy bonuses.
+You start with a castle on a 50×50 map and 125 gold. Gold, other resources and XP trickle in every second. Gold (plus wood/stone/coal later) buys **adjacent unexplored tiles**, each of which becomes a biome and adds income. The **castle** is a big timed upgrade that multiplies everything. **Farm animals** turn food into meat, the **merchant** converts anything into gold (and back, at a loss), **clicking the map** and **chests** add active bonuses, every **level** gives a stat point, and **monsters** on your land can be fought for XP, gold and gear (§15). First finish line = castle 6, best click power and ~40+ tiles (about 4 weeks for an active player, [06](06-playtest-and-pacing-report.md)). After that the game continues with castle levels 7–10 and **Rebirth** (§13), which restarts the map for permanent Legacy bonuses.
 
 ## 2. Map & buying tiles
 
@@ -80,17 +80,17 @@ XP comes from passive income (`total.xp × (1 + xpGainMultiplier)`) and from eve
 | Vitality | wood & food +2.5 % |
 | Charisma | gold & coal +2.5 %, XP production +0.25 %, XP gained +0.25 %, tile cost −0.5 % (max −25 %), Luck +1 (chests) |
 
-All text in tooltips and the tutorial comes from `CHARACTER_STAT_CONFIG`. Other derived stats (HP, MP, attack, defence, crit, reputation …) are display-only for now.
+All text in tooltips and the tutorial comes from `CHARACTER_STAT_CONFIG`. Stat points do not feed combat yet (see §15 and the roadmap). HP is live (current / max); the other derived stats (MP, attack, defence, crit, reputation …) are display-only for now.
 
 ## 12. UI surfaces
 
-Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and the **hidden save tools** (press Control five times): export / import / reset ([07](07-security-and-exploits.md)). Also Settings, Legacy (rebirth + shop) and the re-openable tutorial.
+Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), Character window (paper doll + bag), fight modal, level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and the **hidden save tools** (press Control five times): export / import / reset ([07](07-security-and-exploits.md)). Also Settings, Legacy (rebirth + shop) and the re-openable tutorial.
 
 ## 13. Rebirth and Legacy
 
 - Available when the castle is level 6 or more and you own at least 20 tiles (and no castle upgrade is running). The **Legacy** button in the header (visible from castle 6, or after the first rebirth) opens the dialog.
 - **Legacy points** gained = `floor(4.5 × (castle level − 5) × sqrt(tiles / 10))`, for example castle 6 / 40 tiles = 9, castle 10 / 50 tiles = 50 ([03 §9](03-formulas-and-scaling.md#9-rebirth-and-legacy)). The dialog shows the preview before you confirm.
-- **Resets**: map, resources, castle, animals, buildings, level / XP / stat points, click upgrades, chests, the castle timer. **Keeps**: name, class, play time, all Legacy progress, settings.
+- **Resets**: map, resources, castle, animals, buildings, level / XP / stat points, click upgrades, chests, monsters and any open fight, the castle timer; HP is refilled. **Keeps**: name, class, play time, all Legacy progress, settings, and your **gear, bag and potions**.
 - **Permanent bonus**: +5 % of total income for every Legacy point *earned* (spending points never lowers income).
 - **Shop** (spend points, ten levels each, price grows ×1.4 per level): *Thrift* −2 % tile and building cost per level; *Master Builders* −5 % castle build time; *Click Mastery* +10 % click power; *Provisions* start each run with a bundle of gold, wood and stone. The Thrift discount and Charisma share one cap of 45 %.
 - Expected pace (sim, [06](06-playtest-and-pacing-report.md)): the second run reaches castle 6 in about 70 % of the first run's time, later runs get shorter but flatten.
@@ -99,3 +99,22 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 
 - **Settings** (header): sound on/off, volume, ambient life on/off, buttons for Save tools (same as Control ×5) and the tutorial. Stored in the browser (`idlarz-settings`), separate from the game save.
 - **Ambient life**: every 4–9 s a butterfly, bee, ladybug or rabbit (chosen by biome; Coast gets butterflies and bees) wanders over an owned tile in view for 6–10 s. About 1 in 12 is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Off in Settings, with a hidden tab, or with reduced-motion.
+
+## 15. Monsters and combat
+
+- **Spawning**: once you own 5 tiles, the first rat appears after 2 minutes, then one every 15 minutes (chests: 10), on a random owned non-castle tile without a chest or another monster. At most 8 monsters; the timer pauses while the map is full.
+- **Growing**: a rat gains a tier every 30 minutes on the map (max tier 5): more HP, harder hits, better rewards. A tier-5 rat can evolve into the **Rat King** (35 % every 10 minutes of extra age, only one king at a time). The monster you are fighting does not age.
+- **Fighting**: click a monster to open the fight. Every click on the rat hits for your weapon's damage (Wooden Sword 2, so a tier-1 rat needs 50 hits). The rat attacks on a timer (about every 2 s), reduced by your armor. There is no time limit on rats. Hits use the shared click limiter.
+- **HP**: about 100 at the start (`85 + vitality HP + gear`). It regenerates about 1 HP/s while no fight is active, never during one. **Minor Healing Potions** (35 HP, 8 s shared cooldown in a fight, hotkeys 1-3) work in and out of fights.
+- **Losing**: at 0 HP you are knocked out (30 % HP back), the monster is at full HP again and nothing is lost. Fleeing (Flee button or Esc) resets the monster the same way. A fight never survives a reload; your HP does.
+- **Winning**: the monster is removed; gold and XP are a number of seconds of your income (so they keep up with the economy), plus a chance of a **Rattatui** set piece (8 %, +1 % per tier) and of a potion (25 %, +3 % per tier). A full bag turns the drops into gold.
+- **Rat King**: 1000 HP and a 60-second limit. On a timeout or a knockout it taunts you, resets and stays on the map. With the click limiter and the 3-damage weapon cap it **cannot be killed** in this version (308 clicks x 3 = 924 < 1000; `tests/kingInvariant.test.ts` guards that).
+- **Feedback**: blood burst and a damage number per hit, the fight window shakes with a red flash when you are hurt (reduced-motion: flash only).
+
+## 16. Items and the Character window
+
+- **Slots**: head, shoulder, chest, hands, legs, feet (left), neck, cape, ring, ring, charm (right), weapon and shield (bottom), plus two locked ability slots reserved for skills. A 36-slot bag holds everything else.
+- **Stats**: items give Damage (weapons only), Armor and Max HP. Damage / Armor / Max HP are shown under the hero; the Armor tooltip shows the damage reduction.
+- **Starter kit**: Wooden Sword (damage 2), Wooden Shield (armor 2) and 2 potions. Old saves get it on load.
+- **Rattatui Set** (beta testers): Cap, Shoulderpads, Tunic, Gloves, Trousers, Boots, Amulet, Cloak, Ring (fits both ring slots), Charm, Fang Blade (damage 3), Buckler. Tooltips show set progress; 6 pieces give +10 Max HP, all 13 slots +15 more.
+- **Controls**: hover for a tooltip; double-click or right-click a bag item to equip it (or drink a potion); click an equipped item to take it off; drag to rearrange the bag, to equip, or to unequip. Gear cannot be changed during a fight; taking off gear needs a free bag slot.

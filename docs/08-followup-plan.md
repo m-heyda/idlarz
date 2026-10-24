@@ -9,7 +9,7 @@ Everything that was **not** part of the endgame / settings / ambient batch, orde
 | A1 | **Castle-timer badge** on the castle tile and in the header (B4) | S | remaining time visible without opening the dialog; updates each second; hidden when no upgrade runs |
 | A2 | **Legacy respec** (B9) | S | costs one rebirth or a fixed fee; point-conservation check in `sanitizeSave` still holds; test added |
 | A3 | **Reputation has a use** (U6): small merchant discount or quest gate, or remove it from the statistics | S | either read by one formula (documented in 03) or gone |
-| A4 | **HP/MP bars** decision (U5): hide until combat exists | S | no bar that is always full |
+| A4 | ~~**HP/MP bars** decision (U5)~~ **done**: the HP flask and the Statistics window show live HP; MP stays full until skills exist | S | no bar that is always full |
 | A5 | **CI**: GitHub Action running `tsc`, `lint`, `test`, `build`, plus `sim -- --maxdays=30 hardcore` as a pacing guard | S | PR fails when the first-finish time of the dedicated profile moves by more than ±15 % |
 | A6 | **Playwright smoke test**: new game, click, buy tile, open Settings and Legacy, reload keeps state | M | runs in CI; uses `window.__game` only in dev builds |
 | A7 | **Per-tile selectors** so a tick does not re-render every visible tile (performance backlog in 05) | M | React profiler shows a tick touches only changed tiles |
@@ -25,12 +25,12 @@ Rule for every B item: change one parameter group, run `npm run sim -- --seeds=3
 
 Order matters because each step needs the previous one.
 
-1. **C1 Equipment and inventory** (U1, L): items with stats, equip/unequip, summed into `calculateResourceRates`, saved and validated. Decide whether a rebirth keeps items (B8 in 04).
+1. ~~**C1 Equipment and inventory**~~ **done** (combat, monsters, items, bag, Character window; rebirth keeps gear). Next steps and the longer roadmap (stat rework, monster families, skills, item upgrades and selling) are in [superpowers/specs/2026-10-24-combat-and-inventory-design.md](superpowers/specs/2026-10-24-combat-and-inventory-design.md) §13.
 2. **C2 Upgrade items** (U2, M): gold/resource sink; ties to the merchant.
 3. **C3 Quests** (U3, L): early guidance, item rewards, tracking in the store.
 4. **C4 Building levels / demolish** (U13, M): another resource sink (BL5).
 5. **C5 Gambling** (U4, M): uses `luck`; every payout computed in the store, limited by cooldown and the click limiter.
-6. **C6 Combat decision** (U5, L): build expeditions or fold the stats into the economy and trim the table.
+6. ~~**C6 Combat decision**~~ **decided**: click combat on the map (rats, Rat King). Remaining: let the stat points feed combat (U5) and balance it with a fighting bot (05 BL12).
 7. **C7 Offline progress** (U9, M): needs trusted time (Phase D) or a conservative cap (8 h at 50 %).
 8. **C8 Mobile layout** (U14, L): responsive modals, bigger tap targets, test on a real phone.
 
