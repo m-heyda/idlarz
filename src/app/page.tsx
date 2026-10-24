@@ -3,17 +3,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import Grid from '@/components/game/Grid';
-import CharacterOverlay from '@/components/game/overlays/CharacterOverlay';
+import MenuOverlay from '@/components/game/overlays/MenuOverlay';
 import FightModal from '@/components/game/overlays/FightModal';
-import StatisticsOverlay from '@/components/game/overlays/StatisticsOverlay';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import NamePrompt from '@/components/game/overlays/NamePrompt';
 import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/gameConfig';
 import { calculateTileCost, economyTiles, effectiveTileDiscount } from '@/utils/gameUtils';
-import MerchantOverlay from '@/components/game/overlays/Merchant/MerchantOverlay';
-import FarmOverlay from '@/components/game/overlays/FarmOverlay';
 import GameHeader from '@/components/game/GameHeader';
 import BiomeSelectionDialog from '@/components/game/BiomeSelectionDialog';
 import ChestNotification from '@/components/game/overlays/ChestNotification';
@@ -104,16 +101,14 @@ export default function Home() {
 
 	return (
 		<main className='h-screen w-screen overflow-hidden relative'>
-			<div className='fixed top-0 left-0 right-0 z-10 bg-gray-900/80 backdrop-blur-sm'>
+			{/* z-50 puts the header above the window backdrop (z-45): resources stay visible and the Menu button toggles */}
+			<div className='fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm'>
 				<GameHeader />
 			</div>
 			<Grid />
 			<FloatingText />
-			<CharacterOverlay />
+			<MenuOverlay />
 			<FightModal />
-			<StatisticsOverlay />
-			<MerchantOverlay />
-			<FarmOverlay />
 			<ClassPickerDialog />
 			<LevelUpNotification />
 			<LoadingScreen />

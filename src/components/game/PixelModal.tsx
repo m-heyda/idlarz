@@ -15,6 +15,8 @@ interface PixelModalProps {
 	className?: string;
 	/** No body padding or scrolling: the content fills the whole window (the farm scene) */
 	flush?: boolean;
+	/** A tab strip between the title bar and the body (PixelTabs) */
+	tabs?: React.ReactNode;
 	children: React.ReactNode;
 }
 
@@ -31,6 +33,7 @@ const PixelModal: React.FC<PixelModalProps> = ({
 	hideClose = false,
 	className,
 	flush = false,
+	tabs,
 	children,
 }) => {
 	const id = useRef(Symbol('modal')).current;
@@ -74,6 +77,7 @@ const PixelModal: React.FC<PixelModalProps> = ({
 					</h2>
 					<span className='px-title-line rev' />
 				</div>
+				{tabs}
 				<div className={cn('px-modal-body', flush && 'px-modal-body-flush')}>{children}</div>
 			</div>
 		</div>

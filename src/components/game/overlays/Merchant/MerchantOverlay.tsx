@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber } from '@/utils/formatters';
 import { ResourceSellingSection } from './ResourceSellingSection';
@@ -16,7 +16,6 @@ import {
 } from '@/config/gameConfig';
 import { cn } from '@/lib/utils';
 import type { MerchantTab } from '@/types/game';
-import PixelModal from '../../PixelModal';
 import PixelIcon from '../../PixelIcon';
 import ResourceIcon from '../../ResourceIcon';
 
@@ -130,8 +129,6 @@ const ResourceBuyingSection: React.FC<ResourceBuyingSectionProps> = ({
 
 const MerchantOverlay: React.FC = () => {
 	const {
-		showMerchantWindow,
-		toggleMerchantWindow,
 		resources,
 		sellResources,
 		buyResource,
@@ -160,13 +157,6 @@ const MerchantOverlay: React.FC = () => {
 		item: string;
 		price: number;
 	} | null>(null);
-
-	// Always reopen on the Sell tab (the overlay stays mounted while closed)
-	useEffect(() => {
-		if (showMerchantWindow) setActiveTab('exchange');
-	}, [showMerchantWindow]);
-
-	if (!showMerchantWindow) return null;
 
 	// Calculate the max for each resource (current owned amount)
 	const maxAmounts = resources as unknown as Record<string, number>;
@@ -522,11 +512,6 @@ const MerchantOverlay: React.FC = () => {
 	};
 
 	return (
-		<PixelModal
-			title='Merchant'
-			icon={<PixelIcon name='menu_merchant' alt='' />}
-			size='lg'
-			onClose={toggleMerchantWindow}>
 				<div className='grid grid-cols-5 gap-5'>
 					{/* Merchant Avatar and Navigation */}
 					<div className='col-span-1 flex flex-col gap-4'>
@@ -555,7 +540,6 @@ const MerchantOverlay: React.FC = () => {
 						{renderTabContent()}
 					</div>
 				</div>
-		</PixelModal>
 	);
 };
 

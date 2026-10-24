@@ -1,52 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber } from '@/utils/formatters';
-import { ANIMALS, BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
-import { calculateAnimalCost } from '@/utils/gameUtils';
-import PixelIcon from './PixelIcon';
+import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR, REBIRTH, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
+import { useMenuAttention } from '@/hooks/useMenuAttention';
+import { useUiStore } from '@/stores/uiStore';
 import type { PixelIconName } from '@/config/pixelIcons';
+import PixelIcon from './PixelIcon';
 import LevelOrb from './LevelOrb';
 import NotifyDot from './NotifyDot';
 import CharacterPortrait from './CharacterPortrait';
 import EditableName from './EditableName';
-import { useUiStore } from '@/stores/uiStore';
-import { REBIRTH } from '@/config/gameConfig';
-import { GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
 
-// Inner width of the XP frame sprite (72px wide, 3px border each side)
-const XP_BAR_INNER_PX = 66;
+// Inner width of the XP frame sprite (96px wide, 3px border each side)
+const XP_BAR_INNER_PX = 90;
 
-const HeaderMenu: React.FC = () => {
-	const {
-		resources,
-		level,
-		toggleCharacterWindow,
-		toggleStatisticsWindow,
-		toggleMerchantWindow,
-		showMerchantWindow,
-		showStatisticsWindow,
-		showCharacterWindow,
-		showFarmWindow,
-		toggleFarmWindow,
-		characterStats,
-		farmLevels,
-	} = useGameStore((state) => state);
-
-	// Something on the farm is affordable: a new animal or an upgrade
-	const farmAffordable = ANIMALS.some(
-		(animal) => resources.food >= calculateAnimalCost(animal, farmLevels[animal.id] || 0)
-	);
-
+/** Portrait, name, level orb and XP bar. A click opens the Stats tab; double-click renames / picks the class. */
+export const PlayerCard: React.FC = () => {
+	const xp = useGameStore((state) => state.resources.xp);
+	const level = useGameStore((state) => state.level);
+	const availablePoints = useGameStore((state) => state.characterStats.availablePoints);
+	const openMenu = useUiStore((state) => state.openMenu);
+	const statsOpen = useUiStore((state) => state.menuOpen && state.menuTab === 'stats');
 	const [levelUpActive, setLevelUpActive] = useState(false);
-	const settingsOpen = useUiStore((state) => state.settingsOpen);
-	const toggleSettings = useUiStore((state) => state.toggleSettings);
-	const legacyOpen = useUiStore((state) => state.legacyOpen);
-	const toggleLegacy = useUiStore((state) => state.toggleLegacy);
-	const castleLevel = useGameStore((state) => state.tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1);
-	const rebirths = useGameStore((state) => state.prestige.rebirths);
-	const legacyVisible = castleLevel >= REBIRTH.minCastleLevel || rebirths > 0;
+	const [prevAvailablePoints, setPrevAvailablePoints] = useState(0);
 
-	// A single click opens the statistics; hold it back a moment so a double-click (rename / class picker)
+	// A single click opens the stats; hold it back a moment so a double-click (rename / class picker)
 	// can cancel it instead of flashing the window open and shut.
 	const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const cancelClick = () => {
@@ -55,22 +33,66 @@ const HeaderMenu: React.FC = () => {
 	};
 	const handleProfileClick = () => {
 		cancelClick();
-		clickTimer.current = setTimeout(toggleStatisticsWindow, 220);
+		clickTimer.current = setTimeout(() => openMenu('stats'), 220);
 	};
 	useEffect(() => cancelClick, []);
-	const [prevAvailablePoints, setPrevAvailablePoints] = useState(0);
 
 	// Detect level up based on available points
 	useEffect(() => {
-		if (characterStats.availablePoints > prevAvailablePoints) {
+		if (availablePoints > prevAvailablePoints) {
 			setLevelUpActive(true);
-		} else if (characterStats.availablePoints === 0 && levelUpActive) {
+		} else if (availablePoints === 0 && levelUpActive) {
 			setLevelUpActive(false);
 		}
-		setPrevAvailablePoints(characterStats.availablePoints);
-	}, [characterStats.availablePoints, prevAvailablePoints, levelUpActive]);
+		setPrevAvailablePoints(availablePoints);
+	}, [availablePoints, prevAvailablePoints, levelUpActive]);
 
-	const menuButtons: {
+	// XP into the current level, out of what the level needs
+	const needed = Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1));
+	const into = Math.floor(level.progress * needed);
+
+	return (
+		<div
+			className='pixel-profile'
+			data-active={statsOpen}
+			title='Statistics'
+			onClick={handleProfileClick}
+			onDoubleClick={cancelClick}>
+			<span className='pixel-avatar'>
+				<CharacterPortrait variant='bust' />
+			</span>
+			<div className='flex flex-col text-[#ecdcb4] items-start justify-center select-none gap-1'>
+				<div className='flex items-center gap-2'>
+					<EditableName className='pixel-name' />
+					<LevelOrb
+						level={level.level}
+						notify={availablePoints > 0}
+						notifyLabel={`${availablePoints} unassigned stat points`}
+						className={levelUpActive ? 'animate-pulse-ring' : undefined}
+					/>
+				</div>
+				<div className='pixel-xp' title={`XP: ${formatNumber(into)} / ${formatNumber(needed)} (${formatNumber(xp)} in total)`}>
+					<div className='pixel-xp-fill' style={{ width: `${Math.round(level.progress * XP_BAR_INNER_PX)}px` }} />
+				</div>
+			</div>
+		</div>
+	);
+};
+
+/** The three header buttons: the main menu (Character, Stats, Merchant, Farm), Legacy / rebirth and Settings. */
+export const HeaderButtons: React.FC = () => {
+	const attention = useMenuAttention();
+	const menuOpen = useUiStore((state) => state.menuOpen);
+	const toggleMenu = useUiStore((state) => state.toggleMenu);
+	const settingsOpen = useUiStore((state) => state.settingsOpen);
+	const toggleSettings = useUiStore((state) => state.toggleSettings);
+	const legacyOpen = useUiStore((state) => state.legacyOpen);
+	const toggleLegacy = useUiStore((state) => state.toggleLegacy);
+	const castleLevel = useGameStore((state) => state.tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1);
+	const rebirths = useGameStore((state) => state.prestige.rebirths);
+	const legacyVisible = castleLevel >= REBIRTH.minCastleLevel || rebirths > 0;
+
+	const buttons: {
 		icon: PixelIconName;
 		title: string;
 		active: boolean;
@@ -79,24 +101,12 @@ const HeaderMenu: React.FC = () => {
 		notifyLabel?: string;
 	}[] = [
 		{
-			icon: 'menu_character',
-			title: 'Character',
-			active: showCharacterWindow,
-			onClick: toggleCharacterWindow,
-		},
-		{
-			icon: 'menu_merchant',
-			title: 'Merchant',
-			active: showMerchantWindow,
-			onClick: toggleMerchantWindow,
-		},
-		{
-			icon: 'menu_farm',
-			title: 'Farm',
-			active: showFarmWindow,
-			onClick: toggleFarmWindow,
-			notify: farmAffordable,
-			notifyLabel: 'An animal or upgrade is affordable',
+			icon: 'menu_main',
+			title: 'Menu: character, stats, merchant and farm',
+			active: menuOpen,
+			onClick: toggleMenu,
+			notify: attention.any,
+			notifyLabel: 'Something needs your attention',
 		},
 		...(legacyVisible
 			? [
@@ -109,7 +119,7 @@ const HeaderMenu: React.FC = () => {
 			  ]
 			: []),
 		{
-			icon: 'menu_settings' as PixelIconName,
+			icon: 'menu_settings',
 			title: 'Settings',
 			active: settingsOpen,
 			onClick: toggleSettings,
@@ -117,42 +127,8 @@ const HeaderMenu: React.FC = () => {
 	];
 
 	return (
-		<div className='pixel-divider-right flex items-center gap-3 shrink-0 pr-6'>
-			<div
-				className='pixel-profile max-w-64'
-				data-active={showStatisticsWindow}
-				onClick={handleProfileClick}
-				onDoubleClick={cancelClick}>
-				<span className='pixel-avatar'>
-					<CharacterPortrait variant='bust' />
-				</span>
-				<div className='flex flex-col text-[#ecdcb4] items-start justify-center select-none'>
-					<div className='flex items-center gap-2 mb-1'>
-						<EditableName className='pixel-name' />
-						<LevelOrb
-							level={level.level}
-							notify={characterStats.availablePoints > 0}
-							notifyLabel={`${characterStats.availablePoints} unassigned stat points`}
-							className={levelUpActive ? 'animate-pulse-ring' : undefined}
-						/>
-					</div>
-
-					<div
-						className='pixel-xp'
-						title={`XP: ${formatNumber(resources.xp)} / ${formatNumber(
-							Math.floor(
-								BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1)
-							)
-						)}`}>
-						<div
-							className='pixel-xp-fill'
-							style={{ width: `${Math.round(level.progress * XP_BAR_INNER_PX)}px` }}
-						/>
-					</div>
-				</div>
-			</div>
-
-			{menuButtons.map((button) => (
+		<div className='flex items-center gap-2 shrink-0'>
+			{buttons.map((button) => (
 				<div
 					key={button.icon}
 					className='pixel-slot'
@@ -166,5 +142,3 @@ const HeaderMenu: React.FC = () => {
 		</div>
 	);
 };
-
-export default HeaderMenu;

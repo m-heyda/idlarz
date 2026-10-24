@@ -212,7 +212,7 @@ body {
 
 .pixel-xp {
 	position: relative;
-	width: 72px;
+	width: 96px;
 	height: 10px;
 	background: url('/pixel/ui/header_xp_frame.png') no-repeat;
 	image-rendering: pixelated;
@@ -377,7 +377,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 124px 16px 16px;
+	padding: calc(var(--header-h, 76px) + 28px) 16px 16px;
 	background: rgba(4, 3, 6, 0.7);
 	animation: px-fade 0.15s ease-out;
 }
@@ -630,6 +630,77 @@ body {
 		background: #6a4414;
 		border-color: #c08a30;
 		box-shadow: inset 2px 2px 0 #a8783a, inset -2px -2px 0 #3a2410;
+	}
+}
+
+/* --- tab strip at the top of a window: stone tabs on a bronze baseline, the active one raised and joined to the panel --- */
+.px-tabbar {
+	display: flex;
+	align-items: flex-end;
+	gap: 6px;
+	flex-shrink: 0;
+	margin: -4px 0 14px;
+	padding: 0 6px;
+	border-bottom: 3px solid #8a5f26;
+	box-shadow: 0 2px 0 #2a1a0a;
+}
+
+.px-tabbar-item {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: -3px;
+	padding: 6px 18px 6px 12px;
+	font-family: var(--font-pixel);
+	font-size: 0.9375rem;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	color: #b9a77f;
+	background: linear-gradient(#34241a, #1c130c);
+	border: 2px solid #0a0605;
+	border-bottom: 3px solid #8a5f26;
+	box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.1), inset -2px 0 0 rgba(0, 0, 0, 0.35);
+	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+	clip-path: polygon(0 5px, 3px 5px, 3px 3px, 5px 3px, 5px 0, calc(100% - 5px) 0, calc(100% - 5px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 5px, 100% 5px, 100% 100%, 0 100%);
+	transition: filter 0.1s;
+
+	&:hover {
+		color: #fff;
+		filter: brightness(1.2);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--px-gold);
+		outline-offset: -4px;
+	}
+
+	&[data-active='true'] {
+		z-index: 1;
+		padding-top: 9px;
+		color: #fff1c0;
+		background: linear-gradient(#8a5a1c, #5a3910);
+		border-color: #0a0605;
+		border-bottom-color: #14100c;
+		box-shadow: inset 2px 2px 0 #c9954a, inset -2px 0 0 #3a2410;
+		filter: none;
+	}
+
+	.notify-dot {
+		top: 2px;
+		right: 4px;
+	}
+}
+
+@media (max-width: 760px) {
+	.px-tabbar-label {
+		display: none;
+	}
+
+	.px-tabbar-item {
+		padding-right: 12px;
 	}
 }
 

@@ -155,10 +155,6 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		farmLevels: {} as Record<string, number>,
 		farmUpgrades: {} as Record<string, number>,
 		merchantUpgrades: {} as Record<string, number>,
-		showCharacterWindow: false,
-		showStatisticsWindow: false,
-		showMerchantWindow: false,
-		showFarmWindow: false,
 		isHydrated: false,
 		biomeSelectionActive: false,
 		pendingTileCoords: null,
@@ -351,14 +347,6 @@ const createGameSlice = (
 			);
 			set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
 			return true;
-		},
-
-		toggleFarmWindow: () => {
-			set({ showFarmWindow: !get().showFarmWindow });
-		},
-
-		setShowFarmWindow: (show: boolean) => {
-			set({ showFarmWindow: show });
 		},
 
 		addStatPoint: (stat: keyof CharacterStats) => {
@@ -874,23 +862,6 @@ const createGameSlice = (
 				next[k] = Math.min(updated, RESOURCE_CAP);
 			}
 			set({ resources: next });
-		},
-
-		toggleCharacterWindow: () =>
-			set((state) => ({ showCharacterWindow: !state.showCharacterWindow })),
-		toggleStatisticsWindow: () =>
-			set((state) => ({ showStatisticsWindow: !state.showStatisticsWindow })),
-		toggleMerchantWindow: () => {
-			// Close other windows if merchant window is being opened
-			if (!get().showMerchantWindow) {
-				set({
-					showCharacterWindow: false,
-					showStatisticsWindow: false,
-					showMerchantWindow: true,
-				});
-			} else {
-				set({ showMerchantWindow: false });
-			}
 		},
 
 		// Sell resources to the merchant for gold. Gold and XP cannot be sold.

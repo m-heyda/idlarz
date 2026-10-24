@@ -258,10 +258,6 @@ export interface GameState {
 	farmLevels: Record<string, number>; // animals owned per kind
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
-	showCharacterWindow: boolean;
-	showStatisticsWindow: boolean;
-	showMerchantWindow: boolean;
-	showFarmWindow: boolean;
 	isHydrated: boolean;
 	biomeSelectionActive: boolean;
 	pendingTileCoords: { x: number; y: number } | null;
@@ -295,11 +291,6 @@ export interface GameState {
 	buyItem: (id: string, qty?: number) => boolean;
 	upgradeGroundsTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
-	toggleCharacterWindow: () => void;
-	toggleStatisticsWindow: () => void;
-	toggleMerchantWindow: () => void;
-	toggleFarmWindow: () => void;
-	setShowFarmWindow: (show: boolean) => void;
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
 	addStatPoint: (stat: keyof CharacterStats) => void;
 	setPlayerName: (name: string) => void;

@@ -5,8 +5,6 @@ import { queueTileTap } from '@/lib/floatText';
 import type { Critter } from './MeadowLayer';
 import audioManager from '@/utils/audioManager';
 import '@/styles/Farm.css';
-import PixelModal from '../PixelModal';
-import PixelIcon from '../PixelIcon';
 import FarmScene from './FarmScene';
 import FarmHud from './FarmHud';
 import FarmUpgradeDock from './FarmUpgradeDock';
@@ -20,8 +18,6 @@ const FarmOverlay: React.FC = () => {
 	const farmLevels = useGameStore((state) => state.farmLevels);
 	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
 	const purchaseAnimal = useGameStore((state) => state.purchaseAnimal);
-	const showFarmWindow = useGameStore((state) => state.showFarmWindow);
-	const setShowFarmWindow = useGameStore((state) => state.setShowFarmWindow);
 	const claimCritterGift = useGameStore((state) => state.claimCritterGift);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [celebrate, setCelebrate] = useState<string | null>(null);
@@ -31,12 +27,6 @@ const FarmOverlay: React.FC = () => {
 		const t = setTimeout(() => setCelebrate(null), 1100);
 		return () => clearTimeout(t);
 	}, [celebrate]);
-
-	useEffect(() => {
-		if (!showFarmWindow) setSelectedId(null);
-	}, [showFarmWindow]);
-
-	if (!showFarmWindow) return null;
 
 	// A meadow critter was clicked: gift = some seconds of that resource's income (bigger if golden).
 	// The amount rides the click's cursor popup together with the usual click gold.
@@ -52,27 +42,20 @@ const FarmOverlay: React.FC = () => {
 	};
 
 	return (
-		<PixelModal
-			title='Farm'
-			icon={<PixelIcon name='menu_farm' alt='' />}
-			size='lg'
-			flush
-			onClose={() => setShowFarmWindow(false)}>
-			<div className='farm-root'>
-				<FarmScene
-					farmLevels={farmLevels}
-					farmUpgrades={farmUpgrades}
-					food={food}
-					selectedId={selectedId}
-					onSelect={setSelectedId}
-					onBuy={buy}
-					celebrate={celebrate}
-					onCatchCritter={catchCritter}
-				/>
-				<FarmHud />
-				<FarmUpgradeDock />
-			</div>
-		</PixelModal>
+		<div className='farm-root'>
+			<FarmScene
+				farmLevels={farmLevels}
+				farmUpgrades={farmUpgrades}
+				food={food}
+				selectedId={selectedId}
+				onSelect={setSelectedId}
+				onBuy={buy}
+				celebrate={celebrate}
+				onCatchCritter={catchCritter}
+			/>
+			<FarmHud />
+			<FarmUpgradeDock />
+		</div>
 	);
 };
 

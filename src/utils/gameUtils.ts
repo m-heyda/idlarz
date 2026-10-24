@@ -343,6 +343,23 @@ export const affordableAnimals = (animal: Animal, owned: number, food: number, c
 	return n;
 };
 
+/** True when the farm has something to buy right now: one more animal (below the pen cap) or the next level of an upgrade. */
+export const farmHasPurchase = (
+	resources: Pick<Resources, 'food' | 'wood' | 'stone' | 'coal' | 'meat' | 'eggs' | 'milk' | 'hide' | 'gold'>,
+	farmLevels: Record<string, number>,
+	farmUpgrades: FarmUpgrades | undefined
+): boolean => {
+	const cap = farmCap(farmUpgrades);
+	if (ANIMALS.some((a) => affordableAnimals(a, farmLevels[a.id] || 0, resources.food, cap, 1) > 0)) return true;
+	return (Object.keys(FARM_UPGRADES) as FarmUpgradeId[]).some((id) => {
+		const level = farmUpgradeLevel(farmUpgrades, id);
+		if (level >= FARM_UPGRADES[id].maxLevel) return false;
+		return Object.entries(farmUpgradeCost(id, level)).every(
+			([resource, price]) => (resources[resource as keyof typeof resources] ?? 0) >= (price ?? 0)
+		);
+	});
+};
+
 // Calculate combat stats from base stats
 export const calculateCombatStats = (
 	stats: CharacterStats

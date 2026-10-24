@@ -7,17 +7,13 @@ import { armorOf, damagePerClick, maxHp } from '@/lib/combat';
 import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
 import type { EquipmentSlot } from '@/types/game';
 import LevelDetails from '../LevelDetails';
-import PixelModal from '../PixelModal';
-import PixelIcon from '../PixelIcon';
 import ItemSlot from '../ItemSlot';
 import Bag from '../Bag';
 
 const ABILITY_HINT = 'Ability slot - skills are coming soon';
 
 const CharacterOverlay: React.FC = () => {
-	const show = useGameStore((state) => state.showCharacterWindow);
-	const toggleCharacterWindow = useGameStore((state) => state.toggleCharacterWindow);
-	const toggleStatisticsWindow = useGameStore((state) => state.toggleStatisticsWindow);
+	const setMenuTab = useUiStore((state) => state.setMenuTab);
 	const equipment = useGameStore((state) => state.equipment);
 	const characterStats = useGameStore((state) => state.characterStats);
 	const equipItem = useGameStore((state) => state.equipItem);
@@ -30,8 +26,6 @@ const CharacterOverlay: React.FC = () => {
 		const timer = setTimeout(() => setNotice(null), 2200);
 		return () => clearTimeout(timer);
 	}, [notice]);
-
-	if (!show) return null;
 
 	const blocked = () => (useGameStore.getState().fight ? 'Finish the fight first' : null);
 
@@ -64,12 +58,7 @@ const CharacterOverlay: React.FC = () => {
 	const mitigation = Math.round((armor / (armor + COMBAT.armorK)) * 100);
 
 	return (
-		<PixelModal
-			title='Character'
-			icon={<PixelIcon name='menu_character' alt='' />}
-			size='lg'
-			onClose={toggleCharacterWindow}>
-			<div className='flex gap-5 h-full'>
+		<div className='flex gap-5 h-full'>
 				{/* Paper doll: hero scene between the slot columns, weapon and shield below */}
 				<div className='px-panel overflow-y-auto shrink-0'>
 					<div className='inv-doll'>
@@ -109,10 +98,7 @@ const CharacterOverlay: React.FC = () => {
 						</button>
 						<button
 							className='px-btn px-btn-sm'
-							onClick={() => {
-								toggleCharacterWindow();
-								toggleStatisticsWindow();
-							}}>
+							onClick={() => setMenuTab('stats')}>
 							Stats
 						</button>
 					</div>
@@ -131,8 +117,7 @@ const CharacterOverlay: React.FC = () => {
 						</div>
 					)}
 				</div>
-			</div>
-		</PixelModal>
+		</div>
 	);
 };
 
