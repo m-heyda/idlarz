@@ -12,7 +12,7 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 | U4 | **Merchant → Gambling** | placeholder | same | RNG games using `luck`; must stay inside the exploit rules ([07](07-security-and-exploits.md)) |
 | U5 | **Stat points in combat** | click combat exists (rats, Rat King) but fight damage and armor come from gear only; `physicalAtk, magicAtk, mp, def, magicDef, critChance, critDmg, atkSpeed` are still display-only; `vitality` adds a little HP, `luck` raises kill gold | `calculateCombatStats`, `combat.ts` (`damagePerClick` is the hook) | stat rework: let the five stats feed damage, armor, crit and speed |
 | U6 | **Reputation** | +100 per tile (derived on load); shown; nothing reads it | `StatisticsOverlay.tsx` | tie to quests/merchant discounts or remove |
-| U9 | **Offline progress** | none (a closed tab does not progress; a throttled tab catches up in 5-min steps) | `tick`, `saveVault.ts` | needs trusted time (see [07 §6](07-security-and-exploits.md)) to avoid a clock exploit; cap e.g. 8 h at 50 % |
+| U9 | **Offline progress** | none (a closed tab does not progress; a throttled tab catches up in 5-min steps) | `tick`, `saveStorage.ts` | needs trusted time (see [07 §6](07-security-and-exploits.md)) to avoid a clock exploit; cap e.g. 8 h at 50 % |
 | U13 | **Building management** | buildings are permanent (no demolish/swap/upgrade) | `Tile.tsx`, `BuildingSelectionDialog.tsx` | demolish with refund, building levels |
 | U14 | **Mobile / small screens** | pixel UI is desktop-first; touch pan exists, rest untested | `Grid.tsx`, modals | responsive pass |
 
@@ -30,7 +30,7 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 
 - **Performance**: every visible `Tile` re-renders on each tick (subscribes to `tiles` + `resources`). Save writes are already debounced, so only rendering remains; use per-tile selectors if the viewport grows. The ambient critters add at most 5 small DOM nodes and no timers beyond one spawn timeout.
 - **No UI tests**: logic is covered by `npm test` (limiter, economy/exploit, save validation/crypto, castle, rebirth, ambient). Components are verified manually; add Playwright if the UI starts changing a lot.
-- **Save compatibility**: the loader refuses invalid saves silently (falls back to the previous slot, then a new game). Any change to persisted fields needs `sanitizeSave` + a `SAVE_VERSION` decision ([07 §7](07-security-and-exploits.md)). `prestige` is optional in saves, so it needed no version bump.
+- **Save compatibility**: a save that cannot be read falls back to the backup, then to a new game, and the damaged text is kept and offered in the Save dialog. A new field is optional in `sanitizeSave` (no bump); a renamed or removed one needs `SAVE_SCHEMA` + `MIGRATIONS` and a frozen fixture ([07 §7](07-security-and-exploits.md)). Content that is removed from the game (an item, a building) still makes `sanitizeSave` reject old saves unless a migration replaces it.
 - **Float drift**: resources are doubles capped at 10¹⁵. With castle 10 and Legacy bonuses the income grows by orders of magnitude, so watch the cap if more multipliers are added.
 - **Dependencies held back**: Next 16, TypeScript 7, ESLint 10 (see [05 §3](05-balance-backlog-and-roadmap.md)).
 

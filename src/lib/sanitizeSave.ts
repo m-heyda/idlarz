@@ -63,9 +63,6 @@ export const PERSISTED_KEYS = [
 	'playSeconds',
 	'chestSpawnTimer',
 	'activeChests',
-	'lastChestReward',
-	'lastChestGoldRate',
-	'lastChestMinutesAwarded',
 	'equipment',
 	'bag',
 	'playerHp',
@@ -101,7 +98,7 @@ const int = (v: unknown, min: number, max: number): number | null => {
 	return n !== null && Number.isInteger(n) ? n : null;
 };
 
-const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
+export const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 const RESOURCE_KEYS = Object.keys(INITIAL_RESOURCES) as (keyof Resources)[];
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
@@ -381,18 +378,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 
 	const chestSpawnTimer = num(raw.chestSpawnTimer, 0, CHEST.intervalSec);
 	const playSeconds = num(raw.playSeconds, 0, 1e9);
-	const lastChestReward = num(raw.lastChestReward ?? 0);
-	const lastChestGoldRate = num(raw.lastChestGoldRate ?? 0);
-	const lastChestMinutesAwarded = num(raw.lastChestMinutesAwarded ?? 0);
-	if (
-		chestSpawnTimer === null ||
-		playSeconds === null ||
-		lastChestReward === null ||
-		lastChestGoldRate === null ||
-		lastChestMinutesAwarded === null
-	) {
-		return fail('timers');
-	}
+	if (chestSpawnTimer === null || playSeconds === null) return fail('timers');
 
 	const rawName = typeof raw.playerName === 'string' ? raw.playerName.trim().slice(0, 9) : '';
 	const playerClass: PlayerClassId =
@@ -418,9 +404,6 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			playSeconds,
 			chestSpawnTimer,
 			activeChests: chests,
-			lastChestReward,
-			lastChestGoldRate,
-			lastChestMinutesAwarded,
 			equipment,
 			bag,
 			playerHp,

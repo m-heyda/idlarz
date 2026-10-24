@@ -114,7 +114,7 @@ All text in tooltips and the tutorial comes from `CHARACTER_STAT_CONFIG`. Stat p
 
 ## 12. UI surfaces
 
-Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), Character window (paper doll + bag), fight modal, level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and the **hidden save tools** (press Control five times): export / import / reset ([07](07-security-and-exploits.md)). Also Settings, Legacy (rebirth + shop) and the re-openable tutorial. A small orange **notify dot** on the level orb (unspent stat points) and on the Farm button (an animal or upgrade is affordable) marks things that need attention.
+Header (avatar → Statistics, Character, Merchant, Farm; resource counters with base/modifier/total tooltips), map with tile hover cards, castle dialog (with timer), building dialog (with cost), biome picker (with all costs), Character window (paper doll + bag), fight modal, level-up and chest toasts, loading screen (until the save is loaded), name prompt + tutorial, class picker, dev-only debug panel, and **Save & Backup** (Settings, or press Control five times): autosave status, export / import as one line of text or a file, reset ([07](07-security-and-exploits.md)). Also Settings, Legacy (rebirth + shop) and the re-openable tutorial. A small orange **notify dot** on the level orb (unspent stat points) and on the Farm button (an animal or upgrade is affordable) marks things that need attention.
 
 ## 13. Rebirth and Legacy
 
@@ -127,7 +127,7 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 
 ## 14. Settings and ambient life
 
-- **Settings** (header): sound on/off, volume, ambient life on/off, buttons for Save tools (same as Control ×5) and the tutorial. Stored in the browser (`idlarz-settings`), separate from the game save.
+- **Settings** (header): sound on/off, volume, ambient life on/off, buttons for Save & backup (same as Control ×5) and the tutorial. Stored in the browser (`idlarz-settings`), separate from the game save.
 - **Ambient life**: every 4–9 s a critter wanders over an owned tile in view for 6–10 s, chosen by biome: butterflies and bees on plains, forest, lake and coast, ladybugs on swamp and grounds, rabbits on hills, tundra and grounds, plus decoration-only **fish** (lakes, only on tiles with water on all four sides), **frogs** (swamp), **crabs** (coast), **goats** (hills) and **small wolves** (forest). A tile with a building uses its foundation biome. About 1 in 12 of the four farm critters (butterfly, bee, ladybug, rabbit) is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Fish, frogs, crabs, goats and wolves never carry a gift. Off in Settings, with a hidden tab, or with reduced-motion.
 
 ## 15. Monsters and combat

@@ -7,7 +7,7 @@
 | Next.js | 15.5.28 | App Router, one page (`src/app/page.tsx`), `'use client'` |
 | React | 19.3.x | |
 | Tailwind CSS | 4.3.x via `@tailwindcss/postcss` | `@import 'tailwindcss'` in `globals.css`; pixel-art UI kit styles in `src/app/globals.css` and `src/styles/*` |
-| Zustand | 5.0.x | `persist` with a custom encrypted IndexedDB storage |
+| Zustand | 5.0.x | `persist` with a custom localStorage text-save storage |
 | TypeScript | 5.9 (`target ES2017`) | `strict` |
 | ESLint | 9 (flat config) | `npm run lint` = `eslint .` (CLI; `next lint` is gone) |
 | Test / sim runner | `tsx` (devDependency) | `npm test` (node:test), `npm run sim`, `npm run report` |
@@ -44,13 +44,15 @@ src/
 │   ├── inventoryDrag.ts      drag payload shared by the bag and the equipment slots
 │   ├── ambientLife.ts        pure picker for the wandering map critters (owned tile in view, biome-matched type)
 │   ├── terrainRenderer.ts    loads the terrain atlas and draws the whole map ground onto one canvas
-│   ├── saveVault.ts          IndexedDB + AES-GCM vault, debounced writes, export/import/reset
+│   ├── saveFormat.ts         the save text (IDLZ2.<base64 JSON>.<check>): compact body, schema + migrations, encode/decode
+│   ├── saveStorage.ts        localStorage storage: sync flush on close, backup + damaged copy, persist(), import/reset
+│   ├── legacyVault.ts        read-only: the old encrypted IndexedDB vault and IDLZ1 exports
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS
 │   ├── floatText.ts          "+N resource" popups at the cursor
 ├── hooks/
 │   ├── useHydration.ts       true when the save has been loaded and the splash was shown long enough
 │   ├── useSingleTab.ts       Web Lock: one tab owns the game
-│   └── useCtrlSequence.ts    Control ×5 detector (hidden save tools)
+│   └── useCtrlSequence.ts    Control ×5 detector (shortcut to Save & Backup)
 └── components/game/          Grid (pan + stepped wheel zoom), TerrainLayer (canvas ground), Tile (transparent hit area + overlays), TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
     │                         building), header (HeaderMenu, LevelOrb, NotifyDot), AmbientLife (decorative critters + rare golden gift),
     │                         CastleRange (violet 3x3 area, castle < 7) / CastleFortress (walls, gate, corner towers, castle 7+), MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
@@ -77,7 +79,7 @@ Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `p
 
 ## Persistence
 
-`persist` + `vaultStorage` (see [07](07-security-and-exploits.md)): state objects are kept as-is in memory and encrypted/compressed only when written (debounced). On start the vault reads `current` (or `previous`), validates it with `sanitizeSave`, `merge` rebuilds rates and sets `isHydrated`; `onRehydrateStorage` then enables writing. Save key `idle-explorer-v12`, `SAVE_VERSION = 12`; old localStorage saves are deleted, not migrated.
+`persist` + `saveStorage` (see [07](07-security-and-exploits.md)): state objects are kept as-is in memory and encoded to one line of text only when written (debounced 2 s, and synchronously on `pagehide`). On start the storage reads `current` (or `backup`, or the old IndexedDB vault once), decodes and validates it with `sanitizeSave`, `merge` rebuilds rates and sets `isHydrated`; `onRehydrateStorage` then enables writing. The initial in-memory world is a fixed placeholder (so the server render and the first client render match); a player without a save gets a random start in `merge`. The schema version lives in `saveFormat.ts` (`SAVE_SCHEMA`, `MIGRATIONS`).
 
 ## Clicks
 

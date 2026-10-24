@@ -265,9 +265,6 @@ export interface GameState {
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
 	chestSpawnTimer: number;
 	activeChests: number;
-	lastChestReward: number;
-	lastChestGoldRate: number;
-	lastChestMinutesAwarded: number;
 	lastChestLoot: ChestLoot | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods

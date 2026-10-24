@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { setVaultPaused } from '@/lib/saveVault';
+import { setSavePaused } from '@/lib/saveStorage';
 
 const LOCK_NAME = 'idlarz-game-owner';
 
@@ -23,7 +23,7 @@ export const useSingleTab = () => {
 		navigator.locks
 			.request(LOCK_NAME, steal ? { steal: true } : { ifAvailable: true }, (lock) => {
 				if (!lock) {
-					setVaultPaused(true);
+					setSavePaused(true);
 					setStatus('blocked');
 					return undefined;
 				}
@@ -31,7 +31,7 @@ export const useSingleTab = () => {
 					// The previous owner saved up to a moment ago: continue from its save, not from this stale tab
 					void useGameStore.persist.rehydrate();
 				}
-				setVaultPaused(false);
+				setSavePaused(false);
 				setStatus('owner');
 				return new Promise<void>((resolve) => {
 					release.current = resolve;
@@ -39,7 +39,7 @@ export const useSingleTab = () => {
 			})
 			.catch(() => {
 				// Our lock was stolen by another tab
-				setVaultPaused(true);
+				setSavePaused(true);
 				setStatus('blocked');
 			});
 	}, []);

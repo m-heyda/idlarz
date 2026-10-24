@@ -61,7 +61,7 @@ import { rollKillLoot } from '@/lib/loot';
 import { advanceMonsters, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
-import { markVaultReady, SAVE_NAME, SAVE_VERSION, vaultStorage } from '@/lib/saveVault';
+import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type {
 	BiomeType,
@@ -106,9 +106,17 @@ const neighbours = (x: number, y: number) => [
 	[x, y + 1],
 ];
 
+/** A tiny seeded generator: the server and the first client render must start from the same world. */
+const seededRandom = (seed: number) => () => {
+	seed = (seed + 0x6d2b79f5) | 0;
+	let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+	t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+	return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
 /** All game data of a brand-new game (no actions). */
-export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
-	const grid = createInitialGrid();
+export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () => number = Math.random) => {
+	const grid = createInitialGrid(random);
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
 	const equipment = { ...STARTER_EQUIPMENT };
@@ -145,9 +153,6 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
 		playSeconds: 0,
 		chestSpawnTimer: 0,
 		activeChests: 0,
-		lastChestReward: 0,
-		lastChestGoldRate: 0,
-		lastChestMinutesAwarded: 0,
 		lastChestLoot: null as ChestLoot | null, // what the last chest held (transient: only drives the toast)
 	};
 };
@@ -206,7 +211,9 @@ const createGameSlice = (
 	};
 
 	return {
-		...createInitialData(),
+		// A fixed placeholder world: it is rendered on the server and before the save is read, so it must not be
+		// random (that broke hydration). `merge` below replaces it with a random one for a player without a save.
+		...createInitialData(EMPTY_PRESTIGE, seededRandom(1)),
 
 		resetGame: () => {
 			clickLimiter.reset();
@@ -458,9 +465,6 @@ const createGameSlice = (
 				resources,
 				bag,
 				lastChestLoot: loot,
-				...(loot.kind === 'gold' || loot.kind === 'boost'
-					? { lastChestReward: loot.gold, lastChestGoldRate: loot.goldRate, lastChestMinutesAwarded: loot.minutes }
-					: {}),
 			});
 			return true;
 		},
@@ -895,15 +899,15 @@ const createGameSlice = (
 
 export const useGameStore = create(
 	persist<GameState, [], [], PersistedGame>((set, get) => createGameSlice(set, get), {
-		name: SAVE_NAME,
-		version: SAVE_VERSION,
-		// Encrypted IndexedDB vault (already validated by sanitizeSave when it is read)
-		storage: vaultStorage,
+		name: PERSIST_NAME,
+		version: PERSIST_VERSION,
+		// One text line in localStorage (decoded and validated by sanitizeSave when it is read)
+		storage: saveStorage,
 		// Only game data is saved; rates, UI flags and actions are rebuilt on load
 		partialize: (state) => pickPersisted(state),
 		merge: (persisted, current) => {
 			const saved = persisted as PersistedGame | undefined;
-			if (!saved) return { ...current, isHydrated: true };
+			if (!saved) return { ...current, ...createInitialData(), isHydrated: true };
 			const rates = calculateResourceRates(
 				saved.tiles,
 				saved.characterStats,
@@ -920,6 +924,6 @@ export const useGameStore = create(
 			};
 		},
 		// From here on changes are written (nothing is saved before the first load has finished)
-		onRehydrateStorage: () => () => markVaultReady(),
+		onRehydrateStorage: () => () => markSaveReady(),
 	})
 );
