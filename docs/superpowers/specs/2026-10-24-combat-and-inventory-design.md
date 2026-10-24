@@ -149,3 +149,7 @@ Update `docs/01-architecture.md` (file map, state, loop order, persistence), `02
 - **Quests/achievements** tied to kills (docs/08 C3), daily bounty monster.
 - **Auto-battle** unlock for idle play (rate-limited, weaker than manual) and offline-safe combat once server-verified saves exist (docs/08 Phase D).
 - **Mobile layout** for the fight modal and bag (docs/08 C8).
+
+> **Update (gear tiers and skill-based fights):** the click limiter no longer applies to fight hits, the "weapon damage capped at 3" / unkillable-King invariant was replaced by
+> simulation-based balance (`src/lib/fightSim.ts`, `tests/fightBalance.test.ts`, `docs/generated/fight-sim.md`), and the item data moved to `src/catalog`. See
+> `docs/02-mechanics.md` section 15 and 16.

@@ -29,6 +29,7 @@ import sprites_characters  # noqa: E402
 import sprites_equipment  # noqa: E402
 import sprites_farm  # noqa: E402
 import sprites_fortress  # noqa: E402
+import sprites_gear  # noqa: E402
 import sprites_map  # noqa: E402
 import sprites_menu  # noqa: E402
 import sprites_water  # noqa: E402
@@ -71,6 +72,7 @@ SPRITES = {
     **sprites_menu.SPRITES,
     **sprites_water.SPRITES,
     **sprites_monsters.SPRITES,
+    **sprites_gear.SPRITES,
 }
 
 UI = {

@@ -3,7 +3,8 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL } from '@/config/itemCatalog';
-import { armorOf, damagePerClick, maxHp } from '@/lib/combat';
+import { armorOf, critOdds, damagePerClick, maxHp } from '@/lib/combat';
+import { aggregateStats } from '@/lib/inventory';
 import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
 import type { EquipmentSlot } from '@/types/game';
 import LevelDetails from '../LevelDetails';
@@ -56,6 +57,9 @@ const CharacterOverlay: React.FC = () => {
 
 	const armor = armorOf(equipment);
 	const mitigation = Math.round((armor / (armor + COMBAT.armorK)) * 100);
+	const odds = critOdds(characterStats, equipment);
+	const gear = aggregateStats(equipment);
+	const pct = (v: number) => `${Math.round(v * 1000) / 10}%`;
 
 	return (
 		<div className='flex gap-5 h-full'>
@@ -82,6 +86,14 @@ const CharacterOverlay: React.FC = () => {
 								<div className='inv-readout'>
 									<span className='inv-readout-label'>Max HP</span>
 									<span className='inv-readout-value'>{maxHp(characterStats, equipment)}</span>
+								</div>
+								<div className='inv-readout' title={`Chance that a click crits (x${COMBAT.crit.mult}); a crit becomes a super crit (x${COMBAT.crit.superMult}) with ${pct(odds.superCrit)}`}>
+									<span className='inv-readout-label'>Crit</span>
+									<span className='inv-readout-value'>{pct(odds.crit)}</span>
+								</div>
+								<div className='inv-readout' title={`HP per second: ${COMBAT.regenPerSec} base, ${gear.regen} from gear (gear regen also works in fights); ${gear.luck} Luck from gear`}>
+									<span className='inv-readout-label'>Regen</span>
+									<span className='inv-readout-value'>{Math.round((COMBAT.regenPerSec + gear.regen) * 10) / 10}/s</span>
 								</div>
 							</div>
 							<div className='inv-abilities'>

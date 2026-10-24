@@ -116,4 +116,9 @@ MATS = {
     'pond': Material(['#0a3a70', '#0f62a8', '#1c8ed4', '#4cc0f0', '#b8ecff'], '#062a52', spec=0.06, shiny=18, spec_col='#eaffff'),
     'ruby_meat': Material(['#34070e', '#6e1220', '#a8222c', '#d84a3c', '#ff9a82'], '#240408', spec=0.05, shiny=22, spec_col='#fff0d0'),
     'hay': Material(['#7a5412', '#b88a22', '#e4b83a', '#f8dc6c', '#fff4b0'], '#4a300a', grain=0.25, grain_scale=3.0),
+    # --- round 3: gear tiers (obsidian = glassy black with violet light, ember = legendary fire)
+    'obsidian': Material(['#050309', '#0b0715', '#170f2e', '#2c1d54', '#6a52b8'], '#030208', spec=0.06, shiny=28, spec_col='#d8ccff', gamma=1.35, gain=0.82),
+    'obsidian_edge': Material(['#240a5a', '#5a24b8', '#9a58f8', '#58e4f0', '#e8ffff'], '#12043a', spec=0.05, shiny=18, spec_col='#ffffff', gain=1.25),
+    'ember': Material(['#2a0602', '#7a1606', '#d23a10', '#ff7a20', '#ffd060'], '#1c0402', spec=0.05, shiny=18, spec_col='#fff0b0', gamma=1.2),
+    'linen': Material(['#6a5e50', '#a89c86', '#d8ccb0', '#f2e8cc', '#fffaea'], '#3a3024', grain=0.2, grain_scale=4.0),
 }

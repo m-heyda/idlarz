@@ -3,7 +3,7 @@ import { castleLevelOf } from '@/lib/castleWard';
 import React, { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, MAX_CATCHUP_SEC } from '@/config/gameConfig';
-import { RATTATUI_SET } from '@/config/itemCatalog';
+import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '@/catalog';
 import { addToBag } from '@/lib/inventory';
 import { maxHp } from '@/lib/combat';
 import { pickSpawnTile } from '@/lib/monsters';
@@ -100,8 +100,10 @@ const GameDebug: React.FC = () => {
 	const handleGiveSet = () => {
 		useGameStore.setState((state) => {
 			let bag = state.bag;
-			for (const id of [...RATTATUI_SET.pieces, 'rattatui_ring']) bag = addToBag(bag, id, 1).bag;
-			return { bag: addToBag(bag, 'potion_minor', 5).bag };
+			const { pieces } = SETS.rattatui;
+			const ring = pieces.find((id) => ITEM_CATALOG[id].slot === 'ring'); // a second ring for the other hand
+			for (const id of ring ? [...pieces, ring] : pieces) bag = addToBag(bag, id, 1).bag;
+			return { bag: addToBag(bag, STARTER_BAG_ITEMS[0].id, 5).bag };
 		});
 	};
 

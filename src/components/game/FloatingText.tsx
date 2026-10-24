@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FLOAT_EVENT, FloatDetail } from '@/lib/floatText';
+import { RESOURCES } from '@/catalog/resources';
 import { formatNumber } from '@/utils/formatters';
 import ResourceIcon from './ResourceIcon';
 
@@ -11,15 +12,8 @@ interface Popup extends FloatDetail {
 
 const POPUP_DURATION_MS = 1000;
 
-// Resource colours for the popup lines
-const RESOURCE_COLORS: Record<string, string> = {
-	gold: '#ffe27a',
-	wood: '#e0b078',
-	stone: '#d4cdb8',
-	coal: '#9fb4e8',
-	food: '#f4d25a',
-	meat: '#ff9a86',
-};
+// Resource colours for the popup lines come from the catalog (catalog/resources.ts)
+const colorOf = (resource: string): string => (RESOURCES as Record<string, { color: string }>)[resource]?.color ?? '#fff';
 
 /**
  * Renders "+N <icon>" popups where the player clicked. Mounted once; everything that earns
@@ -69,7 +63,7 @@ const FloatingText: React.FC = () => {
 						<span
 							key={item.resource}
 							className='float-line'
-							style={{ color: RESOURCE_COLORS[item.resource] ?? '#fff' }}>
+							style={{ color: colorOf(item.resource) }}>
 							<ResourceIcon resource={item.resource} />
 							+{formatNumber(item.amount)}
 						</span>

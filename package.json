@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "sim": "tsx scripts/sim.ts",
     "test": "tsx --test \"tests/**/*.test.ts\"",
-    "report": "tsx scripts/balance-report.ts"
+    "report": "tsx scripts/balance-report.ts",
+    "fight-sim": "tsx scripts/fight-sim.ts",
+    "catalog-report": "tsx scripts/catalog-report.ts"
   },
   "dependencies": {
     "@fontsource-variable/mozilla-headline": "^5.3.0",

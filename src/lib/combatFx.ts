@@ -1,7 +1,7 @@
 // Tiny event bus for fight effects (blood, shake, damage numbers). The store emits, the fight modal listens.
 
 export type CombatFx =
-	| { kind: 'hit'; damage: number; killed: boolean }
+	| { kind: 'hit'; damage: number; killed: boolean; crit: 'none' | 'crit' | 'super' }
 	| { kind: 'hurt'; amount: number }
 	| { kind: 'heal'; amount: number };
 

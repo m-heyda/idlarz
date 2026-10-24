@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyHit, armorOf, damagePerClick, maxHp, mitigate, newFight, regen, stepFight } from '../src/lib/combat';
+import { applyHit, armorOf, critOdds, damagePerClick, maxHp, mitigate, newFight, regen, rollHit, stepFight } from '../src/lib/combat';
 import { monsterStats } from '../src/lib/monsters';
-import { INITIAL_CHARACTER_STATS, CLICK_LIMIT } from '../src/config/gameConfig';
-import { MONSTERS } from '../src/config/combatConfig';
-import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import { INITIAL_CHARACTER_STATS } from '../src/config/gameConfig';
+import { COMBAT, MONSTERS } from '../src/config/combatConfig';
+import { ITEM_CATALOG, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { calculateCombatStats } from '../src/utils/gameUtils';
+import { fullSet } from '../src/lib/fightSim';
 import type { CharacterStats } from '../src/types/game';
 
 const freshStats = (): CharacterStats => {
@@ -22,13 +23,13 @@ test('maxHp is 101 for a fresh character with the starter kit', () => {
 });
 
 test('maxHp includes gear and set bonuses', () => {
-	assert.equal(maxHp(freshStats(), { chest: 'rattatui_tunic' }), 101 + 8);
+	assert.equal(maxHp(freshStats(), { chest: 'rattatui_tunic' }), 101 + ITEM_CATALOG.rattatui_tunic.stats!.maxHp!);
 });
 
 test('damagePerClick is 2 with the wooden sword, 1 without a weapon, 3 with the fang blade', () => {
 	assert.equal(damagePerClick(STARTER_EQUIPMENT), 2);
 	assert.equal(damagePerClick({}), 1);
-	assert.equal(damagePerClick({ mainHand: 'rattatui_fang_blade' }), 3);
+	assert.equal(damagePerClick({ mainHand: 'rattatui_fang_blade' }), ITEM_CATALOG.rattatui_fang_blade.stats!.damage);
 });
 
 test('armorOf sums gear armor', () => {
@@ -134,17 +135,22 @@ test('king times out after the time limit of steps and sets a taunt from the con
 	assert.deepEqual(last.events.at(-1), { kind: 'timeout' });
 });
 
-test('king: starter-kit damage over the whole time limit stays below max HP', () => {
-	let fight = king();
-	let hp = maxHp(freshStats(), STARTER_EQUIPMENT);
-	const start = hp;
-	for (let i = 0; i < MONSTERS.ratKing.timeLimitSec + 10 && fight.phase === 'active'; i++) {
-		const r = stepFight(fight, 1, hp, armorOf(STARTER_EQUIPMENT), noRng);
-		fight = r.fight;
-		hp = r.playerHp;
-	}
-	assert.equal(fight.phase, 'timeout');
-	assert.ok(hp > 0 && hp < start);
+test('king: a starter-kit player is knocked out well before the time limit, full Rattatui armor outlasts it', () => {
+	const run = (equipment: typeof STARTER_EQUIPMENT) => {
+		let fight = king();
+		let hp = maxHp(freshStats(), equipment);
+		const start = hp;
+		for (let i = 0; i < MONSTERS.ratKing.timeLimitSec + 10 && fight.phase === 'active'; i++) {
+			const r = stepFight(fight, 1, hp, armorOf(equipment), noRng);
+			fight = r.fight;
+			hp = r.playerHp;
+		}
+		return { phase: fight.phase, hp, start };
+	};
+	assert.equal(run(STARTER_EQUIPMENT).phase, 'knockedOut');
+	const geared = run(fullSet('rattatui'));
+	assert.equal(geared.phase, 'timeout');
+	assert.ok(geared.hp > 0 && geared.hp < geared.start);
 });
 
 test('regen stops at max and ignores bad input', () => {
@@ -154,7 +160,28 @@ test('regen stops at max and ignores bad input', () => {
 	assert.equal(regen(50, 101, NaN), 50);
 });
 
-test('CLICK_LIMIT is the burst/sustain model the king invariant relies on', () => {
-	assert.equal(CLICK_LIMIT.capacity, 8);
-	assert.equal(CLICK_LIMIT.refillPerSec, 5);
+test('fight hits are not tied to CLICK_LIMIT: crit odds add the character and the gear, and are capped', () => {
+	const stats = freshStats();
+	assert.deepEqual(critOdds(stats, {}), { crit: stats.critChance / 100, superCrit: COMBAT.crit.superBase / 100 });
+	const gear = critOdds(stats, { mainHand: 'starfall_bow', charm: 'rattatui_charm' });
+	assert.ok(gear.crit > critOdds(stats, {}).crit && gear.superCrit > COMBAT.crit.superBase / 100);
+	const stacked = { ...stats, critChance: 500 };
+	assert.equal(critOdds(stacked, {}).crit, COMBAT.crit.maxCritChance / 100);
+});
+
+test('rollHit: low roll is a plain hit, high roll crits, and a second high roll is a super crit', () => {
+	const stats = freshStats();
+	const seq = (...r: number[]) => () => r.shift() ?? 0;
+	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0)), { damage: 2, crit: 'none' });
+	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0.999, 0)), { damage: 2 * COMBAT.crit.mult, crit: 'crit' });
+	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0.999, 0.999)), { damage: 2 * COMBAT.crit.superMult, crit: 'super' });
+});
+
+test('gear regen heals outside fights on top of the base rate, and inside fights too', () => {
+	assert.equal(regen(50, 101, 10, 2), 50 + (COMBAT.regenPerSec + 2) * 10);
+	const f = king();
+	const hurt = stepFight(f, 1, 50, 0, noRng);
+	const healed = stepFight(f, 1, 50, 0, noRng, { perSec: 2, max: 101 });
+	assert.equal(healed.playerHp, hurt.playerHp + 2);
+	assert.equal(stepFight(f, 1, 100.5, 0, noRng, { perSec: 5, max: 101 }).playerHp <= 101, true);
 });

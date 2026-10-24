@@ -1,5 +1,5 @@
 import { CHEST, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
-import { BASIC_GEAR, ITEM_CATALOG } from '@/config/itemCatalog';
+import { lootPool, pickWeighted } from '@/catalog';
 import { addToBag } from '@/lib/inventory';
 import { isInWard } from '@/lib/castleWard';
 import type { BagSlot, Resources, Tile } from '@/types/game';
@@ -64,8 +64,8 @@ export interface ChestContext {
 
 const between = (random: () => number, [lo, hi]: [number, number]) => lo + random() * (hi - lo);
 
-/** Chest items: plain gear and potions. The Rattatui set drops only from the Rat King. */
-export const CHEST_ITEMS: string[] = [...BASIC_GEAR, 'potion_minor'].filter((id) => !!ITEM_CATALOG[id]);
+/** Chest items: whatever the catalog puts in the `chest` pool (the Rattatui set drops only from the Rat King). */
+export const CHEST_ITEMS: string[] = lootPool('chest').map((entry) => entry.id);
 
 /** Relative chances with Luck shifted from plain gold toward the lucky chest and the item. */
 export function rewardWeights(luck: number): Record<keyof typeof CHEST.rewards, number> {
@@ -116,9 +116,9 @@ export function rollChestLoot(ctx: ChestContext, random: () => number = Math.ran
 		const minutes = between(random, CHEST.xp.minutes);
 		return { kind: 'xp', xp: Math.max(CHEST.xp.floor, Math.floor(ctx.rates.xp * minutes * 60)), minutes };
 	}
-	if (kind === 'item' && CHEST_ITEMS.length) {
-		const itemId = CHEST_ITEMS[Math.floor(random() * CHEST_ITEMS.length) % CHEST_ITEMS.length];
-		if (addToBag(ctx.bag, itemId, 1).added === 1) return { kind: 'item', itemId };
+	if (kind === 'item') {
+		const itemId = pickWeighted(lootPool('chest'), random);
+		if (itemId && addToBag(ctx.bag, itemId, 1).added === 1) return { kind: 'item', itemId };
 	}
 	return goldLoot(1); // gold, or an item that did not fit in the bag
 }

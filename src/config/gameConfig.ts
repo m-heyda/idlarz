@@ -5,6 +5,8 @@ import {
 	CharacterStats,
 	Resources, // Added Resources import
 } from '@/types/game';
+import { RESOURCES, type MerchantResourceKey, type ResourceKey } from '@/catalog/resources';
+import { shopItems } from '@/catalog/loot';
 
 // Default player name
 export const DEFAULT_PLAYER_NAME = 'Explorer';
@@ -111,101 +113,28 @@ export const TILE_RESOURCE_COST: { from: number; resource: 'wood' | 'stone' | 'c
 // Biome/building output is multiplied by this (the castle's own output and the base rates are not)
 export const BIOME_YIELD = { scale: 1.3 };
 
-// Biome Configuration
-export const RESOURCE_ICONS = {
-	gold: '💰',
-	wood: '🪓',
-	stone: '🧱',
-	coal: '⚫',
-	food: '🌾',
-	meat: '🥩',
-	xp: '✨',
-	eggs: '🥚',
-	milk: '🥛',
-	hide: '🟫',
-	gems: '💎',
-};
+// Resource presentation (labels, glyphs, tooltips, merchant prices) lives in catalog/resources.ts; these are the old views of it
+const resourceKeys = Object.keys(RESOURCES) as ResourceKey[];
+const fromResources = <V>(keys: readonly string[], pick: (key: ResourceKey) => V) =>
+	Object.fromEntries(keys.map((key) => [key, pick(key as ResourceKey)]));
+
+export const RESOURCE_ICONS = fromResources(resourceKeys, (key) => RESOURCES[key].emoji) as { [K in ResourceKey]: string };
 
 // What the header tooltips say about each currency: what it is, what it is for and where it comes from.
-export const HEADER_DISPLAYED_RESOURCES_INFO = {
-	gold: {
-		icon: RESOURCE_ICONS.gold,
-		label: 'Gold',
-		description: 'The coin of the realm.',
-		usedFor: 'Buying map tiles, buildings, castle upgrades, click power and everything at the merchant.',
-		source: 'The castle and most land, every click on the map, and selling goods to the merchant.',
-	},
-	wood: {
-		icon: RESOURCE_ICONS.wood,
-		label: 'Wood',
-		description: 'Basic construction material.',
-		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Hen House and Pen Expansion.',
-		source: 'Forest and swamp tiles. Sells to the merchant.',
-	},
-	stone: {
-		icon: RESOURCE_ICONS.stone,
-		label: 'Stone',
-		description: 'Durable building material.',
-		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Dairy and Pen Expansion.',
-		source: 'Hills tiles. Sells to the merchant.',
-	},
-	coal: {
-		icon: RESOURCE_ICONS.coal,
-		label: 'Coal',
-		description: 'Fuel for heavy industry.',
-		usedFor: 'Part of the price of tiles (from the 30th), castle upgrades from level 3 and the Tannery.',
-		source: 'Tundra and hills tiles. Sells to the merchant.',
-	},
-	food: {
-		icon: RESOURCE_ICONS.food,
-		label: 'Food',
-		description: 'Sustains your people and your animals.',
-		usedFor: 'Buying farm animals, Feed Trough, Pen Expansion, tiles (from the 40th) and castle upgrades from level 4.',
-		source: 'Plains, lake and coast tiles. Sells to the merchant.',
-	},
-	meat: {
-		icon: RESOURCE_ICONS.meat,
-		label: 'Meat',
-		description: 'Produced by farm animals.',
-		usedFor: 'Castle upgrades from level 4; sell the rest to the merchant.',
-		source: 'Every animal on the farm (boosted by Feed Trough and the plains bonus).',
-	},
-	eggs: {
-		icon: RESOURCE_ICONS.eggs,
-		label: 'Eggs',
-		description: 'A farm product laid by chickens.',
-		usedFor: 'Hen House upgrades; sell the rest to the merchant.',
-		source: 'Chickens on the farm. Cannot be bought.',
-	},
-	milk: {
-		icon: RESOURCE_ICONS.milk,
-		label: 'Milk',
-		description: 'A farm product from cows.',
-		usedFor: 'Dairy upgrades; sell the rest to the merchant.',
-		source: 'Cows on the farm. Cannot be bought.',
-	},
-	hide: {
-		icon: RESOURCE_ICONS.hide,
-		label: 'Hide',
-		description: 'A farm product from deer and pigs.',
-		usedFor: 'Tannery upgrades; sell the rest to the merchant.',
-		source: 'Deer and pigs on the farm. Cannot be bought.',
-	},
-	xp: {
-		icon: RESOURCE_ICONS.xp,
-		label: 'XP',
-		description: 'Experience: fills the level bar next to your name.',
-		usedFor: 'Every level gives stat points to spend on the Stats tab.',
-		source: 'The castle, buying tiles and your stats.',
-	},
-} as const;
+export const HEADER_DISPLAYED_RESOURCES_INFO = fromResources(
+	resourceKeys.filter((key) => key !== 'gems'),
+	(key) => {
+		const { emoji, label, description, usedFor, source } = RESOURCES[key];
+		return { icon: emoji, label, description, usedFor, source };
+	}
+) as { [K in Exclude<ResourceKey, 'gems'>]: { icon: string; label: string; description: string; usedFor: string; source: string } };
 
 // The rebirth currency (not a resource: it lives in the prestige state)
 export const GEMS_INFO = {
-	label: 'Gems',
-	description: 'The rebirth currency.',
-	usedFor: 'Permanent upgrades in the Legacy window; they survive every rebirth.',
-	source: 'Rebirthing from castle level 6: the higher your castle and income, the more you get.',
+	label: RESOURCES.gems.label,
+	description: RESOURCES.gems.description,
+	usedFor: RESOURCES.gems.usedFor,
+	source: RESOURCES.gems.source,
 };
 
 // The castle's own per-second output (single source of truth: BIOMES.castle reads from it).
@@ -413,17 +342,10 @@ export const CASTLE_UPGRADE = {
 
 // Merchant
 // Resource pricing constants (gold per unit)
-export const MERCHANT_RESOURCE_PRICES = {
-	wood: 0.5,
-	stone: 0.5,
-	coal: 1,
-	food: 0.75,
-	meat: 1,
-	// farm products sell for more than the meat they come with
-	eggs: 3,
-	milk: 4,
-	hide: 6,
-};
+export const MERCHANT_RESOURCE_PRICES = fromResources(
+	resourceKeys.filter((key) => 'merchant' in RESOURCES[key]),
+	(key) => (RESOURCES[key] as { merchant: { price: number } }).merchant.price
+) as { [K in MerchantResourceKey]: number };
 
 // Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
 // starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
@@ -466,14 +388,7 @@ export type MerchantUpgradeId = keyof typeof MERCHANT_UPGRADES;
 
 // Plain gear and potions the merchant sells (gold). Every price is at least 3x the item's sell value (x1.3 for a maxed Haggler),
 // so buying and selling can never print gold: tests/economy.test.ts checks it for every entry.
-export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = [
-	{ id: 'potion_minor', price: 80 },
-	{ id: 'leather_cap', price: 400 },
-	{ id: 'leather_gloves', price: 400 },
-	{ id: 'leather_boots', price: 450 },
-	{ id: 'leather_vest', price: 800 },
-	{ id: 'iron_sword', price: 6000 },
-];
+export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems(); // each item's own `shop` price in the catalog
 
 // Farm products: shown on the farm and at the merchant, not in the header row
 export const FARM_PRODUCT_KEYS = ['eggs', 'milk', 'hide'] as const;
@@ -579,48 +494,13 @@ export const FARM_UPGRADES = {
 export type FarmUpgradeId = keyof typeof FARM_UPGRADES;
 
 // Resource display information
-export const MERCHANT_RESOURCE_INFO = {
-	wood: {
-		label: 'Wood',
-		description: 'A basic construction material, available in forests.',
-		priceDescription: 'Common but always in demand.',
-	},
-	stone: {
-		label: 'Stone',
-		description: 'Durable and versatile building material from quarries.',
-		priceDescription: 'Premium quality building material.',
-	},
-	coal: {
-		label: 'Coal',
-		description: 'Valuable fuel source used for advanced applications.',
-		priceDescription: 'Highly sought after for its energy properties.',
-	},
-	food: {
-		label: 'Food',
-		description: 'Sustains population and enables growth.',
-		priceDescription: 'Plentiful but essential for survival.',
-	},
-	meat: {
-		label: 'Meat',
-		description: 'A source of protein for a healthy diet.',
-		priceDescription: 'High demand for a nutritious meal.',
-	},
-	eggs: {
-		label: 'Eggs',
-		description: 'Fresh from the coop.',
-		priceDescription: 'Bakers pay well for fresh eggs.',
-	},
-	milk: {
-		label: 'Milk',
-		description: 'Creamy and cold from the dairy.',
-		priceDescription: 'A town favourite at breakfast.',
-	},
-	hide: {
-		label: 'Hide',
-		description: 'Tanned leather from the farm.',
-		priceDescription: 'Craftsmen always need good leather.',
-	},
-};
+export const MERCHANT_RESOURCE_INFO = fromResources(
+	resourceKeys.filter((key) => 'merchant' in RESOURCES[key]),
+	(key) => {
+		const { label, merchant } = RESOURCES[key] as { label: string; merchant: { description: string; pitch: string } };
+		return { label, description: merchant.description, priceDescription: merchant.pitch };
+	}
+) as { [K in MerchantResourceKey]: { label: string; description: string; priceDescription: string } };
 
 // Buildings for grounds tiles
 export type BuildingType =
@@ -710,15 +590,6 @@ export const BUILDINGS: Record<BuildingType, Building> = {
 	barracks: { name: 'barracks', label: 'Barracks', resourceGeneration: { gold: 0.1, xp: 0.1 } },
 };
 
-// Equipment and items configuration
-export const EQUIPMENT_RARITY_COLORS = {
-	common: 'border-gray-500',
-	uncommon: 'border-green-500',
-	rare: 'border-blue-500',
-	epic: 'border-purple-500',
-	legendary: 'border-orange-500',
-};
-
 // Tile tapping: clicking an owned tile also yields a small slice of that tile's own output.
 // A tap = `seconds` worth of the tile's per-second production, with a per-tile cooldown so
 // spam-clicking can add at most seconds/cooldown (~42%) on top of a tile's passive income.
@@ -788,7 +659,7 @@ export const CHEST = {
 	},
 
 	// What a chest holds: relative chances (they need not sum to 100)
-	rewards: { gold: 50, bundle: 25, xp: 12, boost: 10, item: 3 } as Record<'gold' | 'bundle' | 'xp' | 'boost' | 'item', number>,
+	rewards: { gold: 50, bundle: 25, xp: 12, boost: 10, item: 8 } as Record<'gold' | 'bundle' | 'xp' | 'boost' | 'item', number>,
 	boostMultiplier: 1.5, // the "lucky chest": gold x this
 	bundle: {
 		resources: ['wood', 'stone', 'coal', 'food'] as ('wood' | 'stone' | 'coal' | 'food')[],

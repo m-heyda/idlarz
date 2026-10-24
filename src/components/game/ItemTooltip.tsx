@@ -1,11 +1,8 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { EQUIPMENT_SLOT_LABEL, ITEM_CATALOG, RATTATUI_SET } from '@/config/itemCatalog';
-import { aggregateStats } from '@/lib/inventory';
+import { EQUIPMENT_SLOT_LABEL, ITEM_CATALOG, SETS, RARITIES, formatStat, formatStats, setCounts } from '@/catalog';
 import ResourceIcon from './ResourceIcon';
 import { RARITY_COLOR } from './itemUi';
-
-const STAT_LABEL: Record<string, string> = { damage: 'Damage', armor: 'Armor', maxHp: 'Max HP' };
 
 /** The body of an item hover card (name, slot, stats, set progress, description, sell value). */
 const ItemTooltipBody: React.FC<{ itemId: string }> = ({ itemId }) => {
@@ -15,7 +12,8 @@ const ItemTooltipBody: React.FC<{ itemId: string }> = ({ itemId }) => {
 
 	const slotLabel = def.slot === 'ring' ? 'Ring' : def.slot ? EQUIPMENT_SLOT_LABEL[def.slot] : 'Consumable';
 	const equippedIds = Object.values(equipment);
-	const setCount = aggregateStats(equipment).setCount;
+	const set = def.set ? SETS[def.set] : undefined;
+	const setCount = set ? (setCounts(equipment)[set.id] ?? 0) : 0;
 
 	return (
 		<div className='text-sm' style={{ minWidth: 200 }}>
@@ -23,29 +21,30 @@ const ItemTooltipBody: React.FC<{ itemId: string }> = ({ itemId }) => {
 				{def.name}
 			</div>
 			<div className='px-tip-muted text-xs mb-1 capitalize'>
-				{def.rarity} - {slotLabel}
+				{RARITIES[def.rarity].label}
+				{def.weaponType ? ` ${def.weaponType}` : ''} - {slotLabel}
 			</div>
 			{def.stats &&
 				Object.entries(def.stats).map(([stat, value]) => (
 					<div key={stat} className='text-green-400 text-xs'>
-						+{value} {STAT_LABEL[stat] ?? stat}
+						{formatStat(stat, value as number)}
 					</div>
 				))}
 			{def.consumable && <div className='text-green-400 text-xs'>Restores {def.consumable.healHp} HP</div>}
 
-			{def.set === RATTATUI_SET.id && (
+			{set && (
 				<div className='mt-2 text-xs'>
 					<div className='px-tip-title'>
-						{RATTATUI_SET.label} ({setCount}/{RATTATUI_SET.size})
+						{set.label} ({setCount}/{set.size})
 					</div>
-					{RATTATUI_SET.pieces.map((id) => (
+					{set.pieces.map((id) => (
 						<div key={id} style={{ color: equippedIds.includes(id) ? '#f0d27a' : '#6a5a48' }}>
 							{ITEM_CATALOG[id].name}
 						</div>
 					))}
-					{Object.entries(RATTATUI_SET.bonuses).map(([count, bonus]) => (
+					{Object.entries(set.bonuses).map(([count, bonus]) => (
 						<div key={count} style={{ color: setCount >= Number(count) ? '#4ade80' : '#6a5a48' }}>
-							({count}) {Object.entries(bonus).map(([stat, v]) => `+${v} ${STAT_LABEL[stat] ?? stat}`).join(', ')}
+							({count}) {formatStats(bonus)}
 						</div>
 					))}
 				</div>

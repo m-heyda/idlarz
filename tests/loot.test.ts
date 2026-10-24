@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { rollKillLoot } from '../src/lib/loot';
 import { emitCombat } from '../src/lib/combatFx';
 import { COMBAT } from '../src/config/combatConfig';
-import { BASIC_GEAR, RATTATUI_SET } from '../src/config/itemCatalog';
+import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, lootPool, isGear } from '../src/config/itemCatalog';
 
 const ctx = { goldPerSec: 100, xpPerSec: 2, luck: 0 };
 const T1 = { type: 'rat', tier: 1 } as const;
@@ -26,20 +26,33 @@ test('rats never drop Rattatui pieces, whatever the rng', () => {
 });
 
 test('drop chances rise with the tier', () => {
-	const rng = () => COMBAT.drops.basicGearBase + 0.005; // above the T1 chance, below T3's
+	const rng = () => COMBAT.drops.gearBase + 0.005; // above the T1 chance, below T3's
 	const gear = (tier: number) =>
 		rollKillLoot({ type: 'rat', tier }, ctx, rng).items.filter((i) => i.id !== 'potion_minor').length;
 	assert.equal(gear(1), 0);
 	assert.equal(gear(3), 1);
 });
 
-test('the Rat King always drops a Rattatui piece and potions', () => {
+test('the Rat King always drops a Rattatui piece and every potion that lists him', () => {
 	const king = { type: 'ratKing', tier: 1 } as const;
 	const r = rollKillLoot(king, ctx, () => 0.999);
 	const pieces = r.items.filter((i) => RATTATUI_SET.pieces.includes(i.id));
 	assert.equal(pieces.length, COMBAT.drops.king.setPieces);
-	assert.deepEqual(r.items.find((i) => i.id === 'potion_minor'), { id: 'potion_minor', qty: COMBAT.drops.king.potions });
-	assert.equal(rollKillLoot(king, ctx, () => 0).items.filter((i) => RATTATUI_SET.pieces.includes(i.id)).length, 2);
+	assert.deepEqual(r.items.find((i) => i.id === 'potion_minor'), { id: 'potion_minor', qty: 2 });
+	assert.deepEqual(r.items.find((i) => i.id === 'potion_greater'), { id: 'potion_greater', qty: 1 });
+	assert.equal(r.items.some((i) => ITEM_CATALOG[i.id].rarity === 'legendary'), false);
+	const lucky = rollKillLoot(king, ctx, () => 0).items;
+	assert.equal(lucky.filter((i) => RATTATUI_SET.pieces.includes(i.id)).length, 2);
+	assert.equal(lucky.filter((i) => ITEM_CATALOG[i.id].rarity === 'legendary').length, 1, 'a low roll also wins a legendary weapon');
+});
+
+test('older rats drop better gear: steel needs tier 3, obsidian tier 5, the greater potion tier 4', () => {
+	const rarities = (tier: number) => new Set(lootPool('rat', tier, isGear).map((e) => ITEM_CATALOG[e.id].rarity));
+	assert.deepEqual([...rarities(1)], ['common']);
+	assert.ok(!rarities(2).has('uncommon') && rarities(3).has('uncommon') && !rarities(4).has('rare') && rarities(5).has('rare'));
+	assert.ok(!lootPool('rat', 3).some((e) => e.id === 'potion_greater'));
+	assert.ok(lootPool('rat', 4).some((e) => e.id === 'potion_greater'));
+	for (const tier of [1, 3, 5]) assert.ok(!lootPool('rat', tier).some((e) => ITEM_CATALOG[e.id].rarity === 'legendary' || ITEM_CATALOG[e.id].rarity === 'epic'));
 });
 
 test('the king prefers pieces you do not own yet, and falls back to duplicates once you own all', () => {
@@ -89,7 +102,7 @@ test('plain gear is picked uniformly from BASIC_GEAR', () => {
 });
 
 test('emitCombat is a no-op outside the browser', () => {
-	emitCombat({ kind: 'hit', damage: 2, killed: false });
+	emitCombat({ kind: 'hit', damage: 2, killed: false, crit: 'none' });
 	emitCombat({ kind: 'hurt', amount: 3 });
 	emitCombat({ kind: 'heal', amount: 35 });
 });

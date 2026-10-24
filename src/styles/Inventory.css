@@ -30,8 +30,31 @@
 	opacity: 0.55;
 }
 
+/* Rarity glow: colour, blur and opacity come from the catalog (catalog/rarity.ts) through --glow / --glow-blur / --glow-alpha */
 .inv-icon {
-	filter: drop-shadow(0 0 3px var(--glow, transparent));
+	filter: drop-shadow(0 0 var(--glow-blur, 3px) color-mix(in srgb, var(--glow, transparent) calc(var(--glow-alpha, 0.5) * 100%), transparent));
+}
+
+/* a faint rarity-coloured inner edge from uncommon up */
+.inv-slot[data-filled='true'][data-rarity]:not([data-rarity='common']) {
+	box-shadow: inset 0 0 6px color-mix(in srgb, var(--glow) 35%, transparent);
+}
+
+/* epic and legendary breathe */
+.inv-slot[data-pulse='true'] .inv-icon {
+	animation: inv-glow-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes inv-glow-pulse {
+	50% {
+		filter: drop-shadow(0 0 calc(var(--glow-blur, 3px) * 1.7) var(--glow));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.inv-slot[data-pulse='true'] .inv-icon {
+		animation: none;
+	}
 }
 
 .inv-qty {
@@ -107,7 +130,8 @@
 
 .inv-readouts {
 	display: flex;
-	gap: 16px;
+	flex-wrap: wrap;
+	gap: 6px 14px;
 	justify-content: center;
 }
 

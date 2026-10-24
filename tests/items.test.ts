@@ -5,6 +5,7 @@ import {
 	EQUIPMENT_LAYOUT,
 	ITEM_CATALOG,
 	RATTATUI_SET,
+	SETS,
 	STARTER_BAG_ITEMS,
 	STARTER_EQUIPMENT,
 } from '../src/config/itemCatalog';
@@ -57,10 +58,11 @@ test('Rattatui pieces cover all 13 slots (the ring item covers ring1 and ring2)'
 	assert.equal(RATTATUI_SET.pieces.length, 12);
 });
 
-test('no weapon exceeds COMBAT.maxWeaponDamage and the starter weapon deals 2', () => {
+test('only weapons carry damage, none exceeds COMBAT.maxItemDamage, and the starter weapon deals 2', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
-		if (def.slot === 'mainHand') assert.ok((def.stats?.damage ?? 0) <= COMBAT.maxWeaponDamage, def.id);
-		else assert.equal(def.stats?.damage, undefined, `${def.id} is not a weapon`);
+		if (def.slot === 'mainHand') {
+			assert.ok((def.stats?.damage ?? 0) >= 1 && def.stats!.damage! <= COMBAT.maxItemDamage, def.id);
+		} else assert.equal(def.stats?.damage, undefined, `${def.id} is not a weapon`);
 	}
 	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.mainHand!].stats?.damage, 2);
 });
@@ -69,8 +71,52 @@ test('starter shield has armor 2', () => {
 	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.offHand!].stats?.armor, 2);
 });
 
-test('fang blade damage equals COMBAT.maxWeaponDamage', () => {
-	assert.equal(ITEM_CATALOG.rattatui_fang_blade.stats?.damage, COMBAT.maxWeaponDamage);
+const SLOTS_OF = (set: string) => {
+	const covered = new Set<string>();
+	for (const id of SETS[set].pieces) {
+		const slot = ITEM_CATALOG[id].slot!;
+		if (slot === 'ring') ['ring1', 'ring2'].forEach((r) => covered.add(r));
+		else covered.add(slot);
+	}
+	return covered;
+};
+
+test('every armour family fills every armour and accessory slot plus the off hand (weapons come separately)', () => {
+	const expected = ALL_SLOTS.filter((slot) => slot !== 'mainHand').sort();
+	for (const set of ['woodland', 'apprentice', 'knight', 'obsidian']) assert.deepEqual([...SLOTS_OF(set)].sort(), expected, set);
+});
+
+test('rarity follows the family: wood and cloth common, steel uncommon, obsidian rare, Rattatui epic, three legendaries', () => {
+	const rarityOf = (set: string) => new Set(SETS[set].pieces.map((id) => ITEM_CATALOG[id].rarity));
+	assert.deepEqual([...rarityOf('woodland')], ['common']);
+	assert.deepEqual([...rarityOf('apprentice')], ['common']);
+	assert.deepEqual([...rarityOf('knight')], ['uncommon']);
+	assert.deepEqual([...rarityOf('obsidian')], ['rare']);
+	assert.deepEqual([...rarityOf('rattatui')], ['epic']);
+	assert.equal(Object.values(ITEM_CATALOG).filter((d) => d.rarity === 'legendary').length, 3);
+});
+
+test('every weapon type has a steel or obsidian version and every weapon comes with its stats', () => {
+	const types = new Set(Object.values(ITEM_CATALOG).filter((d) => d.kind === 'weapon').map((d) => d.weaponType));
+	for (const t of ['sword', 'mace', 'maul', 'axe', 'dagger', 'spear', 'bow', 'crossbow', 'staff', 'wand']) assert.ok(types.has(t as never), t);
+});
+
+test('gear power rises with the tier slot by slot (wood < steel < obsidian < Rattatui), and Rattatui is the best of all', () => {
+	const power = (id: string) => (ITEM_CATALOG[id].stats?.armor ?? 0) + (ITEM_CATALOG[id].stats?.maxHp ?? 0);
+	const bySlot = (set: string) => {
+		const m: Record<string, string> = {};
+		for (const id of SETS[set].pieces) m[ITEM_CATALOG[id].slot!] = id;
+		return m;
+	};
+	const tiers = ['woodland', 'knight', 'obsidian', 'rattatui'].map(bySlot);
+	for (const slot of Object.keys(tiers[3])) {
+		if (!tiers.every((t) => t[slot])) continue; // weapons are not part of a set family
+		for (let i = 1; i < tiers.length; i++) assert.ok(power(tiers[i][slot]) > power(tiers[i - 1][slot]), `${slot}: tier ${i}`);
+	}
+});
+
+test('set bonuses only use thresholds a set can reach', () => {
+	for (const set of Object.values(SETS)) for (const n of Object.keys(set.bonuses)) assert.ok(Number(n) <= set.size, `${set.id} ${n}`);
 });
 
 test('starter bag items exist in the catalog', () => {

@@ -22,7 +22,9 @@ src/
 ├── config/
 │   ├── gameConfig.ts         ALL tunable constants (costs, curves, biomes, castle, animals, merchant, click limiter, chests, stats)
 │   ├── combatConfig.ts       COMBAT + MONSTERS: HP, regen, armor, spawn, tiers, drops, Rat King
-│   ├── itemCatalog.ts        every item (ITEM_CATALOG), the Rattatui set, starter kit, equipment slot layout
+│   ├── itemCatalog.ts        facade: re-exports src/catalog and derives BASIC_GEAR / RATTATUI_SET for older imports
+├── catalog/                  THE catalog: index.ts (ITEM_CATALOG, SETS, setCounts, starter kit, equipment layout), items/*.ts (one file per family: wooden, cloth, steel,
+│                             obsidian, rattatui, legendary, consumables), rarity.ts, stats.ts, sets.ts, resources.ts, loot.ts (drop pools, shop list)
 │   ├── playerClasses.ts, pixelIcons.ts
 ├── types/game.ts             Resources, Tile, CharacterStats, GameState (store interface), ClickInput, TileCost ...
 ├── stores/
@@ -34,7 +36,9 @@ src/
 │   ├── terrain.ts            dual-grid map terrain: ground rank, dual-cell layers, tile depth, prop + dock placement (port of scripts/pixel/terrain_logic.py)
 │   ├── formatters.ts, audioManager.ts
 ├── lib/
-│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps, critter gifts and fight hits
+│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps and critter gifts (NOT fight hits)
+│   ├── hitGuard.ts           fight hits: trusted clicks only, one DOM event counts once, no rate limit
+│   ├── fightSim.ts           a bot that fights with the real combat rules (scripts/fight-sim.ts, tests/fightBalance.test.ts)
 │   ├── castleWard.ts         the castle's ward (castle level 7+): isInWard, monstersOutsideWard, fortressWallTier
 │   ├── inventory.ts          pure bag / equipment operations + aggregateStats (the one place gear is summed)
 │   ├── combat.ts             max HP, damage per click, armor mitigation, regen, fight state machine (stepFight)

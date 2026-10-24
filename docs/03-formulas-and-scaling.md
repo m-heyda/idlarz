@@ -126,7 +126,7 @@ critter gift = max(min, N s of that resource's income)  (×2 golden); N = 10 on 
              cooldown: farm 8 s, map 20 s, both gated by the click limiter, amount computed in the store
 ```
 
-Click limiter: burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
+Click limiter (gold clicks, tile taps, critter gifts; NOT fight hits): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
 
 ## 7. Character-derived stats
 
@@ -160,37 +160,31 @@ Conservation rule used by the save check: `legacyPoints + Σ shop spending = leg
 ## 10. Combat, monsters and items
 
 ```
-maxHp        = round(85 + characterStats.hp + Σ gear maxHp + set bonus)         COMBAT.baseHp   (101 at the start)
-damage/click = max(1, weapon damage)                                            Wooden Sword 2, Rattatui Fang Blade 3 (COMBAT.maxWeaponDamage)
+maxHp        = round(85 + characterStats.hp + Σ gear maxHp + set bonuses)       COMBAT.baseHp   (101 at the start)
+damage/click = max(1, Σ gear damage + set bonuses)                              Wooden Sword 2 ... Titan Maul 15 (COMBAT.maxItemDamage 16 is a sanity ceiling)
+click        : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
+               then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
+fight hits   : not rate limited; trusted real clicks only, one DOM event counts once (lib/hitGuard.ts)
 hit taken    = max(1, round(attack × (1 − armor / (armor + 40))))               COMBAT.armorK
-regen        = +1 HP/s with no active fight; knockout restores 30 % of max HP
-potion       = +35 HP (not above max), 8 s cooldown shared by all potions in a fight
+regen        = (1 + gear regen) HP/s with no active fight, gear regen only during one; knockout restores 30 % of max HP
+potion       = +35 / +90 HP (not above max), 8 s cooldown shared by all potions in a fight
 rat tier t   : HP = round(100 × 1.5^(t−1))  → 100 / 150 / 225 / 338 / 506
                attack = round(4 × 1.25^(t−1)) every 2 s → 4 / 5 / 6 / 8 / 10
 tier         = min(5, 1 + floor(age / 1800 s))                                  age counts only while not being fought
 rewards      : rewardSec = 90 × 1.5^(t−1)
-               gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))
+               gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
-drops        : rat: plain gear 8 % + 1 % per tier above 1; potion 25 % + 3 % per tier   (tier 1: 90 s of income, tier 5: ~456 s)
-               Rat King: 1 Rattatui piece (missing ones first) + 40 % a second one + 2 potions
+drops        : rat: gear 12 % + 2 % per tier above 1, picked by weight from the catalog's rat pool (common 10, uncommon 4 from T3, rare 1.2 from T5);
+               potion 25 % + 3 % per tier (Greater from T4)                      (tier 1: 90 s of income, tier 5: ~456 s)
+               Rat King: 1 Rattatui piece (missing ones first) + 40 % a second one + 5 % a legendary weapon + 2 Minor and 1 Greater potion
+               chest (item result, 8 % of chests): the chest pool by weight - see generated/item-catalog.md
 spawn        : first rat 120 s after 5 owned tiles, then 900 s; max 8; Rat King check every 600 s of age after tier 5 (7200 s), 35 %
-Rat King     : 450 HP, attack 4 every 3.5 s, 75 s limit (a player who never clicks takes ~82 damage in that time and times out)
-king bounds  : starter sword: (8 + 5/s × 75 s) = 383 clicks × 2 = 766 >= 1.25 × 450, best loadout (3/click): 150 clicks = 28 s at the 5/s cap, never under 20 s
+Rat King     : 5200 HP, attack 14 every 3 s, 75 s limit
 ```
 
-| Rattatui piece | Slot | Rarity | Armor | Max HP | Damage |
-| --- | --- | --- | --- | --- | --- |
-| Cap | head | uncommon | 3 | 4 | |
-| Shoulderpads | shoulder | uncommon | 3 | 3 | |
-| Tunic | chest | rare | 6 | 8 | |
-| Gloves | hands | uncommon | 2 | 2 | |
-| Trousers | legs | uncommon | 4 | 5 | |
-| Boots | feet | uncommon | 2 | 3 | |
-| Amulet | neck | rare | | 8 | |
-| Cloak | cape | uncommon | 2 | 3 | |
-| Ring (x2) | ring | rare | | 5 | |
-| Charm | charm | epic | 2 | 10 | |
-| Fang Blade | weapon | rare | | | 3 |
-| Buckler | shield | rare | 5 | 4 | |
+The King's numbers were tuned with `npm run fight-sim` (a bot with the real combat rules; tables in [generated/fight-sim.md](generated/fight-sim.md)) and are
+held by `tests/fightBalance.test.ts`: the starter kit and plain wood never win, steel needs fast clicking, obsidian a steady pace, the Rattatui set is comfortable,
+and no loadout trivialises him. Rats are basic enemies and are not tuned around him.
 
-Set bonus: 6 pieces +10 Max HP, 13 pieces +15 Max HP more (both rings count). Everything above lives in `src/config/combatConfig.ts` and `src/config/itemCatalog.ts`.
+Items, sets, rarities, stats, drop pools and the merchant stock are generated into [generated/item-catalog.md](generated/item-catalog.md) from `src/catalog`.
+Combat numbers live in `src/config/combatConfig.ts`.

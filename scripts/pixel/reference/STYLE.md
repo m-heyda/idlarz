@@ -15,6 +15,7 @@ graphics for anything that isn't a map glyph. Match the references in this folde
 | `map-terrain.png`, `map-sprites.png` | **Map direction**: the dual-grid terrain sample island (organic edges, depth tiers, trees, docks, fog sea) and its sprite sheet at 3x. |
 | `town.png` | The 16 town buildings (48x60, transparent, no ground) at 3x on meadow green. |
 | `fog.png`, `castle-levels.png`, `gold-shine.png` | Fog tile, castle levels and the coin twinkle strip. |
+| `gear.png` | The gear tiers: wooden/leather, cloth, steel and obsidian sets (10 icons each), the weapons and the potions, labelled, at 4x. |
 
 Reference images in this folder: `icons.png` (icon set), `characters.png` (heroes, merchant, busts), `farm.png` (pen back + front layers), `hero-hud.png`, `castle-levels.png`, `map-terrain.png`, `map-sprites.png`, `town.png`, `fog.png`, `ui-parts.png`, `gold-shine.png`.
 
@@ -206,3 +207,16 @@ build. After approval run `build.py --refs` and update this guide.
 No black outlines, no ground shadows on sprites (buildings have no baked-in ground either: the foundation is terrain), no per-tile stamped biome icons (map details are hashed, sparse sprites), no smooth gradients or glossy plastic, no noisy dither, no emoji-style
 flat icons, no ad-hoc Tailwind greys for new UI (use the `.px-*` kit), no fractional sprite scales, no leftover
 generators or generated sample folders in the repo.
+
+## Gear tiers (`sprites_gear.py`, `item_<id>` 40x40)
+Four armour families, each with the same 10 slot icons (head, shoulder, chest, hands, legs, feet, neck, cape, ring, charm) plus an off hand, drawn by re-skinning the
+slot icons of `sprites_equipment.py` through material remaps (`_skin`, optional extra primitives for flourishes), plus a few drawn from scratch (the wizard hat, the robe):
+- **Wooden/leather**: `leather`/`pleather`/`bark`/`wood_cut`, green gems. Plain and brown.
+- **Cloth**: `robe` (violet) and `linen` (cream) with gold trim and `arcane` gems; wizard hat, robe with sash.
+- **Steel**: `plate` (cool silver) with `steel` rims, `banner_blue` cloth, `crystal` gems.
+- **Obsidian** (the fanciest): `obsidian` (near-black glass, violet specular) with `obsidian_edge` (violet-cyan light) trims and gems, horns, spikes and a glowing core.
+- **Weapons** are new geometry (swords, daggers, mace, maul, axe, spear, bow, crossbow, staff, wand, tome) rendered on a roomy canvas, then shrunk to fit 40x40 (`_done`);
+  the Rattatui Fang Blade keeps its bone re-skin. **Legendary** weapons burn in `ember` (orange) with `glow` and gold.
+- Glints only on metal and glass (steel, obsidian, gems); none on wood, leather, cloth or fur.
+- Rarity is shown by the item frame glow in the UI (`catalog/rarity.ts`), never baked into the sprite.
+- New materials: `obsidian`, `obsidian_edge`, `ember`, `linen`. The potion pair: `item_potion_hp` (small red flask) and `item_potion_greater` (bigger flask, gold band, star stud).
