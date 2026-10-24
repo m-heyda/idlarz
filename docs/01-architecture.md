@@ -48,8 +48,8 @@ src/
 │   ├── useHydration.ts       true when the save has been loaded and the splash was shown long enough
 │   ├── useSingleTab.ts       Web Lock: one tab owns the game
 │   └── useCtrlSequence.ts    Control ×5 detector (hidden save tools)
-└── components/game/          Grid, Tile, TileStatus, BiomeTooltip, dialogs (castle, biome, building), header,
-    │                         AmbientLife (decorative critters + rare golden gift)
+└── components/game/          Grid (pan + stepped wheel zoom), Tile, TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
+    │                         building), header (HeaderMenu, LevelOrb, NotifyDot), AmbientLife (decorative critters + rare golden gift),
     │                         MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
     └── overlays/             Statistics, Character (paper doll + bag), FightModal, Farm (+scene/critters), Merchant, NamePrompt + Tutorial,
                               SettingsDialog, LegacyDialog (rebirth + shop), TutorialDialog, SaveMenuDialog,
@@ -57,7 +57,7 @@ src/
 scripts/
 ├── sim.ts                    bot simulation on the REAL store (milestones per player profile)
 ├── balance-report.ts         tables for docs/generated/balance-tables.md
-└── pixel/                    sprite generators
+└── pixel/                    sprite generators -> public/pixel/ (see "Pixel art pipeline")
 tests/                        clickLimiter, economy (exploit/behaviour), saves (validation + crypto), castle, rebirth, ambient,
                               items, inventory, equipment, combat, monsters, loot, fight, kingInvariant
 ```
@@ -93,8 +93,16 @@ Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a
 ## Rendering notes
 
 - `Grid` culls to the visible window and pans with pointer handlers; fling inertia keeps its velocity in a ref with friction (no per-frame React state).
+- **Wheel zoom** is stepped (0.75 / 1 / 1.5 / 2, one step per 50 px of wheel delta) so the pixel art stays crisp, zooms around the cursor and never goes below the level where the world stops covering the screen. The zoom is exposed to CSS as `--map-zoom`; tile tooltips scale with it, castle/building dialogs do not.
+- Tile tooltips are portalled into `MapTipLayer`, a layer above the critters, because every tile is its own stacking context.
+- `NotifyDot` is the one "needs attention" marker (a soft orange dot). It is used on header controls only: unspent stat points on the level orb and an affordable farm animal or upgrade on the Farm button.
+- Font: Mozilla Headline (self-hosted via `@fontsource-variable/mozilla-headline`, exposed as `--font-pixel`).
 - Every visible `Tile` subscribes to `tiles` and `resources`, so tiles re-render on each tick; fine for the current viewport, the first thing to optimise if it grows ([05](05-balance-backlog-and-roadmap.md)).
 - Tutorial, stat tooltips and cost lists are generated from config constants, so they cannot drift from the rules.
+
+## Pixel art pipeline
+
+All sprites, frames, grounds and edge-blend masks are generated, not drawn by hand: `python scripts/pixel/build.py [name ...]` (Pillow) rewrites `public/pixel/{icons,ui,bg}/` in place and prunes stale files afterwards, so a running dev server never 404s. `--refs` also refreshes the curated images in `scripts/pixel/reference/`; the visual rules (top-down buildings, outlines, palette, ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Icons are registered in `src/config/pixelIcons.ts`.
 
 ## Build & run
 
