@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store } from './helpers';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { GRID_CENTER_X, GRID_CENTER_Y, REBIRTH } from '../src/config/gameConfig';
-import { ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
 import { maxHp } from '../src/lib/combat';
 import { pickPersisted } from '../src/lib/sanitizeSave';
@@ -13,7 +13,7 @@ let seq = 0;
 let clock = 1_000_000;
 /** One trusted click; `gapMs` between clicks keeps a human pace (4/s) unless a test wants to hammer the limiter. */
 const hit = (gapMs = 250) => api().hitMonster({ eventId: ++seq, now: (clock += gapMs), trusted: true });
-const hits = (n: number) => Array.from({ length: n }, () => hit());
+const hits = (n: number, gapMs = 250) => Array.from({ length: n }, () => hit(gapMs));
 const run = (seconds: number) => {
 	for (let i = 0; i < seconds; i++) api().tick(1000);
 };
@@ -102,7 +102,8 @@ test('a kill pays gold, xp and loot', () => {
 		assert.ok(Math.abs(api().resources.xp - before.xp - summary.xp) < 1e-6);
 		const ids = summary.items.map((i) => i.id);
 		assert.ok(ids.includes('potion_minor'));
-		assert.ok(ids.some((id) => RATTATUI_SET.pieces.includes(id)));
+		assert.ok(ids.some((id) => (BASIC_GEAR as readonly string[]).includes(id)));
+		assert.equal(ids.some((id) => RATTATUI_SET.pieces.includes(id)), false, 'a rat drops no Rattatui piece');
 		assert.equal(api().bag.find((s) => s?.id === 'potion_minor')?.qty, 3);
 		assert.equal(summary.convertedGold, 0);
 	} finally {
@@ -122,8 +123,8 @@ test('loot with a full bag converts to gold and loses no items', () => {
 		const summary = api().fight!.summary!;
 		assert.deepEqual(api().bag, full);
 		assert.deepEqual(summary.items, []);
-		const piece = ITEM_CATALOG[RATTATUI_SET.pieces[0]];
-		assert.equal(summary.convertedGold, piece.sellValue + ITEM_CATALOG.potion_minor.sellValue);
+		const gear = ITEM_CATALOG[BASIC_GEAR[0]];
+		assert.equal(summary.convertedGold, gear.sellValue + ITEM_CATALOG.potion_minor.sellValue);
 		assert.equal(api().resources.gold - before, summary.gold + summary.convertedGold);
 	} finally {
 		mock.restoreAll();
@@ -264,19 +265,37 @@ test('chests never spawn on a monster tile', () => {
 	assert.equal(api().tiles[b.y][b.x].hasChest, true);
 });
 
-test('the Rat King times out after 60 s, taunts, and stays on the map at full HP', () => {
+test('the Rat King times out, taunts, and stays on the map at full HP', () => {
 	withMonster({ type: 'ratKing', tier: 1 });
 	api().startFight(1);
-	assert.equal(api().fight?.timeLeftSec, 60);
+	assert.equal(api().fight?.timeLeftSec, MONSTERS.ratKing.timeLimitSec);
 	hits(40);
-	run(61);
+	run(MONSTERS.ratKing.timeLimitSec + 1);
 	assert.equal(api().fight?.phase, 'timeout');
 	assert.ok((MONSTERS.ratKing.taunts as readonly string[]).includes(api().fight!.taunt!));
 	assert.equal(api().monsters.length, 1);
 	assert.equal(api().monsters[0].type, 'ratKing');
 	api().leaveFight();
 	api().startFight(1);
-	assert.equal(api().fight?.monsterHp, 1000);
+	assert.equal(api().fight?.monsterHp, MONSTERS.ratKing.hp);
+});
+
+test('a player clicking at the limiter cap beats the Rat King with the starter sword and wins Rattatui gear', () => {
+	withMonster({ type: 'ratKing', tier: 1 });
+	mock.method(Math, 'random', () => 0);
+	try {
+		api().startFight(1);
+		for (let sec = 0; sec < MONSTERS.ratKing.timeLimitSec && api().fight?.phase === 'active'; sec++) {
+			hits(5, 200); // 5 clicks per second: the limiter's sustained cap
+			api().tick(1000);
+		}
+		assert.equal(api().fight?.phase, 'won');
+		const ids = api().fight!.summary!.items.map((i) => i.id);
+		assert.ok(ids.some((id) => RATTATUI_SET.pieces.includes(id)), 'the king drops a Rattatui piece');
+		assert.equal(api().monsters.length, 0);
+	} finally {
+		mock.restoreAll();
+	}
 });
 
 test('the monster being fought does not age', () => {

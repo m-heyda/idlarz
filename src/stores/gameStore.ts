@@ -539,6 +539,10 @@ const createGameSlice = (
 					goldPerSec: rates.gold,
 					xpPerSec: rates.xp * (1 + state.characterStats.xpGainMultiplier / 100),
 					luck: state.characterStats.luck,
+					owned: [
+						...Object.values(state.equipment),
+						...state.bag.map((slot) => slot?.id),
+					].filter((id): id is string => !!id),
 				},
 				Math.random
 			);

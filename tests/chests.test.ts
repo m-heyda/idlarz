@@ -99,7 +99,8 @@ test('chest loot: gold is minutes of income (like before), a lucky chest pays x1
 		} else if (loot.kind === 'xp') {
 			assert.ok(loot.xp >= CHEST.xp.floor);
 		} else {
-			assert.ok(CHEST_ITEMS.includes(loot.itemId) && ITEM_CATALOG[loot.itemId].rarity !== 'common');
+			assert.ok(CHEST_ITEMS.includes(loot.itemId));
+			assert.notEqual(ITEM_CATALOG[loot.itemId].set, 'rattatui', 'chests never hold Rattatui pieces');
 		}
 	}
 });
@@ -114,8 +115,10 @@ test('chest loot: luck moves weight from plain gold to lucky chests and items', 
 
 test('chest loot: an item that does not fit in a full bag becomes gold', () => {
 	let bag: BagSlot[] = emptyBag();
-	bag = bag.map((_, i) => ({ id: CHEST_ITEMS[i % CHEST_ITEMS.length], qty: 1 })); // gear does not stack: every slot used
-	assert.equal(addToBag(bag, CHEST_ITEMS[0], 1).added, 0);
+	const gear = CHEST_ITEMS.filter((id) => !ITEM_CATALOG[id].consumable); // gear does not stack: every slot used
+	bag = bag.map((_, i) => ({ id: gear[i % gear.length], qty: 1 }));
+	for (const id of CHEST_ITEMS.filter((i) => !ITEM_CATALOG[i].consumable)) assert.equal(addToBag(bag, id, 1).added, 0);
+	assert.equal(addToBag(bag, 'potion_minor', 1).added, 0);
 	for (let i = 0; i < 4000; i++) {
 		const loot = rollChestLoot({ rates: rates(), luck: 100, bag }, rng(i));
 		assert.notEqual(loot.kind, 'item');
