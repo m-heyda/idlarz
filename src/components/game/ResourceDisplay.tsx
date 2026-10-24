@@ -81,18 +81,11 @@ const ResourceDisplay: React.FC = () => {
 						key={resource}
 						className='group relative flex items-center justify-center gap-2 text-sm'>
 						{RESOURCE_PIXEL_ICONS[resource] ? (
-							resource === 'gold' ? (
-								<div
-									className='pixel-gold-shine'
-									role='img'
-									aria-label={resource}
-								/>
-							) : (
-								<PixelIcon
-									name={RESOURCE_PIXEL_ICONS[resource]!}
-									alt={resource}
-								/>
-							)
+							<PixelIcon
+								name={RESOURCE_PIXEL_ICONS[resource]!}
+								alt={resource}
+								shine={resource === 'gold'}
+							/>
 						) : (
 							<div
 								className='text-xl md:text-2xl'

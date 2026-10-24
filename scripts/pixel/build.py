@@ -19,14 +19,12 @@ import render3d  # noqa: E402
 render3d.DEFAULTS.update(rim=True, dither=0.2)       # the house look: rim light + whisper of dither
 
 from PIL import Image  # noqa: E402
-import fx  # noqa: E402
 import fog  # noqa: E402
 import ground_art  # noqa: E402
 import ui_art  # noqa: E402
 import sprites_animals  # noqa: E402
 import sprites_buildings  # noqa: E402
 import sprites_castle  # noqa: E402
-import sprites_chest  # noqa: E402
 import sprites_characters  # noqa: E402
 import sprites_equipment  # noqa: E402
 import sprites_farm  # noqa: E402
@@ -37,6 +35,7 @@ import sprites_monsters  # noqa: E402
 import sprites_meadow  # noqa: E402
 import sprites_props  # noqa: E402
 import sprites_resources  # noqa: E402
+import sprites_sheet  # noqa: E402
 import terrain_art  # noqa: E402
 import terrain_build  # noqa: E402
 import terrain_preview  # noqa: E402
@@ -47,11 +46,11 @@ PUB = os.path.join(ROOT, 'public', 'pixel')
 PREVIEW = os.path.join(HERE, 'previews')
 
 SPRITES = {
-    'gold': sprites_resources.gold, 'wood': sprites_resources.wood, 'stone': sprites_resources.stone,
-    'coal': sprites_resources.coal, 'food': sprites_resources.bread, 'meat': sprites_resources.meat,
-    # reserved late-game art (no game resource yet, see docs/05): iron, fish, mana, ability shard, random-item box
-    'res_iron': sprites_resources.iron, 'res_fish': sprites_resources.fish, 'res_mana': sprites_resources.mana,
-    'res_shard': sprites_resources.shard, 'res_mystery': sprites_resources.mystery,
+    # cut from the supplied sheet (assets/*.png): resources, reserved currencies, the gem and both chests
+    **sprites_sheet.SPRITES,
+    # no picture in the sheet: bread, the emerald ability shard, farm products
+    'food': sprites_resources.bread, 'res_shard': sprites_resources.shard,
+    'eggs': sprites_resources.eggs, 'milk': sprites_resources.milk, 'hide': sprites_resources.hide,
     'menu_character': sprites_props.helm, 'menu_merchant': sprites_props.pouch, 'menu_farm': sprites_props.barn,
     'level_orb': sprites_props.level_orb,
     'equip_head': sprites_equipment.head, 'equip_neck': sprites_equipment.neck,
@@ -68,7 +67,6 @@ SPRITES = {
     **sprites_castle.SPRITES,
     **sprites_fortress.SPRITES,
     **sprites_buildings.SPRITES,
-    **sprites_chest.SPRITES,
     **sprites_menu.SPRITES,
     **sprites_monsters.SPRITES,
 }
@@ -105,17 +103,6 @@ def save_group(folder, makers, only):
         img.save(os.path.join(out, f'{name}.png'))
         made[name] = img
     return made
-
-
-def gold_shine():
-    """6-frame twinkle strip (40x40 each) for the header coin; glints swell and fade out of phase."""
-    base = sprites_resources.gold_base()
-    spots = fx.find_highlights(base, sprites_resources.NUGGET_HI, n=2, min_dist=11)
-    frames = fx.shine_frames(base, [(x - 1, y - 1) for x, y in spots])
-    strip = Image.new('RGBA', (40 * len(frames), 40), (0, 0, 0, 0))
-    for i, f in enumerate(frames):
-        strip.alpha_composite(f, (i * 40, 0))
-    return strip
 
 
 def contact_sheet(imgs, path, k=5, cols=6, bg=(150, 133, 117, 255)):
@@ -230,8 +217,9 @@ def main():
     sprites = save_group('icons', SPRITES, only)
     ui = save_group('ui', UI, only)
     bg = save_group('bg', BG, only)
-    if not only or 'gold_shine' in only:
-        gold_shine().save(os.path.join(PUB, 'icons', 'gold_shine.png'))
+    for name, make in sprites_sheet.SHEETS.items():
+        if not only or name in only:
+            make().save(os.path.join(PUB, 'icons', f'{name}.png'))
     if not only or 'castle_6_anim' in only:
         sprites_castle.sheet_max().save(os.path.join(PUB, 'icons', 'castle_6_anim.png'))
     if not only or 'castle_keep_anim' in only:

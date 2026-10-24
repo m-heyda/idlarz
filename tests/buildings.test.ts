@@ -41,5 +41,5 @@ test('reserved resources are art only: icons exist, but nothing treats them as a
 		assert.equal(name in RESOURCE_PIXEL_ICONS, false, `${name} must not be a ResourceIcon`);
 		assert.equal(name in INITIAL_RESOURCES, false, `${name} must not be a game resource`);
 	}
-	assert.deepEqual(Object.keys(RESERVED_RESOURCES).sort(), ['abilityShard', 'fish', 'iron', 'mana', 'randomItem']);
+	assert.deepEqual(Object.keys(RESERVED_RESOURCES).sort(), ['abilityShard', 'crystal', 'fish', 'iron', 'mana', 'randomItem', 'sapphire']);
 });

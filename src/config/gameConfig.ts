@@ -120,6 +120,10 @@ export const RESOURCE_ICONS = {
 	food: '🌾',
 	meat: '🥩',
 	xp: '✨',
+	eggs: '🥚',
+	milk: '🥛',
+	hide: '🟫',
+	gems: '💎',
 };
 
 export const HEADER_DISPLAYED_RESOURCES_INFO = {
@@ -638,7 +642,7 @@ export const CHARACTER_STAT_CONFIG = {
 	plainsMeatModifier: 0.05,
 };
 
-// Rebirth: restart with a permanent Legacy bonus. Available once the castle reaches `minCastleLevel`.
+// Rebirth: restart with a permanent bonus paid in Gems (the Legacy points). Available once the castle reaches `minCastleLevel`.
 export const REBIRTH = {
 	minCastleLevel: 6,
 	minTiles: 20, // a rebirth also needs this much territory (no cheap rebirth with a tiny map)
@@ -650,7 +654,7 @@ export const REBIRTH = {
 		Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * Math.sqrt(Math.max(0, tiles) / 10)),
 };
 
-// The Legacy shop: permanent upgrades bought with unspent Legacy points. The N+1-th level costs
+// The Legacy shop: permanent upgrades bought with unspent Gems. The N+1-th level costs
 // ceil(baseCost x costGrowth^N) points.
 export const LEGACY_UPGRADES = {
 	thrift: {

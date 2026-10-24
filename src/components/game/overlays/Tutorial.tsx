@@ -164,7 +164,7 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0]'>
 					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles you can
 					Rebirth from the Legacy window: the map, resources, castle, farm and level start again, and you keep your name,
-					hero and Legacy. Every Legacy point is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
+					hero and Gems. Every Gem is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
 					the shop ({Object.values(LEGACY_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
 					at the moment of rebirth give more points, so pushing on to level {CASTLE_UPGRADE.maxLevel} first pays.
 				</p>

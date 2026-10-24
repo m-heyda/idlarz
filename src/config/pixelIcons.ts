@@ -11,6 +11,12 @@ export const PIXEL_ICON_SIZES = {
 	coal: [40, 40],
 	food: [40, 40],
 	meat: [40, 40],
+	// farm products
+	eggs: [40, 40],
+	milk: [40, 40],
+	hide: [40, 40],
+	// the rebirth currency (Legacy points are shown as Gems)
+	gems: [40, 40],
 	// menu buttons + badges
 	menu_character: [40, 40],
 	menu_merchant: [40, 40],
@@ -19,12 +25,22 @@ export const PIXEL_ICON_SIZES = {
 	menu_legacy: [40, 40],
 	level_orb: [24, 24],
 	xp: [40, 40],
-	bonus_chest: [24, 24],
-	chest_map: [40, 40], // the map pickup: chest on a grass patch
+	bonus_chest: [32, 32], // the chest alone, for toasts and tooltips
+	chest_map: [48, 40], // the map pickup: chest on a grass patch
+	chest_map_anim: [192, 40], // 4 idle frames of chest_map (lock and lid glints)
+	// twinkle strips: 6 frames of the sprite with glints that swell and fade
+	gold_shine: [240, 40],
+	gems_shine: [240, 40],
+	res_crystal_shine: [240, 40],
+	res_sapphire_shine: [240, 40],
+	res_mana_shine: [240, 40],
+	res_mystery_shine: [240, 40],
 	// reserved late-game art (no game resource yet, see RESERVED_RESOURCES below)
 	res_iron: [40, 40],
 	res_fish: [40, 40],
 	res_mana: [40, 40],
+	res_crystal: [40, 40],
+	res_sapphire: [40, 40],
 	res_shard: [40, 40],
 	res_mystery: [40, 40],
 	unknown: [11, 14],
@@ -148,8 +164,23 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 	coal: 'coal',
 	food: 'food',
 	meat: 'meat',
+	eggs: 'eggs',
+	milk: 'milk',
+	hide: 'hide',
+	gems: 'gems', // the prestige currency (not a Resources key)
 	xp: 'xp',
 };
+
+// Sprites that twinkle: name -> its 6-frame strip (see the .px-shine class)
+export const SHINE_SHEETS: Partial<Record<PixelIconName, PixelIconName>> = {
+	gold: 'gold_shine',
+	gems: 'gems_shine',
+	res_crystal: 'res_crystal_shine',
+	res_sapphire: 'res_sapphire_shine',
+	res_mana: 'res_mana_shine',
+	res_mystery: 'res_mystery_shine',
+};
+export const SHINE_FRAMES = 6;
 
 // Equipment slot -> its pixel icon (both ring slots share one sprite)
 export const EQUIPMENT_PIXEL_ICONS: Record<string, PixelIconName> = {
@@ -243,6 +274,8 @@ export const RESERVED_RESOURCES: Record<string, PixelIconName> = {
 	iron: 'res_iron',
 	fish: 'res_fish',
 	mana: 'res_mana',
+	crystal: 'res_crystal',
+	sapphire: 'res_sapphire',
 	abilityShard: 'res_shard',
 	randomItem: 'res_mystery',
 };

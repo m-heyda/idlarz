@@ -26,7 +26,7 @@ import {
 import { cn } from '@/lib/utils';
 import audioManager from '@/utils/audioManager';
 import { queueTileTap } from '@/lib/floatText';
-import PixelIcon from './PixelIcon';
+import PixelIcon, { PixelSheet } from './PixelIcon';
 import CastleSprite from './CastleSprite';
 import { BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
 import { TileStatus } from './TileStatus';
@@ -317,8 +317,9 @@ const Tile: React.FC<TileProps> = ({
 					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && (
 						<span className='tile-chest-wrap'>
-							<PixelIcon name='chest_map' alt='Treasure chest' className='tile-chest' />
-							<i className='chest-twinkle' aria-hidden />
+							<span className='tile-chest'>
+								<PixelSheet name='chest_map_anim' frames={4} durationMs={1600} alt='Treasure chest' />
+							</span>
 						</span>
 					)}
 

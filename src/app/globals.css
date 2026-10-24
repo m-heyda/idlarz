@@ -229,22 +229,31 @@ body {
 	transition: width 0.3s ease-out;
 }
 
-/* gold coins twinkle: 6-frame sprite strip, 40x40 per frame */
-.pixel-gold-shine {
-	width: 40px;
-	height: 40px;
-	flex-shrink: 0;
-	background: url('/pixel/icons/gold_shine.png') 0 0 / 240px 40px no-repeat;
+/* Stepped sprite-sheet player: twinkling resources (gold, gems, crystals) and the map chest. Frame size, count, loop
+   length and the sheet come from CSS variables set by PixelSheet. */
+.px-shine {
+	display: inline-block;
+	width: var(--px-w);
+	height: var(--px-h);
+	background: var(--px-sheet) 0 0 / calc(var(--px-w) * var(--px-frames)) var(--px-h) no-repeat;
 	image-rendering: pixelated;
-	animation: pixel-shine 1.2s steps(6) infinite;
+	animation: px-shine-play var(--px-ms, 1200ms) steps(var(--px-frames)) infinite;
 }
 
-@keyframes pixel-shine {
-	from {
-		background-position-x: 0;
-	}
+@keyframes px-shine-play {
 	to {
-		background-position-x: -240px;
+		background-position-x: calc(var(--px-w) * var(--px-frames) * -1);
+	}
+}
+
+/* the rebirth gem hovers a pixel or two while it twinkles */
+.px-float {
+	animation: px-float 2.4s steps(2) infinite alternate;
+}
+
+@keyframes px-float {
+	to {
+		transform: translateY(-2px);
 	}
 }
 
@@ -340,7 +349,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
 	.fog-a,
 	.fog-b,
-	.pixel-gold-shine {
+	.px-shine,
+	.px-float {
 		animation: none;
 	}
 }
@@ -1234,10 +1244,10 @@ body {
 /* --- Treasure chest on the map: a banded chest on its own grass patch, a soft glow and one twinkle --- */
 .tile-chest-wrap {
 	position: absolute;
-	left: 4px;
+	left: 0;
 	bottom: 2px;
 	z-index: 10;
-	width: 40px;
+	width: 48px;
 	height: 40px;
 	pointer-events: none;
 }
@@ -1253,20 +1263,12 @@ body {
 
 .tile-chest {
 	position: relative;
+	display: block;
+	width: 48px;
+	height: 40px;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.45));
 	animation: chest-bob 2s steps(2) infinite alternate;
-}
-
-.chest-twinkle {
-	position: absolute;
-	top: -6px;
-	right: -4px;
-	width: 22px;
-	height: 22px;
-	background: url('/pixel/ui/spark_sheet.png') 0 0 / 132px 22px no-repeat;
-	image-rendering: pixelated;
-	animation: spark-twinkle 1.6s steps(6) infinite;
 }
 
 @keyframes chest-bob {
@@ -1287,8 +1289,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
 	.level-orb,
 	.tile-chest,
-	.tile-chest-wrap::before,
-	.chest-twinkle {
+	.tile-chest-wrap::before {
 		animation: none;
 	}
 }
