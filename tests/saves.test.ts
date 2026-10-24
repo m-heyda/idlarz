@@ -124,7 +124,8 @@ test('export -> parse accepts a real save and rejects edited / foreign ones', as
 	assert.equal(parsed.ok, true, parsed.ok ? '' : parsed.reason);
 	if (parsed.ok) assert.equal(parsed.state.tiles.flat().filter((t) => t.isOwned).length, owned());
 
-	const bad = await parseSave(file.slice(0, 50) + 'x' + file.slice(51));
+	// swap one character for a different one (a fixed 'x' is a no-op 1 time in 64 and made this test flaky)
+	const bad = await parseSave(file.slice(0, 50) + (file[50] === 'x' ? 'y' : 'x') + file.slice(51));
 	assert.equal(bad.ok, false);
 	assert.equal((await parseSave('{"state":{}}')).ok, false);
 
