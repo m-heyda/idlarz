@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store } from './helpers';
 import { CASTLE_FORTRESS, CASTLE_RANGE, GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
-import { castleLevelOf, isInWard, monstersOutsideWard } from '../src/lib/castleWard';
+import { castleLevelOf, fortressWallTier, isInWard, monstersOutsideWard } from '../src/lib/castleWard';
+import { groundOf } from '../src/utils/biomeBlend';
 import { pickSpawnTile } from '../src/lib/monsters';
 import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
@@ -129,4 +130,19 @@ test('a save with a monster inside the ward of a level 7+ castle is rejected', (
 	// castle level 7 needs the castle upgrade cost map: take it from sanitize's own recomputation, only the level matters
 	const result = sanitizeSave(snapshot());
 	assert.equal(result.ok, false);
+});
+
+test('fortressWallTier: stone walls for levels 7-8, gilded for 9-10', () => {
+	assert.deepEqual([7, 8, 9, 10].map(fortressWallTier), ['a', 'a', 'b', 'b']);
+});
+
+test('the castle tile is drawn on cobbled yard ground from level 7 and on its flagstones before', () => {
+	freshGame();
+	const castle = () => api().tiles[GRID_CENTER_Y][GRID_CENTER_X];
+	setCastle(L7 - 1);
+	assert.equal(groundOf(castle()), 'castle');
+	setCastle(L7);
+	assert.equal(groundOf(castle()), 'yard');
+	setCastle(10);
+	assert.equal(groundOf(castle()), 'yard');
 });

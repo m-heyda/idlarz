@@ -41,6 +41,7 @@ Gold, wood, stone, coal, food, meat, xp. All except gold/xp can be sold to the m
 
 - Max level 10. **Each upgrade is a timed build**: resources are paid up front, then the castle works for 1 h, 4 h, 12 h, 36 h and 72 h (levels 2–6, 5 d 5 h in total), then 3 d, 4 d, 5 d and 7 d for levels 7–10 (24 d 5 h in total). Master Builders (Legacy) shortens these times. It keeps its current bonus meanwhile and only one upgrade runs at a time. The timer is advanced by the game tick (never by the system clock), is saved, and is shown in the castle dialog and its tooltip.
 - Effect of level L: the modifier of every resource doubles each level up to 6 (+20 % … +640 %), then grows by a flat +320 % per level (+960 % at 7 … +1920 % at 10), plus **+0.5 XP/s per level above 1** (flat). The castle sprite glows brighter from level 6 on, and level 10 gets sparks and the gold border.
+- **Fortress (levels 7-10)**: from level 7 the castle grows over its whole 3x3 bonus area. The violet area marker is replaced by stone **walls** along the four edges, a **gatehouse** in the middle of the south wall and a **tower on every corner**; the keep itself is a detailed animated castle on its own (cobbled) tile that spills a few pixels over its neighbours. All eight surrounding biomes stay visible. The towers get richer every level (7 red cone roof, 8 slate roof with crown and banner, 9 gold roof with glowing slits, 10 crystal spire and two banners) and the walls turn gold-trimmed from level 9. The area is a **ward**: no monsters or chests spawn inside it, and monsters already standing there when level 7 is reached are driven out (a monster you are fighting stays until the fight ends).
 - Costs: see [03 §4](03-formulas-and-scaling.md#4-castle) (gold, wood, stone, coal from level 2→3, food + meat from 3→4; levels 7–10 cost about 1.6× the previous step).
 
 ## 6. Farm
@@ -64,7 +65,7 @@ Gold, wood, stone, coal, food, meat, xp. All except gold/xp can be sold to the m
 
 ## 9. Chests
 
-A chest appears on a random owned non-castle tile every 10 min (the timer only runs while fewer than 5 chests wait). The chest is drawn as a glowing, gently bobbing treasure chest on the tile. Collect it by clicking the tile: reward = `passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`. Chests are saved with the map.
+A chest appears on a random owned non-castle tile every 10 min (the timer only runs while fewer than 5 chests wait; from castle level 7 never inside the castle's ward and never on a monster tile). The chest is drawn as a glowing, gently bobbing treasure chest on the tile. Collect it by clicking the tile: reward = `passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`. Chests are saved with the map.
 
 ## 10. XP, levels and stat points
 
@@ -102,7 +103,7 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 
 ## 15. Monsters and combat
 
-- **Spawning**: once you own 5 tiles, the first rat appears after 2 minutes, then one every 15 minutes (chests: 10), on a random owned non-castle tile without a chest or another monster. At most 8 monsters; the timer pauses while the map is full.
+- **Spawning**: once you own 5 tiles, the first rat appears after 2 minutes, then one every 15 minutes (chests: 10), on a random owned non-castle tile without a chest or another monster and, from castle level 7, outside the castle's ward. At most 8 monsters; the timer pauses while the map is full.
 - **Growing**: a rat gains a tier every 30 minutes on the map (max tier 5): more HP, harder hits, better rewards. A tier-5 rat can evolve into the **Rat King** (35 % every 10 minutes of extra age, only one king at a time). The monster you are fighting does not age.
 - **Fighting**: click a monster to open the fight. Every click on the rat hits for your weapon's damage (Wooden Sword 2, so a tier-1 rat needs 50 hits). The rat attacks on a timer (about every 2 s), reduced by your armor. There is no time limit on rats. Hits use the shared click limiter.
 - **HP**: about 100 at the start (`85 + vitality HP + gear`). It regenerates about 1 HP/s while no fight is active, never during one. **Minor Healing Potions** (35 HP, 8 s shared cooldown in a fight, hotkeys 1-3) work in and out of fights.

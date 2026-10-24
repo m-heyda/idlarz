@@ -15,3 +15,6 @@ export const monstersOutsideWard = (monsters: Monster[], castleLevel: number, ke
 	castleLevel < CASTLE_FORTRESS.fromLevel
 		? monsters
 		: monsters.filter((m) => m.id === keepId || !isInWard(m.x, m.y, castleLevel));
+
+/** Wall set of the fortress: plain stone ('a') for levels 7-8, gold-trimmed ('b') from level 9. */
+export const fortressWallTier = (castleLevel: number): 'a' | 'b' => (castleLevel >= 9 ? 'b' : 'a');

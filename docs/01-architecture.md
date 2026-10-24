@@ -34,6 +34,7 @@ src/
 │   ├── formatters.ts, audioManager.ts
 ├── lib/
 │   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps, critter gifts and fight hits
+│   ├── castleWard.ts         the castle's ward (castle level 7+): isInWard, monstersOutsideWard, fortressWallTier
 │   ├── inventory.ts          pure bag / equipment operations + aggregateStats (the one place gear is summed)
 │   ├── combat.ts             max HP, damage per click, armor mitigation, regen, fight state machine (stepFight)
 │   ├── monsters.ts           tiers, monster stats, spawn tile, aging and Rat King evolution
@@ -50,7 +51,7 @@ src/
 │   └── useCtrlSequence.ts    Control ×5 detector (hidden save tools)
 └── components/game/          Grid (pan + stepped wheel zoom), Tile, TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
     │                         building), header (HeaderMenu, LevelOrb, NotifyDot), AmbientLife (decorative critters + rare golden gift),
-    │                         MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
+    │                         CastleRange (violet 3x3 area, castle < 7) / CastleFortress (walls, gate, corner towers, castle 7+), MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
     └── overlays/             Statistics, Character (paper doll + bag), FightModal, Farm (+scene/critters), Merchant, NamePrompt + Tutorial,
                               SettingsDialog, LegacyDialog (rebirth + shop), TutorialDialog, SaveMenuDialog,
                               TabLockOverlay, LevelUp/Chest notifications, LoadingScreen

@@ -86,7 +86,13 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   **max-level grand castle**: gold roofs, gilded bands, glowing windows, crystal spire. Max level is a 4-frame sheet
   (`castle_6_anim`, flags wave, crystal pulses) with a pulsing golden glow, a golden aura on the tile and sparkles rising.
   The upgrade dialog previews current -> next castle. Reference: `castle-levels.png`.
-- **Buildings** (`building_*`, `sprites_buildings.py`, 48px, top-down like the castle so each fills its tile): thatched farm
+- **Fortress** (`sprites_fortress.py`, castle levels 7-10): the castle stops being one big tile sprite and takes its 3x3 bonus area, drawn by `CastleFortress.tsx` instead of the violet
+  range marker (no violet wash, dashes or border; the castle tile switches to the cobbled `yard` ground). Parts, all 1x pixel art seen from a lower camera (pitch 58) so brickwork,
+  windows and banners show: `castle_keep` / `castle_keep_anim` (64px keep, 4-frame sheet: great hall with slate gable roof, gold donjon with crystal, two flag turrets, banners; spills 8px over
+  its neighbours), `castle_tower_7..10` (40x56 round towers on the area corners: red cone roof / slate roof + crown + banner / gold roof, glowing slits, gold bands / crystal spire, three bands, two flags),
+  `castle_wall_h_a|b` + `castle_wall_v_a|b` (48x12 crenellated wall pieces, tiled; south and east are CSS flips; `b` is gold-trimmed for levels 9-10) and `castle_gate_a|b`
+  (52x30 gatehouse, exactly one tile wide so it joins the south wall). `python scripts/pixel/sprites_fortress.py out.png [parts.png]` renders a 3x3 review mock on real biome ground.
+- **Buildings** (`building_*, `sprites_buildings.py`, 48px, top-down like the castle so each fills its tile): thatched farm
   cottage with crop rows + haystack, mine with a timbered shaft, rails and coal cart, lumber mill with a flat saw bench and log
   pile, striped-awning market stall with fruit crates, stone forge with glowing coals + anvil + chimney smoke, gear workshop with a
   big cog and a floating XP orb. The same sprite is the picker icon and the tile graphic. A converted grounds tile switches to a

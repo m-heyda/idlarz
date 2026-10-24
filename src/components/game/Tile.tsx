@@ -9,6 +9,7 @@ import {
 	BUILDINGS,
 	BuildingType,
 	TILE_TAP,
+	CASTLE_FORTRESS,
 	CASTLE_UPGRADE,
 	CASTLE_RANGE,
 	TILE_SIZE,
@@ -129,6 +130,8 @@ const Tile: React.FC<TileProps> = ({
 	const hasBuilding = biome === 'grounds' && !!building && (level ?? 1) > 1;
 	const castleLevel = tiles?.[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1;
 	const isGlowingCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.glowFromLevel;
+	// from the fortress level the castle stands on cobbles inside walls: no purple border, no golden tile aura
+	const isFortress = biome === 'castle' && castleLevel >= CASTLE_FORTRESS.fromLevel;
 
 	// Owned neighbours of the castle get gold sparkles: they are inside the castle's range
 	const inCastleRange =
@@ -249,24 +252,26 @@ const Tile: React.FC<TileProps> = ({
 					{
 						'opacity-100': isOwned,
 						'tile-unknown': !isOwned && isAdjacent,
-						[`tile-ground tile-ground-${hasBuilding ? 'yard' : biome} tile-owned`]: isOwned,
+						[`tile-ground tile-ground-${hasBuilding || isFortress ? 'yard' : biome} tile-owned`]: isOwned,
 						'opacity-75': farAwayTile,
 						'hover:z-10 cursor-pointer border border-gray-800':
 							!isOwned && isAdjacent,
 						'hover:border-green-800': !isOwned && isAdjacent && canAfford,
 						'hover:border-red-800 cursor-not-allowed':
 							!isOwned && isAdjacent && !canAfford,
-						'border border-purple-400': biome === 'castle',
+						'border border-purple-400': biome === 'castle' && !isFortress,
 						'border-2 border-amber-300':
 							(tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 0) >= CASTLE_UPGRADE.maxLevel &&
-							biome === 'castle',
+							biome === 'castle' &&
+							!isFortress,
 						'group hover:z-20': true,
 						'opacity-75 border-2 border-red-500': isShaking,
 						'cursor-pointer':
 							isOwned && (biome === 'castle' || biome === 'grounds' || hasChest || !!monsterKey),
 						'tile-has-monster': isOwned && !!monsterKey,
 						'castle-tile': isOwned && biome === 'castle',
-						'castle-max-tile': isOwned && isGlowingCastle,
+						'castle-max-tile': isOwned && isGlowingCastle && !isFortress,
+						'tile-fortress': isOwned && isFortress,
 						'border-2 border-amber-400': isOwned && hasChest,
 						'tile-cooldown': cooling,
 					},
