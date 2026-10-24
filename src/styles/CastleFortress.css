@@ -1,10 +1,12 @@
 /* Castle fortress (castle level 7+): walls on the edges of the 3x3 area, a gatehouse on the south wall, a tower on each
    corner. Sprites are drawn at 1x (scripts/pixel/sprites_fortress.py); the south and east walls are the north and west
-   pieces flipped. Above the tiles (z-12, like the old range wash) but never takes a click. */
+   pieces flipped. Never takes a click.
+   Stacking on the map: tiles 0-10, a hovered tile 20, THIS layer 21 (so hovering a tile inside the walls never lifts it over
+   a wall or tower), ambient critters 22 / 25, the castle tile on hover and the tooltip layer 30. */
 
 .castle-fortress {
 	position: absolute;
-	z-index: 12;
+	z-index: 21;
 	pointer-events: none;
 	image-rendering: pixelated;
 }
