@@ -261,11 +261,11 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 
 | Upgrade | effect per level | max level | cost of level 1 | cost of the last level |
 | --- | --- | --- | --- | --- |
-| Feed Trough | +10% meat | 10 | 20.00K food | 3.97M food |
-| Hen House | +15% eggs | 10 | 4000 wood + 40.00 eggs | 474.35K wood + 4744 eggs |
-| Dairy | +15% milk | 10 | 4000 stone + 30.00 milk | 474.35K stone + 3558 milk |
-| Tannery | +15% hide | 10 | 3000 coal + 20.00 hide | 355.76K coal + 2372 hide |
-| Pen Expansion | +3% farm output, +4 animals per kind | 8 | 50.00K food + 10.00K wood + 10.00K stone | 6.40M food + 1.28M wood + 1.28M stone |
+| Feed Trough | +5% meat | 10 | 20.00K food | 3.97M food |
+| Hen House | +10% eggs | 10 | 4000 wood + 40.00 eggs | 474.35K wood + 4744 eggs |
+| Dairy | +10% milk | 10 | 4000 stone + 30.00 milk | 474.35K stone + 3558 milk |
+| Tannery | +10% hide | 10 | 3000 coal + 20.00 hide | 355.76K coal + 2372 hide |
+| Pen Expansion | +2% farm output, +4 animals per kind | 8 | 50.00K food + 10.00K wood + 10.00K stone | 6.40M food + 1.28M wood + 1.28M stone |
 
 ## 5. Biomes and buildings
 
@@ -319,12 +319,12 @@ Derived stats for the starting stats (all 5):
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 1.760 | 45.0% | 2.552 |
-| wood | 0 | 0.05 | 0.050 | 45.0% | 0.072 |
+| gold | 0.1 | 0.1 | 1.630 | 45.0% | 2.364 |
+| wood | 0 | 0.05 | 0.440 | 45.0% | 0.638 |
 | stone | 0 | 0.1 | 0.100 | 32.5% | 0.133 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 4.730 | 45.0% | 6.858 |
-| meat | 0 | 0 | 0.000 | 60.0% | 0.000 |
+| food | 0 | 0.05 | 3.950 | 45.0% | 5.728 |
+| meat | 0 | 0 | 0.000 | 55.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |

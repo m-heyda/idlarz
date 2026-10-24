@@ -488,38 +488,38 @@ export const FARM = {
 };
 
 // Pen Expansion: per level, every animal kind may hold `capPerLevel` more animals and all farm output grows
-export const FARM_PEN = { outputPerLevel: 0.03, capPerLevel: 4 };
+export const FARM_PEN = { outputPerLevel: 0.02, capPerLevel: 4 };
 
 export const FARM_UPGRADES = {
 	feed: {
 		label: 'Feed Trough',
-		description: (n: number) => `+${Math.round(n * 10)}% meat`,
+		description: (n: number) => `+${Math.round(n * 5)}% meat`,
 		maxLevel: 10,
-		effectPerLevel: 0.1, // meat
+		effectPerLevel: 0.05, // meat
 		cost: { food: 20000 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.8,
 	},
 	coop: {
 		label: 'Hen House',
-		description: (n: number) => `+${Math.round(n * 15)}% eggs`,
+		description: (n: number) => `+${Math.round(n * 10)}% eggs`,
 		maxLevel: 10,
-		effectPerLevel: 0.15, // eggs
+		effectPerLevel: 0.1, // eggs
 		cost: { wood: 4000, eggs: 40 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.7,
 	},
 	dairy: {
 		label: 'Dairy',
-		description: (n: number) => `+${Math.round(n * 15)}% milk`,
+		description: (n: number) => `+${Math.round(n * 10)}% milk`,
 		maxLevel: 10,
-		effectPerLevel: 0.15, // milk
+		effectPerLevel: 0.1, // milk
 		cost: { stone: 4000, milk: 30 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.7,
 	},
 	tannery: {
 		label: 'Tannery',
-		description: (n: number) => `+${Math.round(n * 15)}% hide`,
+		description: (n: number) => `+${Math.round(n * 10)}% hide`,
 		maxLevel: 10,
-		effectPerLevel: 0.15, // hide
+		effectPerLevel: 0.1, // hide
 		cost: { coal: 3000, hide: 20 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.7,
 	},

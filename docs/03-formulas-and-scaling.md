@@ -83,8 +83,8 @@ Build time to level 6 is 5 d 5 h, to level 10 24 d 5 h (before Legacy discounts)
 
 ```
 cost of the N-th animal of a kind = floor(baseCost × costScaling^(N−1))   food
-meat/s of N animals               = baseProduction × N × (1 + 0.03 × pen) × (1 + 0.10 × feed)
-product/s of N animals            = perSec × N × (1 + 0.03 × pen) × (1 + 0.15 × coop|dairy|tannery)
+meat/s of N animals               = baseProduction × N × (1 + 0.02 × pen) × (1 + 0.05 × feed)
+product/s of N animals            = perSec × N × (1 + 0.02 × pen) × (1 + 0.10 × coop|dairy|tannery)
 meat total                        = base × (1 + castle modifier + 0.05 × plainsTiles)
 products total                    = base × (1 + castle modifier)          (eggs, milk, hide)
 cap per kind                      = 12 + 4 × pen level
@@ -100,11 +100,11 @@ upgrade cost (level N → N+1)      = ceil(base × growth^N) per resource
 
 | Upgrade | per level | levels | base cost | cost × |
 | --- | --- | --- | --- | --- |
-| Feed Trough | +10 % meat | 10 | 20 K food | 1.8 |
-| Hen House | +15 % eggs | 10 | 4 K wood + 40 eggs | 1.7 |
-| Dairy | +15 % milk | 10 | 4 K stone + 30 milk | 1.7 |
-| Tannery | +15 % hide | 10 | 3 K coal + 20 hide | 1.7 |
-| Pen Expansion | +3 % all farm output, +4 animals per kind | 8 | 50 K food + 10 K wood + 10 K stone | 2 |
+| Feed Trough | +5 % meat | 10 | 20 K food | 1.8 |
+| Hen House | +10 % eggs | 10 | 4 K wood + 40 eggs | 1.7 |
+| Dairy | +10 % milk | 10 | 4 K stone + 30 milk | 1.7 |
+| Tannery | +10 % hide | 10 | 3 K coal + 20 hide | 1.7 |
+| Pen Expansion | +2 % all farm output, +4 animals per kind | 8 | 50 K food + 10 K wood + 10 K stone | 2 |
 
 A product sells for 3 / 4 / 6 gold (eggs / milk / hide), which is 25–40 % of the meat value of the animal that makes it.
 
