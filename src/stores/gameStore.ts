@@ -17,17 +17,24 @@ import {
 	GRID_HEIGHT,
 	GRID_SIZE,
 	INITIAL_CHARACTER_STATS,
+	FARM_UPGRADES,
 	LEGACY_UPGRADES,
 	MAX_CATCHUP_SEC,
+	MERCHANT_BUYABLE,
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
+	MERCHANT_SHOP_ITEMS,
+	MERCHANT_UPGRADES,
+	type MerchantUpgradeId,
 	REBIRTH,
 	RESOURCE_CAP,
 	TILE_TAP,
+	type FarmUpgradeId,
 	type LegacyUpgradeId,
 } from '@/config/gameConfig';
 import {
-	calculateAnimalCost,
+	affordableAnimals,
+	animalBatchCost,
 	calculateBuildingCost,
 	calculateCombatStats,
 	calculateLevel,
@@ -42,10 +49,17 @@ import {
 	economyTiles,
 	EMPTY_PRESTIGE,
 	effectiveTileDiscount,
+	farmCap,
+	farmUpgradeCost,
+	farmUpgradeLevel,
 	STARTER_FREE_TILES,
 	legacyEffect,
 	legacyGain,
 	legacyUpgradeCost,
+	merchantLevel,
+	merchantLuck,
+	merchantUpgradeCost,
+	sellPayout,
 	startingResources,
 	subtractBundle,
 	tileCostAsResources,
@@ -60,7 +74,7 @@ import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { rollKillLoot } from '@/lib/loot';
 import { advanceMonsters, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
-import { ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
+import { ITEM_CATALOG, RARITY_ORDER, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type {
@@ -68,6 +82,7 @@ import type {
 	CharacterStats,
 	ClickInput,
 	CritterGift,
+	EquipmentRarity,
 	EquipmentSlot,
 	FightState,
 	GameState,
@@ -138,6 +153,8 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		nextMonsterId: 1,
 		fight: null as FightState | null,
 		farmLevels: {} as Record<string, number>,
+		farmUpgrades: {} as Record<string, number>,
+		merchantUpgrades: {} as Record<string, number>,
 		showCharacterWindow: false,
 		showStatisticsWindow: false,
 		showMerchantWindow: false,
@@ -176,7 +193,7 @@ const createGameSlice = (
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = economyTiles(state.tiles, state.freeTiles);
-		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige));
+		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades));
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
 
@@ -187,7 +204,8 @@ const createGameSlice = (
 			newTiles,
 			state.characterStats,
 			state.farmLevels,
-				state.prestige
+				state.prestige,
+				state.farmUpgrades
 		);
 
 		const xpGain =
@@ -247,6 +265,8 @@ const createGameSlice = (
 				// gear is character progression: it survives a rebirth (HP is refilled)
 				equipment: state.equipment,
 				bag: state.bag,
+				// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
+				merchantUpgrades: state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {},
 				playerHp: maxHp(fresh.characterStats, state.equipment),
 				playerName: state.playerName,
 				playerClass: state.playerClass,
@@ -275,22 +295,32 @@ const createGameSlice = (
 			return true;
 		},
 
-		// Buy one more animal of a kind (each purchase adds one animal)
-		purchaseAnimal: (animalId: string) => {
+		// Buy animals of a kind with food (each one costs more than the last). `count` is a number or 'max' (all you can
+		// afford). The pen holds at most farmCap animals per kind. Returns how many were bought.
+		purchaseAnimal: (animalId: string, count: number | 'max' = 1) => {
 			const state = get();
 			const animal = ANIMALS.find((a) => a.id === animalId);
-			if (!animal) return false;
+			if (!animal) return 0;
+			if (count !== 'max' && !(Number.isInteger(count) && count > 0)) return 0;
 
-			const currentLevel = state.farmLevels[animalId] || 0;
-			const cost = calculateAnimalCost(animal, currentLevel);
-			if (state.resources.food < cost) return false;
+			const owned = state.farmLevels[animalId] || 0;
+			const n = affordableAnimals(
+				animal,
+				owned,
+				state.resources.food,
+				farmCap(state.farmUpgrades),
+				count === 'max' ? Infinity : count
+			);
+			if (n <= 0 || (count !== 'max' && n < count)) return 0; // a fixed batch is all or nothing
+			const cost = animalBatchCost(animal, owned, n);
 
-			const newFarmLevels = { ...state.farmLevels, [animalId]: currentLevel + 1 };
+			const newFarmLevels = { ...state.farmLevels, [animalId]: owned + n };
 			const newRates = calculateResourceRates(
 				state.tiles,
 				state.characterStats,
 				newFarmLevels,
-				state.prestige
+				state.prestige,
+				state.farmUpgrades
 			);
 
 			set({
@@ -298,6 +328,28 @@ const createGameSlice = (
 				resources: { ...state.resources, food: state.resources.food - cost },
 				resourceRates: newRates,
 			});
+			return n;
+		},
+
+		// One level of a farm upgrade (feed, hen house, dairy, tannery, pen), paid in resources
+		buyFarmUpgrade: (id: FarmUpgradeId) => {
+			const state = get();
+			const def = FARM_UPGRADES[id];
+			if (!def) return false;
+			const level = farmUpgradeLevel(state.farmUpgrades, id);
+			if (level >= def.maxLevel) return false;
+			const cost = farmUpgradeCost(id, level);
+			if (!canAffordBundle(state.resources, cost)) return false;
+
+			const farmUpgrades = { ...state.farmUpgrades, [id]: level + 1 };
+			const newRates = calculateResourceRates(
+				state.tiles,
+				state.characterStats,
+				state.farmLevels,
+				state.prestige,
+				farmUpgrades
+			);
+			set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
 			return true;
 		},
 
@@ -323,7 +375,8 @@ const createGameSlice = (
 				state.tiles,
 				newStats,
 				state.farmLevels,
-				state.prestige
+				state.prestige,
+				state.farmUpgrades
 			);
 
 			set({
@@ -346,7 +399,7 @@ const createGameSlice = (
 
 			const owned = economyTiles(state.tiles, state.freeTiles);
 			const purchased = owned - 1;
-			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige));
+			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades));
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
 			// Every 4th tile (3, 7, 11 ... counted as before) the player picks the biome among what the rules allow; payment happens on selection
@@ -428,7 +481,8 @@ const createGameSlice = (
 				updatedTiles,
 				state.characterStats,
 				state.farmLevels,
-				state.prestige
+				state.prestige,
+				state.farmUpgrades
 			);
 
 			set({
@@ -446,7 +500,7 @@ const createGameSlice = (
 			const tile = state.tiles[y]?.[x];
 			if (!tile || !tile.isOwned || !tile.hasChest) return false;
 
-			const loot = rollChestLoot({ rates: state.resourceRates.total, luck: state.characterStats.luck, bag: state.bag });
+			const loot = rollChestLoot({ rates: state.resourceRates.total, luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades), bag: state.bag });
 
 			const newTiles = [...state.tiles];
 			newTiles[y] = [...newTiles[y]];
@@ -538,7 +592,7 @@ const createGameSlice = (
 				{
 					goldPerSec: rates.gold,
 					xpPerSec: rates.xp * (1 + state.characterStats.xpGainMultiplier / 100),
-					luck: state.characterStats.luck,
+					luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades),
 					owned: [
 						...Object.values(state.equipment),
 						...state.bag.map((slot) => slot?.id),
@@ -698,7 +752,8 @@ const createGameSlice = (
 							newTiles,
 							state.characterStats,
 							state.farmLevels,
-				state.prestige
+				state.prestige,
+				state.farmUpgrades
 						);
 					}
 					newCastleUpgrade = null;
@@ -848,7 +903,7 @@ const createGameSlice = (
 
 			const price =
 				MERCHANT_RESOURCE_PRICES[resource as keyof typeof MERCHANT_RESOURCE_PRICES];
-			const goldGained = Math.floor(amount * price);
+			const goldGained = sellPayout(price, amount, state.merchantUpgrades);
 
 			set({
 				resources: {
@@ -860,9 +915,82 @@ const createGameSlice = (
 			return true;
 		},
 
+		// Sell bag items for gold (flat price per item, plus Haggler). Equipped gear is not in the bag, so it is never sold.
+		sellItem: (bagIndex: number, qty?: number) => {
+			const state = get();
+			if (state.fight) return 0;
+			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
+			if (!slot) return 0;
+			const def = ITEM_CATALOG[slot.id];
+			if (!def) return 0;
+			const amount = qty === undefined ? 1 : Math.floor(qty);
+			if (!(amount >= 1) || amount > slot.qty) return 0;
+			const gold = sellPayout(def.sellValue, amount, state.merchantUpgrades);
+			set({
+				bag: removeFromBag(state.bag, bagIndex, amount),
+				resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) },
+			});
+			return gold;
+		},
+
+		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)
+		sellJunk: (maxRarity: EquipmentRarity) => {
+			const state = get();
+			if (state.fight) return { gold: 0, count: 0 };
+			const limit = RARITY_ORDER.indexOf(maxRarity);
+			if (limit < 0) return { gold: 0, count: 0 };
+			let bag = state.bag;
+			let gold = 0;
+			let count = 0;
+			bag.forEach((slot, index) => {
+				const def = slot && ITEM_CATALOG[slot.id];
+				if (!slot || !def || def.consumable || !def.slot) return;
+				if (RARITY_ORDER.indexOf(def.rarity) > limit) return;
+				gold += sellPayout(def.sellValue, slot.qty, state.merchantUpgrades);
+				count += slot.qty;
+				bag = removeFromBag(bag, index, slot.qty);
+			});
+			if (count === 0) return { gold: 0, count: 0 };
+			set({ bag, resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) } });
+			return { gold, count };
+		},
+
+		// Buy plain gear or potions from the shop; nothing is charged for what does not fit in the bag
+		buyItem: (id: string, qty = 1) => {
+			const state = get();
+			const entry = MERCHANT_SHOP_ITEMS.find((item) => item.id === id);
+			if (!entry || !ITEM_CATALOG[id]) return false;
+			if (!Number.isInteger(qty) || qty < 1 || qty > 99) return false;
+			const price = entry.price * qty;
+			if (state.resources.gold < price) return false;
+			const added = addToBag(state.bag, id, qty);
+			if (added.overflow > 0) return false;
+			set({ bag: added.bag, resources: { ...state.resources, gold: state.resources.gold - price } });
+			return true;
+		},
+
+		// One level of a merchant bonus (Haggler, Bulk Discount, Lucky Charm, Pack Rat), paid in gold
+		buyMerchantUpgrade: (id: MerchantUpgradeId) => {
+			const state = get();
+			const def = MERCHANT_UPGRADES[id];
+			if (!def) return false;
+			const level = merchantLevel(state.merchantUpgrades, id);
+			if (level >= def.maxLevel) return false;
+			const cost = merchantUpgradeCost(id, level);
+			if (state.resources.gold < cost) return false;
+			const merchantUpgrades = { ...state.merchantUpgrades, [id]: level + 1 };
+			const grow = id === 'packrat' ? Array.from({ length: def.effectPerLevel }, () => null) : [];
+			set({
+				merchantUpgrades,
+				bag: [...state.bag, ...grow],
+				resources: { ...state.resources, gold: state.resources.gold - cost },
+			});
+			return true;
+		},
+
 		// Buy whole units of a resource from the merchant (price rounds UP in the merchant's favour)
 		buyResource: (resource: keyof Resources, amount: number) => {
-			if (!(resource in MERCHANT_RESOURCE_PRICES)) return false;
+			if (!(resource in MERCHANT_RESOURCE_PRICES) || !(MERCHANT_BUYABLE as readonly string[]).includes(resource)) return false;
 			if (!isPositiveNumber(amount)) return false;
 			const units = Math.floor(amount);
 			if (units < 1) return false;
@@ -916,7 +1044,8 @@ export const useGameStore = create(
 				saved.tiles,
 				saved.characterStats,
 				saved.farmLevels,
-				saved.prestige
+				saved.prestige,
+				saved.farmUpgrades
 			);
 			return {
 				...current,

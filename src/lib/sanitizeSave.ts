@@ -7,6 +7,8 @@ import {
 	CHEST,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
+	FARM_UPGRADES,
+	MERCHANT_UPGRADES,
 	GRID_CENTER_X,
 	GRID_CENTER_Y,
 	GRID_HEIGHT,
@@ -15,7 +17,9 @@ import {
 	INITIAL_RESOURCES,
 	LEGACY_UPGRADES,
 	RESOURCE_CAP,
+	type FarmUpgradeId,
 	type LegacyUpgradeId,
+	type MerchantUpgradeId,
 } from '@/config/gameConfig';
 import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
@@ -24,6 +28,7 @@ import { isInWard } from '@/lib/castleWard';
 import { starterBag } from '@/lib/inventory';
 import { tierFor } from '@/lib/monsters';
 import {
+	bagSizeFor,
 	calculateCombatStats,
 	calculateLevel,
 	calculateXpGain,
@@ -56,6 +61,8 @@ export const PERSISTED_KEYS = [
 	'playerClass',
 	'characterStats',
 	'farmLevels',
+	'farmUpgrades',
+	'merchantUpgrades',
 	'clickLevel',
 	'castleUpgrade',
 	'prestige',
@@ -100,6 +107,7 @@ const int = (v: unknown, min: number, max: number): number | null => {
 
 export const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 const RESOURCE_KEYS = Object.keys(INITIAL_RESOURCES) as (keyof Resources)[];
+const OPTIONAL_RESOURCES = new Set<keyof Resources>(['eggs', 'milk', 'hide']);
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
@@ -216,7 +224,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (!isObject(raw.resources)) return fail('resources');
 	const resources = { ...INITIAL_RESOURCES };
 	for (const key of RESOURCE_KEYS) {
-		const v = num(raw.resources[key]);
+		// resources added after launch (farm products) are missing from older saves and start at 0
+		const v = raw.resources[key] === undefined && OPTIONAL_RESOURCES.has(key) ? 0 : num(raw.resources[key]);
 		if (v === null) return fail(`resource ${key}`);
 		resources[key] = v;
 	}
@@ -256,12 +265,25 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	Object.assign(characterStats, calculateCombatStats(characterStats));
 
 
+	// ---- merchant bonuses (optional: an older save has none). Parsed first because Pack Rat sets the bag size ----------
+	const merchantUpgrades: Record<string, number> = {};
+	if (raw.merchantUpgrades !== undefined) {
+		if (!isObject(raw.merchantUpgrades)) return fail('merchant upgrades');
+		for (const [id, lvl] of Object.entries(raw.merchantUpgrades)) {
+			if (!(id in MERCHANT_UPGRADES)) return fail('unknown merchant upgrade');
+			const v = int(lvl, 0, MERCHANT_UPGRADES[id as MerchantUpgradeId].maxLevel);
+			if (v === null) return fail('merchant upgrade level');
+			if (v > 0) merchantUpgrades[id] = v;
+		}
+	}
+	const bagSize = bagSizeFor(COMBAT.bagSize, merchantUpgrades);
+
 	// ---- gear, bag, HP, monsters (all optional: a save from before combat gets the starter kit) ------------------
 	let equipment: Equipment;
 	let bag: BagSlot[];
 	if (raw.equipment === undefined && raw.bag === undefined) {
 		equipment = { ...STARTER_EQUIPMENT };
-		bag = starterBag();
+		bag = [...starterBag(), ...Array.from({ length: bagSize - COMBAT.bagSize }, () => null)];
 	} else {
 		if (raw.equipment === undefined || raw.bag === undefined) return fail('equipment and bag belong together');
 		if (!isObject(raw.equipment)) return fail('equipment');
@@ -274,7 +296,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (!fits) return fail('equipped item in the wrong slot');
 			equipment[slot as EquipmentSlot] = id as string;
 		}
-		if (!Array.isArray(raw.bag) || raw.bag.length !== COMBAT.bagSize) return fail('bag size');
+		if (!Array.isArray(raw.bag) || raw.bag.length !== bagSize) return fail('bag size');
 		bag = [];
 		for (const entry of raw.bag) {
 			if (entry === null) {
@@ -340,6 +362,18 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (v > 0) farmLevels[id] = v;
 	}
 
+	// farm upgrades arrived later than the farm: an older save simply has none
+	const farmUpgrades: Record<string, number> = {};
+	if (raw.farmUpgrades !== undefined) {
+		if (!isObject(raw.farmUpgrades)) return fail('farm upgrades');
+		for (const [id, lvl] of Object.entries(raw.farmUpgrades)) {
+			if (!(id in FARM_UPGRADES)) return fail('unknown farm upgrade');
+			const v = int(lvl, 0, FARM_UPGRADES[id as FarmUpgradeId].maxLevel);
+			if (v === null) return fail('farm upgrade level');
+			if (v > 0) farmUpgrades[id] = v;
+		}
+	}
+
 	const clickLevel = int(raw.clickLevel, 0, CLICK_LADDER.length - 1);
 	if (clickLevel === null) return fail('click level');
 
@@ -397,6 +431,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			playerClass,
 			characterStats,
 			farmLevels,
+			farmUpgrades,
+			merchantUpgrades,
 			clickLevel,
 			castleUpgrade,
 			prestige,

@@ -25,7 +25,7 @@ const territory = (r: number): Tile[][] => {
 		for (let x = -r; x <= r; x++) g[GRID_CENTER_Y + y][GRID_CENTER_X + x] = { biome: x === 0 && y === 0 ? 'castle' : 'plains', isOwned: true, ...(x === 0 && y === 0 ? { level: 1 } : {}) };
 	return g;
 };
-const rates = (over: Partial<Resources> = {}): Resources => ({ gold: 2, wood: 1, stone: 1, coal: 0.5, food: 1, meat: 0, xp: 1, ...over });
+const rates = (over: Partial<Resources> = {}): Resources => ({ gold: 2, wood: 1, stone: 1, coal: 0.5, food: 1, meat: 0, eggs: 0, milk: 0, hide: 0, xp: 1, ...over });
 
 test('chest spot: only owned tiles, never the castle, a building, a monster or another chest', () => {
 	const g = territory(2);

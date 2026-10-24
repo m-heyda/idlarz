@@ -8,13 +8,13 @@ import {
 	GRID_CENTER_X,
 	GRID_CENTER_Y,
 	MAX_CATCHUP_SEC,
-	MERCHANT_RESOURCE_PRICES,
+	MERCHANT_BUYABLE,
 	TILE_RESOURCE_COST,
 } from '../src/config/gameConfig';
 import { calculateTileCost, calculateBuildingCost, effectiveTileDiscount } from '../src/utils/gameUtils';
 import type { Resources } from '../src/types/game';
 
-const SELLABLE = Object.keys(MERCHANT_RESOURCE_PRICES) as (keyof typeof MERCHANT_RESOURCE_PRICES)[];
+const SELLABLE = [...MERCHANT_BUYABLE]; // what can be both bought and sold; farm products only sell (see merchantShop.test.ts)
 const castleLevel = () => api().tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1;
 
 test('merchant: buying then selling never makes gold, for every resource and amount', () => {
@@ -258,11 +258,11 @@ test('stat points: only the five base stats can be raised and only with points',
 
 test('farm: animals cost food and stack production', () => {
 	freshGame();
-	assert.equal(api().purchaseAnimal('chicken'), false);
-	assert.equal(api().purchaseAnimal('dragon'), false);
+	assert.equal(api().purchaseAnimal('chicken'), 0);
+	assert.equal(api().purchaseAnimal('dragon'), 0);
 	setResources({ food: 1e9 });
-	assert.equal(api().purchaseAnimal('chicken'), true);
+	assert.equal(api().purchaseAnimal('chicken'), 1);
 	const one = api().resourceRates.base.meat;
-	assert.equal(api().purchaseAnimal('chicken'), true);
+	assert.equal(api().purchaseAnimal('chicken'), 1);
 	assert.ok(Math.abs(api().resourceRates.base.meat - 2 * one) < 1e-9);
 });

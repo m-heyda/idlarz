@@ -287,7 +287,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 			if (!frontier) break;
 			const owned = utils.economyTiles(s.tiles, s.freeTiles);
-			const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige));
+			const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades));
 			const bundle = utils.tileCostAsResources(cost);
 			if (!utils.canAffordBundle(s.resources, bundle)) {
 				if (!topUp(bundle)) break;
@@ -324,7 +324,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		const need: Record<string, number> = { ...((castle.upgradeCost ?? {}) as Record<string, number>) };
 		const owned = utils.economyTiles(s.tiles, s.freeTiles);
 		for (let k = 0; k < 3; k++) {
-			const c = utils.calculateTileCost(owned + k, utils.effectiveTileDiscount(s.characterStats, s.prestige));
+			const c = utils.calculateTileCost(owned + k, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades));
 			Object.entries(c.resources).forEach(([r, v]) => {
 				need[r] = Math.max(need[r] ?? 0, (v ?? 0) * 1.1);
 			});

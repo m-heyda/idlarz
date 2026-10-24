@@ -2,7 +2,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { Resources } from '@/types/game';
 import { formatNumber } from '@/utils/formatters';
-import { HEADER_DISPLAYED_RESOURCES_INFO, RESOURCE_ICONS } from '@/config/gameConfig';
+import { FARM_PRODUCT_KEYS, HEADER_DISPLAYED_RESOURCES_INFO, RESOURCE_ICONS } from '@/config/gameConfig';
 import { RESOURCE_PIXEL_ICONS } from '@/config/pixelIcons';
 import { emitFloat, mergeItems, takeTileTap, FloatItem } from '@/lib/floatText';
 import PixelIcon from './PixelIcon';
@@ -65,12 +65,12 @@ const ResourceDisplay: React.FC = () => {
 				// Format modifier as percentage
 				const modifierPercent = Math.round(modifier * 100);
 
-				if (resource === 'xp') {
+				if (resource === 'xp' || (FARM_PRODUCT_KEYS as readonly string[]).includes(resource)) {
 					return null;
 				}
 
 				// Get resource info or use fallback for meat if not in header info
-				const resourceInfo = HEADER_DISPLAYED_RESOURCES_INFO[resource] || {
+				const resourceInfo = (HEADER_DISPLAYED_RESOURCES_INFO as Record<string, { icon: string; label: string; description: string }>)[resource] || {
 					icon: RESOURCE_ICONS[resource] || '🥩',
 					label: resource.charAt(0).toUpperCase() + resource.slice(1),
 					description: `${resource.charAt(0).toUpperCase() + resource.slice(1)} resource generated from farm animals`,

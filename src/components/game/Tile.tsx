@@ -50,7 +50,7 @@ const MonsterTip: React.FC<{ id: number; type: 'rat' | 'ratKing'; tier: number }
 			{nextTier !== null && (
 				<div className='px-tip-muted'>Grows stronger in {Math.max(1, Math.ceil(nextTier / 60))} min</div>
 			)}
-			{type === 'ratKing' && <div className='px-tip-muted'>Beat it within 60 seconds</div>}
+			{type === 'ratKing' && <div className='px-tip-muted'>Beat it within {MONSTERS.ratKing.timeLimitSec} seconds for a Rattatui piece</div>}
 			<div className='text-[#f0d27a]'>Click to fight</div>
 		</div>
 	);
@@ -70,6 +70,7 @@ const Tile: React.FC<TileProps> = ({
 	const resources = useGameStore((state) => state.resources);
 	const characterStats = useGameStore((state) => state.characterStats);
 	const prestige = useGameStore((state) => state.prestige);
+	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const upgradeGroundsTile = useGameStore((state) => state.upgradeGroundsTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
@@ -134,8 +135,8 @@ const Tile: React.FC<TileProps> = ({
 	const ownedTilesCount = useMemo(() => economyTiles(tiles, freeTiles), [tiles, freeTiles]);
 
 	const tileCost = useMemo(
-		() => calculateTileCost(ownedTilesCount, effectiveTileDiscount(characterStats, prestige)),
-		[ownedTilesCount, characterStats, prestige]
+		() => calculateTileCost(ownedTilesCount, effectiveTileDiscount(characterStats, prestige, merchantUpgrades)),
+		[ownedTilesCount, characterStats, prestige, merchantUpgrades]
 	);
 
 	const canAfford = canAffordBundle(resources, tileCostAsResources(tileCost));

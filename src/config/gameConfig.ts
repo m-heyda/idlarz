@@ -172,6 +172,9 @@ export const CASTLE_BASE_RATES = {
 	coal: 0,
 	food: 0.05,
 	meat: 0,
+	eggs: 0,
+	milk: 0,
+	hide: 0,
 	xp: 0.5,
 };
 
@@ -313,6 +316,9 @@ export const INITIAL_RESOURCES = {
 	coal: 0,
 	food: 0,
 	meat: 0,
+	eggs: 0,
+	milk: 0,
+	hide: 0,
 	xp: 0,
 };
 
@@ -324,6 +330,9 @@ export const BASE_GENERATION_RATES = {
 	coal: 0,
 	food: 0,
 	meat: 0, // Meat can only be generated through the farm
+	eggs: 0, // so are eggs, milk and hide
+	milk: 0,
+	hide: 0,
 	xp: 0.25, // Base XP generation rate increased
 };
 
@@ -366,7 +375,67 @@ export const MERCHANT_RESOURCE_PRICES = {
 	coal: 1,
 	food: 0.75,
 	meat: 1,
+	// farm products sell for more than the meat they come with
+	eggs: 3,
+	milk: 4,
+	hide: 6,
 };
+
+// Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
+// starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
+export const MERCHANT_UPGRADES = {
+	haggler: {
+		label: 'Haggler',
+		description: (n: number) => `+${Math.round(n * 3)}% gold from everything you sell`,
+		maxLevel: 10,
+		effectPerLevel: 0.03, // gold from selling resources and items
+		baseCost: 100000,
+		costGrowth: 1.9,
+	},
+	bulk: {
+		label: 'Bulk Discount',
+		description: (n: number) => `-${n}% tile and building cost`,
+		maxLevel: 8,
+		effectPerLevel: 1, // percentage points, added to Charisma and Thrift (REBIRTH.discountCapPercent still caps the sum)
+		baseCost: 250000,
+		costGrowth: 2.1,
+	},
+	charm: {
+		label: 'Lucky Charm',
+		description: (n: number) => `+${n * 2} Luck for chests and kills`,
+		maxLevel: 10,
+		effectPerLevel: 2, // Luck
+		baseCost: 150000,
+		costGrowth: 1.9,
+	},
+	packrat: {
+		label: 'Pack Rat',
+		description: (n: number) => `+${n * 4} bag slots`,
+		maxLevel: 4,
+		effectPerLevel: 4, // bag slots
+		baseCost: 500000,
+		costGrowth: 3,
+	},
+} as const;
+
+export type MerchantUpgradeId = keyof typeof MERCHANT_UPGRADES;
+
+// Plain gear and potions the merchant sells (gold). Every price is at least 3x the item's sell value (x1.3 for a maxed Haggler),
+// so buying and selling can never print gold: tests/economy.test.ts checks it for every entry.
+export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = [
+	{ id: 'potion_minor', price: 80 },
+	{ id: 'leather_cap', price: 400 },
+	{ id: 'leather_gloves', price: 400 },
+	{ id: 'leather_boots', price: 450 },
+	{ id: 'leather_vest', price: 800 },
+	{ id: 'iron_sword', price: 6000 },
+];
+
+// Farm products: shown on the farm and at the merchant, not in the header row
+export const FARM_PRODUCT_KEYS = ['eggs', 'milk', 'hide'] as const;
+
+// Only these can be bought back (as resource packs); farm products are earned on the farm, never bought
+export const MERCHANT_BUYABLE = ['wood', 'stone', 'coal', 'food', 'meat'] as const;
 
 // Buying resources from the merchant costs this many times the sell price
 export const MERCHANT_BUY_MULTIPLIER = 2;
@@ -380,6 +449,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 10000, // Starting at 10k food as requested
 		costScaling: 1.5, // Each purchase costs 1.5x more than the previous one
 		baseProduction: 0.2, // meat per second per animal; each purchase adds one more animal
+		product: { resource: 'eggs', perSec: 0.02 },
 	},
 	{
 		id: 'deer',
@@ -388,6 +458,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 50000,
 		costScaling: 1.6,
 		baseProduction: 0.5,
+		product: { resource: 'hide', perSec: 0.025 },
 	},
 	{
 		id: 'pig',
@@ -396,6 +467,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 200000,
 		costScaling: 1.7,
 		baseProduction: 1,
+		product: { resource: 'hide', perSec: 0.05 },
 	},
 	{
 		id: 'cow',
@@ -404,8 +476,63 @@ export const ANIMALS: Animal[] = [
 		baseCost: 1000000,
 		costScaling: 1.8,
 		baseProduction: 2,
+		product: { resource: 'milk', perSec: 0.15 },
 	},
 ];
+
+// The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
+// once sold). Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
+export const FARM = {
+	baseCap: 12, // animals of one kind the pen holds before it is expanded
+	unitsDrawn: 6, // most sprites drawn per kind in the pen (the count badge carries on)
+};
+
+// Pen Expansion: per level, every animal kind may hold `capPerLevel` more animals and all farm output grows
+export const FARM_PEN = { outputPerLevel: 0.03, capPerLevel: 4 };
+
+export const FARM_UPGRADES = {
+	feed: {
+		label: 'Feed Trough',
+		description: (n: number) => `+${Math.round(n * 100)}% meat`,
+		maxLevel: 10,
+		effectPerLevel: 0.1, // meat
+		cost: { food: 20000 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.8,
+	},
+	coop: {
+		label: 'Hen House',
+		description: (n: number) => `+${Math.round(n * 100)}% eggs`,
+		maxLevel: 10,
+		effectPerLevel: 0.15, // eggs
+		cost: { wood: 4000, eggs: 40 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.7,
+	},
+	dairy: {
+		label: 'Dairy',
+		description: (n: number) => `+${Math.round(n * 100)}% milk`,
+		maxLevel: 10,
+		effectPerLevel: 0.15, // milk
+		cost: { stone: 4000, milk: 30 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.7,
+	},
+	tannery: {
+		label: 'Tannery',
+		description: (n: number) => `+${Math.round(n * 100)}% hide`,
+		maxLevel: 10,
+		effectPerLevel: 0.15, // hide
+		cost: { coal: 3000, hide: 20 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.7,
+	},
+	pen: {
+		label: 'Pen Expansion',
+		description: (n: number) => `+${Math.round(n * FARM_PEN.outputPerLevel * 100)}% farm output, +${n * FARM_PEN.capPerLevel} animals per kind`,
+		maxLevel: 8,
+		effectPerLevel: FARM_PEN.outputPerLevel,
+		cost: { food: 50000, wood: 10000, stone: 10000 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 2,
+	},
+} as const;
+export type FarmUpgradeId = keyof typeof FARM_UPGRADES;
 
 // Resource display information
 export const MERCHANT_RESOURCE_INFO = {
@@ -433,6 +560,21 @@ export const MERCHANT_RESOURCE_INFO = {
 		label: 'Meat',
 		description: 'A source of protein for a healthy diet.',
 		priceDescription: 'High demand for a nutritious meal.',
+	},
+	eggs: {
+		label: 'Eggs',
+		description: 'Fresh from the coop.',
+		priceDescription: 'Bakers pay well for fresh eggs.',
+	},
+	milk: {
+		label: 'Milk',
+		description: 'Creamy and cold from the dairy.',
+		priceDescription: 'A town favourite at breakfast.',
+	},
+	hide: {
+		label: 'Hide',
+		description: 'Tanned leather from the farm.',
+		priceDescription: 'Craftsmen always need good leather.',
 	},
 };
 

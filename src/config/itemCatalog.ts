@@ -3,6 +3,8 @@ import type { Equipment, EquipmentRarity, EquipmentSlot, ItemDef, ItemStats } fr
 
 // Every item in the game. Saves store item ids only (see sanitizeSave), so stats here are the single source of truth.
 
+export const RARITY_ORDER: EquipmentRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+
 // Flat gold the merchant pays for an item. Deliberately not tied to income: the shop sells gear at several times
 // these prices, so buying and selling the same item can never print gold (tests/economy.test.ts sweeps this).
 const SELL_VALUE: Record<EquipmentRarity, number> = {

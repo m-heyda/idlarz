@@ -51,13 +51,14 @@ export default function Home() {
 	const pendingTileCoords = useGameStore((state) => state.pendingTileCoords);
 	const characterStats = useGameStore((state) => state.characterStats);
 	const prestige = useGameStore((state) => state.prestige);
+	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const tiles = useGameStore((state) => state.tiles);
 	const freeTiles = useGameStore((state) => state.freeTiles);
 	const [clickPosition, setClickPosition] = React.useState<{x: number, y: number} | undefined>(undefined);
 	
 	const tileCost = calculateTileCost(
 		economyTiles(tiles, freeTiles),
-		effectiveTileDiscount(characterStats, prestige)
+		effectiveTileDiscount(characterStats, prestige, merchantUpgrades)
 	);
 
 	useEffect(() => {
