@@ -699,15 +699,20 @@ export const AMBIENT_LIFE = {
 	giftSeconds: 5, // a map gift is worth this many seconds of that resource's income (x goldenMultiplier)
 	giftCooldownMs: 20000, // at most one map gift per this long
 	farmGiftCooldownMs: 8000, // same for the farm meadow critters
-	// which critter likes which biome
+	// which critter likes which biome (a name twice = twice as common). Fish only swim where the lake has water on all four
+	// sides, and fish, frogs, crabs, goats and wolves are decoration only: the golden gift critters are the four from FARM_BONUS.
 	byBiome: {
-		forest: ['butterfly', 'bee'],
+		forest: ['butterfly', 'bee', 'wolf'],
 		plains: ['bee', 'butterfly'],
-		swamp: ['ladybug'],
-		hills: ['rabbit'],
+		swamp: ['ladybug', 'frog', 'frog'],
+		hills: ['rabbit', 'goat', 'goat'],
 		tundra: ['rabbit'],
-		lake: ['butterfly'],
-		coast: ['butterfly', 'bee'],
+		lake: ['fish', 'fish', 'butterfly'],
+		coast: ['butterfly', 'bee', 'crab', 'crab'],
 		grounds: ['rabbit', 'ladybug'],
-	} as Record<string, readonly ('butterfly' | 'bee' | 'ladybug' | 'rabbit')[]>,
+	} as Record<string, readonly AmbientCritterType[]>,
+	// how far a critter strays, as a share of roamTiles (swimmers and crawlers stay close to where they appear)
+	roamScale: { fish: 0.35, frog: 0.45, crab: 0.5, goat: 0.8, wolf: 1 } as Record<string, number>,
 };
+
+export type AmbientCritterType = 'butterfly' | 'bee' | 'ladybug' | 'rabbit' | 'fish' | 'frog' | 'crab' | 'goat' | 'wolf';

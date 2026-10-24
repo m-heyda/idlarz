@@ -1,8 +1,11 @@
-import { AMBIENT_LIFE, GRID_HEIGHT, GRID_SIZE, TILE_SIZE } from '@/config/gameConfig';
+import { AMBIENT_LIFE, FARM_BONUS, GRID_HEIGHT, GRID_SIZE, TILE_SIZE, type AmbientCritterType } from '@/config/gameConfig';
 import type { Tile } from '@/types/game';
 import { foundationBiome } from '@/utils/terrain';
 
-export type AmbientType = 'butterfly' | 'bee' | 'ladybug' | 'rabbit';
+export type AmbientType = AmbientCritterType;
+
+/** Only these four can carry a clickable gift (the farm critters); fish, frogs and crabs are decoration. */
+export const GIFT_CRITTERS = Object.keys(FARM_BONUS.critters) as AmbientType[];
 
 /** Visible part of the map in tile coordinates (inclusive). */
 export interface Viewport {
@@ -50,7 +53,12 @@ export const pickAmbientCritter = (
 			const tile = tiles[y]?.[x];
 			if (!tile?.isOwned || tile.biome === 'castle') continue;
 			// a built-on tile stands on its neighbours' biome (snowy foundation -> rabbits, meadow -> bees)
-			const types = AMBIENT_LIFE.byBiome[foundationBiome(tiles, x, y)];
+			const biome = foundationBiome(tiles, x, y);
+			let types = AMBIENT_LIFE.byBiome[biome];
+			// fish need open water: not on a lake tile that touches the shore
+			if (types && biome === 'lake' && !([[0, -1], [1, 0], [0, 1], [-1, 0]] as const).every(([dx, dy]) => tiles[y + dy]?.[x + dx]?.isOwned && tiles[y + dy][x + dx].biome === 'lake')) {
+				types = types.filter((t) => t !== 'fish');
+			}
 			if (types?.length) candidates.push({ x, y, types });
 		}
 	}
@@ -58,12 +66,13 @@ export const pickAmbientCritter = (
 
 	const spot = candidates[Math.floor(rng() * candidates.length)];
 	const type = spot.types[Math.floor(rng() * spot.types.length)];
-	const reach = AMBIENT_LIFE.roamTiles * TILE_SIZE;
+	const reach = AMBIENT_LIFE.roamTiles * TILE_SIZE * (AMBIENT_LIFE.roamScale[type] ?? 1);
 	const dx = between(rng, -reach, reach);
+	const giftRoll = rng() < AMBIENT_LIFE.giftChance; // always one roll, so the sequence does not depend on the type
 	return {
 		id: nextId++,
 		type,
-		golden: rng() < AMBIENT_LIFE.giftChance,
+		golden: giftRoll && GIFT_CRITTERS.includes(type),
 		x: (spot.x + between(rng, 0.2, 0.8)) * TILE_SIZE,
 		y: (spot.y + between(rng, 0.25, 0.8)) * TILE_SIZE,
 		dx,

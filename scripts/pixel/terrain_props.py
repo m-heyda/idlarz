@@ -221,6 +221,71 @@ def boulder(seed=0, size=1, pal=ROCK, snow=False):
     return _outline(img, pal['outline'])
 
 
+def rock_pile(seed=0, pal=ROCK_BROWN):
+    """Three boulders heaped together with a few chips in front (a scree / rubble pile)."""
+    w, h = 30, 20
+    img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    px = img.load()
+    lit, mid, dark = C(pal['lit']), C(pal['mid']), C(pal['dark'])
+    stones = [(8, 12, 7, 5), (19, 12, 8, 6), (13, 7, 6, 5)] if seed % 2 == 0 else [(9, 12, 8, 6), (21, 13, 6, 5), (15, 7, 7, 5)]
+
+    for cx, cy, rx, ry in stones:
+        def pick(dx, dy, d, rx=rx, ry=ry):
+            t = (dx / (rx + 0.5)) + (dy / (ry + 0.5))
+            return dark if t > 0.7 else lit if t < -0.7 and d < 0.9 else mid
+        _disc(px, w, h, cx, cy, rx, ry, pick)
+    for i, (x, y) in enumerate(((3, 17), (14, 17), (26, 16), (22, 18))):
+        _put(px, w, h, x, y, mid)
+        _put(px, w, h, x + 1, y, dark)
+    for x, y in ((7, 9), (18, 9), (13, 5)):
+        _put(px, w, h, x, y, lit)
+    return _outline(_pad(img, 0), pal['outline'])
+
+
+def cave(seed=0):
+    """A rocky knoll with a dark cave mouth framed by two timbers and a lintel, rubble at the foot."""
+    w, h = 36, 30
+    img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    px = img.load()
+    lit, mid, dark = C(ROCK['lit']), C(ROCK['mid']), C(ROCK['dark'])
+    for cx, cy, rx, ry in ((18, 15, 16, 12), (8, 19, 8, 7), (28, 19, 8, 7)):
+        def pick(dx, dy, d):
+            t = (dx / (rx_ + 0.5)) + (dy / (ry_ + 0.5))
+            if t > 0.55:
+                return dark
+            if t < -0.45 and d < 0.9:
+                return lit
+            return mid
+        rx_, ry_ = rx, ry
+        _disc(px, w, h, cx, cy, rx, ry, pick)
+    for k in range(6):                                                   # strata strokes
+        y = 6 + k * 3
+        for x in range(10 + (k % 2) * 3, 17 + (k % 2) * 3):
+            if px[x, y][3]:
+                px[x, y] = lit if k % 2 == 0 else dark
+    cx, base = 18, 26
+    for dy in range(-9, 1):                                              # the cave mouth: an arch of darkness
+        half = int((1 - (dy / 9.5) ** 2) ** 0.5 * 7)
+        for dx in range(-half, half + 1):
+            col = C('#0c0a14') if dy > -6 or abs(dx) < half - 1 else C('#1c1824')
+            _put(px, w, h, cx + dx, base + dy, col)
+    for dx in range(-6, 7):                                              # a hint of floor inside
+        if abs(dx) < 5:
+            _put(px, w, h, cx + dx, base, C('#2c2638'))
+    wood, wood_l = C('#7a4c26'), C('#a8703c')
+    for x in (cx - 8, cx + 8):                                           # timbers
+        for y in range(base - 9, base + 1):
+            _put(px, w, h, x, y, wood)
+            _put(px, w, h, x - 1, y, wood_l)
+    for x in range(cx - 9, cx + 10):                                     # lintel
+        _put(px, w, h, x, base - 10, wood_l)
+        _put(px, w, h, x, base - 9, wood)
+    for x, y in ((4, 27), (9, 28), (26, 28), (31, 27), (13, 28), (22, 28)):    # rubble
+        _put(px, w, h, x, y, mid)
+        _put(px, w, h, x + 1, y, dark)
+    return _outline(img, ROCK['outline'])
+
+
 def peak(seed=0, snow=False, pal=ROCK):
     """Mountain with a shoulder peak: lit left face, shaded right face, strata strokes and scree."""
     w, h = 40, 46
@@ -465,10 +530,14 @@ PROPS = {
     'forest': dict(edge=[0.12, 0.42, 0.34, 0.12], deep=[0.04, 0.18, 0.36, 0.42],
                    opts=oaks(4) + pines(4) + [('fern', (fern,), 2, 0), ('mushrooms', (mushrooms,), 1, 0), ('rock', (boulder, 2, 0), 1, 0),
                                               ('log', (log,), 1, 1), ('stump', (stump,), 1, 1), ('pond', (pond, False, 1), 1, 1)]),
-    'hills': dict(edge=[0.5, 0.4, 0.1], deep=[0.35, 0.42, 0.2, 0.03],
+    'hills': dict(edge=[0.4, 0.42, 0.15, 0.03], deep=[0.22, 0.4, 0.28, 0.1],
                   opts=[('boulder', (boulder, 3, 1), 4, 0), ('rock_s', (boulder, 4, 0), 3, 0), ('bush', (bush, False), 2, 0),
                         ('oak', (oak, 5, 0.8), 2, 0), ('pine', (pine, 3, 3, False, 0.9), 2, 0), ('grass', (tall_grass,), 2, 0),
-                        ('boulder_l', (boulder, 5, 2), 3, 1), ('peak', (peak, 0), 4, 2), ('peak2', (peak, 1), 3, 2), ('peak3', (peak, 2), 3, 2)]),
+                        ('rock_s2', (boulder, 7, 0, ROCK_BROWN), 3, 0), ('rock_m2', (boulder, 8, 1, ROCK_BROWN), 3, 0),
+                        ('rubble', (rock_pile, 0), 3, 0), ('rubble2', (rock_pile, 1, ROCK), 2, 0),
+                        ('boulder_l', (boulder, 5, 2), 3, 1), ('boulder_l2', (boulder, 9, 2, ROCK_BROWN), 2, 1),
+                        ('cave', (cave, 0), 2, 1),
+                        ('peak', (peak, 0), 4, 2), ('peak2', (peak, 1), 3, 2), ('peak3', (peak, 2), 3, 2)]),
     'swamp': dict(edge=[0.4, 0.45, 0.15], deep=[0.25, 0.4, 0.28, 0.07],
                   opts=[('dead', (dead_tree, 0, 1.0), 4, 0), ('dead2', (dead_tree, 1, 0.8), 3, 0), ('dead3', (dead_tree, 2, 1.1), 2, 0),
                         ('stump', (stump,), 2, 0), ('reeds', (reeds,), 4, 0), ('mushrooms', (mushrooms,), 1, 0), ('log', (log,), 1, 0),

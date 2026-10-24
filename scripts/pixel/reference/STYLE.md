@@ -92,6 +92,8 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
     ice floes, and a quiet slate-blue "?" (11x14, 80% opacity) that brightens on hover. Farther tiles show only the drifting fog.
   - *Fog of war*: chunky low-res clouds (48px/64px art shown at 3x, 3 flat alpha bands, no outlines, no dither), two layers
     drifting opposite ways and gently breathing.
+  - *Hill details*: besides boulders and the grey peaks, hills get brown and grey rock piles (`rock_pile`), bigger brown boulders and rare **caves** (`cave`: a rocky knoll with a dark mouth framed by two timbers and a lintel, placed on interior hill tiles).
+  - *Ambient critters* (`sprites_meadow.py`, 2-frame sheets stepped by CSS, drawn at native size): the four gift critters (butterfly, bee, ladybug, rabbit) plus decoration-only fish (blue, tail swing, with a CSS ripple), frog, crab (drawn pixel by pixel from above), goat (tan with bone horns) and wolf (dark grey). Fish only appear on open-water lake tiles.
   - *Pickups*: the treasure chest is `chest_map` (40px: a banded wooden chest with a gold lock on its own grass patch with rocks, a soft glow, a slow 1px bob and one twinkle; no tile border), `bonus_chest` (24px, the same chest alone) is for toasts. Castle level uses a pixel plaque.
   - The `biome_*` 32px icons are no longer stamped on tiles; they remain for the biome picker, tutorial and building dialogs.
 - **Castle** (`castle_1`-`castle_6`, `sprites_castle.py`): seen from above (ray-cast at pitch 78), every level a full 48px tile on a

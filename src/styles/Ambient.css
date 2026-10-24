@@ -31,8 +31,45 @@
 	animation: amb-wander var(--life) ease-in-out both;
 }
 
-.amb-critter[data-type='rabbit'] .amb-move {
-	animation-timing-function: steps(14);
+.amb-critter[data-type='rabbit'] .amb-move,
+.amb-critter[data-type='frog'] .amb-move {
+	animation-timing-function: steps(10);
+}
+
+/* walkers amble in small steps */
+.amb-critter[data-type='goat'] .amb-move,
+.amb-critter[data-type='wolf'] .amb-move {
+	animation-timing-function: steps(18);
+}
+
+/* swimmers and crawlers: no drop shadow on the ground, fish leave a small ripple */
+.amb-critter[data-type='fish'] .amb-sprite {
+	filter: none;
+}
+
+.amb-critter[data-type='fish'] .amb-move::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 70%;
+	width: 26px;
+	height: 8px;
+	margin-left: -13px;
+	border: 1px solid rgba(220, 245, 255, 0.55);
+	border-radius: 50%;
+	animation: amb-ripple 1.6s ease-out infinite;
+	pointer-events: none;
+}
+
+@keyframes amb-ripple {
+	from {
+		transform: scale(0.35);
+		opacity: 0.9;
+	}
+	to {
+		transform: scale(1.1);
+		opacity: 0;
+	}
 }
 
 @keyframes amb-wander {

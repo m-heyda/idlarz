@@ -6,7 +6,18 @@ import { nextSpawnDelay, pickAmbientCritter, type AmbientCritter, type Viewport 
 import { queueTileTap } from '@/lib/floatText';
 import audioManager from '@/utils/audioManager';
 import { CRITTER_SHEETS } from './overlays/MeadowLayer';
+import type { FarmCritterType } from '@/config/gameConfig';
 import '@/styles/Ambient.css';
+
+/** Sprite sheets of every ambient critter: the four farm critters plus the decorative fish, frog, crab, goat and wolf (2 frames each). */
+const AMBIENT_SHEETS: Record<AmbientCritter['type'], { name: string; w: number; h: number; ms: number }> = {
+	...CRITTER_SHEETS,
+	fish: { name: 'bonus_fish', w: 32, h: 22, ms: 260 },
+	frog: { name: 'bonus_frog', w: 26, h: 22, ms: 600 },
+	crab: { name: 'bonus_crab', w: 30, h: 20, ms: 420 },
+	goat: { name: 'bonus_goat', w: 36, h: 32, ms: 460 },
+	wolf: { name: 'bonus_wolf', w: 38, h: 30, ms: 380 },
+};
 
 /**
  * Little animals wandering over your land. Decorative, except the rare golden one which can be clicked for a
@@ -50,7 +61,7 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 	return (
 		<>
 			{critters.map((c) => {
-				const sheet = CRITTER_SHEETS[c.type];
+				const sheet = AMBIENT_SHEETS[c.type];
 				return (
 					<div
 						key={c.id}
@@ -74,7 +85,7 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 							onClick={(e) => {
 								if (!c.golden || !e.isTrusted) return;
 								const gift = claimCritterGift(
-									{ source: 'map', type: c.type, golden: true },
+									{ source: 'map', type: c.type as FarmCritterType, golden: true },
 									{ eventId: e.nativeEvent.timeStamp, now: performance.now(), trusted: e.nativeEvent.isTrusted }
 								);
 								if (gift) {

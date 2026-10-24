@@ -128,7 +128,7 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 ## 14. Settings and ambient life
 
 - **Settings** (header): sound on/off, volume, ambient life on/off, buttons for Save tools (same as Control ×5) and the tutorial. Stored in the browser (`idlarz-settings`), separate from the game save.
-- **Ambient life**: every 4–9 s a butterfly, bee, ladybug or rabbit (chosen by biome; Coast gets butterflies and bees) wanders over an owned tile in view for 6–10 s. About 1 in 12 is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Off in Settings, with a hidden tab, or with reduced-motion.
+- **Ambient life**: every 4–9 s a critter wanders over an owned tile in view for 6–10 s, chosen by biome: butterflies and bees on plains, forest, lake and coast, ladybugs on swamp and grounds, rabbits on hills, tundra and grounds, plus decoration-only **fish** (lakes, only on tiles with water on all four sides), **frogs** (swamp), **crabs** (coast), **goats** (hills) and **small wolves** (forest). A tile with a building uses its foundation biome. About 1 in 12 of the four farm critters (butterfly, bee, ladybug, rabbit) is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Fish, frogs, crabs, goats and wolves never carry a gift. Off in Settings, with a hidden tab, or with reduced-motion.
 
 ## 15. Monsters and combat
 
