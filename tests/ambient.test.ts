@@ -146,3 +146,10 @@ test('swamp frogs, coast crabs, hill goats and forest wolves exist and stay clos
 		assert.ok(seen.has(type), `${biome} has ${type}s`);
 	}
 });
+
+test('critters are rare on purpose: farm visitors at least a minute apart, map critters spaced out and few at once', () => {
+	assert.ok(FARM_BONUS.minGapMs >= 60_000 && FARM_BONUS.firstDelayMs >= 30_000);
+	assert.ok(FARM_BONUS.maxGapMs > FARM_BONUS.minGapMs);
+	assert.ok(AMBIENT_LIFE.spawnMinMs >= 10_000 && AMBIENT_LIFE.maxAlive <= 3);
+	assert.ok(AMBIENT_LIFE.firstSpawnMs > 0 && AMBIENT_LIFE.firstSpawnMs <= AMBIENT_LIFE.spawnMinMs);
+});

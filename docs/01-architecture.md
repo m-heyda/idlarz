@@ -69,7 +69,7 @@ tests/                        clickLimiter, economy (exploit/behaviour), saves (
 
 ## State (`GameState`)
 
-Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots), `playerHp`, `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
+Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Gems = Legacy points earned/unspent, shop levels; optional in saves), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots, plus 4 per Pack Rat level), `playerHp`, `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
 
 ## The loop
 

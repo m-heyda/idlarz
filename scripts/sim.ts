@@ -144,6 +144,9 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	let t = 0; // game seconds
 	let eventId = 0;
 	let giftClock = 0;
+	// a gift critter turns up on the map every spawn gap x (1 / giftChance); a farm critter every farm gap (while the window is open)
+	const GIFT_CLOCK_SEC = ((cfg.AMBIENT_LIFE.spawnMinMs + cfg.AMBIENT_LIFE.spawnMaxMs) / 2000) / cfg.AMBIENT_LIFE.giftChance;
+	const FARM_CRITTER_GAP_SEC = (cfg.FARM_BONUS.minGapMs + cfg.FARM_BONUS.maxGapMs) / 2000;
 	let ownedTiles: [number, number][] = [];
 	const refreshOwned = () => {
 		ownedTiles = [];
@@ -263,6 +266,17 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 		}
 
+		// Farm upgrades: once the resources are there with room to spare (never what the castle needs)
+		for (const id of Object.keys(cfg.FARM_UPGRADES) as (keyof typeof cfg.FARM_UPGRADES)[]) {
+			const level = utils.farmUpgradeLevel(s.farmUpgrades, id);
+			if (level >= cfg.FARM_UPGRADES[id].maxLevel) continue;
+			const cost = utils.farmUpgradeCost(id, level);
+			const roomy = Object.entries(cost).every(
+				([r, v]) => s.resources[r as keyof typeof s.resources] >= (v ?? 0) * 1.5 + (castleNeed[r] ?? 0)
+			);
+			if (roomy && api().buyFarmUpgrade(id)) s = api();
+		}
+
 		// Buildings on idle Grounds tiles
 		for (let y = 0; y < cfg.GRID_HEIGHT; y++) {
 			for (let x = 0; x < cfg.GRID_SIZE; x++) {
@@ -334,6 +348,14 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const excess = s.resources[r] - keep;
 			if (excess > 50) api().sellResources(r, Math.floor(excess));
 		});
+		// Farm products: keep what the next hen house / dairy / tannery level needs, sell the rest
+		const productUpgrade = { eggs: 'coop', milk: 'dairy', hide: 'tannery' } as const;
+		(['eggs', 'milk', 'hide'] as const).forEach((r) => {
+			const id = productUpgrade[r];
+			const next = utils.farmUpgradeCost(id, utils.farmUpgradeLevel(s.farmUpgrades, id))[r] ?? 0;
+			const excess = api().resources[r] - next * 1.6;
+			if (excess > 5) api().sellResources(r, Math.floor(excess));
+		});
 		// Food: keep what animals/castle/tiles might need (2 days of income) and sell the rest
 		const foodKeep = Math.max(need.food ?? 0, 0) * 1.1 + 20000;
 		const foodExcess = api().resources.food - foodKeep;
@@ -368,14 +390,14 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		// Bonus critters: a golden map critter now and then (about half are caught), farm-window critters rarely
 		if (active) {
 			giftClock += step;
-			if (giftClock >= 90) {
+			if (giftClock >= GIFT_CLOCK_SEC) {
 				giftClock = 0;
 				if (Math.random() < 0.5) {
 					const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
 					api().claimCritterGift({ source: 'map', type, golden: true }, { eventId: ++eventId, now: t * 1000, trusted: true });
 				}
 			}
-			if (Math.random() < (step / 30) * 0.1 * 0.7) {
+			if (Math.random() < (step / FARM_CRITTER_GAP_SEC) * 0.1 * 0.7) {
 				const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
 				api().claimCritterGift({ source: 'farm', type, golden: Math.random() < 0.12 }, { eventId: ++eventId, now: t * 1000, trusted: true });
 			}

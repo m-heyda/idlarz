@@ -62,7 +62,7 @@ All numbers live in one config file; the rules apply to new purchases only (exis
 
 ## 4. Resources
 
-Gold, wood, stone, coal (drawn as charcoal "fuel"), food, meat, xp. All except gold/xp can be sold to the merchant; all except xp can be bought (at 2× the sell price). The header hides xp (it is the level bar). No stockpile can exceed 10¹⁵. **Reserved art** (not resources yet, nothing produces or spends them): iron, fish, mana, ability shard and the random-item box exist as icons (`RESERVED_RESOURCES` in `pixelIcons.ts`) for a later end-game / rebirth system ([05](05-balance-backlog-and-roadmap.md) BL14).
+Gold, wood, stone, coal (drawn as charcoal "fuel"), food, meat, the farm products **eggs, milk and hide**, and xp. All except gold/xp can be sold to the merchant; wood, stone, coal, food and meat can also be bought (at 2× the sell price); the farm products are only earned. The header hides xp (it is the level bar) and the three farm products (they live in the Farm window and at the merchant). No stockpile can exceed 10¹⁵. The icons come from a supplied pixel-art sheet (cut out by `scripts/pixel/extract_sheet.py`, 40×40, twinkle strips for the shiny ones). **Gems** (the green gem) are the rebirth currency, see §13; they are not a `Resources` key. **Reserved art** (not resources yet, nothing produces or spends them): iron, fish, mana, blue crystal, sapphire, ability shard and the random-item box exist as icons (`RESERVED_RESOURCES` in `pixelIcons.ts`) for a later end-game / rebirth system ([05](05-balance-backlog-and-roadmap.md) BL14).
 
 ## 5. Castle
 
@@ -73,16 +73,20 @@ Gold, wood, stone, coal (drawn as charcoal "fuel"), food, meat, xp. All except g
 
 ## 6. Farm
 
-- Each purchase adds **one more animal** of that kind (production = base × count). First cost in food: chicken 10 K, deer 50 K, pig 200 K, cow 1 M; each next one of the same kind costs ×1.5 / 1.6 / 1.7 / 1.8 more.
-- Meat income = `Σ production × (1 + castle modifier + 0.05 × Plains tiles)`.
-- While the Farm window is open a critter wanders by every 20–40 s (one at a time, 10 s lifetime): click it for a gift (golden ones ×2). The store decides the amount (about 10 s of income, never less than the critter's minimum) and enforces an 8 s cooldown for the window; the click limiter applies.
+- Each purchase adds **one more animal** of that kind (production = base × count). First cost in food: chicken 10 K, deer 50 K, pig 200 K, cow 1 M; each next one of the same kind costs ×1.5 / 1.6 / 1.7 / 1.8 more. The pen holds **12 animals per kind** (more with Pen Expansion); a save that already has more keeps them.
+- Every animal also yields a **farm product**: chickens eggs (0.02/s), cows milk (0.15/s), deer and pigs hide (0.025 / 0.05 per s). Sold, a product is worth about a third of the animal's meat.
+- Meat and product income = `Σ production × upgrades × (1 + castle modifier + 0.05 × Plains tiles for meat)`.
+- **Upgrades** (bought in the Farm window with resources, 10 levels, the pen 8): Feed Trough +10 % meat, Hen House +15 % eggs, Dairy +15 % milk, Tannery +15 % hide, Pen Expansion +4 animals per kind and +3 % all farm output per level. Each costs ×1.7–2 more per level; the product upgrades are paid partly in the product itself.
+- **The window** is one scene: the pen fills it, hovering an animal shows its **buy card** (owned/limit, output, Buy ×1 / ×10 / Max), a corner readout shows the output and stock, and the upgrade shelf sits along the bottom.
+- While the Farm window is open a critter wanders by every 60–120 s (one at a time, 10 s lifetime; the first after 45 s): click it for a gift (golden ones ×2). The store decides the amount (about 10 s of income, never less than the critter's minimum) and enforces an 8 s cooldown for the window; the click limiter applies.
 
 ## 7. Merchant
 
-- Sell: wood 0.5, stone 0.5, coal 1, food 0.75, meat 1 gold per unit (`floor(amount × price)`).
-- Buy: 2× the sell price, rounded **up**. Buying then selling (or the reverse) can never gain gold — covered by tests.
-- **Click power** upgrades (gold per click as a % of your gold/s): 50 % → 90 % (750 K) → 130 % (2.5 M) → 180 % (10 M).
-- Three tabs (Upgrade Items / Quests / Gambling) are still placeholders ([04](04-unfinished-and-known-issues.md)). The window always opens on the Sell tab.
+- Sell: wood 0.5, stone 0.5, coal 1, food 0.75, meat 1, eggs 3, milk 4, hide 6 gold per unit (`floor(amount × price × Haggler)`).
+- Buy resource packs (wood, stone, coal, food, meat): 2× the sell price, rounded **up**. Buying then selling (or the reverse) can never gain gold, even with a maxed Haggler — covered by tests.
+- **Sell items**: the Sell tab also lists your bag. Click an item to sell one, Shift-click for the stack, or "Sell common" / "Sell up to uncommon" to clear plain gear (potions and worn gear are never touched). Prices are flat per item (common 8, uncommon 90, rare 250, epic 700, legendary 2000, potion 20), refused during a fight.
+- **Buy Goods** tab: **Click power** (gold per click as a % of your gold/s): 50 % → 90 % (750 K) → 130 % (2.5 M) → 180 % (10 M); four **bonuses** with level ladders (price ×1.9–3 per level): *Haggler* +3 % gold from everything you sell (10 levels), *Bulk Discount* −1 % tile and building cost (8, shares the 45 % cap with Charisma and Thrift), *Lucky Charm* +2 Luck (10), *Pack Rat* +4 bag slots (4); and a **gear shop**: Minor Healing Potion 80, Leather Cap / Gloves 400, Boots 450, Vest 800, Iron Sword (damage 3) 6000 gold. Every shop price is at least 3× the item's sell value. The bonuses start again on a rebirth, except Pack Rat (the bag stays).
+- Two tabs (Quests / Gambling, and Upgrade Items) are still placeholders ([04](04-unfinished-and-known-issues.md)). The window always opens on the Sell tab.
 
 ## 8. Clicking
 
@@ -92,9 +96,9 @@ Gold, wood, stone, coal (drawn as charcoal "fuel"), food, meat, xp. All except g
 
 ## 9. Chests
 
-A chest appears every 10 min (the timer only runs while fewer than 5 chests wait). **Where** (`pickChestSpot`): any owned tile except the castle, a building, a monster, another chest and (from castle level 7) the castle's ward; each tile weighs 1, **+3 if it touches land you have not bought**, +1 per 4 tiles of distance from the castle, ×0.3 if another chest is within 2 tiles - so chests lean toward the edge of your land and spread out. It is drawn as a banded wooden chest on a small grass patch with a soft glow and one twinkle. Chests are saved with the map.
+A chest appears every 10 min (the timer only runs while fewer than 5 chests wait). **Where** (`pickChestSpot`): any owned tile except the castle, a building, a monster, another chest and (from castle level 7) the castle's ward; each tile weighs 1, **+3 if it touches land you have not bought**, +1 per 4 tiles of distance from the castle, ×0.3 if another chest is within 2 tiles - so chests lean toward the edge of your land and spread out. It is drawn as a banded wooden chest on a small grass patch (from the supplied sheet) with a soft glow, a bob and an animated lock and lid glint. Chests are saved with the map.
 
-**What is inside** (`rollChestLoot`, chances in `CHEST.rewards`): **gold** 50 % (`passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`, as before) · **resource bundle** 25 % (1–2 of wood, stone, coal, food, each 10–30 min of its income, at least 25) · **XP** 12 % (10–30 min of XP income, at least 60) · **lucky chest** 10 % (gold ×1.5) · **gear** 3 % (a random uncommon-or-better Rattatui piece into the bag; a full bag turns it into gold). Each Luck point shifts 1 % of the gold chance into lucky chests (80 %) and gear (20 %). A toast shows what was found; the last result is not saved.
+**What is inside** (`rollChestLoot`, chances in `CHEST.rewards`): **gold** 50 % (`passive gold/s × random 10–60 min × (1 + 0.5 % × Luck)`, as before) · **resource bundle** 25 % (1–2 of wood, stone, coal, food, each 10–30 min of its income, at least 25) · **XP** 12 % (10–30 min of XP income, at least 60) · **lucky chest** 10 % (gold ×1.5) · **gear** 3 % (plain gear or a potion into the bag - never Rattatui pieces; a full bag turns it into gold). Each Luck point shifts 1 % of the gold chance into lucky chests (80 %) and gear (20 %). A toast shows what was found; the last result is not saved.
 
 ## 10. XP, levels and stat points
 
@@ -119,16 +123,16 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 ## 13. Rebirth and Legacy
 
 - Available when the castle is level 6 or more and you own at least 20 tiles (and no castle upgrade is running). The **Legacy** button in the header (visible from castle 6, or after the first rebirth) opens the dialog.
-- **Legacy points** gained = `floor(4.5 × (castle level − 5) × sqrt(tiles / 10))`, for example castle 6 / 40 tiles = 9, castle 10 / 50 tiles = 50 ([03 §9](03-formulas-and-scaling.md#9-rebirth-and-legacy)). The dialog shows the preview before you confirm.
+- **Gems** (the Legacy points, shown with the green gem icon) gained = `floor(4.5 × (castle level − 5) × sqrt(tiles / 10))`, for example castle 6 / 40 tiles = 9, castle 10 / 50 tiles = 50 ([03 §9](03-formulas-and-scaling.md#9-rebirth-and-legacy)). The dialog shows the preview before you confirm.
 - **Resets**: map, resources, castle, animals, buildings, level / XP / stat points, click upgrades, chests, monsters and any open fight, the castle timer; HP is refilled. **Keeps**: name, class, play time, all Legacy progress, settings, and your **gear, bag and potions**.
-- **Permanent bonus**: +5 % of total income for every Legacy point *earned* (spending points never lowers income).
-- **Shop** (spend points, ten levels each, price grows ×1.4 per level): *Thrift* −2 % tile and building cost per level; *Master Builders* −5 % castle build time; *Click Mastery* +10 % click power; *Provisions* start each run with a bundle of gold, wood and stone. The Thrift discount and Charisma share one cap of 45 %.
+- **Permanent bonus**: +5 % of total income for every Gem *earned* (spending points never lowers income).
+- **Shop** (spend Gems, ten levels each, price grows ×1.4 per level): *Thrift* −2 % tile and building cost per level; *Master Builders* −5 % castle build time; *Click Mastery* +10 % click power; *Provisions* start each run with a bundle of gold, wood and stone. The Thrift discount and Charisma share one cap of 45 %.
 - Expected pace (sim, [06](06-playtest-and-pacing-report.md)): the second run reaches castle 6 in about 70 % of the first run's time, later runs get shorter but flatten.
 
 ## 14. Settings and ambient life
 
 - **Settings** (header): sound on/off, volume, ambient life on/off, buttons for Save & backup (same as Control ×5) and the tutorial. Stored in the browser (`idlarz-settings`), separate from the game save.
-- **Ambient life**: every 4–9 s a critter wanders over an owned tile in view for 6–10 s, chosen by biome: butterflies and bees on plains, forest, lake and coast, ladybugs on swamp and grounds, rabbits on hills, tundra and grounds, plus decoration-only **fish** (lakes, only on tiles with water on all four sides), **frogs** (swamp), **crabs** (coast), **goats** (hills) and **small wolves** (forest). A tile with a building uses its foundation biome. About 1 in 12 of the four farm critters (butterfly, bee, ladybug, rabbit) is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Fish, frogs, crabs, goats and wolves never carry a gift. Off in Settings, with a hidden tab, or with reduced-motion.
+- **Ambient life**: every 14–30 s (the first after 6 s, at most 3 at once) a critter wanders over an owned tile in view for 6–10 s, chosen by biome: butterflies and bees on plains, forest, lake and coast, ladybugs on swamp and grounds, rabbits on hills, tundra and grounds, plus decoration-only **fish** (lakes, only on tiles with water on all four sides), **frogs** (swamp), **crabs** (coast), **goats** (hills) and **small wolves** (forest). A tile with a building uses its foundation biome. About 1 in 12 of the four farm critters (butterfly, bee, ladybug, rabbit) is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Fish, frogs, crabs, goats and wolves never carry a gift. Off in Settings, with a hidden tab, or with reduced-motion.
 
 ## 15. Monsters and combat
 
@@ -137,8 +141,8 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 - **Fighting**: click a monster to open the fight. Every click on the rat hits for your weapon's damage (Wooden Sword 2, so a tier-1 rat needs 50 hits). The rat attacks on a timer (about every 2 s), reduced by your armor. There is no time limit on rats. Hits use the shared click limiter.
 - **HP**: about 100 at the start (`85 + vitality HP + gear`). It regenerates about 1 HP/s while no fight is active, never during one. **Minor Healing Potions** (35 HP, 8 s shared cooldown in a fight, hotkeys 1-3) work in and out of fights.
 - **Losing**: at 0 HP you are knocked out (30 % HP back), the monster is at full HP again and nothing is lost. Fleeing (Flee button or Esc) resets the monster the same way. A fight never survives a reload; your HP does.
-- **Winning**: the monster is removed; gold and XP are a number of seconds of your income (so they keep up with the economy), plus a chance of a **Rattatui** set piece (8 %, +1 % per tier) and of a potion (25 %, +3 % per tier). A full bag turns the drops into gold.
-- **Rat King**: 1000 HP and a 60-second limit. On a timeout or a knockout it taunts you, resets and stays on the map. With the click limiter and the 3-damage weapon cap it **cannot be killed** in this version (308 clicks x 3 = 924 < 1000; `tests/kingInvariant.test.ts` guards that).
+- **Winning**: the monster is removed; gold and XP are a number of seconds of your income (so they keep up with the economy), plus a chance of a piece of **plain gear** (wooden or leather, 8 %, +1 % per tier) and of a potion (25 %, +3 % per tier). Rats never drop Rattatui pieces. A full bag turns the drops into gold.
+- **Rat King**: 450 HP and a 75-second limit. On a timeout or a knockout it taunts you, resets and stays on the map. He is **beatable**: with the starter sword (damage 2) about 225 clicks at the limiter's 5 clicks/s cap kill him in about 45 s, so it takes steady clicking and a potion or two. Winning always drops a **Rattatui piece** (preferring ones you do not own yet), 40 % for a second, and 2 potions; he is the only source of the set (`tests/kingInvariant.test.ts` guards the bounds).
 - **Feedback**: blood burst and a damage number per hit, the fight window shakes with a red flash when you are hurt (reduced-motion: flash only).
 
 ## 16. Items and the Character window
@@ -146,5 +150,6 @@ Header (avatar → Statistics, Character, Merchant, Farm; resource counters with
 - **Slots**: head, shoulder, chest, hands, legs, feet (left), neck, cape, ring, ring, charm (right), weapon and shield (bottom), plus two locked ability slots reserved for skills. A 36-slot bag holds everything else.
 - **Stats**: items give Damage (weapons only), Armor and Max HP. Damage / Armor / Max HP are shown under the hero; the Armor tooltip shows the damage reduction.
 - **Starter kit**: Wooden Sword (damage 2), Wooden Shield (armor 2) and 2 potions. Old saves get it on load.
-- **Rattatui Set** (beta testers): Cap, Shoulderpads, Tunic, Gloves, Trousers, Boots, Amulet, Cloak, Ring (fits both ring slots), Charm, Fang Blade (damage 3), Buckler. Tooltips show set progress; 6 pieces give +10 Max HP, all 13 slots +15 more.
+- **Plain gear** (rats, chests, the merchant): Wooden Sword/Shield, Leather Cap, Vest, Gloves, Boots (common, small armor and HP), and the shop-only Iron Sword (damage 3). They use the slot silhouette as their icon.
+- **Rattatui Set** (beta testers, **only from the Rat King**): Cap, Shoulderpads, Tunic, Gloves, Trousers, Boots, Amulet, Cloak, Ring (fits both ring slots), Charm, Fang Blade (damage 3), Buckler. Tooltips show set progress; 6 pieces give +10 Max HP, all 13 slots +15 more.
 - **Controls**: hover for a tooltip; double-click or right-click a bag item to equip it (or drink a potion); click an equipped item to take it off; drag to rearrange the bag, to equip, or to unequip. Gear cannot be changed during a fight; taking off gear needs a free bag slot.

@@ -6,7 +6,7 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 
 | # | Feature | State today | Where | To finish |
 | --- | --- | --- | --- | --- |
-| U1 | **Items beyond gear** | equipment, the 36-slot bag, drops and potions work (Damage / Armor / Max HP only); no selling, upgrading, crafting or bag expansion; gear gives no resource income | `itemCatalog.ts`, `inventory.ts` | see the roadmap in the combat spec; rebirth keeps gear (decided) |
+| U1 | **Items beyond gear** | equipment, the 36-slot bag, drops and potions work (Damage / Armor / Max HP only); the merchant buys and sells bag items and Pack Rat expands the bag; no upgrading or crafting; gear gives no resource income; the plain gear pieces have no art of their own (slot silhouettes) | `itemCatalog.ts`, `inventory.ts` | see the roadmap in the combat spec; rebirth keeps gear (decided) |
 | U2 | **Merchant → Upgrade Items** | "Coming soon" | `MerchantOverlay.tsx` | needs U1; gold/resource sink |
 | U3 | **Merchant → Quests** | placeholder | same | quest model, rewards (items), tracking in store |
 | U4 | **Merchant → Gambling** | placeholder | same | RNG games using `luck`; must stay inside the exploit rules ([07](07-security-and-exploits.md)) |
@@ -39,5 +39,5 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 - Monsters are one family (rats); there is one weapon per tier of rarity and no item selling or upgrading yet.
 - The sim bots do not fight or equip, so combat rewards (gold / XP as seconds of income) are not part of `docs/generated/sim-milestones.md`; measure before tuning them ([05 BL12](05-balance-backlog-and-roadmap.md)).
 - A fight does not survive a reload (the monster is full HP again); your HP does.
-- The Rat King is unkillable by design until the weapon cap and the King's HP are revisited together (guarded by `tests/kingInvariant.test.ts`).
+- The Rat King is beatable (450 HP, 75 s) and the only source of Rattatui pieces; if weapons get stronger, revisit his HP together with the bounds in `tests/kingInvariant.test.ts`.
 - Ability slots are locked placeholders; MP has no use yet.

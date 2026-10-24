@@ -173,8 +173,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Farm</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Buy animals with <Res r='food'>food</Res>. Each purchase adds one more animal, which produces meat
-					every second; the next one of the same kind costs more.
+					Buy animals with <Res r='food'>food</Res>: hover an animal for its card (Buy, x10 or Max). Each animal
+					produces meat every second plus a farm product (<Res r='eggs'>eggs</Res>, <Res r='milk'>milk</Res> or{' '}
+					<Res r='hide'>hide</Res>) you can sell or spend on the upgrades along the bottom; the next one of the same
+					kind costs more, and the pen holds a limited number of each kind.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
 					{ANIMALS.map((a) => (
@@ -198,8 +200,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Merchant</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Sell resources for gold; buying costs {MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and
-					forth never gains anything.
+					Sell resources, farm products and spare gear from your bag for gold; buying resources costs{' '}
+					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. Buy Goods has
+					click power, permanent bonuses (Haggler, Bulk Discount, Lucky Charm, Pack Rat) and plain gear and potions.
+					Rattatui gear is not for sale: the Rat King drops it.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-5 gap-2'>
 					{Object.entries(MERCHANT_RESOURCE_PRICES).map(([r, price]) => (

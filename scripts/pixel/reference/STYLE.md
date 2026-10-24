@@ -50,10 +50,15 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
 - Textures are *stone and metal*: speckled grey-brown with hairline cracks; avoid flat gradients and glossy plastic.
 
 ## Approved set
-- **Resources** (reference-sheet look: chunky faceted heaps, saturated ramps, crisp glints, still no ground shadow): gold (faceted nuggets, twinkles), wood (log pile with end rings),
-  stone (rounded grey boulders), coal (glassy charcoal lumps - the reference's "fuel"), food (baguette + cross-cut boule), meat (red roast drumstick), xp (purple orb).
-  **Reserved, art only** (`res_iron`, `res_fish`, `res_mana`, `res_shard`, `res_mystery`; no game resource yet, see `RESERVED_RESOURCES` and docs/05 BL14): navy iron ore,
-  a blue fish, a violet crystal cluster, a green ability shard and a gold-cornered crate with a "?" plaque.
+- **Resources and currencies** come from a supplied pixel-art sheet (`reference/resource-sheet.jpg`), cut out by `extract_sheet.py` into 40px sprites with
+  hard alpha, a 28-colour palette and a 1px dark outline, no ground shadow (`assets/*.png`, committed; `sprites_sheet.py` hands them to `build.py`):
+  gold (faceted nuggets), wood (log pile), stone (grey boulders), coal (charcoal lumps), meat (roast drumstick), gems (the green gem on its moss, the **rebirth currency**).
+  The sheet has no bread or emerald shard, so `food` (baguette + boule) and `res_shard` stay procedural, as do the farm products `eggs` (three eggs on straw),
+  `milk` (a stoppered bottle) and `hide` (a rolled, corded hide). xp is the purple orb.
+  **Reserved, art only** (`res_iron`, `res_fish`, `res_mana`, `res_crystal`, `res_sapphire`, `res_shard`, `res_mystery`; no game resource yet, see `RESERVED_RESOURCES` and docs/05 BL14): navy iron ore,
+  a blue fish, a violet crystal cluster, a blue crystal cluster, a tall blue crystal, a green ability shard and a gold-cornered crate with a "?" plaque.
+  **Twinkle strips** (`<name>_shine.png`, 6 frames, `sprites_sheet.py`): gold, gems, both blue crystals, mana and the crate; played by the generic stepped `.px-shine` / `PixelSheet`
+  (`PixelIcon shine`), reduced-motion safe.
 - **Menu**: character = plumed great helm (T-visor), merchant = stitched coin pouch, farm = shingled barn.
 - **Badges/portraits**: level orb (`level_orb`, animated), heroes `hero_<class>` + `bust_<class>`, `merchant`.
 - **Equipment slots**: `equip_head/neck/chest/mainHand/offHand/legs/feet/ring` - kettle hat, amulet, cuirass, sword,
@@ -94,7 +99,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
     drifting opposite ways and gently breathing.
   - *Hill details*: besides boulders and the grey peaks, hills get brown and grey rock piles (`rock_pile`), bigger brown boulders and rare **caves** (`cave`: a rocky knoll with a dark mouth framed by two timbers and a lintel, placed on interior hill tiles).
   - *Ambient critters* (`sprites_meadow.py`, 2-frame sheets stepped by CSS, drawn at native size): the four gift critters (butterfly, bee, ladybug, rabbit) plus decoration-only fish (blue, tail swing, with a CSS ripple), frog, crab (drawn pixel by pixel from above), goat (tan with bone horns) and wolf (dark grey). Fish only appear on open-water lake tiles.
-  - *Pickups*: the treasure chest is `chest_map` (40px: a banded wooden chest with a gold lock on its own grass patch with rocks, a soft glow, a slow 1px bob and one twinkle; no tile border), `bonus_chest` (24px, the same chest alone) is for toasts. Castle level uses a pixel plaque.
+  - *Pickups*: the treasure chest is `chest_map` (48x40 from the sheet: a banded wooden chest with a gold lock on its own grass patch with rocks, a soft glow, a slow 1px bob and the 4-frame `chest_map_anim` lock/lid glints; no tile border), `bonus_chest` (32px, the same chest alone) is for toasts. Castle level uses a pixel plaque.
   - The `biome_*` 32px icons are no longer stamped on tiles; they remain for the biome picker, tutorial and building dialogs.
 - **Castle** (`castle_1`-`castle_6`, `sprites_castle.py`): seen from above (ray-cast at pitch 78), every level a full 48px tile on a
   paved plinth, growing with each upgrade - crenellated keep with timber roof, keep + round watchtower, keep + two towers and a
@@ -127,8 +132,9 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   marching dashes, `range_corner` brackets and a label; owned tiles in range show rising gold twinkles (`spark_sheet`).
 - **Farm** (`FarmScene.tsx`): an isometric pen ray-cast like the animals (`farm_back` everything, `farm_front` the near fences,
   cut from the same render so animals walk between them). Ground to screen: `sx = OX + (x-y)*0.7071*S`, `sy = OY - (x+y)*0.3536*S`
-  (constants in `farmGeometry.ts`). Animals wander, flip by screen direction, get more copies as they level; selected = 1px gold
-  outline + ring; unowned = pale silhouette with price tag. Side panel holds the selected animal's numbers and button.
+  (constants in `farmGeometry.ts`). The scene fills the whole window (`PixelModal flush`): the pen is drawn at the biggest whole-pixel zoom that fits (`penZoom`, 1-4x),
+  the meadow props and grass fill the rest. Animals wander, flip by screen direction, one sprite per animal owned up to 6; hovering one (or clicking to pin it) freezes its kind and hangs
+  a **buy card** (owned/limit, yield, Buy / x10 / Max) above it; unowned = pale silhouette with price tag. A stats readout sits top-left, the upgrade shelf along the bottom (collapsible).
 - **Level-up** (`LevelUpNotification.tsx`): white flash, pixelated god-rays (SVG block filter, 6px grid), orb pop, stepped
   shockwave rings, crimson banner (`banner_left/mid/right`, 3x) with dropping letters, spark burst, points earned.
 - **Header**: cracked-stone bar, bronze/iron edge with rivets, 48px slot frames (active glows gold), ornamental divider,
@@ -168,7 +174,7 @@ shadows, contours, rim light, coloured outlines), so every asset shares one ligh
 |---|---|
 | `render3d.py` | Engine. `common.py`, `fx.py` (glints), `fog.py` (tileable noise + cracked stone). |
 | `materials.py` | Every material: 5-tone ramp + outline + shading hints. One palette for the whole game. |
-| `sprites_resources.py` `sprites_props.py` `sprites_characters.py` `sprites_equipment.py` `sprites_animals.py` `sprites_map.py` `sprites_castle.py` `sprites_buildings.py` `sprites_chest.py` `sprites_farm.py` | Sprites as lists of primitives (boxes, ellipsoids, cylinders, cones). `sprites_props` also draws the purple orb in 2D; `sprites_farm` renders the pen in two layers. |
+| `sprites_resources.py` `sprites_sheet.py` `extract_sheet.py` `sprites_props.py` `sprites_characters.py` `sprites_equipment.py` `sprites_animals.py` `sprites_map.py` `sprites_castle.py` `sprites_buildings.py` `sprites_farm.py` | Sprites as lists of primitives (boxes, ellipsoids, cylinders, cones). `sprites_props` also draws the purple orb in 2D; `sprites_farm` renders the pen in two layers. |
 | `ground_art.py` | The fog-of-war cloud tiles (flat-banded cloud generator). |
 | `terrain_field.py` | Dual-grid shape fields (smooth corner blend + coordinate warp that is zero on cell borders; square footprint for yard / castle) and the shared 32-bit hash. |
 | `terrain_art.py` | Palettes, 192px textures, depth tiers and rims (cliff, foam + bank, fringe, kerb) per style; the "?" marker. |

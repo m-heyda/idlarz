@@ -19,6 +19,12 @@ import {
 	CASTLE_UPGRADE,
 	CHARACTER_STAT_CONFIG,
 	CLICK_LADDER,
+	FARM,
+	FARM_UPGRADES,
+	type FarmUpgradeId,
+	MERCHANT_SHOP_ITEMS,
+	MERCHANT_UPGRADES,
+	type MerchantUpgradeId,
 	LEGACY_UPGRADES,
 	REBIRTH,
 	type LegacyUpgradeId,
@@ -38,9 +44,12 @@ import {
 	calculateXpGain,
 	castleModifier,
 	createInitialGrid,
+	farmUpgradeCost,
+	merchantUpgradeCost,
 	legacyGain,
 	legacyUpgradeCost,
 } from '../src/utils/gameUtils';
+import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import { formatTime } from '../src/utils/formatters';
 import type { Resources } from '../src/types/game';
 
@@ -170,6 +179,40 @@ ANIMALS.forEach((a) => {
 	table(['Count', 'cost of this one (food)', 'cumulative food', 'meat/s total', 'payback'], rows);
 });
 
+line('### Farm products and upgrades');
+line();
+line(
+	`The pen holds ${FARM.baseCap} animals per kind (+4 per Pen Expansion level). Every animal also yields a product; once sold it is worth about a third of its meat.`
+);
+line();
+table(
+	['Animal', 'product', 'per second each', 'sells for', 'gold/s each (sold)', 'meat gold/s each', 'share of meat'],
+	ANIMALS.map((a) => {
+		const price = MERCHANT_RESOURCE_PRICES[a.product.resource];
+		const sold = a.product.perSec * price;
+		return [
+			a.name,
+			a.product.resource,
+			a.product.perSec,
+			price,
+			sold.toFixed(3),
+			(a.baseProduction * MERCHANT_RESOURCE_PRICES.meat).toFixed(2),
+			`${((sold / (a.baseProduction * MERCHANT_RESOURCE_PRICES.meat)) * 100).toFixed(0)}%`,
+		];
+	})
+);
+table(
+	['Upgrade', 'effect per level', 'max level', 'cost of level 1', 'cost of the last level'],
+	(Object.keys(FARM_UPGRADES) as FarmUpgradeId[]).map((id) => {
+		const def = FARM_UPGRADES[id];
+		const fmtCost = (c: Partial<Resources>) =>
+			Object.entries(c)
+				.map(([r, v]) => `${fmt(v as number)} ${r}`)
+				.join(' + ');
+		return [def.label, def.description(1), def.maxLevel, fmtCost(farmUpgradeCost(id, 0)), fmtCost(farmUpgradeCost(id, def.maxLevel - 1))];
+	})
+);
+
 // ---------------------------------------------------------------------------
 line('## 5. Biomes and buildings');
 line();
@@ -249,7 +292,27 @@ table(
 );
 table(
 	['Resource', 'sells for', `costs (x${MERCHANT_BUY_MULTIPLIER})`],
-	Object.entries(MERCHANT_RESOURCE_PRICES).map(([r, p]) => [r, p, p * MERCHANT_BUY_MULTIPLIER])
+	Object.entries(MERCHANT_RESOURCE_PRICES).map(([r, p]) => [
+		r,
+		p,
+		(['wood', 'stone', 'coal', 'food', 'meat'] as string[]).includes(r) ? p * MERCHANT_BUY_MULTIPLIER : 'not for sale',
+	])
+);
+line('### Merchant bonuses and gear shop');
+line();
+table(
+	['Bonus', 'effect per level', 'max level', 'price of level 1', 'price of the last level'],
+	(Object.keys(MERCHANT_UPGRADES) as MerchantUpgradeId[]).map((id) => {
+		const def = MERCHANT_UPGRADES[id];
+		return [def.label, def.description(1), def.maxLevel, fmt(merchantUpgradeCost(id, 0)), fmt(merchantUpgradeCost(id, def.maxLevel - 1))];
+	})
+);
+table(
+	['Item', 'rarity', 'sells for', 'shop price', 'shop / sell'],
+	MERCHANT_SHOP_ITEMS.map(({ id, price }) => {
+		const def = ITEM_CATALOG[id];
+		return [def.name, def.rarity, def.sellValue, fmt(price), `${(price / def.sellValue).toFixed(1)}x`];
+	})
 );
 
 // ---------------------------------------------------------------------------
