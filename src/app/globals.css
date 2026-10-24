@@ -451,6 +451,12 @@ body {
 	padding-right: 8px;
 }
 
+.px-modal-body-flush {
+	position: relative;
+	padding-right: 0;
+	overflow: hidden;
+}
+
 .px-close {
 	position: absolute;
 	top: -20px;

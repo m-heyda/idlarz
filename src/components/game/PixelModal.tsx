@@ -13,6 +13,8 @@ interface PixelModalProps {
 	closeOnBackdrop?: boolean;
 	hideClose?: boolean;
 	className?: string;
+	/** No body padding or scrolling: the content fills the whole window (the farm scene) */
+	flush?: boolean;
 	children: React.ReactNode;
 }
 
@@ -28,6 +30,7 @@ const PixelModal: React.FC<PixelModalProps> = ({
 	closeOnBackdrop = true,
 	hideClose = false,
 	className,
+	flush = false,
 	children,
 }) => {
 	const id = useRef(Symbol('modal')).current;
@@ -71,7 +74,7 @@ const PixelModal: React.FC<PixelModalProps> = ({
 					</h2>
 					<span className='px-title-line rev' />
 				</div>
-				<div className='px-modal-body'>{children}</div>
+				<div className={cn('px-modal-body', flush && 'px-modal-body-flush')}>{children}</div>
 			</div>
 		</div>
 	);

@@ -1,25 +1,17 @@
-/* Farm mini-game: an isometric pen with wandering animals, plus a side panel for the selected one. */
+/* Farm mini-game: one seamless scene. The pen fills the window; hover cards, a stats readout and an upgrade shelf float over it. */
 
-.farm-layout {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) 340px;
-	gap: 16px;
-	align-items: start;
-}
-
-@media (max-width: 1000px) {
-	.farm-layout {
-		grid-template-columns: minmax(0, 1fr);
-	}
+.farm-root {
+	position: absolute;
+	inset: 0;
 }
 
 /* --- the meadow around the pen: plains grass, vignette, a drifting cloud shadow --- */
 .farm-stage {
-	position: relative;
+	position: absolute;
+	inset: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	min-height: 520px;
 	overflow: hidden;
 	background: #3a6030 url('/pixel/bg/ground_plains.png') 0 0 / 192px 192px repeat;
 	background-blend-mode: multiply;
@@ -78,8 +70,8 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	width: 80px;
-	height: 80px;
+	width: calc(40px * var(--z, 2));
+	height: calc(40px * var(--z, 2));
 	pointer-events: none;
 	will-change: transform;
 }
@@ -115,10 +107,10 @@
 
 .farm-shadow {
 	position: absolute;
-	left: 14px;
-	top: 58px;
-	width: 52px;
-	height: 14px;
+	left: calc(7px * var(--z, 2));
+	top: calc(29px * var(--z, 2));
+	width: calc(26px * var(--z, 2));
+	height: calc(7px * var(--z, 2));
 	border-radius: 50%;
 	background: rgba(0, 0, 0, 0.32);
 	pointer-events: none;
@@ -158,21 +150,21 @@
 
 .farm-lvl {
 	position: absolute;
-	left: 28px;
-	top: -14px;
+	left: calc(14px * var(--z, 2));
+	top: calc(-7px * var(--z, 2));
 	pointer-events: none;
 	line-height: 0;
 }
 
 .farm-animal[data-selected='true'] .farm-lvl {
-	top: -22px;
+	top: calc(-11px * var(--z, 2));
 	filter: drop-shadow(0 0 6px #ffd23a);
 }
 
 .farm-tag {
 	position: absolute;
 	left: 50%;
-	top: -6px;
+	top: calc(-3px * var(--z, 2));
 	display: flex;
 	align-items: center;
 	gap: 2px;
@@ -237,103 +229,6 @@
 		transform: translate(var(--x), var(--y));
 		opacity: 0;
 	}
-}
-
-/* --- side panel --- */
-.farm-side {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.farm-picker {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 8px;
-}
-
-.farm-pick {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 56px;
-	cursor: pointer;
-	background: rgba(10, 7, 6, 0.8);
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
-	image-rendering: pixelated;
-	transition: filter 0.12s;
-}
-
-.farm-pick:hover {
-	filter: brightness(1.2);
-}
-
-.farm-pick[data-owned='false'] img {
-	filter: brightness(0.25) saturate(0.2);
-}
-
-.farm-pick[data-selected='true'] {
-	background: rgba(70, 46, 16, 0.85);
-	box-shadow: 0 0 0 2px #ffe27a, 0 0 12px rgba(255, 210, 80, 0.5);
-}
-
-.farm-pick-lvl {
-	position: absolute;
-	right: -4px;
-	bottom: -6px;
-	line-height: 0;
-}
-
-.farm-panel {
-	padding: 12px;
-	background: rgba(10, 7, 6, 0.8);
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
-	image-rendering: pixelated;
-}
-
-.farm-portrait {
-	display: flex;
-	gap: 12px;
-	align-items: center;
-	margin-bottom: 12px;
-}
-
-.farm-portrait-stage {
-	flex-shrink: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 96px;
-	height: 96px;
-	background: radial-gradient(circle at 50% 70%, rgba(120, 200, 80, 0.28), transparent 70%), rgba(6, 12, 6, 0.8);
-	border: 3px solid #5a3f1c;
-	box-shadow: inset 0 0 0 2px #080504;
-}
-
-.farm-rows {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	margin-bottom: 12px;
-}
-
-.farm-row {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 8px;
-	font-size: 0.875rem;
-	color: #a89878;
-}
-
-.farm-hint {
-	margin-top: 12px;
-	font-size: 0.8rem;
-	line-height: 1.3;
-	color: #7a6a52;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -524,6 +419,290 @@
 	.mc-move,
 	.mc-sprite,
 	.mc-gift {
+		animation: none;
+	}
+}
+
+/* --- hover / pinned buy card, hanging above the animal --- */
+.farm-card-anchor {
+	position: absolute;
+	z-index: 600;
+	width: 0;
+	height: 0;
+}
+
+.farm-card {
+	position: absolute;
+	left: 0;
+	bottom: 10px;
+	width: 236px;
+	transform: translateX(-50%);
+	padding: 8px 10px 10px;
+	font-size: 0.8rem;
+	color: #d8c8a0;
+	background: rgba(12, 8, 6, 0.95);
+	border: 4px solid transparent;
+	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+	image-rendering: pixelated;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+	animation: farm-card-in 0.12s ease-out;
+}
+
+/* the little pointer under the card */
+.farm-card::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	bottom: -14px;
+	width: 10px;
+	height: 10px;
+	background: #1a120d;
+	border-right: 3px solid #5a3f1c;
+	border-bottom: 3px solid #5a3f1c;
+	transform: translateX(-50%) rotate(45deg);
+}
+
+.farm-card[data-pinned='true'] {
+	box-shadow: 0 0 0 2px #ffe27a, 0 6px 18px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes farm-card-in {
+	from {
+		opacity: 0;
+		margin-bottom: -6px;
+	}
+}
+
+.farm-card-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	margin-bottom: 4px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid #3a2a18;
+}
+
+.farm-card-name {
+	font-weight: 700;
+	font-size: 1rem;
+	color: var(--px-gold, #f0d27a);
+}
+
+.farm-card-count {
+	font-weight: 700;
+	color: #bff59a;
+}
+
+.farm-card-rows {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin-bottom: 8px;
+}
+
+.farm-card-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+}
+
+.farm-card-note {
+	text-align: center;
+	color: #a89878;
+	line-height: 1.25;
+}
+
+.farm-card-buy {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 6px;
+}
+
+.farm-card-buy .px-btn {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 3px 2px;
+	line-height: 1.15;
+}
+
+.farm-card-buy .px-btn[data-ok='false'] {
+	opacity: 0.55;
+}
+
+.farm-cost {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	font-size: 0.65rem;
+	font-weight: 700;
+	color: #bff59a;
+	white-space: nowrap;
+}
+
+.farm-card-buy .px-btn[data-ok='false'] .farm-cost {
+	color: #ff9a8a;
+}
+
+/* --- stats readout (top-left) --- */
+.farm-hud {
+	position: absolute;
+	left: 12px;
+	top: 12px;
+	z-index: 700;
+	padding: 6px 10px 8px;
+	font-size: 0.72rem;
+	color: #a89878;
+	background: rgba(10, 7, 6, 0.86);
+	border: 4px solid transparent;
+	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+	image-rendering: pixelated;
+}
+
+.farm-hud-title {
+	margin-bottom: 2px;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: var(--px-gold, #f0d27a);
+}
+
+.farm-hud table {
+	border-collapse: collapse;
+}
+
+.farm-hud th {
+	padding: 0 6px;
+	font-weight: 400;
+	text-align: right;
+	color: #7a6a52;
+}
+
+.farm-hud td {
+	padding: 1px 6px;
+	text-align: right;
+	font-weight: 600;
+	color: #e8d08a;
+	white-space: nowrap;
+}
+
+.farm-hud td:first-child {
+	text-align: left;
+	padding-left: 0;
+}
+
+.farm-hud-note {
+	margin-top: 4px;
+	color: #e0c050;
+}
+
+/* --- upgrade shelf (bottom) --- */
+.farm-dock {
+	position: absolute;
+	left: 12px;
+	right: 12px;
+	bottom: 10px;
+	z-index: 700;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	pointer-events: none;
+}
+
+.farm-dock > * {
+	pointer-events: auto;
+}
+
+.farm-dock-toggle {
+	padding: 1px 12px;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	cursor: pointer;
+	color: var(--px-gold, #f0d27a);
+	background: rgba(10, 7, 6, 0.9);
+	border: 2px solid #5a3f1c;
+}
+
+.farm-dock-toggle:hover {
+	filter: brightness(1.25);
+}
+
+.farm-dock-row {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 6px;
+	width: 100%;
+	max-width: 1000px;
+}
+
+.farm-up {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 5px 7px 6px;
+	font-size: 0.72rem;
+	color: #a89878;
+	background: rgba(10, 7, 6, 0.92);
+	border: 4px solid transparent;
+	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+	image-rendering: pixelated;
+}
+
+.farm-up[data-ok='true'] {
+	box-shadow: 0 0 0 1px #4a8a2c;
+}
+
+.farm-up-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+}
+
+.farm-up-name {
+	font-weight: 700;
+	font-size: 0.8rem;
+	color: #ecdcb4;
+}
+
+.farm-up-lvl {
+	color: #bff59a;
+	font-weight: 700;
+}
+
+.farm-up-effect {
+	min-height: 2.4em;
+	line-height: 1.2;
+}
+
+.farm-up-next {
+	color: #7ac27a;
+}
+
+.farm-up-max {
+	text-align: center;
+	font-weight: 700;
+	color: #c9a0ff;
+}
+
+.farm-up-cost {
+	display: inline-flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 2px 6px;
+	font-size: 0.68rem;
+	color: #bff59a;
+}
+
+.farm-up-cost [data-short='true'] {
+	color: #ff9a8a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.farm-card {
 		animation: none;
 	}
 }

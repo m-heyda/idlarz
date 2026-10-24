@@ -7,9 +7,11 @@ export const PEN = {
 	scale: 13,
 	ox: 128,
 	oy: 124,
-	/** native -> CSS pixels */
-	zoom: 2,
 };
+
+/** Native -> CSS pixels: the biggest whole number of pixels that fits the stage (min 1, max 4) */
+export const penZoom = (stageW: number, stageH: number) =>
+	Math.max(1, Math.min(4, Math.floor(Math.min(stageW / PEN.w, stageH / PEN.h))));
 
 /** Ground position (x, y world units, z = 0) -> pixel position inside the pen image (native pixels). */
 export const project = (gx: number, gy: number) => ({

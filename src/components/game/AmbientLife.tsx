@@ -52,7 +52,7 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 			}
 			timer = setTimeout(spawn, nextSpawnDelay());
 		};
-		timer = setTimeout(spawn, 1500);
+		timer = setTimeout(spawn, AMBIENT_LIFE.firstSpawnMs);
 		return () => clearTimeout(timer);
 	}, [enabled, getViewport, remove]);
 

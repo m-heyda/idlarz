@@ -493,7 +493,7 @@ export const FARM_PEN = { outputPerLevel: 0.03, capPerLevel: 4 };
 export const FARM_UPGRADES = {
 	feed: {
 		label: 'Feed Trough',
-		description: (n: number) => `+${Math.round(n * 100)}% meat`,
+		description: (n: number) => `+${Math.round(n * 10)}% meat`,
 		maxLevel: 10,
 		effectPerLevel: 0.1, // meat
 		cost: { food: 20000 } as Partial<Record<keyof Resources, number>>,
@@ -501,7 +501,7 @@ export const FARM_UPGRADES = {
 	},
 	coop: {
 		label: 'Hen House',
-		description: (n: number) => `+${Math.round(n * 100)}% eggs`,
+		description: (n: number) => `+${Math.round(n * 15)}% eggs`,
 		maxLevel: 10,
 		effectPerLevel: 0.15, // eggs
 		cost: { wood: 4000, eggs: 40 } as Partial<Record<keyof Resources, number>>,
@@ -509,7 +509,7 @@ export const FARM_UPGRADES = {
 	},
 	dairy: {
 		label: 'Dairy',
-		description: (n: number) => `+${Math.round(n * 100)}% milk`,
+		description: (n: number) => `+${Math.round(n * 15)}% milk`,
 		maxLevel: 10,
 		effectPerLevel: 0.15, // milk
 		cost: { stone: 4000, milk: 30 } as Partial<Record<keyof Resources, number>>,
@@ -517,7 +517,7 @@ export const FARM_UPGRADES = {
 	},
 	tannery: {
 		label: 'Tannery',
-		description: (n: number) => `+${Math.round(n * 100)}% hide`,
+		description: (n: number) => `+${Math.round(n * 15)}% hide`,
 		maxLevel: 10,
 		effectPerLevel: 0.15, // hide
 		cost: { coal: 3000, hide: 20 } as Partial<Record<keyof Resources, number>>,
@@ -689,9 +689,9 @@ export const TILE_TAP = {
 // it leaves (lifetimeMs) for a gift worth `seconds` of that resource's income (at least `min`).
 export const FARM_BONUS = {
 	lifetimeMs: 10000,
-	firstDelayMs: 15000,
-	minGapMs: 20000,
-	maxGapMs: 40000,
+	firstDelayMs: 45000, // rare on purpose: a visit is a treat, not a chore
+	minGapMs: 60000,
+	maxGapMs: 120000,
 	maxActive: 1,
 	goldenChance: 0.12,
 	goldenMultiplier: 2,
@@ -835,9 +835,10 @@ export type LegacyUpgradeId = keyof typeof LEGACY_UPGRADES;
 // Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
 // Purely decorative, except the rare golden one, which can be clicked for a small gift (see claimCritterGift).
 export const AMBIENT_LIFE = {
-	spawnMinMs: 4000,
-	spawnMaxMs: 9000,
-	maxAlive: 5,
+	firstSpawnMs: 6000, // the first critter shows up this long after the map opens
+	spawnMinMs: 14000,
+	spawnMaxMs: 30000,
+	maxAlive: 3,
 	lifeMinMs: 6000,
 	lifeMaxMs: 10000,
 	roamTiles: 1.5, // how far a critter strays from where it appears
