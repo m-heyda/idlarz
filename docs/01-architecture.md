@@ -31,6 +31,7 @@ src/
 │   └── settingsStore.ts      sound / volume / ambient-life preferences (localStorage `idlarz-settings`, not game state)
 ├── utils/
 │   ├── gameUtils.ts          pure maths: rates, costs, level curve, stat modifiers, tooltips text helpers
+│   ├── terrain.ts            dual-grid map terrain: ground rank, dual-cell layers, tile depth, prop + dock placement (port of scripts/pixel/terrain_logic.py)
 │   ├── formatters.ts, audioManager.ts
 ├── lib/
 │   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps, critter gifts and fight hits
@@ -42,6 +43,7 @@ src/
 │   ├── combatFx.ts           window event bus: hit / hurt / heal effects for the fight modal
 │   ├── inventoryDrag.ts      drag payload shared by the bag and the equipment slots
 │   ├── ambientLife.ts        pure picker for the wandering map critters (owned tile in view, biome-matched type)
+│   ├── terrainRenderer.ts    loads the terrain atlas and draws the whole map ground onto one canvas
 │   ├── saveVault.ts          IndexedDB + AES-GCM vault, debounced writes, export/import/reset
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS
 │   ├── floatText.ts          "+N resource" popups at the cursor
@@ -49,7 +51,7 @@ src/
 │   ├── useHydration.ts       true when the save has been loaded and the splash was shown long enough
 │   ├── useSingleTab.ts       Web Lock: one tab owns the game
 │   └── useCtrlSequence.ts    Control ×5 detector (hidden save tools)
-└── components/game/          Grid (pan + stepped wheel zoom), Tile, TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
+└── components/game/          Grid (pan + stepped wheel zoom), TerrainLayer (canvas ground), Tile (transparent hit area + overlays), TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
     │                         building), header (HeaderMenu, LevelOrb, NotifyDot), AmbientLife (decorative critters + rare golden gift),
     │                         CastleRange (violet 3x3 area, castle < 7) / CastleFortress (walls, gate, corner towers, castle 7+), MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
     └── overlays/             Statistics, Character (paper doll + bag), FightModal, Farm (+scene/critters), Merchant, NamePrompt + Tutorial,
@@ -60,7 +62,7 @@ scripts/
 ├── balance-report.ts         tables for docs/generated/balance-tables.md
 └── pixel/                    sprite generators -> public/pixel/ (see "Pixel art pipeline")
 tests/                        clickLimiter, economy (exploit/behaviour), saves (validation + crypto), castle, rebirth, ambient,
-                              items, inventory, equipment, combat, monsters, loot, fight, kingInvariant
+                              items, inventory, equipment, combat, monsters, loot, fight, kingInvariant, terrain (+ Python parity fixture)
 ```
 
 ## State (`GameState`)
@@ -95,6 +97,7 @@ Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a
 
 - `Grid` culls to the visible window and pans with pointer handlers; fling inertia keeps its velocity in a ref with friction (no per-frame React state).
 - **Wheel zoom** is stepped (0.75 / 1 / 1.5 / 2, one step per 50 px of wheel delta) so the pixel art stays crisp, zooms around the cursor and never goes below the level where the world stops covering the screen. The zoom is exposed to CSS as `--map-zoom`; tile tooltips scale with it, castle/building dialogs do not.
+- **Terrain**: the map ground is one 2400x2400 `<canvas>` (`TerrainLayer`, first child of the world div) drawn by `terrainRenderer.ts` from the atlas in `public/pixel/terrain/` + `src/config/terrainAtlas.json`. It redraws only when `terrainKey(tiles)` changes (a purchase, a yard upgrade, rebirth, load - not on pan, zoom or chest toggles), so panning and zoom just move one raster with no cell seams. Tiles are transparent hit areas that carry the castle, buildings, chest, '?' marker and hover overlays. Buyable unexplored tiles are drawn as the dark 'mist' sea; a flat colour per ground is shown until the atlas loads.
 - Tile tooltips are portalled into `MapTipLayer`, a layer above the critters, because every tile is its own stacking context.
 - `NotifyDot` is the one "needs attention" marker (a soft orange dot). It is used on header controls only: unspent stat points on the level orb and an affordable farm animal or upgrade on the Farm button.
 - Font: Mozilla Headline (self-hosted via `@fontsource-variable/mozilla-headline`, exposed as `--font-pixel`).
@@ -103,7 +106,7 @@ Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a
 
 ## Pixel art pipeline
 
-All sprites, frames, grounds and edge-blend masks are generated, not drawn by hand: `python scripts/pixel/build.py [name ...]` (Pillow) rewrites `public/pixel/{icons,ui,bg}/` in place and prunes stale files afterwards, so a running dev server never 404s. `--refs` also refreshes the curated images in `scripts/pixel/reference/`; the visual rules (top-down buildings, outlines, palette, ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Icons are registered in `src/config/pixelIcons.ts`.
+All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: `python scripts/pixel/build.py [name ...]` (Pillow) rewrites `public/pixel/{icons,ui,bg,terrain}/` in place and prunes stale files afterwards, so a running dev server never 404s. `python scripts/pixel/build.py terrain` rebuilds only the terrain, `src/config/terrainAtlas.json` and `tests/fixtures/terrain-parity.json`; `python scripts/pixel/terrain_preview.py` renders mock maps to `scripts/pixel/previews/`. `--refs` also refreshes the curated images in `scripts/pixel/reference/`; the visual rules (top-down buildings, outlines, palette, ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Icons are registered in `src/config/pixelIcons.ts`.
 
 ## Build & run
 

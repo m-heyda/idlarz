@@ -20,7 +20,7 @@ export const PIXEL_ICON_SIZES = {
 	level_orb: [24, 24],
 	xp: [40, 40],
 	bonus_chest: [24, 24],
-	unknown: [12, 16],
+	unknown: [11, 14],
 	// portraits: full figure per hero class, head-and-shoulders bust for the header, the merchant
 	hero_warrior: [56, 80],
 	hero_paladin: [56, 80],

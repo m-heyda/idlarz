@@ -165,20 +165,8 @@ def xp_orb():
 
 # ----------------------------------------------------------------- "?" mark for unexplored land (12x16)
 def unknown_mark():
-    from PIL import Image
-    from common import add_outline, hexc
-    rows = ['..####..', '.######.', '##....##', '##....##', '.....##.', '....##..', '...##...', '...##...',
-            '........', '...##...', '...##...']
-    img = Image.new('RGBA', (12, 16), (0, 0, 0, 0))
-    for y, row in enumerate(rows):
-        for x, ch in enumerate(row):
-            if ch == '#':
-                lit = x + y < 7
-                img.putpixel((x + 2, y + 2), hexc('#f0f6ff') if lit else hexc('#a8c0f0'))
-    img = add_outline(img, hexc('#1a2866'))
-    for x, y in ((1, 1), (10, 3), (2, 13)):
-        img.putpixel((x, y), hexc('#cfe0ff'))
-    return img
+    import terrain_art
+    return terrain_art.unknown_mark()
 
 
 SPRITES = {
