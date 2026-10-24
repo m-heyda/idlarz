@@ -20,6 +20,7 @@ import {
 import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { maxHp } from '@/lib/combat';
+import { isInWard } from '@/lib/castleWard';
 import { starterBag } from '@/lib/inventory';
 import { tierFor } from '@/lib/monsters';
 import {
@@ -312,6 +313,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (m.tier !== tierFor(m.type, ageSec)) return fail('monster tier');
 			const tile = tiles[y][x];
 			if (!tile.isOwned || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
+			if (isInWard(x, y, castleLevel)) return fail('monster inside the castle ward');
 			if (ids.has(id) || spots.has(`${x},${y}`)) return fail('duplicate monster');
 			ids.add(id);
 			spots.add(`${x},${y}`);

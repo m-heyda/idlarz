@@ -56,6 +56,7 @@ import { createClickLimiter } from '@/lib/clickLimiter';
 import { applyHit, armorOf, damagePerClick, maxHp, newFight, regen, stepFight } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
 import { addToBag, equipFromBag, moveSlot, removeFromBag, starterBag, unequip } from '@/lib/inventory';
+import { castleLevelOf, isInWard, monstersOutsideWard } from '@/lib/castleWard';
 import { rollKillLoot } from '@/lib/loot';
 import { advanceMonsters, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
@@ -711,10 +712,11 @@ const createGameSlice = (
 				if (newChestSpawnTimer >= CHEST.intervalSec) {
 					newChestSpawnTimer = 0;
 					const monsterSpots = new Set(state.monsters.map((m) => `${m.x},${m.y}`));
+					const wardLevel = castleLevelOf(newTiles);
 					const eligibleTiles: { x: number; y: number }[] = [];
 					newTiles.forEach((row, y) => {
 						row.forEach((tile, x) => {
-							if (tile.isOwned && tile.biome !== 'castle' && !tile.hasChest && !monsterSpots.has(`${x},${y}`)) {
+							if (tile.isOwned && tile.biome !== 'castle' && !tile.hasChest && !monsterSpots.has(`${x},${y}`) && !isInWard(x, y, wardLevel)) {
 								eligibleTiles.push({ x, y });
 							}
 						});
@@ -736,6 +738,8 @@ const createGameSlice = (
 			let newNextMonsterId = state.nextMonsterId;
 			if (newMonsters.length > 0) {
 				newMonsters = advanceMonsters(newMonsters, secondsElapsed, Math.random, state.fight?.monsterId ?? null);
+				// the castle's ward (castle level 7+) drives monsters out; the one being fought stays until the fight ends
+				newMonsters = monstersOutsideWard(newMonsters, castleLevelOf(newTiles), state.fight?.monsterId ?? null);
 			}
 			if (newMonsters.length >= COMBAT.maxMonsters || countOwnedTiles(newTiles) < COMBAT.spawn.minOwnedTiles) {
 				newMonsterSpawnTimer = 0;
