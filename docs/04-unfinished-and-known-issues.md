@@ -6,11 +6,11 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 
 | # | Feature | State today | Where | To finish |
 | --- | --- | --- | --- | --- |
-| U1 | **Equipment & inventory** | 9 slots, always "Empty"; 6 starter items in `INITIAL_INVENTORY_ITEMS` whose stats are resource rates; no inventory UI, no equip action, no drops; equipment/inventory are not saved | `CharacterOverlay.tsx`, `gameConfig.ts`, `types/game.ts` | inventory grid + equip/unequip, sum equipped stats into `calculateResourceRates`, add to `PERSISTED_KEYS` + `sanitizeSave`; decide whether a rebirth keeps items |
+| U1 | **Items beyond gear** | equipment, the 36-slot bag, drops and potions work (Damage / Armor / Max HP only); no selling, upgrading, crafting or bag expansion; gear gives no resource income | `itemCatalog.ts`, `inventory.ts` | see the roadmap in the combat spec; rebirth keeps gear (decided) |
 | U2 | **Merchant → Upgrade Items** | "Coming soon" | `MerchantOverlay.tsx` | needs U1; gold/resource sink |
 | U3 | **Merchant → Quests** | placeholder | same | quest model, rewards (items), tracking in store |
 | U4 | **Merchant → Gambling** | placeholder | same | RNG games using `luck`; must stay inside the exploit rules ([07](07-security-and-exploits.md)) |
-| U5 | **Combat stats** | `physicalAtk, magicAtk, hp, mp, def, magicDef, critChance, critDmg, atkSpeed` computed and shown; no combat exists; HP/MP bars always full | `calculateCombatStats`, `LevelDetails.tsx` | build combat/expeditions or fold into economy bonuses. (`luck` → chests and crit → lucky tile taps already have an effect.) |
+| U5 | **Stat points in combat** | click combat exists (rats, Rat King) but fight damage and armor come from gear only; `physicalAtk, magicAtk, mp, def, magicDef, critChance, critDmg, atkSpeed` are still display-only; `vitality` adds a little HP, `luck` raises kill gold | `calculateCombatStats`, `combat.ts` (`damagePerClick` is the hook) | stat rework: let the five stats feed damage, armor, crit and speed |
 | U6 | **Reputation** | +100 per tile (derived on load); shown; nothing reads it | `StatisticsOverlay.tsx` | tie to quests/merchant discounts or remove |
 | U9 | **Offline progress** | none (a closed tab does not progress; a throttled tab catches up in 5-min steps) | `tick`, `saveVault.ts` | needs trusted time (see [07 §6](07-security-and-exploits.md)) to avoid a clock exploit; cap e.g. 8 h at 50 % |
 | U13 | **Building management** | buildings are permanent (no demolish/swap/upgrade) | `Tile.tsx`, `BuildingSelectionDialog.tsx` | demolish with refund, building levels |
@@ -33,3 +33,11 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 - **Save compatibility**: the loader refuses invalid saves silently (falls back to the previous slot, then a new game). Any change to persisted fields needs `sanitizeSave` + a `SAVE_VERSION` decision ([07 §7](07-security-and-exploits.md)). `prestige` is optional in saves, so it needed no version bump.
 - **Float drift**: resources are doubles capped at 10¹⁵. With castle 10 and Legacy bonuses the income grows by orders of magnitude, so watch the cap if more multipliers are added.
 - **Dependencies held back**: Next 16, TypeScript 7, ESLint 10 (see [05 §3](05-balance-backlog-and-roadmap.md)).
+
+## D. Combat and items: known limits
+
+- Monsters are one family (rats); there is one weapon per tier of rarity and no item selling or upgrading yet.
+- The sim bots do not fight or equip, so combat rewards (gold / XP as seconds of income) are not part of `docs/generated/sim-milestones.md`; measure before tuning them ([05 BL12](05-balance-backlog-and-roadmap.md)).
+- A fight does not survive a reload (the monster is full HP again); your HP does.
+- The Rat King is unkillable by design until the weapon cap and the King's HP are revisited together (guarded by `tests/kingInvariant.test.ts`).
+- Ability slots are locked placeholders; MP has no use yet.

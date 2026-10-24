@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { CASTLE_UPGRADE } from '@/config/gameConfig';
+import { CASTLE_FORTRESS, CASTLE_UPGRADE } from '@/config/gameConfig';
 import { castleIconName } from '@/config/pixelIcons';
 import PixelIcon from './PixelIcon';
 
@@ -33,6 +33,17 @@ export const castleTier = (level: number) => Math.max(0, level - CASTLE_UPGRADE.
 const CastleSprite: React.FC<CastleSpriteProps> = ({ level, variant = 'tile', className }) => {
 	const glowing = level >= CASTLE_UPGRADE.glowFromLevel;
 	const inline = variant === 'inline';
+
+	// Fortress levels: the castle is a keep on its own tile (the walls and towers are drawn by CastleFortress around the area)
+	if (level >= CASTLE_FORTRESS.fromLevel) {
+		return (
+			<span
+				role='img'
+				aria-label={`Castle level ${level}`}
+				className={cn('castle-sprite castle-keep', inline && 'castle-inline', className)}
+			/>
+		);
+	}
 
 	if (glowing) {
 		const tier = castleTier(level);

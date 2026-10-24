@@ -33,6 +33,10 @@ export const PIXEL_ICON_SIZES = {
 	merchant: [76, 96],
 	// equipment slots
 	equip_head: [40, 40],
+	equip_shoulder: [40, 40],
+	equip_hands: [40, 40],
+	equip_cape: [40, 40],
+	equip_charm: [40, 40],
 	equip_neck: [40, 40],
 	equip_chest: [40, 40],
 	equip_mainHand: [40, 40],
@@ -40,6 +44,25 @@ export const PIXEL_ICON_SIZES = {
 	equip_legs: [40, 40],
 	equip_feet: [40, 40],
 	equip_ring: [40, 40],
+	// monsters: 2-frame idle sheets (frame width x 2)
+	monster_rat: [80, 40],
+	monster_ratking: [112, 56],
+	// items
+	item_potion_hp: [40, 40],
+	item_wooden_sword: [40, 40],
+	item_wooden_shield: [40, 40],
+	item_rattatui_cap: [40, 40],
+	item_rattatui_shoulderpads: [40, 40],
+	item_rattatui_tunic: [40, 40],
+	item_rattatui_gloves: [40, 40],
+	item_rattatui_trousers: [40, 40],
+	item_rattatui_boots: [40, 40],
+	item_rattatui_amulet: [40, 40],
+	item_rattatui_cloak: [40, 40],
+	item_rattatui_ring: [40, 40],
+	item_rattatui_charm: [40, 40],
+	item_rattatui_fang_blade: [40, 40],
+	item_rattatui_buckler: [40, 40],
 	// castle by upgrade level, seen from above; every level fills its 48px tile (6 is the animated max)
 	castle_1: [48, 48],
 	castle_2: [48, 48],
@@ -47,6 +70,20 @@ export const PIXEL_ICON_SIZES = {
 	castle_4: [48, 48],
 	castle_5: [48, 48],
 	castle_6: [48, 48],
+	// castle fortress (level 7+): keep (64px, spills 8px over its neighbours; the anim sheet is 4 frames), corner towers,
+	// walls (stone a / gilded b) and the south gate
+	castle_keep: [64, 64],
+	castle_keep_anim: [256, 64],
+	castle_tower_7: [40, 56],
+	castle_tower_8: [40, 56],
+	castle_tower_9: [40, 56],
+	castle_tower_10: [40, 56],
+	castle_wall_h_a: [48, 12],
+	castle_wall_h_b: [48, 12],
+	castle_wall_v_a: [12, 48],
+	castle_wall_v_b: [12, 48],
+	castle_gate_a: [52, 30],
+	castle_gate_b: [52, 30],
 	// map: one icon per biome
 	biome_forest: [32, 32],
 	biome_plains: [32, 32],
@@ -100,6 +137,10 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 // Equipment slot -> its pixel icon (both ring slots share one sprite)
 export const EQUIPMENT_PIXEL_ICONS: Record<string, PixelIconName> = {
 	head: 'equip_head',
+	shoulder: 'equip_shoulder',
+	hands: 'equip_hands',
+	cape: 'equip_cape',
+	charm: 'equip_charm',
 	neck: 'equip_neck',
 	chest: 'equip_chest',
 	mainHand: 'equip_mainHand',
@@ -108,6 +149,12 @@ export const EQUIPMENT_PIXEL_ICONS: Record<string, PixelIconName> = {
 	feet: 'equip_feet',
 	ring1: 'equip_ring',
 	ring2: 'equip_ring',
+};
+
+// Monster type -> its 2-frame idle sheet (frame size; the PNG is twice as wide)
+export const MONSTER_SHEETS: Record<'rat' | 'ratKing', { name: PixelIconName; w: number; h: number }> = {
+	rat: { name: 'monster_rat', w: 40, h: 40 },
+	ratKing: { name: 'monster_ratking', w: 56, h: 56 },
 };
 
 // Farm animal id -> sprite

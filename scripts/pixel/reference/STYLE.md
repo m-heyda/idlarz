@@ -55,6 +55,15 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
 - **Equipment slots**: `equip_head/neck/chest/mainHand/offHand/legs/feet/ring` - kettle hat, amulet, cuirass, sword,
   round shield, greaves, boots, ring. Empty = dim grayscale silhouette, filled = glowing slot frame.
 - **Animals**: `animal_chicken/pig/cow/deer`.
+- **Monsters** (`sprites_monsters.py`): `monster_rat` (2-frame idle sheet, 2 x 40x40) and `monster_ratking` (2 x 56x56, crowned, red cape,
+  fur collar). Same 3/4 view as the farm animals, head to the lower-left; grey-brown fur ramp (`rat_fur`), pink ears/paws/tail (`rat_pink`),
+  cream buck teeth, one glowing red eye. Shown through `MonsterArt` (CSS sheet animation, 520 ms per frame) on the map tile (red glow, tier badge)
+  and in the fight modal (3-5x).
+- **Slots and items**: four more empty-slot silhouettes (`equip_shoulder/hands/cape/charm`: pauldrons, gauntlet, cloak with clasp, bead on a cord).
+  Item icons are `item_*` 40px sprites: `item_potion_hp` (red flask, cork), the wooden starter kit (`item_wooden_sword/shield`) and the 12
+  **Rattatui** set icons (`item_rattatui_<piece>`), which are the slot icons re-skinned through `_skin()` in `sprites_monsters.py`
+  (steel -> `rat_fur`, gold -> `rat_tan`, cloth -> `rat_pink`, leather -> `rat_fur_dk`, shield face -> `cheese`; the fang blade is bone).
+  New materials: `rat_fur`, `rat_fur_dk`, `rat_pink`, `rat_tan`, `cheese`, `glass`.
 - **Character HUD** (`LevelDetails.tsx`): 144x112 stone alcove scene shown at 2x - the hero (class sprite, idle bob, double-click = class picker) standing on the floor under a name plate (double-click = rename),
   two flickering torches (3-frame strip), HP/MP flasks flanking him, stony XP bar along the floor with a flowing emerald
   fill and 10% ticks, level on the purple orb. Flask scale is an integer (`--s`).
@@ -77,7 +86,13 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   **max-level grand castle**: gold roofs, gilded bands, glowing windows, crystal spire. Max level is a 4-frame sheet
   (`castle_6_anim`, flags wave, crystal pulses) with a pulsing golden glow, a golden aura on the tile and sparkles rising.
   The upgrade dialog previews current -> next castle. Reference: `castle-levels.png`.
-- **Buildings** (`building_*`, `sprites_buildings.py`, 48px, top-down like the castle so each fills its tile): thatched farm
+- **Fortress** (`sprites_fortress.py`, castle levels 7-10): the castle stops being one big tile sprite and takes its 3x3 bonus area, drawn by `CastleFortress.tsx` instead of the violet
+  range marker (no violet wash, dashes or border; the castle tile switches to the cobbled `yard` ground). Parts, all 1x pixel art seen from a lower camera (pitch 58) so brickwork,
+  windows and banners show: `castle_keep` / `castle_keep_anim` (64px keep, 4-frame sheet: great hall with slate gable roof, gold donjon with crystal, two flag turrets, banners; spills 8px over
+  its neighbours), `castle_tower_7..10` (40x56 round towers on the area corners: red cone roof / slate roof + crown + banner / gold roof, glowing slits, gold bands / crystal spire, three bands, two flags),
+  `castle_wall_h_a|b` + `castle_wall_v_a|b` (48x12 crenellated wall pieces, tiled; south and east are CSS flips; `b` is gold-trimmed for levels 9-10) and `castle_gate_a|b`
+  (52x30 gatehouse, exactly one tile wide so it joins the south wall). `python scripts/pixel/sprites_fortress.py out.png [parts.png]` renders a 3x3 review mock on real biome ground.
+- **Buildings** (`building_*, `sprites_buildings.py`, 48px, top-down like the castle so each fills its tile): thatched farm
   cottage with crop rows + haystack, mine with a timbered shaft, rails and coal cart, lumber mill with a flat saw bench and log
   pile, striped-awning market stall with fruit crates, stone forge with glowing coals + anvil + chimney smoke, gear workshop with a
   big cog and a floating XP orb. The same sprite is the picker icon and the tile graphic. A converted grounds tile switches to a

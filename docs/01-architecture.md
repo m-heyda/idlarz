@@ -21,6 +21,8 @@ src/
 ├── app/page.tsx              game loop, tab lock, hidden Ctrl×5 shortcut, composes all overlays
 ├── config/
 │   ├── gameConfig.ts         ALL tunable constants (costs, curves, biomes, castle, animals, merchant, click limiter, chests, stats)
+│   ├── combatConfig.ts       COMBAT + MONSTERS: HP, regen, armor, spawn, tiers, drops, Rat King
+│   ├── itemCatalog.ts        every item (ITEM_CATALOG), the Rattatui set, starter kit, equipment slot layout
 │   ├── playerClasses.ts, pixelIcons.ts
 ├── types/game.ts             Resources, Tile, CharacterStats, GameState (store interface), ClickInput, TileCost ...
 ├── stores/
@@ -31,7 +33,14 @@ src/
 │   ├── gameUtils.ts          pure maths: rates, costs, level curve, stat modifiers, tooltips text helpers
 │   ├── formatters.ts, audioManager.ts
 ├── lib/
-│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps and critter gifts
+│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps, critter gifts and fight hits
+│   ├── castleWard.ts         the castle's ward (castle level 7+): isInWard, monstersOutsideWard, fortressWallTier
+│   ├── inventory.ts          pure bag / equipment operations + aggregateStats (the one place gear is summed)
+│   ├── combat.ts             max HP, damage per click, armor mitigation, regen, fight state machine (stepFight)
+│   ├── monsters.ts           tiers, monster stats, spawn tile, aging and Rat King evolution
+│   ├── loot.ts               kill rewards and drops (gold / xp as seconds of income)
+│   ├── combatFx.ts           window event bus: hit / hurt / heal effects for the fight modal
+│   ├── inventoryDrag.ts      drag payload shared by the bag and the equipment slots
 │   ├── ambientLife.ts        pure picker for the wandering map critters (owned tile in view, biome-matched type)
 │   ├── saveVault.ts          IndexedDB + AES-GCM vault, debounced writes, export/import/reset
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS
@@ -41,32 +50,36 @@ src/
 │   ├── useSingleTab.ts       Web Lock: one tab owns the game
 │   └── useCtrlSequence.ts    Control ×5 detector (hidden save tools)
 └── components/game/          Grid (pan + stepped wheel zoom), Tile, TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
-    │                         building), header (HeaderMenu, LevelOrb, NotifyDot), AmbientLife (decorative critters + rare golden gift)
-    └── overlays/             Statistics, Character, Farm (+scene/critters), Merchant, NamePrompt + Tutorial,
+    │                         building), header (HeaderMenu, LevelOrb, NotifyDot), AmbientLife (decorative critters + rare golden gift),
+    │                         CastleRange (violet 3x3 area, castle < 7) / CastleFortress (walls, gate, corner towers, castle 7+), MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
+    └── overlays/             Statistics, Character (paper doll + bag), FightModal, Farm (+scene/critters), Merchant, NamePrompt + Tutorial,
                               SettingsDialog, LegacyDialog (rebirth + shop), TutorialDialog, SaveMenuDialog,
                               TabLockOverlay, LevelUp/Chest notifications, LoadingScreen
 scripts/
 ├── sim.ts                    bot simulation on the REAL store (milestones per player profile)
 ├── balance-report.ts         tables for docs/generated/balance-tables.md
 └── pixel/                    sprite generators -> public/pixel/ (see "Pixel art pipeline")
-tests/                        clickLimiter, economy (exploit/behaviour), saves (validation + crypto), castle, rebirth, ambient
+tests/                        clickLimiter, economy (exploit/behaviour), saves (validation + crypto), castle, rebirth, ambient,
+                              items, inventory, equipment, combat, monsters, loot, fight, kingInvariant
 ```
 
 ## State (`GameState`)
 
-Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `equipment` and `inventory` exist but are not saved (nothing changes them yet).
+Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots), `playerHp`, `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
 
 ## The loop
 
 `page.tsx` runs `setInterval(…, 100 ms)` **only** in the owning tab and only after the save is loaded. Each interval computes `deltaTime = performance.now() − last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 … MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. There is no offline progress.
 
-`tick` order: accumulate resources → XP (with `xpGainMultiplier`) → castle upgrade timer (finishing recomputes the rates) → chests → level / stat points → one `set()`.
+`tick` order: accumulate resources → XP (with `xpGainMultiplier`) → castle upgrade timer (finishing recomputes the rates) → chests (never on a monster tile) → monsters (age, evolve, spawn; the monster being fought is frozen) → fight step (monster attacks, King timer) or HP regeneration → level / stat points → one `set()`. The fight step clamps its delta to 1 s, so a throttled background tab slows a fight down instead of replaying minutes of attacks.
 
 ## Persistence
 
 `persist` + `vaultStorage` (see [07](07-security-and-exploits.md)): state objects are kept as-is in memory and encrypted/compressed only when written (debounced). On start the vault reads `current` (or `previous`), validates it with `sanitizeSave`, `merge` rebuilds rates and sets `isHydrated`; `onRehydrateStorage` then enables writing. Save key `idle-explorer-v12`, `SAVE_VERSION = 12`; old localStorage saves are deleted, not migrated.
 
 ## Clicks
+
+Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a token from the same limiter (one token per physical click, trusted clicks only).
 
 `ResourceDisplay` registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold` (and the tile's `onClick` calls `tapTile` for the same event); both ask the shared limiter with the event's `timeStamp` as id, so one physical click costs one token. Catching a critter gift (`claimCritterGift`, map or farm window) goes through the same limiter and also has a per-source cooldown; the amount is always computed by the store.
 

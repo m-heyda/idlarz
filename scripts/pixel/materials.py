@@ -46,6 +46,13 @@ MATS = {
     'patch': Material(['#0a0810', '#1c1820', '#34303a', '#524c58', '#78727e'], '#06050a', grain=0.15, grain_scale=4.0),
     'fawn': Material(['#3a2010', '#6a4020', '#98622e', '#c68c4a', '#ecc080'], '#2a1608', grain=0.2, grain_scale=4.0),
     'spots': Material(['#a89878', '#d4c6a2', '#efe4c4', '#fff6dc', '#ffffff'], '#6a5c44'),
+    # --- rats (monsters + the Rattatui beta-tester set)
+    'rat_fur': Material(['#2c2420', '#4e403a', '#7a665a', '#a89484', '#d6c6b4'], '#1c1612', grain=0.22, grain_scale=4.0),
+    'rat_fur_dk': Material(['#16100e', '#2a201c', '#44352e', '#665246', '#8c7868'], '#0e0a08', grain=0.2, grain_scale=4.0),
+    'rat_pink': Material(['#6a2e3a', '#a85a68', '#d8828e', '#f4a8b0', '#ffd6d8'], '#3e1822', grain=0.1, grain_scale=4.0),
+    'rat_tan': Material(['#5c4a30', '#8c7248', '#bfa468', '#e6cf94', '#fff2c8'], '#2e2212', grain=0.1, grain_scale=4.0),
+    'cheese': Material(['#8a5a08', '#c48a10', '#eab628', '#fad658', '#fff4a0'], '#4a2c04', grain=0.15, grain_scale=3.0),
+    'glass': Material(['#4a6a8a', '#7a9ab8', '#a8c8dc', '#d4eaf6', '#ffffff'], '#2a4258', spec=0.06, shiny=20, spec_col='#ffffff'),
     # --- map: nature + castle
     'pine': Material(['#06201a', '#0c3a22', '#145a2e', '#22803c', '#52b45a'], '#04140c', grain=0.25, grain_scale=3.5, gamma=1.15),
     'grass': Material(['#2a5a1a', '#3d8a2a', '#58b040', '#82d65a', '#c0f090'], '#1a3a0e', grain=0.15, grain_scale=4.0),

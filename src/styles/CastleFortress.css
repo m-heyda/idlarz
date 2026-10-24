@@ -1,0 +1,98 @@
+/* Castle fortress (castle level 7+): walls on the edges of the 3x3 area, a gatehouse on the south wall, a tower on each
+   corner. Sprites are drawn at 1x (scripts/pixel/sprites_fortress.py); the south and east walls are the north and west
+   pieces flipped. Never takes a click.
+   Stacking on the map: tiles 0-10, a hovered tile 20, THIS layer 21 (so hovering a tile inside the walls never lifts it over
+   a wall or tower), ambient critters 22 / 25, the castle tile on hover and the tooltip layer 30. */
+
+.castle-fortress {
+	position: absolute;
+	z-index: 21;
+	pointer-events: none;
+	image-rendering: pixelated;
+}
+
+.castle-fortress i {
+	position: absolute;
+	display: block;
+	background-repeat: no-repeat;
+	image-rendering: pixelated;
+}
+
+.fort-wall {
+	background-repeat: repeat;
+}
+
+.fort-wall.n,
+.fort-wall.s {
+	left: 0;
+	width: 100%;
+	height: 12px;
+	background-image: var(--wall-h);
+	background-repeat: repeat-x;
+}
+
+.fort-wall.n {
+	top: 0;
+}
+
+.fort-wall.s {
+	bottom: 0;
+	transform: scaleY(-1);
+}
+
+.fort-wall.w,
+.fort-wall.e {
+	top: 0;
+	width: 12px;
+	height: 100%;
+	background-image: var(--wall-v);
+	background-repeat: repeat-y;
+}
+
+.fort-wall.w {
+	left: 0;
+}
+
+.fort-wall.e {
+	right: 0;
+	transform: scaleX(-1);
+}
+
+/* the gatehouse is exactly one tile wide, so it replaces the middle wall segment and joins the walls on both sides */
+.fort-gate {
+	left: 50%;
+	bottom: -4px;
+	width: 52px;
+	height: 30px;
+	transform: translateX(-50%);
+	background-image: var(--gate);
+	filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3));
+}
+
+/* towers are centred on the corners of the area: a quarter of each sits over the biome inside, the rest outside */
+.fort-tower {
+	width: 40px;
+	height: 56px;
+	background-image: var(--tower);
+	filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35));
+}
+
+.fort-tower.nw {
+	left: -20px;
+	top: -40px;
+}
+
+.fort-tower.ne {
+	right: -20px;
+	top: -40px;
+}
+
+.fort-tower.sw {
+	left: -20px;
+	bottom: -16px;
+}
+
+.fort-tower.se {
+	right: -20px;
+	bottom: -16px;
+}

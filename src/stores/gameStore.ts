@@ -19,7 +19,6 @@ import {
 	GRID_HEIGHT,
 	GRID_SIZE,
 	INITIAL_CHARACTER_STATS,
-	INITIAL_INVENTORY_ITEMS,
 	LEGACY_UPGRADES,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUY_MULTIPLIER,
@@ -54,6 +53,14 @@ import {
 	tileCostAsResources,
 } from '@/utils/gameUtils';
 import { createClickLimiter } from '@/lib/clickLimiter';
+import { applyHit, armorOf, damagePerClick, maxHp, newFight, regen, stepFight } from '@/lib/combat';
+import { emitCombat } from '@/lib/combatFx';
+import { addToBag, equipFromBag, moveSlot, removeFromBag, starterBag, unequip } from '@/lib/inventory';
+import { castleLevelOf, isInWard, monstersOutsideWard } from '@/lib/castleWard';
+import { rollKillLoot } from '@/lib/loot';
+import { advanceMonsters, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
+import { COMBAT } from '@/config/combatConfig';
+import { ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markVaultReady, SAVE_NAME, SAVE_VERSION, vaultStorage } from '@/lib/saveVault';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type {
@@ -61,8 +68,11 @@ import type {
 	CharacterStats,
 	ClickInput,
 	CritterGift,
+	EquipmentSlot,
+	FightState,
 	GameState,
 	GiftResult,
+	Monster,
 	PrestigeState,
 	Resources,
 	TapResult,
@@ -101,6 +111,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
 	const grid = createInitialGrid();
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
+	const equipment = { ...STARTER_EQUIPMENT };
 	const rates = calculateResourceRates(grid, stats, {}, prestige);
 	return {
 		tiles: grid,
@@ -111,8 +122,13 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE) => {
 		playerName: DEFAULT_PLAYER_NAME,
 		playerClass: DEFAULT_PLAYER_CLASS,
 		characterStats: stats,
-		equipment: {},
-		inventory: INITIAL_INVENTORY_ITEMS.map((item) => ({ ...item })),
+		equipment,
+		bag: starterBag(),
+		playerHp: maxHp(stats, equipment),
+		monsters: [] as Monster[],
+		monsterSpawnTimer: 0,
+		nextMonsterId: 1,
+		fight: null as FightState | null,
 		farmLevels: {} as Record<string, number>,
 		showCharacterWindow: false,
 		showStatisticsWindow: false,
@@ -216,8 +232,13 @@ const createGameSlice = (
 			clickLimiter.reset();
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
+			const fresh = createInitialData(prestige);
 			set({
-				...createInitialData(prestige),
+				...fresh,
+				// gear is character progression: it survives a rebirth (HP is refilled)
+				equipment: state.equipment,
+				bag: state.bag,
+				playerHp: maxHp(fresh.characterStats, state.equipment),
 				playerName: state.playerName,
 				playerClass: state.playerClass,
 				playSeconds: state.playSeconds,
@@ -486,6 +507,120 @@ const createGameSlice = (
 			return { resource: def.resource, amount };
 		},
 
+		// Fights. The click must pass the shared limiter; damage, rewards and loot are always computed here.
+		startFight: (monsterId: number) => {
+			const state = get();
+			if (state.fight || state.playerHp <= 0) return false;
+			const monster = state.monsters.find((m) => m.id === monsterId);
+			if (!monster) return false;
+			set({ fight: newFight(monster) });
+			return true;
+		},
+
+		hitMonster: (input: ClickInput) => {
+			const state = get();
+			const fight = state.fight;
+			if (!fight || fight.phase !== 'active') return null;
+			if (!clickLimiter.take(input)) return null;
+
+			const damage = damagePerClick(state.equipment);
+			const { fight: next, killed } = applyHit(fight, damage);
+			emitCombat({ kind: 'hit', damage, killed });
+			if (!killed) {
+				set({ fight: next });
+				return { damage, killed: false };
+			}
+
+			const rates = state.resourceRates.total;
+			const loot = rollKillLoot(
+				{ type: fight.type, tier: fight.tier },
+				{
+					goldPerSec: rates.gold,
+					xpPerSec: rates.xp * (1 + state.characterStats.xpGainMultiplier / 100),
+					luck: state.characterStats.luck,
+				},
+				Math.random
+			);
+			let bag = state.bag;
+			const items: { id: string; qty: number }[] = [];
+			let convertedGold = 0;
+			for (const drop of loot.items) {
+				const added = addToBag(bag, drop.id, drop.qty);
+				bag = added.bag;
+				if (added.added > 0) items.push({ id: drop.id, qty: added.added });
+				convertedGold += added.overflow * (ITEM_CATALOG[drop.id]?.sellValue ?? 0);
+			}
+			set({
+				fight: { ...next, phase: 'won', summary: { gold: loot.gold, xp: loot.xp, items, convertedGold } },
+				monsters: state.monsters.filter((m) => m.id !== fight.monsterId),
+				bag,
+				resources: {
+					...state.resources,
+					gold: Math.min(state.resources.gold + loot.gold + convertedGold, RESOURCE_CAP),
+					xp: state.resources.xp + loot.xp,
+				},
+			});
+			return { damage, killed: true };
+		},
+
+		// Closing the fight (flee, or dismissing an end panel). The monster is never persisted damaged, so it is simply full HP again.
+		leaveFight: () => set({ fight: null }),
+
+		drinkPotion: (bagIndex: number) => {
+			const state = get();
+			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
+			const healHp = slot ? ITEM_CATALOG[slot.id]?.consumable?.healHp : undefined;
+			if (!slot || !healHp || slot.qty < 1) return false;
+			const max = maxHp(state.characterStats, state.equipment);
+			if (state.playerHp >= max) return false;
+			if (state.fight && (state.fight.phase !== 'active' || state.fight.potionCd > 0)) return false;
+
+			const healed = Math.min(healHp, max - state.playerHp);
+			set({
+				bag: removeFromBag(state.bag, bagIndex, 1),
+				playerHp: state.playerHp + healed,
+				fight: state.fight ? { ...state.fight, potionCd: COMBAT.potionCooldownSec } : null,
+			});
+			emitCombat({ kind: 'heal', amount: healed });
+			return true;
+		},
+
+		// Gear actions: refused while a fight is open; max HP can drop when gear comes off, so playerHp follows it down
+		equipItem: (bagIndex: number) => {
+			const state = get();
+			if (state.fight) return false;
+			const result = equipFromBag(state.bag, state.equipment, bagIndex);
+			if (!result) return false;
+			set({
+				bag: result.bag,
+				equipment: result.equipment,
+				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
+			});
+			return true;
+		},
+
+		unequipItem: (slot: EquipmentSlot) => {
+			const state = get();
+			if (state.fight) return false;
+			const result = unequip(state.bag, state.equipment, slot);
+			if (!result) return false;
+			set({
+				bag: result.bag,
+				equipment: result.equipment,
+				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
+			});
+			return true;
+		},
+
+		moveBagItem: (from: number, to: number) => {
+			const state = get();
+			if (state.fight || from === to) return false;
+			const inRange = (i: number) => Number.isInteger(i) && i >= 0 && i < state.bag.length;
+			if (!inRange(from) || !inRange(to)) return false;
+			set({ bag: moveSlot(state.bag, from, to) });
+			return true;
+		},
+
 		// Tapping an owned tile yields a slice of its own output (per-tile cooldown + the shared click limiter)
 		tapTile: (x: number, y: number, input?: ClickInput): TapResult | null => {
 			if (!input || !clickLimiter.take(input)) return null;
@@ -576,10 +711,12 @@ const createGameSlice = (
 				newChestSpawnTimer += secondsElapsed;
 				if (newChestSpawnTimer >= CHEST.intervalSec) {
 					newChestSpawnTimer = 0;
+					const monsterSpots = new Set(state.monsters.map((m) => `${m.x},${m.y}`));
+					const wardLevel = castleLevelOf(newTiles);
 					const eligibleTiles: { x: number; y: number }[] = [];
 					newTiles.forEach((row, y) => {
 						row.forEach((tile, x) => {
-							if (tile.isOwned && tile.biome !== 'castle' && !tile.hasChest) {
+							if (tile.isOwned && tile.biome !== 'castle' && !tile.hasChest && !monsterSpots.has(`${x},${y}`) && !isInWard(x, y, wardLevel)) {
 								eligibleTiles.push({ x, y });
 							}
 						});
@@ -594,6 +731,49 @@ const createGameSlice = (
 					}
 				}
 			}
+
+			// Monsters: the one being fought is frozen; the spawn timer only runs with enough land and room on the map
+			let newMonsters = state.monsters;
+			let newMonsterSpawnTimer = state.monsterSpawnTimer;
+			let newNextMonsterId = state.nextMonsterId;
+			if (newMonsters.length > 0) {
+				newMonsters = advanceMonsters(newMonsters, secondsElapsed, Math.random, state.fight?.monsterId ?? null);
+				// the castle's ward (castle level 7+) drives monsters out; the one being fought stays until the fight ends
+				newMonsters = monstersOutsideWard(newMonsters, castleLevelOf(newTiles), state.fight?.monsterId ?? null);
+			}
+			if (newMonsters.length >= COMBAT.maxMonsters || countOwnedTiles(newTiles) < COMBAT.spawn.minOwnedTiles) {
+				newMonsterSpawnTimer = 0;
+			} else {
+				newMonsterSpawnTimer += secondsElapsed;
+				if (newMonsterSpawnTimer >= spawnThreshold(newNextMonsterId)) {
+					newMonsterSpawnTimer = 0;
+					const spot = pickSpawnTile(newTiles, newMonsters, Math.random);
+					if (spot) {
+						newMonsters = [
+							...newMonsters,
+							{ id: newNextMonsterId, type: 'rat', tier: 1, x: spot.x, y: spot.y, ageSec: 0 },
+						];
+						newNextMonsterId++;
+					}
+				}
+			}
+
+			// Fight step (monster attacks, king timer) or, with no active fight, HP regeneration
+			let newFightState = state.fight;
+			let newPlayerHp = state.playerHp;
+			const playerMaxHp = maxHp(state.characterStats, state.equipment);
+			if (newFightState && newFightState.phase === 'active') {
+				const step = stepFight(newFightState, secondsElapsed, newPlayerHp, armorOf(state.equipment), Math.random);
+				newFightState = step.fight;
+				newPlayerHp = step.playerHp;
+				for (const event of step.events) {
+					if (event.kind === 'hurt') emitCombat({ kind: 'hurt', amount: event.amount });
+					if (event.kind === 'knockedOut') newPlayerHp = Math.round(playerMaxHp * COMBAT.knockoutHpFraction);
+				}
+			} else {
+				newPlayerHp = regen(newPlayerHp, playerMaxHp, secondsElapsed);
+			}
+			newPlayerHp = Math.min(newPlayerHp, playerMaxHp);
 
 			// Level and stat points
 			const { level, progress } = calculateLevel(newResources.xp);
@@ -612,6 +792,11 @@ const createGameSlice = (
 				castleUpgrade: newCastleUpgrade,
 				chestSpawnTimer: newChestSpawnTimer,
 				activeChests: newActiveChestsCount,
+				monsters: newMonsters,
+				monsterSpawnTimer: newMonsterSpawnTimer,
+				nextMonsterId: newNextMonsterId,
+				fight: newFightState,
+				playerHp: newPlayerHp,
 				playSeconds: state.playSeconds + secondsElapsed,
 			});
 		},
@@ -740,6 +925,8 @@ export const useGameStore = create(
 			return {
 				...current,
 				...saved,
+				// an open fight belongs to the tab that opened it: after a reload or a tab take-over it is stale
+				fight: null,
 				resourceRates: rates,
 				isHydrated: true,
 			};

@@ -7,12 +7,14 @@ import React, {
 	JSX,
 } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { GRID_SIZE, GRID_HEIGHT, TILE_SIZE } from '@/config/gameConfig';
+import { GRID_SIZE, GRID_HEIGHT, TILE_SIZE, CASTLE_FORTRESS } from '@/config/gameConfig';
+import { castleLevelOf } from '@/lib/castleWard';
 import Tile from './Tile';
 import AmbientLife from './AmbientLife';
 import { MapTipLayerContext } from './MapTipLayer';
 import type { Viewport } from '@/lib/ambientLife';
 import CastleRange from './CastleRange';
+import CastleFortress from './CastleFortress';
 
 interface Position {
 	x: number;
@@ -318,7 +320,11 @@ const Grid: React.FC = () => {
 				} as React.CSSProperties}>
 				<MapTipLayerContext.Provider value={tipLayer}>{visibleTiles}</MapTipLayerContext.Provider>
 				<AmbientLife getViewport={getViewport} />
-				<CastleRange />
+				{castleLevelOf(tiles) >= CASTLE_FORTRESS.fromLevel ? (
+					<CastleFortress level={castleLevelOf(tiles)} />
+				) : (
+					<CastleRange />
+				)}
 				<div ref={setTipLayer} className='map-tip-layer' />
 			</div>
 		</div>

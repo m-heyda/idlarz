@@ -18,6 +18,8 @@ Only **remaining** work. Delivered so far: the first rebalance pass (click limit
 | BL10 | **Late Legacy runs flatten** | gain grows with `sqrt(tiles)` and the castle level, the shop is capped at 10 levels each; once the shop is maxed points only add the +5 % income each | consider a second prestige tier or a sink for surplus points |
 | BL11 | **Biome luck and the 24 h player** | after the Coast/water clustering merge the seed spread is large (hardcore 27–45 d) and the 24 h/day auto-clicker bot is ~25 % faster than the 8 h/day hardcore bot | tune `BIOME_SPAWN` weights (fewer water tiles early or a wood/stone-yielding coast) and re-run `sim --seeds=3` |
 
+| BL12 | **Combat rewards and difficulty** | kill gold / XP are `rewardSec` seconds of income (tier 1: 90 s) with 15-minute spawns; a fight costs ~30-40 HP at tier 1; none of it is in the sim | add a fighting bot to `sim.ts`, check the share of income from fights stays small, tune `COMBAT.spawn`, `MONSTERS.rat.rewardSec`, armor `K` |
+
 ## 2. Framework upgrade notes
 
 On Next 15.5.28, React 19.3, Tailwind 4.3, Zustand 5.0, TypeScript 5.9, ESLint 9.39 (all within their majors); linting runs through the ESLint CLI (`npm run lint`) and the workspace root is pinned in `next.config.ts`. Held back deliberately: **Next 16**, **TypeScript 7**, **ESLint 10**, `@types/node` 26.

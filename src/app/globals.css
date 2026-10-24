@@ -1386,6 +1386,21 @@ body {
 	}
 }
 
+/* the fortress keep: 64px frames in a 4-frame sheet (banners wave, the crystal pulses); spills 8px over the neighbours */
+.castle-keep {
+	width: 64px;
+	height: 64px;
+	translate: 0 -6px;
+	background: url('/pixel/icons/castle_keep_anim.png') 0 0 / 256px 64px no-repeat;
+	animation: castle-keep-anim 1.2s steps(4) infinite;
+}
+
+@keyframes castle-keep-anim {
+	to {
+		background-position-x: -256px;
+	}
+}
+
 .castle-max {
 	--tier: 0;
 	--grow: calc(1 + var(--tier) * 0.06); /* 1.00 at the first glowing level, 1.24 at level 10 */
@@ -1457,8 +1472,15 @@ body {
 	z-index: 6;
 }
 
+/* the keep reaches to the top of its tile: the level plaque moves to the bottom corner */
+.tile-fortress .tile-badge {
+	top: auto;
+	bottom: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.castle-max,
+	.castle-keep,
 	.castle-max-tile,
 	.castle-spark {
 		animation: none;

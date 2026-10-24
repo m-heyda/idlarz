@@ -188,3 +188,66 @@ def ring():
     img = sc.render()
     fx.glint(img, 17, 6, 2)
     return img
+
+
+# ----------------------------------------------------------------- shoulder: pauldrons
+def shoulder():
+    sc = _scene(12.5, (20, 27))
+    for sx in (-1, 1):
+        _A(sc, 'ell', (1.0 * sx, 0, 1.0), (0.85, 0.7, 0.55), 'steel', I3, plate_tex, 1 + sx)     # dome
+        _A(sc, 'cyl', (1.0 * sx, 0, 0.62), (0.82, 0.06), 'gold')                                  # rim
+        _A(sc, 'ell', (1.0 * sx, -0.5, 1.15), (0.12, 0.08, 0.12), 'gold')                         # rivets
+        _A(sc, 'ell', (1.0 * sx, 0.1, 1.5), (0.12, 0.1, 0.1), 'gold')
+    _A(sc, 'box', (0, 0, 0.55), (0.28, 0.1, 0.07), 'leather')                                     # strap between them
+    img = sc.render()
+    fx.glint(img, 12, 12, 2)
+    return img
+
+
+# ----------------------------------------------------------------- hands: gauntlet
+def hands():
+    sc = _scene(12.5, (20, 30))
+    _A(sc, 'cyl', (0, 0, 0.55), (0.62, 0.55), 'steel', I3, plate_tex, 1)                          # cuff
+    _A(sc, 'cyl', (0, 0, 0.12), (0.66, 0.06), 'gold')
+    _A(sc, 'ell', (0, 0, 1.45), (0.62, 0.42, 0.55), 'steel', I3, None, 2)                         # back of the hand
+    for i, x in enumerate((-0.42, -0.14, 0.14, 0.42)):                                            # fingers
+        _A(sc, 'cyl', (x, -0.05, 2.08), (0.1, 0.34), 'steel', I3, None, 3 + i)
+        _A(sc, 'ell', (x, -0.05, 2.45), (0.1, 0.1, 0.08), 'steel', I3, None, 7 + i)
+    _A(sc, 'ell', (0.72, -0.1, 1.5), (0.14, 0.16, 0.34), 'steel', rot(0, 0, 25), None, 12)       # thumb
+    _A(sc, 'box', (0, -0.45, 1.5), (0.3, 0.04, 0.1), 'gold')
+    img = sc.render()
+    fx.glint(img, 14, 9, 2)
+    return img
+
+
+# ----------------------------------------------------------------- cape: cloak with a clasp
+def cape():
+    sc = _scene(12.5, (20, 34))
+    _A(sc, 'ell', (0, 0.15, 1.2), (1.05, 0.2, 1.35), 'cloth', I3, None, 1)                        # the cloak
+    _A(sc, 'ell', (-0.62, -0.05, 0.85), (0.4, 0.2, 1.0), 'cloth', rot(0, 0, -8), None, 2)        # folds
+    _A(sc, 'ell', (0.62, -0.05, 0.85), (0.4, 0.2, 1.0), 'cloth', rot(0, 0, 8), None, 3)
+    _A(sc, 'cyl', (0, 0, 2.3), (0.62, 0.12), 'cloth')                                             # collar
+    _A(sc, 'cyl', (0, 0, 2.42), (0.64, 0.05), 'gold')
+    _A(sc, 'ell', (0, -0.3, 2.2), (0.16, 0.1, 0.16), 'gold')                                      # clasp
+    _A(sc, 'box', (0, 0, 0.0), (1.0, 0.18, 0.05), 'gold')                                         # hem trim
+    img = sc.render()
+    fx.glint(img, 20, 10, 2)
+    return img
+
+
+# ----------------------------------------------------------------- charm: bead on a cord
+def charm():
+    sc = _scene(12.5, (20, 20))
+    n = 12
+    for i in range(n + 1):                                                                        # cord loop
+        a = math.pi * i / n
+        sc.add(Prim('ell', _P(sc, 0.8 * math.cos(a), 1.5 - 1.2 * math.sin(a)), (0.07, 0.07, 0.07), 'leather', I3, None, 80 + i))
+    c = _P(sc, 0, -0.35)
+    sc.add(Prim('ell', c, (0.62, 0.62, 0.62), 'gold', I3, None, 1))                               # setting
+    sc.add(Prim('ell', add(c, mul(sc.f, -0.15)), (0.5, 0.5, 0.5), 'ruby', I3, None, 2))           # bead
+    sc.add(Prim('ell', _P(sc, 0, 1.55), (0.12, 0.12, 0.12), 'gold', I3, None, 3))                 # knot
+    for k, (dx, dy) in enumerate(((-0.25, -1.2), (0.0, -1.35), (0.25, -1.2))):                    # tassel
+        sc.add(between('cyl', add(c, _P(sc, 0, -0.5)), add(c, _P(sc, dx, dy)), (0.05,), 'leather', None, (0, 0, 1)))
+    img = sc.render()
+    fx.glint(img, 17, 17, 2)
+    return img

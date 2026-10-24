@@ -139,3 +139,40 @@ provisions  : start each run with level × (1500 gold, 400 wood, 400 stone)
 | 10 | 31 | 45 | 55 |
 
 Conservation rule used by the save check: `legacyPoints + Σ shop spending = legacyEarned`, and `rebirths = 0` implies `legacyEarned = 0` ([07 §3](07-security-and-exploits.md)). More tables in [generated/balance-tables.md](generated/balance-tables.md).
+
+## 10. Combat, monsters and items
+
+```
+maxHp        = round(85 + characterStats.hp + Σ gear maxHp + set bonus)         COMBAT.baseHp   (101 at the start)
+damage/click = max(1, weapon damage)                                            Wooden Sword 2, Rattatui Fang Blade 3 (COMBAT.maxWeaponDamage)
+hit taken    = max(1, round(attack × (1 − armor / (armor + 40))))               COMBAT.armorK
+regen        = +1 HP/s with no active fight; knockout restores 30 % of max HP
+potion       = +35 HP (not above max), 8 s cooldown shared by all potions in a fight
+rat tier t   : HP = round(100 × 1.5^(t−1))  → 100 / 150 / 225 / 338 / 506
+               attack = round(4 × 1.25^(t−1)) every 2 s → 4 / 5 / 6 / 8 / 10
+tier         = min(5, 1 + floor(age / 1800 s))                                  age counts only while not being fought
+rewards      : rewardSec = 90 × 1.5^(t−1)
+               gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))
+               xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
+drops        : Rattatui piece 8 % + 1 % per tier above 1; potion 25 % + 3 % per tier   (tier 1: 90 s of income, tier 5: ~456 s)
+spawn        : first rat 120 s after 5 owned tiles, then 900 s; max 8; Rat King check every 600 s of age after tier 5 (7200 s), 35 %
+Rat King     : 1000 HP, attack 5 every 3.5 s, 60 s limit (a starter-kit player takes ~85 damage in that minute)
+king invariant: (8 + 5/s × 60 s) clicks × 3 damage = 924 < 1000
+```
+
+| Rattatui piece | Slot | Rarity | Armor | Max HP | Damage |
+| --- | --- | --- | --- | --- | --- |
+| Cap | head | uncommon | 3 | 4 | |
+| Shoulderpads | shoulder | uncommon | 3 | 3 | |
+| Tunic | chest | rare | 6 | 8 | |
+| Gloves | hands | uncommon | 2 | 2 | |
+| Trousers | legs | uncommon | 4 | 5 | |
+| Boots | feet | uncommon | 2 | 3 | |
+| Amulet | neck | rare | | 8 | |
+| Cloak | cape | uncommon | 2 | 3 | |
+| Ring (x2) | ring | rare | | 5 | |
+| Charm | charm | epic | 2 | 10 | |
+| Fang Blade | weapon | rare | | | 3 |
+| Buckler | shield | rare | 5 | 4 | |
+
+Set bonus: 6 pieces +10 Max HP, 13 pieces +15 Max HP more (both rings count). Everything above lives in `src/config/combatConfig.ts` and `src/config/itemCatalog.ts`.

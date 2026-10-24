@@ -1,3 +1,4 @@
+import { CASTLE_FORTRESS } from '@/config/gameConfig';
 import type { Tile } from '@/types/game';
 
 /**
@@ -53,6 +54,7 @@ function variantFor(x: number, y: number, piece: BlendPiece): number {
 /** The ground an owned tile is drawn with; null when it is not owned. */
 export function groundOf(tile: Tile | undefined): string | null {
 	if (!tile || !tile.isOwned) return null;
+	if (tile.biome === 'castle' && (tile.level ?? 1) >= CASTLE_FORTRESS.fromLevel) return 'yard'; // the fortress stands on cobbles
 	return tile.biome === 'grounds' && tile.building && (tile.level ?? 1) > 1 ? 'yard' : tile.biome;
 }
 

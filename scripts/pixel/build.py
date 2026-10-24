@@ -29,8 +29,10 @@ import sprites_castle  # noqa: E402
 import sprites_characters  # noqa: E402
 import sprites_equipment  # noqa: E402
 import sprites_farm  # noqa: E402
+import sprites_fortress  # noqa: E402
 import sprites_map  # noqa: E402
 import sprites_menu  # noqa: E402
+import sprites_monsters  # noqa: E402
 import sprites_meadow  # noqa: E402
 import sprites_props  # noqa: E402
 import sprites_resources  # noqa: E402
@@ -50,14 +52,18 @@ SPRITES = {
     'equip_chest': sprites_equipment.chest, 'equip_mainHand': sprites_equipment.mainhand,
     'equip_offHand': sprites_equipment.offhand, 'equip_legs': sprites_equipment.legs,
     'equip_feet': sprites_equipment.feet, 'equip_ring': sprites_equipment.ring,
+    'equip_shoulder': sprites_equipment.shoulder, 'equip_hands': sprites_equipment.hands,
+    'equip_cape': sprites_equipment.cape, 'equip_charm': sprites_equipment.charm,
     **sprites_characters.SPRITES,
     **sprites_animals.SPRITES,
     **sprites_farm.SPRITES,
     **sprites_meadow.SPRITES,
     **sprites_map.SPRITES,
     **sprites_castle.SPRITES,
+    **sprites_fortress.SPRITES,
     **sprites_buildings.SPRITES,
     **sprites_menu.SPRITES,
+    **sprites_monsters.SPRITES,
 }
 
 UI = {
@@ -227,6 +233,8 @@ def main():
         gold_shine().save(os.path.join(PUB, 'icons', 'gold_shine.png'))
     if not only or 'castle_6_anim' in only:
         sprites_castle.sheet_max().save(os.path.join(PUB, 'icons', 'castle_6_anim.png'))
+    if not only or 'castle_keep_anim' in only:
+        sprites_fortress.keep_sheet().save(os.path.join(PUB, 'icons', 'castle_keep_anim.png'))
     if not only or 'castle_loading' in only:
         # loading screen: the castle growing through its six levels (48px cells)
         cells = Image.new('RGBA', (48 * 6, 48), (0, 0, 0, 0))
