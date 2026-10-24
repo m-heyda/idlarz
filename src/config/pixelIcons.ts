@@ -25,6 +25,8 @@ export const PIXEL_ICON_SIZES = {
 	menu_legacy: [40, 40],
 	menu_main: [40, 40],
 	menu_stats: [40, 40],
+	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
+	water_ripple_swamp: [96, 5], // 8 frames of 12x5
 	level_orb: [24, 24],
 	xp: [40, 40],
 	bonus_chest: [32, 32], // the chest alone, for toasts and tooltips

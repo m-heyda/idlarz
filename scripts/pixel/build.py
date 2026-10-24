@@ -31,6 +31,7 @@ import sprites_farm  # noqa: E402
 import sprites_fortress  # noqa: E402
 import sprites_map  # noqa: E402
 import sprites_menu  # noqa: E402
+import sprites_water  # noqa: E402
 import sprites_monsters  # noqa: E402
 import sprites_meadow  # noqa: E402
 import sprites_props  # noqa: E402
@@ -68,6 +69,7 @@ SPRITES = {
     **sprites_fortress.SPRITES,
     **sprites_buildings.SPRITES,
     **sprites_menu.SPRITES,
+    **sprites_water.SPRITES,
     **sprites_monsters.SPRITES,
 }
 

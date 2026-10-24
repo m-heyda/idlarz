@@ -159,6 +159,45 @@ def tile_sprites(m, g, x, y):
     return out
 
 
+def _overlaps(a, b, margin):
+    return a[0] < b[2] + margin and b[0] < a[2] + margin and a[1] < b[3] + margin and b[1] < a[3] + margin
+
+
+def tile_decor(m, g, x, y, props):
+    """Tiny decorations (flowers on plains, fallen trees on swamps): a second hash pass that never moves the props.
+    `props` are this tile's prop placements; decor keeps clear of them and of the neighbouring grounds."""
+    me = at(g, x, y)
+    table = (m.get('decor') or {}).get(me)
+    if not table:
+        return []
+    d = depth(g, x, y)
+    probs = table['deep'] if d else table['edge']
+    roll = hash32(x, y, 700) % 1000
+    count, acc = len(probs) - 1, 0
+    for i, p in enumerate(probs):
+        acc += p
+        if roll < acc:
+            count = i
+            break
+    opts = [o for o in table['opts'] if d >= o[2]]
+    boxes = [(px - x * CELL, bottom - m['sprites'][pid][3] - y * CELL, px - x * CELL + m['sprites'][pid][2], bottom - y * CELL)
+             for pid, px, bottom in props]
+    out = []
+    for k in range(count):
+        o = _pick(opts, hash32(x, y, 710 + k))
+        sw, sh = m['sprites'][o[0]][2], m['sprites'][o[0]][3]
+        for attempt in range(6):
+            px = 2 + hash32(x, y, 720 + k * 7 + attempt) % (CELL - sw - 4)
+            py = 2 + hash32(x, y, 760 + k * 7 + attempt) % (CELL - sh - 4)
+            box = (px, py, px + sw, py + sh)
+            if any(_overlaps(box, b, 2) for b in boxes) or not fits(g, x, y, box, 3, me):
+                continue
+            boxes.append(box)
+            out.append((o[0], x * CELL + px, y * CELL + py + sh))
+            break
+    return out
+
+
 def dock_at(m, g, x, y):
     """A pier (sometimes with a boat) on a lake tile with exactly one land side; only a local maximum of the roll."""
     def eligible(tx, ty):
@@ -231,5 +270,6 @@ def all_sprites(m, g, built=None):
     items = []
     for y in range(len(g)):
         for x in range(len(g[0])):
-            items += ([] if built and (x, y) in built else tile_sprites(m, g, x, y)) + dock_at(m, g, x, y)
+            props = [] if built and (x, y) in built else tile_sprites(m, g, x, y)
+            items += props + ([] if built and (x, y) in built else tile_decor(m, g, x, y, props)) + dock_at(m, g, x, y)
     return sorted(items, key=lambda it: (it[2], it[1]))

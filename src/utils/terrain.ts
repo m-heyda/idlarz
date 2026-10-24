@@ -44,6 +44,8 @@ export interface TerrainAtlas {
 	square: string[];
 	sprites: Record<string, [number, number, number, number]>; // id -> x, y, w, h in props.png
 	props: Record<string, PropTable>;
+	decor?: Record<string, PropTable>; // tiny second-pass decorations (flowers, fallen trees)
+	water?: { swamp?: [number, number][][] }; // ripple spots inside swamp pools, per 48px block of the 4x4 texture
 }
 export const ATLAS = atlasJson as unknown as TerrainAtlas;
 
@@ -276,6 +278,51 @@ export function tileSprites(g: GroundGrid, x: number, y: number, m: TerrainAtlas
 	return out;
 }
 
+const overlaps = (a: number[], b: number[], margin: number) =>
+	a[0] < b[2] + margin && b[0] < a[2] + margin && a[1] < b[3] + margin && b[1] < a[3] + margin;
+
+/**
+ * Tiny decorations (flowers on plains, fallen trees on swamps): a second hash pass that never moves the props.
+ * `props` are this tile's prop placements; decor keeps clear of them and of the neighbouring grounds.
+ */
+export function decorSprites(g: GroundGrid, x: number, y: number, props: Placed[], m: TerrainAtlas = ATLAS): Placed[] {
+	const me = at(g, x, y);
+	const table = me ? m.decor?.[me] : undefined;
+	if (!me || !table) return [];
+	const d = depth(g, x, y);
+	const probs = d ? table.deep : table.edge;
+	const roll = hash32(x, y, 700) % 1000;
+	let count = probs.length - 1;
+	let acc = 0;
+	for (let i = 0; i < probs.length; i++) {
+		acc += probs[i];
+		if (roll < acc) {
+			count = i;
+			break;
+		}
+	}
+	const opts = table.opts.filter((o) => d >= o[2]);
+	const boxes = props.map((p) => {
+		const [, , w, h] = m.sprites[p.id];
+		return [p.x - x * CELL, p.bottom - h - y * CELL, p.x - x * CELL + w, p.bottom - y * CELL];
+	});
+	const out: Placed[] = [];
+	for (let k = 0; k < count; k++) {
+		const o = pick(opts, hash32(x, y, 710 + k));
+		const [, , sw, sh] = m.sprites[o[0]];
+		for (let attempt = 0; attempt < 6; attempt++) {
+			const px = 2 + (hash32(x, y, 720 + k * 7 + attempt) % (CELL - sw - 4));
+			const py = 2 + (hash32(x, y, 760 + k * 7 + attempt) % (CELL - sh - 4));
+			const box = [px, py, px + sw, py + sh];
+			if (boxes.some((b) => overlaps(box, b, 2)) || !fits(g, x, y, box, 3, me)) continue;
+			boxes.push(box);
+			out.push({ id: o[0], x: x * CELL + px, bottom: y * CELL + py + sh });
+			break;
+		}
+	}
+	return out;
+}
+
 /** A pier (sometimes with a boat) on a lake tile with exactly one land side; only a local maximum of the roll. */
 export function dockAt(g: GroundGrid, x: number, y: number, m: TerrainAtlas = ATLAS): Placed[] {
 	const eligible = (tx: number, ty: number): [number, number, string] | null => {
@@ -337,6 +384,10 @@ export function builtSet(tiles: Tile[][] | undefined): Set<string> {
 export function allSprites(g: GroundGrid, m: TerrainAtlas = ATLAS, built?: Set<string>): Placed[] {
 	const items: Placed[] = [];
 	for (let y = 0; y < g.length; y++)
-		for (let x = 0; x < g[0].length; x++) items.push(...(built?.has(`${x},${y}`) ? [] : tileSprites(g, x, y, m)), ...dockAt(g, x, y, m));
+		for (let x = 0; x < g[0].length; x++) {
+			const skip = built?.has(`${x},${y}`);
+			const props = skip ? [] : tileSprites(g, x, y, m);
+			items.push(...props, ...(skip ? [] : decorSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
+		}
 	return items.sort((a, b) => a.bottom - b.bottom || a.x - b.x);
 }

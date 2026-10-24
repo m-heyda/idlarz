@@ -93,6 +93,10 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
     islet and ice floes in the fog sea. Placed deterministically by hash (`terrain_logic.py` = `src/utils/terrain.ts`), never one per
     tile: edge tiles get fewer, interiors more, and a sprite keeps clear of neighbouring grounds. Outlines are 1px of a darker tone
     of the sprite's own colour, 3-tone shading lit from the top-left, crisp leaf speckle.
+  - *Decor* (second hash pass, `tile_decor` = `decorSprites`, so the props above never move): tiny bare 3x4 flowers (white, yellow, pink, violet) and grass tufts
+    on plains, fallen grey-brown dead trees (16x7 / 22x8, pale cut end, a patch of moss) on swamps. They keep clear of props, buildings and neighbouring grounds.
+  - *Water ripples* (`sprites_water.py`, `WaterLayer.tsx`): an 8-frame ring that opens, breaks up and rests (`water_ripple` 16x6 on open lake, `water_ripple_swamp` 12x5 on
+    deep-swamp pools found in the texture), hard alpha, no outline, stepped CSS, placed by hash and culled to the screen; off with Settings > Life on the map or reduced motion.
   - *Unexplored land*: buyable tiles form a dark navy "sea" ring (the lowest terrain layer) with a bubbly edge, scattered rocks and
     ice floes, and a quiet slate-blue "?" (11x14, 80% opacity) that brightens on hover. Farther tiles show only the drifting fog.
   - *Fog of war*: chunky low-res clouds (48px/64px art shown at 3x, 3 flat alpha bands, no outlines, no dither), two layers
@@ -137,17 +141,20 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   a **buy card** (owned/limit, yield, Buy / x10 / Max) above it; unowned = pale silhouette with price tag. A stats readout sits top-left, the upgrade shelf along the bottom (collapsible).
 - **Level-up** (`LevelUpNotification.tsx`): white flash, pixelated god-rays (SVG block filter, 6px grid), orb pop, stepped
   shockwave rings, crimson banner (`banner_left/mid/right`, 3x) with dropping letters, spark burst, points earned.
-- **Header**: cracked-stone bar, bronze/iron edge with rivets, 48px slot frames (active glows gold), ornamental divider,
-  slim bronze XP bar, twinkling coin.
+- **Header**: one compact row on the cracked-stone bar with the bronze/iron edge: player card (48px portrait frame, name, purple level orb,
+  96px bronze XP bar), then every currency as a small chip (24px icon = the 40px sprite at 0.6, value over rate; eggs/milk/hide and Gems only appear
+  once you have them), then three 48px slot buttons (Menu = maroon journal with a gold sigil and purple orb, Legacy, Settings; active glows gold).
+  Chips wrap to a second row when narrow; the real height is published as `--header-h`. Twinkling coin.
 - **Backgrounds**: cracked dark stone tile (`bg/crack.png`) for header/modals. Fog drift distance must equal one tile period.
 
 ## UI kit (windows, dialogs, tooltips)
 - **Font**: Mozilla Headline (`@fontsource-variable/mozilla-headline`, CSS var `--font-pixel`); Tailwind text scale is nudged up
-  one notch in `globals.css` (`@theme`). `NotifyDot` (green pulsing dot) is the universal "needs attention" marker. Never use sub-12px text.
+  one notch in `globals.css` (`@theme`). `NotifyDot` (orange pulsing dot) is the universal "needs attention" marker (header buttons and the Menu tabs). Never use sub-12px text.
 - **Modal shell** (`PixelModal.tsx`): bronze 9-slice frame over the cracked-stone tile, ornamented title bar, red pixel
   close button hanging off the corner, Esc/backdrop dismiss, backdrop under the header (z-45). Sizes: `sm` 440
   (confirmations), `md` 760 (pickers), `lg` 1080 x full height (Character, Statistics, Merchant, Farm).
-  **Do not hand-roll modals.**
+  **Do not hand-roll modals.** A window with several areas uses `PixelTabs` (`.px-tabbar`: bevelled stone tabs on a bronze baseline, the active one raised and joined to the panel,
+  20px icon + label, arrow keys, label hidden under 760px) through the `tabs` slot: the Menu window holds Character, Stats, Merchant and Farm, only the active tab mounted.
 - **Panels/cards** `.px-panel` / `.px-card`; headings `.px-h`; buttons `.px-btn` (+ `-gold/-red/-blue/-gray/-sm`) with
   stepped corners and a 2px bevel; `.px-tab`, `.px-range`, `.px-input`. Palette: parchment `#d8c8a0`, muted `#a89878`,
   gold `#f0d27a`.

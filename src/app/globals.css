@@ -353,6 +353,17 @@ body {
 	.px-float {
 		animation: none;
 	}
+
+	.px-ripple {
+		display: none;
+	}
+}
+
+/* Water ripples on lakes and swamp pools (WaterLayer): the generic stepped sheet, placed on the map by the layer */
+.px-ripple {
+	position: absolute;
+	z-index: 1;
+	pointer-events: none;
 }
 
 .castle-tile {

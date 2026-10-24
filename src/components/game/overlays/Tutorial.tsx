@@ -63,7 +63,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Game Basics</h3>
 				<p className='text-[#d8c8a0]'>
 					Grow your realm: buy tiles next to your territory, upgrade the castle, farm animals, trade with the
-					merchant and spend stat points. Everything produces resources every second, even while you are
+					merchant and spend stat points. The journal button in the top bar opens the Menu: Character, Stats, Merchant and Farm are its tabs. Everything produces resources every second, even while you are
 					away from the keyboard (the tab must stay open). Progress is saved automatically in this browser.
 				</p>
 			</section>
@@ -192,7 +192,7 @@ const Tutorial: React.FC = () => {
 					))}
 				</div>
 				<p className='text-[#a89878] text-xs mt-2'>
-					While the Farm window is open, a critter wanders by now and then: click it for a gift worth about{' '}
+					While the Farm tab of the Menu is open, a critter wanders by now and then: click it for a gift worth about{' '}
 					{FARM_BONUS.critters.butterfly.seconds} seconds of that resource&apos;s income.
 				</p>
 			</section>
