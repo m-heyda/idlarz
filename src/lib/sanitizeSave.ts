@@ -3,6 +3,7 @@ import {
 	ANIMALS,
 	BIOMES,
 	BUILDINGS,
+	BUILDING_COST,
 	CASTLE_UPGRADE,
 	CHEST,
 	CLICK_LADDER,
@@ -159,24 +160,22 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 
 			const tile: Tile = { biome: t.biome, isOwned: true };
 			if (t.biome === 'castle') {
+				if (t.building !== undefined) return fail('building on the castle');
 				const level = int(t.level, 1, CASTLE_UPGRADE.maxLevel);
 				if (level === null) return fail('castle level');
 				tile.level = level;
 				if (level < CASTLE_UPGRADE.maxLevel) {
 					tile.upgradeCost = { ...CASTLE_UPGRADE.upgradeCosts[level - 1] };
 				}
-			} else if (t.biome === 'grounds') {
-				const building = t.building;
-				if (building !== undefined) {
-					if (typeof building !== 'string' || !(building in BUILDINGS)) return fail('building');
-					if (t.level !== 2) return fail('building level');
-					tile.level = 2;
-					tile.building = building;
-				} else if (t.level !== undefined) {
-					return fail('grounds level');
-				}
-			} else if (t.level !== undefined || t.building !== undefined) {
-				return fail('level on non-grounds tile');
+			} else if (t.building !== undefined) {
+				// a building stands on any biome except water (BUILDING_COST.blockedBiomes); only old Grounds saves carry `level: 2`
+				if (typeof t.building !== 'string' || !(t.building in BUILDINGS)) return fail('building');
+				if (BUILDING_COST.blockedBiomes.includes(t.biome)) return fail('building on a tile that cannot take one');
+				if (t.biome === 'grounds' ? t.level !== undefined && t.level !== 2 : t.level !== undefined) return fail('building level');
+				if (t.level === 2) tile.level = 2;
+				tile.building = t.building;
+			} else if (t.level !== undefined) {
+				return fail('level without a building');
 			}
 			if (t.hasChest !== undefined) {
 				if (t.hasChest !== true || t.biome === 'castle') return fail('chest');

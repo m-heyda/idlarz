@@ -28,7 +28,7 @@ The order follows leverage and risk — remove the exploit-like multipliers firs
 | 2 | **Meat 15 → 1 gold**, animals **stack** (each purchase adds one animal) | removes the gold fountain (2) and makes later animal purchases matter |
 | 3 | **Castle**: costs ×10, **timed builds** (1 h … 72 h, tick-counted), castle XP bonus implemented | the finish line can no longer be bought in one go (3); timers survive clock edits |
 | 4 | **Tiles**: cost curve ×1.45/tile to 20, ×1.27 to 40, ×1.17 after (was ×1.42 everywhere, tile 40 = 95 M → 10.8 M), **extra wood/stone/coal/food from larger territories**, biome yield ×1.3 | tiles stay a meaningful long-term sink and finally give wood/stone/coal/food a use (4, 5) |
-| 5 | **Buildings cost resources** (×1.6 each), Blacksmith 0.1 → 0.07 | a choice instead of a free pick |
+| 5 | **Buildings cost resources** (×1.6 each, later replaced by the cheap-start three-stage curve in [03](03-formulas-and-scaling.md)), Blacksmith 0.1 → 0.07 | a choice instead of a free pick |
 | 6 | **Chest timer pauses at the cap**, reward 10–60 min, +0.5 %/Luck; **farm critters** 45 s → ~10 s gifts, 20–40 s apart, one at a time, real clicks only | removes two easy bonuses (6) |
 | 7 | **T1**: the hidden +10 % gold / +25 % XP modifier removed (modifiers start at 0); castle output has a single source of truth | honest numbers; part of the intended slowdown |
 | 8 | **Clock/offline safety** (monotonic time, tick clamp), validated actions, encrypted IndexedDB saves ([07](07-security-and-exploits.md)) | closes the cheap exploits so the new pacing means something |
@@ -94,3 +94,10 @@ Hardcore bot, game time (3 seeds, median and range). The unchanged game (re-meas
 A 6-seed check to day 70 gave castle 6 at 23.4 d against 22.2 d and castle 8 at 45.6 d against 41.6 d, so most of the early gap is seed noise; the new mechanics add roughly 8-10 % to income in the late game (the same run with every new mechanic switched off, `--set=` overrides, reached castle 10 at 68.8 d). That is inside the 10-15 % budget for this round, and the dedicated player now needs a bit under 10 weeks for castle 10 (the earlier target was 70-100 d, and the table in section 4 was measured before the free starting ring). If it needs to slow down again, lower `FARM_UPGRADES.*.effectPerLevel` first, then the product sell prices in `MERCHANT_RESOURCE_PRICES`.
 
 Rebirth, same bots: the second run reaches castle 6 in 14.2 d after a first run of 21.5 d (66 %), and in 7.3 d after a castle-10 first run.
+
+## Update: right-click buildings
+
+Buildings moved from Grounds lots to any explored tile (cheap first four, then three-stage growth, see [03](03-formulas-and-scaling.md)). The bot now builds on the first free explored tile
+whenever it has 3x the gold. One seed per profile, compared with the earlier 3-seed medians: castle 6 at 26 d idle (was 25 d), 23.5 d casual (28 d), 19.5 d hardcore (21.5 d),
+the autoclicker profile 15.9 d (26 d); castle 10 at 83 d idle (82 d) and 65 d hardcore (63 d). Pacing stays within about 10 % except for the auto-clicker profile, which now has
+more to spend its gold on; the long tail (castle 7-10) is unchanged.

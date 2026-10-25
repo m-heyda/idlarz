@@ -22,9 +22,11 @@ import {
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
 } from '@/config/gameConfig';
+import { COMBAT, MONSTERS } from '@/config/combatConfig';
+import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatNumber, formatTime } from '@/utils/formatters';
-import { castleModifier } from '@/utils/gameUtils';
+import { buildingCostFactor, castleModifier } from '@/utils/gameUtils';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
 
@@ -45,7 +47,10 @@ const Res: React.FC<{ r: string; children?: React.ReactNode }> = ({ r, children 
 );
 
 const Tutorial: React.FC = () => {
-	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty');
+	// Grounds, the old building lot, is no longer part of a new map (buildings go on any tile)
+	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty' && b.name !== 'grounds');
+	const buildingBase = BUILDING_COST.base;
+	const buildingExamples = [0, 1, 2, 3, 4, 8, 16, 32].map((n) => ({ n, gold: Math.floor((buildingBase.gold ?? 0) * buildingCostFactor(n)) }));
 	const castleStart = castleModifier(1);
 	const castleAtDoublingEnd = castleModifier(CASTLE_UPGRADE.doublingUntil);
 	const castleMax = castleModifier(CASTLE_UPGRADE.maxLevel);
@@ -74,8 +79,9 @@ const Tutorial: React.FC = () => {
 					You start with the castle and its eight neighbours already yours. Every tile you buy becomes a biome and
 					produces resources per second. Same-biome neighbours boost each other by +{pct(SCALING_CONFIG.adjacencyBonus)} per
 					neighbour (up to four). New land tends to continue the biome next to it, so areas grow into forests, lakes and ridges.
-					Every 4th purchase lets you choose the biome instead of rolling one - but some biomes are blocked by their neighbours
-					(Tundra never touches Swamp or Coast, Hills never touch Coast, Coast needs water) or unlock later (Swamp, Tundra).
+					The biome is rolled when you buy the tile, and some biomes are blocked by their neighbours (Tundra never touches Swamp
+					or Coast, Hills never touch Coast, Coast needs water) or unlock later (Swamp, Tundra). Right-click any explored tile to
+					build on it (see Buildings).
 				</p>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
 					{biomes.map((b) => (
@@ -98,18 +104,29 @@ const Tutorial: React.FC = () => {
 									Each Plains tile also adds +{pct(stat.plainsMeatModifier)} to meat production.
 								</p>
 							)}
-							{b.name === 'grounds' && (
-								<p className='text-[#a89878] text-xs mt-1'>
-									Click it once to build one permanent building (they cost resources, and each one costs
-									more than the last: from {Object.entries(BUILDING_COST.base).map(([r, v]) => `${short(v as number)} ${r}`).join(', ')}, x
-									{BUILDING_COST.growth} each).
-								</p>
-							)}
 						</div>
 					))}
 				</div>
-				<p className='text-[#a89878] text-xs mt-2'>
-					Buildings: {Object.values(BUILDINGS).map((b) => b.label).join(', ')}.
+			</section>
+
+			<section>
+				<h3 className='px-h'>Buildings</h3>
+				<p className='text-[#d8c8a0] mb-2'>
+					<b>Right-click</b> any explored tile (not the castle, not a lake, and not while a chest or a monster is on it) to open the build
+					menu. Pick one of {Object.keys(BUILDINGS).length} buildings: {Object.values(BUILDINGS).map((b) => b.label).join(', ')}. The tile
+					keeps its biome and its output and the building adds its own on top, with the same neighbour bonus; a patch in the
+					style of the biome (packed earth, trampled snow, a plank landing ...) is laid under it. One building per tile, and it is permanent.
+				</p>
+				<p className='text-[#d8c8a0] mb-1'>
+					Every building costs more than the last. The first {BUILDING_COST.starter.length} are cheap (
+					{BUILDING_COST.starter.map((f) => `x${f}`).join(', ')} of the base price of{' '}
+					{Object.entries(buildingBase).map(([r, v]) => `${short(v as number)} ${r}`).join(', ')}), then the price grows x
+					{BUILDING_COST.growthEarly} per building for {BUILDING_COST.earlyCount} buildings, x{BUILDING_COST.growthMid} for the next{' '}
+					{BUILDING_COST.midCount} and x{BUILDING_COST.growthLate} after that (the same three-stage shape as tile prices).
+				</p>
+				<p className='text-[#a89878] text-xs px-card font-mono'>
+					gold for building number: {buildingExamples.map((e) => `${e.n + 1}: ${short(e.gold)}`).join(' - ')} (wood and stone
+					scale the same way; Legacy Thrift lowers it)
 				</p>
 			</section>
 
@@ -142,7 +159,7 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#a89878] mt-1'>
 					Fast clicking is fine: you can click up to {CLICK_LIMIT.capacity} times in a burst and about{' '}
 					{CLICK_LIMIT.refillPerSec} times per second sustained. Faster than that, clicks made by scripts or
-					auto-clickers, and clicks on menus or buttons do not pay.
+					auto-clickers, and clicks on menus or buttons do not pay. Fight clicks have no such limit (see Monsters &amp; Fighting).
 				</p>
 			</section>
 
@@ -157,6 +174,71 @@ const Tutorial: React.FC = () => {
 					castle keeps its current bonus while it is being built. From level 2 it also produces +
 					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1.
 				</p>
+			</section>
+
+			<section>
+				<h3 className='px-h'>Monsters &amp; Fighting</h3>
+				<p className='text-[#d8c8a0] mb-2'>
+					Once you own {COMBAT.spawn.minOwnedTiles} tiles, a <b>rat</b> appears on one of them after{' '}
+					{formatTime(COMBAT.spawn.firstSec)}, then another every {formatTime(COMBAT.spawn.intervalSec)} (up to{' '}
+					{COMBAT.maxMonsters} on the map). A rat grows a tier every {formatTime(COMBAT.tierIntervalSec)} on the map (up to tier{' '}
+					{COMBAT.maxTier}): more HP ({MONSTERS.rat.hp} at tier 1, x{MONSTERS.rat.hpGrowth} per tier), harder hits and better rewards. A tier-{COMBAT.maxTier} rat
+					can grow into the <b>Rat King</b> ({pct(MONSTERS.ratKing.evolveChance)} every {formatTime(MONSTERS.ratKing.evolveCheckSec)}; only one at a time).
+					Click a monster to fight it.
+				</p>
+				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
+					<li>
+						Every click in the fight hits for your gear&apos;s Damage. <b>There is no click-speed limit</b> in fights: fast clicking is a
+						skill (only real clicks count). A click can <b>crit</b> (x{COMBAT.crit.mult}) with your Crit chance - Dexterity and Charisma
+						plus gear - and a crit can become a <b>super crit</b> (x{COMBAT.crit.superMult}) with {COMBAT.crit.superBase}% plus the gear&apos;s Super Crit.
+					</li>
+					<li>
+						The monster hits back on a timer; Armor reduces every hit (armor / (armor + {COMBAT.armorK})). Your HP is about{' '}
+						{COMBAT.baseHp + 16} at the start, regenerates {COMBAT.regenPerSec} HP/s outside fights (gear Regen adds to that and also heals in
+						fights) and at 0 you are knocked out with {pct(COMBAT.knockoutHpFraction)} HP back; nothing is lost. Fleeing resets the monster.
+					</li>
+					<li>
+						Potions (hotkeys 1-3 in a fight, a shared {COMBAT.potionCooldownSec}s cooldown) heal 35 or 90 HP and work outside fights too.
+					</li>
+					<li>
+						Winning pays gold and XP worth some seconds of your income, plus a chance of gear and potions. Rats drop wood, cloth and, from
+						older rats, steel and obsidian gear. The <b>Rat King</b> ({MONSTERS.ratKing.hp} HP, a {MONSTERS.ratKing.timeLimitSec}s time limit) is hard: he needs real
+						gear and quick clicking. He always drops a piece of the epic Rattatui set (the only place to get it), sometimes a second one or a legendary weapon, and potions.
+					</li>
+				</ul>
+			</section>
+
+			<section>
+				<h3 className='px-h'>Gear &amp; Items</h3>
+				<p className='text-[#d8c8a0] mb-2'>
+					The Character window has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
+					and a 36-slot bag. Double-click or right-click a bag item to equip it (or drink a potion), click gear to take it off, drag to
+					rearrange. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
+					hover for a tooltip.
+				</p>
+				<div className='flex flex-wrap gap-x-4 gap-y-1 mb-2 text-xs'>
+					{RARITY_ORDER.map((r) => (
+						<span key={r} style={{ color: RARITIES[r].color }}>
+							{RARITIES[r].label}
+						</span>
+					))}
+				</div>
+				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
+					<li>
+						<b>Sets</b>: wear several pieces of one set for bonuses (both rings count):{' '}
+						{Object.values(SETS).map((set) => `${set.label} (${Object.keys(set.bonuses).join(' / ')} pieces)`).join(', ')}.
+					</li>
+					<li>
+						Wood and leather (common) and Apprentice cloth (common, more HP, regen and luck) drop from rats and chests; Knight&apos;s steel
+						(uncommon) comes from older rats and chests, and the merchant sells some pieces; Obsidian (rare) needs tier-5 rats or a good
+						chest; the Rattatui set (epic) is the Rat King&apos;s; legendary weapons are very rare finds.
+					</li>
+					<li>
+						Weapons come in many types - swords, maces, mauls, axes, daggers, spears, bows, crossbows, staves and wands. Maces and mauls hit
+						hardest, bows and daggers crit more, staves and wands trade damage for regen and luck.
+					</li>
+					<li>Chests, rats and the Rat King drop items; the merchant buys spare gear for gold.</li>
+				</ul>
 			</section>
 
 			<section>
@@ -202,7 +284,7 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-2'>
 					Sell resources, farm products and spare gear from your bag for gold; buying resources costs{' '}
 					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. Buy Goods has
-					click power, permanent bonuses (Haggler, Bulk Discount, Lucky Charm, Pack Rat) and plain gear and potions.
+					click power, permanent bonuses (Haggler, Bulk Discount, Lucky Charm, Pack Rat), potions and some leather and steel gear.
 					Rattatui gear is not for sale: the Rat King drops it.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-5 gap-2'>
@@ -255,7 +337,7 @@ const Tutorial: React.FC = () => {
 					XP to leave level N = {BASE_XP_PER_LEVEL} x {XP_GROWTH_FACTOR}^(N-1)
 				</p>
 				<p className='text-[#a89878] mt-1'>
-					XP comes from time (more with the castle and Grounds tiles) and from every tile you buy.
+					XP comes from time (more with the castle and some buildings) and from every tile you buy.
 				</p>
 			</section>
 
@@ -267,6 +349,8 @@ const Tutorial: React.FC = () => {
 					<li>Check what the next castle level needs before spending wood, stone and coal on tiles.</li>
 					<li>Surplus resources can be sold, and missing ones bought, at the merchant.</li>
 					<li>Plains boost meat; a farm is the main way to turn food into gold.</li>
+					<li>Right-click tiles to build: early buildings are cheap, so put the first few where neighbours already boost the tile.</li>
+					<li>Wear a full set for its bonus, and keep a few potions for the Rat King.</li>
 				</ul>
 			</section>
 		</div>

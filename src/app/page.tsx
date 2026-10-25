@@ -10,9 +10,7 @@ import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import NamePrompt from '@/components/game/overlays/NamePrompt';
 import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/gameConfig';
-import { calculateTileCost, economyTiles, effectiveTileDiscount } from '@/utils/gameUtils';
 import GameHeader from '@/components/game/GameHeader';
-import BiomeSelectionDialog from '@/components/game/BiomeSelectionDialog';
 import ChestNotification from '@/components/game/overlays/ChestNotification';
 import FloatingText from '@/components/game/FloatingText';
 import ClassPickerDialog from '@/components/game/ClassPickerDialog';
@@ -41,23 +39,6 @@ export default function Home() {
 	const [showChestNotification, setShowChestNotification] = useState(false);
 	const shownLootRef = useRef<typeof lastChestLoot>(null);
 
-	const biomeSelectionActive = useGameStore((state) => state.biomeSelectionActive);
-	const selectableBiomes = useGameStore((state) => state.selectableBiomes);
-	const selectBiome = useGameStore((state) => state.selectBiome);
-	const cancelBiomeSelection = useGameStore((state) => state.cancelBiomeSelection);
-	const pendingTileCoords = useGameStore((state) => state.pendingTileCoords);
-	const characterStats = useGameStore((state) => state.characterStats);
-	const prestige = useGameStore((state) => state.prestige);
-	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
-	const tiles = useGameStore((state) => state.tiles);
-	const freeTiles = useGameStore((state) => state.freeTiles);
-	const [clickPosition, setClickPosition] = React.useState<{x: number, y: number} | undefined>(undefined);
-	
-	const tileCost = calculateTileCost(
-		economyTiles(tiles, freeTiles),
-		effectiveTileDiscount(characterStats, prestige, merchantUpgrades)
-	);
-
 	useEffect(() => {
 		// Only the owning tab runs the game, and only once the saved game has been loaded
 		if (!isHydrated || tabStatus !== 'owner') return;
@@ -73,22 +54,6 @@ export default function Home() {
 		const interval = setInterval(gameLoop, TICK_RATE);
 		return () => clearInterval(interval);
 	}, [tick, isHydrated, tabStatus]);
-
-	useEffect(() => {
-		if (biomeSelectionActive && pendingTileCoords) {
-			// Get the tile element by its coordinates
-			const tileElement = document.getElementById(`tile-${pendingTileCoords.x}-${pendingTileCoords.y}`);
-			if (tileElement) {
-				const rect = tileElement.getBoundingClientRect();
-				setClickPosition({
-					x: rect.left + rect.width / 2,
-					y: rect.top
-				});
-			}
-		} else {
-			setClickPosition(undefined);
-		}
-	}, [biomeSelectionActive, pendingTileCoords]);
 
 	useEffect(() => {
 		// A new chest result (a fresh object every time one is opened) shows the toast for 3 seconds
@@ -120,16 +85,6 @@ export default function Home() {
 			<TutorialDialog />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}
 			<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
-			{/* Biome Selection Dialog */}
-			{biomeSelectionActive && selectableBiomes && (
-				<BiomeSelectionDialog
-					verdicts={selectableBiomes}
-					onSelect={selectBiome}
-					onCancel={cancelBiomeSelection}
-					cost={tileCost}
-					position={clickPosition}
-				/>
-			)}
 		</main>
 	);
 }

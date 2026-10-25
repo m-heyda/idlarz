@@ -21,7 +21,7 @@ discount%= min(0.5 × Charisma, 25)
 
 Past 40 tiles growth drops from ×1.27 to ×1.17 per tile (`growthEndgame`, `lateTiles`), so tile 50 costs ~51 M instead of 118 M and tile 60 ~0.2 B instead of 1.5 B; the first 40 tiles are unchanged, so the pacing milestones in [06](06-playtest-and-pacing-report.md) still hold.
 
-Biome pick every purchase with `n % 4 === 3`. XP and reputation per purchase in §2.
+Every purchase rolls its biome (no picker). XP and reputation per purchase in §2.
 
 ## 2. XP and levels
 
@@ -188,3 +188,28 @@ and no loadout trivialises him. Rats are basic enemies and are not tuned around 
 
 Items, sets, rarities, stats, drop pools and the merchant stock are generated into [generated/item-catalog.md](generated/item-catalog.md) from `src/catalog`.
 Combat numbers live in `src/config/combatConfig.ts`.
+
+## Building cost
+
+```
+building number n (1-based, `built = n - 1` already stand)   factor(built) =
+  built < 4              : starter[built]                       x0.4, x0.6, x0.8, x1.0     (BUILDING_COST.starter)
+  k = built - 3           : 1.35^min(k, 12) x 1.25^clamp(k - 12, 0, 16) x 1.15^max(k - 28, 0)
+cost (gold / wood / stone) = floor(base x factor x (1 - Thrift))     base = 500 / 250 / 150
+```
+
+| Building | factor | gold |
+| --- | --- | --- |
+| 1 | 0.4 | 200 |
+| 2 | 0.6 | 300 |
+| 3 | 0.8 | 400 |
+| 4 | 1.0 | 500 |
+| 5 | 1.35 | 675 |
+| 10 | 6.05 | 3.0K |
+| 16 | 36.6 | 18.3K |
+| 20 | 89.5 | 44.7K |
+| 32 | 1302 | 651K |
+| 40 | 3982 | 1.99M |
+
+The price follows the tile curve in shape (steep, then gentler, then gentler again) but starts lower, so a building is a fraction of a tile at the same point of the game.
+`src/config/gameConfig.ts` `BUILDING_COST` and `buildingCostFactor` in `src/utils/gameUtils.ts`; `tests/buildOnTile.test.ts` holds the shape.

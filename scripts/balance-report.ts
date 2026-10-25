@@ -41,6 +41,7 @@ import {
 	calculateResourceRates,
 	calculateStatResourceModifiers,
 	calculateTileCost,
+	buildingCostFactor,
 	calculateXpGain,
 	castleModifier,
 	createInitialGrid,
@@ -95,7 +96,7 @@ line();
 line(
 	'`n` = tiles owned *before* the purchase (the castle counts, so the first purchase is n = 1). ' +
 		'Costs are with the starting Charisma (5 -> 2.5% discount). Extra resources are required from the tile counts in `TILE_RESOURCE_COST`. ' +
-		'"Pick" marks purchases where the player chooses the biome (`n % 4 === 3`). XP is before the XP-gain multiplier.'
+		'XP is before the XP-gain multiplier. The biome of every purchase is rolled (there is no biome picker).'
 );
 line();
 {
@@ -107,9 +108,9 @@ line();
 		const extras = TILE_RESOURCE_COST.filter((r) => n >= r.from)
 			.map((r) => `${fmt(c.resources[r.resource] ?? 0)} ${r.resource}`)
 			.join(', ');
-		rows.push([n, fmt(c.gold), fmt(cumulative), extras || '—', fmt(calculateXpGain(n + 1)), n % 4 === 3 ? 'pick' : '']);
+		rows.push([n, fmt(c.gold), fmt(cumulative), extras || '—', fmt(calculateXpGain(n + 1))]);
 	}
-	table(['n', 'gold', 'cumulative gold', 'extra resources', 'XP gained', 'Pick'], rows);
+	table(['n', 'gold', 'cumulative gold', 'extra resources', 'XP gained'], rows);
 }
 
 // ---------------------------------------------------------------------------
@@ -229,7 +230,7 @@ line();
 	line(
 		`Building cost: ${Object.entries(BUILDING_COST.base)
 			.map(([r, v]) => `${fmt(v as number)} ${r}`)
-			.join(', ')} for the first, ×${BUILDING_COST.growth} for each further building.`
+			.join(', ')} as the base price. Building number n costs base × ${[0, 1, 2, 3, 4, 8, 16, 32].map((n) => `${n + 1}: ×${+buildingCostFactor(n).toFixed(2)}`).join(', ')} (first ${BUILDING_COST.starter.length} cheap, then ×${BUILDING_COST.growthEarly} for ${BUILDING_COST.earlyCount}, ×${BUILDING_COST.growthMid} for ${BUILDING_COST.midCount}, ×${BUILDING_COST.growthLate} after).`
 	);
 	line();
 }

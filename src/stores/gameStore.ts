@@ -36,6 +36,7 @@ import {
 	affordableAnimals,
 	animalBatchCost,
 	calculateBuildingCost,
+	canBuildOn,
 	calculateCombatStats,
 	calculateLevel,
 	calculateResourceRates,
@@ -64,7 +65,7 @@ import {
 	subtractBundle,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
-import { biomeVerdicts, rollBiome } from '@/utils/biomeRules';
+import { rollBiome } from '@/utils/biomeRules';
 import { pickChestSpot, rollChestLoot, type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
 import { createHitGuard } from '@/lib/hitGuard';
@@ -73,7 +74,7 @@ import { emitCombat } from '@/lib/combatFx';
 import { addToBag, aggregateStats, equipFromBag, moveSlot, removeFromBag, starterBag, unequip } from '@/lib/inventory';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { rollKillLoot } from '@/lib/loot';
-import { advanceMonsters, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
+import { advanceMonsters, monsterAt, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG, RARITY_ORDER, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
@@ -158,9 +159,6 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		farmUpgrades: {} as Record<string, number>,
 		merchantUpgrades: {} as Record<string, number>,
 		isHydrated: false,
-		biomeSelectionActive: false,
-		pendingTileCoords: null,
-		selectableBiomes: null,
 		freeTiles: STARTER_FREE_TILES,
 		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
 		clickLevel: 0,
@@ -187,7 +185,7 @@ const createGameSlice = (
 	) => void,
 	get: () => GameState
 ) => {
-	/** Shared tail of buyTile / selectBiome: charge, claim the tile, award XP + reputation. */
+	/** Charge, claim the tile, award XP + reputation. */
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = economyTiles(state.tiles, state.freeTiles);
@@ -219,9 +217,6 @@ const createGameSlice = (
 				...state.characterStats,
 				reputation: state.characterStats.reputation + 100,
 			},
-			biomeSelectionActive: false,
-			pendingTileCoords: null,
-			selectableBiomes: null,
 		});
 		return true;
 	};
@@ -382,7 +377,6 @@ const createGameSlice = (
 			if (!Number.isInteger(x) || !Number.isInteger(y)) return false;
 			const target = state.tiles[y]?.[x];
 			if (!target || target.isOwned) return false;
-			if (state.biomeSelectionActive) return false;
 
 			const isAdjacent = neighbours(x, y).some(
 				([ax, ay]) => state.tiles[ay]?.[ax]?.isOwned
@@ -394,48 +388,7 @@ const createGameSlice = (
 			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades));
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
-			// Every 4th tile (3, 7, 11 ... counted as before) the player picks the biome among what the rules allow; payment happens on selection
-			if (owned % 4 === 3) {
-				set({
-					biomeSelectionActive: true,
-					pendingTileCoords: { x, y },
-					selectableBiomes: biomeVerdicts(state.tiles, x, y, purchased),
-				});
-				return true;
-			}
-
 			return completePurchase(x, y, rollBiome(state.tiles, x, y, purchased));
-		},
-
-		selectBiome: (biome: BiomeType) => {
-			const state = get();
-			if (
-				!state.biomeSelectionActive ||
-				!state.pendingTileCoords ||
-				!state.selectableBiomes?.some((v) => v.biome === biome && v.allowed)
-			) {
-				return false;
-			}
-
-			const { x, y } = state.pendingTileCoords;
-			if (!completePurchase(x, y, biome)) {
-				// Could not pay any more: drop the pending selection
-				set({
-					biomeSelectionActive: false,
-					pendingTileCoords: null,
-					selectableBiomes: null,
-				});
-				return false;
-			}
-			return true;
-		},
-
-		cancelBiomeSelection: () => {
-			set({
-				biomeSelectionActive: false,
-				pendingTileCoords: null,
-				selectableBiomes: null,
-			});
 		},
 
 		// Starts the (timed) castle upgrade: resources are paid now, the level changes when the timer ends
@@ -458,17 +411,19 @@ const createGameSlice = (
 			return true;
 		},
 
-		upgradeGroundsTile: (x: number, y: number, buildingType: string) => {
+		// Builds on an explored tile of any biome (not the castle or a lake; one building per tile, nothing on a tile with a chest or a monster).
+		// The tile keeps its biome and its output; the building adds its own. Each building costs more than the last (calculateBuildingCost).
+		buildOnTile: (x: number, y: number, buildingType: string) => {
 			const state = get();
 			const tile = state.tiles[y]?.[x];
-			if (!tile || !tile.isOwned || tile.biome !== 'grounds') return false;
-			if (tile.building || !(buildingType in BUILDINGS)) return false;
+			if (!tile || !canBuildOn(tile) || tile.hasChest || monsterAt(state.monsters, x, y)) return false;
+			if (!(buildingType in BUILDINGS)) return false;
 
 			const cost = calculateBuildingCost(state.tiles, state.prestige);
 			if (!canAffordBundle(state.resources, cost)) return false;
 
 			const updatedTiles = state.tiles.map((row) => [...row]);
-			updatedTiles[y][x] = { ...tile, level: 2, building: buildingType };
+			updatedTiles[y][x] = { ...tile, building: buildingType };
 			const newRates = calculateResourceRates(
 				updatedTiles,
 				state.characterStats,

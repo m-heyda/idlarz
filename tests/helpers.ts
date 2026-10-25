@@ -86,7 +86,6 @@ export const growTo = (n: number) => {
 		if (!target) return;
 		const [tx, ty] = target as [number, number];
 		api().buyTile(tx, ty);
-		if (api().biomeSelectionActive) api().selectBiome('plains');
 	}
 };
 

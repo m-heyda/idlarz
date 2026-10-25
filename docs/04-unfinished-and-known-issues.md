@@ -22,7 +22,7 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 | --- | --- | --- |
 | 🔧 B4 | The castle upgrade is only visible inside the castle dialog and tooltip | add a small timer badge on the castle tile / header |
 | ⚠️ B6 | Chests and tile taps are small next to the rest of the economy | decide whether they should scale with progress ([05](05-balance-backlog-and-roadmap.md)) |
-| ⚠️ B7 | `sim.ts` bots tap tiles, catch map/farm critter gifts and buy Legacy upgrades, but they do not use the class picker, the stat-point allocation is a fixed policy, and their play style (reserve resources for the castle, top up with the merchant) is one reasonable strategy, not the optimum | fine for pacing checks, extend the bot before tuning small effects |
+| ⚠️ B7 | `sim.ts` bots tap tiles, catch map/farm critter gifts and buy Legacy upgrades, but they build on the first free explored tile (round-robin through six buildings), they do not use the class picker, the stat-point allocation is a fixed policy, and their play style (reserve resources for the castle, top up with the merchant) is one reasonable strategy, not the optimum | fine for pacing checks, extend the bot before tuning small effects |
 | 🔧 B8 | Rebirth wipes the character level, stat points and class-bound progress; the class itself is kept | decide with the equipment work (U1) what a rebirth keeps |
 | 🔧 B9 | Rebirth has no confirmation of unspent legacy points beyond the dialog; there is no "undo" or respec of the Legacy shop | add a respec (costs one rebirth) if players complain |
 

@@ -11,7 +11,7 @@ import {
 	BuildingType,
 } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
-import { calculateTileTapYield, castleModifier } from '@/utils/gameUtils';
+import { calculateTileTapYield, canBuildOn, castleModifier } from '@/utils/gameUtils';
 import { formatTime } from '@/utils/formatters';
 import { TILE_TAP } from '@/config/gameConfig';
 import ResourceIcon from './ResourceIcon';
@@ -47,6 +47,7 @@ export const BiomeTooltip = memo(
 		
 		// Get building info if we have one
 		const buildingInfo = building ? BUILDINGS[building as BuildingType] : undefined;
+		const canBuild = x !== undefined && y !== undefined && canBuildOn(tiles[y][x]);
 
 		const adjacentCount = useMemo(() => {
 			if (x === undefined || y === undefined) return 0;
@@ -84,11 +85,11 @@ export const BiomeTooltip = memo(
 					</div>
 				)}
 				
-				{/* Display building info for upgraded grounds */}
-				{biome === 'grounds' && level === 2 && buildingInfo && (
+				{/* The building standing on this tile */}
+				{buildingInfo && (
 					<div className='mb-2 text-purple-300 font-semibold text-xs flex items-start gap-1'>
 						<PixelIcon name={BUILDING_PIXEL_ICONS[buildingInfo.name]} alt='' scale={0.5} className='mt-px' />
-						<span>Grounds level 2 with {buildingInfo.label}</span>
+						<span>{buildingInfo.label} built here</span>
 					</div>
 				)}
 				
@@ -124,7 +125,7 @@ export const BiomeTooltip = memo(
 				})}
 				
 				{/* Display building resource bonuses */}
-				{biome === 'grounds' && level === 2 && buildingInfo && buildingInfo.resourceGeneration && (
+				{buildingInfo && buildingInfo.resourceGeneration && (
 					<>
 						<div className='mt-2 mb-1 text-green-400 text-xs'>
 							Building Bonuses:
@@ -165,10 +166,8 @@ export const BiomeTooltip = memo(
 						Upgrading to level {castleUpgrade.toLevel}: {formatTime(castleUpgrade.remainingSec)} left
 					</div>
 				)}
-				{biome === 'grounds' && (!level || level === 1) && (
-										<div className='text-amber-400 text-xs'>
-										This grounds can be expanded with a building
-									</div>
+				{canBuild && (
+					<div className='text-amber-400 text-xs mt-1'>Right-click to build here</div>
 				)}
 				{adjacentCount > 0 && (
 					<div className='mt-0.5 text-yellow-500 text-xs'>

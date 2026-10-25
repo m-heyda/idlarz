@@ -9,8 +9,8 @@ import type { BagSlot, Resources, Tile } from '@/types/game';
 // ----------------------------------------------------------------------------------------------- placement
 const SIDES4: [number, number][] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
-/** A grounds tile with a building: the building stands on it, so no chest goes there. */
-const isBuilt = (t: Tile) => t.biome === 'grounds' && !!t.building && (t.level ?? 1) > 1;
+/** A tile with a building: the building stands on it, so no chest goes there. */
+const isBuilt = (t: Tile) => !!t.building;
 
 /**
  * Where the next chest goes. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys), no building,

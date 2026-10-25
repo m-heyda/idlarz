@@ -502,7 +502,7 @@ export const MERCHANT_RESOURCE_INFO = fromResources(
 	}
 ) as { [K in MerchantResourceKey]: { label: string; description: string; priceDescription: string } };
 
-// Buildings for grounds tiles
+// Buildings (any explored tile)
 export type BuildingType =
 	| 'farm'
 	| 'mine'
@@ -671,10 +671,19 @@ export const CHEST = {
 	luckRewardBonusPerPoint: 0.01, // each Luck point shifts this share of the gold weight into boost and item chances
 };
 
-// Buildings on Grounds tiles cost resources; each further building costs `growth` times more.
+// Buildings stand on any explored tile (not the castle or a lake) and cost resources; every building costs more than the last.
+// The first few are cheap (`starter` = share of `base` for building 1, 2, 3 ...), then the price grows in three stages the way
+// tile prices do: steeply for the next `earlyCount` buildings, gentler for `midCount` more, gentler again after that.
 export const BUILDING_COST = {
 	base: { gold: 500, wood: 250, stone: 150 } as Partial<Resources>,
-	growth: 1.6,
+	starter: [0.4, 0.6, 0.8, 1] as number[],
+	growthEarly: 1.35,
+	earlyCount: 12,
+	growthMid: 1.25,
+	midCount: 16,
+	growthLate: 1.15,
+	/** Biomes a building cannot stand on (water; the castle has its own upgrades) */
+	blockedBiomes: ['lake', 'castle', 'empty'] as string[],
 };
 
 // What each base stat does per point. Used by the maths (gameUtils) AND by every tooltip/tutorial text.

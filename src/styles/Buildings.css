@@ -47,3 +47,65 @@
 		animation: none;
 	}
 }
+
+/* The right-click build menu: each building drawn on a patch of the tile's own biome, with a pad in that biome's style */
+.build-menu {
+	width: min(660px, calc(100vw - 16px));
+	max-width: calc(100vw - 16px); /* wider than a plain tooltip */
+	max-height: calc(100vh - 16px);
+	overflow-y: auto;
+	pointer-events: auto;
+}
+
+.build-menu-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+	gap: 6px;
+	align-items: stretch;
+}
+
+.build-menu-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 6px;
+	text-align: left;
+	cursor: pointer;
+	transition: filter 0.12s;
+}
+
+.build-menu-item:hover:not(:disabled) {
+	filter: brightness(1.25);
+}
+
+.build-menu-item:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.build-menu-patch {
+	position: relative;
+	flex: none;
+	width: 48px;
+	height: 48px;
+	overflow: visible;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+/* the foundation pad: a worked patch of earth under the sprite, whatever the ground is */
+.build-menu-pad {
+	position: absolute;
+	left: 3px;
+	right: 3px;
+	bottom: 4px;
+	height: 26px;
+	border-radius: 50%;
+	background: radial-gradient(closest-side, rgba(104, 76, 44, 0.85) 55%, rgba(60, 40, 22, 0.9) 85%, transparent 100%);
+}
+
+.build-menu-sprite {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	max-width: none;
+}

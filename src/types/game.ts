@@ -254,8 +254,6 @@ export interface TapResult {
 	lucky: boolean;
 }
 
-export type { BiomeVerdict } from '@/utils/biomeRules';
-import type { BiomeVerdict } from '@/utils/biomeRules';
 import type { ChestLoot } from '@/lib/chests';
 
 export interface GameState {
@@ -281,9 +279,6 @@ export interface GameState {
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
 	isHydrated: boolean;
-	biomeSelectionActive: boolean;
-	pendingTileCoords: { x: number; y: number } | null;
-	selectableBiomes: BiomeVerdict[] | null; // what the biome picker offers (blocked ones carry the reason)
 	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
 	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
@@ -302,8 +297,6 @@ export interface GameState {
 	rebirth: () => boolean;
 	buyLegacyUpgrade: (id: LegacyUpgradeId) => boolean;
 	claimCritterGift: (gift: CritterGift, input: ClickInput) => GiftResult | null;
-	selectBiome: (biome: BiomeType) => boolean;
-	cancelBiomeSelection: () => void;
 	upgradeCastle: () => boolean;
 	purchaseAnimal: (animalId: string, count?: number | 'max') => number; // animals bought
 	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;
@@ -311,7 +304,7 @@ export interface GameState {
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
 	sellJunk: (maxRarity: EquipmentRarity) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
-	upgradeGroundsTile: (x: number, y: number, buildingType: string) => boolean;
+	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
 	addStatPoint: (stat: keyof CharacterStats) => void;

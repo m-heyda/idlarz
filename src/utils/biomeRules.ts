@@ -2,7 +2,7 @@ import { BIOMES, BIOME_SPAWN, SPECIAL_SINGLE_TYPE_BIOMES, EMPTY_BIOMES } from '@
 import { BIOME_RULES } from '@/config/biomeRules';
 import type { BiomeType, Tile } from '@/types/game';
 
-/** What the biome picker shows for one biome on one tile. */
+/** Whether a biome may turn up on one tile, and why not. */
 export interface BiomeVerdict {
 	biome: BiomeType;
 	allowed: boolean;
@@ -23,12 +23,12 @@ export function neighbourBiomes(tiles: Tile[][], x: number, y: number) {
 	return { four: pick(SIDES4), eight: pick(SIDES8) };
 }
 
-/** Every biome a purchase can produce (castle and empty are not). */
+/** Every biome a purchase can produce (castle and empty are not; Grounds, the old building lot, no longer turns up: buildings go on any tile). */
 export const SELECTABLE_BIOMES = Object.keys(BIOMES).filter(
-	(name) => !SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) && !EMPTY_BIOMES.includes(name as BiomeType)
+	(name) => !SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) && !EMPTY_BIOMES.includes(name as BiomeType) && name !== 'grounds'
 ) as BiomeType[];
 
-/** Verdict for each selectable biome on tile (x, y) after `purchased` purchases. */
+/** Verdict for each biome a purchase can produce on tile (x, y) after `purchased` purchases. */
 export function biomeVerdicts(tiles: Tile[][], x: number, y: number, purchased: number): BiomeVerdict[] {
 	const { four, eight } = neighbourBiomes(tiles, x, y);
 	const hasWater = eight.some((b) => b === 'lake' || b === 'coast');
