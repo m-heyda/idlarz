@@ -2,6 +2,10 @@ import { BIOMES } from '@/config/gameConfig';
 import type { PlayerClassId } from '@/config/playerClasses';
 import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config/gameConfig';
 import type { PixelIconName } from '@/config/pixelIcons';
+import type { ItemStats } from '@/catalog/stats';
+import type { CritKind } from '@/lib/combat';
+
+export type { ItemStats };
 
 export type BiomeType = keyof typeof BIOMES;
 
@@ -89,19 +93,33 @@ export type EquipmentRarity =
 	| 'epic'
 	| 'legendary';
 
-export interface ItemStats {
-	damage?: number;
-	armor?: number;
-	maxHp?: number;
+export type ItemKind = 'weapon' | 'offhand' | 'armor' | 'accessory' | 'consumable';
+
+export type WeaponType = 'sword' | 'dagger' | 'mace' | 'maul' | 'axe' | 'spear' | 'bow' | 'crossbow' | 'staff' | 'wand' | 'shield' | 'tome';
+
+/** Where an item can drop from: a monster type or a map chest. */
+export type DropSource = MonsterType | 'chest';
+
+/** Relative drop weight inside a source's loot pool; `minTier` / `maxTier` bound the monster tier that can drop it. */
+export interface DropRule {
+	weight: number;
+	/** Consumables the Rat King always drops: how many */
+	qty?: number;
+	minTier?: number;
+	maxTier?: number;
 }
 
-/** Static definition of an item; saves only ever store the `id`. */
+/** Static definition of an item; saves only ever store the `id`. Everything about an item lives here (see src/catalog). */
 export interface ItemDef {
 	id: string;
 	name: string;
+	kind: ItemKind;
 	/** Gear slot; 'ring' fits ring1 or ring2. Consumables have none. */
 	slot?: EquipmentSlot | 'ring';
 	rarity: EquipmentRarity;
+	/** Grade of the material family: 1 wooden / cloth, 2 steel, 3 obsidian, 4 Rattatui, 5 legendary (consumables: 0) */
+	tier: number;
+	weaponType?: WeaponType;
 	stats?: ItemStats;
 	set?: string;
 	description?: string;
@@ -109,6 +127,10 @@ export interface ItemDef {
 	stackMax?: number;
 	sellValue: number;
 	icon?: PixelIconName;
+	/** Loot pools this item is in */
+	drops?: Partial<Record<DropSource, DropRule>>;
+	/** Merchant price in gold; absent = not sold */
+	shop?: number;
 }
 
 /** Equipped item ids by slot */
@@ -232,8 +254,6 @@ export interface TapResult {
 	lucky: boolean;
 }
 
-export type { BiomeVerdict } from '@/utils/biomeRules';
-import type { BiomeVerdict } from '@/utils/biomeRules';
 import type { ChestLoot } from '@/lib/chests';
 
 export interface GameState {
@@ -259,9 +279,6 @@ export interface GameState {
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
 	isHydrated: boolean;
-	biomeSelectionActive: boolean;
-	pendingTileCoords: { x: number; y: number } | null;
-	selectableBiomes: BiomeVerdict[] | null; // what the biome picker offers (blocked ones carry the reason)
 	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
 	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
@@ -280,8 +297,6 @@ export interface GameState {
 	rebirth: () => boolean;
 	buyLegacyUpgrade: (id: LegacyUpgradeId) => boolean;
 	claimCritterGift: (gift: CritterGift, input: ClickInput) => GiftResult | null;
-	selectBiome: (biome: BiomeType) => boolean;
-	cancelBiomeSelection: () => void;
 	upgradeCastle: () => boolean;
 	purchaseAnimal: (animalId: string, count?: number | 'max') => number; // animals bought
 	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;
@@ -289,7 +304,7 @@ export interface GameState {
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
 	sellJunk: (maxRarity: EquipmentRarity) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
-	upgradeGroundsTile: (x: number, y: number, buildingType: string) => boolean;
+	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
 	addStatPoint: (stat: keyof CharacterStats) => void;
@@ -298,7 +313,7 @@ export interface GameState {
 	addResources: (resourceToAdd: Partial<Resources>) => void;
 	collectChest: (x: number, y: number) => boolean;
 	startFight: (monsterId: number) => boolean;
-	hitMonster: (input: ClickInput) => { damage: number; killed: boolean } | null;
+	hitMonster: (input: ClickInput) => { damage: number; killed: boolean; crit: CritKind } | null;
 	leaveFight: () => void;
 	drinkPotion: (bagIndex: number) => boolean;
 	equipItem: (bagIndex: number) => boolean;

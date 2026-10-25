@@ -1,5 +1,6 @@
 /**
- * How the map grows: which biomes a new tile may turn into, and how likely it is to continue a neighbouring area.
+ * How the map grows: which biomes a new tile may turn into, and how likely it is to continue a neighbouring area. Every purchase is a
+ * random roll (there is no biome picker); buildings are put on explored tiles afterwards (right-click).
  * Pure data - the logic is in src/utils/biomeRules.ts, the player-facing description in docs/02-mechanics.md.
  *
  * "purchased tiles" = tiles bought so far (the castle and the free starting ring do not count).
@@ -27,13 +28,13 @@ export const BIOME_RULES = {
 	needsWater: ['coast'] as string[],
 
 	/** Never blocked by a neighbour (but still subject to unlocks). */
-	neutral: ['plains', 'grounds'] as string[],
+	neutral: ['plains'] as string[],
 
 	/** Random purchases: chance (%) to copy a neighbouring biome instead of rolling from the weights. */
 	cluster: {
 		basePct: { forest: 60, hills: 55, lake: 50, swamp: 55, tundra: 65, plains: 45, coast: 40 } as Record<string, number>,
 		perExtraNeighbourPct: 10, // +10 for every same-biome 4-neighbour beyond the first
 		capPct: 90,
-		neverCopy: ['grounds'] as string[], // building lots stay rare
+		neverCopy: [] as string[],
 	},
 };

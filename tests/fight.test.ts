@@ -6,13 +6,26 @@ import { GRID_CENTER_X, GRID_CENTER_Y, REBIRTH } from '../src/config/gameConfig'
 import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
 import { maxHp } from '../src/lib/combat';
+import { fullSet } from '../src/lib/fightSim';
 import { pickPersisted } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
 
 let seq = 0;
 let clock = 1_000_000;
-/** One trusted click; `gapMs` between clicks keeps a human pace (4/s) unless a test wants to hammer the limiter. */
-const hit = (gapMs = 250) => api().hitMonster({ eventId: ++seq, now: (clock += gapMs), trusted: true });
+/**
+ * One trusted click. Crits are rolled with Math.random, so unless a test stubbed it already the click runs with a
+ * random of `rnd` (0 = never a crit, 0.999 = always a crit and a super crit at the default odds).
+ */
+const hit = (gapMs = 250, rnd = 0) => {
+	const input = { eventId: ++seq, now: (clock += gapMs), trusted: true };
+	if ('mock' in Math.random) return api().hitMonster(input);
+	const stub = mock.method(Math, 'random', () => rnd);
+	try {
+		return api().hitMonster(input);
+	} finally {
+		stub.mock.restore();
+	}
+};
 const hits = (n: number, gapMs = 250) => Array.from({ length: n }, () => hit(gapMs));
 const run = (seconds: number) => {
 	for (let i = 0; i < seconds; i++) api().tick(1000);
@@ -50,13 +63,38 @@ test('50 hits at 2 damage kill a tier-1 rat and 49 do not', () => {
 	assert.equal(api().monsters.length, 0);
 });
 
-test('untrusted clicks and clicks over the limiter rate do nothing', () => {
+test('untrusted clicks and repeated events do nothing, but fight hits are not rate limited', () => {
 	withMonster();
 	api().startFight(1);
 	assert.equal(api().hitMonster({ eventId: ++seq, now: (clock += 250), trusted: false }), null);
+	const sameEvent = { eventId: ++seq, now: (clock += 250), trusted: true };
+	assert.ok(api().hitMonster(sameEvent));
+	assert.equal(api().hitMonster(sameEvent), null); // one DOM event counts once
+	// 20 distinct real clicks in the same millisecond all land: speed is skill, there is no cap
 	const now = (clock += 10_000);
-	const results = Array.from({ length: 20 }, () => api().hitMonster({ eventId: ++seq, now, trusted: true }));
-	assert.equal(results.filter(Boolean).length, 8); // CLICK_LIMIT.capacity
+	const stub = mock.method(Math, 'random', () => 0);
+	try {
+		const results = Array.from({ length: 20 }, () => api().hitMonster({ eventId: ++seq, now, trusted: true }));
+		assert.equal(results.filter(Boolean).length, 20);
+	} finally {
+		stub.mock.restore();
+	}
+});
+
+test('crits: a high roll doubles the click, a super crit multiplies it by 5, a low roll is a plain hit', () => {
+	withMonster({ type: 'ratKing', tier: 1 });
+	api().startFight(1);
+	const base = 2;
+	assert.deepEqual(hit(250, 0), { damage: base, killed: false, crit: 'none' });
+	assert.deepEqual(hit(250, 0.999), { damage: base * COMBAT.crit.superMult, killed: false, crit: 'super' });
+	// a roll that crits (>= 1 - crit chance) but misses the super threshold
+	const rolls = [0.99, 0];
+	const stub = mock.method(Math, 'random', () => rolls.shift() ?? 0);
+	try {
+		assert.deepEqual(api().hitMonster({ eventId: ++seq, now: (clock += 250), trusted: true }), { damage: base * COMBAT.crit.mult, killed: false, crit: 'crit' });
+	} finally {
+		stub.mock.restore();
+	}
 });
 
 test('hitMonster without a fight, or after the fight ended, returns null', () => {
@@ -267,6 +305,8 @@ test('chests never spawn on a monster tile', () => {
 
 test('the Rat King times out, taunts, and stays on the map at full HP', () => {
 	withMonster({ type: 'ratKing', tier: 1 });
+	store.setState({ equipment: fullSet('rattatui') }); // armor that outlasts the whole time limit
+	store.setState({ playerHp: max() });
 	api().startFight(1);
 	assert.equal(api().fight?.timeLeftSec, MONSTERS.ratKing.timeLimitSec);
 	hits(40);
@@ -280,13 +320,15 @@ test('the Rat King times out, taunts, and stays on the map at full HP', () => {
 	assert.equal(api().fight?.monsterHp, MONSTERS.ratKing.hp);
 });
 
-test('a player clicking at the limiter cap beats the Rat King with the starter sword and wins Rattatui gear', () => {
+test('a fast clicker in full Rattatui gear beats the Rat King and wins Rattatui gear; the starter kit cannot', () => {
 	withMonster({ type: 'ratKing', tier: 1 });
-	mock.method(Math, 'random', () => 0);
+	mock.method(Math, 'random', () => 0); // no crits, no lucky drops: plain damage only
 	try {
+		store.setState({ equipment: fullSet('rattatui') });
+		store.setState({ playerHp: max() });
 		api().startFight(1);
 		for (let sec = 0; sec < MONSTERS.ratKing.timeLimitSec && api().fight?.phase === 'active'; sec++) {
-			hits(5, 200); // 5 clicks per second: the limiter's sustained cap
+			hits(10, 100); // 10 clicks per second
 			api().tick(1000);
 		}
 		assert.equal(api().fight?.phase, 'won');
@@ -296,6 +338,13 @@ test('a player clicking at the limiter cap beats the Rat King with the starter s
 	} finally {
 		mock.restoreAll();
 	}
+	withMonster({ type: 'ratKing', tier: 1 });
+	api().startFight(1);
+	for (let sec = 0; sec < MONSTERS.ratKing.timeLimitSec && api().fight?.phase === 'active'; sec++) {
+		hits(25, 40); // even 25 clicks per second with the wooden sword gets nowhere
+		api().tick(1000);
+	}
+	assert.notEqual(api().fight?.phase, 'won');
 });
 
 test('the monster being fought does not age', () => {

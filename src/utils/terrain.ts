@@ -69,8 +69,11 @@ export function groundOf(tile: Tile | undefined): Ground | null {
 	return rankOf(tile.biome) > 0 ? (tile.biome as Ground) : null;
 }
 
-/** A grounds tile with a building above level 1. */
-export const isBuilt = (tile: Tile | undefined): boolean => !!tile && tile.isOwned && tile.biome === 'grounds' && !!tile.building && (tile.level ?? 1) > 1;
+/** A tile with a building (any biome). */
+export const isBuilt = (tile: Tile | undefined): boolean => !!tile && tile.isOwned && !!tile.building;
+
+/** Old Grounds lots take the ground of the land around them; a building on any other biome keeps its own ground and gets a pad in that biome's style. */
+const isGroundsLot = (tile: Tile | undefined): boolean => isBuilt(tile) && tile!.biome === 'grounds';
 
 type OwnedName = Ground | 'building' | null;
 
@@ -93,12 +96,12 @@ function foundation(owned: OwnedName[][], x: number, y: number): Ground {
 	return FOUNDATION_ORDER.find((b) => counts[b] === best) as Ground;
 }
 
-const ownedNames = (tiles: Tile[][]): OwnedName[][] => tiles.map((row) => row.map((t) => (isBuilt(t) ? 'building' : groundOf(t))));
+const ownedNames = (tiles: Tile[][]): OwnedName[][] => tiles.map((row) => row.map((t) => (isGroundsLot(t) ? 'building' : groundOf(t))));
 
 /** The biome a tile's ground belongs to for the eye: its own, or (built-on tiles) the foundation biome. */
 export function foundationBiome(tiles: Tile[][], x: number, y: number): string {
 	const t = tiles[y]?.[x];
-	return isBuilt(t) ? foundation(ownedNames(tiles), x, y) : (t?.biome ?? 'empty');
+	return isGroundsLot(t) ? foundation(ownedNames(tiles), x, y) : (t?.biome ?? 'empty');
 }
 
 /** Ground per tile; unowned tiles 4-adjacent to an owned one become 'mist' (the buyable ring), the rest stay null. */
@@ -119,9 +122,12 @@ export function allPads(tiles: Tile[][] | undefined): Placed[] {
 	if (!tiles) return [];
 	const owned = ownedNames(tiles);
 	const out: Placed[] = [];
-	owned.forEach((row, y) =>
-		row.forEach((name, x) => {
-			if (name === 'building') out.push({ id: `pad_${foundation(owned, x, y)}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
+	tiles.forEach((row, y) =>
+		row.forEach((tile, x) => {
+			if (!isBuilt(tile)) return;
+			// a lot on its own biome gets that biome's pad; an old Grounds lot the pad of the land around it
+			const kind = isGroundsLot(tile) ? foundation(owned, x, y) : (FOUNDATION_ORDER as readonly string[]).includes(tile.biome) ? tile.biome : 'plains';
+			out.push({ id: `pad_${kind}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
 		})
 	);
 	return out;

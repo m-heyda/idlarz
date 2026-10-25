@@ -432,8 +432,8 @@ export const calculateResourceRates = (
 					}
 				});
 
-				// Add building resources if the tile is an upgraded grounds tile with a building
-				if (tile.biome === 'grounds' && tile.level === 2 && tile.building) {
+				// A building adds its own output on top of the tile's biome output
+				if (tile.building) {
 					const building = BUILDINGS[tile.building as BuildingType];
 					if (building && building.resourceGeneration) {
 						// Add building resource generation to the base rates
@@ -527,7 +527,7 @@ export const calculateTileTapYield = (
 	Object.entries(BIOMES[tile.biome].resourceGeneration).forEach(([resource, rate]) =>
 		addRate(resource, rate as number)
 	);
-	if (tile.biome === 'grounds' && tile.level === 2 && tile.building) {
+	if (tile.building) {
 		const building = BUILDINGS[tile.building as BuildingType];
 		if (building?.resourceGeneration) {
 			Object.entries(building.resourceGeneration).forEach(([resource, rate]) =>
@@ -591,19 +591,34 @@ export const countBuildings = (tiles: Tile[][]): number => {
 	return count;
 };
 
-/** Cost of the next building: base cost x growth^(buildings already built). */
+/** Price factor of the next building when `built` buildings stand: the cheap starter steps, then three stages of growth. */
+export const buildingCostFactor = (built: number): number => {
+	const C = BUILDING_COST;
+	if (built < C.starter.length) return C.starter[built];
+	const k = built - C.starter.length + 1; // 1 for the first building after the starter ones
+	return (
+		Math.pow(C.growthEarly, Math.min(k, C.earlyCount)) *
+		Math.pow(C.growthMid, Math.min(Math.max(k - C.earlyCount, 0), C.midCount)) *
+		Math.pow(C.growthLate, Math.max(k - C.earlyCount - C.midCount, 0))
+	);
+};
+
+/** Cost of the next building: base cost x the factor for the number of buildings already built. */
 export const calculateBuildingCost = (
 	tiles: Tile[][],
 	prestige?: PrestigeState
 ): Partial<Resources> => {
-	const factor =
-		Math.pow(BUILDING_COST.growth, countBuildings(tiles)) * (1 - legacyEffect(prestige, 'thrift'));
+	const factor = buildingCostFactor(countBuildings(tiles)) * (1 - legacyEffect(prestige, 'thrift'));
 	const cost: Partial<Resources> = {};
 	Object.entries(BUILDING_COST.base).forEach(([resource, amount]) => {
 		cost[resource as keyof Resources] = Math.floor((amount || 0) * factor);
 	});
 	return cost;
 };
+
+/** An explored tile that can take a building: not water or the castle, and nothing built on it yet. */
+export const canBuildOn = (tile: Tile | undefined): boolean =>
+	!!tile && tile.isOwned && !BUILDING_COST.blockedBiomes.includes(tile.biome) && !tile.building;
 
 /**
  * Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each

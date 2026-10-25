@@ -291,3 +291,26 @@ test('a played game that started with the free ring passes validation (tiles, bu
 	const result = sanitizeSave(snapshot());
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
+
+test('buildings on any land biome save and load; water, nonsense and stray levels are rejected; old Grounds lots (level 2) still load', () => {
+	api().resetGame();
+	growTo(12);
+	const spot = api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+	const place = (tile: Record<string, unknown>) => (raw: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+		raw.tiles[spot.y][spot.x] = { isOwned: true, ...tile };
+	};
+	const load = (tile: Record<string, unknown>) => {
+		const raw = snapshot();
+		place(tile)(raw);
+		return sanitizeSave(raw);
+	};
+	assert.equal(load({ biome: 'forest', building: 'tavern' }).ok, true, 'a forest building');
+	assert.equal(load({ biome: 'hills', building: 'quarry' }).ok, true);
+	assert.equal(load({ biome: 'grounds', building: 'tavern', level: 2 }).ok, true, 'an old Grounds lot');
+	assert.equal(load({ biome: 'grounds' }).ok, true, 'an old empty lot');
+	assert.equal(load({ biome: 'lake', building: 'tavern' }).ok, false, 'a building on water');
+	assert.equal(load({ biome: 'forest', building: 'nonsense' }).ok, false);
+	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok, false, 'level 2 only belongs to old Grounds lots');
+	assert.equal(load({ biome: 'forest', level: 2 }).ok, false, 'a level without a building');
+	rejects((raw) => { raw.tiles[GRID_CENTER_Y][GRID_CENTER_X].building = 'tavern'; }, 'a building on the castle');
+});

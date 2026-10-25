@@ -10,7 +10,7 @@ import {
 	starterBag,
 	unequip,
 } from '../src/lib/inventory';
-import { ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import { ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT, emptyStats, setCounts, sumStats } from '../src/config/itemCatalog';
 import type { BagSlot, Equipment } from '../src/types/game';
 
 const deepFreeze = <T,>(o: T): T => {
@@ -148,11 +148,11 @@ test('moveSlot merges stacks and swaps others', () => {
 });
 
 test('aggregateStats sums the starter kit to damage 2 armor 2', () => {
-	assert.deepEqual(aggregateStats(STARTER_EQUIPMENT), { damage: 2, armor: 2, maxHp: 0, setCount: 0 });
-	assert.deepEqual(aggregateStats({}), { damage: 0, armor: 0, maxHp: 0, setCount: 0 });
+	assert.deepEqual(aggregateStats(STARTER_EQUIPMENT), { ...emptyStats(), damage: 2, armor: 2, setCount: 1 }); // the shield is a Woodland Set piece
+	assert.deepEqual(aggregateStats({}), { ...emptyStats(), setCount: 0 });
 });
 
-test('aggregateStats applies the 6-piece and 13-piece set bonuses', () => {
+test('aggregateStats adds gear stats and every set bonus threshold reached', () => {
 	const six: Equipment = {
 		head: 'rattatui_cap',
 		shoulder: 'rattatui_shoulderpads',
@@ -161,11 +161,11 @@ test('aggregateStats applies the 6-piece and 13-piece set bonuses', () => {
 		legs: 'rattatui_trousers',
 		feet: 'rattatui_boots',
 	};
-	const base = (eq: Equipment) =>
-		Object.values(eq).reduce((sum, id) => sum + (ITEM_CATALOG[id!].stats?.maxHp ?? 0), 0);
+	const gearOnly = (eq: Equipment) => sumStats(...Object.values(eq).map((id) => ITEM_CATALOG[id!].stats));
+	const bonus = (...counts: number[]) => sumStats(...counts.map((c) => RATTATUI_SET.bonuses[c]));
 	const a6 = aggregateStats(six);
 	assert.equal(a6.setCount, 6);
-	assert.equal(a6.maxHp, base(six) + RATTATUI_SET.bonuses[6].maxHp!);
+	assert.deepEqual({ ...a6, setCount: undefined }, { ...sumStats(gearOnly(six), bonus(3, 6)), setCount: undefined });
 
 	const full: Equipment = {
 		...six,
@@ -179,8 +179,12 @@ test('aggregateStats applies the 6-piece and 13-piece set bonuses', () => {
 	};
 	const a13 = aggregateStats(full);
 	assert.equal(a13.setCount, 13);
-	assert.equal(a13.maxHp, base(full) + RATTATUI_SET.bonuses[6].maxHp! + RATTATUI_SET.bonuses[13].maxHp!);
-	assert.equal(a13.damage, 3);
+	assert.deepEqual({ ...a13, setCount: undefined }, { ...sumStats(gearOnly(full), bonus(3, 6, 13)), setCount: undefined });
+});
+
+test('two sets at once: each counts its own pieces', () => {
+	const mixed: Equipment = { head: 'steel_helm', chest: 'steel_cuirass', hands: 'steel_gauntlets', legs: 'leather_leggings', feet: 'leather_boots', neck: 'wooden_pendant' };
+	assert.deepEqual(setCounts(mixed), { knight: 3, woodland: 3 });
 });
 
 test('functions do not mutate their inputs', () => {

@@ -22,7 +22,9 @@ src/
 ├── config/
 │   ├── gameConfig.ts         ALL tunable constants (costs, curves, biomes, castle, animals, merchant, click limiter, chests, stats)
 │   ├── combatConfig.ts       COMBAT + MONSTERS: HP, regen, armor, spawn, tiers, drops, Rat King
-│   ├── itemCatalog.ts        every item (ITEM_CATALOG), the Rattatui set, starter kit, equipment slot layout
+│   ├── itemCatalog.ts        facade: re-exports src/catalog and derives BASIC_GEAR / RATTATUI_SET for older imports
+├── catalog/                  THE catalog: index.ts (ITEM_CATALOG, SETS, setCounts, starter kit, equipment layout), items/*.ts (one file per family: wooden, cloth, steel,
+│                             obsidian, rattatui, legendary, consumables), rarity.ts, stats.ts, sets.ts, resources.ts, loot.ts (drop pools, shop list)
 │   ├── playerClasses.ts, pixelIcons.ts
 ├── types/game.ts             Resources, Tile, CharacterStats, GameState (store interface), ClickInput, TileCost ...
 ├── stores/
@@ -34,7 +36,9 @@ src/
 │   ├── terrain.ts            dual-grid map terrain: ground rank, dual-cell layers, tile depth, prop + dock placement (port of scripts/pixel/terrain_logic.py)
 │   ├── formatters.ts, audioManager.ts
 ├── lib/
-│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps, critter gifts and fight hits
+│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps and critter gifts (NOT fight hits)
+│   ├── hitGuard.ts           fight hits: trusted clicks only, one DOM event counts once, no rate limit
+│   ├── fightSim.ts           a bot that fights with the real combat rules (scripts/fight-sim.ts, tests/fightBalance.test.ts)
 │   ├── castleWard.ts         the castle's ward (castle level 7+): isInWard, monstersOutsideWard, fortressWallTier
 │   ├── inventory.ts          pure bag / equipment operations + aggregateStats (the one place gear is summed)
 │   ├── combat.ts             max HP, damage per click, armor mitigation, regen, fight state machine (stepFight)
@@ -100,8 +104,8 @@ Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a
 - `Grid` culls to the visible window and pans with pointer handlers; fling inertia keeps its velocity in a ref with friction (no per-frame React state).
 - **Wheel zoom** is stepped (0.75 / 1 / 1.5 / 2, one step per 50 px of wheel delta) so the pixel art stays crisp, zooms around the cursor and never goes below the level where the world stops covering the screen. The zoom is exposed to CSS as `--map-zoom`; tile tooltips scale with it, castle/building dialogs do not.
 - **Terrain**: the map ground is one 2400x2400 `<canvas>` (`TerrainLayer`, first child of the world div) drawn by `terrainRenderer.ts` from the atlas in `public/pixel/terrain/` + `src/config/terrainAtlas.json`. It redraws only when `terrainKey(tiles)` changes (a purchase, a yard upgrade, rebirth, load - not on pan, zoom or chest toggles), so panning and zoom just move one raster with no cell seams. Tiles are transparent hit areas that carry the castle, buildings, chest, '?' marker and hover overlays. Buyable unexplored tiles are drawn as the dark 'mist' sea; a flat colour per ground is shown until the atlas loads.
-- **Biome rules and chests**: `src/config/biomeRules.ts` (numbers) + `src/utils/biomeRules.ts` (unlocks, conflicts, clustering, picker verdicts, the starting ring) decide what a purchase becomes; `src/lib/chests.ts` decides where chests appear and what they hold. Both are pure with an injectable `random()`. The free starting ring is `GameState.freeTiles`; costs use `economyTiles()` (see [02](02-mechanics.md)).
-- **Foundations**: a built-on grounds tile resolves to the biome around it (`foundation()` in `terrain.ts`, ported to `terrain_logic.py` and covered by the parity fixture) and gets a pad decal (`terrain_pads.py`, drawn under the sprites); building tiles carry no props.
+- **Biome rules and chests**: `src/config/biomeRules.ts` (numbers) + `src/utils/biomeRules.ts` (unlocks, conflicts, clustering, the starting ring) decide what a purchase becomes; `src/lib/chests.ts` decides where chests appear and what they hold. Both are pure with an injectable `random()`. The free starting ring is `GameState.freeTiles`; costs use `economyTiles()` (see [02](02-mechanics.md)).
+- **Buildings**: any explored tile except the castle and lakes can take one (`buildOnTile`, `canBuildOn`, price `calculateBuildingCost` / `buildingCostFactor`); the right-click `BuildMenu` component opens from `Tile.tsx`. A building keeps its tile's own ground and gets a pad of that biome (`allPads()` in `terrain.ts`, art in `terrain_pads.py`, drawn under the sprites); an old built-on Grounds lot still resolves to the biome around it (`foundation()`, ported to `terrain_logic.py` and covered by the parity fixture). Building tiles carry no props.
 - Tile tooltips are portalled into `MapTipLayer`, a layer above the critters, because every tile is its own stacking context.
 - `NotifyDot` is the one "needs attention" marker (a soft orange dot). It is used on header controls and the Menu tabs: unspent stat points (level orb, Stats tab) and an affordable farm animal or upgrade (Farm tab); the Menu button shows either (`useMenuAttention`).
 - Font: Mozilla Headline (self-hosted via `@fontsource-variable/mozilla-headline`, exposed as `--font-pixel`).

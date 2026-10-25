@@ -14,7 +14,7 @@ import '@/styles/Fight.css';
 interface FloatNumber {
 	id: number;
 	text: string;
-	kind: 'dmg' | 'hurt' | 'heal';
+	kind: 'dmg' | 'crit' | 'super' | 'hurt' | 'heal';
 	x: number;
 }
 
@@ -73,7 +73,7 @@ const FightView: React.FC = () => {
 			const fx = (e as CustomEvent<CombatFx>).detail;
 			if (fx.kind === 'hit') {
 				const id = nextId.current++;
-				const bits = Array.from({ length: 8 }, () => ({
+				const bits = Array.from({ length: fx.crit === 'super' ? 20 : fx.crit === 'crit' ? 13 : 8 }, () => ({
 					dx: (Math.random() - 0.5) * 120,
 					dy: -10 - Math.random() * 70,
 					s: 4 + Math.floor(Math.random() * 3) * 2,
@@ -81,7 +81,7 @@ const FightView: React.FC = () => {
 				setBursts((prev) => [...prev.slice(-4), { id, bits }]);
 				setTimeout(() => setBursts((prev) => prev.filter((b) => b.id !== id)), 650);
 				setHitTick((t) => t + 1);
-				pushNumber(`-${fx.damage}`, 'dmg');
+				pushNumber(fx.crit === 'none' ? `-${fx.damage}` : `-${fx.damage}!`, fx.crit === 'none' ? 'dmg' : fx.crit);
 				audioManager.playSound('click');
 			} else if (fx.kind === 'hurt') {
 				setShake(true);

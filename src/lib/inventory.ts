@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { ITEM_CATALOG, RATTATUI_SET, STARTER_BAG_ITEMS } from '@/config/itemCatalog';
+import { ITEM_CATALOG, STARTER_BAG_ITEMS, setBonusStats, setCounts, sumStats, type StatTotals } from '@/catalog';
 import type { BagSlot, Equipment, EquipmentSlot } from '@/types/game';
 
 // Pure bag / equipment operations. Nothing here mutates its arguments; every function returns fresh arrays and objects.
@@ -113,25 +113,10 @@ export const unequip = (
 	return { bag: nextBag, equipment: nextEquipment };
 };
 
-/** The one place gear is summed: stats of everything equipped plus the set bonuses reached. */
-export const aggregateStats = (
-	equipment: Equipment
-): { damage: number; armor: number; maxHp: number; setCount: number } => {
-	const total = { damage: 0, armor: 0, maxHp: 0, setCount: 0 };
-	for (const id of Object.values(equipment)) {
-		const def = id ? ITEM_CATALOG[id] : undefined;
-		if (!def) continue;
-		total.damage += def.stats?.damage ?? 0;
-		total.armor += def.stats?.armor ?? 0;
-		total.maxHp += def.stats?.maxHp ?? 0;
-		if (def.set === RATTATUI_SET.id) total.setCount++;
-	}
-	for (const [threshold, bonus] of Object.entries(RATTATUI_SET.bonuses)) {
-		if (total.setCount >= Number(threshold)) {
-			total.damage += bonus.damage ?? 0;
-			total.armor += bonus.armor ?? 0;
-			total.maxHp += bonus.maxHp ?? 0;
-		}
-	}
-	return total;
+/** The one place gear is summed: stats of everything equipped plus the set bonuses reached (all via the catalog's stat table). */
+export const aggregateStats = (equipment: Equipment): StatTotals & { setCount: number } => {
+	const worn = Object.values(equipment).map((id) => (id ? ITEM_CATALOG[id]?.stats : undefined));
+	const counts = setCounts(equipment);
+	const total = sumStats(...worn, setBonusStats(counts));
+	return { ...total, setCount: Math.max(0, ...Object.values(counts)) };
 };

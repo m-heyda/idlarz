@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { EQUIPMENT_PIXEL_ICONS } from '@/config/pixelIcons';
-import { ITEM_CATALOG } from '@/config/itemCatalog';
+import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import type { EquipmentSlot } from '@/types/game';
 import PixelIcon from './PixelIcon';
 import ItemTooltipBody from './ItemTooltip';
@@ -54,6 +54,8 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				data-filled={!!def}
 				data-equipped={!!equipped}
 				data-locked={!!locked}
+				data-rarity={def?.rarity}
+				data-pulse={def ? RARITIES[def.rarity].glow.pulse : undefined}
 				data-over={over}
 				draggable={!!def && !!draggable}
 				onDragStart={(e) => {
@@ -83,7 +85,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 					e.preventDefault();
 					onContextMenu();
 				}}
-				style={def ? ({ '--glow': RARITY_COLOR[def.rarity] } as React.CSSProperties) : undefined}>
+				style={def ? ({ '--glow': RARITY_COLOR[def.rarity], '--glow-blur': `${RARITIES[def.rarity].glow.blur}px`, '--glow-alpha': RARITIES[def.rarity].glow.alpha } as React.CSSProperties) : undefined}>
 				{def ? (
 					<PixelIcon name={itemIconName(def)} alt={def.name} className='inv-icon' />
 				) : slot ? (

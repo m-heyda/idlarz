@@ -3,6 +3,7 @@ import { ITEM_CATALOG } from '@/config/itemCatalog';
 import type { ChestLoot } from '@/lib/chests';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
+import { RARITY_COLOR, itemIconName } from '../itemUi';
 
 interface ChestNotificationProps {
 	loot: ChestLoot | null;
@@ -64,8 +65,10 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClo
 			const item = ITEM_CATALOG[loot.itemId];
 			title = (
 				<>
-					<span className='text-lg font-semibold whitespace-nowrap'>You found {item?.name ?? 'an item'}!</span>
-					{item?.icon && <PixelIcon name={item.icon} alt='' />}
+					<span className='text-lg font-semibold whitespace-nowrap'>
+						You found <span style={item ? { color: RARITY_COLOR[item.rarity] } : undefined}>{item?.name ?? 'an item'}</span>!
+					</span>
+					{item && <PixelIcon name={itemIconName(item)} alt='' />}
 				</>
 			);
 			hint = <span className='text-xs text-[#a89878] mt-1'>Added to your bag</span>;

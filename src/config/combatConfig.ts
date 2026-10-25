@@ -6,7 +6,15 @@ export const COMBAT = {
 	knockoutHpFraction: 0.3, // HP restored (as a share of max) after a knockout
 	armorK: 40, // mitigation = armor / (armor + armorK)
 	fightStepClampSec: 1, // a fight step never advances more than this (throttled tabs freeze fights instead of fast-forwarding them)
-	maxWeaponDamage: 3, // no single item deals more, so the Rat King always takes a real fight (see tests/kingInvariant.test.ts)
+	maxItemDamage: 16, // sanity ceiling for one item's damage (tests/items.test.ts); fights are balanced by tests/fightBalance.test.ts, not by a cap
+	// Clicks are not rate limited in fights: speed is skill. What stops a click from being too strong is damage and crit.
+	crit: {
+		mult: 2, // a crit deals this many times the damage
+		superMult: 5, // a super crit (rolled only when a click already crit)
+		superBase: 5, // % chance for a crit to become a super crit, before gear
+		maxCritChance: 75, // % caps, so stacked gear cannot make every click a crit
+		maxSuperChance: 50,
+	},
 	bagSize: 36,
 	maxMonsters: 8,
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
@@ -18,14 +26,16 @@ export const COMBAT = {
 	tierIntervalSec: 1800, // a rat gains a tier every 30 min on the map
 	maxTier: 5,
 	drops: {
-		basicGearBase: 0.08, // a rat can drop one piece of plain gear (never a Rattatui piece)
-		basicGearTierBonus: 0.01,
+		// a rat can drop one piece of gear from the catalog's `rat` pool (never a Rattatui piece); older rats unlock better tiers
+		gearBase: 0.12,
+		gearTierBonus: 0.02,
 		potionBase: 0.25,
 		potionTierBonus: 0.03,
 		king: {
 			setPieces: 1, // the Rat King always drops this many Rattatui pieces, preferring ones you do not own yet
 			extraPieceChance: 0.4, // and one more piece with this chance
-			potions: 2,
+			legendaryChance: 0.05, // and a legendary weapon with this chance
+			// potions: every potion that lists the King in its drops, `qty` of each (see catalog/items/consumables.ts)
 		},
 	},
 	rewards: { minGold: 10, minXp: 5 },
@@ -44,9 +54,9 @@ export const MONSTERS = {
 	},
 	ratKing: {
 		label: 'Rat King',
-		hp: 450, // beatable with the starter sword (2 per click) in about 45 s of steady clicking at the 5 clicks/s limiter cap
-		attack: 4,
-		attackIntervalSec: 3.5, // tuned so the timer, not the player's HP, is the normal way to lose
+		hp: 5200, // see docs/generated/fight-sim.md: a starter kit never wins; steel needs ~10+ clicks/s, obsidian ~7, Rattatui is comfortable
+		attack: 14,
+		attackIntervalSec: 3, // armor decides how many hits you survive; potions fill the gap
 		rewardSec: 3600,
 		timeLimitSec: 75,
 		evolveChance: 0.35, // rolled every evolveCheckSec once a rat has reached the last tier

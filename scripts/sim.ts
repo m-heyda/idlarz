@@ -155,7 +155,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	let frontier: [number, number] | null = null;
 	let frontierDirty = true;
 	let buildingCursor = 0;
-	let picks = 0;
 	const BUILD_ORDER = ['market', 'farm', 'lumbermill', 'mine', 'blacksmith', 'workshop'];
 
 	const isActive = (sec: number) => {
@@ -277,18 +276,14 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			if (roomy && api().buyFarmUpgrade(id)) s = api();
 		}
 
-		// Buildings on idle Grounds tiles
-		for (let y = 0; y < cfg.GRID_HEIGHT; y++) {
-			for (let x = 0; x < cfg.GRID_SIZE; x++) {
-				const tile = s.tiles[y][x];
-				if (tile.isOwned && tile.biome === 'grounds' && !tile.building) {
-					const bc = utils.calculateBuildingCost(s.tiles, s.prestige);
-					if (utils.canAffordBundle(s.resources, bc) && s.resources.gold > (bc.gold ?? 0) * 3) {
-						if (api().upgradeGroundsTile(x, y, BUILD_ORDER[buildingCursor % BUILD_ORDER.length])) {
-							buildingCursor++;
-							s = api();
-						}
-					}
+		// Buildings: on the first explored tile that can take one, while the gold is comfortably there (the price rises with every one)
+		{
+			const bc = utils.calculateBuildingCost(s.tiles, s.prestige);
+			if (utils.canAffordBundle(s.resources, bc) && s.resources.gold > (bc.gold ?? 0) * 3) {
+				const spot = ownedTiles.find(([x, y]) => utils.canBuildOn(s.tiles[y][x]));
+				if (spot && api().buildOnTile(spot[0], spot[1], BUILD_ORDER[buildingCursor % BUILD_ORDER.length])) {
+					buildingCursor++;
+					s = api();
 				}
 			}
 		}
@@ -318,11 +313,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 			const ok = api().buyTile(frontier[0], frontier[1]);
 			if (!ok) break;
-			if (api().biomeSelectionActive) {
-				// pick-your-biome: first picks are Grounds (buildings), then Plains (food/meat)
-				picks++;
-				api().selectBiome(picks <= 3 ? 'grounds' : picks % 2 ? 'plains' : 'lake');
-			}
 			frontierDirty = true;
 			s = api();
 			const ownedNow = utils.economyTiles(s.tiles, s.freeTiles);
@@ -438,7 +428,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 					run++;
 					runStart = t;
 					frontierDirty = true;
-					picks = 0;
 					buildingCursor = 0;
 				}
 			}

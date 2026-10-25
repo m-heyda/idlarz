@@ -51,12 +51,11 @@ test('unlocks: swamp and tundra only after enough purchases', () => {
 	assert.equal(spread(g, 0).tundra, undefined);
 });
 
-test('conflicts: tundra-swamp, tundra-coast and hills-coast may not touch (8 neighbours); plains and grounds always fit', () => {
+test('conflicts: tundra-swamp, tundra-coast and hills-coast may not touch (8 neighbours); plains always fits', () => {
 	const g = map(['.....', '.T...', '.....', '.....', '.....']); // a tundra at (1,1): diagonal of (2,2)
 	assert.equal(verdict(g, 20, 'swamp').allowed, false);
 	assert.match(verdict(g, 20, 'swamp').reason ?? '', /Not next to Tundra/);
 	assert.equal(verdict(g, 20, 'plains').allowed, true);
-	assert.equal(verdict(g, 20, 'grounds').allowed, true);
 	assert.equal(verdict(g, 20, 'forest').allowed, true);
 	const h = map(['.....', '.H...', '.....', '.....', '.....']);
 	assert.equal(verdict(h, 20, 'coast').allowed, false);
@@ -85,10 +84,10 @@ test('clustering: a forest neighbour makes forest much likelier, and more neighb
 	assert.ok(three.forest / 1000 <= BIOME_RULES.cluster.capPct / 100 + 0.2);
 });
 
-test('grounds is never copied from a neighbour (lots stay rare) but can still be rolled', () => {
+test('grounds, the old building lot, is never rolled any more (buildings go on any explored tile)', () => {
 	const g = map(['.....', '..G..', '.G.G.', '..G..', '.....']);
-	const seen = spread(g, 20);
-	assert.ok((seen.grounds ?? 0) < 200);
+	assert.equal(spread(g, 20).grounds ?? 0, 0);
+	assert.equal(spread(empty(), 20).grounds ?? 0, 0);
 });
 
 test('water clusters: next to a lake, lakes and coasts both get likelier', () => {

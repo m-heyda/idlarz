@@ -174,6 +174,8 @@
 }
 
 .fight-number[data-kind='dmg'] { color: #ffe27a; }
+.fight-number[data-kind='crit'] { color: #ffb03a; font-size: 2rem; }
+.fight-number[data-kind='super'] { color: #ff6ae0; font-size: 2.6rem; animation-duration: 1.2s; }
 .fight-number[data-kind='hurt'] { color: #ff6a5a; top: 70%; }
 .fight-number[data-kind='heal'] { color: #7aff8a; top: 70%; }
 

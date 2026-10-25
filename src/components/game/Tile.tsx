@@ -20,6 +20,7 @@ import {
 	calculateTileCost,
 	canAffordBundle,
 	effectiveTileDiscount,
+	canBuildOn,
 	economyTiles,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
@@ -34,7 +35,7 @@ import MonsterSprite from './MonsterSprite';
 import { monsterAt, monsterStats, tierSecondsLeft } from '@/lib/monsters';
 import { MONSTERS } from '@/config/combatConfig';
 import CastleUpgradeDialog from './CastleUpgradeDialog';
-import BuildingSelectionDialog from './BuildingSelectionDialog';
+import BuildMenu from './BuildMenu';
 import { useMapTipLayer } from './MapTipLayer';
 
 /** Hover card of a monster: tier, HP, time to the next tier and the call to fight. Reads the age at render time. */
@@ -71,7 +72,7 @@ const Tile: React.FC<TileProps> = ({
 	const characterStats = useGameStore((state) => state.characterStats);
 	const prestige = useGameStore((state) => state.prestige);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
-	const upgradeGroundsTile = useGameStore((state) => state.upgradeGroundsTile);
+	const buildOnTile = useGameStore((state) => state.buildOnTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
 	const startFight = useGameStore((state) => state.startFight);
@@ -81,14 +82,9 @@ const Tile: React.FC<TileProps> = ({
 		return m ? `${m.id}:${m.type}:${m.tier}` : '';
 	});
 	const [monsterId, monsterType, monsterTier] = monsterKey ? monsterKey.split(':') : [];
-	const isBiomeSelectionActive = useGameStore(
-		(state) => state.biomeSelectionActive
-	);
-	const pendingTileCoords = useGameStore((state) => state.pendingTileCoords);
-	const selectBiome = useGameStore((state) => state.selectBiome);
 	const [isShaking, setIsShaking] = useState(false);
 	const [showCastleDialog, setShowCastleDialog] = useState(false);
-	const [showBuildingDialog, setShowBuildingDialog] = useState(false);
+	const [buildMenuAt, setBuildMenuAt] = useState<{ x: number; y: number } | null>(null);
 	const [showChestTooltip, setShowChestTooltip] = useState(false);
 	const [hovered, setHovered] = useState(false);
 	const tipLayer = useMapTipLayer();
@@ -118,7 +114,7 @@ const Tile: React.FC<TileProps> = ({
 		);
 	}, [x, y, isOwned, tiles]);
 
-	const hasBuilding = biome === 'grounds' && !!building && (level ?? 1) > 1;
+	const hasBuilding = !!building;
 	const castleLevel = tiles?.[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1;
 	const isGlowingCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.glowFromLevel;
 	// from the fortress level the castle stands on cobbles inside walls: no purple border, no golden tile aura
@@ -142,12 +138,6 @@ const Tile: React.FC<TileProps> = ({
 	const canAfford = canAffordBundle(resources, tileCostAsResources(tileCost));
 
 	const handleClick = (e: React.MouseEvent) => {
-		// First priority: If in biome selection mode, handle selection
-		if (isBiomeSelectionActive && pendingTileCoords) {
-			selectBiome(biome);
-			return;
-		}
-
 		// A monster on this tile: clicking it opens the fight (no tile tap, no chest)
 		if (isOwned && monsterKey) {
 			// starting a fight is not a map click: keep it from reaching the window-level gold click listener
@@ -192,13 +182,6 @@ const Tile: React.FC<TileProps> = ({
 				return;
 			}
 
-			// Grounds tile - show building dialog ONLY if not already upgraded
-			if (biome === 'grounds' && (!level || level < 2) && !building) {
-				audioManager.playSound('click');
-				setShowBuildingDialog(true);
-				return;
-			}
-
 			// For any owned tile, show tooltip
 			// toggleTooltip(); // This function is not defined in the provided code
 			return;
@@ -206,12 +189,7 @@ const Tile: React.FC<TileProps> = ({
 
 		if (isAdjacent && !isOwned) {
 			if (canAfford) {
-				const result = buyTile(x, y);
-				// Only play the purchase sound if the tile was actually purchased
-				// (not when biome selection was triggered)
-				if (result && !useGameStore.getState().biomeSelectionActive) {
-					audioManager.playSound('purchase');
-				}
+				if (buyTile(x, y)) audioManager.playSound('purchase');
 			} else if (tileCost.gold > 0) {
 				// Only play wrong sound and shake for adjacent unaffordable tiles
 				setIsShaking(true);
@@ -221,16 +199,20 @@ const Tile: React.FC<TileProps> = ({
 		}
 	};
 
-	const handleBuildingSelect = (buildingType: string) => {
-		// Upgrade the grounds tile with the selected building
-		if (biome === 'grounds') {
-			if (upgradeGroundsTile(x, y, buildingType)) {
-				audioManager.playSound('purchase');
-			} else {
-				audioManager.playSound('wrong');
-			}
+	// Right click on an explored tile: the build menu (a monster, a chest or an existing building keeps it closed)
+	const handleContextMenu = (e: React.MouseEvent) => {
+		if (!isOwned) return;
+		e.preventDefault();
+		if (monsterKey || hasChest || !canBuildOn(tiles[y]?.[x])) {
+			audioManager.playSound('wrong');
+			return;
 		}
-		setShowBuildingDialog(false);
+		setBuildMenuAt({ x: e.clientX, y: e.clientY });
+	};
+
+	const handleBuildingSelect = (buildingType: string) => {
+		audioManager.playSound(buildOnTile(x, y, buildingType) ? 'purchase' : 'wrong');
+		setBuildMenuAt(null);
 	};
 
 	return (
@@ -256,7 +238,7 @@ const Tile: React.FC<TileProps> = ({
 						'group hover:z-20': true,
 						'opacity-75 border-2 border-red-500': isShaking,
 						'cursor-pointer':
-							isOwned && (biome === 'castle' || biome === 'grounds' || hasChest || !!monsterKey),
+							isOwned && (biome === 'castle' || hasChest || !!monsterKey),
 						'tile-has-monster': isOwned && !!monsterKey,
 						'castle-tile': isOwned && biome === 'castle',
 						'castle-max-tile': isOwned && isGlowingCastle && !isFortress,
@@ -269,6 +251,7 @@ const Tile: React.FC<TileProps> = ({
 					...({ '--cd': `${TILE_TAP.cooldownMs}ms` } as React.CSSProperties),
 				}}
 				onClick={handleClick}
+				onContextMenu={handleContextMenu}
 				onMouseEnter={() => {
 					setHovered(true);
 					if (hasChest) setShowChestTooltip(true);
@@ -373,13 +356,9 @@ const Tile: React.FC<TileProps> = ({
 			{showCastleDialog &&
 				createPortal(<CastleUpgradeDialog onClose={() => setShowCastleDialog(false)} />, document.body)}
 
-			{showBuildingDialog &&
+			{buildMenuAt &&
 				createPortal(
-					<BuildingSelectionDialog
-						isOpen={showBuildingDialog}
-						onClose={() => setShowBuildingDialog(false)}
-						onSelect={handleBuildingSelect}
-					/>,
+					<BuildMenu biome={biome} anchor={buildMenuAt} onSelect={handleBuildingSelect} onClose={() => setBuildMenuAt(null)} />,
 					document.body
 				)}
 		</>
