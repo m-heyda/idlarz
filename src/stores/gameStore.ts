@@ -572,6 +572,15 @@ const createGameSlice = (
 		// Closing the fight (flee, or dismissing an end panel). The monster is never persisted damaged, so it is simply full HP again.
 		leaveFight: () => set({ fight: null }),
 
+		// Removes a monster from the map without a fight or loot (for a rat too strong to beat while the map is at its monster cap)
+		dismissMonster: (id: number) => {
+			const state = get();
+			if (state.fight?.monsterId === id) return false;
+			if (!state.monsters.some((m) => m.id === id)) return false;
+			set({ monsters: state.monsters.filter((m) => m.id !== id) });
+			return true;
+		},
+
 		drinkPotion: (bagIndex: number) => {
 			const state = get();
 			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
@@ -862,6 +871,18 @@ const createGameSlice = (
 				resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) },
 			});
 			return gold;
+		},
+
+		// Throw bag items away for good (no gold); `qty` defaults to one, pass the stack size to clear the slot
+		discardItem: (bagIndex: number, qty?: number) => {
+			const state = get();
+			if (state.fight) return false;
+			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
+			if (!slot) return false;
+			const amount = qty === undefined ? 1 : Math.floor(qty);
+			if (!(amount >= 1) || amount > slot.qty) return false;
+			set({ bag: removeFromBag(state.bag, bagIndex, amount) });
+			return true;
 		},
 
 		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)

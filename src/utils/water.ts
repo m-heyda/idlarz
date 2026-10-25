@@ -33,7 +33,7 @@ export function tileRipples(g: GroundGrid, x: number, y: number, m: TerrainAtlas
 
 	if (me === 'lake') {
 		const [w, h] = RIPPLE_SIZE.lake;
-		const count = d >= 1 ? (roll < 25 ? 0 : roll < 80 ? 1 : 2) : roll < 10 ? 1 : 0; // shore tiles are mostly foam
+		const count = d >= 1 ? (roll < 10 ? 0 : roll < 50 ? 1 : roll < 88 ? 2 : 3) : roll < 15 ? 1 : 0; // shore tiles are mostly foam
 		for (let k = 0; k < count; k++) {
 			// shore tiles keep to the middle; open water may use the whole tile
 			const left = d >= 1 ? 4 + (hash32(x, y, 810 + k) % (CELL - w - 7)) : 12 + (hash32(x, y, 810 + k) % 9);
@@ -49,6 +49,47 @@ export function tileRipples(g: GroundGrid, x: number, y: number, m: TerrainAtlas
 			out.push({ key: `${x},${y},0`, kind: 'swamp', tx: x, ty: y, x: x * CELL + sx - (w >> 1), y: y * CELL + sy - (h >> 1), ...timing(0) });
 		}
 	}
+	return out;
+}
+
+/** The soft glitter over open lake water: one 48px sheet (4 frames) per tile, see sprites_water.py `water_shimmer`. */
+export const SHIMMER = { size: CELL, frames: 4 } as const;
+
+export interface Shimmer {
+	key: string;
+	tx: number;
+	ty: number;
+	x: number; // world px, top-left of the tile
+	y: number;
+	/** mirrored, so neighbouring tiles do not repeat the same dashes */
+	flip: boolean;
+	/** one full loop (ms) and a negative start delay, so the glitter never moves in step across the lake */
+	ms: number;
+	offsetMs: number;
+}
+
+/** Open-water lake tiles (not the shore, which is foam and bank) each get one shimmer. */
+export function tileShimmer(g: GroundGrid, x: number, y: number): Shimmer | null {
+	if (at(g, x, y) !== 'lake' || depth(g, x, y) < 1) return null;
+	return {
+		key: `${x},${y}`,
+		tx: x,
+		ty: y,
+		x: x * CELL,
+		y: y * CELL,
+		flip: hash32(x, y, 850) % 2 === 0,
+		ms: 3200 + (hash32(x, y, 851) % 2400),
+		offsetMs: hash32(x, y, 852) % 6000,
+	};
+}
+
+export function buildShimmers(g: GroundGrid): Shimmer[] {
+	const out: Shimmer[] = [];
+	for (let y = 0; y < g.length; y++)
+		for (let x = 0; x < g[0].length; x++) {
+			const s = tileShimmer(g, x, y);
+			if (s) out.push(s);
+		}
 	return out;
 }
 

@@ -1,0 +1,51 @@
+import { useGameStore } from '@/stores/gameStore';
+import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
+import { pickPersisted } from '@/lib/sanitizeSave';
+import { exportSaveText, saveNow } from '@/lib/saveStorage';
+import { copyText } from '@/lib/clipboard';
+
+const saveGame = async () => {
+	const ok = await saveNow(pickPersisted(useGameStore.getState()));
+	useUiStore.getState().showToast(ok ? 'Game saved' : 'Could not save: the browser blocked it, or another tab runs the game');
+};
+
+const exportGame = async () => {
+	const ok = await copyText(exportSaveText(pickPersisted(useGameStore.getState())));
+	useUiStore.getState().showToast(ok ? 'Save copied to the clipboard' : 'Could not copy: open Import / export and copy it by hand');
+};
+
+/** The entries every menu ends with: settings, saving and the view options. The header dropdown and the right-click menu share them. */
+export const globalMenuItems = (): ContextMenuItem[] => {
+	const ui = useUiStore.getState();
+	const items: ContextMenuItem[] = [
+		{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings },
+		{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
+		{ id: 'save', label: 'Save game', separator: true, onSelect: () => void saveGame() },
+		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
+		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },
+		{
+			id: 'stats',
+			label: 'Show statistics',
+			separator: true,
+			checked: ui.showStats,
+			onSelect: () => ui.setPref('showStats', !ui.showStats),
+		},
+	];
+	// the admin panel exists only in development builds
+	if (process.env.NODE_ENV === 'development') {
+		items.push({
+			id: 'admin',
+			label: 'Show admin mode',
+			checked: ui.showAdmin,
+			onSelect: () => ui.setPref('showAdmin', !ui.showAdmin),
+		});
+	}
+	return items;
+};
+
+/** Opens the menu at a screen position: the given entries first, then the global ones below a rule. */
+export const openMenuAt = (x: number, y: number, title: string | undefined, own: ContextMenuItem[] = []): void => {
+	const global = globalMenuItems();
+	if (own.length) global[0] = { ...global[0], separator: true };
+	useUiStore.getState().openContextMenu({ x, y, title, items: [...own, ...global] });
+};

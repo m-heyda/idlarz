@@ -409,9 +409,18 @@ body {
 		animation: none;
 	}
 
-	.px-ripple {
+	.px-ripple,
+	.px-shimmer {
 		display: none;
 	}
+}
+
+/* A soft glitter over every open-water lake tile (WaterLayer): drifting light dashes, under the ripples, at half strength */
+.px-shimmer {
+	position: absolute;
+	z-index: 0;
+	pointer-events: none;
+	opacity: 0.55;
 }
 
 /* Water ripples on lakes and swamp pools (WaterLayer): the generic stepped sheet, placed on the map by the layer */

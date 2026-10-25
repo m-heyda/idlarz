@@ -18,7 +18,7 @@ No backend, no API routes. The whole game is client-side state.
 
 ```
 src/
-├── app/page.tsx              game loop, tab lock, hidden Ctrl×5 shortcut, composes all overlays
+├── app/page.tsx              game loop, tab lock, hidden Ctrl×5 shortcut, global right-click handler, composes all overlays
 ├── config/
 │   ├── gameConfig.ts         ALL tunable constants (costs, curves, biomes, castle, animals, merchant, click limiter, chests, stats)
 │   ├── combatConfig.ts       COMBAT + MONSTERS: HP, regen, armor, spawn, tiers, drops, Rat King

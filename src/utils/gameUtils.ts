@@ -393,23 +393,59 @@ export const calculateCombatStats = (
 export const calculateTotalMeatProduction = (farmLevels: Record<string, number>, upgrades?: FarmUpgrades): number =>
 	calculateFarmOutput(farmLevels, upgrades).meat;
 
-export const calculateResourceRates = (
+/** Where one resource's income comes from, piece by piece. `base` and `total` are exactly what `calculateResourceRates` reports. */
+export interface ResourceBreakdownEntry {
+	/** Flat income of the realm itself (before any tile) */
+	start: number;
+	/** Farm animals */
+	farm: number;
+	/** Biome tiles, with the adjacency bonus and the yield scale applied */
+	biome: number;
+	/** Buildings, with the adjacency bonus and the yield scale applied */
+	building: number;
+	/** Flat XP from castle levels above 1 */
+	castleXp: number;
+	/** start + farm + biome + building + castleXp */
+	base: number;
+	/** Percentage bonuses (0.2 = +20%), added together before the legacy multiplier */
+	castleMod: number;
+	plainsMod: number;
+	statMod: number;
+	/** The rebirth income multiplier (1 = none) */
+	legacyMult: number;
+	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * legacy - 1 */
+	modifier: number;
+	total: number;
+}
+
+export type ResourceBreakdown = Record<keyof Resources, ResourceBreakdownEntry>;
+
+const RESOURCE_KEYS = Object.keys(BASE_GENERATION_RATES) as (keyof Resources)[];
+const FARM_KEYS = ['meat', 'eggs', 'milk', 'hide'] as const;
+
+const zeroResources = (): Resources => ({ gold: 0, wood: 0, stone: 0, coal: 0, food: 0, meat: 0, eggs: 0, milk: 0, hide: 0, xp: 0 });
+
+/** Income per second of every resource, split into its sources and modifiers (the one place the income formula lives). */
+export const calculateResourceBreakdown = (
 	tiles: Tile[][],
 	characterStats?: CharacterStats,
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
 	farmUpgrades?: FarmUpgrades
-): ResourceRates => {
-	const base = { ...BASE_GENERATION_RATES };
-	const modifiers: Resources = { gold: 0, wood: 0, stone: 0, coal: 0, food: 0, meat: 0, eggs: 0, milk: 0, hide: 0, xp: 0 };
-	const total = { ...BASE_GENERATION_RATES };
+): ResourceBreakdown => {
+	const base: Resources = { ...BASE_GENERATION_RATES };
+	const start: Resources = { ...BASE_GENERATION_RATES };
+	const farmPart = zeroResources();
+	const biomePart = zeroResources();
+	const buildingPart = zeroResources();
 
-	// Add meat and farm products from animals to base rates
+	// Meat and the other farm products come from the animals alone
 	const farm = calculateFarmOutput(farmLevels, farmUpgrades);
-	base.meat = farm.meat;
-	base.eggs = farm.eggs;
-	base.milk = farm.milk;
-	base.hide = farm.hide;
+	for (const key of FARM_KEYS) {
+		base[key] = farm[key];
+		start[key] = 0;
+		farmPart[key] = farm[key];
+	}
 
 	// Calculate base rates from tiles
 	for (let y = 0; y < tiles.length; y++) {
@@ -427,8 +463,9 @@ export const calculateResourceRates = (
 				Object.entries(biome.resourceGeneration).forEach(([resource, rate]) => {
 					if (rate) {
 						// Add to base rate with adjacency bonus
-						base[resource as keyof Resources] +=
-							rate * adjacencyMultiplier * yieldScale;
+						const gain = rate * adjacencyMultiplier * yieldScale;
+						base[resource as keyof Resources] += gain;
+						biomePart[resource as keyof Resources] += gain;
 					}
 				});
 
@@ -436,12 +473,11 @@ export const calculateResourceRates = (
 				if (tile.building) {
 					const building = BUILDINGS[tile.building as BuildingType];
 					if (building && building.resourceGeneration) {
-						// Add building resource generation to the base rates
 						Object.entries(building.resourceGeneration).forEach(([resource, rate]) => {
 							if (rate && typeof rate === 'number') {
-								// Add to base rate with adjacency bonus
-								base[resource as keyof Resources] +=
-									rate * adjacencyMultiplier * BIOME_YIELD.scale;
+								const gain = rate * adjacencyMultiplier * BIOME_YIELD.scale;
+								base[resource as keyof Resources] += gain;
+								buildingPart[resource as keyof Resources] += gain;
 							}
 						});
 					}
@@ -463,41 +499,63 @@ export const calculateResourceRates = (
 	}
 	const castleBonus = castleModifier(castleLevel);
 
-	// Add the castle modifier to all resources
-	Object.keys(modifiers).forEach((resource) => {
-		const key = resource as keyof Resources;
-		modifiers[key] += castleBonus;
-	});
-
 	// Castle levels above 1 add flat XP/s
-	base.xp += CASTLE_UPGRADE.xpBonus * Math.max(castleLevel - 1, 0);
+	const castleXp = CASTLE_UPGRADE.xpBonus * Math.max(castleLevel - 1, 0);
+	base.xp += castleXp;
 
-	// Add Plains biome bonus for meat production
 	// Each owned Plains tile provides a 5% bonus to meat production
+	const plainsMod = zeroResources();
 	const plainsCount = countOwnedBiomeTypes(tiles, 'plains');
-	if (plainsCount > 0) {
-		// 5% per plains tile
-		modifiers.meat += plainsCount * CHARACTER_STAT_CONFIG.plainsMeatModifier;
-	}
+	if (plainsCount > 0) plainsMod.meat = plainsCount * CHARACTER_STAT_CONFIG.plainsMeatModifier;
 
-	// Apply stat-based resource modifiers if stats are provided
+	// Stat-based resource modifiers, when stats are provided
+	const statMod = zeroResources();
 	if (characterStats) {
-		const statModifiers = calculateStatResourceModifiers(characterStats);
-		Object.entries(statModifiers).forEach(([resource, modifier]) => {
-			modifiers[resource as keyof Resources] += modifier;
+		Object.entries(calculateStatResourceModifiers(characterStats)).forEach(([resource, modifier]) => {
+			statMod[resource as keyof Resources] += modifier;
 		});
 	}
 
-	// Legacy income bonus multiplies everything; it is folded into the modifiers so tooltips stay consistent
-	const legacyMultiplier = legacyIncomeMultiplier(prestige);
+	// Legacy income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
+	const legacyMult = legacyIncomeMultiplier(prestige);
 
-	// Calculate total rates
-	Object.keys(total).forEach((resource) => {
-		const key = resource as keyof Resources;
-		modifiers[key] = (1 + modifiers[key]) * legacyMultiplier - 1;
-		total[key] = base[key] * (1 + modifiers[key]);
-	});
+	const result = {} as ResourceBreakdown;
+	for (const key of RESOURCE_KEYS) {
+		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * legacyMult - 1;
+		result[key] = {
+			start: start[key],
+			farm: farmPart[key],
+			biome: biomePart[key],
+			building: buildingPart[key],
+			castleXp: key === 'xp' ? castleXp : 0,
+			base: base[key],
+			castleMod: castleBonus,
+			plainsMod: plainsMod[key],
+			statMod: statMod[key],
+			legacyMult,
+			modifier,
+			total: base[key] * (1 + modifier),
+		};
+	}
+	return result;
+};
 
+export const calculateResourceRates = (
+	tiles: Tile[][],
+	characterStats?: CharacterStats,
+	farmLevels: Record<string, number> = {},
+	prestige?: PrestigeState,
+	farmUpgrades?: FarmUpgrades
+): ResourceRates => {
+	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades);
+	const base = zeroResources();
+	const modifiers = zeroResources();
+	const total = zeroResources();
+	for (const key of RESOURCE_KEYS) {
+		base[key] = breakdown[key].base;
+		modifiers[key] = breakdown[key].modifier;
+		total[key] = breakdown[key].total;
+	}
 	return { base, modifiers, total };
 };
 

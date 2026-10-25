@@ -54,6 +54,8 @@ total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × legacyPointsEarned)    
 
 The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Everything is additive inside the single `(1 + Σ)`.
 
+`calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Legacy factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Stats tab's *Where the income comes from* section shows exactly these numbers per resource.
+
 **New game**: gold 0.2 base × 1.45 = **0.29/s**, wood and food 0.05 × 1.45, stone 0.1 × 1.325, xp 0.75 × 1.223 = 0.92/s.
 
 ## 4. Castle

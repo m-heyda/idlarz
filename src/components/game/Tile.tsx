@@ -6,6 +6,7 @@ import {
 	GRID_HEIGHT,
 	GRID_CENTER_X,
 	GRID_CENTER_Y,
+	BIOMES,
 	BUILDINGS,
 	BuildingType,
 	TILE_TAP,
@@ -35,8 +36,10 @@ import MonsterSprite from './MonsterSprite';
 import { monsterAt, monsterStats, tierSecondsLeft } from '@/lib/monsters';
 import { MONSTERS } from '@/config/combatConfig';
 import CastleUpgradeDialog from './CastleUpgradeDialog';
-import BuildMenu from './BuildMenu';
 import { useMapTipLayer } from './MapTipLayer';
+import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
+import { openMenuAt } from '@/lib/globalMenu';
+import '@/styles/ContextMenu.css';
 
 /** Hover card of a monster: tier, HP, time to the next tier and the call to fight. Reads the age at render time. */
 const MonsterTip: React.FC<{ id: number; type: 'rat' | 'ratKing'; tier: number }> = ({ id, type, tier }) => {
@@ -72,7 +75,6 @@ const Tile: React.FC<TileProps> = ({
 	const characterStats = useGameStore((state) => state.characterStats);
 	const prestige = useGameStore((state) => state.prestige);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
-	const buildOnTile = useGameStore((state) => state.buildOnTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
 	const startFight = useGameStore((state) => state.startFight);
@@ -84,7 +86,8 @@ const Tile: React.FC<TileProps> = ({
 	const [monsterId, monsterType, monsterTier] = monsterKey ? monsterKey.split(':') : [];
 	const [isShaking, setIsShaking] = useState(false);
 	const [showCastleDialog, setShowCastleDialog] = useState(false);
-	const [buildMenuAt, setBuildMenuAt] = useState<{ x: number; y: number } | null>(null);
+	// "Highlight biome" from the right-click menu: every explored tile of that biome pulses an outline for a moment
+	const highlighted = useUiStore((state) => isOwned && biome !== 'castle' && state.highlightBiome === biome);
 	const [showChestTooltip, setShowChestTooltip] = useState(false);
 	const [hovered, setHovered] = useState(false);
 	const tipLayer = useMapTipLayer();
@@ -175,10 +178,11 @@ const Tile: React.FC<TileProps> = ({
 
 		// Prioritize owned tiles for special interactions
 		if (isOwned) {
-			// Castle tile - show castle dialog
+			// Castle tile: the upgrade dialog; a castle that cannot be upgraded any further opens the rebirth (Legacy) window
 			if (biome === 'castle') {
 				audioManager.playSound('click');
-				setShowCastleDialog(true);
+				if (castleLevel >= CASTLE_UPGRADE.maxLevel) useUiStore.getState().toggleLegacy();
+				else setShowCastleDialog(true);
 				return;
 			}
 
@@ -199,20 +203,40 @@ const Tile: React.FC<TileProps> = ({
 		}
 	};
 
-	// Right click on an explored tile: the build menu (a monster, a chest or an existing building keeps it closed)
+	// Right click on an explored tile: what can be done here (fight / dismiss a monster, open a chest, build, highlight the biome),
+	// then the global entries. Unexplored tiles fall through to the global menu alone.
 	const handleContextMenu = (e: React.MouseEvent) => {
 		if (!isOwned) return;
 		e.preventDefault();
-		if (monsterKey || hasChest || !canBuildOn(tiles[y]?.[x])) {
-			audioManager.playSound('wrong');
-			return;
+		const ui = useUiStore.getState();
+		const own: ContextMenuItem[] = [];
+		if (monsterKey) {
+			const id = Number(monsterId);
+			own.push(
+				{ id: 'fight', label: 'Fight', onSelect: () => void startFight(id) },
+				{ id: 'dismiss', label: `Dismiss ${MONSTERS[monsterType as 'rat' | 'ratKing'].label}...`, danger: true, onSelect: () => ui.askDismissMonster(id) }
+			);
+		} else if (hasChest) {
+			own.push({ id: 'chest', label: 'Open chest', onSelect: () => void collectChest(x, y) });
 		}
-		setBuildMenuAt({ x: e.clientX, y: e.clientY });
-	};
-
-	const handleBuildingSelect = (buildingType: string) => {
-		audioManager.playSound(buildOnTile(x, y, buildingType) ? 'purchase' : 'wrong');
-		setBuildMenuAt(null);
+		if (biome !== 'castle') {
+			if (!hasBuilding) {
+				const blocked = !!monsterKey || hasChest;
+				own.push({
+					id: 'build',
+					label: 'Build here...',
+					disabled: blocked || !canBuildOn(tiles[y]?.[x]),
+					hint: blocked ? 'tile in use' : undefined,
+					onSelect: () => ui.openBuildDialog(x, y),
+				});
+			}
+			own.push({
+				id: 'highlight',
+				label: `Highlight ${BIOMES[biome]?.label ?? biome}`,
+				onSelect: () => ui.flashBiome(biome),
+			});
+		}
+		openMenuAt(e.clientX, e.clientY, biome === 'castle' ? 'Castle' : BIOMES[biome]?.label ?? biome, own);
 	};
 
 	return (
@@ -244,6 +268,7 @@ const Tile: React.FC<TileProps> = ({
 						'castle-max-tile': isOwned && isGlowingCastle && !isFortress,
 						'tile-fortress': isOwned && isFortress,
 						'tile-cooldown': cooling,
+						'tile-highlight': highlighted,
 					}
 				)}
 				style={{
@@ -355,12 +380,6 @@ const Tile: React.FC<TileProps> = ({
 			{/* Dialogs go to <body>: inside the map they would be scaled and panned together with the tiles */}
 			{showCastleDialog &&
 				createPortal(<CastleUpgradeDialog onClose={() => setShowCastleDialog(false)} />, document.body)}
-
-			{buildMenuAt &&
-				createPortal(
-					<BuildMenu biome={biome} anchor={buildMenuAt} onSelect={handleBuildingSelect} onClose={() => setBuildMenuAt(null)} />,
-					document.body
-				)}
 		</>
 	);
 };

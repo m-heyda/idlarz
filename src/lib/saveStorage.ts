@@ -323,5 +323,14 @@ export const resetSave = saves.reset;
 export const getSaveInfo = saves.info;
 export const getDamagedSave = saves.damagedCopy;
 
+/** Writes the given state right now instead of waiting for the autosave delay ("Save game"); false when the browser or tab would not take it. */
+export const saveNow = async (state: PersistedGame): Promise<boolean> => {
+	const before = (await saves.info()).savedAt;
+	saves.storage.setItem(PERSIST_NAME, { state, version: PERSIST_VERSION });
+	saves.flush();
+	const after = await saves.info();
+	return !after.error && after.savedAt !== null && after.savedAt !== before;
+};
+
 /** The text a player can copy or download to back up (or move) their game. */
 export const exportSaveText = (state: PersistedGame): string => encodeSave(state);

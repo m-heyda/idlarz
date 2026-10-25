@@ -48,15 +48,7 @@
 	}
 }
 
-/* The right-click build menu: each building drawn on a patch of the tile's own biome, with a pad in that biome's style */
-.build-menu {
-	width: min(660px, calc(100vw - 16px));
-	max-width: calc(100vw - 16px); /* wider than a plain tooltip */
-	max-height: calc(100vh - 16px);
-	overflow-y: auto;
-	pointer-events: auto;
-}
-
+/* The build dialog: each building drawn on a patch of the tile's own biome, with a pad in that biome's style */
 .build-menu-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));

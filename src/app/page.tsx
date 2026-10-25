@@ -23,6 +23,12 @@ import TabLockOverlay from '@/components/game/overlays/TabLockOverlay';
 import { useSingleTab } from '@/hooks/useSingleTab';
 import { useCtrlSequence } from '@/hooks/useCtrlSequence';
 import { useUiStore } from '@/stores/uiStore';
+import { useGlobalContextMenu } from '@/hooks/useGlobalContextMenu';
+import ContextMenu from '@/components/game/ContextMenu';
+import BuildDialog from '@/components/game/BuildDialog';
+import ConfirmDialogs from '@/components/game/ConfirmDialogs';
+import StatsOverlay from '@/components/game/StatsOverlay';
+import Toast from '@/components/game/Toast';
 
 export default function Home() {
 	const tick = useGameStore((state) => state.tick);
@@ -31,6 +37,10 @@ export default function Home() {
 	const toggleSaveMenu = useUiStore((state) => state.toggleSaveMenu);
 	const loadSettings = useSettingsStore((state) => state.load);
 	useEffect(() => loadSettings(), [loadSettings]);
+	const loadPrefs = useUiStore((state) => state.loadPrefs);
+	useEffect(() => loadPrefs(), [loadPrefs]);
+	// no browser menu anywhere: the right click belongs to the game (tiles and bag slots add their own entries)
+	useGlobalContextMenu();
 	// Hidden shortcut: Control x5 within 2.5 s opens the save tools (export / import / reset)
 	useCtrlSequence(5, 2500, toggleSaveMenu);
 	const lastChestLoot = useGameStore((state) => state.lastChestLoot);
@@ -83,6 +93,11 @@ export default function Home() {
 			<SettingsDialog />
 			<LegacyDialog />
 			<TutorialDialog />
+			<BuildDialog />
+			<ConfirmDialogs />
+			<StatsOverlay />
+			<ContextMenu />
+			<Toast />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}
 			<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
 		</main>

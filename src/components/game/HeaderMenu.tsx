@@ -4,6 +4,7 @@ import { formatNumber } from '@/utils/formatters';
 import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR, REBIRTH, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
 import { useMenuAttention } from '@/hooks/useMenuAttention';
 import { useUiStore } from '@/stores/uiStore';
+import { openMenuAt } from '@/lib/globalMenu';
 import type { PixelIconName } from '@/config/pixelIcons';
 import PixelIcon from './PixelIcon';
 import LevelOrb from './LevelOrb';
@@ -85,7 +86,6 @@ export const HeaderButtons: React.FC = () => {
 	const menuOpen = useUiStore((state) => state.menuOpen);
 	const toggleMenu = useUiStore((state) => state.toggleMenu);
 	const settingsOpen = useUiStore((state) => state.settingsOpen);
-	const toggleSettings = useUiStore((state) => state.toggleSettings);
 	const legacyOpen = useUiStore((state) => state.legacyOpen);
 	const toggleLegacy = useUiStore((state) => state.toggleLegacy);
 	const castleLevel = useGameStore((state) => state.tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1);
@@ -96,7 +96,9 @@ export const HeaderButtons: React.FC = () => {
 		icon: PixelIconName;
 		title: string;
 		active: boolean;
-		onClick: () => void;
+		onClick: (event: React.MouseEvent<HTMLElement>) => void;
+		/** Marks a button that opens the dropdown, so a second click on it closes the menu instead of reopening it */
+		anchor?: boolean;
 		notify?: boolean;
 		notifyLabel?: string;
 	}[] = [
@@ -120,9 +122,15 @@ export const HeaderButtons: React.FC = () => {
 			: []),
 		{
 			icon: 'menu_settings',
-			title: 'Settings',
+			title: 'Game menu: settings, save, export, statistics',
 			active: settingsOpen,
-			onClick: toggleSettings,
+			anchor: true,
+			onClick: (event) => {
+				const ui = useUiStore.getState();
+				if (ui.contextMenu) return ui.closeContextMenu();
+				const box = event.currentTarget.getBoundingClientRect();
+				openMenuAt(box.right - 4, box.bottom + 4, 'Menu');
+			},
 		},
 	];
 
@@ -134,6 +142,7 @@ export const HeaderButtons: React.FC = () => {
 					className='pixel-slot'
 					data-active={button.active}
 					title={button.title}
+					data-ctx-anchor={button.anchor ? '' : undefined}
 					onClick={button.onClick}>
 					<PixelIcon name={button.icon} alt={button.title} scale={0.8} />
 					<NotifyDot show={!!button.notify} label={button.notifyLabel} />

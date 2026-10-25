@@ -302,6 +302,7 @@ export interface GameState {
 	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;
 	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
+	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
 	sellJunk: (maxRarity: EquipmentRarity) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
 	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
@@ -315,6 +316,7 @@ export interface GameState {
 	startFight: (monsterId: number) => boolean;
 	hitMonster: (input: ClickInput) => { damage: number; killed: boolean; crit: CritKind } | null;
 	leaveFight: () => void;
+	dismissMonster: (id: number) => boolean; // removes a monster from the map, no loot; false for the one being fought
 	drinkPotion: (bagIndex: number) => boolean;
 	equipItem: (bagIndex: number) => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;

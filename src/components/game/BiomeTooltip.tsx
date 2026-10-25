@@ -167,7 +167,7 @@ export const BiomeTooltip = memo(
 					</div>
 				)}
 				{canBuild && (
-					<div className='text-amber-400 text-xs mt-1'>Right-click to build here</div>
+					<div className='text-amber-400 text-xs mt-1'>Right-click to build or for more</div>
 				)}
 				{adjacentCount > 0 && (
 					<div className='mt-0.5 text-yellow-500 text-xs'>

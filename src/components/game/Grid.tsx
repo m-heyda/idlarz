@@ -150,6 +150,8 @@ const Grid: React.FC = () => {
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent | React.TouchEvent) => {
+			// only the main button pans: a right press belongs to the context menu
+			if ('button' in e && e.button !== 0) return;
 			e.preventDefault();
 			const pos = 'touches' in e ? e.touches[0] : e;
 			setIsDragging(true);

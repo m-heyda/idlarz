@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { buildGroundGrid, terrainKey } from '@/utils/terrain';
-import { buildRipples, RIPPLE_FRAMES, RIPPLE_SIZE } from '@/utils/water';
+import { buildRipples, buildShimmers, RIPPLE_FRAMES, RIPPLE_SIZE, SHIMMER } from '@/utils/water';
 import { pixelIconSrc } from '@/config/pixelIcons';
 
 interface WaterLayerProps {
@@ -24,12 +24,39 @@ const WaterLayer: React.FC<WaterLayerProps> = React.memo(({ minX, maxX, minY, ma
 	const key = useMemo(() => terrainKey(tiles), [tiles]);
 	const tilesRef = useRef(tiles);
 	tilesRef.current = tiles;
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const ripples = useMemo(() => (tilesRef.current ? buildRipples(buildGroundGrid(tilesRef.current)) : []), [key]);
+	const water = useMemo(() => {
+		if (!tilesRef.current) return { ripples: [], shimmers: [] };
+		const grid = buildGroundGrid(tilesRef.current);
+		return { ripples: buildRipples(grid), shimmers: buildShimmers(grid) };
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [key]);
+	const { ripples, shimmers } = water;
 
 	if (!enabled) return null;
 	return (
 		<>
+			{shimmers
+				.filter((s) => s.tx >= minX && s.tx < maxX && s.ty >= minY && s.ty < maxY)
+				.map((s) => (
+					<span
+						key={s.key}
+						className='px-shine px-shimmer'
+						aria-hidden
+						style={
+							{
+								left: s.x,
+								top: s.y,
+								'--px-w': `${SHIMMER.size}px`,
+								'--px-h': `${SHIMMER.size}px`,
+								'--px-frames': SHIMMER.frames,
+								'--px-ms': `${s.ms}ms`,
+								'--px-sheet': `url(${pixelIconSrc('water_shimmer')})`,
+								animationDelay: `-${s.offsetMs}ms`,
+								transform: s.flip ? 'scaleX(-1)' : undefined,
+							} as React.CSSProperties
+						}
+					/>
+				))}
 			{ripples
 				.filter((r) => r.tx >= minX && r.tx < maxX && r.ty >= minY && r.ty < maxY)
 				.map((r) => {
