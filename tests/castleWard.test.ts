@@ -1,20 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, store } from './helpers';
-import { CASTLE_FORTRESS, CASTLE_RANGE, GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
+import { api, freshGame, growTo, store, tileAt, rawSnapshot, gridCells } from './helpers';
+import { CASTLE_FORTRESS, CASTLE_RANGE, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import { castleLevelOf, fortressWallTier, isInWard, monstersOutsideWard } from '../src/lib/castleWard';
 import { groundOf } from '../src/utils/terrain';
 import { pickSpawnTile } from '../src/lib/monsters';
-import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
+import { sanitizeSave } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
+import { patchTile, setTile } from '../src/utils/world';
 
 const L7 = CASTLE_FORTRESS.fromLevel;
 const R = CASTLE_RANGE.radius;
 
 const setCastle = (level: number) =>
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		tiles[GRID_CENTER_Y][GRID_CENTER_X] = { ...tiles[GRID_CENTER_Y][GRID_CENTER_X], level };
+		const tiles = patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level });
 		return { tiles };
 	});
 
@@ -22,7 +22,7 @@ const ring = () => {
 	const out: { x: number; y: number }[] = [];
 	for (let dy = -R; dy <= R; dy++) {
 		for (let dx = -R; dx <= R; dx++) {
-			if (dx || dy) out.push({ x: GRID_CENTER_X + dx, y: GRID_CENTER_Y + dy });
+			if (dx || dy) out.push({ x: CASTLE_X + dx, y: CASTLE_Y + dy });
 		}
 	}
 	return out;
@@ -31,8 +31,8 @@ const ring = () => {
 /** Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3). */
 const ownRing = () =>
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		for (const { x, y } of ring()) tiles[y][x] = { biome: 'plains', isOwned: true };
+		let tiles = s.tiles;
+		for (const { x, y } of ring()) tiles = setTile(tiles, x, y, { biome: 'plains', isOwned: true });
 		return { tiles };
 	});
 
@@ -48,9 +48,9 @@ test('isInWard: the 3x3 around the castle from level 7, nothing before and nothi
 		assert.equal(isInWard(x, y, L7), true, `${x},${y} at level ${L7}`);
 		assert.equal(isInWard(x, y, 10), true);
 	}
-	assert.equal(isInWard(GRID_CENTER_X + R + 1, GRID_CENTER_Y, 10), false);
-	assert.equal(isInWard(GRID_CENTER_X, GRID_CENTER_Y - R - 1, 10), false);
-	assert.equal(isInWard(GRID_CENTER_X + R + 1, GRID_CENTER_Y + R + 1, 10), false);
+	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y, 10), false);
+	assert.equal(isInWard(CASTLE_X, CASTLE_Y - R - 1, 10), false);
+	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y + R + 1, 10), false);
 });
 
 test('castleLevelOf reads the castle tile', () => {
@@ -61,7 +61,7 @@ test('castleLevelOf reads the castle tile', () => {
 });
 
 test('monstersOutsideWard drops ring monsters but keeps the one being fought', () => {
-	const list = [rat(1, GRID_CENTER_X + 1, GRID_CENTER_Y), rat(2, GRID_CENTER_X + 2, GRID_CENTER_Y), rat(3, GRID_CENTER_X, GRID_CENTER_Y - 1)];
+	const list = [rat(1, CASTLE_X + 1, CASTLE_Y), rat(2, CASTLE_X + 2, CASTLE_Y), rat(3, CASTLE_X, CASTLE_Y - 1)];
 	assert.deepEqual(monstersOutsideWard(list, L7, null).map((m) => m.id), [2]);
 	assert.deepEqual(monstersOutsideWard(list, L7, 3).map((m) => m.id), [2, 3]);
 	assert.equal(monstersOutsideWard(list, L7 - 1, null), list);
@@ -88,11 +88,10 @@ test('pickSpawnTile never picks a ward tile from level 7, but does before', () =
 test('reaching level 7 clears the monsters inside the ward, a fought one stays until the fight ends', () => {
 	freshGame();
 	growTo(14);
-	const outside = api()
-		.tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y })))
+	const outside = gridCells()
 		.find(({ t, x, y }) => t.isOwned && t.biome !== 'castle' && !isInWard(x, y, L7))!;
 	store.setState({
-		monsters: [rat(1, GRID_CENTER_X + 1, GRID_CENTER_Y), rat(2, outside.x, outside.y), rat(3, GRID_CENTER_X - 1, GRID_CENTER_Y + 1)],
+		monsters: [rat(1, CASTLE_X + 1, CASTLE_Y), rat(2, outside.x, outside.y), rat(3, CASTLE_X - 1, CASTLE_Y + 1)],
 		nextMonsterId: 4,
 		castleUpgrade: { toLevel: L7, remainingSec: 0.05 },
 	});
@@ -112,18 +111,18 @@ test('no chest ever spawns inside the ward from level 7', () => {
 	setCastle(L7);
 	for (let i = 0; i < 4; i++) api().tick(300_000);
 	assert.equal(api().activeChests, 0);
-	assert.ok(ring().every(({ x, y }) => !api().tiles[y][x].hasChest));
+	assert.ok(ring().every(({ x, y }) => !tileAt(api().tiles, x, y).hasChest));
 	growTo(12);
 	for (let i = 0; i < 4; i++) api().tick(300_000);
 	assert.ok(api().activeChests > 0, 'chests still spawn outside the ward');
-	assert.ok(ring().every(({ x, y }) => !api().tiles[y][x].hasChest));
+	assert.ok(ring().every(({ x, y }) => !tileAt(api().tiles, x, y).hasChest));
 });
 
 test('a save with a monster inside the ward of a level 7+ castle is rejected', () => {
 	freshGame();
 	growTo(12);
-	const snapshot = () => JSON.parse(JSON.stringify(pickPersisted(api())));
-	store.setState({ monsters: [rat(1, GRID_CENTER_X + 1, GRID_CENTER_Y)], nextMonsterId: 2 });
+	const snapshot = () => rawSnapshot();
+	store.setState({ monsters: [rat(1, CASTLE_X + 1, CASTLE_Y)], nextMonsterId: 2 });
 	setCastle(L7 - 1);
 	assert.equal(sanitizeSave(snapshot()).ok, true, 'fine below level 7');
 	setCastle(L7);
@@ -138,7 +137,7 @@ test('fortressWallTier: stone walls for levels 7-8, gilded for 9-10', () => {
 
 test('the castle tile is drawn on cobbled yard ground from level 7 and on its flagstones before', () => {
 	freshGame();
-	const castle = () => api().tiles[GRID_CENTER_Y][GRID_CENTER_X];
+	const castle = () => tileAt(api().tiles, CASTLE_X, CASTLE_Y);
 	setCastle(L7 - 1);
 	assert.equal(groundOf(castle()), 'castle');
 	setCastle(L7);

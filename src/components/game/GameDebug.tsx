@@ -3,12 +3,14 @@ import { castleLevelOf } from '@/lib/castleWard';
 import React, { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, MAX_CATCHUP_SEC } from '@/config/gameConfig';
+import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, MAX_CATCHUP_SEC, XP_CAP } from '@/config/gameConfig';
+import { MAX_OWNED_TILES, ownedCount, patchTile, tileAt } from '@/utils/world';
+import { syntheticWorld } from '@/utils/worldGen';
 import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '@/catalog';
 import { addToBag } from '@/lib/inventory';
 import { maxHp } from '@/lib/combat';
 import { pickSpawnTile } from '@/lib/monsters';
-import { countOwnedTiles } from '@/utils/gameUtils';
+import { calculateResourceRates, calculateXpGain, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
 import type { MonsterType, Resources } from '@/types/game';
 import PixelIcon from './PixelIcon';
 
@@ -27,12 +29,10 @@ const spawnChest = () => {
 	const state = useGameStore.getState();
 	const spot = pickChestSpot(state.tiles, new Set(state.monsters.map((m) => `${m.x},${m.y}`)), castleLevelOf(state.tiles));
 	if (!spot) return toast('No eligible tile for a chest: buy more tiles first');
-	useGameStore.setState((st) => {
-		const tiles = [...st.tiles];
-		tiles[spot.y] = [...tiles[spot.y]];
-		tiles[spot.y][spot.x] = { ...tiles[spot.y][spot.x], hasChest: true };
-		return { tiles, activeChests: st.activeChests + 1 };
-	});
+	useGameStore.setState((st) => ({
+		tiles: patchTile(st.tiles, spot.x, spot.y, { hasChest: true }),
+		activeChests: st.activeChests + 1,
+	}));
 	toast(`Chest spawned at tile (${spot.x}, ${spot.y})`);
 };
 
@@ -62,16 +62,29 @@ const heal = () => useGameStore.setState((state) => ({ playerHp: maxHp(state.cha
 // Dev shortcuts for testing the late game quickly
 const castleUp = () =>
 	useGameStore.setState((state) => {
-		const tiles = state.tiles.map((row) => [...row]);
-		const castle = tiles[GRID_CENTER_Y][GRID_CENTER_X];
+		const castle = tileAt(state.tiles, CASTLE_X, CASTLE_Y);
 		const level = Math.min((castle.level ?? 1) + 1, CASTLE_UPGRADE.maxLevel);
-		tiles[GRID_CENTER_Y][GRID_CENTER_X] = {
-			...castle,
+		const tiles = patchTile(state.tiles, CASTLE_X, CASTLE_Y, {
 			level,
 			upgradeCost: level < CASTLE_UPGRADE.maxLevel ? { ...CASTLE_UPGRADE.upgradeCosts[level - 1] } : undefined,
-		};
+		});
 		return { tiles, castleUpgrade: null };
 	});
+
+/** Grows the map by `count` connected tiles at once (a seeded random blob, reaching negative coordinates). Cheat: the XP those tiles would have paid is granted, so the game stays saveable. */
+const growMap = (count: number) => {
+	const s = useGameStore.getState();
+	const n = Math.min(count, MAX_OWNED_TILES - ownedCount(s.tiles));
+	if (n <= 0) return toast('The map is full');
+	const t0 = performance.now();
+	const tiles = syntheticWorld(n, ownedCount(s.tiles), s.tiles);
+	let needed = 0;
+	for (let k = 2; k <= economyTiles(tiles, s.freeTiles); k++) needed += calculateXpGain(k);
+	const xp = Math.max(s.resources.xp, Math.min(needed * 1.01, XP_CAP));
+	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);
+	useGameStore.setState({ tiles, resources: { ...s.resources, xp }, resourceRates });
+	toast(`Added ${n.toLocaleString('en')} tiles in ${Math.round(performance.now() - t0)} ms (${ownedCount(tiles).toLocaleString('en')} in all)`);
+};
 
 const fastForward = () => {
 	for (let i = 0; i < 12; i++) useGameStore.getState().tick(MAX_CATCHUP_SEC * 1000);
@@ -105,6 +118,14 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 			{ label: 'Heal', tone: '', run: heal },
 			{ label: 'Castle +1 level', tone: 'blue', run: castleUp },
 			{ label: 'Reset name', tone: 'gray', run: () => useGameStore.getState().setPlayerName('Explorer') },
+		],
+	},
+	{
+		title: 'Map',
+		actions: [
+			{ label: '+500 tiles', tone: 'gray', run: () => growMap(500) },
+			{ label: '+5k tiles', tone: 'gray', run: () => growMap(5000) },
+			{ label: '+50k tiles', tone: 'red', run: () => growMap(50000) },
 		],
 	},
 	{

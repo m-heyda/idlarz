@@ -13,7 +13,7 @@ import {
 } from '@/lib/saveStorage';
 import { copyText } from '@/lib/clipboard';
 import { formatTime } from '@/utils/formatters';
-import { GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
+import { castleLevelOf } from '@/lib/castleWard';
 import { countOwnedTiles } from '@/utils/gameUtils';
 import PixelModal from '../PixelModal';
 
@@ -223,7 +223,7 @@ const SaveDialogBody: React.FC = () => {
 							<div className='mt-3'>
 								<div className='px-h'>Replace current progress?</div>
 								<div className='text-[#d8c8a0] mb-3'>
-									Level {ok.level.level}, castle {ok.tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1}, {countOwnedTiles(ok.tiles)} tiles,{' '}
+									Level {ok.level.level}, castle {castleLevelOf(ok.tiles)}, {countOwnedTiles(ok.tiles)} tiles,{' '}
 									{formatTime(ok.playSeconds)} played
 									{parsed.kind === 'ok' && parsed.savedAt ? `, saved ${new Date(parsed.savedAt).toLocaleString()}` : ''}.
 								</div>

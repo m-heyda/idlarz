@@ -1,8 +1,9 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { buildGroundGrid, terrainKey } from '@/utils/terrain';
-import { buildRipples, buildShimmers, RIPPLE_FRAMES, RIPPLE_SIZE, SHIMMER } from '@/utils/water';
+import { CHUNK_TILES, chunkOf, chunkSignature, worldGround } from '@/utils/terrain';
+import { tileRipples, tileShimmer, RIPPLE_FRAMES, RIPPLE_SIZE, SHIMMER, type Ripple, type Shimmer } from '@/utils/water';
+import { ownedBounds, type World } from '@/utils/world';
 import { pixelIconSrc } from '@/config/pixelIcons';
 
 interface WaterLayerProps {
@@ -14,28 +15,38 @@ interface WaterLayerProps {
 }
 
 /**
- * Ripples on lakes and swamp pools: small stepped sprite sheets laid over the terrain canvas. They are placed by hash
- * (utils/water.ts), recomputed only when the terrain changes, culled to the screen, and follow the Ambient life setting
- * and prefers-reduced-motion.
+ * Ripples on lakes and swamp pools and the glitter on open water: small stepped sprite sheets laid over the terrain. They
+ * are placed by hash (utils/water.ts), built per chunk and rebuilt only when that chunk's terrain changes, culled to the
+ * screen, and follow the Ambient life setting and prefers-reduced-motion.
  */
-const WaterLayer: React.FC<WaterLayerProps> = React.memo(({ minX, maxX, minY, maxY }) => {
-	const tiles = useGameStore((state) => state.tiles);
-	const enabled = useSettingsStore((state) => state.ambientLife);
-	const key = useMemo(() => terrainKey(tiles), [tiles]);
-	const tilesRef = useRef(tiles);
-	tilesRef.current = tiles;
-	const water = useMemo(() => {
-		if (!tilesRef.current) return { ripples: [], shimmers: [] };
-		const grid = buildGroundGrid(tilesRef.current);
-		return { ripples: buildRipples(grid), shimmers: buildShimmers(grid) };
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [key]);
-	const { ripples, shimmers } = water;
+interface WaterChunkProps extends WaterLayerProps {
+	cx: number;
+	cy: number;
+	tiles: World;
+}
 
-	if (!enabled) return null;
+const WaterChunk: React.FC<WaterChunkProps> = React.memo(({ cx, cy, tiles, minX, maxX, minY, maxY }) => {
+	const signature = useMemo(() => chunkSignature(tiles, cx, cy), [tiles, cx, cy]);
+	const water = useMemo(() => {
+		const g = worldGround(tiles);
+		const ripples: Ripple[] = [];
+		const shimmers: Shimmer[] = [];
+		for (let y = cy * CHUNK_TILES; y < (cy + 1) * CHUNK_TILES; y++) {
+			for (let x = cx * CHUNK_TILES; x < (cx + 1) * CHUNK_TILES; x++) {
+				if (!g(x, y)) continue;
+				ripples.push(...tileRipples(g, x, y));
+				const s = tileShimmer(g, x, y);
+				if (s) shimmers.push(s);
+			}
+		}
+		return { ripples, shimmers };
+		// the picture of the chunk (its signature) is all the water depends on
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [signature, cx, cy]);
+
 	return (
 		<>
-			{shimmers
+			{water.shimmers
 				.filter((s) => s.tx >= minX && s.tx < maxX && s.ty >= minY && s.ty < maxY)
 				.map((s) => (
 					<span
@@ -57,7 +68,7 @@ const WaterLayer: React.FC<WaterLayerProps> = React.memo(({ minX, maxX, minY, ma
 						}
 					/>
 				))}
-			{ripples
+			{water.ripples
 				.filter((r) => r.tx >= minX && r.tx < maxX && r.ty >= minY && r.ty < maxY)
 				.map((r) => {
 					const [w, h] = RIPPLE_SIZE[r.kind];
@@ -81,6 +92,30 @@ const WaterLayer: React.FC<WaterLayerProps> = React.memo(({ minX, maxX, minY, ma
 						/>
 					);
 				})}
+		</>
+	);
+});
+WaterChunk.displayName = 'WaterChunk';
+
+const WaterLayer: React.FC<WaterLayerProps> = React.memo(({ minX, maxX, minY, maxY }) => {
+	const tiles = useGameStore((state) => state.tiles);
+	const enabled = useSettingsStore((state) => state.ambientLife);
+	const bounds = ownedBounds(tiles);
+	if (!enabled || !bounds) return null;
+
+	// only the chunks that overlap the screen and the explored land
+	const chunks: { cx: number; cy: number }[] = [];
+	const c0x = Math.max(chunkOf(minX), chunkOf(bounds.minX - 1));
+	const c1x = Math.min(chunkOf(maxX - 1), chunkOf(bounds.maxX + 1));
+	const c0y = Math.max(chunkOf(minY), chunkOf(bounds.minY - 1));
+	const c1y = Math.min(chunkOf(maxY - 1), chunkOf(bounds.maxY + 1));
+	for (let cy = c0y; cy <= c1y; cy++) for (let cx = c0x; cx <= c1x; cx++) chunks.push({ cx, cy });
+
+	return (
+		<>
+			{chunks.map(({ cx, cy }) => (
+				<WaterChunk key={`${cx},${cy}`} cx={cx} cy={cy} tiles={tiles} minX={minX} maxX={maxX} minY={minY} maxY={maxY} />
+			))}
 		</>
 	);
 });

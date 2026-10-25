@@ -1,15 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, setResources } from './helpers';
-import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, MAX_CATCHUP_SEC } from '../src/config/gameConfig';
+import { api, freshGame, setResources, tileAt, rawSnapshot } from './helpers';
+import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, MAX_CATCHUP_SEC } from '../src/config/gameConfig';
 import { castleModifier, castleUpgradeDuration } from '../src/utils/gameUtils';
-import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
+import { sanitizeSave } from '../src/lib/sanitizeSave';
 
-const castleLevel = () => api().tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1;
+const castleLevel = () => tileAt(api().tiles, CASTLE_X, CASTLE_Y).level ?? 1;
 
 /** Pays for and waits out one castle upgrade with the real actions. */
 const upgradeOnce = () => {
-	const cost = api().tiles[GRID_CENTER_Y][GRID_CENTER_X].upgradeCost!;
+	const cost = tileAt(api().tiles, CASTLE_X, CASTLE_Y).upgradeCost!;
 	setResources({ ...(cost as Record<string, number>) });
 	assert.equal(api().upgradeCastle(), true);
 	setResources({ gold: 1e12, wood: 1e12, stone: 1e12, coal: 1e12, food: 1e12, meat: 1e12 });
@@ -50,11 +50,11 @@ test('the castle can be taken all the way to the last level, the rates follow, a
 		assert.ok(api().resourceRates.modifiers.gold >= castleModifier(target) - 1e-9);
 		assert.equal(api().castleUpgrade, null);
 	}
-	assert.equal(api().tiles[GRID_CENTER_Y][GRID_CENTER_X].upgradeCost, undefined);
+	assert.equal(tileAt(api().tiles, CASTLE_X, CASTLE_Y).upgradeCost, undefined);
 	assert.equal(api().upgradeCastle(), false); // already at the last level
-	const saved = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const saved = rawSnapshot();
 	assert.equal(sanitizeSave(saved).ok, true);
-	saved.tiles[GRID_CENTER_Y][GRID_CENTER_X].level = CASTLE_UPGRADE.maxLevel + 1;
+	saved.tiles[CASTLE_Y][CASTLE_X].level = CASTLE_UPGRADE.maxLevel + 1;
 	assert.equal(sanitizeSave(saved).ok, false);
 	// xp bonus keeps growing with the level
 	assert.ok(api().resourceRates.base.xp >= 0.25 + CASTLE_UPGRADE.xpBonus * (CASTLE_UPGRADE.maxLevel - 1));
@@ -62,15 +62,15 @@ test('the castle can be taken all the way to the last level, the rates follow, a
 
 test('a castle upgrade in a save must be exactly the next level', () => {
 	freshGame();
-	const cost = api().tiles[GRID_CENTER_Y][GRID_CENTER_X].upgradeCost as Record<string, number>;
+	const cost = tileAt(api().tiles, CASTLE_X, CASTLE_Y).upgradeCost as Record<string, number>;
 	setResources({ ...cost });
 	assert.equal(api().upgradeCastle(), true);
-	const saved = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const saved = rawSnapshot();
 	assert.equal(sanitizeSave(saved).ok, true);
 	saved.castleUpgrade.toLevel = 4;
 	assert.equal(sanitizeSave(saved).ok, false);
 	saved.castleUpgrade = { toLevel: 2, remainingSec: castleUpgradeDuration(1) + 1 };
 	assert.equal(sanitizeSave(saved).ok, false);
 	assert.equal(castleLevel(), 1);
-	assert.equal(GRID_CENTER_X, 25);
+	assert.equal(CASTLE_X, 25);
 });

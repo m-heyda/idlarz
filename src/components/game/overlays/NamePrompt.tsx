@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { countOwnedTiles } from '@/utils/gameUtils';
 import PixelModal from '../PixelModal';
 import Tutorial from './Tutorial';
 
@@ -14,14 +15,7 @@ const NamePrompt = () => {
 	// Count owned tiles to determine if we should show the name prompt
 	useEffect(() => {
 		// Count all owned tiles
-		let ownedTileCount = 0;
-		tiles.forEach((row) => {
-			row.forEach((tile) => {
-				if (tile && tile.isOwned) {
-					ownedTileCount++;
-				}
-			});
-		});
+		const ownedTileCount = countOwnedTiles(tiles);
 
 		// Show the prompt if:
 		// 1. Player has exactly 2 owned tiles (castle + first purchase)

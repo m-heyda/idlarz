@@ -7,8 +7,12 @@ import React, {
 	JSX,
 } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { GRID_SIZE, GRID_HEIGHT, TILE_SIZE, CASTLE_FORTRESS } from '@/config/gameConfig';
+import { CASTLE_FORTRESS } from '@/config/gameConfig';
 import { castleLevelOf } from '@/lib/castleWard';
+import { visibleTileRange } from '@/lib/mapView';
+import { useViewStore } from '@/stores/viewStore';
+import { calculateTileCost, canAffordBundle, economyTiles, effectiveTileDiscount, tileCostAsResources } from '@/utils/gameUtils';
+import { getTile, hasOwnedNeighbour } from '@/utils/world';
 import Tile from './Tile';
 import AmbientLife from './AmbientLife';
 import { MapTipLayerContext } from './MapTipLayer';
@@ -17,13 +21,14 @@ import CastleRange from './CastleRange';
 import CastleFortress from './CastleFortress';
 import TerrainLayer from './TerrainLayer';
 import WaterLayer from './WaterLayer';
+import HighlightLayer from './HighlightLayer';
 
-interface Position {
+interface Velocity {
 	x: number;
 	y: number;
 }
 
-interface Velocity {
+interface Position {
 	x: number;
 	y: number;
 }
@@ -37,47 +42,34 @@ const VISIBLE_PADDING = 2;
 // Wheel zoom. Stepped (not continuous) so the pixel art stays crisp; the range is kept narrow enough that tiles stay
 // readable (0.75 = 36px tiles) and sprites never get blurry-big (2 = a clean 2x).
 const ZOOM_LEVELS = [0.75, 1, 1.5, 2];
-const DEFAULT_ZOOM = 1;
 const WHEEL_STEP_PX = 50; // accumulated wheel delta needed for one zoom step
 const WHEEL_LOCKOUT_MS = 140; // swallow trackpad inertia after a step
 
 const Grid: React.FC = () => {
 	const tiles = useGameStore((state) => state.tiles);
+	// whether the next tile can be paid: the price is the same for every tile that can be bought, so it is worked out once here
+	const canAffordNext = useGameStore((state) =>
+		canAffordBundle(
+			state.resources,
+			tileCostAsResources(
+				calculateTileCost(economyTiles(state.tiles, state.freeTiles), effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades))
+			)
+		)
+	);
 	const gridRef = useRef<HTMLDivElement>(null);
-	const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+	const { x: viewX, y: viewY, zoom, w: windowW, h: windowH } = useViewStore();
 	const velocityRef = useRef<Velocity>({ x: 0, y: 0 });
 	const [isDragging, setIsDragging] = useState(false);
 	const [lastMousePos, setLastMousePos] = useState<Position | null>(null);
 	const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
-	const [windowSize, setWindowSize] = useState<Position>({ x: 800, y: 600 });
 	const animationFrameRef = useRef<number | null>(null);
-	const [zoom, setZoom] = useState(DEFAULT_ZOOM);
-	const zoomRef = useRef(DEFAULT_ZOOM);
 	const wheelAccRef = useRef({ delta: 0, lockedUntil: 0 });
 
 	useEffect(() => {
-		const updateWindowSize = () => {
-			if (typeof window !== 'undefined') {
-				setWindowSize({
-					x: window.innerWidth,
-					y: window.innerHeight,
-				});
-			}
-		};
-
+		const updateWindowSize = () => useViewStore.getState().setSize(window.innerWidth, window.innerHeight);
 		updateWindowSize();
+		useViewStore.getState().centerOnCastle();
 		window.addEventListener('resize', updateWindowSize);
-
-		// Center the grid initially
-		const centerX = Math.floor(GRID_SIZE / 2);
-		const centerY = Math.floor(GRID_HEIGHT / 2);
-
-		// Adjust initial position to center the viewport
-		setPosition({
-			x: window.innerWidth / 2 - centerX * TILE_SIZE,
-			y: window.innerHeight / 2 - centerY * TILE_SIZE,
-		});
-
 		return () => {
 			window.removeEventListener('resize', updateWindowSize);
 			if (animationFrameRef.current) {
@@ -86,24 +78,15 @@ const Grid: React.FC = () => {
 		};
 	}, []);
 
-	const getBoundedPosition = useCallback(
-		(pos: Position, z: number = zoomRef.current): Position => {
-			const gridWidth = GRID_SIZE * TILE_SIZE * z;
-			const gridHeight = GRID_HEIGHT * TILE_SIZE * z;
+	// the explored land changed (a purchase at the edge, rebirth, reset, load): the view may no longer be allowed
+	useEffect(() => {
+		useViewStore.getState().reclamp();
+	}, [tiles.bounds]);
 
-			// Calculate maximum allowed movement to keep grid visible
-			const minX = -(gridWidth - windowSize.x); // Don't allow dragging past right edge
-			const minY = -(gridHeight - windowSize.y); // Don't allow dragging past bottom edge
-			const maxX = 0; // Don't allow dragging past left edge
-			const maxY = 0; // Don't allow dragging past top edge
-
-			return {
-				x: Math.min(maxX, Math.max(minX, pos.x)),
-				y: Math.min(maxY, Math.max(minY, pos.y)),
-			};
-		},
-		[windowSize]
-	);
+	const pan = useCallback((dx: number, dy: number) => {
+		const v = useViewStore.getState();
+		v.setPosition({ x: v.x + dx, y: v.y + dy });
+	}, []);
 
 	// Wheel zoom around the cursor. Native listener: React's onWheel is passive and cannot stop the page zooming.
 	useEffect(() => {
@@ -120,33 +103,18 @@ const Grid: React.FC = () => {
 			acc.delta = 0;
 			acc.lockedUntil = now + WHEEL_LOCKOUT_MS;
 
-			// never zoom out so far that the world no longer covers the screen
-			const minZoom = Math.max(
-				windowSize.x / (GRID_SIZE * TILE_SIZE),
-				windowSize.y / (GRID_HEIGHT * TILE_SIZE)
-			);
-			const levels = ZOOM_LEVELS.filter((l) => l >= minZoom);
-			if (levels.length === 0) return;
-			const from = zoomRef.current;
-			const idx = levels.indexOf(from);
-			const base = idx === -1 ? levels.findIndex((l) => l >= from) : idx;
-			const next = levels[Math.max(0, Math.min(levels.length - 1, (base === -1 ? levels.length - 1 : base) + dir))];
+			const from = useViewStore.getState().zoom;
+			const idx = ZOOM_LEVELS.indexOf(from);
+			const base = idx === -1 ? ZOOM_LEVELS.findIndex((l) => l >= from) : idx;
+			const next = ZOOM_LEVELS[Math.max(0, Math.min(ZOOM_LEVELS.length - 1, (base === -1 ? ZOOM_LEVELS.length - 1 : base) + dir))];
 			if (next === from) return;
 
-			zoomRef.current = next;
-			setZoom(next);
 			velocityRef.current = { x: 0, y: 0 };
-			const ratio = next / from;
-			setPosition((prev) =>
-				getBoundedPosition(
-					{ x: e.clientX - (e.clientX - prev.x) * ratio, y: e.clientY - (e.clientY - prev.y) * ratio },
-					next
-				)
-			);
+			useViewStore.getState().setZoom(next, { x: e.clientX, y: e.clientY });
 		};
 		el.addEventListener('wheel', onWheel, { passive: false });
 		return () => el.removeEventListener('wheel', onWheel);
-	}, [windowSize, getBoundedPosition, tiles]);
+	}, []);
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent | React.TouchEvent) => {
@@ -179,17 +147,12 @@ const Grid: React.FC = () => {
 				};
 			}
 
-			setPosition((prev) =>
-				getBoundedPosition({
-					x: prev.x + deltaX,
-					y: prev.y + deltaY,
-				})
-			);
+			pan(deltaX, deltaY);
 
 			setLastMousePos({ x: pos.clientX, y: pos.clientY });
 			setLastUpdateTime(currentTime);
 		},
-		[isDragging, lastMousePos, lastUpdateTime, getBoundedPosition]
+		[isDragging, lastMousePos, lastUpdateTime, pan]
 	);
 
 	const handleMouseUp = useCallback(() => {
@@ -206,18 +169,13 @@ const Grid: React.FC = () => {
 			if (Math.abs(vel.x) < MIN_VELOCITY && Math.abs(vel.y) < MIN_VELOCITY) {
 				velocityRef.current = { x: 0, y: 0 };
 			} else {
-				setPosition((prevPos) =>
-					getBoundedPosition({
-						x: prevPos.x + vel.x * FRAME_MS,
-						y: prevPos.y + vel.y * FRAME_MS,
-					})
-				);
+				pan(vel.x * FRAME_MS, vel.y * FRAME_MS);
 				velocityRef.current = { x: vel.x * FRICTION, y: vel.y * FRICTION };
 			}
 		}
 
 		animationFrameRef.current = requestAnimationFrame(animate);
-	}, [isDragging, getBoundedPosition]);
+	}, [isDragging, pan]);
 
 	useEffect(() => {
 		animationFrameRef.current = requestAnimationFrame(animate);
@@ -232,77 +190,39 @@ const Grid: React.FC = () => {
 	// Which tiles are on screen right now (read by the ambient critters when they pick a spot)
 	const [tipLayer, setTipLayer] = useState<HTMLElement | null>(null);
 	const viewportRef = useRef<Viewport>({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
-	viewportRef.current = {
-		minX: Math.floor(-position.x / TILE_SIZE),
-		maxX: Math.ceil((-position.x + windowSize.x) / TILE_SIZE),
-		minY: Math.floor(-position.y / TILE_SIZE),
-		maxY: Math.ceil((-position.y + windowSize.y) / TILE_SIZE),
-	};
+	const size = { w: windowW, h: windowH };
+	viewportRef.current = visibleTileRange({ x: viewX, y: viewY }, zoom, size);
 	const getViewport = useCallback(() => viewportRef.current, []);
 
-	// Tile range on screen (one tile of slack): the water ripples render only inside it
-	const tilePx = TILE_SIZE * zoom;
-	const waterRange = {
-		minX: Math.max(0, Math.floor(-position.x / tilePx) - 1),
-		maxX: Math.min(GRID_SIZE, Math.ceil((-position.x + windowSize.x) / tilePx) + 1),
-		minY: Math.max(0, Math.floor(-position.y / tilePx) - 1),
-		maxY: Math.min(GRID_HEIGHT, Math.ceil((-position.y + windowSize.y) / tilePx) + 1),
-	};
+	// Tile range on screen (one tile of slack): the terrain chunks and the water ripples render only inside it
+	const seen = visibleTileRange({ x: viewX, y: viewY }, zoom, size, 1);
 
+	// The tiles that exist on screen: explored ones and the unexplored ones that touch them (what can be bought). Rebuilt when the
+	// range of tiles changes or the map does, not on every pixel of panning.
+	const padded = visibleTileRange({ x: viewX, y: viewY }, zoom, size, VISIBLE_PADDING);
+	const { minX, maxX, minY, maxY } = padded;
 	const visibleTiles = useMemo(() => {
-		if (!tiles) return [];
-
-		const tilePx = TILE_SIZE * zoom;
-		const startX = Math.max(
-			0,
-			Math.floor(-position.x / tilePx) - VISIBLE_PADDING
-		);
-		const endX = Math.min(
-			GRID_SIZE,
-			Math.ceil((-position.x + windowSize.x) / tilePx) + VISIBLE_PADDING
-		);
-		const startY = Math.max(
-			0,
-			Math.floor(-position.y / tilePx) - VISIBLE_PADDING
-		);
-		const endY = Math.min(
-			GRID_HEIGHT,
-			Math.ceil((-position.y + windowSize.y) / tilePx) + VISIBLE_PADDING
-		);
-
 		const visible: JSX.Element[] = [];
-		for (let y = startY; y < endY; y++) {
-			for (let x = startX; x < endX; x++) {
-				if (!tiles[y] || !tiles[y][x]) continue;
-				const tile = tiles[y][x];
+		for (let y = minY; y < maxY; y++) {
+			for (let x = minX; x < maxX; x++) {
+				const tile = getTile(tiles, x, y);
+				if (!tile && !hasOwnedNeighbour(tiles, x, y)) continue;
 				visible.push(
 					<Tile
 						key={`${x},${y}`}
-						biome={tile.biome}
-						isOwned={tile.isOwned}
+						biome={tile ? tile.biome : 'empty'}
+						isOwned={!!tile}
 						x={x}
 						y={y}
-						level={tile.level}
-							building={tile.building}
-						style={{
-							width: TILE_SIZE,
-							height: TILE_SIZE,
-							transform: `translate(${x * TILE_SIZE}px, ${y * TILE_SIZE}px)`,
-						}}
+						level={tile?.level}
+						building={tile?.building}
+						canAfford={canAffordNext}
 					/>
 				);
 			}
 		}
 		return visible;
-	}, [position.x, position.y, windowSize, tiles, zoom]);
-
-	if (!tiles) {
-		return (
-			<div className='fixed inset-0 flex items-center justify-center bg-gray-950'>
-				<div className='text-white text-lg'>Loading world...</div>
-			</div>
-		);
-	}
+	}, [minX, maxX, minY, maxY, tiles, canAffordNext]);
 
 	return (
 		<div
@@ -320,19 +240,22 @@ const Grid: React.FC = () => {
 			<div className='fog-layer fog-a' />
 			<div
 				className='fog-layer fog-b'
-				style={{ backgroundPosition: `${position.x * 0.35}px ${position.y * 0.35}px` }}
+				style={{ backgroundPosition: `${viewX * 0.35}px ${viewY * 0.35}px` }}
 			/>
+			{/* The world: a zero-size origin, everything inside is placed in world px (negative ones too) */}
 			<div
 				className='absolute'
 				style={{
-					transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
+					left: 0,
+					top: 0,
+					width: 0,
+					height: 0,
+					transform: `translate(${viewX}px, ${viewY}px) scale(${zoom})`,
 					transformOrigin: '0 0',
-					width: GRID_SIZE * TILE_SIZE,
-					height: GRID_HEIGHT * TILE_SIZE,
 					'--map-zoom': zoom,
 				} as React.CSSProperties}>
-				<TerrainLayer />
-				<WaterLayer minX={waterRange.minX} maxX={waterRange.maxX} minY={waterRange.minY} maxY={waterRange.maxY} />
+				<TerrainLayer minX={seen.minX} maxX={seen.maxX} minY={seen.minY} maxY={seen.maxY} />
+				<WaterLayer minX={seen.minX} maxX={seen.maxX} minY={seen.minY} maxY={seen.maxY} />
 				<MapTipLayerContext.Provider value={tipLayer}>{visibleTiles}</MapTipLayerContext.Provider>
 				<AmbientLife getViewport={getViewport} />
 				{castleLevelOf(tiles) >= CASTLE_FORTRESS.fromLevel ? (
@@ -342,6 +265,7 @@ const Grid: React.FC = () => {
 				)}
 				<div ref={setTipLayer} className='map-tip-layer' />
 			</div>
+			<HighlightLayer />
 		</div>
 	);
 };

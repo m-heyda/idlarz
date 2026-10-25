@@ -1,8 +1,8 @@
 import {
 	BIOMES,
 	CASTLE_UPGRADE,
-	GRID_SIZE,
-	GRID_HEIGHT,
+	CASTLE_X,
+	CASTLE_Y,
 	BASE_GENERATION_RATES,
 	ANIMALS,
 	FARM,
@@ -13,8 +13,9 @@ import {
 	BASE_XP_PER_LEVEL,
 	XP_GROWTH_FACTOR,
 	SCALING_CONFIG,
-	GRID_CENTER_Y,
-	GRID_CENTER_X,
+	XP_TILE,
+	XP_CAP,
+	RESOURCE_CAP,
 	BUILDINGS,
 	BuildingType,
 	BIOME_YIELD,
@@ -40,40 +41,23 @@ import {
 	TileCost,
 } from '@/types/game';
 import { RING, generateStartRing } from '@/utils/biomeRules';
+import {
+	EMPTY_WORLD,
+	biomeCount,
+	buildingCount,
+	forEachOwned,
+	getTile,
+	ownedCount,
+	setTiles,
+	type Placed,
+	type World,
+} from '@/utils/world';
 
-/**
- * Counts the total number of owned tiles in the grid
- * @param tiles Grid of tiles to count ownership from
- * @returns Number of owned tiles
- */
-export const countOwnedTiles = (tiles: { isOwned: boolean }[][]): number => {
-	let count = 0;
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		for (let x = 0; x < GRID_SIZE; x++) {
-			if (tiles[y][x].isOwned) count++;
-		}
-	}
-	return count;
-};
+/** Number of owned tiles on the map (kept up to date by the world, so this is O(1)). */
+export const countOwnedTiles = (tiles: World): number => ownedCount(tiles);
 
-/**
- * Counts the total number of owned tiles of a specific biome type
- * @param tiles Grid of tiles to count ownership from
- * @param biomeType The type of biome to count
- * @returns Number of owned tiles of the specified biome type
- */
-export const countOwnedBiomeTypes = (
-	tiles: Tile[][],
-	biomeType: BiomeType
-): number => {
-	let count = 0;
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		for (let x = 0; x < GRID_SIZE; x++) {
-			if (tiles[y][x].isOwned && tiles[y][x].biome === biomeType) count++;
-		}
-	}
-	return count;
-};
+/** Number of owned tiles of one biome (O(1)). */
+export const countOwnedBiomeTypes = (tiles: World, biomeType: BiomeType): number => biomeCount(tiles, biomeType);
 
 /**
  * Gets the description for a character stat
@@ -139,9 +123,11 @@ export const getStatDescription = (
  * The more tiles owned, the more XP gained
  */
 export const calculateXpGain = (ownedTiles: number): number => {
-	// Basic XP gain increases with the number of tiles owned
-	// Each tile contributes XP that increases slightly with more tiles
-	return BASE_XP_PER_TILE * Math.pow(1.02, ownedTiles - 1) * (ownedTiles / 4);
+	// Basic XP gain increases with the number of tiles owned: each tile contributes XP that grows slightly with more tiles.
+	// Up to XP_TILE.growthUntil tiles that is exponential (1.02 per tile); beyond it a polynomial tail keeps it finite.
+	const k = Math.min(ownedTiles, XP_TILE.growthUntil);
+	const xp = BASE_XP_PER_TILE * Math.pow(1.02, k - 1) * (k / 4);
+	return ownedTiles > XP_TILE.growthUntil ? xp * Math.pow(ownedTiles / XP_TILE.growthUntil, XP_TILE.tailExponent) : xp;
 };
 
 /**
@@ -154,15 +140,16 @@ export const calculateLevel = (
 	// Start at level 1, no XP needed for first level
 	let level = 1;
 	let xpForNextLevel = BASE_XP_PER_LEVEL;
-	let remainingXp = xp;
+	let remainingXp = Number.isFinite(xp) ? Math.min(xp, XP_CAP) : XP_CAP;
 
-	// Keep leveling up until we don't have enough XP
+	// Keep leveling up until we don't have enough XP (a non-finite threshold ends it: levels past ~2700 overflow)
 	while (remainingXp >= xpForNextLevel) {
 		remainingXp -= xpForNextLevel;
 		level++;
 		xpForNextLevel = Math.floor(
 			BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level - 1)
 		);
+		if (!Number.isFinite(xpForNextLevel)) return { level, progress: 0 };
 	}
 
 	// Calculate progress to next level
@@ -176,29 +163,11 @@ export const countAdjacentSameBiomes = (
 	x: number,
 	y: number,
 	biome: BiomeType
-): number => {
-	const directions = [
-		[-1, 0],
-		[1, 0],
-		[0, -1],
-		[0, 1],
-	];
-	return directions.reduce((count, [dx, dy]) => {
-		const newX = x + dx;
-		const newY = y + dy;
-		if (
-			newX >= 0 &&
-			newX < GRID_SIZE &&
-			newY >= 0 &&
-			newY < GRID_HEIGHT &&
-			tiles[newY][newX].isOwned &&
-			tiles[newY][newX].biome === biome
-		) {
-			return count + 1;
-		}
-		return count;
-	}, 0);
-};
+): number =>
+	(getTile(tiles, x - 1, y)?.biome === biome ? 1 : 0) +
+	(getTile(tiles, x + 1, y)?.biome === biome ? 1 : 0) +
+	(getTile(tiles, x, y - 1)?.biome === biome ? 1 : 0) +
+	(getTile(tiles, x, y + 1)?.biome === biome ? 1 : 0);
 
 /** Tiles that did not cost anything: the castle (1) in an old save, the castle and its 8 neighbours in a new game. */
 export const STARTER_FREE_TILES = 9;
@@ -208,36 +177,25 @@ export const STARTER_FREE_TILES = 9;
  * resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting ring does not
  * make the first purchases expensive. Pass the state's `freeTiles`.
  */
-export const economyTiles = (tiles: { isOwned: boolean }[][], freeTiles: number): number =>
-	countOwnedTiles(tiles) - freeTiles + 1;
+export const economyTiles = (tiles: World, freeTiles: number): number => countOwnedTiles(tiles) - freeTiles + 1;
 
-/** A new map: the castle at the centre and its 8 neighbours already owned, generated from the basic biomes. */
-export const createInitialGrid = (random: () => number = Math.random): Tile[][] => {
-	const grid: Tile[][] = Array(GRID_HEIGHT)
-		.fill(null)
-		.map(() =>
-			Array(GRID_SIZE)
-				.fill(null)
-				.map(() => ({
-					biome: 'empty' as BiomeType,
-					isOwned: false,
-				}))
-		);
-
-	// Place castle at center
-	grid[GRID_CENTER_Y][GRID_CENTER_X] = {
-		biome: 'castle',
-		isOwned: true,
-		level: 1,
-		upgradeCost: CASTLE_UPGRADE.upgradeCosts[0],
-	} as Tile;
-
+/** A new map: the castle at (CASTLE_X, CASTLE_Y) and its 8 neighbours already owned, generated from the basic biomes. */
+export const createInitialWorld = (random: () => number = Math.random): World => {
+	const placed: Placed[] = [
+		{
+			x: CASTLE_X,
+			y: CASTLE_Y,
+			tile: {
+				biome: 'castle',
+				isOwned: true,
+				level: 1,
+				upgradeCost: CASTLE_UPGRADE.upgradeCosts[0],
+			} as Tile,
+		},
+	];
 	const ring = generateStartRing(random);
-	RING.forEach(([dx, dy], i) => {
-		grid[GRID_CENTER_Y + dy][GRID_CENTER_X + dx] = { biome: ring[i], isOwned: true };
-	});
-
-	return grid;
+	RING.forEach(([dx, dy], i) => placed.push({ x: CASTLE_X + dx, y: CASTLE_Y + dy, tile: { biome: ring[i], isOwned: true } }));
+	return setTiles(EMPTY_WORLD, placed);
 };
 
 // Resource Management
@@ -427,7 +385,7 @@ const zeroResources = (): Resources => ({ gold: 0, wood: 0, stone: 0, coal: 0, f
 
 /** Income per second of every resource, split into its sources and modifiers (the one place the income formula lives). */
 export const calculateResourceBreakdown = (
-	tiles: Tile[][],
+	tiles: World,
 	characterStats?: CharacterStats,
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
@@ -447,39 +405,46 @@ export const calculateResourceBreakdown = (
 		farmPart[key] = farm[key];
 	}
 
-	// Calculate base rates from tiles
-	for (let y = 0; y < tiles.length; y++) {
-		for (let x = 0; x < tiles[y].length; x++) {
-			const tile = tiles[y][x];
-			if (tile.isOwned) {
-				const biome = BIOMES[tile.biome];
-				const adjacentCount = countAdjacentSameBiomes(tiles, x, y, tile.biome);
-				const adjacencyMultiplier =
-					1 + SCALING_CONFIG.adjacencyBonus * adjacentCount;
-
-				// Biome output is boosted by BIOME_YIELD.scale; the castle (unique tile) is not
-				const yieldScale = tile.biome === 'castle' ? 1 : BIOME_YIELD.scale;
-
-				Object.entries(biome.resourceGeneration).forEach(([resource, rate]) => {
+	// Calculate base rates from tiles. Tiles are counted by (biome, same-biome neighbours, building) first and each group is
+	// priced once, so a map of tens of thousands of tiles costs one cheap pass instead of an allocation per tile.
+	const biomeNames = Object.keys(BIOMES);
+	const biomeSlot = new Map(biomeNames.map((name, i) => [name, i]));
+	const buildingNames = ['', ...Object.keys(BUILDINGS)];
+	const buildingSlot = new Map(buildingNames.map((name, i) => [name, i]));
+	const groups = new Float64Array(biomeNames.length * 5 * buildingNames.length);
+	forEachOwned(tiles, (tile, x, y) => {
+		const b = biomeSlot.get(tile.biome);
+		if (b === undefined) return;
+		const adjacent = countAdjacentSameBiomes(tiles, x, y, tile.biome);
+		const bld = tile.building ? buildingSlot.get(tile.building) ?? 0 : 0;
+		groups[(b * 5 + adjacent) * buildingNames.length + bld]++;
+	});
+	for (let b = 0; b < biomeNames.length; b++) {
+		const biome = BIOMES[biomeNames[b]];
+		// Biome output is boosted by BIOME_YIELD.scale; the castle (unique tile) is not
+		const yieldScale = biomeNames[b] === 'castle' ? 1 : BIOME_YIELD.scale;
+		for (let adjacent = 0; adjacent < 5; adjacent++) {
+			const adjacencyMultiplier = 1 + SCALING_CONFIG.adjacencyBonus * adjacent;
+			for (let bld = 0; bld < buildingNames.length; bld++) {
+				const count = groups[(b * 5 + adjacent) * buildingNames.length + bld];
+				if (count === 0) continue;
+				for (const [resource, rate] of Object.entries(biome.resourceGeneration)) {
 					if (rate) {
 						// Add to base rate with adjacency bonus
-						const gain = rate * adjacencyMultiplier * yieldScale;
+						const gain = count * rate * adjacencyMultiplier * yieldScale;
 						base[resource as keyof Resources] += gain;
 						biomePart[resource as keyof Resources] += gain;
 					}
-				});
-
+				}
 				// A building adds its own output on top of the tile's biome output
-				if (tile.building) {
-					const building = BUILDINGS[tile.building as BuildingType];
-					if (building && building.resourceGeneration) {
-						Object.entries(building.resourceGeneration).forEach(([resource, rate]) => {
-							if (rate && typeof rate === 'number') {
-								const gain = rate * adjacencyMultiplier * BIOME_YIELD.scale;
-								base[resource as keyof Resources] += gain;
-								buildingPart[resource as keyof Resources] += gain;
-							}
-						});
+				const building = bld > 0 ? BUILDINGS[buildingNames[bld] as BuildingType] : undefined;
+				if (building && building.resourceGeneration) {
+					for (const [resource, rate] of Object.entries(building.resourceGeneration)) {
+						if (rate && typeof rate === 'number') {
+							const gain = count * rate * adjacencyMultiplier * BIOME_YIELD.scale;
+							base[resource as keyof Resources] += gain;
+							buildingPart[resource as keyof Resources] += gain;
+						}
 					}
 				}
 			}
@@ -487,16 +452,8 @@ export const calculateResourceBreakdown = (
 	}
 
 	// Calculate castle modifier (exponential growth - doubles each level after level 1)
-	let castleLevel = 1;
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		for (let x = 0; x < GRID_SIZE; x++) {
-			const tile = tiles[y][x];
-			if (tile.isOwned && tile.biome === 'castle' && tile.level) {
-				castleLevel = tile.level;
-				break;
-			}
-		}
-	}
+	const castleTile = getTile(tiles, CASTLE_X, CASTLE_Y);
+	const castleLevel = castleTile && castleTile.biome === 'castle' && castleTile.level ? castleTile.level : 1;
 	const castleBonus = castleModifier(castleLevel);
 
 	// Castle levels above 1 add flat XP/s
@@ -541,7 +498,7 @@ export const calculateResourceBreakdown = (
 };
 
 export const calculateResourceRates = (
-	tiles: Tile[][],
+	tiles: World,
 	characterStats?: CharacterStats,
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
@@ -562,13 +519,13 @@ export const calculateResourceRates = (
 // Per-second output of one owned tile (biome + building, adjacency bonus, global modifiers).
 // Used for the tile-tap bonus and the tile tooltip. XP is excluded on purpose.
 export const calculateTileTapYield = (
-	tiles: Tile[][],
+	tiles: World,
 	x: number,
 	y: number,
 	rates: ResourceRates
 ): Partial<Resources> => {
-	const tile = tiles[y]?.[x];
-	if (!tile || !tile.isOwned) return {};
+	const tile = getTile(tiles, x, y);
+	if (!tile) return {};
 
 	const out: Partial<Resources> = {};
 	const adjacent = countAdjacentSameBiomes(tiles, x, y, tile.biome);
@@ -639,15 +596,7 @@ export const subtractBundle = (
 	return next;
 };
 
-export const countBuildings = (tiles: Tile[][]): number => {
-	let count = 0;
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		for (let x = 0; x < GRID_SIZE; x++) {
-			if (tiles[y][x].isOwned && tiles[y][x].building) count++;
-		}
-	}
-	return count;
-};
+export const countBuildings = (tiles: World): number => buildingCount(tiles);
 
 /** Price factor of the next building when `built` buildings stand: the cheap starter steps, then three stages of growth. */
 export const buildingCostFactor = (built: number): number => {
@@ -663,13 +612,14 @@ export const buildingCostFactor = (built: number): number => {
 
 /** Cost of the next building: base cost x the factor for the number of buildings already built. */
 export const calculateBuildingCost = (
-	tiles: Tile[][],
+	tiles: World,
 	prestige?: PrestigeState
 ): Partial<Resources> => {
 	const factor = buildingCostFactor(countBuildings(tiles)) * (1 - legacyEffect(prestige, 'thrift'));
 	const cost: Partial<Resources> = {};
 	Object.entries(BUILDING_COST.base).forEach(([resource, amount]) => {
-		cost[resource as keyof Resources] = Math.floor((amount || 0) * factor);
+		// finite whatever the building count (1.15^n overflows past ~4,900 buildings)
+		cost[resource as keyof Resources] = Math.floor(Math.min((amount || 0) * factor, RESOURCE_CAP / 100));
 	});
 	return cost;
 };

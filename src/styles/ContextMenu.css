@@ -134,29 +134,16 @@
 	}
 }
 
-/* "Highlight biome": every explored tile of the chosen biome pulses an outline */
-.tile-highlight {
-	z-index: 5;
-	animation: tile-highlight 0.9s ease-in-out infinite;
-}
-
-@keyframes tile-highlight {
-	0%,
-	100% {
-		box-shadow: inset 0 0 0 2px rgba(255, 226, 122, 0.95), 0 0 10px rgba(255, 226, 122, 0.55);
-		background: rgba(255, 226, 122, 0.1);
-	}
-	50% {
-		box-shadow: inset 0 0 0 2px rgba(255, 226, 122, 0.35), 0 0 3px rgba(255, 226, 122, 0.2);
-		background: rgba(255, 226, 122, 0.02);
-	}
+/* "Highlight": the tint of an area, drawn over the map in screen space (HighlightLayer) */
+.highlight-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 8;
+	pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.tile-highlight {
-		animation: none;
-		box-shadow: inset 0 0 0 2px rgba(255, 226, 122, 0.95);
-	}
 	.ui-toast {
 		animation: none;
 	}

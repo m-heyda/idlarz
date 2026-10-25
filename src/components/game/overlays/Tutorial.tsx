@@ -18,6 +18,7 @@ import {
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
 	SCALING_CONFIG,
+	TILE_PRICE,
 	TILE_RESOURCE_COST,
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
@@ -135,7 +136,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Buildings</h3>
 				<p className='text-[#d8c8a0] mb-2'>
 					<b>Right-click</b> any explored tile (not the castle, not a lake, and not while a chest or a monster is on it) and choose{' '}
-					<b>Build here</b> to open the build window (<b>Highlight</b> in the same menu outlines every tile of that biome for a moment).
+					<b>Build here</b> to open the build window (<b>Highlight this area</b> in the same menu tints the connected area of that biome around the tile for a moment).
 					Pick one of {Object.keys(BUILDINGS).length} buildings: {Object.values(BUILDINGS).map((b) => b.label).join(', ')}. The tile
 					keeps its biome and its output and the building adds its own on top, with the same neighbour bonus; a patch in the
 					style of the biome (packed earth, trampled snow, a plank landing ...) is laid under it. One building per tile, and it is permanent.
@@ -158,7 +159,8 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-1'>
 					Each new tile costs more than the last: about x{SCALING_CONFIG.growthEarly} per tile you own up to{' '}
 					{SCALING_CONFIG.earlyTiles} tiles, then x{SCALING_CONFIG.growthLate} per tile up to {SCALING_CONFIG.lateTiles}, and
-					x{SCALING_CONFIG.growthEndgame} beyond that.
+					x{SCALING_CONFIG.growthEndgame} up to {TILE_PRICE.tailFrom}. After that the price keeps rising, but slowly, so there is no limit
+					to how far the map can grow.
 				</p>
 				<p className='text-[#d8c8a0] text-xs px-card font-mono'>
 					gold = {BASE_TILE_COST} x {SCALING_CONFIG.growthEarly}^min(tiles, {SCALING_CONFIG.earlyTiles}) x{' '}

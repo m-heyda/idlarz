@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, setResources, store } from './helpers';
-import { AMBIENT_LIFE, FARM_BONUS, GRID_CENTER_X, GRID_CENTER_Y, TILE_SIZE } from '../src/config/gameConfig';
+import { api, freshGame, growTo, setResources, store, tileAt, worldFromRows } from './helpers';
+import { AMBIENT_LIFE, FARM_BONUS, CASTLE_X, CASTLE_Y, TILE_SIZE } from '../src/config/gameConfig';
 import { nextSpawnDelay, pickAmbientCritter, type Viewport } from '../src/lib/ambientLife';
 import type { Tile } from '../src/types/game';
 
@@ -17,12 +17,12 @@ const seq = (...values: number[]) => {
 
 test('critters need owned land in view, and never appear on the castle or unowned tiles', () => {
 	const tiles = emptyGrid();
-	assert.equal(pickAmbientCritter(tiles, WHOLE_MAP), null);
+	assert.equal(pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP), null);
 	tiles[25][25] = { biome: 'castle', isOwned: true, level: 1 };
-	assert.equal(pickAmbientCritter(tiles, WHOLE_MAP), null);
+	assert.equal(pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP), null);
 	tiles[10][10] = { biome: 'forest', isOwned: true };
-	assert.equal(pickAmbientCritter(tiles, { minX: 20, maxX: 30, minY: 20, maxY: 30 }), null); // forest is out of view
-	assert.ok(pickAmbientCritter(tiles, WHOLE_MAP));
+	assert.equal(pickAmbientCritter(worldFromRows(tiles), { minX: 20, maxX: 30, minY: 20, maxY: 30 }), null); // forest is out of view
+	assert.ok(pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP));
 });
 
 test('a critter picks a type that likes the biome and starts inside its tile', () => {
@@ -30,7 +30,7 @@ test('a critter picks a type that likes the biome and starts inside its tile', (
 		const tiles = emptyGrid();
 		tiles[12][7] = { biome, isOwned: true } as Tile;
 		for (let i = 0; i < 30; i++) {
-			const c = pickAmbientCritter(tiles, WHOLE_MAP)!;
+			const c = pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP)!;
 			assert.ok(AMBIENT_LIFE.byBiome[biome].includes(c.type), `${biome}: ${c.type}`);
 			assert.ok(c.x >= 7 * TILE_SIZE && c.x <= 8 * TILE_SIZE);
 			assert.ok(c.y >= 12 * TILE_SIZE && c.y <= 13 * TILE_SIZE);
@@ -45,9 +45,9 @@ test('about one critter in twelve carries a gift, and spawn delays stay in range
 	tiles[3][3] = { biome: 'plains', isOwned: true };
 	let gifts = 0;
 	const n = 6000;
-	for (let i = 0; i < n; i++) if (pickAmbientCritter(tiles, WHOLE_MAP)!.golden) gifts++;
+	for (let i = 0; i < n; i++) if (pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP)!.golden) gifts++;
 	assert.ok(Math.abs(gifts / n - AMBIENT_LIFE.giftChance) < 0.02, `share ${gifts / n}`);
-	assert.equal(pickAmbientCritter(tiles, WHOLE_MAP, seq(0.5, 0.5, 0.5, 0.01, 0.5, 0.5, 0.5, 0.5))!.golden, true);
+	assert.equal(pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP, seq(0.5, 0.5, 0.5, 0.01, 0.5, 0.5, 0.5, 0.5))!.golden, true);
 	assert.equal(nextSpawnDelay(() => 0), AMBIENT_LIFE.spawnMinMs);
 	assert.equal(nextSpawnDelay(() => 1), AMBIENT_LIFE.spawnMaxMs);
 });
@@ -99,8 +99,8 @@ test('rebirth and full reset clear the gift cooldowns', () => {
 	api().resetGame();
 	growTo(3);
 	assert.ok(api().claimCritterGift({ source: 'map', type: 'bee', golden: true }, click(3, 10_000_002)));
-	assert.equal(store.getState().tiles[GRID_CENTER_Y][GRID_CENTER_X].level, 1);
-	assert.equal(GRID_CENTER_X, 25);
+	assert.equal(tileAt(store.getState().tiles, CASTLE_X, CASTLE_Y).level, 1);
+	assert.equal(CASTLE_X, 25);
 });
 
 test('a built-on tile hosts the critters of its foundation biome (swamp plot -> ladybugs and frogs only, never the grounds rabbit)', () => {
@@ -109,7 +109,7 @@ test('a built-on tile hosts the critters of its foundation biome (swamp plot -> 
 	tiles[12][7] = { biome: 'grounds', isOwned: true, building: 'farm', level: 2 };
 	const hosts = new Set<string>();
 	for (let i = 0; i < 400; i++) {
-		const c = pickAmbientCritter(tiles, WHOLE_MAP, () => (i * 0.6180339 + 0.1) % 1)!;
+		const c = pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP, () => (i * 0.6180339 + 0.1) % 1)!;
 		if (Math.floor(c.x / TILE_SIZE) === 7 && Math.floor(c.y / TILE_SIZE) === 12) hosts.add(c.type);
 	}
 	assert.ok(hosts.size > 0, 'the plot hosts critters');
@@ -122,7 +122,7 @@ test('fish only swim in open water, and only the four farm critters can carry a 
 	const rim = new Set<string>();
 	const inner = new Set<string>();
 	for (let i = 0; i < 1500; i++) {
-		const c = pickAmbientCritter(pond, WHOLE_MAP, seq(((i * 0.6180339) % 1), ((i * 0.3819) % 1), 0.37, 0.61, 0.2, 0.9, 0.4))!;
+		const c = pickAmbientCritter(worldFromRows(pond), WHOLE_MAP, seq(((i * 0.6180339) % 1), ((i * 0.3819) % 1), 0.37, 0.61, 0.2, 0.9, 0.4))!;
 		const tx = Math.floor(c.x / TILE_SIZE);
 		const ty = Math.floor(c.y / TILE_SIZE);
 		const interior = tx > 5 && tx < 9 && ty > 10 && ty < 14;
@@ -139,7 +139,7 @@ test('swamp frogs, coast crabs, hill goats and forest wolves exist and stay clos
 		tiles[12][7] = { biome, isOwned: true } as Tile;
 		const seen = new Set<string>();
 		for (let i = 0; i < 200; i++) {
-			const c = pickAmbientCritter(tiles, WHOLE_MAP, () => ((i * 0.61803) % 1))!;
+			const c = pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP, () => ((i * 0.61803) % 1))!;
 			seen.add(c.type);
 			if (c.type === type) assert.ok(Math.abs(c.dx) <= AMBIENT_LIFE.roamTiles * TILE_SIZE * AMBIENT_LIFE.roamScale[type] + 1e-9);
 		}

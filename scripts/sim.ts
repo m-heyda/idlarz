@@ -10,6 +10,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { getTile, isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
 
 // zustand's persist middleware needs *a* storage; the sim replaces it with a no-op one below
 (globalThis as unknown as { localStorage: unknown }).localStorage = {
@@ -150,7 +151,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	let ownedTiles: [number, number][] = [];
 	const refreshOwned = () => {
 		ownedTiles = [];
-		api().tiles.forEach((row, y) => row.forEach((tile, x) => tile.isOwned && ownedTiles.push([x, y])));
+		for (const { x, y } of ownedRowMajor(api().tiles)) ownedTiles.push([x, y]);
 	};
 	let frontier: [number, number] | null = null;
 	let frontierDirty = true;
@@ -166,17 +167,19 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		const { tiles } = api();
 		let best: [number, number] | null = null;
 		let bestD = Infinity;
-		for (let y = 0; y < cfg.GRID_HEIGHT; y++) {
-			for (let x = 0; x < cfg.GRID_SIZE; x++) {
-				if (tiles[y][x].isOwned) continue;
+		const b = ownedBounds(tiles);
+		if (!b) return null;
+		for (let y = b.minY - 1; y <= b.maxY + 1; y++) {
+			for (let x = b.minX - 1; x <= b.maxX + 1; x++) {
+				if (isOwnedAt(tiles, x, y)) continue;
 				const adj = [
 					[x - 1, y],
 					[x + 1, y],
 					[x, y - 1],
 					[x, y + 1],
-				].some(([ax, ay]) => tiles[ay]?.[ax]?.isOwned);
+				].some(([ax, ay]) => isOwnedAt(tiles, ax, ay));
 				if (!adj) continue;
-				const d = Math.abs(x - cfg.GRID_CENTER_X) + Math.abs(y - cfg.GRID_CENTER_Y);
+				const d = Math.abs(x - cfg.CASTLE_X) + Math.abs(y - cfg.CASTLE_Y);
 				if (d < bestD) {
 					bestD = d;
 					best = [x, y];
@@ -212,9 +215,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 		// Chests (only while the player is playing)
 		if (active && s.activeChests > 0) {
-			for (let y = 0; y < cfg.GRID_HEIGHT; y++)
-				for (let x = 0; x < cfg.GRID_SIZE; x++)
-					if (s.tiles[y][x].hasChest) api().collectChest(x, y);
+			for (const { x, y, tile } of ownedRowMajor(s.tiles)) if (tile.hasChest) api().collectChest(x, y);
 			s = api();
 		}
 
@@ -235,7 +236,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		}
 
 		// Castle
-		const castle = s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X];
+		const castle = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
 		if (!s.castleUpgrade && (castle.level ?? 1) < cfg.CASTLE_UPGRADE.maxLevel && castle.upgradeCost) {
 			topUp(castle.upgradeCost as Partial<Record<string, number>>);
 			if (api().upgradeCastle()) s = api();
@@ -280,7 +281,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		{
 			const bc = utils.calculateBuildingCost(s.tiles, s.prestige);
 			if (utils.canAffordBundle(s.resources, bc) && s.resources.gold > (bc.gold ?? 0) * 3) {
-				const spot = ownedTiles.find(([x, y]) => utils.canBuildOn(s.tiles[y][x]));
+				const spot = ownedTiles.find(([x, y]) => utils.canBuildOn(getTile(s.tiles, x, y)));
 				if (spot && api().buildOnTile(spot[0], spot[1], BUILD_ORDER[buildingCursor % BUILD_ORDER.length])) {
 					buildingCursor++;
 					s = api();
@@ -303,7 +304,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 				s = api();
 			}
 			// A sensible player does not let tiles eat the resources the next castle level needs
-			const castleTile = s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X];
+			const castleTile = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
 			if (!s.castleUpgrade && (castleTile.level ?? 1) < cfg.CASTLE_UPGRADE.maxLevel && castleTile.upgradeCost) {
 				const after = utils.subtractBundle(s.resources, bundle);
 				const blocked = Object.entries(castleTile.upgradeCost).some(
@@ -324,7 +325,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	};
 
 	const sellExcess = (s: ReturnType<typeof api>) => {
-		const castle = s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X];
+		const castle = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
 		const need: Record<string, number> = { ...((castle.upgradeCost ?? {}) as Record<string, number>) };
 		const owned = utils.economyTiles(s.tiles, s.freeTiles);
 		for (let k = 0; k < 3; k++) {
@@ -355,7 +356,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 	const finished = () => {
 		const s = api();
-		const castle = s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level ?? 1;
+		const castle = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level ?? 1;
 		return (
 			castle >= FIRST_FINISH_CASTLE &&
 			s.clickLevel >= cfg.CLICK_LADDER.length - 1 &&
@@ -371,7 +372,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const s = api();
 			const r = s.resourceRates.total;
 			console.error(
-				`[${name}] day ${lastTraceDay} tiles ${utils.economyTiles(s.tiles, s.freeTiles)} castle ${s.tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level} up=${s.castleUpgrade ? Math.round(s.castleUpgrade.remainingSec / 3600) + 'h' : '-'} lvl ${s.level.level} click${s.clickLevel} gold ${Math.round(s.resources.gold)} (+${r.gold.toFixed(1)}/s) wood ${Math.round(s.resources.wood)} stone ${Math.round(s.resources.stone)} coal ${Math.round(s.resources.coal)} food ${Math.round(s.resources.food)} (+${r.food.toFixed(1)}) meat ${Math.round(s.resources.meat)} (+${r.meat.toFixed(1)}) farm ${JSON.stringify(s.farmLevels)}`
+				`[${name}] day ${lastTraceDay} tiles ${utils.economyTiles(s.tiles, s.freeTiles)} castle ${tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level} up=${s.castleUpgrade ? Math.round(s.castleUpgrade.remainingSec / 3600) + 'h' : '-'} lvl ${s.level.level} click${s.clickLevel} gold ${Math.round(s.resources.gold)} (+${r.gold.toFixed(1)}/s) wood ${Math.round(s.resources.wood)} stone ${Math.round(s.resources.stone)} coal ${Math.round(s.resources.coal)} food ${Math.round(s.resources.food)} (+${r.food.toFixed(1)}) meat ${Math.round(s.resources.meat)} (+${r.meat.toFixed(1)}) farm ${JSON.stringify(s.farmLevels)}`
 			);
 		}
 		const active = isActive(t);
@@ -418,7 +419,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const lvl = api().level.level;
 			[10, 20, 30].forEach((n) => lvl >= n && mark(`level${n}`, t));
 			if (finished()) mark('finished', t);
-			const castleNow = api().tiles[cfg.GRID_CENTER_Y][cfg.GRID_CENTER_X].level ?? 1;
+			const castleNow = tileAt(api().tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level ?? 1;
 			const totalRebirths = profile.rebirthAtCastle ? profile.rebirths ?? 1 : 0;
 			if (profile.rebirthAtCastle && run <= totalRebirths && castleNow >= profile.rebirthAtCastle && !api().castleUpgrade) {
 				mark('rebirth', t);

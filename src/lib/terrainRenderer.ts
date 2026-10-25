@@ -1,10 +1,14 @@
-import { ATLAS, CELL, allSprites, cellLayers, type GroundGrid, type Placed } from '@/utils/terrain';
+import { ATLAS, CELL, CHUNK_TILES, cellLayers, chunkPads, chunkSprites, worldGround } from '@/utils/terrain';
+import { BIOME_COLORS, MIST_COLOR, YARD_COLOR } from '@/config/biomePalette';
+import type { World } from '@/utils/world';
 
 /**
- * Draws the whole map terrain onto one canvas (1 canvas px = 1 art px = 1 world px, scaled by the world div's CSS
- * transform, so pan and zoom never redraw). Per dual cell and layer: fill with the style's seamless texture (the
- * pattern is anchored at the world origin, so cells never show seams), cut it with the shape's body mask, then lay
- * the rim (bank, cliff face, foam...) over it. Sprites (trees, rocks, docks) are drawn last, bottom edge first.
+ * Draws the map terrain one chunk at a time (CHUNK_TILES x CHUNK_TILES tiles per canvas; 1 canvas px = 1 art px = 1 world
+ * px, scaled by the world div's CSS transform, so pan and zoom never redraw). Per dual cell and layer: fill with the
+ * style's seamless texture (the pattern is anchored at the world origin, so cells and chunks never show seams), cut it
+ * with the shape's body mask, then lay the rim (bank, cliff face, foam...) over it. Sprites (trees, rocks, docks) are
+ * drawn last, bottom edge first; a chunk also draws the sprites of the tiles around it that reach into it, so nothing is
+ * cut at a chunk border.
  */
 export interface TerrainAssets {
 	tex: Record<string, HTMLImageElement>;
@@ -46,59 +50,74 @@ export function loadTerrainAssets(): Promise<TerrainAssets> {
 }
 
 /** Flat colours shown until the atlas has loaded (or if it fails), so the map is never blank. */
-const FALLBACK: Record<string, string> = {
-	mist: '#112248', coast: '#dcc791', plains: '#65a540', swamp: '#6c6b33', tundra: '#e3edf7', grounds: '#72502c',
-	forest: '#317433', hills: '#709046', lake: '#35a6d8', yard: '#928068', castle: '#6045a0',
-};
+const FALLBACK: Record<string, string> = { ...BIOME_COLORS, mist: MIST_COLOR, yard: YARD_COLOR };
 
-export function drawTerrain(canvas: HTMLCanvasElement, assets: TerrainAssets | null, g: GroundGrid, pads: Placed[] = [], built?: Set<string>): void {
+/** Side of the part of the map a chunk owns, in px. */
+export const CHUNK_PX = CHUNK_TILES * CELL;
+/**
+ * A chunk canvas is a little larger than its part and continues into its right and lower neighbours (which draw the same
+ * pixels there). Zoomed to a fraction the canvas edges fall between screen pixels, and without the overlap a hairline of
+ * background would show along every chunk border.
+ */
+export const CHUNK_OVERLAP_PX = 2;
+export const CHUNK_CANVAS_PX = CHUNK_PX + CHUNK_OVERLAP_PX;
+
+const prepare = (canvas: HTMLCanvasElement, cx: number, cy: number): CanvasRenderingContext2D | null => {
 	const ctx = canvas.getContext('2d');
-	if (!ctx) return;
+	if (!ctx) return null;
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 	ctx.globalCompositeOperation = 'source-over';
 	ctx.imageSmoothingEnabled = false;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	if (g.length === 0) return;
+	// from here on everything is drawn in world pixels
+	ctx.setTransform(1, 0, 0, 1, -cx * CHUNK_PX, -cy * CHUNK_PX);
+	return ctx;
+};
 
-	if (!assets) {
-		g.forEach((row, y) =>
-			row.forEach((gr, x) => {
-				if (!gr) return;
-				ctx.fillStyle = FALLBACK[gr] ?? '#000';
-				ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
-			})
-		);
-		return;
+/** The chunk as flat colours: shown until the atlas has loaded and as a cheap first picture. */
+export function drawChunkFlat(canvas: HTMLCanvasElement, world: World, cx: number, cy: number): void {
+	const ctx = prepare(canvas, cx, cy);
+	if (!ctx) return;
+	const g = worldGround(world);
+	for (let y = cy * CHUNK_TILES; y <= (cy + 1) * CHUNK_TILES; y++) {
+		for (let x = cx * CHUNK_TILES; x <= (cx + 1) * CHUNK_TILES; x++) {
+			const gr = g(x, y);
+			if (!gr) continue;
+			ctx.fillStyle = FALLBACK[gr] ?? '#000';
+			ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
+		}
 	}
+}
+
+let scratch: HTMLCanvasElement | null = null;
+
+/** The full picture of one chunk. Dual cells on the chunk's border are drawn by both chunks (each keeps its own half). */
+export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, world: World, cx: number, cy: number): void {
+	const ctx = prepare(canvas, cx, cy);
+	if (!ctx) return;
+	const g = worldGround(world);
 
 	const patterns: Record<string, CanvasPattern> = {};
 	for (const [style, img] of Object.entries(assets.tex)) {
 		const p = ctx.createPattern(img, 'repeat');
 		if (p) patterns[style] = p;
 	}
-	const scratch = document.createElement('canvas');
-	scratch.width = CELL;
-	scratch.height = CELL;
+	if (!scratch) {
+		scratch = document.createElement('canvas');
+		scratch.width = CELL;
+		scratch.height = CELL;
+	}
 	const sctx = scratch.getContext('2d');
 	if (!sctx) return;
 	sctx.imageSmoothingEnabled = false;
 
-	// only the part of the map that has any terrain (the rest of the 2400 px canvas stays transparent)
-	let minX = g[0].length, maxX = -1, minY = g.length, maxY = -1;
-	g.forEach((row, y) =>
-		row.forEach((gr, x) => {
-			if (!gr) return;
-			minX = Math.min(minX, x);
-			maxX = Math.max(maxX, x);
-			minY = Math.min(minY, y);
-			maxY = Math.max(maxY, y);
-		})
-	);
-	for (let cy = minY; cy <= maxY + 1; cy++) {
-		for (let cx = minX; cx <= maxX + 1; cx++) {
-			const ox = cx * CELL - CELL / 2;
-			const oy = cy * CELL - CELL / 2;
-			for (const { style, mask, variant } of cellLayers(g, cx, cy)) {
+	const x0 = cx * CHUNK_TILES;
+	const y0 = cy * CHUNK_TILES;
+	for (let dy = y0; dy <= y0 + CHUNK_TILES; dy++) {
+		for (let dx = x0; dx <= x0 + CHUNK_TILES; dx++) {
+			const ox = dx * CELL - CELL / 2;
+			const oy = dy * CELL - CELL / 2;
+			for (const { style, mask, variant } of cellLayers(g, dx, dy)) {
 				const pattern = patterns[style];
 				const shape = assets.shapes[style];
 				if (!pattern || !shape) continue;
@@ -122,8 +141,34 @@ export function drawTerrain(canvas: HTMLCanvasElement, assets: TerrainAssets | n
 		}
 	}
 
-	for (const s of [...pads, ...allSprites(g, undefined, built)]) {                   // foundation pads first, then sprites bottom edge first
+	for (const s of [...chunkPads(world, cx, cy), ...chunkSprites(world, cx, cy)]) {      // foundation pads first, then sprites bottom edge first
 		const [sx, sy, sw, sh] = ATLAS.sprites[s.id];
 		ctx.drawImage(assets.props, sx, sy, sw, sh, s.x, s.bottom - sh, sw, sh);
 	}
+}
+
+// ---- spreading the work over frames ---------------------------------------------------------------------------------
+
+/** Time a frame may spend on chunk drawing before the rest waits for the next frame (at least one chunk is always drawn) */
+const FRAME_BUDGET_MS = 6;
+const queue: (() => void)[] = [];
+let frame = 0;
+
+const runJobs = () => {
+	frame = 0;
+	const started = performance.now();
+	do {
+		queue.shift()?.();
+	} while (queue.length > 0 && performance.now() - started < FRAME_BUDGET_MS);
+	if (queue.length > 0) frame = requestAnimationFrame(runJobs);
+};
+
+/** Runs `job` on a later frame, as many per frame as fit in FRAME_BUDGET_MS, in order. Returns a function that cancels it. */
+export function scheduleDraw(job: () => void): () => void {
+	queue.push(job);
+	if (!frame) frame = requestAnimationFrame(runJobs);
+	return () => {
+		const i = queue.indexOf(job);
+		if (i >= 0) queue.splice(i, 1);
+	};
 }

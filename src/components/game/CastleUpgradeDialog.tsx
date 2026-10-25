@@ -4,6 +4,7 @@ import { CASTLE_UPGRADE } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber, formatTime } from '@/utils/formatters';
 import { castleModifier, castleUpgradeDuration } from '@/utils/gameUtils';
+import { castleLevelOf } from '@/lib/castleWard';
 import audioManager from '@/utils/audioManager';
 import PixelModal from './PixelModal';
 import ResourceIcon from './ResourceIcon';
@@ -21,10 +22,7 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
 	const prestige = useGameStore((state) => state.prestige);
 
-	// Safely get castle level from the center tile
-	const centerX = Math.floor(tiles[0].length / 2);
-	const centerY = Math.floor(tiles.length / 2);
-	const castleLevel = tiles[centerY]?.[centerX]?.level || 1;
+	const castleLevel = castleLevelOf(tiles);
 
 	const isMaxLevel = castleLevel >= CASTLE_UPGRADE.maxLevel;
 	const isNextToMaxLevel = castleLevel >= CASTLE_UPGRADE.maxLevel - 1;

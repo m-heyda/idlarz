@@ -1,5 +1,5 @@
 import React from 'react';
-import { TILE_SIZE, CASTLE_RANGE, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
+import { TILE_SIZE, CASTLE_RANGE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import '@/styles/CastleRange.css';
 
 /** Violet patch drawn over the tiles the castle's range bonus covers (the bonus itself comes later). */
@@ -10,8 +10,8 @@ const CastleRange: React.FC = () => {
 		<div
 			className='castle-range'
 			style={{
-				left: (GRID_CENTER_X - r) * TILE_SIZE,
-				top: (GRID_CENTER_Y - r) * TILE_SIZE,
+				left: (CASTLE_X - r) * TILE_SIZE,
+				top: (CASTLE_Y - r) * TILE_SIZE,
 				width: side,
 				height: side,
 			}}

@@ -1,14 +1,15 @@
 import test, { mock } from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, store } from './helpers';
+import { api, freshGame, growTo, store, tileAt, gridCells } from './helpers';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
-import { GRID_CENTER_X, GRID_CENTER_Y, REBIRTH } from '../src/config/gameConfig';
+import { CASTLE_X, CASTLE_Y, REBIRTH } from '../src/config/gameConfig';
 import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
 import { maxHp } from '../src/lib/combat';
 import { fullSet } from '../src/lib/fightSim';
 import { pickPersisted } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
+import { patchTile } from '../src/utils/world';
 
 let seq = 0;
 let clock = 1_000_000;
@@ -33,13 +34,9 @@ const run = (seconds: number) => {
 const max = () => maxHp(api().characterStats, api().equipment);
 
 const ownedSpots = () => {
-	const found: { x: number; y: number }[] = [];
-	api().tiles.forEach((row, y) =>
-		row.forEach((t, x) => {
-			if (t.isOwned && t.biome !== 'castle') found.push({ x, y });
-		})
-	);
-	return found;
+	return gridCells()
+		.filter(({ t }) => t.isOwned && t.biome !== 'castle')
+		.map(({ x, y }) => ({ x, y }));
 };
 
 /** Fresh game with 6 tiles and one monster (id 1) on the first free owned tile. */
@@ -245,8 +242,7 @@ test('rebirth and resetGame clear the fight and the monsters; rebirth keeps the 
 	withMonster();
 	api().startFight(1);
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		tiles[GRID_CENTER_Y][GRID_CENTER_X] = { ...tiles[GRID_CENTER_Y][GRID_CENTER_X], level: REBIRTH.minCastleLevel };
+		const tiles = patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel });
 		return { tiles, equipment: { ...STARTER_EQUIPMENT, head: 'rattatui_cap' }, fight: null };
 	});
 	growTo(20);
@@ -277,8 +273,8 @@ test('the first rat spawns after 120 s with 5 owned tiles, not before', () => {
 	assert.equal(m.type, 'rat');
 	assert.equal(m.tier, 1);
 	assert.equal(api().nextMonsterId, 2);
-	assert.ok(!(m.x === GRID_CENTER_X && m.y === GRID_CENTER_Y));
-	assert.equal(api().tiles[m.y][m.x].hasChest, undefined);
+	assert.ok(!(m.x === CASTLE_X && m.y === CASTLE_Y));
+	assert.equal(tileAt(api().tiles, m.x, m.y).hasChest, undefined);
 });
 
 test('monsters never exceed the cap, never share a tile and never stand on the castle', () => {
@@ -288,9 +284,9 @@ test('monsters never exceed the cap, never share a tile and never stand on the c
 	const list = api().monsters;
 	assert.equal(list.length, COMBAT.maxMonsters);
 	assert.equal(new Set(list.map((m) => `${m.x},${m.y}`)).size, list.length);
-	assert.ok(list.every((m) => api().tiles[m.y][m.x].isOwned && api().tiles[m.y][m.x].biome !== 'castle'));
+	assert.ok(list.every((m) => tileAt(api().tiles, m.x, m.y).isOwned && tileAt(api().tiles, m.x, m.y).biome !== 'castle'));
 	assert.ok(list.filter((m) => m.type === 'ratKing').length <= 1);
-	assert.ok(list.every((m) => !api().tiles[m.y][m.x].hasChest));
+	assert.ok(list.every((m) => !tileAt(api().tiles, m.x, m.y).hasChest));
 });
 
 test('chests never spawn on a monster tile', () => {
@@ -299,8 +295,8 @@ test('chests never spawn on a monster tile', () => {
 	const [a, b] = ownedSpots();
 	store.setState({ monsters: [{ id: 1, type: 'rat', tier: 1, ...a, ageSec: 0 }], nextMonsterId: 2 });
 	for (let i = 0; i < 3; i++) api().tick(300_000);
-	assert.equal(api().tiles[a.y][a.x].hasChest, undefined);
-	assert.equal(api().tiles[b.y][b.x].hasChest, true);
+	assert.equal(tileAt(api().tiles, a.x, a.y).hasChest, undefined);
+	assert.equal(tileAt(api().tiles, b.x, b.y).hasChest, true);
 });
 
 test('the Rat King times out, taunts, and stays on the map at full HP', () => {
@@ -361,7 +357,7 @@ test('loading a save (tab take-over / reload) drops a stale open fight', () => {
 	withMonster();
 	api().startFight(1);
 	const merge = store.persist.getOptions().merge!;
-	const saved = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const saved = pickPersisted(api());
 	const merged = merge(saved, api()) as ReturnType<typeof api>;
 	assert.equal(merged.fight, null);
 	assert.equal(merged.isHydrated, true);

@@ -1,21 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, owned, setResources, store } from './helpers';
+import { api, freshGame, growTo, owned, setResources, store, tileAt, gridCells } from './helpers';
 import {
 	CASTLE_UPGRADE,
 	CHEST,
 	CLICK_LADDER,
-	GRID_CENTER_X,
-	GRID_CENTER_Y,
+	CASTLE_X,
+	CASTLE_Y,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUYABLE,
 	TILE_RESOURCE_COST,
 } from '../src/config/gameConfig';
 import { calculateTileCost, calculateBuildingCost, effectiveTileDiscount } from '../src/utils/gameUtils';
 import type { Resources } from '../src/types/game';
+import { hasOwnedNeighbour, isOwnedAt } from '../src/utils/world';
 
 const SELLABLE = [...MERCHANT_BUYABLE]; // what can be both bought and sold; farm products only sell (see merchantShop.test.ts)
-const castleLevel = () => api().tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1;
+const castleLevel = () => tileAt(api().tiles, CASTLE_X, CASTLE_Y).level ?? 1;
 
 test('merchant: buying then selling never makes gold, for every resource and amount', () => {
 	for (const resource of SELLABLE) {
@@ -99,7 +100,7 @@ test('tile purchase that causes a level-up still awards the stat point', () => {
 	freshGame();
 	setResources({ gold: 1e9, xp: 740 });
 	const before = api().characterStats.availablePoints;
-	const frontier = [GRID_CENTER_X + 1, GRID_CENTER_Y] as const;
+	const frontier = [CASTLE_X + 1, CASTLE_Y] as const;
 	assert.equal(api().buyTile(frontier[0], frontier[1]), true);
 	api().tick(100);
 	assert.ok(api().level.level >= 2);
@@ -108,25 +109,24 @@ test('tile purchase that causes a level-up still awards the stat point', () => {
 
 test('buyTile: only adjacent, unowned, affordable tiles; pick-a-biome flow is guarded', () => {
 	freshGame({ gold: 1e9 });
-	assert.equal(api().buyTile(GRID_CENTER_X + 5, GRID_CENTER_Y), false); // not adjacent
-	assert.equal(api().buyTile(GRID_CENTER_X, GRID_CENTER_Y), false); // already owned
+	assert.equal(api().buyTile(CASTLE_X + 5, CASTLE_Y), false); // not adjacent
+	assert.equal(api().buyTile(CASTLE_X, CASTLE_Y), false); // already owned
 	assert.equal(api().buyTile(1.5, 2), false);
 	assert.equal(api().buyTile(-1, 0), false);
 	growTo(3); // the 4th purchase used to be a biome pick: now every purchase is a plain rolled purchase
 	assert.equal(owned(), 3);
 	const spot = (() => {
 		const s = api();
-		for (let y = 0; y < s.tiles.length; y++)
-			for (let x = 0; x < s.tiles[y].length; x++)
-				if (!s.tiles[y][x].isOwned && [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].some(([ax, ay]) => s.tiles[ay]?.[ax]?.isOwned)) return [x, y];
-		throw new Error('no frontier');
+		const f = gridCells(s.tiles).find(({ x, y }) => !isOwnedAt(s.tiles, x, y) && hasOwnedNeighbour(s.tiles, x, y));
+		if (!f) throw new Error('no frontier');
+		return [f.x, f.y];
 	})();
 	const gold = api().resources.gold;
 	assert.equal(api().buyTile(spot[0], spot[1]), true);
 	assert.ok(api().resources.gold < gold, 'the purchase is charged at once');
 	assert.equal(owned(), 4);
-	assert.ok(api().tiles[spot[1]][spot[0]].isOwned);
-	assert.notEqual(api().tiles[spot[1]][spot[0]].biome, 'grounds', 'Grounds no longer turns up: buildings go on any tile');
+	assert.ok(tileAt(api().tiles, spot[0], spot[1]).isOwned);
+	assert.notEqual(tileAt(api().tiles, spot[0], spot[1]).biome, 'grounds', 'Grounds no longer turns up: buildings go on any tile');
 });
 
 test('tile cost: extra resources are required from the configured tile count and are paid', () => {
@@ -138,7 +138,7 @@ test('tile cost: extra resources are required from the configured tile count and
 	assert.ok((cost.resources[first.resource] ?? 0) > 0);
 	// enough gold, but none of the required resource
 	setResources({ gold: 1e12, wood: 0, stone: 0, coal: 0, food: 0 });
-	const frontier = api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t, x, y }) => !t.isOwned && [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].some(([ax, ay]) => api().tiles[ay]?.[ax]?.isOwned))!;
+	const frontier = gridCells().find(({ t, x, y }) => !t.isOwned && hasOwnedNeighbour(api().tiles, x, y))!;
 	assert.equal(api().buyTile(frontier.x, frontier.y), false);
 	setResources({ [first.resource]: cost.resources[first.resource]! } as Partial<Resources>);
 	setResources({ stone: cost.resources.stone ?? 0, wood: cost.resources.wood ?? 0 });
@@ -191,14 +191,14 @@ test('click power: untrusted clicks pay nothing, trusted clicks pay gold/s x pow
 test('chests: the spawn timer pauses at the cap, collecting needs a real chest, luck raises the reward', () => {
 	freshGame();
 	growTo(8);
-	assert.equal(api().collectChest(GRID_CENTER_X, GRID_CENTER_Y), false);
+	assert.equal(api().collectChest(CASTLE_X, CASTLE_Y), false);
 	store.setState({ activeChests: CHEST.max, chestSpawnTimer: 123 });
 	api().tick(10_000);
 	assert.equal(api().chestSpawnTimer, 0);
 	store.setState({ activeChests: 0, chestSpawnTimer: 0 });
 	for (let t = 0; t < CHEST.intervalSec; t += MAX_CATCHUP_SEC) api().tick(MAX_CATCHUP_SEC * 1000);
 	assert.equal(api().activeChests, 1);
-	const spot = api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.hasChest)!;
+	const spot = gridCells().find(({ t }) => t.hasChest)!;
 	setResources({ gold: 0, wood: 0, stone: 0, coal: 0, food: 0 });
 	const xpBefore = api().resources.xp;
 	const bagBefore = JSON.stringify(api().bag);
@@ -216,16 +216,16 @@ test('chests: the spawn timer pauses at the cap, collecting needs a real chest, 
 test('buildings: cost resources, grow more expensive, and only go on free Grounds tiles', () => {
 	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
 	growTo(4);
-	const spot = api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')!;
+	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')!;
 	const first = calculateBuildingCost(api().tiles);
 	assert.equal(api().buildOnTile(spot.x, spot.y, 'nonsense'), false);
-	assert.equal(api().buildOnTile(GRID_CENTER_X, GRID_CENTER_Y, 'market'), false); // the castle
+	assert.equal(api().buildOnTile(CASTLE_X, CASTLE_Y, 'market'), false); // the castle
 	setResources({ gold: 0, wood: 0, stone: 0 });
 	assert.equal(api().buildOnTile(spot.x, spot.y, 'market'), false);
 	setResources({ gold: 1e12, wood: 1e12, stone: 1e12 });
 	assert.equal(api().buildOnTile(spot.x, spot.y, 'market'), true);
-	assert.equal(api().tiles[spot.y][spot.x].building, 'market');
-	assert.equal(api().tiles[spot.y][spot.x].biome, spot.t.biome, 'the tile keeps its biome');
+	assert.equal(tileAt(api().tiles, spot.x, spot.y).building, 'market');
+	assert.equal(tileAt(api().tiles, spot.x, spot.y).biome, spot.t.biome, 'the tile keeps its biome');
 	assert.equal(api().buildOnTile(spot.x, spot.y, 'farm'), false); // already built
 	const second = calculateBuildingCost(api().tiles);
 	assert.ok((second.gold ?? 0) > (first.gold ?? 0));

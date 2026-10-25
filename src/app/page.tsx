@@ -27,7 +27,7 @@ import { useGlobalContextMenu } from '@/hooks/useGlobalContextMenu';
 import ContextMenu from '@/components/game/ContextMenu';
 import BuildDialog from '@/components/game/BuildDialog';
 import ConfirmDialogs from '@/components/game/ConfirmDialogs';
-import StatsOverlay from '@/components/game/StatsOverlay';
+import BottomRightStack from '@/components/game/BottomRightStack';
 import Toast from '@/components/game/Toast';
 
 export default function Home() {
@@ -95,7 +95,7 @@ export default function Home() {
 			<TutorialDialog />
 			<BuildDialog />
 			<ConfirmDialogs />
-			<StatsOverlay />
+			<BottomRightStack />
 			<ContextMenu />
 			<Toast />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}

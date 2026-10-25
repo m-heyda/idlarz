@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, setResources, store } from './helpers';
+import { api, freshGame, growTo, setResources, store, rawSnapshot } from './helpers';
 import { COMBAT } from '../src/config/combatConfig';
 import {
 	FARM_PRODUCT_KEYS,
@@ -8,16 +8,17 @@ import {
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_SHOP_ITEMS,
-	GRID_CENTER_X,
-	GRID_CENTER_Y,
+	CASTLE_X,
+	CASTLE_Y,
 	MERCHANT_UPGRADES,
 	REBIRTH,
 	type MerchantUpgradeId,
 } from '../src/config/gameConfig';
 import { BASIC_GEAR, ITEM_CATALOG, RARITY_ORDER, RATTATUI_SET } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
-import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
+import { sanitizeSave } from '../src/lib/sanitizeSave';
 import { merchantUpgradeCost, sellMultiplier } from '../src/utils/gameUtils';
+import { patchTile } from '../src/utils/world';
 
 const MAX_HAGGLER = 1 + MERCHANT_UPGRADES.haggler.maxLevel * MERCHANT_UPGRADES.haggler.effectPerLevel;
 
@@ -171,14 +172,13 @@ test('merchant bonuses start again on a rebirth, except the bigger bag (the bag 
 	api().buyMerchantUpgrade('charm');
 	const size = api().bag.length;
 	store.setState((st) => {
-		const tiles = st.tiles.map((row) => [...row]);
-		tiles[GRID_CENTER_Y][GRID_CENTER_X] = { ...tiles[GRID_CENTER_Y][GRID_CENTER_X], level: REBIRTH.minCastleLevel };
+		const tiles = patchTile(st.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel });
 		return { tiles };
 	});
 	assert.equal(api().rebirth(), true);
 	assert.deepEqual(api().merchantUpgrades, { packrat: 1 });
 	assert.equal(api().bag.length, size);
-	const raw = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const raw = rawSnapshot();
 	assert.equal(sanitizeSave(raw).ok, true);
 });
 
@@ -186,7 +186,7 @@ test('saves: merchant upgrades round-trip, the bag size follows Pack Rat, and ba
 	freshGame({ gold: 1e12 });
 	api().buyMerchantUpgrade('packrat');
 	api().buyMerchantUpgrade('haggler');
-	const raw = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const raw = rawSnapshot();
 	const ok = sanitizeSave(raw);
 	assert.equal(ok.ok, true, ok.ok ? '' : ok.reason);
 	if (ok.ok) {
@@ -211,7 +211,7 @@ test('saves: merchant upgrades round-trip, the bag size follows Pack Rat, and ba
 
 test('saves: an older save without farm products or farm upgrades loads with zeros', () => {
 	freshGame();
-	const raw = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const raw = rawSnapshot();
 	for (const key of FARM_PRODUCT_KEYS) delete raw.resources[key];
 	delete raw.farmUpgrades;
 	delete raw.merchantUpgrades;
@@ -221,7 +221,7 @@ test('saves: an older save without farm products or farm upgrades loads with zer
 		for (const key of FARM_PRODUCT_KEYS) assert.equal(result.state.resources[key], 0);
 		assert.deepEqual(result.state.farmUpgrades, {});
 	}
-	const bad = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const bad = rawSnapshot();
 	bad.farmUpgrades = { feed: 99 };
 	assert.equal(sanitizeSave(bad).ok, false);
 	bad.farmUpgrades = { sorcery: 1 };

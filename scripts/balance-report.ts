@@ -32,7 +32,11 @@ import {
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
 	TILE_RESOURCE_COST,
+	TILE_PRICE,
+	RESOURCE_CAP,
+	SCALING_CONFIG,
 	XP_GROWTH_FACTOR,
+	XP_TILE,
 } from '../src/config/gameConfig';
 import {
 	calculateAnimalCost,
@@ -44,7 +48,7 @@ import {
 	buildingCostFactor,
 	calculateXpGain,
 	castleModifier,
-	createInitialGrid,
+	createInitialWorld,
 	farmUpgradeCost,
 	merchantUpgradeCost,
 	legacyGain,
@@ -60,7 +64,9 @@ const line = (s = '') => out.push(s);
 const fmt = (n: number): string => {
 	if (!isFinite(n)) return '∞';
 	const a = Math.abs(n);
-	if (a >= 1e12) return `${(n / 1e12).toFixed(2)}T`;
+	if (a >= 1e24) return n.toExponential(2).replace('e+', 'e');
+	const big = ['Sx', 'Qi', 'Qa', 'T'].find((_, i) => a >= Math.pow(10, 21 - 3 * i));
+	if (big) return `${(n / Math.pow(10, 21 - 3 * ['Sx', 'Qi', 'Qa', 'T'].indexOf(big))).toFixed(2)}${big}`;
 	if (a >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
 	if (a >= 1e6) return `${(n / 1e6).toFixed(2)}M`;
 	if (a >= 1e4) return `${(n / 1e3).toFixed(2)}K`;
@@ -111,6 +117,25 @@ line();
 		rows.push([n, fmt(c.gold), fmt(cumulative), extras || '—', fmt(calculateXpGain(n + 1))]);
 	}
 	table(['n', 'gold', 'cumulative gold', 'extra resources', 'XP gained'], rows);
+
+	line('### Late tiles (the polynomial tail)');
+	line();
+	line(
+		`Past ${TILE_PRICE.tailFrom} tiles the price grows like (n / ${TILE_PRICE.tailFrom})^${TILE_PRICE.tailExponent} instead of ×${SCALING_CONFIG.growthEndgame} per tile, capped at ${TILE_PRICE.ceiling.toExponential(0).replace('e+', 'e')}; ` +
+			`XP per tile has the same shape past ${XP_TILE.growthUntil} tiles (exponent ${XP_TILE.tailExponent}). Knobs: \`TILE_PRICE\`, \`XP_TILE\`, \`RESOURCE_CAP\` (${fmt(RESOURCE_CAP)}). See docs/05 BL16.`
+	);
+	line();
+	const late: (string | number)[][] = [];
+	let sum = 0;
+	let from = 1;
+	for (const n of [100, 157, 300, 1000, 3000, 10_000, 30_000, 50_000]) {
+		for (; from < n; from++) sum += calculateTileCost(from, 2.5).gold;
+		const c = calculateTileCost(n, 2.5);
+		late.push([n, fmt(c.gold), fmt(sum + c.gold), fmt(calculateXpGain(n + 1))]);
+		sum += c.gold;
+		from = n + 1;
+	}
+	table(['n', 'gold', 'cumulative gold', 'XP gained'], late);
 }
 
 // ---------------------------------------------------------------------------
@@ -269,7 +294,7 @@ line();
 line('## 7. Rates of a brand-new game');
 line();
 {
-	const r = calculateResourceRates(createInitialGrid(), INITIAL_CHARACTER_STATS, {});
+	const r = calculateResourceRates(createInitialWorld(), INITIAL_CHARACTER_STATS, {});
 	const keys = Object.keys(r.total) as (keyof Resources)[];
 	table(
 		['Resource', 'BASE_GENERATION_RATES', 'CASTLE_BASE_RATES', 'base (computed)', 'modifier (computed)', 'total /s'],

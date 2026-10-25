@@ -46,7 +46,7 @@ const StatsBody: React.FC = () => {
 	const fpsColor = fps >= 50 ? 'text-green-400' : fps >= 30 ? 'text-amber-300' : 'text-red-400';
 
 	return (
-		<div className='fixed bottom-4 right-4 z-40 px-panel text-xs pointer-events-none min-w-[170px]' aria-label='Statistics'>
+		<div className='px-panel text-xs pointer-events-none min-w-[170px]' aria-label='Statistics'>
 			<div className='px-h mb-1'>Statistics</div>
 			<Row label='FPS' value={<span className={fpsColor}>{fps}</span>} />
 			<Row label='Slowest frame' value={`${worstMs} ms`} />

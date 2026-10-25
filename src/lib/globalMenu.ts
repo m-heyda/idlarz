@@ -24,9 +24,15 @@ export const globalMenuItems = (): ContextMenuItem[] => {
 		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
 		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },
 		{
+			id: 'minimap',
+			label: 'Show minimap',
+			separator: true,
+			checked: ui.showMinimap,
+			onSelect: () => ui.setPref('showMinimap', !ui.showMinimap),
+		},
+		{
 			id: 'stats',
 			label: 'Show statistics',
-			separator: true,
 			checked: ui.showStats,
 			onSelect: () => ui.setPref('showStats', !ui.showStats),
 		},

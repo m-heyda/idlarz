@@ -1,4 +1,4 @@
-import { ATLAS, CELL, depth, hash32, type GroundGrid, type TerrainAtlas } from './terrain';
+import { ATLAS, CELL, depth, hash32, type GroundGrid, type GroundSrc, type TerrainAtlas } from './terrain';
 
 /**
  * Where the map's water ripples go: a few per open-water lake tile and one per deep swamp tile, placed by hash so the
@@ -21,9 +21,12 @@ export interface Ripple {
 	ms: number;
 }
 
-const at = (g: GroundGrid, x: number, y: number) => g[y]?.[x] ?? null;
+const at = (g: GroundSrc, x: number, y: number) => (typeof g === 'function' ? g(x, y) : g[y]?.[x] ?? null);
 
-export function tileRipples(g: GroundGrid, x: number, y: number, m: TerrainAtlas = ATLAS): Ripple[] {
+/** x mod 4 as 0..3, also for negative coordinates (the map has them). */
+const mod4 = (n: number) => ((n % 4) + 4) % 4;
+
+export function tileRipples(g: GroundSrc, x: number, y: number, m: TerrainAtlas = ATLAS): Ripple[] {
 	const me = at(g, x, y);
 	if (me !== 'lake' && me !== 'swamp') return [];
 	const d = depth(g, x, y);
@@ -42,7 +45,7 @@ export function tileRipples(g: GroundGrid, x: number, y: number, m: TerrainAtlas
 			out.push({ key: `${x},${y},${k}`, kind: 'lake', tx: x, ty: y, x: x * CELL + left, y: y * CELL + top, ...timing(k) });
 		}
 	} else if (d >= 1 && roll < 65) {
-		const spots = m.water?.swamp?.[(y % 4) * 4 + (x % 4)];
+		const spots = m.water?.swamp?.[mod4(y) * 4 + mod4(x)];
 		if (spots?.length) {
 			const [w, h] = RIPPLE_SIZE.swamp;
 			const [sx, sy] = spots[hash32(x, y, 810) % spots.length];
@@ -69,7 +72,7 @@ export interface Shimmer {
 }
 
 /** Open-water lake tiles (not the shore, which is foam and bank) each get one shimmer. */
-export function tileShimmer(g: GroundGrid, x: number, y: number): Shimmer | null {
+export function tileShimmer(g: GroundSrc, x: number, y: number): Shimmer | null {
 	if (at(g, x, y) !== 'lake' || depth(g, x, y) < 1) return null;
 	return {
 		key: `${x},${y}`,

@@ -4,6 +4,7 @@ import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
 import type { CritKind } from '@/lib/combat';
+import type { World } from '@/utils/world';
 
 export type { ItemStats };
 
@@ -178,9 +179,10 @@ export interface TileProps {
 	isOwned: boolean;
 	x: number;
 	y: number;
-	style: React.CSSProperties;
 	level?: number;
 	building?: string;
+	/** For a tile that is not explored yet: whether the next tile is affordable (the map works that out once for all of them) */
+	canAfford?: boolean;
 }
 
 export type MerchantTab =
@@ -258,7 +260,7 @@ import type { ChestLoot } from '@/lib/chests';
 
 export interface GameState {
 	previousLevel: number;
-	tiles: Tile[][];
+	tiles: World; // the explored map: sparse, unbounded (see src/utils/world.ts)
 	resources: Resources;
 	resourceRates: ResourceRates;
 	level: {

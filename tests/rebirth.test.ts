@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, owned, setResources, store } from './helpers';
+import { api, freshGame, growTo, owned, setResources, store, tileAt, rawSnapshot } from './helpers';
 import {
 	CASTLE_UPGRADE,
 	CLICK_LADDER,
-	GRID_CENTER_X,
-	GRID_CENTER_Y,
+	CASTLE_X,
+	CASTLE_Y,
 	INITIAL_RESOURCES,
 	LEGACY_UPGRADES,
 	REBIRTH,
@@ -20,12 +20,12 @@ import {
 	legacySpent,
 	legacyUpgradeCost,
 } from '../src/utils/gameUtils';
-import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
+import { sanitizeSave } from '../src/lib/sanitizeSave';
+import { patchTile } from '../src/utils/world';
 
 const setCastleLevel = (level: number) =>
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		tiles[GRID_CENTER_Y][GRID_CENTER_X] = { ...tiles[GRID_CENTER_Y][GRID_CENTER_X], level };
+		const tiles = patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level });
 		return { tiles };
 	});
 
@@ -36,7 +36,7 @@ const readyToRebirth = (castle = REBIRTH.minCastleLevel, tiles = 20) => {
 	setCastleLevel(castle);
 };
 
-const snapshot = () => JSON.parse(JSON.stringify(pickPersisted(api())));
+const snapshot = () => rawSnapshot();
 
 test('rebirth needs the castle at the minimum level and no upgrade running', () => {
 	freshGame();
@@ -66,7 +66,7 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 	);
 	assert.equal(owned(), 9, 'a rebirth starts with the castle and its 8 free neighbours');
 	assert.equal(s.freeTiles, 9);
-	assert.equal(s.tiles[GRID_CENTER_Y][GRID_CENTER_X].level, 1);
+	assert.equal(tileAt(s.tiles, CASTLE_X, CASTLE_Y).level, 1);
 	assert.equal(s.clickLevel, 0);
 	assert.deepEqual(s.farmLevels, {});
 	assert.equal(s.level.level, 1);
@@ -191,8 +191,8 @@ test('saves: prestige survives validation, forged Legacy is rejected', () => {
 	// a save from before Legacy existed is still fine
 	const old = snapshot();
 	delete old.prestige;
-	old.tiles = freshGame() && JSON.parse(JSON.stringify(pickPersisted(api()))).tiles;
-	const reloaded = sanitizeSave({ ...JSON.parse(JSON.stringify(pickPersisted(api()))), prestige: undefined });
+	old.tiles = freshGame() && rawSnapshot().tiles;
+	const reloaded = sanitizeSave({ ...rawSnapshot(), prestige: undefined });
 	assert.equal(reloaded.ok, true);
 	if (reloaded.ok) assert.equal(reloaded.state.prestige.legacyEarned, 0);
 });

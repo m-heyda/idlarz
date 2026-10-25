@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { RING, SELECTABLE_BIOMES, biomeVerdicts, generateStartRing, neighbourBiomes, rollBiome } from '../src/utils/biomeRules';
-import { createInitialGrid, economyTiles, STARTER_FREE_TILES, countOwnedTiles } from '../src/utils/gameUtils';
+import { createInitialWorld, economyTiles, STARTER_FREE_TILES, countOwnedTiles } from '../src/utils/gameUtils';
 import { BIOME_RULES } from '../src/config/biomeRules';
-import { SCALING_CONFIG, BIOMES, GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
+import { SCALING_CONFIG, BIOMES, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import type { BiomeType, Tile } from '../src/types/game';
+import { tileAt, worldFromRows } from '../src/utils/world';
 
 const tile = (biome: BiomeType, isOwned = true): Tile => ({ biome, isOwned });
 const empty = (): Tile[][] => Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => tile('empty', false)));
@@ -14,9 +15,10 @@ const map = (rows: string[]): Tile[][] => rows.map((r) => [...r].map((c) => (c =
 
 /** Deterministic sweep of the random range. */
 const spread = (tiles: Tile[][], purchased: number, n = 1000) => {
+	const world = worldFromRows(tiles);
 	const seen: Record<string, number> = {};
 	for (let i = 0; i < n; i++) {
-		const b = rollBiome(tiles, 2, 2, purchased, seqRandom(i));
+		const b = rollBiome(world, 2, 2, purchased, seqRandom(i));
 		seen[b] = (seen[b] ?? 0) + 1;
 	}
 	return seen;
@@ -31,7 +33,7 @@ const seqRandom = (i: number) => {
 		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 	};
 };
-const verdict = (tiles: Tile[][], purchased: number, biome: string) => biomeVerdicts(tiles, 2, 2, purchased).find((v) => v.biome === biome)!;
+const verdict = (tiles: Tile[][], purchased: number, biome: string) => biomeVerdicts(worldFromRows(tiles), 2, 2, purchased).find((v) => v.biome === biome)!;
 
 test('rolled biomes are always allowed, never the castle or empty land', () => {
 	const seen = spread(empty(), 20);
@@ -100,7 +102,7 @@ test('water clusters: next to a lake, lakes and coasts both get likelier', () =>
 test('neighbourBiomes ignores unowned tiles and the castle', () => {
 	const g = map(['.....', '.....', '.FC..', '.....', '.....']);
 	g[2][1].isOwned = false;
-	assert.deepEqual(neighbourBiomes(g, 2, 2), { four: [], eight: [] });
+	assert.deepEqual(neighbourBiomes(worldFromRows(g), 2, 2), { four: [], eight: [] });
 });
 
 test('start ring: 8 basic biomes, at least 3 plains, no other biome more than 3 times, always valid across many seeds', () => {
@@ -119,11 +121,11 @@ test('start ring: 8 basic biomes, at least 3 plains, no other biome more than 3 
 });
 
 test('a new map owns the castle and its 8 neighbours; the economy still sees a castle-only start', () => {
-	const g = createInitialGrid(seqRandom(7));
+	const g = createInitialWorld(seqRandom(7));
 	assert.equal(countOwnedTiles(g), 9);
-	assert.equal(g[GRID_CENTER_Y][GRID_CENTER_X].biome, 'castle');
+	assert.equal(tileAt(g, CASTLE_X, CASTLE_Y).biome, 'castle');
 	RING.forEach(([dx, dy]) => {
-		const t = g[GRID_CENTER_Y + dy][GRID_CENTER_X + dx];
+		const t = tileAt(g, CASTLE_X + dx, CASTLE_Y + dy);
 		assert.ok(t.isOwned && t.biome !== 'castle' && t.biome !== 'empty');
 	});
 	assert.equal(economyTiles(g, STARTER_FREE_TILES), 1); // first purchase is priced like tile #1 always was

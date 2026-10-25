@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber } from '@/utils/formatters';
-import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR, REBIRTH, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
+import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR, REBIRTH } from '@/config/gameConfig';
 import { useMenuAttention } from '@/hooks/useMenuAttention';
 import { useUiStore } from '@/stores/uiStore';
 import { openMenuAt } from '@/lib/globalMenu';
+import { castleLevelOf } from '@/lib/castleWard';
 import type { PixelIconName } from '@/config/pixelIcons';
 import PixelIcon from './PixelIcon';
 import LevelOrb from './LevelOrb';
@@ -88,7 +89,7 @@ export const HeaderButtons: React.FC = () => {
 	const settingsOpen = useUiStore((state) => state.settingsOpen);
 	const legacyOpen = useUiStore((state) => state.legacyOpen);
 	const toggleLegacy = useUiStore((state) => state.toggleLegacy);
-	const castleLevel = useGameStore((state) => state.tiles[GRID_CENTER_Y]?.[GRID_CENTER_X]?.level ?? 1);
+	const castleLevel = useGameStore((state) => castleLevelOf(state.tiles));
 	const rebirths = useGameStore((state) => state.prestige.rebirths);
 	const legacyVisible = castleLevel >= REBIRTH.minCastleLevel || rebirths > 0;
 

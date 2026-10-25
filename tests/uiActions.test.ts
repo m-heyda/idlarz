@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, store } from './helpers';
+import { api, freshGame, growTo, store, gridCells } from './helpers';
 import { emptyBag } from '../src/lib/inventory';
 import { calculateResourceBreakdown, calculateResourceRates } from '../src/utils/gameUtils';
 import { useUiStore } from '../src/stores/uiStore';
@@ -8,8 +8,8 @@ import { PREF_DEFAULTS, readPref, writePref } from '../src/lib/uiPrefs';
 import type { BagSlot, Monster } from '../src/types/game';
 
 const spot = () => {
-	for (let y = 0; y < api().tiles.length; y++)
-		for (let x = 0; x < api().tiles[y].length; x++) if (api().tiles[y][x].isOwned && api().tiles[y][x].biome !== 'castle') return { x, y };
+	const found = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle');
+	if (found) return { x: found.x, y: found.y };
 	throw new Error('no owned tile');
 };
 
@@ -78,8 +78,8 @@ test('discardItem rejects empty slots, bad amounts and anything during a fight',
 test('the income breakdown adds up to exactly what calculateResourceRates reports', () => {
 	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
 	growTo(14);
-	const at = spot();
-	api().buildOnTile(at.x, at.y, 'farm');
+	const at = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')!; // the land is rolled: a lake cannot take a farm
+	assert.equal(api().buildOnTile(at.x, at.y, 'farm'), true);
 	const s = api();
 	const rates = calculateResourceRates(s.tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);
 	const breakdown = calculateResourceBreakdown(s.tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);

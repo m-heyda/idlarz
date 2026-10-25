@@ -1,6 +1,6 @@
-import { AMBIENT_LIFE, FARM_BONUS, GRID_HEIGHT, GRID_SIZE, TILE_SIZE, type AmbientCritterType } from '@/config/gameConfig';
-import type { Tile } from '@/types/game';
+import { AMBIENT_LIFE, FARM_BONUS, TILE_SIZE, type AmbientCritterType } from '@/config/gameConfig';
 import { foundationBiome } from '@/utils/terrain';
+import { getTile, ownedBounds, type World } from '@/utils/world';
 
 export type AmbientType = AmbientCritterType;
 
@@ -39,24 +39,27 @@ export const nextSpawnDelay = (rng: () => number = Math.random) =>
  * Returns null when nothing in view can host one. Pure apart from the id counter, so it is easy to test.
  */
 export const pickAmbientCritter = (
-	tiles: Tile[][],
+	tiles: World,
 	view: Viewport,
 	rng: () => number = Math.random
 ): AmbientCritter | null => {
 	const candidates: { x: number; y: number; types: readonly AmbientType[] }[] = [];
-	const minY = Math.max(0, Math.floor(view.minY));
-	const maxY = Math.min(GRID_HEIGHT - 1, Math.ceil(view.maxY));
-	const minX = Math.max(0, Math.floor(view.minX));
-	const maxX = Math.min(GRID_SIZE - 1, Math.ceil(view.maxX));
+	const bounds = ownedBounds(tiles);
+	if (!bounds) return null;
+	// only the part of the view that can hold explored tiles
+	const minY = Math.max(bounds.minY, Math.floor(view.minY));
+	const maxY = Math.min(bounds.maxY, Math.ceil(view.maxY));
+	const minX = Math.max(bounds.minX, Math.floor(view.minX));
+	const maxX = Math.min(bounds.maxX, Math.ceil(view.maxX));
 	for (let y = minY; y <= maxY; y++) {
 		for (let x = minX; x <= maxX; x++) {
-			const tile = tiles[y]?.[x];
-			if (!tile?.isOwned || tile.biome === 'castle') continue;
+			const tile = getTile(tiles, x, y);
+			if (!tile || tile.biome === 'castle') continue;
 			// a built-on tile stands on its neighbours' biome (snowy foundation -> rabbits, meadow -> bees)
 			const biome = foundationBiome(tiles, x, y);
 			let types = AMBIENT_LIFE.byBiome[biome];
 			// fish need open water: not on a lake tile that touches the shore
-			if (types && biome === 'lake' && !([[0, -1], [1, 0], [0, 1], [-1, 0]] as const).every(([dx, dy]) => tiles[y + dy]?.[x + dx]?.isOwned && tiles[y + dy][x + dx].biome === 'lake')) {
+			if (types && biome === 'lake' && !([[0, -1], [1, 0], [0, 1], [-1, 0]] as const).every(([dx, dy]) => getTile(tiles, x + dx, y + dy)?.biome === 'lake')) {
 				types = types.filter((t) => t !== 'fish');
 			}
 			if (types?.length) candidates.push({ x, y, types });

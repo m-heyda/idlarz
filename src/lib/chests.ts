@@ -1,8 +1,9 @@
-import { CHEST, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
+import { CHEST, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { lootPool, pickWeighted } from '@/catalog';
 import { addToBag } from '@/lib/inventory';
 import { isInWard } from '@/lib/castleWard';
 import type { BagSlot, Resources, Tile } from '@/types/game';
+import { isOwnedAt, ownedRowMajor, type World } from '@/utils/world';
 
 // Treasure chests: where they appear and what is inside. Pure, with an injectable random(), unit-tested in chests.test.ts.
 
@@ -18,26 +19,25 @@ const isBuilt = (t: Tile) => !!t.building;
  * penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.
  */
 export function pickChestSpot(
-	tiles: Tile[][],
+	tiles: World,
 	taken: Set<string>,
 	castleLevel: number,
 	random: () => number = Math.random
 ): { x: number; y: number } | null {
 	const P = CHEST.placement;
 	const chests: [number, number][] = [];
-	tiles.forEach((row, y) => row.forEach((t, x) => t.hasChest && chests.push([x, y])));
+	const entries = ownedRowMajor(tiles);
+	if (tiles.stats.chests > 0) for (const { x, y, tile } of entries) if (tile.hasChest) chests.push([x, y]);
 
 	const spots: { x: number; y: number; w: number }[] = [];
-	tiles.forEach((row, y) =>
-		row.forEach((t, x) => {
-			if (!t.isOwned || t.biome === 'castle' || t.hasChest || isBuilt(t) || taken.has(`${x},${y}`) || isInWard(x, y, castleLevel)) return;
-			let w = 1;
-			if (SIDES4.some(([dx, dy]) => !tiles[y + dy]?.[x + dx]?.isOwned)) w += P.frontierBonus;
-			w += Math.floor(Math.max(Math.abs(x - GRID_CENTER_X), Math.abs(y - GRID_CENTER_Y)) / P.distanceStep);
-			if (chests.some(([cx, cy]) => Math.max(Math.abs(cx - x), Math.abs(cy - y)) <= P.nearbyRadius)) w *= P.nearbyFactor;
-			spots.push({ x, y, w });
-		})
-	);
+	for (const { x, y, tile: t } of entries) {
+		if (t.biome === 'castle' || t.hasChest || isBuilt(t) || taken.has(`${x},${y}`) || isInWard(x, y, castleLevel)) continue;
+		let w = 1;
+		if (SIDES4.some(([dx, dy]) => !isOwnedAt(tiles, x + dx, y + dy))) w += P.frontierBonus;
+		w += Math.floor(Math.max(Math.abs(x - CASTLE_X), Math.abs(y - CASTLE_Y)) / P.distanceStep);
+		if (chests.some(([cx, cy]) => Math.max(Math.abs(cx - x), Math.abs(cy - y)) <= P.nearbyRadius)) w *= P.nearbyFactor;
+		spots.push({ x, y, w });
+	}
 	if (spots.length === 0) return null;
 	let r = random() * spots.reduce((s, p) => s + p.w, 0);
 	for (const p of spots) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TILE_SIZE, CASTLE_RANGE, GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
+import { TILE_SIZE, CASTLE_RANGE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { fortressWallTier } from '@/lib/castleWard';
 import '@/styles/CastleFortress.css';
 
@@ -19,8 +19,8 @@ const CastleFortress: React.FC<{ level: number }> = ({ level }) => {
 			className='castle-fortress'
 			style={
 				{
-					left: (GRID_CENTER_X - r) * TILE_SIZE,
-					top: (GRID_CENTER_Y - r) * TILE_SIZE,
+					left: (CASTLE_X - r) * TILE_SIZE,
+					top: (CASTLE_Y - r) * TILE_SIZE,
 					width: side,
 					height: side,
 					'--wall-h': icon(`castle_wall_h_${tier}`),

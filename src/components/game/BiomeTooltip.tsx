@@ -2,8 +2,6 @@ import React, { memo, useMemo } from 'react';
 import { BiomeType } from '@/types/game';
 import {
 	BIOMES,
-	GRID_SIZE,
-	GRID_HEIGHT,
 	SCALING_CONFIG,
 	RESOURCE_ICONS,
 	BIOME_YIELD,
@@ -11,7 +9,8 @@ import {
 	BuildingType,
 } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
-import { calculateTileTapYield, canBuildOn, castleModifier } from '@/utils/gameUtils';
+import { calculateTileTapYield, canBuildOn, castleModifier, countAdjacentSameBiomes } from '@/utils/gameUtils';
+import { getTile } from '@/utils/world';
 import { formatTime } from '@/utils/formatters';
 import { TILE_TAP } from '@/config/gameConfig';
 import ResourceIcon from './ResourceIcon';
@@ -37,7 +36,7 @@ export const BiomeTooltip = memo(
 	}) => {
 		const biomeInfo = BIOMES[biome];
 		const tiles = useGameStore((state) => state.tiles);
-		const building = x !== undefined && y !== undefined ? tiles[y][x].building : undefined;
+		const building = x !== undefined && y !== undefined ? getTile(tiles, x, y)?.building : undefined;
 		const resourceRates = useGameStore((state) => state.resourceRates);
 		const castleUpgrade = useGameStore((state) => state.castleUpgrade);
 		const tapYield =
@@ -47,32 +46,12 @@ export const BiomeTooltip = memo(
 		
 		// Get building info if we have one
 		const buildingInfo = building ? BUILDINGS[building as BuildingType] : undefined;
-		const canBuild = x !== undefined && y !== undefined && canBuildOn(tiles[y][x]);
+		const canBuild = x !== undefined && y !== undefined && canBuildOn(getTile(tiles, x, y));
 
-		const adjacentCount = useMemo(() => {
-			if (x === undefined || y === undefined) return 0;
-			const directions = [
-				[-1, 0],
-				[1, 0],
-				[0, -1],
-				[0, 1],
-			];
-			return directions.reduce((count, [dx, dy]) => {
-				const newX = x + dx;
-				const newY = y + dy;
-				if (
-					newX >= 0 &&
-					newX < GRID_SIZE &&
-					newY >= 0 &&
-					newY < GRID_HEIGHT &&
-					tiles[newY][newX].isOwned &&
-					tiles[newY][newX].biome === biome
-				) {
-					return count + 1;
-				}
-				return count;
-			}, 0);
-		}, [x, y, biome, tiles]);
+		const adjacentCount = useMemo(
+			() => (x === undefined || y === undefined ? 0 : countAdjacentSameBiomes(tiles, x, y, biome)),
+			[x, y, biome, tiles]
+		);
 
 		const adjacencyMultiplier =
 			1 + SCALING_CONFIG.adjacencyBonus * adjacentCount;

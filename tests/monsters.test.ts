@@ -10,8 +10,9 @@ import {
 	tierSecondsLeft,
 } from '../src/lib/monsters';
 import { COMBAT } from '../src/config/combatConfig';
-import { GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
+import { CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import type { Monster } from '../src/types/game';
+import { ownedRowMajor, patchTile } from '../src/utils/world';
 
 const m = (over: Partial<Monster> = {}): Monster => ({
 	id: 1,
@@ -42,20 +43,21 @@ test('monsterAt finds a monster by tile', () => {
 test('pickSpawnTile never returns the castle, chest tiles, monster tiles or unowned tiles', () => {
 	freshGame();
 	growTo(8);
-	const tiles = api().tiles.map((row) => row.map((t) => ({ ...t })));
-	const ownedTiles: { x: number; y: number }[] = [];
-	tiles.forEach((row, y) => row.forEach((t, x) => t.isOwned && t.biome !== 'castle' && ownedTiles.push({ x, y })));
+	let tiles = api().tiles;
+	const ownedTiles = ownedRowMajor(tiles)
+		.filter((e) => e.tile.biome !== 'castle')
+		.map(({ x, y }) => ({ x, y }));
 	// block all but one tile with a chest or a monster
 	const keep = ownedTiles[ownedTiles.length - 1];
 	const monsters: Monster[] = [];
 	ownedTiles.slice(0, -1).forEach(({ x, y }, i) => {
-		if (i % 2 === 0) tiles[y][x].hasChest = true;
+		if (i % 2 === 0) tiles = patchTile(tiles, x, y, { hasChest: true });
 		else monsters.push(m({ id: i + 1, x, y }));
 	});
 	for (let i = 0; i < 50; i++) {
 		const pick = pickSpawnTile(tiles, monsters, Math.random)!;
 		assert.deepEqual(pick, keep);
-		assert.ok(!(pick.x === GRID_CENTER_X && pick.y === GRID_CENTER_Y));
+		assert.ok(!(pick.x === CASTLE_X && pick.y === CASTLE_Y));
 	}
 });
 

@@ -10,14 +10,14 @@ import {
 	DEFAULT_PLAYER_NAME,
 	FARM_UPGRADES,
 	MERCHANT_UPGRADES,
-	GRID_CENTER_X,
-	GRID_CENTER_Y,
-	GRID_HEIGHT,
-	GRID_SIZE,
+	CASTLE_X,
+	CASTLE_Y,
+	LEGACY_GRID_SIZE,
 	INITIAL_CHARACTER_STATS,
 	INITIAL_RESOURCES,
 	LEGACY_UPGRADES,
 	RESOURCE_CAP,
+	XP_CAP,
 	type FarmUpgradeId,
 	type LegacyUpgradeId,
 	type MerchantUpgradeId,
@@ -39,6 +39,18 @@ import {
 	STARTER_FREE_TILES,
 } from '@/utils/gameUtils';
 import { RING } from '@/utils/biomeRules';
+import {
+	COORD_LIMIT,
+	EMPTY_WORLD,
+	MAX_OWNED_TILES,
+	getTile,
+	inRange,
+	keyX,
+	keyY,
+	setTiles,
+	tileKey,
+	type Placed,
+} from '@/utils/world';
 import type {
 	BagSlot,
 	CastleUpgradeState,
@@ -117,6 +129,62 @@ const BAG_ENTRY_KEYS = new Set(['id', 'qty']);
 /** Level-ups are awarded by the tick, so a save written a moment after a purchase can be a few points behind. */
 const POINT_TOLERANCE = 5;
 
+const LAND_KEYS = new Set(['x', 'y', 'biome', 'level', 'building', 'chest']);
+const hasBiome = (name: unknown): name is string => typeof name === 'string' && Object.prototype.hasOwnProperty.call(BIOMES, name);
+
+interface RawLand {
+	x: number;
+	y: number;
+	t: Record<string, unknown>;
+}
+
+/**
+ * The owned tiles of a raw save, as `{ x, y, t }` with `t` in the tile shape (`biome`, `isOwned`, `level`, `building`,
+ * `hasChest`). Two layouts are read: the 50 x 50 grid of the first saves (`tiles`, also what the legacy vault holds) and the
+ * list of owned tiles (`land`) that the save format writes. Returns an error text instead when the layout is wrong.
+ */
+const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
+	const out: RawLand[] = [];
+	if (Array.isArray(raw.tiles)) {
+		const rows = raw.tiles;
+		if (rows.length !== LEGACY_GRID_SIZE) return 'grid height';
+		for (let y = 0; y < LEGACY_GRID_SIZE; y++) {
+			const row = rows[y];
+			if (!Array.isArray(row) || row.length !== LEGACY_GRID_SIZE) return 'grid width';
+			for (let x = 0; x < LEGACY_GRID_SIZE; x++) {
+				const t = row[x];
+				if (!isObject(t)) return 'tile shape';
+				for (const key of Object.keys(t)) if (!TILE_KEYS.has(key)) return 'tile key';
+				if (!hasBiome(t.biome)) return 'tile biome';
+				if (typeof t.isOwned !== 'boolean') return 'tile owned';
+				if (!t.isOwned) {
+					if (t.biome !== 'empty' || t.level !== undefined || t.building !== undefined || t.hasChest) {
+						return 'unowned tile content';
+					}
+					continue;
+				}
+				out.push({ x, y, t });
+			}
+		}
+		return out;
+	}
+	if (!Array.isArray(raw.land)) return 'map';
+	if (raw.land.length > MAX_OWNED_TILES) return 'too many tiles';
+	for (const entry of raw.land) {
+		if (!isObject(entry)) return 'land entry shape';
+		for (const key of Object.keys(entry)) if (!LAND_KEYS.has(key)) return 'land entry key';
+		const { x, y, biome, level, building, chest } = entry;
+		if (typeof x !== 'number' || typeof y !== 'number' || !inRange(x, y)) return 'land entry position';
+		if (!hasBiome(biome)) return 'tile biome';
+		const t: Record<string, unknown> = { biome, isOwned: true };
+		if (level !== undefined) t.level = level;
+		if (building !== undefined) t.building = building;
+		if (chest !== undefined) t.hasChest = chest;
+		out.push({ x, y, t });
+	}
+	return out;
+};
+
 /**
  * Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
  * (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -126,98 +194,89 @@ const POINT_TOLERANCE = 5;
 export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (!isObject(raw)) return fail('not an object');
 
-	// ---- grid ---------------------------------------------------------------------------------
-	const rawTiles = raw.tiles;
-	if (!Array.isArray(rawTiles) || rawTiles.length !== GRID_HEIGHT) return fail('grid height');
+	// ---- map ----------------------------------------------------------------------------------
+	const land = readLand(raw);
+	if (typeof land === 'string') return fail(land);
 
-	const tiles: Tile[][] = [];
+	const placed: Placed[] = [];
+	const at = new Set<number>();
+	let castleTile: Tile | null = null;
 	let owned = 0;
 	let chests = 0;
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		const row = rawTiles[y];
-		if (!Array.isArray(row) || row.length !== GRID_SIZE) return fail('grid width');
-		const outRow: Tile[] = [];
-		for (let x = 0; x < GRID_SIZE; x++) {
-			const t = row[x];
-			if (!isObject(t)) return fail('tile shape');
-			for (const key of Object.keys(t)) if (!TILE_KEYS.has(key)) return fail('tile key');
-			if (typeof t.biome !== 'string' || !Object.prototype.hasOwnProperty.call(BIOMES, t.biome)) return fail('tile biome');
-			if (typeof t.isOwned !== 'boolean') return fail('tile owned');
+	for (const { x, y, t } of land) {
+		const key = tileKey(x, y);
+		if (at.has(key)) return fail('two tiles share a position');
+		at.add(key);
 
-			const isCenter = x === GRID_CENTER_X && y === GRID_CENTER_Y;
-			if ((t.biome === 'castle') !== isCenter) return fail('castle position');
-			if (isCenter && !t.isOwned) return fail('castle not owned');
+		const isCenter = x === CASTLE_X && y === CASTLE_Y;
+		if ((t.biome === 'castle') !== isCenter) return fail('castle position');
+		if (t.biome === 'empty') return fail('owned empty tile');
+		owned++;
 
-			if (!t.isOwned) {
-				if (t.biome !== 'empty' || t.level !== undefined || t.building !== undefined || t.hasChest) {
-					return fail('unowned tile content');
-				}
-				outRow.push({ biome: 'empty', isOwned: false });
-				continue;
+		const tile: Tile = { biome: t.biome as Tile['biome'], isOwned: true };
+		if (t.biome === 'castle') {
+			if (t.building !== undefined) return fail('building on the castle');
+			const level = int(t.level, 1, CASTLE_UPGRADE.maxLevel);
+			if (level === null) return fail('castle level');
+			tile.level = level;
+			if (level < CASTLE_UPGRADE.maxLevel) {
+				tile.upgradeCost = { ...CASTLE_UPGRADE.upgradeCosts[level - 1] };
 			}
-			if (t.biome === 'empty') return fail('owned empty tile');
-			owned++;
-
-			const tile: Tile = { biome: t.biome, isOwned: true };
-			if (t.biome === 'castle') {
-				if (t.building !== undefined) return fail('building on the castle');
-				const level = int(t.level, 1, CASTLE_UPGRADE.maxLevel);
-				if (level === null) return fail('castle level');
-				tile.level = level;
-				if (level < CASTLE_UPGRADE.maxLevel) {
-					tile.upgradeCost = { ...CASTLE_UPGRADE.upgradeCosts[level - 1] };
-				}
-			} else if (t.building !== undefined) {
-				// a building stands on any biome except water (BUILDING_COST.blockedBiomes); only old Grounds saves carry `level: 2`
-				if (typeof t.building !== 'string' || !(t.building in BUILDINGS)) return fail('building');
-				if (BUILDING_COST.blockedBiomes.includes(t.biome)) return fail('building on a tile that cannot take one');
-				if (t.biome === 'grounds' ? t.level !== undefined && t.level !== 2 : t.level !== undefined) return fail('building level');
-				if (t.level === 2) tile.level = 2;
-				tile.building = t.building;
-			} else if (t.level !== undefined) {
-				return fail('level without a building');
-			}
-			if (t.hasChest !== undefined) {
-				if (t.hasChest !== true || t.biome === 'castle') return fail('chest');
-				tile.hasChest = true;
-				chests++;
-			}
-			outRow.push(tile);
+			castleTile = tile;
+		} else if (t.building !== undefined) {
+			// a building stands on any biome except water (BUILDING_COST.blockedBiomes); only old Grounds saves carry `level: 2`
+			if (typeof t.building !== 'string' || !(t.building in BUILDINGS)) return fail('building');
+			if (BUILDING_COST.blockedBiomes.includes(t.biome as Tile['biome'])) return fail('building on a tile that cannot take one');
+			if (t.biome === 'grounds' ? t.level !== undefined && t.level !== 2 : t.level !== undefined) return fail('building level');
+			if (t.level === 2) tile.level = 2;
+			tile.building = t.building;
+		} else if (t.level !== undefined) {
+			return fail('level without a building');
 		}
-		tiles.push(outRow);
+		if (t.hasChest !== undefined) {
+			if (t.hasChest !== true || t.biome === 'castle') return fail('chest');
+			tile.hasChest = true;
+			chests++;
+		}
+		placed.push({ x, y, tile });
 	}
+	if (!castleTile) return fail('castle not owned');
 	if (chests > CHEST.max) return fail('too many chests');
 
 	// Every owned tile must be reachable from the castle through owned neighbours
-	const seen = new Set<number>();
-	const stack: [number, number][] = [[GRID_CENTER_X, GRID_CENTER_Y]];
-	seen.add(GRID_CENTER_Y * GRID_SIZE + GRID_CENTER_X);
+	const castleKey = tileKey(CASTLE_X, CASTLE_Y);
+	const reached = new Set<number>([castleKey]);
+	const stack = [castleKey];
 	while (stack.length) {
-		const [cx, cy] = stack.pop()!;
+		const k = stack.pop() as number;
+		const cx = keyX(k);
+		const cy = keyY(k);
 		for (const [nx, ny] of [
 			[cx - 1, cy],
 			[cx + 1, cy],
 			[cx, cy - 1],
 			[cx, cy + 1],
 		]) {
-			const id = ny * GRID_SIZE + nx;
-			if (tiles[ny]?.[nx]?.isOwned && !seen.has(id)) {
-				seen.add(id);
-				stack.push([nx, ny]);
+			if (!inRange(nx, ny)) continue;
+			const nk = tileKey(nx, ny);
+			if (at.has(nk) && !reached.has(nk)) {
+				reached.add(nk);
+				stack.push(nk);
 			}
 		}
 	}
-	if (seen.size !== owned) return fail('disconnected territory');
+	if (reached.size !== owned) return fail('disconnected territory');
+	const tiles = setTiles(EMPTY_WORLD, placed);
 
 	// Tiles that cost nothing: just the castle in a save from before the starting ring, the castle + its 8 neighbours otherwise
 	const freeTiles = raw.freeTiles === undefined ? 1 : int(raw.freeTiles, 1, STARTER_FREE_TILES);
 	if (freeTiles === null || (freeTiles !== 1 && freeTiles !== STARTER_FREE_TILES)) return fail('free tiles');
-	if (freeTiles === STARTER_FREE_TILES && !RING.every(([dx, dy]) => tiles[GRID_CENTER_Y + dy][GRID_CENTER_X + dx].isOwned)) {
+	if (freeTiles === STARTER_FREE_TILES && !RING.every(([dx, dy]) => at.has(tileKey(CASTLE_X + dx, CASTLE_Y + dy)))) {
 		return fail('starting ring not owned');
 	}
 	const purchasedOwned = owned - freeTiles + 1; // as the economy counts (castle + purchases)
 
-	const castleLevel = tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1;
+	const castleLevel = castleTile.level ?? 1;
 
 	// ---- resources, XP and level ----------------------------------------------------------------
 	if (!isObject(raw.resources)) return fail('resources');
@@ -230,7 +289,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	}
 	let minXp = 0;
 	for (let k = 2; k <= purchasedOwned; k++) minXp += calculateXpGain(k);
-	if (resources.xp < minXp * 0.999) return fail('xp does not cover owned tiles');
+	if (resources.xp < Math.min(minXp, XP_CAP) * 0.999) return fail('xp does not cover owned tiles');
 	const level = calculateLevel(resources.xp);
 
 	// ---- character ---------------------------------------------------------------------------
@@ -334,14 +393,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (!isObject(m)) return fail('monster shape');
 			for (const key of Object.keys(m)) if (!MONSTER_KEYS.has(key)) return fail('monster key');
 			const id = int(m.id, 1, nextMonsterId - 1);
-			const x = int(m.x, 0, GRID_SIZE - 1);
-			const y = int(m.y, 0, GRID_HEIGHT - 1);
+			const x = int(m.x, -COORD_LIMIT, COORD_LIMIT);
+			const y = int(m.y, -COORD_LIMIT, COORD_LIMIT);
 			const ageSec = num(m.ageSec, 0, 1e8);
 			if (id === null || x === null || y === null || ageSec === null) return fail('monster numbers');
 			if (m.type !== 'rat' && m.type !== 'ratKing') return fail('monster type');
 			if (m.tier !== tierFor(m.type, ageSec)) return fail('monster tier');
-			const tile = tiles[y][x];
-			if (!tile.isOwned || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
+			const tile = getTile(tiles, x, y);
+			if (!tile || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
 			if (isInWard(x, y, castleLevel)) return fail('monster inside the castle ward');
 			if (ids.has(id) || spots.has(`${x},${y}`)) return fail('duplicate monster');
 			ids.add(id);

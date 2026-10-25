@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { PREF_DEFAULTS, readPref, writePref, type UiPrefKey } from '@/lib/uiPrefs';
+import { connectedCluster } from '@/utils/cluster';
+import { getTile, type World } from '@/utils/world';
 
 /** The tabs of the main menu window (everything the old header buttons opened) */
 export type MenuTab = 'character' | 'stats' | 'merchant' | 'farm';
@@ -30,6 +32,9 @@ export interface ContextMenuState {
 let toastId = 0;
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 let flashTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** How long a highlighted area stays tinted (ms) */
+export const HIGHLIGHT_MS = 3000;
 
 // Transient UI flags (never persisted): dialogs that are opened from several places.
 interface UiState {
@@ -68,14 +73,16 @@ interface UiState {
 	askDismissMonster: (id: number | null) => void;
 	discardIndex: number | null;
 	askDiscard: (index: number | null) => void;
-	/** Outline every explored tile of one biome for a few seconds ("Highlight biome") */
-	highlightBiome: string | null;
-	flashBiome: (biome: string) => void;
+	/** The connected area of one biome that is tinted for a few seconds ("Highlight" in the tile menu): its tiles as map keys */
+	highlight: { biome: string; cells: ReadonlySet<number> } | null;
+	/** Tints the area of the same biome around tile (x, y): every tile of that biome that touches it, side by side. */
+	flashCluster: (world: World, x: number, y: number) => void;
 	/** A short message at the bottom of the screen */
 	toast: { id: number; text: string } | null;
 	showToast: (text: string) => void;
 	/** Remembered view options (localStorage, see lib/uiPrefs): the FPS / statistics panel and the dev admin panel */
 	showStats: boolean;
+	showMinimap: boolean;
 	showAdmin: boolean;
 	adminCollapsed: boolean;
 	setPref: (key: UiPrefKey, value: boolean) => void;
@@ -114,11 +121,17 @@ export const useUiStore = create<UiState>((set) => ({
 	askDismissMonster: (id) => set({ dismissMonsterId: id, contextMenu: null }),
 	discardIndex: null,
 	askDiscard: (index) => set({ discardIndex: index, contextMenu: null }),
-	highlightBiome: null,
-	flashBiome: (biome) => {
+	highlight: null,
+	flashCluster: (world, x, y) => {
 		if (flashTimer) clearTimeout(flashTimer);
-		set({ highlightBiome: biome, contextMenu: null });
-		flashTimer = setTimeout(() => set({ highlightBiome: null }), 3000);
+		const tile = getTile(world, x, y);
+		const cells = connectedCluster(world, x, y);
+		if (!tile || cells.size === 0) {
+			set({ highlight: null, contextMenu: null });
+			return;
+		}
+		set({ highlight: { biome: tile.biome, cells }, contextMenu: null });
+		flashTimer = setTimeout(() => set({ highlight: null }), HIGHLIGHT_MS);
 	},
 	toast: null,
 	showToast: (text) => {

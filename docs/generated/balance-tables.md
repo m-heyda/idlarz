@@ -79,6 +79,21 @@
 | 69 | 1.02B | 7.02B | 102.37M wood, 102.37M stone, 81.90M coal, 81.90M food | 8577 |
 | 70 | 1.20B | 8.22B | 119.78M wood, 119.78M stone, 95.82M coal, 95.82M food | 8874 |
 
+### Late tiles (the polynomial tail)
+
+Past 100 tiles the price grows like (n / 100)^2.5 instead of ×1.17 per tile, capped at 1e19; XP per tile has the same shape past 300 tiles (exponent 1.5). Knobs: `TILE_PRICE`, `XP_TILE`, `RESOURCE_CAP` (1.00Sx). See docs/05 BL16.
+
+| n | gold | cumulative gold | XP gained |
+| --- | --- | --- | --- |
+| 100 | 133.03B | 915.54B | 22.87K |
+| 157 | 410.87B | 15.68T | 110.59K |
+| 300 | 2.07T | 175.84T | 3.51M |
+| 1000 | 42.07T | 12.04Qa | 21.30M |
+| 3000 | 655.78T | 562.42Qa | 110.57M |
+| 10000 | 13.30Qa | 38.02Qi | 672.68M |
+| 30000 | 207.38Qa | 1.78Sx | 3.49B |
+| 50000 | 743.67Qa | 10.62Sx | 7.52B |
+
 ## 2. Level curve
 
 XP to go from level L to L+1 = `floor(750 × 1.3^(L-1))`. One stat point per level.
@@ -319,11 +334,11 @@ Derived stats for the starting stats (all 5):
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 1.338 | 45.0% | 1.939 |
-| wood | 0 | 0.05 | 1.025 | 45.0% | 1.486 |
-| stone | 0 | 0.1 | 0.100 | 32.5% | 0.133 |
-| coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 2.813 | 45.0% | 4.078 |
+| gold | 0.1 | 0.1 | 1.305 | 45.0% | 1.892 |
+| wood | 0 | 0.05 | 0.440 | 45.0% | 0.638 |
+| stone | 0 | 0.1 | 1.660 | 32.5% | 2.200 |
+| coal | 0 | 0 | 1.040 | 45.0% | 1.508 |
+| food | 0 | 0.05 | 2.195 | 45.0% | 3.183 |
 | meat | 0 | 0 | 0.000 | 40.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |

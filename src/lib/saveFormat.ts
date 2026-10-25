@@ -1,6 +1,5 @@
-import { GRID_HEIGHT, GRID_SIZE } from '@/config/gameConfig';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
-import type { Tile } from '@/types/game';
+import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/utils/world';
 
 /**
  * The save format: one plain text line that is the same in browser storage and in an exported file.
@@ -12,8 +11,11 @@ import type { Tile } from '@/types/game';
  * `sanitizeSave`, which rejects anything the game cannot produce and recomputes everything derived.
  *
  * The game inside is stored compactly and without derived values:
- *   - `land` lists only the OWNED tiles (`{ x, y, biome, level?, building?, chest? }`), not the 50x50 grid;
+ *   - the map is only the OWNED tiles, as runs: `land` is a list of `[y, x0, letters]` (one letter per biome, for the
+ *     tiles x0, x0 + 1, ... of row y) and `extra` lists the tiles that carry more than a biome, `[x, y, { level?, building?,
+ *     chest? }]`. A 50,000-tile map is about 60 KB of text. Coordinates may be negative.
  *   - level, activeChests, previousLevel, tile upgrade costs and combat stats are left out (rebuilt on load).
+ * Schema 1 wrote `land` as one `{ x, y, biome, level?, building?, chest? }` object per tile (MIGRATIONS[1] converts it).
  *
  * ADDING THINGS LATER (keep old saves working):
  *   - A new field: add it to PERSISTED_KEYS, make `sanitizeSave` accept it as OPTIONAL with a default, and do
@@ -24,7 +26,7 @@ import type { Tile } from '@/types/game';
  *   - A save written by a NEWER schema than this game is refused with a clear message, never half-loaded.
  */
 
-export const SAVE_SCHEMA = 1;
+export const SAVE_SCHEMA = 2;
 export const SAVE_PREFIX = 'IDLZ2.';
 
 /** Longer than any real save by far; stops a pasted novel from freezing the page. */
@@ -38,7 +40,104 @@ export type SaveBody = Record<string, unknown>;
 /** Upgrades the `s` of schema N to schema N+1. */
 export type Migration = (body: SaveBody) => SaveBody;
 
-export const MIGRATIONS: Record<number, Migration> = {};
+/** One letter per biome in the compact land. Frozen: never change or reuse a letter (a test checks every biome has one). */
+export const BIOME_CODES: Readonly<Record<string, string>> = {
+	castle: 'K',
+	grounds: 'g',
+	forest: 'f',
+	plains: 'p',
+	hills: 'h',
+	swamp: 's',
+	tundra: 't',
+	lake: 'l',
+	coast: 'c',
+};
+const CODE_BIOMES = new Map(Object.entries(BIOME_CODES).map(([biome, code]) => [code, biome]));
+
+/** The map as it is written (see the header): runs per row plus the tiles with extras. */
+export interface PackedLand {
+	land: [number, number, string][];
+	extra: [number, number, SaveBody][];
+}
+
+interface LandCell {
+	x: number;
+	y: number;
+	biome: string;
+	level?: unknown;
+	building?: unknown;
+	chest?: boolean;
+}
+
+/** Packs cells that are already ordered by row, then column. */
+const packCells = (cells: Iterable<LandCell>): PackedLand => {
+	const land: [number, number, string][] = [];
+	const extra: [number, number, SaveBody][] = [];
+	let runY = 0;
+	let runX0 = 0;
+	let runNext = 0;
+	let letters = '';
+	for (const cell of cells) {
+		const code = BIOME_CODES[cell.biome];
+		if (!code) throw new Error(`the biome ${cell.biome} has no save letter`);
+		if (letters && cell.y === runY && cell.x === runNext) {
+			letters += code;
+			runNext++;
+		} else {
+			if (letters) land.push([runY, runX0, letters]);
+			runY = cell.y;
+			runX0 = cell.x;
+			runNext = cell.x + 1;
+			letters = code;
+		}
+		if (cell.level !== undefined || cell.building !== undefined || cell.chest) {
+			const props: SaveBody = {};
+			if (cell.level !== undefined) props.level = cell.level;
+			if (cell.building !== undefined) props.building = cell.building;
+			if (cell.chest) props.chest = true;
+			extra.push([cell.x, cell.y, props]);
+		}
+	}
+	if (letters) land.push([runY, runX0, letters]);
+	return { land, extra };
+};
+
+const packedCache = new WeakMap<World, PackedLand>();
+
+/** The map of a World in the save layout. Cached per World: autosaves that only change resources do not repack it. */
+export const packLand = (world: World): PackedLand => {
+	let packed = packedCache.get(world);
+	if (!packed) {
+		packed = packCells(
+			(function* () {
+				for (const { x, y, tile } of ownedRowMajor(world)) {
+					yield { x, y, biome: tile.biome, level: tile.level, building: tile.building, chest: tile.hasChest };
+				}
+			})()
+		);
+		packedCache.set(world, packed);
+	}
+	return packed;
+};
+
+export const MIGRATIONS: Record<number, Migration> = {
+	// 1 -> 2: `land` was one object per tile; it is runs now. A body that is not a plain list of such objects is left as it
+	// is, and unpackBody then refuses it.
+	1: (body) => {
+		const old = body.land;
+		if (!Array.isArray(old)) return body;
+		const cells: LandCell[] = [];
+		for (const entry of old) {
+			if (!isRecord(entry) || !Number.isInteger(entry.x) || !Number.isInteger(entry.y) || typeof entry.biome !== 'string' || !(entry.biome in BIOME_CODES)) {
+				return body;
+			}
+			cells.push({ x: entry.x as number, y: entry.y as number, biome: entry.biome, level: entry.level, building: entry.building, chest: entry.chest === true });
+		}
+		cells.sort((a, b) => a.y - b.y || a.x - b.x);
+		const { land, extra } = packCells(cells);
+		return { ...body, land, extra };
+	},
+};
 
 export const migrateBody = (
 	body: SaveBody,
@@ -93,47 +192,59 @@ export const packBody = (state: PersistedGame): SaveBody => {
 	for (const key of BASE_STAT_KEYS) characterStats[key] = stats[key];
 	body.characterStats = characterStats;
 
-	const land: SaveBody[] = [];
-	state.tiles.forEach((row, y) =>
-		row.forEach((tile, x) => {
-			if (!tile.isOwned) return;
-			const entry: SaveBody = { x, y, biome: tile.biome };
-			if (tile.level !== undefined) entry.level = tile.level;
-			if (tile.building !== undefined) entry.building = tile.building;
-			if (tile.hasChest) entry.chest = true;
-			land.push(entry);
-		})
-	);
+	const { land, extra } = packLand(state.tiles);
 	body.land = land;
+	body.extra = extra;
 	return body;
 };
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 
-/** Rebuilds the full grid that `sanitizeSave` validates. Returns an error text for a malformed `land` list. */
+const EXTRA_KEYS = new Set(['level', 'building', 'chest']);
+
+/**
+ * The body as `sanitizeSave` reads it: the runs are expanded to one `{ x, y, biome, level?, building?, chest? }` entry per
+ * tile (sanitizeSave checks those: duplicates, the castle, connectivity, what a tile may carry). Only the layout is checked
+ * here; a layout error is returned as text.
+ */
 export const unpackBody = (body: SaveBody): { raw: SaveBody } | { error: string } => {
-	if (!Array.isArray(body.land)) return { error: 'the land list is missing' };
-	const tiles: Tile[][] = Array.from({ length: GRID_HEIGHT }, () =>
-		Array.from({ length: GRID_SIZE }, (): Tile => ({ biome: 'empty', isOwned: false }))
-	);
-	for (const entry of body.land) {
-		if (!isRecord(entry)) return { error: 'a land entry is not an object' };
-		const { x, y, biome, level, building, chest } = entry;
-		if (!Number.isInteger(x) || !Number.isInteger(y)) return { error: 'a land entry has no position' };
-		const tx = x as number;
-		const ty = y as number;
-		if (tx < 0 || tx >= GRID_SIZE || ty < 0 || ty >= GRID_HEIGHT) return { error: 'a land entry is off the map' };
-		if (typeof biome !== 'string') return { error: 'a land entry has no biome' };
-		if (tiles[ty][tx].isOwned) return { error: 'two land entries share a tile' };
-		const tile: Tile = { biome: biome as Tile['biome'], isOwned: true };
-		if (level !== undefined) tile.level = level as number;
-		if (building !== undefined) tile.building = building as string;
-		if (chest === true) tile.hasChest = true;
-		tiles[ty][tx] = tile;
+	const rows = body.land;
+	if (!Array.isArray(rows)) return { error: 'the land list is missing' };
+	const entries: SaveBody[] = [];
+	const byKey = new Map<number, SaveBody>();
+	for (const row of rows) {
+		if (!Array.isArray(row) || row.length !== 3) return { error: 'a land row is malformed' };
+		const [y, x0, letters] = row;
+		if (!Number.isInteger(y) || !Number.isInteger(x0) || typeof letters !== 'string' || letters.length === 0) {
+			return { error: 'a land row is malformed' };
+		}
+		if (entries.length + letters.length > MAX_OWNED_TILES) return { error: 'too many tiles' };
+		if (!inRange(x0, y) || !inRange(x0 + letters.length - 1, y)) return { error: 'a land row is off the map' };
+		for (let i = 0; i < letters.length; i++) {
+			const biome = CODE_BIOMES.get(letters[i]);
+			if (!biome) return { error: 'a land row has an unknown biome letter' };
+			const entry: SaveBody = { x: x0 + i, y, biome };
+			entries.push(entry);
+			byKey.set(tileKey(x0 + i, y), entry);
+		}
 	}
-	const { land: _land, ...rest } = body;
+	const extra = body.extra === undefined ? [] : body.extra;
+	if (!Array.isArray(extra)) return { error: 'the extra list is malformed' };
+	for (const item of extra) {
+		if (!Array.isArray(item) || item.length !== 3 || !isRecord(item[2])) return { error: 'an extra entry is malformed' };
+		const [x, y, props] = item;
+		if (!Number.isInteger(x) || !Number.isInteger(y) || !inRange(x, y)) return { error: 'an extra entry is off the map' };
+		const entry = byKey.get(tileKey(x, y));
+		if (!entry) return { error: 'an extra entry is for a tile that is not there' };
+		for (const [key, value] of Object.entries(props)) {
+			if (!EXTRA_KEYS.has(key)) return { error: 'an extra entry has an unknown key' };
+			entry[key] = value;
+		}
+	}
+	const { land: _land, extra: _extra, ...rest } = body;
 	void _land;
-	return { raw: { ...rest, tiles } };
+	void _extra;
+	return { raw: { ...rest, land: entries } };
 };
 
 // ---- encode / decode ---------------------------------------------------------------------------------------------
