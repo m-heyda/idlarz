@@ -8,11 +8,11 @@
 export const BIOME_RULES = {
 	/** The castle's 8 neighbours are owned from the start (new game and every rebirth), generated from these. */
 	startRing: {
-		// No lake: the ring holds the castle walls, water starts just beyond them. Every run of the ring is 2+ tiles (no 1x1 patch).
-		weights: { plains: 5, forest: 3, hills: 2 } as Record<string, number>,
+		// Only gentle biomes next to the castle (no hills or lakes: the ring holds the castle walls, water starts just beyond). Every run of the ring is 2+ tiles (no 1x1 patch).
+		weights: { plains: 5, forest: 3 } as Record<string, number>,
 		copyPreviousPct: 50, // chance a ring tile continues the previous one, so the ring forms 2-4 patches
 		minPlains: 3,
-		maxOfOther: 3,
+		maxOfOther: 4,
 	},
 
 	/** Purchases needed before a biome can turn up or be picked. Not listed = available from the start. */

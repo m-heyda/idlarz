@@ -1,11 +1,11 @@
 """Resource sprites. The six heaps (gold, wood, stone, coal, meat) plus the reserved late-game set (iron, fish, mana,
 blue crystals, mystery box) and the gem and chests come from the supplied sheet (extract_sheet.py -> assets/*.png, 40px, no
-ground shadow). What the sheet has no picture for stays procedural: bread (food), the emerald ability shard and the farm
+ground shadow). What the sheet has no picture for stays procedural: the carrots (food), the emerald ability shard and the farm
 products (eggs, milk, hide). Sprites float on transparency so they sit on any background."""
 import math
 import os
 from PIL import Image
-from render3d import Scene, Prim, rot, vnoise, I3
+from render3d import Scene, Prim, rot, vnoise, I3, mv, mm as mm3, mul as mul3, add as add3
 from materials import MATS
 import fx
 
@@ -57,7 +57,7 @@ def facet_tex(pl, nl, pr):
 
 
 
-# ----------------------------------------------------------------- food: bread + wheat
+# ----------------------------------------------------------------- food: carrots (and the bread kept for later)
 def loaf_tex(pl, nl, pr):
     if pl[2] > 0.08 and abs(pl[1]) < 0.42:
         if ((pl[0] * 1.1 + pl[1] * 1.5) % 1.0) < 0.3:
@@ -80,6 +80,30 @@ def bread():
     sc.add(Prim('ell', (-0.2, -0.75, 0.62), (0.82, 0.82, 0.62), 'bread', rot(0, 0, 25), boule_tex, 2))
     for p in ((-1.25, -0.05), (0.75, -1.15)):
         sc.add(Prim('ell', (p[0], p[1], 0.06), (0.09, 0.09, 0.06), 'crumb', I3, None, 4))
+    return sc.render()
+
+
+def carrot_tex(pl, nl, pr):
+    """Growth rings across the root and the odd chip of lighter skin."""
+    ring = (pl[2] * 2.6 + vnoise(pl[0] * 3, pl[1] * 3, 0, pr.seed) * 0.5) % 1.0
+    if ring < 0.1:
+        return None, -0.22
+    n = vnoise(pl[0] * 4, pl[1] * 4, pl[2] * 4, pr.seed)
+    return None, (0.2 if n > 0.8 else 0.0)
+
+
+def carrot():
+    """Food: two carrots lying across each other, with leafy green tops."""
+    sc = Scene(MATS, scale=11.0, origin=(20, 29))
+    for k, (c, yaw, h, r) in enumerate((((0.35, 0.3, 0.8), 300, 1.55, 0.55), ((-0.95, -0.7, 0.6), 335, 1.1, 0.42))):
+        R = rot(90, 0, yaw)
+        sc.add(Prim('cone', c, (r, h), 'carrot', R, carrot_tex, 10 + k))
+        up = mv(R, (0, 0, -1))                                   # from the tip towards the leafy end
+        top = add3(c, mul3(up, h))
+        for j, (side, splay) in enumerate(((0.0, 0), (0.16, 24), (-0.16, -24))):
+            Rl = mm3(R, rot(0, splay, 0))
+            base = add3(top, mul3(mv(Rl, (0, 0, -1)), 0.75))
+            sc.add(Prim('ell', (base[0] + side * 0.3, base[1], base[2] + 0.05), (0.17, 0.17, 0.95), 'reed', Rl, None, 20 + k * 3 + j))
     return sc.render()
 
 

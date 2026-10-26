@@ -212,9 +212,9 @@ export const PIXEL_ICON_SIZES = {
 	animal_pig: [40, 40],
 	animal_cow: [40, 40],
 	animal_deer: [40, 40],
-	// farm pen: the whole fenced meadow (back) and the near fences that go in front of the animals (front)
-	farm_back: [256, 184],
-	farm_front: [256, 184],
+	// farm pasture: the whole fenced meadow (back) and the near fences that go in front of the animals (front)
+	farm_back: [348, 300],
+	farm_front: [348, 300],
 	// meadow around the pen
 	meadow_tree: [56, 72],
 	meadow_pine: [48, 76],

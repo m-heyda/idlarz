@@ -150,11 +150,11 @@ test('neighbourBiomes ignores unowned tiles and the castle', () => {
 	assert.deepEqual(neighbourBiomes(worldFromRows(g), 2, 2), { four: [], eight: [] });
 });
 
-test('start ring: 8 basic biomes, no water, every patch 2+ tiles, at least 3 plains, no other biome more than 3 times, always valid across many seeds', () => {
+test('start ring: only plains and forest, every patch 2+ tiles, at least 3 plains, no other biome more than maxOfOther times, always valid across many seeds', () => {
 	for (let i = 0; i < 300; i++) {
 		const ring = generateStartRing(seqRandom(i));
 		assert.equal(ring.length, 8);
-		assert.ok(!ring.includes('lake') && !ring.includes('coast'), 'the castle walls stand on dry land');
+		assert.ok(ring.every((b) => b === 'plains' || b === 'forest'), 'no hills or lakes touch the castle');
 		ring.forEach((b, k) => assert.ok(b === ring[(k + 7) % 8] || b === ring[(k + 1) % 8], `ring tile ${k} is a 1x1 patch`));
 		assert.ok(ring.filter((b) => b === 'plains').length >= BIOME_RULES.startRing.minPlains);
 		for (const b of new Set(ring)) {
@@ -164,7 +164,7 @@ test('start ring: 8 basic biomes, no water, every patch 2+ tiles, at least 3 pla
 	}
 	const seen = new Set<string>();
 	for (let i = 0; i < 300; i++) generateStartRing(seqRandom(i)).forEach((b) => seen.add(b));
-	assert.ok(seen.size >= 3, 'the ring varies between games');
+	assert.ok(seen.size >= 2, 'the ring varies between games');
 });
 
 test('a new map owns the castle and its 8 neighbours; the economy still sees a castle-only start', () => {

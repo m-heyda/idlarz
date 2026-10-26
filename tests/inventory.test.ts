@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
 	addToBag,
 	aggregateStats,
+	compareDetailed,
 	compareToEquipped,
 	emptyBag,
 	equipFromBag,
@@ -241,4 +242,48 @@ test('compareToEquipped includes the set bonus the swap reaches', () => {
 	for (const key of ['damage', 'armor', 'maxHp', 'critChance', 'superCrit', 'regen', 'luck'] as const) {
 		assert.equal(cmp.deltas[key] ?? 0, Math.round((withSet[key] - without[key]) * 100) / 100, key);
 	}
+});
+
+test('compareDetailed: stats are NEW, LOST, up or down against the worn piece, and an empty slot has no worn piece', () => {
+	const cmp = compareDetailed('rattatui_fang_blade', STARTER_EQUIPMENT)!;
+	assert.equal(cmp.slot, 'mainHand');
+	assert.equal(cmp.equippedId, 'wooden_sword');
+	const worn = ITEM_CATALOG.wooden_sword.stats!;
+	const next = ITEM_CATALOG.rattatui_fang_blade.stats!;
+	for (const row of cmp.rows) {
+		assert.equal(row.was, worn[row.key] ?? 0, row.key);
+		assert.equal(row.now, next[row.key] ?? 0, row.key);
+		assert.equal(row.delta, Math.round((row.now - row.was) * 100) / 100, row.key);
+		const expected = !row.was ? 'new' : !row.now ? 'lost' : row.delta > 0 ? 'up' : row.delta < 0 ? 'down' : 'same';
+		assert.equal(row.status, expected, row.key);
+	}
+	assert.deepEqual(cmp.net, compareToEquipped('rattatui_fang_blade', STARTER_EQUIPMENT)!.deltas);
+	assert.equal(cmp.after.mainHand, 'rattatui_fang_blade');
+
+	// swapping to something that lacks a stat the worn piece has marks it as lost
+	const back = compareDetailed('wooden_sword', { ...STARTER_EQUIPMENT, mainHand: 'rattatui_fang_blade' })!;
+	const lostKeys = Object.keys(next).filter((k) => !(worn as Record<string, number>)[k]);
+	for (const key of lostKeys) assert.equal(back.rows.find((r) => r.key === key)?.status, 'lost', key);
+
+	const empty = compareDetailed('rattatui_cap', {})!;
+	assert.equal(empty.equippedId, undefined);
+	assert.ok(empty.rows.length > 0 && empty.rows.every((r) => r.status === 'new'));
+
+	assert.equal(compareDetailed('potion_minor', STARTER_EQUIPMENT), null);
+	assert.equal(compareDetailed('no_such_item', STARTER_EQUIPMENT), null);
+});
+
+test('compareDetailed reports the set tiers a swap switches on and off', () => {
+	const pieces = RATTATUI_SET.pieces;
+	const slotOf = (id: string) => (ITEM_CATALOG[id].slot === 'ring' ? 'ring1' : ITEM_CATALOG[id].slot!);
+	const lowest = Math.min(...Object.keys(RATTATUI_SET.bonuses).map(Number));
+	const wornSome = Object.fromEntries(pieces.filter((id) => ITEM_CATALOG[id].slot !== 'ring').slice(0, lowest - 1).map((id) => [slotOf(id), id])) as Equipment;
+	const next = pieces.find((id) => ITEM_CATALOG[id].slot !== 'ring' && !Object.values(wornSome).includes(id))!;
+
+	const gain = compareDetailed(next, wornSome)!;
+	const change = gain.setChanges.find((c) => c.setId === RATTATUI_SET.id)!;
+	assert.equal(change.from, lowest - 1);
+	assert.equal(change.to, lowest);
+	assert.deepEqual(change.gained.map((t) => t.count), [lowest]);
+	assert.equal(change.lost.length, 0);
 });

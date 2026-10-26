@@ -7,20 +7,33 @@ import { setTiles, EMPTY_WORLD } from '../src/utils/world';
 import { formatNumber, formatRate } from '../src/utils/formatters';
 
 // The tile price and the XP per tile used to be pure exponentials that stopped being payable at ~157 tiles. They now have a
-// polynomial tail; everything up to the tail start is exactly what it always was.
+// polynomial tail; below the tail start the price is exactly the three exponential stages of SCALING_CONFIG.
 
-/** The price formula before the tail existed, kept here as the reference. */
-const oldPrice = (n: number) =>
-	Math.floor(
+/** The three exponential stages written out from the config, kept here as the reference. */
+const stagedPrice = (n: number) => {
+	const S = SCALING_CONFIG;
+	return Math.floor(
 		BASE_TILE_COST *
-			Math.pow(1.45, Math.min(n, 20)) *
-			Math.pow(1.27, Math.max(Math.min(n, 40) - 20, 0)) *
-			Math.pow(1.17, Math.max(n - 40, 0))
+			Math.pow(S.growthEarly, Math.min(n, S.earlyTiles)) *
+			Math.pow(S.growthLate, Math.max(Math.min(n, S.lateTiles) - S.earlyTiles, 0)) *
+			Math.pow(S.growthEndgame, Math.max(n - S.lateTiles, 0))
 	);
+};
 const oldXp = (n: number) => BASE_XP_PER_TILE * Math.pow(1.02, n - 1) * (n / 4);
 
-test('tile price: identical to the old curve up to the tail start', () => {
-	for (let n = 0; n <= TILE_PRICE.tailFrom; n++) assert.equal(SCALING_CONFIG.costFormula(n), oldPrice(n), `n=${n}`);
+test('tile price: the three exponential stages up to the tail start', () => {
+	for (let n = 0; n <= TILE_PRICE.tailFrom; n++) assert.equal(SCALING_CONFIG.costFormula(n), stagedPrice(n), `n=${n}`);
+});
+
+test('tile price: pacing anchors (cheap to ~100 tiles, a long soft middle to 300)', () => {
+	const price = SCALING_CONFIG.costFormula;
+	assert.ok(price(1) <= 100, 'the first tile is nearly free');
+	assert.ok(price(50) < 10_000, 'tile 50 is an hour-ish');
+	assert.ok(price(100) < 250_000, 'tile 100 stays within the first day');
+	assert.ok(price(300) < 1_500_000, 'tile 300 is a 2-3 day goal');
+	let cumulative = 0;
+	for (let n = 1; n <= 300; n++) cumulative += price(n);
+	assert.ok(cumulative < 1e8, '300 tiles cost under 1e8 gold in total');
 });
 
 test('tile price: finite, rising and never above the ceiling, for any number of tiles', () => {
@@ -36,13 +49,17 @@ test('tile price: finite, rising and never above the ceiling, for any number of 
 	assert.ok(SCALING_CONFIG.costFormula(50_000) < RESOURCE_CAP, 'a 50,000-tile map is buyable');
 });
 
-test('tile price: each step past the tail start grows by less than the last exponential stage, and ever less', () => {
-	let lastRatio = SCALING_CONFIG.growthEndgame;
-	for (let n = TILE_PRICE.tailFrom; n < 5000; n += 7) {
-		const ratio = SCALING_CONFIG.costFormula(n + 1) / SCALING_CONFIG.costFormula(n);
-		assert.ok(ratio <= lastRatio + 1e-9, `n=${n}: ${ratio} vs ${lastRatio}`);
-		lastRatio = ratio;
+test('tile price: past the tail start the climb is steeper than before it, then eases off towards a polynomial', () => {
+	const ratio = (n: number) => SCALING_CONFIG.costFormula(n + 1) / SCALING_CONFIG.costFormula(n);
+	assert.ok(ratio(TILE_PRICE.tailFrom) > SCALING_CONFIG.growthEndgame, 'harder once the map is filled');
+	let lastRatio = ratio(TILE_PRICE.tailFrom);
+	for (let n = TILE_PRICE.tailFrom + 1; n < 5000; n += 7) {
+		assert.ok(ratio(n) <= lastRatio + 1e-9, `n=${n}: ${ratio(n)} vs ${lastRatio}`);
+		lastRatio = ratio(n);
 	}
+	// 100 tiles past the fill line cost clearly more than the 100 before it
+	const stretch = (from: number) => Array.from({ length: 100 }, (_, i) => SCALING_CONFIG.costFormula(from + i)).reduce((a, b) => a + b, 0);
+	assert.ok(stretch(TILE_PRICE.tailFrom) > 2.5 * stretch(TILE_PRICE.tailFrom - 100));
 });
 
 test('XP per tile: identical to the old curve up to the tail start, finite and slow after it', () => {

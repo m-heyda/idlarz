@@ -25,6 +25,12 @@ export const formatNumber = (num: number | undefined): string => {
   return num.toFixed(decimalPlaces);
 };
 
+/** A percentage in the same short style as the numbers: 450%, 4.93K%, 1.20M% */
+export const formatPercent = (pct: number): string => {
+  if (!Number.isFinite(pct) || pct < 1000) return `${Math.round(pct)}%`;
+  return `${compact(pct) ?? `${(pct / 1_000).toFixed(2)}K`}%`;
+};
+
 export const formatRate = (rate: number): string => {
   if (Math.abs(rate) < 0.01) return '0/s';
   const sign = rate > 0 ? '+' : '';

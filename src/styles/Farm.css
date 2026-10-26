@@ -1,32 +1,35 @@
-/* Farm mini-game: one seamless scene. The pen fills the window; hover cards, a stats readout and an upgrade shelf float over it. */
+/* Farm mini-game: one seamless scene. The meadow fills the whole window; a stats readout, the animal shop (right) and the
+   upgrade shelf (bottom) are cells of one grid laid over it, so they never cover each other. */
 
 .farm-root {
 	position: absolute;
 	inset: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-rows: minmax(0, 1fr) auto;
 }
 
 /* --- the meadow around the pen: plains grass, vignette, a drifting cloud shadow --- */
 .farm-stage {
-	position: absolute;
-	inset: 0;
+	grid-area: 1 / 1 / 3 / 3;
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
 	background: #3a6030 url('/pixel/bg/ground_plains.png') 0 0 / 192px 192px repeat;
 	background-blend-mode: multiply;
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
 	image-rendering: pixelated;
 	cursor: default;
 }
 
+/* a soft shade towards the edges only, so the meadow reads as filling the whole window */
 .farm-stage::after {
 	content: '';
 	position: absolute;
 	inset: 0;
 	pointer-events: none;
-	background: radial-gradient(ellipse at center, rgba(10, 24, 8, 0) 34%, rgba(6, 12, 6, 0.82) 100%);
+	background: radial-gradient(ellipse at center, rgba(10, 24, 8, 0) 62%, rgba(6, 12, 6, 0.5) 100%);
 }
 
 .farm-cloud {
@@ -81,8 +84,6 @@
 	inset: 0;
 	display: block;
 	line-height: 0;
-	pointer-events: auto;
-	cursor: pointer;
 }
 
 .farm-animal[data-dir='r'] .farm-sprite img {
@@ -116,20 +117,7 @@
 	pointer-events: none;
 }
 
-.farm-animal[data-owned='false'] .farm-sprite img {
-	filter: brightness(0) invert(1);
-	opacity: 0.3;
-}
-
-.farm-animal:hover .farm-sprite img {
-	filter: brightness(1.18);
-}
-
-.farm-animal[data-owned='false']:hover .farm-sprite img {
-	opacity: 0.55;
-}
-
-/* selected: one-native-pixel gold outline + a gold ring on the ground */
+/* lit while its card in the animal shop is hovered: one-native-pixel gold outline + a gold ring on the ground */
 .farm-animal[data-selected='true'] .farm-sprite img {
 	filter: drop-shadow(2px 0 0 #ffd23a) drop-shadow(-2px 0 0 #ffd23a) drop-shadow(0 2px 0 #ffd23a)
 		drop-shadow(0 -2px 0 #ffd23a) drop-shadow(0 0 10px rgba(255, 200, 60, 0.95)) brightness(1.08);
@@ -146,42 +134,6 @@
 	to {
 		transform: scale(1.08);
 	}
-}
-
-.farm-lvl {
-	position: absolute;
-	left: calc(14px * var(--z, 2));
-	top: calc(-7px * var(--z, 2));
-	pointer-events: none;
-	line-height: 0;
-}
-
-.farm-animal[data-selected='true'] .farm-lvl {
-	top: calc(-11px * var(--z, 2));
-	filter: drop-shadow(0 0 6px #ffd23a);
-}
-
-.farm-tag {
-	position: absolute;
-	left: 50%;
-	top: calc(-3px * var(--z, 2));
-	display: flex;
-	align-items: center;
-	gap: 2px;
-	padding: 0 6px 0 7px;
-	transform: translateX(-50%);
-	font-size: 0.7rem;
-	font-weight: 700;
-	white-space: nowrap;
-	color: #ff9a8a;
-	background: rgba(12, 8, 6, 0.9);
-	border: 2px solid #5a3a1c;
-	pointer-events: none;
-}
-
-.farm-tag.can {
-	color: #bff59a;
-	border-color: #4a8a2c;
 }
 
 /* celebration burst when an animal is bought / upgraded */
@@ -237,20 +189,6 @@
 	.farm-animal[data-selected='true'] .farm-shadow {
 		animation: none;
 	}
-}
-
-/* --- meadow scenery behind the pen --- */
-.meadow-decor {
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-}
-
-.meadow-prop {
-	position: absolute;
-	line-height: 0;
-	transform: translate(-50%, -100%);
-	image-rendering: pixelated;
 }
 
 .farm-pen {
@@ -423,135 +361,175 @@
 	}
 }
 
-/* --- hover / pinned buy card, hanging above the animal --- */
-.farm-card-anchor {
-	position: absolute;
-	z-index: 600;
-	width: 0;
-	height: 0;
+/* --- animal shop (right edge): one card per kind with its yield and x1 / x10 / Max buttons --- */
+.farm-animals {
+	grid-area: 1 / 2;
+	position: relative;
+	z-index: 700;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 4px;
+	min-height: 0;
+	margin: 12px 12px 6px 0;
+	pointer-events: none;
 }
 
-.farm-card {
-	position: absolute;
-	left: 0;
-	bottom: 10px;
-	width: 236px;
-	transform: translateX(-50%);
-	padding: 8px 10px 10px;
-	font-size: 0.8rem;
+.farm-animals > * {
+	pointer-events: auto;
+}
+
+.farm-animals-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	width: 248px;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	scrollbar-width: thin;
+}
+
+.farm-animal-card {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 5px 7px 7px;
+	font-size: 0.75rem;
 	color: #d8c8a0;
-	background: rgba(12, 8, 6, 0.95);
+	background: rgba(10, 7, 6, 0.92);
 	border: 4px solid transparent;
 	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
 	image-rendering: pixelated;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
-	animation: farm-card-in 0.12s ease-out;
 }
 
-/* the little pointer under the card */
-.farm-card::after {
-	content: '';
-	position: absolute;
-	left: 50%;
-	bottom: -14px;
-	width: 10px;
-	height: 10px;
-	background: #1a120d;
-	border-right: 3px solid #5a3f1c;
-	border-bottom: 3px solid #5a3f1c;
-	transform: translateX(-50%) rotate(45deg);
+.farm-animal-card[data-ok='true'] {
+	box-shadow: 0 0 0 1px #4a8a2c;
 }
 
-.farm-card[data-pinned='true'] {
-	box-shadow: 0 0 0 2px #ffe27a, 0 6px 18px rgba(0, 0, 0, 0.55);
-}
-
-@keyframes farm-card-in {
-	from {
-		opacity: 0;
-		margin-bottom: -6px;
-	}
-}
-
-.farm-card-head {
+.farm-animal-head {
 	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
-	margin-bottom: 4px;
-	padding-bottom: 4px;
-	border-bottom: 1px solid #3a2a18;
+	align-items: center;
+	gap: 6px;
+	line-height: 0;
 }
 
-.farm-card-name {
+.farm-animal-name {
+	flex: 1;
 	font-weight: 700;
-	font-size: 1rem;
+	font-size: 0.95rem;
+	line-height: 1.1;
 	color: var(--px-gold, #f0d27a);
 }
 
-.farm-card-count {
+.farm-animal-count {
 	font-weight: 700;
+	line-height: 1.1;
 	color: #bff59a;
 }
 
-.farm-card-rows {
+.farm-animal-yield {
 	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	margin-bottom: 8px;
-}
-
-.farm-card-row {
-	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	gap: 8px;
+	gap: 10px;
+	color: #a89878;
 }
 
-.farm-card-note {
+.farm-animal-each {
+	margin-left: auto;
+	color: #7a6a52;
+}
+
+.farm-animal-note {
 	text-align: center;
 	color: #a89878;
 	line-height: 1.25;
 }
 
-.farm-card-buy {
+.farm-animal-buy {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 6px;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 5px;
 }
 
-.farm-card-buy .px-btn {
+/* a buy button: the action on top, the price under it; green when you can pay, dark when you cannot */
+.farm-buy {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 3px 2px;
-	line-height: 1.15;
+	justify-content: center;
+	gap: 1px;
+	min-width: 0;
+	padding: 4px 2px 3px;
+	font-family: var(--font-pixel);
+	color: #fff;
+	background: #3f8f2e;
+	border: 2px solid var(--px-ink);
+	box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px 0 rgba(0, 0, 0, 0.4);
+	cursor: pointer;
+	transition: filter 0.1s;
 }
 
-.farm-card-buy .px-btn[data-ok='false'] {
-	opacity: 0.55;
+.farm-buy:hover:not(:disabled) {
+	filter: brightness(1.18);
 }
 
-.farm-cost {
+.farm-buy:active:not(:disabled) {
+	transform: translateY(1px);
+}
+
+.farm-buy-label {
+	font-size: 0.74rem;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	line-height: 1.1;
+	text-transform: uppercase;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.farm-buy-cost {
 	display: inline-flex;
 	align-items: center;
 	gap: 2px;
-	font-size: 0.65rem;
-	font-weight: 700;
-	color: #bff59a;
+	font-size: 0.68rem;
+	font-weight: 600;
+	line-height: 1.1;
+	color: #e8ffd0;
 	white-space: nowrap;
 }
 
-.farm-card-buy .px-btn[data-ok='false'] .farm-cost {
+.farm-buy[data-ok='false'] {
+	background: #2e2824;
+	box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.08), inset -2px -2px 0 rgba(0, 0, 0, 0.45);
+	cursor: default;
+}
+
+.farm-buy[data-ok='false'] .farm-buy-label {
+	color: #b9a77f;
+}
+
+.farm-buy[data-ok='false'] .farm-buy-cost {
 	color: #ff9a8a;
+}
+
+.farm-buy:disabled {
+	cursor: not-allowed;
+}
+
+.farm-buy:disabled .farm-buy-cost {
+	color: #7a6e60;
 }
 
 /* --- stats readout (top-left) --- */
 .farm-hud {
-	position: absolute;
-	left: 12px;
-	top: 12px;
+	grid-area: 1 / 1;
+	position: relative;
+	align-self: start;
+	justify-self: start;
+	margin: 12px 0 0 12px;
 	z-index: 700;
-	padding: 6px 10px 8px;
+	width: 260px; /* fixed: ticking numbers never resize the panel */
+	padding: 4px 10px 8px;
 	font-size: 0.72rem;
 	color: #a89878;
 	background: rgba(10, 7, 6, 0.86);
@@ -561,35 +539,71 @@
 }
 
 .farm-hud-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
 	margin-bottom: 2px;
+	padding: 0;
 	font-weight: 700;
+	font-size: 0.78rem;
 	letter-spacing: 1px;
 	text-transform: uppercase;
 	color: var(--px-gold, #f0d27a);
+	cursor: pointer;
+}
+
+.farm-hud-title:hover {
+	filter: brightness(1.25);
+}
+
+.farm-hud[data-open='false'] {
+	padding-bottom: 4px;
+}
+
+.farm-hud[data-open='false'] .farm-hud-title {
+	margin-bottom: 0;
 }
 
 .farm-hud table {
+	width: 100%;
+	table-layout: fixed;
 	border-collapse: collapse;
 }
 
+.farm-hud th:first-child,
+.farm-hud td:first-child {
+	width: 22px;
+}
+
 .farm-hud th {
-	padding: 0 6px;
+	padding: 0 2px;
 	font-weight: 400;
 	text-align: right;
 	color: #7a6a52;
 }
 
 .farm-hud td {
-	padding: 1px 6px;
+	padding: 1px 2px;
 	text-align: right;
 	font-weight: 600;
 	color: #e8d08a;
 	white-space: nowrap;
 }
 
+.farm-hud td > span {
+	justify-content: flex-end;
+}
+
 .farm-hud td:first-child {
 	text-align: left;
 	padding-left: 0;
+}
+
+.farm-hud td.farm-hud-label {
+	text-align: left;
+	color: #a89878;
+	font-weight: 400;
 }
 
 .farm-hud-note {
@@ -599,10 +613,9 @@
 
 /* --- upgrade shelf (bottom) --- */
 .farm-dock {
-	position: absolute;
-	left: 12px;
-	right: 12px;
-	bottom: 10px;
+	grid-area: 2 / 1 / 3 / 3;
+	position: relative;
+	margin: 0 12px 10px;
 	z-index: 700;
 	display: flex;
 	flex-direction: column;
@@ -701,8 +714,3 @@
 	color: #ff9a8a;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	.farm-card {
-		animation: none;
-	}
-}

@@ -60,3 +60,14 @@ export const formatStats = (stats: ItemStats): string =>
 		.filter(([, value]) => value)
 		.map(([key, value]) => formatStat(key, value as number))
 		.join(', ');
+
+const statNumber = (key: string, value: number): string => {
+	const def = (STAT_DEFS as Record<string, StatDef>)[key];
+	return `${def?.decimals ? value.toFixed(def.decimals) : String(value)}${def?.unit ?? ''}`;
+};
+
+/** '8%', '1.5/s': the value alone, for a stat table whose row already names the stat */
+export const formatStatValue = (key: string, value: number): string => statNumber(key, value);
+
+/** '+2', '-1', '+0.5/s': a signed change without the stat name */
+export const formatStatChange = (key: string, delta: number): string => `${delta < 0 ? '-' : '+'}${statNumber(key, Math.abs(delta))}`;

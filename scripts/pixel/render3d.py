@@ -86,8 +86,14 @@ class Prim:
 
     def __init__(self, kind, center, size, mat, R=I3, tex=None, seed=0):
         self.kind, self.c, self.s, self.mat, self.R, self.tex, self.seed = kind, center, size, mat, R, tex, seed
+        # conservative bounding sphere: a ray (unit direction) that misses it cannot hit the primitive
+        self.rad2 = sum(v * v for v in size) if kind in ('box', 'ell') else size[0] ** 2 + size[1] ** 2
 
     def hit(self, o, d):
+        w = (self.c[0] - o[0], self.c[1] - o[1], self.c[2] - o[2])
+        along = w[0] * d[0] + w[1] * d[1] + w[2] * d[2]
+        if w[0] * w[0] + w[1] * w[1] + w[2] * w[2] - along * along > self.rad2 + 1e-6:
+            return None
         ol = mtv(self.R, sub(o, self.c))
         dl = mtv(self.R, d)
         res = None

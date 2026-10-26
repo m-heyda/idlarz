@@ -5,7 +5,6 @@ import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
 import { LevelUpTimer } from './LevelUpTimer';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import CharacterPortrait from './CharacterPortrait';
-import EditableName from './EditableName';
 import LevelOrb from './LevelOrb';
 import { maxHp } from '@/lib/combat';
 
@@ -42,7 +41,7 @@ const Flask: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({
  * and a stony XP bar along the floor with the level on a gem. Shared by the Character and Statistics windows.
  */
 const LevelDetails: React.FC = () => {
-	const { resources, level, resourceRates, characterStats, playerClass, playerHp, equipment } = useGameStore();
+	const { resources, level, resourceRates, characterStats, playerClass, playerHp, equipment, playerName } = useGameStore();
 	const hpMax = maxHp(characterStats, equipment);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
@@ -58,7 +57,7 @@ const LevelDetails: React.FC = () => {
 			<div className='hero-torch' style={{ left: 240 }} />
 
 			<div className='hero-nameplate'>
-				<EditableName />
+				<span className='px-name'>{playerName}</span>
 				<span className='hero-class'>
 					{info.race} {info.label}
 				</span>

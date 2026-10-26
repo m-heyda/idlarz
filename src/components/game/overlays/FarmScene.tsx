@@ -1,14 +1,9 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { MeadowCritter, MeadowDecor, useMeadowCritters, Critter } from './MeadowLayer';
+import { MeadowCritter, useMeadowCritters, Critter } from './MeadowLayer';
 import { ANIMALS, FARM } from '@/config/gameConfig';
 import { ANIMAL_PIXEL_ICONS } from '@/config/pixelIcons';
-import { calculateAnimalCost } from '@/utils/gameUtils';
-import { formatNumber } from '@/utils/formatters';
 import { Animal, ClickInput } from '@/types/game';
 import PixelIcon from '../PixelIcon';
-import LevelOrb from '../LevelOrb';
-import ResourceIcon from '../ResourceIcon';
-import FarmAnimalCard from './FarmAnimalCard';
 import {
 	ANCHOR,
 	ANIMAL_MOTION,
@@ -16,15 +11,18 @@ import {
 	penZoom,
 	project,
 	randomSpot,
+	PERSONAL_SPACE,
+	roomySpot,
 	seeded,
+	walkView,
 	walkable,
+	type Insets,
+	type WalkView,
 } from './farmGeometry';
 
 interface Agent {
 	key: string;
 	id: string;
-	first: boolean;
-	ghost: boolean;
 	x: number;
 	y: number;
 	tx: number;
@@ -37,21 +35,14 @@ interface Agent {
 interface Instance {
 	key: string;
 	animal: Animal;
-	level: number;
 	first: boolean;
-	ghost: boolean;
 }
 
-// Where animals you do not own yet stand (as dark silhouettes with a price tag)
-const GHOST_SPOTS: Record<string, { x: number; y: number }> = {
-	chicken: { x: -3.2, y: -2.8 },
-	pig: { x: 3.4, y: -2.4 },
-	cow: { x: -3.6, y: -0.4 },
-	deer: { x: 1.4, y: -0.2 },
-};
+/** Animals drawn for a count: one per animal owned, up to FARM.unitsDrawn (the animal panel carries the real count) */
+const copiesFor = (count: number) => Math.min(FARM.unitsDrawn, Math.max(0, count));
 
-/** Animals drawn for a count: one per animal owned, up to FARM.unitsDrawn (the count badge carries on) */
-const copiesFor = (count: number) => (count <= 0 ? 1 : Math.min(FARM.unitsDrawn, count));
+/** Candidate spots tried when an animal picks where to wander next; the one farthest from everybody else wins. */
+const SPOT_TRIES = 12;
 
 const hash = (s: string) => {
 	let h = 7;
@@ -61,75 +52,41 @@ const hash = (s: string) => {
 
 interface FarmSceneProps {
 	farmLevels: Record<string, number>;
-	farmUpgrades: Record<string, number>;
-	food: number;
-	selectedId: string | null;
-	onSelect: (id: string | null) => void;
-	/** buy animals of a kind: a number, or 'max' for all you can afford */
-	onBuy: (animalId: string, count: number | 'max') => void;
+	/** Animal kind to light up (the card in the animal panel being hovered) */
+	highlightId: string | null;
 	/** animal id that was just bought (plays a little burst) */
 	celebrate: string | null;
+	/** Panels laid over the window (CSS px): animals and critters keep clear of them */
+	insets: Insets;
 	/** a bonus critter was clicked (cursor position for the popup) */
 	onCatchCritter: (critter: Critter, x: number, y: number, input: ClickInput) => void;
 }
 
 /**
- * The farm as a tiny game: an isometric pen (barn, trough, hay, gate) with your animals wandering about, filling the
- * whole window. Hover an animal (or click it to pin) to get its buy card right above it; click the grass to let go.
+ * The farm as a tiny game: an isometric pen (barn, trough, hay, gate) with your animals wandering about, on a meadow that
+ * fills the whole window. The animals are scenery: buying happens in the panel beside the scene.
  */
-const FarmScene: React.FC<FarmSceneProps> = ({
-	farmLevels,
-	farmUpgrades,
-	food,
-	selectedId,
-	onSelect,
-	onBuy,
-	celebrate,
-	onCatchCritter,
-}) => {
+const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrate, insets, onCatchCritter }) => {
 	const stageRef = useRef<HTMLDivElement>(null);
 	const [zoom, setZoom] = useState(3);
 	const zoomRef = useRef(zoom);
 	zoomRef.current = zoom;
-	const { critters, remove } = useMeadowCritters(stageRef, zoomRef);
+	const insetsRef = useRef(insets);
+	insetsRef.current = insets;
+	const { critters, remove } = useMeadowCritters(stageRef, insetsRef);
 	const nodes = useRef(new Map<string, HTMLDivElement>());
 	const agents = useRef(new Map<string, Agent>());
-	const [hoverId, setHoverId] = useState<string | null>(null);
-	const leaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-	const activeId = hoverId ?? selectedId;
-	const activeRef = useRef<string | null>(activeId);
-	activeRef.current = activeId;
-
-	// the pen is drawn at the biggest whole-pixel zoom that fits the window
-	useLayoutEffect(() => {
-		const el = stageRef.current;
-		if (!el) return;
-		const fit = () => setZoom(penZoom(el.clientWidth, el.clientHeight));
-		fit();
-		const ro = new ResizeObserver(fit);
-		ro.observe(el);
-		return () => ro.disconnect();
-	}, []);
-
-	const hover = (id: string | null) => {
-		clearTimeout(leaveTimer.current);
-		if (id) setHoverId(id);
-		else leaveTimer.current = setTimeout(() => setHoverId(null), 220); // time to reach the card
-	};
-	useEffect(() => () => clearTimeout(leaveTimer.current), []);
+	const viewRef = useRef<WalkView | null>(null);
 
 	const instances = useMemo<Instance[]>(
 		() =>
-			ANIMALS.flatMap((animal) => {
-				const level = farmLevels[animal.id] || 0;
-				return Array.from({ length: copiesFor(level) }, (_, i) => ({
+			ANIMALS.flatMap((animal) =>
+				Array.from({ length: copiesFor(farmLevels[animal.id] || 0) }, (_, i) => ({
 					key: `${animal.id}-${i}`,
 					animal,
-					level,
 					first: i === 0,
-					ghost: level <= 0,
-				}));
-			}),
+				}))
+			),
 		[farmLevels]
 	);
 
@@ -142,6 +99,35 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 		el.dataset.moving = a.moving ? '1' : '0';
 	};
 
+	// The pasture is shown at a whole-pixel zoom and centred in the window (cropped, never scaled). Whenever the window or a
+	// panel changes, work out which part of it is on screen and move any animal that ended up under a panel or off screen.
+	useLayoutEffect(() => {
+		const el = stageRef.current;
+		if (!el) return;
+		const fit = () => {
+			const z = penZoom(el.clientWidth);
+			zoomRef.current = z;
+			setZoom(z);
+			const view = walkView(el.clientWidth, el.clientHeight, z, insets);
+			viewRef.current = view;
+			agents.current.forEach((a) => {
+				if (!walkable(a.x, a.y, view)) {
+					const spot = randomSpot(undefined, view);
+					a.x = a.tx = spot.x;
+					a.y = a.ty = spot.y;
+					a.moving = false;
+				}
+				const node = nodes.current.get(a.key);
+				if (node) place(node, a);
+			});
+		};
+		fit();
+		const ro = new ResizeObserver(fit);
+		ro.observe(el);
+		return () => ro.disconnect();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [insets.right, insets.bottom, insets.hudOpen]);
+
 	// keep one agent per visible instance; new ones appear at a spot of their own
 	useLayoutEffect(() => {
 		const wanted = new Set(instances.map((i) => i.key));
@@ -151,14 +137,13 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 		instances.forEach((inst) => {
 			let a = agents.current.get(inst.key);
 			if (!a) {
-				const ghostSpot = GHOST_SPOTS[inst.animal.id];
 				const rnd = seeded(hash(inst.key));
-				const spot = inst.ghost && ghostSpot ? ghostSpot : randomSpot(rnd);
+				const others: { x: number; y: number }[] = [];
+				agents.current.forEach((o) => others.push({ x: o.x, y: o.y }));
+				const spot = roomySpot(others, 40, rnd, viewRef.current);
 				a = {
 					key: inst.key,
 					id: inst.animal.id,
-					first: inst.first,
-					ghost: inst.ghost,
 					x: spot.x,
 					y: spot.y,
 					tx: spot.x,
@@ -169,11 +154,6 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 				};
 				agents.current.set(inst.key, a);
 			}
-			if (a.ghost && !inst.ghost) {
-				// the first animal of a kind was just bought: it steps off its silhouette spot
-				a.wait = 0.4;
-			}
-			a.ghost = inst.ghost;
 			const el = nodes.current.get(inst.key);
 			if (el) place(el, a);
 		});
@@ -188,6 +168,15 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 	}, [zoom]);
 
 	useEffect(() => {
+		// the next stop: of a few random spots, the one with the most room around it, so the herd spreads out instead of clumping
+		const pickSpot = (self: Agent) => {
+			const others: { x: number; y: number }[] = [];
+			agents.current.forEach((other) => {
+				if (other !== self) others.push({ x: other.tx, y: other.ty });
+			});
+			return roomySpot(others, SPOT_TRIES, Math.random, viewRef.current);
+		};
+
 		let raf = 0;
 		let last = performance.now();
 		const step = (now: number) => {
@@ -196,14 +185,11 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 			agents.current.forEach((a) => {
 				const el = nodes.current.get(a.key);
 				if (!el) return;
-				const frozen = a.ghost || a.id === activeRef.current;
-				if (frozen) {
-					a.moving = false;
-				} else if (a.wait > 0) {
+				if (a.wait > 0) {
 					a.wait -= dt;
 					a.moving = false;
 					if (a.wait <= 0) {
-						const spot = randomSpot();
+						const spot = pickSpot(a);
 						a.tx = spot.x;
 						a.ty = spot.y;
 					}
@@ -220,7 +206,12 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 					} else {
 						const nx = a.x + (dx / dist) * stepLen;
 						const ny = a.y + (dy / dist) * stepLen;
-						if (walkable(nx, ny)) {
+						let crowded = false;
+						agents.current.forEach((o) => {
+							// no walking into another animal (unless already overlapping, so nobody gets stuck)
+							if (!crowded && o !== a && Math.hypot(o.x - nx, o.y - ny) < PERSONAL_SPACE && Math.hypot(o.x - a.x, o.y - a.y) >= PERSONAL_SPACE) crowded = true;
+						});
+						if (!crowded && walkable(nx, ny, viewRef.current)) {
 							a.x = nx;
 							a.y = ny;
 							a.moving = true;
@@ -240,21 +231,8 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 		return () => cancelAnimationFrame(raf);
 	}, []);
 
-	// The card hangs above the first animal of the active kind. Animals of that kind are frozen while it is shown,
-	// so reading the agent here (at render time) is stable.
-	const activeAnimal = ANIMALS.find((a) => a.id === activeId) ?? null;
-	const anchor = activeAnimal ? agents.current.get(`${activeAnimal.id}-0`) : undefined;
-	const cardPos = anchor ? project(anchor.x, anchor.y) : null;
-
 	return (
-		<div
-			ref={stageRef}
-			className='farm-stage'
-			onClick={(e) => {
-				if ((e.target as HTMLElement).closest('.meadow-critter, .farm-card, .farm-hud, .farm-dock')) return;
-				onSelect(null);
-			}}>
-			<MeadowDecor />
+		<div ref={stageRef} className='farm-stage'>
 			<div className='farm-cloud' />
 			<div
 				className='farm-pen'
@@ -263,8 +241,6 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 
 				{instances.map((inst) => {
 					const a = inst.animal;
-					const selected = activeId === a.id;
-					const cost = calculateAnimalCost(a, inst.level);
 					return (
 						<div
 							key={inst.key}
@@ -273,31 +249,12 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 								else nodes.current.delete(inst.key);
 							}}
 							className='farm-animal'
-							data-selected={selected}
-							data-owned={!inst.ghost}
+							data-selected={highlightId === a.id}
 							data-celebrate={celebrate === a.id}>
 							<span className='farm-shadow' />
-							<span
-								className='farm-sprite'
-								onMouseEnter={() => hover(a.id)}
-								onMouseLeave={() => hover(null)}
-								onClick={(e) => {
-									e.stopPropagation();
-									onSelect(selectedId === a.id ? null : a.id);
-								}}>
+							<span className='farm-sprite'>
 								<PixelIcon name={ANIMAL_PIXEL_ICONS[a.id]} scale={zoom} alt={a.name} />
 							</span>
-							{!inst.ghost && inst.first && (
-								<span className='farm-lvl'>
-									<LevelOrb level={inst.level} />
-								</span>
-							)}
-							{inst.ghost && (
-								<span className={`farm-tag${food >= cost ? ' can' : ''}`}>
-									{formatNumber(cost)}
-									<ResourceIcon resource='food' />
-								</span>
-							)}
 							{celebrate === a.id && inst.first && (
 								<span className='farm-burst'>
 									<i />
@@ -313,23 +270,6 @@ const FarmScene: React.FC<FarmSceneProps> = ({
 				})}
 
 				<PixelIcon name='farm_front' scale={zoom} alt='' className='farm-layer farm-front' />
-
-				{activeAnimal && cardPos && (
-					<div
-						className='farm-card-anchor'
-						style={{ left: cardPos.x * zoom, top: (cardPos.y - ANCHOR.y) * zoom }}
-						onMouseEnter={() => hover(activeAnimal.id)}
-						onMouseLeave={() => hover(null)}>
-						<FarmAnimalCard
-							animal={activeAnimal}
-							owned={farmLevels[activeAnimal.id] || 0}
-							upgrades={farmUpgrades}
-							food={food}
-							pinned={selectedId === activeAnimal.id}
-							onBuy={(count) => onBuy(activeAnimal.id, count)}
-						/>
-					</div>
-				)}
 			</div>
 
 			{critters.map((c) => (

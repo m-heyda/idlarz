@@ -83,7 +83,7 @@ test('equip actions are refused during a fight', () => {
 
 test('rebirth keeps equipment and bag and refills HP', () => {
 	freshGame();
-	growTo(20);
+	growTo(REBIRTH.minTiles);
 	store.setState((s) => {
 		const tiles = patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel });
 		return { tiles, bag: bagWith('rattatui_tunic', 'rattatui_cap'), playerHp: 10 };
