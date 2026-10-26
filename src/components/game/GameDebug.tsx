@@ -117,7 +117,6 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 		actions: [
 			{ label: 'Heal', tone: '', run: heal },
 			{ label: 'Castle +1 level', tone: 'blue', run: castleUp },
-			{ label: 'Reset name', tone: 'gray', run: () => useGameStore.getState().setPlayerName('Explorer') },
 		],
 	},
 	{

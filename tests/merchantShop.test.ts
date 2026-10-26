@@ -166,7 +166,7 @@ test('merchant upgrades: cost grows, effects apply, max level stops, Pack Rat gr
 
 test('merchant bonuses start again on a rebirth, except the bigger bag (the bag itself survives)', () => {
 	freshGame({ gold: 1e12 });
-	growTo(20);
+	growTo(REBIRTH.minTiles);
 	api().buyMerchantUpgrade('packrat');
 	api().buyMerchantUpgrade('haggler');
 	api().buyMerchantUpgrade('charm');

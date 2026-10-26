@@ -8,19 +8,24 @@ import '@/styles/Farm.css';
 import FarmScene from './FarmScene';
 import FarmHud from './FarmHud';
 import FarmUpgradeDock from './FarmUpgradeDock';
+import FarmAnimalDock, { ANIMAL_DOCK_WIDTH } from './FarmAnimalDock';
+
+/** Height the open / collapsed upgrade shelf takes along the bottom (CSS px, with its margin) */
+const UPGRADE_DOCK_HEIGHT = { open: 170, closed: 36 };
 
 /**
- * The Farm window: one seamless scene. The pen and its animals fill the whole window, hovering an animal shows its
- * buy card right above it, a corner readout shows the output and the upgrade shelf sits along the bottom.
+ * The Farm window: one meadow filling the whole window with the pen and its animals in it, a corner readout, the animal
+ * shop along the right edge and the upgrade shelf along the bottom.
  */
 const FarmOverlay: React.FC = () => {
-	const food = useGameStore((state) => state.resources.food);
-	const farmLevels = useGameStore((state) => state.farmLevels);
-	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
-	const purchaseAnimal = useGameStore((state) => state.purchaseAnimal);
 	const claimCritterGift = useGameStore((state) => state.claimCritterGift);
-	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const purchaseAnimal = useGameStore((state) => state.purchaseAnimal);
+	const farmLevels = useGameStore((state) => state.farmLevels);
+	const [highlightId, setHighlightId] = useState<string | null>(null);
 	const [celebrate, setCelebrate] = useState<string | null>(null);
+	const [animalsOpen, setAnimalsOpen] = useState(true);
+	const [upgradesOpen, setUpgradesOpen] = useState(true);
+	const [hudOpen, setHudOpen] = useState(true);
 
 	useEffect(() => {
 		if (!celebrate) return;
@@ -45,16 +50,18 @@ const FarmOverlay: React.FC = () => {
 		<div className='farm-root'>
 			<FarmScene
 				farmLevels={farmLevels}
-				farmUpgrades={farmUpgrades}
-				food={food}
-				selectedId={selectedId}
-				onSelect={setSelectedId}
-				onBuy={buy}
+				highlightId={highlightId}
 				celebrate={celebrate}
+				insets={{
+					right: animalsOpen ? ANIMAL_DOCK_WIDTH : 0,
+					bottom: upgradesOpen ? UPGRADE_DOCK_HEIGHT.open : UPGRADE_DOCK_HEIGHT.closed,
+					hudOpen,
+				}}
 				onCatchCritter={catchCritter}
 			/>
-			<FarmHud />
-			<FarmUpgradeDock />
+			<FarmHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} />
+			<FarmAnimalDock open={animalsOpen} onToggle={() => setAnimalsOpen(!animalsOpen)} onBuy={buy} onHover={setHighlightId} />
+			<FarmUpgradeDock open={upgradesOpen} onToggle={() => setUpgradesOpen(!upgradesOpen)} />
 		</div>
 	);
 };

@@ -12,6 +12,7 @@ MATS = {
     'coal': Material(['#07060e', '#13112a', '#211f3c', '#33385f', '#7088c8'], '#05040a', grain=0.2, grain_scale=3.0, spec=0.04, shiny=30, spec_col='#d8e8ff', gamma=1.5, gain=0.7),
     'dark': Material(['#050408', '#0a0810', '#120f1c', '#1c1830', '#2a2444'], '#050408'),
     # --- food
+    'carrot': Material(['#5a1e08', '#a83c0e', '#e86a14', '#fa9a2a', '#ffcb6a'], '#3a1004', grain=0.2, grain_scale=3.4, spec=0.02, shiny=16),
     'bread': Material(['#46200a', '#7c3c12', '#b2641e', '#da9038', '#f6c56c'], '#3a1708', grain=0.3, grain_scale=3.0, spec=0.02, shiny=18, spec_col='#ffe6a8'),
     'crumb': Material(['#9a6a2c', '#cf9c52', '#eac27c', '#f8dca4', '#fff2d2'], '#3a1708'),
     'wheat': Material(['#6b4710', '#a97a1a', '#dba824', '#f4d25a', '#fff3ac'], '#47290a', grain=0.1),

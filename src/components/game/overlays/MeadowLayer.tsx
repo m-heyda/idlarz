@@ -1,41 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FARM_BONUS, FarmCritterType } from '@/config/gameConfig';
 import type { ClickInput } from '@/types/game';
-import { PixelIconName } from '@/config/pixelIcons';
-import { PEN } from './farmGeometry';
-import PixelIcon from '../PixelIcon';
+import type { Insets } from './farmGeometry';
 import ResourceIcon from '../ResourceIcon';
-
-// Static scenery around the pen: sprite, anchor (bottom-centre) as % of the stage
-const DECOR: { name: PixelIconName; x: number; y: number }[] = [
-	{ name: 'meadow_tree', x: 7, y: 40 },
-	{ name: 'meadow_pine', x: 94, y: 36 },
-	{ name: 'meadow_pine', x: 86, y: 18 },
-	{ name: 'meadow_bush', x: 24, y: 12 },
-	{ name: 'meadow_stump', x: 40, y: 9 },
-	{ name: 'meadow_mushrooms', x: 12, y: 20 },
-	{ name: 'meadow_bush', x: 68, y: 10 },
-	{ name: 'meadow_flowers', x: 55, y: 7 },
-	{ name: 'meadow_tree', x: 91, y: 92 },
-	{ name: 'meadow_pond', x: 80, y: 95 },
-	{ name: 'meadow_flowers', x: 22, y: 94 },
-	{ name: 'meadow_rocks', x: 40, y: 96 },
-	{ name: 'meadow_pine', x: 7, y: 90 },
-	{ name: 'meadow_mushrooms', x: 62, y: 96 },
-	{ name: 'meadow_flowers', x: 6, y: 62 },
-	{ name: 'meadow_rocks', x: 95, y: 62 },
-];
-
-/** Static meadow scenery; sits behind the pen and never takes clicks. */
-export const MeadowDecor: React.FC = () => (
-	<div className='meadow-decor' aria-hidden>
-		{DECOR.map((d, i) => (
-			<span key={i} className='meadow-prop' style={{ left: `${d.x}%`, top: `${d.y}%`, zIndex: Math.round(d.y) }}>
-				<PixelIcon name={d.name} scale={2} />
-			</span>
-		))}
-	</div>
-);
 
 // sheet = 2 frames (flap / hop), frame size in native px
 export const CRITTER_SHEETS: Record<FarmCritterType, { name: string; w: number; h: number; ms: number }> = {
@@ -58,19 +25,17 @@ export interface Critter {
 
 let nextId = 1;
 
-/** Pick a spot in the meadow, preferably outside the pen (the scene fills the window, so the margin can be thin). */
-const pickSpot = (w: number, h: number, zoom: number) => {
-	const penW = PEN.w * zoom * 0.5 + 24;
-	const penH = PEN.h * zoom * 0.5;
+/** Pick a spot on the meadow that is not under a panel or the stats readout in the top-left corner (so it can be clicked). */
+const pickSpot = (w: number, h: number, insets: Insets) => {
 	const spot = () => ({
-		x: 36 + Math.random() * Math.max(10, w - 72),
-		y: 50 + Math.random() * Math.max(10, h - 90),
+		x: 36 + Math.random() * Math.max(10, w - insets.right - 90),
+		y: 50 + Math.random() * Math.max(10, h - insets.bottom - 110),
 	});
 	for (let i = 0; i < 40; i++) {
 		const p = spot();
-		if (Math.abs(p.x - w / 2) > penW || Math.abs(p.y - h / 2) > penH) return p;
+		if (p.x > 290 || p.y > 270) return p;
 	}
-	return spot(); // no meadow left: it flutters over the pen instead
+	return spot();
 };
 
 const pickType = (): FarmCritterType => {
@@ -83,8 +48,8 @@ const pickType = (): FarmCritterType => {
 	return 'butterfly';
 };
 
-export const makeCritter = (w: number, h: number, zoom: number): Critter => {
-	const { x, y } = pickSpot(w, h, zoom);
+export const makeCritter = (w: number, h: number, insets: Insets): Critter => {
+	const { x, y } = pickSpot(w, h, insets);
 	return {
 		id: nextId++,
 		type: pickType(),
@@ -98,7 +63,7 @@ export const makeCritter = (w: number, h: number, zoom: number): Critter => {
 };
 
 /** Spawns critters on a timer while mounted and removes each after FARM_BONUS.lifetimeMs. */
-export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>, zoom: React.RefObject<number>) => {
+export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>, insets: React.RefObject<Insets>) => {
 	const [critters, setCritters] = useState<Critter[]>([]);
 
 	useEffect(() => {
@@ -110,7 +75,7 @@ export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>,
 					setCritters((prev) =>
 						prev.length >= FARM_BONUS.maxActive
 							? prev
-							: [...prev, makeCritter(el.clientWidth, el.clientHeight, zoom.current)]
+							: [...prev, makeCritter(el.clientWidth, el.clientHeight, insets.current)]
 					);
 				}
 				schedule(FARM_BONUS.minGapMs + Math.random() * (FARM_BONUS.maxGapMs - FARM_BONUS.minGapMs));
@@ -118,7 +83,7 @@ export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>,
 		};
 		schedule(FARM_BONUS.firstDelayMs);
 		return () => clearTimeout(timer);
-	}, [stage, zoom]);
+	}, [stage, insets]);
 
 	const remove = (id: number) => setCritters((prev) => prev.filter((c) => c.id !== id));
 	return { critters, remove };

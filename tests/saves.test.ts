@@ -208,7 +208,11 @@ test('a played game with gear, a monster and damaged HP round-trips unchanged', 
 });
 
 test('a monster standing on a building (a save from before the spawn fix) is dropped, the save still loads', () => {
-	const raw = combatSave((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].building = 'farm'));
+	const raw = combatSave((r) => {
+		const tile = r.tiles[r.monsters[0].y][r.monsters[0].x];
+		tile.biome = 'plains'; // the purchases are random: never a lake, which cannot hold a building
+		tile.building = 'farm';
+	});
 	const result = sanitizeSave(raw);
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 	if (!result.ok) return;

@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { ITEM_CATALOG, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, type ItemStats, type StatTotals } from '@/catalog';
+import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, type ItemStats, type StatKey, type StatTotals } from '@/catalog';
 import type { BagSlot, Equipment, EquipmentSlot, ItemDef } from '@/types/game';
 
 // Pure bag / equipment operations. Nothing here mutates its arguments; every function returns fresh arrays and objects.
@@ -143,4 +143,85 @@ export const compareToEquipped = (itemId: string, equipment: Equipment): ItemCom
 		if (delta) deltas[key] = delta;
 	}
 	return { slot, equippedId: equipment[slot], deltas };
+};
+
+export type StatRowStatus = 'new' | 'lost' | 'up' | 'down' | 'same';
+
+/** One stat line of a comparison: what the worn piece gives (`was`), what the hovered piece would give (`now`). */
+export interface StatRow {
+	key: StatKey;
+	was: number;
+	now: number;
+	delta: number;
+	/** new: only the hovered piece has it, lost: only the worn piece has it */
+	status: StatRowStatus;
+}
+
+/** A set whose piece count changes with the swap, and the bonus tiers that switch on (gained) or off (lost). */
+export interface SetChange {
+	setId: string;
+	label: string;
+	from: number;
+	to: number;
+	size: number;
+	gained: { count: number; stats: ItemStats }[];
+	lost: { count: number; stats: ItemStats }[];
+}
+
+export interface DetailedComparison {
+	slot: EquipmentSlot;
+	equippedId?: string;
+	/** The two pieces side by side, stat by stat (own stats only, no set bonuses) */
+	rows: StatRow[];
+	setChanges: SetChange[];
+	/** The whole character: every stat that changes, set bonuses included (same as `compareToEquipped().deltas`) */
+	net: ItemStats;
+	/** The equipment as it would be after the swap, for previewing set progress */
+	after: Equipment;
+}
+
+const round2 = (value: number) => Math.round(value * 100) / 100;
+
+/**
+ * The hover comparison: the hovered piece against the one worn in its slot, stat by stat with new / lost / up / down,
+ * plus the set progress the swap changes. Pure; `compareToEquipped` stays the plain net-delta view.
+ */
+export const compareDetailed = (itemId: string, equipment: Equipment): DetailedComparison | null => {
+	const base = compareToEquipped(itemId, equipment);
+	const def = ITEM_CATALOG[itemId];
+	if (!base || !def) return null;
+
+	const wornStats = base.equippedId ? ITEM_CATALOG[base.equippedId]?.stats : undefined;
+	const rows: StatRow[] = [];
+	for (const key of STAT_KEYS) {
+		const was = wornStats?.[key] ?? 0;
+		const now = def.stats?.[key] ?? 0;
+		if (!was && !now) continue;
+		const delta = round2(now - was);
+		const status: StatRowStatus = !was ? 'new' : !now ? 'lost' : delta > 0 ? 'up' : delta < 0 ? 'down' : 'same';
+		rows.push({ key, was, now, delta, status });
+	}
+
+	const after: Equipment = { ...equipment, [base.slot]: itemId };
+	const before = setCounts(equipment);
+	const next = setCounts(after);
+	const setChanges: SetChange[] = [];
+	for (const setId of new Set([...Object.keys(before), ...Object.keys(next)])) {
+		const from = before[setId] ?? 0;
+		const to = next[setId] ?? 0;
+		if (from === to) continue;
+		const set = SETS[setId];
+		const tiers = Object.entries(set.bonuses).map(([count, stats]) => ({ count: Number(count), stats }));
+		setChanges.push({
+			setId,
+			label: set.label,
+			from,
+			to,
+			size: set.size,
+			gained: tiers.filter((t) => to >= t.count && from < t.count),
+			lost: tiers.filter((t) => from >= t.count && to < t.count),
+		});
+	}
+
+	return { slot: base.slot, equippedId: base.equippedId, rows, setChanges, net: base.deltas, after };
 };

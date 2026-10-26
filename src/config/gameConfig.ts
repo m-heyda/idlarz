@@ -67,14 +67,15 @@ export const MAX_CATCHUP_SEC = 300; // one tick never advances the game by more 
 export const RESOURCE_CAP = 1e21;
 export const XP_CAP = RESOURCE_CAP;
 
-// The late part of the tile price. Up to `tailFrom` owned tiles the price is the three exponential stages of SCALING_CONFIG
-// (unchanged); beyond it grows like (n / tailFrom)^tailExponent, which is far gentler than any exponential, so the map can
-// keep growing for as long as the player keeps earning. `ceiling` keeps the price a finite, affordable-in-principle number.
-// This is the knob for the later rebirth design: bigger starting resources and bigger maps mean raising `tailFrom`
-// or lowering `tailExponent` (docs/05, BL16).
+// The late part of the tile price. Up to `tailFrom` owned tiles the price is the three exponential stages of SCALING_CONFIG;
+// beyond it grows like (n / tailFrom)^tailExponent, which is far gentler than any exponential, so the map can keep growing
+// for as long as the player keeps earning. `ceiling` keeps the price a finite, affordable-in-principle number.
+// The first 300 tiles are the "fill the map" part of a run (about 2-3 days); past them the price climbs much faster than the
+// income, so 400 tiles take about twice as long per 100 as the stretch before. This is the knob for the later rebirth design:
+// bigger starting resources and bigger maps mean raising `tailFrom` or lowering `tailExponent` (docs/05, BL16).
 export const TILE_PRICE = {
-	tailFrom: 100,
-	tailExponent: 2.5,
+	tailFrom: 300,
+	tailExponent: 4.5,
 	ceiling: RESOURCE_CAP / 100,
 };
 
@@ -84,14 +85,15 @@ export const XP_TILE = {
 	tailExponent: 1.5,
 };
 
-// Tile cost curve: exponential growth that is steep early (cheap first tiles), gentler through the mid game and
-// gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number
+// Tile cost curve: exponential growth that is steepest early (cheap first tiles), gentler through the mid game and
+// gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number. Tuned with scripts/sim.ts
+// so the first ~100 tiles come within the first day, 200-300 within 2-3 days (docs/06).
 export const SCALING_CONFIG = {
-	growthEarly: 1.45, // cost multiplier per owned tile up to `earlyTiles`
-	earlyTiles: 20,
-	growthLate: 1.27, // cost multiplier per owned tile from `earlyTiles` to `lateTiles`
-	lateTiles: 40,
-	growthEndgame: 1.17, // cost multiplier per owned tile after `lateTiles`, up to `TILE_PRICE.tailFrom`
+	growthEarly: 1.13, // cost multiplier per owned tile up to `earlyTiles`
+	earlyTiles: 15,
+	growthLate: 1.07, // cost multiplier per owned tile from `earlyTiles` to `lateTiles`
+	lateTiles: 100,
+	growthEndgame: 1.007, // cost multiplier per owned tile after `lateTiles`, up to `TILE_PRICE.tailFrom`
 
 	// Gold cost of the next tile when `ownedTiles` tiles are owned (castle counts), before discounts
 	costFormula: (ownedTiles: number) => tilePrice(ownedTiles),
@@ -355,15 +357,15 @@ export const CASTLE_UPGRADE = {
 	// Real upgrade time in seconds, indexed by the level being left (1 -> 2 is index 0). Counted by the tick loop.
 	durationsSec: [3600, 14400, 43200, 129600, 259200, 259200, 345600, 432000, 604800],
 	upgradeCosts: [
-		{ gold: 350000, wood: 50000, stone: 50000 },
-		{ gold: 1000000, wood: 150000, stone: 150000, coal: 100000 },
-		{ gold: 5000000, wood: 500000, stone: 500000, coal: 250000, food: 1000000, meat: 200000 },
+		{ gold: 70000, wood: 10000, stone: 10000 },
+		{ gold: 200000, wood: 30000, stone: 30000, coal: 20000 },
+		{ gold: 1000000, wood: 100000, stone: 100000, coal: 50000, food: 200000, meat: 40000 },
+		{ gold: 4000000, wood: 400000, stone: 400000, coal: 200000, food: 2000000, meat: 100000 },
 		{ gold: 20000000, wood: 2000000, stone: 2000000, coal: 1000000, food: 10000000, meat: 500000 },
-		{ gold: 100000000, wood: 10000000, stone: 10000000, coal: 5000000, food: 50000000, meat: 2500000 },
-		{ gold: 150000000, wood: 15000000, stone: 15000000, coal: 8000000, food: 80000000, meat: 4000000 },
-		{ gold: 240000000, wood: 24000000, stone: 24000000, coal: 13000000, food: 128000000, meat: 6400000 },
-		{ gold: 384000000, wood: 38000000, stone: 38000000, coal: 20000000, food: 205000000, meat: 10000000 },
-		{ gold: 614000000, wood: 61000000, stone: 61000000, coal: 33000000, food: 328000000, meat: 16000000 },
+		{ gold: 30000000, wood: 3000000, stone: 3000000, coal: 1600000, food: 16000000, meat: 800000 },
+		{ gold: 48000000, wood: 4800000, stone: 4800000, coal: 2600000, food: 25600000, meat: 1280000 },
+		{ gold: 76800000, wood: 7600000, stone: 7600000, coal: 4000000, food: 41000000, meat: 2000000 },
+		{ gold: 122800000, wood: 12200000, stone: 12200000, coal: 6600000, food: 65600000, meat: 3200000 },
 	],
 };
 
@@ -432,8 +434,8 @@ export const ANIMALS: Animal[] = [
 		id: 'chicken',
 		name: 'Chicken',
 		description: 'A simple farm animal that produces a small amount of meat.',
-		baseCost: 10000, // Starting at 10k food as requested
-		costScaling: 1.5, // Each purchase costs 1.5x more than the previous one
+		baseCost: 1000, // the first chicken is within reach after about half an hour (a few dozen tiles)
+		costScaling: 1.3, // each purchase costs this much more than the previous one
 		baseProduction: 0.2, // meat per second per animal; each purchase adds one more animal
 		product: { resource: 'eggs', perSec: 0.02 },
 	},
@@ -441,8 +443,8 @@ export const ANIMALS: Animal[] = [
 		id: 'deer',
 		name: 'Deer',
 		description: 'A wild animal that produces more meat than a chicken.',
-		baseCost: 50000,
-		costScaling: 1.6,
+		baseCost: 10000,
+		costScaling: 1.33,
 		baseProduction: 0.5,
 		product: { resource: 'hide', perSec: 0.025 },
 	},
@@ -450,8 +452,8 @@ export const ANIMALS: Animal[] = [
 		id: 'pig',
 		name: 'Pig',
 		description: 'A domestic animal that produces a good amount of meat.',
-		baseCost: 200000,
-		costScaling: 1.7,
+		baseCost: 60000,
+		costScaling: 1.36,
 		baseProduction: 1,
 		product: { resource: 'hide', perSec: 0.05 },
 	},
@@ -459,8 +461,8 @@ export const ANIMALS: Animal[] = [
 		id: 'cow',
 		name: 'Cow',
 		description: 'A large animal that produces a significant amount of meat.',
-		baseCost: 1000000,
-		costScaling: 1.8,
+		baseCost: 400000,
+		costScaling: 1.4,
 		baseProduction: 2,
 		product: { resource: 'milk', perSec: 0.15 },
 	},
@@ -468,9 +470,11 @@ export const ANIMALS: Animal[] = [
 
 // The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
 // once sold). Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
+// Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
+// then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
 export const FARM = {
 	baseCap: 12, // animals of one kind the pen holds before it is expanded
-	unitsDrawn: 6, // most sprites drawn per kind in the pen (the count badge carries on)
+	unitsDrawn: 8, // most sprites drawn per kind in the pen (the animal panel shows the real count)
 };
 
 // Pen Expansion: per level, every animal kind may hold `capPerLevel` more animals and all farm output grows
@@ -482,40 +486,40 @@ export const FARM_UPGRADES = {
 		description: (n: number) => `+${Math.round(n * 5)}% meat`,
 		maxLevel: 10,
 		effectPerLevel: 0.05, // meat
-		cost: { food: 20000 } as Partial<Record<keyof Resources, number>>,
-		costGrowth: 1.8,
+		cost: { food: 2000 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.6,
 	},
 	coop: {
 		label: 'Hen House',
 		description: (n: number) => `+${Math.round(n * 10)}% eggs`,
 		maxLevel: 10,
 		effectPerLevel: 0.1, // eggs
-		cost: { wood: 4000, eggs: 40 } as Partial<Record<keyof Resources, number>>,
-		costGrowth: 1.7,
+		cost: { wood: 1500, eggs: 40 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.6,
 	},
 	dairy: {
 		label: 'Dairy',
 		description: (n: number) => `+${Math.round(n * 10)}% milk`,
 		maxLevel: 10,
 		effectPerLevel: 0.1, // milk
-		cost: { stone: 4000, milk: 30 } as Partial<Record<keyof Resources, number>>,
-		costGrowth: 1.7,
+		cost: { stone: 1500, milk: 30 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.6,
 	},
 	tannery: {
 		label: 'Tannery',
 		description: (n: number) => `+${Math.round(n * 10)}% hide`,
 		maxLevel: 10,
 		effectPerLevel: 0.1, // hide
-		cost: { coal: 3000, hide: 20 } as Partial<Record<keyof Resources, number>>,
-		costGrowth: 1.7,
+		cost: { coal: 1200, hide: 20 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.6,
 	},
 	pen: {
 		label: 'Pen Expansion',
 		description: (n: number) => `+${Math.round(n * FARM_PEN.outputPerLevel * 100)}% farm output, +${n * FARM_PEN.capPerLevel} animals per kind`,
 		maxLevel: 8,
 		effectPerLevel: FARM_PEN.outputPerLevel,
-		cost: { food: 50000, wood: 10000, stone: 10000 } as Partial<Record<keyof Resources, number>>,
-		costGrowth: 2,
+		cost: { food: 8000, wood: 3000, stone: 3000 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.9,
 	},
 } as const;
 export type FarmUpgradeId = keyof typeof FARM_UPGRADES;
@@ -704,11 +708,11 @@ export const CHEST = {
 export const BUILDING_COST = {
 	base: { gold: 500, wood: 250, stone: 150 } as Partial<Resources>,
 	starter: [0.4, 0.6, 0.8, 1] as number[],
-	growthEarly: 1.35,
+	growthEarly: 1.15,
 	earlyCount: 12,
-	growthMid: 1.25,
+	growthMid: 1.09,
 	midCount: 16,
-	growthLate: 1.15,
+	growthLate: 1.025,
 	/** Biomes a building cannot stand on (water; the castle has its own upgrades) */
 	blockedBiomes: ['lake', 'castle', 'empty'] as string[],
 };
@@ -738,7 +742,7 @@ export const CHARACTER_STAT_CONFIG = {
 // Rebirth: restart with a permanent bonus paid in Gems (the Legacy points). Available once the castle reaches `minCastleLevel`.
 export const REBIRTH = {
 	minCastleLevel: 6,
-	minTiles: 20, // a rebirth also needs this much territory (no cheap rebirth with a tiny map)
+	minTiles: 100, // a rebirth also needs this much territory (the first ~100 tiles come within a day, so it is the castle that gates it)
 	gainScale: 4.5, // Legacy points = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
 	incomePerPoint: 0.05, // +5% of all income per Legacy point ever earned (spending points never lowers it)
 	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile

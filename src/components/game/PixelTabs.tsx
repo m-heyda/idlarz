@@ -46,7 +46,7 @@ function PixelTabs<Id extends string>({ tabs, active, onSelect }: PixelTabsProps
 						else return;
 						e.preventDefault();
 					}}>
-					<PixelIcon name={tab.icon} scale={0.5} />
+					<PixelIcon name={tab.icon} scale={0.75} />
 					<span className='px-tabbar-label'>{tab.label}</span>
 					<NotifyDot show={!!tab.notify} label={tab.notifyLabel} />
 				</button>

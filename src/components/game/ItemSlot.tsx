@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { EQUIPMENT_PIXEL_ICONS } from '@/config/pixelIcons';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import type { EquipmentSlot } from '@/types/game';
 import PixelIcon from './PixelIcon';
-import ItemTooltipBody from './ItemTooltip';
+import ItemTooltipStack from './ItemTooltip';
 import { RARITY_COLOR, itemIconName } from './itemUi';
 import '@/styles/Inventory.css';
 
@@ -26,6 +26,29 @@ interface ItemSlotProps {
 	onDragStart?: () => void;
 	onDrop?: () => void;
 }
+
+/**
+ * A hover card at the cursor. It measures itself, so a wide one (an item next to the gear it would replace) flips to the
+ * left of the cursor near the right edge and never leaves the screen.
+ */
+const FloatingTip: React.FC<{ x: number; y: number; children: React.ReactNode }> = ({ x, y, children }) => {
+	const ref = useRef<HTMLDivElement>(null);
+	useLayoutEffect(() => {
+		const el = ref.current;
+		if (!el) return;
+		const { width, height } = el.getBoundingClientRect();
+		const gap = 16;
+		const margin = 8;
+		const left = x + gap + width > window.innerWidth - margin ? x - gap - width : x + gap;
+		el.style.left = `${Math.max(margin, left)}px`;
+		el.style.top = `${Math.max(margin, Math.min(y + gap, window.innerHeight - height - margin))}px`;
+	});
+	return (
+		<div ref={ref} className='fixed z-[100] pointer-events-none' style={{ left: x + 16, top: y + 16 }}>
+			{children}
+		</div>
+	);
+};
 
 /** One 48px frame: an item (rarity glow, stack count, hover card), an empty equipment slot, or a locked slot. */
 const ItemSlot: React.FC<ItemSlotProps> = ({
@@ -101,16 +124,15 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 			{tip &&
 				hasTip &&
 				createPortal(
-					<div
-						className='fixed z-[100] pointer-events-none'
-						style={{
-							left: Math.min(tip.x + 16, window.innerWidth - 300),
-							top: Math.min(tip.y + 16, window.innerHeight - 300),
-						}}>
-						<div className='px-tooltip'>
-							{def ? <ItemTooltipBody itemId={def.id} compare={compare} /> : <div className='px-tip-muted text-sm'>{label}</div>}
-						</div>
-					</div>,
+						<FloatingTip x={tip.x} y={tip.y}>
+							{def ? (
+								<ItemTooltipStack itemId={def.id} compare={compare} />
+							) : (
+								<div className='px-tooltip'>
+									<div className='px-tip-muted text-sm'>{label}</div>
+								</div>
+							)}
+						</FloatingTip>,
 					document.body
 				)}
 		</>

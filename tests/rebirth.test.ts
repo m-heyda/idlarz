@@ -30,7 +30,7 @@ const setCastleLevel = (level: number) =>
 	});
 
 /** A run that has reached the rebirth line. */
-const readyToRebirth = (castle = REBIRTH.minCastleLevel, tiles = 20) => {
+const readyToRebirth = (castle = REBIRTH.minCastleLevel, tiles = REBIRTH.minTiles) => {
 	freshGame();
 	growTo(tiles);
 	setCastleLevel(castle);
@@ -40,7 +40,7 @@ const snapshot = () => rawSnapshot();
 
 test('rebirth needs the castle at the minimum level and no upgrade running', () => {
 	freshGame();
-	growTo(20);
+	growTo(REBIRTH.minTiles);
 	assert.equal(api().rebirth(), false);
 	setCastleLevel(REBIRTH.minCastleLevel - 1);
 	assert.equal(api().rebirth(), false);
@@ -52,7 +52,7 @@ test('rebirth needs the castle at the minimum level and no upgrade running', () 
 });
 
 test('rebirth grants points by the formula, resets the run and keeps the identity', () => {
-	readyToRebirth(8, 25);
+	readyToRebirth(8, REBIRTH.minTiles + 5);
 	const expected = legacyGain(8, owned());
 	assert.ok(expected >= 1);
 	store.setState({ playerName: 'Hero', playerClass: 'mage', playSeconds: 12345 });
@@ -116,7 +116,7 @@ test('the shop: cost curve, max level, not enough points, validated ids', () => 
 test('shop effects: thrift, master builders, click mastery, provisions', () => {
 	freshGame();
 	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 500, legacyEarned: 500 } }));
-	growTo(20);
+	growTo(REBIRTH.minTiles);
 	const tileBefore = calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, api().prestige)).gold;
 	const buildingBefore = calculateBuildingCost(api().tiles, api().prestige).gold!;
 	const durationBefore = castleUpgradeDuration(1, api().prestige);
@@ -158,7 +158,7 @@ test('thrift together with charisma can never discount more than the cap', () =>
 });
 
 test('a full reset (not a rebirth) wipes the Legacy too', () => {
-	readyToRebirth(7, 25);
+	readyToRebirth(7, REBIRTH.minTiles + 5);
 	assert.equal(api().rebirth(), true);
 	assert.ok(api().prestige.legacyEarned > 0);
 	api().resetGame();
@@ -166,7 +166,7 @@ test('a full reset (not a rebirth) wipes the Legacy too', () => {
 });
 
 test('saves: prestige survives validation, forged Legacy is rejected', () => {
-	readyToRebirth(9, 30);
+	readyToRebirth(9, REBIRTH.minTiles + 10);
 	assert.equal(api().rebirth(), true);
 	api().buyLegacyUpgrade('builders');
 	api().buyLegacyUpgrade('thrift');

@@ -11,22 +11,22 @@ import PixelIcon from './PixelIcon';
 import LevelOrb from './LevelOrb';
 import NotifyDot from './NotifyDot';
 import CharacterPortrait from './CharacterPortrait';
-import EditableName from './EditableName';
 
 // Inner width of the XP frame sprite (80px wide, 3px border each side)
 const XP_BAR_INNER_PX = 74;
 
-/** Portrait, name, level orb and XP bar. A click opens the Stats tab; double-click renames / picks the class. */
+/** Portrait, name, level orb and XP bar. A click opens the Stats tab. */
 export const PlayerCard: React.FC = () => {
 	const xp = useGameStore((state) => state.resources.xp);
 	const level = useGameStore((state) => state.level);
+	const playerName = useGameStore((state) => state.playerName);
 	const availablePoints = useGameStore((state) => state.characterStats.availablePoints);
 	const openMenu = useUiStore((state) => state.openMenu);
 	const statsOpen = useUiStore((state) => state.menuOpen && state.menuTab === 'stats');
 	const [levelUpActive, setLevelUpActive] = useState(false);
 	const [prevAvailablePoints, setPrevAvailablePoints] = useState(0);
 
-	// A single click opens the stats; hold it back a moment so a double-click (rename / class picker)
+	// A single click opens the stats; hold it back a moment so a double-click
 	// can cancel it instead of flashing the window open and shut.
 	const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const cancelClick = () => {
@@ -72,7 +72,7 @@ export const PlayerCard: React.FC = () => {
 				</span>
 			</span>
 			<div className='flex flex-col text-[#ecdcb4] items-start justify-center select-none gap-1 ml-1'>
-				<EditableName className='pixel-name' />
+				<span className='px-name pixel-name'>{playerName}</span>
 				<div className='pixel-xp' title={`XP: ${formatNumber(into)} / ${formatNumber(needed)} (${formatNumber(xp)} in total)`}>
 					<div className='pixel-xp-fill' style={{ width: `${Math.round(level.progress * XP_BAR_INNER_PX)}px` }} />
 				</div>

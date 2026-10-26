@@ -287,7 +287,7 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Farm</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Buy animals with <Res r='food'>food</Res>: hover an animal for its card (Buy, x10 or Max). Each animal
+					Buy animals with <Res r='food'>food</Res> in the animal panel on the right (Buy, x10 or Max). Each animal
 					produces meat every second plus a farm product (<Res r='eggs'>eggs</Res>, <Res r='milk'>milk</Res> or{' '}
 					<Res r='hide'>hide</Res>) you can sell or spend on the upgrades along the bottom; the next one of the same
 					kind costs more, and the pen holds a limited number of each kind.
