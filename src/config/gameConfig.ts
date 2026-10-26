@@ -330,8 +330,10 @@ export const BASE_GENERATION_RATES = {
 };
 
 
-// Castle range: tiles within this many steps of the castle (3x3 at radius 1) will get the castle's range bonus
-export const CASTLE_RANGE = { radius: 1 };
+// Castle range: tiles within this many steps of the castle (3x3 at radius 1) will get the castle's range bonus. `radius` is
+// also the ward and the fortress walls. From `growFromLevel` the violet area (not the ward) grows by `growPerLevel` tiles on
+// every side per level: 3x3 up to level 7, then 5x5, 7x7 and 9x9 at level 10.
+export const CASTLE_RANGE = { radius: 1, growFromLevel: 8, growPerLevel: 1 };
 
 // From this castle level the 3x3 range becomes a walled fortress (walls on its edges, a tower on each corner): no monsters
 // and no chests spawn inside it and monsters already there are driven out.

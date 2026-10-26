@@ -28,6 +28,7 @@ import ContextMenu from '@/components/game/ContextMenu';
 import BuildDialog from '@/components/game/BuildDialog';
 import ConfirmDialogs from '@/components/game/ConfirmDialogs';
 import BottomRightStack from '@/components/game/BottomRightStack';
+import CastleCompass from '@/components/game/CastleCompass';
 import Toast from '@/components/game/Toast';
 
 export default function Home() {
@@ -96,6 +97,7 @@ export default function Home() {
 			<BuildDialog />
 			<ConfirmDialogs />
 			<BottomRightStack />
+			<CastleCompass />
 			<ContextMenu />
 			<Toast />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}

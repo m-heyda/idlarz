@@ -42,6 +42,14 @@ test('chest spot: only owned tiles, never the castle, a building, a monster or a
 	}
 });
 
+test('chest spot: a lake is fine (drawn as a glowing ripple), a building is not', () => {
+	const g = territory(1);
+	for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]]) g[CASTLE_Y + dy][CASTLE_X + dx] = { biome: 'grounds', isOwned: true, building: 'farm', level: 1 };
+	g[CASTLE_Y + 1][CASTLE_X + 1] = { biome: 'lake', isOwned: true }; // the only tile left that is not castle or built
+	const w = worldFromRows(g);
+	for (let i = 0; i < 40; i++) assert.deepEqual(pickChestSpot(w, new Set(), 1, rng(i)), { x: CASTLE_X + 1, y: CASTLE_Y + 1 });
+});
+
 test('chest spot: nothing eligible gives null, and the fortress ward is off limits', () => {
 	assert.equal(pickChestSpot(worldFromRows(blank()), new Set(), 1), null);
 	const g = worldFromRows(territory(1)); // castle + its 8 neighbours = exactly the ward

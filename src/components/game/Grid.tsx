@@ -7,8 +7,8 @@ import React, {
 	JSX,
 } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { CASTLE_FORTRESS } from '@/config/gameConfig';
-import { castleLevelOf } from '@/lib/castleWard';
+import { CASTLE_FORTRESS, CASTLE_RANGE } from '@/config/gameConfig';
+import { castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import { visibleTileRange } from '@/lib/mapView';
 import { useViewStore } from '@/stores/viewStore';
 import { calculateTileCost, canAffordBundle, economyTiles, effectiveTileDiscount, tileCostAsResources } from '@/utils/gameUtils';
@@ -47,6 +47,8 @@ const WHEEL_LOCKOUT_MS = 140; // swallow trackpad inertia after a step
 
 const Grid: React.FC = () => {
 	const tiles = useGameStore((state) => state.tiles);
+	const castleLevel = castleLevelOf(tiles);
+	const rangeRadius = castleRangeRadius(castleLevel);
 	// whether the next tile can be paid: the price is the same for every tile that can be bought, so it is worked out once here
 	const canAffordNext = useGameStore((state) =>
 		canAffordBundle(
@@ -258,11 +260,9 @@ const Grid: React.FC = () => {
 				<WaterLayer minX={seen.minX} maxX={seen.maxX} minY={seen.minY} maxY={seen.maxY} />
 				<MapTipLayerContext.Provider value={tipLayer}>{visibleTiles}</MapTipLayerContext.Provider>
 				<AmbientLife getViewport={getViewport} />
-				{castleLevelOf(tiles) >= CASTLE_FORTRESS.fromLevel ? (
-					<CastleFortress level={castleLevelOf(tiles)} />
-				) : (
-					<CastleRange />
-				)}
+				{/* below the fortress level the violet 3x3 alone; at the fortress level the walls replace it; once the range outgrows the walled 3x3 both show */}
+				{castleLevel < CASTLE_FORTRESS.fromLevel || rangeRadius > CASTLE_RANGE.radius ? <CastleRange radius={rangeRadius} /> : null}
+				{castleLevel >= CASTLE_FORTRESS.fromLevel && <CastleFortress level={castleLevel} />}
 				<div ref={setTipLayer} className='map-tip-layer' />
 			</div>
 			<HighlightLayer />

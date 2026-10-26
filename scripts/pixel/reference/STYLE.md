@@ -133,8 +133,13 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   socket so the number reads) with a 6-frame rim sweep + glint strip (`LevelOrb`, number centred, outlined) is the level
   badge. No stars, no gems. The shine sweep must never cross the socket.
 - **Converted tiles**: no badge - a faint work-glow in a per-building colour (`BUILDING_GLOW`, a soft halo on the foundation and a 2px outline glow, slow fade).
-- **Castle range** (`CastleRange.tsx`): the tiles within `CASTLE_RANGE.radius` of the castle get a violet wash (`range_tint`),
-  marching dashes, `range_corner` brackets and a label; owned tiles in range show rising gold twinkles (`spark_sheet`).
+- **Castle range** (`CastleRange.tsx`): the tiles within `castleRangeRadius(level)` of the castle (3x3, growing to 9x9 from castle
+  level 8) get a violet wash (`range_tint`), marching dashes, `range_corner` brackets and a label; owned tiles in range show
+  rising gold twinkles (`spark_sheet`). The fortress walls always stay on the inner 3x3.
+- **Chest on a lake** (`.tile-chest-ripple`, CSS only): no chest sprite on water, but three golden rings spreading from a twinkling
+  gold diamond with a warm glow. **Castle compass** (`CastleCompass.tsx`): a round dark badge with a gold arrow and the distance, gold
+  frame and soft pulse, plus a `px-btn-gold` "Back to castle" button. **Minimap dots**: red (`#ff4d4d`) for monsters, yellow
+  (`#ffd23a`) with a pulsing halo for chests, dark 1px outline, bigger when several merge.
 - **Farm** (`FarmScene.tsx`): an isometric pen ray-cast like the animals (`farm_back` everything, `farm_front` the near fences,
   cut from the same render so animals walk between them). Ground to screen: `sx = OX + (x-y)*0.7071*S`, `sy = OY - (x+y)*0.3536*S`
   (constants in `farmGeometry.ts`). The scene fills the whole window (`PixelModal flush`): the pen is drawn at the biggest whole-pixel zoom that fits (`penZoom`, 1-4x),

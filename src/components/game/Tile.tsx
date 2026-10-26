@@ -10,12 +10,11 @@ import {
 	TILE_TAP,
 	CASTLE_FORTRESS,
 	CASTLE_UPGRADE,
-	CASTLE_RANGE,
 	TILE_SIZE,
 } from '@/config/gameConfig';
 import '@/styles/Buildings.css';
 import { useGameStore } from '@/stores/gameStore';
-import { castleLevelOf } from '@/lib/castleWard';
+import { castleLevelOf, inCastleRange, MAX_CASTLE_RANGE_RADIUS } from '@/lib/castleWard';
 import { getTile } from '@/utils/world';
 import { canBuildOn } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
@@ -93,12 +92,13 @@ const Tile: React.FC<TileProps> = ({
 	// from the fortress level the castle stands on cobbles inside walls: no purple border, no golden tile aura
 	const isFortress = biome === 'castle' && castleLevel >= CASTLE_FORTRESS.fromLevel;
 
-	// Owned neighbours of the castle get gold sparkles: they are inside the castle's range
-	const inCastleRange =
+	// Owned tiles around the castle get gold sparkles: they are inside the castle's range (it grows from castle level 8). A tile
+	// farther than the biggest range never reads the castle level.
+	const mayBeInRange =
 		isOwned &&
 		biome !== 'castle' &&
-		Math.abs(x - CASTLE_X) <= CASTLE_RANGE.radius &&
-		Math.abs(y - CASTLE_Y) <= CASTLE_RANGE.radius;
+		Math.max(Math.abs(x - CASTLE_X), Math.abs(y - CASTLE_Y)) <= MAX_CASTLE_RANGE_RADIUS;
+	const inRange = useGameStore((state) => mayBeInRange && inCastleRange(x, y, castleLevelOf(state.tiles)));
 
 	const handleClick = (e: React.MouseEvent) => {
 		// A monster on this tile: clicking it opens the fight (no tile tap, no chest)
@@ -260,7 +260,7 @@ const Tile: React.FC<TileProps> = ({
 						<span className='tile-badge'>{castleLevel}</span>
 					)}
 
-					{inCastleRange && (
+					{inRange && (
 						<span className='range-sparks' aria-hidden>
 							{[0, 1].map((k) => {
 								const h = (((x * 7 + y * 13 + k * 5) % 11) + 11) % 11; // 0..10, also for negative tiles
@@ -285,7 +285,14 @@ const Tile: React.FC<TileProps> = ({
 					)}
 
 					{/* Bonus treasure chest on the tile */}
-					{isOwned && hasChest && (
+					{isOwned && hasChest && biome === 'lake' && (
+							<span className='tile-chest-ripple' aria-label='Something glints in the water'>
+								<i />
+								<i />
+								<i />
+							</span>
+						)}
+						{isOwned && hasChest && biome !== 'lake' && (
 						<span className='tile-chest-wrap'>
 							<span className='tile-chest'>
 								<PixelSheet name='chest_map_anim' frames={4} durationMs={1600} alt='Treasure chest' />
@@ -319,7 +326,7 @@ const Tile: React.FC<TileProps> = ({
 						)}
 						{isOwned && hasChest && showChestTooltip && (
 							<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs text-[#f0d27a]'>
-								Click to open the treasure chest
+								{biome === 'lake' ? 'Something glints in the water. Click to open' : 'Click to open the treasure chest'}
 							</div>
 						)}
 						<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>

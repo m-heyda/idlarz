@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store, tileAt, rawSnapshot, gridCells } from './helpers';
 import { CASTLE_FORTRESS, CASTLE_RANGE, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
-import { castleLevelOf, fortressWallTier, isInWard, monstersOutsideWard } from '../src/lib/castleWard';
+import { castleLevelOf, castleRangeRadius, fortressWallTier, inCastleRange, isInWard, MAX_CASTLE_RANGE_RADIUS, monstersOutsideWard } from '../src/lib/castleWard';
 import { groundOf } from '../src/utils/terrain';
 import { pickSpawnTile } from '../src/lib/monsters';
 import { sanitizeSave } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
-import { patchTile, setTile } from '../src/utils/world';
+import { EMPTY_WORLD, patchTile, setTile } from '../src/utils/world';
 
 const L7 = CASTLE_FORTRESS.fromLevel;
 const R = CASTLE_RANGE.radius;
@@ -51,6 +51,52 @@ test('isInWard: the 3x3 around the castle from level 7, nothing before and nothi
 	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y, 10), false);
 	assert.equal(isInWard(CASTLE_X, CASTLE_Y - R - 1, 10), false);
 	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y + R + 1, 10), false);
+});
+
+test('the range area: 3x3 up to level 7, then one more tile on every side per level up to 9x9; the ward stays 3x3', () => {
+	assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(castleRangeRadius), [1, 1, 1, 1, 1, 1, 1, 2, 3, 4]);
+	assert.equal(MAX_CASTLE_RANGE_RADIUS, 4);
+	for (const [level, r] of [[7, 1], [8, 2], [9, 3], [10, 4]]) {
+		assert.equal(inCastleRange(CASTLE_X + r, CASTLE_Y - r, level), true, `level ${level}: corner at ${r}`);
+		assert.equal(inCastleRange(CASTLE_X + r + 1, CASTLE_Y, level), false, `level ${level}: one past`);
+		assert.equal(inCastleRange(CASTLE_X, CASTLE_Y - r - 1, level), false);
+	}
+	// the safe ward and the walled fortress do not grow with it
+	assert.equal(isInWard(CASTLE_X + 2, CASTLE_Y, 10), false);
+	assert.equal(isInWard(CASTLE_X + R, CASTLE_Y + R, 10), true);
+});
+
+test('pickSpawnTile never picks a building, a lake or a chest tile, however often it is asked', () => {
+	let w = setTile(EMPTY_WORLD, CASTLE_X, CASTLE_Y, { biome: 'castle', isOwned: true, level: 1 });
+	const plain: string[] = [];
+	for (let dy = -3; dy <= 3; dy++) {
+		for (let dx = -3; dx <= 3; dx++) {
+			if (!dx && !dy) continue;
+			const x = CASTLE_X + dx;
+			const y = CASTLE_Y + dy;
+			const kind = (Math.abs(dx) + 2 * Math.abs(dy)) % 4;
+			if (kind === 0) w = setTile(w, x, y, { biome: 'lake', isOwned: true });
+			else if (kind === 1) w = setTile(w, x, y, { biome: 'grounds', isOwned: true, building: 'farm', level: 1 });
+			else if (kind === 2) w = setTile(w, x, y, { biome: 'plains', isOwned: true, hasChest: true });
+			else {
+				w = setTile(w, x, y, { biome: 'forest', isOwned: true });
+				plain.push(`${x},${y}`);
+			}
+		}
+	}
+	assert.ok(plain.length > 5);
+	const seen = new Set<string>();
+	for (let i = 0; i < 400; i++) {
+		const pick = pickSpawnTile(w, [], Math.random)!;
+		assert.ok(plain.includes(`${pick.x},${pick.y}`), `${pick.x},${pick.y} is not a plain tile`);
+		seen.add(`${pick.x},${pick.y}`);
+	}
+	assert.equal(seen.size, plain.length, 'every plain tile can still be picked');
+	// when only unsuitable tiles are left, nothing spawns
+	let only = setTile(EMPTY_WORLD, CASTLE_X, CASTLE_Y, { biome: 'castle', isOwned: true, level: 1 });
+	only = setTile(only, CASTLE_X + 1, CASTLE_Y, { biome: 'lake', isOwned: true });
+	only = setTile(only, CASTLE_X - 1, CASTLE_Y, { biome: 'plains', isOwned: true, building: 'farm', level: 1 });
+	assert.equal(pickSpawnTile(only, [], Math.random), null);
 });
 
 test('castleLevelOf reads the castle tile', () => {

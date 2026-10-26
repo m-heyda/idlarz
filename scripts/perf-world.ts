@@ -13,11 +13,11 @@ import { pickPersisted } from '../src/lib/sanitizeSave';
 import { decodeSave, encodeSave } from '../src/lib/saveFormat';
 import { pickChestSpot } from '../src/lib/chests';
 import { castleLevelOf } from '../src/lib/castleWard';
-import { minimapLayout, paintMinimap } from '../src/lib/minimap';
+import { minimapLayout, minimapMarkers, paintChestGlow, paintMinimap } from '../src/lib/minimap';
 import { calculateResourceRates, calculateXpGain } from '../src/utils/gameUtils';
 import { connectedCluster } from '../src/utils/cluster';
 import { chunkSignature, chunkSprites } from '../src/utils/terrain';
-import { hasOwnedNeighbour, isOwnedAt, ownedBounds, ownedCount } from '../src/utils/world';
+import { hasOwnedNeighbour, isOwnedAt, ownedBounds, ownedCount, ownedEntries, patchTile } from '../src/utils/world';
 import { syntheticWorld } from '../src/utils/worldGen';
 import { XP_CAP } from '../src/config/gameConfig';
 
@@ -62,6 +62,19 @@ for (const count of [5_000, 50_000, 250_000]) {
 	const [loaded, decode] = time(() => decodeSave(text));
 	const layout = minimapLayout(ownedBounds(api().tiles), { w: 176, h: 132 });
 	const paint = median(() => paintMinimap(new Uint8ClampedArray(layout.width * layout.height * 4), api().tiles, layout), 3);
+	// the same overview with 500 chests and 8 monsters on it: clustered into dots, painted, plus the glow picture
+	let chested = api().tiles;
+	const entries = ownedEntries(chested);
+	for (let i = 0; i < 500; i++) {
+		const e = entries[(i * 7919) % entries.length];
+		if (e.tile.biome !== 'castle') chested = patchTile(chested, e.x, e.y, { hasChest: true });
+	}
+	const monsterSpots = entries.slice(0, 8).map((e) => ({ x: e.x, y: e.y }));
+	const dots = median(() => {
+		const markers = minimapMarkers(chested, monsterSpots, layout);
+		paintMinimap(new Uint8ClampedArray(layout.width * layout.height * 4), chested, layout, markers);
+		paintChestGlow(new Uint8ClampedArray(layout.width * layout.height * 4), layout, markers.chests);
+	}, 3);
 	const cluster = median(() => void connectedCluster(api().tiles, 25, 26), 3);
 	const cx = Math.floor(25 / 16);
 	const chunk = median(() => void [chunkSignature(api().tiles, cx, cx), chunkSprites(api().tiles, cx, cx)]);
@@ -75,6 +88,7 @@ for (const count of [5_000, 50_000, 250_000]) {
 	console.log(`  save: encode / re-encode  ${ms(encodeFirst)} /${ms(encodeAgain)}   (${(text.length / 1000).toFixed(0)}k characters)`);
 	console.log(`  save: decode + validate   ${ms(decode)}   ${loaded.ok ? 'ok' : 'FAILED: ' + loaded.reason}`);
 	console.log(`  minimap paint             ${ms(paint)}`);
+	console.log(`  minimap + chest/monster dots ${ms(dots)}`);
 	console.log(`  highlight area (cluster)  ${ms(cluster)}`);
 	console.log(`  one terrain chunk (data)  ${ms(chunk)}`);
 }

@@ -21,6 +21,57 @@
 	pointer-events: none;
 }
 
+/* the halo around chest dots lies over the map; its opacity breathes, the picture itself is painted once per change */
+.minimap-glow {
+	position: absolute;
+	inset: 0;
+	animation: minimap-glow 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes minimap-glow {
+	from {
+		opacity: 0.35;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/* the counts of enemies and chests, top left over the picture */
+.minimap-legend {
+	position: absolute;
+	left: 3px;
+	top: 3px;
+	display: flex;
+	gap: 6px;
+	padding: 1px 4px;
+	font-size: 10px;
+	line-height: 12px;
+	color: #e8dcc0;
+	background: rgba(10, 14, 28, 0.72);
+	pointer-events: none;
+}
+
+.minimap-legend span {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+}
+
+.minimap-legend i {
+	display: block;
+	width: 6px;
+	height: 6px;
+	outline: 1px solid #15091f;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.minimap-glow {
+		animation: none;
+		opacity: 0.8;
+	}
+}
+
 .minimap-view {
 	position: absolute;
 	box-sizing: border-box;

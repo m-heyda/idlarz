@@ -32,7 +32,10 @@ export const tierFor = (type: MonsterType, ageSec: number): number =>
 export const monsterAt = (monsters: Monster[], x: number, y: number): Monster | undefined =>
 	monsters.find((mon) => mon.x === x && mon.y === y);
 
-/** A random owned tile without the castle, a chest or a monster on it, and outside the castle's ward from level 7. */
+/**
+ * A random owned tile without the castle, a chest, a monster or a building on it, not a lake, and outside the castle's ward
+ * from level 7. (A chest may lie on a lake - it is drawn as a glowing ripple there - but a monster cannot stand on water.)
+ */
 export const pickSpawnTile = (
 	tiles: World,
 	monsters: Monster[],
@@ -42,7 +45,14 @@ export const pickSpawnTile = (
 	const castleLevel = castleLevelOf(tiles);
 	const eligible: { x: number; y: number }[] = [];
 	for (const { x, y, tile } of ownedRowMajor(tiles)) {
-		if (tile.biome !== 'castle' && !tile.hasChest && !taken.has(`${x},${y}`) && !isInWard(x, y, castleLevel)) {
+		if (
+			tile.biome !== 'castle' &&
+			tile.biome !== 'lake' &&
+			!tile.building &&
+			!tile.hasChest &&
+			!taken.has(`${x},${y}`) &&
+			!isInWard(x, y, castleLevel)
+		) {
 			eligible.push({ x, y });
 		}
 	}

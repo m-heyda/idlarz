@@ -44,7 +44,8 @@ src/
 │   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps and critter gifts (NOT fight hits)
 │   ├── hitGuard.ts           fight hits: trusted clicks only, one DOM event counts once, no rate limit
 │   ├── fightSim.ts           a bot that fights with the real combat rules (scripts/fight-sim.ts, tests/fightBalance.test.ts)
-│   ├── castleWard.ts         the castle's ward (castle level 7+): isInWard, monstersOutsideWard, fortressWallTier
+│   ├── castleWard.ts         the castle's ward (castle level 7+): isInWard, monstersOutsideWard, fortressWallTier; the growing violet range area: castleRangeRadius, inCastleRange
+│   ├── castleFinder.ts       pure maths for finding the castle again: isCastleOnScreen, compassArrow (where on the screen edge the arrow goes, its angle, the distance)
 │   ├── inventory.ts          pure bag / equipment operations + aggregateStats (the one place gear is summed)
 │   ├── combat.ts             max HP, damage per click, armor mitigation, regen, fight state machine (stepFight)
 │   ├── monsters.ts           tiers, monster stats, spawn tile, aging and Rat King evolution
@@ -54,7 +55,7 @@ src/
 │   ├── ambientLife.ts        pure picker for the wandering map critters (owned tile in view, biome-matched type)
 │   ├── terrainRenderer.ts    loads the terrain atlas and draws one terrain chunk (16x16 tiles) onto its own canvas; a frame-budgeted draw queue
 │   ├── mapView.ts            pure view maths: clampPosition (the pan limit), visibleTileRange, centerOf / positionForCenter
-│   ├── minimap.ts            pure minimap layout and pixel painting (biome squares, castle + workshop markers, view rectangle maths)
+│   ├── minimap.ts            pure minimap layout and pixel painting (biome squares, castle + workshop markers, clustered red monster and yellow chest dots + chest glow picture, view rectangle maths)
 │   ├── saveFormat.ts         the save text (IDLZ2.<base64 JSON>.<check>): compact body (the map as runs per row), schema 2 + migrations, encode/decode
 │   ├── saveStorage.ts        localStorage storage: sync flush on close, backup + damaged copy, persist(), import/reset
 │   ├── legacyVault.ts        read-only: the old encrypted IndexedDB vault and IDLZ1 exports
@@ -64,9 +65,9 @@ src/
 │   ├── useHydration.ts       true when the save has been loaded and the splash was shown long enough
 │   ├── useSingleTab.ts       Web Lock: one tab owns the game
 │   └── useCtrlSequence.ts    Control ×5 detector (shortcut to Save & Backup)
-└── components/game/          Grid (pan + stepped wheel zoom, mounts only the explored and buyable tiles on screen), TerrainLayer (one canvas per chunk near the screen), HighlightLayer (the area tint), Minimap + BottomRightStack (overview above the statistics), Tile (transparent hit area + overlays), TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
+└── components/game/          Grid (pan + stepped wheel zoom, mounts only the explored and buyable tiles on screen), TerrainLayer (one canvas per chunk near the screen), HighlightLayer (the area tint), Minimap + BottomRightStack (overview above the statistics), CastleCompass (edge arrow + "Back to castle" while the castle is off screen), Tile (transparent hit area + overlays), TileStatus, BiomeTooltip + MapTipLayer, dialogs (castle, biome,
     │                         building), header (GameHeader: PlayerCard + HeaderButtons in HeaderMenu, ResourceDisplay chips, LevelOrb, NotifyDot), Menu window (MenuOverlay + PixelTabs: Character, Stats, Merchant, Farm tabs; state in `uiStore` `menuOpen`/`menuTab`), WaterLayer (ripples), AmbientLife (decorative critters + rare golden gift),
-    │                         CastleRange (violet 3x3 area, castle < 7) / CastleFortress (walls, gate, corner towers, castle 7+), MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
+    │                         CastleRange (violet area: 3x3, growing to 9x9 from castle level 8) / CastleFortress (walls, gate, corner towers on the inner 3x3, castle 7+), MonsterSprite / MonsterArt (monsters on tiles), ItemSlot / ItemTooltip / Bag (inventory)
     └── overlays/             Statistics, Character (paper doll + bag), FightModal, Farm (+scene/critters), Merchant, NamePrompt + Tutorial,
                               SettingsDialog, LegacyDialog (rebirth + shop), TutorialDialog, SaveMenuDialog,
                               TabLockOverlay, LevelUp/Chest notifications, LoadingScreen
