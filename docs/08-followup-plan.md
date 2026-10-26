@@ -19,7 +19,7 @@ Everything that was **not** part of the endgame / settings / ambient batch, orde
 
 B1 active-vs-idle gap (BL1) · B2 levels and stat points (BL2) · B3 chests and tile taps (BL3) · B4 animal engine (BL4) · B5 sinks (BL5) · B6 merchant saturation (BL6) · B7 biome specialisation (BL8) · B8 first ten minutes: check the tutorial flow, first tile at ~1 min, first animal before the first castle upgrade · B9 more Legacy shop shapes (BL9, BL10) · B10 biome luck and the 24 h player (BL11): do this first, it decides how stable the other sim comparisons are.
 
-Rule for every B item: change one parameter group, run `npm run sim -- --seeds=3`, compare with `docs/generated/sim-milestones.md`, keep the dedicated profile's first finish at 4 weeks ± 15 % and castle 10 between 70 and 100 days.
+Rule for every B item: change one parameter group, run `npm run sim -- --seeds=3`, compare with `docs/generated/sim-milestones.md`, keep the early-game targets of [06 §0](06-playtest-and-pacing-report.md) (100 tiles in the first day, 200-300 tiles in 2-3 days, a clearly slower climb after 300, first rebirth at castle 6 + 100 tiles in about a week, each rebirth run faster than the last).
 
 ## Phase C — content
 

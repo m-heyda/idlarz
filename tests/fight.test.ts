@@ -245,7 +245,7 @@ test('rebirth and resetGame clear the fight and the monsters; rebirth keeps the 
 		const tiles = patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel });
 		return { tiles, equipment: { ...STARTER_EQUIPMENT, head: 'rattatui_cap' }, fight: null };
 	});
-	growTo(20);
+	growTo(REBIRTH.minTiles);
 	api().startFight(1);
 	assert.equal(api().rebirth(), true);
 	assert.equal(api().fight, null);

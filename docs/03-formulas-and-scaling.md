@@ -7,8 +7,8 @@ Notation: `n` = tiles owned (castle included), `L` = player level, `C` = castle 
 ## 1. Tile cost
 
 ```
-base(n)  = floor(min(55 × 1.45^min(m, 20) × 1.27^(min(m, 40) − 20, ≥0) × 1.17^max(m − 40, 0) × (n / 100)^2.5 if n > 100, ceiling))
-           with m = min(n, 100)                                                              SCALING_CONFIG.costFormula (tilePrice)
+base(n)  = floor(min(55 × 1.13^min(m, 15) × 1.07^(min(m, 100) − 15, ≥0) × 1.007^max(m − 100, 0) × (n / 300)^4.5 if n > 300, ceiling))
+           with m = min(n, 300)                                                              SCALING_CONFIG.costFormula (tilePrice)
 gold     = floor(base × (1 − discount%/100))
 extra    = floor(base × share × (1 − discount%/100))  for each TILE_RESOURCE_COST row with n ≥ from
 discount%= min(0.5 × Charisma, 25)
@@ -16,13 +16,13 @@ discount%= min(0.5 × Charisma, 25)
 
 `TILE_RESOURCE_COST`: wood 10 % and stone 10 % of the gold cost from n = 15; coal 8 % from n = 30; food 8 % from n = 40.
 
-| n | 1 | 5 | 10 | 15 | 20 | 25 | 30 | 40 | 50 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gold (cha 5) | 77 | 343 | 2.2 K | 14.1 K | 90.5 K | 299 K | 988 K | 10.8 M | 51 M |
+| n | 1 | 10 | 20 | 30 | 50 | 75 | 100 | 150 | 200 | 300 | 400 | 500 | 1,000 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gold (cha 5) | 60 | 181 | 469 | 925 | 3.6 K | 19.4 K | 105 K | 150 K | 212 K | 426 K | 1.6 M | 4.2 M | 96 M |
 
-**The tail (no tile limit).** Up to 100 tiles the price is exactly the old three-stage exponential. Past `TILE_PRICE.tailFrom` (100) it grows like `(n / 100)^2.5` (`TILE_PRICE.tailExponent`) and is capped at `TILE_PRICE.ceiling` (`RESOURCE_CAP / 100`), so it is always finite and a map of tens of thousands of tiles stays buyable (tile 157 ≈ 4e11 instead of 1e15, tile 1,000 ≈ 4e13, tile 10,000 ≈ 1.4e16, tile 50,000 ≈ 8e17; table in [generated/balance-tables.md](generated/balance-tables.md)). `RESOURCE_CAP` was raised from 1e15 to 1e21 for it. There is no tile limit any more (see 02 §1, map). The numbers are first guesses for a game that will later be built around rebirths (bigger starting resources, much bigger maps): see BL16 in [05](05-balance-backlog-and-roadmap.md).
+Cumulative gold for the first 100 / 200 / 300 / 400 / 500 tiles: 1.7 M / 17 M / 49 M / 142 M / 422 M (the extra wood, stone, coal and food shares come on top).
 
-Past 40 tiles growth drops from ×1.27 to ×1.17 per tile (`growthEndgame`, `lateTiles`), so tile 50 costs ~51 M instead of 118 M and tile 60 ~0.2 B instead of 1.5 B; the first 40 tiles are unchanged, so the pacing milestones in [06](06-playtest-and-pacing-report.md) still hold.
+**The tail (no tile limit).** Up to 300 tiles the price is the three exponential stages (×1.13 to 15 tiles, ×1.07 to 100, then only ×1.007 per tile, the soft middle). Past `TILE_PRICE.tailFrom` (300) it grows like `(n / 300)^4.5` (`TILE_PRICE.tailExponent`), much steeper than the stretch before, and is capped at `TILE_PRICE.ceiling` (`RESOURCE_CAP / 100`), so it is always finite and a map of tens of thousands of tiles stays buyable (table in [generated/balance-tables.md](generated/balance-tables.md)). `RESOURCE_CAP` was raised from 1e15 to 1e21 for it. There is no tile limit any more (see 02 §1, map). The numbers are tuned with `npm run sim` against the pacing targets in [06](06-playtest-and-pacing-report.md) (100 tiles within the first day, 200-300 tiles in 2-3 days, a visibly harder climb after 300) for a game that will later be built around rebirths (bigger starting resources, much bigger maps): see BL16 in [05](05-balance-backlog-and-roadmap.md).
 
 Every purchase rolls its biome (no picker). XP and reputation per purchase in §2.
 
@@ -74,15 +74,15 @@ upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[
 
 | Upgrade | Build time | gold | wood | stone | coal | food | meat |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1→2 | 1 h | 350 K | 50 K | 50 K | — | — | — |
-| 2→3 | 4 h | 1 M | 150 K | 150 K | 100 K | — | — |
-| 3→4 | 12 h | 5 M | 500 K | 500 K | 250 K | 1 M | 200 K |
-| 4→5 | 1 d 12 h | 20 M | 2 M | 2 M | 1 M | 10 M | 500 K |
-| 5→6 | 3 d | 100 M | 10 M | 10 M | 5 M | 50 M | 2.5 M |
-| 6→7 | 3 d | 150 M | 15 M | 15 M | 8 M | 80 M | 4 M |
-| 7→8 | 4 d | 240 M | 24 M | 24 M | 13 M | 128 M | 6.4 M |
-| 8→9 | 5 d | 384 M | 38 M | 38 M | 20 M | 205 M | 10 M |
-| 9→10 | 7 d | 614 M | 61 M | 61 M | 33 M | 328 M | 16 M |
+| 1→2 | 1 h | 70 K | 10 K | 10 K | — | — | — |
+| 2→3 | 4 h | 200 K | 30 K | 30 K | 20 K | — | — |
+| 3→4 | 12 h | 1 M | 100 K | 100 K | 50 K | 200 K | 40 K |
+| 4→5 | 1 d 12 h | 4 M | 400 K | 400 K | 200 K | 2 M | 100 K |
+| 5→6 | 3 d | 20 M | 2 M | 2 M | 1 M | 10 M | 500 K |
+| 6→7 | 3 d | 30 M | 3 M | 3 M | 1.6 M | 16 M | 800 K |
+| 7→8 | 4 d | 48 M | 4.8 M | 4.8 M | 2.6 M | 25.6 M | 1.28 M |
+| 8→9 | 5 d | 76.8 M | 7.6 M | 7.6 M | 4 M | 41 M | 2 M |
+| 9→10 | 7 d | 122.8 M | 12.2 M | 12.2 M | 6.6 M | 65.6 M | 3.2 M |
 
 Build time to level 6 is 5 d 5 h, to level 10 24 d 5 h (before Legacy discounts). Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
 
@@ -100,22 +100,22 @@ upgrade cost (level N → N+1)      = ceil(base × growth^N) per resource
 
 | Animal | first cost | cost × | meat/s each | product/s each |
 | --- | --- | --- | --- | --- |
-| Chicken | 10 K | 1.5 | 0.2 | 0.02 eggs |
-| Deer | 50 K | 1.6 | 0.5 | 0.025 hide |
-| Pig | 200 K | 1.7 | 1 | 0.05 hide |
-| Cow | 1 M | 1.8 | 2 | 0.15 milk |
+| Chicken | 1 K | 1.3 | 0.2 | 0.02 eggs |
+| Deer | 10 K | 1.33 | 0.5 | 0.025 hide |
+| Pig | 60 K | 1.36 | 1 | 0.05 hide |
+| Cow | 400 K | 1.4 | 2 | 0.15 milk |
 
 | Upgrade | per level | levels | base cost | cost × |
 | --- | --- | --- | --- | --- |
-| Feed Trough | +5 % meat | 10 | 20 K food | 1.8 |
-| Hen House | +10 % eggs | 10 | 4 K wood + 40 eggs | 1.7 |
-| Dairy | +10 % milk | 10 | 4 K stone + 30 milk | 1.7 |
-| Tannery | +10 % hide | 10 | 3 K coal + 20 hide | 1.7 |
-| Pen Expansion | +2 % all farm output, +4 animals per kind | 8 | 50 K food + 10 K wood + 10 K stone | 2 |
+| Feed Trough | +5 % meat | 10 | 2 K food | 1.6 |
+| Hen House | +10 % eggs | 10 | 1.5 K wood + 40 eggs | 1.6 |
+| Dairy | +10 % milk | 10 | 1.5 K stone + 30 milk | 1.6 |
+| Tannery | +10 % hide | 10 | 1.2 K coal + 20 hide | 1.6 |
+| Pen Expansion | +2 % all farm output, +4 animals per kind | 8 | 8 K food + 3 K wood + 3 K stone | 1.9 |
 
 A product sells for 3 / 4 / 6 gold (eggs / milk / hide), which is 25–40 % of the meat value of the animal that makes it.
 
-Payback (food valued at its sell price 0.75, meat at 1) is ≈ 10 h for the first chicken and grows with each extra animal (generated §4).
+Payback (food valued at its sell price 0.75, meat at 1) is well under a day for the first chicken and grows with each extra animal (generated §4); the sim buys the first chicken within minutes and the first cow after about half a day.
 
 ## 6. Merchant, clicks, chests, buildings
 
@@ -156,11 +156,11 @@ mastery     : click power × (1 + 0.10 × level)
 provisions  : start each run with level × (1500 gold, 400 wood, 400 stone)
 ```
 
-| castle | 20 tiles | 40 tiles | 60 tiles |
+| castle | 100 tiles | 200 tiles | 300 tiles |
 | --- | --- | --- | --- |
-| 6 | 6 | 9 | 11 |
-| 8 | 19 | 27 | 33 |
-| 10 | 31 | 45 | 55 |
+| 6 | 14 | 20 | 24 |
+| 8 | 42 | 60 | 73 |
+| 10 | 71 | 100 | 123 |
 
 Conservation rule used by the save check: `legacyPoints + Σ shop spending = legacyEarned`, and `rebirths = 0` implies `legacyEarned = 0` ([07 §3](07-security-and-exploits.md)). More tables in [generated/balance-tables.md](generated/balance-tables.md).
 

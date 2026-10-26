@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { FARM_UPGRADES, type FarmUpgradeId } from '@/config/gameConfig';
 import { formatNumber } from '@/utils/formatters';
@@ -8,16 +8,20 @@ import ResourceIcon from '../ResourceIcon';
 
 const IDS = Object.keys(FARM_UPGRADES) as FarmUpgradeId[];
 
+interface FarmUpgradeDockProps {
+	open: boolean;
+	onToggle: () => void;
+}
+
 /** The farm's upgrade shelf along the bottom of the scene: feed, hen house, dairy, tannery and the pen. */
-const FarmUpgradeDock: React.FC = () => {
+const FarmUpgradeDock: React.FC<FarmUpgradeDockProps> = ({ open, onToggle }) => {
 	const resources = useGameStore((state) => state.resources);
 	const upgrades = useGameStore((state) => state.farmUpgrades);
 	const buy = useGameStore((state) => state.buyFarmUpgrade);
-	const [open, setOpen] = useState(true);
 
 	return (
 		<div className='farm-dock' data-open={open}>
-			<button className='farm-dock-toggle' onClick={() => setOpen(!open)} aria-expanded={open}>
+			<button className='farm-dock-toggle' onClick={onToggle} aria-expanded={open}>
 				Upgrades {open ? '▼' : '▲'}
 			</button>
 			{open && (

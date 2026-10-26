@@ -2,6 +2,36 @@
 
 **Why:** a friend "finished" the live game in about 3 days. This document records what the playtest found, which fixes were applied first and why, and what the simulation says now. Applied items are *not* repeated in the backlog ([05](05-balance-backlog-and-roadmap.md)).
 
+## 0. Early-game pace pass (current numbers)
+
+The sections below describe the first rebalance (which stretched the old 3-day game to about 4 weeks for the first 40 tiles). The
+next pass changed the goal: the first ~100 tiles should be **easy** (hours), then the climb should be a **2-3 day** project up to
+200-300 tiles, and the price should steepen clearly after 300, because enemies and resources are still to come and a rebirth must
+be faster than the run before it. What changed (all in `src/config/gameConfig.ts`):
+
+- **Tile price**: ×1.13 per tile up to 15, ×1.07 up to 100, ×1.007 up to 300, then `(n / 300)^4.5` (was ×1.45 / 1.27 / 1.17 and `(n / 100)^2.5`).
+- **Castle upgrade costs** (all resources) are 20 % of what they were; the build timers are unchanged and are now what paces the castle.
+- **Building prices** grow ×1.15 / 1.09 / 1.025 per building (was ×1.35 / 1.25 / 1.15) so buildings still matter next to cheaper tiles.
+- **Rebirth** needs castle 6 **and 100 tiles** (was 20); the gain formula is unchanged.
+- **Farm**: first animal costs 1 K / 10 K / 60 K / 400 K food (was 10 K / 50 K / 200 K / 1 M) with growth ×1.3-1.4 (was ×1.5-1.8); farm upgrades are 3-10× cheaper.
+- **Start ring**: the castle's 3×3 is only plains and forest (no lakes or hills).
+
+Simulated result (`npm run sim`, median game time; see [generated/sim-milestones.md](generated/sim-milestones.md)):
+
+| milestone | idle | casual | hardcore | autoclicker |
+| --- | --- | --- | --- | --- |
+| 100 tiles | 8.6 h | 8.6 h | 7.3 h | 3.3 h |
+| 200 tiles | 1.4 d | 1.2 d | 21.9 h | 16.4 h |
+| 300 tiles | 2.1 d | 1.9 d | 1.5 d | 1.2 d |
+| 400 tiles | 3.7 d | 3.0 d | 2.3 d | 1.9 d |
+| castle 6 (first rebirth possible) | 7.2 d | 6.7 d | 6.2 d | 5.7 d |
+| castle 10 | 26.7 d | 26.0 d | 25.5 d | 24.9 d |
+
+The 100 tiles take hours, the next 200 about two days, and the 100 tiles after 300 take about twice as long as the 100 before them.
+The hardcore bot that rebirths at castle 6 gets to castle 6 again after 6.2 d, 4.4 d, 3.8 d and 3.2 d (and has 100 tiles after 7.3 h, 2.6 h,
+1.6 h and 0.6 h). The castle timers (24 d to castle 10) are now the longest pole: if the first run should be longer once new content
+exists, lengthen `CASTLE_UPGRADE.durationsSec` rather than the tile curve.
+
 ## 1. What the playtests showed
 
 Two independent measurements of the **old** game agree:

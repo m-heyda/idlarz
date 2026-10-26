@@ -45,7 +45,7 @@ test('pickSpawnTile never returns the castle, chest tiles, monster tiles or unow
 	growTo(8);
 	let tiles = api().tiles;
 	const ownedTiles = ownedRowMajor(tiles)
-		.filter((e) => e.tile.biome !== 'castle')
+		.filter((e) => e.tile.biome !== 'castle' && e.tile.biome !== 'lake') // a monster cannot stand on water
 		.map(({ x, y }) => ({ x, y }));
 	// block all but one tile with a chest or a monster
 	const keep = ownedTiles[ownedTiles.length - 1];
