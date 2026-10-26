@@ -121,7 +121,7 @@ const CharacterOverlay: React.FC = () => {
 					<div className='px-h text-center'>Items Bag</div>
 					<Bag onNotice={setNotice} />
 					<div className='px-tip-muted text-xs text-center mt-3'>
-						Double-click or right-click to equip or drink. Drag to rearrange.
+						Double-click to equip or drink, right-click for more. Drag to rearrange.
 					</div>
 					{notice && (
 						<div className='px-toast absolute left-1/2 bottom-3 -translate-x-1/2 px-3 py-1 text-sm text-[#f0d27a] whitespace-nowrap'>

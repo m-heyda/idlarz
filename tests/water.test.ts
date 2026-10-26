@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ATLAS, CELL, buildGroundGrid, depth } from '../src/utils/terrain';
-import { RIPPLE_SIZE, buildRipples, tileRipples } from '../src/utils/water';
+import { RIPPLE_SIZE, buildRipples, buildShimmers, tileRipples } from '../src/utils/water';
 import type { BiomeType, Tile } from '../src/types/game';
 
 const NAMES: Record<string, BiomeType> = { P: 'plains', S: 'swamp', L: 'lake', T: 'tundra', H: 'hills' };
@@ -29,8 +29,24 @@ test('open lake water gets about one ripple per tile, the shore far fewer, and e
 		else shore++;
 	}
 	const openTiles = Array.from({ length: 16 * 16 }, (_, i) => depth(g, i % 16, Math.floor(i / 16))).filter((d) => d >= 1).length;
-	assert.ok(open > openTiles * 0.5 && open < openTiles * 1.6, `${open} ripples on ${openTiles} open tiles`);
+	assert.ok(open > openTiles * 1 && open < openTiles * 2.2, `${open} ripples on ${openTiles} open tiles`);
 	assert.ok(shore < open / 2, `${shore} shore ripples vs ${open} open`);
+});
+
+test('shimmer: one per open-water lake tile, none on the shore, land or swamp, the same every time', () => {
+	const g = block('L', 14);
+	const shimmers = buildShimmers(g);
+	assert.deepEqual(shimmers, buildShimmers(g));
+	const openTiles = Array.from({ length: 14 * 14 }, (_, i) => ({ x: i % 14, y: Math.floor(i / 14) })).filter(({ x, y }) => depth(g, x, y) >= 1);
+	assert.equal(shimmers.length, openTiles.length);
+	for (const s of shimmers) {
+		assert.ok(depth(g, s.tx, s.ty) >= 1, 'open water only');
+		assert.equal(s.x, s.tx * CELL);
+		assert.equal(s.y, s.ty * CELL);
+		assert.ok(s.ms >= 3200 && s.ms < 5600 && s.offsetMs >= 0 && s.offsetMs < 6000, 'timing in range');
+	}
+	assert.ok(shimmers.some((s) => s.flip) && shimmers.some((s) => !s.flip), 'tiles are mirrored in a mix');
+	for (const c of ['P', 'T', 'H', 'S']) assert.deepEqual(buildShimmers(block(c, 8)), [], `no shimmer on ${c}`);
 });
 
 test('swamp ripples sit on pool spots the terrain build found, only on deep swamp tiles', () => {

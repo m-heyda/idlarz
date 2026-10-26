@@ -1,0 +1,89 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import './helpers';
+import { BASE_TILE_COST, BASE_XP_PER_TILE, RESOURCE_CAP, SCALING_CONFIG, TILE_PRICE, XP_CAP, XP_TILE } from '../src/config/gameConfig';
+import { calculateBuildingCost, calculateLevel, calculateXpGain } from '../src/utils/gameUtils';
+import { setTiles, EMPTY_WORLD } from '../src/utils/world';
+import { formatNumber, formatRate } from '../src/utils/formatters';
+
+// The tile price and the XP per tile used to be pure exponentials that stopped being payable at ~157 tiles. They now have a
+// polynomial tail; everything up to the tail start is exactly what it always was.
+
+/** The price formula before the tail existed, kept here as the reference. */
+const oldPrice = (n: number) =>
+	Math.floor(
+		BASE_TILE_COST *
+			Math.pow(1.45, Math.min(n, 20)) *
+			Math.pow(1.27, Math.max(Math.min(n, 40) - 20, 0)) *
+			Math.pow(1.17, Math.max(n - 40, 0))
+	);
+const oldXp = (n: number) => BASE_XP_PER_TILE * Math.pow(1.02, n - 1) * (n / 4);
+
+test('tile price: identical to the old curve up to the tail start', () => {
+	for (let n = 0; n <= TILE_PRICE.tailFrom; n++) assert.equal(SCALING_CONFIG.costFormula(n), oldPrice(n), `n=${n}`);
+});
+
+test('tile price: finite, rising and never above the ceiling, for any number of tiles', () => {
+	let last = 0;
+	for (const n of [100, 101, 157, 300, 1000, 3000, 10_000, 30_000, 50_000, 250_000, 1e6, 1e9]) {
+		const p = SCALING_CONFIG.costFormula(n);
+		assert.ok(Number.isFinite(p) && (n <= 250_000 ? p > last : p >= last), `n=${n} price ${p}`);
+		assert.ok(p <= TILE_PRICE.ceiling, `n=${n} below the ceiling`);
+		last = p;
+	}
+	// the old curve passed the resource cap at 157 tiles; this one is still comfortably payable far past it
+	assert.ok(SCALING_CONFIG.costFormula(157) < RESOURCE_CAP / 1000);
+	assert.ok(SCALING_CONFIG.costFormula(50_000) < RESOURCE_CAP, 'a 50,000-tile map is buyable');
+});
+
+test('tile price: each step past the tail start grows by less than the last exponential stage, and ever less', () => {
+	let lastRatio = SCALING_CONFIG.growthEndgame;
+	for (let n = TILE_PRICE.tailFrom; n < 5000; n += 7) {
+		const ratio = SCALING_CONFIG.costFormula(n + 1) / SCALING_CONFIG.costFormula(n);
+		assert.ok(ratio <= lastRatio + 1e-9, `n=${n}: ${ratio} vs ${lastRatio}`);
+		lastRatio = ratio;
+	}
+});
+
+test('XP per tile: identical to the old curve up to the tail start, finite and slow after it', () => {
+	for (let n = 1; n <= XP_TILE.growthUntil; n++) assert.equal(calculateXpGain(n), oldXp(n), `n=${n}`);
+	let cumulative = 0;
+	let last = 0;
+	for (let n = 2; n <= 250_000; n++) {
+		const xp = calculateXpGain(n);
+		assert.ok(Number.isFinite(xp) && xp >= last, `n=${n}`);
+		last = xp;
+		cumulative += xp;
+	}
+	assert.ok(cumulative < XP_CAP / 100, `a 250,000-tile map's XP (${cumulative}) fits well under the cap`);
+});
+
+test('levels: terminate for any XP, including absurd and non-finite values', () => {
+	assert.deepEqual(calculateLevel(0), { level: 1, progress: 0 });
+	for (const xp of [1e9, XP_CAP, XP_CAP * 1e30, Infinity, NaN]) {
+		const { level, progress } = calculateLevel(xp);
+		assert.ok(Number.isInteger(level) && level >= 1 && progress >= 0 && progress <= 1, `xp=${xp}`);
+	}
+});
+
+test('big numbers are shown with suffixes up to Sx, then scientific, and never as Infinity text by accident', () => {
+	assert.equal(formatNumber(1_500_000), '1.50M');
+	assert.equal(formatNumber(2.5e9), '2.50B');
+	assert.equal(formatNumber(3e12), '3.00T');
+	assert.equal(formatNumber(4e15), '4.00Qa');
+	assert.equal(formatNumber(5e18), '5.00Qi');
+	assert.equal(formatNumber(6e21), '6.00Sx');
+	assert.equal(formatNumber(7e24), '7.00e24');
+	assert.equal(formatNumber(12_345), '12.35K');
+	assert.equal(formatRate(2e15), '+2.00Qa/s');
+	assert.equal(formatRate(-3e6), '-3.00M/s');
+	assert.equal(formatRate(1234.5), '+1234.50/s');
+});
+
+test('building cost stays finite however many buildings stand', () => {
+	const built = Array.from({ length: 6000 }, (_, i) => ({ x: i % 100, y: Math.floor(i / 100), tile: { biome: 'plains' as const, isOwned: true, building: 'farm' } }));
+	const cost = calculateBuildingCost(setTiles(EMPTY_WORLD, built));
+	for (const [resource, amount] of Object.entries(cost)) {
+		assert.ok(Number.isFinite(amount) && (amount as number) <= RESOURCE_CAP / 100, `${resource}: ${amount}`);
+	}
+});

@@ -1,31 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, setResources, store } from './helpers';
-import { BIOMES, BUILDINGS, BUILDING_COST, GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
+import { api, freshGame, growTo, setResources, store, tileAt, gridCells, rowsOf } from './helpers';
+import { BIOMES, BUILDINGS, BUILDING_COST, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import { buildingCostFactor, calculateBuildingCost, canBuildOn, countBuildings } from '../src/utils/gameUtils';
 import { allPads, foundationBiome, isBuilt, terrainKey } from '../src/utils/terrain';
 import { pickChestSpot } from '../src/lib/chests';
 import { SELECTABLE_BIOMES } from '../src/utils/biomeRules';
 import type { BiomeType, Tile } from '../src/types/game';
+import { biomeCount, patchTile, setTile } from '../src/utils/world';
 
 // Buildings: right-click any explored tile (not the castle or a lake) and build. One per tile, the price rises with every building.
 
 const set = (x: number, y: number, tile: Partial<Tile>) =>
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		tiles[y][x] = { ...tiles[y][x], ...tile };
-		return { tiles };
+		return { tiles: patchTile(s.tiles, x, y, tile) };
 	});
 
 /** The first explored non-castle tile, turned into `biome`. */
 const lot = (biome: BiomeType) => {
-	const spot = api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
 	set(spot.x, spot.y, { biome });
 	return spot;
 };
 
 const ownedLots = () =>
-	api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).filter(({ t }) => t.isOwned && t.biome !== 'castle');
+	gridCells().filter(({ t }) => t.isOwned && t.biome !== 'castle');
 
 test('building prices: four cheap starters, then three stages of growth, always rising', () => {
 	assert.deepEqual([0, 1, 2, 3].map(buildingCostFactor), BUILDING_COST.starter);
@@ -50,16 +49,16 @@ test('buildOnTile works on every land biome, one building per tile, and the tile
 	biomes.forEach((biome, i) => {
 		const { x, y } = lots[i];
 		set(x, y, { biome });
-		assert.equal(canBuildOn(api().tiles[y][x]), true, biome);
+		assert.equal(canBuildOn(tileAt(api().tiles, x, y)), true, biome);
 		assert.equal(api().buildOnTile(x, y, 'market'), true, biome);
-		assert.equal(api().tiles[y][x].biome, biome);
-		assert.equal(api().tiles[y][x].building, 'market');
+		assert.equal(tileAt(api().tiles, x, y).biome, biome);
+		assert.equal(tileAt(api().tiles, x, y).building, 'market');
 		assert.equal(api().buildOnTile(x, y, 'farm'), false, 'one building per tile');
 	});
-	assert.equal(api().buildOnTile(GRID_CENTER_X, GRID_CENTER_Y, 'market'), false, 'not on the castle');
+	assert.equal(api().buildOnTile(CASTLE_X, CASTLE_Y, 'market'), false, 'not on the castle');
 	const spare = lots[biomes.length];
 	set(spare.x, spare.y, { biome: 'lake' });
-	assert.equal(canBuildOn(api().tiles[spare.y][spare.x]), false);
+	assert.equal(canBuildOn(tileAt(api().tiles, spare.x, spare.y)), false);
 	assert.equal(api().buildOnTile(spare.x, spare.y, 'market'), false, 'not on water');
 	assert.equal(api().buildOnTile(0, 0, 'market'), false, 'not on unexplored land');
 	assert.equal(api().buildOnTile(1.5, 1, 'market'), false);
@@ -99,7 +98,7 @@ test('a building adds its output on top of the biome output', () => {
 test('every purchase is a plain roll: Grounds never appears', () => {
 	freshGame({ gold: 1e15, wood: 1e15, stone: 1e15, coal: 1e15, food: 1e15 });
 	growTo(40);
-	assert.equal(api().tiles.flat().filter((t) => t.isOwned && t.biome === 'grounds').length, 0);
+	assert.equal(biomeCount(api().tiles, 'grounds'), 0);
 	assert.ok(!SELECTABLE_BIOMES.includes('grounds' as BiomeType));
 });
 
@@ -109,13 +108,13 @@ test('terrain: a building keeps its biome ground and gets a pad of that biome; a
 	const a = lot('hills');
 	api().buildOnTile(a.x, a.y, 'quarry');
 	const tiles = api().tiles;
-	assert.equal(isBuilt(tiles[a.y][a.x]), true);
+	const rows = rowsOf(tiles);
+	assert.equal(isBuilt(tileAt(tiles, a.x, a.y)), true);
 	assert.equal(foundationBiome(tiles, a.x, a.y), 'hills');
-	const pad = allPads(tiles).find((p) => p.x === a.x * 48);
+	const pad = allPads(rows).find((p) => p.x === a.x * 48);
 	assert.ok(pad && pad.id.startsWith('pad_hills_'), pad?.id);
-	assert.match(terrainKey(tiles), /[A-Z]/); // built-on tiles are upper case, so the terrain is redrawn
-	const old = tiles.map((row) => [...row]);
-	old[a.y][a.x] = { biome: 'grounds', isOwned: true, building: 'farm', level: 2 };
+	assert.match(terrainKey(rows), /[A-Z]/); // built-on tiles are upper case, so the terrain is redrawn
+	const old = setTile(tiles, a.x, a.y, { biome: 'grounds', isOwned: true, building: 'farm', level: 2 });
 	assert.notEqual(foundationBiome(old, a.x, a.y), 'grounds'); // old lots resolve their foundation
 });
 
@@ -125,6 +124,6 @@ test('chests never land on a building', () => {
 	for (const o of ownedLots().slice(1)) set(o.x, o.y, { building: 'farm' });
 	for (let i = 0; i < 40; i++) {
 		const spot = pickChestSpot(api().tiles, new Set(), 1, () => i / 40);
-		if (spot) assert.ok(!api().tiles[spot.y][spot.x].building);
+		if (spot) assert.ok(!tileAt(api().tiles, spot.x, spot.y).building);
 	}
 });

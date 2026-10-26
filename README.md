@@ -1,6 +1,6 @@
 # Idle Explorer
 
-An idle / incremental territory game. Start with a castle on a 50×50 map, buy adjacent tiles that turn into biomes (forest, plains, hills, swamp, tundra, lake, coast), then right-click any explored tile to build on it, grow your income, upgrade the castle (levels 1-10, timed builds), raise farm animals, trade with the merchant, fight the rats (and the Rat King) that wander onto your land, collect and equip gear, level up and spend stat points. Once the castle is strong enough you can **Rebirth** for permanent Legacy bonuses. Progress is saved automatically in the browser (localStorage) and can be exported and imported as one line of text.
+An idle / incremental territory game. Start with a castle on an unbounded map, buy adjacent tiles that turn into biomes (forest, plains, hills, swamp, tundra, lake, coast), then right-click any explored tile to build on it, grow your income, upgrade the castle (levels 1-10, timed builds), raise farm animals, trade with the merchant, fight the rats (and the Rat King) that wander onto your land, collect and equip gear, level up and spend stat points. Once the castle is strong enough you can **Rebirth** for permanent Legacy bonuses. Progress is saved automatically in the browser (localStorage) and can be exported and imported as one line of text.
 
 Live: https://idler-rose.vercel.app/
 

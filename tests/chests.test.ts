@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CHEST, GRID_CENTER_X, GRID_CENTER_Y } from '../src/config/gameConfig';
+import { CHEST, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import { CHEST_ITEMS, pickChestSpot, rewardWeights, rollChestLoot } from '../src/lib/chests';
 import { emptyBag, addToBag } from '../src/lib/inventory';
 import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import type { BagSlot, BiomeType, Resources, Tile } from '../src/types/game';
+import { worldFromRows, tileAt } from '../src/utils/world';
 
 const rng = (seed: number) => {
 	let a = (seed + 1) * 0x9e3779b1;
@@ -22,48 +23,59 @@ const blank = (): Tile[][] => Array.from({ length: SIZE }, () => Array.from({ le
 const territory = (r: number): Tile[][] => {
 	const g = blank();
 	for (let y = -r; y <= r; y++)
-		for (let x = -r; x <= r; x++) g[GRID_CENTER_Y + y][GRID_CENTER_X + x] = { biome: x === 0 && y === 0 ? 'castle' : 'plains', isOwned: true, ...(x === 0 && y === 0 ? { level: 1 } : {}) };
+		for (let x = -r; x <= r; x++) g[CASTLE_Y + y][CASTLE_X + x] = { biome: x === 0 && y === 0 ? 'castle' : 'plains', isOwned: true, ...(x === 0 && y === 0 ? { level: 1 } : {}) };
 	return g;
 };
 const rates = (over: Partial<Resources> = {}): Resources => ({ gold: 2, wood: 1, stone: 1, coal: 0.5, food: 1, meat: 0, eggs: 0, milk: 0, hide: 0, xp: 1, ...over });
 
 test('chest spot: only owned tiles, never the castle, a building, a monster or another chest', () => {
 	const g = territory(2);
-	g[GRID_CENTER_Y][GRID_CENTER_X + 1] = { biome: 'grounds', isOwned: true, building: 'farm', level: 2 };
-	g[GRID_CENTER_Y + 1][GRID_CENTER_X].hasChest = true;
-	const taken = new Set([`${GRID_CENTER_X - 1},${GRID_CENTER_Y}`]);
+	g[CASTLE_Y][CASTLE_X + 1] = { biome: 'grounds', isOwned: true, building: 'farm', level: 2 };
+	g[CASTLE_Y + 1][CASTLE_X].hasChest = true;
+	const taken = new Set([`${CASTLE_X - 1},${CASTLE_Y}`]);
+	const w = worldFromRows(g);
 	for (let i = 0; i < 400; i++) {
-		const spot = pickChestSpot(g, taken, 1, rng(i))!;
-		const t = g[spot.y][spot.x];
+		const spot = pickChestSpot(w, taken, 1, rng(i))!;
+		const t = tileAt(w, spot.x, spot.y);
 		assert.ok(t.isOwned && t.biome !== 'castle' && !t.hasChest && !(t.biome === 'grounds' && t.building));
 		assert.ok(!taken.has(`${spot.x},${spot.y}`));
 	}
 });
 
+test('chest spot: a lake is fine (drawn as a glowing ripple), a building is not', () => {
+	const g = territory(1);
+	for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [-1, 1], [1, -1]]) g[CASTLE_Y + dy][CASTLE_X + dx] = { biome: 'grounds', isOwned: true, building: 'farm', level: 1 };
+	g[CASTLE_Y + 1][CASTLE_X + 1] = { biome: 'lake', isOwned: true }; // the only tile left that is not castle or built
+	const w = worldFromRows(g);
+	for (let i = 0; i < 40; i++) assert.deepEqual(pickChestSpot(w, new Set(), 1, rng(i)), { x: CASTLE_X + 1, y: CASTLE_Y + 1 });
+});
+
 test('chest spot: nothing eligible gives null, and the fortress ward is off limits', () => {
-	assert.equal(pickChestSpot(blank(), new Set(), 1), null);
-	const g = territory(1); // castle + its 8 neighbours = exactly the ward
+	assert.equal(pickChestSpot(worldFromRows(blank()), new Set(), 1), null);
+	const g = worldFromRows(territory(1)); // castle + its 8 neighbours = exactly the ward
 	assert.equal(pickChestSpot(g, new Set(), 7), null);
 	assert.ok(pickChestSpot(g, new Set(), 6));
 });
 
 test('chest spot: the edge of the land is favoured over the middle, and chests spread out', () => {
 	const g = territory(3);
-	const edge = (x: number, y: number) => Math.max(Math.abs(x - GRID_CENTER_X), Math.abs(y - GRID_CENTER_Y)) === 3;
+	const edge = (x: number, y: number) => Math.max(Math.abs(x - CASTLE_X), Math.abs(y - CASTLE_Y)) === 3;
 	let onEdge = 0;
 	const n = 3000;
+	const w1 = worldFromRows(g);
 	for (let i = 0; i < n; i++) {
-		const s = pickChestSpot(g, new Set(), 1, rng(i))!;
+		const s = pickChestSpot(w1, new Set(), 1, rng(i))!;
 		if (edge(s.x, s.y)) onEdge++;
 	}
 	// 24 of the 48 candidate tiles are on the rim; a uniform pick would give 50%, the frontier bonus must beat that clearly
 	assert.ok(onEdge / n > 0.65, `${onEdge / n}`);
 
-	g[GRID_CENTER_Y - 3][GRID_CENTER_X].hasChest = true;
+	g[CASTLE_Y - 3][CASTLE_X].hasChest = true;
 	let near = 0;
+	const w2 = worldFromRows(g);
 	for (let i = 0; i < n; i++) {
-		const s = pickChestSpot(g, new Set(), 1, rng(i))!;
-		if (Math.max(Math.abs(s.x - GRID_CENTER_X), Math.abs(s.y - (GRID_CENTER_Y - 3))) <= CHEST.placement.nearbyRadius) near++;
+		const s = pickChestSpot(w2, new Set(), 1, rng(i))!;
+		if (Math.max(Math.abs(s.x - CASTLE_X), Math.abs(s.y - (CASTLE_Y - 3))) <= CHEST.placement.nearbyRadius) near++;
 	}
 	const nearTiles = 5 * 3 - 1; // tiles within the radius that are owned and free, roughly
 	assert.ok(near / n < nearTiles / 48, `${near / n} should be below the uniform share ${nearTiles / 48}`);

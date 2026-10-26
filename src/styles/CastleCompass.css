@@ -1,0 +1,96 @@
+/* Finding the castle again (CastleCompass.tsx): an edge arrow and a "Back to castle" button, shown only while the castle is off screen */
+.castle-compass {
+	position: fixed;
+	inset: 0;
+	z-index: 40; /* above the map, below windows (45) and the header (50) */
+	pointer-events: none;
+}
+
+.castle-compass[data-away='0'] .compass-arrow,
+.castle-compass[data-away='0'] .compass-home {
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.2s, visibility 0s 0.2s;
+}
+
+.compass-arrow,
+.compass-home {
+	pointer-events: auto;
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 0.2s;
+}
+
+.compass-home {
+	position: absolute;
+	left: 50%;
+	top: calc(var(--header-h, 56px) + 10px);
+	translate: -50% 0;
+	white-space: nowrap;
+}
+
+.compass-arrow {
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	padding: 0;
+	cursor: pointer;
+	color: #f0d27a;
+	background: rgba(14, 10, 22, 0.88);
+	border: 2px solid #8a6a2c;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px #2a1a08, 0 0 12px rgba(255, 216, 96, 0.45), 0 3px 8px rgba(0, 0, 0, 0.6);
+	animation: compass-pulse 1.6s ease-in-out infinite alternate;
+}
+
+.compass-arrow:hover {
+	filter: brightness(1.2);
+}
+
+.compass-turn {
+	display: block;
+	width: 26px;
+	height: 26px;
+	margin-top: -2px;
+}
+
+.compass-turn svg {
+	display: block;
+}
+
+.compass-dist {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: -2px;
+	font-family: var(--font-pixel);
+	font-size: 11px;
+	line-height: 1;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.compass-unit {
+	font-size: 8px;
+	color: #a89878;
+}
+
+@keyframes compass-pulse {
+	from {
+		box-shadow: 0 0 0 1px #2a1a08, 0 0 6px rgba(255, 216, 96, 0.25), 0 3px 8px rgba(0, 0, 0, 0.6);
+	}
+	to {
+		box-shadow: 0 0 0 1px #2a1a08, 0 0 16px rgba(255, 216, 96, 0.6), 0 3px 8px rgba(0, 0, 0, 0.6);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.compass-arrow {
+		animation: none;
+	}
+}

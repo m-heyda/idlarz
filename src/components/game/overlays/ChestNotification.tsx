@@ -3,6 +3,7 @@ import { ITEM_CATALOG } from '@/config/itemCatalog';
 import type { ChestLoot } from '@/lib/chests';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
+import '@/styles/ContextMenu.css';
 import { RARITY_COLOR, itemIconName } from '../itemUi';
 
 interface ChestNotificationProps {
@@ -78,7 +79,7 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClo
 
 	return (
 		<div
-			className='fixed top-[calc(var(--header-h,76px)+20px)] left-1/2transform -translate-x-1/2 px-toast text-[#ffe27a] py-2 px-4 z-[70] flex flex-col items-center gap-1 animate-fadeInOut cursor-pointer'
+			className='fixed top-[calc(var(--header-h,76px)+20px)] left-1/2 -translate-x-1/2 px-toast text-[#ffe27a] py-2 px-4 z-[70] flex flex-col items-center gap-1 chest-toast cursor-pointer'
 			onClick={onClose}>
 			<div className='flex items-center gap-2'>{title}</div>
 			{detail}

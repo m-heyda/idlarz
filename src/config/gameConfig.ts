@@ -7,6 +7,7 @@ import {
 } from '@/types/game';
 import { RESOURCES, type MerchantResourceKey, type ResourceKey } from '@/catalog/resources';
 import { shopItems } from '@/catalog/loot';
+import { BIOME_COLORS } from '@/config/biomePalette';
 
 // Default player name
 export const DEFAULT_PLAYER_NAME = 'Explorer';
@@ -38,11 +39,12 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
 	reputation: 1000, // Base reputation value
 };
 
-// Grid Configuration
-export const GRID_SIZE = 50; // Width of the grid
-export const GRID_HEIGHT = 50; // Height of the grid (same as width)
-export const GRID_CENTER_X = Math.floor(GRID_SIZE / 2);
-export const GRID_CENTER_Y = Math.floor(GRID_HEIGHT / 2);
+// Map. The map itself is unbounded (utils/world.ts): there is no grid size. The castle stays at its logical position, so
+// old saves and the procedural art (which hashes absolute coordinates) are unchanged.
+export const CASTLE_X = 25;
+export const CASTLE_Y = 25;
+/** The first saves stored the map as this square (castle in the middle); only the old save layout and test adapters still use it. */
+export const LEGACY_GRID_SIZE = 50;
 
 export const TILE_SIZE = 48; // Balanced for visibility
 
@@ -60,7 +62,27 @@ export const EMPTY_BIOMES: BiomeType[] = ['empty'];
 
 // Hard limits shared by the tick loop and save validation
 export const MAX_CATCHUP_SEC = 300; // one tick never advances the game by more than this (clock edits, device sleep)
-export const RESOURCE_CAP = 1e15; // anything above this in a save is considered tampered
+// Every stockpile, XP included, stops here; a save above it is considered tampered. Raised from 1e15 so a map of tens of
+// thousands of tiles stays buyable (see TILE_PRICE and docs/05 BL16).
+export const RESOURCE_CAP = 1e21;
+export const XP_CAP = RESOURCE_CAP;
+
+// The late part of the tile price. Up to `tailFrom` owned tiles the price is the three exponential stages of SCALING_CONFIG
+// (unchanged); beyond it grows like (n / tailFrom)^tailExponent, which is far gentler than any exponential, so the map can
+// keep growing for as long as the player keeps earning. `ceiling` keeps the price a finite, affordable-in-principle number.
+// This is the knob for the later rebirth design: bigger starting resources and bigger maps mean raising `tailFrom`
+// or lowering `tailExponent` (docs/05, BL16).
+export const TILE_PRICE = {
+	tailFrom: 100,
+	tailExponent: 2.5,
+	ceiling: RESOURCE_CAP / 100,
+};
+
+// XP a tile purchase gives: 125 x 1.02^(k-1) x k/4 up to tile `growthUntil` (the old curve), then a polynomial tail
+export const XP_TILE = {
+	growthUntil: 300,
+	tailExponent: 1.5,
+};
 
 // Tile cost curve: exponential growth that is steep early (cheap first tiles), gentler through the mid game and
 // gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number
@@ -69,30 +91,28 @@ export const SCALING_CONFIG = {
 	earlyTiles: 20,
 	growthLate: 1.27, // cost multiplier per owned tile from `earlyTiles` to `lateTiles`
 	lateTiles: 40,
-	growthEndgame: 1.17, // cost multiplier per owned tile after `lateTiles`
+	growthEndgame: 1.17, // cost multiplier per owned tile after `lateTiles`, up to `TILE_PRICE.tailFrom`
 
 	// Gold cost of the next tile when `ownedTiles` tiles are owned (castle counts), before discounts
-	costFormula: (ownedTiles: number) =>
-		Math.floor(
-			BASE_TILE_COST *
-				Math.pow(
-					SCALING_CONFIG.growthEarly,
-					Math.min(ownedTiles, SCALING_CONFIG.earlyTiles)
-				) *
-				Math.pow(
-					SCALING_CONFIG.growthLate,
-					Math.max(
-						Math.min(ownedTiles, SCALING_CONFIG.lateTiles) - SCALING_CONFIG.earlyTiles,
-						0
-					)
-				) *
-				Math.pow(
-					SCALING_CONFIG.growthEndgame,
-					Math.max(ownedTiles - SCALING_CONFIG.lateTiles, 0)
-				)
-		),
+	costFormula: (ownedTiles: number) => tilePrice(ownedTiles),
 	adjacencyBonus: 0.25, // +25% output per same-biome neighbour
 };
+
+/**
+ * Gold price of the next tile when `ownedTiles` are owned, before discounts: the three exponential stages of SCALING_CONFIG
+ * up to TILE_PRICE.tailFrom, then the polynomial tail, never above TILE_PRICE.ceiling. Always finite.
+ */
+function tilePrice(ownedTiles: number): number {
+	const S = SCALING_CONFIG;
+	const n = Math.min(ownedTiles, TILE_PRICE.tailFrom);
+	let price =
+		BASE_TILE_COST *
+		Math.pow(S.growthEarly, Math.min(n, S.earlyTiles)) *
+		Math.pow(S.growthLate, Math.max(Math.min(n, S.lateTiles) - S.earlyTiles, 0)) *
+		Math.pow(S.growthEndgame, Math.max(n - S.lateTiles, 0));
+	if (ownedTiles > TILE_PRICE.tailFrom) price *= Math.pow(ownedTiles / TILE_PRICE.tailFrom, TILE_PRICE.tailExponent);
+	return Math.floor(Math.min(price, TILE_PRICE.ceiling));
+}
 
 // Which biome a random purchase turns up. Everything weighs 1 unless listed; water clusters and gets a shore:
 // next to a lake or a coast both become likelier, so ponds grow into bays with beaches instead of single specks.
@@ -155,7 +175,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	empty: {
 		name: 'empty',
 		label: 'Empty',
-		baseColor: '#1a1a1a',
+		baseColor: BIOME_COLORS.empty,
 		unique: true,
 		upgradeable: false,
 		resourceGeneration: {},
@@ -165,7 +185,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	castle: {
 		name: 'castle',
 		label: 'Castle',
-		baseColor: '#6d28d9',
+		baseColor: BIOME_COLORS.castle,
 		unique: true,
 		upgradeable: true,
 		resourceGeneration: Object.fromEntries(
@@ -177,7 +197,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	grounds: {
 		name: 'grounds',
 		label: 'Grounds',
-		baseColor: '#371c00',
+		baseColor: BIOME_COLORS.grounds,
 		unique: false,
 		upgradeable: true,
 		resourceGeneration: {
@@ -191,7 +211,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	forest: {
 		name: 'forest',
 		label: 'Forest',
-		baseColor: '#166534',
+		baseColor: BIOME_COLORS.forest,
 		unique: false,
 		upgradeable: false,
 		resourceGeneration: {
@@ -204,7 +224,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	plains: {
 		name: 'plains',
 		label: 'Plains',
-		baseColor: '#2f8123',
+		baseColor: BIOME_COLORS.plains,
 		unique: false,
 		upgradeable: false,
 		resourceGeneration: {
@@ -217,7 +237,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	hills: {
 		name: 'hills',
 		label: 'Hills',
-		baseColor: '#3d3d3d',
+		baseColor: BIOME_COLORS.hills,
 		unique: false,
 		upgradeable: false,
 		resourceGeneration: {
@@ -231,7 +251,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	swamp: {
 		name: 'swamp',
 		label: 'Swamp',
-		baseColor: '#929706',
+		baseColor: BIOME_COLORS.swamp,
 		unique: false,
 		upgradeable: false,
 		resourceGeneration: {
@@ -244,7 +264,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	tundra: {
 		name: 'tundra',
 		label: 'Tundra',
-		baseColor: '#0f53b9',
+		baseColor: BIOME_COLORS.tundra,
 		unique: false,
 		upgradeable: false,
 		resourceGeneration: {
@@ -257,7 +277,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	lake: {
 		name: 'lake',
 		label: 'Lake',
-		baseColor: '#0ea5e9',
+		baseColor: BIOME_COLORS.lake,
 		unique: false,
 		upgradeable: false,
 		resourceGeneration: {
@@ -270,7 +290,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	coast: {
 		name: 'coast',
 		label: 'Coast',
-		baseColor: '#d8bc7c',
+		baseColor: BIOME_COLORS.coast,
 		unique: false,
 		upgradeable: false,
 		resourceGeneration: {
@@ -310,8 +330,10 @@ export const BASE_GENERATION_RATES = {
 };
 
 
-// Castle range: tiles within this many steps of the castle (3x3 at radius 1) will get the castle's range bonus
-export const CASTLE_RANGE = { radius: 1 };
+// Castle range: tiles within this many steps of the castle (3x3 at radius 1) will get the castle's range bonus. `radius` is
+// also the ward and the fortress walls. From `growFromLevel` the violet area (not the ward) grows by `growPerLevel` tiles on
+// every side per level: 3x3 up to level 7, then 5x5, 7x7 and 9x9 at level 10.
+export const CASTLE_RANGE = { radius: 1, growFromLevel: 8, growPerLevel: 1 };
 
 // From this castle level the 3x3 range becomes a walled fortress (walls on its edges, a tower on each corner): no monsters
 // and no chests spawn inside it and monsters already there are driven out.

@@ -1,6 +1,7 @@
 import { BIOMES, BIOME_SPAWN, SPECIAL_SINGLE_TYPE_BIOMES, EMPTY_BIOMES } from '@/config/gameConfig';
 import { BIOME_RULES } from '@/config/biomeRules';
 import type { BiomeType, Tile } from '@/types/game';
+import { getTile, type World } from '@/utils/world';
 
 /** Whether a biome may turn up on one tile, and why not. */
 export interface BiomeVerdict {
@@ -17,9 +18,9 @@ const label = (b: string) => BIOMES[b]?.label ?? b;
 const ownedBiome = (t: Tile | undefined): BiomeType | null => (t?.isOwned && t.biome !== 'castle' ? t.biome : null);
 
 /** Biomes of the owned non-castle neighbours: 4-neighbours and all 8. */
-export function neighbourBiomes(tiles: Tile[][], x: number, y: number) {
+export function neighbourBiomes(tiles: World, x: number, y: number) {
 	const pick = (sides: [number, number][]) =>
-		sides.map(([dx, dy]) => ownedBiome(tiles[y + dy]?.[x + dx])).filter((b): b is BiomeType => b !== null);
+		sides.map(([dx, dy]) => ownedBiome(getTile(tiles, x + dx, y + dy))).filter((b): b is BiomeType => b !== null);
 	return { four: pick(SIDES4), eight: pick(SIDES8) };
 }
 
@@ -29,7 +30,7 @@ export const SELECTABLE_BIOMES = Object.keys(BIOMES).filter(
 ) as BiomeType[];
 
 /** Verdict for each biome a purchase can produce on tile (x, y) after `purchased` purchases. */
-export function biomeVerdicts(tiles: Tile[][], x: number, y: number, purchased: number): BiomeVerdict[] {
+export function biomeVerdicts(tiles: World, x: number, y: number, purchased: number): BiomeVerdict[] {
 	const { four, eight } = neighbourBiomes(tiles, x, y);
 	const hasWater = eight.some((b) => b === 'lake' || b === 'coast');
 	return SELECTABLE_BIOMES.map((biome) => {
@@ -63,7 +64,7 @@ function weighted<T>(items: [T, number][], roll: number): T {
  * same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore
  * (BIOME_SPAWN). Always returns an allowed biome (plains is never blocked).
  */
-export function rollBiome(tiles: Tile[][], x: number, y: number, purchased: number, random: () => number = Math.random): BiomeType {
+export function rollBiome(tiles: World, x: number, y: number, purchased: number, random: () => number = Math.random): BiomeType {
 	const allowed = biomeVerdicts(tiles, x, y, purchased).filter((v) => v.allowed).map((v) => v.biome);
 	const { four } = neighbourBiomes(tiles, x, y);
 

@@ -4,6 +4,7 @@ import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
 import type { CritKind } from '@/lib/combat';
+import type { World } from '@/utils/world';
 
 export type { ItemStats };
 
@@ -178,9 +179,10 @@ export interface TileProps {
 	isOwned: boolean;
 	x: number;
 	y: number;
-	style: React.CSSProperties;
 	level?: number;
 	building?: string;
+	/** For a tile that is not explored yet: whether the next tile is affordable (the map works that out once for all of them) */
+	canAfford?: boolean;
 }
 
 export type MerchantTab =
@@ -258,7 +260,7 @@ import type { ChestLoot } from '@/lib/chests';
 
 export interface GameState {
 	previousLevel: number;
-	tiles: Tile[][];
+	tiles: World; // the explored map: sparse, unbounded (see src/utils/world.ts)
 	resources: Resources;
 	resourceRates: ResourceRates;
 	level: {
@@ -302,6 +304,7 @@ export interface GameState {
 	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;
 	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
+	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
 	sellJunk: (maxRarity: EquipmentRarity) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
 	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
@@ -315,6 +318,7 @@ export interface GameState {
 	startFight: (monsterId: number) => boolean;
 	hitMonster: (input: ClickInput) => { damage: number; killed: boolean; crit: CritKind } | null;
 	leaveFight: () => void;
+	dismissMonster: (id: number) => boolean; // removes a monster from the map, no loot; false for the one being fought
 	drinkPotion: (bagIndex: number) => boolean;
 	equipItem: (bagIndex: number) => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;

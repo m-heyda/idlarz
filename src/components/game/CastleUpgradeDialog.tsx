@@ -4,6 +4,7 @@ import { CASTLE_UPGRADE } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber, formatTime } from '@/utils/formatters';
 import { castleModifier, castleUpgradeDuration } from '@/utils/gameUtils';
+import { castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import audioManager from '@/utils/audioManager';
 import PixelModal from './PixelModal';
 import ResourceIcon from './ResourceIcon';
@@ -21,10 +22,7 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
 	const prestige = useGameStore((state) => state.prestige);
 
-	// Safely get castle level from the center tile
-	const centerX = Math.floor(tiles[0].length / 2);
-	const centerY = Math.floor(tiles.length / 2);
-	const castleLevel = tiles[centerY]?.[centerX]?.level || 1;
+	const castleLevel = castleLevelOf(tiles);
 
 	const isMaxLevel = castleLevel >= CASTLE_UPGRADE.maxLevel;
 	const isNextToMaxLevel = castleLevel >= CASTLE_UPGRADE.maxLevel - 1;
@@ -73,6 +71,11 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 	const afterNextXpBonus = CASTLE_UPGRADE.xpBonus * (castleLevel + 1);
 
 	const duration = castleUpgradeDuration(castleLevel, prestige);
+
+	// The violet range area grows from level 8 (3x3 -> 5x5 -> 7x7 -> 9x9)
+	const currentRange = castleRangeRadius(castleLevel);
+	const nextRange = castleRangeRadius(castleLevel + 1);
+	const rangeLabel = (radius: number) => `${radius * 2 + 1}x${radius * 2 + 1}`;
 
 	const CostGrid: React.FC<{ costs: Partial<Record<string, number>>; muted?: boolean }> = ({
 		costs,
@@ -142,6 +145,12 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 					</div>
 					<div className='text-sm text-[#a89878] mb-3'>
 						Castle XP: <span className='text-amber-400'>+{nextXpBonus.toFixed(1)} XP/s</span> flat
+						{nextRange > currentRange && (
+							<div>
+								Castle range: <span className='text-violet-300'>{rangeLabel(currentRange)}</span> {'→'}{' '}
+								<span className='text-violet-300'>{rangeLabel(nextRange)}</span>
+							</div>
+						)}
 					</div>
 
 					{!isNextToMaxLevel && afterNextLevelCosts && (

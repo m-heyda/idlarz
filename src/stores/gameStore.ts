@@ -14,8 +14,8 @@ import {
 	FARM_BONUS,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
-	GRID_HEIGHT,
-	GRID_SIZE,
+	CASTLE_X,
+	CASTLE_Y,
 	INITIAL_CHARACTER_STATS,
 	FARM_UPGRADES,
 	LEGACY_UPGRADES,
@@ -28,6 +28,7 @@ import {
 	type MerchantUpgradeId,
 	REBIRTH,
 	RESOURCE_CAP,
+	XP_CAP,
 	TILE_TAP,
 	type FarmUpgradeId,
 	type LegacyUpgradeId,
@@ -46,7 +47,7 @@ import {
 	canAffordBundle,
 	castleUpgradeDuration,
 	countOwnedTiles,
-	createInitialGrid,
+	createInitialWorld,
 	economyTiles,
 	EMPTY_PRESTIGE,
 	effectiveTileDiscount,
@@ -93,8 +94,8 @@ import type {
 	PrestigeState,
 	Resources,
 	TapResult,
-	Tile,
 } from '@/types/game';
+import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, patchTile, setTile, type World } from '@/utils/world';
 
 // Last tap time per tile (not persisted) - enforces TILE_TAP.cooldownMs
 const lastTapAt: Record<string, number> = {};
@@ -117,13 +118,6 @@ const BASE_STATS = [
 const isPositiveNumber = (n: unknown): n is number =>
 	typeof n === 'number' && Number.isFinite(n) && n > 0;
 
-const neighbours = (x: number, y: number) => [
-	[x - 1, y],
-	[x + 1, y],
-	[x, y - 1],
-	[x, y + 1],
-];
-
 /** A tiny seeded generator: the server and the first client render must start from the same world. */
 const seededRandom = (seed: number) => () => {
 	seed = (seed + 0x6d2b79f5) | 0;
@@ -134,7 +128,7 @@ const seededRandom = (seed: number) => () => {
 
 /** All game data of a brand-new game (no actions). */
 export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () => number = Math.random) => {
-	const grid = createInitialGrid(random);
+	const grid = createInitialWorld(random);
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
 	const equipment = { ...STARTER_EQUIPMENT };
@@ -170,14 +164,11 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 	};
 };
 
-const findCastle = (tiles: Tile[][]) => {
-	for (let y = 0; y < GRID_HEIGHT; y++) {
-		for (let x = 0; x < GRID_SIZE; x++) {
-			if (tiles[y][x].biome === 'castle') return { tile: tiles[y][x], x, y };
-		}
-	}
-	return null;
+const findCastle = (tiles: World) => {
+	const tile = getTile(tiles, CASTLE_X, CASTLE_Y);
+	return tile && tile.biome === 'castle' ? { tile, x: CASTLE_X, y: CASTLE_Y } : null;
 };
+
 
 const createGameSlice = (
 	set: (
@@ -193,8 +184,7 @@ const createGameSlice = (
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
 
-		const newTiles = state.tiles.map((row) => [...row]);
-		newTiles[y][x] = { ...newTiles[y][x], biome, isOwned: true };
+		const newTiles = setTile(state.tiles, x, y, { biome, isOwned: true });
 
 		const newRates = calculateResourceRates(
 			newTiles,
@@ -207,7 +197,7 @@ const createGameSlice = (
 		const xpGain =
 			calculateXpGain(owned + 1) * (1 + state.characterStats.xpGainMultiplier / 100);
 		const resources = subtractBundle(state.resources, bundle);
-		resources.xp += xpGain;
+		resources.xp = Math.min(resources.xp + xpGain, XP_CAP);
 
 		set({
 			tiles: newTiles,
@@ -375,13 +365,8 @@ const createGameSlice = (
 		buyTile: (x: number, y: number) => {
 			const state = get();
 			if (!Number.isInteger(x) || !Number.isInteger(y)) return false;
-			const target = state.tiles[y]?.[x];
-			if (!target || target.isOwned) return false;
-
-			const isAdjacent = neighbours(x, y).some(
-				([ax, ay]) => state.tiles[ay]?.[ax]?.isOwned
-			);
-			if (!isAdjacent) return false;
+			if (!inRange(x, y) || isOwnedAt(state.tiles, x, y) || ownedCount(state.tiles) >= MAX_OWNED_TILES) return false;
+			if (!hasOwnedNeighbour(state.tiles, x, y)) return false;
 
 			const owned = economyTiles(state.tiles, state.freeTiles);
 			const purchased = owned - 1;
@@ -415,15 +400,14 @@ const createGameSlice = (
 		// The tile keeps its biome and its output; the building adds its own. Each building costs more than the last (calculateBuildingCost).
 		buildOnTile: (x: number, y: number, buildingType: string) => {
 			const state = get();
-			const tile = state.tiles[y]?.[x];
+			const tile = getTile(state.tiles, x, y);
 			if (!tile || !canBuildOn(tile) || tile.hasChest || monsterAt(state.monsters, x, y)) return false;
 			if (!(buildingType in BUILDINGS)) return false;
 
 			const cost = calculateBuildingCost(state.tiles, state.prestige);
 			if (!canAffordBundle(state.resources, cost)) return false;
 
-			const updatedTiles = state.tiles.map((row) => [...row]);
-			updatedTiles[y][x] = { ...tile, building: buildingType };
+			const updatedTiles = setTile(state.tiles, x, y, { ...tile, building: buildingType });
 			const newRates = calculateResourceRates(
 				updatedTiles,
 				state.characterStats,
@@ -444,20 +428,18 @@ const createGameSlice = (
 		// gear piece - see src/lib/chests.ts. Luck improves the odds and the gold.
 		collectChest: (x: number, y: number) => {
 			const state = get();
-			const tile = state.tiles[y]?.[x];
-			if (!tile || !tile.isOwned || !tile.hasChest) return false;
+			const tile = getTile(state.tiles, x, y);
+			if (!tile || !tile.hasChest) return false;
 
 			const loot = rollChestLoot({ rates: state.resourceRates.total, luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck, bag: state.bag });
 
-			const newTiles = [...state.tiles];
-			newTiles[y] = [...newTiles[y]];
-			newTiles[y][x] = { ...newTiles[y][x], hasChest: false };
+			const newTiles = setTile(state.tiles, x, y, { ...tile, hasChest: false });
 
 			const resources = { ...state.resources };
 			let bag = state.bag;
 			if (loot.kind === 'gold' || loot.kind === 'boost') resources.gold += loot.gold;
 			else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
-			else if (loot.kind === 'xp') resources.xp += loot.xp;
+			else if (loot.kind === 'xp') resources.xp = Math.min(resources.xp + loot.xp, XP_CAP);
 			else bag = addToBag(bag, loot.itemId, 1).bag;
 
 			set({
@@ -563,7 +545,7 @@ const createGameSlice = (
 				resources: {
 					...state.resources,
 					gold: Math.min(state.resources.gold + loot.gold + convertedGold, RESOURCE_CAP),
-					xp: state.resources.xp + loot.xp,
+					xp: Math.min(state.resources.xp + loot.xp, XP_CAP),
 				},
 			});
 			return { damage, killed: true, crit };
@@ -571,6 +553,15 @@ const createGameSlice = (
 
 		// Closing the fight (flee, or dismissing an end panel). The monster is never persisted damaged, so it is simply full HP again.
 		leaveFight: () => set({ fight: null }),
+
+		// Removes a monster from the map without a fight or loot (for a rat too strong to beat while the map is at its monster cap)
+		dismissMonster: (id: number) => {
+			const state = get();
+			if (state.fight?.monsterId === id) return false;
+			if (!state.monsters.some((m) => m.id === id)) return false;
+			set({ monsters: state.monsters.filter((m) => m.id !== id) });
+			return true;
+		},
 
 		drinkPotion: (bagIndex: number) => {
 			const state = get();
@@ -676,7 +667,7 @@ const createGameSlice = (
 			);
 			const xpGain =
 				state.resourceRates.total.xp * (1 + state.characterStats.xpGainMultiplier / 100);
-			newResources.xp += xpGain * secondsElapsed;
+			newResources.xp = Math.min(newResources.xp + xpGain * secondsElapsed, XP_CAP);
 
 			let newTiles = state.tiles;
 			let newRates = state.resourceRates;
@@ -688,13 +679,12 @@ const createGameSlice = (
 				if (remaining <= 0) {
 					const castle = findCastle(state.tiles);
 					if (castle) {
-						newTiles = state.tiles.map((row) => [...row]);
-						newTiles[castle.y][castle.x] = {
+						newTiles = setTile(state.tiles, castle.x, castle.y, {
 							...castle.tile,
 							level: newCastleUpgrade.toLevel,
 							upgradeCost:
 								CASTLE_UPGRADE.upgradeCosts[newCastleUpgrade.toLevel - 1] ?? undefined,
-						};
+						});
 						newRates = calculateResourceRates(
 							newTiles,
 							state.characterStats,
@@ -722,9 +712,7 @@ const createGameSlice = (
 					const spot = pickChestSpot(newTiles, monsterSpots, castleLevelOf(newTiles));
 					if (spot) {
 						const { x, y } = spot;
-						newTiles = newTiles === state.tiles ? [...state.tiles] : newTiles;
-						newTiles[y] = [...newTiles[y]];
-						newTiles[y][x] = { ...newTiles[y][x], hasChest: true };
+						newTiles = patchTile(newTiles, x, y, { hasChest: true });
 						newActiveChestsCount++;
 					}
 				}
@@ -862,6 +850,18 @@ const createGameSlice = (
 				resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) },
 			});
 			return gold;
+		},
+
+		// Throw bag items away for good (no gold); `qty` defaults to one, pass the stack size to clear the slot
+		discardItem: (bagIndex: number, qty?: number) => {
+			const state = get();
+			if (state.fight) return false;
+			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
+			if (!slot) return false;
+			const amount = qty === undefined ? 1 : Math.floor(qty);
+			if (!(amount >= 1) || amount > slot.qty) return false;
+			set({ bag: removeFromBag(state.bag, bagIndex, amount) });
+			return true;
 		},
 
 		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)

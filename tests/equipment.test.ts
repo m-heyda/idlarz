@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store } from './helpers';
-import { GRID_CENTER_X, GRID_CENTER_Y, REBIRTH } from '../src/config/gameConfig';
+import { CASTLE_X, CASTLE_Y, REBIRTH } from '../src/config/gameConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
 import { maxHp, newFight } from '../src/lib/combat';
 import type { BagSlot } from '../src/types/game';
+import { patchTile } from '../src/utils/world';
 
 const max = () => maxHp(api().characterStats, api().equipment);
 const bagWith = (...ids: string[]): BagSlot[] => {
@@ -84,8 +85,7 @@ test('rebirth keeps equipment and bag and refills HP', () => {
 	freshGame();
 	growTo(20);
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		tiles[GRID_CENTER_Y][GRID_CENTER_X] = { ...tiles[GRID_CENTER_Y][GRID_CENTER_X], level: REBIRTH.minCastleLevel };
+		const tiles = patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel });
 		return { tiles, bag: bagWith('rattatui_tunic', 'rattatui_cap'), playerHp: 10 };
 	});
 	api().equipItem(1);

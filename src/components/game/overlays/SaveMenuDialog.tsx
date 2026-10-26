@@ -11,8 +11,9 @@ import {
 	resetSave,
 	type SaveInfo,
 } from '@/lib/saveStorage';
+import { copyText } from '@/lib/clipboard';
 import { formatTime } from '@/utils/formatters';
-import { GRID_CENTER_X, GRID_CENTER_Y } from '@/config/gameConfig';
+import { castleLevelOf } from '@/lib/castleWard';
 import { countOwnedTiles } from '@/utils/gameUtils';
 import PixelModal from '../PixelModal';
 
@@ -30,20 +31,6 @@ const ago = (time: number | null): string => {
 	if (sec < 10) return 'just now';
 	if (sec < 90) return `${sec} s ago`;
 	return `${Math.round(sec / 60)} min ago`;
-};
-
-const copyText = async (text: string, fallbackTarget: HTMLTextAreaElement | null): Promise<boolean> => {
-	try {
-		await navigator.clipboard.writeText(text);
-		return true;
-	} catch {
-		fallbackTarget?.select();
-		try {
-			return document.execCommand('copy');
-		} catch {
-			return false;
-		}
-	}
 };
 
 type Parsed =
@@ -236,7 +223,7 @@ const SaveDialogBody: React.FC = () => {
 							<div className='mt-3'>
 								<div className='px-h'>Replace current progress?</div>
 								<div className='text-[#d8c8a0] mb-3'>
-									Level {ok.level.level}, castle {ok.tiles[GRID_CENTER_Y][GRID_CENTER_X].level ?? 1}, {countOwnedTiles(ok.tiles)} tiles,{' '}
+									Level {ok.level.level}, castle {castleLevelOf(ok.tiles)}, {countOwnedTiles(ok.tiles)} tiles,{' '}
 									{formatTime(ok.playSeconds)} played
 									{parsed.kind === 'ok' && parsed.savedAt ? `, saved ${new Date(parsed.savedAt).toLocaleString()}` : ''}.
 								</div>

@@ -1,6 +1,7 @@
 import type { Tile } from '@/types/game';
 import { CASTLE_FORTRESS } from '@/config/gameConfig';
 import atlasJson from '@/config/terrainAtlas.json';
+import { getTile, inRange, tileKey, type World } from './world';
 
 /**
  * Dual-grid terrain. A dual cell (48 px) sits on the corner shared by four map tiles; per ground that is present
@@ -21,6 +22,10 @@ const SE = 8;
 export const RANK = ['mist', 'coast', 'plains', 'swamp', 'tundra', 'grounds', 'forest', 'hills', 'lake', 'yard', 'castle'] as const;
 export type Ground = (typeof RANK)[number];
 export type GroundGrid = (Ground | null)[][];
+/** The ground at a tile (null = nothing there): the map reads it through this, a test grid through the array form. */
+export type GroundFn = (x: number, y: number) => Ground | null;
+/** What the terrain maths reads. An array is clamped to its edges (the oldest tests rely on that); a function is exact. */
+export type GroundSrc = GroundGrid | GroundFn;
 
 export const MAX_DEPTH: Record<string, number> = { forest: 1, hills: 2, swamp: 1, tundra: 1, lake: 2 };
 const LAND: string[] = ['plains', 'forest', 'hills', 'swamp', 'tundra', 'coast'];
@@ -82,12 +87,12 @@ type OwnedName = Ground | 'building' | null;
 export const FOUNDATION_ORDER = ['hills', 'forest', 'tundra', 'swamp', 'plains', 'coast'] as const;
 const PAD_VARIANTS = 2;
 
-function foundation(owned: OwnedName[][], x: number, y: number): Ground {
+function foundation(nameAt: (x: number, y: number) => OwnedName | undefined, x: number, y: number): Ground {
 	const counts: Record<string, number> = { hills: 0, forest: 0, tundra: 0, swamp: 0, plains: 0, coast: 0 };
 	for (let dy = -1; dy <= 1; dy++)
 		for (let dx = -1; dx <= 1; dx++) {
 			if (!dx && !dy) continue;
-			const n = owned[y + dy]?.[x + dx];
+			const n = nameAt(x + dx, y + dy);
 			const name = n === 'lake' ? 'coast' : n;
 			if (name && name in counts) counts[name]++;
 		}
@@ -96,19 +101,21 @@ function foundation(owned: OwnedName[][], x: number, y: number): Ground {
 	return FOUNDATION_ORDER.find((b) => counts[b] === best) as Ground;
 }
 
-const ownedNames = (tiles: Tile[][]): OwnedName[][] => tiles.map((row) => row.map((t) => (isGroundsLot(t) ? 'building' : groundOf(t))));
+const nameOf = (t: Tile | undefined): OwnedName => (isGroundsLot(t) ? 'building' : groundOf(t));
+const ownedNames = (tiles: Tile[][]): OwnedName[][] => tiles.map((row) => row.map(nameOf));
 
 /** The biome a tile's ground belongs to for the eye: its own, or (built-on tiles) the foundation biome. */
-export function foundationBiome(tiles: Tile[][], x: number, y: number): string {
-	const t = tiles[y]?.[x];
-	return isGroundsLot(t) ? foundation(ownedNames(tiles), x, y) : (t?.biome ?? 'empty');
+export function foundationBiome(tiles: World, x: number, y: number): string {
+	const t = getTile(tiles, x, y);
+	if (!isGroundsLot(t)) return t?.biome ?? 'empty';
+	return foundation((nx, ny) => nameOf(getTile(tiles, nx, ny)), x, y);
 }
 
 /** Ground per tile; unowned tiles 4-adjacent to an owned one become 'mist' (the buyable ring), the rest stay null. */
 export function buildGroundGrid(tiles: Tile[][] | undefined): GroundGrid {
 	if (!tiles) return [];
 	const owned = ownedNames(tiles);
-	const resolved: GroundGrid = owned.map((row, y) => row.map((g, x) => (g === 'building' ? foundation(owned, x, y) : g)));
+	const resolved: GroundGrid = owned.map((row, y) => row.map((g, x) => (g === 'building' ? foundation((nx, ny) => owned[ny]?.[nx], x, y) : g)));
 	return resolved.map((row, y) =>
 		row.map((g, x) =>
 			g ??
@@ -126,7 +133,7 @@ export function allPads(tiles: Tile[][] | undefined): Placed[] {
 		row.forEach((tile, x) => {
 			if (!isBuilt(tile)) return;
 			// a lot on its own biome gets that biome's pad; an old Grounds lot the pad of the land around it
-			const kind = isGroundsLot(tile) ? foundation(owned, x, y) : (FOUNDATION_ORDER as readonly string[]).includes(tile.biome) ? tile.biome : 'plains';
+			const kind = isGroundsLot(tile) ? foundation((nx, ny) => owned[ny]?.[nx], x, y) : (FOUNDATION_ORDER as readonly string[]).includes(tile.biome) ? tile.biome : 'plains';
 			out.push({ id: `pad_${kind}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
 		})
 	);
@@ -150,11 +157,11 @@ export function terrainKey(tiles: Tile[][] | undefined): string {
 		.join('/');
 }
 
-const at = (g: GroundGrid, x: number, y: number): Ground | null =>
-	g[Math.min(Math.max(y, 0), g.length - 1)][Math.min(Math.max(x, 0), g[0].length - 1)];
+const at = (g: GroundSrc, x: number, y: number): Ground | null =>
+	typeof g === 'function' ? g(x, y) : g[Math.min(Math.max(y, 0), g.length - 1)][Math.min(Math.max(x, 0), g[0].length - 1)];
 
 /** How many rings (1..MAX_DEPTH) around the tile share its ground; 0 on edges and for flat grounds. */
-export function depth(g: GroundGrid, x: number, y: number): number {
+export function depth(g: GroundSrc, x: number, y: number): number {
 	const me = at(g, x, y);
 	let d = 0;
 	for (let r = 1; r <= (me ? (MAX_DEPTH[me] ?? 0) : 0); r++) {
@@ -173,7 +180,7 @@ export interface Layer {
 }
 
 /** Layers bottom-up for dual cell (cx, cy); corners are tiles NW=(cx-1,cy-1), NE=(cx,cy-1), SW=(cx-1,cy), SE=(cx,cy). */
-export function cellLayers(g: GroundGrid, cx: number, cy: number): Layer[] {
+export function cellLayers(g: GroundSrc, cx: number, cy: number): Layer[] {
 	const corners: [number, number, number][] = [
 		[NW, cx - 1, cy - 1],
 		[NE, cx, cy - 1],
@@ -217,7 +224,7 @@ const gap2 = (rx0: number, ry0: number, [bx0, by0, bx1, by1]: number[]) => {
 };
 
 /** Box (tile-local px, may extend outside the tile) keeps `margin` px from every neighbouring tile of another ground. */
-function fits(g: GroundGrid, x: number, y: number, box: number[], margin: number, ground: Ground | null): boolean {
+function fits(g: GroundSrc, x: number, y: number, box: number[], margin: number, ground: Ground | null): boolean {
 	for (let dx = -1; dx <= 1; dx++)
 		for (let dy = -1; dy <= 1; dy++)
 			if ((dx || dy) && at(g, x + dx, y + dy) !== ground && gap2(dx * CELL, dy * CELL, box) < margin * margin) return false;
@@ -235,7 +242,7 @@ function pick(opts: [string, number, number][], h: number): [string, number, num
 }
 
 /** 0..3 props for tile (x, y), anchored at their base centre. */
-export function tileSprites(g: GroundGrid, x: number, y: number, m: TerrainAtlas = ATLAS): Placed[] {
+export function tileSprites(g: GroundSrc, x: number, y: number, m: TerrainAtlas = ATLAS): Placed[] {
 	const me = at(g, x, y);
 	const table = me ? m.props[me] : undefined;
 	if (!me || !table) return [];
@@ -291,7 +298,7 @@ const overlaps = (a: number[], b: number[], margin: number) =>
  * Tiny decorations (flowers on plains, fallen trees on swamps): a second hash pass that never moves the props.
  * `props` are this tile's prop placements; decor keeps clear of them and of the neighbouring grounds.
  */
-export function decorSprites(g: GroundGrid, x: number, y: number, props: Placed[], m: TerrainAtlas = ATLAS): Placed[] {
+export function decorSprites(g: GroundSrc, x: number, y: number, props: Placed[], m: TerrainAtlas = ATLAS): Placed[] {
 	const me = at(g, x, y);
 	const table = me ? m.decor?.[me] : undefined;
 	if (!me || !table) return [];
@@ -330,7 +337,7 @@ export function decorSprites(g: GroundGrid, x: number, y: number, props: Placed[
 }
 
 /** A pier (sometimes with a boat) on a lake tile with exactly one land side; only a local maximum of the roll. */
-export function dockAt(g: GroundGrid, x: number, y: number, m: TerrainAtlas = ATLAS): Placed[] {
+export function dockAt(g: GroundSrc, x: number, y: number, m: TerrainAtlas = ATLAS): Placed[] {
 	const eligible = (tx: number, ty: number): [number, number, string] | null => {
 		if (at(g, tx, ty) !== 'lake') return null;
 		const land = SIDES.filter(([dx, dy]) => at(g, tx + dx, ty + dy) !== 'lake');
@@ -396,4 +403,103 @@ export function allSprites(g: GroundGrid, m: TerrainAtlas = ATLAS, built?: Set<s
 			items.push(...props, ...(skip ? [] : decorSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
 		}
 	return items.sort((a, b) => a.bottom - b.bottom || a.x - b.x);
+}
+
+// ------------------------------------------------------------------ the map, in chunks
+/** The map is drawn in square chunks of this many tiles (a 768 px canvas each), only near the screen. */
+export const CHUNK_TILES = 16;
+/**
+ * How far from a chunk the drawing can depend on the ground: the deepest ring (2), a neighbour's neighbour for docks (3)
+ * and the margin of `fits` all stay inside 5 tiles, so a chunk's picture is a function of the ground in chunk + 5.
+ */
+export const CHUNK_HALO = 5;
+/** Sprites of tiles this close to a chunk can reach into it (a pier is under one tile long). */
+const SPRITE_REACH = 2;
+
+export const chunkOf = (tile: number): number => Math.floor(tile / CHUNK_TILES);
+
+const groundCache = new WeakMap<World, GroundFn>();
+
+/**
+ * The ground of every tile of a World, the way buildGroundGrid derives it for an array: an explored tile has its own ground
+ * (a building on an old Grounds lot takes the land around it), an unexplored tile next to explored land is 'mist', the rest
+ * is nothing. Cached per World (and per tile), so drawing a chunk does not recompute the same neighbours again and again.
+ */
+export function worldGround(world: World): GroundFn {
+	let fn = groundCache.get(world);
+	if (!fn) {
+		const memo = new Map<number, Ground | null>();
+		const nameAt = (x: number, y: number): OwnedName => nameOf(getTile(world, x, y));
+		fn = (x, y) => {
+			if (!inRange(x, y)) return null;
+			const key = tileKey(x, y);
+			const known = memo.get(key);
+			if (known !== undefined) return known;
+			const own = nameAt(x, y);
+			let ground: Ground | null;
+			if (own === 'building') ground = foundation(nameAt, x, y);
+			else if (own) ground = own;
+			else ground = SIDES.some(([dx, dy]) => nameAt(x + dx, y + dy) != null) ? 'mist' : null;
+			memo.set(key, ground);
+			return ground;
+		};
+		groundCache.set(world, fn);
+	}
+	return fn;
+}
+
+/**
+ * One character per tile of the chunk and its halo: changes exactly when the chunk's picture changes (the ground, and which
+ * tiles carry a building, upper case), not on chest toggles, resources, ... Only letters mean there is something to draw.
+ */
+export function chunkSignature(world: World, cx: number, cy: number): string {
+	const g = worldGround(world);
+	const x0 = cx * CHUNK_TILES - CHUNK_HALO;
+	const y0 = cy * CHUNK_TILES - CHUNK_HALO;
+	const n = CHUNK_TILES + 2 * CHUNK_HALO;
+	let out = '';
+	for (let y = y0; y < y0 + n; y++) {
+		for (let x = x0; x < x0 + n; x++) {
+			const gr = g(x, y);
+			if (!gr) {
+				out += '.';
+				continue;
+			}
+			const c = String.fromCharCode(97 + rankOf(gr));
+			out += isBuilt(getTile(world, x, y)) ? c.toUpperCase() : c;
+		}
+		out += '/';
+	}
+	return out;
+}
+
+/** Foundation pads of the building tiles inside the chunk. */
+export function chunkPads(world: World, cx: number, cy: number): Placed[] {
+	const out: Placed[] = [];
+	const nameAt = (x: number, y: number): OwnedName => nameOf(getTile(world, x, y));
+	for (let y = cy * CHUNK_TILES; y < (cy + 1) * CHUNK_TILES; y++) {
+		for (let x = cx * CHUNK_TILES; x < (cx + 1) * CHUNK_TILES; x++) {
+			const tile = getTile(world, x, y);
+			if (!tile || !isBuilt(tile)) continue;
+			// a lot on its own biome gets that biome's pad; an old Grounds lot the pad of the land around it
+			const kind = isGroundsLot(tile) ? foundation(nameAt, x, y) : (FOUNDATION_ORDER as readonly string[]).includes(tile.biome) ? tile.biome : 'plains';
+			out.push({ id: `pad_${kind}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
+		}
+	}
+	return out;
+}
+
+/** Props, decorations and docks that can touch the chunk (those of tiles up to SPRITE_REACH away too), bottom edge first. */
+export function chunkSprites(world: World, cx: number, cy: number, m: TerrainAtlas = ATLAS): Placed[] {
+	const g = worldGround(world);
+	const items: Placed[] = [];
+	for (let y = cy * CHUNK_TILES - SPRITE_REACH; y < (cy + 1) * CHUNK_TILES + SPRITE_REACH; y++) {
+		for (let x = cx * CHUNK_TILES - SPRITE_REACH; x < (cx + 1) * CHUNK_TILES + SPRITE_REACH; x++) {
+			if (!g(x, y)) continue;
+			const built = isBuilt(getTile(world, x, y));
+			const props = built ? [] : tileSprites(g, x, y, m);
+			items.push(...props, ...(built ? [] : decorSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
+		}
+	}
+	return items.sort((a, b) => a.bottom - b.bottom || a.x - b.x || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }

@@ -1,15 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, setResources, owned, store } from './helpers';
+import { api, freshGame, growTo, setResources, owned, store, tileAt, gridCells, rawSnapshot } from './helpers';
 import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
 import { decodeSave, encodeSave } from '../src/lib/saveFormat';
-import { CASTLE_UPGRADE, GRID_CENTER_X, GRID_CENTER_Y, RESOURCE_CAP } from '../src/config/gameConfig';
+import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { COMBAT } from '../src/config/combatConfig';
 import { emptyBag } from '../src/lib/inventory';
+import { ownedCount, patchTile, setTile } from '../src/utils/world';
 
 /** A plain JSON copy of a (valid) persisted game, as it would come out of a save file. */
-const snapshot = () => JSON.parse(JSON.stringify(pickPersisted(api())));
+const snapshot = () => rawSnapshot();
 
 const rejects = (mutate: (raw: any) => void, label: string) => { // eslint-disable-line @typescript-eslint/no-explicit-any
 	const raw = snapshot();
@@ -27,7 +28,7 @@ test('a normally played game passes validation unchanged', () => {
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 	if (result.ok) {
 		assert.equal(result.state.resources.gold, raw.resources.gold);
-		assert.equal(result.state.tiles.flat().filter((t) => t.isOwned).length, owned());
+		assert.equal(ownedCount(result.state.tiles), owned());
 	}
 });
 
@@ -68,14 +69,14 @@ test('tampered saves are rejected', () => {
 	rejects((r) => (r.characterStats.strength += 50), 'extra strength points');
 	rejects((r) => (r.characterStats.availablePoints += 50), 'extra available points');
 	rejects((r) => (r.characterStats.charisma = 2.5), 'fractional stat');
-	rejects((r) => (r.tiles[GRID_CENTER_Y][GRID_CENTER_X].level = CASTLE_UPGRADE.maxLevel + 1), 'castle above max level');
-	rejects((r) => (r.tiles[GRID_CENTER_Y][GRID_CENTER_X].level = 0), 'castle level 0');
+	rejects((r) => (r.tiles[CASTLE_Y][CASTLE_X].level = CASTLE_UPGRADE.maxLevel + 1), 'castle above max level');
+	rejects((r) => (r.tiles[CASTLE_Y][CASTLE_X].level = 0), 'castle level 0');
 	rejects((r) => (r.tiles[0][0] = { biome: 'forest', isOwned: true }), 'territory not connected to the castle');
 	rejects((r) => (r.tiles[0][1] = { biome: 'castle', isOwned: true, level: 1 }), 'second castle');
 	rejects((r) => (r.tiles[0][0] = { biome: 'empty', isOwned: false, building: 'market', level: 2 }), 'building on an unowned tile');
 	rejects((r) => (r.tiles[0][0] = { biome: 'forest', isOwned: false }), 'unowned tile with a biome');
-	rejects((r) => (r.tiles[GRID_CENTER_Y][GRID_CENTER_X + 1] = { biome: 'forest', isOwned: true, building: 'market', level: 2 }), 'building on a forest');
-	rejects((r) => (r.tiles[GRID_CENTER_Y][GRID_CENTER_X + 1].hasChest = 'yes'), 'bad chest flag');
+	rejects((r) => (r.tiles[CASTLE_Y][CASTLE_X + 1] = { biome: 'forest', isOwned: true, building: 'market', level: 2 }), 'building on a forest');
+	rejects((r) => (r.tiles[CASTLE_Y][CASTLE_X + 1].hasChest = 'yes'), 'bad chest flag');
 	rejects((r) => (r.farmLevels = { dragon: 3 }), 'unknown animal');
 	rejects((r) => (r.farmLevels = { chicken: -4 }), 'negative animals');
 	rejects((r) => (r.clickLevel = 9), 'click level above the ladder');
@@ -100,7 +101,7 @@ test('derived values cannot be forged: rates, reputation, level, combat stats an
 	raw.characterStats.hp = 1e9;
 	raw.characterStats.tileCostDiscount = 99;
 	raw.level = { level: 99, progress: 0.5 };
-	raw.tiles[GRID_CENTER_Y][GRID_CENTER_X].upgradeCost = { gold: 1 };
+	raw.tiles[CASTLE_Y][CASTLE_X].upgradeCost = { gold: 1 };
 	const result = sanitizeSave(raw);
 	assert.equal(result.ok, true);
 	if (!result.ok) return;
@@ -108,7 +109,7 @@ test('derived values cannot be forged: rates, reputation, level, combat stats an
 	assert.ok(result.state.characterStats.hp < 100);
 	assert.ok(result.state.characterStats.tileCostDiscount <= 25);
 	assert.equal(result.state.level.level, api().level.level);
-	assert.ok((result.state.tiles[GRID_CENTER_Y][GRID_CENTER_X].upgradeCost?.gold ?? 0) > 1);
+	assert.ok((tileAt(result.state.tiles, CASTLE_X, CASTLE_Y).upgradeCost?.gold ?? 0) > 1);
 });
 
 test('a save one level-up behind (written between a purchase and the next tick) is repaired, a far-behind one is rejected', () => {
@@ -131,7 +132,7 @@ test('export -> decode accepts a real save and rejects edited / foreign ones', (
 	const file = encodeSave(pickPersisted(api()));
 	const parsed = decodeSave(file);
 	assert.equal(parsed.ok, true, parsed.ok ? '' : parsed.reason);
-	if (parsed.ok) assert.equal(parsed.state.tiles.flat().filter((t: { isOwned: boolean }) => t.isOwned).length, owned());
+	if (parsed.ok) assert.equal(ownedCount(parsed.state.tiles), owned());
 
 	// swap one character for a different one: the check code catches it
 	const bad = decodeSave(file.slice(0, 50) + (file[50] === 'x' ? 'y' : 'x') + file.slice(51));
@@ -139,7 +140,7 @@ test('export -> decode accepts a real save and rejects edited / foreign ones', (
 	assert.equal(decodeSave('{"state":{}}').ok, false);
 
 	// a well-formed file whose content is impossible is rejected by validation
-	const forged = snapshot();
+	const forged = structuredClone(pickPersisted(api()));
 	forged.resources.gold = 1e300;
 	assert.equal(decodeSave(encodeSave(forged)).ok, false);
 });
@@ -149,12 +150,9 @@ const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'monsters', 'monsterSpawnTimer
 
 /** The n-th owned tile that is not the castle. */
 const spot = (n = 0) => {
-	const found: { x: number; y: number }[] = [];
-	api().tiles.forEach((row, y) =>
-		row.forEach((t, x) => {
-			if (t.isOwned && t.biome !== 'castle') found.push({ x, y });
-		})
-	);
+	const found = gridCells()
+		.filter(({ t }) => t.isOwned && t.biome !== 'castle')
+		.map(({ x, y }) => ({ x, y }));
 	return found[n];
 };
 
@@ -232,7 +230,7 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.playerHp = 1e6), 'playerHp above max');
 	bad((r) => (r.playerHp = NaN), 'playerHp NaN');
 	bad((r) => (r.playerHp = -1), 'negative playerHp');
-	bad((r) => (r.monsters[0].x = GRID_CENTER_X, r.monsters[0].y = GRID_CENTER_Y), 'monster on the castle');
+	bad((r) => (r.monsters[0].x = CASTLE_X, r.monsters[0].y = CASTLE_Y), 'monster on the castle');
 	bad((r) => (r.monsters[0].x = 0, r.monsters[0].y = 0), 'monster on an unowned tile');
 	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].hasChest = true), 'monster on a chest tile');
 	bad((r) => r.monsters.push({ ...r.monsters[0], id: 2, type: 'ratKing', tier: 1 }, { ...r.monsters[0], id: 3, type: 'ratKing', tier: 1 }), 'two kings on one tile');
@@ -271,9 +269,7 @@ test('a chest cannot share a tile with a monster', () => {
 	const { x, y } = spot();
 	store.setState({ monsters: [rat()] as never, nextMonsterId: 2 });
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		tiles[y][x] = { ...tiles[y][x], hasChest: true };
-		return { tiles, activeChests: 1 };
+		return { tiles: patchTile(s.tiles, x, y, { hasChest: true }), activeChests: 1 };
 	});
 	assert.equal(sanitizeSave(snapshot()).ok, false);
 });
@@ -282,10 +278,8 @@ test('a played game that started with the free ring passes validation (tiles, bu
 	api().resetGame(); // keep the starting ring
 	growTo(30);
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		const spot = tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
-		tiles[spot.y][spot.x] = { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 };
-		return { tiles };
+		const spot = gridCells(s.tiles).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+		return { tiles: setTile(s.tiles, spot.x, spot.y, { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 }) };
 	});
 	api().tick(60_000);
 	const result = sanitizeSave(snapshot());
@@ -295,7 +289,7 @@ test('a played game that started with the free ring passes validation (tiles, bu
 test('buildings on any land biome save and load; water, nonsense and stray levels are rejected; old Grounds lots (level 2) still load', () => {
 	api().resetGame();
 	growTo(12);
-	const spot = api().tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
 	const place = (tile: Record<string, unknown>) => (raw: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
 		raw.tiles[spot.y][spot.x] = { isOwned: true, ...tile };
 	};
@@ -312,5 +306,5 @@ test('buildings on any land biome save and load; water, nonsense and stray level
 	assert.equal(load({ biome: 'forest', building: 'nonsense' }).ok, false);
 	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok, false, 'level 2 only belongs to old Grounds lots');
 	assert.equal(load({ biome: 'forest', level: 2 }).ok, false, 'a level without a building');
-	rejects((raw) => { raw.tiles[GRID_CENTER_Y][GRID_CENTER_X].building = 'tavern'; }, 'a building on the castle');
+	rejects((raw) => { raw.tiles[CASTLE_Y][CASTLE_X].building = 'tavern'; }, 'a building on the castle');
 });

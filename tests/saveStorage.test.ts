@@ -2,12 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { api, freshGame, growTo, store } from './helpers';
+import { api, freshGame, growTo, store, gridCells } from './helpers';
 import { pickPersisted, type PersistedGame } from '../src/lib/sanitizeSave';
 import { MIGRATIONS, SAVE_PREFIX, SAVE_SCHEMA, decodeSave, encodeSave, migrateBody, packBody, sealWire } from '../src/lib/saveFormat';
 import { createSaveStorage, type KeyValue } from '../src/lib/saveStorage';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
+import { ownedCount, patchTile, setTile } from '../src/utils/world';
 
 const FIXTURES = resolve(__dirname, 'fixtures', 'saves');
 
@@ -18,14 +19,13 @@ const playedGame = (): PersistedGame => {
 	const bag = emptyBag();
 	bag[2] = { id: 'rattatui_tunic', qty: 1 };
 	store.setState((s) => {
-		const tiles = s.tiles.map((row) => [...row]);
-		const lots = tiles.flatMap((row, y) => row.map((t, x) => ({ t, x, y }))).filter(({ t }) => t.isOwned && t.biome !== 'castle');
-		tiles[lots[0].y][lots[0].x] = { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 };
-		tiles[lots[1].y][lots[1].x] = { ...tiles[lots[1].y][lots[1].x], hasChest: true };
+		const lots = gridCells(s.tiles).filter(({ t }) => t.isOwned && t.biome !== 'castle');
+		let tiles = setTile(s.tiles, lots[0].x, lots[0].y, { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 });
+		tiles = patchTile(tiles, lots[1].x, lots[1].y, { hasChest: true });
 		return { tiles, activeChests: 1, bag, equipment: { ...STARTER_EQUIPMENT, head: 'rattatui_cap' }, playerName: 'Zoë' } as never;
 	});
 	api().tick(60_000);
-	return JSON.parse(JSON.stringify(pickPersisted(api())));
+	return structuredClone(pickPersisted(api()));
 };
 
 /** A browser-like key/value store that can be told to refuse writes. */
@@ -69,7 +69,7 @@ test('the text is compact: only owned land is written, derived values are not', 
 	assert.equal('level' in body, false);
 	assert.equal('activeChests' in body, false);
 	assert.deepEqual(Object.keys(body.characterStats as object).sort(), ['availablePoints', 'charisma', 'dexterity', 'intelligence', 'strength', 'vitality']);
-	assert.equal((body.land as unknown[]).length, game.tiles.flat().filter((t) => t.isOwned).length);
+	assert.equal((body.land as [number, number, string][]).reduce((n, row) => n + row[2].length, 0), ownedCount(game.tiles));
 	assert.ok(encodeSave(game).length < 8000, 'a 16-tile game is a few KB');
 });
 
@@ -103,7 +103,7 @@ test('migrations upgrade old bodies step by step', () => {
 	assert.equal(decodeSave(v1, { schema: 2, migrations: table }).ok, true);
 	assert.equal(decodeSave(v1, { schema: 2, migrations: {} }).ok, false, 'a missing step is an error, not a guess');
 	assert.deepEqual(migrateBody({ a: 1 }, 1, 3, { 1: (b) => ({ ...b, b: 2 }), 2: (b) => ({ ...b, c: 3 }) }), { a: 1, b: 2, c: 3 });
-	assert.deepEqual(Object.keys(MIGRATIONS), [], 'schema 1 is the first; add a migration when SAVE_SCHEMA is bumped');
+	assert.deepEqual(Object.keys(MIGRATIONS), ['1'], 'one step per bump of SAVE_SCHEMA: 1 -> 2 turned the land list into runs');
 });
 
 test('every frozen save in tests/fixtures/saves still loads (the compatibility guard)', async () => {
@@ -113,7 +113,7 @@ test('every frozen save in tests/fixtures/saves still loads (the compatibility g
 	for (const file of files) {
 		const result = await parse(readFileSync(resolve(FIXTURES, file), 'utf8'));
 		assert.equal(result.ok, true, `${file}: ${result.ok ? '' : result.reason}`);
-		if (result.ok) assert.ok(result.state.tiles.flat().filter((t) => t.isOwned).length > 9, file);
+		if (result.ok) assert.ok(ownedCount(result.state.tiles) > 9, file);
 	}
 });
 
@@ -274,7 +274,7 @@ test('a save from the old encrypted vault is copied over once, then the vault is
 test('import replaces the save, keeps the old one as backup and blocks later autosaves', async () => {
 	const mine = playedGame();
 	freshGame();
-	const other: PersistedGame = JSON.parse(JSON.stringify(pickPersisted(api())));
+	const other: PersistedGame = structuredClone(pickPersisted(api()));
 	const { kv, data } = fakeKv({ [KEY]: encodeSave(mine) });
 	const s = createSaveStorage({ kv });
 	await s.storage.getItem('x');

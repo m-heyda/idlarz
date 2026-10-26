@@ -7,6 +7,8 @@ import {
 	BIOMES,
 	BUILDINGS,
 	BUILDING_COST,
+	CASTLE_FORTRESS,
+	CASTLE_RANGE,
 	CASTLE_UPGRADE,
 	CHARACTER_STAT_CONFIG,
 	CHEST,
@@ -18,6 +20,7 @@ import {
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
 	SCALING_CONFIG,
+	TILE_PRICE,
 	TILE_RESOURCE_COST,
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
@@ -74,6 +77,28 @@ const Tutorial: React.FC = () => {
 			</section>
 
 			<section>
+				<h3 className='px-h'>Menus &amp; Saving</h3>
+				<p className='text-[#d8c8a0] mb-2'>
+					The browser&apos;s own right-click menu is switched off in the game; the <b>right click</b> opens the game&apos;s menu instead.
+					Right-click a tile, a monster, a chest or a bag item for what you can do with it (the entries are listed in their sections),
+					and the same menu ends with the global entries. The gear button in the top bar opens the same global menu as a dropdown.
+				</p>
+				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
+					<li><b>Settings</b> and <b>Guide</b>: sound and ambient life, and this page.</li>
+					<li>
+						<b>Save game</b> writes the save right now. The game also saves itself a couple of seconds after every change and when you
+						close or hide the tab.
+					</li>
+					<li>
+						<b>Export game save</b> copies your whole game as one line of text to the clipboard; <b>Import / backup</b> pastes one back
+						(or saves it as a file).
+					</li>
+					<li><b>Show statistics</b> puts a small panel in the bottom right corner: FPS, slowest frame, tiles owned, monsters and time played.</li>
+					<li>Development builds also have <b>Show admin mode</b>, the cheat panel, which can be folded into an icon.</li>
+				</ul>
+			</section>
+
+			<section>
 				<h3 className='px-h'>Tiles &amp; Biomes</h3>
 				<p className='text-[#d8c8a0] mb-2'>
 					You start with the castle and its eight neighbours already yours. Every tile you buy becomes a biome and
@@ -112,8 +137,9 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Buildings</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					<b>Right-click</b> any explored tile (not the castle, not a lake, and not while a chest or a monster is on it) to open the build
-					menu. Pick one of {Object.keys(BUILDINGS).length} buildings: {Object.values(BUILDINGS).map((b) => b.label).join(', ')}. The tile
+					<b>Right-click</b> any explored tile (not the castle, not a lake, and not while a chest or a monster is on it) and choose{' '}
+					<b>Build here</b> to open the build window (<b>Highlight this area</b> in the same menu tints the connected area of that biome around the tile for a moment).
+					Pick one of {Object.keys(BUILDINGS).length} buildings: {Object.values(BUILDINGS).map((b) => b.label).join(', ')}. The tile
 					keeps its biome and its output and the building adds its own on top, with the same neighbour bonus; a patch in the
 					style of the biome (packed earth, trampled snow, a plank landing ...) is laid under it. One building per tile, and it is permanent.
 				</p>
@@ -135,7 +161,8 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-1'>
 					Each new tile costs more than the last: about x{SCALING_CONFIG.growthEarly} per tile you own up to{' '}
 					{SCALING_CONFIG.earlyTiles} tiles, then x{SCALING_CONFIG.growthLate} per tile up to {SCALING_CONFIG.lateTiles}, and
-					x{SCALING_CONFIG.growthEndgame} beyond that.
+					x{SCALING_CONFIG.growthEndgame} up to {TILE_PRICE.tailFrom}. After that the price keeps rising, but slowly, so there is no limit
+					to how far the map can grow.
 				</p>
 				<p className='text-[#d8c8a0] text-xs px-card font-mono'>
 					gold = {BASE_TILE_COST} x {SCALING_CONFIG.growthEarly}^min(tiles, {SCALING_CONFIG.earlyTiles}) x{' '}
@@ -172,7 +199,11 @@ const Tutorial: React.FC = () => {
 					{CASTLE_UPGRADE.maxLevel}. Upgrades cost resources and take real time (
 					{formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in total); the
 					castle keeps its current bonus while it is being built. From level 2 it also produces +
-					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1.
+					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1. The violet area around it is the castle&apos;s range: 3x3 at first, growing by a
+						tile on every side with each level from {CASTLE_RANGE.growFromLevel} (9x9 at level {CASTLE_UPGRADE.maxLevel}); from level{' '}
+						{CASTLE_FORTRESS.fromLevel} walls surround the inner 3x3 and no monsters or chests appear there. If you lose the castle while
+						exploring, an arrow at the edge of the screen points to it and <b>Back to castle</b> brings you home. Once the castle is at its maximum level, clicking it opens the Legacy
+					window, where you can rebirth.
 				</p>
 			</section>
 
@@ -184,7 +215,8 @@ const Tutorial: React.FC = () => {
 					{COMBAT.maxMonsters} on the map). A rat grows a tier every {formatTime(COMBAT.tierIntervalSec)} on the map (up to tier{' '}
 					{COMBAT.maxTier}): more HP ({MONSTERS.rat.hp} at tier 1, x{MONSTERS.rat.hpGrowth} per tier), harder hits and better rewards. A tier-{COMBAT.maxTier} rat
 					can grow into the <b>Rat King</b> ({pct(MONSTERS.ratKing.evolveChance)} every {formatTime(MONSTERS.ratKing.evolveCheckSec)}; only one at a time).
-					Click a monster to fight it.
+					Click a monster to fight it. Right-click it for <b>Dismiss</b>: after a confirmation the monster is removed from the map with
+					no reward, which frees a place when one is too strong for you and the map is full.
 				</p>
 				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
 					<li>
@@ -212,7 +244,8 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Gear &amp; Items</h3>
 				<p className='text-[#d8c8a0] mb-2'>
 					The Character window has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
-					and a 36-slot bag. Double-click or right-click a bag item to equip it (or drink a potion), click gear to take it off, drag to
+					and a 36-slot bag. Double-click a bag item to equip it (or drink a potion); right-click it for Equip / Drink, Sell one and{' '}
+					<b>Discard</b> (destroys it for good, after a confirmation, no gold). Click gear to take it off, drag to
 					rearrange. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
 					hover for a tooltip.
 				</p>

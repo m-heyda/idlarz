@@ -409,9 +409,18 @@ body {
 		animation: none;
 	}
 
-	.px-ripple {
+	.px-ripple,
+	.px-shimmer {
 		display: none;
 	}
+}
+
+/* A soft glitter over every open-water lake tile (WaterLayer): drifting light dashes, under the ripples, at half strength */
+.px-shimmer {
+	position: absolute;
+	z-index: 0;
+	pointer-events: none;
+	opacity: 0.55;
 }
 
 /* Water ripples on lakes and swamp pools (WaterLayer): the generic stepped sheet, placed on the map by the layer */
@@ -1429,11 +1438,98 @@ body {
 	}
 }
 
+/* A chest on a lake: no chest sprite on the water, but golden rings spreading from a glinting spot (clickable like a chest) */
+.tile-chest-ripple {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 10;
+	width: 60px;
+	height: 36px;
+	margin: -18px 0 0 -30px;
+	pointer-events: none;
+	filter: drop-shadow(0 0 6px rgba(255, 214, 90, 0.95));
+}
+
+.tile-chest-ripple::before {
+	content: '';
+	position: absolute;
+	inset: 8px 14px;
+	border-radius: 50%;
+	background: radial-gradient(closest-side, rgba(255, 244, 170, 0.95), rgba(255, 190, 60, 0.45) 60%, transparent);
+	animation: chest-halo 1.6s ease-in-out infinite alternate;
+}
+
+/* the glint at the centre: a small gold diamond that twinkles */
+.tile-chest-ripple::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 9px;
+	height: 9px;
+	margin: -5px 0 0 -5px;
+	background: #fff4b0;
+	border: 1px solid #ffb830;
+	box-shadow: 0 0 8px 3px rgba(255, 204, 70, 0.9);
+	transform: rotate(45deg);
+	animation: chest-glint 1.2s steps(4) infinite alternate;
+}
+
+@keyframes chest-glint {
+	from {
+		opacity: 0.55;
+		transform: rotate(45deg) scale(0.8);
+	}
+	to {
+		opacity: 1;
+		transform: rotate(45deg) scale(1.15);
+	}
+}
+
+.tile-chest-ripple i {
+	position: absolute;
+	inset: 0;
+	border: 3px solid rgba(255, 230, 120, 1);
+	border-radius: 50%;
+	box-shadow: 0 0 6px 1px rgba(255, 200, 70, 0.8), inset 0 0 5px rgba(255, 220, 110, 0.6);
+	opacity: 0;
+	transform: scale(0.2);
+	animation: chest-ring 2.4s ease-out infinite;
+}
+
+.tile-chest-ripple i:nth-child(2) {
+	animation-delay: 0.8s;
+}
+
+.tile-chest-ripple i:nth-child(3) {
+	animation-delay: 1.6s;
+}
+
+@keyframes chest-ring {
+	0% {
+		opacity: 0.95;
+		transform: scale(0.2);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(1);
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.level-orb,
 	.tile-chest,
-	.tile-chest-wrap::before {
+	.tile-chest-wrap::before,
+	.tile-chest-ripple::before,
+	.tile-chest-ripple::after {
 		animation: none;
+	}
+
+	.tile-chest-ripple i {
+		animation: none;
+		opacity: 0.7;
+		transform: scale(0.7);
 	}
 }
 

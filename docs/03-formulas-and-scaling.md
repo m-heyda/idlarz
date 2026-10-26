@@ -7,7 +7,8 @@ Notation: `n` = tiles owned (castle included), `L` = player level, `C` = castle 
 ## 1. Tile cost
 
 ```
-base(n)  = floor(55 × 1.45^min(n, 20) × 1.27^(min(n, 40) − 20, ≥0) × 1.17^max(n − 40, 0))   SCALING_CONFIG.costFormula
+base(n)  = floor(min(55 × 1.45^min(m, 20) × 1.27^(min(m, 40) − 20, ≥0) × 1.17^max(m − 40, 0) × (n / 100)^2.5 if n > 100, ceiling))
+           with m = min(n, 100)                                                              SCALING_CONFIG.costFormula (tilePrice)
 gold     = floor(base × (1 − discount%/100))
 extra    = floor(base × share × (1 − discount%/100))  for each TILE_RESOURCE_COST row with n ≥ from
 discount%= min(0.5 × Charisma, 25)
@@ -19,6 +20,8 @@ discount%= min(0.5 × Charisma, 25)
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | gold (cha 5) | 77 | 343 | 2.2 K | 14.1 K | 90.5 K | 299 K | 988 K | 10.8 M | 51 M |
 
+**The tail (no tile limit).** Up to 100 tiles the price is exactly the old three-stage exponential. Past `TILE_PRICE.tailFrom` (100) it grows like `(n / 100)^2.5` (`TILE_PRICE.tailExponent`) and is capped at `TILE_PRICE.ceiling` (`RESOURCE_CAP / 100`), so it is always finite and a map of tens of thousands of tiles stays buyable (tile 157 ≈ 4e11 instead of 1e15, tile 1,000 ≈ 4e13, tile 10,000 ≈ 1.4e16, tile 50,000 ≈ 8e17; table in [generated/balance-tables.md](generated/balance-tables.md)). `RESOURCE_CAP` was raised from 1e15 to 1e21 for it. There is no tile limit any more (see 02 §1, map). The numbers are first guesses for a game that will later be built around rebirths (bigger starting resources, much bigger maps): see BL16 in [05](05-balance-backlog-and-roadmap.md).
+
 Past 40 tiles growth drops from ×1.27 to ×1.17 per tile (`growthEndgame`, `lateTiles`), so tile 50 costs ~51 M instead of 118 M and tile 60 ~0.2 B instead of 1.5 B; the first 40 tiles are unchanged, so the pacing milestones in [06](06-playtest-and-pacing-report.md) still hold.
 
 Every purchase rolls its biome (no picker). XP and reputation per purchase in §2.
@@ -26,7 +29,7 @@ Every purchase rolls its biome (no picker). XP and reputation per purchase in §
 ## 2. XP and levels
 
 ```
-tileXP(k)   = 125 × 1.02^(k−1) × k/4          k = owned count AFTER the purchase
+tileXP(k)   = 125 × 1.02^(min(k,300)−1) × min(k,300)/4 × (k/300)^1.5 if k > 300      k = owned count AFTER the purchase (XP_TILE)
 awardedXP   = tileXP × (1 + xpGainMultiplier/100)
 xpGainMultiplier (%) = 0.2·INT + 0.25·CHA
 passive xp/s = rates.total.xp × (1 + xpGainMultiplier/100)
@@ -53,6 +56,8 @@ total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × legacyPointsEarned)    
 ```
 
 The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Everything is additive inside the single `(1 + Σ)`.
+
+`calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Legacy factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Stats tab's *Where the income comes from* section shows exactly these numbers per resource.
 
 **New game**: gold 0.2 base × 1.45 = **0.29/s**, wood and food 0.05 × 1.45, stone 0.1 × 1.325, xp 0.75 × 1.223 = 0.92/s.
 

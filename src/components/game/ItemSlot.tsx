@@ -20,7 +20,7 @@ interface ItemSlotProps {
 	draggable?: boolean;
 	onClick?: (event: React.MouseEvent) => void;
 	onDoubleClick?: () => void;
-	onContextMenu?: () => void;
+	onContextMenu?: (event: React.MouseEvent) => void;
 	onDragStart?: () => void;
 	onDrop?: () => void;
 }
@@ -83,7 +83,8 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				onContextMenu={(e) => {
 					if (!onContextMenu) return;
 					e.preventDefault();
-					onContextMenu();
+					setTip(null);
+					onContextMenu(e);
 				}}
 				style={def ? ({ '--glow': RARITY_COLOR[def.rarity], '--glow-blur': `${RARITIES[def.rarity].glow.blur}px`, '--glow-alpha': RARITIES[def.rarity].glow.alpha } as React.CSSProperties) : undefined}>
 				{def ? (

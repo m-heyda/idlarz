@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "sim": "tsx scripts/sim.ts",
+    "perf": "tsx scripts/perf-world.ts",
     "test": "tsx --test \"tests/**/*.test.ts\"",
     "report": "tsx scripts/balance-report.ts",
     "fight-sim": "tsx scripts/fight-sim.ts",

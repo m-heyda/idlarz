@@ -49,4 +49,34 @@ def water_ripple_swamp():
     return _strip(SWAMP, '#cfe08a', '#9bb556')
 
 
-SPRITES = {'water_ripple': water_ripple, 'water_ripple_swamp': water_ripple_swamp}
+SHIMMER_FRAMES = 4
+SHIMMER_CELL = 48
+
+
+def water_shimmer():
+    """A whole tile of open water, 4 frames: short light dashes that swell, drift a pixel to the right and fade.
+
+    WaterLayer lays one over every open-water lake tile (flipped and delayed per tile, so no two look alike). A dash is
+    light on the water, no outline; the layer shows it at half strength, so it reads as a soft glitter on the surface.
+    """
+    import random
+    rng = random.Random(7)  # fixed seed: the same strip every build
+    light, mid = C('#e2f7ff'), C('#9adcf6')
+    spots = []
+    while len(spots) < 11:
+        x, y, w = rng.randrange(5, 36), rng.randrange(4, 44), rng.choice((3, 4, 5))
+        if all(abs(y - sy) >= 5 or abs(x - sx) >= 9 for sx, sy, _ in spots):
+            spots.append((x, y, w))
+    img = Image.new('RGBA', (SHIMMER_CELL * SHIMMER_FRAMES, SHIMMER_CELL), (0, 0, 0, 0))
+    for f in range(SHIMMER_FRAMES):
+        for k, (x, y, w) in enumerate(spots):
+            phase = (k + f) % 4  # 0 grows, 1 full, 2 thins, 3 rests
+            if phase == 3:
+                continue
+            length, colour = {0: (w - 2, mid), 1: (w, light), 2: (w - 2, mid)}[phase]
+            for i in range(max(length, 2)):
+                img.putpixel((f * SHIMMER_CELL + x + f + i, y), colour)
+    return img
+
+
+SPRITES = {'water_ripple': water_ripple, 'water_ripple_swamp': water_ripple_swamp, 'water_shimmer': water_shimmer}

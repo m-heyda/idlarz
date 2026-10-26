@@ -20,6 +20,7 @@ import {
 } from '../src/utils/terrain';
 import type { BiomeType, Tile } from '../src/types/game';
 import parity from './fixtures/terrain-parity.json';
+import { worldFromRows } from '../src/utils/world';
 
 /** Builds a tile grid from rows of letters (the parity fixture's names); '.' is not owned. */
 const NAMES: Record<string, { biome: BiomeType; building?: string; level?: number }> = {
@@ -86,7 +87,7 @@ test('foundation: a building tile takes the most common land biome around it (la
 	const g4 = buildGroundGrid(grid(['GGG', 'GYG', 'GGG']));
 	assert.equal(g4[1][1], 'plains');
 	const tiles = grid(['TTT', 'TYT', 'TTT']);
-	assert.equal(foundationBiome(tiles, 1, 1), 'tundra');
+	assert.equal(foundationBiome(worldFromRows(tiles), 1, 1), 'tundra');
 	assert.deepEqual(allPads(tiles).map((p) => p.id.replace(/_\d$/, '')), ['pad_tundra']);
 	assert.equal(allSprites(buildGroundGrid(tiles), undefined, builtSet(tiles)).filter((s) => s.x >= 48 && s.x < 96 && s.bottom > 48 && s.bottom <= 96).length, 0);
 });
