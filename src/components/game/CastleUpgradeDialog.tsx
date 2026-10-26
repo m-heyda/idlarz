@@ -4,7 +4,7 @@ import { CASTLE_UPGRADE } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber, formatTime } from '@/utils/formatters';
 import { castleModifier, castleUpgradeDuration } from '@/utils/gameUtils';
-import { castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
+import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import audioManager from '@/utils/audioManager';
 import PixelModal from './PixelModal';
 import ResourceIcon from './ResourceIcon';
@@ -149,6 +149,12 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 							<div>
 								Castle range: <span className='text-violet-300'>{rangeLabel(currentRange)}</span> {'→'}{' '}
 								<span className='text-violet-300'>{rangeLabel(nextRange)}</span>
+							</div>
+						)}
+						{castleAreaBonus(castleLevel + 1) > castleAreaBonus(castleLevel) && (
+							<div>
+								Castle area production: <span className='text-violet-300'>+{castleAreaBonus(castleLevel) * 100}%</span> {'→'}{' '}
+								<span className='text-violet-300'>+{castleAreaBonus(castleLevel + 1) * 100}%</span>
 							</div>
 						)}
 					</div>

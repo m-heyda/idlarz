@@ -1,11 +1,10 @@
 // Remembered view options (not game state): plain booleans in localStorage, every access guarded
 // (private windows and blocked storage throw, and the server render has no window).
 
-export type UiPrefKey = 'showStats' | 'showAdmin' | 'adminCollapsed' | 'showMinimap';
+export type UiPrefKey = 'showAdmin' | 'adminCollapsed' | 'showMinimap';
 
-/** What a first visit (and the server render) sees: the dev admin panel starts open, the statistics panel off, the minimap on */
+/** What a first visit (and the server render) sees: the dev admin panel starts open, the minimap on */
 export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
-	showStats: false,
 	showAdmin: true,
 	adminCollapsed: false,
 	showMinimap: true,

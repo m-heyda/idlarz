@@ -17,7 +17,7 @@ export interface Insets {
 	right: number;
 	bottom: number;
 	left: number;
-	/** A box in the bottom right corner (the minimap and statistics) the arrow stays out of */
+	/** A box in the bottom right corner (the minimap) the arrow stays out of */
 	avoid?: Size;
 }
 

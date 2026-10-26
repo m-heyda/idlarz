@@ -123,14 +123,14 @@ export const HeaderButtons: React.FC = () => {
 			: []),
 		{
 			icon: 'menu_settings',
-			title: 'Game menu: settings, save, export, statistics',
+			title: 'Game menu: settings, save, export',
 			active: settingsOpen,
 			anchor: true,
 			onClick: (event) => {
 				const ui = useUiStore.getState();
 				if (ui.contextMenu) return ui.closeContextMenu();
 				const box = event.currentTarget.getBoundingClientRect();
-				openMenuAt(box.right - 4, box.bottom + 4, 'Menu');
+				openMenuAt(box.right - 4, box.bottom + 4, 'Menu', [], true);
 			},
 		},
 	];

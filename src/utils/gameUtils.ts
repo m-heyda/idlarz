@@ -40,6 +40,7 @@ import {
 	Tile,
 	TileCost,
 } from '@/types/game';
+import { castleAreaBonus, castleLevelOf, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
 import { RING, generateStartRing } from '@/utils/biomeRules';
 import {
 	EMPTY_WORLD,
@@ -361,9 +362,11 @@ export interface ResourceBreakdownEntry {
 	biome: number;
 	/** Buildings, with the adjacency bonus and the yield scale applied */
 	building: number;
+	/** What the castle area bonus adds on the tiles (and their buildings) inside the castle range */
+	castleArea: number;
 	/** Flat XP from castle levels above 1 */
 	castleXp: number;
-	/** start + farm + biome + building + castleXp */
+	/** start + farm + biome + building + castleArea + castleXp */
 	base: number;
 	/** Percentage bonuses (0.2 = +20%), added together before the legacy multiplier */
 	castleMod: number;
@@ -382,6 +385,48 @@ const RESOURCE_KEYS = Object.keys(BASE_GENERATION_RATES) as (keyof Resources)[];
 const FARM_KEYS = ['meat', 'eggs', 'milk', 'hide'] as const;
 
 const zeroResources = (): Resources => ({ gold: 0, wood: 0, stone: 0, coal: 0, food: 0, meat: 0, eggs: 0, milk: 0, hide: 0, xp: 0 });
+
+/** What one tile produces per second (before the global modifiers), split into the part that is its own and the bonuses on it. */
+export interface TileOutput {
+	/** The biome's and the building's own output (with the yield scale) */
+	base: Partial<Resources>;
+	/** Extra from adjacent tiles of the same biome */
+	neighbour: Partial<Resources>;
+	/** Extra from the castle area bonus (0 outside the range or below castle level 7) */
+	area: Partial<Resources>;
+	/** The adjacency step count, and the area bonus as a fraction (1 = +100%) */
+	adjacent: number;
+	areaBonus: number;
+}
+
+/** The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it. */
+export const calculateTileOutput = (tiles: World, x: number, y: number, castleLevel: number): TileOutput | null => {
+	const tile = getTile(tiles, x, y);
+	if (!tile) return null;
+	const adjacent = countAdjacentSameBiomes(tiles, x, y, tile.biome);
+	const adjacency = 1 + SCALING_CONFIG.adjacencyBonus * adjacent;
+	const areaBonus = inCastleRange(x, y, castleLevel) ? castleAreaBonus(castleLevel) : 0;
+	const yieldScale = tile.biome === 'castle' ? 1 : BIOME_YIELD.scale;
+	const out: TileOutput = { base: {}, neighbour: {}, area: {}, adjacent, areaBonus };
+	const add = (resource: string, rate: number | undefined, scale: number) => {
+		if (!rate) return;
+		const key = resource as keyof Resources;
+		const own = rate * scale;
+		const withNeighbours = own * adjacency;
+		out.base[key] = (out.base[key] || 0) + own;
+		out.neighbour[key] = (out.neighbour[key] || 0) + (withNeighbours - own);
+		out.area[key] = (out.area[key] || 0) + withNeighbours * areaBonus;
+	};
+	for (const [resource, rate] of Object.entries(BIOMES[tile.biome].resourceGeneration)) add(resource, rate as number, yieldScale);
+	// A building adds its own output on top of the tile's biome output, with the same neighbour bonus
+	const building = tile.building ? BUILDINGS[tile.building as BuildingType] : undefined;
+	if (building?.resourceGeneration) {
+		for (const [resource, rate] of Object.entries(building.resourceGeneration)) {
+			if (typeof rate === 'number') add(resource, rate, BIOME_YIELD.scale);
+		}
+	}
+	return out;
+};
 
 /** Income per second of every resource, split into its sources and modifiers (the one place the income formula lives). */
 export const calculateResourceBreakdown = (
@@ -456,6 +501,22 @@ export const calculateResourceBreakdown = (
 	const castleLevel = castleTile && castleTile.biome === 'castle' && castleTile.level ? castleTile.level : 1;
 	const castleBonus = castleModifier(castleLevel);
 
+	// The castle area bonus: the tiles inside the range (at most 9x9) add their output once more per range step
+	const areaPart = zeroResources();
+	if (castleAreaBonus(castleLevel) > 0) {
+		const radius = castleRangeRadius(castleLevel);
+		for (let y = CASTLE_Y - radius; y <= CASTLE_Y + radius; y++) {
+			for (let x = CASTLE_X - radius; x <= CASTLE_X + radius; x++) {
+				const output = calculateTileOutput(tiles, x, y, castleLevel);
+				if (!output) continue;
+				for (const [resource, gain] of Object.entries(output.area)) {
+					base[resource as keyof Resources] += gain;
+					areaPart[resource as keyof Resources] += gain;
+				}
+			}
+		}
+	}
+
 	// Castle levels above 1 add flat XP/s
 	const castleXp = CASTLE_UPGRADE.xpBonus * Math.max(castleLevel - 1, 0);
 	base.xp += castleXp;
@@ -484,6 +545,7 @@ export const calculateResourceBreakdown = (
 			farm: farmPart[key],
 			biome: biomePart[key],
 			building: buildingPart[key],
+			castleArea: areaPart[key],
 			castleXp: key === 'xp' ? castleXp : 0,
 			base: base[key],
 			castleMod: castleBonus,
@@ -516,39 +578,21 @@ export const calculateResourceRates = (
 	return { base, modifiers, total };
 };
 
-// Per-second output of one owned tile (biome + building, adjacency bonus, global modifiers).
-// Used for the tile-tap bonus and the tile tooltip. XP is excluded on purpose.
+// Per-second output of one owned tile (biome + building, adjacency and castle area bonus, global modifiers).
+// Used for the tile-tap bonus. XP is excluded on purpose.
 export const calculateTileTapYield = (
 	tiles: World,
 	x: number,
 	y: number,
 	rates: ResourceRates
 ): Partial<Resources> => {
-	const tile = getTile(tiles, x, y);
-	if (!tile) return {};
-
+	const output = calculateTileOutput(tiles, x, y, castleLevelOf(tiles));
+	if (!output) return {};
 	const out: Partial<Resources> = {};
-	const adjacent = countAdjacentSameBiomes(tiles, x, y, tile.biome);
-	const adjacency = 1 + SCALING_CONFIG.adjacencyBonus * adjacent;
-	const addRate = (resource: string, rate: number) => {
-		if (!rate || resource === 'xp') return;
-		const key = resource as keyof Resources;
-		out[key] =
-			(out[key] || 0) +
-			rate * adjacency * yieldScale * (1 + (rates.modifiers[key] || 0));
-	};
-	const yieldScale = tile.biome === 'castle' ? 1 : BIOME_YIELD.scale;
-
-	Object.entries(BIOMES[tile.biome].resourceGeneration).forEach(([resource, rate]) =>
-		addRate(resource, rate as number)
-	);
-	if (tile.building) {
-		const building = BUILDINGS[tile.building as BuildingType];
-		if (building?.resourceGeneration) {
-			Object.entries(building.resourceGeneration).forEach(([resource, rate]) =>
-				addRate(resource, rate as number)
-			);
-		}
+	for (const resource of Object.keys(output.base) as (keyof Resources)[]) {
+		if (resource === 'xp') continue;
+		const perSecond = (output.base[resource] || 0) + (output.neighbour[resource] || 0) + (output.area[resource] || 0);
+		if (perSecond) out[resource] = perSecond * (1 + (rates.modifiers[resource] || 0));
 	}
 	return out;
 };

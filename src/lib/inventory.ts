@@ -1,6 +1,6 @@
 import { COMBAT } from '@/config/combatConfig';
-import { ITEM_CATALOG, STARTER_BAG_ITEMS, setBonusStats, setCounts, sumStats, type StatTotals } from '@/catalog';
-import type { BagSlot, Equipment, EquipmentSlot } from '@/types/game';
+import { ITEM_CATALOG, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, type ItemStats, type StatTotals } from '@/catalog';
+import type { BagSlot, Equipment, EquipmentSlot, ItemDef } from '@/types/game';
 
 // Pure bag / equipment operations. Nothing here mutates its arguments; every function returns fresh arrays and objects.
 
@@ -72,6 +72,13 @@ export const moveSlot = (bag: BagSlot[], from: number, to: number): BagSlot[] =>
 	return next;
 };
 
+/** The gear slot an item goes into: rings take the first free ring slot (else replace the first), everything else its own slot. */
+export const targetSlot = (def: ItemDef, equipment: Equipment): EquipmentSlot | null => {
+	if (!def.slot) return null;
+	if (def.slot === 'ring') return !equipment.ring1 ? 'ring1' : !equipment.ring2 ? 'ring2' : 'ring1';
+	return def.slot;
+};
+
 /** Equips the gear in a bag slot, sending whatever was in that gear slot back into the freed bag slot. */
 export const equipFromBag = (
 	bag: BagSlot[],
@@ -81,14 +88,8 @@ export const equipFromBag = (
 	if (!validIndex(bag, index)) return null;
 	const entry = bag[index];
 	const def = entry ? ITEM_CATALOG[entry.id] : undefined;
-	if (!entry || !def || !def.slot) return null;
-
-	let target: EquipmentSlot;
-	if (def.slot === 'ring') {
-		target = !equipment.ring1 ? 'ring1' : !equipment.ring2 ? 'ring2' : 'ring1';
-	} else {
-		target = def.slot;
-	}
+	const target = def ? targetSlot(def, equipment) : null;
+	if (!entry || !def || !target) return null;
 
 	const displaced = equipment[target];
 	const nextBag = bag.map((slot) => (slot ? { ...slot } : null));
@@ -119,4 +120,27 @@ export const aggregateStats = (equipment: Equipment): StatTotals & { setCount: n
 	const counts = setCounts(equipment);
 	const total = sumStats(...worn, setBonusStats(counts));
 	return { ...total, setCount: Math.max(0, ...Object.values(counts)) };
+};
+
+/** What wearing a piece of gear would change: the slot it takes, what is in it now, and the change of every stat (set bonuses included). */
+export interface ItemComparison {
+	slot: EquipmentSlot;
+	equippedId?: string;
+	/** Only the stats that change; positive is better */
+	deltas: ItemStats;
+}
+
+/** Compares a piece of gear with what is worn in the slot it would take; null for anything that is not gear. */
+export const compareToEquipped = (itemId: string, equipment: Equipment): ItemComparison | null => {
+	const def = ITEM_CATALOG[itemId];
+	const slot = def ? targetSlot(def, equipment) : null;
+	if (!def || !slot) return null;
+	const before = aggregateStats(equipment);
+	const after = aggregateStats({ ...equipment, [slot]: itemId });
+	const deltas: ItemStats = {};
+	for (const key of STAT_KEYS) {
+		const delta = Math.round((after[key] - before[key]) * 100) / 100;
+		if (delta) deltas[key] = delta;
+	}
+	return { slot, equippedId: equipment[slot], deltas };
 };

@@ -119,8 +119,8 @@ const Tile: React.FC<TileProps> = ({
 			return;
 		}
 
-		// Tapping an owned tile also yields a slice of that tile's own output (rate-limited per tile)
-		if (isOwned) {
+		// Tapping an owned tile also yields a slice of that tile's own output (rate-limited per tile); the castle opens its dialog instead
+		if (isOwned && biome !== 'castle') {
 			const tap = tapTile(x, y, {
 				eventId: e.nativeEvent.timeStamp,
 				now: performance.now(),

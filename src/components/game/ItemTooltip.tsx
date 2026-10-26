@@ -1,11 +1,15 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { EQUIPMENT_SLOT_LABEL, ITEM_CATALOG, SETS, RARITIES, formatStat, formatStats, setCounts } from '@/catalog';
+import { EQUIPMENT_SLOT_LABEL, ITEM_CATALOG, SETS, RARITIES, STAT_KEYS, formatStat, formatStatDelta, formatStats, setCounts } from '@/catalog';
+import { compareToEquipped } from '@/lib/inventory';
 import ResourceIcon from './ResourceIcon';
 import { RARITY_COLOR } from './itemUi';
 
-/** The body of an item hover card (name, slot, stats, set progress, description, sell value). */
-const ItemTooltipBody: React.FC<{ itemId: string }> = ({ itemId }) => {
+/**
+ * The body of an item hover card (name, slot, stats, set progress, description, sell value). With `compare` (the bag) it
+ * also shows what wearing the item instead of the gear in its slot would change: green for better, red for worse.
+ */
+const ItemTooltipBody: React.FC<{ itemId: string; compare?: boolean }> = ({ itemId, compare }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const def = ITEM_CATALOG[itemId];
 	if (!def) return null;
@@ -14,6 +18,8 @@ const ItemTooltipBody: React.FC<{ itemId: string }> = ({ itemId }) => {
 	const equippedIds = Object.values(equipment);
 	const set = def.set ? SETS[def.set] : undefined;
 	const setCount = set ? (setCounts(equipment)[set.id] ?? 0) : 0;
+	const comparison = compare ? compareToEquipped(itemId, equipment) : null;
+	const changed = comparison ? STAT_KEYS.filter((key) => comparison.deltas[key]) : [];
 
 	return (
 		<div className='text-sm' style={{ minWidth: 200 }}>
@@ -30,6 +36,24 @@ const ItemTooltipBody: React.FC<{ itemId: string }> = ({ itemId }) => {
 						{formatStat(stat, value as number)}
 					</div>
 				))}
+			{comparison && (
+				<div className='mt-1 pt-1 border-t px-rule text-xs'>
+					<div className='px-tip-muted'>
+						{comparison.equippedId
+							? `Compared to ${ITEM_CATALOG[comparison.equippedId]?.name ?? 'equipped'}`
+							: `Compared to an empty ${EQUIPMENT_SLOT_LABEL[comparison.slot]} slot`}
+					</div>
+					{changed.length === 0 && <div className='px-tip-muted'>No change</div>}
+					{changed.map((key) => {
+						const delta = comparison.deltas[key] as number;
+						return (
+							<div key={key} className={delta > 0 ? 'text-green-400' : 'text-red-400'}>
+								{formatStatDelta(key, delta)}
+							</div>
+						);
+					})}
+				</div>
+			)}
 			{def.consumable && <div className='text-green-400 text-xs'>Restores {def.consumable.healHp} HP</div>}
 
 			{set && (

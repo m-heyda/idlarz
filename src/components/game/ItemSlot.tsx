@@ -18,6 +18,8 @@ interface ItemSlotProps {
 	equipped?: boolean;
 	locked?: boolean;
 	draggable?: boolean;
+	/** The hover card compares the item with the gear worn in its slot (the bag) */
+	compare?: boolean;
 	onClick?: (event: React.MouseEvent) => void;
 	onDoubleClick?: () => void;
 	onContextMenu?: (event: React.MouseEvent) => void;
@@ -34,6 +36,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 	equipped,
 	locked,
 	draggable,
+	compare,
 	onClick,
 	onDoubleClick,
 	onContextMenu,
@@ -105,7 +108,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 							top: Math.min(tip.y + 16, window.innerHeight - 300),
 						}}>
 						<div className='px-tooltip'>
-							{def ? <ItemTooltipBody itemId={def.id} /> : <div className='px-tip-muted text-sm'>{label}</div>}
+							{def ? <ItemTooltipBody itemId={def.id} compare={compare} /> : <div className='px-tip-muted text-sm'>{label}</div>}
 						</div>
 					</div>,
 					document.body

@@ -66,6 +66,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 					itemId={slot?.id}
 					qty={slot?.qty}
 					draggable
+					compare
 					onDragStart={() => setDrag({ kind: 'bag', index: i })}
 					onDrop={() => drop(i)}
 					onDoubleClick={() => activate(i)}

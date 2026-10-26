@@ -402,6 +402,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			const tile = getTile(tiles, x, y);
 			if (!tile || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
 			if (isInWard(x, y, castleLevel)) return fail('monster inside the castle ward');
+			// monsters never stand on a building: one a save from an older version left there is dropped, not a reason to refuse the save
+			if (tile.building) continue;
 			if (ids.has(id) || spots.has(`${x},${y}`)) return fail('duplicate monster');
 			ids.add(id);
 			spots.add(`${x},${y}`);

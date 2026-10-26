@@ -124,7 +124,7 @@ const MinimapBody: React.FC = () => {
 	);
 };
 
-/** The overview of the whole explored map (bottom right, above the statistics), switched on and off in the global menu. */
+/** The overview of the whole explored map (bottom right), switched on and off in the global menu. */
 const Minimap: React.FC = () => {
 	const show = useUiStore((state) => state.showMinimap);
 	return show ? <MinimapBody /> : null;
