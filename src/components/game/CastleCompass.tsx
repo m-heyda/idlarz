@@ -6,7 +6,7 @@ import '@/styles/CastleCompass.css';
 /** Breathing room (px) between the header and the free part of the screen */
 const HEADER_FALLBACK_PX = 56;
 
-/** The parts of the window the arrow must stay out of: the header on top and the minimap/statistics stack bottom right. */
+/** The parts of the window the arrow must stay out of: the header on top and the minimap stack bottom right. */
 const readInsets = (): Insets => {
 	const header = parseFloat(document.documentElement.style.getPropertyValue('--header-h')) || HEADER_FALLBACK_PX;
 	const stack = document.querySelector<HTMLElement>('[data-bottom-right-stack]');
@@ -40,7 +40,7 @@ const CastleCompass: React.FC = () => {
 		};
 		update();
 		const unsubscribe = useViewStore.subscribe(update);
-		// the minimap and statistics change size (shown, hidden, a different map): the arrow keeps out of their way
+		// the minimap changes size (shown, hidden, a different map): the arrow keeps out of their way
 		const stack = document.querySelector('[data-bottom-right-stack]');
 		const observer = typeof ResizeObserver !== 'undefined' && stack ? new ResizeObserver(update) : null;
 		if (observer && stack) observer.observe(stack);

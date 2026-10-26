@@ -53,7 +53,7 @@ for (const [name, dx, dy, ok] of DIRECTIONS) {
 			// on the border of the shrunk screen, or slid along it out of the minimap box
 			const onBorder = Math.abs(a.x - ARROW_MARGIN) < 1 || Math.abs(a.x - (W - ARROW_MARGIN)) < 1 || Math.abs(a.y - (INSETS.top + ARROW_MARGIN)) < 1 || Math.abs(a.y - (H - ARROW_MARGIN)) < 1 || a.y <= H - 300 - ARROW_MARGIN + 1 || a.x <= W - 200 - ARROW_MARGIN + 1;
 			assert.ok(onBorder, `${a.x},${a.y}`);
-			// never in the box of the minimap and statistics
+			// never in the box of the minimap
 			assert.ok(!(a.x > W - 200 - ARROW_MARGIN + 1e-6 && a.y > H - 300 - ARROW_MARGIN + 1e-6), `${a.x},${a.y} is in the minimap box`);
 			// the distance is the real one, in tiles
 			const expected = Math.round(Math.hypot(dx * 120, dy * 90));

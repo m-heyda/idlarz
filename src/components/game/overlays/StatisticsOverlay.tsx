@@ -36,6 +36,7 @@ const BreakdownBody: React.FC<{ entry: ResourceBreakdownEntry }> = ({ entry }) =
 		['Farm animals', entry.farm],
 		['Biome tiles', entry.biome],
 		['Buildings', entry.building],
+		['Castle area', entry.castleArea],
 		['Castle levels', entry.castleXp],
 	];
 	const bonuses: [string, string][] = [];

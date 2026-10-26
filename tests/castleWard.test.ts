@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store, tileAt, rawSnapshot, gridCells } from './helpers';
 import { CASTLE_FORTRESS, CASTLE_RANGE, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
-import { castleLevelOf, castleRangeRadius, fortressWallTier, inCastleRange, isInWard, MAX_CASTLE_RANGE_RADIUS, monstersOutsideWard } from '../src/lib/castleWard';
+import { castleAreaBonus, castleLevelOf, castleRangeRadius, fortressWallTier, inCastleRange, isInWard, MAX_CASTLE_RANGE_RADIUS, monstersOutsideWard } from '../src/lib/castleWard';
+import { calculateResourceBreakdown, calculateTileOutput } from '../src/utils/gameUtils';
 import { groundOf } from '../src/utils/terrain';
 import { pickSpawnTile } from '../src/lib/monsters';
 import { sanitizeSave } from '../src/lib/sanitizeSave';
@@ -190,4 +191,45 @@ test('the castle tile is drawn on cobbled yard ground from level 7 and on its fl
 	assert.equal(groundOf(castle()), 'yard');
 	setCastle(10);
 	assert.equal(groundOf(castle()), 'yard');
+});
+
+const sumOf = (parts: Partial<Record<string, number>>) => Object.values(parts).reduce<number>((a, b) => a + (b ?? 0), 0);
+
+test('castleAreaBonus: nothing below level 7, then +1x (100%) per tile of range up to +4x at level 10', () => {
+	assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(castleAreaBonus), [0, 0, 0, 0, 0, 0, 1, 2, 3, 4]);
+});
+
+test('the castle area bonus multiplies the output of the tiles (and buildings) inside the range only', () => {
+	const world = (level: number) => {
+		let w = setTile(EMPTY_WORLD, CASTLE_X, CASTLE_Y, { biome: 'castle', isOwned: true, level });
+		w = setTile(w, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', isOwned: true }); // inside at every level
+		w = setTile(w, CASTLE_X + 3, CASTLE_Y, { biome: 'forest', isOwned: true, building: 'farm', level: 1 }); // inside from level 9
+		w = setTile(w, CASTLE_X + 6, CASTLE_Y, { biome: 'forest', isOwned: true }); // never inside
+		return w;
+	};
+	const area = (level: number, dx: number) => {
+		const out = calculateTileOutput(world(level), CASTLE_X + dx, CASTLE_Y, level)!;
+		return { own: sumOf(out.base) + sumOf(out.neighbour), extra: sumOf(out.area), bonus: out.areaBonus };
+	};
+	for (const dx of [1, 3, 6]) assert.equal(area(6, dx).extra, 0, `level 6, dx ${dx}`);
+	assert.ok(area(7, 1).own > 0);
+	assert.ok(Math.abs(area(7, 1).extra - area(7, 1).own) < 1e-9, 'level 7 doubles the tile');
+	assert.equal(area(7, 3).extra, 0, 'radius 1 does not reach 3 tiles out');
+	assert.ok(Math.abs(area(10, 1).extra - 4 * area(10, 1).own) < 1e-9, 'level 10: +400%');
+	assert.ok(Math.abs(area(9, 3).extra - 3 * area(9, 3).own) < 1e-9, 'the building tile counts with its building');
+	assert.equal(area(10, 6).extra, 0, 'outside the range');
+	assert.equal(area(10, 6).bonus, 0);
+});
+
+test('the income breakdown adds the area bonus to the base income', () => {
+	const entry = (level: number) => {
+		let w = setTile(EMPTY_WORLD, CASTLE_X, CASTLE_Y, { biome: 'castle', isOwned: true, level });
+		w = setTile(w, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', isOwned: true });
+		return calculateResourceBreakdown(w).wood;
+	};
+	assert.equal(entry(6).castleArea, 0);
+	const l7 = entry(7);
+	assert.ok(l7.castleArea > 0);
+	assert.ok(Math.abs(l7.base - (l7.start + l7.farm + l7.biome + l7.building + l7.castleArea + l7.castleXp)) < 1e-9);
+	assert.ok(Math.abs(entry(10).castleArea - 4 * l7.castleArea) < 1e-9, '4x at level 10, 1x at level 7');
 });

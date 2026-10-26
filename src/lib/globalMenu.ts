@@ -14,13 +14,20 @@ const exportGame = async () => {
 	useUiStore.getState().showToast(ok ? 'Save copied to the clipboard' : 'Could not copy: open Import / export and copy it by hand');
 };
 
-/** The entries every menu ends with: settings, saving and the view options. The header dropdown and the right-click menu share them. */
-export const globalMenuItems = (): ContextMenuItem[] => {
+/**
+ * The entries every menu ends with: saving and the view options. The header dropdown (`full`) also lists Settings and the
+ * Guide, the right-click menu stays short.
+ */
+export const globalMenuItems = (full = false): ContextMenuItem[] => {
 	const ui = useUiStore.getState();
 	const items: ContextMenuItem[] = [
-		{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings },
-		{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
-		{ id: 'save', label: 'Save game', separator: true, onSelect: () => void saveGame() },
+		...(full
+			? [
+					{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings },
+					{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
+				]
+			: []),
+		{ id: 'save', label: 'Save game', separator: full, onSelect: () => void saveGame() },
 		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
 		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },
 		{
@@ -29,12 +36,6 @@ export const globalMenuItems = (): ContextMenuItem[] => {
 			separator: true,
 			checked: ui.showMinimap,
 			onSelect: () => ui.setPref('showMinimap', !ui.showMinimap),
-		},
-		{
-			id: 'stats',
-			label: 'Show statistics',
-			checked: ui.showStats,
-			onSelect: () => ui.setPref('showStats', !ui.showStats),
 		},
 	];
 	// the admin panel exists only in development builds
@@ -50,8 +51,14 @@ export const globalMenuItems = (): ContextMenuItem[] => {
 };
 
 /** Opens the menu at a screen position: the given entries first, then the global ones below a rule. */
-export const openMenuAt = (x: number, y: number, title: string | undefined, own: ContextMenuItem[] = []): void => {
-	const global = globalMenuItems();
+export const openMenuAt = (
+	x: number,
+	y: number,
+	title: string | undefined,
+	own: ContextMenuItem[] = [],
+	full = false
+): void => {
+	const global = globalMenuItems(full);
 	if (own.length) global[0] = { ...global[0], separator: true };
 	useUiStore.getState().openContextMenu({ x, y, title, items: [...own, ...global] });
 };

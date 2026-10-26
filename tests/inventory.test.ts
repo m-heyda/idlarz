@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
 	addToBag,
 	aggregateStats,
+	compareToEquipped,
 	emptyBag,
 	equipFromBag,
 	moveSlot,
@@ -197,4 +198,47 @@ test('functions do not mutate their inputs', () => {
 	const withGear = deepFreeze(addToBag(emptyBag(), 'rattatui_cap').bag);
 	equipFromBag(withGear, eq, 0);
 	aggregateStats(eq);
+});
+
+test('compareToEquipped: a better weapon shows the stat difference to the worn one', () => {
+	const cmp = compareToEquipped('rattatui_fang_blade', STARTER_EQUIPMENT)!;
+	assert.equal(cmp.slot, 'mainHand');
+	assert.equal(cmp.equippedId, 'wooden_sword');
+	const now = sumStats(ITEM_CATALOG.wooden_sword.stats);
+	const next = sumStats(ITEM_CATALOG.rattatui_fang_blade.stats);
+	for (const key of Object.keys(next) as (keyof typeof next)[]) {
+		const expected = Math.round((next[key] - now[key]) * 100) / 100;
+		assert.equal(cmp.deltas[key] ?? 0, expected, key);
+	}
+	// swapping back is the exact opposite
+	const back = compareToEquipped('wooden_sword', { ...STARTER_EQUIPMENT, mainHand: 'rattatui_fang_blade' })!;
+	for (const key of Object.keys(cmp.deltas) as (keyof typeof cmp.deltas)[]) assert.equal(back.deltas[key], -cmp.deltas[key]!);
+});
+
+test('compareToEquipped: an empty slot gains everything, rings pick the slot equipFromBag would, consumables have none', () => {
+	const cap = compareToEquipped('rattatui_cap', {})!;
+	assert.equal(cap.slot, 'head');
+	assert.equal(cap.equippedId, undefined);
+	assert.deepEqual(cap.deltas, Object.fromEntries(Object.entries(ITEM_CATALOG.rattatui_cap.stats!).filter(([, v]) => v)));
+
+	assert.equal(compareToEquipped('rattatui_ring', {})!.slot, 'ring1');
+	assert.equal(compareToEquipped('rattatui_ring', { ring1: 'rattatui_ring' })!.slot, 'ring2');
+	const full = compareToEquipped('rattatui_ring', { ring1: 'rattatui_ring', ring2: 'rattatui_ring' })!;
+	assert.equal(full.slot, 'ring1');
+	assert.deepEqual(full.deltas, {}, 'the same ring over the same ring changes nothing');
+
+	assert.equal(compareToEquipped('potion_minor', STARTER_EQUIPMENT), null);
+	assert.equal(compareToEquipped('no_such_item', STARTER_EQUIPMENT), null);
+});
+
+test('compareToEquipped includes the set bonus the swap reaches', () => {
+	const pieces = RATTATUI_SET.pieces;
+	const [first, ...rest] = pieces;
+	const wornAll = Object.fromEntries(rest.map((id) => [ITEM_CATALOG[id].slot === 'ring' ? 'ring1' : ITEM_CATALOG[id].slot, id])) as Equipment;
+	const withSet = aggregateStats({ ...wornAll, [ITEM_CATALOG[first].slot === 'ring' ? 'ring1' : ITEM_CATALOG[first].slot!]: first });
+	const without = aggregateStats(wornAll);
+	const cmp = compareToEquipped(first, wornAll)!;
+	for (const key of ['damage', 'armor', 'maxHp', 'critChance', 'superCrit', 'regen', 'luck'] as const) {
+		assert.equal(cmp.deltas[key] ?? 0, Math.round((withSet[key] - without[key]) * 100) / 100, key);
+	}
 });

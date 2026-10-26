@@ -80,8 +80,7 @@ interface UiState {
 	/** A short message at the bottom of the screen */
 	toast: { id: number; text: string } | null;
 	showToast: (text: string) => void;
-	/** Remembered view options (localStorage, see lib/uiPrefs): the FPS / statistics panel and the dev admin panel */
-	showStats: boolean;
+	/** Remembered view options (localStorage, see lib/uiPrefs): the minimap and the dev admin panel */
 	showMinimap: boolean;
 	showAdmin: boolean;
 	adminCollapsed: boolean;
@@ -147,7 +146,6 @@ export const useUiStore = create<UiState>((set) => ({
 	// read after mount (the server render has no localStorage): keeps hydration identical
 	loadPrefs: () =>
 		set({
-			showStats: readPref('showStats'),
 			showAdmin: readPref('showAdmin'),
 			adminCollapsed: readPref('adminCollapsed'),
 		}),

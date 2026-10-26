@@ -47,6 +47,13 @@ export const formatStat = (key: string, value: number): string => {
 	return `+${num}${def?.unit ?? ''} ${def?.label ?? key}`;
 };
 
+/** '+2 Armor', '-1 Damage', '+0.5/s HP Regen': a signed change, for comparing two items */
+export const formatStatDelta = (key: string, delta: number): string => {
+	const def = (STAT_DEFS as Record<string, StatDef>)[key];
+	const num = def?.decimals ? Math.abs(delta).toFixed(def.decimals) : String(Math.abs(delta));
+	return `${delta < 0 ? '-' : '+'}${num}${def?.unit ?? ''} ${def?.label ?? key}`;
+};
+
 /** '+3 Damage, +4 Max HP' */
 export const formatStats = (stats: ItemStats): string =>
 	Object.entries(stats)

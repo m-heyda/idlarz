@@ -81,10 +81,10 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-2'>
 					The browser&apos;s own right-click menu is switched off in the game; the <b>right click</b> opens the game&apos;s menu instead.
 					Right-click a tile, a monster, a chest or a bag item for what you can do with it (the entries are listed in their sections),
-					and the same menu ends with the global entries. The gear button in the top bar opens the same global menu as a dropdown.
+					and the same menu ends with the global entries. The gear button in the top bar opens that menu as a dropdown, with <b>Settings</b> and <b>Guide</b> on top.
 				</p>
 				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
-					<li><b>Settings</b> and <b>Guide</b>: sound and ambient life, and this page.</li>
+					<li><b>Settings</b> and <b>Guide</b> (gear button only): sound and ambient life, and this page.</li>
 					<li>
 						<b>Save game</b> writes the save right now. The game also saves itself a couple of seconds after every change and when you
 						close or hide the tab.
@@ -93,7 +93,6 @@ const Tutorial: React.FC = () => {
 						<b>Export game save</b> copies your whole game as one line of text to the clipboard; <b>Import / backup</b> pastes one back
 						(or saves it as a file).
 					</li>
-					<li><b>Show statistics</b> puts a small panel in the bottom right corner: FPS, slowest frame, tiles owned, monsters and time played.</li>
 					<li>Development builds also have <b>Show admin mode</b>, the cheat panel, which can be folded into an icon.</li>
 				</ul>
 			</section>

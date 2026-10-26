@@ -207,6 +207,14 @@ test('a played game with gear, a monster and damaged HP round-trips unchanged', 
 	assert.equal(result.state.nextMonsterId, 2);
 });
 
+test('a monster standing on a building (a save from before the spawn fix) is dropped, the save still loads', () => {
+	const raw = combatSave((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].building = 'farm'));
+	const result = sanitizeSave(raw);
+	assert.equal(result.ok, true, result.ok ? '' : result.reason);
+	if (!result.ok) return;
+	assert.deepEqual(result.state.monsters, []);
+});
+
 test('forged inventories, HP and monsters are rejected', () => {
 	const bad = (mutate: (raw: any) => void, label: string) => { // eslint-disable-line @typescript-eslint/no-explicit-any
 		assert.equal(sanitizeSave(combatSave(mutate)).ok, false, `${label} should be rejected`);
