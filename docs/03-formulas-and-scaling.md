@@ -45,7 +45,7 @@ stat points = 1 per level; reputation = 1000 + 100 per tile bought
 base[r]  = BASE_GENERATION_RATES[r]                                 gold 0.1, xp 0.25
          + Σ owned tiles of  (biome output[r] × scale + building output[r] × scale) × (1 + 0.25 × sameBiomeNeighbours)
               scale = 1.3 (BIOME_YIELD.scale); the castle uses its own output unscaled, without adjacency
-         + Σ tiles inside the castle range  tileOutput[r] × castleAreaBonus(C)      (C ≥ 7: radius 1/2/3/4 at C = 7/8/9/10 → +100 % … +400 %)
+         + Σ tiles inside the castle range  tileOutput[r] × castleAreaBonus(C)      (C < 7: +50 %; C ≥ 7: radius 1/2/3/4 at C = 7/8/9/10 → +100 % … +400 %)
          + 0.5 × (C − 1)   (r = xp only; CASTLE_UPGRADE.xpBonus)
          + Σ animals (r = meat only)
 
@@ -68,7 +68,7 @@ The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Ev
 castleModifier(C)  = 0.2 × 2^(C−1)   for C ≤ 6  → +20 %, +40 %, +80 %, +160 %, +320 %, +640 %
                    = 6.4 + 3.2 × (C−6)  for C > 6  → +960 %, +1280 %, +1600 %, +1920 %      (lateLevelStep)
 xp/s (flat)        = 0.5 × (C − 1)
-castleAreaBonus(C) = 0 for C < 7, else castleRangeRadius(C) × 1   → 1, 2, 3, 4 at levels 7-10 (extra output of every tile and building in range)
+castleAreaBonus(C) = 0.5 for C < 7, else castleRangeRadius(C) × 1   → 0.5 at levels 1-6, 1, 2, 3, 4 at levels 7-10 (extra output of every tile and building in range)
 upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[C−1] × (1 − 0.05 × MasterBuilders) (tick-counted)
 ```
 

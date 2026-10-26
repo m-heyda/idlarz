@@ -410,7 +410,10 @@ body {
 	}
 
 	.px-ripple,
-	.px-shimmer {
+	.px-shimmer,
+	.px-boat,
+	.px-dolphin,
+	.px-bubble {
 		display: none;
 	}
 }
@@ -428,6 +431,207 @@ body {
 	position: absolute;
 	z-index: 1;
 	pointer-events: none;
+}
+
+/* Life on the water (WaterLayer): corruption bubbles on swamp pools, waterfalls off the hills, sailboats and leaping dolphins */
+.px-bubble,
+.px-fall,
+.px-dolphin,
+.px-boat {
+	position: absolute;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.px-fall {
+	z-index: 2;
+}
+
+/* A sailboat sails to and fro over open water and turns round (mirrored) at each end; the sprite inside bobs on its own */
+.px-boat {
+	animation: px-boat-drift var(--px-ms, 50000ms) linear infinite;
+}
+
+@keyframes px-boat-drift {
+	0% {
+		transform: translate(calc(var(--bx) * -1), calc(var(--by) * -1)) scaleX(1);
+		animation-timing-function: ease-in-out;
+	}
+	49.9% {
+		transform: translate(var(--bx), var(--by)) scaleX(1);
+		animation-timing-function: step-end;
+	}
+	50% {
+		transform: translate(var(--bx), var(--by)) scaleX(-1);
+		animation-timing-function: ease-in-out;
+	}
+	99.9% {
+		transform: translate(calc(var(--bx) * -1), calc(var(--by) * -1)) scaleX(-1);
+		animation-timing-function: step-end;
+	}
+	100% {
+		transform: translate(calc(var(--bx) * -1), calc(var(--by) * -1)) scaleX(1);
+	}
+}
+
+/* A dolphin leap: the body (one of 5 poses) slides along a parabola, so the motion is smooth; the waterline is the bottom of
+   the clip box, so it rises out of the water and dives back. The box is 52x34 with the waterline 26px down. It rests for most
+   of the loop (hidden below the waterline) and leaps between 76% and 92%. */
+.px-dolphin {
+	--px-w: 24px;
+}
+
+.px-dolphin-clip {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 52px;
+	height: 26px;
+	overflow: hidden;
+}
+
+.px-dolphin-x,
+.px-dolphin-y,
+.px-dolphin-pose,
+.px-splash {
+	animation-duration: var(--px-ms, 12000ms);
+	animation-delay: var(--px-delay, 0ms);
+	animation-iteration-count: infinite;
+}
+
+.px-dolphin-x,
+.px-dolphin-y {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 24px;
+	height: 24px;
+}
+
+.px-dolphin-x {
+	animation-name: px-dolphin-x;
+	animation-timing-function: linear;
+}
+
+.px-dolphin-y {
+	animation-name: px-dolphin-y;
+}
+
+.px-dolphin-pose {
+	display: block;
+	width: 24px;
+	height: 24px;
+	background: var(--px-sheet) 0 0 / 120px 24px no-repeat;
+	image-rendering: pixelated;
+	animation-name: px-dolphin-pose;
+	animation-timing-function: steps(1, end);
+}
+
+.px-splash {
+	position: absolute;
+	top: 22px;
+	width: 20px;
+	height: 8px;
+	background: var(--px-sheet) -60px 0 / 80px 8px no-repeat;
+	image-rendering: pixelated;
+	animation-timing-function: steps(1, end);
+}
+
+.px-splash-out {
+	left: 6px;
+	animation-name: px-splash-out;
+}
+
+.px-splash-in {
+	left: 30px;
+	animation-name: px-splash-in;
+}
+
+@keyframes px-dolphin-x {
+	0%,
+	76% {
+		transform: translateX(4px);
+	}
+	92%,
+	100% {
+		transform: translateX(28px);
+	}
+}
+
+@keyframes px-dolphin-y {
+	0%,
+	76% {
+		transform: translateY(26px);
+		animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+	}
+	84% {
+		transform: translateY(1px);
+		animation-timing-function: cubic-bezier(0.64, 0, 0.78, 0.39);
+	}
+	92%,
+	100% {
+		transform: translateY(26px);
+	}
+}
+
+@keyframes px-dolphin-pose {
+	0%,
+	78.5% {
+		background-position-x: 0;
+	}
+	81.5% {
+		background-position-x: -24px;
+	}
+	84% {
+		background-position-x: -48px;
+	}
+	86.5% {
+		background-position-x: -72px;
+	}
+	89.5%,
+	100% {
+		background-position-x: -96px;
+	}
+}
+
+@keyframes px-splash-out {
+	0%,
+	76% {
+		background-position-x: -60px;
+	}
+	77% {
+		background-position-x: 0;
+	}
+	79.5% {
+		background-position-x: -20px;
+	}
+	82% {
+		background-position-x: -40px;
+	}
+	84.5%,
+	100% {
+		background-position-x: -60px;
+	}
+}
+
+@keyframes px-splash-in {
+	0%,
+	91% {
+		background-position-x: -60px;
+	}
+	92% {
+		background-position-x: 0;
+	}
+	94.5% {
+		background-position-x: -20px;
+	}
+	97% {
+		background-position-x: -40px;
+	}
+	99.5%,
+	100% {
+		background-position-x: -60px;
+	}
 }
 
 .castle-tile {

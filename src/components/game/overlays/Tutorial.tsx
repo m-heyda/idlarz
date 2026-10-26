@@ -198,7 +198,7 @@ const Tutorial: React.FC = () => {
 					{CASTLE_UPGRADE.maxLevel}. Upgrades cost resources and take real time (
 					{formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in total); the
 					castle keeps its current bonus while it is being built. From level 2 it also produces +
-					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1. The violet area around it is the castle&apos;s range: 3x3 at first, growing by a
+					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1. The violet area around it is the castle&apos;s range: everything inside produces +50% (+100% or more once the walls stand). It is 3x3 at first, growing by a
 						tile on every side with each level from {CASTLE_RANGE.growFromLevel} (9x9 at level {CASTLE_UPGRADE.maxLevel}); from level{' '}
 						{CASTLE_FORTRESS.fromLevel} walls surround the inner 3x3 and no monsters or chests appear there. If you lose the castle while
 						exploring, an arrow at the edge of the screen points to it and <b>Back to castle</b> brings you home. Once the castle is at its maximum level, clicking it opens the Legacy

@@ -2,7 +2,27 @@ import React, { useMemo } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CHUNK_TILES, chunkOf, chunkSignature, worldGround } from '@/utils/terrain';
-import { tileRipples, tileShimmer, RIPPLE_FRAMES, RIPPLE_SIZE, SHIMMER, type Ripple, type Shimmer } from '@/utils/water';
+import {
+	tileRipples,
+	tileShimmer,
+	tileBubbles,
+	tileFalls,
+	tileBoat,
+	tileDolphin,
+	RIPPLE_FRAMES,
+	RIPPLE_SIZE,
+	SHIMMER,
+	BUBBLE,
+	FALL,
+	BOAT,
+	DOLPHIN,
+	type Ripple,
+	type Shimmer,
+	type Bubble,
+	type Fall,
+	type Boat,
+	type Dolphin,
+} from '@/utils/water';
 import { ownedBounds, type World } from '@/utils/world';
 import { pixelIconSrc } from '@/config/pixelIcons';
 
@@ -15,7 +35,8 @@ interface WaterLayerProps {
 }
 
 /**
- * Ripples on lakes and swamp pools and the glitter on open water: small stepped sprite sheets laid over the terrain. They
+ * Ripples on lakes and swamp pools and the glitter on open water, corruption bubbles on swamp pools, waterfalls where hills
+ * meet a lake, and boats and leaping dolphins on open water: small stepped sprite sheets laid over the terrain. They
  * are placed by hash (utils/water.ts), built per chunk and rebuilt only when that chunk's terrain changes, culled to the
  * screen, and follow the Ambient life setting and prefers-reduced-motion.
  */
@@ -31,18 +52,30 @@ const WaterChunk: React.FC<WaterChunkProps> = React.memo(({ cx, cy, tiles, minX,
 		const g = worldGround(tiles);
 		const ripples: Ripple[] = [];
 		const shimmers: Shimmer[] = [];
+		const bubbles: Bubble[] = [];
+		const falls: Fall[] = [];
+		const boats: Boat[] = [];
+		const dolphins: Dolphin[] = [];
 		for (let y = cy * CHUNK_TILES; y < (cy + 1) * CHUNK_TILES; y++) {
 			for (let x = cx * CHUNK_TILES; x < (cx + 1) * CHUNK_TILES; x++) {
 				if (!g(x, y)) continue;
 				ripples.push(...tileRipples(g, x, y));
 				const s = tileShimmer(g, x, y);
 				if (s) shimmers.push(s);
+				bubbles.push(...tileBubbles(g, x, y));
+				falls.push(...tileFalls(g, x, y));
+				const boat = tileBoat(g, x, y);
+				if (boat) boats.push(boat);
+				const dolphin = tileDolphin(g, x, y);
+				if (dolphin) dolphins.push(dolphin);
 			}
 		}
-		return { ripples, shimmers };
+		return { ripples, shimmers, bubbles, falls, boats, dolphins };
 		// the picture of the chunk (its signature) is all the water depends on
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [signature, cx, cy]);
+
+	const inView = (p: { tx: number; ty: number }) => p.tx >= minX && p.tx < maxX && p.ty >= minY && p.ty < maxY;
 
 	return (
 		<>
@@ -64,6 +97,110 @@ const WaterChunk: React.FC<WaterChunkProps> = React.memo(({ cx, cy, tiles, minX,
 								'--px-sheet': `url(${pixelIconSrc('water_shimmer')})`,
 								animationDelay: `-${s.offsetMs}ms`,
 								transform: s.flip ? 'scaleX(-1)' : undefined,
+							} as React.CSSProperties
+						}
+					/>
+				))}
+			{water.falls
+				.filter((f) => inView(f))
+				.map((f) => (
+					<span
+						key={f.key}
+						className='px-shine px-fall'
+						aria-hidden
+						style={
+							{
+								left: f.x,
+								top: f.y,
+								'--px-w': `${FALL.w}px`,
+								'--px-h': `${FALL.h}px`,
+								'--px-frames': FALL.frames,
+								'--px-ms': `${f.ms}ms`,
+								'--px-sheet': `url(${pixelIconSrc('water_fall')})`,
+								animationDelay: `-${f.offsetMs}ms`,
+							} as React.CSSProperties
+						}
+					/>
+				))}
+			{water.boats
+				.filter((b) => inView(b))
+				.map((b) => (
+					<span
+						key={b.key}
+						className='px-boat'
+						aria-hidden
+						style={
+							{
+								left: b.x,
+								top: b.y,
+								width: BOAT.w,
+								height: BOAT.h,
+								'--bx': `${b.axis === 'x' ? b.range : 0}px`,
+								'--by': `${b.axis === 'y' ? b.range : 0}px`,
+								'--px-ms': `${b.ms}ms`,
+								animationDelay: `-${b.offsetMs}ms`,
+							} as React.CSSProperties
+						}>
+						<span
+							className='px-shine'
+							style={
+								{
+									'--px-w': `${BOAT.w}px`,
+									'--px-h': `${BOAT.h}px`,
+									'--px-frames': BOAT.frames,
+									'--px-ms': '1400ms',
+									'--px-sheet': `url(${pixelIconSrc('water_boat')})`,
+								} as React.CSSProperties
+							}
+						/>
+					</span>
+				))}
+			{water.dolphins
+				.filter((d) => inView(d))
+				.map((d) => (
+					<span
+						key={d.key}
+						className='px-dolphin'
+						aria-hidden
+						style={
+							{
+								left: d.x,
+								top: d.y,
+								width: DOLPHIN.w,
+								height: DOLPHIN.h,
+								'--px-ms': `${d.ms}ms`,
+								'--px-delay': `-${d.offsetMs}ms`,
+								transform: d.flip ? 'scaleX(-1)' : undefined,
+							} as React.CSSProperties
+						}>
+						<span className='px-dolphin-clip'>
+							<span className='px-dolphin-x'>
+								<span className='px-dolphin-y'>
+									<span className='px-dolphin-pose' style={{ '--px-sheet': `url(${pixelIconSrc('water_dolphin')})` } as React.CSSProperties} />
+								</span>
+							</span>
+						</span>
+						<span className='px-splash px-splash-out' style={{ '--px-sheet': `url(${pixelIconSrc('water_splash')})` } as React.CSSProperties} />
+						<span className='px-splash px-splash-in' style={{ '--px-sheet': `url(${pixelIconSrc('water_splash')})` } as React.CSSProperties} />
+					</span>
+				))}
+			{water.bubbles
+				.filter((b) => inView(b))
+				.map((b) => (
+					<span
+						key={b.key}
+						className='px-shine px-bubble'
+						aria-hidden
+						style={
+							{
+								left: b.x,
+								top: b.y,
+								'--px-w': `${BUBBLE.size}px`,
+								'--px-h': `${BUBBLE.size}px`,
+								'--px-frames': BUBBLE.frames,
+								'--px-ms': `${b.ms}ms`,
+								'--px-sheet': `url(${pixelIconSrc('water_bubble')})`,
+								animationDelay: `-${b.offsetMs}ms`,
 							} as React.CSSProperties
 						}
 					/>

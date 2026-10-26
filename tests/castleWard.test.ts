@@ -195,8 +195,8 @@ test('the castle tile is drawn on cobbled yard ground from level 7 and on its fl
 
 const sumOf = (parts: Partial<Record<string, number>>) => Object.values(parts).reduce<number>((a, b) => a + (b ?? 0), 0);
 
-test('castleAreaBonus: nothing below level 7, then +1x (100%) per tile of range up to +4x at level 10', () => {
-	assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(castleAreaBonus), [0, 0, 0, 0, 0, 0, 1, 2, 3, 4]);
+test('castleAreaBonus: +50% below level 7 (no walls), then +1x (100%) per tile of range up to +4x at level 10', () => {
+	assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(castleAreaBonus), [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 2, 3, 4]);
 });
 
 test('the castle area bonus multiplies the output of the tiles (and buildings) inside the range only', () => {
@@ -211,7 +211,8 @@ test('the castle area bonus multiplies the output of the tiles (and buildings) i
 		const out = calculateTileOutput(world(level), CASTLE_X + dx, CASTLE_Y, level)!;
 		return { own: sumOf(out.base) + sumOf(out.neighbour), extra: sumOf(out.area), bonus: out.areaBonus };
 	};
-	for (const dx of [1, 3, 6]) assert.equal(area(6, dx).extra, 0, `level 6, dx ${dx}`);
+	assert.ok(Math.abs(area(6, 1).extra - 0.5 * area(6, 1).own) < 1e-9, 'level 6: x1.5 inside the 3x3');
+	for (const dx of [3, 6]) assert.equal(area(6, dx).extra, 0, `level 6, dx ${dx}`);
 	assert.ok(area(7, 1).own > 0);
 	assert.ok(Math.abs(area(7, 1).extra - area(7, 1).own) < 1e-9, 'level 7 doubles the tile');
 	assert.equal(area(7, 3).extra, 0, 'radius 1 does not reach 3 tiles out');
@@ -227,8 +228,10 @@ test('the income breakdown adds the area bonus to the base income', () => {
 		w = setTile(w, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', isOwned: true });
 		return calculateResourceBreakdown(w).wood;
 	};
-	assert.equal(entry(6).castleArea, 0);
+	const l6 = entry(6);
 	const l7 = entry(7);
+	assert.ok(l6.castleArea > 0);
+	assert.ok(Math.abs(l7.castleArea - 2 * l6.castleArea) < 1e-9, '+100% at level 7 is twice the +50% before');
 	assert.ok(l7.castleArea > 0);
 	assert.ok(Math.abs(l7.base - (l7.start + l7.farm + l7.biome + l7.building + l7.castleArea + l7.castleXp)) < 1e-9);
 	assert.ok(Math.abs(entry(10).castleArea - 4 * l7.castleArea) < 1e-9, '4x at level 10, 1x at level 7');

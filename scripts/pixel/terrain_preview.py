@@ -63,11 +63,16 @@ def render_world(layout, m, images, sprites=True, marks=True):
         for cx in range(w + 1):
             ox, oy = cx * CELL - 24, cy * CELL - 24
             for style, mask, var in logic.cell_layers(g, cx, cy):
+                shore = style[5:] if style in ('lake_frost', 'lake_bog') else None
+                if shore:
+                    style, sub, var = 'lake', var >> 1, var & 1
                 tex = _crop_tex(art.texture(style), ox, oy)
                 if mask == 15:
                     world.paste(tex, (ox + pad, oy + pad))
                     continue
                 body, rim = art.render_cell(style, mask, var)
+                if shore:
+                    rim = art.render_shore(shore, mask, sub, var)
                 world.paste(tex, (ox + pad, oy + pad), body)
                 world.alpha_composite(rim, (ox + pad, oy + pad))
     if sprites:

@@ -22,9 +22,9 @@ export const MAX_CASTLE_RANGE_RADIUS = castleRangeRadius(CASTLE_UPGRADE.maxLevel
 export const inCastleRange = (x: number, y: number, castleLevel: number): boolean =>
 	Math.max(Math.abs(x - CASTLE_X), Math.abs(y - CASTLE_Y)) <= castleRangeRadius(castleLevel);
 
-/** The extra output (as a fraction: 1 = +100%) every tile inside the castle range gets: 0 below level 7, then one step per tile of range. */
+/** The extra output (as a fraction: 1 = +100%) every tile inside the castle range gets: +50% below level 7 (no walls), then one step per tile of range. */
 export const castleAreaBonus = (castleLevel: number): number =>
-	castleLevel >= CASTLE_AREA_BONUS.fromLevel ? castleRangeRadius(castleLevel) * CASTLE_AREA_BONUS.perRadiusTile : 0;
+	castleLevel >= CASTLE_AREA_BONUS.fromLevel ? castleRangeRadius(castleLevel) * CASTLE_AREA_BONUS.perRadiusTile : CASTLE_AREA_BONUS.earlyBonus;
 
 /** Drops the monsters standing in the ward, except the one being fought (`keepId`). Returns the same array when nothing is warded. */
 export const monstersOutsideWard = (monsters: Monster[], castleLevel: number, keepId: number | null): Monster[] =>

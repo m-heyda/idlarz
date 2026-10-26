@@ -50,7 +50,7 @@ export interface TerrainAtlas {
 	sprites: Record<string, [number, number, number, number]>; // id -> x, y, w, h in props.png
 	props: Record<string, PropTable>;
 	decor?: Record<string, PropTable>; // tiny second-pass decorations (flowers, fallen trees)
-	water?: { swamp?: [number, number][][] }; // ripple spots inside swamp pools, per 48px block of the 4x4 texture
+	water?: { swamp?: [number, number][][]; swamp0?: [number, number][][] }; // spots inside swamp pools (deep texture: ripples; plain texture: bubbles), per 48px block of the 4x4 texture
 }
 export const ATLAS = atlasJson as unknown as TerrainAtlas;
 
@@ -179,6 +179,20 @@ export interface Layer {
 	variant: number;
 }
 
+/**
+ * A lake's shore takes on the land it meets: frozen beside tundra, murky beside a swamp (never both: they cannot touch). The
+ * extra variant is 2 x the bits of the corners holding that land, so the shore art can fade the tint in from those corners (a
+ * dual cell's corners are tile centres, so the fade runs on across the cell borders).
+ */
+function shoreStyle(gr: Ground, info: { bit: number; ground: Ground | null }[]): [string, number] {
+	if (gr !== 'lake') return [gr, 0];
+	const bits = (land: Ground) => info.reduce((s, i) => (i.ground === land ? s + i.bit : s), 0);
+	const tundra = bits('tundra');
+	if (tundra) return ['lake_frost', 2 * tundra];
+	const swamp = bits('swamp');
+	return swamp ? ['lake_bog', 2 * swamp] : [gr, 0];
+}
+
 /** Layers bottom-up for dual cell (cx, cy); corners are tiles NW=(cx-1,cy-1), NE=(cx,cy-1), SW=(cx-1,cy), SE=(cx,cy). */
 export function cellLayers(g: GroundSrc, cx: number, cy: number): Layer[] {
 	const corners: [number, number, number][] = [
@@ -201,7 +215,8 @@ export function cellLayers(g: GroundSrc, cx: number, cy: number): Layer[] {
 	const out: Layer[] = [];
 	layers.forEach(({ gr, mask, variant }, i) => {
 		if (lastFull >= 0 && i < lastFull) return;
-		out.push({ style: gr, mask, variant });
+		const [style, extra] = shoreStyle(gr, info);
+		out.push({ style, mask, variant: variant + extra });
 		for (let tier = 1; tier <= (MAX_DEPTH[gr] ?? 0); tier++) {
 			const dmask = info.reduce((s, c) => (c.ground === gr && c.d >= tier ? s + c.bit : s), 0);
 			if (dmask) out.push({ style: `${gr}_d${tier}`, mask: dmask, variant });
@@ -357,8 +372,10 @@ export function dockAt(g: GroundSrc, x: number, y: number, m: TerrainAtlas = ATL
 			if ((ox || oy) && eligible(x + ox, y + oy) && hash32(x + ox, y + oy, 300) % 100 < DOCK_PCT && hash32(x + ox, y + oy, 301) >= mine) return [];
 	const d = land[2];
 	const length = [22, 26, 30][hash32(x, y, 302) % 3];
-	const barrel = hash32(x, y, 303) % 3 === 0 ? 1 : 0;
-	const pid = `pier_${d}_${length}_${barrel}`;
+	const landGround = at(g, x + land[0], y + land[1]);
+	const kind = landGround === 'tundra' ? 'ice_' : landGround === 'swamp' ? 'bog_' : ''; // frozen dock beside tundra, rotten one beside a swamp
+	const barrel = kind === 'bog_' ? 0 : hash32(x, y, 303) % 3 === 0 ? 1 : 0;
+	const pid = `pier_${kind}${d}_${length}_${barrel}`;
 	const [, , w, h] = m.sprites[pid];
 	const horizontalAxis = d === 'n' || d === 's';
 	const off = 8 + (hash32(x, y, 304) % (CELL - 16 - (horizontalAxis ? w : h)));
@@ -370,7 +387,7 @@ export function dockAt(g: GroundSrc, x: number, y: number, m: TerrainAtlas = ATL
 	const out: Placed[] = [{ id: pid, x: px, bottom: py + h }];
 	if (hash32(x, y, 305) % 3 === 0) {
 		// a rowboat moored beside the pier
-		const bid = horizontalAxis ? 'boat_v' : 'boat_h';
+		const bid = horizontalAxis ? `boat_${kind}v` : `boat_${kind}h`;
 		const [, , bw, bh] = m.sprites[bid];
 		const side = (horizontalAxis ? px - x * CELL : py - y * CELL) < 20 ? 1 : -1;
 		let bx: number, by: number;

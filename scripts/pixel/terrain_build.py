@@ -58,18 +58,22 @@ def collect():
         for length in (22, 26, 30):
             for barrel in (0, 1):
                 images[f'pier_{d}_{length}_{barrel}'] = props.cached(props.pier, d, length, bool(barrel))
+                if barrel == 0:                                          # swamp docks are rotten (no barrel), tundra docks are frozen in
+                    images[f'pier_bog_{d}_{length}_0'] = props.cached(props.pier, d, length, False, 'bog')
+                images[f'pier_ice_{d}_{length}_{barrel}'] = props.cached(props.pier, d, length, bool(barrel), 'ice')
     for pid, make in pads.PADS.items():
         images[pid] = make()
-    images['boat_h'] = props.cached(props.boat, False)
-    images['boat_v'] = props.cached(props.boat, True)
+    for kind, name in (('', 'boat'), ('ice', 'boat_ice'), ('bog', 'boat_bog')):
+        images[f'{name}_h'] = props.cached(props.boat, False, kind)
+        images[f'{name}_v'] = props.cached(props.boat, True, kind)
     return images, table, decor
 
 
-def water_spots():
-    """Where a ripple fits inside the swamp pools: per 48px block of the (4x4 block) deep-swamp texture, up to 6 local
-    centres whose 13x5 box is all water and sits in the middle of the tile (the part its own dual-cell blobs always cover)."""
-    p = art.PAL['swamp_d1']
-    img = art.tex_swamp(1)
+def _pool_spots(tier, half_w, half_h, apart, most):
+    """Per 48px block of the (4x4 block) swamp texture of `tier`: up to `most` local centres whose box is all water and sits
+    in the middle of the tile (the part its own dual-cell blobs always cover)."""
+    p = art.PAL['swamp_d1' if tier else 'swamp']
+    img = art.tex_swamp(tier)
     px = img.load()
     tex = art.TEX
     water = {tuple(art.C(p[k])) for k in ('water', 'water2', 'water_lt')}
@@ -78,16 +82,23 @@ def water_spots():
     for by in range(tex // CELL):
         for bx in range(tex // CELL):
             cand = [(lx, ly) for ly in range(14, CELL - 14) for lx in range(12, CELL - 12)
-                    if all(wet[(by * CELL + ly + dy) % tex][(bx * CELL + lx + dx) % tex] for dx in range(-6, 7) for dy in range(-2, 3))]
+                    if all(wet[(by * CELL + ly + dy) % tex][(bx * CELL + lx + dx) % tex]
+                           for dx in range(-half_w, half_w + 1) for dy in range(-half_h, half_h + 1))]
             cand.sort(key=lambda c: hash32(bx * CELL + c[0], by * CELL + c[1], 800))
             keep = []
             for c in cand:
-                if all((c[0] - k[0]) ** 2 + (c[1] - k[1]) ** 2 >= 14 * 14 for k in keep):
+                if all((c[0] - k[0]) ** 2 + (c[1] - k[1]) ** 2 >= apart * apart for k in keep):
                     keep.append(c)
-                if len(keep) == 6:
+                if len(keep) == most:
                     break
             blocks.append([list(c) for c in keep])
-    return {'swamp': blocks}
+    return blocks
+
+
+def water_spots():
+    """Where things fit inside the swamp pools. `swamp`: ripple spots (13x5 box) in the deep-swamp texture; `swamp0`: smaller
+    spots (9x5 box) in the plain swamp texture, so bubbles can also rise on the rim and in small swamps."""
+    return {'swamp': _pool_spots(1, 6, 2, 14, 6), 'swamp0': _pool_spots(0, 4, 2, 12, 5)}
 
 
 def pack(images):
@@ -116,6 +127,18 @@ def shapes_sheet(style):
             white.putalpha(body)
             sheet.paste(white, (mask * CELL, var * 2 * CELL))
             sheet.paste(rim, (mask * CELL, (var * 2 + 1) * CELL))
+    return sheet
+
+
+def shore_sheet(kind):
+    """Rim overlays of the tinted lake shores: column = bits of the corners holding the tundra / swamp, row = mask * 2 + variant."""
+    sheet = Image.new('RGBA', (16 * CELL, 32 * CELL), (0, 0, 0, 0))
+    for mask in range(1, 15):
+        for sub in range(1, 16):
+            if sub & mask:
+                continue                                              # those corners are lake themselves
+            for var in (0, 1):
+                sheet.paste(art.render_shore(kind, mask, sub, var), (sub * CELL, (mask * 2 + var) * CELL))
     return sheet
 
 
@@ -177,6 +200,9 @@ def write_all(verbose=True):
         written |= {f'tex_{style}.png', f'shapes_{style}.png'}
         if verbose:
             print('  terrain style', style)
+    for kind in ('frost', 'bog'):
+        shore_sheet(kind).save(os.path.join(OUT, f'shore_{kind}.png'))
+        written.add(f'shore_{kind}.png')
     atlas.save(os.path.join(OUT, 'props.png'))
     written.add('props.png')
     for name in os.listdir(OUT):

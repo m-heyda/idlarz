@@ -33,7 +33,11 @@ PAL = {
     'tundra_d1': dict(tones=['#cfe3f4', '#d6e8f7', '#dcecf9'], shade='#b8d2ea', spark='#ffffff', crack='#9cc0e0', edge='#eaf4fc', rim_sh='#9cbad8'),
     'coast':    dict(tones=['#d6c18a', '#dcc791', '#e2cd98'], dk='#c9b27a', speck='#b99e66', lt='#ecdca8', ripple='#c4ac74', edge='#bda568'),
     'lake':     dict(tones=['#2f9fd2', '#35a6d8', '#3badde'], tick='#a8dcf2', foam='#f0f8ff', foam2='#bfe4f6', band='#52bff0',
-                     sand='#d6c18a', wet='#b49a66', pebble='#9a8456'),
+                     sand='#d6c18a', wet='#b49a66', pebble='#9a8456', fringe='#d0bc86'),
+    # a lake's shore where it meets tundra (ice shelf over snow) or a swamp (scum over mud); the water body is the plain lake's
+    'lake_frost': dict(slush='#c4c8c8', snow='#e8e8dc', crystal='#a8cce4', ice='#ffffff', ice2='#dff0fa', sheet='#bfe4f6', crack='#8ccbee', fringe='#d6d8cc'),
+    'lake_bog': dict(mud='#6a6030', moss_mud='#8a8450', clump='#7fa04a', pit='#4a4624', scum='#b4c474', scum2='#8aa85a', murk='#4a8a7a',
+                     taint='#8a5ac0', fringe='#a49a60'),
     'lake_d1':  dict(tones=['#2380bd', '#2886c3', '#2d8cc9'], tick='#4ca4da', edge='#2c94d0'),
     'lake_d2':  dict(tones=['#185b9e', '#1c61a4', '#2067aa'], tick='#3a7cc4', abyss='#123e7a', edge='#226cb8'),
     'grounds':  dict(tones=['#6a4a28', '#72502c', '#7a5830'], furrow='#4e3418', ridge='#8a6438', stone='#8a7a66', edge='#4e3418', speck='#5a3c20'),
@@ -51,7 +55,8 @@ STYLES = {                      # coordinate warp in px (amp) and scalloping (lo
     'swamp': dict(amp=6.0, lobe=3.0), 'swamp_d1': dict(amp=6.0, lobe=2.5),
     'tundra': dict(amp=5.0, lobe=2.5), 'tundra_d1': dict(amp=6.0, lobe=2.0),
     'coast': dict(amp=6.0, lobe=0.0),
-    'lake': dict(amp=4.5, lobe=0.0), 'lake_d1': dict(amp=6.0, lobe=0.0), 'lake_d2': dict(amp=7.0, lobe=0.0),
+    'lake': dict(amp=4.5, lobe=0.0),
+    'lake_d1': dict(amp=6.0, lobe=0.0), 'lake_d2': dict(amp=7.0, lobe=0.0),
     'mist': dict(amp=7.0, lobe=3.0),
     'grounds': dict(amp=4.0, lobe=1.0),
     'yard': dict(square=True), 'castle': dict(square=True),
@@ -366,6 +371,44 @@ def _cliff(sd, lit, r, x, y, level):
     return None
 
 
+def _feather(p, sd, r):
+    """The land side of a bank frays into the ground beside it: dithered pixels of the bank tone, thinning out over 2.5px, so a
+    shore never ends in a ruler-straight line."""
+    if -8.0 < sd <= -5.5 and r < 0.5 * (8.0 + sd) / 2.5:
+        return C(p['fringe'])
+    return None
+
+
+def _paint_frost(p, sd, r):
+    """Lake shore beside tundra: packed slush and snow on the bank, a pale ice shelf with hairline cracks on the water."""
+    if sd < 0:
+        if sd >= -2:
+            return C(p['slush'])
+        if sd >= -5.5:
+            return C(p['crystal']) if r < 0.04 else C(p['snow'])
+        return _feather(p, sd, r)
+    if sd < 1.6:
+        return C(p['ice']) if r > 0.25 else C(p['ice2'])
+    if sd < 4.4:
+        return C(p['ice']) if r < 0.05 else C(p['crack']) if r > 0.93 else C(p['sheet'])
+    return None
+
+
+def _paint_bog(p, sd, r):
+    """Lake shore beside a swamp: black mud and moss clumps on the bank, a green scum line and murky water with a purple taint."""
+    if sd < 0:
+        if sd >= -2:
+            return C(p['mud'])
+        if sd >= -5.5:
+            return C(p['clump']) if r < 0.05 else C(p['pit']) if r < 0.09 else C(p['moss_mud'])
+        return _feather(p, sd, r)
+    if sd < 1.4:
+        return C(p['scum']) if r > 0.25 else C(p['scum2'])
+    if sd < 3.0:
+        return C(p['taint']) if r > 0.965 else C(p['murk'])
+    return None
+
+
 def _paint(style, sd, lit, r, x, y):
     """RGBA (or None) for one pixel of the rim overlay. sd > 0 is inside the body, lit > 0 faces the top-left light."""
     p = PAL[style]
@@ -414,7 +457,7 @@ def _paint(style, sd, lit, r, x, y):
                 return C(p['wet'])
             if sd >= -5.5:
                 return C(p['pebble']) if r < 0.035 else C(p['sand'])
-            return None
+            return _feather(p, sd, r)
         if sd < 1.4:
             return C(p['foam']) if r > 0.25 else C(p['foam2'])
         if sd < 3.0:
@@ -442,6 +485,36 @@ def _paint(style, sd, lit, r, x, y):
 
 
 _CELL_CACHE = {}
+_SHORE_CACHE = {}
+
+
+def render_shore(kind, mask, sub, variant):
+    """Rim overlay (RGBA) of a lake shore cell beside tundra ('frost') or a swamp ('bog'). `sub` holds the bits of the cell's
+    corners that are that land. The ordinary sand shore is dithered into the tinted one by the bilinear weight of those corners,
+    so the tint fades in from the corner and carries on across the borders of the neighbouring cells (they share the corners)."""
+    key = (kind, mask, sub, variant)
+    if key in _SHORE_CACHE:
+        return _SHORE_CACHE[key]
+    st = STYLES['lake']
+    sh = shape(mask, seed=3 + variant * 17 + sum(map(ord, 'lake')) % 29, amp=st['amp'], lobe=st['lobe'])
+    p_base, p_alt = PAL['lake'], PAL['lake_' + kind]
+    alt = _paint_frost if kind == 'frost' else _paint_bog
+    nw, ne, sw, se = (sub & 1) != 0, (sub & 2) != 0, (sub & 4) != 0, (sub & 8) != 0
+    rim = Image.new('RGBA', (CELL, CELL), (0, 0, 0, 0))
+    rp = rim.load()
+    for y in range(CELL):
+        v = y / (CELL - 1)
+        for x in range(CELL):
+            u = x / (CELL - 1)
+            w = (1 - u) * (1 - v) * nw + u * (1 - v) * ne + (1 - u) * v * sw + u * v * se
+            sd = sh['sd'][y][x]
+            r = rnd01(x, y, mask * 7 + variant)
+            col = alt(p_alt, sd, r) if rnd01(x, y, 991) < min(1.0, w * 1.5) else _paint('lake', sd, sh['lit'][y][x], r, x, y)
+            if col:
+                rp[x, y] = col
+    _SHORE_CACHE[key] = rim
+    return rim
+
 
 
 def render_cell(style, mask, variant):

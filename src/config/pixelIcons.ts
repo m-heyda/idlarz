@@ -28,6 +28,11 @@ export const PIXEL_ICON_SIZES = {
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
 	water_ripple_swamp: [96, 5], // 8 frames of 12x5
 	water_shimmer: [192, 48], // 4 frames of a whole open-water tile: drifting light dashes (WaterLayer)
+	water_bubble: [80, 10], // 8 frames of 10x10: a corruption bubble swelling and popping on a swamp pool (WaterLayer)
+	water_fall: [64, 24], // 4 frames of 16x24: a waterfall off a hill's south cliff into a lake
+	water_boat: [40, 18], // 2 frames of 20x18: a sailboat; WaterLayer drifts it over open water
+	water_dolphin: [120, 24], // 5 poses of 24x24 of a leaping dolphin; WaterLayer moves the pose along the arc
+	water_splash: [80, 8], // 4 frames of 20x8: the ring where the dolphin leaves and enters the water
 	level_orb: [24, 24],
 	xp: [40, 40],
 	bonus_chest: [32, 32], // the chest alone, for toasts and tooltips

@@ -148,10 +148,10 @@ test('export -> decode accepts a real save and rejects edited / foreign ones', (
 // ---- combat / inventory state ------------------------------------------------------------------------------------
 const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId'];
 
-/** The n-th owned tile that is not the castle. */
+/** The n-th owned tile that is not the castle or a lake (the land is rolled, and a monster or a building cannot be on water). */
 const spot = (n = 0) => {
 	const found = gridCells()
-		.filter(({ t }) => t.isOwned && t.biome !== 'castle')
+		.filter(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')
 		.map(({ x, y }) => ({ x, y }));
 	return found[n];
 };
