@@ -88,7 +88,7 @@ test('the income breakdown adds up to exactly what calculateResourceRates report
 		assert.equal(e.base, rates.base[key], `${key} base`);
 		assert.equal(e.modifier, rates.modifiers[key], `${key} modifier`);
 		assert.equal(e.total, rates.total[key], `${key} total`);
-		const parts = e.start + e.farm + e.biome + e.building + e.castleXp;
+		const parts = e.start + e.farm + e.biome + e.building + e.castleArea + e.castleXp;
 		assert.ok(Math.abs(parts - e.base) < 1e-9, `${key}: the pieces add up to the base`);
 		assert.ok(Math.abs(e.base * (1 + e.modifier) - e.total) < 1e-9, `${key}: base x (1 + modifier) = total`);
 	}

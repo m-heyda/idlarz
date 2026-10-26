@@ -50,13 +50,13 @@ test('pickSpawnTile never returns the castle, chest tiles, monster tiles or unow
 	// block all but one tile with a chest or a monster
 	const keep = ownedTiles[ownedTiles.length - 1];
 	const monsters: Monster[] = [];
-	ownedTiles.slice(0, -1).forEach(({ x, y }, i) => {
+	ownedTiles.filter((t) => t !== keep).forEach(({ x, y }, i) => {
 		if (i % 2 === 0) tiles = patchTile(tiles, x, y, { hasChest: true });
 		else monsters.push(m({ id: i + 1, x, y }));
 	});
 	for (let i = 0; i < 50; i++) {
 		const pick = pickSpawnTile(tiles, monsters, Math.random)!;
-		assert.deepEqual(pick, keep);
+		assert.deepEqual(pick, { x: keep.x, y: keep.y });
 		assert.ok(!(pick.x === CASTLE_X && pick.y === CASTLE_Y));
 	}
 });

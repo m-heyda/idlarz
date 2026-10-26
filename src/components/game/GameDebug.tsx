@@ -6,6 +6,7 @@ import { useUiStore } from '@/stores/uiStore';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, MAX_CATCHUP_SEC, XP_CAP } from '@/config/gameConfig';
 import { MAX_OWNED_TILES, ownedCount, patchTile, tileAt } from '@/utils/world';
 import { syntheticWorld } from '@/utils/worldGen';
+import { growWorld } from '@/utils/growWorld';
 import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '@/catalog';
 import { addToBag } from '@/lib/inventory';
 import { maxHp } from '@/lib/combat';
@@ -86,6 +87,20 @@ const growMap = (count: number) => {
 	toast(`Added ${n.toLocaleString('en')} tiles in ${Math.round(performance.now() - t0)} ms (${ownedCount(tiles).toLocaleString('en')} in all)`);
 };
 
+let labSeed = 0;
+/** Map lab: replaces the map with a fresh seeded one rolled exactly like real purchases (rollBiome), to eyeball how the land and its art come out. Cheat: grants the XP those tiles would have cost. */
+const rolledMap = (purchases: number, policy: 'nearest' | 'random') => {
+	const s = useGameStore.getState();
+	const seed = labSeed++;
+	const tiles = growWorld(purchases, seed, policy);
+	let needed = 0;
+	for (let k = 2; k <= economyTiles(tiles, s.freeTiles); k++) needed += calculateXpGain(k);
+	const xp = Math.max(s.resources.xp, Math.min(needed * 1.01, XP_CAP));
+	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);
+	useGameStore.setState({ tiles, resources: { ...s.resources, xp }, resourceRates, monsters: [], activeChests: 0 });
+	toast(`Rolled map: seed ${seed}, ${purchases} purchases (${policy})`);
+};
+
 const fastForward = () => {
 	for (let i = 0; i < 12; i++) useGameStore.getState().tick(MAX_CATCHUP_SEC * 1000);
 };
@@ -125,6 +140,9 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 			{ label: '+500 tiles', tone: 'gray', run: () => growMap(500) },
 			{ label: '+5k tiles', tone: 'gray', run: () => growMap(5000) },
 			{ label: '+50k tiles', tone: 'red', run: () => growMap(50000) },
+			{ label: 'Rolled map 60', tone: 'blue', run: () => rolledMap(60, 'nearest') },
+			{ label: 'Rolled map 400', tone: 'blue', run: () => rolledMap(400, 'nearest') },
+			{ label: 'Rolled map 400 ragged', tone: 'blue', run: () => rolledMap(400, 'random') },
 		],
 	},
 	{

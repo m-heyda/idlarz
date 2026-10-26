@@ -13,8 +13,13 @@ import type { World } from '@/utils/world';
 export interface TerrainAssets {
 	tex: Record<string, HTMLImageElement>;
 	shapes: Record<string, HTMLImageElement>;
+	/** rim sheets of the tinted lake shores ('lake_frost', 'lake_bog'): column = corner bits, row = mask * 2 + variant */
+	shores: Record<string, HTMLImageElement>;
 	props: HTMLImageElement;
 }
+
+/** The tinted lake shores are lake cells (lake texture and body) with a rim of their own; their variant is the lake variant + 2 x the corner bits. */
+const SHORES = ['lake_frost', 'lake_bog'];
 
 const BASE = '/pixel/terrain';
 
@@ -33,14 +38,18 @@ export function loadTerrainAssets(): Promise<TerrainAssets> {
 		assetsPromise = (async () => {
 			const tex: Record<string, HTMLImageElement> = {};
 			const shapes: Record<string, HTMLImageElement> = {};
+			const shores: Record<string, HTMLImageElement> = {};
 			const [props] = await Promise.all([
 				loadImage(`${BASE}/props.png`),
+				...SHORES.map(async (s) => {
+					shores[s] = await loadImage(`${BASE}/shore_${s.slice(5)}.png`);
+				}),
 				...ATLAS.styles.map(async (s) => {
 					tex[s] = await loadImage(`${BASE}/tex_${s}.png`);
 					shapes[s] = await loadImage(`${BASE}/shapes_${s}.png`);
 				}),
 			]);
-			return { tex, shapes, props };
+			return { tex, shapes, shores, props };
 		})().catch((e) => {
 			assetsPromise = null; // allow a retry on the next draw
 			throw e;
@@ -91,17 +100,28 @@ export function drawChunkFlat(canvas: HTMLCanvasElement, world: World, cx: numbe
 
 let scratch: HTMLCanvasElement | null = null;
 
+/** The ground textures as canvas patterns, made once per atlas: a pattern belongs to no context, so every chunk can fill with it. */
+const patternCache = new WeakMap<TerrainAssets, Record<string, CanvasPattern>>();
+const patternsOf = (assets: TerrainAssets, ctx: CanvasRenderingContext2D): Record<string, CanvasPattern> => {
+	let patterns = patternCache.get(assets);
+	if (!patterns) {
+		patterns = {};
+		for (const [style, img] of Object.entries(assets.tex)) {
+			const p = ctx.createPattern(img, 'repeat');
+			if (p) patterns[style] = p;
+		}
+		patternCache.set(assets, patterns);
+	}
+	return patterns;
+};
+
 /** The full picture of one chunk. Dual cells on the chunk's border are drawn by both chunks (each keeps its own half). */
 export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, world: World, cx: number, cy: number): void {
 	const ctx = prepare(canvas, cx, cy);
 	if (!ctx) return;
 	const g = worldGround(world);
 
-	const patterns: Record<string, CanvasPattern> = {};
-	for (const [style, img] of Object.entries(assets.tex)) {
-		const p = ctx.createPattern(img, 'repeat');
-		if (p) patterns[style] = p;
-	}
+	const patterns = patternsOf(assets, ctx);
 	if (!scratch) {
 		scratch = document.createElement('canvas');
 		scratch.width = CELL;
@@ -117,7 +137,11 @@ export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, worl
 		for (let dx = x0; dx <= x0 + CHUNK_TILES; dx++) {
 			const ox = dx * CELL - CELL / 2;
 			const oy = dy * CELL - CELL / 2;
-			for (const { style, mask, variant } of cellLayers(g, dx, dy)) {
+			for (const layer of cellLayers(g, dx, dy)) {
+				const { mask } = layer;
+				const tinted = SHORES.includes(layer.style); // a lake shore beside tundra or a swamp
+				const style = tinted ? 'lake' : layer.style;
+				const variant = tinted ? layer.variant & 1 : layer.variant;
 				const pattern = patterns[style];
 				const shape = assets.shapes[style];
 				if (!pattern || !shape) continue;
@@ -136,7 +160,8 @@ export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, worl
 				sctx.globalCompositeOperation = 'destination-in';
 				sctx.drawImage(shape, mask * CELL, variant * 2 * CELL, CELL, CELL, 0, 0, CELL, CELL);
 				ctx.drawImage(scratch, ox, oy);
-				ctx.drawImage(shape, mask * CELL, (variant * 2 + 1) * CELL, CELL, CELL, ox, oy, CELL, CELL);
+				if (tinted) ctx.drawImage(assets.shores[layer.style], (layer.variant >> 1) * CELL, (mask * 2 + variant) * CELL, CELL, CELL, ox, oy, CELL, CELL);
+				else ctx.drawImage(shape, mask * CELL, (variant * 2 + 1) * CELL, CELL, CELL, ox, oy, CELL, CELL);
 			}
 		}
 	}

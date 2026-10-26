@@ -24,6 +24,12 @@ export function neighbourBiomes(tiles: World, x: number, y: number) {
 	return { four: pick(SIDES4), eight: pick(SIDES8) };
 }
 
+/** An owned non-castle tile with no same-biome 4-neighbour: a 1x1 speck that the next purchase beside it should join. */
+export function isLonely(tiles: World, x: number, y: number): boolean {
+	const biome = ownedBiome(getTile(tiles, x, y));
+	return biome !== null && !SIDES4.some(([dx, dy]) => getTile(tiles, x + dx, y + dy)?.biome === biome);
+}
+
 /** Every biome a purchase can produce (castle and empty are not; Grounds, the old building lot, no longer turns up: buildings go on any tile). */
 export const SELECTABLE_BIOMES = Object.keys(BIOMES).filter(
 	(name) => !SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) && !EMPTY_BIOMES.includes(name as BiomeType) && name !== 'grounds'
@@ -48,6 +54,27 @@ export function biomeVerdicts(tiles: World, x: number, y: number, purchased: num
 	});
 }
 
+const DIAGONALS: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+
+/**
+ * What the four 2x2 blocks round (x, y) say about the new tile, to keep two tiles of a biome from touching only at a corner
+ * (the dual-grid then pinches them into a neck or a stray blob, never a clean shore):
+ *   `avoid`   biomes that would meet a diagonal tile of the same biome with both tiles between them owned and different;
+ *   `require` biomes of a diagonal pair of owned tiles whose fourth corner is owned and different: the new tile must join them.
+ */
+export function saddleRules(tiles: World, x: number, y: number): { avoid: Set<BiomeType>; require: Set<BiomeType> } {
+	const avoid = new Set<BiomeType>();
+	const require = new Set<BiomeType>();
+	for (const [dx, dy] of DIAGONALS) {
+		const diag = getTile(tiles, x + dx, y + dy);
+		const o1 = getTile(tiles, x + dx, y);
+		const o2 = getTile(tiles, x, y + dy);
+		if (diag && o1 && o2 && o1.biome !== diag.biome && o2.biome !== diag.biome && diag.biome !== 'castle') avoid.add(diag.biome);
+		if (diag && o1 && o2 && o1.biome === o2.biome && o1.biome !== diag.biome && o1.biome !== 'castle') require.add(o1.biome);
+	}
+	return { avoid, require };
+}
+
 /** Pick one by weight from [item, weight][] using a [0,1) roll. */
 function weighted<T>(items: [T, number][], roll: number): T {
 	const total = items.reduce((s, [, w]) => s + w, 0);
@@ -65,8 +92,28 @@ function weighted<T>(items: [T, number][], roll: number): T {
  * (BIOME_SPAWN). Always returns an allowed biome (plains is never blocked).
  */
 export function rollBiome(tiles: World, x: number, y: number, purchased: number, random: () => number = Math.random): BiomeType {
-	const allowed = biomeVerdicts(tiles, x, y, purchased).filter((v) => v.allowed).map((v) => v.biome);
+	const everyAllowed = biomeVerdicts(tiles, x, y, purchased).filter((v) => v.allowed).map((v) => v.biome);
 	const { four } = neighbourBiomes(tiles, x, y);
+
+	// No corner-only contacts (see saddleRules): join the pair that needs it, otherwise stay off the biomes that would pinch.
+	const saddle = saddleRules(tiles, x, y);
+	const required = [...saddle.require].filter((b) => everyAllowed.includes(b));
+	if (required.length) return required[Math.floor(random() * required.length)];
+	const unpinched = everyAllowed.filter((b) => !saddle.avoid.has(b));
+	const allowed = unpinched.length ? unpinched : everyAllowed;
+
+	// Buddy rule: join a lone neighbour, so every biome ends up at least two tiles big.
+	const lonely = SIDES4.filter(([dx, dy]) => isLonely(tiles, x + dx, y + dy))
+		.map(([dx, dy]) => getTile(tiles, x + dx, y + dy)!.biome)
+		.filter((b) => allowed.includes(b));
+	if (lonely.length && random() * 100 < BIOME_RULES.cluster.buddyPct) return lonely[Math.floor(random() * lonely.length)];
+
+	// A gap (every side owned) can never be joined later, so it must continue a neighbour.
+	const ownedSides = SIDES4.filter(([dx, dy]) => getTile(tiles, x + dx, y + dy) !== undefined).length;
+	if (ownedSides === 4) {
+		const fits = four.filter((b) => allowed.includes(b));
+		if (fits.length) return fits[Math.floor(random() * fits.length)]; // a biome on more sides is likelier
+	}
 
 	const copyable = [...new Set(four)].filter((b) => allowed.includes(b) && !BIOME_RULES.cluster.neverCopy.includes(b));
 	if (copyable.length) {
@@ -106,7 +153,9 @@ export function generateStartRing(random: () => number = Math.random): BiomeType
 			ring.push(i > 0 && random() * 100 < copyPreviousPct ? ring[i - 1] : weighted(entries, random()));
 		}
 		const count = (b: string) => ring.filter((r) => r === b).length;
-		if (count('plains') >= minPlains && entries.every(([b]) => b === 'plains' || count(b) <= maxOfOther)) return ring;
+		// the ring is a cycle of 4-adjacent tiles: every tile needs a same-biome neighbour in it (no 1x1 patch)
+		const paired = ring.every((b, i) => b === ring[(i + 7) % 8] || b === ring[(i + 1) % 8]);
+		if (paired && count('plains') >= minPlains && entries.every(([b]) => b === 'plains' || count(b) <= maxOfOther)) return ring;
 	}
-	return RING.map((_, i) => (i % 2 === 0 ? 'plains' : 'forest')) as BiomeType[];
+	return RING.map((_, i) => (i % 4 < 2 ? 'plains' : 'forest')) as BiomeType[];
 }

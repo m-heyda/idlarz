@@ -337,10 +337,10 @@ export const BASE_GENERATION_RATES = {
 // every side per level: 3x3 up to level 7, then 5x5, 7x7 and 9x9 at level 10.
 export const CASTLE_RANGE = { radius: 1, growFromLevel: 8, growPerLevel: 1 };
 
-// Production bonus inside the castle range: from `fromLevel` every tile of the (growing) range area, and the building on it,
-// produces `perRadiusTile` times its output extra for every tile the range reaches out: +100% at radius 1 (level 7) up to
-// +400% at radius 4 (level 10).
-export const CASTLE_AREA_BONUS = { fromLevel: 7, perRadiusTile: 1 };
+// Production bonus inside the castle range: below `fromLevel` (no walls yet) every tile of the 3x3 range, and the building on
+// it, produces `earlyBonus` extra (+50%, x1.5). From `fromLevel` it produces `perRadiusTile` times its output extra for every
+// tile the range reaches out: +100% at radius 1 (level 7) up to +400% at radius 4 (level 10).
+export const CASTLE_AREA_BONUS = { fromLevel: 7, perRadiusTile: 1, earlyBonus: 0.5 };
 
 // From this castle level the 3x3 range becomes a walled fortress (walls on its edges, a tower on each corner): no monsters
 // and no chests spawn inside it and monsters already there are driven out.

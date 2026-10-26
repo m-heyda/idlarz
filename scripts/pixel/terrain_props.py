@@ -367,6 +367,62 @@ def mushrooms():
     return _sprite(['..cc....', '.cccc.cc', 'cccccccc', '..ss..ss', '..ss..ss'], dict(c='#c8503e', s='#ece4cc'), '#6a2a20')
 
 
+def mushroom(kind=0, cluster=False):
+    """Forest-floor toadstools: 0 red with cream dots, 1 blue, 2 white. `cluster` is a small group of three."""
+    pal = [
+        dict(c='#d4483a', w='#f6ecd8', s='#ece0c4', d='#a8302a', o='#5e1e1c'),
+        dict(c='#4c7fd8', w='#d4e6ff', s='#e4e8f0', d='#3458a8', o='#1c2c64'),
+        dict(c='#eee9de', w='#ffffff', s='#d8d0bc', d='#bfb7a2', o='#5e5848'),
+    ][kind]
+    rows = ['.ccc.', 'cwccc', 'ddddd', '..s..', '..s..']
+    if cluster:
+        rows = ['.ccc....cc..', 'cwccc..cwccc', 'ddddd..ddddd', '..s.....ss..', '..s.....ss..']
+    return _sprite(rows, {k: v for k, v in pal.items() if k != 'o'}, pal['o'])
+
+
+def moss_stone(kind=0):
+    """A stone furred with moss (swamp): green cap over grey rock."""
+    colors = dict(m='#5f8a3c', M='#88b24e', h='#b4bcc4', s='#8a949e', d='#5e6a76')
+    rows = [
+        ['..Mmm...', '.mmMmhh.', 'hhsmmsmd', 'hssssssd', '.dddddd.'],
+        ['.mMm.', 'hmmsh', 'sssdd', '.ddd.'],
+        ['.mM.....', 'hsmd.mm.', '.dd.hsmd', '.....dd.'],
+    ][kind]
+    return _sprite(rows, colors, '#2c3c30')
+
+
+def crab(kind=0):
+    """A little beach crab, claws up: 0 red, 1 sandy orange."""
+    pal = [dict(c='#e8654c', r='#c8432e', l='#8a2c1e', e='#ffffff', o='#5e1e14'),
+           dict(c='#e8a24c', r='#c8802e', l='#8a5a1e', e='#ffffff', o='#5e3a14')][kind]
+    rows = ['.cc..cc.', '.c.rr.c.', '..rerr..', '.rrrrrr.', 'l.l..l.l']
+    return _sprite(rows, {k: v for k, v in pal.items() if k != 'o'}, pal['o'])
+
+
+def starfish(kind=0):
+    """A starfish on the sand: 0 orange, 1 pink."""
+    pal = [dict(a='#f0883a', b='#d06a24', o='#8a3e14'), dict(a='#f0a0b4', b='#d07890', o='#8a3e58')][kind]
+    return _sprite(['..a..', 'aaaaa', '.aba.', '.a.a.'], {k: v for k, v in pal.items() if k != 'o'}, pal['o'])
+
+
+def seashell(kind=0):
+    """Beach shells: 0 spiral, 1 scallop, 2 tiny cream shell."""
+    if kind == 0:
+        return _sprite(['.cc.', 'cwcc', 'cccd', '.dd.'], dict(c='#f2e2c8', w='#fffaf0', d='#c8a888'), '#8a6c50')
+    if kind == 1:
+        return _sprite(['.pp.', 'pwpp', 'pppp', '.dd.'], dict(p='#f0b4a8', w='#ffe4de', d='#c88478'), '#8a504a')
+    return _sprite(['cw', 'cd'], dict(c='#f6ecd8', w='#ffffff', d='#d4b890'), '#a08a68')
+
+
+def sand_dollar():
+    return _sprite(['.ww.', 'wmmw', 'wmmw', '.ww.'], dict(w='#f4ecd8', m='#e0d0b0'), '#a89870')
+
+
+def sea_grass():
+    """A tuft of dune grass on the sand."""
+    return _bare(['g.g', 'gsg', 'ggg'], dict(g='#7aa83a', s='#a8c85a'))
+
+
 def reeds():
     return _sprite(['.t...t..t.', '.t...t..t.', '.s.t.s..s.', '.s.s.s.ss.', 'ss.s.ss.s.', 'ssssssssss'], dict(t='#8a5a30', s='#7a9a3a'), '#445a1e')
 
@@ -493,14 +549,74 @@ def ice_floe(seed=0):
 
 
 # ------------------------------------------------------------------ water: boats and piers
-def boat(vertical=False):
-    img = _sprite(['..hhhhhhhhhhhh..', '.hhiiiiiiiiiihh.', 'hhiiiiiibiiiiihh', 'hhiiiiiibiiiiihh', '.hhiiiiiiiiiihh.', '..hhhhhhhhhhhh..'],
-                  dict(h='#b88c58', i='#7a5a38', b='#9a7040'), '#47301a')
+def boat(vertical=False, kind=''):
+    """A rowboat: '' plain, 'ice' frozen in with snow on it, 'bog' half sunk in the murk."""
+    cols = dict(h='#b88c58', i='#7a5a38', b='#9a7040')
+    out = '#47301a'
+    if kind == 'ice':
+        cols, out = dict(h='#f2f9fe', i='#cfe6f6', b='#a8c8e0'), '#3a5470'
+    elif kind == 'bog':
+        cols, out = dict(h='#6a7a3a', i='#3c4a26', b='#4c5a2e'), '#222a14'
+    rows = ['..hhhhhhhhhhhh..', '.hhiiiiiiiiiihh.', 'hhiiiiiibiiiiihh', 'hhiiiiiibiiiiihh', '.hhiiiiiiiiiihh.', '..hhhhhhhhhhhh..']
+    if kind == 'bog':
+        rows = ['..hhh..hhhhh....', '.hhi.iiiiiihh...', 'hhiiiiibiiiihh..', '.hhiiiiiibiihh..', '..hhhhhhhhhhhh..']
+        rows = [r.ljust(16, '.') for r in rows]
+    img = _sprite(rows, cols, out)
+    if kind == 'bog':
+        px = img.load()
+        for x, y in ((4, 2), (9, 3)):
+            if px[x, y][3]:
+                px[x, y] = C('#8a5ac0')
     return img.transpose(Image.TRANSPOSE) if vertical else img
 
 
-def pier(land, length=26, barrel=False):
-    """Pier whose base touches land on side `land` ('n','e','s','w'); far end points into the water."""
+def _mix(col, target, t):
+    return tuple(round(a + (b - a) * t) for a, b in zip(col[:3], target[:3])) + (col[3],)
+
+
+def _frost(img, length):
+    """Snow settled on the top of every plank and an icy blue cast on the rest: the dock is frozen in."""
+    px = img.load()
+    w, h = img.size
+    snow, ice = C('#f2f9fe'), C('#cfe6f6')
+    for y in range(h):
+        for x in range(w):
+            if not px[x, y][3]:
+                continue
+            if y % 4 == 0 and hash32(x, y, 61) % 5:
+                px[x, y] = snow
+            elif hash32(x, y, 62) % 3 == 0:
+                px[x, y] = _mix(px[x, y], ice, 0.7)
+            else:
+                px[x, y] = _mix(px[x, y], ice, 0.3)
+
+
+def _rot(img, length, w):
+    """A swamp pier left to rot: missing boards, a snapped end, moss and a few corrupted purple specks."""
+    px = img.load()
+    h = img.size[1]
+    moss, slime, dark = C('#5f7d32'), C('#8a5ac0'), C('#2c2a18')
+    gone = {1 + hash32(length, w, 71) % 2, 3 + hash32(length, w, 72) % 2, 5}            # plank rows (y // 4) that fell in
+    for y in range(4, h):
+        for x in range(2, w - 2):
+            if (y // 4) in gone and y % 4 != 3 and hash32(x, y, 73) % 6:
+                px[x, y] = (0, 0, 0, 0)
+    for y in range(h - 7, h):                                                              # the far end is snapped off, ragged
+        for x in range(w):
+            if y - (h - 7) > 2 + hash32(x, 0, 74) % 5:
+                px[x, y] = (0, 0, 0, 0)
+    for y in range(h):
+        for x in range(w):
+            if not px[x, y][3]:
+                continue
+            r = hash32(x, y, 75) % 100
+            col = _mix(px[x, y], C('#4a5a2a'), 0.38)
+            px[x, y] = moss if r < 12 else slime if r < 14 else dark if r < 18 else col
+
+
+def pier(land, length=26, barrel=False, kind=''):
+    """Pier whose base touches land on side `land` ('n','e','s','w'); far end points into the water.
+    kind '' is a sound dock, 'ice' is frozen in (snow on the planks), 'bog' is rotten and broken (swamp)."""
     w = 12
     img = Image.new('RGBA', (w, length), (0, 0, 0, 0))
     px = img.load()
@@ -522,7 +638,11 @@ def pier(land, length=26, barrel=False):
         for y in range(length - 8, length - 1):
             for x in range(7, 11):
                 px[x, y] = C('#7a5a3c') if y not in (length - 7, length - 4) else C('#4a3320')
-    img = _outline(_pad(img), '#46301a')
+    if kind == 'ice':
+        _frost(img, length)
+    elif kind == 'bog':
+        _rot(img, length, w)
+    img = _outline(_pad(img), {'': '#46301a', 'ice': '#3a5470', 'bog': '#2c2a1a'}[kind])
     if land == 'n':
         img = img.transpose(Image.FLIP_TOP_BOTTOM)
     elif land == 'e':
@@ -594,6 +714,14 @@ DECOR = {
     'plains': dict(edge=[0.2, 0.3, 0.28, 0.14, 0.08], deep=[0.2, 0.3, 0.28, 0.14, 0.08],
                    opts=[('fl_w', (tiny_flower, 0), 3, 0), ('fl_y', (tiny_flower, 1), 3, 0), ('fl_p', (tiny_flower, 2), 2, 0),
                          ('fl_v', (tiny_flower, 3), 2, 0), ('tuft', (tuft,), 2, 0)]),
-    'swamp': dict(edge=[0.8, 0.2], deep=[0.58, 0.42],
-                  opts=[('fallen', (fallen_log, 0), 3, 0), ('fallen2', (fallen_log, 1), 2, 0)]),
+    'swamp': dict(edge=[0.62, 0.28, 0.1], deep=[0.42, 0.4, 0.18],
+                  opts=[('fallen', (fallen_log, 0), 3, 0), ('fallen2', (fallen_log, 1), 2, 0),
+                        ('moss1', (moss_stone, 0), 3, 0), ('moss2', (moss_stone, 1), 3, 0), ('moss3', (moss_stone, 2), 2, 0)]),
+    'coast': dict(edge=[0.18, 0.32, 0.28, 0.22], deep=[0.18, 0.32, 0.28, 0.22],
+                  opts=[('sh1', (seashell, 0), 3, 0), ('sh2', (seashell, 1), 3, 0), ('sh3', (seashell, 2), 3, 0), ('crab1', (crab, 0), 3, 0),
+                        ('crab2', (crab, 1), 2, 0), ('star1', (starfish, 0), 2, 0), ('star2', (starfish, 1), 1, 0),
+                        ('dollar', (sand_dollar,), 2, 0), ('dgrass', (sea_grass,), 3, 0)]),
+    'forest': dict(edge=[0.5, 0.32, 0.18], deep=[0.38, 0.38, 0.24],
+                   opts=[('mu_r', (mushroom, 0), 3, 0), ('mu_b', (mushroom, 1), 2, 0), ('mu_w', (mushroom, 2), 3, 0),
+                         ('mc_r', (mushroom, 0, True), 1, 0), ('mc_b', (mushroom, 1, True), 1, 0), ('mc_w', (mushroom, 2, True), 1, 0)]),
 }

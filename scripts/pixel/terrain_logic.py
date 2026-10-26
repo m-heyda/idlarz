@@ -31,6 +31,21 @@ def depth(g, x, y):
     return d
 
 
+def shore_style(gr, info):
+    """A lake's shore takes on the land it meets: frozen beside tundra, murky beside a swamp (never both: they cannot touch).
+    Returns (style, extra variant): the extra is 2 x the bits of the corners holding that land, so the shore art can fade the
+    tint in from those corners (the dual cell's corners are tile centres, so the fade runs on across the cell borders)."""
+    if gr != 'lake':
+        return gr, 0
+    tundra = sum(bit for bit, other, _ in info if other == 'tundra')
+    swamp = sum(bit for bit, other, _ in info if other == 'swamp')
+    if tundra:
+        return 'lake_frost', 2 * tundra
+    if swamp:
+        return 'lake_bog', 2 * swamp
+    return gr, 0
+
+
 def cell_layers(g, cx, cy):
     """[(style, mask, variant)] bottom-up for dual cell (cx, cy); corners are tiles NW=(cx-1,cy-1) ... SE=(cx,cy)."""
     corners = [(NW, cx - 1, cy - 1), (NE, cx, cy - 1), (SW, cx - 1, cy), (SE, cx, cy)]
@@ -45,7 +60,8 @@ def cell_layers(g, cx, cy):
     for i, (gr, mask, var) in enumerate(layers):
         if full and i < full[-1]:
             continue
-        out.append((gr, mask, var))
+        style, extra = shore_style(gr, info)
+        out.append((style, mask, var + extra))
         for tier in range(1, MAX_DEPTH.get(gr, 0) + 1):
             dmask = sum(bit for bit, other, d in info if other == gr and d >= tier)
             if dmask:
@@ -224,7 +240,10 @@ def dock_at(m, g, x, y):
     dx, dy, d = land
     length = (22, 26, 30)[hash32(x, y, 302) % 3]
     barrel = 1 if hash32(x, y, 303) % 3 == 0 else 0
-    pid = f'pier_{d}_{length}_{barrel}'
+    kind = {'tundra': 'ice_', 'swamp': 'bog_'}.get(at(g, x + dx, y + dy), '')     # frozen dock beside tundra, rotten one beside a swamp
+    if kind == 'bog_':
+        barrel = 0
+    pid = f'pier_{kind}{d}_{length}_{barrel}'
     w, h = m['sprites'][pid][2], m['sprites'][pid][3]
     off = 8 + hash32(x, y, 304) % (CELL - 16 - (w if d in 'ns' else h))
     if d == 's':
@@ -237,7 +256,7 @@ def dock_at(m, g, x, y):
         px, py = x * CELL - 7, y * CELL + off
     out = [(pid, px, py + h)]
     if hash32(x, y, 305) % 3 == 0:                                  # a rowboat moored beside the pier
-        bid = 'boat_v' if d in 'ns' else 'boat_h'
+        bid = f'boat_{kind}v' if d in 'ns' else f'boat_{kind}h'
         bw, bh = m['sprites'][bid][2], m['sprites'][bid][3]
         side = 1 if ((px - x * CELL) if d in 'ns' else (py - y * CELL)) < 20 else -1
         if d in 'ns':

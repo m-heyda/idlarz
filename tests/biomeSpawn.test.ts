@@ -6,6 +6,7 @@ import { BIOME_RULES } from '../src/config/biomeRules';
 import { SCALING_CONFIG, BIOMES, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import type { BiomeType, Tile } from '../src/types/game';
 import { tileAt, worldFromRows } from '../src/utils/world';
+import { growWorld, loneTileStats, saddleCount } from '../src/utils/growWorld';
 
 const tile = (biome: BiomeType, isOwned = true): Tile => ({ biome, isOwned });
 const empty = (): Tile[][] => Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => tile('empty', false)));
@@ -79,8 +80,8 @@ test('the picker marks a biome that continues an adjoining area', () => {
 
 test('clustering: a forest neighbour makes forest much likelier, and more neighbours make it likelier still', () => {
 	const none = spread(empty(), 20);
-	const one = spread(map(['.....', '.....', '.F...', '.....', '.....']), 20);
-	const three = spread(map(['.....', '..F..', '.F...', '..F..', '.....']), 20);
+	const one = spread(map(['.....', '.F...', '.F...', '.....', '.....']), 20); // a pair: not a lone tile the new one would join
+	const three = spread(map(['.....', '.FF..', '.F...', '.FF..', '.....']), 20); // three forest sides, none of them lone
 	assert.ok(one.forest > none.forest * 2.5, `${one.forest} vs ${none.forest}`);
 	assert.ok(three.forest > one.forest);
 	assert.ok(three.forest / 1000 <= BIOME_RULES.cluster.capPct / 100 + 0.2);
@@ -94,9 +95,53 @@ test('grounds, the old building lot, is never rolled any more (buildings go on a
 
 test('water clusters: next to a lake, lakes and coasts both get likelier', () => {
 	const base = spread(empty(), 20);
-	const near = spread(map(['.....', '.....', '.L...', '.....', '.....']), 20);
+	const near = spread(map(['.....', '.L...', '.L...', '.....', '.....']), 20);
 	assert.ok(near.lake > base.lake * 2);
 	assert.ok((near.coast ?? 0) > (base.coast ?? 0));
+});
+
+test('buddy rule: a tile beside a lone tile joins it, so no biome stays a 1x1 speck', () => {
+	const lone = map(['.....', '.....', '.F...', '.....', '.....']); // a single forest west of (2,2)
+	assert.equal(spread(lone, 20).forest, 1000);
+	const pair = map(['.....', '.F...', '.F...', '.....', '.....']);
+	assert.ok(spread(pair, 20).forest < 1000, 'a forest that already has a neighbour does not force the roll');
+	// swamp is blocked beside tundra, so a lone swamp cannot be joined there
+	const blocked = map(['.....', '.....', '.S...', '..T..', '.....']);
+	assert.equal(spread(blocked, 20).swamp, undefined);
+});
+
+test('a gap (every side owned) continues one of its neighbours', () => {
+	const gap = map(['.....', '..F..', '.PCH.', '..L..', '.....']);
+	const seen = spread(gap, 20);
+	assert.deepEqual(Object.keys(seen).sort(), ['forest', 'hills', 'lake', 'plains'].sort());
+	assert.ok(!('swamp' in seen) && !('tundra' in seen) && !('coast' in seen));
+});
+
+test('growing a map leaves few 1x1 specks and none that can never be joined', () => {
+	for (const policy of ['nearest', 'random'] as const) {
+		let lone = 0;
+		let stuck = 0;
+		let total = 0;
+		for (let seed = 0; seed < 40; seed++) {
+			const s = loneTileStats(growWorld(150, seed, policy));
+			lone += s.lone;
+			stuck += s.stuck;
+			total += s.total;
+		}
+		assert.ok(lone / total < 0.07, `${policy}: ${((100 * lone) / total).toFixed(1)}% lone tiles (was ~12% before the buddy rule)`);
+		assert.ok(stuck / 40 < 1, `${policy}: ${stuck / 40} stuck lone tiles per map`);
+	}
+});
+
+test('no two tiles of a biome touch only at a corner: the new tile joins the pair or stays off the biome', () => {
+	// forest NW of the target (2,2) with plains between: forest would pinch, so it is never rolled
+	const pinch = map(['.....', '.FP..', '.PP..', '.....', '.....']);
+	assert.equal(spread(pinch, 20).forest, undefined);
+	// a diagonal pair of forest with the 4th corner plains: the new tile must be forest
+	const pair = map(['.....', '.....', '...FF', '..FP.', '..F..']);
+	assert.deepEqual(Object.keys(spread(pair, 20)), ['forest']);
+	for (const policy of ['nearest', 'random'] as const)
+		for (let seed = 0; seed < 30; seed++) assert.equal(saddleCount(growWorld(200, seed, policy)), 0, `${policy} seed ${seed}`);
 });
 
 test('neighbourBiomes ignores unowned tiles and the castle', () => {
@@ -105,11 +150,12 @@ test('neighbourBiomes ignores unowned tiles and the castle', () => {
 	assert.deepEqual(neighbourBiomes(worldFromRows(g), 2, 2), { four: [], eight: [] });
 });
 
-test('start ring: only plains and forest, at least 3 plains, no other biome more than maxOfOther times, always valid across many seeds', () => {
+test('start ring: only plains and forest, every patch 2+ tiles, at least 3 plains, no other biome more than maxOfOther times, always valid across many seeds', () => {
 	for (let i = 0; i < 300; i++) {
 		const ring = generateStartRing(seqRandom(i));
 		assert.equal(ring.length, 8);
 		assert.ok(ring.every((b) => b === 'plains' || b === 'forest'), 'no hills or lakes touch the castle');
+		ring.forEach((b, k) => assert.ok(b === ring[(k + 7) % 8] || b === ring[(k + 1) % 8], `ring tile ${k} is a 1x1 patch`));
 		assert.ok(ring.filter((b) => b === 'plains').length >= BIOME_RULES.startRing.minPlains);
 		for (const b of new Set(ring)) {
 			assert.ok(b in BIOME_RULES.startRing.weights, `${b} is a basic biome`);

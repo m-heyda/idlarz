@@ -128,7 +128,7 @@ test('props stay in bounds: density is sparse, trees and rocks are never drawn o
 	assert.ok(props > 20 && props < 20 * 20 * 2.5, `placed ${props} props on 400 plains tiles`);
 });
 
-test('decor: tiny flowers on plains, fallen trees on swamps, nothing elsewhere, never under props or on buildings', () => {
+test('decor: flowers on plains, mushrooms in forests, logs and mossy stones on swamps, crabs and shells on the beach, nothing elsewhere, never under props or on buildings', () => {
 	const plains = buildGroundGrid(grid(Array(20).fill('P'.repeat(20))));
 	let flowers = 0;
 	for (let y = 0; y < 20; y++)
@@ -152,9 +152,19 @@ test('decor: tiny flowers on plains, fallen trees on swamps, nothing elsewhere, 
 	const swamp = buildGroundGrid(grid(Array(12).fill('S'.repeat(12))));
 	let logs = 0;
 	for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) logs += decorSprites(swamp, x, y, tileSprites(swamp, x, y)).length;
-	assert.ok(logs > 10 && logs < 12 * 12 * 0.8, `placed ${logs} fallen trees on 144 swamp tiles`);
+	assert.ok(logs > 10 && logs < 12 * 12 * 0.8, `placed ${logs} fallen trees and mossy stones on 144 swamp tiles`);
 
-	for (const ground of ['L', 'H', 'F', 'T', 'B']) {
+	const forest = buildGroundGrid(grid(Array(12).fill('F'.repeat(12))));
+	let mushrooms = 0;
+	for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) mushrooms += decorSprites(forest, x, y, tileSprites(forest, x, y)).length;
+	assert.ok(mushrooms > 20 && mushrooms < 12 * 12, `placed ${mushrooms} mushrooms on 144 forest tiles`);
+
+	const beach = buildGroundGrid(grid(Array(12).fill('B'.repeat(12))));
+	let shells = 0;
+	for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) shells += decorSprites(beach, x, y, tileSprites(beach, x, y)).length;
+	assert.ok(shells > 40 && shells < 12 * 12 * 3, `placed ${shells} beach details on 144 coast tiles`);
+
+	for (const ground of ['L', 'H', 'T']) {
 		const g = buildGroundGrid(grid(Array(6).fill(ground.repeat(6))));
 		for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) assert.deepEqual(decorSprites(g, x, y, []), [], `no decor on ${ground}`);
 	}

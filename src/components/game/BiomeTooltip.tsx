@@ -95,9 +95,8 @@ export const BiomeTooltip = memo(
 				{/* The castle explains its bonus area: every tile (and building) inside it produces more */}
 				{biome === 'castle' && (
 					<div className='text-purple-300 text-xs'>
-						{areaBonus > 0
-							? `Castle area: ${percent(areaBonus)} production on every tile and building within ${castleRangeRadius(castleLevel)} tile${castleRangeRadius(castleLevel) > 1 ? 's' : ''}`
-							: `Castle area bonus unlocks at level ${CASTLE_AREA_BONUS.fromLevel}`}
+						{`Castle area: ${percent(areaBonus)} production on every tile and building within ${castleRangeRadius(castleLevel)} tile${castleRangeRadius(castleLevel) > 1 ? 's' : ''}`}
+						{castleLevel < CASTLE_AREA_BONUS.fromLevel && ` (walls at level ${CASTLE_AREA_BONUS.fromLevel} double it)`}
 					</div>
 				)}
 				{biome === 'castle' && castleUpgrade && (
