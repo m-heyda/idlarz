@@ -11,6 +11,7 @@ import {
 	penZoom,
 	project,
 	randomSpot,
+	PERSONAL_SPACE,
 	roomySpot,
 	seeded,
 	walkView,
@@ -205,7 +206,12 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 					} else {
 						const nx = a.x + (dx / dist) * stepLen;
 						const ny = a.y + (dy / dist) * stepLen;
-						if (walkable(nx, ny, viewRef.current)) {
+						let crowded = false;
+						agents.current.forEach((o) => {
+							// no walking into another animal (unless already overlapping, so nobody gets stuck)
+							if (!crowded && o !== a && Math.hypot(o.x - nx, o.y - ny) < PERSONAL_SPACE && Math.hypot(o.x - a.x, o.y - a.y) >= PERSONAL_SPACE) crowded = true;
+						});
+						if (!crowded && walkable(nx, ny, viewRef.current)) {
 							a.x = nx;
 							a.y = ny;
 							a.moving = true;

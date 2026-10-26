@@ -31,22 +31,26 @@ const BARN = { x: 8.5, y: 8.5 };
 const COOP = { x: -1, y: 11 };
 const POND = { x: -12, y: -4 };
 
-/** Where animals may walk: inside the fence (at +-18), a little clear of it */
-const BOUNDS = { x: 17, y: 17 };
+/** Where animals may walk: inside the fence (at +-18), clear of its posts */
+const BOUNDS = { x: 16.5, y: 16.5 };
 
 const box = (x: number, y: number, hx: number, hy: number): [number, number, number, number] => [x - hx, x + hx, y - hy, y + hy];
 
-// Rectangles animals keep out of (x0, x1, y0, y1): every prop with a little room round it
+// Rectangles animals keep out of (x0, x1, y0, y1): every prop plus about a body's width round it, so an animal never stands in
+// or on a building, a trough, a hay stack and so on (its feet stay a whole sprite away from the prop's footprint)
 const BLOCKED: [number, number, number, number][] = [
-	box(BARN.x, BARN.y, 2.1, 1.65),
-	box(COOP.x, COOP.y, 1.1, 0.85),
-	box(POND.x, POND.y, 2.4, 2.1),
-	...TROUGHS.map(([x, y, axis]) => (axis === 'x' ? box(x, y, 1.25, 0.7) : box(x, y, 0.7, 1.25))),
-	...TANKS.map(([x, y]) => box(x, y, 1.1, 1.1)),
-	...HAY.map(([x, y]) => box(x, y, 1.4, 1.4)),
-	...BARRELS.map(([x, y]) => box(x, y, 0.55, 0.55)),
-	...CRATES.map(([x, y]) => box(x, y, 0.6, 0.6)),
+	box(BARN.x, BARN.y, 3.4, 2.9),
+	box(COOP.x, COOP.y, 2.2, 2.0),
+	box(POND.x, POND.y, 3.3, 3.0),
+	...TROUGHS.map(([x, y, axis]) => (axis === 'x' ? box(x, y, 2.1, 1.5) : box(x, y, 1.5, 2.1))),
+	...TANKS.map(([x, y]) => box(x, y, 1.95, 1.95)),
+	...HAY.map(([x, y]) => box(x, y, 2.3, 2.3)),
+	...BARRELS.map(([x, y]) => box(x, y, 1.35, 1.35)),
+	...CRATES.map(([x, y]) => box(x, y, 1.4, 1.4)),
 ];
+
+/** Animals keep at least this far (world units) from each other */
+export const PERSONAL_SPACE = 0.9;
 
 /** The part of the pasture that is actually on screen and not under a panel, in native pen pixels (feet positions). */
 export interface WalkView {
