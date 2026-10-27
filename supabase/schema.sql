@@ -1,5 +1,5 @@
 -- Idlarz accounts and cloud saves: the schema as it stands on the Supabase project (applied as migrations create_profiles,
--- cloud_save_v2_split, harden_policies_and_rpc, test_account_marker). Run once in the SQL editor of a fresh project.
+-- cloud_save_v2_split, harden_policies_and_rpc, test_account_marker, autosave_history_by_time). Run once in the SQL editor of a fresh project.
 -- Design and rules: docs/09-cloud-saves.md.
 
 -- ---- profiles: character name and hero, owner-only ------------------------------------------------------------------
@@ -49,6 +49,7 @@ create table public.player_saves (
   fresh_start      boolean     not null,   -- the first save of the account was a young game: ranking-eligible
   ever_flagged     boolean     not null default false,
   test_account     boolean     not null default false, -- saved through a non-production server: never ranked, flags never count
+  last_archive_at  timestamptz not null default now(),  -- when save_history last got a full copy (a new one is due 30 min later)
   constraint rev_positive check (rev >= 1)
 );
 
@@ -81,7 +82,7 @@ create index player_stats_tiles    on public.player_stats (tiles_owned desc)    
 create index player_stats_income   on public.player_stats (gold_per_min desc)                 where trusted;
 create index player_stats_rebirths on public.player_stats (rebirths desc, legacy_earned desc) where trusted;
 
--- ---- save_history: sparse full copies for rollback (first save, every 20th, new flags; pinned when a game is replaced) -
+-- ---- save_history: sparse full copies for rollback (first save, one per 30 min, new flags; pinned when a game is replaced) -
 create table public.save_history (
   id               bigint generated always as identity primary key,
   user_id          uuid        not null references auth.users (id) on delete cascade,
@@ -138,7 +139,7 @@ begin
       castle_level = r.castle_level, tiles_owned = r.tiles_owned, buildings_owned = r.buildings_owned, rebirths = r.rebirths,
       legacy_points = r.legacy_points, legacy_earned = r.legacy_earned, xp_gain_pct = r.xp_gain_pct, rates = r.rates,
       gold_per_min = r.gold_per_min, flags = r.flags, audit_ratio = r.audit_ratio, ever_flagged = r.ever_flagged,
-      test_account = r.test_account
+      test_account = r.test_account, last_archive_at = coalesce(r.last_archive_at, t.last_archive_at)
     from jsonb_populate_record(null::public.player_saves, p_save) r
     where t.user_id = p_user and t.rev = p_base_rev;
     get diagnostics v_rows = row_count;

@@ -73,6 +73,7 @@ import { createClickLimiter } from '@/lib/clickLimiter';
 import { createHitGuard } from '@/lib/hitGuard';
 import { applyHit, armorOf, dodgeChance, maxHp, newFight, regen, rollHit, stepFight } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
+import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
 import { addToBag, aggregateStats, equipFromBag, moveSlot, removeFromBag, starterBag, unequip } from '@/lib/inventory';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { canSpawn } from '@/lib/spawnLimits';
@@ -214,7 +215,7 @@ const createGameSlice = (
 		return true;
 	};
 
-	return {
+	const slice = {
 		// A fixed placeholder world: it is rendered on the server and before the save is read, so it must not be
 		// random (that broke hydration). `merge` below replaces it with a random one for a player without a save.
 		...createInitialData(EMPTY_PRESTIGE, seededRandom(1)),
@@ -344,8 +345,8 @@ const createGameSlice = (
 
 		addStatPoint: (stat: keyof CharacterStats) => {
 			const state = get();
-			if (!(BASE_STATS as readonly string[]).includes(stat)) return;
-			if (state.characterStats.availablePoints <= 0) return;
+			if (!(BASE_STATS as readonly string[]).includes(stat)) return false;
+			if (state.characterStats.availablePoints <= 0) return false;
 
 			const newStats = { ...state.characterStats };
 			newStats[stat]++;
@@ -364,6 +365,7 @@ const createGameSlice = (
 				characterStats: newStats,
 				resourceRates: newRates,
 			});
+			return true;
 		},
 
 		buyTile: (x: number, y: number) => {
@@ -770,6 +772,7 @@ const createGameSlice = (
 
 			// Level and stat points
 			const { level, progress } = calculateLevel(newResources.xp);
+			const castleFinished = !!state.castleUpgrade && !newCastleUpgrade;
 			const newCharacterStats = { ...state.characterStats };
 			if (level > state.level.level) {
 				newCharacterStats.availablePoints += level - state.level.level;
@@ -792,6 +795,8 @@ const createGameSlice = (
 				playerHp: newPlayerHp,
 				playSeconds: state.playSeconds + secondsElapsed,
 			});
+			if (castleFinished) emitSaveEvent('castleUpgraded');
+			if (level > state.level.level) emitSaveEvent('levelUp');
 		},
 
 		setPlayerName: (name: string) => {
@@ -972,6 +977,9 @@ const createGameSlice = (
 			return true;
 		},
 	};
+
+	// Purchases, castle upgrades, rebirth, gear changes: a successful call tells the cloud sync to save soon
+	return withSaveEvents(slice);
 };
 
 export const useGameStore = create(

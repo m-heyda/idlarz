@@ -29,10 +29,11 @@ interface Row {
 	fresh_start: boolean;
 	ever_flagged: boolean;
 	test_account: boolean;
+	last_archive_at: string;
 }
 
 const COLUMNS =
-	'rev, schema, server_saved_at, created_at, core, world_hash, play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, flags, audit_ratio, fresh_start, ever_flagged, test_account';
+	'rev, schema, server_saved_at, created_at, core, world_hash, play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, flags, audit_ratio, fresh_start, ever_flagged, test_account, last_archive_at';
 
 const iso = (ms: number) => new Date(ms).toISOString();
 
@@ -63,6 +64,7 @@ const toRow = (save: StoredSave) => ({
 	fresh_start: save.freshStart,
 	ever_flagged: save.everFlagged,
 	test_account: save.testAccount,
+	last_archive_at: iso(save.lastArchiveAt),
 });
 
 const fromRow = (row: Row): StoredSave => ({
@@ -93,6 +95,7 @@ const fromRow = (row: Row): StoredSave => ({
 	testAccount: row.test_account,
 	serverSavedAt: Date.parse(row.server_saved_at),
 	createdAt: Date.parse(row.created_at),
+	lastArchiveAt: Date.parse(row.last_archive_at),
 });
 
 /** The full body of a save (map included), as kept in the history. */

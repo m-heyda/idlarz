@@ -4,7 +4,7 @@ import { api, growTo, store } from './helpers';
 import { pickPersisted, type PersistedGame } from '../src/lib/sanitizeSave';
 import { decodeSave, encodeSave, sealWire } from '../src/lib/saveFormat';
 import {
-	HISTORY_EVERY,
+	HISTORY_EVERY_MS,
 	HISTORY_KEEP,
 	MIN_SAVE_INTERVAL_MS,
 	PINNED_KEEP,
@@ -153,23 +153,39 @@ test('saves from one player are rate limited', async () => {
 	assert.equal((await accept(repo, 'u1', state, 1, T0 + 1000)).kind, 'too_soon');
 });
 
-test('history is sparse: first save, every 20th, and the first save with a new flag; only the newest few stay', async () => {
+test('history is sparse: first save, one copy per 30 minutes of the clock, and the first save with a new flag; only the newest few stay', async () => {
 	const { repo, history } = memoryRepo();
 	let state = game();
 	let now = T0;
-	await accept(repo, 'u1', state, 0, now);
+	let rev = 0;
+	const save = async (next: PersistedGame, stepMs: number) => {
+		now += stepMs;
+		const out = await accept(repo, 'u1', next, rev, now);
+		assert.equal(out.kind, 'ok');
+		rev++;
+		return out;
+	};
+	await save(state, 0);
 	assert.deepEqual(history.map((h) => h.rev), [1]);
-	for (let rev = 1; rev < HISTORY_EVERY * (HISTORY_KEEP + 2); rev++) {
-		now += MIN_SAVE_INTERVAL_MS + 1000;
+
+	// a burst of event saves (every 11 s for 20 min) makes no copies: the clock decides, not the revision count
+	for (let i = 0; i < 100; i++) {
 		state = { ...state, playSeconds: state.playSeconds + 11 };
-		assert.equal((await accept(repo, 'u1', state, rev, now)).kind, 'ok');
+		await save(state, 11_000);
+	}
+	assert.deepEqual(history.map((h) => h.rev), [1], '100 saves in 18 min: still only the first copy');
+
+	// then one save every 5 min: a copy every 6th save (30 min)
+	for (let i = 0; i < 6 * (HISTORY_KEEP + 2); i++) {
+		state = { ...state, playSeconds: state.playSeconds + 300 };
+		await save(state, 5 * 60_000);
 	}
 	assert.equal(history.length, HISTORY_KEEP);
-	assert.ok(history.every((h) => h.rev % HISTORY_EVERY === 0), 'only every 20th revision is kept');
+	const revs = history.map((h) => h.rev).sort((x, y) => x - y);
+	assert.ok(revs.slice(1).every((r, i) => r - revs[i] === 6), `one copy per 6 saves, got ${revs.join()}`);
 
-	now += MIN_SAVE_INTERVAL_MS + 1000;
 	const cheat = { ...state, gems: state.gems + 1 };
-	const flagged = await accept(repo, 'u1', cheat, HISTORY_EVERY * (HISTORY_KEEP + 2), now);
+	const flagged = await save(cheat, 60_000);
 	assert.ok(flagged.kind === 'ok' && flagged.flags.includes('gems_increase'));
 	assert.ok(history.some((h) => h.flags.includes('gems_increase')), 'a flagged save is archived at once');
 
@@ -177,10 +193,8 @@ test('history is sparse: first save, every 20th, and the first save with a new f
 	const before = history.length;
 	let again = cheat;
 	for (let i = 1; i <= 4; i++) {
-		now += MIN_SAVE_INTERVAL_MS + 1000;
 		again = { ...again, playSeconds: again.playSeconds + 11 };
-		const next = await accept(repo, 'u1', again, HISTORY_EVERY * (HISTORY_KEEP + 2) + i, now);
-		assert.ok(next.kind === 'ok');
+		await save(again, 11_000);
 	}
 	assert.equal(history.length, before, 'a flag that was already there is not archived again');
 });
@@ -196,8 +210,8 @@ test('starting over (a much younger game) pins the replaced game so history neve
 	assert.ok(out.kind === 'ok' && out.flags.includes('playtime_regress'));
 	assert.equal(history.find((h) => h.rev === 1 && h.pinned) !== undefined, true);
 	let state = fresh;
-	for (let rev = 2; rev <= HISTORY_EVERY * (HISTORY_KEEP + 3); rev++) {
-		now += MIN_SAVE_INTERVAL_MS + 1000;
+	for (let rev = 2; rev <= 6 * (HISTORY_KEEP + 3); rev++) {
+		now += HISTORY_EVERY_MS / 6;
 		state = { ...state, playSeconds: state.playSeconds + 11 };
 		await accept(repo, 'u1', state, rev, now);
 	}

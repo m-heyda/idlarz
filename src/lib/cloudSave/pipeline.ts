@@ -4,8 +4,8 @@ import { checkNetWorth } from './netWorth';
 import { summarize, type SaveSummary } from './summary';
 import { POISON_FLAGS, VERIFY, verifyTransition, type SaveFlag, type Snapshot } from './verify';
 
-/** Accepted saves are copied into the history every this many revisions (about 30 min of play), and when a flag appears that the previous save did not have. */
-export const HISTORY_EVERY = 20;
+/** Accepted saves are copied into the history when this long passed since the last copy (not every N revisions: event saves make the revision count race ahead of the clock), and when a flag appears that the previous save did not have. */
+export const HISTORY_EVERY_MS = 30 * 60_000;
 /** How many history copies are kept per player, and how many extra pinned ones. */
 export const HISTORY_KEEP = 6;
 export const PINNED_KEEP = 3;
@@ -39,6 +39,8 @@ export interface StoredSave {
 	testAccount: boolean;
 	serverSavedAt: number;
 	createdAt: number;
+	/** When the history last got a full copy of this player's game. */
+	lastArchiveAt: number;
 }
 
 /** What the leaderboard row of an account holds (the display name comes from the profile, never from the save). */
@@ -88,7 +90,7 @@ export const storedToText = (stored: StoredSave): string => {
  *   - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently
  *   - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here
  *   - the spending check and the transition from the previous save are verified in shadow mode (flags, no rejection)
- *   - the map is only written when it changed; every ~30 min and when a new flag appears a full copy goes to the history
+ *   - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history
  */
 export const acceptSave = async (
 	repo: SaveRepo,
@@ -129,6 +131,10 @@ export const acceptSave = async (
 	const everFlagged = !testAccount && ((current?.everFlagged ?? false) || flags.some((flag) => POISON_FLAGS.has(flag)));
 	const freshStart = current ? current.freshStart : summary.playSeconds <= VERIFY.freshStartSec;
 
+	// A flag already on the previous save is not archived again: an account that stays flagged must not make us store a full copy every upload (test accounts only get the regular copies)
+	const newFlag = !testAccount && flags.some((flag) => !(current?.flags ?? []).includes(flag));
+	const archive = !current || nowMs - current.lastArchiveAt >= HISTORY_EVERY_MS || newFlag;
+
 	const save: StoredSave = {
 		rev: (current?.rev ?? 0) + 1,
 		schema: SAVE_SCHEMA,
@@ -142,6 +148,7 @@ export const acceptSave = async (
 		testAccount,
 		serverSavedAt: nowMs,
 		createdAt: current?.createdAt ?? nowMs,
+		lastArchiveAt: archive ? nowMs : (current?.lastArchiveAt ?? nowMs),
 	};
 	const worldChanged = !current || current.worldHash !== world.hash;
 	const written = await repo.commit(userId, baseRev, save, worldChanged ? world : null, { displayName, trusted: !testAccount && freshStart && !everFlagged });
@@ -150,8 +157,6 @@ export const acceptSave = async (
 		return { kind: 'conflict', rev: latest?.rev ?? 0, serverSavedAt: latest?.serverSavedAt ?? 0 };
 	}
 
-	// A flag already on the previous save is not archived again: an account that stays flagged must not make us store a full copy every upload (test accounts only get the regular copies)
-	const newFlag = !testAccount && flags.some((flag) => !(current?.flags ?? []).includes(flag));
-	if (save.rev === 1 || save.rev % HISTORY_EVERY === 0 || newFlag) await repo.archive(userId, { ...save, world }, HISTORY_KEEP);
+	if (archive) await repo.archive(userId, { ...save, world }, HISTORY_KEEP);
 	return { kind: 'ok', rev: save.rev, serverSavedAt: nowMs, flags };
 };
