@@ -36,6 +36,7 @@ The **cloud** copy is about milestones and safety, not about every second:
 | milestone: tile bought, building built, castle upgrade started / finished, rebirth, Legacy / farm / merchant / click upgrade, stat point, gear equipped or removed, level up | after a 5 s settle (a burst of purchases is ONE upload), never closer than 30 s to the previous attempt |
 | idle | every 5 min (idle income is rebuilt from `rates` on the server, so more frequent uploads add nothing) |
 | tab hidden / closed | at once, unless an upload was tried in the last 11 s (the server accepts one per 10 s); `keepalive` only while the body is under 60 kB (browsers cap it at 64 KiB) |
+| menu **Save game** (right-click or the header menu) | saves to this browser always; with an account it also uploads at once, at most **once per 10 minutes** (the entry shows `cloud in 7:55` / `cloud ready`; the time survives a reload, per account). It runs through the same scheduler, so it never overlaps another upload and the next heartbeat waits a full period after it. Only an upload that went through starts the 10 minutes; a failure can be retried at once |
 | failure (outage, 429) | backoff 30 s, 1 min, 2 min, then 5 min; normal again after a success |
 | 409 conflict, 422 refused, 401 signed out | stop for the session and tell the player (toast) |
 

@@ -20,7 +20,7 @@ export const SYNC = {
 	keepaliveMaxBytes: 60_000,
 } as const;
 
-export type PushReason = 'first' | 'event' | 'heartbeat' | 'hide' | 'retry';
+export type PushReason = 'first' | 'event' | 'heartbeat' | 'hide' | 'retry' | 'manual';
 /** `ok`: nothing to do (also when there was nothing new to send); `retry`: try again with backoff; `stop`: give up for this session. */
 export type PushOutcome = 'ok' | 'retry' | 'stop';
 
@@ -66,8 +66,9 @@ export const createSyncScheduler = (deps: SyncDeps) => {
 		}, Math.max(0, dueAt() - deps.now()));
 	};
 
-	const run = async (reason: PushReason) => {
-		if (!started || stopped || busy) return;
+	const run = async (reason: PushReason): Promise<PushOutcome | 'busy' | 'stopped'> => {
+		if (!started || stopped) return 'stopped';
+		if (busy) return 'busy';
 		clear();
 		busy = true;
 		lastAttemptAt = deps.now();
@@ -81,7 +82,7 @@ export const createSyncScheduler = (deps: SyncDeps) => {
 		busy = false;
 		if (outcome === 'stop') {
 			stop();
-			return;
+			return outcome;
 		}
 		if (outcome === 'retry') {
 			failures++;
@@ -90,6 +91,7 @@ export const createSyncScheduler = (deps: SyncDeps) => {
 			failures = 0;
 		}
 		plan();
+		return outcome;
 	};
 
 	const stop = () => {
@@ -111,6 +113,8 @@ export const createSyncScheduler = (deps: SyncDeps) => {
 			if (eventAt === null) eventAt = deps.now();
 			plan();
 		},
+		/** The player asked for an upload now (the menu's "Save game"): runs at once, counts as an attempt, never overlaps another upload. */
+		runNow: (): Promise<PushOutcome | 'busy' | 'stopped'> => run('manual'),
 		/** The tab is being hidden or closed. */
 		hide: () => {
 			if (!started || stopped || busy) return;

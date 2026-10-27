@@ -3,10 +3,12 @@ import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import { pickPersisted } from '@/lib/sanitizeSave';
 import { exportSaveText, saveNow } from '@/lib/saveStorage';
 import { copyText } from '@/lib/clipboard';
+import { cloudHint, manualSaveMessage, saveGameEverywhere } from '@/lib/manualCloudSave';
 
+/** Saves to this browser and, with an account signed in, to the cloud copy too (once every 10 minutes: the entry's hint counts it down). */
 const saveGame = async () => {
-	const ok = await saveNow(pickPersisted(useGameStore.getState()));
-	useUiStore.getState().showToast(ok ? 'Game saved' : 'Could not save: the browser blocked it, or another tab runs the game');
+	const result = await saveGameEverywhere({ saveLocal: () => saveNow(pickPersisted(useGameStore.getState())), now: () => Date.now() });
+	useUiStore.getState().showToast(manualSaveMessage(result));
 };
 
 const exportGame = async () => {
@@ -27,7 +29,7 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 					{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
 				]
 			: []),
-		{ id: 'save', label: 'Save game', separator: full, onSelect: () => void saveGame() },
+		{ id: 'save', label: 'Save game', separator: full, liveHint: () => cloudHint(Date.now()), onSelect: () => void saveGame() },
 		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
 		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },
 		{

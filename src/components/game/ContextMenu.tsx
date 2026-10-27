@@ -50,6 +50,15 @@ const ContextMenu: React.FC = () => {
 		};
 	}, [menu, close]);
 
+	// entries with a live hint (a countdown) are redrawn once a second while the menu is open
+	const [, setTick] = useState(0);
+	const hasLive = !!menu?.items.some((item) => item.liveHint);
+	useEffect(() => {
+		if (!hasLive) return;
+		const timer = setInterval(() => setTick((n) => n + 1), 1000);
+		return () => clearInterval(timer);
+	}, [hasLive, menu]);
+
 	if (!menu || typeof document === 'undefined') return null;
 
 	return createPortal(
@@ -78,7 +87,7 @@ const ContextMenu: React.FC = () => {
 						}}>
 						{item.checked !== undefined && <span className='ctx-check' data-on={item.checked} aria-hidden />}
 						<span>{item.label}</span>
-						{item.hint && <span className='ctx-hint'>{item.hint}</span>}
+						{(item.liveHint?.() ?? item.hint) && <span className='ctx-hint'>{item.liveHint?.() ?? item.hint}</span>}
 					</button>
 				</React.Fragment>
 			))}

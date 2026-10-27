@@ -15,6 +15,8 @@ export interface ContextMenuItem {
 	/** Greyed out; `hint` says why */
 	disabled?: boolean;
 	hint?: string;
+	/** A label that changes while the menu is open (a countdown): the menu asks again every second and shows it instead of `hint` */
+	liveHint?: () => string | undefined;
 	/** A toggle: shows a tick box */
 	checked?: boolean;
 	/** A thin rule above this entry */
