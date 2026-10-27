@@ -103,7 +103,6 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<FloatingText />
 			<MenuOverlay />
 			<FightModal />
-			<VictoryToast />
 			<ClassPickerDialog />
 			<LevelUpNotification />
 			<LoadingScreen />
@@ -119,9 +118,13 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<BottomRightStack />
 			<CastleCompass />
 			<ContextMenu />
-			<Toast />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}
-			<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
+			{/* one stack for every notice: chest rewards, fight loot, and the short messages (merchant, bag, saves) */}
+			<div className='notice-stack'>
+				<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
+				<VictoryToast />
+				<Toast />
+			</div>
 		</main>
 	);
 }

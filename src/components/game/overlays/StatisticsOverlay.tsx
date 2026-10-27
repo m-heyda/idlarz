@@ -6,13 +6,13 @@ import LevelDetails from '../LevelDetails';
 import CollapsibleSection from '../CollapsibleSection';
 import ResourceIcon from '../ResourceIcon';
 import { calculateResourceBreakdown, countOwnedTiles, getStatDescription, type ResourceBreakdownEntry } from '@/utils/gameUtils';
-import { formatNumber, formatRate } from '@/utils/formatters';
+import { formatNumber, formatPercent, formatRate, formatCompact } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { REBIRTH } from '@/config/gameConfig';
 
 const BASE_STATS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 
-const pct = (value: number, digits = 0) => `${value.toFixed(digits)}%`;
+const pct = (value: number, digits = 0) => (Math.abs(value) >= 5000 ? formatPercent(value) : `${value.toFixed(digits)}%`);
 const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** One label / value line; `muted` for the small print inside a breakdown. */
@@ -43,7 +43,7 @@ const BreakdownBody: React.FC<{ entry: ResourceBreakdownEntry }> = ({ entry }) =
 	if (entry.castleMod) bonuses.push(['Castle', `+${pct(entry.castleMod * 100)}`]);
 	if (entry.plainsMod) bonuses.push(['Plains tiles', `+${pct(entry.plainsMod * 100)}`]);
 	if (entry.statMod) bonuses.push(['Attributes', `+${pct(entry.statMod * 100)}`]);
-	if (entry.legacyMult !== 1) bonuses.push(['Rebirth (Legacy)', `x${entry.legacyMult.toFixed(2)}`]);
+	if (entry.legacyMult !== 1) bonuses.push(['Rebirth (Legacy)', `x${formatCompact(entry.legacyMult, 2)}`]);
 
 	return (
 		<div className='text-xs space-y-1'>
@@ -102,7 +102,7 @@ const StatisticsOverlay: React.FC = () => {
 						<div
 							className='absolute top-2 right-2 z-10 px-2 py-0.5 text-xs font-semibold text-[#2a1e10] bg-[#f0d27a] border border-[#8a6a2a] pointer-events-none'
 							title='Unspent attribute points'>
-							{points} {points === 1 ? 'point' : 'points'}
+							{formatCompact(points)} {points === 1 ? 'point' : 'points'}
 						</div>
 					)}
 				</div>
@@ -115,7 +115,7 @@ const StatisticsOverlay: React.FC = () => {
 								<div key={stat} className='flex items-center text-xs'>
 									<div className='group relative flex-1 flex justify-between items-center cursor-help'>
 										<span className='text-[#d8c8a0] capitalize'>{stat}</span>
-										<span className='text-blue-400 font-medium tabular-nums'>{characterStats[stat]}</span>
+										<span className='text-blue-400 font-medium tabular-nums'>{formatCompact(characterStats[stat])}</span>
 										<div className='absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-full w-max opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity duration-200'>
 											<div className='px-tooltip min-w-[240px]'>
 												<div className='px-tip-title'>{capital(stat)}</div>
@@ -144,14 +144,14 @@ const StatisticsOverlay: React.FC = () => {
 					<div>
 						<h3 className='px-h'>Overview</h3>
 						<div className='space-y-1.5 text-xs'>
-							<Line label='Level' value={level.level} valueClass='text-yellow-400' />
+							<Line label='Level' value={formatCompact(level.level)} valueClass='text-yellow-400' />
 							<Line label='Next level' value={pct(level.progress * 100, 1)} valueClass='text-purple-400' />
 							<Line label='XP' value={`${formatNumber(resources.xp)} (${formatRate(resourceRates.total.xp)})`} valueClass='text-green-400' />
 							<Line label='Gold' value={formatNumber(resources.gold)} valueClass='text-yellow-400' />
-							<Line label='Tiles' value={countOwnedTiles(tiles)} valueClass='text-blue-400' />
+							<Line label='Tiles' value={formatCompact(countOwnedTiles(tiles))} valueClass='text-blue-400' />
 							<Line
 								label='Rebirths'
-								value={`${prestige.rebirths} (+${(prestige.legacyEarned * REBIRTH.incomePerPoint * 100).toFixed(0)}%)`}
+								value={`${formatNumber(prestige.rebirths)} (+${formatPercent(prestige.legacyEarned * REBIRTH.incomePerPoint * 100)})`}
 								valueClass='text-purple-300'
 							/>
 						</div>
@@ -162,28 +162,28 @@ const StatisticsOverlay: React.FC = () => {
 			<div className='grid grid-cols-2 gap-x-8 gap-y-4 max-[760px]:grid-cols-1'>
 				<CollapsibleSection id='combat-stats' title='Combat'>
 					<div className='space-y-1 text-xs'>
-						<Line label='HP' value={`${Math.floor(playerHp)} / ${fx.maxHp}`} valueClass='text-green-400' />
-						<Line label='MP' value={`${Math.floor(playerMp)} / ${fx.maxMana}`} valueClass='text-blue-400' />
-						<Line label='Damage' value={`${fx.damage} per hit`} valueClass='text-orange-300' />
+						<Line label='HP' value={`${formatCompact(Math.floor(playerHp))} / ${formatCompact(fx.maxHp)}`} valueClass='text-green-400' />
+						<Line label='MP' value={`${formatCompact(Math.floor(playerMp))} / ${formatCompact(fx.maxMana)}`} valueClass='text-blue-400' />
+						<Line label='Damage' value={`${formatCompact(fx.damage)} per hit`} valueClass='text-orange-300' />
 						<Line label='Physical ATK' value={`+${pct(characterStats.physicalAtk, 1)}`} valueClass='text-amber-400' />
 						<Line label='Magic ATK' value={`+${pct(characterStats.magicAtk, 1)}`} valueClass='text-purple-400' />
 						<Line label='Crit chance' value={pct(fx.critChance, 1)} valueClass='text-yellow-300' />
-						<Line label='Crit damage' value={`x${fx.critMultiplier.toFixed(2)}`} valueClass='text-orange-400' />
+						<Line label='Crit damage' value={`x${formatCompact(fx.critMultiplier, 2)}`} valueClass='text-orange-400' />
 						<Line label='Super crit chance' value={`${pct(fx.superCritChance, 1)} of crits`} valueClass='text-pink-300' />
-						<Line label='Super crit damage' value={`x${fx.superCritMultiplier.toFixed(2)}`} valueClass='text-pink-400' />
-						<Line label='DEF (armor)' value={`${Math.round(fx.armor * 10) / 10} (-${pct(fx.armorReduction, 0)} damage taken)`} valueClass='text-amber-200' />
+						<Line label='Super crit damage' value={`x${formatCompact(fx.superCritMultiplier, 2)}`} valueClass='text-pink-400' />
+						<Line label='DEF (armor)' value={`${formatCompact(fx.armor)} (-${pct(fx.armorReduction, 0)} damage taken)`} valueClass='text-amber-200' />
 						<Line label='Dodge' value={pct(fx.dodge, 1)} valueClass='text-cyan-300' />
-						<Line label='HP regen' value={`${Math.round(fx.hpRegen * 10) / 10}/s`} valueClass='text-green-300' />
-						<Line label='ATK speed' value={`${fx.attacksPerSecond}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`} valueClass='text-blue-300' />
+						<Line label='HP regen' value={`${formatCompact(fx.hpRegen)}/s`} valueClass='text-green-300' />
+						<Line label='ATK speed' value={`${formatCompact(fx.attacksPerSecond, 2)}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`} valueClass='text-blue-300' />
 						<Line label='Life leech' value={pct(fx.lifeLeech, 1)} valueClass='text-red-300' />
 					</div>
 				</CollapsibleSection>
 
 				<CollapsibleSection id='bonus-stats' title='Bonuses' defaultOpen={false}>
 					<div className='space-y-1 text-xs'>
-						<Line label='Luck' value={fx.luck} valueClass='text-purple-500' />
+						<Line label='Luck' value={formatCompact(fx.luck)} valueClass='text-purple-500' />
 						<Line label='Gold find' value={pct(fx.goldFind, 1)} valueClass='text-yellow-400' />
-						<Line label='Mana regen' value={`${Math.round(fx.manaRegen * 100) / 100}/s`} valueClass='text-blue-400' />
+						<Line label='Mana regen' value={`${formatCompact(fx.manaRegen, 2)}/s`} valueClass='text-blue-400' />
 						<Line label='Spell power' value={pct(fx.spellPower, 1)} valueClass='text-purple-300' />
 						<Line label='Lucky tap damage' value={pct(characterStats.critDmgMultiplier, 2)} valueClass='text-orange-400' />
 						<Line label='XP gain' value={pct(fx.xpGain, 2)} valueClass='text-green-400' />
@@ -192,7 +192,7 @@ const StatisticsOverlay: React.FC = () => {
 						{fx.buildTimeReduction > 0 && <Line label='Master builders (rebirth)' value={`-${pct(fx.buildTimeReduction, 0)} castle build time`} valueClass='text-purple-300' />}
 						<Line
 							label='Reputation'
-							value={characterStats.reputation}
+							value={formatCompact(characterStats.reputation)}
 							valueClass={characterStats.reputation >= 0 ? 'text-green-400' : 'text-red-400'}
 						/>
 					</div>

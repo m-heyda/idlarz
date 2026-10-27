@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatNumber } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { BIOMES, BIOME_YIELD, BUILDINGS } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
@@ -58,7 +59,7 @@ const BuildDialogBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 							<span className='flex flex-wrap gap-x-2 text-xs'>
 								{(Object.entries(building.resourceGeneration) as [string, number][]).map(([resource, rate]) => (
 									<span key={resource} className='inline-flex items-center gap-0.5 text-green-400'>
-										<ResourceIcon resource={resource} />+{(rate * BIOME_YIELD.scale).toFixed(2)}/s
+										<ResourceIcon resource={resource} />+{formatNumber(rate * BIOME_YIELD.scale)}/s
 									</span>
 								))}
 							</span>

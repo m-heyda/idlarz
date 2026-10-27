@@ -1,3 +1,5 @@
+import { formatNumber } from '@/utils/formatters';
+
 /**
  * Every stat an item or a set bonus can carry. One row per stat (label and how to print it); `sumStats` is the only
  * place stats are added together, so a new stat is one row here plus whatever reads it in combat.
@@ -160,17 +162,20 @@ export const sumStats = (...blocks: (ItemStats | undefined)[]): StatTotals => {
 
 export const statLabel = (key: string): string => (STAT_DEFS as Record<string, StatDef>)[key]?.label ?? key;
 
+/** A stat value for a tooltip: plain up to 9,999, then 12.34K / M / B / T like every other number in the game */
+const statText = (value: number, decimals?: number): string => (Math.abs(value) >= 10_000 ? formatNumber(value) : decimals ? value.toFixed(decimals) : String(value));
+
 /** '+8% Crit Chance' */
 export const formatStat = (key: string, value: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
-	const num = def?.decimals ? value.toFixed(def.decimals) : String(value);
+	const num = statText(value, def?.decimals);
 	return `+${num}${def?.unit ?? ''} ${def?.label ?? key}`;
 };
 
 /** '+2 Armor', '-1 Damage', '+0.5/s HP Regen': a signed change, for comparing two items */
 export const formatStatDelta = (key: string, delta: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
-	const num = def?.decimals ? Math.abs(delta).toFixed(def.decimals) : String(Math.abs(delta));
+	const num = statText(Math.abs(delta), def?.decimals);
 	return `${delta < 0 ? '-' : '+'}${num}${def?.unit ?? ''} ${def?.label ?? key}`;
 };
 
@@ -183,7 +188,7 @@ export const formatStats = (stats: ItemStats): string =>
 
 const statNumber = (key: string, value: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
-	return `${def?.decimals ? value.toFixed(def.decimals) : String(value)}${def?.unit ?? ''}`;
+	return `${statText(value, def?.decimals)}${def?.unit ?? ''}`;
 };
 
 /** '8%', '1.5/s': the value alone, for a stat table whose row already names the stat */

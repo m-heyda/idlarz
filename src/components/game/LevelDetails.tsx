@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { formatNumber } from '@/utils/formatters';
+import { formatCompact, formatNumber } from '@/utils/formatters';
 import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
 import { LevelUpTimer } from './LevelUpTimer';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
@@ -41,11 +41,24 @@ const xpNumbers = (level: { level: number; progress: number }) => {
 	return { next, current: Math.floor(next * level.progress), pct: Math.floor(level.progress * 100) };
 };
 
+/** A flat HP or MP bar with its numbers: half the width of the Equipment tab each. */
+const VitalBar: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({ kind, value, max }) => (
+	<div className='eq-vital' data-kind={kind} title={`${kind === 'hp' ? 'HP' : 'MP'}: ${formatNumber(value)} / ${formatNumber(max)}`}>
+		<div className='eq-vital-fill' style={{ width: `${max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0}%` }} />
+		<span className='eq-vital-text'>
+			{kind === 'hp' ? 'HP' : 'MP'} {formatCompact(value)} / {formatCompact(max)}
+		</span>
+	</div>
+);
+
 /** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). */
 export const LevelBar: React.FC = () => {
-	const { resources, level, resourceRates } = useGameStore();
+	const { resources, level, resourceRates, characterStats, equipment, playerHp, playerMp } = useGameStore();
 	const { next, current, pct } = xpNumbers(level);
+	const hpMax = maxHp(characterStats, equipment);
+	const mpMax = maxMana(characterStats, equipment);
 	return (
+		<div className='eq-level-wrap'>
 		<div className='eq-level'>
 			<div className='eq-level-orb' title={`Level ${level.level}`}>
 				<LevelOrb scale={2} level={level.level} />
@@ -63,6 +76,11 @@ export const LevelBar: React.FC = () => {
 					</div>
 				</div>
 			</div>
+		</div>
+		<div className='eq-vitals'>
+			<VitalBar kind='hp' value={Math.floor(playerHp)} max={hpMax} />
+			<VitalBar kind='mp' value={Math.floor(playerMp)} max={mpMax} />
+		</div>
 		</div>
 	);
 };

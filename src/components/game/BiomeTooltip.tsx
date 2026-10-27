@@ -5,17 +5,17 @@ import { useGameStore } from '@/stores/gameStore';
 import { calculateTileOutput, canBuildOn, castleModifier } from '@/utils/gameUtils';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import { getTile } from '@/utils/world';
-import { formatTime } from '@/utils/formatters';
+import { formatPercent, formatNumber, formatTime } from '@/utils/formatters';
 import ResourceIcon from './ResourceIcon';
 import PixelIcon from './PixelIcon';
 import { BUILDING_PIXEL_ICONS } from '@/config/pixelIcons';
 
 const formatRate = (rate: number) => {
 	if (rate === 0) return '0/s';
-	return `${rate.toFixed(2)}/s`;
+	return `${formatNumber(rate)}/s`;
 };
 
-const percent = (fraction: number) => `+${Math.round(fraction * 100)}%`;
+const percent = (fraction: number) => `+${formatPercent(fraction * 100)}`;
 
 export const BiomeTooltip = memo(
 	({
@@ -89,7 +89,7 @@ export const BiomeTooltip = memo(
 
 				{biome === 'castle' && level && level > 1 && (
 					<div className='mt-2 text-purple-400 text-xs'>
-						Castle Bonus: {Math.round(castleModifier(level) * 100)}% all resource generation
+						Castle Bonus: {formatPercent(castleModifier(level) * 100)} all resource generation
 					</div>
 				)}
 				{/* The castle explains its bonus area: every tile (and building) inside it produces more */}

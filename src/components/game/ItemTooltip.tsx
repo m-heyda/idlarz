@@ -19,6 +19,7 @@ import {
 import { compareDetailed, primaryKeyOf, type DetailedComparison, type StatRow } from '@/lib/inventory';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
 import type { Equipment, ItemInstance } from '@/types/game';
+import { formatCompact, formatNumber } from '@/utils/formatters';
 import ResourceIcon from './ResourceIcon';
 import { RARITY_COLOR } from './itemUi';
 
@@ -26,7 +27,7 @@ import { RARITY_COLOR } from './itemUi';
 const Diff: React.FC<{ delta: number; text: string }> = ({ delta, text }) =>
 	delta ? <span className={delta > 0 ? 'px-diff-up' : 'px-diff-down'}> ({text})</span> : null;
 
-const signed = (delta: number, digits = 0) => `${delta < 0 ? '-' : '+'}${+Math.abs(delta).toFixed(digits)}`;
+const signed = (delta: number, digits = 0) => `${delta < 0 ? '-' : '+'}${formatCompact(Math.abs(delta), digits)}`;
 
 /** One secondary stat line: a bullet, "+12% Crit Chance", and how it differs from the worn piece. */
 const StatLine: React.FC<{ row: StatRow; withDiff: boolean }> = ({ row, withDiff }) => {
@@ -102,7 +103,7 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison,
 			</div>
 			{resolved && (
 				<div className='px-tip-level'>
-					Item Level {resolved.instance.level}
+					Item Level {formatCompact(resolved.instance.level)}
 					<span className='px-tip-muted'> · Quality {Math.round(qualityMultiplier(resolved.instance.quality) * 100)}%</span>
 				</div>
 			)}
@@ -110,7 +111,7 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison,
 
 			{primary && (
 				<div className='px-tip-primary'>
-					<span className='px-tip-big'>{primary.value}</span> {statLabel(primary.key)}
+					<span className='px-tip-big'>{formatCompact(primary.value, 2)}</span> {statLabel(primary.key)}
 					{withDiff && <Diff delta={primaryDelta} text={signed(primaryDelta)} />}
 				</div>
 			)}
@@ -121,14 +122,14 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison,
 						{withDiff && swing && <Diff delta={swing.speed.delta} text={signed(swing.speed.delta, 2)} />}
 					</div>
 					<div>
-						<b>{weaponDps({ stats, attackSpeed: def.attackSpeed })}</b> Damage per Second
+						<b>{formatCompact(weaponDps({ stats, attackSpeed: def.attackSpeed }), 2)}</b> Damage per Second
 						{withDiff && swing && <Diff delta={swing.dps.delta} text={signed(swing.dps.delta, 2)} />}
 					</div>
 				</div>
 			)}
 			{emptySlot && <div className='px-tip-muted text-xs mt-1'>Empty {EQUIPMENT_SLOT_LABEL[comparison!.slot]} slot</div>}
 
-			{def.consumable && <div className='px-tip-bullet px-diff-up'>Restores {def.consumable.healHp} HP</div>}
+			{def.consumable && <div className='px-tip-bullet px-diff-up'>Restores {formatCompact(def.consumable.healHp)} HP</div>}
 			{rows.length > 0 && (
 				<div className='px-tip-list'>
 					{rows.map((row) => (
@@ -215,7 +216,7 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison,
 
 			{def.description && <div className='px-tip-flavor'>{def.description}</div>}
 			<div className='px-tip-sell'>
-				Sells for {sellPrice} <ResourceIcon resource='gold' />
+				Sells for {formatNumber(sellPrice)} <ResourceIcon resource='gold' />
 			</div>
 		</div>
 	);

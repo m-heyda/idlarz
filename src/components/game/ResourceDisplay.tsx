@@ -2,7 +2,7 @@ import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { Resources } from '@/types/game';
-import { formatNumber } from '@/utils/formatters';
+import { formatNumber, formatPercent } from '@/utils/formatters';
 import {
 	GEMS_INFO,
 	LEGACY_INFO,
@@ -133,7 +133,7 @@ const ResourceDisplay: React.FC = () => {
 										<Line label='Per minute' value={formatNumber(rate * 60)} />
 										<Line label='Per hour' value={formatNumber(rate * 3600)} />
 										<Line label='Base rate' value={`${formatNumber(resourceRates.base[resource])}/s`} />
-										<Line label='Modifier' value={`+${Math.round(resourceRates.modifiers[resource] * 100)}%`} />
+										<Line label='Modifier' value={`+${formatPercent(resourceRates.modifiers[resource] * 100)}`} />
 										{price !== undefined && <Line label='Merchant pays' value={`${price} gold each`} />}
 									</div>
 								</Pill>

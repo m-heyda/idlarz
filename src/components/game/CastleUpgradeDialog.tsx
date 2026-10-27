@@ -2,7 +2,7 @@ import React from 'react';
 import type { FC } from 'react';
 import { CASTLE_UPGRADE } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
-import { formatNumber, formatTime } from '@/utils/formatters';
+import { formatCompact, formatNumber, formatPercent, formatTime } from '@/utils/formatters';
 import { castleModifier, castleUpgradeDuration } from '@/utils/gameUtils';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import audioManager from '@/utils/audioManager';
@@ -121,11 +121,11 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 			</div>
 			<div className='text-sm text-[#a89878] mb-1'>
 				Current bonus:{' '}
-				<span className='text-green-400'>+{(currentMultiplier * 100).toFixed(0)}%</span> to all
+				<span className='text-green-400'>+{formatPercent(currentMultiplier * 100)}</span> to all
 				resources
 			</div>
 			<div className='text-sm text-[#a89878] mb-3'>
-				Castle XP: <span className='text-amber-400'>+{currentXpBonus.toFixed(1)} XP/s</span> flat
+				Castle XP: <span className='text-amber-400'>+{formatCompact(currentXpBonus)} XP/s</span> flat
 			</div>
 
 			{castleUpgrade && (
@@ -140,11 +140,11 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 				<>
 					<div className='text-sm text-[#a89878] mb-1'>
 						Next level:{' '}
-						<span className='text-green-400'>+{(nextMultiplier * 100).toFixed(0)}%</span> to
+						<span className='text-green-400'>+{formatPercent(nextMultiplier * 100)}</span> to
 						all resources
 					</div>
 					<div className='text-sm text-[#a89878] mb-3'>
-						Castle XP: <span className='text-amber-400'>+{nextXpBonus.toFixed(1)} XP/s</span> flat
+						Castle XP: <span className='text-amber-400'>+{formatCompact(nextXpBonus)} XP/s</span> flat
 						{nextRange > currentRange && (
 							<div>
 								Castle range: <span className='text-violet-300'>{rangeLabel(currentRange)}</span> {'→'}{' '}
@@ -153,16 +153,16 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 						)}
 						{castleAreaBonus(castleLevel + 1) > castleAreaBonus(castleLevel) && (
 							<div>
-								Castle area production: <span className='text-violet-300'>+{castleAreaBonus(castleLevel) * 100}%</span> {'→'}{' '}
-								<span className='text-violet-300'>+{castleAreaBonus(castleLevel + 1) * 100}%</span>
+								Castle area production: <span className='text-violet-300'>+{formatPercent(castleAreaBonus(castleLevel) * 100)}</span> {'→'}{' '}
+								<span className='text-violet-300'>+{formatPercent(castleAreaBonus(castleLevel + 1) * 100)}</span>
 							</div>
 						)}
 					</div>
 
 					{!isNextToMaxLevel && afterNextLevelCosts && (
 						<div className='text-[#7a6a52] text-xs mb-3'>
-							Level {castleLevel + 2}: +{(afterNextMultiplier * 100).toFixed(0)}% to all
-							resources, +{afterNextXpBonus.toFixed(1)} XP/s
+							Level {castleLevel + 2}: +{formatPercent(afterNextMultiplier * 100)} to all
+							resources, +{formatCompact(afterNextXpBonus)} XP/s
 						</div>
 					)}
 

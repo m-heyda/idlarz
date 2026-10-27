@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '@/stores/gameStore';
+import { useUiStore } from '@/stores/uiStore';
 import { ITEM_CATALOG, RARITIES, RARITY_ORDER } from '@/config/itemCatalog';
 import { gearOf, slotQty } from '@/lib/inventory';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
@@ -24,12 +25,8 @@ export const MerchantItemsSection: React.FC = () => {
 	const sellJunk = useGameStore((state) => state.sellJunk);
 	const autoSellUpTo = useGameStore((state) => state.autoSellUpTo);
 	const setAutoSell = useGameStore((state) => state.setAutoSell);
-	const [message, setMessage] = useState<string | null>(null);
-
-	const say = (text: string) => {
-		setMessage(text);
-		setTimeout(() => setMessage(null), 3000);
-	};
+	// what was sold is announced by the shared toast at the top of the screen, so the window never jumps
+	const say = useUiStore((state) => state.showToast);
 
 	const sell = (index: number, all: boolean) => {
 		const slot = bag[index];
@@ -38,7 +35,7 @@ export const MerchantItemsSection: React.FC = () => {
 		const name = (gear && resolveItem(gear)?.name) || ('id' in slot ? ITEM_CATALOG[slot.id]?.name : undefined) || 'item';
 		const qty = all ? slotQty(slot) : 1;
 		const gold = sellItem(index, qty);
-		if (gold > 0) say(`Sold ${qty > 1 ? `${qty} x ` : ''}${name} for ${formatNumber(gold)} Gold`);
+		if (gold > 0) say(`Sold ${qty > 1 ? `${formatNumber(qty)} x ` : ''}${name} for ${formatNumber(gold)} Gold`);
 		else say(fighting ? 'Finish the fight first' : 'The merchant is not interested');
 	};
 
@@ -46,7 +43,7 @@ export const MerchantItemsSection: React.FC = () => {
 		const { gold, count } = sellJunk(maxRarity);
 		say(
 			count > 0
-				? `Sold ${count} piece${count === 1 ? '' : 's'} of gear for ${formatNumber(gold)} Gold`
+				? `Sold ${formatNumber(count)} piece${count === 1 ? '' : 's'} of gear for ${formatNumber(gold)} Gold`
 				: 'No junk to sell'
 		);
 	};
@@ -93,7 +90,6 @@ export const MerchantItemsSection: React.FC = () => {
 					))}
 				</select>
 			</label>
-			{message && <p className='text-green-400 text-sm mb-2'>{message}</p>}
 			<div className='inv-bag'>
 				{bag.map((slot, i) => (
 					<ItemSlot

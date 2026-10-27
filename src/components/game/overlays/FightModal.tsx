@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { formatCompact } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { COMBAT, MONSTERS } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
@@ -38,7 +39,7 @@ const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | '
 			<div className='fight-bar-trail' style={{ width: `${pct}%` }} />
 			<div className='fight-bar-fill' style={{ width: `${pct}%` }} />
 			<div className='fight-bar-text'>
-				{label} {Math.ceil(value)} / {Math.round(max)}
+				{label} {formatCompact(Math.ceil(value))} / {formatCompact(Math.round(max))}
 			</div>
 		</div>
 	);
@@ -89,16 +90,16 @@ const FightView: React.FC = () => {
 				setBursts((prev) => [...prev.slice(-4), { id, bits }]);
 				setTimeout(() => setBursts((prev) => prev.filter((b) => b.id !== id)), 650);
 				setHitTick((t) => t + 1);
-				pushNumber(fx.crit === 'none' ? `-${fx.damage}` : `-${fx.damage}!`, fx.crit === 'none' ? 'dmg' : fx.crit);
+				pushNumber(fx.crit === 'none' ? `-${formatCompact(fx.damage)}` : `-${formatCompact(fx.damage)}!`, fx.crit === 'none' ? 'dmg' : fx.crit);
 				audioManager.playSound('click');
 			} else if (fx.kind === 'hurt') {
 				setShake(true);
 				clearTimeout(shakeTimer.current);
 				shakeTimer.current = setTimeout(() => setShake(false), 320);
-				pushNumber(fx.crit ? `-${fx.amount}!` : `-${fx.amount}`, 'hurt');
+				pushNumber(fx.crit ? `-${formatCompact(fx.amount)}!` : `-${formatCompact(fx.amount)}`, 'hurt');
 				audioManager.playSound('wrong');
 			} else if (fx.kind === 'heal') {
-				pushNumber(`+${fx.amount}`, 'heal');
+				pushNumber(`+${formatCompact(fx.amount)}`, 'heal');
 				audioManager.playSound('purchase');
 			} else if (fx.kind === 'resist') {
 				pushNumber('Resisted!', 'resist');
@@ -163,7 +164,7 @@ const FightView: React.FC = () => {
 						</span>
 						<b>BOSS</b>
 						<span className='fight-boss-traits'>
-							Crits {traits.critChance}% - resists Stun {traits.stunResist}% - armor {Math.round(traits.armor)}
+							Crits {formatCompact(traits.critChance)}% - resists Stun {formatCompact(traits.stunResist)}% - armor {formatCompact(Math.round(traits.armor))}
 						</span>
 					</div>
 				)}

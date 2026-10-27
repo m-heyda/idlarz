@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatCompact } from '@/utils/formatters';
 import { MONSTERS } from '@/config/combatConfig';
 import type { MonsterType } from '@/types/game';
 import MonsterArt from './MonsterArt';
@@ -12,7 +13,7 @@ const MonsterSprite: React.FC<{ type: MonsterType; level: number }> = ({ type, l
 			<MonsterArt type={type} label={MONSTERS[type].label} className='tile-monster-img' />
 			<span className='tile-monster-tier' data-boss={boss}>
 				{boss ? '☠ ' : ''}
-				{level}
+				{formatCompact(level)}
 			</span>
 		</span>
 	);

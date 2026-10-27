@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import { averageItemLevel } from '@/lib/inventory';
@@ -61,7 +62,8 @@ export const MerchantUpgradeCards: React.FC<BoughtProps> = ({ onBought }) => {
 };
 
 /** Supplies: potions, always in stock. Nothing is charged if they do not fit in the bag. */
-const Supplies: React.FC<BoughtProps & { full: boolean; setFull: (full: boolean) => void }> = ({ onBought, full, setFull }) => {
+const Supplies: React.FC<BoughtProps> = ({ onBought }) => {
+	const showToast = useUiStore((state) => state.showToast);
 	const gold = useGameStore((state) => state.resources.gold);
 	const buyItem = useGameStore((state) => state.buyItem);
 	return (
@@ -82,8 +84,8 @@ const Supplies: React.FC<BoughtProps & { full: boolean; setFull: (full: boolean)
 									disabled={gold < price}
 									onClick={() => {
 										const ok = buyItem(id, 1);
-										setFull(!ok && gold >= price);
 										if (ok) onBought(def.name, price);
+										else if (gold >= price) showToast('Your bag is full');
 									}}>
 									<span className='inline-flex items-center gap-1'>
 										{formatNumber(price)} <ResourceIcon resource='gold' />
@@ -94,7 +96,6 @@ const Supplies: React.FC<BoughtProps & { full: boolean; setFull: (full: boolean)
 					);
 				})}
 			</div>
-			{full && <p className='text-red-400 text-sm mt-2'>Your bag is full.</p>}
 		</div>
 	);
 };
@@ -111,7 +112,7 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 	const worn = useGameStore((state) => Math.round(averageItemLevel(state.equipment)));
 	const buyOffer = useGameStore((state) => state.buyOffer);
 	const refresh = useGameStore((state) => state.refreshMerchantStock);
-	const [full, setFull] = useState(false);
+	const showToast = useUiStore((state) => state.showToast);
 	const cost = refreshCost(refreshes);
 	const left = stock ? secondsToRotation(stock, playSeconds) : 0;
 	return (
@@ -135,9 +136,7 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 					</div>
 				</div>
 				<p className='text-sm text-[#d8c8a0] mb-3'>
-					Plain and fine gear for the world around you, never more than {MERCHANT_GOODS.maxAboveAverage} item levels above what you wear (item level {worn}). Hover for what it does.
-					{full && <span className='text-red-400'> Your bag is full.</span>}
-				</p>
+					Plain and fine gear for the world around you, never more than {MERCHANT_GOODS.maxAboveAverage} item levels above what you wear (item level {worn}). Hover for what it does.				</p>
 				{!stock || stock.offers.length === 0 ? (
 					<p className='text-sm text-[#a89878]'>Sold out. New goods arrive soon.</p>
 				) : (
@@ -155,8 +154,8 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 											disabled={gold < price}
 											onClick={() => {
 												const ok = buyOffer(index);
-												setFull(!ok && gold >= price);
 												if (ok) onBought(name, price);
+												else if (gold >= price) showToast('Your bag is full');
 											}}>
 											<span className='inline-flex items-center gap-1'>
 												{formatNumber(price)} <ResourceIcon resource='gold' />
@@ -169,7 +168,7 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 					</div>
 				)}
 			</div>
-			<Supplies onBought={onBought} full={full} setFull={setFull} />
+			<Supplies onBought={onBought} />
 		</>
 	);
 };

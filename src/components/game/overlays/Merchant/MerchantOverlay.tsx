@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { formatNumber } from '@/utils/formatters';
+import { useUiStore } from '@/stores/uiStore';
+import { formatNumber, formatPercent } from '@/utils/formatters';
 import { ResourceSellingSection } from './ResourceSellingSection';
 import { MerchantPriceList } from './MerchantPriceList';
 import { MerchantTabButtons } from './MerchantTabButtons';
@@ -146,18 +147,8 @@ const MerchantOverlay: React.FC = () => {
 	const [sellAmounts, setSellAmounts] = useState<Record<string, number>>(() => zero(Object.keys(MERCHANT_RESOURCE_PRICES)));
 	const [buyAmounts, setBuyAmounts] = useState<Record<string, number>>(() => zero(MERCHANT_BUYABLE));
 
-	// For showing success message after selling
-	const [saleMessage, setSaleMessage] = useState<{
-		resource: string;
-		amount: number;
-		gold: number;
-	} | null>(null);
-
-	// For showing purchase success message
-	const [purchaseMessage, setPurchaseMessage] = useState<{
-		item: string;
-		price: number;
-	} | null>(null);
+	// Every sale and purchase is announced by the shared toast (top of the screen), so the window never jumps
+	const showToast = useUiStore((state) => state.showToast);
 
 	// Calculate the max for each resource (current owned amount)
 	const maxAmounts = resources as unknown as Record<string, number>;
@@ -173,22 +164,13 @@ const MerchantOverlay: React.FC = () => {
 		if (!sellResources(resource, sellAmounts[resource])) return;
 
 		// Set success message
-		setSaleMessage({
-			resource: MERCHANT_RESOURCE_INFO[resource].label,
-			amount: sellAmounts[resource],
-			gold: goldGained,
-		});
+		showToast(`Sold ${formatNumber(sellAmounts[resource])} ${MERCHANT_RESOURCE_INFO[resource].label} for ${formatNumber(goldGained)} Gold`);
 
 		// Reset the slider for this resource
 		setSellAmounts((prev) => ({
 			...prev,
 			[resource]: 0,
 		}));
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setSaleMessage(null);
-		}, 3000);
 	};
 
 	// Handle selling all of a resource
@@ -204,16 +186,7 @@ const MerchantOverlay: React.FC = () => {
 		if (!sellResources(resource, amountToSell)) return;
 
 		// Set success message
-		setSaleMessage({
-			resource: MERCHANT_RESOURCE_INFO[resource].label,
-			amount: amountToSell,
-			gold: goldGained,
-		});
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setSaleMessage(null);
-		}, 3000);
+		showToast(`Sold ${formatNumber(amountToSell)} ${MERCHANT_RESOURCE_INFO[resource].label} for ${formatNumber(goldGained)} Gold`);
 	};
 
 	// Handle changing the amount of a resource to sell
@@ -272,29 +245,21 @@ const MerchantOverlay: React.FC = () => {
 		if (!buyResource(resource, amount)) return;
 
 		// Show purchase message
-		setPurchaseMessage({
-			item: `${MERCHANT_RESOURCE_INFO[resource].label} x${formatNumber(
+		announcePurchase(`${MERCHANT_RESOURCE_INFO[resource].label} x${formatNumber(
 				amount
-			)}`,
-			price: price,
-		});
+			)}`, price);
 
 		// Reset the slider for this resource
 		setBuyAmounts((prev) => ({
 			...prev,
 			[resource]: 0,
 		}));
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setPurchaseMessage(null);
-		}, 3000);
 	};
 
 	// Click power ladder: gold per click = your gold/s x power (see CLICK_LADDER)
 	const maxClickLevel = CLICK_LADDER.length - 1;
 	const nextClick = CLICK_LADDER[clickLevel + 1];
-	const percent = (power: number) => `${Math.round(power * 100)}%`;
+	const percent = (power: number) => formatPercent(power * 100);
 
 	const getClickMultiplierText = () =>
 		nextClick
@@ -308,15 +273,7 @@ const MerchantOverlay: React.FC = () => {
 		if (!buyClickUpgrade()) return;
 
 		// Show purchase message
-		setPurchaseMessage({
-			item: `Click Power Level ${clickLevel + 1}`,
-			price: price,
-		});
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setPurchaseMessage(null);
-		}, 3000);
+		announcePurchase(`Click Power Level ${clickLevel + 1}`, price);
 	};
 
 	// Calculate max buy amount based on player's gold
@@ -328,31 +285,8 @@ const MerchantOverlay: React.FC = () => {
 	};
 
 	const announcePurchase = (item: string, price: number) => {
-		setPurchaseMessage({ item, price });
-		setTimeout(() => setPurchaseMessage(null), 3000);
+		showToast(`Purchased ${item} for ${formatNumber(price)} Gold`);
 	};
-
-	// The result of the last sale or purchase, shown at the top of every tab
-	const messages = (
-		<>
-			{saleMessage && (
-				<div className='mb-4 px-card text-center'>
-					<p className='text-green-400'>
-						Sold {formatNumber(saleMessage.amount)} {saleMessage.resource}{' '}
-						for {formatNumber(saleMessage.gold)} Gold!
-					</p>
-				</div>
-			)}
-			{purchaseMessage && (
-				<div className='mb-4 px-card text-center'>
-					<p className='text-green-400'>
-						Purchased {purchaseMessage.item} for{' '}
-						{formatNumber(purchaseMessage.price)} Gold!
-					</p>
-				</div>
-			)}
-		</>
-	);
 
 	// Render tab content based on active tab
 	const renderTabContent = () => {
@@ -363,7 +297,6 @@ const MerchantOverlay: React.FC = () => {
 						<h2 className='px-h text-center'>
 							Resources
 						</h2>
-						{messages}
 
 						<div className='grid grid-cols-2 gap-6'>
 							{/* Resource selling section */}
@@ -433,7 +366,6 @@ const MerchantOverlay: React.FC = () => {
 						<h2 className='px-h text-center'>
 							Goods
 						</h2>
-						{messages}
 
 						{/* The shuffling shelf and the supplies */}
 						<MerchantGoods onBought={announcePurchase} />
@@ -448,7 +380,6 @@ const MerchantOverlay: React.FC = () => {
 						<h2 className='px-h text-center'>
 							Upgrades
 						</h2>
-						{messages}
 
 						<div className='grid grid-cols-2 gap-4'>
 							{/* Gold click multiplier upgrade */}

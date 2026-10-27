@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { formatCompact, formatNumber } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { COMBAT, MONSTERS } from '@/config/combatConfig';
 import { maxHp, maxMana } from '@/lib/combat';
@@ -50,7 +51,7 @@ const VictoryToast: React.FC = () => {
 		const def = MONSTERS[fight.type];
 		setVictory({
 			id: nextId++,
-			title: `${def.grade === 'boss' ? '☠ ' : ''}${def.label} (Lv ${fight.level}) defeated`,
+			title: `${def.grade === 'boss' ? '☠ ' : ''}${def.label} (Lv ${formatCompact(fight.level)}) defeated`,
 			boss: def.grade === 'boss',
 			summary: fight.summary,
 			hp: state.playerHp,
@@ -81,13 +82,13 @@ const VictoryToast: React.FC = () => {
 			<div className='victory-title'>{victory.title}</div>
 			<div className='victory-row'>
 				<span className='flex items-center gap-1'>
-					+{Math.floor(summary.gold)} <ResourceIcon resource='gold' />
+					+{formatNumber(Math.floor(summary.gold))} <ResourceIcon resource='gold' />
 				</span>
 				<span className='flex items-center gap-1'>
-					+{Math.floor(summary.xp)} <ResourceIcon resource='xp' />
+					+{formatNumber(Math.floor(summary.xp))} <ResourceIcon resource='xp' />
 				</span>
 				<span className='victory-status'>
-					HP {Math.ceil(victory.hp)}/{victory.hpMax} - MP {Math.floor(victory.mp)}/{victory.mpMax}
+					HP {formatCompact(Math.ceil(victory.hp))}/{formatCompact(victory.hpMax)} - MP {formatCompact(Math.floor(victory.mp))}/{formatCompact(victory.mpMax)}
 				</span>
 			</div>
 			{summary.items.length > 0 ? (
@@ -101,10 +102,10 @@ const VictoryToast: React.FC = () => {
 			)}
 			{summary.autoSold.count > 0 && (
 				<div className='victory-note'>
-					Auto-sold {summary.autoSold.count} piece{summary.autoSold.count === 1 ? '' : 's'} of gear for {summary.autoSold.gold} gold
+					Auto-sold {summary.autoSold.count} piece{summary.autoSold.count === 1 ? '' : 's'} of gear for {formatNumber(summary.autoSold.gold)} gold
 				</div>
 			)}
-			{summary.convertedGold > 0 && <div className='victory-note'>Bag full - {summary.convertedGold} gold paid for the drops that did not fit</div>}
+			{summary.convertedGold > 0 && <div className='victory-note'>Bag full - {formatNumber(summary.convertedGold)} gold paid for the drops that did not fit</div>}
 		</div>
 	);
 };

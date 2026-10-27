@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatCompact, formatNumber } from '@/utils/formatters';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import type { ChestLoot } from '@/lib/chests';
 import { resolveItem } from '@/lib/itemInstance';
@@ -13,7 +14,7 @@ interface ChestNotificationProps {
 	onClose: () => void;
 }
 
-const fmt = (n: number) => Math.floor(n).toLocaleString('en-US');
+const fmt = (n: number) => formatNumber(Math.floor(n));
 
 /** The toast after opening a chest: what was inside, in the same gold-framed style for every kind. */
 const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClose }) => {
@@ -37,10 +38,10 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClo
 			);
 			detail = (
 				<span className='text-sm text-[#f0d27a] font-medium'>
-					{loot.minutes.toFixed(1)} minutes of gold income{loot.kind === 'boost' ? ` x${loot.multiplier}` : ''}
+					{formatCompact(loot.minutes)} minutes of gold income{loot.kind === 'boost' ? ` x${formatCompact(loot.multiplier)}` : ''}
 				</span>
 			);
-			hint = <span className='text-xs text-[#a89878] mt-1'>Based on your current {loot.goldRate.toFixed(2)} gold/s rate</span>;
+			hint = <span className='text-xs text-[#a89878] mt-1'>Based on your current {formatNumber(loot.goldRate)} gold/s rate</span>;
 			break;
 		case 'bundle':
 			title = <span className='text-lg font-semibold whitespace-nowrap'>Chest of supplies</span>;
@@ -61,7 +62,7 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClo
 					<ResourceIcon resource='xp' scale={1} />
 				</>
 			);
-			detail = <span className='text-sm text-[#f0d27a] font-medium'>{loot.minutes.toFixed(1)} minutes of XP income</span>;
+			detail = <span className='text-sm text-[#f0d27a] font-medium'>{formatCompact(loot.minutes)} minutes of XP income</span>;
 			break;
 		case 'item': {
 			const drop = loot.drop;
@@ -76,14 +77,14 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClo
 				{def && <PixelIcon name={itemIconName(def)} alt='' />}
 			</>
 		);
-		hint = <span className='text-xs text-[#a89878] mt-1'>{resolved ? `Item level ${resolved.instance.level} - ` : ''}Added to your bag</span>;
+		hint = <span className='text-xs text-[#a89878] mt-1'>{resolved ? `Item level ${formatCompact(resolved.instance.level)} - ` : ''}Added to your bag</span>;
 			break;
 		}
 	}
 
 	return (
 		<div
-			className='fixed top-[calc(var(--header-h,76px)+20px)] left-1/2 -translate-x-1/2 px-toast text-[#ffe27a] py-2 px-4 z-[70] flex flex-col items-center gap-1 chest-toast cursor-pointer'
+			className='relative px-toast text-[#ffe27a] py-2 px-4 flex flex-col items-center gap-1 chest-toast cursor-pointer'
 			onClick={onClose}>
 			<div className='flex items-center gap-2'>{title}</div>
 			{detail}

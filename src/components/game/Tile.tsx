@@ -1,4 +1,5 @@
 import React, { memo, useState } from 'react';
+import { formatCompact } from '@/utils/formatters';
 import { createPortal } from 'react-dom';
 import { TileProps } from '@/types/game';
 import {
@@ -43,7 +44,7 @@ const MonsterTip: React.FC<{ id: number; type: 'rat' | 'ratKing'; level: number 
 		<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs'>
 			<div className='px-tip-title'>
 				{isBoss(type) ? '☠ ' : ''}
-				{MONSTERS[type].label} - Lv {level} - {stats.maxHp} HP
+				{MONSTERS[type].label} - Lv {formatCompact(level)} - {formatCompact(stats.maxHp)} HP
 			</div>
 			{isBoss(type) && <div className='text-[#ff8a6a] font-bold'>BOSS</div>}
 			{nextLevel !== null && (

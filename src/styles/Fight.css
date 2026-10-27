@@ -347,13 +347,9 @@
 	}
 }
 
-/* --- the loot notice after a won fight: bottom centre, never in the way of the clicks that follow --- */
+/* --- the loot notice after a won fight: in the notice stack at the top centre (like chest rewards), never in the way of the clicks that follow --- */
 .victory-toast {
-	position: fixed;
-	left: 50%;
-	bottom: 24px;
-	transform: translateX(-50%);
-	z-index: 70;
+	position: relative;
 	min-width: 260px;
 	max-width: min(92vw, 520px);
 	padding: 10px 28px 10px 14px;
@@ -414,6 +410,6 @@
 }
 
 @keyframes victory-in {
-	from { opacity: 0; transform: translate(-50%, 12px); }
-	to { opacity: 1; transform: translate(-50%, 0); }
+	from { opacity: 0; transform: translateY(-10px); }
+	to { opacity: 1; transform: translateY(0); }
 }
