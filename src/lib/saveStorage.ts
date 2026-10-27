@@ -25,6 +25,8 @@ export const PERSIST_NAME = 'idlarz-save';
 const KEY_CURRENT = 'idlarz.save';
 const KEY_BACKUP = 'idlarz.save.backup';
 const KEY_DAMAGED = 'idlarz.save.damaged';
+const KEY_PREVIOUS_GAME = 'idlarz.save.previous-game'; // the game a New Game replaced; reset never removes it
+const BARELY_PLAYED_SEC = 300;
 const FLUSH_DELAY_MS = 2000;
 const ROTATE_EVERY_MS = 10 * 60 * 1000;
 
@@ -49,6 +51,12 @@ export interface SaveInfo {
 	/** Set when the save could not be read at start (what happened, in words). */
 	loadProblem: string | null;
 }
+
+/** What the start hub sees in storage. `unreadable`: something is stored but neither copy decodes. */
+export type SavePeek =
+	| { kind: 'none' }
+	| { kind: 'ok'; state: PersistedGame; savedAt: number | null; fromBackup: boolean }
+	| { kind: 'unreadable' };
 
 interface Options {
 	kv: KeyValue | null;
@@ -251,6 +259,49 @@ export const createSaveStorage = (options: Options) => {
 		if (legacy) await legacy.clear();
 	};
 
+	/** Read-only look at what is stored (start hub): never writes, never starts a game, never touches the legacy vault. */
+	const peek = (): SavePeek => {
+		const current = load(KEY_CURRENT);
+		const backup = load(KEY_BACKUP);
+		if (!current && !backup) return { kind: 'none' };
+		if (current) {
+			const result = decodeSave(current);
+			if (result.ok) return { kind: 'ok', state: result.state, savedAt: result.savedAt, fromBackup: false };
+		}
+		if (backup) {
+			const result = decodeSave(backup);
+			if (result.ok) return { kind: 'ok', state: result.state, savedAt: result.savedAt, fromBackup: true };
+		}
+		return { kind: 'unreadable' };
+	};
+
+	/**
+	 * Keeps a copy of the stored game under its own key before a New Game wipes it. A copy of a barely played game
+	 * never replaces an earlier copy of a real one. False when a copy was needed but the browser would not store it.
+	 */
+	const archiveForNewGame = (): boolean => {
+		const text = load(KEY_CURRENT) ?? load(KEY_BACKUP);
+		if (!text) return true;
+		const result = decodeSave(text);
+		if (result.ok && result.state.playSeconds < BARELY_PLAYED_SEC && load(KEY_PREVIOUS_GAME)) return true;
+		return store(KEY_PREVIOUS_GAME, text) && load(KEY_PREVIOUS_GAME) === text;
+	};
+
+	/**
+	 * Makes the given save text (the account's cloud save) this browser's current game, before the game is loaded.
+	 * The game that was here is copied aside first; false (nothing changed) when that copy, the text or the write fails.
+	 */
+	const install = (text: string): boolean => {
+		const decoded = decodeSave(text);
+		if (!decoded.ok || !archiveForNewGame()) return false;
+		const previous = load(KEY_CURRENT);
+		if (previous) store(KEY_BACKUP, previous);
+		const written = encodeSave(decoded.state, now());
+		if (!store(KEY_CURRENT, written) || !decodeSave(load(KEY_CURRENT) ?? '').ok) return false;
+		drop(KEY_DAMAGED);
+		return true;
+	};
+
 	const info = async (): Promise<SaveInfo> => {
 		let persisted: boolean | null = null;
 		try {
@@ -274,6 +325,9 @@ export const createSaveStorage = (options: Options) => {
 		},
 		freeze,
 		flush,
+		peek,
+		archiveForNewGame,
+		install,
 		parse,
 		commitImport,
 		reset,
@@ -320,6 +374,9 @@ export const freezeSaves = saves.freeze;
 export const parseSaveText = saves.parse;
 export const commitImport = saves.commitImport;
 export const resetSave = saves.reset;
+export const peekSave = saves.peek;
+export const archiveForNewGame = saves.archiveForNewGame;
+export const installSave = saves.install;
 export const getSaveInfo = saves.info;
 export const getDamagedSave = saves.damagedCopy;
 
