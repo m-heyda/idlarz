@@ -1,6 +1,6 @@
 # 10 · Loot system
 
-One shared, data-driven pipeline gives out gear for every source (rats, the Rat King, chests). Design: [superpowers/specs/2026-10-27-loot-system-design.md](superpowers/specs/2026-10-27-loot-system-design.md). Numbers: [generated/loot-sim.md](generated/loot-sim.md) and [generated/item-catalog.md](generated/item-catalog.md).
+One shared, data-driven pipeline gives out gear for every source (rats, the Rat King, chests and the merchant's shelf). Design: [superpowers/specs/2026-10-27-loot-system-design.md](superpowers/specs/2026-10-27-loot-system-design.md). Numbers: [generated/loot-sim.md](generated/loot-sim.md) and [generated/item-catalog.md](generated/item-catalog.md).
 
 ## The five separate ideas
 
@@ -16,7 +16,7 @@ Rarity never decides the item level and the item level never decides the rarity.
 
 ## The pipeline (`generateLoot`, src/lib/loot/generate.ts)
 
-1. `source` (`rat` / `ratKing` / `chest`) names a profile (`LOOT_SOURCES`).
+1. `source` (`rat` / `ratKing` / `chest` / `merchant`) names a profile (`LOOT_SOURCES`).
 2. Roll count: the first `guaranteed` rolls always succeed, the rest with `chancePerRoll (+ chancePerTier per tier above 1)`.
 3. Source level = `base + perTier × (tier − 1) + perCastleLevel × (castle − 1)`, clamped to 1..100.
 4. Item level = source level + profile offset ± variance, inside the profile's bounds.
@@ -57,10 +57,14 @@ Stats are derived at load and never stored, so retuning the curve retunes every 
 
 Schema 3 stores gear as instances: equipment `{ slot: { base, level, rarity, quality, affixes: [{ id, roll }] } }`, bag gear `{ item: {...} }`, consumables `{ id, qty }` as before. Schema 2 saves (bare item ids) are converted by `MIGRATIONS[2]` using the frozen table in `src/lib/legacyGear.ts`: each old id becomes the item at its authored level, neutral quality, no affixes and its old rarity, so its stats do not change (`tests/saves.test.ts` checks all 76 gear ids). The old encrypted vault format goes through the same step. New optional fields: `lootPity` (bad-luck counters by `profile:table`) and `autoSellUpTo` (rarity id).
 
+## The merchant's shelf
+
+The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs the `merchant_stock` profile: six guaranteed rolls on the general pool at +-2 item levels, rarity weights common 50 / uncommon 32 / rare 14 / epic 4 (gated by item level like chests), no legendary and no bonus tables. `generateMerchantStock` (src/lib/merchant.ts) turns the drops into the shelf; the price is `ceil(sellValueOf(item) × 40)`, derived each time, never saved. The shelf is the optional save key `merchantStock` (`{ at, offers }`, every offer read by the same item validation as the bag, at most 12 offers).
+
 ## Player-facing
 
 - **Pity**: the King's legendary weapon table adds +1 % per miss up to +10 %; a drop resets it. Set pieces already prefer ones you do not own.
-- **Auto-sell**: *Merchant → Sell items → Auto-sell new gear up to ...* sells matching drops the moment they drop (with the Haggler bonus), so a bigger drop volume does not clog the bag. Never offered for the two rarest tiers.
+- **Auto-sell**: *Merchant → Goods → Sell items → Auto-sell new gear up to ...* sells matching drops the moment they drop (with the Haggler bonus), so a bigger drop volume does not clog the bag. Never offered for the two rarest tiers.
 
 ## Not done yet (kept on purpose)
 

@@ -75,7 +75,7 @@ import { applyHit, armorOf, dodgeChance, leechHeal, manaRegenPerSec, maxHp, maxM
 import { emitCombat } from '@/lib/combatFx';
 import { SKILLS, type SkillId } from '@/catalog/skills';
 import { castRefusal, healAmount, isSkillId, tickCooldowns } from '@/lib/skills';
-import { generateMerchantStock, refreshCost, shopPriceOf, stockDue } from '@/lib/merchant';
+import { generateMerchantStock, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
 import { addDrop, aggregateStats, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
 import { plainItem, sellValueOf } from '@/lib/itemInstance';
@@ -862,7 +862,7 @@ const createGameSlice = (
 				playerHp: newPlayerHp,
 				playerMp: newPlayerMp,
 				skillCd: tickCooldowns(state.skillCd, secondsElapsed),
-				merchantStock: stockDue(state.merchantStock, newPlaySeconds) ? generateMerchantStock(castleLevelOf(state.tiles), Math.random, newPlaySeconds) : state.merchantStock,
+				merchantStock: stockDue(state.merchantStock, newPlaySeconds) ? generateMerchantStock(castleLevelOf(state.tiles), rotationRng(newPlaySeconds), newPlaySeconds) : state.merchantStock,
 				playSeconds: newPlaySeconds,
 			});
 			if (castleFinished) emitSaveEvent('castleUpgraded');

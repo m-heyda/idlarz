@@ -24,7 +24,7 @@ src/
 │   ├── combatConfig.ts       COMBAT + MONSTERS: HP, regen, armor, spawn, tiers, drops, Rat King
 │   ├── itemCatalog.ts        facade: re-exports src/catalog and derives BASIC_GEAR / RATTATUI_SET for older imports
 ├── catalog/                  THE catalog: index.ts (ITEM_CATALOG, SETS, setCounts, starter kit, equipment layout), items/*.ts (one file per family: wooden, cloth, steel,
-│                             obsidian, rattatui, legendary, consumables), rarity.ts, stats.ts, sets.ts, resources.ts, loot.ts (drop pools, shop list)
+│                             obsidian, rattatui, legendary, consumables), rarity.ts, stats.ts, sets.ts, resources.ts, skills.ts (Heal, Stun), loot.ts (the supplies list)
 │   ├── biomePalette.ts       one colour per biome (flat terrain fallback, minimap dots, BIOMES.baseColor) and the highlight tints
 │   ├── playerClasses.ts, pixelIcons.ts
 ├── types/game.ts             Resources, Tile, CharacterStats, GameState (store interface), ClickInput, TileCost ...
@@ -90,7 +90,7 @@ The map has no edge. `GameState.tiles` is a `World` (`src/utils/world.ts`): an i
 
 ## State (`GameState`)
 
-Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves), `gems` (the premium currency; optional in saves, default 1000), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots, plus 4 per Pack Rat level), `playerHp`, `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
+Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves), `gems` (the premium currency; optional in saves, default 1000), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots, plus 4 per Pack Rat level), `playerHp`, `playerMp`, `merchantStock` (the shelf of goods, optional), `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
 
 ## The loop
 

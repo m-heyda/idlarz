@@ -123,7 +123,9 @@ Payback (food valued at its sell price 0.75, meat at 1) is well under a day for 
 sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .75, stone .9, coal 1.1, food .4, meat 1, eggs 2, milk 3, hide 4
 buy:   gold = ceil(amount × price × 2)                         wood, stone, coal, food, meat only
 item:  sell = floor(sellValue × qty × Haggler)   common 8, uncommon 90, rare 250, epic 700, legendary 2000, potion 20
-       shop price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
+       supplies (potions) price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
+goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle level above 1, +-2; common 50 / uncommon 32 / rare 14 / epic 4)
+       price = ceil(sellValue × 40), reshuffle after 1800 s of play time, refresh = 2000 × castleLevel² gold (MERCHANT_GOODS)
 bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
@@ -173,6 +175,14 @@ click        : crit with  (character critChance + gear critChance) %  (max 75 %)
                then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
 fight hits   : not rate limited; trusted real clicks only, one DOM event counts once (lib/hitGuard.ts)
 hit taken    = max(1, round(attack × (1 − armor / (armor + 40))))               COMBAT.armorK
+stat bonuses : counted above the starting 5 (STAT_RULES)
+               damage = gear damage × (1 + 0.02 × (STR−5))  physical weapons;  × (1 + 0.024 × (INT−5))  staff and wand
+               armor  = gear armor + 0.5 × (DEX−5) + 0.5 × (VIT−5) + 0.25 × (STR−5)       hit taken × (1 − armor / (armor + 40))
+               crit multipliers x2 / x5 × (1 + (1 × (STR−5) + 0.5 × (DEX−5) + 0.5 × (CHA−5)) / 100)
+               attacks/s = weapon speed × (1 + 0.0025 × (DEX−5))   (hook for speed combat; clicks ignore it)
+mana         = 20 + 4 × INT + gear;  regen = 0.5 + 0.05 × INT + gear  per second;  life leech = min(15, gear %) of the click damage as HP
+Heal         = round(25 % max HP × (1 + 0.024 × (INT−5)) × (1 + Spell Power %)), level 5, 20 mana, 12 s cooldown
+Stun         = the monster's attack timer is frozen 3 s, level 10, 15 mana, 15 s cooldown (the King's limit keeps running)
 regen        = (1 + gear regen) HP/s with no active fight, gear regen only during one; knockout restores 30 % of max HP
 potion       = +35 / +90 HP (not above max), 8 s cooldown shared by all potions in a fight
 rat tier t   : HP = round(100 × 1.5^(t−1))  → 100 / 150 / 225 / 338 / 506
@@ -186,7 +196,7 @@ drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> s
                potion 25 % + 3 % per tier (Greater from T4)                      (tier 1: 90 s of income, tier 5: ~456 s)
                Rat King: 1 item of his own (rolled rarity) + 1 Rattatui piece (missing ones first) + 40 % a second one + 5 % (pity up to 15 %) a legendary weapon + 2 Minor and 1 Greater potion
                chest (item result, 8 % of chests): one item - gear 82 % (rolled rarity) or a potion, 1.9 % a legendary weapon instead
-item level   : source level = base + steps per tier + 3 per castle level above 1 (rat 1/3/5/7/9, King 12, chest 4, +3 per castle level); gear power x levelScale(level) = 1 + 0.07 x (level - 1)
+item level   : source level = base + steps per tier + 3 per castle level above 1 (rat 1/3/5/7/9, King 12, chest 4, merchant 4, +3 per castle level); gear power x levelScale(level) = 1 + 0.07 x (level - 1)
 spawn        : first rat 120 s after 5 owned tiles, then 900 s; max 8; Rat King check every 600 s of age after tier 5 (7200 s), 35 %
 Rat King     : 15600 HP, attack 14 every 3 s, 75 s limit
 ```

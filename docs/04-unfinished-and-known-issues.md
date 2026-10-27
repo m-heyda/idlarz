@@ -7,7 +7,7 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 | # | Feature | State today | Where | To finish |
 | --- | --- | --- | --- | --- |
 | U1 | **Items beyond gear** | equipment, the 36-slot bag, drops and potions work (Damage / Armor / Max HP / Crit / Super Crit / Regen / Luck); the merchant buys and sells bag items and Pack Rat expands the bag; no upgrading or crafting; gear gives no resource income | `src/catalog`, `inventory.ts` | see the roadmap in the combat spec; rebirth keeps gear (decided) |
-| U2 | **Merchant → Upgrade Items** | "Coming soon" | `MerchantOverlay.tsx` | needs U1; gold/resource sink |
+| U2 | **Item upgrading** | not built: the merchant's Upgrades tab holds click power and the merchant bonuses, not gear enhancement | `MerchantOverlay.tsx` | needs U1; gold/resource sink (salvage and reroll are in [10](10-loot-system.md)) |
 | U3 | **Merchant → Quests** | placeholder | same | quest model, rewards (items), tracking in store |
 | U4 | **Merchant → Gambling** | placeholder | same | RNG games using `luck`; must stay inside the exploit rules ([07](07-security-and-exploits.md)) |
 | U5 | **Stat points in combat** | click combat exists (rats, Rat King) but fight damage and armor come from gear only; `physicalAtk, magicAtk, mp, def, magicDef, critChance, critDmg, atkSpeed` are still display-only; `vitality` adds a little HP, `luck` raises kill gold | `calculateCombatStats`, `combat.ts` (`damagePerClick` is the hook) | stat rework: let the five stats feed damage, armor, crit and speed |
@@ -37,8 +37,8 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 
 ## D. Combat and items: known limits
 
-- Monsters are one family (rats); there is one weapon per tier of rarity and no item selling or upgrading yet.
+- Monsters are one family (rats); there is one weapon per tier of rarity and no item upgrading yet.
 - The sim bots do not fight or equip, so combat rewards (gold / XP as seconds of income) are not part of `docs/generated/sim-milestones.md`; measure before tuning them ([05 BL12](05-balance-backlog-and-roadmap.md)).
 - A fight does not survive a reload (the monster is full HP again); your HP does.
 - The Rat King (5200 HP, 75 s) is the only source of Rattatui pieces. Fight clicks are not rate limited, so a hardware auto-clicker (trusted clicks) can out-click a human; the King is tuned so even 25 clicks/s without gear loses. If that becomes an exploit, add a generous anti-bot ceiling to `lib/hitGuard.ts`. When gear or monsters change, rerun `npm run fight-sim` and revisit `tests/fightBalance.test.ts`.
-- Ability slots are locked placeholders; MP has no use yet.
+- Heal and Stun are the only skills; the Character tab's two ability slots hold them (Heal is castable there, out of fights). More skills, class-specific skills and weapon-speed combat are open; classes are still cosmetic.

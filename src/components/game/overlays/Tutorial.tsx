@@ -19,6 +19,7 @@ import {
 	CLICK_LIMIT,
 	FARM_BONUS,
 	MERCHANT_BUY_MULTIPLIER,
+	MERCHANT_GOODS,
 	MERCHANT_RESOURCE_PRICES,
 	SCALING_CONFIG,
 	TILE_PRICE,
@@ -270,7 +271,7 @@ const Tutorial: React.FC = () => {
 					</li>
 					<li>
 						Wood and leather (common) and Apprentice cloth (common, more HP, regen and luck) drop from rats and chests; Knight&apos;s steel
-						(uncommon) comes from older rats and chests, and the merchant sells some pieces; Obsidian (rare) needs tier-5 rats or a good
+						(uncommon) comes from older rats and chests, and the merchant&apos;s shelf may carry some; Obsidian (rare) needs tier-5 rats or a good
 						chest; the Rattatui set (epic) is the Rat King&apos;s; legendary weapons are very rare finds.
 					</li>
 					<li>
@@ -322,10 +323,11 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Merchant</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Sell resources, farm products and spare gear from your bag for gold; buying resources costs{' '}
-					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. Buy Goods has
-					click power, permanent bonuses (Haggler, Bulk Discount, Lucky Charm, Pack Rat), potions and some leather and steel gear.
-					Rattatui gear is not for sale: the Rat King drops it.
+					The <b>Resources</b> tab sells resources and farm products for gold; buying resources costs{' '}
+					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. <b>Goods</b> shows a shelf of
+					six pieces of gear that is reshuffled every {MERCHANT_GOODS.rotateSec / 60} minutes of play (or at once for gold with Refresh), potions,
+					and your bag to sell spare gear from. <b>Upgrades</b> has click power and the permanent bonuses (Haggler, Bulk Discount,
+					Lucky Charm, Pack Rat). The shelf never holds legendary gear and Rattatui gear is not for sale: the Rat King drops it.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-5 gap-2'>
 					{Object.entries(MERCHANT_RESOURCE_PRICES).map(([r, price]) => (

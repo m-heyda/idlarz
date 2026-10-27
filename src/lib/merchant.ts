@@ -1,7 +1,7 @@
 import { MERCHANT_GOODS } from '@/config/gameConfig';
 import { generateLoot } from '@/lib/loot';
 import { sellValueOf } from '@/lib/itemInstance';
-import type { Rng } from '@/lib/rng';
+import { mulberry32, type Rng } from '@/lib/rng';
 import type { ItemInstance, MerchantStock } from '@/types/game';
 
 // The merchant's shuffling goods: a few pieces of gear rolled by the shared loot pipeline (source `merchant`), refreshed on a
@@ -20,6 +20,12 @@ export const generateMerchantStock = (castleLevel: number, rng: Rng, playSeconds
 	const offers = result.drops.flatMap((drop) => (drop.kind === 'gear' ? [drop.item] : []));
 	return { at: playSeconds, offers: offers.slice(0, MERCHANT_GOODS.offers) };
 };
+
+/**
+ * The generator for a shelf the clock reshuffles: seeded by the play time it is made at, so the timed rotation never takes
+ * numbers from `Math.random` (the rest of the game's randomness, spawns and chests, is the same with or without a shelf).
+ */
+export const rotationRng = (playSeconds: number): Rng => mulberry32(Math.floor(playSeconds * 1000) ^ 0x5bd1e995);
 
 /** Seconds of play until the shelf is reshuffled (0 once it is due). */
 export const secondsToRotation = (stock: MerchantStock, playSeconds: number): number =>
