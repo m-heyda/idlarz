@@ -6,8 +6,7 @@
 export const BIOME_COLORS: Readonly<Record<string, string>> = {
 	empty: '#1a1a1a',
 	castle: '#6045a0',
-	grounds: '#72502c',
-	forest: '#317433',
+forest: '#317433',
 	plains: '#65a540',
 	hills: '#709046',
 	swamp: '#6c6b33',
@@ -25,8 +24,7 @@ export const YARD_COLOR = '#928068';
  * forest would not show), one clearly different hue per biome.
  */
 export const HIGHLIGHT_COLORS: Readonly<Record<string, string>> = {
-	grounds: '#ffb347',
-	forest: '#2dff9a',
+forest: '#2dff9a',
 	plains: '#d4ff3a',
 	hills: '#ffe14d',
 	swamp: '#e0d23a',

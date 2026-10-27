@@ -27,15 +27,15 @@ import type { BiomeType, Tile } from '../src/types/game';
 // The map is drawn in chunks. A chunk's picture must be a function of the ground inside chunk + CHUNK_HALO only (so the
 // signature of that window decides when it is redrawn), and chunks must agree with each other along their borders.
 
-const NAMES: Record<string, BiomeType> = { P: 'plains', S: 'swamp', L: 'lake', T: 'tundra', H: 'hills', F: 'forest', B: 'coast', C: 'castle', G: 'grounds' };
+const NAMES: Record<string, BiomeType> = { P: 'plains', S: 'swamp', L: 'lake', T: 'tundra', H: 'hills', F: 'forest',B: 'coast', C: 'castle' };
 const rows = (lines: string[]): Tile[][] =>
 	lines.map((row) =>
 		[...row].map((c): Tile =>
-			c === 'Y' ? { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 } : NAMES[c] ? { biome: NAMES[c], isOwned: true } : { biome: 'empty', isOwned: false }
+			c === 'Y' ? { biome: 'plains', isOwned: true, building: 'tavern' } : NAMES[c] ? { biome: NAMES[c], isOwned: true } : { biome: 'empty', isOwned: false }
 		)
 	);
 
-test('the map ground matches the array ground for every position (explored, building on old lots, mist ring, nothing)', () => {
+test('the map ground matches the array ground for every position(explored, building, mist ring, nothing)', () => {
 	const lines = ['..........', '.PPPFFF...', '.PYPFLL...', '.PPPFLL...', '.HHSSTT...', '.HHSBBT...', '..........'];
 	const tiles = rows(lines);
 	const array = buildGroundGrid(tiles);

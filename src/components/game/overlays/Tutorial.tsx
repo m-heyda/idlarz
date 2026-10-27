@@ -51,8 +51,7 @@ const Res: React.FC<{ r: string; children?: React.ReactNode }> = ({ r, children 
 );
 
 const Tutorial: React.FC = () => {
-	// Grounds, the old building lot, is no longer part of a new map (buildings go on any tile)
-	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty' && b.name !== 'grounds');
+	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty');
 	const buildingBase = BUILDING_COST.base;
 	const buildingExamples = [0, 1, 2, 3, 4, 8, 16, 32].map((n) => ({ n, gold: Math.floor((buildingBase.gold ?? 0) * buildingCostFactor(n)) }));
 	const castleStart = castleModifier(1);

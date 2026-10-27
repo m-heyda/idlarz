@@ -30,9 +30,9 @@ export function isLonely(tiles: World, x: number, y: number): boolean {
 	return biome !== null && !SIDES4.some(([dx, dy]) => getTile(tiles, x + dx, y + dy)?.biome === biome);
 }
 
-/** Every biome a purchase can produce (castle and empty are not; Grounds, the old building lot, no longer turns up: buildings go on any tile). */
+/** Every biome a purchase can produce (castle and empty are not). */
 export const SELECTABLE_BIOMES = Object.keys(BIOMES).filter(
-	(name) => !SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) && !EMPTY_BIOMES.includes(name as BiomeType) && name !== 'grounds'
+	(name) => !SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) && !EMPTY_BIOMES.includes(name as BiomeType)
 ) as BiomeType[];
 
 /** Verdict for each biome a purchase can produce on tile (x, y) after `purchased` purchases. */

@@ -21,7 +21,7 @@ const playedGame = (): PersistedGame => {
 	bag[2] = { item: plainItem('rattatui_tunic') };
 	store.setState((s) => {
 		const lots = gridCells(s.tiles).filter(({ t }) => t.isOwned && t.biome !== 'castle');
-		let tiles = setTile(s.tiles, lots[0].x, lots[0].y, { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 });
+		let tiles = setTile(s.tiles, lots[0].x, lots[0].y,{ biome: 'forest', isOwned: true, building: 'tavern' });
 		tiles = patchTile(tiles, lots[1].x, lots[1].y, { hasChest: true });
 		return { tiles, activeChests: 1, bag, equipment: { ...STARTER_EQUIPMENT, head: plainItem('rattatui_cap') }, playerName: 'Zoë' } as never;
 	});
@@ -104,7 +104,7 @@ test('migrations upgrade old bodies step by step', () => {
 	assert.equal(decodeSave(v1, { schema: 2, migrations: table }).ok, true);
 	assert.equal(decodeSave(v1, { schema: 2, migrations: {} }).ok, false, 'a missing step is an error, not a guess');
 	assert.deepEqual(migrateBody({ a: 1 }, 1, 3, { 1: (b) => ({ ...b, b: 2 }), 2: (b) => ({ ...b, c: 3 }) }), { a: 1, b: 2, c: 3 });
-	assert.deepEqual(Object.keys(MIGRATIONS), ['1', '2'], 'one step per bump of SAVE_SCHEMA: 1 -> 2 turned the land list into runs, 2 -> 3 the gear ids into item instances');
+	assert.deepEqual(Object.keys(MIGRATIONS), ['1', '2', '3'], 'one step per bump of SAVE_SCHEMA: 1 -> 2 turned the land list into runs, 2 -> 3 the gear ids into item instances, 3 -> 4 the Grounds tiles into land');
 });
 
 test('every frozen save in tests/fixtures/saves still loads (the compatibility guard)', async () => {

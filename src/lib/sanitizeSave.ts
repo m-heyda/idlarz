@@ -252,11 +252,10 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			}
 			castleTile = tile;
 		} else if (t.building !== undefined) {
-			// a building stands on any biome except water (BUILDING_COST.blockedBiomes); only old Grounds saves carry `level: 2`
+			// a building stands on any biome except water (BUILDING_COST.blockedBiomes) and never has a level
 			if (typeof t.building !== 'string' || !(t.building in BUILDINGS)) return fail('building');
 			if (BUILDING_COST.blockedBiomes.includes(t.biome as Tile['biome'])) return fail('building on a tile that cannot take one');
-			if (t.biome === 'grounds' ? t.level !== undefined && t.level !== 2 : t.level !== undefined) return fail('building level');
-			if (t.level === 2) tile.level = 2;
+			if (t.level !== undefined) return fail('building level');
 			tile.building = t.building;
 		} else if (t.level !== undefined) {
 			return fail('level without a building');

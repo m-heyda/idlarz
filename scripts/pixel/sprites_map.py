@@ -113,21 +113,6 @@ def coast():
     return img
 
 
-def grounds():
-    sc = _scene(9.4, (16, 24))
-    _P(sc, 'box', (0, 0, 0.12), (1.3, 0.95, 0.12), 'soil', rot(0, 0, 0), None, 1)           # tilled plot
-    for i in range(3):                                                                      # furrows + sprouts
-        _P(sc, 'box', (0, -0.55 + i * 0.55, 0.28), (1.15, 0.12, 0.07), 'soil', I3, None, 10 + i)
-        for j in range(4):
-            _P(sc, 'cone', (-0.8 + j * 0.5, -0.55 + i * 0.55, 0.5), (0.09, 0.16), 'grass', I3, None, 30 + i * 4 + j)
-    for sx in (-1, 1):                                                                       # stakes + string
-        _P(sc, 'cyl', (1.15 * sx, -0.85, 0.7), (0.07, 0.6), 'bark', I3, None, 5)
-    sc.add(between('cyl', (-1.15, -0.85, 1.05), (1.15, -0.85, 1.05), (0.025,), 'cream', None, (0, 0, 1)))
-    _P(sc, 'cyl', (0.55, 0.45, 0.85), (0.06, 0.75), 'bark', rot(0, 12, 0), None, 6)           # shovel
-    _P(sc, 'box', (0.55 + 0.17, 0.45, 0.18), (0.2, 0.05, 0.26), 'steel', rot(0, 12, 0), None, 7)
-    return sc.render()
-
-
 # ----------------------------------------------------------------- bonus treasure chest (24x24)
 def bonus_chest():
     """Deliberately plain: wooden box, round lid, two iron straps, gold lock, and a hard black outline so it reads
@@ -172,6 +157,6 @@ def unknown_mark():
 SPRITES = {
     'unknown': unknown_mark,
     'biome_forest': forest, 'biome_plains': plains, 'biome_hills': hills, 'biome_swamp': swamp,
-    'biome_tundra': tundra, 'biome_lake': lake, 'biome_coast': coast, 'biome_grounds': grounds,
+    'biome_tundra': tundra, 'biome_lake': lake, 'biome_coast': coast,
     'xp': xp_orb,
 }

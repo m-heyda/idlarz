@@ -11,7 +11,7 @@ import terrain_logic as logic
 from terrain_field import hash32, CELL
 
 NAMES = {'P': 'plains', 'F': 'forest', 'L': 'lake', 'H': 'hills', 'S': 'swamp', 'T': 'tundra', 'B': 'coast',
-         'G': 'grounds', 'Y': 'building', 'W': 'yard', 'C': 'castle'}
+         'W': 'yard', 'C': 'castle', 't': 'tundra', 's': 'swamp', 'f': 'forest', 'p': 'plains', 'b': 'coast'}
 
 
 def make_layout(W=30, H=20):
@@ -54,7 +54,7 @@ def _crop_tex(tex, ox, oy):
 
 
 def render_world(layout, m, images, sprites=True, marks=True):
-    owned = [[NAMES.get(c) for c in row] for row in layout]
+    owned, built = build.layout_owned(layout, NAMES)
     g = logic.ground_grid(owned)
     h, w = len(g), len(g[0])
     pad = 48
@@ -76,9 +76,9 @@ def render_world(layout, m, images, sprites=True, marks=True):
                 world.paste(tex, (ox + pad, oy + pad), body)
                 world.alpha_composite(rim, (ox + pad, oy + pad))
     if sprites:
-        for pid, px, py in logic.all_pads(owned):
+        for pid, px, py in logic.all_pads(owned, built):
             world.alpha_composite(images[pid], (px + pad, py + pad))
-        for sid, sx, sbottom in logic.all_sprites(m, g, logic.built_set(owned)):
+        for sid, sx, sbottom in logic.all_sprites(m, g, built):
             sp = images[sid]
             world.alpha_composite(sp, (sx + pad, sbottom - sp.size[1] + pad))
     if marks:

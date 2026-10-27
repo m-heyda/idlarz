@@ -27,7 +27,7 @@ const bigGame = (count: number, seed = 5) => {
 
 test('every biome except empty has one save letter, and letters are unique', () => {
 	const biomes = Object.keys(BIOMES).filter((b) => b !== 'empty');
-	assert.deepEqual(Object.keys(BIOME_CODES).sort(), biomes.sort());
+	assert.deepEqual(Object.keys(BIOME_CODES).sort(), [...biomes, 'grounds'].sort(), "plus 'grounds': a removed biome keeps its letter, old saves still name it (MIGRATIONS[1] and [3])");
 	const letters = Object.values(BIOME_CODES);
 	assert.equal(new Set(letters).size, letters.length);
 	assert.ok(letters.every((l) => l.length === 1));

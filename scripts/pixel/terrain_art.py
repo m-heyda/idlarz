@@ -40,8 +40,7 @@ PAL = {
                      taint='#8a5ac0', fringe='#a49a60'),
     'lake_d1':  dict(tones=['#2380bd', '#2886c3', '#2d8cc9'], tick='#4ca4da', edge='#2c94d0'),
     'lake_d2':  dict(tones=['#185b9e', '#1c61a4', '#2067aa'], tick='#3a7cc4', abyss='#123e7a', edge='#226cb8'),
-    'grounds':  dict(tones=['#6a4a28', '#72502c', '#7a5830'], furrow='#4e3418', ridge='#8a6438', stone='#8a7a66', edge='#4e3418', speck='#5a3c20'),
-    'yard':     dict(tones=['#8a7860', '#928068', '#9a8870'], cobble='#a69678', cobble_lt='#c2b496', cobble_sh='#6e604a', mortar='#6a5c46',
+'yard':     dict(tones=['#8a7860', '#928068', '#9a8870'], cobble='#a69678', cobble_lt='#c2b496', cobble_sh='#6e604a', mortar='#6a5c46',
                      lip='#d4ccb8', lip_sh='#aea690', face='#8c8470', mark='#6c6452', inner='#5c5444', outline='#2e2a22'),
     'castle':   dict(tones=['#5a3f98', '#6045a0', '#664ba8'], line='#3a2866', slab_lt='#7e63c0',
                      lip='#c4b8ec', lip_sh='#9c90c8', face='#7a6eb0', mark='#5a4e90', inner='#483c78', outline='#241a46'),
@@ -58,8 +57,7 @@ STYLES = {                      # coordinate warp in px (amp) and scalloping (lo
     'lake': dict(amp=4.5, lobe=0.0),
     'lake_d1': dict(amp=6.0, lobe=0.0), 'lake_d2': dict(amp=7.0, lobe=0.0),
     'mist': dict(amp=7.0, lobe=3.0),
-    'grounds': dict(amp=4.0, lobe=1.0),
-    'yard': dict(square=True), 'castle': dict(square=True),
+'yard': dict(square=True), 'castle': dict(square=True),
 }
 MAX_DEPTH = {'forest': 1, 'hills': 2, 'swamp': 1, 'tundra': 1, 'lake': 2}
 
@@ -281,22 +279,6 @@ def tex_lake(tier=0):
     return img
 
 
-def tex_grounds():
-    p = PAL['grounds']
-    img, px = _banded(p['tones'], 151, cells=(3, 6))
-    furrow, ridge = C(p['furrow']), C(p['ridge'])
-    for y in range(TEX):
-        for x in range(TEX):
-            m = y % 12
-            if m in (3, 4):
-                px[x, y] = furrow
-            elif m == 6 and (x + y // 12) % 4:
-                px[x, y] = ridge
-    _sprinkle(153, 20, 0.5, lambda x, y: _blob(px, x, y, 2, 1, C(p['stone']), C('#a89a86'), C('#5a4e3e')))
-    _sprinkle(155, 9, 0.2, lambda x, y: _put(px, x, y, C(p['speck'])))
-    return img
-
-
 def tex_yard():
     p = PAL['yard']
     img, px = _banded(p['tones'], 161, cells=(3, 6))
@@ -338,7 +320,7 @@ TEXTURES = {
     'hills': tex_hills, 'hills_d1': lambda: tex_hills(1), 'hills_d2': lambda: tex_hills(2),
     'swamp': tex_swamp, 'swamp_d1': lambda: tex_swamp(1),
     'tundra': tex_tundra, 'tundra_d1': lambda: tex_tundra(1),
-    'grounds': tex_grounds, 'yard': tex_yard, 'castle': tex_castle,
+    'yard': tex_yard, 'castle': tex_castle,
     'coast': tex_coast, 'lake': tex_lake, 'lake_d1': lambda: tex_lake(1), 'lake_d2': lambda: tex_lake(2), 'mist': tex_mist,
 }
 _TEX_CACHE = {}
@@ -471,11 +453,6 @@ def _paint(style, sd, lit, r, x, y):
             return C(p['mark']) if (x + y) % 7 == 0 else C(p['face'])
         if sd < 4.2:
             return C(p['inner'])
-    elif fam == 'grounds':
-        if 0 <= sd < 1.6:
-            return C(p['edge'])
-        if -1.6 <= sd < 0 and r < 0.35:
-            return C(p['speck'])
     elif fam == 'mist':
         if 0 <= sd < 2.4:
             return C(p['edge'])

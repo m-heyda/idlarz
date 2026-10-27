@@ -1,3 +1,4 @@
+import { convertGroundsBody } from '@/lib/groundsMigration';
 import { LEGACY_GEAR } from '@/lib/legacyGear';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
 import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/utils/world';
@@ -19,6 +20,8 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  * Schema 1 wrote `land` as one `{ x, y, biome, level?, building?, chest? }` object per tile (MIGRATIONS[1] converts it).
  * Schema 2 stored gear as bare item ids (`equipment: { head: 'steel_helm' }`, bag entries `{ id, qty }`); schema 3 stores item
  * instances (`{ base, level, rarity, quality, affixes }`, bag gear as `{ item }`) and MIGRATIONS[2] converts them (src/lib/legacyGear.ts).
+ * Schema 3 could still hold Grounds tiles (the old building lot, letter `g`, built lots with `level: 2`); schema 4 has no Grounds biome and
+ * MIGRATIONS[3] turns each into the land biome around it (src/lib/groundsMigration.ts).
  *
  * ADDING THINGS LATER (keep old saves working):
  *   - A new field: add it to PERSISTED_KEYS, make `sanitizeSave` accept it as OPTIONAL with a default, and do
@@ -29,7 +32,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *   - A save written by a NEWER schema than this game is refused with a clear message, never half-loaded.
  */
 
-export const SAVE_SCHEMA = 3;
+export const SAVE_SCHEMA = 4;
 export const SAVE_PREFIX = 'IDLZ2.';
 
 /** Longer than any real save by far; stops a pasted novel from freezing the page. */
@@ -46,7 +49,7 @@ export type Migration = (body: SaveBody) => SaveBody;
 /** One letter per biome in the compact land. Frozen: never change or reuse a letter (a test checks every biome has one). */
 export const BIOME_CODES: Readonly<Record<string, string>> = {
 	castle: 'K',
-	grounds: 'g',
+	grounds: 'g', // LEGACY: the biome is gone (schema 4) but the letter stays reserved: MIGRATIONS[1] and [3] still read it, and a v4 save with it is refused
 	forest: 'f',
 	plains: 'p',
 	hills: 'h',
@@ -165,6 +168,8 @@ export const MIGRATIONS: Record<number, Migration> = {
 		}
 		return next;
 	},
+	// 3 -> 4: no more Grounds tiles (see groundsMigration.ts)
+	3: (body) => convertGroundsBody(body),
 };
 
 export const migrateBody = (

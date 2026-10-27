@@ -1658,10 +1658,6 @@ body {
 	background-image: url('/pixel/bg/ground_coast.png');
 }
 
-.tile-ground-grounds {
-	background-image: url('/pixel/bg/ground_grounds.png');
-}
-
 .tile-ground-castle {
 	background-image: url('/pixel/bg/ground_castle.png');
 }

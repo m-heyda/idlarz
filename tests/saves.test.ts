@@ -319,14 +319,14 @@ test('a played game that started with the free ring passes validation (tiles, bu
 	growTo(30);
 	store.setState((s) => {
 		const spot = gridCells(s.tiles).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
-		return { tiles: setTile(s.tiles, spot.x, spot.y, { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 }) };
+		return { tiles: setTile(s.tiles, spot.x, spot.y, { biome: 'forest', isOwned: true, building: 'tavern' }) };
 	});
 	api().tick(60_000);
 	const result = sanitizeSave(snapshot());
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
-test('buildings on any land biome save and load; water, nonsense and stray levels are rejected; old Grounds lots (level 2) still load', () => {
+test('buildings on any land biome save and load; water, nonsense and stray levels are rejected; the removed Grounds biome is refused', () => {
 	api().resetGame();
 	growTo(12);
 	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
@@ -340,11 +340,11 @@ test('buildings on any land biome save and load; water, nonsense and stray level
 	};
 	assert.equal(load({ biome: 'forest', building: 'tavern' }).ok, true, 'a forest building');
 	assert.equal(load({ biome: 'hills', building: 'quarry' }).ok, true);
-	assert.equal(load({ biome: 'grounds', building: 'tavern', level: 2 }).ok, true, 'an old Grounds lot');
-	assert.equal(load({ biome: 'grounds' }).ok, true, 'an old empty lot');
+	assert.equal(load({ biome: 'grounds', building: 'tavern' }).ok, false, 'Grounds is no biome any more (schema 3 saves are converted when they are read)');
+	assert.equal(load({ biome: 'grounds' }).ok, false, 'an old empty lot');
 	assert.equal(load({ biome: 'lake', building: 'tavern' }).ok, false, 'a building on water');
 	assert.equal(load({ biome: 'forest', building: 'nonsense' }).ok, false);
-	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok, false, 'level 2 only belongs to old Grounds lots');
+	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok,false, 'a building never has a level');
 	assert.equal(load({ biome: 'forest', level: 2 }).ok, false, 'a level without a building');
 	rejects((raw) => { raw.tiles[CASTLE_Y][CASTLE_X].building = 'tavern'; }, 'a building on the castle');
 });

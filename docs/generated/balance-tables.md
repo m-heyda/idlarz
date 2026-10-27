@@ -290,7 +290,6 @@ Per-second output of one tile before adjacency and modifiers (already multiplied
 | --- | --- |
 | Empty | — |
 | Castle | gold 0.1, wood 0.05, stone 0.1, food 0.05, xp 0.5 |
-| Grounds | xp 0.195, gold 0.065, wood 0.065 |
 | Forest | gold 0.13, wood 0.39 |
 | Plains | gold 0.13, food 0.39 |
 | Hills | gold 0.065, stone 0.39, coal 0.26 |
@@ -335,11 +334,11 @@ Derived stats for the starting stats (all 5):
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
 | gold | 0.1 | 0.1 | 2.395 | 45.0% | 3.473 |
-| wood | 0 | 0.05 | 3.292 | 45.0% | 4.774 |
+| wood | 0 | 0.05 | 1.538 | 45.0% | 2.229 |
 | stone | 0 | 0.1 | 0.150 | 32.5% | 0.199 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 3.292 | 45.0% | 4.774 |
-| meat | 0 | 0 | 0.000 | 40.0% | 0.000 |
+| food | 0 | 0.05 | 5.048 | 45.0% | 7.319 |
+| meat | 0 | 0 | 0.000 | 50.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |

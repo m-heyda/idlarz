@@ -77,7 +77,7 @@ test('pickSpawnTile never picks a building, a lake or a chest tile, however ofte
 			const y = CASTLE_Y + dy;
 			const kind = (Math.abs(dx) + 2 * Math.abs(dy)) % 4;
 			if (kind === 0) w = setTile(w, x, y, { biome: 'lake', isOwned: true });
-			else if (kind === 1) w = setTile(w, x, y, { biome: 'grounds', isOwned: true, building: 'farm', level: 1 });
+			else if (kind === 1) w =setTile(w, x, y, { biome: 'swamp', isOwned: true, building: 'farm' });
 			else if (kind === 2) w = setTile(w, x, y, { biome: 'plains', isOwned: true, hasChest: true });
 			else {
 				w = setTile(w, x, y, { biome: 'forest', isOwned: true });

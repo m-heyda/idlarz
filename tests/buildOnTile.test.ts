@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo, setResources, store, tileAt, gridCells, rowsOf } from './helpers';
 import { BIOMES, BUILDINGS, BUILDING_COST, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import { buildingCostFactor, calculateBuildingCost, canBuildOn, countBuildings } from '../src/utils/gameUtils';
-import { allPads, foundationBiome, isBuilt, terrainKey } from '../src/utils/terrain';
+import { allPads, isBuilt, terrainKey } from '../src/utils/terrain';
 import { pickChestSpot } from '../src/lib/chests';
 import { SELECTABLE_BIOMES } from '../src/utils/biomeRules';
 import type { BiomeType, Tile } from '../src/types/game';
-import { biomeCount, patchTile, setTile } from '../src/utils/world';
+import { biomeCount, patchTile } from '../src/utils/world';
 
 // Buildings: right-click any explored tile (not the castle or a lake) and build. One per tile, the price rises with every building.
 
@@ -43,7 +43,7 @@ test('building prices: four cheap starters, then three stages of growth, always 
 test('buildOnTile works on every land biome, one building per tile, and the tile keeps its biome', () => {
 	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
 	growTo(10);
-	const biomes: BiomeType[] = ['plains', 'forest', 'hills', 'swamp', 'tundra', 'coast', 'grounds'];
+	const biomes: BiomeType[] = ['plains', 'forest', 'hills', 'swamp', 'tundra', 'coast'];
 	const lots = ownedLots();
 	assert.ok(lots.length >= biomes.length);
 	biomes.forEach((biome, i) => {
@@ -95,14 +95,14 @@ test('a building adds its output on top of the biome output', () => {
 	assert.ok(BUILDINGS.lumbermill.resourceGeneration.wood! > 0 && BIOMES.forest.resourceGeneration.wood! > 0);
 });
 
-test('every purchase is a plain roll: Grounds never appears', () => {
+test('every purchase is a plain roll: the removed Grounds biome never appears', () => {
 	freshGame({ gold: 1e15, wood: 1e15, stone: 1e15, coal: 1e15, food: 1e15 });
 	growTo(40);
 	assert.equal(biomeCount(api().tiles, 'grounds'), 0);
 	assert.ok(!SELECTABLE_BIOMES.includes('grounds' as BiomeType));
 });
 
-test('terrain: a building keeps its biome ground and gets a pad of that biome; an old Grounds lot still takes the ground around it', () => {
+test('terrain: a building keeps its biome ground and gets a pad of that biome', () => {
 	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
 	growTo(6);
 	const a = lot('hills');
@@ -110,12 +110,10 @@ test('terrain: a building keeps its biome ground and gets a pad of that biome; a
 	const tiles = api().tiles;
 	const rows = rowsOf(tiles);
 	assert.equal(isBuilt(tileAt(tiles, a.x, a.y)), true);
-	assert.equal(foundationBiome(tiles, a.x, a.y), 'hills');
-	const pad = allPads(rows).find((p) => p.x === a.x * 48);
+const pad = allPads(rows).find((p) => p.x === a.x * 48);
 	assert.ok(pad && pad.id.startsWith('pad_hills_'), pad?.id);
 	assert.match(terrainKey(rows), /[A-Z]/); // built-on tiles are upper case, so the terrain is redrawn
-	const old = setTile(tiles, a.x, a.y, { biome: 'grounds', isOwned: true, building: 'farm', level: 2 });
-	assert.notEqual(foundationBiome(old, a.x, a.y), 'grounds'); // old lots resolve their foundation
+	assert.equal(tileAt(tiles, a.x, a.y).biome, 'hills'); // the tile keeps its biome (and so its ground)
 });
 
 test('chests never land on a building', () => {

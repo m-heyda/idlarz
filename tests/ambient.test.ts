@@ -103,17 +103,17 @@ test('rebirth and full reset clear the gift cooldowns', () => {
 	assert.equal(CASTLE_X, 25);
 });
 
-test('a built-on tile hosts the critters of its foundation biome (swamp plot -> ladybugs and frogs only, never the grounds rabbit)', () => {
+test('a built-on tile hosts the critters of its own biome (swamp plot -> ladybugs and frogs only)', () => {
 	const tiles = emptyGrid();
 	for (let y = 11; y <= 13; y++) for (let x = 6; x <= 8; x++) tiles[y][x] = { biome: 'swamp', isOwned: true };
-	tiles[12][7] = { biome: 'grounds', isOwned: true, building: 'farm', level: 2 };
+	tiles[12][7] = { biome: 'swamp', isOwned: true, building: 'farm' };
 	const hosts = new Set<string>();
 	for (let i = 0; i < 400; i++) {
 		const c = pickAmbientCritter(worldFromRows(tiles), WHOLE_MAP, () => (i * 0.6180339 + 0.1) % 1)!;
 		if (Math.floor(c.x / TILE_SIZE) === 7 && Math.floor(c.y / TILE_SIZE) === 12) hosts.add(c.type);
 	}
 	assert.ok(hosts.size > 0, 'the plot hosts critters');
-	for (const t of hosts) assert.ok(['frog', 'ladybug'].includes(t), `${t} lives on a swamp foundation`);
+	for (const t of hosts) assert.ok(['frog', 'ladybug'].includes(t), `${t} lives on a swamp plot`);
 });
 
 test('fish only swim in open water, and only the four farm critters can carry a gift', () => {

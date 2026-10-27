@@ -202,21 +202,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		resourceIcons: [RESOURCE_ICONS.gold, RESOURCE_ICONS.xp],
 		description: 'Your castle generates resources over time',
 	},
-	grounds: {
-		name: 'grounds',
-		label: 'Grounds',
-		baseColor: BIOME_COLORS.grounds,
-		unique: false,
-		upgradeable: true,
-		resourceGeneration: {
-			xp: 0.15,
-			gold: 0.05,
-			wood: 0.05,
-		},
-		resourceIcons: [RESOURCE_ICONS.xp],
-		description: 'Allow you to build structures',
-	},
-	forest: {
+forest: {
 		name: 'forest',
 		label: 'Forest',
 		baseColor: BIOME_COLORS.forest,
@@ -830,8 +816,7 @@ export const AMBIENT_LIFE = {
 		tundra: ['rabbit'],
 		lake: ['fish', 'fish', 'butterfly'],
 		coast: ['butterfly', 'bee', 'crab', 'crab'],
-		grounds: ['rabbit', 'ladybug'],
-	} as Record<string, readonly AmbientCritterType[]>,
+} as Record<string, readonly AmbientCritterType[]>,
 	// how far a critter strays, as a share of roamTiles (swimmers and crawlers stay close to where they appear)
 	roamScale: { fish: 0.35, frog: 0.45, crab: 0.5, goat: 0.8, wolf: 1 } as Record<string, number>,
 };
