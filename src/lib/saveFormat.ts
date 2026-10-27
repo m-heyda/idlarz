@@ -1,3 +1,4 @@
+import { LEGACY_GEAR } from '@/lib/legacyGear';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
 import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/utils/world';
 
@@ -16,6 +17,8 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *     chest? }]`. A 50,000-tile map is about 60 KB of text. Coordinates may be negative.
  *   - level, activeChests, previousLevel, tile upgrade costs and combat stats are left out (rebuilt on load).
  * Schema 1 wrote `land` as one `{ x, y, biome, level?, building?, chest? }` object per tile (MIGRATIONS[1] converts it).
+ * Schema 2 stored gear as bare item ids (`equipment: { head: 'steel_helm' }`, bag entries `{ id, qty }`); schema 3 stores item
+ * instances (`{ base, level, rarity, quality, affixes }`, bag gear as `{ item }`) and MIGRATIONS[2] converts them (src/lib/legacyGear.ts).
  *
  * ADDING THINGS LATER (keep old saves working):
  *   - A new field: add it to PERSISTED_KEYS, make `sanitizeSave` accept it as OPTIONAL with a default, and do
@@ -26,7 +29,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *   - A save written by a NEWER schema than this game is refused with a clear message, never half-loaded.
  */
 
-export const SAVE_SCHEMA = 2;
+export const SAVE_SCHEMA = 3;
 export const SAVE_PREFIX = 'IDLZ2.';
 
 /** Longer than any real save by far; stops a pasted novel from freezing the page. */
@@ -120,6 +123,13 @@ export const packLand = (world: World): PackedLand => {
 	return packed;
 };
 
+/** The instance an old save's bare item id stands for, or null when the id is not old gear. */
+const legacyItem = (id: unknown): SaveBody | null => {
+	if (typeof id !== 'string' || !Object.prototype.hasOwnProperty.call(LEGACY_GEAR, id)) return null;
+	const [rarity, level] = LEGACY_GEAR[id];
+	return { base: id, level, rarity, quality: 50, affixes: [] };
+};
+
 export const MIGRATIONS: Record<number, Migration> = {
 	// 1 -> 2: `land` was one object per tile; it is runs now. A body that is not a plain list of such objects is left as it
 	// is, and unpackBody then refuses it.
@@ -136,6 +146,24 @@ export const MIGRATIONS: Record<number, Migration> = {
 		cells.sort((a, b) => a.y - b.y || a.x - b.x);
 		const { land, extra } = packCells(cells);
 		return { ...body, land, extra };
+	},
+	// 2 -> 3: gear was an item id; it is an instance now (the rarity and level the item had, neutral quality, no affixes: the
+	// same stats). Anything that is not plain old gear is left as it is, and sanitizeSave refuses it.
+	2: (body) => {
+		const next: SaveBody = { ...body };
+		if (isRecord(body.equipment)) {
+			const equipment: SaveBody = {};
+			for (const [slot, id] of Object.entries(body.equipment)) equipment[slot] = legacyItem(id) ?? id;
+			next.equipment = equipment;
+		}
+		if (Array.isArray(body.bag)) {
+			next.bag = body.bag.map((entry) => {
+				if (!isRecord(entry) || Object.keys(entry).length !== 2 || entry.qty !== 1) return entry;
+				const item = legacyItem(entry.id);
+				return item ? { item } : entry;
+			});
+		}
+		return next;
 	},
 };
 

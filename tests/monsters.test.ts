@@ -125,3 +125,53 @@ test('tierSecondsLeft counts down to the next tier and is null at the cap and fo
 	assert.equal(tierSecondsLeft(m({ tier: 5, ageSec: TIER5_AGE })), null);
 	assert.equal(tierSecondsLeft(m({ type: 'ratKing' })), null);
 });
+
+// ---- monsters scale with the world (castle) level on the same curve as item level -------------------------------------
+import { monsterLevel, monsterPower, monsterStats } from '../src/lib/monsters';
+import { LOOT_SOURCES } from '../src/catalog/lootConfig';
+import { resolveSourceLevel } from '../src/lib/loot/generate';
+import { newFight, stepFight } from '../src/lib/combat';
+import { levelScale } from '../src/catalog/stats';
+
+test('monster level is the level its loot drops at, and the world level only ever raises it', () => {
+	for (const type of ['rat', 'ratKing'] as const) {
+		for (const tier of [1, 3, 5]) {
+			assert.equal(monsterLevel(type, tier, 4), resolveSourceLevel(LOOT_SOURCES[type].level, type === 'ratKing' ? 1 : tier, 4));
+			assert.ok(monsterLevel(type, tier, 5) > monsterLevel(type, tier, 1));
+		}
+	}
+});
+
+test('at castle level 1 every monster number is exactly what it always was; higher castle levels scale HP and attack, not rewards', () => {
+	for (const type of ['rat', 'ratKing'] as const) {
+		for (const tier of [1, 2, 3, 4, 5]) {
+			assert.equal(monsterPower(type, tier, 1), 1);
+			assert.deepEqual(monsterStats(type, tier, 1), monsterStats(type, tier));
+		}
+	}
+	assert.deepEqual([1, 2, 3, 4, 5].map((t) => monsterStats('rat', t).maxHp), [100, 150, 225, 338, 506]);
+	assert.equal(monsterStats('ratKing', 1).maxHp, 15600);
+	const strong = monsterStats('rat', 3, 6);
+	const base = monsterStats('rat', 3, 1);
+	const power = levelScale(monsterLevel('rat', 3, 6)) / levelScale(monsterLevel('rat', 3, 1));
+	assert.equal(strong.maxHp, Math.round(base.maxHp * power));
+	assert.equal(strong.attack, Math.round(4 * Math.pow(1.25, 2) * power));
+	assert.equal(strong.attackIntervalSec, base.attackIntervalSec);
+	assert.equal(strong.rewardSec, base.rewardSec);
+	for (let c = 2; c <= 10; c++) assert.ok(monsterStats('ratKing', 1, c).maxHp > monsterStats('ratKing', 1, c - 1).maxHp);
+});
+
+test('a fight keeps the castle level it started at: HP and attack are fixed for its whole length', () => {
+	const fight = newFight({ id: 1, type: 'rat', tier: 3 }, 6);
+	assert.equal(fight.castleLevel, 6);
+	assert.equal(fight.monsterMaxHp, monsterStats('rat', 3, 6).maxHp);
+	const plain = newFight({ id: 1, type: 'rat', tier: 3 });
+	assert.equal(plain.castleLevel, 1);
+	const hpAfter = (start: typeof fight) => {
+		let f = start;
+		let hp = 1000;
+		for (let i = 0; i < 6; i++) ({ fight: f, playerHp: hp } = stepFight(f, 1, hp, 0, () => 0));
+		return hp;
+	};
+	assert.ok(hpAfter(fight) < hpAfter(plain), 'a stronger monster hits harder');
+});

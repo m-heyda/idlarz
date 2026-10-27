@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
+import { plainItem } from '@/lib/itemInstance';
 import { MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/gameConfig';
 import { formatNumber } from '@/utils/formatters';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/gameUtils';
@@ -75,7 +76,7 @@ export const MerchantShop: React.FC<BoughtProps> = ({ onBought }) => {
 					if (!def) return null;
 					return (
 						<div key={id} className='flex items-center gap-3'>
-							<ItemSlot itemId={id} compare />
+							{def.kind === 'consumable' ? <ItemSlot itemId={id} /> : <ItemSlot item={plainItem(id)} compare />}
 							<div className='flex flex-col gap-1 min-w-0'>
 								<span className='text-xs text-white truncate'>{def.name}</span>
 								<button

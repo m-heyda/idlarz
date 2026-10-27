@@ -8,7 +8,9 @@ import { MAX_OWNED_TILES, ownedCount, patchTile, tileAt } from '@/utils/world';
 import { syntheticWorld } from '@/utils/worldGen';
 import { growWorld } from '@/utils/growWorld';
 import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '@/catalog';
-import { addToBag } from '@/lib/inventory';
+import { addGear, addToBag } from '@/lib/inventory';
+import { plainItem, resolveItem } from '@/lib/itemInstance';
+import { generateLoot, receiveDrops } from '@/lib/loot';
 import { maxHp } from '@/lib/combat';
 import { pickSpawnTile } from '@/lib/monsters';
 import { calculateResourceRates, calculateXpGain, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
@@ -53,9 +55,25 @@ const giveSet = () => {
 		let bag = state.bag;
 		const { pieces } = SETS.rattatui;
 		const ring = pieces.find((id) => ITEM_CATALOG[id].slot === 'ring'); // a second ring for the other hand
-		for (const id of ring ? [...pieces, ring] : pieces) bag = addToBag(bag, id, 1).bag;
+		for (const id of ring ? [...pieces, ring] : pieces) bag = addGear(bag, plainItem(id)).bag;
 		return { bag: addToBag(bag, STARTER_BAG_ITEMS[0].id, 5).bag };
 	});
+};
+
+/** Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table). */
+const rollLoot = (sourceId: 'rat' | 'ratKing' | 'chest', tier: number) => {
+	const state = useGameStore.getState();
+	const castleLevel = castleLevelOf(state.tiles);
+	const owned = [
+		...Object.values(state.equipment).map((item) => item?.base),
+		...state.bag.map((slot) => (slot && 'item' in slot ? slot.item.base : slot?.id)),
+	].filter((id): id is string => !!id);
+	const result = generateLoot({ sourceId, tier, castleLevel, owned, pity: state.lootPity }, Math.random);
+	const received = receiveDrops(state.bag, result.drops, state.autoSellUpTo, state.merchantUpgrades);
+	useGameStore.setState({ bag: received.bag, lootPity: result.pity, resources: { ...state.resources, gold: state.resources.gold + received.autoSold.gold + received.convertedGold } });
+	console.table(result.trace);
+	const names = result.drops.map((d) => (d.kind === 'gear' ? `${resolveItem(d.item)?.name} (${d.item.rarity}, il ${d.item.level})` : `${d.qty}x ${ITEM_CATALOG[d.id].name}`));
+	toast(`${sourceId} (level ${result.sourceLevel}): ${names.join(', ') || 'nothing'}`);
 };
 
 const heal = () => useGameStore.setState((state) => ({ playerHp: maxHp(state.characterStats, state.equipment) }));
@@ -125,6 +143,9 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 			{ label: 'Rat', tone: 'red', run: () => spawnMonster('rat') },
 			{ label: 'Rat King', tone: 'red', run: () => spawnMonster('ratKing') },
 			{ label: 'Rattatui set', tone: '', run: giveSet },
+			{ label: 'Loot: rat T5', tone: 'gray', run: () => rollLoot('rat', 5) },
+			{ label: 'Loot: Rat King', tone: 'gray', run: () => rollLoot('ratKing', 1) },
+			{ label: 'Loot: chest', tone: 'gray', run: () => rollLoot('chest', 1) },
 		],
 	},
 	{

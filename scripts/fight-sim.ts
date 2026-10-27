@@ -8,6 +8,7 @@ import { MONSTERS } from '../src/config/combatConfig';
 import { fullSet, seeded, simulateMany } from '../src/lib/fightSim';
 import { maxHp } from '../src/lib/combat';
 import { aggregateStats } from '../src/lib/inventory';
+import { plainItem } from '../src/lib/itemInstance';
 import { freshCharacter } from '../src/lib/fightSim';
 import type { Equipment } from '../src/types/game';
 
@@ -23,8 +24,8 @@ export const LOADOUTS: { name: string; equipment: Equipment }[] = [
 	{ name: 'obsidian set + maul', equipment: fullSet('obsidian', 'obsidian_maul') },
 	{ name: 'obsidian set + longbow', equipment: fullSet('obsidian', 'obsidian_longbow') },
 	{ name: 'rattatui set (fang blade)', equipment: fullSet('rattatui') },
-	{ name: 'rattatui + titan maul', equipment: { ...fullSet('rattatui'), mainHand: 'titan_maul' } },
-	{ name: 'rattatui + starfall bow', equipment: { ...fullSet('rattatui'), mainHand: 'starfall_bow' } },
+	{ name: 'rattatui + titan maul', equipment: { ...fullSet('rattatui'), mainHand: plainItem('titan_maul') } },
+	{ name: 'rattatui + starfall bow', equipment: { ...fullSet('rattatui'), mainHand: plainItem('starfall_bow') } },
 ];
 
 const MONSTER_ROWS = [

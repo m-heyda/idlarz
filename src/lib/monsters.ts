@@ -1,5 +1,8 @@
 import { COMBAT, MONSTERS } from '@/config/combatConfig';
+import { LOOT_SOURCES } from '@/catalog/lootConfig';
+import { levelScale } from '@/catalog/stats';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
+import { resolveSourceLevel } from '@/lib/loot/generate';
 import type { Monster, MonsterType } from '@/types/game';
 import { ownedRowMajor, type World } from '@/utils/world';
 
@@ -10,17 +13,29 @@ export interface MonsterStats {
 	rewardSec: number;
 }
 
-/** HP, attack and reward of a monster at a tier (the Rat King ignores the tier). */
-export const monsterStats = (type: MonsterType, tier: number): MonsterStats => {
+/** The level of a monster: the same level its loot drops at (tier and castle level, see catalog/lootConfig). */
+export const monsterLevel = (type: MonsterType, tier: number, castleLevel = 1): number =>
+	resolveSourceLevel(LOOT_SOURCES[type].level, type === 'ratKing' ? 1 : tier, castleLevel);
+
+/**
+ * How much stronger a monster is than the same monster at castle level 1: the item level curve between the two levels. 1 at
+ * castle level 1, so every number below is unchanged there; gear rises on the same curve, so fights keep their shape.
+ */
+export const monsterPower = (type: MonsterType, tier: number, castleLevel = 1): number =>
+	levelScale(monsterLevel(type, tier, castleLevel)) / levelScale(monsterLevel(type, tier, 1));
+
+/** HP, attack and reward of a monster at a tier and world (castle) level (the Rat King ignores the tier). Reward is income-based, so it does not scale. */
+export const monsterStats = (type: MonsterType, tier: number, castleLevel = 1): MonsterStats => {
+	const power = monsterPower(type, tier, castleLevel);
 	if (type === 'ratKing') {
 		const k = MONSTERS.ratKing;
-		return { maxHp: k.hp, attack: k.attack, attackIntervalSec: k.attackIntervalSec, rewardSec: k.rewardSec };
+		return { maxHp: Math.round(k.hp * power), attack: Math.round(k.attack * power), attackIntervalSec: k.attackIntervalSec, rewardSec: k.rewardSec };
 	}
 	const r = MONSTERS.rat;
 	const t = Math.max(1, Math.min(COMBAT.maxTier, Math.floor(tier))) - 1;
 	return {
-		maxHp: Math.round(r.hp * Math.pow(r.hpGrowth, t)),
-		attack: Math.round(r.attack * Math.pow(r.attackGrowth, t)),
+		maxHp: Math.round(r.hp * Math.pow(r.hpGrowth, t) * power),
+		attack: Math.round(r.attack * Math.pow(r.attackGrowth, t) * power),
 		attackIntervalSec: r.attackIntervalSec,
 		rewardSec: r.rewardSec * Math.pow(r.rewardGrowth, t),
 	};

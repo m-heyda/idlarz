@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store } from './helpers';
 import { CASTLE_X, CASTLE_Y, REBIRTH } from '../src/config/gameConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
-import { emptyBag } from '../src/lib/inventory';
+import { emptyBag, gearOf } from '../src/lib/inventory';
+import { plainItem } from '../src/lib/itemInstance';
 import { maxHp, newFight } from '../src/lib/combat';
 import type { BagSlot } from '../src/types/game';
 import { patchTile } from '../src/utils/world';
@@ -11,7 +12,7 @@ import { patchTile } from '../src/utils/world';
 const max = () => maxHp(api().characterStats, api().equipment);
 const bagWith = (...ids: string[]): BagSlot[] => {
 	const bag = emptyBag();
-	ids.forEach((id, i) => (bag[i] = { id, qty: 1 }));
+	ids.forEach((id, i) => (bag[i] = { item: plainItem(id) }));
 	return bag;
 };
 
@@ -31,8 +32,8 @@ test('equipItem swaps with the equipped item and nothing is lost', () => {
 	freshGame();
 	store.setState({ bag: bagWith('rattatui_fang_blade') });
 	assert.equal(api().equipItem(0), true);
-	assert.equal(api().equipment.mainHand, 'rattatui_fang_blade');
-	assert.deepEqual(api().bag[0], { id: 'wooden_sword', qty: 1 });
+	assert.deepEqual(api().equipment.mainHand, plainItem('rattatui_fang_blade'));
+	assert.deepEqual(api().bag[0], { item: plainItem('wooden_sword') });
 });
 
 test('equipItem rejects potions, empty slots and bad indexes', () => {
@@ -51,15 +52,15 @@ test('gear that raises max HP can be taken off again and playerHp follows the ne
 	store.setState({ playerHp: max() });
 	assert.equal(api().unequipItem('chest'), true);
 	assert.equal(api().playerHp, 101);
-	assert.deepEqual(api().bag[0], { id: 'rattatui_tunic', qty: 1 });
+	assert.deepEqual(api().bag[0], { item: plainItem('rattatui_tunic') });
 });
 
 test('unequipItem fails on an empty slot and when the bag is full', () => {
 	freshGame();
 	assert.equal(api().unequipItem('head'), false);
-	store.setState({ bag: emptyBag().map(() => ({ id: 'wooden_sword', qty: 1 })) });
+	store.setState({ bag: emptyBag().map(() => ({ item: plainItem('wooden_sword') })) });
 	assert.equal(api().unequipItem('offHand'), false);
-	assert.equal(api().equipment.offHand, 'wooden_shield');
+	assert.deepEqual(api().equipment.offHand, plainItem('wooden_shield'));
 });
 
 test('moveBagItem swaps slots and rejects bad indexes', () => {
@@ -77,8 +78,8 @@ test('equip actions are refused during a fight', () => {
 	assert.equal(api().equipItem(0), false);
 	assert.equal(api().unequipItem('offHand'), false);
 	assert.equal(api().moveBagItem(0, 1), false);
-	assert.equal(api().equipment.mainHand, 'wooden_sword');
-	assert.equal(api().bag[0]?.id, 'rattatui_fang_blade');
+	assert.deepEqual(api().equipment.mainHand, plainItem('wooden_sword'));
+	assert.equal(gearOf(api().bag[0])?.base, 'rattatui_fang_blade');
 });
 
 test('rebirth keeps equipment and bag and refills HP', () => {

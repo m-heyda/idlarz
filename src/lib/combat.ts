@@ -48,12 +48,13 @@ export const regen = (hp: number, max: number, dtSec: number, gearRegenPerSec = 
 	return Math.min(max, hp + (COMBAT.regenPerSec + gearRegenPerSec) * dtSec);
 };
 
-export const newFight = (monster: Pick<Monster, 'id' | 'type' | 'tier'>): FightState => {
-	const stats = monsterStats(monster.type, monster.tier);
+export const newFight = (monster: Pick<Monster, 'id' | 'type' | 'tier'>, castleLevel = 1): FightState => {
+	const stats = monsterStats(monster.type, monster.tier, castleLevel);
 	return {
 		monsterId: monster.id,
 		type: monster.type,
 		tier: monster.tier,
+		castleLevel,
 		monsterHp: stats.maxHp,
 		monsterMaxHp: stats.maxHp,
 		attackTimer: 0,
@@ -101,7 +102,7 @@ export const stepFight = (
 	if (fight.phase !== 'active' || !Number.isFinite(dtSec) || dtSec <= 0) return { fight, playerHp, events: [] };
 
 	const dt = Math.min(dtSec, COMBAT.fightStepClampSec);
-	const stats = monsterStats(fight.type, fight.tier);
+	const stats = monsterStats(fight.type, fight.tier, fight.castleLevel);
 	const events: CombatEvent[] = [];
 	let hp = playerHp;
 	let attackTimer = fight.attackTimer + dt;

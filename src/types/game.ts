@@ -98,18 +98,6 @@ export type ItemKind = 'weapon' | 'offhand' | 'armor' | 'accessory' | 'consumabl
 
 export type WeaponType = 'sword' | 'dagger' | 'mace' | 'maul' | 'axe' | 'spear' | 'bow' | 'crossbow' | 'staff' | 'wand' | 'shield' | 'tome';
 
-/** Where an item can drop from: a monster type or a map chest. */
-export type DropSource = MonsterType | 'chest';
-
-/** Relative drop weight inside a source's loot pool; `minTier` / `maxTier` bound the monster tier that can drop it. */
-export interface DropRule {
-	weight: number;
-	/** Consumables the Rat King always drops: how many */
-	qty?: number;
-	minTier?: number;
-	maxTier?: number;
-}
-
 /** Static definition of an item; saves only ever store the `id`. Everything about an item lives here (see src/catalog). */
 export interface ItemDef {
 	id: string;
@@ -120,8 +108,6 @@ export interface ItemDef {
 	rarity: EquipmentRarity;
 	/** Grade of the material family: 1 wooden / cloth, 2 steel, 3 obsidian, 4 Rattatui, 5 legendary (consumables: 0) */
 	tier: number;
-	/** Item level: stats scale with it later (catalog `statScale`); every item is level 10 for now */
-	itemLevel: number;
 	weaponType?: WeaponType;
 	/** Weapons only: attacks per second. Not a summed stat; the base for attack-speed combat (catalog `weaponDps`) */
 	attackSpeed?: number;
@@ -132,16 +118,59 @@ export interface ItemDef {
 	stackMax?: number;
 	sellValue: number;
 	icon?: PixelIconName;
-	/** Loot pools this item is in */
-	drops?: Partial<Record<DropSource, DropRule>>;
 	/** Merchant price in gold; absent = not sold */
 	shop?: number;
+
+	// ---- loot generation (see src/lib/loot and docs/10-loot-system.md); gear only ----
+	/** false takes the item out of every loot pool (and stops saves from holding it); default true */
+	enabled?: boolean;
+	/** `base`: a generic item that drops at any level inside its window with a rolled rarity. `named`: a fixed-identity item. */
+	generation?: 'base' | 'named';
+	/** Pool selectors: `weapon`, `sword`, `knight`... pools match items by these (or by explicit id) */
+	tags?: string[];
+	/** Item level window the item can be generated in; `stats` are authored at `minItemLevel` */
+	minItemLevel?: number;
+	maxItemLevel?: number;
+	/** Bases: rarities this base may roll as */
+	allowedRarities?: string[];
+	/** Named items: the rarity every instance has */
+	fixedRarity?: string;
+	/** Relative chance inside a pool, after the rarity is known */
+	poolWeight?: number;
+	/** Loot pool ids a named item or a consumable belongs to (bases are matched by tags instead) */
+	pools?: string[];
 }
 
-/** Equipped item ids by slot */
-export type Equipment = Partial<Record<EquipmentSlot, string>>;
+/** One rolled affix on an item: which affix and how well it rolled (0-100 inside its value range). Values are derived. */
+export interface AffixRoll {
+	id: string;
+	roll: number;
+}
 
-export type BagSlot = { id: string; qty: number } | null;
+/**
+ * A dropped or owned piece of gear. Only the choices are stored; stats are derived from the catalog and the level curve
+ * (`resolveItem`), so retuning the curve retunes existing items and a save can only describe items the generator could make.
+ */
+export interface ItemInstance {
+	/** Id of the item definition (base or named) */
+	base: string;
+	/** Item level 1..100: its power, from the source that dropped it */
+	level: number;
+	/** Rarity id (a key of RARITIES) */
+	rarity: string;
+	/** Base-stat quality roll 0-100; 50 is the authored value */
+	quality: number;
+	affixes: AffixRoll[];
+}
+
+/** Equipped gear by slot: instances (rolled rarity, level, quality, affixes) */
+export type Equipment = Partial<Record<EquipmentSlot, ItemInstance>>;
+
+/** A bag slot holds one piece of gear (an instance) or a stack of a consumable */
+export type BagSlot = { item: ItemInstance } | { id: string; qty: number } | null;
+
+/** One thing a kill, chest or shop hands over: a piece of gear, or some of a consumable */
+export type Drop = { kind: 'gear'; item: ItemInstance } | { kind: 'consumable'; id: string; qty: number };
 
 export type MonsterType = 'rat' | 'ratKing';
 
@@ -157,9 +186,11 @@ export interface Monster {
 export interface KillSummary {
 	gold: number;
 	xp: number;
-	items: { id: string; qty: number }[];
+	items: Drop[];
 	/** Gold paid for drops that did not fit into the bag */
 	convertedGold: number;
+	/** Gear the auto-sell filter sold on the spot: how many pieces and for how much gold */
+	autoSold: { count: number; gold: number };
 }
 
 export type FightPhase = 'active' | 'won' | 'knockedOut' | 'timeout';
@@ -168,6 +199,8 @@ export interface FightState {
 	monsterId: number;
 	type: MonsterType;
 	tier: number;
+	/** The castle level the fight started at: the monster's HP and attack were scaled for it and stay so for the whole fight */
+	castleLevel: number;
 	monsterHp: number;
 	monsterMaxHp: number;
 	attackTimer: number;
@@ -294,9 +327,14 @@ export interface GameState {
 	activeChests: number;
 	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Legacy points of `prestige`. */
 	gems: number;
+	/** Bad-luck protection counters of the loot tables, by `profile:table` (see catalog/lootConfig `pity`) */
+	lootPity: Record<string, number>;
+	/** Gear of this rarity or lower is sold the moment it drops (a rarity id); null = keep everything */
+	autoSellUpTo: string | null;
 	lastChestLoot: ChestLoot | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods
+	setAutoSell: (rarity: string | null) => void;
 	buyTile: (x: number, y: number) => boolean;
 	buyClickUpgrade: () => boolean;
 	buyResource: (resource: keyof Resources, amount: number) => boolean;
@@ -311,7 +349,7 @@ export interface GameState {
 	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
 	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
-	sellJunk: (maxRarity: EquipmentRarity) => { gold: number; count: number };
+	sellJunk: (maxRarity: string) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
 	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;

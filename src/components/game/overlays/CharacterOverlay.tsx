@@ -46,7 +46,7 @@ const CharacterOverlay: React.FC = () => {
 			key={slot}
 			slot={slot}
 			label={EQUIPMENT_SLOT_LABEL[slot]}
-			itemId={equipment[slot]}
+			item={equipment[slot]}
 			equipped
 			draggable
 			onClick={() => takeOff(slot)}

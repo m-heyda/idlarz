@@ -7,27 +7,29 @@ import {
 	ITEM_CATALOG,
 	RARITIES,
 	RARITY_ORDER,
+	LOOT_POOLS,
+	LOOT_PROFILES,
 	RESOURCES,
 	SETS,
 	STAT_DEFS,
-	lootPool,
-	pickWeighted,
 	setBonusStats,
 	setCounts,
 	shopItems,
 	sumStats,
 } from '../src/catalog';
+import { plainItem, sellValueOf } from '../src/lib/itemInstance';
 import { HEADER_DISPLAYED_RESOURCES_INFO, INITIAL_RESOURCES, MERCHANT_RESOURCE_PRICES, RESOURCE_ICONS } from '../src/config/gameConfig';
 import { PIXEL_ICON_SIZES, pixelIconSrc, type PixelIconName } from '../src/config/pixelIcons';
 
 const PUBLIC = resolve(__dirname, '..', 'public');
 
-test('every item has a unique id and a rarity that exists', () => {
+test('every item has a unique id and a rarity that exists (named items and consumables carry it; bases roll theirs)', () => {
 	assert.equal(new Set(ITEMS.map((i) => i.id)).size, ITEMS.length);
 	for (const def of ITEMS) assert.ok(RARITIES[def.rarity], def.id);
+	for (const def of ITEMS.filter((i) => i.generation === 'named')) assert.equal(def.fixedRarity, def.rarity, def.id);
 });
 
-test('sell value follows the rarity unless the item overrides it, and never decreases with rarity', () => {
+test('sell value at level 1 follows the rarity unless the item overrides it, and never decreases with rarity', () => {
 	for (const def of ITEMS.filter((i) => i.kind !== 'consumable')) assert.equal(def.sellValue, RARITIES[def.rarity].sellValue, def.id);
 	const values = RARITY_ORDER.map((r) => RARITIES[r].sellValue);
 	assert.deepEqual([...values].sort((a, b) => a - b), values);
@@ -67,32 +69,31 @@ test('every set piece exists and names its set, and set bonuses only use known s
 
 test('set counting and bonuses go through the registry', () => {
 	const rattatui = SETS.rattatui;
-	const six = Object.fromEntries(rattatui.pieces.slice(0, 6).map((id, i) => [['head', 'shoulder', 'chest', 'hands', 'legs', 'feet'][i], id]));
+	const six = Object.fromEntries(rattatui.pieces.slice(0, 6).map((id, i) => [['head', 'shoulder', 'chest', 'hands', 'legs', 'feet'][i], plainItem(id)]));
 	assert.equal(setCounts(six).rattatui, 6);
 	assert.deepEqual(setBonusStats(setCounts(six)), sumStats(rattatui.bonuses[3], rattatui.bonuses[6]));
 	assert.deepEqual(setBonusStats({}), sumStats());
 });
 
-test('loot pools: the Rattatui set only drops from the king, and every drop and shop item exists', () => {
-	for (const source of ['rat', 'ratKing', 'chest'] as const) for (const { id, weight } of lootPool(source)) assert.ok(ITEM_CATALOG[id] && weight > 0, `${source}: ${id}`);
-	for (const piece of SETS.rattatui.pieces) {
-		assert.ok(lootPool('ratKing').some((e) => e.id === piece), piece);
-		assert.ok(!lootPool('rat').some((e) => e.id === piece), piece);
-		assert.ok(!lootPool('chest').some((e) => e.id === piece), piece);
-	}
+test('shop items exist and cost at least 3x what they sell for (bought as a plain item at its first level)', () => {
 	for (const { id, price } of shopItems()) {
 		assert.ok(ITEM_CATALOG[id], id);
-		assert.ok(price >= 3 * ITEM_CATALOG[id].sellValue, `${id} must cost at least 3x its sell value`);
+		const sells = ITEM_CATALOG[id].kind === 'consumable' ? ITEM_CATALOG[id].sellValue : sellValueOf(plainItem(id));
+		assert.ok(price >= 3 * sells, `${id} must cost at least 3x its sell value (${price} vs ${sells})`);
 	}
 });
 
-test('pickWeighted follows the weights and costs no random number for a pool of one', () => {
-	assert.equal(pickWeighted([], () => 0), undefined);
-	assert.equal(pickWeighted([{ id: 'a', weight: 5 }], () => assert.fail('no rng needed')), 'a');
-	const pool = [{ id: 'a', weight: 1 }, { id: 'b', weight: 3 }];
-	assert.equal(pickWeighted(pool, () => 0), 'a');
-	assert.equal(pickWeighted(pool, () => 0.3), 'b');
-	assert.equal(pickWeighted(pool, () => 0.999), 'b');
+test('named items sit in pools that exist, and only the King and chests reach them', () => {
+	for (const piece of SETS.rattatui.pieces) {
+		assert.deepEqual(ITEM_CATALOG[piece].pools, ['rattatui_set'], piece);
+		assert.equal(ITEM_CATALOG[piece].generation, 'named', piece);
+		assert.equal(ITEM_CATALOG[piece].fixedRarity, 'epic', piece);
+	}
+	for (const profile of Object.values(LOOT_PROFILES)) {
+		for (const table of profile.bonusTables) assert.ok(LOOT_POOLS[table.poolId], `${profile.id}/${table.id}`);
+	}
+	const reach = (poolId: string) => Object.values(LOOT_PROFILES).filter((p) => p.bonusTables.some((t) => t.poolId === poolId)).map((p) => p.id);
+	assert.deepEqual(reach('rattatui_set'), ['boss']);
 });
 
 test('the resource registry is the one place resources are listed', () => {

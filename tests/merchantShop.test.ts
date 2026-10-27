@@ -15,23 +15,32 @@ import {
 	type MerchantUpgradeId,
 } from '../src/config/gameConfig';
 import { BASIC_GEAR, ITEM_CATALOG, RARITY_ORDER, RATTATUI_SET } from '../src/config/itemCatalog';
-import { emptyBag } from '../src/lib/inventory';
+import { emptyBag, gearOf, slotItemId, stackOf } from '../src/lib/inventory';
+import { plainItem, sellValueOf } from '../src/lib/itemInstance';
+import type { ItemInstance } from '../src/types/game';
 import { sanitizeSave } from '../src/lib/sanitizeSave';
 import { merchantUpgradeCost, sellMultiplier } from '../src/utils/gameUtils';
 import { patchTile } from '../src/utils/world';
 
 const MAX_HAGGLER = 1 + MERCHANT_UPGRADES.haggler.maxLevel * MERCHANT_UPGRADES.haggler.effectPerLevel;
 
-test('sell values rise with rarity', () => {
-	const value = (rarity: (typeof RARITY_ORDER)[number]) =>
-		Object.values(ITEM_CATALOG).find((i) => i.rarity === rarity && i.slot)?.sellValue ?? 0;
+/** What a plain item sells for at its first level (the shop's stock); consumables have their own price. */
+const unitValue = (id: string) => (ITEM_CATALOG[id].kind === 'consumable' ? ITEM_CATALOG[id].sellValue : sellValueOf(plainItem(id)));
+const ofRarity = (rarity: string, level = 10): ItemInstance => ({ ...plainItem('iron_sword'), rarity, level });
+
+test('sell values rise with rarity and with item level', () => {
 	let last = 0;
 	for (const rarity of RARITY_ORDER) {
-		const v = value(rarity);
-		if (v === 0) continue;
+		const v = sellValueOf(ofRarity(rarity));
 		assert.ok(v > last, `${rarity} sells for more than the rarity below`);
 		last = v;
 	}
+	assert.ok(sellValueOf(ofRarity('rare', 40)) > sellValueOf(ofRarity('rare', 10)));
+});
+
+test('no single item is worth a fortune: the best drop at the level cap sells for far less than the verified gold burst allowance', () => {
+	const top = Math.max(...RARITY_ORDER.map((r) => sellValueOf(ofRarity(r, 100))));
+	assert.ok(top <= 20_000, `the best item at level 100 sells for ${top}`);
 });
 
 test('the shop sells plain wares only, every price is at least 3x the sell value (3.9x of a max Haggler) so buying and selling never print gold', () => {
@@ -39,10 +48,10 @@ test('the shop sells plain wares only, every price is at least 3x the sell value
 		const def = ITEM_CATALOG[id];
 		assert.ok(def, id);
 		assert.notEqual(def.set, 'rattatui', `${id} is not for sale`);
-		assert.ok(price >= def.sellValue * 3, `${id}: ${price} vs ${def.sellValue}`);
-		assert.ok(price > def.sellValue * MAX_HAGGLER, `${id} with a max Haggler`);
+		assert.ok(price >= unitValue(id) * 3, `${id}: ${price} vs ${unitValue(id)}`);
+		assert.ok(price > unitValue(id) * MAX_HAGGLER, `${id} with a max Haggler`);
 	}
-	for (const id of BASIC_GEAR) assert.ok(ITEM_CATALOG[id].sellValue > 0);
+	for (const id of BASIC_GEAR) assert.ok(unitValue(id) > 0);
 	assert.ok(!MERCHANT_SHOP_ITEMS.some(({ id }) => RATTATUI_SET.pieces.includes(id)));
 });
 
@@ -52,7 +61,7 @@ test('buy-then-sell of every shop item never gains gold, even with a max Haggler
 		store.setState({ merchantUpgrades: { haggler: MERCHANT_UPGRADES.haggler.maxLevel } });
 		const start = api().resources.gold;
 		assert.equal(api().buyItem(id, 1), true);
-		const index = api().bag.findIndex((s) => s?.id === id);
+		const index = api().bag.findIndex((s) => slotItemId(s) === id);
 		const gold = api().sellItem(index, 1);
 		assert.ok(api().resources.gold <= start, `${id}: paid ${price}, got back ${gold}`);
 	}
@@ -64,19 +73,19 @@ test('a max Haggler never makes reselling a resource profitable (buy price is 2x
 
 test('sellItem: pays the flat price, removes the item, handles stacks and refuses bad input', () => {
 	freshGame({ gold: 0 });
-	const sword = ITEM_CATALOG.wooden_sword;
+	const sword = sellValueOf(plainItem('wooden_sword'));
 	const potion = ITEM_CATALOG.potion_minor;
 	const bag = emptyBag();
-	bag[0] = { id: 'wooden_sword', qty: 1 };
+	bag[0] = { item: plainItem('wooden_sword') };
 	bag[1] = { id: 'potion_minor', qty: 5 };
 	store.setState({ bag });
 
-	assert.equal(api().sellItem(0), sword.sellValue);
+	assert.equal(api().sellItem(0), sword);
 	assert.equal(api().bag[0], null);
-	assert.equal(api().resources.gold, sword.sellValue);
+	assert.equal(api().resources.gold, sword);
 
 	assert.equal(api().sellItem(1, 2), potion.sellValue * 2);
-	assert.equal(api().bag[1]?.qty, 3);
+	assert.equal(stackOf(api().bag[1])?.qty, 3);
 	assert.equal(api().sellItem(1), potion.sellValue); // default: one
 	assert.equal(api().sellItem(1, 99), 0, 'more than the stack');
 
@@ -88,7 +97,7 @@ test('sellItem: pays the flat price, removes the item, handles stacks and refuse
 test('sellItem and sellJunk are refused during a fight and never touch worn gear', () => {
 	freshGame({ gold: 0 });
 	const bag = emptyBag();
-	bag[0] = { id: 'leather_cap', qty: 1 };
+	bag[0] = { item: plainItem('leather_cap') };
 	store.setState({ bag, fight: { phase: 'active' } as never });
 	assert.equal(api().sellItem(0), 0);
 	assert.deepEqual(api().sellJunk('uncommon'), { gold: 0, count: 0 });
@@ -101,19 +110,21 @@ test('sellItem and sellJunk are refused during a fight and never touch worn gear
 test('sellJunk sells gear up to the rarity but keeps potions and better gear', () => {
 	freshGame({ gold: 0 });
 	const bag = emptyBag();
-	bag[0] = { id: 'leather_cap', qty: 1 }; // common
-	bag[1] = { id: 'iron_sword', qty: 1 }; // uncommon
-	bag[2] = { id: 'rattatui_tunic', qty: 1 }; // rare
+	const uncommon = ofRarity('uncommon', 6);
+	const rare = ofRarity('rare', 12);
+	bag[0] = { item: plainItem('leather_cap') }; // common
+	bag[1] = { item: uncommon };
+	bag[2] = { item: rare };
 	bag[3] = { id: 'potion_minor', qty: 4 };
 	store.setState({ bag });
 	const r = api().sellJunk('common');
 	assert.equal(r.count, 1);
-	assert.equal(r.gold, ITEM_CATALOG.leather_cap.sellValue);
+	assert.equal(r.gold, sellValueOf(plainItem('leather_cap')));
 	const r2 = api().sellJunk('uncommon');
 	assert.equal(r2.count, 1);
-	assert.equal(r2.gold, ITEM_CATALOG.iron_sword.sellValue);
-	assert.equal(api().bag[2]?.id, 'rattatui_tunic');
-	assert.equal(api().bag[3]?.qty, 4);
+	assert.equal(r2.gold, sellValueOf(uncommon));
+	assert.deepEqual(gearOf(api().bag[2]), rare);
+	assert.equal(stackOf(api().bag[3])?.qty, 4);
 	assert.deepEqual(api().sellJunk('uncommon'), { gold: 0, count: 0 });
 });
 
@@ -133,10 +144,11 @@ test('buyItem: charges the price, adds the item, and a full bag costs nothing', 
 	const { id, price } = MERCHANT_SHOP_ITEMS[0];
 	assert.equal(api().buyItem(id, 3), true);
 	assert.equal(api().resources.gold, 10_000 - price * 3);
-	assert.ok((api().bag.find((s) => s?.id === id)?.qty ?? 0) >= 3);
+	const bought = api().bag.map((s) => stackOf(s)).find((s) => s?.id === id);
+	assert.ok(bought ? bought.qty >= 3 : api().bag.filter((s) => slotItemId(s) === id).length >= 3);
 
 	const gearId = MERCHANT_SHOP_ITEMS.find((e) => !ITEM_CATALOG[e.id].consumable)!.id;
-	store.setState({ bag: emptyBag().map(() => ({ id: 'wooden_sword', qty: 1 })), resources: { ...api().resources, gold: 1e9 } });
+	store.setState({ bag: emptyBag().map(() => ({ item: plainItem('wooden_sword') })), resources: { ...api().resources, gold: 1e9 } });
 	assert.equal(api().buyItem(gearId, 1), false);
 	assert.equal(api().resources.gold, 1e9, 'nothing charged');
 

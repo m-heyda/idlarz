@@ -2,9 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, setResources, owned, store, tileAt, gridCells, rawSnapshot } from './helpers';
 import { pickPersisted, sanitizeSave } from '../src/lib/sanitizeSave';
-import { decodeSave, encodeSave } from '../src/lib/saveFormat';
+import { decodeSave, encodeSave, packBody, sealWire } from '../src/lib/saveFormat';
+import { readFileSync } from 'node:fs';
+import { aggregateStats } from '../src/lib/inventory';
+import { resolveItem } from '../src/lib/itemInstance';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import { plainItem } from '../src/lib/itemInstance';
 import { COMBAT } from '../src/config/combatConfig';
 import { emptyBag } from '../src/lib/inventory';
 import { ownedCount, patchTile, setTile } from '../src/utils/world';
@@ -146,7 +150,7 @@ test('export -> decode accepts a real save and rejects edited / foreign ones', (
 });
 
 // ---- combat / inventory state ------------------------------------------------------------------------------------
-const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId'];
+const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId', 'lootPity', 'autoSellUpTo'];
 
 /** The n-th owned tile that is not the castle or a lake (the land is rolled, and a monster or a building cannot be on water). */
 const spot = (n = 0) => {
@@ -163,10 +167,10 @@ const combatSave = (mutate: (raw: any) => void) => { // eslint-disable-line @typ
 	freshGame();
 	growTo(8);
 	const bag = emptyBag();
-	bag[3] = { id: 'rattatui_tunic', qty: 1 };
+	bag[3] = { item: plainItem('rattatui_tunic') };
 	bag[4] = { id: 'potion_minor', qty: 20 };
 	store.setState({
-		equipment: { ...STARTER_EQUIPMENT, ring1: 'rattatui_ring', ring2: 'rattatui_ring', head: 'rattatui_cap' },
+		equipment: { ...STARTER_EQUIPMENT, ring1: plainItem('rattatui_ring'), ring2: plainItem('rattatui_ring'), head: plainItem('rattatui_cap') },
 		bag,
 		playerHp: 50,
 		monsters: [rat()],
@@ -223,19 +227,41 @@ test('forged inventories, HP and monsters are rejected', () => {
 	const bad = (mutate: (raw: any) => void, label: string) => { // eslint-disable-line @typescript-eslint/no-explicit-any
 		assert.equal(sanitizeSave(combatSave(mutate)).ok, false, `${label} should be rejected`);
 	};
-	bad((r) => (r.equipment.head = 'mythic_crown'), 'unknown equipped item');
-	bad((r) => (r.equipment.head = 'wooden_sword'), 'sword in the head slot');
-	bad((r) => (r.equipment.mainHand = 'rattatui_ring'), 'ring item in the weapon slot');
-	bad((r) => (r.equipment.ring1 = 'rattatui_cap'), 'cap in a ring slot');
-	bad((r) => (r.equipment.head = 'potion_minor'), 'potion equipped');
-	bad((r) => (r.equipment.bogus = 'wooden_sword'), 'unknown equipment slot');
+	bad((r) => (r.equipment.head = 'mythic_crown'), 'a bare item id (the old format) is not an item');
+	bad((r) => (r.equipment.head = plainItem('wooden_sword')), 'sword in the head slot');
+	bad((r) => (r.equipment.mainHand = plainItem('rattatui_ring')), 'ring item in the weapon slot');
+	bad((r) => (r.equipment.ring1 = plainItem('rattatui_cap')), 'cap in a ring slot');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'potion_minor' }), 'potion equipped');
+	bad((r) => (r.equipment.bogus = plainItem('wooden_sword')), 'unknown equipment slot');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'nope' }), 'unknown base item');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'mythic' }), 'unknown rarity');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 500 }), 'item level above the cap');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 0 }), 'item level 0');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 1.5 }), 'fractional item level');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 90 }), 'item level past the base window');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), quality: 101 }), 'quality out of range');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), stats: { damage: 9999 } }), 'a stat field smuggled into an instance');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), affixes: [{ id: 'maxHp_prefix', roll: 5 }, { id: 'armor_prefix', roll: 5 }] }), 'two affixes on a common item');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'nope', roll: 5 }] }), 'unknown affix');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'damage_prefix', roll: 5 }] }), 'a weapon affix on a cap');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'maxHp_prefix', roll: 500 }] }), 'affix roll out of range');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'maxHp_prefix', roll: 5, value: 9999 }] }), 'a value smuggled into an affix');
+	bad((r) => (r.equipment.head = { ...plainItem('rattatui_cap'), rarity: 'common' }), 'a named item with another rarity');
+	bad((r) => (r.bag[3].item.rarity = 'mythic'), 'a bag item with an unknown rarity');
+	bad((r) => (r.bag[3] = { item: plainItem('rattatui_tunic'), extra: 1 }), 'a stray key on a gear entry');
+	bad((r) => (r.bag[3] = { id: 'rattatui_tunic', qty: 1 }), 'gear stored as a stack (the old format)');
+	bad((r) => (r.lootPity = { 'boss:nope': 1 }), 'pity for an unknown table');
+	bad((r) => (r.lootPity = { 'boss:king_legendary': -1 }), 'negative pity');
+	bad((r) => (r.lootPity = { 'boss:king_legendary': 1e9 }), 'absurd pity');
+	bad((r) => (r.autoSellUpTo = 'mythic'), 'auto-sell up to an unknown rarity');
+	bad((r) => (r.autoSellUpTo = 'constructor'), 'auto-sell up to a prototype name');
 	bad((r) => (r.bag = r.bag.slice(1)), 'bag of 35');
 	bad((r) => (r.bag = [...r.bag, null]), 'bag of 37');
 	bad((r) => (r.bag[4].qty = 21), 'potion stack of 21');
 	bad((r) => (r.bag[4].qty = 0), 'empty stack');
 	bad((r) => (r.bag[4].qty = 2.5), 'fractional stack');
 	bad((r) => (r.bag[3].qty = 2), 'gear with qty 2');
-	bad((r) => (r.bag[3].id = 'nope'), 'unknown bag item');
+	bad((r) => (r.bag[4].id = 'nope'), 'unknown bag item');
 	bad((r) => (r.bag[0] = 'sword'), 'bag entry that is not an object');
 	bad((r) => delete r.bag, 'equipment without a bag');
 	bad((r) => delete r.equipment, 'bag without equipment');
@@ -257,6 +283,8 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.bag[0] = { id: 'toString', qty: 1 }), 'toString as a bag item');
 	bad((r) => (r.equipment.head = 'constructor'), 'object prototype name as equipped item');
 	bad((r) => (r.equipment.neck = 'hasOwnProperty'), 'hasOwnProperty as equipped item');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'constructor' }), 'prototype name as an item base');
+	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'constructor' }), 'prototype name as a rarity');
 	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].biome = 'constructor'), 'object prototype name as a biome');
 	bad((r) => (r.monsterSpawnTimer = COMBAT.spawn.intervalSec + 1), 'spawn timer out of range');
 	bad((r) => (r.nextMonsterId = 0), 'nextMonsterId 0');
@@ -319,4 +347,81 @@ test('buildings on any land biome save and load; water, nonsense and stray level
 	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok, false, 'level 2 only belongs to old Grounds lots');
 	assert.equal(load({ biome: 'forest', level: 2 }).ok, false, 'a level without a building');
 	rejects((raw) => { raw.tiles[CASTLE_Y][CASTLE_X].building = 'tavern'; }, 'a building on the castle');
+});
+
+// ---- schema 2 -> 3: gear ids become item instances -------------------------------------------------------------------
+const legacy = JSON.parse(readFileSync(new URL('./fixtures/legacy-items.json', import.meta.url), 'utf8')) as Record<string, { kind: string; slot: string | null; rarity: string; stats: Record<string, number> }>;
+const legacyGear = Object.entries(legacy).filter(([, item]) => item.kind !== 'consumable');
+
+/** A v2 save: the current game written the way schema 2 did (gear as bare ids). */
+const v2Text = (gear: { equipment?: Record<string, string>; bag?: unknown[] }) => {
+	freshGame();
+	growTo(8);
+	const body = packBody(pickPersisted(api())) as Record<string, unknown>;
+	const { lootPity: _p, autoSellUpTo: _a, ...rest } = body; // schema 2 had neither
+	void _p;
+	void _a;
+	return sealWire({ v: 2, t: 1, s: { ...rest, equipment: gear.equipment ?? {}, bag: gear.bag ?? Array.from({ length: 36 }, () => null) } });
+};
+
+test('a schema 2 save keeps every item: each old gear id converts to an instance with exactly its old stats', () => {
+	const ids = legacyGear.map(([id]) => id);
+	for (let from = 0; from < ids.length; from += 36) {
+		const chunk = ids.slice(from, from + 36);
+		const bag: unknown[] = Array.from({ length: 36 }, (_, i) => (chunk[i] ? { id: chunk[i], qty: 1 } : null));
+		const r = decodeSave(v2Text({ bag }));
+		assert.equal(r.ok, true, r.ok ? '' : r.reason);
+		if (!r.ok) continue;
+		chunk.forEach((id, i) => {
+			const slot = r.state.bag[i];
+			assert.ok(slot && 'item' in slot, id);
+			if (!slot || !('item' in slot)) return;
+			assert.equal(slot.item.base, id);
+			assert.equal(slot.item.rarity, legacy[id].rarity, `${id} keeps its old rarity`);
+			assert.deepEqual(resolveItem(slot.item)!.stats, legacy[id].stats, `${id} keeps its old stats`);
+		});
+	}
+});
+
+test('a schema 2 save keeps worn gear and stacks, and its derived stats do not change', () => {
+	const r = decodeSave(v2Text({ equipment: { mainHand: 'wooden_sword', offHand: 'wooden_shield', head: 'rattatui_cap' }, bag: [{ id: 'potion_minor', qty: 5 }, ...Array.from({ length: 35 }, () => null)] }));
+	assert.equal(r.ok, true, r.ok ? '' : r.reason);
+	if (!r.ok) return;
+	assert.deepEqual(r.state.equipment.mainHand, { base: 'wooden_sword', level: 1, rarity: 'common', quality: 50, affixes: [] });
+	assert.equal(r.state.equipment.head?.rarity, 'epic');
+	assert.deepEqual(r.state.bag[0], { id: 'potion_minor', qty: 5 });
+	assert.deepEqual(aggregateStats(r.state.equipment), { ...aggregateStats({ mainHand: plainItem('wooden_sword'), offHand: plainItem('wooden_shield'), head: plainItem('rattatui_cap') }) });
+	assert.deepEqual(r.state.lootPity, {});
+	assert.equal(r.state.autoSellUpTo, null);
+});
+
+test('a forged schema 2 save is still refused: unknown ids, prototype names, stacked gear, potions as armour', () => {
+	const bad = (gear: { equipment?: Record<string, string>; bag?: unknown[] }) => decodeSave(v2Text(gear)).ok;
+	const row = (entry: unknown) => [entry, ...Array.from({ length: 35 }, () => null)];
+	assert.equal(bad({ equipment: { head: 'mythic_crown' } }), false);
+	assert.equal(bad({ equipment: { head: 'constructor' } }), false);
+	assert.equal(bad({ equipment: { head: 'potion_minor' } }), false);
+	assert.equal(bad({ equipment: { head: 'wooden_sword' } }), false, 'wrong slot');
+	assert.equal(bad({ bag: row({ id: 'steel_helm', qty: 2 }) }), false, 'two helms in one slot');
+	assert.equal(bad({ bag: row({ id: '__proto__', qty: 1 }) }), false);
+	assert.equal(bad({ bag: row({ id: 'toString', qty: 1 }) }), false);
+	assert.equal(bad({ bag: row({ id: 'steel_helm', qty: 1 }) }), true);
+});
+
+test('the frozen schema 3 fixture holds rolled gear, pity and the auto-sell filter, and re-encodes unchanged', () => {
+	const text = readFileSync(new URL('./fixtures/saves/v3.sav', import.meta.url), 'utf8').trim();
+	const r = decodeSave(text);
+	assert.equal(r.ok, true, r.ok ? '' : r.reason);
+	if (!r.ok) return;
+	assert.equal(r.schema, 3);
+	const gear = r.state.bag.flatMap((slot) => (slot && 'item' in slot ? [slot.item] : []));
+	assert.ok(gear.length >= 9);
+	assert.ok(gear.some((item) => item.affixes.length > 0 && item.level > 1), 'rolled items with affixes and a level above 1');
+	assert.ok(gear.every((item) => resolveItem(item)), 'every instance resolves');
+	assert.deepEqual(r.state.lootPity, { 'boss:king_legendary': 3 });
+	assert.equal(r.state.autoSellUpTo, 'common');
+	assert.ok(r.state.equipment.head && r.state.equipment.neck && r.state.equipment.head.affixes.length > 0, 'rolled gear is worn too');
+	const again = decodeSave(encodeSave(r.state));
+	assert.equal(again.ok, true);
+	if (again.ok) assert.deepEqual(again.state.bag, r.state.bag);
 });

@@ -9,7 +9,7 @@ import {
 	STARTER_BAG_ITEMS,
 	STARTER_EQUIPMENT,
 } from '../src/config/itemCatalog';
-import { DEFAULT_ITEM_LEVEL, STAT_BASE_BY_TIER, STAT_KEYS, WEAPON_ATTACK_SPEED, baseStat, statScale, weaponDps } from '../src/catalog';
+import { MAX_ITEM_LEVEL, STAT_BASE_BY_TIER, STAT_KEYS, WEAPON_ATTACK_SPEED, baseStat, levelScale, weaponDps } from '../src/catalog';
 import type { EquipmentSlot } from '../src/types/game';
 
 const ALL_SLOTS: EquipmentSlot[] = [
@@ -65,11 +65,11 @@ test('only weapons carry damage, none exceeds COMBAT.maxItemDamage, and the star
 			assert.ok((def.stats?.damage ?? 0) >= 1 && def.stats!.damage! <= COMBAT.maxItemDamage, def.id);
 		} else assert.equal(def.stats?.damage, undefined, `${def.id} is not a weapon`);
 	}
-	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.mainHand!].stats?.damage, 6);
+	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.mainHand!.base].stats?.damage, 6);
 });
 
 test('starter shield has armor 2', () => {
-	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.offHand!].stats?.armor, 2);
+	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.offHand!.base].stats?.armor, 2);
 });
 
 const SLOTS_OF = (set: string) => {
@@ -129,23 +129,26 @@ test('starter bag items exist in the catalog', () => {
 
 // ---- item level, tier base stats, attack speed ---------------------------------------------------------------------
 
-test('every item has an id of its own and item level 10', () => {
+test('every item has an id of its own, and every piece of gear an item level window inside 1..MAX_ITEM_LEVEL', () => {
 	const ids = new Set<string>();
 	for (const def of Object.values(ITEM_CATALOG)) {
 		assert.ok(def.id && !ids.has(def.id), `${def.id} is unique`);
 		ids.add(def.id);
-		assert.equal(def.itemLevel, DEFAULT_ITEM_LEVEL, def.id);
+		if (def.slot) {
+			assert.ok(def.minItemLevel! >= 1 && def.maxItemLevel! <= MAX_ITEM_LEVEL && def.minItemLevel! <= def.maxItemLevel!, `${def.id} window`);
+			assert.ok(def.generation === 'base' || def.generation === 'named', def.id);
+		}
 	}
 });
 
-test('the base value of every stat rises with the tier, and item level scales it', () => {
+test('the base value of every stat rises with the tier, and the item level curve scales it', () => {
 	for (const key of STAT_KEYS) {
 		const row = STAT_BASE_BY_TIER[key];
 		for (let tier = 2; tier <= row.length; tier++) assert.ok(row[tier - 1] > row[tier - 2], `${key}: tier ${tier} beats tier ${tier - 1}`);
 		assert.equal(baseStat(key, 3), row[2]);
-		assert.equal(baseStat(key, 3, 20), Math.round(row[2] * 2 * 100) / 100, `${key} doubles at item level 20`);
+		assert.ok(row[2] * levelScale(20) > row[2], `${key} grows with item level`);
 	}
-	assert.equal(statScale(DEFAULT_ITEM_LEVEL), 1);
+	assert.equal(levelScale(1), 1);
 });
 
 test('items that carry a new stat take its number from the tier table', () => {

@@ -2,14 +2,18 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { EQUIPMENT_PIXEL_ICONS } from '@/config/pixelIcons';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
-import type { EquipmentSlot } from '@/types/game';
+import { resolveItem } from '@/lib/itemInstance';
+import type { EquipmentSlot, ItemInstance } from '@/types/game';
 import PixelIcon from './PixelIcon';
 import ItemTooltipStack from './ItemTooltip';
 import { placeTip, type Box } from '@/lib/tipPlacement';
-import { RARITY_COLOR, itemIconName } from './itemUi';
+import { itemIconName } from './itemUi';
 import '@/styles/Inventory.css';
 
 interface ItemSlotProps {
+	/** A piece of gear (an instance) ... */
+	item?: ItemInstance | null;
+	/** ... or a consumable by its catalog id */
 	itemId?: string | null;
 	qty?: number;
 	/** Equipment slot this frame stands for (shows its dim silhouette while empty) */
@@ -53,6 +57,7 @@ const FloatingTip: React.FC<{ anchor: Box; children: React.ReactNode }> = ({ anc
 
 /** One 48px frame: an item (rarity glow, stack count, hover card), an empty equipment slot, or a locked slot. */
 const ItemSlot: React.FC<ItemSlotProps> = ({
+	item,
 	itemId,
 	qty = 1,
 	slot,
@@ -69,7 +74,10 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 }) => {
 	const [tip, setTip] = useState<Box | null>(null);
 	const [over, setOver] = useState(false);
-	const def = itemId ? ITEM_CATALOG[itemId] : undefined;
+	const resolved = item ? resolveItem(item) : null;
+	const def = resolved?.def ?? (itemId ? ITEM_CATALOG[itemId] : undefined);
+	const rarityId = resolved?.instance.rarity ?? def?.rarity;
+	const rarity = rarityId ? RARITIES[rarityId as keyof typeof RARITIES] : undefined;
 	const hasTip = !!def || !!label;
 
 	useEffect(() => {
@@ -84,12 +92,12 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 			<div
 				className='inv-slot'
 				role='button'
-				aria-label={def?.name ?? label ?? 'Empty slot'}
+				aria-label={resolved?.name ?? def?.name ?? label ?? 'Empty slot'}
 				data-filled={!!def}
 				data-equipped={!!equipped}
 				data-locked={!!locked}
-				data-rarity={def?.rarity}
-				data-pulse={def ? RARITIES[def.rarity].glow.pulse : undefined}
+				data-rarity={rarityId}
+				data-pulse={rarity?.glow.pulse}
 				data-over={over}
 				draggable={!!def && !!draggable}
 				onDragStart={(e) => {
@@ -124,9 +132,9 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 					setTip(null);
 					onContextMenu(e);
 				}}
-				style={def ? ({ '--glow': RARITY_COLOR[def.rarity], '--glow-blur': `${RARITIES[def.rarity].glow.blur}px`, '--glow-alpha': RARITIES[def.rarity].glow.alpha } as React.CSSProperties) : undefined}>
+				style={def && rarity ? ({ '--glow': rarity.color, '--glow-blur': `${rarity.glow.blur}px`, '--glow-alpha': rarity.glow.alpha } as React.CSSProperties) : undefined}>
 				{def ? (
-					<PixelIcon name={itemIconName(def)} alt={def.name} className='inv-icon' />
+					<PixelIcon name={itemIconName(def)} alt={resolved?.name ?? def.name} className='inv-icon' />
 				) : slot ? (
 					<PixelIcon name={EQUIPMENT_PIXEL_ICONS[slot]} alt='' className='px-equip-empty' />
 				) : null}
@@ -138,7 +146,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				createPortal(
 						<FloatingTip anchor={tip}>
 							{def ? (
-								<ItemTooltipStack itemId={def.id} compare={compare} />
+								<ItemTooltipStack item={item ?? undefined} itemId={itemId ?? undefined} compare={compare} />
 							) : (
 								<div className='px-tooltip'>
 									<div className='px-tip-muted text-sm'>{label}</div>

@@ -74,13 +74,14 @@ import { createHitGuard } from '@/lib/hitGuard';
 import { applyHit, armorOf, dodgeChance, maxHp, newFight, regen, rollHit, stepFight } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
-import { addToBag, aggregateStats, equipFromBag, moveSlot, removeFromBag, starterBag, unequip } from '@/lib/inventory';
+import { addDrop, aggregateStats, equipFromBag, gearOf, moveSlot, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
+import { plainItem, sellValueOf } from '@/lib/itemInstance';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { canSpawn } from '@/lib/spawnLimits';
-import { rollKillLoot } from '@/lib/loot';
+import { isAutoSold, receiveDrops, rollKillLoot } from '@/lib/loot';
 import { advanceMonsters, monsterAt, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
-import { ITEM_CATALOG, RARITY_ORDER, STARTER_EQUIPMENT } from '@/config/itemCatalog';
+import { ITEM_CATALOG, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type {
@@ -88,7 +89,6 @@ import type {
 	CharacterStats,
 	ClickInput,
 	CritterGift,
-	EquipmentRarity,
 	EquipmentSlot,
 	FightState,
 	GameState,
@@ -164,6 +164,8 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		chestSpawnTimer: 0,
 		activeChests: 0,
 		gems: STARTING_GEMS,
+		lootPity: {} as Record<string, number>,
+		autoSellUpTo: null as string | null,
 		lastChestLoot: null as ChestLoot | null, // what the last chest held (transient: only drives the toast)
 	};
 };
@@ -255,6 +257,8 @@ const createGameSlice = (
 				equipment: state.equipment,
 				bag: state.bag,
 				gems: state.gems, // the premium currency survives a rebirth
+				lootPity: state.lootPity,
+				autoSellUpTo: state.autoSellUpTo,
 				// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
 				merchantUpgrades: state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {},
 				playerHp: maxHp(fresh.characterStats, state.equipment),
@@ -437,7 +441,14 @@ const createGameSlice = (
 			const tile = getTile(state.tiles, x, y);
 			if (!tile || !tile.hasChest) return false;
 
-			const loot = rollChestLoot({ rates: state.resourceRates.total, luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck, goldFind: aggregateStats(state.equipment).goldFind, bag: state.bag });
+			const loot = rollChestLoot({
+				rates: state.resourceRates.total,
+				luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck,
+				goldFind: aggregateStats(state.equipment).goldFind,
+				bag: state.bag,
+				castleLevel: castleLevelOf(state.tiles),
+				autoSellUpTo: state.autoSellUpTo,
+			});
 
 			const newTiles = setTile(state.tiles, x, y, { ...tile, hasChest: false });
 
@@ -446,7 +457,11 @@ const createGameSlice = (
 			if (loot.kind === 'gold' || loot.kind === 'boost') resources.gold += loot.gold;
 			else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
 			else if (loot.kind === 'xp') resources.xp = Math.min(resources.xp + loot.xp, XP_CAP);
-			else bag = addToBag(bag, loot.itemId, 1).bag;
+			else {
+				const received = receiveDrops(bag, [loot.drop], state.autoSellUpTo, state.merchantUpgrades);
+				bag = received.bag;
+				resources.gold = Math.min(resources.gold + received.autoSold.gold, RESOURCE_CAP);
+			}
 
 			set({
 				tiles: newTiles,
@@ -503,7 +518,7 @@ const createGameSlice = (
 			if (state.fight || state.playerHp <= 0) return false;
 			const monster = state.monsters.find((m) => m.id === monsterId);
 			if (!monster) return false;
-			set({ fight: newFight(monster) });
+			set({ fight: newFight(monster, castleLevelOf(state.tiles)) });
 			return true;
 		},
 
@@ -530,28 +545,23 @@ const createGameSlice = (
 					luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck,
 					goldFind: aggregateStats(state.equipment).goldFind,
 					owned: [
-						...Object.values(state.equipment),
-						...state.bag.map((slot) => slot?.id),
+						...Object.values(state.equipment).map((item) => item?.base),
+						...state.bag.map((slot) => (slot && 'item' in slot ? slot.item.base : slot?.id)),
 					].filter((id): id is string => !!id),
+					castleLevel: castleLevelOf(state.tiles),
+					pity: state.lootPity,
 				},
 				Math.random
 			);
-			let bag = state.bag;
-			const items: { id: string; qty: number }[] = [];
-			let convertedGold = 0;
-			for (const drop of loot.items) {
-				const added = addToBag(bag, drop.id, drop.qty);
-				bag = added.bag;
-				if (added.added > 0) items.push({ id: drop.id, qty: added.added });
-				convertedGold += added.overflow * (ITEM_CATALOG[drop.id]?.sellValue ?? 0);
-			}
+			const received = receiveDrops(state.bag, loot.items, state.autoSellUpTo, state.merchantUpgrades);
 			set({
-				fight: { ...next, phase: 'won', summary: { gold: loot.gold, xp: loot.xp, items, convertedGold } },
+				fight: { ...next, phase: 'won', summary: { gold: loot.gold, xp: loot.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold } },
 				monsters: state.monsters.filter((m) => m.id !== fight.monsterId),
-				bag,
+				bag: received.bag,
+				lootPity: loot.pity,
 				resources: {
 					...state.resources,
-					gold: Math.min(state.resources.gold + loot.gold + convertedGold, RESOURCE_CAP),
+					gold: Math.min(state.resources.gold + loot.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP),
 					xp: Math.min(state.resources.xp + loot.xp, XP_CAP),
 				},
 			});
@@ -572,7 +582,7 @@ const createGameSlice = (
 
 		drinkPotion: (bagIndex: number) => {
 			const state = get();
-			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
+			const slot = Number.isInteger(bagIndex) ? stackOf(state.bag[bagIndex]) : null;
 			const healHp = slot ? ITEM_CATALOG[slot.id]?.consumable?.healHp : undefined;
 			if (!slot || !healHp || slot.qty < 1) return false;
 			const max = maxHp(state.characterStats, state.equipment);
@@ -859,11 +869,13 @@ const createGameSlice = (
 			if (state.fight) return 0;
 			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
 			if (!slot) return 0;
-			const def = ITEM_CATALOG[slot.id];
-			if (!def) return 0;
+			const gear = gearOf(slot);
+			const stack = stackOf(slot);
+			const unit = gear ? sellValueOf(gear) : stack ? (ITEM_CATALOG[stack.id]?.sellValue ?? 0) : 0;
+			if (!unit) return 0;
 			const amount = qty === undefined ? 1 : Math.floor(qty);
-			if (!(amount >= 1) || amount > slot.qty) return 0;
-			const gold = sellPayout(def.sellValue, amount, state.merchantUpgrades);
+			if (!(amount >= 1) || amount > slotQty(slot)) return 0;
+			const gold = sellPayout(unit, amount, state.merchantUpgrades);
 			set({
 				bag: removeFromBag(state.bag, bagIndex, amount),
 				resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) },
@@ -878,31 +890,35 @@ const createGameSlice = (
 			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
 			if (!slot) return false;
 			const amount = qty === undefined ? 1 : Math.floor(qty);
-			if (!(amount >= 1) || amount > slot.qty) return false;
+			if (!(amount >= 1) || amount > slotQty(slot)) return false;
 			set({ bag: removeFromBag(state.bag, bagIndex, amount) });
 			return true;
 		},
 
 		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)
-		sellJunk: (maxRarity: EquipmentRarity) => {
+		sellJunk: (maxRarity: string) => {
 			const state = get();
 			if (state.fight) return { gold: 0, count: 0 };
-			const limit = RARITY_ORDER.indexOf(maxRarity);
-			if (limit < 0) return { gold: 0, count: 0 };
+			if (!Object.prototype.hasOwnProperty.call(RARITIES, maxRarity)) return { gold: 0, count: 0 };
 			let bag = state.bag;
 			let gold = 0;
 			let count = 0;
 			bag.forEach((slot, index) => {
-				const def = slot && ITEM_CATALOG[slot.id];
-				if (!slot || !def || def.consumable || !def.slot) return;
-				if (RARITY_ORDER.indexOf(def.rarity) > limit) return;
-				gold += sellPayout(def.sellValue, slot.qty, state.merchantUpgrades);
-				count += slot.qty;
-				bag = removeFromBag(bag, index, slot.qty);
+				const item = gearOf(slot);
+				if (!item || !isAutoSold(item, maxRarity)) return;
+				gold += sellPayout(sellValueOf(item), 1, state.merchantUpgrades);
+				count += 1;
+				bag = removeFromBag(bag, index, 1);
 			});
 			if (count === 0) return { gold: 0, count: 0 };
 			set({ bag, resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) } });
 			return { gold, count };
+		},
+
+		// The auto-sell filter: gear of this rarity or lower is sold the moment it drops (null = keep everything)
+		setAutoSell: (rarity: string | null) => {
+			if (rarity !== null && !Object.prototype.hasOwnProperty.call(RARITIES, rarity)) return;
+			set({ autoSellUpTo: rarity });
 		},
 
 		// Buy plain gear or potions from the shop; nothing is charged for what does not fit in the bag
@@ -913,9 +929,19 @@ const createGameSlice = (
 			if (!Number.isInteger(qty) || qty < 1 || qty > 99) return false;
 			const price = entry.price * qty;
 			if (state.resources.gold < price) return false;
-			const added = addToBag(state.bag, id, qty);
-			if (added.overflow > 0) return false;
-			set({ bag: added.bag, resources: { ...state.resources, gold: state.resources.gold - price } });
+			let bag = state.bag;
+			if (ITEM_CATALOG[id].kind === 'consumable') {
+				const added = addDrop(bag, { kind: 'consumable', id, qty });
+				if (added.overflow > 0) return false;
+				bag = added.bag;
+			} else {
+				for (let i = 0; i < qty; i++) {
+					const added = addDrop(bag, { kind: 'gear', item: plainItem(id) });
+					if (added.overflow > 0) return false;
+					bag = added.bag;
+				}
+			}
+			set({ bag, resources: { ...state.resources, gold: state.resources.gold - price } });
 			return true;
 		},
 

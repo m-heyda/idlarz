@@ -4,7 +4,9 @@ import { api, freshGame, growTo, store, tileAt, gridCells } from './helpers';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { CASTLE_X, CASTLE_Y, REBIRTH } from '../src/config/gameConfig';
 import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
-import { emptyBag } from '../src/lib/inventory';
+import { emptyBag, stackOf } from '../src/lib/inventory';
+import { plainItem, sellValueOf } from '../src/lib/itemInstance';
+import { sellPayout } from '../src/utils/gameUtils';
 import { maxHp } from '../src/lib/combat';
 import { castleLevelOf } from '../src/lib/castleWard';
 import { spawnCap } from '../src/lib/spawnLimits';
@@ -137,12 +139,13 @@ test('a kill pays gold, xp and loot', () => {
 		assert.ok(summary.gold >= COMBAT.rewards.minGold);
 		assert.equal(api().resources.gold - before.gold, summary.gold);
 		assert.ok(Math.abs(api().resources.xp - before.xp - summary.xp) < 1e-6);
-		const ids = summary.items.map((i) => i.id);
+		const ids = summary.items.map((d) => (d.kind === 'gear' ? d.item.base : d.id));
 		assert.ok(ids.includes('potion_minor'));
 		assert.ok(ids.some((id) => (BASIC_GEAR as readonly string[]).includes(id)));
 		assert.equal(ids.some((id) => RATTATUI_SET.pieces.includes(id)), false, 'a rat drops no Rattatui piece');
-		assert.equal(api().bag.find((s) => s?.id === 'potion_minor')?.qty, 3);
+		assert.equal(api().bag.map(stackOf).find((s) => s?.id === 'potion_minor')?.qty, 3);
 		assert.equal(summary.convertedGold, 0);
+		assert.deepEqual(summary.autoSold, { count: 0, gold: 0 });
 	} finally {
 		mock.restoreAll();
 	}
@@ -150,7 +153,7 @@ test('a kill pays gold, xp and loot', () => {
 
 test('loot with a full bag converts to gold and loses no items', () => {
 	withMonster();
-	const full = emptyBag().map(() => ({ id: 'wooden_sword', qty: 1 }));
+	const full = emptyBag().map(() => ({ item: plainItem('wooden_sword') }));
 	store.setState({ bag: full });
 	mock.method(Math, 'random', () => 0);
 	try {
@@ -160,8 +163,8 @@ test('loot with a full bag converts to gold and loses no items', () => {
 		const summary = api().fight!.summary!;
 		assert.deepEqual(api().bag, full);
 		assert.deepEqual(summary.items, []);
-		const gear = ITEM_CATALOG[BASIC_GEAR[0]];
-		assert.equal(summary.convertedGold, gear.sellValue + ITEM_CATALOG.potion_minor.sellValue);
+		// a random of 0 rolls a level 1 common item: the first base of the pool
+		assert.equal(summary.convertedGold, sellValueOf(plainItem(BASIC_GEAR[0])) + ITEM_CATALOG.potion_minor.sellValue);
 		assert.equal(api().resources.gold - before, summary.gold + summary.convertedGold);
 	} finally {
 		mock.restoreAll();
@@ -174,10 +177,10 @@ test('drinkPotion heals, respects the cooldown, rejects empty slots, non-consuma
 	api().startFight(1);
 	assert.equal(api().drinkPotion(0), true);
 	assert.equal(api().playerHp, 85);
-	assert.equal(api().bag[0]?.qty, 1);
+	assert.equal(stackOf(api().bag[0])?.qty, 1);
 	assert.equal(api().fight?.potionCd, COMBAT.potionCooldownSec);
 	assert.equal(api().drinkPotion(0), false); // cooldown
-	assert.equal(api().bag[0]?.qty, 1);
+	assert.equal(stackOf(api().bag[0])?.qty, 1);
 	run(COMBAT.potionCooldownSec);
 	assert.equal(api().fight?.potionCd, 0);
 	store.setState({ playerHp: 40 });
@@ -187,7 +190,7 @@ test('drinkPotion heals, respects the cooldown, rejects empty slots, non-consuma
 	assert.equal(api().drinkPotion(0), false); // empty slot
 	assert.equal(api().drinkPotion(1.5), false);
 	assert.equal(api().drinkPotion(-1), false);
-	store.setState({ bag: [{ id: 'wooden_sword', qty: 1 }, ...emptyBag().slice(1)] });
+	store.setState({ bag: [{ item: plainItem('wooden_sword') }, ...emptyBag().slice(1)] });
 	assert.equal(api().drinkPotion(0), false); // not a consumable
 	store.setState({ bag: [{ id: 'potion_minor', qty: 1 }, ...emptyBag().slice(1)], playerHp: max() });
 	assert.equal(api().drinkPotion(0), false); // full HP
@@ -245,14 +248,14 @@ test('rebirth and resetGame clear the fight and the monsters; rebirth keeps the 
 	api().startFight(1);
 	store.setState((s) => {
 		const tiles = patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel });
-		return { tiles, equipment: { ...STARTER_EQUIPMENT, head: 'rattatui_cap' }, fight: null };
+		return { tiles, equipment: { ...STARTER_EQUIPMENT, head: plainItem('rattatui_cap') }, fight: null };
 	});
 	growTo(REBIRTH.minTiles);
 	api().startFight(1);
 	assert.equal(api().rebirth(), true);
 	assert.equal(api().fight, null);
 	assert.deepEqual(api().monsters, []);
-	assert.equal(api().equipment.head, 'rattatui_cap');
+	assert.deepEqual(api().equipment.head, plainItem('rattatui_cap'));
 
 	api().resetGame();
 	assert.equal(api().fight, null);
@@ -331,8 +334,12 @@ test('a fast clicker in full Rattatui gear beats the Rat King and wins Rattatui 
 			api().tick(1000);
 		}
 		assert.equal(api().fight?.phase, 'won');
-		const ids = api().fight!.summary!.items.map((i) => i.id);
+		const items = api().fight!.summary!.items;
+		const ids = items.map((d) => (d.kind === 'gear' ? d.item.base : d.id));
 		assert.ok(ids.some((id) => RATTATUI_SET.pieces.includes(id)), 'the king drops a Rattatui piece');
+		const piece = items.find((d) => d.kind === 'gear' && RATTATUI_SET.pieces.includes(d.item.base));
+		assert.equal(piece?.kind === 'gear' ? piece.item.level : 0, 12, 'at the King level, castle level 1');
+		assert.equal(api().lootPity['boss:king_legendary'] ?? 0, 0, 'a random of 0 always drops the legendary: nothing to protect against');
 		assert.equal(api().monsters.length, 0);
 	} finally {
 		mock.restoreAll();
@@ -364,4 +371,53 @@ test('loading a save (tab take-over / reload) drops a stale open fight', () => {
 	const merged = merge(saved, api()) as ReturnType<typeof api>;
 	assert.equal(merged.fight, null);
 	assert.equal(merged.isHydrated, true);
+});
+
+test('the auto-sell filter sells matching gear on the spot, pays Haggler like a hand sale, and still stores the potion', () => {
+	withMonster();
+	store.setState({ autoSellUpTo: 'common', merchantUpgrades: { haggler: 3 } });
+	mock.method(Math, 'random', () => 0);
+	try {
+		const before = api().resources.gold;
+		const bagBefore = api().bag;
+		api().startFight(1);
+		hits(50);
+		const summary = api().fight!.summary!;
+		const unit = sellValueOf(plainItem(BASIC_GEAR[0]));
+		assert.equal(summary.autoSold.count, 1);
+		assert.equal(summary.autoSold.gold, sellPayout(unit, 1, { haggler: 3 }));
+		assert.equal(summary.items.some((d) => d.kind === 'gear'), false, 'the gear was sold, not stored');
+		assert.equal(summary.items.some((d) => d.kind === 'consumable'), true);
+		assert.equal(api().resources.gold - before, summary.gold + summary.autoSold.gold);
+		assert.equal(api().bag.filter((s) => s && 'item' in s).length, bagBefore.filter((s) => s && 'item' in s).length);
+	} finally {
+		mock.restoreAll();
+	}
+});
+
+test('drops are not auto-sold above the chosen rarity, and the setting is validated', () => {
+	freshGame();
+	api().setAutoSell('uncommon');
+	assert.equal(api().autoSellUpTo, 'uncommon');
+	api().setAutoSell('mythic');
+	assert.equal(api().autoSellUpTo, 'uncommon', 'an unknown rarity changes nothing');
+	api().setAutoSell(null);
+	assert.equal(api().autoSellUpTo, null);
+});
+
+test('a higher castle level raises the item level of what a rat drops', () => {
+	const best = (castleLevel: number) => {
+		withMonster({ type: 'rat', tier: 5 });
+		store.setState((s) => ({ tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: castleLevel }), bag: emptyBag() }));
+		mock.method(Math, 'random', () => 0.0001); // always drops; the item level roll takes the low end
+		try {
+			api().startFight(1);
+			hits(260);
+			const items = api().fight!.summary!.items;
+			return Math.max(0, ...items.map((d) => (d.kind === 'gear' ? d.item.level : 0)));
+		} finally {
+			mock.restoreAll();
+		}
+	};
+	assert.ok(best(5) > best(1) + 8);
 });

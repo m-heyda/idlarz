@@ -17,7 +17,8 @@ const rattatui = (
 		description,
 		art: true,
 		weaponType,
-		drops: { ratKing: { weight: 1 } },
+		named: true,
+		pools: ['rattatui_set'],
 	});
 
 export const RATTATUI_ITEMS: ItemDef[] = [

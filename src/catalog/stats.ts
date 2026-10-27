@@ -8,33 +8,34 @@ export interface StatDef {
 	unit?: string;
 	/** Decimal places the tooltip shows */
 	decimals?: number;
+	/** Rolled values of this stat are whole numbers (a stat that is on an item at all never rounds down to 0) */
+	integer?: boolean;
+	/**
+	 * How much of the item level growth this stat follows, 0-1 (default 1). Flat stats (damage, armor, max HP) follow it
+	 * fully; capped percentage stats follow a share, or they would reach their caps (crit 75 %, dodge 40 %...) within a few levels.
+	 */
+	levelShare?: number;
 }
 
 export const STAT_DEFS = {
-	damage: { label: 'Damage' },
-	armor: { label: 'Armor' },
-	maxHp: { label: 'Max HP' },
-	critChance: { label: 'Crit Chance', unit: '%' }, // chance in % that a click crits (x2 damage), added to the character's own
-	superCrit: { label: 'Super Crit', unit: '%' }, // chance in % that a crit becomes a super crit (x5), on top of the base chance
-	regen: { label: 'HP Regen', unit: '/s', decimals: 1 }, // HP per second, in and out of fights
-	luck: { label: 'Luck' }, // adds to the Luck of the character: better chest and kill gold and rarer chest finds
-	goldFind: { label: 'Gold Find', unit: '%' }, // % more gold from kills and chests
-	dodge: { label: 'Dodge', unit: '%', decimals: 1 }, // chance in % that a monster's hit misses (capped by COMBAT.maxDodge)
+	damage: { label: 'Damage', integer: true },
+	armor: { label: 'Armor', integer: true },
+	maxHp: { label: 'Max HP', integer: true },
+	critChance: { label: 'Crit Chance', unit: '%', levelShare: 0.3 }, // chance in % that a click crits (x2 damage), added to the character's own
+	superCrit: { label: 'Super Crit', unit: '%', levelShare: 0.3 }, // chance in % that a crit becomes a super crit (x5), on top of the base chance
+	regen: { label: 'HP Regen', unit: '/s', decimals: 1, levelShare: 0.6 }, // HP per second, in and out of fights
+	luck: { label: 'Luck', integer: true, levelShare: 0.5 }, // adds to the Luck of the character: better chest and kill gold and rarer chest finds
+	goldFind: { label: 'Gold Find', unit: '%', levelShare: 0.5 }, // % more gold from kills and chests
+	dodge: { label: 'Dodge', unit: '%', decimals: 1, levelShare: 0.3 }, // chance in % that a monster's hit misses (capped by COMBAT.maxDodge)
 } as const satisfies Record<string, StatDef>;
 
 export type StatKey = keyof typeof STAT_DEFS;
 export const STAT_KEYS = Object.keys(STAT_DEFS) as StatKey[];
 
-/** Item level every item has for now; stats scale with it later (see `statScale`). */
-export const DEFAULT_ITEM_LEVEL = 10;
-
-/** Multiplier on an item's base stats: 1 at the default item level, so raising or lowering the level scales everything. */
-export const statScale = (itemLevel: number): number => itemLevel / DEFAULT_ITEM_LEVEL;
-
 /**
  * The flat value one stat starts at for gear of each tier (index 0 = tier 1 wood/cloth ... 4 = tier 5 legendary), at the
  * default item level. Every row rises with the tier. Items pick the stats they carry; where a stat is new it takes its
- * number from here (`baseStat`), so a later item-level system only has to change `statScale`.
+ * number from here (`baseStat`); the rolled item level scales from there (`levelScale`).
  */
 export const STAT_BASE_BY_TIER: Record<StatKey, readonly [number, number, number, number, number]> = {
 	damage: [6, 12, 18, 24, 33],
@@ -48,15 +49,62 @@ export const STAT_BASE_BY_TIER: Record<StatKey, readonly [number, number, number
 	dodge: [1, 1.5, 2, 3, 4],
 };
 
-/** The base value of a stat for a tier (1-5) at an item level, rounded to 2 decimals. */
-export const baseStat = (stat: StatKey, tier: number, itemLevel = DEFAULT_ITEM_LEVEL): number => {
+/** The base value of a stat for a tier (1-5) at the item's authored level. */
+export const baseStat = (stat: StatKey, tier: number): number => {
 	const row = STAT_BASE_BY_TIER[stat];
-	const base = row[Math.min(row.length, Math.max(1, Math.round(tier))) - 1];
-	return Math.round(base * statScale(itemLevel) * 100) / 100;
+	return row[Math.min(row.length, Math.max(1, Math.round(tier))) - 1];
 };
 
 export type ItemStats = Partial<Record<StatKey, number>>;
 export type StatTotals = Record<StatKey, number>;
+
+// ---- item level curve ---------------------------------------------------------------------------------------------
+// The one place that says how power grows with item level. Gear is authored at its own `minItemLevel`; an instance of
+// level L has `baseStats x levelScale(L) / levelScale(minItemLevel)`, then the quality roll. Affix values use the same
+// curve (`affixMagnitude`). Retune the whole game's power curve here (a lookup table would drop in just as well).
+
+/** The highest item level the game generates; sources and bases are clamped to 1..MAX_ITEM_LEVEL. */
+export const MAX_ITEM_LEVEL = 100;
+
+/** Each item level adds this share of the level-1 power (linear: 1 at level 1, 1.63 at 10, 7.9 at 100). */
+export const POWER_PER_LEVEL = 0.07;
+
+export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL, Math.max(1, Math.round(level)));
+
+/** Power multiplier of an item level (1 at level 1). */
+export const levelScale = (itemLevel: number): number => 1 + POWER_PER_LEVEL * (clampItemLevel(itemLevel) - 1);
+
+/** The quality roll moves base stats by at most this much either way (quality 0-100, 50 = the authored value). */
+export const QUALITY_SPREAD = 0.08;
+
+export const qualityMultiplier = (quality: number): number => 1 + ((Math.min(100, Math.max(0, quality)) - 50) / 50) * QUALITY_SPREAD;
+
+const round2 = (value: number): number => Math.round(value * 100) / 100;
+
+/** Rounds one stat value the way its definition says: whole numbers (never below 1 when it is on the item) or 2 decimals. */
+export const roundStat = (key: StatKey, value: number): number => {
+	if (!value) return 0;
+	return (STAT_DEFS[key] as StatDef).integer ? Math.max(1, Math.round(value)) : round2(value);
+};
+
+/** The part of a level ratio a stat follows: `1 + (ratio - 1) x levelShare`. A ratio of 1 stays 1. */
+export const statLevelFactor = (key: StatKey, ratio: number): number => 1 + (ratio - 1) * ((STAT_DEFS[key] as StatDef).levelShare ?? 1);
+
+/**
+ * Scales a stat block from one item level to another (`levelRatio`, each stat following its own share of it) and by a plain
+ * `multiplier` (quality, rarity), rounding every stat. A ratio and multiplier of exactly 1 return the same values.
+ */
+export const scaleStats = (stats: ItemStats, levelRatio: number, multiplier = 1): ItemStats => {
+	const out: ItemStats = {};
+	for (const key of STAT_KEYS) {
+		const value = stats[key];
+		if (value) out[key] = roundStat(key, value * statLevelFactor(key, levelRatio) * multiplier);
+	}
+	return out;
+};
+
+/** What one point of an affix on this stat is worth at an item level: the level-1 wooden-tier value, grown by the stat's share of the curve. */
+export const affixMagnitude = (stat: StatKey, itemLevel: number): number => STAT_BASE_BY_TIER[stat][0] * statLevelFactor(stat, levelScale(itemLevel));
 
 export const emptyStats = (): StatTotals => Object.fromEntries(STAT_KEYS.map((key) => [key, 0])) as StatTotals;
 
