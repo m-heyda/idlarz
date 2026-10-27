@@ -3,7 +3,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { pickPersisted } from '@/lib/sanitizeSave';
 import { exportSaveText, flushSaves } from '@/lib/saveStorage';
-import { pushCloud, readLink, writeLink } from '@/lib/cloudClient';
+import { adoptOwnSave, pushCloud, readLink, recordAttempt, writeAttempts, writeLink } from '@/lib/cloudClient';
 import { onSaveEvent } from '@/lib/saveEvents';
 import { createSyncScheduler, type PushOutcome, type PushReason } from '@/lib/syncPolicy';
 import { registerCloudSaver } from '@/lib/manualCloudSave';
@@ -27,11 +27,22 @@ export const useCloudSync = (userId: string | null, active: boolean) => {
 			if (!link || link.userId !== userId) return 'ok';
 			const state = pickPersisted(useGameStore.getState());
 			if (!manual && state.playSeconds === lastSentPlay) return 'ok'; // the game did not run since the last upload (paused or hidden); a manual save always goes out
-			const result = await pushCloud(exportSaveText(state), link.rev, hiding);
+			const text = exportSaveText(state);
+			recordAttempt({ userId, baseRev: link.rev, playSeconds: state.playSeconds }); // the page may die before the answer comes
+			let result = await pushCloud(text, link.rev, hiding);
+			if (result.status === 'conflict') {
+				// "newer save" can be this browser's own upload whose answer was lost (a reload sends one as the page closes): carry on from it
+				const rev = await adoptOwnSave(userId);
+				if (rev !== null) {
+					recordAttempt({ userId, baseRev: rev, playSeconds: state.playSeconds });
+					result = await pushCloud(text, rev, hiding);
+				}
+			}
 			switch (result.status) {
 				case 'ok':
 					lastSentPlay = state.playSeconds;
 					writeLink({ userId, rev: result.rev });
+					writeAttempts([]);
 					return 'ok';
 				case 'conflict':
 					useUiStore.getState().showToast('Your account has a newer save from another browser. Reload to choose.');

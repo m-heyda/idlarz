@@ -69,3 +69,70 @@ export const writeLink = (link: CloudLink | null): void => {
 		/* without a link the hub just asks again next time */
 	}
 };
+
+// ---- uploads whose answer never arrived ----------------------------------------------------------------------------------
+// The server can store a save while the page that sent it is already gone (closing or reloading the tab sends a last upload
+// that nobody reads the answer of). The next upload from the reloaded page then carries the old revision and the server says
+// "newer save": but the newer save is this browser's own. So every upload is remembered until one is confirmed, and a conflict
+// first checks whether the account's save is one of them (same revision step, same play time) before calling it another browser.
+
+const ATTEMPTS_KEY = 'idlarz.cloud.attempts';
+const ATTEMPTS_KEEP = 5;
+
+export interface PushAttempt {
+	userId: string;
+	/** The revision the upload was based on */
+	baseRev: number;
+	/** The play time inside the uploaded save: the same game on both sides has the same number */
+	playSeconds: number;
+}
+
+export const readAttempts = (): PushAttempt[] => {
+	try {
+		const list = JSON.parse(window.localStorage.getItem(ATTEMPTS_KEY) ?? '[]') as Partial<PushAttempt>[];
+		return Array.isArray(list)
+			? list.filter((a): a is PushAttempt => typeof a?.userId === 'string' && Number.isInteger(a.baseRev) && typeof a.playSeconds === 'number')
+			: [];
+	} catch {
+		return [];
+	}
+};
+
+export const writeAttempts = (list: PushAttempt[]): void => {
+	try {
+		if (list.length) window.localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(list.slice(-ATTEMPTS_KEEP)));
+		else window.localStorage.removeItem(ATTEMPTS_KEY);
+	} catch {
+		/* without storage a lost answer is reported as a conflict, which the player can resolve in the hub */
+	}
+};
+
+/** Remembers an upload before it is sent (the page may die before the answer comes). */
+export const recordAttempt = (attempt: PushAttempt): void => writeAttempts([...readAttempts(), attempt]);
+
+/** True when the account's save is the very save one of these uploads was sending: the step after its base revision, with its play time. */
+export const isOwnSave = (attempts: readonly PushAttempt[], userId: string, cloud: Pick<CloudInfo, 'rev' | 'summary'>): boolean =>
+	attempts.some((a) => a.userId === userId && cloud.rev === a.baseRev + 1 && cloud.summary.playSeconds === a.playSeconds);
+
+export interface AdoptDeps {
+	fetchCloud: () => Promise<FetchCloud>;
+	readAttempts: () => PushAttempt[];
+	writeLink: (link: CloudLink) => void;
+	clearAttempts: () => void;
+}
+
+const REAL_ADOPT_DEPS: AdoptDeps = { fetchCloud, readAttempts, writeLink, clearAttempts: () => writeAttempts([]) };
+
+/**
+ * After a 409: if the account's save is one of this browser's own lost uploads, take its revision as the new base and return
+ * it (the caller uploads again on top of it). Null when the save really came from somewhere else, or could not be checked.
+ */
+export const adoptOwnSave = async (userId: string, deps: AdoptDeps = REAL_ADOPT_DEPS): Promise<number | null> => {
+	const attempts = deps.readAttempts();
+	if (attempts.length === 0) return null;
+	const latest = await deps.fetchCloud();
+	if (latest.status !== 'ok' || !isOwnSave(attempts, userId, latest.cloud)) return null;
+	deps.writeLink({ userId, rev: latest.cloud.rev });
+	deps.clearAttempts();
+	return latest.cloud.rev;
+};
