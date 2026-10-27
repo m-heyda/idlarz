@@ -443,7 +443,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 1000, // the first chicken is within reach after about half an hour (a few dozen tiles)
 		costScaling: 1.3, // each purchase costs this much more than the previous one
 		baseProduction: 0.2, // meat per second per animal; each purchase adds one more animal
-		product: { resource: 'eggs', perSec: 0.02 },
+		product: { resource: 'eggs', perSec: 0.03 },
 	},
 	{
 		id: 'deer',
@@ -452,7 +452,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 10000,
 		costScaling: 1.33,
 		baseProduction: 0.5,
-		product: { resource: 'hide', perSec: 0.025 },
+		product: { resource: 'hide', perSec: 0.0375 },
 	},
 	{
 		id: 'pig',
@@ -461,7 +461,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 60000,
 		costScaling: 1.36,
 		baseProduction: 1,
-		product: { resource: 'hide', perSec: 0.05 },
+		product: { resource: 'hide', perSec: 0.075 },
 	},
 	{
 		id: 'cow',
@@ -470,12 +470,15 @@ export const ANIMALS: Animal[] = [
 		baseCost: 400000,
 		costScaling: 1.4,
 		baseProduction: 2,
-		product: { resource: 'milk', perSec: 0.15 },
+		product: { resource: 'milk', perSec: 0.225 },
 	},
 ];
 
 // The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
-// once sold). Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
+// once sold). Products were 50 % slower (and their upgrade bonuses 33 % smaller) until the second-tier resources felt too
+// slow to earn; the merchant prices were lowered by the same factor, so a product still sells for the same share of its
+// animal's meat and gold income is unchanged: the products themselves, and what they unlock, come faster.
+// Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
 // Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
 // then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
 export const FARM = {
@@ -497,25 +500,25 @@ export const FARM_UPGRADES = {
 	},
 	coop: {
 		label: 'Hen House',
-		description: (n: number) => `+${Math.round(n * 10)}% eggs`,
+		description: (n: number) => `+${Math.round(n * 15)}% eggs`,
 		maxLevel: 10,
-		effectPerLevel: 0.1, // eggs
+		effectPerLevel: 0.15, // eggs
 		cost: { wood: 1500, eggs: 40 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
 	dairy: {
 		label: 'Dairy',
-		description: (n: number) => `+${Math.round(n * 10)}% milk`,
+		description: (n: number) => `+${Math.round(n * 15)}% milk`,
 		maxLevel: 10,
-		effectPerLevel: 0.1, // milk
+		effectPerLevel: 0.15, // milk
 		cost: { stone: 1500, milk: 30 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
 	tannery: {
 		label: 'Tannery',
-		description: (n: number) => `+${Math.round(n * 10)}% hide`,
+		description: (n: number) => `+${Math.round(n * 15)}% hide`,
 		maxLevel: 10,
-		effectPerLevel: 0.1, // hide
+		effectPerLevel: 0.15, // hide
 		cost: { coal: 1200, hide: 20 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},

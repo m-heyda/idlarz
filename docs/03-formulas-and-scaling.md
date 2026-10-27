@@ -100,27 +100,27 @@ upgrade cost (level N → N+1)      = ceil(base × growth^N) per resource
 
 | Animal | first cost | cost × | meat/s each | product/s each |
 | --- | --- | --- | --- | --- |
-| Chicken | 1 K | 1.3 | 0.2 | 0.02 eggs |
-| Deer | 10 K | 1.33 | 0.5 | 0.025 hide |
-| Pig | 60 K | 1.36 | 1 | 0.05 hide |
-| Cow | 400 K | 1.4 | 2 | 0.15 milk |
+| Chicken | 1 K | 1.3 | 0.2 | 0.03 eggs |
+| Deer | 10 K | 1.33 | 0.5 | 0.0375 hide |
+| Pig | 60 K | 1.36 | 1 | 0.075 hide |
+| Cow | 400 K | 1.4 | 2 | 0.225 milk |
 
 | Upgrade | per level | levels | base cost | cost × |
 | --- | --- | --- | --- | --- |
 | Feed Trough | +5 % meat | 10 | 2 K food | 1.6 |
-| Hen House | +10 % eggs | 10 | 1.5 K wood + 40 eggs | 1.6 |
-| Dairy | +10 % milk | 10 | 1.5 K stone + 30 milk | 1.6 |
-| Tannery | +10 % hide | 10 | 1.2 K coal + 20 hide | 1.6 |
+| Hen House | +15 % eggs | 10 | 1.5 K wood + 40 eggs | 1.6 |
+| Dairy | +15 % milk | 10 | 1.5 K stone + 30 milk | 1.6 |
+| Tannery | +15 % hide | 10 | 1.2 K coal + 20 hide | 1.6 |
 | Pen Expansion | +2 % all farm output, +4 animals per kind | 8 | 8 K food + 3 K wood + 3 K stone | 1.9 |
 
-A product sells for 3 / 4 / 6 gold (eggs / milk / hide), which is 25–40 % of the meat value of the animal that makes it.
+A product sells for 2 / 3 / 4 gold (eggs / milk / hide), which is 30–34 % of the meat value of the animal that makes it (products were produced 50 % slower and sold for 3 / 4 / 6 before: the same gold, reached faster).
 
 Payback (food valued at its sell price 0.75, meat at 1) is well under a day for the first chicken and grows with each extra animal (generated §4); the sim buys the first chicken within minutes and the first cow after about half a day.
 
 ## 6. Merchant, clicks, chests, buildings
 
 ```
-sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .5, stone .5, coal 1, food .75, meat 1, eggs 3, milk 4, hide 6
+sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .5, stone .5, coal 1, food .75, meat 1, eggs 2, milk 3, hide 4
 buy:   gold = ceil(amount × price × 2)                         wood, stone, coal, food, meat only
 item:  sell = floor(sellValue × qty × Haggler)   common 8, uncommon 90, rare 250, epic 700, legendary 2000, potion 20
        shop price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold

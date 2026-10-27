@@ -269,17 +269,17 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 
 | Animal | product | per second each | sells for | gold/s each (sold) | meat gold/s each | share of meat |
 | --- | --- | --- | --- | --- | --- | --- |
-| Chicken | eggs | 0.02 | 3 | 0.060 | 0.20 | 30% |
-| Deer | hide | 0.025 | 6 | 0.150 | 0.50 | 30% |
-| Pig | hide | 0.05 | 6 | 0.300 | 1.00 | 30% |
-| Cow | milk | 0.15 | 4 | 0.600 | 2.00 | 30% |
+| Chicken | eggs | 0.03 | 2 | 0.060 | 0.20 | 30% |
+| Deer | hide | 0.0375 | 4 | 0.150 | 0.50 | 30% |
+| Pig | hide | 0.075 | 4 | 0.300 | 1.00 | 30% |
+| Cow | milk | 0.225 | 3 | 0.675 | 2.00 | 34% |
 
 | Upgrade | effect per level | max level | cost of level 1 | cost of the last level |
 | --- | --- | --- | --- | --- |
 | Feed Trough | +5% meat | 10 | 2000 food | 137.44K food |
-| Hen House | +10% eggs | 10 | 1500 wood + 40.00 eggs | 103.08K wood + 2749 eggs |
-| Dairy | +10% milk | 10 | 1500 stone + 30.00 milk | 103.08K stone + 2062 milk |
-| Tannery | +10% hide | 10 | 1200 coal + 20.00 hide | 82.46K coal + 1375 hide |
+| Hen House | +15% eggs | 10 | 1500 wood + 40.00 eggs | 103.08K wood + 2749 eggs |
+| Dairy | +15% milk | 10 | 1500 stone + 30.00 milk | 103.08K stone + 2062 milk |
+| Tannery | +15% hide | 10 | 1200 coal + 20.00 hide | 82.46K coal + 1375 hide |
 | Pen Expansion | +2% farm output, +4 animals per kind | 8 | 8000 food + 3000 wood + 3000 stone | 715.10K food + 268.16K wood + 268.16K stone |
 
 ## 5. Biomes and buildings
@@ -334,16 +334,16 @@ Derived stats for the starting stats (all 5):
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 1.630 | 45.0% | 2.364 |
-| wood | 0 | 0.05 | 1.025 | 45.0% | 1.486 |
-| stone | 0 | 0.1 | 0.100 | 32.5% | 0.133 |
+| gold | 0.1 | 0.1 | 2.590 | 45.0% | 3.756 |
+| wood | 0 | 0.05 | 0.075 | 45.0% | 0.109 |
+| stone | 0 | 0.1 | 0.150 | 32.5% | 0.199 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 3.365 | 45.0% | 4.879 |
-| meat | 0 | 0 | 0.000 | 50.0% | 0.000 |
+| food | 0 | 0.05 | 7.095 | 45.0% | 10.288 |
+| meat | 0 | 0 | 0.000 | 60.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |
-| xp | 0.25 | 0.5 | 0.750 | 22.2% | 0.917 |
+| xp | 0.25 | 0.5 | 1.000 | 22.2% | 1.222 |
 
 ## 8. Click power and merchant
 
@@ -361,9 +361,9 @@ Derived stats for the starting stats (all 5):
 | coal | 1 | 2 |
 | food | 0.75 | 1.5 |
 | meat | 1 | 2 |
-| eggs | 3 | not for sale |
-| milk | 4 | not for sale |
-| hide | 6 | not for sale |
+| eggs | 2 | not for sale |
+| milk | 3 | not for sale |
+| hide | 4 | not for sale |
 
 ### Merchant bonuses and gear shop
 

@@ -79,7 +79,7 @@ export const RESOURCES = {
 		usedFor: 'Hen House upgrades; sell the rest to the merchant.',
 		source: 'Chickens on the farm. Cannot be bought.',
 		color: '#f4e6c4',
-		merchant: { price: 3, description: 'Fresh from the coop.', pitch: 'Bakers pay well for fresh eggs.' },
+		merchant: { price: 2, description: 'Fresh from the coop.', pitch: 'Bakers pay well for fresh eggs.' },
 	},
 	milk: {
 		emoji: '🥛',
@@ -88,7 +88,7 @@ export const RESOURCES = {
 		usedFor: 'Dairy upgrades; sell the rest to the merchant.',
 		source: 'Cows on the farm. Cannot be bought.',
 		color: '#e8f0fa',
-		merchant: { price: 4, description: 'Creamy and cold from the dairy.', pitch: 'A town favourite at breakfast.' },
+		merchant: { price: 3, description: 'Creamy and cold from the dairy.', pitch: 'A town favourite at breakfast.' },
 	},
 	hide: {
 		emoji: '🟫',
@@ -97,7 +97,7 @@ export const RESOURCES = {
 		usedFor: 'Tannery upgrades; sell the rest to the merchant.',
 		source: 'Deer and pigs on the farm. Cannot be bought.',
 		color: '#c89868',
-		merchant: { price: 6, description: 'Tanned leather from the farm.', pitch: 'Craftsmen always need good leather.' },
+		merchant: { price: 4, description: 'Tanned leather from the farm.', pitch: 'Craftsmen always need good leather.' },
 	},
 	xp: {
 		emoji: '✨',
