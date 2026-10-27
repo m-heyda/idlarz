@@ -87,6 +87,22 @@
 	background: #d8f0b8;
 }
 
+.fight-bar[data-kind='mana'] {
+	height: 18px;
+}
+
+.fight-bar[data-kind='mana'] .fight-bar-fill {
+	background: linear-gradient(#5aa8f0 0 35%, #2f6fc0 35% 100%);
+}
+
+.fight-bar[data-kind='mana'] .fight-bar-trail {
+	background: #b8d8f8;
+}
+
+.fight-bar[data-kind='mana'] .fight-bar-text {
+	font-size: 0.7rem;
+}
+
 .fight-bar-text {
 	position: absolute;
 	inset: 0;
@@ -178,6 +194,7 @@
 .fight-number[data-kind='super'] { color: #ff6ae0; font-size: 2.6rem; animation-duration: 1.2s; }
 .fight-number[data-kind='hurt'] { color: #ff6a5a; top: 70%; }
 .fight-number[data-kind='heal'] { color: #7aff8a; top: 70%; }
+.fight-number[data-kind='stun'] { color: #8ac0ff; top: 18%; font-size: 1.3rem; }
 
 @keyframes fight-float {
 	0% { transform: translateY(0); opacity: 1; }
@@ -220,6 +237,67 @@
 	font-weight: 700;
 	color: #f0d27a;
 	text-shadow: 1px 1px 0 #000;
+	pointer-events: none;
+}
+
+.fight-skills {
+	display: flex;
+	gap: 8px;
+}
+
+.fight-skill {
+	position: relative;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 8px 6px 6px 22px;
+	overflow: hidden;
+	background: #1c120a;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c, inset 0 0 0 2px #2a1a0c;
+	color: #f0e6d0;
+	cursor: pointer;
+}
+
+.fight-skill:disabled {
+	cursor: default;
+}
+
+.fight-skill[data-locked='true'] {
+	color: #8a7a62;
+	background: #120a06;
+}
+
+.fight-skill[data-nomana='true'] .fight-skill-cost {
+	color: #ff8a7a;
+}
+
+.fight-skill-name {
+	font-weight: 700;
+	font-size: 0.9rem;
+}
+
+.fight-skill-cost {
+	font-size: 0.75rem;
+	color: #8ac0ff;
+}
+
+.fight-stunned {
+	position: absolute;
+	left: 50%;
+	top: 6%;
+	transform: translateX(-50%);
+	z-index: 6;
+	padding: 2px 8px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #101010;
+	background: #8ac0ff;
+	border: 2px solid #0a0605;
 	pointer-events: none;
 }
 

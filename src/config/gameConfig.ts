@@ -406,9 +406,18 @@ export const MERCHANT_UPGRADES = {
 
 export type MerchantUpgradeId = keyof typeof MERCHANT_UPGRADES;
 
-// Plain gear and potions the merchant sells (gold). Every price is at least 3x the item's sell value (x1.3 for a maxed Haggler),
-// so buying and selling can never print gold: tests/economy.test.ts checks it for every entry.
-export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems(); // each item's own `shop` price in the catalog
+// Supplies (potions) the merchant always sells, each at its own `shop` price in the catalog. Every price is at least 3x the item's
+// sell value (x1.3 for a maxed Haggler), so buying and selling can never print gold: tests/merchantShop.test.ts checks every entry.
+export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems();
+
+// The merchant's shuffling goods (Goods tab): pieces of gear rolled by the loot pipeline (source `merchant`, see lootConfig).
+export const MERCHANT_GOODS = {
+	offers: 6, // pieces on the shelf
+	rotateSec: 30 * 60, // the shelf is reshuffled after this much play time
+	maxOffers: 12, // what a save may hold
+	priceFactor: 40, // gold per gold of sell value: far above the 3.9x a max Haggler could resell at (about 400 for a common piece, 5 000-90 000 for the rest)
+	refreshBase: 2000, // a paid refresh costs this x castle level squared
+} as const;
 
 // Farm products: shown on the farm and at the merchant, not in the header row
 export const FARM_PRODUCT_KEYS = ['eggs', 'milk', 'hide'] as const;

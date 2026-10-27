@@ -106,6 +106,7 @@ export const newFight = (monster: Pick<Monster, 'id' | 'type' | 'tier'>, castleL
 		attackTimer: 0,
 		timeLeftSec: monster.type === 'ratKing' ? MONSTERS.ratKing.timeLimitSec : null,
 		potionCd: 0,
+		stunLeftSec: 0,
 		phase: 'active',
 		summary: null,
 		taunt: null,
@@ -151,7 +152,9 @@ export const stepFight = (
 	const stats = monsterStats(fight.type, fight.tier, fight.castleLevel);
 	const events: CombatEvent[] = [];
 	let hp = playerHp;
-	let attackTimer = fight.attackTimer + dt;
+	// A stunned monster does not wind up its next attack; the stun runs down first and only the rest of the step counts
+	const stunned = Math.min(fight.stunLeftSec, dt);
+	let attackTimer = fight.attackTimer + (dt - stunned);
 	while (attackTimer >= stats.attackIntervalSec) {
 		attackTimer -= stats.attackIntervalSec;
 		if (dodge > 0 && rng() >= 1 - dodge) {
@@ -169,6 +172,7 @@ export const stepFight = (
 		...fight,
 		attackTimer,
 		potionCd: Math.max(0, fight.potionCd - dt),
+		stunLeftSec: fight.stunLeftSec - stunned,
 		timeLeftSec: fight.timeLeftSec === null ? null : Math.max(0, fight.timeLeftSec - dt),
 	};
 	if (hp === 0) {

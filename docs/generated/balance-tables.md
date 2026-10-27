@@ -316,16 +316,15 @@ Derived stats for the starting stats (all 5):
 
 | Stat | calculateCombatStats() | INITIAL_CHARACTER_STATS |
 | --- | --- | --- |
-| physicalAtk | 5 | 0 |
-| magicAtk | 5 | 0 |
+| physicalAtk | 0 | 0 |
+| magicAtk | 0 | 0 |
 | hp | 16.25 | 0 |
-| mp | 10 | 0 |
-| def | 11.25 | 0 |
-| magicDef | 8.75 | 0 |
+| mp | 40 | 0 |
+| def | 0 | 0 |
 | luck | 5 | 0 |
 | critChance | 3.75 | 0 |
 | critDmgMultiplier | 110 | 0 |
-| atkSpeedIncrease | 1.25 | 0 |
+| atkSpeedIncrease | 0 | 0 |
 | xpGainMultiplier | 2.25 | 0 |
 | tileCostDiscount | 2.5 | 0 |
 
@@ -333,12 +332,12 @@ Derived stats for the starting stats (all 5):
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 2.395 | 45.0% | 3.473 |
-| wood | 0 | 0.05 | 1.538 | 45.0% | 2.229 |
+| gold | 0.1 | 0.1 | 2.590 | 45.0% | 3.756 |
+| wood | 0 | 0.05 | 0.075 | 45.0% | 0.109 |
 | stone | 0 | 0.1 | 0.150 | 32.5% | 0.199 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 5.048 | 45.0% | 7.319 |
-| meat | 0 | 0 | 0.000 | 50.0% | 0.000 |
+| food | 0 | 0.05 | 7.095 | 45.0% | 10.288 |
+| meat | 0 | 0 | 0.000 | 60.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |
@@ -377,13 +376,6 @@ Derived stats for the starting stats (all 5):
 | --- | --- | --- | --- | --- |
 | Minor Healing Potion | common | 20 | 80.00 | 4.0x |
 | Greater Healing Potion | uncommon | 90 | 360 | 4.0x |
-| Steel Gauntlets | uncommon | 90 | 3500 | 38.9x |
-| Steel Sabatons | uncommon | 90 | 3500 | 38.9x |
-| Steel Helm | uncommon | 90 | 4500 | 50.0x |
-| Iron Sword | uncommon | 90 | 6000 | 66.7x |
-| Steel Shield | uncommon | 90 | 6500 | 72.2x |
-| Steel Greaves | uncommon | 90 | 7000 | 77.8x |
-| Steel Cuirass | uncommon | 90 | 9000 | 100.0x |
 
 ## 9. Rebirth and Legacy
 

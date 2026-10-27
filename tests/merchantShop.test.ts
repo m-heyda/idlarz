@@ -43,10 +43,12 @@ test('no single item is worth a fortune: the best drop at the level cap sells fo
 	assert.ok(top <= 20_000, `the best item at level 100 sells for ${top}`);
 });
 
-test('the shop sells plain wares only, every price is at least 3x the sell value (3.9x of a max Haggler) so buying and selling never print gold', () => {
+test('the supplies are potions only, every price is at least 3x the sell value (3.9x of a max Haggler) so buying and selling never print gold', () => {
+	assert.ok(MERCHANT_SHOP_ITEMS.length > 0);
 	for (const { id, price } of MERCHANT_SHOP_ITEMS) {
 		const def = ITEM_CATALOG[id];
 		assert.ok(def, id);
+		assert.equal(def.kind, 'consumable', `${id}: gear comes from the shuffling goods`);
 		assert.notEqual(def.set, 'rattatui', `${id} is not for sale`);
 		assert.ok(price >= unitValue(id) * 3, `${id}: ${price} vs ${unitValue(id)}`);
 		assert.ok(price > unitValue(id) * MAX_HAGGLER, `${id} with a max Haggler`);
@@ -147,9 +149,8 @@ test('buyItem: charges the price, adds the item, and a full bag costs nothing', 
 	const bought = api().bag.map((s) => stackOf(s)).find((s) => s?.id === id);
 	assert.ok(bought ? bought.qty >= 3 : api().bag.filter((s) => slotItemId(s) === id).length >= 3);
 
-	const gearId = MERCHANT_SHOP_ITEMS.find((e) => !ITEM_CATALOG[e.id].consumable)!.id;
 	store.setState({ bag: emptyBag().map(() => ({ item: plainItem('wooden_sword') })), resources: { ...api().resources, gold: 1e9 } });
-	assert.equal(api().buyItem(gearId, 1), false);
+	assert.equal(api().buyItem(id, 1), false);
 	assert.equal(api().resources.gold, 1e9, 'nothing charged');
 
 	for (const bad of [0, -1, 1.5, 1000, NaN]) assert.equal(api().buyItem(id, bad), false, String(bad));

@@ -3,6 +3,7 @@ import type { PlayerClassId } from '@/config/playerClasses';
 import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config/gameConfig';
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
+import type { SkillId } from '@/catalog/skills';
 import type { CritKind } from '@/lib/combat';
 import type { World } from '@/utils/world';
 
@@ -205,6 +206,8 @@ export interface FightState {
 	attackTimer: number;
 	timeLeftSec: number | null;
 	potionCd: number;
+	/** Seconds the monster stays stunned: its attack timer does not run (the King's time limit does) */
+	stunLeftSec: number;
 	phase: FightPhase;
 	summary: KillSummary | null;
 	taunt: string | null;
@@ -222,11 +225,17 @@ export interface TileProps {
 }
 
 export type MerchantTab =
-	| 'exchange'
-	| 'buy'
-	| 'upgrade'
+	| 'resources'
+	| 'goods'
+	| 'upgrades'
 	| 'quests'
 	| 'gambling';
+
+/** The merchant's shuffling shelf: gear offers rolled at `at` (play seconds); the price is derived from the item, never saved */
+export interface MerchantStock {
+	at: number;
+	offers: ItemInstance[];
+}
 
 export interface MerchantTabInfo {
 	id: MerchantTab;
@@ -311,6 +320,8 @@ export interface GameState {
 	playerHp: number;
 	/** Mana: spent by skills, refills over time (persisted; clamped to the max on load) */
 	playerMp: number;
+	/** Seconds left on each skill's cooldown (transient: a cooldown never outlives the tab) */
+	skillCd: Partial<Record<SkillId, number>>;
 	monsters: Monster[];
 	monsterSpawnTimer: number;
 	nextMonsterId: number;
@@ -318,6 +329,7 @@ export interface GameState {
 	farmLevels: Record<string, number>; // animals owned per kind
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
+	merchantStock: MerchantStock | null; // the goods on offer (null until the first shelf is rolled)
 	isHydrated: boolean;
 	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
 	prestige: PrestigeState;
@@ -352,6 +364,8 @@ export interface GameState {
 	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
 	sellJunk: (maxRarity: string) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
+	buyOffer: (index: number) => boolean;
+	refreshMerchantStock: () => boolean;
 	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
@@ -367,9 +381,11 @@ export interface GameState {
 	leaveFight: () => void;
 	dismissMonster: (id: number) => boolean; // removes a monster from the map, no loot; false for the one being fought
 	drinkPotion: (bagIndex: number) => boolean;
+	castSkill: (id: SkillId) => boolean;
 	equipItem: (bagIndex: number) => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;
+	organizeBag: () => boolean;
 	// Tap an owned tile: grants a slice of its output. Returns null while on cooldown / nothing to give.
 	tapTile: (x: number, y: number, input?: ClickInput) => TapResult | null;
 }

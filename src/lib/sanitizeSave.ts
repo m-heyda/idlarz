@@ -11,6 +11,7 @@ import {
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
 	FARM_UPGRADES,
+	MERCHANT_GOODS,
 	MERCHANT_UPGRADES,
 	CASTLE_X,
 	CASTLE_Y,
@@ -62,6 +63,7 @@ import type {
 	EquipmentSlot,
 	GameState,
 	ItemInstance,
+	MerchantStock,
 	Monster,
 	PrestigeState,
 	Resources,
@@ -97,6 +99,7 @@ export const PERSISTED_KEYS = [
 	'nextMonsterId',
 	'lootPity',
 	'autoSellUpTo',
+	'merchantStock',
 ] as const;
 
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]>;
@@ -541,6 +544,23 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	const playSeconds = num(raw.playSeconds, 0, 1e9);
 	if (chestSpawnTimer === null || playSeconds === null) return fail('timers');
 
+	// The merchant's goods (optional: older saves get a fresh shelf on the next tick). Every offer is a full item check.
+	let merchantStock: MerchantStock | null = null;
+	if (raw.merchantStock !== undefined && raw.merchantStock !== null) {
+		const rawStock = raw.merchantStock;
+		if (!isObject(rawStock)) return fail('merchant stock');
+		for (const key of Object.keys(rawStock)) if (key !== 'at' && key !== 'offers') return fail('merchant stock key');
+		const at = num(rawStock.at, 0, 1e12);
+		if (at === null || !Array.isArray(rawStock.offers) || rawStock.offers.length > MERCHANT_GOODS.maxOffers) return fail('merchant stock');
+		const offers: ItemInstance[] = [];
+		for (const entry of rawStock.offers) {
+			const item = readInstance(entry);
+			if (typeof item === 'string') return fail(`merchant offer (${item})`);
+			offers.push(item);
+		}
+		merchantStock = { at: Math.min(at, playSeconds), offers };
+	}
+
 	const rawName = typeof raw.playerName === 'string' ? raw.playerName.trim().slice(0, 9) : '';
 	const playerClass: PlayerClassId =
 		typeof raw.playerClass === 'string' && raw.playerClass in PLAYER_CLASSES
@@ -577,6 +597,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			nextMonsterId,
 			lootPity,
 			autoSellUpTo,
+			merchantStock,
 		},
 	};
 };

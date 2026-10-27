@@ -144,11 +144,23 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 		],
 		enabled: true,
 	},
+	// The merchant's shelf: six pieces of gear at the world level, never legendary (those stay a reward for the King and chests)
+	merchant_stock: {
+		id: 'merchant_stock',
+		rolls: { min: 6, max: 6, guaranteed: 6, chancePerRoll: 1 },
+		itemLevel: { offset: 0, variance: 2, min: 1, max: 100 },
+		rarityWeights: { common: 50, uncommon: 32, rare: 14, epic: 4 },
+		rarityLevelGate: { rare: 3, epic: 6 },
+		generalPoolId: 'general_equipment',
+		bonusTables: [],
+		enabled: true,
+	},
 };
 
-/** Keyed by the `DropSource` (a monster type or `chest`). Rat tiers 1-5 are levels 1,3,5,7,9; the Rat King is 12. */
+/** Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). Rat tiers 1-5 are levels 1,3,5,7,9; the Rat King is 12. */
 export const LOOT_SOURCES: Record<string, LootSource> = {
 	rat: { id: 'rat', lootProfileId: 'normal_monster', level: { base: 1, perTier: 2, perCastleLevel: 3 } },
 	ratKing: { id: 'ratKing', lootProfileId: 'boss', level: { base: 12, perTier: 0, perCastleLevel: 3 } },
 	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perTier: 0, perCastleLevel: 3 } },
+	merchant: { id: 'merchant', lootProfileId: 'merchant_stock', level: { base: 4, perTier: 0, perCastleLevel: 3 } },
 };

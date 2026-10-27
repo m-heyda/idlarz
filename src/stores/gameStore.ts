@@ -73,8 +73,11 @@ import { createClickLimiter } from '@/lib/clickLimiter';
 import { createHitGuard } from '@/lib/hitGuard';
 import { applyHit, armorOf, dodgeChance, leechHeal, manaRegenPerSec, maxHp, maxMana, newFight, regen, rollHit, stepFight } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
+import { SKILLS, type SkillId } from '@/catalog/skills';
+import { castRefusal, healAmount, isSkillId, tickCooldowns } from '@/lib/skills';
+import { generateMerchantStock, refreshCost, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
-import { addDrop, aggregateStats, equipFromBag, gearOf, moveSlot, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
+import { addDrop, aggregateStats, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
 import { plainItem, sellValueOf } from '@/lib/itemInstance';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { canSpawn } from '@/lib/spawnLimits';
@@ -93,6 +96,7 @@ import type {
 	FightState,
 	GameState,
 	GiftResult,
+	MerchantStock,
 	Monster,
 	PrestigeState,
 	Resources,
@@ -149,6 +153,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		bag: starterBag(),
 		playerHp: maxHp(stats, equipment),
 		playerMp: maxMana(stats, equipment),
+		skillCd: {} as Partial<Record<SkillId, number>>,
 		monsters: [] as Monster[],
 		monsterSpawnTimer: 0,
 		nextMonsterId: 1,
@@ -156,6 +161,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		farmLevels: {} as Record<string, number>,
 		farmUpgrades: {} as Record<string, number>,
 		merchantUpgrades: {} as Record<string, number>,
+		merchantStock: null as MerchantStock | null,
 		isHydrated: false,
 		freeTiles: STARTER_FREE_TILES,
 		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
@@ -605,6 +611,37 @@ const createGameSlice = (
 			return true;
 		},
 
+		// Skills: mana and a cooldown each. Heal works anywhere, Stun only in an active fight (see lib/skills.ts for the rules)
+		castSkill: (id: SkillId) => {
+			const state = get();
+			if (!isSkillId(id)) return false;
+			const max = maxHp(state.characterStats, state.equipment);
+			const refusal = castRefusal(id, {
+				level: state.level.level,
+				mana: state.playerMp,
+				hp: state.playerHp,
+				maxHp: max,
+				fight: state.fight,
+				cooldowns: state.skillCd,
+			});
+			if (refusal) return false;
+			const skill = SKILLS[id];
+			const patch: Partial<GameState> = {
+				playerMp: state.playerMp - skill.manaCost,
+				skillCd: { ...state.skillCd, [id]: skill.cooldownSec },
+			};
+			if (id === 'heal') {
+				const healed = Math.min(healAmount(state.characterStats, state.equipment, skill), max - state.playerHp);
+				patch.playerHp = state.playerHp + healed;
+				emitCombat({ kind: 'heal', amount: Math.round(healed) });
+			} else if (state.fight) {
+				patch.fight = { ...state.fight, stunLeftSec: skill.stunSec ?? 0 };
+				emitCombat({ kind: 'stun', sec: skill.stunSec ?? 0 });
+			}
+			set(patch);
+			return true;
+		},
+
 		// Gear actions: refused while a fight is open; max HP can drop when gear comes off, so playerHp follows it down
 		equipItem: (bagIndex: number) => {
 			const state = get();
@@ -640,6 +677,14 @@ const createGameSlice = (
 			const inRange = (i: number) => Number.isInteger(i) && i >= 0 && i < state.bag.length;
 			if (!inRange(from) || !inRange(to)) return false;
 			set({ bag: moveSlot(state.bag, from, to) });
+			return true;
+		},
+
+		// Tidy the bag from the left (stacks merged, gear sorted); like every bag action, not while a fight is open
+		organizeBag: () => {
+			const state = get();
+			if (state.fight) return false;
+			set({ bag: organizeBag(state.bag) });
 			return true;
 		},
 
@@ -790,6 +835,8 @@ const createGameSlice = (
 			// Mana refills in and out of fights
 			const newPlayerMp = Math.min(maxMana(state.characterStats, state.equipment), state.playerMp + manaRegenPerSec(state.characterStats, state.equipment) * secondsElapsed);
 
+			const newPlaySeconds = state.playSeconds + secondsElapsed;
+
 			// Level and stat points
 			const { level, progress } = calculateLevel(newResources.xp);
 			const castleFinished = !!state.castleUpgrade && !newCastleUpgrade;
@@ -814,7 +861,9 @@ const createGameSlice = (
 				fight: newFightState,
 				playerHp: newPlayerHp,
 				playerMp: newPlayerMp,
-				playSeconds: state.playSeconds + secondsElapsed,
+				skillCd: tickCooldowns(state.skillCd, secondsElapsed),
+				merchantStock: stockDue(state.merchantStock, newPlaySeconds) ? generateMerchantStock(castleLevelOf(state.tiles), Math.random, newPlaySeconds) : state.merchantStock,
+				playSeconds: newPlaySeconds,
 			});
 			if (castleFinished) emitSaveEvent('castleUpgraded');
 			if (level > state.level.level) emitSaveEvent('levelUp');
@@ -953,6 +1002,39 @@ const createGameSlice = (
 				}
 			}
 			set({ bag, resources: { ...state.resources, gold: state.resources.gold - price } });
+			return true;
+		},
+
+		// Buy one piece of the merchant's goods at its price; nothing is charged when it does not fit in the bag
+		buyOffer: (index: number) => {
+			const state = get();
+			const stock = state.merchantStock;
+			if (!stock || !Number.isInteger(index) || index < 0 || index >= stock.offers.length) return false;
+			const item = stock.offers[index];
+			const price = shopPriceOf(item);
+			if (state.resources.gold < price) return false;
+			const added = addDrop(state.bag, { kind: 'gear', item });
+			if (added.overflow > 0) return false;
+			set({
+				bag: added.bag,
+				resources: { ...state.resources, gold: state.resources.gold - price },
+				merchantStock: { ...stock, offers: stock.offers.filter((_, i) => i !== index) },
+			});
+			emitSaveEvent('buyOffer');
+			return true;
+		},
+
+		// A new shelf of goods for gold (the free reshuffle comes with the timer, in `tick`)
+		refreshMerchantStock: () => {
+			const state = get();
+			const castle = castleLevelOf(state.tiles);
+			const cost = refreshCost(castle);
+			if (state.resources.gold < cost) return false;
+			set({
+				resources: { ...state.resources, gold: state.resources.gold - cost },
+				merchantStock: generateMerchantStock(castle, Math.random, state.playSeconds),
+			});
+			emitSaveEvent('refreshMerchantStock');
 			return true;
 		},
 

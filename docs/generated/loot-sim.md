@@ -38,3 +38,4 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 - **normal_monster**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
 - **boss**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_set, king_legendary, king_potions
 - **basic_chest**: 1-1 roll(s), 0 guaranteed, 82% per roll; rarity weights common 62.0%, uncommon 24.0%, rare 9.0%, epic 4.0%, legendary 1.0%; bonus: chest_legendary, chest_potion
+- **merchant_stock**: 6-6 roll(s), 6 guaranteed, 100% per roll; rarity weights common 50.0%, uncommon 32.0%, rare 14.0%, epic 4.0%; bonus: none

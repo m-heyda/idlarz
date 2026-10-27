@@ -14,6 +14,8 @@ export type SaveEventReason =
 	| 'equipItem'
 	| 'unequipItem'
 	| 'buyMerchantUpgrade'
+	| 'buyOffer'
+	| 'refreshMerchantStock'
 	| 'buyClickUpgrade'
 	| 'levelUp';
 

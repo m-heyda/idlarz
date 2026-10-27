@@ -91,3 +91,42 @@ test('defense points matter: Vitality and Dexterity let a tier-5 rat fight go be
 	assert.ok(tank.winRate >= bare.winRate);
 	assert.ok(Number.isNaN(tank.meanHpLeft) || Number.isNaN(bare.meanHpLeft) || tank.meanHpLeft > bare.meanHpLeft, 'more HP left after the fight');
 });
+
+// ---- skills (Heal under 50 % HP and Stun on cooldown, cast by the bot at level 30) --------------------------------------------
+
+const withSkills = (equipment: Equipment, cps: number, monster: { type: 'rat' | 'ratKing'; tier: number } = KING, skillLevel = 30) =>
+	simulateMany({ equipment, monster: { ...monster }, cps, skillLevel }, RUNS, seeded(7 + cps));
+
+test('skills make a close fight winnable but never replace gear: steel wins about two clicks per second sooner, the starter kit still never beats the king', () => {
+	assert.equal(sim(STEEL, 10).winRate, 0, 'without skills steel loses at 10 cps');
+	assert.ok(withSkills(STEEL, 10).winRate > 0.9, 'Heal and Stun carry it over the line');
+	assert.equal(withSkills(STEEL, 7).winRate, 0, 'but a slow clicker still loses');
+	const wood = fullSet('woodland', 'wooden_club');
+	for (const cps of [7, 15, 25]) assert.equal(withSkills(STARTER_EQUIPMENT, cps).winRate, 0, `starter at ${cps} cps`);
+	for (const cps of [7, 15, 20]) assert.equal(withSkills(wood, cps).winRate, 0, `woodland at ${cps} cps`);
+	// only a perfect 25 clicks per second with perfect casting scrapes past it, with seconds to spare and a sliver of HP
+	const scrape = withSkills(wood, 25);
+	assert.ok(scrape.winRate === 0 || (scrape.meanTimeSec > MONSTERS.ratKing.timeLimitSec * 0.8 && scrape.meanHpLeft < 0.15), `${scrape.meanTimeSec} s, ${scrape.meanHpLeft} HP left`);
+});
+
+test('skills only ever help the bot, and cost it no time: damage is still the clicks', () => {
+	for (const [gear, cps] of [[STEEL, 12], [STEEL, 15], [OBSIDIAN, 7], [RATTATUI, 7]] as const) {
+		const plain = sim(gear, cps);
+		const skilled = withSkills(gear, cps);
+		assert.ok(skilled.winRate >= plain.winRate);
+		assert.ok(skilled.meanHpLeft >= plain.meanHpLeft - 0.01, `${cps} cps: ${skilled.meanHpLeft} vs ${plain.meanHpLeft}`);
+		assert.ok(Math.abs(skilled.meanTimeSec - plain.meanTimeSec) < plain.meanTimeSec * 0.02, 'skills do no damage');
+	}
+});
+
+test('the skills do not trivialise the king: the best loadout at 25 clicks per second still needs several seconds', () => {
+	const best = { ...RATTATUI, mainHand: plainItem('titan_maul') };
+	assert.ok(withSkills(best, 25).meanTimeSec >= 6);
+});
+
+test('a skill the character has not unlocked is never cast: at level 4 the bot has neither, at level 5 only Heal', () => {
+	const plain = sim(STEEL, 10);
+	assert.equal(withSkills(STEEL, 10, KING, 4).winRate, plain.winRate);
+	assert.equal(withSkills(STEEL, 10, KING, 4).meanHpLeft || 0, plain.meanHpLeft || 0);
+	assert.ok(withSkills(STEEL, 10, KING, 5).winRate <= withSkills(STEEL, 10, KING, 30).winRate, 'Stun adds to Heal');
+});

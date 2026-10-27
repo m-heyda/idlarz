@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
-import { plainItem } from '@/lib/itemInstance';
+import { castleLevelOf } from '@/lib/castleWard';
+import { resolveItem } from '@/lib/itemInstance';
+import { refreshCost, secondsToRotation, shopPriceOf } from '@/lib/merchant';
 import { MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/gameConfig';
-import { formatNumber } from '@/utils/formatters';
+import { formatNumber, formatTime } from '@/utils/formatters';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/gameUtils';
 import ItemSlot from '../../ItemSlot';
 import ResourceIcon from '../../ResourceIcon';
@@ -58,25 +60,21 @@ export const MerchantUpgradeCards: React.FC<BoughtProps> = ({ onBought }) => {
 	);
 };
 
-/** Plain gear and potions. Nothing is charged if they do not fit in the bag. */
-export const MerchantShop: React.FC<BoughtProps> = ({ onBought }) => {
+/** Supplies: potions, always in stock. Nothing is charged if they do not fit in the bag. */
+const Supplies: React.FC<BoughtProps & { full: boolean; setFull: (full: boolean) => void }> = ({ onBought, full, setFull }) => {
 	const gold = useGameStore((state) => state.resources.gold);
 	const buyItem = useGameStore((state) => state.buyItem);
-	const [full, setFull] = useState(false);
 	return (
-		<div className='px-card mb-6'>
-			<h3 className='text-white font-semibold mb-2'>Gear &amp; potions</h3>
-			<p className='text-sm text-[#d8c8a0] mb-4'>
-				Plain wares for your bag. Rattatui gear is not for sale: only the Rat King carries it.
-				{full && <span className='text-red-400'> Your bag is full.</span>}
-			</p>
+		<div className='px-card mb-4'>
+			<h3 className='text-white font-semibold mb-2'>Supplies</h3>
+			<p className='text-sm text-[#d8c8a0] mb-3'>Always in stock.</p>
 			<div className='grid grid-cols-3 gap-3'>
 				{MERCHANT_SHOP_ITEMS.map(({ id, price }) => {
 					const def = ITEM_CATALOG[id];
 					if (!def) return null;
 					return (
 						<div key={id} className='flex items-center gap-3'>
-							{def.kind === 'consumable' ? <ItemSlot itemId={id} /> : <ItemSlot item={plainItem(id)} compare />}
+							<ItemSlot itemId={id} />
 							<div className='flex flex-col gap-1 min-w-0'>
 								<span className='text-xs text-white truncate'>{def.name}</span>
 								<button
@@ -96,6 +94,81 @@ export const MerchantShop: React.FC<BoughtProps> = ({ onBought }) => {
 					);
 				})}
 			</div>
+			{full && <p className='text-red-400 text-sm mt-2'>Your bag is full.</p>}
 		</div>
+	);
+};
+
+/**
+ * The merchant's goods: a shelf of rolled gear that is reshuffled every half hour of play time (or for gold), and the supplies.
+ * Buying a piece takes it off the shelf; a full bag buys nothing.
+ */
+export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
+	const gold = useGameStore((state) => state.resources.gold);
+	const stock = useGameStore((state) => state.merchantStock);
+	const playSeconds = useGameStore((state) => state.playSeconds);
+	const castle = useGameStore((state) => castleLevelOf(state.tiles));
+	const buyOffer = useGameStore((state) => state.buyOffer);
+	const refresh = useGameStore((state) => state.refreshMerchantStock);
+	const [full, setFull] = useState(false);
+	const cost = refreshCost(castle);
+	const left = stock ? secondsToRotation(stock, playSeconds) : 0;
+	return (
+		<>
+			<div className='px-card mb-4'>
+				<div className='flex items-center justify-between mb-2 gap-2'>
+					<h3 className='text-white font-semibold'>Today&apos;s goods</h3>
+					<div className='flex items-center gap-3'>
+						<span className='text-xs text-[#a89878]'>New goods in {formatTime(left)}</span>
+						<button
+							className='px-btn px-btn-sm'
+							disabled={gold < cost}
+							title='Shuffle the shelf now'
+							onClick={() => {
+								if (refresh()) onBought('a new shelf of goods', cost);
+							}}>
+							<span className='inline-flex items-center gap-1'>
+								Refresh {formatNumber(cost)} <ResourceIcon resource='gold' />
+							</span>
+						</button>
+					</div>
+				</div>
+				<p className='text-sm text-[#d8c8a0] mb-3'>
+					Gear that matches the world around you, never the rarest. Hover for what it does.
+					{full && <span className='text-red-400'> Your bag is full.</span>}
+				</p>
+				{!stock || stock.offers.length === 0 ? (
+					<p className='text-sm text-[#a89878]'>Sold out. New goods arrive soon.</p>
+				) : (
+					<div className='grid grid-cols-3 gap-3'>
+						{stock.offers.map((item, index) => {
+							const price = shopPriceOf(item);
+							const name = resolveItem(item)?.name ?? item.base;
+							return (
+								<div key={`${index}-${item.base}-${item.level}`} className='flex items-center gap-3'>
+									<ItemSlot item={item} compare />
+									<div className='flex flex-col gap-1 min-w-0'>
+										<span className='text-xs text-white truncate'>{name}</span>
+										<button
+											className='px-btn px-btn-sm'
+											disabled={gold < price}
+											onClick={() => {
+												const ok = buyOffer(index);
+												setFull(!ok && gold >= price);
+												if (ok) onBought(name, price);
+											}}>
+											<span className='inline-flex items-center gap-1'>
+												{formatNumber(price)} <ResourceIcon resource='gold' />
+											</span>
+										</button>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				)}
+			</div>
+			<Supplies onBought={onBought} full={full} setFull={setFull} />
+		</>
 	);
 };

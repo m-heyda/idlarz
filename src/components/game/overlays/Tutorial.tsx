@@ -26,7 +26,8 @@ import {
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
 } from '@/config/gameConfig';
-import { COMBAT, MONSTERS } from '@/config/combatConfig';
+import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
+import { SKILLS } from '@/catalog/skills';
 import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatNumber, formatTime } from '@/utils/formatters';
@@ -219,7 +220,8 @@ const Tutorial: React.FC = () => {
 				</p>
 				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
 					<li>
-						Every click in the fight hits for your gear&apos;s Damage. <b>There is no click-speed limit</b> in fights: fast clicking is a
+						Every click in the fight hits for your gear&apos;s Damage, plus {STAT_RULES.physicalDamagePerStrength}% per point of Strength above {STAT_RULES.base} with
+						physical weapons or {STAT_RULES.magicDamagePerIntelligence}% per point of Intelligence above {STAT_RULES.base} with a staff or wand. <b>There is no click-speed limit</b> in fights: fast clicking is a
 						skill (only real clicks count). A click can <b>crit</b> (x{COMBAT.crit.mult}) with your Crit chance - Dexterity and Charisma
 						plus gear - and a crit can become a <b>super crit</b> (x{COMBAT.crit.superMult}) with {COMBAT.crit.superBase}% plus the gear&apos;s Super Crit.
 					</li>
@@ -230,6 +232,12 @@ const Tutorial: React.FC = () => {
 					</li>
 					<li>
 						Potions (hotkeys 1-3 in a fight, a shared {COMBAT.potionCooldownSec}s cooldown) heal 35 or 90 HP and work outside fights too.
+					</li>
+					<li>
+						<b>Skills</b> cost mana (Intelligence and some gear raise it and how fast it refills). <b>{SKILLS.heal.name}</b> (level {SKILLS.heal.unlockLevel}, hotkey 4,{' '}
+						{SKILLS.heal.manaCost} mana, {SKILLS.heal.cooldownSec}s cooldown) restores {pct(SKILLS.heal.healFraction ?? 0)} of your max HP, more with Intelligence and Spell Power, and works
+						outside fights too. <b>{SKILLS.stun.name}</b> (level {SKILLS.stun.unlockLevel}, hotkey 5, {SKILLS.stun.manaCost} mana, {SKILLS.stun.cooldownSec}s cooldown) freezes the monster&apos;s attacks for{' '}
+						{SKILLS.stun.stunSec} seconds. They do no damage: they buy time for your clicks.
 					</li>
 					<li>
 						Winning pays gold and XP worth some seconds of your income, plus a chance of gear and potions. Rats drop wood, cloth and, from
@@ -245,7 +253,7 @@ const Tutorial: React.FC = () => {
 					The Character window has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
 					and a 36-slot bag. Double-click a bag item to equip it (or drink a potion); right-click it for Equip / Drink, Sell one and{' '}
 					<b>Discard</b> (destroys it for good, after a confirmation, no gold). Click gear to take it off, drag to
-					rearrange. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
+					rearrange, or press <b>Organize</b> to merge stacks and sort the bag. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
 					hover for a tooltip.
 				</p>
 				<div className='flex flex-wrap gap-x-4 gap-y-1 mb-2 text-xs'>

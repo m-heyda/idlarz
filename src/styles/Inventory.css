@@ -160,3 +160,36 @@
 	display: flex;
 	gap: 8px;
 }
+
+.inv-ability {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	background: #1c120a;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c, inset 0 0 0 2px #2a1a0c;
+	color: #f0e6d0;
+	cursor: pointer;
+}
+
+.inv-ability:disabled {
+	cursor: default;
+}
+
+.inv-ability[data-locked='true'] {
+	color: #8a7a62;
+	background: #120a06;
+}
+
+.inv-ability-name {
+	font-weight: 700;
+	font-size: 0.85rem;
+}
+
+.inv-ability-sub {
+	font-size: 0.7rem;
+	color: #8ac0ff;
+}

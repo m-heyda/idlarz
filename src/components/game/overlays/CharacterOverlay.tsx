@@ -3,21 +3,26 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL } from '@/config/itemCatalog';
+import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { armorOf, critOdds, damagePerClick, maxHp } from '@/lib/combat';
+import { healAmount } from '@/lib/skills';
 import { aggregateStats } from '@/lib/inventory';
 import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
 import type { EquipmentSlot } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import ItemSlot from '../ItemSlot';
 import Bag from '../Bag';
+import OrganizeButton from '../OrganizeButton';
 
-const ABILITY_HINT = 'Ability slot - skills are coming soon';
 
 const CharacterOverlay: React.FC = () => {
 	const setMenuTab = useUiStore((state) => state.setMenuTab);
 	const equipment = useGameStore((state) => state.equipment);
 	const characterStats = useGameStore((state) => state.characterStats);
 	const equipItem = useGameStore((state) => state.equipItem);
+	const castSkill = useGameStore((state) => state.castSkill);
+	const skillCd = useGameStore((state) => state.skillCd);
+	const level = useGameStore((state) => state.level.level);
 	const unequipItem = useGameStore((state) => state.unequipItem);
 	const openClassDialog = useUiStore((state) => state.openClassDialog);
 	const [notice, setNotice] = useState<string | null>(null);
@@ -97,8 +102,26 @@ const CharacterOverlay: React.FC = () => {
 								</div>
 							</div>
 							<div className='inv-abilities'>
-								<ItemSlot locked label={ABILITY_HINT} />
-								<ItemSlot locked label={ABILITY_HINT} />
+								{SKILL_IDS.map((id) => {
+									const skill = SKILLS[id];
+									const locked = level < skill.unlockLevel;
+									const cd = Math.ceil(skillCd[id] ?? 0);
+									const detail = locked
+										? `Unlocks at level ${skill.unlockLevel}`
+										: `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown${id === 'heal' ? `, heals about ${healAmount(characterStats, equipment, skill)} HP` : ''}`;
+									return (
+										<button
+											key={id}
+											className='inv-ability'
+											data-locked={locked}
+											disabled={locked || skill.fightOnly}
+											onClick={() => castSkill(id)}
+											title={`${skill.name}: ${skillDescription(skill)} (${detail})`}>
+											<span className='inv-ability-name'>{skill.name}</span>
+											<span className='inv-ability-sub'>{locked ? `Lv ${skill.unlockLevel}` : cd > 0 ? `${cd} s` : `${skill.manaCost} MP`}</span>
+										</button>
+									);
+								})}
 							</div>
 						</div>
 						{gearSlot('offHand')}
@@ -119,9 +142,12 @@ const CharacterOverlay: React.FC = () => {
 				{/* Bag */}
 				<div className='px-panel flex-1 min-w-[360px] overflow-y-auto relative'>
 					<div className='px-h text-center'>Items Bag</div>
+					<div className='flex justify-center mb-2'>
+						<OrganizeButton onNotice={setNotice} />
+					</div>
 					<Bag onNotice={setNotice} />
 					<div className='px-tip-muted text-xs text-center mt-3'>
-						Double-click to equip or drink, right-click for more. Drag to rearrange.
+						Double-click to equip or drink, right-click for more. Drag to rearrange, or press Organize.
 					</div>
 					{notice && (
 						<div className='px-toast absolute left-1/2 bottom-3 -translate-x-1/2 px-3 py-1 text-sm text-[#f0d27a] whitespace-nowrap'>

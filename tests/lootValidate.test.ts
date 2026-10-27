@@ -118,6 +118,7 @@ test('every weighted rarity needs an eligible item at every level the source can
 	d.profiles.normal_monster.rarityWeights.rare = 0;
 	d.profiles.basic_chest.rarityWeights.rare = 0;
 	d.profiles.boss.rarityWeights.rare = 0;
+	d.profiles.merchant_stock.rarityWeights.rare = 0;
 	assert.deepEqual(validateLootData(d).errors, []);
 });
 

@@ -102,6 +102,29 @@ for (const { label, monster } of MONSTER_ROWS.filter((m) => m.monster.tier === 5
 	}
 }
 
+// ---- skills: the same bot casting Heal (under 50 % HP) and Stun (on cooldown) at level 30 ---------------------------------------------
+const SKILL_SPEEDS = [7, 10, 12, 15, 25];
+out();
+out('# Skills (level 30)');
+out();
+out('The bot also casts Heal (under 50 % HP) and Stun (whenever it is ready); mana and cooldowns apply, no potions. Skills do no damage, so a fight the bot already wins takes as long as before: they only move the line where gear stops being enough. Cells: win % (mean seconds, mean HP left at the end).');
+for (const { label, monster } of MONSTER_ROWS.filter((m) => m.monster.type === 'ratKing')) {
+	out();
+	out(`## ${label}`);
+	out();
+	out(`| Loadout | Skills | ${SKILL_SPEEDS.map((s) => `${s} cps`).join(' | ')} |`);
+	out(`|---|---|${SKILL_SPEEDS.map(() => '---').join('|')}|`);
+	for (const { name, equipment } of LOADOUTS.filter((l) => ['starter kit', 'woodland set + club', "knight's set + mace", 'obsidian set + maul', 'rattatui + titan maul'].includes(l.name))) {
+		for (const skillLevel of [0, 30]) {
+			const cells = SKILL_SPEEDS.map((cps) => {
+				const r = simulateMany({ equipment, monster: { ...monster }, cps, skillLevel }, RUNS, seeded(3000 + cps));
+				return `${Math.round(r.winRate * 100)}%${r.winRate > 0 ? ` (${r.meanTimeSec.toFixed(0)}s, ${Math.round(r.meanHpLeft * 100)}% HP)` : ''}`;
+			});
+			out(`| ${name} | ${skillLevel ? 'Heal + Stun' : 'none'} | ${cells.join(' | ')} |`);
+		}
+	}
+}
+
 if (process.argv.includes('--md')) {
 	writeFileSync(resolve(__dirname, '..', 'docs', 'generated', 'fight-sim.md'), lines.join('\n') + '\n');
 	console.log('wrote docs/generated/fight-sim.md');

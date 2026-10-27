@@ -8,6 +8,7 @@ import { formatNumber } from '@/utils/formatters';
 import { sellPayout } from '@/utils/gameUtils';
 import ItemSlot from '../../ItemSlot';
 import { slotProps } from '../../itemUi';
+import OrganizeButton from '../../OrganizeButton';
 import ResourceIcon from '../../ResourceIcon';
 import '@/styles/Inventory.css';
 
@@ -62,6 +63,7 @@ export const MerchantItemsSection: React.FC = () => {
 			<div className='flex items-center justify-between mb-2'>
 				<h3 className='text-white font-bold text-sm'>Sell items</h3>
 				<div className='flex gap-2'>
+					<OrganizeButton onNotice={say} />
 					<button className='px-btn px-btn-sm' onClick={() => junk('common')} disabled={fighting}>
 						Sell common
 					</button>
