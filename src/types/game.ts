@@ -316,7 +316,7 @@ export interface GameState {
 	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
-	addStatPoint: (stat: keyof CharacterStats) => void;
+	addStatPoint: (stat: keyof CharacterStats) => boolean;
 	setPlayerName: (name: string) => void;
 	setPlayerClass: (playerClass: PlayerClassId) => void;
 	/** Gives a brand-new game (no play time, default name) the account's name and hero; any played game is left alone. */

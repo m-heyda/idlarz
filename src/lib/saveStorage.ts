@@ -371,6 +371,8 @@ export const saveStorage = saves.storage;
 export const markSaveReady = saves.markReady;
 export const setSavePaused = saves.setPaused;
 export const freezeSaves = saves.freeze;
+/** Writes what is pending to localStorage right now (a milestone should not wait for the 2 s autosave delay). */
+export const flushSaves = saves.flush;
 export const parseSaveText = saves.parse;
 export const commitImport = saves.commitImport;
 export const resetSave = saves.reset;

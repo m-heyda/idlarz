@@ -2,60 +2,68 @@ import { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { pickPersisted } from '@/lib/sanitizeSave';
-import { exportSaveText } from '@/lib/saveStorage';
+import { exportSaveText, flushSaves } from '@/lib/saveStorage';
 import { pushCloud, readLink, writeLink } from '@/lib/cloudClient';
-
-const FIRST_PUSH_MS = 4000;
-const PUSH_EVERY_MS = 90_000;
+import { onSaveEvent } from '@/lib/saveEvents';
+import { createSyncScheduler, type PushOutcome } from '@/lib/syncPolicy';
 
 /**
- * Copies the game to the signed-in account's cloud save: shortly after the game starts, every ~90 s while it changes,
- * and when the tab is hidden or closed. The local save stays the primary copy; a failed upload is simply retried.
- * Stops for the session when the account's save moved on elsewhere (409) or the server refuses this save.
+ * Copies the game to the signed-in account's cloud save (cadence and limits: syncPolicy.ts): shortly after the game starts,
+ * soon after a milestone (purchase, castle upgrade, rebirth, level up), every 5 min while idle, and when the tab is hidden
+ * or closed. The local save stays the primary copy; a failed upload is retried with backoff.
+ * Stops for the session when the account's save moved on elsewhere (409), the server refuses this save, or the login is gone.
  */
 export const useCloudSync = (userId: string | null, active: boolean) => {
 	useEffect(() => {
 		if (!userId || !active) return;
-		let stopped = false;
-		let busy = false;
 		let lastSentPlay = -1;
 
-		const push = async (keepalive = false) => {
-			if (stopped || busy) return;
+		const push = async (hiding: boolean): Promise<PushOutcome> => {
 			const link = readLink();
-			if (!link || link.userId !== userId) return;
+			if (!link || link.userId !== userId) return 'ok';
 			const state = pickPersisted(useGameStore.getState());
-			if (state.playSeconds === lastSentPlay) return; // nothing happened since the last upload
-			busy = true;
-			try {
-				const result = await pushCloud(exportSaveText(state), link.rev, keepalive);
-				if (result.status === 'ok') {
+			if (state.playSeconds === lastSentPlay) return 'ok'; // the game did not run since the last upload (paused or hidden)
+			const result = await pushCloud(exportSaveText(state), link.rev, hiding);
+			switch (result.status) {
+				case 'ok':
 					lastSentPlay = state.playSeconds;
 					writeLink({ userId, rev: result.rev });
-				} else if (result.status === 'conflict') {
-					stopped = true;
+					return 'ok';
+				case 'conflict':
 					useUiStore.getState().showToast('Your account has a newer save from another browser. Reload to choose.');
-				} else if (result.status === 'rejected') {
-					stopped = true;
+					return 'stop';
+				case 'rejected':
 					useUiStore.getState().showToast('Cloud save paused: the server refused this save.');
-				}
-			} finally {
-				busy = false;
+					return 'stop';
+				case 'signed_out':
+					useUiStore.getState().showToast('Cloud save paused: you are signed out. Reload to log in again.');
+					return 'stop';
+				default:
+					return 'retry';
 			}
 		};
 
-		const first = setTimeout(() => void push(), FIRST_PUSH_MS);
-		const every = setInterval(() => void push(), PUSH_EVERY_MS);
+		const scheduler = createSyncScheduler({
+			now: () => Date.now(),
+			setTimer: (fn, ms) => setTimeout(fn, ms),
+			clearTimer: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
+			push: (reason) => push(reason === 'hide'),
+		});
+		scheduler.start();
+
+		const offEvents = onSaveEvent(() => {
+			flushSaves(); // the milestone is on disk now, the cloud copy follows after a short settle
+			scheduler.event();
+		});
 		const onHide = () => {
-			if (document.visibilityState === 'hidden') void push(true);
+			if (document.visibilityState === 'hidden') scheduler.hide();
 		};
-		const onPageHide = () => void push(true);
+		const onPageHide = () => scheduler.hide();
 		document.addEventListener('visibilitychange', onHide);
 		window.addEventListener('pagehide', onPageHide);
 		return () => {
-			stopped = true;
-			clearTimeout(first);
-			clearInterval(every);
+			scheduler.stop();
+			offEvents();
 			document.removeEventListener('visibilitychange', onHide);
 			window.removeEventListener('pagehide', onPageHide);
 		};
