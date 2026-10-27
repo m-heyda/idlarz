@@ -1,0 +1,1820 @@
+{
+ "wooden_sword": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "common",
+  "tier": 1,
+  "set": null,
+  "weaponType": "sword",
+  "attackSpeed": 1.2,
+  "stats": {
+   "damage": 6
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "wooden_club": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "common",
+  "tier": 1,
+  "set": null,
+  "weaponType": "mace",
+  "attackSpeed": 0.8,
+  "stats": {
+   "damage": 9
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "hunting_bow": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "common",
+  "tier": 1,
+  "set": null,
+  "weaponType": "bow",
+  "attackSpeed": 1,
+  "stats": {
+   "damage": 6,
+   "critChance": 6
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "wooden_shield": {
+  "kind": "offhand",
+  "slot": "offHand",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": "shield",
+  "attackSpeed": null,
+  "stats": {
+   "armor": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "leather_cap": {
+  "kind": "armor",
+  "slot": "head",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "leather_pauldrons": {
+  "kind": "armor",
+  "slot": "shoulder",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "leather_vest": {
+  "kind": "armor",
+  "slot": "chest",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 2,
+   "maxHp": 4
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "leather_gloves": {
+  "kind": "armor",
+  "slot": "hands",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 1
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "leather_leggings": {
+  "kind": "armor",
+  "slot": "legs",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 2,
+   "maxHp": 3
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "leather_boots": {
+  "kind": "armor",
+  "slot": "feet",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "wooden_pendant": {
+  "kind": "accessory",
+  "slot": "neck",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 3,
+   "goldFind": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "leather_cloak": {
+  "kind": "accessory",
+  "slot": "cape",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 2,
+   "dodge": 1
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "wooden_ring": {
+  "kind": "accessory",
+  "slot": "ring",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "acorn_charm": {
+  "kind": "accessory",
+  "slot": "charm",
+  "rarity": "common",
+  "tier": 1,
+  "set": "woodland",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 3,
+   "luck": 1
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "potion_minor": {
+  "kind": "consumable",
+  "slot": null,
+  "rarity": "common",
+  "tier": 0,
+  "set": null,
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {},
+  "sellValue": 20,
+  "shop": 80,
+  "drops": {
+   "rat": {
+    "weight": 4
+   },
+   "ratKing": {
+    "weight": 1,
+    "qty": 2
+   },
+   "chest": {
+    "weight": 60
+   }
+  }
+ },
+ "potion_greater": {
+  "kind": "consumable",
+  "slot": null,
+  "rarity": "uncommon",
+  "tier": 0,
+  "set": null,
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {},
+  "sellValue": 90,
+  "shop": 360,
+  "drops": {
+   "rat": {
+    "weight": 1,
+    "minTier": 4
+   },
+   "ratKing": {
+    "weight": 1,
+    "qty": 1
+   },
+   "chest": {
+    "weight": 25
+   }
+  }
+ },
+ "oak_staff": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "common",
+  "tier": 1,
+  "set": null,
+  "weaponType": "staff",
+  "attackSpeed": 0.9,
+  "stats": {
+   "damage": 3,
+   "regen": 0.5,
+   "luck": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "apprentice_wand": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "common",
+  "tier": 1,
+  "set": null,
+  "weaponType": "wand",
+  "attackSpeed": 1.3,
+  "stats": {
+   "damage": 3,
+   "critChance": 4,
+   "luck": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "apprentice_tome": {
+  "kind": "offhand",
+  "slot": "offHand",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": "tome",
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 6,
+   "regen": 0.3
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_hat": {
+  "kind": "armor",
+  "slot": "head",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 4,
+   "luck": 1
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_mantle": {
+  "kind": "armor",
+  "slot": "shoulder",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 3
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_robe": {
+  "kind": "armor",
+  "slot": "chest",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 8,
+   "regen": 0.3
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_gloves": {
+  "kind": "armor",
+  "slot": "hands",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 2,
+   "critChance": 1
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_trousers": {
+  "kind": "armor",
+  "slot": "legs",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 4
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_slippers": {
+  "kind": "armor",
+  "slot": "feet",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 3,
+   "regen": 0.2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_amulet": {
+  "kind": "accessory",
+  "slot": "neck",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 4,
+   "luck": 1,
+   "goldFind": 2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_cape": {
+  "kind": "accessory",
+  "slot": "cape",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 3,
+   "dodge": 1
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_ring": {
+  "kind": "accessory",
+  "slot": "ring",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 2,
+   "critChance": 1
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "cloth_charm": {
+  "kind": "accessory",
+  "slot": "charm",
+  "rarity": "common",
+  "tier": 1,
+  "set": "apprentice",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 3,
+   "luck": 1,
+   "regen": 0.2
+  },
+  "sellValue": 8,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 10
+   },
+   "chest": {
+    "weight": 10
+   }
+  }
+ },
+ "iron_sword": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": null,
+  "weaponType": "sword",
+  "attackSpeed": 1.2,
+  "stats": {
+   "damage": 12
+  },
+  "sellValue": 90,
+  "shop": 6000,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_mace": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": null,
+  "weaponType": "mace",
+  "attackSpeed": 0.8,
+  "stats": {
+   "damage": 18
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "battle_axe": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": null,
+  "weaponType": "axe",
+  "attackSpeed": 1,
+  "stats": {
+   "damage": 15,
+   "critChance": 3
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_dagger": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": null,
+  "weaponType": "dagger",
+  "attackSpeed": 1.6,
+  "stats": {
+   "damage": 9,
+   "critChance": 10
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_spear": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": null,
+  "weaponType": "spear",
+  "attackSpeed": 1.1,
+  "stats": {
+   "damage": 12,
+   "armor": 2
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "recurve_bow": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": null,
+  "weaponType": "bow",
+  "attackSpeed": 1,
+  "stats": {
+   "damage": 9,
+   "critChance": 12
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_shield": {
+  "kind": "offhand",
+  "slot": "offHand",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": "shield",
+  "attackSpeed": null,
+  "stats": {
+   "armor": 8,
+   "maxHp": 2
+  },
+  "sellValue": 90,
+  "shop": 6500,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_helm": {
+  "kind": "armor",
+  "slot": "head",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 4,
+   "maxHp": 3
+  },
+  "sellValue": 90,
+  "shop": 4500,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_pauldrons": {
+  "kind": "armor",
+  "slot": "shoulder",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 3,
+   "maxHp": 3
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_cuirass": {
+  "kind": "armor",
+  "slot": "chest",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 7,
+   "maxHp": 6
+  },
+  "sellValue": 90,
+  "shop": 9000,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_gauntlets": {
+  "kind": "armor",
+  "slot": "hands",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 2,
+   "maxHp": 2
+  },
+  "sellValue": 90,
+  "shop": 3500,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_greaves": {
+  "kind": "armor",
+  "slot": "legs",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 5,
+   "maxHp": 4
+  },
+  "sellValue": 90,
+  "shop": 7000,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_sabatons": {
+  "kind": "armor",
+  "slot": "feet",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 3,
+   "maxHp": 2
+  },
+  "sellValue": 90,
+  "shop": 3500,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_gorget": {
+  "kind": "accessory",
+  "slot": "neck",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 5,
+   "goldFind": 4
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_cloak": {
+  "kind": "accessory",
+  "slot": "cape",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 2,
+   "maxHp": 3,
+   "dodge": 1.5
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_ring": {
+  "kind": "accessory",
+  "slot": "ring",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 4
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "steel_charm": {
+  "kind": "accessory",
+  "slot": "charm",
+  "rarity": "uncommon",
+  "tier": 2,
+  "set": "knight",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 4
+  },
+  "sellValue": 90,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 4,
+    "minTier": 3
+   },
+   "chest": {
+    "weight": 5
+   }
+  }
+ },
+ "obsidian_blade": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "rare",
+  "tier": 3,
+  "set": null,
+  "weaponType": "sword",
+  "attackSpeed": 1.2,
+  "stats": {
+   "damage": 18,
+   "critChance": 5
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_maul": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "rare",
+  "tier": 3,
+  "set": null,
+  "weaponType": "maul",
+  "attackSpeed": 0.6,
+  "stats": {
+   "damage": 27
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_longbow": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "rare",
+  "tier": 3,
+  "set": null,
+  "weaponType": "bow",
+  "attackSpeed": 1,
+  "stats": {
+   "damage": 15,
+   "critChance": 15,
+   "superCrit": 3
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_crossbow": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "rare",
+  "tier": 3,
+  "set": null,
+  "weaponType": "crossbow",
+  "attackSpeed": 0.8,
+  "stats": {
+   "damage": 18,
+   "critChance": 12,
+   "superCrit": 5
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_kris": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "rare",
+  "tier": 3,
+  "set": null,
+  "weaponType": "dagger",
+  "attackSpeed": 1.6,
+  "stats": {
+   "damage": 12,
+   "critChance": 14,
+   "superCrit": 4,
+   "luck": 3
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_staff": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "rare",
+  "tier": 3,
+  "set": null,
+  "weaponType": "staff",
+  "attackSpeed": 0.9,
+  "stats": {
+   "damage": 9,
+   "regen": 1.5,
+   "luck": 5
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_aegis": {
+  "kind": "offhand",
+  "slot": "offHand",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": "shield",
+  "attackSpeed": null,
+  "stats": {
+   "armor": 11,
+   "maxHp": 12
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_helm": {
+  "kind": "armor",
+  "slot": "head",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 6,
+   "maxHp": 6
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_pauldrons": {
+  "kind": "armor",
+  "slot": "shoulder",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 5,
+   "maxHp": 5
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_cuirass": {
+  "kind": "armor",
+  "slot": "chest",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 10,
+   "maxHp": 12
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_gauntlets": {
+  "kind": "armor",
+  "slot": "hands",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 3,
+   "maxHp": 3,
+   "critChance": 1.5
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_greaves": {
+  "kind": "armor",
+  "slot": "legs",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 7,
+   "maxHp": 8
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_sabatons": {
+  "kind": "armor",
+  "slot": "feet",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 4,
+   "maxHp": 4
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_pendant": {
+  "kind": "accessory",
+  "slot": "neck",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 2,
+   "maxHp": 8,
+   "critChance": 1.5,
+   "goldFind": 6
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_cloak": {
+  "kind": "accessory",
+  "slot": "cape",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 3,
+   "maxHp": 5,
+   "dodge": 2
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_ring": {
+  "kind": "accessory",
+  "slot": "ring",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 6,
+   "critChance": 1.5
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "obsidian_charm": {
+  "kind": "accessory",
+  "slot": "charm",
+  "rarity": "rare",
+  "tier": 3,
+  "set": "obsidian",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 1,
+   "maxHp": 7,
+   "superCrit": 1
+  },
+  "sellValue": 250,
+  "shop": null,
+  "drops": {
+   "rat": {
+    "weight": 1.2,
+    "minTier": 5
+   },
+   "chest": {
+    "weight": 2
+   }
+  }
+ },
+ "rattatui_cap": {
+  "kind": "armor",
+  "slot": "head",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 6,
+   "maxHp": 8
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_shoulderpads": {
+  "kind": "armor",
+  "slot": "shoulder",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 5,
+   "maxHp": 7
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_tunic": {
+  "kind": "armor",
+  "slot": "chest",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 11,
+   "maxHp": 14
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_gloves": {
+  "kind": "armor",
+  "slot": "hands",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 4,
+   "maxHp": 5,
+   "critChance": 1
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_trousers": {
+  "kind": "armor",
+  "slot": "legs",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 8,
+   "maxHp": 10
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_boots": {
+  "kind": "armor",
+  "slot": "feet",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 5,
+   "maxHp": 6,
+   "regen": 0.3
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_amulet": {
+  "kind": "accessory",
+  "slot": "neck",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 2,
+   "maxHp": 14,
+   "critChance": 2,
+   "goldFind": 9
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_cloak": {
+  "kind": "accessory",
+  "slot": "cape",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 4,
+   "maxHp": 6,
+   "regen": 0.5,
+   "dodge": 3
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_ring": {
+  "kind": "accessory",
+  "slot": "ring",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "maxHp": 10,
+   "critChance": 2
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_charm": {
+  "kind": "accessory",
+  "slot": "charm",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": null,
+  "attackSpeed": null,
+  "stats": {
+   "armor": 3,
+   "maxHp": 16,
+   "superCrit": 2,
+   "luck": 2
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_fang_blade": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": "sword",
+  "attackSpeed": 1.2,
+  "stats": {
+   "damage": 24,
+   "critChance": 8,
+   "superCrit": 4
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "rattatui_buckler": {
+  "kind": "offhand",
+  "slot": "offHand",
+  "rarity": "epic",
+  "tier": 4,
+  "set": "rattatui",
+  "weaponType": "shield",
+  "attackSpeed": null,
+  "stats": {
+   "armor": 12,
+   "maxHp": 20
+  },
+  "sellValue": 700,
+  "shop": null,
+  "drops": {
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "emberbrand": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "legendary",
+  "tier": 5,
+  "set": null,
+  "weaponType": "sword",
+  "attackSpeed": 1.2,
+  "stats": {
+   "damage": 33,
+   "critChance": 10,
+   "superCrit": 8
+  },
+  "sellValue": 2000,
+  "shop": null,
+  "drops": {
+   "chest": {
+    "weight": 3
+   },
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "starfall_bow": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "legendary",
+  "tier": 5,
+  "set": null,
+  "weaponType": "bow",
+  "attackSpeed": 1,
+  "stats": {
+   "damage": 24,
+   "critChance": 20,
+   "superCrit": 10
+  },
+  "sellValue": 2000,
+  "shop": null,
+  "drops": {
+   "chest": {
+    "weight": 3
+   },
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ },
+ "titan_maul": {
+  "kind": "weapon",
+  "slot": "mainHand",
+  "rarity": "legendary",
+  "tier": 5,
+  "set": null,
+  "weaponType": "maul",
+  "attackSpeed": 0.6,
+  "stats": {
+   "damage": 45,
+   "critChance": 4,
+   "superCrit": 6
+  },
+  "sellValue": 2000,
+  "shop": null,
+  "drops": {
+   "chest": {
+    "weight": 3
+   },
+   "ratKing": {
+    "weight": 1
+   }
+  }
+ }
+}

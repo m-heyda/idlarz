@@ -1,3 +1,4 @@
+import { MIGRATIONS, type SaveBody } from '@/lib/saveFormat';
 import { sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
 import type { DecodeResult } from '@/lib/saveFormat';
 
@@ -83,7 +84,9 @@ const readEnvelope = async (text: string): Promise<PersistedGame | { reason: str
 	if (typeof envelope?.v !== 'number' || envelope.v > LEGACY_LAST_VERSION) {
 		return { reason: 'This save belongs to a different game version.' };
 	}
-	const result = sanitizeSave(envelope.state);
+	// This format predates the item instances: its gear is bare item ids, which migration 2 -> 3 turns into instances
+	const state = typeof envelope.state === 'object' && envelope.state !== null && !Array.isArray(envelope.state) ? MIGRATIONS[2](envelope.state as SaveBody) : envelope.state;
+	const result = sanitizeSave(state);
 	return result.ok ? result.state : { reason: `The save contains impossible data (${result.reason}).` };
 };
 

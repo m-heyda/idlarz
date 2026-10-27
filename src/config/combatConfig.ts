@@ -25,19 +25,7 @@ export const COMBAT = {
 	},
 	tierIntervalSec: 1800, // a rat gains a tier every 30 min on the map
 	maxTier: 5,
-	drops: {
-		// a rat can drop one piece of gear from the catalog's `rat` pool (never a Rattatui piece); older rats unlock better tiers
-		gearBase: 0.12,
-		gearTierBonus: 0.02,
-		potionBase: 0.25,
-		potionTierBonus: 0.03,
-		king: {
-			setPieces: 1, // the Rat King always drops this many Rattatui pieces, preferring ones you do not own yet
-			extraPieceChance: 0.4, // and one more piece with this chance
-			legendaryChance: 0.05, // and a legendary weapon with this chance
-			// potions: every potion that lists the King in its drops, `qty` of each (see catalog/items/consumables.ts)
-		},
-	},
+	// What drops (how often, which rarity and item level) is loot config: src/catalog/lootConfig.ts
 	rewards: { minGold: 10, minXp: 5 },
 };
 

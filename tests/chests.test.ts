@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CHEST, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
-import { CHEST_ITEMS, pickChestSpot, rewardWeights, rollChestLoot } from '../src/lib/chests';
-import { emptyBag, addToBag } from '../src/lib/inventory';
+import { pickChestSpot, rewardWeights, rollChestLoot } from '../src/lib/chests';
+import { emptyBag, addGear, addToBag } from '../src/lib/inventory';
+import { instanceProblem, plainItem } from '../src/lib/itemInstance';
 import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import type { BagSlot, BiomeType, Resources, Tile } from '../src/types/game';
 import { worldFromRows, tileAt } from '../src/utils/world';
@@ -111,8 +112,10 @@ test('chest loot: gold is minutes of income (like before), a lucky chest pays x1
 		} else if (loot.kind === 'xp') {
 			assert.ok(loot.xp >= CHEST.xp.floor);
 		} else {
-			assert.ok(CHEST_ITEMS.includes(loot.itemId));
-			assert.notEqual(ITEM_CATALOG[loot.itemId].set, 'rattatui', 'chests never hold Rattatui pieces');
+			const id = loot.drop.kind === 'gear' ? loot.drop.item.base : loot.drop.id;
+			assert.ok(ITEM_CATALOG[id], id);
+			assert.notEqual(ITEM_CATALOG[id].set, 'rattatui', 'chests never hold Rattatui pieces');
+			if (loot.drop.kind === 'gear') assert.equal(instanceProblem(loot.drop.item), null);
 		}
 	}
 });
@@ -127,12 +130,36 @@ test('chest loot: luck moves weight from plain gold to lucky chests and items', 
 
 test('chest loot: an item that does not fit in a full bag becomes gold', () => {
 	let bag: BagSlot[] = emptyBag();
-	const gear = CHEST_ITEMS.filter((id) => !ITEM_CATALOG[id].consumable); // gear does not stack: every slot used
-	bag = bag.map((_, i) => ({ id: gear[i % gear.length], qty: 1 }));
-	for (const id of CHEST_ITEMS.filter((i) => !ITEM_CATALOG[i].consumable)) assert.equal(addToBag(bag, id, 1).added, 0);
+	bag = bag.map(() => ({ item: plainItem('wooden_sword') })); // gear does not stack: every slot used
+	assert.equal(addGear(bag, plainItem('iron_sword')).added, false);
 	assert.equal(addToBag(bag, 'potion_minor', 1).added, 0);
 	for (let i = 0; i < 4000; i++) {
 		const loot = rollChestLoot({ rates: rates(), luck: 100, bag }, rng(i));
 		assert.notEqual(loot.kind, 'item');
 	}
+});
+
+test('chest loot: the auto-sell filter takes an item even when the bag is full; the rest still turn into gold', () => {
+	const bag: BagSlot[] = emptyBag().map(() => ({ item: plainItem('wooden_sword') }));
+	let sold = 0;
+	for (let i = 0; i < 4000; i++) {
+		const loot = rollChestLoot({ rates: rates(), luck: 100, bag, autoSellUpTo: 'epic' }, rng(i));
+		if (loot.kind === 'item') {
+			assert.equal(loot.drop.kind, 'gear', 'a potion has nowhere to go');
+			sold++;
+		}
+	}
+	assert.ok(sold > 0, 'gear still arrives so the filter can sell it');
+});
+
+test('chest loot: the castle level raises the item level of a chest item', () => {
+	const level = (castleLevel: number) => {
+		let best = 0;
+		for (let i = 0; i < 3000; i++) {
+			const loot = rollChestLoot({ rates: rates(), luck: 100, bag: emptyBag(), castleLevel }, rng(i));
+			if (loot.kind === 'item' && loot.drop.kind === 'gear') best = Math.max(best, loot.drop.item.level);
+		}
+		return best;
+	};
+	assert.ok(level(8) > level(1) + 10);
 });

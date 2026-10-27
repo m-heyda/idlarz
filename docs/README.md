@@ -14,8 +14,10 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 | [06-playtest-and-pacing-report.md](06-playtest-and-pacing-report.md) | Why the old game finished in ~3 days, what the rebalance changed, simulated results incl. castle 7–10 and Rebirth |
 | [07-security-and-exploits.md](07-security-and-exploits.md) | Save vault, validation, hidden save tools, exploit audit, server-verified saves (later) |
 | [08-followup-plan.md](08-followup-plan.md) | What to build next, in order, with sizes and acceptance criteria |
+| [10-loot-system.md](10-loot-system.md) | The loot pipeline: profiles, rarity, item level, affixes, pools, saves, and how to add items, affixes and rarities |
 | [superpowers/specs/2026-10-24-combat-and-inventory-design.md](superpowers/specs/2026-10-24-combat-and-inventory-design.md) | Design of the combat / monsters / items system and the long roadmap; the implementation plan sits next to it in `superpowers/plans/` |
 | [generated/balance-tables.md](generated/balance-tables.md) | Auto-generated tables (tile cost, levels, castle, animals, biomes, rates, Rebirth/Legacy) |
+| [generated/loot-sim.md](generated/loot-sim.md) / [item-catalog.md](generated/item-catalog.md) | Auto-generated loot simulation (rarity, item level, drops per kill per source) and the item catalog |
 | [generated/sim-milestones.md](generated/sim-milestones.md) | Auto-generated milestone times per simulated player profile |
 
 ## Commands
@@ -27,6 +29,8 @@ npm run sim -- --seeds=3 hardcore         # median and min-max over 3 seeds (pro
 npm run sim -- --maxdays=60 hardcore      # stop early
 npm run sim -- --legacy hardcore          # approximate the pre-rebalance game
 npm run sim -- --set=SCALING_CONFIG.growthLate=1.25 castleCostScale=...   # try a tweak without editing files
+npm run loot-sim -- --md      # seeded loot simulation (rarity, item level, drops per kill) -> docs/generated/loot-sim.md
+npm run catalog-report        # items, affixes, loot sources -> docs/generated/item-catalog.md
 npm test         # click limiter, economy/exploit, save-validation, castle, rebirth and ambient tests
 ```
 

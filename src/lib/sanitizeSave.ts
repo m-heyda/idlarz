@@ -25,7 +25,8 @@ import {
 	type MerchantUpgradeId,
 } from '@/config/gameConfig';
 import { COMBAT } from '@/config/combatConfig';
-import { EQUIPMENT_LAYOUT, ITEM_CATALOG, STARTER_EQUIPMENT } from '@/config/itemCatalog';
+import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
+import { instanceProblem } from '@/lib/itemInstance';
 import { maxHp } from '@/lib/combat';
 import { isInWard } from '@/lib/castleWard';
 import { starterBag } from '@/lib/inventory';
@@ -60,6 +61,7 @@ import type {
 	Equipment,
 	EquipmentSlot,
 	GameState,
+	ItemInstance,
 	Monster,
 	PrestigeState,
 	Resources,
@@ -92,6 +94,8 @@ export const PERSISTED_KEYS = [
 	'monsters',
 	'monsterSpawnTimer',
 	'nextMonsterId',
+	'lootPity',
+	'autoSellUpTo',
 ] as const;
 
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]>;
@@ -113,6 +117,22 @@ const fail = (reason: string): SanitizeResult => ({ ok: false, reason });
 const isObject = (v: unknown): v is Record<string, unknown> =>
 	typeof v === 'object' && v !== null && !Array.isArray(v);
 
+/** A saved piece of gear, rebuilt field by field (nothing else survives), or the reason it is not valid. */
+const readInstance = (value: unknown): ItemInstance | string => {
+	if (!isObject(value)) return 'not an item';
+	for (const key of Object.keys(value)) if (!INSTANCE_KEYS.has(key)) return 'unknown field';
+	if (typeof value.base !== 'string' || typeof value.rarity !== 'string' || !Array.isArray(value.affixes)) return 'malformed';
+	const affixes: ItemInstance['affixes'] = [];
+	for (const a of value.affixes) {
+		if (!isObject(a)) return 'malformed affix';
+		for (const key of Object.keys(a)) if (!AFFIX_KEYS.has(key)) return 'unknown affix field';
+		if (typeof a.id !== 'string' || typeof a.roll !== 'number') return 'malformed affix';
+		affixes.push({ id: a.id, roll: a.roll });
+	}
+	const item: ItemInstance = { base: value.base, level: value.level as number, rarity: value.rarity, quality: value.quality as number, affixes };
+	return instanceProblem(item) ?? item;
+};
+
 const num = (v: unknown, min = 0, max = RESOURCE_CAP): number | null =>
 	typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max ? v : null;
 
@@ -128,7 +148,12 @@ const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building
 const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
 const MONSTER_KEYS = new Set(['id', 'type', 'tier', 'x', 'y', 'ageSec']);
-const BAG_ENTRY_KEYS = new Set(['id', 'qty']);
+const STACK_KEYS = new Set(['id', 'qty']);
+const GEAR_ENTRY_KEYS = new Set(['item']);
+const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes']);
+const AFFIX_KEYS = new Set(['id', 'roll']);
+/** Longest pity counter a save may hold: far past any cap, so only a forged value exceeds it */
+const MAX_PITY = 100000;
 /** Level-ups are awarded by the tick, so a save written a moment after a purchase can be a few points behind. */
 const POINT_TOLERANCE = 5;
 
@@ -350,13 +375,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (raw.equipment === undefined || raw.bag === undefined) return fail('equipment and bag belong together');
 		if (!isObject(raw.equipment)) return fail('equipment');
 		equipment = {};
-		for (const [slot, id] of Object.entries(raw.equipment)) {
+		for (const [slot, value] of Object.entries(raw.equipment)) {
 			if (!GEAR_SLOTS.has(slot)) return fail('equipment slot');
-			const def = typeof id === 'string' ? ITEM_CATALOG[id] : undefined;
-			if (!def || !def.slot || def.consumable) return fail('equipped item');
+			const item = readInstance(value);
+			if (typeof item === 'string') return fail(`equipped item (${item})`);
+			const def = ITEM_CATALOG[item.base];
 			const fits = def.slot === slot || (def.slot === 'ring' && (slot === 'ring1' || slot === 'ring2'));
 			if (!fits) return fail('equipped item in the wrong slot');
-			equipment[slot as EquipmentSlot] = id as string;
+			equipment[slot as EquipmentSlot] = item;
 		}
 		if (!Array.isArray(raw.bag) || raw.bag.length !== bagSize) return fail('bag size');
 		bag = [];
@@ -366,13 +392,38 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 				continue;
 			}
 			if (!isObject(entry)) return fail('bag entry');
-			for (const key of Object.keys(entry)) if (!BAG_ENTRY_KEYS.has(key)) return fail('bag entry key');
+			if ('item' in entry) {
+				for (const key of Object.keys(entry)) if (!GEAR_ENTRY_KEYS.has(key)) return fail('bag entry key');
+				const item = readInstance(entry.item);
+				if (typeof item === 'string') return fail(`bag item (${item})`);
+				bag.push({ item });
+				continue;
+			}
+			for (const key of Object.keys(entry)) if (!STACK_KEYS.has(key)) return fail('bag entry key');
 			const def = typeof entry.id === 'string' ? ITEM_CATALOG[entry.id] : undefined;
-			if (!def) return fail('bag item');
+			if (!def || def.kind !== 'consumable') return fail('bag item');
 			const qty = int(entry.qty, 1, def.stackMax ?? 1);
 			if (qty === null) return fail('bag quantity');
 			bag.push({ id: def.id, qty });
 		}
+	}
+
+	// Loot bookkeeping (optional: a save from before it has no pity and keeps everything)
+	const lootPity: Record<string, number> = {};
+	if (raw.lootPity !== undefined) {
+		if (!isObject(raw.lootPity)) return fail('loot pity');
+		const known = new Set(Object.values(LOOT_PROFILES).flatMap((p) => p.bonusTables.filter((t) => t.pity).map((t) => `${p.id}:${t.id}`)));
+		for (const [key, count] of Object.entries(raw.lootPity)) {
+			if (!known.has(key)) return fail('unknown loot table');
+			const v = int(count, 0, MAX_PITY);
+			if (v === null) return fail('loot pity count');
+			if (v > 0) lootPity[key] = v;
+		}
+	}
+	let autoSellUpTo: string | null = null;
+	if (raw.autoSellUpTo !== undefined && raw.autoSellUpTo !== null) {
+		if (typeof raw.autoSellUpTo !== 'string' || !Object.prototype.hasOwnProperty.call(RARITIES, raw.autoSellUpTo)) return fail('auto-sell rarity');
+		autoSellUpTo = raw.autoSellUpTo;
 	}
 
 	const maxPlayerHp = maxHp(characterStats, equipment);
@@ -515,6 +566,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			monsters,
 			monsterSpawnTimer,
 			nextMonsterId,
+			lootPity,
+			autoSellUpTo,
 		},
 	};
 };

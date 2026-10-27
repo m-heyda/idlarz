@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import { plainItem } from '../src/lib/itemInstance';
 import { fullSet, seeded, simulateMany } from '../src/lib/fightSim';
 import type { Equipment } from '../src/types/game';
 
@@ -40,12 +41,12 @@ test('obsidian wins at a steady pace, Rattatui comfortably, and the best loadout
 	assert.ok(sim(OBSIDIAN, 7).winRate > 0.8);
 	assert.ok(sim(RATTATUI, 7).winRate > 0.95);
 	assert.ok(sim(RATTATUI, 7).meanTimeSec < MONSTERS.ratKing.timeLimitSec * 0.85);
-	const best = { ...RATTATUI, mainHand: 'titan_maul' };
+	const best = { ...RATTATUI, mainHand: plainItem('titan_maul') };
 	assert.ok(sim(best, 7).meanTimeSec < sim(RATTATUI, 7).meanTimeSec);
 });
 
 test('no loadout trivialises the king: even the best gear at 25 clicks per second needs several seconds', () => {
-	const best = { ...RATTATUI, mainHand: 'titan_maul' };
+	const best = { ...RATTATUI, mainHand: plainItem('titan_maul') };
 	assert.ok(sim(best, 25).meanTimeSec >= 6, `${sim(best, 25).meanTimeSec} s`);
 });
 

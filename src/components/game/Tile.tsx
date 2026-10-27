@@ -35,13 +35,14 @@ import '@/styles/ContextMenu.css';
 
 /** Hover card of a monster: tier, HP, time to the next tier and the call to fight. Reads the age at render time. */
 const MonsterTip: React.FC<{ id: number; type: 'rat' | 'ratKing'; tier: number }> = ({ id, type, tier }) => {
-	const monster = useGameStore.getState().monsters.find((m) => m.id === id);
+	const state = useGameStore.getState();
+	const monster = state.monsters.find((m) => m.id === id);
 	const nextTier = monster ? tierSecondsLeft(monster) : null;
 	return (
 		<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs'>
 			<div className='px-tip-title'>
 				{MONSTERS[type].label}
-				{type === 'rat' ? ` - Tier ${tier}` : ''} - {monsterStats(type, tier).maxHp} HP
+				{type === 'rat' ? ` - Tier ${tier}` : ''} - {monsterStats(type, tier, castleLevelOf(state.tiles)).maxHp} HP
 			</div>
 			{nextTier !== null && (
 				<div className='px-tip-muted'>Grows stronger in {Math.max(1, Math.ceil(nextTier / 60))} min</div>

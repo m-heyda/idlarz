@@ -8,6 +8,7 @@ import audioManager from '@/utils/audioManager';
 import PixelModal from '../PixelModal';
 import MonsterArt from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
+import { slotProps } from '../itemUi';
 import ResourceIcon from '../ResourceIcon';
 import '@/styles/Fight.css';
 
@@ -108,7 +109,7 @@ const FightView: React.FC = () => {
 	// Up to three potion stacks from the bag, with hotkeys 1-3
 	const potions = bag
 		.map((slot, index) => ({ slot, index }))
-		.filter(({ slot }) => slot && ITEM_CATALOG[slot.id]?.consumable)
+		.filter(({ slot }) => slot && 'id' in slot && ITEM_CATALOG[slot.id]?.consumable)
 		.slice(0, 3);
 
 	useEffect(() => {
@@ -197,9 +198,14 @@ const FightView: React.FC = () => {
 									</div>
 									{fight.summary.items.length > 0 && (
 										<div className='flex justify-center gap-2 mt-2'>
-											{fight.summary.items.map((item) => (
-												<ItemSlot key={item.id} itemId={item.id} qty={item.qty} />
-											))}
+											{fight.summary.items.map((drop, i) =>
+												drop.kind === 'gear' ? <ItemSlot key={i} item={drop.item} /> : <ItemSlot key={i} itemId={drop.id} qty={drop.qty} />
+											)}
+										</div>
+									)}
+									{fight.summary.autoSold.count > 0 && (
+										<div className='px-tip-muted text-xs text-center mt-2'>
+											Auto-sold {fight.summary.autoSold.count} piece{fight.summary.autoSold.count === 1 ? '' : 's'} of gear for {fight.summary.autoSold.gold} gold
 										</div>
 									)}
 									{fight.summary.convertedGold > 0 && (
@@ -239,8 +245,7 @@ const FightView: React.FC = () => {
 						{potions.map(({ slot, index }, i) => (
 							<div key={index} className='fight-potion'>
 								<ItemSlot
-									itemId={slot!.id}
-									qty={slot!.qty}
+									{...slotProps(slot)}
 									onClick={() => active && drinkPotion(index)}
 								/>
 								<span className='fight-hotkey'>{i + 1}</span>

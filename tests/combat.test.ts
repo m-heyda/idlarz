@@ -7,6 +7,7 @@ import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { calculateCombatStats } from '../src/utils/gameUtils';
 import { fullSet } from '../src/lib/fightSim';
+import { plainItem } from '../src/lib/itemInstance';
 import type { CharacterStats } from '../src/types/game';
 
 const freshStats = (): CharacterStats => {
@@ -23,13 +24,13 @@ test('maxHp is 101 for a fresh character with the starter kit', () => {
 });
 
 test('maxHp includes gear and set bonuses', () => {
-	assert.equal(maxHp(freshStats(), { chest: 'rattatui_tunic' }), 101 + ITEM_CATALOG.rattatui_tunic.stats!.maxHp!);
+	assert.equal(maxHp(freshStats(), { chest: plainItem('rattatui_tunic') }), 101 + ITEM_CATALOG.rattatui_tunic.stats!.maxHp!);
 });
 
 test('damagePerClick is 6 with the wooden sword, 1 without a weapon, 3 with the fang blade', () => {
 	assert.equal(damagePerClick(STARTER_EQUIPMENT), 6);
 	assert.equal(damagePerClick({}), 1);
-	assert.equal(damagePerClick({ mainHand: 'rattatui_fang_blade' }), ITEM_CATALOG.rattatui_fang_blade.stats!.damage);
+	assert.equal(damagePerClick({ mainHand: plainItem('rattatui_fang_blade') }), ITEM_CATALOG.rattatui_fang_blade.stats!.damage);
 });
 
 test('armorOf sums gear armor', () => {
@@ -163,7 +164,7 @@ test('regen stops at max and ignores bad input', () => {
 test('fight hits are not tied to CLICK_LIMIT: crit odds add the character and the gear, and are capped', () => {
 	const stats = freshStats();
 	assert.deepEqual(critOdds(stats, {}), { crit: stats.critChance / 100, superCrit: COMBAT.crit.superBase / 100 });
-	const gear = critOdds(stats, { mainHand: 'starfall_bow', charm: 'rattatui_charm' });
+	const gear = critOdds(stats, { mainHand: plainItem('starfall_bow'), charm: plainItem('rattatui_charm') });
 	assert.ok(gear.crit > critOdds(stats, {}).crit && gear.superCrit > COMBAT.crit.superBase / 100);
 	const stacked = { ...stats, critChance: 500 };
 	assert.equal(critOdds(stacked, {}).crit, COMBAT.crit.maxCritChance / 100);
@@ -201,6 +202,6 @@ test('dodge: a high roll avoids a monster hit, a low roll does not, and no dodge
 
 test('dodgeChance reads the gear and is capped', () => {
 	assert.equal(dodgeChance({}), 0);
-	assert.equal(dodgeChance({ cape: 'rattatui_cloak' }), ITEM_CATALOG.rattatui_cloak.stats!.dodge! / 100);
+	assert.equal(dodgeChance({ cape: plainItem('rattatui_cloak') }), ITEM_CATALOG.rattatui_cloak.stats!.dodge! / 100);
 	assert.ok(dodgeChance(fullSet('rattatui')) <= COMBAT.maxDodge / 100);
 });

@@ -182,3 +182,56 @@ test('keepalive is only asked for when the body fits the browser limit (64 KiB)'
 	// multi-byte text counts in bytes, not characters
 	assert.equal(shouldKeepalive('é'.repeat(SYNC.keepaliveMaxBytes / 2 + 1)), false);
 });
+
+// ---- the menu's manual save --------------------------------------------------------------------------------------------
+
+test('runNow uploads at once as a manual attempt, and the heartbeat waits a full period after it', async () => {
+	const h = harness();
+	h.scheduler.start();
+	await h.advance(SYNC.firstMs + 1);
+	await h.advance(2 * MIN);
+	assert.equal(await h.scheduler.runNow(), 'ok');
+	assert.deepEqual(h.pushes.map((p) => p.reason), ['first', 'manual']);
+	const manualAt = h.pushes[1].at;
+	await h.advance(SYNC.heartbeatMs - 1000);
+	assert.equal(h.pushes.length, 2, 'no heartbeat inside the period after a manual save');
+	await h.advance(2000);
+	assert.equal(h.pushes.length, 3);
+	assert.ok(h.pushes[2].at - manualAt >= SYNC.heartbeatMs - 1);
+});
+
+test('runNow reports busy during an upload, stopped before start and after stop, and a failure as retry with backoff', async () => {
+	const early = harness();
+	assert.equal(await early.scheduler.runNow(), 'stopped', 'not started yet');
+
+	const h = harness(['retry', 'ok']);
+	h.scheduler.start();
+	assert.equal(await h.scheduler.runNow(), 'retry');
+	await h.advance(SYNC.backoffMs[0] - 1000);
+	assert.equal(h.pushes.length, 1, 'the retry waits out the backoff');
+	await h.advance(2000);
+	assert.deepEqual(h.pushes.map((p) => p.reason), ['manual', 'retry']);
+
+	const stopped = harness();
+	stopped.scheduler.start();
+	stopped.scheduler.stop();
+	assert.equal(await stopped.scheduler.runNow(), 'stopped');
+
+	let release!: () => void;
+	const gate = new Promise<void>((resolve) => (release = resolve));
+	const slow = createSyncScheduler({ now: () => 1, setTimer: () => 0, clearTimer: () => undefined, push: async () => (await gate, 'ok') });
+	slow.start();
+	const first = slow.runNow();
+	assert.equal(await slow.runNow(), 'busy', 'a second press while uploading does nothing');
+	release();
+	assert.equal(await first, 'ok');
+});
+
+test('a server refusal during a manual save stops the scheduler for the session', async () => {
+	const h = harness(['stop']);
+	h.scheduler.start();
+	assert.equal(await h.scheduler.runNow(), 'stop');
+	assert.equal(await h.scheduler.runNow(), 'stopped');
+	await h.advance(20 * MIN);
+	assert.equal(h.pushes.length, 1);
+});

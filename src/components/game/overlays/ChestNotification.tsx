@@ -1,6 +1,7 @@
 import React from 'react';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import type { ChestLoot } from '@/lib/chests';
+import { resolveItem } from '@/lib/itemInstance';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
 import '@/styles/ContextMenu.css';
@@ -63,16 +64,19 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClo
 			detail = <span className='text-sm text-[#f0d27a] font-medium'>{loot.minutes.toFixed(1)} minutes of XP income</span>;
 			break;
 		case 'item': {
-			const item = ITEM_CATALOG[loot.itemId];
-			title = (
-				<>
-					<span className='text-lg font-semibold whitespace-nowrap'>
-						You found <span style={item ? { color: RARITY_COLOR[item.rarity] } : undefined}>{item?.name ?? 'an item'}</span>!
-					</span>
-					{item && <PixelIcon name={itemIconName(item)} alt='' />}
-				</>
-			);
-			hint = <span className='text-xs text-[#a89878] mt-1'>Added to your bag</span>;
+			const drop = loot.drop;
+		const resolved = drop.kind === 'gear' ? resolveItem(drop.item) : null;
+		const def = resolved?.def ?? (drop.kind === 'consumable' ? ITEM_CATALOG[drop.id] : undefined);
+		const color = RARITY_COLOR[(resolved?.instance.rarity ?? def?.rarity ?? 'common') as keyof typeof RARITY_COLOR];
+		title = (
+			<>
+				<span className='text-lg font-semibold whitespace-nowrap'>
+					You found <span style={def ? { color } : undefined}>{resolved?.name ?? def?.name ?? 'an item'}</span>!
+				</span>
+				{def && <PixelIcon name={itemIconName(def)} alt='' />}
+			</>
+		);
+		hint = <span className='text-xs text-[#a89878] mt-1'>{resolved ? `Item level ${resolved.instance.level} - ` : ''}Added to your bag</span>;
 			break;
 		}
 	}

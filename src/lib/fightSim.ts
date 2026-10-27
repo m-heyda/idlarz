@@ -3,6 +3,7 @@ import { ITEM_CATALOG, SETS } from '@/catalog';
 import { COMBAT } from '@/config/combatConfig';
 import { applyHit, armorOf, maxHp, newFight, rollHit, stepFight } from '@/lib/combat';
 import { aggregateStats } from '@/lib/inventory';
+import { plainItem } from '@/lib/itemInstance';
 import { calculateCombatStats } from '@/utils/gameUtils';
 import type { CharacterStats, Equipment, EquipmentSlot, MonsterType } from '@/types/game';
 
@@ -14,15 +15,15 @@ export const freshCharacter = (): CharacterStats => {
 	return Object.assign(stats, calculateCombatStats(stats));
 };
 
-/** Every piece of a set worn, plus a weapon (and the set's own off hand is part of the set). Both rings are filled. */
+/** Every piece of a set worn, plus a weapon (and the set's own off hand is part of the set). Both rings are filled. Items are plain: their authored level, neutral quality, no affixes. */
 export const fullSet = (setId: string, weapon?: string): Equipment => {
 	const eq: Equipment = {};
 	for (const id of SETS[setId].pieces) {
 		const slot = ITEM_CATALOG[id].slot!;
-		if (slot === 'ring') eq.ring1 = eq.ring2 = id;
-		else eq[slot as EquipmentSlot] = id;
+		if (slot === 'ring') eq.ring1 = eq.ring2 = plainItem(id);
+		else eq[slot as EquipmentSlot] = plainItem(id);
 	}
-	if (weapon) eq.mainHand = weapon;
+	if (weapon) eq.mainHand = plainItem(weapon);
 	return eq;
 };
 

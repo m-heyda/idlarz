@@ -7,6 +7,7 @@ import { pickPersisted, type PersistedGame } from '../src/lib/sanitizeSave';
 import { MIGRATIONS, SAVE_PREFIX, SAVE_SCHEMA, decodeSave, encodeSave, migrateBody, packBody, sealWire } from '../src/lib/saveFormat';
 import { createSaveStorage, type KeyValue } from '../src/lib/saveStorage';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import { plainItem } from '../src/lib/itemInstance';
 import { emptyBag } from '../src/lib/inventory';
 import { ownedCount, patchTile, setTile } from '../src/utils/world';
 
@@ -17,12 +18,12 @@ const playedGame = (): PersistedGame => {
 	api().resetGame();
 	growTo(16);
 	const bag = emptyBag();
-	bag[2] = { id: 'rattatui_tunic', qty: 1 };
+	bag[2] = { item: plainItem('rattatui_tunic') };
 	store.setState((s) => {
 		const lots = gridCells(s.tiles).filter(({ t }) => t.isOwned && t.biome !== 'castle');
 		let tiles = setTile(s.tiles, lots[0].x, lots[0].y, { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 });
 		tiles = patchTile(tiles, lots[1].x, lots[1].y, { hasChest: true });
-		return { tiles, activeChests: 1, bag, equipment: { ...STARTER_EQUIPMENT, head: 'rattatui_cap' }, playerName: 'Zoë' } as never;
+		return { tiles, activeChests: 1, bag, equipment: { ...STARTER_EQUIPMENT, head: plainItem('rattatui_cap') }, playerName: 'Zoë' } as never;
 	});
 	api().tick(60_000);
 	return structuredClone(pickPersisted(api()));
@@ -103,7 +104,7 @@ test('migrations upgrade old bodies step by step', () => {
 	assert.equal(decodeSave(v1, { schema: 2, migrations: table }).ok, true);
 	assert.equal(decodeSave(v1, { schema: 2, migrations: {} }).ok, false, 'a missing step is an error, not a guess');
 	assert.deepEqual(migrateBody({ a: 1 }, 1, 3, { 1: (b) => ({ ...b, b: 2 }), 2: (b) => ({ ...b, c: 3 }) }), { a: 1, b: 2, c: 3 });
-	assert.deepEqual(Object.keys(MIGRATIONS), ['1'], 'one step per bump of SAVE_SCHEMA: 1 -> 2 turned the land list into runs');
+	assert.deepEqual(Object.keys(MIGRATIONS), ['1', '2'], 'one step per bump of SAVE_SCHEMA: 1 -> 2 turned the land list into runs, 2 -> 3 the gear ids into item instances');
 });
 
 test('every frozen save in tests/fixtures/saves still loads (the compatibility guard)', async () => {

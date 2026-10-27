@@ -168,7 +168,7 @@ Conservation rule used by the save check: `legacyPoints + Σ shop spending = leg
 
 ```
 maxHp        = round(85 + characterStats.hp + Σ gear maxHp + set bonuses)       COMBAT.baseHp   (101 at the start)
-damage/click = max(1, Σ gear damage + set bonuses)                              Wooden Sword 2 ... Titan Maul 15 (COMBAT.maxItemDamage 16 is a sanity ceiling)
+damage/click = max(1, Σ gear damage + set bonuses)                              Wooden Sword 6 ... Titan Maul 45 at their first level (COMBAT.maxItemDamage 50 caps the authored base damage; gear grows with its item level)
 click        : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
                then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
 fight hits   : not rate limited; trusted real clicks only, one DOM event counts once (lib/hitGuard.ts)
@@ -181,12 +181,14 @@ tier         = min(5, 1 + floor(age / 1800 s))                                  
 rewards      : rewardSec = 90 × 1.5^(t−1)
                gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
-drops        : rat: gear 12 % + 2 % per tier above 1, picked by weight from the catalog's rat pool (common 10, uncommon 4 from T3, rare 1.2 from T5);
+drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> source level -> item level -> rarity -> base -> affixes
+               rat: gear 12 % + 2 % per tier above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
                potion 25 % + 3 % per tier (Greater from T4)                      (tier 1: 90 s of income, tier 5: ~456 s)
-               Rat King: 1 Rattatui piece (missing ones first) + 40 % a second one + 5 % a legendary weapon + 2 Minor and 1 Greater potion
-               chest (item result, 8 % of chests): the chest pool by weight - see generated/item-catalog.md
+               Rat King: 1 item of his own (rolled rarity) + 1 Rattatui piece (missing ones first) + 40 % a second one + 5 % (pity up to 15 %) a legendary weapon + 2 Minor and 1 Greater potion
+               chest (item result, 8 % of chests): one item - gear 82 % (rolled rarity) or a potion, 1.9 % a legendary weapon instead
+item level   : source level = base + steps per tier + 3 per castle level above 1 (rat 1/3/5/7/9, King 12, chest 4, +3 per castle level); gear power x levelScale(level) = 1 + 0.07 x (level - 1)
 spawn        : first rat 120 s after 5 owned tiles, then 900 s; max 8; Rat King check every 600 s of age after tier 5 (7200 s), 35 %
-Rat King     : 5200 HP, attack 14 every 3 s, 75 s limit
+Rat King     : 15600 HP, attack 14 every 3 s, 75 s limit
 ```
 
 The King's numbers were tuned with `npm run fight-sim` (a bot with the real combat rules; tables in [generated/fight-sim.md](generated/fight-sim.md)) and are

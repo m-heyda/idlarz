@@ -13,10 +13,15 @@ const BODY_MAX = 4096;
 export const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 export const fail = (error: string, status: number) => json({ error }, status);
 
-/** The auth service cannot be reached or is not set up: the client treats this as "play without an account", never as "logged out". */
-export const unavailable = () => json({ error: 'Accounts are unavailable right now.', unavailable: true }, 503);
+/**
+ * The auth service cannot be reached or is not set up: the client treats this as "play without an account", never as "logged out".
+ * `reason` tells the two apart: `not_configured` (the server has no Supabase variables: retrying cannot help) or `outage`.
+ */
+export type UnavailableReason = 'not_configured' | 'outage';
+export const unavailable = (reason: UnavailableReason = 'outage') =>
+	json({ error: 'Accounts are unavailable right now.', unavailable: true, reason }, 503);
 
-export const guardConfigured = () => (supabaseConfigured() ? null : unavailable());
+export const guardConfigured = () => (supabaseConfigured() ? null : unavailable('not_configured'));
 
 /** Reads a small JSON body; null when it is missing, too large or not JSON. */
 export const readBody = async (request: Request, maxChars = BODY_MAX): Promise<unknown> => {

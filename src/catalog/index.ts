@@ -10,6 +10,8 @@ export * from './resources';
 export * from './stats';
 export * from './weapons';
 export * from './loot';
+export * from './affixes';
+export * from './lootConfig';
 export type { SetDef } from './sets';
 
 // No prototype: `ITEM_CATALOG['constructor']` must be undefined, or a forged save could name an item that is not one
@@ -38,8 +40,8 @@ export const SETS: Record<string, ArmourSet> = Object.assign(
 /** How many pieces of each set are worn (both rings count). */
 export const setCounts = (equipment: Equipment): Record<string, number> => {
 	const counts: Record<string, number> = {};
-	for (const id of Object.values(equipment)) {
-		const set = id ? ITEM_CATALOG[id]?.set : undefined;
+	for (const item of Object.values(equipment)) {
+		const set = item ? ITEM_CATALOG[item.base]?.set : undefined;
 		if (set && SETS[set]) counts[set] = (counts[set] ?? 0) + 1;
 	}
 	return counts;
@@ -54,8 +56,8 @@ export const setBonusStats = (counts: Record<string, number>): StatTotals => {
 	return sumStats(...blocks);
 };
 
-/** Plain gear: what rats drop, what chests hold and what the merchant sells. (Derived from the items' `drops`.) */
-export const STARTER_EQUIPMENT: Equipment = { mainHand: 'wooden_sword', offHand: 'wooden_shield' };
+/** What a new character wears: the base items worn at their authored level (see `STARTER_EQUIPMENT` in config/itemCatalog for the instances). */
+export const STARTER_EQUIPMENT_IDS: Partial<Record<EquipmentSlot, string>> = { mainHand: 'wooden_sword', offHand: 'wooden_shield' };
 export const STARTER_BAG_ITEMS = [{ id: 'potion_minor', qty: 2 }];
 
 export const EQUIPMENT_LAYOUT: {

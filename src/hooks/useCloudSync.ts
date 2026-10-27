@@ -5,12 +5,14 @@ import { pickPersisted } from '@/lib/sanitizeSave';
 import { exportSaveText, flushSaves } from '@/lib/saveStorage';
 import { pushCloud, readLink, writeLink } from '@/lib/cloudClient';
 import { onSaveEvent } from '@/lib/saveEvents';
-import { createSyncScheduler, type PushOutcome } from '@/lib/syncPolicy';
+import { createSyncScheduler, type PushOutcome, type PushReason } from '@/lib/syncPolicy';
+import { registerCloudSaver } from '@/lib/manualCloudSave';
 
 /**
  * Copies the game to the signed-in account's cloud save (cadence and limits: syncPolicy.ts): shortly after the game starts,
  * soon after a milestone (purchase, castle upgrade, rebirth, level up), every 5 min while idle, and when the tab is hidden
- * or closed. The local save stays the primary copy; a failed upload is retried with backoff.
+ * or closed, and on demand from the menu's "Save game" (registered below, at most once per 10 min, lib/manualCloudSave.ts). The local save
+ * stays the primary copy; a failed upload is retried with backoff.
  * Stops for the session when the account's save moved on elsewhere (409), the server refuses this save, or the login is gone.
  */
 export const useCloudSync = (userId: string | null, active: boolean) => {
@@ -18,11 +20,13 @@ export const useCloudSync = (userId: string | null, active: boolean) => {
 		if (!userId || !active) return;
 		let lastSentPlay = -1;
 
-		const push = async (hiding: boolean): Promise<PushOutcome> => {
+		const push = async (reason: PushReason): Promise<PushOutcome> => {
+			const hiding = reason === 'hide';
+			const manual = reason === 'manual';
 			const link = readLink();
 			if (!link || link.userId !== userId) return 'ok';
 			const state = pickPersisted(useGameStore.getState());
-			if (state.playSeconds === lastSentPlay) return 'ok'; // the game did not run since the last upload (paused or hidden)
+			if (!manual && state.playSeconds === lastSentPlay) return 'ok'; // the game did not run since the last upload (paused or hidden); a manual save always goes out
 			const result = await pushCloud(exportSaveText(state), link.rev, hiding);
 			switch (result.status) {
 				case 'ok':
@@ -47,9 +51,10 @@ export const useCloudSync = (userId: string | null, active: boolean) => {
 			now: () => Date.now(),
 			setTimer: (fn, ms) => setTimeout(fn, ms),
 			clearTimer: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-			push: (reason) => push(reason === 'hide'),
+			push,
 		});
 		scheduler.start();
+		const unregister = registerCloudSaver({ userId, run: () => scheduler.runNow() });
 
 		const offEvents = onSaveEvent(() => {
 			flushSaves(); // the milestone is on disk now, the cloud copy follows after a short settle
@@ -63,6 +68,7 @@ export const useCloudSync = (userId: string | null, active: boolean) => {
 		window.addEventListener('pagehide', onPageHide);
 		return () => {
 			scheduler.stop();
+			unregister();
 			offEvents();
 			document.removeEventListener('visibilitychange', onHide);
 			window.removeEventListener('pagehide', onPageHide);

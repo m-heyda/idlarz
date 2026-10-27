@@ -1,38 +1,54 @@
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, weaponDps, type ItemStats, type StatKey, type StatTotals } from '@/catalog';
-import type { BagSlot, Equipment, EquipmentSlot, ItemDef } from '@/types/game';
+import { resolveItem } from '@/lib/itemInstance';
+import type { BagSlot, Drop, Equipment, EquipmentSlot, ItemDef, ItemInstance } from '@/types/game';
 
 // Pure bag / equipment operations. Nothing here mutates its arguments; every function returns fresh arrays and objects.
+// A bag slot holds one piece of gear (an instance) or a stack of a consumable; equipment holds instances.
 
 export const emptyBag = (): BagSlot[] => Array.from({ length: COMBAT.bagSize }, () => null);
 
 export const starterBag = (): BagSlot[] =>
 	STARTER_BAG_ITEMS.reduce((bag, { id, qty }) => addToBag(bag, id, qty).bag, emptyBag());
 
+/** The gear in a slot, or null (empty slot or a consumable stack). */
+export const gearOf = (slot: BagSlot): ItemInstance | null => (slot && 'item' in slot ? slot.item : null);
+
+/** The consumable stack in a slot, or null. */
+export const stackOf = (slot: BagSlot): { id: string; qty: number } | null => (slot && 'id' in slot ? slot : null);
+
+/** The catalog id of whatever is in the slot: the base of a piece of gear, the id of a stack. */
+export const slotItemId = (slot: BagSlot): string | undefined => (slot && 'item' in slot ? slot.item.base : slot?.id);
+
+/** How many items a slot holds: 1 for gear, the stack size for a consumable. */
+export const slotQty = (slot: BagSlot): number => (slot && 'item' in slot ? 1 : (slot?.qty ?? 0));
+
 const stackMax = (id: string) => ITEM_CATALOG[id]?.stackMax ?? 1;
+
+const copySlot = (slot: BagSlot): BagSlot => (slot ? ('item' in slot ? { item: slot.item } : { ...slot }) : null);
 
 const validIndex = (bag: BagSlot[], index: number) =>
 	Number.isInteger(index) && index >= 0 && index < bag.length;
 
-/** Adds `qty` of an item: tops up existing stacks first, then uses the first empty slots. Whatever does not fit is `overflow`. */
+/** Adds `qty` of a consumable: tops up existing stacks first, then uses the first empty slots. Whatever does not fit is `overflow`. Gear goes in with `addGear`. */
 export const addToBag = (
 	bag: BagSlot[],
 	id: string,
 	qty = 1
 ): { bag: BagSlot[]; added: number; overflow: number } => {
-	const next = bag.map((slot) => (slot ? { ...slot } : null));
-	if (!ITEM_CATALOG[id] || !Number.isInteger(qty) || qty < 1) return { bag: next, added: 0, overflow: Math.max(0, qty) };
+	const next = bag.map(copySlot);
+	const def = ITEM_CATALOG[id];
+	if (!def || def.kind !== 'consumable' || !Number.isInteger(qty) || qty < 1) return { bag: next, added: 0, overflow: Math.max(0, qty) };
 
 	const max = stackMax(id);
 	let left = qty;
-	if (max > 1) {
-		for (const slot of next) {
-			if (left === 0) break;
-			if (slot && slot.id === id && slot.qty < max) {
-				const take = Math.min(max - slot.qty, left);
-				slot.qty += take;
-				left -= take;
-			}
+	for (const slot of next) {
+		if (left === 0) break;
+		const stack = stackOf(slot);
+		if (stack && stack.id === id && stack.qty < max) {
+			const take = Math.min(max - stack.qty, left);
+			stack.qty += take;
+			left -= take;
 		}
 	}
 	for (let i = 0; i < next.length && left > 0; i++) {
@@ -45,21 +61,41 @@ export const addToBag = (
 	return { bag: next, added: qty - left, overflow: left };
 };
 
+/** Puts a piece of gear in the first empty slot; `added` is false when the bag is full. */
+export const addGear = (bag: BagSlot[], item: ItemInstance): { bag: BagSlot[]; added: boolean } => {
+	const next = bag.map(copySlot);
+	const free = next.findIndex((slot) => slot === null);
+	if (free < 0) return { bag: next, added: false };
+	next[free] = { item };
+	return { bag: next, added: true };
+};
+
+/** Adds whatever a drop holds; `overflow` is how many of it did not fit (1 for gear). */
+export const addDrop = (bag: BagSlot[], drop: Drop): { bag: BagSlot[]; overflow: number } => {
+	if (drop.kind === 'gear') {
+		const r = addGear(bag, drop.item);
+		return { bag: r.bag, overflow: r.added ? 0 : 1 };
+	}
+	const r = addToBag(bag, drop.id, drop.qty);
+	return { bag: r.bag, overflow: r.overflow };
+};
+
 export const removeFromBag = (bag: BagSlot[], index: number, qty = 1): BagSlot[] => {
-	const next = bag.map((slot) => (slot ? { ...slot } : null));
+	const next = bag.map(copySlot);
 	const slot = validIndex(next, index) ? next[index] : null;
 	if (!slot) return next;
-	if (slot.qty <= qty) next[index] = null;
-	else slot.qty -= qty;
+	const stack = stackOf(slot);
+	if (!stack || stack.qty <= qty) next[index] = null;
+	else stack.qty -= qty;
 	return next;
 };
 
 /** Swaps two bag slots; two stacks of the same consumable merge up to the stack limit. */
 export const moveSlot = (bag: BagSlot[], from: number, to: number): BagSlot[] => {
-	const next = bag.map((slot) => (slot ? { ...slot } : null));
+	const next = bag.map(copySlot);
 	if (!validIndex(next, from) || !validIndex(next, to) || from === to) return next;
-	const a = next[from];
-	const b = next[to];
+	const a = stackOf(next[from]);
+	const b = stackOf(next[to]);
 	if (a && b && a.id === b.id && stackMax(a.id) > 1) {
 		const max = stackMax(a.id);
 		const total = a.qty + b.qty;
@@ -67,8 +103,9 @@ export const moveSlot = (bag: BagSlot[], from: number, to: number): BagSlot[] =>
 		next[from] = total > max ? { id: a.id, qty: total - max } : null;
 		return next;
 	}
-	next[from] = b;
-	next[to] = a;
+	const held = next[from];
+	next[from] = next[to];
+	next[to] = held;
 	return next;
 };
 
@@ -86,15 +123,15 @@ export const equipFromBag = (
 	index: number
 ): { bag: BagSlot[]; equipment: Equipment } | null => {
 	if (!validIndex(bag, index)) return null;
-	const entry = bag[index];
-	const def = entry ? ITEM_CATALOG[entry.id] : undefined;
+	const item = gearOf(bag[index]);
+	const def = item ? ITEM_CATALOG[item.base] : undefined;
 	const target = def ? targetSlot(def, equipment) : null;
-	if (!entry || !def || !target) return null;
+	if (!item || !def || !target) return null;
 
 	const displaced = equipment[target];
-	const nextBag = bag.map((slot) => (slot ? { ...slot } : null));
-	nextBag[index] = displaced ? { id: displaced, qty: 1 } : null;
-	return { bag: nextBag, equipment: { ...equipment, [target]: entry.id } };
+	const nextBag = bag.map(copySlot);
+	nextBag[index] = displaced ? { item: displaced } : null;
+	return { bag: nextBag, equipment: { ...equipment, [target]: item } };
 };
 
 /** Moves an equipped item into the first free bag slot; null if the slot is empty or the bag is full. */
@@ -103,20 +140,20 @@ export const unequip = (
 	equipment: Equipment,
 	slot: EquipmentSlot
 ): { bag: BagSlot[]; equipment: Equipment } | null => {
-	const id = equipment[slot];
-	if (!id) return null;
+	const item = equipment[slot];
+	if (!item) return null;
 	const free = bag.findIndex((s) => s === null);
 	if (free < 0) return null;
-	const nextBag = bag.map((s) => (s ? { ...s } : null));
-	nextBag[free] = { id, qty: 1 };
+	const nextBag = bag.map(copySlot);
+	nextBag[free] = { item };
 	const nextEquipment = { ...equipment };
 	delete nextEquipment[slot];
 	return { bag: nextBag, equipment: nextEquipment };
 };
 
-/** The one place gear is summed: stats of everything equipped plus the set bonuses reached (all via the catalog's stat table). */
+/** The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached. */
 export const aggregateStats = (equipment: Equipment): StatTotals & { setCount: number } => {
-	const worn = Object.values(equipment).map((id) => (id ? ITEM_CATALOG[id]?.stats : undefined));
+	const worn = Object.values(equipment).map((item) => (item ? resolveItem(item)?.stats : undefined));
 	const counts = setCounts(equipment);
 	const total = sumStats(...worn, setBonusStats(counts));
 	return { ...total, setCount: Math.max(0, ...Object.values(counts)) };
@@ -125,24 +162,24 @@ export const aggregateStats = (equipment: Equipment): StatTotals & { setCount: n
 /** What wearing a piece of gear would change: the slot it takes, what is in it now, and the change of every stat (set bonuses included). */
 export interface ItemComparison {
 	slot: EquipmentSlot;
-	equippedId?: string;
+	equipped?: ItemInstance;
 	/** Only the stats that change; positive is better */
 	deltas: ItemStats;
 }
 
 /** Compares a piece of gear with what is worn in the slot it would take; null for anything that is not gear. */
-export const compareToEquipped = (itemId: string, equipment: Equipment): ItemComparison | null => {
-	const def = ITEM_CATALOG[itemId];
+export const compareToEquipped = (item: ItemInstance, equipment: Equipment): ItemComparison | null => {
+	const def = ITEM_CATALOG[item.base];
 	const slot = def ? targetSlot(def, equipment) : null;
-	if (!def || !slot) return null;
+	if (!def || !slot || !resolveItem(item)) return null;
 	const before = aggregateStats(equipment);
-	const after = aggregateStats({ ...equipment, [slot]: itemId });
+	const after = aggregateStats({ ...equipment, [slot]: item });
 	const deltas: ItemStats = {};
 	for (const key of STAT_KEYS) {
 		const delta = Math.round((after[key] - before[key]) * 100) / 100;
 		if (delta) deltas[key] = delta;
 	}
-	return { slot, equippedId: equipment[slot], deltas };
+	return { slot, equipped: equipment[slot], deltas };
 };
 
 export type StatRowStatus = 'new' | 'lost' | 'up' | 'down' | 'same';
@@ -184,7 +221,7 @@ export interface SwingRow {
 
 export interface DetailedComparison {
 	slot: EquipmentSlot;
-	equippedId?: string;
+	equipped?: ItemInstance;
 	/** The two pieces side by side, stat by stat (own stats only, no set bonuses) */
 	rows: StatRow[];
 	/** The headline stat (weapon damage or armor); its row is also in `rows` */
@@ -208,23 +245,26 @@ export const primaryKeyOf = (def: Pick<ItemDef, 'kind' | 'stats'>): 'damage' | '
  * The hover comparison: the hovered piece against the one worn in its slot, stat by stat with new / lost / up / down,
  * plus the set progress the swap changes. Pure; `compareToEquipped` stays the plain net-delta view.
  */
-export const compareDetailed = (itemId: string, equipment: Equipment): DetailedComparison | null => {
-	const base = compareToEquipped(itemId, equipment);
-	const def = ITEM_CATALOG[itemId];
-	if (!base || !def) return null;
+export const compareDetailed = (item: ItemInstance, equipment: Equipment): DetailedComparison | null => {
+	const base = compareToEquipped(item, equipment);
+	const resolved = resolveItem(item);
+	if (!base || !resolved) return null;
+	const def = resolved.def;
+	const stats = resolved.stats;
 
-	const wornStats = base.equippedId ? ITEM_CATALOG[base.equippedId]?.stats : undefined;
+	const worn = base.equipped ? resolveItem(base.equipped) : null;
+	const wornStats = worn?.stats;
 	const rows: StatRow[] = [];
 	for (const key of STAT_KEYS) {
 		const was = wornStats?.[key] ?? 0;
-		const now = def.stats?.[key] ?? 0;
+		const now = stats[key] ?? 0;
 		if (!was && !now) continue;
 		const delta = round2(now - was);
 		const status: StatRowStatus = !was ? 'new' : !now ? 'lost' : delta > 0 ? 'up' : delta < 0 ? 'down' : 'same';
 		rows.push({ key, was, now, delta, status });
 	}
 
-	const after: Equipment = { ...equipment, [base.slot]: itemId };
+	const after: Equipment = { ...equipment, [base.slot]: item };
 	const before = setCounts(equipment);
 	const next = setCounts(after);
 	const setChanges: SetChange[] = [];
@@ -245,21 +285,21 @@ export const compareDetailed = (itemId: string, equipment: Equipment): DetailedC
 		});
 	}
 
-	const wornDef = base.equippedId ? ITEM_CATALOG[base.equippedId] : undefined;
-	const primaryKey = primaryKeyOf(def);
+	const wornDef = worn?.def;
+	const primaryKey = primaryKeyOf({ kind: def.kind, stats });
 	const primary: PrimaryRow | null = primaryKey
-		? { key: primaryKey, was: wornStats?.[primaryKey] ?? 0, now: def.stats?.[primaryKey] ?? 0, delta: round2((def.stats?.[primaryKey] ?? 0) - (wornStats?.[primaryKey] ?? 0)) }
+		? { key: primaryKey, was: wornStats?.[primaryKey] ?? 0, now: stats[primaryKey] ?? 0, delta: round2((stats[primaryKey] ?? 0) - (wornStats?.[primaryKey] ?? 0)) }
 		: null;
 	let swing: SwingRow | null = null;
 	if (def.kind === 'weapon' && def.attackSpeed) {
 		const wasSpeed = wornDef?.kind === 'weapon' ? (wornDef.attackSpeed ?? 0) : 0;
-		const wasDps = wornDef?.kind === 'weapon' ? weaponDps(wornDef) : 0;
-		const nowDps = weaponDps(def);
+		const wasDps = wornDef?.kind === 'weapon' && wornStats ? weaponDps({ stats: wornStats, attackSpeed: wornDef.attackSpeed }) : 0;
+		const nowDps = weaponDps({ stats, attackSpeed: def.attackSpeed });
 		swing = {
 			speed: { was: wasSpeed, now: def.attackSpeed, delta: round2(def.attackSpeed - wasSpeed) },
 			dps: { was: wasDps, now: nowDps, delta: round2(nowDps - wasDps) },
 		};
 	}
 
-	return { slot: base.slot, equippedId: base.equippedId, rows, primary, swing, setChanges, net: base.deltas, after };
+	return { slot: base.slot, equipped: base.equipped, rows, primary, swing, setChanges, net: base.deltas, after };
 };

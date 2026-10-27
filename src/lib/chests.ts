@@ -1,8 +1,9 @@
 import { CHEST, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
-import { lootPool, pickWeighted } from '@/catalog';
-import { addToBag } from '@/lib/inventory';
+import { addDrop } from '@/lib/inventory';
+import { generateLoot } from '@/lib/loot/generate';
+import { isAutoSold } from '@/lib/loot/autoSell';
 import { isInWard } from '@/lib/castleWard';
-import type { BagSlot, Resources, Tile } from '@/types/game';
+import type { BagSlot, Drop, Resources, Tile } from '@/types/game';
 import { isOwnedAt, ownedRowMajor, type World } from '@/utils/world';
 
 // Treasure chests: where they appear and what is inside. Pure, with an injectable random(), unit-tested in chests.test.ts.
@@ -54,7 +55,7 @@ export type ChestLoot =
 	| { kind: 'boost'; gold: number; minutes: number; goldRate: number; multiplier: number }
 	| { kind: 'bundle'; items: { resource: 'wood' | 'stone' | 'coal' | 'food'; amount: number }[] }
 	| { kind: 'xp'; xp: number; minutes: number }
-	| { kind: 'item'; itemId: string };
+	| { kind: 'item'; drop: Drop };
 
 export interface ChestContext {
 	rates: Resources; // total per-second income (resourceRates.total)
@@ -62,12 +63,13 @@ export interface ChestContext {
 	/** Gold Find of the gear, in %: extra gold from gold and lucky chests */
 	goldFind?: number;
 	bag: BagSlot[];
+	/** The world level (castle level): raises the item level of the chest's loot */
+	castleLevel?: number;
+	/** Gear of this rarity or lower is auto-sold, so a full bag does not turn it into gold first */
+	autoSellUpTo?: string | null;
 }
 
 const between = (random: () => number, [lo, hi]: [number, number]) => lo + random() * (hi - lo);
-
-/** Chest items: whatever the catalog puts in the `chest` pool (the Rattatui set drops only from the Rat King). */
-export const CHEST_ITEMS: string[] = lootPool('chest').map((entry) => entry.id);
 
 /** Relative chances with Luck shifted from plain gold toward the lucky chest and the item. */
 export function rewardWeights(luck: number): Record<keyof typeof CHEST.rewards, number> {
@@ -119,8 +121,11 @@ export function rollChestLoot(ctx: ChestContext, random: () => number = Math.ran
 		return { kind: 'xp', xp: Math.max(CHEST.xp.floor, Math.floor(ctx.rates.xp * minutes * 60)), minutes };
 	}
 	if (kind === 'item') {
-		const itemId = pickWeighted(lootPool('chest'), random);
-		if (itemId && addToBag(ctx.bag, itemId, 1).added === 1) return { kind: 'item', itemId };
+		const result = generateLoot({ sourceId: 'chest', castleLevel: ctx.castleLevel }, random);
+		if (result.warnings.length) console.warn('[loot]', ...result.warnings);
+		const drop = result.drops[0];
+		const sold = drop?.kind === 'gear' && isAutoSold(drop.item, ctx.autoSellUpTo ?? null);
+		if (drop && (sold || addDrop(ctx.bag, drop).overflow === 0)) return { kind: 'item', drop };
 	}
 	return goldLoot(1); // gold, or an item that did not fit in the bag
 }

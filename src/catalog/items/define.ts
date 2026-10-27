@@ -1,6 +1,6 @@
 import type { PixelIconName } from '@/config/pixelIcons';
-import type { DropRule, DropSource, EquipmentRarity, EquipmentSlot, ItemDef, ItemKind, WeaponType } from '@/types/game';
-import { DEFAULT_ITEM_LEVEL, type ItemStats } from '../stats';
+import type { EquipmentRarity, EquipmentSlot, ItemDef, ItemKind, WeaponType } from '@/types/game';
+import { MAX_ITEM_LEVEL, type ItemStats } from '../stats';
 import { RARITIES } from '../rarity';
 import { WEAPON_ATTACK_SPEED } from '../weapons';
 
@@ -24,23 +24,35 @@ const KIND_OF_SLOT: Record<EquipmentSlot | 'ring', ItemKind> = {
 	charm: 'accessory',
 };
 
-/** Where gear of a rarity drops by default: rats give out the common stuff, higher tiers need an older rat, chests are kinder. */
-export const dropsFor = (rarity: EquipmentRarity): Partial<Record<DropSource, DropRule>> => {
-	switch (rarity) {
-		case 'common':
-			return { rat: { weight: 10 }, chest: { weight: 10 } };
-		case 'uncommon':
-			return { rat: { weight: 4, minTier: 3 }, chest: { weight: 5 } };
-		case 'rare':
-			return { rat: { weight: 1.2, minTier: 5 }, chest: { weight: 2 } };
-		case 'legendary':
-			return { chest: { weight: 3 }, ratKing: { weight: 1 } };
-		default:
-			return {}; // epic: the Rattatui set gives its own (Rat King only)
-	}
+/**
+ * The item level window of a material tier. Gear is authored at the window's start (`minItemLevel`) and stronger at higher
+ * levels (catalog/stats `levelScale`). Wood and cloth stop dropping once the game is past them; the rest scale to the cap.
+ * Rat tier 1-5 are source levels 1,3,5,7,9, the Rat King 12 (see catalog/lootConfig), so the old "steel from tier 3,
+ * obsidian from tier 5" gating survives as these windows.
+ */
+export const LEVEL_WINDOW_BY_TIER: Record<number, readonly [number, number]> = {
+	1: [1, 20],
+	2: [4, 50],
+	3: [8, MAX_ITEM_LEVEL],
+	4: [10, MAX_ITEM_LEVEL],
+	5: [3, MAX_ITEM_LEVEL],
 };
 
+/** What affixes and pools match an item by: its category, slot, weapon type and set. */
+const tagsFor = (kind: ItemKind, slot: string, weaponType: WeaponType | undefined, set: string | undefined, named: boolean): string[] => [
+	'gear',
+	kind,
+	slot.toLowerCase(),
+	...(weaponType ? [weaponType] : []),
+	...(set ? [set] : []),
+	...(named ? ['named'] : []),
+];
+
 export interface GearOptions {
+	/** A named item: fixed identity and rarity (always the `rarity` argument), dropped from its `pools` instead of the general pool */
+	named?: boolean;
+	/** Named items: pool ids they belong to */
+	pools?: string[];
 	tier: number;
 	set?: string;
 	description?: string;
@@ -48,13 +60,10 @@ export interface GearOptions {
 	/** Icon name; by default `item_<id>` when `art` is set. Omit both to fall back to the slot silhouette. */
 	icon?: PixelIconName;
 	art?: boolean;
-	/** Overrides the default drops of the rarity (`{}` = does not drop) */
-	drops?: Partial<Record<DropSource, DropRule>>;
 	shop?: number;
 	sellValue?: number;
 	/** Attacks per second of a weapon; by default its weapon type's (see catalog/weapons.ts) */
 	attackSpeed?: number;
-	itemLevel?: number;
 }
 
 export const gear = (
@@ -63,7 +72,7 @@ export const gear = (
 	slot: NonNullable<ItemDef['slot']>,
 	rarity: EquipmentRarity,
 	stats: ItemStats,
-	{ tier, art, icon, sellValue, drops, itemLevel, attackSpeed, ...rest }: GearOptions
+	{ tier, art, icon, sellValue, attackSpeed, named = false, pools, ...rest }: GearOptions
 ): ItemDef => ({
 	id,
 	name,
@@ -71,11 +80,15 @@ export const gear = (
 	slot,
 	rarity,
 	tier,
-	itemLevel: itemLevel ?? DEFAULT_ITEM_LEVEL,
+	generation: named ? 'named' : 'base',
+	tags: tagsFor(KIND_OF_SLOT[slot], slot, rest.weaponType, rest.set, named),
+	minItemLevel: LEVEL_WINDOW_BY_TIER[tier][0],
+	maxItemLevel: LEVEL_WINDOW_BY_TIER[tier][1],
+	...(named ? { fixedRarity: rarity, pools: pools ?? [] } : { allowedRarities: Object.keys(RARITIES) }),
+	poolWeight: named ? 1 : 10,
 	...(KIND_OF_SLOT[slot] === 'weapon' ? { attackSpeed: attackSpeed ?? (rest.weaponType && WEAPON_ATTACK_SPEED[rest.weaponType]) ?? 1 } : {}),
 	stats,
 	sellValue: sellValue ?? RARITIES[rarity].sellValue,
-	drops: drops ?? dropsFor(rarity),
 	...(icon ? { icon } : art ? { icon: `item_${id}` as PixelIconName } : {}),
 	...rest,
 });
