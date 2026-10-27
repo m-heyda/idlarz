@@ -34,8 +34,14 @@ test('shine strips are SHINE_FRAMES frames wide and as tall as their sprite', ()
 	}
 });
 
-test('gems is the rebirth currency: it has an icon but is not a game resource', () => {
-	assert.equal(RESOURCE_PIXEL_ICONS.gems, 'gems');
+test('legacy is the rebirth currency: it has an icon but is not a game resource', () => {
+	assert.equal(RESOURCE_PIXEL_ICONS.legacy, 'legacy');
+	assert.equal('legacy' in INITIAL_RESOURCES, false);
+	assert.ok(SHINE_SHEETS.legacy);
+});
+
+test('gems is the premium currency: the diamond, with a twinkle strip, and not a game resource', () => {
+	assert.equal(RESOURCE_PIXEL_ICONS.gems, 'diamond');
 	assert.equal('gems' in INITIAL_RESOURCES, false);
-	assert.ok(SHINE_SHEETS.gems);
+	assert.equal(SHINE_SHEETS.diamond, 'diamond_shine');
 });

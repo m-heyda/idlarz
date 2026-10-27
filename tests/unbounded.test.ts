@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { api, freshGame, setResources, store, owned } from './helpers';
 import { CASTLE_X, CASTLE_Y, CHEST, RESOURCE_CAP } from '../src/config/gameConfig';
 import { pickPersisted } from '../src/lib/sanitizeSave';
+import { spawnCap } from '../src/lib/spawnLimits';
 import { decodeSave, encodeSave } from '../src/lib/saveFormat';
 import { calculateTileCost, calculateXpGain, economyTiles } from '../src/utils/gameUtils';
 import { COORD_LIMIT, MAX_OWNED_TILES, getTile, isOwnedAt, ownedBounds, ownedCount, setTile } from '../src/utils/world';
@@ -108,7 +109,7 @@ test('chests and monsters spawn on land with negative coordinates, and the game 
 	setResources({ xp: xp * 1.01 });
 	for (let i = 0; i < 40; i++) api().tick(CHEST.intervalSec * 1000);
 	const placed = [...api().tiles.map.entries()].filter(([, t]) => t.hasChest).length;
-	assert.ok(placed > 0 && placed <= CHEST.max, `chests on the map: ${placed}`);
+	assert.ok(placed > 0 && placed <= spawnCap(world, 1), `chests on the map: ${placed}`);
 	assert.equal(api().tiles.stats.chests, placed);
 	assert.ok(api().monsters.length > 0, 'monsters appeared');
 	for (const m of api().monsters) assert.ok(isOwnedAt(api().tiles, m.x, m.y) && getTile(api().tiles, m.x, m.y)?.biome !== 'castle');

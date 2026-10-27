@@ -34,14 +34,14 @@ Pieces: apprentice_tome, cloth_hat, cloth_mantle, cloth_robe, cloth_gloves, clot
 
 - 3 pieces: +3 Armor
 - 6 pieces: +8 Max HP
-- 12 pieces: +4 Armor, +1 Damage
+- 12 pieces: +4 Armor, +3 Damage
 
 Pieces: steel_shield, steel_helm, steel_pauldrons, steel_cuirass, steel_gauntlets, steel_greaves, steel_sabatons, steel_gorget, steel_cloak, steel_ring, steel_charm
 
 ### Obsidian Set (12 slots)
 
 - 3 pieces: +2% Crit Chance
-- 6 pieces: +1 Damage, +2% Crit Chance
+- 6 pieces: +3 Damage, +2% Crit Chance
 - 12 pieces: +3% Super Crit, +5 Armor, +10 Max HP
 
 Pieces: obsidian_aegis, obsidian_helm, obsidian_pauldrons, obsidian_cuirass, obsidian_gauntlets, obsidian_greaves, obsidian_sabatons, obsidian_pendant, obsidian_cloak, obsidian_ring, obsidian_charm
@@ -49,8 +49,8 @@ Pieces: obsidian_aegis, obsidian_helm, obsidian_pauldrons, obsidian_cuirass, obs
 ### Rattatui Set (13 slots)
 
 - 3 pieces: +3 Armor
-- 6 pieces: +1 Damage, +4% Crit Chance, +15 Max HP
-- 13 pieces: +1 Damage, +6% Super Crit, +1.0/s HP Regen, +25 Max HP
+- 6 pieces: +3 Damage, +4% Crit Chance, +15 Max HP
+- 13 pieces: +3 Damage, +6% Super Crit, +1.0/s HP Regen, +25 Max HP
 
 Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, rattatui_trousers, rattatui_boots, rattatui_amulet, rattatui_cloak, rattatui_ring, rattatui_charm, rattatui_fang_blade, rattatui_buckler
 
@@ -58,9 +58,9 @@ Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, ra
 
 | Item | Id | Kind | Tier | Rarity | Stats | Sells | Shop | Drops (weight) |
 |---|---|---|---|---|---|---|---|---|
-| Wooden Sword | `wooden_sword` | weapon (sword) | 1 | Common | +2 Damage | 8 |  | rat (10), chest (10) |
-| Wooden Club | `wooden_club` | weapon (mace) | 1 | Common | +3 Damage | 8 |  | rat (10), chest (10) |
-| Hunting Bow | `hunting_bow` | weapon (bow) | 1 | Common | +2 Damage, +6% Crit Chance | 8 |  | rat (10), chest (10) |
+| Wooden Sword | `wooden_sword` | weapon (sword) | 1 | Common | +6 Damage | 8 |  | rat (10), chest (10) |
+| Wooden Club | `wooden_club` | weapon (mace) | 1 | Common | +9 Damage | 8 |  | rat (10), chest (10) |
+| Hunting Bow | `hunting_bow` | weapon (bow) | 1 | Common | +6 Damage, +6% Crit Chance | 8 |  | rat (10), chest (10) |
 | Wooden Shield | `wooden_shield` | offhand (shield) | 1 | Common | +2 Armor | 8 |  | rat (10), chest (10) |
 | Leather Cap | `leather_cap` | armor | 1 | Common | +1 Armor, +2 Max HP | 8 |  | rat (10), chest (10) |
 | Leather Pauldrons | `leather_pauldrons` | armor | 1 | Common | +1 Armor, +2 Max HP | 8 |  | rat (10), chest (10) |
@@ -68,14 +68,14 @@ Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, ra
 | Leather Gloves | `leather_gloves` | armor | 1 | Common | +1 Armor, +1 Max HP | 8 |  | rat (10), chest (10) |
 | Leather Leggings | `leather_leggings` | armor | 1 | Common | +2 Armor, +3 Max HP | 8 |  | rat (10), chest (10) |
 | Leather Boots | `leather_boots` | armor | 1 | Common | +1 Armor, +2 Max HP | 8 |  | rat (10), chest (10) |
-| Wooden Pendant | `wooden_pendant` | accessory | 1 | Common | +3 Max HP | 8 |  | rat (10), chest (10) |
-| Leather Cloak | `leather_cloak` | accessory | 1 | Common | +1 Armor, +2 Max HP | 8 |  | rat (10), chest (10) |
+| Wooden Pendant | `wooden_pendant` | accessory | 1 | Common | +3 Max HP, +2% Gold Find | 8 |  | rat (10), chest (10) |
+| Leather Cloak | `leather_cloak` | accessory | 1 | Common | +1 Armor, +2 Max HP, +1.0% Dodge | 8 |  | rat (10), chest (10) |
 | Wooden Ring | `wooden_ring` | accessory | 1 | Common | +2 Max HP | 8 |  | rat (10), chest (10) |
 | Acorn Charm | `acorn_charm` | accessory | 1 | Common | +3 Max HP, +1 Luck | 8 |  | rat (10), chest (10) |
 | Minor Healing Potion | `potion_minor` | consumable | 0 | Common | heals 35 HP | 20 | 80 | rat (4), ratKing x2 (1), chest (60) |
 | Greater Healing Potion | `potion_greater` | consumable | 0 | Uncommon | heals 90 HP | 90 | 360 | rat@T4+ (1), ratKing x1 (1), chest (25) |
-| Oak Staff | `oak_staff` | weapon (staff) | 1 | Common | +1 Damage, +0.5/s HP Regen, +2 Luck | 8 |  | rat (10), chest (10) |
-| Apprentice Wand | `apprentice_wand` | weapon (wand) | 1 | Common | +1 Damage, +4% Crit Chance, +2 Luck | 8 |  | rat (10), chest (10) |
+| Oak Staff | `oak_staff` | weapon (staff) | 1 | Common | +3 Damage, +0.5/s HP Regen, +2 Luck | 8 |  | rat (10), chest (10) |
+| Apprentice Wand | `apprentice_wand` | weapon (wand) | 1 | Common | +3 Damage, +4% Crit Chance, +2 Luck | 8 |  | rat (10), chest (10) |
 | Apprentice Tome | `apprentice_tome` | offhand (tome) | 1 | Common | +6 Max HP, +0.3/s HP Regen | 8 |  | rat (10), chest (10) |
 | Apprentice Hat | `cloth_hat` | armor | 1 | Common | +4 Max HP, +1 Luck | 8 |  | rat (10), chest (10) |
 | Linen Mantle | `cloth_mantle` | armor | 1 | Common | +1 Armor, +3 Max HP | 8 |  | rat (10), chest (10) |
@@ -83,16 +83,16 @@ Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, ra
 | Linen Gloves | `cloth_gloves` | armor | 1 | Common | +2 Max HP, +1% Crit Chance | 8 |  | rat (10), chest (10) |
 | Apprentice Trousers | `cloth_trousers` | armor | 1 | Common | +1 Armor, +4 Max HP | 8 |  | rat (10), chest (10) |
 | Apprentice Slippers | `cloth_slippers` | armor | 1 | Common | +3 Max HP, +0.2/s HP Regen | 8 |  | rat (10), chest (10) |
-| Apprentice Amulet | `cloth_amulet` | accessory | 1 | Common | +4 Max HP, +1 Luck | 8 |  | rat (10), chest (10) |
-| Apprentice Cape | `cloth_cape` | accessory | 1 | Common | +1 Armor, +3 Max HP | 8 |  | rat (10), chest (10) |
+| Apprentice Amulet | `cloth_amulet` | accessory | 1 | Common | +4 Max HP, +1 Luck, +2% Gold Find | 8 |  | rat (10), chest (10) |
+| Apprentice Cape | `cloth_cape` | accessory | 1 | Common | +1 Armor, +3 Max HP, +1.0% Dodge | 8 |  | rat (10), chest (10) |
 | Apprentice Ring | `cloth_ring` | accessory | 1 | Common | +2 Max HP, +1% Crit Chance | 8 |  | rat (10), chest (10) |
 | Apprentice Charm | `cloth_charm` | accessory | 1 | Common | +3 Max HP, +1 Luck, +0.2/s HP Regen | 8 |  | rat (10), chest (10) |
-| Iron Sword | `iron_sword` | weapon (sword) | 2 | Uncommon | +4 Damage | 90 | 6000 | rat@T3+ (4), chest (5) |
-| Steel Mace | `steel_mace` | weapon (mace) | 2 | Uncommon | +6 Damage | 90 |  | rat@T3+ (4), chest (5) |
-| Battle Axe | `battle_axe` | weapon (axe) | 2 | Uncommon | +5 Damage, +3% Crit Chance | 90 |  | rat@T3+ (4), chest (5) |
-| Steel Dagger | `steel_dagger` | weapon (dagger) | 2 | Uncommon | +3 Damage, +10% Crit Chance | 90 |  | rat@T3+ (4), chest (5) |
-| Steel Spear | `steel_spear` | weapon (spear) | 2 | Uncommon | +4 Damage, +2 Armor | 90 |  | rat@T3+ (4), chest (5) |
-| Recurve Bow | `recurve_bow` | weapon (bow) | 2 | Uncommon | +3 Damage, +12% Crit Chance | 90 |  | rat@T3+ (4), chest (5) |
+| Iron Sword | `iron_sword` | weapon (sword) | 2 | Uncommon | +12 Damage | 90 | 6000 | rat@T3+ (4), chest (5) |
+| Steel Mace | `steel_mace` | weapon (mace) | 2 | Uncommon | +18 Damage | 90 |  | rat@T3+ (4), chest (5) |
+| Battle Axe | `battle_axe` | weapon (axe) | 2 | Uncommon | +15 Damage, +3% Crit Chance | 90 |  | rat@T3+ (4), chest (5) |
+| Steel Dagger | `steel_dagger` | weapon (dagger) | 2 | Uncommon | +9 Damage, +10% Crit Chance | 90 |  | rat@T3+ (4), chest (5) |
+| Steel Spear | `steel_spear` | weapon (spear) | 2 | Uncommon | +12 Damage, +2 Armor | 90 |  | rat@T3+ (4), chest (5) |
+| Recurve Bow | `recurve_bow` | weapon (bow) | 2 | Uncommon | +9 Damage, +12% Crit Chance | 90 |  | rat@T3+ (4), chest (5) |
 | Steel Shield | `steel_shield` | offhand (shield) | 2 | Uncommon | +8 Armor, +2 Max HP | 90 | 6500 | rat@T3+ (4), chest (5) |
 | Steel Helm | `steel_helm` | armor | 2 | Uncommon | +4 Armor, +3 Max HP | 90 | 4500 | rat@T3+ (4), chest (5) |
 | Steel Pauldrons | `steel_pauldrons` | armor | 2 | Uncommon | +3 Armor, +3 Max HP | 90 |  | rat@T3+ (4), chest (5) |
@@ -100,16 +100,16 @@ Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, ra
 | Steel Gauntlets | `steel_gauntlets` | armor | 2 | Uncommon | +2 Armor, +2 Max HP | 90 | 3500 | rat@T3+ (4), chest (5) |
 | Steel Greaves | `steel_greaves` | armor | 2 | Uncommon | +5 Armor, +4 Max HP | 90 | 7000 | rat@T3+ (4), chest (5) |
 | Steel Sabatons | `steel_sabatons` | armor | 2 | Uncommon | +3 Armor, +2 Max HP | 90 | 3500 | rat@T3+ (4), chest (5) |
-| Steel Gorget | `steel_gorget` | accessory | 2 | Uncommon | +1 Armor, +5 Max HP | 90 |  | rat@T3+ (4), chest (5) |
-| Knight's Cloak | `steel_cloak` | accessory | 2 | Uncommon | +2 Armor, +3 Max HP | 90 |  | rat@T3+ (4), chest (5) |
+| Steel Gorget | `steel_gorget` | accessory | 2 | Uncommon | +1 Armor, +5 Max HP, +4% Gold Find | 90 |  | rat@T3+ (4), chest (5) |
+| Knight's Cloak | `steel_cloak` | accessory | 2 | Uncommon | +2 Armor, +3 Max HP, +1.5% Dodge | 90 |  | rat@T3+ (4), chest (5) |
 | Steel Ring | `steel_ring` | accessory | 2 | Uncommon | +4 Max HP | 90 |  | rat@T3+ (4), chest (5) |
 | Steel Charm | `steel_charm` | accessory | 2 | Uncommon | +1 Armor, +4 Max HP | 90 |  | rat@T3+ (4), chest (5) |
-| Obsidian Blade | `obsidian_blade` | weapon (sword) | 3 | Rare | +6 Damage, +5% Crit Chance | 250 |  | rat@T5+ (1.2), chest (2) |
-| Obsidian Maul | `obsidian_maul` | weapon (maul) | 3 | Rare | +9 Damage | 250 |  | rat@T5+ (1.2), chest (2) |
-| Obsidian Longbow | `obsidian_longbow` | weapon (bow) | 3 | Rare | +5 Damage, +15% Crit Chance, +3% Super Crit | 250 |  | rat@T5+ (1.2), chest (2) |
-| Obsidian Crossbow | `obsidian_crossbow` | weapon (crossbow) | 3 | Rare | +6 Damage, +12% Crit Chance, +5% Super Crit | 250 |  | rat@T5+ (1.2), chest (2) |
-| Obsidian Kris | `obsidian_kris` | weapon (dagger) | 3 | Rare | +4 Damage, +14% Crit Chance, +4% Super Crit, +3 Luck | 250 |  | rat@T5+ (1.2), chest (2) |
-| Obsidian Staff | `obsidian_staff` | weapon (staff) | 3 | Rare | +3 Damage, +1.5/s HP Regen, +5 Luck | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Blade | `obsidian_blade` | weapon (sword) | 3 | Rare | +18 Damage, +5% Crit Chance | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Maul | `obsidian_maul` | weapon (maul) | 3 | Rare | +27 Damage | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Longbow | `obsidian_longbow` | weapon (bow) | 3 | Rare | +15 Damage, +15% Crit Chance, +3% Super Crit | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Crossbow | `obsidian_crossbow` | weapon (crossbow) | 3 | Rare | +18 Damage, +12% Crit Chance, +5% Super Crit | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Kris | `obsidian_kris` | weapon (dagger) | 3 | Rare | +12 Damage, +14% Crit Chance, +4% Super Crit, +3 Luck | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Staff | `obsidian_staff` | weapon (staff) | 3 | Rare | +9 Damage, +1.5/s HP Regen, +5 Luck | 250 |  | rat@T5+ (1.2), chest (2) |
 | Obsidian Aegis | `obsidian_aegis` | offhand (shield) | 3 | Rare | +11 Armor, +12 Max HP | 250 |  | rat@T5+ (1.2), chest (2) |
 | Obsidian Helm | `obsidian_helm` | armor | 3 | Rare | +6 Armor, +6 Max HP | 250 |  | rat@T5+ (1.2), chest (2) |
 | Obsidian Pauldrons | `obsidian_pauldrons` | armor | 3 | Rare | +5 Armor, +5 Max HP | 250 |  | rat@T5+ (1.2), chest (2) |
@@ -117,8 +117,8 @@ Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, ra
 | Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | Rare | +3 Armor, +3 Max HP, +1.5% Crit Chance | 250 |  | rat@T5+ (1.2), chest (2) |
 | Obsidian Greaves | `obsidian_greaves` | armor | 3 | Rare | +7 Armor, +8 Max HP | 250 |  | rat@T5+ (1.2), chest (2) |
 | Obsidian Sabatons | `obsidian_sabatons` | armor | 3 | Rare | +4 Armor, +4 Max HP | 250 |  | rat@T5+ (1.2), chest (2) |
-| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | Rare | +2 Armor, +8 Max HP, +1.5% Crit Chance | 250 |  | rat@T5+ (1.2), chest (2) |
-| Obsidian Cloak | `obsidian_cloak` | accessory | 3 | Rare | +3 Armor, +5 Max HP | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | Rare | +2 Armor, +8 Max HP, +1.5% Crit Chance, +6% Gold Find | 250 |  | rat@T5+ (1.2), chest (2) |
+| Obsidian Cloak | `obsidian_cloak` | accessory | 3 | Rare | +3 Armor, +5 Max HP, +2.0% Dodge | 250 |  | rat@T5+ (1.2), chest (2) |
 | Obsidian Ring | `obsidian_ring` | accessory | 3 | Rare | +6 Max HP, +1.5% Crit Chance | 250 |  | rat@T5+ (1.2), chest (2) |
 | Obsidian Charm | `obsidian_charm` | accessory | 3 | Rare | +1 Armor, +7 Max HP, +1% Super Crit | 250 |  | rat@T5+ (1.2), chest (2) |
 | Rattatui Cap | `rattatui_cap` | armor | 4 | Epic | +6 Armor, +8 Max HP | 700 |  | ratKing (1) |
@@ -127,15 +127,15 @@ Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, ra
 | Rattatui Gloves | `rattatui_gloves` | armor | 4 | Epic | +4 Armor, +5 Max HP, +1% Crit Chance | 700 |  | ratKing (1) |
 | Rattatui Trousers | `rattatui_trousers` | armor | 4 | Epic | +8 Armor, +10 Max HP | 700 |  | ratKing (1) |
 | Rattatui Boots | `rattatui_boots` | armor | 4 | Epic | +5 Armor, +6 Max HP, +0.3/s HP Regen | 700 |  | ratKing (1) |
-| Rattatui Amulet | `rattatui_amulet` | accessory | 4 | Epic | +2 Armor, +14 Max HP, +2% Crit Chance | 700 |  | ratKing (1) |
-| Rattatui Cloak | `rattatui_cloak` | accessory | 4 | Epic | +4 Armor, +6 Max HP, +0.5/s HP Regen | 700 |  | ratKing (1) |
+| Rattatui Amulet | `rattatui_amulet` | accessory | 4 | Epic | +2 Armor, +14 Max HP, +2% Crit Chance, +9% Gold Find | 700 |  | ratKing (1) |
+| Rattatui Cloak | `rattatui_cloak` | accessory | 4 | Epic | +4 Armor, +6 Max HP, +0.5/s HP Regen, +3.0% Dodge | 700 |  | ratKing (1) |
 | Rattatui Ring | `rattatui_ring` | accessory | 4 | Epic | +10 Max HP, +2% Crit Chance | 700 |  | ratKing (1) |
 | Rattatui Charm | `rattatui_charm` | accessory | 4 | Epic | +3 Armor, +16 Max HP, +2% Super Crit, +2 Luck | 700 |  | ratKing (1) |
-| Rattatui Fang Blade | `rattatui_fang_blade` | weapon (sword) | 4 | Epic | +8 Damage, +8% Crit Chance, +4% Super Crit | 700 |  | ratKing (1) |
+| Rattatui Fang Blade | `rattatui_fang_blade` | weapon (sword) | 4 | Epic | +24 Damage, +8% Crit Chance, +4% Super Crit | 700 |  | ratKing (1) |
 | Rattatui Buckler | `rattatui_buckler` | offhand (shield) | 4 | Epic | +12 Armor, +20 Max HP | 700 |  | ratKing (1) |
-| Emberbrand | `emberbrand` | weapon (sword) | 5 | Legendary | +11 Damage, +10% Crit Chance, +8% Super Crit | 2000 |  | chest (3), ratKing (1) |
-| Starfall Bow | `starfall_bow` | weapon (bow) | 5 | Legendary | +8 Damage, +20% Crit Chance, +10% Super Crit | 2000 |  | chest (3), ratKing (1) |
-| Titan Maul | `titan_maul` | weapon (maul) | 5 | Legendary | +15 Damage, +4% Crit Chance, +6% Super Crit | 2000 |  | chest (3), ratKing (1) |
+| Emberbrand | `emberbrand` | weapon (sword) | 5 | Legendary | +33 Damage, +10% Crit Chance, +8% Super Crit | 2000 |  | chest (3), ratKing (1) |
+| Starfall Bow | `starfall_bow` | weapon (bow) | 5 | Legendary | +24 Damage, +20% Crit Chance, +10% Super Crit | 2000 |  | chest (3), ratKing (1) |
+| Titan Maul | `titan_maul` | weapon (maul) | 5 | Legendary | +45 Damage, +4% Crit Chance, +6% Super Crit | 2000 |  | chest (3), ratKing (1) |
 
 ## Loot pools
 
@@ -172,4 +172,5 @@ Pieces: rattatui_cap, rattatui_shoulderpads, rattatui_tunic, rattatui_gloves, ra
 | `milk` | Milk | 4 | Cows on the farm. Cannot be bought. |
 | `hide` | Hide | 6 | Deer and pigs on the farm. Cannot be bought. |
 | `xp` | XP |  | The castle, buying tiles and your stats. |
-| `gems` | Gems |  | Rebirthing from castle level 6: the higher your castle and income, the more you get. |
+| `legacy` | Legacy |  | Rebirthing from castle level 6: the higher your castle and income, the more you get. |
+| `gems` | Gems |  | Your starting purse; more ways to earn them are coming. |

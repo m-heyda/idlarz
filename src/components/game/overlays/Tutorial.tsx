@@ -14,6 +14,7 @@ import {
 	CHEST,
 	LEGACY_UPGRADES,
 	REBIRTH,
+	SPAWN_LIMIT,
 	CLICK_LADDER,
 	CLICK_LIMIT,
 	FARM_BONUS,
@@ -210,8 +211,8 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Monsters &amp; Fighting</h3>
 				<p className='text-[#d8c8a0] mb-2'>
 					Once you own {COMBAT.spawn.minOwnedTiles} tiles, a <b>rat</b> appears on one of them after{' '}
-					{formatTime(COMBAT.spawn.firstSec)}, then another every {formatTime(COMBAT.spawn.intervalSec)} (up to{' '}
-					{COMBAT.maxMonsters} on the map). A rat grows a tier every {formatTime(COMBAT.tierIntervalSec)} on the map (up to tier{' '}
+					{formatTime(COMBAT.spawn.firstSec)}, then another every {formatTime(COMBAT.spawn.intervalSec)} (monsters
+					and chests together never fill more than {pct(SPAWN_LIMIT.maxFraction)} of your free land). A rat grows a tier every {formatTime(COMBAT.tierIntervalSec)} on the map (up to tier{' '}
 					{COMBAT.maxTier}): more HP ({MONSTERS.rat.hp} at tier 1, x{MONSTERS.rat.hpGrowth} per tier), harder hits and better rewards. A tier-{COMBAT.maxTier} rat
 					can grow into the <b>Rat King</b> ({pct(MONSTERS.ratKing.evolveChance)} every {formatTime(MONSTERS.ratKing.evolveCheckSec)}; only one at a time).
 					Click a monster to fight it. Right-click it for <b>Dismiss</b>: after a confirmation the monster is removed from the map with
@@ -278,7 +279,7 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0]'>
 					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles you can
 					Rebirth from the Legacy window: the map, resources, castle, farm and level start again, and you keep your name,
-					hero and Gems. Every Gem is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
+					hero and Legacy. Every point is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
 					the shop ({Object.values(LEGACY_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
 					at the moment of rebirth give more points, so pushing on to level {CASTLE_UPGRADE.maxLevel} first pays.
 				</p>
@@ -335,7 +336,7 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Chests</h3>
 				<p className='text-[#d8c8a0]'>
-					A chest appears on one of your tiles every {formatTime(CHEST.intervalSec)} (up to {CHEST.max} wait for you).
+					A chest appears on one of your tiles every {formatTime(CHEST.intervalSec)} (while there is room: they share {pct(SPAWN_LIMIT.maxFraction)} of your free land with the monsters).
 					Click it to open it: usually {CHEST.minMinutes}-{CHEST.maxMinutes} minutes&apos; worth of your passive gold
 					income, sometimes a lucky x{CHEST.boostMultiplier} chest, a bundle of wood, stone, coal or food, a burst of XP, or
 					even a piece of gear. Chests like the edge of your land. Each point of Luck (from Charisma) adds

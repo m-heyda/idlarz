@@ -49,8 +49,8 @@ test('no loadout trivialises the king: even the best gear at 25 clicks per secon
 	assert.ok(sim(best, 25).meanTimeSec >= 6, `${sim(best, 25).meanTimeSec} s`);
 });
 
-test('rats are basic enemies: a tier-1 rat falls to the starter kit at a normal pace, a tier-5 rat is out of its league', () => {
-	assert.equal(sim(STARTER_EQUIPMENT, 7, { type: 'rat', tier: 1 }).winRate, 1);
-	assert.ok(sim(STARTER_EQUIPMENT, 4, { type: 'rat', tier: 5 }).winRate < 0.5);
+test('rats are basic enemies: a tier-1 rat falls to the starter kit even at a slow pace, a tier-5 rat still beats a slow clicker', () => {
+	assert.equal(sim(STARTER_EQUIPMENT, 2, { type: 'rat', tier: 1 }).winRate, 1);
+	assert.ok(sim(STARTER_EQUIPMENT, 1, { type: 'rat', tier: 5 }).winRate < 0.5);
 	assert.equal(sim(RATTATUI, 4, { type: 'rat', tier: 5 }).winRate, 1);
 });

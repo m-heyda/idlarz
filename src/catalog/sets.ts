@@ -25,16 +25,16 @@ export const SET_DEFS: SetDef[] = [
 	{
 		id: 'knight',
 		label: "Knight's Set",
-		bonuses: { 3: { armor: 3 }, 6: { maxHp: 8 }, 12: { armor: 4, damage: 1 } },
+		bonuses: { 3: { armor: 3 }, 6: { maxHp: 8 }, 12: { armor: 4, damage: 3 } },
 	},
 	{
 		id: 'obsidian',
 		label: 'Obsidian Set',
-		bonuses: { 3: { critChance: 2 }, 6: { damage: 1, critChance: 2 }, 12: { superCrit: 3, armor: 5, maxHp: 10 } },
+		bonuses: { 3: { critChance: 2 }, 6: { damage: 3, critChance: 2 }, 12: { superCrit: 3, armor: 5, maxHp: 10 } },
 	},
 	{
 		id: 'rattatui',
 		label: 'Rattatui Set',
-		bonuses: { 3: { armor: 3 }, 6: { damage: 1, critChance: 4, maxHp: 15 }, 13: { damage: 1, superCrit: 6, regen: 1, maxHp: 25 } },
+		bonuses: { 3: { armor: 3 }, 6: { damage: 3, critChance: 4, maxHp: 15 }, 13: { damage: 3, superCrit: 6, regen: 1, maxHp: 25 } },
 	},
 ];

@@ -149,8 +149,8 @@ test('moveSlot merges stacks and swaps others', () => {
 	assert.deepEqual(moveSlot(bag, 0, 99), bag);
 });
 
-test('aggregateStats sums the starter kit to damage 2 armor 2', () => {
-	assert.deepEqual(aggregateStats(STARTER_EQUIPMENT), { ...emptyStats(), damage: 2, armor: 2, setCount: 1 }); // the shield is a Woodland Set piece
+test('aggregateStats sums the starter kit to damage 6 armor 2', () => {
+	assert.deepEqual(aggregateStats(STARTER_EQUIPMENT), { ...emptyStats(), damage: 6, armor: 2, setCount: 1 }); // the shield is a Woodland Set piece
 	assert.deepEqual(aggregateStats({}), { ...emptyStats(), setCount: 0 });
 });
 
@@ -286,4 +286,19 @@ test('compareDetailed reports the set tiers a swap switches on and off', () => {
 	assert.equal(change.to, lowest);
 	assert.deepEqual(change.gained.map((t) => t.count), [lowest]);
 	assert.equal(change.lost.length, 0);
+});
+
+test('compareDetailed gives the headline stat, attack speed and DPS of a weapon against the worn one', () => {
+	const cmp = compareDetailed('iron_sword', STARTER_EQUIPMENT)!;
+	assert.deepEqual(cmp.primary, { key: 'damage', was: 6, now: 12, delta: 6 });
+	assert.equal(cmp.swing?.speed.now, ITEM_CATALOG.iron_sword.attackSpeed);
+	assert.equal(cmp.swing?.speed.was, ITEM_CATALOG.wooden_sword.attackSpeed);
+	assert.equal(cmp.swing?.dps.delta, Math.round((12 * 1.2 - 6 * 1.2) * 100) / 100);
+});
+
+test('compareDetailed: armor pieces headline armor, jewellery has no headline, an empty slot compares against nothing', () => {
+	assert.equal(compareDetailed('steel_helm', {})?.primary?.key, 'armor');
+	assert.equal(compareDetailed('steel_helm', {})?.primary?.was, 0);
+	assert.equal(compareDetailed('steel_ring', {})?.primary, null);
+	assert.equal(compareDetailed('steel_helm', {})?.swing, null);
 });

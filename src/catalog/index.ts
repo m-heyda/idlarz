@@ -8,6 +8,7 @@ export { ITEMS } from './items';
 export * from './rarity';
 export * from './resources';
 export * from './stats';
+export * from './weapons';
 export * from './loot';
 export type { SetDef } from './sets';
 

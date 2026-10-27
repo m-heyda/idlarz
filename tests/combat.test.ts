@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyHit, armorOf, critOdds, damagePerClick, maxHp, mitigate, newFight, regen, rollHit, stepFight } from '../src/lib/combat';
+import { applyHit, armorOf, critOdds, damagePerClick, dodgeChance, maxHp, mitigate, newFight, regen, rollHit, stepFight } from '../src/lib/combat';
 import { monsterStats } from '../src/lib/monsters';
 import { INITIAL_CHARACTER_STATS } from '../src/config/gameConfig';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
@@ -26,8 +26,8 @@ test('maxHp includes gear and set bonuses', () => {
 	assert.equal(maxHp(freshStats(), { chest: 'rattatui_tunic' }), 101 + ITEM_CATALOG.rattatui_tunic.stats!.maxHp!);
 });
 
-test('damagePerClick is 2 with the wooden sword, 1 without a weapon, 3 with the fang blade', () => {
-	assert.equal(damagePerClick(STARTER_EQUIPMENT), 2);
+test('damagePerClick is 6 with the wooden sword, 1 without a weapon, 3 with the fang blade', () => {
+	assert.equal(damagePerClick(STARTER_EQUIPMENT), 6);
 	assert.equal(damagePerClick({}), 1);
 	assert.equal(damagePerClick({ mainHand: 'rattatui_fang_blade' }), ITEM_CATALOG.rattatui_fang_blade.stats!.damage);
 });
@@ -172,9 +172,9 @@ test('fight hits are not tied to CLICK_LIMIT: crit odds add the character and th
 test('rollHit: low roll is a plain hit, high roll crits, and a second high roll is a super crit', () => {
 	const stats = freshStats();
 	const seq = (...r: number[]) => () => r.shift() ?? 0;
-	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0)), { damage: 2, crit: 'none' });
-	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0.999, 0)), { damage: 2 * COMBAT.crit.mult, crit: 'crit' });
-	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0.999, 0.999)), { damage: 2 * COMBAT.crit.superMult, crit: 'super' });
+	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0)), { damage: 6, crit: 'none' });
+	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0.999, 0)), { damage: 6 * COMBAT.crit.mult, crit: 'crit' });
+	assert.deepEqual(rollHit(stats, STARTER_EQUIPMENT, seq(0.999, 0.999)), { damage: 6 * COMBAT.crit.superMult, crit: 'super' });
 });
 
 test('gear regen heals outside fights on top of the base rate, and inside fights too', () => {
@@ -184,4 +184,23 @@ test('gear regen heals outside fights on top of the base rate, and inside fights
 	const healed = stepFight(f, 1, 50, 0, noRng, { perSec: 2, max: 101 });
 	assert.equal(healed.playerHp, hurt.playerHp + 2);
 	assert.equal(stepFight(f, 1, 100.5, 0, noRng, { perSec: 5, max: 101 }).playerHp <= 101, true);
+});
+
+test('dodge: a high roll avoids a monster hit, a low roll does not, and no dodge never rolls', () => {
+	const f = rat();
+	const hitAfter = (dodge: number, roll: number) => stepFight({ ...f, attackTimer: 1.99 }, 0.02, 100, 0, () => roll, undefined, dodge);
+	const hurt = hitAfter(0.3, 0); // a low roll never dodges
+	assert.equal(hurt.events[0].kind, 'hurt');
+	const dodged = hitAfter(0.3, 0.9);
+	assert.deepEqual(dodged.events, [{ kind: 'dodged' }]);
+	assert.equal(dodged.playerHp, 100);
+	let calls = 0;
+	stepFight({ ...f, attackTimer: 1.99 }, 0.02, 100, 0, () => (calls++, 0.99));
+	assert.equal(calls, 0, 'without dodge the rng is untouched');
+});
+
+test('dodgeChance reads the gear and is capped', () => {
+	assert.equal(dodgeChance({}), 0);
+	assert.equal(dodgeChance({ cape: 'rattatui_cloak' }), ITEM_CATALOG.rattatui_cloak.stats!.dodge! / 100);
+	assert.ok(dodgeChance(fullSet('rattatui')) <= COMBAT.maxDodge / 100);
 });

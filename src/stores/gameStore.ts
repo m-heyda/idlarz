@@ -11,6 +11,7 @@ import {
 	AMBIENT_LIFE,
 	CASTLE_UPGRADE,
 	CHEST,
+	STARTING_GEMS,
 	FARM_BONUS,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
@@ -70,10 +71,11 @@ import { rollBiome } from '@/utils/biomeRules';
 import { pickChestSpot, rollChestLoot, type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
 import { createHitGuard } from '@/lib/hitGuard';
-import { applyHit, armorOf, maxHp, newFight, regen, rollHit, stepFight } from '@/lib/combat';
+import { applyHit, armorOf, dodgeChance, maxHp, newFight, regen, rollHit, stepFight } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
 import { addToBag, aggregateStats, equipFromBag, moveSlot, removeFromBag, starterBag, unequip } from '@/lib/inventory';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
+import { canSpawn } from '@/lib/spawnLimits';
 import { rollKillLoot } from '@/lib/loot';
 import { advanceMonsters, monsterAt, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
@@ -160,6 +162,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		playSeconds: 0,
 		chestSpawnTimer: 0,
 		activeChests: 0,
+		gems: STARTING_GEMS,
 		lastChestLoot: null as ChestLoot | null, // what the last chest held (transient: only drives the toast)
 	};
 };
@@ -250,6 +253,7 @@ const createGameSlice = (
 				// gear is character progression: it survives a rebirth (HP is refilled)
 				equipment: state.equipment,
 				bag: state.bag,
+				gems: state.gems, // the premium currency survives a rebirth
 				// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
 				merchantUpgrades: state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {},
 				playerHp: maxHp(fresh.characterStats, state.equipment),
@@ -431,7 +435,7 @@ const createGameSlice = (
 			const tile = getTile(state.tiles, x, y);
 			if (!tile || !tile.hasChest) return false;
 
-			const loot = rollChestLoot({ rates: state.resourceRates.total, luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck, bag: state.bag });
+			const loot = rollChestLoot({ rates: state.resourceRates.total, luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck, goldFind: aggregateStats(state.equipment).goldFind, bag: state.bag });
 
 			const newTiles = setTile(state.tiles, x, y, { ...tile, hasChest: false });
 
@@ -522,6 +526,7 @@ const createGameSlice = (
 					goldPerSec: rates.gold,
 					xpPerSec: rates.xp * (1 + state.characterStats.xpGainMultiplier / 100),
 					luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck,
+					goldFind: aggregateStats(state.equipment).goldFind,
 					owned: [
 						...Object.values(state.equipment),
 						...state.bag.map((slot) => slot?.id),
@@ -699,10 +704,11 @@ const createGameSlice = (
 				}
 			}
 
-			// Chests: the spawn timer only runs while there is room for another chest
+			// Chests: the spawn timer only runs while monsters and chests together are below their share of the free tiles
 			let newChestSpawnTimer = state.chestSpawnTimer;
 			let newActiveChestsCount = state.activeChests;
-			if (newActiveChestsCount >= CHEST.max) {
+			const wardLevel = castleLevelOf(newTiles);
+			if (!canSpawn(newTiles, wardLevel, state.monsters.length, newActiveChestsCount)) {
 				newChestSpawnTimer = 0;
 			} else {
 				newChestSpawnTimer += secondsElapsed;
@@ -727,7 +733,7 @@ const createGameSlice = (
 				// the castle's ward (castle level 7+) drives monsters out; the one being fought stays until the fight ends
 				newMonsters = monstersOutsideWard(newMonsters, castleLevelOf(newTiles), state.fight?.monsterId ?? null);
 			}
-			if (newMonsters.length >= COMBAT.maxMonsters || countOwnedTiles(newTiles) < COMBAT.spawn.minOwnedTiles) {
+			if (!canSpawn(newTiles, wardLevel, newMonsters.length, newActiveChestsCount) || countOwnedTiles(newTiles) < COMBAT.spawn.minOwnedTiles) {
 				newMonsterSpawnTimer = 0;
 			} else {
 				newMonsterSpawnTimer += secondsElapsed;
@@ -750,7 +756,7 @@ const createGameSlice = (
 			const playerMaxHp = maxHp(state.characterStats, state.equipment);
 			if (newFightState && newFightState.phase === 'active') {
 				const gearRegen = aggregateStats(state.equipment).regen;
-				const step = stepFight(newFightState, secondsElapsed, newPlayerHp, armorOf(state.equipment), Math.random, { perSec: gearRegen, max: playerMaxHp });
+				const step = stepFight(newFightState, secondsElapsed, newPlayerHp, armorOf(state.equipment), Math.random, { perSec: gearRegen, max: playerMaxHp }, dodgeChance(state.equipment));
 				newFightState = step.fight;
 				newPlayerHp = step.playerHp;
 				for (const event of step.events) {

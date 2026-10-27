@@ -8,6 +8,8 @@ export interface KillContext {
 	goldPerSec: number;
 	xpPerSec: number;
 	luck: number;
+	/** Gold Find of the gear, in %: extra kill gold */
+	goldFind?: number;
 	/** Item ids the player already has (bag + worn): the king prefers Rattatui pieces that are still missing */
 	owned?: readonly string[];
 }
@@ -24,7 +26,8 @@ export const rollKillLoot = (
 ): { gold: number; xp: number; items: { id: string; qty: number }[] } => {
 	const { rewardSec } = monsterStats(monster.type, monster.tier);
 	const luckBonus = 1 + ctx.luck * CHEST.luckBonusPerPoint;
-	const gold = Math.floor(Math.max(COMBAT.rewards.minGold, ctx.goldPerSec * rewardSec * luckBonus));
+	const goldFind = 1 + (ctx.goldFind ?? 0) / 100;
+	const gold = Math.floor(Math.max(COMBAT.rewards.minGold, ctx.goldPerSec * rewardSec * luckBonus * goldFind));
 	const xp = Math.max(COMBAT.rewards.minXp, ctx.xpPerSec * rewardSec);
 	const items: { id: string; qty: number }[] = [];
 

@@ -6,6 +6,8 @@ import {
 	BUILDING_COST,
 	CASTLE_UPGRADE,
 	CHEST,
+	GEMS_CAP,
+	STARTING_GEMS,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
 	FARM_UPGRADES,
@@ -83,6 +85,7 @@ export const PERSISTED_KEYS = [
 	'playSeconds',
 	'chestSpawnTimer',
 	'activeChests',
+	'gems',
 	'equipment',
 	'bag',
 	'playerHp',
@@ -241,7 +244,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		placed.push({ x, y, tile });
 	}
 	if (!castleTile) return fail('castle not owned');
-	if (chests > CHEST.max) return fail('too many chests');
+	// No fixed chest cap: the spawn limit (src/lib/spawnLimits.ts) is a share of the map, and every chest already
+	// stands on its own owned tile, so a save can never hold more chests than land.
 
 	// Every owned tile must be reachable from the castle through owned neighbours
 	const castleKey = tileKey(CASTLE_X, CASTLE_Y);
@@ -385,7 +389,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (monsterSpawnTimer === null) return fail('monster spawn timer');
 	const monsters: Monster[] = [];
 	if (raw.monsters !== undefined) {
-		if (!Array.isArray(raw.monsters) || raw.monsters.length > COMBAT.maxMonsters) return fail('monsters');
+		if (!Array.isArray(raw.monsters) || raw.monsters.length > tiles.stats.owned) return fail('monsters'); // one per tile at most (the duplicate check below)
 		const ids = new Set<number>();
 		const spots = new Set<string>();
 		let kings = 0;
@@ -470,6 +474,10 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		prestige = { rebirths, legacyPoints, legacyEarned, upgrades };
 	}
 
+	// Gems (optional so saves from before they existed stay valid: those players get the starting gems too)
+	const gems = raw.gems === undefined ? STARTING_GEMS : int(raw.gems, 0, GEMS_CAP);
+	if (gems === null) return fail('gems');
+
 	const chestSpawnTimer = num(raw.chestSpawnTimer, 0, CHEST.intervalSec);
 	const playSeconds = num(raw.playSeconds, 0, 1e9);
 	if (chestSpawnTimer === null || playSeconds === null) return fail('timers');
@@ -500,6 +508,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			playSeconds,
 			chestSpawnTimer,
 			activeChests: chests,
+			gems,
 			equipment,
 			bag,
 			playerHp,

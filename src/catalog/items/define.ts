@@ -1,7 +1,8 @@
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { DropRule, DropSource, EquipmentRarity, EquipmentSlot, ItemDef, ItemKind, WeaponType } from '@/types/game';
-import type { ItemStats } from '../stats';
+import { DEFAULT_ITEM_LEVEL, type ItemStats } from '../stats';
 import { RARITIES } from '../rarity';
+import { WEAPON_ATTACK_SPEED } from '../weapons';
 
 // Builders shared by the item files. They fill in what is derivable (kind, sell value, icon name, default drops) so an
 // item definition only says what is special about it.
@@ -51,6 +52,9 @@ export interface GearOptions {
 	drops?: Partial<Record<DropSource, DropRule>>;
 	shop?: number;
 	sellValue?: number;
+	/** Attacks per second of a weapon; by default its weapon type's (see catalog/weapons.ts) */
+	attackSpeed?: number;
+	itemLevel?: number;
 }
 
 export const gear = (
@@ -59,7 +63,7 @@ export const gear = (
 	slot: NonNullable<ItemDef['slot']>,
 	rarity: EquipmentRarity,
 	stats: ItemStats,
-	{ tier, art, icon, sellValue, drops, ...rest }: GearOptions
+	{ tier, art, icon, sellValue, drops, itemLevel, attackSpeed, ...rest }: GearOptions
 ): ItemDef => ({
 	id,
 	name,
@@ -67,6 +71,8 @@ export const gear = (
 	slot,
 	rarity,
 	tier,
+	itemLevel: itemLevel ?? DEFAULT_ITEM_LEVEL,
+	...(KIND_OF_SLOT[slot] === 'weapon' ? { attackSpeed: attackSpeed ?? (rest.weaponType && WEAPON_ATTACK_SPEED[rest.weaponType]) ?? 1 } : {}),
 	stats,
 	sellValue: sellValue ?? RARITIES[rarity].sellValue,
 	drops: drops ?? dropsFor(rarity),
