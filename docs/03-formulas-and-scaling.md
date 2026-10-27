@@ -120,7 +120,7 @@ Payback (food valued at its sell price 0.75, meat at 1) is well under a day for 
 ## 6. Merchant, clicks, chests, buildings
 
 ```
-sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .5, stone .5, coal 1, food .75, meat 1, eggs 2, milk 3, hide 4
+sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .75, stone .9, coal 1.1, food .4, meat 1, eggs 2, milk 3, hide 4
 buy:   gold = ceil(amount × price × 2)                         wood, stone, coal, food, meat only
 item:  sell = floor(sellValue × qty × Haggler)   common 8, uncommon 90, rare 250, epic 700, legendary 2000, potion 20
        shop price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold

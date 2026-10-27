@@ -254,3 +254,15 @@ test('farm products sell but are never offered for sale; resource packs stay on 
 	assert.equal(api().buyResource('milk', 5), false);
 	assert.equal(api().buyResource('hide', 5), false);
 });
+
+test('merchant prices follow early scarcity: the slower a basic resource is produced early, the more it sells for', () => {
+	const p = MERCHANT_RESOURCE_PRICES;
+	// early production per second (random 10-40 tile maps): food > wood > stone > coal, so the price rises in that order
+	assert.ok(p.food < p.wood && p.wood < p.stone && p.stone < p.coal, `${p.food} < ${p.wood} < ${p.stone} < ${p.coal}`);
+	// an hour of any basic resource sells for about the same gold on an early map (the rates below are the measured 20-tile averages)
+	const earlyRate = { wood: 4.07, stone: 4.02, coal: 3.01, food: 8.49 };
+	const worth = (Object.keys(earlyRate) as (keyof typeof earlyRate)[]).map((k) => earlyRate[k] * p[k]);
+	assert.ok(Math.max(...worth) / Math.min(...worth) < 1.25, worth.map((w) => w.toFixed(2)).join(' / '));
+	// buying back always costs more than selling, even with a maxed Haggler
+	for (const key of MERCHANT_BUYABLE) assert.ok(p[key] * MERCHANT_BUY_MULTIPLIER > p[key] * MAX_HAGGLER, key);
+});
