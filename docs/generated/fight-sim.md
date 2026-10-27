@@ -5,63 +5,63 @@ Cells: win % (mean seconds to win). Seed is fixed, so the table is reproducible.
 
 | Loadout | Damage | Armor | Max HP | Crit % | Super % |
 |---|---|---|---|---|---|
-| starter kit | 2 | 2 | 101 | 3.8 | 5 |
-| woodland set + club | 3 | 13 | 139 | 3.8 | 5 |
-| apprentice set + wand | 1 | 4 | 145 | 12.8 | 5 |
-| knight's set + mace | 7 | 43 | 151 | 3.8 | 5 |
-| knight's set + recurve bow | 4 | 43 | 151 | 15.8 | 5 |
-| obsidian set + maul | 10 | 57 | 193 | 13.8 | 9 |
-| obsidian set + longbow | 6 | 57 | 193 | 28.8 | 12 |
-| rattatui set (fang blade) | 10 | 63 | 267 | 22.8 | 17 |
-| rattatui + titan maul | 16 | 63 | 242 | 18.8 | 13 |
-| rattatui + starfall bow | 9 | 63 | 242 | 34.8 | 17 |
+| starter kit | 6 | 2 | 101 | 3.8 | 5 |
+| woodland set + club | 9 | 13 | 139 | 3.8 | 5 |
+| apprentice set + wand | 3 | 4 | 145 | 12.8 | 5 |
+| knight's set + mace | 21 | 43 | 151 | 3.8 | 5 |
+| knight's set + recurve bow | 12 | 43 | 151 | 15.8 | 5 |
+| obsidian set + maul | 30 | 57 | 193 | 13.8 | 9 |
+| obsidian set + longbow | 18 | 57 | 193 | 28.8 | 12 |
+| rattatui set (fang blade) | 30 | 63 | 267 | 22.8 | 17 |
+| rattatui + titan maul | 48 | 63 | 242 | 18.8 | 13 |
+| rattatui + starfall bow | 27 | 63 | 242 | 34.8 | 17 |
 
 ## Rat tier 1
 
 | Loadout | 4 cps | 7 cps | 10 cps | 15 cps | 25 cps |
 |---|---|---|---|---|---|
-| starter kit | 100% (12s) | 100% (7s) | 100% (5s) | 100% (3s) | 100% (2s) |
-| woodland set + club | 100% (8s) | 100% (5s) | 100% (3s) | 100% (2s) | 100% (1s) |
-| apprentice set + wand | 100% (22s) | 100% (12s) | 100% (9s) | 100% (6s) | 100% (3s) |
-| knight's set + mace | 100% (4s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) |
-| knight's set + recurve bow | 100% (5s) | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) |
-| obsidian set + maul | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) | 100% (0s) |
-| obsidian set + longbow | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (0s) |
-| rattatui set (fang blade) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) | 100% (0s) |
-| rattatui + titan maul | 100% (1s) | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) |
-| rattatui + starfall bow | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) | 100% (0s) |
+| starter kit | 100% (4s) | 100% (2s) | 100% (2s) | 100% (1s) | 100% (1s) |
+| woodland set + club | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (0s) |
+| apprentice set + wand | 100% (7s) | 100% (4s) | 100% (3s) | 100% (2s) | 100% (1s) |
+| knight's set + mace | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) | 100% (0s) |
+| knight's set + recurve bow | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) | 100% (0s) |
+| obsidian set + maul | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) | 100% (0s) |
+| obsidian set + longbow | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) | 100% (0s) |
+| rattatui set (fang blade) | 100% (1s) | 100% (0s) | 100% (0s) | 100% (0s) | 100% (0s) |
+| rattatui + titan maul | 100% (1s) | 100% (0s) | 100% (0s) | 100% (0s) | 100% (0s) |
+| rattatui + starfall bow | 100% (1s) | 100% (0s) | 100% (0s) | 100% (0s) | 100% (0s) |
 
 ## Rat tier 3
 
 | Loadout | 4 cps | 7 cps | 10 cps | 15 cps | 25 cps |
 |---|---|---|---|---|---|
-| starter kit | 100% (27s) | 100% (15s) | 100% (11s) | 100% (7s) | 100% (4s) |
-| woodland set + club | 100% (18s) | 100% (10s) | 100% (7s) | 100% (5s) | 100% (3s) |
-| apprentice set + wand | 100% (49s) | 100% (28s) | 100% (20s) | 100% (13s) | 100% (8s) |
-| knight's set + mace | 100% (8s) | 100% (5s) | 100% (3s) | 100% (2s) | 100% (1s) |
-| knight's set + recurve bow | 100% (12s) | 100% (7s) | 100% (5s) | 100% (3s) | 100% (2s) |
-| obsidian set + maul | 100% (5s) | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) |
-| obsidian set + longbow | 100% (7s) | 100% (4s) | 100% (3s) | 100% (2s) | 100% (1s) |
-| rattatui set (fang blade) | 100% (4s) | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) |
-| rattatui + titan maul | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (0s) |
-| rattatui + starfall bow | 100% (4s) | 100% (2s) | 100% (2s) | 100% (1s) | 100% (1s) |
+| starter kit | 100% (9s) | 100% (5s) | 100% (4s) | 100% (2s) | 100% (1s) |
+| woodland set + club | 100% (6s) | 100% (3s) | 100% (2s) | 100% (2s) | 100% (1s) |
+| apprentice set + wand | 100% (16s) | 100% (9s) | 100% (7s) | 100% (4s) | 100% (3s) |
+| knight's set + mace | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (0s) |
+| knight's set + recurve bow | 100% (4s) | 100% (2s) | 100% (2s) | 100% (1s) | 100% (1s) |
+| obsidian set + maul | 100% (2s) | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) |
+| obsidian set + longbow | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) | 100% (0s) |
+| rattatui set (fang blade) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) |
+| rattatui + titan maul | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) | 100% (0s) |
+| rattatui + starfall bow | 100% (2s) | 100% (1s) | 100% (1s) | 100% (0s) | 100% (0s) |
 
 ## Rat tier 5
 
 | Loadout | 4 cps | 7 cps | 10 cps | 15 cps | 25 cps |
 |---|---|---|---|---|---|
-| starter kit | 0% | 0% | 0% | 100% (16s) | 100% (10s) |
-| woodland set + club | 24% (39s) | 100% (23s) | 100% (16s) | 100% (11s) | 100% (6s) |
-| apprentice set + wand | 0% | 0% | 100% (44s) | 100% (29s) | 100% (18s) |
-| knight's set + mace | 100% (18s) | 100% (10s) | 100% (7s) | 100% (5s) | 100% (3s) |
-| knight's set + recurve bow | 100% (27s) | 100% (15s) | 100% (11s) | 100% (7s) | 100% (4s) |
-| obsidian set + maul | 100% (11s) | 100% (6s) | 100% (4s) | 100% (3s) | 100% (2s) |
-| obsidian set + longbow | 100% (15s) | 100% (9s) | 100% (6s) | 100% (4s) | 100% (2s) |
-| rattatui set (fang blade) | 100% (10s) | 100% (5s) | 100% (4s) | 100% (3s) | 100% (2s) |
-| rattatui + titan maul | 100% (6s) | 100% (4s) | 100% (3s) | 100% (2s) | 100% (1s) |
-| rattatui + starfall bow | 100% (9s) | 100% (5s) | 100% (4s) | 100% (3s) | 100% (2s) |
+| starter kit | 100% (20s) | 100% (12s) | 100% (8s) | 100% (5s) | 100% (3s) |
+| woodland set + club | 100% (14s) | 100% (8s) | 100% (5s) | 100% (4s) | 100% (2s) |
+| apprentice set + wand | 100% (37s) | 100% (21s) | 100% (15s) | 100% (10s) | 100% (6s) |
+| knight's set + mace | 100% (6s) | 100% (3s) | 100% (2s) | 100% (2s) | 100% (1s) |
+| knight's set + recurve bow | 100% (9s) | 100% (5s) | 100% (4s) | 100% (2s) | 100% (1s) |
+| obsidian set + maul | 100% (4s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) |
+| obsidian set + longbow | 100% (5s) | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) |
+| rattatui set (fang blade) | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) |
+| rattatui + titan maul | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) | 100% (0s) |
+| rattatui + starfall bow | 100% (3s) | 100% (2s) | 100% (1s) | 100% (1s) | 100% (1s) |
 
-## Rat King (5200 HP, 75 s)
+## Rat King (15600 HP, 75 s)
 
 | Loadout | 4 cps | 7 cps | 10 cps | 15 cps | 25 cps |
 |---|---|---|---|---|---|
