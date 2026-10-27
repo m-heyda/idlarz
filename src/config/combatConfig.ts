@@ -3,10 +3,11 @@
 export const COMBAT = {
 	baseHp: 85, // max HP = baseHp + vitality-derived hp + gear maxHp (about 100 at game start)
 	regenPerSec: 1, // HP per second while no fight is open
+	maxDodge: 40, // % cap on the gear's Dodge, so a monster's hit can never be avoided every time
 	knockoutHpFraction: 0.3, // HP restored (as a share of max) after a knockout
 	armorK: 40, // mitigation = armor / (armor + armorK)
 	fightStepClampSec: 1, // a fight step never advances more than this (throttled tabs freeze fights instead of fast-forwarding them)
-	maxItemDamage: 16, // sanity ceiling for one item's damage (tests/items.test.ts); fights are balanced by tests/fightBalance.test.ts, not by a cap
+	maxItemDamage: 50, // sanity ceiling for one item's damage (tests/items.test.ts); fights are balanced by tests/fightBalance.test.ts, not by a cap
 	// Clicks are not rate limited in fights: speed is skill. What stops a click from being too strong is damage and crit.
 	crit: {
 		mult: 2, // a crit deals this many times the damage
@@ -16,7 +17,6 @@ export const COMBAT = {
 		maxSuperChance: 50,
 	},
 	bagSize: 36,
-	maxMonsters: 8,
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
 	spawn: {
 		firstSec: 120, // first monster this long after the territory reaches minOwnedTiles
@@ -54,7 +54,7 @@ export const MONSTERS = {
 	},
 	ratKing: {
 		label: 'Rat King',
-		hp: 5200, // see docs/generated/fight-sim.md: a starter kit never wins; steel needs ~10+ clicks/s, obsidian ~7, Rattatui is comfortable
+		hp: 15600, // 3x the old 5200, matching the tripled weapon damage, so the fight is as hard as before; see docs/generated/fight-sim.md: a starter kit never wins; steel needs ~10+ clicks/s, obsidian ~7, Rattatui is comfortable
 		attack: 14,
 		attackIntervalSec: 3, // armor decides how many hits you survive; potions fill the gap
 		rewardSec: 3600,

@@ -77,7 +77,11 @@ const pickTaunt = (rng: () => number): string => {
 	return taunts[Math.floor(rng() * taunts.length) % taunts.length];
 };
 
-export type CombatEvent = { kind: 'hurt'; amount: number } | { kind: 'knockedOut' } | { kind: 'timeout' };
+/** Chance (0-1) that a monster's hit misses: the gear's Dodge, capped. */
+export const dodgeChance = (equipment: Equipment): number =>
+	Math.max(0, Math.min(COMBAT.maxDodge, aggregateStats(equipment).dodge)) / 100;
+
+export type CombatEvent = { kind: 'hurt'; amount: number } | { kind: 'dodged' } | { kind: 'knockedOut' } | { kind: 'timeout' };
 
 /**
  * Advances an active fight: monster attacks, potion cooldown and the king's timer. `dtSec` is clamped so a throttled
@@ -90,7 +94,9 @@ export const stepFight = (
 	armor: number,
 	rng: () => number,
 	/** Gear regen works in fights too (the base regen does not); `max` caps the healing */
-	gearRegen: { perSec: number; max: number } = { perSec: 0, max: Infinity }
+	gearRegen: { perSec: number; max: number } = { perSec: 0, max: Infinity },
+	/** Chance (0-1) that a monster's hit misses; rolled (one rng call per hit) only when above 0, so high rolls dodge like they crit */
+	dodge = 0
 ): { fight: FightState; playerHp: number; events: CombatEvent[] } => {
 	if (fight.phase !== 'active' || !Number.isFinite(dtSec) || dtSec <= 0) return { fight, playerHp, events: [] };
 
@@ -101,6 +107,10 @@ export const stepFight = (
 	let attackTimer = fight.attackTimer + dt;
 	while (attackTimer >= stats.attackIntervalSec) {
 		attackTimer -= stats.attackIntervalSec;
+		if (dodge > 0 && rng() >= 1 - dodge) {
+			events.push({ kind: 'dodged' });
+			continue;
+		}
 		const amount = mitigate(stats.attack, armor);
 		hp = Math.max(0, hp - amount);
 		events.push({ kind: 'hurt', amount });

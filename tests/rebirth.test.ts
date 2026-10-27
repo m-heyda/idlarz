@@ -9,6 +9,7 @@ import {
 	INITIAL_RESOURCES,
 	LEGACY_UPGRADES,
 	REBIRTH,
+	STARTING_GEMS,
 	type LegacyUpgradeId,
 } from '../src/config/gameConfig';
 import {
@@ -195,4 +196,27 @@ test('saves: prestige survives validation, forged Legacy is rejected', () => {
 	const reloaded = sanitizeSave({ ...rawSnapshot(), prestige: undefined });
 	assert.equal(reloaded.ok, true);
 	if (reloaded.ok) assert.equal(reloaded.state.prestige.legacyEarned, 0);
+});
+
+// ---- Gems: the premium currency --------------------------------------------------------------------------------
+
+test('Gems: a new game starts with the starting purse, a rebirth keeps the balance, Legacy stays separate', () => {
+	readyToRebirth();
+	assert.equal(api().gems, STARTING_GEMS);
+	store.setState({ gems: 1234 });
+	setResources({ gold: 0 });
+	assert.equal(api().rebirth(), true);
+	assert.equal(api().gems, 1234, 'gems are not wiped by a rebirth');
+	assert.ok(api().prestige.legacyPoints > 0, 'the rebirth currency is Legacy, a different balance');
+});
+
+test('Gems in saves: a save without them gets the starting purse, a saved balance is kept, junk is refused', () => {
+	freshGame();
+	const raw = snapshot() as Record<string, unknown>;
+	delete raw.gems;
+	const old = sanitizeSave(raw);
+	assert.ok(old.ok && old.state.gems === STARTING_GEMS);
+	const kept = sanitizeSave({ ...raw, gems: 42 });
+	assert.ok(kept.ok && kept.state.gems === 42);
+	for (const bad of [-1, 1.5, NaN, '1000', 1e12]) assert.equal(sanitizeSave({ ...raw, gems: bad }).ok, false, `gems ${String(bad)}`);
 });

@@ -13,6 +13,7 @@ import {
 } from '../src/config/gameConfig';
 import { calculateTileCost, calculateBuildingCost, effectiveTileDiscount } from '../src/utils/gameUtils';
 import type { Resources } from '../src/types/game';
+import { spawnCap } from '../src/lib/spawnLimits';
 import { hasOwnedNeighbour, isOwnedAt } from '../src/utils/world';
 
 const SELLABLE = [...MERCHANT_BUYABLE]; // what can be both bought and sold; farm products only sell (see merchantShop.test.ts)
@@ -188,11 +189,11 @@ test('click power: untrusted clicks pay nothing, trusted clicks pay gold/s x pow
 	assert.equal(api().buyClickUpgrade(), false); // max level
 });
 
-test('chests: the spawn timer pauses at the cap, collecting needs a real chest, luck raises the reward', () => {
+test('chests: the spawn timer pauses at the limit, collecting needs a real chest, luck raises the reward', () => {
 	freshGame();
 	growTo(8);
 	assert.equal(api().collectChest(CASTLE_X, CASTLE_Y), false);
-	store.setState({ activeChests: CHEST.max, chestSpawnTimer: 123 });
+	store.setState({ activeChests: spawnCap(api().tiles, castleLevel()), chestSpawnTimer: 123 });
 	api().tick(10_000);
 	assert.equal(api().chestSpawnTimer, 0);
 	store.setState({ activeChests: 0, chestSpawnTimer: 0 });

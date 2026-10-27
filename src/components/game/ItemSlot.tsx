@@ -1,10 +1,11 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { EQUIPMENT_PIXEL_ICONS } from '@/config/pixelIcons';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import type { EquipmentSlot } from '@/types/game';
 import PixelIcon from './PixelIcon';
 import ItemTooltipStack from './ItemTooltip';
+import { placeTip, type Box } from '@/lib/tipPlacement';
 import { RARITY_COLOR, itemIconName } from './itemUi';
 import '@/styles/Inventory.css';
 
@@ -28,23 +29,23 @@ interface ItemSlotProps {
 }
 
 /**
- * A hover card at the cursor. It measures itself, so a wide one (an item next to the gear it would replace) flips to the
- * left of the cursor near the right edge and never leaves the screen.
+ * A hover card attached to the edge of its item box (not the cursor, so it stays put while the mouse moves over the box).
+ * It measures itself, so a wide one (an item next to the gear it would replace) flips to the left of the box near the right
+ * edge and never leaves the screen (see lib/tipPlacement.ts).
  */
-const FloatingTip: React.FC<{ x: number; y: number; children: React.ReactNode }> = ({ x, y, children }) => {
+const FloatingTip: React.FC<{ anchor: Box; children: React.ReactNode }> = ({ anchor, children }) => {
 	const ref = useRef<HTMLDivElement>(null);
 	useLayoutEffect(() => {
 		const el = ref.current;
 		if (!el) return;
 		const { width, height } = el.getBoundingClientRect();
-		const gap = 16;
-		const margin = 8;
-		const left = x + gap + width > window.innerWidth - margin ? x - gap - width : x + gap;
-		el.style.left = `${Math.max(margin, left)}px`;
-		el.style.top = `${Math.max(margin, Math.min(y + gap, window.innerHeight - height - margin))}px`;
+		const { left, top } = placeTip(anchor, { width, height }, { width: window.innerWidth, height: window.innerHeight });
+		el.style.left = `${left}px`;
+		el.style.top = `${top}px`;
+		el.style.visibility = 'visible';
 	});
 	return (
-		<div ref={ref} className='fixed z-[100] pointer-events-none' style={{ left: x + 16, top: y + 16 }}>
+		<div ref={ref} className='fixed z-[100] pointer-events-none' style={{ left: anchor.right + 8, top: anchor.top, visibility: 'hidden' }}>
 			{children}
 		</div>
 	);
@@ -66,10 +67,17 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 	onDragStart,
 	onDrop,
 }) => {
-	const [tip, setTip] = useState<{ x: number; y: number } | null>(null);
+	const [tip, setTip] = useState<Box | null>(null);
 	const [over, setOver] = useState(false);
 	const def = itemId ? ITEM_CATALOG[itemId] : undefined;
 	const hasTip = !!def || !!label;
+
+	useEffect(() => {
+		if (!tip) return;
+		const close = () => setTip(null);
+		window.addEventListener('scroll', close, true);
+		return () => window.removeEventListener('scroll', close, true);
+	}, [tip]);
 
 	return (
 		<>
@@ -102,7 +110,11 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 					setOver(false);
 					onDrop?.();
 				}}
-				onMouseMove={(e) => hasTip && setTip({ x: e.clientX, y: e.clientY })}
+				onMouseEnter={(e) => {
+					if (!hasTip) return;
+					const { left, top, right, bottom } = e.currentTarget.getBoundingClientRect();
+					setTip({ left, top, right, bottom });
+				}}
 				onMouseLeave={() => setTip(null)}
 				onClick={onClick}
 				onDoubleClick={onDoubleClick}
@@ -124,7 +136,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 			{tip &&
 				hasTip &&
 				createPortal(
-						<FloatingTip x={tip.x} y={tip.y}>
+						<FloatingTip anchor={tip}>
 							{def ? (
 								<ItemTooltipStack itemId={def.id} compare={compare} />
 							) : (

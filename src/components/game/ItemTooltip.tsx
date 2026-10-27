@@ -6,39 +6,33 @@ import {
 	SETS,
 	RARITIES,
 	STAT_KEYS,
-	formatStat,
 	formatStatChange,
 	formatStatDelta,
 	formatStatValue,
 	formatStats,
 	setCounts,
 	statLabel,
+	weaponDps,
 } from '@/catalog';
-import { compareDetailed, type DetailedComparison, type StatRow } from '@/lib/inventory';
+import { compareDetailed, primaryKeyOf, type DetailedComparison, type StatRow } from '@/lib/inventory';
 import type { Equipment } from '@/types/game';
 import ResourceIcon from './ResourceIcon';
 import { RARITY_COLOR } from './itemUi';
 
-const STATUS_TAG: Record<StatRow['status'], string> = { new: 'NEW', lost: 'LOST', up: '▲', down: '▼', same: '=' };
+/** A signed change in parentheses, green for a gain and red for a loss: "(+12%)", "(-16)". Nothing when it did not change. */
+const Diff: React.FC<{ delta: number; text: string }> = ({ delta, text }) =>
+	delta ? <span className={delta > 0 ? 'px-diff-up' : 'px-diff-down'}> ({text})</span> : null;
 
-/** One line of the stat table: the stat, the value this piece gives, and how it differs from the worn piece (NEW / LOST / ▲ / ▼). */
-const StatCompareRow: React.FC<{ row: StatRow; withTag: boolean }> = ({ row, withTag }) => {
-	const status = withTag ? row.status : 'up'; // an empty slot: everything is a plain gain, no tags
-	const shownValue = row.status === 'lost' ? row.was : row.now; // a lost stat shows what you would give up, struck through
-	const change =
-		row.status === 'new' || row.status === 'lost'
-			? STATUS_TAG[row.status]
-			: row.status === 'same'
-				? STATUS_TAG.same
-				: `${STATUS_TAG[row.status]} ${formatStatChange(row.key, row.delta)}`;
+const signed = (delta: number, digits = 0) => `${delta < 0 ? '-' : '+'}${+Math.abs(delta).toFixed(digits)}`;
+
+/** One secondary stat line: a bullet, "+12% Crit Chance", and how it differs from the worn piece. */
+const StatLine: React.FC<{ row: StatRow; withDiff: boolean }> = ({ row, withDiff }) => {
+	const change = row.status === 'new' ? row.now : row.delta; // a stat the worn piece lacks is all gain
 	return (
-		<div className='px-stat-row' data-status={status}>
-			<span className='px-stat-name'>{statLabel(row.key)}</span>
-			<span className='px-stat-value'>{formatStatValue(row.key, shownValue)}</span>
-			<span className='px-stat-change'>
-				{withTag ? change : ''}
-				{withTag && row.status === 'lost' ? ` ${formatStatChange(row.key, row.delta)}` : ''}
-			</span>
+		<div className='px-tip-bullet'>
+			<span>{formatStatValue(row.key, row.now).replace(/^/, '+')} </span>
+			<span>{statLabel(row.key)}</span>
+			{withDiff && row.status !== 'same' && <Diff delta={change} text={formatStatChange(row.key, change)} />}
 		</div>
 	);
 };
@@ -52,8 +46,10 @@ interface BodyProps {
 }
 
 /**
- * The body of an item hover card (name, slot, stats, set progress, description, sell value). With a `comparison` the stats
- * become a table against the worn piece (NEW / LOST / up / down) and the set block shows the state after the swap.
+ * The body of an item hover card, laid out like an action-RPG card: name, rarity and slot, item level, the headline stat
+ * (damage with attack speed and DPS for a weapon, armor for armor) and the other stats as a bullet list. With a
+ * `comparison` every number carries its change against the worn piece, stats the worn piece has and this one lacks are
+ * listed as lost, and the set block shows the state after the swap.
  */
 export const ItemTooltipBody: React.FC<BodyProps> = ({ itemId, comparison, wornLabel }) => {
 	const equipment = useGameStore((state) => state.equipment);
@@ -67,40 +63,77 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ itemId, comparison, wornL
 	const set = def.set ? SETS[def.set] : undefined;
 	const setCount = set ? (setCounts(shown)[set.id] ?? 0) : 0;
 	const emptySlot = !!comparison && !comparison.equippedId;
+	const withDiff = !!comparison && !emptySlot;
 	// Only sets whose bonus tiers switch on or off matter here; plain progress is already in the set block below
 	const tierChanges = comparison ? comparison.setChanges.filter((change) => change.gained.length || change.lost.length) : [];
 	const netChanged = comparison ? STAT_KEYS.filter((key) => comparison.net[key]) : [];
 
+	const primaryKey = primaryKeyOf(def);
+	const primary = primaryKey ? { key: primaryKey, value: def.stats?.[primaryKey] ?? 0 } : null;
+	const primaryDelta = comparison?.primary?.delta ?? 0;
+	// Own stats except the headline one (it has its own line); the plain card lists them from the definition
+	const rows: StatRow[] = comparison
+		? comparison.rows.filter((row) => row.status !== 'lost' && row.key !== primaryKey)
+		: STAT_KEYS.filter((key) => def.stats?.[key] && key !== primaryKey).map((key) => ({ key, was: 0, now: def.stats![key]!, delta: 0, status: 'same' as const }));
+	const lost = comparison ? comparison.rows.filter((row) => row.status === 'lost' && row.key !== primaryKey) : [];
+	const swing = comparison?.swing;
+
 	return (
-		<div className='text-sm' style={{ minWidth: 200 }}>
+		<div className='px-tip-body'>
 			{wornLabel && <div className='px-tip-worn'>Equipped</div>}
 			<div className='px-tip-title' style={{ color: RARITY_COLOR[def.rarity] }}>
 				{def.name}
 			</div>
-			<div className='px-tip-muted text-xs mb-1 capitalize'>
+			<div className='px-tip-kind' style={{ color: RARITY_COLOR[def.rarity] }}>
 				{RARITIES[def.rarity].label}
 				{def.weaponType ? ` ${def.weaponType}` : ''} - {slotLabel}
 			</div>
-			{comparison ? (
-				<div className='px-stat-table'>
-					{emptySlot && <div className='px-tip-muted text-xs mb-1'>Empty {EQUIPMENT_SLOT_LABEL[comparison.slot]} slot</div>}
-					{comparison.rows.map((row) => (
-						<StatCompareRow key={row.key} row={row} withTag={!emptySlot} />
-					))}
-					{comparison.rows.length === 0 && <div className='px-tip-muted text-xs'>No stats</div>}
+			{!def.consumable && <div className='px-tip-level'>Item Level {def.itemLevel}</div>}
+			<div className='px-tip-sep' />
+
+			{primary && (
+				<div className='px-tip-primary'>
+					<span className='px-tip-big'>{primary.value}</span> {statLabel(primary.key)}
+					{withDiff && <Diff delta={primaryDelta} text={signed(primaryDelta)} />}
 				</div>
-			) : (
-				def.stats &&
-				Object.entries(def.stats).map(([stat, value]) => (
-					<div key={stat} className='text-green-400 text-xs'>
-						{formatStat(stat, value as number)}
-					</div>
-				))
 			)}
-			{def.consumable && <div className='text-green-400 text-xs'>Restores {def.consumable.healHp} HP</div>}
+			{def.kind === 'weapon' && def.attackSpeed && (
+				<div className='px-tip-swing'>
+					<div>
+						<b>{def.attackSpeed}</b> Attacks per Second
+						{withDiff && swing && <Diff delta={swing.speed.delta} text={signed(swing.speed.delta, 2)} />}
+					</div>
+					<div>
+						<b>{weaponDps(def)}</b> Damage per Second
+						{withDiff && swing && <Diff delta={swing.dps.delta} text={signed(swing.dps.delta, 2)} />}
+					</div>
+				</div>
+			)}
+			{emptySlot && <div className='px-tip-muted text-xs mt-1'>Empty {EQUIPMENT_SLOT_LABEL[comparison!.slot]} slot</div>}
+
+			{def.consumable && <div className='px-tip-bullet px-diff-up'>Restores {def.consumable.healHp} HP</div>}
+			{rows.length > 0 && (
+				<div className='px-tip-list'>
+					{rows.map((row) => (
+						<StatLine key={row.key} row={row} withDiff={withDiff} />
+					))}
+				</div>
+			)}
+			{!primary && rows.length === 0 && !def.consumable && <div className='px-tip-muted text-xs'>No stats</div>}
+
+			{lost.length > 0 && (
+				<div className='px-tip-lost'>
+					<div className='px-tip-lost-title'>Properties lost when equipped:</div>
+					{lost.map((row) => (
+						<div key={row.key} className='px-tip-lost-line'>
+							{formatStatValue(row.key, row.was).replace(/^/, '+')} {statLabel(row.key)}
+						</div>
+					))}
+				</div>
+			)}
 
 			{comparison && tierChanges.length > 0 && (
-				<div className='mt-2 pt-1 border-t px-rule text-xs'>
+				<div className='px-tip-section'>
 					<div className='px-tip-title'>Set changes</div>
 					{tierChanges.map((change) => (
 						<div key={change.setId} className='mb-1'>
@@ -108,12 +141,12 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ itemId, comparison, wornL
 								{change.label} {change.from} → {change.to}/{change.size}
 							</div>
 							{change.gained.map((tier) => (
-								<div key={`g${tier.count}`} className='text-green-400'>
+								<div key={`g${tier.count}`} className='px-diff-up'>
 									+ ({tier.count}) {formatStats(tier.stats)}
 								</div>
 							))}
 							{change.lost.map((tier) => (
-								<div key={`l${tier.count}`} className='text-red-400'>
+								<div key={`l${tier.count}`} className='px-diff-down'>
 									− ({tier.count}) {formatStats(tier.stats)}
 								</div>
 							))}
@@ -125,7 +158,7 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ itemId, comparison, wornL
 							{netChanged.map((key) => {
 								const delta = comparison.net[key] as number;
 								return (
-									<div key={key} className={delta > 0 ? 'text-green-400' : 'text-red-400'}>
+									<div key={key} className={delta > 0 ? 'px-diff-up' : 'px-diff-down'}>
 										{formatStatDelta(key, delta)}
 									</div>
 								);
@@ -136,7 +169,7 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ itemId, comparison, wornL
 			)}
 
 			{set && (
-				<div className='mt-2 text-xs'>
+				<div className='px-tip-section'>
 					<div className='px-tip-title'>
 						{set.label} ({setCount}/{set.size})
 					</div>
@@ -153,8 +186,8 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ itemId, comparison, wornL
 				</div>
 			)}
 
-			{def.description && <div className='px-tip-muted text-xs mt-2 italic'>{def.description}</div>}
-			<div className='text-xs mt-2 flex items-center gap-1 text-[#d8c8a0]'>
+			{def.description && <div className='px-tip-flavor'>{def.description}</div>}
+			<div className='px-tip-sell'>
 				Sells for {def.sellValue} <ResourceIcon resource='gold' />
 			</div>
 		</div>
@@ -163,7 +196,7 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ itemId, comparison, wornL
 
 /**
  * The hover card of an item. With `compare` (the bag) and a piece worn in the same slot it becomes two cards side by side:
- * the hovered item with its stat table against the worn piece, and the worn piece itself.
+ * the worn piece (marked Equipped) and the hovered one with every number set against it.
  */
 const ItemTooltipStack: React.FC<{ itemId: string; compare?: boolean }> = ({ itemId, compare }) => {
 	const equipment = useGameStore((state) => state.equipment);

@@ -5,6 +5,7 @@ import { Resources } from '@/types/game';
 import { formatNumber } from '@/utils/formatters';
 import {
 	GEMS_INFO,
+	LEGACY_INFO,
 	HEADER_DISPLAYED_RESOURCES_INFO,
 	MERCHANT_RESOURCE_PRICES,
 	RESOURCE_ICONS,
@@ -12,12 +13,13 @@ import {
 import { RESOURCE_PIXEL_ICONS } from '@/config/pixelIcons';
 import PixelIcon from './PixelIcon';
 import GemIcon from './GemIcon';
+import LegacyIcon from './LegacyIcon';
 import StableNumber from './StableNumber';
 
 const PILL_ICON_SCALE = 0.6; // the 40px sprites drawn at 24px
 const TIP_ICON_SCALE = 0.8; // 32px in the tooltip
 
-/** Header order: money, building materials, food, farm products. Gems (the rebirth currency) close the row. */
+/** Header order: money, building materials, food, farm products. Gems (premium) and Legacy (rebirth) close the row. */
 const GROUPS: (keyof Resources)[][] = [['gold'], ['wood', 'stone', 'coal'], ['food', 'meat'], ['eggs', 'milk', 'hide']];
 
 interface Info {
@@ -93,7 +95,8 @@ const Line: React.FC<{ label: string; value: string; accent?: boolean }> = ({ la
 const ResourceDisplay: React.FC = () => {
 	const resources = useGameStore((state) => state.resources);
 	const resourceRates = useGameStore((state) => state.resourceRates);
-	const gems = useGameStore((state) => state.prestige.legacyPoints);
+	const gems = useGameStore((state) => state.gems);
+	const legacy = useGameStore((state) => state.prestige.legacyPoints);
 	const toggleLegacy = useUiStore((state) => state.toggleLegacy);
 
 	const exactOf = (n: number) => Math.floor(n).toLocaleString('en-US');
@@ -139,7 +142,7 @@ const ResourceDisplay: React.FC = () => {
 				</div>
 			))}
 
-			{/* Gems: the rebirth currency (not a resource); click to open the Legacy window */}
+			{/* Gems: the premium currency (its own balance) */}
 			<div className='hdr-group'>
 				<Pill
 					icon={<GemIcon scale={PILL_ICON_SCALE} />}
@@ -147,6 +150,17 @@ const ResourceDisplay: React.FC = () => {
 					value={formatNumber(gems)}
 					exact={exactOf(gems)}
 					info={GEMS_INFO}
+				/>
+			</div>
+
+			{/* Legacy: the rebirth currency (not a resource); click to open the Legacy window */}
+			<div className='hdr-group'>
+				<Pill
+					icon={<LegacyIcon scale={PILL_ICON_SCALE} />}
+					tipIcon={<LegacyIcon scale={TIP_ICON_SCALE} />}
+					value={formatNumber(legacy)}
+					exact={exactOf(legacy)}
+					info={LEGACY_INFO}
 					onClick={toggleLegacy}>
 					<div className='pt-1 mt-1 border-t px-rule text-[#9be26a]'>Click to open the Legacy window.</div>
 				</Pill>

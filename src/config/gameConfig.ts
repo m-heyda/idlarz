@@ -144,14 +144,20 @@ export const RESOURCE_ICONS = fromResources(resourceKeys, (key) => RESOURCES[key
 
 // What the header tooltips say about each currency: what it is, what it is for and where it comes from.
 export const HEADER_DISPLAYED_RESOURCES_INFO = fromResources(
-	resourceKeys.filter((key) => key !== 'gems'),
+	resourceKeys.filter((key) => key !== 'gems' && key !== 'legacy'),
 	(key) => {
 		const { emoji, label, description, usedFor, source } = RESOURCES[key];
 		return { icon: emoji, label, description, usedFor, source };
 	}
-) as { [K in Exclude<ResourceKey, 'gems'>]: { icon: string; label: string; description: string; usedFor: string; source: string } };
+) as { [K in Exclude<ResourceKey, 'gems' | 'legacy'>]: { icon: string; label: string; description: string; usedFor: string; source: string } };
 
-// The rebirth currency (not a resource: it lives in the prestige state)
+// The two currencies that are not resources: Legacy (rebirth, lives in the prestige state) and Gems (their own balance)
+export const LEGACY_INFO = {
+	label: RESOURCES.legacy.label,
+	description: RESOURCES.legacy.description,
+	usedFor: RESOURCES.legacy.usedFor,
+	source: RESOURCES.legacy.source,
+};
 export const GEMS_INFO = {
 	label: RESOURCES.gems.label,
 	description: RESOURCES.gems.description,
@@ -672,11 +678,21 @@ export const CLICK_LIMIT = {
 	requireTrusted: true, // ignore synthetic (script-dispatched) clicks
 };
 
-// Chests: one spawns every `intervalSec` (timer pauses while `max` chests are waiting) on a random owned tile.
+/** Gems every player starts with (also granted to saves from before Gems existed). */
+export const STARTING_GEMS = 1000;
+export const GEMS_CAP = 1_000_000_000;
+
+// Monsters and chests together never take more than `maxFraction` of the free tiles (see src/lib/spawnLimits.ts); the spawn
+// timers pause at that limit. `minAllowed` keeps a tiny early map playable: one rat and one chest can always coexist.
+export const SPAWN_LIMIT = {
+	maxFraction: 0.3,
+	minAllowed: 2,
+};
+
+// Chests: one spawns every `intervalSec` (timer pauses while SPAWN_LIMIT is reached) on a random owned tile.
 // Reward = passive gold/s x a random time between minMinutes and maxMinutes, plus a small bonus per Luck.
 export const CHEST = {
 	intervalSec: 600,
-	max: 5,
 	minMinutes: 10,
 	maxMinutes: 60,
 	luckBonusPerPoint: 0.005,
@@ -739,7 +755,7 @@ export const CHARACTER_STAT_CONFIG = {
 	plainsMeatModifier: 0.05,
 };
 
-// Rebirth: restart with a permanent bonus paid in Gems (the Legacy points). Available once the castle reaches `minCastleLevel`.
+// Rebirth: restart with a permanent bonus paid in Legacy points. Available once the castle reaches `minCastleLevel`.
 export const REBIRTH = {
 	minCastleLevel: 6,
 	minTiles: 100, // a rebirth also needs this much territory (the first ~100 tiles come within a day, so it is the castle that gates it)
@@ -751,7 +767,7 @@ export const REBIRTH = {
 		Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * Math.sqrt(Math.max(0, tiles) / 10)),
 };
 
-// The Legacy shop: permanent upgrades bought with unspent Gems. The N+1-th level costs
+// The Legacy shop: permanent upgrades bought with unspent Legacy points. The N+1-th level costs
 // ceil(baseCost x costGrowth^N) points.
 export const LEGACY_UPGRADES = {
 	thrift: {

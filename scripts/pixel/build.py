@@ -51,7 +51,7 @@ SPRITES = {
     # cut from the supplied sheet (assets/*.png): resources, reserved currencies, the gem and both chests
     **sprites_sheet.SPRITES,
     # no picture in the sheet: bread, the emerald ability shard, farm products
-    'food': sprites_resources.carrot, 'res_shard': sprites_resources.shard,
+    'food': sprites_resources.carrot, 'res_shard': sprites_resources.shard, 'diamond': sprites_resources.diamond,
     'eggs': sprites_resources.eggs, 'milk': sprites_resources.milk, 'hide': sprites_resources.hide,
     'menu_character': sprites_props.helm, 'menu_merchant': sprites_props.pouch, 'menu_farm': sprites_props.barn,
     'level_orb': sprites_props.level_orb,

@@ -246,7 +246,7 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.monsters[0].x = 0, r.monsters[0].y = 0), 'monster on an unowned tile');
 	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].hasChest = true), 'monster on a chest tile');
 	bad((r) => r.monsters.push({ ...r.monsters[0], id: 2, type: 'ratKing', tier: 1 }, { ...r.monsters[0], id: 3, type: 'ratKing', tier: 1 }), 'two kings on one tile');
-	bad((r) => (r.monsters = Array.from({ length: COMBAT.maxMonsters + 1 }, (_, i) => ({ ...r.monsters[0], id: i + 1 }))), 'nine monsters');
+	bad((r) => (r.monsters = Array.from({ length: 5000 }, (_, i) => ({ ...r.monsters[0], id: i + 1 }))), 'more monsters than tiles');
 	bad((r) => (r.monsters[0].tier = COMBAT.maxTier + 1), 'tier above the cap');
 	bad((r) => (r.monsters[0].type = 'dragon'), 'unknown monster type');
 	bad((r) => (r.monsters.push({ ...r.monsters[0], ...spot(1) }), (r.nextMonsterId = 5)), 'duplicate monster ids');

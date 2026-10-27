@@ -1,4 +1,5 @@
 import type { ItemDef } from '@/types/game';
+import { DEFAULT_ITEM_LEVEL } from '../stats';
 
 // Potions. On a rat kill a potion drops from the `rat` pool (heavier tiers unlock the better one); the Rat King always
 // drops `qty` of each potion that lists him. The first three potion stacks in the bag get the fight hotkeys 1-3.
@@ -9,6 +10,7 @@ export const CONSUMABLES: ItemDef[] = [
 		kind: 'consumable',
 		rarity: 'common',
 		tier: 0,
+		itemLevel: DEFAULT_ITEM_LEVEL,
 		consumable: { healHp: 35 },
 		stackMax: 20,
 		sellValue: 20,
@@ -23,6 +25,7 @@ export const CONSUMABLES: ItemDef[] = [
 		kind: 'consumable',
 		rarity: 'uncommon',
 		tier: 0,
+		itemLevel: DEFAULT_ITEM_LEVEL,
 		consumable: { healHp: 90 },
 		stackMax: 20,
 		sellValue: 90,

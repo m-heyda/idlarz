@@ -78,6 +78,7 @@ export const MerchantItemsSection: React.FC = () => {
 						key={i}
 						itemId={slot?.id}
 						qty={slot?.qty}
+						compare
 						onClick={(e) => sell(i, e.shiftKey)}
 					/>
 				))}

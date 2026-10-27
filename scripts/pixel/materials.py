@@ -93,6 +93,7 @@ MATS = {
     'smoke': Material(['#3a3a46', '#5a5a68', '#80808e', '#aaaab8', '#d4d4e0'], '#2a2a34', grain=0.2, grain_scale=3.0),
     'slate_blue': Material(['#141c34', '#26365c', '#3c548a', '#5a78b4', '#90acd8'], '#0c1224', grain=0.2, grain_scale=3.0),
     'glow': Material(['#8a5a10', '#d8a020', '#ffd860', '#fff2a0', '#ffffff'], '#6a4408', gain=1.35),
+    'diamond': Material(['#0e2a66', '#1f5cb4', '#3f93e0', '#8ad0f6', '#e6f8ff'], '#08183c', spec=0.07, shiny=22, spec_col='#ffffff', gain=0.78, gamma=1.35),
     'crystal': Material(['#1a4a7a', '#3a8ac8', '#8ad0f8', '#d8f4ff', '#ffffff'], '#0e2a4a', spec=0.08, shiny=14, spec_col='#ffffff', gain=1.2),
     'flag': Material(['#4a0a14', '#8a1428', '#c8283c', '#f05468', '#ffa0ac'], '#2e0610'),
     # --- round 2: reference-style resources, chest and town buildings (more saturated, crisper facets)

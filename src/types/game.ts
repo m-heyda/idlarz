@@ -120,7 +120,11 @@ export interface ItemDef {
 	rarity: EquipmentRarity;
 	/** Grade of the material family: 1 wooden / cloth, 2 steel, 3 obsidian, 4 Rattatui, 5 legendary (consumables: 0) */
 	tier: number;
+	/** Item level: stats scale with it later (catalog `statScale`); every item is level 10 for now */
+	itemLevel: number;
 	weaponType?: WeaponType;
+	/** Weapons only: attacks per second. Not a summed stat; the base for attack-speed combat (catalog `weaponDps`) */
+	attackSpeed?: number;
 	stats?: ItemStats;
 	set?: string;
 	description?: string;
@@ -288,6 +292,8 @@ export interface GameState {
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
 	chestSpawnTimer: number;
 	activeChests: number;
+	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Legacy points of `prestige`. */
+	gems: number;
 	lastChestLoot: ChestLoot | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods

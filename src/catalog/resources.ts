@@ -107,14 +107,23 @@ export const RESOURCES = {
 		source: 'The castle, buying tiles and your stats.',
 		color: '#c4a0ff',
 	},
-	// The rebirth currency (not in `Resources`: it lives in the prestige state)
-	gems: {
-		emoji: '💎',
-		label: 'Gems',
+	// The rebirth currency (not in Resources: it lives in the prestige state)
+	legacy: {
+		emoji: '🔮',
+		label: 'Legacy',
 		description: 'The rebirth currency.',
 		usedFor: 'Permanent upgrades in the Legacy window; they survive every rebirth.',
 		source: 'Rebirthing from castle level 6: the higher your castle and income, the more you get.',
 		color: '#6ae88a',
+	},
+	// The premium currency (not in Resources: it is its own gems balance in the game state)
+	gems: {
+		emoji: '💎',
+		label: 'Gems',
+		description: 'Rare gems. Everyone starts with a purse of them.',
+		usedFor: 'Upgrades (coming soon). They are never lost by a rebirth.',
+		source: 'Your starting purse; more ways to earn them are coming.',
+		color: '#7fd8ff',
 	},
 } as const satisfies Record<string, ResourceDef>;
 

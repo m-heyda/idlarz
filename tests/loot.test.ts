@@ -106,3 +106,10 @@ test('emitCombat is a no-op outside the browser', () => {
 	emitCombat({ kind: 'hurt', amount: 3 });
 	emitCombat({ kind: 'heal', amount: 35 });
 });
+
+test('Gold Find raises kill gold by its percentage and leaves a plain kill alone', () => {
+	const plain = rollKillLoot(T1, ctx, () => 0.999).gold;
+	const boosted = rollKillLoot(T1, { ...ctx, goldFind: 50 }, () => 0.999).gold;
+	assert.equal(boosted, Math.floor(plain * 1.5));
+	assert.equal(rollKillLoot(T1, { ...ctx, goldFind: 0 }, () => 0.999).gold, plain);
+});

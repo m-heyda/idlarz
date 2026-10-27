@@ -98,7 +98,7 @@ test('pickWeighted follows the weights and costs no random number for a pool of 
 test('the resource registry is the one place resources are listed', () => {
 	for (const key of Object.keys(INITIAL_RESOURCES)) assert.ok(key in RESOURCES, `${key} missing from RESOURCES`);
 	assert.deepEqual(Object.keys(RESOURCE_ICONS), Object.keys(RESOURCES));
-	assert.deepEqual(Object.keys(HEADER_DISPLAYED_RESOURCES_INFO), Object.keys(RESOURCES).filter((k) => k !== 'gems'));
+	assert.deepEqual(Object.keys(HEADER_DISPLAYED_RESOURCES_INFO), Object.keys(RESOURCES).filter((k) => k !== 'gems' && k !== 'legacy'));
 	assert.deepEqual(
 		Object.keys(MERCHANT_RESOURCE_PRICES),
 		Object.entries(RESOURCES).filter(([, def]) => 'merchant' in def).map(([key]) => key)

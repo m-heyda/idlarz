@@ -6,6 +6,8 @@ import { CASTLE_X, CASTLE_Y, REBIRTH } from '../src/config/gameConfig';
 import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag } from '../src/lib/inventory';
 import { maxHp } from '../src/lib/combat';
+import { castleLevelOf } from '../src/lib/castleWard';
+import { spawnCap } from '../src/lib/spawnLimits';
 import { fullSet } from '../src/lib/fightSim';
 import { pickPersisted } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
@@ -48,12 +50,12 @@ const withMonster = (over: Partial<Monster> = {}) => {
 	return spot;
 };
 
-test('50 hits at 2 damage kill a tier-1 rat and 49 do not', () => {
+test('17 hits at 6 damage kill a tier-1 rat and 16 do not', () => {
 	withMonster();
 	assert.equal(api().startFight(1), true);
-	const results = hits(49);
-	assert.ok(results.every((r) => r && r.damage === 2 && !r.killed));
-	assert.equal(api().fight?.monsterHp, 2);
+	const results = hits(16);
+	assert.ok(results.every((r) => r && r.damage === 6 && !r.killed));
+	assert.equal(api().fight?.monsterHp, 4);
 	const last = hit();
 	assert.equal(last?.killed, true);
 	assert.equal(api().fight?.phase, 'won');
@@ -67,12 +69,12 @@ test('untrusted clicks and repeated events do nothing, but fight hits are not ra
 	const sameEvent = { eventId: ++seq, now: (clock += 250), trusted: true };
 	assert.ok(api().hitMonster(sameEvent));
 	assert.equal(api().hitMonster(sameEvent), null); // one DOM event counts once
-	// 20 distinct real clicks in the same millisecond all land: speed is skill, there is no cap
+	// 10 distinct real clicks in the same millisecond all land: speed is skill, there is no cap
 	const now = (clock += 10_000);
 	const stub = mock.method(Math, 'random', () => 0);
 	try {
-		const results = Array.from({ length: 20 }, () => api().hitMonster({ eventId: ++seq, now, trusted: true }));
-		assert.equal(results.filter(Boolean).length, 20);
+		const results = Array.from({ length: 10 }, () => api().hitMonster({ eventId: ++seq, now, trusted: true }));
+		assert.equal(results.filter(Boolean).length, 10);
 	} finally {
 		stub.mock.restore();
 	}
@@ -81,7 +83,7 @@ test('untrusted clicks and repeated events do nothing, but fight hits are not ra
 test('crits: a high roll doubles the click, a super crit multiplies it by 5, a low roll is a plain hit', () => {
 	withMonster({ type: 'ratKing', tier: 1 });
 	api().startFight(1);
-	const base = 2;
+	const base = 6;
 	assert.deepEqual(hit(250, 0), { damage: base, killed: false, crit: 'none' });
 	assert.deepEqual(hit(250, 0.999), { damage: base * COMBAT.crit.superMult, killed: false, crit: 'super' });
 	// a roll that crits (>= 1 - crit chance) but misses the super threshold
@@ -117,7 +119,7 @@ test('leaveFight then startFight gives the monster full HP again', () => {
 	withMonster();
 	api().startFight(1);
 	hits(10);
-	assert.equal(api().fight?.monsterHp, 80);
+	assert.equal(api().fight?.monsterHp, 40);
 	api().leaveFight();
 	assert.equal(api().fight, null);
 	api().startFight(1);
@@ -277,12 +279,13 @@ test('the first rat spawns after 120 s with 5 owned tiles, not before', () => {
 	assert.equal(tileAt(api().tiles, m.x, m.y).hasChest, undefined);
 });
 
-test('monsters never exceed the cap, never share a tile and never stand on the castle', () => {
+test('monsters and chests fill exactly their share of the map, never share a tile and never stand on the castle', () => {
 	freshGame();
 	growTo(30);
 	for (let i = 0; i < 160; i++) api().tick(300_000);
 	const list = api().monsters;
-	assert.equal(list.length, COMBAT.maxMonsters);
+	const cap = spawnCap(api().tiles, castleLevelOf(api().tiles));
+	assert.equal(list.length + api().tiles.stats.chests, cap);
 	assert.equal(new Set(list.map((m) => `${m.x},${m.y}`)).size, list.length);
 	assert.ok(list.every((m) => tileAt(api().tiles, m.x, m.y).isOwned && tileAt(api().tiles, m.x, m.y).biome !== 'castle'));
 	assert.ok(list.filter((m) => m.type === 'ratKing').length <= 1);

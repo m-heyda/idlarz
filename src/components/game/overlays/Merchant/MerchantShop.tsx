@@ -75,7 +75,7 @@ export const MerchantShop: React.FC<BoughtProps> = ({ onBought }) => {
 					if (!def) return null;
 					return (
 						<div key={id} className='flex items-center gap-3'>
-							<ItemSlot itemId={id} />
+							<ItemSlot itemId={id} compare />
 							<div className='flex flex-col gap-1 min-w-0'>
 								<span className='text-xs text-white truncate'>{def.name}</span>
 								<button

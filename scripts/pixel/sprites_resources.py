@@ -118,6 +118,41 @@ def shard():
     return img
 
 
+def diamond(glints=True):
+    """The Gems currency: a cut diamond drawn facet by facet (table, crown, pointed pavilion) in a blue ramp, lit from the top-left."""
+    from PIL import ImageDraw
+    ramp = ['#123a86', '#2468c6', '#4aa0ee', '#9adcfa', '#effcff']    # dark -> light
+    line = '#0a2152'
+    img = Image.new('RGBA', (40, 40), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    y0, y1, y2 = 7, 17, 35                     # table line, girdle, culet
+    xs = (4, 13, 20, 27, 36)                   # girdle points
+    top = (12, 20, 28)                         # table points
+    facets = [
+        ([(top[0], y0), (xs[0], y1), (xs[1], y1)], 2),
+        ([(top[0], y0), (top[1], y0), (xs[1], y1)], 4),
+        ([(top[1], y0), (xs[1], y1), (xs[2], y1)], 3),
+        ([(top[1], y0), (xs[2], y1), (xs[3], y1)], 2),
+        ([(top[1], y0), (top[2], y0), (xs[3], y1)], 3),
+        ([(top[2], y0), (xs[3], y1), (xs[4], y1)], 1),
+        ([(xs[0], y1), (xs[1], y1), (xs[2], y2)], 3),
+        ([(xs[1], y1), (xs[2], y1), (xs[2], y2)], 4),
+        ([(xs[2], y1), (xs[3], y1), (xs[2], y2)], 2),
+        ([(xs[3], y1), (xs[4], y1), (xs[2], y2)], 1),
+    ]
+    for pts, tone in facets:
+        d.polygon(pts, fill=ramp[tone])
+    # facet edges, then the 1px coloured outline of the whole silhouette
+    for pts, _ in facets:
+        d.line(pts + [pts[0]], fill=ramp[0] if False else '#1c4fa8', width=1)
+    d.line([(top[0], y0), (top[2], y0), (xs[4], y1), (xs[2], y2), (xs[0], y1), (top[0], y0)], fill=line, width=1)
+    img = img.transform(img.size, Image.AFFINE, (1, 0, 0, 0, 1, -1))   # nudge the stone down a pixel so it sits centred
+    if glints:
+        fx.glint(img, 13, 10, 2)
+        fx.glint(img, 28, 22, 1)
+    return img
+
+
 # ----------------------------------------------------------------- farm products
 def egg_tex(pl, nl, pr):
     n = vnoise(pl[0] * 5, pl[1] * 5, pl[2] * 5, pr.seed)

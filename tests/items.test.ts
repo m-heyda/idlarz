@@ -9,6 +9,7 @@ import {
 	STARTER_BAG_ITEMS,
 	STARTER_EQUIPMENT,
 } from '../src/config/itemCatalog';
+import { DEFAULT_ITEM_LEVEL, STAT_BASE_BY_TIER, STAT_KEYS, WEAPON_ATTACK_SPEED, baseStat, statScale, weaponDps } from '../src/catalog';
 import type { EquipmentSlot } from '../src/types/game';
 
 const ALL_SLOTS: EquipmentSlot[] = [
@@ -58,13 +59,13 @@ test('Rattatui pieces cover all 13 slots (the ring item covers ring1 and ring2)'
 	assert.equal(RATTATUI_SET.pieces.length, 12);
 });
 
-test('only weapons carry damage, none exceeds COMBAT.maxItemDamage, and the starter weapon deals 2', () => {
+test('only weapons carry damage, none exceeds COMBAT.maxItemDamage, and the starter weapon deals 6', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
 		if (def.slot === 'mainHand') {
 			assert.ok((def.stats?.damage ?? 0) >= 1 && def.stats!.damage! <= COMBAT.maxItemDamage, def.id);
 		} else assert.equal(def.stats?.damage, undefined, `${def.id} is not a weapon`);
 	}
-	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.mainHand!].stats?.damage, 2);
+	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.mainHand!].stats?.damage, 6);
 });
 
 test('starter shield has armor 2', () => {
@@ -124,4 +125,68 @@ test('starter bag items exist in the catalog', () => {
 		assert.ok(ITEM_CATALOG[id], id);
 		assert.ok(qty >= 1);
 	}
+});
+
+// ---- item level, tier base stats, attack speed ---------------------------------------------------------------------
+
+test('every item has an id of its own and item level 10', () => {
+	const ids = new Set<string>();
+	for (const def of Object.values(ITEM_CATALOG)) {
+		assert.ok(def.id && !ids.has(def.id), `${def.id} is unique`);
+		ids.add(def.id);
+		assert.equal(def.itemLevel, DEFAULT_ITEM_LEVEL, def.id);
+	}
+});
+
+test('the base value of every stat rises with the tier, and item level scales it', () => {
+	for (const key of STAT_KEYS) {
+		const row = STAT_BASE_BY_TIER[key];
+		for (let tier = 2; tier <= row.length; tier++) assert.ok(row[tier - 1] > row[tier - 2], `${key}: tier ${tier} beats tier ${tier - 1}`);
+		assert.equal(baseStat(key, 3), row[2]);
+		assert.equal(baseStat(key, 3, 20), Math.round(row[2] * 2 * 100) / 100, `${key} doubles at item level 20`);
+	}
+	assert.equal(statScale(DEFAULT_ITEM_LEVEL), 1);
+});
+
+test('items that carry a new stat take its number from the tier table', () => {
+	for (const def of Object.values(ITEM_CATALOG)) {
+		for (const key of ['goldFind', 'dodge'] as const) {
+			const value = def.stats?.[key];
+			if (value !== undefined) assert.equal(value, baseStat(key, def.tier), `${def.id} ${key}`);
+		}
+	}
+	assert.ok(Object.values(ITEM_CATALOG).some((d) => d.stats?.goldFind) && Object.values(ITEM_CATALOG).some((d) => d.stats?.dodge));
+});
+
+test('every weapon swings at a positive attack speed and nothing else has one', () => {
+	for (const def of Object.values(ITEM_CATALOG)) {
+		if (def.slot === 'mainHand') assert.ok((def.attackSpeed ?? 0) > 0, `${def.id} has an attack speed`);
+		else assert.equal(def.attackSpeed, undefined, `${def.id} is not a weapon`);
+	}
+	assert.equal(ITEM_CATALOG.wooden_sword.attackSpeed, WEAPON_ATTACK_SPEED.sword);
+	assert.ok(ITEM_CATALOG.titan_maul.attackSpeed! < ITEM_CATALOG.steel_dagger.attackSpeed!, 'heavy swings slower than light');
+});
+
+test('weapon DPS rises with the tier within a weapon type', () => {
+	const best = new Map<string, number>(); // weaponType -> DPS of the previous (lower) tier
+	const weapons = Object.values(ITEM_CATALOG)
+		.filter((d) => d.slot === 'mainHand')
+		.sort((a, b) => a.tier - b.tier);
+	const byType = new Map<string, typeof weapons>();
+	for (const w of weapons) byType.set(w.weaponType!, [...(byType.get(w.weaponType!) ?? []), w]);
+	for (const [type, list] of byType) {
+		let lowerTier = { tier: 0, dps: 0 };
+		for (const tier of [...new Set(list.map((w) => w.tier))]) {
+			const dps = Math.max(...list.filter((w) => w.tier === tier).map(weaponDps));
+			assert.ok(dps > lowerTier.dps, `${type}: tier ${tier} (${dps}) beats tier ${lowerTier.tier} (${lowerTier.dps})`);
+			lowerTier = { tier, dps };
+		}
+		best.set(type, lowerTier.dps);
+	}
+	assert.ok(best.size >= 6);
+});
+
+test('a starter weapon kills a tier-1 rat in well under a minute of attack-speed swings', () => {
+	const sword = ITEM_CATALOG.wooden_sword;
+	assert.ok(100 / weaponDps(sword) < 30);
 });

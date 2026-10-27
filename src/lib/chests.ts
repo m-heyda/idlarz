@@ -59,6 +59,8 @@ export type ChestLoot =
 export interface ChestContext {
 	rates: Resources; // total per-second income (resourceRates.total)
 	luck: number;
+	/** Gold Find of the gear, in %: extra gold from gold and lucky chests */
+	goldFind?: number;
 	bag: BagSlot[];
 }
 
@@ -94,7 +96,7 @@ export function rollChestLoot(ctx: ChestContext, random: () => number = Math.ran
 	const luck = 1 + ctx.luck * CHEST.luckBonusPerPoint;
 	const goldLoot = (multiplier: number): ChestLoot => {
 		const minutes = between(random, [CHEST.minMinutes, CHEST.maxMinutes]);
-		const gold = Math.floor(ctx.rates.gold * minutes * 60 * luck * multiplier);
+		const gold = Math.floor(ctx.rates.gold * minutes * 60 * luck * multiplier * (1 + (ctx.goldFind ?? 0) / 100));
 		return multiplier > 1
 			? { kind: 'boost', gold, minutes, goldRate: ctx.rates.gold, multiplier }
 			: { kind: 'gold', gold, minutes, goldRate: ctx.rates.gold };

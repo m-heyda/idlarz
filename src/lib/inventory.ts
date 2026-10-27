@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, type ItemStats, type StatKey, type StatTotals } from '@/catalog';
+import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, weaponDps, type ItemStats, type StatKey, type StatTotals } from '@/catalog';
 import type { BagSlot, Equipment, EquipmentSlot, ItemDef } from '@/types/game';
 
 // Pure bag / equipment operations. Nothing here mutates its arguments; every function returns fresh arrays and objects.
@@ -168,11 +168,29 @@ export interface SetChange {
 	lost: { count: number; stats: ItemStats }[];
 }
 
+/** The headline number of a card (weapon damage, or armor) with the worn piece's value, like the big Armor line of an action-RPG card. */
+export interface PrimaryRow {
+	key: 'damage' | 'armor';
+	was: number;
+	now: number;
+	delta: number;
+}
+
+/** A weapon's swing: attacks per second and damage per second, the hovered piece against the worn one. */
+export interface SwingRow {
+	speed: { was: number; now: number; delta: number };
+	dps: { was: number; now: number; delta: number };
+}
+
 export interface DetailedComparison {
 	slot: EquipmentSlot;
 	equippedId?: string;
 	/** The two pieces side by side, stat by stat (own stats only, no set bonuses) */
 	rows: StatRow[];
+	/** The headline stat (weapon damage or armor); its row is also in `rows` */
+	primary: PrimaryRow | null;
+	/** Attack speed and DPS when the hovered piece is a weapon */
+	swing: SwingRow | null;
 	setChanges: SetChange[];
 	/** The whole character: every stat that changes, set bonuses included (same as `compareToEquipped().deltas`) */
 	net: ItemStats;
@@ -181,6 +199,10 @@ export interface DetailedComparison {
 }
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
+
+/** Which stat is the headline of an item card: damage for a weapon, else armor if it has any. */
+export const primaryKeyOf = (def: Pick<ItemDef, 'kind' | 'stats'>): 'damage' | 'armor' | null =>
+	def.kind === 'weapon' ? 'damage' : def.stats?.armor ? 'armor' : null;
 
 /**
  * The hover comparison: the hovered piece against the one worn in its slot, stat by stat with new / lost / up / down,
@@ -223,5 +245,21 @@ export const compareDetailed = (itemId: string, equipment: Equipment): DetailedC
 		});
 	}
 
-	return { slot: base.slot, equippedId: base.equippedId, rows, setChanges, net: base.deltas, after };
+	const wornDef = base.equippedId ? ITEM_CATALOG[base.equippedId] : undefined;
+	const primaryKey = primaryKeyOf(def);
+	const primary: PrimaryRow | null = primaryKey
+		? { key: primaryKey, was: wornStats?.[primaryKey] ?? 0, now: def.stats?.[primaryKey] ?? 0, delta: round2((def.stats?.[primaryKey] ?? 0) - (wornStats?.[primaryKey] ?? 0)) }
+		: null;
+	let swing: SwingRow | null = null;
+	if (def.kind === 'weapon' && def.attackSpeed) {
+		const wasSpeed = wornDef?.kind === 'weapon' ? (wornDef.attackSpeed ?? 0) : 0;
+		const wasDps = wornDef?.kind === 'weapon' ? weaponDps(wornDef) : 0;
+		const nowDps = weaponDps(def);
+		swing = {
+			speed: { was: wasSpeed, now: def.attackSpeed, delta: round2(def.attackSpeed - wasSpeed) },
+			dps: { was: wasDps, now: nowDps, delta: round2(nowDps - wasDps) },
+		};
+	}
+
+	return { slot: base.slot, equippedId: base.equippedId, rows, primary, swing, setChanges, net: base.deltas, after };
 };

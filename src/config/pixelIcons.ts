@@ -15,8 +15,10 @@ export const PIXEL_ICON_SIZES = {
 	eggs: [40, 40],
 	milk: [40, 40],
 	hide: [40, 40],
-	// the rebirth currency (Legacy points are shown as Gems)
-	gems: [40, 40],
+	// the rebirth currency (the Legacy points)
+	legacy: [40, 40],
+	// the premium currency
+	diamond: [40, 40],
 	// menu buttons + badges
 	menu_character: [40, 40],
 	menu_merchant: [40, 40],
@@ -40,7 +42,8 @@ export const PIXEL_ICON_SIZES = {
 	chest_map_anim: [192, 40], // 4 idle frames of chest_map (lock and lid glints)
 	// twinkle strips: 6 frames of the sprite with glints that swell and fade
 	gold_shine: [240, 40],
-	gems_shine: [240, 40],
+	legacy_shine: [240, 40],
+	diamond_shine: [240, 40],
 	res_crystal_shine: [240, 40],
 	res_sapphire_shine: [240, 40],
 	res_mana_shine: [240, 40],
@@ -241,14 +244,16 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 	eggs: 'eggs',
 	milk: 'milk',
 	hide: 'hide',
-	gems: 'gems', // the prestige currency (not a Resources key)
+	legacy: 'legacy', // the rebirth currency (not a Resources key)
+	gems: 'diamond', // the premium currency (its own balance, not a Resources key)
 	xp: 'xp',
 };
 
 // Sprites that twinkle: name -> its 6-frame strip (see the .px-shine class)
 export const SHINE_SHEETS: Partial<Record<PixelIconName, PixelIconName>> = {
 	gold: 'gold_shine',
-	gems: 'gems_shine',
+	legacy: 'legacy_shine',
+	diamond: 'diamond_shine',
 	res_crystal: 'res_crystal_shine',
 	res_sapphire: 'res_sapphire_shine',
 	res_mana: 'res_mana_shine',

@@ -1088,10 +1088,17 @@ body {
 	color: #a89878;
 }
 
-/* Item comparison: the worn piece beside the hovered one, and a stat table with NEW / LOST / up / down tags */
+/* Item card (action-RPG layout): name, rarity line, item level, big headline stat, bullet list, red "lost" list.
+   With a comparison every number carries its change in parentheses, green for better, red for worse. */
 .px-tooltip-worn {
 	opacity: 0.92;
 	filter: saturate(0.8);
+}
+
+.px-tip-body {
+	min-width: 220px;
+	font-size: 0.8125rem;
+	line-height: 1.35;
 }
 
 .px-tip-worn {
@@ -1103,61 +1110,112 @@ body {
 	border-bottom: 1px solid #3a2810;
 }
 
-.px-stat-table {
-	display: grid;
-	gap: 1px;
+.px-tip-kind {
+	font-size: 0.75rem;
+	text-transform: capitalize;
+	opacity: 0.85;
 }
 
-.px-stat-row {
-	display: grid;
-	grid-template-columns: minmax(78px, 1fr) auto minmax(56px, auto);
-	align-items: baseline;
-	gap: 10px;
-	padding: 0 4px;
+.px-tip-level {
 	font-size: 0.75rem;
 	color: #d8c8a0;
+}
 
-	.px-stat-value {
-		text-align: right;
+.px-tip-sep {
+	margin: 4px 0;
+	border-top: 1px solid #3a2810;
+}
+
+.px-tip-primary {
+	font-size: 0.875rem;
+	color: #d8c8a0;
+
+	.px-tip-big {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #f1e6c8;
+	}
+}
+
+.px-tip-swing {
+	margin-top: 2px;
+	font-size: 0.75rem;
+	color: #a89878;
+
+	b {
+		color: #f1e6c8;
+	}
+}
+
+.px-tip-list {
+	margin-top: 6px;
+	display: grid;
+	gap: 2px;
+}
+
+.px-tip-bullet {
+	position: relative;
+	padding-left: 14px;
+	color: #d8c8a0;
+
+	&::before {
+		content: '';
+		position: absolute;
+		left: 3px;
+		top: 0.55em;
+		width: 5px;
+		height: 5px;
+		background: #a89878;
+		transform: rotate(45deg);
+	}
+}
+
+.px-diff-up {
+	color: #4ade80;
+	font-weight: 700;
+}
+
+.px-diff-down {
+	color: #f87171;
+	font-weight: 700;
+}
+
+.px-tip-lost {
+	margin-top: 8px;
+	font-size: 0.75rem;
+
+	.px-tip-lost-title {
+		color: #d8c8a0;
+		margin-bottom: 1px;
+	}
+
+	.px-tip-lost-line {
+		color: #f87171;
 		font-weight: 700;
 	}
+}
 
-	.px-stat-change {
-		text-align: right;
-		font-weight: 700;
-		white-space: nowrap;
-	}
+.px-tip-section {
+	margin-top: 8px;
+	padding-top: 4px;
+	border-top: 1px solid #3a2810;
+	font-size: 0.75rem;
+}
 
-	&[data-status='up'] {
-		color: #4ade80;
-		background: rgba(74, 222, 128, 0.08);
-	}
+.px-tip-flavor {
+	margin-top: 8px;
+	font-size: 0.75rem;
+	font-style: italic;
+	color: #a89878;
+}
 
-	&[data-status='new'] {
-		color: #4ade80;
-		background: rgba(74, 222, 128, 0.16);
-		box-shadow: inset 2px 0 0 #4ade80;
-	}
-
-	&[data-status='down'] {
-		color: #f87171;
-		background: rgba(248, 113, 113, 0.08);
-	}
-
-	&[data-status='lost'] {
-		color: #f87171;
-		background: rgba(248, 113, 113, 0.16);
-		box-shadow: inset 2px 0 0 #f87171;
-
-		.px-stat-name,
-		.px-stat-value {
-			text-decoration: line-through;
-		}
-	}
-
-	&[data-status='same'] .px-stat-change {
-		color: #a89878;
-	}
+.px-tip-sell {
+	margin-top: 8px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 0.75rem;
+	color: #d8c8a0;
 }
 
 /* --- toasts (chest, level-up) --- */
