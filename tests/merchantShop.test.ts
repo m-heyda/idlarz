@@ -38,9 +38,24 @@ test('sell values rise with rarity and with item level', () => {
 	assert.ok(sellValueOf(ofRarity('rare', 40)) > sellValueOf(ofRarity('rare', 10)));
 });
 
-test('no single item is worth a fortune: the best drop at the level cap sells for far less than the verified gold burst allowance', () => {
-	const top = Math.max(...RARITY_ORDER.map((r) => sellValueOf(ofRarity(r, 100))));
-	assert.ok(top <= 20_000, `the best item at level 100 sells for ${top}`);
+test('no single item is worth a fortune: the best plain drop of the levels the game produces (up to the Kings 35) stays under 50 million', () => {
+	const top = Math.max(...RARITY_ORDER.map((r) => sellValueOf(ofRarity(r, 35))));
+	assert.ok(top <= 50_000_000, `the best item at level 35 sells for ${top}`);
+});
+
+test('what an item sells for follows its rarity, item level, quality and affixes, and is worth selling', () => {
+	const base = ofRarity('rare', 12);
+	const plain = sellValueOf(base);
+	assert.ok(sellValueOf({ ...base, quality: 100 }) > plain, 'a better quality roll is worth more');
+	assert.ok(sellValueOf({ ...base, quality: 0 }) < plain);
+	const one = sellValueOf({ ...base, affixes: [{ id: 'regen_prefix', roll: 50 }] });
+	const two = sellValueOf({ ...base, affixes: [{ id: 'regen_prefix', roll: 50 }, { id: 'luck_prefix', roll: 50 }] });
+	assert.ok(one > plain && two > one, 'every affix adds to the value');
+	assert.ok(sellValueOf({ ...base, affixes: [{ id: 'regen_prefix', roll: 100 }] }) > one, 'and a better roll adds more');
+	assert.ok(sellValueOf(ofRarity('common', 1)) >= 100, 'even the plainest drop is worth a few minutes of early income, not a coin');
+	// each rarity step is a clear step up at the same level
+	const steps = RARITY_ORDER.map((r) => sellValueOf(ofRarity(r, 10)));
+	for (let i = 1; i < steps.length; i++) assert.ok(steps[i] >= steps[i - 1] * 2.5, `${RARITY_ORDER[i]}`);
 });
 
 test('the supplies are potions only, every price is at least 3x the sell value (3.9x of a max Haggler) so buying and selling never print gold', () => {

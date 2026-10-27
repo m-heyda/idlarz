@@ -12,7 +12,7 @@ export interface RarityDef {
 	color: string;
 	/** Rank: ordering of the tiers (higher is rarer). The auto-sell filter and "sell junk" compare ranks. */
 	order: number;
-	/** Gold the merchant pays for an item of this rarity at item level 1 (grows with the item level, see `sellValueOf`) */
+	/** Gold the merchant pays for a plain item of this rarity at item level 1; the item level, quality and affixes grow it (see `sellValueOf`, `ITEM_VALUE`) */
 	sellValue: number;
 	glow: { blur: number; alpha: number; pulse: boolean };
 	/** How many affixes an item of this rarity rolls (inclusive range) */
@@ -25,11 +25,11 @@ export interface RarityDef {
 }
 
 export const RARITIES: Record<EquipmentRarity, RarityDef> = {
-	common: { id: 'common', label: 'Common', color: '#c8c8c8', order: 0, sellValue: 8, glow: { blur: 2, alpha: 0.35, pulse: false }, minAffixes: 0, maxAffixes: 0, statMultiplier: 1, enabled: true },
-	uncommon: { id: 'uncommon', label: 'Uncommon', color: '#4ade80', order: 1, sellValue: 90, glow: { blur: 3, alpha: 0.55, pulse: false }, minAffixes: 1, maxAffixes: 1, statMultiplier: 1, enabled: true },
-	rare: { id: 'rare', label: 'Rare', color: '#60a5fa', order: 2, sellValue: 250, glow: { blur: 4, alpha: 0.7, pulse: false }, minAffixes: 2, maxAffixes: 3, statMultiplier: 1, enabled: true },
-	epic: { id: 'epic', label: 'Epic', color: '#c084fc', order: 3, sellValue: 700, glow: { blur: 5, alpha: 0.85, pulse: true }, minAffixes: 3, maxAffixes: 4, statMultiplier: 1, enabled: true },
-	legendary: { id: 'legendary', label: 'Legendary', color: '#fb923c', order: 4, sellValue: 2000, glow: { blur: 6, alpha: 0.95, pulse: true }, minAffixes: 4, maxAffixes: 5, statMultiplier: 1, enabled: true },
+	common: { id: 'common', label: 'Common', color: '#c8c8c8', order: 0, sellValue: 300, glow: { blur: 2, alpha: 0.35, pulse: false }, minAffixes: 0, maxAffixes: 0, statMultiplier: 1, enabled: true },
+	uncommon: { id: 'uncommon', label: 'Uncommon', color: '#4ade80', order: 1, sellValue: 1200, glow: { blur: 3, alpha: 0.55, pulse: false }, minAffixes: 1, maxAffixes: 1, statMultiplier: 1, enabled: true },
+	rare: { id: 'rare', label: 'Rare', color: '#60a5fa', order: 2, sellValue: 3600, glow: { blur: 4, alpha: 0.7, pulse: false }, minAffixes: 2, maxAffixes: 3, statMultiplier: 1, enabled: true },
+	epic: { id: 'epic', label: 'Epic', color: '#c084fc', order: 3, sellValue: 12000, glow: { blur: 5, alpha: 0.85, pulse: true }, minAffixes: 3, maxAffixes: 4, statMultiplier: 1, enabled: true },
+	legendary: { id: 'legendary', label: 'Legendary', color: '#fb923c', order: 4, sellValue: 45000, glow: { blur: 6, alpha: 0.95, pulse: true }, minAffixes: 4, maxAffixes: 5, statMultiplier: 1, enabled: true },
 };
 
 export const RARITY_ORDER = (Object.keys(RARITIES) as EquipmentRarity[]).sort((a, b) => RARITIES[a].order - RARITIES[b].order);

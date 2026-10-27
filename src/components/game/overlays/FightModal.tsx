@@ -12,7 +12,6 @@ import PixelModal from '../PixelModal';
 import MonsterArt from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
 import { slotProps } from '../itemUi';
-import ResourceIcon from '../ResourceIcon';
 import '@/styles/Fight.css';
 
 interface FloatNumber {
@@ -116,10 +115,6 @@ const FightView: React.FC = () => {
 		};
 	}, [pushNumber]);
 
-	useEffect(() => {
-		if (fight.phase === 'won') audioManager.playSound('fanfare');
-	}, [fight.phase]);
-
 	// Up to three potion stacks from the bag, with hotkeys 1-3
 	const potions = bag
 		.map((slot, index) => ({ slot, index }))
@@ -216,36 +211,6 @@ const FightView: React.FC = () => {
 					))}
 					{!active && (
 						<div className='fight-result px-card'>
-							{fight.phase === 'won' && fight.summary && (
-								<>
-									<div className='px-h text-center'>Victory!</div>
-									<div className='flex justify-center gap-4 text-sm'>
-										<span className='flex items-center gap-1'>
-											+{Math.floor(fight.summary.gold)} <ResourceIcon resource='gold' />
-										</span>
-										<span className='flex items-center gap-1'>
-											+{Math.floor(fight.summary.xp)} <ResourceIcon resource='xp' />
-										</span>
-									</div>
-									{fight.summary.items.length > 0 && (
-										<div className='flex justify-center gap-2 mt-2'>
-											{fight.summary.items.map((drop, i) =>
-												drop.kind === 'gear' ? <ItemSlot key={i} item={drop.item} /> : <ItemSlot key={i} itemId={drop.id} qty={drop.qty} />
-											)}
-										</div>
-									)}
-									{fight.summary.autoSold.count > 0 && (
-										<div className='px-tip-muted text-xs text-center mt-2'>
-											Auto-sold {fight.summary.autoSold.count} piece{fight.summary.autoSold.count === 1 ? '' : 's'} of gear for {fight.summary.autoSold.gold} gold
-										</div>
-									)}
-									{fight.summary.convertedGold > 0 && (
-										<div className='px-tip-muted text-xs text-center mt-2'>
-											Bag full - {fight.summary.convertedGold} gold paid for the drops that did not fit
-										</div>
-									)}
-								</>
-							)}
 							{fight.phase === 'knockedOut' && (
 								<div className='text-center'>
 									<div className='px-h'>Knocked out</div>
@@ -331,7 +296,8 @@ const FightView: React.FC = () => {
 };
 
 const FightModal: React.FC = () => {
-	const open = useGameStore((state) => state.fight !== null);
+	// a won fight is handed to the victory notice (VictoryToast), which closes it: no window to confirm after the last click
+	const open = useGameStore((state) => state.fight !== null && state.fight.phase !== 'won');
 	return open ? <FightView /> : null;
 };
 

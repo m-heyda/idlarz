@@ -20,6 +20,7 @@ export const COMBAT = {
 	},
 	bagSize: LIMITS.bagSize, // base bag slots; read the current size through limitOf('bagSize', ctx) (Pack Rat and later effects add to it)
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
+	victoryToastSec: 12, // how long the loot notice after a won fight stays up (hover pauses it)
 	spawn: {
 		firstSec: 120, // first monster this long after the territory reaches minOwnedTiles
 		intervalSec: 900, // then one per this long (chests: 600 s)
@@ -109,13 +110,12 @@ export const MONSTERS = {
 	ratKing: {
 		grade: 'boss',
 		label: 'Rat King',
-		hp: 10400, // behind 20 armor (a third of every click is lost): 15600 effective HP at level 15, the old tuning; see docs/generated/fight-sim.md
-		attack: 14,
-		armor: 20,
-		critChance: 10,
+		hp: 9600, // behind 15 armor (a bit over a quarter of every click is lost): about 13200 effective HP at level 15; see docs/generated/fight-sim.md
+		attack: 11,
+		armor: 15,
+		critChance: 8,
 		critMult: 1.5,
-		stunResist: 25,
-		attackIntervalSec: 3, // armor decides how many hits you survive; potions fill the gap
+		stunResist: 20,
 		rewardSec: 3600,
 		refLevel: 15,
 		scaling: 'gear',
@@ -132,5 +132,6 @@ export const MONSTERS = {
 			'The King is not impressed.',
 			'Run along, little knight!',
 		],
+		attackIntervalSec: 3, // armor decides how many hits you survive; potions fill the gap
 	},
 } as const satisfies Record<string, MonsterDef>;

@@ -59,7 +59,7 @@ Schema 3 stores gear as instances: equipment `{ slot: { base, level, rarity, qua
 
 ## The merchant's shelf
 
-The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs the `merchant_stock` profile: six guaranteed rolls on the general pool at +-2 item levels, rarity weights common 50 / uncommon 32 / rare 14 / epic 4 (gated by item level like chests), no legendary and no bonus tables. `generateMerchantStock` (src/lib/merchant.ts) turns the drops into the shelf; the price is `ceil(sellValueOf(item) × 40)`, derived each time, never saved. The shelf is the optional save key `merchantStock` (`{ at, offers }`, every offer read by the same item validation as the bag, at most 12 offers).
+The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs the `merchant_stock` profile: twelve guaranteed rolls on the general pool (the shelf keeps the first six) at +-2 item levels, rarity weights common 50 / uncommon 32 / rare 14 / epic 4 (gated by item level like chests), no legendary and no bonus tables. `generateMerchantStock` (src/lib/merchant.ts) turns the drops into the shelf; the price is `ceil(sellValueOf(item) × 5)`, derived each time, never saved. The shelf is the optional save key `merchantStock` (`{ at, offers }`, every offer read by the same item validation as the bag, at most 12 offers).
 
 ## Player-facing
 
@@ -71,3 +71,7 @@ The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs 
 Salvage / materials and reroll / upgrade (real gear sinks), flat set bonuses that fade at high level, `requiredLevel`, weapon attack speed in combat, offline loot (there is no offline progress), elite monsters and premium chests, a Luck effect on rarity weights, and rebalancing the monsters with the world level (see the follow-up list in the design spec).
 
 A monster source has no level of its own: `LootRequest.level` is the monster's level, and the source's `levels` range (rat 1-20, King 15-35) is what `validateLootData` checks the pools against. Per-level chances (`chancePerLevel`) replace the old per-tier ones (half the size: a tier was two levels). A boss is a monster def with `grade: 'boss'` whose `lootSourceId` names its own source and profile, so boss-only drops need data only.
+
+## What gear is worth
+
+`sellValueOf` = the rarity's value at level 1 (common 300 ... legendary 45000) x `valueCurve(level)` x the quality roll x the affixes (`ITEM_VALUE`, `catalog/stats.ts`): steep up to level 10 (x1.3 per level) and flatter after (x1.12), so an item is worth minutes of the income of the stage it drops in, a well rolled rare clearly more than a plain one. The merchant sells at 5x.

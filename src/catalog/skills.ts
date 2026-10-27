@@ -20,7 +20,7 @@ export interface SkillDef {
 
 export const SKILLS: Record<SkillId, SkillDef> = {
 	heal: { id: 'heal', name: 'Heal', unlockLevel: 5, manaCost: 20, cooldownSec: 12, fightOnly: false, healFraction: 0.25 },
-	stun: { id: 'stun', name: 'Stun', unlockLevel: 10, manaCost: 15, cooldownSec: 15, fightOnly: true, stunSec: 3 },
+	stun: { id: 'stun', name: 'Stun', unlockLevel: 10, manaCost: 15, cooldownSec: 30, fightOnly: true, stunSec: 10 },
 };
 
 /** The order they show in (hotkeys 4 and 5 in a fight). */

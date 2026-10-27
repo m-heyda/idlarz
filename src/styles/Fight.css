@@ -346,3 +346,74 @@
 		filter: brightness(1.8);
 	}
 }
+
+/* --- the loot notice after a won fight: bottom centre, never in the way of the clicks that follow --- */
+.victory-toast {
+	position: fixed;
+	left: 50%;
+	bottom: 24px;
+	transform: translateX(-50%);
+	z-index: 70;
+	min-width: 260px;
+	max-width: min(92vw, 520px);
+	padding: 10px 28px 10px 14px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	color: #f0e6d0;
+	animation: victory-in 0.25s ease-out both;
+}
+
+.victory-toast[data-boss='true'] {
+	border-color: #ffd860;
+}
+
+.victory-title {
+	font-weight: 700;
+	color: #ffe27a;
+	text-align: center;
+}
+
+.victory-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 6px 14px;
+	font-size: 0.85rem;
+}
+
+.victory-status {
+	color: #a89878;
+	font-size: 0.75rem;
+}
+
+.victory-loot {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 6px;
+}
+
+.victory-note {
+	font-size: 0.75rem;
+	color: #a89878;
+	text-align: center;
+}
+
+.victory-close {
+	position: absolute;
+	top: 2px;
+	right: 4px;
+	width: 20px;
+	height: 20px;
+	line-height: 1;
+	color: #c8b896;
+	cursor: pointer;
+}
+
+@keyframes victory-in {
+	from { opacity: 0; transform: translate(-50%, 12px); }
+	to { opacity: 1; transform: translate(-50%, 0); }
+}

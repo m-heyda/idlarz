@@ -15,7 +15,7 @@ import CharacterPortrait from './CharacterPortrait';
 // Inner width of the XP frame sprite (80px wide, 3px border each side)
 const XP_BAR_INNER_PX = 74;
 
-/** Portrait, name, level orb and XP bar. A click opens the Stats tab. */
+/** Portrait, name, level orb and XP bar. A click opens the Character tab. */
 export const PlayerCard: React.FC = () => {
 	const xp = useGameStore((state) => state.resources.xp);
 	const level = useGameStore((state) => state.level);
@@ -81,7 +81,7 @@ export const PlayerCard: React.FC = () => {
 	);
 };
 
-/** The three header buttons: the main menu (Character, Stats, Merchant, Farm), Legacy / rebirth and Settings. */
+/** The three header buttons: the main menu (Equipment, Character, Merchant, Farm), Legacy / rebirth and Settings. */
 export const HeaderButtons: React.FC = () => {
 	const attention = useMenuAttention();
 	const menuOpen = useUiStore((state) => state.menuOpen);

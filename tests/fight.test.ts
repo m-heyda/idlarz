@@ -13,6 +13,7 @@ import type { ItemInstance } from '../src/types/game';
 import { castleLevelOf } from '../src/lib/castleWard';
 import { spawnCap } from '../src/lib/spawnLimits';
 import { fullSet } from '../src/lib/fightSim';
+import { generateLoot } from '../src/lib/loot';
 import { pickPersisted } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
 import { patchTile } from '../src/utils/world';
@@ -165,8 +166,11 @@ test('loot with a full bag converts to gold and loses no items', () => {
 		const summary = api().fight!.summary!;
 		assert.deepEqual(api().bag, full);
 		assert.deepEqual(summary.items, []);
-		// a random of 0 rolls a level 1 common item: the first base of the pool
-		assert.equal(summary.convertedGold, sellValueOf(plainItem(BASIC_GEAR[0])) + ITEM_CATALOG.potion_minor.sellValue);
+		// the same roll again: the gear that did not fit is paid at its sell value, the potion at the potion's
+		const drops = generateLoot({ sourceId: 'rat', level: 1 }, () => 0).drops;
+		const expected = drops.reduce((sum, d) => sum + (d.kind === 'gear' ? sellValueOf(d.item) : d.qty * ITEM_CATALOG[d.id].sellValue), 0);
+		assert.ok(expected > ITEM_CATALOG.potion_minor.sellValue);
+		assert.equal(summary.convertedGold, expected);
 		assert.equal(api().resources.gold - before, summary.gold + summary.convertedGold);
 	} finally {
 		mock.restoreAll();
@@ -386,7 +390,9 @@ test('the auto-sell filter sells matching gear on the spot, pays Haggler like a 
 		api().startFight(1);
 		hits(50);
 		const summary = api().fight!.summary!;
-		const unit = sellValueOf(plainItem(BASIC_GEAR[0]));
+		const rolled = generateLoot({ sourceId: 'rat', level: 1 }, () => 0).drops.find((d) => d.kind === 'gear');
+		const unit = rolled && rolled.kind === 'gear' ? sellValueOf(rolled.item) : 0;
+		assert.ok(unit > 0);
 		assert.equal(summary.autoSold.count, 1);
 		assert.equal(summary.autoSold.gold, sellPayout(unit, 1, { merchantUpgrades: { haggler: 3 } }));
 		assert.equal(summary.items.some((d) => d.kind === 'gear'), false, 'the gear was sold, not stored');

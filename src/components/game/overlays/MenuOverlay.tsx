@@ -12,7 +12,7 @@ import MerchantOverlay from './Merchant/MerchantOverlay';
 import FarmOverlay from './FarmOverlay';
 
 /**
- * The main menu: one window with a tab per area (Character, Stats, Merchant, Farm). Only the active tab is mounted,
+ * The main menu: one window with a tab per area (Equipment, Character, Merchant, Farm). Only the active tab is mounted,
  * so the farm scene measures its real body and its critters only roam while you look at it.
  */
 const MenuOverlay: React.FC = () => {
@@ -33,10 +33,10 @@ const MenuOverlay: React.FC = () => {
 	if (!open) return null;
 
 	const tabs: PixelTabItem<MenuTab>[] = [
-		{ id: 'character', label: 'Character', icon: 'menu_character' },
+		{ id: 'character', label: 'Equipment', icon: 'menu_character' },
 		{
 			id: 'stats',
-			label: 'Stats',
+			label: 'Character',
 			icon: 'menu_stats',
 			notify: attention.stats,
 			notifyLabel: 'Unassigned stat points',

@@ -7,6 +7,7 @@ import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { armorOf, critOdds, damagePerClick, maxHp } from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
 import { aggregateStats } from '@/lib/inventory';
+import { effectiveStats } from '@/lib/effectiveStats';
 import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
 import type { EquipmentSlot } from '@/types/game';
 import LevelDetails from '../LevelDetails';
@@ -19,6 +20,8 @@ const CharacterOverlay: React.FC = () => {
 	const equipment = useGameStore((state) => state.equipment);
 	const characterStats = useGameStore((state) => state.characterStats);
 	const equipItem = useGameStore((state) => state.equipItem);
+	const prestige = useGameStore((state) => state.prestige);
+	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const castSkill = useGameStore((state) => state.castSkill);
 	const skillCd = useGameStore((state) => state.skillCd);
 	const level = useGameStore((state) => state.level.level);
@@ -63,6 +66,7 @@ const CharacterOverlay: React.FC = () => {
 	const mitigation = Math.round((armor / (armor + COMBAT.armorK)) * 100);
 	const odds = critOdds(characterStats, equipment);
 	const gear = aggregateStats(equipment);
+	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades });
 	const pct = (v: number) => `${Math.round(v * 1000) / 10}%`;
 
 	return (
@@ -91,7 +95,7 @@ const CharacterOverlay: React.FC = () => {
 									<span className='inv-readout-label'>Max HP</span>
 									<span className='inv-readout-value'>{maxHp(characterStats, equipment)}</span>
 								</div>
-								<div className='inv-readout' title={`Chance that a click crits (x${COMBAT.crit.mult}); a crit becomes a super crit (x${COMBAT.crit.superMult}) with ${pct(odds.superCrit)}`}>
+								<div className='inv-readout' title={`Chance that a click crits (x${fx.critMultiplier.toFixed(2)}); a crit becomes a super crit (x${fx.superCritMultiplier.toFixed(2)}) ${pct(odds.superCrit)} of the time`}>
 									<span className='inv-readout-label'>Crit</span>
 									<span className='inv-readout-value'>{pct(odds.crit)}</span>
 								</div>
@@ -133,7 +137,7 @@ const CharacterOverlay: React.FC = () => {
 						<button
 							className='px-btn px-btn-sm'
 							onClick={() => setMenuTab('stats')}>
-							Stats
+							Character
 						</button>
 					</div>
 				</div>

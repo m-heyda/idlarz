@@ -187,14 +187,14 @@ test('rat stats: level 1 is 100 HP, level 9 is the old tier 5 (506 HP); HP, atta
 	assert.equal(monsterStats('rat', 1).stunResist, 0);
 });
 
-test('the Rat King has armor, crits and resists Stun; at level 15 he is exactly the old tuning behind his armor, and he follows the gear curve above it', () => {
+test('the Rat King has armor, crits and resists Stun; at level 15 he is the tuned fight behind his armor, and he follows the gear curve above it', () => {
 	const king = monsterStats('ratKing', 15);
-	assert.equal(king.maxHp, 10400);
-	assert.equal(king.attack, 14);
-	assert.equal(king.armor, 20);
-	assert.equal(king.critChance, 10);
-	assert.equal(king.stunResist, 25);
-	assert.equal(Math.round(king.maxHp / (1 - king.armor / (king.armor + COMBAT.armorK))), 15600, 'the old 15600 HP once the armor is counted');
+	assert.equal(king.maxHp, 9600);
+	assert.equal(king.attack, 11);
+	assert.equal(king.armor, 15);
+	assert.equal(king.critChance, 8);
+	assert.equal(king.stunResist, 20);
+	assert.equal(Math.round(king.maxHp / (1 - king.armor / (king.armor + COMBAT.armorK))), 13200, 'about 13200 effective HP once the armor is counted');
 	let last = king;
 	for (let l = 16; l <= 35; l++) {
 		const next = monsterStats('ratKing', l);
@@ -226,8 +226,8 @@ test('a boss crit hits harder by its multiplier, and only the high rolls crit; r
 	assert.deepEqual(plain.events.map((e) => e.kind), ['hurt']);
 	assert.equal(plain.events[0].kind === 'hurt' && plain.events[0].crit, false);
 	assert.equal(crit.events[0].kind === 'hurt' && crit.events[0].crit, true);
-	assert.equal(1000 - plain.playerHp, 14);
-	assert.equal(1000 - crit.playerHp, Math.round(14 * 1.5));
+	assert.equal(1000 - plain.playerHp, 11);
+	assert.equal(1000 - crit.playerHp, Math.round(11 * 1.5));
 	let calls = 0;
 	stepFight({ ...newFight({ id: 1, type: 'rat', level: 1 }), attackTimer: 1.9 }, 0.2, 1000, 0, () => (calls++, 0));
 	assert.equal(calls, 0, 'a monster that cannot crit takes no random number');

@@ -1,6 +1,6 @@
 import type { AffixDef } from '@/catalog/affixes';
 import type { RarityDef } from '@/catalog/rarity';
-import { MAX_ITEM_LEVEL, STAT_KEYS, affixMagnitude, levelScale, qualityMultiplier, roundStat, scaleStats, type ItemStats } from '@/catalog/stats';
+import { MAX_ITEM_LEVEL, STAT_KEYS, affixMagnitude, affixesValue, levelScale, qualityValue, valueCurve, qualityMultiplier, roundStat, scaleStats, type ItemStats } from '@/catalog/stats';
 import { LOOT_DATA, type LootData } from '@/lib/loot/data';
 import { lerp } from '@/lib/rng';
 import type { ItemDef, ItemInstance } from '@/types/game';
@@ -80,10 +80,15 @@ export const resolveItem = (instance: ItemInstance, data: LootData = LOOT_DATA):
 	return resolved;
 };
 
-/** What a merchant pays for an instance: the rarity's value grown with the item level. */
+/**
+ * What a merchant pays for an instance: the rarity's value at level 1, grown with the item level (`valueCurve`), then by the
+ * quality roll and by every affix, so a well rolled rare is worth clearly more than a plain one. Always at least 1.
+ */
 export const sellValueOf = (instance: ItemInstance, data: LootData = LOOT_DATA): number => {
 	const rarity = data.rarities[instance.rarity];
-	return rarity ? Math.round(rarity.sellValue * levelScale(instance.level)) : 0;
+	if (!rarity) return 0;
+	const value = rarity.sellValue * valueCurve(instance.level) * qualityValue(instance.quality) * affixesValue(instance.affixes.map((a) => a.roll));
+	return Math.max(1, Math.round(value));
 };
 
 /** The item an old save held when it only stored an id: the base at its authored level, neutral quality, its old rarity, no affixes. Resolves to the old stats exactly. */

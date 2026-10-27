@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { armorOf, attacksPerSecond, damagePerClick, lifeLeechPercent, maxHp, maxMana } from '@/lib/combat';
+import { effectiveStats } from '@/lib/effectiveStats';
 import type { CharacterStats, Resources } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import CollapsibleSection from '../CollapsibleSection';
@@ -75,6 +75,8 @@ const StatisticsOverlay: React.FC = () => {
 	const equipment = useGameStore((state) => state.equipment);
 	const farmLevels = useGameStore((state) => state.farmLevels);
 	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
+	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
+	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades });
 
 	const points = characterStats.availablePoints;
 	const breakdown = useMemo(
@@ -160,24 +162,34 @@ const StatisticsOverlay: React.FC = () => {
 			<div className='grid grid-cols-2 gap-x-8 gap-y-4 max-[760px]:grid-cols-1'>
 				<CollapsibleSection id='combat-stats' title='Combat'>
 					<div className='space-y-1 text-xs'>
-						<Line label='HP' value={`${Math.floor(playerHp)} / ${maxHp(characterStats, equipment)}`} valueClass='text-green-400' />
-						<Line label='MP' value={`${Math.floor(playerMp)} / ${maxMana(characterStats, equipment)}`} valueClass='text-blue-400' />
-						<Line label='Damage' value={`${damagePerClick(equipment, characterStats)} per hit`} valueClass='text-orange-300' />
+						<Line label='HP' value={`${Math.floor(playerHp)} / ${fx.maxHp}`} valueClass='text-green-400' />
+						<Line label='MP' value={`${Math.floor(playerMp)} / ${fx.maxMana}`} valueClass='text-blue-400' />
+						<Line label='Damage' value={`${fx.damage} per hit`} valueClass='text-orange-300' />
 						<Line label='Physical ATK' value={`+${pct(characterStats.physicalAtk, 1)}`} valueClass='text-amber-400' />
 						<Line label='Magic ATK' value={`+${pct(characterStats.magicAtk, 1)}`} valueClass='text-purple-400' />
-						<Line label='DEF (armor)' value={Math.round(armorOf(equipment, characterStats) * 10) / 10} valueClass='text-amber-200' />
-						<Line label='Luck' value={characterStats.luck} valueClass='text-purple-500' />
+						<Line label='Crit chance' value={pct(fx.critChance, 1)} valueClass='text-yellow-300' />
+						<Line label='Crit damage' value={`x${fx.critMultiplier.toFixed(2)}`} valueClass='text-orange-400' />
+						<Line label='Super crit chance' value={`${pct(fx.superCritChance, 1)} of crits`} valueClass='text-pink-300' />
+						<Line label='Super crit damage' value={`x${fx.superCritMultiplier.toFixed(2)}`} valueClass='text-pink-400' />
+						<Line label='DEF (armor)' value={`${Math.round(fx.armor * 10) / 10} (-${pct(fx.armorReduction, 0)} damage taken)`} valueClass='text-amber-200' />
+						<Line label='Dodge' value={pct(fx.dodge, 1)} valueClass='text-cyan-300' />
+						<Line label='HP regen' value={`${Math.round(fx.hpRegen * 10) / 10}/s`} valueClass='text-green-300' />
+						<Line label='ATK speed' value={`${fx.attacksPerSecond}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`} valueClass='text-blue-300' />
+						<Line label='Life leech' value={pct(fx.lifeLeech, 1)} valueClass='text-red-300' />
 					</div>
 				</CollapsibleSection>
 
 				<CollapsibleSection id='bonus-stats' title='Bonuses' defaultOpen={false}>
 					<div className='space-y-1 text-xs'>
-						<Line label='Crit chance' value={pct(characterStats.critChance, 2)} valueClass='text-yellow-300' />
-						<Line label='Crit damage' value={pct(characterStats.critDmgMultiplier, 2)} valueClass='text-orange-400' />
-						<Line label='ATK speed' value={`${attacksPerSecond(equipment, characterStats)}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`} valueClass='text-blue-300' />
-						<Line label='Life leech' value={pct(lifeLeechPercent(equipment), 1)} valueClass='text-red-300' />
-						<Line label='XP gain' value={pct(characterStats.xpGainMultiplier, 2)} valueClass='text-green-400' />
-						<Line label='Tile discount' value={pct(characterStats.tileCostDiscount, 2)} valueClass='text-blue-400' />
+						<Line label='Luck' value={fx.luck} valueClass='text-purple-500' />
+						<Line label='Gold find' value={pct(fx.goldFind, 1)} valueClass='text-yellow-400' />
+						<Line label='Mana regen' value={`${Math.round(fx.manaRegen * 100) / 100}/s`} valueClass='text-blue-400' />
+						<Line label='Spell power' value={pct(fx.spellPower, 1)} valueClass='text-purple-300' />
+						<Line label='Lucky tap damage' value={pct(characterStats.critDmgMultiplier, 2)} valueClass='text-orange-400' />
+						<Line label='XP gain' value={pct(fx.xpGain, 2)} valueClass='text-green-400' />
+						<Line label='Tile discount' value={pct(fx.tileDiscount, 2)} valueClass='text-blue-400' />
+						{fx.clickMastery > 0 && <Line label='Click mastery (rebirth)' value={`+${pct(fx.clickMastery, 0)} gold per click`} valueClass='text-purple-300' />}
+						{fx.buildTimeReduction > 0 && <Line label='Master builders (rebirth)' value={`-${pct(fx.buildTimeReduction, 0)} castle build time`} valueClass='text-purple-300' />}
 						<Line
 							label='Reputation'
 							value={characterStats.reputation}

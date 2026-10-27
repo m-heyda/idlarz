@@ -79,6 +79,38 @@ export const POWER_PER_LEVEL = 0.07;
 
 export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL, Math.max(1, Math.round(level)));
 
+// ---- item value curve ---------------------------------------------------------------------------------------------
+// What gear is worth in gold. The economy grows far faster than gear power, so value follows its own curve: steep while the
+// early game's income climbs (levels up to the knee), flatter after it. The merchant pays `rarity base x curve x quality x
+// affixes` (`sellValueOf`) and sells at a multiple of that (`MERCHANT_GOODS.priceFactor`). One place to retune the whole market.
+
+export const ITEM_VALUE = {
+	/** Growth of the value per item level up to `kneeLevel`, and above it */
+	growthLow: 1.3,
+	growthHigh: 1.12,
+	kneeLevel: 10,
+	/** The quality roll (0-100, 50 = neutral) scales the value between these */
+	quality: { min: 0.75, max: 1.25 },
+	/** Every affix adds `base` plus up to `perRoll` (by how well it rolled) to the value multiplier */
+	affix: { base: 0.15, perRoll: 0.35 },
+} as const;
+
+/** Value multiplier of an item level (1 at level 1). */
+export const valueCurve = (itemLevel: number): number => {
+	const level = clampItemLevel(itemLevel);
+	const low = Math.min(level, ITEM_VALUE.kneeLevel) - 1;
+	const high = Math.max(0, level - ITEM_VALUE.kneeLevel);
+	return Math.pow(ITEM_VALUE.growthLow, low) * Math.pow(ITEM_VALUE.growthHigh, high);
+};
+
+/** Value multiplier of a quality roll (0-100). */
+export const qualityValue = (quality: number): number =>
+	ITEM_VALUE.quality.min + (ITEM_VALUE.quality.max - ITEM_VALUE.quality.min) * (Math.min(100, Math.max(0, quality)) / 100);
+
+/** Value multiplier of the affixes of an item: 1 with none, more for every one, more still for good rolls. */
+export const affixesValue = (rolls: readonly number[]): number =>
+	1 + rolls.reduce((sum, roll) => sum + ITEM_VALUE.affix.base + ITEM_VALUE.affix.perRoll * (Math.min(100, Math.max(0, roll)) / 100), 0);
+
 /** Power multiplier of an item level (1 at level 1). */
 export const levelScale = (itemLevel: number): number => 1 + POWER_PER_LEVEL * (clampItemLevel(itemLevel) - 1);
 

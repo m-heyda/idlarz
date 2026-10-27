@@ -74,7 +74,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Game Basics</h3>
 				<p className='text-[#d8c8a0]'>
 					Grow your realm: buy tiles next to your territory, upgrade the castle, farm animals, trade with the
-					merchant and spend stat points. The journal button in the top bar opens the Menu: Character, Stats, Merchant and Farm are its tabs. Everything produces resources every second, even while you are
+					merchant and spend stat points. The journal button in the top bar opens the Menu: Equipment, Character, Merchant and Farm are its tabs. Everything produces resources every second, even while you are
 					away from the keyboard (the tab must stay open). Progress is saved automatically in this browser.
 				</p>
 			</section>
@@ -253,7 +253,7 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Gear &amp; Items</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					The Character window has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
+					The Equipment tab has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
 					and a 36-slot bag. Double-click a bag item to equip it (or drink a potion); right-click it for Equip / Drink, Sell one and{' '}
 					<b>Discard</b> (destroys it for good, after a confirmation, no gold). Click gear to take it off, drag to
 					rearrange, or press <b>Organize</b> to merge stacks and sort the bag. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
@@ -356,7 +356,7 @@ const Tutorial: React.FC = () => {
 			</section>
 
 			<section>
-				<h3 className='px-h'>Character Stats</h3>
+				<h3 className='px-h'>Character (attributes)</h3>
 				<p className='text-[#d8c8a0] mb-2'>You gain one stat point per level. Each point gives:</p>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
 					{(Object.keys(stat.resourceTargets) as (keyof typeof stat.resourceTargets)[]).map((s) => (

@@ -416,7 +416,7 @@ export const MERCHANT_GOODS = {
 	offers: LIMITS.merchantOffers, // pieces on the shelf (base value: read it through limitOf('merchantOffers', ctx))
 	rotateSec: LIMITS.merchantRotateSec, // the shelf is reshuffled after this much play time (limitOf('merchantRotateSec', ctx))
 	maxOffers: HARD_LIMITS.merchantOffers, // what a save may hold
-	priceFactor: 40, // gold per gold of sell value: far above the 3.9x a max Haggler could resell at (about 400 for a common piece, 5 000-90 000 for the rest)
+	priceFactor: 5, // gold per gold of sell value: above the 3.9x a max Haggler could resell at, so buying and selling never gains
 	refreshBase: LIMITS.merchantRefreshBase, // a paid refresh costs this x castle level squared (limitOf('merchantRefreshBase', ctx))
 } as const;
 

@@ -27,17 +27,17 @@ const withFight = (monster: Partial<Monster> = {}) => {
 	assert.equal(api().startFight(1), true);
 };
 
-test('the two skills: Heal unlocks at level 5, Stun at level 10 with a 3 s stun on a 15 s cooldown', () => {
+test('the two skills: Heal unlocks at level 5, Stun at level 10 with a 10 s stun on a 30 s cooldown', () => {
 	assert.deepEqual([...SKILL_IDS], ['heal', 'stun']);
 	assert.equal(SKILLS.heal.unlockLevel, 5);
 	assert.equal(SKILLS.heal.fightOnly, false);
 	assert.equal(SKILLS.stun.unlockLevel, 10);
-	assert.equal(SKILLS.stun.stunSec, 3);
-	assert.equal(SKILLS.stun.cooldownSec, 15);
+	assert.equal(SKILLS.stun.stunSec, 10);
+	assert.equal(SKILLS.stun.cooldownSec, 30);
 	assert.equal(SKILLS.stun.fightOnly, true);
 	assert.ok(SKILLS.heal.cooldownSec < SKILLS.stun.cooldownSec);
 	for (const id of SKILL_IDS) assert.ok(SKILLS[id].manaCost > 0 && SKILLS[id].manaCost <= maxMana(character(), {}), `${id} is castable with the starting mana pool`);
-	assert.ok(skillDescription(SKILLS.stun).includes('3 s'), 'tooltips are built from the numbers');
+	assert.ok(skillDescription(SKILLS.stun).includes('10 s'), 'tooltips are built from the numbers');
 	assert.ok(skillDescription(SKILLS.heal).includes('25%'));
 	assert.equal(isSkillId('heal'), true);
 	assert.equal(isSkillId('constructor'), false, 'a prototype name is not a skill');
@@ -119,7 +119,7 @@ test('skill cooldowns and mana run down with the game clock', () => {
 	assert.equal(api().castSkill('heal'), true);
 });
 
-test('castSkill(stun): fights only, level 10, freezes the monster for 3 s, then the attacks resume', () => {
+test('castSkill(stun): fights only, level 10, freezes the monster for 10 s, then the attacks resume', () => {
 	freshGame();
 	level(30);
 	assert.equal(api().castSkill('stun'), false, 'no fight');
@@ -135,14 +135,13 @@ test('castSkill(stun): fights only, level 10, freezes the monster for 3 s, then 
 	assert.equal(api().castSkill('stun'), false, 'cooldown');
 
 	const hp = api().playerHp;
-	api().tick(1000);
-	api().tick(1000);
+	for (let i = 0; i < (SKILLS.stun.stunSec ?? 0) - 1; i++) api().tick(1000);
 	assert.equal(api().playerHp >= hp, true, 'no damage while stunned');
 	assert.equal(api().fight?.attackTimer, 0, 'the monster did not even wind up');
+	assert.ok((api().fight?.stunLeftSec ?? 0) > 0);
 	api().tick(1000);
 	assert.equal(api().fight?.stunLeftSec, 0);
-	api().tick(1000);
-	api().tick(1000);
+	for (let i = 0; i < 4; i++) api().tick(1000);
 	assert.ok(api().playerHp < hp, 'after the stun the rat bites again');
 });
 

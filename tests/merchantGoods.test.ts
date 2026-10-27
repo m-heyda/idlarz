@@ -47,7 +47,7 @@ test('the goods are never a bargain: every price is far above what he pays, even
 		for (let seed = 1; seed <= 30; seed++) {
 			for (const item of stock(castle, seed).offers) {
 				const price = shopPriceOf(item);
-				assert.ok(price >= sellValueOf(item) * 30, `${item.base}: ${price} vs ${sellValueOf(item)}`);
+				assert.ok(price >= sellValueOf(item) * 5, `${item.base}: ${price} vs ${sellValueOf(item)}`);
 				assert.ok(price > sellPayout(sellValueOf(item), 1, { merchantUpgrades: { haggler: MERCHANT_UPGRADES.haggler.maxLevel } }) * 3);
 				assert.ok(price > sellValueOf(item) * MAX_HAGGLER * 3);
 			}

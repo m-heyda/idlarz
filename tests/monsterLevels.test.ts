@@ -2,6 +2,7 @@ import test, { mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { api, freshGame, gridCells, growTo, setResources, store } from './helpers';
+import { SKILLS } from '../src/catalog/skills';
 import { COMBAT } from '../src/config/combatConfig';
 import { LIMITS } from '../src/config/limits';
 import { emptyBag, gearOf } from '../src/lib/inventory';
@@ -107,7 +108,7 @@ const fightKing = () => {
 	assert.equal(api().startFight(1), true);
 };
 
-test('the King can resist Stun (25%): the mana and the cooldown are spent, the monster is not stunned', () => {
+test('the King can resist Stun (20%): the mana and the cooldown are spent, the monster is not stunned', () => {
 	fightKing();
 	const mana = api().playerMp;
 	const stub = mock.method(Math, 'random', () => 0); // a roll under the resist chance
@@ -126,7 +127,7 @@ test('the King can resist Stun (25%): the mana and the cooldown are spent, the m
 	} finally {
 		stub2.mock.restore();
 	}
-	assert.equal(api().fight!.stunLeftSec, 3);
+	assert.equal(api().fight!.stunLeftSec, SKILLS.stun.stunSec);
 });
 
 test('a rat never resists Stun', () => {
@@ -141,7 +142,7 @@ test('a rat never resists Stun', () => {
 	} finally {
 		stub.mock.restore();
 	}
-	assert.equal(api().fight!.stunLeftSec, 3);
+	assert.equal(api().fight!.stunLeftSec, SKILLS.stun.stunSec);
 });
 
 test("a monster's armor takes its share of every click, never below 1", () => {
@@ -150,11 +151,11 @@ test("a monster's armor takes its share of every click, never below 1", () => {
 	const stub = mock.method(Math, 'random', () => 0); // no crit
 	try {
 		const result = api().hitMonster({ eventId: 1, now: 1000, trusted: true });
-		assert.equal(result!.damage, 4, 'a 6 damage click against 20 armor');
+		assert.equal(result!.damage, 4.4, 'a 6 damage click against 15 armor');
 	} finally {
 		stub.mock.restore();
 	}
-	assert.equal(before - api().fight!.monsterHp, 4);
+	assert.equal(Math.round((before - api().fight!.monsterHp) * 10) / 10, 4.4);
 });
 
 // ---- limits are reusable ---------------------------------------------------------------------------------------------------------
