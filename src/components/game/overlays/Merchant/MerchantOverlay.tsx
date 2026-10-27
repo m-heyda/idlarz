@@ -16,7 +16,6 @@ import {
 } from '@/config/gameConfig';
 import { cn } from '@/lib/utils';
 import type { MerchantTab } from '@/types/game';
-import PixelIcon from '../../PixelIcon';
 import ResourceIcon from '../../ResourceIcon';
 
 // Extracted component for tab content placeholders
@@ -517,14 +516,6 @@ const MerchantOverlay: React.FC = () => {
 					<div className='col-span-1 flex flex-col gap-4'>
 						{/* Merchant Avatar */}
 						<div className='px-panel flex flex-col items-center'>
-							<div className='mb-3'><PixelIcon name='merchant' alt='Merchant' scale={2} /></div>
-							<h3 className='px-h text-center w-full'>
-								Merchant
-							</h3>
-							<p className='text-[#a89878] text-xs text-center mb-4'>
-								{`"I'll give you gold for your resources, traveler!"`}
-							</p>
-
 							<MerchantPriceList />
 						</div>
 
