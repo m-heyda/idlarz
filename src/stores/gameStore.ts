@@ -804,6 +804,14 @@ const createGameSlice = (
 			if (PLAYER_CLASSES[playerClass]) set({ playerClass });
 		},
 
+		applyProfileToFreshGame: (name: string, playerClass: PlayerClassId) => {
+			const state = get();
+			const cleanName = name.trim().substring(0, 9);
+			if (state.playSeconds > 0 || state.playerName !== DEFAULT_PLAYER_NAME || !cleanName || !PLAYER_CLASSES[playerClass]) return false;
+			set({ playerName: cleanName, playerClass });
+			return true;
+		},
+
 		// Adds (or subtracts) resources. Rejects non-finite input and never lets a stockpile go negative.
 		addResources: (resourceToAdd: Partial<Resources>) => {
 			const state = get();

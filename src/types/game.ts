@@ -319,6 +319,8 @@ export interface GameState {
 	addStatPoint: (stat: keyof CharacterStats) => void;
 	setPlayerName: (name: string) => void;
 	setPlayerClass: (playerClass: PlayerClassId) => void;
+	/** Gives a brand-new game (no play time, default name) the account's name and hero; any played game is left alone. */
+	applyProfileToFreshGame: (name: string, playerClass: PlayerClassId) => boolean;
 	addResources: (resourceToAdd: Partial<Resources>) => void;
 	collectChest: (x: number, y: number) => boolean;
 	startFight: (monsterId: number) => boolean;

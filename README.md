@@ -20,6 +20,15 @@ npm run lint
 npm test         # click limiter, economy/exploit, save, castle, rebirth and ambient tests
 ```
 
+## Accounts (Supabase)
+
+The game sits behind email/password login. The browser never talks to Supabase: the `/api/auth/*` route handlers do, with HttpOnly cookies. The save stays primary in the browser (localStorage); the account holds the character name and hero (`profiles`) and, when the cloud save is set up, a verified copy of the game (`player_saves`).
+
+1. Supabase → Authentication → Providers: Email on, **Confirm email off**. Run [`supabase/schema.sql`](supabase/schema.sql) in the SQL editor (profiles, cloud save tables, access rules, the atomic save function).
+2. Copy `.env.example` to `.env.local` and fill `SUPABASE_URL` and `SUPABASE_ANON_KEY` (the publishable key). On Vercel add the same two as server-side env vars (no `NEXT_PUBLIC_`).
+3. Cloud save (optional, needs a second server-only secret): add `SUPABASE_SERVICE_ROLE_KEY` (Settings > API Keys > secret key) to `.env.local` / Vercel. Without it the game still runs, the account just has no cloud copy. See [docs/09-cloud-saves.md](docs/09-cloud-saves.md).
+4. Restart `npm run dev`. If accounts are unreachable the start page offers "Play without account", so a local save is never locked out.
+
 ## Documentation
 
 Full design and technical docs live in [`docs/`](docs/README.md):
