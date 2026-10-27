@@ -2,6 +2,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
 import {
 	armorOf,
+	armorReduction as armorReductionOf,
 	attacksPerSecond,
 	critOdds,
 	damagePerClick,
@@ -42,7 +43,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		attacksPerSecond: attacksPerSecond(equipment, characterStats),
 		armor,
 		/** % of the damage of a monster's hit the armor takes away */
-		armorReduction: (armor / (armor + COMBAT.armorK)) * 100,
+		armorReduction: armorReductionOf(armor) * 100,
 		dodge: dodgeChance(equipment) * 100,
 		lifeLeech: lifeLeechPercent(equipment),
 		/** % chance that a click crits */

@@ -167,11 +167,11 @@ test('limits: a bonus registered for a key reaches every reader (bag size, the m
 	LIMIT_BONUSES.merchantOffers = () => 2; // a future Legacy effect
 	try {
 		assert.equal(limitOf('merchantOffers'), 8);
-		assert.equal(generateMerchantStock(3, () => 0.5, 0, {}).offers.length, 8);
+		assert.equal(generateMerchantStock(3, 20, () => 0.5, 0, {}).offers.length, 8);
 	} finally {
 		LIMIT_BONUSES.merchantOffers = original;
 	}
-	assert.equal(generateMerchantStock(3, () => 0.5, 0, {}).offers.length, LIMITS.merchantOffers);
+	assert.equal(generateMerchantStock(3, 20, () => 0.5, 0, {}).offers.length, LIMITS.merchantOffers);
 });
 
 // ---- the sell bonus reaches everything the player sells -------------------------------------------------------------------------

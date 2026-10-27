@@ -125,11 +125,12 @@ export const BIOME_SPAWN = {
 };
 
 // Extra resources a tile purchase costs once enough tiles are owned. amount = gold cost x share
-export const TILE_RESOURCE_COST: { from: number; resource: 'wood' | 'stone' | 'coal' | 'food'; share: number }[] = [
-	{ from: 15, resource: 'wood', share: 0.1 },
-	{ from: 15, resource: 'stone', share: 0.1 },
-	{ from: 30, resource: 'coal', share: 0.08 },
-	{ from: 40, resource: 'food', share: 0.08 },
+export const TILE_RESOURCE_COST: { from: number; resource: 'wood' | 'stone' | 'coal' | 'food' | 'hide'; share: number }[] = [
+	{ from: 15, resource: 'wood', share: 0.3 },
+	{ from: 15, resource: 'stone', share: 0.25 },
+	{ from: 30, resource: 'coal', share: 0.2 },
+	{ from: 40, resource: 'food', share: 0.1 },
+	{ from: 120, resource: 'hide', share: 0.03 }, // milk and eggs are kept for other uses, so the big territories ask for leather
 ];
 
 // Biome/building output is multiplied by this (the castle's own output and the base rates are not)
@@ -417,7 +418,15 @@ export const MERCHANT_GOODS = {
 	rotateSec: LIMITS.merchantRotateSec, // the shelf is reshuffled after this much play time (limitOf('merchantRotateSec', ctx))
 	maxOffers: HARD_LIMITS.merchantOffers, // what a save may hold
 	priceFactor: 5, // gold per gold of sell value: above the 3.9x a max Haggler could resell at, so buying and selling never gains
-	refreshBase: LIMITS.merchantRefreshBase, // a paid refresh costs this x castle level squared (limitOf('merchantRefreshBase', ctx))
+	// A paid refresh costs `refreshBase` x (refreshes bought so far + 1) for the first `stepRefreshes` of them (5k, 10k ... 50k), then
+	// every further one costs `bigStep` more than the one before (100k, 150k ...). Counted per run (a rebirth starts it again).
+	refreshBase: LIMITS.merchantRefreshBase, // limitOf('merchantRefreshBase', ctx)
+	refresh: { stepRefreshes: 10, bigStep: 50_000 },
+	// What the shelf may hold: never above uncommon (the rarer pieces stay a reward for fights and chests), and never more than
+	// `maxAboveAverage` item levels above the average level of the gear the player wears. The shelf is built around the world (castle)
+	// level, held down to `centreAboveAverage` above that average.
+	maxAboveAverage: 5,
+	centreAboveAverage: 3,
 } as const;
 
 // Farm products: shown on the farm and at the merchant, not in the header row

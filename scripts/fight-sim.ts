@@ -130,7 +130,7 @@ for (const { label, monster } of MONSTER_ROWS.filter((m) => m.monster.type === '
 out();
 out('# The Rat King by level');
 out();
-out('A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 10 % crits, 25 % Stun resistance. HP, attack and armor follow the item level curve. Gear "at the level" is the same set at the item level of the King; "behind" is item level 15. Win % (mean seconds). No skills, no potions.');
+out('A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 8 % crits, 20 % Stun resistance. HP, attack and armor follow the item level curve. Gear "at the level" is the same set at the item level of the King; "behind" is item level 15. Win % (mean seconds). No skills, no potions.');
 const KING_LEVELS = [15, 25, 35];
 const GEARS = [
 	{ name: "knight's set + mace", equipment: fullSet('knight', 'steel_mace') },

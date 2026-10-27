@@ -344,7 +344,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		(['eggs', 'milk', 'hide'] as const).forEach((r) => {
 			const id = productUpgrade[r];
 			const next = utils.farmUpgradeCost(id, utils.farmUpgradeLevel(s.farmUpgrades, id))[r] ?? 0;
-			const excess = api().resources[r] - next * 1.6;
+			const excess = api().resources[r] - Math.max(next * 1.6, (need[r] ?? 0) * 1.1); // the next tiles may cost hide too
 			if (excess > 5) api().sellResources(r, Math.floor(excess));
 		});
 		// Food: keep what animals/castle/tiles might need (2 days of income) and sell the rest

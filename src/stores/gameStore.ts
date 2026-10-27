@@ -78,7 +78,7 @@ import { castRefusal, healAmount, isSkillId, tickCooldowns } from '@/lib/skills'
 import type { LimitContext } from '@/lib/limits';
 import { generateMerchantStock, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
-import { addDrop, aggregateStats, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
+import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
 import { plainItem, sellValueOf } from '@/lib/itemInstance';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { canSpawn } from '@/lib/spawnLimits';
@@ -167,6 +167,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		farmUpgrades: {} as Record<string, number>,
 		merchantUpgrades: {} as Record<string, number>,
 		merchantStock: null as MerchantStock | null,
+		merchantRefreshes: 0,
 		isHydrated: false,
 		freeTiles: STARTER_FREE_TILES,
 		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
@@ -889,7 +890,7 @@ const createGameSlice = (
 				playerHp: newPlayerHp,
 				playerMp: newPlayerMp,
 				skillCd: tickCooldowns(state.skillCd, secondsElapsed),
-				merchantStock: stockDue(state.merchantStock, newPlaySeconds, limitCtx(state)) ? generateMerchantStock(castleLevelOf(state.tiles), rotationRng(newPlaySeconds), newPlaySeconds, limitCtx(state)) : state.merchantStock,
+				merchantStock: stockDue(state.merchantStock, newPlaySeconds, limitCtx(state)) ? generateMerchantStock(castleLevelOf(state.tiles), averageItemLevel(state.equipment), rotationRng(newPlaySeconds), newPlaySeconds, limitCtx(state)) : state.merchantStock,
 				playSeconds: newPlaySeconds,
 			});
 			if (castleFinished) emitSaveEvent('castleUpgraded');
@@ -1055,11 +1056,12 @@ const createGameSlice = (
 		refreshMerchantStock: () => {
 			const state = get();
 			const castle = castleLevelOf(state.tiles);
-			const cost = refreshCost(castle, limitCtx(state));
+			const cost = refreshCost(state.merchantRefreshes, limitCtx(state));
 			if (state.resources.gold < cost) return false;
 			set({
 				resources: { ...state.resources, gold: state.resources.gold - cost },
-				merchantStock: generateMerchantStock(castle, Math.random, state.playSeconds, limitCtx(state)),
+				merchantStock: generateMerchantStock(castle, averageItemLevel(state.equipment), Math.random, state.playSeconds, limitCtx(state)),
+				merchantRefreshes: state.merchantRefreshes + 1,
 			});
 			emitSaveEvent('refreshMerchantStock');
 			return true;

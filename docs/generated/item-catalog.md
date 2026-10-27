@@ -187,7 +187,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **chest** (profile `basic_chest`, item level 4): 44 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
   - bonus `chest_legendary` from pool `legendary_weapons`, chance 0.019, replace
   - bonus `chest_potion` from pool `potions_chest`, fallback
-- **merchant** (profile `merchant_stock`, item level 4): 44 bases eligible; Common 52.1%, Uncommon 33.3%, Rare 14.6%
+- **merchant** (profile `merchant_stock`, item level 4): 44 bases eligible; Common 60.0%, Uncommon 40.0%
 
 Pools: `general_equipment`, `rattatui_set`, `legendary_weapons`, `potions_rat`, `potions_king`, `potions_chest`
 

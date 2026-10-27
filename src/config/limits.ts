@@ -11,8 +11,8 @@ export const LIMITS = {
 	merchantOffers: 6,
 	/** Seconds of play time until the shelf is reshuffled */
 	merchantRotateSec: 1800,
-	/** Gold of a paid shelf refresh at castle level 1 (times the castle level squared) */
-	merchantRefreshBase: 2000,
+	/** Gold of the first paid shelf refresh (each one after it costs this much more, see MERCHANT_GOODS.refresh) */
+	merchantRefreshBase: 5000,
 	/** Bag slots (the Pack Rat bonus adds to it) */
 	bagSize: 36,
 } as const;

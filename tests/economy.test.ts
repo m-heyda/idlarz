@@ -149,6 +149,22 @@ test('tile cost: extra resources are required from the configured tile count and
 	assert.ok(api().resources.gold < goldBefore);
 });
 
+test('tile cost: gold stays the biggest part, wood, stone and coal are a real share, and hide joins from 120 tiles', () => {
+	for (const n of [15, 30, 60, 100, 119, 120, 200, 300, 1000]) {
+		const { gold, resources } = calculateTileCost(n, 0);
+		for (const [key, amount] of Object.entries(resources)) assert.ok((amount ?? 0) < gold, `${key} costs less than the gold at n=${n}`);
+		const raw = (resources.wood ?? 0) + (resources.stone ?? 0) + (resources.coal ?? 0);
+		assert.ok(raw > gold * 0.4 || n < 30, `wood, stone and coal are about half of the gold at n=${n}`);
+		assert.ok(raw < gold * 1.5, `and gold is still the biggest single part at n=${n}`);
+	}
+	assert.equal(calculateTileCost(119, 0).resources.hide, undefined, 'no hide before the 120th tile');
+	assert.ok((calculateTileCost(120, 0).resources.hide ?? 0) > 0, 'hide from the 120th tile');
+	assert.ok((calculateTileCost(30, 0).resources.coal ?? 0) > 0);
+	const kept = calculateTileCost(150, 50).resources;
+	const full = calculateTileCost(150, 0).resources;
+	for (const key of Object.keys(full) as (keyof typeof full)[]) assert.ok((kept[key] ?? 0) <= (full[key] ?? 0) / 2 + 1, `${key} gets the Charisma discount too`);
+});
+
 test('castle: needs the resources, only one upgrade at a time, takes real tick time, then levels up', () => {
 	freshGame();
 	assert.equal(api().upgradeCastle(), false); // cannot afford

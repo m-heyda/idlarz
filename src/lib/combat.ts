@@ -85,8 +85,19 @@ export const lifeLeechPercent = (equipment: Equipment): number => Math.min(STAT_
 /** HP a click of `damage` gives back through Life Leech. */
 export const leechHeal = (damage: number, equipment: Equipment): number => (damage * lifeLeechPercent(equipment)) / 100;
 
+/**
+ * The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much,
+ * so no amount of armor makes anything unkillable (the asymptote is 75 %).
+ */
+export const armorReduction = (armor: number): number => {
+	if (!(armor > 0)) return 0;
+	const raw = armor / (armor + COMBAT.armorK);
+	const { armorSoftCap: cap, armorSoftSlope: slope } = COMBAT;
+	return raw <= cap ? raw : cap + (raw - cap) * slope;
+};
+
 export const mitigate = (rawDamage: number, armor: number): number =>
-	Math.max(1, Math.round(rawDamage * (1 - armor / (armor + COMBAT.armorK))));
+	Math.max(1, Math.round(rawDamage * (1 - armorReduction(armor))));
 
 /** HP regeneration outside fights: the base rate plus the gear's regen stat. */
 export const regen = (hp: number, max: number, dtSec: number, gearRegenPerSec = 0): number => {
@@ -128,7 +139,7 @@ const pickTaunt = (type: Monster['type'], rng: () => number): string | null => {
 /** What is left of a click after the monster's armor (never less than 1): the same curve as the player's own armor. */
 export const damageAfterArmor = (fight: Pick<FightState, 'type' | 'level'>, raw: number): number => {
 	const { armor } = monsterStats(fight.type, fight.level);
-	return armor > 0 ? Math.max(1, round1(raw * (1 - armor / (armor + COMBAT.armorK)))) : raw;
+	return armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(armor)))) : raw;
 };
 
 /** Whether the monster shrugs off a Stun (one rng call, and only for monsters that can resist at all). */

@@ -36,6 +36,37 @@ const Flask: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({
 	);
 };
 
+const xpNumbers = (level: { level: number; progress: number }) => {
+	const next = Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1));
+	return { next, current: Math.floor(next * level.progress), pct: Math.floor(level.progress * 100) };
+};
+
+/** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). */
+export const LevelBar: React.FC = () => {
+	const { resources, level, resourceRates } = useGameStore();
+	const { next, current, pct } = xpNumbers(level);
+	return (
+		<div className='eq-level'>
+			<div className='eq-level-orb' title={`Level ${level.level}`}>
+				<LevelOrb scale={2} level={level.level} />
+			</div>
+			<div className='group relative flex-1'>
+				<div className='hero-xp eq-xp' style={{ '--pct': level.progress * 100 } as React.CSSProperties}>
+					<div className='hero-xp-fill' />
+					<div className='hero-xp-text'>
+						{pct}% · {formatNumber(current)} / {formatNumber(next)}
+					</div>
+				</div>
+				<div className='absolute left-1/2 top-full -translate-x-1/2 mt-2 w-max z-[60] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150'>
+					<div className='px-tooltip'>
+						<LevelUpTimer resourceRates={resourceRates} resources={resources} level={level} />
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
 /**
  * The character "scene": the hero standing in a torch-lit stone alcove, HP/MP flasks flanking him
  * and a stony XP bar along the floor with the level on a gem. Shared by the Character and Statistics windows.

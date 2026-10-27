@@ -102,6 +102,7 @@ export const PERSISTED_KEYS = [
 	'lootPity',
 	'autoSellUpTo',
 	'merchantStock',
+	'merchantRefreshes',
 ] as const;
 
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]>;
@@ -572,6 +573,9 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		merchantStock = { at: Math.min(at, playSeconds), offers };
 	}
 
+	const merchantRefreshes = raw.merchantRefreshes === undefined ? 0 : int(raw.merchantRefreshes, 0, 100_000);
+	if (merchantRefreshes === null) return fail('merchant refreshes');
+
 	const rawName = typeof raw.playerName === 'string' ? raw.playerName.trim().slice(0, 9) : '';
 	const playerClass: PlayerClassId =
 		typeof raw.playerClass === 'string' && raw.playerClass in PLAYER_CLASSES
@@ -610,6 +614,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			lootPity,
 			autoSellUpTo,
 			merchantStock,
+			merchantRefreshes,
 		},
 	};
 };

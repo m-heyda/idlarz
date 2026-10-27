@@ -14,7 +14,7 @@ extra    = floor(base × share × (1 − discount%/100))  for each TILE_RESOURCE
 discount%= min(0.5 × Charisma, 25)
 ```
 
-`TILE_RESOURCE_COST`: wood 10 % and stone 10 % of the gold cost from n = 15; coal 8 % from n = 30; food 8 % from n = 40.
+`TILE_RESOURCE_COST`: wood 30 % and stone 25 % of the gold cost from n = 15; coal 20 % from n = 30; food 10 % from n = 40; hide 3 % from n = 120 (milk and eggs are kept for other uses). Gold stays the biggest single part.
 
 | n | 1 | 10 | 20 | 30 | 50 | 75 | 100 | 150 | 200 | 300 | 400 | 500 | 1,000 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -126,7 +126,7 @@ item:  sell = floor(rarityValue × valueCurve(level) × qualityValue × affixesV
        valueCurve = 1.3^(min(L,10)−1) × 1.12^max(0,L−10);  qualityValue 0.75..1.25;  affixesValue = 1 + Σ(0.15 + 0.35 × roll/100)   (ITEM_VALUE in catalog/stats.ts)
        supplies (potions) price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
 goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle level above 1, +-2; common 50 / uncommon 32 / rare 14 / epic 4)
-       price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 2000 × castleLevel² gold (MERCHANT_GOODS)
+       price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh); rarity common 60 / uncommon 40; item level centre = min(world level, avgWorn + 3), max avgWorn + 5
 bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
@@ -175,10 +175,11 @@ damage/click = max(1, Σ gear damage + set bonuses)                             
 click        : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
                then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
 fight hits   : not rate limited; trusted real clicks only, one DOM event counts once (lib/hitGuard.ts)
-hit taken    = max(1, round(attack × (1 − armor / (armor + 40))))               COMBAT.armorK
+hit taken    = max(1, round(attack × (1 − armorReduction(armor))))              COMBAT.armorK, armorSoftCap, armorSoftSlope
+armorReduction(a) = r = a/(a+40);  r ≤ 0.5 ? r : 0.5 + (r − 0.5) × 0.5       (ceiling 75 %)
 stat bonuses : counted above the starting 5 (STAT_RULES)
                damage = gear damage × (1 + 0.02 × (STR−5))  physical weapons;  × (1 + 0.024 × (INT−5))  staff and wand
-               armor  = gear armor + 0.5 × (DEX−5) + 0.5 × (VIT−5) + 0.25 × (STR−5)       hit taken × (1 − armor / (armor + 40))
+               armor  = gear armor + 0.5 × (DEX−5) + 0.5 × (VIT−5) + 0.25 × (STR−5)       hit taken × (1 − armorReduction(armor))
                crit multipliers x2 / x5 × (1 + (1 × (STR−5) + 0.5 × (DEX−5) + 0.5 × (CHA−5)) / 100)
                attacks/s = weapon speed × (1 + 0.0025 × (DEX−5))   (hook for speed combat; clicks ignore it)
 mana         = 20 + 4 × INT + gear;  regen = 0.5 + 0.05 × INT + gear  per second;  life leech = min(15, gear %) of the click damage as HP
@@ -190,7 +191,7 @@ monster level: level = spawnLevel + min(growthLevels, floor(age / growthInterval
                spawn level: rat window [1 + (castle−1), +2] capped at 10; King [15 + floor(0.8 × (castle−1)), +3] capped at 25; rolled from the monster id (no Math.random)
 rat level L  : HP = round(100 × 1.5^((L−1)/2))  → level 1 / 3 / 5 / 7 / 9 = 100 / 150 / 225 / 338 / 506     attack = round(4 × 1.25^((L−1)/2))     armor = 0.5 × (L−1)
 King level L : HP, attack = base × levelScale(L) / levelScale(15)  (9600 HP, 11 attack at 15), armor 15 + 0.5 × (L−15), 8 % crit x1.5, 20 % Stun resist
-click damage = max(1, your damage × (1 − armor / (armor + 40)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
+click damage = max(1, your damage × (1 − armorReduction(armor)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
 rewards      : rewardSec = 90 × 1.17^(L−1) (rat), 3600 × 1.03^(L−15) (King)
                gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)

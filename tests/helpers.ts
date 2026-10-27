@@ -99,6 +99,7 @@ export const growTo = (n: number) => {
 			stone: 1e12,
 			coal: 1e12,
 			food: 1e12,
+			hide: 1e12, // big territories (from 120 tiles) also cost hide
 			xp: s.resources.xp,
 		});
 		const target = nextFrontier(s.tiles);

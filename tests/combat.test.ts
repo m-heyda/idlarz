@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyHit, armorOf, critOdds, damagePerClick, dodgeChance, maxHp, mitigate, newFight, regen, rollHit, stepFight } from '../src/lib/combat';
+import { applyHit, armorOf, armorReduction, critOdds, damagePerClick, dodgeChance, maxHp, mitigate, newFight, regen, rollHit, stepFight } from '../src/lib/combat';
 import { monsterStats } from '../src/lib/monsters';
 import { INITIAL_CHARACTER_STATS } from '../src/config/gameConfig';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
@@ -35,6 +35,23 @@ test('damagePerClick is 6 with the wooden sword, 1 without a weapon, 3 with the 
 
 test('armorOf sums gear armor', () => {
 	assert.equal(armorOf(STARTER_EQUIPMENT), 2);
+});
+
+test('armorReduction: armor / (armor + 40) up to 50 %, half as much per point after that, never above 75 %', () => {
+	assert.equal(armorReduction(0), 0);
+	assert.equal(armorReduction(-5), 0);
+	assert.equal(armorReduction(40), 0.5, 'armor 40 is the knee');
+	assert.ok(Math.abs(armorReduction(20) - 20 / 60) < 1e-12, 'below the knee it is the plain formula');
+	assert.ok(Math.abs(armorReduction(120) - 0.625) < 1e-12, 'raw 75 % is worth 62.5 % past the knee');
+	let last = 0;
+	for (const armor of [1, 10, 40, 41, 100, 400, 1e4, 1e6, 1e9]) {
+		const r = armorReduction(armor);
+		assert.ok(r > last, `still rising at ${armor}`);
+		assert.ok(r < 0.75, `${armor} stays under the 75 % ceiling`);
+		last = r;
+	}
+	assert.equal(mitigate(100, 1e9), 25, 'a 100 hit still does 25 through any armor');
+	assert.ok(mitigate(100, 120) > mitigate(100, 1e6), 'but more armor keeps helping a little');
 });
 
 test('mitigate: armor 2 turns 4 into 4, armor 40 halves 10 to 5, never below 1', () => {

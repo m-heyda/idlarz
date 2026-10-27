@@ -198,6 +198,12 @@ export const unequip = (
 	return { bag: nextBag, equipment: nextEquipment };
 };
 
+/** The average item level of what is worn (empty slots do not count; 0 with nothing on): the number shown as "Item level" and the one the merchant's goods are held to. */
+export const averageItemLevel = (equipment: Equipment): number => {
+	const levels = Object.values(equipment).flatMap((item) => (item ? [item.level] : []));
+	return levels.length ? levels.reduce((sum, level) => sum + level, 0) / levels.length : 0;
+};
+
 /** The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached. */
 export const aggregateStats = (equipment: Equipment): StatTotals & { setCount: number } => {
 	const worn = Object.values(equipment).map((item) => (item ? resolveItem(item)?.stats : undefined));

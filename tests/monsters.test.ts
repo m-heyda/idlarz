@@ -20,7 +20,7 @@ import {
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { LIMITS } from '../src/config/limits';
 import { limitOf, LIMIT_BONUSES } from '../src/lib/limits';
-import { newFight, stepFight } from '../src/lib/combat';
+import { armorReduction, newFight, stepFight } from '../src/lib/combat';
 import { CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import type { Monster } from '../src/types/game';
 import { ownedRowMajor, patchTile } from '../src/utils/world';
@@ -194,7 +194,7 @@ test('the Rat King has armor, crits and resists Stun; at level 15 he is the tune
 	assert.equal(king.armor, 15);
 	assert.equal(king.critChance, 8);
 	assert.equal(king.stunResist, 20);
-	assert.equal(Math.round(king.maxHp / (1 - king.armor / (king.armor + COMBAT.armorK))), 13200, 'about 13200 effective HP once the armor is counted');
+	assert.equal(Math.round(king.maxHp / (1 - armorReduction(king.armor))), 13200, 'about 13200 effective HP once the armor is counted');
 	let last = king;
 	for (let l = 16; l <= 35; l++) {
 		const next = monsterStats('ratKing', l);

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
-import { castleLevelOf } from '@/lib/castleWard';
+import { averageItemLevel } from '@/lib/inventory';
 import { resolveItem } from '@/lib/itemInstance';
 import { refreshCost, secondsToRotation, shopPriceOf } from '@/lib/merchant';
-import { MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/gameConfig';
+import { MERCHANT_GOODS, MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/gameConfig';
 import { formatNumber, formatTime } from '@/utils/formatters';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/gameUtils';
 import ItemSlot from '../../ItemSlot';
@@ -107,11 +107,12 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 	const gold = useGameStore((state) => state.resources.gold);
 	const stock = useGameStore((state) => state.merchantStock);
 	const playSeconds = useGameStore((state) => state.playSeconds);
-	const castle = useGameStore((state) => castleLevelOf(state.tiles));
+	const refreshes = useGameStore((state) => state.merchantRefreshes);
+	const worn = useGameStore((state) => Math.round(averageItemLevel(state.equipment)));
 	const buyOffer = useGameStore((state) => state.buyOffer);
 	const refresh = useGameStore((state) => state.refreshMerchantStock);
 	const [full, setFull] = useState(false);
-	const cost = refreshCost(castle);
+	const cost = refreshCost(refreshes);
 	const left = stock ? secondsToRotation(stock, playSeconds) : 0;
 	return (
 		<>
@@ -134,7 +135,7 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 					</div>
 				</div>
 				<p className='text-sm text-[#d8c8a0] mb-3'>
-					Gear that matches the world around you, never the rarest. Hover for what it does.
+					Plain and fine gear for the world around you, never more than {MERCHANT_GOODS.maxAboveAverage} item levels above what you wear (item level {worn}). Hover for what it does.
 					{full && <span className='text-red-400'> Your bag is full.</span>}
 				</p>
 				{!stock || stock.offers.length === 0 ? (

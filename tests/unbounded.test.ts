@@ -12,7 +12,7 @@ import { syntheticWorld } from '../src/utils/worldGen';
 // The map has no edge: tiles can be bought past x = 0 / y = 0 (negative coordinates) and as far as the limits allow.
 
 const rich = () =>
-	setResources({ gold: RESOURCE_CAP / 10, wood: RESOURCE_CAP / 10, stone: RESOURCE_CAP / 10, coal: RESOURCE_CAP / 10, food: RESOURCE_CAP / 10 });
+	setResources({ gold: RESOURCE_CAP / 10, wood: RESOURCE_CAP / 10, stone: RESOURCE_CAP / 10, coal: RESOURCE_CAP / 10, food: RESOURCE_CAP / 10, hide: RESOURCE_CAP / 10 });
 
 test('a line of tiles can be bought to the left, past x = 0 and far beyond the old 50 x 50 square', () => {
 	freshGame();

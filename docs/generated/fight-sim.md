@@ -124,14 +124,14 @@ The bot also casts Heal (under 50 % HP) and Stun (whenever it is ready); mana an
 | woodland set + club | Heal + Stun | 0% | 0% | 0% | 0% | 100% (57s, 64% HP) |
 | knight's set + mace | none | 0% | 100% (60s, 32% HP) | 100% (50s, 44% HP) | 100% (40s, 55% HP) | 100% (24s, 74% HP) |
 | knight's set + mace | Heal + Stun | 0% | 100% (60s, 60% HP) | 100% (50s, 63% HP) | 100% (40s, 74% HP) | 100% (24s, 83% HP) |
-| obsidian set + maul | none | 100% (54s, 54% HP) | 100% (38s, 68% HP) | 100% (31s, 73% HP) | 100% (25s, 79% HP) | 100% (15s, 88% HP) |
-| obsidian set + maul | Heal + Stun | 100% (54s, 67% HP) | 100% (38s, 81% HP) | 100% (31s, 82% HP) | 100% (25s, 87% HP) | 100% (15s, 95% HP) |
-| rattatui + titan maul | none | 100% (31s, 92% HP) | 100% (22s, 94% HP) | 100% (18s, 95% HP) | 100% (15s, 96% HP) | 100% (9s, 98% HP) |
-| rattatui + titan maul | Heal + Stun | 100% (31s, 95% HP) | 100% (22s, 96% HP) | 100% (18s, 97% HP) | 100% (15s, 98% HP) | 100% (9s, 100% HP) |
+| obsidian set + maul | none | 100% (54s, 53% HP) | 100% (38s, 67% HP) | 100% (31s, 73% HP) | 100% (25s, 79% HP) | 100% (15s, 88% HP) |
+| obsidian set + maul | Heal + Stun | 100% (54s, 67% HP) | 100% (38s, 81% HP) | 100% (31s, 81% HP) | 100% (25s, 86% HP) | 100% (15s, 95% HP) |
+| rattatui + titan maul | none | 100% (31s, 88% HP) | 100% (22s, 91% HP) | 100% (18s, 93% HP) | 100% (15s, 95% HP) | 100% (9s, 97% HP) |
+| rattatui + titan maul | Heal + Stun | 100% (31s, 92% HP) | 100% (22s, 95% HP) | 100% (18s, 96% HP) | 100% (15s, 98% HP) | 100% (9s, 99% HP) |
 
 # The Rat King by level
 
-A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 10 % crits, 25 % Stun resistance. HP, attack and armor follow the item level curve. Gear "at the level" is the same set at the item level of the King; "behind" is item level 15. Win % (mean seconds). No skills, no potions.
+A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 8 % crits, 20 % Stun resistance. HP, attack and armor follow the item level curve. Gear "at the level" is the same set at the item level of the King; "behind" is item level 15. Win % (mean seconds). No skills, no potions.
 
 | King level | Loadout | Gear | 4 cps | 7 cps | 10 cps | 15 cps | 25 cps |
 |---|---|---|---|---|---|---|---|

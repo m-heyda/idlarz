@@ -7,7 +7,11 @@ export const COMBAT = {
 	regenPerSec: 1, // HP per second while no fight is open
 	maxDodge: 40, // % cap on the gear's Dodge, so a monster's hit can never be avoided every time
 	knockoutHpFraction: 0.3, // HP restored (as a share of max) after a knockout
-	armorK: 40, // mitigation = armor / (armor + armorK)
+	armorK: 40, // raw mitigation = armor / (armor + armorK); armorReduction() in lib/combat.ts then bends it past armorSoftCap
+	// Past this share of damage taken away every further armor point is worth only `armorSoftSlope` of what it was, so armor
+	// tops out at softCap + (1 - softCap) x softSlope = 75 % and the rest of the survival has to come from HP, regen, dodge and Stun.
+	armorSoftCap: 0.5,
+	armorSoftSlope: 0.5,
 	fightStepClampSec: 1, // a fight step never advances more than this (throttled tabs freeze fights instead of fast-forwarding them)
 	maxItemDamage: 50, // sanity ceiling for one item's damage (tests/items.test.ts); fights are balanced by tests/fightBalance.test.ts, not by a cap
 	// Clicks are not rate limited in fights: speed is skill. What stops a click from being too strong is damage and crit.

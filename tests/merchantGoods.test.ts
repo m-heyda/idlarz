@@ -3,22 +3,23 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo, rawSnapshot, store } from './helpers';
 import { CASTLE_X, CASTLE_Y, MERCHANT_GOODS, MERCHANT_UPGRADES, REBIRTH } from '../src/config/gameConfig';
 import { ITEM_CATALOG, RARITIES } from '../src/config/itemCatalog';
-import { emptyBag, gearOf } from '../src/lib/inventory';
+import { averageItemLevel, emptyBag, gearOf } from '../src/lib/inventory';
 import { plainItem, sellValueOf } from '../src/lib/itemInstance';
-import { generateMerchantStock, refreshCost, secondsToRotation, shopPriceOf, stockDue } from '../src/lib/merchant';
+import { generateMerchantStock, refreshCost, secondsToRotation, shelfLevels, shopPriceOf, stockDue } from '../src/lib/merchant';
 import { seeded } from '../src/lib/fightSim';
 import { sanitizeSave } from '../src/lib/sanitizeSave';
 import { sellPayout } from '../src/utils/gameUtils';
 import { patchTile } from '../src/utils/world';
-import type { MerchantStock } from '../src/types/game';
+import type { Equipment, MerchantStock } from '../src/types/game';
 
 const MAX_HAGGLER = 1 + MERCHANT_UPGRADES.haggler.maxLevel * MERCHANT_UPGRADES.haggler.effectPerLevel;
-const stock = (castle = 1, seed = 1, at = 0) => generateMerchantStock(castle, seed ? seeded(seed) : Math.random, at);
+// `worn` is the average item level of the player's gear: high by default, so the world (castle) level is what sets the shelf
+const stock = (castle = 1, seed = 1, at = 0, worn = 100) => generateMerchantStock(castle, worn, seed ? seeded(seed) : Math.random, at);
 const tick = (seconds: number) => {
 	for (let i = 0; i < seconds; i++) api().tick(1000);
 };
 
-test('a shelf holds six pieces of gear, rolled by the loot pipeline, and never a legendary', () => {
+test('a shelf holds six pieces of gear, rolled by the loot pipeline: common or uncommon, never better', () => {
 	for (const castle of [1, 3, 6, 10]) {
 		for (let seed = 1; seed <= 40; seed++) {
 			const s = stock(castle, seed);
@@ -26,7 +27,7 @@ test('a shelf holds six pieces of gear, rolled by the loot pipeline, and never a
 			assert.equal(s.at, 0);
 			for (const item of s.offers) {
 				assert.ok(ITEM_CATALOG[item.base] && ITEM_CATALOG[item.base].kind !== 'consumable', item.base);
-				assert.notEqual(item.rarity, 'legendary');
+				assert.ok(item.rarity === 'common' || item.rarity === 'uncommon', `${item.base} is ${item.rarity}`);
 				assert.ok(item.rarity in RARITIES);
 			}
 		}
@@ -42,6 +43,29 @@ test('the shelf follows the world level: a castle 10 shelf holds higher level ge
 	assert.ok(level(1) < 12);
 });
 
+test('the shelf is held to the gear the player wears: never more than 5 item levels above the average, whatever the castle', () => {
+	for (const worn of [1, 4, 10, 25]) {
+		for (const castle of [1, 5, 10]) {
+			for (let seed = 1; seed <= 40; seed++) {
+				for (const item of stock(castle, seed, 0, worn).offers) {
+					assert.ok(item.level <= worn + MERCHANT_GOODS.maxAboveAverage, `worn ${worn}, castle ${castle}: level ${item.level}`);
+				}
+			}
+		}
+	}
+	const { centre, max } = shelfLevels(10, 8);
+	assert.equal(max, 8 + MERCHANT_GOODS.maxAboveAverage);
+	assert.equal(centre, 8 + MERCHANT_GOODS.centreAboveAverage, 'a high world level is held down to the gear');
+	assert.equal(shelfLevels(1, 40).centre, shelfLevels(1, 100).centre, 'and a low world level is not lifted by good gear');
+	assert.ok(shelfLevels(1, 0).max >= 1, 'nothing worn counts as level 1');
+});
+
+test('averageItemLevel is the mean of the worn pieces, empty slots left out', () => {
+	assert.equal(averageItemLevel({ mainHand: null, offHand: null } as unknown as Equipment), 0);
+	const worn = { mainHand: { ...plainItem('wooden_sword'), level: 10 }, offHand: { ...plainItem('wooden_shield'), level: 20 }, head: null } as unknown as Equipment;
+	assert.equal(averageItemLevel(worn), 15);
+});
+
 test('the goods are never a bargain: every price is far above what he pays, even with a max Haggler, so buy-then-sell never gains gold', () => {
 	for (const castle of [1, 5, 10]) {
 		for (let seed = 1; seed <= 30; seed++) {
@@ -55,10 +79,14 @@ test('the goods are never a bargain: every price is far above what he pays, even
 	}
 });
 
-test('the refresh costs more as the world level grows, and the rotation is a countdown in play time', () => {
-	assert.equal(refreshCost(1), MERCHANT_GOODS.refreshBase);
-	assert.equal(refreshCost(5), MERCHANT_GOODS.refreshBase * 25);
-	assert.ok(refreshCost(10) > refreshCost(9));
+test('the refresh costs 5k, then 5k more each time, then 50k more each time after the tenth; the rotation is a countdown in play time', () => {
+	assert.equal(refreshCost(0), 5000, 'the first one');
+	assert.equal(refreshCost(1), 10_000);
+	assert.equal(refreshCost(9), 50_000, 'the tenth');
+	assert.equal(refreshCost(10), 100_000, 'the eleventh: 50k more');
+	assert.equal(refreshCost(11), 150_000);
+	assert.equal(refreshCost(19), 550_000);
+	for (let n = 1; n < 40; n++) assert.ok(refreshCost(n) > refreshCost(n - 1));
 	const s: MerchantStock = { at: 100, offers: [] };
 	assert.equal(secondsToRotation(s, 100), MERCHANT_GOODS.rotateSec);
 	assert.equal(secondsToRotation(s, 100 + MERCHANT_GOODS.rotateSec - 1), 1);
@@ -124,11 +152,15 @@ test('refreshMerchantStock: costs gold, reshuffles at once and restarts the half
 	tick(30);
 	const gold = api().resources.gold;
 	assert.equal(api().refreshMerchantStock(), true);
-	assert.equal(api().resources.gold, gold - refreshCost(1));
+	assert.equal(api().resources.gold, gold - refreshCost(0));
 	assert.notEqual(api().merchantStock, before);
 	assert.equal(api().merchantStock!.offers.length, MERCHANT_GOODS.offers);
 	assert.equal(api().merchantStock!.at, api().playSeconds);
-	freshGame({ gold: refreshCost(1) - 1 });
+	assert.equal(api().merchantRefreshes, 1);
+	assert.equal(api().refreshMerchantStock(), true);
+	assert.equal(api().resources.gold, gold - refreshCost(0) - refreshCost(1), 'the second one costs more');
+	assert.equal(api().merchantRefreshes, 2);
+	freshGame({ gold: refreshCost(0) - 1 });
 	api().tick(1000);
 	const shelf = api().merchantStock;
 	assert.equal(api().refreshMerchantStock(), false);

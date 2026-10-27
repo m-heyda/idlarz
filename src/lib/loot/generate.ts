@@ -19,6 +19,8 @@ export interface LootRequest {
 	level?: number;
 	/** The world level: castle level, 1-10 */
 	castleLevel?: number;
+	/** No item rolled for this request gets a higher item level than this (the merchant's shelf is held to the player's gear) */
+	maxItemLevel?: number;
 	/** Base item ids the player already has (bag + worn), for tables that prefer missing pieces */
 	owned?: readonly string[];
 	/** Bad-luck counters from the save, by `profile:table` */
@@ -194,6 +196,8 @@ const drawFixed = (ctx: Ctx, trace: RollTrace, def: ItemDef, itemLevel: number, 
 	return { kind: 'gear', item };
 };
 
+const capped = (ctx: Ctx, def: ItemLevelDef): ItemLevelDef => ({ ...def, max: Math.min(def.max ?? MAX_ITEM_LEVEL, ctx.req.maxItemLevel ?? MAX_ITEM_LEVEL) });
+
 /** Runs one bonus table; returns what it dropped and whether it triggered. */
 const runTable = (ctx: Ctx, table: BonusTable): { drops: LootDrop[]; triggered: boolean } => {
 	const key = `${ctx.profile.id}:${table.id}`;
@@ -203,7 +207,7 @@ const runTable = (ctx: Ctx, table: BonusTable): { drops: LootDrop[]; triggered: 
 	const triggered = chance >= 1 || ctx.rng() < chance;
 	if (!triggered) return { drops: [], triggered: false };
 
-	const levelDef = { ...ctx.profile.itemLevel, ...table.itemLevel };
+	const levelDef = capped(ctx, { ...ctx.profile.itemLevel, ...table.itemLevel });
 	const drops: LootDrop[] = [];
 	if (table.takeAll) {
 		const itemLevel = rollItemLevel(ctx.sourceLevel, levelDef, ctx.rng);
@@ -244,7 +248,7 @@ export const generateLoot = (req: LootRequest, rng: Rng, data: LootData = LOOT_D
 	if (profile.generalPoolId) {
 		const hits = countSuccesses(profile.rolls, level, rng);
 		for (let i = 0; i < hits; i++) {
-			const itemLevel = rollItemLevel(sourceLevel, profile.itemLevel, rng);
+			const itemLevel = rollItemLevel(sourceLevel, capped(ctx, profile.itemLevel), rng);
 			const drop = rollRarityGear(ctx, 'general', profile.generalPoolId, itemLevel);
 			if (drop) drops.push(drop);
 		}

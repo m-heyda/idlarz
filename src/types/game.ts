@@ -334,6 +334,7 @@ export interface GameState {
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
 	merchantStock: MerchantStock | null; // the goods on offer (null until the first shelf is rolled)
+	merchantRefreshes: number; // paid shelf refreshes bought this run: each one costs more (see MERCHANT_GOODS.refresh)
 	isHydrated: boolean;
 	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
 	prestige: PrestigeState;

@@ -69,7 +69,7 @@ const game = (patch: Partial<PersistedGame> = {}): PersistedGame => {
 	api().resetGame();
 	growTo(12);
 	// the helper hands out a huge balance: reset it to an honest-looking one
-	store.setState({ playSeconds: 1000, resources: { ...api().resources, gold: 100, wood: 0, stone: 0, coal: 0, food: 0 }, ...patch } as never);
+	store.setState({ playSeconds: 1000, resources: { ...api().resources, gold: 100, wood: 0, stone: 0, coal: 0, food: 0, hide: 0 }, ...patch } as never);
 	return structuredClone(pickPersisted(api()));
 };
 const withResources = (state: PersistedGame, resources: Partial<PersistedGame['resources']>): PersistedGame => ({

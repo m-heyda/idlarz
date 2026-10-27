@@ -229,7 +229,8 @@ const Tutorial: React.FC = () => {
 						plus gear - and a crit can become a <b>super crit</b> (x{COMBAT.crit.superMult}) with {COMBAT.crit.superBase}% plus the gear&apos;s Super Crit.
 					</li>
 					<li>
-						The monster hits back on a timer; Armor reduces every hit (armor / (armor + {COMBAT.armorK})). Your HP is about{' '}
+						The monster hits back on a timer; Armor reduces every hit (armor / (armor + {COMBAT.armorK}) up to {pct(COMBAT.armorSoftCap)}, then each point is worth half as much, so
+							no armor can take away more than {pct(COMBAT.armorSoftCap + (1 - COMBAT.armorSoftCap) * COMBAT.armorSoftSlope)}: the rest of your survival is HP, regen and dodge). Your HP is about{' '}
 						{COMBAT.baseHp + 16} at the start, regenerates {COMBAT.regenPerSec} HP/s outside fights (gear Regen adds to that and also heals in
 						fights) and at 0 you are knocked out with {pct(COMBAT.knockoutHpFraction)} HP back; nothing is lost. Fleeing resets the monster.
 					</li>
