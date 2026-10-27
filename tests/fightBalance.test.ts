@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { plainItem } from '../src/lib/itemInstance';
-import { fullSet, seeded, simulateMany } from '../src/lib/fightSim';
+import { fullSet, seeded, simulateMany, spentCharacter } from '../src/lib/fightSim';
 import type { Equipment } from '../src/types/game';
 
 // The Rat King is the MVP monster: fights are not rate limited, so the tuning is checked by simulating a bot that clicks at a
@@ -54,4 +54,40 @@ test('rats are basic enemies: a tier-1 rat falls to the starter kit even at a sl
 	assert.equal(sim(STARTER_EQUIPMENT, 2, { type: 'rat', tier: 1 }).winRate, 1);
 	assert.ok(sim(STARTER_EQUIPMENT, 1, { type: 'rat', tier: 5 }).winRate < 0.5);
 	assert.equal(sim(RATTATUI, 4, { type: 'rat', tier: 5 }).winRate, 1);
+});
+
+// ---- attribute builds (25 spare points is about level 30) --------------------------------------------------------------------
+
+const simAs = (character: ReturnType<typeof spentCharacter>, equipment: Equipment, cps: number, monster: { type: 'rat' | 'ratKing'; tier: number } = KING) =>
+	simulateMany({ equipment, monster: { ...monster }, cps, character }, RUNS, seeded(11 + cps));
+
+test('spending points pays off: 25 Strength makes a physical weapon clearly faster, 25 Intelligence does the same for a magic weapon, and the wrong stat does nothing', () => {
+	const maul = OBSIDIAN;
+	const staff = fullSet('obsidian', 'obsidian_staff');
+	const none = spentCharacter({});
+	const strong = spentCharacter({ strength: 25 });
+	const wise = spentCharacter({ intelligence: 25 });
+	const base = simAs(none, maul, 10).meanTimeSec;
+	assert.ok(simAs(strong, maul, 10).meanTimeSec < base * 0.8, 'Strength speeds up the maul');
+	assert.ok(Math.abs(simAs(wise, maul, 10).meanTimeSec - base) < base * 0.05, 'Intelligence does nothing for a maul');
+	const staffBase = simAs(none, staff, 15).meanTimeSec;
+	assert.ok(simAs(wise, staff, 15).meanTimeSec < staffBase * 0.8, 'Intelligence speeds up the staff');
+	// Strength gives a staff no damage (tests/stats.test.ts), only its share of crit damage: far less than Intelligence does
+	assert.ok(simAs(strong, staff, 15).meanTimeSec > staffBase * 0.92, 'Strength barely helps a staff');
+});
+
+test('points never trivialise the king: even a level 30 Strength build with the best loadout needs several seconds at an auto-clicker speed', () => {
+	const best = { ...RATTATUI, mainHand: plainItem('titan_maul') };
+	const r = simAs(spentCharacter({ strength: 25 }), best, 25);
+	assert.ok(r.meanTimeSec >= 6, `${r.meanTimeSec} s`);
+	// and the starter kit with the same points still does not win by clicking alone
+	assert.equal(simAs(spentCharacter({ strength: 25 }), STARTER_EQUIPMENT, 25).winRate, 0);
+});
+
+test('defense points matter: Vitality and Dexterity let a tier-5 rat fight go better than none', () => {
+	const rat5 = { type: 'rat', tier: 5 } as const;
+	const bare = simAs(spentCharacter({}), STARTER_EQUIPMENT, 3, rat5);
+	const tank = simAs(spentCharacter({ vitality: 25, dexterity: 10 }), STARTER_EQUIPMENT, 3, rat5);
+	assert.ok(tank.winRate >= bare.winRate);
+	assert.ok(Number.isNaN(tank.meanHpLeft) || Number.isNaN(bare.meanHpLeft) || tank.meanHpLeft > bare.meanHpLeft, 'more HP left after the fight');
 });

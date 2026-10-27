@@ -27,6 +27,10 @@ export const STAT_DEFS = {
 	luck: { label: 'Luck', integer: true, levelShare: 0.5 }, // adds to the Luck of the character: better chest and kill gold and rarer chest finds
 	goldFind: { label: 'Gold Find', unit: '%', levelShare: 0.5 }, // % more gold from kills and chests
 	dodge: { label: 'Dodge', unit: '%', decimals: 1, levelShare: 0.3 }, // chance in % that a monster's hit misses (capped by COMBAT.maxDodge)
+	maxMana: { label: 'Max Mana', integer: true, levelShare: 0.7 }, // added to the character's mana pool (skills spend it)
+	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
+	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
+	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of click damage returned as HP (capped by STAT_RULES.lifeLeechCap)
 } as const satisfies Record<string, StatDef>;
 
 export type StatKey = keyof typeof STAT_DEFS;
@@ -47,6 +51,10 @@ export const STAT_BASE_BY_TIER: Record<StatKey, readonly [number, number, number
 	luck: [1, 2, 3, 4, 6],
 	goldFind: [2, 4, 6, 9, 12],
 	dodge: [1, 1.5, 2, 3, 4],
+	maxMana: [8, 12, 18, 26, 36],
+	manaRegen: [0.2, 0.3, 0.45, 0.65, 0.9],
+	spellPower: [4, 7, 10, 14, 18],
+	lifeLeech: [0.5, 1, 1.5, 2, 3],
 };
 
 /** The base value of a stat for a tier (1-5) at the item's authored level. */

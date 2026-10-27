@@ -29,6 +29,22 @@ export const COMBAT = {
 	rewards: { minGold: 10, minXp: 5 },
 };
 
+// How the five attributes feed combat (read through lib/statBonuses.ts). Every attribute starts at `base`; bonuses count the
+// points ABOVE it, so a new character plays exactly like one with no stat bonuses and every point spent is a real step up.
+export const STAT_RULES = {
+	base: 5,
+	physicalDamagePerStrength: 2, // % damage with physical weapons per point above base
+	magicDamagePerIntelligence: 2.4, // % damage with magic weapons: 1.2x the physical rate, so magic is worth going into
+	armorPerDexterity: 0.5, // armor added to the gear's per point above base
+	armorPerVitality: 0.5,
+	armorPerStrength: 0.25,
+	critDamagePerPoint: { strength: 1, dexterity: 0.5, charisma: 0.5 }, // % extra on the x2 crit and x5 super crit multipliers
+	atkSpeedPerDexterity: 0.25, // % attack speed (the hook for speed-based combat; clicks ignore it)
+	mana: { base: 20, perIntelligence: 4, regenBase: 0.5, regenPerIntelligence: 0.05 }, // max mana and mana per second
+	magicWeaponTypes: ['staff', 'wand'] as readonly string[], // these scale with Intelligence, every other weapon with Strength
+	lifeLeechCap: 15, // % of click damage returned as HP: the gear's Life Leech never counts above this
+};
+
 export const MONSTERS = {
 	rat: {
 		label: 'Rat',

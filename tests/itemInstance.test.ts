@@ -7,6 +7,7 @@ import { MAX_ITEM_LEVEL, levelScale, qualityMultiplier, roundStat, scaleStats } 
 import { ITEM_CATALOG } from '@/catalog';
 import { affixFits, affixValue, instanceProblem, legacyInstance, resolveItem, sellValueOf } from '@/lib/itemInstance';
 import type { ItemInstance } from '@/types/game';
+import { RETUNED_STATS } from './retunedItems';
 
 // Captured from the catalog BEFORE the loot rework (tests/fixtures/legacy-items.json): what every item was in a v2 save.
 interface LegacyItem {
@@ -18,7 +19,7 @@ interface LegacyItem {
 const legacy = JSON.parse(readFileSync(new URL('./fixtures/legacy-items.json', import.meta.url), 'utf8')) as Record<string, LegacyItem>;
 const legacyGear = Object.entries(legacy).filter(([, item]) => item.kind !== 'consumable');
 
-test('every legacy item converts to an instance that resolves to exactly its old stats', () => {
+test('every legacy item converts to an instance that resolves to exactly its old stats (the nine retuned on purpose to their pinned new ones)', () => {
 	assert.equal(legacyGear.length, 76);
 	for (const [id, old] of legacyGear) {
 		const instance = legacyInstance(id, old.rarity);
@@ -26,7 +27,7 @@ test('every legacy item converts to an instance that resolves to exactly its old
 		assert.equal(instanceProblem(instance), null, id);
 		const resolved = resolveItem(instance);
 		assert.ok(resolved, id);
-		assert.deepEqual(resolved.stats, old.stats, id);
+		assert.deepEqual(resolved.stats, RETUNED_STATS[id] ?? old.stats, id);
 		assert.equal(resolved.rarity.id, old.rarity, id);
 	}
 });

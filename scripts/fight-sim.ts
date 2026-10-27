@@ -5,8 +5,8 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { MONSTERS } from '../src/config/combatConfig';
-import { fullSet, seeded, simulateMany } from '../src/lib/fightSim';
-import { maxHp } from '../src/lib/combat';
+import { fullSet, seeded, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import { armorOf, damagePerClick, maxHp } from '../src/lib/combat';
 import { aggregateStats } from '../src/lib/inventory';
 import { plainItem } from '../src/lib/itemInstance';
 import { freshCharacter } from '../src/lib/fightSim';
@@ -65,6 +65,40 @@ for (const { label, monster } of MONSTER_ROWS) {
 			return `${Math.round(r.winRate * 100)}%${r.winRate > 0 ? ` (${r.meanTimeSec.toFixed(0)}s)` : ''}`;
 		});
 		out(`| ${name} | ${cells.join(' | ')} |`);
+	}
+}
+
+// ---- attribute builds: what 25 spare points (about level 30) do against the King and a tier 5 rat -----------------------------------
+const BUILDS = [
+	{ name: 'no points spent', spend: {} },
+	{ name: 'warrior: +25 Strength', spend: { strength: 25 } },
+	{ name: 'mage: +25 Intelligence', spend: { intelligence: 25 } },
+	{ name: 'tank: +15 Vitality, +10 Dexterity', spend: { vitality: 15, dexterity: 10 } },
+	{ name: 'balanced: +5 each', spend: { strength: 5, dexterity: 5, intelligence: 5, vitality: 5, charisma: 5 } },
+];
+const BUILD_GEAR = [
+	{ name: 'obsidian set + maul (physical)', equipment: fullSet('obsidian', 'obsidian_maul'), type: 'physical' },
+	{ name: 'obsidian set + staff (magic)', equipment: fullSet('obsidian', 'obsidian_staff'), type: 'magic' },
+];
+out();
+out('# Level 30 builds');
+out();
+out('The same bot with 25 spare attribute points spent as shown (bonuses count points above the starting 5). Win % (mean seconds).');
+for (const { label, monster } of MONSTER_ROWS.filter((m) => m.monster.tier === 5 || m.monster.type === 'ratKing')) {
+	out();
+	out(`## ${label}`);
+	out();
+	out(`| Build + gear | Damage/hit | Armor | ${[7, 10, 15].map((s) => `${s} cps`).join(' | ')} |`);
+	out('|---|---|---|---|---|---|');
+	for (const gear of BUILD_GEAR) {
+		for (const build of BUILDS) {
+			const hero = spentCharacter(build.spend);
+			const cells = [7, 10, 15].map((cps) => {
+				const r = simulateMany({ equipment: gear.equipment, monster: { ...monster }, cps, character: hero }, RUNS, seeded(2000 + cps));
+				return `${Math.round(r.winRate * 100)}%${r.winRate > 0 ? ` (${r.meanTimeSec.toFixed(0)}s)` : ''}`;
+			});
+			out(`| ${build.name}, ${gear.name} | ${damagePerClick(gear.equipment, hero)} | ${Math.round(armorOf(gear.equipment, hero) * 10) / 10} | ${cells.join(' | ')} |`);
+		}
 	}
 }
 

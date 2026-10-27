@@ -1,6 +1,8 @@
-import { COMBAT, MONSTERS } from '@/config/combatConfig';
+import { ITEM_CATALOG } from '@/catalog';
+import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
 import { monsterStats } from '@/lib/monsters';
+import { atkSpeedPercent, critDamagePercent, magicDamagePercent, physicalDamagePercent, statArmor, statManaRegen, type Attributes } from '@/lib/statBonuses';
 import type { CharacterStats, Equipment, FightState, Monster } from '@/types/game';
 
 // Pure combat rules. The store applies the results; nothing here touches state.
@@ -8,8 +10,37 @@ import type { CharacterStats, Equipment, FightState, Monster } from '@/types/gam
 export const maxHp = (characterStats: CharacterStats, equipment: Equipment): number =>
 	Math.round(COMBAT.baseHp + characterStats.hp + aggregateStats(equipment).maxHp);
 
-/** Damage of a plain click: the gear's total damage (1 without a weapon). */
-export const damagePerClick = (equipment: Equipment): number => Math.max(1, aggregateStats(equipment).damage);
+export type DamageType = 'physical' | 'magic';
+
+/** Magic weapons (staves, wands) scale with Intelligence; everything else, bare hands included, with Strength. */
+export const weaponDamageType = (equipment: Equipment): DamageType => {
+	const base = equipment.mainHand?.base;
+	const type = base ? ITEM_CATALOG[base]?.weaponType : undefined;
+	return type && STAT_RULES.magicWeaponTypes.includes(type) ? 'magic' : 'physical';
+};
+
+/** The damage multiplier the attributes give with the worn weapon (1 for a character with no bonus, or when no attributes are given). */
+export const damageMultiplier = (equipment: Equipment, stats?: Attributes): number => {
+	if (!stats) return 1;
+	const percent = weaponDamageType(equipment) === 'magic' ? magicDamagePercent(stats) : physicalDamagePercent(stats);
+	return 1 + percent / 100;
+};
+
+const round1 = (value: number): number => Math.round(value * 10) / 10;
+
+/** Damage of a plain click: the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon). */
+export const damagePerClick = (equipment: Equipment, stats?: Attributes): number =>
+	Math.max(1, round1(aggregateStats(equipment).damage * damageMultiplier(equipment, stats)));
+
+/** Attacks per second: the weapon's speed (1 bare-handed) and the Dexterity bonus. Clicks do not use it yet; the speed-based combat will. */
+export const attacksPerSecond = (equipment: Equipment, stats?: Attributes): number => {
+	const base = equipment.mainHand ? (ITEM_CATALOG[equipment.mainHand.base]?.attackSpeed ?? 1) : 1;
+	return Math.round(base * (1 + (stats ? atkSpeedPercent(stats) : 0) / 100) * 100) / 100;
+};
+
+/** Damage per second at that speed: what the damage readout and, later, the fight are built on. */
+export const damagePerSecond = (equipment: Equipment, stats?: Attributes): number =>
+	Math.round(damagePerClick(equipment, stats) * attacksPerSecond(equipment, stats) * 100) / 100;
 
 export type CritKind = 'none' | 'crit' | 'super';
 
@@ -30,14 +61,29 @@ export const rollHit = (
 	equipment: Equipment,
 	rng: () => number
 ): { damage: number; crit: CritKind } => {
-	const base = damagePerClick(equipment);
+	const base = damagePerClick(equipment, characterStats);
 	const odds = critOdds(characterStats, equipment);
 	if (!(rng() >= 1 - odds.crit)) return { damage: base, crit: 'none' }; // high rolls crit, so a stubbed rng() of 0 never does
-	if (rng() >= 1 - odds.superCrit) return { damage: Math.max(1, Math.round(base * COMBAT.crit.superMult)), crit: 'super' };
-	return { damage: Math.max(1, Math.round(base * COMBAT.crit.mult)), crit: 'crit' };
+	const extra = 1 + critDamagePercent(characterStats) / 100; // Strength, Dexterity and Charisma points above 5 make crits hit harder
+	if (rng() >= 1 - odds.superCrit) return { damage: Math.max(1, round1(base * COMBAT.crit.superMult * extra)), crit: 'super' };
+	return { damage: Math.max(1, round1(base * COMBAT.crit.mult * extra)), crit: 'crit' };
 };
 
-export const armorOf = (equipment: Equipment): number => aggregateStats(equipment).armor;
+/** Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add. */
+export const armorOf = (equipment: Equipment, stats?: Attributes): number => aggregateStats(equipment).armor + (stats ? statArmor(stats) : 0);
+
+/** Mana: the attributes' pool plus the gear's. */
+export const maxMana = (characterStats: CharacterStats, equipment: Equipment): number =>
+	Math.round(characterStats.mp + aggregateStats(equipment).maxMana);
+
+/** Mana per second, in and out of fights. */
+export const manaRegenPerSec = (stats: Attributes, equipment: Equipment): number => statManaRegen(stats) + aggregateStats(equipment).manaRegen;
+
+/** The gear's Life Leech in %, never above the cap. */
+export const lifeLeechPercent = (equipment: Equipment): number => Math.min(STAT_RULES.lifeLeechCap, Math.max(0, aggregateStats(equipment).lifeLeech));
+
+/** HP a click of `damage` gives back through Life Leech. */
+export const leechHeal = (damage: number, equipment: Equipment): number => (damage * lifeLeechPercent(equipment)) / 100;
 
 export const mitigate = (rawDamage: number, armor: number): number =>
 	Math.max(1, Math.round(rawDamage * (1 - armor / (armor + COMBAT.armorK))));

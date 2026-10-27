@@ -7,7 +7,9 @@ import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../sr
 import { emptyBag, stackOf } from '../src/lib/inventory';
 import { plainItem, sellValueOf } from '../src/lib/itemInstance';
 import { sellPayout } from '../src/utils/gameUtils';
-import { maxHp } from '../src/lib/combat';
+import { leechHeal, maxHp, maxMana } from '../src/lib/combat';
+import { calculateCombatStats } from '../src/utils/gameUtils';
+import type { ItemInstance } from '../src/types/game';
 import { castleLevelOf } from '../src/lib/castleWard';
 import { spawnCap } from '../src/lib/spawnLimits';
 import { fullSet } from '../src/lib/fightSim';
@@ -420,4 +422,60 @@ test('a higher castle level raises the item level of what a rat drops', () => {
 		}
 	};
 	assert.ok(best(5) > best(1) + 8);
+});
+
+// ---- mana and life leech ------------------------------------------------------------------------------------------------
+
+test('mana refills over time, in and out of fights, and never above the maximum', () => {
+	freshGame();
+	assert.equal(api().playerMp, maxMana(api().characterStats, api().equipment));
+	store.setState({ playerMp: 0 });
+	run(10);
+	assert.ok(Math.abs(api().playerMp - 7.5) < 0.01, `${api().playerMp}`); // 0.75 per second at the start
+	run(500);
+	assert.equal(api().playerMp, 40);
+	withMonster();
+	store.setState({ playerMp: 10 });
+	api().startFight(1);
+	run(4);
+	assert.ok(api().playerMp > 12.5, 'mana also refills during a fight');
+});
+
+test('Intelligence and magic gear raise the mana pool and its refill; changing gear clamps the mana', () => {
+	freshGame();
+	store.setState((s) => ({ characterStats: { ...s.characterStats, intelligence: 25, ...calculateCombatStats({ ...s.characterStats, intelligence: 25 }) } }));
+	store.setState({ bag: [{ item: plainItem('apprentice_tome') }, ...emptyBag().slice(1)] });
+	assert.equal(maxMana(api().characterStats, api().equipment), 120);
+	store.setState({ playerMp: 120 });
+	assert.equal(api().equipItem(0), true); // the tome: +8 mana
+	assert.equal(maxMana(api().characterStats, api().equipment), 128);
+	store.setState({ playerMp: 128 });
+	assert.equal(api().unequipItem('offHand'), true);
+	assert.equal(api().playerMp, 120, 'the pool shrinks, the mana follows it down');
+});
+
+test('life leech: a hit gives back a share of its damage as HP, never above the maximum', () => {
+	withMonster();
+	const leechy: ItemInstance = { base: 'steel_dagger', level: 40, rarity: 'uncommon', quality: 50, affixes: [{ id: 'lifeLeech_prefix', roll: 100 }] };
+	store.setState((s) => ({ equipment: { ...s.equipment, mainHand: leechy }, playerHp: 50 }));
+	api().startFight(1);
+	const before = api().playerHp;
+	const hitResult = hit(250, 0)!;
+	const expected = leechHeal(hitResult.damage, api().equipment);
+	assert.ok(expected > 0);
+	assert.ok(Math.abs(api().playerHp - before - expected) < 1e-6, `${api().playerHp - before} vs ${expected}`);
+	store.setState({ playerHp: max() });
+	hit(250, 0);
+	assert.equal(api().playerHp, max(), 'at full HP leech cannot overheal');
+});
+
+test('a rebirth refills mana to the pool of the gear that survives', () => {
+	freshGame();
+	growTo(REBIRTH.minTiles);
+	store.setState((s) => ({ tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel }), bag: [{ item: plainItem('apprentice_tome') }, ...emptyBag().slice(1)] }));
+	api().equipItem(0);
+	store.setState({ playerMp: 1 });
+	assert.equal(api().rebirth(), true);
+	assert.equal(api().playerMp, maxMana(api().characterStats, api().equipment));
+	assert.equal(api().playerMp, 48);
 });

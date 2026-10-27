@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { maxHp } from '@/lib/combat';
+import { armorOf, attacksPerSecond, damagePerClick, lifeLeechPercent, maxHp, maxMana } from '@/lib/combat';
 import type { CharacterStats, Resources } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import CollapsibleSection from '../CollapsibleSection';
@@ -71,6 +71,7 @@ const StatisticsOverlay: React.FC = () => {
 	const characterStats = useGameStore((state) => state.characterStats);
 	const prestige = useGameStore((state) => state.prestige);
 	const playerHp = useGameStore((state) => state.playerHp);
+	const playerMp = useGameStore((state) => state.playerMp);
 	const equipment = useGameStore((state) => state.equipment);
 	const farmLevels = useGameStore((state) => state.farmLevels);
 	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
@@ -160,11 +161,11 @@ const StatisticsOverlay: React.FC = () => {
 				<CollapsibleSection id='combat-stats' title='Combat'>
 					<div className='space-y-1 text-xs'>
 						<Line label='HP' value={`${Math.floor(playerHp)} / ${maxHp(characterStats, equipment)}`} valueClass='text-green-400' />
-						<Line label='MP' value={characterStats.mp} valueClass='text-blue-400' />
-						<Line label='Physical ATK' value={characterStats.physicalAtk} valueClass='text-amber-400' />
-						<Line label='Magic ATK' value={characterStats.magicAtk} valueClass='text-purple-400' />
-						<Line label='DEF' value={characterStats.def} valueClass='text-amber-200' />
-						<Line label='Magic DEF' value={characterStats.magicDef} valueClass='text-indigo-400' />
+						<Line label='MP' value={`${Math.floor(playerMp)} / ${maxMana(characterStats, equipment)}`} valueClass='text-blue-400' />
+						<Line label='Damage' value={`${damagePerClick(equipment, characterStats)} per hit`} valueClass='text-orange-300' />
+						<Line label='Physical ATK' value={`+${pct(characterStats.physicalAtk, 1)}`} valueClass='text-amber-400' />
+						<Line label='Magic ATK' value={`+${pct(characterStats.magicAtk, 1)}`} valueClass='text-purple-400' />
+						<Line label='DEF (armor)' value={Math.round(armorOf(equipment, characterStats) * 10) / 10} valueClass='text-amber-200' />
 						<Line label='Luck' value={characterStats.luck} valueClass='text-purple-500' />
 					</div>
 				</CollapsibleSection>
@@ -173,7 +174,8 @@ const StatisticsOverlay: React.FC = () => {
 					<div className='space-y-1 text-xs'>
 						<Line label='Crit chance' value={pct(characterStats.critChance, 2)} valueClass='text-yellow-300' />
 						<Line label='Crit damage' value={pct(characterStats.critDmgMultiplier, 2)} valueClass='text-orange-400' />
-						<Line label='ATK speed' value={pct(characterStats.atkSpeedIncrease, 2)} valueClass='text-blue-300' />
+						<Line label='ATK speed' value={`${attacksPerSecond(equipment, characterStats)}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`} valueClass='text-blue-300' />
+						<Line label='Life leech' value={pct(lifeLeechPercent(equipment), 1)} valueClass='text-red-300' />
 						<Line label='XP gain' value={pct(characterStats.xpGainMultiplier, 2)} valueClass='text-green-400' />
 						<Line label='Tile discount' value={pct(characterStats.tileCostDiscount, 2)} valueClass='text-blue-400' />
 						<Line

@@ -15,6 +15,13 @@ export const freshCharacter = (): CharacterStats => {
 	return Object.assign(stats, calculateCombatStats(stats));
 };
 
+/** A character with attribute points spent on top of the starting 5 each (a level 30 character has about 25 to spend). */
+export const spentCharacter = (spend: Partial<Pick<CharacterStats, 'strength' | 'dexterity' | 'intelligence' | 'vitality' | 'charisma'>>): CharacterStats => {
+	const stats = { ...INITIAL_CHARACTER_STATS };
+	for (const [key, points] of Object.entries(spend)) (stats as unknown as Record<string, number>)[key] += points ?? 0;
+	return Object.assign(stats, calculateCombatStats(stats));
+};
+
 /** Every piece of a set worn, plus a weapon (and the set's own off hand is part of the set). Both rings are filled. Items are plain: their authored level, neutral quality, no affixes. */
 export const fullSet = (setId: string, weapon?: string): Equipment => {
 	const eq: Equipment = {};
@@ -53,7 +60,7 @@ export const simulateFight = ({ equipment, monster, cps, rng, character = freshC
 	let fight = newFight({ id: 1, ...monster });
 	const max = maxHp(character, equipment);
 	let hp = max;
-	const armor = armorOf(equipment);
+	const armor = armorOf(equipment, character);
 	const gearRegen = { perSec: aggregateStats(equipment).regen, max };
 	const bag = potions.map((p) => ({ ...p })).sort((a, b) => b.healHp - a.healHp);
 	let time = 0;

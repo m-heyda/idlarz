@@ -27,7 +27,7 @@ import {
 import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { instanceProblem } from '@/lib/itemInstance';
-import { maxHp } from '@/lib/combat';
+import { maxHp, maxMana } from '@/lib/combat';
 import { isInWard } from '@/lib/castleWard';
 import { starterBag } from '@/lib/inventory';
 import { tierFor } from '@/lib/monsters';
@@ -91,7 +91,8 @@ export const PERSISTED_KEYS = [
 	'equipment',
 	'bag',
 	'playerHp',
-	'monsters',
+	'playerMp',
+'monsters',
 	'monsterSpawnTimer',
 	'nextMonsterId',
 	'lootPity',
@@ -432,6 +433,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (v === null) return fail('player hp');
 		playerHp = v;
 	}
+	// Mana (optional: a save from before it was added starts full)
+	const maxPlayerMp = maxMana(characterStats, equipment);
+	let playerMp = maxPlayerMp;
+	if (raw.playerMp !== undefined) {
+		const v = num(raw.playerMp, 0, maxPlayerMp);
+		if (v === null) return fail('player mana');
+		playerMp = v;
+	}
 
 	const nextMonsterId = raw.nextMonsterId === undefined ? 1 : int(raw.nextMonsterId, 1, 1e9);
 	if (nextMonsterId === null) return fail('next monster id');
@@ -562,6 +571,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			equipment,
 			bag,
 			playerHp,
+			playerMp,
 			monsters,
 			monsterSpawnTimer,
 			nextMonsterId,

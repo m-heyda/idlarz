@@ -6,7 +6,7 @@ import { LevelUpTimer } from './LevelUpTimer';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import CharacterPortrait from './CharacterPortrait';
 import LevelOrb from './LevelOrb';
-import { maxHp } from '@/lib/combat';
+import { maxHp, maxMana } from '@/lib/combat';
 
 type FlaskKind = 'hp' | 'mp';
 
@@ -41,8 +41,9 @@ const Flask: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({
  * and a stony XP bar along the floor with the level on a gem. Shared by the Character and Statistics windows.
  */
 const LevelDetails: React.FC = () => {
-	const { resources, level, resourceRates, characterStats, playerClass, playerHp, equipment, playerName } = useGameStore();
+	const { resources, level, resourceRates, characterStats, playerClass, playerHp, playerMp, equipment, playerName } = useGameStore();
 	const hpMax = maxHp(characterStats, equipment);
+	const mpMax = maxMana(characterStats, equipment);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
 	const xpForNextLevel = Math.floor(
@@ -68,7 +69,7 @@ const LevelDetails: React.FC = () => {
 			</div>
 
 			<Flask kind='hp' value={Math.floor(playerHp)} max={hpMax} />
-			<Flask kind='mp' value={characterStats.mp} max={characterStats.mp} />
+			<Flask kind='mp' value={playerMp} max={mpMax} />
 
 			<div className='group'>
 				<div className='hero-xp' style={{ '--pct': level.progress * 100 } as React.CSSProperties}>

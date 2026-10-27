@@ -30,17 +30,16 @@ export interface CharacterStats {
 	vitality: number;
 	charisma: number;
 	availablePoints: number;
-	// Combat stats
-	physicalAtk: number;
-	magicAtk: number;
+	// Derived stats (never saved: rebuilt by calculateCombatStats from the five attributes)
+	physicalAtk: number; // % more damage with physical weapons (0 at the start: bonuses count points above 5)
+	magicAtk: number; // % more damage with magic weapons
 	hp: number;
-	mp: number;
-	def: number;
-	magicDef: number;
+	mp: number; // mana before gear
+	def: number; // armor the attributes add to the gear's
 	luck: number;
 	critChance: number;
-	critDmgMultiplier: number;
-	atkSpeedIncrease: number;
+	critDmgMultiplier: number; // % for lucky tile taps (fights use statBonuses.critDamagePercent)
+	atkSpeedIncrease: number; // % attack speed
 	xpGainMultiplier: number;
 	tileCostDiscount: number;
 	reputation: number;
@@ -310,6 +309,8 @@ export interface GameState {
 	equipment: Equipment;
 	bag: BagSlot[];
 	playerHp: number;
+	/** Mana: spent by skills, refills over time (persisted; clamped to the max on load) */
+	playerMp: number;
 	monsters: Monster[];
 	monsterSpawnTimer: number;
 	nextMonsterId: number;

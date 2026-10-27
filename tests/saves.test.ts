@@ -6,6 +6,7 @@ import { decodeSave, encodeSave, packBody, sealWire } from '../src/lib/saveForma
 import { readFileSync } from 'node:fs';
 import { aggregateStats } from '../src/lib/inventory';
 import { resolveItem } from '../src/lib/itemInstance';
+import { RETUNED_STATS } from './retunedItems';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { plainItem } from '../src/lib/itemInstance';
@@ -150,7 +151,7 @@ test('export -> decode accepts a real save and rejects edited / foreign ones', (
 });
 
 // ---- combat / inventory state ------------------------------------------------------------------------------------
-const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId', 'lootPity', 'autoSellUpTo'];
+const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'playerMp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId', 'lootPity', 'autoSellUpTo'];
 
 /** The n-th owned tile that is not the castle or a lake (the land is rolled, and a monster or a building cannot be on water). */
 const spot = (n = 0) => {
@@ -195,6 +196,7 @@ test('an old save without the combat fields loads with the starter kit', () => {
 	assert.equal(result.state.bag.length, 36);
 	assert.deepEqual(result.state.monsters, []);
 	assert.equal(result.state.playerHp, 101);
+	assert.equal(result.state.playerMp, 40, 'a save from before mana starts with a full pool');
 	assert.equal(result.state.nextMonsterId, 1);
 });
 
@@ -268,6 +270,10 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.playerHp = 1e6), 'playerHp above max');
 	bad((r) => (r.playerHp = NaN), 'playerHp NaN');
 	bad((r) => (r.playerHp = -1), 'negative playerHp');
+	bad((r) => (r.playerMp = 1e6), 'playerMp above the mana pool');
+	bad((r) => (r.playerMp = NaN), 'playerMp NaN');
+	bad((r) => (r.playerMp = -1), 'negative playerMp');
+	bad((r) => (r.playerMp = '40'), 'playerMp as text');
 	bad((r) => (r.monsters[0].x = CASTLE_X, r.monsters[0].y = CASTLE_Y), 'monster on the castle');
 	bad((r) => (r.monsters[0].x = 0, r.monsters[0].y = 0), 'monster on an unowned tile');
 	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].hasChest = true), 'monster on a chest tile');
@@ -378,7 +384,7 @@ test('a schema 2 save keeps every item: each old gear id converts to an instance
 			if (!slot || !('item' in slot)) return;
 			assert.equal(slot.item.base, id);
 			assert.equal(slot.item.rarity, legacy[id].rarity, `${id} keeps its old rarity`);
-			assert.deepEqual(resolveItem(slot.item)!.stats, legacy[id].stats, `${id} keeps its old stats`);
+			assert.deepEqual(resolveItem(slot.item)!.stats, RETUNED_STATS[id] ?? legacy[id].stats, `${id} keeps its old stats (or its pinned retuned ones)`);
 		});
 	}
 });

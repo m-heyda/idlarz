@@ -55,7 +55,7 @@ const CharacterOverlay: React.FC = () => {
 		/>
 	);
 
-	const armor = armorOf(equipment);
+	const armor = Math.round(armorOf(equipment, characterStats) * 10) / 10;
 	const mitigation = Math.round((armor / (armor + COMBAT.armorK)) * 100);
 	const odds = critOdds(characterStats, equipment);
 	const gear = aggregateStats(equipment);
@@ -77,7 +77,7 @@ const CharacterOverlay: React.FC = () => {
 							<div className='inv-readouts'>
 								<div className='inv-readout'>
 									<span className='inv-readout-label'>Damage</span>
-									<span className='inv-readout-value'>{damagePerClick(equipment)}</span>
+									<span className='inv-readout-value'>{damagePerClick(equipment, characterStats)}</span>
 								</div>
 								<div className='inv-readout' title={`${mitigation}% less damage taken`}>
 									<span className='inv-readout-label'>Armor</span>

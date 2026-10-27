@@ -71,7 +71,7 @@ import { rollBiome } from '@/utils/biomeRules';
 import { pickChestSpot, rollChestLoot, type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
 import { createHitGuard } from '@/lib/hitGuard';
-import { applyHit, armorOf, dodgeChance, maxHp, newFight, regen, rollHit, stepFight } from '@/lib/combat';
+import { applyHit, armorOf, dodgeChance, leechHeal, manaRegenPerSec, maxHp, maxMana, newFight, regen, rollHit, stepFight } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
 import { addDrop, aggregateStats, equipFromBag, gearOf, moveSlot, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
@@ -148,6 +148,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		equipment,
 		bag: starterBag(),
 		playerHp: maxHp(stats, equipment),
+		playerMp: maxMana(stats, equipment),
 		monsters: [] as Monster[],
 		monsterSpawnTimer: 0,
 		nextMonsterId: 1,
@@ -262,6 +263,7 @@ const createGameSlice = (
 				// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
 				merchantUpgrades: state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {},
 				playerHp: maxHp(fresh.characterStats, state.equipment),
+				playerMp: maxMana(fresh.characterStats, state.equipment),
 				playerName: state.playerName,
 				playerClass: state.playerClass,
 				playSeconds: state.playSeconds,
@@ -530,9 +532,12 @@ const createGameSlice = (
 
 			const { damage, crit } = rollHit(state.characterStats, state.equipment, Math.random);
 			const { fight: next, killed } = applyHit(fight, damage);
+			// Life Leech: a share of the click's damage comes back as HP
+			const leech = leechHeal(damage, state.equipment);
+			const hpAfter = leech > 0 ? Math.min(maxHp(state.characterStats, state.equipment), state.playerHp + leech) : state.playerHp;
 			emitCombat({ kind: 'hit', damage, killed, crit });
 			if (!killed) {
-				set({ fight: next });
+				set({ fight: next, playerHp: hpAfter });
 				return { damage, killed: false, crit };
 			}
 
@@ -557,6 +562,7 @@ const createGameSlice = (
 			set({
 				fight: { ...next, phase: 'won', summary: { gold: loot.gold, xp: loot.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold } },
 				monsters: state.monsters.filter((m) => m.id !== fight.monsterId),
+				playerHp: hpAfter,
 				bag: received.bag,
 				lootPity: loot.pity,
 				resources: {
@@ -609,6 +615,7 @@ const createGameSlice = (
 				bag: result.bag,
 				equipment: result.equipment,
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
+				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
 			});
 			return true;
 		},
@@ -622,6 +629,7 @@ const createGameSlice = (
 				bag: result.bag,
 				equipment: result.equipment,
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
+				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
 			});
 			return true;
 		},
@@ -768,7 +776,7 @@ const createGameSlice = (
 			const playerMaxHp = maxHp(state.characterStats, state.equipment);
 			if (newFightState && newFightState.phase === 'active') {
 				const gearRegen = aggregateStats(state.equipment).regen;
-				const step = stepFight(newFightState, secondsElapsed, newPlayerHp, armorOf(state.equipment), Math.random, { perSec: gearRegen, max: playerMaxHp }, dodgeChance(state.equipment));
+				const step = stepFight(newFightState, secondsElapsed, newPlayerHp, armorOf(state.equipment, state.characterStats), Math.random, { perSec: gearRegen, max: playerMaxHp }, dodgeChance(state.equipment));
 				newFightState = step.fight;
 				newPlayerHp = step.playerHp;
 				for (const event of step.events) {
@@ -779,6 +787,8 @@ const createGameSlice = (
 				newPlayerHp = regen(newPlayerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen);
 			}
 			newPlayerHp = Math.min(newPlayerHp, playerMaxHp);
+			// Mana refills in and out of fights
+			const newPlayerMp = Math.min(maxMana(state.characterStats, state.equipment), state.playerMp + manaRegenPerSec(state.characterStats, state.equipment) * secondsElapsed);
 
 			// Level and stat points
 			const { level, progress } = calculateLevel(newResources.xp);
@@ -803,6 +813,7 @@ const createGameSlice = (
 				nextMonsterId: newNextMonsterId,
 				fight: newFightState,
 				playerHp: newPlayerHp,
+				playerMp: newPlayerMp,
 				playSeconds: state.playSeconds + secondsElapsed,
 			});
 			if (castleFinished) emitSaveEvent('castleUpgraded');
