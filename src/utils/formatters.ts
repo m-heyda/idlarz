@@ -25,10 +25,26 @@ export const formatNumber = (num: number | undefined): string => {
   return num.toFixed(decimalPlaces);
 };
 
-/** A percentage in the same short style as the numbers: 450%, 4.93K%, 1.20M% */
+/** A percentage in the same short style as the numbers: 450%, 4.93K%, 1.20M% (short from 5,000) */
 export const formatPercent = (pct: number): string => {
-  if (!Number.isFinite(pct) || pct < 1000) return `${Math.round(pct)}%`;
+  if (!Number.isFinite(pct) || Math.abs(pct) < 5000) return `${Math.round(pct)}%`;
   return `${compact(pct) ?? `${(pct / 1_000).toFixed(2)}K`}%`;
+};
+
+const trimmed = (n: number, decimals: number): string => String(Math.round(n * 10 ** decimals) / 10 ** decimals);
+
+/** A stat or count: plain up to 9,999 (at most `decimals` places, none trailing: 40.8, 281, 6), then 12.34K / M / B / T */
+export const formatCompact = (n: number | undefined, decimals = 1): string => {
+  if (n === undefined || n === null || Number.isNaN(n)) return '0';
+  if (Math.abs(n) >= 10_000 || !Number.isFinite(n)) return formatNumber(n);
+  return trimmed(n, decimals);
+};
+
+/** A percentage with decimals (27.3%) that turns into 5.01K% / 1.20M% from 5,000 */
+export const formatPct = (pct: number | undefined, decimals = 1): string => {
+  if (pct === undefined || pct === null || Number.isNaN(pct)) return '0%';
+  if (Math.abs(pct) >= 5000 || !Number.isFinite(pct)) return formatPercent(pct);
+  return `${trimmed(pct, decimals)}%`;
 };
 
 export const formatRate = (rate: number): string => {

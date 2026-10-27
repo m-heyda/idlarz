@@ -26,6 +26,10 @@ export const RESOURCES = {
 		source: 'The castle and most land, every click on the map, and selling goods to the merchant.',
 		color: '#ffe27a',
 	},
+	// Merchant prices follow how fast each resource is produced early on (measured on random maps of 10-40 tiles): the slower
+	// a resource comes in, the more it sells for, so selling an hour of any basic resource pays about the same gold. The overall
+	// level keeps the early total sell value where it was (wood .75, stone .9, coal 1.1, food .4; they were .5 / .5 / 1 / .75).
+	// Buying costs MERCHANT_BUY_MULTIPLIER x the price. Meat and the farm products are priced against what their animals cost.
 	wood: {
 		emoji: '🪓',
 		label: 'Wood',
@@ -33,7 +37,7 @@ export const RESOURCES = {
 		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Hen House and Pen Expansion.',
 		source: 'Forest and swamp tiles. Sells to the merchant.',
 		color: '#e0b078',
-		merchant: { price: 0.5, description: 'A basic construction material, available in forests.', pitch: 'Common but always in demand.' },
+		merchant: { price: 0.75, description: 'A basic construction material, available in forests.', pitch: 'Common but always in demand.' },
 	},
 	stone: {
 		emoji: '🧱',
@@ -42,7 +46,7 @@ export const RESOURCES = {
 		usedFor: 'Part of the price of tiles (from the 15th), buildings, castle upgrades, Dairy and Pen Expansion.',
 		source: 'Hills tiles. Sells to the merchant.',
 		color: '#d4cdb8',
-		merchant: { price: 0.5, description: 'Durable and versatile building material from quarries.', pitch: 'Premium quality building material.' },
+		merchant: { price: 0.9, description: 'Durable and versatile building material from quarries.', pitch: 'Premium quality building material.' },
 	},
 	coal: {
 		emoji: '⚫',
@@ -51,7 +55,7 @@ export const RESOURCES = {
 		usedFor: 'Part of the price of tiles (from the 30th), castle upgrades from level 3 and the Tannery.',
 		source: 'Tundra and hills tiles. Sells to the merchant.',
 		color: '#9fb4e8',
-		merchant: { price: 1, description: 'Valuable fuel source used for advanced applications.', pitch: 'Highly sought after for its energy properties.' },
+		merchant: { price: 1.1, description: 'Valuable fuel source used for advanced applications.', pitch: 'Highly sought after for its energy properties.' },
 	},
 	food: {
 		emoji: '🌾',
@@ -60,7 +64,7 @@ export const RESOURCES = {
 		usedFor: 'Buying farm animals, Feed Trough, Pen Expansion, tiles (from the 40th) and castle upgrades from level 4.',
 		source: 'Plains, lake and coast tiles. Sells to the merchant.',
 		color: '#f4d25a',
-		merchant: { price: 0.75, description: 'Sustains population and enables growth.', pitch: 'Plentiful but essential for survival.' },
+		merchant: { price: 0.4, description: 'Sustains population and enables growth.', pitch: 'Plentiful but essential for survival.' },
 	},
 	meat: {
 		emoji: '🥩',
@@ -79,7 +83,7 @@ export const RESOURCES = {
 		usedFor: 'Hen House upgrades; sell the rest to the merchant.',
 		source: 'Chickens on the farm. Cannot be bought.',
 		color: '#f4e6c4',
-		merchant: { price: 3, description: 'Fresh from the coop.', pitch: 'Bakers pay well for fresh eggs.' },
+		merchant: { price: 2, description: 'Fresh from the coop.', pitch: 'Bakers pay well for fresh eggs.' },
 	},
 	milk: {
 		emoji: '🥛',
@@ -88,7 +92,7 @@ export const RESOURCES = {
 		usedFor: 'Dairy upgrades; sell the rest to the merchant.',
 		source: 'Cows on the farm. Cannot be bought.',
 		color: '#e8f0fa',
-		merchant: { price: 4, description: 'Creamy and cold from the dairy.', pitch: 'A town favourite at breakfast.' },
+		merchant: { price: 3, description: 'Creamy and cold from the dairy.', pitch: 'A town favourite at breakfast.' },
 	},
 	hide: {
 		emoji: '🟫',
@@ -97,7 +101,7 @@ export const RESOURCES = {
 		usedFor: 'Tannery upgrades; sell the rest to the merchant.',
 		source: 'Deer and pigs on the farm. Cannot be bought.',
 		color: '#c89868',
-		merchant: { price: 6, description: 'Tanned leather from the farm.', pitch: 'Craftsmen always need good leather.' },
+		merchant: { price: 4, description: 'Tanned leather from the farm.', pitch: 'Craftsmen always need good leather.' },
 	},
 	xp: {
 		emoji: '✨',

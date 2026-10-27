@@ -11,6 +11,7 @@ import {
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
 	FARM_UPGRADES,
+	MERCHANT_GOODS,
 	MERCHANT_UPGRADES,
 	CASTLE_X,
 	CASTLE_Y,
@@ -27,12 +28,13 @@ import {
 import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { instanceProblem } from '@/lib/itemInstance';
-import { maxHp } from '@/lib/combat';
+import { maxHp, maxMana } from '@/lib/combat';
 import { isInWard } from '@/lib/castleWard';
 import { starterBag } from '@/lib/inventory';
-import { tierFor } from '@/lib/monsters';
+import { limitOf } from '@/lib/limits';
+import { levelAtAge, spawnLevelRange } from '@/lib/monsters';
+import { MONSTERS } from '@/config/combatConfig';
 import {
-	bagSizeFor,
 	calculateCombatStats,
 	calculateLevel,
 	calculateXpGain,
@@ -62,6 +64,7 @@ import type {
 	EquipmentSlot,
 	GameState,
 	ItemInstance,
+	MerchantStock,
 	Monster,
 	PrestigeState,
 	Resources,
@@ -91,11 +94,15 @@ export const PERSISTED_KEYS = [
 	'equipment',
 	'bag',
 	'playerHp',
-	'monsters',
+	'playerMp',
+'monsters',
 	'monsterSpawnTimer',
+	'bossSpawnTimer',
 	'nextMonsterId',
 	'lootPity',
 	'autoSellUpTo',
+	'merchantStock',
+	'merchantRefreshes',
 ] as const;
 
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]>;
@@ -147,7 +154,7 @@ const OPTIONAL_RESOURCES = new Set<keyof Resources>(['eggs', 'milk', 'hide']);
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
-const MONSTER_KEYS = new Set(['id', 'type', 'tier', 'x', 'y', 'ageSec']);
+const MONSTER_KEYS = new Set(['id', 'type', 'level', 'spawnLevel', 'x', 'y', 'ageSec']);
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);
 const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes']);
@@ -252,11 +259,10 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			}
 			castleTile = tile;
 		} else if (t.building !== undefined) {
-			// a building stands on any biome except water (BUILDING_COST.blockedBiomes); only old Grounds saves carry `level: 2`
+			// a building stands on any biome except water (BUILDING_COST.blockedBiomes) and never has a level
 			if (typeof t.building !== 'string' || !(t.building in BUILDINGS)) return fail('building');
 			if (BUILDING_COST.blockedBiomes.includes(t.biome as Tile['biome'])) return fail('building on a tile that cannot take one');
-			if (t.biome === 'grounds' ? t.level !== undefined && t.level !== 2 : t.level !== undefined) return fail('building level');
-			if (t.level === 2) tile.level = 2;
+			if (t.level !== undefined) return fail('building level');
 			tile.building = t.building;
 		} else if (t.level !== undefined) {
 			return fail('level without a building');
@@ -363,7 +369,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (v > 0) merchantUpgrades[id] = v;
 		}
 	}
-	const bagSize = bagSizeFor(COMBAT.bagSize, merchantUpgrades);
+	const bagSize = limitOf('bagSize', { merchantUpgrades });
 
 	// ---- gear, bag, HP, monsters (all optional: a save from before combat gets the starter kit) ------------------
 	let equipment: Equipment;
@@ -433,11 +439,21 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (v === null) return fail('player hp');
 		playerHp = v;
 	}
+	// Mana (optional: a save from before it was added starts full)
+	const maxPlayerMp = maxMana(characterStats, equipment);
+	let playerMp = maxPlayerMp;
+	if (raw.playerMp !== undefined) {
+		const v = num(raw.playerMp, 0, maxPlayerMp);
+		if (v === null) return fail('player mana');
+		playerMp = v;
+	}
 
 	const nextMonsterId = raw.nextMonsterId === undefined ? 1 : int(raw.nextMonsterId, 1, 1e9);
 	if (nextMonsterId === null) return fail('next monster id');
 	const monsterSpawnTimer = raw.monsterSpawnTimer === undefined ? 0 : num(raw.monsterSpawnTimer, 0, COMBAT.spawn.intervalSec);
 	if (monsterSpawnTimer === null) return fail('monster spawn timer');
+	const bossSpawnTimer = raw.bossSpawnTimer === undefined ? 0 : num(raw.bossSpawnTimer, 0, COMBAT.spawn.bossIntervalSec);
+	if (bossSpawnTimer === null) return fail('boss spawn timer');
 	const monsters: Monster[] = [];
 	if (raw.monsters !== undefined) {
 		if (!Array.isArray(raw.monsters) || raw.monsters.length > tiles.stats.owned) return fail('monsters'); // one per tile at most (the duplicate check below)
@@ -452,8 +468,15 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			const y = int(m.y, -COORD_LIMIT, COORD_LIMIT);
 			const ageSec = num(m.ageSec, 0, 1e8);
 			if (id === null || x === null || y === null || ageSec === null) return fail('monster numbers');
-			if (m.type !== 'rat' && m.type !== 'ratKing') return fail('monster type');
-			if (m.tier !== tierFor(m.type, ageSec)) return fail('monster tier');
+			if (typeof m.type !== 'string' || !Object.hasOwn(MONSTERS, m.type)) return fail('monster type');
+			const type = m.type as keyof typeof MONSTERS;
+			// the level it appeared at is inside what the type can spawn at; its level is that plus at most the growth its age can have
+			// earned (up to the hard ceiling: the growth limit can be raised later, never above it)
+			const spawnLevel = int(m.spawnLevel, 1, MONSTERS[type].spawnWindow.cap);
+			const level = int(m.level, 1, 1000);
+			if (spawnLevel === null || level === null) return fail('monster level');
+			if (spawnLevel < spawnLevelRange(type, 1).min) return fail('monster spawn level');
+			if (level < spawnLevel || level > levelAtAge(spawnLevel, ageSec, { hardCap: true })) return fail('monster level');
 			const tile = getTile(tiles, x, y);
 			if (!tile || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
 			if (isInWard(x, y, castleLevel)) return fail('monster inside the castle ward');
@@ -463,7 +486,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			ids.add(id);
 			spots.add(`${x},${y}`);
 			if (m.type === 'ratKing' && ++kings > 1) return fail('more than one king');
-			monsters.push({ id, type: m.type, tier: m.tier, x, y, ageSec });
+			monsters.push({ id, type, level, spawnLevel, x, y, ageSec });
 		}
 	}
 
@@ -533,6 +556,26 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	const playSeconds = num(raw.playSeconds, 0, 1e9);
 	if (chestSpawnTimer === null || playSeconds === null) return fail('timers');
 
+	// The merchant's goods (optional: older saves get a fresh shelf on the next tick). Every offer is a full item check.
+	let merchantStock: MerchantStock | null = null;
+	if (raw.merchantStock !== undefined && raw.merchantStock !== null) {
+		const rawStock = raw.merchantStock;
+		if (!isObject(rawStock)) return fail('merchant stock');
+		for (const key of Object.keys(rawStock)) if (key !== 'at' && key !== 'offers') return fail('merchant stock key');
+		const at = num(rawStock.at, 0, 1e12);
+		if (at === null || !Array.isArray(rawStock.offers) || rawStock.offers.length > MERCHANT_GOODS.maxOffers) return fail('merchant stock');
+		const offers: ItemInstance[] = [];
+		for (const entry of rawStock.offers) {
+			const item = readInstance(entry);
+			if (typeof item === 'string') return fail(`merchant offer (${item})`);
+			offers.push(item);
+		}
+		merchantStock = { at: Math.min(at, playSeconds), offers };
+	}
+
+	const merchantRefreshes = raw.merchantRefreshes === undefined ? 0 : int(raw.merchantRefreshes, 0, 100_000);
+	if (merchantRefreshes === null) return fail('merchant refreshes');
+
 	const rawName = typeof raw.playerName === 'string' ? raw.playerName.trim().slice(0, 9) : '';
 	const playerClass: PlayerClassId =
 		typeof raw.playerClass === 'string' && raw.playerClass in PLAYER_CLASSES
@@ -563,11 +606,15 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			equipment,
 			bag,
 			playerHp,
+			playerMp,
 			monsters,
 			monsterSpawnTimer,
+			bossSpawnTimer,
 			nextMonsterId,
 			lootPity,
 			autoSellUpTo,
+			merchantStock,
+			merchantRefreshes,
 		},
 	};
 };

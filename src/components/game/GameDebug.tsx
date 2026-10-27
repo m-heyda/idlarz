@@ -12,7 +12,8 @@ import { addGear, addToBag } from '@/lib/inventory';
 import { plainItem, resolveItem } from '@/lib/itemInstance';
 import { generateLoot, receiveDrops } from '@/lib/loot';
 import { maxHp } from '@/lib/combat';
-import { pickSpawnTile } from '@/lib/monsters';
+import { isBoss, newMonster, pickSpawnTile } from '@/lib/monsters';
+import { MONSTERS } from '@/config/combatConfig';
 import { calculateResourceRates, calculateXpGain, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
 import type { MonsterType, Resources } from '@/types/game';
 import PixelIcon from './PixelIcon';
@@ -41,11 +42,11 @@ const spawnChest = () => {
 
 const spawnMonster = (type: MonsterType) => {
 	const state = useGameStore.getState();
-	if (type === 'ratKing' && state.monsters.some((m) => m.type === 'ratKing')) return toast('There is already a Rat King on the map');
+	if (isBoss(type) && state.monsters.some((m) => m.type === type)) return toast(`There is already a ${MONSTERS[type].label} on the map`);
 	const spot = pickSpawnTile(state.tiles, state.monsters, Math.random);
 	if (!spot) return toast('No free explored tile for a monster: buy more tiles first');
 	useGameStore.setState({
-		monsters: [...state.monsters, { id: state.nextMonsterId, type, tier: 1, ...spot, ageSec: 0 }],
+		monsters: [...state.monsters, newMonster(type, state.nextMonsterId, spot, castleLevelOf(state.tiles))],
 		nextMonsterId: state.nextMonsterId + 1,
 	});
 };
@@ -61,15 +62,15 @@ const giveSet = () => {
 };
 
 /** Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table). */
-const rollLoot = (sourceId: 'rat' | 'ratKing' | 'chest', tier: number) => {
+const rollLoot = (sourceId: 'rat' | 'ratKing' | 'chest', level?: number) => {
 	const state = useGameStore.getState();
 	const castleLevel = castleLevelOf(state.tiles);
 	const owned = [
 		...Object.values(state.equipment).map((item) => item?.base),
 		...state.bag.map((slot) => (slot && 'item' in slot ? slot.item.base : slot?.id)),
 	].filter((id): id is string => !!id);
-	const result = generateLoot({ sourceId, tier, castleLevel, owned, pity: state.lootPity }, Math.random);
-	const received = receiveDrops(state.bag, result.drops, state.autoSellUpTo, state.merchantUpgrades);
+	const result = generateLoot({ sourceId, level, castleLevel, owned, pity: state.lootPity }, Math.random);
+	const received = receiveDrops(state.bag, result.drops, state.autoSellUpTo, state);
 	useGameStore.setState({ bag: received.bag, lootPity: result.pity, resources: { ...state.resources, gold: state.resources.gold + received.autoSold.gold + received.convertedGold } });
 	console.table(result.trace);
 	const names = result.drops.map((d) => (d.kind === 'gear' ? `${resolveItem(d.item)?.name} (${d.item.rarity}, il ${d.item.level})` : `${d.qty}x ${ITEM_CATALOG[d.id].name}`));
@@ -143,9 +144,9 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 			{ label: 'Rat', tone: 'red', run: () => spawnMonster('rat') },
 			{ label: 'Rat King', tone: 'red', run: () => spawnMonster('ratKing') },
 			{ label: 'Rattatui set', tone: '', run: giveSet },
-			{ label: 'Loot: rat T5', tone: 'gray', run: () => rollLoot('rat', 5) },
-			{ label: 'Loot: Rat King', tone: 'gray', run: () => rollLoot('ratKing', 1) },
-			{ label: 'Loot: chest', tone: 'gray', run: () => rollLoot('chest', 1) },
+			{ label: 'Loot: rat lv 9', tone: 'gray', run: () => rollLoot('rat', 9) },
+			{ label: 'Loot: Rat King', tone: 'gray', run: () => rollLoot('ratKing', 15) },
+			{ label: 'Loot: chest', tone: 'gray', run: () => rollLoot('chest') },
 		],
 	},
 	{

@@ -93,7 +93,7 @@ BG = {
     'fog_a': ground_art.fog,
     'fog_b': lambda: ground_art.fog(size=64, seed=11, tint=(110, 170, 190), thresholds=(0.44, 0.52, 0.60), alphas=(10, 22, 36)),
     **{f'ground_{name}': (lambda n=name: terrain_art.texture(n))      # swatches for dialogs / the farm stage
-       for name in ('forest', 'plains', 'hills', 'swamp', 'tundra', 'lake', 'coast', 'grounds', 'castle', 'yard')},
+       for name in ('forest', 'plains', 'hills', 'swamp', 'tundra', 'lake', 'coast', 'castle', 'yard')},
 }
 
 

@@ -44,7 +44,7 @@ test('the chest timer sits at 0 while monsters already fill the share of the map
 	const spots = [...api().tiles.map.entries()]
 		.filter(([, t]) => t.biome !== 'castle' && t.biome !== 'lake')
 		.slice(0, cap)
-		.map(([k], i) => ({ id: i + 1, type: 'rat' as const, tier: 1, x: keyX(k), y: keyY(k), ageSec: 0 }));
+		.map(([k], i) => ({ id: i + 1, type: 'rat' as const, level: 1, spawnLevel: 1, x: keyX(k), y: keyY(k), ageSec: 0 }));
 	if (spots.length < cap) return; // the grown map had too many lakes to fill the cap: nothing to check
 	store.setState({ monsters: spots, nextMonsterId: cap + 1, chestSpawnTimer: 123, monsterSpawnTimer: 50 });
 	api().tick(10_000);

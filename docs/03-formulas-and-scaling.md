@@ -14,7 +14,7 @@ extra    = floor(base × share × (1 − discount%/100))  for each TILE_RESOURCE
 discount%= min(0.5 × Charisma, 25)
 ```
 
-`TILE_RESOURCE_COST`: wood 10 % and stone 10 % of the gold cost from n = 15; coal 8 % from n = 30; food 8 % from n = 40.
+`TILE_RESOURCE_COST`: wood 30 % and stone 25 % of the gold cost from n = 15; coal 20 % from n = 30; food 10 % from n = 40; hide 3 % from n = 120 (milk and eggs are kept for other uses). Gold stays the biggest single part.
 
 | n | 1 | 10 | 20 | 30 | 50 | 75 | 100 | 150 | 200 | 300 | 400 | 500 | 1,000 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -100,30 +100,33 @@ upgrade cost (level N → N+1)      = ceil(base × growth^N) per resource
 
 | Animal | first cost | cost × | meat/s each | product/s each |
 | --- | --- | --- | --- | --- |
-| Chicken | 1 K | 1.3 | 0.2 | 0.02 eggs |
-| Deer | 10 K | 1.33 | 0.5 | 0.025 hide |
-| Pig | 60 K | 1.36 | 1 | 0.05 hide |
-| Cow | 400 K | 1.4 | 2 | 0.15 milk |
+| Chicken | 1 K | 1.3 | 0.2 | 0.03 eggs |
+| Deer | 10 K | 1.33 | 0.5 | 0.0375 hide |
+| Pig | 60 K | 1.36 | 1 | 0.075 hide |
+| Cow | 400 K | 1.4 | 2 | 0.225 milk |
 
 | Upgrade | per level | levels | base cost | cost × |
 | --- | --- | --- | --- | --- |
 | Feed Trough | +5 % meat | 10 | 2 K food | 1.6 |
-| Hen House | +10 % eggs | 10 | 1.5 K wood + 40 eggs | 1.6 |
-| Dairy | +10 % milk | 10 | 1.5 K stone + 30 milk | 1.6 |
-| Tannery | +10 % hide | 10 | 1.2 K coal + 20 hide | 1.6 |
+| Hen House | +15 % eggs | 10 | 1.5 K wood + 40 eggs | 1.6 |
+| Dairy | +15 % milk | 10 | 1.5 K stone + 30 milk | 1.6 |
+| Tannery | +15 % hide | 10 | 1.2 K coal + 20 hide | 1.6 |
 | Pen Expansion | +2 % all farm output, +4 animals per kind | 8 | 8 K food + 3 K wood + 3 K stone | 1.9 |
 
-A product sells for 3 / 4 / 6 gold (eggs / milk / hide), which is 25–40 % of the meat value of the animal that makes it.
+A product sells for 2 / 3 / 4 gold (eggs / milk / hide), which is 30–34 % of the meat value of the animal that makes it (products were produced 50 % slower and sold for 3 / 4 / 6 before: the same gold, reached faster).
 
 Payback (food valued at its sell price 0.75, meat at 1) is well under a day for the first chicken and grows with each extra animal (generated §4); the sim buys the first chicken within minutes and the first cow after about half a day.
 
 ## 6. Merchant, clicks, chests, buildings
 
 ```
-sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .5, stone .5, coal 1, food .75, meat 1, eggs 3, milk 4, hide 6
+sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .75, stone .9, coal 1.1, food .4, meat 1, eggs 2, milk 3, hide 4
 buy:   gold = ceil(amount × price × 2)                         wood, stone, coal, food, meat only
-item:  sell = floor(sellValue × qty × Haggler)   common 8, uncommon 90, rare 250, epic 700, legendary 2000, potion 20
-       shop price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
+item:  sell = floor(rarityValue × valueCurve(level) × qualityValue × affixesValue × Haggler)   rarityValue 300 / 1200 / 3600 / 12000 / 45000; potions 20 / 90
+       valueCurve = 1.3^(min(L,10)−1) × 1.12^max(0,L−10);  qualityValue 0.75..1.25;  affixesValue = 1 + Σ(0.15 + 0.35 × roll/100)   (ITEM_VALUE in catalog/stats.ts)
+       supplies (potions) price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
+goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle level above 1, +-2; common 50 / uncommon 32 / rare 14 / epic 4)
+       price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh); rarity common 60 / uncommon 40; item level centre = min(world level, avgWorn + 3), max avgWorn + 5
 bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
@@ -172,23 +175,34 @@ damage/click = max(1, Σ gear damage + set bonuses)                             
 click        : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
                then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
 fight hits   : not rate limited; trusted real clicks only, one DOM event counts once (lib/hitGuard.ts)
-hit taken    = max(1, round(attack × (1 − armor / (armor + 40))))               COMBAT.armorK
+hit taken    = max(1, round(attack × (1 − armorReduction(armor))))              COMBAT.armorK, armorSoftCap, armorSoftSlope
+armorReduction(a) = r = a/(a+40);  r ≤ 0.5 ? r : 0.5 + (r − 0.5) × 0.5       (ceiling 75 %)
+stat bonuses : counted above the starting 5 (STAT_RULES)
+               damage = gear damage × (1 + 0.02 × (STR−5))  physical weapons;  × (1 + 0.024 × (INT−5))  staff and wand
+               armor  = gear armor + 0.5 × (DEX−5) + 0.5 × (VIT−5) + 0.25 × (STR−5)       hit taken × (1 − armorReduction(armor))
+               crit multipliers x2 / x5 × (1 + (1 × (STR−5) + 0.5 × (DEX−5) + 0.5 × (CHA−5)) / 100)
+               attacks/s = weapon speed × (1 + 0.0025 × (DEX−5))   (hook for speed combat; clicks ignore it)
+mana         = 20 + 4 × INT + gear;  regen = 0.5 + 0.05 × INT + gear  per second;  life leech = min(15, gear %) of the click damage as HP
+Heal         = round(25 % max HP × (1 + 0.024 × (INT−5)) × (1 + Spell Power %)), level 5, 20 mana, 12 s cooldown
+Stun         = the monster's attack timer is frozen 10 s, level 10, 15 mana, 30 s cooldown (the King's limit keeps running); a monster's stunResist % can make it fail
 regen        = (1 + gear regen) HP/s with no active fight, gear regen only during one; knockout restores 30 % of max HP
 potion       = +35 / +90 HP (not above max), 8 s cooldown shared by all potions in a fight
-rat tier t   : HP = round(100 × 1.5^(t−1))  → 100 / 150 / 225 / 338 / 506
-               attack = round(4 × 1.25^(t−1)) every 2 s → 4 / 5 / 6 / 8 / 10
-tier         = min(5, 1 + floor(age / 1800 s))                                  age counts only while not being fought
-rewards      : rewardSec = 90 × 1.5^(t−1)
+monster level: level = spawnLevel + min(growthLevels, floor(age / growthInterval))    growthLevels 10, interval 1800 s (LIMITS, via limitOf); age counts only while not being fought
+               spawn level: rat window [1 + (castle−1), +2] capped at 10; King [15 + floor(0.8 × (castle−1)), +3] capped at 25; rolled from the monster id (no Math.random)
+rat level L  : HP = round(100 × 1.5^((L−1)/2))  → level 1 / 3 / 5 / 7 / 9 = 100 / 150 / 225 / 338 / 506     attack = round(4 × 1.25^((L−1)/2))     armor = 0.5 × (L−1)
+King level L : HP, attack = base × levelScale(L) / levelScale(15)  (9600 HP, 11 attack at 15), armor 15 + 0.5 × (L−15), 8 % crit x1.5, 20 % Stun resist
+click damage = max(1, your damage × (1 − armorReduction(armor)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
+rewards      : rewardSec = 90 × 1.17^(L−1) (rat), 3600 × 1.03^(L−15) (King)
                gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
 drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> source level -> item level -> rarity -> base -> affixes
-               rat: gear 12 % + 2 % per tier above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
-               potion 25 % + 3 % per tier (Greater from T4)                      (tier 1: 90 s of income, tier 5: ~456 s)
+               rat: gear 12 % + 1 % per level above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
+               potion 25 % + 1.5 % per level (Greater from level 7)              (level 1: 90 s of income, level 9: ~316 s)
                Rat King: 1 item of his own (rolled rarity) + 1 Rattatui piece (missing ones first) + 40 % a second one + 5 % (pity up to 15 %) a legendary weapon + 2 Minor and 1 Greater potion
                chest (item result, 8 % of chests): one item - gear 82 % (rolled rarity) or a potion, 1.9 % a legendary weapon instead
-item level   : source level = base + steps per tier + 3 per castle level above 1 (rat 1/3/5/7/9, King 12, chest 4, +3 per castle level); gear power x levelScale(level) = 1 + 0.07 x (level - 1)
-spawn        : first rat 120 s after 5 owned tiles, then 900 s; max 8; Rat King check every 600 s of age after tier 5 (7200 s), 35 %
-Rat King     : 15600 HP, attack 14 every 3 s, 75 s limit
+item level   : a monster's drops are at its own level (rat 1-20, King 15-35); chest 4 and the merchant 4, +3 per castle level; gear power x levelScale(level) = 1 + 0.07 x (level - 1)
+spawn        : first rat 120 s after 5 owned tiles, then 900 s; a boss (one at a time) every 10800 s of spawn time (COMBAT.spawn.bossIntervalSec)
+Rat King     : level 15: 9600 HP + 15 armor (about 13200 effective), attack 11 every 3 s, 75 s limit
 ```
 
 The King's numbers were tuned with `npm run fight-sim` (a bot with the real combat rules; tables in [generated/fight-sim.md](generated/fight-sim.md)) and are
@@ -222,3 +236,7 @@ cost (gold / wood / stone) = floor(base x factor x (1 - Thrift))     base = 500 
 
 The price follows the tile curve in shape (steep, then gentler, then gentler again) but starts lower, so a building is a fraction of a tile at the same point of the game.
 `src/config/gameConfig.ts` `BUILDING_COST` and `buildingCostFactor` in `src/utils/gameUtils.ts`; `tests/buildOnTile.test.ts` holds the shape.
+
+## 7. Limits and bonus hooks (what upgrades and rebirth will extend)
+
+Bounds that progression is meant to raise live in `src/config/limits.ts` (`LIMITS`: monster growth levels and interval, merchant shelf size, rotation and refresh cost, bag size) with a `HARD_LIMITS` ceiling for what a save may hold. Code reads them through `limitOf(key, ctx)` (`src/lib/limits.ts`), which adds the bonuses registered in `LIMIT_BONUSES` (today only Pack Rat on the bag size); a new upgrade or Legacy effect is one entry there and every reader follows. Likewise every gold payout for something the player sells goes through `sellMultiplier(ctx)` / `sellPayout` (`utils/gameUtils.ts`) with the bonuses in `SELL_BONUSES` (today Haggler): resources, bag gear, junk, auto-sold drops, the merchant previews and the cloud net-worth check all use it, so a "+20 % selling" effect applies to all of them alike (`tests/monsterLevels.test.ts` proves it with a registered bonus).

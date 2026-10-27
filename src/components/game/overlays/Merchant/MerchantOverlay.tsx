@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { formatNumber } from '@/utils/formatters';
+import { useUiStore } from '@/stores/uiStore';
+import { formatNumber, formatPercent } from '@/utils/formatters';
 import { ResourceSellingSection } from './ResourceSellingSection';
 import { MerchantPriceList } from './MerchantPriceList';
 import { MerchantTabButtons } from './MerchantTabButtons';
 import { MerchantItemsSection } from './MerchantItemsSection';
-import { MerchantShop, MerchantUpgradeCards } from './MerchantShop';
+import { MerchantGoods, MerchantUpgradeCards } from './MerchantShop';
 import { sellMultiplier, sellPayout } from '@/utils/gameUtils';
 import {
 	CLICK_LADDER,
@@ -135,28 +136,19 @@ const MerchantOverlay: React.FC = () => {
 		buyClickUpgrade,
 		clickLevel,
 		merchantUpgrades,
+		prestige,
 	} = useGameStore();
 
 	// State for current merchant tab
-	const [activeTab, setActiveTab] = useState<MerchantTab>('exchange');
+	const [activeTab, setActiveTab] = useState<MerchantTab>('resources');
 
 	// Slider amounts for selling and buying, one entry per resource the merchant trades
 	const zero = (keys: readonly string[]): Record<string, number> => Object.fromEntries(keys.map((k) => [k, 0]));
 	const [sellAmounts, setSellAmounts] = useState<Record<string, number>>(() => zero(Object.keys(MERCHANT_RESOURCE_PRICES)));
 	const [buyAmounts, setBuyAmounts] = useState<Record<string, number>>(() => zero(MERCHANT_BUYABLE));
 
-	// For showing success message after selling
-	const [saleMessage, setSaleMessage] = useState<{
-		resource: string;
-		amount: number;
-		gold: number;
-	} | null>(null);
-
-	// For showing purchase success message
-	const [purchaseMessage, setPurchaseMessage] = useState<{
-		item: string;
-		price: number;
-	} | null>(null);
+	// Every sale and purchase is announced by the shared toast (top of the screen), so the window never jumps
+	const showToast = useUiStore((state) => state.showToast);
 
 	// Calculate the max for each resource (current owned amount)
 	const maxAmounts = resources as unknown as Record<string, number>;
@@ -172,22 +164,13 @@ const MerchantOverlay: React.FC = () => {
 		if (!sellResources(resource, sellAmounts[resource])) return;
 
 		// Set success message
-		setSaleMessage({
-			resource: MERCHANT_RESOURCE_INFO[resource].label,
-			amount: sellAmounts[resource],
-			gold: goldGained,
-		});
+		showToast(`Sold ${formatNumber(sellAmounts[resource])} ${MERCHANT_RESOURCE_INFO[resource].label} for ${formatNumber(goldGained)} Gold`);
 
 		// Reset the slider for this resource
 		setSellAmounts((prev) => ({
 			...prev,
 			[resource]: 0,
 		}));
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setSaleMessage(null);
-		}, 3000);
 	};
 
 	// Handle selling all of a resource
@@ -203,16 +186,7 @@ const MerchantOverlay: React.FC = () => {
 		if (!sellResources(resource, amountToSell)) return;
 
 		// Set success message
-		setSaleMessage({
-			resource: MERCHANT_RESOURCE_INFO[resource].label,
-			amount: amountToSell,
-			gold: goldGained,
-		});
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setSaleMessage(null);
-		}, 3000);
+		showToast(`Sold ${formatNumber(amountToSell)} ${MERCHANT_RESOURCE_INFO[resource].label} for ${formatNumber(goldGained)} Gold`);
 	};
 
 	// Handle changing the amount of a resource to sell
@@ -242,7 +216,7 @@ const MerchantOverlay: React.FC = () => {
 		resource: keyof typeof MERCHANT_RESOURCE_PRICES,
 		amount: number
 	) => {
-		return sellPayout(MERCHANT_RESOURCE_PRICES[resource], amount, merchantUpgrades);
+		return sellPayout(MERCHANT_RESOURCE_PRICES[resource], amount, { merchantUpgrades, prestige });
 	};
 
 	// Price of a resource pack (rounded up, same as the store's buyResource)
@@ -271,29 +245,21 @@ const MerchantOverlay: React.FC = () => {
 		if (!buyResource(resource, amount)) return;
 
 		// Show purchase message
-		setPurchaseMessage({
-			item: `${MERCHANT_RESOURCE_INFO[resource].label} x${formatNumber(
+		announcePurchase(`${MERCHANT_RESOURCE_INFO[resource].label} x${formatNumber(
 				amount
-			)}`,
-			price: price,
-		});
+			)}`, price);
 
 		// Reset the slider for this resource
 		setBuyAmounts((prev) => ({
 			...prev,
 			[resource]: 0,
 		}));
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setPurchaseMessage(null);
-		}, 3000);
 	};
 
 	// Click power ladder: gold per click = your gold/s x power (see CLICK_LADDER)
 	const maxClickLevel = CLICK_LADDER.length - 1;
 	const nextClick = CLICK_LADDER[clickLevel + 1];
-	const percent = (power: number) => `${Math.round(power * 100)}%`;
+	const percent = (power: number) => formatPercent(power * 100);
 
 	const getClickMultiplierText = () =>
 		nextClick
@@ -307,15 +273,7 @@ const MerchantOverlay: React.FC = () => {
 		if (!buyClickUpgrade()) return;
 
 		// Show purchase message
-		setPurchaseMessage({
-			item: `Click Power Level ${clickLevel + 1}`,
-			price: price,
-		});
-
-		// Clear message after 3 seconds
-		setTimeout(() => {
-			setPurchaseMessage(null);
-		}, 3000);
+		announcePurchase(`Click Power Level ${clickLevel + 1}`, price);
 	};
 
 	// Calculate max buy amount based on player's gold
@@ -326,25 +284,19 @@ const MerchantOverlay: React.FC = () => {
 		return Math.floor(resources.gold / unitPrice);
 	};
 
+	const announcePurchase = (item: string, price: number) => {
+		showToast(`Purchased ${item} for ${formatNumber(price)} Gold`);
+	};
+
 	// Render tab content based on active tab
 	const renderTabContent = () => {
 		switch (activeTab) {
-			case 'exchange':
+			case 'resources':
 				return (
 					<>
 						<h2 className='px-h text-center'>
-							Sell resources
+							Resources
 						</h2>
-
-						{/* Sale success message */}
-						{saleMessage && (
-							<div className='mb-4 px-card text-center'>
-								<p className='text-green-400'>
-									Sold {formatNumber(saleMessage.amount)} {saleMessage.resource}{' '}
-									for {formatNumber(saleMessage.gold)} Gold!
-								</p>
-							</div>
-						)}
 
 						<div className='grid grid-cols-2 gap-6'>
 							{/* Resource selling section */}
@@ -362,7 +314,7 @@ const MerchantOverlay: React.FC = () => {
 										maxAmount={maxAmount}
 										currentAmount={currentAmount}
 										goldValue={goldValue}
-										priceMultiplier={sellMultiplier(merchantUpgrades)}
+										priceMultiplier={sellMultiplier({ merchantUpgrades, prestige })}
 										onAmountChange={handleAmountChange}
 										onSell={handleSell}
 										onSellAll={handleSellAll}
@@ -371,124 +323,102 @@ const MerchantOverlay: React.FC = () => {
 							})}
 						</div>
 
-						{/* Sell bag items */}
-						<MerchantItemsSection />
-					</>
-				);
-			case 'buy':
-				return (
-					<>
-						<h2 className='px-h text-center'>
-							Buy Goods
-						</h2>
+						{/* Resource packs */}
+						<div className='px-card mt-6'>
+							<h3 className='text-white font-semibold mb-2'>
+								Resource Packs
+							</h3>
+							<p className='text-sm text-[#d8c8a0] mb-4'>
+								Purchase resources in bulk (prices are {MERCHANT_BUY_MULTIPLIER}x sell value).
+							</p>
 
-						{/* Purchase success message */}
-						{purchaseMessage && (
-							<div className='mb-4 px-card text-center'>
-								<p className='text-green-400'>
-									Purchased {purchaseMessage.item} for{' '}
-									{formatNumber(purchaseMessage.price)} Gold!
-								</p>
-							</div>
-						)}
+							<div className='grid grid-cols-2 gap-4'>
+								{/* Resource buying sections with sliders */}
+								{MERCHANT_BUYABLE.map((resource) => {
+									const typedResource =
+										resource as keyof typeof MERCHANT_RESOURCE_PRICES;
+									const maxAmount = calculateMaxBuyAmount(typedResource);
+									const currentAmount = buyAmounts[typedResource] ?? 0;
+									const goldPrice = calculateResourcePackPrice(
+										typedResource,
+										currentAmount
+									);
 
-						<div>
-							{/* Gold click multiplier upgrade */}
-							<div className="grid grid-cols-2 gap-4 mb-6">
-								<div className={cn('px-card text-white', {
-									'!border-purple-500': clickLevel >= maxClickLevel
-								})}>
-									<h3 className='font-semibold mb-2 flex items-center text-sm'>
-										<span className='mr-2'><ResourceIcon resource='gold' /></span> Click Power
-										{clickLevel >= maxClickLevel && (
-										<span className='ml-2 text-xs uppercase text-purple-500'>
-										(Max level)
-									</span>
-										)}
-									</h3>
-									<p className='text-sm text-[#d8c8a0] mb-4'>
-									{getClickMultiplierText()}
-								</p>
-								
-									{nextClick ? (
-										<div className='flex justify-between items-center text-sm mt-2'>
-											<p className='text-yellow-400 font-medium'>
-												<span className='inline-flex items-center gap-1'>{formatNumber(nextClick?.price ?? 0)} <ResourceIcon resource='gold' /></span>
-											</p>
-											<button
-												onClick={handleBuyClickMultiplier}
-												disabled={resources.gold < (nextClick?.price ?? 0)}
-												className='px-btn px-btn-sm'>
-												{resources.gold >= (nextClick?.price ?? 0) ? 'Purchase' : 'Get more gold!'}
-											</button>
-										</div>
-									) : (
-										<div className='bg-purple-900 bg-opacity-50 p-2 rounded border border-purple-700 text-center'>
-											<p className='text-purple-300 font-medium'>Max Level Reached ({percent(CLICK_LADDER[clickLevel].power)} per click)</p>
-										</div>
-									)}
-								</div>
-								<MerchantUpgradeCards
-									onBought={(item, price) => {
-										setPurchaseMessage({ item, price });
-										setTimeout(() => setPurchaseMessage(null), 3000);
-									}}
-								/>
-							</div>
-
-							{/* Gear and potions */}
-							<MerchantShop
-								onBought={(item, price) => {
-									setPurchaseMessage({ item, price });
-									setTimeout(() => setPurchaseMessage(null), 3000);
-								}}
-							/>
-
-							{/* Resource packs */}
-							<div className='px-card'>
-								<h3 className='text-white font-semibold mb-2'>
-									Resource Packs
-								</h3>
-								<p className='text-sm text-[#d8c8a0] mb-4'>
-									Purchase resources in bulk (prices are {MERCHANT_BUY_MULTIPLIER}x sell value).
-								</p>
-
-								<div className='grid grid-cols-2 gap-4'>
-									{/* Resource buying sections with sliders */}
-									{MERCHANT_BUYABLE.map((resource) => {
-											const typedResource =
-												resource as keyof typeof MERCHANT_RESOURCE_PRICES;
-											const maxAmount = calculateMaxBuyAmount(typedResource);
-											const currentAmount = buyAmounts[typedResource] ?? 0;
-											const goldPrice = calculateResourcePackPrice(
-												typedResource,
-												currentAmount
-											);
-
-											return (
-												<ResourceBuyingSection
-													key={resource}
-													resource={typedResource}
-													maxAmount={maxAmount}
-													currentAmount={currentAmount}
-													goldPrice={goldPrice}
-													onAmountChange={handleBuyAmountChange}
-													onBuy={handleBuyResource}
-												/>
-											);
-										})}
-								</div>
+									return (
+										<ResourceBuyingSection
+											key={resource}
+											resource={typedResource}
+											maxAmount={maxAmount}
+											currentAmount={currentAmount}
+											goldPrice={goldPrice}
+											onAmountChange={handleBuyAmountChange}
+											onBuy={handleBuyResource}
+										/>
+									);
+								})}
 							</div>
 						</div>
 					</>
 				);
-			case 'upgrade':
+			case 'goods':
 				return (
-					<PlaceholderTabContent
-						title='Upgrade Items'
-						emoji='⚒️'
-						description='Coming soon! Enhance your weapons, armor, and other equipment to make them more powerful.'
-					/>
+					<>
+						<h2 className='px-h text-center'>
+							Goods
+						</h2>
+
+						{/* The shuffling shelf and the supplies */}
+						<MerchantGoods onBought={announcePurchase} />
+
+						{/* Sell bag items */}
+						<MerchantItemsSection />
+					</>
+				);
+			case 'upgrades':
+				return (
+					<>
+						<h2 className='px-h text-center'>
+							Upgrades
+						</h2>
+
+						<div className='grid grid-cols-2 gap-4'>
+							{/* Gold click multiplier upgrade */}
+							<div className={cn('px-card text-white', {
+								'!border-purple-500': clickLevel >= maxClickLevel
+							})}>
+								<h3 className='font-semibold mb-2 flex items-center text-sm'>
+									<span className='mr-2'><ResourceIcon resource='gold' /></span> Click Power
+									{clickLevel >= maxClickLevel && (
+										<span className='ml-2 text-xs uppercase text-purple-500'>
+											(Max level)
+										</span>
+									)}
+								</h3>
+								<p className='text-sm text-[#d8c8a0] mb-4'>
+									{getClickMultiplierText()}
+								</p>
+
+								{nextClick ? (
+									<div className='flex justify-between items-center text-sm mt-2'>
+										<p className='text-yellow-400 font-medium'>
+											<span className='inline-flex items-center gap-1'>{formatNumber(nextClick?.price ?? 0)} <ResourceIcon resource='gold' /></span>
+										</p>
+										<button
+											onClick={handleBuyClickMultiplier}
+											disabled={resources.gold < (nextClick?.price ?? 0)}
+											className='px-btn px-btn-sm'>
+											{resources.gold >= (nextClick?.price ?? 0) ? 'Purchase' : 'Get more gold!'}
+										</button>
+									</div>
+								) : (
+									<div className='bg-purple-900 bg-opacity-50 p-2 rounded border border-purple-700 text-center'>
+										<p className='text-purple-300 font-medium'>Max Level Reached ({percent(CLICK_LADDER[clickLevel].power)} per click)</p>
+									</div>
+								)}
+							</div>
+							<MerchantUpgradeCards onBought={announcePurchase} />
+						</div>
+					</>
 				);
 			case 'quests':
 				return (

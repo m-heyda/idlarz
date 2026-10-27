@@ -20,7 +20,7 @@ export const SET_DEFS: SetDef[] = [
 	{
 		id: 'apprentice',
 		label: 'Apprentice Set',
-		bonuses: { 3: { luck: 2 }, 6: { regen: 0.5 }, 12: { critChance: 2, regen: 0.5, luck: 2 } },
+		bonuses: { 3: { luck: 2, maxMana: 10 }, 6: { regen: 0.5, manaRegen: 0.3 }, 12: { critChance: 2, regen: 0.5, luck: 2, maxMana: 20, spellPower: 10 } },
 	},
 	{
 		id: 'knight',

@@ -5,6 +5,7 @@ import { useGameStore } from '@/stores/gameStore';
 import Grid from '@/components/game/Grid';
 import MenuOverlay from '@/components/game/overlays/MenuOverlay';
 import FightModal from '@/components/game/overlays/FightModal';
+import VictoryToast from '@/components/game/overlays/VictoryToast';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import NamePrompt from '@/components/game/overlays/NamePrompt';
@@ -117,9 +118,13 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<BottomRightStack />
 			<CastleCompass />
 			<ContextMenu />
-			<Toast />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}
-			<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
+			{/* one stack for every notice: chest rewards, fight loot, and the short messages (merchant, bag, saves) */}
+			<div className='notice-stack'>
+				<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
+				<VictoryToast />
+				<Toast />
+			</div>
 		</main>
 	);
 }

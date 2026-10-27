@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyHit, armorOf, critOdds, damagePerClick, dodgeChance, maxHp, mitigate, newFight, regen, rollHit, stepFight } from '../src/lib/combat';
+import { applyHit, armorOf, armorReduction, critOdds, damagePerClick, dodgeChance, maxHp, mitigate, newFight, regen, rollHit, stepFight } from '../src/lib/combat';
 import { monsterStats } from '../src/lib/monsters';
 import { INITIAL_CHARACTER_STATS } from '../src/config/gameConfig';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
@@ -15,8 +15,8 @@ const freshStats = (): CharacterStats => {
 	return Object.assign(stats, calculateCombatStats(stats));
 };
 
-const rat = (tier = 1) => newFight({ id: 1, type: 'rat', tier });
-const king = () => newFight({ id: 2, type: 'ratKing', tier: 1 });
+const rat = (level = 1) => newFight({ id: 1, type: 'rat', level });
+const king = () => newFight({ id: 2, type: 'ratKing', level: 15 });
 const noRng = () => 0;
 
 test('maxHp is 101 for a fresh character with the starter kit', () => {
@@ -37,6 +37,23 @@ test('armorOf sums gear armor', () => {
 	assert.equal(armorOf(STARTER_EQUIPMENT), 2);
 });
 
+test('armorReduction: armor / (armor + 40) up to 50 %, half as much per point after that, never above 75 %', () => {
+	assert.equal(armorReduction(0), 0);
+	assert.equal(armorReduction(-5), 0);
+	assert.equal(armorReduction(40), 0.5, 'armor 40 is the knee');
+	assert.ok(Math.abs(armorReduction(20) - 20 / 60) < 1e-12, 'below the knee it is the plain formula');
+	assert.ok(Math.abs(armorReduction(120) - 0.625) < 1e-12, 'raw 75 % is worth 62.5 % past the knee');
+	let last = 0;
+	for (const armor of [1, 10, 40, 41, 100, 400, 1e4, 1e6, 1e9]) {
+		const r = armorReduction(armor);
+		assert.ok(r > last, `still rising at ${armor}`);
+		assert.ok(r < 0.75, `${armor} stays under the 75 % ceiling`);
+		last = r;
+	}
+	assert.equal(mitigate(100, 1e9), 25, 'a 100 hit still does 25 through any armor');
+	assert.ok(mitigate(100, 120) > mitigate(100, 1e6), 'but more armor keeps helping a little');
+});
+
 test('mitigate: armor 2 turns 4 into 4, armor 40 halves 10 to 5, never below 1', () => {
 	assert.equal(mitigate(4, 2), 4);
 	assert.equal(mitigate(10, 40), 5);
@@ -44,16 +61,16 @@ test('mitigate: armor 2 turns 4 into 4, armor 40 halves 10 to 5, never below 1',
 	assert.equal(mitigate(4, 0), 4);
 });
 
-test('rat stats: T1 100 HP, T5 506 HP, attack grows per tier', () => {
+test('rat stats: level 1 100 HP, level 9 506 HP, attack grows per level; the King at level 15 is his config', () => {
 	assert.equal(monsterStats('rat', 1).maxHp, 100);
-	assert.equal(monsterStats('rat', 5).maxHp, 506);
-	assert.ok(monsterStats('rat', 5).attack > monsterStats('rat', 1).attack);
-	assert.equal(monsterStats('ratKing', 3).maxHp, MONSTERS.ratKing.hp);
-	assert.equal(monsterStats('ratKing', 3).attackIntervalSec, MONSTERS.ratKing.attackIntervalSec);
+	assert.equal(monsterStats('rat', 9).maxHp, 506);
+	assert.ok(monsterStats('rat', 9).attack > monsterStats('rat', 1).attack);
+	assert.equal(monsterStats('ratKing', 15).maxHp, MONSTERS.ratKing.hp);
+	assert.equal(monsterStats('ratKing', 15).attackIntervalSec, MONSTERS.ratKing.attackIntervalSec);
 });
 
 test('newFight starts active at full HP; only the king has a timer', () => {
-	const r = rat(5);
+	const r = rat(9);
 	assert.equal(r.phase, 'active');
 	assert.equal(r.monsterHp, 506);
 	assert.equal(r.monsterMaxHp, 506);
@@ -82,7 +99,7 @@ test('stepFight: a rat deals one mitigated hit every 2 s', () => {
 	assert.deepEqual(r.events, []);
 	r = stepFight(r.fight, 1, r.playerHp, 2, noRng);
 	assert.equal(r.playerHp, 97);
-	assert.deepEqual(r.events, [{ kind: 'hurt', amount: 4 }]);
+	assert.deepEqual(r.events, [{ kind: 'hurt', amount: 4, crit: false }]);
 	fight = r.fight;
 	hp = r.playerHp;
 	r = stepFight(fight, 1, hp, 2, noRng);

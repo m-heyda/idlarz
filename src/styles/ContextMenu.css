@@ -84,13 +84,9 @@
 	box-shadow: inset 0 0 0 2px #2a1e10;
 }
 
-/* the short message at the bottom of the screen */
+/* the short message of the notice stack (top centre, under the header) */
 .ui-toast {
-	position: fixed;
-	left: 50%;
-	bottom: 24px;
-	z-index: 80;
-	transform: translateX(-50%);
+	position: relative;
 	padding: 8px 16px;
 	max-width: calc(100vw - 32px);
 	animation: ui-toast-in 0.18s ease-out;
@@ -100,17 +96,36 @@
 @keyframes ui-toast-in {
 	from {
 		opacity: 0;
-		transform: translate(-50%, 8px);
+		transform: translateY(-8px);
 	}
 	to {
 		opacity: 1;
-		transform: translate(-50%, 0);
+		transform: translateY(0);
 	}
 }
 
 /* the chest reward toast fades in and out over its 3 seconds (it sits centred under the header) */
 .chest-toast {
 	animation: chest-toast 3s ease-in-out both;
+}
+
+/* every notice (chest rewards, fight loot, merchant and bag messages, saves) stacks here, so they never overlap or jump the window */
+.notice-stack {
+	position: fixed;
+	top: calc(var(--header-h, 76px) + 20px);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 90;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	max-width: calc(100vw - 32px);
+	pointer-events: none;
+}
+
+.notice-stack > * {
+	pointer-events: auto;
 }
 
 @keyframes chest-toast {

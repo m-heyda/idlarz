@@ -192,9 +192,8 @@ export const PIXEL_ICON_SIZES = {
 	biome_tundra: [32, 32],
 	biome_lake: [32, 32],
 	biome_coast: [32, 32],
-	biome_grounds: [32, 32],
-	// grounds buildings, 3/4 view on a transparent 48x60 canvas anchored at the tile bottom (the foundation is terrain art)
-	building_farm: [48, 60],
+	// buildings, 3/4 view on a transparent 48x60 canvas anchored at the tile bottom (the foundation is terrain art)
+building_farm: [48, 60],
 	building_mine: [48, 60],
 	building_lumbermill: [48, 60],
 	building_market: [48, 60],
@@ -301,7 +300,6 @@ export const BIOME_PIXEL_ICONS: Record<string, PixelIconName | undefined> = {
 	tundra: 'biome_tundra',
 	lake: 'biome_lake',
 	coast: 'biome_coast',
-	grounds: 'biome_grounds',
 };
 
 export const castleIconName = (level: number): PixelIconName =>

@@ -8,14 +8,14 @@ Config validation: 0 errors, 0 warnings.
 
 | Source | Source level | Gear / kill | Common | Uncommon | Rare | Epic | Legendary | Item level p50 / p90 / max | P(epic+ per kill) | Named / kill | Empty-pool warnings |
 |---|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|
-| Rat tier 1, castle 1 | 1 | 0.119 | 76.4% | 23.6% | 0.0% | 0.0% | 0.0% | 1 / 2 / 2 | 0.0% | 0.0000 | 0 |
-| Rat tier 3, castle 1 | 5 | 0.160 | 70.7% | 22.0% | 7.3% | 0.0% | 0.0% | 5 / 6 / 6 | 0.0% | 0.0000 | 0 |
-| Rat tier 5, castle 1 | 9 | 0.201 | 70.2% | 21.6% | 7.1% | 1.1% | 0.0% | 9 / 10 / 10 | 0.2% | 0.0000 | 0 |
-| Rat tier 5, castle 5 | 21 | 0.200 | 70.0% | 21.6% | 7.0% | 1.1% | 0.2% | 21 / 22 / 22 | 0.3% | 0.0000 | 0 |
-| Rat tier 5, castle 10 | 36 | 0.200 | 70.0% | 21.6% | 7.0% | 1.1% | 0.2% | 36 / 37 / 37 | 0.3% | 0.0000 | 0 |
-| Rat King, castle 1 | 12 | 2.451 | 8.2% | 12.3% | 12.3% | 63.2% | 4.1% | 12 / 12 / 12 | 100.0% | 1.4510 | 0 |
-| Rat King, castle 5 | 24 | 2.451 | 8.2% | 12.3% | 12.3% | 63.2% | 4.1% | 24 / 24 / 24 | 100.0% | 1.4510 | 0 |
-| Rat King, castle 10 | 39 | 2.451 | 8.2% | 12.3% | 12.3% | 63.2% | 4.1% | 39 / 39 / 39 | 100.0% | 1.4510 | 0 |
+| Rat level 1 | 1 | 0.119 | 76.4% | 23.6% | 0.0% | 0.0% | 0.0% | 1 / 2 / 2 | 0.0% | 0.0000 | 0 |
+| Rat level 5 | 5 | 0.160 | 70.7% | 22.0% | 7.3% | 0.0% | 0.0% | 5 / 6 / 6 | 0.0% | 0.0000 | 0 |
+| Rat level 9 | 9 | 0.201 | 70.2% | 21.6% | 7.1% | 1.1% | 0.0% | 9 / 10 / 10 | 0.2% | 0.0000 | 0 |
+| Rat level 15 | 15 | 0.260 | 70.1% | 21.9% | 6.8% | 1.0% | 0.1% | 15 / 16 / 16 | 0.3% | 0.0000 | 0 |
+| Rat level 20 | 20 | 0.310 | 70.0% | 21.7% | 7.1% | 1.1% | 0.2% | 20 / 21 / 21 | 0.4% | 0.0000 | 0 |
+| Rat King level 15 | 15 | 2.451 | 8.2% | 12.3% | 12.3% | 63.2% | 4.1% | 15 / 15 / 15 | 100.0% | 1.4510 | 0 |
+| Rat King level 25 | 25 | 2.451 | 8.2% | 12.3% | 12.3% | 63.2% | 4.1% | 25 / 25 / 25 | 100.0% | 1.4510 | 0 |
+| Rat King level 35 | 35 | 2.451 | 8.2% | 12.3% | 12.3% | 63.2% | 4.1% | 35 / 35 / 35 | 100.0% | 1.4510 | 0 |
 | Chest, castle 1 | 4 | 0.825 | 63.6% | 24.9% | 9.2% | 0.0% | 2.3% | 4 / 5 / 5 | 1.9% | 0.0186 | 0 |
 | Chest, castle 5 | 16 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 16 / 17 / 17 | 5.9% | 0.0190 | 0 |
 | Chest, castle 10 | 31 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 31 / 32 / 32 | 5.9% | 0.0190 | 0 |
@@ -38,3 +38,4 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 - **normal_monster**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
 - **boss**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_set, king_legendary, king_potions
 - **basic_chest**: 1-1 roll(s), 0 guaranteed, 82% per roll; rarity weights common 62.0%, uncommon 24.0%, rare 9.0%, epic 4.0%, legendary 1.0%; bonus: chest_legendary, chest_potion
+- **merchant_stock**: 12-12 roll(s), 12 guaranteed, 100% per roll; rarity weights common 50.0%, uncommon 32.0%, rare 14.0%, epic 4.0%; bonus: none

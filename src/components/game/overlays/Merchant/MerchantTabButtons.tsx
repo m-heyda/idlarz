@@ -3,22 +3,22 @@ import React from 'react';
 
 const MERCHANT_TABS: MerchantTabInfo[] = [
 	{
-		id: 'exchange',
-		label: 'Sell Resources',
+		id: 'resources',
+		label: 'Resources',
 		emoji: '💱',
-		description: 'Sell your resources for gold',
+		description: 'Sell your resources for gold, or buy them back in packs',
 	},
 	{
-		id: 'buy',
-		label: 'Buy Goods',
+		id: 'goods',
+		label: 'Goods',
 		emoji: '🛒',
-		description: 'Purchase useful items and resources',
+		description: 'Gear that changes through the day, supplies, and selling from your bag',
 	},
 	{
-		id: 'upgrade',
-		label: 'Upgrade Items',
+		id: 'upgrades',
+		label: 'Upgrades',
 		emoji: '⚒️',
-		description: 'Enhance your existing items',
+		description: 'Click power and permanent merchant bonuses',
 	},
 	{
 		id: 'quests',

@@ -2,8 +2,10 @@
 
 export type CombatFx =
 	| { kind: 'hit'; damage: number; killed: boolean; crit: 'none' | 'crit' | 'super' }
-	| { kind: 'hurt'; amount: number }
-	| { kind: 'heal'; amount: number };
+	| { kind: 'hurt'; amount: number; crit?: boolean }
+	| { kind: 'heal'; amount: number }
+	| { kind: 'stun'; sec: number }
+	| { kind: 'resist' };
 
 export const COMBAT_EVENT = 'idlarz:combat';
 

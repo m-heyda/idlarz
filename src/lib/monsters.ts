@@ -1,48 +1,77 @@
-import { COMBAT, MONSTERS } from '@/config/combatConfig';
-import { LOOT_SOURCES } from '@/catalog/lootConfig';
+import { COMBAT, MONSTERS, type MonsterDef } from '@/config/combatConfig';
 import { levelScale } from '@/catalog/stats';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
-import { resolveSourceLevel } from '@/lib/loot/generate';
+import { limitOf, type LimitContext } from '@/lib/limits';
+import { mulberry32, randomInt } from '@/lib/rng';
 import type { Monster, MonsterType } from '@/types/game';
 import { ownedRowMajor, type World } from '@/utils/world';
 
 export interface MonsterStats {
 	maxHp: number;
 	attack: number;
+	/** Reduces the damage of the player's clicks (same curve as the player's armor) */
+	armor: number;
+	/** % chance and multiplier of a crit on one of its hits */
+	critChance: number;
+	critMult: number;
+	/** % chance that Stun does not work */
+	stunResist: number;
 	attackIntervalSec: number;
 	rewardSec: number;
 }
 
-/** The level of a monster: the same level its loot drops at (tier and castle level, see catalog/lootConfig). */
-export const monsterLevel = (type: MonsterType, tier: number, castleLevel = 1): number =>
-	resolveSourceLevel(LOOT_SOURCES[type].level, type === 'ratKing' ? 1 : tier, castleLevel);
+export const monsterDef = (type: MonsterType): MonsterDef => MONSTERS[type];
 
-/**
- * How much stronger a monster is than the same monster at castle level 1: the item level curve between the two levels. 1 at
- * castle level 1, so every number below is unchanged there; gear rises on the same curve, so fights keep their shape.
- */
-export const monsterPower = (type: MonsterType, tier: number, castleLevel = 1): number =>
-	levelScale(monsterLevel(type, tier, castleLevel)) / levelScale(monsterLevel(type, tier, 1));
+export const isBoss = (type: MonsterType): boolean => MONSTERS[type].grade === 'boss';
 
-/** HP, attack and reward of a monster at a tier and world (castle) level (the Rat King ignores the tier). Reward is income-based, so it does not scale. */
-export const monsterStats = (type: MonsterType, tier: number, castleLevel = 1): MonsterStats => {
-	const power = monsterPower(type, tier, castleLevel);
-	if (type === 'ratKing') {
-		const k = MONSTERS.ratKing;
-		return { maxHp: Math.round(k.hp * power), attack: Math.round(k.attack * power), attackIntervalSec: k.attackIntervalSec, rewardSec: k.rewardSec };
-	}
-	const r = MONSTERS.rat;
-	const t = Math.max(1, Math.min(COMBAT.maxTier, Math.floor(tier))) - 1;
-	return {
-		maxHp: Math.round(r.hp * Math.pow(r.hpGrowth, t) * power),
-		attack: Math.round(r.attack * Math.pow(r.attackGrowth, t) * power),
-		attackIntervalSec: r.attackIntervalSec,
-		rewardSec: r.rewardSec * Math.pow(r.rewardGrowth, t),
-	};
+/** The levels a new monster of this type can appear at in a world of this castle level (both ends included). */
+export const spawnLevelRange = (type: MonsterType, castleLevel = 1): { min: number; max: number } => {
+	const { base, perCastleLevel, spread, cap } = MONSTERS[type].spawnWindow;
+	const min = Math.max(1, Math.min(cap - spread, base + Math.floor(perCastleLevel * (Math.max(1, castleLevel) - 1))));
+	return { min, max: Math.min(cap, min + spread) };
 };
 
-export const tierFor = (type: MonsterType, ageSec: number): number =>
-	type === 'ratKing' ? 1 : Math.min(COMBAT.maxTier, 1 + Math.floor(Math.max(0, ageSec) / COMBAT.tierIntervalSec));
+/**
+ * The level a new monster starts at. Rolled from a generator seeded by its id and nothing else, so it takes no number from
+ * Math.random (the rest of the game's randomness is the same with or without it) and the same monster always rolls the same.
+ */
+export const rollSpawnLevel = (type: MonsterType, castleLevel: number, monsterId: number): number => {
+	const { min, max } = spawnLevelRange(type, castleLevel);
+	return randomInt(mulberry32(monsterId * 2654435761 + 17), min, max);
+};
+
+/** A new monster standing on `spot`, at a level rolled for the world it appears in. */
+export const newMonster = (type: MonsterType, id: number, spot: { x: number; y: number }, castleLevel: number): Monster => {
+	const level = rollSpawnLevel(type, castleLevel, id);
+	return { id, type, level, spawnLevel: level, x: spot.x, y: spot.y, ageSec: 0 };
+};
+
+/** The highest level a monster that appeared at `spawnLevel` can grow to. */
+export const maxLevelOf = (spawnLevel: number, ctx: LimitContext = {}): number => spawnLevel + limitOf('monsterGrowthLevels', ctx);
+
+/** The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit. */
+export const levelAtAge = (spawnLevel: number, ageSec: number, ctx: LimitContext = {}): number =>
+	spawnLevel + Math.min(limitOf('monsterGrowthLevels', ctx), Math.floor(Math.max(0, ageSec) / limitOf('monsterGrowthIntervalSec', ctx)));
+
+/** Rounds .5 up even when the power of an irrational growth factor lands a hair below it (337.4999... is 338, like the old exact 1.5 per tier). */
+const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
+
+/** HP, attack, armor, crit, stun resistance and reward of a monster at a level. Reward is income-based, so it does not scale with the world. */
+export const monsterStats = (type: MonsterType, level: number): MonsterStats => {
+	const d = monsterDef(type);
+	const steps = Math.max(1, Math.floor(level)) - d.refLevel;
+	const gear = d.scaling === 'gear' ? levelScale(Math.max(1, Math.floor(level))) / levelScale(d.refLevel) : null;
+	return {
+		maxHp: roundHalfUp(d.hp * (gear ?? Math.pow(d.hpPerLevel, steps))),
+		attack: roundHalfUp(d.attack * (gear ?? Math.pow(d.attackPerLevel, steps))),
+		armor: Math.max(0, d.armor + d.armorPerLevel * steps),
+		critChance: d.critChance,
+		critMult: d.critMult,
+		stunResist: d.stunResist,
+		attackIntervalSec: d.attackIntervalSec,
+		rewardSec: d.rewardSec * Math.pow(d.rewardPerLevel, steps),
+	};
+};
 
 export const monsterAt = (monsters: Monster[], x: number, y: number): Monster | undefined =>
 	monsters.find((mon) => mon.x === x && mon.y === y);
@@ -78,40 +107,27 @@ export const pickSpawnTile = (
 export const spawnThreshold = (nextMonsterId: number): number =>
 	nextMonsterId === 1 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec;
 
-const TIER_CAP_AGE = (COMBAT.maxTier - 1) * COMBAT.tierIntervalSec;
-// Number of evolution checks a rat of this age has passed (the first one comes evolveCheckSec after the last tier)
-const evolveChecks = (ageSec: number) =>
-	Math.max(0, Math.floor((ageSec - TIER_CAP_AGE) / MONSTERS.ratKing.evolveCheckSec));
-
 /**
- * Ages every monster (except `frozenId`, the one being fought), recomputes tiers and rolls the Rat King evolution
- * for rats that passed an evolution check. At most one king exists and at most one rat evolves per call.
+ * Ages every monster (except `frozenId`, the one being fought) and raises its level as it earns growth. There is no random
+ * element: a monster of an age always has the same level.
  */
-export const advanceMonsters = (
-	monsters: Monster[],
-	dtSec: number,
-	rng: () => number,
-	frozenId: number | null
-): Monster[] => {
-	let kingExists = monsters.some((mon) => mon.type === 'ratKing');
-	return monsters.map((mon) => {
-		if (mon.id === frozenId || mon.type === 'ratKing') return mon;
+export const advanceMonsters = (monsters: Monster[], dtSec: number, frozenId: number | null, ctx: LimitContext = {}): Monster[] =>
+	monsters.map((mon) => {
+		if (mon.id === frozenId) return mon;
 		const ageSec = mon.ageSec + dtSec;
-		const aged: Monster = { ...mon, ageSec, tier: tierFor('rat', ageSec) };
-		if (!kingExists) {
-			for (let i = evolveChecks(mon.ageSec); i < evolveChecks(ageSec); i++) {
-				if (rng() < MONSTERS.ratKing.evolveChance) {
-					kingExists = true;
-					return { ...aged, type: 'ratKing', tier: 1 };
-				}
-			}
-		}
-		return aged;
+		return { ...mon, ageSec, level: levelAtAge(mon.spawnLevel, ageSec, ctx) };
 	});
+
+/** Seconds until a monster gains its next level; null at the growth limit. */
+export const growthSecondsLeft = (mon: Monster, ctx: LimitContext = {}): number | null => {
+	if (mon.level >= maxLevelOf(mon.spawnLevel, ctx)) return null;
+	const interval = limitOf('monsterGrowthIntervalSec', ctx);
+	return interval * (mon.level - mon.spawnLevel + 1) - mon.ageSec;
 };
 
-/** Seconds until a rat gains its next tier; null for the king and for a rat at the last tier. */
-export const tierSecondsLeft = (mon: Monster): number | null =>
-	mon.type === 'ratKing' || mon.tier >= COMBAT.maxTier
-		? null
-		: COMBAT.tierIntervalSec * mon.tier - mon.ageSec;
+/** Seconds the boss timer must reach before the next boss appears. */
+export const bossThreshold = (): number => COMBAT.spawn.bossIntervalSec;
+
+/** The kind of boss that appears next: one at a time, so the first kind that is not on the map (only the Rat King for now). */
+export const nextBossType = (monsters: Monster[]): MonsterType | null =>
+	(Object.keys(MONSTERS) as MonsterType[]).find((type) => isBoss(type) && !monsters.some((mon) => mon.type === type)) ?? null;

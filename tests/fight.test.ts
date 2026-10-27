@@ -7,10 +7,13 @@ import { BASIC_GEAR, ITEM_CATALOG, RATTATUI_SET, STARTER_EQUIPMENT } from '../sr
 import { emptyBag, stackOf } from '../src/lib/inventory';
 import { plainItem, sellValueOf } from '../src/lib/itemInstance';
 import { sellPayout } from '../src/utils/gameUtils';
-import { maxHp } from '../src/lib/combat';
+import { leechHeal, maxHp, maxMana } from '../src/lib/combat';
+import { calculateCombatStats } from '../src/utils/gameUtils';
+import type { ItemInstance } from '../src/types/game';
 import { castleLevelOf } from '../src/lib/castleWard';
 import { spawnCap } from '../src/lib/spawnLimits';
 import { fullSet } from '../src/lib/fightSim';
+import { generateLoot } from '../src/lib/loot';
 import { pickPersisted } from '../src/lib/sanitizeSave';
 import type { Monster } from '../src/types/game';
 import { patchTile } from '../src/utils/world';
@@ -48,11 +51,11 @@ const withMonster = (over: Partial<Monster> = {}) => {
 	freshGame();
 	growTo(6);
 	const spot = ownedSpots()[0];
-	store.setState({ monsters: [{ id: 1, type: 'rat', tier: 1, ...spot, ageSec: 0, ...over }], nextMonsterId: 2 });
+	store.setState({ monsters: [{ id: 1, type: 'rat', level: 1, spawnLevel: 1, ...spot, ageSec: 0, ...over }], nextMonsterId: 2 });
 	return spot;
 };
 
-test('17 hits at 6 damage kill a tier-1 rat and 16 do not', () => {
+test('17 hits at 6 damage kill a level 1 rat and 16 do not', () => {
 	withMonster();
 	assert.equal(api().startFight(1), true);
 	const results = hits(16);
@@ -83,7 +86,7 @@ test('untrusted clicks and repeated events do nothing, but fight hits are not ra
 });
 
 test('crits: a high roll doubles the click, a super crit multiplies it by 5, a low roll is a plain hit', () => {
-	withMonster({ type: 'ratKing', tier: 1 });
+	withMonster(); // a rat has no armor, so the click is the plain damage
 	api().startFight(1);
 	const base = 6;
 	assert.deepEqual(hit(250, 0), { damage: base, killed: false, crit: 'none' });
@@ -163,8 +166,11 @@ test('loot with a full bag converts to gold and loses no items', () => {
 		const summary = api().fight!.summary!;
 		assert.deepEqual(api().bag, full);
 		assert.deepEqual(summary.items, []);
-		// a random of 0 rolls a level 1 common item: the first base of the pool
-		assert.equal(summary.convertedGold, sellValueOf(plainItem(BASIC_GEAR[0])) + ITEM_CATALOG.potion_minor.sellValue);
+		// the same roll again: the gear that did not fit is paid at its sell value, the potion at the potion's
+		const drops = generateLoot({ sourceId: 'rat', level: 1 }, () => 0).drops;
+		const expected = drops.reduce((sum, d) => sum + (d.kind === 'gear' ? sellValueOf(d.item) : d.qty * ITEM_CATALOG[d.id].sellValue), 0);
+		assert.ok(expected > ITEM_CATALOG.potion_minor.sellValue);
+		assert.equal(summary.convertedGold, expected);
 		assert.equal(api().resources.gold - before, summary.gold + summary.convertedGold);
 	} finally {
 		mock.restoreAll();
@@ -276,7 +282,8 @@ test('the first rat spawns after 120 s with 5 owned tiles, not before', () => {
 	assert.equal(api().monsters.length, 1);
 	const m = api().monsters[0];
 	assert.equal(m.type, 'rat');
-	assert.equal(m.tier, 1);
+	assert.equal(m.level, m.spawnLevel);
+	assert.ok(m.level >= 1 && m.level <= 3, 'a castle level 1 rat appears at level 1-3');
 	assert.equal(api().nextMonsterId, 2);
 	assert.ok(!(m.x === CASTLE_X && m.y === CASTLE_Y));
 	assert.equal(tileAt(api().tiles, m.x, m.y).hasChest, undefined);
@@ -299,14 +306,14 @@ test('chests never spawn on a monster tile', () => {
 	freshGame();
 	growTo(3); // castle + 2 tiles: below the monster spawn threshold of 5 owned tiles
 	const [a, b] = ownedSpots();
-	store.setState({ monsters: [{ id: 1, type: 'rat', tier: 1, ...a, ageSec: 0 }], nextMonsterId: 2 });
+	store.setState({ monsters: [{ id: 1, type: 'rat', level: 1, spawnLevel: 1, ...a, ageSec: 0 }], nextMonsterId: 2 });
 	for (let i = 0; i < 3; i++) api().tick(300_000);
 	assert.equal(tileAt(api().tiles, a.x, a.y).hasChest, undefined);
 	assert.equal(tileAt(api().tiles, b.x, b.y).hasChest, true);
 });
 
 test('the Rat King times out, taunts, and stays on the map at full HP', () => {
-	withMonster({ type: 'ratKing', tier: 1 });
+	withMonster({ type: 'ratKing', level: 15, spawnLevel: 15 });
 	store.setState({ equipment: fullSet('rattatui') }); // armor that outlasts the whole time limit
 	store.setState({ playerHp: max() });
 	api().startFight(1);
@@ -323,7 +330,7 @@ test('the Rat King times out, taunts, and stays on the map at full HP', () => {
 });
 
 test('a fast clicker in full Rattatui gear beats the Rat King and wins Rattatui gear; the starter kit cannot', () => {
-	withMonster({ type: 'ratKing', tier: 1 });
+	withMonster({ type: 'ratKing', level: 15, spawnLevel: 15 });
 	mock.method(Math, 'random', () => 0); // no crits, no lucky drops: plain damage only
 	try {
 		store.setState({ equipment: fullSet('rattatui') });
@@ -338,13 +345,13 @@ test('a fast clicker in full Rattatui gear beats the Rat King and wins Rattatui 
 		const ids = items.map((d) => (d.kind === 'gear' ? d.item.base : d.id));
 		assert.ok(ids.some((id) => RATTATUI_SET.pieces.includes(id)), 'the king drops a Rattatui piece');
 		const piece = items.find((d) => d.kind === 'gear' && RATTATUI_SET.pieces.includes(d.item.base));
-		assert.equal(piece?.kind === 'gear' ? piece.item.level : 0, 12, 'at the King level, castle level 1');
+		assert.equal(piece?.kind === 'gear' ? piece.item.level : 0, 15, 'at the King level');
 		assert.equal(api().lootPity['boss:king_legendary'] ?? 0, 0, 'a random of 0 always drops the legendary: nothing to protect against');
 		assert.equal(api().monsters.length, 0);
 	} finally {
 		mock.restoreAll();
 	}
-	withMonster({ type: 'ratKing', tier: 1 });
+	withMonster({ type: 'ratKing', level: 15, spawnLevel: 15 });
 	api().startFight(1);
 	for (let sec = 0; sec < MONSTERS.ratKing.timeLimitSec && api().fight?.phase === 'active'; sec++) {
 		hits(25, 40); // even 25 clicks per second with the wooden sword gets nowhere
@@ -383,9 +390,11 @@ test('the auto-sell filter sells matching gear on the spot, pays Haggler like a 
 		api().startFight(1);
 		hits(50);
 		const summary = api().fight!.summary!;
-		const unit = sellValueOf(plainItem(BASIC_GEAR[0]));
+		const rolled = generateLoot({ sourceId: 'rat', level: 1 }, () => 0).drops.find((d) => d.kind === 'gear');
+		const unit = rolled && rolled.kind === 'gear' ? sellValueOf(rolled.item) : 0;
+		assert.ok(unit > 0);
 		assert.equal(summary.autoSold.count, 1);
-		assert.equal(summary.autoSold.gold, sellPayout(unit, 1, { haggler: 3 }));
+		assert.equal(summary.autoSold.gold, sellPayout(unit, 1, { merchantUpgrades: { haggler: 3 } }));
 		assert.equal(summary.items.some((d) => d.kind === 'gear'), false, 'the gear was sold, not stored');
 		assert.equal(summary.items.some((d) => d.kind === 'consumable'), true);
 		assert.equal(api().resources.gold - before, summary.gold + summary.autoSold.gold);
@@ -405,19 +414,75 @@ test('drops are not auto-sold above the chosen rarity, and the setting is valida
 	assert.equal(api().autoSellUpTo, null);
 });
 
-test('a higher castle level raises the item level of what a rat drops', () => {
-	const best = (castleLevel: number) => {
-		withMonster({ type: 'rat', tier: 5 });
-		store.setState((s) => ({ tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: castleLevel }), bag: emptyBag() }));
+test('a higher monster level raises the item level of what it drops', () => {
+	const best = (level: number) => {
+		withMonster({ type: 'rat', level, spawnLevel: level });
+		store.setState({ bag: emptyBag() });
 		mock.method(Math, 'random', () => 0.0001); // always drops; the item level roll takes the low end
 		try {
 			api().startFight(1);
-			hits(260);
+			hits(400);
 			const items = api().fight!.summary!.items;
 			return Math.max(0, ...items.map((d) => (d.kind === 'gear' ? d.item.level : 0)));
 		} finally {
 			mock.restoreAll();
 		}
 	};
-	assert.ok(best(5) > best(1) + 8);
+	assert.ok(best(15) > best(5) + 8);
+});
+
+// ---- mana and life leech ------------------------------------------------------------------------------------------------
+
+test('mana refills over time, in and out of fights, and never above the maximum', () => {
+	freshGame();
+	assert.equal(api().playerMp, maxMana(api().characterStats, api().equipment));
+	store.setState({ playerMp: 0 });
+	run(10);
+	assert.ok(Math.abs(api().playerMp - 7.5) < 0.01, `${api().playerMp}`); // 0.75 per second at the start
+	run(500);
+	assert.equal(api().playerMp, 40);
+	withMonster();
+	store.setState({ playerMp: 10 });
+	api().startFight(1);
+	run(4);
+	assert.ok(api().playerMp > 12.5, 'mana also refills during a fight');
+});
+
+test('Intelligence and magic gear raise the mana pool and its refill; changing gear clamps the mana', () => {
+	freshGame();
+	store.setState((s) => ({ characterStats: { ...s.characterStats, intelligence: 25, ...calculateCombatStats({ ...s.characterStats, intelligence: 25 }) } }));
+	store.setState({ bag: [{ item: plainItem('apprentice_tome') }, ...emptyBag().slice(1)] });
+	assert.equal(maxMana(api().characterStats, api().equipment), 120);
+	store.setState({ playerMp: 120 });
+	assert.equal(api().equipItem(0), true); // the tome: +8 mana
+	assert.equal(maxMana(api().characterStats, api().equipment), 128);
+	store.setState({ playerMp: 128 });
+	assert.equal(api().unequipItem('offHand'), true);
+	assert.equal(api().playerMp, 120, 'the pool shrinks, the mana follows it down');
+});
+
+test('life leech: a hit gives back a share of its damage as HP, never above the maximum', () => {
+	withMonster();
+	const leechy: ItemInstance = { base: 'steel_dagger', level: 40, rarity: 'uncommon', quality: 50, affixes: [{ id: 'lifeLeech_prefix', roll: 100 }] };
+	store.setState((s) => ({ equipment: { ...s.equipment, mainHand: leechy }, playerHp: 50 }));
+	api().startFight(1);
+	const before = api().playerHp;
+	const hitResult = hit(250, 0)!;
+	const expected = leechHeal(hitResult.damage, api().equipment);
+	assert.ok(expected > 0);
+	assert.ok(Math.abs(api().playerHp - before - expected) < 1e-6, `${api().playerHp - before} vs ${expected}`);
+	store.setState({ playerHp: max() });
+	hit(250, 0);
+	assert.equal(api().playerHp, max(), 'at full HP leech cannot overheal');
+});
+
+test('a rebirth refills mana to the pool of the gear that survives', () => {
+	freshGame();
+	growTo(REBIRTH.minTiles);
+	store.setState((s) => ({ tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel }), bag: [{ item: plainItem('apprentice_tome') }, ...emptyBag().slice(1)] }));
+	api().equipItem(0);
+	store.setState({ playerMp: 1 });
+	assert.equal(api().rebirth(), true);
+	assert.equal(api().playerMp, maxMana(api().characterStats, api().equipment));
+	assert.equal(api().playerMp, 48);
 });

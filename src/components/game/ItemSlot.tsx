@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { formatCompact } from '@/utils/formatters';
 import { createPortal } from 'react-dom';
 import { EQUIPMENT_PIXEL_ICONS } from '@/config/pixelIcons';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
@@ -138,7 +139,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				) : slot ? (
 					<PixelIcon name={EQUIPMENT_PIXEL_ICONS[slot]} alt='' className='px-equip-empty' />
 				) : null}
-				{def && (def.stackMax ?? 1) > 1 && qty > 1 && <span className='inv-qty'>{qty}</span>}
+				{def && (def.stackMax ?? 1) > 1 && qty > 1 && <span className='inv-qty'>{formatCompact(qty)}</span>}
 				{locked && <span className='inv-lock' aria-hidden />}
 			</div>
 			{tip &&

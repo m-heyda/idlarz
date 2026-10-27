@@ -38,6 +38,28 @@
 	transition: none;
 }
 
+.fight-boss {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 2px 8px;
+	color: #ffe9a8;
+	background: #4a0e0a;
+	border: 2px solid #ffd860;
+	letter-spacing: 1px;
+}
+
+.fight-boss-skull {
+	font-size: 1.2rem;
+}
+
+.fight-boss-traits {
+	font-size: 0.7rem;
+	color: #f0d8b0;
+	letter-spacing: 0;
+}
+
 .fight-timer {
 	text-align: center;
 	font-weight: 700;
@@ -85,6 +107,22 @@
 
 .fight-bar[data-kind='player'] .fight-bar-trail {
 	background: #d8f0b8;
+}
+
+.fight-bar[data-kind='mana'] {
+	height: 18px;
+}
+
+.fight-bar[data-kind='mana'] .fight-bar-fill {
+	background: linear-gradient(#5aa8f0 0 35%, #2f6fc0 35% 100%);
+}
+
+.fight-bar[data-kind='mana'] .fight-bar-trail {
+	background: #b8d8f8;
+}
+
+.fight-bar[data-kind='mana'] .fight-bar-text {
+	font-size: 0.7rem;
 }
 
 .fight-bar-text {
@@ -178,6 +216,8 @@
 .fight-number[data-kind='super'] { color: #ff6ae0; font-size: 2.6rem; animation-duration: 1.2s; }
 .fight-number[data-kind='hurt'] { color: #ff6a5a; top: 70%; }
 .fight-number[data-kind='heal'] { color: #7aff8a; top: 70%; }
+.fight-number[data-kind='resist'] { color: #c8c8c8; top: 18%; font-size: 1.3rem; }
+.fight-number[data-kind='stun'] { color: #8ac0ff; top: 18%; font-size: 1.3rem; }
 
 @keyframes fight-float {
 	0% { transform: translateY(0); opacity: 1; }
@@ -223,6 +263,67 @@
 	pointer-events: none;
 }
 
+.fight-skills {
+	display: flex;
+	gap: 8px;
+}
+
+.fight-skill {
+	position: relative;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 8px 6px 6px 22px;
+	overflow: hidden;
+	background: #1c120a;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c, inset 0 0 0 2px #2a1a0c;
+	color: #f0e6d0;
+	cursor: pointer;
+}
+
+.fight-skill:disabled {
+	cursor: default;
+}
+
+.fight-skill[data-locked='true'] {
+	color: #8a7a62;
+	background: #120a06;
+}
+
+.fight-skill[data-nomana='true'] .fight-skill-cost {
+	color: #ff8a7a;
+}
+
+.fight-skill-name {
+	font-weight: 700;
+	font-size: 0.9rem;
+}
+
+.fight-skill-cost {
+	font-size: 0.75rem;
+	color: #8ac0ff;
+}
+
+.fight-stunned {
+	position: absolute;
+	left: 50%;
+	top: 6%;
+	transform: translateX(-50%);
+	z-index: 6;
+	padding: 2px 8px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #101010;
+	background: #8ac0ff;
+	border: 2px solid #0a0605;
+	pointer-events: none;
+}
+
 .fight-cooldown {
 	position: absolute;
 	left: 0;
@@ -244,4 +345,71 @@
 	.fight-sprite[data-hit='true'] {
 		filter: brightness(1.8);
 	}
+}
+
+/* --- the loot notice after a won fight: in the notice stack at the top centre (like chest rewards), never in the way of the clicks that follow --- */
+.victory-toast {
+	position: relative;
+	min-width: 260px;
+	max-width: min(92vw, 520px);
+	padding: 10px 28px 10px 14px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	color: #f0e6d0;
+	animation: victory-in 0.25s ease-out both;
+}
+
+.victory-toast[data-boss='true'] {
+	border-color: #ffd860;
+}
+
+.victory-title {
+	font-weight: 700;
+	color: #ffe27a;
+	text-align: center;
+}
+
+.victory-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 6px 14px;
+	font-size: 0.85rem;
+}
+
+.victory-status {
+	color: #a89878;
+	font-size: 0.75rem;
+}
+
+.victory-loot {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 6px;
+}
+
+.victory-note {
+	font-size: 0.75rem;
+	color: #a89878;
+	text-align: center;
+}
+
+.victory-close {
+	position: absolute;
+	top: 2px;
+	right: 4px;
+	width: 20px;
+	height: 20px;
+	line-height: 1;
+	color: #c8b896;
+	cursor: pointer;
+}
+
+@keyframes victory-in {
+	from { opacity: 0; transform: translateY(-10px); }
+	to { opacity: 1; transform: translateY(0); }
 }

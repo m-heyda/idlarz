@@ -4,13 +4,13 @@ import { useGameStore } from '@/stores/gameStore';
 import { LEGACY_UPGRADES, REBIRTH, CASTLE_UPGRADE, type LegacyUpgradeId } from '@/config/gameConfig';
 import { castleModifier, economyTiles, legacyGain, legacyIncomeMultiplier, legacyUpgradeCost } from '@/utils/gameUtils';
 import { castleLevelOf } from '@/lib/castleWard';
-import { formatNumber } from '@/utils/formatters';
+import { formatNumber, formatPercent } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import PixelModal from '../PixelModal';
 import PixelIcon from '../PixelIcon';
 import LegacyIcon from '../LegacyIcon';
 
-const pct = (n: number, digits = 0) => `${(n * 100).toFixed(digits)}%`;
+const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercent(n * 100) : `${(n * 100).toFixed(digits)}%`);
 
 const shopText: Record<LegacyUpgradeId, (levels: number) => string> = {
 	thrift: (n) => `-${pct(LEGACY_UPGRADES.thrift.effectPerLevel)} tile and building cost per level (now -${pct(n * LEGACY_UPGRADES.thrift.effectPerLevel)}, with Charisma at most -${REBIRTH.discountCapPercent}%)`,
@@ -69,7 +69,7 @@ const LegacyDialog: React.FC = () => {
 			<div className='px-card mb-3 text-sm grid grid-cols-3 gap-2 text-center'>
 				<div>
 					<div className='text-[#a89878]'>Rebirths</div>
-					<div className='text-[#f0d27a] text-lg'>{prestige.rebirths}</div>
+					<div className='text-[#f0d27a] text-lg'>{formatNumber(prestige.rebirths)}</div>
 				</div>
 				<div>
 					<div className='text-[#a89878]'>Income bonus</div>
@@ -78,7 +78,7 @@ const LegacyDialog: React.FC = () => {
 				<div>
 					<div className='text-[#a89878]'>Legacy</div>
 					<div className='text-green-300 text-lg flex items-center justify-center gap-1'>
-						<LegacyIcon /> {prestige.legacyPoints}
+						<LegacyIcon /> {formatNumber(prestige.legacyPoints)}
 					</div>
 				</div>
 			</div>
@@ -87,7 +87,7 @@ const LegacyDialog: React.FC = () => {
 				<div className='px-card mb-3 text-sm'>
 					<div className='px-h'>Rebirth now?</div>
 					<p className='text-[#d8c8a0] mb-2'>
-						You gain <b className='text-green-300'>{gain}</b> Legacy (+{pct(gain * REBIRTH.incomePerPoint)} income
+						You gain <b className='text-green-300'>{formatNumber(gain)}</b> Legacy (+{pct(gain * REBIRTH.incomePerPoint)} income
 						for ever). The map, resources, castle, farm, level and stat points start again. Your name, hero,
 						Legacy and shop upgrades stay.
 					</p>
@@ -104,12 +104,12 @@ const LegacyDialog: React.FC = () => {
 				<div className='px-card mb-3 text-sm'>
 					<div className='px-h'>Rebirth</div>
 					<p className='text-[#d8c8a0] mb-2'>
-						Start over with a permanent bonus. A rebirth gives about {gain} Legacy point{gain === 1 ? '' : 's'} now; a
+						Start over with a permanent bonus. A rebirth gives about {formatNumber(gain)} Legacy point{gain === 1 ? '' : 's'} now; a
 						higher castle level and more tiles give more (castle level {CASTLE_UPGRADE.maxLevel} is the best you can do).
 					</p>
 					<div className='mb-3'>
 						<Check ok={levelOk}>Castle level {REBIRTH.minCastleLevel}+ (now {castleLevel})</Check>
-						<Check ok={tilesOk}>At least {REBIRTH.minTiles} tiles (now {ownedTiles})</Check>
+						<Check ok={tilesOk}>At least {REBIRTH.minTiles} tiles (now {formatNumber(ownedTiles)})</Check>
 						<Check ok={idleOk}>No castle upgrade in progress</Check>
 					</div>
 					<div className='text-xs text-[#a89878] mb-2'>
@@ -117,7 +117,7 @@ const LegacyDialog: React.FC = () => {
 					</div>
 					<div className='flex justify-center'>
 						<button className='px-btn px-btn-gold' disabled={!canRebirth} onClick={() => setConfirming(true)}>
-							Rebirth for {gain} Legacy
+							Rebirth for {formatNumber(gain)} Legacy
 						</button>
 					</div>
 				</div>
@@ -146,7 +146,7 @@ const LegacyDialog: React.FC = () => {
 									onClick={() => {
 										if (buyLegacyUpgrade(id)) audioManager.playSound('purchase');
 									}}>
-									{maxed ? 'Max' : <><LegacyIcon /> {cost}</>}
+									{maxed ? 'Max' : <><LegacyIcon /> {formatNumber(cost)}</>}
 								</button>
 							</div>
 						);

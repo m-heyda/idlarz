@@ -4,7 +4,7 @@ import './helpers';
 import { BASE_TILE_COST, BASE_XP_PER_TILE, RESOURCE_CAP, SCALING_CONFIG, TILE_PRICE, XP_CAP, XP_TILE } from '../src/config/gameConfig';
 import { calculateBuildingCost, calculateLevel, calculateXpGain } from '../src/utils/gameUtils';
 import { setTiles, EMPTY_WORLD } from '../src/utils/world';
-import { formatNumber, formatRate } from '../src/utils/formatters';
+import { formatCompact, formatNumber, formatPct, formatPercent, formatRate } from '../src/utils/formatters';
 
 // The tile price and the XP per tile used to be pure exponentials that stopped being payable at ~157 tiles. They now have a
 // polynomial tail; below the tail start the price is exactly the three exponential stages of SCALING_CONFIG.
@@ -95,6 +95,24 @@ test('big numbers are shown with suffixes up to Sx, then scientific, and never a
 	assert.equal(formatRate(2e15), '+2.00Qa/s');
 	assert.equal(formatRate(-3e6), '-3.00M/s');
 	assert.equal(formatRate(1234.5), '+1234.50/s');
+});
+
+test('stats and percentages use the same short notation: plain below 10,000 (5,000 for a percentage), then K / M / B / T', () => {
+	assert.equal(formatCompact(40.8), '40.8');
+	assert.equal(formatCompact(281), '281');
+	assert.equal(formatCompact(6.004), '6');
+	assert.equal(formatCompact(2.456, 2), '2.46');
+	assert.equal(formatCompact(9999), '9999');
+	assert.equal(formatCompact(174_198_138), '174.20M');
+	assert.equal(formatCompact(2.5e9), '2.50B');
+	assert.equal(formatCompact(undefined), '0');
+	assert.equal(formatPct(27.34), '27.3%');
+	assert.equal(formatPct(4999), '4999%');
+	assert.equal(formatPct(14_080), '14.08K%');
+	assert.equal(formatPct(3e6), '3.00M%');
+	assert.equal(formatPercent(4999), '4999%');
+	assert.equal(formatPercent(5000), '5.00K%');
+	assert.equal(formatPercent(450), '450%');
 });
 
 test('building cost stays finite however many buildings stand', () => {

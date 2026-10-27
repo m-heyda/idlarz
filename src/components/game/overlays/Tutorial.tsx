@@ -19,6 +19,7 @@ import {
 	CLICK_LIMIT,
 	FARM_BONUS,
 	MERCHANT_BUY_MULTIPLIER,
+	MERCHANT_GOODS,
 	MERCHANT_RESOURCE_PRICES,
 	SCALING_CONFIG,
 	TILE_PRICE,
@@ -26,7 +27,9 @@ import {
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
 } from '@/config/gameConfig';
-import { COMBAT, MONSTERS } from '@/config/combatConfig';
+import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
+import { SKILLS } from '@/catalog/skills';
+import { LIMITS } from '@/config/limits';
 import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatNumber, formatTime } from '@/utils/formatters';
@@ -51,8 +54,7 @@ const Res: React.FC<{ r: string; children?: React.ReactNode }> = ({ r, children 
 );
 
 const Tutorial: React.FC = () => {
-	// Grounds, the old building lot, is no longer part of a new map (buildings go on any tile)
-	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty' && b.name !== 'grounds');
+	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty');
 	const buildingBase = BUILDING_COST.base;
 	const buildingExamples = [0, 1, 2, 3, 4, 8, 16, 32].map((n) => ({ n, gold: Math.floor((buildingBase.gold ?? 0) * buildingCostFactor(n)) }));
 	const castleStart = castleModifier(1);
@@ -72,7 +74,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Game Basics</h3>
 				<p className='text-[#d8c8a0]'>
 					Grow your realm: buy tiles next to your territory, upgrade the castle, farm animals, trade with the
-					merchant and spend stat points. The journal button in the top bar opens the Menu: Character, Stats, Merchant and Farm are its tabs. Everything produces resources every second, even while you are
+					merchant and spend stat points. The journal button in the top bar opens the Menu: Equipment, Character, Merchant and Farm are its tabs. Everything produces resources every second, even while you are
 					away from the keyboard (the tab must stay open). Progress is saved automatically in this browser.
 				</p>
 			</section>
@@ -212,20 +214,23 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-2'>
 					Once you own {COMBAT.spawn.minOwnedTiles} tiles, a <b>rat</b> appears on one of them after{' '}
 					{formatTime(COMBAT.spawn.firstSec)}, then another every {formatTime(COMBAT.spawn.intervalSec)} (monsters
-					and chests together never fill more than {pct(SPAWN_LIMIT.maxFraction)} of your free land). A rat grows a tier every {formatTime(COMBAT.tierIntervalSec)} on the map (up to tier{' '}
-					{COMBAT.maxTier}): more HP ({MONSTERS.rat.hp} at tier 1, x{MONSTERS.rat.hpGrowth} per tier), harder hits and better rewards. A tier-{COMBAT.maxTier} rat
-					can grow into the <b>Rat King</b> ({pct(MONSTERS.ratKing.evolveChance)} every {formatTime(MONSTERS.ratKing.evolveCheckSec)}; only one at a time).
+					and chests together never fill more than {pct(SPAWN_LIMIT.maxFraction)} of your free land). Monsters have a <b>level</b>: a new rat appears at level {MONSTERS.rat.spawnWindow.base} to {MONSTERS.rat.spawnWindow.cap} (the higher, the further your castle has
+					grown) and gains a level every {formatTime(LIMITS.monsterGrowthIntervalSec)} on the map, up to {LIMITS.monsterGrowthLevels} levels above the one it appeared at: more HP, harder hits, some armor
+					and better rewards. Every {formatTime(COMBAT.spawn.bossIntervalSec)} a <b>boss</b> appears, one at a time: the <b>Rat King</b> (level {MONSTERS.ratKing.spawnWindow.base}-{MONSTERS.ratKing.spawnWindow.cap} at the start, with a skull on
+					his badge). Bosses can crit, can resist Stun and carry drops nobody else has.
 					Click a monster to fight it. Right-click it for <b>Dismiss</b>: after a confirmation the monster is removed from the map with
 					no reward, which frees a place when one is too strong for you and the map is full.
 				</p>
 				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
 					<li>
-						Every click in the fight hits for your gear&apos;s Damage. <b>There is no click-speed limit</b> in fights: fast clicking is a
+						Every click in the fight hits for your gear&apos;s Damage, plus {STAT_RULES.physicalDamagePerStrength}% per point of Strength above {STAT_RULES.base} with
+						physical weapons or {STAT_RULES.magicDamagePerIntelligence}% per point of Intelligence above {STAT_RULES.base} with a staff or wand. <b>There is no click-speed limit</b> in fights: fast clicking is a
 						skill (only real clicks count). A click can <b>crit</b> (x{COMBAT.crit.mult}) with your Crit chance - Dexterity and Charisma
 						plus gear - and a crit can become a <b>super crit</b> (x{COMBAT.crit.superMult}) with {COMBAT.crit.superBase}% plus the gear&apos;s Super Crit.
 					</li>
 					<li>
-						The monster hits back on a timer; Armor reduces every hit (armor / (armor + {COMBAT.armorK})). Your HP is about{' '}
+						The monster hits back on a timer; Armor reduces every hit (armor / (armor + {COMBAT.armorK}) up to {pct(COMBAT.armorSoftCap)}, then each point is worth half as much, so
+							no armor can take away more than {pct(COMBAT.armorSoftCap + (1 - COMBAT.armorSoftCap) * COMBAT.armorSoftSlope)}: the rest of your survival is HP, regen and dodge). Your HP is about{' '}
 						{COMBAT.baseHp + 16} at the start, regenerates {COMBAT.regenPerSec} HP/s outside fights (gear Regen adds to that and also heals in
 						fights) and at 0 you are knocked out with {pct(COMBAT.knockoutHpFraction)} HP back; nothing is lost. Fleeing resets the monster.
 					</li>
@@ -233,8 +238,14 @@ const Tutorial: React.FC = () => {
 						Potions (hotkeys 1-3 in a fight, a shared {COMBAT.potionCooldownSec}s cooldown) heal 35 or 90 HP and work outside fights too.
 					</li>
 					<li>
+						<b>Skills</b> cost mana (Intelligence and some gear raise it and how fast it refills). <b>{SKILLS.heal.name}</b> (level {SKILLS.heal.unlockLevel}, hotkey 4,{' '}
+						{SKILLS.heal.manaCost} mana, {SKILLS.heal.cooldownSec}s cooldown) restores {pct(SKILLS.heal.healFraction ?? 0)} of your max HP, more with Intelligence and Spell Power, and works
+						outside fights too. <b>{SKILLS.stun.name}</b> (level {SKILLS.stun.unlockLevel}, hotkey 5, {SKILLS.stun.manaCost} mana, {SKILLS.stun.cooldownSec}s cooldown) freezes the monster&apos;s attacks for{' '}
+						{SKILLS.stun.stunSec} seconds. They do no damage: they buy time for your clicks.
+					</li>
+					<li>
 						Winning pays gold and XP worth some seconds of your income, plus a chance of gear and potions. Rats drop wood, cloth and, from
-						older rats, steel and obsidian gear. The <b>Rat King</b> ({MONSTERS.ratKing.hp} HP, a {MONSTERS.ratKing.timeLimitSec}s time limit) is hard: he needs real
+						older rats, steel and obsidian gear. The <b>Rat King</b> (boss, armor, {MONSTERS.ratKing.critChance}% crits, resists Stun {MONSTERS.ratKing.stunResist}%, a {MONSTERS.ratKing.timeLimitSec}s time limit) is hard: he needs real
 						gear and quick clicking. He always drops a piece of the epic Rattatui set (the only place to get it), sometimes a second one or a legendary weapon, and potions.
 					</li>
 				</ul>
@@ -243,10 +254,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Gear &amp; Items</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					The Character window has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
+					The Equipment tab has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
 					and a 36-slot bag. Double-click a bag item to equip it (or drink a potion); right-click it for Equip / Drink, Sell one and{' '}
 					<b>Discard</b> (destroys it for good, after a confirmation, no gold). Click gear to take it off, drag to
-					rearrange. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
+					rearrange, or press <b>Organize</b> to merge stacks and sort the bag. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
 					hover for a tooltip.
 				</p>
 				<div className='flex flex-wrap gap-x-4 gap-y-1 mb-2 text-xs'>
@@ -263,7 +274,7 @@ const Tutorial: React.FC = () => {
 					</li>
 					<li>
 						Wood and leather (common) and Apprentice cloth (common, more HP, regen and luck) drop from rats and chests; Knight&apos;s steel
-						(uncommon) comes from older rats and chests, and the merchant sells some pieces; Obsidian (rare) needs tier-5 rats or a good
+						(uncommon) comes from older rats and chests, and the merchant&apos;s shelf may carry some; Obsidian (rare) needs tier-5 rats or a good
 						chest; the Rattatui set (epic) is the Rat King&apos;s; legendary weapons are very rare finds.
 					</li>
 					<li>
@@ -315,10 +326,11 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Merchant</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Sell resources, farm products and spare gear from your bag for gold; buying resources costs{' '}
-					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. Buy Goods has
-					click power, permanent bonuses (Haggler, Bulk Discount, Lucky Charm, Pack Rat), potions and some leather and steel gear.
-					Rattatui gear is not for sale: the Rat King drops it.
+					The <b>Resources</b> tab sells resources and farm products for gold; buying resources costs{' '}
+					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. <b>Goods</b> shows a shelf of
+					six pieces of gear that is reshuffled every {MERCHANT_GOODS.rotateSec / 60} minutes of play (or at once for gold with Refresh), potions,
+					and your bag to sell spare gear from. <b>Upgrades</b> has click power and the permanent bonuses (Haggler, Bulk Discount,
+					Lucky Charm, Pack Rat). The shelf never holds legendary gear and Rattatui gear is not for sale: the Rat King drops it.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-5 gap-2'>
 					{Object.entries(MERCHANT_RESOURCE_PRICES).map(([r, price]) => (
@@ -345,7 +357,7 @@ const Tutorial: React.FC = () => {
 			</section>
 
 			<section>
-				<h3 className='px-h'>Character Stats</h3>
+				<h3 className='px-h'>Character (attributes)</h3>
 				<p className='text-[#d8c8a0] mb-2'>You gain one stat point per level. Each point gives:</p>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
 					{(Object.keys(stat.resourceTargets) as (keyof typeof stat.resourceTargets)[]).map((s) => (

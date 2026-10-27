@@ -1,3 +1,5 @@
+import { formatNumber } from '@/utils/formatters';
+
 /**
  * Every stat an item or a set bonus can carry. One row per stat (label and how to print it); `sumStats` is the only
  * place stats are added together, so a new stat is one row here plus whatever reads it in combat.
@@ -27,6 +29,10 @@ export const STAT_DEFS = {
 	luck: { label: 'Luck', integer: true, levelShare: 0.5 }, // adds to the Luck of the character: better chest and kill gold and rarer chest finds
 	goldFind: { label: 'Gold Find', unit: '%', levelShare: 0.5 }, // % more gold from kills and chests
 	dodge: { label: 'Dodge', unit: '%', decimals: 1, levelShare: 0.3 }, // chance in % that a monster's hit misses (capped by COMBAT.maxDodge)
+	maxMana: { label: 'Max Mana', integer: true, levelShare: 0.7 }, // added to the character's mana pool (skills spend it)
+	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
+	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
+	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of click damage returned as HP (capped by STAT_RULES.lifeLeechCap)
 } as const satisfies Record<string, StatDef>;
 
 export type StatKey = keyof typeof STAT_DEFS;
@@ -47,6 +53,10 @@ export const STAT_BASE_BY_TIER: Record<StatKey, readonly [number, number, number
 	luck: [1, 2, 3, 4, 6],
 	goldFind: [2, 4, 6, 9, 12],
 	dodge: [1, 1.5, 2, 3, 4],
+	maxMana: [8, 12, 18, 26, 36],
+	manaRegen: [0.2, 0.3, 0.45, 0.65, 0.9],
+	spellPower: [4, 7, 10, 14, 18],
+	lifeLeech: [0.5, 1, 1.5, 2, 3],
 };
 
 /** The base value of a stat for a tier (1-5) at the item's authored level. */
@@ -70,6 +80,38 @@ export const MAX_ITEM_LEVEL = 100;
 export const POWER_PER_LEVEL = 0.07;
 
 export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL, Math.max(1, Math.round(level)));
+
+// ---- item value curve ---------------------------------------------------------------------------------------------
+// What gear is worth in gold. The economy grows far faster than gear power, so value follows its own curve: steep while the
+// early game's income climbs (levels up to the knee), flatter after it. The merchant pays `rarity base x curve x quality x
+// affixes` (`sellValueOf`) and sells at a multiple of that (`MERCHANT_GOODS.priceFactor`). One place to retune the whole market.
+
+export const ITEM_VALUE = {
+	/** Growth of the value per item level up to `kneeLevel`, and above it */
+	growthLow: 1.3,
+	growthHigh: 1.12,
+	kneeLevel: 10,
+	/** The quality roll (0-100, 50 = neutral) scales the value between these */
+	quality: { min: 0.75, max: 1.25 },
+	/** Every affix adds `base` plus up to `perRoll` (by how well it rolled) to the value multiplier */
+	affix: { base: 0.15, perRoll: 0.35 },
+} as const;
+
+/** Value multiplier of an item level (1 at level 1). */
+export const valueCurve = (itemLevel: number): number => {
+	const level = clampItemLevel(itemLevel);
+	const low = Math.min(level, ITEM_VALUE.kneeLevel) - 1;
+	const high = Math.max(0, level - ITEM_VALUE.kneeLevel);
+	return Math.pow(ITEM_VALUE.growthLow, low) * Math.pow(ITEM_VALUE.growthHigh, high);
+};
+
+/** Value multiplier of a quality roll (0-100). */
+export const qualityValue = (quality: number): number =>
+	ITEM_VALUE.quality.min + (ITEM_VALUE.quality.max - ITEM_VALUE.quality.min) * (Math.min(100, Math.max(0, quality)) / 100);
+
+/** Value multiplier of the affixes of an item: 1 with none, more for every one, more still for good rolls. */
+export const affixesValue = (rolls: readonly number[]): number =>
+	1 + rolls.reduce((sum, roll) => sum + ITEM_VALUE.affix.base + ITEM_VALUE.affix.perRoll * (Math.min(100, Math.max(0, roll)) / 100), 0);
 
 /** Power multiplier of an item level (1 at level 1). */
 export const levelScale = (itemLevel: number): number => 1 + POWER_PER_LEVEL * (clampItemLevel(itemLevel) - 1);
@@ -120,17 +162,20 @@ export const sumStats = (...blocks: (ItemStats | undefined)[]): StatTotals => {
 
 export const statLabel = (key: string): string => (STAT_DEFS as Record<string, StatDef>)[key]?.label ?? key;
 
+/** A stat value for a tooltip: plain up to 9,999, then 12.34K / M / B / T like every other number in the game */
+const statText = (value: number, decimals?: number): string => (Math.abs(value) >= 10_000 ? formatNumber(value) : decimals ? value.toFixed(decimals) : String(value));
+
 /** '+8% Crit Chance' */
 export const formatStat = (key: string, value: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
-	const num = def?.decimals ? value.toFixed(def.decimals) : String(value);
+	const num = statText(value, def?.decimals);
 	return `+${num}${def?.unit ?? ''} ${def?.label ?? key}`;
 };
 
 /** '+2 Armor', '-1 Damage', '+0.5/s HP Regen': a signed change, for comparing two items */
 export const formatStatDelta = (key: string, delta: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
-	const num = def?.decimals ? Math.abs(delta).toFixed(def.decimals) : String(Math.abs(delta));
+	const num = statText(Math.abs(delta), def?.decimals);
 	return `${delta < 0 ? '-' : '+'}${num}${def?.unit ?? ''} ${def?.label ?? key}`;
 };
 
@@ -143,7 +188,7 @@ export const formatStats = (stats: ItemStats): string =>
 
 const statNumber = (key: string, value: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
-	return `${def?.decimals ? value.toFixed(def.decimals) : String(value)}${def?.unit ?? ''}`;
+	return `${statText(value, def?.decimals)}${def?.unit ?? ''}`;
 };
 
 /** '8%', '1.5/s': the value alone, for a stat table whose row already names the stat */

@@ -143,32 +143,39 @@ def shore_sheet(kind):
 
 
 def parity_layout():
-    """A canned map covering every ground (incl. farmland, yard, castle) plus unexplored tiles."""
+    """A canned map covering every ground (incl. yard, castle) plus unexplored tiles. A lowercase letter is a building on that biome's tile."""
     rows = [
         '.............................',
         '.TTTTTTT..HHHHHHHHH..........',
-        '.TTTTYTTHHHHHHHHHHHH.........',
+        '.TTTTtTTHHHHHHHHHHHH.........',
         '.TTTTTTPPHHHHHHHHHPP..SSS....',
-        '.TTTPPPPPPHHHHHHPPPPPSYSSS...',
-        '..PPPPPPPFFYFFFPPPPPPSSSSS...',
-        '..PPPPGGPFFFFFFFPPPPPSSSS....',
-        '.BBPPPGYPFFFFFFFPPPPPSSS.....',
+        '.TTTPPPPPPHHHHHHPPPPPSsSSS...',
+        '..PPPPPPPFFfFFFPPPPPPSSSSS...',
+        '..PPPPPPPFFFFFFFPPPPPSSSS....',
+        '.BBPPPPpPFFFFFFFPPPPPSSS.....',
         '.BBBPPPPPPFFFWFPPPPPPPP......',
         '.BLLBPPPPPPCPPPPPPPPBBB......',
-        '.LLLLBPPPPPPPPPPPBBYBLL......',
+        '.LLLLBPPPPPPPPPPPBBbBLL......',
         '.LLLLLLBBBBBBBBBBBLLLLL......',
         '.LLLLLLLLLLLLLLLLLLLLLL......',
         '..LLLLLLLLLLLLLLLLLLLL.......',
         '.............................',
     ]
-    names = {'T': 'tundra', 'H': 'hills', 'P': 'plains', 'S': 'swamp', 'F': 'forest', 'G': 'grounds', 'Y': 'building',
-             'W': 'yard', 'B': 'coast', 'L': 'lake', 'C': 'castle'}
+    names = {'T': 'tundra', 'H': 'hills', 'P': 'plains', 'S': 'swamp', 'F': 'forest', 'W': 'yard', 'B': 'coast', 'L': 'lake', 'C': 'castle',
+             't': 'tundra', 's': 'swamp', 'f': 'forest', 'p': 'plains', 'b': 'coast'}
     return rows, names
+
+
+def layout_owned(rows, names):
+    """(ground name per tile, coordinates of building tiles) from layout rows; lowercase letters are buildings."""
+    owned = [[names.get(c) for c in row] for row in rows]
+    built = {(x, y) for y, row in enumerate(rows) for x, c in enumerate(row) if c.islower() and c != '.'}
+    return owned, built
 
 
 def build_parity(m):
     rows, names = parity_layout()
-    owned = [[names.get(c) for c in row] for row in rows]
+    owned, built = layout_owned(rows, names)
     g = logic.ground_grid(owned)
     return {
         'layout': rows,
@@ -177,8 +184,8 @@ def build_parity(m):
         'depth': [[logic.depth(g, x, y) for x in range(len(g[0]))] for y in range(len(g))],
         'cells': [[cx, cy, [list(layer) for layer in logic.cell_layers(g, cx, cy)]]
                   for cy in range(len(g) + 1) for cx in range(len(g[0]) + 1)],
-        'sprites': [list(s) for s in logic.all_sprites(m, g, logic.built_set(owned))],
-        'pads': [list(p) for p in logic.all_pads(owned)],
+        'sprites': [list(s) for s in logic.all_sprites(m, g, built)],
+        'pads': [list(p) for p in logic.all_pads(owned, built)],
     }
 
 

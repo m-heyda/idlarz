@@ -8,6 +8,7 @@ import {
 import { RESOURCES, type MerchantResourceKey, type ResourceKey } from '@/catalog/resources';
 import { shopItems } from '@/catalog/loot';
 import { BIOME_COLORS } from '@/config/biomePalette';
+import { HARD_LIMITS, LIMITS } from '@/config/limits';
 
 // Default player name
 export const DEFAULT_PLAYER_NAME = 'Explorer';
@@ -29,8 +30,7 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
 	hp: 0,
 	mp: 0,
 	def: 0,
-	magicDef: 0,
-	luck: 0,
+luck: 0,
 	critChance: 0,
 	critDmgMultiplier: 0,
 	atkSpeedIncrease: 0,
@@ -125,11 +125,12 @@ export const BIOME_SPAWN = {
 };
 
 // Extra resources a tile purchase costs once enough tiles are owned. amount = gold cost x share
-export const TILE_RESOURCE_COST: { from: number; resource: 'wood' | 'stone' | 'coal' | 'food'; share: number }[] = [
-	{ from: 15, resource: 'wood', share: 0.1 },
-	{ from: 15, resource: 'stone', share: 0.1 },
-	{ from: 30, resource: 'coal', share: 0.08 },
-	{ from: 40, resource: 'food', share: 0.08 },
+export const TILE_RESOURCE_COST: { from: number; resource: 'wood' | 'stone' | 'coal' | 'food' | 'hide'; share: number }[] = [
+	{ from: 15, resource: 'wood', share: 0.3 },
+	{ from: 15, resource: 'stone', share: 0.25 },
+	{ from: 30, resource: 'coal', share: 0.2 },
+	{ from: 40, resource: 'food', share: 0.1 },
+	{ from: 120, resource: 'hide', share: 0.03 }, // milk and eggs are kept for other uses, so the big territories ask for leather
 ];
 
 // Biome/building output is multiplied by this (the castle's own output and the base rates are not)
@@ -202,21 +203,7 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		resourceIcons: [RESOURCE_ICONS.gold, RESOURCE_ICONS.xp],
 		description: 'Your castle generates resources over time',
 	},
-	grounds: {
-		name: 'grounds',
-		label: 'Grounds',
-		baseColor: BIOME_COLORS.grounds,
-		unique: false,
-		upgradeable: true,
-		resourceGeneration: {
-			xp: 0.15,
-			gold: 0.05,
-			wood: 0.05,
-		},
-		resourceIcons: [RESOURCE_ICONS.xp],
-		description: 'Allow you to build structures',
-	},
-	forest: {
+forest: {
 		name: 'forest',
 		label: 'Forest',
 		baseColor: BIOME_COLORS.forest,
@@ -421,9 +408,26 @@ export const MERCHANT_UPGRADES = {
 
 export type MerchantUpgradeId = keyof typeof MERCHANT_UPGRADES;
 
-// Plain gear and potions the merchant sells (gold). Every price is at least 3x the item's sell value (x1.3 for a maxed Haggler),
-// so buying and selling can never print gold: tests/economy.test.ts checks it for every entry.
-export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems(); // each item's own `shop` price in the catalog
+// Supplies (potions) the merchant always sells, each at its own `shop` price in the catalog. Every price is at least 3x the item's
+// sell value (x1.3 for a maxed Haggler), so buying and selling can never print gold: tests/merchantShop.test.ts checks every entry.
+export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems();
+
+// The merchant's shuffling goods (Goods tab): pieces of gear rolled by the loot pipeline (source `merchant`, see lootConfig).
+export const MERCHANT_GOODS = {
+	offers: LIMITS.merchantOffers, // pieces on the shelf (base value: read it through limitOf('merchantOffers', ctx))
+	rotateSec: LIMITS.merchantRotateSec, // the shelf is reshuffled after this much play time (limitOf('merchantRotateSec', ctx))
+	maxOffers: HARD_LIMITS.merchantOffers, // what a save may hold
+	priceFactor: 5, // gold per gold of sell value: above the 3.9x a max Haggler could resell at, so buying and selling never gains
+	// A paid refresh costs `refreshBase` x (refreshes bought so far + 1) for the first `stepRefreshes` of them (5k, 10k ... 50k), then
+	// every further one costs `bigStep` more than the one before (100k, 150k ...). Counted per run (a rebirth starts it again).
+	refreshBase: LIMITS.merchantRefreshBase, // limitOf('merchantRefreshBase', ctx)
+	refresh: { stepRefreshes: 10, bigStep: 50_000 },
+	// What the shelf may hold: never above uncommon (the rarer pieces stay a reward for fights and chests), and never more than
+	// `maxAboveAverage` item levels above the average level of the gear the player wears. The shelf is built around the world (castle)
+	// level, held down to `centreAboveAverage` above that average.
+	maxAboveAverage: 5,
+	centreAboveAverage: 3,
+} as const;
 
 // Farm products: shown on the farm and at the merchant, not in the header row
 export const FARM_PRODUCT_KEYS = ['eggs', 'milk', 'hide'] as const;
@@ -443,7 +447,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 1000, // the first chicken is within reach after about half an hour (a few dozen tiles)
 		costScaling: 1.3, // each purchase costs this much more than the previous one
 		baseProduction: 0.2, // meat per second per animal; each purchase adds one more animal
-		product: { resource: 'eggs', perSec: 0.02 },
+		product: { resource: 'eggs', perSec: 0.03 },
 	},
 	{
 		id: 'deer',
@@ -452,7 +456,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 10000,
 		costScaling: 1.33,
 		baseProduction: 0.5,
-		product: { resource: 'hide', perSec: 0.025 },
+		product: { resource: 'hide', perSec: 0.0375 },
 	},
 	{
 		id: 'pig',
@@ -461,7 +465,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 60000,
 		costScaling: 1.36,
 		baseProduction: 1,
-		product: { resource: 'hide', perSec: 0.05 },
+		product: { resource: 'hide', perSec: 0.075 },
 	},
 	{
 		id: 'cow',
@@ -470,12 +474,15 @@ export const ANIMALS: Animal[] = [
 		baseCost: 400000,
 		costScaling: 1.4,
 		baseProduction: 2,
-		product: { resource: 'milk', perSec: 0.15 },
+		product: { resource: 'milk', perSec: 0.225 },
 	},
 ];
 
 // The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
-// once sold). Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
+// once sold). Products were 50 % slower (and their upgrade bonuses 33 % smaller) until the second-tier resources felt too
+// slow to earn; the merchant prices were lowered by the same factor, so a product still sells for the same share of its
+// animal's meat and gold income is unchanged: the products themselves, and what they unlock, come faster.
+// Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
 // Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
 // then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
 export const FARM = {
@@ -497,25 +504,25 @@ export const FARM_UPGRADES = {
 	},
 	coop: {
 		label: 'Hen House',
-		description: (n: number) => `+${Math.round(n * 10)}% eggs`,
+		description: (n: number) => `+${Math.round(n * 15)}% eggs`,
 		maxLevel: 10,
-		effectPerLevel: 0.1, // eggs
+		effectPerLevel: 0.15, // eggs
 		cost: { wood: 1500, eggs: 40 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
 	dairy: {
 		label: 'Dairy',
-		description: (n: number) => `+${Math.round(n * 10)}% milk`,
+		description: (n: number) => `+${Math.round(n * 15)}% milk`,
 		maxLevel: 10,
-		effectPerLevel: 0.1, // milk
+		effectPerLevel: 0.15, // milk
 		cost: { stone: 1500, milk: 30 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
 	tannery: {
 		label: 'Tannery',
-		description: (n: number) => `+${Math.round(n * 10)}% hide`,
+		description: (n: number) => `+${Math.round(n * 15)}% hide`,
 		maxLevel: 10,
-		effectPerLevel: 0.1, // hide
+		effectPerLevel: 0.15, // hide
 		cost: { coal: 1200, hide: 20 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
@@ -827,8 +834,7 @@ export const AMBIENT_LIFE = {
 		tundra: ['rabbit'],
 		lake: ['fish', 'fish', 'butterfly'],
 		coast: ['butterfly', 'bee', 'crab', 'crab'],
-		grounds: ['rabbit', 'ladybug'],
-	} as Record<string, readonly AmbientCritterType[]>,
+} as Record<string, readonly AmbientCritterType[]>,
 	// how far a critter strays, as a share of roamTiles (swimmers and crawlers stay close to where they appear)
 	roamScale: { fish: 0.35, frog: 0.45, crab: 0.5, goat: 0.8, wolf: 1 } as Record<string, number>,
 };

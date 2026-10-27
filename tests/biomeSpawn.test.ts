@@ -11,7 +11,7 @@ import { growWorld, loneTileStats, saddleCount } from '../src/utils/growWorld';
 const tile = (biome: BiomeType, isOwned = true): Tile => ({ biome, isOwned });
 const empty = (): Tile[][] => Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => tile('empty', false)));
 /** A 5x5 map with the given owned tiles around the centre (2,2): rows of letters, '.' = not owned. */
-const L: Record<string, BiomeType> = { P: 'plains', F: 'forest', H: 'hills', S: 'swamp', T: 'tundra', B: 'coast', L: 'lake', G: 'grounds', C: 'castle' };
+const L: Record<string, BiomeType> = { P: 'plains', F: 'forest', H: 'hills', S: 'swamp', T: 'tundra',B: 'coast', L: 'lake', C: 'castle' };
 const map = (rows: string[]): Tile[][] => rows.map((r) => [...r].map((c) => (c === '.' ? tile('empty', false) : tile(L[c]))));
 
 /** Deterministic sweep of the random range. */
@@ -87,8 +87,10 @@ test('clustering: a forest neighbour makes forest much likelier, and more neighb
 	assert.ok(three.forest / 1000 <= BIOME_RULES.cluster.capPct / 100 + 0.2);
 });
 
-test('grounds, the old building lot, is never rolled any more (buildings go on any explored tile)', () => {
-	const g = map(['.....', '..G..', '.G.G.', '..G..', '.....']);
+test('grounds, the old building lot, is gone: not a biome, never rolled (buildings go on any explored tile)', () => {
+	assert.equal('grounds' in BIOMES, false);
+	assert.equal(SELECTABLE_BIOMES.includes('grounds' as BiomeType), false);
+	const g = map(['.....', '..P..', '.P.P.', '..P..', '.....']);
 	assert.equal(spread(g, 20).grounds ?? 0, 0);
 	assert.equal(spread(empty(), 20).grounds ?? 0, 0);
 });

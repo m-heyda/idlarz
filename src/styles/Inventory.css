@@ -160,3 +160,187 @@
 	display: flex;
 	gap: 8px;
 }
+
+.inv-ability {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	background: #1c120a;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c, inset 0 0 0 2px #2a1a0c;
+	color: #f0e6d0;
+	cursor: pointer;
+}
+
+.inv-ability:disabled {
+	cursor: default;
+}
+
+.inv-ability[data-locked='true'] {
+	color: #8a7a62;
+	background: #120a06;
+}
+
+.inv-ability-name {
+	font-weight: 700;
+	font-size: 0.85rem;
+}
+
+/* --- the Equipment tab: compact level bar, item level, the slots in groups --- */
+.eq-panel {
+	width: 440px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.eq-level {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.eq-level-orb {
+	flex: none;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	filter: drop-shadow(0 0 5px rgba(150, 90, 255, 0.8));
+}
+
+/* the stony XP bar of the hero scene, laid out in a row instead of pinned to the floor of the alcove */
+.hero-xp.eq-xp {
+	position: relative;
+	left: auto;
+	right: auto;
+	bottom: auto;
+}
+
+.eq-level-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+/* HP and MP: two flat bars side by side, each half of the full width, directly under the XP bar */
+.eq-vitals {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+.eq-vital {
+	position: relative;
+	height: 22px;
+	background: #0a0706;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c;
+	overflow: hidden;
+}
+
+.eq-vital-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	transition: width 0.3s ease-out;
+}
+
+.eq-vital[data-kind='hp'] .eq-vital-fill {
+	background: linear-gradient(#e0504a, #a02420);
+}
+
+.eq-vital[data-kind='mp'] .eq-vital-fill {
+	background: linear-gradient(#5aa0ff, #2a5cc0);
+}
+
+.eq-vital-text {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: #fff;
+	text-shadow: 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000;
+}
+
+/* the item level: a small pill, label and number on one baseline */
+.eq-ilvl {
+	align-self: center;
+	display: inline-flex;
+	align-items: baseline;
+	gap: 8px;
+	padding: 3px 14px;
+	background: #1c120a;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c, inset 0 0 0 2px #2a1a0c;
+	cursor: help;
+}
+
+.eq-ilvl-label {
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	color: #a89878;
+}
+
+.eq-ilvl-value {
+	font-size: 1.15rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #f0d27a;
+	text-shadow: 0 2px 0 #1a0e04;
+}
+
+.eq-skills {
+	display: flex;
+	gap: 8px;
+}
+
+.eq-groups {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px 18px;
+	justify-items: center;
+}
+
+.eq-group {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+}
+
+.eq-group-title {
+	font-size: 0.7rem;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	color: #a89878;
+}
+
+.eq-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 48px);
+	gap: 6px;
+}
+
+.eq-grid-hands {
+	grid-template-columns: repeat(2, 48px);
+	gap: 14px;
+}
+
+.eq-readouts {
+	padding-top: 4px;
+}
+
+.inv-ability-sub {
+	font-size: 0.7rem;
+	color: #8ac0ff;
+}

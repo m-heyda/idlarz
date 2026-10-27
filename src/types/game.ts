@@ -3,6 +3,7 @@ import type { PlayerClassId } from '@/config/playerClasses';
 import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config/gameConfig';
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
+import type { SkillId } from '@/catalog/skills';
 import type { CritKind } from '@/lib/combat';
 import type { World } from '@/utils/world';
 
@@ -30,17 +31,16 @@ export interface CharacterStats {
 	vitality: number;
 	charisma: number;
 	availablePoints: number;
-	// Combat stats
-	physicalAtk: number;
-	magicAtk: number;
+	// Derived stats (never saved: rebuilt by calculateCombatStats from the five attributes)
+	physicalAtk: number; // % more damage with physical weapons (0 at the start: bonuses count points above 5)
+	magicAtk: number; // % more damage with magic weapons
 	hp: number;
-	mp: number;
-	def: number;
-	magicDef: number;
+	mp: number; // mana before gear
+	def: number; // armor the attributes add to the gear's
 	luck: number;
 	critChance: number;
-	critDmgMultiplier: number;
-	atkSpeedIncrease: number;
+	critDmgMultiplier: number; // % for lucky tile taps (fights use statBonuses.critDamagePercent)
+	atkSpeedIncrease: number; // % attack speed
 	xpGainMultiplier: number;
 	tileCostDiscount: number;
 	reputation: number;
@@ -177,7 +177,10 @@ export type MonsterType = 'rat' | 'ratKing';
 export interface Monster {
 	id: number;
 	type: MonsterType;
-	tier: number;
+	/** Its level now: `spawnLevel` plus the growth its age has earned (capped by the growth limit) */
+	level: number;
+	/** The level it appeared at */
+	spawnLevel: number;
 	x: number;
 	y: number;
 	ageSec: number;
@@ -198,14 +201,15 @@ export type FightPhase = 'active' | 'won' | 'knockedOut' | 'timeout';
 export interface FightState {
 	monsterId: number;
 	type: MonsterType;
-	tier: number;
-	/** The castle level the fight started at: the monster's HP and attack were scaled for it and stay so for the whole fight */
-	castleLevel: number;
+	/** The monster's level when the fight started: its HP, attack and armor stay what that level gave for the whole fight */
+	level: number;
 	monsterHp: number;
 	monsterMaxHp: number;
 	attackTimer: number;
 	timeLeftSec: number | null;
 	potionCd: number;
+	/** Seconds the monster stays stunned: its attack timer does not run (the King's time limit does) */
+	stunLeftSec: number;
 	phase: FightPhase;
 	summary: KillSummary | null;
 	taunt: string | null;
@@ -223,11 +227,17 @@ export interface TileProps {
 }
 
 export type MerchantTab =
-	| 'exchange'
-	| 'buy'
-	| 'upgrade'
+	| 'resources'
+	| 'goods'
+	| 'upgrades'
 	| 'quests'
 	| 'gambling';
+
+/** The merchant's shuffling shelf: gear offers rolled at `at` (play seconds); the price is derived from the item, never saved */
+export interface MerchantStock {
+	at: number;
+	offers: ItemInstance[];
+}
 
 export interface MerchantTabInfo {
 	id: MerchantTab;
@@ -310,13 +320,21 @@ export interface GameState {
 	equipment: Equipment;
 	bag: BagSlot[];
 	playerHp: number;
+	/** Mana: spent by skills, refills over time (persisted; clamped to the max on load) */
+	playerMp: number;
+	/** Seconds left on each skill's cooldown (transient: a cooldown never outlives the tab) */
+	skillCd: Partial<Record<SkillId, number>>;
 	monsters: Monster[];
 	monsterSpawnTimer: number;
+	/** Seconds towards the next boss (counts only while no boss is on the map and there is room) */
+	bossSpawnTimer: number;
 	nextMonsterId: number;
 	fight: FightState | null; // transient: never saved
 	farmLevels: Record<string, number>; // animals owned per kind
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
+	merchantStock: MerchantStock | null; // the goods on offer (null until the first shelf is rolled)
+	merchantRefreshes: number; // paid shelf refreshes bought this run: each one costs more (see MERCHANT_GOODS.refresh)
 	isHydrated: boolean;
 	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
 	prestige: PrestigeState;
@@ -351,6 +369,8 @@ export interface GameState {
 	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
 	sellJunk: (maxRarity: string) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
+	buyOffer: (index: number) => boolean;
+	refreshMerchantStock: () => boolean;
 	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
@@ -366,9 +386,11 @@ export interface GameState {
 	leaveFight: () => void;
 	dismissMonster: (id: number) => boolean; // removes a monster from the map, no loot; false for the one being fought
 	drinkPotion: (bagIndex: number) => boolean;
+	castSkill: (id: SkillId) => boolean;
 	equipItem: (bagIndex: number) => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;
+	organizeBag: () => boolean;
 	// Tap an owned tile: grants a slice of its output. Returns null while on cooldown / nothing to give.
 	tapTile: (x: number, y: number, input?: ClickInput) => TapResult | null;
 }

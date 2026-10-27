@@ -1,21 +1,24 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { formatCompact } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { COMBAT, MONSTERS } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
-import { maxHp } from '@/lib/combat';
+import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
+import { maxHp, maxMana } from '@/lib/combat';
+import { monsterStats } from '@/lib/monsters';
 import { COMBAT_EVENT, type CombatFx } from '@/lib/combatFx';
+import { healAmount } from '@/lib/skills';
 import audioManager from '@/utils/audioManager';
 import PixelModal from '../PixelModal';
 import MonsterArt from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
 import { slotProps } from '../itemUi';
-import ResourceIcon from '../ResourceIcon';
 import '@/styles/Fight.css';
 
 interface FloatNumber {
 	id: number;
 	text: string;
-	kind: 'dmg' | 'crit' | 'super' | 'hurt' | 'heal';
+	kind: 'dmg' | 'crit' | 'super' | 'hurt' | 'heal' | 'stun' | 'resist';
 	x: number;
 }
 
@@ -24,7 +27,7 @@ interface Burst {
 	bits: { dx: number; dy: number; s: number }[];
 }
 
-const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player'; label: string }> = ({
+const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | 'mana'; label: string }> = ({
 	value,
 	max,
 	kind,
@@ -36,7 +39,7 @@ const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player'; la
 			<div className='fight-bar-trail' style={{ width: `${pct}%` }} />
 			<div className='fight-bar-fill' style={{ width: `${pct}%` }} />
 			<div className='fight-bar-text'>
-				{label} {Math.ceil(value)} / {Math.round(max)}
+				{label} {formatCompact(Math.ceil(value))} / {formatCompact(Math.round(max))}
 			</div>
 		</div>
 	);
@@ -50,6 +53,10 @@ const FightView: React.FC = () => {
 	const bag = useGameStore((state) => state.bag);
 	const hitMonster = useGameStore((state) => state.hitMonster);
 	const drinkPotion = useGameStore((state) => state.drinkPotion);
+	const castSkill = useGameStore((state) => state.castSkill);
+	const playerMp = useGameStore((state) => state.playerMp);
+	const skillCd = useGameStore((state) => state.skillCd);
+	const playerLevel = useGameStore((state) => state.level.level);
 	const leaveFight = useGameStore((state) => state.leaveFight);
 
 	const [numbers, setNumbers] = useState<FloatNumber[]>([]);
@@ -61,6 +68,7 @@ const FightView: React.FC = () => {
 
 	const active = fight.phase === 'active';
 	const hpMax = maxHp(characterStats, equipment);
+	const mpMax = maxMana(characterStats, equipment);
 
 	const pushNumber = useCallback((text: string, kind: FloatNumber['kind']) => {
 		const id = nextId.current++;
@@ -82,17 +90,23 @@ const FightView: React.FC = () => {
 				setBursts((prev) => [...prev.slice(-4), { id, bits }]);
 				setTimeout(() => setBursts((prev) => prev.filter((b) => b.id !== id)), 650);
 				setHitTick((t) => t + 1);
-				pushNumber(fx.crit === 'none' ? `-${fx.damage}` : `-${fx.damage}!`, fx.crit === 'none' ? 'dmg' : fx.crit);
+				pushNumber(fx.crit === 'none' ? `-${formatCompact(fx.damage)}` : `-${formatCompact(fx.damage)}!`, fx.crit === 'none' ? 'dmg' : fx.crit);
 				audioManager.playSound('click');
 			} else if (fx.kind === 'hurt') {
 				setShake(true);
 				clearTimeout(shakeTimer.current);
 				shakeTimer.current = setTimeout(() => setShake(false), 320);
-				pushNumber(`-${fx.amount}`, 'hurt');
+				pushNumber(fx.crit ? `-${formatCompact(fx.amount)}!` : `-${formatCompact(fx.amount)}`, 'hurt');
 				audioManager.playSound('wrong');
 			} else if (fx.kind === 'heal') {
-				pushNumber(`+${fx.amount}`, 'heal');
+				pushNumber(`+${formatCompact(fx.amount)}`, 'heal');
 				audioManager.playSound('purchase');
+			} else if (fx.kind === 'resist') {
+				pushNumber('Resisted!', 'resist');
+				audioManager.playSound('wrong');
+			} else if (fx.kind === 'stun') {
+				pushNumber('Stunned!', 'stun');
+				audioManager.playSound('wrong');
 			}
 		};
 		window.addEventListener(COMBAT_EVENT, onFx);
@@ -102,25 +116,23 @@ const FightView: React.FC = () => {
 		};
 	}, [pushNumber]);
 
-	useEffect(() => {
-		if (fight.phase === 'won') audioManager.playSound('fanfare');
-	}, [fight.phase]);
-
 	// Up to three potion stacks from the bag, with hotkeys 1-3
 	const potions = bag
 		.map((slot, index) => ({ slot, index }))
 		.filter(({ slot }) => slot && 'id' in slot && ITEM_CATALOG[slot.id]?.consumable)
 		.slice(0, 3);
 
+	// Hotkeys: 1-3 drink the potions, 4 and 5 cast the skills
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
 			const n = Number(e.key);
-			if (!active || !(n >= 1 && n <= 3) || !potions[n - 1]) return;
-			drinkPotion(potions[n - 1].index);
+			if (!active || !Number.isInteger(n)) return;
+			if (n >= 1 && n <= 3 && potions[n - 1]) drinkPotion(potions[n - 1].index);
+			else if (n >= 4 && n < 4 + SKILL_IDS.length) castSkill(SKILL_IDS[n - 4]);
 		};
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
-	}, [active, potions, drinkPotion]);
+	}, [active, potions, drinkPotion, castSkill]);
 
 	const hit = (e: React.MouseEvent) => {
 		if (!active) return;
@@ -132,7 +144,9 @@ const FightView: React.FC = () => {
 	};
 
 	const def = MONSTERS[fight.type];
-	const title = fight.type === 'rat' ? `${def.label} - Tier ${fight.tier}` : def.label;
+	const boss = def.grade === 'boss';
+	const traits = monsterStats(fight.type, fight.level);
+	const title = `${boss ? '☠ ' : ''}${def.label} - Lv ${fight.level}`;
 
 	return (
 		<PixelModal
@@ -142,6 +156,18 @@ const FightView: React.FC = () => {
 			onClose={leaveFight}>
 			<div className='fight-body' data-shake={shake}>
 				<div className='fight-hurt-flash' data-on={shake} aria-hidden />
+
+				{boss && (
+					<div className='fight-boss' title='A boss: its own drops, crits and sometimes resists Stun'>
+						<span className='fight-boss-skull' aria-hidden>
+							{'☠'}
+						</span>
+						<b>BOSS</b>
+						<span className='fight-boss-traits'>
+							Crits {formatCompact(traits.critChance)}% - resists Stun {formatCompact(traits.stunResist)}% - armor {formatCompact(Math.round(traits.armor))}
+						</span>
+					</div>
+				)}
 
 				{fight.timeLeftSec !== null && active && (
 					<div className='fight-timer' data-low={fight.timeLeftSec <= 10}>
@@ -178,6 +204,7 @@ const FightView: React.FC = () => {
 							</span>
 						))}
 					</button>
+					{active && fight.stunLeftSec > 0 && <div className='fight-stunned'>Stunned {fight.stunLeftSec.toFixed(1)} s</div>}
 					{numbers.map((n) => (
 						<span key={n.id} className='fight-number' data-kind={n.kind} style={{ left: `${n.x}%` }}>
 							{n.text}
@@ -185,36 +212,6 @@ const FightView: React.FC = () => {
 					))}
 					{!active && (
 						<div className='fight-result px-card'>
-							{fight.phase === 'won' && fight.summary && (
-								<>
-									<div className='px-h text-center'>Victory!</div>
-									<div className='flex justify-center gap-4 text-sm'>
-										<span className='flex items-center gap-1'>
-											+{Math.floor(fight.summary.gold)} <ResourceIcon resource='gold' />
-										</span>
-										<span className='flex items-center gap-1'>
-											+{Math.floor(fight.summary.xp)} <ResourceIcon resource='xp' />
-										</span>
-									</div>
-									{fight.summary.items.length > 0 && (
-										<div className='flex justify-center gap-2 mt-2'>
-											{fight.summary.items.map((drop, i) =>
-												drop.kind === 'gear' ? <ItemSlot key={i} item={drop.item} /> : <ItemSlot key={i} itemId={drop.id} qty={drop.qty} />
-											)}
-										</div>
-									)}
-									{fight.summary.autoSold.count > 0 && (
-										<div className='px-tip-muted text-xs text-center mt-2'>
-											Auto-sold {fight.summary.autoSold.count} piece{fight.summary.autoSold.count === 1 ? '' : 's'} of gear for {fight.summary.autoSold.gold} gold
-										</div>
-									)}
-									{fight.summary.convertedGold > 0 && (
-										<div className='px-tip-muted text-xs text-center mt-2'>
-											Bag full - {fight.summary.convertedGold} gold paid for the drops that did not fit
-										</div>
-									)}
-								</>
-							)}
 							{fight.phase === 'knockedOut' && (
 								<div className='text-center'>
 									<div className='px-h'>Knocked out</div>
@@ -238,6 +235,36 @@ const FightView: React.FC = () => {
 				</div>
 
 				<Bar value={playerHp} max={hpMax} kind='player' label='You' />
+				<Bar value={playerMp} max={mpMax} kind='mana' label='Mana' />
+
+				<div className='fight-skills'>
+					{SKILL_IDS.map((id, i) => {
+						const skill = SKILLS[id];
+						const locked = playerLevel < skill.unlockLevel;
+						const cd = skillCd[id] ?? 0;
+						const lacksMana = playerMp < skill.manaCost;
+						const detail = locked
+							? `Unlocks at level ${skill.unlockLevel}`
+							: `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown${id === 'heal' ? `, heals about ${healAmount(characterStats, equipment, skill)} HP` : ''}`;
+						return (
+							<button
+								key={id}
+								className='fight-skill'
+								data-locked={locked}
+								data-nomana={!locked && lacksMana}
+								disabled={!active || locked}
+								onClick={() => castSkill(id)}
+								title={`${skill.name}: ${skillDescription(skill)} (${detail})`}>
+								<span className='fight-skill-name'>{skill.name}</span>
+								<span className='fight-skill-cost'>{locked ? `Lv ${skill.unlockLevel}` : `${skill.manaCost} MP`}</span>
+								<span className='fight-hotkey'>{4 + i}</span>
+								{!locked && cd > 0 && (
+									<span className='fight-cooldown' style={{ height: `${Math.min(100, (cd / skill.cooldownSec) * 100)}%` }} />
+								)}
+							</button>
+						);
+					})}
+				</div>
 
 				<div className='fight-actions'>
 					<div className='fight-potions'>
@@ -270,7 +297,8 @@ const FightView: React.FC = () => {
 };
 
 const FightModal: React.FC = () => {
-	const open = useGameStore((state) => state.fight !== null);
+	// a won fight is handed to the victory notice (VictoryToast), which closes it: no window to confirm after the last click
+	const open = useGameStore((state) => state.fight !== null && state.fight.phase !== 'won');
 	return open ? <FightView /> : null;
 };
 

@@ -19,7 +19,7 @@ const SW = 4;
 const SE = 8;
 
 /** Low to high: the higher ground draws its rim over the lower one. */
-export const RANK = ['mist', 'coast', 'plains', 'swamp', 'tundra', 'grounds', 'forest', 'hills', 'lake', 'yard', 'castle'] as const;
+export const RANK = ['mist', 'coast', 'plains', 'swamp', 'tundra', 'forest', 'hills', 'lake', 'yard', 'castle'] as const;
 export type Ground = (typeof RANK)[number];
 export type GroundGrid = (Ground | null)[][];
 /** The ground at a tile (null = nothing there): the map reads it through this, a test grid through the array form. */
@@ -67,7 +67,7 @@ export function hash32(x: number, y: number, salt = 0): number {
 
 const rankOf = (g: string) => RANK.indexOf(g as Ground);
 
-/** The ground an owned tile is drawn with; null when it is not owned. A built-on grounds tile is still `grounds` here: the grid resolves its foundation. */
+/** The ground an owned tile is drawn with; null when it is not owned. A building does not change it: the tile keeps its biome's ground and gets a pad in that biome's style. */
 export function groundOf(tile: Tile | undefined): Ground | null {
 	if (!tile || !tile.isOwned) return null;
 	if (tile.biome === 'castle' && (tile.level ?? 1) >= CASTLE_FORTRESS.fromLevel) return 'yard'; // the fortress stands on cobbles
@@ -77,46 +77,21 @@ export function groundOf(tile: Tile | undefined): Ground | null {
 /** A tile with a building (any biome). */
 export const isBuilt = (tile: Tile | undefined): boolean => !!tile && tile.isOwned && !!tile.building;
 
-/** Old Grounds lots take the ground of the land around them; a building on any other biome keeps its own ground and gets a pad in that biome's style. */
-const isGroundsLot = (tile: Tile | undefined): boolean => isBuilt(tile) && tile!.biome === 'grounds';
-
-type OwnedName = Ground | 'building' | null;
-
-/** Foundation of a building tile: the land biome most common among its 8 neighbours (a lake counts as coast, so a lakeside
- * plot stands on sand); ties go to the earlier entry; no land around -> plains. */
+/** The biomes that have a foundation pad; a building on anything else (the castle's neighbours are never built on) gets the plains pad. */
 export const FOUNDATION_ORDER = ['hills', 'forest', 'tundra', 'swamp', 'plains', 'coast'] as const;
 const PAD_VARIANTS = 2;
 
-function foundation(nameAt: (x: number, y: number) => OwnedName | undefined, x: number, y: number): Ground {
-	const counts: Record<string, number> = { hills: 0, forest: 0, tundra: 0, swamp: 0, plains: 0, coast: 0 };
-	for (let dy = -1; dy <= 1; dy++)
-		for (let dx = -1; dx <= 1; dx++) {
-			if (!dx && !dy) continue;
-			const n = nameAt(x + dx, y + dy);
-			const name = n === 'lake' ? 'coast' : n;
-			if (name && name in counts) counts[name]++;
-		}
-	const best = Math.max(...Object.values(counts));
-	if (best === 0) return 'plains';
-	return FOUNDATION_ORDER.find((b) => counts[b] === best) as Ground;
-}
+const nameOf = groundOf;
+const ownedNames = (tiles: Tile[][]): (Ground | null)[][] => tiles.map((row) => row.map(nameOf));
 
-const nameOf = (t: Tile | undefined): OwnedName => (isGroundsLot(t) ? 'building' : groundOf(t));
-const ownedNames = (tiles: Tile[][]): OwnedName[][] => tiles.map((row) => row.map(nameOf));
-
-/** The biome a tile's ground belongs to for the eye: its own, or (built-on tiles) the foundation biome. */
-export function foundationBiome(tiles: World, x: number, y: number): string {
-	const t = getTile(tiles, x, y);
-	if (!isGroundsLot(t)) return t?.biome ?? 'empty';
-	return foundation((nx, ny) => nameOf(getTile(tiles, nx, ny)), x, y);
-}
+/** The pad kind of a building tile: its own biome's pad (plains when the biome has none, such as a lake). */
+const padKind = (tile: Tile): string => ((FOUNDATION_ORDER as readonly string[]).includes(tile.biome) ? tile.biome : 'plains');
 
 /** Ground per tile; unowned tiles 4-adjacent to an owned one become 'mist' (the buyable ring), the rest stay null. */
 export function buildGroundGrid(tiles: Tile[][] | undefined): GroundGrid {
 	if (!tiles) return [];
 	const owned = ownedNames(tiles);
-	const resolved: GroundGrid = owned.map((row, y) => row.map((g, x) => (g === 'building' ? foundation((nx, ny) => owned[ny]?.[nx], x, y) : g)));
-	return resolved.map((row, y) =>
+	return owned.map((row, y) =>
 		row.map((g, x) =>
 			g ??
 			(SIDES.some(([dx, dy]) => owned[y + dy]?.[x + dx] != null) ? ('mist' as Ground) : null)
@@ -127,14 +102,11 @@ export function buildGroundGrid(tiles: Tile[][] | undefined): GroundGrid {
 /** Foundation pads (48x48 worked-ground decals) under building tiles; `bottom` is the pad's bottom edge in world px. */
 export function allPads(tiles: Tile[][] | undefined): Placed[] {
 	if (!tiles) return [];
-	const owned = ownedNames(tiles);
 	const out: Placed[] = [];
 	tiles.forEach((row, y) =>
 		row.forEach((tile, x) => {
 			if (!isBuilt(tile)) return;
-			// a lot on its own biome gets that biome's pad; an old Grounds lot the pad of the land around it
-			const kind = isGroundsLot(tile) ? foundation((nx, ny) => owned[ny]?.[nx], x, y) : (FOUNDATION_ORDER as readonly string[]).includes(tile.biome) ? tile.biome : 'plains';
-			out.push({ id: `pad_${kind}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
+			out.push({ id: `pad_${padKind(tile)}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
 		})
 	);
 	return out;
@@ -438,25 +410,21 @@ export const chunkOf = (tile: number): number => Math.floor(tile / CHUNK_TILES);
 const groundCache = new WeakMap<World, GroundFn>();
 
 /**
- * The ground of every tile of a World, the way buildGroundGrid derives it for an array: an explored tile has its own ground
- * (a building on an old Grounds lot takes the land around it), an unexplored tile next to explored land is 'mist', the rest
- * is nothing. Cached per World (and per tile), so drawing a chunk does not recompute the same neighbours again and again.
+ * The ground of every tile of a World, the way buildGroundGrid derives it for an array: an explored tile has its own ground,
+ * an unexplored tile next to explored land is 'mist', the rest is nothing. Cached per World (and per tile), so drawing a chunk does not recompute the same neighbours again and again.
  */
 export function worldGround(world: World): GroundFn {
 	let fn = groundCache.get(world);
 	if (!fn) {
 		const memo = new Map<number, Ground | null>();
-		const nameAt = (x: number, y: number): OwnedName => nameOf(getTile(world, x, y));
+		const nameAt = (x: number, y: number): Ground | null => nameOf(getTile(world, x, y));
 		fn = (x, y) => {
 			if (!inRange(x, y)) return null;
 			const key = tileKey(x, y);
 			const known = memo.get(key);
 			if (known !== undefined) return known;
 			const own = nameAt(x, y);
-			let ground: Ground | null;
-			if (own === 'building') ground = foundation(nameAt, x, y);
-			else if (own) ground = own;
-			else ground = SIDES.some(([dx, dy]) => nameAt(x + dx, y + dy) != null) ? 'mist' : null;
+			const ground: Ground | null = own ?? (SIDES.some(([dx, dy]) => nameAt(x + dx, y + dy) != null) ? 'mist' : null);
 			memo.set(key, ground);
 			return ground;
 		};
@@ -493,14 +461,11 @@ export function chunkSignature(world: World, cx: number, cy: number): string {
 /** Foundation pads of the building tiles inside the chunk. */
 export function chunkPads(world: World, cx: number, cy: number): Placed[] {
 	const out: Placed[] = [];
-	const nameAt = (x: number, y: number): OwnedName => nameOf(getTile(world, x, y));
 	for (let y = cy * CHUNK_TILES; y < (cy + 1) * CHUNK_TILES; y++) {
 		for (let x = cx * CHUNK_TILES; x < (cx + 1) * CHUNK_TILES; x++) {
 			const tile = getTile(world, x, y);
 			if (!tile || !isBuilt(tile)) continue;
-			// a lot on its own biome gets that biome's pad; an old Grounds lot the pad of the land around it
-			const kind = isGroundsLot(tile) ? foundation(nameAt, x, y) : (FOUNDATION_ORDER as readonly string[]).includes(tile.biome) ? tile.biome : 'plains';
-			out.push({ id: `pad_${kind}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
+			out.push({ id: `pad_${padKind(tile)}_${hash32(x, y, 600) % PAD_VARIANTS}`, x: x * CELL, bottom: (y + 1) * CELL });
 		}
 	}
 	return out;

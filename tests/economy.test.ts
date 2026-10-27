@@ -127,7 +127,7 @@ test('buyTile: only adjacent, unowned, affordable tiles; pick-a-biome flow is gu
 	assert.ok(api().resources.gold < gold, 'the purchase is charged at once');
 	assert.equal(owned(), 4);
 	assert.ok(tileAt(api().tiles, spot[0], spot[1]).isOwned);
-	assert.notEqual(tileAt(api().tiles, spot[0], spot[1]).biome, 'grounds', 'Grounds no longer turns up: buildings go on any tile');
+	assert.notEqual(tileAt(api().tiles, spot[0], spot[1]).biome, 'grounds','the removed Grounds biome never turns up: buildings go on any tile');
 });
 
 test('tile cost: extra resources are required from the configured tile count and are paid', () => {
@@ -147,6 +147,22 @@ test('tile cost: extra resources are required from the configured tile count and
 	assert.equal(api().buyTile(frontier.x, frontier.y), true);
 	assert.equal(api().resources[first.resource], 0, 'the resource was spent');
 	assert.ok(api().resources.gold < goldBefore);
+});
+
+test('tile cost: gold stays the biggest part, wood, stone and coal are a real share, and hide joins from 120 tiles', () => {
+	for (const n of [15, 30, 60, 100, 119, 120, 200, 300, 1000]) {
+		const { gold, resources } = calculateTileCost(n, 0);
+		for (const [key, amount] of Object.entries(resources)) assert.ok((amount ?? 0) < gold, `${key} costs less than the gold at n=${n}`);
+		const raw = (resources.wood ?? 0) + (resources.stone ?? 0) + (resources.coal ?? 0);
+		assert.ok(raw > gold * 0.4 || n < 30, `wood, stone and coal are about half of the gold at n=${n}`);
+		assert.ok(raw < gold * 1.5, `and gold is still the biggest single part at n=${n}`);
+	}
+	assert.equal(calculateTileCost(119, 0).resources.hide, undefined, 'no hide before the 120th tile');
+	assert.ok((calculateTileCost(120, 0).resources.hide ?? 0) > 0, 'hide from the 120th tile');
+	assert.ok((calculateTileCost(30, 0).resources.coal ?? 0) > 0);
+	const kept = calculateTileCost(150, 50).resources;
+	const full = calculateTileCost(150, 0).resources;
+	for (const key of Object.keys(full) as (keyof typeof full)[]) assert.ok((kept[key] ?? 0) <= (full[key] ?? 0) / 2 + 1, `${key} gets the Charisma discount too`);
 });
 
 test('castle: needs the resources, only one upgrade at a time, takes real tick time, then levels up', () => {
@@ -214,7 +230,7 @@ test('chests: the spawn timer pauses at the limit, collecting needs a real chest
 	assert.equal(api().activeChests, 0);
 });
 
-test('buildings: cost resources, grow more expensive, and only go on free Grounds tiles', () => {
+test('buildings: cost resources, grow more expensive, and only go on free land tiles', () => {
 	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
 	growTo(4);
 	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')!;

@@ -6,6 +6,7 @@ import { decodeSave, encodeSave, packBody, sealWire } from '../src/lib/saveForma
 import { readFileSync } from 'node:fs';
 import { aggregateStats } from '../src/lib/inventory';
 import { resolveItem } from '../src/lib/itemInstance';
+import { RETUNED_STATS } from './retunedItems';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { plainItem } from '../src/lib/itemInstance';
@@ -150,7 +151,7 @@ test('export -> decode accepts a real save and rejects edited / foreign ones', (
 });
 
 // ---- combat / inventory state ------------------------------------------------------------------------------------
-const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId', 'lootPity', 'autoSellUpTo'];
+const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'playerMp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId', 'lootPity', 'autoSellUpTo'];
 
 /** The n-th owned tile that is not the castle or a lake (the land is rolled, and a monster or a building cannot be on water). */
 const spot = (n = 0) => {
@@ -160,7 +161,7 @@ const spot = (n = 0) => {
 	return found[n];
 };
 
-const rat = (over: Record<string, unknown> = {}) => ({ id: 1, type: 'rat', tier: 1, ...spot(), ageSec: 100, ...over });
+const rat = (over: Record<string, unknown> = {}) => ({ id: 1, type: 'rat', level: 1, spawnLevel: 1, ...spot(), ageSec: 100, ...over });
 
 /** A played game with some gear, one monster and damaged HP; returns its raw snapshot after `mutate`. */
 const combatSave = (mutate: (raw: any) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -195,6 +196,7 @@ test('an old save without the combat fields loads with the starter kit', () => {
 	assert.equal(result.state.bag.length, 36);
 	assert.deepEqual(result.state.monsters, []);
 	assert.equal(result.state.playerHp, 101);
+	assert.equal(result.state.playerMp, 40, 'a save from before mana starts with a full pool');
 	assert.equal(result.state.nextMonsterId, 1);
 });
 
@@ -268,12 +270,20 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.playerHp = 1e6), 'playerHp above max');
 	bad((r) => (r.playerHp = NaN), 'playerHp NaN');
 	bad((r) => (r.playerHp = -1), 'negative playerHp');
+	bad((r) => (r.playerMp = 1e6), 'playerMp above the mana pool');
+	bad((r) => (r.playerMp = NaN), 'playerMp NaN');
+	bad((r) => (r.playerMp = -1), 'negative playerMp');
+	bad((r) => (r.playerMp = '40'), 'playerMp as text');
 	bad((r) => (r.monsters[0].x = CASTLE_X, r.monsters[0].y = CASTLE_Y), 'monster on the castle');
 	bad((r) => (r.monsters[0].x = 0, r.monsters[0].y = 0), 'monster on an unowned tile');
 	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].hasChest = true), 'monster on a chest tile');
-	bad((r) => r.monsters.push({ ...r.monsters[0], id: 2, type: 'ratKing', tier: 1 }, { ...r.monsters[0], id: 3, type: 'ratKing', tier: 1 }), 'two kings on one tile');
+	bad((r) => r.monsters.push({ ...r.monsters[0], id: 2, type: 'ratKing', level: 15, spawnLevel: 15 }, { ...r.monsters[0], id: 3, type: 'ratKing', level: 15, spawnLevel: 15 }), 'two kings on one tile');
 	bad((r) => (r.monsters = Array.from({ length: 5000 }, (_, i) => ({ ...r.monsters[0], id: i + 1 }))), 'more monsters than tiles');
-	bad((r) => (r.monsters[0].tier = COMBAT.maxTier + 1), 'tier above the cap');
+	bad((r) => (r.monsters[0].level = r.monsters[0].spawnLevel + 41), 'level above what the hard growth ceiling allows');
+	bad((r) => (r.monsters[0].level = 5), 'a level the age has not earned');
+	bad((r) => (r.monsters[0].spawnLevel = 0), 'a spawn level below 1');
+	bad((r) => (r.monsters[0].spawnLevel = 11, r.monsters[0].level = 11), 'a rat that spawned above the rat cap');
+	bad((r) => (r.monsters[0].tier = 1), 'the old tier key');
 	bad((r) => (r.monsters[0].type = 'dragon'), 'unknown monster type');
 	bad((r) => (r.monsters.push({ ...r.monsters[0], ...spot(1) }), (r.nextMonsterId = 5)), 'duplicate monster ids');
 	bad((r) => (r.monsters[0].id = 5), 'monster id not below nextMonsterId');
@@ -293,8 +303,8 @@ test('forged inventories, HP and monsters are rejected', () => {
 test('two kings are rejected even on different tiles', () => {
 	const raw = combatSave((r) => {
 		const other = { ...r.monsters[0] };
-		r.monsters[0] = { ...r.monsters[0], type: 'ratKing', tier: 1, ageSec: 0 };
-		r.monsters.push({ ...other, id: 2, type: 'ratKing', tier: 1, ageSec: 0 });
+		r.monsters[0] = { ...r.monsters[0], type: 'ratKing', level: 15, spawnLevel: 15, ageSec: 0 };
+		r.monsters.push({ ...other, id: 2, type: 'ratKing', level: 15, spawnLevel: 15, ageSec: 0 });
 		r.nextMonsterId = 3;
 	});
 	// move the second king to another owned tile
@@ -319,14 +329,14 @@ test('a played game that started with the free ring passes validation (tiles, bu
 	growTo(30);
 	store.setState((s) => {
 		const spot = gridCells(s.tiles).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
-		return { tiles: setTile(s.tiles, spot.x, spot.y, { biome: 'grounds', isOwned: true, building: 'tavern', level: 2 }) };
+		return { tiles: setTile(s.tiles, spot.x, spot.y, { biome: 'forest', isOwned: true, building: 'tavern' }) };
 	});
 	api().tick(60_000);
 	const result = sanitizeSave(snapshot());
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
-test('buildings on any land biome save and load; water, nonsense and stray levels are rejected; old Grounds lots (level 2) still load', () => {
+test('buildings on any land biome save and load; water, nonsense and stray levels are rejected; the removed Grounds biome is refused', () => {
 	api().resetGame();
 	growTo(12);
 	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
@@ -340,11 +350,11 @@ test('buildings on any land biome save and load; water, nonsense and stray level
 	};
 	assert.equal(load({ biome: 'forest', building: 'tavern' }).ok, true, 'a forest building');
 	assert.equal(load({ biome: 'hills', building: 'quarry' }).ok, true);
-	assert.equal(load({ biome: 'grounds', building: 'tavern', level: 2 }).ok, true, 'an old Grounds lot');
-	assert.equal(load({ biome: 'grounds' }).ok, true, 'an old empty lot');
+	assert.equal(load({ biome: 'grounds', building: 'tavern' }).ok, false, 'Grounds is no biome any more (schema 3 saves are converted when they are read)');
+	assert.equal(load({ biome: 'grounds' }).ok, false, 'an old empty lot');
 	assert.equal(load({ biome: 'lake', building: 'tavern' }).ok, false, 'a building on water');
 	assert.equal(load({ biome: 'forest', building: 'nonsense' }).ok, false);
-	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok, false, 'level 2 only belongs to old Grounds lots');
+	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok,false, 'a building never has a level');
 	assert.equal(load({ biome: 'forest', level: 2 }).ok, false, 'a level without a building');
 	rejects((raw) => { raw.tiles[CASTLE_Y][CASTLE_X].building = 'tavern'; }, 'a building on the castle');
 });
@@ -378,7 +388,7 @@ test('a schema 2 save keeps every item: each old gear id converts to an instance
 			if (!slot || !('item' in slot)) return;
 			assert.equal(slot.item.base, id);
 			assert.equal(slot.item.rarity, legacy[id].rarity, `${id} keeps its old rarity`);
-			assert.deepEqual(resolveItem(slot.item)!.stats, legacy[id].stats, `${id} keeps its old stats`);
+			assert.deepEqual(resolveItem(slot.item)!.stats, RETUNED_STATS[id] ?? legacy[id].stats, `${id} keeps its old stats (or its pinned retuned ones)`);
 		});
 	}
 });

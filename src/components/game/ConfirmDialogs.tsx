@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { formatCompact } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { MONSTERS } from '@/config/combatConfig';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
@@ -23,7 +24,7 @@ const DismissBody: React.FC<{ id: number }> = ({ id }) => {
 		if (!monster) close(null);
 	}, [monster, close]);
 	if (!monster) return null;
-	const label = monster.type === 'rat' ? `${MONSTERS.rat.label} (tier ${monster.tier})` : MONSTERS[monster.type].label;
+	const label = `${MONSTERS[monster.type].label} (level ${formatCompact(monster.level)})`;
 
 	return (
 		<PixelModal title='Dismiss monster?' size='sm' onClose={done}>
@@ -77,7 +78,7 @@ const DiscardBody: React.FC<{ index: number }> = ({ index }) => {
 	const discard = (amount: number) => {
 		if (discardItem(index, amount)) {
 			audioManager.playSound('click');
-			showToast(`Discarded ${amount > 1 ? `${amount} x ` : ''}${name}`);
+			showToast(`Discarded ${amount > 1 ? `${formatCompact(amount)} x ` : ''}${name}`);
 		} else {
 			audioManager.playSound('wrong');
 		}
@@ -91,7 +92,7 @@ const DiscardBody: React.FC<{ index: number }> = ({ index }) => {
 					<PixelIcon name={itemIconName(def)} alt='' />
 					<span style={{ color }}>
 						{name}
-						{qty > 1 ? ` x${qty}` : ''}
+						{qty > 1 ? ` x${formatCompact(qty)}` : ''}
 					</span>
 				</div>
 				<p className='text-[#a89878] mb-3'>It is destroyed for good, not sold: you get no gold. To get gold for it, sell it to the merchant.</p>
@@ -106,7 +107,7 @@ const DiscardBody: React.FC<{ index: number }> = ({ index }) => {
 							</button>
 						)}
 						<button className='px-btn px-btn-red' onClick={() => discard(qty)}>
-							{qty > 1 ? `Discard all (${qty})` : 'Discard'}
+							{qty > 1 ? `Discard all (${formatCompact(qty)})` : 'Discard'}
 						</button>
 					</div>
 				</div>

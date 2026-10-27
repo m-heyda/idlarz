@@ -29,8 +29,8 @@ export interface RollsDef {
 	max: number;
 	guaranteed?: number;
 	chancePerRoll: number;
-	/** Added to `chancePerRoll` per monster tier above 1 */
-	chancePerTier?: number;
+	/** Added to `chancePerRoll` per monster level above 1 */
+	chancePerLevel?: number;
 }
 
 export interface ItemLevelDef {
@@ -52,8 +52,8 @@ export interface BonusTable {
 	poolId: string;
 	/** Chance the table triggers at all (default 1) */
 	chance?: number;
-	/** Added to `chance` per monster tier above 1 */
-	chancePerTier?: number;
+	/** Added to `chance` per monster level above 1 */
+	chancePerLevel?: number;
 	/** How many items it gives once triggered; default one */
 	rolls?: RollsDef;
 	/** `rolled`: the item's rarity is rolled from the profile's weights (bases). `fixed`: as the item defines it (named items, consumables). */
@@ -83,17 +83,21 @@ export interface LootProfile {
 	enabled: boolean;
 }
 
-/** Where a source's level comes from: the monster's tier and the castle level (the game's world level). Never the player's level. */
+/** Where the level of a chest or a shelf comes from: the castle level (the game's world level). Never the player's level. */
 export interface SourceLevelDef {
 	base: number;
-	perTier: number;
 	perCastleLevel: number;
 }
 
+/**
+ * A source either has a level of its own (`level`: chests, the merchant's shelf) or gets it from the caller (`levels`: a monster
+ * passes its own level, and `levels` is the range it can have, which `validateLootData` checks the pools against).
+ */
 export interface LootSource {
 	id: string;
 	lootProfileId: string;
-	level: SourceLevelDef;
+	level?: SourceLevelDef;
+	levels?: { min: number; max: number };
 }
 
 export const LOOT_POOLS: Record<string, PoolDef> = {
@@ -108,12 +112,12 @@ export const LOOT_POOLS: Record<string, PoolDef> = {
 export const LOOT_PROFILES: Record<string, LootProfile> = {
 	normal_monster: {
 		id: 'normal_monster',
-		rolls: { min: 1, max: 1, chancePerRoll: 0.12, chancePerTier: 0.02 },
+		rolls: { min: 1, max: 1, chancePerRoll: 0.12, chancePerLevel: 0.01 },
 		itemLevel: { offset: 0, variance: 1, min: 1, max: 100 },
 		rarityWeights: { common: 70, uncommon: 22, rare: 7, epic: 1, legendary: 0.2 },
 		rarityLevelGate: { rare: 3, epic: 8, legendary: 15 },
 		generalPoolId: 'general_equipment',
-		bonusTables: [{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerTier: 0.03, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } }],
+		bonusTables: [{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerLevel: 0.015, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } }],
 		enabled: true,
 	},
 	boss: {
@@ -144,11 +148,23 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 		],
 		enabled: true,
 	},
+	// The merchant's shelf: plain pieces of gear (common and uncommon only; the rest stays a reward for fights and chests) at the world
+	// level, held to what the player wears (lib/merchant.ts, MERCHANT_GOODS)
+	merchant_stock: {
+		id: 'merchant_stock',
+		rolls: { min: 12, max: 12, guaranteed: 12, chancePerRoll: 1 }, // the most a shelf may ever hold (HARD_LIMITS); lib/merchant keeps the first `merchantOffers`
+		itemLevel: { offset: 0, variance: 2, min: 1, max: 100 },
+		rarityWeights: { common: 60, uncommon: 40 },
+		generalPoolId: 'general_equipment',
+		bonusTables: [],
+		enabled: true,
+	},
 };
 
-/** Keyed by the `DropSource` (a monster type or `chest`). Rat tiers 1-5 are levels 1,3,5,7,9; the Rat King is 12. */
+/** Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (rats 1-20, the Rat King 15-35). */
 export const LOOT_SOURCES: Record<string, LootSource> = {
-	rat: { id: 'rat', lootProfileId: 'normal_monster', level: { base: 1, perTier: 2, perCastleLevel: 3 } },
-	ratKing: { id: 'ratKing', lootProfileId: 'boss', level: { base: 12, perTier: 0, perCastleLevel: 3 } },
-	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perTier: 0, perCastleLevel: 3 } },
+	rat: { id: 'rat', lootProfileId: 'normal_monster', levels: { min: 1, max: 20 } },
+	ratKing: { id: 'ratKing', lootProfileId: 'boss', levels: { min: 15, max: 35 } },
+	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perCastleLevel: 3 } },
+	merchant: { id: 'merchant', lootProfileId: 'merchant_stock', level: { base: 4, perCastleLevel: 3 } },
 };

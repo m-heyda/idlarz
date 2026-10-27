@@ -38,15 +38,32 @@ test('sell values rise with rarity and with item level', () => {
 	assert.ok(sellValueOf(ofRarity('rare', 40)) > sellValueOf(ofRarity('rare', 10)));
 });
 
-test('no single item is worth a fortune: the best drop at the level cap sells for far less than the verified gold burst allowance', () => {
-	const top = Math.max(...RARITY_ORDER.map((r) => sellValueOf(ofRarity(r, 100))));
-	assert.ok(top <= 20_000, `the best item at level 100 sells for ${top}`);
+test('no single item is worth a fortune: the best plain drop of the levels the game produces (up to the Kings 35) stays under 50 million', () => {
+	const top = Math.max(...RARITY_ORDER.map((r) => sellValueOf(ofRarity(r, 35))));
+	assert.ok(top <= 50_000_000, `the best item at level 35 sells for ${top}`);
 });
 
-test('the shop sells plain wares only, every price is at least 3x the sell value (3.9x of a max Haggler) so buying and selling never print gold', () => {
+test('what an item sells for follows its rarity, item level, quality and affixes, and is worth selling', () => {
+	const base = ofRarity('rare', 12);
+	const plain = sellValueOf(base);
+	assert.ok(sellValueOf({ ...base, quality: 100 }) > plain, 'a better quality roll is worth more');
+	assert.ok(sellValueOf({ ...base, quality: 0 }) < plain);
+	const one = sellValueOf({ ...base, affixes: [{ id: 'regen_prefix', roll: 50 }] });
+	const two = sellValueOf({ ...base, affixes: [{ id: 'regen_prefix', roll: 50 }, { id: 'luck_prefix', roll: 50 }] });
+	assert.ok(one > plain && two > one, 'every affix adds to the value');
+	assert.ok(sellValueOf({ ...base, affixes: [{ id: 'regen_prefix', roll: 100 }] }) > one, 'and a better roll adds more');
+	assert.ok(sellValueOf(ofRarity('common', 1)) >= 100, 'even the plainest drop is worth a few minutes of early income, not a coin');
+	// each rarity step is a clear step up at the same level
+	const steps = RARITY_ORDER.map((r) => sellValueOf(ofRarity(r, 10)));
+	for (let i = 1; i < steps.length; i++) assert.ok(steps[i] >= steps[i - 1] * 2.5, `${RARITY_ORDER[i]}`);
+});
+
+test('the supplies are potions only, every price is at least 3x the sell value (3.9x of a max Haggler) so buying and selling never print gold', () => {
+	assert.ok(MERCHANT_SHOP_ITEMS.length > 0);
 	for (const { id, price } of MERCHANT_SHOP_ITEMS) {
 		const def = ITEM_CATALOG[id];
 		assert.ok(def, id);
+		assert.equal(def.kind, 'consumable', `${id}: gear comes from the shuffling goods`);
 		assert.notEqual(def.set, 'rattatui', `${id} is not for sale`);
 		assert.ok(price >= unitValue(id) * 3, `${id}: ${price} vs ${unitValue(id)}`);
 		assert.ok(price > unitValue(id) * MAX_HAGGLER, `${id} with a max Haggler`);
@@ -135,7 +152,7 @@ test('Haggler raises every payout (resources and items)', () => {
 	freshGame({ gold: 0, wood: 1000 });
 	store.setState({ merchantUpgrades: { haggler: 10 } });
 	api().sellResources('wood', 1000);
-	assert.equal(api().resources.gold, Math.floor(1000 * MERCHANT_RESOURCE_PRICES.wood * sellMultiplier({ haggler: 10 })));
+	assert.equal(api().resources.gold, Math.floor(1000 * MERCHANT_RESOURCE_PRICES.wood * sellMultiplier({ merchantUpgrades: { haggler: 10 } })));
 	assert.ok(api().resources.gold > plain);
 });
 
@@ -147,9 +164,8 @@ test('buyItem: charges the price, adds the item, and a full bag costs nothing', 
 	const bought = api().bag.map((s) => stackOf(s)).find((s) => s?.id === id);
 	assert.ok(bought ? bought.qty >= 3 : api().bag.filter((s) => slotItemId(s) === id).length >= 3);
 
-	const gearId = MERCHANT_SHOP_ITEMS.find((e) => !ITEM_CATALOG[e.id].consumable)!.id;
 	store.setState({ bag: emptyBag().map(() => ({ item: plainItem('wooden_sword') })), resources: { ...api().resources, gold: 1e9 } });
-	assert.equal(api().buyItem(gearId, 1), false);
+	assert.equal(api().buyItem(id, 1), false);
 	assert.equal(api().resources.gold, 1e9, 'nothing charged');
 
 	for (const bad of [0, -1, 1.5, 1000, NaN]) assert.equal(api().buyItem(id, bad), false, String(bad));
@@ -253,4 +269,16 @@ test('farm products sell but are never offered for sale; resource packs stay on 
 	assert.equal(api().buyResource('eggs', 5), false);
 	assert.equal(api().buyResource('milk', 5), false);
 	assert.equal(api().buyResource('hide', 5), false);
+});
+
+test('merchant prices follow early scarcity: the slower a basic resource is produced early, the more it sells for', () => {
+	const p = MERCHANT_RESOURCE_PRICES;
+	// early production per second (random 10-40 tile maps): food > wood > stone > coal, so the price rises in that order
+	assert.ok(p.food < p.wood && p.wood < p.stone && p.stone < p.coal, `${p.food} < ${p.wood} < ${p.stone} < ${p.coal}`);
+	// an hour of any basic resource sells for about the same gold on an early map (the rates below are the measured 20-tile averages)
+	const earlyRate = { wood: 4.07, stone: 4.02, coal: 3.01, food: 8.49 };
+	const worth = (Object.keys(earlyRate) as (keyof typeof earlyRate)[]).map((k) => earlyRate[k] * p[k]);
+	assert.ok(Math.max(...worth) / Math.min(...worth) < 1.25, worth.map((w) => w.toFixed(2)).join(' / '));
+	// buying back always costs more than selling, even with a maxed Haggler
+	for (const key of MERCHANT_BUYABLE) assert.ok(p[key] * MERCHANT_BUY_MULTIPLIER > p[key] * MAX_HAGGLER, key);
 });

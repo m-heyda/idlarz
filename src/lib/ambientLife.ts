@@ -1,5 +1,4 @@
 import { AMBIENT_LIFE, FARM_BONUS, TILE_SIZE, type AmbientCritterType } from '@/config/gameConfig';
-import { foundationBiome } from '@/utils/terrain';
 import { getTile, ownedBounds, type World } from '@/utils/world';
 
 export type AmbientType = AmbientCritterType;
@@ -55,8 +54,7 @@ export const pickAmbientCritter = (
 		for (let x = minX; x <= maxX; x++) {
 			const tile = getTile(tiles, x, y);
 			if (!tile || tile.biome === 'castle') continue;
-			// a built-on tile stands on its neighbours' biome (snowy foundation -> rabbits, meadow -> bees)
-			const biome = foundationBiome(tiles, x, y);
+			const biome = tile.biome;
 			let types = AMBIENT_LIFE.byBiome[biome];
 			// fish need open water: not on a lake tile that touches the shore
 			if (types && biome === 'lake' && !([[0, -1], [1, 0], [0, 1], [-1, 0]] as const).every(([dx, dy]) => getTile(tiles, x + dx, y + dy)?.biome === 'lake')) {

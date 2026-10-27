@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, weaponDps, type ItemStats, type StatKey, type StatTotals } from '@/catalog';
+import { EQUIPMENT_LAYOUT, ITEM_CATALOG, RARITIES, SETS, STARTER_BAG_ITEMS, STAT_KEYS, setBonusStats, setCounts, sumStats, weaponDps, type ItemStats, type StatKey, type StatTotals } from '@/catalog';
 import { resolveItem } from '@/lib/itemInstance';
 import type { BagSlot, Drop, Equipment, EquipmentSlot, ItemDef, ItemInstance } from '@/types/game';
 
@@ -109,6 +109,53 @@ export const moveSlot = (bag: BagSlot[], from: number, to: number): BagSlot[] =>
 	return next;
 };
 
+const KIND_ORDER: Record<string, number> = { weapon: 0, offhand: 1, armor: 2, accessory: 3 };
+const SLOT_ORDER = [...EQUIPMENT_LAYOUT.bottom, ...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right];
+
+/** Sort key of a piece of gear: its kind, then the slot (both rings count as one, in the order of the equipment panel), then the better item first. */
+const gearOrder = (item: ItemInstance): (number | string)[] => {
+	const def = ITEM_CATALOG[item.base];
+	const slot = def?.slot === 'ring' ? 'ring1' : def?.slot;
+	const slotIndex = slot ? SLOT_ORDER.indexOf(slot) : -1;
+	return [KIND_ORDER[def?.kind ?? ''] ?? 9, slotIndex < 0 ? 99 : slotIndex, -((RARITIES as Record<string, { order: number } | undefined>)[item.rarity]?.order ?? 0), -item.level, -item.quality, item.base];
+};
+
+const compareKeys = (a: (number | string)[], b: (number | string)[]): number => {
+	for (let i = 0; i < a.length; i++) {
+		if (a[i] === b[i]) continue;
+		return typeof a[i] === 'string' ? (a[i] as string).localeCompare(b[i] as string) : (a[i] as number) - (b[i] as number);
+	}
+	return 0;
+};
+
+/**
+ * Tidies the bag from the left: consumables first (same ones merged into full stacks, in catalog order), then the gear by kind,
+ * slot, rarity, item level and quality (best first), then the empty slots. The same number of slots, nothing lost, and organising
+ * an organised bag changes nothing.
+ */
+export const organizeBag = (bag: BagSlot[]): BagSlot[] => {
+	const totals = new Map<string, number>();
+	const gear: ItemInstance[] = [];
+	for (const slot of bag) {
+		const item = gearOf(slot);
+		const stack = stackOf(slot);
+		if (item) gear.push(item);
+		else if (stack) totals.set(stack.id, (totals.get(stack.id) ?? 0) + stack.qty);
+	}
+	const catalogIndex = (id: string) => Object.keys(ITEM_CATALOG).indexOf(id);
+	const stacks: BagSlot[] = [];
+	for (const [id, total] of [...totals].sort((a, b) => catalogIndex(a[0]) - catalogIndex(b[0]) || a[0].localeCompare(b[0]))) {
+		const max = stackMax(id);
+		for (let left = total; left > 0; left -= max) stacks.push({ id, qty: Math.min(left, max) });
+	}
+	const sorted: BagSlot[] = gear
+		.map((item) => ({ item, key: gearOrder(item) }))
+		.sort((a, b) => compareKeys(a.key, b.key))
+		.map(({ item }) => ({ item }));
+	const organized = [...stacks, ...sorted];
+	return Array.from({ length: bag.length }, (_, i) => organized[i] ?? null);
+};
+
 /** The gear slot an item goes into: rings take the first free ring slot (else replace the first), everything else its own slot. */
 export const targetSlot = (def: ItemDef, equipment: Equipment): EquipmentSlot | null => {
 	if (!def.slot) return null;
@@ -149,6 +196,12 @@ export const unequip = (
 	const nextEquipment = { ...equipment };
 	delete nextEquipment[slot];
 	return { bag: nextBag, equipment: nextEquipment };
+};
+
+/** The average item level of what is worn (empty slots do not count; 0 with nothing on): the number shown as "Item level" and the one the merchant's goods are held to. */
+export const averageItemLevel = (equipment: Equipment): number => {
+	const levels = Object.values(equipment).flatMap((item) => (item ? [item.level] : []));
+	return levels.length ? levels.reduce((sum, level) => sum + level, 0) / levels.length : 0;
 };
 
 /** The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached. */

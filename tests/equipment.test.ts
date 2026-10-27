@@ -74,7 +74,7 @@ test('moveBagItem swaps slots and rejects bad indexes', () => {
 
 test('equip actions are refused during a fight', () => {
 	freshGame();
-	store.setState({ bag: bagWith('rattatui_fang_blade'), fight: newFight({ id: 1, type: 'rat', tier: 1 }) });
+	store.setState({ bag: bagWith('rattatui_fang_blade'), fight: newFight({ id: 1, type: 'rat', level: 1 }) });
 	assert.equal(api().equipItem(0), false);
 	assert.equal(api().unequipItem('offHand'), false);
 	assert.equal(api().moveBagItem(0, 1), false);

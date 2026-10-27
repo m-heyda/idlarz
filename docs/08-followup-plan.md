@@ -9,7 +9,7 @@ Everything that was **not** part of the endgame / settings / ambient batch, orde
 | A1 | **Castle-timer badge** on the castle tile and in the header (B4) | S | remaining time visible without opening the dialog; updates each second; hidden when no upgrade runs |
 | A2 | **Legacy respec** (B9) | S | costs one rebirth or a fixed fee; point-conservation check in `sanitizeSave` still holds; test added |
 | A3 | **Reputation has a use** (U6): small merchant discount or quest gate, or remove it from the statistics | S | either read by one formula (documented in 03) or gone |
-| A4 | ~~**HP/MP bars** decision (U5)~~ **done**: the HP flask and the Statistics window show live HP; MP stays full until skills exist | S | no bar that is always full |
+| A4 | ~~**HP/MP bars** decision (U5)~~ **done**: the HP flask and the Statistics window show live HP; MP is real now: it is saved, refills and Heal / Stun spend it | S | no bar that is always full |
 | A5 | **CI**: GitHub Action running `tsc`, `lint`, `test`, `build`, plus `sim -- --maxdays=30 hardcore` as a pacing guard | S | PR fails when the first-finish time of the dedicated profile moves by more than ±15 % |
 | A6 | **Playwright smoke test**: new game, click, buy tile, open Settings and Legacy, reload keeps state | M | runs in CI; uses `window.__game` only in dev builds |
 | A7 | **Per-tile selectors** so a tick does not re-render every visible tile (performance backlog in 05) | M | React profiler shows a tick touches only changed tiles |

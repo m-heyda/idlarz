@@ -31,6 +31,7 @@ export interface AffixDef {
 const WEAPON = ['weapon'];
 const DEFENCE = ['head', 'shoulder', 'chest', 'hands', 'legs', 'feet', 'offhand', 'cape'];
 const TRINKET = ['neck', 'ring', 'charm', 'cape'];
+const MAGIC = ['staff', 'wand', 'tome'];
 
 interface Pair {
 	stat: StatKey;
@@ -68,6 +69,10 @@ export const AFFIXES: AffixDef[] = [
 	...pair({ stat: 'goldFind', prefix: 'Gilded', suffix: 'of Greed', power: 1.5, tags: [], weight: 8 }),
 	...pair({ stat: 'luck', prefix: 'Lucky', suffix: 'of Fortune', power: 1.5, tags: [], weight: 8 }),
 	...pair({ stat: 'regen', prefix: 'Mending', suffix: 'of Renewal', power: 1.5, tags: [], weight: 8 }),
+	...pair({ stat: 'maxMana', prefix: 'Arcane', suffix: 'of the Well', power: 1.5, tags: [...MAGIC, 'head', 'chest', 'neck', 'ring', 'charm'], weight: 8 }),
+	...pair({ stat: 'manaRegen', prefix: 'Flowing', suffix: 'of Clarity', power: 1.5, tags: [...MAGIC, 'head', 'chest', 'neck', 'ring', 'charm'], weight: 8 }),
+	...pair({ stat: 'spellPower', prefix: 'Wise', suffix: 'of Sorcery', power: 1.5, tags: [...MAGIC, 'neck', 'ring', 'charm'], weight: 6 }),
+	...pair({ stat: 'lifeLeech', prefix: 'Vampiric', suffix: 'of the Leech', power: 2, tags: WEAPON, minItemLevel: 5, weight: 5 }),
 ];
 
 // No prototype: an affix id from a save must not resolve to 'constructor' and friends

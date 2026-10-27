@@ -254,7 +254,7 @@ def mock(level, ground_dir):
     tile uses the cobbled yard ground."""
     pad = 36
     S = 48
-    grounds = ['forest', 'plains', 'hills', 'swamp', 'coast', 'tundra', 'lake', 'grounds']
+    grounds = ['forest', 'plains', 'hills', 'swamp', 'coast', 'tundra', 'lake']
     canvas = Image.new('RGBA', (3 * S + 2 * pad, 3 * S + 2 * pad), (12, 14, 28, 255))
     k = 0
     for ty in range(3):

@@ -41,6 +41,8 @@ import {
 	TileCost,
 } from '@/types/game';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
+import { STAT_RULES } from '@/config/combatConfig';
+import { atkSpeedPercent, magicDamagePercent, physicalDamagePercent, statArmor, statMaxMana } from '@/lib/statBonuses';
 import { RING, generateStartRing } from '@/utils/biomeRules';
 import {
 	EMPTY_WORLD,
@@ -68,6 +70,8 @@ export const countOwnedBiomeTypes = (tiles: World, biomeType: BiomeType): number
 const titleCase = (s: string) => s[0].toUpperCase() + s.slice(1);
 
 /** "+2.5% Stone & Coal production per point / +0.2% XP production per point / +0.2% XP gained per point" */
+const R = STAT_RULES;
+
 const resourceEffect = (stat: keyof typeof CHARACTER_STAT_CONFIG.resourceTargets): string => {
 	const cfg = CHARACTER_STAT_CONFIG;
 	const parts = [
@@ -88,27 +92,25 @@ export const getStatDescription = (
 		string
 	> = {
 		// Resource, XP and discount effects come from CHARACTER_STAT_CONFIG (the same constants the maths uses)
-		strength: `${resourceEffect('strength')} / +1 Physical ATK per point / +0.5 DEF per point / +1% Crit DMG per point`,
-		dexterity: `${resourceEffect('dexterity')} / +1 DEF per point / +0.25% ATK Speed per point / +0.25% Crit Chance per point / +0.5% Crit DMG per point`,
-		intelligence: `${resourceEffect('intelligence')} / +1 Magic ATK per point / +1 Magic DEF per point / +2 MP per point`,
-		vitality: `${resourceEffect('vitality')} / +3 HP per point / +0.5 DEF per point / +0.5 Magic DEF per point`,
-		charisma: `${resourceEffect('charisma')} / +${CHARACTER_STAT_CONFIG.tileDiscountPercentPerCharisma}% Tile Cost Discount per point (max ${CHARACTER_STAT_CONFIG.tileDiscountCapPercent}%) / +1 Luck per point (bigger chests) / +0.25 HP, DEF & Magic DEF per point / +0.5% Crit Chance & Crit DMG per point`,
+		// Every number below is read from STAT_RULES / CHARACTER_STAT_CONFIG: the text cannot drift from the maths. Combat bonuses count points above 5.
+		strength: `${resourceEffect('strength')} / +${R.physicalDamagePerStrength}% damage with physical weapons per point above ${R.base} / +${R.armorPerStrength} DEF per point above ${R.base} / +${R.critDamagePerPoint.strength}% Crit DMG per point above ${R.base}`,
+		dexterity: `${resourceEffect('dexterity')} / +${R.armorPerDexterity} DEF per point above ${R.base} / +${R.atkSpeedPerDexterity}% ATK Speed per point above ${R.base} / +0.25% Crit Chance per point / +${R.critDamagePerPoint.dexterity}% Crit DMG per point above ${R.base}`,
+		intelligence: `${resourceEffect('intelligence')} / +${R.magicDamagePerIntelligence}% damage with magic weapons (staves, wands) per point above ${R.base} / +${R.mana.perIntelligence} Max Mana per point / +${R.mana.regenPerIntelligence} Mana Regen per second per point`,
+		vitality: `${resourceEffect('vitality')} / +3 HP per point / +${R.armorPerVitality} DEF per point above ${R.base}`,
+		charisma: `${resourceEffect('charisma')} / +${CHARACTER_STAT_CONFIG.tileDiscountPercentPerCharisma}% Tile Cost Discount per point (max ${CHARACTER_STAT_CONFIG.tileDiscountCapPercent}%) / +1 Luck per point (bigger chests) / +0.25 HP per point / +0.5% Crit Chance per point / +${R.critDamagePerPoint.charisma}% Crit DMG per point above ${R.base}`,
 		// Combat stats
-		physicalAtk:
-			'Your physical attack power. Determines damage dealt with physical attacks.',
-		magicAtk:
-			'Your magical attack power. Determines damage dealt with magical attacks.',
+		physicalAtk: 'Bonus damage with physical weapons: swords, daggers, maces, mauls, axes, spears, bows and crossbows. Grows with Strength.',
+		magicAtk: 'Bonus damage with magic weapons: staves and wands. Grows with Intelligence, a little faster than Strength does for physical ones.',
 		hp: 'Hit Points. Your health that determines how much damage you can take.',
-		mp: 'Mana Points. Resource used for casting spells and special abilities.',
-		def: 'Physical Defense. Reduces damage taken from physical attacks.',
-		magicDef: 'Magical Defense. Reduces damage taken from magical attacks.',
+		mp: 'Mana. Skills like Heal and Stun spend it; it refills over time. Grows with Intelligence and magic gear.',
+		def: 'Defense from your attributes, added to your gear armor: it cuts the damage monsters deal.',
 		luck: 'Influences random events and rare item finds.',
 		critChance:
 			'Percentage chance to land a critical hit for increased damage.',
 		critDmgMultiplier:
 			'Percentage of additional damage dealt on critical hits.',
 		atkSpeedIncrease:
-			'Percentage increase to attack speed, allowing faster actions.',
+			'Percentage increase to attack speed. Clicks do not use it yet: it is the base for the speed-based combat.',
 		xpGainMultiplier:
 			'Percentage increase to experience points gained from all sources.',
 		tileCostDiscount: 'Percentage discount when purchasing new tiles.',
@@ -324,21 +326,17 @@ export const calculateCombatStats = (
 	stats: CharacterStats
 ): Partial<CharacterStats> => {
 	return {
-		physicalAtk: stats.strength, // +1 per strength
-		magicAtk: stats.intelligence, // +1 per intelligence
+		// the combat ones come from lib/statBonuses.ts (the same functions the fight uses); bonuses count points above 5
+		physicalAtk: physicalDamagePercent(stats),
+		magicAtk: magicDamagePercent(stats),
 		hp: stats.vitality * 3 + stats.charisma * 0.25, // +3 per vitality, +0.25 per charisma
-		mp: stats.intelligence * 2, // +2 per intelligence
-		def:
-			stats.dexterity +
-			stats.strength * 0.5 +
-			stats.vitality * 0.5 +
-			stats.charisma * 0.25, // Base + dex + str/2 + vit/2 + cha/4
-		magicDef: stats.intelligence + stats.vitality * 0.5 + stats.charisma * 0.25, // Base + int + vit/2 + cha/4
+		mp: statMaxMana(stats),
+		def: statArmor(stats),
 		luck: stats.charisma, // +1 per charisma
 		critChance: stats.dexterity * 0.25 + stats.charisma * 0.5, // +0.25% per dex, +0.5% per cha
 		critDmgMultiplier:
-			100 + stats.strength + stats.dexterity * 0.5 + stats.charisma * 0.5, // Base 100% + str + dex/2 + cha/2
-		atkSpeedIncrease: stats.dexterity * 0.25, // +0.25% per dex
+			100 + stats.strength + stats.dexterity * 0.5 + stats.charisma * 0.5, // Base 100% + str + dex/2 + cha/2 (lucky tile taps)
+		atkSpeedIncrease: atkSpeedPercent(stats),
 		xpGainMultiplier:
 			stats.intelligence * CHARACTER_STAT_CONFIG.xpGainPercentPerPoint.intelligence +
 			stats.charisma * CHARACTER_STAT_CONFIG.xpGainPercentPerPoint.charisma,
@@ -741,18 +739,30 @@ export const merchantEffect = (upgrades: MerchantUpgrades | undefined, id: Merch
 export const merchantUpgradeCost = (id: MerchantUpgradeId, level: number): number =>
 	Math.ceil(MERCHANT_UPGRADES[id].baseCost * Math.pow(MERCHANT_UPGRADES[id].costGrowth, level));
 
-/** Multiplier on every gold payout from selling to the merchant (Haggler). */
-export const sellMultiplier = (upgrades: MerchantUpgrades | undefined): number => 1 + merchantEffect(upgrades, 'haggler');
+/** What can raise what the merchant pays: the merchant bonuses now, rebirth (Legacy) effects later. A whole game state fits. */
+export interface SellContext {
+	merchantUpgrades?: MerchantUpgrades;
+	prestige?: PrestigeState;
+}
+
+/**
+ * The sources of the sell bonus, each an amount added to 1 (0.03 is +3 %). Every payout for what the player sells (resources,
+ * bag gear, junk, auto-sold drops, the previews and the net-worth check) goes through `sellMultiplier`, so a new bonus (a Legacy
+ * effect, a merchant level, an event) is one entry here and applies to all of them alike.
+ */
+export const SELL_BONUSES: ((ctx: SellContext) => number)[] = [(ctx) => merchantEffect(ctx.merchantUpgrades, 'haggler')];
+
+/** Multiplier on every gold payout from selling to the merchant. */
+export const sellMultiplier = (ctx: SellContext | undefined): number => 1 + SELL_BONUSES.reduce((sum, bonus) => sum + (ctx ? bonus(ctx) : 0), 0);
 
 /** Gold for selling `qty` of something worth `unit` each. */
-export const sellPayout = (unit: number, qty: number, upgrades: MerchantUpgrades | undefined): number =>
-	Math.floor(unit * qty * sellMultiplier(upgrades));
+export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefined): number => Math.floor(unit * qty * sellMultiplier(ctx));
 
 /** Luck from the Lucky Charm, added to the character's Luck for chests and kills. */
 export const merchantLuck = (upgrades: MerchantUpgrades | undefined): number => merchantEffect(upgrades, 'charm');
 
 /** Bag slots a game has: the base bag plus Pack Rat. */
-export const bagSizeFor = (baseSize: number, upgrades: MerchantUpgrades | undefined): number => baseSize + merchantEffect(upgrades, 'packrat');
+
 
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {

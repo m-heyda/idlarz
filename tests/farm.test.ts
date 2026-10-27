@@ -27,7 +27,7 @@ test('every animal yields meat plus a farm product', () => {
 });
 
 test('a product is a small share of the meat value once sold (so the farm stays balanced)', () => {
-	const price = { eggs: 3, milk: 4, hide: 6 };
+	const price = { eggs: 2, milk: 3, hide: 4 };
 	for (const animal of ANIMALS) {
 		const meat = animal.baseProduction * 1; // sells for 1 gold per meat
 		const product = animal.product.perSec * price[animal.product.resource];
@@ -120,4 +120,15 @@ test('Pen Expansion raises the per-kind cap and all farm output', () => {
 	assert.equal(farmCap(api().farmUpgrades), FARM.baseCap + FARM_PEN.capPerLevel);
 	assert.ok(Math.abs(api().resourceRates.base.meat - meat0 * (1 + FARM_PEN.outputPerLevel)) < 1e-9);
 	assert.equal(api().purchaseAnimal('chicken', 'max'), FARM_PEN.capPerLevel);
+});
+
+test('second-tier products come at a brisk pace: a full pen of chickens pays the first Hen House in two minutes, and the upgrades give +15 % per level', () => {
+	const eggsPerSec = calculateFarmOutput({ chicken: FARM.baseCap }).eggs;
+	assert.ok(eggsPerSec >= 0.35, `${eggsPerSec} eggs/s from a full coop`);
+	assert.ok((farmUpgradeCost('coop', 0).eggs ?? 0) / eggsPerSec <= 120, 'the first Hen House level costs under two minutes of a full coop');
+	for (const [id, resource, animal] of [['coop', 'eggs', 'chicken'], ['dairy', 'milk', 'cow'], ['tannery', 'hide', 'pig']] as const) {
+		const base = calculateFarmOutput({ [animal]: 4 })[resource];
+		const maxed = calculateFarmOutput({ [animal]: 4 }, { [id]: 10 })[resource];
+		assert.ok(Math.abs(maxed / base - 2.5) < 1e-9, `${id}: ${maxed / base}`);
+	}
 });

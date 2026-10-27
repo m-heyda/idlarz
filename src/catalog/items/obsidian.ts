@@ -11,7 +11,7 @@ export const OBSIDIAN_ITEMS: ItemDef[] = [
 	gear('obsidian_longbow', 'Obsidian Longbow', 'mainHand', 'rare', { damage: 15, critChance: 15, superCrit: 3 }, { tier: 3, weaponType: 'bow', art: true, description: 'The string sings in violet.' }),
 	gear('obsidian_crossbow', 'Obsidian Crossbow', 'mainHand', 'rare', { damage: 18, critChance: 12, superCrit: 5 }, { tier: 3, weaponType: 'crossbow', art: true, description: 'Hits hard where it matters.' }),
 	gear('obsidian_kris', 'Obsidian Kris', 'mainHand', 'rare', { damage: 12, critChance: 14, superCrit: 4, luck: 3 }, { tier: 3, weaponType: 'dagger', art: true, description: 'A wavy blade that always finds a way.' }),
-	gear('obsidian_staff', 'Obsidian Staff', 'mainHand', 'rare', { damage: 9, regen: 1.5, luck: 5 }, { tier: 3, weaponType: 'staff', art: true, description: 'Cold light pools in its orb.' }),
+	gear('obsidian_staff', 'Obsidian Staff', 'mainHand', 'rare',{ damage: 17, regen: 1.5, luck: 5, maxMana: baseStat('maxMana', 3), manaRegen: baseStat('manaRegen', 3), spellPower: baseStat('spellPower', 3) * 2 }, { tier: 3, weaponType: 'staff', art: true, description: 'Cold light pools in its orb.' }),
 	gear('obsidian_aegis', 'Obsidian Aegis', 'offHand', 'rare', { armor: 11, maxHp: 12 }, { ...obs, weaponType: 'shield', description: 'A spiked disc of black glass.' }),
 	gear('obsidian_helm', 'Obsidian Helm', 'head', 'rare', { armor: 6, maxHp: 6 }, { ...obs, description: 'Crowned with two cold horns.' }),
 	gear('obsidian_pauldrons', 'Obsidian Pauldrons', 'shoulder', 'rare', { armor: 5, maxHp: 5 }, { ...obs, description: 'Spiked and shining.' }),

@@ -56,7 +56,7 @@ export const minimumSpend = (state: PersistedGame): number => {
 const stockValue = (resources: Resources, state: PersistedGame): number => {
 	let value = 0;
 	for (const [key, price] of Object.entries(MERCHANT_RESOURCE_PRICES) as [keyof Resources, number][]) {
-		value += sellPayout(price, resources[key], state.merchantUpgrades);
+		value += sellPayout(price, resources[key], state);
 	}
 	return value;
 };
@@ -65,7 +65,7 @@ const stockValue = (resources: Resources, state: PersistedGame): number => {
 export const incomePerSec = (summary: SaveSummary, state: PersistedGame): number => {
 	let perSec = summary.rates.gold;
 	for (const [key, price] of Object.entries(MERCHANT_RESOURCE_PRICES) as [keyof Resources, number][]) {
-		perSec += sellPayout(price, summary.rates[key], state.merchantUpgrades);
+		perSec += sellPayout(price, summary.rates[key], state);
 	}
 	return perSec;
 };
