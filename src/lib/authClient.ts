@@ -6,22 +6,30 @@ export interface Profile {
 	playerClass: PlayerClassId;
 }
 
+/** Why accounts cannot be used: the server has no Supabase setup (retrying cannot help), or it is an outage / network problem (it may pass). */
+export type UnavailableReason = 'not_configured' | 'outage';
+
 export type AuthResult =
 	| { status: 'ok'; userId: string; profile: Profile | null }
 	| { status: 'guest' } // no session (a clean 401)
-	| { status: 'unavailable' } // outage, missing env, network: never treated as "logged out"
+	| { status: 'unavailable'; reason: UnavailableReason } // outage, missing env, network: never treated as "logged out"
 	| { status: 'error'; message: string }; // the player's input was refused
+
+/** A request that hangs must not leave the player on the loading screen: it counts as an outage. */
+const REQUEST_TIMEOUT_MS = 8000;
 
 const request = async (path: string, init?: RequestInit): Promise<AuthResult> => {
 	try {
-		const response = await fetch(path, { ...init, credentials: 'same-origin', cache: 'no-store' });
-		const body = (await response.json().catch(() => ({}))) as { user?: { id?: string }; profile?: Profile | null; error?: string; unavailable?: boolean };
+		const response = await fetch(path, { ...init, credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+		const body = (await response.json().catch(() => ({}))) as { user?: { id?: string }; profile?: Profile | null; error?: string; unavailable?: boolean; reason?: UnavailableReason };
 		if (response.ok) return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null };
-		if (response.status === 503 || response.status >= 500 || body.unavailable) return { status: 'unavailable' };
+		if (response.status === 503 || response.status >= 500 || body.unavailable) {
+			return { status: 'unavailable', reason: body.reason === 'not_configured' ? 'not_configured' : 'outage' };
+		}
 		if (response.status === 401 && path === '/api/auth/me') return { status: 'guest' };
 		return { status: 'error', message: body.error ?? 'Something went wrong.' };
 	} catch {
-		return { status: 'unavailable' };
+		return { status: 'unavailable', reason: 'outage' };
 	}
 };
 
