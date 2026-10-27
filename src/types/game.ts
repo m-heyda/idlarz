@@ -177,7 +177,10 @@ export type MonsterType = 'rat' | 'ratKing';
 export interface Monster {
 	id: number;
 	type: MonsterType;
-	tier: number;
+	/** Its level now: `spawnLevel` plus the growth its age has earned (capped by the growth limit) */
+	level: number;
+	/** The level it appeared at */
+	spawnLevel: number;
 	x: number;
 	y: number;
 	ageSec: number;
@@ -198,9 +201,8 @@ export type FightPhase = 'active' | 'won' | 'knockedOut' | 'timeout';
 export interface FightState {
 	monsterId: number;
 	type: MonsterType;
-	tier: number;
-	/** The castle level the fight started at: the monster's HP and attack were scaled for it and stay so for the whole fight */
-	castleLevel: number;
+	/** The monster's level when the fight started: its HP, attack and armor stay what that level gave for the whole fight */
+	level: number;
 	monsterHp: number;
 	monsterMaxHp: number;
 	attackTimer: number;
@@ -324,6 +326,8 @@ export interface GameState {
 	skillCd: Partial<Record<SkillId, number>>;
 	monsters: Monster[];
 	monsterSpawnTimer: number;
+	/** Seconds towards the next boss (counts only while no boss is on the map and there is room) */
+	bossSpawnTimer: number;
 	nextMonsterId: number;
 	fight: FightState | null; // transient: never saved
 	farmLevels: Record<string, number>; // animals owned per kind

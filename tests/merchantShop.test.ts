@@ -137,7 +137,7 @@ test('Haggler raises every payout (resources and items)', () => {
 	freshGame({ gold: 0, wood: 1000 });
 	store.setState({ merchantUpgrades: { haggler: 10 } });
 	api().sellResources('wood', 1000);
-	assert.equal(api().resources.gold, Math.floor(1000 * MERCHANT_RESOURCE_PRICES.wood * sellMultiplier({ haggler: 10 })));
+	assert.equal(api().resources.gold, Math.floor(1000 * MERCHANT_RESOURCE_PRICES.wood * sellMultiplier({ merchantUpgrades: { haggler: 10 } })));
 	assert.ok(api().resources.gold > plain);
 });
 

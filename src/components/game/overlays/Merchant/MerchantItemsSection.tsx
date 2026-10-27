@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '@/stores/gameStore';
 import { ITEM_CATALOG, RARITIES, RARITY_ORDER } from '@/config/itemCatalog';
 import { gearOf, slotQty } from '@/lib/inventory';
@@ -8,7 +9,6 @@ import { formatNumber } from '@/utils/formatters';
 import { sellPayout } from '@/utils/gameUtils';
 import ItemSlot from '../../ItemSlot';
 import { slotProps } from '../../itemUi';
-import OrganizeButton from '../../OrganizeButton';
 import ResourceIcon from '../../ResourceIcon';
 import '@/styles/Inventory.css';
 
@@ -18,7 +18,7 @@ import '@/styles/Inventory.css';
  */
 export const MerchantItemsSection: React.FC = () => {
 	const bag = useGameStore((state) => state.bag);
-	const upgrades = useGameStore((state) => state.merchantUpgrades);
+	const sellCtx = useGameStore(useShallow((state) => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige })));
 	const fighting = useGameStore((state) => !!state.fight);
 	const sellItem = useGameStore((state) => state.sellItem);
 	const sellJunk = useGameStore((state) => state.sellJunk);
@@ -53,7 +53,7 @@ export const MerchantItemsSection: React.FC = () => {
 
 	const worth = bag.reduce((sum, slot) => {
 		const gear = slot ? gearOf(slot) : null;
-		return gear && isAutoSold(gear, 'uncommon') ? sum + sellPayout(sellValueOf(gear), 1, upgrades) : sum;
+		return gear && isAutoSold(gear, 'uncommon') ? sum + sellPayout(sellValueOf(gear), 1, sellCtx) : sum;
 	}, 0);
 	// Auto-sell may go up to (but never include) the two rarest tiers: those are never junk
 	const autoChoices = RARITY_ORDER.slice(0, -2);
@@ -63,7 +63,6 @@ export const MerchantItemsSection: React.FC = () => {
 			<div className='flex items-center justify-between mb-2'>
 				<h3 className='text-white font-bold text-sm'>Sell items</h3>
 				<div className='flex gap-2'>
-					<OrganizeButton onNotice={say} />
 					<button className='px-btn px-btn-sm' onClick={() => junk('common')} disabled={fighting}>
 						Sell common
 					</button>

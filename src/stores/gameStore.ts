@@ -71,10 +71,11 @@ import { rollBiome } from '@/utils/biomeRules';
 import { pickChestSpot, rollChestLoot, type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
 import { createHitGuard } from '@/lib/hitGuard';
-import { applyHit, armorOf, dodgeChance, leechHeal, manaRegenPerSec, maxHp, maxMana, newFight, regen, rollHit, stepFight } from '@/lib/combat';
+import { applyHit, armorOf, damageAfterArmor, dodgeChance, leechHeal, manaRegenPerSec, maxHp, maxMana, newFight, regen, rollHit, stepFight, stunResisted } from '@/lib/combat';
 import { emitCombat } from '@/lib/combatFx';
 import { SKILLS, type SkillId } from '@/catalog/skills';
 import { castRefusal, healAmount, isSkillId, tickCooldowns } from '@/lib/skills';
+import type { LimitContext } from '@/lib/limits';
 import { generateMerchantStock, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
 import { addDrop, aggregateStats, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
@@ -82,7 +83,7 @@ import { plainItem, sellValueOf } from '@/lib/itemInstance';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { canSpawn } from '@/lib/spawnLimits';
 import { isAutoSold, receiveDrops, rollKillLoot } from '@/lib/loot';
-import { advanceMonsters, monsterAt, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
+import { advanceMonsters, bossThreshold, monsterAt, newMonster, nextBossType, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
@@ -108,6 +109,9 @@ import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedC
 const lastTapAt: Record<string, number> = {};
 
 // Last accepted critter gift per source (not persisted) - enforces the gift cooldowns
+/** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
+const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'>): LimitContext => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige });
+
 const lastGiftAt: Record<string, number> = {};
 
 // Shared by the gold click and the tile tap: one token per physical click
@@ -156,6 +160,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		skillCd: {} as Partial<Record<SkillId, number>>,
 		monsters: [] as Monster[],
 		monsterSpawnTimer: 0,
+		bossSpawnTimer: 0,
 		nextMonsterId: 1,
 		fight: null as FightState | null,
 		farmLevels: {} as Record<string, number>,
@@ -466,7 +471,7 @@ const createGameSlice = (
 			else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
 			else if (loot.kind === 'xp') resources.xp = Math.min(resources.xp + loot.xp, XP_CAP);
 			else {
-				const received = receiveDrops(bag, [loot.drop], state.autoSellUpTo, state.merchantUpgrades);
+				const received = receiveDrops(bag, [loot.drop], state.autoSellUpTo, state);
 				bag = received.bag;
 				resources.gold = Math.min(resources.gold + received.autoSold.gold, RESOURCE_CAP);
 			}
@@ -526,7 +531,7 @@ const createGameSlice = (
 			if (state.fight || state.playerHp <= 0) return false;
 			const monster = state.monsters.find((m) => m.id === monsterId);
 			if (!monster) return false;
-			set({ fight: newFight(monster, castleLevelOf(state.tiles)) });
+			set({ fight: newFight(monster) });
 			return true;
 		},
 
@@ -536,7 +541,9 @@ const createGameSlice = (
 			if (!fight || fight.phase !== 'active') return null;
 			if (!hitGuard.take(input)) return null;
 
-			const { damage, crit } = rollHit(state.characterStats, state.equipment, Math.random);
+			const rolled = rollHit(state.characterStats, state.equipment, Math.random);
+			const crit = rolled.crit;
+			const damage = damageAfterArmor(fight, rolled.damage); // the monster's armor takes its share
 			const { fight: next, killed } = applyHit(fight, damage);
 			// Life Leech: a share of the click's damage comes back as HP
 			const leech = leechHeal(damage, state.equipment);
@@ -549,7 +556,7 @@ const createGameSlice = (
 
 			const rates = state.resourceRates.total;
 			const loot = rollKillLoot(
-				{ type: fight.type, tier: fight.tier },
+				{ type: fight.type, level: fight.level },
 				{
 					goldPerSec: rates.gold,
 					xpPerSec: rates.xp * (1 + state.characterStats.xpGainMultiplier / 100),
@@ -559,12 +566,11 @@ const createGameSlice = (
 						...Object.values(state.equipment).map((item) => item?.base),
 						...state.bag.map((slot) => (slot && 'item' in slot ? slot.item.base : slot?.id)),
 					].filter((id): id is string => !!id),
-					castleLevel: castleLevelOf(state.tiles),
 					pity: state.lootPity,
 				},
 				Math.random
 			);
-			const received = receiveDrops(state.bag, loot.items, state.autoSellUpTo, state.merchantUpgrades);
+			const received = receiveDrops(state.bag, loot.items, state.autoSellUpTo, state);
 			set({
 				fight: { ...next, phase: 'won', summary: { gold: loot.gold, xp: loot.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold } },
 				monsters: state.monsters.filter((m) => m.id !== fight.monsterId),
@@ -635,8 +641,12 @@ const createGameSlice = (
 				patch.playerHp = state.playerHp + healed;
 				emitCombat({ kind: 'heal', amount: Math.round(healed) });
 			} else if (state.fight) {
-				patch.fight = { ...state.fight, stunLeftSec: skill.stunSec ?? 0 };
-				emitCombat({ kind: 'stun', sec: skill.stunSec ?? 0 });
+				if (stunResisted(state.fight, Math.random)) {
+					emitCombat({ kind: 'resist' }); // the mana and the cooldown are spent all the same
+				} else {
+					patch.fight = { ...state.fight, stunLeftSec: skill.stunSec ?? 0 };
+					emitCombat({ kind: 'stun', sec: skill.stunSec ?? 0 });
+				}
 			}
 			set(patch);
 			return true;
@@ -794,11 +804,13 @@ const createGameSlice = (
 			let newMonsterSpawnTimer = state.monsterSpawnTimer;
 			let newNextMonsterId = state.nextMonsterId;
 			if (newMonsters.length > 0) {
-				newMonsters = advanceMonsters(newMonsters, secondsElapsed, Math.random, state.fight?.monsterId ?? null);
+				newMonsters = advanceMonsters(newMonsters, secondsElapsed, state.fight?.monsterId ?? null, limitCtx(state));
 				// the castle's ward (castle level 7+) drives monsters out; the one being fought stays until the fight ends
 				newMonsters = monstersOutsideWard(newMonsters, castleLevelOf(newTiles), state.fight?.monsterId ?? null);
 			}
-			if (!canSpawn(newTiles, wardLevel, newMonsters.length, newActiveChestsCount) || countOwnedTiles(newTiles) < COMBAT.spawn.minOwnedTiles) {
+			let newBossSpawnTimer = state.bossSpawnTimer;
+			const roomToSpawn = canSpawn(newTiles, wardLevel, newMonsters.length, newActiveChestsCount) && countOwnedTiles(newTiles) >= COMBAT.spawn.minOwnedTiles;
+			if (!roomToSpawn) {
 				newMonsterSpawnTimer = 0;
 			} else {
 				newMonsterSpawnTimer += secondsElapsed;
@@ -808,8 +820,22 @@ const createGameSlice = (
 					if (spot) {
 						newMonsters = [
 							...newMonsters,
-							{ id: newNextMonsterId, type: 'rat', tier: 1, x: spot.x, y: spot.y, ageSec: 0 },
+							newMonster('rat', newNextMonsterId, spot, castleLevelOf(newTiles)),
 						];
+						newNextMonsterId++;
+					}
+				}
+			}
+			// Bosses come on their own timer, one kind at a time; the timer waits while there is no room and restarts when one leaves
+			const bossType = nextBossType(newMonsters);
+			if (!bossType) newBossSpawnTimer = 0;
+			else if (roomToSpawn) {
+				newBossSpawnTimer += secondsElapsed;
+				if (newBossSpawnTimer >= bossThreshold()) {
+					const spot = pickSpawnTile(newTiles, newMonsters, Math.random);
+					if (spot) {
+						newBossSpawnTimer = 0;
+						newMonsters = [...newMonsters, newMonster(bossType, newNextMonsterId, spot, castleLevelOf(newTiles))];
 						newNextMonsterId++;
 					}
 				}
@@ -825,7 +851,7 @@ const createGameSlice = (
 				newFightState = step.fight;
 				newPlayerHp = step.playerHp;
 				for (const event of step.events) {
-					if (event.kind === 'hurt') emitCombat({ kind: 'hurt', amount: event.amount });
+					if (event.kind === 'hurt') emitCombat({ kind: 'hurt', amount: event.amount, crit: event.crit });
 					if (event.kind === 'knockedOut') newPlayerHp = Math.round(playerMaxHp * COMBAT.knockoutHpFraction);
 				}
 			} else {
@@ -857,12 +883,13 @@ const createGameSlice = (
 				activeChests: newActiveChestsCount,
 				monsters: newMonsters,
 				monsterSpawnTimer: newMonsterSpawnTimer,
+				bossSpawnTimer: newBossSpawnTimer,
 				nextMonsterId: newNextMonsterId,
 				fight: newFightState,
 				playerHp: newPlayerHp,
 				playerMp: newPlayerMp,
 				skillCd: tickCooldowns(state.skillCd, secondsElapsed),
-				merchantStock: stockDue(state.merchantStock, newPlaySeconds) ? generateMerchantStock(castleLevelOf(state.tiles), rotationRng(newPlaySeconds), newPlaySeconds) : state.merchantStock,
+				merchantStock: stockDue(state.merchantStock, newPlaySeconds, limitCtx(state)) ? generateMerchantStock(castleLevelOf(state.tiles), rotationRng(newPlaySeconds), newPlaySeconds, limitCtx(state)) : state.merchantStock,
 				playSeconds: newPlaySeconds,
 			});
 			if (castleFinished) emitSaveEvent('castleUpgraded');
@@ -911,7 +938,7 @@ const createGameSlice = (
 
 			const price =
 				MERCHANT_RESOURCE_PRICES[resource as keyof typeof MERCHANT_RESOURCE_PRICES];
-			const goldGained = sellPayout(price, amount, state.merchantUpgrades);
+			const goldGained = sellPayout(price, amount, state);
 
 			set({
 				resources: {
@@ -935,7 +962,7 @@ const createGameSlice = (
 			if (!unit) return 0;
 			const amount = qty === undefined ? 1 : Math.floor(qty);
 			if (!(amount >= 1) || amount > slotQty(slot)) return 0;
-			const gold = sellPayout(unit, amount, state.merchantUpgrades);
+			const gold = sellPayout(unit, amount, state);
 			set({
 				bag: removeFromBag(state.bag, bagIndex, amount),
 				resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) },
@@ -966,7 +993,7 @@ const createGameSlice = (
 			bag.forEach((slot, index) => {
 				const item = gearOf(slot);
 				if (!item || !isAutoSold(item, maxRarity)) return;
-				gold += sellPayout(sellValueOf(item), 1, state.merchantUpgrades);
+				gold += sellPayout(sellValueOf(item), 1, state);
 				count += 1;
 				bag = removeFromBag(bag, index, 1);
 			});
@@ -1028,11 +1055,11 @@ const createGameSlice = (
 		refreshMerchantStock: () => {
 			const state = get();
 			const castle = castleLevelOf(state.tiles);
-			const cost = refreshCost(castle);
+			const cost = refreshCost(castle, limitCtx(state));
 			if (state.resources.gold < cost) return false;
 			set({
 				resources: { ...state.resources, gold: state.resources.gold - cost },
-				merchantStock: generateMerchantStock(castle, Math.random, state.playSeconds),
+				merchantStock: generateMerchantStock(castle, Math.random, state.playSeconds, limitCtx(state)),
 			});
 			emitSaveEvent('refreshMerchantStock');
 			return true;

@@ -4,12 +4,18 @@ import type { MonsterType } from '@/types/game';
 import MonsterArt from './MonsterArt';
 import '@/styles/Monsters.css';
 
-/** A monster standing on its tile: idle bob, tier badge for rats, bigger and golden for the Rat King. */
-const MonsterSprite: React.FC<{ type: MonsterType; tier: number }> = ({ type, tier }) => (
-	<span className='tile-monster' data-king={type === 'ratKing'}>
-		<MonsterArt type={type} label={MONSTERS[type].label} className='tile-monster-img' />
-		{type === 'rat' && <span className='tile-monster-tier'>{tier}</span>}
-	</span>
-);
+/** A monster standing on its tile: idle bob, a level badge, and for bosses a skull in the badge and a golden glow. */
+const MonsterSprite: React.FC<{ type: MonsterType; level: number }> = ({ type, level }) => {
+	const boss = MONSTERS[type].grade === 'boss';
+	return (
+		<span className='tile-monster' data-king={type === 'ratKing'} data-boss={boss}>
+			<MonsterArt type={type} label={MONSTERS[type].label} className='tile-monster-img' />
+			<span className='tile-monster-tier' data-boss={boss}>
+				{boss ? '☠ ' : ''}
+				{level}
+			</span>
+		</span>
+	);
+};
 
 export default MonsterSprite;

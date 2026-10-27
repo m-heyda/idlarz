@@ -1,4 +1,5 @@
 import { convertGroundsGrid } from '@/lib/groundsMigration';
+import { convertMonstersBody } from '@/lib/monstersMigration';
 import { MIGRATIONS, type SaveBody } from '@/lib/saveFormat';
 import { sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
 import type { DecodeResult } from '@/lib/saveFormat';
@@ -87,7 +88,7 @@ const readEnvelope = async (text: string): Promise<PersistedGame | { reason: str
 	}
 	// This format predates the item instances: its gear is bare item ids, which migration 2 -> 3 turns into instances
 	// and Grounds tiles of its 50 x 50 grid become the land around them
-	const gearFixed = typeof envelope.state === 'object' && envelope.state !== null && !Array.isArray(envelope.state) ? MIGRATIONS[2](envelope.state as SaveBody) : envelope.state;
+	const gearFixed = typeof envelope.state === 'object' && envelope.state !== null && !Array.isArray(envelope.state) ? convertMonstersBody(MIGRATIONS[2](envelope.state as SaveBody)) : envelope.state;
 	const state = typeof gearFixed === 'object' && gearFixed !== null && !Array.isArray(gearFixed) ? { ...(gearFixed as SaveBody), tiles: convertGroundsGrid((gearFixed as SaveBody).tiles) } : gearFixed;
 	const result = sanitizeSave(state);
 	return result.ok ? result.state : { reason: `The save contains impossible data (${result.reason}).` };

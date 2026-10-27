@@ -104,7 +104,7 @@ test('migrations upgrade old bodies step by step', () => {
 	assert.equal(decodeSave(v1, { schema: 2, migrations: table }).ok, true);
 	assert.equal(decodeSave(v1, { schema: 2, migrations: {} }).ok, false, 'a missing step is an error, not a guess');
 	assert.deepEqual(migrateBody({ a: 1 }, 1, 3, { 1: (b) => ({ ...b, b: 2 }), 2: (b) => ({ ...b, c: 3 }) }), { a: 1, b: 2, c: 3 });
-	assert.deepEqual(Object.keys(MIGRATIONS), ['1', '2', '3'], 'one step per bump of SAVE_SCHEMA: 1 -> 2 turned the land list into runs, 2 -> 3 the gear ids into item instances, 3 -> 4 the Grounds tiles into land');
+	assert.deepEqual(Object.keys(MIGRATIONS), ['1', '2', '3', '4'], 'one step per bump of SAVE_SCHEMA: 1 -> 2 turned the land list into runs, 2 -> 3 the gear ids into item instances, 3 -> 4 the Grounds tiles into land, 4 -> 5 the monster tiers into levels');
 });
 
 test('every frozen save in tests/fixtures/saves still loads (the compatibility guard)', async () => {

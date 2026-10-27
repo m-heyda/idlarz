@@ -1,6 +1,6 @@
 import { COMBAT } from '@/config/combatConfig';
 import { CHEST } from '@/config/gameConfig';
-import { monsterStats } from '@/lib/monsters';
+import { monsterDef, monsterStats } from '@/lib/monsters';
 import type { Rng } from '@/lib/rng';
 import type { Drop, Monster } from '@/types/game';
 import { generateLoot } from './generate';
@@ -13,8 +13,6 @@ export interface KillContext {
 	goldFind?: number;
 	/** Base item ids the player already has (bag + worn): the king prefers Rattatui pieces that are still missing */
 	owned?: readonly string[];
-	/** The world level (castle level, 1-10): raises the item level of the drops */
-	castleLevel?: number;
 	/** Bad-luck counters from the save */
 	pity?: Readonly<Record<string, number>>;
 }
@@ -33,17 +31,17 @@ export interface KillLoot {
  * item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.
  */
 export const rollKillLoot = (
-	monster: Pick<Monster, 'type' | 'tier'>,
+	monster: Pick<Monster, 'type' | 'level'>,
 	ctx: KillContext,
 	rng: Rng
 ): KillLoot => {
-	const { rewardSec } = monsterStats(monster.type, monster.tier);
+	const { rewardSec } = monsterStats(monster.type, monster.level);
 	const luckBonus = 1 + ctx.luck * CHEST.luckBonusPerPoint;
 	const goldFind = 1 + (ctx.goldFind ?? 0) / 100;
 	const gold = Math.floor(Math.max(COMBAT.rewards.minGold, ctx.goldPerSec * rewardSec * luckBonus * goldFind));
 	const xp = Math.max(COMBAT.rewards.minXp, ctx.xpPerSec * rewardSec);
 
-	const result = generateLoot({ sourceId: monster.type, tier: monster.tier, castleLevel: ctx.castleLevel, owned: ctx.owned, pity: ctx.pity }, rng);
+	const result = generateLoot({ sourceId: monsterDef(monster.type).lootSourceId, level: monster.level, owned: ctx.owned, pity: ctx.pity }, rng);
 	if (result.warnings.length) console.warn('[loot]', ...result.warnings);
 	return { gold, xp, items: result.drops, pity: result.pity };
 };

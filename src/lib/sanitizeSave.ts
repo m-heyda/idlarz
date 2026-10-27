@@ -31,9 +31,10 @@ import { instanceProblem } from '@/lib/itemInstance';
 import { maxHp, maxMana } from '@/lib/combat';
 import { isInWard } from '@/lib/castleWard';
 import { starterBag } from '@/lib/inventory';
-import { tierFor } from '@/lib/monsters';
+import { limitOf } from '@/lib/limits';
+import { levelAtAge, spawnLevelRange } from '@/lib/monsters';
+import { MONSTERS } from '@/config/combatConfig';
 import {
-	bagSizeFor,
 	calculateCombatStats,
 	calculateLevel,
 	calculateXpGain,
@@ -96,6 +97,7 @@ export const PERSISTED_KEYS = [
 	'playerMp',
 'monsters',
 	'monsterSpawnTimer',
+	'bossSpawnTimer',
 	'nextMonsterId',
 	'lootPity',
 	'autoSellUpTo',
@@ -151,7 +153,7 @@ const OPTIONAL_RESOURCES = new Set<keyof Resources>(['eggs', 'milk', 'hide']);
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
-const MONSTER_KEYS = new Set(['id', 'type', 'tier', 'x', 'y', 'ageSec']);
+const MONSTER_KEYS = new Set(['id', 'type', 'level', 'spawnLevel', 'x', 'y', 'ageSec']);
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);
 const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes']);
@@ -366,7 +368,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (v > 0) merchantUpgrades[id] = v;
 		}
 	}
-	const bagSize = bagSizeFor(COMBAT.bagSize, merchantUpgrades);
+	const bagSize = limitOf('bagSize', { merchantUpgrades });
 
 	// ---- gear, bag, HP, monsters (all optional: a save from before combat gets the starter kit) ------------------
 	let equipment: Equipment;
@@ -449,6 +451,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (nextMonsterId === null) return fail('next monster id');
 	const monsterSpawnTimer = raw.monsterSpawnTimer === undefined ? 0 : num(raw.monsterSpawnTimer, 0, COMBAT.spawn.intervalSec);
 	if (monsterSpawnTimer === null) return fail('monster spawn timer');
+	const bossSpawnTimer = raw.bossSpawnTimer === undefined ? 0 : num(raw.bossSpawnTimer, 0, COMBAT.spawn.bossIntervalSec);
+	if (bossSpawnTimer === null) return fail('boss spawn timer');
 	const monsters: Monster[] = [];
 	if (raw.monsters !== undefined) {
 		if (!Array.isArray(raw.monsters) || raw.monsters.length > tiles.stats.owned) return fail('monsters'); // one per tile at most (the duplicate check below)
@@ -463,8 +467,15 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			const y = int(m.y, -COORD_LIMIT, COORD_LIMIT);
 			const ageSec = num(m.ageSec, 0, 1e8);
 			if (id === null || x === null || y === null || ageSec === null) return fail('monster numbers');
-			if (m.type !== 'rat' && m.type !== 'ratKing') return fail('monster type');
-			if (m.tier !== tierFor(m.type, ageSec)) return fail('monster tier');
+			if (typeof m.type !== 'string' || !Object.hasOwn(MONSTERS, m.type)) return fail('monster type');
+			const type = m.type as keyof typeof MONSTERS;
+			// the level it appeared at is inside what the type can spawn at; its level is that plus at most the growth its age can have
+			// earned (up to the hard ceiling: the growth limit can be raised later, never above it)
+			const spawnLevel = int(m.spawnLevel, 1, MONSTERS[type].spawnWindow.cap);
+			const level = int(m.level, 1, 1000);
+			if (spawnLevel === null || level === null) return fail('monster level');
+			if (spawnLevel < spawnLevelRange(type, 1).min) return fail('monster spawn level');
+			if (level < spawnLevel || level > levelAtAge(spawnLevel, ageSec, { hardCap: true })) return fail('monster level');
 			const tile = getTile(tiles, x, y);
 			if (!tile || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
 			if (isInWard(x, y, castleLevel)) return fail('monster inside the castle ward');
@@ -474,7 +485,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			ids.add(id);
 			spots.add(`${x},${y}`);
 			if (m.type === 'ratKing' && ++kings > 1) return fail('more than one king');
-			monsters.push({ id, type: m.type, tier: m.tier, x, y, ageSec });
+			monsters.push({ id, type, level, spawnLevel, x, y, ageSec });
 		}
 	}
 
@@ -594,6 +605,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			playerMp,
 			monsters,
 			monsterSpawnTimer,
+			bossSpawnTimer,
 			nextMonsterId,
 			lootPity,
 			autoSellUpTo,

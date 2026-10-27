@@ -23,7 +23,7 @@ const withFight = (monster: Partial<Monster> = {}) => {
 	freshGame();
 	growTo(6);
 	const spot = gridCells().filter(({ t }) => t.isOwned && t.biome !== 'castle')[0];
-	store.setState({ monsters: [{ id: 1, type: 'rat', tier: 1, x: spot.x, y: spot.y, ageSec: 0, ...monster }], nextMonsterId: 2 });
+	store.setState({ monsters: [{ id: 1, type: 'rat', level: 1, spawnLevel: 1, x: spot.x, y: spot.y, ageSec: 0, ...monster }], nextMonsterId: 2 });
 	assert.equal(api().startFight(1), true);
 };
 
@@ -147,7 +147,7 @@ test('castSkill(stun): fights only, level 10, freezes the monster for 3 s, then 
 });
 
 test('stepFight: the stun runs down first and only the rest of the step winds up the attack', () => {
-	const fight = { ...newFight({ id: 1, type: 'rat', tier: 1 }), stunLeftSec: 0.75 };
+	const fight = { ...newFight({ id: 1, type: 'rat', level: 1 }), stunLeftSec: 0.75 };
 	let r = stepFight(fight, 1, 100, 2, noRng);
 	assert.equal(r.fight.stunLeftSec, 0);
 	assert.equal(r.fight.attackTimer, 0.25, 'a quarter of the second counted towards the attack');
@@ -156,9 +156,9 @@ test('stepFight: the stun runs down first and only the rest of the step winds up
 	assert.equal(r.fight.stunLeftSec, 2);
 	assert.equal(r.fight.attackTimer, 0);
 	// a stunned King still runs out of time
-	const king = { ...newFight({ id: 2, type: 'ratKing', tier: 1 }), stunLeftSec: 3 };
+	const king = { ...newFight({ id: 2, type: 'ratKing', level: 15 }), stunLeftSec: 3 };
 	assert.equal(stepFight(king, 1, 100, 2, noRng).fight.timeLeftSec, king.timeLeftSec! - 1);
-	assert.equal(newFight({ id: 1, type: 'rat', tier: 1 }).stunLeftSec, 0);
+	assert.equal(newFight({ id: 1, type: 'rat', level: 1 }).stunLeftSec, 0);
 });
 
 test('skill cooldowns are transient: a save never holds them', () => {

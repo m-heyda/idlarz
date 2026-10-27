@@ -1,6 +1,6 @@
 # 10 · Loot system
 
-One shared, data-driven pipeline gives out gear for every source (rats, the Rat King, chests and the merchant's shelf). Design: [superpowers/specs/2026-10-27-loot-system-design.md](superpowers/specs/2026-10-27-loot-system-design.md). Numbers: [generated/loot-sim.md](generated/loot-sim.md) and [generated/item-catalog.md](generated/item-catalog.md).
+One shared, data-driven pipeline gives out gear for every source (rats, the Rat King and later bosses, chests and the merchant's shelf). Design: [superpowers/specs/2026-10-27-loot-system-design.md](superpowers/specs/2026-10-27-loot-system-design.md). Numbers: [generated/loot-sim.md](generated/loot-sim.md) and [generated/item-catalog.md](generated/item-catalog.md).
 
 ## The five separate ideas
 
@@ -8,7 +8,7 @@ One shared, data-driven pipeline gives out gear for every source (rats, the Rat 
 |---|---|
 | **How many items** (drop chance, number of rolls) | the source's *loot profile* (`rolls`) in `src/catalog/lootConfig.ts` |
 | **Rarity** (Common … Legendary) | rolled from the profile's `rarityWeights`; behaviour (affix count, colour, sell value) in `src/catalog/rarity.ts` |
-| **Item level** (power) | the source's level: monster tier + castle level (never the player's level), plus the profile's offset/variance |
+| **Item level** (power) | the source's level: a monster's own level (it passes it in), or the castle level for chests and the merchant (never the player's level), plus the profile's offset/variance |
 | **Eligibility** (which items may appear) | pools (`LOOT_POOLS`) match items by id, tags or their own `pools`; each item has an item level window |
 | **Definition vs instance** | an item *definition* says what it is; a dropped/owned *instance* is `{ base, level, rarity, quality, affixes[] }` (`ItemInstance`) |
 
@@ -17,8 +17,8 @@ Rarity never decides the item level and the item level never decides the rarity.
 ## The pipeline (`generateLoot`, src/lib/loot/generate.ts)
 
 1. `source` (`rat` / `ratKing` / `chest` / `merchant`) names a profile (`LOOT_SOURCES`).
-2. Roll count: the first `guaranteed` rolls always succeed, the rest with `chancePerRoll (+ chancePerTier per tier above 1)`.
-3. Source level = `base + perTier × (tier − 1) + perCastleLevel × (castle − 1)`, clamped to 1..100.
+2. Roll count: the first `guaranteed` rolls always succeed, the rest with `chancePerRoll (+ chancePerLevel per monster level above 1)`.
+3. Source level = the monster's level when the caller passes one, else `base + perCastleLevel × (castle − 1)` (chests, the shelf), clamped to 1..100.
 4. Item level = source level + profile offset ± variance, inside the profile's bounds.
 5. Eligible bases = pool members whose window contains the item level.
 6. Rarity: the profile weights, minus rarities gated above this item level (`rarityLevelGate`), minus rarities with no eligible base, normalised. One draw, never chained checks.
@@ -51,7 +51,7 @@ Stats are derived at load and never stored, so retuning the curve retunes every 
 - **A profile / source** (elite monster, premium chest): add the profile and a `LOOT_SOURCES` entry, then point the monster or chest at it.
 - **Tuning**: weights, chances, levels and curve are all config. Run `npm run loot-sim -- --md`.
 
-`validateLootData` (src/lib/loot/validate.ts, run by `tests/lootValidate.test.ts`) checks: sources reference profiles, profiles reference pools and rarities, weights are non-negative with at least one positive, roll counts and guarantees, level windows, known slots/tags/rarities, no empty enabled pool, and that every weighted rarity has an eligible base at **every item level the source can reach** (tier 1-5, castle 1-10).
+`validateLootData` (src/lib/loot/validate.ts, run by `tests/lootValidate.test.ts`) checks: sources reference profiles, profiles reference pools and rarities, weights are non-negative with at least one positive, roll counts and guarantees, level windows, known slots/tags/rarities, no empty enabled pool, and that every weighted rarity has an eligible base at **every item level the source can reach** (a monster source's `levels` range, or castle 1-10 for chests and the shelf).
 
 ## Saves
 
@@ -69,3 +69,5 @@ The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs 
 ## Not done yet (kept on purpose)
 
 Salvage / materials and reroll / upgrade (real gear sinks), flat set bonuses that fade at high level, `requiredLevel`, weapon attack speed in combat, offline loot (there is no offline progress), elite monsters and premium chests, a Luck effect on rarity weights, and rebalancing the monsters with the world level (see the follow-up list in the design spec).
+
+A monster source has no level of its own: `LootRequest.level` is the monster's level, and the source's `levels` range (rat 1-20, King 15-35) is what `validateLootData` checks the pools against. Per-level chances (`chancePerLevel`) replace the old per-tier ones (half the size: a tier was two levels). A boss is a monster def with `grade: 'boss'` whose `lootSourceId` names its own source and profile, so boss-only drops need data only.

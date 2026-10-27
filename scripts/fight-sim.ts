@@ -5,7 +5,8 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { MONSTERS } from '../src/config/combatConfig';
-import { fullSet, seeded, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import { atItemLevel, fullSet, seeded, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import { monsterStats } from '../src/lib/monsters';
 import { armorOf, damagePerClick, maxHp } from '../src/lib/combat';
 import { aggregateStats } from '../src/lib/inventory';
 import { plainItem } from '../src/lib/itemInstance';
@@ -29,10 +30,10 @@ export const LOADOUTS: { name: string; equipment: Equipment }[] = [
 ];
 
 const MONSTER_ROWS = [
-	{ label: 'Rat tier 1', monster: { type: 'rat', tier: 1 } },
-	{ label: 'Rat tier 3', monster: { type: 'rat', tier: 3 } },
-	{ label: 'Rat tier 5', monster: { type: 'rat', tier: 5 } },
-	{ label: `Rat King (${MONSTERS.ratKing.hp} HP, ${MONSTERS.ratKing.timeLimitSec} s)`, monster: { type: 'ratKing', tier: 1 } },
+	{ label: 'Rat level 1', monster: { type: 'rat', level: 1 } },
+	{ label: 'Rat level 5', monster: { type: 'rat', level: 5 } },
+	{ label: 'Rat level 9', monster: { type: 'rat', level: 9 } },
+	{ label: `Rat King (${MONSTERS.ratKing.hp} HP, ${MONSTERS.ratKing.timeLimitSec} s)`, monster: { type: 'ratKing', level: 15 } },
 ] as const;
 
 const lines: string[] = [];
@@ -84,7 +85,7 @@ out();
 out('# Level 30 builds');
 out();
 out('The same bot with 25 spare attribute points spent as shown (bonuses count points above the starting 5). Win % (mean seconds).');
-for (const { label, monster } of MONSTER_ROWS.filter((m) => m.monster.tier === 5 || m.monster.type === 'ratKing')) {
+for (const { label, monster } of MONSTER_ROWS.filter((m) => m.monster.level === 9 || m.monster.type === 'ratKing')) {
 	out();
 	out(`## ${label}`);
 	out();
@@ -121,6 +122,33 @@ for (const { label, monster } of MONSTER_ROWS.filter((m) => m.monster.type === '
 				return `${Math.round(r.winRate * 100)}%${r.winRate > 0 ? ` (${r.meanTimeSec.toFixed(0)}s, ${Math.round(r.meanHpLeft * 100)}% HP)` : ''}`;
 			});
 			out(`| ${name} | ${skillLevel ? 'Heal + Stun' : 'none'} | ${cells.join(' | ')} |`);
+		}
+	}
+}
+
+// ---- the Rat King by level: his armor, crits and Stun resistance, against gear of his own level and gear that fell behind -----------
+out();
+out('# The Rat King by level');
+out();
+out('A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 10 % crits, 25 % Stun resistance. HP, attack and armor follow the item level curve. Gear "at the level" is the same set at the item level of the King; "behind" is item level 15. Win % (mean seconds). No skills, no potions.');
+const KING_LEVELS = [15, 25, 35];
+const GEARS = [
+	{ name: "knight's set + mace", equipment: fullSet('knight', 'steel_mace') },
+	{ name: 'obsidian set + maul', equipment: fullSet('obsidian', 'obsidian_maul') },
+	{ name: 'rattatui + titan maul', equipment: { ...fullSet('rattatui'), mainHand: plainItem('titan_maul') } },
+];
+out();
+out(`| King level | Loadout | Gear | ${SPEEDS.map((c) => `${c} cps`).join(' | ')} |`);
+out(`|---|---|---|${SPEEDS.map(() => '---').join('|')}|`);
+for (const level of KING_LEVELS) {
+	const stats = monsterStats('ratKing', level);
+	for (const { name, equipment } of GEARS) {
+		for (const gearLevel of level === 15 ? [15] : [level, 15]) {
+			const cells = SPEEDS.map((cps) => {
+				const r = simulateMany({ equipment: atItemLevel(equipment, gearLevel), monster: { type: 'ratKing', level }, cps }, 60, seeded(4000 + cps));
+				return `${Math.round(r.winRate * 100)}%${r.winRate > 0 ? ` (${r.meanTimeSec.toFixed(0)}s)` : ''}`;
+			});
+			out(`| ${level} (${stats.maxHp} HP, armor ${Math.round(stats.armor)}) | ${name} | ${gearLevel === level ? 'at the level' : 'behind'} | ${cells.join(' | ')} |`);
 		}
 	}
 }

@@ -2,7 +2,7 @@ import { INITIAL_CHARACTER_STATS } from '@/config/gameConfig';
 import { ITEM_CATALOG, SETS } from '@/catalog';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILLS, type SkillId } from '@/catalog/skills';
-import { applyHit, armorOf, manaRegenPerSec, maxHp, maxMana, newFight, rollHit, stepFight } from '@/lib/combat';
+import { applyHit, armorOf, damageAfterArmor, manaRegenPerSec, maxHp, maxMana, newFight, rollHit, stepFight, stunResisted } from '@/lib/combat';
 import { castRefusal, healAmount, tickCooldowns, type SkillCooldowns } from '@/lib/skills';
 import { aggregateStats } from '@/lib/inventory';
 import { plainItem } from '@/lib/itemInstance';
@@ -36,9 +36,13 @@ export const fullSet = (setId: string, weapon?: string): Equipment => {
 	return eq;
 };
 
+/** The same gear at another item level (what a monster of that level drops, or what the world level has produced by then). */
+export const atItemLevel = (equipment: Equipment, level: number): Equipment =>
+	Object.fromEntries(Object.entries(equipment).map(([slot, item]) => [slot, item ? { ...item, level } : item])) as Equipment;
+
 export interface SimInput {
 	equipment: Equipment;
-	monster: { type: MonsterType; tier: number };
+	monster: { type: MonsterType; level: number };
 	/** Clicks per second (each gap is jittered by +-30 %) */
 	cps: number;
 	rng: () => number;
@@ -78,7 +82,7 @@ export const simulateFight = ({ equipment, monster, cps, rng, character = freshC
 	while (fight.phase === 'active' && time < GIVE_UP_SEC) {
 		time += STEP;
 		while (nextClick <= time && fight.phase === 'active') {
-			const { damage } = rollHit(character, equipment, rng);
+			const damage = damageAfterArmor(fight, rollHit(character, equipment, rng).damage);
 			clicks++;
 			const hitResult = applyHit(fight, damage);
 			fight = hitResult.fight;
@@ -95,7 +99,7 @@ export const simulateFight = ({ equipment, monster, cps, rng, character = freshC
 			if (fight.stunLeftSec <= 0 && can('stun')) {
 				mana -= SKILLS.stun.manaCost;
 				cooldowns = { ...cooldowns, stun: SKILLS.stun.cooldownSec };
-				fight = { ...fight, stunLeftSec: SKILLS.stun.stunSec ?? 0 };
+				if (!stunResisted(fight, rng)) fight = { ...fight, stunLeftSec: SKILLS.stun.stunSec ?? 0 };
 			}
 			if (hp < max * 0.5 && can('heal')) {
 				mana -= SKILLS.heal.manaCost;

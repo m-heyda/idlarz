@@ -46,6 +46,12 @@
 	box-shadow: inset 1px 1px 0 #c8483c, inset -1px -1px 0 #4a0e0a;
 }
 
+.tile-monster-tier[data-boss='true'] {
+	color: #ffe9a8;
+	background: #4a0e0a;
+	border-color: #ffd860;
+}
+
 .tile-has-monster {
 	cursor: pointer;
 }

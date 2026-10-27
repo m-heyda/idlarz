@@ -21,7 +21,7 @@ src/
 ├── app/page.tsx              game loop, tab lock, hidden Ctrl×5 shortcut, global right-click handler, composes all overlays
 ├── config/
 │   ├── gameConfig.ts         ALL tunable constants (costs, curves, biomes, castle, animals, merchant, click limiter, chests, stats)
-│   ├── combatConfig.ts       COMBAT + MONSTERS: HP, regen, armor, spawn, tiers, drops, Rat King
+│   ├── combatConfig.ts       COMBAT + MONSTERS: HP, regen, armor, spawn, monster defs (level scaling, armor, crit, Stun resist, grade), STAT_RULES
 │   ├── itemCatalog.ts        facade: re-exports src/catalog and derives BASIC_GEAR / RATTATUI_SET for older imports
 ├── catalog/                  THE catalog: index.ts (ITEM_CATALOG, SETS, setCounts, starter kit, equipment layout), items/*.ts (one file per family: wooden, cloth, steel,
 │                             obsidian, rattatui, legendary, consumables), rarity.ts, stats.ts, sets.ts, resources.ts, skills.ts (Heal, Stun), loot.ts (the supplies list)
@@ -48,7 +48,7 @@ src/
 │   ├── castleFinder.ts       pure maths for finding the castle again: isCastleOnScreen, compassArrow (where on the screen edge the arrow goes, its angle, the distance)
 │   ├── inventory.ts          pure bag / equipment operations + aggregateStats (the one place gear is summed)
 │   ├── combat.ts             max HP, damage per click, armor mitigation, regen, fight state machine (stepFight)
-│   ├── monsters.ts           tiers, monster stats, spawn tile, aging and Rat King evolution
+│   ├── monsters.ts           monster levels and stats, spawn level windows, spawn tile, growth, boss timer
 │   ├── loot.ts               kill rewards and drops (gold / xp as seconds of income)
 │   ├── combatFx.ts           window event bus: hit / hurt / heal effects for the fight modal
 │   ├── inventoryDrag.ts      drag payload shared by the bag and the equipment slots
@@ -90,7 +90,7 @@ The map has no edge. `GameState.tiles` is a `World` (`src/utils/world.ts`): an i
 
 ## State (`GameState`)
 
-Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves), `gems` (the premium currency; optional in saves, default 1000), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots, plus 4 per Pack Rat level), `playerHp`, `playerMp`, `merchantStock` (the shelf of goods, optional), `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
+Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `playSeconds`, chest fields, `prestige` (rebirths, Legacy points earned/unspent, shop levels; optional in saves), `gems` (the premium currency; optional in saves, default 1000), and the combat state: `equipment` (item ids by slot), `bag` (36 `{id, qty}` slots, plus 4 per Pack Rat level), `playerHp`, `playerMp`, `bossSpawnTimer`, `merchantStock` (the shelf of goods, optional), `monsters`, `monsterSpawnTimer`, `nextMonsterId` (all optional in saves; a save without equipment + bag gets the starter kit). Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`. `fight` (the open fight) is transient and never saved.
 
 ## The loop
 

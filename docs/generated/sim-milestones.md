@@ -7,47 +7,47 @@
 | tiles10 | 0.1 h | 0.1 h | 0.1 h | 0.0 h | 0.1 h | 0.1 h |
 | tiles16 | 0.1 h | 0.1 h | 0.1 h | 0.0 h | 0.1 h | 0.1 h |
 | tiles20 | 0.2 h | 0.2 h | 0.2 h | 0.1 h | 0.2 h | 0.2 h |
-| castle2 | 4.6 h | 4.6 h | 4.6 h | 1.6 h | 4.6 h | 4.6 h |
-| click1 | 11.6 h | 11.6 h | 7.0 h | 6.7 h | 7.0 h | 7.0 h |
-| castle3 | 9.5 h | 9.5 h | 9.5 h | 6.0 h | 9.5 h | 9.5 h |
+| castle2 | 4.7 h | 4.7 h | 4.7 h | 1.6 h | 4.7 h | 4.7 h |
+| click1 | 11.7 h | 11.7 h | 7.0 h | 6.8 h | 7.0 h | 7.0 h |
+| castle3 | 9.7 h | 9.7 h | 9.7 h | 6.0 h | 9.7 h | 9.7 h |
 | tiles25 | 0.3 h | 0.3 h | 0.3 h | 0.1 h | 0.3 h | 0.3 h |
 | chicken1 | 0.1 h | 0.1 h | 0.1 h | 0.0 h | 0.1 h | 0.1 h |
-| cow1 | 10.0 h | 10.0 h | 9.9 h | 14.7 h | 9.9 h | 9.9 h |
+| cow1 | 10.1 h | 10.1 h | 9.9 h | 14.4 h | 9.9 h | 9.9 h |
 | tiles30 | 0.4 h | 0.4 h | 0.4 h | 0.1 h | 0.4 h | 0.4 h |
-| click2 | 2.2 d | 2.8 d | 1.3 d | 20.3 h | 1.3 d | 1.3 d |
-| castle4 | 1.0 d | 1.0 d | 23.2 h | 19.1 h | 23.2 h | 23.2 h |
+| click2 | 2.0 d | 1.8 d | 1.3 d | 20.3 h | 1.3 d | 1.3 d |
+| castle4 | 1.0 d | 1.0 d | 23.3 h | 19.2 h | 23.3 h | 23.3 h |
 | tiles35 | 0.5 h | 0.5 h | 0.5 h | 0.1 h | 0.5 h | 0.5 h |
-| click3 | 3.9 d | 3.5 d | 2.9 d | 2.4 d | 2.9 d | 2.9 d |
-| castle5 | 3.7 d | 3.3 d | 2.8 d | 2.4 d | 2.8 d | 2.8 d |
+| click3 | 3.7 d | 3.4 d | 2.9 d | 2.5 d | 2.9 d | 2.9 d |
+| castle5 | 3.6 d | 3.3 d | 2.8 d | 2.4 d | 2.8 d | 2.8 d |
 | tiles40 | 0.6 h | 0.6 h | 0.6 h | 0.2 h | 0.6 h | 0.6 h |
 | tiles50 | 0.9 h | 0.9 h | 0.9 h | 0.2 h | 0.9 h | 0.9 h |
 | tiles75 | 2.3 h | 2.3 h | 2.3 h | 0.7 h | 2.3 h | 2.3 h |
-| tiles100 | 7.8 h | 7.8 h | 7.0 h | 2.8 h | 7.0 h | 7.0 h |
-| tiles150 | 22.0 h | 19.0 h | 14.2 h | 9.0 h | 14.2 h | 14.2 h |
-| tiles200 | 1.3 d | 1.1 d | 19.5 h | 13.5 h | 19.5 h | 19.5 h |
-| tiles300 | 2.0 d | 1.8 d | 1.4 d | 23.5 h | 1.4 d | 1.4 d |
-| tiles400 | 3.3 d | 2.9 d | 2.2 d | 1.6 d | 2.2 d | 2.2 d |
-| castle6 | 7.0 d | 6.6 d | 6.0 d | 5.5 d | 6.0 d | 6.0 d |
-| castle7 | 10.1 d | 9.7 d | 9.1 d | 8.5 d | — | 9.1 d |
-| castle8 | 14.2 d | 13.8 d | 13.2 d | 12.6 d | — | 13.2 d |
-| castle9 | 19.3 d | 18.8 d | 18.3 d | 17.6 d | — | 18.3 d |
-| castle10 | 26.5 d | 25.9 d | 25.4 d | 24.7 d | — | 25.4 d |
+| tiles100 | 7.8 h | 7.8 h | 7.0 h | 2.7 h | 7.0 h | 7.0 h |
+| tiles150 | 21.3 h | 19.0 h | 14.4 h | 9.0 h | 14.4 h | 14.4 h |
+| tiles200 | 1.2 d | 1.0 d | 20.0 h | 13.3 h | 20.0 h | 20.0 h |
+| tiles300 | 1.9 d | 1.7 d | 1.4 d | 23.4 h | 1.4 d | 1.4 d |
+| tiles400 | 3.1 d | 2.8 d | 2.2 d | 1.6 d | 2.2 d | 2.2 d |
+| castle6 | 6.8 d | 6.6 d | 6.0 d | 5.6 d | 6.0 d | 6.0 d |
+| castle7 | 9.9 d | 9.7 d | 9.1 d | 8.6 d | — | 9.1 d |
+| castle8 | 14.0 d | 13.7 d | 13.2 d | 12.6 d | — | 13.2 d |
+| castle9 | 19.1 d | 18.8 d | 18.3 d | 17.7 d | — | 18.3 d |
+| castle10 | 26.2 d | 25.9 d | 25.3 d | 24.7 d | — | 25.3 d |
 | level10 | 0.4 h | 0.4 h | 0.4 h | 0.1 h | 0.4 h | 0.4 h |
-| level20 | 3.2 h | 3.2 h | 3.2 h | 1.0 h | 3.2 h | 3.2 h |
-| level30 | 1.0 d | 20.0 h | 16.8 h | 10.1 h | 16.8 h | 16.8 h |
-| finished | 7.0 d | 6.6 d | 6.0 d | 5.5 d | 6.0 d | 6.0 d |
-| legacy1 | — | — | — | — | 34 | 234 |
+| level20 | 3.1 h | 3.1 h | 3.1 h | 1.0 h | 3.1 h | 3.1 h |
+| level30 | 23.6 h | 19.7 h | 16.9 h | 10.0 h | 16.9 h | 16.9 h |
+| finished | 6.8 d | 6.6 d | 6.0 d | 5.6 d | 6.0 d | 6.0 d |
+| legacy1 | — | — | — | — | 34 | 233 |
 | legacy2 | — | — | — | — | 38 | — |
 | legacy3 | — | — | — | — | 40 | — |
 | r2.castle6 | — | — | — | — | 4.4 d | 2.6 d |
 | r2.finished | — | — | — | — | 4.4 d | 2.6 d |
-| r2.tiles100 | — | — | — | — | 2.5 h | 0.6 h |
-| r3.castle6 | — | — | — | — | 3.7 d | — |
-| r3.finished | — | — | — | — | 3.7 d | — |
-| r3.tiles100 | — | — | — | — | 1.8 h | — |
+| r2.tiles100 | — | — | — | — | 2.6 h | 0.2 h |
+| r3.castle6 | — | — | — | — | 3.9 d | — |
+| r3.finished | — | — | — | — | 3.9 d | — |
+| r3.tiles100 | — | — | — | — | 1.6 h | — |
 | r4.castle6 | — | — | — | — | 3.2 d | — |
 | r4.finished | — | — | — | — | 3.2 d | — |
-| r4.tiles100 | — | — | — | — | 1.1 h | — |
-| rebirth | — | — | — | — | 6.0 d | 25.4 d |
+| r4.tiles100 | — | — | — | — | 0.8 h | — |
+| rebirth | — | — | — | — | 6.0 d | 25.3 d |
 
 Profiles: idle = never clicks; casual = 1 click/s for 3 h/day; hardcore = 4 clicks/s for 8 h/day; autoclicker = 20 clicks/s 24 h/day (the limiter should keep it at roughly hardcore pace).

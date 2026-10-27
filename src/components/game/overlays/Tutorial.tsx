@@ -29,6 +29,7 @@ import {
 } from '@/config/gameConfig';
 import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
+import { LIMITS } from '@/config/limits';
 import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatNumber, formatTime } from '@/utils/formatters';
@@ -213,9 +214,10 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-2'>
 					Once you own {COMBAT.spawn.minOwnedTiles} tiles, a <b>rat</b> appears on one of them after{' '}
 					{formatTime(COMBAT.spawn.firstSec)}, then another every {formatTime(COMBAT.spawn.intervalSec)} (monsters
-					and chests together never fill more than {pct(SPAWN_LIMIT.maxFraction)} of your free land). A rat grows a tier every {formatTime(COMBAT.tierIntervalSec)} on the map (up to tier{' '}
-					{COMBAT.maxTier}): more HP ({MONSTERS.rat.hp} at tier 1, x{MONSTERS.rat.hpGrowth} per tier), harder hits and better rewards. A tier-{COMBAT.maxTier} rat
-					can grow into the <b>Rat King</b> ({pct(MONSTERS.ratKing.evolveChance)} every {formatTime(MONSTERS.ratKing.evolveCheckSec)}; only one at a time).
+					and chests together never fill more than {pct(SPAWN_LIMIT.maxFraction)} of your free land). Monsters have a <b>level</b>: a new rat appears at level {MONSTERS.rat.spawnWindow.base} to {MONSTERS.rat.spawnWindow.cap} (the higher, the further your castle has
+					grown) and gains a level every {formatTime(LIMITS.monsterGrowthIntervalSec)} on the map, up to {LIMITS.monsterGrowthLevels} levels above the one it appeared at: more HP, harder hits, some armor
+					and better rewards. Every {formatTime(COMBAT.spawn.bossIntervalSec)} a <b>boss</b> appears, one at a time: the <b>Rat King</b> (level {MONSTERS.ratKing.spawnWindow.base}-{MONSTERS.ratKing.spawnWindow.cap} at the start, with a skull on
+					his badge). Bosses can crit, can resist Stun and carry drops nobody else has.
 					Click a monster to fight it. Right-click it for <b>Dismiss</b>: after a confirmation the monster is removed from the map with
 					no reward, which frees a place when one is too strong for you and the map is full.
 				</p>
@@ -242,7 +244,7 @@ const Tutorial: React.FC = () => {
 					</li>
 					<li>
 						Winning pays gold and XP worth some seconds of your income, plus a chance of gear and potions. Rats drop wood, cloth and, from
-						older rats, steel and obsidian gear. The <b>Rat King</b> ({MONSTERS.ratKing.hp} HP, a {MONSTERS.ratKing.timeLimitSec}s time limit) is hard: he needs real
+						older rats, steel and obsidian gear. The <b>Rat King</b> (boss, armor, {MONSTERS.ratKing.critChance}% crits, resists Stun {MONSTERS.ratKing.stunResist}%, a {MONSTERS.ratKing.timeLimitSec}s time limit) is hard: he needs real
 						gear and quick clicking. He always drops a piece of the epic Rattatui set (the only place to get it), sometimes a second one or a legendary weapon, and potions.
 					</li>
 				</ul>

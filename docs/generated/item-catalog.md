@@ -172,13 +172,15 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 
 ## Loot sources
 
-Rarity chances are the profile weights normalised over the rarities that pass their item level gate; level is the item level at the source (castle level 1, tier 1-5 for rats).
+Rarity chances are the profile weights normalised over the rarities that pass their item level gate; level is the item level at the source (the monster level; castle level 1 for chests).
 
-- **rat tier 1** (profile `normal_monster`, item level 1): 27 bases eligible; Common 76.1%, Uncommon 23.9%
-- **rat tier 3** (profile `normal_monster`, item level 5): 44 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **rat tier 5** (profile `normal_monster`, item level 9): 61 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
+- **rat level 1** (profile `normal_monster`, item level 1): 27 bases eligible; Common 76.1%, Uncommon 23.9%
+- **rat level 5** (profile `normal_monster`, item level 5): 44 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
+- **rat level 9** (profile `normal_monster`, item level 9): 61 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
+- **rat level 20** (profile `normal_monster`, item level 20): 61 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **ratKing** (profile `boss`, item level 12): 61 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **ratKing level 15** (profile `boss`, item level 15): 61 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **ratKing level 35** (profile `boss`, item level 35): 34 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_set` from pool `rattatui_set`
   - bonus `king_legendary` from pool `legendary_weapons`, chance 0.05
   - bonus `king_potions` from pool `potions_king`

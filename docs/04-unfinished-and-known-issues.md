@@ -37,7 +37,7 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 
 ## D. Combat and items: known limits
 
-- Monsters are one family (rats); there is one weapon per tier of rarity and no item upgrading yet.
+- Monsters are one family (rats) plus one boss (the Rat King); there is one weapon per tier of rarity and no item upgrading yet.
 - The sim bots do not fight or equip, so combat rewards (gold / XP as seconds of income) are not part of `docs/generated/sim-milestones.md`; measure before tuning them ([05 BL12](05-balance-backlog-and-roadmap.md)).
 - A fight does not survive a reload (the monster is full HP again); your HP does.
 - The Rat King (5200 HP, 75 s) is the only source of Rattatui pieces. Fight clicks are not rate limited, so a hardware auto-clicker (trusted clicks) can out-click a human; the King is tuned so even 25 clicks/s without gear loses. If that becomes an exploit, add a generous anti-bot ceiling to `lib/hitGuard.ts`. When gear or monsters change, rerun `npm run fight-sim` and revisit `tests/fightBalance.test.ts`.

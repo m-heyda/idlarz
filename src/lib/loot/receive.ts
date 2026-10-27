@@ -1,7 +1,7 @@
 import { ITEM_CATALOG } from '@/catalog';
 import { addDrop } from '@/lib/inventory';
 import { sellValueOf } from '@/lib/itemInstance';
-import { sellPayout } from '@/utils/gameUtils';
+import { sellPayout, type SellContext } from '@/utils/gameUtils';
 import type { BagSlot, Drop } from '@/types/game';
 import { isAutoSold } from './autoSell';
 
@@ -16,7 +16,7 @@ export interface Received {
 }
 
 /** Hands drops to the player: the auto-sell filter takes what it matches, the rest goes into the bag, and what does not fit turns into gold. */
-export const receiveDrops = (bag: BagSlot[], drops: readonly Drop[], autoSellUpTo: string | null, merchantUpgrades: Record<string, number>): Received => {
+export const receiveDrops = (bag: BagSlot[], drops: readonly Drop[], autoSellUpTo: string | null, sellCtx: SellContext): Received => {
 	let current = bag;
 	const stored: Drop[] = [];
 	let convertedGold = 0;
@@ -24,7 +24,7 @@ export const receiveDrops = (bag: BagSlot[], drops: readonly Drop[], autoSellUpT
 	for (const drop of drops) {
 		if (drop.kind === 'gear' && isAutoSold(drop.item, autoSellUpTo)) {
 			autoSold.count++;
-			autoSold.gold += sellPayout(sellValueOf(drop.item), 1, merchantUpgrades);
+			autoSold.gold += sellPayout(sellValueOf(drop.item), 1, sellCtx);
 			continue;
 		}
 		const added = addDrop(current, drop);

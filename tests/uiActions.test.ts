@@ -18,13 +18,13 @@ const withMonsters = (...monsters: Partial<Monster>[]) => {
 	growTo(6);
 	const at = spot();
 	store.setState({
-		monsters: monsters.map((m, i) => ({ id: i + 1, type: 'rat', tier: 1, ...at, ageSec: 0, ...m })),
+		monsters: monsters.map((m, i) => ({ id: i + 1, type: 'rat', level: 1, spawnLevel: 1, ...at, ageSec: 0, ...m })),
 		nextMonsterId: monsters.length + 1,
 	});
 };
 
 test('dismissMonster removes the monster with no loot or XP', () => {
-	withMonsters({}, { id: 2, type: 'ratKing' });
+	withMonsters({}, { id: 2, type: 'ratKing', level: 15, spawnLevel: 15 });
 	const before = { ...api().resources };
 	const bag = api().bag;
 	assert.equal(api().dismissMonster(1), true);

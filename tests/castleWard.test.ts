@@ -37,7 +37,7 @@ const ownRing = () =>
 		return { tiles };
 	});
 
-const rat = (id: number, x: number, y: number): Monster => ({ id, type: 'rat', tier: 1, x, y, ageSec: 0 });
+const rat = (id: number, x: number, y: number): Monster => ({ id, type: 'rat', level: 1, spawnLevel: 1, x, y, ageSec: 0 });
 
 test('the fortress starts at castle level 7', () => {
 	assert.equal(L7, 7);

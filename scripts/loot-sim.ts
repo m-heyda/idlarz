@@ -22,19 +22,19 @@ const WRITE_MD = process.argv.includes('--md');
 interface Scenario {
 	label: string;
 	sourceId: string;
-	tier?: number;
+	level?: number;
 	castleLevel?: number;
 }
 
 const SCENARIOS: Scenario[] = [
-	{ label: 'Rat tier 1, castle 1', sourceId: 'rat', tier: 1, castleLevel: 1 },
-	{ label: 'Rat tier 3, castle 1', sourceId: 'rat', tier: 3, castleLevel: 1 },
-	{ label: 'Rat tier 5, castle 1', sourceId: 'rat', tier: 5, castleLevel: 1 },
-	{ label: 'Rat tier 5, castle 5', sourceId: 'rat', tier: 5, castleLevel: 5 },
-	{ label: 'Rat tier 5, castle 10', sourceId: 'rat', tier: 5, castleLevel: 10 },
-	{ label: 'Rat King, castle 1', sourceId: 'ratKing', castleLevel: 1 },
-	{ label: 'Rat King, castle 5', sourceId: 'ratKing', castleLevel: 5 },
-	{ label: 'Rat King, castle 10', sourceId: 'ratKing', castleLevel: 10 },
+	{ label: 'Rat level 1', sourceId: 'rat', level: 1 },
+	{ label: 'Rat level 5', sourceId: 'rat', level: 5 },
+	{ label: 'Rat level 9', sourceId: 'rat', level: 9 },
+	{ label: 'Rat level 15', sourceId: 'rat', level: 15 },
+	{ label: 'Rat level 20', sourceId: 'rat', level: 20 },
+	{ label: 'Rat King level 15', sourceId: 'ratKing', level: 15 },
+	{ label: 'Rat King level 25', sourceId: 'ratKing', level: 25 },
+	{ label: 'Rat King level 35', sourceId: 'ratKing', level: 35 },
 	{ label: 'Chest, castle 1', sourceId: 'chest', castleLevel: 1 },
 	{ label: 'Chest, castle 5', sourceId: 'chest', castleLevel: 5 },
 	{ label: 'Chest, castle 10', sourceId: 'chest', castleLevel: 10 },
@@ -71,7 +71,7 @@ for (const s of SCENARIOS) {
 	let warnings = 0;
 	let sourceLevel = 0;
 	for (let i = 0; i < KILLS; i++) {
-		const r = generateLoot({ sourceId: s.sourceId, tier: s.tier, castleLevel: s.castleLevel }, rng);
+		const r = generateLoot({ sourceId: s.sourceId, level: s.level, castleLevel: s.castleLevel }, rng);
 		sourceLevel = r.sourceLevel;
 		warnings += r.warnings.length;
 		let killHigh = false;

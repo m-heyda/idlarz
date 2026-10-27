@@ -1,3 +1,4 @@
+import { convertMonstersBody } from '@/lib/monstersMigration';
 import { convertGroundsBody } from '@/lib/groundsMigration';
 import { LEGACY_GEAR } from '@/lib/legacyGear';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
@@ -22,6 +23,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  * instances (`{ base, level, rarity, quality, affixes }`, bag gear as `{ item }`) and MIGRATIONS[2] converts them (src/lib/legacyGear.ts).
  * Schema 3 could still hold Grounds tiles (the old building lot, letter `g`, built lots with `level: 2`); schema 4 has no Grounds biome and
  * MIGRATIONS[3] turns each into the land biome around it (src/lib/groundsMigration.ts).
+ * Schema 4 monsters had a tier (1-5); schema 5 has a level and the level they appeared at; MIGRATIONS[4] converts them (src/lib/monstersMigration.ts).
  *
  * ADDING THINGS LATER (keep old saves working):
  *   - A new field: add it to PERSISTED_KEYS, make `sanitizeSave` accept it as OPTIONAL with a default, and do
@@ -32,7 +34,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *   - A save written by a NEWER schema than this game is refused with a clear message, never half-loaded.
  */
 
-export const SAVE_SCHEMA = 4;
+export const SAVE_SCHEMA = 5;
 export const SAVE_PREFIX = 'IDLZ2.';
 
 /** Longer than any real save by far; stops a pasted novel from freezing the page. */
@@ -170,6 +172,8 @@ export const MIGRATIONS: Record<number, Migration> = {
 	},
 	// 3 -> 4: no more Grounds tiles (see groundsMigration.ts)
 	3: (body) => convertGroundsBody(body),
+	// 4 -> 5: monsters have a level instead of a tier (see monstersMigration.ts)
+	4: (body) => convertMonstersBody(body),
 };
 
 export const migrateBody = (

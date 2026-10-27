@@ -65,18 +65,18 @@ for (const a of AFFIXES) out(`| ${a.name} | ${a.position} | ${a.stat} | ${a.minI
 out();
 out('## Loot sources');
 out();
-out('Rarity chances are the profile weights normalised over the rarities that pass their item level gate; level is the item level at the source (castle level 1, tier 1-5 for rats).');
+out('Rarity chances are the profile weights normalised over the rarities that pass their item level gate; level is the item level at the source (the monster level; castle level 1 for chests).');
 out();
 for (const source of Object.values(LOOT_SOURCES)) {
 	const profile = LOOT_PROFILES[source.lootProfileId];
-	const tiers = source.id === 'rat' ? [1, 3, 5] : [1];
-	for (const tier of tiers) {
-		const level = resolveSourceLevel(source.level, tier, 1) + profile.itemLevel.offset;
+	const sourceLevels = source.levels ? (source.id === 'rat' ? [1, 5, 9, 20] : [source.levels.min, source.levels.max]) : [source.level ? resolveSourceLevel(source.level, 1) : 1];
+	for (const sourceLevel of sourceLevels) {
+		const level = sourceLevel + profile.itemLevel.offset;
 		const weights = Object.entries(profile.rarityWeights).filter(([r, w]) => w > 0 && level >= (profile.rarityLevelGate?.[r] ?? 1));
 		const total = weights.reduce((s, [, w]) => s + w, 0);
 		const share = weights.map(([r, w]) => `${RARITIES[r as keyof typeof RARITIES].label} ${((w / total) * 100).toFixed(1)}%`).join(', ');
 		const pool = profile.generalPoolId ? eligibleCandidates(LOOT_DATA, profile.generalPoolId, level).length : 0;
-		out(`- **${source.id}${source.id === 'rat' ? ` tier ${tier}` : ''}** (profile \`${profile.id}\`, item level ${level}): ${pool} bases eligible; ${share}`);
+		out(`- **${source.id}${source.levels ? ` level ${sourceLevel}` : ''}** (profile \`${profile.id}\`, item level ${level}): ${pool} bases eligible; ${share}`);
 	}
 	for (const t of profile.bonusTables) out(`  - bonus \`${t.id}\` from pool \`${t.poolId}\`${t.chance !== undefined ? `, chance ${t.chance}` : ''}${t.placement ? `, ${t.placement}` : ''}`);
 }

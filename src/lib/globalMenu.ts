@@ -29,6 +29,11 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 					{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
 				]
 			: []),
+		{
+			id: 'organize',
+			label: 'Organize bag',
+			onSelect: () => useUiStore.getState().showToast(useGameStore.getState().organizeBag() ? 'Bag organized' : 'Finish the fight first'),
+		},
 		{ id: 'save', label: 'Save game', separator: full, liveHint: () => cloudHint(Date.now()), onSelect: () => void saveGame() },
 		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
 		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },

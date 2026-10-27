@@ -15,8 +15,8 @@ const freshStats = (): CharacterStats => {
 	return Object.assign(stats, calculateCombatStats(stats));
 };
 
-const rat = (tier = 1) => newFight({ id: 1, type: 'rat', tier });
-const king = () => newFight({ id: 2, type: 'ratKing', tier: 1 });
+const rat = (level = 1) => newFight({ id: 1, type: 'rat', level });
+const king = () => newFight({ id: 2, type: 'ratKing', level: 15 });
 const noRng = () => 0;
 
 test('maxHp is 101 for a fresh character with the starter kit', () => {
@@ -44,16 +44,16 @@ test('mitigate: armor 2 turns 4 into 4, armor 40 halves 10 to 5, never below 1',
 	assert.equal(mitigate(4, 0), 4);
 });
 
-test('rat stats: T1 100 HP, T5 506 HP, attack grows per tier', () => {
+test('rat stats: level 1 100 HP, level 9 506 HP, attack grows per level; the King at level 15 is his config', () => {
 	assert.equal(monsterStats('rat', 1).maxHp, 100);
-	assert.equal(monsterStats('rat', 5).maxHp, 506);
-	assert.ok(monsterStats('rat', 5).attack > monsterStats('rat', 1).attack);
-	assert.equal(monsterStats('ratKing', 3).maxHp, MONSTERS.ratKing.hp);
-	assert.equal(monsterStats('ratKing', 3).attackIntervalSec, MONSTERS.ratKing.attackIntervalSec);
+	assert.equal(monsterStats('rat', 9).maxHp, 506);
+	assert.ok(monsterStats('rat', 9).attack > monsterStats('rat', 1).attack);
+	assert.equal(monsterStats('ratKing', 15).maxHp, MONSTERS.ratKing.hp);
+	assert.equal(monsterStats('ratKing', 15).attackIntervalSec, MONSTERS.ratKing.attackIntervalSec);
 });
 
 test('newFight starts active at full HP; only the king has a timer', () => {
-	const r = rat(5);
+	const r = rat(9);
 	assert.equal(r.phase, 'active');
 	assert.equal(r.monsterHp, 506);
 	assert.equal(r.monsterMaxHp, 506);
@@ -82,7 +82,7 @@ test('stepFight: a rat deals one mitigated hit every 2 s', () => {
 	assert.deepEqual(r.events, []);
 	r = stepFight(r.fight, 1, r.playerHp, 2, noRng);
 	assert.equal(r.playerHp, 97);
-	assert.deepEqual(r.events, [{ kind: 'hurt', amount: 4 }]);
+	assert.deepEqual(r.events, [{ kind: 'hurt', amount: 4, crit: false }]);
 	fight = r.fight;
 	hp = r.playerHp;
 	r = stepFight(fight, 1, hp, 2, noRng);

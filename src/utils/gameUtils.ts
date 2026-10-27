@@ -739,18 +739,30 @@ export const merchantEffect = (upgrades: MerchantUpgrades | undefined, id: Merch
 export const merchantUpgradeCost = (id: MerchantUpgradeId, level: number): number =>
 	Math.ceil(MERCHANT_UPGRADES[id].baseCost * Math.pow(MERCHANT_UPGRADES[id].costGrowth, level));
 
-/** Multiplier on every gold payout from selling to the merchant (Haggler). */
-export const sellMultiplier = (upgrades: MerchantUpgrades | undefined): number => 1 + merchantEffect(upgrades, 'haggler');
+/** What can raise what the merchant pays: the merchant bonuses now, rebirth (Legacy) effects later. A whole game state fits. */
+export interface SellContext {
+	merchantUpgrades?: MerchantUpgrades;
+	prestige?: PrestigeState;
+}
+
+/**
+ * The sources of the sell bonus, each an amount added to 1 (0.03 is +3 %). Every payout for what the player sells (resources,
+ * bag gear, junk, auto-sold drops, the previews and the net-worth check) goes through `sellMultiplier`, so a new bonus (a Legacy
+ * effect, a merchant level, an event) is one entry here and applies to all of them alike.
+ */
+export const SELL_BONUSES: ((ctx: SellContext) => number)[] = [(ctx) => merchantEffect(ctx.merchantUpgrades, 'haggler')];
+
+/** Multiplier on every gold payout from selling to the merchant. */
+export const sellMultiplier = (ctx: SellContext | undefined): number => 1 + SELL_BONUSES.reduce((sum, bonus) => sum + (ctx ? bonus(ctx) : 0), 0);
 
 /** Gold for selling `qty` of something worth `unit` each. */
-export const sellPayout = (unit: number, qty: number, upgrades: MerchantUpgrades | undefined): number =>
-	Math.floor(unit * qty * sellMultiplier(upgrades));
+export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefined): number => Math.floor(unit * qty * sellMultiplier(ctx));
 
 /** Luck from the Lucky Charm, added to the character's Luck for chests and kills. */
 export const merchantLuck = (upgrades: MerchantUpgrades | undefined): number => merchantEffect(upgrades, 'charm');
 
 /** Bag slots a game has: the base bag plus Pack Rat. */
-export const bagSizeFor = (baseSize: number, upgrades: MerchantUpgrades | undefined): number => baseSize + merchantEffect(upgrades, 'packrat');
+
 
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {

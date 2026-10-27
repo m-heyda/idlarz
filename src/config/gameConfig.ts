@@ -8,6 +8,7 @@ import {
 import { RESOURCES, type MerchantResourceKey, type ResourceKey } from '@/catalog/resources';
 import { shopItems } from '@/catalog/loot';
 import { BIOME_COLORS } from '@/config/biomePalette';
+import { HARD_LIMITS, LIMITS } from '@/config/limits';
 
 // Default player name
 export const DEFAULT_PLAYER_NAME = 'Explorer';
@@ -412,11 +413,11 @@ export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems();
 
 // The merchant's shuffling goods (Goods tab): pieces of gear rolled by the loot pipeline (source `merchant`, see lootConfig).
 export const MERCHANT_GOODS = {
-	offers: 6, // pieces on the shelf
-	rotateSec: 30 * 60, // the shelf is reshuffled after this much play time
-	maxOffers: 12, // what a save may hold
+	offers: LIMITS.merchantOffers, // pieces on the shelf (base value: read it through limitOf('merchantOffers', ctx))
+	rotateSec: LIMITS.merchantRotateSec, // the shelf is reshuffled after this much play time (limitOf('merchantRotateSec', ctx))
+	maxOffers: HARD_LIMITS.merchantOffers, // what a save may hold
 	priceFactor: 40, // gold per gold of sell value: far above the 3.9x a max Haggler could resell at (about 400 for a common piece, 5 000-90 000 for the rest)
-	refreshBase: 2000, // a paid refresh costs this x castle level squared
+	refreshBase: LIMITS.merchantRefreshBase, // a paid refresh costs this x castle level squared (limitOf('merchantRefreshBase', ctx))
 } as const;
 
 // Farm products: shown on the farm and at the merchant, not in the header row

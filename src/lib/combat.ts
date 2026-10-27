@@ -1,7 +1,7 @@
 import { ITEM_CATALOG } from '@/catalog';
-import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
+import { COMBAT, STAT_RULES } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
-import { monsterStats } from '@/lib/monsters';
+import { monsterDef, monsterStats } from '@/lib/monsters';
 import { atkSpeedPercent, critDamagePercent, magicDamagePercent, physicalDamagePercent, statArmor, statManaRegen, type Attributes } from '@/lib/statBonuses';
 import type { CharacterStats, Equipment, FightState, Monster } from '@/types/game';
 
@@ -94,17 +94,16 @@ export const regen = (hp: number, max: number, dtSec: number, gearRegenPerSec = 
 	return Math.min(max, hp + (COMBAT.regenPerSec + gearRegenPerSec) * dtSec);
 };
 
-export const newFight = (monster: Pick<Monster, 'id' | 'type' | 'tier'>, castleLevel = 1): FightState => {
-	const stats = monsterStats(monster.type, monster.tier, castleLevel);
+export const newFight = (monster: Pick<Monster, 'id' | 'type' | 'level'>): FightState => {
+	const stats = monsterStats(monster.type, monster.level);
 	return {
 		monsterId: monster.id,
 		type: monster.type,
-		tier: monster.tier,
-		castleLevel,
+		level: monster.level,
 		monsterHp: stats.maxHp,
 		monsterMaxHp: stats.maxHp,
 		attackTimer: 0,
-		timeLeftSec: monster.type === 'ratKing' ? MONSTERS.ratKing.timeLimitSec : null,
+		timeLeftSec: monsterDef(monster.type).timeLimitSec ?? null,
 		potionCd: 0,
 		stunLeftSec: 0,
 		phase: 'active',
@@ -120,16 +119,29 @@ export const applyHit = (fight: FightState, damage: number): { fight: FightState
 	return { fight: { ...fight, monsterHp }, killed: monsterHp === 0 };
 };
 
-const pickTaunt = (rng: () => number): string => {
-	const taunts = MONSTERS.ratKing.taunts;
-	return taunts[Math.floor(rng() * taunts.length) % taunts.length];
+/** What a monster that mocks the player says (null for the ones that do not talk). */
+const pickTaunt = (type: Monster['type'], rng: () => number): string | null => {
+	const taunts = monsterDef(type).taunts;
+	return taunts && taunts.length > 0 ? taunts[Math.floor(rng() * taunts.length) % taunts.length] : null;
+};
+
+/** What is left of a click after the monster's armor (never less than 1): the same curve as the player's own armor. */
+export const damageAfterArmor = (fight: Pick<FightState, 'type' | 'level'>, raw: number): number => {
+	const { armor } = monsterStats(fight.type, fight.level);
+	return armor > 0 ? Math.max(1, round1(raw * (1 - armor / (armor + COMBAT.armorK)))) : raw;
+};
+
+/** Whether the monster shrugs off a Stun (one rng call, and only for monsters that can resist at all). */
+export const stunResisted = (fight: Pick<FightState, 'type' | 'level'>, rng: () => number): boolean => {
+	const { stunResist } = monsterStats(fight.type, fight.level);
+	return stunResist > 0 && rng() * 100 < stunResist;
 };
 
 /** Chance (0-1) that a monster's hit misses: the gear's Dodge, capped. */
 export const dodgeChance = (equipment: Equipment): number =>
 	Math.max(0, Math.min(COMBAT.maxDodge, aggregateStats(equipment).dodge)) / 100;
 
-export type CombatEvent = { kind: 'hurt'; amount: number } | { kind: 'dodged' } | { kind: 'knockedOut' } | { kind: 'timeout' };
+export type CombatEvent = { kind: 'hurt'; amount: number; crit: boolean } | { kind: 'dodged' } | { kind: 'knockedOut' } | { kind: 'timeout' };
 
 /**
  * Advances an active fight: monster attacks, potion cooldown and the king's timer. `dtSec` is clamped so a throttled
@@ -149,7 +161,7 @@ export const stepFight = (
 	if (fight.phase !== 'active' || !Number.isFinite(dtSec) || dtSec <= 0) return { fight, playerHp, events: [] };
 
 	const dt = Math.min(dtSec, COMBAT.fightStepClampSec);
-	const stats = monsterStats(fight.type, fight.tier, fight.castleLevel);
+	const stats = monsterStats(fight.type, fight.level);
 	const events: CombatEvent[] = [];
 	let hp = playerHp;
 	// A stunned monster does not wind up its next attack; the stun runs down first and only the rest of the step counts
@@ -161,9 +173,11 @@ export const stepFight = (
 			events.push({ kind: 'dodged' });
 			continue;
 		}
-		const amount = mitigate(stats.attack, armor);
+		// a monster that can crit rolls once per hit (high rolls crit, so a stubbed rng() of 0 never does)
+		const crit = stats.critChance > 0 && rng() >= 1 - stats.critChance / 100;
+		const amount = mitigate(crit ? Math.round(stats.attack * stats.critMult) : stats.attack, armor);
 		hp = Math.max(0, hp - amount);
-		events.push({ kind: 'hurt', amount });
+		events.push({ kind: 'hurt', amount, crit });
 		if (hp === 0) break;
 	}
 	if (hp > 0 && gearRegen.perSec > 0) hp = Math.min(gearRegen.max, hp + gearRegen.perSec * dt);
@@ -177,10 +191,10 @@ export const stepFight = (
 	};
 	if (hp === 0) {
 		// the King gloats about a knockout as well as about a timeout
-		next = { ...next, phase: 'knockedOut', taunt: fight.type === 'ratKing' ? pickTaunt(rng) : null };
+		next = { ...next, phase: 'knockedOut', taunt: pickTaunt(fight.type, rng) };
 		events.push({ kind: 'knockedOut' });
 	} else if (next.timeLeftSec === 0) {
-		next = { ...next, phase: 'timeout', taunt: pickTaunt(rng) };
+		next = { ...next, phase: 'timeout', taunt: pickTaunt(fight.type, rng) };
 		events.push({ kind: 'timeout' });
 	}
 	return { fight: next, playerHp: hp, events };

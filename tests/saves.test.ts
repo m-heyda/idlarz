@@ -161,7 +161,7 @@ const spot = (n = 0) => {
 	return found[n];
 };
 
-const rat = (over: Record<string, unknown> = {}) => ({ id: 1, type: 'rat', tier: 1, ...spot(), ageSec: 100, ...over });
+const rat = (over: Record<string, unknown> = {}) => ({ id: 1, type: 'rat', level: 1, spawnLevel: 1, ...spot(), ageSec: 100, ...over });
 
 /** A played game with some gear, one monster and damaged HP; returns its raw snapshot after `mutate`. */
 const combatSave = (mutate: (raw: any) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -277,9 +277,13 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.monsters[0].x = CASTLE_X, r.monsters[0].y = CASTLE_Y), 'monster on the castle');
 	bad((r) => (r.monsters[0].x = 0, r.monsters[0].y = 0), 'monster on an unowned tile');
 	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].hasChest = true), 'monster on a chest tile');
-	bad((r) => r.monsters.push({ ...r.monsters[0], id: 2, type: 'ratKing', tier: 1 }, { ...r.monsters[0], id: 3, type: 'ratKing', tier: 1 }), 'two kings on one tile');
+	bad((r) => r.monsters.push({ ...r.monsters[0], id: 2, type: 'ratKing', level: 15, spawnLevel: 15 }, { ...r.monsters[0], id: 3, type: 'ratKing', level: 15, spawnLevel: 15 }), 'two kings on one tile');
 	bad((r) => (r.monsters = Array.from({ length: 5000 }, (_, i) => ({ ...r.monsters[0], id: i + 1 }))), 'more monsters than tiles');
-	bad((r) => (r.monsters[0].tier = COMBAT.maxTier + 1), 'tier above the cap');
+	bad((r) => (r.monsters[0].level = r.monsters[0].spawnLevel + 41), 'level above what the hard growth ceiling allows');
+	bad((r) => (r.monsters[0].level = 5), 'a level the age has not earned');
+	bad((r) => (r.monsters[0].spawnLevel = 0), 'a spawn level below 1');
+	bad((r) => (r.monsters[0].spawnLevel = 11, r.monsters[0].level = 11), 'a rat that spawned above the rat cap');
+	bad((r) => (r.monsters[0].tier = 1), 'the old tier key');
 	bad((r) => (r.monsters[0].type = 'dragon'), 'unknown monster type');
 	bad((r) => (r.monsters.push({ ...r.monsters[0], ...spot(1) }), (r.nextMonsterId = 5)), 'duplicate monster ids');
 	bad((r) => (r.monsters[0].id = 5), 'monster id not below nextMonsterId');
@@ -299,8 +303,8 @@ test('forged inventories, HP and monsters are rejected', () => {
 test('two kings are rejected even on different tiles', () => {
 	const raw = combatSave((r) => {
 		const other = { ...r.monsters[0] };
-		r.monsters[0] = { ...r.monsters[0], type: 'ratKing', tier: 1, ageSec: 0 };
-		r.monsters.push({ ...other, id: 2, type: 'ratKing', tier: 1, ageSec: 0 });
+		r.monsters[0] = { ...r.monsters[0], type: 'ratKing', level: 15, spawnLevel: 15, ageSec: 0 };
+		r.monsters.push({ ...other, id: 2, type: 'ratKing', level: 15, spawnLevel: 15, ageSec: 0 });
 		r.nextMonsterId = 3;
 	});
 	// move the second king to another owned tile

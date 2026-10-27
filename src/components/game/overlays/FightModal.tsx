@@ -4,6 +4,7 @@ import { COMBAT, MONSTERS } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { maxHp, maxMana } from '@/lib/combat';
+import { monsterStats } from '@/lib/monsters';
 import { COMBAT_EVENT, type CombatFx } from '@/lib/combatFx';
 import { healAmount } from '@/lib/skills';
 import audioManager from '@/utils/audioManager';
@@ -17,7 +18,7 @@ import '@/styles/Fight.css';
 interface FloatNumber {
 	id: number;
 	text: string;
-	kind: 'dmg' | 'crit' | 'super' | 'hurt' | 'heal' | 'stun';
+	kind: 'dmg' | 'crit' | 'super' | 'hurt' | 'heal' | 'stun' | 'resist';
 	x: number;
 }
 
@@ -95,11 +96,14 @@ const FightView: React.FC = () => {
 				setShake(true);
 				clearTimeout(shakeTimer.current);
 				shakeTimer.current = setTimeout(() => setShake(false), 320);
-				pushNumber(`-${fx.amount}`, 'hurt');
+				pushNumber(fx.crit ? `-${fx.amount}!` : `-${fx.amount}`, 'hurt');
 				audioManager.playSound('wrong');
 			} else if (fx.kind === 'heal') {
 				pushNumber(`+${fx.amount}`, 'heal');
 				audioManager.playSound('purchase');
+			} else if (fx.kind === 'resist') {
+				pushNumber('Resisted!', 'resist');
+				audioManager.playSound('wrong');
 			} else if (fx.kind === 'stun') {
 				pushNumber('Stunned!', 'stun');
 				audioManager.playSound('wrong');
@@ -144,7 +148,9 @@ const FightView: React.FC = () => {
 	};
 
 	const def = MONSTERS[fight.type];
-	const title = fight.type === 'rat' ? `${def.label} - Tier ${fight.tier}` : def.label;
+	const boss = def.grade === 'boss';
+	const traits = monsterStats(fight.type, fight.level);
+	const title = `${boss ? '☠ ' : ''}${def.label} - Lv ${fight.level}`;
 
 	return (
 		<PixelModal
@@ -154,6 +160,18 @@ const FightView: React.FC = () => {
 			onClose={leaveFight}>
 			<div className='fight-body' data-shake={shake}>
 				<div className='fight-hurt-flash' data-on={shake} aria-hidden />
+
+				{boss && (
+					<div className='fight-boss' title='A boss: its own drops, crits and sometimes resists Stun'>
+						<span className='fight-boss-skull' aria-hidden>
+							{'☠'}
+						</span>
+						<b>BOSS</b>
+						<span className='fight-boss-traits'>
+							Crits {traits.critChance}% - resists Stun {traits.stunResist}% - armor {Math.round(traits.armor)}
+						</span>
+					</div>
+				)}
 
 				{fight.timeLeftSec !== null && active && (
 					<div className='fight-timer' data-low={fight.timeLeftSec <= 10}>

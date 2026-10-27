@@ -185,20 +185,22 @@ Heal         = round(25 % max HP × (1 + 0.024 × (INT−5)) × (1 + Spell Power
 Stun         = the monster's attack timer is frozen 3 s, level 10, 15 mana, 15 s cooldown (the King's limit keeps running)
 regen        = (1 + gear regen) HP/s with no active fight, gear regen only during one; knockout restores 30 % of max HP
 potion       = +35 / +90 HP (not above max), 8 s cooldown shared by all potions in a fight
-rat tier t   : HP = round(100 × 1.5^(t−1))  → 100 / 150 / 225 / 338 / 506
-               attack = round(4 × 1.25^(t−1)) every 2 s → 4 / 5 / 6 / 8 / 10
-tier         = min(5, 1 + floor(age / 1800 s))                                  age counts only while not being fought
-rewards      : rewardSec = 90 × 1.5^(t−1)
+monster level: level = spawnLevel + min(growthLevels, floor(age / growthInterval))    growthLevels 10, interval 1800 s (LIMITS, via limitOf); age counts only while not being fought
+               spawn level: rat window [1 + (castle−1), +2] capped at 10; King [15 + floor(0.8 × (castle−1)), +3] capped at 25; rolled from the monster id (no Math.random)
+rat level L  : HP = round(100 × 1.5^((L−1)/2))  → level 1 / 3 / 5 / 7 / 9 = 100 / 150 / 225 / 338 / 506     attack = round(4 × 1.25^((L−1)/2))     armor = 0.5 × (L−1)
+King level L : HP, attack = base × levelScale(L) / levelScale(15)  (10400 HP, 14 attack at 15), armor 20 + 0.5 × (L−15), 10 % crit x1.5, 25 % Stun resist
+click damage = max(1, your damage × (1 − armor / (armor + 40)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
+rewards      : rewardSec = 90 × 1.17^(L−1) (rat), 3600 × 1.03^(L−15) (King)
                gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
 drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> source level -> item level -> rarity -> base -> affixes
-               rat: gear 12 % + 2 % per tier above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
-               potion 25 % + 3 % per tier (Greater from T4)                      (tier 1: 90 s of income, tier 5: ~456 s)
+               rat: gear 12 % + 1 % per level above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
+               potion 25 % + 1.5 % per level (Greater from level 7)              (level 1: 90 s of income, level 9: ~316 s)
                Rat King: 1 item of his own (rolled rarity) + 1 Rattatui piece (missing ones first) + 40 % a second one + 5 % (pity up to 15 %) a legendary weapon + 2 Minor and 1 Greater potion
                chest (item result, 8 % of chests): one item - gear 82 % (rolled rarity) or a potion, 1.9 % a legendary weapon instead
-item level   : source level = base + steps per tier + 3 per castle level above 1 (rat 1/3/5/7/9, King 12, chest 4, merchant 4, +3 per castle level); gear power x levelScale(level) = 1 + 0.07 x (level - 1)
-spawn        : first rat 120 s after 5 owned tiles, then 900 s; max 8; Rat King check every 600 s of age after tier 5 (7200 s), 35 %
-Rat King     : 15600 HP, attack 14 every 3 s, 75 s limit
+item level   : a monster's drops are at its own level (rat 1-20, King 15-35); chest 4 and the merchant 4, +3 per castle level; gear power x levelScale(level) = 1 + 0.07 x (level - 1)
+spawn        : first rat 120 s after 5 owned tiles, then 900 s; a boss (one at a time) every 10800 s of spawn time (COMBAT.spawn.bossIntervalSec)
+Rat King     : level 15: 10400 HP + 20 armor (15600 effective), attack 14 every 3 s, 75 s limit
 ```
 
 The King's numbers were tuned with `npm run fight-sim` (a bot with the real combat rules; tables in [generated/fight-sim.md](generated/fight-sim.md)) and are
@@ -232,3 +234,7 @@ cost (gold / wood / stone) = floor(base x factor x (1 - Thrift))     base = 500 
 
 The price follows the tile curve in shape (steep, then gentler, then gentler again) but starts lower, so a building is a fraction of a tile at the same point of the game.
 `src/config/gameConfig.ts` `BUILDING_COST` and `buildingCostFactor` in `src/utils/gameUtils.ts`; `tests/buildOnTile.test.ts` holds the shape.
+
+## 7. Limits and bonus hooks (what upgrades and rebirth will extend)
+
+Bounds that progression is meant to raise live in `src/config/limits.ts` (`LIMITS`: monster growth levels and interval, merchant shelf size, rotation and refresh cost, bag size) with a `HARD_LIMITS` ceiling for what a save may hold. Code reads them through `limitOf(key, ctx)` (`src/lib/limits.ts`), which adds the bonuses registered in `LIMIT_BONUSES` (today only Pack Rat on the bag size); a new upgrade or Legacy effect is one entry there and every reader follows. Likewise every gold payout for something the player sells goes through `sellMultiplier(ctx)` / `sellPayout` (`utils/gameUtils.ts`) with the bonuses in `SELL_BONUSES` (today Haggler): resources, bag gear, junk, auto-sold drops, the merchant previews and the cloud net-worth check all use it, so a "+20 % selling" effect applies to all of them alike (`tests/monsterLevels.test.ts` proves it with a registered bonus).

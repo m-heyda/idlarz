@@ -12,7 +12,6 @@ import type { EquipmentSlot } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import ItemSlot from '../ItemSlot';
 import Bag from '../Bag';
-import OrganizeButton from '../OrganizeButton';
 
 
 const CharacterOverlay: React.FC = () => {
@@ -142,9 +141,6 @@ const CharacterOverlay: React.FC = () => {
 				{/* Bag */}
 				<div className='px-panel flex-1 min-w-[360px] overflow-y-auto relative'>
 					<div className='px-h text-center'>Items Bag</div>
-					<div className='flex justify-center mb-2'>
-						<OrganizeButton onNotice={setNotice} />
-					</div>
 					<Bag onNotice={setNotice} />
 					<div className='px-tip-muted text-xs text-center mt-3'>
 						Double-click to equip or drink, right-click for more. Drag to rearrange, or press Organize.

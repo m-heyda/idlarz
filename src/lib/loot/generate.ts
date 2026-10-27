@@ -15,8 +15,8 @@ export type LootDrop = Drop;
 
 export interface LootRequest {
 	sourceId: string;
-	/** Monster tier (1-5); 1 for a chest */
-	tier?: number;
+	/** The monster's level (sets the item level of what it drops and the per-level chances); omitted for a chest or the shelf */
+	level?: number;
 	/** The world level: castle level, 1-10 */
 	castleLevel?: number;
 	/** Base item ids the player already has (bag + worn), for tables that prefer missing pieces */
@@ -56,9 +56,9 @@ export interface LootResult {
 
 const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
 
-/** The level of a source: its base, plus steps for the monster tier and the world (castle) level. Never the player's level. */
-export const resolveSourceLevel = (level: SourceLevelDef, tier = 1, castleLevel = 1): number =>
-	clampItemLevel(level.base + level.perTier * (Math.max(1, tier) - 1) + level.perCastleLevel * (Math.max(1, castleLevel) - 1));
+/** The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level. */
+export const resolveSourceLevel = (level: SourceLevelDef, castleLevel = 1): number =>
+	clampItemLevel(level.base + level.perCastleLevel * (Math.max(1, castleLevel) - 1));
 
 /** Rolls the item level around the source level, inside the profile's bounds. */
 export const rollItemLevel = (sourceLevel: number, def: Pick<ItemLevelDef, 'offset' | 'variance'> & Partial<Pick<ItemLevelDef, 'min' | 'max'>>, rng: Rng): number => {
@@ -68,9 +68,9 @@ export const rollItemLevel = (sourceLevel: number, def: Pick<ItemLevelDef, 'offs
 };
 
 /** How many of a roll group succeed: a random count in min..max, the first `guaranteed` always, the rest by chance. */
-const countSuccesses = (rolls: RollsDef, tier: number, rng: Rng): number => {
+const countSuccesses = (rolls: RollsDef, level: number, rng: Rng): number => {
 	const count = randomInt(rng, rolls.min, rolls.max);
-	const chance = clamp01(rolls.chancePerRoll + (rolls.chancePerTier ?? 0) * (tier - 1));
+	const chance = clamp01(rolls.chancePerRoll + (rolls.chancePerLevel ?? 0) * (level - 1));
 	let hits = 0;
 	for (let i = 0; i < count; i++) {
 		if (i < (rolls.guaranteed ?? 0) || chance >= 1 || rng() < chance) hits++;
@@ -105,7 +105,8 @@ interface Ctx {
 	req: LootRequest;
 	profile: LootProfile;
 	sourceLevel: number;
-	tier: number;
+	/** The monster's level (1 for sources without one): drives the per-level chances */
+	level: number;
 	rng: Rng;
 	taken: Set<string>;
 	trace: RollTrace[];
@@ -198,7 +199,7 @@ const runTable = (ctx: Ctx, table: BonusTable): { drops: LootDrop[]; triggered: 
 	const key = `${ctx.profile.id}:${table.id}`;
 	const misses = ctx.req.pity?.[key] ?? 0;
 	const pityBonus = table.pity ? Math.min(table.pity.maxBonus, table.pity.perMiss * misses) : 0;
-	const chance = clamp01((table.chance ?? 1) + (table.chancePerTier ?? 0) * (ctx.tier - 1) + pityBonus);
+	const chance = clamp01((table.chance ?? 1) + (table.chancePerLevel ?? 0) * (ctx.level - 1) + pityBonus);
 	const triggered = chance >= 1 || ctx.rng() < chance;
 	if (!triggered) return { drops: [], triggered: false };
 
@@ -214,7 +215,7 @@ const runTable = (ctx: Ctx, table: BonusTable): { drops: LootDrop[]; triggered: 
 		}
 		return { drops, triggered: true };
 	}
-	const hits = countSuccesses(table.rolls ?? { min: 1, max: 1, chancePerRoll: 1 }, ctx.tier, ctx.rng);
+	const hits = countSuccesses(table.rolls ?? { min: 1, max: 1, chancePerRoll: 1 }, ctx.level, ctx.rng);
 	for (let i = 0; i < hits; i++) {
 		const itemLevel = rollItemLevel(ctx.sourceLevel, levelDef, ctx.rng);
 		const drop = table.mode === 'rolled' ? rollRarityGear(ctx, table.id, table.poolId, itemLevel) : rollFixed(ctx, table, itemLevel);
@@ -233,14 +234,15 @@ export const generateLoot = (req: LootRequest, rng: Rng, data: LootData = LOOT_D
 		return { drops: [], sourceLevel: 1, pity: { ...req.pity }, trace: [], warnings };
 	}
 
-	const tier = Math.max(1, req.tier ?? 1);
-	const sourceLevel = resolveSourceLevel(source.level, tier, req.castleLevel ?? 1);
-	const ctx: Ctx = { data, req, profile, sourceLevel, tier, rng, taken: new Set(req.owned ?? []), trace: [], warnings };
+	const level = Math.max(1, Math.floor(req.level ?? 1));
+	if (req.level === undefined && !source.level) warnings.push(`${req.sourceId}: the source has no level of its own and the caller gave none`);
+	const sourceLevel = req.level !== undefined ? clampItemLevel(req.level) : source.level ? resolveSourceLevel(source.level, req.castleLevel ?? 1) : 1;
+	const ctx: Ctx = { data, req, profile, sourceLevel, level, rng, taken: new Set(req.owned ?? []), trace: [], warnings };
 	const pity: Record<string, number> = { ...req.pity };
 
 	let drops: LootDrop[] = [];
 	if (profile.generalPoolId) {
-		const hits = countSuccesses(profile.rolls, tier, rng);
+		const hits = countSuccesses(profile.rolls, level, rng);
 		for (let i = 0; i < hits; i++) {
 			const itemLevel = rollItemLevel(sourceLevel, profile.itemLevel, rng);
 			const drop = rollRarityGear(ctx, 'general', profile.generalPoolId, itemLevel);

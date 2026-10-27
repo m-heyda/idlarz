@@ -23,7 +23,7 @@ const DismissBody: React.FC<{ id: number }> = ({ id }) => {
 		if (!monster) close(null);
 	}, [monster, close]);
 	if (!monster) return null;
-	const label = monster.type === 'rat' ? `${MONSTERS.rat.label} (tier ${monster.tier})` : MONSTERS[monster.type].label;
+	const label = `${MONSTERS[monster.type].label} (level ${monster.level})`;
 
 	return (
 		<PixelModal title='Dismiss monster?' size='sm' onClose={done}>

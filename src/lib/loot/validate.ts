@@ -14,8 +14,6 @@ export interface LootValidation {
 }
 
 export interface ValidateOptions {
-	/** Highest monster tier a source can reach (COMBAT.maxTier) */
-	maxTier?: number;
 	/** Highest castle level (the world level a source's level grows with) */
 	maxCastleLevel?: number;
 }
@@ -28,7 +26,7 @@ const isProb = (n: unknown): boolean => typeof n === 'number' && Number.isFinite
  * weighted rarity has an eligible item at every item level a source can reach. Run by the tests (and so CI) and available
  * to the dev tooling; pure and cheap.
  */
-export const validateLootData = (data: LootData = LOOT_DATA, { maxTier = 5, maxCastleLevel = 10 }: ValidateOptions = {}): LootValidation => {
+export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 10 }: ValidateOptions = {}): LootValidation => {
 	const errors: string[] = [];
 	const warnings: string[] = [];
 	const err = (msg: string) => errors.push(msg);
@@ -128,12 +126,14 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxTier = 5, maxC
 		const profile = data.profiles[source.lootProfileId];
 		if (!profile?.enabled || !profile.generalPoolId || !data.pools[profile.generalPoolId]) continue;
 		const levels = new Set<number>();
-		for (let tier = 1; tier <= maxTier; tier++) {
-			for (let castle = 1; castle <= maxCastleLevel; castle++) {
-				const base = resolveSourceLevel(source.level, tier, castle) + profile.itemLevel.offset;
-				for (let d = -profile.itemLevel.variance; d <= profile.itemLevel.variance; d++) {
-					levels.add(Math.min(profile.itemLevel.max, Math.max(profile.itemLevel.min, base + d)));
-				}
+		// the source levels it can have: a range given by the caller (monsters) or the castle levels (chests, the shelf)
+		const sourceLevels: number[] = [];
+		if (source.levels) for (let l = source.levels.min; l <= source.levels.max; l++) sourceLevels.push(l);
+		else if (source.level) for (let castle = 1; castle <= maxCastleLevel; castle++) sourceLevels.push(resolveSourceLevel(source.level, castle));
+		for (const sourceLevel of sourceLevels) {
+			const base = sourceLevel + profile.itemLevel.offset;
+			for (let d = -profile.itemLevel.variance; d <= profile.itemLevel.variance; d++) {
+				levels.add(Math.min(profile.itemLevel.max, Math.max(profile.itemLevel.min, base + d)));
 			}
 		}
 		for (const level of [...levels].sort((a, b) => a - b)) {

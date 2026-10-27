@@ -38,6 +38,28 @@
 	transition: none;
 }
 
+.fight-boss {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 2px 8px;
+	color: #ffe9a8;
+	background: #4a0e0a;
+	border: 2px solid #ffd860;
+	letter-spacing: 1px;
+}
+
+.fight-boss-skull {
+	font-size: 1.2rem;
+}
+
+.fight-boss-traits {
+	font-size: 0.7rem;
+	color: #f0d8b0;
+	letter-spacing: 0;
+}
+
 .fight-timer {
 	text-align: center;
 	font-weight: 700;
@@ -194,6 +216,7 @@
 .fight-number[data-kind='super'] { color: #ff6ae0; font-size: 2.6rem; animation-duration: 1.2s; }
 .fight-number[data-kind='hurt'] { color: #ff6a5a; top: 70%; }
 .fight-number[data-kind='heal'] { color: #7aff8a; top: 70%; }
+.fight-number[data-kind='resist'] { color: #c8c8c8; top: 18%; font-size: 1.3rem; }
 .fight-number[data-kind='stun'] { color: #8ac0ff; top: 18%; font-size: 1.3rem; }
 
 @keyframes fight-float {

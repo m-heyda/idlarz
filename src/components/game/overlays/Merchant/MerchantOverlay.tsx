@@ -135,6 +135,7 @@ const MerchantOverlay: React.FC = () => {
 		buyClickUpgrade,
 		clickLevel,
 		merchantUpgrades,
+		prestige,
 	} = useGameStore();
 
 	// State for current merchant tab
@@ -242,7 +243,7 @@ const MerchantOverlay: React.FC = () => {
 		resource: keyof typeof MERCHANT_RESOURCE_PRICES,
 		amount: number
 	) => {
-		return sellPayout(MERCHANT_RESOURCE_PRICES[resource], amount, merchantUpgrades);
+		return sellPayout(MERCHANT_RESOURCE_PRICES[resource], amount, { merchantUpgrades, prestige });
 	};
 
 	// Price of a resource pack (rounded up, same as the store's buyResource)
@@ -380,7 +381,7 @@ const MerchantOverlay: React.FC = () => {
 										maxAmount={maxAmount}
 										currentAmount={currentAmount}
 										goldValue={goldValue}
-										priceMultiplier={sellMultiplier(merchantUpgrades)}
+										priceMultiplier={sellMultiplier({ merchantUpgrades, prestige })}
 										onAmountChange={handleAmountChange}
 										onSell={handleSell}
 										onSellAll={handleSellAll}
