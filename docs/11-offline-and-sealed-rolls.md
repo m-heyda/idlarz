@@ -32,6 +32,8 @@ playing ── useSpawnSync ───────> POST /api/spawn      ask agai
 upload  ── POST /api/save ─────> verifier knows the grants; gems replaced by the ledger balance; a rebirth or new game starts a new run (tickets cleared)
 ```
 
+**Chest counts and the poll race.** Every ticket answer carries `tickets.opened`, the number of chests the run has opened when the server made it. The browser places a missing chest on the map only from an answer that is not older than its own opens (none in flight, and `opened` at least the count the server returned for the player's last open; the guard lasts 15 s and starts again with every run). Without it a poll answered just before the server opened a chest still counted that chest, and while a fight is open (a poll every 2 s) the map put it back a moment after the player opened it. Extra chests on the map are always taken off. A chest that could not be opened because the server has no readable save yet (`404`, for example an account whose save predates the ledger, until its next upload) stays on the map with a message saying so.
+
 If the server says `409 needClaim` (the player was away more than 15 minutes since it last saw them, for instance a laptop that slept with the tab open) the client runs the claim first and then carries on.
 
 ## Data (migration `offline_ledger`, also in `supabase/schema.sql`)

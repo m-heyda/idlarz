@@ -34,6 +34,8 @@ Not part of this change; reviewed later. State today, so the rework starts from 
 | R8 | The King's balance changed with auto-attack: his HP is 1000 (was 9600 for a clicker) so the best gear wins comfortably, obsidian narrowly, steel not | `MONSTERS.ratKing`, `docs/generated/fight-sim.md` | needs a real playtest |
 | R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix, `storageScope.ts`) |
 | R10 | `legacyVault.ts` (the IndexedDB and `idle-explorer-v11/v12` import) and the `IDLZ1.` import format are still shipped | `lib/legacyVault.ts`, `saveStorage.ts` | delete when nobody can still hold such a save |
+| R11 | A sync (no key) overwrites the ledger's `last_key` / `last_result` (`onlineStep` writes `lastKey: key`), so the idempotency record of the previous keyed request (a chest open, a hotkey) is gone when a poll lands between a lost answer and its retry; the retry then takes a second ticket or answers "no ticket" | `lib/offline/online.ts` | keep the old record when the step has no key; rare (the retry follows within a second) |
+| R12 | A release that reads a new column goes live before its SQL migration is applied: on 2026-10-28 between about 01:21 and 01:39 UTC every ledger read failed ("column player_ledger.combat does not exist") until `combat_ledger.sql` ran | `supabase/migrations/` | apply additive migrations before deploying the code that reads them, or read the new column defensively |
 
 ## 3. Server migration backlog (ranked)
 
