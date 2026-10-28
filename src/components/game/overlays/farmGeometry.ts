@@ -66,13 +66,14 @@ export interface WalkView {
 /** Panels laid over the farm window, in CSS px */
 export interface Insets {
 	right: number;
-	bottom: number;
 	/** The stats readout in the top-left corner is unfolded */
 	hudOpen: boolean;
 }
 
 // the stats readout in the top-left corner (CSS px, plus its margin), unfolded and folded up
 const HUD = { open: { w: 285, h: 235 }, closed: { w: 285, h: 48 } };
+// the upgrade drawer's tab along the bottom edge (CSS px, with its margin); the open drawer overlays the scene and reserves nothing
+const UPGRADE_TAB_H = 36;
 const SPRITE = { halfW: 20, above: 33, below: 6 }; // an animal's extent round its feet, native px
 
 /** The walkable window for a stage of this size at this zoom, with the panels subtracted. */
@@ -86,7 +87,7 @@ export const walkView = (stageW: number, stageH: number, zoom: number, insets: I
 		x0: toX(0) + SPRITE.halfW,
 		x1: toX(stageW - insets.right) - SPRITE.halfW,
 		y0: toY(0) + SPRITE.above,
-		y1: toY(stageH - insets.bottom) - SPRITE.below,
+		y1: toY(stageH - UPGRADE_TAB_H) - SPRITE.below,
 		x1h: toX(hud.w) + SPRITE.halfW,
 		y1h: toY(hud.h) + SPRITE.below,
 	};

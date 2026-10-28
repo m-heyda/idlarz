@@ -1,5 +1,4 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { MeadowCritter, useMeadowCritters } from './MeadowLayer';
 import { ANIMALS, FARM } from '@/config/gameConfig';
 import { ANIMAL_PIXEL_ICONS } from '@/config/pixelIcons';
 import { Animal } from '@/types/game';
@@ -56,22 +55,21 @@ interface FarmSceneProps {
 	highlightId: string | null;
 	/** animal id that was just bought (plays a little burst) */
 	celebrate: string | null;
-	/** Panels laid over the window (CSS px): animals and critters keep clear of them */
+	/** Panels laid over the window (CSS px): animals keep clear of them */
 	insets: Insets;
+	/** A press on the meadow itself (the panels laid over it do not count) */
+	onPointerDown?: () => void;
 }
 
 /**
  * The farm as a tiny game: an isometric pen (barn, trough, hay, gate) with your animals wandering about, on a meadow that
  * fills the whole window. The animals are scenery: buying happens in the panel beside the scene.
  */
-const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrate, insets }) => {
+const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrate, insets, onPointerDown }) => {
 	const stageRef = useRef<HTMLDivElement>(null);
 	const [zoom, setZoom] = useState(3);
 	const zoomRef = useRef(zoom);
 	zoomRef.current = zoom;
-	const insetsRef = useRef(insets);
-	insetsRef.current = insets;
-	const { critters, remove } = useMeadowCritters(stageRef, insetsRef);
 	const nodes = useRef(new Map<string, HTMLDivElement>());
 	const agents = useRef(new Map<string, Agent>());
 	const viewRef = useRef<WalkView | null>(null);
@@ -124,7 +122,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 		ro.observe(el);
 		return () => ro.disconnect();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [insets.right, insets.bottom, insets.hudOpen]);
+	}, [insets.right, insets.hudOpen]);
 
 	// keep one agent per visible instance; new ones appear at a spot of their own
 	useLayoutEffect(() => {
@@ -230,7 +228,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 	}, []);
 
 	return (
-		<div ref={stageRef} className='farm-stage'>
+		<div ref={stageRef} className='farm-stage' onPointerDown={onPointerDown}>
 			<div className='farm-cloud' />
 			<div
 				className='farm-pen'
@@ -269,10 +267,6 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 
 				<PixelIcon name='farm_front' scale={zoom} alt='' className='farm-layer farm-front' />
 			</div>
-
-			{critters.map((c) => (
-				<MeadowCritter key={c.id} critter={c} onExpire={remove} />
-			))}
 		</div>
 	);
 };

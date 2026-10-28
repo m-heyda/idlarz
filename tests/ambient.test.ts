@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, worldFromRows } from './helpers';
-import { AMBIENT_LIFE, FARM_CRITTERS, TILE_SIZE } from '../src/config/gameConfig';
+import { AMBIENT_LIFE, TILE_SIZE } from '../src/config/gameConfig';
 import { nextSpawnDelay, pickAmbientCritter, type Viewport } from '../src/lib/ambientLife';
 import type { Tile } from '../src/types/game';
 
@@ -98,9 +98,7 @@ test('swamp frogs, coast crabs, hill goats and forest wolves exist and stay clos
 	}
 });
 
-test('critters are rare on purpose: farm visitors at least a minute apart, map critters spaced out and few at once', () => {
-	assert.ok(FARM_CRITTERS.minGapMs >= 60_000 && FARM_CRITTERS.firstDelayMs >= 30_000);
-	assert.ok(FARM_CRITTERS.maxGapMs > FARM_CRITTERS.minGapMs);
+test('critters are rare on purpose: map critters spaced out and few at once', () => {
 	assert.ok(AMBIENT_LIFE.spawnMinMs >= 10_000 && AMBIENT_LIFE.maxAlive <= 3);
 	assert.ok(AMBIENT_LIFE.firstSpawnMs > 0 && AMBIENT_LIFE.firstSpawnMs <= AMBIENT_LIFE.spawnMinMs);
 });

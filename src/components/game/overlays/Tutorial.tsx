@@ -319,8 +319,7 @@ const Tutorial: React.FC = () => {
 					))}
 				</div>
 				<p className='text-[#a89878] text-xs mt-2'>
-					Butterflies, bees and other little critters wander over your land and through the farm meadow. They are just for show:
-					they take no clicks and give nothing.
+					Butterflies, bees and other little critters wander over your land. They are just for show: they take no clicks and give nothing.
 				</p>
 			</section>
 

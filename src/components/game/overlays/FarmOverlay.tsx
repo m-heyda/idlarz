@@ -6,12 +6,9 @@ import FarmHud from './FarmHud';
 import FarmUpgradeDock from './FarmUpgradeDock';
 import FarmAnimalDock, { ANIMAL_DOCK_WIDTH } from './FarmAnimalDock';
 
-/** Height the open / collapsed upgrade shelf takes along the bottom (CSS px, with its margin) */
-const UPGRADE_DOCK_HEIGHT = { open: 140, closed: 36 };
-
 /**
  * The Farm window: one meadow filling the whole window with the pen and its animals in it, a corner readout, the animal
- * shop along the right edge and the upgrade shelf along the bottom.
+ * shop along the right edge and the upgrade drawer sliding up from the bottom.
  */
 const FarmOverlay: React.FC = () => {
 	const purchaseAnimal = useGameStore((state) => state.purchaseAnimal);
@@ -19,7 +16,7 @@ const FarmOverlay: React.FC = () => {
 	const [highlightId, setHighlightId] = useState<string | null>(null);
 	const [celebrate, setCelebrate] = useState<string | null>(null);
 	const [animalsOpen, setAnimalsOpen] = useState(true);
-	const [upgradesOpen, setUpgradesOpen] = useState(true);
+	const [upgradesOpen, setUpgradesOpen] = useState(false);
 	const [hudOpen, setHudOpen] = useState(true);
 
 	useEffect(() => {
@@ -40,13 +37,13 @@ const FarmOverlay: React.FC = () => {
 				celebrate={celebrate}
 				insets={{
 					right: animalsOpen ? ANIMAL_DOCK_WIDTH : 0,
-					bottom: upgradesOpen ? UPGRADE_DOCK_HEIGHT.open : UPGRADE_DOCK_HEIGHT.closed,
 					hudOpen,
 				}}
+				onPointerDown={() => setUpgradesOpen(false)}
 			/>
 			<FarmHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} />
 			<FarmAnimalDock open={animalsOpen} onToggle={() => setAnimalsOpen(!animalsOpen)} onBuy={buy} onHover={setHighlightId} />
-			<FarmUpgradeDock open={upgradesOpen} onToggle={() => setUpgradesOpen(!upgradesOpen)} />
+			<FarmUpgradeDock open={upgradesOpen} onOpenChange={setUpgradesOpen} />
 		</div>
 	);
 };
