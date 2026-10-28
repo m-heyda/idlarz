@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { formatTime, formatRate } from '@/utils/formatters';
-import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
+import { MAX_LEVEL } from '@/config/gameConfig';
+import { xpToNextLevel } from '@/utils/gameUtils';
 
 // Level Up Timer Component that updates every second
 export const LevelUpTimer: React.FC<{
@@ -18,15 +19,17 @@ export const LevelUpTimer: React.FC<{
 		const updateTimer = () => {
 			// Get current XP rate
 			const xpRate = resourceRates?.total?.xp || 0;
+			if (level.level >= MAX_LEVEL) {
+				setTimeRemaining('Max level');
+				return;
+			}
 			if (xpRate <= 0) {
 				setTimeRemaining('∞');
 				return;
 			}
 
 			// Calculate remaining XP to level up
-			const xpForNextLevel = Math.floor(
-				BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1)
-			);
+			const xpForNextLevel = xpToNextLevel(level.level);
 			const remainingXp = xpForNextLevel * (1 - level.progress);
 
 			// Calculate time in seconds

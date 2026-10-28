@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, growTo, store } from './helpers';
 import { STARTING_GEMS } from '../src/config/gameConfig';
+import { calculateLevel, totalStatPoints } from '../src/utils/gameUtils';
 import { pickPersisted, type PersistedGame } from '../src/lib/sanitizeSave';
 import { encodeSave } from '../src/lib/saveFormat';
 import { acceptSave, type SaveRepo, type StatsRow, type StoredSave, type WorldPart } from '../src/lib/cloudSave/pipeline';
@@ -170,7 +171,15 @@ test('what the server paid is allowed in the next save; the same gold without a 
 	const result = await claim(m, 'u1', 'claim-0001', T0 + 8 * HOUR);
 	const paid = result.grant!.resources;
 
-	const honest = { ...state, playSeconds: state.playSeconds + 15, resources: { ...state.resources, gold: state.resources.gold + paid.gold, xp: state.resources.xp + paid.xp } };
+	const xp = state.resources.xp + paid.xp;
+	// the levels the paid XP gives come with their attribute points (the game's tick or the offline apply credits them)
+	const points = totalStatPoints(calculateLevel(xp).level) - totalStatPoints(calculateLevel(state.resources.xp).level);
+	const honest = {
+		...state,
+		playSeconds: state.playSeconds + 15,
+		characterStats: { ...state.characterStats, availablePoints: state.characterStats.availablePoints + points },
+		resources: { ...state.resources, gold: state.resources.gold + paid.gold, xp },
+	};
 	const ok = await save(m, 'u1', honest, 1, T0 + 8 * HOUR + 20_000);
 	assert.ok(ok.kind === 'ok');
 	assert.equal(ok.flags.includes('gold_jump'), false, 'the grant explains the jump');

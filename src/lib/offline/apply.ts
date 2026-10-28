@@ -3,7 +3,7 @@ import { maxHp, maxMana } from '@/lib/combat';
 import type { LimitContext } from '@/lib/limits';
 import { advanceMonsters } from '@/lib/monsters';
 import type { OfflineGrant } from '@/lib/offline/grant';
-import { calculateLevel, calculateResourceRates } from '@/utils/gameUtils';
+import { calculateLevel, calculateResourceRates, totalStatPoints } from '@/utils/gameUtils';
 import { getTile, setTile } from '@/utils/world';
 import type { GameState, Resources } from '@/types/game';
 
@@ -81,7 +81,7 @@ export const applyOfflineGrant = (state: OfflineStateIn, grant: OfflineGrant, li
 
 	const { level, progress } = calculateLevel(resources.xp);
 	const levelsGained = Math.max(0, level - state.level.level);
-	const characterStats = levelsGained > 0 ? { ...state.characterStats, availablePoints: state.characterStats.availablePoints + levelsGained } : state.characterStats;
+	const characterStats = levelsGained > 0 ? { ...state.characterStats, availablePoints: state.characterStats.availablePoints + totalStatPoints(level) - totalStatPoints(state.level.level) } : state.characterStats;
 	const healed = grant.gapSec >= FULL_HEAL_AFTER_SEC;
 
 	return {

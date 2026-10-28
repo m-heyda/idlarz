@@ -83,7 +83,9 @@ export const redeemChest = (deps: ServiceDeps, userId: string, key: string, nowM
 		const { luck, goldFind } = stored.summary.derived;
 		const ordChest = ledger.ordChest + 1;
 		const rng = sealedRng(deps.secret, userId, ledger.runId, 'chest', ordChest);
-		const loot = rollChestLoot({ rates: stored.summary.rates, luck, goldFind, bag: [], castleLevel: stored.summary.castleLevel, autoSellUpTo: null }, rng);
+		const rolled = rollChestLoot({ rates: stored.summary.rates, luck, goldFind, bag: [], castleLevel: stored.summary.castleLevel, autoSellUpTo: null }, rng);
+		// an XP chest pays like every other XP the player earns: with the XP bonus (kills and the passive XP already do)
+		const loot = rolled.kind === 'xp' ? { ...rolled, xp: Math.floor(rolled.xp * (1 + stored.summary.xpGainPct / 100)) } : rolled;
 		const gems = rollGemFind(luck, rng);
 
 		const granted: Partial<GrantTotals> = { gems };

@@ -5,7 +5,7 @@ import { healAmount } from '@/lib/skills';
 import { critDamagePercent } from '@/lib/statBonuses';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { BagSlot, CharacterStats, Equipment } from '@/types/game';
-import { calculateCombatStats, merchantCombat } from '@/utils/gameUtils';
+import { calculateCombatStats, calculateLevel, merchantCombat } from '@/utils/gameUtils';
 
 // What the server knows about the player's fighting strength: worked out from the last accepted save with the same functions the game's
 // own readouts use, so the numbers in the character window are the numbers the fight runs on.
@@ -30,7 +30,13 @@ const statsOf = (core: Core): CharacterStats => {
 
 export const equipmentOf = (core: Core): Equipment => (isRecord(core.equipment) ? (core.equipment as Equipment) : {});
 
+/**
+ * The character's level. A stored save does not hold it (it is derived from the XP, see saveFormat NOT_WRITTEN), so it is worked out from the
+ * XP exactly as the game does; a record that carries a level but no XP (the engine tests) is still read.
+ */
 export const characterLevelOf = (core: Core): number => {
+	const xp = isRecord(core.resources) ? core.resources.xp : undefined;
+	if (typeof xp === 'number' && Number.isFinite(xp)) return calculateLevel(xp).level;
 	const level = isRecord(core.level) ? core.level.level : undefined;
 	return typeof level === 'number' && Number.isFinite(level) ? Math.max(1, Math.floor(level)) : 1;
 };

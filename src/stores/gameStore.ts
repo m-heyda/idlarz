@@ -21,7 +21,6 @@ import {
 	LEGACY_UPGRADES,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUYABLE,
-	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_SHOP_ITEMS,
 	MERCHANT_UPGRADES,
@@ -41,6 +40,7 @@ import {
 	calculateCombatStats,
 	calculateLevel,
 	calculateResourceRates,
+	buyCost,
 	calculateTileCost,
 	calculateTileTapYield,
 	calculateXpGain,
@@ -59,9 +59,11 @@ import {
 	legacyUpgradeCost,
 	merchantCombat,
 	merchantLevel,
+	reconcileCharacter,
 	merchantUpgradeCost,
 	sellPayout,
 	startingResources,
+	totalStatPoints,
 	subtractBundle,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
@@ -405,7 +407,7 @@ const createGameSlice = (
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
-		// Rebirth: restart with the Legacy bonus. Keeps name, class, play time and all Legacy.
+		// Rebirth: restart with the Legacy bonus. Keeps name, class, play time, all Legacy and the character (XP, level, attributes).
 		rebirth: () => {
 			const state = get();
 			const castle = findCastle(state.tiles);
@@ -425,18 +427,32 @@ const createGameSlice = (
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			const fresh = createInitialData(prestige);
+			// settle the level first: XP bought a moment ago may not have been counted by a tick yet (its points are credited here)
+			const settled = calculateLevel(state.resources.xp);
+			const characterStats = {
+				...state.characterStats,
+				availablePoints: state.characterStats.availablePoints + Math.max(0, totalStatPoints(settled.level) - totalStatPoints(state.level.level)),
+			};
+			// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
+			const merchantUpgrades: Record<string, number> = state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {};
 			set({
 				...fresh,
+				// the character is progression too: lifetime XP, the level it gives and the attributes (with the points still to spend) carry
+				// over, because the level curve is paced over rebirths (level 80 around the 3rd, 100 around the 10th); the income follows the attributes
+				resources: { ...fresh.resources, xp: state.resources.xp },
+				level: settled,
+				previousLevel: settled.level,
+				characterStats,
+				resourceRates: calculateResourceRates(fresh.tiles, characterStats, fresh.farmLevels, prestige, fresh.farmUpgrades, merchantUpgrades),
 				// gear is character progression: it survives a rebirth (HP is refilled)
 				equipment: state.equipment,
 				bag: state.bag,
 				gems: state.gems, // the premium currency survives a rebirth
 				lootPity: state.lootPity,
 				autoSellUpTo: state.autoSellUpTo,
-				// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
-				merchantUpgrades: state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {},
-				playerHp: maxHp(fresh.characterStats, state.equipment),
-				playerMp: maxMana(fresh.characterStats, state.equipment),
+				merchantUpgrades,
+				playerHp: maxHp(characterStats, state.equipment),
+				playerMp: maxMana(characterStats, state.equipment),
 				playerName: state.playerName,
 				playerClass: state.playerClass,
 				playSeconds: state.playSeconds,
@@ -705,6 +721,21 @@ const createGameSlice = (
 			void requestAuto({ autoUse: on }, sinceNow()).then((reply) => settleFight(reply));
 		},
 
+		// The server kept less XP than the game held (see cloudSave/xpModel.ts): XP, the level it gives and the attribute points follow
+		applyServerXp: (xp: number) => {
+			const state = get();
+			if (!Number.isFinite(xp) || xp < 0 || xp >= state.resources.xp) return;
+			const level = calculateLevel(xp);
+			const characterStats = reconcileCharacter(state.characterStats, xp);
+			set({
+				resources: { ...state.resources, xp },
+				level,
+				previousLevel: level.level,
+				characterStats,
+				resourceRates: calculateResourceRates(state.tiles, characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades),
+			});
+		},
+
 		// The server's picture of combat arrived with a sync (polling, a hotkey): see applyCombatView
 		applyFightReply: (reply: FightReply) => {
 			applyCombatView(reply.combat, reply.gemsTotal);
@@ -877,7 +908,7 @@ const createGameSlice = (
 			const castleFinished = !!state.castleUpgrade && !newCastleUpgrade;
 			const newCharacterStats = { ...state.characterStats };
 			if (level > state.level.level) {
-				newCharacterStats.availablePoints += level - state.level.level;
+				newCharacterStats.availablePoints += totalStatPoints(level) - totalStatPoints(state.level.level);
 			}
 
 			set({
@@ -1140,11 +1171,7 @@ const createGameSlice = (
 			if (units < 1) return false;
 
 			const state = get();
-			const price = Math.ceil(
-				units *
-					MERCHANT_RESOURCE_PRICES[resource as keyof typeof MERCHANT_RESOURCE_PRICES] *
-					MERCHANT_BUY_MULTIPLIER
-			);
+			const price = buyCost(resource as keyof typeof MERCHANT_RESOURCE_PRICES, units);
 			if (state.resources.gold < price) return false;
 
 			set({

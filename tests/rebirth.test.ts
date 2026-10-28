@@ -17,7 +17,9 @@ import {
 	calculateTileCost,
 	castleUpgradeDuration,
 	effectiveTileDiscount,
+	calculateLevel,
 	legacyGain,
+	totalStatPoints,
 	legacySpent,
 	legacyUpgradeCost,
 } from '../src/utils/gameUtils';
@@ -58,6 +60,7 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 	assert.ok(expected >= 1);
 	store.setState({ playerName: 'Hero', playerClass: 'mage', playSeconds: 12345 });
 	setResources({ gold: 777 });
+	const before = { xp: api().resources.xp, stats: { ...api().characterStats }, level: api().level.level };
 	assert.equal(api().rebirth(), true);
 
 	const s = api();
@@ -70,7 +73,14 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 	assert.equal(tileAt(s.tiles, CASTLE_X, CASTLE_Y).level, 1);
 	assert.equal(s.clickLevel, 0);
 	assert.deepEqual(s.farmLevels, {});
-	assert.equal(s.level.level, 1);
+	// the character carries over: the XP, the level it gives, the attributes with the points still to spend
+	assert.equal(s.resources.xp, before.xp);
+	assert.equal(s.level.level, calculateLevel(before.xp).level);
+	assert.ok(s.level.level > 1);
+	assert.deepEqual(
+		{ ...s.characterStats, reputation: 0 },
+		{ ...before.stats, availablePoints: before.stats.availablePoints + Math.max(0, totalStatPoints(s.level.level) - totalStatPoints(before.level)), reputation: 0 }
+	);
 	assert.equal(s.castleUpgrade, null);
 	assert.equal(s.resources.gold, INITIAL_RESOURCES.gold);
 	assert.equal(s.playerName, 'Hero');

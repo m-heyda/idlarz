@@ -54,8 +54,32 @@ export const BASE_TILE_COST = 55; // Base cost for first tile purchase
 
 // XP calculation constants - Exponential XP system
 export const BASE_XP_PER_TILE = 125;
-export const XP_GROWTH_FACTOR = 1.3; // Exponential growth factor for XP needed per level (x1.3)
-export const BASE_XP_PER_LEVEL = 750; // Starting XP needed for level 1 to 2
+
+// The character level curve (xpToNextLevel / calculateLevel in utils/gameUtils.ts). Level and XP carry over a rebirth, so the curve is
+// paced over rebirths, not days, and is written down as ANCHORS: the total XP at which a level is reached, measured with the sim bot
+// (npm run sim hardcore-rebirth6-x10 logs lifetime XP and level; the hardcore bot rebirths at ~day 24, 38, 50, 62 ...):
+//   level 10 after ~4-5 h (XP 2e5), level ~30 around day 2-3 (2.5e7), the soft cap (80) around the 3rd rebirth (1.2e10),
+//   level 90 around the 5th (3.4e10) and the maximum (100) around the 10th (1.6e11).
+// Between two anchors the step to the next level grows by a constant factor, chosen so the total hits the anchor and the steps never
+// shrink at a join; the first step is `firstStepXp`. Retune the anchors (not the code) when the sim's XP supply changes.
+export const LEVELING = {
+	maxLevel: 100,
+	softCapLevel: 80,
+	firstStepXp: 5000,
+	// A level gives 1 attribute point; the levels up to `earlyBonusUntil` give `earlyBonusPoints` more. Levels are slower than they were, and
+	// the points (Charisma, Intelligence ...) are what speeds the first days up, so the early levels pay extra to keep the pace of the first days.
+	earlyBonusUntil: 30,
+	earlyBonusPoints: 2,
+	/** [level, total XP needed to reach it], increasing, ending at maxLevel */
+	anchors: [
+		[10, 2.3e5],
+		[30, 2.5e7],
+		[80, 1.2e10],
+		[90, 3.4e10],
+		[100, 1.6e11],
+	] as readonly (readonly [number, number])[],
+};
+export const MAX_LEVEL = LEVELING.maxLevel;
 
 export const SPECIAL_SINGLE_TYPE_BIOMES: BiomeType[] = ['castle'];
 export const EMPTY_BIOMES: BiomeType[] = ['empty'];
@@ -79,8 +103,10 @@ export const TILE_PRICE = {
 	ceiling: RESOURCE_CAP / 100,
 };
 
-// XP a tile purchase gives: 125 x 1.02^(k-1) x k/4 up to tile `growthUntil` (the old curve), then a polynomial tail
+// XP a tile purchase gives: 125 x growth^(k-1) x k/4 up to tile `growthUntil`, then a polynomial tail. `growth` was 1.02, which made
+// the XP of a tile jump ~1000x between tile 100 and tile 300 (and levels with it); the gentler 1.012 spreads it over the run.
 export const XP_TILE = {
+	growth: 1.012,
 	growthUntil: 300,
 	tailExponent: 1.5,
 };

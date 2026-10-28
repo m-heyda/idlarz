@@ -11,7 +11,7 @@ import { dirname, resolve } from 'node:path';
 import {
 	ANIMALS,
 	BASE_GENERATION_RATES,
-	BASE_XP_PER_LEVEL,
+	LEVELING,
 	BIOME_YIELD,
 	BIOMES,
 	BUILDING_COST,
@@ -35,7 +35,6 @@ import {
 	TILE_PRICE,
 	RESOURCE_CAP,
 	SCALING_CONFIG,
-	XP_GROWTH_FACTOR,
 	XP_TILE,
 } from '../src/config/gameConfig';
 import {
@@ -53,6 +52,8 @@ import {
 	merchantUpgradeCost,
 	legacyGain,
 	legacyUpgradeCost,
+	cumulativeXp,
+	xpToNextLevel,
 } from '../src/utils/gameUtils';
 import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import { formatTime } from '../src/utils/formatters';
@@ -141,15 +142,14 @@ line();
 // ---------------------------------------------------------------------------
 line('## 2. Level curve');
 line();
-line(`XP to go from level L to L+1 = \`floor(${BASE_XP_PER_LEVEL} × ${XP_GROWTH_FACTOR}^(L-1))\`. One stat point per level.`);
+line(`The level curve is written as anchors (total XP to reach a level): ${LEVELING.anchors.map(([l, x]) => `level ${l} = ${fmt(x)}`).join(', ')}; between two anchors every step is a constant factor bigger than the one before (\`xpToNextLevel\`). Soft cap at level ${LEVELING.softCapLevel}, maximum level ${LEVELING.maxLevel}. One stat point per level. Level, XP and attributes carry over a rebirth.`);
 line();
 {
 	const rows: (string | number)[][] = [];
 	let cumulative = 0;
-	for (let L = 1; L <= 40; L++) {
-		const step = Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, L - 1));
-		cumulative += step;
-		rows.push([L, fmt(step), fmt(cumulative)]);
+	for (const L of [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 70, 79, 80, 85, 90, 95, 99]) {
+		cumulative = cumulativeXp(L + 1);
+		rows.push([L, fmt(xpToNextLevel(L)), fmt(cumulative)]);
 	}
 	table(['Level', 'XP to next', 'cumulative XP to reach L+1'], rows);
 }

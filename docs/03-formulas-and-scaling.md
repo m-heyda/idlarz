@@ -29,12 +29,14 @@ Every purchase rolls its biome (no picker). XP and reputation per purchase in §
 ## 2. XP and levels
 
 ```
-tileXP(k)   = 125 × 1.02^(min(k,300)−1) × min(k,300)/4 × (k/300)^1.5 if k > 300      k = owned count AFTER the purchase (XP_TILE)
+tileXP(k)   = 125 × 1.012^(min(k,300)−1) × min(k,300)/4 × (k/300)^1.5 if k > 300      k = owned count AFTER the purchase (XP_TILE)
 awardedXP   = tileXP × (1 + xpGainMultiplier/100)
 xpGainMultiplier (%) = 0.2·INT + 0.25·CHA
 passive xp/s = rates.total.xp × (1 + xpGainMultiplier/100)
-XP to leave level N = floor(750 × 1.3^(N−1))
-stat points = 1 per level; reputation = 1000 + 100 per tile bought
+XP to leave level N = xpToNextLevel(N): from anchors (level → total XP) 10 → 2.3e5, 30 → 2.5e7, 80 → 1.2e10, 90 → 3.4e10, 100 → 1.6e11,
+                       every step a constant factor above the one before inside a segment; level 100 is the maximum (LEVELING in gameConfig.ts)
+stat points = 1 per level, +2 for levels 2..30 (totalStatPoints); reputation = 1000 + 100 per tile bought
+level, lifetime XP and attributes carry over a rebirth
 ```
 
 ## 3. Resource rate pipeline

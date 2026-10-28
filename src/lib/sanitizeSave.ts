@@ -33,6 +33,7 @@ import { limitOf } from '@/lib/limits';
 import {
 	calculateCombatStats,
 	calculateLevel,
+	totalStatPoints,
 	calculateXpGain,
 	castleUpgradeDuration,
 	EMPTY_PRESTIGE,
@@ -332,7 +333,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	}
 	const available = int(raw.characterStats.availablePoints, 0, 100000);
 	if (available === null) return fail('available points');
-	const expectedTotal = BASE_STAT_KEYS.length * INITIAL_CHARACTER_STATS.strength + (level.level - 1);
+	const expectedTotal = BASE_STAT_KEYS.length * INITIAL_CHARACTER_STATS.strength + totalStatPoints(level.level);
 	const total = allocated + available;
 	if (total > expectedTotal) return fail('too many stat points');
 	if (total < expectedTotal - POINT_TOLERANCE) return fail('too few stat points');

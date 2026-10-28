@@ -91,8 +91,8 @@ const LegacyDialog: React.FC = () => {
 					<div className='px-h'>Rebirth now?</div>
 					<p className='text-[#d8c8a0] mb-2'>
 						You gain <b className='text-green-300'>{formatNumber(gain)}</b> Legacy (+{pct(gain * REBIRTH.incomePerPoint)} income
-						for ever). The map, resources, castle, farm, level and stat points start again. Your name, hero,
-						Legacy and shop upgrades stay.
+						for ever). The map, resources, castle and farm start again. Your name, hero, level, XP,
+						attributes, Legacy and shop upgrades stay.
 					</p>
 					<div className='flex justify-between'>
 						<button className='px-btn' onClick={() => setConfirming(false)}>

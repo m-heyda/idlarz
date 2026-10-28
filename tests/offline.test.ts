@@ -13,7 +13,7 @@ import { computeOfflineGrant, zeroGrant, type OfflineInput } from '../src/lib/of
 import { offlineCapHours, offlineCapSec, offlineEfficiency, offlineMinGapSec } from '../src/lib/offline/limits';
 import { sealedRng } from '../src/lib/offline/seal';
 import { advanceBank, emptyBank, takeChest, takeMonster, ticketCap, TICKET_CAP, type BankContext, type TicketBank } from '../src/lib/offline/tickets';
-import { calculateCombatStats, calculateResourceRates } from '../src/utils/gameUtils';
+import { calculateCombatStats, calculateResourceRates, totalStatPoints } from '../src/utils/gameUtils';
 import { castleUpgradeDuration } from '../src/utils/gameUtils';
 import type { PrestigeState, Resources } from '../src/types/game';
 
@@ -262,7 +262,7 @@ test('applying a grant adds the income, levels the hero up and fills HP after a 
 	assert.equal(patch.resources!.gold, before.resources.gold + 5 * 7200 * 0.5);
 	assert.ok(patch.resources!.xp > before.resources.xp);
 	assert.equal(summary.levelsGained, patch.level!.level - before.level.level);
-	assert.equal(patch.characterStats!.availablePoints, before.characterStats.availablePoints + summary.levelsGained);
+	assert.equal(patch.characterStats!.availablePoints, before.characterStats.availablePoints + totalStatPoints(patch.level!.level) - totalStatPoints(before.level.level));
 	assert.equal(patch.previousLevel, patch.level!.level, 'no level-up popup: the welcome-back window reports it');
 	assert.ok(patch.playerHp! >= before.playerHp);
 });

@@ -19,7 +19,7 @@ export const fetchCloud = async (): Promise<FetchCloud> => {
 };
 
 export type PushResult =
-	| { status: 'ok'; rev: number }
+	| { status: 'ok'; rev: number; /** Set when the server kept less XP than the save held: the one it can explain */ xp?: number }
 	| { status: 'conflict'; rev: number }
 	| { status: 'signed_out' } // the session is gone (expired, or logged out in another tab): retrying cannot help
 	| { status: 'retry' } // too soon, outage, no network: try again later, nothing is wrong with the save
@@ -36,8 +36,8 @@ export const pushCloud = async (text: string, baseRev: number, keepalive = false
 			// browsers refuse a keepalive body above 64 KiB (the fetch throws): a big save goes out as a normal request
 			keepalive: keepalive && shouldKeepalive(body),
 		});
-		const reply = (await response.json().catch(() => ({}))) as { rev?: number; error?: string };
-		if (response.ok && typeof reply.rev === 'number') return { status: 'ok', rev: reply.rev };
+		const reply = (await response.json().catch(() => ({}))) as { rev?: number; xp?: number; error?: string };
+		if (response.ok && typeof reply.rev === 'number') return { status: 'ok', rev: reply.rev, xp: typeof reply.xp === 'number' && Number.isFinite(reply.xp) ? reply.xp : undefined };
 		if (response.status === 409) return { status: 'conflict', rev: reply.rev ?? 0 };
 		if (response.status === 401) return { status: 'signed_out' };
 		if (response.status === 422 || response.status === 400) return { status: 'rejected', message: reply.error ?? 'The save was refused.' };

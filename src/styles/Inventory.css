@@ -97,29 +97,90 @@
 	justify-content: center;
 }
 
-/* The merchant's shelf: the bag's look with smaller slots and a Buy button under each (the price shows on hover) */
-.shop-grid {
+/* The merchant's shelf: small slots standing on wooden planks, a Buy button hanging under each (the price shows on hover). The wood is CSS only
+   (the kit's bronze and brown ramp: grain, a lit top edge, a dark underside, a front lip, nails), no image. Cells stand 4 to a plank. */
+.shop-board {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 52px);
-	gap: 10px 8px;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 18px 14px;
+	padding: 12px 10px 6px;
+	background: rgba(10, 6, 5, 0.55);
+	box-shadow: inset 0 0 0 2px #1a120c, inset 0 6px 10px rgba(0, 0, 0, 0.45);
+}
+
+.shop-shelf {
+	position: relative;
+	display: flex;
 	justify-content: center;
+	gap: 14px;
+	padding: 0 16px 4px;
+}
+
+/* the plank: it runs under the slots (its top edge overlaps their feet), the buttons hang below it */
+.shop-plank {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 36px;
+	height: 14px;
+	background:
+		repeating-linear-gradient(90deg, transparent 0 52px, rgba(26, 14, 4, 0.55) 52px 54px),
+		repeating-linear-gradient(0deg, #8a5f26 0 3px, #7a5224 3px 6px);
+	border: 2px solid #0a0605;
+	box-shadow: inset 0 2px 0 #c9954a, inset 0 -2px 0 #4a3014, 0 4px 0 #1a120c, 0 7px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* a nail at each end */
+.shop-plank::before,
+.shop-plank::after {
+	content: '';
+	position: absolute;
+	top: 4px;
+	width: 3px;
+	height: 3px;
+	background: #f0d27a;
+	box-shadow: 0 0 0 1px #2a1a0c;
+}
+.shop-plank::before {
+	left: 5px;
+}
+.shop-plank::after {
+	right: 5px;
 }
 
 .shop-cell {
+	position: relative;
+	z-index: 1;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 4px;
+	gap: 14px; /* the plank's thickness: the slot above it, the button below */
+	width: 48px;
 }
 
+/* the native 40px frame (no fractional scaling) */
 .shop-cell .inv-slot {
 	width: 40px;
 	height: 40px;
-	background-size: 100% 100%;
+	background-image: url('/pixel/ui/slot_frame_s.png');
+	background-size: auto;
 }
 
+/* the Buy button hangs from the plank on a string */
 .shop-buy-wrap {
+	position: relative;
 	display: inline-flex;
+}
+.shop-buy-wrap::before {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: -9px;
+	width: 2px;
+	height: 9px;
+	margin-left: -1px;
+	background: #5a3f1c;
+	box-shadow: 1px 0 0 #2a1a0c;
 }
 
 .shop-buy {
@@ -130,6 +191,85 @@
 
 /* a disabled button would swallow the hover that shows the price: let it reach the wrapper */
 .shop-buy:disabled {
+	pointer-events: none;
+}
+
+/* The merchant's Resources tab: an amount picker on top, then one row per resource (no cards, no sliders) */
+.mr-amounts {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+
+.mr-note {
+	margin-left: auto;
+}
+
+/* the chosen amount stays pressed */
+.mr-chip {
+	min-width: 40px;
+	background: #3a3530;
+	color: #d8c8a0;
+}
+.mr-chip[data-active='true'] {
+	background: #3f8f2e;
+	color: #fff;
+}
+
+.mr-table {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.mr-row {
+	display: grid;
+	grid-template-columns: 24px minmax(70px, 1fr) 82px 78px 78px 96px 96px;
+	align-items: center;
+	gap: 8px;
+	padding: 3px 6px;
+	background: rgba(14, 10, 8, 0.55);
+	box-shadow: inset 0 0 0 1px #2b1d0e;
+}
+
+.mr-row:not(.mr-head):hover {
+	background: rgba(60, 40, 18, 0.55);
+}
+
+.mr-head {
+	background: none;
+	box-shadow: none;
+	font-size: 0.75rem;
+	color: #a89878;
+}
+
+.mr-name {
+	color: #fff;
+	font-size: 0.875rem;
+	font-weight: 700;
+}
+
+.mr-num {
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 3px;
+	font-size: 0.8125rem;
+	text-align: right;
+}
+
+.mr-row .tip-btn {
+	width: 100%;
+}
+
+/* hover wrapper of a button with a hover card: a disabled button would swallow the hover */
+.tip-btn-wrap {
+	display: block;
+	width: 100%;
+}
+.tip-btn:disabled {
 	pointer-events: none;
 }
 

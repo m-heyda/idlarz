@@ -15,6 +15,9 @@ import ItemSlot, { FloatingTip } from '../../ItemSlot';
 import ResourceIcon from '../../ResourceIcon';
 import '@/styles/Inventory.css';
 
+/** How many places stand on one plank of the shelf. */
+const SHELF_SLOTS = 4;
+
 interface BoughtProps {
 	onBought: (what: string, price: number) => void;
 }
@@ -123,8 +126,8 @@ const ShelfItem: React.FC<{ item?: ItemInstance; itemId?: string; name: string; 
 };
 
 /**
- * The merchant's goods: one compact shelf, laid out like the bag (small slots, a Buy button under each). It holds the rolled gear, which
- * is reshuffled every half hour of play time (or for gold), and the potions that are always in stock, mixed in one order.
+ * The merchant's goods: a wooden shelf of small slots standing on planks (four to a plank), a Buy button hanging under each. It holds the
+ * rolled gear, which is reshuffled every half hour of play time (or for gold), and the potions that are always in stock, mixed in one order.
  * Buying a piece takes it off the shelf; a full bag buys nothing.
  */
 export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
@@ -140,6 +143,45 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 	const cost = refreshCost(refreshes);
 	const left = stock ? secondsToRotation(stock, playSeconds) : 0;
 	const cells = shelfCells(stock, MERCHANT_SHOP_ITEMS.map(({ id }) => id));
+	// the cells stand on planks, SHELF_SLOTS to a plank
+	const shelves = Array.from({ length: Math.ceil(cells.length / SHELF_SLOTS) }, (_, row) => cells.slice(row * SHELF_SLOTS, (row + 1) * SHELF_SLOTS));
+	const renderCell = (cell: (typeof cells)[number]) => {
+		if (cell.kind === 'offer') {
+			const item = stock?.offers[cell.index];
+			if (!item) return null;
+			const price = shopPriceOf(item);
+			const name = resolveItem(item)?.name ?? item.base;
+			return (
+				<ShelfItem
+					key={`${cell.key}:${cell.index}`}
+					item={item}
+					name={name}
+					price={price}
+					gold={gold}
+					onBuy={() => {
+						if (buyOffer(cell.index)) onBought(name, price);
+						else if (gold >= price) showToast('Your bag is full');
+					}}
+				/>
+			);
+		}
+		const def = ITEM_CATALOG[cell.id];
+		const price = MERCHANT_SHOP_ITEMS.find((entry) => entry.id === cell.id)?.price;
+		if (!def || price === undefined) return null;
+		return (
+			<ShelfItem
+				key={cell.key}
+				itemId={cell.id}
+				name={def.name}
+				price={price}
+				gold={gold}
+				onBuy={() => {
+					if (buyItem(cell.id, 1)) onBought(def.name, price);
+					else if (gold >= price) showToast('Your bag is full');
+				}}
+			/>
+		);
+	};
 	return (
 		<div className='px-card mb-4'>
 			<div className='flex items-center justify-between mb-2 gap-2'>
@@ -163,44 +205,13 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 				Gear never more than {MERCHANT_GOODS.maxAboveAverage} item levels above what you wear (item level {worn}), and potions that are always in stock. Hover an
 				item for what it does and a Buy button for its price.
 			</p>
-			<div className='shop-grid'>
-				{cells.map((cell) => {
-					if (cell.kind === 'offer') {
-						const item = stock?.offers[cell.index];
-						if (!item) return null;
-						const price = shopPriceOf(item);
-						const name = resolveItem(item)?.name ?? item.base;
-						return (
-							<ShelfItem
-								key={`${cell.key}:${cell.index}`}
-								item={item}
-								name={name}
-								price={price}
-								gold={gold}
-								onBuy={() => {
-									if (buyOffer(cell.index)) onBought(name, price);
-									else if (gold >= price) showToast('Your bag is full');
-								}}
-							/>
-						);
-					}
-					const def = ITEM_CATALOG[cell.id];
-					const price = MERCHANT_SHOP_ITEMS.find((entry) => entry.id === cell.id)?.price;
-					if (!def || price === undefined) return null;
-					return (
-						<ShelfItem
-							key={cell.key}
-							itemId={cell.id}
-							name={def.name}
-							price={price}
-							gold={gold}
-							onBuy={() => {
-								if (buyItem(cell.id, 1)) onBought(def.name, price);
-								else if (gold >= price) showToast('Your bag is full');
-							}}
-						/>
-					);
-				})}
+			<div className='shop-board'>
+				{shelves.map((shelf, row) => (
+					<div className='shop-shelf' key={row}>
+						<div className='shop-plank' aria-hidden />
+						{shelf.map(renderCell)}
+					</div>
+				))}
 			</div>
 			{(!stock || stock.offers.length === 0) && <p className='text-sm text-[#a89878] mt-3'>The gear is sold out. New goods arrive soon.</p>}
 		</div>

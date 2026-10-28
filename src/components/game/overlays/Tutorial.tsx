@@ -1,7 +1,7 @@
 import React from 'react';
 import {
 	ANIMALS,
-	BASE_XP_PER_LEVEL,
+	LEVELING,
 	BASE_TILE_COST,
 	BIOME_YIELD,
 	BIOMES,
@@ -25,14 +25,13 @@ import {
 	TILE_PRICE,
 	TILE_RESOURCE_COST,
 	TILE_TAP,
-	XP_GROWTH_FACTOR,
 } from '@/config/gameConfig';
 import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
 import { LIMITS } from '@/config/limits';
 import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
-import { formatNumber, formatTime } from '@/utils/formatters';
+import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
 import { buildingCostFactor, castleModifier } from '@/utils/gameUtils';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
@@ -329,7 +328,7 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Merchant</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					The <b>Resources</b> tab sells resources and farm products for gold; buying resources costs{' '}
+					The <b>Resources</b> tab is one table: pick an amount (1, 10, 100, 25 %, 50 % or Max) and use the Sell and Buy buttons of each row; sell prices include Haggler, and farm products only sell. Buying resources costs{' '}
 					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. <b>Goods</b> shows a shelf of
 					six pieces of gear, mixed with the potions that are always in stock, that is reshuffled every {MERCHANT_GOODS.rotateSec / 60} minutes of play (or at once for gold with Refresh);
 					hover a Buy button for the price. Below it is your bag to sell spare gear from. <b>Upgrades</b> has click power and the permanent bonuses (Haggler, Bulk Discount,
@@ -382,10 +381,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Leveling</h3>
 				<p className='text-[#d8c8a0] text-xs px-card font-mono'>
-					XP to leave level N = {BASE_XP_PER_LEVEL} x {XP_GROWTH_FACTOR}^(N-1)
+					Each level needs more XP than the one before: level {LEVELING.anchors[0][0]} takes about {formatCompact(LEVELING.anchors[0][1])} XP in all, level {LEVELING.anchors[1][0]} {formatCompact(LEVELING.anchors[1][1])}, the soft cap (level {LEVELING.softCapLevel}) {formatCompact(LEVELING.anchors[2][1])} and the maximum (level {LEVELING.maxLevel}) {formatCompact(LEVELING.anchors[4][1])}
 				</p>
 				<p className='text-[#a89878] mt-1'>
-					XP comes from time (more with the castle and some buildings) and from every tile you buy.
+					XP comes from time (more with the castle and some buildings) and from every tile you buy. Your level, XP and attributes are kept when you rebirth: the soft cap (level {LEVELING.softCapLevel}) takes about three rebirths, the maximum many more.
 				</p>
 			</section>
 

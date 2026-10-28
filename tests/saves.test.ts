@@ -12,6 +12,7 @@ import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { plainItem } from '../src/lib/itemInstance';
 import { emptyBag } from '../src/lib/inventory';
 import { ownedCount, setTile } from '../src/utils/world';
+import { totalStatPoints, xpToNextLevel } from '../src/utils/gameUtils';
 
 /** A plain JSON copy of a (valid) persisted game, as it would come out of a save file. */
 const snapshot = () => rawSnapshot();
@@ -117,10 +118,10 @@ test('derived values cannot be forged: rates, reputation, level, combat stats an
 
 test('a save one level-up behind (written between a purchase and the next tick) is repaired, a far-behind one is rejected', () => {
 	freshGame();
-	setResources({ xp: 800 }); // level 2, but the tick has not awarded the point yet
+	setResources({ xp: xpToNextLevel(1) + 100 }); // level 2, but the tick has not awarded the points yet
 	const repaired = sanitizeSave(snapshot());
 	assert.equal(repaired.ok, true);
-	if (repaired.ok) assert.equal(repaired.state.characterStats.availablePoints, 1);
+	if (repaired.ok) assert.equal(repaired.state.characterStats.availablePoints, totalStatPoints(2));
 
 	setResources({ xp: 100_000 }); // many levels without any points: not a one-tick gap
 	assert.equal(sanitizeSave(snapshot()).ok, false);

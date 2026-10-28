@@ -19,7 +19,7 @@ const stagedPrice = (n: number) => {
 			Math.pow(S.growthEndgame, Math.max(n - S.lateTiles, 0))
 	);
 };
-const oldXp = (n: number) => BASE_XP_PER_TILE * Math.pow(1.02, n - 1) * (n / 4);
+const tileXp = (n: number) => BASE_XP_PER_TILE * Math.pow(XP_TILE.growth, n - 1) * (n / 4);
 
 test('tile price: the three exponential stages up to the tail start', () => {
 	for (let n = 0; n <= TILE_PRICE.tailFrom; n++) assert.equal(SCALING_CONFIG.costFormula(n), stagedPrice(n), `n=${n}`);
@@ -62,8 +62,8 @@ test('tile price: past the tail start the climb is steeper than before it, then 
 	assert.ok(stretch(TILE_PRICE.tailFrom) > 2.5 * stretch(TILE_PRICE.tailFrom - 100));
 });
 
-test('XP per tile: identical to the old curve up to the tail start, finite and slow after it', () => {
-	for (let n = 1; n <= XP_TILE.growthUntil; n++) assert.equal(calculateXpGain(n), oldXp(n), `n=${n}`);
+test('XP per tile: the growth formula up to the tail start, finite and slow after it', () => {
+	for (let n = 1; n <= XP_TILE.growthUntil; n++) assert.equal(calculateXpGain(n), tileXp(n), `n=${n}`);
 	let cumulative = 0;
 	let last = 0;
 	for (let n = 2; n <= 250_000; n++) {

@@ -8,9 +8,11 @@ import {
 	CASTLE_Y,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUYABLE,
+	MERCHANT_BUY_MULTIPLIER,
+	MERCHANT_RESOURCE_PRICES,
 	TILE_RESOURCE_COST,
 } from '../src/config/gameConfig';
-import { calculateTileCost, calculateBuildingCost, effectiveTileDiscount } from '../src/utils/gameUtils';
+import { buyCost, calculateTileCost, calculateBuildingCost, effectiveTileDiscount, totalStatPoints, xpToNextLevel } from '../src/utils/gameUtils';
 import type { Resources } from '../src/types/game';
 import { hasOwnedNeighbour, isOwnedAt } from '../src/utils/world';
 
@@ -90,20 +92,20 @@ test('level-ups from any source award exactly one stat point per level', () => {
 	api().tick(100);
 	const level = api().level.level;
 	assert.ok(level > 5);
-	assert.equal(api().characterStats.availablePoints, level - 1);
+	assert.equal(api().characterStats.availablePoints, totalStatPoints(level));
 	api().tick(100);
-	assert.equal(api().characterStats.availablePoints, level - 1); // no double award
+	assert.equal(api().characterStats.availablePoints, totalStatPoints(level)); // no double award
 });
 
 test('tile purchase that causes a level-up still awards the stat point', () => {
 	freshGame();
-	setResources({ gold: 1e9, xp: 740 });
+	setResources({ gold: 1e9, xp: xpToNextLevel(1) - 10 }); // a tile's XP carries it over the first level
 	const before = api().characterStats.availablePoints;
 	const frontier = [CASTLE_X + 1, CASTLE_Y] as const;
 	assert.equal(api().buyTile(frontier[0], frontier[1]), true);
 	api().tick(100);
 	assert.ok(api().level.level >= 2);
-	assert.equal(api().characterStats.availablePoints, before + api().level.level - 1);
+	assert.equal(api().characterStats.availablePoints, before + totalStatPoints(api().level.level));
 });
 
 test('buyTile: only adjacent, unowned, affordable tiles; pick-a-biome flow is guarded', () => {
@@ -260,4 +262,17 @@ test('farm: animals cost food and stack production', () => {
 	const one = api().resourceRates.base.meat;
 	assert.equal(api().purchaseAnimal('chicken'), 1);
 	assert.ok(Math.abs(api().resourceRates.base.meat - 2 * one) < 1e-9);
+});
+
+test('buyCost: what the Resources tab shows is what buyResource charges (twice the sell price, rounded up)', () => {
+	for (const resource of MERCHANT_BUYABLE) {
+		for (const units of [1, 2, 3, 7, 10, 100, 12_345]) {
+			assert.equal(buyCost(resource, units), Math.ceil(units * MERCHANT_RESOURCE_PRICES[resource] * MERCHANT_BUY_MULTIPLIER), `${resource} x${units}`);
+			freshGame();
+			setResources({ gold: 1e9, [resource]: 0 });
+			const before = api().resources.gold;
+			assert.equal(api().buyResource(resource, units), true);
+			assert.equal(before - api().resources.gold, buyCost(resource, units), `${resource} x${units} is charged exactly what the tab shows`);
+		}
+	}
 });

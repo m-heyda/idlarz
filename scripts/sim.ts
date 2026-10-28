@@ -5,6 +5,7 @@
  *   npx tsx scripts/sim.ts                  all profiles
  *   npx tsx scripts/sim.ts hardcore casual  selected profiles
  *   npx tsx scripts/sim.ts --legacy hardcore   approximate the pre-rebalance game (sanity check of the sim)
+ *   npx tsx scripts/sim.ts --no-write hardcore-rebirth6 --maxdays=500   do not touch docs/generated (for tuning runs)
  *
  * Output: docs/generated/sim-milestones.md (not written for --legacy).
  */
@@ -47,6 +48,8 @@ const main = async () => {
 		// the dedicated player who rebirths as early as possible / after pushing the castle to the end
 		'hardcore-rebirth6': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 3 },
 		'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
+		// the long game: ten rebirths, to see the character level (carried over each rebirth) reach the soft cap and the maximum
+		'hardcore-rebirth6-x10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 10 },
 	};
 	const selected = names.length ? names : Object.keys(PROFILES);
 
@@ -81,7 +84,7 @@ const main = async () => {
 
 	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
 	console.log(md);
-	if (!legacy) {
+	if (!legacy && !args.includes('--no-write')) {
 		const target = resolve(
 			dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')),
 			'../docs/generated/sim-milestones.md'
@@ -141,6 +144,11 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		if (milestones[k] == null) milestones[k] = (t - runStart) / 86400;
 	};
 	const TILE_MARKS = [10, 16, 20, 25, 30, 35, 40, 50, 75, 100, 150, 200, 300, 400];
+	// The character level is lifetime progress (it carries over a rebirth), so its milestones are absolute game days, not per run
+	const LEVEL_MARKS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+	// Level and lifetime XP at fixed game times (hours): `lvl@4.5h`, `xp@4.5h` ...
+	const SNAPSHOTS_H = [1, 4.5, 24, 72, 168, 336, 576];
+	const snapshotsTaken = new Set<number>();
 
 	let t = 0; // game seconds
 	let eventId = 0;
@@ -417,7 +425,14 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			lastDecision = t;
 			decide(active);
 			const lvl = api().level.level;
-			[10, 20, 30].forEach((n) => lvl >= n && mark(`level${n}`, t));
+			LEVEL_MARKS.forEach((n) => lvl >= n && milestones[`level${n}`] == null && (milestones[`level${n}`] = t / 86400));
+			SNAPSHOTS_H.forEach((h) => {
+				if (t >= h * 3600 && !snapshotsTaken.has(h)) {
+					snapshotsTaken.add(h);
+					milestones[`lvl@${h}h`] = lvl;
+					milestones[`xp@${h}h`] = api().resources.xp;
+				}
+			});
 			if (finished()) mark('finished', t);
 			const castleNow = tileAt(api().tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level ?? 1;
 			const totalRebirths = profile.rebirthAtCastle ? profile.rebirths ?? 1 : 0;
@@ -425,8 +440,13 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			if (profile.rebirthAtCastle && run <= totalRebirths && castleNow >= profile.rebirthAtCastle && territory && !api().castleUpgrade) {
 				mark('rebirth', t);
 				const before = api().prestige.legacyEarned;
+				const levelBefore = api().level.level;
+				const xpBefore = api().resources.xp;
 				if (api().rebirth()) {
 					milestones[`legacy${run}`] = api().prestige.legacyEarned - before;
+					milestones[`rebirthDay${run}`] = t / 86400;
+					milestones[`lvlAtRebirth${run}`] = levelBefore;
+					milestones[`xpAtRebirth${run}`] = xpBefore;
 					run++;
 					runStart = t;
 					frontierDirty = true;
@@ -482,6 +502,10 @@ const ORDER = [
 	'level10',
 	'level20',
 	'level30',
+	'level50',
+	'level80',
+	'level90',
+	'level100',
 	'finished',
 ];
 
@@ -507,15 +531,17 @@ function renderMarkdown(
 	const extraKeys = Array.from(
 		new Set(
 			names.flatMap((n) =>
-				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(legacy[0-9]+|rebirth|r[0-9]+[.](castle6|tiles100|finished))$/.test(k))
+				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(legacy[0-9]+|rebirth|rebirthDay[0-9]+|lvlAtRebirth[0-9]+|xpAtRebirth[0-9]+|(lvl|xp)@[0-9.]+h|r[0-9]+[.](castle6|tiles100|finished))$/.test(k))
 			)
 		)
 	).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
 	[...ORDER, ...extraKeys].forEach((key) => {
 		if (!names.some((n) => results[n][key] != null) && !ORDER.includes(key)) return;
-		const isCount = key.startsWith('legacy');
+		const isCount = /^(legacy|lvl)/.test(key);
+		const isXp = /^xp/.test(key);
 		const cell = (n: string) => {
 			if (isCount) return String(results[n][key] ?? '—');
+			if (isXp) return results[n][key] == null ? '—' : Number(results[n][key]).toExponential(2);
 			const spread = spreads?.[n]?.[key];
 			const base = fmt(results[n][key]);
 			return spread && results[n][key] != null ? `${base} (${fmt(spread[0])} - ${fmt(spread[1])})` : base;

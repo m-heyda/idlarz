@@ -1,7 +1,8 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatCompact, formatNumber } from '@/utils/formatters';
-import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
+import { MAX_LEVEL } from '@/config/gameConfig';
+import { xpToNextLevel } from '@/utils/gameUtils';
 import { LevelUpTimer } from './LevelUpTimer';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import CharacterPortrait from './CharacterPortrait';
@@ -36,9 +37,11 @@ const Flask: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({
 	);
 };
 
-const xpNumbers = (level: { level: number; progress: number }) => {
-	const next = Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1));
-	return { next, current: Math.floor(next * level.progress), pct: Math.floor(level.progress * 100) };
+/** The text of an XP bar: "42% · 1.2K / 2.9K", or "MAX" at the maximum level (the bar is full). */
+const xpLabel = (level: { level: number; progress: number }) => {
+	if (level.level >= MAX_LEVEL) return 'MAX';
+	const next = xpToNextLevel(level.level);
+	return `${Math.floor(level.progress * 100)}% · ${formatNumber(Math.floor(next * level.progress))} / ${formatNumber(next)}`;
 };
 
 /** A flat HP or MP bar with its numbers: half of the XP bar's width each (see .eq-vitals). */
@@ -54,7 +57,6 @@ const VitalBar: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({ k
 /** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). */
 export const LevelBar: React.FC = () => {
 	const { resources, level, resourceRates, characterStats, equipment, playerHp, playerMp } = useGameStore();
-	const { next, current, pct } = xpNumbers(level);
 	const hpMax = maxHp(characterStats, equipment);
 	const mpMax = maxMana(characterStats, equipment);
 	return (
@@ -67,7 +69,7 @@ export const LevelBar: React.FC = () => {
 				<div className='hero-xp eq-xp' style={{ '--pct': level.progress * 100 } as React.CSSProperties}>
 					<div className='hero-xp-fill' />
 					<div className='hero-xp-text'>
-						{pct}% · {formatNumber(current)} / {formatNumber(next)}
+						{xpLabel(level)}
 					</div>
 				</div>
 				<div className='absolute left-1/2 top-full -translate-x-1/2 mt-2 w-max z-[60] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150'>
@@ -95,11 +97,6 @@ const LevelDetails: React.FC = () => {
 	const mpMax = maxMana(characterStats, equipment);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
-	const xpForNextLevel = Math.floor(
-		BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1)
-	);
-	const currentXp = Math.floor(xpForNextLevel * level.progress);
-	const pct = Math.floor(level.progress * 100);
 
 	return (
 		<div className='hero-hud'>
@@ -124,7 +121,7 @@ const LevelDetails: React.FC = () => {
 				<div className='hero-xp' style={{ '--pct': level.progress * 100 } as React.CSSProperties}>
 					<div className='hero-xp-fill' />
 					<div className='hero-xp-text'>
-						{pct}% · {formatNumber(currentXp)} / {formatNumber(xpForNextLevel)}
+						{xpLabel(level)}
 					</div>
 				</div>
 				<div className='absolute left-1/2 top-full -translate-x-1/2 mt-2 w-max z-[60] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150'>
