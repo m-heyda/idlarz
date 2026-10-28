@@ -218,6 +218,31 @@
 	color: #fff;
 }
 
+/* the typed amount: green like a pressed chip while it reads as a number, red while it does not */
+.mr-custom {
+	width: 84px;
+	height: 24px;
+	padding: 0 6px;
+	background: #1a1410;
+	border: 2px solid #4a3014;
+	color: #f1e6c8;
+	font-size: 12px;
+	text-align: center;
+	outline: none;
+}
+.mr-custom::placeholder {
+	color: #7d6e55;
+}
+.mr-custom:focus {
+	border-color: #7a5224;
+}
+.mr-custom[data-active='true'] {
+	border-color: #3f8f2e;
+}
+.mr-custom[data-invalid='true'] {
+	border-color: #a83a2a;
+}
+
 .mr-table {
 	display: flex;
 	flex-direction: column;

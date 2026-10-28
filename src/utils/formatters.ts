@@ -11,6 +11,19 @@ const compact = (n: number): string | null => {
 	return `${(n / Math.pow(1000, tier)).toFixed(2)}${SUFFIXES[tier]}`;
 };
 
+/**
+ * A typed amount: "250", "1,500", "1.5k", "2M", "3b" (the suffixes of `formatNumber`, any case). A whole number of at least 1, or null
+ * for anything else (empty, negative, unknown suffix, fractions of a unit).
+ */
+export const parseAmount = (text: string): number | null => {
+	const match = /^(\d+(?:\.\d+)?)\s*([a-z]*)$/i.exec(text.replace(/[,_\s]+/g, '').toLowerCase());
+	if (!match) return null;
+	const tier = match[2] === '' ? 0 : SUFFIXES.findIndex((suffix) => suffix !== '' && suffix.toLowerCase() === match[2]);
+	if (tier < 0) return null;
+	const value = Math.floor(Number(match[1]) * Math.pow(1000, tier) + 1e-6);
+	return Number.isFinite(value) && value >= 1 ? value : null;
+};
+
 export const formatNumber = (num: number | undefined): string => {
   if (num === undefined || num === null) return '0';
   if (Math.abs(num) < 0.01) return '0';

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatHeaderAmount, formatRateAuto, pickRateUnit } from '../src/utils/formatters';
+import { formatHeaderAmount, formatRateAuto, parseAmount, pickRateUnit } from '../src/utils/formatters';
 
 test('header amounts below 1,000 are whole numbers, so they never grow decimals', () => {
 	assert.equal(formatHeaderAmount(0), '0');
@@ -66,4 +66,18 @@ test('rate text names its unit and sign', () => {
 	assert.equal(formatRateAuto(12.5), '+12.50/s');
 	assert.equal(formatRateAuto(0.001), '+3.60/h');
 	assert.equal(formatRateAuto(0), null);
+});
+
+test('parseAmount reads typed amounts with suffixes', () => {
+	assert.equal(parseAmount('250'), 250);
+	assert.equal(parseAmount('1,500'), 1500);
+	assert.equal(parseAmount('1.5k'), 1500);
+	assert.equal(parseAmount(' 2M '), 2_000_000);
+	assert.equal(parseAmount('3b'), 3_000_000_000);
+	assert.equal(parseAmount('1.1k'), 1100);
+	assert.equal(parseAmount('2qa'), 2e15);
+});
+
+test('parseAmount rejects anything that is not a whole amount of at least 1', () => {
+	for (const text of ['', ' ', '0', '0.5', '-5', 'abc', '1x', 'k', '1e3', '1..2', '1k2']) assert.equal(parseAmount(text), null, text);
 });
