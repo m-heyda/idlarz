@@ -7,17 +7,17 @@ Everything that was **not** part of the endgame / settings / ambient batch, orde
 | # | Item | Size | Acceptance |
 | --- | --- | --- | --- |
 | A1 | **Castle-timer badge** on the castle tile and in the header (B4) | S | remaining time visible without opening the dialog; updates each second; hidden when no upgrade runs |
-| A2 | **Legacy respec** (B9) | S | costs one rebirth or a fixed fee; point-conservation check in `sanitizeSave` still holds; test added |
+| A2 | **Ember shop respec** (B9) | S | costs one rebirth or a fixed fee; point-conservation check in `sanitizeSave` still holds; test added |
 | A3 | **Reputation has a use** (U6): small merchant discount or quest gate, or remove it from the statistics | S | either read by one formula (documented in 03) or gone |
 | A4 | ~~**HP/MP bars** decision (U5)~~ **done**: the HP flask and the Statistics window show live HP; MP is real now: it is saved, refills and Heal / Stun spend it | S | no bar that is always full |
 | A5 | **CI**: GitHub Action running `tsc`, `lint`, `test`, `build`, plus `sim -- --maxdays=30 hardcore` as a pacing guard | S | PR fails when the first-finish time of the dedicated profile moves by more than ±15 % |
-| A6 | **Playwright smoke test**: new game, click, buy tile, open Settings and Legacy, reload keeps state | M | runs in CI; uses `window.__game` only in dev builds |
+| A6 | **Playwright smoke test**: new game, click, buy tile, open Settings and Rebirth, reload keeps state | M | runs in CI; uses `window.__game` only in dev builds |
 | A7 | **Per-tile selectors** so a tick does not re-render every visible tile (performance backlog in 05) | M | React profiler shows a tick touches only changed tiles |
 | A8 | **Next 16 / TypeScript 7 / ESLint 10** upgrades, one at a time | M | build, tests and sim output unchanged; both PostCSS advisories gone from `npm audit` |
 
 ## Phase B — balance (one topic per PR, each re-runs the sim)
 
-B1 active-vs-idle gap (BL1) · B2 levels and stat points (BL2) · B3 chests and tile taps (BL3) · B4 animal engine (BL4) · B5 sinks (BL5) · B6 merchant saturation (BL6) · B7 biome specialisation (BL8) · B8 first ten minutes: check the tutorial flow, first tile at ~1 min, first animal before the first castle upgrade · B9 more Legacy shop shapes (BL9, BL10) · B10 biome luck and the 24 h player (BL11): do this first, it decides how stable the other sim comparisons are.
+B1 active-vs-idle gap (BL1) · B2 levels and stat points (BL2) · B3 chests and tile taps (BL3) · B4 animal engine (BL4) · B5 sinks (BL5) · B6 merchant saturation (BL6) · B7 biome specialisation (BL8) · B8 first ten minutes: check the tutorial flow, first tile at ~1 min, first animal before the first castle upgrade · B9 more Ember shop shapes (BL9, BL10) · B10 biome luck and the 24 h player (BL11): do this first, it decides how stable the other sim comparisons are.
 
 Rule for every B item: change one parameter group, run `npm run sim -- --seeds=3`, compare with `docs/generated/sim-milestones.md`, keep the early-game targets of [06 §0](06-playtest-and-pacing-report.md) (100 tiles in the first day, 200-300 tiles in 2-3 days, a clearly slower climb after 300, first rebirth at castle 6 + 100 tiles in about a week, each rebirth run faster than the last).
 

@@ -19,7 +19,7 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 | [11-offline-and-sealed-rolls.md](11-offline-and-sealed-rolls.md) | Server-held offline progress, sealed chest and kill rolls, spawn tickets, gems, Luck effects and the threat model |
 | [10-loot-system.md](10-loot-system.md) | The loot pipeline: profiles, rarity, item level, affixes, pools, saves, and how to add items, affixes and rarities |
 | [superpowers/specs/2026-10-24-combat-and-inventory-design.md](superpowers/specs/2026-10-24-combat-and-inventory-design.md) | Design of the combat / monsters / items system and the long roadmap; the implementation plan sits next to it in `superpowers/plans/` |
-| [generated/balance-tables.md](generated/balance-tables.md) | Auto-generated tables (tile cost, levels, castle, animals, biomes, rates, Rebirth/Legacy) |
+| [generated/balance-tables.md](generated/balance-tables.md) | Auto-generated tables (tile cost, levels, castle, animals, biomes, rates, Rebirth/Embers) |
 | [generated/loot-sim.md](generated/loot-sim.md) / [item-catalog.md](generated/item-catalog.md) | Auto-generated loot simulation (rarity, item level, drops per kill per source) and the item catalog |
 | [generated/sim-milestones.md](generated/sim-milestones.md) | Auto-generated milestone times per simulated player profile |
 

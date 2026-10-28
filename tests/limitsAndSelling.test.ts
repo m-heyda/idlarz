@@ -17,7 +17,7 @@ test('limits: a bonus registered for a key reaches every reader (bag size, the m
 	assert.equal(limitOf('bagSize'), LIMITS.bagSize);
 	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 2 } }), LIMITS.bagSize + 8, 'Pack Rat goes through the same hook');
 	const original = LIMIT_BONUSES.merchantOffers;
-	LIMIT_BONUSES.merchantOffers = () => 2; // a future Legacy effect
+	LIMIT_BONUSES.merchantOffers = () => 2; // a future Ember effect
 	try {
 		assert.equal(limitOf('merchantOffers'), 8);
 		assert.equal(generateMerchantStock(3, 20, () => 0.5, 0, {}).offers.length, 8);
@@ -30,7 +30,7 @@ test('limits: a bonus registered for a key reaches every reader (bag size, the m
 // ---- the sell bonus reaches everything the player sells -------------------------------------------------------------------------
 
 test('a new sell bonus applies to resources, bag gear, junk, auto-sold drops and the previews alike', () => {
-	const bonus = () => 0.2; // a future Legacy effect
+	const bonus = () => 0.2; // a future Ember effect
 	SELL_BONUSES.push(bonus);
 	try {
 		assert.equal(sellMultiplier({}), 1.2);

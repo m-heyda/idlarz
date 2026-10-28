@@ -15,7 +15,7 @@ import {
 import { critDamagePercent } from '@/lib/statBonuses';
 import { chestRateBonusPct, gemChance, luckyRatChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
-import { effectiveTileDiscount, legacyEffect, merchantCombat, merchantLuck, type MerchantUpgrades } from '@/utils/gameUtils';
+import { effectiveTileDiscount, emberEffect, merchantCombat, merchantLuck, type MerchantUpgrades } from '@/utils/gameUtils';
 import type { CharacterStats, Equipment, PrestigeState } from '@/types/game';
 
 /** Everything that decides the numbers shown for the character: the attributes, the worn gear, the merchant bonuses and the rebirth state. */
@@ -29,7 +29,7 @@ export interface StatContext {
 /**
  * The character's real numbers, each one built from every source the game applies (attributes, gear, merchant bonuses, rebirth),
  * with the same functions the fights and the economy use. The Character window shows exactly this, so a new source (a new gear stat,
- * a Legacy effect) is added where it is applied and appears here, instead of being patched into each screen.
+ * an Ember effect) is added where it is applied and appears here, instead of being patched into each screen.
  */
 export const effectiveStats = ({ characterStats, equipment, prestige, merchantUpgrades }: StatContext) => {
 	const gear = aggregateStats(equipment);
@@ -76,8 +76,8 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		/** % off tiles and buildings: the attributes, the rebirth Thrift and the merchant's Bulk Discount, capped */
 		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades),
 		/** % more gold per click from rebirth (Click Mastery) and % faster castle builds (Master Builders) */
-		clickMastery: legacyEffect(prestige, 'mastery') * 100,
-		buildTimeReduction: legacyEffect(prestige, 'builders') * 100,
+		clickMastery: emberEffect(prestige, 'mastery') * 100,
+		buildTimeReduction: emberEffect(prestige, 'builders') * 100,
 	};
 };
 

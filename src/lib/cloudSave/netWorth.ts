@@ -6,7 +6,7 @@ import {
 	countBuildings,
 	economyTiles,
 	effectiveTileDiscount,
-	legacyEffect,
+	emberEffect,
 	sellPayout,
 } from '@/utils/gameUtils';
 import { castleLevelOf } from '@/lib/castleWard';
@@ -45,7 +45,7 @@ export const minimumSpend = (state: PersistedGame): number => {
 	let spent = 0;
 	for (let k = 1; k <= purchases; k++) spent += calculateTileCost(k, discount).gold;
 
-	const factorKeep = 1 - legacyEffect(state.prestige, 'thrift');
+	const factorKeep = 1 - emberEffect(state.prestige, 'thrift');
 	const buildingGold = BUILDING_COST.base.gold ?? 0;
 	const buildings = countBuildings(state.tiles);
 	for (let k = 0; k < buildings; k++) spent += Math.floor(buildingGold * buildingCostFactor(k) * factorKeep);

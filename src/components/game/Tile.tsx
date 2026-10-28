@@ -145,10 +145,10 @@ const Tile: React.FC<TileProps> = ({
 
 		// Prioritize owned tiles for special interactions
 		if (isOwned) {
-			// Castle tile: the upgrade dialog; a castle that cannot be upgraded any further opens the rebirth (Legacy) window
+			// Castle tile: the upgrade dialog; a castle that cannot be upgraded any further opens the rebirth (Embers) window
 			if (biome === 'castle') {
 				audioManager.playSound('click');
-				if (castleLevel >= CASTLE_UPGRADE.maxLevel) useUiStore.getState().toggleLegacy();
+				if (castleLevel >= CASTLE_UPGRADE.maxLevel) useUiStore.getState().toggleRebirth();
 				else setShowCastleDialog(true);
 				return;
 			}

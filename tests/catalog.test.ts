@@ -10,6 +10,8 @@ import {
 	LOOT_POOLS,
 	LOOT_PROFILES,
 	RESOURCES,
+	RESOURCE_TIERS,
+	resourcesInTier,
 	SETS,
 	STAT_DEFS,
 	setBonusStats,
@@ -99,7 +101,7 @@ test('named items sit in pools that exist, and only the King and chests reach th
 test('the resource registry is the one place resources are listed', () => {
 	for (const key of Object.keys(INITIAL_RESOURCES)) assert.ok(key in RESOURCES, `${key} missing from RESOURCES`);
 	assert.deepEqual(Object.keys(RESOURCE_ICONS), Object.keys(RESOURCES));
-	assert.deepEqual(Object.keys(HEADER_DISPLAYED_RESOURCES_INFO), Object.keys(RESOURCES).filter((k) => k !== 'gems' && k !== 'legacy'));
+	assert.deepEqual(Object.keys(HEADER_DISPLAYED_RESOURCES_INFO), Object.keys(RESOURCES).filter((k) => k !== 'gems' && k !== 'embers'));
 	assert.deepEqual(
 		Object.keys(MERCHANT_RESOURCE_PRICES),
 		Object.entries(RESOURCES).filter(([, def]) => 'merchant' in def).map(([key]) => key)
@@ -107,4 +109,16 @@ test('the resource registry is the one place resources are listed', () => {
 	for (const [key, def] of Object.entries(RESOURCES)) {
 		assert.ok(def.label && def.description && def.usedFor && def.source && def.color, key);
 	}
+});
+
+test('every header resource sits in a tier: the header groups come from the catalog', () => {
+	const tiered = RESOURCE_TIERS.flatMap((tier) => resourcesInTier(tier.id));
+	// every stored resource except xp (never shown) is in exactly one tier, and nothing in a tier is unknown
+	for (const key of Object.keys(INITIAL_RESOURCES)) {
+		assert.equal(tiered.includes(key as never), key !== 'xp', `${key} tier`);
+	}
+	assert.equal(new Set(tiered).size, tiered.length, 'no resource in two tiers');
+	assert.deepEqual(resourcesInTier('currency'), ['gold', 'gems', 'embers']);
+	assert.deepEqual(resourcesInTier('t0'), ['wood', 'stone', 'coal', 'food', 'meat']);
+	assert.deepEqual(resourcesInTier('t1'), ['eggs', 'milk', 'hide']);
 });

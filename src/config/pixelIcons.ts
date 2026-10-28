@@ -15,7 +15,7 @@ export const PIXEL_ICON_SIZES = {
 	eggs: [40, 40],
 	milk: [40, 40],
 	hide: [40, 40],
-	// the rebirth currency (the Legacy points)
+	// the rebirth currency (Embers; the sprite kept its old name, `legacy`)
 	legacy: [40, 40],
 	// the premium currency
 	diamond: [40, 40],
@@ -243,7 +243,7 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 	eggs: 'eggs',
 	milk: 'milk',
 	hide: 'hide',
-	legacy: 'legacy', // the rebirth currency (not a Resources key)
+	embers: 'legacy', // the rebirth currency (not a Resources key); the sprite kept its old file name
 	gems: 'diamond', // the premium currency (its own balance, not a Resources key)
 	xp: 'xp',
 };

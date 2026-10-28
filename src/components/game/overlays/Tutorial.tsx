@@ -12,7 +12,7 @@ import {
 	CASTLE_UPGRADE,
 	CHARACTER_STAT_CONFIG,
 	CHEST,
-	LEGACY_UPGRADES,
+	EMBER_UPGRADES,
 	REBIRTH,
 	SPAWN_LIMIT,
 	CLICK_LADDER,
@@ -153,7 +153,7 @@ const Tutorial: React.FC = () => {
 				</p>
 				<p className='text-[#a89878] text-xs px-card font-mono'>
 					gold for building number: {buildingExamples.map((e) => `${e.n + 1}: ${short(e.gold)}`).join(' - ')} (wood and stone
-					scale the same way; Legacy Thrift lowers it)
+					scale the same way; Thrift lowers it)
 				</p>
 			</section>
 
@@ -203,7 +203,7 @@ const Tutorial: React.FC = () => {
 					{CASTLE_UPGRADE.xpBonus} XP/s per level above 1. The violet area around it is the castle&apos;s range: everything inside produces +50% (+100% or more once the walls stand). It is 3x3 at first, growing by a
 						tile on every side with each level from {CASTLE_RANGE.growFromLevel} (9x9 at level {CASTLE_UPGRADE.maxLevel}); from level{' '}
 						{CASTLE_FORTRESS.fromLevel} walls surround the inner 3x3 and no monsters or chests appear there. If you lose the castle while
-						exploring, an arrow at the edge of the screen points to it and <b>Back to castle</b> brings you home. Once the castle is at its maximum level, clicking it opens the Legacy
+						exploring, an arrow at the edge of the screen points to it and <b>Back to castle</b> brings you home. Once the castle is at its maximum level, clicking it opens the Rebirth
 					window, where you can rebirth.
 				</p>
 			</section>
@@ -288,13 +288,13 @@ const Tutorial: React.FC = () => {
 			</section>
 
 			<section>
-				<h3 className='px-h'>Rebirth &amp; Legacy</h3>
+				<h3 className='px-h'>Rebirth &amp; Embers</h3>
 				<p className='text-[#d8c8a0]'>
 					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles you can
-					Rebirth from the Legacy window: the map, resources, castle, farm and level start again, and you keep your name,
-					hero and Legacy. Every point is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
-					the shop ({Object.values(LEGACY_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
-					at the moment of rebirth give more points, so pushing on to level {CASTLE_UPGRADE.maxLevel} first pays.
+					Rebirth from the Rebirth window: the map, resources, castle, farm and level start again, and you keep your name,
+					hero and Embers. Every Ember is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
+					the shop ({Object.values(EMBER_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
+					at the moment of rebirth give more Embers, so pushing on to level {CASTLE_UPGRADE.maxLevel} first pays.
 				</p>
 			</section>
 

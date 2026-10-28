@@ -147,16 +147,17 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   a **buy card** (owned/limit, yield, Buy / x10 / Max) above it; unowned = pale silhouette with price tag. A stats readout sits top-left, the upgrade shelf along the bottom (collapsible).
 - **Level-up** (`LevelUpNotification.tsx`): white flash, pixelated god-rays (SVG block filter, 6px grid), orb pop, stepped
   shockwave rings, crimson banner (`banner_left/mid/right`, 3x) with dropping letters, spark burst, points earned.
-- **Header**: one slim row (about 56px with the bronze edge) in the manner of old city-builder bars: player card (40px portrait frame `slot_frame_s`, the purple level orb pinned to its
-  corner like a badge, name, 80px bronze XP bar), then every currency as a bare **pill** (24px icon = the 40px sprite at 0.6 + the amount, nothing else) inside bronze-edged groups
-  (gold | wood stone coal | food meat | eggs milk hide | gems), then three 40px slot buttons (Menu = maroon journal with a gold sigil and purple orb, Legacy, Settings; active glows gold).
-  All detail lives in the hover tooltip: icon, exact amount, what it is, what it is *used for*, where it *comes from*, per second / minute / hour, base rate, modifier and what the merchant pays
-  (texts in `HEADER_DISPLAYED_RESOURCES_INFO` / `GEMS_INFO`). Groups wrap onto a second row when narrow; the real height is published as `--header-h`. Never clip-path a group (it would clip the tooltips). Twinkling coin.
+- **Header**: one compact row (about 48px with the bronze edge) in the manner of old city-builder bars: the hero's avatar (36px portrait frame `slot_frame_s`, the purple level orb at 0.75 pinned to its
+  corner like a badge, the orange `NotifyDot` on its top edge; no name, no XP bar), then every currency as a bare **chip** (20px icon = the 40px sprite at 0.5 + the amount in fixed-width cells, nothing else)
+  inside bronze-edged groups, one per tier of the resource catalog (currency: gold gems Embers | T0: wood stone coal food meat | T1: eggs milk hide), then two 32px slot buttons (Rebirth = the gold sun
+  `menu_legacy`, greyed out until a rebirth is possible; Settings = steel cog; active glows gold). The Embers currency icon is the green-gem sprite still named `legacy` (renamed in the game, not in the art files).
+  The hover card is small: icon, name and exact amount, a rule, then production in the unit that reads best (per second / minute / hour) and the income bonus; the long texts stay in the catalog
+  (`RESOURCES`) for the merchant and a later encyclopedia. Groups wrap onto a second row when narrow; the real height is published as `--header-h`. Never clip-path a group (it would clip the tooltips). Twinkling coin.
 - **Backgrounds**: cracked dark stone tile (`bg/crack.png`) for header/modals. Fog drift distance must equal one tile period.
 
 ## UI kit (windows, dialogs, tooltips)
 - **Font**: Mozilla Headline (`@fontsource-variable/mozilla-headline`, CSS var `--font-pixel`); Tailwind text scale is nudged up
-  one notch in `globals.css` (`@theme`). `NotifyDot` (orange pulsing dot) is the universal "needs attention" marker (header buttons and the Menu tabs). Never use sub-12px text.
+  one notch in `globals.css` (`@theme`). `NotifyDot` (orange pulsing dot) is the universal "needs attention" marker (the avatar in the header and the Menu tabs). Never use sub-12px text.
 - **Modal shell** (`PixelModal.tsx`): bronze 9-slice frame over the cracked-stone tile, ornamented title bar, red pixel
   close button hanging off the corner, Esc/backdrop dismiss, backdrop under the header (z-45). Sizes: `sm` 440
   (confirmations), `md` 760 (pickers), `lg` 1080 x full height (Character, Statistics, Merchant, Farm).

@@ -55,12 +55,12 @@ modifiers[r] = castleModifier(C)                    castle, all resources (§4)
              + stat modifiers                       2.5 % per point, see 02 §11 (XP: +0.2 %/INT, +0.25 %/CHA)
              + 0.05 × plainsTiles                   (r = meat only)
 
-total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × legacyPointsEarned)     (second factor only after a Rebirth, §9)
+total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × embersEarned)     (second factor only after a Rebirth, §9)
 ```
 
 The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Everything is additive inside the single `(1 + Σ)`.
 
-`calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Legacy factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Stats tab's *Where the income comes from* section shows exactly these numbers per resource.
+`calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Ember factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Stats tab's *Where the income comes from* section shows exactly these numbers per resource.
 
 **New game**: gold 0.2 base × 1.45 = **0.29/s**, wood and food 0.05 × 1.45, stone 0.1 × 1.325, xp 0.75 × 1.223 = 0.92/s.
 
@@ -86,7 +86,7 @@ upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[
 | 8→9 | 5 d | 76.8 M | 7.6 M | 7.6 M | 4 M | 41 M | 2 M |
 | 9→10 | 7 d | 122.8 M | 12.2 M | 12.2 M | 6.6 M | 65.6 M | 3.2 M |
 
-Build time to level 6 is 4 d 5 h (1 h + 4 h + 12 h + 1 d + 2 d), to level 10 23 d 5 h (before Legacy discounts); the timers are the floor of the first run, so the cost of 5→6 is what a player who plays a few times a day must be able to pay while the 4→5 timer runs. Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
+Build time to level 6 is 4 d 5 h (1 h + 4 h + 12 h + 1 d + 2 d), to level 10 23 d 5 h (before Ember discounts); the timers are the floor of the first run, so the cost of 5→6 is what a player who plays a few times a day must be able to pay while the 4→5 timer runs. Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
 
 ## 5. Farm animals
 
@@ -130,7 +130,7 @@ item:  sell = floor(rarityValue × valueCurve(level) × qualityValue × affixesV
        supplies (potions) price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
 goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle level above 1, +-2; common 50 / uncommon 32 / rare 14 / epic 4)
        price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh); rarity common 60 / uncommon 40; item level centre = min(world level, avgWorn + 3), max avgWorn + 5
-bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Legacy points of a rebirth = floor(gain × (1 + 0.05 × Tithe))
+bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Embers of a rebirth = floor(gain × (1 + 0.05 × Tithe))
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s, ≤ 5 waiting
@@ -149,7 +149,7 @@ Click limiter (gold clicks, tile taps, critter gifts; NOT fight hits): burst buc
 
 From `npm run sim` (bot players, real store; see [06 §0b](06-playtest-and-pacing-report.md)): castle 4 ≈ 1 d, castle 5 ≈ 2.1-3.6 d, castle 6 ≈ 4.2 d (bots) / 5.8 d (the `human` profile, who plays a few times a day and never sells surplus), castle 10 ≈ 24-26 d; the first rebirth is available around day 6-7 for a person, level ~40 by then. Older numbers below the heading are history. The 24 h/day auto-clicker bot is faster still (castle 6 ≈ 24 d) because it also manages the economy around the clock, see [06 §3](06-playtest-and-pacing-report.md).
 
-## 9. Rebirth and Legacy
+## 9. Rebirth and Embers
 
 ```
 available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 100 (REBIRTH.minTiles), no castle upgrade running
@@ -243,4 +243,4 @@ The price follows the tile curve in shape (steep, then gentler, then gentler aga
 
 ## 7. Limits and bonus hooks (what upgrades and rebirth will extend)
 
-Bounds that progression is meant to raise live in `src/config/limits.ts` (`LIMITS`: monster growth levels and interval, merchant shelf size, rotation and refresh cost, bag size) with a `HARD_LIMITS` ceiling for what a save may hold. Code reads them through `limitOf(key, ctx)` (`src/lib/limits.ts`), which adds the bonuses registered in `LIMIT_BONUSES` (today only Pack Rat on the bag size); a new upgrade or Legacy effect is one entry there and every reader follows. Likewise every gold payout for something the player sells goes through `sellMultiplier(ctx)` / `sellPayout` (`utils/gameUtils.ts`) with the bonuses in `SELL_BONUSES` (today Haggler): resources, bag gear, junk, auto-sold drops, the merchant previews and the cloud net-worth check all use it, so a "+20 % selling" effect applies to all of them alike (`tests/monsterLevels.test.ts` proves it with a registered bonus).
+Bounds that progression is meant to raise live in `src/config/limits.ts` (`LIMITS`: monster growth levels and interval, merchant shelf size, rotation and refresh cost, bag size) with a `HARD_LIMITS` ceiling for what a save may hold. Code reads them through `limitOf(key, ctx)` (`src/lib/limits.ts`), which adds the bonuses registered in `LIMIT_BONUSES` (today only Pack Rat on the bag size); a new upgrade or Ember effect is one entry there and every reader follows. Likewise every gold payout for something the player sells goes through `sellMultiplier(ctx)` / `sellPayout` (`utils/gameUtils.ts`) with the bonuses in `SELL_BONUSES` (today Haggler): resources, bag gear, junk, auto-sold drops, the merchant previews and the cloud net-worth check all use it, so a "+20 % selling" effect applies to all of them alike (`tests/monsterLevels.test.ts` proves it with a registered bonus).

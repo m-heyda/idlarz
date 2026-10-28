@@ -18,19 +18,18 @@ import {
 	CASTLE_Y,
 	INITIAL_CHARACTER_STATS,
 	FARM_UPGRADES,
-	LEGACY_UPGRADES,
+	EMBER_UPGRADES,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUYABLE,
 	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_SHOP_ITEMS,
 	MERCHANT_UPGRADES,
 	type MerchantUpgradeId,
-	REBIRTH,
 	RESOURCE_CAP,
 	XP_CAP,
 	TILE_TAP,
 	type FarmUpgradeId,
-	type LegacyUpgradeId,
+	type EmberUpgradeId,
 } from '@/config/gameConfig';
 import {
 	affordableAnimals,
@@ -54,9 +53,9 @@ import {
 	farmUpgradeCost,
 	farmUpgradeLevel,
 	STARTER_FREE_TILES,
-	legacyEffect,
-	legacyGain,
-	legacyUpgradeCost,
+	emberEffect,
+	rebirthStatus,
+	emberUpgradeCost,
 	merchantCombat,
 	merchantLevel,
 	reconcileCharacter,
@@ -411,15 +410,12 @@ const createGameSlice = (
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
-		// Rebirth: restart with the Legacy bonus. Keeps name, class, play time, all Legacy and the character (XP, level, attributes).
+		// Rebirth: restart with the Ember bonus. Keeps name, class, play time, all Embers and the character (XP, level, attributes).
 		rebirth: () => {
 			const state = get();
-			const castle = findCastle(state.tiles);
-			if (!castle || (castle.tile.level ?? 1) < REBIRTH.minCastleLevel || state.castleUpgrade) return false;
-			const ownedTiles = economyTiles(state.tiles, state.freeTiles);
-			if (ownedTiles < REBIRTH.minTiles) return false;
-			const gain = legacyGain(castle.tile.level ?? 1, ownedTiles, state.merchantUpgrades);
-			if (gain < 1) return false;
+			const status = rebirthStatus(state);
+			if (!status.canRebirth) return false;
+			const gain = status.gain;
 
 			const prestige: PrestigeState = {
 				...state.prestige,
@@ -465,14 +461,14 @@ const createGameSlice = (
 			return true;
 		},
 
-		// Spend Legacy points on a permanent shop upgrade
-		buyLegacyUpgrade: (id: LegacyUpgradeId) => {
+		// Spend Embers on a permanent shop upgrade
+		buyEmberUpgrade: (id: EmberUpgradeId) => {
 			const state = get();
-			const def = LEGACY_UPGRADES[id];
+			const def = EMBER_UPGRADES[id];
 			if (!def) return false;
 			const level = state.prestige.upgrades[id] ?? 0;
 			if (level >= def.maxLevel) return false;
-			const cost = legacyUpgradeCost(id, level);
+			const cost = emberUpgradeCost(id, level);
 			if (state.prestige.legacyPoints < cost) return false;
 			set({
 				prestige: {
@@ -651,7 +647,7 @@ const createGameSlice = (
 			const state = get();
 			const power =
 				(CLICK_LADDER[state.clickLevel]?.power ?? CLICK_LADDER[0].power) *
-				(1 + legacyEffect(state.prestige, 'mastery'));
+				(1 + emberEffect(state.prestige, 'mastery'));
 			const gold = state.resourceRates.total.gold * power;
 			if (!(gold > 0)) return 0;
 			set({

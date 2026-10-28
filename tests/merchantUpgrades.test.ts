@@ -13,7 +13,7 @@ import { sanitizeSave } from '../src/lib/sanitizeSave';
 import {
 	calculateCombatStats,
 	calculateResourceRates,
-	legacyGain,
+	emberGain,
 	merchantCombat,
 	merchantIncomeMultiplier,
 	merchantUpgradeCost,
@@ -171,20 +171,20 @@ test('buying Foreman or Skinner changes the income at once', () => {
 	assert.ok(api().resourceRates.total.meat >= meat);
 });
 
-test('Ancestral Tithe: +5 % Legacy points per level (rounded down), and it is spent with the rebirth', () => {
-	assert.equal(legacyGain(8, 100), REBIRTH.gain(8, 100));
-	assert.equal(legacyGain(8, 100, {}), REBIRTH.gain(8, 100));
+test('Ancestral Tithe: +5 % Embers per level (rounded down), and it is spent with the rebirth', () => {
+	assert.equal(emberGain(8, 100), REBIRTH.gain(8, 100));
+	assert.equal(emberGain(8, 100, {}), REBIRTH.gain(8, 100));
 	const gain = REBIRTH.gain(8, 100);
-	assert.equal(legacyGain(8, 100, { tithe: 10 }), Math.floor(gain * 1.5));
-	assert.equal(legacyGain(8, 100, { tithe: 1 }), Math.floor(gain * 1.05));
-	assert.equal(legacyGain(5, 100, { tithe: 10 }), 0, 'nothing from a castle that is too low');
+	assert.equal(emberGain(8, 100, { tithe: 10 }), Math.floor(gain * 1.5));
+	assert.equal(emberGain(8, 100, { tithe: 1 }), Math.floor(gain * 1.05));
+	assert.equal(emberGain(5, 100, { tithe: 10 }), 0, 'nothing from a castle that is too low');
 
 	freshGame({ gold: 1e12 });
 	growTo(REBIRTH.minTiles);
 	store.setState((st) => ({ tiles: patchTile(st.tiles, CASTLE_X, CASTLE_Y, { level: 8 }) }));
 	for (let i = 0; i < 10; i++) assert.equal(api().buyMerchantUpgrade('tithe'), true);
 	assert.equal(api().buyMerchantUpgrade('tithe'), false, 'max level');
-	const expected = legacyGain(8, api().tiles.stats.owned ?? 0, api().merchantUpgrades);
+	const expected = emberGain(8, api().tiles.stats.owned ?? 0, api().merchantUpgrades);
 	const owned = api().prestige.legacyPoints;
 	assert.equal(api().rebirth(), true);
 	assert.ok(api().prestige.legacyPoints - owned >= 1);

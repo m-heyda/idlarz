@@ -34,9 +34,9 @@ test('shine strips are SHINE_FRAMES frames wide and as tall as their sprite', ()
 	}
 });
 
-test('legacy is the rebirth currency: it has an icon but is not a game resource', () => {
-	assert.equal(RESOURCE_PIXEL_ICONS.legacy, 'legacy');
-	assert.equal('legacy' in INITIAL_RESOURCES, false);
+test('embers is the rebirth currency: it has an icon (the sprite named legacy) but is not a game resource', () => {
+	assert.equal(RESOURCE_PIXEL_ICONS.embers, 'legacy');
+	assert.equal('embers' in INITIAL_RESOURCES, false);
 	assert.ok(SHINE_SHEETS.legacy);
 });
 
