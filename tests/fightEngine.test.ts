@@ -9,6 +9,8 @@ import { plainItem } from '../src/lib/itemInstance';
 import { runCombat } from '../src/lib/offline/fight';
 import type { FightEvent } from '../src/lib/offline/fightTypes';
 import type { Ledger } from '../src/lib/offline/ledger';
+import { bagCountOf, inventoryFromCore } from '../src/lib/offline/inventory';
+import { emptyBag } from '../src/lib/inventory';
 import type { Equipment } from '../src/types/game';
 
 // The server's fight engine, run without a database: a player's saved strength, monsters placed on the map, a sealed random stream.
@@ -35,6 +37,8 @@ const advance = (s: ReturnType<typeof setup>, from: Ledger, seconds: number, ste
 	}
 	return { ledger, events };
 };
+/** Potions of a kind left in the ledger's bag (a drunk one leaves it at once). */
+const left = (ledger: Ledger, id: string) => bagCountOf(ledger.inv!, id);
 const kinds = (events: FightEvent[], ...wanted: FightEvent['kind'][]) => events.filter((e) => wanted.includes(e.kind));
 
 // ---------------------------------------------------------------------------------------------------- speed
@@ -232,31 +236,30 @@ test('a King is fought only when no other monster is ready, and a King that ran 
 
 test('a potion on a hotkey heals, takes one from the stock, starts the shared cooldown and refuses at full HP, with none left, or too soon', () => {
 	const s = setup({ equipment: STARTER_EQUIPMENT, potions: [{ id: 'potion_minor', qty: 2 }], monsters: [{ type: 'ratKing', level: 15 }] });
-	let ledger = runCombat(s.ledger, s.env(s.start), { autoUse: false }).ledger;
+	const ledger = runCombat(s.ledger, s.env(s.start), { autoUse: false }).ledger;
 	const drink = (at: number, l: Ledger) => runCombat(l, s.env(s.start + at), { commands: [{ kind: 'potion', id: 'potion_minor' }] }).ledger;
 	const hurt = { ...ledger, combat: { ...ledger.combat!, hp: 40 } };
 	const once = drink(1, hurt);
-	assert.equal(once.combat!.consumed.potion_minor, 1);
+	assert.equal(left(once, 'potion_minor'), 1, 'one of the two is gone from the bag');
 	assert.ok(once.combat!.cd.potion > 0);
 	assert.ok(once.combat!.log.some((e) => e.kind === 'potion'));
 	const tooSoon = drink(2, once);
-	assert.equal(tooSoon.combat!.consumed.potion_minor, 1, 'the shared cooldown refuses the second');
+	assert.equal(left(tooSoon, 'potion_minor'), 1, 'the shared cooldown refuses the second');
 	const later = drink(COMBAT.potionCooldownSec + 3, { ...tooSoon, combat: { ...tooSoon.combat!, hp: 20 } });
-	assert.equal(later.combat!.consumed.potion_minor, 2);
+	assert.equal(left(later, 'potion_minor'), 0);
 	const empty = drink(COMBAT.potionCooldownSec * 2 + 6, { ...later, combat: { ...later.combat!, hp: 10, cd: { heal: 0, stun: 0, potion: 0 } } });
-	assert.equal(empty.combat!.consumed.potion_minor, 2, 'the bag had two');
-	ledger = { ...empty, combat: { ...empty.combat!, consumedSeen: {} } };
-	assert.ok(ledger.combat);
+	assert.equal(left(empty, 'potion_minor'), 0, 'the bag had two');
+	assert.ok(empty.inv!.ver > ledger.inv!.ver, 'every change is a new version of the inventory');
 });
 
 test('the full-HP potion is refused outside a fight too, and a potion the bag does not have is refused', () => {
 	const s = setup({ equipment: STARTER_EQUIPMENT, potions: [{ id: 'potion_minor', qty: 1 }], monsters: [] });
 	const full = runCombat(s.ledger, s.env(s.start)).ledger;
 	const tried = runCombat(full, s.env(s.start + 1), { commands: [{ kind: 'potion', id: 'potion_minor' }] }).ledger;
-	assert.equal(tried.combat!.consumed.potion_minor ?? 0, 0, 'full HP');
+	assert.equal(left(tried, 'potion_minor'), 1, 'full HP: not drunk');
 	const hurt = { ...full, combat: { ...full.combat!, hp: 30 } };
 	const none = runCombat(hurt, s.env(s.start + 1), { commands: [{ kind: 'potion', id: 'potion_greater' }] }).ledger;
-	assert.equal(none.combat!.consumed.potion_greater ?? 0, 0, 'not in the bag');
+	assert.equal(left(none, 'potion_minor'), 1, 'not in the bag: nothing else changed either');
 });
 
 test('skills: Heal needs its level, mana and a cooldown; Stun needs a fight and level 10 and freezes the monster', () => {
@@ -317,4 +320,39 @@ test('stronger attributes win fights a weak build loses (the profile is read fro
 	const run = (s: ReturnType<typeof setup>) => advance(s, runCombat(s.ledger, s.env(s.start), { autoUse: false }).ledger, 120).events;
 	assert.ok(kinds(run(strong), 'won').length >= 1);
 	assert.equal(kinds(run(weak), 'won').length, 0);
+});
+
+// ---------------------------------------------------------------------------------------------------- what a kill does to the inventory
+
+test("a win puts the drops into the ledger's inventory and grants the gold of what did not fit or was sold, in the same step", () => {
+	// a full bag: what the rats drop cannot be stored, so it is turned into gold on the server
+	const s = setup({ equipment: STRONG, monsters: Array.from({ length: 12 }, () => ({ type: 'rat' as const, level: 3 })) });
+	const full = { ...s.ledger, inv: { ...inventoryFromCore(s.stored.core), bag: emptyBag().map(() => ({ item: plainItem('wooden_sword') })) } };
+	const first = runCombat(full, s.env(s.start)).ledger;
+	const out = advance(s, first, 240);
+	const wins = [...first.combat!.log, ...out.events].filter((e) => e.kind === 'won' && e.reward);
+	assert.ok(wins.length >= 6, 'the rats were beaten');
+	assert.ok(wins.every((w) => (w.reward!.stored?.length ?? 0) === 0), 'nothing fitted');
+	const converted = wins.reduce((sum, w) => sum + (w.reward!.convertedGold ?? 0), 0);
+	assert.ok(converted > 0, 'what did not fit became gold');
+	assert.equal(out.ledger.granted.gold, wins.reduce((sum, w) => sum + w.reward!.gold + (w.reward!.convertedGold ?? 0) + (w.reward!.autoSold?.gold ?? 0), 0), 'all of it is granted');
+	assert.deepEqual(out.ledger.inv!.bag, full.inv.bag);
+
+	// an empty bag: the drops are stored, the version moves
+	const empty = setup({ equipment: STRONG, monsters: Array.from({ length: 12 }, () => ({ type: 'rat' as const, level: 3 })), seed: 'empty-bag' });
+	const start = { ...empty.ledger, inv: { ...inventoryFromCore(empty.stored.core), bag: emptyBag() } };
+	const after = advance(empty, runCombat(start, empty.env(empty.start)).ledger, 240).ledger;
+	assert.ok(after.inv!.bag.some(Boolean), 'the drops are in the bag');
+	assert.ok(after.inv!.ver > start.inv.ver);
+});
+
+test('the auto-sell filter of the ledger sells matching gear on the spot', () => {
+	const s = setup({ equipment: STRONG, monsters: Array.from({ length: 12 }, () => ({ type: 'rat' as const, level: 3 })), seed: 'auto-sell' });
+	const start = { ...s.ledger, inv: { ...inventoryFromCore(s.stored.core), bag: emptyBag(), autoSellUpTo: 'legendary' } };
+	const first = runCombat(start, s.env(s.start)).ledger;
+	const out = advance(s, first, 240);
+	const wins = [...first.combat!.log, ...out.events].filter((e) => e.kind === 'won' && e.reward);
+	assert.ok(wins.length >= 6);
+	assert.equal(out.ledger.inv!.bag.some((slot) => slot && 'item' in slot), false, 'no gear was kept');
+	assert.ok(wins.some((w) => (w.reward!.autoSold?.count ?? 0) > 0), 'some of it was sold');
 });

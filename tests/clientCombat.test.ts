@@ -12,7 +12,8 @@ import { generateLoot } from '../src/lib/loot';
 import { useUiStore } from '../src/stores/uiStore';
 import { patchTile } from '../src/utils/world';
 import type { CombatView, FightEvent } from '../src/lib/offline/fightTypes';
-import type { FightReply } from '../src/lib/offline/types';
+import type { FightReply, Inventory } from '../src/lib/offline/types';
+import { receiveInto } from '../src/lib/offline/inventory';
 import type { Drop } from '../src/types/game';
 
 // The browser's side of server-run combat: the store applies what the server says happened (it never rolls anything itself).
@@ -41,6 +42,31 @@ const won = (no: number, drops: Drop[], over: { gold?: number; xp?: number; luck
 	event(no, 'won', { n: 1, type: 'rat', level: over.level ?? 1, reward: { gold: over.gold ?? 50, xp: over.xp ?? 20, items: drops, pity: {}, lucky: over.lucky ?? false } });
 const ratDrops = (level = 1) => generateLoot({ sourceId: 'rat', level }, () => 0).drops;
 
+/** The player's things as the server would hold them right now: the browser's own copy at the next version. */
+const invOf = (over: Partial<Inventory> = {}): Inventory => ({
+	ver: (api().invVer ?? 0) + 1,
+	bag: api().bag,
+	equipment: api().equipment,
+	lootPity: api().lootPity,
+	autoSellUpTo: api().autoSellUpTo,
+	...over,
+});
+/**
+ * What the server does with a kill's drops (offline/reward.ts): puts them in its inventory and says what happened. The browser is then told
+ * the event and the inventory, and does no bookkeeping of its own.
+ */
+const serverKill = (drops: Drop[], over: { gold?: number; xp?: number; autoSellUpTo?: string | null; merchantUpgrades?: Record<string, number> } = {}) => {
+	const inv = invOf({ autoSellUpTo: over.autoSellUpTo ?? api().autoSellUpTo });
+	const { inv: after, received } = receiveInto(inv, drops, { merchantUpgrades: over.merchantUpgrades });
+	const ev = event(1, 'won', {
+		n: 1,
+		type: 'rat',
+		level: 1,
+		reward: { gold: over.gold ?? 50, xp: over.xp ?? 20, items: drops, stored: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold, pity: {}, lucky: false },
+	});
+	return { after, received, ev };
+};
+
 /** A game whose cursor is already in the server's log (the first answer only says where the log stands). */
 const syncedGame = () => {
 	freshGame();
@@ -62,12 +88,12 @@ test('the first answer only says where the server\'s log stands: nothing in it i
 	assert.equal(api().combat.notice, null);
 });
 
-test('a won fight pays gold, xp and loot exactly once, and announces it', () => {
+test('a won fight pays gold and xp exactly once, shows what the server stored, and takes the server\'s bag', () => {
 	syncedGame();
 	const before = { ...api().resources };
-	const ev = won(1, ratDrops(), { gold: 123, xp: 45 });
-	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] })));
-	assert.equal(api().resources.gold - before.gold, 123);
+	const { after, received, ev } = serverKill(ratDrops(), { gold: 123, xp: 45 });
+	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] }), { inv: after }));
+	assert.equal(api().resources.gold - before.gold, 123 + received.convertedGold + received.autoSold.gold);
 	assert.ok(Math.abs(api().resources.xp - before.xp - 45) < 1e-6);
 	const notice = api().combat.notice!;
 	assert.equal(notice.kind, 'won');
@@ -76,10 +102,12 @@ test('a won fight pays gold, xp and loot exactly once, and announces it', () => 
 	assert.ok(ids.includes('potion_minor'));
 	assert.ok(ids.some((id) => (BASIC_GEAR as readonly string[]).includes(id)));
 	assert.equal(ids.some((id) => RATTATUI_SET.pieces.includes(id)), false, 'a rat drops no Rattatui piece');
+	assert.deepEqual(api().bag, after.bag, 'the bag is the server\'s');
 	assert.equal(api().bag.map(stackOf).find((s) => s?.id === 'potion_minor')?.qty, 3);
+	assert.equal(api().invVer, after.ver);
 	// the same events again (a second poll overlapping the first) change nothing
 	const gold = api().resources.gold;
-	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] })));
+	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] }), { inv: after }));
 	assert.equal(api().resources.gold, gold);
 });
 
@@ -90,27 +118,30 @@ test('an answer older than one already applied is ignored', () => {
 	assert.equal(api().playerHp, 50);
 });
 
-test('loot with a full bag converts to gold and loses no items', () => {
+test('loot with a full bag: the server turns it into gold, the browser pays that gold and keeps the bag the server sent', () => {
 	syncedGame();
 	const full = emptyBag().map(() => ({ item: plainItem('wooden_sword') }));
 	store.setState({ bag: full });
 	const before = api().resources.gold;
-	api().applyFightReply(reply(view({ eventNo: 1, events: [won(1, ratDrops(), { gold: 10 })] })));
+	const { after, received, ev } = serverKill(ratDrops(), { gold: 10 });
+	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] }), { inv: after }));
 	const summary = api().combat.notice!.summary!;
 	assert.deepEqual(api().bag, full);
 	assert.deepEqual(summary.items, []);
 	const expected = ratDrops().reduce((sum, d) => sum + (d.kind === 'gear' ? sellValueOf(d.item) : d.qty * ITEM_CATALOG[d.id].sellValue), 0);
 	assert.ok(expected > ITEM_CATALOG.potion_minor.sellValue);
+	assert.equal(received.convertedGold, expected);
 	assert.equal(summary.convertedGold, expected);
-	assert.equal(api().resources.gold - before, 10 + summary.convertedGold);
+	assert.equal(api().resources.gold - before, 10 + expected);
 });
 
-test('the auto-sell filter sells matching gear on the spot, pays Haggler like a hand sale, and still stores the potion', () => {
+test('the auto-sell filter: the server sells matching gear on the spot (Haggler included) and stores the potion; the browser pays the gold', () => {
 	syncedGame();
 	store.setState({ autoSellUpTo: 'common', merchantUpgrades: { haggler: 3 } });
 	const before = api().resources.gold;
 	const bagBefore = api().bag;
-	api().applyFightReply(reply(view({ eventNo: 1, events: [won(1, ratDrops(), { gold: 10 })] })));
+	const { after, ev } = serverKill(ratDrops(), { gold: 10, merchantUpgrades: { haggler: 3 } });
+	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] }), { inv: after }));
 	const summary = api().combat.notice!.summary!;
 	const rolled = ratDrops().find((d) => d.kind === 'gear');
 	const unit = rolled && rolled.kind === 'gear' ? sellValueOf(rolled.item) : 0;
@@ -133,15 +164,18 @@ test('the auto-sell setting is validated', () => {
 	assert.equal(api().autoSellUpTo, null);
 });
 
-test('a potion the server drank leaves the bag, once', () => {
+test('a potion the server drank leaves the bag because the server\'s inventory says so, and an older inventory never comes back', () => {
 	syncedGame();
 	const qty = () => api().bag.map(stackOf).find((s) => s?.id === 'potion_minor')?.qty;
 	assert.equal(qty(), 2);
-	const ev = event(1, 'potion', { id: 'potion_minor', amount: 35 });
-	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] })));
+	const index = api().bag.findIndex((slot) => stackOf(slot)?.id === 'potion_minor');
+	const drunk = invOf({ bag: api().bag.map((slot, i) => (i === index ? { id: 'potion_minor', qty: 1 } : slot)) });
+	api().applyFightReply(reply(view({ eventNo: 1, events: [event(1, 'potion', { id: 'potion_minor', amount: 35 })] }), { inv: drunk }));
 	assert.equal(qty(), 1);
-	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] })));
-	assert.equal(qty(), 1, 'the same event is never applied twice');
+	assert.equal(api().invVer, drunk.ver);
+	const older = { ...drunk, ver: drunk.ver - 1, bag: drunk.bag.map((slot, i) => (i === index ? { id: 'potion_minor', qty: 2 } : slot)) };
+	api().applyFightReply(reply(view({ eventNo: 1 }), { inv: older }));
+	assert.equal(qty(), 1, 'a picture older than the one held is ignored');
 });
 
 test('a defeat or a timeout is announced; the King taunts, a rat stays silent; the monster is not touched', () => {

@@ -351,6 +351,8 @@ export interface GameState {
 	lootPity: Record<string, number>;
 	/** Gear of this rarity or lower is sold the moment it drops (a rarity id); null = keep everything */
 	autoSellUpTo: string | null;
+	/** The version of the inventory (bag, gear, pity, auto-sell) this browser holds, as the server numbers it; null until the server has said (transient, never saved) */
+	invVer: number | null;
 	lastChestLoot: (ChestLoot & { gems?: number }) | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods

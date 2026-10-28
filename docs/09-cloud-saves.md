@@ -4,7 +4,7 @@ The game is played with an account only (there is no offline or guest play). The
 player's game is also copied to Supabase so it follows them to another browser and survives cleared site data. The server verifies what it stores
 and derives the numbers a leaderboard or offline progress needs. What the server *decides* (spawns, fights, rewards, gems, the XP ceiling) is in [11](11-server-authority.md).
 
-## Tables (`supabase/schema.sql`; an older project adds `autosave_history_by_time`, then `offline_ledger`, then `combat_ledger` from `supabase/migrations/`, in that order)
+## Tables (`supabase/schema.sql`; an older project adds `autosave_history_by_time`, then `offline_ledger`, then `combat_ledger`, then `inventory_ledger` from `supabase/migrations/`, in that order)
 
 The save is split by how it is used, not stored as one blob:
 

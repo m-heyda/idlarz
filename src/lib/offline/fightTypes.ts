@@ -78,8 +78,11 @@ export interface FightEvent {
 	n?: number;
 	type?: MonsterType;
 	level?: number;
-	/** What a kill paid (`won`): the browser puts it in the bag */
-	reward?: { gold: number; xp: number; hide?: number; items: Drop[]; pity: Record<string, number>; lucky: boolean };
+	/**
+	 * What a kill paid (`won`). The server has already put the drops where they go: `stored` is what went into the bag, `convertedGold` what
+	 * the ones that did not fit were worth and `autoSold` what the auto-sell filter sold; the gold the player gets is `gold` plus those two.
+	 */
+	reward?: { gold: number; xp: number; hide?: number; items: Drop[]; stored?: Drop[]; convertedGold?: number; autoSold?: { count: number; gold: number }; pity: Record<string, number>; lucky: boolean };
 }
 
 /** The server's record of a player's combat: vitals, cooldowns, the open fight and the switches. Lives in the ledger. */
@@ -97,8 +100,6 @@ export interface CombatState {
 	/** Monsters that beat the player (or ran out the clock) by ticket number: not tried again before this (epoch seconds) */
 	retryAt: Record<string, number>;
 	/** Potions drunk this run by id, and how many of those the last accepted save already knew about */
-	consumed: Record<string, number>;
-	consumedSeen: Record<string, number>;
 	/** Number of the last event, and the most recent ones */
 	eventNo: number;
 	log: FightEvent[];
@@ -121,8 +122,6 @@ export const freshCombat = (nowSec: number, hp: number, mp: number): CombatState
 	autoUse: true,
 	ord: 0,
 	retryAt: {},
-	consumed: {},
-	consumedSeen: {},
 	eventNo: 0,
 	log: [],
 });

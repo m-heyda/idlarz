@@ -30,10 +30,12 @@ const SERVER_ONLY = [
 	'@/lib/offline/reward',
 	'@/lib/offline/profile',
 	'@/lib/offline/ledger',
+	'@/lib/offline/inventory',
+	'@/lib/offline/winChance',
 	'@/lib/offline/supabaseLedger',
 	'@/lib/cloudSave/pipeline',
 ];
-const ROLLERS = ['rollChestLoot', 'rollKillLoot', 'rollGemFind', 'sealedRng', 'advanceBank', 'placeTickets', 'runCombat', 'payKill', 'pickChestSpot', 'chestSpots'];
+const ROLLERS = ['rollChestLoot', 'rollKillLoot', 'rollGemFind', 'sealedRng', 'advanceBank', 'placeTickets', 'runCombat', 'payKill', 'pickChestSpot', 'chestSpots', 'receiveInto', 'applyOp'];
 
 test('no browser code imports the modules that roll, seal, place or fight', () => {
 	assert.ok(browserFiles.length > 50, 'the check reads the real sources');

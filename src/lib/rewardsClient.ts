@@ -1,5 +1,5 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
-import type { ChestReward, FightReply, SyncResult } from '@/lib/offline/types';
+import type { ChestReward, FightReply, InventoryOp, InventoryReply, SyncResult } from '@/lib/offline/types';
 
 // The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
 
@@ -10,7 +10,15 @@ export type Reply<T> =
 	| { status: 'not_configured' } // the server has no LOOT_SECRET: it cannot seal rolls
 	| { status: 'unavailable' }; // not set up, an outage, signed out
 
+// The version of the inventory this browser holds: sent with every online request, so the server answers with the inventory when it is a newer one.
+let invVerOf: () => number | null = () => null;
+export const provideInvVer = (fn: () => number | null): void => {
+	invVerOf = fn;
+};
+
 const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
+	const invVer = path === '/api/inventory' ? null : invVerOf();
+	if (invVer !== null && typeof body === 'object' && body !== null) body = { ...body, invVer };
 	try {
 		const response = await fetch(path, {
 			method: 'POST',
@@ -35,6 +43,9 @@ export const requestSync = (since?: number): Promise<Reply<SyncResult>> => post<
 
 /** Opens the chest on this tile (the server put it there; a tile with no chest answers `no_ticket`). */
 export const requestChest = (key: string, x: number, y: number): Promise<Reply<ChestReward>> => post<ChestReward>('/api/chest', { key, x, y });
+
+/** One of the player's own changes to what they carry. The answer is the inventory as it stands, and the gold a sale paid. */
+export const requestInventory = (key: string, op: InventoryOp): Promise<Reply<InventoryReply>> => post<InventoryReply>('/api/inventory', { key, ...op });
 
 /** A hotkey: drink a potion or cast a skill. One key per press: the server replays the answer if it is sent twice. */
 export const requestUse = (key: string, command: CombatCommand, since: number | undefined): Promise<Reply<FightReply>> => post<FightReply>('/api/fight', { action: 'use', key, command, since });

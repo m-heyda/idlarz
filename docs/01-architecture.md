@@ -23,7 +23,7 @@ src/
 │   ├── page.tsx              the gate: checking → login/register (StartDialog) → profile → save hub (SaveHub: continue / choose / new game) → GameApp; AuthUnavailable when Supabase is not reachable
 │   ├── GameApp.tsx           the game: 100 ms tick loop, single-tab lock, hidden Ctrl×5 shortcut, the three sync hooks, composes all overlays
 │   ├── layout.tsx, globals.css
-│   └── api/                  auth/{login,logout,me,profile,register}, save (cloud save), offline (claim an absence), spawn (tickets + combat view), chest (open a chest), fight (start / hotkey / auto switches / dismiss)
+│   └── api/                  auth/{login,logout,me,profile,register}, save (cloud save), offline (claim an absence), spawn (tickets + combat view), chest (open a chest), inventory (equip, sell, move, buy ...), fight (start / hotkey / auto switches / dismiss)
 ├── config/
 │   ├── gameConfig.ts         ALL tunable economy constants (costs, curves, biomes, castle, animals, merchant, click limiter, chests, stats, rebirth, offline, luck)
 │   ├── combatConfig.ts       COMBAT + MONSTERS + STAT_RULES: HP, regen, armor, spawn, monster defs (level scaling, armor, crit, Stun resist, grade)
@@ -50,13 +50,13 @@ src/
 │   ├── monsters.ts           monster levels and stats, spawn level windows, growth
 │   ├── skills.ts, effectiveStats.ts, statBonuses.ts, itemInstance.ts, inventory.ts (pure bag/equipment ops + aggregateStats), limits.ts, merchant.ts, chests.ts, luck.ts, rng.ts
 │   ├── loot/                 kill / chest / merchant-stock rolls: generate, kill, receive, pools, validate, autoSell, data
-│   ├── offline/              the server engine, pure and unit-tested: tickets (spawn timers), placement, fight (the tick engine), profile (player stats for a fight), reward, grant,
+│   ├── offline/              the server engine, pure and unit-tested: tickets (spawn timers), placement, fight (the tick engine), profile (player stats for a fight), reward, inventory (the ledger-owned bag, gear and pity and the player's operations on them), winChance (auto-battle's "can I win this?"), grant,
 │   │                         ledger + supabaseLedger, seal / secret (sealed rolls), reconcile, service / online (the request handlers), limits, types
 │   ├── cloudSave/            the cloud-save pipeline: pipeline, verify (plausibility, shadow mode), netWorth, xpModel (the server's XP ceiling), summary, supabaseRepo, environment
 │   ├── supabase/             server.ts (cookie client), admin.ts (service-role client)
 │   ├── authClient / authRoute / authValidation / playerRoute / offlineRoute   the browser and route-handler sides of login and the ledger routes
 │   ├── cloudClient, manualCloudSave, saveEvents, syncPolicy, startPlan, serverSession   when and how the browser pushes saves to the account
-│   ├── rewardsClient, offlineClient, offlineFlow, combatCursor, combatFx   the browser side of /api/spawn, /api/chest, /api/fight, /api/offline
+│   ├── rewardsClient, offlineClient, offlineFlow, combatCursor, combatFx   the browser side of /api/spawn, /api/chest, /api/fight, /api/inventory, /api/offline
 │   ├── saveFormat.ts         the save text (IDLZ2.<base64 JSON>.<check>): compact body, `SAVE_SCHEMA` + `MIGRATIONS`, encode/decode
 │   ├── saveStorage.ts, storageScope.ts   localStorage storage: sync flush on close, backup + damaged copy, `.dev` key suffix on localhost, persist(), import/reset
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS

@@ -19,7 +19,9 @@ import {
 } from '@/lib/offline/fightTypes';
 import type { Ledger } from '@/lib/offline/ledger';
 import { isPlaced } from '@/lib/offline/placement';
-import { bagCount, playerProfile, savedVitals } from '@/lib/offline/profile';
+import { playerProfile, savedVitals } from '@/lib/offline/profile';
+import { bagCountOf, inventoryFromCore, takeOne } from '@/lib/offline/inventory';
+import type { Inventory } from '@/lib/offline/types';
 import { estimateWin, type PotionStock } from '@/lib/offline/winChance';
 import { payKill } from '@/lib/offline/reward';
 import { sealedRng } from '@/lib/offline/seal';
@@ -43,16 +45,12 @@ export interface CombatEnv {
 const EPS = 1e-9;
 const round1 = (value: number): number => Math.round(value * 10) / 10;
 
-/** The potions of a kind the player still has: the saved bag minus the ones the server drank that the saved bag does not know about yet. */
-const potionStock = (core: Parameters<typeof bagCount>[0], c: CombatState, id: string): number =>
-	Math.max(0, bagCount(core, id) - Math.max(0, (c.consumed[id] ?? 0) - (c.consumedSeen[id] ?? 0)));
-
 /** The potions auto-use would drink (none with auto-use off), for the win estimate. */
-const potionsForEstimate = (core: Parameters<typeof bagCount>[0], c: CombatState): PotionStock[] =>
+const potionsForEstimate = (inv: Inventory, c: CombatState): PotionStock[] =>
 	c.autoUse
 		? Object.keys(ITEM_CATALOG)
 				.filter((id) => ITEM_CATALOG[id].consumable?.healHp)
-				.map((id) => ({ healHp: ITEM_CATALOG[id].consumable!.healHp, count: potionStock(core, c, id) }))
+				.map((id) => ({ healHp: ITEM_CATALOG[id].consumable!.healHp, count: bagCountOf(inv, id) }))
 		: [];
 
 /** The combat record of a ledger, seeded from the saved HP and mana the first time. */
@@ -110,11 +108,12 @@ export interface CombatTotals {
  * auto-battle allows. Returns the new ledger. All events are in `ledger.combat.log`.
  */
 export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: CombatCommand[]; autoBattle?: boolean; autoUse?: boolean; ack?: number } = {}): CombatTotals => {
-	let ledger = input;
+	// the bag is the ledger's (the engine tests and the sim build a ledger from a core: the inventory is read from it then)
+	let ledger: Ledger = input.inv ? input : { ...input, inv: inventoryFromCore(env.stored.core) };
 	const base = combatOf(ledger, env);
 	// what the browser has told us it applied (its `since`) is not kept: only cosmetic events are ever dropped unacknowledged
 	const log = ask.ack === undefined ? [...base.log] : base.log.filter((event) => COSMETIC_EVENTS.has(event.kind) || event.no > ask.ack!);
-	const c: CombatState = { ...base, cd: { ...base.cd }, consumed: { ...base.consumed }, log, fight: base.fight ? { ...base.fight } : null };
+	const c: CombatState = { ...base, cd: { ...base.cd }, log, fight: base.fight ? { ...base.fight } : null };
 	const profileNow = playerProfile(env.stored.core);
 	// auto-battle is locked until the first rebirth: a save that has it on from before (or a request for it) does not get it
 	const autoAllowed = autoBattleUnlocked(ledger.rebirths);
@@ -137,9 +136,9 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 	const tickCooldowns = (dt: number) => {
 		c.cd = { heal: Math.max(0, c.cd.heal - dt), stun: Math.max(0, c.cd.stun - dt), potion: Math.max(0, c.cd.potion - dt) };
 	};
-	const stock = (id: string): number => potionStock(env.stored.core, c, id);
+	const stock = (id: string): number => bagCountOf(ledger.inv!, id);
 	/** What auto-battle checks a monster against: the numbers it would fight with and the potions auto-use would drink */
-	const winnable = () => winnableBy(profileNow, c.hp, potionsForEstimate(env.stored.core, c));
+	const winnable = () => winnableBy(profileNow, c.hp, potionsForEstimate(ledger.inv!, c));
 
 	const drink = (t: number, id: string): boolean => {
 		const healHp = ITEM_CATALOG[id]?.consumable?.healHp;
@@ -147,7 +146,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 		if (c.fight && c.cd.potion > 0) return false;
 		const healed = Math.min(healHp, maxHpNow() - c.hp);
 		c.hp += healed;
-		c.consumed[id] = (c.consumed[id] ?? 0) + 1;
+		ledger = { ...ledger, inv: takeOne(ledger.inv!, id) ?? ledger.inv! };
 		if (c.fight) c.cd.potion = COMBAT.potionCooldownSec;
 		push(t, 'potion', { id, amount: Math.round(healed) });
 		return true;
@@ -276,7 +275,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 			const paid = payKill(env.secret, env.userId, ledger, env.stored, f.n, t);
 			if (!paid) return endFight(t, 'retreat');
 			ledger = paid.ledger;
-			push(t, 'won', { n: f.n, type: f.type, level: paid.payout.level, reward: { gold: paid.payout.gold, xp: paid.payout.xp, hide: paid.payout.hide, items: paid.payout.items, pity: paid.payout.pity, lucky: paid.payout.lucky } });
+			push(t, 'won', { n: f.n, type: f.type, level: paid.payout.level, reward: { gold: paid.payout.gold, xp: paid.payout.xp, hide: paid.payout.hide, items: paid.payout.items, stored: paid.payout.stored, convertedGold: paid.payout.convertedGold, autoSold: paid.payout.autoSold, pity: paid.payout.pity, lucky: paid.payout.lucky } });
 			c.fight = null;
 			return;
 		}
@@ -367,9 +366,6 @@ export const dismissTicket = (ledger: Ledger, env: CombatEnv, n: number): { ledg
 	return { ledger: { ...ledger, bank: taken.bank, combat }, ok: true };
 };
 
-/** A save that came in: the potions it already knows about are no longer "unsaved". */
-export const markConsumedSeen = (combat: CombatState): CombatState => ({ ...combat, consumedSeen: { ...combat.consumed } });
-
 /** After an absence the player is back on their feet: HP and mana refilled by resting for `gapSec`, no fight open, cooldowns over. */
 export const restThrough = (ledger: Ledger, env: CombatEnv, gapSec: number): Ledger => {
 	const base = combatOf(ledger, env);
@@ -397,7 +393,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 	else if (f) nextPollSec = COMBAT.poll.fightSec;
 	else {
 		// idle: ask again when something can change
-		const winnable = winnableBy(p, c.hp, potionsForEstimate(env.stored.core, c));
+		const winnable = winnableBy(p, c.hp, potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c));
 		waiting = pickTarget(ledger, c, c.at, winnable) !== null;
 		const resume = (p.maxHp * COMBAT.auto.resumeHpPct) / 100;
 		const retry = nextRetry(ledger, c, c.at);
