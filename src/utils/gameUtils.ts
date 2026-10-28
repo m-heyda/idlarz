@@ -12,6 +12,7 @@ import {
 	BASE_XP_PER_TILE,
 	BASE_XP_PER_LEVEL,
 	XP_GROWTH_FACTOR,
+	XP_LEVEL_SOFT,
 	SCALING_CONFIG,
 	XP_TILE,
 	XP_CAP,
@@ -133,25 +134,34 @@ export const calculateXpGain = (ownedTiles: number): number => {
 	return ownedTiles > XP_TILE.growthUntil ? xp * Math.pow(ownedTiles / XP_TILE.growthUntil, XP_TILE.tailExponent) : xp;
 };
 
+/** The XP curve of a save from before the soft part (every level was x1.3 on the last): the most levels such a save can have gained. */
+export const OLD_XP_LEVEL_SOFT = { fromLevel: Infinity, growth: XP_GROWTH_FACTOR };
+
+/** XP needed to leave level `level`: x1.3 per level up to XP_LEVEL_SOFT.fromLevel, then x`growth` per level. */
+export const xpToLeaveLevel = (level: number, soft: { fromLevel: number; growth: number } = XP_LEVEL_SOFT): number => {
+	const steep = Math.min(level, soft.fromLevel) - 1;
+	const gentle = Math.max(0, level - soft.fromLevel);
+	return Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, steep) * Math.pow(soft.growth, gentle));
+};
+
 /**
  * Calculate level based on total XP using exponential scaling
  * Each level requires more XP than the previous one
  */
 export const calculateLevel = (
-	xp: number
+	xp: number,
+	soft: { fromLevel: number; growth: number } = XP_LEVEL_SOFT
 ): { level: number; progress: number } => {
 	// Start at level 1, no XP needed for first level
 	let level = 1;
-	let xpForNextLevel = BASE_XP_PER_LEVEL;
+	let xpForNextLevel = xpToLeaveLevel(1, soft);
 	let remainingXp = Number.isFinite(xp) ? Math.min(xp, XP_CAP) : XP_CAP;
 
 	// Keep leveling up until we don't have enough XP (a non-finite threshold ends it: levels past ~2700 overflow)
 	while (remainingXp >= xpForNextLevel) {
 		remainingXp -= xpForNextLevel;
 		level++;
-		xpForNextLevel = Math.floor(
-			BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level - 1)
-		);
+		xpForNextLevel = xpToLeaveLevel(level, soft);
 		if (!Number.isFinite(xpForNextLevel)) return { level, progress: 0 };
 	}
 
@@ -267,7 +277,7 @@ export const animalOutput = (animal: Animal, count: number, upgrades?: FarmUpgra
 	const up = (id: FarmUpgradeId) => 1 + farmUpgradeLevel(upgrades, id) * FARM_UPGRADES[id].effectPerLevel;
 	out.meat = animal.baseProduction * count * pen * up('feed');
 	const productUpgrade: Record<Animal['product']['resource'], FarmUpgradeId> = { eggs: 'coop', milk: 'dairy', hide: 'tannery' };
-	out[animal.product.resource] = animal.product.perSec * count * pen * up(productUpgrade[animal.product.resource]);
+	out[animal.product.resource] = animal.product.perSec * count * pen * up(productUpgrade[animal.product.resource]) * up('pasture');
 	return out;
 };
 

@@ -12,6 +12,7 @@ import {
 	ANIMALS,
 	BASE_GENERATION_RATES,
 	BASE_XP_PER_LEVEL,
+	XP_LEVEL_SOFT,
 	BIOME_YIELD,
 	BIOMES,
 	BUILDING_COST,
@@ -53,6 +54,7 @@ import {
 	merchantUpgradeCost,
 	legacyGain,
 	legacyUpgradeCost,
+	xpToLeaveLevel,
 } from '../src/utils/gameUtils';
 import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import { formatTime } from '../src/utils/formatters';
@@ -141,15 +143,15 @@ line();
 // ---------------------------------------------------------------------------
 line('## 2. Level curve');
 line();
-line(`XP to go from level L to L+1 = \`floor(${BASE_XP_PER_LEVEL} × ${XP_GROWTH_FACTOR}^(L-1))\`. One stat point per level.`);
+line(`XP to go from level L to L+1 = \`floor(${BASE_XP_PER_LEVEL} × ${XP_GROWTH_FACTOR}^(min(L, ${XP_LEVEL_SOFT.fromLevel})-1) × ${XP_LEVEL_SOFT.growth}^max(0, L-${XP_LEVEL_SOFT.fromLevel}))\`. One stat point per level.`);
 line();
 {
 	const rows: (string | number)[][] = [];
 	let cumulative = 0;
-	for (let L = 1; L <= 40; L++) {
-		const step = Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, L - 1));
+	for (let L = 1; L <= 100; L++) {
+		const step = xpToLeaveLevel(L);
 		cumulative += step;
-		rows.push([L, fmt(step), fmt(cumulative)]);
+		if (L <= 40 || L % 10 === 0) rows.push([L, fmt(step), fmt(cumulative)]);
 	}
 	table(['Level', 'XP to next', 'cumulative XP to reach L+1'], rows);
 }

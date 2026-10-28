@@ -33,6 +33,7 @@ import { limitOf } from '@/lib/limits';
 import {
 	calculateCombatStats,
 	calculateLevel,
+	OLD_XP_LEVEL_SOFT,
 	calculateXpGain,
 	castleUpgradeDuration,
 	EMPTY_PRESTIGE,
@@ -333,9 +334,11 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	const available = int(raw.characterStats.availablePoints, 0, 100000);
 	if (available === null) return fail('available points');
 	const expectedTotal = BASE_STAT_KEYS.length * INITIAL_CHARACTER_STATS.strength + (level.level - 1);
+	// The level curve got softer past XP_LEVEL_SOFT.fromLevel, so a save written before that holds the points of the old, lower level
+	const oldTotal = BASE_STAT_KEYS.length * INITIAL_CHARACTER_STATS.strength + (calculateLevel(resources.xp, OLD_XP_LEVEL_SOFT).level - 1);
 	const total = allocated + available;
 	if (total > expectedTotal) return fail('too many stat points');
-	if (total < expectedTotal - POINT_TOLERANCE) return fail('too few stat points');
+	if (total < Math.min(expectedTotal, oldTotal) - POINT_TOLERANCE) return fail('too few stat points');
 	const characterStats: CharacterStats = {
 		...INITIAL_CHARACTER_STATS,
 		...base,

@@ -73,6 +73,11 @@ const VictoryToast: React.FC = () => {
 				<span className='flex items-center gap-1'>
 					+{formatNumber(Math.floor(summary.xp))} <ResourceIcon resource='xp' />
 				</span>
+				{(summary.hide ?? 0) > 0 && (
+					<span className='flex items-center gap-1'>
+						+{formatNumber(Math.floor(summary.hide ?? 0))} <ResourceIcon resource='hide' />
+					</span>
+				)}
 				<span className='victory-status'>
 					HP {formatCompact(Math.ceil(playerHp))}/{formatCompact(maxHp)}
 				</span>

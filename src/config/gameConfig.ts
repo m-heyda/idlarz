@@ -53,9 +53,13 @@ export const TICK_RATE = 100; // 10 times per second
 export const BASE_TILE_COST = 55; // Base cost for first tile purchase
 
 // XP calculation constants - Exponential XP system
-export const BASE_XP_PER_TILE = 125;
+export const BASE_XP_PER_TILE = 45; // was 125: levels come about 4 slower for the same land, so level 38 is a first-rebirth level and 100 needs several runs
 export const XP_GROWTH_FACTOR = 1.3; // Exponential growth factor for XP needed per level (x1.3)
 export const BASE_XP_PER_LEVEL = 750; // Starting XP needed for level 1 to 2
+// From this level on a level costs only `growth` x the one before instead of XP_GROWTH_FACTOR x, so a level above ~40 stays a goal
+// instead of an unreachable number (level 100 is about 5e9 XP in total). Up to `fromLevel` the curve is the old one: a save never
+// has a lower level than before.
+export const XP_LEVEL_SOFT = { fromLevel: 38, growth: 1.045 };
 
 export const SPECIAL_SINGLE_TYPE_BIOMES: BiomeType[] = ['castle'];
 export const EMPTY_BIOMES: BiomeType[] = ['empty'];
@@ -127,10 +131,10 @@ export const BIOME_SPAWN = {
 // Extra resources a tile purchase costs once enough tiles are owned. amount = gold cost x share
 export const TILE_RESOURCE_COST: { from: number; resource: 'wood' | 'stone' | 'coal' | 'food' | 'hide'; share: number }[] = [
 	{ from: 15, resource: 'wood', share: 0.3 },
-	{ from: 15, resource: 'stone', share: 0.25 },
+	{ from: 15, resource: 'stone', share: 0.2 }, // was 0.25: stone has the thinnest income of the five, the sim showed it holding tiles back more than gold in the first 100
 	{ from: 30, resource: 'coal', share: 0.2 },
 	{ from: 40, resource: 'food', share: 0.1 },
-	{ from: 120, resource: 'hide', share: 0.03 }, // milk and eggs are kept for other uses, so the big territories ask for leather
+	{ from: 100, resource: 'hide', share: 0.02 }, // milk and eggs are kept for other uses, so the big territories ask for leather
 ];
 
 // Biome/building output is multiplied by this (the castle's own output and the base rates are not)
@@ -348,13 +352,13 @@ export const CASTLE_UPGRADE = {
 	glowFromLevel: 6, // from this level the castle is drawn animated and glowing, stronger with every level
 	xpBonus: 0.5, // Additional flat XP/s for every castle level above 1
 	// Real upgrade time in seconds, indexed by the level being left (1 -> 2 is index 0). Counted by the tick loop.
-	durationsSec: [3600, 14400, 43200, 129600, 259200, 259200, 345600, 432000, 604800],
+	durationsSec: [3600, 14400, 43200, 86400, 172800, 259200, 345600, 432000, 604800],
 	upgradeCosts: [
 		{ gold: 70000, wood: 10000, stone: 10000 },
 		{ gold: 200000, wood: 30000, stone: 30000, coal: 20000 },
 		{ gold: 1000000, wood: 100000, stone: 100000, coal: 50000, food: 200000, meat: 40000 },
 		{ gold: 4000000, wood: 400000, stone: 400000, coal: 200000, food: 2000000, meat: 100000 },
-		{ gold: 20000000, wood: 2000000, stone: 2000000, coal: 1000000, food: 10000000, meat: 500000 },
+		{ gold: 8000000, wood: 2000000, stone: 2000000, coal: 1000000, food: 4000000, meat: 500000 },
 		{ gold: 30000000, wood: 3000000, stone: 3000000, coal: 1600000, food: 16000000, meat: 800000 },
 		{ gold: 48000000, wood: 4800000, stone: 4800000, coal: 2600000, food: 25600000, meat: 1280000 },
 		{ gold: 76800000, wood: 7600000, stone: 7600000, coal: 4000000, food: 41000000, meat: 2000000 },
@@ -456,7 +460,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 10000,
 		costScaling: 1.33,
 		baseProduction: 0.5,
-		product: { resource: 'hide', perSec: 0.0375 },
+		product: { resource: 'hide', perSec: 0.075 },
 	},
 	{
 		id: 'pig',
@@ -465,7 +469,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 60000,
 		costScaling: 1.36,
 		baseProduction: 1,
-		product: { resource: 'hide', perSec: 0.075 },
+		product: { resource: 'hide', perSec: 0.15 },
 	},
 	{
 		id: 'cow',
@@ -520,10 +524,18 @@ export const FARM_UPGRADES = {
 	},
 	tannery: {
 		label: 'Tannery',
-		description: (n: number) => `+${Math.round(n * 15)}% hide`,
+		description: (n: number) => `+${Math.round(n * 25)}% hide`,
 		maxLevel: 10,
-		effectPerLevel: 0.15, // hide
+		effectPerLevel: 0.25, // hide: the one farm product the big territories are paid in (TILE_RESOURCE_COST)
 		cost: { coal: 1200, hide: 20 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.6,
+	},
+	pasture: {
+		label: 'Pasture',
+		description: (n: number) => `+${Math.round(n * 8)}% eggs, milk and hide`,
+		maxLevel: 10,
+		effectPerLevel: 0.08, // eggs, milk and hide together, on top of Hen House / Dairy / Tannery
+		cost: { food: 5000, wood: 2500 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
 	pen: {

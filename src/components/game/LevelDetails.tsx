@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatCompact, formatNumber } from '@/utils/formatters';
-import { BASE_XP_PER_LEVEL, XP_GROWTH_FACTOR } from '@/config/gameConfig';
+import { xpToLeaveLevel } from '@/utils/gameUtils';
 import { LevelUpTimer } from './LevelUpTimer';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import CharacterPortrait from './CharacterPortrait';
@@ -37,7 +37,7 @@ const Flask: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({
 };
 
 const xpNumbers = (level: { level: number; progress: number }) => {
-	const next = Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1));
+	const next = xpToLeaveLevel(level.level);
 	return { next, current: Math.floor(next * level.progress), pct: Math.floor(level.progress * 100) };
 };
 
@@ -95,9 +95,7 @@ const LevelDetails: React.FC = () => {
 	const mpMax = maxMana(characterStats, equipment);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
-	const xpForNextLevel = Math.floor(
-		BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, level.level - 1)
-	);
+	const xpForNextLevel = xpToLeaveLevel(level.level);
 	const currentXp = Math.floor(xpForNextLevel * level.progress);
 	const pct = Math.floor(level.progress * 100);
 

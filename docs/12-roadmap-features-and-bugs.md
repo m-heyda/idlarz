@@ -10,6 +10,8 @@ The one place to look when planning the next step. It does not repeat the long l
 
 ## 1. Building system: a full rework is planned
 
+The design draft (levels, demolish, specialisation, tier-2 resources, how they tie into rebirth and what the first-run pacing must not lose) is [13](13-roadmap-building-and-resources.md).
+
 Not part of this change; reviewed later. State today, so the rework starts from facts:
 
 - Config: `BUILDINGS` (16 buildings, each a `resourceGeneration` rate) and `BUILDING_COST` (a base cost, early/mid/late growth factors, `blockedBiomes`) in `src/config/gameConfig.ts`; cost maths `calculateBuildingCost`, `canBuildOn`, output `calculateTileOutput` in `src/utils/gameUtils.ts`.

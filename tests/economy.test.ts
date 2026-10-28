@@ -147,16 +147,16 @@ test('tile cost: extra resources are required from the configured tile count and
 	assert.ok(api().resources.gold < goldBefore);
 });
 
-test('tile cost: gold stays the biggest part, wood, stone and coal are a real share, and hide joins from 120 tiles', () => {
-	for (const n of [15, 30, 60, 100, 119, 120, 200, 300, 1000]) {
+test('tile cost: gold stays the biggest part, wood, stone and coal are a real share, and hide joins from 100 tiles', () => {
+	for (const n of [15, 30, 60, 99, 100, 120, 200, 300, 1000]) {
 		const { gold, resources } = calculateTileCost(n, 0);
 		for (const [key, amount] of Object.entries(resources)) assert.ok((amount ?? 0) < gold, `${key} costs less than the gold at n=${n}`);
 		const raw = (resources.wood ?? 0) + (resources.stone ?? 0) + (resources.coal ?? 0);
 		assert.ok(raw > gold * 0.4 || n < 30, `wood, stone and coal are about half of the gold at n=${n}`);
 		assert.ok(raw < gold * 1.5, `and gold is still the biggest single part at n=${n}`);
 	}
-	assert.equal(calculateTileCost(119, 0).resources.hide, undefined, 'no hide before the 120th tile');
-	assert.ok((calculateTileCost(120, 0).resources.hide ?? 0) > 0, 'hide from the 120th tile');
+	assert.equal(calculateTileCost(99, 0).resources.hide, undefined, 'no hide before the 100th tile');
+	assert.ok((calculateTileCost(100, 0).resources.hide ?? 0) > 0, 'hide from the 100th tile');
 	assert.ok((calculateTileCost(30, 0).resources.coal ?? 0) > 0);
 	const kept = calculateTileCost(150, 50).resources;
 	const full = calculateTileCost(150, 0).resources;
@@ -260,4 +260,12 @@ test('farm: animals cost food and stack production', () => {
 	const one = api().resourceRates.base.meat;
 	assert.equal(api().purchaseAnimal('chicken'), 1);
 	assert.ok(Math.abs(api().resourceRates.base.meat - 2 * one) < 1e-9);
+});
+
+test('the owner\'s save (185 tiles, 17 % discount, the income of the Character window): gold is the slowest part of the next tile, every material takes at most 60 % of its time', () => {
+	const income = { gold: 75.96, wood: 66.34, stone: 50.07, coal: 70.69, food: 84.74, hide: 4.46 * 2 }; // hide: that save's income with the doubled animal output
+	const cost = calculateTileCost(185, 17);
+	const need: Record<string, number> = { gold: cost.gold, ...(cost.resources as Record<string, number>) };
+	const wait = (r: keyof typeof income) => need[r] / income[r];
+	for (const r of ['wood', 'stone', 'coal', 'food', 'hide'] as const) assert.ok(wait(r) <= 0.6 * wait('gold'), `${r}: ${(wait(r) / 60).toFixed(1)} min against ${(wait('gold') / 60).toFixed(1)} min of gold`);
 });

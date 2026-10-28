@@ -79,7 +79,7 @@ export interface FightEvent {
 	type?: MonsterType;
 	level?: number;
 	/** What a kill paid (`won`): the browser puts it in the bag */
-	reward?: { gold: number; xp: number; items: Drop[]; pity: Record<string, number>; lucky: boolean };
+	reward?: { gold: number; xp: number; hide?: number; items: Drop[]; pity: Record<string, number>; lucky: boolean };
 }
 
 /** The server's record of a player's combat: vitals, cooldowns, the open fight and the switches. Lives in the ledger. */

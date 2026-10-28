@@ -30,6 +30,9 @@ const main = async () => {
 
 	const cfg = await import('../src/config/gameConfig');
 	const utils = await import('../src/utils/gameUtils');
+	const monsters = await import('../src/lib/monsters');
+	const combatCfg = await import('../src/config/combatConfig');
+	const kill = await import('../src/lib/loot/kill');
 	const { useGameStore } = await import('../src/stores/gameStore');
 
 	useGameStore.persist.setOptions({
@@ -47,6 +50,10 @@ const main = async () => {
 		// the dedicated player who rebirths as early as possible / after pushing the castle to the end
 		'hardcore-rebirth6': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 3 },
 		'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
+		// the owner's pace (docs/06): a person who checks in a few times a day, fights with auto-battle, never optimises
+		human: { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18 },
+		'human-rebirth6': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 6, rebirths: 5 },
+		'human-rebirth8': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 8, rebirths: 4 },
 	};
 	const selected = names.length ? names : Object.keys(PROFILES);
 
@@ -61,7 +68,7 @@ const main = async () => {
 		const started = Date.now();
 		const runs: Milestones[] = [];
 		for (let seed = 0; seed < seeds; seed++) {
-			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore }, legacy, seed));
+			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore, monsters, combatCfg, kill }, legacy, seed));
 		}
 		// median per milestone, plus the min-max over seeds
 		results[name] = {};
@@ -99,11 +106,33 @@ interface Profile {
 	windows: [number, number][]; // hours of the day the player is actively playing
 	rebirthAtCastle?: number; // rebirth as soon as the castle reaches this level (and keep playing the next run)
 	rebirths?: number; // how many rebirths to simulate (default 1 when rebirthAtCastle is set)
+	/** A person, not a script: decides only this often while playing, buys at most `tilesPerVisit` tiles per visit, keeps `hoard` x what it might need */
+	human?: { decisionSec: number; hoard: number; tilesPerVisit: number };
+	/** Fight the rat and the Rat King the way the server's auto-battle does (see GEAR_SCHEDULE) */
+	combat?: boolean;
+	/** Hour of the day the game starts at (a new player starts playing at once; the bots start at midnight) */
+	startHour?: number;
 }
 
 type Milestones = Record<string, number | null>; // key -> game day (fractional), null if never
 
+/** Minutes the income needs to pay each part of the next tile, read at tile counts (the hide-versus-gold diagnostic). */
+const tileWaits: Record<string, Record<string, Record<string, number>>> = {};
+
+/**
+ * What the player wears, by game day: the strongest rat they beat, the Rat King win chance (docs/generated/fight-sim.md: the
+ * starter kit beats level 5 rats, knight gear level 9-10 rats and the King 13 % of the time, obsidian gear the King always).
+ */
+const GEAR_SCHEDULE = [
+	{ day: 0, maxRat: 5, king: 0 },
+	{ day: 1.5, maxRat: 10, king: 0.13 },
+	{ day: 5, maxRat: 10, king: 1 },
+];
+
 interface Ctx {
+	kill: typeof import('../src/lib/loot/kill');
+	monsters: typeof import('../src/lib/monsters');
+	combatCfg: typeof import('../src/config/combatConfig');
 	cfg: typeof import('../src/config/gameConfig');
 	utils: typeof import('../src/utils/gameUtils');
 	store: typeof import('../src/stores/gameStore').useGameStore;
@@ -111,6 +140,13 @@ interface Ctx {
 
 const HARDCORE_WINDOWS: [number, number][] = [
 	[7, 9],
+	[12, 13],
+	[18, 23],
+];
+// SIM_DECISION / SIM_HOARD: calibration knobs (docs/06: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus (calibrated to the owner: ~185 tiles after 3.3 days))
+const HUMAN = { decisionSec: Number(process.env.SIM_DECISION ?? 3600), hoard: Number(process.env.SIM_HOARD ?? 1e9), tilesPerVisit: Number(process.env.SIM_TILES ?? 8) };
+const HUMAN_WINDOWS: [number, number][] = [
+	[8, 9],
 	[12, 13],
 	[18, 23],
 ];
@@ -126,7 +162,7 @@ const mulberry32 = (seed: number) => () => {
 };
 
 function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, seed = 0): Milestones {
-	const { cfg, utils, store } = ctx;
+	const { cfg, utils, store, monsters, combatCfg, kill } = ctx;
 	const realRandom = Math.random;
 	Math.random = mulberry32(12345 + seed * 7919);
 
@@ -159,7 +195,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	const BUILD_ORDER = ['market', 'farm', 'lumbermill', 'mine', 'blacksmith', 'workshop'];
 
 	const isActive = (sec: number) => {
-		const hour = (sec % 86400) / 3600;
+		const hour = ((sec + (profile.startHour ?? 0) * 3600) % 86400) / 3600;
 		return profile.windows.some(([a, b]) => hour >= a && hour < b);
 	};
 
@@ -237,7 +273,8 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 		// Castle
 		const castle = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
-		if (!s.castleUpgrade && (castle.level ?? 1) < cfg.CASTLE_UPGRADE.maxLevel && castle.upgradeCost) {
+		const castleCeiling = profile.rebirthAtCastle ?? cfg.CASTLE_UPGRADE.maxLevel; // a player who rebirths at castle N does not start N+1
+		if (!s.castleUpgrade && (castle.level ?? 1) < castleCeiling && castle.upgradeCost) {
 			topUp(castle.upgradeCost as Partial<Record<string, number>>);
 			if (api().upgradeCastle()) s = api();
 		}
@@ -290,7 +327,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		}
 
 		// Tile purchases: as many as affordable
-		for (let guard = 0; guard < 20; guard++) {
+		for (let guard = 0; guard < (profile.human?.tilesPerVisit ?? 20); guard++) {
 			if (frontierDirty || !frontier) {
 				frontier = findFrontier();
 				frontierDirty = false;
@@ -318,6 +355,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			s = api();
 			const ownedNow = utils.economyTiles(s.tiles, s.freeTiles);
 			TILE_MARKS.forEach((n) => ownedNow >= n && mark(`tiles${n}`, t));
+			if (run === 1) recordTileWait(s, ownedNow);
 		}
 
 		// Sell what the bot does not need (keeps a reserve for the castle and the next few tiles)
@@ -325,6 +363,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	};
 
 	const sellExcess = (s: ReturnType<typeof api>) => {
+		const hoard = profile.human?.hoard ?? 1;
 		const castle = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
 		const need: Record<string, number> = { ...((castle.upgradeCost ?? {}) as Record<string, number>) };
 		const owned = utils.economyTiles(s.tiles, s.freeTiles);
@@ -335,7 +374,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			});
 		}
 		(['wood', 'stone', 'coal', 'meat'] as const).forEach((r) => {
-			const keep = (need[r] ?? 0) * 1.1;
+			const keep = (need[r] ?? 0) * 1.1 * hoard;
 			const excess = s.resources[r] - keep;
 			if (excess > 50) api().sellResources(r, Math.floor(excess));
 		});
@@ -344,15 +383,99 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		(['eggs', 'milk', 'hide'] as const).forEach((r) => {
 			const id = productUpgrade[r];
 			const next = utils.farmUpgradeCost(id, utils.farmUpgradeLevel(s.farmUpgrades, id))[r] ?? 0;
-			const excess = api().resources[r] - Math.max(next * 1.6, (need[r] ?? 0) * 1.1); // the next tiles may cost hide too
+			const excess = api().resources[r] - Math.max(next * 1.6, (need[r] ?? 0) * 1.1) * hoard; // the next tiles may cost hide too
 			if (excess > 5) api().sellResources(r, Math.floor(excess));
 		});
 		// Food: keep what animals/castle/tiles might need (2 days of income) and sell the rest
-		const foodKeep = Math.max(need.food ?? 0, 0) * 1.1 + 20000;
+		const foodKeep = (Math.max(need.food ?? 0, 0) * 1.1 + 20000) * hoard;
 		const foodExcess = api().resources.food - foodKeep;
 		if (foodExcess > 5000 && !cfg.ANIMALS.some((a) => api().resources.food >= utils.calculateAnimalCost(a, api().farmLevels[a.id] || 0)))
 			api().sellResources('food', Math.floor(foodExcess));
 	};
+
+	/** Minutes the income needs to cover what is still missing of each part of the next tile; recorded once per tile mark of the first run. */
+	const WAIT_MARKS = [100, 150, 200, 300, 400];
+	const recordTileWait = (s: ReturnType<typeof api>, owned: number) => {
+		const mark = WAIT_MARKS.filter((n) => owned >= n).pop();
+		const key = mark ? String(mark) : null;
+		if (!key) return;
+		const byName = (tileWaits[name] ??= {});
+		if (byName[key]) return;
+		const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades));
+		const need = utils.tileCostAsResources(cost) as Record<string, number>;
+		const rate = s.resourceRates.total as unknown as Record<string, number>;
+		// what is still missing after the purchase just made, over the income: the biggest number is what holds the next tile back
+		const stock = s.resources as unknown as Record<string, number>;
+		byName[key] = Object.fromEntries(Object.entries(need).map(([r, v]) => [r, rate[r] > 0 ? Math.round(Math.max(0, v - stock[r]) / rate[r] / 60) : Infinity]));
+	};
+
+	// Fights (profile.combat): the server spawns a rat every COMBAT.spawn.intervalSec and a Rat King every bossIntervalSec, and
+	// auto-battle fights them while the player plays. A monster waits, growing a level per growth interval, until it is fought.
+	const spawn = combatCfg.COMBAT.spawn;
+	let nextRatAt = 0;
+	let nextKingAt = spawn.bossIntervalSec;
+	let kingRetryAt = 0;
+	let waiting: { type: 'rat' | 'ratKing'; at: number; spawnLevel: number }[] = [];
+	const resetCombat = () => {
+		nextRatAt = t + spawn.firstSec;
+		nextKingAt = t + spawn.bossIntervalSec;
+		kingRetryAt = 0;
+		waiting = [];
+	};
+	const castleLevelNow = () => tileAt(api().tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level ?? 1;
+	const spawnMonsters = () => {
+		const owned = utils.economyTiles(api().tiles, api().freeTiles);
+		if (owned < 5) return;
+		// the spawn timers pause while monsters and chests fill SPAWN_LIMIT.maxFraction of the free tiles
+		const cap = Math.max(cfg.SPAWN_LIMIT.minAllowed, Math.floor(cfg.SPAWN_LIMIT.maxFraction * owned)) - 1;
+		while (t >= nextRatAt && waiting.filter((m) => m.type === 'rat').length < Math.max(1, cap - 1)) {
+			const { min, max } = monsters.spawnLevelRange('rat', castleLevelNow());
+			waiting.push({ type: 'rat', at: nextRatAt, spawnLevel: Math.round((min + max) / 2) });
+			nextRatAt += spawn.intervalSec;
+		}
+		if (t >= nextRatAt) nextRatAt = t + spawn.intervalSec;
+		if (t >= nextKingAt && !waiting.some((m) => m.type === 'ratKing')) {
+			const { min, max } = monsters.spawnLevelRange('ratKing', castleLevelNow());
+			waiting.push({ type: 'ratKing', at: t, spawnLevel: Math.round((min + max) / 2) });
+		}
+	};
+	/** Fights what is waiting with the gear the schedule says the player has; pays the kill like lib/loot/kill.ts does. */
+	const fightWaiting = () => {
+		const day = t / 86400;
+		const gear = [...GEAR_SCHEDULE].reverse().find((g) => day >= g.day) ?? GEAR_SCHEDULE[0];
+		const rates = api().resourceRates.total;
+		const xpRate = rates.xp * (1 + (api().characterStats.xpGainMultiplier ?? 0) / 100);
+		waiting.sort((a, b) => a.spawnLevel - b.spawnLevel);
+		const left: typeof waiting = [];
+		for (const m of waiting) {
+			const level = monsters.levelAtAge(m.spawnLevel, t - m.at);
+			let won = false;
+			if (m.type === 'rat') won = level <= gear.maxRat;
+			else if (t >= kingRetryAt && gear.king > 0) {
+				won = Math.random() < gear.king;
+				if (!won) kingRetryAt = t + combatCfg.COMBAT.auto.bossRetryCooldownSec;
+			}
+			if (!won) {
+				left.push(m);
+				continue;
+			}
+			const r = killReward(m.type, level, { gold: rates.gold, xp: xpRate, hide: rates.hide });
+			store.setState((st) => ({
+				resources: {
+					...st.resources,
+					gold: st.resources.gold + r.gold,
+					xp: st.resources.xp + r.xp,
+					hide: st.resources.hide + r.hide,
+				},
+			}));
+			if (m.type === 'ratKing') nextKingAt = t + spawn.bossIntervalSec;
+			milestones[`kills${m.type}`] = (milestones[`kills${m.type}`] ?? 0) + 1;
+		}
+		waiting = left;
+	};
+	const killReward = (type: 'rat' | 'ratKing', level: number, rates: { gold: number; xp: number; hide: number }) =>
+		kill.killIncome({ type, level }, { goldPerSec: rates.gold, xpPerSec: rates.xp, hidePerSec: rates.hide, luck: 0 });
+	if (profile.combat) resetCombat();
 
 	const finished = () => {
 		const s = api();
@@ -372,7 +495,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const s = api();
 			const r = s.resourceRates.total;
 			console.error(
-				`[${name}] day ${lastTraceDay} tiles ${utils.economyTiles(s.tiles, s.freeTiles)} castle ${tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level} up=${s.castleUpgrade ? Math.round(s.castleUpgrade.remainingSec / 3600) + 'h' : '-'} lvl ${s.level.level} click${s.clickLevel} gold ${Math.round(s.resources.gold)} (+${r.gold.toFixed(1)}/s) wood ${Math.round(s.resources.wood)} stone ${Math.round(s.resources.stone)} coal ${Math.round(s.resources.coal)} food ${Math.round(s.resources.food)} (+${r.food.toFixed(1)}) meat ${Math.round(s.resources.meat)} (+${r.meat.toFixed(1)}) farm ${JSON.stringify(s.farmLevels)}`
+				`[${name}] day ${lastTraceDay} tiles ${utils.economyTiles(s.tiles, s.freeTiles)} castle ${tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level} up=${s.castleUpgrade ? Math.round(s.castleUpgrade.remainingSec / 3600) + 'h' : '-'} lvl ${s.level.level} click${s.clickLevel} gold ${Math.round(s.resources.gold)} (+${r.gold.toFixed(1)}/s) wood ${Math.round(s.resources.wood)} stone ${Math.round(s.resources.stone)} coal ${Math.round(s.resources.coal)} food ${Math.round(s.resources.food)} (+${r.food.toFixed(1)}) hide ${Math.round(s.resources.hide)} (+${r.hide.toFixed(2)}) meat ${Math.round(s.resources.meat)} (+${r.meat.toFixed(1)}) farm ${JSON.stringify(s.farmLevels)}`
 			);
 		}
 		const active = isActive(t);
@@ -412,12 +535,17 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		}
 		api().tick(step * 1000);
 		t += step;
+		if (profile.combat) {
+			spawnMonsters();
+			if (active) fightWaiting();
+		}
 
-		if (t - lastDecision >= step) {
+		const decisionGap = profile.human ? profile.human.decisionSec : step;
+		if (t - lastDecision >= decisionGap && (active || !profile.human)) {
 			lastDecision = t;
 			decide(active);
 			const lvl = api().level.level;
-			[10, 20, 30].forEach((n) => lvl >= n && mark(`level${n}`, t));
+			[10, 20, 30, 35, 40, 50, 75, 100].forEach((n) => lvl >= n && mark(`level${n}`, t));
 			if (finished()) mark('finished', t);
 			const castleNow = tileAt(api().tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level ?? 1;
 			const totalRebirths = profile.rebirthAtCastle ? profile.rebirths ?? 1 : 0;
@@ -425,12 +553,15 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			if (profile.rebirthAtCastle && run <= totalRebirths && castleNow >= profile.rebirthAtCastle && territory && !api().castleUpgrade) {
 				mark('rebirth', t);
 				const before = api().prestige.legacyEarned;
+				const levelBefore = api().level.level;
 				if (api().rebirth()) {
+					milestones[`lvlAtRebirth${run}`] = levelBefore;
 					milestones[`legacy${run}`] = api().prestige.legacyEarned - before;
 					run++;
 					runStart = t;
 					frontierDirty = true;
 					buildingCursor = 0;
+					if (profile.combat) resetCombat();
 				}
 			}
 			if (totalRebirths > 0) {
@@ -482,6 +613,11 @@ const ORDER = [
 	'level10',
 	'level20',
 	'level30',
+	'level35',
+	'level40',
+	'level50',
+	'level75',
+	'level100',
 	'finished',
 ];
 
@@ -507,13 +643,13 @@ function renderMarkdown(
 	const extraKeys = Array.from(
 		new Set(
 			names.flatMap((n) =>
-				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(legacy[0-9]+|rebirth|r[0-9]+[.](castle6|tiles100|finished))$/.test(k))
+				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(legacy[0-9]+|lvlAtRebirth[0-9]+|kills.*|rebirth|r[0-9]+[.](castle6|tiles100|finished|level35|level50|level100))$/.test(k))
 			)
 		)
 	).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
 	[...ORDER, ...extraKeys].forEach((key) => {
 		if (!names.some((n) => results[n][key] != null) && !ORDER.includes(key)) return;
-		const isCount = key.startsWith('legacy');
+		const isCount = key.startsWith('legacy') || key.startsWith('lvlAtRebirth') || key.startsWith('kills');
 		const cell = (n: string) => {
 			if (isCount) return String(results[n][key] ?? '—');
 			const spread = spreads?.[n]?.[key];
@@ -523,6 +659,19 @@ function renderMarkdown(
 		lines.push(`| ${key} | ${names.map(cell).join(' | ')} |`);
 	});
 	lines.push('');
+	const waitNames = names.filter((n) => tileWaits[n]);
+	if (waitNames.length) {
+		lines.push('');
+		lines.push('Minutes the income needs to cover what is still missing of each part of the next tile, right after the purchase that reached that tile count (first run; the biggest number holds the player back):');
+		lines.push('');
+		lines.push('| profile | tiles | gold | wood | stone | coal | food | hide |');
+		lines.push('| --- | --- | --- | --- | --- | --- | --- | --- |');
+		waitNames.forEach((n) =>
+			Object.entries(tileWaits[n]).forEach(([tiles, w]) =>
+				lines.push(`| ${n} | ${tiles} | ${['gold', 'wood', 'stone', 'coal', 'food', 'hide'].map((r) => (w[r] == null ? '—' : w[r])).join(' | ')} |`)
+			)
+		);
+	}
 	lines.push(
 		'Profiles: idle = never clicks; casual = 1 click/s for 3 h/day; hardcore = 4 clicks/s for 8 h/day; ' +
 			'autoclicker = 20 clicks/s 24 h/day (the limiter should keep it at roughly hardcore pace).'

@@ -192,6 +192,8 @@ export interface Monster {
 export interface KillSummary {
 	gold: number;
 	xp: number;
+	/** Pelts the kill paid (a share of the farm's hide income); absent in a notice from before hide came from kills */
+	hide?: number;
 	items: Drop[];
 	/** Gold paid for drops that did not fit into the bag */
 	convertedGold: number;

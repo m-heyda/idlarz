@@ -14,6 +14,7 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 | [06-playtest-and-pacing-report.md](06-playtest-and-pacing-report.md) | Why the old game finished in ~3 days, what the rebalance changed, simulated results incl. castle 7–10 and Rebirth |
 | [07-security-and-exploits.md](07-security-and-exploits.md) | Save vault, validation, hidden save tools, exploit audit, server-verified saves (later) |
 | [08-followup-plan.md](08-followup-plan.md) | What to build next, in order, with sizes and acceptance criteria |
+| [13-roadmap-building-and-resources.md](13-roadmap-building-and-resources.md) | Draft: the building rework (levels, demolish, specialisation), tier-2 resources and the rules for adding one, rebirth hooks |
 | [12-roadmap-features-and-bugs.md](12-roadmap-features-and-bugs.md) | The planning page: accounts-only and server-run combat as built, the building rework to come, known bugs, the server-migration backlog, planned config extensions |
 | [11-offline-and-sealed-rolls.md](11-offline-and-sealed-rolls.md) | Server-held offline progress, sealed chest and kill rolls, spawn tickets, gems, Luck effects and the threat model |
 | [10-loot-system.md](10-loot-system.md) | The loot pipeline: profiles, rarity, item level, affixes, pools, saves, and how to add items, affixes and rarities |
@@ -27,7 +28,7 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 ```bash
 npm run report   # regenerate docs/generated/balance-tables.md from the config
 npm run sim      # bot simulation on the real store -> docs/generated/sim-milestones.md
-npm run sim -- --seeds=3 hardcore         # median and min-max over 3 seeds (profiles: idle casual hardcore autoclicker hardcore-rebirth6 hardcore-rebirth10)
+npm run sim -- --seeds=3 hardcore         # median and min-max over 3 seeds (profiles: idle casual hardcore autoclicker human human-rebirth6 human-rebirth8 hardcore-rebirth6 hardcore-rebirth10)
 npm run sim -- --maxdays=60 hardcore      # stop early
 npm run sim -- --legacy hardcore          # approximate the pre-rebalance game
 npm run sim -- --set=SCALING_CONFIG.growthLate=1.25 castleCostScale=...   # try a tweak without editing files
