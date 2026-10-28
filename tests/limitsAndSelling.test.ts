@@ -68,6 +68,17 @@ test('a new sell bonus applies to resources, bag gear, junk, auto-sold drops and
 
 // ---- Organize is a bag function, in the global menu too -------------------------------------------------------------------------
 
+test('the global menu keeps the battle switches apart: a section of their own, at the bottom, above the view options', () => {
+	freshGame();
+	const ids = globalMenuItems().map((entry) => entry.id);
+	assert.ok(ids.indexOf('autoBattle') > ids.indexOf('import'), 'after the save and bag entries');
+	assert.equal(ids.indexOf('autoUse'), ids.indexOf('autoBattle') + 1);
+	assert.equal(ids.indexOf('minimap'), ids.indexOf('autoUse') + 1, 'right above the view options');
+	const items = globalMenuItems();
+	assert.equal(items.find((entry) => entry.id === 'autoBattle')?.separator, true, 'a rule above the battle section');
+	assert.equal(items.find((entry) => entry.id === 'minimap')?.separator, true, 'and one below it');
+});
+
 test('the global menu has an Organize bag entry that tidies the bag', () => {
 	freshGame();
 	const item = globalMenuItems().find((entry) => entry.id === 'organize');

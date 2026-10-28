@@ -219,7 +219,7 @@ const Tutorial: React.FC = () => {
 					his badge). Bosses can crit, can resist Stun and carry drops nobody else has.
 					<b>Click a monster</b> to fight it: your weapon and the monster then each swing at their own attack speed on their own (nobody clicks to hit). With{' '}
 					<b>Auto-battle</b> on (right-click menu or the fight panel; off at the start) the server also sends you against the next monster, one at a time, so you do not have to look for them.
-					The fight panel shows only while a fight is open and can be minimized to an icon, and a notice tells you when you win. Potions and skills have
+					The fight window opens the moment you click, shows only while a fight is open and can be minimized to an icon; when you win it stays with the dead monster and its loot until you close it. Potions and skills have
 					hotkeys (1-5), or switch on <b>Auto-use</b> to let the server drink and cast for you. Right-click a monster for <b>Dismiss</b>: after a confirmation
 					it is removed from the map with no reward, which frees a place when one is too strong for you.
 				</p>

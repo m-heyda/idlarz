@@ -35,10 +35,15 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 			label: 'Organize bag',
 			onSelect: () => useUiStore.getState().showToast(useGameStore.getState().organizeBag() ? 'Bag organized' : 'Finish the fight first'),
 		},
-		// the combat panel only exists during a fight, so the two switches live here too (a click on a monster starts a fight either way)
+		{ id: 'save', label: 'Save game', separator: full, liveHint: () => cloudHint(Date.now()), onSelect: () => void saveGame() },
+		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
+		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },
+		// the battle switches are a section of their own, at the bottom above the view options (the combat window only shows during a fight;
+		// a click on a monster starts a fight either way)
 		{
 			id: 'autoBattle',
 			label: 'Auto-battle',
+			separator: true,
 			hint: 'monsters one by one',
 			checked: combat.autoBattle,
 			onSelect: () => useGameStore.getState().setAutoBattle(!combat.autoBattle),
@@ -50,9 +55,6 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 			checked: combat.autoUse,
 			onSelect: () => useGameStore.getState().setAutoUse(!combat.autoUse),
 		},
-		{ id: 'save', label: 'Save game', separator: full, liveHint: () => cloudHint(Date.now()), onSelect: () => void saveGame() },
-		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
-		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },
 		{
 			id: 'minimap',
 			label: 'Show minimap',

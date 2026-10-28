@@ -121,3 +121,62 @@
 	height: 100%;
 	background: #38a030;
 }
+
+/* the window while the server has not answered yet: the monster waits, a little dimmed */
+.fight-sprite[data-loading='true'] {
+	opacity: 0.6;
+}
+
+.fight-loading {
+	position: absolute;
+	bottom: 6px;
+	left: 0;
+	right: 0;
+	text-align: center;
+	font-size: 0.8rem;
+	color: #f0d27a;
+	text-shadow: 1px 1px 0 #000;
+}
+
+/* the result: the monster lies dead, grey, with a red cross over it */
+.fight-result {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	color: #f0e6d0;
+}
+
+.fight-dead {
+	position: relative;
+	display: inline-block;
+}
+
+.fight-dead .monster-art {
+	filter: grayscale(1) brightness(0.55);
+	animation-play-state: paused;
+}
+
+.fight-dead::before,
+.fight-dead::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 120%;
+	height: 7px;
+	background: #d8261c;
+	box-shadow: 0 0 0 2px #0a0605, inset 0 2px 0 rgba(255, 255, 255, 0.35);
+}
+
+.fight-dead::before {
+	transform: translate(-50%, -50%) rotate(40deg);
+}
+
+.fight-dead::after {
+	transform: translate(-50%, -50%) rotate(-40deg);
+}
+
+.combat-head .combat-min + .combat-min {
+	margin-left: 2px;
+}

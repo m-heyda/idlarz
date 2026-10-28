@@ -154,6 +154,7 @@ export const initialCombat = (): CombatClientState => ({
 	at: 0,
 	eventNo: null,
 	notice: null,
+	pending: null,
 });
 
 /** All game data of a brand-new game (no actions). */
@@ -368,6 +369,8 @@ const createGameSlice = (
 				at: view.at,
 				eventNo: view.eventNo,
 				notice,
+				// a click waits for the server's answer; once a fight is open (or the answer came) it is over
+				pending: view.fight ? null : state.combat.pending,
 			},
 		});
 		writeCursor(view.eventNo);
@@ -699,9 +702,16 @@ const createGameSlice = (
 		startFight: (id: number) => {
 			const state = get();
 			const monster = state.monsters.find((m) => m.id === id);
-			if (!monster?.ticket || state.combat.fight || state.combat.maxHp <= 0) return false;
+			if (!monster?.ticket || state.combat.fight || state.combat.pending || state.combat.maxHp <= 0) return false;
+			// the window opens at once (maximized, loading) instead of after the server's answer; the answer fills it in or closes it
+			useUiStore.getState().setPref('combatMinimized', false);
+			set({ combat: { ...state.combat, pending: { type: monster.type, level: monster.level } } });
+			const settled = () => set((s) => (s.combat.pending ? { combat: { ...s.combat, pending: null } } : {}));
+			const giveUp = setTimeout(settled, 10_000);
 			void requestUse(newClaimId(), { kind: 'fight', n: monster.ticket }, sinceNow()).then((reply) => {
+				clearTimeout(giveUp);
 				settleFight(reply, 'The fight could not start.');
+				settled();
 				signalSyncNow();
 			});
 			return true;

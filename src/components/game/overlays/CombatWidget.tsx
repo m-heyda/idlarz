@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { formatCompact } from '@/utils/formatters';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { formatCompact, formatNumber } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { COMBAT } from '@/config/combatConfig';
@@ -11,7 +11,9 @@ import audioManager from '@/utils/audioManager';
 import MonsterArt from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
 import NotifyDot from '../NotifyDot';
+import ResourceIcon from '../ResourceIcon';
 import { slotProps } from '../itemUi';
+import type { CombatNotice } from '@/types/game';
 import '@/styles/Fight.css';
 import '@/styles/CombatWidget.css';
 
@@ -22,15 +24,63 @@ interface FloatNumber {
 	x: number;
 }
 
-const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | 'mana'; label: string }> = ({ value, max, kind, label }) => {
-	const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
+/**
+ * A bar that drains smoothly. The server answers every couple of seconds with where the fight stands, so the number jumps; the bar
+ * instead runs from where it is to the new number over about the time since the last answer (the next one arrives around then), which
+ * makes the HP of both sides move continuously. `snapKey` changes with a new fight: the bar starts at once from its first number.
+ * It paints itself (no re-render per frame).
+ */
+const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | 'mana'; label: string; snapKey?: unknown }> = ({ value, max, kind, label, snapKey }) => {
+	const fillRef = useRef<HTMLDivElement>(null);
+	const trailRef = useRef<HTMLDivElement>(null);
+	const textRef = useRef<HTMLDivElement>(null);
+	const shown = useRef(value);
+	const maxRef = useRef(max);
+	const lastChange = useRef(0);
+	const lastKey = useRef<unknown>(undefined);
+	const frame = useRef(0);
+
+	const paint = useCallback(
+		(v: number) => {
+			shown.current = v;
+			const pct = maxRef.current > 0 ? Math.max(0, Math.min(100, (v / maxRef.current) * 100)) : 0;
+			if (fillRef.current) fillRef.current.style.width = `${pct}%`;
+			if (trailRef.current) trailRef.current.style.width = `${pct}%`;
+			if (textRef.current) textRef.current.textContent = `${label} ${formatCompact(Math.ceil(v))} / ${formatCompact(Math.round(maxRef.current))}`;
+		},
+		[label]
+	);
+
+	useLayoutEffect(() => {
+		maxRef.current = max;
+		cancelAnimationFrame(frame.current);
+		const now = performance.now();
+		const first = lastKey.current === undefined || lastKey.current !== snapKey;
+		const interval = now - lastChange.current;
+		lastKey.current = snapKey;
+		lastChange.current = now;
+		// a new fight, a first number, or a jump after a long silence: no animation
+		if (first || interval > 6000 || Math.abs(value - shown.current) < 1e-9) {
+			paint(value);
+			return;
+		}
+		const from = shown.current;
+		const duration = Math.max(350, Math.min(2600, interval));
+		const start = now;
+		const step = (time: number) => {
+			const k = Math.min(1, (time - start) / duration);
+			paint(from + (value - from) * k);
+			if (k < 1) frame.current = requestAnimationFrame(step);
+		};
+		frame.current = requestAnimationFrame(step);
+		return () => cancelAnimationFrame(frame.current);
+	}, [value, max, snapKey, paint]);
+
 	return (
 		<div className='fight-bar' data-kind={kind} aria-label={label}>
-			<div className='fight-bar-trail' style={{ width: `${pct}%` }} />
-			<div className='fight-bar-fill' style={{ width: `${pct}%` }} />
-			<div className='fight-bar-text'>
-				{label} {formatCompact(Math.ceil(value))} / {formatCompact(Math.round(max))}
-			</div>
+			<div ref={trailRef} className='fight-bar-trail' />
+			<div ref={fillRef} className='fight-bar-fill' style={{ transition: 'none' }} />
+			<div ref={textRef} className='fight-bar-text' />
 		</div>
 	);
 };
@@ -40,12 +90,73 @@ const typingInField = (target: EventTarget | null): boolean => {
 	return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
 };
 
+/** What a fight left behind, inside the window: the monster dead (red cross), the gold, XP and hide, the drops (hover for the item card). */
+const FightResult: React.FC<{ notice: CombatNotice; playerHp: number; maxHp: number }> = ({ notice, playerHp, maxHp }) => {
+	const def = monsterDef(notice.type);
+	const { summary } = notice;
+	const won = notice.kind === 'won' && summary;
+	return (
+		<div className='fight-result'>
+			<div className='combat-stage'>
+				<span className='fight-sprite' data-dead={!!won}>
+					<span className={won ? 'fight-dead' : undefined}>
+						<MonsterArt type={notice.type} scale={notice.type === 'ratKing' ? 3 : 4} />
+					</span>
+				</span>
+			</div>
+			{won ? (
+				<>
+					<div className='victory-title'>{def.label} defeated</div>
+					<div className='victory-row'>
+						<span className='flex items-center gap-1'>
+							+{formatNumber(Math.floor(summary.gold))} <ResourceIcon resource='gold' />
+						</span>
+						<span className='flex items-center gap-1'>
+							+{formatNumber(Math.floor(summary.xp))} <ResourceIcon resource='xp' />
+						</span>
+						{(summary.hide ?? 0) > 0 && (
+							<span className='flex items-center gap-1'>
+								+{formatNumber(Math.floor(summary.hide ?? 0))} <ResourceIcon resource='hide' />
+							</span>
+						)}
+					</div>
+					{summary.items.length > 0 ? (
+						<div className='victory-loot'>
+							{summary.items.map((drop, i) => (drop.kind === 'gear' ? <ItemSlot key={i} item={drop.item} /> : <ItemSlot key={i} itemId={drop.id} qty={drop.qty} />))}
+						</div>
+					) : (
+						<div className='victory-note'>No drops this time</div>
+					)}
+					{summary.lucky && <div className='victory-note text-yellow-300'>Lucky monster! x3 gold and XP and an extra piece of gear roll</div>}
+					{summary.autoSold.count > 0 && (
+						<div className='victory-note'>
+							Auto-sold {summary.autoSold.count} piece{summary.autoSold.count === 1 ? '' : 's'} of gear for {formatNumber(summary.autoSold.gold)} gold
+						</div>
+					)}
+					{summary.convertedGold > 0 && <div className='victory-note'>Bag full - {formatNumber(summary.convertedGold)} gold paid for the drops that did not fit</div>}
+				</>
+			) : (
+				<>
+					<div className='victory-title'>{notice.kind === 'defeated' ? `Knocked out by the ${def.label}` : `Time ran out against the ${def.label}`}</div>
+					{notice.taunt && <div className='victory-note italic'>&ldquo;{notice.taunt}&rdquo;</div>}
+					<div className='victory-note'>The monster stays where it is.</div>
+				</>
+			)}
+			<div className='victory-status'>
+				HP {formatCompact(Math.ceil(playerHp))}/{formatCompact(maxHp)}
+			</div>
+		</div>
+	);
+};
+
 /**
- * The combat panel, shown only while a fight is open. A click on a monster starts the fight (or Auto-battle does, one monster after the
- * other); the server then swings both ways at each side's attack speed (see src/lib/offline/fight.ts), so this only shows what it says.
+ * The combat window. It opens the moment a monster is clicked (a loading state until the server answers), shows the fight (HP bars that
+ * drain smoothly between the server's answers), and when the fight is over stays open with the result: the monster dead with a red
+ * cross and its loot, until it is closed (or after a while). A click on a monster starts the fight (or Auto-battle does, one monster
+ * after the other); the server swings both ways at each side's attack speed (see src/lib/offline/fight.ts), so this only shows what it says.
  * Potions and skills are used with the number keys (their slots are not buttons); the switches (also in the right-click menu) are
  * Auto-battle and Auto-use (it drinks, heals and stuns with fixed rules).
- * The panel shrinks to an icon, and a win or defeat is announced by the notice stack either way.
+ * The window shrinks to an icon (a click on a monster opens it again).
  */
 const CombatWidget: React.FC = () => {
 	const combat = useGameStore((state) => state.combat);
@@ -57,6 +168,7 @@ const CombatWidget: React.FC = () => {
 	const requestSkill = useGameStore((state) => state.requestSkill);
 	const setAutoBattle = useGameStore((state) => state.setAutoBattle);
 	const setAutoUse = useGameStore((state) => state.setAutoUse);
+	const clearNotice = useGameStore((state) => state.clearCombatNotice);
 	const minimized = useUiStore((state) => state.combatMinimized);
 	const setPref = useUiStore((state) => state.setPref);
 
@@ -65,15 +177,19 @@ const CombatWidget: React.FC = () => {
 	const [shake, setShake] = useState(false);
 	const nextId = useRef(1);
 	const shakeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+	const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	const fight = combat.fight;
+	const pending = combat.pending;
+	const notice = combat.notice;
 	const pushNumber = useCallback((text: string, kind: FloatNumber['kind']) => {
 		const id = nextId.current++;
 		setNumbers((prev) => [...prev.slice(-8), { id, text, kind, x: 20 + Math.random() * 60 }]);
 		setTimeout(() => setNumbers((prev) => prev.filter((n) => n.id !== id)), 900);
 	}, []);
 
-	// The picture is driven by the events the server reported (see the store's playFx)
+	// The picture is driven by the events the server reported (see the store's playFx). Being hit makes the window shake and flash, with no
+	// sound: a sound on every bite was confusing next to the sounds of the rest of the game.
 	useEffect(() => {
 		const onFx = (e: Event) => {
 			const fx = (e as CustomEvent<CombatFx>).detail;
@@ -85,7 +201,6 @@ const CombatWidget: React.FC = () => {
 				clearTimeout(shakeTimer.current);
 				shakeTimer.current = setTimeout(() => setShake(false), 320);
 				pushNumber(fx.crit ? `-${formatCompact(fx.amount)}!` : `-${formatCompact(fx.amount)}`, 'hurt');
-				audioManager.playSound('wrong');
 			} else if (fx.kind === 'heal') {
 				pushNumber(`+${formatCompact(fx.amount)}`, 'heal');
 				audioManager.playSound('purchase');
@@ -98,6 +213,20 @@ const CombatWidget: React.FC = () => {
 			clearTimeout(shakeTimer.current);
 		};
 	}, [pushNumber]);
+
+	// A won fight is announced with the fanfare; the result closes itself after a while (hover keeps it open)
+	const noticeId = notice?.id;
+	const noticeKind = notice?.kind;
+	const armClose = useCallback(() => {
+		clearTimeout(closeTimer.current);
+		closeTimer.current = setTimeout(clearNotice, COMBAT.victoryToastSec * 1000);
+	}, [clearNotice]);
+	useEffect(() => {
+		if (noticeId === undefined) return;
+		if (noticeKind === 'won') audioManager.playSound('fanfare');
+		armClose();
+		return () => clearTimeout(closeTimer.current);
+	}, [noticeId, noticeKind, armClose]);
 
 	// Up to three potion stacks from the bag, with hotkeys 1-3
 	const potions = bag
@@ -119,112 +248,144 @@ const CombatWidget: React.FC = () => {
 		return () => window.removeEventListener('keydown', onKey);
 	}, [potions, requestPotion, requestSkill]);
 
-	// the server has not said anything yet, or no fight is open: the panel (and its icon) only exist while one is
-	if (combat.maxHp <= 0 || !fight) return null;
+	// nothing to show: the server has not said anything yet, or there is no fight, no click waiting for the server and no result to read
+	if (combat.maxHp <= 0 || (!fight && !pending && !notice)) return null;
 
 	const hpPct = Math.max(0, Math.min(100, (playerHp / combat.maxHp) * 100));
 
-	if (minimized) {
+	// what the window is about: the open fight, the monster that was just clicked (the server has not answered yet), or the last result
+	const type = fight?.type ?? pending?.type ?? notice!.type;
+	const monsterLevel = fight?.level ?? pending?.level ?? notice!.level;
+	const def = monsterDef(type);
+	const boss = def.grade === 'boss';
+
+	// a click on a monster opens the window at once, minimized or not
+	if (minimized && !pending) {
 		return (
 			<button
 				className='combat-icon'
 				data-fighting={!!fight}
 				onClick={() => setPref('combatMinimized', false)}
-				title={`Fighting a ${monsterDef(fight.type).label} - click to open`}
+				title={fight ? `Fighting a ${def.label} - click to open` : `The fight against the ${def.label} is over - click to see the result`}
 				aria-label='Open the combat panel'>
 				<span className='combat-icon-art' aria-hidden>
-					<MonsterArt type={fight.type} scale={2} />
+					<MonsterArt type={type} scale={2} />
 				</span>
 				<span className='combat-icon-hp' aria-hidden>
 					<i style={{ width: `${hpPct}%` }} />
 				</span>
-				<NotifyDot show={!!combat.notice} label='Fight result waiting' />
+				<NotifyDot show={!fight && !!notice} label='Fight result waiting' />
 			</button>
 		);
 	}
 
-	const def = monsterDef(fight.type);
-	const boss = def.grade === 'boss';
-	const traits = monsterStats(fight.type, fight.level);
+	const traits = monsterStats(type, monsterLevel);
+	const showFight = !!fight || !!pending;
+	const snapKey = fight ? `fight-${fight.n}` : 'pending';
+
+	/** The hotkey slots and the potions (a fight only), and the two switches */
+	const controls = (switchesOnly: boolean) => (
+		<>
+			{!switchesOnly && (
+				<>
+					{/* Hotkey slots: they show what is ready, they are not buttons */}
+					<div className='fight-skills'>
+						{SKILL_IDS.map((id, i) => {
+							const skill = SKILLS[id];
+							const locked = level < skill.unlockLevel;
+							const cd = combat.cd[id];
+							return (
+								<div
+									key={id}
+									className='fight-skill'
+									data-locked={locked}
+									data-nomana={!locked && playerMp < skill.manaCost}
+									title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${4 + i}.`}>
+									<span className='fight-skill-name'>{skill.name}</span>
+									<span className='fight-skill-cost'>{locked ? `Lv ${skill.unlockLevel}` : `${skill.manaCost} MP`}</span>
+									<span className='fight-hotkey'>{4 + i}</span>
+									{!locked && cd > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (cd / skill.cooldownSec) * 100)}%` }} />}
+								</div>
+							);
+						})}
+					</div>
+					<div className='fight-potions'>
+						{potions.length === 0 && <span className='px-tip-muted text-xs'>No potions</span>}
+						{potions.map(({ slot }, i) => (
+							<div key={i} className='fight-potion' title={`Press ${i + 1} to drink`}>
+								<ItemSlot {...slotProps(slot)} />
+								<span className='fight-hotkey'>{i + 1}</span>
+								{combat.cd.potion > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (combat.cd.potion / COMBAT.potionCooldownSec) * 100)}%` }} />}
+							</div>
+						))}
+					</div>
+				</>
+			)}
+			<div className='combat-switches'>
+				<label title='After a fight the server sends you against the next monster, one at a time. Off: click a monster to fight it'>
+					<input type='checkbox' checked={combat.autoBattle} onChange={(e) => setAutoBattle(e.target.checked)} /> Auto-battle
+				</label>
+				<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
+					<input type='checkbox' checked={combat.autoUse} onChange={(e) => setAutoUse(e.target.checked)} /> Auto-use
+				</label>
+			</div>
+		</>
+	);
 
 	return (
-		<section className='combat-widget px-card' aria-label='Combat'>
+		<section className='combat-widget px-card' aria-label='Combat' onMouseEnter={() => clearTimeout(closeTimer.current)} onMouseLeave={() => notice && !fight && armClose()}>
 			<header className='combat-head'>
-				<b>{`${boss ? '☠ ' : ''}${def.label} - Lv ${fight.level}`}</b>
-				<button className='combat-min' onClick={() => setPref('combatMinimized', true)} aria-label='Minimize the combat panel' title='Minimize'>
-					_
-				</button>
+				<b>{`${boss ? '☠ ' : ''}${def.label} - Lv ${monsterLevel}`}</b>
+				<span className='flex gap-1'>
+					{!showFight && (
+						<button className='combat-min' onClick={clearNotice} aria-label='Close the result' title='Close'>
+							x
+						</button>
+					)}
+					<button className='combat-min' onClick={() => setPref('combatMinimized', true)} aria-label='Minimize the combat panel' title='Minimize'>
+						_
+					</button>
+				</span>
 			</header>
-			<div className='fight-body' data-shake={shake}>
-				<div className='fight-hurt-flash' data-on={shake} aria-hidden />
-				{boss && (
-					<div className='fight-boss' title='A boss: its own drops, crits and sometimes resists Stun'>
-						<b>BOSS</b>
-						<span className='fight-boss-traits'>
-							Crits {formatCompact(traits.critChance)}% - resists Stun {formatCompact(traits.stunResist)}% - armor {formatCompact(Math.round(traits.armor))}
-						</span>
-					</div>
-				)}
-				{fight.timeLeftSec !== null && (
-					<div className='fight-timer' data-low={fight.timeLeftSec <= 10}>
-						Time left: {Math.ceil(fight.timeLeftSec)} s
-					</div>
-				)}
-				<div className='combat-stage'>
-					<span key={hitTick} className='fight-sprite' data-hit={hitTick > 0}>
-						<MonsterArt type={fight.type} scale={fight.type === 'ratKing' ? 3 : 4} />
-					</span>
-					{fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {fight.stunLeft.toFixed(1)} s</div>}
-					{numbers.map((n) => (
-						<span key={n.id} className='fight-number' data-kind={n.kind} style={{ left: `${n.x}%` }}>
-							{n.text}
-						</span>
-					))}
-				</div>
-				<Bar value={fight.monsterHp} max={fight.monsterMaxHp} kind='monster' label={def.label} />
-				<Bar value={playerHp} max={combat.maxHp} kind='player' label='You' />
-				<Bar value={playerMp} max={combat.maxMp} kind='mana' label='Mana' />
-
-				{/* Hotkey slots: they show what is ready, they are not buttons */}
-				<div className='fight-skills'>
-					{SKILL_IDS.map((id, i) => {
-						const skill = SKILLS[id];
-						const locked = level < skill.unlockLevel;
-						const cd = combat.cd[id];
-						return (
-							<div
-								key={id}
-								className='fight-skill'
-								data-locked={locked}
-								data-nomana={!locked && playerMp < skill.manaCost}
-								title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${4 + i}.`}>
-								<span className='fight-skill-name'>{skill.name}</span>
-								<span className='fight-skill-cost'>{locked ? `Lv ${skill.unlockLevel}` : `${skill.manaCost} MP`}</span>
-								<span className='fight-hotkey'>{4 + i}</span>
-								{!locked && cd > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (cd / skill.cooldownSec) * 100)}%` }} />}
-							</div>
-						);
-					})}
-				</div>
-				<div className='fight-potions'>
-					{potions.length === 0 && <span className='px-tip-muted text-xs'>No potions</span>}
-					{potions.map(({ slot }, i) => (
-						<div key={i} className='fight-potion' title={`Press ${i + 1} to drink`}>
-							<ItemSlot {...slotProps(slot)} />
-							<span className='fight-hotkey'>{i + 1}</span>
-							{combat.cd.potion > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (combat.cd.potion / COMBAT.potionCooldownSec) * 100)}%` }} />}
+			{showFight ? (
+				<div className='fight-body' data-shake={shake}>
+					<div className='fight-hurt-flash' data-on={shake} aria-hidden />
+					{boss && (
+						<div className='fight-boss' title='A boss: its own drops, crits and sometimes resists Stun'>
+							<b>BOSS</b>
+							<span className='fight-boss-traits'>
+								Crits {formatCompact(traits.critChance)}% - resists Stun {formatCompact(traits.stunResist)}% - armor {formatCompact(Math.round(traits.armor))}
+							</span>
 						</div>
-					))}
+					)}
+					{fight && fight.timeLeftSec !== null && (
+						<div className='fight-timer' data-low={fight.timeLeftSec <= 10}>
+							Time left: {Math.ceil(fight.timeLeftSec)} s
+						</div>
+					)}
+					<div className='combat-stage'>
+						<span key={hitTick} className='fight-sprite' data-hit={hitTick > 0} data-loading={!fight}>
+							<MonsterArt type={type} scale={type === 'ratKing' ? 3 : 4} />
+						</span>
+						{!fight && <div className='fight-loading'>Engaging...</div>}
+						{fight && fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {fight.stunLeft.toFixed(1)} s</div>}
+						{numbers.map((n) => (
+							<span key={n.id} className='fight-number' data-kind={n.kind} style={{ left: `${n.x}%` }}>
+								{n.text}
+							</span>
+						))}
+					</div>
+					<Bar value={fight ? fight.monsterHp : traits.maxHp} max={fight ? fight.monsterMaxHp : traits.maxHp} kind='monster' label={def.label} snapKey={snapKey} />
+					<Bar value={playerHp} max={combat.maxHp} kind='player' label='You' snapKey={snapKey} />
+					<Bar value={playerMp} max={combat.maxMp} kind='mana' label='Mana' snapKey={snapKey} />
+					{controls(false)}
 				</div>
-				<div className='combat-switches'>
-					<label title='After a fight the server sends you against the next monster, one at a time. Off: click a monster to fight it'>
-						<input type='checkbox' checked={combat.autoBattle} onChange={(e) => setAutoBattle(e.target.checked)} /> Auto-battle
-					</label>
-					<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
-						<input type='checkbox' checked={combat.autoUse} onChange={(e) => setAutoUse(e.target.checked)} /> Auto-use
-					</label>
+			) : (
+				<div className='fight-body'>
+					<FightResult notice={notice!} playerHp={playerHp} maxHp={combat.maxHp} />
+					{controls(true)}
 				</div>
-			</div>
+			)}
 		</section>
 	);
 };

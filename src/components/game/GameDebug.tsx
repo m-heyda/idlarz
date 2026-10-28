@@ -1,15 +1,13 @@
-import { pickChestSpot } from '@/lib/chests';
 import { castleLevelOf } from '@/lib/castleWard';
 import React, { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, MAX_CATCHUP_SEC, XP_CAP } from '@/config/gameConfig';
-import { MAX_OWNED_TILES, ownedCount, patchTile, tileAt } from '@/utils/world';
+import { XP_CAP } from '@/config/gameConfig';
+import { MAX_OWNED_TILES, ownedCount } from '@/utils/world';
 import { syntheticWorld } from '@/utils/worldGen';
 import { growWorld } from '@/utils/growWorld';
-import { ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '@/catalog';
-import { addGear, addToBag } from '@/lib/inventory';
-import { plainItem, resolveItem } from '@/lib/itemInstance';
+import { ITEM_CATALOG } from '@/catalog';
+import { resolveItem } from '@/lib/itemInstance';
 import { generateLoot, receiveDrops } from '@/lib/loot';
 import { maxHp } from '@/lib/combat';
 import { calculateResourceRates, calculateXpGain, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
@@ -25,28 +23,6 @@ interface DebugAction {
 
 const addResources = (add: Partial<Resources>) => useGameStore.getState().addResources(add);
 const toast = (text: string) => useUiStore.getState().showToast(text);
-
-const spawnChest = () => {
-	// the same placement rule as the timed spawn (frontier-leaning, spread out, never on the castle ward / buildings / monsters)
-	const state = useGameStore.getState();
-	const spot = pickChestSpot(state.tiles, new Set(state.monsters.map((m) => `${m.x},${m.y}`)), castleLevelOf(state.tiles));
-	if (!spot) return toast('No eligible tile for a chest: buy more tiles first');
-	useGameStore.setState((st) => ({
-		tiles: patchTile(st.tiles, spot.x, spot.y, { hasChest: true }),
-		activeChests: st.activeChests + 1,
-	}));
-	toast(`Chest spawned at tile (${spot.x}, ${spot.y})`);
-};
-
-const giveSet = () => {
-	useGameStore.setState((state) => {
-		let bag = state.bag;
-		const { pieces } = SETS.rattatui;
-		const ring = pieces.find((id) => ITEM_CATALOG[id].slot === 'ring'); // a second ring for the other hand
-		for (const id of ring ? [...pieces, ring] : pieces) bag = addGear(bag, plainItem(id)).bag;
-		return { bag: addToBag(bag, STARTER_BAG_ITEMS[0].id, 5).bag };
-	});
-};
 
 /** Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table). */
 const rollLoot = (sourceId: 'rat' | 'ratKing' | 'chest', level?: number) => {
@@ -65,18 +41,6 @@ const rollLoot = (sourceId: 'rat' | 'ratKing' | 'chest', level?: number) => {
 };
 
 const heal = () => useGameStore.setState((state) => ({ playerHp: maxHp(state.characterStats, state.equipment) }));
-
-// Dev shortcuts for testing the late game quickly
-const castleUp = () =>
-	useGameStore.setState((state) => {
-		const castle = tileAt(state.tiles, CASTLE_X, CASTLE_Y);
-		const level = Math.min((castle.level ?? 1) + 1, CASTLE_UPGRADE.maxLevel);
-		const tiles = patchTile(state.tiles, CASTLE_X, CASTLE_Y, {
-			level,
-			upgradeCost: level < CASTLE_UPGRADE.maxLevel ? { ...CASTLE_UPGRADE.upgradeCosts[level - 1] } : undefined,
-		});
-		return { tiles, castleUpgrade: null };
-	});
 
 /** Grows the map by `count` connected tiles at once (a seeded random blob, reaching negative coordinates). Cheat: the XP those tiles would have paid is granted, so the game stays saveable. */
 const growMap = (count: number) => {
@@ -107,10 +71,6 @@ const rolledMap = (purchases: number, policy: 'nearest' | 'random') => {
 	toast(`Rolled map: seed ${seed}, ${purchases} purchases (${policy})`);
 };
 
-const fastForward = () => {
-	for (let i = 0; i < 12; i++) useGameStore.getState().tick(MAX_CATCHUP_SEC * 1000);
-};
-
 const GROUPS: { title: string; actions: DebugAction[] }[] = [
 	{
 		title: 'Resources',
@@ -121,25 +81,15 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 			{ label: '+100k Coal', tone: 'gray', run: () => addResources({ coal: 100000 }) },
 			{ label: '+100k Food', tone: 'gold', run: () => addResources({ food: 100000 }) },
 			{ label: '+100k Meat', tone: 'red', run: () => addResources({ meat: 100000 }) },
-			{ label: '+1.5k XP', tone: 'blue', run: () => addResources({ xp: 1500 }) },
 		],
 	},
 	{
-		title: 'Spawn',
-		actions: [
-			{ label: 'Chest', tone: 'blue', run: spawnChest },
-			{ label: 'Rattatui set', tone: '', run: giveSet },
-			{ label: 'Loot: rat lv 9', tone: 'gray', run: () => rollLoot('rat', 9) },
-			{ label: 'Loot: Rat King', tone: 'gray', run: () => rollLoot('ratKing', 15) },
-			{ label: 'Loot: chest', tone: 'gray', run: () => rollLoot('chest') },
-		],
+		title: 'Loot',
+		actions: [{ label: 'Loot: chest', tone: 'gray', run: () => rollLoot('chest') }],
 	},
 	{
 		title: 'Player',
-		actions: [
-			{ label: 'Heal', tone: '', run: heal },
-			{ label: 'Castle +1 level', tone: 'blue', run: castleUp },
-		],
+		actions: [{ label: 'Heal', tone: '', run: heal }],
 	},
 	{
 		title: 'Map',
@@ -151,10 +101,6 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 			{ label: 'Rolled map 400', tone: 'blue', run: () => rolledMap(400, 'nearest') },
 			{ label: 'Rolled map 400 ragged', tone: 'blue', run: () => rolledMap(400, 'random') },
 		],
-	},
-	{
-		title: 'Time',
-		actions: [{ label: '+1 hour', tone: 'gray', run: fastForward }],
 	},
 ];
 

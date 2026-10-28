@@ -42,7 +42,7 @@ export const COMBAT = {
 	},
 	bagSize: LIMITS.bagSize, // base bag slots; read the current size through limitOf('bagSize', ctx) (Pack Rat and later effects add to it)
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
-	victoryToastSec: 12, // how long the loot notice after a won fight stays up (hover pauses it)
+	victoryToastSec: 15, // how long the result of a fight (the dead monster and its loot) stays in the combat window (hover pauses it)
 	spawn: {
 		firstSec: 120, // first monster this long after the territory reaches minOwnedTiles
 		intervalSec: 900, // then one per this long (chests: 600 s)

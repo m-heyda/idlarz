@@ -232,6 +232,8 @@ export interface CombatClientState {
 	eventNo: number | null;
 	/** The win or defeat the player has not read yet */
 	notice: CombatNotice | null;
+	/** A monster was just clicked and the server has not opened the fight yet: the window is already up, loading (transient) */
+	pending: { type: MonsterType; level: number } | null;
 }
 
 export interface TileProps {
