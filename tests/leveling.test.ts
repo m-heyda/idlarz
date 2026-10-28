@@ -31,13 +31,13 @@ test('every step is a whole number of XP and never smaller than the step before 
 	assert.equal(xpToNextLevel(0), xpToNextLevel(1), 'a nonsense level reads as the first');
 });
 
-test('the pace: level 10 is hours of play, the soft cap is far beyond the first run, and each level past 80 costs more than the one before', () => {
-	// the sim bot earns ~2e5 XP in 4-5 hours, ~1e9 by its first rebirth (day 24) and ~1.2e10 by the third (day 50)
-	assert.ok(cumulativeXp(10) >= 1.5e5 && cumulativeXp(10) <= 3.5e5, `level 10 = ${cumulativeXp(10)}`);
-	assert.ok(cumulativeXp(30) >= 1.5e7 && cumulativeXp(30) <= 4e7, `level 30 = ${cumulativeXp(30)}`);
-	assert.ok(cumulativeXp(LEVELING.softCapLevel) > 5e9, 'the soft cap is a multi-rebirth goal');
-	assert.ok(cumulativeXp(100) > 10 * cumulativeXp(LEVELING.softCapLevel), 'the maximum is far past the soft cap');
-	for (let level = LEVELING.softCapLevel; level < MAX_LEVEL - 1; level++) assert.ok(xpToNextLevel(level + 1) > xpToNextLevel(level));
+test('the pace: level 10 is hours of play, the soft cap is far beyond the first run, and no level costs less than the one before', () => {
+	// the sim bot earns ~1.4e5 XP in 4-5 hours, ~1e8 by day 2, ~3e9 by its third rebirth (day ~10) and ~2e10 by its tenth (day ~25)
+	assert.ok(cumulativeXp(10) >= 1e5 && cumulativeXp(10) <= 3e5, `level 10 = ${cumulativeXp(10)}`);
+	assert.ok(cumulativeXp(30) >= 3e7 && cumulativeXp(30) <= 3e8, `level 30 = ${cumulativeXp(30)}`);
+	assert.ok(cumulativeXp(LEVELING.softCapLevel) > 1e9, 'the soft cap is a multi-rebirth goal');
+	assert.ok(cumulativeXp(100) > 4 * cumulativeXp(LEVELING.softCapLevel), 'the maximum is far past the soft cap');
+	for (let level = 1; level < MAX_LEVEL - 1; level++) assert.ok(xpToNextLevel(level + 1) >= xpToNextLevel(level), `level ${level}`);
 });
 
 test('levels: any XP gives a level between 1 and the maximum; at the maximum the bar is full', () => {

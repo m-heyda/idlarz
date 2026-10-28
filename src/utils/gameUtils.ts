@@ -347,7 +347,7 @@ export const animalOutput = (animal: Animal, count: number, upgrades?: FarmUpgra
 	const up = (id: FarmUpgradeId) => 1 + farmUpgradeLevel(upgrades, id) * FARM_UPGRADES[id].effectPerLevel;
 	out.meat = animal.baseProduction * count * pen * up('feed');
 	const productUpgrade: Record<Animal['product']['resource'], FarmUpgradeId> = { eggs: 'coop', milk: 'dairy', hide: 'tannery' };
-	out[animal.product.resource] = animal.product.perSec * count * pen * up(productUpgrade[animal.product.resource]);
+	out[animal.product.resource] = animal.product.perSec * count * pen * up(productUpgrade[animal.product.resource]) * up('pasture');
 	return out;
 };
 

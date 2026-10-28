@@ -2,7 +2,48 @@
 
 **Why:** a friend "finished" the live game in about 3 days. This document records what the playtest found, which fixes were applied first and why, and what the simulation says now. Applied items are *not* repeated in the backlog ([05](05-balance-backlog-and-roadmap.md)).
 
-## 0. Early-game pace pass (current numbers)
+## 0b. First-rebirth pass: rebirth around day 7, hide, slower levels (current numbers)
+
+**Why:** with server-run combat in, the owner (185 tiles, level 32, 3-4 real days in) hit a "hide wall" and could not see a rebirth before about day 12. Goals: rebirth *available* around day 7 for a person who checks in a few times a day (more room to push on after it: the Legacy gain grows with castle level and tiles), no tile material that silently becomes the limiter, levels that need several rebirths to reach 100. Scope: the first run, one enemy (rat) and its boss (Rat King); the runs after a rebirth were only checked for "faster than the run before".
+
+**What the analysis found (before any change).**
+
+- Hide was not the limiter at the owner's 185 tiles (gold 36 min per tile, hide 18 min, wood 12, stone 14, coal 8, food 3) but it had no way to grow: deer and pigs only, 12 of each, while the gold price climbs ~0.7 % per tile.
+- The real day-7 blocker was the castle: 5→6 cost 20 M gold + 10 M food up front and then a 3-day timer, so a player with an empty purse at day 3.5 could not start it in time. The sim bots never noticed because they sell every surplus and top up at the merchant (castle 6 at ~4.5 d); the owner hoards (3 M meat, 4 M coal unsold).
+- Combat was not in the sim at all.
+- The level curve (x1.3 per level, forever) made level 100 worth ~1e14 XP for one level, and tile XP (125 x 1.02^k x k/4) was ~90 % of all XP.
+
+**New sim profiles** (`scripts/sim.ts`): `human` (one click a second, plays 8-9, 12-13 and 18-23, a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated so it has ~185 tiles after ~3.3 days like the owner), `human-rebirth6` / `human-rebirth8` (the same, rebirthing at castle 6 / 8; they no longer start a castle upgrade past their rebirth level), all with a combat model (a rat every 900 s, the King every 3 h, `GEAR_SCHEDULE`: starter kit, knight gear from day 1.5, obsidian from day 5) paying the real `killIncome`. The table at the end of `generated/sim-milestones.md` shows, per tile count, the minutes the income needs to cover what is *missing* of each part of the next tile.
+
+**What changed** (`src/config/gameConfig.ts` unless noted):
+
+| Area | Before | Now |
+| --- | --- | --- |
+| Castle 4→5 / 5→6 timer | 1 d 12 h / 3 d | 1 d / 2 d |
+| Castle 5→6 cost | 20 M gold, 10 M food (rest unchanged) | 8 M gold, 4 M food |
+| Deer / pig hide per second | 0.0375 / 0.075 | 0.075 / 0.15 (merchant price 4 → 2 gold, so gold income is unchanged) |
+| Tannery | +15 % hide per level | +25 % per level |
+| Pasture (new farm upgrade) | — | +8 % eggs, milk and hide per level, 10 levels, 5 K food + 2.5 K wood x 1.6^n |
+| Tile price in materials | hide 3 % from tile 120, stone 25 % | hide 2 % from tile 100, stone 20 % |
+| Hide from kills (`COMBAT.rewards.hideShare`) | none | rat and King pay hide/s x reward seconds x 0.6 (server-sealed, in the ledger totals) |
+| Tile XP (`BASE_XP_PER_TILE`) | 125 | 45 |
+| Level curve | x1.3 per level | x1.3 up to level 38 (identical), x1.045 after (`XP_LEVEL_SOFT`, `xpToLeaveLevel`) |
+
+The level curve is the old one wherever a save already is (it only ever gives *more* levels for the same XP), so there is no migration; `sanitizeSave` accepts the stat points of the old, lower level for a save written before the change.
+
+**Result** (`npm run sim -- --seeds=3`, median game time):
+
+| milestone | human | idle | hardcore |
+| --- | --- | --- | --- |
+| 100 / 200 / 300 tiles | 1.8 d / 4.0 d / 5.8 d | 7.7 h / 1.5 d / 2.4 d | 7.8 h / 1.3 d / 1.8 d |
+| castle 5 / castle 6 | 3.6 d / **5.8 d** | 2.4 d / 4.8 d | 2.2 d / 4.3 d |
+| level 35 / 40 / 50 | 4.8 d / 6.0 d / 7.6 d | 1.9 d / 2.4 d / 3.5 d | 1.5 d / 1.8 d / 2.8 d |
+
+Rebirth available at castle 6: day 5.8 for the `human`, 4.3-4.8 d for the bots; the real owner, whose economy is about half the human's, lands around day 7. At that moment the human is level 40 with 25 Legacy points (castle 7 first would give about twice that). Runs after it: castle 6 again after 4.0 / 3.3 / 3.5 d (69 % then 57-60 % of the first run). Pushing on to castle 8 first: day 13.0, level 71, 105 points; castle 6 comes again after 3.1 / 2.8 / 2.1 d. Level 100 is not reached by a human in 26 days of one run (level 75 at day 15); a hardcore bot gets it at day 22 in the first run, so a deep run plus one or two rebirths is the realistic path, and the planned rebirth XP modifiers will shorten it ([13](13-roadmap-building-and-resources.md)). Hide is no longer the limiter for the bots that play like people (at most 5 minutes of income against 23-66 for gold); it is still the slowest part for the 24 h auto-clicker between 100 and 200 tiles (11-15 minutes, because that bot sells every surplus), and stone, with the thinnest income, is about as slow as gold for the idle bot (34 against 28 minutes at 300 tiles).
+
+**Caveats.** The `human` is one calibration point (the owner's 185 tiles at day 3.5), not a measurement of players; the bots still beat it by 2-3x. `GEAR_SCHEDULE` is an assumption taken from fight-sim.md. After the first rebirth the sim bot spends its Legacy points builders-first and stops getting faster after the third run (castle 6 at 3.3-3.5 d, bounded by the castle timers): that is the later "max the rebirth shop" design, not this pass. If the first run must be longer once more content exists, lengthen `CASTLE_UPGRADE.durationsSec` and keep an eye on the minutes-to-cover table.
+
+## 0. Early-game pace pass (numbers before the first-rebirth pass)
 
 The sections below describe the first rebalance (which stretched the old 3-day game to about 4 weeks for the first 40 tiles). The
 next pass changed the goal: the first ~100 tiles should be **easy** (hours), then the climb should be a **2-3 day** project up to

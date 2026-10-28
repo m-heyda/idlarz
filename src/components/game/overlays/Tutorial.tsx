@@ -246,7 +246,7 @@ const Tutorial: React.FC = () => {
 						{SKILLS.stun.stunSec} seconds. They do no damage: they buy time for your clicks.
 					</li>
 					<li>
-						Winning pays gold and XP worth some seconds of your income, plus a chance of gear and potions. Rats drop wood, cloth and, from
+						Winning pays gold and XP worth some seconds of your income, a share of the hide your farm makes, plus a chance of gear and potions. Rats drop wood, cloth and, from
 						older rats, steel and obsidian gear. The <b>Rat King</b> (boss, armor, {MONSTERS.ratKing.critChance}% crits, resists Stun {MONSTERS.ratKing.stunResist}%, a {MONSTERS.ratKing.timeLimitSec}s time limit) is hard: he needs real
 						gear and quick clicking. He always drops a piece of the epic Rattatui set (the only place to get it), sometimes a second one or a legendary weapon, and potions.
 					</li>

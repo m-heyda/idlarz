@@ -177,3 +177,13 @@ test('Gold Find raises kill gold by its percentage and leaves a plain kill alone
 	assert.equal(boosted, Math.floor(plain * 1.5));
 	assert.equal(rollKillLoot(T1, { ...ctx, goldFind: 0 }, () => 0.999).gold, plain);
 });
+
+test('a kill pays pelts: a share of the farm hide income for the monster\'s reward seconds, nothing without a farm', () => {
+	const rat = monsterStats('rat', 5).rewardSec;
+	assert.equal(rollKillLoot({ type: 'rat', level: 5 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide, Math.floor(4 * rat * COMBAT.rewards.hideShare));
+	assert.equal(rollKillLoot({ type: 'rat', level: 5 }, ctx, () => 0.5).hide, 0, 'no hide income, no pelts');
+	const king = rollKillLoot({ type: 'ratKing', level: 15 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide;
+	assert.ok(king > rollKillLoot({ type: 'rat', level: 9 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide, 'the King pays more than any rat');
+	const lucky = rollKillLoot({ type: 'rat', level: 5 }, { ...ctx, hidePerSec: 4, lucky: true }, () => 0.5).hide;
+	assert.ok(lucky > Math.floor(4 * rat * COMBAT.rewards.hideShare), 'a lucky monster pays its multiplier on pelts too');
+});

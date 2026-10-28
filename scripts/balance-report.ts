@@ -142,7 +142,7 @@ line();
 // ---------------------------------------------------------------------------
 line('## 2. Level curve');
 line();
-line(`The level curve is written as anchors (total XP to reach a level): ${LEVELING.anchors.map(([l, x]) => `level ${l} = ${fmt(x)}`).join(', ')}; between two anchors every step is a constant factor bigger than the one before (\`xpToNextLevel\`). Soft cap at level ${LEVELING.softCapLevel}, maximum level ${LEVELING.maxLevel}. One stat point per level. Level, XP and attributes carry over a rebirth.`);
+line(`The level curve is written as anchors (total XP to reach a level): ${LEVELING.anchors.map(([l, x]) => `level ${l} = ${fmt(x)}`).join(', ')}; between two anchors every step is a constant factor bigger than the one before (\`xpToNextLevel\`). Soft cap at level ${LEVELING.softCapLevel}, maximum level ${LEVELING.maxLevel}. One attribute point per level, plus ${LEVELING.earlyBonusPoints} more for levels 2-${LEVELING.earlyBonusUntil}. Level, XP and attributes carry over a rebirth.`);
 line();
 {
 	const rows: (string | number)[][] = [];

@@ -8,76 +8,76 @@
 
 | n | gold | cumulative gold | extra resources | XP gained |
 | --- | --- | --- | --- | --- |
-| 1 | 60.00 | 60.00 | — | 63.25 |
-| 2 | 68.00 | 128 | — | 96.01 |
-| 3 | 77.00 | 205 | — | 130 |
-| 4 | 86.00 | 291 | — | 164 |
-| 5 | 98.00 | 389 | — | 199 |
-| 6 | 111 | 500 | — | 235 |
-| 7 | 125 | 625 | — | 272 |
-| 8 | 142 | 767 | — | 309 |
-| 9 | 160 | 927 | — | 348 |
-| 10 | 181 | 1108 | — | 387 |
-| 11 | 204 | 1312 | — | 428 |
-| 12 | 232 | 1544 | — | 469 |
-| 13 | 262 | 1806 | — | 511 |
-| 14 | 296 | 2102 | — | 554 |
-| 15 | 334 | 2436 | 100 wood, 83.00 stone | 598 |
-| 16 | 358 | 2794 | 107 wood, 89.00 stone | 643 |
-| 17 | 383 | 3177 | 114 wood, 95.00 stone | 689 |
-| 18 | 410 | 3587 | 123 wood, 102 stone | 736 |
-| 19 | 438 | 4025 | 131 wood, 109 stone | 784 |
-| 20 | 469 | 4494 | 140 wood, 117 stone | 833 |
-| 21 | 503 | 4997 | 150 wood, 125 stone | 883 |
-| 22 | 538 | 5535 | 161 wood, 134 stone | 934 |
-| 23 | 576 | 6111 | 172 wood, 144 stone | 987 |
-| 24 | 616 | 6727 | 184 wood, 154 stone | 1040 |
-| 25 | 659 | 7386 | 197 wood, 164 stone | 1095 |
-| 26 | 705 | 8091 | 211 wood, 176 stone | 1151 |
-| 27 | 754 | 8845 | 226 wood, 188 stone | 1207 |
-| 28 | 807 | 9652 | 242 wood, 201 stone | 1266 |
-| 29 | 863 | 10.52K | 259 wood, 215 stone | 1325 |
-| 30 | 925 | 11.44K | 277 wood, 231 stone, 185 coal | 1386 |
-| 31 | 989 | 12.43K | 296 wood, 247 stone, 197 coal | 1447 |
-| 32 | 1058 | 13.49K | 317 wood, 264 stone, 211 coal | 1511 |
-| 33 | 1132 | 14.62K | 339 wood, 283 stone, 226 coal | 1575 |
-| 34 | 1212 | 15.83K | 363 wood, 303 stone, 242 coal | 1641 |
-| 35 | 1297 | 17.13K | 389 wood, 324 stone, 259 coal | 1708 |
-| 36 | 1388 | 18.52K | 416 wood, 347 stone, 277 coal | 1776 |
-| 37 | 1484 | 20.00K | 445 wood, 371 stone, 296 coal | 1846 |
-| 38 | 1589 | 21.59K | 476 wood, 397 stone, 317 coal | 1918 |
-| 39 | 1700 | 23.29K | 510 wood, 425 stone, 340 coal | 1990 |
-| 40 | 1819 | 25.11K | 545 wood, 454 stone, 363 coal, 181 food | 2065 |
-| 41 | 1947 | 27.05K | 584 wood, 486 stone, 389 coal, 194 food | 2140 |
-| 42 | 2083 | 29.14K | 625 wood, 520 stone, 416 coal, 208 food | 2218 |
-| 43 | 2229 | 31.37K | 668 wood, 557 stone, 445 coal, 222 food | 2296 |
-| 44 | 2385 | 33.75K | 715 wood, 596 stone, 477 coal, 238 food | 2377 |
-| 45 | 2552 | 36.30K | 765 wood, 638 stone, 510 coal, 255 food | 2459 |
-| 46 | 2730 | 39.03K | 819 wood, 682 stone, 546 coal, 273 food | 2542 |
-| 47 | 2922 | 41.96K | 876 wood, 730 stone, 584 coal, 292 food | 2628 |
-| 48 | 3126 | 45.08K | 938 wood, 781 stone, 625 coal, 312 food | 2715 |
-| 49 | 3346 | 48.43K | 1003 wood, 836 stone, 669 coal, 334 food | 2803 |
-| 50 | 3580 | 52.01K | 1074 wood, 895 stone, 716 coal, 358 food | 2894 |
-| 51 | 3830 | 55.84K | 1149 wood, 957 stone, 766 coal, 383 food | 2986 |
-| 52 | 4098 | 59.94K | 1229 wood, 1024 stone, 819 coal, 409 food | 3080 |
-| 53 | 4386 | 64.32K | 1315 wood, 1096 stone, 877 coal, 438 food | 3175 |
-| 54 | 4693 | 69.02K | 1408 wood, 1173 stone, 938 coal, 469 food | 3273 |
-| 55 | 5021 | 74.04K | 1506 wood, 1255 stone, 1004 coal, 502 food | 3373 |
-| 56 | 5373 | 79.41K | 1611 wood, 1343 stone, 1074 coal, 537 food | 3474 |
-| 57 | 5749 | 85.16K | 1724 wood, 1437 stone, 1149 coal, 574 food | 3577 |
-| 58 | 6152 | 91.31K | 1845 wood, 1538 stone, 1230 coal, 615 food | 3683 |
-| 59 | 6582 | 97.89K | 1974 wood, 1645 stone, 1316 coal, 658 food | 3790 |
-| 60 | 7043 | 104.94K | 2113 wood, 1760 stone, 1408 coal, 704 food | 3900 |
-| 61 | 7536 | 112.47K | 2261 wood, 1884 stone, 1507 coal, 753 food | 4011 |
-| 62 | 8064 | 120.53K | 2419 wood, 2016 stone, 1612 coal, 806 food | 4125 |
-| 63 | 8628 | 129.16K | 2588 wood, 2157 stone, 1725 coal, 862 food | 4240 |
-| 64 | 9232 | 138.40K | 2769 wood, 2308 stone, 1846 coal, 923 food | 4358 |
-| 65 | 9878 | 148.27K | 2963 wood, 2469 stone, 1975 coal, 987 food | 4478 |
-| 66 | 10.57K | 158.84K | 3171 wood, 2642 stone, 2114 coal, 1057 food | 4601 |
-| 67 | 11.31K | 170.15K | 3393 wood, 2827 stone, 2262 coal, 1131 food | 4726 |
-| 68 | 12.10K | 182.25K | 3630 wood, 3025 stone, 2420 coal, 1210 food | 4853 |
-| 69 | 12.95K | 195.20K | 3884 wood, 3237 stone, 2589 coal, 1294 food | 4982 |
-| 70 | 13.86K | 209.06K | 4156 wood, 3463 stone, 2771 coal, 1385 food | 5114 |
+| 1 | 60.00 | 60.00 | — | 22.95 |
+| 2 | 68.00 | 128 | — | 35.11 |
+| 3 | 77.00 | 205 | — | 47.75 |
+| 4 | 86.00 | 291 | — | 60.89 |
+| 5 | 98.00 | 389 | — | 74.53 |
+| 6 | 111 | 500 | — | 88.69 |
+| 7 | 125 | 625 | — | 103 |
+| 8 | 142 | 767 | — | 119 |
+| 9 | 160 | 927 | — | 134 |
+| 10 | 181 | 1108 | — | 151 |
+| 11 | 204 | 1312 | — | 168 |
+| 12 | 232 | 1544 | — | 185 |
+| 13 | 262 | 1806 | — | 204 |
+| 14 | 296 | 2102 | — | 223 |
+| 15 | 334 | 2436 | 100 wood, 66.00 stone | 242 |
+| 16 | 358 | 2794 | 107 wood, 71.00 stone | 263 |
+| 17 | 383 | 3177 | 114 wood, 76.00 stone | 284 |
+| 18 | 410 | 3587 | 123 wood, 82.00 stone | 305 |
+| 19 | 438 | 4025 | 131 wood, 87.00 stone | 328 |
+| 20 | 469 | 4494 | 140 wood, 93.00 stone | 351 |
+| 21 | 503 | 4997 | 150 wood, 100 stone | 375 |
+| 22 | 538 | 5535 | 161 wood, 107 stone | 400 |
+| 23 | 576 | 6111 | 172 wood, 115 stone | 426 |
+| 24 | 616 | 6727 | 184 wood, 123 stone | 452 |
+| 25 | 659 | 7386 | 197 wood, 131 stone | 480 |
+| 26 | 705 | 8091 | 211 wood, 141 stone | 508 |
+| 27 | 754 | 8845 | 226 wood, 150 stone | 538 |
+| 28 | 807 | 9652 | 242 wood, 161 stone | 568 |
+| 29 | 863 | 10.52K | 259 wood, 172 stone | 599 |
+| 30 | 925 | 11.44K | 277 wood, 185 stone, 185 coal | 632 |
+| 31 | 989 | 12.43K | 296 wood, 197 stone, 197 coal | 665 |
+| 32 | 1058 | 13.49K | 317 wood, 211 stone, 211 coal | 700 |
+| 33 | 1132 | 14.62K | 339 wood, 226 stone, 226 coal | 735 |
+| 34 | 1212 | 15.83K | 363 wood, 242 stone, 242 coal | 772 |
+| 35 | 1297 | 17.13K | 389 wood, 259 stone, 259 coal | 810 |
+| 36 | 1388 | 18.52K | 416 wood, 277 stone, 277 coal | 849 |
+| 37 | 1484 | 20.00K | 445 wood, 296 stone, 296 coal | 889 |
+| 38 | 1589 | 21.59K | 476 wood, 317 stone, 317 coal | 931 |
+| 39 | 1700 | 23.29K | 510 wood, 340 stone, 340 coal | 974 |
+| 40 | 1819 | 25.11K | 545 wood, 363 stone, 363 coal, 181 food | 1018 |
+| 41 | 1947 | 27.05K | 584 wood, 389 stone, 389 coal, 194 food | 1064 |
+| 42 | 2083 | 29.14K | 625 wood, 416 stone, 416 coal, 208 food | 1111 |
+| 43 | 2229 | 31.37K | 668 wood, 445 stone, 445 coal, 222 food | 1160 |
+| 44 | 2385 | 33.75K | 715 wood, 477 stone, 477 coal, 238 food | 1210 |
+| 45 | 2552 | 36.30K | 765 wood, 510 stone, 510 coal, 255 food | 1262 |
+| 46 | 2730 | 39.03K | 819 wood, 546 stone, 546 coal, 273 food | 1315 |
+| 47 | 2922 | 41.96K | 876 wood, 584 stone, 584 coal, 292 food | 1370 |
+| 48 | 3126 | 45.08K | 938 wood, 625 stone, 625 coal, 312 food | 1426 |
+| 49 | 3346 | 48.43K | 1003 wood, 669 stone, 669 coal, 334 food | 1484 |
+| 50 | 3580 | 52.01K | 1074 wood, 716 stone, 716 coal, 358 food | 1544 |
+| 51 | 3830 | 55.84K | 1149 wood, 766 stone, 766 coal, 383 food | 1606 |
+| 52 | 4098 | 59.94K | 1229 wood, 819 stone, 819 coal, 409 food | 1670 |
+| 53 | 4386 | 64.32K | 1315 wood, 877 stone, 877 coal, 438 food | 1735 |
+| 54 | 4693 | 69.02K | 1408 wood, 938 stone, 938 coal, 469 food | 1803 |
+| 55 | 5021 | 74.04K | 1506 wood, 1004 stone, 1004 coal, 502 food | 1872 |
+| 56 | 5373 | 79.41K | 1611 wood, 1074 stone, 1074 coal, 537 food | 1944 |
+| 57 | 5749 | 85.16K | 1724 wood, 1149 stone, 1149 coal, 574 food | 2017 |
+| 58 | 6152 | 91.31K | 1845 wood, 1230 stone, 1230 coal, 615 food | 2093 |
+| 59 | 6582 | 97.89K | 1974 wood, 1316 stone, 1316 coal, 658 food | 2171 |
+| 60 | 7043 | 104.94K | 2113 wood, 1408 stone, 1408 coal, 704 food | 2252 |
+| 61 | 7536 | 112.47K | 2261 wood, 1507 stone, 1507 coal, 753 food | 2334 |
+| 62 | 8064 | 120.53K | 2419 wood, 1612 stone, 1612 coal, 806 food | 2419 |
+| 63 | 8628 | 129.16K | 2588 wood, 1725 stone, 1725 coal, 862 food | 2507 |
+| 64 | 9232 | 138.40K | 2769 wood, 1846 stone, 1846 coal, 923 food | 2597 |
+| 65 | 9878 | 148.27K | 2963 wood, 1975 stone, 1975 coal, 987 food | 2690 |
+| 66 | 10.57K | 158.84K | 3171 wood, 2114 stone, 2114 coal, 1057 food | 2785 |
+| 67 | 11.31K | 170.15K | 3393 wood, 2262 stone, 2262 coal, 1131 food | 2883 |
+| 68 | 12.10K | 182.25K | 3630 wood, 2420 stone, 2420 coal, 1210 food | 2984 |
+| 69 | 12.95K | 195.20K | 3884 wood, 2589 stone, 2589 coal, 1294 food | 3088 |
+| 70 | 13.86K | 209.06K | 4156 wood, 2771 stone, 2771 coal, 1385 food | 3195 |
 
 ### Late tiles (the polynomial tail)
 
@@ -85,44 +85,44 @@ Past 300 tiles the price grows like (n / 300)^4.5 instead of ×1.007 per tile, c
 
 | n | gold | cumulative gold | XP gained |
 | --- | --- | --- | --- |
-| 100 | 105.48K | 1.61M | 10.40K |
-| 157 | 156.98K | 9.02M | 32.13K |
-| 300 | 425.65K | 47.67M | 333.51K |
-| 1000 | 95.94M | 17.52B | 2.02M |
-| 3000 | 13.46B | 7.35T | 10.50M |
-| 10000 | 3.03T | 5.52Qa | 63.87M |
-| 30000 | 425.66T | 2.32Qi | 331.87M |
-| 50000 | 4.24Qa | 38.55Qi | 714.05M |
+| 100 | 105.48K | 1.61M | 8232 |
+| 157 | 156.98K | 9.02M | 39.81K |
+| 300 | 425.65K | 47.67M | 1.26M |
+| 1000 | 95.94M | 17.52B | 7.67M |
+| 3000 | 13.46B | 7.35T | 39.81M |
+| 10000 | 3.03T | 5.52Qa | 242.16M |
+| 30000 | 425.66T | 2.32Qi | 1.26B |
+| 50000 | 4.24Qa | 38.55Qi | 2.71B |
 
 ## 2. Level curve
 
-The level curve is written as anchors (total XP to reach a level): level 10 = 230.00K, level 30 = 25.00M, level 80 = 12.00B, level 90 = 34.00B, level 100 = 160.00B; between two anchors every step is a constant factor bigger than the one before (`xpToNextLevel`). Soft cap at level 80, maximum level 100. One stat point per level. Level, XP and attributes carry over a rebirth.
+The level curve is written as anchors (total XP to reach a level): level 10 = 140.00K, level 30 = 100.00M, level 80 = 3.00B, level 90 = 6.50B, level 100 = 18.50B; between two anchors every step is a constant factor bigger than the one before (`xpToNextLevel`). Soft cap at level 80, maximum level 100. One attribute point per level, plus 2 more for levels 2-30. Level, XP and attributes carry over a rebirth.
 
 | Level | XP to next | cumulative XP to reach L+1 |
 | --- | --- | --- |
 | 1 | 5000 | 5000 |
-| 2 | 6922 | 11.92K |
-| 3 | 9583 | 21.50K |
-| 4 | 13.27K | 34.77K |
-| 5 | 18.37K | 53.14K |
-| 6 | 25.43K | 78.57K |
-| 8 | 48.74K | 162.52K |
-| 10 | 83.54K | 313.54K |
-| 12 | 128.05K | 545.02K |
-| 15 | 243.00K | 1.14M |
-| 20 | 706.83K | 3.56M |
-| 25 | 2.06M | 10.57M |
-| 30 | 5.40M | 30.40M |
-| 40 | 16.45M | 135.21M |
-| 50 | 50.11M | 454.51M |
-| 60 | 152.64M | 1.43B |
-| 70 | 464.98M | 4.39B |
-| 79 | 1.27B | 12.00B |
-| 80 | 1.39B | 13.39B |
-| 85 | 2.22B | 22.69B |
-| 90 | 4.01B | 38.01B |
-| 95 | 11.69B | 77.87B |
-| 99 | 27.51B | 160.00B |
+| 2 | 6344 | 11.34K |
+| 3 | 8051 | 19.39K |
+| 4 | 10.22K | 29.61K |
+| 5 | 12.96K | 42.57K |
+| 6 | 16.45K | 59.02K |
+| 8 | 26.49K | 106.39K |
+| 10 | 47.10K | 187.09K |
+| 12 | 92.48K | 345.57K |
+| 15 | 254.44K | 911.17K |
+| 20 | 1.37M | 4.82M |
+| 25 | 7.43M | 25.95M |
+| 30 | 29.36M | 129.36M |
+| 40 | 37.75M | 467.35M |
+| 50 | 48.54M | 901.94M |
+| 60 | 62.41M | 1.46B |
+| 70 | 80.25M | 2.18B |
+| 79 | 100.63M | 3.00B |
+| 80 | 122.67M | 3.12B |
+| 85 | 330.34M | 4.28B |
+| 90 | 794.45M | 7.29B |
+| 95 | 1.22B | 12.46B |
+| 99 | 1.71B | 18.50B |
 
 ## 3. Castle
 
@@ -133,14 +133,14 @@ Resource modifier: +20% at level 1, doubling each level up to level 6, then +320
 | 1 → 2 | 1h 0m | +40% | 70.00K | 10.00K | 10.00K | — | — | — |
 | 2 → 3 | 4h 0m | +80% | 200.00K | 30.00K | 30.00K | 20.00K | — | — |
 | 3 → 4 | 12h 0m | +160% | 1.00M | 100.00K | 100.00K | 50.00K | 200.00K | 40.00K |
-| 4 → 5 | 1d 12h | +320% | 4.00M | 400.00K | 400.00K | 200.00K | 2.00M | 100.00K |
-| 5 → 6 | 3d 0h | +640% | 20.00M | 2.00M | 2.00M | 1.00M | 10.00M | 500.00K |
+| 4 → 5 | 1d 0h | +320% | 4.00M | 400.00K | 400.00K | 200.00K | 2.00M | 100.00K |
+| 5 → 6 | 2d 0h | +640% | 8.00M | 2.00M | 2.00M | 1.00M | 4.00M | 500.00K |
 | 6 → 7 | 3d 0h | +960% | 30.00M | 3.00M | 3.00M | 1.60M | 16.00M | 800.00K |
 | 7 → 8 | 4d 0h | +1280% | 48.00M | 4.80M | 4.80M | 2.60M | 25.60M | 1.28M |
 | 8 → 9 | 5d 0h | +1600% | 76.80M | 7.60M | 7.60M | 4.00M | 41.00M | 2.00M |
 | 9 → 10 | 7d 0h | +1920% | 122.80M | 12.20M | 12.20M | 6.60M | 65.60M | 3.20M |
 
-Total build time to level 10: 24d 5h (to level 6: 5d 5h).
+Total build time to level 10: 22d 17h (to level 6: 3d 17h).
 
 ## 4. Farm animals
 
@@ -253,8 +253,8 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 | Animal | product | per second each | sells for | gold/s each (sold) | meat gold/s each | share of meat |
 | --- | --- | --- | --- | --- | --- | --- |
 | Chicken | eggs | 0.03 | 2 | 0.060 | 0.20 | 30% |
-| Deer | hide | 0.0375 | 4 | 0.150 | 0.50 | 30% |
-| Pig | hide | 0.075 | 4 | 0.300 | 1.00 | 30% |
+| Deer | hide | 0.075 | 2 | 0.150 | 0.50 | 30% |
+| Pig | hide | 0.15 | 2 | 0.300 | 1.00 | 30% |
 | Cow | milk | 0.225 | 3 | 0.675 | 2.00 | 34% |
 
 | Upgrade | effect per level | max level | cost of level 1 | cost of the last level |
@@ -262,7 +262,8 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 | Feed Trough | +5% meat | 10 | 2000 food | 137.44K food |
 | Hen House | +15% eggs | 10 | 1500 wood + 40.00 eggs | 103.08K wood + 2749 eggs |
 | Dairy | +15% milk | 10 | 1500 stone + 30.00 milk | 103.08K stone + 2062 milk |
-| Tannery | +15% hide | 10 | 1200 coal + 20.00 hide | 82.46K coal + 1375 hide |
+| Tannery | +25% hide | 10 | 1200 coal + 20.00 hide | 82.46K coal + 1375 hide |
+| Pasture | +8% eggs, milk and hide | 10 | 5000 food + 2500 wood | 343.60K food + 171.80K wood |
 | Pen Expansion | +2% farm output, +4 animals per kind | 8 | 8000 food + 3000 wood + 3000 stone | 715.10K food + 268.16K wood + 268.16K stone |
 
 ## 5. Biomes and buildings
@@ -315,12 +316,12 @@ Derived stats for the starting stats (all 5):
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 2.590 | 45.0% | 3.756 |
-| wood | 0 | 0.05 | 0.075 | 45.0% | 0.109 |
+| gold | 0.1 | 0.1 | 2.395 | 45.0% | 3.473 |
+| wood | 0 | 0.05 | 1.538 | 45.0% | 2.229 |
 | stone | 0 | 0.1 | 0.150 | 32.5% | 0.199 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 7.095 | 45.0% | 10.288 |
-| meat | 0 | 0 | 0.000 | 60.0% | 0.000 |
+| food | 0 | 0.05 | 5.048 | 45.0% | 7.319 |
+| meat | 0 | 0 | 0.000 | 50.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |
@@ -344,7 +345,7 @@ Derived stats for the starting stats (all 5):
 | meat | 1 | 2 |
 | eggs | 2 | not for sale |
 | milk | 3 | not for sale |
-| hide | 4 | not for sale |
+| hide | 2 | not for sale |
 
 ### Merchant bonuses and gear shop
 
