@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { api, freshGame, growTo, store } from './helpers';
 import { INITIAL_CHARACTER_STATS, LEVELING, MAX_LEVEL, XP_CAP } from '../src/config/gameConfig';
 import { calculateLevel, cumulativeXp, totalStatPoints, xpToNextLevel } from '../src/utils/gameUtils';
-import { decodeSave, encodeSave } from '../src/lib/saveFormat';
+import { decodeSave, encodeSave, sealWire } from '../src/lib/saveFormat';
+import { maxHp, maxMana } from '../src/lib/combat';
 import { pickPersisted } from '../src/lib/sanitizeSave';
 
 // The character level curve (LEVELING in the config): slow, written down as anchors measured with the sim bot, and carried over rebirths.
@@ -102,6 +103,23 @@ test('a schema 5 save keeps its XP, gets the level of the new curve and its attr
 		assert.deepEqual(again.state.characterStats, state.characterStats);
 		assert.equal(again.state.resources.xp, 362_000);
 	}
+});
+
+test('a schema 5 save with full HP and mana for its spent attributes still loads: the refund takes the max down, the pools start full', () => {
+	// A played character has put its points in Vitality / Intelligence and sits at (or near) the full pools they gave. The refund puts those
+	// attributes back, the maxima drop, and a stored HP above the new maximum made sanitizeSave refuse the whole save as damaged.
+	const text = readFileSync(new URL('./fixtures/saves/v5-levels.sav', import.meta.url), 'utf8').trim();
+	const wire = JSON.parse(Buffer.from(text.split('.')[1], 'base64').toString('utf8'));
+	wire.s.characterStats = { ...wire.s.characterStats, vitality: 60, intelligence: 60, availablePoints: 0 };
+	wire.s.playerHp = 5000;
+	wire.s.playerMp = 3000;
+	const result = decodeSave(sealWire(wire));
+	assert.equal(result.ok, true, result.ok ? '' : result.reason);
+	if (!result.ok) return;
+	const { state } = result;
+	assert.equal(state.characterStats.vitality, INITIAL_CHARACTER_STATS.vitality);
+	assert.equal(state.playerHp, maxHp(state.characterStats, state.equipment), 'HP starts full');
+	assert.equal(state.playerMp, maxMana(state.characterStats, state.equipment), 'mana starts full');
 });
 
 test('a schema 6 save is not touched by the migration: attributes stay as the player spent them', () => {
