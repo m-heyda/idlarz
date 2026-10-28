@@ -63,9 +63,14 @@ const ok = <T>(out: Online<T>): T => {
 };
 
 /** A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save. Auto-battle is off unless asked, so the monsters stay for the tests to look at. */
-const playing = async (minutes: number, id = 'u1', autoBattle = false) => {
+const playing = async (minutes: number, id = 'u1', autoBattle = false, rebirths = autoBattle ? 1 : 0) => {
 	const m = memory();
 	await save(m, id, game(), 0, T0);
+	if (rebirths > 0) {
+		// the ledger is seeded by the first request; a rebirth is the one thing a test cannot fake through a save
+		ok(await fightStep(m.deps, id, null, { action: 'sync' }, T0 + 500));
+		m.ledgers.get(id)!.rebirths = rebirths;
+	}
 	ok(await fightStep(m.deps, id, null, { action: 'auto', autoBattle }, T0 + 1000));
 	// the player stays around: the game asks the server every ten minutes or so, which is what keeps "last seen" fresh
 	for (let t = 10; t < minutes; t += 10) ok(await syncTickets(m.deps, id, T0 + t * MIN));
@@ -169,6 +174,14 @@ test('with auto-battle on the server fights the monsters one at a time and pays 
 	assert.ok(won >= 1, 'at least one rat fell');
 	assert.equal(ledger.ordKill, won, 'each win rolled one sealed reward');
 	assert.ok(ledger.granted.gold > 0 && ledger.granted.xp > 0);
+});
+
+test('auto-battle is locked before the first rebirth: the server ignores the switch and fights nothing by itself', async () => {
+	const { m, now } = await playing(25, 'u1', true, 0);
+	const out: FightReply = ok(await fightStep(m.deps, 'u1', null, { action: 'sync', since: 0 }, now + 20_000));
+	assert.equal(out.combat.autoBattle, false);
+	assert.equal(out.combat.fight, null);
+	assert.equal(m.ledgers.get('u1')!.ordKill, 0);
 });
 
 test('a hotkey carries the same key twice and is applied once; an unknown action is refused by the route, a monster the server never made cannot be dismissed', async () => {

@@ -10,6 +10,9 @@ import type { CharacterStats, Equipment } from '@/types/game';
 export const maxHp = (characterStats: CharacterStats, equipment: Equipment): number =>
 	Math.round(COMBAT.baseHp + characterStats.hp + aggregateStats(equipment).maxHp);
 
+/** Auto-battle (the server picking the next monster) is a reward for the first rebirth; a click on a monster starts a fight from the start. */
+export const autoBattleUnlocked = (rebirths: number): boolean => rebirths >= COMBAT.auto.minRebirths;
+
 export type DamageType = 'physical' | 'magic';
 
 /** Magic weapons (staves, wands) scale with Intelligence; everything else, bare hands included, with Strength. */

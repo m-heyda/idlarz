@@ -282,6 +282,23 @@ test('a won fight stays in the window as a result: the notice carries the monste
 	assert.equal(api().combat.notice, null);
 });
 
+test('auto-battle cannot be switched on before the first rebirth: nothing is sent, and it is open after it', async () => {
+	syncedGame();
+	const calls = record();
+	try {
+		store.setState({ combat: { ...api().combat, autoBattle: false } } as never);
+		api().setAutoBattle(true);
+		assert.equal(api().combat.autoBattle, false);
+		store.setState({ prestige: { ...api().prestige, rebirths: 1 } } as never);
+		api().setAutoBattle(true);
+		assert.equal(api().combat.autoBattle, true);
+		await flush();
+		assert.equal(calls.length, 1, 'only the allowed request went out');
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});
+
 test('auto-battle starts switched off, in the browser as on the server', () => {
 	freshGame();
 	assert.equal(api().combat.autoBattle, false);

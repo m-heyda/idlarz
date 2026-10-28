@@ -2,7 +2,7 @@ import { SKILLS, type SkillId } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
-import { armorReduction, mitigate, swing } from '@/lib/combat';
+import { armorReduction, autoBattleUnlocked, mitigate, swing } from '@/lib/combat';
 import { isBoss, levelAtAge, monsterDef, monsterStats } from '@/lib/monsters';
 import {
 	COSMETIC_EVENTS,
@@ -89,6 +89,9 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 	const log = ask.ack === undefined ? [...base.log] : base.log.filter((event) => COSMETIC_EVENTS.has(event.kind) || event.no > ask.ack!);
 	const c: CombatState = { ...base, cd: { ...base.cd }, consumed: { ...base.consumed }, log, fight: base.fight ? { ...base.fight } : null };
 	const profileNow = playerProfile(env.stored.core);
+	// auto-battle is locked until the first rebirth: a save that has it on from before (or a request for it) does not get it
+	const autoAllowed = autoBattleUnlocked(ledger.rebirths);
+	if (!autoAllowed) c.autoBattle = false;
 	const potionIds = Object.keys(ITEM_CATALOG).filter((id) => ITEM_CATALOG[id].consumable?.healHp);
 
 	const push = (t: number, kind: FightEvent['kind'], extra: Partial<FightEvent> = {}) => {
@@ -308,7 +311,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 	// ---- what the player asked for, at the clock's time ----
 	if (ask.autoUse !== undefined) c.autoUse = ask.autoUse;
 	if (ask.autoBattle !== undefined) {
-		c.autoBattle = ask.autoBattle;
+		c.autoBattle = ask.autoBattle && autoAllowed;
 		if (!ask.autoBattle && c.fight) endFight(t, 'retreat');
 	}
 	for (const command of ask.commands ?? []) {

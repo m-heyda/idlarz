@@ -1,6 +1,7 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/gameConfig';
 import { ITEM_CATALOG, SETS } from '@/catalog';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
+import { COMBAT } from '@/config/combatConfig';
 import { runCombat, type CombatEnv } from '@/lib/offline/fight';
 import { freshCombat, type FightEvent } from '@/lib/offline/fightTypes';
 import { newLedger } from '@/lib/offline/ledger';
@@ -83,7 +84,7 @@ export const simSetup = ({ equipment = {}, character = freshCharacter(), potions
 	for (const key of BASE_KEYS) characterStats[key] = character[key];
 	const core = { equipment, characterStats, level: { level, progress: 0 }, bag: potions.map((p) => ({ id: p.id, qty: p.qty })) };
 	const stored = { core, summary: { derived: { luck: 0, goldFind: 0 }, rates: { gold: 1, xp: 1 }, xpGainPct: 0 } } as unknown as StoredSave;
-	const base = newLedger(START * 1000);
+	const base = newLedger(START * 1000, COMBAT.auto.minRebirths);
 	let n = 0;
 	const ticket = (m: SimSetup['monsters'][number]) => ({ n: ++n, at: START, lucky: m.lucky ?? false, x: 2 + n, y: 3, spawnLevel: m.level });
 	const rats = monsters.filter((m) => m.type === 'rat').map(ticket);

@@ -196,3 +196,12 @@
 .combat-flee:hover {
 	background: #7a1c16;
 }
+
+.combat-switches label[data-locked='true'] {
+	color: #8a7a62;
+	cursor: not-allowed;
+}
+
+.combat-switches label[data-locked='true'] input {
+	cursor: not-allowed;
+}

@@ -147,6 +147,20 @@ test('auto-battle off: nothing is engaged; on: the next fight starts at once; of
 	assert.equal(retreat.ordKill, 0, 'no reward');
 });
 
+test('auto-battle is locked until the first rebirth: asking for it changes nothing, and a save that had it on loses it', () => {
+	const s = setup({ equipment: STARTER_EQUIPMENT, monsters: [{ type: 'rat', level: 1 }] });
+	const young = { ...s.ledger, rebirths: 0 };
+	const asked = runCombat(young, s.env(s.start), { autoBattle: true }).ledger;
+	assert.equal(asked.combat!.autoBattle, false);
+	assert.equal(asked.combat!.fight, null, 'nothing is engaged by itself');
+	const had = runCombat({ ...young, combat: { ...young.combat!, autoBattle: true } }, s.env(s.start + 5)).ledger;
+	assert.equal(had.combat!.autoBattle, false);
+	assert.equal(had.combat!.fight, null);
+	// a click still fights
+	const clicked = runCombat(asked, s.env(s.start + 6), { commands: [{ kind: 'fight', n: asked.bank.rats[0].n }] }).ledger;
+	assert.ok(clicked.combat!.fight);
+});
+
 test('a click starts a fight with auto-battle off, even below the resume HP, and the next monster is not chained on', () => {
 	const s = setup({ equipment: STRONG, monsters: [{ type: 'rat', level: 1 }, { type: 'rat', level: 1 }] });
 	const off = runCombat(s.ledger, s.env(s.start), { autoBattle: false }).ledger;

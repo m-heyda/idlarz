@@ -25,6 +25,7 @@ export const COMBAT = {
 	},
 	// What the server does for a player in a fight, and when it starts one. Fixed on purpose: players only switch auto-battle and auto-use on or off.
 	auto: {
+		minRebirths: 1, // auto-battle is locked until the player has rebirthed this many times (clicking a monster to fight it never is)
 		resumeHpPct: 80, // auto-battle only starts a fight with HP at this share of max or more (after a knockout it rests up to it)
 		engageOrder: 'weakest' as 'weakest' | 'oldest', // which waiting monster is next: the lowest level first (an unbeatable one never blocks the easy ones), or the one that came first
 		retryCooldownSec: 300, // a monster that beat you (or ran out the clock) is not tried again for this long...

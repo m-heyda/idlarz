@@ -5,6 +5,7 @@ import { useUiStore } from '@/stores/uiStore';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
+import { autoBattleUnlocked } from '@/lib/combat';
 import { monsterDef, monsterStats } from '@/lib/monsters';
 import { COMBAT_EVENT, type CombatFx } from '@/lib/combatFx';
 import audioManager from '@/utils/audioManager';
@@ -156,6 +157,7 @@ const CombatWidget: React.FC = () => {
 	const playerMp = useGameStore((state) => state.playerMp);
 	const bag = useGameStore((state) => state.bag);
 	const level = useGameStore((state) => state.level.level);
+	const autoLocked = useGameStore((state) => !autoBattleUnlocked(state.prestige.rebirths));
 	const requestPotion = useGameStore((state) => state.requestPotion);
 	const requestSkill = useGameStore((state) => state.requestSkill);
 	const setAutoBattle = useGameStore((state) => state.setAutoBattle);
@@ -340,8 +342,10 @@ const CombatWidget: React.FC = () => {
 				</>
 			)}
 			<div className='combat-switches'>
-				<label title='After a fight the server sends you against the next monster, one at a time. Off: click a monster to fight it'>
-					<input type='checkbox' checked={combat.autoBattle} onChange={(e) => setAutoBattle(e.target.checked)} /> Auto-battle
+				<label
+					title={autoLocked ? 'Unlocks after your first rebirth' : 'After a fight the server sends you against the next monster, one at a time. Off: click a monster to fight it'}
+					data-locked={autoLocked}>
+					<input type='checkbox' checked={combat.autoBattle && !autoLocked} disabled={autoLocked} onChange={(e) => setAutoBattle(e.target.checked)} /> Auto-battle
 				</label>
 				<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
 					<input type='checkbox' checked={combat.autoUse} onChange={(e) => setAutoUse(e.target.checked)} /> Auto-use
