@@ -3,7 +3,7 @@
 
 import { scoped } from '@/lib/storageScope';
 
-export type UiPrefKey = 'showAdmin' | 'adminCollapsed' | 'showMinimap' | 'combatMinimized' | 'showHeaderNumbers';
+export type UiPrefKey = 'showAdmin' | 'adminCollapsed' | 'showMinimap' | 'combatMinimized' | 'compactHeader';
 
 /** What a first visit (and the server render) sees: the dev admin panel starts open, the minimap on */
 export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
@@ -11,7 +11,7 @@ export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
 	adminCollapsed: false,
 	showMinimap: true,
 	combatMinimized: false, // the combat panel starts open
-	showHeaderNumbers: false, // the header shows only the resource icons; the amounts are in the dropdown of each group
+	compactHeader: false, // the header shows each resource with its amount; compact leaves only the icons (the amounts are in the dropdown of each group)
 };
 
 const storageKey = (key: UiPrefKey) => scoped(`idlarz.ui.${key}`);

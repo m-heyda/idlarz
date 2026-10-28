@@ -29,7 +29,7 @@ const GameHeader: React.FC = () => {
 					<div className='pixel-divider-right shrink-0 pr-3'>
 						<PlayerCard />
 					</div>
-					<div className='flex flex-wrap items-center gap-x-1.5 gap-y-1 flex-1 min-w-0'>
+					<div className='flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0'>
 						<ResourceDisplay />
 					</div>
 					<HeaderButtons />

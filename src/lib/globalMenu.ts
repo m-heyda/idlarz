@@ -63,11 +63,11 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 			onSelect: () => ui.setPref('showMinimap', !ui.showMinimap),
 		},
 		{
-			id: 'headerNumbers',
-			label: 'Show resource numbers',
-			hint: 'in the header',
-			checked: ui.showHeaderNumbers,
-			onSelect: () => ui.setPref('showHeaderNumbers', !ui.showHeaderNumbers),
+			id: 'compactHeader',
+			label: 'Show compact header',
+			hint: 'icons only',
+			checked: ui.compactHeader,
+			onSelect: () => ui.setPref('compactHeader', !ui.compactHeader),
 		},
 	];
 	// the admin panel exists only in development builds

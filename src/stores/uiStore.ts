@@ -94,7 +94,7 @@ interface UiState {
 	showAdmin: boolean;
 	adminCollapsed: boolean;
 	/** Small amounts next to the header's resource icons (off: icons only) */
-	showHeaderNumbers: boolean;
+	compactHeader: boolean;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
 }
@@ -163,6 +163,6 @@ export const useUiStore = create<UiState>((set) => ({
 			showAdmin: readPref('showAdmin'),
 			adminCollapsed: readPref('adminCollapsed'),
 			combatMinimized: readPref('combatMinimized'),
-			showHeaderNumbers: readPref('showHeaderNumbers'),
+			compactHeader: readPref('compactHeader'),
 		}),
 }));
