@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { MERCHANT_BUYABLE, MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_INFO, MERCHANT_RESOURCE_PRICES } from '@/config/gameConfig';
-import { formatCompact, formatNumber } from '@/utils/formatters';
+import { formatCompact, formatNumber, parseAmount } from '@/utils/formatters';
 import { buyCost, sellMultiplier, sellPayout } from '@/utils/gameUtils';
 import ResourceIcon from '../../ResourceIcon';
 import { TipButton } from './TipButton';
@@ -12,21 +12,18 @@ type ResourceKey = keyof typeof MERCHANT_RESOURCE_PRICES;
 const RESOURCES = Object.keys(MERCHANT_RESOURCE_PRICES) as ResourceKey[];
 const isBuyable = (resource: ResourceKey) => (MERCHANT_BUYABLE as readonly string[]).includes(resource);
 
-/** How much one Sell or Buy click moves: a number of units, a share of what you hold (or can pay for), or all of it. */
-type Amount = 1 | 10 | 100 | 0.25 | 0.5 | 'max';
+/** How much one Sell or Buy click moves: a number of units, or all of it (everything you hold, or can pay for). */
+type Amount = number | 'max';
 const AMOUNTS: { value: Amount; label: string }[] = [
-	{ value: 1, label: '1' },
-	{ value: 10, label: '10' },
-	{ value: 100, label: '100' },
-	{ value: 0.25, label: '25%' },
-	{ value: 0.5, label: '50%' },
+	{ value: 1_000, label: '1K' },
+	{ value: 1_000_000, label: '1M' },
+	{ value: 1_000_000_000, label: '1B' },
 	{ value: 'max', label: 'Max' },
 ];
 
-/** `amount` of `have` units: a count (at most `have`, whole units), a share of them (rounded down), or all of them (as they are, unless `whole`). */
+/** `amount` of `have` units: a count (at most `have`, whole units), or all of them (as they are, unless `whole`). */
 const amountOf = (amount: Amount, have: number, whole: boolean): number => {
 	if (amount === 'max') return whole ? Math.floor(have) : have;
-	if (amount < 1) return Math.floor(have * amount);
 	return Math.min(amount, Math.floor(have));
 };
 
@@ -44,7 +41,11 @@ export const MerchantResources: React.FC = () => {
 	const sellResources = useGameStore((state) => state.sellResources);
 	const buyResource = useGameStore((state) => state.buyResource);
 	const showToast = useUiStore((state) => state.showToast);
-	const [amount, setAmount] = useState<Amount>(10);
+	const [preset, setPreset] = useState<Amount>(1_000);
+	const [custom, setCustom] = useState('');
+	// a typed amount wins while it reads as a number; a chip click clears it
+	const typed = custom.trim() === '' ? null : parseAmount(custom);
+	const amount: Amount = typed ?? preset;
 
 	const ctx = { merchantUpgrades, prestige };
 	const haggle = sellMultiplier(ctx);
@@ -69,11 +70,36 @@ export const MerchantResources: React.FC = () => {
 		<div className='px-card'>
 			<div className='mr-amounts' role='group' aria-label='Amount to sell or buy'>
 				<span className='text-xs text-[#a89878]'>Amount</span>
-				{AMOUNTS.map(({ value, label }) => (
-					<button key={String(value)} className='px-btn px-btn-sm mr-chip' data-active={amount === value} aria-pressed={amount === value} onClick={() => setAmount(value)}>
-						{label}
-					</button>
-				))}
+				{AMOUNTS.map(({ value, label }) => {
+					const active = typed === null && preset === value;
+					return (
+						<button
+							key={String(value)}
+							className='px-btn px-btn-sm mr-chip'
+							data-active={active}
+							aria-pressed={active}
+							onClick={() => {
+								setPreset(value);
+								setCustom('');
+							}}>
+							{label}
+						</button>
+					);
+				})}
+				<input
+					className='mr-custom'
+					type='text'
+					autoComplete='off'
+					spellCheck={false}
+					placeholder='Custom'
+					title='Type your own amount: 250, 1.5k, 2m, 3b'
+					aria-label='Custom amount (for example 250, 1.5k, 2m)'
+					data-active={typed !== null}
+					data-invalid={custom.trim() !== '' && typed === null}
+					value={custom}
+					maxLength={12}
+					onChange={(event) => setCustom(event.target.value)}
+				/>
 				<span className='text-xs text-[#a89878] mr-note'>
 					Selling pays +{formatNumber((haggle - 1) * 100)}% (Haggler), buying costs {MERCHANT_BUY_MULTIPLIER}x the base price
 				</span>
