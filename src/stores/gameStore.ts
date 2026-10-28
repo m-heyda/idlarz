@@ -87,6 +87,7 @@ import { newClaimId } from '@/lib/offlineClient';
 import { requestAuto, requestChest, requestDismiss, requestUse, type Reply } from '@/lib/rewardsClient';
 import { signalNeedClaim, signalSyncNow } from '@/lib/serverSession';
 import { useUiStore } from '@/stores/uiStore';
+import { useRewardPendingStore } from '@/stores/rewardPendingStore';
 import { isAutoSold, receiveDrops } from '@/lib/loot';
 import { advanceMonsters, monsterAt, monsterDef } from '@/lib/monsters';
 import { ITEM_CATALOG, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
@@ -288,12 +289,14 @@ const createGameSlice = (
 	const openChestRemote = async (x: number, y: number) => {
 		const key = newClaimId();
 		chestOpensInFlight++;
+		useRewardPendingStore.getState().begin(); // the little chest animation covers the wait for the loot
 		let reply: Reply<ChestReward>;
 		try {
 			reply = await requestChest(key);
 			if (reply.status === 'unavailable') reply = await requestChest(key);
 		} finally {
 			chestOpensInFlight--;
+			useRewardPendingStore.getState().end();
 		}
 		if (reply.status === 'ok') {
 			if (reply.value.ok) {

@@ -83,6 +83,7 @@ export const PIXEL_ICON_SIZES = {
 	// monsters: 2-frame idle sheets (frame width x 2)
 	monster_rat: [80, 40],
 	monster_ratking: [112, 56],
+	skull: [40, 40], // lies over a dead monster in the minimized combat box
 	// items
 	item_potion_hp: [40, 40],
 	item_wooden_sword: [40, 40],

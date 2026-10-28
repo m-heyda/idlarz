@@ -58,6 +58,7 @@
 	font-size: 0.7rem;
 	color: #f0d8b0;
 	letter-spacing: 0;
+	white-space: nowrap;
 }
 
 .fight-timer {

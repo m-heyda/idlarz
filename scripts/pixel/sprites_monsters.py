@@ -7,7 +7,7 @@
 """
 import math
 from PIL import Image
-from render3d import Scene, Prim, rot, between, I3, add, mul
+from render3d import Scene, Prim, rot, between, I3, add, mul, place
 from materials import MATS
 import fx
 import sprites_equipment as eq
@@ -92,6 +92,24 @@ def potion():
     return img
 
 
+# ----------------------------------------------------------------- skull (lies over a dead monster in the minimized combat box)
+def skull():
+    sc = Scene(MATS, scale=14.0, origin=(20, 22))
+
+    def A(kind, c, size, mat, R=I3, tex=None, seed=0):
+        sc.add(place(Prim(kind, c, size, mat, R, tex, seed), -45))
+
+    A('ell', (0, 0, 0.3), (0.84, 0.74, 0.74), 'bone', I3, None, 1)                       # cranium
+    A('ell', (0, -0.05, -0.38), (0.5, 0.42, 0.3), 'bone', I3, None, 2)                   # jaw
+    for s in (-1, 1):
+        A('ell', (0.3 * s, -0.6, 0.18), (0.21, 0.14, 0.24), 'dark')                      # eye sockets
+        A('ell', (0.3 * s, -0.76, 0.2), (0.07, 0.05, 0.09), 'eye_glow')                  # a red spark in each
+    A('ell', (0, -0.74, -0.12), (0.08, 0.08, 0.13), 'dark')                              # nose hole
+    img = sc.render()
+    fx.glint(img, 14, 12, 1)
+    return img
+
+
 # ----------------------------------------------------------------- re-skins of the slot icons
 def _mats(remap):
     out = dict(MATS)
@@ -126,6 +144,7 @@ def _item(fn, remap=RAT):
 SPRITES = {
     'monster_rat': monster_rat,
     'monster_ratking': monster_ratking,
+    'skull': skull,
     'item_potion_hp': potion,
     'item_wooden_sword': _item(eq.mainhand, WOOD),
     'item_wooden_shield': _item(eq.offhand, WOOD),

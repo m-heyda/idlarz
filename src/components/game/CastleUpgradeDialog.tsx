@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FC } from 'react';
+import { sortedCostEntries } from '@/catalog';
 import { CASTLE_UPGRADE } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
 import { formatCompact, formatNumber, formatPercent, formatTime } from '@/utils/formatters';
@@ -82,7 +83,7 @@ const CastleUpgradeDialog: FC<CastleUpgradeDialogProps> = ({ onClose }) => {
 		muted,
 	}) => (
 		<div className='grid grid-cols-3 gap-2'>
-			{(Object.entries(costs) as [string, number][]).map(([resource, amount]) => (
+			{sortedCostEntries(costs).map(([resource, amount]) => (
 				<div
 					key={resource}
 					className={`flex items-center gap-1 text-sm ${

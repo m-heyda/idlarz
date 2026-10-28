@@ -11,7 +11,7 @@ import FarmUpgradeDock from './FarmUpgradeDock';
 import FarmAnimalDock, { ANIMAL_DOCK_WIDTH } from './FarmAnimalDock';
 
 /** Height the open / collapsed upgrade shelf takes along the bottom (CSS px, with its margin) */
-const UPGRADE_DOCK_HEIGHT = { open: 170, closed: 36 };
+const UPGRADE_DOCK_HEIGHT = { open: 140, closed: 36 };
 
 /**
  * The Farm window: one meadow filling the whole window with the pen and its animals in it, a corner readout, the animal
@@ -42,7 +42,7 @@ const FarmOverlay: React.FC = () => {
 		audioManager.playSound('click');
 	};
 
-	const buy = (animalId: string, count: number | 'max') => {
+	const buy = (animalId: string, count: number) => {
 		if (purchaseAnimal(animalId, count) > 0) setCelebrate(animalId);
 	};
 

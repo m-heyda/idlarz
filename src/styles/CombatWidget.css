@@ -1,7 +1,7 @@
 /* The combat panel in the bottom right corner, and the icon it shrinks to. Fight.css holds the bars, numbers and slots they share. */
 
 .combat-widget {
-	width: 300px;
+	width: 360px;
 	max-width: calc(100vw - 32px);
 	padding: 6px 8px 8px;
 	pointer-events: auto;
@@ -100,7 +100,21 @@
 	box-shadow: 0 0 0 2px #c0392b, inset 0 0 0 2px #2a1a0c;
 }
 
+.combat-icon[data-slain='true'] .monster-art {
+	filter: grayscale(1) brightness(0.5);
+	animation-play-state: paused;
+}
+
+.combat-icon-skull {
+	position: absolute;
+	top: 5px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 2;
+}
+
 .combat-icon-art {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -150,6 +164,7 @@
 .fight-dead {
 	position: relative;
 	display: inline-block;
+	isolation: isolate;
 }
 
 .fight-dead .monster-art {
@@ -165,6 +180,7 @@
 	top: 50%;
 	width: 120%;
 	height: 7px;
+	z-index: 2; /* the grey sprite is its own layer (filter); the cross goes over it */
 	background: #d8261c;
 	box-shadow: 0 0 0 2px #0a0605, inset 0 2px 0 rgba(255, 255, 255, 0.35);
 }
