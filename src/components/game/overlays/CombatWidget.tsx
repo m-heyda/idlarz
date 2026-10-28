@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import { formatCompact, formatNumber } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { useRewardPendingStore } from '@/stores/rewardPendingStore';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
@@ -12,6 +13,7 @@ import audioManager from '@/utils/audioManager';
 import MonsterArt from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
 import NotifyDot from '../NotifyDot';
+import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
 import { slotProps } from '../itemUi';
 import type { FightView } from '@/lib/offline/fightTypes';
@@ -231,6 +233,15 @@ const CombatWidget: React.FC = () => {
 		return () => clearTimeout(timer);
 	}, [noticeId, fight, pending, revealedId]);
 
+	// A win whose result is not shown yet (the bars are still draining): the little chest covers the wait for the loot
+	const awaitingLoot = noticeKind === 'won' && !fight && !pending && !showResult;
+	useEffect(() => {
+		if (!awaitingLoot) return;
+		const { begin, end } = useRewardPendingStore.getState();
+		begin();
+		return end;
+	}, [awaitingLoot]);
+
 	// A won fight is announced with the fanfare as the result appears; the result closes itself after a while (hover keeps it open)
 	const armClose = useCallback(() => {
 		clearTimeout(closeTimer.current);
@@ -276,15 +287,19 @@ const CombatWidget: React.FC = () => {
 
 	// a click on a monster opens the window at once, minimized or not
 	if (minimized && !pending) {
+		// a won fight leaves the monster dead: grey, with a skull over it (the loot dot stays)
+		const slain = !fight && notice?.kind === 'won';
 		return (
 			<button
 				className='combat-icon'
 				data-fighting={!!fight}
+				data-slain={slain}
 				onClick={() => setPref('combatMinimized', false)}
 				title={fight ? `Fighting a ${def.label} - click to open` : `The fight against the ${def.label} is over - click to see the result`}
 				aria-label='Open the combat panel'>
 				<span className='combat-icon-art' aria-hidden>
 					<MonsterArt type={type} scale={2} />
+					{slain && <PixelIcon name='skull' scale={0.5} className='combat-icon-skull' />}
 				</span>
 				<span className='combat-icon-hp' aria-hidden>
 					<i style={{ width: `${hpPct}%` }} />

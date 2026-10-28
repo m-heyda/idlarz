@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { sortedCostEntries } from '@/catalog';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
 import { EMBER_UPGRADES, REBIRTH, CASTLE_UPGRADE, type EmberUpgradeId } from '@/config/gameConfig';
@@ -18,8 +19,8 @@ const shopText: Record<EmberUpgradeId, (levels: number) => string> = {
 	nightwatch: (n) => `+${EMBER_UPGRADES.nightwatch.effectPerLevel} h of away time per level (now +${n * EMBER_UPGRADES.nightwatch.effectPerLevel} h)`,
 	steward: (n) => `+${pct(EMBER_UPGRADES.steward.effectPerLevel)} income while away per level (now +${pct(n * EMBER_UPGRADES.steward.effectPerLevel)})`,
 	mastery: (n) => `+${pct(EMBER_UPGRADES.mastery.effectPerLevel)} gold per click per level (now +${pct(n * EMBER_UPGRADES.mastery.effectPerLevel)})`,
-	provisions: (n) => `Every new run starts with ${Object.entries(EMBER_UPGRADES.provisions.bundle)
-		.map(([r, v]) => `${formatNumber((v as number) * Math.max(n, 1))} ${r}`)
+	provisions: (n) => `Every new run starts with ${sortedCostEntries(EMBER_UPGRADES.provisions.bundle)
+		.map(([r, v]) => `${formatNumber(v * Math.max(n, 1))} ${r}`)
 		.join(', ')}${n === 0 ? ' per level' : ''}`,
 };
 

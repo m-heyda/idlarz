@@ -251,7 +251,7 @@
 
 .mr-row {
 	display: grid;
-	grid-template-columns: 24px minmax(70px, 1fr) 82px 78px 78px 96px 96px;
+	grid-template-columns: 24px minmax(70px, 1fr) 82px 78px 78px 132px 132px;
 	align-items: center;
 	gap: 8px;
 	padding: 3px 6px;
@@ -287,6 +287,7 @@
 
 .mr-row .tip-btn {
 	width: 100%;
+	white-space: nowrap;
 }
 
 /* hover wrapper of a button with a hover card: a disabled button would swallow the hover */

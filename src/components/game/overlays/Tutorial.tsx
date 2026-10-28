@@ -29,7 +29,7 @@ import {
 import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
 import { LIMITS } from '@/config/limits';
-import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
+import { RARITIES, RARITY_ORDER, SETS, sortedCostEntries } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
 import { buildingCostFactor, castleModifier } from '@/utils/gameUtils';
@@ -147,7 +147,7 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-1'>
 					Every building costs more than the last. The first {BUILDING_COST.starter.length} are cheap (
 					{BUILDING_COST.starter.map((f) => `x${f}`).join(', ')} of the base price of{' '}
-					{Object.entries(buildingBase).map(([r, v]) => `${short(v as number)} ${r}`).join(', ')}), then the price grows x
+					{sortedCostEntries(buildingBase).map(([r, v]) => `${short(v)} ${r}`).join(', ')}), then the price grows x
 					{BUILDING_COST.growthEarly} per building for {BUILDING_COST.earlyCount} buildings, x{BUILDING_COST.growthMid} for the next{' '}
 					{BUILDING_COST.midCount} and x{BUILDING_COST.growthLate} after that (the same three-stage shape as tile prices).
 				</p>

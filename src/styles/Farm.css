@@ -361,7 +361,7 @@
 	}
 }
 
-/* --- animal shop (right edge): one card per kind with its yield and x1 / x10 / Max buttons --- */
+/* --- animal shop (right edge): one card per kind with its yield and Buy / Buy 10 buttons (the price is in their hover card) --- */
 .farm-animals {
 	grid-area: 1 / 2;
 	position: relative;
@@ -440,29 +440,26 @@
 	color: #7a6a52;
 }
 
-.farm-animal-note {
-	text-align: center;
-	color: #a89878;
-	line-height: 1.25;
-}
-
 .farm-animal-buy {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 5px;
 }
 
-/* a buy button: the action on top, the price under it; green when you can pay, dark when you cannot */
+/* a buy button: green when you can pay, dark and disabled when you cannot (its hover card says why) */
 .farm-buy {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 1px;
+	width: 100%;
 	min-width: 0;
-	padding: 4px 2px 3px;
+	padding: 5px 2px 4px;
 	font-family: var(--font-pixel);
+	font-size: 0.74rem;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	line-height: 1.1;
+	text-transform: uppercase;
+	white-space: nowrap;
 	color: #fff;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 	background: #3f8f2e;
 	border: 2px solid var(--px-ink);
 	box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px 0 rgba(0, 0, 0, 0.4);
@@ -478,46 +475,11 @@
 	transform: translateY(1px);
 }
 
-.farm-buy-label {
-	font-size: 0.74rem;
-	font-weight: 700;
-	letter-spacing: 0.5px;
-	line-height: 1.1;
-	text-transform: uppercase;
-	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-}
-
-.farm-buy-cost {
-	display: inline-flex;
-	align-items: center;
-	gap: 2px;
-	font-size: 0.68rem;
-	font-weight: 600;
-	line-height: 1.1;
-	color: #e8ffd0;
-	white-space: nowrap;
-}
-
-.farm-buy[data-ok='false'] {
+.farm-buy:disabled {
+	color: #b9a77f;
 	background: #2e2824;
 	box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.08), inset -2px -2px 0 rgba(0, 0, 0, 0.45);
-	cursor: default;
-}
-
-.farm-buy[data-ok='false'] .farm-buy-label {
-	color: #b9a77f;
-}
-
-.farm-buy[data-ok='false'] .farm-buy-cost {
-	color: #ff9a8a;
-}
-
-.farm-buy:disabled {
 	cursor: not-allowed;
-}
-
-.farm-buy:disabled .farm-buy-cost {
-	color: #7a6e60;
 }
 
 /* --- stats readout (top-left) --- */
@@ -690,27 +652,3 @@
 	min-height: 2.4em;
 	line-height: 1.2;
 }
-
-.farm-up-next {
-	color: #7ac27a;
-}
-
-.farm-up-max {
-	text-align: center;
-	font-weight: 700;
-	color: #c9a0ff;
-}
-
-.farm-up-cost {
-	display: inline-flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 2px 6px;
-	font-size: 0.68rem;
-	color: #bff59a;
-}
-
-.farm-up-cost [data-short='true'] {
-	color: #ff9a8a;
-}
-

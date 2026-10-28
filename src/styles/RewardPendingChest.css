@@ -1,0 +1,86 @@
+/* The chest that waits for a reward from the server: small, centred, no shade, never takes a click. */
+
+.rp-root {
+	position: fixed;
+	left: 50%;
+	top: 38%;
+	z-index: 90;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 96px;
+	height: 96px;
+	margin: -48px 0 0 -48px;
+	pointer-events: none;
+	image-rendering: pixelated;
+	animation: rp-in 0.3s steps(4) both;
+}
+
+.rp-root[data-leaving='true'] {
+	animation: rp-out 0.3s steps(4) both;
+}
+
+.rp-halo {
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	background: radial-gradient(closest-side, rgba(255, 224, 110, 0.5), rgba(255, 176, 40, 0.16) 60%, transparent);
+	animation: rp-halo 1.2s ease-in-out infinite alternate;
+}
+
+.rp-chest {
+	position: relative;
+	filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.5));
+	animation: rp-bob 0.8s steps(2) infinite alternate;
+}
+
+@keyframes rp-in {
+	from {
+		opacity: 0;
+		transform: scale(0.7);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes rp-out {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(1.15);
+	}
+}
+
+@keyframes rp-halo {
+	from {
+		opacity: 0.45;
+		transform: scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1.05);
+	}
+}
+
+@keyframes rp-bob {
+	from {
+		transform: translateY(0) rotate(-3deg);
+	}
+	to {
+		transform: translateY(-4px) rotate(3deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rp-root,
+	.rp-root[data-leaving='true'],
+	.rp-halo,
+	.rp-chest {
+		animation: none;
+	}
+}

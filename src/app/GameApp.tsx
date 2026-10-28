@@ -5,6 +5,7 @@ import { useGameStore } from '@/stores/gameStore';
 import Grid from '@/components/game/Grid';
 import MenuOverlay from '@/components/game/overlays/MenuOverlay';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
+import RewardPendingChest from '@/components/game/overlays/RewardPendingChest';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/gameConfig';
@@ -108,6 +109,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<MenuOverlay />
 			<ClassPickerDialog />
 			<LevelUpNotification />
+			<RewardPendingChest />
 			<LoadingScreen />
 			<GameDebug />
 			<SaveMenuDialog />

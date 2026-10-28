@@ -163,6 +163,17 @@ export type MerchantResourceKey = {
 	[K in ResourceKey]: (typeof RESOURCES)[K] extends { merchant: object } ? K : never;
 }[ResourceKey];
 
+/** Every resource in catalog order: the one order any list of resources (costs, rewards) is shown in */
+export const RESOURCE_ORDER = Object.keys(RESOURCES) as ResourceKey[];
+
+const RESOURCE_RANK = new Map<string, number>(RESOURCE_ORDER.map((key, index) => [key, index]));
+
+/** The entries of a cost bundle that are worth showing (> 0), in catalog order, whatever order the bundle was built in */
+export const sortedCostEntries = <K extends string>(cost: Partial<Record<K, number>>): [K, number][] =>
+	(Object.entries(cost) as [K, number | undefined][])
+		.filter((entry): entry is [K, number] => (entry[1] ?? 0) > 0)
+		.sort(([a], [b]) => (RESOURCE_RANK.get(a) ?? RESOURCE_ORDER.length) - (RESOURCE_RANK.get(b) ?? RESOURCE_ORDER.length));
+
 /** The resources of one tier, in catalog order (the header lists them left to right) */
 export const resourcesInTier = (tier: ResourceTier): ResourceKey[] =>
 	(Object.keys(RESOURCES) as ResourceKey[]).filter((key) => (RESOURCES[key] as ResourceDef).tier === tier);

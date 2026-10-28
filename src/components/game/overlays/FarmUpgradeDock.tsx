@@ -1,10 +1,10 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { FARM_UPGRADES, type FarmUpgradeId } from '@/config/gameConfig';
-import { formatNumber } from '@/utils/formatters';
 import { canAffordBundle, farmUpgradeCost, farmUpgradeLevel } from '@/utils/gameUtils';
 import audioManager from '@/utils/audioManager';
-import ResourceIcon from '../ResourceIcon';
+import CostList from '../CostList';
+import { TipButton } from './Merchant/TipButton';
 
 const IDS = Object.keys(FARM_UPGRADES) as FarmUpgradeId[];
 
@@ -13,7 +13,7 @@ interface FarmUpgradeDockProps {
 	onToggle: () => void;
 }
 
-/** The farm's upgrade shelf along the bottom of the scene: feed, hen house, dairy, tannery and the pen. */
+/** The farm's upgrade shelf along the bottom of the scene: feed, hen house, dairy, tannery and the pen. The next level and the price are in each button's hover card. */
 const FarmUpgradeDock: React.FC<FarmUpgradeDockProps> = ({ open, onToggle }) => {
 	const resources = useGameStore((state) => state.resources);
 	const upgrades = useGameStore((state) => state.farmUpgrades);
@@ -40,33 +40,33 @@ const FarmUpgradeDock: React.FC<FarmUpgradeDockProps> = ({ open, onToggle }) => 
 										{level}/{def.maxLevel}
 									</span>
 								</div>
-								<div className='farm-up-effect'>
-									{level > 0 ? def.description(level) : 'not built yet'}
-									{!maxed && <span className='farm-up-next'> {'→'} {def.description(level + 1)}</span>}
-								</div>
-								{maxed ? (
-									<div className='farm-up-max'>Max</div>
-								) : (
-									<button
-										className='px-btn px-btn-sm w-full'
-										disabled={!affordable}
-										onClick={() => {
-											if (buy(id)) {
-												audioManager.playSound('purchase');
-											}
-										}}>
-										<span className='farm-up-cost'>
-											{(Object.entries(cost) as [keyof typeof resources, number][]).map(([resource, amount]) => (
-												<span
-													key={resource}
-													data-short={resources[resource] < amount}
-													className='inline-flex items-center gap-1'>
-													{formatNumber(amount)} <ResourceIcon resource={resource} />
-												</span>
-											))}
-										</span>
-									</button>
-								)}
+								<div className='farm-up-effect'>{level > 0 ? def.description(level) : 'not built yet'}</div>
+								<TipButton
+									className='px-btn px-btn-sm w-full'
+									label={maxed ? 'Max' : 'Upgrade'}
+									disabled={!affordable}
+									onClick={() => {
+										if (buy(id)) {
+											audioManager.playSound('purchase');
+										}
+									}}
+									tip={
+										<>
+											<div className='px-tip-title'>
+												{def.label} {level}/{def.maxLevel}
+											</div>
+											{maxed ? (
+												<div className='px-tip-muted'>Fully upgraded.</div>
+											) : (
+												<>
+													<div className='text-[#7ac27a]'>Next: {def.description(level + 1)}</div>
+													<CostList cost={cost} />
+													{!affordable && <div className='px-tip-muted'>Not enough resources.</div>}
+												</>
+											)}
+										</>
+									}
+								/>
 							</div>
 						);
 					})}
