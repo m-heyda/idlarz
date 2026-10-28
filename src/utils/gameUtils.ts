@@ -347,9 +347,6 @@ export const calculateCombatStats = (
 	};
 };
 
-export const calculateTotalMeatProduction = (farmLevels: Record<string, number>, upgrades?: FarmUpgrades): number =>
-	calculateFarmOutput(farmLevels, upgrades).meat;
-
 /** Where one resource's income comes from, piece by piece. `base` and `total` are exactly what `calculateResourceRates` reports. */
 export interface ResourceBreakdownEntry {
 	/** Flat income of the realm itself (before any tile) */

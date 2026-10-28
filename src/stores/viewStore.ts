@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { CASTLE_X, CASTLE_Y, TILE_SIZE } from '@/config/gameConfig';
-import { centerOf, clampPosition, positionForCenter, type Point } from '@/lib/mapView';
+import { clampPosition, positionForCenter, type Point } from '@/lib/mapView';
 import { useGameStore } from '@/stores/gameStore';
 import { ownedBounds } from '@/utils/world';
 
@@ -64,9 +64,3 @@ export const useViewStore = create<ViewState>((set, get) => ({
 	centerOnCastle: () => get().centerOn((CASTLE_X + 0.5) * TILE_SIZE, (CASTLE_Y + 0.5) * TILE_SIZE),
 	reclamp: () => get().setPosition({ x: get().x, y: get().y }),
 }));
-
-/** The world point (px) in the middle of the screen right now. */
-export const viewCenter = (): Point => {
-	const { x, y, zoom, w, h } = useViewStore.getState();
-	return centerOf({ x, y }, zoom, { w, h });
-};

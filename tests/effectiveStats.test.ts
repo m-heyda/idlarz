@@ -5,7 +5,7 @@ import { INITIAL_CHARACTER_STATS, LEGACY_UPGRADES } from '../src/config/gameConf
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { aggregateStats } from '../src/lib/inventory';
 import { plainItem } from '../src/lib/itemInstance';
-import { critOdds, damagePerClick, maxHp } from '../src/lib/combat';
+import { critOdds, damagePerHit, maxHp } from '../src/lib/combat';
 import { effectiveStats } from '../src/lib/effectiveStats';
 import { calculateCombatStats } from '../src/utils/gameUtils';
 import type { CharacterStats, Equipment, PrestigeState } from '../src/types/game';
@@ -21,7 +21,7 @@ test('a fresh character shows the base numbers: x2 crits, 5% super crit, no extr
 	assert.equal(fx.critMultiplier, COMBAT.crit.mult);
 	assert.equal(fx.superCritMultiplier, COMBAT.crit.superMult);
 	assert.equal(fx.superCritChance, COMBAT.crit.superBase);
-	assert.equal(fx.damage, damagePerClick(STARTER_EQUIPMENT));
+	assert.equal(fx.damage, damagePerHit(STARTER_EQUIPMENT));
 	assert.equal(fx.maxHp, maxHp(character(), STARTER_EQUIPMENT));
 	assert.equal(fx.tileDiscount, character().tileCostDiscount, 'only the attribute discount');
 	assert.equal(fx.clickMastery, 0);

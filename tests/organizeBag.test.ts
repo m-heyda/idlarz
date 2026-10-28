@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, store } from './helpers';
+import { api, freshGame, openFight, store } from './helpers';
 import { COMBAT } from '../src/config/combatConfig';
 import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import { emptyBag, gearOf, organizeBag, slotQty, stackOf } from '../src/lib/inventory';
@@ -74,7 +74,7 @@ test('the store action organises the bag, and is refused in a fight', () => {
 	assert.deepEqual(ids(api().bag).slice(0, 3), ['potion_minorx2', 'wooden_sword', null]);
 	const bag = api().bag;
 	store.setState({ bag: bagOf(null, gear('wooden_sword'), gear('steel_mace')) });
-	store.setState({ fight: { monsterId: 1, type: 'rat', level: 1, monsterHp: 10, monsterMaxHp: 10, attackTimer: 0, timeLeftSec: null, potionCd: 0, stunLeftSec: 0, phase: 'active', summary: null, taunt: null } });
+	openFight();
 	const before = api().bag;
 	assert.equal(api().organizeBag(), false);
 	assert.equal(api().bag, before, 'untouched during a fight');

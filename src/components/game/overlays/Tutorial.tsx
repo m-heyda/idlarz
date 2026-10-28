@@ -212,14 +212,16 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Monsters &amp; Fighting</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					Once you own {COMBAT.spawn.minOwnedTiles} tiles, a <b>rat</b> appears on one of them after{' '}
+					A <b>rat</b> appears on land you own (not water, and never right next to the castle: {MONSTERS.rat.spawn.minCastleDistance} to {MONSTERS.rat.spawn.maxCastleDistance} tiles from it) after{' '}
 					{formatTime(COMBAT.spawn.firstSec)}, then another every {formatTime(COMBAT.spawn.intervalSec)} (monsters
 					and chests together never fill more than {pct(SPAWN_LIMIT.maxFraction)} of your free land). Monsters have a <b>level</b>: a new rat appears at level {MONSTERS.rat.spawnWindow.base} to {MONSTERS.rat.spawnWindow.cap} (the higher, the further your castle has
 					grown) and gains a level every {formatTime(LIMITS.monsterGrowthIntervalSec)} on the map, up to {LIMITS.monsterGrowthLevels} levels above the one it appeared at: more HP, harder hits, some armor
 					and better rewards. Every {formatTime(COMBAT.spawn.bossIntervalSec)} a <b>boss</b> appears, one at a time: the <b>Rat King</b> (level {MONSTERS.ratKing.spawnWindow.base}-{MONSTERS.ratKing.spawnWindow.cap} at the start, with a skull on
 					his badge). Bosses can crit, can resist Stun and carry drops nobody else has.
-					Click a monster to fight it. Right-click it for <b>Dismiss</b>: after a confirmation the monster is removed from the map with
-					no reward, which frees a place when one is too strong for you and the map is full.
+					You never click to fight: with <b>Auto-battle</b> on, the server sends you against one monster at a time, your weapon
+					and the monster each swinging at their own attack speed. The fight panel can be minimized to an icon, and a notice tells you when you win. Potions and skills have
+					hotkeys (1-5), or switch on <b>Auto-use</b> to let the server drink and cast for you. Right-click a monster for <b>Dismiss</b>: after a confirmation
+					it is removed from the map with no reward, which frees a place when one is too strong for you.
 				</p>
 				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
 					<li>

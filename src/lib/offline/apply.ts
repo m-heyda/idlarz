@@ -1,5 +1,4 @@
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, RESOURCE_CAP, XP_CAP } from '@/config/gameConfig';
-import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { maxHp, maxMana } from '@/lib/combat';
 import type { LimitContext } from '@/lib/limits';
 import { advanceMonsters } from '@/lib/monsters';
@@ -25,7 +24,7 @@ type Applied = Pick<
 	| 'playerMp'
 >;
 
-export type OfflineStateIn = Applied & Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige' | 'fight'>;
+export type OfflineStateIn = Applied & Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige'>;
 
 /** What the welcome-back window shows besides the income. */
 export interface OfflineSummary {
@@ -77,12 +76,8 @@ export const applyOfflineGrant = (state: OfflineStateIn, grant: OfflineGrant, li
 		}
 	}
 
-	// monsters age, and so grow, by the whole absence; a castle that now has a ward drives them out as it does while playing
-	let monsters = state.monsters;
-	if (monsters.length > 0) {
-		monsters = advanceMonsters(monsters, grant.elapsedSec, state.fight?.monsterId ?? null, limits);
-		monsters = monstersOutsideWard(monsters, castleLevelOf(tiles), state.fight?.monsterId ?? null);
-	}
+	// monsters age, and so grow, by the whole absence (the server then says which of them are still there)
+	const monsters = state.monsters.length > 0 ? advanceMonsters(state.monsters, grant.elapsedSec, limits) : state.monsters;
 
 	const { level, progress } = calculateLevel(resources.xp);
 	const levelsGained = Math.max(0, level - state.level.level);
@@ -100,7 +95,7 @@ export const applyOfflineGrant = (state: OfflineStateIn, grant: OfflineGrant, li
 			// the level-up window is for levels reached while playing: the welcome-back window reports these
 			previousLevel: level,
 			characterStats,
-			...(healed && !state.fight ? { playerHp: maxHp(characterStats, state.equipment), playerMp: maxMana(characterStats, state.equipment) } : {}),
+			...(healed ? { playerHp: maxHp(characterStats, state.equipment), playerMp: maxMana(characterStats, state.equipment) } : {}),
 		},
 		summary: { levelsGained, castleReached },
 	};

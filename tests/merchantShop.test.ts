@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, setResources, store, rawSnapshot } from './helpers';
+import { api, closeFight, freshGame, growTo, openFight, setResources, store, rawSnapshot } from './helpers';
 import { COMBAT } from '../src/config/combatConfig';
 import {
 	FARM_PRODUCT_KEYS,
@@ -115,10 +115,11 @@ test('sellItem and sellJunk are refused during a fight and never touch worn gear
 	freshGame({ gold: 0 });
 	const bag = emptyBag();
 	bag[0] = { item: plainItem('leather_cap') };
-	store.setState({ bag, fight: { phase: 'active' } as never });
+	store.setState({ bag });
+	openFight();
 	assert.equal(api().sellItem(0), 0);
 	assert.deepEqual(api().sellJunk('uncommon'), { gold: 0, count: 0 });
-	store.setState({ fight: null });
+	closeFight();
 	const equipped = { ...api().equipment };
 	assert.equal(api().sellJunk('common').count, 1);
 	assert.deepEqual(api().equipment, equipped);

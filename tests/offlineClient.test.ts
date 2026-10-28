@@ -17,72 +17,63 @@ const NOW = 1_800_000_000;
 const tickets = (over: Partial<PublicTickets> = {}): PublicTickets => ({ chests: 0, rats: [], king: null, ...over });
 const state = () => {
 	const s = api();
-	return { tiles: s.tiles, monsters: s.monsters, activeChests: s.activeChests, nextMonsterId: s.nextMonsterId, fightingId: null as number | null };
+	return { tiles: s.tiles, monsters: s.monsters, activeChests: s.activeChests };
 };
-const rat = (id: number, over: Partial<Monster> = {}): Monster => ({ id, type: 'rat', level: 1, spawnLevel: 1, x: CASTLE_X + 1, y: CASTLE_Y, ageSec: 0, ...over });
+/** A monster ticket the server has placed: its tile and the level it appeared at come from the server. */
+const placed = (n: number, at: number, over: { lucky?: boolean; x?: number; y?: number; spawnLevel?: number } = {}) => ({ n, at, lucky: false, x: CASTLE_X + 2, y: CASTLE_Y, spawnLevel: 1, ...over });
 
-test('tickets without monsters become monsters on free tiles, aged as the server says', () => {
+test('placed tickets become monsters exactly where the server put them, aged as the server says', () => {
 	freshGame();
 	growTo(30);
-	const out = reconcileTickets(state(), tickets({ rats: [{ n: 1, at: NOW - 3600, lucky: false }, { n: 2, at: NOW - 100, lucky: true }] }), NOW, mulberry32(3));
+	const out = reconcileTickets(
+		state(),
+		tickets({ rats: [placed(1, NOW - 3600, { x: CASTLE_X + 2, y: CASTLE_Y, spawnLevel: 2 }), placed(2, NOW - 100, { lucky: true, x: CASTLE_X, y: CASTLE_Y + 3, spawnLevel: 1 })] }),
+		NOW,
+		mulberry32(3)
+	);
 	assert.equal(out.monsters.length, 2);
-	assert.deepEqual(out.monsters.map((m) => m.ticket), [1, 2]);
+	assert.deepEqual(out.monsters.map((m) => [m.id, m.ticket, m.x, m.y]), [[1, 1, CASTLE_X + 2, CASTLE_Y], [2, 2, CASTLE_X, CASTLE_Y + 3]]);
 	assert.equal(out.monsters[0].ageSec, 3600);
-	assert.ok(out.monsters[0].level >= out.monsters[0].spawnLevel + 2, 'an hour old: two growth intervals');
+	assert.equal(out.monsters[0].level, out.monsters[0].spawnLevel + 2, 'an hour old: two growth intervals');
 	assert.equal(out.monsters[1].lucky, true);
 	assert.equal(out.monsters[0].lucky, undefined);
 	assert.equal(out.placed.monsters, 2);
 	assert.equal(out.placed.strongestLevel, Math.max(...out.monsters.map((m) => m.level)));
-	assert.equal(new Set(out.monsters.map((m) => `${m.x},${m.y}`)).size, 2, 'one monster per tile');
-	assert.equal(out.nextMonsterId, state().nextMonsterId + 2);
 });
 
 test('the King ticket becomes the King', () => {
 	freshGame();
 	growTo(30);
-	const out = reconcileTickets(state(), tickets({ king: { n: 5, at: NOW - 10 } }), NOW, mulberry32(1));
+	const out = reconcileTickets(state(), tickets({ king: { n: 5, at: NOW - 10, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 15 } }), NOW, mulberry32(1));
 	assert.equal(out.monsters[0].type, 'ratKing');
 	assert.equal(out.monsters[0].ticket, 5);
+	assert.equal(out.monsters[0].level, 15);
 });
 
-test('a monster without a ticket number takes the oldest ticket of its kind; one without any ticket to take is removed', () => {
+test('a monster the server does not list is removed, one it lists stays; nothing is placed twice', () => {
 	freshGame();
 	growTo(30);
-	const base = { ...state(), monsters: [rat(1), rat(2, { x: CASTLE_X - 1 }), rat(3, { y: CASTLE_Y + 1 })], nextMonsterId: 4 };
-	const out = reconcileTickets(base, tickets({ rats: [{ n: 7, at: NOW, lucky: true }, { n: 9, at: NOW, lucky: false }] }), NOW, mulberry32(1));
-	assert.deepEqual(out.monsters.map((m) => [m.id, m.ticket]), [[1, 7], [2, 9]]);
-	assert.equal(out.monsters[0].lucky, true);
-	assert.equal(out.removed.monsters, 1, 'a monster the server never made is not kept');
-	assert.equal(out.placed.monsters, 0);
-});
-
-test('a monster whose ticket was spent is removed, except the one being fought', () => {
-	freshGame();
-	growTo(30);
-	const base = { ...state(), monsters: [rat(1, { ticket: 4 }), rat(2, { ticket: 5, x: CASTLE_X - 1 })], nextMonsterId: 3 };
-	const out = reconcileTickets({ ...base, fightingId: 1 }, tickets({ rats: [] }), NOW, mulberry32(1));
-	assert.deepEqual(out.monsters.map((m) => m.id), [1], 'the fight goes on');
+	const standing: Monster[] = [
+		{ id: 4, type: 'rat', level: 1, spawnLevel: 1, x: CASTLE_X + 2, y: CASTLE_Y, ageSec: 0, ticket: 4 },
+		{ id: 5, type: 'rat', level: 1, spawnLevel: 1, x: CASTLE_X - 2, y: CASTLE_Y, ageSec: 0, ticket: 5 },
+	];
+	const out = reconcileTickets({ ...state(), monsters: standing }, tickets({ rats: [placed(4, NOW, { x: CASTLE_X + 2 })] }), NOW, mulberry32(1));
+	assert.deepEqual(out.monsters.map((m) => m.id), [4]);
 	assert.equal(out.removed.monsters, 1);
+	assert.equal(out.placed.monsters, 0);
 });
 
 test('chests match the server count: missing ones are placed, extra ones taken off', () => {
 	freshGame();
 	growTo(30);
-	const placed = reconcileTickets(state(), tickets({ chests: 3 }), NOW, mulberry32(2));
-	assert.equal(placed.activeChests, 3);
-	assert.equal(placed.tiles.stats.chests, 3);
-	assert.equal(placed.placed.chests, 3);
-	const trimmed = reconcileTickets({ ...state(), tiles: placed.tiles, activeChests: 3 }, tickets({ chests: 1 }), NOW, mulberry32(2));
+	const put = reconcileTickets(state(), tickets({ chests: 3 }), NOW, mulberry32(2));
+	assert.equal(put.activeChests, 3);
+	assert.equal(put.tiles.stats.chests, 3);
+	assert.equal(put.placed.chests, 3);
+	const trimmed = reconcileTickets({ ...state(), tiles: put.tiles, activeChests: 3 }, tickets({ chests: 1 }), NOW, mulberry32(2));
 	assert.equal(trimmed.activeChests, 1);
 	assert.equal(trimmed.tiles.stats.chests, 1);
 	assert.equal(trimmed.removed.chests, 2);
-});
-
-test('with no room the ticket keeps waiting instead of failing', () => {
-	freshGame(); // just the castle: nowhere to stand
-	const out = reconcileTickets(state(), tickets({ rats: [{ n: 1, at: NOW, lucky: false }] }), NOW, mulberry32(1));
-	assert.equal(out.monsters.length, 0);
-	assert.equal(out.placed.monsters, 0);
 });
 
 // ---------------------------------------------------------------------------------------------------- the store action
@@ -97,7 +88,7 @@ test('applyOfflineClaim pays the grant, places the tickets, takes the server gem
 	const before = api();
 	const grant = computeOfflineGrant({ rates: { ...zeroGrant(), gold: 7, xp: 2 }, ratesAfterCastle: null, castleUpgrade: null, xpGainPct: 0, gapSec: 4 * 3600, capSec: 8 * 3600, efficiency: 0.5, minGapSec: 300 })!;
 	const report = api().applyOfflineClaim(
-		claimResult({ grant, reason: 'paid', gems: 1037, tickets: tickets({ chests: 2, rats: [{ n: 1, at: NOW - 3 * 3600, lucky: false }] }) })
+		claimResult({ grant, reason: 'paid', gems: 1037, tickets: tickets({ chests: 2, rats: [placed(1, NOW - 3 * 3600, { spawnLevel: 2 })] }) })
 	);
 	const after = api();
 	assert.equal(after.resources.gold, before.resources.gold + 7 * 4 * 3600 * 0.5);

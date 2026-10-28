@@ -20,10 +20,14 @@ export type TicketKind = 'chest' | 'rat' | 'king';
 export interface MonsterTicket {
 	/** The ticket's number (unique for the run): the monster on the map carries it, a kill names it */
 	n: number;
-	/** When it appeared (epoch seconds, server clock): its age sets the level it may have grown to */
+	/** When it appeared (epoch seconds, server clock): its age sets the level it has grown to */
 	at: number;
 	/** A lucky rat (gold tint, bigger reward); decided here, never by the client */
 	lucky: boolean;
+	/** Where it stands and the level it appeared at: set by the server when it finds a tile (see placement.ts); a ticket without them is not on the map yet */
+	x?: number;
+	y?: number;
+	spawnLevel?: number;
 }
 
 export interface TicketBank {
@@ -40,6 +44,9 @@ export interface TicketBank {
 	/** The number of the next monster ticket, and how many rats this run has had (the first one comes sooner) */
 	nextN: number;
 	ratsMinted: number;
+	/** How many tiles a rat / the King may stand on right now (from the last look at the map: `sitesKey` says which land that was). Monsters stop coming when they are all taken; unknown (never looked) means none come yet. */
+	sites?: { rat: number; king: number };
+	sitesKey?: string;
 }
 
 /** What decides how many tickets there can be and how fast they come: the last accepted save's land and the player's Luck. */
@@ -77,6 +84,13 @@ export const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.m
 
 const ratThreshold = (bank: TicketBank): number => (bank.ratsMinted === 0 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec);
 
+/** Monsters waiting (rats and the King), placed or not. */
+export const monsterCount = (bank: TicketBank): number => bank.rats.length + (bank.king ? 1 : 0);
+
+/** Whether another rat / the King can come: the map has a tile for it that no waiting monster has taken. */
+const ratSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.rat;
+const kingSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.king;
+
 export interface Minted {
 	chests: number[];
 	rats: MonsterTicket[];
@@ -105,11 +119,12 @@ export const advanceBank = (
 	const scale = dt > 0 ? (options.realDtSec ?? dt) / dt : 1;
 	const start = bank.accAt;
 	const chestEvery = chestIntervalSec(ctx.luck);
-	const ratsAllowed = ctx.tilesOwned >= COMBAT.spawn.minOwnedTiles;
 	let used = 0;
 
 	// every pass either mints a ticket (room shrinks) or uses up the time, so this ends
 	for (let guard = 0; guard < 1000 && used < dt; guard++) {
+		const ratsAllowed = ratSiteFree(next);
+		const kingAllowed = !next.king && kingSiteFree(next);
 		if (ticketRoom(next, ctx) <= 0) {
 			next.chestAcc = 0;
 			next.ratAcc = 0;
@@ -117,11 +132,12 @@ export const advanceBank = (
 		}
 		const chestLeft = Math.max(0, chestEvery - next.chestAcc);
 		const ratLeft = ratsAllowed ? Math.max(0, ratThreshold(next) - next.ratAcc) : Infinity;
-		const kingLeft = next.king || !ratsAllowed ? Infinity : Math.max(0, COMBAT.spawn.bossIntervalSec - next.kingAcc);
+		const kingLeft = kingAllowed ? Math.max(0, COMBAT.spawn.bossIntervalSec - next.kingAcc) : Infinity;
 		const step = Math.min(chestLeft, ratLeft, kingLeft, dt - used);
 		next.chestAcc += step;
 		if (ratsAllowed) next.ratAcc += step;
-		if (ratsAllowed && !next.king) next.kingAcc += step;
+		else next.ratAcc = 0; // no free tile: the rat timer waits at 0, like with no room
+		if (kingAllowed) next.kingAcc += step;
 		used += step;
 		const at = start + used * scale;
 
@@ -139,7 +155,7 @@ export const advanceBank = (
 			next.rats.push(ticket);
 			minted.rats.push(ticket);
 		}
-		if (ratsAllowed && !next.king && next.kingAcc >= COMBAT.spawn.bossIntervalSec - 1e-9 && ticketRoom(next, ctx) > 0) {
+		if (kingAllowed && !next.king && kingSiteFree(next) && next.kingAcc >= COMBAT.spawn.bossIntervalSec - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const ticket = { n: next.nextN++, at, lucky: false };
 			next.kingAcc = 0;
 			next.king = ticket;
@@ -168,9 +184,8 @@ export const takeMonster = (bank: TicketBank, n: number): { bank: TicketBank; ti
 /** Seconds until the next ticket of any kind is due, or null when the map is full (nothing is coming until something is opened or killed). */
 export const secondsToNext = (bank: TicketBank, ctx: BankContext): number | null => {
 	if (ticketRoom(bank, ctx) <= 0) return null;
-	const ratsAllowed = ctx.tilesOwned >= COMBAT.spawn.minOwnedTiles;
 	const left = [Math.max(0, chestIntervalSec(ctx.luck) - bank.chestAcc)];
-	if (ratsAllowed) left.push(Math.max(0, ratThreshold(bank) - bank.ratAcc));
-	if (ratsAllowed && !bank.king) left.push(Math.max(0, COMBAT.spawn.bossIntervalSec - bank.kingAcc));
+	if (ratSiteFree(bank)) left.push(Math.max(0, ratThreshold(bank) - bank.ratAcc));
+	if (!bank.king && kingSiteFree(bank)) left.push(Math.max(0, COMBAT.spawn.bossIntervalSec - bank.kingAcc));
 	return Math.min(...left);
 };

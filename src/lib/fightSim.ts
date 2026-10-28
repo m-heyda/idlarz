@@ -1,16 +1,16 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/gameConfig';
 import { ITEM_CATALOG, SETS } from '@/catalog';
-import { COMBAT } from '@/config/combatConfig';
-import { SKILLS, type SkillId } from '@/catalog/skills';
-import { applyHit, armorOf, damageAfterArmor, manaRegenPerSec, maxHp, maxMana, newFight, rollHit, stepFight, stunResisted } from '@/lib/combat';
-import { castRefusal, healAmount, tickCooldowns, type SkillCooldowns } from '@/lib/skills';
-import { aggregateStats } from '@/lib/inventory';
+import type { StoredSave } from '@/lib/cloudSave/pipeline';
+import { runCombat, type CombatEnv } from '@/lib/offline/fight';
+import type { FightEvent } from '@/lib/offline/fightTypes';
+import { newLedger } from '@/lib/offline/ledger';
 import { plainItem } from '@/lib/itemInstance';
 import { calculateCombatStats } from '@/utils/gameUtils';
 import type { CharacterStats, Equipment, EquipmentSlot, MonsterType } from '@/types/game';
 
-// A bot that fights with the real combat rules (rollHit, stepFight, mitigate): used by scripts/fight-sim.ts to tune the
-// monsters and the gear, and by tests/fightBalance.test.ts to keep that tuning honest. Pure; the rng is injected.
+// A fight run by the server's own engine (lib/offline/fight.ts): used by scripts/fight-sim.ts to tune the monsters and the gear, and by
+// tests/fightBalance.test.ts to keep that tuning honest. The player swings at the weapon's attack speed, so there is no "click speed" any
+// more: a fight is decided by gear, attributes, potions and skills alone. Pure apart from the sealed random stream, which a seed picks.
 
 export const freshCharacter = (): CharacterStats => {
 	const stats = { ...INITIAL_CHARACTER_STATS };
@@ -43,81 +43,73 @@ export const atItemLevel = (equipment: Equipment, level: number): Equipment =>
 export interface SimInput {
 	equipment: Equipment;
 	monster: { type: MonsterType; level: number };
-	/** Clicks per second (each gap is jittered by +-30 %) */
-	cps: number;
-	rng: () => number;
 	character?: CharacterStats;
-	/** Potions the bot has: it drinks the best one when HP is under 40 % and the shared cooldown is over */
-	potions?: { healHp: number; qty: number }[];
-	/** The character level the bot casts skills at (Heal under 50 % HP, Stun whenever it is ready); without it the bot casts nothing */
-	skillLevel?: number;
+	/** Potions in the bag, by catalog id (auto-use drinks them below the preset HP) */
+	potions?: { id: string; qty: number }[];
+	/** The character level: skills unlock with it (the default 1 has neither Heal nor Stun) */
+	level?: number;
+	/** Auto-use switched on (the default): potions, Heal and Stun by the fixed rules */
+	autoUse?: boolean;
+	/** Picks the sealed random stream, so a table is reproducible */
+	seed: string;
 }
 
 export interface SimResult {
 	won: boolean;
-	outcome: 'won' | 'timeout' | 'knockedOut' | 'stalled';
+	outcome: 'won' | 'timeout' | 'defeated' | 'stalled';
 	timeSec: number;
 	hpLeftFraction: number;
-	clicks: number;
 }
 
-const STEP = 0.05;
-const GIVE_UP_SEC = 600; // monsters without a time limit (rats): a fight that drags on this long counts as stalled
+const SECRET = 'fight-sim-secret-0123456789';
+const START = 1_000_000;
 
-export const simulateFight = ({ equipment, monster, cps, rng, character = freshCharacter(), potions = [], skillLevel = 0 }: SimInput): SimResult => {
-	let fight = newFight({ id: 1, ...monster });
-	const max = maxHp(character, equipment);
-	let hp = max;
-	const armor = armorOf(equipment, character);
-	const gearRegen = { perSec: aggregateStats(equipment).regen, max };
-	const bag = potions.map((p) => ({ ...p })).sort((a, b) => b.healHp - a.healHp);
-	let mana = maxMana(character, equipment);
-	const manaMax = mana;
-	const manaRegen = manaRegenPerSec(character, equipment);
-	let cooldowns: SkillCooldowns = {};
-	let time = 0;
-	let clicks = 0;
-	let nextClick = (1 / cps) * (0.7 + 0.6 * rng());
+const BASE_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 
-	while (fight.phase === 'active' && time < GIVE_UP_SEC) {
-		time += STEP;
-		while (nextClick <= time && fight.phase === 'active') {
-			const damage = damageAfterArmor(fight, rollHit(character, equipment, rng).damage);
-			clicks++;
-			const hitResult = applyHit(fight, damage);
-			fight = hitResult.fight;
-			if (hitResult.killed) return { won: true, outcome: 'won', timeSec: nextClick, hpLeftFraction: hp / max, clicks };
-			nextClick += (1 / cps) * (0.7 + 0.6 * rng());
-		}
-		const step = stepFight(fight, STEP, hp, armor, rng, gearRegen);
-		fight = step.fight;
-		hp = step.playerHp;
-		mana = Math.min(manaMax, mana + manaRegen * STEP);
-		cooldowns = tickCooldowns(cooldowns, STEP);
-		if (skillLevel > 0 && fight.phase === 'active') {
-			const can = (id: SkillId) => castRefusal(id, { level: skillLevel, mana, hp, maxHp: max, fight, cooldowns }) === null;
-			if (fight.stunLeftSec <= 0 && can('stun')) {
-				mana -= SKILLS.stun.manaCost;
-				cooldowns = { ...cooldowns, stun: SKILLS.stun.cooldownSec };
-				if (!stunResisted(fight, rng)) fight = { ...fight, stunLeftSec: SKILLS.stun.stunSec ?? 0 };
-			}
-			if (hp < max * 0.5 && can('heal')) {
-				mana -= SKILLS.heal.manaCost;
-				cooldowns = { ...cooldowns, heal: SKILLS.heal.cooldownSec };
-				hp = Math.min(max, hp + healAmount(character, equipment));
-			}
-		}
-		if (fight.phase === 'active' && hp < max * 0.4 && fight.potionCd <= 0) {
-			const potion = bag.find((p) => p.qty > 0);
-			if (potion) {
-				potion.qty--;
-				hp = Math.min(max, hp + potion.healHp);
-				fight = { ...fight, potionCd: COMBAT.potionCooldownSec };
-			}
-		}
+export interface SimSetup {
+	equipment?: Equipment;
+	character?: CharacterStats;
+	potions?: { id: string; qty: number }[];
+	level?: number;
+	/** The monsters waiting on the map, placed (ticket numbers count up from 1) */
+	monsters: { type: MonsterType; level: number; lucky?: boolean }[];
+	seed: string;
+}
+
+/** A player, a map with monsters on it and the server clock at `START`: what the fight engine runs on (for the sim and for engine tests). */
+export const simSetup = ({ equipment = {}, character = freshCharacter(), potions = [], level = 1, monsters, seed }: SimSetup) => {
+	const characterStats: Record<string, number> = { availablePoints: 0 };
+	for (const key of BASE_KEYS) characterStats[key] = character[key];
+	const core = { equipment, characterStats, level: { level, progress: 0 }, bag: potions.map((p) => ({ id: p.id, qty: p.qty })) };
+	const stored = { core, summary: { derived: { luck: 0, goldFind: 0 }, rates: { gold: 1, xp: 1 }, xpGainPct: 0 } } as unknown as StoredSave;
+	const base = newLedger(START * 1000);
+	let n = 0;
+	const ticket = (m: SimSetup['monsters'][number]) => ({ n: ++n, at: START, lucky: m.lucky ?? false, x: 2 + n, y: 3, spawnLevel: m.level });
+	const rats = monsters.filter((m) => m.type === 'rat').map(ticket);
+	const kingDef = monsters.find((m) => m.type === 'ratKing');
+	const ledger = { ...base, runId: 1, bank: { ...base.bank, accAt: START, rats, king: kingDef ? ticket(kingDef) : null } };
+	const env = (nowSec: number): CombatEnv => ({ secret: SECRET, userId: seed, stored, nowSec });
+	return { ledger, env, start: START, stored };
+};
+
+export const simulateFight = ({ equipment, monster, character, potions, level, autoUse = true, seed }: SimInput): SimResult => {
+	const { ledger, env } = simSetup({ equipment, character, potions, level, monsters: [monster], seed });
+
+	// the first request engages the monster; then the clock runs on one second at a time until the fight is decided
+	let state = runCombat(ledger, env(START), { autoUse }).ledger;
+	const maxHp = state.combat!.fight?.profile.maxHp ?? 1;
+	let now = START;
+	const seen: FightEvent[] = [];
+	for (let i = 0; i < 700 && state.combat!.fight; i++) {
+		now += 1;
+		state = runCombat(state, env(now)).ledger;
+		seen.push(...state.combat!.log.filter((e) => e.no > (seen[seen.length - 1]?.no ?? 0)));
 	}
-	const outcome = fight.phase === 'active' ? 'stalled' : (fight.phase as SimResult['outcome']);
-	return { won: false, outcome, timeSec: time, hpLeftFraction: hp / max, clicks };
+	const end = seen.find((e) => e.kind === 'won' || e.kind === 'defeated' || e.kind === 'timeout');
+	const hp = state.combat!.hp;
+	if (!end) return { won: false, outcome: 'stalled', timeSec: now - START, hpLeftFraction: hp / maxHp };
+	const outcome = end.kind as 'won' | 'defeated' | 'timeout';
+	return { won: outcome === 'won', outcome, timeSec: end.t - START, hpLeftFraction: outcome === 'won' ? hp / maxHp : 0 };
 };
 
 export interface SimSummary {
@@ -126,13 +118,13 @@ export interface SimSummary {
 	meanHpLeft: number; // of the wins, as a fraction of max HP
 }
 
-/** Runs the bot `runs` times (a seeded rng makes a table reproducible). */
-export const simulateMany = (input: Omit<SimInput, 'rng'>, runs: number, rng: () => number): SimSummary => {
+/** Runs the fight `runs` times (each with its own sealed stream). */
+export const simulateMany = (input: Omit<SimInput, 'seed'>, runs: number, seedBase = 'sim'): SimSummary => {
 	let wins = 0;
 	let time = 0;
 	let hpLeft = 0;
 	for (let i = 0; i < runs; i++) {
-		const r = simulateFight({ ...input, rng });
+		const r = simulateFight({ ...input, seed: `${seedBase}-${i}` });
 		if (r.won) {
 			wins++;
 			time += r.timeSec;

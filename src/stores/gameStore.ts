@@ -10,7 +10,6 @@ import {
 	BUILDINGS,
 	AMBIENT_LIFE,
 	CASTLE_UPGRADE,
-	CHEST,
 	STARTING_GEMS,
 	FARM_BONUS,
 	CLICK_LADDER,
@@ -47,7 +46,6 @@ import {
 	calculateXpGain,
 	canAffordBundle,
 	castleUpgradeDuration,
-	countOwnedTiles,
 	createInitialWorld,
 	economyTiles,
 	EMPTY_PRESTIGE,
@@ -60,7 +58,6 @@ import {
 	legacyGain,
 	legacyUpgradeCost,
 	merchantLevel,
-	merchantLuck,
 	merchantUpgradeCost,
 	sellPayout,
 	startingResources,
@@ -68,30 +65,28 @@ import {
 	tileCostAsResources,
 } from '@/utils/gameUtils';
 import { rollBiome } from '@/utils/biomeRules';
-import { pickChestSpot, rollChestLoot, type ChestLoot } from '@/lib/chests';
+import { type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
-import { createHitGuard } from '@/lib/hitGuard';
-import { applyHit, armorOf, damageAfterArmor, dodgeChance, leechHeal, manaRegenPerSec, maxHp, maxMana, newFight, regen, rollHit, stepFight, stunResisted } from '@/lib/combat';
+import { manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
+import { writeCursor } from '@/lib/combatCursor';
 import { emitCombat } from '@/lib/combatFx';
-import { SKILLS, type SkillId } from '@/catalog/skills';
-import { castRefusal, healAmount, isSkillId, tickCooldowns } from '@/lib/skills';
+import type { SkillId } from '@/catalog/skills';
 import type { LimitContext } from '@/lib/limits';
 import { generateMerchantStock, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
-import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
+import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotItemId, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
 import { plainItem, sellValueOf } from '@/lib/itemInstance';
-import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
-import { canSpawn } from '@/lib/spawnLimits';
+import { castleLevelOf } from '@/lib/castleWard';
 import { applyOfflineGrant } from '@/lib/offline/apply';
 import { reconcileTickets } from '@/lib/offline/reconcile';
-import type { ClaimResult, SyncResult } from '@/lib/offline/types';
+import type { CombatView, FightEvent } from '@/lib/offline/fightTypes';
+import type { ClaimResult, FightReply, SyncResult } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
-import { requestChest, requestKill } from '@/lib/rewardsClient';
+import { requestAuto, requestChest, requestDismiss, requestUse, type Reply } from '@/lib/rewardsClient';
 import { signalNeedClaim } from '@/lib/serverSession';
 import { useUiStore } from '@/stores/uiStore';
-import { isAutoSold, receiveDrops, rollKillLoot } from '@/lib/loot';
-import { advanceMonsters, bossThreshold, monsterAt, newMonster, nextBossType, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
-import { COMBAT } from '@/config/combatConfig';
+import { isAutoSold, receiveDrops } from '@/lib/loot';
+import { advanceMonsters, monsterAt, monsterDef } from '@/lib/monsters';
 import { ITEM_CATALOG, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
@@ -99,9 +94,10 @@ import type {
 	BiomeType,
 	CharacterStats,
 	ClickInput,
+	CombatClientState,
+	CombatNotice,
 	CritterGift,
 	EquipmentSlot,
-	FightState,
 	GameState,
 	GiftResult,
 	MerchantStock,
@@ -110,7 +106,7 @@ import type {
 	Resources,
 	TapResult,
 } from '@/types/game';
-import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, patchTile, setTile, type World } from '@/utils/world';
+import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile, type World } from '@/utils/world';
 
 // Last tap time per tile (not persisted) - enforces TILE_TAP.cooldownMs
 const lastTapAt: Record<string, number> = {};
@@ -123,7 +119,6 @@ const lastGiftAt: Record<string, number> = {};
 
 // Shared by the gold click and the tile tap: one token per physical click
 const clickLimiter = createClickLimiter();
-const hitGuard = createHitGuard(); // fight hits are not rate limited (see lib/hitGuard)
 
 const BASE_STATS = [
 	'strength',
@@ -143,6 +138,20 @@ const seededRandom = (seed: number) => () => {
 	t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
 	return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
+
+/** What the browser knows about combat before the server has said anything: no fight, both switches on (the server's own default). */
+export const initialCombat = (): CombatClientState => ({
+	fight: null,
+	autoBattle: true,
+	autoUse: true,
+	cd: { heal: 0, stun: 0, potion: 0 },
+	maxHp: 0,
+	maxMp: 0,
+	retrySec: 0,
+	at: 0,
+	eventNo: null,
+	notice: null,
+});
 
 /** All game data of a brand-new game (no actions). */
 export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () => number = Math.random) => {
@@ -164,12 +173,8 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		bag: starterBag(),
 		playerHp: maxHp(stats, equipment),
 		playerMp: maxMana(stats, equipment),
-		skillCd: {} as Partial<Record<SkillId, number>>,
 		monsters: [] as Monster[],
-		monsterSpawnTimer: 0,
-		bossSpawnTimer: 0,
-		nextMonsterId: 1,
-		fight: null as FightState | null,
+		combat: initialCombat(),
 		farmLevels: {} as Record<string, number>,
 		farmUpgrades: {} as Record<string, number>,
 		merchantUpgrades: {} as Record<string, number>,
@@ -181,9 +186,8 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		clickLevel: 0,
 		castleUpgrade: null,
 		playSeconds: 0,
-		chestSpawnTimer: 0,
 		activeChests: 0,
-		gems: STARTING_GEMS,
+		gems: STARTING_GEMS, // a new game's gift; once the account has a ledger the server's balance replaces it on every answer
 		lootPity: {} as Record<string, number>,
 		autoSellUpTo: null as string | null,
 		lastChestLoot: null as ChestLoot | null, // what the last chest held (transient: only drives the toast)
@@ -280,40 +284,111 @@ const createGameSlice = (
 		} else toast('Could not reach the server: the chest is still there.');
 	};
 
-	/** Settles a won fight on the server: the loot is rolled there, against the monster's ticket. Until it answers the monster stays on the map. */
-	const settleKill = async (monsterId: number, level: number, ticket: number | undefined) => {
-		const abandon = (text: string) => {
-			set((state) => (state.fight?.monsterId === monsterId ? { fight: null } : {}));
-			toast(text);
-		};
-		if (ticket === undefined) return abandon('This monster was not real: no loot.');
-		const key = newClaimId();
-		let reply = await requestKill(key, ticket, level);
-		if (reply.status === 'unavailable') reply = await requestKill(key, ticket, level);
-		if (reply.status !== 'ok') {
-			if (reply.status === 'need_claim') signalNeedClaim();
-			return abandon('Could not reach the server: the monster is still there.');
+	let noticeId = 1;
+	const tauntOf = (type: Monster['type']): string | null => {
+		const taunts = monsterDef(type).taunts;
+		return taunts && taunts.length > 0 ? taunts[Math.floor(Math.random() * taunts.length)] : null;
+	};
+
+	/** Shows what the server says happened in a fight, with the numbers flying in the order (and roughly the rhythm) they happened. */
+	const playFx = (events: FightEvent[]) => {
+		const recent = events.filter((e) => ['hit', 'crit', 'super', 'hurt', 'heal', 'potion', 'stun', 'resist'].includes(e.kind));
+		const first = recent[0]?.t ?? 0;
+		for (const e of recent.slice(-24)) {
+			const delay = Math.min(2500, Math.max(0, (e.t - first) * 1000));
+			const fx = () => {
+				if (e.kind === 'hit' || e.kind === 'crit' || e.kind === 'super') emitCombat({ kind: 'hit', damage: e.amount ?? 0, killed: false, crit: e.kind === 'hit' ? 'none' : e.kind });
+				else if (e.kind === 'hurt') emitCombat({ kind: 'hurt', amount: e.amount ?? 0, crit: e.crit });
+				else if (e.kind === 'heal' || e.kind === 'potion') emitCombat({ kind: 'heal', amount: e.amount ?? 0 });
+				else if (e.kind === 'stun') emitCombat({ kind: 'stun', sec: e.amount ?? 0 });
+				else if (e.kind === 'resist') emitCombat({ kind: 'resist' });
+			};
+			if (delay === 0) fx();
+			else setTimeout(fx, delay);
 		}
-		const reward = reply.value;
-		if (!reward.ok || reward.dismissed) {
-			set((state) => ({ monsters: state.monsters.filter((m) => m.id !== monsterId) }));
-			return abandon('This monster was not real: no loot.');
-		}
+	};
+
+	/**
+	 * Takes the server's picture of the player's combat: HP, mana, cooldowns, the open fight and the switches replace what was shown, and
+	 * every event the browser has not applied yet is applied once (a potion leaves the bag, a kill's loot goes in, a defeat is announced).
+	 * An answer older than one already applied is ignored.
+	 */
+	const applyCombatView = (view: CombatView, gemsTotal?: number) => {
 		const state = get();
-		const received = receiveDrops(state.bag, reward.items, state.autoSellUpTo, state);
-		const summary = { gold: reward.gold, xp: reward.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold, lucky: reward.lucky };
+		if (view.at < state.combat.at) return;
+		// the log numbers start again with a new run (a rebirth): a server log that is behind the browser's cursor is a new one
+		const seen = state.combat.eventNo === null ? null : view.eventNo >= state.combat.eventNo ? state.combat.eventNo : 0;
+		const fresh = seen === null ? [] : view.events.filter((e) => e.no > seen);
+		let bag = state.bag;
+		let lootPity = state.lootPity;
+		let notice: CombatNotice | null = state.combat.notice;
+		const resources = { ...state.resources };
+		for (const e of fresh) {
+			if (e.kind === 'potion' && e.id) {
+				const index = bag.findIndex((slot) => !!stackOf(slot) && slotItemId(slot) === e.id);
+				if (index >= 0) bag = removeFromBag(bag, index, 1);
+			} else if (e.kind === 'won' && e.reward && e.type) {
+				const received = receiveDrops(bag, e.reward.items, state.autoSellUpTo, state);
+				bag = received.bag;
+				lootPity = e.reward.pity;
+				resources.gold = Math.min(resources.gold + e.reward.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP);
+				resources.xp = Math.min(resources.xp + e.reward.xp, XP_CAP);
+				notice = {
+					id: noticeId++,
+					kind: 'won',
+					type: e.type,
+					level: e.level ?? 1,
+					summary: { gold: e.reward.gold, xp: e.reward.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold, lucky: e.reward.lucky },
+					taunt: null,
+				};
+			} else if ((e.kind === 'defeated' || e.kind === 'timeout') && e.type) {
+				notice = { id: noticeId++, kind: e.kind, type: e.type, level: e.level ?? 1, summary: null, taunt: tauntOf(e.type) };
+			}
+		}
 		set({
-			fight: state.fight?.monsterId === monsterId ? { ...state.fight, phase: 'won', summary } : state.fight,
-			monsters: state.monsters.filter((m) => m.id !== monsterId),
-			bag: received.bag,
-			lootPity: reward.pity,
-			gems: reward.gemsTotal,
-			resources: {
-				...state.resources,
-				gold: Math.min(state.resources.gold + reward.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP),
-				xp: Math.min(state.resources.xp + reward.xp, XP_CAP),
+			bag,
+			lootPity,
+			resources,
+			playerHp: view.hp,
+			playerMp: view.mp,
+			...(gemsTotal !== undefined ? { gems: gemsTotal } : {}),
+			combat: {
+				fight: view.fight,
+				autoBattle: view.autoBattle,
+				autoUse: view.autoUse,
+				cd: view.cd,
+				maxHp: view.maxHp,
+				maxMp: view.maxMp,
+				retrySec: view.retrySec,
+				at: view.at,
+				eventNo: view.eventNo,
+				notice,
 			},
 		});
+		writeCursor(view.eventNo);
+		playFx(fresh);
+	};
+
+	/** The map as the server's tickets say: monsters where it put them, as many chests as it counts. */
+	const reconcileMap = (tickets: SyncResult['tickets'], serverNowSec: number) => {
+		const state = get();
+		const map = reconcileTickets({ tiles: state.tiles, monsters: state.monsters, activeChests: state.activeChests }, tickets, serverNowSec, Math.random, limitCtx(state));
+		set({ tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests });
+		return map;
+	};
+
+	const sinceNow = () => get().combat.eventNo ?? undefined;
+
+	/** What to do with the answer to a combat request: apply it, or say why nothing happened. */
+	const settleFight = (reply: Reply<FightReply>, refused?: string) => {
+		if (reply.status === 'ok') {
+			applyCombatView(reply.value.combat, reply.value.gemsTotal);
+			reconcileMap(reply.value.tickets, reply.value.serverNowSec);
+			if (!reply.value.accepted && refused) toast(refused);
+			return;
+		}
+		if (reply.status === 'need_claim') signalNeedClaim();
+		toast('Could not reach the server.');
 	};
 
 	const slice = {
@@ -323,7 +398,6 @@ const createGameSlice = (
 
 		resetGame: () => {
 			clickLimiter.reset();
-			hitGuard.reset();
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			set({ ...createInitialData(), isHydrated: true });
@@ -346,7 +420,6 @@ const createGameSlice = (
 				legacyEarned: state.prestige.legacyEarned + gain,
 			};
 			clickLimiter.reset();
-			hitGuard.reset();
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			const fresh = createInitialData(prestige);
@@ -534,32 +607,15 @@ const createGameSlice = (
 			return true;
 		},
 
-		// Collect a chest: gold (passive gold/s x random minutes), a lucky x1.5 gold chest, a bundle of resources, XP or a
-		// gear piece - see src/lib/chests.ts. Luck improves the odds and the gold.
+		// Collect a chest: the chest leaves the map at once and what was inside is rolled by the server (sealed on the number of chests
+		// opened this run, so reloading cannot roll it twice): gold (passive gold/s x random minutes), a bundle of resources, XP or a gear
+		// piece - see src/lib/chests.ts. Luck improves the odds and the gold.
 		collectChest: (x: number, y: number) => {
 			const state = get();
 			const tile = getTile(state.tiles, x, y);
 			if (!tile || !tile.hasChest) return false;
-
-			const newTiles = setTile(state.tiles, x, y, { ...tile, hasChest: false });
-			const left = { tiles: newTiles, activeChests: Math.max(0, state.activeChests - 1) };
-
-			if (state.serverSpawns) {
-				// a signed-in player: the chest leaves the map at once, what was inside is rolled by the server (sealed, never twice)
-				set(left);
-				void openChestRemote(x, y);
-				return true;
-			}
-			const loot = rollChestLoot({
-				rates: state.resourceRates.total,
-				luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck,
-				goldFind: aggregateStats(state.equipment).goldFind,
-				bag: state.bag,
-				castleLevel: castleLevelOf(state.tiles),
-				autoSellUpTo: state.autoSellUpTo,
-			});
-			set(left);
-			receiveChest(loot);
+			set({ tiles: setTile(state.tiles, x, y, { ...tile, hasChest: false }), activeChests: Math.max(0, state.activeChests - 1) });
+			void openChestRemote(x, y);
 			return true;
 		},
 
@@ -602,148 +658,53 @@ const createGameSlice = (
 			return { resource: def.resource, amount };
 		},
 
-		// Fights. A hit must be a real click (lib/hitGuard) but is not rate limited: speed is skill, damage and crits are rolled here, and so are rewards and loot.
-		startFight: (monsterId: number) => {
-			const state = get();
-			if (state.fight || state.playerHp <= 0) return false;
-			const monster = state.monsters.find((m) => m.id === monsterId);
-			if (!monster) return false;
-			set({ fight: newFight(monster) });
+		// Combat is the server's: it engages the monsters, swings both ways at each side's attack speed and pays the kills (src/lib/offline/fight.ts).
+		// Nothing here hits anything. These are the few things a player may still ask for - a hotkey, a switch, a dismissal - and each is sent
+		// to the server, whose answer (not a guess made here) changes the picture.
+		requestPotion: (id: string) => {
+			if (!ITEM_CATALOG[id]?.consumable?.healHp) return false;
+			void requestUse(newClaimId(), { kind: 'potion', id }, sinceNow()).then((reply) => settleFight(reply, 'No potion was drunk.'));
 			return true;
 		},
 
-		hitMonster: (input: ClickInput) => {
-			const state = get();
-			const fight = state.fight;
-			if (!fight || fight.phase !== 'active') return null;
-			if (!hitGuard.take(input)) return null;
-
-			const rolled = rollHit(state.characterStats, state.equipment, Math.random);
-			const crit = rolled.crit;
-			const damage = damageAfterArmor(fight, rolled.damage); // the monster's armor takes its share
-			const { fight: next, killed } = applyHit(fight, damage);
-			// Life Leech: a share of the click's damage comes back as HP
-			const leech = leechHeal(damage, state.equipment);
-			const hpAfter = leech > 0 ? Math.min(maxHp(state.characterStats, state.equipment), state.playerHp + leech) : state.playerHp;
-			emitCombat({ kind: 'hit', damage, killed, crit });
-			if (!killed) {
-				set({ fight: next, playerHp: hpAfter });
-				return { damage, killed: false, crit };
-			}
-
-			if (state.serverSpawns) {
-				// a signed-in player: the fight is over, the loot is rolled by the server against the monster's ticket (the monster stays until it answers)
-				const ticket = state.monsters.find((m) => m.id === fight.monsterId)?.ticket;
-				set({ fight: { ...next, phase: 'won', summary: null }, playerHp: hpAfter });
-				void settleKill(fight.monsterId, fight.level, ticket);
-				return { damage, killed: true, crit };
-			}
-
-			const rates = state.resourceRates.total;
-			const loot = rollKillLoot(
-				{ type: fight.type, level: fight.level },
-				{
-					goldPerSec: rates.gold,
-					xpPerSec: rates.xp * (1 + state.characterStats.xpGainMultiplier / 100),
-					luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck,
-					goldFind: aggregateStats(state.equipment).goldFind,
-					owned: [
-						...Object.values(state.equipment).map((item) => item?.base),
-						...state.bag.map((slot) => (slot && 'item' in slot ? slot.item.base : slot?.id)),
-					].filter((id): id is string => !!id),
-					pity: state.lootPity,
-				},
-				Math.random
-			);
-			const received = receiveDrops(state.bag, loot.items, state.autoSellUpTo, state);
-			set({
-				fight: { ...next, phase: 'won', summary: { gold: loot.gold, xp: loot.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold } },
-				monsters: state.monsters.filter((m) => m.id !== fight.monsterId),
-				playerHp: hpAfter,
-				bag: received.bag,
-				lootPity: loot.pity,
-				resources: {
-					...state.resources,
-					gold: Math.min(state.resources.gold + loot.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP),
-					xp: Math.min(state.resources.xp + loot.xp, XP_CAP),
-				},
-			});
-			return { damage, killed: true, crit };
+		requestSkill: (id: SkillId) => {
+			void requestUse(newClaimId(), { kind: 'skill', id }, sinceNow()).then((reply) => settleFight(reply, 'The skill is not ready.'));
+			return true;
 		},
 
-		// Closing the fight (flee, or dismissing an end panel). The monster is never persisted damaged, so it is simply full HP again.
-		leaveFight: () => set({ fight: null }),
+		// Auto-battle (the server starts the next fight itself) and auto-use (it drinks, heals and stuns for you with fixed rules); both on by default
+		setAutoBattle: (on: boolean) => {
+			set((state) => ({ combat: { ...state.combat, autoBattle: on } }));
+			void requestAuto({ autoBattle: on }, sinceNow()).then((reply) => settleFight(reply));
+		},
 
-		// Removes a monster from the map without a fight or loot (for a rat too strong to beat while the map is at its monster cap)
+		setAutoUse: (on: boolean) => {
+			set((state) => ({ combat: { ...state.combat, autoUse: on } }));
+			void requestAuto({ autoUse: on }, sinceNow()).then((reply) => settleFight(reply));
+		},
+
+		// The server's picture of combat arrived with a sync (polling, a hotkey): see applyCombatView
+		applyFightReply: (reply: FightReply) => {
+			applyCombatView(reply.combat, reply.gemsTotal);
+			reconcileMap(reply.tickets, reply.serverNowSec);
+		},
+
+		// The win or defeat notice has been read
+		clearCombatNotice: () => set((state) => (state.combat.notice ? { combat: { ...state.combat, notice: null } } : {})),
+
+		// Takes a monster off the map without a fight or loot (for a rat too strong to beat); ends the fight against it
 		dismissMonster: (id: number) => {
-			const state = get();
-			if (state.fight?.monsterId === id) return false;
-			const monster = state.monsters.find((m) => m.id === id);
+			const monster = get().monsters.find((m) => m.id === id);
 			if (!monster) return false;
-			set({ monsters: state.monsters.filter((m) => m.id !== id) });
-			// the server keeps a ticket for every monster: give it back (no reward), or the monster would simply come back
-			if (state.serverSpawns && monster.ticket !== undefined) void requestKill(newClaimId(), monster.ticket, monster.level, true);
-			return true;
-		},
-
-		drinkPotion: (bagIndex: number) => {
-			const state = get();
-			const slot = Number.isInteger(bagIndex) ? stackOf(state.bag[bagIndex]) : null;
-			const healHp = slot ? ITEM_CATALOG[slot.id]?.consumable?.healHp : undefined;
-			if (!slot || !healHp || slot.qty < 1) return false;
-			const max = maxHp(state.characterStats, state.equipment);
-			if (state.playerHp >= max) return false;
-			if (state.fight && (state.fight.phase !== 'active' || state.fight.potionCd > 0)) return false;
-
-			const healed = Math.min(healHp, max - state.playerHp);
-			set({
-				bag: removeFromBag(state.bag, bagIndex, 1),
-				playerHp: state.playerHp + healed,
-				fight: state.fight ? { ...state.fight, potionCd: COMBAT.potionCooldownSec } : null,
-			});
-			emitCombat({ kind: 'heal', amount: healed });
-			return true;
-		},
-
-		// Skills: mana and a cooldown each. Heal works anywhere, Stun only in an active fight (see lib/skills.ts for the rules)
-		castSkill: (id: SkillId) => {
-			const state = get();
-			if (!isSkillId(id)) return false;
-			const max = maxHp(state.characterStats, state.equipment);
-			const refusal = castRefusal(id, {
-				level: state.level.level,
-				mana: state.playerMp,
-				hp: state.playerHp,
-				maxHp: max,
-				fight: state.fight,
-				cooldowns: state.skillCd,
-			});
-			if (refusal) return false;
-			const skill = SKILLS[id];
-			const patch: Partial<GameState> = {
-				playerMp: state.playerMp - skill.manaCost,
-				skillCd: { ...state.skillCd, [id]: skill.cooldownSec },
-			};
-			if (id === 'heal') {
-				const healed = Math.min(healAmount(state.characterStats, state.equipment, skill), max - state.playerHp);
-				patch.playerHp = state.playerHp + healed;
-				emitCombat({ kind: 'heal', amount: Math.round(healed) });
-			} else if (state.fight) {
-				if (stunResisted(state.fight, Math.random)) {
-					emitCombat({ kind: 'resist' }); // the mana and the cooldown are spent all the same
-				} else {
-					patch.fight = { ...state.fight, stunLeftSec: skill.stunSec ?? 0 };
-					emitCombat({ kind: 'stun', sec: skill.stunSec ?? 0 });
-				}
-			}
-			set(patch);
+			set((state) => ({ monsters: state.monsters.filter((m) => m.id !== id) }));
+			if (monster.ticket !== undefined) void requestDismiss(newClaimId(), monster.ticket, sinceNow()).then((reply) => settleFight(reply));
 			return true;
 		},
 
 		// Gear actions: refused while a fight is open; max HP can drop when gear comes off, so playerHp follows it down
 		equipItem: (bagIndex: number) => {
 			const state = get();
-			if (state.fight) return false;
+			if (state.combat.fight) return false;
 			const result = equipFromBag(state.bag, state.equipment, bagIndex);
 			if (!result) return false;
 			set({
@@ -757,7 +718,7 @@ const createGameSlice = (
 
 		unequipItem: (slot: EquipmentSlot) => {
 			const state = get();
-			if (state.fight) return false;
+			if (state.combat.fight) return false;
 			const result = unequip(state.bag, state.equipment, slot);
 			if (!result) return false;
 			set({
@@ -771,7 +732,7 @@ const createGameSlice = (
 
 		moveBagItem: (from: number, to: number) => {
 			const state = get();
-			if (state.fight || from === to) return false;
+			if (state.combat.fight || from === to) return false;
 			const inRange = (i: number) => Number.isInteger(i) && i >= 0 && i < state.bag.length;
 			if (!inRange(from) || !inRange(to)) return false;
 			set({ bag: moveSlot(state.bag, from, to) });
@@ -781,7 +742,7 @@ const createGameSlice = (
 		// Tidy the bag from the left (stacks merged, gear sorted); like every bag action, not while a fight is open
 		organizeBag: () => {
 			const state = get();
-			if (state.fight) return false;
+			if (state.combat.fight) return false;
 			set({ bag: organizeBag(state.bag) });
 			return true;
 		},
@@ -867,90 +828,24 @@ const createGameSlice = (
 				}
 			}
 
-			// Chests: the spawn timer only runs while monsters and chests together are below their share of the free tiles
-			let newChestSpawnTimer = state.chestSpawnTimer;
-			let newActiveChestsCount = state.activeChests;
-			const wardLevel = castleLevelOf(newTiles);
-			if (state.serverSpawns) {
-				// a signed-in player's chests are made by the server (its clock, its secret): see lib/offline
-				newChestSpawnTimer = 0;
-			} else if (!canSpawn(newTiles, wardLevel, state.monsters.length, newActiveChestsCount)) {
-				newChestSpawnTimer = 0;
-			} else {
-				newChestSpawnTimer += secondsElapsed;
-				if (newChestSpawnTimer >= CHEST.intervalSec) {
-					newChestSpawnTimer = 0;
-					const monsterSpots = new Set(state.monsters.map((m) => `${m.x},${m.y}`));
-					const spot = pickChestSpot(newTiles, monsterSpots, castleLevelOf(newTiles));
-					if (spot) {
-						const { x, y } = spot;
-						newTiles = patchTile(newTiles, x, y, { hasChest: true });
-						newActiveChestsCount++;
-					}
-				}
-			}
+			// Chests and monsters come from the server (see applyServerTickets); between its answers the monsters on the map just age
+			const newMonsters = state.monsters.length > 0 ? advanceMonsters(state.monsters, secondsElapsed, limitCtx(state)) : state.monsters;
 
-			// Monsters: the one being fought is frozen; the spawn timer only runs with enough land and room on the map
-			let newMonsters = state.monsters;
-			let newMonsterSpawnTimer = state.monsterSpawnTimer;
-			let newNextMonsterId = state.nextMonsterId;
-			if (newMonsters.length > 0) {
-				newMonsters = advanceMonsters(newMonsters, secondsElapsed, state.fight?.monsterId ?? null, limitCtx(state));
-				// the castle's ward (castle level 7+) drives monsters out; the one being fought stays until the fight ends
-				newMonsters = monstersOutsideWard(newMonsters, castleLevelOf(newTiles), state.fight?.monsterId ?? null);
-			}
-			let newBossSpawnTimer = state.bossSpawnTimer;
-			const roomToSpawn = canSpawn(newTiles, wardLevel, newMonsters.length, newActiveChestsCount) && countOwnedTiles(newTiles) >= COMBAT.spawn.minOwnedTiles;
-			if (state.serverSpawns || !roomToSpawn) {
-				newMonsterSpawnTimer = 0;
-			} else {
-				newMonsterSpawnTimer += secondsElapsed;
-				if (newMonsterSpawnTimer >= spawnThreshold(newNextMonsterId)) {
-					newMonsterSpawnTimer = 0;
-					const spot = pickSpawnTile(newTiles, newMonsters, Math.random);
-					if (spot) {
-						newMonsters = [
-							...newMonsters,
-							newMonster('rat', newNextMonsterId, spot, castleLevelOf(newTiles)),
-						];
-						newNextMonsterId++;
-					}
-				}
-			}
-			// Bosses come on their own timer, one kind at a time; the timer waits while there is no room and restarts when one leaves
-			const bossType = nextBossType(newMonsters);
-			if (state.serverSpawns || !bossType) newBossSpawnTimer = 0;
-			else if (roomToSpawn) {
-				newBossSpawnTimer += secondsElapsed;
-				if (newBossSpawnTimer >= bossThreshold()) {
-					const spot = pickSpawnTile(newTiles, newMonsters, Math.random);
-					if (spot) {
-						newBossSpawnTimer = 0;
-						newMonsters = [...newMonsters, newMonster(bossType, newNextMonsterId, spot, castleLevelOf(newTiles))];
-						newNextMonsterId++;
-					}
-				}
-			}
-
-			// Fight step (monster attacks, king timer) or, with no active fight, HP regeneration
-			let newFightState = state.fight;
-			let newPlayerHp = state.playerHp;
+			// HP and mana: the server's numbers arrive with every answer; in between they keep filling the way the server will count them
+			// (in a fight the server's picture is the only one, so HP is left alone and only the cooldowns and the stun run down)
 			const playerMaxHp = maxHp(state.characterStats, state.equipment);
-			if (newFightState && newFightState.phase === 'active') {
-				const gearRegen = aggregateStats(state.equipment).regen;
-				const step = stepFight(newFightState, secondsElapsed, newPlayerHp, armorOf(state.equipment, state.characterStats), Math.random, { perSec: gearRegen, max: playerMaxHp }, dodgeChance(state.equipment));
-				newFightState = step.fight;
-				newPlayerHp = step.playerHp;
-				for (const event of step.events) {
-					if (event.kind === 'hurt') emitCombat({ kind: 'hurt', amount: event.amount, crit: event.crit });
-					if (event.kind === 'knockedOut') newPlayerHp = Math.round(playerMaxHp * COMBAT.knockoutHpFraction);
-				}
-			} else {
-				newPlayerHp = regen(newPlayerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen);
-			}
-			newPlayerHp = Math.min(newPlayerHp, playerMaxHp);
-			// Mana refills in and out of fights
+			const inFight = state.combat.fight !== null;
+			const newPlayerHp = Math.min(playerMaxHp, inFight ? state.playerHp : regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen));
 			const newPlayerMp = Math.min(maxMana(state.characterStats, state.equipment), state.playerMp + manaRegenPerSec(state.characterStats, state.equipment) * secondsElapsed);
+			const cd = state.combat.cd;
+			const cooling = cd.heal > 0 || cd.stun > 0 || cd.potion > 0 || (state.combat.fight?.stunLeft ?? 0) > 0;
+			const newCombat = cooling
+				? {
+						...state.combat,
+						cd: { heal: Math.max(0, cd.heal - secondsElapsed), stun: Math.max(0, cd.stun - secondsElapsed), potion: Math.max(0, cd.potion - secondsElapsed) },
+						fight: state.combat.fight ? { ...state.combat.fight, stunLeft: Math.max(0, state.combat.fight.stunLeft - secondsElapsed) } : null,
+					}
+				: state.combat;
 
 			const newPlaySeconds = state.playSeconds + secondsElapsed;
 
@@ -970,16 +865,10 @@ const createGameSlice = (
 				characterStats: newCharacterStats,
 				tiles: newTiles,
 				castleUpgrade: newCastleUpgrade,
-				chestSpawnTimer: newChestSpawnTimer,
-				activeChests: newActiveChestsCount,
 				monsters: newMonsters,
-				monsterSpawnTimer: newMonsterSpawnTimer,
-				bossSpawnTimer: newBossSpawnTimer,
-				nextMonsterId: newNextMonsterId,
-				fight: newFightState,
+				combat: newCombat,
 				playerHp: newPlayerHp,
 				playerMp: newPlayerMp,
-				skillCd: tickCooldowns(state.skillCd, secondsElapsed),
 				merchantStock: stockDue(state.merchantStock, newPlaySeconds, limitCtx(state)) ? generateMerchantStock(castleLevelOf(state.tiles), averageItemLevel(state.equipment), rotationRng(newPlaySeconds), newPlaySeconds, limitCtx(state)) : state.merchantStock,
 				playSeconds: newPlaySeconds,
 			});
@@ -987,22 +876,10 @@ const createGameSlice = (
 			if (level > state.level.level) emitSaveEvent('levelUp');
 		},
 
-		// Whether a signed-in player's chests and monsters come from the server (set by the app once the account is known; never saved)
-		serverSpawns: false,
-		setServerSpawns: (on: boolean) => set({ serverSpawns: on }),
-
-		// The server's view of what has appeared (see /api/spawn): the map is brought in line, the gem balance is the server's
+		// The server's view of what has appeared and of the player's combat (see /api/spawn): the map is brought in line, the gem balance and HP are the server's
 		applyServerTickets: (sync: SyncResult) => {
-			const state = get();
-			const map = reconcileTickets(
-				{ tiles: state.tiles, monsters: state.monsters, activeChests: state.activeChests, nextMonsterId: state.nextMonsterId, fightingId: state.fight?.monsterId ?? null },
-				sync.tickets,
-				sync.serverNowSec,
-				Math.random,
-				limitCtx(state)
-			);
-			set({ tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, nextMonsterId: map.nextMonsterId, gems: sync.gemsTotal });
-			return map.placed;
+			applyCombatView(sync.combat, sync.gemsTotal);
+			return reconcileMap(sync.tickets, sync.serverNowSec).placed;
 		},
 
 		// Applies the server's answer to a login: what the absence paid, then the chests and monsters it made appear
@@ -1019,13 +896,13 @@ const createGameSlice = (
 			}
 			const after = { ...state, ...patch } as GameState;
 			const map = reconcileTickets(
-				{ tiles: after.tiles, monsters: after.monsters, activeChests: after.activeChests, nextMonsterId: after.nextMonsterId, fightingId: state.fight?.monsterId ?? null },
+				{ tiles: after.tiles, monsters: after.monsters, activeChests: after.activeChests },
 				result.tickets,
 				result.serverNowSec,
 				Math.random,
 				limitCtx(state)
 			);
-			set({ ...patch, tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, nextMonsterId: map.nextMonsterId, gems: result.gems });
+			set({ ...patch, tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, gems: result.gems });
 			emitSaveEvent('offlineClaimed');
 			if (!result.grant) return null;
 			return {
@@ -1096,7 +973,7 @@ const createGameSlice = (
 		// Sell bag items for gold (flat price per item, plus Haggler). Equipped gear is not in the bag, so it is never sold.
 		sellItem: (bagIndex: number, qty?: number) => {
 			const state = get();
-			if (state.fight) return 0;
+			if (state.combat.fight) return 0;
 			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
 			if (!slot) return 0;
 			const gear = gearOf(slot);
@@ -1116,7 +993,7 @@ const createGameSlice = (
 		// Throw bag items away for good (no gold); `qty` defaults to one, pass the stack size to clear the slot
 		discardItem: (bagIndex: number, qty?: number) => {
 			const state = get();
-			if (state.fight) return false;
+			if (state.combat.fight) return false;
 			const slot = Number.isInteger(bagIndex) ? state.bag[bagIndex] : null;
 			if (!slot) return false;
 			const amount = qty === undefined ? 1 : Math.floor(qty);
@@ -1128,7 +1005,7 @@ const createGameSlice = (
 		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)
 		sellJunk: (maxRarity: string) => {
 			const state = get();
-			if (state.fight) return { gold: 0, count: 0 };
+			if (state.combat.fight) return { gold: 0, count: 0 };
 			if (!Object.prototype.hasOwnProperty.call(RARITIES, maxRarity)) return { gold: 0, count: 0 };
 			let bag = state.bag;
 			let gold = 0;
@@ -1293,8 +1170,8 @@ export const useGameStore = create(
 			return {
 				...current,
 				...saved,
-				// an open fight belongs to the tab that opened it: after a reload or a tab take-over it is stale
-				fight: null,
+				// combat is the server's: it is asked again as soon as the game is up
+				combat: initialCombat(),
 				resourceRates: rates,
 				isHydrated: true,
 			};

@@ -25,8 +25,6 @@ export const registerCloudSaver = (next: CloudSaver): (() => void) => {
 	};
 };
 
-export const getCloudSaver = (): CloudSaver | null => saver;
-
 // ---- the remembered time of the last manual cloud save (survives a reload, so refreshing does not reset the limit) -------
 
 const KEY = 'idlarz.cloud.manual';

@@ -3,9 +3,13 @@ import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
 import { addTotals, seedLedger, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
+import { restThrough } from '@/lib/offline/fight';
+import { isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
 import { sealedRng } from '@/lib/offline/seal';
 import { advanceBank, type BankContext, type TicketBank } from '@/lib/offline/tickets';
 import { offlineMinGapSec } from '@/lib/offline/limits';
+import type { Rng } from '@/lib/rng';
+import type { World } from '@/utils/world';
 
 // The server's side of offline progress. No database code in here: it takes a `LedgerRepo` and a `SaveRepo`, so the same functions run
 // against Supabase in the app and against a Map in the tests.
@@ -19,11 +23,45 @@ export interface ServiceDeps {
 
 export type { ClaimResult, PublicTickets };
 
+/** An online call is refused with `claim_first` when more than this long passed since the player was last seen (the absence is claimed first). */
+export const UNCLAIMED_SEC = 900;
+
+/** The tickets as the browser may see them: a monster shows once the server has given it a tile. */
 export const publicTickets = (bank: TicketBank): PublicTickets => ({
 	chests: bank.chests.length,
-	rats: bank.rats.map(({ n, at, lucky }) => ({ n, at, lucky })),
-	king: bank.king ? { n: bank.king.n, at: bank.king.at } : null,
+	rats: bank.rats.filter(isPlaced).map(({ n, at, lucky, x, y, spawnLevel }) => ({ n, at, lucky, x: x!, y: y!, spawnLevel: spawnLevel! })),
+	king: bank.king && isPlaced(bank.king) ? { n: bank.king.n, at: bank.king.at, x: bank.king.x!, y: bank.king.y!, spawnLevel: bank.king.spawnLevel! } : null,
 });
+
+/** Reads the player's map at most once per request, and only when it is asked for. */
+export const mapLoader = (deps: ServiceDeps, userId: string) => {
+	let loaded: Promise<{ world: World; key: string; rebirths: number } | null> | null = null;
+	return () =>
+		(loaded ??= (async () => {
+			try {
+				const fresh = await deps.saves.load(userId, { world: true });
+				const world = fresh?.world ? worldFromPart(fresh.world) : null;
+				return fresh && world ? { world, key: siteKey(fresh.summary), rebirths: fresh.summary.rebirths } : null;
+			} catch {
+				return null; // the map and the save disagree for a moment (a save is landing): look again next time
+			}
+		})());
+};
+
+/**
+ * Gives the bank its look at the land when that matters (the land changed, or a monster is waiting for a tile): counts the free
+ * tiles for monsters, and puts every waiting monster on one (see placement.ts).
+ */
+export const lookAtMap = async (
+	loadMap: ReturnType<typeof mapLoader>,
+	bank: TicketBank,
+	stored: StoredSave,
+	rollFor: (kind: string, n: number) => Rng
+): Promise<TicketBank> => {
+	if (!needsLook(bank, siteKey(stored.summary))) return bank;
+	const map = await loadMap();
+	return map ? placeTickets(bank, map.world, map.key, map.rebirths, rollFor) : bank;
+};
 
 export type ClaimOutcome = { kind: 'no_save' } | { kind: 'ok'; result: ClaimResult };
 
@@ -45,7 +83,7 @@ export const withLedger = async <T>(
 	deps: ServiceDeps,
 	userId: string,
 	nowMs: number,
-	step: (ledger: Ledger, stored: StoredSave) => { ledger: Ledger; result: T }
+	step: (ledger: Ledger, stored: StoredSave) => { ledger: Ledger; result: T } | Promise<{ ledger: Ledger; result: T }>
 ): Promise<{ kind: 'no_save' } | { kind: 'ok'; result: T; ledger: Ledger }> => {
 	for (let attempt = 0; attempt < CAS_TRIES; attempt++) {
 		const stored = await deps.saves.load(userId);
@@ -54,7 +92,7 @@ export const withLedger = async <T>(
 		// a save from before the ledger existed does not say what stands on the map (chests): wait for the next upload instead of seeding from guesses
 		if (!existing && stored.summary.derived.known !== true) return { kind: 'no_save' };
 		const base = existing ?? seedLedger(stored, nowMs);
-		const out = step(base, stored);
+		const out = await step(base, stored);
 		const next: Ledger = { ...out.ledger, ver: (existing?.ver ?? 0) + 1 };
 		if (await deps.ledgers.commit(userId, existing?.ver ?? 0, next)) return { kind: 'ok', result: out.result, ledger: next };
 	}
@@ -68,7 +106,8 @@ export const withLedger = async <T>(
  * now (a second claim a moment later pays nothing) and is remembered under `claimId`, so a response lost on the way is simply replayed.
  */
 export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: string, nowMs: number): Promise<ClaimOutcome> => {
-	const done = await withLedger(deps, userId, nowMs, (ledger, stored): { ledger: Ledger; result: ClaimResult } => {
+	const loadMap = mapLoader(deps, userId);
+	const done = await withLedger(deps, userId, nowMs, async (ledger, stored): Promise<{ ledger: Ledger; result: ClaimResult }> => {
 		if (ledger.lastKey === claimId && ledger.lastResult) return { ledger, result: ledger.lastResult as ClaimResult };
 
 		const derived = stored.summary.derived;
@@ -92,13 +131,14 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 		const ctx = bankContext(stored);
 		const rollFor = (kind: string, n: number) => sealedRng(deps.secret, userId, ledger.runId, kind, n);
 		// first the stretch the player was still here (their own spawn timers were running), then the absence at its efficiency
-		let bank = ledger.bank;
+		// the land is looked at first (monsters only come while it has a free tile for them), and again for the monsters this claim makes
+		let bank = await lookAtMap(loadMap, ledger.bank, stored, rollFor);
 		const hereSec = Math.max(0, anchorMs / 1000 - bank.accAt);
 		if (hereSec > 0) bank = advanceBank(bank, hereSec, ctx, rollFor).bank;
 		const from = Math.max(bank.accAt, anchorMs / 1000);
 		if (grant) bank = advanceBank({ ...bank, accAt: from }, grant.elapsedSec * grant.efficiency, ctx, rollFor, { realDtSec: grant.elapsedSec }).bank;
 		else bank = advanceBank({ ...bank, accAt: from }, gapSec, ctx, rollFor).bank;
-		bank = { ...bank, accAt: nowSec };
+		bank = await lookAtMap(loadMap, { ...bank, accAt: nowSec }, stored, rollFor);
 
 		const result: ClaimResult = {
 			grant,
@@ -107,9 +147,10 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 			serverNowSec: nowSec,
 			gems: ledger.gems,
 		};
+		// a real absence is a rest: no fight is left open, HP and mana are back. (A page reload is not one: the open fight carries on.)
+		const rested = gapSec > UNCLAIMED_SEC ? restThrough({ ...ledger, bank }, { secret: deps.secret, userId, stored, nowSec }, gapSec) : { ...ledger, bank };
 		const next: Ledger = {
-			...ledger,
-			bank,
+			...rested,
 			anchorAt: nowMs,
 			granted: grant ? addTotals(ledger.granted, grant.resources) : ledger.granted,
 			lastKey: claimId,

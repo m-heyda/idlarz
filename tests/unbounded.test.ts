@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, setResources, store, owned } from './helpers';
-import { CASTLE_X, CASTLE_Y, CHEST, RESOURCE_CAP } from '../src/config/gameConfig';
+import { CASTLE_X, CASTLE_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 import { pickPersisted } from '../src/lib/sanitizeSave';
 import { spawnCap } from '../src/lib/spawnLimits';
+import { spawnTiles } from '../src/lib/monsters';
 import { decodeSave, encodeSave } from '../src/lib/saveFormat';
 import { calculateTileCost, calculateXpGain, economyTiles } from '../src/utils/gameUtils';
 import { COORD_LIMIT, MAX_OWNED_TILES, getTile, isOwnedAt, ownedBounds, ownedCount, setTile } from '../src/utils/world';
@@ -98,7 +99,7 @@ const findFrontier = (): [number, number] | null => {
 	return null;
 };
 
-test('chests and monsters spawn on land with negative coordinates, and the game saves and loads such a map', () => {
+test('chests and monsters the server lists show on land with negative coordinates, and the game saves and loads such a map', () => {
 	freshGame();
 	// a map that is mostly in the negative quadrant
 	const world = syntheticWorld(1200, 11);
@@ -107,11 +108,21 @@ test('chests and monsters spawn on land with negative coordinates, and the game 
 	let xp = 0;
 	for (let k = 2; k <= 1200; k++) xp += calculateXpGain(k); // what those tiles would have paid, so the save below is plausible
 	setResources({ xp: xp * 1.01 });
-	for (let i = 0; i < 40; i++) api().tick(CHEST.intervalSec * 1000);
+	api().tick(1000); // the levels those tiles paid for hand out their stat points on the next tick
+	// the server lists 5 chests and 3 monsters (placed on land it chose, 2 to 9 tiles from the castle): the map shows them, negative coordinates included
+	const spots = spawnTiles('rat', world, new Set());
+	assert.ok(spots.length >= 3 && spots.some(({ x, y }) => x < 25 || y < 25));
+	api().applyServerTickets({
+		tickets: { chests: 5, rats: spots.slice(0, 3).map(({ x, y }, i) => ({ n: i + 1, at: 0, lucky: false, x, y, spawnLevel: 1 })), king: null },
+		serverNowSec: 10,
+		gemsTotal: 1000,
+		nextInSec: 60,
+		combat: { hp: 100, mp: 40, maxHp: 101, maxMp: 40, cd: { heal: 0, stun: 0, potion: 0 }, fight: null, autoBattle: true, autoUse: true, retrySec: 0, at: 1, eventNo: 0, events: [], behind: false, nextPollSec: 8 },
+	});
 	const placed = [...api().tiles.map.entries()].filter(([, t]) => t.hasChest).length;
-	assert.ok(placed > 0 && placed <= spawnCap(world, 1), `chests on the map: ${placed}`);
+	assert.ok(placed === 5 && placed <= spawnCap(world, 1), `chests on the map: ${placed}`);
 	assert.equal(api().tiles.stats.chests, placed);
-	assert.ok(api().monsters.length > 0, 'monsters appeared');
+	assert.equal(api().monsters.length, 3, 'monsters appeared');
 	for (const m of api().monsters) assert.ok(isOwnedAt(api().tiles, m.x, m.y) && getTile(api().tiles, m.x, m.y)?.biome !== 'castle');
 
 	const text = encodeSave(pickPersisted(api()));

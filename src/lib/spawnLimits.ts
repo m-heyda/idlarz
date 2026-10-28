@@ -17,7 +17,3 @@ export const freeTiles = (world: World, castleLevel: number): number => {
 /** The most monsters and chests together: `SPAWN_LIMIT.maxFraction` of the free tiles (never below `minAllowed`). */
 export const spawnCap = (world: World, castleLevel: number): number =>
 	Math.max(SPAWN_LIMIT.minAllowed, Math.floor(freeTiles(world, castleLevel) * SPAWN_LIMIT.maxFraction));
-
-/** True while there is still room for one more monster or chest. */
-export const canSpawn = (world: World, castleLevel: number, monsterCount: number, chestCount: number): boolean =>
-	monsterCount + chestCount < spawnCap(world, castleLevel);

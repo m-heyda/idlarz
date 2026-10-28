@@ -73,7 +73,6 @@ const Tile: React.FC<TileProps> = ({
 	const buyTile = useGameStore((state) => state.buyTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
-	const startFight = useGameStore((state) => state.startFight);
 	// string selector: the tile re-renders when its monster appears, changes level or leaves, not on every tick
 	const monsterKey = useGameStore((state) => {
 		const m = monsterAt(state.monsters, x, y);
@@ -109,11 +108,9 @@ const Tile: React.FC<TileProps> = ({
 	const inRange = useGameStore((state) => mayBeInRange && inCastleRange(x, y, castleLevelOf(state.tiles)));
 
 	const handleClick = (e: React.MouseEvent) => {
-		// A monster on this tile: clicking it opens the fight (no tile tap, no chest)
+		// A monster on this tile: fights are the server's (nobody clicks to fight), so the click does nothing (no tile tap, no chest, no gold)
 		if (isOwned && monsterKey) {
-			// starting a fight is not a map click: keep it from reaching the window-level gold click listener
 			e.stopPropagation();
-			if (startFight(Number(monsterId))) audioManager.playSound('click');
 			return;
 		}
 
@@ -171,7 +168,7 @@ const Tile: React.FC<TileProps> = ({
 		}
 	};
 
-	// Right click on an explored tile: what can be done here (fight / dismiss a monster, open a chest, build, highlight the area),
+	// Right click on an explored tile: what can be done here (dismiss a monster, open a chest, build, highlight the area),
 	// then the global entries. Unexplored tiles fall through to the global menu alone.
 	const handleContextMenu = (e: React.MouseEvent) => {
 		if (!isOwned) return;
@@ -181,7 +178,6 @@ const Tile: React.FC<TileProps> = ({
 		if (monsterKey) {
 			const id = Number(monsterId);
 			own.push(
-				{ id: 'fight', label: 'Fight', onSelect: () => void startFight(id) },
 				{ id: 'dismiss', label: `Dismiss ${MONSTERS[monsterType as 'rat' | 'ratKing'].label}...`, danger: true, onSelect: () => ui.askDismissMonster(id) }
 			);
 		} else if (hasChest) {

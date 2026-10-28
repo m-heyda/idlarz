@@ -49,13 +49,13 @@ export const logout = async (): Promise<void> => {
 
 const ENTERED_KEY = 'idlarz.entered';
 
-/** 'account': past the start page with a session; 'offline': playing without an account. Lives only as long as the tab. */
-export type EnteredMode = 'account' | 'offline';
+/** 'account': past the start page with a session. Lives only as long as the tab. */
+export type EnteredMode = 'account';
 
 export const readEntered = (): EnteredMode | null => {
 	try {
 		const value = window.sessionStorage.getItem(ENTERED_KEY);
-		return value === 'account' || value === 'offline' ? value : null;
+		return value === 'account' ? value : null;
 	} catch {
 		return null;
 	}

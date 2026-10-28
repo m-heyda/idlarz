@@ -10,11 +10,11 @@ const NOOP = () => {};
 const AUTO_RETRY_MS = 15000;
 
 /**
- * Accounts cannot be reached (outage, missing setup, no network). The local save is untouched, so the game stays reachable.
- * `onRetry` looks again without leaving this dialog (it resolves when the answer is in); if accounts are back the page moves on.
- * With no server setup retrying cannot help, so the dialog says so and puts "Play without account" first.
+ * Accounts cannot be reached (outage, missing setup, no network). The game is played with an account only (the server runs spawns,
+ * chests and fights), so there is nothing to do but wait: the browser's own save is untouched. `onRetry` looks again without leaving
+ * this dialog (it resolves when the answer is in); if accounts are back the page moves on. With no server setup retrying cannot help.
  */
-const AuthUnavailable: React.FC<{ reason: UnavailableReason; onRetry: () => Promise<void>; onPlayOffline: () => void }> = ({ reason, onRetry, onPlayOffline }) => {
+const AuthUnavailable: React.FC<{ reason: UnavailableReason; onRetry: () => Promise<void> }> = ({ reason, onRetry }) => {
 	const [busy, setBusy] = useState(false);
 	const [tries, setTries] = useState(0);
 	const alive = useRef(true);
@@ -51,7 +51,7 @@ const AuthUnavailable: React.FC<{ reason: UnavailableReason; onRetry: () => Prom
 					{notConfigured
 						? 'Accounts are not set up on this server (the Supabase settings are missing), so there is nothing to retry.'
 						: 'Login is not reachable right now.'}{' '}
-					Your game is saved in this browser and is not affected, so you can keep playing without an account.
+					The game runs on its server, so it waits for it. Your progress is safe in this browser and in your account.
 				</p>
 				{!notConfigured && (
 					<p className='text-xs text-center text-[#7a6a52] mb-4' aria-live='polite'>
@@ -60,13 +60,10 @@ const AuthUnavailable: React.FC<{ reason: UnavailableReason; onRetry: () => Prom
 				)}
 				<div className='flex justify-center gap-2'>
 					{!notConfigured && (
-						<button className='px-btn' onClick={() => void retry()} disabled={busy}>
+						<button className='px-btn px-btn-blue' onClick={() => void retry()} disabled={busy} autoFocus>
 							{busy ? 'Checking...' : 'Retry'}
 						</button>
 					)}
-					<button className='px-btn px-btn-blue' onClick={onPlayOffline} autoFocus>
-						Play without account
-					</button>
 				</div>
 			</PixelModal>
 		</div>

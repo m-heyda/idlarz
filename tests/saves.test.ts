@@ -10,9 +10,8 @@ import { RETUNED_STATS } from './retunedItems';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, RESOURCE_CAP } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { plainItem } from '../src/lib/itemInstance';
-import { COMBAT } from '../src/config/combatConfig';
 import { emptyBag } from '../src/lib/inventory';
-import { ownedCount, patchTile, setTile } from '../src/utils/world';
+import { ownedCount, setTile } from '../src/utils/world';
 
 /** A plain JSON copy of a (valid) persisted game, as it would come out of a save file. */
 const snapshot = () => rawSnapshot();
@@ -87,7 +86,6 @@ test('tampered saves are rejected', () => {
 	rejects((r) => (r.clickLevel = 9), 'click level above the ladder');
 	rejects((r) => (r.castleUpgrade = { toLevel: 6, remainingSec: 1 }), 'castle upgrade to a level that is not next');
 	rejects((r) => (r.castleUpgrade = { toLevel: 2, remainingSec: -5 }), 'negative upgrade timer');
-	rejects((r) => (r.chestSpawnTimer = 99999), 'chest timer out of range');
 	rejects((r) => (r.playSeconds = -1), 'negative play time');
 	rejects((r) => (r.tiles = r.tiles.slice(1)), 'grid with a missing row');
 	rejects((r) => (r.resources.xp = 0), 'tiles owned without the XP that paid for them');
@@ -194,13 +192,11 @@ test('an old save without the combat fields loads with the starter kit', () => {
 	assert.deepEqual(result.state.equipment, STARTER_EQUIPMENT);
 	assert.deepEqual(result.state.bag[0], { id: 'potion_minor', qty: 2 });
 	assert.equal(result.state.bag.length, 36);
-	assert.deepEqual(result.state.monsters, []);
 	assert.equal(result.state.playerHp, 101);
 	assert.equal(result.state.playerMp, 40, 'a save from before mana starts with a full pool');
-	assert.equal(result.state.nextMonsterId, 1);
 });
 
-test('a played game with gear, a monster and damaged HP round-trips unchanged', () => {
+test('a played game with gear and damaged HP round-trips unchanged', () => {
 	const raw = combatSave(() => undefined);
 	const result = sanitizeSave(raw);
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);
@@ -208,24 +204,9 @@ test('a played game with gear, a monster and damaged HP round-trips unchanged', 
 	assert.deepEqual(result.state.equipment, raw.equipment);
 	assert.deepEqual(result.state.bag, raw.bag);
 	assert.equal(result.state.playerHp, 50);
-	assert.deepEqual(result.state.monsters, raw.monsters);
-	assert.equal(result.state.monsterSpawnTimer, 123);
-	assert.equal(result.state.nextMonsterId, 2);
 });
 
-test('a monster standing on a building (a save from before the spawn fix) is dropped, the save still loads', () => {
-	const raw = combatSave((r) => {
-		const tile = r.tiles[r.monsters[0].y][r.monsters[0].x];
-		tile.biome = 'plains'; // the purchases are random: never a lake, which cannot hold a building
-		tile.building = 'farm';
-	});
-	const result = sanitizeSave(raw);
-	assert.equal(result.ok, true, result.ok ? '' : result.reason);
-	if (!result.ok) return;
-	assert.deepEqual(result.state.monsters, []);
-});
-
-test('forged inventories, HP and monsters are rejected', () => {
+test('forged inventories and HP are rejected', () => {
 	const bad = (mutate: (raw: any) => void, label: string) => { // eslint-disable-line @typescript-eslint/no-explicit-any
 		assert.equal(sanitizeSave(combatSave(mutate)).ok, false, `${label} should be rejected`);
 	};
@@ -274,20 +255,6 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.playerMp = NaN), 'playerMp NaN');
 	bad((r) => (r.playerMp = -1), 'negative playerMp');
 	bad((r) => (r.playerMp = '40'), 'playerMp as text');
-	bad((r) => (r.monsters[0].x = CASTLE_X, r.monsters[0].y = CASTLE_Y), 'monster on the castle');
-	bad((r) => (r.monsters[0].x = 0, r.monsters[0].y = 0), 'monster on an unowned tile');
-	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].hasChest = true), 'monster on a chest tile');
-	bad((r) => r.monsters.push({ ...r.monsters[0], id: 2, type: 'ratKing', level: 15, spawnLevel: 15 }, { ...r.monsters[0], id: 3, type: 'ratKing', level: 15, spawnLevel: 15 }), 'two kings on one tile');
-	bad((r) => (r.monsters = Array.from({ length: 5000 }, (_, i) => ({ ...r.monsters[0], id: i + 1 }))), 'more monsters than tiles');
-	bad((r) => (r.monsters[0].level = r.monsters[0].spawnLevel + 41), 'level above what the hard growth ceiling allows');
-	bad((r) => (r.monsters[0].level = 5), 'a level the age has not earned');
-	bad((r) => (r.monsters[0].spawnLevel = 0), 'a spawn level below 1');
-	bad((r) => (r.monsters[0].spawnLevel = 11, r.monsters[0].level = 11), 'a rat that spawned above the rat cap');
-	bad((r) => (r.monsters[0].tier = 1), 'the old tier key');
-	bad((r) => (r.monsters[0].type = 'dragon'), 'unknown monster type');
-	bad((r) => (r.monsters.push({ ...r.monsters[0], ...spot(1) }), (r.nextMonsterId = 5)), 'duplicate monster ids');
-	bad((r) => (r.monsters[0].id = 5), 'monster id not below nextMonsterId');
-	bad((r) => (r.monsters[0].ageSec = -1), 'negative monster age');
 	bad((r) => (r.bag[0] = { id: 'constructor', qty: 1 }), 'object prototype name as a bag item');
 	bad((r) => (r.bag[0] = { id: '__proto__', qty: 1 }), '__proto__ as a bag item');
 	bad((r) => (r.bag[0] = { id: 'toString', qty: 1 }), 'toString as a bag item');
@@ -295,33 +262,6 @@ test('forged inventories, HP and monsters are rejected', () => {
 	bad((r) => (r.equipment.neck = 'hasOwnProperty'), 'hasOwnProperty as equipped item');
 	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'constructor' }), 'prototype name as an item base');
 	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'constructor' }), 'prototype name as a rarity');
-	bad((r) => (r.tiles[r.monsters[0].y][r.monsters[0].x].biome = 'constructor'), 'object prototype name as a biome');
-	bad((r) => (r.monsterSpawnTimer = COMBAT.spawn.intervalSec + 1), 'spawn timer out of range');
-	bad((r) => (r.nextMonsterId = 0), 'nextMonsterId 0');
-});
-
-test('two kings are rejected even on different tiles', () => {
-	const raw = combatSave((r) => {
-		const other = { ...r.monsters[0] };
-		r.monsters[0] = { ...r.monsters[0], type: 'ratKing', level: 15, spawnLevel: 15, ageSec: 0 };
-		r.monsters.push({ ...other, id: 2, type: 'ratKing', level: 15, spawnLevel: 15, ageSec: 0 });
-		r.nextMonsterId = 3;
-	});
-	// move the second king to another owned tile
-	raw.monsters[1].x = spot(1).x;
-	raw.monsters[1].y = spot(1).y;
-	assert.equal(sanitizeSave(raw).ok, false);
-});
-
-test('a chest cannot share a tile with a monster', () => {
-	freshGame();
-	growTo(8);
-	const { x, y } = spot();
-	store.setState({ monsters: [rat()] as never, nextMonsterId: 2 });
-	store.setState((s) => {
-		return { tiles: patchTile(s.tiles, x, y, { hasChest: true }), activeChests: 1 };
-	});
-	assert.equal(sanitizeSave(snapshot()).ok, false);
 });
 
 test('a played game that started with the free ring passes validation (tiles, buildings, chests)', () => {

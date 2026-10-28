@@ -1,9 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, owned, setResources, store, tileAt, gridCells } from './helpers';
+import { api, freshGame, growTo, owned, patchTileAt, setResources, store, tileAt, gridCells } from './helpers';
 import {
 	CASTLE_UPGRADE,
-	CHEST,
 	CLICK_LADDER,
 	CASTLE_X,
 	CASTLE_Y,
@@ -13,7 +12,6 @@ import {
 } from '../src/config/gameConfig';
 import { calculateTileCost, calculateBuildingCost, effectiveTileDiscount } from '../src/utils/gameUtils';
 import type { Resources } from '../src/types/game';
-import { spawnCap } from '../src/lib/spawnLimits';
 import { hasOwnedNeighbour, isOwnedAt } from '../src/utils/world';
 
 const SELLABLE = [...MERCHANT_BUYABLE]; // what can be both bought and sold; farm products only sell (see merchantShop.test.ts)
@@ -205,29 +203,21 @@ test('click power: untrusted clicks pay nothing, trusted clicks pay gold/s x pow
 	assert.equal(api().buyClickUpgrade(), false); // max level
 });
 
-test('chests: the spawn timer pauses at the limit, collecting needs a real chest, luck raises the reward', () => {
+test('chests: collecting needs a real chest and takes it off the map at once (what was inside is the server: see serverSpawns.test.ts)', () => {
 	freshGame();
 	growTo(8);
 	assert.equal(api().collectChest(CASTLE_X, CASTLE_Y), false);
-	store.setState({ activeChests: spawnCap(api().tiles, castleLevel()), chestSpawnTimer: 123 });
-	api().tick(10_000);
-	assert.equal(api().chestSpawnTimer, 0);
-	store.setState({ activeChests: 0, chestSpawnTimer: 0 });
-	for (let t = 0; t < CHEST.intervalSec; t += MAX_CATCHUP_SEC) api().tick(MAX_CATCHUP_SEC * 1000);
-	assert.equal(api().activeChests, 1);
-	const spot = gridCells().find(({ t }) => t.hasChest)!;
-	setResources({ gold: 0, wood: 0, stone: 0, coal: 0, food: 0 });
-	const xpBefore = api().resources.xp;
-	const bagBefore = JSON.stringify(api().bag);
-	assert.equal(api().collectChest(spot.x, spot.y), true);
-	assert.equal(api().collectChest(spot.x, spot.y), false); // gone
-	const loot = api().lastChestLoot;
-	assert.ok(loot, 'what was inside is remembered for the toast');
-	const r = api().resources;
-	const gained =
-		r.gold > 0 || r.wood > 0 || r.stone > 0 || r.coal > 0 || r.food > 0 || r.xp > xpBefore || JSON.stringify(api().bag) !== bagBefore;
-	assert.ok(gained, `a ${loot!.kind} chest pays something`);
-	assert.equal(api().activeChests, 0);
+	patchTileAt(CASTLE_X + 1, CASTLE_Y, { hasChest: true });
+	store.setState({ activeChests: 1 });
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = (async () => new Response('{}', { status: 503 })) as typeof fetch;
+	try {
+		assert.equal(api().collectChest(CASTLE_X + 1, CASTLE_Y), true);
+		assert.equal(api().activeChests, 0);
+		assert.equal(api().collectChest(CASTLE_X + 1, CASTLE_Y), false); // gone
+	} finally {
+		globalThis.fetch = realFetch;
+	}
 });
 
 test('buildings: cost resources, grow more expensive, and only go on free land tiles', () => {

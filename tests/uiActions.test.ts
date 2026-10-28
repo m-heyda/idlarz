@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, store, gridCells } from './helpers';
+import { api, freshGame, growTo, openFight, store, gridCells } from './helpers';
 import { emptyBag } from '../src/lib/inventory';
 import { calculateResourceBreakdown, calculateResourceRates } from '../src/utils/gameUtils';
 import { useUiStore } from '../src/stores/uiStore';
@@ -19,7 +19,6 @@ const withMonsters = (...monsters: Partial<Monster>[]) => {
 	const at = spot();
 	store.setState({
 		monsters: monsters.map((m, i) => ({ id: i + 1, type: 'rat', level: 1, spawnLevel: 1, ...at, ageSec: 0, ...m })),
-		nextMonsterId: monsters.length + 1,
 	});
 };
 
@@ -35,12 +34,11 @@ test('dismissMonster removes the monster with no loot or XP', () => {
 	assert.equal(api().dismissMonster(99), false, 'unknown id');
 });
 
-test('dismissMonster refuses the monster that is being fought', () => {
+test('dismissing the monster that is being fought is allowed: the server ends that fight', () => {
 	withMonsters({}, { id: 2 });
-	assert.equal(api().startFight(1), true);
-	assert.equal(api().dismissMonster(1), false);
-	assert.equal(api().monsters.length, 2);
-	assert.equal(api().dismissMonster(2), true, 'another monster can still go');
+	openFight({ n: 1 });
+	assert.equal(api().dismissMonster(1), true, 'the server ends the fight against a dismissed monster');
+	assert.equal(api().monsters.length, 1);
 });
 
 test('discardItem throws bag items away without paying gold, and never touches equipment', () => {
@@ -70,7 +68,7 @@ test('discardItem rejects empty slots, bad amounts and anything during a fight',
 	assert.equal(api().discardItem(-1), false);
 	assert.equal(api().discardItem(0, 3), false, 'more than the stack');
 	assert.equal(api().discardItem(0, 0), false);
-	assert.equal(api().startFight(1), true);
+	openFight();
 	assert.equal(api().discardItem(0), false, 'not in a fight');
 	assert.deepEqual(api().bag[0], { id: 'potion_minor', qty: 2 });
 });

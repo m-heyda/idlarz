@@ -1,6 +1,8 @@
 import { LIMITS } from '@/config/limits';
+import type { BiomeType } from '@/types/game';
 
 // Combat tunables. Every number the fight, the monsters and the loot depend on lives here.
+// SERVER-OWNED: the server rolls spawns, places monsters and runs every fight from these numbers; the browser only shows them.
 
 export const COMBAT = {
 	baseHp: 85, // max HP = baseHp + vitality-derived hp + gear maxHp (about 100 at game start)
@@ -12,14 +14,30 @@ export const COMBAT = {
 	// tops out at softCap + (1 - softCap) x softSlope = 75 % and the rest of the survival has to come from HP, regen, dodge and Stun.
 	armorSoftCap: 0.5,
 	armorSoftSlope: 0.5,
-	fightStepClampSec: 1, // a fight step never advances more than this (throttled tabs freeze fights instead of fast-forwarding them)
 	maxItemDamage: 50, // sanity ceiling for one item's damage (tests/items.test.ts); fights are balanced by tests/fightBalance.test.ts, not by a cap
-	// Clicks are not rate limited in fights: speed is skill. What stops a click from being too strong is damage and crit.
+	// Fights run on the server in fixed ticks: the player swings at the weapon's attack speed, a monster at its own. Nobody clicks to hit.
+	tickSec: 0.1, // the server's fight step
+	maxCatchUpSec: 120, // one request runs a fight forward by at most this long (a longer silence is simulated by the next request)
+	maxFightSec: 180, // a fight that has not been decided by now is called off (the monster stays, no reward)
+	poll: {
+		fightSec: 2, // the open combat panel asks the server for the fight this often...
+		minimizedSec: 8, // ...the minimized icon (or a hidden tab) this often
+	},
+	// What the server does for a player in a fight, and when it starts one. Fixed on purpose: players only switch auto-battle and auto-use on or off.
+	auto: {
+		resumeHpPct: 80, // auto-battle only starts a fight with HP at this share of max or more (after a knockout it rests up to it)
+		engageOrder: 'weakest' as 'weakest' | 'oldest', // which waiting monster is next: the lowest level first (an unbeatable one never blocks the easy ones), or the one that came first
+		retryCooldownSec: 300, // a monster that beat you (or ran out the clock) is not tried again for this long...
+		bossRetryCooldownSec: 600, // ...a boss for this long
+		potionBelowHpPct: 40, // auto-use drinks the best-fitting potion below this share of max HP
+		healBelowHpPct: 50, // ...and casts Heal below this share
+		stunWhenReady: true, // ...and casts Stun whenever it can
+	},
 	crit: {
 		mult: 2, // a crit deals this many times the damage
-		superMult: 5, // a super crit (rolled only when a click already crit)
+		superMult: 5, // a super crit (rolled only when a hit already crit)
 		superBase: 5, // % chance for a crit to become a super crit, before gear
-		maxCritChance: 75, // % caps, so stacked gear cannot make every click a crit
+		maxCritChance: 75, // % caps, so stacked gear cannot make every hit a crit
 		maxSuperChance: 50,
 	},
 	bagSize: LIMITS.bagSize, // base bag slots; read the current size through limitOf('bagSize', ctx) (Pack Rat and later effects add to it)
@@ -29,7 +47,6 @@ export const COMBAT = {
 		firstSec: 120, // first monster this long after the territory reaches minOwnedTiles
 		intervalSec: 900, // then one per this long (chests: 600 s)
 		bossIntervalSec: 10800, // a boss (one at a time) appears this long after the last one left, or after the start
-		minOwnedTiles: 5,
 		dangerStep: 8, // a monster that appears this many tiles (Chebyshev) further from the castle spawns one level higher: the frontier is more dangerous than the home land
 	},
 	// What drops (how often, which rarity and item level) is loot config: src/catalog/lootConfig.ts
@@ -55,6 +72,19 @@ export const STAT_RULES = {
 /** `boss` monsters get their own spawn timer, a banner in the fight and boss-only drops (the loot source `lootSourceId` names the profile). */
 export type MonsterGrade = 'normal' | 'boss';
 
+/** The tiles a monster may stand on. A tile qualifies when its biome is listed and its castle distance lies within the range. */
+export interface MonsterSpawnRule {
+	/** Allowlist of biomes: a biome that is not listed (water, the castle, anything added later) never gets this monster */
+	biomes: readonly BiomeType[];
+	minCastleDistance: number;
+	maxCastleDistance: number;
+	/** For monsters that only come after this many rebirths (biomes and monsters unlocked by rebirth are planned) */
+	minRebirths?: number;
+}
+
+/** Land a rat or the King may stand on: no water (lake, coast) and never the castle. */
+const LAND_BIOMES: readonly BiomeType[] = ['plains', 'forest', 'hills', 'swamp', 'tundra'];
+
 /**
  * A kind of monster. The numbers are for `refLevel`; other levels follow `scaling`: `exp` multiplies by the `*PerLevel` factors for
  * every level away from `refLevel`, `gear` follows the item level curve (`levelScale`), so a boss keeps pace with the gear that drops
@@ -74,7 +104,10 @@ export interface MonsterDef {
 	critMult: number;
 	/** % chance that Stun does not work on it (the mana and the cooldown are still spent) */
 	stunResist: number;
-	attackIntervalSec: number;
+	/** Attacks per second (the same unit as a weapon's `attackSpeed`) */
+	attackSpeed: number;
+	/** Where it may appear. Distances are in tiles (Chebyshev) from the castle: a minimum of 2 keeps it off the castle's neighbours. */
+	spawn: MonsterSpawnRule;
 	/** Gold and XP of a kill are this many seconds of income */
 	rewardSec: number;
 	refLevel: number;
@@ -101,7 +134,8 @@ export const MONSTERS = {
 		critChance: 0,
 		critMult: 1.5,
 		stunResist: 0,
-		attackIntervalSec: 2,
+		attackSpeed: 0.5, // one bite every 2 s
+		spawn: { biomes: LAND_BIOMES, minCastleDistance: 2, maxCastleDistance: 9 },
 		rewardSec: 90,
 		refLevel: 1,
 		scaling: 'exp',
@@ -115,7 +149,7 @@ export const MONSTERS = {
 	ratKing: {
 		grade: 'boss',
 		label: 'Rat King',
-		hp: 9600, // behind 15 armor (a bit over a quarter of every click is lost): about 13200 effective HP at level 15; see docs/generated/fight-sim.md
+		hp: 1000, // behind 15 armor (about a quarter of every hit is lost) and a 75 s clock: the best gear wins comfortably, obsidian with seconds to spare, steel not; see docs/generated/fight-sim.md
 		attack: 11,
 		armor: 15,
 		critChance: 8,
@@ -137,6 +171,7 @@ export const MONSTERS = {
 			'The King is not impressed.',
 			'Run along, little knight!',
 		],
-		attackIntervalSec: 3, // armor decides how many hits you survive; potions fill the gap
+		attackSpeed: 1 / 3, // one hit every 3 s; armor decides how many hits you survive, potions fill the gap
+		spawn: { biomes: LAND_BIOMES, minCastleDistance: 2, maxCastleDistance: 9 },
 	},
 } as const satisfies Record<string, MonsterDef>;

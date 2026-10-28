@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { CombatState } from './fightTypes';
 import { zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
 import { emptyBank, type TicketBank } from './tickets';
 
@@ -15,9 +16,10 @@ interface Row {
 	gems: number;
 	last_key: string | null;
 	last_result: unknown;
+	combat: CombatState | null;
 }
 
-const COLUMNS = 'ver, run_id, rebirths, anchor_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result';
+const COLUMNS = 'ver, run_id, rebirths, anchor_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat';
 
 const toRow = (ledger: Ledger) => ({
 	ver: ledger.ver,
@@ -32,6 +34,7 @@ const toRow = (ledger: Ledger) => ({
 	gems: ledger.gems,
 	last_key: ledger.lastKey,
 	last_result: ledger.lastResult,
+	combat: ledger.combat,
 	updated_at: new Date().toISOString(),
 });
 
@@ -48,6 +51,7 @@ const fromRow = (row: Row): Ledger => ({
 	gems: row.gems,
 	lastKey: row.last_key,
 	lastResult: row.last_result,
+	combat: row.combat ?? null,
 });
 
 /**
