@@ -59,9 +59,9 @@ export const PlayerCard: React.FC = () => {
 				}
 			}}>
 			<span className='pixel-avatar'>
-				<CharacterPortrait variant='bust' scale={0.7} />
+				<CharacterPortrait variant='bust' scale={0.85} />
 				<span className='pixel-avatar-orb'>
-					<LevelOrb level={level.level} scale={0.75} className={levelUpActive ? 'animate-pulse-ring' : undefined} />
+					<LevelOrb level={level.level} scale={0.95} className={levelUpActive ? 'animate-pulse-ring' : undefined} />
 				</span>
 				<NotifyDot show={attention.any} label='Something needs your attention' />
 			</span>

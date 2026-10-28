@@ -143,7 +143,7 @@ const ResourceDisplay: React.FC = () => {
 	const resourceRates = useGameStore((state) => state.resourceRates);
 	const gems = useGameStore((state) => state.gems);
 	const embers = useGameStore((state) => state.prestige.legacyPoints); // saved under its old name, see PrestigeState
-	const showNumbers = useUiStore((state) => state.showHeaderNumbers);
+	const compact = useUiStore((state) => state.compactHeader);
 	const toggleRebirth = useUiStore((state) => state.toggleRebirth);
 
 	const amountOf = (key: ResourceKey): number =>
@@ -164,7 +164,7 @@ const ResourceDisplay: React.FC = () => {
 						bonus: produced ? resourceRates.modifiers[key as keyof typeof resourceRates.modifiers] : undefined,
 					};
 				});
-				return <ResourceGroup key={tier.id} tier={tier} rows={rows} showNumbers={showNumbers} align={t === 0 ? 'start' : 'center'} onOpenEmbers={toggleRebirth} />;
+				return <ResourceGroup key={tier.id} tier={tier} rows={rows} showNumbers={!compact} align={t === 0 ? 'start' : 'center'} onOpenEmbers={toggleRebirth} />;
 			})}
 		</>
 	);
