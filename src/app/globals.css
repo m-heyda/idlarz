@@ -1996,6 +1996,38 @@ body {
 	z-index: 6;
 }
 
+/* the castle upgrade's remaining time: a small plaque under the keep, readable without opening the dialog */
+.tile-timer {
+	position: absolute;
+	left: 50%;
+	bottom: -2px;
+	transform: translateX(-50%);
+	z-index: 7;
+	padding: 0 4px;
+	font-size: 10px;
+	line-height: 14px;
+	white-space: nowrap;
+	color: #f0d27a;
+	background: rgba(24, 16, 8, 0.85);
+	border: 1px solid #8a6a2a;
+	pointer-events: none;
+}
+
+/* the header chip of the same timer: click to find the castle */
+.hdr-castle-timer {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 0 6px;
+	height: 28px;
+	font-size: 11px;
+	color: #f0d27a;
+	background: rgba(24, 16, 8, 0.85);
+	border: 1px solid #8a6a2a;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
 /* the keep reaches to the top of its tile: the level plaque moves to the bottom corner */
 .tile-fortress .tile-badge {
 	top: auto;

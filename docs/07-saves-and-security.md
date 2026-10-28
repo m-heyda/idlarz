@@ -47,7 +47,7 @@ A Web Lock (`navigator.locks`) lets only one tab run the game; another tab shows
 | XP and level | save floor (XP the owned tiles must have produced) | `cloudSave/xpModel.ts` clamps a save's XP to what bought tiles, play time and server payouts can explain; the browser takes the lower number (`applyServerXp`) |
 | Chests, kills, gems | none: a chest opens only against a server ticket | sealed rolls (`HMAC(LOOT_SECRET, user / run / kind / ordinal)`), the ledger holds the gem balance, a save can never raise it |
 | Monsters and fights | none: the browser only displays and asks | the server places monsters, runs every fight and pays the win; HP, mana and potions are the ledger's |
-| Gold jumps / forged land | none | `networth_exceeds`, `gold_jump`, `playtime_*`, `prestige_regress`, `baseline_rich` flags, **shadow mode**: stored, the save is accepted; flagged accounts are never ranked ([09](09-cloud-saves.md)) |
+| Gold jumps / forged land | none | `networth_exceeds`, `gold_jump`, `playtime_*`, `prestige_regress`, `castle_jump`, `baseline_rich` flags, **shadow mode**: stored, the save is accepted; flagged accounts are never ranked ([09](09-cloud-saves.md)) |
 | Rebirth | needs castle ≥ 6 and 100 tiles; points computed in the store; shop spending is checked by the point-conservation rule on every load | the ledger starts a new run (sealed rolls never repeat) |
 | Settings in `localStorage` | cosmetic only | not stored |
 

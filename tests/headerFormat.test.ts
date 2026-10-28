@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { formatHeaderAmount, formatRateAuto, parseAmount, pickRateUnit } from '../src/utils/formatters';
+import { castleTimerLabel } from '../src/lib/castleTimer';
 
 test('header amounts below 1,000 are whole numbers, so they never grow decimals', () => {
 	assert.equal(formatHeaderAmount(0), '0');
@@ -80,4 +81,13 @@ test('parseAmount reads typed amounts with suffixes', () => {
 
 test('parseAmount rejects anything that is not a whole amount of at least 1', () => {
 	for (const text of ['', ' ', '0', '0.5', '-5', 'abc', '1x', 'k', '1e3', '1..2', '1k2']) assert.equal(parseAmount(text), null, text);
+});
+
+test('the castle timer text: nothing without an upgrade, never below one second, the two largest units otherwise', () => {
+	assert.equal(castleTimerLabel(null), null);
+	assert.equal(castleTimerLabel({ remainingSec: 0 }), '1s');
+	assert.equal(castleTimerLabel({ remainingSec: 0.2 }), '1s');
+	assert.equal(castleTimerLabel({ remainingSec: 59.4 }), '1m 0s');
+	assert.equal(castleTimerLabel({ remainingSec: 4 * 3600 + 5 * 60 }), '4h 5m');
+	assert.equal(castleTimerLabel({ remainingSec: 3 * 86400 + 7200 }), '3d 2h');
 });

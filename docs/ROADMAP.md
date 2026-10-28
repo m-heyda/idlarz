@@ -7,7 +7,7 @@ The big plan is to move more of the economy to the server (see "Server authority
 ## Where things stand
 
 - **Accounts only.** There is no guest or "play without account" mode: the game needs the server to spawn, place and fight. A server outage shows a retry screen; the browser save is a cache and the export path. (Paid offline *progress* is a kept feature: [11](11-server-authority.md).)
-- **The server owns:** when chests and monsters appear, **where a monster stands**, what a chest or a kill holds, the gem balance, the XP ceiling, and **every fight** (player HP and mana, cooldowns, hits both ways, potions drunk, the kill's reward). See [11](11-server-authority.md) and the combat section of [02](02-mechanics.md).
+- **The server owns:** when chests and monsters appear, **where each one stands**, what a chest or a kill holds, the gem balance, the XP ceiling, and **every fight** (player HP and mana, cooldowns, hits both ways, potions drunk, the kill's reward). See [11](11-server-authority.md) and the combat section of [02](02-mechanics.md).
 - **A click starts a fight; the server runs it.** With *Auto-battle* on (locked until the first rebirth) the server also sends the player against the next monster. Potions and skills have hotkeys (1-5) and an *Auto-use* switch with a fixed preset (`COMBAT.auto`).
 - **Still the browser's:** the economy (income, tile and building purchases, the map), the stat allocation, the merchant, the farm, rebirth. The server checks them only by plausibility ([07](07-saves-and-security.md), [09](09-cloud-saves.md)).
 
@@ -22,7 +22,6 @@ The big plan is to move more of the economy to the server (see "Server authority
 | R7 | `dangerBonus` (one level per 8 tiles from the castle) is now 0 or 1: monsters stand at most 9 tiles out | `lib/monsters.ts` | the frontier is no longer more dangerous than the home land; rework with the biomes |
 | R8 | The King's balance changed with auto-attack (1000 HP, 75 s clock): the best gear wins comfortably, obsidian narrowly, steel not | `MONSTERS.ratKing`, [generated/fight-sim.md](generated/fight-sim.md) | needs a real playtest |
 | R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix) |
-| 🔧 B4 | The castle upgrade is only visible inside the castle dialog and tooltip | | add a small timer badge on the castle tile / header (S) |
 | ⚠️ B6 | Chests and map clicks are small next to the rest of the economy (the click is the only click income for now; the tile tap was removed) | | decide whether they should scale with progress, together with the click rework (BL3) |
 | ⚠️ B7 | `sim.ts` bots build on the first free explored tile (round-robin through six buildings), do not use the class picker, allocate stat points by a fixed policy, and play one reasonable style (reserve for the castle, top up at the merchant) | `scripts/sim.ts` | fine for pacing checks; extend the bot before tuning small effects |
 
@@ -32,7 +31,7 @@ What still runs in the browser and is only checked by plausibility. Tile buying 
 
 1. **Ledger-owned inventory and equipment** (closes R3, R5, R6): the bag, the worn gear and the loot pity live in the ledger; the browser shows them. Then a fight can never use gear the player does not own.
 2. **Enforce `verify.ts`** (today it only flags): reject a save that gained more than the server granted.
-3. **Economy actions** by the server where they pay out: castle upgrade, rebirth/Embers, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
+3. **Economy actions** by the server where they pay out: castle upgrade (start, cost and finish time in the ledger; today the server only checks the timer on its own clock, `castle_jump`), rebirth/Embers, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
 4. **XP award** of tile purchases and the attribute allocation (the server already models and clamps XP, `cloudSave/xpModel.ts`, and derives the fight level from the saved XP).
 5. **Merchant and sell** (gold for gear, resource sell/buy, upgrades): server-priced. Every merchant action is a store action over `buyOffer`, `buyItem`, `sellResources`, `buyResource` and `buyMerchantUpgrade`, so moving them behind routes changes no UI.
 6. **Spawn caps from the real map**: monsters and chests count free tiles from the map; the overall share (`SPAWN_LIMIT`, `ticketCap`) still use an estimate from the owned-tile count.
@@ -53,7 +52,6 @@ Notes from reading the code (not measured against the live project):
 
 | Item | Size | Acceptance |
 |---|---|---|
-| Castle-timer badge (B4) | S | remaining time visible without opening the dialog |
 | CI: a GitHub Action running `tsc`, `lint`, `test`, `build`, plus `sim -- --maxdays=30 hardcore` as a pacing guard (no `.github` exists yet) | S | PR fails when the first-finish time of a profile moves by more than ±15 % |
 | Playwright smoke test: new game, click, buy tile, open Settings and Rebirth, reload keeps state (no UI tests exist) | M | runs in CI; uses `window.__game` only in dev builds |
 | Framework upgrades one at a time: Next 16, TypeScript 7, ESLint 10, `@types/node` 26 (held back on purpose; Next 16 fixes two PostCSS advisories bundled in 15; check `typescript-eslint` / `eslint-config-next` peer ranges) | M | build, tests and sim output unchanged |

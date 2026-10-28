@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import audioManager from '@/utils/audioManager';
 import PixelIcon, { PixelSheet } from './PixelIcon';
 import CastleSprite from './CastleSprite';
+import CastleTimerBadge from './CastleTimerBadge';
 import { BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
 import { TileStatus } from './TileStatus';
 import MonsterSprite from './MonsterSprite';
@@ -238,6 +239,7 @@ const Tile: React.FC<TileProps> = ({
 					{biome === 'castle' && (
 						<span className='tile-badge'>{castleLevel}</span>
 					)}
+					{isOwned && biome === 'castle' && <CastleTimerBadge />}
 
 					{inRange && (
 						<span className='range-sparks' aria-hidden>
