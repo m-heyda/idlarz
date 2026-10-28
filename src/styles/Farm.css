@@ -1,17 +1,18 @@
-/* Farm mini-game: one seamless scene. The meadow fills the whole window; a stats readout, the animal shop (right) and the
-   upgrade shelf (bottom) are cells of one grid laid over it, so they never cover each other. */
+/* Farm mini-game: one seamless scene. The meadow fills the whole window; a stats readout (top-left), the animal shop (right)
+   and the upgrade drawer (bottom, beside the shop) are cells of one grid laid over it. The drawer slides up over the meadow. */
 
 .farm-root {
 	position: absolute;
 	inset: 0;
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;
-	grid-template-rows: minmax(0, 1fr) auto;
+	grid-template-rows: minmax(0, 1fr);
+	overflow: hidden; /* the closed upgrade drawer waits just below the window edge */
 }
 
 /* --- the meadow around the pen: plains grass, vignette, a drifting cloud shadow --- */
 .farm-stage {
-	grid-area: 1 / 1 / 3 / 3;
+	grid-area: 1 / 1 / 2 / 3;
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -189,109 +190,14 @@
 	.farm-animal[data-selected='true'] .farm-shadow {
 		animation: none;
 	}
+
+	.farm-dock {
+		transition: none;
+	}
 }
 
 .farm-pen {
 	z-index: 40;
-}
-
-/* --- meadow critters: decoration that wanders for 10s and leaves --- */
-.meadow-critter {
-	position: absolute;
-	z-index: 60;
-	width: 0;
-	height: 0;
-	pointer-events: none;
-	animation: mc-in 0.35s steps(4) both;
-}
-
-@keyframes mc-in {
-	from {
-		transform: scale(0.2);
-		opacity: 0;
-	}
-	to {
-		transform: scale(1);
-		opacity: 1;
-	}
-}
-
-.mc-move {
-	position: absolute;
-	left: 0;
-	top: 0;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	transform: translate(-50%, -50%);
-	animation: mc-wander 5s ease-in-out infinite;
-}
-
-.meadow-critter[data-type='bee'] .mc-move {
-	animation-duration: 3s;
-}
-
-.meadow-critter[data-type='ladybug'] .mc-move {
-	animation-duration: 9s;
-	animation-timing-function: linear;
-}
-
-.meadow-critter[data-type='rabbit'] .mc-move {
-	animation: mc-wander 4.5s steps(18) infinite;
-}
-
-@keyframes mc-wander {
-	0% {
-		translate: 0 0;
-	}
-	25% {
-		translate: var(--dx) calc(var(--dy) * -1);
-	}
-	50% {
-		translate: calc(var(--dx) * 1.5) var(--dy);
-	}
-	75% {
-		translate: var(--dx) calc(var(--dy) * 0.3);
-	}
-	100% {
-		translate: 0 0;
-	}
-}
-
-.mc-sprite {
-	display: block;
-	background-repeat: no-repeat;
-	image-rendering: pixelated;
-	scale: var(--f) 1;
-	filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.25));
-	animation: mc-frames var(--frame-ms) steps(1) infinite, mc-blink 0.4s steps(2) calc(var(--life) - 3000ms) infinite;
-}
-
-.meadow-critter[data-type='butterfly'] .mc-sprite,
-.meadow-critter[data-type='bee'] .mc-sprite {
-	animation-timing-function: steps(1);
-}
-
-@keyframes mc-frames {
-	0% {
-		background-position-x: 0;
-	}
-	50% {
-		background-position-x: calc(var(--sheet-w) / -2);
-	}
-}
-
-@keyframes mc-blink {
-	50% {
-		opacity: 0.25;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.mc-move,
-	.mc-sprite {
-		animation: none;
-	}
 }
 
 /* --- animal shop (right edge): one card per kind with its yield and Buy / Buy 10 buttons (the price is in their hover card) --- */
@@ -506,21 +412,54 @@
 	color: #e0c050;
 }
 
-/* --- upgrade shelf (bottom) --- */
+/* --- upgrade drawer (bottom): slides up over the scene on a blurred backdrop; its column ends where the animal shop starts --- */
 .farm-dock {
-	grid-area: 2 / 1 / 3 / 3;
+	grid-area: 1 / 1;
+	align-self: end;
 	position: relative;
 	margin: 0 12px 10px;
-	z-index: 700;
+	z-index: 710;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 4px;
 	pointer-events: none;
+	transition: transform 0.28s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+/* closed: everything but the tab (26px + the 10px margin = UPGRADE_TAB_H in farmGeometry.ts) slides below the window edge */
+.farm-dock[data-open='false'] {
+	transform: translateY(calc(100% - 26px));
 }
 
 .farm-dock > * {
 	pointer-events: auto;
+}
+
+.farm-drawer {
+	width: 100%;
+	min-height: min(170px, 34vh); /* roomy: a second row of upgrades fits without the drawer growing */
+	max-height: min(300px, 48vh);
+	overflow-x: hidden;
+	overflow-y: auto;
+	scrollbar-width: thin;
+	padding: 8px;
+	background: rgba(10, 7, 6, 0.5);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	border: 4px solid transparent;
+	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+	image-rendering: pixelated;
+	/* cards wrap onto further rows by themselves as upgrades are added */
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+	align-content: start;
+	gap: 8px;
+}
+
+.farm-dock[data-open='false'] .farm-drawer {
+	visibility: hidden;
+	transition: visibility 0s 0.28s;
 }
 
 .farm-dock-toggle {
@@ -539,14 +478,6 @@
 	filter: brightness(1.25);
 }
 
-.farm-dock-row {
-	display: grid;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
-	gap: 6px;
-	width: 100%;
-	max-width: 1100px;
-}
-
 .farm-up {
 	display: flex;
 	flex-direction: column;
@@ -554,7 +485,7 @@
 	padding: 5px 7px 6px;
 	font-size: 0.72rem;
 	color: #a89878;
-	background: rgba(10, 7, 6, 0.92);
+	background: rgba(10, 7, 6, 0.8);
 	border: 4px solid transparent;
 	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
 	image-rendering: pixelated;

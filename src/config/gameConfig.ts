@@ -778,24 +778,6 @@ export const TILE_TAP = {
 	cooldownMs: 1200,
 };
 
-// Farm meadow critters: little animals wander into the meadow while the Farm window is open, stay for `lifetimeMs` and leave.
-// Purely cosmetic: they cannot be clicked and give nothing.
-export const FARM_CRITTERS = {
-	lifetimeMs: 10000,
-	firstDelayMs: 45000,
-	minGapMs: 60000,
-	maxGapMs: 120000,
-	maxActive: 1,
-	critters: {
-		butterfly: { label: 'Butterfly', weight: 3 },
-		bee: { label: 'Bee', weight: 3 },
-		ladybug: { label: 'Ladybug', weight: 2 },
-		rabbit: { label: 'Rabbit', weight: 2 },
-	},
-} as const;
-
-export type FarmCritterType = keyof typeof FARM_CRITTERS.critters;
-
 // Gold per click = total gold/s x click power. Four upgrade levels, bought from the merchant.
 export const CLICK_LADDER = [
 	{ power: 0.5, price: 0 },

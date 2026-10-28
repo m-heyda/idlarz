@@ -115,7 +115,7 @@ const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, on
 	);
 };
 
-/** The animal shop along the right edge of the farm scene (the mirror of the upgrade shelf at the bottom). */
+/** The animal shop along the right edge of the farm scene (the upgrade drawer slides up beside it). */
 const FarmAnimalDock: React.FC<FarmAnimalDockProps> = ({ open, onToggle, onBuy, onHover }) => {
 	const food = useGameStore((state) => state.resources.food);
 	const farmLevels = useGameStore((state) => state.farmLevels);

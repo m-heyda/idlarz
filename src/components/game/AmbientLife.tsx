@@ -3,12 +3,14 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { AMBIENT_LIFE } from '@/config/gameConfig';
 import { nextSpawnDelay, pickAmbientCritter, type AmbientCritter, type Viewport } from '@/lib/ambientLife';
-import { CRITTER_SHEETS } from './overlays/MeadowLayer';
 import '@/styles/Ambient.css';
 
-/** Sprite sheets of every ambient critter: the four farm critters plus the decorative fish, frog, crab, goat and wolf (2 frames each). */
+/** Sprite sheets of every ambient critter (2 frames each: flap / hop / swing), frame size in native px. */
 const AMBIENT_SHEETS: Record<AmbientCritter['type'], { name: string; w: number; h: number; ms: number }> = {
-	...CRITTER_SHEETS,
+	butterfly: { name: 'bonus_butterfly', w: 28, h: 28, ms: 320 },
+	bee: { name: 'bonus_bee', w: 28, h: 26, ms: 140 },
+	ladybug: { name: 'bonus_ladybug', w: 24, h: 22, ms: 500 },
+	rabbit: { name: 'bonus_rabbit', w: 34, h: 34, ms: 520 },
 	fish: { name: 'bonus_fish', w: 32, h: 22, ms: 260 },
 	frog: { name: 'bonus_frog', w: 26, h: 22, ms: 600 },
 	crab: { name: 'bonus_crab', w: 30, h: 20, ms: 420 },
