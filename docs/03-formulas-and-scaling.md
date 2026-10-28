@@ -24,7 +24,7 @@ Cumulative gold for the first 100 / 200 / 300 / 400 / 500 tiles: 1.6 M / 17 M / 
 
 **The tail (no tile limit).** Up to 300 tiles the price is the three exponential stages (×1.13 to 15 tiles, ×1.07 to 100, then only ×1.007 per tile, the soft middle). Past `TILE_PRICE.tailFrom` (300) it grows like `(n / 300)^4.5` (`TILE_PRICE.tailExponent`), much steeper than the stretch before, and is capped at `TILE_PRICE.ceiling` (`RESOURCE_CAP / 100`), so it is always finite and a map of tens of thousands of tiles stays buyable (table in [generated/balance-tables.md](generated/balance-tables.md)). `RESOURCE_CAP` was raised from 1e15 to 1e21 for it. There is no tile limit any more (see 02 §1, map). The numbers are tuned with `npm run sim` against the pacing targets in [06](06-pacing-targets.md) (100 tiles within the first day, 200-300 tiles in 2-3 days, a visibly harder climb after 300) for a game that will later be built around rebirths (bigger starting resources, much bigger maps); the tail is also on the balance backlog in [ROADMAP](ROADMAP.md).
 
-Every purchase rolls its biome (no picker). XP and reputation per purchase in §2.
+Every purchase rolls its biome (no picker). XP per purchase in §2.
 
 ## 2. XP and levels
 
@@ -35,7 +35,7 @@ xpGainMultiplier (%) = 0.2·INT + 0.25·CHA
 passive xp/s = rates.total.xp × (1 + xpGainMultiplier/100)
 XP to leave level N = xpToNextLevel(N): from anchors (level → total XP) 10 → 1.4e5, 30 → 1e8, 80 → 3e9, 90 → 6.5e9, 100 → 1.85e10,
                        every step a constant factor above the one before inside a segment; level 100 is the maximum (LEVELING in gameConfig.ts)
-stat points = 1 per level, +2 for levels 2..30 (totalStatPoints); reputation = 1000 + 100 per tile bought
+stat points = 1 per level, +2 for levels 2..30 (totalStatPoints)
 level, lifetime XP and attributes carry over a rebirth
 ```
 
@@ -142,7 +142,7 @@ Click limiter (gold clicks): burst bucket 8 tokens refilling 5/s × stamina buck
 
 ## 7. Character-derived stats
 
-`calculateCombatStats` (`gameUtils.ts`; the combat parts come from `lib/statBonuses.ts`, the same functions the server's fights use, and count the points above the starting 5): physicalAtk % = 2·(STR−5); magicAtk % = 2.4·(INT−5); hp = 3·VIT + 0.25·CHA (on top of the base 85); mp = 20 + 4·INT; def = 0.5·(DEX−5) + 0.5·(VIT−5) + 0.25·(STR−5); luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; atkSpeed % = 0.25·(DEX−5); **xpGainMultiplier** = 0.2·INT + 0.25·CHA and **tileCostDiscount** = 0.5·CHA (max 25) as above. Damage, armor, crit damage and attack speed feed the fight engine (§10), luck feeds chests and kills, xpGainMultiplier and tileCostDiscount the economy; reputation is display-only.
+`calculateCombatStats` (`gameUtils.ts`; the combat parts come from `lib/statBonuses.ts`, the same functions the server's fights use, and count the points above the starting 5): physicalAtk % = 2·(STR−5); magicAtk % = 2.4·(INT−5); hp = 3·VIT + 0.25·CHA (on top of the base 85); mp = 20 + 4·INT; def = 0.5·(DEX−5) + 0.5·(VIT−5) + 0.25·(STR−5); luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; atkSpeed % = 0.25·(DEX−5); **xpGainMultiplier** = 0.2·INT + 0.25·CHA and **tileCostDiscount** = 0.5·CHA (max 25) as above. Damage, armor, crit damage and attack speed feed the fight engine (§10), luck feeds chests and kills, xpGainMultiplier and tileCostDiscount the economy.
 
 ## 8. What the pacing looks like
 

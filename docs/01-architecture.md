@@ -61,7 +61,6 @@ src/
 │   ├── saveStorage.ts, storageScope.ts   localStorage storage: sync flush on close, backup + damaged copy, `.dev` key suffix on localhost, persist(), import/reset
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS
 │   ├── groundsMigration, levelsMigration, monstersMigration, legacyGear   one migration module per old save schema (frozen fixtures in tests/fixtures/saves guard them)
-│   ├── legacyVault.ts        read-only: the old encrypted IndexedDB vault and IDLZ1 exports
 │   ├── fightSim.ts           a bot that fights with the real engine (scripts/fight-sim.ts, tests/fightBalance.test.ts)
 │   └── castleWard, castleFinder, mapView, minimap, terrainRenderer, tipPlacement, ambientLife, floatText, inventoryDrag, globalMenu, uiPrefs, clipboard
 ├── hooks/
@@ -98,7 +97,7 @@ The map has no edge. `GameState.tiles` is a `World` (`src/utils/world.ts`): an i
 
 Persisted (`PERSISTED_KEYS` in `sanitizeSave.ts`, the one list): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `prestige` (rebirths, Embers earned/unspent, shop levels), `freeTiles`, `playSeconds`, `activeChests`, `gems`, `equipment` (item instances by slot), `bag` (`limitOf('bagSize')` slots: 36 plus Pack Rat), `playerHp`, `playerMp`, `lootPity`, `autoSellUpTo`, `merchantStock`, `merchantRefreshes`. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.
 
-Not saved: `monsters` and the open fight (`combat`) are the server's picture and arrive with each `/api/spawn` answer. Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`.
+Not saved: `monsters` and the open fight (`combat`) are the server's picture and arrive with each `/api/spawn` answer. Rebuilt on load: `resourceRates`, derived combat stats, castle upgrade cost, every window/dialog flag, `isHydrated`.
 
 ## The loop
 

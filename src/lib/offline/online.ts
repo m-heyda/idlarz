@@ -50,7 +50,8 @@ const onlineStep = async <T>(deps: ServiceDeps, userId: string, key: string | nu
 		const bank = await place(advanced);
 		const env: CombatEnv = { secret: deps.secret, userId, stored, nowSec };
 		const out = await body({ ledger: { ...ledger, bank }, stored, bank, nowSec, env, place });
-		return { ledger: { ...out.ledger, anchorAt: nowMs, lastKey: key, lastResult: key ? out.value : null }, result: { claimFirst: false, value: out.value } };
+		// a poll (no key) keeps the record of the last keyed request: its answer may still have to be replayed for a retry
+		return { ledger: { ...out.ledger, anchorAt: nowMs, ...(key ? { lastKey: key, lastResult: out.value } : {}) }, result: { claimFirst: false, value: out.value } };
 	});
 	if (done.kind === 'no_save') return done;
 	return done.result.claimFirst ? { kind: 'claim_first' } : { kind: 'ok', value: done.result.value };

@@ -35,7 +35,6 @@ luck: 0,
 	atkSpeedIncrease: 0,
 	xpGainMultiplier: 0,
 	tileCostDiscount: 0,
-	reputation: 1000, // Base reputation value
 };
 
 // Map. The map itself is unbounded (utils/world.ts): there is no grid size. The castle stays at its logical position, so

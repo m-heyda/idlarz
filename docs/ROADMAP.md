@@ -23,12 +23,9 @@ The big plan is to move more of the economy to the server (see "Server authority
 | R7 | `dangerBonus` (one level per 8 tiles from the castle) is now 0 or 1: monsters stand at most 9 tiles out | `lib/monsters.ts` | the frontier is no longer more dangerous than the home land; rework with the biomes |
 | R8 | The King's balance changed with auto-attack (1000 HP, 75 s clock): the best gear wins comfortably, obsidian narrowly, steel not | `MONSTERS.ratKing`, [generated/fight-sim.md](generated/fight-sim.md) | needs a real playtest |
 | R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix) |
-| R10 | `legacyVault.ts` (the IndexedDB and `idle-explorer-v11/v12` import) and the `IDLZ1.` import format are still shipped | `lib/legacyVault.ts`, `saveStorage.ts` | delete when nobody can still hold such a save |
-| R11 | A sync (no key) overwrites the ledger's `last_key` / `last_result` (`onlineStep` writes `lastKey: key`), so the idempotency record of the previous keyed request (a chest open, a hotkey) is gone when a poll lands between a lost answer and its retry; the retry then takes a second ticket or answers "no ticket" | `lib/offline/online.ts`, `lib/offline/supabaseLedger.ts` | keep the old record when the step has no key; rare (the retry follows within a second) |
 | 🔧 B4 | The castle upgrade is only visible inside the castle dialog and tooltip | | add a small timer badge on the castle tile / header (S) |
 | ⚠️ B6 | Chests and map clicks are small next to the rest of the economy (the click is the only click income for now; the tile tap was removed) | | decide whether they should scale with progress, together with the click rework (BL3) |
 | ⚠️ B7 | `sim.ts` bots build on the first free explored tile (round-robin through six buildings), do not use the class picker, allocate stat points by a fixed policy, and play one reasonable style (reserve for the castle, top up at the merchant) | `scripts/sim.ts` | fine for pacing checks; extend the bot before tuning small effects |
-| 🔧 U6 | Reputation (+100 per tile) is shown and nothing reads it | `StatisticsOverlay.tsx` | tie it to a merchant discount or quests, or remove it |
 
 ## Server authority (the migration backlog, ranked)
 

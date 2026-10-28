@@ -112,12 +112,12 @@ test('tampered saves are rejected', () => {
 	assert.equal(sanitizeSave([]).ok, false);
 });
 
-test('derived values cannot be forged: rates, reputation, level, combat stats and castle cost are recomputed', () => {
+test('derived values cannot be forged: rates, level, combat stats and castle cost are recomputed', () => {
 	freshGame();
 	growTo(6);
 	api().tick(1000);
 	const raw = snapshot();
-	raw.characterStats.reputation = 999999;
+	(raw.characterStats as unknown as Record<string, number>).reputation = 999999; // a stray field from an old save is ignored
 	raw.characterStats.hp = 1e9;
 	raw.characterStats.tileCostDiscount = 99;
 	raw.level = { level: 99, progress: 0.5 };
@@ -125,7 +125,7 @@ test('derived values cannot be forged: rates, reputation, level, combat stats an
 	const result = sanitizeSave(raw);
 	assert.equal(result.ok, true);
 	if (!result.ok) return;
-	assert.equal(result.state.characterStats.reputation, 1000 + 100 * (owned() - 1));
+	assert.equal('reputation' in result.state.characterStats, false);
 	assert.ok(result.state.characterStats.hp < 100);
 	assert.ok(result.state.characterStats.tileCostDiscount <= 25);
 	assert.equal(result.state.level.level, api().level.level);

@@ -239,3 +239,23 @@ test('two chest opens at the same moment spend two tickets, never the same one t
 	assert.equal(m.ledgers.get('u1')!.ordChest, 2);
 	assert.equal(m.ledgers.get('u1')!.bank.chests.length, 0);
 });
+
+test('a poll between a lost answer and its retry does not erase the idempotency record: the retry replays, no second ticket is spent', async () => {
+	const { m, now } = await playing(25);
+	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11a', now));
+	assert.equal(first.ok, true);
+	const spent = m.ledgers.get('u1')!.ordChest;
+	// the answer was lost; before the retry the game polls (a sync carries no key)
+	ok(await syncTickets(m.deps, 'u1', now + 1000));
+	assert.equal(m.ledgers.get('u1')!.lastKey, 'chest-key-r11a', 'the poll left the record alone');
+	const retry = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11a', now + 2000));
+	assert.deepEqual(retry, first);
+	assert.equal(m.ledgers.get('u1')!.ordChest, spent, 'no second chest was opened');
+});
+
+test('a fight poll keeps the record of the last keyed request too', async () => {
+	const { m, now } = await playing(25);
+	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11b', now));
+	ok(await fightStep(m.deps, 'u1', null, { action: 'sync' }, now + 1000));
+	assert.deepEqual(ok(await redeemChest(m.deps, 'u1', 'chest-key-r11b', now + 2000)), first);
+});

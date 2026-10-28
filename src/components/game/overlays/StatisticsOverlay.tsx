@@ -204,11 +204,6 @@ const StatisticsOverlay: React.FC = () => {
 							value={`up to ${formatCompact(fx.offlineCapHours, 1)} h at ${pct(fx.offlineEfficiency, 0)} income`}
 							valueClass='text-purple-300'
 						/>
-						<Line
-							label='Reputation'
-							value={formatCompact(characterStats.reputation)}
-							valueClass={characterStats.reputation >= 0 ? 'text-green-400' : 'text-red-400'}
-						/>
 					</div>
 				</CollapsibleSection>
 			</div>

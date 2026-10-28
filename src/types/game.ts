@@ -39,7 +39,6 @@ export interface CharacterStats {
 	atkSpeedIncrease: number; // % attack speed
 	xpGainMultiplier: number;
 	tileCostDiscount: number;
-	reputation: number;
 }
 
 export interface ResourceRates {

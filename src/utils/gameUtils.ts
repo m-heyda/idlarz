@@ -116,8 +116,6 @@ export const getStatDescription = (
 		xpGainMultiplier:
 			'Percentage increase to experience points gained from all sources.',
 		tileCostDiscount: 'Percentage discount when purchasing new tiles.',
-		reputation:
-			'Your standing in the world. Affects interactions with NPCs and factions.',
 	};
 
 	return descriptions[stat];

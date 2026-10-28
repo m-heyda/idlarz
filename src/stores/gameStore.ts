@@ -206,7 +206,7 @@ const createGameSlice = (
 	) => void,
 	get: () => GameState
 ) => {
-	/** Charge, claim the tile, award XP + reputation. */
+	/** Charge, claim the tile, award XP. */
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = economyTiles(state.tiles, state.freeTiles);
@@ -235,10 +235,6 @@ const createGameSlice = (
 			tiles: newTiles,
 			resources,
 			resourceRates: newRates,
-			characterStats: {
-				...state.characterStats,
-				reputation: state.characterStats.reputation + 100,
-			},
 		});
 		return true;
 	};

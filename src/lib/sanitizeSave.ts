@@ -212,7 +212,7 @@ const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
 /**
  * Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
  * (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
- * pay for the owned tiles ...) is rejected; derived values (rates, level, reputation, combat stats, castle
+ * pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
  * cost) are recomputed instead of trusted. Returns the cleaned persisted slice.
  */
 export const sanitizeSave = (raw: unknown): SanitizeResult => {
@@ -346,7 +346,6 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		...INITIAL_CHARACTER_STATS,
 		...base,
 		availablePoints: available + (expectedTotal - total),
-		reputation: INITIAL_CHARACTER_STATS.reputation + 100 * (purchasedOwned - 1),
 	};
 	Object.assign(characterStats, calculateCombatStats(characterStats));
 

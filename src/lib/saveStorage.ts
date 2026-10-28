@@ -1,8 +1,7 @@
 import type { PersistStorage, StorageValue } from 'zustand/middleware';
-import { legacyVault, parseLegacy, LEGACY_PREFIX, type LegacyVault } from '@/lib/legacyVault';
 import { decodeSave, encodeSave, type DecodeResult } from '@/lib/saveFormat';
 import type { PersistedGame } from '@/lib/sanitizeSave';
-import { isLocalDev, scoped } from '@/lib/storageScope';
+import { scoped } from '@/lib/storageScope';
 
 /**
  * Where the game is kept: the browser's localStorage, one text line (see saveFormat.ts).
@@ -17,7 +16,6 @@ import { isLocalDev, scoped } from '@/lib/storageScope';
  *   - The browser is asked to mark the storage as persistent, so it is not cleared when disk space runs low.
  *   - If the browser refuses to store (full, blocked, private mode) the game keeps running from memory and the
  *     save dialog says so, so the player can export instead.
- *   - Saves from the first format (encrypted IndexedDB) are copied over on first start (legacyVault.ts).
  */
 
 export const PERSIST_VERSION = 1; // for the zustand persist option only; the real schema lives in saveFormat.ts
@@ -61,7 +59,6 @@ export type SavePeek =
 
 interface Options {
 	kv: KeyValue | null;
-	legacy?: LegacyVault;
 	now?: () => number;
 	/** Asks the browser for persistent storage; resolves to whether it was granted. */
 	requestPersist?: () => Promise<boolean | null>;
@@ -69,7 +66,7 @@ interface Options {
 }
 
 export const createSaveStorage = (options: Options) => {
-	const { kv, legacy } = options;
+	const { kv } = options;
 	const now = options.now ?? Date.now;
 
 	let ready = false; // nothing is written before the first load finished (a fresh game must not overwrite a save)
@@ -160,18 +157,6 @@ export const createSaveStorage = (options: Options) => {
 			if (!current) markDamaged(backup, result.reason);
 		}
 
-		if (!current && !backup && legacy) {
-			const state = await legacy.read();
-			if (state) {
-				// Copy into the new storage, check it reads back, only then delete the old vault
-				const text = encodeSave(state, now());
-				if (store(KEY_CURRENT, text) && decodeSave(load(KEY_CURRENT) ?? '').ok) await legacy.clear();
-				savedAt = null;
-				lastRotation = 0;
-				return state;
-			}
-		}
-
 		lastRotation = now();
 		if (current || backup) {
 			loadProblem = 'Your save could not be read. The damaged text was kept; you can copy it from the save dialog.';
@@ -234,11 +219,8 @@ export const createSaveStorage = (options: Options) => {
 		dropPending();
 	};
 
-	/** Parses pasted / uploaded save text, in either format. */
-	const parse = async (text: string): Promise<DecodeResult> => {
-		if (text.trim().startsWith(LEGACY_PREFIX)) return parseLegacy(text);
-		return decodeSave(text);
-	};
+	/** Parses pasted / uploaded save text. */
+	const parse = async (text: string): Promise<DecodeResult> => decodeSave(text);
 
 	/** Replaces the stored save with an imported one. The caller reloads the page afterwards. */
 	const commitImport = (state: PersistedGame) => {
@@ -257,10 +239,9 @@ export const createSaveStorage = (options: Options) => {
 		drop(KEY_CURRENT);
 		drop(KEY_BACKUP);
 		drop(KEY_DAMAGED);
-		if (legacy) await legacy.clear();
 	};
 
-	/** Read-only look at what is stored (start hub): never writes, never starts a game, never touches the legacy vault. */
+	/** Read-only look at what is stored (start hub): never writes, never starts a game. */
 	const peek = (): SavePeek => {
 		const current = load(KEY_CURRENT);
 		const backup = load(KEY_BACKUP);
@@ -354,7 +335,6 @@ const persistence = () => (typeof navigator !== 'undefined' ? navigator.storage 
 
 const saves = createSaveStorage({
 	kv: browserKv(),
-	legacy: isLocalDev() ? undefined : legacyVault, // a dev session starts fresh: it never adopts (or wipes) an old vault
 	requestPersist: async () => (await persistence()?.persist?.()) ?? null,
 	queryPersisted: async () => (await persistence()?.persisted?.()) ?? null,
 });
