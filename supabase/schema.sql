@@ -116,6 +116,7 @@ create table public.player_ledger (
   last_key      text,                                 -- idempotency key of the last claim / redemption ...
   last_result   jsonb,                                -- ... and its answer, replayed when a response got lost
   combat        jsonb,                                -- HP and mana, cooldowns, the open fight, auto-battle switches, recent events (migration combat_ledger)
+  inv           jsonb,                                -- the bag, the worn gear, the loot pity and the auto-sell filter: the server's (migration inventory_ledger)
   updated_at    timestamptz not null default now(),
   constraint ledger_ver_positive check (ver >= 1),
   constraint ledger_gems_range   check (gems >= 0 and gems <= 1000000000)

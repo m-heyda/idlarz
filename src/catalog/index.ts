@@ -37,6 +37,9 @@ export const SETS: Record<string, ArmourSet> = Object.assign(
 	)
 );
 
+/** Every piece of a set, or of a plain loot family (wood, cloth, steel) that has no set bonus. */
+export const familyPieces = (id: string): string[] => ITEMS.filter((item) => item.set === id || item.family === id).map((item) => item.id);
+
 /** How many pieces of each set are worn (both rings count). */
 export const setCounts = (equipment: Equipment): Record<string, number> => {
 	const counts: Record<string, number> = {};

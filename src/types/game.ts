@@ -39,7 +39,6 @@ export interface CharacterStats {
 	atkSpeedIncrease: number; // % attack speed
 	xpGainMultiplier: number;
 	tileCostDiscount: number;
-	reputation: number;
 }
 
 export interface ResourceRates {
@@ -109,6 +108,8 @@ export interface ItemDef {
 	attackSpeed?: number;
 	stats?: ItemStats;
 	set?: string;
+	/** A plain loot family (wood, cloth, steel): matches affixes and pools like a set does, but gives no set bonus */
+	family?: string;
 	description?: string;
 	consumable?: { healHp: number };
 	stackMax?: number;
@@ -223,6 +224,8 @@ export interface CombatClientState {
 	maxMp: number;
 	/** Seconds until the soonest monster that beat the player is tried again (0: none is waiting out) */
 	retrySec: number;
+	/** Auto-battle is idle because no waiting monster looks winnable (a click on one fights it anyway) */
+	autoNote: 'no_winnable' | null;
 	/** Server clock of the picture shown (an older answer than this is ignored) */
 	at: number;
 	/** The last combat event applied: null until the server has said where its log stands */
@@ -304,10 +307,6 @@ export interface PrestigeState {
 	upgrades: Partial<Record<EmberUpgradeId, number>>;
 }
 
-export interface TapResult {
-	items: { resource: keyof Resources; amount: number }[];
-}
-
 import type { ChestLoot } from '@/lib/chests';
 import type { OfflineReport } from '@/lib/offline/apply';
 import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
@@ -340,7 +339,7 @@ export interface GameState {
 	merchantStock: MerchantStock | null; // the goods on offer (null until the first shelf is rolled)
 	merchantRefreshes: number; // paid shelf refreshes bought this run: each one costs more (see MERCHANT_GOODS.refresh)
 	isHydrated: boolean;
-	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
+	freeTiles: number; // owned tiles that cost nothing (castle + the four starting tiles); see economyTiles()
 	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
 	castleUpgrade: CastleUpgradeState | null;
@@ -352,6 +351,8 @@ export interface GameState {
 	lootPity: Record<string, number>;
 	/** Gear of this rarity or lower is sold the moment it drops (a rarity id); null = keep everything */
 	autoSellUpTo: string | null;
+	/** The version of the inventory (bag, gear, pity, auto-sell) this browser holds, as the server numbers it; null until the server has said (transient, never saved) */
+	invVer: number | null;
 	lastChestLoot: (ChestLoot & { gems?: number }) | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods
@@ -404,6 +405,4 @@ export interface GameState {
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;
 	organizeBag: () => boolean;
-	// Tap an owned tile: grants a slice of its output. Returns null while on cooldown / nothing to give.
-	tapTile: (x: number, y: number, input?: ClickInput) => TapResult | null;
 }

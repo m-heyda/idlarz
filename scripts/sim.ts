@@ -34,6 +34,8 @@ const main = async () => {
 	const monsters = await import('../src/lib/monsters');
 	const combatCfg = await import('../src/config/combatConfig');
 	const kill = await import('../src/lib/loot/kill');
+	const gearEco = await import('../src/lib/gearEconomy');
+	const fightSim = await import('../src/lib/fightSim');
 	const { useGameStore } = await import('../src/stores/gameStore');
 
 	useGameStore.persist.setOptions({
@@ -71,7 +73,7 @@ const main = async () => {
 		const started = Date.now();
 		const runs: Milestones[] = [];
 		for (let seed = 0; seed < seeds; seed++) {
-			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore, monsters, combatCfg, kill }, legacy, seed));
+			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore, monsters, combatCfg, kill, gearEco, fightSim }, legacy, seed));
 		}
 		// median per milestone, plus the min-max over seeds
 		results[name] = {};
@@ -124,16 +126,19 @@ const tileWaits: Record<string, Record<string, Record<string, number>>> = {};
 
 /**
  * What the player wears, by game day: the strongest rat they beat, the Rat King win chance (docs/generated/fight-sim.md: the
- * starter kit beats level 5 rats, knight gear level 9-10 rats and the King 13 % of the time, obsidian gear the King always).
+ * starter kit beats level 5 rats, knight gear level 9-10 rats but never the King, obsidian gear the King always).
  */
-const GEAR_SCHEDULE = [
+const GEAR_SCHEDULE: { day: number; maxRat: number; king: number; set?: string; weapon?: string }[] = [
 	{ day: 0, maxRat: 5, king: 0 },
-	{ day: 1.5, maxRat: 10, king: 0.13 },
-	{ day: 5, maxRat: 10, king: 1 },
+	{ day: 1.5, maxRat: 10, king: 0 },
+	// the full Obsidian set is worn from here on, so its economy bonuses (income, XP, kill rewards) count in the sim too
+	{ day: 5, maxRat: 10, king: 1, set: 'obsidian', weapon: 'obsidian_maul' },
 ];
 
 interface Ctx {
 	kill: typeof import('../src/lib/loot/kill');
+	gearEco: typeof import('../src/lib/gearEconomy');
+	fightSim: typeof import('../src/lib/fightSim');
 	monsters: typeof import('../src/lib/monsters');
 	combatCfg: typeof import('../src/config/combatConfig');
 	cfg: typeof import('../src/config/gameConfig');
@@ -165,7 +170,7 @@ const mulberry32 = (seed: number) => () => {
 };
 
 function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, seed = 0): Milestones {
-	const { cfg, utils, store, monsters, combatCfg, kill } = ctx;
+	const { cfg, utils, store, monsters, combatCfg, kill, gearEco, fightSim } = ctx;
 	const realRandom = Math.random;
 	Math.random = mulberry32(12345 + seed * 7919);
 
@@ -444,11 +449,20 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		}
 	};
 	/** Fights what is waiting with the gear the schedule says the player has; pays the kill like lib/loot/kill.ts does. */
+	let wearing = '';
 	const fightWaiting = () => {
 		const day = t / 86400;
 		const gear = [...GEAR_SCHEDULE].reverse().find((g) => day >= g.day) ?? GEAR_SCHEDULE[0];
+		if (gear.set && wearing !== gear.set) {
+			wearing = gear.set;
+			const equipment = fightSim.fullSet(gear.set, gear.weapon);
+			store.setState((st) => ({
+				equipment,
+				resourceRates: utils.calculateResourceRates(st.tiles, st.characterStats, st.farmLevels, st.prestige, st.farmUpgrades, st.merchantUpgrades, gearEco.gearIncomePct(equipment)),
+			}));
+		}
 		const rates = api().resourceRates.total;
-		const xpRate = rates.xp * (1 + (api().characterStats.xpGainMultiplier ?? 0) / 100);
+		const xpRate = rates.xp * (1 + gearEco.xpGainPct(api().characterStats, api().equipment) / 100);
 		waiting.sort((a, b) => a.spawnLevel - b.spawnLevel);
 		const left: typeof waiting = [];
 		for (const m of waiting) {
@@ -478,7 +492,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		waiting = left;
 	};
 	const killReward = (type: 'rat' | 'ratKing', level: number, rates: { gold: number; xp: number; hide: number }) =>
-		kill.killIncome({ type, level }, { goldPerSec: rates.gold, xpPerSec: rates.xp, hidePerSec: rates.hide, luck: 0 });
+		kill.killIncome({ type, level }, { goldPerSec: rates.gold, xpPerSec: rates.xp, hidePerSec: rates.hide, luck: 0, killRewardPct: gearEco.gearEconomy(api().equipment).killRewardPct });
 	if (profile.combat) resetCombat();
 
 	const finished = () => {
@@ -514,11 +528,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			for (let i = 0; i < n; i++) {
 				const input = { eventId: ++eventId, now: t * 1000 + i * gap, trusted: true };
 				api().clickForGold(input);
-				// about one click in eight lands on an owned tile and taps it too (same click, same token)
-				if (i % 8 === 0 && ownedTiles.length) {
-					const [tx, ty] = ownedTiles[Math.floor(Math.random() * ownedTiles.length)];
-					api().tapTile(tx, ty, input);
-				}
 			}
 		}
 		api().tick(step * 1000);

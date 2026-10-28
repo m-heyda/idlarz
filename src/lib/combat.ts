@@ -7,8 +7,10 @@ import type { CharacterStats, Equipment } from '@/types/game';
 // Pure combat rules: what a character's gear and attributes make of damage, speed, armor and HP. The server's fight engine
 // (lib/offline/fight.ts) runs fights on them; the character window shows the same numbers.
 
-export const maxHp = (characterStats: CharacterStats, equipment: Equipment): number =>
-	Math.round(COMBAT.baseHp + characterStats.hp + aggregateStats(equipment).maxHp);
+export const maxHp = (characterStats: CharacterStats, equipment: Equipment): number => {
+	const gear = aggregateStats(equipment);
+	return Math.round((COMBAT.baseHp + characterStats.hp + gear.maxHp) * (1 + gear.maxHpPct / 100));
+};
 
 /** Auto-battle (the server picking the next monster) is a reward for the first rebirth; a click on a monster starts a fight from the start. */
 export const autoBattleUnlocked = (rebirths: number): boolean => rebirths >= COMBAT.auto.minRebirths;
@@ -52,9 +54,11 @@ export const damageMultiplier = (equipment: Equipment, stats?: Attributes, bonus
 
 const round1 = (value: number): number => Math.round(value * 10) / 10;
 
-/** Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon). */
-export const damagePerHit = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number =>
-	Math.max(1, round1(aggregateStats(equipment).damage * damageMultiplier(equipment, stats, bonus)));
+/** Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage. */
+export const damagePerHit = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {
+	const gear = aggregateStats(equipment);
+	return Math.max(1, round1(gear.damage * damageMultiplier(equipment, stats, bonus) * (1 + gear.damagePct / 100)));
+};
 
 /** Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed. */
 export const attacksPerSecond = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {

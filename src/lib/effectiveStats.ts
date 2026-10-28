@@ -13,6 +13,7 @@ import {
 	maxMana,
 } from '@/lib/combat';
 import { critDamagePercent } from '@/lib/statBonuses';
+import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
 import { chestRateBonusPct, gemChance, luckyRatChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
 import { effectiveTileDiscount, emberEffect, merchantCombat, merchantLuck, type MerchantUpgrades } from '@/utils/gameUtils';
@@ -38,7 +39,8 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 	const critExtra = 1 + critDamagePercent(characterStats) / 100;
 	const armor = armorOf(equipment, characterStats);
 	const luck = characterStats.luck + merchantLuck(merchantUpgrades) + gear.luck;
-	const limits = { prestige, merchantUpgrades };
+	const economy = gearEconomy(equipment);
+	const limits = { prestige, merchantUpgrades, gear: economy };
 	return {
 		maxHp: maxHp(characterStats, equipment),
 		maxMana: maxMana(characterStats, equipment),
@@ -72,11 +74,15 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		offlineEfficiency: offlineEfficiency(limits) * 100,
 		goldFind: gear.goldFind,
 		spellPower: gear.spellPower,
-		xpGain: characterStats.xpGainMultiplier,
+		xpGain: xpGainPct(characterStats, equipment),
 		/** % off tiles and buildings: the attributes, the rebirth Thrift and the merchant's Bulk Discount, capped */
 		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades),
 		/** % more gold per click from rebirth (Click Mastery) and % faster castle builds (Master Builders) */
 		clickMastery: emberEffect(prestige, 'mastery') * 100,
 		buildTimeReduction: emberEffect(prestige, 'builders') * 100,
+		/** Set bonuses of the worn gear: % more income (every resource but XP), % more gold and XP from kills, % more gold per click */
+		gearIncome: economy.incomePct,
+		killRewards: economy.killRewardPct,
+		gearClick: economy.clickPct,
 	};
 };

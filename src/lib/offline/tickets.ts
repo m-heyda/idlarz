@@ -17,6 +17,15 @@ export const TICKET_CAP = 40;
 /** What `kind` of ticket: a chest, a rat or the Rat King (a boss: one at a time). */
 export type TicketKind = 'chest' | 'rat' | 'king';
 
+/** A waiting chest. Like a monster it has a number and (once the server found a tile for it, see placement.ts) a tile: the browser draws it there and opens it by naming that tile. */
+export interface ChestTicket {
+	n: number;
+	/** When it appeared (epoch seconds, server clock) */
+	at: number;
+	x?: number;
+	y?: number;
+}
+
 export interface MonsterTicket {
 	/** The ticket's number (unique for the run): the monster on the map carries it, a kill names it */
 	n: number;
@@ -37,15 +46,15 @@ export interface TicketBank {
 	kingAcc: number;
 	/** The server clock (epoch seconds) the timers were last brought up to */
 	accAt: number;
-	/** Waiting chests: when each appeared */
-	chests: number[];
+	/** Waiting chests */
+	chests: ChestTicket[];
 	rats: MonsterTicket[];
 	king: MonsterTicket | null;
 	/** The number of the next monster ticket, and how many rats this run has had (the first one comes sooner) */
 	nextN: number;
 	ratsMinted: number;
-	/** How many tiles a rat / the King may stand on right now (from the last look at the map: `sitesKey` says which land that was). Monsters stop coming when they are all taken; unknown (never looked) means none come yet. */
-	sites?: { rat: number; king: number };
+	/** How many tiles a rat / the King may stand on right now (from the last look at the map: `sitesKey` says which land that was). Monsters stop coming when they are all taken; unknown (never looked) means none come yet. `chest` counts the tiles a chest may stand on (absent in rows from before chests were placed here). */
+	sites?: { rat: number; king: number; chest?: number };
 	sitesKey?: string;
 }
 
@@ -92,7 +101,7 @@ const ratSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(
 const kingSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.king;
 
 export interface Minted {
-	chests: number[];
+	chests: ChestTicket[];
 	rats: MonsterTicket[];
 	king: MonsterTicket | null;
 }
@@ -143,8 +152,9 @@ export const advanceBank = (
 
 		if (next.chestAcc >= chestEvery - 1e-9 && ticketRoom(next, ctx) > 0) {
 			next.chestAcc = 0;
-			next.chests.push(at);
-			minted.chests.push(at);
+			const chest = { n: next.nextN++, at };
+			next.chests.push(chest);
+			minted.chests.push(chest);
 		}
 		if (ratsAllowed && next.ratAcc >= ratThreshold(next) - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const n = next.nextN++;
@@ -166,11 +176,21 @@ export const advanceBank = (
 	return { bank: next, minted };
 };
 
-/** Takes the oldest waiting chest (it was the first on the map). Null when none waits. */
-export const takeChest = (bank: TicketBank): { bank: TicketBank; at: number } | null => {
-	if (bank.chests.length === 0) return null;
-	const [at, ...rest] = bank.chests;
-	return { bank: { ...bank, chests: rest }, at };
+/** Takes the chest standing on this tile. Null when there is none: a click on a tile without a real chest opens nothing. */
+export const takeChestAt = (bank: TicketBank, x: number, y: number): { bank: TicketBank; ticket: ChestTicket } | null => {
+	const ticket = bank.chests.find((chest) => chest.x === x && chest.y === y);
+	if (!ticket) return null;
+	return { bank: { ...bank, chests: bank.chests.filter((chest) => chest.n !== ticket.n) }, ticket };
+};
+
+/**
+ * Reads a bank as stored: rows from before chests had numbers and tiles hold the time each chest appeared as a plain number. They
+ * become numbered tickets without a tile (the server finds one at the next look at the map).
+ */
+export const upgradeBank = (stored: Omit<TicketBank, 'chests'> & { chests?: (ChestTicket | number)[] }): TicketBank => {
+	let nextN = stored.nextN;
+	const chests = (stored.chests ?? []).map((chest): ChestTicket => (typeof chest === 'number' ? { n: nextN++, at: chest } : chest));
+	return { ...stored, chests, nextN };
 };
 
 /** Takes the monster ticket numbered `n` (a kill or a dismissal). Null when there is none. */

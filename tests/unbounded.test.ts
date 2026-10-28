@@ -7,7 +7,7 @@ import { spawnCap } from '../src/lib/spawnLimits';
 import { spawnTiles } from '../src/lib/monsters';
 import { decodeSave, encodeSave } from '../src/lib/saveFormat';
 import { calculateTileCost, calculateXpGain, economyTiles } from '../src/utils/gameUtils';
-import { COORD_LIMIT, MAX_OWNED_TILES, getTile, isOwnedAt, ownedBounds, ownedCount, setTile } from '../src/utils/world';
+import { COORD_LIMIT, MAX_OWNED_TILES, getTile, isOwnedAt, ownedBounds, ownedCount, ownedRowMajor, setTile } from '../src/utils/world';
 import { syntheticWorld } from '../src/utils/worldGen';
 
 // The map has no edge: tiles can be bought past x = 0 / y = 0 (negative coordinates) and as far as the limits allow.
@@ -113,7 +113,7 @@ test('chests and monsters the server lists show on land with negative coordinate
 	const spots = spawnTiles('rat', world, new Set());
 	assert.ok(spots.length >= 3 && spots.some(({ x, y }) => x < 25 || y < 25));
 	api().applyServerTickets({
-		tickets: { chests: 5, rats: spots.slice(0, 3).map(({ x, y }, i) => ({ n: i + 1, at: 0, lucky: false, x, y, spawnLevel: 1 })), king: null },
+		tickets: { chests: world.stats.owned ? ownedRowMajor(world).filter(({ tile }) => tile.biome !== 'castle').slice(0, 5).map(({ x, y }, i) => ({ n: 50 + i, x, y })) : [], rats: spots.slice(0, 3).map(({ x, y }, i) => ({ n: i + 1, at: 0, lucky: false, x, y, spawnLevel: 1 })), king: null },
 		serverNowSec: 10,
 		gemsTotal: 1000,
 		nextInSec: 60,
@@ -139,6 +139,6 @@ test('rebirth and reset bring the map back to the starting ring, wherever the la
 	freshGame();
 	store.setState({ tiles: syntheticWorld(800, 2), freeTiles: 1 });
 	api().resetGame();
-	assert.equal(ownedCount(api().tiles), 9);
+	assert.equal(ownedCount(api().tiles), 5);
 	assert.deepEqual(ownedBounds(api().tiles), { minX: CASTLE_X - 1, maxX: CASTLE_X + 1, minY: CASTLE_Y - 1, maxY: CASTLE_Y + 1 });
 });

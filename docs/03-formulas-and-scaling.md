@@ -24,7 +24,7 @@ Cumulative gold for the first 100 / 200 / 300 / 400 / 500 tiles: 1.6 M / 17 M / 
 
 **The tail (no tile limit).** Up to 300 tiles the price is the three exponential stages (×1.13 to 15 tiles, ×1.07 to 100, then only ×1.007 per tile, the soft middle). Past `TILE_PRICE.tailFrom` (300) it grows like `(n / 300)^4.5` (`TILE_PRICE.tailExponent`), much steeper than the stretch before, and is capped at `TILE_PRICE.ceiling` (`RESOURCE_CAP / 100`), so it is always finite and a map of tens of thousands of tiles stays buyable (table in [generated/balance-tables.md](generated/balance-tables.md)). `RESOURCE_CAP` was raised from 1e15 to 1e21 for it. There is no tile limit any more (see 02 §1, map). The numbers are tuned with `npm run sim` against the pacing targets in [06](06-pacing-targets.md) (100 tiles within the first day, 200-300 tiles in 2-3 days, a visibly harder climb after 300) for a game that will later be built around rebirths (bigger starting resources, much bigger maps); the tail is also on the balance backlog in [ROADMAP](ROADMAP.md).
 
-Every purchase rolls its biome (no picker). XP and reputation per purchase in §2.
+Every purchase rolls its biome (no picker). XP per purchase in §2.
 
 ## 2. XP and levels
 
@@ -35,7 +35,7 @@ xpGainMultiplier (%) = 0.2·INT + 0.25·CHA
 passive xp/s = rates.total.xp × (1 + xpGainMultiplier/100)
 XP to leave level N = xpToNextLevel(N): from anchors (level → total XP) 10 → 1.4e5, 30 → 1e8, 80 → 3e9, 90 → 6.5e9, 100 → 1.85e10,
                        every step a constant factor above the one before inside a segment; level 100 is the maximum (LEVELING in gameConfig.ts)
-stat points = 1 per level, +2 for levels 2..30 (totalStatPoints); reputation = 1000 + 100 per tile bought
+stat points = 1 per level, +2 for levels 2..30 (totalStatPoints)
 level, lifetime XP and attributes carry over a rebirth
 ```
 
@@ -55,7 +55,7 @@ modifiers[r] = castleModifier(C)                    castle, all resources (§4)
              + stat modifiers                       2.5 % per point, see 02 §11 (XP: +0.2 %/INT, +0.25 %/CHA)
              + 0.05 × plainsTiles                   (r = meat only)
 
-total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × embersEarned) × (1 + Foreman)     (second factor only after a Rebirth, §9; Foreman = merchant upgrade, +1 % per level, every resource but XP)
+total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.06 × embersEarned) × (1 + Foreman) × (1 + setIncomePct/100)     (second factor only after a Rebirth, §9; Foreman = merchant upgrade, +1 % per level; the set Income % comes from the worn Obsidian set; both on every resource but XP)
 
 The merchant's Skinner upgrade (+5 % per level) multiplies the farm's meat and hide inside `base` before the modifiers.
 ```
@@ -64,7 +64,7 @@ The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Ev
 
 `calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Ember factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Character tab's *Where the income comes from* section shows exactly these numbers per resource.
 
-**New game**: the castle plus the 8 free start tiles (a random ring of plains and forest) give roughly 3-4 gold/s, about 0.1 wood and 0.2 stone/s and a few food per second, under the castle's +45 % modifier (+32.5 % stone), and about 1.2 xp/s. The exact rows for one fixed ring are in [generated/balance-tables.md §7](generated/balance-tables.md).
+**New game**: the castle plus the 4 free start tiles (a random mix of plains and forest) give roughly 2-3 gold/s, about 0.1 wood and 0.2 stone/s and a few food per second, under the castle's +45 % modifier (+32.5 % stone), and about 1.2 xp/s. The exact rows for one fixed ring are in [generated/balance-tables.md §7](generated/balance-tables.md).
 
 ## 4. Castle
 
@@ -134,16 +134,15 @@ goods: shelf = 6 pieces of loot source `merchant` (profile `merchant_stock`: com
        price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh)
 bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Embers of a rebirth = floor(gain × (1 + 0.05 × Tithe))
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
-tap:   resource = tile output/s × 0.5 s, tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s of server time (Luck shortens it), counted with the monsters against min(40, 30 % of the free land)
 building cost: see §11
 ```
 
-Click limiter (gold clicks and tile taps): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
+Click limiter (gold clicks): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
 
 ## 7. Character-derived stats
 
-`calculateCombatStats` (`gameUtils.ts`; the combat parts come from `lib/statBonuses.ts`, the same functions the server's fights use, and count the points above the starting 5): physicalAtk % = 2·(STR−5); magicAtk % = 2.4·(INT−5); hp = 3·VIT + 0.25·CHA (on top of the base 85); mp = 20 + 4·INT; def = 0.5·(DEX−5) + 0.5·(VIT−5) + 0.25·(STR−5); luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; atkSpeed % = 0.25·(DEX−5); **xpGainMultiplier** = 0.2·INT + 0.25·CHA and **tileCostDiscount** = 0.5·CHA (max 25) as above. Damage, armor, crit damage and attack speed feed the fight engine (§10), luck feeds chests and kills, xpGainMultiplier and tileCostDiscount the economy; reputation is display-only.
+`calculateCombatStats` (`gameUtils.ts`; the combat parts come from `lib/statBonuses.ts`, the same functions the server's fights use, and count the points above the starting 5): physicalAtk % = 2·(STR−5); magicAtk % = 2.4·(INT−5); hp = 3·VIT + 0.25·CHA (on top of the base 85); mp = 20 + 4·INT; def = 0.5·(DEX−5) + 0.5·(VIT−5) + 0.25·(STR−5); luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; atkSpeed % = 0.25·(DEX−5); **xpGainMultiplier** = 0.2·INT + 0.25·CHA and **tileCostDiscount** = 0.5·CHA (max 25) as above. Damage, armor, crit damage and attack speed feed the fight engine (§10), luck feeds chests and kills, xpGainMultiplier and tileCostDiscount the economy.
 
 ## 8. What the pacing looks like
 
@@ -153,8 +152,8 @@ Pacing is measured, not written here: `npm run sim` drives the real store with b
 
 ```
 available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 100 (REBIRTH.minTiles), no castle upgrade running
-points      = floor(4.5 × (C − 5) × sqrt(n / 10))                     REBIRTH.gain
-income      × (1 + 0.05 × legacyEarned)                                folded into the modifiers, spending never lowers it
+points      = floor(3 × (C − 5) × sqrt(n / 10))                     REBIRTH.gain
+income      × (1 + 0.06 × legacyEarned)                                folded into the modifiers, spending never lowers it
 shop cost   = ceil(base × 1.4^level)        base: thrift 2, builders 3, mastery 2, provisions 2; max level 10
 thrift      : tile and building cost × (1 − 0.02 × level), summed with the Charisma discount, capped at 45 %
 builders    : castle build time × (1 − 0.05 × level)
@@ -173,8 +172,8 @@ Conservation rule used by the save check: `legacyPoints + Σ shop spending = leg
 ## 10. Combat, monsters and items
 
 ```
-maxHp        = round(85 + characterStats.hp + Σ gear maxHp + set bonuses)       COMBAT.baseHp   (101 at the start)
-damage/hit   = max(1, Σ gear damage + set bonuses)                              Wooden Sword 6 ... Titan Maul 45 at their first level (COMBAT.maxItemDamage 50 caps the authored base damage; gear grows with its item level)
+maxHp        = round((85 + characterStats.hp + Σ gear maxHp + set bonuses) × (1 + maxHpPct/100))       COMBAT.baseHp   (101 at the start)
+damage/hit   = max(1, (Σ gear damage + set bonuses) × (1 + damagePct/100))                              Wooden Sword 6 ... Titan Maul 45 at their first level (COMBAT.maxItemDamage 50 caps the authored base damage; gear grows with its item level)
 hit          : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
                then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
 hit taken    = max(1, round(attack × (1 − armorReduction(armor))))              COMBAT.armorK, armorSoftCap, armorSoftSlope
@@ -195,8 +194,8 @@ rat level L  : HP = round(100 × 1.5^((L−1)/2))  → level 1 / 3 / 5 / 7 / 9 =
 King level L : HP, attack = base × levelScale(L) / levelScale(15)  (1000 HP, 11 attack at 15), armor 15 + 0.5 × (L−15), 8 % crit x1.5, 20 % Stun resist
 hit dealt    = max(1, your damage × (1 − armorReduction(armor)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
 rewards      : rewardSec = 90 × 1.17^(L−1) (rat), 3600 × 1.03^(L−15) (King)
-               gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
-               xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
+               gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck) × (1 + goldFind%)) × (1 + killRewardPct/100))   Luck = character + merchant + gear
+               xp   = max(5, xp/s × (1 + xpGain%) × rewardSec) × (1 + killRewardPct/100)
                hide = floor(hide/s × rewardSec × 0.6)      COMBAT.rewards.hideShare; pelts are a share of the farm's income, 0 without deer and pigs; also x3 on a lucky rat
 drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> source level -> item level -> rarity -> base -> affixes
                rat: gear 12 % + 1 % per level above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
@@ -211,6 +210,8 @@ Rat King     : level 15: 1000 HP behind 15 armor, attack 11 every 3 s, 75 s limi
 The King's numbers were tuned with `npm run fight-sim` (a bot with the real combat rules; tables in [generated/fight-sim.md](generated/fight-sim.md)) and are
 held by `tests/fightBalance.test.ts`: the starter kit and plain wood never win, full steel does not, full obsidian wins with seconds to spare, the Rattatui set comfortably,
 and no loadout trivialises him. Rats are basic enemies and are not tuned around him.
+
+Set bonuses (`catalog/sets.ts`) may carry the set-only stats `incomePct`, `xpPct`, `killRewardPct`, `offlineEff`, `offlineCapHours`, `clickPct`, `damagePct` and `maxHpPct`; `xpGain% = attributes + set XP %`, the away limits add the set's away hours and efficiency points. The two sets are generated into [generated/item-catalog.md](generated/item-catalog.md), with where every effect is applied.
 
 Items, sets, rarities, stats, drop pools and the merchant stock are generated into [generated/item-catalog.md](generated/item-catalog.md) from `src/catalog`.
 Combat numbers live in `src/config/combatConfig.ts`.

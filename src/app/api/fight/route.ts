@@ -7,7 +7,13 @@ export const dynamic = 'force-dynamic';
 const since = (value: unknown): number | undefined => (Number.isInteger(value) && (value as number) >= 0 ? (value as number) : undefined);
 
 /** `{ key, action, ... }` with action `sync`, `use` (`{ kind: 'potion', id } | { kind: 'skill', id } | { kind: 'fight', n }`), `auto` (`autoBattle?`, `autoUse?`) or `dismiss` (`n`). */
-const parse = (body: Record<string, unknown>): { key: string | null; request: FightRequest } | null => {
+const parse = (body: Record<string, unknown>): { key: string | null; request: FightRequest; invVer?: number } | null => {
+	const parsed = parseRequest(body);
+	const invVer = Number.isInteger(body.invVer) && (body.invVer as number) >= 0 ? (body.invVer as number) : undefined;
+	return parsed ? { ...parsed, invVer } : null;
+};
+
+const parseRequest = (body: Record<string, unknown>): { key: string | null; request: FightRequest } | null => {
 	const key = typeof body.key === 'string' && KEY.test(body.key) ? body.key : null;
 	const common = since(body.since);
 	switch (body.action) {
@@ -36,5 +42,5 @@ const parse = (body: Record<string, unknown>): { key: string | null; request: Fi
 
 /** The one door for combat: no click ever hits anything, the browser only asks the server to carry the fight on, start one against a monster, press a hotkey, flip a switch or dismiss a monster. */
 export async function POST(request: Request) {
-	return onlineRoute(request, parse, (deps, userId, body, nowMs) => fightStep(deps, userId, body.key, body.request, nowMs));
+	return onlineRoute(request, parse, (deps, userId, body, nowMs) => fightStep(deps, userId, body.key, body.request, nowMs, body.invVer));
 }

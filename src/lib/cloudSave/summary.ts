@@ -1,6 +1,7 @@
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
+import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
 import { calculateResourceRates, countBuildings, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
 import { getTile, setTile } from '@/utils/world';
@@ -26,7 +27,7 @@ export interface SaveSummary {
 	rebirths: number;
 	legacyPoints: number;
 	legacyEarned: number;
-	/** Percent bonus on xp income (`characterStats.xpGainMultiplier`). */
+	/** Percent bonus on xp income (`characterStats.xpGainMultiplier` plus the gear's XP Gain). */
 	xpGainPct: number;
 	playSeconds: number;
 	/** What an absence and the server-rolled rewards need, kept in the `derived` column (older rows lack it: see `DEFAULT_DERIVED`). */
@@ -42,6 +43,8 @@ export interface SaveDerived {
 	/** Total Luck (attributes + Lucky Charm + gear) and the gear's Gold Find %: they decide server-rolled rewards */
 	luck: number;
 	goldFind: number;
+	/** The set bonuses' Kill Rewards %: extra gold and XP from a kill (absent in older rows: none) */
+	killRewardPct?: number;
 	/** Chests standing on the map: the ledger is seeded from them the first time it is created (monsters are the ledger's own) */
 	chests: number;
 	/** What the Ember upgrades made of the away-time cap (seconds) and efficiency (0-1) */
@@ -58,6 +61,7 @@ export const DEFAULT_DERIVED: SaveDerived = {
 	ratesAfterCastle: null,
 	luck: 0,
 	goldFind: 0,
+	killRewardPct: 0,
 	chests: 0,
 	offlineCapSec: offlineCapSec(),
 	offlineEfficiency: offlineEfficiency(),
@@ -69,13 +73,14 @@ const ratesAfterUpgrade = (state: PersistedGame): Resources | null => {
 	const castle = getTile(state.tiles, CASTLE_X, CASTLE_Y);
 	if (!upgrade || !castle || castle.biome !== 'castle') return null;
 	const tiles = setTile(state.tiles, CASTLE_X, CASTLE_Y, { ...castle, level: upgrade.toLevel, upgradeCost: CASTLE_UPGRADE.upgradeCosts[upgrade.toLevel - 1] ?? undefined });
-	return calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades).total;
+	return calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades, gearIncomePct(state.equipment)).total;
 };
 
 export const summarize = (state: PersistedGame): SaveSummary => {
-	const rates = calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades).total;
+	const rates = calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades, gearIncomePct(state.equipment)).total;
 	const fx = effectiveStats({ characterStats: state.characterStats, equipment: state.equipment, prestige: state.prestige, merchantUpgrades: state.merchantUpgrades });
-	const limits = { prestige: state.prestige, merchantUpgrades: state.merchantUpgrades };
+	const gear = gearEconomy(state.equipment);
+	const limits = { prestige: state.prestige, merchantUpgrades: state.merchantUpgrades, gear };
 	return {
 		rates,
 		gold: state.resources.gold,
@@ -89,7 +94,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		rebirths: state.prestige.rebirths,
 		legacyPoints: state.prestige.legacyPoints,
 		legacyEarned: state.prestige.legacyEarned,
-		xpGainPct: state.characterStats.xpGainMultiplier,
+		xpGainPct: xpGainPct(state.characterStats, state.equipment),
 		playSeconds: state.playSeconds,
 		derived: {
 			known: true,
@@ -97,6 +102,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			ratesAfterCastle: ratesAfterUpgrade(state),
 			luck: fx.luck,
 			goldFind: fx.goldFind,
+			killRewardPct: gear.killRewardPct,
 			chests: state.tiles.stats.chests,
 			offlineCapSec: offlineCapSec(limits),
 			offlineEfficiency: offlineEfficiency(limits),

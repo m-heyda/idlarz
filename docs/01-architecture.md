@@ -23,7 +23,7 @@ src/
 │   ├── page.tsx              the gate: checking → login/register (StartDialog) → profile → save hub (SaveHub: continue / choose / new game) → GameApp; AuthUnavailable when Supabase is not reachable
 │   ├── GameApp.tsx           the game: 100 ms tick loop, single-tab lock, hidden Ctrl×5 shortcut, the three sync hooks, composes all overlays
 │   ├── layout.tsx, globals.css
-│   └── api/                  auth/{login,logout,me,profile,register}, save (cloud save), offline (claim an absence), spawn (tickets + combat view), chest (open a chest), fight (start / hotkey / auto switches / dismiss)
+│   └── api/                  auth/{login,logout,me,profile,register}, save (cloud save), offline (claim an absence), spawn (tickets + combat view), chest (open a chest), inventory (equip, sell, move, buy ...), fight (start / hotkey / auto switches / dismiss)
 ├── config/
 │   ├── gameConfig.ts         ALL tunable economy constants (costs, curves, biomes, castle, animals, merchant, click limiter, chests, stats, rebirth, offline, luck)
 │   ├── combatConfig.ts       COMBAT + MONSTERS + STAT_RULES: HP, regen, armor, spawn, monster defs (level scaling, armor, crit, Stun resist, grade)
@@ -35,7 +35,7 @@ src/
 │                             loot.ts + lootConfig.ts (loot profiles, pools, merchant stock; see 10-loot-system.md)
 ├── types/game.ts             Resources, Tile, CharacterStats, ItemInstance, Monster, GameState (store interface), ClickInput ...
 ├── stores/
-│   ├── gameStore.ts          the single game store: every action (buyTile, tick, upgradeCastle, clickForGold, tapTile, startFight, rebirth, buyEmberUpgrade, merchant actions ...)
+│   ├── gameStore.ts          the single game store: every action (buyTile, tick, upgradeCastle, clickForGold, startFight, rebirth, buyEmberUpgrade, merchant actions ...)
 │   ├── uiStore.ts            transient UI flags (menu, dialogs, right-click menu, highlight, toast) and remembered panel state (`setPref`)
 │   ├── viewStore.ts          where the map is on the screen (pan x/y, zoom, window size), clamped to the explored land
 │   ├── settingsStore.ts      sound / volume / ambient-life preferences (localStorage `idlarz-settings`, not game state)
@@ -45,23 +45,22 @@ src/
 │   ├── world.ts              THE map: a sparse immutable `World` (explored tiles by numeric key, incremental counters + bounds), copy-on-write setTile/patchTile, row adapters for tests
 │   └── biomeRules.ts, growWorld.ts, worldGen.ts, cluster.ts, terrain.ts (dual-grid terrain, port of scripts/pixel/terrain_logic.py), water.ts, formatters.ts, audioManager.ts
 ├── lib/
-│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks and tile taps
+│   ├── clickLimiter.ts       token-bucket limiter for gold clicks
 │   ├── combat.ts             pure combat rules: max HP, armor mitigation, damage per hit, crit, regen (used by the server engine and the UI)
 │   ├── monsters.ts           monster levels and stats, spawn level windows, growth
 │   ├── skills.ts, effectiveStats.ts, statBonuses.ts, itemInstance.ts, inventory.ts (pure bag/equipment ops + aggregateStats), limits.ts, merchant.ts, chests.ts, luck.ts, rng.ts
 │   ├── loot/                 kill / chest / merchant-stock rolls: generate, kill, receive, pools, validate, autoSell, data
-│   ├── offline/              the server engine, pure and unit-tested: tickets (spawn timers), placement, fight (the tick engine), profile (player stats for a fight), reward, grant,
+│   ├── offline/              the server engine, pure and unit-tested: tickets (spawn timers), placement, fight (the tick engine), profile (player stats for a fight), reward, inventory (the ledger-owned bag, gear and pity and the player's operations on them), winChance (auto-battle's "can I win this?"), grant,
 │   │                         ledger + supabaseLedger, seal / secret (sealed rolls), reconcile, service / online (the request handlers), limits, types
 │   ├── cloudSave/            the cloud-save pipeline: pipeline, verify (plausibility, shadow mode), netWorth, xpModel (the server's XP ceiling), summary, supabaseRepo, environment
 │   ├── supabase/             server.ts (cookie client), admin.ts (service-role client)
 │   ├── authClient / authRoute / authValidation / playerRoute / offlineRoute   the browser and route-handler sides of login and the ledger routes
 │   ├── cloudClient, manualCloudSave, saveEvents, syncPolicy, startPlan, serverSession   when and how the browser pushes saves to the account
-│   ├── rewardsClient, offlineClient, offlineFlow, combatCursor, combatFx   the browser side of /api/spawn, /api/chest, /api/fight, /api/offline
+│   ├── rewardsClient, offlineClient, offlineFlow, combatCursor, combatFx   the browser side of /api/spawn, /api/chest, /api/fight, /api/inventory, /api/offline
 │   ├── saveFormat.ts         the save text (IDLZ2.<base64 JSON>.<check>): compact body, `SAVE_SCHEMA` + `MIGRATIONS`, encode/decode
 │   ├── saveStorage.ts, storageScope.ts   localStorage storage: sync flush on close, backup + damaged copy, `.dev` key suffix on localhost, persist(), import/reset
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS
 │   ├── groundsMigration, levelsMigration, monstersMigration, legacyGear   one migration module per old save schema (frozen fixtures in tests/fixtures/saves guard them)
-│   ├── legacyVault.ts        read-only: the old encrypted IndexedDB vault and IDLZ1 exports
 │   ├── fightSim.ts           a bot that fights with the real engine (scripts/fight-sim.ts, tests/fightBalance.test.ts)
 │   └── castleWard, castleFinder, mapView, minimap, terrainRenderer, tipPlacement, ambientLife, floatText, inventoryDrag, globalMenu, uiPrefs, clipboard
 ├── hooks/
@@ -79,7 +78,7 @@ src/
 supabase/                     schema.sql (a fresh project) + migrations/ (autosave_history_by_time, offline_ledger, combat_ledger: run in that order on an older project)
 scripts/
 ├── sim.ts                    bot simulation on the REAL store (milestones per player profile)
-├── balance-report.ts, catalog-report.ts, fight-sim.ts, loot-sim.ts   generators of docs/generated/*.md (`npm run docs:gen` runs them all)
+├── balance-report.ts, catalog-report.ts (renders catalogDoc.ts), fight-sim.ts, loot-sim.ts   generators of docs/generated/*.md (`npm run docs:gen` runs them all)
 ├── perf-world.ts             timings at 5k / 50k / 250k tiles (`npm run perf`)
 └── pixel/                    sprite generators -> public/pixel/ (see "Pixel art pipeline")
 tests/                        one file per area (economy, saves, castle, rebirth, loot, offline/ledger, fight engine and balance, merchant, terrain ...); helpers.ts builds games; fixtures/ holds frozen old saves
@@ -98,7 +97,7 @@ The map has no edge. `GameState.tiles` is a `World` (`src/utils/world.ts`): an i
 
 Persisted (`PERSISTED_KEYS` in `sanitizeSave.ts`, the one list): `tiles`, `resources`, `level`, `previousLevel`, `playerName`, `playerClass`, `characterStats`, `farmLevels`, `farmUpgrades`, `merchantUpgrades`, `clickLevel`, `castleUpgrade`, `prestige` (rebirths, Embers earned/unspent, shop levels), `freeTiles`, `playSeconds`, `activeChests`, `gems`, `equipment` (item instances by slot), `bag` (`limitOf('bagSize')` slots: 36 plus Pack Rat), `playerHp`, `playerMp`, `lootPity`, `autoSellUpTo`, `merchantStock`, `merchantRefreshes`. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.
 
-Not saved: `monsters` and the open fight (`combat`) are the server's picture and arrive with each `/api/spawn` answer. Rebuilt on load: `resourceRates`, derived combat stats, reputation, castle upgrade cost, every window/dialog flag, `isHydrated`.
+Not saved: `monsters` and the open fight (`combat`) are the server's picture and arrive with each `/api/spawn` answer. Rebuilt on load: `resourceRates`, derived combat stats, castle upgrade cost, every window/dialog flag, `isHydrated`.
 
 ## The loop
 
@@ -114,7 +113,7 @@ Not saved: `monsters` and the open fight (`combat`) are the server's picture and
 
 ## Clicks
 
-`useClickIncome` (called by `GameHeader`) registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold` (and the tile's `onClick` calls `tapTile` for the same event); both ask the shared limiter with the event's `timeStamp` as id, so one physical click costs one token. Nothing hits a monster by clicking: a click on a monster only opens the fight (`startFight`).
+`useClickIncome` (called by `GameHeader`) registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold`, which asks the limiter with the event's `timeStamp` as id, so one physical click costs one token. Nothing hits a monster by clicking: a click on a monster only opens the fight (`startFight`).
 
 ## Rebirth
 
@@ -131,7 +130,7 @@ Not saved: `monsters` and the open fight (`combat`) are the server's picture and
 - **Terrain**: the ground is drawn in **chunks** of 16 x 16 tiles (768 px, `CHUNK_TILES`), one `<canvas>` each (`TerrainLayer` / `TerrainChunk`), only for the chunks on screen plus a ring around them, by `terrainRenderer.ts` from the atlas in `public/pixel/terrain/` + `src/config/terrainAtlas.json`. A chunk's picture depends only on the ground inside the chunk plus `CHUNK_HALO` (5) tiles, so its `chunkSignature` (one character per tile of that window, building tiles upper case) decides when it is redrawn: a purchase redraws the chunks next to it, never pan, zoom or a chest toggle. The ground comes from `worldGround(world)` (explored tile -> its ground, unexplored next to explored -> 'mist'), cached per World. Dual cells on a chunk border are drawn by both chunks, sprites that reach over a border (a tree, a pier) by both too, the texture pattern is anchored at the world origin and each canvas is 2 px larger than its part, so there are no seams even at fractional zoom. Draws are queued and run within a 6 ms frame budget (at least one chunk per frame); flat colours show first and until the atlas loads. Tiles are transparent hit areas that carry the castle, buildings, chest, '?' marker and hover overlays. Buyable unexplored tiles are drawn as the dark 'mist' sea. `tests/terrainChunks.test.ts` checks the halo is enough, that equal signatures mean equal pictures, and that nothing is cut at a border.
 - **Highlight**: the tile menu's "Highlight this ... area" tints the connected same-biome area (`connectedCluster`, an iterative flood fill) with the biome's colour from `biomePalette.ts` for 3 s, drawn by `HighlightLayer` as one screen-space canvas (only tiles on screen are looked at, so a 20,000-tile area costs the same as a 20-tile one), no border.
 - **Minimap**: `Minimap` (bottom right, switched in the global menu) paints one square per explored tile in its biome colour into one `ImageData` (`src/lib/minimap.ts`, repainted at most every 200 ms; 4 ms at 50,000 tiles), a gold marker on the castle, purple ones on workshops, and outlines the visible part (moved straight in the DOM, no React render per pan frame). Click or drag centres the view there (clamped like any pan); it is outside the map's click area, so it never pays gold. A small map is drawn up to 6 px per tile, a big one down to a fraction of a pixel.
-- **Biome rules and chests**: `src/config/biomeRules.ts` (numbers) + `src/utils/biomeRules.ts` (unlocks, conflicts, clustering, the starting ring) decide what a purchase becomes; `src/lib/chests.ts` decides where chests appear and what they hold. Both are pure with an injectable `random()`. The free starting ring is `GameState.freeTiles`; costs use `economyTiles()` (see [02](02-mechanics.md)).
+- **Biome rules and chests**: `src/config/biomeRules.ts` (numbers) + `src/utils/biomeRules.ts` (unlocks, conflicts, clustering, the starting tiles) decide what a purchase becomes; `src/lib/chests.ts` decides where chests appear and what they hold. Both are pure with an injectable `random()`. The free starting tiles are `GameState.freeTiles`; costs use `economyTiles()` (see [02](02-mechanics.md)).
 - **Buildings**: any explored tile except the castle and lakes can take one (`buildOnTile`, `canBuildOn`, price `calculateBuildingCost` / `buildingCostFactor`); the right-click `BuildDialog` opens from `Tile.tsx`. A building keeps its tile's own ground and gets a pad of that biome (`allPads()` in `terrain.ts`, art in `terrain_pads.py`, drawn under the sprites) (the same rule is ported to `terrain_logic.py` and covered by the parity fixture, where a lowercase letter marks a building). Building tiles carry no props.
 - Tile tooltips are portalled into `MapTipLayer`, a layer above the critters, because every tile is its own stacking context.
 - `NotifyDot` is the one "needs attention" marker (a soft orange dot). It is used on the avatar in the header and on the Menu tabs: unspent stat points (Stats tab) and an affordable farm animal or upgrade (Farm tab); the avatar shows either (`useMenuAttention`).

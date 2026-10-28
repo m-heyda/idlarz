@@ -12,6 +12,7 @@ import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { plainItem } from '../src/lib/itemInstance';
 import { emptyBag } from '../src/lib/inventory';
 import { ownedCount, setTile } from '../src/utils/world';
+import { LEGACY_RING } from '../src/utils/biomeRules';
 import { totalStatPoints, xpToNextLevel } from '../src/utils/gameUtils';
 
 /** A plain JSON copy of a (valid) persisted game, as it would come out of a save file. */
@@ -37,27 +38,42 @@ test('a normally played game passes validation unchanged', () => {
 	}
 });
 
-test('a real new game (castle + free ring) saves and loads; an old castle-only save loads with its own count', () => {
-	api().resetGame(); // not freshGame(): keep the starting ring
-	assert.equal(api().freeTiles, 9);
+test('a real new game (castle + 4 free tiles) saves and loads; an old castle-only save and a 3x3 start load with their own count', () => {
+	api().resetGame(); // not freshGame(): keep the starting tiles
+	assert.equal(api().freeTiles, 5);
 	const fresh = sanitizeSave(snapshot());
 	assert.equal(fresh.ok, true, fresh.ok ? '' : fresh.reason);
-	if (fresh.ok) assert.equal(fresh.state.freeTiles, 9);
+	if (fresh.ok) assert.equal(fresh.state.freeTiles, 5);
+
+	// a run that began with the old 3x3 start: all eight neighbours owned, nine tiles free
+	api().resetGame();
+	store.setState((st) => {
+		let tiles = st.tiles;
+		for (const [dx, dy] of LEGACY_RING) {
+			if (!tiles || tileAt(tiles, CASTLE_X + dx, CASTLE_Y + dy)?.isOwned) continue;
+			tiles = setTile(tiles, CASTLE_X + dx, CASTLE_Y + dy, { biome: 'plains', isOwned: true });
+		}
+		return { tiles, freeTiles: 9 };
+	});
+	const legacy3x3 = sanitizeSave(snapshot());
+	assert.equal(legacy3x3.ok, true, legacy3x3.ok ? '' : legacy3x3.reason);
+	if (legacy3x3.ok) assert.equal(legacy3x3.state.freeTiles, 9);
 
 	freshGame(); // castle only
 	growTo(6);
 	const legacy = snapshot();
-	delete legacy.freeTiles; // a save from before the starting ring
+	delete legacy.freeTiles; // a save from before the starting tiles
 	const loaded = sanitizeSave(legacy);
 	assert.equal(loaded.ok, true, loaded.ok ? '' : loaded.reason);
 	if (loaded.ok) assert.equal(loaded.state.freeTiles, 1);
 });
 
-test('free tiles cannot be forged: only 1 or 9, and 9 needs the whole ring owned', () => {
+test('free tiles cannot be forged: only 1, 5 or 9, and 5 and 9 need their whole start owned', () => {
 	freshGame();
-	growTo(4);
-	rejects((r) => (r.freeTiles = 9), 'free ring claimed without owning it');
-	rejects((r) => (r.freeTiles = 5), 'odd free tile count');
+	growTo(3);
+	rejects((r) => (r.freeTiles = 9), 'free 3x3 claimed without owning it');
+	rejects((r) => (r.freeTiles = 5), 'free plus claimed without owning it');
+	rejects((r) => (r.freeTiles = 7), 'odd free tile count');
 	rejects((r) => (r.freeTiles = 0), 'zero free tiles');
 	rejects((r) => (r.freeTiles = 1.5), 'fractional free tiles');
 });
@@ -96,12 +112,12 @@ test('tampered saves are rejected', () => {
 	assert.equal(sanitizeSave([]).ok, false);
 });
 
-test('derived values cannot be forged: rates, reputation, level, combat stats and castle cost are recomputed', () => {
+test('derived values cannot be forged: rates, level, combat stats and castle cost are recomputed', () => {
 	freshGame();
 	growTo(6);
 	api().tick(1000);
 	const raw = snapshot();
-	raw.characterStats.reputation = 999999;
+	(raw.characterStats as unknown as Record<string, number>).reputation = 999999; // a stray field from an old save is ignored
 	raw.characterStats.hp = 1e9;
 	raw.characterStats.tileCostDiscount = 99;
 	raw.level = { level: 99, progress: 0.5 };
@@ -109,7 +125,7 @@ test('derived values cannot be forged: rates, reputation, level, combat stats an
 	const result = sanitizeSave(raw);
 	assert.equal(result.ok, true);
 	if (!result.ok) return;
-	assert.equal(result.state.characterStats.reputation, 1000 + 100 * (owned() - 1));
+	assert.equal('reputation' in result.state.characterStats, false);
 	assert.ok(result.state.characterStats.hp < 100);
 	assert.ok(result.state.characterStats.tileCostDiscount <= 25);
 	assert.equal(result.state.level.level, api().level.level);
@@ -266,7 +282,7 @@ test('forged inventories and HP are rejected', () => {
 });
 
 test('a played game that started with the free ring passes validation (tiles, buildings, chests)', () => {
-	api().resetGame(); // keep the starting ring
+	api().resetGame(); // keep the starting tiles
 	growTo(30);
 	store.setState((s) => {
 		const spot = gridCells(s.tiles).find(({ t }) => t.isOwned && t.biome !== 'castle')!;

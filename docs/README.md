@@ -28,7 +28,7 @@ npm run sim -- --maxdays=60 hardcore      # stop early
 npm run sim -- --no-write hardcore        # print only, leave the file alone
 npm run sim -- --legacy hardcore          # approximate the pre-rebalance game
 npm run sim -- --set=SCALING_CONFIG.growthLate=1.25 castleCostScale=...   # try a tweak without editing files
-npm run catalog-report        # items, affixes, loot sources -> docs/generated/item-catalog.md
+npm run catalog-report        # the two sets, their items, affixes, loot sources -> docs/generated/item-catalog.md (tests/catalogDoc.test.ts keeps it current)
 npm run fight-sim -- --md     # fight balance tables -> docs/generated/fight-sim.md (without --md it only prints)
 npm run loot-sim -- --md      # seeded loot simulation -> docs/generated/loot-sim.md (without --md it only prints)
 npm run perf                  # timings of the map at 5k / 50k / 250k tiles

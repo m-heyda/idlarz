@@ -8,15 +8,15 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | Loadout | Damage/hit | Swings/s | DPS | Armor | Max HP | Crit % | Super % |
 |---|---|---|---|---|---|---|---|
 | starter kit | 6 | 1.2 | 7.2 | 2 | 101 | 3.8 | 5 |
-| woodland set + club | 9 | 0.8 | 7.2 | 13 | 139 | 3.8 | 5 |
-| apprentice set + wand | 5 | 1.3 | 6.5 | 4 | 145 | 12.8 | 5 |
-| knight's set + mace | 21 | 0.8 | 16.8 | 43 | 151 | 3.8 | 5 |
-| knight's set + recurve bow | 12 | 1 | 12 | 43 | 151 | 15.8 | 5 |
-| obsidian set + maul | 30 | 0.6 | 18 | 57 | 193 | 13.8 | 9 |
-| obsidian set + longbow | 18 | 1 | 18 | 57 | 193 | 28.8 | 12 |
-| rattatui set (fang blade) | 30 | 1.2 | 36 | 63 | 267 | 22.8 | 17 |
-| rattatui + titan maul | 48 | 0.6 | 28.8 | 63 | 242 | 18.8 | 13 |
-| rattatui + starfall bow | 27 | 1 | 27 | 63 | 242 | 34.8 | 17 |
+| woodland set + club | 9 | 0.8 | 7.2 | 11 | 127 | 3.8 | 5 |
+| apprentice set + wand | 5 | 1.3 | 6.5 | 4 | 145 | 10.8 | 5 |
+| knight's set + mace | 18 | 0.8 | 14.4 | 36 | 143 | 3.8 | 5 |
+| knight's set + recurve bow | 9 | 1 | 9 | 36 | 143 | 15.8 | 5 |
+| obsidian set + maul | 32 | 0.6 | 19.2 | 68 | 243 | 9.8 | 12 |
+| obsidian set + longbow | 20 | 1 | 20 | 68 | 243 | 24.8 | 15 |
+| rattatui set (fang blade) | 32.4 | 1.2 | 38.88 | 63 | 315 | 22.8 | 19 |
+| rattatui + titan maul | 54 | 0.6 | 32.4 | 63 | 290 | 18.8 | 21 |
+| rattatui + starfall bow | 28.8 | 1 | 28.8 | 63 | 290 | 34.8 | 25 |
 
 # No potions, no skills
 
@@ -25,13 +25,13 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | starter kit | 100% (14s) | 100% (32s) | 0% | 0% |
 | woodland set + club | 100% (14s) | 100% (33s) | 0% | 0% |
 | apprentice set + wand | 100% (14s) | 100% (32s) | 0% | 0% |
-| knight's set + mace | 100% (6s) | 100% (14s) | 100% (32s) | 13% (74s) |
-| knight's set + recurve bow | 100% (8s) | 100% (17s) | 100% (40s) | 0% |
-| obsidian set + maul | 100% (6s) | 100% (12s) | 100% (28s) | 100% (66s) |
-| obsidian set + longbow | 100% (5s) | 100% (10s) | 100% (23s) | 100% (56s) |
-| rattatui set (fang blade) | 100% (3s) | 100% (5s) | 100% (13s) | 100% (29s) |
-| rattatui + titan maul | 100% (4s) | 100% (7s) | 100% (17s) | 100% (39s) |
-| rattatui + starfall bow | 100% (3s) | 100% (6s) | 100% (14s) | 100% (34s) |
+| knight's set + mace | 100% (7s) | 100% (17s) | 100% (37s) | 0% |
+| knight's set + recurve bow | 100% (11s) | 100% (23s) | 100% (53s) | 0% |
+| obsidian set + maul | 100% (6s) | 100% (12s) | 100% (27s) | 100% (64s) |
+| obsidian set + longbow | 100% (4s) | 100% (9s) | 100% (21s) | 100% (51s) |
+| rattatui set (fang blade) | 100% (3s) | 100% (5s) | 100% (12s) | 100% (26s) |
+| rattatui + titan maul | 100% (3s) | 100% (7s) | 100% (15s) | 100% (35s) |
+| rattatui + starfall bow | 100% (3s) | 100% (6s) | 100% (13s) | 100% (30s) |
 
 # Level 30 builds
 
@@ -39,16 +39,16 @@ The same fight with 25 spare attribute points spent as shown (bonuses count poin
 
 | Build + gear | Damage/hit | Swings/s | Armor | Rat level 9 | Rat King |
 |---|---|---|---|---|---|
-| no points spent, obsidian set + maul (physical) | 30 | 0.6 | 57 | 100% (28s) | 100% (64s) |
-| warrior: +25 Strength, obsidian set + maul (physical) | 45 | 0.6 | 63.3 | 100% (17s) | 100% (42s) |
-| mage: +25 Intelligence, obsidian set + maul (physical) | 30 | 0.6 | 57 | 100% (27s) | 98% (65s) |
-| tank: +15 Vitality, +10 Dexterity, obsidian set + maul (physical) | 30 | 0.61 | 69.5 | 100% (26s) | 100% (63s) |
-| balanced: +5 each, obsidian set + maul (physical) | 33 | 0.61 | 63.3 | 100% (23s) | 100% (55s) |
-| no points spent, obsidian set + staff (magic) | 20 | 0.9 | 57 | 100% (27s) | 100% (65s) |
-| warrior: +25 Strength, obsidian set + staff (magic) | 20 | 0.9 | 63.3 | 100% (26s) | 98% (62s) |
-| mage: +25 Intelligence, obsidian set + staff (magic) | 32 | 0.9 | 57 | 100% (17s) | 100% (41s) |
-| tank: +15 Vitality, +10 Dexterity, obsidian set + staff (magic) | 20 | 0.92 | 69.5 | 100% (25s) | 100% (62s) |
-| balanced: +5 each, obsidian set + staff (magic) | 22.4 | 0.91 | 63.3 | 100% (22s) | 100% (55s) |
+| no points spent, obsidian set + maul (physical) | 32 | 0.6 | 68 | 100% (27s) | 100% (63s) |
+| warrior: +25 Strength, obsidian set + maul (physical) | 48 | 0.6 | 74.3 | 100% (17s) | 100% (41s) |
+| mage: +25 Intelligence, obsidian set + maul (physical) | 32 | 0.6 | 68 | 100% (27s) | 100% (64s) |
+| tank: +15 Vitality, +10 Dexterity, obsidian set + maul (physical) | 32 | 0.61 | 80.5 | 100% (26s) | 100% (60s) |
+| balanced: +5 each, obsidian set + maul (physical) | 35.2 | 0.61 | 74.3 | 100% (23s) | 100% (54s) |
+| no points spent, obsidian set + staff (magic) | 22 | 0.9 | 68 | 100% (26s) | 100% (62s) |
+| warrior: +25 Strength, obsidian set + staff (magic) | 22 | 0.9 | 74.3 | 100% (24s) | 100% (59s) |
+| mage: +25 Intelligence, obsidian set + staff (magic) | 35.2 | 0.9 | 68 | 100% (16s) | 100% (40s) |
+| tank: +15 Vitality, +10 Dexterity, obsidian set + staff (magic) | 22 | 0.92 | 80.5 | 100% (24s) | 100% (58s) |
+| balanced: +5 each, obsidian set + staff (magic) | 24.6 | 0.91 | 74.3 | 100% (21s) | 100% (52s) |
 
 # Auto-use (level 30)
 
@@ -60,17 +60,17 @@ Auto-use drinks a potion below 40% HP, casts Heal below 50% and Stun whenever it
 | starter kit | Heal + Stun | 0% | 0% |
 | starter kit | Heal + Stun + 5 greater potions | 100% (74s, 62% HP) | 0% |
 | woodland set + club | nothing | 0% | 0% |
-| woodland set + club | Heal + Stun | 100% (74s, 36% HP) | 0% |
-| woodland set + club | Heal + Stun + 5 greater potions | 100% (75s, 97% HP) | 0% |
-| knight's set + mace | nothing | 100% (33s, 49% HP) | 3% (74s, 20% HP) |
-| knight's set + mace | Heal + Stun | 100% (32s, 68% HP) | 12% (74s, 62% HP) |
-| knight's set + mace | Heal + Stun + 5 greater potions | 100% (32s, 68% HP) | 17% (74s, 60% HP) |
-| obsidian set + maul | nothing | 100% (27s, 67% HP) | 100% (65s, 44% HP) |
-| obsidian set + maul | Heal + Stun | 100% (27s, 80% HP) | 100% (65s, 64% HP) |
-| obsidian set + maul | Heal + Stun + 5 greater potions | 100% (27s, 79% HP) | 100% (66s, 64% HP) |
-| rattatui + titan maul | nothing | 100% (17s, 93% HP) | 100% (39s, 86% HP) |
-| rattatui + titan maul | Heal + Stun | 100% (16s, 97% HP) | 100% (39s, 93% HP) |
-| rattatui + titan maul | Heal + Stun + 5 greater potions | 100% (16s, 97% HP) | 100% (39s, 94% HP) |
+| woodland set + club | Heal + Stun | 100% (74s, 7% HP) | 0% |
+| woodland set + club | Heal + Stun + 5 greater potions | 100% (75s, 69% HP) | 0% |
+| knight's set + mace | nothing | 100% (37s, 37% HP) | 0% |
+| knight's set + mace | Heal + Stun | 100% (37s, 66% HP) | 0% |
+| knight's set + mace | Heal + Stun + 5 greater potions | 100% (37s, 66% HP) | 0% |
+| obsidian set + maul | nothing | 100% (26s, 79% HP) | 100% (63s, 57% HP) |
+| obsidian set + maul | Heal + Stun | 100% (26s, 88% HP) | 100% (63s, 71% HP) |
+| obsidian set + maul | Heal + Stun + 5 greater potions | 100% (27s, 87% HP) | 100% (64s, 71% HP) |
+| rattatui + titan maul | nothing | 100% (15s, 100% HP) | 100% (34s, 100% HP) |
+| rattatui + titan maul | Heal + Stun | 100% (15s, 100% HP) | 100% (34s, 100% HP) |
+| rattatui + titan maul | Heal + Stun + 5 greater potions | 100% (15s, 100% HP) | 100% (34s, 100% HP) |
 
 # The Rat King by level
 
@@ -78,18 +78,18 @@ A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he
 
 | King level | Loadout | Gear | Result |
 |---|---|---|---|
-| 15 (1000 HP, armor 15) | knight's set + mace | at the level | 100% (52s) |
-| 15 (1000 HP, armor 15) | obsidian set + maul | at the level | 100% (51s) |
-| 15 (1000 HP, armor 15) | rattatui + titan maul | at the level | 100% (22s) |
-| 25 (1354 HP, armor 20) | knight's set + mace | at the level | 100% (58s) |
-| 25 (1354 HP, armor 20) | knight's set + mace | behind | 22% (73s) |
-| 25 (1354 HP, armor 20) | obsidian set + maul | at the level | 100% (57s) |
-| 25 (1354 HP, armor 20) | obsidian set + maul | behind | 45% (71s) |
-| 25 (1354 HP, armor 20) | rattatui + titan maul | at the level | 100% (24s) |
-| 25 (1354 HP, armor 20) | rattatui + titan maul | behind | 100% (34s) |
-| 35 (1707 HP, armor 25) | knight's set + mace | at the level | 100% (64s) |
+| 15 (1000 HP, armor 15) | knight's set + mace | at the level | 100% (58s) |
+| 15 (1000 HP, armor 15) | obsidian set + maul | at the level | 100% (50s) |
+| 15 (1000 HP, armor 15) | rattatui + titan maul | at the level | 100% (19s) |
+| 25 (1354 HP, armor 20) | knight's set + mace | at the level | 100% (61s) |
+| 25 (1354 HP, armor 20) | knight's set + mace | behind | 0% |
+| 25 (1354 HP, armor 20) | obsidian set + maul | at the level | 100% (56s) |
+| 25 (1354 HP, armor 20) | obsidian set + maul | behind | 65% (71s) |
+| 25 (1354 HP, armor 20) | rattatui + titan maul | at the level | 100% (20s) |
+| 25 (1354 HP, armor 20) | rattatui + titan maul | behind | 100% (28s) |
+| 35 (1707 HP, armor 25) | knight's set + mace | at the level | 100% (68s) |
 | 35 (1707 HP, armor 25) | knight's set + mace | behind | 0% |
 | 35 (1707 HP, armor 25) | obsidian set + maul | at the level | 100% (62s) |
 | 35 (1707 HP, armor 25) | obsidian set + maul | behind | 0% |
-| 35 (1707 HP, armor 25) | rattatui + titan maul | at the level | 100% (27s) |
-| 35 (1707 HP, armor 25) | rattatui + titan maul | behind | 100% (46s) |
+| 35 (1707 HP, armor 25) | rattatui + titan maul | at the level | 100% (22s) |
+| 35 (1707 HP, armor 25) | rattatui + titan maul | behind | 100% (38s) |

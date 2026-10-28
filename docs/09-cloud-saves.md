@@ -4,7 +4,7 @@ The game is played with an account only (there is no offline or guest play). The
 player's game is also copied to Supabase so it follows them to another browser and survives cleared site data. The server verifies what it stores
 and derives the numbers a leaderboard or offline progress needs. What the server *decides* (spawns, fights, rewards, gems, the XP ceiling) is in [11](11-server-authority.md).
 
-## Tables (`supabase/schema.sql`; an older project adds `autosave_history_by_time`, then `offline_ledger`, then `combat_ledger` from `supabase/migrations/`, in that order)
+## Tables (`supabase/schema.sql`; an older project adds `autosave_history_by_time`, then `offline_ledger`, then `combat_ledger`, then `inventory_ledger` from `supabase/migrations/`, in that order)
 
 The save is split by how it is used, not stored as one blob:
 
@@ -56,7 +56,7 @@ The server still enforces its own floor of one accepted save per 10 s, whatever 
    - `networth_exceeds`: gold + stock held (merchant prices) + the least gold the owned tiles, buildings and castle cost must not exceed the income
      the game could have paid over the play time (`netWorth.ts`). Tile prices depend only on how many tiles are owned, so forged land cannot hide behind forged rates.
      An honest bot that spends everything on land sits at 0.10 to 0.27 of the limit (15 min to 24 h); the slack is 3x for clicks, chests and loot.
-   - `playtime_fast`, `playtime_regress`, `gold_jump`, `xp_jump`, `gems_increase`, `prestige_regress`, `baseline_rich` (`verify.ts`, from summaries, with the **server's** clock).
+   - `playtime_fast`, `playtime_regress`, `gold_jump`, `xp_jump`, `gems_increase`, `prestige_regress`, `castle_jump`, `baseline_rich` (`verify.ts`, from summaries, with the **server's** clock). `castle_jump` is the castle timer on the server's clock: a new castle level needs an upgrade that was running in the previous save with its remaining time covered by the real time between the saves, one level at a time, and a running timer cannot lose more seconds than passed (so `remainingSec: 0` in a save, or a level the timer never paid for, is flagged). The cost of the upgrade is still paid in the browser; a server-run upgrade (start, cost and finish time in the ledger) is part of the economy actions in the [ROADMAP](ROADMAP.md).
 7. `trusted` (leaderboard eligibility) = the account's first save was a young game (`fresh_start`, at most 15 min of play) **and** no poisonous flag was ever raised (`ever_flagged`; going back to an older save is not poisonous).
 
 Tune `VERIFY` / `NETWORTH` on real data: `select flags, audit_ratio from player_saves`, then turn chosen flags into rejections.

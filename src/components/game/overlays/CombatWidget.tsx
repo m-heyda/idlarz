@@ -362,6 +362,11 @@ const CombatWidget: React.FC = () => {
 					data-locked={autoLocked}>
 					<input type='checkbox' checked={combat.autoBattle && !autoLocked} disabled={autoLocked} onChange={(e) => setAutoBattle(e.target.checked)} /> Auto-battle
 				</label>
+				{combat.autoBattle && !combat.fight && combat.autoNote === 'no_winnable' && (
+					<span className='px-tip-muted text-xs' title='Click a monster to fight it anyway'>
+						Waiting: no monster looks winnable
+					</span>
+				)}
 				<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
 					<input type='checkbox' checked={combat.autoUse} onChange={(e) => setAutoUse(e.target.checked)} /> Auto-use
 				</label>

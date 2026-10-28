@@ -12,7 +12,7 @@ import { applyOfflineGrant } from '../src/lib/offline/apply';
 import { computeOfflineGrant, zeroGrant, type OfflineInput } from '../src/lib/offline/grant';
 import { offlineCapHours, offlineCapSec, offlineEfficiency, offlineMinGapSec } from '../src/lib/offline/limits';
 import { sealedRng } from '../src/lib/offline/seal';
-import { advanceBank, emptyBank, takeChest, takeMonster, ticketCap, TICKET_CAP, type BankContext, type TicketBank } from '../src/lib/offline/tickets';
+import { advanceBank, emptyBank, takeChestAt, takeMonster, upgradeBank, ticketCap, TICKET_CAP, type BankContext, type TicketBank } from '../src/lib/offline/tickets';
 import { calculateCombatStats, calculateResourceRates, totalStatPoints } from '../src/utils/gameUtils';
 import { castleUpgradeDuration } from '../src/utils/gameUtils';
 import type { PrestigeState, Resources } from '../src/types/game';
@@ -151,18 +151,17 @@ test('the first rat comes after 2 minutes, the next ones every 15, chests every 
 	assert.equal(hour.minted.rats.length, 1 + Math.floor((3600 - COMBAT.spawn.firstSec) / COMBAT.spawn.intervalSec));
 	assert.equal(hour.minted.rats[0].at, COMBAT.spawn.firstSec);
 	assert.equal(hour.minted.rats[1].at, COMBAT.spawn.firstSec + COMBAT.spawn.intervalSec);
-	assert.deepEqual(
-		hour.minted.rats.map((rat) => rat.n),
-		hour.minted.rats.map((_, i) => i + 1),
-		'tickets are numbered in order'
-	);
+	// chests and monsters share one counter, so every ticket has its own number and they come in the order they appeared
+	const numbers = [...hour.minted.chests, ...hour.minted.rats].sort((a, b) => a.at - b.at || a.n - b.n).map((t) => t.n);
+	assert.deepEqual(numbers, [...numbers].sort((a, b) => a - b), 'tickets are numbered in order');
+	assert.equal(new Set(numbers).size, numbers.length);
 });
 
 test('tickets are the same however the time is cut up', () => {
 	const whole = advanceBank(openBank(), 7200, ctx(), NO_LUCKY).bank;
 	let bank = openBank();
 	for (let i = 0; i < 72; i++) bank = advanceBank(bank, 100, ctx(), NO_LUCKY).bank;
-	assert.deepEqual(bank.chests.map(Math.round), whole.chests.map(Math.round));
+	assert.deepEqual(bank.chests.map((c) => [c.n, Math.round(c.at)]), whole.chests.map((c) => [c.n, Math.round(c.at)]));
 	assert.deepEqual(bank.rats.map((r) => Math.round(r.at)), whole.rats.map((r) => Math.round(r.at)));
 	assert.equal(bank.ratsMinted, whole.ratsMinted);
 });
@@ -218,16 +217,28 @@ test('an absence is credited at its efficiency but the tickets are stamped acros
 	// 6 h away at 50 %: the bank runs 3 h, the stamps spread over the 6 h
 	const { bank, minted } = advanceBank(openBank(), 3 * 3600, ctx({ tilesOwned: 10000 }), NO_LUCKY, { realDtSec: 6 * 3600 });
 	assert.equal(bank.accAt, 6 * 3600);
-	const lastChest = minted.chests[minted.chests.length - 1];
+	const lastChest = minted.chests[minted.chests.length - 1].at;
 	assert.ok(lastChest > 5 * 3600 && lastChest <= 6 * 3600, `${lastChest}`);
+});
+
+test('a bank stored before chests had numbers and tiles is read as numbered tickets without a tile', () => {
+	const old = { ...emptyBank(0), nextN: 3, chests: [100, 200] as never };
+	const bank = upgradeBank(old as never);
+	assert.deepEqual(bank.chests, [{ n: 3, at: 100 }, { n: 4, at: 200 }]);
+	assert.equal(bank.nextN, 5);
+	assert.deepEqual(upgradeBank(bank), bank, 'a bank in the new shape is left alone');
 });
 
 test('taking tickets removes exactly one and refuses what does not exist', () => {
 	const { bank } = advanceBank(openBank(), 7200, ctx(), NO_LUCKY);
-	const chest = takeChest(bank)!;
+	// a chest is taken by the tile it stands on; one with no tile yet, or on another tile, cannot be opened
+	assert.equal(takeChestAt(bank, 3, 4), null, 'no chest has a tile yet');
+	const placed = { ...bank, chests: bank.chests.map((c, i) => ({ ...c, x: 10 + i, y: 20 })) };
+	const chest = takeChestAt(placed, 11, 20)!;
 	assert.equal(chest.bank.chests.length, bank.chests.length - 1);
-	assert.equal(chest.at, bank.chests[0], 'the oldest chest goes first');
-	assert.equal(takeChest(emptyBank(0)), null);
+	assert.equal(chest.ticket.n, bank.chests[1].n, 'the chest on that tile is the one that goes');
+	assert.equal(takeChestAt(chest.bank, 11, 20), null, 'the same tile cannot be opened twice');
+	assert.equal(takeChestAt(emptyBank(0), 11, 20), null);
 	const monster = takeMonster(bank, bank.rats[0].n)!;
 	assert.equal(monster.kind, 'rat');
 	assert.equal(monster.bank.rats.length, bank.rats.length - 1);

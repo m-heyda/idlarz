@@ -6,7 +6,7 @@ import { gear } from './define';
 // and wand are the magic weapons: their damage scales with Intelligence (STAT_RULES, 1.2x the Strength rate) and their damage per
 // second matches a melee weapon of the same tier (staff 8 x 0.9 = 7.2 = the sword's 6 x 1.2; the wand 5 x 1.3 = 6.5 plus crit), so
 // the mage's edge is that rate and the mana and spell power the staff and wand bring.
-const cloth = { tier: 1, set: 'apprentice', art: true } as const;
+const cloth = { tier: 1, family: 'apprentice', art: true } as const;
 
 export const CLOTH_ITEMS: ItemDef[] = [
 	gear('oak_staff', 'Oak Staff', 'mainHand', 'common',{ damage: 8, regen: 0.5, luck: 2, maxMana: baseStat('maxMana', 1), spellPower: baseStat('spellPower', 1) * 2 }, { tier: 1, weaponType: 'staff', art: true, description: 'A walking staff with a green gem. It hums when you rest.' }),

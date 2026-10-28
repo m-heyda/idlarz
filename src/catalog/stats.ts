@@ -17,6 +17,11 @@ export interface StatDef {
 	 * fully; capped percentage stats follow a share, or they would reach their caps (crit 75 %, dodge 40 %...) within a few levels.
 	 */
 	levelShare?: number;
+	/**
+	 * Only set bonuses carry this stat: no item rolls it, so it has no row in STAT_BASE_BY_TIER and no affix. These are
+	 * the multipliers and economy effects of the big set bonuses (income, XP, kill rewards, away income, click gold, % damage, % max HP).
+	 */
+	setOnly?: boolean;
 }
 
 export const STAT_DEFS = {
@@ -33,17 +38,32 @@ export const STAT_DEFS = {
 	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
 	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
+
+	// ---- set-only stats: percentages and economy effects that only a set bonus gives ---------------------------------------
+	damagePct: { label: 'Damage', unit: '%', setOnly: true }, // % more damage per hit, on top of the flat damage and the attributes
+	maxHpPct: { label: 'Max HP', unit: '%', setOnly: true }, // % more max HP (applied to attributes + gear)
+	incomePct: { label: 'Income', unit: '%', setOnly: true }, // % more of every resource but XP, like the merchant's Foreman (the server's income rates include it)
+	xpPct: { label: 'XP Gain', unit: '%', setOnly: true }, // % more XP from every source (tiles, passive, kills, chests, away time)
+	killRewardPct: { label: 'Kill Rewards', unit: '%', setOnly: true }, // % more gold and XP from a kill (the server pays kills)
+	offlineEff: { label: 'Away Income', unit: '%', setOnly: true }, // percentage points added to the share of the income paid while away
+	offlineCapHours: { label: 'Away Time', unit: 'h', setOnly: true }, // hours added to the longest away time that is paid
+	clickPct: { label: 'Click Gold', unit: '%', setOnly: true }, // % more gold per map click
 } as const satisfies Record<string, StatDef>;
 
 export type StatKey = keyof typeof STAT_DEFS;
 export const STAT_KEYS = Object.keys(STAT_DEFS) as StatKey[];
+
+type SetOnlyKey = { [K in StatKey]: (typeof STAT_DEFS)[K] extends { setOnly: true } ? K : never }[StatKey];
+/** The stats an item can carry (everything but the set-only ones) */
+export type ItemStatKey = Exclude<StatKey, SetOnlyKey>;
+export const ITEM_STAT_KEYS = STAT_KEYS.filter((key) => !(STAT_DEFS[key] as StatDef).setOnly) as ItemStatKey[];
 
 /**
  * The flat value one stat starts at for gear of each tier (index 0 = tier 1 wood/cloth ... 4 = tier 5 legendary), at the
  * default item level. Every row rises with the tier. Items pick the stats they carry; where a stat is new it takes its
  * number from here (`baseStat`); the rolled item level scales from there (`levelScale`).
  */
-export const STAT_BASE_BY_TIER: Record<StatKey, readonly [number, number, number, number, number]> = {
+export const STAT_BASE_BY_TIER: Record<ItemStatKey, readonly [number, number, number, number, number]> = {
 	damage: [6, 12, 18, 24, 33],
 	armor: [1, 3, 5, 7, 10],
 	maxHp: [3, 5, 8, 12, 18],
@@ -60,7 +80,7 @@ export const STAT_BASE_BY_TIER: Record<StatKey, readonly [number, number, number
 };
 
 /** The base value of a stat for a tier (1-5) at the item's authored level. */
-export const baseStat = (stat: StatKey, tier: number): number => {
+export const baseStat = (stat: ItemStatKey, tier: number): number => {
 	const row = STAT_BASE_BY_TIER[stat];
 	return row[Math.min(row.length, Math.max(1, Math.round(tier))) - 1];
 };
@@ -146,7 +166,7 @@ export const scaleStats = (stats: ItemStats, levelRatio: number, multiplier = 1)
 };
 
 /** What one point of an affix on this stat is worth at an item level: the level-1 wooden-tier value, grown by the stat's share of the curve. */
-export const affixMagnitude = (stat: StatKey, itemLevel: number): number => STAT_BASE_BY_TIER[stat][0] * statLevelFactor(stat, levelScale(itemLevel));
+export const affixMagnitude = (stat: ItemStatKey, itemLevel: number): number => STAT_BASE_BY_TIER[stat][0] * statLevelFactor(stat, levelScale(itemLevel));
 
 export const emptyStats = (): StatTotals => Object.fromEntries(STAT_KEYS.map((key) => [key, 0])) as StatTotals;
 

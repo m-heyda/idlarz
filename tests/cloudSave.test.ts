@@ -18,6 +18,8 @@ import {
 import { summarize } from '../src/lib/cloudSave/summary';
 import { VERIFY, verifyTransition } from '../src/lib/cloudSave/verify';
 import { isNonProduction } from '../src/lib/cloudSave/environment';
+import { setTile as setWorldTile, getTile as getWorldTile } from '../src/utils/world';
+import { CASTLE_X as CX, CASTLE_Y as CY } from '../src/config/gameConfig';
 
 interface Hist {
 	userId: string;
@@ -343,4 +345,46 @@ test('the same forged save through the production server poisons the account and
 	assert.equal(rows.get('player')?.testAccount, false);
 	assert.equal(rows.get('player')?.everFlagged, true);
 	assert.equal(stats.get('player')?.trusted, false);
+});
+
+// ---- the castle timer is checked on the server's clock ---------------------------------------------------------
+
+/** The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null: none running). */
+const castleAt = (state: PersistedGame, level: number, remaining: number | null): PersistedGame => {
+	const castle = getWorldTile(state.tiles, CX, CY)!;
+	return {
+		...state,
+		tiles: setWorldTile(state.tiles, CX, CY, { ...castle, level }),
+		castleUpgrade: remaining === null ? null : { toLevel: level + 1, remainingSec: remaining },
+	};
+};
+
+test('a castle level whose timer ran out on the clock raises no flag; a level that skipped its timer is a castle_jump', () => {
+	const base = game();
+	const prev = castleAt(base, 1, 3600);
+	// an hour later the upgrade is done
+	const done = castleAt({ ...prev, playSeconds: prev.playSeconds + 3600 }, 2, null);
+	assert.ok(!flagsOf(prev, done, T0 + 3600_000 + 5000).includes('castle_jump'));
+	// the same level two minutes after the upgrade started: the timer cannot have run
+	assert.ok(flagsOf(prev, { ...done, playSeconds: prev.playSeconds + 120 }, T0 + 120_000).includes('castle_jump'));
+	// a level with no upgrade running before it
+	assert.ok(flagsOf(castleAt(base, 1, null), castleAt(base, 2, null), T0 + 60_000).includes('castle_jump'));
+	// two levels at once
+	assert.ok(flagsOf(castleAt(base, 1, 10), castleAt(base, 3, null), T0 + 3600_000).includes('castle_jump'));
+});
+
+test('a running castle timer that lost more seconds than passed is a castle_jump; one that ran normally is not', () => {
+	const prev = castleAt(game(), 1, 7200);
+	assert.ok(!flagsOf(prev, castleAt({ ...prev, playSeconds: prev.playSeconds + 60 }, 1, 7140), T0 + 61_000).includes('castle_jump'));
+	assert.ok(flagsOf(prev, castleAt({ ...prev, playSeconds: prev.playSeconds + 60 }, 1, 0), T0 + 61_000).includes('castle_jump'), 'remainingSec set to 0 in the save');
+});
+
+test('a rebirth resets the castle without a flag', () => {
+	const prev = castleAt(game(), 6, null);
+	const reborn = castleAt(
+		{ ...prev, prestige: { ...prev.prestige, rebirths: prev.prestige.rebirths + 1, legacyEarned: prev.prestige.legacyEarned + 5 }, playSeconds: prev.playSeconds + 60, resources: { ...prev.resources, gold: 0, xp: 0 } },
+		1,
+		null
+	);
+	assert.ok(!flagsOf(prev, reborn, T0 + 61_000).includes('castle_jump'));
 });

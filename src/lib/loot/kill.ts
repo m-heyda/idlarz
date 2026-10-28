@@ -13,6 +13,8 @@ export interface KillContext {
 	luck: number;
 	/** Gold Find of the gear, in %: extra kill gold */
 	goldFind?: number;
+	/** Kill Rewards of the gear's set bonus, in %: extra kill gold and XP */
+	killRewardPct?: number;
 	/** Base item ids the player already has (bag + worn): the king prefers Rattatui pieces that are still missing */
 	owned?: readonly string[];
 	/** Bad-luck counters from the save */
@@ -40,9 +42,10 @@ export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillCo
 	const luckBonus = 1 + ctx.luck * CHEST.luckBonusPerPoint;
 	const goldFind = 1 + (ctx.goldFind ?? 0) / 100;
 	const bonus = ctx.lucky ? LUCK.luckyRat.rewardMultiplier : 1;
+	const kills = 1 + (ctx.killRewardPct ?? 0) / 100;
 	return {
-		gold: Math.floor(Math.max(COMBAT.rewards.minGold, ctx.goldPerSec * rewardSec * luckBonus * goldFind) * bonus),
-		xp: Math.max(COMBAT.rewards.minXp, ctx.xpPerSec * rewardSec) * bonus,
+		gold: Math.floor(Math.max(COMBAT.rewards.minGold, ctx.goldPerSec * rewardSec * luckBonus * goldFind) * bonus * kills),
+		xp: Math.max(COMBAT.rewards.minXp, ctx.xpPerSec * rewardSec) * bonus * kills,
 		hide: Math.floor((ctx.hidePerSec ?? 0) * rewardSec * COMBAT.rewards.hideShare * bonus),
 	};
 };

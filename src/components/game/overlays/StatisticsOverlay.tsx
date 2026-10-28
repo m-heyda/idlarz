@@ -5,6 +5,7 @@ import type { CharacterStats, Resources } from '@/types/game';
 import LevelDetails from '../LevelDetails';
 import CollapsibleSection from '../CollapsibleSection';
 import ResourceIcon from '../ResourceIcon';
+import { gearIncomePct } from '@/lib/gearEconomy';
 import { calculateResourceBreakdown, countOwnedTiles, getStatDescription, type ResourceBreakdownEntry } from '@/utils/gameUtils';
 import { formatNumber, formatPercent, formatRate, formatCompact } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
@@ -45,6 +46,7 @@ const BreakdownBody: React.FC<{ entry: ResourceBreakdownEntry }> = ({ entry }) =
 	if (entry.statMod) bonuses.push(['Attributes', `+${pct(entry.statMod * 100)}`]);
 	if (entry.emberMult !== 1) bonuses.push(['Rebirth (Embers)', `x${formatCompact(entry.emberMult, 2)}`]);
 	if (entry.merchantMult !== 1) bonuses.push(['Foreman (merchant)', `x${formatCompact(entry.merchantMult, 2)}`]);
+	if (entry.gearMult !== 1) bonuses.push(['Set bonus (gear)', `x${formatCompact(entry.gearMult, 2)}`]);
 
 	return (
 		<div className='text-xs space-y-1'>
@@ -81,8 +83,8 @@ const StatisticsOverlay: React.FC = () => {
 
 	const points = characterStats.availablePoints;
 	const breakdown = useMemo(
-		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades),
-		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades]
+		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncomePct(equipment)),
+		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment]
 	);
 
 	const handleAddStatPoint = (stat: keyof CharacterStats) => {
@@ -192,17 +194,15 @@ const StatisticsOverlay: React.FC = () => {
 						<Line label='Spell power' value={pct(fx.spellPower, 1)} valueClass='text-purple-300' />
 						<Line label='XP gain' value={pct(fx.xpGain, 2)} valueClass='text-green-400' />
 						<Line label='Tile discount' value={pct(fx.tileDiscount, 2)} valueClass='text-blue-400' />
+						{fx.gearIncome > 0 && <Line label='Income (set bonus)' value={`+${pct(fx.gearIncome, 0)}`} valueClass='text-green-300' />}
+						{fx.killRewards > 0 && <Line label='Kill rewards (set bonus)' value={`+${pct(fx.killRewards, 0)} gold and XP`} valueClass='text-green-300' />}
+						{fx.gearClick > 0 && <Line label='Click gold (set bonus)' value={`+${pct(fx.gearClick, 0)}`} valueClass='text-green-300' />}
 						{fx.clickMastery > 0 && <Line label='Click mastery (rebirth)' value={`+${pct(fx.clickMastery, 0)} gold per click`} valueClass='text-purple-300' />}
 						{fx.buildTimeReduction > 0 && <Line label='Master builders (rebirth)' value={`-${pct(fx.buildTimeReduction, 0)} castle build time`} valueClass='text-purple-300' />}
 						<Line
 							label='Offline progress'
 							value={`up to ${formatCompact(fx.offlineCapHours, 1)} h at ${pct(fx.offlineEfficiency, 0)} income`}
 							valueClass='text-purple-300'
-						/>
-						<Line
-							label='Reputation'
-							value={formatCompact(characterStats.reputation)}
-							valueClass={characterStats.reputation >= 0 ? 'text-green-400' : 'text-red-400'}
 						/>
 					</div>
 				</CollapsibleSection>

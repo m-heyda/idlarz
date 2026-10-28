@@ -42,7 +42,7 @@ export const patchTileAt = (x: number, y: number, patch: Partial<Tile>) =>
 
 /**
  * The pre-ring start most economy tests were written for: the castle alone, one free tile. (A real new game owns the
- * castle and its 8 neighbours; that is covered in biomeSpawn.test.ts.)
+ * castle and its 4 neighbours; that is covered in biomeSpawn.test.ts.)
  */
 const classicStart = () => {
 	const s = api();

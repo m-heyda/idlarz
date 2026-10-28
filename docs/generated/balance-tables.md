@@ -313,16 +313,16 @@ Derived stats for the starting stats (all 5):
 
 ## 7. Rates of a brand-new game
 
-A real game rolls its 8 start tiles at random; this table uses one fixed ring (seed 1) so the file is reproducible.
+A real game rolls its 4 start tiles at random; this table uses one fixed ring (seed 1) so the file is reproducible.
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 2.590 | 45.0% | 3.756 |
-| wood | 0 | 0.05 | 0.075 | 45.0% | 0.109 |
+| gold | 0.1 | 0.1 | 1.030 | 45.0% | 1.493 |
+| wood | 0 | 0.05 | 1.245 | 45.0% | 1.805 |
 | stone | 0 | 0.1 | 0.150 | 32.5% | 0.199 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 7.095 | 45.0% | 10.288 |
-| meat | 0 | 0 | 0.000 | 60.0% | 0.000 |
+| food | 0 | 0.05 | 1.245 | 45.0% | 1.805 |
+| meat | 0 | 0 | 0.000 | 30.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |
@@ -374,15 +374,15 @@ A real game rolls its 8 start tiles at random; this table uses one fixed ring (s
 
 ## 9. Rebirth and Embers
 
-Rebirth needs castle level ≥ 6 and ≥ 100 tiles. Embers = `floor(4.5 × (castle − 5) × sqrt(tiles / 10))`; each point earned is +5% income for ever.
+Rebirth needs castle level ≥ 6 and ≥ 100 tiles. Embers = `floor(3 × (castle − 5) × sqrt(tiles / 10))`; each point earned is +6% income for ever.
 
-| castle level | 20 tiles | 30 tiles | 40 tiles | 50 tiles | 60 tiles | 80 tiles |
-| --- | --- | --- | --- | --- | --- | --- |
-| 6 | 6 | 7 | 9 | 10 | 11 | 12 |
-| 7 | 12 | 15 | 18 | 20 | 22 | 25 |
-| 8 | 19 | 23 | 27 | 30 | 33 | 38 |
-| 9 | 25 | 31 | 36 | 40 | 44 | 50 |
-| 10 | 31 | 38 | 45 | 50 | 55 | 63 |
+| castle level | 100 tiles | 150 tiles | 200 tiles | 300 tiles | 500 tiles |
+| --- | --- | --- | --- | --- | --- |
+| 6 | 9 | 11 | 13 | 16 | 21 |
+| 7 | 18 | 23 | 26 | 32 | 42 |
+| 8 | 28 | 34 | 40 | 49 | 63 |
+| 9 | 37 | 46 | 53 | 65 | 84 |
+| 10 | 47 | 58 | 67 | 82 | 106 |
 
 Shop (cost in points of the next level, by current level):
 

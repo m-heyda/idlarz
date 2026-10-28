@@ -68,7 +68,7 @@ The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs 
 
 ## Not done yet (kept on purpose)
 
-Salvage / materials and reroll / upgrade (real gear sinks), flat set bonuses that fade at high level, `requiredLevel`, elite monsters and premium chests, and rebalancing the monsters with the world level (see [ROADMAP](ROADMAP.md)).
+Salvage / materials and reroll / upgrade (real gear sinks), set bonuses that follow the item level (today a set bonus is a fixed amount, bigger on purpose so it matters before the first rebirth), `requiredLevel`, elite monsters and premium chests, and rebalancing the monsters with the world level (see [ROADMAP](ROADMAP.md)).
 
 A monster source has no level of its own: `LootRequest.level` is the monster's level, and the source's `levels` range (rat 1-20, King 15-35) is what `validateLootData` checks the pools against. Per-level chances (`chancePerLevel`) replace the old per-tier ones (half the size: a tier was two levels). A boss is a monster def with `grade: 'boss'` whose `lootSourceId` names its own source and profile, so boss-only drops need data only.
 

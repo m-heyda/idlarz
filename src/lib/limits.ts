@@ -6,6 +6,8 @@ import type { PrestigeState } from '@/types/game';
 export interface LimitContext {
 	merchantUpgrades?: MerchantUpgrades;
 	prestige?: PrestigeState;
+	/** What the worn gear's set bonuses add to the away-time limits (lib/gearEconomy.ts) */
+	gear?: { offlineEff: number; offlineCapHours: number };
 	/** Validation only: use the hard ceilings (`HARD_LIMITS`) where there are any instead of the current value */
 	hardCap?: boolean;
 }
@@ -16,8 +18,8 @@ export interface LimitContext {
  */
 export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } = {
 	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat'),
-	offlineCapHours: (ctx) => emberEffect(ctx.prestige, 'nightwatch'),
-	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward'),
+	offlineCapHours: (ctx) => emberEffect(ctx.prestige, 'nightwatch') + (ctx.gear?.offlineCapHours ?? 0),
+	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward') + (ctx.gear?.offlineEff ?? 0) / 100,
 };
 
 /** The current value of a limit: its base plus the registered bonuses. */

@@ -7,7 +7,7 @@ The big plan is to move more of the economy to the server (see "Server authority
 ## Where things stand
 
 - **Accounts only.** There is no guest or "play without account" mode: the game needs the server to spawn, place and fight. A server outage shows a retry screen; the browser save is a cache and the export path. (Paid offline *progress* is a kept feature: [11](11-server-authority.md).)
-- **The server owns:** when chests and monsters appear, **where a monster stands**, what a chest or a kill holds, the gem balance, the XP ceiling, and **every fight** (player HP and mana, cooldowns, hits both ways, potions drunk, the kill's reward). See [11](11-server-authority.md) and the combat section of [02](02-mechanics.md).
+- **The server owns:** when chests and monsters appear, **where each one stands**, what a chest or a kill holds, the gem balance, the XP ceiling, **what the player carries** (the bag, the worn gear, the loot pity and the auto-sell filter live in the ledger: [11](11-server-authority.md)), and **every fight** (player HP and mana, cooldowns, hits both ways, potions drunk, the kill's reward). See [11](11-server-authority.md) and the combat section of [02](02-mechanics.md).
 - **A click starts a fight; the server runs it.** With *Auto-battle* on (locked until the first rebirth) the server also sends the player against the next monster. Potions and skills have hotkeys (1-5) and an *Auto-use* switch with a fixed preset (`COMBAT.auto`).
 - **Still the browser's:** the economy (income, tile and building purchases, the map), the stat allocation, the merchant, the farm, rebirth. The server checks them only by plausibility ([07](07-saves-and-security.md), [09](09-cloud-saves.md)).
 
@@ -15,43 +15,32 @@ The big plan is to move more of the economy to the server (see "Server authority
 
 | # | What | Where | Note |
 |---|---|---|---|
-| R2 | Chests are placed on a tile by the browser (`pickChestSpot`); only their count is the server's | `lib/chests.ts`, `lib/offline/reconcile.ts` | harmless today (a position carries no value); move it to the server with monster placement |
-| R3 | `luck`, `goldFind`, income `rates`, equipment and the bag the server rolls with come from the **last accepted save**, which the client wrote; `cloudSave/verify.ts` only flags | `cloudSave/summary.ts`, `lib/offline/profile.ts` | the fight profile is read from the save when a fight starts; a forged save can claim gear it never found. Closing this is the ledger-owned inventory below |
-| R4 | No "can I win this?" gate: auto-battle engages the weakest waiting monster at 80 % HP, loses to anything too strong and rests; a monster that beat the player is left alone for 5 min (a boss 10) | `COMBAT.auto` | enough for now; a win-chance estimate would let it skip hopeless fights |
-| R5 | Potions the server drank are removed from the **browser's** bag when the event arrives; the server counts them against the saved bag (`consumed` minus `consumedSeen`). A reload in the middle can leave the local bag one potion too full for a moment | `lib/offline/fight.ts`, `cloudSave/pipeline.ts` | the server never lets a potion be drunk twice; the right fix is the server-owned bag |
-| R6 | A fight uses the gear of the last accepted save, frozen when the fight starts. The cloud save goes out soon after an equip, but not at once | `useCloudSync` | equipping is blocked while a fight is open in the browser |
 | R7 | `dangerBonus` (one level per 8 tiles from the castle) is now 0 or 1: monsters stand at most 9 tiles out | `lib/monsters.ts` | the frontier is no longer more dangerous than the home land; rework with the biomes |
-| R8 | The King's balance changed with auto-attack (1000 HP, 75 s clock): the best gear wins comfortably, obsidian narrowly, steel not | `MONSTERS.ratKing`, [generated/fight-sim.md](generated/fight-sim.md) | needs a real playtest |
+| R8 | The King's balance changed with auto-attack (1000 HP, 75 s clock): the Rattatui set wins in 26-35 s, obsidian in 51-64 s, steel and wood not at all (steel lost its old set bonus) | `MONSTERS.ratKing`, [generated/fight-sim.md](generated/fight-sim.md) | needs a real playtest |
 | R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix) |
-| R10 | `legacyVault.ts` (the IndexedDB and `idle-explorer-v11/v12` import) and the `IDLZ1.` import format are still shipped | `lib/legacyVault.ts`, `saveStorage.ts` | delete when nobody can still hold such a save |
-| R11 | A sync (no key) overwrites the ledger's `last_key` / `last_result` (`onlineStep` writes `lastKey: key`), so the idempotency record of the previous keyed request (a chest open, a hotkey) is gone when a poll lands between a lost answer and its retry; the retry then takes a second ticket or answers "no ticket" | `lib/offline/online.ts`, `lib/offline/supabaseLedger.ts` | keep the old record when the step has no key; rare (the retry follows within a second) |
-| 🔧 B4 | The castle upgrade is only visible inside the castle dialog and tooltip | | add a small timer badge on the castle tile / header (S) |
-| ⚠️ B6 | Chests and tile taps are small next to the rest of the economy | | decide whether they should scale with progress (BL3) |
+| ⚠️ B6 | Chests and map clicks are small next to the rest of the economy (the click is the only click income for now; the tile tap was removed) | | decide whether they should scale with progress, together with the click rework (BL3) |
 | ⚠️ B7 | `sim.ts` bots build on the first free explored tile (round-robin through six buildings), do not use the class picker, allocate stat points by a fixed policy, and play one reasonable style (reserve for the castle, top up at the merchant) | `scripts/sim.ts` | fine for pacing checks; extend the bot before tuning small effects |
-| 🔧 B9 | The Ember shop has no respec | | add one (costs one rebirth or a fee) if players ask; the point-conservation check in `sanitizeSave` must still hold (S) |
-| 🔧 U6 | Reputation (+100 per tile) is shown and nothing reads it | `StatisticsOverlay.tsx` | tie it to a merchant discount or quests, or remove it |
 
 ## Server authority (the migration backlog, ranked)
 
 What still runs in the browser and is only checked by plausibility. Tile buying was assessed and **stays client-side with autosave**: it is the most frequent action (an API call per click would be the real server load), its gold lives in the client-authored save the server already checks, and the one server consumer of the map (monster placement) tolerates the autosave lag. It becomes worth an API when `verify.ts` stops being shadow mode and starts rejecting.
 
-1. **Ledger-owned inventory and equipment** (closes R3, R5, R6): the bag, the worn gear and the loot pity live in the ledger; the browser shows them. Then a fight can never use gear the player does not own.
-2. **Enforce `verify.ts`** (today it only flags): reject a save that gained more than the server granted.
-3. **Economy actions** by the server where they pay out: castle upgrade, rebirth/Embers, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
-4. **XP award** of tile purchases and the attribute allocation (the server already models and clamps XP, `cloudSave/xpModel.ts`, and derives the fight level from the saved XP).
-5. **Merchant and sell** (gold for gear, resource sell/buy, upgrades): server-priced. Every merchant action is a store action over `buyOffer`, `buyItem`, `sellResources`, `buyResource` and `buyMerchantUpgrade`, so moving them behind routes changes no UI.
-6. **Chest placement** (R2) next to monster placement.
-7. **Spawn caps from the real map**: monsters count free tiles from the map; chests and the overall share (`SPAWN_LIMIT`) still use an estimate from the owned-tile count.
+1. **Enforce `verify.ts`** (today it only flags): reject a save that gained more than the server granted.
+2. **Economy actions** by the server where they pay out: castle upgrade (start, cost and finish time in the ledger; today the server only checks the timer on its own clock, `castle_jump`), rebirth/Embers, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
+3. **XP award** of tile purchases and the attribute allocation (the server already models and clamps XP, `cloudSave/xpModel.ts`, and derives the fight level from the saved XP).
+4. **Merchant and sell** (gold for gear, resource sell/buy, upgrades): server-priced. The inventory already is the server's, so only the prices and the shelf (`merchantStock`, rolled in the browser) are left; a purchase today is checked for being a valid item, not for what it costs. Every merchant action is a store action over `buyOffer`, `buyItem`, `sellResources`, `buyResource` and `buyMerchantUpgrade`, so moving them behind routes changes no UI.
+5. **Spawn caps from the real map**: monsters and chests count free tiles from the map; the overall share (`SPAWN_LIMIT`, `ticketCap`) still use an estimate from the owned-tile count.
 
 Notes from reading the code (not measured against the live project):
 
 - **No cron job and no Realtime channel are needed now.** Everything the server decides is computed lazily on a request from timestamps; the browser only talks to `/api/*`. Add `pg_cron` only for something that must progress while nobody is online (a leaderboard season roll-up, expiring events).
 - **Catalogs stay in code, not in the database.** The API routes import the same TypeScript modules as the browser, so client and server cannot disagree. Move a catalog to tables only if content must change without a deploy.
-- **Rebirth and Embers are client-authoritative.** `sanitizeSave` checks conservation and ranges; nothing checks that the Embers earned match the castle level and tiles of the run that ended. Cheap next step: a shadow flag in `cloudSave/verify.ts` comparing the claimed gain with `emberGain(castle_level, tiles_owned)` of the previously stored row. Later: a server-owned `/api/rebirth` (item 3).
+- **Rebirth and Embers are client-authoritative.** `sanitizeSave` checks conservation and ranges; nothing checks that the Embers earned match the castle level and tiles of the run that ended. Cheap next step: a shadow flag in `cloudSave/verify.ts` comparing the claimed gain with `emberGain(castle_level, tiles_owned)` of the previously stored row. Later: a server-owned `/api/rebirth` (item 2).
+- **The inventory's open edges.** The ledger owns the bag, the gear, the pity and the auto-sell filter, but a purchase still pays its gold in the browser and the merchant's shelf is rolled there, so a forged shelf piece can be bought (for its price, which the net-worth check bounds). The bag's size follows the Pack Rat level of the last upload. The dev panel's loot buttons (`GameDebug`) change the local bag only, which the server's picture replaces at the next answer.
 - **Free-tier hot spot: polling during a fight.** While a fight is open the browser calls `/api/spawn` / `/api/fight` every 2 s (about 1,800 requests an hour). Each does `auth.getUser()`, a read of `player_saves` and `player_ledger`, and **a ledger UPDATE even for a read-only sync** (`onlineStep` returns `anchorAt: nowMs`; `toRow` stamps `updated_at`). Next: skip the write when nothing but the anchor changed, or poll less while the fight is only watched.
 - **Resource key lists are hand-kept in several places** (the `Resources` interface, `INITIAL_RESOURCES`, `BASE_GENERATION_RATES`, `CASTLE_BASE_RATES`, `FARM_PRODUCT_KEYS`, `zeroResources`, `sanitizeSave` `OPTIONAL_RESOURCES`, `offline/grant.ts`, `offline/ledger.ts` `zeroTotals`). A new resource must be added to all of them together; `tests/catalog.test.ts` fails if a stored resource has no tier.
 - **Secret in the repo**: `.env.example` carries a concrete `LOOT_SECRET` ("the shared one every new workspace starts with"). Fine while the repo is private; rotate it and give every deployment its own before any public release.
-- **Deploy order**: apply additive SQL migrations before deploying the code that reads the new column (a release that read `player_ledger.combat` before `combat_ledger.sql` ran made every ledger read fail).
+- **Deploy order**: apply additive SQL migrations before deploying the code that reads the new column (a release that read `player_ledger.combat` before `combat_ledger.sql` ran made every ledger read fail; the same goes for `inv` and `inventory_ledger.sql`).
 
 ## Features and content (in suggested order)
 
@@ -59,8 +48,6 @@ Notes from reading the code (not measured against the live project):
 
 | Item | Size | Acceptance |
 |---|---|---|
-| Castle-timer badge (B4) | S | remaining time visible without opening the dialog |
-| Ember shop respec (B9) | S | conservation check still holds; test added |
 | CI: a GitHub Action running `tsc`, `lint`, `test`, `build`, plus `sim -- --maxdays=30 hardcore` as a pacing guard (no `.github` exists yet) | S | PR fails when the first-finish time of a profile moves by more than ±15 % |
 | Playwright smoke test: new game, click, buy tile, open Settings and Rebirth, reload keeps state (no UI tests exist) | M | runs in CI; uses `window.__game` only in dev builds |
 | Framework upgrades one at a time: Next 16, TypeScript 7, ESLint 10, `@types/node` 26 (held back on purpose; Next 16 fixes two PostCSS advisories bundled in 15; check `typescript-eslint` / `eslint-config-next` peer ranges) | M | build, tests and sim output unchanged |
@@ -84,6 +71,27 @@ Notes from reading the code (not measured against the live project):
 - **Fight tunables** all sit in `COMBAT` (`tickSec`, `maxCatchUpSec`, `maxFightSec`, `poll`, `auto`): thresholds, retry cooldowns, which monster is next (`engageOrder`).
 
 **Paragon levels (draft, not built).** The level curve ends at 100 (soft cap 80, level 90 around the 5th rebirth, 100 around the 10th). Past it a paragon track would give the endless part of the game without feeding the attribute economy (a level-100 character already holds 157 attribute points): the same lifetime XP keeps counting, each paragon level gives one point, points go into a few small, capped, account-wide bonuses (income, XP gain, Luck, offline efficiency), and the leaderboard ranks level then paragon level. Open: points per level, the caps, whether levels 81-100 should give extra attribute points, and how the Ember shop and Ancestral Tithe interact.
+
+## Draft ideas for later (not committed to)
+
+Loose ideas, not scheduled and not sized; each needs a design pass before it enters the lists above.
+
+**Economy upgrades** (the Ember shop and the merchant ladders are flat percentages today; BL5, BL6, BL9, BL10)
+- *Market saturation*: the price of a resource drops with the volume sold and recovers over ~30 min, so burst selling is not the best move.
+- *Caravans / trade contracts*: a timed gold-and-resource sink that pays out more than it costs, run on the server clock (the ledger already has the timers pattern).
+- *Storage caps tied to the castle*: stockpiles stop at a cap that grows with the castle, which gives wood, stone and coal a reason to be spent.
+- *Building levels and specialisation*: the building rework below, with the set-like bonus for clusters of one kind.
+- *A second Ember currency or prestige tier* and shop items with a different shape (a longer chest timer cap, a free animal slot, a start with a tier-2 resource). Embers stay permanent: no reroll or respec.
+- *More economy sets*: the Obsidian set pays income, XP and away time; a later tier could pay different things (chest rewards, merchant prices, farm output).
+
+**Combat upgrades** (the two ability slots hold Heal and Stun; one weapon per rarity tier)
+- *Item upgrading / enchanting*: a gold-and-material sink tied to the merchant, with salvage ([10](10-loot-system.md)); the natural place for the tier-2 materials.
+- *Gem sockets* in gear, and gems as the thing the premium currency buys.
+- *A skill tree or class skills* (classes are cosmetic today): more skills for the two slots, passive picks per class.
+- *Monster families per biome*, a bestiary with kill counts, monster abilities (bleed, enrage), elites and a daily bounty monster.
+- *Set depth*: more sets per gear tier, set bonuses that scale with the item level (today they are fixed amounts), loadout swapping between an economy set and a combat set.
+
+**Server authority follow-ups**: the ledger-owned inventory above, server-run castle upgrades (start, cost, finish time), a server-priced merchant, enforcing `verify.ts`, and a server-owned `/api/rebirth`.
 
 ## Building rework and late-game resources (design draft, nothing built)
 
@@ -127,19 +135,19 @@ Measure with `npm run sim -- --seeds=3`, never from numbers copied into prose: [
 | --- | --- | --- | --- |
 | BL1 | **Gap between active and idle players is small** | gold is only part of the economy; the castle timers (3 d 17 h to level 6) and resource costs dominate | raise click power further, or let clicks pay a small share of other resources; re-run the sim |
 | BL2 | **Levels and stat points barely matter for income** | levels 2-30 give 3 points, later levels 1; +2.5 % each on a pool the castle multiplies | gate castle levels by player level, raise per-point effects, or add respec |
-| BL3 | **Chests and tile taps are small** next to income | chest = 10-60 min of *passive* gold; tap = 0.5 s of one tile | scale chests with click-inclusive income or give resource packs |
+| BL3 | **Chests and map clicks are small** next to income | chest = 10-60 min of *passive* gold; a click = 50-180 % of one second of gold | scale chests with click-inclusive income, give resource packs, or rework clicking altogether |
 | BL4 | **Meat/food is the strongest engine** (animal stacking × castle multiplier) | animals dominate mid-game income in the sim traces | revisit `costScaling` or add upkeep |
 | BL5 | **Resource sinks are thin after the castle and tiles** | wood/stone/coal beyond tile and castle needs only sell for 0.4-1.1 gold | equipment upgrades, buildings with levels, storage caps tied to the castle |
 | BL6 | **Merchant has little depth** | flat prices, no saturation; bonuses, supplies and a shuffling gear shelf exist | optional "market saturation" (price drops with volume sold, recovers over ~30 min) if burst selling shows up again |
 | BL7 | **Late tiles are very expensive** | steep `(n/300)^4.5` tail after 300 (table in [generated/balance-tables.md](generated/balance-tables.md)) | fine as an endgame sink; revisit if the Ember discount (cap 45 %) makes late rebirth runs too cheap |
 | BL8 | **Idle tile income** | with `BIOME_YIELD.scale` = 1.3 a tile adds ~0.1-0.5 gold-equivalent/s | per-biome specialisation bonuses (e.g. +x % per 4 same biome) |
-| BL9 | **Ember shop is six items**, all flat percentages | the choice is mostly "which first" | add one or two with a different shape (longer chest timer cap, a free animal slot) |
+| BL9 | **Ember shop is six items**, all flat percentages | the choice is mostly "which first" | add one or two with a different shape (longer chest timer cap, a free animal slot). A purchase stays permanent: the shop is not rerolled or respecced, it only gains items |
 | BL10 | **Late Ember runs flatten** | gain grows with `sqrt(tiles)` and castle level, the shop caps at 10 levels each | a second prestige tier or a sink for surplus points |
 | BL11 | **Biome luck and the 24 h player** | seed spread is large and the 24 h auto-clicker bot is faster than the 8 h/day hardcore bot | tune `BIOME_SPAWN` weights (fewer water tiles early) and re-run `sim --seeds=3` |
 | BL12 | **Combat rewards and difficulty** | kill gold / XP / hide are `rewardSec` seconds of income; the `human*` sim profiles fight on an assumed `GEAR_SCHEDULE` | check the share of income from fights stays small, tune `COMBAT.spawn`, `MONSTERS.rat.rewardSec`, armor `K` once real playtests exist |
 | BL13 | **Round 2 numbers are first guesses** | the ten newer buildings, the chest reward table (50 / 25 / 12 / 10 / 8), the unlock thresholds and cluster chances were set by feel | run `npm run sim`, then tune `BUILDINGS`, `CHEST.rewards`, `BIOME_RULES` |
 | BL14 | **Reserved resources** | iron, fish, mana, blue crystal, sapphire, ability shard and the random-item box exist as icons only | design them as end-game / rebirth currencies and add them to `Resources` + the merchant + `sanitizeSave` together (see the tier rules above) |
-| BL15 | **The free starting ring speeds up the opening** | 8 free tiles produce from second 0 | if too fast: scale the ring's yield, lower the start gold, or raise `SCALING_CONFIG.growthEarly` |
+| BL15 | **The four free start tiles shape the opening** | 4 free tiles (north, east, south, west of the castle) produce from second 0; the corners are the first tiles to buy | if the opening is too slow or too fast: scale the start tiles' yield, change the start gold, or `SCALING_CONFIG.growthEarly` |
 | BL16 | **Late tile price and map scale (rebirth-centred)** | the map is limited only by `COORD_LIMIT` (±16,000) and `MAX_OWNED_TILES` (250,000); price tail `tailFrom` 300, exponent 4.5, `RESOURCE_CAP` 1e21; placeholders until rebirth is designed | pick the intended map size per rebirth tier, then move `tailFrom` / `tailExponent` (and the `TILE_RESOURCE_COST` shares); also check building price, income vs price at 1k+ tiles, the XP curve at 10k+ tiles, and float precision of gold past 2^53 |
 
 ## Technical risks

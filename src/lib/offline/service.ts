@@ -4,7 +4,8 @@ import { computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
 import { addTotals, seedLedger, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
 import { restThrough } from '@/lib/offline/fight';
-import { isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
+import { coreWithInventory, fitInventory, inventoryFromCore } from '@/lib/offline/inventory';
+import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
 import { sealedRng } from '@/lib/offline/seal';
 import { advanceBank, type BankContext, type TicketBank } from '@/lib/offline/tickets';
 import { offlineMinGapSec } from '@/lib/offline/limits';
@@ -26,9 +27,9 @@ export type { ClaimResult, PublicTickets };
 /** An online call is refused with `claim_first` when more than this long passed since the player was last seen (the absence is claimed first). */
 export const UNCLAIMED_SEC = 900;
 
-/** The tickets as the browser may see them: a monster shows once the server has given it a tile. */
+/** The tickets as the browser may see them: a monster or chest shows once the server has given it a tile. */
 export const publicTickets = (bank: TicketBank, opened?: number): PublicTickets => ({
-	chests: bank.chests.length,
+	chests: bank.chests.filter(isChestPlaced).map(({ n, x, y }) => ({ n, x: x!, y: y! })),
 	...(opened === undefined ? {} : { opened }),
 	rats: bank.rats.filter(isPlaced).map(({ n, at, lucky, x, y, spawnLevel }) => ({ n, at, lucky, x: x!, y: y!, spawnLevel: spawnLevel! })),
 	king: bank.king && isPlaced(bank.king) ? { n: bank.king.n, at: bank.king.at, x: bank.king.x!, y: bank.king.y!, spawnLevel: bank.king.spawnLevel! } : null,
@@ -92,8 +93,10 @@ export const withLedger = async <T>(
 		const existing = await deps.ledgers.load(userId);
 		// a save from before the ledger existed does not say what stands on the map (chests): wait for the next upload instead of seeding from guesses
 		if (!existing && stored.summary.derived.known !== true) return { kind: 'no_save' };
-		const base = existing ?? seedLedger(stored, nowMs);
-		const out = await step(base, stored);
+		const seeded = existing ?? seedLedger(stored, nowMs);
+		// the bag, the gear and the pity are the ledger's (seeded from the save the first time); the engine sees the save with them in place
+		const base: Ledger = { ...seeded, inv: fitInventory(seeded.inv ?? inventoryFromCore(stored.core), stored.core) };
+		const out = await step(base, { ...stored, core: coreWithInventory(stored.core, base.inv) as StoredSave['core'] });
 		const next: Ledger = { ...out.ledger, ver: (existing?.ver ?? 0) + 1 };
 		if (await deps.ledgers.commit(userId, existing?.ver ?? 0, next)) return { kind: 'ok', result: out.result, ledger: next };
 	}

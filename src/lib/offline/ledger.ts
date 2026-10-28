@@ -1,5 +1,7 @@
 import { STARTING_GEMS } from '@/config/gameConfig';
 import type { CombatState } from '@/lib/offline/fightTypes';
+import { inventoryFromCore } from '@/lib/offline/inventory';
+import type { Inventory } from '@/lib/offline/types';
 import { emptyBank, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
 import type { Resources } from '@/types/game';
 
@@ -51,6 +53,8 @@ export interface Ledger {
 	lastResult: unknown;
 	/** The player's combat: HP and mana, cooldowns, the open fight (null until the first combat request seeds it from the save) */
 	combat: CombatState | null;
+	/** The bag, the worn gear, the loot pity and the auto-sell filter: the server's, not the save's (null only in rows from before the inventory moved here; the first request seeds it from the save) */
+	inv: Inventory | null;
 }
 
 export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
@@ -67,6 +71,7 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	lastKey: null,
 	lastResult: null,
 	combat: null,
+	inv: null,
 });
 
 /** Storage of the ledger: Supabase in the app, a Map in tests. */
@@ -103,18 +108,22 @@ export const seedLedger = (source: LedgerSeedSource, nowMs: number): Ledger => {
 		if (monster.type === 'ratKing') king = king ?? ticket;
 		else rats.push(ticket);
 	}
+	// the chests standing on the saved map become numbered tickets; the server finds them a tile at the first look at the map
+	const chestCount = Math.max(0, Math.floor(num(source.summary.derived.chests)));
+	const chests = Array.from({ length: chestCount }, (_, i) => ({ n: n + i, at: savedSec }));
 	ledger.bank = {
 		...emptyBank(nowMs / 1000),
-		chests: Array.from({ length: Math.max(0, Math.floor(num(source.summary.derived.chests))) }, () => savedSec),
+		chests,
 		rats,
 		king,
-		nextN: n,
+		nextN: n + chestCount,
 		ratsMinted: Math.max(rats.length, num(source.core.nextMonsterId, 1) > 1 ? 1 : 0),
 		chestAcc: Math.max(0, num(source.core.chestSpawnTimer)),
 		ratAcc: Math.max(0, num(source.core.monsterSpawnTimer)),
 		kingAcc: Math.max(0, num(source.core.bossSpawnTimer)),
 	};
 	ledger.anchorAt = source.serverSavedAt;
+	ledger.inv = inventoryFromCore(source.core);
 	ledger.gems = Math.max(0, Math.min(Math.floor(num(source.summary.gems, STARTING_GEMS)), STARTING_GEMS));
 	return ledger;
 };

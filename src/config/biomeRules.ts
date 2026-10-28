@@ -3,16 +3,15 @@
  * random roll (there is no biome picker); buildings are put on explored tiles afterwards (right-click).
  * Pure data - the logic is in src/utils/biomeRules.ts, the player-facing description in docs/02-mechanics.md.
  *
- * "purchased tiles" = tiles bought so far (the castle and the free starting ring do not count).
+ * "purchased tiles" = tiles bought so far (the castle and the four free starting tiles do not count).
  */
 export const BIOME_RULES = {
-	/** The castle's 8 neighbours are owned from the start (new game and every rebirth), generated from these. */
+	/** The four tiles north, east, south and west of the castle are owned from the start (new game and every rebirth), generated from these. */
 	startRing: {
-		// Only gentle biomes next to the castle (no hills or lakes: the ring holds the castle walls, water starts just beyond). Every run of the ring is 2+ tiles (no 1x1 patch).
+		// Only gentle biomes next to the castle (no hills or lakes: water starts just beyond). The four tiles do not touch each other, so there is no patch rule.
 		weights: { plains: 5, forest: 3 } as Record<string, number>,
-		copyPreviousPct: 50, // chance a ring tile continues the previous one, so the ring forms 2-4 patches
-		minPlains: 3,
-		maxOfOther: 4,
+		minPlains: 2,
+		maxOfOther: 2,
 	},
 
 	/** Purchases needed before a biome can turn up or be picked. Not listed = available from the start. */

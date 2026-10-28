@@ -10,6 +10,7 @@ import { ITEM_CATALOG } from '@/catalog';
 import { resolveItem } from '@/lib/itemInstance';
 import { generateLoot, receiveDrops } from '@/lib/loot';
 import { maxHp } from '@/lib/combat';
+import { gearIncomePct } from '@/lib/gearEconomy';
 import { calculateResourceRates, calculateXpGain, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
 import type { Resources } from '@/types/game';
 import PixelIcon from './PixelIcon';
@@ -52,7 +53,7 @@ const growMap = (count: number) => {
 	let needed = 0;
 	for (let k = 2; k <= economyTiles(tiles, s.freeTiles); k++) needed += calculateXpGain(k);
 	const xp = Math.max(s.resources.xp, Math.min(needed * 1.01, XP_CAP));
-	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades);
+	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades, gearIncomePct(s.equipment));
 	useGameStore.setState({ tiles, resources: { ...s.resources, xp }, resourceRates });
 	toast(`Added ${n.toLocaleString('en')} tiles in ${Math.round(performance.now() - t0)} ms (${ownedCount(tiles).toLocaleString('en')} in all)`);
 };
@@ -66,7 +67,7 @@ const rolledMap = (purchases: number, policy: 'nearest' | 'random') => {
 	let needed = 0;
 	for (let k = 2; k <= economyTiles(tiles, s.freeTiles); k++) needed += calculateXpGain(k);
 	const xp = Math.max(s.resources.xp, Math.min(needed * 1.01, XP_CAP));
-	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades);
+	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades, gearIncomePct(s.equipment));
 	useGameStore.setState({ tiles, resources: { ...s.resources, xp }, resourceRates, monsters: [], activeChests: 0 });
 	toast(`Rolled map: seed ${seed}, ${purchases} purchases (${policy})`);
 };

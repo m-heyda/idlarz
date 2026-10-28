@@ -9,7 +9,7 @@ import {
 	STARTER_BAG_ITEMS,
 	STARTER_EQUIPMENT,
 } from '../src/config/itemCatalog';
-import { MAX_ITEM_LEVEL, STAT_BASE_BY_TIER, STAT_KEYS, WEAPON_ATTACK_SPEED, baseStat, levelScale, weaponDps } from '../src/catalog';
+import { ITEM_STAT_KEYS, MAX_ITEM_LEVEL, familyPieces, STAT_BASE_BY_TIER, WEAPON_ATTACK_SPEED, baseStat, levelScale, weaponDps } from '../src/catalog';
 import type { EquipmentSlot } from '../src/types/game';
 
 const ALL_SLOTS: EquipmentSlot[] = [
@@ -74,7 +74,7 @@ test('starter shield has armor 2', () => {
 
 const SLOTS_OF = (set: string) => {
 	const covered = new Set<string>();
-	for (const id of SETS[set].pieces) {
+	for (const id of familyPieces(set)) {
 		const slot = ITEM_CATALOG[id].slot!;
 		if (slot === 'ring') ['ring1', 'ring2'].forEach((r) => covered.add(r));
 		else covered.add(slot);
@@ -88,7 +88,7 @@ test('every armour family fills every armour and accessory slot plus the off han
 });
 
 test('rarity follows the family: wood and cloth common, steel uncommon, obsidian rare, Rattatui epic, three legendaries', () => {
-	const rarityOf = (set: string) => new Set(SETS[set].pieces.map((id) => ITEM_CATALOG[id].rarity));
+	const rarityOf = (set: string) => new Set(familyPieces(set).map((id) => ITEM_CATALOG[id].rarity));
 	assert.deepEqual([...rarityOf('woodland')], ['common']);
 	assert.deepEqual([...rarityOf('apprentice')], ['common']);
 	assert.deepEqual([...rarityOf('knight')], ['uncommon']);
@@ -106,7 +106,7 @@ test('gear power rises with the tier slot by slot (wood < steel < obsidian < Rat
 	const power = (id: string) => (ITEM_CATALOG[id].stats?.armor ?? 0) + (ITEM_CATALOG[id].stats?.maxHp ?? 0);
 	const bySlot = (set: string) => {
 		const m: Record<string, string> = {};
-		for (const id of SETS[set].pieces) m[ITEM_CATALOG[id].slot!] = id;
+		for (const id of familyPieces(set)) m[ITEM_CATALOG[id].slot!] = id;
 		return m;
 	};
 	const tiers = ['woodland', 'knight', 'obsidian', 'rattatui'].map(bySlot);
@@ -142,7 +142,7 @@ test('every item has an id of its own, and every piece of gear an item level win
 });
 
 test('the base value of every stat rises with the tier, and the item level curve scales it', () => {
-	for (const key of STAT_KEYS) {
+	for (const key of ITEM_STAT_KEYS) {
 		const row = STAT_BASE_BY_TIER[key];
 		for (let tier = 2; tier <= row.length; tier++) assert.ok(row[tier - 1] > row[tier - 2], `${key}: tier ${tier} beats tier ${tier - 1}`);
 		assert.equal(baseStat(key, 3), row[2]);

@@ -171,7 +171,7 @@ test('moveSlot merges stacks and swaps others', () => {
 });
 
 test('aggregateStats sums the starter kit to damage 6 armor 2', () => {
-	assert.deepEqual(aggregateStats(STARTER_EQUIPMENT), { ...emptyStats(), damage: 6, armor: 2, setCount: 1 }); // the shield is a Woodland Set piece
+	assert.deepEqual(aggregateStats(STARTER_EQUIPMENT), { ...emptyStats(), damage: 6, armor: 2, setCount: 0 }); // wood is plain loot: no set
 	assert.deepEqual(aggregateStats({}), { ...emptyStats(), setCount: 0 });
 });
 
@@ -197,7 +197,7 @@ test('aggregateStats adds gear stats and every set bonus threshold reached', () 
 	const bonus = (...counts: number[]) => sumStats(...counts.map((c) => RATTATUI_SET.bonuses[c]));
 	const a6 = aggregateStats(six);
 	assert.equal(a6.setCount, 6);
-	assert.deepEqual({ ...a6, setCount: undefined }, { ...sumStats(gearOnly(six), bonus(3, 6)), setCount: undefined });
+	assert.deepEqual({ ...a6, setCount: undefined }, { ...sumStats(gearOnly(six), bonus(2, 4, 6)), setCount: undefined });
 
 	const full: Equipment = {
 		...six,
@@ -211,12 +211,12 @@ test('aggregateStats adds gear stats and every set bonus threshold reached', () 
 	};
 	const a13 = aggregateStats(full);
 	assert.equal(a13.setCount, 13);
-	assert.deepEqual({ ...a13, setCount: undefined }, { ...sumStats(gearOnly(full), bonus(3, 6, 13)), setCount: undefined });
+	assert.deepEqual({ ...a13, setCount: undefined }, { ...sumStats(gearOnly(full), bonus(2, 4, 6, 9, 13)), setCount: undefined });
 });
 
 test('two sets at once: each counts its own pieces', () => {
-	const mixed: Equipment = { head: p('steel_helm'), chest: p('steel_cuirass'), hands: p('steel_gauntlets'), legs: p('leather_leggings'), feet: p('leather_boots'), neck: p('wooden_pendant') };
-	assert.deepEqual(setCounts(mixed), { knight: 3, woodland: 3 });
+	const mixed: Equipment = { head: p('obsidian_helm'), chest: p('obsidian_cuirass'), hands: p('obsidian_gauntlets'), legs: p('rattatui_trousers'), feet: p('rattatui_boots'), neck: p('rattatui_amulet'), cape: p('steel_cloak') };
+	assert.deepEqual(setCounts(mixed), { obsidian: 3, rattatui: 3 }); // a steel piece belongs to no set
 });
 
 test('functions do not mutate their inputs', () => {

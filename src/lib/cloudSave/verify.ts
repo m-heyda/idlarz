@@ -25,6 +25,9 @@ export const VERIFY = {
 	baselineBurstSec: 3600,
 	/** A first save with at most this much play time counts as a fresh start (ranking-eligible). */
 	freshStartSec: 900,
+	/** A castle upgrade's timer cannot run faster than real time (same slack as the play time). */
+	castleSlack: 1.05,
+	castleGraceSec: 30,
 } as const;
 
 export interface Snapshot {
@@ -41,16 +44,34 @@ export type SaveFlag =
 	| 'gold_jump'
 	| 'xp_jump'
 	| 'gems_increase'
-	| 'prestige_regress';
+	| 'prestige_regress'
+	| 'castle_jump';
 
 /** Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat. */
-export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_rich', 'networth_exceeds', 'playtime_fast', 'gold_jump', 'xp_jump', 'gems_increase', 'prestige_regress']);
+export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_rich', 'networth_exceeds', 'playtime_fast', 'gold_jump', 'xp_jump', 'gems_increase', 'prestige_regress', 'castle_jump']);
 
 /**
  * `grants`: what the server itself handed out since the previous save (income while away, chest and kill rewards): a save may
  * contain that much more than its income explains. When it is given the server also holds the gem balance, so the gem check
  * happens against that balance in the pipeline instead of here.
  */
+/**
+ * The castle upgrade is a timer the server can check from two summaries: it runs at most as fast as real time. So a new castle level is
+ * only believable when an upgrade was running and the real time between the saves covers what was left of its timer, and a running timer
+ * cannot have lost more seconds than passed. (Setting `remainingSec` to 0 in a save, or a level the timer never paid for, is a jump.)
+ */
+const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number): boolean => {
+	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
+	const was = before.derived.castleUpgrade;
+	const now = next.derived.castleUpgrade;
+	if (next.castleLevel > before.castleLevel) {
+		// every level needs its own upgrade: more than one level between two saves, or a level with no running upgrade behind it, is a jump
+		return next.castleLevel > before.castleLevel + 1 || !was || was.toLevel !== next.castleLevel || was.remainingSec > allowed;
+	}
+	// still the same level: a timer that carries on must not have run faster than the clock
+	return !!was && !!now && was.toLevel === now.toLevel && was.remainingSec - now.remainingSec > allowed;
+};
+
 export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs: number, grants?: GrantTotals): SaveFlag[] => {
 	const flags = new Set<SaveFlag>();
 
@@ -73,6 +94,8 @@ export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs
 
 	if (next.rebirths < before.rebirths || next.legacyEarned < before.legacyEarned) flags.add('prestige_regress');
 	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
+
+	if (sameRun && before.derived.known && castleJumped(before, next, elapsedSec)) flags.add('castle_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);

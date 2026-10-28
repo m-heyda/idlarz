@@ -43,7 +43,7 @@ import {
 	Tile,
 	TileCost,
 } from '@/types/game';
-import { castleAreaBonus, castleLevelOf, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
+import { castleAreaBonus, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
 import type { CombatBonus } from '@/lib/combat';
 import { STAT_RULES } from '@/config/combatConfig';
 import { atkSpeedPercent, magicDamagePercent, physicalDamagePercent, statArmor, statMaxMana } from '@/lib/statBonuses';
@@ -116,8 +116,6 @@ export const getStatDescription = (
 		xpGainMultiplier:
 			'Percentage increase to experience points gained from all sources.',
 		tileCostDiscount: 'Percentage discount when purchasing new tiles.',
-		reputation:
-			'Your standing in the world. Affects interactions with NPCs and factions.',
 	};
 
 	return descriptions[stat];
@@ -250,17 +248,21 @@ const countAdjacentSameBiomes = (
 	(getTile(tiles, x, y - 1)?.biome === biome ? 1 : 0) +
 	(getTile(tiles, x, y + 1)?.biome === biome ? 1 : 0);
 
-/** Tiles that did not cost anything: the castle (1) in an old save, the castle and its 8 neighbours in a new game. */
-export const STARTER_FREE_TILES = 9;
+/**
+ * Tiles that did not cost anything: the castle (1) in an old save, the castle and its four neighbours (north, east, south,
+ * west) in a new game. A run that began with the old 3x3 start keeps 9 (`LEGACY_FREE_TILES`).
+ */
+export const STARTER_FREE_TILES = 5;
+export const LEGACY_FREE_TILES = 9;
 
 /**
  * Owned-tile count as the economy sees it: purchases + 1 (the old castle-only start). Tile cost, XP per tile, the extra
- * resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting ring does not
+ * resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting tiles do not
  * make the first purchases expensive. Pass the state's `freeTiles`.
  */
 export const economyTiles = (tiles: World, freeTiles: number): number => countOwnedTiles(tiles) - freeTiles + 1;
 
-/** A new map: the castle at (CASTLE_X, CASTLE_Y) and its 8 neighbours already owned, generated from the basic biomes. */
+/** A new map: the castle at (CASTLE_X, CASTLE_Y) and the tiles north, east, south and west of it already owned, generated from the basic biomes. */
 export const createInitialWorld = (random: () => number = Math.random): World => {
 	const placed: Placed[] = [
 		{
@@ -447,7 +449,9 @@ export interface ResourceBreakdownEntry {
 	emberMult: number;
 	/** The merchant's Foreman multiplier (1 = none; never on XP) */
 	merchantMult: number;
-	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * ember multiplier * merchant - 1 */
+	/** The worn gear's set-bonus income multiplier (1 = none; never on XP) */
+	gearMult: number;
+	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * ember multiplier * merchant * gear - 1 */
 	modifier: number;
 	total: number;
 }
@@ -508,7 +512,9 @@ export const calculateResourceBreakdown = (
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
 	farmUpgrades?: FarmUpgrades,
-	merchantUpgrades?: MerchantUpgrades
+	merchantUpgrades?: MerchantUpgrades,
+	/** The worn gear's Income % (set bonuses; `gearIncomePct` in lib/gearEconomy.ts) */
+	gearIncomePct = 0
 ): ResourceBreakdown => {
 	const base: Resources = { ...BASE_GENERATION_RATES };
 	const start: Resources = { ...BASE_GENERATION_RATES };
@@ -614,11 +620,13 @@ export const calculateResourceBreakdown = (
 	// Embers income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
 	const emberMult = emberIncomeMultiplier(prestige);
 	const foreman = merchantIncomeMultiplier(merchantUpgrades);
+	const gearIncome = 1 + gearIncomePct / 100;
 
 	const result = {} as ResourceBreakdown;
 	for (const key of RESOURCE_KEYS) {
 		const merchantMult = key === 'xp' ? 1 : foreman;
-		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * emberMult * merchantMult - 1;
+		const gearMult = key === 'xp' ? 1 : gearIncome;
+		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * emberMult * merchantMult * gearMult - 1;
 		result[key] = {
 			start: start[key],
 			farm: farmPart[key],
@@ -632,6 +640,7 @@ export const calculateResourceBreakdown = (
 			statMod: statMod[key],
 			emberMult,
 			merchantMult,
+			gearMult,
 			modifier,
 			total: base[key] * (1 + modifier),
 		};
@@ -645,9 +654,10 @@ export const calculateResourceRates = (
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
 	farmUpgrades?: FarmUpgrades,
-	merchantUpgrades?: MerchantUpgrades
+	merchantUpgrades?: MerchantUpgrades,
+	gearIncomePct = 0
 ): ResourceRates => {
-	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades);
+	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncomePct);
 	const base = zeroResources();
 	const modifiers = zeroResources();
 	const total = zeroResources();
@@ -657,25 +667,6 @@ export const calculateResourceRates = (
 		total[key] = breakdown[key].total;
 	}
 	return { base, modifiers, total };
-};
-
-// Per-second output of one owned tile (biome + building, adjacency and castle area bonus, global modifiers).
-// Used for the tile-tap bonus. XP is excluded on purpose.
-export const calculateTileTapYield = (
-	tiles: World,
-	x: number,
-	y: number,
-	rates: ResourceRates
-): Partial<Resources> => {
-	const output = calculateTileOutput(tiles, x, y, castleLevelOf(tiles));
-	if (!output) return {};
-	const out: Partial<Resources> = {};
-	for (const resource of Object.keys(output.base) as (keyof Resources)[]) {
-		if (resource === 'xp') continue;
-		const perSecond = (output.base[resource] || 0) + (output.neighbour[resource] || 0) + (output.area[resource] || 0);
-		if (perSecond) out[resource] = perSecond * (1 + (rates.modifiers[resource] || 0));
-	}
-	return out;
 };
 
 // ---------------------------------------------------------------------------

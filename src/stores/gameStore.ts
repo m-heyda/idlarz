@@ -25,7 +25,6 @@ import {
 	type MerchantUpgradeId,
 	RESOURCE_CAP,
 	XP_CAP,
-	TILE_TAP,
 	type FarmUpgradeId,
 	type EmberUpgradeId,
 } from '@/config/gameConfig';
@@ -39,7 +38,6 @@ import {
 	calculateResourceRates,
 	buyCost,
 	calculateTileCost,
-	calculateTileTapYield,
 	calculateXpGain,
 	canAffordBundle,
 	castleUpgradeDuration,
@@ -74,19 +72,20 @@ import type { SkillId } from '@/catalog/skills';
 import type { LimitContext } from '@/lib/limits';
 import { generateMerchantStock, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
-import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotItemId, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
+import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
 import { plainItem, sellValueOf } from '@/lib/itemInstance';
 import { castleLevelOf } from '@/lib/castleWard';
 import { applyOfflineGrant } from '@/lib/offline/apply';
 import { reconcileTickets } from '@/lib/offline/reconcile';
 import type { CombatView, FightEvent } from '@/lib/offline/fightTypes';
-import type { ChestReward, ClaimResult, FightReply, SyncResult } from '@/lib/offline/types';
+import type { ChestReward, ClaimResult, FightReply, Inventory, InventoryOp, InventoryReply, SyncResult } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
-import { requestAuto, requestChest, requestDismiss, requestUse, type Reply } from '@/lib/rewardsClient';
+import { provideInvVer, requestAuto, requestChest, requestDismiss, requestInventory, requestUse, type Reply } from '@/lib/rewardsClient';
 import { signalNeedClaim, signalSyncNow } from '@/lib/serverSession';
 import { useUiStore } from '@/stores/uiStore';
 import { useRewardPendingStore } from '@/stores/rewardPendingStore';
-import { isAutoSold, receiveDrops } from '@/lib/loot';
+import { isAutoSold } from '@/lib/loot';
 import { advanceMonsters, monsterAt, monsterDef } from '@/lib/monsters';
 import { ITEM_CATALOG, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
@@ -97,20 +96,24 @@ import type {
 	ClickInput,
 	CombatClientState,
 	CombatNotice,
+	Equipment,
 	EquipmentSlot,
 	GameState,
 	MerchantStock,
 	Monster,
 	PrestigeState,
 	Resources,
-	TapResult,
 } from '@/types/game';
 import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile, type World } from '@/utils/world';
 
-// Last tap time per tile (not persisted) - enforces TILE_TAP.cooldownMs
-const lastTapAt: Record<string, number> = {};
 
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
+/** The income rates for the state with this gear on (a set bonus can add income). */
+const ratesWithGear = (
+	state: Pick<GameState, 'tiles' | 'characterStats' | 'farmLevels' | 'prestige' | 'farmUpgrades' | 'merchantUpgrades'>,
+	equipment: Equipment
+) => calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades, gearIncomePct(equipment));
+
 const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'>): LimitContext => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige });
 
 // Shared by the gold click and the tile tap: one token per physical click
@@ -144,6 +147,7 @@ const initialCombat = (): CombatClientState => ({
 	maxHp: 0,
 	maxMp: 0,
 	retrySec: 0,
+	autoNote: null,
 	at: 0,
 	eventNo: null,
 	notice: null,
@@ -156,7 +160,7 @@ const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () 
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
 	const equipment = { ...STARTER_EQUIPMENT };
-	const rates = calculateResourceRates(grid, stats, {}, prestige);
+	const rates = calculateResourceRates(grid, stats, {}, prestige, undefined, undefined, gearIncomePct(equipment));
 	return {
 		tiles: grid,
 		resources: startingResources(prestige),
@@ -187,6 +191,7 @@ const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () 
 		gems: STARTING_GEMS, // a new game's gift; once the account has a ledger the server's balance replaces it on every answer
 		lootPity: {} as Record<string, number>,
 		autoSellUpTo: null as string | null,
+		invVer: null as number | null, // the inventory version the server last gave (transient)
 		lastChestLoot: null as ChestLoot | null, // what the last chest held (transient: only drives the toast)
 	};
 };
@@ -203,7 +208,7 @@ const createGameSlice = (
 	) => void,
 	get: () => GameState
 ) => {
-	/** Charge, claim the tile, award XP + reputation. */
+	/** Charge, claim the tile, award XP. */
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = economyTiles(state.tiles, state.freeTiles);
@@ -219,11 +224,12 @@ const createGameSlice = (
 			state.farmLevels,
 			state.prestige,
 			state.farmUpgrades,
-			state.merchantUpgrades
+			state.merchantUpgrades,
+			gearIncomePct(state.equipment)
 		);
 
 		const xpGain =
-			calculateXpGain(owned + 1) * (1 + state.characterStats.xpGainMultiplier / 100);
+			calculateXpGain(owned + 1) * (1 + xpGainPct(state.characterStats, state.equipment) / 100);
 		const resources = subtractBundle(state.resources, bundle);
 		resources.xp = Math.min(resources.xp + xpGain, XP_CAP);
 
@@ -231,28 +237,99 @@ const createGameSlice = (
 			tiles: newTiles,
 			resources,
 			resourceRates: newRates,
-			characterStats: {
-				...state.characterStats,
-				reputation: state.characterStats.reputation + 100,
-			},
 		});
 		return true;
 	};
 
+	// ---- the player's things are the server's -------------------------------------------------------------------------
+	// The bag, the worn gear, the loot pity and the auto-sell filter belong to the server's ledger (docs/11-server-authority.md): drops, drunk
+	// potions and chest items already happened there, and the player's own changes are asked of it (`/api/inventory`). The browser previews
+	// each change at once and the server's answer, which carries the inventory as it stands, settles it. Changes are sent one at a time, in
+	// order (a bag index means the bag as the previous change left it), and while any is on its way a picture from another answer is not taken.
+	let invOpsInFlight = 0;
+	let invQueue: Promise<void> = Promise.resolve();
+	let invGen = 0; // a New Game starts the changes over: an answer that belongs to the game before it is dropped
+
+	/** Takes the server's picture of the player's things, unless it is older than the one held or one of our own changes is still on its way. */
+	const applyInventory = (inv: Inventory | undefined) => {
+		if (!inv || invOpsInFlight > 0) return;
+		const state = get();
+		if (state.invVer !== null && inv.ver <= state.invVer) return;
+		set({
+			bag: inv.bag,
+			equipment: inv.equipment,
+			lootPity: inv.lootPity,
+			autoSellUpTo: inv.autoSellUpTo,
+			invVer: inv.ver,
+			// a set bonus can change the income: the rates follow the gear
+			resourceRates: ratesWithGear(state, inv.equipment),
+			playerHp: Math.min(state.playerHp, maxHp(state.characterStats, inv.equipment)),
+			playerMp: Math.min(state.playerMp, maxMana(state.characterStats, inv.equipment)),
+		});
+	};
+
+	/**
+	 * Asks the server to make one of the player's changes. `settle` runs with the answer (null: it never came) before the server's picture is
+	 * taken, to put right what the preview got wrong (the gold of a sale, the price of a purchase the server refused).
+	 */
+	const sendInventoryOp = (op: InventoryOp, settle?: (reply: InventoryReply | null) => void) => {
+		invOpsInFlight++;
+		const gen = invGen;
+		invQueue = invQueue.then(async () => {
+			if (gen !== invGen) return;
+			const key = newClaimId();
+			let reply = await requestInventory(key, op);
+			if (gen !== invGen) return;
+			if (reply.status === 'unavailable') reply = await requestInventory(key, op);
+			if (gen !== invGen) return;
+			invOpsInFlight--;
+			if (reply.status === 'ok') {
+				settle?.(reply.value);
+				if (!reply.value.ok) toast('The server did not do that: it is undone.');
+				applyInventory(reply.value.inv);
+				return;
+			}
+			settle?.(null);
+			// the preview cannot be trusted any more: forget the version and ask for the real picture
+			set({ invVer: null });
+			if (reply.status === 'need_claim') signalNeedClaim();
+			else {
+				toast('Could not reach the server: the change is undone.');
+				signalSyncNow();
+			}
+		});
+	};
+
+	/** Corrects the gold by what the server says a sale paid against what the preview paid (all of it back when the sale did not happen). */
+	const settleSale = (previewGold: number) => (reply: InventoryReply | null) => {
+		const delta = (reply?.ok ? reply.gold : 0) - previewGold;
+		if (delta !== 0) set((state) => ({ resources: { ...state.resources, gold: Math.min(Math.max(0, state.resources.gold + delta), RESOURCE_CAP) } }));
+	};
+
+	/** Gives the price back when the server did not put the purchase in the bag. */
+	const settlePurchase = (price: number, undo?: () => void) => (reply: InventoryReply | null) => {
+		if (reply?.ok) return;
+		set((state) => ({ resources: { ...state.resources, gold: Math.min(state.resources.gold + price, RESOURCE_CAP) } }));
+		undo?.();
+	};
+
+	provideInvVer(() => get().invVer);
+
+	/** Puts a chest's item and the gold the server paid for what did not fit (see ChestReward.received). */
+	type ChestReceived = NonNullable<Extract<ChestReward, { ok: true }>['received']>;
+
 	/** Puts what a chest held into the game: resources, XP, an item (through the auto-sell filter and the full-bag rule), and the server's gem balance when it gave one. */
-	const receiveChest = (loot: ChestLoot, gemsTotal?: number, gemsFound = 0) => {
+	const receiveChest = (loot: ChestLoot, gemsTotal?: number, gemsFound = 0, received?: ChestReceived) => {
 		const state = get();
 		const resources = { ...state.resources };
-		let bag = state.bag;
 		if (loot.kind === 'gold' || loot.kind === 'boost') resources.gold += loot.gold;
 		else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
 		else if (loot.kind === 'xp') resources.xp = Math.min(resources.xp + loot.xp, XP_CAP);
-		else {
-			const received = receiveDrops(bag, [loot.drop], state.autoSellUpTo, state);
-			bag = received.bag;
-			resources.gold = Math.min(resources.gold + received.autoSold.gold, RESOURCE_CAP);
+		else if (received) {
+			// the server has put the item in its bag (the picture comes with the answer); the gold of what it sold or could not fit is ours
+			resources.gold = Math.min(resources.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP);
 		}
-		set({ resources, bag, ...(gemsTotal !== undefined ? { gems: gemsTotal } : {}), lastChestLoot: gemsFound > 0 ? { ...loot, gems: gemsFound } : loot });
+		set({ resources, ...(gemsTotal !== undefined ? { gems: gemsTotal } : {}), lastChestLoot: gemsFound > 0 ? { ...loot, gems: gemsFound } : loot });
 	};
 
 	/** Puts a chest back on its tile (the server could not be reached, so nothing was opened). */
@@ -285,16 +362,17 @@ const createGameSlice = (
 		useRewardPendingStore.getState().begin(); // the little chest animation covers the wait for the loot
 		let reply: Reply<ChestReward>;
 		try {
-			reply = await requestChest(key);
-			if (reply.status === 'unavailable') reply = await requestChest(key);
+			reply = await requestChest(key, x, y);
+			if (reply.status === 'unavailable') reply = await requestChest(key, x, y);
 		} finally {
 			chestOpensInFlight--;
 			useRewardPendingStore.getState().end();
 		}
 		if (reply.status === 'ok') {
+			applyInventory(reply.value.inv);
 			if (reply.value.ok) {
 				lastOwnOpen = { opened: Math.max(lastOwnOpen.opened, reply.value.tickets.opened ?? 0), at: Date.now() };
-				receiveChest(reply.value.loot, reply.value.gemsTotal, reply.value.gems);
+				receiveChest(reply.value.loot, reply.value.gemsTotal, reply.value.gems, reply.value.received);
 			} else toast('The chest crumbled: it was not a real one.');
 			return;
 		}
@@ -343,18 +421,12 @@ const createGameSlice = (
 		// the log numbers start again with a new run (a rebirth): a server log that is behind the browser's cursor is a new one
 		const seen = state.combat.eventNo === null ? null : view.eventNo >= state.combat.eventNo ? state.combat.eventNo : 0;
 		const fresh = seen === null ? [] : view.events.filter((e) => e.no > seen);
-		let bag = state.bag;
-		let lootPity = state.lootPity;
 		let notice: CombatNotice | null = state.combat.notice;
 		const resources = { ...state.resources };
 		for (const e of fresh) {
-			if (e.kind === 'potion' && e.id) {
-				const index = bag.findIndex((slot) => !!stackOf(slot) && slotItemId(slot) === e.id);
-				if (index >= 0) bag = removeFromBag(bag, index, 1);
-			} else if (e.kind === 'won' && e.reward && e.type) {
-				const received = receiveDrops(bag, e.reward.items, state.autoSellUpTo, state);
-				bag = received.bag;
-				lootPity = e.reward.pity;
+			if (e.kind === 'won' && e.reward && e.type) {
+				// the server has put the drops where they go (the bag comes with the answer as `inv`); the gold of what it sold or could not fit is ours
+				const received = { stored: e.reward.stored ?? e.reward.items, convertedGold: e.reward.convertedGold ?? 0, autoSold: e.reward.autoSold ?? { count: 0, gold: 0 } };
 				resources.gold = Math.min(resources.gold + e.reward.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP);
 				resources.xp = Math.min(resources.xp + e.reward.xp, XP_CAP);
 				resources.hide = Math.min(resources.hide + (e.reward.hide ?? 0), RESOURCE_CAP);
@@ -374,8 +446,6 @@ const createGameSlice = (
 			}
 		}
 		set({
-			bag,
-			lootPity,
 			resources,
 			playerHp: view.hp,
 			playerMp: view.mp,
@@ -388,6 +458,7 @@ const createGameSlice = (
 				maxHp: view.maxHp,
 				maxMp: view.maxMp,
 				retrySec: view.retrySec,
+				autoNote: view.autoNote ?? null,
 				at: view.at,
 				eventNo: view.eventNo,
 				notice,
@@ -406,7 +477,6 @@ const createGameSlice = (
 			{ tiles: state.tiles, monsters: state.monsters, activeChests: state.activeChests },
 			tickets,
 			serverNowSec,
-			Math.random,
 			limitCtx(state),
 			{ placeChests: chestsMayBePlaced(tickets) }
 		);
@@ -419,6 +489,7 @@ const createGameSlice = (
 	/** What to do with the answer to a combat request: apply it, or say why nothing happened. */
 	const settleFight = (reply: Reply<FightReply>, refused?: string) => {
 		if (reply.status === 'ok') {
+			applyInventory(reply.value.inv);
 			applyCombatView(reply.value.combat, reply.value.gemsTotal);
 			reconcileMap(reply.value.tickets, reply.value.serverNowSec);
 			if (!reply.value.accepted && refused) toast(refused);
@@ -435,8 +506,10 @@ const createGameSlice = (
 
 		resetGame: () => {
 			clickLimiter.reset();
+			invGen++;
+			invOpsInFlight = 0;
+			invQueue = Promise.resolve();
 			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
-			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
@@ -455,7 +528,6 @@ const createGameSlice = (
 			};
 			clickLimiter.reset();
 			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
-			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			const fresh = createInitialData(prestige);
 			// settle the level first: XP bought a moment ago may not have been counted by a tick yet (its points are credited here)
 			const settled = calculateLevel(state.resources.xp);
@@ -473,7 +545,7 @@ const createGameSlice = (
 				level: settled,
 				previousLevel: settled.level,
 				characterStats,
-				resourceRates: calculateResourceRates(fresh.tiles, characterStats, fresh.farmLevels, prestige, fresh.farmUpgrades, merchantUpgrades),
+				resourceRates: calculateResourceRates(fresh.tiles, characterStats, fresh.farmLevels, prestige, fresh.farmUpgrades, merchantUpgrades, gearIncomePct(state.equipment)),
 				// gear is character progression: it survives a rebirth (HP is refilled)
 				equipment: state.equipment,
 				bag: state.bag,
@@ -536,7 +608,8 @@ const createGameSlice = (
 				newFarmLevels,
 				state.prestige,
 				state.farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 
 			set({
@@ -564,7 +637,8 @@ const createGameSlice = (
 				state.farmLevels,
 				state.prestige,
 				farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 			set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
 			return true;
@@ -586,7 +660,8 @@ const createGameSlice = (
 				state.farmLevels,
 				state.prestige,
 				state.farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 
 			set({
@@ -648,7 +723,8 @@ const createGameSlice = (
 				state.farmLevels,
 				state.prestige,
 				state.farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 
 			set({
@@ -677,7 +753,8 @@ const createGameSlice = (
 			const state = get();
 			const power =
 				(CLICK_LADDER[state.clickLevel]?.power ?? CLICK_LADDER[0].power) *
-				(1 + emberEffect(state.prestige, 'mastery'));
+				(1 + emberEffect(state.prestige, 'mastery')) *
+				(1 + gearEconomy(state.equipment).clickPct / 100);
 			const gold = state.resourceRates.total.gold * power;
 			if (!(gold > 0)) return 0;
 			set({
@@ -757,12 +834,13 @@ const createGameSlice = (
 				level,
 				previousLevel: level.level,
 				characterStats,
-				resourceRates: calculateResourceRates(state.tiles, characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades),
+				resourceRates: calculateResourceRates(state.tiles, characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades, gearIncomePct(state.equipment)),
 			});
 		},
 
 		// The server's picture of combat arrived with a sync (polling, a hotkey): see applyCombatView
 		applyFightReply: (reply: FightReply) => {
+			applyInventory(reply.inv);
 			applyCombatView(reply.combat, reply.gemsTotal);
 			reconcileMap(reply.tickets, reply.serverNowSec);
 		},
@@ -785,9 +863,12 @@ const createGameSlice = (
 			if (state.combat.fight) return false;
 			const result = equipFromBag(state.bag, state.equipment, bagIndex);
 			if (!result) return false;
+			sendInventoryOp({ action: 'equip', index: bagIndex });
 			set({
 				bag: result.bag,
 				equipment: result.equipment,
+				// a set bonus can change the income: the rates follow the gear
+				resourceRates: ratesWithGear(state, result.equipment),
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
 				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
 			});
@@ -799,9 +880,12 @@ const createGameSlice = (
 			if (state.combat.fight) return false;
 			const result = unequip(state.bag, state.equipment, slot);
 			if (!result) return false;
+			sendInventoryOp({ action: 'unequip', slot });
 			set({
 				bag: result.bag,
 				equipment: result.equipment,
+				// a set bonus can change the income: the rates follow the gear
+				resourceRates: ratesWithGear(state, result.equipment),
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
 				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
 			});
@@ -813,6 +897,7 @@ const createGameSlice = (
 			if (state.combat.fight || from === to) return false;
 			const inRange = (i: number) => Number.isInteger(i) && i >= 0 && i < state.bag.length;
 			if (!inRange(from) || !inRange(to)) return false;
+			sendInventoryOp({ action: 'move', from, to });
 			set({ bag: moveSlot(state.bag, from, to) });
 			return true;
 		},
@@ -821,32 +906,9 @@ const createGameSlice = (
 		organizeBag: () => {
 			const state = get();
 			if (state.combat.fight) return false;
+			sendInventoryOp({ action: 'organize' });
 			set({ bag: organizeBag(state.bag) });
 			return true;
-		},
-
-		// Tapping an owned tile yields a slice of its own output (per-tile cooldown + the shared click limiter)
-		tapTile: (x: number, y: number, input?: ClickInput): TapResult | null => {
-			if (!input || !clickLimiter.take(input)) return null;
-
-			const state = get();
-			const key = `${x},${y}`;
-			if (input.now - (lastTapAt[key] ?? -Infinity) < TILE_TAP.cooldownMs) return null;
-
-			const perSecond = calculateTileTapYield(state.tiles, x, y, state.resourceRates);
-
-			const items = (Object.entries(perSecond) as [keyof Resources, number][])
-				.map(([resource, rate]) => ({ resource, amount: rate * TILE_TAP.seconds }))
-				.filter((item) => item.amount > 0);
-			if (items.length === 0) return null;
-
-			lastTapAt[key] = input.now;
-			const gained: Partial<Resources> = {};
-			items.forEach(({ resource, amount }) => {
-				gained[resource] = amount;
-			});
-			get().addResources(gained);
-			return { items };
 		},
 
 		tick: (deltaTime: number) => {
@@ -868,7 +930,7 @@ const createGameSlice = (
 				}
 			);
 			const xpGain =
-				state.resourceRates.total.xp * (1 + state.characterStats.xpGainMultiplier / 100);
+				state.resourceRates.total.xp * (1 + xpGainPct(state.characterStats, state.equipment) / 100);
 			newResources.xp = Math.min(newResources.xp + xpGain * secondsElapsed, XP_CAP);
 
 			let newTiles = state.tiles;
@@ -893,7 +955,8 @@ const createGameSlice = (
 							state.farmLevels,
 							state.prestige,
 							state.farmUpgrades,
-							state.merchantUpgrades
+							state.merchantUpgrades,
+							gearIncomePct(state.equipment)
 						);
 					}
 					newCastleUpgrade = null;
@@ -952,6 +1015,7 @@ const createGameSlice = (
 
 		// The server's view of what has appeared and of the player's combat (see /api/spawn): the map is brought in line, the gem balance and HP are the server's
 		applyServerTickets: (sync: SyncResult) => {
+			applyInventory(sync.inv);
 			applyCombatView(sync.combat, sync.gemsTotal);
 			return reconcileMap(sync.tickets, sync.serverNowSec).placed;
 		},
@@ -973,7 +1037,6 @@ const createGameSlice = (
 				{ tiles: after.tiles, monsters: after.monsters, activeChests: after.activeChests },
 				result.tickets,
 				result.serverNowSec,
-				Math.random,
 				limitCtx(state)
 			);
 			set({ ...patch, tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, gems: result.gems });
@@ -1051,6 +1114,7 @@ const createGameSlice = (
 			const amount = qty === undefined ? 1 : Math.floor(qty);
 			if (!(amount >= 1) || amount > slotQty(slot)) return 0;
 			const gold = sellPayout(unit, amount, state);
+			sendInventoryOp({ action: 'sell', index: bagIndex, qty: amount }, settleSale(gold));
 			set({
 				bag: removeFromBag(state.bag, bagIndex, amount),
 				resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) },
@@ -1066,6 +1130,7 @@ const createGameSlice = (
 			if (!slot) return false;
 			const amount = qty === undefined ? 1 : Math.floor(qty);
 			if (!(amount >= 1) || amount > slotQty(slot)) return false;
+			sendInventoryOp({ action: 'discard', index: bagIndex, qty: amount });
 			set({ bag: removeFromBag(state.bag, bagIndex, amount) });
 			return true;
 		},
@@ -1086,6 +1151,7 @@ const createGameSlice = (
 				bag = removeFromBag(bag, index, 1);
 			});
 			if (count === 0) return { gold: 0, count: 0 };
+			sendInventoryOp({ action: 'sellJunk', maxRarity }, settleSale(gold));
 			set({ bag, resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) } });
 			return { gold, count };
 		},
@@ -1093,6 +1159,7 @@ const createGameSlice = (
 		// The auto-sell filter: gear of this rarity or lower is sold the moment it drops (null = keep everything)
 		setAutoSell: (rarity: string | null) => {
 			if (rarity !== null && !Object.prototype.hasOwnProperty.call(RARITIES, rarity)) return;
+			sendInventoryOp({ action: 'autoSell', rarity });
 			set({ autoSellUpTo: rarity });
 		},
 
@@ -1116,6 +1183,7 @@ const createGameSlice = (
 					bag = added.bag;
 				}
 			}
+			sendInventoryOp({ action: 'buyShop', id, qty }, settlePurchase(price));
 			set({ bag, resources: { ...state.resources, gold: state.resources.gold - price } });
 			return true;
 		},
@@ -1130,6 +1198,13 @@ const createGameSlice = (
 			if (state.resources.gold < price) return false;
 			const added = addDrop(state.bag, { kind: 'gear', item });
 			if (added.overflow > 0) return false;
+			// the server did not put it in the bag: the offer is back on the shelf and the price is back in the purse
+			sendInventoryOp(
+				{ action: 'buyOffer', item },
+				settlePurchase(price, () =>
+					set((s) => (s.merchantStock ? { merchantStock: { ...s.merchantStock, offers: [...s.merchantStock.offers.slice(0, index), item, ...s.merchantStock.offers.slice(index)] } } : {}))
+				)
+			);
 			set({
 				bag: added.bag,
 				resources: { ...state.resources, gold: state.resources.gold - price },
@@ -1171,7 +1246,7 @@ const createGameSlice = (
 				resources: { ...state.resources, gold: state.resources.gold - cost },
 				// Foreman and Skinner change the income: the rates follow at once (the other bonuses do not touch them)
 				...(id === 'foreman' || id === 'skinner'
-					? { resourceRates: calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, merchantUpgrades) }
+					? { resourceRates: calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, merchantUpgrades, gearIncomePct(state.equipment)) }
 					: {}),
 			});
 			return true;
@@ -1234,7 +1309,8 @@ export const useGameStore = create(
 				saved.farmLevels,
 				saved.prestige,
 				saved.farmUpgrades,
-				saved.merchantUpgrades
+				saved.merchantUpgrades,
+				gearIncomePct(saved.equipment)
 			);
 			return {
 				...current,

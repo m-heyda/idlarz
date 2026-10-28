@@ -75,7 +75,7 @@ const LoadingView: React.FC = () => {
 			</div>
 
 			<div className='loading-tips'>
-				<span>Tap a tile to gather a slice of its output</span>
+				<span>Click the map to earn a little gold</span>
 				<span>Neighbouring tiles of one biome boost each other</span>
 				<span>Upgrade your castle for a bonus on every resource</span>
 			</div>

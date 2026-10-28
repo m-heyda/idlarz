@@ -1,5 +1,5 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/gameConfig';
-import { ITEM_CATALOG, SETS } from '@/catalog';
+import { ITEM_CATALOG, familyPieces } from '@/catalog';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { COMBAT } from '@/config/combatConfig';
 import { runCombat, type CombatEnv } from '@/lib/offline/fight';
@@ -29,7 +29,7 @@ export const spentCharacter = (spend: Partial<Pick<CharacterStats, 'strength' | 
 /** Every piece of a set worn, plus a weapon (and the set's own off hand is part of the set). Both rings are filled. Items are plain: their authored level, neutral quality, no affixes. */
 export const fullSet = (setId: string, weapon?: string): Equipment => {
 	const eq: Equipment = {};
-	for (const id of SETS[setId].pieces) {
+	for (const id of familyPieces(setId)) {
 		const slot = ITEM_CATALOG[id].slot!;
 		if (slot === 'ring') eq.ring1 = eq.ring2 = plainItem(id);
 		else eq[slot as EquipmentSlot] = plainItem(id);
@@ -100,8 +100,8 @@ export const simSetup = ({ equipment = {}, character = freshCharacter(), potions
 const simulateFight = ({ equipment, monster, character, potions, level, autoUse = true, seed }: SimInput): SimResult => {
 	const { ledger, env } = simSetup({ equipment, character, potions, level, monsters: [monster], seed });
 
-	// the first request engages the monster; then the clock runs on one second at a time until the fight is decided
-	let state = runCombat(ledger, env(START), { autoUse }).ledger;
+	// the first request fights the monster (a click on it, so auto-battle's win-chance gate does not decide); then the clock runs on one second at a time until the fight is decided
+	let state = runCombat(ledger, env(START), { autoUse, commands: [{ kind: 'fight', n: 1 }] }).ledger;
 	const maxHp = state.combat!.fight?.profile.maxHp ?? 1;
 	let now = START;
 	const seen: FightEvent[] = [];

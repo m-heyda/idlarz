@@ -1,5 +1,6 @@
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y, RESOURCE_CAP, XP_CAP } from '@/config/gameConfig';
 import { maxHp, maxMana } from '@/lib/combat';
+import { gearIncomePct } from '@/lib/gearEconomy';
 import type { LimitContext } from '@/lib/limits';
 import { advanceMonsters } from '@/lib/monsters';
 import type { OfflineGrant } from '@/lib/offline/grant';
@@ -69,7 +70,7 @@ export const applyOfflineGrant = (state: OfflineStateIn, grant: OfflineGrant, li
 			const castle = getTile(tiles, CASTLE_X, CASTLE_Y);
 			if (castle && castle.biome === 'castle') {
 				tiles = setTile(tiles, CASTLE_X, CASTLE_Y, { ...castle, level: castleUpgrade.toLevel, upgradeCost: CASTLE_UPGRADE.upgradeCosts[castleUpgrade.toLevel - 1] ?? undefined });
-				resourceRates = calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades);
+				resourceRates = calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades, gearIncomePct(state.equipment));
 				castleReached = castleUpgrade.toLevel;
 			}
 			castleUpgrade = null;

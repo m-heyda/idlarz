@@ -6,6 +6,8 @@ import { rebirthStatus, xpToNextLevel } from '@/utils/gameUtils';
 import { useMenuAttention } from '@/hooks/useMenuAttention';
 import { useUiStore } from '@/stores/uiStore';
 import { openMenuAt } from '@/lib/globalMenu';
+import { castleTimerLabel } from '@/lib/castleTimer';
+import { useViewStore } from '@/stores/viewStore';
 import { cn } from '@/lib/utils';
 import PixelIcon from './PixelIcon';
 import LevelOrb from './LevelOrb';
@@ -102,9 +104,30 @@ export const HeaderButtons: React.FC = () => {
 		[tiles, freeTiles, castleUpgrade, merchantUpgrades]
 	);
 	const reached = status.requirements.every((r) => r.met);
+	// a minute-resolution text above an hour, so the chip re-renders once a second only in the last hour
+	const castleTimer = useGameStore((state) => castleTimerLabel(state.castleUpgrade));
+	const centerOnCastle = useViewStore((state) => state.centerOnCastle);
 
 	return (
 		<div className='flex items-center gap-1.5 shrink-0'>
+			{castleTimer && (
+				<div
+					className='hdr-castle-timer'
+					role='button'
+					tabIndex={0}
+					title='Castle upgrade in progress: click to find the castle'
+					aria-label={`Castle upgrade: ${castleTimer} left. Show the castle`}
+					onClick={centerOnCastle}
+					onKeyDown={(event) => {
+						if (event.key === 'Enter' || event.key === ' ') {
+							event.preventDefault();
+							centerOnCastle();
+						}
+					}}>
+					<PixelIcon name='castle_1' alt='' scale={0.45} />
+					<span>{castleTimer}</span>
+				</div>
+			)}
 			<div className='hdr-has-tip flex'>
 				<div
 					className={cn('pixel-slot pixel-slot-sm', !status.canRebirth && 'is-disabled')}

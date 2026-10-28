@@ -23,7 +23,6 @@ import {
 	SCALING_CONFIG,
 	TILE_PRICE,
 	TILE_RESOURCE_COST,
-	TILE_TAP,
 } from '@/config/gameConfig';
 import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
@@ -101,7 +100,7 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Tiles &amp; Biomes</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					You start with the castle and its eight neighbours already yours. Every tile you buy becomes a biome and
+					You start with the castle and the four tiles beside it (north, east, south, west) already yours. Every tile you buy becomes a biome and
 					produces resources per second. Same-biome neighbours boost each other by +{pct(SCALING_CONFIG.adjacencyBonus)} per
 					neighbour (up to four). New land tends to continue the biome next to it, so areas grow into forests, lakes and ridges.
 					The biome is rolled when you buy the tile, and some biomes are blocked by their neighbours (Tundra never touches Swamp
@@ -179,9 +178,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Clicking</h3>
 				<p className='text-[#d8c8a0]'>
 					Clicking the <b>map</b> pays <Res r='gold'>{pct(CLICK_LADDER[0].power)}</Res> of your gold per second per
-					click, upgradeable in the merchant to {pct(CLICK_LADDER[CLICK_LADDER.length - 1].power)}. Clicking an
-					owned tile also taps it for {TILE_TAP.seconds}s of its own output (each tile recharges for{' '}
-					{TILE_TAP.cooldownMs / 1000}s).
+					click, upgradeable in the merchant to {pct(CLICK_LADDER[CLICK_LADDER.length - 1].power)}.
 				</p>
 				<p className='text-[#a89878] mt-1'>
 					Fast clicking is fine: you can click up to {CLICK_LIMIT.capacity} times in a burst and about{' '}
@@ -270,7 +267,7 @@ const Tutorial: React.FC = () => {
 				</div>
 				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
 					<li>
-						<b>Sets</b>: wear several pieces of one set for bonuses (both rings count):{' '}
+						<b>Sets</b>: wear several pieces of one set for bonuses that add up (both rings count). Obsidian pays the kingdom (income, XP, kill rewards, away time), Rattatui adds percent damage and health:{' '}
 						{Object.values(SETS).map((set) => `${set.label} (${Object.keys(set.bonuses).join(' / ')} pieces)`).join(', ')}.
 					</li>
 					<li>

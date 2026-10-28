@@ -96,8 +96,8 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 		{ rebirths: s.prestige.rebirths, points: s.prestige.legacyPoints, earned: s.prestige.legacyEarned },
 		{ rebirths: 1, points: expected, earned: expected }
 	);
-	assert.equal(owned(), 9, 'a rebirth starts with the castle and its 8 free neighbours');
-	assert.equal(s.freeTiles, 9);
+	assert.equal(owned(), 5, 'a rebirth starts with the castle and its 4 free neighbours');
+	assert.equal(s.freeTiles, 5);
 	assert.equal(tileAt(s.tiles, CASTLE_X, CASTLE_Y).level, 1);
 	assert.equal(s.clickLevel, 0);
 	assert.deepEqual(s.farmLevels, {});
@@ -105,10 +105,10 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 	assert.equal(s.resources.xp, before.xp);
 	assert.equal(s.level.level, calculateLevel(before.xp).level);
 	assert.ok(s.level.level > 1);
-	assert.deepEqual(
-		{ ...s.characterStats, reputation: 0 },
-		{ ...before.stats, availablePoints: before.stats.availablePoints + Math.max(0, totalStatPoints(s.level.level) - totalStatPoints(before.level)), reputation: 0 }
-	);
+	assert.deepEqual(s.characterStats, {
+		...before.stats,
+		availablePoints: before.stats.availablePoints + Math.max(0, totalStatPoints(s.level.level) - totalStatPoints(before.level)),
+	});
 	assert.equal(s.castleUpgrade, null);
 	assert.equal(s.resources.gold, INITIAL_RESOURCES.gold);
 	assert.equal(s.playerName, 'Hero');

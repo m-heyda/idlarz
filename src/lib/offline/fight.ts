@@ -19,7 +19,10 @@ import {
 } from '@/lib/offline/fightTypes';
 import type { Ledger } from '@/lib/offline/ledger';
 import { isPlaced } from '@/lib/offline/placement';
-import { bagCount, playerProfile, savedVitals } from '@/lib/offline/profile';
+import { playerProfile, savedVitals } from '@/lib/offline/profile';
+import { bagCountOf, inventoryFromCore, takeOne } from '@/lib/offline/inventory';
+import type { Inventory } from '@/lib/offline/types';
+import { estimateWin, type PotionStock } from '@/lib/offline/winChance';
 import { payKill } from '@/lib/offline/reward';
 import { sealedRng } from '@/lib/offline/seal';
 import { takeMonster, type MonsterTicket } from '@/lib/offline/tickets';
@@ -42,6 +45,14 @@ export interface CombatEnv {
 const EPS = 1e-9;
 const round1 = (value: number): number => Math.round(value * 10) / 10;
 
+/** The potions auto-use would drink (none with auto-use off), for the win estimate. */
+const potionsForEstimate = (inv: Inventory, c: CombatState): PotionStock[] =>
+	c.autoUse
+		? Object.keys(ITEM_CATALOG)
+				.filter((id) => ITEM_CATALOG[id].consumable?.healHp)
+				.map((id) => ({ healHp: ITEM_CATALOG[id].consumable!.healHp, count: bagCountOf(inv, id) }))
+		: [];
+
 /** The combat record of a ledger, seeded from the saved HP and mana the first time. */
 const combatOf = (ledger: Ledger, env: CombatEnv): CombatState => {
 	if (ledger.combat) return ledger.combat;
@@ -53,15 +64,29 @@ const combatOf = (ledger: Ledger, env: CombatEnv): CombatState => {
  * The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the King. One that
  * beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.
  */
-const pickTarget = (ledger: Ledger, combat: CombatState, tSec: number): { ticket: MonsterTicket; type: 'rat' | 'ratKing' } | null => {
-	const ready = (ticket: MonsterTicket) => isPlaced(ticket) && tSec >= (combat.retryAt[ticket.n] ?? 0);
+const pickTarget = (
+	ledger: Ledger,
+	combat: CombatState,
+	tSec: number,
+	/** Auto-battle only: whether the player is expected to win against this monster (left out: no check) */
+	winnable?: (type: 'rat' | 'ratKing', level: number) => boolean
+): { ticket: MonsterTicket; type: 'rat' | 'ratKing' } | null => {
 	const levelOf = (ticket: MonsterTicket) => levelAtAge(ticket.spawnLevel ?? 1, tSec - ticket.at);
-	const rats = ledger.bank.rats.filter(ready).sort((a, b) => (COMBAT.auto.engageOrder === 'weakest' ? levelOf(a) - levelOf(b) : 0) || a.n - b.n);
+	const ready = (ticket: MonsterTicket, type: 'rat' | 'ratKing') =>
+		isPlaced(ticket) && tSec >= (combat.retryAt[ticket.n] ?? 0) && (!winnable || winnable(type, levelOf(ticket)));
+	const rats = ledger.bank.rats.filter((ticket) => ready(ticket, 'rat')).sort((a, b) => (COMBAT.auto.engageOrder === 'weakest' ? levelOf(a) - levelOf(b) : 0) || a.n - b.n);
 	if (rats[0]) return { ticket: rats[0], type: 'rat' };
 	const king = ledger.bank.king;
-	if (king && ready(king)) return { ticket: king, type: 'ratKing' };
+	if (king && ready(king, 'ratKing')) return { ticket: king, type: 'ratKing' };
 	return null;
 };
+
+/**
+ * Whether auto-battle expects to beat a monster: the estimate (offline/winChance.ts) with the HP it would start with (at least the resume
+ * line, so a player who is still resting is not judged on a low HP) and the potions auto-use would drink. A click on a monster skips this.
+ */
+const winnableBy = (profile: PlayerProfile, hp: number, potions: PotionStock[]) => (type: 'rat' | 'ratKing', level: number): boolean =>
+	estimateWin(profile, Math.max(hp, (profile.maxHp * COMBAT.auto.resumeHpPct) / 100), type, level, potions).chance >= COMBAT.auto.minWinChance;
 
 /** The soonest time a monster that is waiting out its retry cooldown becomes a target again (Infinity: none). */
 const nextRetry = (ledger: Ledger, combat: CombatState, tSec: number): number => {
@@ -83,11 +108,12 @@ export interface CombatTotals {
  * auto-battle allows. Returns the new ledger. All events are in `ledger.combat.log`.
  */
 export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: CombatCommand[]; autoBattle?: boolean; autoUse?: boolean; ack?: number } = {}): CombatTotals => {
-	let ledger = input;
+	// the bag is the ledger's (the engine tests and the sim build a ledger from a core: the inventory is read from it then)
+	let ledger: Ledger = input.inv ? input : { ...input, inv: inventoryFromCore(env.stored.core) };
 	const base = combatOf(ledger, env);
 	// what the browser has told us it applied (its `since`) is not kept: only cosmetic events are ever dropped unacknowledged
 	const log = ask.ack === undefined ? [...base.log] : base.log.filter((event) => COSMETIC_EVENTS.has(event.kind) || event.no > ask.ack!);
-	const c: CombatState = { ...base, cd: { ...base.cd }, consumed: { ...base.consumed }, log, fight: base.fight ? { ...base.fight } : null };
+	const c: CombatState = { ...base, cd: { ...base.cd }, log, fight: base.fight ? { ...base.fight } : null };
 	const profileNow = playerProfile(env.stored.core);
 	// auto-battle is locked until the first rebirth: a save that has it on from before (or a request for it) does not get it
 	const autoAllowed = autoBattleUnlocked(ledger.rebirths);
@@ -110,7 +136,9 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 	const tickCooldowns = (dt: number) => {
 		c.cd = { heal: Math.max(0, c.cd.heal - dt), stun: Math.max(0, c.cd.stun - dt), potion: Math.max(0, c.cd.potion - dt) };
 	};
-	const stock = (id: string): number => Math.max(0, bagCount(env.stored.core, id) - Math.max(0, (c.consumed[id] ?? 0) - (c.consumedSeen[id] ?? 0)));
+	const stock = (id: string): number => bagCountOf(ledger.inv!, id);
+	/** What auto-battle checks a monster against: the numbers it would fight with and the potions auto-use would drink */
+	const winnable = () => winnableBy(profileNow, c.hp, potionsForEstimate(ledger.inv!, c));
 
 	const drink = (t: number, id: string): boolean => {
 		const healHp = ITEM_CATALOG[id]?.consumable?.healHp;
@@ -118,7 +146,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 		if (c.fight && c.cd.potion > 0) return false;
 		const healed = Math.min(healHp, maxHpNow() - c.hp);
 		c.hp += healed;
-		c.consumed[id] = (c.consumed[id] ?? 0) + 1;
+		ledger = { ...ledger, inv: takeOne(ledger.inv!, id) ?? ledger.inv! };
 		if (c.fight) c.cd.potion = COMBAT.potionCooldownSec;
 		push(t, 'potion', { id, amount: Math.round(healed) });
 		return true;
@@ -192,7 +220,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 	/** Auto-battle's pick: only with the switch on and enough HP. */
 	const engage = (t: number): boolean => {
 		if (!c.autoBattle || c.hp < (profileNow.maxHp * COMBAT.auto.resumeHpPct) / 100) return false;
-		const target = pickTarget(ledger, c, t);
+		const target = pickTarget(ledger, c, t, winnable());
 		return target ? start(t, target) : false;
 	};
 
@@ -247,7 +275,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 			const paid = payKill(env.secret, env.userId, ledger, env.stored, f.n, t);
 			if (!paid) return endFight(t, 'retreat');
 			ledger = paid.ledger;
-			push(t, 'won', { n: f.n, type: f.type, level: paid.payout.level, reward: { gold: paid.payout.gold, xp: paid.payout.xp, hide: paid.payout.hide, items: paid.payout.items, pity: paid.payout.pity, lucky: paid.payout.lucky } });
+			push(t, 'won', { n: f.n, type: f.type, level: paid.payout.level, reward: { gold: paid.payout.gold, xp: paid.payout.xp, hide: paid.payout.hide, items: paid.payout.items, stored: paid.payout.stored, convertedGold: paid.payout.convertedGold, autoSold: paid.payout.autoSold, pity: paid.payout.pity, lucky: paid.payout.lucky } });
 			c.fight = null;
 			return;
 		}
@@ -283,7 +311,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 			// nothing to fight yet: rest until something can change (HP back above the resume line, the King's retry time, or now)
 			let until = now;
 			if (c.autoBattle) {
-				if (pickTarget(ledger, c, t)) {
+				if (pickTarget(ledger, c, t, winnable())) {
 					const need = (profileNow.maxHp * COMBAT.auto.resumeHpPct) / 100 - c.hp;
 					if (need > 0 && idleRegen > 0) until = Math.min(until, t + need / idleRegen + EPS);
 				} else {
@@ -338,9 +366,6 @@ export const dismissTicket = (ledger: Ledger, env: CombatEnv, n: number): { ledg
 	return { ledger: { ...ledger, bank: taken.bank, combat }, ok: true };
 };
 
-/** A save that came in: the potions it already knows about are no longer "unsaved". */
-export const markConsumedSeen = (combat: CombatState): CombatState => ({ ...combat, consumedSeen: { ...combat.consumed } });
-
 /** After an absence the player is back on their feet: HP and mana refilled by resting for `gapSec`, no fight open, cooldowns over. */
 export const restThrough = (ledger: Ledger, env: CombatEnv, gapSec: number): Ledger => {
 	const base = combatOf(ledger, env);
@@ -363,11 +388,13 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 	const p = c.fight ? c.fight.profile : playerProfile(env.stored.core);
 	const f = c.fight;
 	let nextPollSec: number = COMBAT.poll.minimizedSec;
+	let waiting = false;
 	if (behind) nextPollSec = 0.5;
 	else if (f) nextPollSec = COMBAT.poll.fightSec;
 	else {
 		// idle: ask again when something can change
-		const waiting = pickTarget(ledger, c, c.at) !== null;
+		const winnable = winnableBy(p, c.hp, potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c));
+		waiting = pickTarget(ledger, c, c.at, winnable) !== null;
 		const resume = (p.maxHp * COMBAT.auto.resumeHpPct) / 100;
 		const retry = nextRetry(ledger, c, c.at);
 		if (!c.autoBattle) nextPollSec = 600;
@@ -390,5 +417,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		events: c.log.filter((event) => event.no > since),
 		behind,
 		nextPollSec,
+		// auto-battle is idle with monsters standing around: they are all beyond the player (or still waiting out a retry, which has its own line)
+		autoNote: c.autoBattle && !f && !waiting && pickTarget(ledger, c, c.at) !== null ? 'no_winnable' : null,
 	};
 };

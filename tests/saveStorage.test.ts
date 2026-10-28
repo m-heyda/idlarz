@@ -109,7 +109,7 @@ test('migrations upgrade old bodies step by step', () => {
 
 test('every frozen save in tests/fixtures/saves still loads (the compatibility guard)', async () => {
 	const files = readdirSync(FIXTURES).filter((f) => f.endsWith('.sav'));
-	assert.ok(files.some((f) => f.startsWith('legacy-')) && files.some((f) => f.startsWith('v')), 'both formats are covered');
+	assert.ok(files.some((f) => f.startsWith('v')), 'old schema versions are covered');
 	const { parse } = createSaveStorage({ kv: null });
 	for (const file of files) {
 		const result = await parse(readFileSync(resolve(FIXTURES, file), 'utf8'));
@@ -254,24 +254,6 @@ test('persistent storage is requested once, after the first successful save', as
 	assert.equal((await s.info()).persisted, true);
 });
 
-test('a save from the old encrypted vault is copied over once, then the vault is deleted', async () => {
-	const game = playedGame();
-	let cleared = 0;
-	const legacy = { read: async () => game, clear: async () => void cleared++ };
-	const { kv, data } = fakeKv();
-	const s = createSaveStorage({ kv, legacy });
-	const loaded = await s.storage.getItem('x');
-	assert.deepEqual(loaded && !(loaded instanceof Promise) ? loaded.state.resources : null, game.resources);
-	assert.ok(decodeSave(data.get(KEY)!).ok, 'written in the new format straight away');
-	assert.equal(cleared, 1);
-
-	// with a new-format save present the old vault is not consulted
-	let reads = 0;
-	const s2 = createSaveStorage({ kv, legacy: { read: async () => (reads++, game), clear: async () => undefined } });
-	await s2.storage.getItem('x');
-	assert.equal(reads, 0);
-});
-
 test('import replaces the save, keeps the old one as backup and blocks later autosaves', async () => {
 	const mine = playedGame();
 	freshGame();
@@ -295,11 +277,9 @@ test('import replaces the save, keeps the old one as backup and blocks later aut
 	assert.deepEqual(after.ok && after.state.tiles, other.tiles);
 });
 
-test('reset removes the save, the backup, the damaged copy and the old vault', async () => {
-	let cleared = 0;
+test('reset removes the save, the backup and the damaged copy', async () => {
 	const { kv, data } = fakeKv({ [KEY]: 'a', [BACKUP]: 'b', [DAMAGED]: 'c' });
-	const s = createSaveStorage({ kv, legacy: { read: async () => null, clear: async () => void cleared++ } });
+	const s = createSaveStorage({ kv });
 	await s.reset();
 	assert.equal(data.size, 0);
-	assert.equal(cleared, 1);
 });
