@@ -114,3 +114,35 @@ test('ui store: dialogs close the menu, confirmations track their target, prefs 
 	assert.equal(readPref('showAdmin'), PREF_DEFAULTS.showAdmin);
 	assert.doesNotThrow(() => writePref('showMinimap', false));
 });
+
+test('the farm panels and the minimap are remembered: defaults first, then what was folded stays folded after a reload', () => {
+	assert.deepEqual(
+		[PREF_DEFAULTS.farmAnimalsOpen, PREF_DEFAULTS.farmHudOpen, PREF_DEFAULTS.farmUpgradesOpen],
+		[true, true, false],
+		'a first visit sees the shop and the readout open and the upgrade drawer shut'
+	);
+	// a working storage on a real (non-dev) host for this test only
+	const memory = new Map<string, string>();
+	const g = globalThis as unknown as { window?: unknown };
+	g.window = {
+		location: { hostname: 'example.com' },
+		localStorage: { getItem: (k: string) => memory.get(k) ?? null, setItem: (k: string, v: string) => void memory.set(k, v) },
+	};
+	try {
+		const ui = useUiStore.getState();
+		ui.setPref('farmAnimalsOpen', false);
+		ui.setPref('farmHudOpen', false);
+		ui.setPref('farmUpgradesOpen', true);
+		ui.setPref('showMinimap', false);
+		useUiStore.setState({ ...PREF_DEFAULTS }); // a reload: the store is back to its defaults ...
+		useUiStore.getState().loadPrefs(); // ... until the prefs are read after mount
+		const after = useUiStore.getState();
+		assert.equal(after.farmAnimalsOpen, false);
+		assert.equal(after.farmHudOpen, false);
+		assert.equal(after.farmUpgradesOpen, true);
+		assert.equal(after.showMinimap, false, 'the minimap choice used to be written but never read back');
+	} finally {
+		delete g.window;
+		useUiStore.setState({ ...PREF_DEFAULTS });
+	}
+});

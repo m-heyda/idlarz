@@ -95,6 +95,10 @@ interface UiState {
 	adminCollapsed: boolean;
 	/** Small amounts next to the header's resource icons (off: icons only) */
 	compactHeader: boolean;
+	/** The Farm window's panels: animal shop, stats readout, upgrade drawer */
+	farmAnimalsOpen: boolean;
+	farmHudOpen: boolean;
+	farmUpgradesOpen: boolean;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
 }
@@ -161,8 +165,12 @@ export const useUiStore = create<UiState>((set) => ({
 	loadPrefs: () =>
 		set({
 			showAdmin: readPref('showAdmin'),
+			showMinimap: readPref('showMinimap'),
 			adminCollapsed: readPref('adminCollapsed'),
 			combatMinimized: readPref('combatMinimized'),
 			compactHeader: readPref('compactHeader'),
+			farmAnimalsOpen: readPref('farmAnimalsOpen'),
+			farmHudOpen: readPref('farmHudOpen'),
+			farmUpgradesOpen: readPref('farmUpgradesOpen'),
 		}),
 }));

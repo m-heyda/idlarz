@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { useUiStore } from '@/stores/uiStore';
 import '@/styles/Farm.css';
 import FarmScene from './FarmScene';
 import FarmHud from './FarmHud';
@@ -15,9 +16,12 @@ const FarmOverlay: React.FC = () => {
 	const farmLevels = useGameStore((state) => state.farmLevels);
 	const [highlightId, setHighlightId] = useState<string | null>(null);
 	const [celebrate, setCelebrate] = useState<string | null>(null);
-	const [animalsOpen, setAnimalsOpen] = useState(true);
-	const [upgradesOpen, setUpgradesOpen] = useState(false);
-	const [hudOpen, setHudOpen] = useState(true);
+	// which panels are folded is remembered between visits (lib/uiPrefs)
+	const animalsOpen = useUiStore((state) => state.farmAnimalsOpen);
+	const upgradesOpen = useUiStore((state) => state.farmUpgradesOpen);
+	const hudOpen = useUiStore((state) => state.farmHudOpen);
+	const setPref = useUiStore((state) => state.setPref);
+	const setUpgradesOpen = useCallback((open: boolean) => setPref('farmUpgradesOpen', open), [setPref]);
 
 	useEffect(() => {
 		if (!celebrate) return;
@@ -39,10 +43,10 @@ const FarmOverlay: React.FC = () => {
 					right: animalsOpen ? ANIMAL_DOCK_WIDTH : 0,
 					hudOpen,
 				}}
-				onPointerDown={() => setUpgradesOpen(false)}
+				onPointerDown={() => upgradesOpen && setUpgradesOpen(false)}
 			/>
-			<FarmHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} />
-			<FarmAnimalDock open={animalsOpen} onToggle={() => setAnimalsOpen(!animalsOpen)} onBuy={buy} onHover={setHighlightId} />
+			<FarmHud open={hudOpen} onToggle={() => setPref('farmHudOpen', !hudOpen)} />
+			<FarmAnimalDock open={animalsOpen} onToggle={() => setPref('farmAnimalsOpen', !animalsOpen)} onBuy={buy} onHover={setHighlightId} />
 			<FarmUpgradeDock open={upgradesOpen} onOpenChange={setUpgradesOpen} />
 		</div>
 	);
