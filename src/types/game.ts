@@ -1,6 +1,6 @@
 import { BIOMES } from '@/config/gameConfig';
 import type { PlayerClassId } from '@/config/playerClasses';
-import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config/gameConfig';
+import type { FarmUpgradeId, EmberUpgradeId, MerchantUpgradeId } from '@/config/gameConfig';
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
 import type { SkillId } from '@/catalog/skills';
@@ -299,12 +299,12 @@ export interface TileCost {
 	resources: Partial<Resources>;
 }
 
-// Rebirth / Legacy (kept across rebirths)
+// Rebirth / Embers (kept across rebirths)
 export interface PrestigeState {
 	rebirths: number;
 	legacyPoints: number; // unspent
 	legacyEarned: number; // ever earned; drives the income bonus. earned = unspent + cost of all shop levels
-	upgrades: Partial<Record<LegacyUpgradeId, number>>;
+	upgrades: Partial<Record<EmberUpgradeId, number>>;
 }
 
 // A bonus critter that was clicked (farm meadow or map)
@@ -362,7 +362,7 @@ export interface GameState {
 	castleUpgrade: CastleUpgradeState | null;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
 	activeChests: number;
-	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Legacy points of `prestige`. */
+	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Embers of `prestige`. */
 	gems: number;
 	/** Bad-luck protection counters of the loot tables, by `profile:table` (see catalog/lootConfig `pity`) */
 	lootPity: Record<string, number>;
@@ -378,7 +378,7 @@ export interface GameState {
 	clickForGold: (input: ClickInput) => number;
 	resetGame: () => void;
 	rebirth: () => boolean;
-	buyLegacyUpgrade: (id: LegacyUpgradeId) => boolean;
+	buyEmberUpgrade: (id: EmberUpgradeId) => boolean;
 	claimCritterGift: (gift: CritterGift, input: ClickInput) => GiftResult | null;
 	upgradeCastle: () => boolean;
 	purchaseAnimal: (animalId: string, count?: number | 'max') => number; // animals bought

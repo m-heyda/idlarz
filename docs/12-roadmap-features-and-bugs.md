@@ -34,6 +34,8 @@ Not part of this change; reviewed later. State today, so the rework starts from 
 | R8 | The King's balance changed with auto-attack: his HP is 1000 (was 9600 for a clicker) so the best gear wins comfortably, obsidian narrowly, steel not | `MONSTERS.ratKing`, `docs/generated/fight-sim.md` | needs a real playtest |
 | R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix, `storageScope.ts`) |
 | R10 | `legacyVault.ts` (the IndexedDB and `idle-explorer-v11/v12` import) and the `IDLZ1.` import format are still shipped | `lib/legacyVault.ts`, `saveStorage.ts` | delete when nobody can still hold such a save |
+| R11 | A sync (no key) overwrites the ledger's `last_key` / `last_result` (`onlineStep` writes `lastKey: key`), so the idempotency record of the previous keyed request (a chest open, a hotkey) is gone when a poll lands between a lost answer and its retry; the retry then takes a second ticket or answers "no ticket" | `lib/offline/online.ts` | keep the old record when the step has no key; rare (the retry follows within a second) |
+| R12 | A release that reads a new column goes live before its SQL migration is applied: on 2026-10-28 between about 01:21 and 01:39 UTC every ledger read failed ("column player_ledger.combat does not exist") until `combat_ledger.sql` ran | `supabase/migrations/` | apply additive migrations before deploying the code that reads them, or read the new column defensively |
 
 ## 3. Server migration backlog (ranked)
 
@@ -41,13 +43,24 @@ What still runs in the browser and is only checked by plausibility. Tile buying 
 
 1. **Ledger-owned inventory and equipment** (closes R3, R5, R6): the bag, the worn gear and the loot pity live in the ledger; the browser shows them. Then a fight can never use gear the player does not own.
 2. **Enforce `verify.ts`** (today it only flags): rejecting a save that gained more than the server granted.
-3. **Economy actions** by the server where they pay out: castle upgrade, rebirth/Legacy, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
+3. **Economy actions** by the server where they pay out: castle upgrade, rebirth/Embers, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
 4. ~~**XP, levels and stat points** from server-held XP~~ **done in part**: the server models and clamps XP (`cloudSave/xpModel.ts`) and the fight profile derives the level from the saved XP. Still client-side: the *award* of tile-purchase XP (tile buying stays a client action, see above) and the attribute allocation (bounded by the level's points).
 5. **Merchant and sell** (gold for gear, resource sell/buy, upgrades): server-priced. Today every merchant action is a client store action checked only by `sanitizeSave`, `netWorth` and the gold/XP flags; the Goods shelf and the Resources table are pure UI over `buyOffer`, `buyItem`, `sellResources`, `buyResource` and `buyMerchantUpgrade`, so moving them behind routes later changes no UI.
 6. **Chest placement** (R2) next to monster placement.
 7. **Spawn caps from the real map**: the server now counts free tiles for monsters from the map; chests and the overall share (`SPAWN_LIMIT`) still use an estimate from the owned-tile count.
 
-Call volume: every online request is one compare-and-swap on the ledger plus a read of the save row; the map row is read only when the land changed or a monster waits for a tile. Combat polling is `COMBAT.poll` (2 s with the panel open, 8 s minimized or hidden, and as long as 10 min when nothing can change).
+Call volume (see 3b for the free-tier notes): every online request is one compare-and-swap on the ledger plus a read of the save row; the map row is read only when the land changed or a monster waits for a tile. Combat polling is `COMBAT.poll` (2 s with the panel open, 8 s minimized or hidden, and as long as 10 min when nothing can change).
+
+## 3b. Server authority and free-tier notes
+
+Decisions and findings from the header / resource-tier pass (read from the code, **not measured against the live project**). Nothing here changed server code.
+
+1. **No cron job and no Realtime channel are needed now.** Everything the server decides is computed lazily on a request from timestamps ([11](11-offline-and-sealed-rolls.md)); the browser never talks to Supabase directly, only to `/api/*`. Add `pg_cron` only for a feature that must progress while nobody is online (a leaderboard season roll-up, expiring events). The header's production rates (per second / minute / hour) are derived client-side from the state the player already holds (`resourceRates`); they cost no request.
+2. **Catalogs stay in code, not in the database.** The API routes import the same TypeScript modules as the browser (`src/catalog/*`, `gameConfig.ts`, `combatConfig.ts`), so client and server cannot disagree, and a catalog change ships with its tests (`tests/catalog.test.ts`, `serverBoundary.test.ts`). The DB stores ids and numbers inside `core`. Move a catalog to tables only if you need to change content without a deploy (live events, A/B prices); until then it would add reads on a free tier and a second source of truth. The new `tier` field in `src/catalog/resources.ts` drives the header, so adding a tier is a catalog change.
+3. **Rebirth and Embers are client-authoritative.** `sanitizeSave` only checks conservation (`legacyPoints + shop spending = legacyEarned`) and ranges, and `verify.ts` flags a counter that goes down; nothing checks that the Embers earned match the castle level and tiles of the run that ended. A crafted save can claim any conserving total up to 1,000,000. *Recommended next, cheap:* a shadow flag in `cloudSave/verify.ts` that compares the claimed gain with `emberGain(castle_level, tiles_owned)` of the previously stored row (`player_saves` already has both columns), with a tolerance for the autosave lag, reusing the poison-flag path (un-ranks, stops offline pay). *Later:* a server-owned `/api/rebirth` (item 3 above).
+4. **Free-tier hot spot: polling during a fight.** While a fight is open the browser calls `/api/spawn` / `/api/fight` every 2 s (about 1,800 requests an hour). Each request does `auth.getUser()`, a read of `player_saves` and of `player_ledger`, and **a ledger UPDATE even for a read-only sync**: every online step returns `anchorAt: nowMs` (`offline/online.ts`) and `toRow` stamps `updated_at` (`offline/supabaseLedger.ts`). *Recommended next:* skip the write when the step changed nothing but the anchor (or raise the poll interval while the fight is only being watched). The 5-minute save heartbeat (12 an hour, one RPC each) and the 30-minute history copies are modest by comparison.
+5. **Resource key lists are still duplicated by hand** (the `Resources` interface, `INITIAL_RESOURCES`, `BASE_GENERATION_RATES`, `CASTLE_BASE_RATES`, `FARM_PRODUCT_KEYS`, `zeroResources`, `sanitizeSave` `OPTIONAL_RESOURCES`, `offline/grant.ts`, `offline/ledger.ts` `zeroTotals`, ...). The header groups no longer are: they come from the catalog tiers. A new resource still has to be added to those lists together, see [13 §3](13-roadmap-building-and-resources.md). `tests/catalog.test.ts` fails if a stored resource has no tier.
+6. **Secret in the repo**: `.env.example` carries a concrete `LOOT_SECRET` value ("the shared one every new workspace starts with"). Fine while the repo is private; rotate it, and give every deployment its own, before any public release.
 
 ## 4. Config extensions planned (the shape is ready)
 
@@ -62,7 +75,7 @@ The level curve ends at level 100 (the soft cap is 80, level 90 comes around the
 - After level 100 the same lifetime XP keeps counting; every paragon level (a flat step first, then slowly growing, tuned with the sim like the main curve) gives **one paragon point**. The server's XP ceiling already carries lifetime XP over rebirths, so nothing new has to be tracked for the XP.
 - Points go into a few **small, capped, account-wide bonuses** (income, XP gain, Luck, offline efficiency, maybe a combat stat), not attribute points; each bonus has its own level cap so the sum can never run away.
 - The leaderboard ranks level, then paragon level.
-- Open questions: points per level, the caps, whether levels 81-100 should give extra attribute points as a reward for the steep part, whether paragon points reset (probably not), and how the Legacy shop and the merchant's Ancestral Tithe interact with it.
+- Open questions: points per level, the caps, whether levels 81-100 should give extra attribute points as a reward for the steep part, whether paragon points reset (probably not), and how the Ember shop and the merchant's Ancestral Tithe interact with it.
 
 ## 5. Documentation to keep in step
 

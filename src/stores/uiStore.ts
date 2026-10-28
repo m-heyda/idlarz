@@ -54,9 +54,9 @@ interface UiState {
 	settingsOpen: boolean;
 	toggleSettings: () => void;
 	closeSettings: () => void;
-	legacyOpen: boolean;
-	toggleLegacy: () => void;
-	closeLegacy: () => void;
+	rebirthOpen: boolean;
+	toggleRebirth: () => void;
+	closeRebirth: () => void;
 	tutorialOpen: boolean;
 	openTutorial: () => void;
 	closeTutorial: () => void;
@@ -93,6 +93,8 @@ interface UiState {
 	combatMinimized: boolean;
 	showAdmin: boolean;
 	adminCollapsed: boolean;
+	/** Small amounts next to the header's resource icons (off: icons only) */
+	showHeaderNumbers: boolean;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
 }
@@ -110,9 +112,9 @@ export const useUiStore = create<UiState>((set) => ({
 	settingsOpen: false,
 	toggleSettings: () => set((state) => ({ settingsOpen: !state.settingsOpen })),
 	closeSettings: () => set({ settingsOpen: false }),
-	legacyOpen: false,
-	toggleLegacy: () => set((state) => ({ legacyOpen: !state.legacyOpen })),
-	closeLegacy: () => set({ legacyOpen: false }),
+	rebirthOpen: false,
+	toggleRebirth: () => set((state) => ({ rebirthOpen: !state.rebirthOpen })),
+	closeRebirth: () => set({ rebirthOpen: false }),
 	tutorialOpen: false,
 	openTutorial: () => set({ tutorialOpen: true }),
 	closeTutorial: () => set({ tutorialOpen: false }),
@@ -161,5 +163,6 @@ export const useUiStore = create<UiState>((set) => ({
 			showAdmin: readPref('showAdmin'),
 			adminCollapsed: readPref('adminCollapsed'),
 			combatMinimized: readPref('combatMinimized'),
+			showHeaderNumbers: readPref('showHeaderNumbers'),
 		}),
 }));

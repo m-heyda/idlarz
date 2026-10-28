@@ -208,7 +208,7 @@ Pools: `general_equipment`, `rattatui_set`, `legendary_weapons`, `potions_rat`, 
 | `meat` | Meat | 1 | Every animal on the farm (boosted by Feed Trough and the plains bonus). |
 | `eggs` | Eggs | 2 | Chickens on the farm. Cannot be bought. |
 | `milk` | Milk | 3 | Cows on the farm. Cannot be bought. |
-| `hide` | Hide | 4 | Deer and pigs on the farm. Cannot be bought. |
+| `hide` | Hide | 2 | Deer and pigs on the farm, and the rats you beat. Cannot be bought. |
 | `xp` | XP |  | The castle, buying tiles and your stats. |
-| `legacy` | Legacy |  | Rebirthing from castle level 6: the higher your castle and income, the more you get. |
 | `gems` | Gems |  | Your starting purse; more ways to earn them are coming. |
+| `embers` | Embers |  | Rebirthing from castle level 6: the higher your castle and land, the more you get. |

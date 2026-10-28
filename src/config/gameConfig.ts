@@ -171,19 +171,19 @@ export const RESOURCE_ICONS = fromResources(resourceKeys, (key) => RESOURCES[key
 
 // What the header tooltips say about each currency: what it is, what it is for and where it comes from.
 export const HEADER_DISPLAYED_RESOURCES_INFO = fromResources(
-	resourceKeys.filter((key) => key !== 'gems' && key !== 'legacy'),
+	resourceKeys.filter((key) => key !== 'gems' && key !== 'embers'),
 	(key) => {
 		const { emoji, label, description, usedFor, source } = RESOURCES[key];
 		return { icon: emoji, label, description, usedFor, source };
 	}
-) as { [K in Exclude<ResourceKey, 'gems' | 'legacy'>]: { icon: string; label: string; description: string; usedFor: string; source: string } };
+) as { [K in Exclude<ResourceKey, 'gems' | 'embers'>]: { icon: string; label: string; description: string; usedFor: string; source: string } };
 
-// The two currencies that are not resources: Legacy (rebirth, lives in the prestige state) and Gems (their own balance)
-export const LEGACY_INFO = {
-	label: RESOURCES.legacy.label,
-	description: RESOURCES.legacy.description,
-	usedFor: RESOURCES.legacy.usedFor,
-	source: RESOURCES.legacy.source,
+// The two currencies that are not resources: Embers (rebirth, lives in the prestige state) and Gems (their own balance)
+export const EMBERS_INFO = {
+	label: RESOURCES.embers.label,
+	description: RESOURCES.embers.description,
+	usedFor: RESOURCES.embers.usedFor,
+	source: RESOURCES.embers.source,
 };
 export const GEMS_INFO = {
 	label: RESOURCES.gems.label,
@@ -527,9 +527,9 @@ export const MERCHANT_UPGRADES = {
 	tithe: {
 		label: 'Ancestral Tithe',
 		group: 'rebirth',
-		description: (n: number) => `+${n * 5}% Legacy points from your next rebirth`,
+		description: (n: number) => `+${n * 5}% Embers from your next rebirth`,
 		maxLevel: 10,
-		effectPerLevel: 0.05, // multiplies the Legacy points of a rebirth (legacyGain); starts again with the rebirth like the rest
+		effectPerLevel: 0.05, // multiplies the Embers of a rebirth (emberGain); starts again with the rebirth like the rest
 		baseCost: 600000,
 		costGrowth: 1.9,
 	},
@@ -918,21 +918,21 @@ export const CHARACTER_STAT_CONFIG = {
 	plainsMeatModifier: 0.05,
 };
 
-// Rebirth: restart with a permanent bonus paid in Legacy points. Available once the castle reaches `minCastleLevel`.
+// Rebirth: restart with a permanent bonus paid in Embers. Available once the castle reaches `minCastleLevel`.
 export const REBIRTH = {
 	minCastleLevel: 6,
 	minTiles: 100, // a rebirth also needs this much territory (the first ~100 tiles come within a day, so it is the castle that gates it)
-	gainScale: 4.5, // Legacy points = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
-	incomePerPoint: 0.05, // +5% of all income per Legacy point ever earned (spending points never lowers it)
+	gainScale: 4.5, // Embers = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
+	incomePerPoint: 0.05, // +5% of all income per Ember ever earned (spending points never lowers it)
 	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile
-	// Legacy points granted for a rebirth with this castle level and territory
+	// Embers granted for a rebirth with this castle level and territory
 	gain: (castleLevel: number, tiles: number) =>
 		Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * Math.sqrt(Math.max(0, tiles) / 10)),
 };
 
-// The Legacy shop: permanent upgrades bought with unspent Legacy points. The N+1-th level costs
+// The Ember shop: permanent upgrades bought with unspent Embers. The N+1-th level costs
 // ceil(baseCost x costGrowth^N) points.
-export const LEGACY_UPGRADES = {
+export const EMBER_UPGRADES = {
 	thrift: {
 		label: 'Thrift',
 		maxLevel: 10,
@@ -978,7 +978,7 @@ export const LEGACY_UPGRADES = {
 	},
 } as const;
 
-export type LegacyUpgradeId = keyof typeof LEGACY_UPGRADES;
+export type EmberUpgradeId = keyof typeof EMBER_UPGRADES;
 
 // Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
 // Purely decorative, except the rare golden one, which can be clicked for a small gift (see claimCritterGift).

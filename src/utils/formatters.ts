@@ -25,6 +25,50 @@ export const formatNumber = (num: number | undefined): string => {
   return num.toFixed(decimalPlaces);
 };
 
+/**
+ * The amount on a header chip. It is built so a ticking counter never changes its width except at a suffix step:
+ * below 1,000 a whole number (no decimals to appear and vanish), from 1,000 three significant digits with a suffix
+ * (1.23K, 12.3K, 123K, 1.23M ...), so it is at most 5 characters up to T and 6 for Qa and beyond.
+ */
+export const formatHeaderAmount = (num: number | undefined): string => {
+  if (num === undefined || num === null || Number.isNaN(num)) return '0';
+  if (!Number.isFinite(num)) return num > 0 ? '∞' : '-∞';
+  const sign = num < 0 ? '-' : '';
+  const abs = Math.abs(num);
+  if (abs < 1000) return `${sign}${Math.floor(abs)}`;
+
+  let tier = Math.floor(Math.log10(abs) / 3);
+  if (tier >= SUFFIXES.length) return `${sign}${abs.toExponential(1).replace('e+', 'e')}`;
+  let text = (abs / Math.pow(1000, tier)).toPrecision(3);
+  if (Number(text) >= 1000) {
+    // 999.96K rounds to "1000": carry into the next suffix instead
+    tier += 1;
+    if (tier >= SUFFIXES.length) return `${sign}${abs.toExponential(1).replace('e+', 'e')}`;
+    text = (abs / Math.pow(1000, tier)).toPrecision(3);
+  }
+  return `${sign}${text}${SUFFIXES[tier]}`;
+};
+
+/**
+ * A production rate in the unit that reads best for how much there is: per second from 1/s, per minute from 1/min,
+ * else per hour. Null when it is too small to mean anything (under 0.01 an hour) or not a number.
+ */
+export const pickRateUnit = (perSecond: number | undefined): { value: number; unit: 's' | 'min' | 'h' } | null => {
+  if (perSecond === undefined || perSecond === null || !Number.isFinite(perSecond)) return null;
+  const abs = Math.abs(perSecond);
+  if (abs >= 1) return { value: perSecond, unit: 's' };
+  if (abs * 60 >= 1) return { value: perSecond * 60, unit: 'min' };
+  if (abs * 3600 >= 0.01) return { value: perSecond * 3600, unit: 'h' };
+  return null;
+};
+
+/** "+1.25/min" for a tooltip: the rate in its best unit, or null when there is no production */
+export const formatRateAuto = (perSecond: number | undefined): string | null => {
+  const rate = pickRateUnit(perSecond);
+  if (!rate) return null;
+  return `${rate.value > 0 ? '+' : ''}${formatNumber(rate.value)}/${rate.unit}`;
+};
+
 /** A percentage in the same short style as the numbers: 450%, 4.93K%, 1.20M% (short from 5,000) */
 export const formatPercent = (pct: number): string => {
   if (!Number.isFinite(pct) || Math.abs(pct) < 5000) return `${Math.round(pct)}%`;

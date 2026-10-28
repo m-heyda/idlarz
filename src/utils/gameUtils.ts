@@ -23,14 +23,14 @@ import {
 	CHARACTER_STAT_CONFIG,
 	INITIAL_CHARACTER_STATS,
 	INITIAL_RESOURCES,
-	LEGACY_UPGRADES,
+	EMBER_UPGRADES,
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_UPGRADES,
 	type MerchantUpgradeId,
 	REBIRTH,
 	TILE_RESOURCE_COST,
-	type LegacyUpgradeId,
+	type EmberUpgradeId,
 } from '@/config/gameConfig';
 import {
 	Animal,
@@ -443,15 +443,15 @@ export interface ResourceBreakdownEntry {
 	castleXp: number;
 	/** start + farm + biome + building + castleArea + castleXp */
 	base: number;
-	/** Percentage bonuses (0.2 = +20%), added together before the legacy multiplier */
+	/** Percentage bonuses (0.2 = +20%), added together before the ember multiplier */
 	castleMod: number;
 	plainsMod: number;
 	statMod: number;
 	/** The rebirth income multiplier (1 = none) */
-	legacyMult: number;
+	emberMult: number;
 	/** The merchant's Foreman multiplier (1 = none; never on XP) */
 	merchantMult: number;
-	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * legacy * merchant - 1 */
+	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * ember multiplier * merchant - 1 */
 	modifier: number;
 	total: number;
 }
@@ -615,14 +615,14 @@ export const calculateResourceBreakdown = (
 		});
 	}
 
-	// Legacy income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
-	const legacyMult = legacyIncomeMultiplier(prestige);
+	// Embers income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
+	const emberMult = emberIncomeMultiplier(prestige);
 	const foreman = merchantIncomeMultiplier(merchantUpgrades);
 
 	const result = {} as ResourceBreakdown;
 	for (const key of RESOURCE_KEYS) {
 		const merchantMult = key === 'xp' ? 1 : foreman;
-		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * legacyMult * merchantMult - 1;
+		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * emberMult * merchantMult - 1;
 		result[key] = {
 			start: start[key],
 			farm: farmPart[key],
@@ -634,7 +634,7 @@ export const calculateResourceBreakdown = (
 			castleMod: castleBonus,
 			plainsMod: plainsMod[key],
 			statMod: statMod[key],
-			legacyMult,
+			emberMult,
 			merchantMult,
 			modifier,
 			total: base[key] * (1 + modifier),
@@ -744,7 +744,7 @@ export const calculateBuildingCost = (
 	tiles: World,
 	prestige?: PrestigeState
 ): Partial<Resources> => {
-	const factor = buildingCostFactor(countBuildings(tiles)) * (1 - legacyEffect(prestige, 'thrift'));
+	const factor = buildingCostFactor(countBuildings(tiles)) * (1 - emberEffect(prestige, 'thrift'));
 	const cost: Partial<Resources> = {};
 	Object.entries(BUILDING_COST.base).forEach(([resource, amount]) => {
 		// finite whatever the building count (1.15^n overflows past ~4,900 buildings)
@@ -773,34 +773,34 @@ export const castleModifier = (level: number): number => {
 
 /** Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`. */
 export const castleUpgradeDuration = (fromLevel: number, prestige?: PrestigeState): number =>
-	Math.floor((CASTLE_UPGRADE.durationsSec[fromLevel - 1] ?? 0) * (1 - legacyEffect(prestige, 'builders')));
+	Math.floor((CASTLE_UPGRADE.durationsSec[fromLevel - 1] ?? 0) * (1 - emberEffect(prestige, 'builders')));
 
 // ---------------------------------------------------------------------------
-// Rebirth / Legacy
+// Rebirth / Embers
 
 export const EMPTY_PRESTIGE: PrestigeState = { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: {} };
 
-export const legacyLevel = (prestige: PrestigeState | undefined, id: LegacyUpgradeId): number =>
+export const emberLevel = (prestige: PrestigeState | undefined, id: EmberUpgradeId): number =>
 	prestige?.upgrades?.[id] ?? 0;
 
 /** Effect of a shop upgrade as a fraction (or, for Provisions, as a number of starting bundles). */
-export const legacyEffect = (prestige: PrestigeState | undefined, id: LegacyUpgradeId): number =>
-	legacyLevel(prestige, id) * LEGACY_UPGRADES[id].effectPerLevel;
+export const emberEffect = (prestige: PrestigeState | undefined, id: EmberUpgradeId): number =>
+	emberLevel(prestige, id) * EMBER_UPGRADES[id].effectPerLevel;
 
-/** Cost in Legacy points of buying the next level of an upgrade, given its current level. */
-export const legacyUpgradeCost = (id: LegacyUpgradeId, currentLevel: number): number =>
-	Math.ceil(LEGACY_UPGRADES[id].baseCost * Math.pow(LEGACY_UPGRADES[id].costGrowth, currentLevel));
+/** Cost in Embers of buying the next level of an upgrade, given its current level. */
+export const emberUpgradeCost = (id: EmberUpgradeId, currentLevel: number): number =>
+	Math.ceil(EMBER_UPGRADES[id].baseCost * Math.pow(EMBER_UPGRADES[id].costGrowth, currentLevel));
 
 /** Points spent on shop levels so far. */
-export const legacySpent = (upgrades: PrestigeState['upgrades']): number => {
+export const emberSpent = (upgrades: PrestigeState['upgrades']): number => {
 	let spent = 0;
-	(Object.keys(LEGACY_UPGRADES) as LegacyUpgradeId[]).forEach((id) => {
-		for (let level = 0; level < (upgrades[id] ?? 0); level++) spent += legacyUpgradeCost(id, level);
+	(Object.keys(EMBER_UPGRADES) as EmberUpgradeId[]).forEach((id) => {
+		for (let level = 0; level < (upgrades[id] ?? 0); level++) spent += emberUpgradeCost(id, level);
 	});
 	return spent;
 };
 
-export const legacyIncomeMultiplier = (prestige: PrestigeState | undefined): number =>
+export const emberIncomeMultiplier = (prestige: PrestigeState | undefined): number =>
 	1 + REBIRTH.incomePerPoint * (prestige?.legacyEarned ?? 0);
 
 /** Percent off tile cost: Charisma plus Thrift, capped. */
@@ -810,7 +810,7 @@ export const effectiveTileDiscount = (
 	merchant?: MerchantUpgrades
 ): number =>
 	Math.min(
-		stats.tileCostDiscount + legacyEffect(prestige, 'thrift') * 100 + merchantEffect(merchant, 'bulk'),
+		stats.tileCostDiscount + emberEffect(prestige, 'thrift') * 100 + merchantEffect(merchant, 'bulk'),
 		REBIRTH.discountCapPercent
 	);
 
@@ -826,7 +826,7 @@ export const merchantEffect = (upgrades: MerchantUpgrades | undefined, id: Merch
 export const merchantUpgradeCost = (id: MerchantUpgradeId, level: number): number =>
 	Math.ceil(MERCHANT_UPGRADES[id].baseCost * Math.pow(MERCHANT_UPGRADES[id].costGrowth, level));
 
-/** What can raise what the merchant pays: the merchant bonuses now, rebirth (Legacy) effects later. A whole game state fits. */
+/** What can raise what the merchant pays: the merchant bonuses now, rebirth (Embers) effects later. A whole game state fits. */
 export interface SellContext {
 	merchantUpgrades?: MerchantUpgrades;
 	prestige?: PrestigeState;
@@ -834,7 +834,7 @@ export interface SellContext {
 
 /**
  * The sources of the sell bonus, each an amount added to 1 (0.03 is +3 %). Every payout for what the player sells (resources,
- * bag gear, junk, auto-sold drops, the previews and the net-worth check) goes through `sellMultiplier`, so a new bonus (a Legacy
+ * bag gear, junk, auto-sold drops, the previews and the net-worth check) goes through `sellMultiplier`, so a new bonus (an Ember
  * effect, a merchant level, an event) is one entry here and applies to all of them alike.
  */
 export const SELL_BONUSES: ((ctx: SellContext) => number)[] = [(ctx) => merchantEffect(ctx.merchantUpgrades, 'haggler')];
@@ -869,13 +869,64 @@ export const merchantCombat = (upgrades: MerchantUpgrades | undefined): CombatBo
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {
 	const out: Resources = { ...INITIAL_RESOURCES };
-	const bundles = legacyEffect(prestige, 'provisions');
-	Object.entries(LEGACY_UPGRADES.provisions.bundle).forEach(([resource, amount]) => {
+	const bundles = emberEffect(prestige, 'provisions');
+	Object.entries(EMBER_UPGRADES.provisions.bundle).forEach(([resource, amount]) => {
 		out[resource as keyof Resources] += (amount || 0) * bundles;
 	});
 	return out;
 };
 
-/** Legacy points a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus. */
-export const legacyGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades): number =>
+/** Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus. */
+export const emberGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades): number =>
 	Math.floor(REBIRTH.gain(castleLevel, tiles) * (1 + merchantEffect(merchant, 'tithe')));
+
+export interface RebirthRequirement {
+	id: 'castle' | 'tiles' | 'idle';
+	label: string;
+	/** What the player has now / needs (for 'idle': 1 when no castle upgrade is running, 0 while one is) */
+	current: number;
+	needed: number;
+	met: boolean;
+}
+
+export interface RebirthStatus {
+	castleLevel: number;
+	/** Purchased tiles + 1: the free starting ring does not count (economyTiles) */
+	ownedTiles: number;
+	/** Embers a rebirth would give right now */
+	gain: number;
+	requirements: RebirthRequirement[];
+	canRebirth: boolean;
+}
+
+/**
+ * Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store's `rebirth`
+ * all read this one function, so what the tooltip promises is what the action checks.
+ */
+export const rebirthStatus = (
+	state: Pick<GameState, 'tiles' | 'freeTiles' | 'castleUpgrade' | 'merchantUpgrades'>
+): RebirthStatus => {
+	const castleTile = getTile(state.tiles, CASTLE_X, CASTLE_Y);
+	const castleLevel = castleTile && castleTile.biome === 'castle' ? castleTile.level ?? 1 : 0; // 0: no castle (lost)
+	const ownedTiles = economyTiles(state.tiles, state.freeTiles);
+	const gain = emberGain(castleLevel, ownedTiles, state.merchantUpgrades);
+	const idle = !state.castleUpgrade;
+	const requirements: RebirthRequirement[] = [
+		{
+			id: 'castle',
+			label: `Castle level ${REBIRTH.minCastleLevel}`,
+			current: castleLevel,
+			needed: REBIRTH.minCastleLevel,
+			met: castleLevel >= REBIRTH.minCastleLevel,
+		},
+		{
+			id: 'tiles',
+			label: `${REBIRTH.minTiles} tiles`,
+			current: ownedTiles,
+			needed: REBIRTH.minTiles,
+			met: ownedTiles >= REBIRTH.minTiles,
+		},
+		{ id: 'idle', label: 'No castle upgrade in progress', current: idle ? 1 : 0, needed: 1, met: idle },
+	];
+	return { castleLevel, ownedTiles, gain, requirements, canRebirth: requirements.every((r) => r.met) && gain >= 1 };
+};

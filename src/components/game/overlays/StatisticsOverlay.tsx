@@ -43,7 +43,7 @@ const BreakdownBody: React.FC<{ entry: ResourceBreakdownEntry }> = ({ entry }) =
 	if (entry.castleMod) bonuses.push(['Castle', `+${pct(entry.castleMod * 100)}`]);
 	if (entry.plainsMod) bonuses.push(['Plains tiles', `+${pct(entry.plainsMod * 100)}`]);
 	if (entry.statMod) bonuses.push(['Attributes', `+${pct(entry.statMod * 100)}`]);
-	if (entry.legacyMult !== 1) bonuses.push(['Rebirth (Legacy)', `x${formatCompact(entry.legacyMult, 2)}`]);
+	if (entry.emberMult !== 1) bonuses.push(['Rebirth (Embers)', `x${formatCompact(entry.emberMult, 2)}`]);
 	if (entry.merchantMult !== 1) bonuses.push(['Foreman (merchant)', `x${formatCompact(entry.merchantMult, 2)}`]);
 
 	return (

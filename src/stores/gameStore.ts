@@ -18,19 +18,18 @@ import {
 	CASTLE_Y,
 	INITIAL_CHARACTER_STATS,
 	FARM_UPGRADES,
-	LEGACY_UPGRADES,
+	EMBER_UPGRADES,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUYABLE,
 	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_SHOP_ITEMS,
 	MERCHANT_UPGRADES,
 	type MerchantUpgradeId,
-	REBIRTH,
 	RESOURCE_CAP,
 	XP_CAP,
 	TILE_TAP,
 	type FarmUpgradeId,
-	type LegacyUpgradeId,
+	type EmberUpgradeId,
 } from '@/config/gameConfig';
 import {
 	affordableAnimals,
@@ -54,9 +53,9 @@ import {
 	farmUpgradeCost,
 	farmUpgradeLevel,
 	STARTER_FREE_TILES,
-	legacyEffect,
-	legacyGain,
-	legacyUpgradeCost,
+	emberEffect,
+	rebirthStatus,
+	emberUpgradeCost,
 	merchantCombat,
 	merchantLevel,
 	reconcileCharacter,
@@ -83,7 +82,7 @@ import { castleLevelOf } from '@/lib/castleWard';
 import { applyOfflineGrant } from '@/lib/offline/apply';
 import { reconcileTickets } from '@/lib/offline/reconcile';
 import type { CombatView, FightEvent } from '@/lib/offline/fightTypes';
-import type { ClaimResult, FightReply, SyncResult } from '@/lib/offline/types';
+import type { ChestReward, ClaimResult, FightReply, SyncResult } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
 import { requestAuto, requestChest, requestDismiss, requestUse, type Reply } from '@/lib/rewardsClient';
 import { signalNeedClaim, signalSyncNow } from '@/lib/serverSession';
@@ -272,20 +271,44 @@ const createGameSlice = (
 
 	const toast = (text: string) => useUiStore.getState().showToast(text);
 
+	// Chest opens and the polls that follow them cross on the way. An answer the server made BEFORE it opened our chest still counts that
+	// chest, and the map would put it back ("missing") a moment after the player opened it. So a chest is only placed from an answer that is
+	// not older than our own opens: none of them is still in flight, and the server's `opened` count (how many chests the run has opened
+	// when it made the answer) has reached the last one we were told about. Taking extra chests off is always fine.
+	let chestOpensInFlight = 0;
+	let lastOwnOpen = { opened: 0, at: 0 };
+	const OWN_OPEN_WINDOW_MS = 15_000; // an older answer than this cannot still be on its way (and a rebirth starts the count again)
+	const chestsMayBePlaced = (tickets: SyncResult['tickets']): boolean => {
+		if (chestOpensInFlight > 0) return false;
+		const recent = Date.now() - lastOwnOpen.at < OWN_OPEN_WINDOW_MS;
+		return !(recent && tickets.opened !== undefined && tickets.opened < lastOwnOpen.opened);
+	};
+
 	/** Opens a chest on the server (one try, one more with the same key if the answer got lost: the server replays it). */
 	const openChestRemote = async (x: number, y: number) => {
 		const key = newClaimId();
-		let reply = await requestChest(key);
-		if (reply.status === 'unavailable') reply = await requestChest(key);
+		chestOpensInFlight++;
+		let reply: Reply<ChestReward>;
+		try {
+			reply = await requestChest(key);
+			if (reply.status === 'unavailable') reply = await requestChest(key);
+		} finally {
+			chestOpensInFlight--;
+		}
 		if (reply.status === 'ok') {
-			if (reply.value.ok) receiveChest(reply.value.loot, reply.value.gemsTotal, reply.value.gems);
-			else toast('The chest crumbled: it was not a real one.');
+			if (reply.value.ok) {
+				lastOwnOpen = { opened: Math.max(lastOwnOpen.opened, reply.value.tickets.opened ?? 0), at: Date.now() };
+				receiveChest(reply.value.loot, reply.value.gemsTotal, reply.value.gems);
+			} else toast('The chest crumbled: it was not a real one.');
 			return;
 		}
 		restoreChest(x, y);
 		if (reply.status === 'need_claim') {
 			signalNeedClaim();
 			toast('Catching up with the server, try again in a moment.');
+		} else if (reply.status === 'no_save') {
+			// the server has no readable save of this player yet (an older save, or the first upload is still on its way)
+			toast('Your progress is still being saved to the server: the chest is still there, try again in a moment.');
 		} else toast('Could not reach the server: the chest is still there.');
 	};
 
@@ -383,7 +406,14 @@ const createGameSlice = (
 	/** The map as the server's tickets say: monsters where it put them, as many chests as it counts. */
 	const reconcileMap = (tickets: SyncResult['tickets'], serverNowSec: number) => {
 		const state = get();
-		const map = reconcileTickets({ tiles: state.tiles, monsters: state.monsters, activeChests: state.activeChests }, tickets, serverNowSec, Math.random, limitCtx(state));
+		const map = reconcileTickets(
+			{ tiles: state.tiles, monsters: state.monsters, activeChests: state.activeChests },
+			tickets,
+			serverNowSec,
+			Math.random,
+			limitCtx(state),
+			{ placeChests: chestsMayBePlaced(tickets) }
+		);
 		set({ tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests });
 		return map;
 	};
@@ -409,20 +439,18 @@ const createGameSlice = (
 
 		resetGame: () => {
 			clickLimiter.reset();
+			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
-		// Rebirth: restart with the Legacy bonus. Keeps name, class, play time, all Legacy and the character (XP, level, attributes).
+		// Rebirth: restart with the Ember bonus. Keeps name, class, play time, all Embers and the character (XP, level, attributes).
 		rebirth: () => {
 			const state = get();
-			const castle = findCastle(state.tiles);
-			if (!castle || (castle.tile.level ?? 1) < REBIRTH.minCastleLevel || state.castleUpgrade) return false;
-			const ownedTiles = economyTiles(state.tiles, state.freeTiles);
-			if (ownedTiles < REBIRTH.minTiles) return false;
-			const gain = legacyGain(castle.tile.level ?? 1, ownedTiles, state.merchantUpgrades);
-			if (gain < 1) return false;
+			const status = rebirthStatus(state);
+			if (!status.canRebirth) return false;
+			const gain = status.gain;
 
 			const prestige: PrestigeState = {
 				...state.prestige,
@@ -431,6 +459,7 @@ const createGameSlice = (
 				legacyEarned: state.prestige.legacyEarned + gain,
 			};
 			clickLimiter.reset();
+			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			const fresh = createInitialData(prestige);
@@ -468,14 +497,14 @@ const createGameSlice = (
 			return true;
 		},
 
-		// Spend Legacy points on a permanent shop upgrade
-		buyLegacyUpgrade: (id: LegacyUpgradeId) => {
+		// Spend Embers on a permanent shop upgrade
+		buyEmberUpgrade: (id: EmberUpgradeId) => {
 			const state = get();
-			const def = LEGACY_UPGRADES[id];
+			const def = EMBER_UPGRADES[id];
 			if (!def) return false;
 			const level = state.prestige.upgrades[id] ?? 0;
 			if (level >= def.maxLevel) return false;
-			const cost = legacyUpgradeCost(id, level);
+			const cost = emberUpgradeCost(id, level);
 			if (state.prestige.legacyPoints < cost) return false;
 			set({
 				prestige: {
@@ -654,7 +683,7 @@ const createGameSlice = (
 			const state = get();
 			const power =
 				(CLICK_LADDER[state.clickLevel]?.power ?? CLICK_LADDER[0].power) *
-				(1 + legacyEffect(state.prestige, 'mastery'));
+				(1 + emberEffect(state.prestige, 'mastery'));
 			const gold = state.resourceRates.total.gold * power;
 			if (!(gold > 0)) return 0;
 			set({

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, setResources, tileAt } from './helpers';
-import { CASTLE_X, CASTLE_Y, CHEST, LEGACY_UPGRADES, LUCK } from '../src/config/gameConfig';
+import { CASTLE_X, CASTLE_Y, CHEST, EMBER_UPGRADES, LUCK } from '../src/config/gameConfig';
 import { COMBAT } from '../src/config/combatConfig';
 import { INITIAL_CHARACTER_STATS } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
@@ -35,16 +35,16 @@ const input = (over: Partial<OfflineInput> = {}): OfflineInput => ({
 	...over,
 });
 
-// ---------------------------------------------------------------------------------------------------- limits and Legacy
+// ---------------------------------------------------------------------------------------------------- limits and Embers
 
-test('away time defaults to 8 h at 50 %, and the Legacy upgrades raise it (never past the hard ceilings)', () => {
+test('away time defaults to 8 h at 50 %, and the Ember upgrades raise it (never past the hard ceilings)', () => {
 	assert.equal(offlineCapHours(), 8);
 	assert.equal(offlineCapSec(), 8 * 3600);
 	assert.equal(offlineEfficiency(), 0.5);
 	assert.equal(offlineMinGapSec(), 300);
-	assert.equal(offlineCapHours({ prestige: prestige({ nightwatch: 4 }) }), 8 + 4 * LEGACY_UPGRADES.nightwatch.effectPerLevel);
-	assert.ok(Math.abs(offlineEfficiency({ prestige: prestige({ steward: 4 }) }) - (0.5 + 4 * LEGACY_UPGRADES.steward.effectPerLevel)) < 1e-9);
-	assert.equal(offlineEfficiency({ prestige: prestige({ steward: LEGACY_UPGRADES.steward.maxLevel }) }), 1, 'fully upgraded the kingdom works at full speed');
+	assert.equal(offlineCapHours({ prestige: prestige({ nightwatch: 4 }) }), 8 + 4 * EMBER_UPGRADES.nightwatch.effectPerLevel);
+	assert.ok(Math.abs(offlineEfficiency({ prestige: prestige({ steward: 4 }) }) - (0.5 + 4 * EMBER_UPGRADES.steward.effectPerLevel)) < 1e-9);
+	assert.equal(offlineEfficiency({ prestige: prestige({ steward: EMBER_UPGRADES.steward.maxLevel }) }), 1, 'fully upgraded the kingdom works at full speed');
 });
 
 test('the Character window lists the offline cap and efficiency, with the rebirth upgrades in them', () => {

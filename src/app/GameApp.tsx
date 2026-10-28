@@ -14,7 +14,7 @@ import FloatingText from '@/components/game/FloatingText';
 import ClassPickerDialog from '@/components/game/ClassPickerDialog';
 import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
 import SettingsDialog from '@/components/game/overlays/SettingsDialog';
-import LegacyDialog from '@/components/game/overlays/LegacyDialog';
+import RebirthDialog from '@/components/game/overlays/RebirthDialog';
 import TutorialDialog from '@/components/game/overlays/TutorialDialog';
 import { useSettingsStore } from '@/stores/settingsStore';
 import TabLockOverlay from '@/components/game/overlays/TabLockOverlay';
@@ -112,7 +112,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<GameDebug />
 			<SaveMenuDialog />
 			<SettingsDialog />
-			<LegacyDialog />
+			<RebirthDialog />
 			<OfflineDialog />
 			<TutorialDialog />
 			<BuildDialog />

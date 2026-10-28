@@ -96,6 +96,17 @@ test('a chest opens against a ticket, pays what the server rolled, and the same 
 	assert.equal(m.ledgers.get('u1')!.bank.chests.length, 1, 'one ticket was spent');
 });
 
+test('every ticket answer says how many chests the run has opened, so the browser can tell an old answer from a new one', async () => {
+	const { m, now } = await playing(25);
+	const before = ok(await syncTickets(m.deps, 'u1', now));
+	assert.equal(before.tickets.opened, 0);
+	const opened = ok(await redeemChest(m.deps, 'u1', 'chest-key-0002', now + 1000));
+	assert.equal(opened.tickets.opened, 1);
+	const after = ok(await syncTickets(m.deps, 'u1', now + 2000));
+	assert.equal(after.tickets.opened, 1);
+	assert.equal(after.tickets.chests, before.tickets.chests - 1);
+});
+
 test('opening more chests than have appeared gives nothing: five clicks in five seconds earn what the clock allows', async () => {
 	const { m, now } = await playing(25); // two chests have appeared
 	let opened = 0;

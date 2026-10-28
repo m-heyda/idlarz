@@ -263,11 +263,11 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			s = api();
 		}
 
-		// Legacy shop: spend points as they come, Master Builders first
+		// Ember shop: spend Embers as they come, Master Builders first
 		for (let guard = 0; guard < 50; guard++) {
 			const order: ('builders' | 'thrift' | 'mastery' | 'provisions')[] = ['builders', 'thrift', 'mastery', 'provisions'];
 			const target = order.find((id) => (s.prestige.upgrades[id] ?? 0) <= (s.prestige.upgrades.builders ?? 0));
-			if (!target || !api().buyLegacyUpgrade(target)) break;
+			if (!target || !api().buyEmberUpgrade(target)) break;
 			s = api();
 		}
 
@@ -572,7 +572,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 				const xpBefore = api().resources.xp;
 				if (api().rebirth()) {
 					milestones[`lvlAtRebirth${run}`] = levelBefore;
-					milestones[`legacy${run}`] = api().prestige.legacyEarned - before;
+					milestones[`embers${run}`] = api().prestige.legacyEarned - before;
 					milestones[`rebirthDay${run}`] = t / 86400;
 					milestones[`xpAtRebirth${run}`] = xpBefore;
 					run++;
@@ -660,13 +660,13 @@ function renderMarkdown(
 	const extraKeys = Array.from(
 		new Set(
 			names.flatMap((n) =>
-				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(legacy[0-9]+|kills.*|rebirth|rebirthDay[0-9]+|lvlAtRebirth[0-9]+|xpAtRebirth[0-9]+|(lvl|xp)@[0-9.]+h|r[0-9]+[.](castle6|tiles100|finished))$/.test(k))
+				Object.keys(results[n]).filter((k) => !ORDER.includes(k) && /^(embers[0-9]+|kills.*|rebirth|rebirthDay[0-9]+|lvlAtRebirth[0-9]+|xpAtRebirth[0-9]+|(lvl|xp)@[0-9.]+h|r[0-9]+[.](castle6|tiles100|finished))$/.test(k))
 			)
 		)
 	).sort((x, y) => x.localeCompare(y, undefined, { numeric: true }));
 	[...ORDER, ...extraKeys].forEach((key) => {
 		if (!names.some((n) => results[n][key] != null) && !ORDER.includes(key)) return;
-		const isCount = /^(legacy|lvl|kills)/.test(key);
+		const isCount = /^(embers|lvl|kills)/.test(key);
 		const isXp = /^xp/.test(key);
 		const cell = (n: string) => {
 			if (isCount) return String(results[n][key] ?? '—');

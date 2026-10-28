@@ -32,7 +32,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   feather/fur breaks, facets. Silhouettes are chunky, never perfect ellipses. 1-3 pieces per resource icon.
 - **People**: big friendly heads with readable eyes (white + pupil, flat brows), hair with streak texture, jointed limbs
   (round-ended rods), one signature prop each. Built from the shared body kit in `sprites_characters.py`; no royalty.
-  The four hero classes (cosmetic for now, picked by double-clicking the character): **Warrior/Human** (steel breastplate,
+  The four hero classes (cosmetic for now, picked with the Change class button of the Equipment tab): **Warrior/Human** (steel breastplate,
   red cape, round shield, sword), **Paladin/Angel** (fanned white wings, halo of gold beads, gold + white plate, mace,
   kite shield), **Ranger/Elf** (green hood, pointed ears, red hair, longbow, quiver), **Mage/Dark Elf** (lavender skin,
   white hair, glowing eyes, pointed purple hood, crystal staff, floating orb). Each also has a 40x40 bust for the header.
@@ -74,7 +74,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   **Rattatui** set icons (`item_rattatui_<piece>`), which are the slot icons re-skinned through `_skin()` in `sprites_monsters.py`
   (steel -> `rat_fur`, gold -> `rat_tan`, cloth -> `rat_pink`, leather -> `rat_fur_dk`, shield face -> `cheese`; the fang blade is bone).
   New materials: `rat_fur`, `rat_fur_dk`, `rat_pink`, `rat_tan`, `cheese`, `glass`.
-- **Character HUD** (`LevelDetails.tsx`): 144x112 stone alcove scene shown at 2x - the hero (class sprite, idle bob, double-click = class picker) standing on the floor under a name plate (double-click = rename),
+- **Character HUD** (`LevelDetails.tsx`): 144x112 stone alcove scene shown at 2x - the hero (class sprite, idle bob) standing on the floor under a name plate (double-click = rename),
   two flickering torches (3-frame strip), HP/MP flasks flanking him, stony XP bar along the floor with a flowing emerald
   fill and 10% ticks, level on the purple orb. Flask scale is an integer (`--s`).
 - **Map terrain** (48px tiles, art 1:1; `terrain_*.py`, drawn by `TerrainLayer` on one canvas - see `reference/map-terrain.png`
@@ -147,16 +147,17 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   a **buy card** (owned/limit, yield, Buy / x10 / Max) above it; unowned = pale silhouette with price tag. A stats readout sits top-left, the upgrade shelf along the bottom (collapsible).
 - **Level-up** (`LevelUpNotification.tsx`): white flash, pixelated god-rays (SVG block filter, 6px grid), orb pop, stepped
   shockwave rings, crimson banner (`banner_left/mid/right`, 3x) with dropping letters, spark burst, points earned.
-- **Header**: one slim row (about 56px with the bronze edge) in the manner of old city-builder bars: player card (40px portrait frame `slot_frame_s`, the purple level orb pinned to its
-  corner like a badge, name, 80px bronze XP bar), then every currency as a bare **pill** (24px icon = the 40px sprite at 0.6 + the amount, nothing else) inside bronze-edged groups
-  (gold | wood stone coal | food meat | eggs milk hide | gems), then three 40px slot buttons (Menu = maroon journal with a gold sigil and purple orb, Legacy, Settings; active glows gold).
-  All detail lives in the hover tooltip: icon, exact amount, what it is, what it is *used for*, where it *comes from*, per second / minute / hour, base rate, modifier and what the merchant pays
-  (texts in `HEADER_DISPLAYED_RESOURCES_INFO` / `GEMS_INFO`). Groups wrap onto a second row when narrow; the real height is published as `--header-h`. Never clip-path a group (it would clip the tooltips). Twinkling coin.
+- **Header**: one compact row (about 48px with the bronze edge) in the manner of old city-builder bars: the hero's avatar (36px portrait frame `slot_frame_s`, the purple level orb at 0.75 pinned to its
+  corner like a badge, the orange `NotifyDot` on its top edge; no name, no XP bar), then every currency as a bare **icon chip** (20px icon = the 40px sprite at 0.5; an optional small amount in fixed-width cells, off by default: the cog menu's *Show resource numbers*)
+  inside bronze-edged groups, one per tier of the resource catalog (currency: gold gems Embers | T0: wood stone coal food meat | T1: eggs milk hide), then two 32px slot buttons (Rebirth = the gold sun
+  `menu_legacy`, greyed out until a rebirth is possible; Settings = steel cog; active glows gold). The Embers currency icon is the green-gem sprite still named `legacy` (renamed in the game, not in the art files).
+  The hover card is one list per group: icon, name, amount and production in the unit that reads best (per second / minute / hour) for every resource of the tier; the long texts stay in the catalog
+  (`RESOURCES`) for the merchant and a later encyclopedia. Groups wrap onto a second row when narrow; the real height is published as `--header-h`. Never clip-path a group (it would clip the tooltips). Twinkling coin.
 - **Backgrounds**: cracked dark stone tile (`bg/crack.png`) for header/modals. Fog drift distance must equal one tile period.
 
 ## UI kit (windows, dialogs, tooltips)
 - **Font**: Mozilla Headline (`@fontsource-variable/mozilla-headline`, CSS var `--font-pixel`); Tailwind text scale is nudged up
-  one notch in `globals.css` (`@theme`). `NotifyDot` (orange pulsing dot) is the universal "needs attention" marker (header buttons and the Menu tabs). Never use sub-12px text.
+  one notch in `globals.css` (`@theme`). `NotifyDot` (orange pulsing dot) is the universal "needs attention" marker (the avatar in the header and the Menu tabs). Never use sub-12px text.
 - **Modal shell** (`PixelModal.tsx`): bronze 9-slice frame over the cracked-stone tile, ornamented title bar, red pixel
   close button hanging off the corner, Esc/backdrop dismiss, backdrop under the header (z-45). Sizes: `sm` 440
   (confirmations), `md` 760 (pickers), `lg` 1080 x full height (Character, Statistics, Merchant, Farm).

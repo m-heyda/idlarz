@@ -7,10 +7,10 @@ import {
 	CASTLE_X,
 	CASTLE_Y,
 	INITIAL_RESOURCES,
-	LEGACY_UPGRADES,
+	EMBER_UPGRADES,
 	REBIRTH,
 	STARTING_GEMS,
-	type LegacyUpgradeId,
+	type EmberUpgradeId,
 } from '../src/config/gameConfig';
 import {
 	calculateBuildingCost,
@@ -18,10 +18,11 @@ import {
 	castleUpgradeDuration,
 	effectiveTileDiscount,
 	calculateLevel,
-	legacyGain,
+	emberGain,
+	rebirthStatus,
 	totalStatPoints,
-	legacySpent,
-	legacyUpgradeCost,
+	emberSpent,
+	emberUpgradeCost,
 } from '../src/utils/gameUtils';
 import { sanitizeSave } from '../src/lib/sanitizeSave';
 import { patchTile } from '../src/utils/world';
@@ -54,9 +55,36 @@ test('rebirth needs the castle at the minimum level and no upgrade running', () 
 	assert.equal(api().rebirth(), true);
 });
 
+test('rebirthStatus lists what is missing, and agrees with what rebirth() does', () => {
+	freshGame();
+	let status = rebirthStatus(api());
+	assert.equal(status.canRebirth, false);
+	assert.deepEqual(status.requirements.map((r) => [r.id, r.met]), [['castle', false], ['tiles', false], ['idle', true]]);
+	assert.equal(status.requirements[0].needed, REBIRTH.minCastleLevel);
+	assert.equal(status.requirements[1].needed, REBIRTH.minTiles);
+
+	growTo(REBIRTH.minTiles);
+	status = rebirthStatus(api());
+	assert.deepEqual(status.requirements.map((r) => r.met), [false, true, true]);
+	assert.equal(status.requirements[1].current, status.ownedTiles);
+
+	setCastleLevel(REBIRTH.minCastleLevel);
+	store.setState({ castleUpgrade: { toLevel: REBIRTH.minCastleLevel + 1, remainingSec: 100 } });
+	status = rebirthStatus(api());
+	assert.deepEqual(status.requirements.map((r) => r.met), [true, true, false]);
+	assert.equal(status.canRebirth, false);
+
+	store.setState({ castleUpgrade: null });
+	status = rebirthStatus(api());
+	assert.equal(status.canRebirth, true);
+	assert.equal(status.gain, emberGain(REBIRTH.minCastleLevel, status.ownedTiles));
+	assert.ok(status.gain >= 1);
+	assert.equal(api().rebirth(), true);
+});
+
 test('rebirth grants points by the formula, resets the run and keeps the identity', () => {
 	readyToRebirth(8, REBIRTH.minTiles + 5);
-	const expected = legacyGain(8, owned());
+	const expected = emberGain(8, owned());
 	assert.ok(expected >= 1);
 	store.setState({ playerName: 'Hero', playerClass: 'mage', playSeconds: 12345 });
 	setResources({ gold: 777 });
@@ -86,7 +114,7 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 	assert.equal(s.playerName, 'Hero');
 	assert.equal(s.playerClass, 'mage');
 	assert.equal(s.playSeconds, 12345);
-	// every resource's modifier now includes the Legacy income bonus
+	// every resource's modifier now includes the Embers income bonus
 	const base = 1 + CASTLE_UPGRADE.baseResourceMultiplier + 0.025 * 10; // castle 1 + int/cha gold
 	assert.ok(Math.abs(1 + s.resourceRates.modifiers.gold - base * (1 + REBIRTH.incomePerPoint * expected)) < 1e-9);
 	// and the game can be played on
@@ -95,9 +123,9 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 });
 
 test('gains grow with the castle level and the territory, and a tiny run earns nothing', () => {
-	assert.ok(legacyGain(10, 50) > legacyGain(6, 50));
-	assert.ok(legacyGain(6, 80) > legacyGain(6, 20));
-	assert.equal(legacyGain(5, 100), 0);
+	assert.ok(emberGain(10, 50) > emberGain(6, 50));
+	assert.ok(emberGain(6, 80) > emberGain(6, 20));
+	assert.equal(emberGain(5, 100), 0);
 	freshGame();
 	setCastleLevel(REBIRTH.minCastleLevel);
 	assert.equal(api().rebirth(), false); // 1 tile
@@ -109,19 +137,19 @@ test('gains grow with the castle level and the territory, and a tiny run earns n
 
 test('the shop: cost curve, max level, not enough points, validated ids', () => {
 	freshGame();
-	assert.equal(api().buyLegacyUpgrade('thrift'), false);
+	assert.equal(api().buyEmberUpgrade('thrift'), false);
 	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 1000, legacyEarned: 1000 } }));
-	assert.equal(api().buyLegacyUpgrade('nonsense' as LegacyUpgradeId), false);
-	for (const id of Object.keys(LEGACY_UPGRADES) as LegacyUpgradeId[]) {
+	assert.equal(api().buyEmberUpgrade('nonsense' as EmberUpgradeId), false);
+	for (const id of Object.keys(EMBER_UPGRADES) as EmberUpgradeId[]) {
 		const before = api().prestige.legacyPoints;
-		assert.equal(api().buyLegacyUpgrade(id), true);
-		assert.equal(before - api().prestige.legacyPoints, legacyUpgradeCost(id, 0));
+		assert.equal(api().buyEmberUpgrade(id), true);
+		assert.equal(before - api().prestige.legacyPoints, emberUpgradeCost(id, 0));
 	}
-	for (let i = 0; i < 20; i++) api().buyLegacyUpgrade('thrift');
-	assert.equal(api().prestige.upgrades.thrift, LEGACY_UPGRADES.thrift.maxLevel);
+	for (let i = 0; i < 20; i++) api().buyEmberUpgrade('thrift');
+	assert.equal(api().prestige.upgrades.thrift, EMBER_UPGRADES.thrift.maxLevel);
 	// points are conserved
-	assert.equal(api().prestige.legacyPoints + legacySpent(api().prestige.upgrades), api().prestige.legacyEarned);
-	assert.ok(legacyUpgradeCost('thrift', 5) > legacyUpgradeCost('thrift', 0));
+	assert.equal(api().prestige.legacyPoints + emberSpent(api().prestige.upgrades), api().prestige.legacyEarned);
+	assert.ok(emberUpgradeCost('thrift', 5) > emberUpgradeCost('thrift', 0));
 });
 
 test('shop effects: thrift, master builders, click mastery, provisions', () => {
@@ -135,28 +163,28 @@ test('shop effects: thrift, master builders, click mastery, provisions', () => {
 	const clickBefore = api().clickForGold({ eventId: 1, now: 0, trusted: true });
 
 	for (let i = 0; i < 3; i++) {
-		api().buyLegacyUpgrade('thrift');
-		api().buyLegacyUpgrade('builders');
-		api().buyLegacyUpgrade('mastery');
-		api().buyLegacyUpgrade('provisions');
+		api().buyEmberUpgrade('thrift');
+		api().buyEmberUpgrade('builders');
+		api().buyEmberUpgrade('mastery');
+		api().buyEmberUpgrade('provisions');
 	}
 	const p = api().prestige;
 	assert.ok(calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, p)).gold < tileBefore);
 	assert.ok(calculateBuildingCost(api().tiles, p).gold! < buildingBefore);
 	assert.ok(castleUpgradeDuration(1, p) < durationBefore);
 	assert.ok(
-		Math.abs(castleUpgradeDuration(1, p) - Math.floor(durationBefore * (1 - 3 * LEGACY_UPGRADES.builders.effectPerLevel))) <= 1
+		Math.abs(castleUpgradeDuration(1, p) - Math.floor(durationBefore * (1 - 3 * EMBER_UPGRADES.builders.effectPerLevel))) <= 1
 	);
 	setResources({ gold: 0 });
 	const clickAfter = api().clickForGold({ eventId: 2, now: 10_000, trusted: true });
-	assert.ok(Math.abs(clickAfter / clickBefore - (1 + 3 * LEGACY_UPGRADES.mastery.effectPerLevel)) < 0.05);
+	assert.ok(Math.abs(clickAfter / clickBefore - (1 + 3 * EMBER_UPGRADES.mastery.effectPerLevel)) < 0.05);
 	assert.ok(CLICK_LADDER[0].power > 0);
 
 	// provisions arrive with the next run
 	setCastleLevel(REBIRTH.minCastleLevel);
 	assert.equal(api().rebirth(), true);
-	assert.equal(api().resources.gold, INITIAL_RESOURCES.gold + 3 * LEGACY_UPGRADES.provisions.bundle.gold!);
-	assert.equal(api().resources.wood, 3 * LEGACY_UPGRADES.provisions.bundle.wood!);
+	assert.equal(api().resources.gold, INITIAL_RESOURCES.gold + 3 * EMBER_UPGRADES.provisions.bundle.gold!);
+	assert.equal(api().resources.wood, 3 * EMBER_UPGRADES.provisions.bundle.wood!);
 });
 
 test('thrift together with charisma can never discount more than the cap', () => {
@@ -168,7 +196,7 @@ test('thrift together with charisma can never discount more than the cap', () =>
 	assert.equal(effectiveTileDiscount(api().characterStats, api().prestige), REBIRTH.discountCapPercent);
 });
 
-test('a full reset (not a rebirth) wipes the Legacy too', () => {
+test('a full reset (not a rebirth) wipes the Embers too', () => {
 	readyToRebirth(7, REBIRTH.minTiles + 5);
 	assert.equal(api().rebirth(), true);
 	assert.ok(api().prestige.legacyEarned > 0);
@@ -176,11 +204,11 @@ test('a full reset (not a rebirth) wipes the Legacy too', () => {
 	assert.deepEqual(api().prestige, { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: {} });
 });
 
-test('saves: prestige survives validation, forged Legacy is rejected', () => {
+test('saves: prestige survives validation, forged Embers is rejected', () => {
 	readyToRebirth(9, REBIRTH.minTiles + 10);
 	assert.equal(api().rebirth(), true);
-	api().buyLegacyUpgrade('builders');
-	api().buyLegacyUpgrade('thrift');
+	api().buyEmberUpgrade('builders');
+	api().buyEmberUpgrade('thrift');
 	assert.equal(sanitizeSave(snapshot()).ok, true);
 
 	const rejects = (mutate: (raw: any) => void, label: string) => { // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -199,7 +227,7 @@ test('saves: prestige survives validation, forged Legacy is rejected', () => {
 	rejects((r) => (r.prestige.legacyPoints = 1.5), 'fractional points');
 	rejects((r) => (r.prestige = 'lots'), 'not an object');
 
-	// a save from before Legacy existed is still fine
+	// a save from before Embers existed is still fine
 	const old = snapshot();
 	delete old.prestige;
 	old.tiles = freshGame() && rawSnapshot().tiles;
@@ -210,14 +238,14 @@ test('saves: prestige survives validation, forged Legacy is rejected', () => {
 
 // ---- Gems: the premium currency --------------------------------------------------------------------------------
 
-test('Gems: a new game starts with the starting purse, a rebirth keeps the balance, Legacy stays separate', () => {
+test('Gems: a new game starts with the starting purse, a rebirth keeps the balance, Embers stays separate', () => {
 	readyToRebirth();
 	assert.equal(api().gems, STARTING_GEMS);
 	store.setState({ gems: 1234 });
 	setResources({ gold: 0 });
 	assert.equal(api().rebirth(), true);
 	assert.equal(api().gems, 1234, 'gems are not wiped by a rebirth');
-	assert.ok(api().prestige.legacyPoints > 0, 'the rebirth currency is Legacy, a different balance');
+	assert.ok(api().prestige.legacyPoints > 0, 'the rebirth currency is Embers, a different balance');
 });
 
 test('Gems in saves: a save without them gets the starting purse, a saved balance is kept, junk is refused', () => {

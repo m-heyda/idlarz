@@ -27,8 +27,9 @@ export type { ClaimResult, PublicTickets };
 export const UNCLAIMED_SEC = 900;
 
 /** The tickets as the browser may see them: a monster shows once the server has given it a tile. */
-export const publicTickets = (bank: TicketBank): PublicTickets => ({
+export const publicTickets = (bank: TicketBank, opened?: number): PublicTickets => ({
 	chests: bank.chests.length,
+	...(opened === undefined ? {} : { opened }),
 	rats: bank.rats.filter(isPlaced).map(({ n, at, lucky, x, y, spawnLevel }) => ({ n, at, lucky, x: x!, y: y!, spawnLevel: spawnLevel! })),
 	king: bank.king && isPlaced(bank.king) ? { n: bank.king.n, at: bank.king.at, x: bank.king.x!, y: bank.king.y!, spawnLevel: bank.king.spawnLevel! } : null,
 });
@@ -143,7 +144,7 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 		const result: ClaimResult = {
 			grant,
 			reason: flagged ? 'flagged' : grant ? 'paid' : 'short',
-			tickets: publicTickets(bank),
+			tickets: publicTickets(bank, ledger.ordChest),
 			serverNowSec: nowSec,
 			gems: ledger.gems,
 		};

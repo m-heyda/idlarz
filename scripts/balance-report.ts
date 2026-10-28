@@ -25,9 +25,9 @@ import {
 	MERCHANT_SHOP_ITEMS,
 	MERCHANT_UPGRADES,
 	type MerchantUpgradeId,
-	LEGACY_UPGRADES,
+	EMBER_UPGRADES,
 	REBIRTH,
-	type LegacyUpgradeId,
+	type EmberUpgradeId,
 	INITIAL_CHARACTER_STATS,
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
@@ -50,8 +50,8 @@ import {
 	createInitialWorld,
 	farmUpgradeCost,
 	merchantUpgradeCost,
-	legacyGain,
-	legacyUpgradeCost,
+	emberGain,
+	emberUpgradeCost,
 	cumulativeXp,
 	xpToNextLevel,
 } from '../src/utils/gameUtils';
@@ -342,10 +342,10 @@ table(
 );
 
 // ---------------------------------------------------------------------------
-line('## 9. Rebirth and Legacy');
+line('## 9. Rebirth and Embers');
 line();
 line(
-	`Rebirth needs castle level ≥ ${REBIRTH.minCastleLevel} and ≥ ${REBIRTH.minTiles} tiles. Legacy points = \`floor(${REBIRTH.gainScale} × (castle − 5) × sqrt(tiles / 10))\`; ` +
+	`Rebirth needs castle level ≥ ${REBIRTH.minCastleLevel} and ≥ ${REBIRTH.minTiles} tiles. Embers = \`floor(${REBIRTH.gainScale} × (castle − 5) × sqrt(tiles / 10))\`; ` +
 		`each point earned is +${REBIRTH.incomePerPoint * 100}% income for ever.`
 );
 line();
@@ -353,20 +353,20 @@ line();
 	const tilesList = [20, 30, 40, 50, 60, 80];
 	table(
 		['castle level', ...tilesList.map((n) => `${n} tiles`)],
-		[6, 7, 8, 9, 10].map((c) => [c, ...tilesList.map((n) => legacyGain(c, n))])
+		[6, 7, 8, 9, 10].map((c) => [c, ...tilesList.map((n) => emberGain(c, n))])
 	);
-	const ids = Object.keys(LEGACY_UPGRADES) as LegacyUpgradeId[];
+	const ids = Object.keys(EMBER_UPGRADES) as EmberUpgradeId[];
 	line('Shop (cost in points of the next level, by current level):');
 	line();
 	table(
 		['upgrade', 'effect per level', 'max', ...[0, 1, 2, 3, 5, 9].map((l) => `cost at level ${l}`)],
 		ids.map((id) => [
-			LEGACY_UPGRADES[id].label,
+			EMBER_UPGRADES[id].label,
 			id === 'provisions'
-				? Object.entries(LEGACY_UPGRADES.provisions.bundle).map(([r, v]) => `${fmt(v as number)} ${r}`).join(' + ')
-				: `${LEGACY_UPGRADES[id].effectPerLevel * 100}%`,
-			LEGACY_UPGRADES[id].maxLevel,
-			...[0, 1, 2, 3, 5, 9].map((l) => legacyUpgradeCost(id, l)),
+				? Object.entries(EMBER_UPGRADES.provisions.bundle).map(([r, v]) => `${fmt(v as number)} ${r}`).join(' + ')
+				: `${EMBER_UPGRADES[id].effectPerLevel * 100}%`,
+			EMBER_UPGRADES[id].maxLevel,
+			...[0, 1, 2, 3, 5, 9].map((l) => emberUpgradeCost(id, l)),
 		])
 	);
 }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COMBAT } from '../src/config/combatConfig';
-import { INITIAL_CHARACTER_STATS, LEGACY_UPGRADES } from '../src/config/gameConfig';
+import { INITIAL_CHARACTER_STATS, EMBER_UPGRADES } from '../src/config/gameConfig';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { aggregateStats } from '../src/lib/inventory';
 import { plainItem } from '../src/lib/itemInstance';
@@ -48,7 +48,7 @@ test('luck adds the merchant charm and the gear; the tile discount adds the rebi
 	const base = effectiveStats({ characterStats: stats, equipment: STARTER_EQUIPMENT });
 	const boosted = effectiveStats({ characterStats: stats, equipment: STARTER_EQUIPMENT, merchantUpgrades: { charm: 3, bulk: 4 }, prestige: prestige({ thrift: 5, mastery: 2, builders: 3 }) });
 	assert.equal(boosted.luck - base.luck, 6, 'three Lucky Charm levels are +6 Luck');
-	assert.equal(boosted.tileDiscount - base.tileDiscount, 4 + 5 * LEGACY_UPGRADES.thrift.effectPerLevel * 100);
-	assert.equal(boosted.clickMastery, 2 * LEGACY_UPGRADES.mastery.effectPerLevel * 100);
-	assert.equal(boosted.buildTimeReduction, 3 * LEGACY_UPGRADES.builders.effectPerLevel * 100);
+	assert.equal(boosted.tileDiscount - base.tileDiscount, 4 + 5 * EMBER_UPGRADES.thrift.effectPerLevel * 100);
+	assert.equal(boosted.clickMastery, 2 * EMBER_UPGRADES.mastery.effectPerLevel * 100);
+	assert.equal(boosted.buildTimeReduction, 3 * EMBER_UPGRADES.builders.effectPerLevel * 100);
 });

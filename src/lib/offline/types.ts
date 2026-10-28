@@ -16,6 +16,11 @@ export interface PublicMonster {
 
 export interface PublicTickets {
 	chests: number;
+	/**
+	 * How many chests this run has opened, as the server counted when it made this answer. The browser uses it to tell an answer that
+	 * was made before one of its own chest opens (it still counts that chest) from one made after it. Left out by older servers.
+	 */
+	opened?: number;
 	rats: (PublicMonster & { lucky: boolean })[];
 	king: PublicMonster | null;
 }

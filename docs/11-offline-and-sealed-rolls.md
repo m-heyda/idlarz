@@ -1,8 +1,8 @@
 # 11 · Offline progress, sealed rolls, Luck and gems
 
-For a **signed-in** player the server now decides three things the browser used to decide alone: how long the player was away and what that was worth, which chests and monsters have appeared (and what is in them), and how many gems the player holds. A guest (no account) plays exactly as before: local rules, no offline progress, no gems.
+For a **signed-in** player the server now decides three things the browser used to decide alone: how long the player was away and what that was worth, which chests and monsters have appeared (and what is in them), and how many gems the player holds. There is no guest mode any more (the game needs an account, [12](12-roadmap-features-and-bugs.md)), so these rules apply to every player.
 
-There is no scheduled job and nothing runs while nobody is playing. Everything is computed **lazily on a request**, from timestamps, so the free Supabase tier is enough (about 10 tiny calls an hour of play, one small row per player).
+There is no scheduled job and nothing runs while nobody is playing. Everything is computed **lazily on a request**, from timestamps, so the free Supabase tier is enough for idle play (about 10 tiny calls an hour). **That figure does not hold during an open fight**: the browser then polls `/api/spawn` / `/api/fight` every 2 s (8 s when minimised), and each request does an auth check, two reads and a ledger write, see [12 §3b](12-roadmap-features-and-bugs.md#3b-server-authority-and-free-tier-notes).
 
 ## What the server guarantees (and what it cannot)
 
@@ -28,10 +28,11 @@ login ── GameApp waits for ──> POST /api/offline {claimId}        (useOf
                                         tickets become monsters/chests on the map, welcome-back window (OfflineDialog)
 playing ── useSpawnSync ───────> POST /api/spawn      ask again when the next ticket is due (answer says when), on tab focus
            collectChest ───────> POST /api/chest {key}   reward is sealed and returned; the chest leaves the map at once, comes back if the server was unreachable
-           hitMonster (kill) ──> POST /api/kill {key,n,level}  loot is rolled against the monster's ticket; the monster stays until the server answers
-           dismissMonster ─────> POST /api/kill {dismiss:true} gives the ticket back
+           fights (auto or by hand) ──> POST /api/fight {sync | use | auto | dismiss}  the server runs the whole fight (HP, hits, potions, rewards) and rolls the loot against the monster's ticket; dismiss gives the ticket back
 upload  ── POST /api/save ─────> verifier knows the grants; gems replaced by the ledger balance; a rebirth or new game starts a new run (tickets cleared)
 ```
+
+**Chest counts and the poll race.** Every ticket answer carries `tickets.opened`, the number of chests the run has opened when the server made it. The browser places a missing chest on the map only from an answer that is not older than its own opens (none in flight, and `opened` at least the count the server returned for the player's last open; the guard lasts 15 s and starts again with every run). Without it a poll answered just before the server opened a chest still counted that chest, and while a fight is open (a poll every 2 s) the map put it back a moment after the player opened it. Extra chests on the map are always taken off. A chest that could not be opened because the server has no readable save yet (`404`, for example an account whose save predates the ledger, until its next upload) stays on the map with a message saying so.
 
 If the server says `409 needClaim` (the player was away more than 15 minutes since it last saw them, for instance a laptop that slept with the tab open) the client runs the claim first and then carries on.
 
@@ -41,14 +42,14 @@ If the server says `409 needClaim` (the player was away more than 15 minutes sin
 - `player_saves.derived` (jsonb): the castle upgrade and the rates after it, Luck and Gold Find, monster and chest counts, the away-time cap and efficiency. Written by the server from the sanitised save; rows from before the migration have none until their next upload (their first claim answers "no save yet").
 - RLS is on; everything is revoked from `anon`/`authenticated`; an owner may `select (user_id, gems)` of their own row and nothing else; the server writes with the service role. There is no SQL logic: the compare-and-swap and all maths live in TypeScript, which is unit-tested against an in-memory repo.
 
-Environment: `LOOT_SECRET` (server only, 16+ characters). Without it `/api/offline` and the reward routes answer 503 `not_configured` and the game falls back to local spawns (as for a guest).
+Environment: `LOOT_SECRET` (server only, 16+ characters). Without it `/api/offline` and the reward routes answer 503 `not_configured` and the game cannot spawn anything (there is no local fallback any more; the client shows the retry screen).
 
 ## Offline numbers (`src/config/limits.ts`, read with `limitOf`)
 
 | Limit | Base | Raised by |
 |---|---|---|
-| `offlineCapHours` | 8 | Legacy **Night Watch**: +1 h per level (max 10), hard ceiling 72 |
-| `offlineEfficiency` | 50 % | Legacy **Steward**: +5 % per level (max 10), hard ceiling 100 % |
+| `offlineCapHours` | 8 | Ember **Night Watch**: +1 h per level (max 10), hard ceiling 72 |
+| `offlineEfficiency` | 50 % | Ember **Steward**: +5 % per level (max 10), hard ceiling 100 % |
 | `offlineMinGapSec` | 300 | shorter absences pay nothing and show no window |
 
 Income, XP and the arrival of chests/monsters use the efficiency; **castle builds and monster growth run at full speed** for the whole (capped) absence. Both rows are listed in the Character window under *Bonuses* (*Offline progress*), next to the Luck effects. A claim moves the anchor to "now", so claiming again pays nothing.

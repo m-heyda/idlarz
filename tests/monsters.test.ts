@@ -126,7 +126,7 @@ test('growthSecondsLeft counts down to the next level and is null at the growth 
 test('the growth limit is a config value that upgrades can raise: every reader follows', () => {
 	assert.equal(limitOf('monsterGrowthLevels'), 10);
 	const original = LIMIT_BONUSES.monsterGrowthLevels;
-	LIMIT_BONUSES.monsterGrowthLevels = () => 5; // a future Legacy effect
+	LIMIT_BONUSES.monsterGrowthLevels = () => 5; // a future Ember effect
 	try {
 		assert.equal(maxLevelOf(4), 19);
 		assert.equal(levelAtAge(4, 99 * STEP), 19);

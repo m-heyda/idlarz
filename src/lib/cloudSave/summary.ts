@@ -44,7 +44,7 @@ export interface SaveDerived {
 	goldFind: number;
 	/** Chests standing on the map: the ledger is seeded from them the first time it is created (monsters are the ledger's own) */
 	chests: number;
-	/** What the Legacy upgrades made of the away-time cap (seconds) and efficiency (0-1) */
+	/** What the Ember upgrades made of the away-time cap (seconds) and efficiency (0-1) */
 	offlineCapSec: number;
 	offlineEfficiency: number;
 	/** Tiles bought, as the XP formula counts them (castle + purchases): the XP the purchases can explain is worked out from it (absent in older rows) */

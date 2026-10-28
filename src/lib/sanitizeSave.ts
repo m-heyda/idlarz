@@ -17,11 +17,11 @@ import {
 	LEGACY_GRID_SIZE,
 	INITIAL_CHARACTER_STATS,
 	INITIAL_RESOURCES,
-	LEGACY_UPGRADES,
+	EMBER_UPGRADES,
 	RESOURCE_CAP,
 	XP_CAP,
 	type FarmUpgradeId,
-	type LegacyUpgradeId,
+	type EmberUpgradeId,
 	type MerchantUpgradeId,
 } from '@/config/gameConfig';
 import { COMBAT } from '@/config/combatConfig';
@@ -37,7 +37,7 @@ import {
 	calculateXpGain,
 	castleUpgradeDuration,
 	EMPTY_PRESTIGE,
-	legacySpent,
+	emberSpent,
 	STARTER_FREE_TILES,
 } from '@/utils/gameUtils';
 import { RING } from '@/utils/biomeRules';
@@ -471,7 +471,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		castleUpgrade = { toLevel, remainingSec: remaining };
 	}
 
-	// ---- Rebirth / Legacy (optional so saves from before it existed stay valid) -----------------------------
+	// ---- Rebirth / Embers (optional so saves from before it existed stay valid) -----------------------------
 	let prestige: PrestigeState = { ...EMPTY_PRESTIGE, upgrades: {} };
 	if (raw.prestige !== undefined) {
 		if (!isObject(raw.prestige)) return fail('prestige');
@@ -482,15 +482,15 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		const upgrades: PrestigeState['upgrades'] = {};
 		if (!isObject(raw.prestige.upgrades)) return fail('prestige upgrades');
 		for (const [id, lvl] of Object.entries(raw.prestige.upgrades)) {
-			if (!(id in LEGACY_UPGRADES)) return fail('unknown legacy upgrade');
-			const level = int(lvl, 0, LEGACY_UPGRADES[id as LegacyUpgradeId].maxLevel);
-			if (level === null) return fail('legacy upgrade level');
-			if (level > 0) upgrades[id as LegacyUpgradeId] = level;
+			if (!(id in EMBER_UPGRADES)) return fail('unknown ember upgrade');
+			const level = int(lvl, 0, EMBER_UPGRADES[id as EmberUpgradeId].maxLevel);
+			if (level === null) return fail('ember upgrade level');
+			if (level > 0) upgrades[id as EmberUpgradeId] = level;
 		}
 		// Points are conserved: everything earned is either still unspent or paid for shop levels
-		if (legacyPoints + legacySpent(upgrades) !== legacyEarned) return fail('legacy points do not add up');
-		if ((rebirths === 0) !== (legacyEarned === 0)) return fail('rebirths and legacy disagree');
-		if (legacyEarned < rebirths) return fail('too few legacy points for the rebirths');
+		if (legacyPoints + emberSpent(upgrades) !== legacyEarned) return fail('embers do not add up');
+		if ((rebirths === 0) !== (legacyEarned === 0)) return fail('rebirths and embers disagree');
+		if (legacyEarned < rebirths) return fail('too few embers for the rebirths');
 		prestige = { rebirths, legacyPoints, legacyEarned, upgrades };
 	}
 

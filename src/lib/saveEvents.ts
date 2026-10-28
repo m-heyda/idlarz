@@ -7,7 +7,7 @@ export type SaveEventReason =
 	| 'upgradeCastle'
 	| 'castleUpgraded'
 	| 'rebirth'
-	| 'buyLegacyUpgrade'
+	| 'buyEmberUpgrade'
 	| 'purchaseAnimal'
 	| 'buyFarmUpgrade'
 	| 'addStatPoint'
@@ -40,7 +40,7 @@ export const SAVE_EVENT_ACTIONS = [
 	'buildOnTile',
 	'upgradeCastle',
 	'rebirth',
-	'buyLegacyUpgrade',
+	'buyEmberUpgrade',
 	'purchaseAnimal',
 	'buyFarmUpgrade',
 	'addStatPoint',

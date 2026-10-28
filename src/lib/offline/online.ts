@@ -69,7 +69,7 @@ export const syncTickets = (deps: ServiceDeps, userId: string, nowMs: number, si
 		const { ledger, view } = withCombat(ctx, since);
 		return {
 			ledger,
-			value: { tickets: publicTickets(ledger.bank), serverNowSec: ctx.nowSec, gemsTotal: ledger.gems, nextInSec: secondsToNext(ledger.bank, bankContext(ctx.stored)), combat: view },
+			value: { tickets: publicTickets(ledger.bank, ledger.ordChest), serverNowSec: ctx.nowSec, gemsTotal: ledger.gems, nextInSec: secondsToNext(ledger.bank, bankContext(ctx.stored)), combat: view },
 		};
 	});
 
@@ -78,7 +78,7 @@ export const redeemChest = (deps: ServiceDeps, userId: string, key: string, nowM
 	onlineStep(deps, userId, key, nowMs, ({ ledger, stored, bank, nowSec }): { ledger: Ledger; value: ChestReward } => {
 		const taken = takeChest(bank);
 		if (!taken) {
-			return { ledger: { ...ledger, bank }, value: { ok: false, reason: 'no_ticket', tickets: publicTickets(bank), serverNowSec: nowSec, gemsTotal: ledger.gems } };
+			return { ledger: { ...ledger, bank }, value: { ok: false, reason: 'no_ticket', tickets: publicTickets(bank, ledger.ordChest), serverNowSec: nowSec, gemsTotal: ledger.gems } };
 		}
 		const { luck, goldFind } = stored.summary.derived;
 		const ordChest = ledger.ordChest + 1;
@@ -93,7 +93,7 @@ export const redeemChest = (deps: ServiceDeps, userId: string, key: string, nowM
 		else if (loot.kind === 'bundle') for (const item of loot.items) granted[item.resource] = (granted[item.resource] ?? 0) + item.amount;
 		else if (loot.kind === 'xp') granted.xp = loot.xp;
 		const next: Ledger = { ...ledger, bank: taken.bank, ordChest, gems: Math.min(GEMS_CAP, ledger.gems + gems), granted: addTotals(ledger.granted, granted) };
-		return { ledger: next, value: { ok: true, loot, gems, gemsTotal: next.gems, tickets: publicTickets(taken.bank), serverNowSec: nowSec } };
+		return { ledger: next, value: { ok: true, loot, gems, gemsTotal: next.gems, tickets: publicTickets(taken.bank, ordChest), serverNowSec: nowSec } };
 	});
 
 export type FightRequest =
@@ -112,7 +112,7 @@ export const fightStep = (deps: ServiceDeps, userId: string, key: string | null,
 	onlineStep(deps, userId, key, nowMs, (ctx): Promise<{ ledger: Ledger; value: FightReply }> | { ledger: Ledger; value: FightReply } => {
 		const reply = (ledger: Ledger, view: FightReply['combat'], accepted: boolean): { ledger: Ledger; value: FightReply } => ({
 			ledger,
-			value: { combat: view, tickets: publicTickets(ledger.bank), serverNowSec: ctx.nowSec, gemsTotal: ledger.gems, accepted },
+			value: { combat: view, tickets: publicTickets(ledger.bank, ledger.ordChest), serverNowSec: ctx.nowSec, gemsTotal: ledger.gems, accepted },
 		});
 		if (request.action === 'dismiss') {
 			const ran = runCombat(ctx.ledger, ctx.env, { ack: request.since });

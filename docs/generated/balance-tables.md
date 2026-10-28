@@ -316,12 +316,12 @@ Derived stats for the starting stats (all 5):
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |
-| gold | 0.1 | 0.1 | 2.395 | 45.0% | 3.473 |
-| wood | 0 | 0.05 | 1.538 | 45.0% | 2.229 |
+| gold | 0.1 | 0.1 | 2.590 | 45.0% | 3.756 |
+| wood | 0 | 0.05 | 0.075 | 45.0% | 0.109 |
 | stone | 0 | 0.1 | 0.150 | 32.5% | 0.199 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
-| food | 0 | 0.05 | 5.048 | 45.0% | 7.319 |
-| meat | 0 | 0 | 0.000 | 50.0% | 0.000 |
+| food | 0 | 0.05 | 7.095 | 45.0% | 10.288 |
+| meat | 0 | 0 | 0.000 | 60.0% | 0.000 |
 | eggs | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |
@@ -364,16 +364,16 @@ Derived stats for the starting stats (all 5):
 | Arcana | +2% damage with staves and wands | 8 | 250.00K | 32.00M |
 | Vampiric Fang | +0.5% life leech: HP back from the damage you deal | 6 | 300.00K | 9.60M |
 | Second Wind | +0.25 HP regenerated per second | 6 | 300.00K | 9.60M |
-| Ancestral Tithe | +5% Legacy points from your next rebirth | 10 | 600.00K | 193.61M |
+| Ancestral Tithe | +5% Embers from your next rebirth | 10 | 600.00K | 193.61M |
 
 | Item | rarity | sells for | shop price | shop / sell |
 | --- | --- | --- | --- | --- |
 | Minor Healing Potion | common | 20 | 80.00 | 4.0x |
 | Greater Healing Potion | uncommon | 90 | 360 | 4.0x |
 
-## 9. Rebirth and Legacy
+## 9. Rebirth and Embers
 
-Rebirth needs castle level ≥ 6 and ≥ 100 tiles. Legacy points = `floor(4.5 × (castle − 5) × sqrt(tiles / 10))`; each point earned is +5% income for ever.
+Rebirth needs castle level ≥ 6 and ≥ 100 tiles. Embers = `floor(4.5 × (castle − 5) × sqrt(tiles / 10))`; each point earned is +5% income for ever.
 
 | castle level | 20 tiles | 30 tiles | 40 tiles | 50 tiles | 60 tiles | 80 tiles |
 | --- | --- | --- | --- | --- | --- | --- |

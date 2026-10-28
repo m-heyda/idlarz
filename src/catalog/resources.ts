@@ -4,7 +4,21 @@
  * fallbacks all read this one table (gameConfig.ts derives its old RESOURCE_ICONS / HEADER_* / MERCHANT_* views from it).
  * Rates, costs and prices-per-level stay in gameConfig.ts: those are balance numbers, not catalog data.
  */
+/**
+ * The header shows one boxed group per tier, left to right. A new tier is one entry here plus its resources' `tier`.
+ * currency: gold, gems and Embers. t0: the base materials the land produces. t1: the farm products.
+ */
+export type ResourceTier = 'currency' | 't0' | 't1';
+
+export const RESOURCE_TIERS: readonly { id: ResourceTier; label: string }[] = [
+	{ id: 'currency', label: 'Currency' },
+	{ id: 't0', label: 'Base materials' },
+	{ id: 't1', label: 'T1 materials' },
+];
+
 export interface ResourceDef {
+	/** Header group; left out for things the header never lists (xp) */
+	tier?: ResourceTier;
 	/** Fallback glyph while a pixel icon is missing (the pixel art itself is registered in config/pixelIcons.ts) */
 	emoji: string;
 	label: string;
@@ -19,6 +33,7 @@ export interface ResourceDef {
 
 export const RESOURCES = {
 	gold: {
+		tier: 'currency',
 		emoji: '💰',
 		label: 'Gold',
 		description: 'The coin of the realm.',
@@ -31,6 +46,7 @@ export const RESOURCES = {
 	// level keeps the early total sell value where it was (wood .75, stone .9, coal 1.1, food .4; they were .5 / .5 / 1 / .75).
 	// Buying costs MERCHANT_BUY_MULTIPLIER x the price. Meat and the farm products are priced against what their animals cost.
 	wood: {
+		tier: 't0',
 		emoji: '🪓',
 		label: 'Wood',
 		description: 'Basic construction material.',
@@ -40,6 +56,7 @@ export const RESOURCES = {
 		merchant: { price: 0.75, description: 'A basic construction material, available in forests.', pitch: 'Common but always in demand.' },
 	},
 	stone: {
+		tier: 't0',
 		emoji: '🧱',
 		label: 'Stone',
 		description: 'Durable building material.',
@@ -49,6 +66,7 @@ export const RESOURCES = {
 		merchant: { price: 0.9, description: 'Durable and versatile building material from quarries.', pitch: 'Premium quality building material.' },
 	},
 	coal: {
+		tier: 't0',
 		emoji: '⚫',
 		label: 'Coal',
 		description: 'Fuel for heavy industry.',
@@ -58,6 +76,7 @@ export const RESOURCES = {
 		merchant: { price: 1.1, description: 'Valuable fuel source used for advanced applications.', pitch: 'Highly sought after for its energy properties.' },
 	},
 	food: {
+		tier: 't0',
 		emoji: '🌾',
 		label: 'Food',
 		description: 'Sustains your people and your animals.',
@@ -67,6 +86,7 @@ export const RESOURCES = {
 		merchant: { price: 0.4, description: 'Sustains population and enables growth.', pitch: 'Plentiful but essential for survival.' },
 	},
 	meat: {
+		tier: 't0',
 		emoji: '🥩',
 		label: 'Meat',
 		description: 'Produced by farm animals.',
@@ -77,6 +97,7 @@ export const RESOURCES = {
 	},
 	// farm products sell for more than the meat they come with
 	eggs: {
+		tier: 't1',
 		emoji: '🥚',
 		label: 'Eggs',
 		description: 'A farm product laid by chickens.',
@@ -86,6 +107,7 @@ export const RESOURCES = {
 		merchant: { price: 2, description: 'Fresh from the coop.', pitch: 'Bakers pay well for fresh eggs.' },
 	},
 	milk: {
+		tier: 't1',
 		emoji: '🥛',
 		label: 'Milk',
 		description: 'A farm product from cows.',
@@ -95,6 +117,7 @@ export const RESOURCES = {
 		merchant: { price: 3, description: 'Creamy and cold from the dairy.', pitch: 'A town favourite at breakfast.' },
 	},
 	hide: {
+		tier: 't1',
 		emoji: '🟫',
 		label: 'Hide',
 		description: 'A farm product from deer and pigs.',
@@ -111,23 +134,25 @@ export const RESOURCES = {
 		source: 'The castle, buying tiles and your stats.',
 		color: '#c4a0ff',
 	},
-	// The rebirth currency (not in Resources: it lives in the prestige state)
-	legacy: {
-		emoji: '🔮',
-		label: 'Legacy',
-		description: 'The rebirth currency.',
-		usedFor: 'Permanent upgrades in the Legacy window; they survive every rebirth.',
-		source: 'Rebirthing from castle level 6: the higher your castle and income, the more you get.',
-		color: '#6ae88a',
-	},
 	// The premium currency (not in Resources: it is its own gems balance in the game state)
 	gems: {
+		tier: 'currency',
 		emoji: '💎',
 		label: 'Gems',
 		description: 'Rare gems. Everyone starts with a purse of them.',
 		usedFor: 'Upgrades (coming soon). They are never lost by a rebirth.',
 		source: 'Your starting purse; more ways to earn them are coming.',
 		color: '#7fd8ff',
+	},
+	// The rebirth currency (not in Resources: it lives in the prestige state, saved as prestige.legacyPoints / legacyEarned)
+	embers: {
+		tier: 'currency',
+		emoji: '🔮',
+		label: 'Embers',
+		description: 'The rebirth currency: what a rebirth leaves behind.',
+		usedFor: 'Permanent upgrades in the Ember shop; they survive every rebirth, and every Ember adds to your income.',
+		source: 'Rebirthing from castle level 6: the higher your castle and land, the more you get.',
+		color: '#6ae88a',
 	},
 } as const satisfies Record<string, ResourceDef>;
 
@@ -137,3 +162,7 @@ export type ResourceKey = keyof typeof RESOURCES;
 export type MerchantResourceKey = {
 	[K in ResourceKey]: (typeof RESOURCES)[K] extends { merchant: object } ? K : never;
 }[ResourceKey];
+
+/** The resources of one tier, in catalog order (the header lists them left to right) */
+export const resourcesInTier = (tier: ResourceTier): ResourceKey[] =>
+	(Object.keys(RESOURCES) as ResourceKey[]).filter((key) => (RESOURCES[key] as ResourceDef).tier === tier);

@@ -29,9 +29,17 @@ export interface ReconcileResult {
 /**
  * - every monster the server lists stands where the server says, at the level its age has earned (the monster's id is its ticket number);
  * - a monster the server does not list (killed, dismissed, never real) is removed;
- * - chests: as many as the server counts (extra ones are taken off, missing ones are placed).
+ * - chests: as many as the server counts (extra ones are taken off, missing ones are placed unless the answer may be older than a chest the player opened).
  */
-export const reconcileTickets = (state: ReconcileInput, tickets: PublicTickets, serverNowSec: number, rng: Rng, limits: LimitContext = {}): ReconcileResult => {
+export const reconcileTickets = (
+	state: ReconcileInput,
+	tickets: PublicTickets,
+	serverNowSec: number,
+	rng: Rng,
+	limits: LimitContext = {},
+	/** `placeChests: false` still takes extra chests off but puts no missing one back: for an answer that may be older than a chest the player just opened */
+	options: { placeChests?: boolean } = {}
+): ReconcileResult => {
 	const standing = new Set(state.monsters.map((mon) => mon.ticket));
 	const waiting = [
 		...tickets.rats.map((t) => ({ ...t, type: 'rat' as const, lucky: t.lucky })),
@@ -65,7 +73,7 @@ export const reconcileTickets = (state: ReconcileInput, tickets: PublicTickets, 
 			removedChests++;
 		}
 	}
-	while (activeChests < tickets.chests) {
+	while (options.placeChests !== false && activeChests < tickets.chests) {
 		const spot = pickChestSpot(tiles, new Set(monsters.map((m) => `${m.x},${m.y}`)), castleLevelOf(tiles), rng);
 		if (!spot) break;
 		tiles = patchTile(tiles, spot.x, spot.y, { hasChest: true });
