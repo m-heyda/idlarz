@@ -60,6 +60,7 @@ src/
 │   ├── saveFormat.ts         the save text (IDLZ2.<base64 JSON>.<check>): compact body, `SAVE_SCHEMA` + `MIGRATIONS`, encode/decode
 │   ├── saveStorage.ts, storageScope.ts   localStorage storage: sync flush on close, backup + damaged copy, `.dev` key suffix on localhost, persist(), import/reset
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS
+│   ├── repairSave.ts         lenient read of the game's own copies: adjusts a value a moved rule refuses, then re-checks
 │   ├── groundsMigration, levelsMigration, monstersMigration, legacyGear   one migration module per old save schema (frozen fixtures in tests/fixtures/saves guard them)
 │   ├── fightSim.ts           a bot that fights with the real engine (scripts/fight-sim.ts, tests/fightBalance.test.ts)
 │   └── castleWard, castleFinder, mapView, minimap, terrainRenderer, tipPlacement, ambientLife, floatText, inventoryDrag, globalMenu, uiPrefs, clipboard

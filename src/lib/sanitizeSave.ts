@@ -115,7 +115,7 @@ const isObject = (v: unknown): v is Record<string, unknown> =>
 	typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /** A saved piece of gear, rebuilt field by field (nothing else survives), or the reason it is not valid. */
-const readInstance = (value: unknown): ItemInstance | string => {
+export const readInstance = (value: unknown): ItemInstance | string => {
 	if (!isObject(value)) return 'not an item';
 	for (const key of Object.keys(value)) if (!INSTANCE_KEYS.has(key)) return 'unknown field';
 	if (typeof value.base !== 'string' || typeof value.rarity !== 'string' || !Array.isArray(value.affixes)) return 'malformed';
@@ -142,7 +142,7 @@ export const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitalit
 const RESOURCE_KEYS = Object.keys(INITIAL_RESOURCES) as (keyof Resources)[];
 const OPTIONAL_RESOURCES = new Set<keyof Resources>(['eggs', 'milk', 'hide']);
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
-const MAX_ANIMALS = 5000;
+export const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);

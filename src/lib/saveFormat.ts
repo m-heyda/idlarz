@@ -3,6 +3,7 @@ import { convertLevelsBody } from '@/lib/levelsMigration';
 import { convertGroundsBody } from '@/lib/groundsMigration';
 import { LEGACY_GEAR } from '@/lib/legacyGear';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
+import { sanitizeSaveLenient, type LenientResult } from '@/lib/repairSave';
 import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/utils/world';
 
 /**
@@ -301,7 +302,7 @@ export const encodeSave = (state: PersistedGame, now: number = Date.now()): stri
 	sealWire({ v: SAVE_SCHEMA, t: now, s: packBody(state) });
 
 export type DecodeResult =
-	| { ok: true; state: PersistedGame; savedAt: number | null; schema: number }
+	| { ok: true; state: PersistedGame; savedAt: number | null; schema: number; /** Lenient reads only: the refusals that were adjusted away to load the save */ repaired?: string[] }
 	| { ok: false; reason: string };
 
 const bad = (reason: string): DecodeResult => ({ ok: false, reason });
@@ -310,7 +311,19 @@ const bad = (reason: string): DecodeResult => ({ ok: false, reason });
 export const decodeSave = (
 	text: string,
 	/** Tests run a different schema / migration table; the game always uses the defaults. */
-	{ schema: current = SAVE_SCHEMA, migrations = MIGRATIONS }: { schema?: number; migrations?: Record<number, Migration> } = {}
+	{
+		schema: current = SAVE_SCHEMA,
+		migrations = MIGRATIONS,
+		lenient = false,
+	}: {
+		schema?: number;
+		migrations?: Record<number, Migration>;
+		/**
+		 * For the game's own copies (browser storage, the account's save): a value the rules of today no longer allow is adjusted instead of
+		 * refusing the whole save (src/lib/repairSave.ts). The server and imports read strictly, which is the default.
+		 */
+		lenient?: boolean;
+	} = {}
 ): DecodeResult => {
 	// Pasting often adds line breaks, spaces or quotes around the text
 	const clean = text.replace(/\s+/g, '').replace(/^["'`]+|["'`]+$/g, '');
@@ -345,12 +358,13 @@ export const decodeSave = (
 	const unpacked = unpackBody(body);
 	if ('error' in unpacked) return bad(`The save contains impossible data (${unpacked.error}).`);
 
-	const result = sanitizeSave(unpacked.raw);
+	const result: LenientResult = lenient ? sanitizeSaveLenient(unpacked.raw) : sanitizeSave(unpacked.raw);
 	if (!result.ok) return bad(`The save contains impossible data (${result.reason}).`);
 	return {
 		ok: true,
 		state: result.state,
 		savedAt: typeof wire.t === 'number' && Number.isFinite(wire.t) ? wire.t : null,
 		schema,
+		...(result.repaired?.length ? { repaired: result.repaired } : {}),
 	};
 };

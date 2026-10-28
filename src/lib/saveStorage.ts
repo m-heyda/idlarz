@@ -29,6 +29,11 @@ const BARELY_PLAYED_SEC = 300;
 const FLUSH_DELAY_MS = 2000;
 const ROTATE_EVERY_MS = 10 * 60 * 1000;
 
+/** The game's own copies are read leniently: a value the rules no longer allow is adjusted, not a reason to lose the game (repairSave.ts). */
+const readOwn = (text: string): DecodeResult => decodeSave(text, { lenient: true });
+
+const ADJUSTED = 'Your save held values this version of the game no longer allows, so they were adjusted. The original text was kept; you can copy it from the save dialog.';
+
 export interface KeyValue {
 	get(key: string): string | null;
 	/** Throws when the browser refuses (quota, blocked). */
@@ -136,10 +141,11 @@ export const createSaveStorage = (options: Options) => {
 	const loadGame = async (): Promise<PersistedGame | null> => {
 		const current = load(KEY_CURRENT);
 		if (current) {
-			const result = decodeSave(current);
+			const result = readOwn(current);
 			if (result.ok) {
 				savedAt = result.savedAt;
 				lastRotation = 0; // the first write of this session keeps this save as the backup
+				if (result.repaired) markDamaged(current, ADJUSTED); // the game goes on from the adjusted state; the text it came from is not lost
 				return result.state;
 			}
 			markDamaged(current, result.reason);
@@ -147,11 +153,12 @@ export const createSaveStorage = (options: Options) => {
 
 		const backup = load(KEY_BACKUP);
 		if (backup) {
-			const result = decodeSave(backup);
+			const result = readOwn(backup);
 			if (result.ok) {
 				savedAt = result.savedAt;
 				lastRotation = now(); // `current` is unusable: do not rotate it over this good backup
 				if (current) loadProblem = 'Your latest save could not be read, so the previous backup was loaded.';
+				else if (result.repaired) markDamaged(backup, ADJUSTED);
 				return result.state;
 			}
 			if (!current) markDamaged(backup, result.reason);
@@ -247,11 +254,11 @@ export const createSaveStorage = (options: Options) => {
 		const backup = load(KEY_BACKUP);
 		if (!current && !backup) return { kind: 'none' };
 		if (current) {
-			const result = decodeSave(current);
+			const result = readOwn(current);
 			if (result.ok) return { kind: 'ok', state: result.state, savedAt: result.savedAt, fromBackup: false };
 		}
 		if (backup) {
-			const result = decodeSave(backup);
+			const result = readOwn(backup);
 			if (result.ok) return { kind: 'ok', state: result.state, savedAt: result.savedAt, fromBackup: true };
 		}
 		return { kind: 'unreadable' };
@@ -264,7 +271,7 @@ export const createSaveStorage = (options: Options) => {
 	const archiveForNewGame = (): boolean => {
 		const text = load(KEY_CURRENT) ?? load(KEY_BACKUP);
 		if (!text) return true;
-		const result = decodeSave(text);
+		const result = readOwn(text);
 		if (result.ok && result.state.playSeconds < BARELY_PLAYED_SEC && load(KEY_PREVIOUS_GAME)) return true;
 		return store(KEY_PREVIOUS_GAME, text) && load(KEY_PREVIOUS_GAME) === text;
 	};
@@ -274,13 +281,14 @@ export const createSaveStorage = (options: Options) => {
 	 * The game that was here is copied aside first; false (nothing changed) when that copy, the text or the write fails.
 	 */
 	const install = (text: string): boolean => {
-		const decoded = decodeSave(text);
+		const decoded = readOwn(text);
 		if (!decoded.ok || !archiveForNewGame()) return false;
 		const previous = load(KEY_CURRENT);
 		if (previous) store(KEY_BACKUP, previous);
 		const written = encodeSave(decoded.state, now());
 		if (!store(KEY_CURRENT, written) || !decodeSave(load(KEY_CURRENT) ?? '').ok) return false;
 		drop(KEY_DAMAGED);
+		if (decoded.repaired) markDamaged(text, ADJUSTED); // the account's text as it was, next to the adjusted game now stored
 		return true;
 	};
 
