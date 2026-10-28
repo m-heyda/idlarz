@@ -13,6 +13,7 @@ The save is split by how it is used, not stored as one blob:
 | `profiles` | 1 / account | at registration | character name, hero (owner-only RLS) |
 | `player_saves` | 1 / account | **every accepted save** (small, ~1 KB core) | `core` (bag, gear, upgrades, monsters, timers: everything but the map), `world_hash`, and typed columns derived by the **server**: `play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, gold_per_min`, plus `rev`, `schema`, `server_saved_at`, `flags`, `audit_ratio`, `fresh_start`, `ever_flagged`, `last_archive_at` |
 | `player_worlds` | 1 / account | **only when the map changed** (a purchase), by `hash` | `land` (runs), `extra`, `tiles`. ~98 % of a save's bytes; a 55,000-tile map is 63 KB of JSON (27 KB stored) |
+| `player_ledger` | 1 / account | only on claim, spawn sync, chest, kill and a rebirth / new game | the server's own record: away-time anchor, spawn tickets, reward counters, lifetime grants, the gem balance ([11](11-offline-and-sealed-rolls.md)) |
 | `player_stats` | 1 / account | with every save | narrow leaderboard row: `display_name` (from `profiles`, never from the save), `level, tiles_owned, castle_level, rebirths, legacy_earned, gold_per_min, play_seconds, trusted`. Public read, **trusted rows only**, never any game state. Partial indexes per ranking |
 | `save_history` | sparse | first save, one copy per 30 min of the clock (`last_archive_at`), the first save with a new flag; pinned when a game is replaced by a much younger one (New Game) | full body for rollback. 6 newest + 3 pinned per player |
 
@@ -81,7 +82,6 @@ Each browser remembers which account and revision its save continues (`idlarz.cl
 nothing anywhere = new game; this browser continues the account = Continue; new browser = the account save; both exist and differ = choose
 (the one not chosen is copied aside: local to `idlarz.save.previous-game`, cloud stays in `save_history`). If the account cannot be reached the local save just plays on.
 
-## Offline progress (next step, not built)
+## Offline progress (built)
 
-On load the server can return `min(now - server_saved_at, cap) x rates` (cap ~8 h at 50 %, see 08 C7), applied only when the client's `rev`
-equals the stored `rev` so the same offline time cannot be claimed from two browsers. Everything it needs (`rates`, `server_saved_at`, `rev`) is already a column.
+See [11-offline-and-sealed-rolls.md](11-offline-and-sealed-rolls.md). On login `POST /api/offline` pays `min(gap, cap) x efficiency x rates` from the last accepted save and the server clock, and the save verifier now allows what the server granted (`player_ledger.granted`). The ledger also holds the gem balance, which a save can no longer raise.

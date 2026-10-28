@@ -12,6 +12,7 @@ import {
 import { castleLevelOf } from '@/lib/castleWard';
 import type { PersistedGame } from '@/lib/sanitizeSave';
 import type { Resources } from '@/types/game';
+import type { GrantTotals } from '@/lib/offline/ledger';
 import type { SaveSummary } from './summary';
 
 /**
@@ -78,10 +79,19 @@ export interface NetWorthCheck {
 	exceeds: boolean;
 }
 
-export const checkNetWorth = (state: PersistedGame, summary: SaveSummary): NetWorthCheck => {
+/** Gold-equivalent worth of everything the server ever granted this account (the sellable resources at merchant prices). */
+export const grantedValue = (granted: GrantTotals, state: PersistedGame): number => {
+	let value = granted.gold;
+	for (const [key, price] of Object.entries(MERCHANT_RESOURCE_PRICES) as [keyof Resources, number][]) {
+		value += sellPayout(price, granted[key] ?? 0, state);
+	}
+	return value;
+};
+
+export const checkNetWorth = (state: PersistedGame, summary: SaveSummary, granted?: GrantTotals): NetWorthCheck => {
 	const required = state.resources.gold + stockValue(state.resources, state) + minimumSpend(state);
 	const perSec = incomePerSec(summary, state);
-	const allowed = perSec * summary.playSeconds * NETWORTH.slack + perSec * NETWORTH.burstSec + NETWORTH.floor;
+	const allowed = perSec * summary.playSeconds * NETWORTH.slack + perSec * NETWORTH.burstSec + NETWORTH.floor + (granted ? grantedValue(granted, state) : 0);
 	const ratio = allowed > 0 ? required / allowed : Infinity;
 	return { required, allowed, ratio, exceeds: ratio > 1 };
 };

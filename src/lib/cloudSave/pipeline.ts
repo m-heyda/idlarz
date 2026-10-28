@@ -1,4 +1,7 @@
 import { createHash } from 'node:crypto';
+import { STARTING_GEMS } from '@/config/gameConfig';
+import { emptyBank } from '@/lib/offline/tickets';
+import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
 import { checkNetWorth } from './netWorth';
 import { summarize, type SaveSummary } from './summary';
@@ -65,7 +68,7 @@ export interface SaveRepo {
 }
 
 export type SaveOutcome =
-	| { kind: 'ok'; rev: number; serverSavedAt: number; flags: SaveFlag[] }
+	| { kind: 'ok'; rev: number; serverSavedAt: number; flags: SaveFlag[]; /** The authoritative gem balance (the ledger's), when there is one */ gems?: number }
 	| { kind: 'conflict'; rev: number; serverSavedAt: number }
 	| { kind: 'invalid'; reason: string }
 	| { kind: 'too_soon'; retryAfterMs: number };
@@ -101,6 +104,8 @@ export const acceptSave = async (
 	nowMs: number,
 	/** True when this server is not production (see environment.ts). The route decides; nothing from the request is involved. */
 	nonProduction = false,
+	/** The server's own record of the player (gems, spawn tickets, what it granted). Without it saves are checked as before; a ledger that cannot be read never blocks a save. */
+	ledgers: LedgerRepo | null = null,
 ): Promise<SaveOutcome> => {
 	const decoded = decodeSave(text);
 	if (!decoded.ok) return { kind: 'invalid', reason: decoded.reason };
@@ -115,9 +120,26 @@ export const acceptSave = async (
 
 	const summary = summarize(state);
 	const previous: Snapshot | null = current ? { summary: current.summary, serverSavedAt: current.serverSavedAt } : null;
-	const flags = verifyTransition(previous, summary, nowMs);
-	const worth = checkNetWorth(state, summary);
+
+	// The ledger knows what the server itself granted since the last save (income while away, chest and kill rewards), so a save may
+	// contain that on top of its income, and it holds the real gem balance: whatever the save claims is checked against it, then replaced.
+	let ledger: Ledger | null = null;
+	let ledgerUsable = false;
+	if (ledgers) {
+		try {
+			ledger = await ledgers.load(userId);
+			ledgerUsable = true;
+		} catch {
+			ledgerUsable = false;
+		}
+	}
+	const gemsClaimed = summary.gems;
+	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
+	const flags = verifyTransition(previous, summary, nowMs, grants);
+	if (ledger && gemsClaimed > ledger.gems) flags.push('gems_increase');
+	const worth = checkNetWorth(state, summary, ledger?.granted);
 	if (worth.exceeds) flags.push('networth_exceeds');
+	const newRun = !!(ledger && current && (summary.rebirths > current.summary.rebirths || flags.includes('playtime_regress')));
 
 	// Starting over (New Game) must not push the old game out of the history: pin the save that is about to be replaced
 	if (current && flags.includes('playtime_regress')) {
@@ -125,7 +147,12 @@ export const acceptSave = async (
 		if (old?.world && old.rev === current.rev) await repo.pin(userId, old, PINNED_KEEP);
 	}
 
-	const { core, world } = splitBody(packBody(state), summary.tilesOwned);
+	// The gem balance is the server's: a save can never raise it (a new ledger starts at the save's gems, but never above the starting gift)
+	const gems = ledgerUsable ? (ledger ? ledger.gems : Math.max(0, Math.min(summary.gems, STARTING_GEMS))) : summary.gems;
+	summary.gems = gems;
+	const split = splitBody(packBody(state), summary.tilesOwned);
+	const core = ledgerUsable ? { ...split.core, gems } : split.core;
+	const world = split.world;
 	// A test account's findings are still recorded (they show the checks working) but never count against it, and it is never ranked
 	const testAccount = (current?.testAccount ?? false) || nonProduction;
 	const everFlagged = !testAccount && ((current?.everFlagged ?? false) || flags.some((flag) => POISON_FLAGS.has(flag)));
@@ -158,5 +185,21 @@ export const acceptSave = async (
 	}
 
 	if (archive) await repo.archive(userId, { ...save, world }, HISTORY_KEEP);
-	return { kind: 'ok', rev: save.rev, serverSavedAt: nowMs, flags };
+
+	if (ledgers && ledgerUsable) {
+		try {
+			if (!ledger) {
+				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1 });
+			} else if (newRun) {
+				// a rebirth or a new game: the map and its monsters start over, so do the tickets, and rolls start again from ordinal 1 in a new run
+				const next: Ledger = { ...ledger, ver: ledger.ver + 1, runId: ledger.runId + 1, rebirths: summary.rebirths, anchorAt: nowMs, bank: emptyBank(nowMs / 1000), ordChest: 0, ordKill: 0, grantedSeen: ledger.granted, lastKey: null, lastResult: null };
+				await ledgers.commit(userId, ledger.ver, next);
+			} else if (grants && Object.values(grants).some((amount) => amount > 0)) {
+				await ledgers.commit(userId, ledger.ver, { ...ledger, ver: ledger.ver + 1, grantedSeen: ledger.granted });
+			}
+		} catch {
+			// the save is stored; the next one brings the ledger up to date
+		}
+	}
+	return { kind: 'ok', rev: save.rev, serverSavedAt: nowMs, flags, gems: ledgerUsable ? gems : undefined };
 };

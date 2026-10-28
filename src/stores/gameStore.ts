@@ -82,6 +82,13 @@ import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSl
 import { plainItem, sellValueOf } from '@/lib/itemInstance';
 import { castleLevelOf, monstersOutsideWard } from '@/lib/castleWard';
 import { canSpawn } from '@/lib/spawnLimits';
+import { applyOfflineGrant } from '@/lib/offline/apply';
+import { reconcileTickets } from '@/lib/offline/reconcile';
+import type { ClaimResult, SyncResult } from '@/lib/offline/types';
+import { newClaimId } from '@/lib/offlineClient';
+import { requestChest, requestKill } from '@/lib/rewardsClient';
+import { signalNeedClaim } from '@/lib/serverSession';
+import { useUiStore } from '@/stores/uiStore';
 import { isAutoSold, receiveDrops, rollKillLoot } from '@/lib/loot';
 import { advanceMonsters, bossThreshold, monsterAt, newMonster, nextBossType, pickSpawnTile, spawnThreshold } from '@/lib/monsters';
 import { COMBAT } from '@/config/combatConfig';
@@ -228,6 +235,85 @@ const createGameSlice = (
 			},
 		});
 		return true;
+	};
+
+	/** Puts what a chest held into the game: resources, XP, an item (through the auto-sell filter and the full-bag rule), and the server's gem balance when it gave one. */
+	const receiveChest = (loot: ChestLoot, gemsTotal?: number, gemsFound = 0) => {
+		const state = get();
+		const resources = { ...state.resources };
+		let bag = state.bag;
+		if (loot.kind === 'gold' || loot.kind === 'boost') resources.gold += loot.gold;
+		else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
+		else if (loot.kind === 'xp') resources.xp = Math.min(resources.xp + loot.xp, XP_CAP);
+		else {
+			const received = receiveDrops(bag, [loot.drop], state.autoSellUpTo, state);
+			bag = received.bag;
+			resources.gold = Math.min(resources.gold + received.autoSold.gold, RESOURCE_CAP);
+		}
+		set({ resources, bag, ...(gemsTotal !== undefined ? { gems: gemsTotal } : {}), lastChestLoot: gemsFound > 0 ? { ...loot, gems: gemsFound } : loot });
+	};
+
+	/** Puts a chest back on its tile (the server could not be reached, so nothing was opened). */
+	const restoreChest = (x: number, y: number) => {
+		const state = get();
+		const tile = getTile(state.tiles, x, y);
+		if (!tile || tile.hasChest) return;
+		set({ tiles: setTile(state.tiles, x, y, { ...tile, hasChest: true }), activeChests: state.activeChests + 1 });
+	};
+
+	const toast = (text: string) => useUiStore.getState().showToast(text);
+
+	/** Opens a chest on the server (one try, one more with the same key if the answer got lost: the server replays it). */
+	const openChestRemote = async (x: number, y: number) => {
+		const key = newClaimId();
+		let reply = await requestChest(key);
+		if (reply.status === 'unavailable') reply = await requestChest(key);
+		if (reply.status === 'ok') {
+			if (reply.value.ok) receiveChest(reply.value.loot, reply.value.gemsTotal, reply.value.gems);
+			else toast('The chest crumbled: it was not a real one.');
+			return;
+		}
+		restoreChest(x, y);
+		if (reply.status === 'need_claim') {
+			signalNeedClaim();
+			toast('Catching up with the server, try again in a moment.');
+		} else toast('Could not reach the server: the chest is still there.');
+	};
+
+	/** Settles a won fight on the server: the loot is rolled there, against the monster's ticket. Until it answers the monster stays on the map. */
+	const settleKill = async (monsterId: number, level: number, ticket: number | undefined) => {
+		const abandon = (text: string) => {
+			set((state) => (state.fight?.monsterId === monsterId ? { fight: null } : {}));
+			toast(text);
+		};
+		if (ticket === undefined) return abandon('This monster was not real: no loot.');
+		const key = newClaimId();
+		let reply = await requestKill(key, ticket, level);
+		if (reply.status === 'unavailable') reply = await requestKill(key, ticket, level);
+		if (reply.status !== 'ok') {
+			if (reply.status === 'need_claim') signalNeedClaim();
+			return abandon('Could not reach the server: the monster is still there.');
+		}
+		const reward = reply.value;
+		if (!reward.ok || reward.dismissed) {
+			set((state) => ({ monsters: state.monsters.filter((m) => m.id !== monsterId) }));
+			return abandon('This monster was not real: no loot.');
+		}
+		const state = get();
+		const received = receiveDrops(state.bag, reward.items, state.autoSellUpTo, state);
+		const summary = { gold: reward.gold, xp: reward.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold, lucky: reward.lucky };
+		set({
+			fight: state.fight?.monsterId === monsterId ? { ...state.fight, phase: 'won', summary } : state.fight,
+			monsters: state.monsters.filter((m) => m.id !== monsterId),
+			bag: received.bag,
+			lootPity: reward.pity,
+			gems: reward.gemsTotal,
+			resources: {
+				...state.resources,
+				gold: Math.min(state.resources.gold + reward.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP),
+				xp: Math.min(state.resources.xp + reward.xp, XP_CAP),
+			},
+		});
 	};
 
 	const slice = {
@@ -455,6 +541,15 @@ const createGameSlice = (
 			const tile = getTile(state.tiles, x, y);
 			if (!tile || !tile.hasChest) return false;
 
+			const newTiles = setTile(state.tiles, x, y, { ...tile, hasChest: false });
+			const left = { tiles: newTiles, activeChests: Math.max(0, state.activeChests - 1) };
+
+			if (state.serverSpawns) {
+				// a signed-in player: the chest leaves the map at once, what was inside is rolled by the server (sealed, never twice)
+				set(left);
+				void openChestRemote(x, y);
+				return true;
+			}
 			const loot = rollChestLoot({
 				rates: state.resourceRates.total,
 				luck: state.characterStats.luck + merchantLuck(state.merchantUpgrades) + aggregateStats(state.equipment).luck,
@@ -463,27 +558,8 @@ const createGameSlice = (
 				castleLevel: castleLevelOf(state.tiles),
 				autoSellUpTo: state.autoSellUpTo,
 			});
-
-			const newTiles = setTile(state.tiles, x, y, { ...tile, hasChest: false });
-
-			const resources = { ...state.resources };
-			let bag = state.bag;
-			if (loot.kind === 'gold' || loot.kind === 'boost') resources.gold += loot.gold;
-			else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
-			else if (loot.kind === 'xp') resources.xp = Math.min(resources.xp + loot.xp, XP_CAP);
-			else {
-				const received = receiveDrops(bag, [loot.drop], state.autoSellUpTo, state);
-				bag = received.bag;
-				resources.gold = Math.min(resources.gold + received.autoSold.gold, RESOURCE_CAP);
-			}
-
-			set({
-				tiles: newTiles,
-				activeChests: Math.max(0, state.activeChests - 1),
-				resources,
-				bag,
-				lastChestLoot: loot,
-			});
+			set(left);
+			receiveChest(loot);
 			return true;
 		},
 
@@ -555,6 +631,14 @@ const createGameSlice = (
 				return { damage, killed: false, crit };
 			}
 
+			if (state.serverSpawns) {
+				// a signed-in player: the fight is over, the loot is rolled by the server against the monster's ticket (the monster stays until it answers)
+				const ticket = state.monsters.find((m) => m.id === fight.monsterId)?.ticket;
+				set({ fight: { ...next, phase: 'won', summary: null }, playerHp: hpAfter });
+				void settleKill(fight.monsterId, fight.level, ticket);
+				return { damage, killed: true, crit };
+			}
+
 			const rates = state.resourceRates.total;
 			const loot = rollKillLoot(
 				{ type: fight.type, level: fight.level },
@@ -594,8 +678,11 @@ const createGameSlice = (
 		dismissMonster: (id: number) => {
 			const state = get();
 			if (state.fight?.monsterId === id) return false;
-			if (!state.monsters.some((m) => m.id === id)) return false;
+			const monster = state.monsters.find((m) => m.id === id);
+			if (!monster) return false;
 			set({ monsters: state.monsters.filter((m) => m.id !== id) });
+			// the server keeps a ticket for every monster: give it back (no reward), or the monster would simply come back
+			if (state.serverSpawns && monster.ticket !== undefined) void requestKill(newClaimId(), monster.ticket, monster.level, true);
 			return true;
 		},
 
@@ -784,7 +871,10 @@ const createGameSlice = (
 			let newChestSpawnTimer = state.chestSpawnTimer;
 			let newActiveChestsCount = state.activeChests;
 			const wardLevel = castleLevelOf(newTiles);
-			if (!canSpawn(newTiles, wardLevel, state.monsters.length, newActiveChestsCount)) {
+			if (state.serverSpawns) {
+				// a signed-in player's chests are made by the server (its clock, its secret): see lib/offline
+				newChestSpawnTimer = 0;
+			} else if (!canSpawn(newTiles, wardLevel, state.monsters.length, newActiveChestsCount)) {
 				newChestSpawnTimer = 0;
 			} else {
 				newChestSpawnTimer += secondsElapsed;
@@ -811,7 +901,7 @@ const createGameSlice = (
 			}
 			let newBossSpawnTimer = state.bossSpawnTimer;
 			const roomToSpawn = canSpawn(newTiles, wardLevel, newMonsters.length, newActiveChestsCount) && countOwnedTiles(newTiles) >= COMBAT.spawn.minOwnedTiles;
-			if (!roomToSpawn) {
+			if (state.serverSpawns || !roomToSpawn) {
 				newMonsterSpawnTimer = 0;
 			} else {
 				newMonsterSpawnTimer += secondsElapsed;
@@ -829,7 +919,7 @@ const createGameSlice = (
 			}
 			// Bosses come on their own timer, one kind at a time; the timer waits while there is no room and restarts when one leaves
 			const bossType = nextBossType(newMonsters);
-			if (!bossType) newBossSpawnTimer = 0;
+			if (state.serverSpawns || !bossType) newBossSpawnTimer = 0;
 			else if (roomToSpawn) {
 				newBossSpawnTimer += secondsElapsed;
 				if (newBossSpawnTimer >= bossThreshold()) {
@@ -895,6 +985,58 @@ const createGameSlice = (
 			});
 			if (castleFinished) emitSaveEvent('castleUpgraded');
 			if (level > state.level.level) emitSaveEvent('levelUp');
+		},
+
+		// Whether a signed-in player's chests and monsters come from the server (set by the app once the account is known; never saved)
+		serverSpawns: false,
+		setServerSpawns: (on: boolean) => set({ serverSpawns: on }),
+
+		// The server's view of what has appeared (see /api/spawn): the map is brought in line, the gem balance is the server's
+		applyServerTickets: (sync: SyncResult) => {
+			const state = get();
+			const map = reconcileTickets(
+				{ tiles: state.tiles, monsters: state.monsters, activeChests: state.activeChests, nextMonsterId: state.nextMonsterId, fightingId: state.fight?.monsterId ?? null },
+				sync.tickets,
+				sync.serverNowSec,
+				Math.random,
+				limitCtx(state)
+			);
+			set({ tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, nextMonsterId: map.nextMonsterId, gems: sync.gemsTotal });
+			return map.placed;
+		},
+
+		// Applies the server's answer to a login: what the absence paid, then the chests and monsters it made appear
+		applyOfflineClaim: (result: ClaimResult) => {
+			const state = get();
+			let patch: Partial<GameState> = {};
+			let levelsGained = 0;
+			let castleReached: number | null = null;
+			if (result.grant) {
+				const applied = applyOfflineGrant(state, result.grant, limitCtx(state));
+				patch = applied.patch;
+				levelsGained = applied.summary.levelsGained;
+				castleReached = applied.summary.castleReached;
+			}
+			const after = { ...state, ...patch } as GameState;
+			const map = reconcileTickets(
+				{ tiles: after.tiles, monsters: after.monsters, activeChests: after.activeChests, nextMonsterId: after.nextMonsterId, fightingId: state.fight?.monsterId ?? null },
+				result.tickets,
+				result.serverNowSec,
+				Math.random,
+				limitCtx(state)
+			);
+			set({ ...patch, tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, nextMonsterId: map.nextMonsterId, gems: result.gems });
+			emitSaveEvent('offlineClaimed');
+			if (!result.grant) return null;
+			return {
+				grant: result.grant,
+				levelsGained,
+				castleReached,
+				chestsPlaced: map.placed.chests,
+				monstersPlaced: map.placed.monsters,
+				strongestMonster: map.placed.strongestLevel,
+				gems: result.gems,
+			};
 		},
 
 		setPlayerName: (name: string) => {

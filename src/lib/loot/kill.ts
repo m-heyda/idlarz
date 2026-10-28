@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { CHEST } from '@/config/gameConfig';
+import { CHEST, LUCK } from '@/config/gameConfig';
 import { monsterDef, monsterStats } from '@/lib/monsters';
 import type { Rng } from '@/lib/rng';
 import type { Drop, Monster } from '@/types/game';
@@ -15,6 +15,8 @@ export interface KillContext {
 	owned?: readonly string[];
 	/** Bad-luck counters from the save */
 	pity?: Readonly<Record<string, number>>;
+	/** A lucky monster: the gold and XP are multiplied and it adds a guaranteed gear roll */
+	lucky?: boolean;
 }
 
 export interface KillLoot {
@@ -38,10 +40,14 @@ export const rollKillLoot = (
 	const { rewardSec } = monsterStats(monster.type, monster.level);
 	const luckBonus = 1 + ctx.luck * CHEST.luckBonusPerPoint;
 	const goldFind = 1 + (ctx.goldFind ?? 0) / 100;
-	const gold = Math.floor(Math.max(COMBAT.rewards.minGold, ctx.goldPerSec * rewardSec * luckBonus * goldFind));
-	const xp = Math.max(COMBAT.rewards.minXp, ctx.xpPerSec * rewardSec);
+	const bonus = ctx.lucky ? LUCK.luckyRat.rewardMultiplier : 1;
+	const gold = Math.floor(Math.max(COMBAT.rewards.minGold, ctx.goldPerSec * rewardSec * luckBonus * goldFind) * bonus);
+	const xp = Math.max(COMBAT.rewards.minXp, ctx.xpPerSec * rewardSec) * bonus;
 
-	const result = generateLoot({ sourceId: monsterDef(monster.type).lootSourceId, level: monster.level, owned: ctx.owned, pity: ctx.pity }, rng);
+	const result = generateLoot(
+		{ sourceId: monsterDef(monster.type).lootSourceId, level: monster.level, owned: ctx.owned, pity: ctx.pity, luck: ctx.luck, extraGearRolls: ctx.lucky ? LUCK.luckyRat.extraGearRolls : 0 },
+		rng
+	);
 	if (result.warnings.length) console.warn('[loot]', ...result.warnings);
 	return { gold, xp, items: result.drops, pity: result.pity };
 };

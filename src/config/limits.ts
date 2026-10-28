@@ -15,6 +15,12 @@ export const LIMITS = {
 	merchantRefreshBase: 5000,
 	/** Bag slots (the Pack Rat bonus adds to it) */
 	bagSize: 36,
+	/** Hours of away time the server pays out when the player comes back (the Night Watch Legacy upgrade adds to it) */
+	offlineCapHours: 8,
+	/** Share of the normal income (and chest/monster arrivals) an away hour pays (the Steward Legacy upgrade adds to it) */
+	offlineEfficiency: 0.5,
+	/** Shorter absences pay nothing and show no welcome-back window (a reload, a lunch break) */
+	offlineMinGapSec: 300,
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
@@ -26,4 +32,6 @@ export type LimitKey = keyof typeof LIMITS;
 export const HARD_LIMITS = {
 	monsterGrowthLevels: 40,
 	merchantOffers: 12,
+	offlineCapHours: 72,
+	offlineEfficiency: 1,
 } as const;

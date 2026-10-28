@@ -182,6 +182,10 @@ const StatisticsOverlay: React.FC = () => {
 				<CollapsibleSection id='bonus-stats' title='Bonuses' defaultOpen={false}>
 					<div className='space-y-1 text-xs'>
 						<Line label='Luck' value={formatCompact(fx.luck)} valueClass='text-purple-500' />
+						<Line label='Chest rate (Luck)' value={`+${pct(fx.chestRateBonus, 1)}`} valueClass='text-purple-400' />
+						<Line label='Rare drop odds (Luck)' value={`+${pct(fx.rarityLuckBonus, 1)}`} valueClass='text-purple-400' />
+						<Line label='Gem find in chests' value={pct(fx.gemChance, 1)} valueClass='text-cyan-300' />
+						<Line label='Lucky rat chance' value={pct(fx.luckyRatChance, 1)} valueClass='text-yellow-300' />
 						<Line label='Gold find' value={pct(fx.goldFind, 1)} valueClass='text-yellow-400' />
 						<Line label='Mana regen' value={`${formatCompact(fx.manaRegen, 2)}/s`} valueClass='text-blue-400' />
 						<Line label='Spell power' value={pct(fx.spellPower, 1)} valueClass='text-purple-300' />
@@ -190,6 +194,11 @@ const StatisticsOverlay: React.FC = () => {
 						<Line label='Tile discount' value={pct(fx.tileDiscount, 2)} valueClass='text-blue-400' />
 						{fx.clickMastery > 0 && <Line label='Click mastery (rebirth)' value={`+${pct(fx.clickMastery, 0)} gold per click`} valueClass='text-purple-300' />}
 						{fx.buildTimeReduction > 0 && <Line label='Master builders (rebirth)' value={`-${pct(fx.buildTimeReduction, 0)} castle build time`} valueClass='text-purple-300' />}
+						<Line
+							label='Offline progress'
+							value={`up to ${formatCompact(fx.offlineCapHours, 1)} h at ${pct(fx.offlineEfficiency, 0)} income`}
+							valueClass='text-purple-300'
+						/>
 						<Line
 							label='Reputation'
 							value={formatCompact(characterStats.reputation)}

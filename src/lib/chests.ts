@@ -121,7 +121,7 @@ export function rollChestLoot(ctx: ChestContext, random: () => number = Math.ran
 		return { kind: 'xp', xp: Math.max(CHEST.xp.floor, Math.floor(ctx.rates.xp * minutes * 60)), minutes };
 	}
 	if (kind === 'item') {
-		const result = generateLoot({ sourceId: 'chest', castleLevel: ctx.castleLevel }, random);
+		const result = generateLoot({ sourceId: 'chest', castleLevel: ctx.castleLevel, luck: ctx.luck }, random);
 		if (result.warnings.length) console.warn('[loot]', ...result.warnings);
 		const drop = result.drops[0];
 		const sold = drop?.kind === 'gear' && isAutoSold(drop.item, ctx.autoSellUpTo ?? null);

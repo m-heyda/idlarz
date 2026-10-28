@@ -2,6 +2,7 @@ import React from 'react';
 import { formatCompact, formatNumber } from '@/utils/formatters';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import type { ChestLoot } from '@/lib/chests';
+import GemIcon from '../GemIcon';
 import { resolveItem } from '@/lib/itemInstance';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
@@ -9,7 +10,7 @@ import '@/styles/ContextMenu.css';
 import { RARITY_COLOR, itemIconName } from '../itemUi';
 
 interface ChestNotificationProps {
-	loot: ChestLoot | null;
+	loot: (ChestLoot & { gems?: number }) | null;
 	show: boolean;
 	onClose: () => void;
 }
@@ -89,6 +90,11 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, show, onClo
 			<div className='flex items-center gap-2'>{title}</div>
 			{detail}
 			{hint}
+			{!!loot.gems && (
+				<span className='text-sm text-cyan-300 font-semibold inline-flex items-center gap-1'>
+					Gem find! +{loot.gems} <GemIcon />
+				</span>
+			)}
 		</div>
 	);
 };

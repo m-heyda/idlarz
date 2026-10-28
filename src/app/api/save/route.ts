@@ -1,25 +1,15 @@
-import { createSupabaseServer } from '@/lib/supabase/server';
-import { adminConfigured, createSupabaseAdmin } from '@/lib/supabase/admin';
+import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { supabaseSaveRepo } from '@/lib/cloudSave/supabaseRepo';
 import { acceptSave, storedToText } from '@/lib/cloudSave/pipeline';
 import { isNonProduction } from '@/lib/cloudSave/environment';
-import { fail, guardConfigured, isOutage, json, loadProfile, readBody, unavailable } from '@/lib/authRoute';
+import { fail, json, loadProfile, readBody, unavailable } from '@/lib/authRoute';
+import { requirePlayer } from '@/lib/playerRoute';
+import { supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
 
 export const dynamic = 'force-dynamic';
 
 // Real saves are far smaller (a 55,000-tile map is about 85 KB as text); this keeps one account from storing megabytes
 const SAVE_BODY_MAX = 600_000;
-
-/** The signed-in player's id from the session cookie, or the response to send instead. */
-const requirePlayer = async () => {
-	const off = guardConfigured() ?? (adminConfigured() ? null : unavailable());
-	if (off) return { response: off };
-	const supabase = await createSupabaseServer();
-	const { data, error } = await supabase.auth.getUser();
-	if (isOutage(error)) return { response: unavailable() };
-	if (error || !data.user) return { response: fail('Not signed in.', 401) };
-	return { userId: data.user.id, supabase };
-};
 
 /** The account's cloud save (text the client imports, plus headline numbers for the start hub), or `{ empty: true }`. */
 export async function GET() {
@@ -48,10 +38,10 @@ export async function POST(request: Request) {
 
 		// The leaderboard name comes from the player's profile row (the owner-only name set at registration), never from the save
 		const { profile } = await loadProfile(player.supabase, player.userId);
-		const outcome = await acceptSave(supabaseSaveRepo(createSupabaseAdmin()), player.userId, profile?.characterName ?? 'Player', body.text, body.baseRev as number, Date.now(), isNonProduction());
+		const outcome = await acceptSave(supabaseSaveRepo(createSupabaseAdmin()), player.userId, profile?.characterName ?? 'Player', body.text, body.baseRev as number, Date.now(), isNonProduction(), supabaseLedgerRepo(createSupabaseAdmin()));
 		switch (outcome.kind) {
 			case 'ok':
-				return json({ rev: outcome.rev, serverSavedAt: outcome.serverSavedAt });
+				return json({ rev: outcome.rev, serverSavedAt: outcome.serverSavedAt, gems: outcome.gems });
 			case 'conflict':
 				return json({ error: 'Your account has a newer save.', conflict: true, rev: outcome.rev, serverSavedAt: outcome.serverSavedAt }, 409);
 			case 'too_soon':

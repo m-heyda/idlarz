@@ -184,6 +184,10 @@ export interface Monster {
 	x: number;
 	y: number;
 	ageSec: number;
+	/** For a signed-in player: the number of the server's ticket for this monster (a kill is paid against it) */
+	ticket?: number;
+	/** A lucky monster (decided by the server): golden, bigger reward */
+	lucky?: boolean;
 }
 
 export interface KillSummary {
@@ -194,6 +198,8 @@ export interface KillSummary {
 	convertedGold: number;
 	/** Gear the auto-sell filter sold on the spot: how many pieces and for how much gold */
 	autoSold: { count: number; gold: number };
+	/** A lucky monster: the gold, XP and gear were multiplied */
+	lucky?: boolean;
 }
 
 export type FightPhase = 'active' | 'won' | 'knockedOut' | 'timeout';
@@ -304,6 +310,8 @@ export interface TapResult {
 }
 
 import type { ChestLoot } from '@/lib/chests';
+import type { OfflineReport } from '@/lib/offline/apply';
+import type { ClaimResult, SyncResult } from '@/lib/offline/types';
 
 export interface GameState {
 	previousLevel: number;
@@ -349,7 +357,7 @@ export interface GameState {
 	lootPity: Record<string, number>;
 	/** Gear of this rarity or lower is sold the moment it drops (a rarity id); null = keep everything */
 	autoSellUpTo: string | null;
-	lastChestLoot: ChestLoot | null; // transient: the last chest's contents, shown by the toast (never saved)
+	lastChestLoot: (ChestLoot & { gems?: number }) | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods
 	setAutoSell: (rarity: string | null) => void;
@@ -373,6 +381,13 @@ export interface GameState {
 	refreshMerchantStock: () => boolean;
 	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
+	/** Applies what the server paid for an absence (income, castle progress, monster growth) and puts its chests and monsters on the map. Null when there was nothing to apply. */
+	applyOfflineClaim: (result: ClaimResult) => OfflineReport | null;
+	/** True for a signed-in player: chests and monsters come from the server (transient, never saved) */
+	serverSpawns: boolean;
+	setServerSpawns: (on: boolean) => void;
+	/** Brings the map in line with the server's tickets and takes its gem balance; returns what was placed */
+	applyServerTickets: (sync: SyncResult) => { chests: number; monsters: number; strongestLevel: number };
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
 	addStatPoint: (stat: keyof CharacterStats) => boolean;
 	setPlayerName: (name: string) => void;

@@ -15,6 +15,8 @@ const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercen
 const shopText: Record<LegacyUpgradeId, (levels: number) => string> = {
 	thrift: (n) => `-${pct(LEGACY_UPGRADES.thrift.effectPerLevel)} tile and building cost per level (now -${pct(n * LEGACY_UPGRADES.thrift.effectPerLevel)}, with Charisma at most -${REBIRTH.discountCapPercent}%)`,
 	builders: (n) => `-${pct(LEGACY_UPGRADES.builders.effectPerLevel)} castle build time per level (now -${pct(n * LEGACY_UPGRADES.builders.effectPerLevel)})`,
+	nightwatch: (n) => `+${LEGACY_UPGRADES.nightwatch.effectPerLevel} h of away time per level (now +${n * LEGACY_UPGRADES.nightwatch.effectPerLevel} h)`,
+	steward: (n) => `+${pct(LEGACY_UPGRADES.steward.effectPerLevel)} income while away per level (now +${pct(n * LEGACY_UPGRADES.steward.effectPerLevel)})`,
 	mastery: (n) => `+${pct(LEGACY_UPGRADES.mastery.effectPerLevel)} gold per click per level (now +${pct(n * LEGACY_UPGRADES.mastery.effectPerLevel)})`,
 	provisions: (n) => `Every new run starts with ${Object.entries(LEGACY_UPGRADES.provisions.bundle)
 		.map(([r, v]) => `${formatNumber((v as number) * Math.max(n, 1))} ${r}`)

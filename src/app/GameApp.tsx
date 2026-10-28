@@ -33,6 +33,9 @@ import CastleCompass from '@/components/game/CastleCompass';
 import Toast from '@/components/game/Toast';
 import type { Profile } from '@/lib/authClient';
 import { useCloudSync } from '@/hooks/useCloudSync';
+import { useOfflineClaim } from '@/hooks/useOfflineClaim';
+import { useSpawnSync } from '@/hooks/useSpawnSync';
+import OfflineDialog from '@/components/game/overlays/OfflineDialog';
 
 interface GameAppProps {
 	/** The account's name and hero, given to a brand-new game only (never to one that has been played). */
@@ -60,7 +63,11 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 	const [showChestNotification, setShowChestNotification] = useState(false);
 	const shownLootRef = useRef<typeof lastChestLoot>(null);
 
-	useCloudSync(userId, isHydrated && tabStatus === 'owner');
+	// What the absence was worth is claimed before the game starts running and before the first upload (the claim changes the game)
+	const claim = useOfflineClaim(userId, isHydrated && tabStatus === 'owner');
+	useCloudSync(userId, isHydrated && tabStatus === 'owner' && claim === 'done');
+	// ... and from then on the server says when a chest or a monster appears (and what is in it)
+	useSpawnSync(userId, isHydrated && tabStatus === 'owner' && claim === 'done');
 	const applyProfileToFreshGame = useGameStore((state) => state.applyProfileToFreshGame);
 	useEffect(() => {
 		// Before the first tick: a brand-new game becomes the account's character (a played game is never touched)
@@ -70,7 +77,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 
 	useEffect(() => {
 		// Only the owning tab runs the game, and only once the saved game has been loaded
-		if (!isHydrated || tabStatus !== 'owner') return;
+		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done') return;
 		lastTickTime.current = performance.now();
 		const gameLoop = () => {
 			const currentTime = performance.now();
@@ -82,7 +89,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 
 		const interval = setInterval(gameLoop, TICK_RATE);
 		return () => clearInterval(interval);
-	}, [tick, isHydrated, tabStatus]);
+	}, [tick, isHydrated, tabStatus, claim]);
 
 	useEffect(() => {
 		// A new chest result (a fresh object every time one is opened) shows the toast for 3 seconds
@@ -112,6 +119,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<SaveMenuDialog />
 			<SettingsDialog />
 			<LegacyDialog />
+			<OfflineDialog />
 			<TutorialDialog />
 			<BuildDialog />
 			<ConfirmDialogs />

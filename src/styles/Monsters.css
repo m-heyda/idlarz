@@ -86,3 +86,8 @@
 		animation: none;
 	}
 }
+
+/* A lucky monster (decided by the server): a golden tint and glow so it is worth the walk */
+.tile-monster[data-lucky='true'] .tile-monster-img {
+	filter: sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.15) drop-shadow(0 0 4px #ffd54a);
+}

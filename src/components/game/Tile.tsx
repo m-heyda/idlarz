@@ -77,9 +77,9 @@ const Tile: React.FC<TileProps> = ({
 	// string selector: the tile re-renders when its monster appears, changes level or leaves, not on every tick
 	const monsterKey = useGameStore((state) => {
 		const m = monsterAt(state.monsters, x, y);
-		return m ? `${m.id}:${m.type}:${m.level}` : '';
+		return m ? `${m.id}:${m.type}:${m.level}:${m.lucky ? 1 : 0}` : '';
 	});
-	const [monsterId, monsterType, monsterLevel] = monsterKey ? monsterKey.split(':') : [];
+	const [monsterId, monsterType, monsterLevel, monsterLucky] = monsterKey ? monsterKey.split(':') : [];
 	const [isShaking, setIsShaking] = useState(false);
 	const [showCastleDialog, setShowCastleDialog] = useState(false);
 	const [showChestTooltip, setShowChestTooltip] = useState(false);
@@ -289,7 +289,7 @@ const Tile: React.FC<TileProps> = ({
 					)}
 
 					{isOwned && monsterKey && (
-						<MonsterSprite type={monsterType as 'rat' | 'ratKing'} level={Number(monsterLevel)} />
+						<MonsterSprite type={monsterType as 'rat' | 'ratKing'} level={Number(monsterLevel)} lucky={monsterLucky === '1'} />
 					)}
 
 					{/* Bonus treasure chest on the tile */}

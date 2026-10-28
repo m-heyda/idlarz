@@ -1,5 +1,5 @@
 import { HARD_LIMITS, LIMITS, type LimitKey } from '@/config/limits';
-import { merchantEffect, type MerchantUpgrades } from '@/utils/gameUtils';
+import { legacyEffect, merchantEffect, type MerchantUpgrades } from '@/utils/gameUtils';
 import type { PrestigeState } from '@/types/game';
 
 /** What can raise a limit: the merchant bonuses now, the rebirth (Legacy) effects later. Pass what you have; the rest counts as none. */
@@ -16,6 +16,8 @@ export interface LimitContext {
  */
 export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } = {
 	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat'),
+	offlineCapHours: (ctx) => legacyEffect(ctx.prestige, 'nightwatch'),
+	offlineEfficiency: (ctx) => legacyEffect(ctx.prestige, 'steward'),
 };
 
 /** The current value of a limit: its base plus the registered bonuses. */
