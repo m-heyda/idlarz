@@ -304,10 +304,6 @@ export interface PrestigeState {
 	upgrades: Partial<Record<EmberUpgradeId, number>>;
 }
 
-export interface TapResult {
-	items: { resource: keyof Resources; amount: number }[];
-}
-
 import type { ChestLoot } from '@/lib/chests';
 import type { OfflineReport } from '@/lib/offline/apply';
 import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
@@ -340,7 +336,7 @@ export interface GameState {
 	merchantStock: MerchantStock | null; // the goods on offer (null until the first shelf is rolled)
 	merchantRefreshes: number; // paid shelf refreshes bought this run: each one costs more (see MERCHANT_GOODS.refresh)
 	isHydrated: boolean;
-	freeTiles: number; // owned tiles that cost nothing (castle + starting ring); see economyTiles()
+	freeTiles: number; // owned tiles that cost nothing (castle + the four starting tiles); see economyTiles()
 	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
 	castleUpgrade: CastleUpgradeState | null;
@@ -404,6 +400,4 @@ export interface GameState {
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;
 	organizeBag: () => boolean;
-	// Tap an owned tile: grants a slice of its output. Returns null while on cooldown / nothing to give.
-	tapTile: (x: number, y: number, input?: ClickInput) => TapResult | null;
 }

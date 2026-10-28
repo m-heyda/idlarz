@@ -39,8 +39,9 @@ import {
 	EMPTY_PRESTIGE,
 	emberSpent,
 	STARTER_FREE_TILES,
+	LEGACY_FREE_TILES,
 } from '@/utils/gameUtils';
-import { RING } from '@/utils/biomeRules';
+import { RING, LEGACY_RING } from '@/utils/biomeRules';
 import {
 	EMPTY_WORLD,
 	MAX_OWNED_TILES,
@@ -291,10 +292,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (reached.size !== owned) return fail('disconnected territory');
 	const tiles = setTiles(EMPTY_WORLD, placed);
 
-	// Tiles that cost nothing: just the castle in a save from before the starting ring, the castle + its 8 neighbours otherwise
-	const freeTiles = raw.freeTiles === undefined ? 1 : int(raw.freeTiles, 1, STARTER_FREE_TILES);
-	if (freeTiles === null || (freeTiles !== 1 && freeTiles !== STARTER_FREE_TILES)) return fail('free tiles');
-	if (freeTiles === STARTER_FREE_TILES && !RING.every(([dx, dy]) => at.has(tileKey(CASTLE_X + dx, CASTLE_Y + dy)))) {
+	// Tiles that cost nothing: just the castle in a save from before the starting tiles, the castle + its four neighbours
+	// today, or the castle + all eight neighbours for a run that began with the old 3x3 start
+	const freeTiles = raw.freeTiles === undefined ? 1 : int(raw.freeTiles, 1, LEGACY_FREE_TILES);
+	if (freeTiles === null || (freeTiles !== 1 && freeTiles !== STARTER_FREE_TILES && freeTiles !== LEGACY_FREE_TILES)) {
+		return fail('free tiles');
+	}
+	const startTiles = freeTiles === LEGACY_FREE_TILES ? LEGACY_RING : freeTiles === STARTER_FREE_TILES ? RING : [];
+	if (!startTiles.every(([dx, dy]) => at.has(tileKey(CASTLE_X + dx, CASTLE_Y + dy)))) {
 		return fail('starting ring not owned');
 	}
 	const purchasedOwned = owned - freeTiles + 1; // as the economy counts (castle + purchases)

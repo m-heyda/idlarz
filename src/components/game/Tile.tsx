@@ -8,7 +8,6 @@ import {
 	BIOMES,
 	BUILDINGS,
 	BuildingType,
-	TILE_TAP,
 	CASTLE_FORTRESS,
 	CASTLE_UPGRADE,
 	TILE_SIZE,
@@ -20,7 +19,6 @@ import { getTile } from '@/utils/world';
 import { canBuildOn } from '@/utils/gameUtils';
 import { cn } from '@/lib/utils';
 import audioManager from '@/utils/audioManager';
-import { queueTileTap } from '@/lib/floatText';
 import PixelIcon, { PixelSheet } from './PixelIcon';
 import CastleSprite from './CastleSprite';
 import { BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
@@ -72,7 +70,6 @@ const Tile: React.FC<TileProps> = ({
 	// Only primitives are read from the store: a tile re-renders for its own chest, monster or castle level, not for every change of the map
 	const buyTile = useGameStore((state) => state.buyTile);
 	const collectChest = useGameStore((state) => state.collectChest);
-	const tapTile = useGameStore((state) => state.tapTile);
 	const startFight = useGameStore((state) => state.startFight);
 	// string selector: the tile re-renders when its monster appears, changes level or leaves, not on every tick
 	const monsterKey = useGameStore((state) => {
@@ -85,8 +82,6 @@ const Tile: React.FC<TileProps> = ({
 	const [showChestTooltip, setShowChestTooltip] = useState(false);
 	const [hovered, setHovered] = useState(false);
 	const tipLayer = useMapTipLayer();
-	const [tapped, setTapped] = useState(false);
-	const [cooling, setCooling] = useState(false);
 
 	// Check if this tile has a chest
 	const hasChest = useGameStore((state) => isOwned && !!getTile(state.tiles, x, y)?.hasChest);
@@ -109,7 +104,7 @@ const Tile: React.FC<TileProps> = ({
 	const inRange = useGameStore((state) => mayBeInRange && inCastleRange(x, y, castleLevelOf(state.tiles)));
 
 	const handleClick = (e: React.MouseEvent) => {
-		// A monster on this tile: a (real) click asks the server to start the fight against it, auto-battle or not; no tile tap, no chest, no gold
+		// A monster on this tile: a (real) click asks the server to start the fight against it, auto-battle or not; no chest, no gold
 		if (isOwned && monsterKey) {
 			e.stopPropagation();
 			if (e.nativeEvent.isTrusted && startFight(Number(monsterId))) audioManager.playSound('click');
@@ -124,23 +119,6 @@ const Tile: React.FC<TileProps> = ({
 				// You could add a special chest collection sound here
 			}
 			return;
-		}
-
-		// Tapping an owned tile also yields a slice of that tile's own output (rate-limited per tile); the castle opens its dialog instead
-		if (isOwned && biome !== 'castle') {
-			const tap = tapTile(x, y, {
-				eventId: e.nativeEvent.timeStamp,
-				now: performance.now(),
-				trusted: e.nativeEvent.isTrusted,
-			});
-			if (tap) {
-				audioManager.playSound('click');
-				queueTileTap(tap.items);
-				setTapped(true);
-				setCooling(true);
-				setTimeout(() => setTapped(false), 160);
-				setTimeout(() => setCooling(false), TILE_TAP.cooldownMs);
-			}
 		}
 
 		// Prioritize owned tiles for special interactions
@@ -234,14 +212,12 @@ const Tile: React.FC<TileProps> = ({
 						'castle-tile': isOwned && biome === 'castle',
 						'castle-max-tile': isOwned && isGlowingCastle && !isFortress,
 						'tile-fortress': isOwned && isFortress,
-						'tile-cooldown': cooling,
-									}
+					}
 				)}
 				style={{
 					width: TILE_SIZE,
 					height: TILE_SIZE,
 					transform: `translate(${x * TILE_SIZE}px, ${y * TILE_SIZE}px)`,
-					...({ '--cd': `${TILE_TAP.cooldownMs}ms` } as React.CSSProperties),
 				}}
 				onClick={handleClick}
 				onContextMenu={handleContextMenu}
@@ -254,11 +230,7 @@ const Tile: React.FC<TileProps> = ({
 					setShowChestTooltip(false);
 				}}
 				role='button'>
-				<div
-					className={cn(
-						'w-full h-full flex items-center justify-center relative',
-						{ 'tile-tapped': tapped }
-					)}>
+				<div className='w-full h-full flex items-center justify-center relative'>
 					{isOwned && biome === 'castle' && <CastleSprite level={castleLevel} />}
 					{!isOwned && isAdjacent && (
 						<PixelIcon name='unknown' alt='Unexplored' className='unknown-mark' />

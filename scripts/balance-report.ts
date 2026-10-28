@@ -294,7 +294,7 @@ line();
 // ---------------------------------------------------------------------------
 line('## 7. Rates of a brand-new game');
 line();
-line('A real game rolls its 8 start tiles at random; this table uses one fixed ring (seed 1) so the file is reproducible.');
+line('A real game rolls its 4 start tiles at random; this table uses one fixed ring (seed 1) so the file is reproducible.');
 line();
 {
 	const r = calculateResourceRates(createInitialWorld(mulberry32(1)), INITIAL_CHARACTER_STATS, {});
@@ -353,7 +353,7 @@ line(
 );
 line();
 {
-	const tilesList = [20, 30, 40, 50, 60, 80];
+	const tilesList = [100, 150, 200, 300, 500];
 	table(
 		['castle level', ...tilesList.map((n) => `${n} tiles`)],
 		[6, 7, 8, 9, 10].map((c) => [c, ...tilesList.map((n) => emberGain(c, n))])

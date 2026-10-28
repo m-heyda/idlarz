@@ -514,11 +514,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			for (let i = 0; i < n; i++) {
 				const input = { eventId: ++eventId, now: t * 1000 + i * gap, trusted: true };
 				api().clickForGold(input);
-				// about one click in eight lands on an owned tile and taps it too (same click, same token)
-				if (i % 8 === 0 && ownedTiles.length) {
-					const [tx, ty] = ownedTiles[Math.floor(Math.random() * ownedTiles.length)];
-					api().tapTile(tx, ty, input);
-				}
 			}
 		}
 		api().tick(step * 1000);

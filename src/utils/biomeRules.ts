@@ -137,25 +137,26 @@ export function rollBiome(tiles: World, x: number, y: number, purchased: number,
 	return weighted(weights, random());
 }
 
-/** Ring order around the castle, clockwise from the north-west corner. */
-export const RING: [number, number][] = [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]];
+/** The four starting tiles beside the castle: north, east, south, west. */
+export const RING: [number, number][] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
 /**
- * The castle's 8 neighbours for a new game: patches of the basic biomes (plains most), always at least `minPlains`
+ * The 3x3 start of saves from before the plus-shaped start (clockwise from the north-west corner). Only
+ * `sanitizeSave` still reads it, to accept a run that began with eight free neighbours.
+ */
+export const LEGACY_RING: [number, number][] = [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]];
+
+/**
+ * The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains`
  * plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.
  */
 export function generateStartRing(random: () => number = Math.random): BiomeType[] {
-	const { weights, copyPreviousPct, minPlains, maxOfOther } = BIOME_RULES.startRing;
+	const { weights, minPlains, maxOfOther } = BIOME_RULES.startRing;
 	const entries = Object.entries(weights) as [BiomeType, number][];
 	for (let attempt = 0; attempt < 50; attempt++) {
-		const ring: BiomeType[] = [];
-		for (let i = 0; i < RING.length; i++) {
-			ring.push(i > 0 && random() * 100 < copyPreviousPct ? ring[i - 1] : weighted(entries, random()));
-		}
+		const ring = RING.map(() => weighted(entries, random()));
 		const count = (b: string) => ring.filter((r) => r === b).length;
-		// the ring is a cycle of 4-adjacent tiles: every tile needs a same-biome neighbour in it (no 1x1 patch)
-		const paired = ring.every((b, i) => b === ring[(i + 7) % 8] || b === ring[(i + 1) % 8]);
-		if (paired && count('plains') >= minPlains && entries.every(([b]) => b === 'plains' || count(b) <= maxOfOther)) return ring;
+		if (count('plains') >= minPlains && entries.every(([b]) => b === 'plains' || count(b) <= maxOfOther)) return ring;
 	}
-	return RING.map((_, i) => (i % 4 < 2 ? 'plains' : 'forest')) as BiomeType[];
+	return RING.map((_, i) => (i < 2 ? 'plains' : 'forest')) as BiomeType[];
 }

@@ -54,7 +54,7 @@ test('the same land and the same seal always give the same map', () => {
 });
 
 test('a map with no tile for them leaves the tickets hidden, and they appear once the land grows', () => {
-	const ringOnly = world(1); // the castle and its 8 neighbours: all adjacent
+	const ringOnly = world(1); // the castle and its 4 neighbours: all adjacent
 	const hidden = placeTickets(bankWith(2), ringOnly, 'ring', 0, rollFor);
 	assert.equal(hidden.rats.filter(isPlaced).length, 0);
 	assert.deepEqual(hidden.sites, { rat: 0, king: 0 });

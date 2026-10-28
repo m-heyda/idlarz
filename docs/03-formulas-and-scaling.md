@@ -55,7 +55,7 @@ modifiers[r] = castleModifier(C)                    castle, all resources (§4)
              + stat modifiers                       2.5 % per point, see 02 §11 (XP: +0.2 %/INT, +0.25 %/CHA)
              + 0.05 × plainsTiles                   (r = meat only)
 
-total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × embersEarned) × (1 + Foreman)     (second factor only after a Rebirth, §9; Foreman = merchant upgrade, +1 % per level, every resource but XP)
+total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.06 × embersEarned) × (1 + Foreman)     (second factor only after a Rebirth, §9; Foreman = merchant upgrade, +1 % per level, every resource but XP)
 
 The merchant's Skinner upgrade (+5 % per level) multiplies the farm's meat and hide inside `base` before the modifiers.
 ```
@@ -64,7 +64,7 @@ The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Ev
 
 `calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Ember factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Character tab's *Where the income comes from* section shows exactly these numbers per resource.
 
-**New game**: the castle plus the 8 free start tiles (a random ring of plains and forest) give roughly 3-4 gold/s, about 0.1 wood and 0.2 stone/s and a few food per second, under the castle's +45 % modifier (+32.5 % stone), and about 1.2 xp/s. The exact rows for one fixed ring are in [generated/balance-tables.md §7](generated/balance-tables.md).
+**New game**: the castle plus the 4 free start tiles (a random mix of plains and forest) give roughly 2-3 gold/s, about 0.1 wood and 0.2 stone/s and a few food per second, under the castle's +45 % modifier (+32.5 % stone), and about 1.2 xp/s. The exact rows for one fixed ring are in [generated/balance-tables.md §7](generated/balance-tables.md).
 
 ## 4. Castle
 
@@ -134,12 +134,11 @@ goods: shelf = 6 pieces of loot source `merchant` (profile `merchant_stock`: com
        price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh)
 bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Embers of a rebirth = floor(gain × (1 + 0.05 × Tithe))
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
-tap:   resource = tile output/s × 0.5 s, tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s of server time (Luck shortens it), counted with the monsters against min(40, 30 % of the free land)
 building cost: see §11
 ```
 
-Click limiter (gold clicks and tile taps): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
+Click limiter (gold clicks): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
 
 ## 7. Character-derived stats
 
@@ -153,8 +152,8 @@ Pacing is measured, not written here: `npm run sim` drives the real store with b
 
 ```
 available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 100 (REBIRTH.minTiles), no castle upgrade running
-points      = floor(4.5 × (C − 5) × sqrt(n / 10))                     REBIRTH.gain
-income      × (1 + 0.05 × legacyEarned)                                folded into the modifiers, spending never lowers it
+points      = floor(3 × (C − 5) × sqrt(n / 10))                     REBIRTH.gain
+income      × (1 + 0.06 × legacyEarned)                                folded into the modifiers, spending never lowers it
 shop cost   = ceil(base × 1.4^level)        base: thrift 2, builders 3, mastery 2, provisions 2; max level 10
 thrift      : tile and building cost × (1 − 0.02 × level), summed with the Charisma discount, capped at 45 %
 builders    : castle build time × (1 − 0.05 × level)

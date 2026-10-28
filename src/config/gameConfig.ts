@@ -756,14 +756,6 @@ export const BUILDINGS: Record<BuildingType, Building> = {
 	barracks: { name: 'barracks', label: 'Barracks', resourceGeneration: { gold: 0.1, xp: 0.1 } },
 };
 
-// Tile tapping: clicking an owned tile also yields a small slice of that tile's own output.
-// A tap = `seconds` worth of the tile's per-second production, with a per-tile cooldown so
-// spam-clicking can add at most seconds/cooldown (~42%) on top of a tile's passive income.
-export const TILE_TAP = {
-	seconds: 0.5,
-	cooldownMs: 1200,
-};
-
 // Gold per click = total gold/s x click power. Four upgrade levels, bought from the merchant.
 export const CLICK_LADDER = [
 	{ power: 0.5, price: 0 },
@@ -885,8 +877,8 @@ export const CHARACTER_STAT_CONFIG = {
 export const REBIRTH = {
 	minCastleLevel: 6,
 	minTiles: 100, // a rebirth also needs this much territory (the first ~100 tiles come within a day, so it is the castle that gates it)
-	gainScale: 4.5, // Embers = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
-	incomePerPoint: 0.05, // +5% of all income per Ember ever earned (spending points never lowers it)
+	gainScale: 3, // Embers = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
+	incomePerPoint: 0.06, // +6% of all income per Ember ever earned (spending points never lowers it)
 	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile
 	// Embers granted for a rebirth with this castle level and territory
 	gain: (castleLevel: number, tiles: number) =>

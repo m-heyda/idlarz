@@ -6,7 +6,7 @@ What pace the economy is tuned for, why, and how to check it. The measured numbe
 
 | Stage | Target |
 | --- | --- |
-| First ~100 tiles | easy: hours for an active bot, about a day and a half for the `human` profile |
+| First ~100 tiles | easy: hours for an active bot, between a day and a half and two days for the `human` profile (the four free start tiles make the first hours a little slower than the old 3x3 start) |
 | 200-300 tiles | a 2-3 day project |
 | After 300 tiles | clearly steeper (`(n/300)^4.5` tail, [03 §1](03-formulas-and-scaling.md#1-tile-cost)); a map of tens of thousands of tiles stays buyable |
 | First Rebirth (castle 6 + 100 tiles) | available around day 5-7 for a person who checks in a few times a day |

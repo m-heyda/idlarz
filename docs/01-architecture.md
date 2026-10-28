@@ -35,7 +35,7 @@ src/
 │                             loot.ts + lootConfig.ts (loot profiles, pools, merchant stock; see 10-loot-system.md)
 ├── types/game.ts             Resources, Tile, CharacterStats, ItemInstance, Monster, GameState (store interface), ClickInput ...
 ├── stores/
-│   ├── gameStore.ts          the single game store: every action (buyTile, tick, upgradeCastle, clickForGold, tapTile, startFight, rebirth, buyEmberUpgrade, merchant actions ...)
+│   ├── gameStore.ts          the single game store: every action (buyTile, tick, upgradeCastle, clickForGold, startFight, rebirth, buyEmberUpgrade, merchant actions ...)
 │   ├── uiStore.ts            transient UI flags (menu, dialogs, right-click menu, highlight, toast) and remembered panel state (`setPref`)
 │   ├── viewStore.ts          where the map is on the screen (pan x/y, zoom, window size), clamped to the explored land
 │   ├── settingsStore.ts      sound / volume / ambient-life preferences (localStorage `idlarz-settings`, not game state)
@@ -45,7 +45,7 @@ src/
 │   ├── world.ts              THE map: a sparse immutable `World` (explored tiles by numeric key, incremental counters + bounds), copy-on-write setTile/patchTile, row adapters for tests
 │   └── biomeRules.ts, growWorld.ts, worldGen.ts, cluster.ts, terrain.ts (dual-grid terrain, port of scripts/pixel/terrain_logic.py), water.ts, formatters.ts, audioManager.ts
 ├── lib/
-│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks and tile taps
+│   ├── clickLimiter.ts       token-bucket limiter for gold clicks
 │   ├── combat.ts             pure combat rules: max HP, armor mitigation, damage per hit, crit, regen (used by the server engine and the UI)
 │   ├── monsters.ts           monster levels and stats, spawn level windows, growth
 │   ├── skills.ts, effectiveStats.ts, statBonuses.ts, itemInstance.ts, inventory.ts (pure bag/equipment ops + aggregateStats), limits.ts, merchant.ts, chests.ts, luck.ts, rng.ts
@@ -114,7 +114,7 @@ Not saved: `monsters` and the open fight (`combat`) are the server's picture and
 
 ## Clicks
 
-`useClickIncome` (called by `GameHeader`) registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold` (and the tile's `onClick` calls `tapTile` for the same event); both ask the shared limiter with the event's `timeStamp` as id, so one physical click costs one token. Nothing hits a monster by clicking: a click on a monster only opens the fight (`startFight`).
+`useClickIncome` (called by `GameHeader`) registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold`, which asks the limiter with the event's `timeStamp` as id, so one physical click costs one token. Nothing hits a monster by clicking: a click on a monster only opens the fight (`startFight`).
 
 ## Rebirth
 
@@ -131,7 +131,7 @@ Not saved: `monsters` and the open fight (`combat`) are the server's picture and
 - **Terrain**: the ground is drawn in **chunks** of 16 x 16 tiles (768 px, `CHUNK_TILES`), one `<canvas>` each (`TerrainLayer` / `TerrainChunk`), only for the chunks on screen plus a ring around them, by `terrainRenderer.ts` from the atlas in `public/pixel/terrain/` + `src/config/terrainAtlas.json`. A chunk's picture depends only on the ground inside the chunk plus `CHUNK_HALO` (5) tiles, so its `chunkSignature` (one character per tile of that window, building tiles upper case) decides when it is redrawn: a purchase redraws the chunks next to it, never pan, zoom or a chest toggle. The ground comes from `worldGround(world)` (explored tile -> its ground, unexplored next to explored -> 'mist'), cached per World. Dual cells on a chunk border are drawn by both chunks, sprites that reach over a border (a tree, a pier) by both too, the texture pattern is anchored at the world origin and each canvas is 2 px larger than its part, so there are no seams even at fractional zoom. Draws are queued and run within a 6 ms frame budget (at least one chunk per frame); flat colours show first and until the atlas loads. Tiles are transparent hit areas that carry the castle, buildings, chest, '?' marker and hover overlays. Buyable unexplored tiles are drawn as the dark 'mist' sea. `tests/terrainChunks.test.ts` checks the halo is enough, that equal signatures mean equal pictures, and that nothing is cut at a border.
 - **Highlight**: the tile menu's "Highlight this ... area" tints the connected same-biome area (`connectedCluster`, an iterative flood fill) with the biome's colour from `biomePalette.ts` for 3 s, drawn by `HighlightLayer` as one screen-space canvas (only tiles on screen are looked at, so a 20,000-tile area costs the same as a 20-tile one), no border.
 - **Minimap**: `Minimap` (bottom right, switched in the global menu) paints one square per explored tile in its biome colour into one `ImageData` (`src/lib/minimap.ts`, repainted at most every 200 ms; 4 ms at 50,000 tiles), a gold marker on the castle, purple ones on workshops, and outlines the visible part (moved straight in the DOM, no React render per pan frame). Click or drag centres the view there (clamped like any pan); it is outside the map's click area, so it never pays gold. A small map is drawn up to 6 px per tile, a big one down to a fraction of a pixel.
-- **Biome rules and chests**: `src/config/biomeRules.ts` (numbers) + `src/utils/biomeRules.ts` (unlocks, conflicts, clustering, the starting ring) decide what a purchase becomes; `src/lib/chests.ts` decides where chests appear and what they hold. Both are pure with an injectable `random()`. The free starting ring is `GameState.freeTiles`; costs use `economyTiles()` (see [02](02-mechanics.md)).
+- **Biome rules and chests**: `src/config/biomeRules.ts` (numbers) + `src/utils/biomeRules.ts` (unlocks, conflicts, clustering, the starting tiles) decide what a purchase becomes; `src/lib/chests.ts` decides where chests appear and what they hold. Both are pure with an injectable `random()`. The free starting tiles are `GameState.freeTiles`; costs use `economyTiles()` (see [02](02-mechanics.md)).
 - **Buildings**: any explored tile except the castle and lakes can take one (`buildOnTile`, `canBuildOn`, price `calculateBuildingCost` / `buildingCostFactor`); the right-click `BuildDialog` opens from `Tile.tsx`. A building keeps its tile's own ground and gets a pad of that biome (`allPads()` in `terrain.ts`, art in `terrain_pads.py`, drawn under the sprites) (the same rule is ported to `terrain_logic.py` and covered by the parity fixture, where a lowercase letter marks a building). Building tiles carry no props.
 - Tile tooltips are portalled into `MapTipLayer`, a layer above the critters, because every tile is its own stacking context.
 - `NotifyDot` is the one "needs attention" marker (a soft orange dot). It is used on the avatar in the header and on the Menu tabs: unspent stat points (Stats tab) and an affordable farm animal or upgrade (Farm tab); the avatar shows either (`useMenuAttention`).

@@ -42,7 +42,7 @@ const RebirthDialog: React.FC = () => {
 
 	if (!open) return null;
 
-	const ownedTiles = economyTiles(tiles, freeTiles); // purchases + 1: the free starting ring does not count
+	const ownedTiles = economyTiles(tiles, freeTiles); // purchases + 1: the free starting tiles do not count
 	const castleLevel = castleLevelOf(tiles);
 	const gain = emberGain(castleLevel, ownedTiles, merchantUpgrades);
 	const levelOk = castleLevel >= REBIRTH.minCastleLevel;

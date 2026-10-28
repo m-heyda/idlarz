@@ -25,7 +25,6 @@ import {
 	type MerchantUpgradeId,
 	RESOURCE_CAP,
 	XP_CAP,
-	TILE_TAP,
 	type FarmUpgradeId,
 	type EmberUpgradeId,
 } from '@/config/gameConfig';
@@ -39,7 +38,6 @@ import {
 	calculateResourceRates,
 	buyCost,
 	calculateTileCost,
-	calculateTileTapYield,
 	calculateXpGain,
 	canAffordBundle,
 	castleUpgradeDuration,
@@ -103,12 +101,9 @@ import type {
 	Monster,
 	PrestigeState,
 	Resources,
-	TapResult,
 } from '@/types/game';
 import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile, type World } from '@/utils/world';
 
-// Last tap time per tile (not persisted) - enforces TILE_TAP.cooldownMs
-const lastTapAt: Record<string, number> = {};
 
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
 const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'>): LimitContext => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige });
@@ -436,7 +431,6 @@ const createGameSlice = (
 		resetGame: () => {
 			clickLimiter.reset();
 			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
-			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
@@ -455,7 +449,6 @@ const createGameSlice = (
 			};
 			clickLimiter.reset();
 			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
-			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			const fresh = createInitialData(prestige);
 			// settle the level first: XP bought a moment ago may not have been counted by a tick yet (its points are credited here)
 			const settled = calculateLevel(state.resources.xp);
@@ -823,30 +816,6 @@ const createGameSlice = (
 			if (state.combat.fight) return false;
 			set({ bag: organizeBag(state.bag) });
 			return true;
-		},
-
-		// Tapping an owned tile yields a slice of its own output (per-tile cooldown + the shared click limiter)
-		tapTile: (x: number, y: number, input?: ClickInput): TapResult | null => {
-			if (!input || !clickLimiter.take(input)) return null;
-
-			const state = get();
-			const key = `${x},${y}`;
-			if (input.now - (lastTapAt[key] ?? -Infinity) < TILE_TAP.cooldownMs) return null;
-
-			const perSecond = calculateTileTapYield(state.tiles, x, y, state.resourceRates);
-
-			const items = (Object.entries(perSecond) as [keyof Resources, number][])
-				.map(([resource, rate]) => ({ resource, amount: rate * TILE_TAP.seconds }))
-				.filter((item) => item.amount > 0);
-			if (items.length === 0) return null;
-
-			lastTapAt[key] = input.now;
-			const gained: Partial<Resources> = {};
-			items.forEach(({ resource, amount }) => {
-				gained[resource] = amount;
-			});
-			get().addResources(gained);
-			return { items };
 		},
 
 		tick: (deltaTime: number) => {

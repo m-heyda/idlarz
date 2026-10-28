@@ -139,6 +139,6 @@ test('rebirth and reset bring the map back to the starting ring, wherever the la
 	freshGame();
 	store.setState({ tiles: syntheticWorld(800, 2), freeTiles: 1 });
 	api().resetGame();
-	assert.equal(ownedCount(api().tiles), 9);
+	assert.equal(ownedCount(api().tiles), 5);
 	assert.deepEqual(ownedBounds(api().tiles), { minX: CASTLE_X - 1, maxX: CASTLE_X + 1, minY: CASTLE_Y - 1, maxY: CASTLE_Y + 1 });
 });

@@ -43,7 +43,7 @@ import {
 	Tile,
 	TileCost,
 } from '@/types/game';
-import { castleAreaBonus, castleLevelOf, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
+import { castleAreaBonus, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
 import type { CombatBonus } from '@/lib/combat';
 import { STAT_RULES } from '@/config/combatConfig';
 import { atkSpeedPercent, magicDamagePercent, physicalDamagePercent, statArmor, statMaxMana } from '@/lib/statBonuses';
@@ -250,17 +250,21 @@ const countAdjacentSameBiomes = (
 	(getTile(tiles, x, y - 1)?.biome === biome ? 1 : 0) +
 	(getTile(tiles, x, y + 1)?.biome === biome ? 1 : 0);
 
-/** Tiles that did not cost anything: the castle (1) in an old save, the castle and its 8 neighbours in a new game. */
-export const STARTER_FREE_TILES = 9;
+/**
+ * Tiles that did not cost anything: the castle (1) in an old save, the castle and its four neighbours (north, east, south,
+ * west) in a new game. A run that began with the old 3x3 start keeps 9 (`LEGACY_FREE_TILES`).
+ */
+export const STARTER_FREE_TILES = 5;
+export const LEGACY_FREE_TILES = 9;
 
 /**
  * Owned-tile count as the economy sees it: purchases + 1 (the old castle-only start). Tile cost, XP per tile, the extra
- * resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting ring does not
+ * resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting tiles do not
  * make the first purchases expensive. Pass the state's `freeTiles`.
  */
 export const economyTiles = (tiles: World, freeTiles: number): number => countOwnedTiles(tiles) - freeTiles + 1;
 
-/** A new map: the castle at (CASTLE_X, CASTLE_Y) and its 8 neighbours already owned, generated from the basic biomes. */
+/** A new map: the castle at (CASTLE_X, CASTLE_Y) and the tiles north, east, south and west of it already owned, generated from the basic biomes. */
 export const createInitialWorld = (random: () => number = Math.random): World => {
 	const placed: Placed[] = [
 		{
@@ -657,25 +661,6 @@ export const calculateResourceRates = (
 		total[key] = breakdown[key].total;
 	}
 	return { base, modifiers, total };
-};
-
-// Per-second output of one owned tile (biome + building, adjacency and castle area bonus, global modifiers).
-// Used for the tile-tap bonus. XP is excluded on purpose.
-export const calculateTileTapYield = (
-	tiles: World,
-	x: number,
-	y: number,
-	rates: ResourceRates
-): Partial<Resources> => {
-	const output = calculateTileOutput(tiles, x, y, castleLevelOf(tiles));
-	if (!output) return {};
-	const out: Partial<Resources> = {};
-	for (const resource of Object.keys(output.base) as (keyof Resources)[]) {
-		if (resource === 'xp') continue;
-		const perSecond = (output.base[resource] || 0) + (output.neighbour[resource] || 0) + (output.area[resource] || 0);
-		if (perSecond) out[resource] = perSecond * (1 + (rates.modifiers[resource] || 0));
-	}
-	return out;
 };
 
 // ---------------------------------------------------------------------------

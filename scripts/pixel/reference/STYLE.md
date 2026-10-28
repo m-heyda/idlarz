@@ -169,8 +169,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
 - **Tooltips/toasts** `.px-tooltip` / `.px-toast` (gold 9-slice), `.px-tip-title`, `.px-tip-muted` - every hover card.
   Resource icons in UI text use `ResourceIcon` (20px sprite), not emoji.
 - **Motion**: transform/opacity only, integer pixel steps for sprite animation, honour `prefers-reduced-motion`.
-- **Tile tap feedback**: cursor popup (a line per resource, lucky header), pulse on the *inner* tile element (the outer
-  one carries the grid translate), darkening cooldown overlay.
+- **Click feedback**: cursor popup with the gold a map click paid.
 - **Terrain logic**: `src/utils/terrain.ts` (tested in `tests/terrain.test.ts` against `tests/fixtures/terrain-parity.json`, written by the
   Python build) is a line-for-line port of `scripts/pixel/terrain_logic.py` (ground rank, dual-cell layers, tile depth, prop and dock
   placement; integer maths only), so art previews and the game agree exactly. Layer rank, low to high: mist < coast < plains <
