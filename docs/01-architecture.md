@@ -78,7 +78,7 @@ src/
 supabase/                     schema.sql (a fresh project) + migrations/ (autosave_history_by_time, offline_ledger, combat_ledger: run in that order on an older project)
 scripts/
 ├── sim.ts                    bot simulation on the REAL store (milestones per player profile)
-├── balance-report.ts, catalog-report.ts, fight-sim.ts, loot-sim.ts   generators of docs/generated/*.md (`npm run docs:gen` runs them all)
+├── balance-report.ts, catalog-report.ts (renders catalogDoc.ts), fight-sim.ts, loot-sim.ts   generators of docs/generated/*.md (`npm run docs:gen` runs them all)
 ├── perf-world.ts             timings at 5k / 50k / 250k tiles (`npm run perf`)
 └── pixel/                    sprite generators -> public/pixel/ (see "Pixel art pipeline")
 tests/                        one file per area (economy, saves, castle, rebirth, loot, offline/ledger, fight engine and balance, merchant, terrain ...); helpers.ts builds games; fixtures/ holds frozen old saves

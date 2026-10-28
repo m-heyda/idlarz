@@ -164,4 +164,6 @@ export interface CombatView {
 	behind: boolean;
 	/** Seconds until the browser should ask again */
 	nextPollSec: number;
+	/** Why auto-battle is idle although monsters wait: none of them looks winnable (see offline/winChance.ts); a click fights one anyway */
+	autoNote?: 'no_winnable' | null;
 }

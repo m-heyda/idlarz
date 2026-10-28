@@ -224,6 +224,8 @@ export interface CombatClientState {
 	maxMp: number;
 	/** Seconds until the soonest monster that beat the player is tried again (0: none is waiting out) */
 	retrySec: number;
+	/** Auto-battle is idle because no waiting monster looks winnable (a click on one fights it anyway) */
+	autoNote: 'no_winnable' | null;
 	/** Server clock of the picture shown (an older answer than this is ignored) */
 	at: number;
 	/** The last combat event applied: null until the server has said where its log stands */

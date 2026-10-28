@@ -100,8 +100,8 @@ export const simSetup = ({ equipment = {}, character = freshCharacter(), potions
 const simulateFight = ({ equipment, monster, character, potions, level, autoUse = true, seed }: SimInput): SimResult => {
 	const { ledger, env } = simSetup({ equipment, character, potions, level, monsters: [monster], seed });
 
-	// the first request engages the monster; then the clock runs on one second at a time until the fight is decided
-	let state = runCombat(ledger, env(START), { autoUse }).ledger;
+	// the first request fights the monster (a click on it, so auto-battle's win-chance gate does not decide); then the clock runs on one second at a time until the fight is decided
+	let state = runCombat(ledger, env(START), { autoUse, commands: [{ kind: 'fight', n: 1 }] }).ledger;
 	const maxHp = state.combat!.fight?.profile.maxHp ?? 1;
 	let now = START;
 	const seen: FightEvent[] = [];

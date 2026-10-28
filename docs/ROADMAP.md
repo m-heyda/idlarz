@@ -15,12 +15,11 @@ The big plan is to move more of the economy to the server (see "Server authority
 
 | # | What | Where | Note |
 |---|---|---|---|
-| R3 | `luck`, `goldFind`, income `rates`, equipment and the bag the server rolls with come from the **last accepted save**, which the client wrote; `cloudSave/verify.ts` only flags | `cloudSave/summary.ts`, `lib/offline/profile.ts` | the fight profile is read from the save when a fight starts; a forged save can claim gear it never found. Closing this is the ledger-owned inventory below |
-| R4 | No "can I win this?" gate: auto-battle engages the weakest waiting monster at 80 % HP, loses to anything too strong and rests; a monster that beat the player is left alone for 5 min (a boss 10) | `COMBAT.auto` | enough for now; a win-chance estimate would let it skip hopeless fights |
+| R3 | `luck`, `goldFind`, income `rates`, equipment and the bag the server rolls with come from the **last accepted save**, which the client wrote; `cloudSave/verify.ts` only flags | `cloudSave/summary.ts`, `lib/offline/profile.ts` | the fight profile is read from the save when a fight starts; a forged save can claim gear it never found (and now a set it never found: the Obsidian economy bonuses are derived from the saved gear). Closing this is the ledger-owned inventory, designed under "Server authority" below |
 | R5 | Potions the server drank are removed from the **browser's** bag when the event arrives; the server counts them against the saved bag (`consumed` minus `consumedSeen`). A reload in the middle can leave the local bag one potion too full for a moment | `lib/offline/fight.ts`, `cloudSave/pipeline.ts` | the server never lets a potion be drunk twice; the right fix is the server-owned bag |
 | R6 | A fight uses the gear of the last accepted save, frozen when the fight starts. The cloud save goes out soon after an equip, but not at once | `useCloudSync` | equipping is blocked while a fight is open in the browser |
 | R7 | `dangerBonus` (one level per 8 tiles from the castle) is now 0 or 1: monsters stand at most 9 tiles out | `lib/monsters.ts` | the frontier is no longer more dangerous than the home land; rework with the biomes |
-| R8 | The King's balance changed with auto-attack (1000 HP, 75 s clock): the best gear wins comfortably, obsidian narrowly, steel not | `MONSTERS.ratKing`, [generated/fight-sim.md](generated/fight-sim.md) | needs a real playtest |
+| R8 | The King's balance changed with auto-attack (1000 HP, 75 s clock): the Rattatui set wins in 26-35 s, obsidian in 51-64 s, steel and wood not at all (steel lost its old set bonus) | `MONSTERS.ratKing`, [generated/fight-sim.md](generated/fight-sim.md) | needs a real playtest |
 | R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix) |
 | ⚠️ B6 | Chests and map clicks are small next to the rest of the economy (the click is the only click income for now; the tile tap was removed) | | decide whether they should scale with progress, together with the click rework (BL3) |
 | ⚠️ B7 | `sim.ts` bots build on the first free explored tile (round-robin through six buildings), do not use the class picker, allocate stat points by a fixed policy, and play one reasonable style (reserve for the castle, top up at the merchant) | `scripts/sim.ts` | fine for pacing checks; extend the bot before tuning small effects |
@@ -29,7 +28,7 @@ The big plan is to move more of the economy to the server (see "Server authority
 
 What still runs in the browser and is only checked by plausibility. Tile buying was assessed and **stays client-side with autosave**: it is the most frequent action (an API call per click would be the real server load), its gold lives in the client-authored save the server already checks, and the one server consumer of the map (monster placement) tolerates the autosave lag. It becomes worth an API when `verify.ts` stops being shadow mode and starts rejecting.
 
-1. **Ledger-owned inventory and equipment** (closes R3, R5, R6): the bag, the worn gear and the loot pity live in the ledger; the browser shows them. Then a fight can never use gear the player does not own.
+1. **Ledger-owned inventory and equipment** (closes R3, R5, R6; designed, not built - it is the next piece): the bag, the worn gear and the loot pity live in the ledger; the browser shows them, so the server never reads them from a client-authored save. Design: an additive `player_ledger.inv jsonb` (`{ver, bag, equipment, lootPity, autoSellUpTo}`, seeded once from the stored core; apply the migration before deploying); `acceptSave` stamps `ledger.inv` over the bag, gear and pity of the uploaded core (an imported or edited save can no longer smuggle gear in); fights and kill/chest rewards read and write `ledger.inv` (a drunk potion leaves the bag there, which deletes `consumed`/`consumedSeen` and closes R5; chest items overflow to gold on the server); one `POST /api/inventory {key, action}` (`equip`, `unequip`, `layout`, `discard`, `sell`, `sellJunk`, `autoSell`) over the pure functions of `lib/inventory.ts`, refused while a fight is open (closes R6); the 2 s poll sends `invVer` and gets the inventory only when stale, and the ledger write is skipped when only the anchor changed. **Every other way the bag changes has to move behind a route in the same change**, or the next upload would stamp it away: the merchant's `buyItem` / `buyOffer` / potion purchases and `refreshMerchantStock` (their gold still lives in the client save, so the route pays out and the price check stays a plausibility check until item 5), the chest item branch and the kill drops. Tests: `serverInventory`, plus updates to `fightEngine`, `clientCombat`, `equipment`, `inventory`, `cloudSave`, `rebirth`.
 2. **Enforce `verify.ts`** (today it only flags): reject a save that gained more than the server granted.
 3. **Economy actions** by the server where they pay out: castle upgrade (start, cost and finish time in the ledger; today the server only checks the timer on its own clock, `castle_jump`), rebirth/Embers, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
 4. **XP award** of tile purchases and the attribute allocation (the server already models and clamps XP, `cloudSave/xpModel.ts`, and derives the fight level from the saved XP).
@@ -75,6 +74,27 @@ Notes from reading the code (not measured against the live project):
 - **Fight tunables** all sit in `COMBAT` (`tickSec`, `maxCatchUpSec`, `maxFightSec`, `poll`, `auto`): thresholds, retry cooldowns, which monster is next (`engageOrder`).
 
 **Paragon levels (draft, not built).** The level curve ends at 100 (soft cap 80, level 90 around the 5th rebirth, 100 around the 10th). Past it a paragon track would give the endless part of the game without feeding the attribute economy (a level-100 character already holds 157 attribute points): the same lifetime XP keeps counting, each paragon level gives one point, points go into a few small, capped, account-wide bonuses (income, XP gain, Luck, offline efficiency), and the leaderboard ranks level then paragon level. Open: points per level, the caps, whether levels 81-100 should give extra attribute points, and how the Ember shop and Ancestral Tithe interact.
+
+## Draft ideas for later (not committed to)
+
+Loose ideas, not scheduled and not sized; each needs a design pass before it enters the lists above.
+
+**Economy upgrades** (the Ember shop and the merchant ladders are flat percentages today; BL5, BL6, BL9, BL10)
+- *Market saturation*: the price of a resource drops with the volume sold and recovers over ~30 min, so burst selling is not the best move.
+- *Caravans / trade contracts*: a timed gold-and-resource sink that pays out more than it costs, run on the server clock (the ledger already has the timers pattern).
+- *Storage caps tied to the castle*: stockpiles stop at a cap that grows with the castle, which gives wood, stone and coal a reason to be spent.
+- *Building levels and specialisation*: the building rework below, with the set-like bonus for clusters of one kind.
+- *A second Ember currency or prestige tier* and shop items with a different shape (a longer chest timer cap, a free animal slot, a start with a tier-2 resource). Embers stay permanent: no reroll or respec.
+- *More economy sets*: the Obsidian set pays income, XP and away time; a later tier could pay different things (chest rewards, merchant prices, farm output).
+
+**Combat upgrades** (the two ability slots hold Heal and Stun; one weapon per rarity tier)
+- *Item upgrading / enchanting*: a gold-and-material sink tied to the merchant, with salvage ([10](10-loot-system.md)); the natural place for the tier-2 materials.
+- *Gem sockets* in gear, and gems as the thing the premium currency buys.
+- *A skill tree or class skills* (classes are cosmetic today): more skills for the two slots, passive picks per class.
+- *Monster families per biome*, a bestiary with kill counts, monster abilities (bleed, enrage), elites and a daily bounty monster.
+- *Set depth*: more sets per gear tier, set bonuses that scale with the item level (today they are fixed amounts), loadout swapping between an economy set and a combat set.
+
+**Server authority follow-ups**: the ledger-owned inventory above, server-run castle upgrades (start, cost, finish time), a server-priced merchant, enforcing `verify.ts`, and a server-owned `/api/rebirth`.
 
 ## Building rework and late-game resources (design draft, nothing built)
 

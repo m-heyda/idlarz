@@ -13,6 +13,10 @@ import type { Equipment } from '../src/types/game';
 
 // The server's fight engine, run without a database: a player's saved strength, monsters placed on the map, a sealed random stream.
 
+// Auto-battle's win-chance gate (offline/winChance.ts) is tested in winChance.test.ts. Here the player fights whatever the test puts in front of
+// them, weak kit against strong monsters included, so the gate is off for this file (each test file runs in its own process).
+(COMBAT.auto as { minWinChance: number }).minWinChance = 0;
+
 const DAGGER: Equipment = { ...STARTER_EQUIPMENT, mainHand: plainItem('steel_dagger') };
 const MAUL: Equipment = { ...STARTER_EQUIPMENT, mainHand: plainItem('obsidian_maul') };
 const STRONG = fullSet('rattatui');
