@@ -98,10 +98,10 @@ export const RESOURCES = {
 		emoji: '🟫',
 		label: 'Hide',
 		description: 'A farm product from deer and pigs.',
-		usedFor: 'Tannery upgrades; sell the rest to the merchant.',
-		source: 'Deer and pigs on the farm. Cannot be bought.',
+		usedFor: 'Tannery upgrades and the price of big territories; sell the rest to the merchant.',
+		source: 'Deer and pigs on the farm, and the rats you beat. Cannot be bought.',
 		color: '#c89868',
-		merchant: { price: 4, description: 'Tanned leather from the farm.', pitch: 'Craftsmen always need good leather.' },
+		merchant: { price: 2, description: 'Tanned leather from the farm.', pitch: 'Craftsmen always need good leather.' },
 	},
 	xp: {
 		emoji: '✨',

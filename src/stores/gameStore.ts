@@ -333,12 +333,13 @@ const createGameSlice = (
 				lootPity = e.reward.pity;
 				resources.gold = Math.min(resources.gold + e.reward.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP);
 				resources.xp = Math.min(resources.xp + e.reward.xp, XP_CAP);
+				resources.hide = Math.min(resources.hide + (e.reward.hide ?? 0), RESOURCE_CAP);
 				notice = {
 					id: noticeId++,
 					kind: 'won',
 					type: e.type,
 					level: e.level ?? 1,
-					summary: { gold: e.reward.gold, xp: e.reward.xp, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold, lucky: e.reward.lucky },
+					summary: { gold: e.reward.gold, xp: e.reward.xp, hide: e.reward.hide, items: received.stored, convertedGold: received.convertedGold, autoSold: received.autoSold, lucky: e.reward.lucky },
 					taunt: null,
 				};
 			} else if ((e.kind === 'defeated' || e.kind === 'timeout') && e.type) {

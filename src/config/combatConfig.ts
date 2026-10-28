@@ -50,7 +50,9 @@ export const COMBAT = {
 		dangerStep: 8, // a monster that appears this many tiles (Chebyshev) further from the castle spawns one level higher: the frontier is more dangerous than the home land
 	},
 	// What drops (how often, which rarity and item level) is loot config: src/catalog/lootConfig.ts
-	rewards: { minGold: 10, minXp: 5 },
+	// A kill pays seconds of income: gold and XP as `rewardSec` x the rate, hide as that x `hideShare` (hide only comes from the farm, so
+	// a rat's pelts are a share of it: they help with the hide the big territories cost, see TILE_RESOURCE_COST)
+	rewards: { minGold: 10, minXp: 5, hideShare: 0.6 },
 };
 
 // How the five attributes feed combat (read through lib/statBonuses.ts). Every attribute starts at `base`; bonuses count the

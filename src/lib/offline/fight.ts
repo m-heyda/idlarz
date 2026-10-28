@@ -230,7 +230,7 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 			const paid = payKill(env.secret, env.userId, ledger, env.stored, f.n, t);
 			if (!paid) return endFight(t, 'retreat');
 			ledger = paid.ledger;
-			push(t, 'won', { n: f.n, type: f.type, level: paid.payout.level, reward: { gold: paid.payout.gold, xp: paid.payout.xp, items: paid.payout.items, pity: paid.payout.pity, lucky: paid.payout.lucky } });
+			push(t, 'won', { n: f.n, type: f.type, level: paid.payout.level, reward: { gold: paid.payout.gold, xp: paid.payout.xp, hide: paid.payout.hide, items: paid.payout.items, pity: paid.payout.pity, lucky: paid.payout.lucky } });
 			c.fight = null;
 			return;
 		}

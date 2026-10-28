@@ -14,7 +14,7 @@ extra    = floor(base × share × (1 − discount%/100))  for each TILE_RESOURCE
 discount%= min(0.5 × Charisma, 25)
 ```
 
-`TILE_RESOURCE_COST`: wood 30 % and stone 25 % of the gold cost from n = 15; coal 20 % from n = 30; food 10 % from n = 40; hide 3 % from n = 120 (milk and eggs are kept for other uses). Gold stays the biggest single part.
+`TILE_RESOURCE_COST`: wood 30 % and stone 20 % of the gold cost from n = 15; coal 20 % from n = 30; food 10 % from n = 40; hide 2 % from n = 100 (milk and eggs are kept for other uses). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (`npm run sim`, table at the end of [generated/sim-milestones.md](generated/sim-milestones.md)): gold must be the biggest number, hide and the rest below it. Gold stays the biggest single part.
 
 | n | 1 | 10 | 20 | 30 | 50 | 75 | 100 | 150 | 200 | 300 | 400 | 500 | 1,000 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -29,11 +29,11 @@ Every purchase rolls its biome (no picker). XP and reputation per purchase in §
 ## 2. XP and levels
 
 ```
-tileXP(k)   = 125 × 1.02^(min(k,300)−1) × min(k,300)/4 × (k/300)^1.5 if k > 300      k = owned count AFTER the purchase (XP_TILE)
+tileXP(k)   = 45 × 1.02^(min(k,300)−1) × min(k,300)/4 × (k/300)^1.5 if k > 300       k = owned count AFTER the purchase (XP_TILE, BASE_XP_PER_TILE; was 125)
 awardedXP   = tileXP × (1 + xpGainMultiplier/100)
 xpGainMultiplier (%) = 0.2·INT + 0.25·CHA
 passive xp/s = rates.total.xp × (1 + xpGainMultiplier/100)
-XP to leave level N = floor(750 × 1.3^(N−1))
+XP to leave level N = floor(750 × 1.3^(min(N,38)−1) × 1.045^max(0,N−38))     xpToLeaveLevel, XP_LEVEL_SOFT: the old x1.3 up to level 38, then x1.045
 stat points = 1 per level; reputation = 1000 + 100 per tile bought
 ```
 
@@ -77,21 +77,21 @@ upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[
 | 1→2 | 1 h | 70 K | 10 K | 10 K | — | — | — |
 | 2→3 | 4 h | 200 K | 30 K | 30 K | 20 K | — | — |
 | 3→4 | 12 h | 1 M | 100 K | 100 K | 50 K | 200 K | 40 K |
-| 4→5 | 1 d 12 h | 4 M | 400 K | 400 K | 200 K | 2 M | 100 K |
-| 5→6 | 3 d | 20 M | 2 M | 2 M | 1 M | 10 M | 500 K |
+| 4→5 | 1 d | 4 M | 400 K | 400 K | 200 K | 2 M | 100 K |
+| 5→6 | 2 d | 8 M | 2 M | 2 M | 1 M | 4 M | 500 K |
 | 6→7 | 3 d | 30 M | 3 M | 3 M | 1.6 M | 16 M | 800 K |
 | 7→8 | 4 d | 48 M | 4.8 M | 4.8 M | 2.6 M | 25.6 M | 1.28 M |
 | 8→9 | 5 d | 76.8 M | 7.6 M | 7.6 M | 4 M | 41 M | 2 M |
 | 9→10 | 7 d | 122.8 M | 12.2 M | 12.2 M | 6.6 M | 65.6 M | 3.2 M |
 
-Build time to level 6 is 5 d 5 h, to level 10 24 d 5 h (before Legacy discounts). Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
+Build time to level 6 is 4 d 5 h (1 h + 4 h + 12 h + 1 d + 2 d), to level 10 23 d 5 h (before Legacy discounts); the timers are the floor of the first run, so the cost of 5→6 is what a player who plays a few times a day must be able to pay while the 4→5 timer runs. Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
 
 ## 5. Farm animals
 
 ```
 cost of the N-th animal of a kind = floor(baseCost × costScaling^(N−1))   food
 meat/s of N animals               = baseProduction × N × (1 + 0.02 × pen) × (1 + 0.05 × feed)
-product/s of N animals            = perSec × N × (1 + 0.02 × pen) × (1 + 0.10 × coop|dairy|tannery)
+product/s of N animals            = perSec × N × (1 + 0.02 × pen) × (1 + effect × coop|dairy|tannery) × (1 + 0.08 × pasture)      effect: 0.15 coop / dairy, 0.25 tannery
 meat total                        = base × (1 + castle modifier + 0.05 × plainsTiles)
 products total                    = base × (1 + castle modifier)          (eggs, milk, hide)
 cap per kind                      = 12 + 4 × pen level
@@ -101,8 +101,8 @@ upgrade cost (level N → N+1)      = ceil(base × growth^N) per resource
 | Animal | first cost | cost × | meat/s each | product/s each |
 | --- | --- | --- | --- | --- |
 | Chicken | 1 K | 1.3 | 0.2 | 0.03 eggs |
-| Deer | 10 K | 1.33 | 0.5 | 0.0375 hide |
-| Pig | 60 K | 1.36 | 1 | 0.075 hide |
+| Deer | 10 K | 1.33 | 0.5 | 0.075 hide |
+| Pig | 60 K | 1.36 | 1 | 0.15 hide |
 | Cow | 400 K | 1.4 | 2 | 0.225 milk |
 
 | Upgrade | per level | levels | base cost | cost × |
@@ -110,17 +110,18 @@ upgrade cost (level N → N+1)      = ceil(base × growth^N) per resource
 | Feed Trough | +5 % meat | 10 | 2 K food | 1.6 |
 | Hen House | +15 % eggs | 10 | 1.5 K wood + 40 eggs | 1.6 |
 | Dairy | +15 % milk | 10 | 1.5 K stone + 30 milk | 1.6 |
-| Tannery | +15 % hide | 10 | 1.2 K coal + 20 hide | 1.6 |
+| Tannery | +25 % hide | 10 | 1.2 K coal + 20 hide | 1.6 |
+| Pasture | +8 % eggs, milk and hide | 10 | 5 K food + 2.5 K wood | 1.6 |
 | Pen Expansion | +2 % all farm output, +4 animals per kind | 8 | 8 K food + 3 K wood + 3 K stone | 1.9 |
 
-A product sells for 2 / 3 / 4 gold (eggs / milk / hide), which is 30–34 % of the meat value of the animal that makes it (products were produced 50 % slower and sold for 3 / 4 / 6 before: the same gold, reached faster).
+A product sells for 2 / 3 / 2 gold (eggs / milk / hide; hide produces twice as fast as before and sells for half, so its gold is unchanged and the hide itself reaches the tile price faster), which is 30–40 % of the meat value of the animal that makes it (products were produced 50 % slower and sold for 3 / 4 / 6 before: the same gold, reached faster).
 
 Payback (food valued at its sell price 0.75, meat at 1) is well under a day for the first chicken and grows with each extra animal (generated §4); the sim buys the first chicken within minutes and the first cow after about half a day.
 
 ## 6. Merchant, clicks, chests, buildings
 
 ```
-sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .75, stone .9, coal 1.1, food .4, meat 1, eggs 2, milk 3, hide 4
+sell:  gold = floor(amount × price × (1 + 0.03 × Haggler))    wood .75, stone .9, coal 1.1, food .4, meat 1, eggs 2, milk 3, hide 2
 buy:   gold = ceil(amount × price × 2)                         wood, stone, coal, food, meat only
 item:  sell = floor(rarityValue × valueCurve(level) × qualityValue × affixesValue × Haggler)   rarityValue 300 / 1200 / 3600 / 12000 / 45000; potions 20 / 90
        valueCurve = 1.3^(min(L,10)−1) × 1.12^max(0,L−10);  qualityValue 0.75..1.25;  affixesValue = 1 + Σ(0.15 + 0.35 × roll/100)   (ITEM_VALUE in catalog/stats.ts)
@@ -144,12 +145,12 @@ Click limiter (gold clicks, tile taps, critter gifts; NOT fight hits): burst buc
 
 ## 8. What the pacing looks like
 
-From `npm run sim` (bot players, real store; see [06](06-playtest-and-pacing-report.md)): castle 2 ≈ 17–21 h, castle 3 ≈ 2–3 d, castle 4 ≈ 5–8 d, castle 5 ≈ 13–18 d, castle 6 ≈ 32–40 d, castle 10 ≈ 100–125 d, with the dedicated human about 20 % faster than a player who never clicks. The 24 h/day auto-clicker bot is faster still (castle 6 ≈ 24 d) because it also manages the economy around the clock, see [06 §3](06-playtest-and-pacing-report.md).
+From `npm run sim` (bot players, real store; see [06 §0b](06-playtest-and-pacing-report.md)): castle 4 ≈ 1 d, castle 5 ≈ 2.1-3.6 d, castle 6 ≈ 4.2 d (bots) / 5.8 d (the `human` profile, who plays a few times a day and never sells surplus), castle 10 ≈ 24-26 d; the first rebirth is available around day 6-7 for a person, level ~40 by then. Older numbers below the heading are history. The 24 h/day auto-clicker bot is faster still (castle 6 ≈ 24 d) because it also manages the economy around the clock, see [06 §3](06-playtest-and-pacing-report.md).
 
 ## 9. Rebirth and Legacy
 
 ```
-available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 20 (REBIRTH.minTiles), no castle upgrade running
+available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 100 (REBIRTH.minTiles), no castle upgrade running
 points      = floor(4.5 × (C − 5) × sqrt(n / 10))                     REBIRTH.gain
 income      × (1 + 0.05 × legacyEarned)                                folded into the modifiers, spending never lowers it
 shop cost   = ceil(base × 1.4^level)        base: thrift 2, builders 3, mastery 2, provisions 2; max level 10
@@ -195,6 +196,7 @@ click damage = max(1, your damage × (1 − armorReduction(armor)))     monster 
 rewards      : rewardSec = 90 × 1.17^(L−1) (rat), 3600 × 1.03^(L−15) (King)
                gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
+               hide = floor(hide/s × rewardSec × 0.6)      COMBAT.rewards.hideShare; pelts are a share of the farm's income, 0 without deer and pigs; also x3 on a lucky rat
 drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> source level -> item level -> rarity -> base -> affixes
                rat: gear 12 % + 1 % per level above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
                potion 25 % + 1.5 % per level (Greater from level 7)              (level 1: 90 s of income, level 9: ~316 s)

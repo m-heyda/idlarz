@@ -26,6 +26,7 @@ import {
 	TILE_RESOURCE_COST,
 	TILE_TAP,
 	XP_GROWTH_FACTOR,
+	XP_LEVEL_SOFT,
 } from '@/config/gameConfig';
 import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
@@ -246,7 +247,7 @@ const Tutorial: React.FC = () => {
 						{SKILLS.stun.stunSec} seconds. They do no damage: they buy time for your clicks.
 					</li>
 					<li>
-						Winning pays gold and XP worth some seconds of your income, plus a chance of gear and potions. Rats drop wood, cloth and, from
+						Winning pays gold and XP worth some seconds of your income, a share of the hide your farm makes, plus a chance of gear and potions. Rats drop wood, cloth and, from
 						older rats, steel and obsidian gear. The <b>Rat King</b> (boss, armor, {MONSTERS.ratKing.critChance}% crits, resists Stun {MONSTERS.ratKing.stunResist}%, a {MONSTERS.ratKing.timeLimitSec}s time limit) is hard: he needs real
 						gear and quick clicking. He always drops a piece of the epic Rattatui set (the only place to get it), sometimes a second one or a legendary weapon, and potions.
 					</li>
@@ -381,7 +382,7 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Leveling</h3>
 				<p className='text-[#d8c8a0] text-xs px-card font-mono'>
-					XP to leave level N = {BASE_XP_PER_LEVEL} x {XP_GROWTH_FACTOR}^(N-1)
+					XP to leave level N = {BASE_XP_PER_LEVEL} x {XP_GROWTH_FACTOR}^(N-1) up to level {XP_LEVEL_SOFT.fromLevel}, then x{XP_LEVEL_SOFT.growth} per level
 				</p>
 				<p className='text-[#a89878] mt-1'>
 					XP comes from time (more with the castle and some buildings) and from every tile you buy.

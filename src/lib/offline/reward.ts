@@ -25,13 +25,14 @@ export interface KillPayout {
 	lucky: boolean;
 	gold: number;
 	xp: number;
+	hide: number;
 	items: Drop[];
 	pity: Record<string, number>;
 }
 
 /**
  * Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll
- * it again), and the gold and XP go into what the server has granted. Null when the ticket is not there.
+ * it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.
  */
 export const payKill = (secret: string, userId: string, ledger: Ledger, stored: StoredSave, n: number, nowSec: number): { ledger: Ledger; payout: KillPayout } | null => {
 	const taken = takeMonster(ledger.bank, n);
@@ -45,11 +46,11 @@ export const payKill = (secret: string, userId: string, ledger: Ledger, stored: 
 	const { owned, pity } = rollInputs(stored);
 	const loot = rollKillLoot(
 		{ type, level },
-		{ goldPerSec: stored.summary.rates.gold, xpPerSec: stored.summary.rates.xp * (1 + stored.summary.xpGainPct / 100), luck, goldFind, owned, pity, lucky: ticket.lucky },
+		{ goldPerSec: stored.summary.rates.gold, xpPerSec: stored.summary.rates.xp * (1 + stored.summary.xpGainPct / 100), hidePerSec: stored.summary.rates.hide, luck, goldFind, owned, pity, lucky: ticket.lucky },
 		rng
 	);
 	return {
-		ledger: { ...ledger, bank: taken.bank, ordKill, granted: addTotals(ledger.granted, { gold: loot.gold, xp: loot.xp }) },
-		payout: { level, lucky: ticket.lucky, gold: loot.gold, xp: loot.xp, items: loot.items, pity: loot.pity },
+		ledger: { ...ledger, bank: taken.bank, ordKill, granted: addTotals(ledger.granted, { gold: loot.gold, xp: loot.xp, hide: loot.hide }) },
+		payout: { level, lucky: ticket.lucky, gold: loot.gold, xp: loot.xp, hide: loot.hide, items: loot.items, pity: loot.pity },
 	};
 };
