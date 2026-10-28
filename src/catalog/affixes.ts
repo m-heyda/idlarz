@@ -1,4 +1,4 @@
-import type { StatKey } from './stats';
+import type { ItemStatKey } from './stats';
 
 /**
  * Affixes: extra stats rolled onto gear. How many an item gets comes from its rarity (`RARITIES[r].minAffixes..maxAffixes`);
@@ -10,7 +10,7 @@ export interface AffixDef {
 	/** Shown as "Keen Iron Sword" (prefix) or "Iron Sword of Precision" (suffix) */
 	name: string;
 	position: 'prefix' | 'suffix';
-	stat: StatKey;
+	stat: ItemStatKey;
 	/** Multiplier on the stat's level-1 value (`STAT_BASE_BY_TIER[stat][0]`) */
 	power: number;
 	/** The value range as a multiple of the base value; the item's 0-100 roll picks the point inside it */
@@ -34,7 +34,7 @@ const TRINKET = ['neck', 'ring', 'charm', 'cape'];
 const MAGIC = ['staff', 'wand', 'tome'];
 
 interface Pair {
-	stat: StatKey;
+	stat: ItemStatKey;
 	prefix: string;
 	suffix: string;
 	power: number;

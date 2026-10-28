@@ -267,7 +267,7 @@ const Tutorial: React.FC = () => {
 				</div>
 				<ul className='list-disc pl-5 text-[#d8c8a0] text-xs space-y-1'>
 					<li>
-						<b>Sets</b>: wear several pieces of one set for bonuses (both rings count):{' '}
+						<b>Sets</b>: wear several pieces of one set for bonuses that add up (both rings count). Obsidian pays the kingdom (income, XP, kill rewards, away time), Rattatui adds percent damage and health:{' '}
 						{Object.values(SETS).map((set) => `${set.label} (${Object.keys(set.bonuses).join(' / ')} pieces)`).join(', ')}.
 					</li>
 					<li>

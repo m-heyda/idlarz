@@ -42,11 +42,11 @@ export const payKill = (secret: string, userId: string, ledger: Ledger, stored: 
 	const level = levelAtAge(ticket.spawnLevel ?? 1, nowSec - ticket.at);
 	const ordKill = ledger.ordKill + 1;
 	const rng = sealedRng(secret, userId, ledger.runId, 'kill', ordKill);
-	const { luck, goldFind } = stored.summary.derived;
+	const { luck, goldFind, killRewardPct } = stored.summary.derived;
 	const { owned, pity } = rollInputs(stored);
 	const loot = rollKillLoot(
 		{ type, level },
-		{ goldPerSec: stored.summary.rates.gold, xpPerSec: stored.summary.rates.xp * (1 + stored.summary.xpGainPct / 100), hidePerSec: stored.summary.rates.hide, luck, goldFind, owned, pity, lucky: ticket.lucky },
+		{ goldPerSec: stored.summary.rates.gold, xpPerSec: stored.summary.rates.xp * (1 + stored.summary.xpGainPct / 100), hidePerSec: stored.summary.rates.hide, luck, goldFind, killRewardPct, owned, pity, lucky: ticket.lucky },
 		rng
 	);
 	return {

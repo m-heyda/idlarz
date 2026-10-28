@@ -14,6 +14,7 @@ import { decodeSave, encodeSave } from '../src/lib/saveFormat';
 import { pickChestSpot } from '../src/lib/chests';
 import { castleLevelOf } from '../src/lib/castleWard';
 import { minimapLayout, minimapMarkers, paintChestGlow, paintMinimap } from '../src/lib/minimap';
+import { gearIncomePct } from '../src/lib/gearEconomy';
 import { calculateResourceRates, calculateXpGain } from '../src/utils/gameUtils';
 import { connectedCluster } from '../src/utils/cluster';
 import { chunkSignature, chunkSprites } from '../src/utils/terrain';
@@ -54,7 +55,7 @@ for (const count of [5_000, 50_000, 250_000]) {
 	rich();
 	const [, buy] = time(() => api().buyTile(spot![0], spot![1]));
 	const tick = median(() => api().tick(100));
-	const rates = median(() => void calculateResourceRates(api().tiles, api().characterStats, api().farmLevels, api().prestige, api().farmUpgrades, api().merchantUpgrades));
+	const rates = median(() => void calculateResourceRates(api().tiles, api().characterStats, api().farmLevels, api().prestige, api().farmUpgrades, api().merchantUpgrades, gearIncomePct(api().equipment)));
 	const chest = median(() => void pickChestSpot(api().tiles, new Set(), castleLevelOf(api().tiles)), 3);
 	const persisted = pickPersisted(api());
 	const [text, encodeFirst] = time(() => encodeSave(persisted));

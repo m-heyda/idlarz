@@ -1,5 +1,5 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/gameConfig';
-import { ITEM_CATALOG, SETS } from '@/catalog';
+import { ITEM_CATALOG, familyPieces } from '@/catalog';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { COMBAT } from '@/config/combatConfig';
 import { runCombat, type CombatEnv } from '@/lib/offline/fight';
@@ -29,7 +29,7 @@ export const spentCharacter = (spend: Partial<Pick<CharacterStats, 'strength' | 
 /** Every piece of a set worn, plus a weapon (and the set's own off hand is part of the set). Both rings are filled. Items are plain: their authored level, neutral quality, no affixes. */
 export const fullSet = (setId: string, weapon?: string): Equipment => {
 	const eq: Equipment = {};
-	for (const id of SETS[setId].pieces) {
+	for (const id of familyPieces(setId)) {
 		const slot = ITEM_CATALOG[id].slot!;
 		if (slot === 'ring') eq.ring1 = eq.ring2 = plainItem(id);
 		else eq[slot as EquipmentSlot] = plainItem(id);

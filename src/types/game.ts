@@ -109,6 +109,8 @@ export interface ItemDef {
 	attackSpeed?: number;
 	stats?: ItemStats;
 	set?: string;
+	/** A plain loot family (wood, cloth, steel): matches affixes and pools like a set does, but gives no set bonus */
+	family?: string;
 	description?: string;
 	consumable?: { healHp: number };
 	stackMax?: number;

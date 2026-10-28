@@ -72,6 +72,7 @@ import type { SkillId } from '@/catalog/skills';
 import type { LimitContext } from '@/lib/limits';
 import { generateMerchantStock, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
+import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotItemId, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
 import { plainItem, sellValueOf } from '@/lib/itemInstance';
 import { castleLevelOf } from '@/lib/castleWard';
@@ -95,6 +96,7 @@ import type {
 	ClickInput,
 	CombatClientState,
 	CombatNotice,
+	Equipment,
 	EquipmentSlot,
 	GameState,
 	MerchantStock,
@@ -106,6 +108,12 @@ import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedC
 
 
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
+/** The income rates for the state with this gear on (a set bonus can add income). */
+const ratesWithGear = (
+	state: Pick<GameState, 'tiles' | 'characterStats' | 'farmLevels' | 'prestige' | 'farmUpgrades' | 'merchantUpgrades'>,
+	equipment: Equipment
+) => calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades, gearIncomePct(equipment));
+
 const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'>): LimitContext => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige });
 
 // Shared by the gold click and the tile tap: one token per physical click
@@ -151,7 +159,7 @@ const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () 
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
 	const equipment = { ...STARTER_EQUIPMENT };
-	const rates = calculateResourceRates(grid, stats, {}, prestige);
+	const rates = calculateResourceRates(grid, stats, {}, prestige, undefined, undefined, gearIncomePct(equipment));
 	return {
 		tiles: grid,
 		resources: startingResources(prestige),
@@ -214,11 +222,12 @@ const createGameSlice = (
 			state.farmLevels,
 			state.prestige,
 			state.farmUpgrades,
-			state.merchantUpgrades
+			state.merchantUpgrades,
+			gearIncomePct(state.equipment)
 		);
 
 		const xpGain =
-			calculateXpGain(owned + 1) * (1 + state.characterStats.xpGainMultiplier / 100);
+			calculateXpGain(owned + 1) * (1 + xpGainPct(state.characterStats, state.equipment) / 100);
 		const resources = subtractBundle(state.resources, bundle);
 		resources.xp = Math.min(resources.xp + xpGain, XP_CAP);
 
@@ -466,7 +475,7 @@ const createGameSlice = (
 				level: settled,
 				previousLevel: settled.level,
 				characterStats,
-				resourceRates: calculateResourceRates(fresh.tiles, characterStats, fresh.farmLevels, prestige, fresh.farmUpgrades, merchantUpgrades),
+				resourceRates: calculateResourceRates(fresh.tiles, characterStats, fresh.farmLevels, prestige, fresh.farmUpgrades, merchantUpgrades, gearIncomePct(state.equipment)),
 				// gear is character progression: it survives a rebirth (HP is refilled)
 				equipment: state.equipment,
 				bag: state.bag,
@@ -529,7 +538,8 @@ const createGameSlice = (
 				newFarmLevels,
 				state.prestige,
 				state.farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 
 			set({
@@ -557,7 +567,8 @@ const createGameSlice = (
 				state.farmLevels,
 				state.prestige,
 				farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 			set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
 			return true;
@@ -579,7 +590,8 @@ const createGameSlice = (
 				state.farmLevels,
 				state.prestige,
 				state.farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 
 			set({
@@ -641,7 +653,8 @@ const createGameSlice = (
 				state.farmLevels,
 				state.prestige,
 				state.farmUpgrades,
-				state.merchantUpgrades
+				state.merchantUpgrades,
+				gearIncomePct(state.equipment)
 			);
 
 			set({
@@ -670,7 +683,8 @@ const createGameSlice = (
 			const state = get();
 			const power =
 				(CLICK_LADDER[state.clickLevel]?.power ?? CLICK_LADDER[0].power) *
-				(1 + emberEffect(state.prestige, 'mastery'));
+				(1 + emberEffect(state.prestige, 'mastery')) *
+				(1 + gearEconomy(state.equipment).clickPct / 100);
 			const gold = state.resourceRates.total.gold * power;
 			if (!(gold > 0)) return 0;
 			set({
@@ -750,7 +764,7 @@ const createGameSlice = (
 				level,
 				previousLevel: level.level,
 				characterStats,
-				resourceRates: calculateResourceRates(state.tiles, characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades),
+				resourceRates: calculateResourceRates(state.tiles, characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades, gearIncomePct(state.equipment)),
 			});
 		},
 
@@ -781,6 +795,8 @@ const createGameSlice = (
 			set({
 				bag: result.bag,
 				equipment: result.equipment,
+				// a set bonus can change the income: the rates follow the gear
+				resourceRates: ratesWithGear(state, result.equipment),
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
 				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
 			});
@@ -795,6 +811,8 @@ const createGameSlice = (
 			set({
 				bag: result.bag,
 				equipment: result.equipment,
+				// a set bonus can change the income: the rates follow the gear
+				resourceRates: ratesWithGear(state, result.equipment),
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
 				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
 			});
@@ -837,7 +855,7 @@ const createGameSlice = (
 				}
 			);
 			const xpGain =
-				state.resourceRates.total.xp * (1 + state.characterStats.xpGainMultiplier / 100);
+				state.resourceRates.total.xp * (1 + xpGainPct(state.characterStats, state.equipment) / 100);
 			newResources.xp = Math.min(newResources.xp + xpGain * secondsElapsed, XP_CAP);
 
 			let newTiles = state.tiles;
@@ -862,7 +880,8 @@ const createGameSlice = (
 							state.farmLevels,
 							state.prestige,
 							state.farmUpgrades,
-							state.merchantUpgrades
+							state.merchantUpgrades,
+							gearIncomePct(state.equipment)
 						);
 					}
 					newCastleUpgrade = null;
@@ -1140,7 +1159,7 @@ const createGameSlice = (
 				resources: { ...state.resources, gold: state.resources.gold - cost },
 				// Foreman and Skinner change the income: the rates follow at once (the other bonuses do not touch them)
 				...(id === 'foreman' || id === 'skinner'
-					? { resourceRates: calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, merchantUpgrades) }
+					? { resourceRates: calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, merchantUpgrades, gearIncomePct(state.equipment)) }
 					: {}),
 			});
 			return true;
@@ -1203,7 +1222,8 @@ export const useGameStore = create(
 				saved.farmLevels,
 				saved.prestige,
 				saved.farmUpgrades,
-				saved.merchantUpgrades
+				saved.merchantUpgrades,
+				gearIncomePct(saved.equipment)
 			);
 			return {
 				...current,

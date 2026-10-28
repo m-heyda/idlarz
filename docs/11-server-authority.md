@@ -62,6 +62,8 @@ A ticket is the server's record of a chest or monster waiting on the map. Chests
 
 Luck = Charisma + the merchant's Lucky Charm + gear. Besides the gold multipliers it now gives: faster chests, rare-and-better gear odds (x`1 + 0.004 Luck`, cap 1.6), a higher monster gear drop chance, a bonus **gem roll** on every chest (`3 % + 0.06 % x Luck`, cap 15 %, 5 to 50 gems skewed low) and **lucky rats** (`2 % + 0.05 % x Luck`, cap 10 %: golden, x3 gold and XP, one extra gear roll). `npm run loot-sim` prints the effect per Luck level ([generated/loot-sim.md](generated/loot-sim.md)).
 
+**Set bonuses that pay the economy** (the Obsidian set: income, XP, kill rewards, away time and efficiency; [generated/item-catalog.md](generated/item-catalog.md)) are derived the server's way: `summarize()` computes them from the saved gear with the pure `gearEconomy(equipment)` (`lib/gearEconomy.ts`), folds the income into `summary.rates` (so offline grants, kill gold, chest gold, `verify.ts`, `netWorth.ts` and the XP model all follow), adds the XP to `xpGainPct`, the away hours and efficiency to the limits (`LimitContext.gear`) and stores the Kill Rewards % in `derived.killRewardPct` for `payKill`. The percent damage and health of the Rattatui set go through the shared `damagePerHit` / `maxHp`, which the server's fights already use. The gear itself is still the last accepted save's: until the ledger owns the inventory ([ROADMAP](ROADMAP.md) R3), a forged save could claim a set it never found.
+
 ## Monsters
 
 Monsters carry an integer level (there are no tiers any more). A monster spawns one level higher for every 8 tiles (`COMBAT.spawn.dangerStep`) it stands from the castle.

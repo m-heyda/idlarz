@@ -3,7 +3,7 @@ import { baseStat } from '../stats';
 import { gear } from './define';
 
 // Steel: honest armour, the first tier worth wearing in a real fight.
-const steel = { tier: 2, set: 'knight', art: true } as const;
+const steel = { tier: 2, family: 'knight', art: true } as const;
 
 export const STEEL_ITEMS: ItemDef[] = [
 	gear('iron_sword', 'Iron Sword', 'mainHand', 'uncommon', { damage: 12 }, { tier: 2, weaponType: 'sword', art: true, description: 'A plain blade that holds an edge.' }),

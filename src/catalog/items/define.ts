@@ -38,7 +38,7 @@ const LEVEL_WINDOW_BY_TIER: Record<number, readonly [number, number]> = {
 	5: [3, MAX_ITEM_LEVEL],
 };
 
-/** What affixes and pools match an item by: its category, slot, weapon type and set. */
+/** What affixes and pools match an item by: its category, slot, weapon type and set (or plain family). */
 const tagsFor = (kind: ItemKind, slot: string, weaponType: WeaponType | undefined, set: string | undefined, named: boolean): string[] => [
 	'gear',
 	kind,
@@ -55,6 +55,8 @@ export interface GearOptions {
 	pools?: string[];
 	tier: number;
 	set?: string;
+	/** A plain loot family with no set bonus (see ItemDef.family) */
+	family?: string;
 	description?: string;
 	weaponType?: WeaponType;
 	/** Icon name; by default `item_<id>` when `art` is set. Omit both to fall back to the slot silhouette. */
@@ -81,7 +83,7 @@ export const gear = (
 	rarity,
 	tier,
 	generation: named ? 'named' : 'base',
-	tags: tagsFor(KIND_OF_SLOT[slot], slot, rest.weaponType, rest.set, named),
+	tags: tagsFor(KIND_OF_SLOT[slot], slot, rest.weaponType, rest.set ?? rest.family, named),
 	minItemLevel: LEVEL_WINDOW_BY_TIER[tier][0],
 	maxItemLevel: LEVEL_WINDOW_BY_TIER[tier][1],
 	...(named ? { fixedRarity: rarity, pools: pools ?? [] } : { allowedRarities: Object.keys(RARITIES) }),

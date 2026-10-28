@@ -451,7 +451,9 @@ export interface ResourceBreakdownEntry {
 	emberMult: number;
 	/** The merchant's Foreman multiplier (1 = none; never on XP) */
 	merchantMult: number;
-	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * ember multiplier * merchant - 1 */
+	/** The worn gear's set-bonus income multiplier (1 = none; never on XP) */
+	gearMult: number;
+	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * ember multiplier * merchant * gear - 1 */
 	modifier: number;
 	total: number;
 }
@@ -512,7 +514,9 @@ export const calculateResourceBreakdown = (
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
 	farmUpgrades?: FarmUpgrades,
-	merchantUpgrades?: MerchantUpgrades
+	merchantUpgrades?: MerchantUpgrades,
+	/** The worn gear's Income % (set bonuses; `gearIncomePct` in lib/gearEconomy.ts) */
+	gearIncomePct = 0
 ): ResourceBreakdown => {
 	const base: Resources = { ...BASE_GENERATION_RATES };
 	const start: Resources = { ...BASE_GENERATION_RATES };
@@ -618,11 +622,13 @@ export const calculateResourceBreakdown = (
 	// Embers income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
 	const emberMult = emberIncomeMultiplier(prestige);
 	const foreman = merchantIncomeMultiplier(merchantUpgrades);
+	const gearIncome = 1 + gearIncomePct / 100;
 
 	const result = {} as ResourceBreakdown;
 	for (const key of RESOURCE_KEYS) {
 		const merchantMult = key === 'xp' ? 1 : foreman;
-		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * emberMult * merchantMult - 1;
+		const gearMult = key === 'xp' ? 1 : gearIncome;
+		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * emberMult * merchantMult * gearMult - 1;
 		result[key] = {
 			start: start[key],
 			farm: farmPart[key],
@@ -636,6 +642,7 @@ export const calculateResourceBreakdown = (
 			statMod: statMod[key],
 			emberMult,
 			merchantMult,
+			gearMult,
 			modifier,
 			total: base[key] * (1 + modifier),
 		};
@@ -649,9 +656,10 @@ export const calculateResourceRates = (
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
 	farmUpgrades?: FarmUpgrades,
-	merchantUpgrades?: MerchantUpgrades
+	merchantUpgrades?: MerchantUpgrades,
+	gearIncomePct = 0
 ): ResourceRates => {
-	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades);
+	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncomePct);
 	const base = zeroResources();
 	const modifiers = zeroResources();
 	const total = zeroResources();

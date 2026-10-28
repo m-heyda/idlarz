@@ -4,7 +4,7 @@ import { gear } from './define';
 
 // Wood and leather: what you start with and what rats and chests hand out most. Every piece has an `item_<id>` icon
 // from scripts/pixel/sprites_gear.py (the wooden sword and shield keep their original sprites).
-const wood = { tier: 1, set: 'woodland', art: true } as const;
+const wood = { tier: 1, family: 'woodland', art: true } as const;
 
 export const WOODEN_ITEMS: ItemDef[] = [
 	gear('wooden_sword', 'Wooden Sword', 'mainHand', 'common', { damage: 6 }, { tier: 1, weaponType: 'sword', icon: 'item_wooden_sword', description: 'A simple training sword.' }),

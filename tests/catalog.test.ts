@@ -73,7 +73,7 @@ test('set counting and bonuses go through the registry', () => {
 	const rattatui = SETS.rattatui;
 	const six = Object.fromEntries(rattatui.pieces.slice(0, 6).map((id, i) => [['head', 'shoulder', 'chest', 'hands', 'legs', 'feet'][i], plainItem(id)]));
 	assert.equal(setCounts(six).rattatui, 6);
-	assert.deepEqual(setBonusStats(setCounts(six)), sumStats(rattatui.bonuses[3], rattatui.bonuses[6]));
+	assert.deepEqual(setBonusStats(setCounts(six)), sumStats(rattatui.bonuses[2], rattatui.bonuses[4], rattatui.bonuses[6]));
 	assert.deepEqual(setBonusStats({}), sumStats());
 });
 

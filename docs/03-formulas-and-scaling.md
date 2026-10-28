@@ -55,7 +55,7 @@ modifiers[r] = castleModifier(C)                    castle, all resources (§4)
              + stat modifiers                       2.5 % per point, see 02 §11 (XP: +0.2 %/INT, +0.25 %/CHA)
              + 0.05 × plainsTiles                   (r = meat only)
 
-total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.06 × embersEarned) × (1 + Foreman)     (second factor only after a Rebirth, §9; Foreman = merchant upgrade, +1 % per level, every resource but XP)
+total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.06 × embersEarned) × (1 + Foreman) × (1 + setIncomePct/100)     (second factor only after a Rebirth, §9; Foreman = merchant upgrade, +1 % per level; the set Income % comes from the worn Obsidian set; both on every resource but XP)
 
 The merchant's Skinner upgrade (+5 % per level) multiplies the farm's meat and hide inside `base` before the modifiers.
 ```
@@ -172,8 +172,8 @@ Conservation rule used by the save check: `legacyPoints + Σ shop spending = leg
 ## 10. Combat, monsters and items
 
 ```
-maxHp        = round(85 + characterStats.hp + Σ gear maxHp + set bonuses)       COMBAT.baseHp   (101 at the start)
-damage/hit   = max(1, Σ gear damage + set bonuses)                              Wooden Sword 6 ... Titan Maul 45 at their first level (COMBAT.maxItemDamage 50 caps the authored base damage; gear grows with its item level)
+maxHp        = round((85 + characterStats.hp + Σ gear maxHp + set bonuses) × (1 + maxHpPct/100))       COMBAT.baseHp   (101 at the start)
+damage/hit   = max(1, (Σ gear damage + set bonuses) × (1 + damagePct/100))                              Wooden Sword 6 ... Titan Maul 45 at their first level (COMBAT.maxItemDamage 50 caps the authored base damage; gear grows with its item level)
 hit          : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
                then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
 hit taken    = max(1, round(attack × (1 − armorReduction(armor))))              COMBAT.armorK, armorSoftCap, armorSoftSlope
@@ -194,8 +194,8 @@ rat level L  : HP = round(100 × 1.5^((L−1)/2))  → level 1 / 3 / 5 / 7 / 9 =
 King level L : HP, attack = base × levelScale(L) / levelScale(15)  (1000 HP, 11 attack at 15), armor 15 + 0.5 × (L−15), 8 % crit x1.5, 20 % Stun resist
 hit dealt    = max(1, your damage × (1 − armorReduction(armor)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
 rewards      : rewardSec = 90 × 1.17^(L−1) (rat), 3600 × 1.03^(L−15) (King)
-               gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
-               xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
+               gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck) × (1 + goldFind%)) × (1 + killRewardPct/100))   Luck = character + merchant + gear
+               xp   = max(5, xp/s × (1 + xpGain%) × rewardSec) × (1 + killRewardPct/100)
                hide = floor(hide/s × rewardSec × 0.6)      COMBAT.rewards.hideShare; pelts are a share of the farm's income, 0 without deer and pigs; also x3 on a lucky rat
 drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> source level -> item level -> rarity -> base -> affixes
                rat: gear 12 % + 1 % per level above 1, rarity rolled (Common 70 / Uncommon 22 / Rare 7 / Epic 1 / Legendary 0.2, gated by item level);
@@ -210,6 +210,8 @@ Rat King     : level 15: 1000 HP behind 15 armor, attack 11 every 3 s, 75 s limi
 The King's numbers were tuned with `npm run fight-sim` (a bot with the real combat rules; tables in [generated/fight-sim.md](generated/fight-sim.md)) and are
 held by `tests/fightBalance.test.ts`: the starter kit and plain wood never win, full steel does not, full obsidian wins with seconds to spare, the Rattatui set comfortably,
 and no loadout trivialises him. Rats are basic enemies and are not tuned around him.
+
+Set bonuses (`catalog/sets.ts`) may carry the set-only stats `incomePct`, `xpPct`, `killRewardPct`, `offlineEff`, `offlineCapHours`, `clickPct`, `damagePct` and `maxHpPct`; `xpGain% = attributes + set XP %`, the away limits add the set's away hours and efficiency points. The two sets are generated into [generated/item-catalog.md](generated/item-catalog.md), with where every effect is applied.
 
 Items, sets, rarities, stats, drop pools and the merchant stock are generated into [generated/item-catalog.md](generated/item-catalog.md) from `src/catalog`.
 Combat numbers live in `src/config/combatConfig.ts`.
