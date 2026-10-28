@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatHeaderAmount, formatNumber } from '@/utils/formatters';
 import { MAX_LEVEL } from '@/config/gameConfig';
@@ -17,8 +17,7 @@ import HeaderTip, { TipLine } from './HeaderTip';
 const XP_BAR_INNER_PX = 74;
 
 /**
- * The hero: just the portrait and the level orb. A click opens the character screen, a double-click the class picker. The
- * name and the XP bar are in the tooltip. The orange dot on top says something in the menu needs you (stat points, a farm purchase).
+ * The hero: just the portrait and the level orb. A click opens the character screen. The name and the XP bar are in the tooltip. The orange dot on top says something in the menu needs you (stat points, a farm purchase).
  */
 export const PlayerCard: React.FC = () => {
 	const xp = useGameStore((state) => state.resources.xp);
@@ -27,27 +26,9 @@ export const PlayerCard: React.FC = () => {
 	const availablePoints = useGameStore((state) => state.characterStats.availablePoints);
 	const attention = useMenuAttention();
 	const openMenu = useUiStore((state) => state.openMenu);
-	const openClassDialog = useUiStore((state) => state.openClassDialog);
 	const statsOpen = useUiStore((state) => state.menuOpen && state.menuTab === 'stats');
 	const [levelUpActive, setLevelUpActive] = useState(false);
 	const [prevAvailablePoints, setPrevAvailablePoints] = useState(0);
-
-	// A single click opens the character screen; hold it back a moment so a double-click
-	// can cancel it instead of flashing the window open and shut.
-	const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const cancelClick = () => {
-		if (clickTimer.current) clearTimeout(clickTimer.current);
-		clickTimer.current = null;
-	};
-	const handleProfileClick = () => {
-		cancelClick();
-		clickTimer.current = setTimeout(() => openMenu('stats'), 220);
-	};
-	const handleDoubleClick = () => {
-		cancelClick();
-		openClassDialog();
-	};
-	useEffect(() => cancelClick, []);
 
 	// Detect level up based on available points
 	useEffect(() => {
@@ -70,8 +51,7 @@ export const PlayerCard: React.FC = () => {
 			role='button'
 			tabIndex={0}
 			aria-label={`${playerName}, level ${level.level}. Opens the character screen`}
-			onClick={handleProfileClick}
-			onDoubleClick={handleDoubleClick}
+			onClick={() => openMenu('stats')}
 			onKeyDown={(event) => {
 				if (event.key === 'Enter' || event.key === ' ') {
 					event.preventDefault();
@@ -79,7 +59,7 @@ export const PlayerCard: React.FC = () => {
 				}
 			}}>
 			<span className='pixel-avatar'>
-				<CharacterPortrait variant='bust' scale={0.7} interactive={false} />
+				<CharacterPortrait variant='bust' scale={0.7} />
 				<span className='pixel-avatar-orb'>
 					<LevelOrb level={level.level} scale={0.75} className={levelUpActive ? 'animate-pulse-ring' : undefined} />
 				</span>
@@ -101,7 +81,7 @@ export const PlayerCard: React.FC = () => {
 						{attention.farm && <div>A farm purchase is affordable</div>}
 					</div>
 				)}
-				<div className='px-tip-muted text-xs mt-1'>Click: character. Double-click: change class.</div>
+				<div className='px-tip-muted text-xs mt-1'>Click to open the character screen.</div>
 			</HeaderTip>
 		</div>
 	);

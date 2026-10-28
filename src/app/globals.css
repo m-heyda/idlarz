@@ -208,10 +208,6 @@ body {
 .character-portrait {
 	display: inline-flex;
 	line-height: 0;
-
-	&.is-interactive {
-		cursor: pointer;
-	}
 }
 
 .px-name {
@@ -241,6 +237,8 @@ body {
 .hdr-group {
 	display: flex;
 	align-items: center;
+	cursor: pointer;
+	user-select: none;
 	padding: 1px;
 	background: rgba(8, 5, 3, 0.78);
 	border: 2px solid #4a3014;
@@ -248,24 +246,43 @@ body {
 	border-radius: 3px; /* no clip-path here: it would clip the tooltips */
 }
 
-.hdr-pill {
+.hdr-group:hover,
+.hdr-group[data-pinned='true'] {
+	border-color: #7a5224;
+}
+
+/* one resource in a group: its icon, and a small fixed-width amount when the cog menu asks for numbers */
+.hdr-chip {
 	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 3px;
 	height: 22px;
-	padding: 0 5px 0 3px;
-	cursor: default;
-	user-select: none;
+	padding: 0 4px;
 
 	& + & {
 		border-left: 1px solid #2b1d0e;
 		box-shadow: inset 1px 0 0 rgba(217, 168, 80, 0.12);
 	}
 
+	&.is-link {
+		cursor: pointer;
+	}
+
 	&:hover {
 		background: rgba(90, 56, 20, 0.45);
 	}
+}
+
+/* the group's dropdown lists every resource of the tier */
+.hdr-rows {
+	display: grid;
+	grid-template-columns: 20px minmax(0, 1fr) auto auto;
+	align-items: center;
+	column-gap: 8px;
+	row-gap: 3px;
+	max-height: 60vh;
+	overflow-y: auto;
 }
 
 /* a header control with a hover card (.hdr-tip, see HeaderTip.tsx); a click can pin it open with data-pinned="true" */
@@ -300,6 +317,11 @@ body {
 .hdr-has-tip:hover > .hdr-tip,
 .hdr-has-tip[data-pinned='true'] > .hdr-tip {
 	opacity: 1;
+}
+
+/* a pinned card can be scrolled and clicked */
+.hdr-has-tip[data-pinned='true'] > .hdr-tip {
+	pointer-events: auto;
 }
 
 /* Stepped sprite-sheet player: twinkling resources (gold, gems, crystals) and the map chest. Frame size, count, loop

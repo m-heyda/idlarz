@@ -62,6 +62,13 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 			checked: ui.showMinimap,
 			onSelect: () => ui.setPref('showMinimap', !ui.showMinimap),
 		},
+		{
+			id: 'headerNumbers',
+			label: 'Show resource numbers',
+			hint: 'in the header',
+			checked: ui.showHeaderNumbers,
+			onSelect: () => ui.setPref('showHeaderNumbers', !ui.showHeaderNumbers),
+		},
 	];
 	// the admin panel exists only in development builds
 	if (process.env.NODE_ENV === 'development') {

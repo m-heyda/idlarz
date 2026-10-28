@@ -1,51 +1,55 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { RESOURCES, RESOURCE_TIERS, resourcesInTier, type ResourceKey } from '@/catalog';
+import { RESOURCES, RESOURCE_TIERS, resourcesInTier, type ResourceKey, type ResourceTier } from '@/catalog';
 import { RESOURCE_ICONS } from '@/config/gameConfig';
 import { RESOURCE_PIXEL_ICONS, SHINE_SHEETS } from '@/config/pixelIcons';
 import { formatHeaderAmount, formatPercent, formatRateAuto } from '@/utils/formatters';
 import { cn } from '@/lib/utils';
 import PixelIcon from './PixelIcon';
 import StableNumber from './StableNumber';
-import HeaderTip, { TipLine } from './HeaderTip';
+import HeaderTip from './HeaderTip';
 
-const CHIP_ICON_SCALE = 0.5; // the 40px sprites drawn at 20px
-const TIP_ICON_SCALE = 0.8; // 32px in the tooltip
-/** Room for the longest ordinary amount ("12.3K"), so a chip keeps its width while its number ticks */
-const AMOUNT_SLOT = '2.9em';
+const ICON_SCALE = 0.5; // the 40px sprites drawn at 20px
+/** Room for the longest ordinary amount ("12.3K") at the small header size, so a chip keeps its width while its number ticks */
+const AMOUNT_SLOT = '2.8em';
 
 const exactOf = (n: number) => Math.floor(n).toLocaleString('en-US');
 
-const iconOf = (key: ResourceKey, scale: number) => {
+const iconOf = (key: ResourceKey) => {
 	const name = RESOURCE_PIXEL_ICONS[key];
 	return name ? (
-		<PixelIcon name={name} alt={RESOURCES[key].label} scale={scale} shine={!!SHINE_SHEETS[name]} />
+		<PixelIcon name={name} alt={RESOURCES[key].label} scale={ICON_SCALE} shine={!!SHINE_SHEETS[name]} />
 	) : (
-		<span className='text-lg' role='img' aria-label={RESOURCES[key].label}>
+		<span className='text-base leading-none' role='img' aria-label={RESOURCES[key].label}>
 			{RESOURCE_ICONS[key]}
 		</span>
 	);
 };
 
-interface ChipProps {
-	resource: ResourceKey;
+interface Row {
+	key: ResourceKey;
 	amount: number;
 	/** Production per second; left out for currencies that nothing produces (gems, embers) */
 	rate?: number;
 	/** Income bonus as a fraction (0.2 = +20%) */
 	bonus?: number;
-	hint?: string;
-	/** Overrides the click that pins the tooltip (the Embers chip opens the rebirth window instead) */
-	onActivate?: () => void;
-	align?: 'center' | 'start';
+}
+
+interface GroupProps {
+	tier: { id: ResourceTier; label: string };
+	rows: Row[];
+	showNumbers: boolean;
+	align: 'center' | 'start';
+	onOpenEmbers: () => void;
 }
 
 /**
- * One currency in the header: a small icon and the amount. The tooltip (hover, or pinned by a click for touch screens) has
- * the name, the exact amount and the production per second / minute / hour, whichever reads best.
+ * One tier of the resource catalog: a boxed strip of small icons (with small amounts when the cog menu asks for them). Hovering it
+ * opens a list of every resource in the tier with its amount and production; a click pins that list open (touch screens, or just to
+ * read it for a while). A tier can grow to dozens of resources and the strip stays as wide as its icons.
  */
-const ResourceChip: React.FC<ChipProps> = ({ resource, amount, rate, bonus = 0, hint, onActivate, align }) => {
+const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, onOpenEmbers }) => {
 	const [pinned, setPinned] = useState(false);
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -65,40 +69,66 @@ const ResourceChip: React.FC<ChipProps> = ({ resource, amount, rate, bonus = 0, 
 		};
 	}, [pinned]);
 
-	const label = RESOURCES[resource].label;
-	const activate = onActivate ?? (() => setPinned((p) => !p));
-	const production = rate === undefined ? undefined : formatRateAuto(rate);
+	const hasEmbers = rows.some((row) => row.key === 'embers');
 
 	return (
 		<div
 			ref={ref}
-			className={cn('hdr-pill hdr-has-tip', onActivate && 'cursor-pointer')}
+			className='hdr-group hdr-has-tip'
 			data-pinned={pinned}
 			role='button'
 			tabIndex={0}
-			aria-label={`${label}: ${exactOf(amount)}`}
-			onClick={activate}
+			aria-label={`${tier.label}: show the list`}
+			onClick={() => setPinned((p) => !p)}
 			onKeyDown={(event) => {
 				if (event.key === 'Enter' || event.key === ' ') {
 					event.preventDefault();
-					activate();
+					setPinned((p) => !p);
 				}
 			}}>
-			{iconOf(resource, CHIP_ICON_SCALE)}
-			<StableNumber value={formatHeaderAmount(amount)} minWidth={AMOUNT_SLOT} className='font-semibold text-[12px] text-[#f1e6c8]' />
-			<HeaderTip align={align}>
-				<div className='flex items-center gap-2'>
-					{iconOf(resource, TIP_ICON_SCALE)}
-					<div className='px-tip-title flex-1'>{label}</div>
-					<div className='text-xs text-[#f1e6c8]'>{exactOf(amount)}</div>
+			{rows.map((row) => {
+				const isEmbers = row.key === 'embers';
+				return (
+					<span
+						key={row.key}
+						className={cn('hdr-chip', isEmbers && 'is-link')}
+						title={RESOURCES[row.key].label}
+						onClick={
+							isEmbers
+								? (event) => {
+										event.stopPropagation();
+										onOpenEmbers();
+									}
+								: undefined
+						}>
+						{iconOf(row.key)}
+						{showNumbers && <StableNumber value={formatHeaderAmount(row.amount)} minWidth={AMOUNT_SLOT} className='font-semibold text-[11px] text-[#f1e6c8]' />}
+					</span>
+				);
+			})}
+			<HeaderTip align={align} width={270}>
+				<div className='px-tip-title mb-1'>{tier.label}</div>
+				<div className='hdr-rows text-xs'>
+					{rows.map((row) => {
+						const production = row.rate === undefined ? null : formatRateAuto(row.rate);
+						const bonus = row.bonus !== undefined && row.bonus > 0.0005 ? `+${formatPercent(row.bonus * 100)}` : null;
+						return (
+							<React.Fragment key={row.key}>
+								{iconOf(row.key)}
+								<span className='px-tip-muted truncate' title={bonus ? `Bonus ${bonus}` : undefined}>
+									{RESOURCES[row.key].label}
+								</span>
+								<span className='text-[#f1e6c8] text-right' title={exactOf(row.amount)}>
+									{formatHeaderAmount(row.amount)}
+								</span>
+								<span className={cn('text-right min-w-[4.5em]', production ? 'text-[#f0d27a]' : 'px-tip-muted')}>
+									{row.rate === undefined ? '' : (production ?? 'none')}
+								</span>
+							</React.Fragment>
+						);
+					})}
 				</div>
-				{(rate !== undefined || hint) && (
-					<div className='pt-1 mt-1 border-t px-rule space-y-1 text-xs'>
-						{rate !== undefined && <TipLine label='Production' value={production ?? 'None yet'} accent={!!production} />}
-						{rate !== undefined && bonus > 0.0005 && <TipLine label='Bonus' value={`+${formatPercent(bonus * 100)}`} />}
-						{hint && <div className='text-[#9be26a]'>{hint}</div>}
-					</div>
-				)}
+				{hasEmbers && <div className='pt-1 mt-1 border-t px-rule text-xs text-[#9be26a]'>Click the green gem to open the Ember shop.</div>}
 			</HeaderTip>
 		</div>
 	);
@@ -113,6 +143,7 @@ const ResourceDisplay: React.FC = () => {
 	const resourceRates = useGameStore((state) => state.resourceRates);
 	const gems = useGameStore((state) => state.gems);
 	const embers = useGameStore((state) => state.prestige.legacyPoints); // saved under its old name, see PrestigeState
+	const showNumbers = useUiStore((state) => state.showHeaderNumbers);
 	const toggleRebirth = useUiStore((state) => state.toggleRebirth);
 
 	const amountOf = (key: ResourceKey): number =>
@@ -123,26 +154,17 @@ const ResourceDisplay: React.FC = () => {
 			{RESOURCE_TIERS.map((tier, t) => {
 				const keys = resourcesInTier(tier.id);
 				if (keys.length === 0) return null;
-				return (
-					<div className='hdr-group' key={tier.id} role='group' aria-label={tier.label}>
-						{keys.map((key, i) => {
-							// production only exists for what the land and farm make; gems and embers come in lumps
-							const produced = key in resources && key !== 'xp';
-							return (
-								<ResourceChip
-									key={key}
-									resource={key}
-									amount={amountOf(key)}
-									rate={produced ? resourceRates.total[key as keyof typeof resourceRates.total] : undefined}
-									bonus={produced ? resourceRates.modifiers[key as keyof typeof resourceRates.modifiers] : undefined}
-									hint={key === 'embers' ? 'Click to open the Ember shop.' : undefined}
-									onActivate={key === 'embers' ? toggleRebirth : undefined}
-									align={t === 0 && i === 0 ? 'start' : 'center'}
-								/>
-							);
-						})}
-					</div>
-				);
+				const rows: Row[] = keys.map((key) => {
+					// production only exists for what the land and farm make; gems and embers come in lumps
+					const produced = key in resources && key !== 'xp';
+					return {
+						key,
+						amount: amountOf(key),
+						rate: produced ? resourceRates.total[key as keyof typeof resourceRates.total] : undefined,
+						bonus: produced ? resourceRates.modifiers[key as keyof typeof resourceRates.modifiers] : undefined,
+					};
+				});
+				return <ResourceGroup key={tier.id} tier={tier} rows={rows} showNumbers={showNumbers} align={t === 0 ? 'start' : 'center'} onOpenEmbers={toggleRebirth} />;
 			})}
 		</>
 	);
