@@ -156,10 +156,8 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 		if (COMBAT.auto.stunWhenReady && c.fight && c.fight.stunLeft <= 0) cast(t, 'stun');
 	};
 
-	const engage = (t: number): boolean => {
-		if (!c.autoBattle || c.hp < (profileNow.maxHp * COMBAT.auto.resumeHpPct) / 100) return false;
-		const target = pickTarget(ledger, c, t);
-		if (!target) return false;
+	/** Opens the fight against a monster: the start of both an automatic and a chosen fight. */
+	const start = (t: number, target: { ticket: MonsterTicket; type: 'rat' | 'ratKing' }): boolean => {
 		const level = levelAtAge(target.ticket.spawnLevel ?? 1, t - target.ticket.at);
 		const stats = monsterStats(target.type, level);
 		const profile: PlayerProfile = profileNow;
@@ -186,6 +184,22 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 		};
 		push(t, 'engage', { n: target.ticket.n, type: target.type, level });
 		return true;
+	};
+
+	/** Auto-battle's pick: only with the switch on and enough HP. */
+	const engage = (t: number): boolean => {
+		if (!c.autoBattle || c.hp < (profileNow.maxHp * COMBAT.auto.resumeHpPct) / 100) return false;
+		const target = pickTarget(ledger, c, t);
+		return target ? start(t, target) : false;
+	};
+
+	/** The player's pick (a click on a monster): works with auto-battle off, needs no HP threshold and ignores a monster's retry time. */
+	const engageTicket = (t: number, n: number): boolean => {
+		if (c.fight || c.hp <= 0) return false;
+		const rat = ledger.bank.rats.find((ticket) => ticket.n === n && isPlaced(ticket));
+		const king = ledger.bank.king && ledger.bank.king.n === n && isPlaced(ledger.bank.king) ? ledger.bank.king : undefined;
+		if (rat) return start(t, { ticket: rat, type: 'rat' });
+		return king ? start(t, { ticket: king, type: 'ratKing' }) : false;
 	};
 
 	const endFight = (t: number, kind: 'defeated' | 'timeout' | 'retreat') => {
@@ -299,7 +313,9 @@ export const runCombat = (input: Ledger, env: CombatEnv, ask: { commands?: Comba
 	}
 	for (const command of ask.commands ?? []) {
 		if (command.kind === 'potion') drink(t, command.id);
-		else cast(t, command.id);
+		else if (command.kind === 'fight') {
+			if (!behind) engageTicket(t, command.n);
+		} else cast(t, command.id);
 	}
 	if (!behind && !c.fight) engage(t);
 

@@ -22,6 +22,7 @@ const exportGame = async () => {
  */
 export const globalMenuItems = (full = false): ContextMenuItem[] => {
 	const ui = useUiStore.getState();
+	const { combat } = useGameStore.getState();
 	const items: ContextMenuItem[] = [
 		...(full
 			? [
@@ -33,6 +34,21 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 			id: 'organize',
 			label: 'Organize bag',
 			onSelect: () => useUiStore.getState().showToast(useGameStore.getState().organizeBag() ? 'Bag organized' : 'Finish the fight first'),
+		},
+		// the combat panel only exists during a fight, so the two switches live here too (a click on a monster starts a fight either way)
+		{
+			id: 'autoBattle',
+			label: 'Auto-battle',
+			hint: 'monsters one by one',
+			checked: combat.autoBattle,
+			onSelect: () => useGameStore.getState().setAutoBattle(!combat.autoBattle),
+		},
+		{
+			id: 'autoUse',
+			label: 'Auto-use potions',
+			hint: 'and skills',
+			checked: combat.autoUse,
+			onSelect: () => useGameStore.getState().setAutoUse(!combat.autoUse),
 		},
 		{ id: 'save', label: 'Save game', separator: full, liveHint: () => cloudHint(Date.now()), onSelect: () => void saveGame() },
 		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },

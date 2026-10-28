@@ -8,3 +8,6 @@ export const setNeedClaimHandler = (fn: (() => void) | null): void => {
 };
 
 export const signalNeedClaim = (): void => handler?.();
+
+/** Asks the poll to run now: a fight was just started (by a click or by switching auto-battle on), so the next answer sets the pace of the fight, not the idle one. */
+export const signalSyncNow = (): void => handler?.();

@@ -41,6 +41,7 @@ import {
 	TileCost,
 } from '@/types/game';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
+import type { CombatBonus } from '@/lib/combat';
 import { STAT_RULES } from '@/config/combatConfig';
 import { atkSpeedPercent, magicDamagePercent, physicalDamagePercent, statArmor, statMaxMana } from '@/lib/statBonuses';
 import { RING, generateStartRing } from '@/utils/biomeRules';
@@ -369,7 +370,9 @@ export interface ResourceBreakdownEntry {
 	statMod: number;
 	/** The rebirth income multiplier (1 = none) */
 	legacyMult: number;
-	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * legacy - 1 */
+	/** The merchant's Foreman multiplier (1 = none; never on XP) */
+	merchantMult: number;
+	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * legacy * merchant - 1 */
 	modifier: number;
 	total: number;
 }
@@ -429,7 +432,8 @@ export const calculateResourceBreakdown = (
 	characterStats?: CharacterStats,
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
-	farmUpgrades?: FarmUpgrades
+	farmUpgrades?: FarmUpgrades,
+	merchantUpgrades?: MerchantUpgrades
 ): ResourceBreakdown => {
 	const base: Resources = { ...BASE_GENERATION_RATES };
 	const start: Resources = { ...BASE_GENERATION_RATES };
@@ -437,8 +441,11 @@ export const calculateResourceBreakdown = (
 	const biomePart = zeroResources();
 	const buildingPart = zeroResources();
 
-	// Meat and the other farm products come from the animals alone
+	// Meat and the other farm products come from the animals alone (the Skinner's bonus is on the meat and the hide)
 	const farm = calculateFarmOutput(farmLevels, farmUpgrades);
+	const skinner = 1 + merchantEffect(merchantUpgrades, 'skinner');
+	farm.meat *= skinner;
+	farm.hide *= skinner;
 	for (const key of FARM_KEYS) {
 		base[key] = farm[key];
 		start[key] = 0;
@@ -531,10 +538,12 @@ export const calculateResourceBreakdown = (
 
 	// Legacy income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
 	const legacyMult = legacyIncomeMultiplier(prestige);
+	const foreman = merchantIncomeMultiplier(merchantUpgrades);
 
 	const result = {} as ResourceBreakdown;
 	for (const key of RESOURCE_KEYS) {
-		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * legacyMult - 1;
+		const merchantMult = key === 'xp' ? 1 : foreman;
+		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * legacyMult * merchantMult - 1;
 		result[key] = {
 			start: start[key],
 			farm: farmPart[key],
@@ -547,6 +556,7 @@ export const calculateResourceBreakdown = (
 			plainsMod: plainsMod[key],
 			statMod: statMod[key],
 			legacyMult,
+			merchantMult,
 			modifier,
 			total: base[key] * (1 + modifier),
 		};
@@ -559,9 +569,10 @@ export const calculateResourceRates = (
 	characterStats?: CharacterStats,
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
-	farmUpgrades?: FarmUpgrades
+	farmUpgrades?: FarmUpgrades,
+	merchantUpgrades?: MerchantUpgrades
 ): ResourceRates => {
-	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades);
+	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades);
 	const base = zeroResources();
 	const modifiers = zeroResources();
 	const total = zeroResources();
@@ -758,8 +769,19 @@ export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefin
 /** Luck from the Lucky Charm, added to the character's Luck for chests and kills. */
 export const merchantLuck = (upgrades: MerchantUpgrades | undefined): number => merchantEffect(upgrades, 'charm');
 
-/** Bag slots a game has: the base bag plus Pack Rat. */
+/** The Foreman's multiplier on the income of every resource but XP (1 = none). */
+export const merchantIncomeMultiplier = (upgrades: MerchantUpgrades | undefined): number => 1 + merchantEffect(upgrades, 'foreman');
 
+/** What the merchant's combat upgrades add to the fight: one place, read by the readouts (effectiveStats), the server's fights and the regeneration. */
+export const merchantCombat = (upgrades: MerchantUpgrades | undefined): CombatBonus => ({
+	atkSpeedPct: merchantEffect(upgrades, 'swift'),
+	critPct: merchantEffect(upgrades, 'keen'),
+	superCritPct: merchantEffect(upgrades, 'deadly'),
+	physPct: merchantEffect(upgrades, 'might'),
+	magicPct: merchantEffect(upgrades, 'arcana'),
+	leechPct: merchantEffect(upgrades, 'fang'),
+	regen: merchantEffect(upgrades, 'wind'),
+});
 
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {
@@ -771,4 +793,6 @@ export const startingResources = (prestige: PrestigeState | undefined): Resource
 	return out;
 };
 
-export const legacyGain = (castleLevel: number, tiles: number): number => REBIRTH.gain(castleLevel, tiles);
+/** Legacy points a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus. */
+export const legacyGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades): number =>
+	Math.floor(REBIRTH.gain(castleLevel, tiles) * (1 + merchantEffect(merchant, 'tithe')));

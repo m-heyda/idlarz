@@ -26,6 +26,8 @@ interface ItemSlotProps {
 	draggable?: boolean;
 	/** The hover card compares the item with the gear worn in its slot (the bag) */
 	compare?: boolean;
+	/** On the merchant's shelf: the hover card says what it costs instead of what it sells for */
+	buyPrice?: number;
 	onClick?: (event: React.MouseEvent) => void;
 	onDoubleClick?: () => void;
 	onContextMenu?: (event: React.MouseEvent) => void;
@@ -38,7 +40,7 @@ interface ItemSlotProps {
  * It measures itself, so a wide one (an item next to the gear it would replace) flips to the left of the box near the right
  * edge and never leaves the screen (see lib/tipPlacement.ts).
  */
-const FloatingTip: React.FC<{ anchor: Box; children: React.ReactNode }> = ({ anchor, children }) => {
+export const FloatingTip: React.FC<{ anchor: Box; children: React.ReactNode }> = ({ anchor, children }) => {
 	const ref = useRef<HTMLDivElement>(null);
 	useLayoutEffect(() => {
 		const el = ref.current;
@@ -67,6 +69,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 	locked,
 	draggable,
 	compare,
+	buyPrice,
 	onClick,
 	onDoubleClick,
 	onContextMenu,
@@ -147,7 +150,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				createPortal(
 						<FloatingTip anchor={tip}>
 							{def ? (
-								<ItemTooltipStack item={item ?? undefined} itemId={itemId ?? undefined} compare={compare} />
+								<ItemTooltipStack item={item ?? undefined} itemId={itemId ?? undefined} compare={compare} buyPrice={buyPrice} />
 							) : (
 								<div className='px-tooltip'>
 									<div className='px-tip-muted text-sm'>{label}</div>

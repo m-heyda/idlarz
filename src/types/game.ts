@@ -403,6 +403,8 @@ export interface GameState {
 	/** Hotkeys and switches: each is a request to the server, whose answer changes what is shown */
 	requestPotion: (id: string) => boolean;
 	requestSkill: (id: SkillId) => boolean;
+	/** A click on a monster of the map: asks the server to start the fight against it (false when nothing was asked: no such monster, or a fight is open) */
+	startFight: (id: number) => boolean;
 	setAutoBattle: (on: boolean) => void;
 	setAutoUse: (on: boolean) => void;
 	applyFightReply: (reply: FightReply) => void;

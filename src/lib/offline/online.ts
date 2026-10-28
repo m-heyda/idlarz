@@ -101,7 +101,8 @@ export type FightRequest =
 	| { action: 'dismiss'; n: number; since?: number };
 
 /**
- * Everything the browser can ask about combat. `sync` carries the fight forward and answers; `use` is a hotkey (a potion or a skill) and
+ * Everything the browser can ask about combat. `sync` carries the fight forward and answers; `use` is a hotkey (a potion or a skill) or a
+ * click on a monster (`fight`: starts the fight against it, with auto-battle on or off) and
  * `auto` flips auto-battle or auto-use, both applied at the server's clock after the fight is brought up to date; `dismiss` takes a
  * monster off the map with no reward (and ends the fight against it).
  */
@@ -120,7 +121,13 @@ export const fightStep = (deps: ServiceDeps, userId: string, key: string | null,
 		const ask = request.action === 'use' ? { commands: [request.command] } : request.action === 'auto' ? { autoBattle: request.autoBattle, autoUse: request.autoUse } : {};
 		const before = ctx.ledger.combat?.eventNo ?? 0;
 		const { ledger, view } = withCombat(ctx, request.since, ask);
-		// a hotkey is "accepted" when it did something (an event was added after the fight was brought up to date)
-		const accepted = request.action !== 'use' || (ledger.combat?.log.some((event) => event.no > before && (event.kind === 'potion' || event.kind === 'heal' || event.kind === 'stun' || event.kind === 'resist')) ?? false);
+		// a hotkey is "accepted" when it did something (an event was added after the fight was brought up to date); a click on a monster, when it
+		// opened a fight against that monster (an automatic engage does not count: it is another monster or was there before)
+		const done = (event: { no: number; kind: string; n?: number }) =>
+			event.no > before &&
+			(request.action === 'use' && request.command.kind === 'fight'
+				? event.kind === 'engage' && event.n === request.command.n
+				: event.kind === 'potion' || event.kind === 'heal' || event.kind === 'stun' || event.kind === 'resist');
+		const accepted = request.action !== 'use' || (ledger.combat?.log.some(done) ?? false);
 		return reply(ledger, view, accepted);
 	});

@@ -24,7 +24,7 @@ type Applied = Pick<
 	| 'playerMp'
 >;
 
-export type OfflineStateIn = Applied & Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige'>;
+export type OfflineStateIn = Applied & Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige' | 'merchantUpgrades'>;
 
 /** What the welcome-back window shows besides the income. */
 export interface OfflineSummary {
@@ -69,7 +69,7 @@ export const applyOfflineGrant = (state: OfflineStateIn, grant: OfflineGrant, li
 			const castle = getTile(tiles, CASTLE_X, CASTLE_Y);
 			if (castle && castle.biome === 'castle') {
 				tiles = setTile(tiles, CASTLE_X, CASTLE_Y, { ...castle, level: castleUpgrade.toLevel, upgradeCost: CASTLE_UPGRADE.upgradeCosts[castleUpgrade.toLevel - 1] ?? undefined });
-				resourceRates = calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades);
+				resourceRates = calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades);
 				castleReached = castleUpgrade.toLevel;
 			}
 			castleUpgrade = null;

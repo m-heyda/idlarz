@@ -44,13 +44,6 @@
 	user-select: none;
 }
 
-.combat-idle {
-	padding: 0 12px;
-	text-align: center;
-	font-size: 0.85rem;
-	color: #a89878;
-}
-
 .combat-widget .fight-bar {
 	height: 20px;
 }
@@ -113,11 +106,6 @@
 	justify-content: center;
 	height: 30px;
 	overflow: hidden;
-}
-
-.combat-icon-swords {
-	font-size: 1.4rem;
-	color: #f0d27a;
 }
 
 .combat-icon-hp {

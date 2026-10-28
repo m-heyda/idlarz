@@ -12,7 +12,7 @@ const MERCHANT_TABS: MerchantTabInfo[] = [
 		id: 'goods',
 		label: 'Goods',
 		emoji: '🛒',
-		description: 'Gear that changes through the day, supplies, and selling from your bag',
+		description: 'Gear and potions on one shelf that changes through the day, and selling from your bag',
 	},
 	{
 		id: 'upgrades',

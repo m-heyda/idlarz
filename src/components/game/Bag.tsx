@@ -6,6 +6,8 @@ import { resolveItem, sellValueOf } from '@/lib/itemInstance';
 import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import { openMenuAt } from '@/lib/globalMenu';
+import { formatNumber } from '@/utils/formatters';
+import { sellPayout } from '@/utils/gameUtils';
 import ItemSlot from './ItemSlot';
 import OrganizeButton from './OrganizeButton';
 import { slotProps } from './itemUi';
@@ -38,18 +40,37 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 		const def = resolved?.def ?? (slot && 'id' in slot ? ITEM_CATALOG[slot.id] : undefined);
 		if (!slot || !def) return;
 		const ui = useUiStore.getState();
-		const fighting = !!useGameStore.getState().combat.fight;
+		const state = useGameStore.getState();
+		const fighting = !!state.combat.fight;
+		const qty = slotQty(slot);
+		const unit = gear ? sellValueOf(gear) : def.sellValue;
+		const name = resolved?.name ?? def.name;
+		// the price shown is what is paid: Haggler included
+		const sellBatch = (n: number) => {
+			const gold = sellItem(index, n);
+			ui.showToast(gold > 0 ? `Sold ${n > 1 ? `${formatNumber(n)} x ` : ''}${name} for ${formatNumber(gold)} Gold` : 'Finish the fight first');
+		};
 		const items: ContextMenuItem[] = [
 			{ id: 'use', label: def.consumable ? 'Drink' : 'Equip', onSelect: () => activate(index) },
 			{
 				id: 'sell',
-				label: `Sell${slotQty(slot) > 1 ? ' one' : ''}`,
-				hint: `${gear ? sellValueOf(gear) : def.sellValue} gold`,
+				label: `Sell${qty > 1 ? ' one' : ''}`,
+				hint: `${formatNumber(sellPayout(unit, 1, state))} gold`,
 				disabled: fighting,
-				onSelect: () => {
-					sellItem(index, 1);
-				},
+				onSelect: () => sellBatch(1),
 			},
+			// a stack (potions) can be sold in one go
+			...(qty > 1
+				? [
+						{
+							id: 'sellAll',
+							label: `Sell all (${qty})`,
+							hint: `${formatNumber(sellPayout(unit, qty, state))} gold`,
+							disabled: fighting,
+							onSelect: () => sellBatch(qty),
+						},
+					]
+				: []),
 			{ id: 'discard', label: 'Discard...', danger: true, disabled: fighting, hint: fighting ? 'in a fight' : undefined, onSelect: () => ui.askDiscard(index) },
 		];
 		openMenuAt(e.clientX, e.clientY, resolved?.name ?? def.name, items);

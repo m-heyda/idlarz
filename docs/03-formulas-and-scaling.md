@@ -127,7 +127,7 @@ item:  sell = floor(rarityValue × valueCurve(level) × qualityValue × affixesV
        supplies (potions) price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
 goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle level above 1, +-2; common 50 / uncommon 32 / rare 14 / epic 4)
        price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh); rarity common 60 / uncommon 40; item level centre = min(world level, avgWorn + 3), max avgWorn + 5
-bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3
+bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Legacy points of a rebirth = floor(gain × (1 + 0.05 × Tithe))
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s, ≤ 5 waiting

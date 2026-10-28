@@ -88,7 +88,7 @@ const growMap = (count: number) => {
 	let needed = 0;
 	for (let k = 2; k <= economyTiles(tiles, s.freeTiles); k++) needed += calculateXpGain(k);
 	const xp = Math.max(s.resources.xp, Math.min(needed * 1.01, XP_CAP));
-	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);
+	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades);
 	useGameStore.setState({ tiles, resources: { ...s.resources, xp }, resourceRates });
 	toast(`Added ${n.toLocaleString('en')} tiles in ${Math.round(performance.now() - t0)} ms (${ownedCount(tiles).toLocaleString('en')} in all)`);
 };
@@ -102,7 +102,7 @@ const rolledMap = (purchases: number, policy: 'nearest' | 'random') => {
 	let needed = 0;
 	for (let k = 2; k <= economyTiles(tiles, s.freeTiles); k++) needed += calculateXpGain(k);
 	const xp = Math.max(s.resources.xp, Math.min(needed * 1.01, XP_CAP));
-	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);
+	const resourceRates = calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades);
 	useGameStore.setState({ tiles, resources: { ...s.resources, xp }, resourceRates, monsters: [], activeChests: 0 });
 	toast(`Rolled map: seed ${seed}, ${purchases} purchases (${policy})`);
 };

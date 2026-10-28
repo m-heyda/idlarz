@@ -54,7 +54,7 @@ for (const count of [5_000, 50_000, 250_000]) {
 	rich();
 	const [, buy] = time(() => api().buyTile(spot![0], spot![1]));
 	const tick = median(() => api().tick(100));
-	const rates = median(() => void calculateResourceRates(api().tiles, api().characterStats, api().farmLevels, api().prestige, api().farmUpgrades));
+	const rates = median(() => void calculateResourceRates(api().tiles, api().characterStats, api().farmLevels, api().prestige, api().farmUpgrades, api().merchantUpgrades));
 	const chest = median(() => void pickChestSpot(api().tiles, new Set(), castleLevelOf(api().tiles)), 3);
 	const persisted = pickPersisted(api());
 	const [text, encodeFirst] = time(() => encodeSave(persisted));

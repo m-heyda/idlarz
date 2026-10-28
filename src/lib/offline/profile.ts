@@ -5,7 +5,7 @@ import { healAmount } from '@/lib/skills';
 import { critDamagePercent } from '@/lib/statBonuses';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { BagSlot, CharacterStats, Equipment } from '@/types/game';
-import { calculateCombatStats } from '@/utils/gameUtils';
+import { calculateCombatStats, merchantCombat } from '@/utils/gameUtils';
 
 // What the server knows about the player's fighting strength: worked out from the last accepted save with the same functions the game's
 // own readouts use, so the numbers in the character window are the numbers the fight runs on.
@@ -35,23 +35,32 @@ export const characterLevelOf = (core: Core): number => {
 	return typeof level === 'number' && Number.isFinite(level) ? Math.max(1, Math.floor(level)) : 1;
 };
 
+/** The merchant's upgrades of the save (levels by id; anything else is ignored: merchantLevel clamps to the known ids and their maximum). */
+const merchantOf = (core: Core): Record<string, number> => {
+	const saved = isRecord(core.merchantUpgrades) ? core.merchantUpgrades : {};
+	const out: Record<string, number> = {};
+	for (const [id, level] of Object.entries(saved)) if (typeof level === 'number' && Number.isFinite(level)) out[id] = level;
+	return out;
+};
+
 export const playerProfile = (core: Core): PlayerProfile => {
 	const stats = statsOf(core);
 	const equipment = equipmentOf(core);
-	const odds = critOdds(stats, equipment);
+	const bonus = merchantCombat(merchantOf(core));
+	const odds = critOdds(stats, equipment, bonus);
 	return {
 		level: characterLevelOf(core),
 		maxHp: maxHp(stats, equipment),
 		maxMp: maxMana(stats, equipment),
-		hit: damagePerHit(equipment, stats),
+		hit: damagePerHit(equipment, stats, bonus),
 		crit: odds.crit,
 		superCrit: odds.superCrit,
 		critExtra: 1 + critDamagePercent(stats) / 100,
-		attacksPerSec: attacksPerSecond(equipment, stats),
+		attacksPerSec: attacksPerSecond(equipment, stats, bonus),
 		armor: armorOf(equipment, stats),
 		dodge: dodgeChance(equipment),
-		leechPct: lifeLeechPercent(equipment),
-		hpRegen: aggregateStats(equipment).regen,
+		leechPct: lifeLeechPercent(equipment, bonus),
+		hpRegen: aggregateStats(equipment).regen + bonus.regen,
 		mpRegen: manaRegenPerSec(stats, equipment),
 		heal: healAmount(stats, equipment),
 	};

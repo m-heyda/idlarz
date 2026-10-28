@@ -371,9 +371,19 @@ export const MERCHANT_RESOURCE_PRICES = fromResources(
 
 // Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
 // starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
+// They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
+// ladders together cost over a billion; tests/merchantShop.test.ts keeps it that way) and are bought over several runs.
+// `group` only decides the heading of the card in the Upgrades tab.
+export const MERCHANT_UPGRADE_GROUPS = {
+	economy: 'Economy',
+	combat: 'Combat',
+	rebirth: 'Rebirth',
+} as const;
+
 export const MERCHANT_UPGRADES = {
 	haggler: {
 		label: 'Haggler',
+		group: 'economy',
 		description: (n: number) => `+${Math.round(n * 3)}% gold from everything you sell`,
 		maxLevel: 10,
 		effectPerLevel: 0.03, // gold from selling resources and items
@@ -382,6 +392,7 @@ export const MERCHANT_UPGRADES = {
 	},
 	bulk: {
 		label: 'Bulk Discount',
+		group: 'economy',
 		description: (n: number) => `-${n}% tile and building cost`,
 		maxLevel: 8,
 		effectPerLevel: 1, // percentage points, added to Charisma and Thrift (REBIRTH.discountCapPercent still caps the sum)
@@ -390,6 +401,7 @@ export const MERCHANT_UPGRADES = {
 	},
 	charm: {
 		label: 'Lucky Charm',
+		group: 'economy',
 		description: (n: number) => `+${n * 2} Luck for chests and kills`,
 		maxLevel: 10,
 		effectPerLevel: 2, // Luck
@@ -398,11 +410,102 @@ export const MERCHANT_UPGRADES = {
 	},
 	packrat: {
 		label: 'Pack Rat',
+		group: 'economy',
 		description: (n: number) => `+${n * 4} bag slots`,
 		maxLevel: 4,
 		effectPerLevel: 4, // bag slots
 		baseCost: 500000,
 		costGrowth: 3,
+	},
+	foreman: {
+		label: 'Foreman',
+		group: 'economy',
+		description: (n: number) => `+${n}% income from every resource, gold included`,
+		maxLevel: 10,
+		effectPerLevel: 0.01, // multiplies the income of every resource but XP (utils/gameUtils.ts, merchantIncomeMultiplier)
+		baseCost: 400000,
+		costGrowth: 1.9,
+	},
+	skinner: {
+		label: 'Skinner',
+		group: 'economy',
+		description: (n: number) => `+${n * 5}% meat and hide from your animals`,
+		maxLevel: 8,
+		effectPerLevel: 0.05, // on top of the farm upgrades
+		baseCost: 300000,
+		costGrowth: 1.9,
+	},
+	swift: {
+		label: 'Quick Hands',
+		group: 'combat',
+		description: (n: number) => `+${n * 2}% attack speed`,
+		maxLevel: 8,
+		effectPerLevel: 2, // % attacks per second
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	keen: {
+		label: 'Keen Eye',
+		group: 'combat',
+		description: (n: number) => `+${n}% crit chance`,
+		maxLevel: 8,
+		effectPerLevel: 1, // percentage points (COMBAT.crit.maxCritChance still caps the total)
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	deadly: {
+		label: 'Deadly Aim',
+		group: 'combat',
+		description: (n: number) => `+${n}% chance that a crit is a super crit`,
+		maxLevel: 8,
+		effectPerLevel: 1, // percentage points (COMBAT.crit.maxSuperChance still caps the total)
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	might: {
+		label: 'Might',
+		group: 'combat',
+		description: (n: number) => `+${n * 2}% damage with physical weapons`,
+		maxLevel: 8,
+		effectPerLevel: 2, // %
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	arcana: {
+		label: 'Arcana',
+		group: 'combat',
+		description: (n: number) => `+${n * 2}% damage with staves and wands`,
+		maxLevel: 8,
+		effectPerLevel: 2, // %
+		baseCost: 250000,
+		costGrowth: 2,
+	},
+	fang: {
+		label: 'Vampiric Fang',
+		group: 'combat',
+		description: (n: number) => `+${n * 0.5}% life leech: HP back from the damage you deal`,
+		maxLevel: 6,
+		effectPerLevel: 0.5, // % of the damage dealt (STAT_RULES.lifeLeechCap still caps the total)
+		baseCost: 300000,
+		costGrowth: 2,
+	},
+	wind: {
+		label: 'Second Wind',
+		group: 'combat',
+		description: (n: number) => `+${n * 0.25} HP regenerated per second`,
+		maxLevel: 6,
+		effectPerLevel: 0.25, // HP/s, in and out of fights
+		baseCost: 300000,
+		costGrowth: 2,
+	},
+	tithe: {
+		label: 'Ancestral Tithe',
+		group: 'rebirth',
+		description: (n: number) => `+${n * 5}% Legacy points from your next rebirth`,
+		maxLevel: 10,
+		effectPerLevel: 0.05, // multiplies the Legacy points of a rebirth (legacyGain); starts again with the rebirth like the rest
+		baseCost: 600000,
+		costGrowth: 1.9,
 	},
 } as const;
 

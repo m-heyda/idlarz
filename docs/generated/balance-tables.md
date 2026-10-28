@@ -371,6 +371,16 @@ Derived stats for the starting stats (all 5):
 | Bulk Discount | -1% tile and building cost | 8 | 250.00K | 45.03M |
 | Lucky Charm | +2 Luck for chests and kills | 10 | 150.00K | 48.40M |
 | Pack Rat | +4 bag slots | 4 | 500.00K | 13.50M |
+| Foreman | +1% income from every resource, gold included | 10 | 400.00K | 129.08M |
+| Skinner | +5% meat and hide from your animals | 8 | 300.00K | 26.82M |
+| Quick Hands | +2% attack speed | 8 | 250.00K | 22.35M |
+| Keen Eye | +1% crit chance | 8 | 250.00K | 22.35M |
+| Deadly Aim | +1% chance that a crit is a super crit | 8 | 250.00K | 22.35M |
+| Might | +2% damage with physical weapons | 8 | 250.00K | 22.35M |
+| Arcana | +2% damage with staves and wands | 8 | 250.00K | 32.00M |
+| Vampiric Fang | +0.5% life leech: HP back from the damage you deal | 6 | 300.00K | 9.60M |
+| Second Wind | +0.25 HP regenerated per second | 6 | 300.00K | 9.60M |
+| Ancestral Tithe | +5% Legacy points from your next rebirth | 10 | 600.00K | 193.61M |
 
 | Item | rarity | sells for | shop price | shop / sell |
 | --- | --- | --- | --- | --- |
@@ -397,3 +407,5 @@ Shop (cost in points of the next level, by current level):
 | Master Builders | 5% | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
 | Click Mastery | 10% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
 | Provisions | 1500 gold + 400 wood + 400 stone | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Night Watch | 100% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Steward | 5% | 10 | 3 | 5 | 6 | 9 | 17 | 62 |

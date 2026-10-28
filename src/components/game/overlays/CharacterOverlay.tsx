@@ -5,7 +5,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL } from '@/config/itemCatalog';
 import { MERCHANT_GOODS } from '@/config/gameConfig';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
-import { armorOf, armorReduction, critOdds, damagePerHit, maxHp } from '@/lib/combat';
+import { armorOf, armorReduction, maxHp } from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { effectiveStats } from '@/lib/effectiveStats';
@@ -63,7 +63,6 @@ const CharacterOverlay: React.FC = () => {
 
 	const armor = armorOf(equipment, characterStats);
 	const mitigation = armorReduction(armor) * 100;
-	const odds = critOdds(characterStats, equipment);
 	const gear = aggregateStats(equipment);
 	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades });
 	const worn = Object.values(equipment).filter(Boolean).length;
@@ -125,7 +124,7 @@ const CharacterOverlay: React.FC = () => {
 				<div className='inv-readouts eq-readouts'>
 					<div className='inv-readout'>
 						<span className='inv-readout-label'>Damage</span>
-						<span className='inv-readout-value'>{formatCompact(damagePerHit(equipment, characterStats))}</span>
+						<span className='inv-readout-value'>{formatCompact(fx.damage)}</span>
 					</div>
 					<div className='inv-readout' title={`${formatPct(mitigation, 0)} less damage taken (armor has diminishing returns past ${Math.round(COMBAT.armorSoftCap * 100)}% and never gives more than 75%)`}>
 						<span className='inv-readout-label'>Armor</span>
@@ -135,13 +134,13 @@ const CharacterOverlay: React.FC = () => {
 						<span className='inv-readout-label'>Max HP</span>
 						<span className='inv-readout-value'>{formatCompact(maxHp(characterStats, equipment))}</span>
 					</div>
-					<div className='inv-readout' title={`Chance that a click crits (x${formatCompact(fx.critMultiplier, 2)}); a crit becomes a super crit (x${formatCompact(fx.superCritMultiplier, 2)}) ${formatPct(odds.superCrit * 100)} of the time`}>
+					<div className='inv-readout' title={`Chance that a click crits (x${formatCompact(fx.critMultiplier, 2)}); a crit becomes a super crit (x${formatCompact(fx.superCritMultiplier, 2)}) ${formatPct(fx.superCritChance)} of the time`}>
 						<span className='inv-readout-label'>Crit</span>
-						<span className='inv-readout-value'>{formatPct(odds.crit * 100)}</span>
+						<span className='inv-readout-value'>{formatPct(fx.critChance)}</span>
 					</div>
-					<div className='inv-readout' title={`HP per second: ${COMBAT.regenPerSec} base, ${formatCompact(gear.regen)} from gear (gear regen also works in fights); ${formatCompact(gear.luck)} Luck from gear`}>
+					<div className='inv-readout' title={`HP per second: ${COMBAT.regenPerSec} base, ${formatCompact(gear.regen)} from gear and ${formatCompact(fx.hpRegen - COMBAT.regenPerSec - gear.regen)} from the merchant (it also works in fights); ${formatCompact(gear.luck)} Luck from gear`}>
 						<span className='inv-readout-label'>Regen</span>
-						<span className='inv-readout-value'>{formatCompact(COMBAT.regenPerSec + gear.regen)}/s</span>
+						<span className='inv-readout-value'>{formatCompact(fx.hpRegen)}/s</span>
 					</div>
 				</div>
 

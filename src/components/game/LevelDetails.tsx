@@ -41,7 +41,7 @@ const xpNumbers = (level: { level: number; progress: number }) => {
 	return { next, current: Math.floor(next * level.progress), pct: Math.floor(level.progress * 100) };
 };
 
-/** A flat HP or MP bar with its numbers: half the width of the Equipment tab each. */
+/** A flat HP or MP bar with its numbers: half of the XP bar's width each (see .eq-vitals). */
 const VitalBar: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({ kind, value, max }) => (
 	<div className='eq-vital' data-kind={kind} title={`${kind === 'hp' ? 'HP' : 'MP'}: ${formatNumber(value)} / ${formatNumber(max)}`}>
 		<div className='eq-vital-fill' style={{ width: `${max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0}%` }} />

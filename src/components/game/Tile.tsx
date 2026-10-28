@@ -73,6 +73,7 @@ const Tile: React.FC<TileProps> = ({
 	const buyTile = useGameStore((state) => state.buyTile);
 	const collectChest = useGameStore((state) => state.collectChest);
 	const tapTile = useGameStore((state) => state.tapTile);
+	const startFight = useGameStore((state) => state.startFight);
 	// string selector: the tile re-renders when its monster appears, changes level or leaves, not on every tick
 	const monsterKey = useGameStore((state) => {
 		const m = monsterAt(state.monsters, x, y);
@@ -108,9 +109,10 @@ const Tile: React.FC<TileProps> = ({
 	const inRange = useGameStore((state) => mayBeInRange && inCastleRange(x, y, castleLevelOf(state.tiles)));
 
 	const handleClick = (e: React.MouseEvent) => {
-		// A monster on this tile: fights are the server's (nobody clicks to fight), so the click does nothing (no tile tap, no chest, no gold)
+		// A monster on this tile: a (real) click asks the server to start the fight against it, auto-battle or not; no tile tap, no chest, no gold
 		if (isOwned && monsterKey) {
 			e.stopPropagation();
+			if (e.nativeEvent.isTrusted && startFight(Number(monsterId))) audioManager.playSound('click');
 			return;
 		}
 
@@ -178,6 +180,7 @@ const Tile: React.FC<TileProps> = ({
 		if (monsterKey) {
 			const id = Number(monsterId);
 			own.push(
+				{ id: 'fight', label: `Fight ${MONSTERS[monsterType as 'rat' | 'ratKing'].label}`, onSelect: () => void startFight(id) },
 				{ id: 'dismiss', label: `Dismiss ${MONSTERS[monsterType as 'rat' | 'ratKing'].label}...`, danger: true, onSelect: () => ui.askDismissMonster(id) }
 			);
 		} else if (hasChest) {
@@ -333,18 +336,21 @@ const Tile: React.FC<TileProps> = ({
 								{biome === 'lake' ? 'Something glints in the water. Click to open' : 'Click to open the treasure chest'}
 							</div>
 						)}
-						<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>
-							<div className='px-tooltip break-words'>
-								<TileStatus
-									biome={biome}
-									isOwned={isOwned}
-									isAdjacent={isAdjacent}
-									level={level}
-									x={x}
-									y={y}
-								/>
+						{/* a monster has its own tooltip: the biome card would only cover it */}
+						{!(isOwned && monsterKey) && (
+							<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>
+								<div className='px-tooltip break-words'>
+									<TileStatus
+										biome={biome}
+										isOwned={isOwned}
+										isAdjacent={isAdjacent}
+										level={level}
+										x={x}
+										y={y}
+									/>
+								</div>
 							</div>
-						</div>
+						)}
 					</div>,
 					tipLayer
 				)}

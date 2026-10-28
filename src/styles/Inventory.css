@@ -97,6 +97,42 @@
 	justify-content: center;
 }
 
+/* The merchant's shelf: the bag's look with smaller slots and a Buy button under each (the price shows on hover) */
+.shop-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 52px);
+	gap: 10px 8px;
+	justify-content: center;
+}
+
+.shop-cell {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+}
+
+.shop-cell .inv-slot {
+	width: 40px;
+	height: 40px;
+	background-size: 100% 100%;
+}
+
+.shop-buy-wrap {
+	display: inline-flex;
+}
+
+.shop-buy {
+	min-width: 48px;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+/* a disabled button would swallow the hover that shows the price: let it reach the wrapper */
+.shop-buy:disabled {
+	pointer-events: none;
+}
+
 .inv-doll {
 	display: grid;
 	grid-template-columns: 48px 288px 48px;
@@ -200,13 +236,13 @@
 .eq-level {
 	display: flex;
 	align-items: center;
-	gap: 4px;
+	gap: var(--eq-orb-gap);
 }
 
 .eq-level-orb {
 	flex: none;
-	width: 48px;
-	height: 48px;
+	width: var(--eq-orb);
+	height: var(--eq-orb);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -222,16 +258,21 @@
 }
 
 .eq-level-wrap {
+	--eq-orb: 48px; /* the level badge, and the gap to the XP bar next to it: the vitals below start where the XP bar does */
+	--eq-orb-gap: 4px;
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 }
 
-/* HP and MP: two flat bars side by side, each half of the full width, directly under the XP bar */
+/* HP and MP: two flat bars side by side, filling exactly the width of the XP bar above (the badge column is skipped). The 2px margins
+   make room for the bars' own 2px outer ring, so it ends on the XP bar's edges instead of sticking out. */
 .eq-vitals {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 8px;
+	gap: 12px;
+	margin-left: calc(var(--eq-orb) + var(--eq-orb-gap) + 2px);
+	margin-right: 2px;
 }
 
 .eq-vital {

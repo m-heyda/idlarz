@@ -33,6 +33,7 @@ const LegacyDialog: React.FC = () => {
 	const tiles = useGameStore((state) => state.tiles);
 	const freeTiles = useGameStore((state) => state.freeTiles);
 	const prestige = useGameStore((state) => state.prestige);
+	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
 	const rebirth = useGameStore((state) => state.rebirth);
 	const buyLegacyUpgrade = useGameStore((state) => state.buyLegacyUpgrade);
@@ -42,7 +43,7 @@ const LegacyDialog: React.FC = () => {
 
 	const ownedTiles = economyTiles(tiles, freeTiles); // purchases + 1: the free starting ring does not count
 	const castleLevel = castleLevelOf(tiles);
-	const gain = legacyGain(castleLevel, ownedTiles);
+	const gain = legacyGain(castleLevel, ownedTiles, merchantUpgrades);
 	const levelOk = castleLevel >= REBIRTH.minCastleLevel;
 	const tilesOk = ownedTiles >= REBIRTH.minTiles;
 	const idleOk = !castleUpgrade;

@@ -41,9 +41,10 @@ const typingInField = (target: EventTarget | null): boolean => {
 };
 
 /**
- * The combat panel. Nobody clicks to fight: the server engages one monster at a time and swings both ways at each side's attack speed
- * (see src/lib/offline/fight.ts), so this only shows what it says. Potions and skills are used with the number keys (their slots are not
- * buttons); the switches are Auto-battle (the server starts the next fight) and Auto-use (it drinks, heals and stuns with fixed rules).
+ * The combat panel, shown only while a fight is open. A click on a monster starts the fight (or Auto-battle does, one monster after the
+ * other); the server then swings both ways at each side's attack speed (see src/lib/offline/fight.ts), so this only shows what it says.
+ * Potions and skills are used with the number keys (their slots are not buttons); the switches (also in the right-click menu) are
+ * Auto-battle and Auto-use (it drinks, heals and stuns with fixed rules).
  * The panel shrinks to an icon, and a win or defeat is announced by the notice stack either way.
  */
 const CombatWidget: React.FC = () => {
@@ -118,10 +119,10 @@ const CombatWidget: React.FC = () => {
 		return () => window.removeEventListener('keydown', onKey);
 	}, [potions, requestPotion, requestSkill]);
 
-	if (combat.maxHp <= 0) return null; // the server has not said anything yet
+	// the server has not said anything yet, or no fight is open: the panel (and its icon) only exist while one is
+	if (combat.maxHp <= 0 || !fight) return null;
 
 	const hpPct = Math.max(0, Math.min(100, (playerHp / combat.maxHp) * 100));
-	const resumeHp = (combat.maxHp * COMBAT.auto.resumeHpPct) / 100;
 
 	if (minimized) {
 		return (
@@ -129,10 +130,10 @@ const CombatWidget: React.FC = () => {
 				className='combat-icon'
 				data-fighting={!!fight}
 				onClick={() => setPref('combatMinimized', false)}
-				title={fight ? `Fighting a ${monsterDef(fight.type).label} - click to open` : combat.autoBattle ? 'Combat: resting or waiting for a monster - click to open' : 'Auto-battle is off - click to open'}
+				title={`Fighting a ${monsterDef(fight.type).label} - click to open`}
 				aria-label='Open the combat panel'>
 				<span className='combat-icon-art' aria-hidden>
-					{fight ? <MonsterArt type={fight.type} scale={2} /> : <span className='combat-icon-swords'>{'⚔'}</span>}
+					<MonsterArt type={fight.type} scale={2} />
 				</span>
 				<span className='combat-icon-hp' aria-hidden>
 					<i style={{ width: `${hpPct}%` }} />
@@ -142,28 +143,21 @@ const CombatWidget: React.FC = () => {
 		);
 	}
 
-	const def = fight ? monsterDef(fight.type) : null;
-	const boss = def?.grade === 'boss';
-	const traits = fight ? monsterStats(fight.type, fight.level) : null;
-	const status = !combat.autoBattle
-		? 'Auto-battle is off.'
-		: playerHp < resumeHp
-			? `Resting until HP is back to ${COMBAT.auto.resumeHpPct}%.`
-			: combat.retrySec > 0
-				? `A monster beat you: trying again in ${combat.retrySec} s.`
-				: 'Waiting for a monster.';
+	const def = monsterDef(fight.type);
+	const boss = def.grade === 'boss';
+	const traits = monsterStats(fight.type, fight.level);
 
 	return (
 		<section className='combat-widget px-card' aria-label='Combat'>
 			<header className='combat-head'>
-				<b>{fight ? `${boss ? '☠ ' : ''}${def!.label} - Lv ${fight.level}` : 'Combat'}</b>
+				<b>{`${boss ? '☠ ' : ''}${def.label} - Lv ${fight.level}`}</b>
 				<button className='combat-min' onClick={() => setPref('combatMinimized', true)} aria-label='Minimize the combat panel' title='Minimize'>
 					_
 				</button>
 			</header>
 			<div className='fight-body' data-shake={shake}>
 				<div className='fight-hurt-flash' data-on={shake} aria-hidden />
-				{fight && boss && traits && (
+				{boss && (
 					<div className='fight-boss' title='A boss: its own drops, crits and sometimes resists Stun'>
 						<b>BOSS</b>
 						<span className='fight-boss-traits'>
@@ -171,29 +165,23 @@ const CombatWidget: React.FC = () => {
 						</span>
 					</div>
 				)}
-				{fight && fight.timeLeftSec !== null && (
+				{fight.timeLeftSec !== null && (
 					<div className='fight-timer' data-low={fight.timeLeftSec <= 10}>
 						Time left: {Math.ceil(fight.timeLeftSec)} s
 					</div>
 				)}
 				<div className='combat-stage'>
-					{fight ? (
-						<>
-							<span key={hitTick} className='fight-sprite' data-hit={hitTick > 0}>
-								<MonsterArt type={fight.type} scale={fight.type === 'ratKing' ? 3 : 4} />
-							</span>
-							{fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {fight.stunLeft.toFixed(1)} s</div>}
-						</>
-					) : (
-						<div className='combat-idle'>{status}</div>
-					)}
+					<span key={hitTick} className='fight-sprite' data-hit={hitTick > 0}>
+						<MonsterArt type={fight.type} scale={fight.type === 'ratKing' ? 3 : 4} />
+					</span>
+					{fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {fight.stunLeft.toFixed(1)} s</div>}
 					{numbers.map((n) => (
 						<span key={n.id} className='fight-number' data-kind={n.kind} style={{ left: `${n.x}%` }}>
 							{n.text}
 						</span>
 					))}
 				</div>
-				{fight && <Bar value={fight.monsterHp} max={fight.monsterMaxHp} kind='monster' label={def!.label} />}
+				<Bar value={fight.monsterHp} max={fight.monsterMaxHp} kind='monster' label={def.label} />
 				<Bar value={playerHp} max={combat.maxHp} kind='player' label='You' />
 				<Bar value={playerMp} max={combat.maxMp} kind='mana' label='Mana' />
 
@@ -229,7 +217,7 @@ const CombatWidget: React.FC = () => {
 					))}
 				</div>
 				<div className='combat-switches'>
-					<label title='The server sends you against one monster at a time'>
+					<label title='After a fight the server sends you against the next monster, one at a time. Off: click a monster to fight it'>
 						<input type='checkbox' checked={combat.autoBattle} onChange={(e) => setAutoBattle(e.target.checked)} /> Auto-battle
 					</label>
 					<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>

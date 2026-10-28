@@ -52,5 +52,7 @@ test('no browser code calls a function that rolls a reward or a fight', () => {
 
 test('the browser has no way to hit a monster: the store has no click combat and no guest spawning left', () => {
 	const store = readFileSync(join(SRC, 'stores', 'gameStore.ts'), 'utf8');
-	for (const gone of ['hitMonster', 'startFight', 'stepFight', 'rollHit', 'serverSpawns', 'hitGuard']) assert.ok(!store.includes(gone), `${gone} is gone from the store`);
+	for (const gone of ['hitMonster', 'stepFight', 'rollHit', 'serverSpawns', 'hitGuard']) assert.ok(!store.includes(gone), `${gone} is gone from the store`);
+	// a click on a monster may only ask the server to open the fight: startFight is a request, nothing is rolled or hit here
+	assert.ok(store.includes("requestUse(newClaimId(), { kind: 'fight'"), 'startFight asks the server');
 });

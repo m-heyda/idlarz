@@ -65,11 +65,11 @@ const ratesAfterUpgrade = (state: PersistedGame): Resources | null => {
 	const castle = getTile(state.tiles, CASTLE_X, CASTLE_Y);
 	if (!upgrade || !castle || castle.biome !== 'castle') return null;
 	const tiles = setTile(state.tiles, CASTLE_X, CASTLE_Y, { ...castle, level: upgrade.toLevel, upgradeCost: CASTLE_UPGRADE.upgradeCosts[upgrade.toLevel - 1] ?? undefined });
-	return calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades).total;
+	return calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades).total;
 };
 
 export const summarize = (state: PersistedGame): SaveSummary => {
-	const rates = calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades).total;
+	const rates = calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades).total;
 	const fx = effectiveStats({ characterStats: state.characterStats, equipment: state.equipment, prestige: state.prestige, merchantUpgrades: state.merchantUpgrades });
 	const limits = { prestige: state.prestige, merchantUpgrades: state.merchantUpgrades };
 	return {

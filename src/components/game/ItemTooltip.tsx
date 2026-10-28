@@ -50,6 +50,8 @@ interface BodyProps {
 	comparison?: DetailedComparison | null;
 	/** Marks the card of the piece currently worn, shown beside the hovered one */
 	wornLabel?: boolean;
+	/** The item is on the merchant's shelf: the card shows what it costs instead of what it sells for */
+	buyPrice?: number;
 }
 
 /**
@@ -58,7 +60,7 @@ interface BodyProps {
  * `comparison` every number carries its change against the worn piece, stats the worn piece has and this one lacks are
  * listed as lost, and the set block shows the state after the swap.
  */
-export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel }) => {
+export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const resolved = item ? resolveItem(item) : null;
 	const def = resolved?.def ?? (itemId ? ITEM_CATALOG[itemId] : undefined);
@@ -216,7 +218,7 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison,
 
 			{def.description && <div className='px-tip-flavor'>{def.description}</div>}
 			<div className='px-tip-sell'>
-				Sells for {formatNumber(sellPrice)} <ResourceIcon resource='gold' />
+				{buyPrice !== undefined ? 'Costs' : 'Sells for'} {formatNumber(buyPrice ?? sellPrice)} <ResourceIcon resource='gold' />
 			</div>
 		</div>
 	);
@@ -226,13 +228,13 @@ export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison,
  * The hover card of an item. With `compare` (the bag) and a piece worn in the same slot it becomes two cards side by side:
  * the worn piece (marked Equipped) and the hovered one with every number set against it.
  */
-const ItemTooltipStack: React.FC<{ item?: ItemInstance; itemId?: string; compare?: boolean }> = ({ item, itemId, compare }) => {
+const ItemTooltipStack: React.FC<{ item?: ItemInstance; itemId?: string; compare?: boolean; buyPrice?: number }> = ({ item, itemId, compare, buyPrice }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const comparison = compare && item ? compareDetailed(item, equipment) : null;
 	return (
 		<div className='flex items-start gap-2'>
 			<div className='px-tooltip'>
-				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} />
+				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} />
 			</div>
 			{comparison?.equipped && (
 				<div className='px-tooltip px-tooltip-worn'>

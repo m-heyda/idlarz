@@ -15,7 +15,7 @@ import {
 import { critDamagePercent } from '@/lib/statBonuses';
 import { chestRateBonusPct, gemChance, luckyRatChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
-import { effectiveTileDiscount, legacyEffect, merchantLuck, type MerchantUpgrades } from '@/utils/gameUtils';
+import { effectiveTileDiscount, legacyEffect, merchantCombat, merchantLuck, type MerchantUpgrades } from '@/utils/gameUtils';
 import type { CharacterStats, Equipment, PrestigeState } from '@/types/game';
 
 /** Everything that decides the numbers shown for the character: the attributes, the worn gear, the merchant bonuses and the rebirth state. */
@@ -33,7 +33,8 @@ export interface StatContext {
  */
 export const effectiveStats = ({ characterStats, equipment, prestige, merchantUpgrades }: StatContext) => {
 	const gear = aggregateStats(equipment);
-	const odds = critOdds(characterStats, equipment);
+	const bonus = merchantCombat(merchantUpgrades);
+	const odds = critOdds(characterStats, equipment, bonus);
 	const critExtra = 1 + critDamagePercent(characterStats) / 100;
 	const armor = armorOf(equipment, characterStats);
 	const luck = characterStats.luck + merchantLuck(merchantUpgrades) + gear.luck;
@@ -41,15 +42,15 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 	return {
 		maxHp: maxHp(characterStats, equipment),
 		maxMana: maxMana(characterStats, equipment),
-		hpRegen: COMBAT.regenPerSec + gear.regen,
+		hpRegen: COMBAT.regenPerSec + gear.regen + bonus.regen,
 		manaRegen: manaRegenPerSec(characterStats, equipment),
-		damage: damagePerHit(equipment, characterStats),
-		attacksPerSecond: attacksPerSecond(equipment, characterStats),
+		damage: damagePerHit(equipment, characterStats, bonus),
+		attacksPerSecond: attacksPerSecond(equipment, characterStats, bonus),
 		armor,
 		/** % of the damage of a monster's hit the armor takes away */
 		armorReduction: armorReductionOf(armor) * 100,
 		dodge: dodgeChance(equipment) * 100,
-		lifeLeech: lifeLeechPercent(equipment),
+		lifeLeech: lifeLeechPercent(equipment, bonus),
 		/** % chance that a click crits */
 		critChance: odds.crit * 100,
 		/** What a crit multiplies the click by */

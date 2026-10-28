@@ -205,6 +205,39 @@ test('hotkeys, switches and dismissals are requests to the server: a key per pre
 	}
 });
 
+test('a click on a monster asks the server for that monster\'s ticket: no such monster, no ticket or a fight already open send nothing', async () => {
+	syncedGame();
+	store.setState({
+		monsters: [
+			{ id: 3, type: 'rat', level: 1, spawnLevel: 1, x: CASTLE_X + 2, y: CASTLE_Y, ageSec: 0, ticket: 7 },
+			{ id: 4, type: 'rat', level: 1, spawnLevel: 1, x: CASTLE_X + 3, y: CASTLE_Y, ageSec: 0 },
+		],
+	});
+	const calls = record();
+	try {
+		assert.equal(api().startFight(99), false, 'not on the map');
+		assert.equal(api().startFight(4), false, 'a monster the server has no ticket for');
+		assert.equal(api().startFight(3), true);
+		openFight();
+		assert.equal(api().startFight(3), false, 'a fight is already open');
+		await flush();
+		assert.equal(calls.length, 1);
+		assert.equal(calls[0].path, '/api/fight');
+		assert.equal(calls[0].body.action, 'use');
+		assert.deepEqual(calls[0].body.command, { kind: 'fight', n: 7 });
+		assert.match(String(calls[0].body.key), /^[A-Za-z0-9_-]{8,64}$/);
+	} finally {
+		closeFight();
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('auto-battle starts switched off, in the browser as on the server', () => {
+	freshGame();
+	assert.equal(api().combat.autoBattle, false);
+	assert.equal(api().combat.autoUse, true);
+});
+
 // ---------------------------------------------------------------------------------------------------- the clock between answers
 
 const run = (seconds: number) => {

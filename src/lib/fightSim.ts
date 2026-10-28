@@ -2,8 +2,9 @@ import { INITIAL_CHARACTER_STATS } from '@/config/gameConfig';
 import { ITEM_CATALOG, SETS } from '@/catalog';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { runCombat, type CombatEnv } from '@/lib/offline/fight';
-import type { FightEvent } from '@/lib/offline/fightTypes';
+import { freshCombat, type FightEvent } from '@/lib/offline/fightTypes';
 import { newLedger } from '@/lib/offline/ledger';
+import { savedVitals } from '@/lib/offline/profile';
 import { plainItem } from '@/lib/itemInstance';
 import { calculateCombatStats } from '@/utils/gameUtils';
 import type { CharacterStats, Equipment, EquipmentSlot, MonsterType } from '@/types/game';
@@ -87,7 +88,10 @@ export const simSetup = ({ equipment = {}, character = freshCharacter(), potions
 	const ticket = (m: SimSetup['monsters'][number]) => ({ n: ++n, at: START, lucky: m.lucky ?? false, x: 2 + n, y: 3, spawnLevel: m.level });
 	const rats = monsters.filter((m) => m.type === 'rat').map(ticket);
 	const kingDef = monsters.find((m) => m.type === 'ratKing');
-	const ledger = { ...base, runId: 1, bank: { ...base.bank, accAt: START, rats, king: kingDef ? ticket(kingDef) : null } };
+	// the sim lets the engine pick the monsters one after the other, so auto-battle is on (a new player starts with it off)
+	const vitals = savedVitals(core);
+	const combat = { ...freshCombat(START, vitals.hp, vitals.mp), autoBattle: true };
+	const ledger = { ...base, runId: 1, combat, bank: { ...base.bank, accAt: START, rats, king: kingDef ? ticket(kingDef) : null } };
 	const env = (nowSec: number): CombatEnv => ({ secret: SECRET, userId: seed, stored, nowSec });
 	return { ledger, env, start: START, stored };
 };
