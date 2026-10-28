@@ -10,9 +10,8 @@ import {
 	FARM_UPGRADES,
 	type FarmUpgradeId,
 	BASE_XP_PER_TILE,
-	BASE_XP_PER_LEVEL,
-	XP_GROWTH_FACTOR,
-	XP_LEVEL_SOFT,
+	LEVELING,
+	MAX_LEVEL,
 	SCALING_CONFIG,
 	XP_TILE,
 	XP_CAP,
@@ -22,8 +21,11 @@ import {
 	BIOME_YIELD,
 	BUILDING_COST,
 	CHARACTER_STAT_CONFIG,
+	INITIAL_CHARACTER_STATS,
 	INITIAL_RESOURCES,
 	LEGACY_UPGRADES,
+	MERCHANT_BUY_MULTIPLIER,
+	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_UPGRADES,
 	type MerchantUpgradeId,
 	REBIRTH,
@@ -42,6 +44,7 @@ import {
 	TileCost,
 } from '@/types/game';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
+import type { CombatBonus } from '@/lib/combat';
 import { STAT_RULES } from '@/config/combatConfig';
 import { atkSpeedPercent, magicDamagePercent, physicalDamagePercent, statArmor, statMaxMana } from '@/lib/statBonuses';
 import { RING, generateStartRing } from '@/utils/biomeRules';
@@ -130,45 +133,112 @@ export const calculateXpGain = (ownedTiles: number): number => {
 	// Basic XP gain increases with the number of tiles owned: each tile contributes XP that grows slightly with more tiles.
 	// Up to XP_TILE.growthUntil tiles that is exponential (1.02 per tile); beyond it a polynomial tail keeps it finite.
 	const k = Math.min(ownedTiles, XP_TILE.growthUntil);
-	const xp = BASE_XP_PER_TILE * Math.pow(1.02, k - 1) * (k / 4);
+	const xp = BASE_XP_PER_TILE * Math.pow(XP_TILE.growth, k - 1) * (k / 4);
 	return ownedTiles > XP_TILE.growthUntil ? xp * Math.pow(ownedTiles / XP_TILE.growthUntil, XP_TILE.tailExponent) : xp;
 };
 
-/** The XP curve of a save from before the soft part (every level was x1.3 on the last): the most levels such a save can have gained. */
-export const OLD_XP_LEVEL_SOFT = { fromLevel: Infinity, growth: XP_GROWTH_FACTOR };
+/**
+ * The XP steps of the level curve, index L - 1 = XP to go from level L to L + 1. Built once from LEVELING.anchors: from one anchor to the
+ * next every step is the one before times a constant ratio, solved (bisection) so the steps add up to the anchor's XP; the ratio also
+ * applies at the join, so the steps only ever grow. Only additions, multiplications and floor: the same table on every device and on the server.
+ */
+const buildLevelSteps = (): number[] => {
+	const steps: number[] = [];
+	let last = LEVELING.firstStepXp;
+	let level = 1;
+	let xp = 0;
+	for (const [toLevel, toXp] of LEVELING.anchors) {
+		const n = toLevel - level;
+		const total = toXp - xp;
+		// the sum of n steps: the first is `first`, each next one is the one before times r
+		const first = (r: number) => (level === 1 ? LEVELING.firstStepXp : last * r);
+		const sumFor = (r: number) => {
+			let step = first(r);
+			let sum = 0;
+			for (let i = 0; i < n; i++) {
+				sum += step;
+				step *= r;
+			}
+			return sum;
+		};
+		let lo = 1;
+		let hi = 4;
+		for (let i = 0; i < 200; i++) {
+			const mid = (lo + hi) / 2;
+			if (sumFor(mid) < total) lo = mid;
+			else hi = mid;
+		}
+		const r = (lo + hi) / 2;
+		let step = first(r);
+		for (let i = 0; i < n; i++) {
+			steps.push(Math.floor(step));
+			last = step;
+			step *= r;
+		}
+		level = toLevel;
+		xp = toXp;
+	}
+	return steps;
+};
+const LEVEL_STEPS = buildLevelSteps();
 
-/** XP needed to leave level `level`: x1.3 per level up to XP_LEVEL_SOFT.fromLevel, then x`growth` per level. */
-export const xpToLeaveLevel = (level: number, soft: { fromLevel: number; growth: number } = XP_LEVEL_SOFT): number => {
-	const steep = Math.min(level, soft.fromLevel) - 1;
-	const gentle = Math.max(0, level - soft.fromLevel);
-	return Math.floor(BASE_XP_PER_LEVEL * Math.pow(XP_GROWTH_FACTOR, steep) * Math.pow(soft.growth, gentle));
+/** The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING). */
+export const totalStatPoints = (level: number): number => {
+	const l = Math.max(1, Math.min(Math.floor(level), LEVELING.maxLevel));
+	return l - 1 + Math.max(0, Math.min(l, LEVELING.earlyBonusUntil) - 1) * LEVELING.earlyBonusPoints;
+};
+
+const ATTRIBUTES = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
+
+/**
+ * Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned
+ * (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every
+ * point the level has earned is left to spend again. A character that is within its points is returned as it is.
+ */
+export const reconcileCharacter = (stats: CharacterStats, xp: number): CharacterStats => {
+	const level = calculateLevel(xp).level;
+	const expected = ATTRIBUTES.length * INITIAL_CHARACTER_STATS.strength + totalStatPoints(level);
+	const total = ATTRIBUTES.reduce((sum, key) => sum + stats[key], 0) + stats.availablePoints;
+	if (total <= expected) return stats;
+	const next: CharacterStats = { ...stats, availablePoints: totalStatPoints(level) };
+	for (const key of ATTRIBUTES) next[key] = INITIAL_CHARACTER_STATS[key];
+	return Object.assign(next, calculateCombatStats(next));
 };
 
 /**
- * Calculate level based on total XP using exponential scaling
- * Each level requires more XP than the previous one
+ * XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config);
+ * everything that shows or checks a level threshold uses this.
+ */
+export const xpToNextLevel = (level: number): number => {
+	if (!(level >= 1)) return LEVEL_STEPS[0];
+	if (level >= LEVELING.maxLevel) return Infinity;
+	return LEVEL_STEPS[Math.floor(level) - 1];
+};
+
+/** The total XP at which `level` is reached (level 1 is 0). */
+export const cumulativeXp = (level: number): number => {
+	let total = 0;
+	for (let l = 1; l < Math.min(level, LEVELING.maxLevel); l++) total += xpToNextLevel(l);
+	return total;
+};
+
+/**
+ * Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.
  */
 export const calculateLevel = (
-	xp: number,
-	soft: { fromLevel: number; growth: number } = XP_LEVEL_SOFT
+	xp: number
 ): { level: number; progress: number } => {
-	// Start at level 1, no XP needed for first level
 	let level = 1;
-	let xpForNextLevel = xpToLeaveLevel(1, soft);
-	let remainingXp = Number.isFinite(xp) ? Math.min(xp, XP_CAP) : XP_CAP;
+	let remainingXp = Number.isFinite(xp) ? Math.max(0, Math.min(xp, XP_CAP)) : XP_CAP;
+	let step = xpToNextLevel(level);
 
-	// Keep leveling up until we don't have enough XP (a non-finite threshold ends it: levels past ~2700 overflow)
-	while (remainingXp >= xpForNextLevel) {
-		remainingXp -= xpForNextLevel;
+	while (level < MAX_LEVEL && remainingXp >= step) {
+		remainingXp -= step;
 		level++;
-		xpForNextLevel = xpToLeaveLevel(level, soft);
-		if (!Number.isFinite(xpForNextLevel)) return { level, progress: 0 };
+		step = xpToNextLevel(level);
 	}
-
-	// Calculate progress to next level
-	const progress = xpForNextLevel > 0 ? remainingXp / xpForNextLevel : 0;
-
-	return { level, progress };
+	if (level >= MAX_LEVEL) return { level, progress: 1 };
+	return { level, progress: step > 0 ? remainingXp / step : 0 };
 };
 
 export const countAdjacentSameBiomes = (
@@ -379,7 +449,9 @@ export interface ResourceBreakdownEntry {
 	statMod: number;
 	/** The rebirth income multiplier (1 = none) */
 	legacyMult: number;
-	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * legacy - 1 */
+	/** The merchant's Foreman multiplier (1 = none; never on XP) */
+	merchantMult: number;
+	/** All of the above folded into one modifier, as shown in tooltips: (1 + castle + plains + stats) * legacy * merchant - 1 */
 	modifier: number;
 	total: number;
 }
@@ -439,7 +511,8 @@ export const calculateResourceBreakdown = (
 	characterStats?: CharacterStats,
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
-	farmUpgrades?: FarmUpgrades
+	farmUpgrades?: FarmUpgrades,
+	merchantUpgrades?: MerchantUpgrades
 ): ResourceBreakdown => {
 	const base: Resources = { ...BASE_GENERATION_RATES };
 	const start: Resources = { ...BASE_GENERATION_RATES };
@@ -447,8 +520,11 @@ export const calculateResourceBreakdown = (
 	const biomePart = zeroResources();
 	const buildingPart = zeroResources();
 
-	// Meat and the other farm products come from the animals alone
+	// Meat and the other farm products come from the animals alone (the Skinner's bonus is on the meat and the hide)
 	const farm = calculateFarmOutput(farmLevels, farmUpgrades);
+	const skinner = 1 + merchantEffect(merchantUpgrades, 'skinner');
+	farm.meat *= skinner;
+	farm.hide *= skinner;
 	for (const key of FARM_KEYS) {
 		base[key] = farm[key];
 		start[key] = 0;
@@ -541,10 +617,12 @@ export const calculateResourceBreakdown = (
 
 	// Legacy income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
 	const legacyMult = legacyIncomeMultiplier(prestige);
+	const foreman = merchantIncomeMultiplier(merchantUpgrades);
 
 	const result = {} as ResourceBreakdown;
 	for (const key of RESOURCE_KEYS) {
-		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * legacyMult - 1;
+		const merchantMult = key === 'xp' ? 1 : foreman;
+		const modifier = (1 + (castleBonus + plainsMod[key] + statMod[key])) * legacyMult * merchantMult - 1;
 		result[key] = {
 			start: start[key],
 			farm: farmPart[key],
@@ -557,6 +635,7 @@ export const calculateResourceBreakdown = (
 			plainsMod: plainsMod[key],
 			statMod: statMod[key],
 			legacyMult,
+			merchantMult,
 			modifier,
 			total: base[key] * (1 + modifier),
 		};
@@ -569,9 +648,10 @@ export const calculateResourceRates = (
 	characterStats?: CharacterStats,
 	farmLevels: Record<string, number> = {},
 	prestige?: PrestigeState,
-	farmUpgrades?: FarmUpgrades
+	farmUpgrades?: FarmUpgrades,
+	merchantUpgrades?: MerchantUpgrades
 ): ResourceRates => {
-	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades);
+	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades);
 	const base = zeroResources();
 	const modifiers = zeroResources();
 	const total = zeroResources();
@@ -765,11 +845,26 @@ export const sellMultiplier = (ctx: SellContext | undefined): number => 1 + SELL
 /** Gold for selling `qty` of something worth `unit` each. */
 export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefined): number => Math.floor(unit * qty * sellMultiplier(ctx));
 
+/** Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this). */
+export const buyCost = (resource: keyof typeof MERCHANT_RESOURCE_PRICES, units: number): number =>
+	Math.ceil(units * MERCHANT_RESOURCE_PRICES[resource] * MERCHANT_BUY_MULTIPLIER);
+
 /** Luck from the Lucky Charm, added to the character's Luck for chests and kills. */
 export const merchantLuck = (upgrades: MerchantUpgrades | undefined): number => merchantEffect(upgrades, 'charm');
 
-/** Bag slots a game has: the base bag plus Pack Rat. */
+/** The Foreman's multiplier on the income of every resource but XP (1 = none). */
+export const merchantIncomeMultiplier = (upgrades: MerchantUpgrades | undefined): number => 1 + merchantEffect(upgrades, 'foreman');
 
+/** What the merchant's combat upgrades add to the fight: one place, read by the readouts (effectiveStats), the server's fights and the regeneration. */
+export const merchantCombat = (upgrades: MerchantUpgrades | undefined): CombatBonus => ({
+	atkSpeedPct: merchantEffect(upgrades, 'swift'),
+	critPct: merchantEffect(upgrades, 'keen'),
+	superCritPct: merchantEffect(upgrades, 'deadly'),
+	physPct: merchantEffect(upgrades, 'might'),
+	magicPct: merchantEffect(upgrades, 'arcana'),
+	leechPct: merchantEffect(upgrades, 'fang'),
+	regen: merchantEffect(upgrades, 'wind'),
+});
 
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {
@@ -781,4 +876,6 @@ export const startingResources = (prestige: PrestigeState | undefined): Resource
 	return out;
 };
 
-export const legacyGain = (castleLevel: number, tiles: number): number => REBIRTH.gain(castleLevel, tiles);
+/** Legacy points a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus. */
+export const legacyGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades): number =>
+	Math.floor(REBIRTH.gain(castleLevel, tiles) * (1 + merchantEffect(merchant, 'tithe')));

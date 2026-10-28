@@ -29,12 +29,14 @@ Every purchase rolls its biome (no picker). XP and reputation per purchase in §
 ## 2. XP and levels
 
 ```
-tileXP(k)   = 45 × 1.02^(min(k,300)−1) × min(k,300)/4 × (k/300)^1.5 if k > 300       k = owned count AFTER the purchase (XP_TILE, BASE_XP_PER_TILE; was 125)
+tileXP(k)   = 45 × 1.02^(min(k,300)−1) × min(k,300)/4 × (k/300)^1.5 if k > 300      k = owned count AFTER the purchase (XP_TILE)
 awardedXP   = tileXP × (1 + xpGainMultiplier/100)
 xpGainMultiplier (%) = 0.2·INT + 0.25·CHA
 passive xp/s = rates.total.xp × (1 + xpGainMultiplier/100)
-XP to leave level N = floor(750 × 1.3^(min(N,38)−1) × 1.045^max(0,N−38))     xpToLeaveLevel, XP_LEVEL_SOFT: the old x1.3 up to level 38, then x1.045
-stat points = 1 per level; reputation = 1000 + 100 per tile bought
+XP to leave level N = xpToNextLevel(N): from anchors (level → total XP) 10 → 1.4e5, 30 → 1e8, 80 → 3e9, 90 → 6.5e9, 100 → 1.85e10,
+                       every step a constant factor above the one before inside a segment; level 100 is the maximum (LEVELING in gameConfig.ts)
+stat points = 1 per level, +2 for levels 2..30 (totalStatPoints); reputation = 1000 + 100 per tile bought
+level, lifetime XP and attributes carry over a rebirth
 ```
 
 ## 3. Resource rate pipeline
@@ -128,7 +130,7 @@ item:  sell = floor(rarityValue × valueCurve(level) × qualityValue × affixesV
        supplies (potions) price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
 goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle level above 1, +-2; common 50 / uncommon 32 / rare 14 / epic 4)
        price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh); rarity common 60 / uncommon 40; item level centre = min(world level, avgWorn + 3), max avgWorn + 5
-bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3
+bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Legacy points of a rebirth = floor(gain × (1 + 0.05 × Tithe))
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s, ≤ 5 waiting

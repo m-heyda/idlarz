@@ -117,7 +117,7 @@ export const freshCombat = (nowSec: number, hp: number, mp: number): CombatState
 	mp,
 	cd: freshCooldowns(),
 	fight: null,
-	autoBattle: true,
+	autoBattle: false,
 	autoUse: true,
 	ord: 0,
 	retryAt: {},
@@ -127,8 +127,8 @@ export const freshCombat = (nowSec: number, hp: number, mp: number): CombatState
 	log: [],
 });
 
-/** What a manual hotkey asks for. */
-export type CombatCommand = { kind: 'potion'; id: string } | { kind: 'skill'; id: SkillId };
+/** What the player asks for by hand: a hotkey, or a click on a monster (`n` is its ticket number). */
+export type CombatCommand = { kind: 'potion'; id: string } | { kind: 'skill'; id: SkillId } | { kind: 'fight'; n: number };
 
 /** The fight as the browser sees it (the numbers it needs to draw the panel and the map). */
 export interface FightView {

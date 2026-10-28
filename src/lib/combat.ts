@@ -19,39 +19,60 @@ export const weaponDamageType = (equipment: Equipment): DamageType => {
 	return type && STAT_RULES.magicWeaponTypes.includes(type) ? 'magic' : 'physical';
 };
 
+/**
+ * What the merchant's upgrades add to the fight (see `merchantCombat` in utils/gameUtils.ts), every number in the unit of its readout (percent,
+ * percentage points, HP per second). Each function below takes it as an optional last argument: without it nothing changes.
+ */
+export interface CombatBonus {
+	/** % more attacks per second */
+	atkSpeedPct: number;
+	/** Percentage points of crit chance, and of the chance that a crit becomes a super crit */
+	critPct: number;
+	superCritPct: number;
+	/** % more damage with physical weapons and with magic weapons */
+	physPct: number;
+	magicPct: number;
+	/** % of the damage dealt that comes back as HP (the cap still applies to the total) */
+	leechPct: number;
+	/** HP per second, in and out of fights */
+	regen: number;
+}
+
+export const NO_COMBAT_BONUS: CombatBonus = { atkSpeedPct: 0, critPct: 0, superCritPct: 0, physPct: 0, magicPct: 0, leechPct: 0, regen: 0 };
+
 /** The damage multiplier the attributes give with the worn weapon (1 for a character with no bonus, or when no attributes are given). */
-export const damageMultiplier = (equipment: Equipment, stats?: Attributes): number => {
-	if (!stats) return 1;
-	const percent = weaponDamageType(equipment) === 'magic' ? magicDamagePercent(stats) : physicalDamagePercent(stats);
+export const damageMultiplier = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {
+	const magic = weaponDamageType(equipment) === 'magic';
+	const percent = (stats ? (magic ? magicDamagePercent(stats) : physicalDamagePercent(stats)) : 0) + (bonus ? (magic ? bonus.magicPct : bonus.physPct) : 0);
 	return 1 + percent / 100;
 };
 
 const round1 = (value: number): number => Math.round(value * 10) / 10;
 
 /** Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon). */
-export const damagePerHit = (equipment: Equipment, stats?: Attributes): number =>
-	Math.max(1, round1(aggregateStats(equipment).damage * damageMultiplier(equipment, stats)));
+export const damagePerHit = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number =>
+	Math.max(1, round1(aggregateStats(equipment).damage * damageMultiplier(equipment, stats, bonus)));
 
-/** Attacks per second: the weapon's speed (1 bare-handed) and the Dexterity bonus. The fight swings at exactly this speed. */
-export const attacksPerSecond = (equipment: Equipment, stats?: Attributes): number => {
+/** Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed. */
+export const attacksPerSecond = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {
 	const base = equipment.mainHand ? (ITEM_CATALOG[equipment.mainHand.base]?.attackSpeed ?? 1) : 1;
-	return Math.round(base * (1 + (stats ? atkSpeedPercent(stats) : 0) / 100) * 100) / 100;
+	return Math.round(base * (1 + ((stats ? atkSpeedPercent(stats) : 0) + (bonus?.atkSpeedPct ?? 0)) / 100) * 100) / 100;
 };
 
 /** Damage per second at that speed: what the damage readout is built on. */
-export const damagePerSecond = (equipment: Equipment, stats?: Attributes): number =>
-	Math.round(damagePerHit(equipment, stats) * attacksPerSecond(equipment, stats) * 100) / 100;
+export const damagePerSecond = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number =>
+	Math.round(damagePerHit(equipment, stats, bonus) * attacksPerSecond(equipment, stats, bonus) * 100) / 100;
 
 export type CritKind = 'none' | 'crit' | 'super';
 
 const clampPct = (pct: number, max: number) => Math.max(0, Math.min(max, pct)) / 100;
 
 /** Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear. */
-export const critOdds = (characterStats: CharacterStats, equipment: Equipment): { crit: number; superCrit: number } => {
+export const critOdds = (characterStats: CharacterStats, equipment: Equipment, bonus?: CombatBonus): { crit: number; superCrit: number } => {
 	const gear = aggregateStats(equipment);
 	return {
-		crit: clampPct((characterStats.critChance || 0) + gear.critChance, COMBAT.crit.maxCritChance),
-		superCrit: clampPct(COMBAT.crit.superBase + gear.superCrit, COMBAT.crit.maxSuperChance),
+		crit: clampPct((characterStats.critChance || 0) + gear.critChance + (bonus?.critPct ?? 0), COMBAT.crit.maxCritChance),
+		superCrit: clampPct(COMBAT.crit.superBase + gear.superCrit + (bonus?.superCritPct ?? 0), COMBAT.crit.maxSuperChance),
 	};
 };
 
@@ -70,7 +91,7 @@ export const rollHit = (characterStats: CharacterStats, equipment: Equipment, rn
 	swing(damagePerHit(equipment, characterStats), critOdds(characterStats, equipment), 1 + critDamagePercent(characterStats) / 100, rng);
 
 /** HP a swing of `damage` gives back through Life Leech. */
-export const leechHeal = (damage: number, equipment: Equipment): number => (damage * lifeLeechPercent(equipment)) / 100;
+export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBonus): number => (damage * lifeLeechPercent(equipment, bonus)) / 100;
 
 /** Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add. */
 export const armorOf = (equipment: Equipment, stats?: Attributes): number => aggregateStats(equipment).armor + (stats ? statArmor(stats) : 0);
@@ -82,8 +103,9 @@ export const maxMana = (characterStats: CharacterStats, equipment: Equipment): n
 /** Mana per second, in and out of fights. */
 export const manaRegenPerSec = (stats: Attributes, equipment: Equipment): number => statManaRegen(stats) + aggregateStats(equipment).manaRegen;
 
-/** The gear's Life Leech in %, never above the cap. */
-export const lifeLeechPercent = (equipment: Equipment): number => Math.min(STAT_RULES.lifeLeechCap, Math.max(0, aggregateStats(equipment).lifeLeech));
+/** The Life Leech in %, the gear's and the merchant's together, never above the cap. */
+export const lifeLeechPercent = (equipment: Equipment, bonus?: CombatBonus): number =>
+	Math.min(STAT_RULES.lifeLeechCap, Math.max(0, aggregateStats(equipment).lifeLeech + (bonus?.leechPct ?? 0)));
 
 /**
  * The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much,

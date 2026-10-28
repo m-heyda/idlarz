@@ -6,6 +6,8 @@ import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
 import { checkNetWorth } from './netWorth';
 import { summarize, type SaveSummary } from './summary';
+import { settleXp } from './xpModel';
+import { calculateLevel, reconcileCharacter } from '@/utils/gameUtils';
 import { POISON_FLAGS, VERIFY, verifyTransition, type SaveFlag, type Snapshot } from './verify';
 
 /** Accepted saves are copied into the history when this long passed since the last copy (not every N revisions: event saves make the revision count race ahead of the clock), and when a flag appears that the previous save did not have. */
@@ -69,7 +71,7 @@ export interface SaveRepo {
 }
 
 export type SaveOutcome =
-	| { kind: 'ok'; rev: number; serverSavedAt: number; flags: SaveFlag[]; /** The authoritative gem balance (the ledger's), when there is one */ gems?: number }
+	| { kind: 'ok'; rev: number; serverSavedAt: number; flags: SaveFlag[]; /** The authoritative gem balance (the ledger's), when there is one */ gems?: number; /** The XP the server kept, only when the save held more than it could have earned (the browser takes the lower number) */ xp?: number }
 	| { kind: 'conflict'; rev: number; serverSavedAt: number }
 	| { kind: 'invalid'; reason: string }
 	| { kind: 'too_soon'; retryAfterMs: number };
@@ -116,7 +118,7 @@ export const acceptSave = async (
 ): Promise<SaveOutcome> => {
 	const decoded = decodeSave(text);
 	if (!decoded.ok) return { kind: 'invalid', reason: decoded.reason };
-	const state = decoded.state;
+	let state = decoded.state;
 
 	const current = await repo.load(userId);
 	if (current && current.rev !== baseRev) return { kind: 'conflict', rev: current.rev, serverSavedAt: current.serverSavedAt };
@@ -125,7 +127,7 @@ export const acceptSave = async (
 		return { kind: 'too_soon', retryAfterMs: MIN_SAVE_INTERVAL_MS - (nowMs - current.serverSavedAt) };
 	}
 
-	const summary = summarize(state);
+	let summary = summarize(state);
 	const previous: Snapshot | null = current ? { summary: current.summary, serverSavedAt: current.serverSavedAt } : null;
 
 	// The ledger knows what the server itself granted since the last save (income while away, chest and kill rewards), so a save may
@@ -142,7 +144,17 @@ export const acceptSave = async (
 	}
 	const gemsClaimed = summary.gems;
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
-	const flags = verifyTransition(previous, summary, nowMs, grants);
+	// XP is the server's to bound: a save that holds more than the tiles bought, the time played and what the server paid can explain is
+	// clamped to what they explain (and its attribute points to the level that XP gives), and the stored copy, the level on the ranking
+	// and everything the server derives (rates, rewards) are computed from that
+	const claimed = summary;
+	const xpVerdict = settleXp(previous, claimed, nowMs, grants);
+	if (xpVerdict.clamped) {
+		state = { ...state, resources: { ...state.resources, xp: xpVerdict.xp }, level: calculateLevel(xpVerdict.xp), characterStats: reconcileCharacter(state.characterStats, xpVerdict.xp) };
+		summary = summarize(state);
+	}
+	summary.derived.xpBase = xpVerdict.base;
+	const flags = verifyTransition(previous, claimed, nowMs, grants); // judged as the player sent it (the XP check flags a clamp)
 	if (ledger && gemsClaimed > ledger.gems) flags.push('gems_increase');
 	const worth = checkNetWorth(state, summary, ledger?.granted);
 	if (worth.exceeds) flags.push('networth_exceeds');
@@ -210,5 +222,5 @@ export const acceptSave = async (
 			// the save is stored; the next one brings the ledger up to date
 		}
 	}
-	return { kind: 'ok', rev: save.rev, serverSavedAt: nowMs, flags, gems: ledgerUsable ? gems : undefined };
+	return { kind: 'ok', rev: save.rev, serverSavedAt: nowMs, flags, gems: ledgerUsable ? gems : undefined, xp: xpVerdict.clamped ? xpVerdict.xp : undefined };
 };

@@ -1,5 +1,6 @@
 import type { GrantTotals } from '@/lib/offline/ledger';
 import type { SaveSummary } from './summary';
+import { settleXp } from './xpModel';
 
 /**
  * Plausibility checks between two consecutive saves of one player, run on the SERVER with the SERVER's clock, from the
@@ -19,7 +20,6 @@ export const VERIFY = {
 	/** One-off gains (chests, loot, sales) are allowed up to this many seconds of current income, plus a floor. */
 	burstSec: 900,
 	goldFloor: 10_000,
-	xpFloor: 2_000,
 	/** Without a previous save the whole balance has to be explained by the current income over the play time. */
 	baselineSlack: 3,
 	baselineBurstSec: 3600,
@@ -46,8 +46,6 @@ export type SaveFlag =
 /** Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat. */
 export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_rich', 'networth_exceeds', 'playtime_fast', 'gold_jump', 'xp_jump', 'gems_increase', 'prestige_regress']);
 
-const xpRate = (s: SaveSummary) => s.rates.xp * (1 + s.xpGainPct / 100);
-
 /**
  * `grants`: what the server itself handed out since the previous save (income while away, chest and kill rewards): a save may
  * contain that much more than its income explains. When it is given the server also holds the gem balance, so the gem check
@@ -61,6 +59,7 @@ export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs
 		const rate = next.rates.gold;
 		const explained = rate * next.playSeconds * VERIFY.baselineSlack + rate * VERIFY.baselineBurstSec + VERIFY.goldFloor;
 		if (next.gold > explained) flags.add('baseline_rich');
+		if (settleXp(null, next, nowMs, grants).clamped) flags.add('xp_jump');
 		return [...flags];
 	}
 
@@ -80,11 +79,10 @@ export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs
 		const goldRate = Math.max(before.rates.gold, next.rates.gold);
 		const goldAllowed = goldRate * played * VERIFY.gainSlack + goldRate * VERIFY.burstSec + VERIFY.goldFloor + (grants?.gold ?? 0);
 		if (next.gold - before.gold > goldAllowed) flags.add('gold_jump');
-
-		const rate = Math.max(xpRate(before), xpRate(next));
-		const xpAllowed = rate * played * VERIFY.gainSlack + rate * VERIFY.burstSec + VERIFY.xpFloor + (grants?.xp ?? 0);
-		if (next.xp - before.xp > xpAllowed) flags.add('xp_jump');
 	}
+
+	// XP is lifetime progress (it carries over a rebirth) and is judged by the server's model of it: see xpModel.ts
+	if (settleXp(prev, next, nowMs, grants).clamped) flags.add('xp_jump');
 
 	return [...flags];
 };

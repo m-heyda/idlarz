@@ -2,7 +2,7 @@ import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
-import { calculateResourceRates, countBuildings, countOwnedTiles } from '@/utils/gameUtils';
+import { calculateResourceRates, countBuildings, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
 import { getTile, setTile } from '@/utils/world';
 import type { PersistedGame } from '@/lib/sanitizeSave';
 import type { CastleUpgradeState, Resources } from '@/types/game';
@@ -47,6 +47,10 @@ export interface SaveDerived {
 	/** What the Legacy upgrades made of the away-time cap (seconds) and efficiency (0-1) */
 	offlineCapSec: number;
 	offlineEfficiency: number;
+	/** Tiles bought, as the XP formula counts them (castle + purchases): the XP the purchases can explain is worked out from it (absent in older rows) */
+	purchased?: number;
+	/** The most XP the server has seen this character earn (cloudSave/xpModel.ts): kept from save to save, absent in older rows */
+	xpBase?: number;
 }
 
 export const DEFAULT_DERIVED: SaveDerived = {
@@ -65,11 +69,11 @@ const ratesAfterUpgrade = (state: PersistedGame): Resources | null => {
 	const castle = getTile(state.tiles, CASTLE_X, CASTLE_Y);
 	if (!upgrade || !castle || castle.biome !== 'castle') return null;
 	const tiles = setTile(state.tiles, CASTLE_X, CASTLE_Y, { ...castle, level: upgrade.toLevel, upgradeCost: CASTLE_UPGRADE.upgradeCosts[upgrade.toLevel - 1] ?? undefined });
-	return calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades).total;
+	return calculateResourceRates(tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades).total;
 };
 
 export const summarize = (state: PersistedGame): SaveSummary => {
-	const rates = calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades).total;
+	const rates = calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades).total;
 	const fx = effectiveStats({ characterStats: state.characterStats, equipment: state.equipment, prestige: state.prestige, merchantUpgrades: state.merchantUpgrades });
 	const limits = { prestige: state.prestige, merchantUpgrades: state.merchantUpgrades };
 	return {
@@ -96,6 +100,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			chests: state.tiles.stats.chests,
 			offlineCapSec: offlineCapSec(limits),
 			offlineEfficiency: offlineEfficiency(limits),
+			purchased: economyTiles(state.tiles, state.freeTiles),
 		},
 	};
 };

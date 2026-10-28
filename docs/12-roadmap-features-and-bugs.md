@@ -6,7 +6,7 @@ The one place to look when planning the next step. It does not repeat the long l
 
 - **Accounts only.** There is no "play without account" any more: the game needs the server to spawn, place and fight. A server outage shows a retry screen; the browser save stays as a cache and as the way an old guest-only save is adopted into an account on first login. (Offline *progress* - the paid absence - is a separate, kept feature: [11](11-offline-and-sealed-rolls.md).)
 - **The server owns:** when chests and monsters appear, **where a monster stands**, what a chest or a kill holds, the gem balance, **every fight** (player HP and mana, cooldowns, hits both ways, potions drunk, the kill's reward). See [11](11-offline-and-sealed-rolls.md) and the combat section of [02](02-mechanics.md).
-- **Combat is automatic.** Nobody clicks a monster. With *Auto-battle* on the server sends the player against one monster at a time; the player's weapon swings at its `attackSpeed` (with Dexterity), the monster at its own `attackSpeed` (attacks per second, the same unit). Potions and skills have hotkeys (1-5) and an *Auto-use* switch with a fixed preset (`COMBAT.auto`). The panel can be minimized to an icon; a win or a defeat is announced either way.
+- **Combat is the server's; a click starts it.** A click on a monster opens the fight against it (auto-battle on or off); nobody clicks to hit. With *Auto-battle* on (off by default) the server also sends the player against the next monster, one at a time; the player's weapon swings at its `attackSpeed` (with Dexterity), the monster at its own `attackSpeed` (attacks per second, the same unit). Potions and skills have hotkeys (1-5) and an *Auto-use* switch with a fixed preset (`COMBAT.auto`). The panel shows only while a fight is open and can be minimized to an icon; a win or a defeat is announced either way.
 
 ## 1. Building system: a full rework is planned
 
@@ -42,8 +42,8 @@ What still runs in the browser and is only checked by plausibility. Tile buying 
 1. **Ledger-owned inventory and equipment** (closes R3, R5, R6): the bag, the worn gear and the loot pity live in the ledger; the browser shows them. Then a fight can never use gear the player does not own.
 2. **Enforce `verify.ts`** (today it only flags): rejecting a save that gained more than the server granted.
 3. **Economy actions** by the server where they pay out: castle upgrade, rebirth/Legacy, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
-4. **XP, levels and stat points** from server-held XP; the fight profile then trusts the level.
-5. **Merchant and sell** (gold for gear): server-priced.
+4. ~~**XP, levels and stat points** from server-held XP~~ **done in part**: the server models and clamps XP (`cloudSave/xpModel.ts`) and the fight profile derives the level from the saved XP. Still client-side: the *award* of tile-purchase XP (tile buying stays a client action, see above) and the attribute allocation (bounded by the level's points).
+5. **Merchant and sell** (gold for gear, resource sell/buy, upgrades): server-priced. Today every merchant action is a client store action checked only by `sanitizeSave`, `netWorth` and the gold/XP flags; the Goods shelf and the Resources table are pure UI over `buyOffer`, `buyItem`, `sellResources`, `buyResource` and `buyMerchantUpgrade`, so moving them behind routes later changes no UI.
 6. **Chest placement** (R2) next to monster placement.
 7. **Spawn caps from the real map**: the server now counts free tiles for monsters from the map; chests and the overall share (`SPAWN_LIMIT`) still use an estimate from the owned-tile count.
 
@@ -55,6 +55,14 @@ Call volume: every online request is one compare-and-swap on the ledger plus a r
 - **Biomes unlocked by rebirth**: extend `BIOME_RULES` with `unlock: { purchases?, rebirths? }` (today swamp and tundra unlock after 6 and 10 purchases). Not built; a monster's `biomes` list already follows whatever biomes exist.
 - **Per-biome loot and modifiers**, **per-monster loot sources** (`lootSourceId` already exists per monster).
 - **Fight tunables** all sit in `COMBAT` (`tickSec`, `maxCatchUpSec`, `maxFightSec`, `poll`, `auto`): thresholds, retry cooldowns, which monster is next (`engageOrder`: `weakest` or `oldest`). Letting the player set their own thresholds is a settings screen on top of the same numbers.
+
+## 4b. Paragon levels (draft, not built)
+
+The level curve ends at level 100 (the soft cap is 80, level 90 comes around the 5th rebirth and 100 around the 10th, `LEVELING` in `gameConfig.ts`). Past it, a **paragon** track gives the endless part of the game without feeding the attribute economy (a level-100 character already holds 157 attribute points):
+- After level 100 the same lifetime XP keeps counting; every paragon level (a flat step first, then slowly growing, tuned with the sim like the main curve) gives **one paragon point**. The server's XP ceiling already carries lifetime XP over rebirths, so nothing new has to be tracked for the XP.
+- Points go into a few **small, capped, account-wide bonuses** (income, XP gain, Luck, offline efficiency, maybe a combat stat), not attribute points; each bonus has its own level cap so the sum can never run away.
+- The leaderboard ranks level, then paragon level.
+- Open questions: points per level, the caps, whether levels 81-100 should give extra attribute points as a reward for the steep part, whether paragon points reset (probably not), and how the Legacy shop and the merchant's Ancestral Tithe interact with it.
 
 ## 5. Documentation to keep in step
 

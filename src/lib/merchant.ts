@@ -54,6 +54,31 @@ export const generateMerchantStock = (
  */
 export const rotationRng = (playSeconds: number): Rng => mulberry32(Math.floor(playSeconds * 1000) ^ 0x5bd1e995);
 
+/** One place on the shop's shelf: a piece of the rolled gear (by its index in the stock) or a supply that is always in stock (by item id). */
+export type ShelfCell = { kind: 'offer'; index: number; key: string } | { kind: 'supply'; id: string; key: string };
+
+/** A small stable hash of a string (the order of the shelf comes from it). */
+const hashOf = (text: string): number => {
+	let h = 5381;
+	for (let i = 0; i < text.length; i++) h = (Math.imul(h, 33) ^ text.charCodeAt(i)) >>> 0;
+	return h;
+};
+
+/**
+ * The shelf as one row of places: the rolled gear and the supplies (potions) mixed in an order that belongs to this stock (seeded by the
+ * play time it was made at) and to each thing itself, so it stays the same between renders and when a piece is bought, the others do
+ * not jump to new places. A new stock, a rotation or a paid refresh, shuffles it again.
+ */
+export const shelfCells = (stock: MerchantStock | null, supplyIds: readonly string[]): ShelfCell[] => {
+	const seed = Math.floor((stock?.at ?? 0) * 1000) ^ 0x2f1d3a7b;
+	const cells: ShelfCell[] = [
+		...(stock?.offers ?? []).map((item, index): ShelfCell => ({ kind: 'offer', index, key: `offer:${item.base}:${item.level}:${item.rarity}` })),
+		...supplyIds.map((id): ShelfCell => ({ kind: 'supply', id, key: `supply:${id}` })),
+	];
+	const order = new Map(cells.map((cell, i) => [cell, mulberry32(seed ^ hashOf(cell.key))() + i * 1e-9]));
+	return [...cells].sort((a, b) => order.get(a)! - order.get(b)!);
+};
+
 /** Seconds of play until the shelf is reshuffled (0 once it is due). */
 export const secondsToRotation = (stock: MerchantStock, playSeconds: number, ctx: LimitContext = {}): number =>
 	Math.max(0, limitOf('merchantRotateSec', ctx) - (playSeconds - stock.at));

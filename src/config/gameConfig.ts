@@ -53,13 +53,33 @@ export const TICK_RATE = 100; // 10 times per second
 export const BASE_TILE_COST = 55; // Base cost for first tile purchase
 
 // XP calculation constants - Exponential XP system
-export const BASE_XP_PER_TILE = 45; // was 125: levels come about 4 slower for the same land, so level 38 is a first-rebirth level and 100 needs several runs
-export const XP_GROWTH_FACTOR = 1.3; // Exponential growth factor for XP needed per level (x1.3)
-export const BASE_XP_PER_LEVEL = 750; // Starting XP needed for level 1 to 2
-// From this level on a level costs only `growth` x the one before instead of XP_GROWTH_FACTOR x, so a level above ~40 stays a goal
-// instead of an unreachable number (level 100 is about 5e9 XP in total). Up to `fromLevel` the curve is the old one: a save never
-// has a lower level than before.
-export const XP_LEVEL_SOFT = { fromLevel: 38, growth: 1.045 };
+export const BASE_XP_PER_TILE = 45; // was 125 (pacing commit): tile XP is now the smaller part of a level, the curve below is fitted to what the bot earns
+
+// The character level curve (xpToNextLevel / calculateLevel in utils/gameUtils.ts). Level and XP carry over a rebirth, so the curve is
+// paced over rebirths, not days, and is written down as ANCHORS: the total XP at which a level is reached, measured with the sim bot
+// (npm run sim hardcore-rebirth6-x10 logs lifetime XP and level; with the cheaper castle the hardcore bot rebirths at ~day 4, 7, 10, 12.5, 15 ... 25):
+//   level 10 after ~4-5 h (XP 1.4e5), level ~30 around day 2 (1e8), the soft cap (80) around the 3rd rebirth (3e9),
+//   level 90 around the 5th (6.5e9) and the maximum (100) around the 10th (1.85e10).
+// Between two anchors the step to the next level grows by a constant factor, chosen so the total hits the anchor and the steps never
+// shrink at a join; the first step is `firstStepXp`. Retune the anchors (not the code) when the sim's XP supply changes.
+export const LEVELING = {
+	maxLevel: 100,
+	softCapLevel: 80,
+	firstStepXp: 5000,
+	// A level gives 1 attribute point; the levels up to `earlyBonusUntil` give `earlyBonusPoints` more. Levels are slower than they were, and
+	// the points (Charisma, Intelligence ...) are what speeds the first days up, so the early levels pay extra to keep the pace of the first days.
+	earlyBonusUntil: 30,
+	earlyBonusPoints: 2,
+	/** [level, total XP needed to reach it], increasing, ending at maxLevel */
+	anchors: [
+		[10, 1.4e5],
+		[30, 1.0e8],
+		[80, 3.0e9],
+		[90, 6.5e9],
+		[100, 1.85e10],
+	] as readonly (readonly [number, number])[],
+};
+export const MAX_LEVEL = LEVELING.maxLevel;
 
 export const SPECIAL_SINGLE_TYPE_BIOMES: BiomeType[] = ['castle'];
 export const EMPTY_BIOMES: BiomeType[] = ['empty'];
@@ -83,8 +103,10 @@ export const TILE_PRICE = {
 	ceiling: RESOURCE_CAP / 100,
 };
 
-// XP a tile purchase gives: 125 x 1.02^(k-1) x k/4 up to tile `growthUntil` (the old curve), then a polynomial tail
+// XP a tile purchase gives: BASE_XP_PER_TILE x growth^(k-1) x k/4 up to tile `growthUntil`, then a polynomial tail. The level curve above is
+// fitted to the XP these numbers give the sim bot, so change them together (re-run the sim and move the anchors).
 export const XP_TILE = {
+	growth: 1.02,
 	growthUntil: 300,
 	tailExponent: 1.5,
 };
@@ -375,9 +397,19 @@ export const MERCHANT_RESOURCE_PRICES = fromResources(
 
 // Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
 // starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
+// They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
+// ladders together cost over a billion; tests/merchantShop.test.ts keeps it that way) and are bought over several runs.
+// `group` only decides the heading of the card in the Upgrades tab.
+export const MERCHANT_UPGRADE_GROUPS = {
+	economy: 'Economy',
+	combat: 'Combat',
+	rebirth: 'Rebirth',
+} as const;
+
 export const MERCHANT_UPGRADES = {
 	haggler: {
 		label: 'Haggler',
+		group: 'economy',
 		description: (n: number) => `+${Math.round(n * 3)}% gold from everything you sell`,
 		maxLevel: 10,
 		effectPerLevel: 0.03, // gold from selling resources and items
@@ -386,6 +418,7 @@ export const MERCHANT_UPGRADES = {
 	},
 	bulk: {
 		label: 'Bulk Discount',
+		group: 'economy',
 		description: (n: number) => `-${n}% tile and building cost`,
 		maxLevel: 8,
 		effectPerLevel: 1, // percentage points, added to Charisma and Thrift (REBIRTH.discountCapPercent still caps the sum)
@@ -394,6 +427,7 @@ export const MERCHANT_UPGRADES = {
 	},
 	charm: {
 		label: 'Lucky Charm',
+		group: 'economy',
 		description: (n: number) => `+${n * 2} Luck for chests and kills`,
 		maxLevel: 10,
 		effectPerLevel: 2, // Luck
@@ -402,11 +436,102 @@ export const MERCHANT_UPGRADES = {
 	},
 	packrat: {
 		label: 'Pack Rat',
+		group: 'economy',
 		description: (n: number) => `+${n * 4} bag slots`,
 		maxLevel: 4,
 		effectPerLevel: 4, // bag slots
 		baseCost: 500000,
 		costGrowth: 3,
+	},
+	foreman: {
+		label: 'Foreman',
+		group: 'economy',
+		description: (n: number) => `+${n}% income from every resource, gold included`,
+		maxLevel: 10,
+		effectPerLevel: 0.01, // multiplies the income of every resource but XP (utils/gameUtils.ts, merchantIncomeMultiplier)
+		baseCost: 400000,
+		costGrowth: 1.9,
+	},
+	skinner: {
+		label: 'Skinner',
+		group: 'economy',
+		description: (n: number) => `+${n * 5}% meat and hide from your animals`,
+		maxLevel: 8,
+		effectPerLevel: 0.05, // on top of the farm upgrades
+		baseCost: 300000,
+		costGrowth: 1.9,
+	},
+	swift: {
+		label: 'Quick Hands',
+		group: 'combat',
+		description: (n: number) => `+${n * 2}% attack speed`,
+		maxLevel: 8,
+		effectPerLevel: 2, // % attacks per second
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	keen: {
+		label: 'Keen Eye',
+		group: 'combat',
+		description: (n: number) => `+${n}% crit chance`,
+		maxLevel: 8,
+		effectPerLevel: 1, // percentage points (COMBAT.crit.maxCritChance still caps the total)
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	deadly: {
+		label: 'Deadly Aim',
+		group: 'combat',
+		description: (n: number) => `+${n}% chance that a crit is a super crit`,
+		maxLevel: 8,
+		effectPerLevel: 1, // percentage points (COMBAT.crit.maxSuperChance still caps the total)
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	might: {
+		label: 'Might',
+		group: 'combat',
+		description: (n: number) => `+${n * 2}% damage with physical weapons`,
+		maxLevel: 8,
+		effectPerLevel: 2, // %
+		baseCost: 250000,
+		costGrowth: 1.9,
+	},
+	arcana: {
+		label: 'Arcana',
+		group: 'combat',
+		description: (n: number) => `+${n * 2}% damage with staves and wands`,
+		maxLevel: 8,
+		effectPerLevel: 2, // %
+		baseCost: 250000,
+		costGrowth: 2,
+	},
+	fang: {
+		label: 'Vampiric Fang',
+		group: 'combat',
+		description: (n: number) => `+${n * 0.5}% life leech: HP back from the damage you deal`,
+		maxLevel: 6,
+		effectPerLevel: 0.5, // % of the damage dealt (STAT_RULES.lifeLeechCap still caps the total)
+		baseCost: 300000,
+		costGrowth: 2,
+	},
+	wind: {
+		label: 'Second Wind',
+		group: 'combat',
+		description: (n: number) => `+${n * 0.25} HP regenerated per second`,
+		maxLevel: 6,
+		effectPerLevel: 0.25, // HP/s, in and out of fights
+		baseCost: 300000,
+		costGrowth: 2,
+	},
+	tithe: {
+		label: 'Ancestral Tithe',
+		group: 'rebirth',
+		description: (n: number) => `+${n * 5}% Legacy points from your next rebirth`,
+		maxLevel: 10,
+		effectPerLevel: 0.05, // multiplies the Legacy points of a rebirth (legacyGain); starts again with the rebirth like the rest
+		baseCost: 600000,
+		costGrowth: 1.9,
 	},
 } as const;
 

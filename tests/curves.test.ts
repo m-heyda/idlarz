@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import './helpers';
-import { BASE_TILE_COST, BASE_XP_PER_TILE, RESOURCE_CAP, SCALING_CONFIG, TILE_PRICE, XP_CAP, XP_LEVEL_SOFT, XP_TILE } from '../src/config/gameConfig';
-import { calculateBuildingCost, calculateLevel, calculateXpGain, OLD_XP_LEVEL_SOFT, xpToLeaveLevel } from '../src/utils/gameUtils';
+import { BASE_TILE_COST, BASE_XP_PER_TILE, RESOURCE_CAP, SCALING_CONFIG, TILE_PRICE, XP_CAP, XP_TILE } from '../src/config/gameConfig';
+import { calculateBuildingCost, calculateLevel, calculateXpGain } from '../src/utils/gameUtils';
 import { setTiles, EMPTY_WORLD } from '../src/utils/world';
 import { formatCompact, formatNumber, formatPct, formatPercent, formatRate } from '../src/utils/formatters';
 
@@ -19,7 +19,7 @@ const stagedPrice = (n: number) => {
 			Math.pow(S.growthEndgame, Math.max(n - S.lateTiles, 0))
 	);
 };
-const oldXp = (n: number) => BASE_XP_PER_TILE * Math.pow(1.02, n - 1) * (n / 4);
+const tileXp = (n: number) => BASE_XP_PER_TILE * Math.pow(XP_TILE.growth, n - 1) * (n / 4);
 
 test('tile price: the three exponential stages up to the tail start', () => {
 	for (let n = 0; n <= TILE_PRICE.tailFrom; n++) assert.equal(SCALING_CONFIG.costFormula(n), stagedPrice(n), `n=${n}`);
@@ -62,8 +62,8 @@ test('tile price: past the tail start the climb is steeper than before it, then 
 	assert.ok(stretch(TILE_PRICE.tailFrom) > 2.5 * stretch(TILE_PRICE.tailFrom - 100));
 });
 
-test('XP per tile: identical to the old curve up to the tail start, finite and slow after it', () => {
-	for (let n = 1; n <= XP_TILE.growthUntil; n++) assert.equal(calculateXpGain(n), oldXp(n), `n=${n}`);
+test('XP per tile: the growth formula up to the tail start, finite and slow after it', () => {
+	for (let n = 1; n <= XP_TILE.growthUntil; n++) assert.equal(calculateXpGain(n), tileXp(n), `n=${n}`);
 	let cumulative = 0;
 	let last = 0;
 	for (let n = 2; n <= 250_000; n++) {
@@ -121,20 +121,4 @@ test('building cost stays finite however many buildings stand', () => {
 	for (const [resource, amount] of Object.entries(cost)) {
 		assert.ok(Number.isFinite(amount) && (amount as number) <= RESOURCE_CAP / 100, `${resource}: ${amount}`);
 	}
-});
-
-test('level curve: the old x1.3 per level up to the soft level, gentler after, so level 100 is a real (if distant) goal', () => {
-	for (let level = 1; level <= XP_LEVEL_SOFT.fromLevel; level++) assert.equal(xpToLeaveLevel(level), Math.floor(750 * Math.pow(1.3, level - 1)), `level ${level}`);
-	for (let level = XP_LEVEL_SOFT.fromLevel + 1; level <= 100; level++) {
-		assert.ok(xpToLeaveLevel(level) > xpToLeaveLevel(level - 1), `still growing at ${level}`);
-		assert.ok(xpToLeaveLevel(level) < xpToLeaveLevel(level, OLD_XP_LEVEL_SOFT), `softer than the old curve at ${level}`);
-	}
-	// total XP for level 100: reachable by a run of a thousand-odd tiles, nowhere near the cap
-	let total = 0;
-	for (let level = 1; level < 100; level++) total += xpToLeaveLevel(level);
-	assert.ok(total > 1e9 && total < 5e10, `level 100 needs ${total.toExponential(2)} XP`);
-	assert.equal(calculateLevel(total).level, 100);
-	assert.equal(calculateLevel(total - 1).level, 99);
-	// a save never has a lower level than the old curve gave it
-	for (const xp of [0, 5e3, 1e6, 5e7, 1.5e8, 1e10, 1e12]) assert.ok(calculateLevel(xp).level >= calculateLevel(xp, OLD_XP_LEVEL_SOFT).level, `xp=${xp}`);
 });

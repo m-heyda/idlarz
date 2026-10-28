@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 		const outcome = await acceptSave(supabaseSaveRepo(createSupabaseAdmin()), player.userId, profile?.characterName ?? 'Player', body.text, body.baseRev as number, Date.now(), isNonProduction(), supabaseLedgerRepo(createSupabaseAdmin()));
 		switch (outcome.kind) {
 			case 'ok':
-				return json({ rev: outcome.rev, serverSavedAt: outcome.serverSavedAt, gems: outcome.gems });
+				return json({ rev: outcome.rev, serverSavedAt: outcome.serverSavedAt, gems: outcome.gems, xp: outcome.xp });
 			case 'conflict':
 				return json({ error: 'Your account has a newer save.', conflict: true, rev: outcome.rev, serverSavedAt: outcome.serverSavedAt }, 409);
 			case 'too_soon':

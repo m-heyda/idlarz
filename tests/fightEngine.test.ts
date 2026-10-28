@@ -147,6 +147,56 @@ test('auto-battle off: nothing is engaged; on: the next fight starts at once; of
 	assert.equal(retreat.ordKill, 0, 'no reward');
 });
 
+test('a click starts a fight with auto-battle off, even below the resume HP, and the next monster is not chained on', () => {
+	const s = setup({ equipment: STRONG, monsters: [{ type: 'rat', level: 1 }, { type: 'rat', level: 1 }] });
+	const off = runCombat(s.ledger, s.env(s.start), { autoBattle: false }).ledger;
+	assert.equal(off.combat!.fight, null, 'nothing is engaged by itself');
+	const [first, second] = off.bank.rats;
+
+	// below the 80 % line auto-battle would rest first; a click does not wait
+	const tired = { ...off, combat: { ...off.combat!, hp: Math.round(off.combat!.hp * 0.5) } };
+	const clicked = runCombat(tired, s.env(s.start + 1), { commands: [{ kind: 'fight', n: second.n }] }).ledger;
+	assert.equal(clicked.combat!.fight?.n, second.n, 'the monster that was clicked, not the weakest');
+	assert.equal(clicked.combat!.log.at(-1)?.kind, 'engage');
+
+	// the fight runs on its own; when it is over the player is not sent against the other rat
+	const { ledger, events } = advance(s, clicked, 90);
+	assert.ok(kinds(events, 'won', 'defeated')[0], 'the fight was decided');
+	assert.equal(kinds(events, 'engage').length, 0, 'no second engage');
+	assert.equal(ledger.combat!.fight, null);
+	assert.ok(ledger.bank.rats.some((rat) => rat.n === first.n), 'the other rat is still there');
+});
+
+test('a click is refused for a monster that is not there, during a fight, at 0 HP, and is ignored when the server is behind', () => {
+	const s = setup({ equipment: STRONG, monsters: [{ type: 'rat', level: 1 }, { type: 'rat', level: 1 }] });
+	const off = runCombat(s.ledger, s.env(s.start), { autoBattle: false }).ledger;
+	const click = (ledger: Ledger, n: number, at = s.start + 1) => runCombat(ledger, s.env(at), { commands: [{ kind: 'fight', n }] }).ledger;
+
+	assert.equal(click(off, 99).combat!.fight, null, 'no such ticket');
+	assert.equal(click(off, 0).combat!.fight, null);
+	assert.equal(click({ ...off, combat: { ...off.combat!, hp: 0 } }, off.bank.rats[0].n, s.start).combat!.fight, null, 'no HP (at the same clock: resting would give some back)');
+
+	const fighting = click(off, off.bank.rats[0].n);
+	assert.equal(fighting.combat!.fight?.n, off.bank.rats[0].n);
+	const again = click(fighting, off.bank.rats[1].n, s.start + 2);
+	assert.equal(again.combat!.fight?.n, off.bank.rats[0].n, 'a second click does not change the fight');
+
+	// a request that is still catching up does not start a fight in the past
+	const busy = setup({ equipment: STARTER_EQUIPMENT, monsters: Array.from({ length: 20 }, () => ({ type: 'rat' as const, level: 3 })) });
+	const on = runCombat(busy.ledger, busy.env(busy.start)).ledger;
+	const late = runCombat(on, busy.env(busy.start + COMBAT.maxCatchUpSec * 3), { autoBattle: false, commands: [{ kind: 'fight', n: on.bank.rats[5].n }] });
+	assert.equal(late.behind, true);
+	assert.notEqual(late.ledger.combat!.fight?.n, on.bank.rats[5].n);
+});
+
+test('the King can be clicked too, with auto-battle off', () => {
+	const s = setup({ equipment: STRONG, monsters: [{ type: 'rat', level: 1 }, { type: 'ratKing', level: 15 }] });
+	const off = runCombat(s.ledger, s.env(s.start), { autoBattle: false }).ledger;
+	const king = off.bank.king!;
+	const clicked = runCombat(off, s.env(s.start + 1), { commands: [{ kind: 'fight', n: king.n }] }).ledger;
+	assert.equal(clicked.combat!.fight?.type, 'ratKing');
+});
+
 test('a King is fought only when no other monster is ready, and a King that ran out the clock waits out the boss cooldown', () => {
 	const s = setup({ equipment: STRONG, monsters: [{ type: 'rat', level: 1 }, { type: 'ratKing', level: 15 }] });
 	const first = runCombat(s.ledger, s.env(s.start)).ledger;

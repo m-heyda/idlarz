@@ -96,56 +96,33 @@ Past 300 tiles the price grows like (n / 300)^4.5 instead of ×1.007 per tile, c
 
 ## 2. Level curve
 
-XP to go from level L to L+1 = `floor(750 × 1.3^(min(L, 38)-1) × 1.045^max(0, L-38))`. One stat point per level.
+The level curve is written as anchors (total XP to reach a level): level 10 = 140.00K, level 30 = 100.00M, level 80 = 3.00B, level 90 = 6.50B, level 100 = 18.50B; between two anchors every step is a constant factor bigger than the one before (`xpToNextLevel`). Soft cap at level 80, maximum level 100. One attribute point per level, plus 2 more for levels 2-30. Level, XP and attributes carry over a rebirth.
 
 | Level | XP to next | cumulative XP to reach L+1 |
 | --- | --- | --- |
-| 1 | 750 | 750 |
-| 2 | 975 | 1725 |
-| 3 | 1267 | 2992 |
-| 4 | 1647 | 4639 |
-| 5 | 2142 | 6781 |
-| 6 | 2784 | 9565 |
-| 7 | 3620 | 13.19K |
-| 8 | 4706 | 17.89K |
-| 9 | 6117 | 24.01K |
-| 10 | 7953 | 31.96K |
-| 11 | 10.34K | 42.30K |
-| 12 | 13.44K | 55.74K |
-| 13 | 17.47K | 73.21K |
-| 14 | 22.71K | 95.93K |
-| 15 | 29.53K | 125.46K |
-| 16 | 38.39K | 163.85K |
-| 17 | 49.91K | 213.75K |
-| 18 | 64.88K | 278.63K |
-| 19 | 84.34K | 362.97K |
-| 20 | 109.64K | 472.62K |
-| 21 | 142.54K | 615.15K |
-| 22 | 185.30K | 800.45K |
-| 23 | 240.89K | 1.04M |
-| 24 | 313.15K | 1.35M |
-| 25 | 407.10K | 1.76M |
-| 26 | 529.23K | 2.29M |
-| 27 | 688.00K | 2.98M |
-| 28 | 894.40K | 3.87M |
-| 29 | 1.16M | 5.04M |
-| 30 | 1.51M | 6.55M |
-| 31 | 1.96M | 8.51M |
-| 32 | 2.55M | 11.07M |
-| 33 | 3.32M | 14.39M |
-| 34 | 4.32M | 18.70M |
-| 35 | 5.61M | 24.32M |
-| 36 | 7.30M | 31.61M |
-| 37 | 9.48M | 41.10M |
-| 38 | 12.33M | 53.43M |
-| 39 | 12.88M | 66.31M |
-| 40 | 13.46M | 79.78M |
-| 50 | 20.91M | 252.68M |
-| 60 | 32.47M | 521.19M |
-| 70 | 50.43M | 938.19M |
-| 80 | 78.32M | 1.59B |
-| 90 | 121.62M | 2.59B |
-| 100 | 188.88M | 4.15B |
+| 1 | 5000 | 5000 |
+| 2 | 6344 | 11.34K |
+| 3 | 8051 | 19.39K |
+| 4 | 10.22K | 29.61K |
+| 5 | 12.96K | 42.57K |
+| 6 | 16.45K | 59.02K |
+| 8 | 26.49K | 106.39K |
+| 10 | 47.10K | 187.09K |
+| 12 | 92.48K | 345.57K |
+| 15 | 254.44K | 911.17K |
+| 20 | 1.37M | 4.82M |
+| 25 | 7.43M | 25.95M |
+| 30 | 29.36M | 129.36M |
+| 40 | 37.75M | 467.35M |
+| 50 | 48.54M | 901.94M |
+| 60 | 62.41M | 1.46B |
+| 70 | 80.25M | 2.18B |
+| 79 | 100.63M | 3.00B |
+| 80 | 122.67M | 3.12B |
+| 85 | 330.34M | 4.28B |
+| 90 | 794.45M | 7.29B |
+| 95 | 1.22B | 12.46B |
+| 99 | 1.71B | 18.50B |
 
 ## 3. Castle
 
@@ -378,6 +355,16 @@ Derived stats for the starting stats (all 5):
 | Bulk Discount | -1% tile and building cost | 8 | 250.00K | 45.03M |
 | Lucky Charm | +2 Luck for chests and kills | 10 | 150.00K | 48.40M |
 | Pack Rat | +4 bag slots | 4 | 500.00K | 13.50M |
+| Foreman | +1% income from every resource, gold included | 10 | 400.00K | 129.08M |
+| Skinner | +5% meat and hide from your animals | 8 | 300.00K | 26.82M |
+| Quick Hands | +2% attack speed | 8 | 250.00K | 22.35M |
+| Keen Eye | +1% crit chance | 8 | 250.00K | 22.35M |
+| Deadly Aim | +1% chance that a crit is a super crit | 8 | 250.00K | 22.35M |
+| Might | +2% damage with physical weapons | 8 | 250.00K | 22.35M |
+| Arcana | +2% damage with staves and wands | 8 | 250.00K | 32.00M |
+| Vampiric Fang | +0.5% life leech: HP back from the damage you deal | 6 | 300.00K | 9.60M |
+| Second Wind | +0.25 HP regenerated per second | 6 | 300.00K | 9.60M |
+| Ancestral Tithe | +5% Legacy points from your next rebirth | 10 | 600.00K | 193.61M |
 
 | Item | rarity | sells for | shop price | shop / sell |
 | --- | --- | --- | --- | --- |

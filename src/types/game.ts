@@ -232,6 +232,8 @@ export interface CombatClientState {
 	eventNo: number | null;
 	/** The win or defeat the player has not read yet */
 	notice: CombatNotice | null;
+	/** A monster was just clicked and the server has not opened the fight yet: the window is already up, loading (transient) */
+	pending: { type: MonsterType; level: number } | null;
 }
 
 export interface TileProps {
@@ -405,8 +407,12 @@ export interface GameState {
 	/** Hotkeys and switches: each is a request to the server, whose answer changes what is shown */
 	requestPotion: (id: string) => boolean;
 	requestSkill: (id: SkillId) => boolean;
+	/** A click on a monster of the map: asks the server to start the fight against it (false when nothing was asked: no such monster, or a fight is open) */
+	startFight: (id: number) => boolean;
 	setAutoBattle: (on: boolean) => void;
 	setAutoUse: (on: boolean) => void;
+	/** The server kept less XP than the game held (it could not be earned): take it, the level follows and attribute points the new level has not earned go back to be spent again */
+	applyServerXp: (xp: number) => void;
 	applyFightReply: (reply: FightReply) => void;
 	clearCombatNotice: () => void;
 	dismissMonster: (id: number) => boolean; // takes a monster off the map, no loot; the server ends the fight against it

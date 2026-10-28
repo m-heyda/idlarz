@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { formatNumber } from '@/utils/formatters';
-import { REBIRTH } from '@/config/gameConfig';
-import { xpToLeaveLevel } from '@/utils/gameUtils';
+import { MAX_LEVEL, REBIRTH } from '@/config/gameConfig';
+import { xpToNextLevel } from '@/utils/gameUtils';
 import { useMenuAttention } from '@/hooks/useMenuAttention';
 import { useUiStore } from '@/stores/uiStore';
 import { openMenuAt } from '@/lib/globalMenu';
@@ -51,7 +51,7 @@ export const PlayerCard: React.FC = () => {
 	}, [availablePoints, prevAvailablePoints, levelUpActive]);
 
 	// XP into the current level, out of what the level needs
-	const needed = xpToLeaveLevel(level.level);
+	const needed = level.level >= MAX_LEVEL ? 0 : xpToNextLevel(level.level);
 	const into = Math.floor(level.progress * needed);
 
 	return (

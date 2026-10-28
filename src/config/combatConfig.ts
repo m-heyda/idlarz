@@ -15,7 +15,7 @@ export const COMBAT = {
 	armorSoftCap: 0.5,
 	armorSoftSlope: 0.5,
 	maxItemDamage: 50, // sanity ceiling for one item's damage (tests/items.test.ts); fights are balanced by tests/fightBalance.test.ts, not by a cap
-	// Fights run on the server in fixed ticks: the player swings at the weapon's attack speed, a monster at its own. Nobody clicks to hit.
+	// Fights run on the server in fixed ticks: the player swings at the weapon's attack speed, a monster at its own. Nobody clicks to hit: a click on a monster only starts the fight.
 	tickSec: 0.1, // the server's fight step
 	maxCatchUpSec: 120, // one request runs a fight forward by at most this long (a longer silence is simulated by the next request)
 	maxFightSec: 180, // a fight that has not been decided by now is called off (the monster stays, no reward)
@@ -42,7 +42,7 @@ export const COMBAT = {
 	},
 	bagSize: LIMITS.bagSize, // base bag slots; read the current size through limitOf('bagSize', ctx) (Pack Rat and later effects add to it)
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
-	victoryToastSec: 12, // how long the loot notice after a won fight stays up (hover pauses it)
+	victoryToastSec: 15, // how long the result of a fight (the dead monster and its loot) stays in the combat window (hover pauses it)
 	spawn: {
 		firstSec: 120, // first monster this long after the territory reaches minOwnedTiles
 		intervalSec: 900, // then one per this long (chests: 600 s)

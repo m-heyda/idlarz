@@ -66,7 +66,7 @@ const ok = <T>(out: Online<T>): T => {
 const playing = async (minutes: number, id = 'u1', autoBattle = false) => {
 	const m = memory();
 	await save(m, id, game(), 0, T0);
-	if (!autoBattle) ok(await fightStep(m.deps, id, null, { action: 'auto', autoBattle: false }, T0 + 1000));
+	ok(await fightStep(m.deps, id, null, { action: 'auto', autoBattle }, T0 + 1000));
 	// the player stays around: the game asks the server every ten minutes or so, which is what keeps "last seen" fresh
 	for (let t = 10; t < minutes; t += 10) ok(await syncTickets(m.deps, id, T0 + t * MIN));
 	const now = T0 + minutes * MIN;

@@ -1,4 +1,5 @@
 import { convertMonstersBody } from '@/lib/monstersMigration';
+import { convertLevelsBody } from '@/lib/levelsMigration';
 import { convertGroundsBody } from '@/lib/groundsMigration';
 import { LEGACY_GEAR } from '@/lib/legacyGear';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
@@ -24,6 +25,8 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  * Schema 3 could still hold Grounds tiles (the old building lot, letter `g`, built lots with `level: 2`); schema 4 has no Grounds biome and
  * MIGRATIONS[3] turns each into the land biome around it (src/lib/groundsMigration.ts).
  * Schema 4 monsters had a tier (1-5); schema 5 has a level and the level they appeared at; MIGRATIONS[4] converts them (src/lib/monstersMigration.ts).
+ * Schema 5 had the fast level curve and reset the character on a rebirth; schema 6 has the slow one (it carries over rebirths), and MIGRATIONS[5] re-derives
+ * the level from the XP and refunds the attribute points (src/lib/levelsMigration.ts).
  *
  * ADDING THINGS LATER (keep old saves working):
  *   - A new field: add it to PERSISTED_KEYS, make `sanitizeSave` accept it as OPTIONAL with a default, and do
@@ -34,7 +37,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *   - A save written by a NEWER schema than this game is refused with a clear message, never half-loaded.
  */
 
-export const SAVE_SCHEMA = 5;
+export const SAVE_SCHEMA = 6;
 export const SAVE_PREFIX = 'IDLZ2.';
 
 /** Longer than any real save by far; stops a pasted novel from freezing the page. */
@@ -174,6 +177,8 @@ export const MIGRATIONS: Record<number, Migration> = {
 	3: (body) => convertGroundsBody(body),
 	// 4 -> 5: monsters have a level instead of a tier (see monstersMigration.ts)
 	4: (body) => convertMonstersBody(body),
+	// 5 -> 6: the slower level curve: the level follows the XP, the attribute points are refunded (see levelsMigration.ts)
+	5: (body) => convertLevelsBody(body),
 };
 
 export const migrateBody = (

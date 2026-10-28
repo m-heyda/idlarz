@@ -33,6 +33,7 @@ const LegacyDialog: React.FC = () => {
 	const tiles = useGameStore((state) => state.tiles);
 	const freeTiles = useGameStore((state) => state.freeTiles);
 	const prestige = useGameStore((state) => state.prestige);
+	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
 	const rebirth = useGameStore((state) => state.rebirth);
 	const buyLegacyUpgrade = useGameStore((state) => state.buyLegacyUpgrade);
@@ -42,7 +43,7 @@ const LegacyDialog: React.FC = () => {
 
 	const ownedTiles = economyTiles(tiles, freeTiles); // purchases + 1: the free starting ring does not count
 	const castleLevel = castleLevelOf(tiles);
-	const gain = legacyGain(castleLevel, ownedTiles);
+	const gain = legacyGain(castleLevel, ownedTiles, merchantUpgrades);
 	const levelOk = castleLevel >= REBIRTH.minCastleLevel;
 	const tilesOk = ownedTiles >= REBIRTH.minTiles;
 	const idleOk = !castleUpgrade;
@@ -90,8 +91,8 @@ const LegacyDialog: React.FC = () => {
 					<div className='px-h'>Rebirth now?</div>
 					<p className='text-[#d8c8a0] mb-2'>
 						You gain <b className='text-green-300'>{formatNumber(gain)}</b> Legacy (+{pct(gain * REBIRTH.incomePerPoint)} income
-						for ever). The map, resources, castle, farm, level and stat points start again. Your name, hero,
-						Legacy and shop upgrades stay.
+						for ever). The map, resources, castle and farm start again. Your name, hero, level, XP,
+						attributes, Legacy and shop upgrades stay.
 					</p>
 					<div className='flex justify-between'>
 						<button className='px-btn' onClick={() => setConfirming(false)}>

@@ -40,6 +40,8 @@ export const useCloudSync = (userId: string, active: boolean) => {
 			}
 			switch (result.status) {
 				case 'ok':
+					// the server can explain less XP than this save held (it clamped it): the game takes the lower number
+					if (result.xp !== undefined) useGameStore.getState().applyServerXp(result.xp);
 					lastSentPlay = state.playSeconds;
 					writeLink({ userId, rev: result.rev });
 					writeAttempts([]);

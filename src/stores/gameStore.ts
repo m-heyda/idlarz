@@ -21,7 +21,6 @@ import {
 	LEGACY_UPGRADES,
 	MAX_CATCHUP_SEC,
 	MERCHANT_BUYABLE,
-	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_SHOP_ITEMS,
 	MERCHANT_UPGRADES,
@@ -41,6 +40,7 @@ import {
 	calculateCombatStats,
 	calculateLevel,
 	calculateResourceRates,
+	buyCost,
 	calculateTileCost,
 	calculateTileTapYield,
 	calculateXpGain,
@@ -57,10 +57,13 @@ import {
 	legacyEffect,
 	legacyGain,
 	legacyUpgradeCost,
+	merchantCombat,
 	merchantLevel,
+	reconcileCharacter,
 	merchantUpgradeCost,
 	sellPayout,
 	startingResources,
+	totalStatPoints,
 	subtractBundle,
 	tileCostAsResources,
 } from '@/utils/gameUtils';
@@ -83,7 +86,7 @@ import type { CombatView, FightEvent } from '@/lib/offline/fightTypes';
 import type { ClaimResult, FightReply, SyncResult } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
 import { requestAuto, requestChest, requestDismiss, requestUse, type Reply } from '@/lib/rewardsClient';
-import { signalNeedClaim } from '@/lib/serverSession';
+import { signalNeedClaim, signalSyncNow } from '@/lib/serverSession';
 import { useUiStore } from '@/stores/uiStore';
 import { isAutoSold, receiveDrops } from '@/lib/loot';
 import { advanceMonsters, monsterAt, monsterDef } from '@/lib/monsters';
@@ -139,10 +142,10 @@ const seededRandom = (seed: number) => () => {
 	return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-/** What the browser knows about combat before the server has said anything: no fight, both switches on (the server's own default). */
+/** What the browser knows about combat before the server has said anything: no fight, auto-battle off and auto-use on (the server's own defaults). */
 export const initialCombat = (): CombatClientState => ({
 	fight: null,
-	autoBattle: true,
+	autoBattle: false,
 	autoUse: true,
 	cd: { heal: 0, stun: 0, potion: 0 },
 	maxHp: 0,
@@ -151,6 +154,7 @@ export const initialCombat = (): CombatClientState => ({
 	at: 0,
 	eventNo: null,
 	notice: null,
+	pending: null,
 });
 
 /** All game data of a brand-new game (no actions). */
@@ -220,8 +224,9 @@ const createGameSlice = (
 			newTiles,
 			state.characterStats,
 			state.farmLevels,
-				state.prestige,
-				state.farmUpgrades
+			state.prestige,
+			state.farmUpgrades,
+			state.merchantUpgrades
 		);
 
 		const xpGain =
@@ -364,6 +369,8 @@ const createGameSlice = (
 				at: view.at,
 				eventNo: view.eventNo,
 				notice,
+				// a click waits for the server's answer; once a fight is open (or the answer came) it is over
+				pending: view.fight ? null : state.combat.pending,
 			},
 		});
 		writeCursor(view.eventNo);
@@ -404,14 +411,14 @@ const createGameSlice = (
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
-		// Rebirth: restart with the Legacy bonus. Keeps name, class, play time and all Legacy.
+		// Rebirth: restart with the Legacy bonus. Keeps name, class, play time, all Legacy and the character (XP, level, attributes).
 		rebirth: () => {
 			const state = get();
 			const castle = findCastle(state.tiles);
 			if (!castle || (castle.tile.level ?? 1) < REBIRTH.minCastleLevel || state.castleUpgrade) return false;
 			const ownedTiles = economyTiles(state.tiles, state.freeTiles);
 			if (ownedTiles < REBIRTH.minTiles) return false;
-			const gain = legacyGain(castle.tile.level ?? 1, ownedTiles);
+			const gain = legacyGain(castle.tile.level ?? 1, ownedTiles, state.merchantUpgrades);
 			if (gain < 1) return false;
 
 			const prestige: PrestigeState = {
@@ -424,18 +431,32 @@ const createGameSlice = (
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
 			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			const fresh = createInitialData(prestige);
+			// settle the level first: XP bought a moment ago may not have been counted by a tick yet (its points are credited here)
+			const settled = calculateLevel(state.resources.xp);
+			const characterStats = {
+				...state.characterStats,
+				availablePoints: state.characterStats.availablePoints + Math.max(0, totalStatPoints(settled.level) - totalStatPoints(state.level.level)),
+			};
+			// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
+			const merchantUpgrades: Record<string, number> = state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {};
 			set({
 				...fresh,
+				// the character is progression too: lifetime XP, the level it gives and the attributes (with the points still to spend) carry
+				// over, because the level curve is paced over rebirths (level 80 around the 3rd, 100 around the 10th); the income follows the attributes
+				resources: { ...fresh.resources, xp: state.resources.xp },
+				level: settled,
+				previousLevel: settled.level,
+				characterStats,
+				resourceRates: calculateResourceRates(fresh.tiles, characterStats, fresh.farmLevels, prestige, fresh.farmUpgrades, merchantUpgrades),
 				// gear is character progression: it survives a rebirth (HP is refilled)
 				equipment: state.equipment,
 				bag: state.bag,
 				gems: state.gems, // the premium currency survives a rebirth
 				lootPity: state.lootPity,
 				autoSellUpTo: state.autoSellUpTo,
-				// the bag survives, so does the room Pack Rat made for it; the other merchant bonuses start again
-				merchantUpgrades: state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {},
-				playerHp: maxHp(fresh.characterStats, state.equipment),
-				playerMp: maxMana(fresh.characterStats, state.equipment),
+				merchantUpgrades,
+				playerHp: maxHp(characterStats, state.equipment),
+				playerMp: maxMana(characterStats, state.equipment),
 				playerName: state.playerName,
 				playerClass: state.playerClass,
 				playSeconds: state.playSeconds,
@@ -488,7 +509,8 @@ const createGameSlice = (
 				state.characterStats,
 				newFarmLevels,
 				state.prestige,
-				state.farmUpgrades
+				state.farmUpgrades,
+				state.merchantUpgrades
 			);
 
 			set({
@@ -515,7 +537,8 @@ const createGameSlice = (
 				state.characterStats,
 				state.farmLevels,
 				state.prestige,
-				farmUpgrades
+				farmUpgrades,
+				state.merchantUpgrades
 			);
 			set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
 			return true;
@@ -536,7 +559,8 @@ const createGameSlice = (
 				newStats,
 				state.farmLevels,
 				state.prestige,
-				state.farmUpgrades
+				state.farmUpgrades,
+				state.merchantUpgrades
 			);
 
 			set({
@@ -597,7 +621,8 @@ const createGameSlice = (
 				state.characterStats,
 				state.farmLevels,
 				state.prestige,
-				state.farmUpgrades
+				state.farmUpgrades,
+				state.merchantUpgrades
 			);
 
 			set({
@@ -673,15 +698,53 @@ const createGameSlice = (
 			return true;
 		},
 
-		// Auto-battle (the server starts the next fight itself) and auto-use (it drinks, heals and stuns for you with fixed rules); both on by default
+		// A click on a monster: the server opens the fight against it (auto-battle on or off) and swings both ways from then on.
+		startFight: (id: number) => {
+			const state = get();
+			const monster = state.monsters.find((m) => m.id === id);
+			if (!monster?.ticket || state.combat.fight || state.combat.pending || state.combat.maxHp <= 0) return false;
+			// the window opens at once (maximized, loading) instead of after the server's answer; the answer fills it in or closes it
+			useUiStore.getState().setPref('combatMinimized', false);
+			set({ combat: { ...state.combat, pending: { type: monster.type, level: monster.level } } });
+			const settled = () => set((s) => (s.combat.pending ? { combat: { ...s.combat, pending: null } } : {}));
+			const giveUp = setTimeout(settled, 10_000);
+			void requestUse(newClaimId(), { kind: 'fight', n: monster.ticket }, sinceNow()).then((reply) => {
+				clearTimeout(giveUp);
+				settleFight(reply, 'The fight could not start.');
+				settled();
+				signalSyncNow();
+			});
+			return true;
+		},
+
+		// Auto-battle (the server picks the next monster itself, one after the other; off by default, a click always starts a fight) and
+		// auto-use (it drinks, heals and stuns for you with fixed rules; on by default)
 		setAutoBattle: (on: boolean) => {
 			set((state) => ({ combat: { ...state.combat, autoBattle: on } }));
-			void requestAuto({ autoBattle: on }, sinceNow()).then((reply) => settleFight(reply));
+			void requestAuto({ autoBattle: on }, sinceNow()).then((reply) => {
+				settleFight(reply);
+				if (on) signalSyncNow();
+			});
 		},
 
 		setAutoUse: (on: boolean) => {
 			set((state) => ({ combat: { ...state.combat, autoUse: on } }));
 			void requestAuto({ autoUse: on }, sinceNow()).then((reply) => settleFight(reply));
+		},
+
+		// The server kept less XP than the game held (see cloudSave/xpModel.ts): XP, the level it gives and the attribute points follow
+		applyServerXp: (xp: number) => {
+			const state = get();
+			if (!Number.isFinite(xp) || xp < 0 || xp >= state.resources.xp) return;
+			const level = calculateLevel(xp);
+			const characterStats = reconcileCharacter(state.characterStats, xp);
+			set({
+				resources: { ...state.resources, xp },
+				level,
+				previousLevel: level.level,
+				characterStats,
+				resourceRates: calculateResourceRates(state.tiles, characterStats, state.farmLevels, state.prestige, state.farmUpgrades, state.merchantUpgrades),
+			});
 		},
 
 		// The server's picture of combat arrived with a sync (polling, a hotkey): see applyCombatView
@@ -819,8 +882,9 @@ const createGameSlice = (
 							newTiles,
 							state.characterStats,
 							state.farmLevels,
-				state.prestige,
-				state.farmUpgrades
+							state.prestige,
+							state.farmUpgrades,
+							state.merchantUpgrades
 						);
 					}
 					newCastleUpgrade = null;
@@ -836,7 +900,7 @@ const createGameSlice = (
 			// (in a fight the server's picture is the only one, so HP is left alone and only the cooldowns and the stun run down)
 			const playerMaxHp = maxHp(state.characterStats, state.equipment);
 			const inFight = state.combat.fight !== null;
-			const newPlayerHp = Math.min(playerMaxHp, inFight ? state.playerHp : regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen));
+			const newPlayerHp = Math.min(playerMaxHp, inFight ? state.playerHp : regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen + merchantCombat(state.merchantUpgrades).regen));
 			const newPlayerMp = Math.min(maxMana(state.characterStats, state.equipment), state.playerMp + manaRegenPerSec(state.characterStats, state.equipment) * secondsElapsed);
 			const cd = state.combat.cd;
 			const cooling = cd.heal > 0 || cd.stun > 0 || cd.potion > 0 || (state.combat.fight?.stunLeft ?? 0) > 0;
@@ -855,7 +919,7 @@ const createGameSlice = (
 			const castleFinished = !!state.castleUpgrade && !newCastleUpgrade;
 			const newCharacterStats = { ...state.characterStats };
 			if (level > state.level.level) {
-				newCharacterStats.availablePoints += level - state.level.level;
+				newCharacterStats.availablePoints += totalStatPoints(level) - totalStatPoints(state.level.level);
 			}
 
 			set({
@@ -1087,7 +1151,7 @@ const createGameSlice = (
 			return true;
 		},
 
-		// One level of a merchant bonus (Haggler, Bulk Discount, Lucky Charm, Pack Rat), paid in gold
+		// One level of a merchant bonus (see MERCHANT_UPGRADES: economy, combat and the rebirth one), paid in gold
 		buyMerchantUpgrade: (id: MerchantUpgradeId) => {
 			const state = get();
 			const def = MERCHANT_UPGRADES[id];
@@ -1102,6 +1166,10 @@ const createGameSlice = (
 				merchantUpgrades,
 				bag: [...state.bag, ...grow],
 				resources: { ...state.resources, gold: state.resources.gold - cost },
+				// Foreman and Skinner change the income: the rates follow at once (the other bonuses do not touch them)
+				...(id === 'foreman' || id === 'skinner'
+					? { resourceRates: calculateResourceRates(state.tiles, state.characterStats, state.farmLevels, state.prestige, state.farmUpgrades, merchantUpgrades) }
+					: {}),
 			});
 			return true;
 		},
@@ -1114,11 +1182,7 @@ const createGameSlice = (
 			if (units < 1) return false;
 
 			const state = get();
-			const price = Math.ceil(
-				units *
-					MERCHANT_RESOURCE_PRICES[resource as keyof typeof MERCHANT_RESOURCE_PRICES] *
-					MERCHANT_BUY_MULTIPLIER
-			);
+			const price = buyCost(resource as keyof typeof MERCHANT_RESOURCE_PRICES, units);
 			if (state.resources.gold < price) return false;
 
 			set({
@@ -1166,7 +1230,8 @@ export const useGameStore = create(
 				saved.characterStats,
 				saved.farmLevels,
 				saved.prestige,
-				saved.farmUpgrades
+				saved.farmUpgrades,
+				saved.merchantUpgrades
 			);
 			return {
 				...current,

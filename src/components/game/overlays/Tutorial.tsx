@@ -1,7 +1,7 @@
 import React from 'react';
 import {
 	ANIMALS,
-	BASE_XP_PER_LEVEL,
+	LEVELING,
 	BASE_TILE_COST,
 	BIOME_YIELD,
 	BIOMES,
@@ -25,15 +25,13 @@ import {
 	TILE_PRICE,
 	TILE_RESOURCE_COST,
 	TILE_TAP,
-	XP_GROWTH_FACTOR,
-	XP_LEVEL_SOFT,
 } from '@/config/gameConfig';
 import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
 import { LIMITS } from '@/config/limits';
 import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
-import { formatNumber, formatTime } from '@/utils/formatters';
+import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
 import { buildingCostFactor, castleModifier } from '@/utils/gameUtils';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
@@ -219,8 +217,9 @@ const Tutorial: React.FC = () => {
 					grown) and gains a level every {formatTime(LIMITS.monsterGrowthIntervalSec)} on the map, up to {LIMITS.monsterGrowthLevels} levels above the one it appeared at: more HP, harder hits, some armor
 					and better rewards. Every {formatTime(COMBAT.spawn.bossIntervalSec)} a <b>boss</b> appears, one at a time: the <b>Rat King</b> (level {MONSTERS.ratKing.spawnWindow.base}-{MONSTERS.ratKing.spawnWindow.cap} at the start, with a skull on
 					his badge). Bosses can crit, can resist Stun and carry drops nobody else has.
-					You never click to fight: with <b>Auto-battle</b> on, the server sends you against one monster at a time, your weapon
-					and the monster each swinging at their own attack speed. The fight panel can be minimized to an icon, and a notice tells you when you win. Potions and skills have
+					<b>Click a monster</b> to fight it: your weapon and the monster then each swing at their own attack speed on their own (nobody clicks to hit). With{' '}
+					<b>Auto-battle</b> on (right-click menu or the fight panel; off at the start) the server also sends you against the next monster, one at a time, so you do not have to look for them.
+					The fight window opens the moment you click, shows only while a fight is open and can be minimized to an icon; when you win it stays with the dead monster and its loot until you close it. Potions and skills have
 					hotkeys (1-5), or switch on <b>Auto-use</b> to let the server drink and cast for you. Right-click a monster for <b>Dismiss</b>: after a confirmation
 					it is removed from the map with no reward, which frees a place when one is too strong for you.
 				</p>
@@ -258,7 +257,7 @@ const Tutorial: React.FC = () => {
 				<h3 className='px-h'>Gear &amp; Items</h3>
 				<p className='text-[#d8c8a0] mb-2'>
 					The Equipment tab has 13 gear slots (head, shoulder, chest, hands, legs, feet, neck, cape, two rings, charm, weapon, shield)
-					and a 36-slot bag. Double-click a bag item to equip it (or drink a potion); right-click it for Equip / Drink, Sell one and{' '}
+					and a 36-slot bag. Double-click a bag item to equip it (or drink a potion); right-click it for Equip / Drink, Sell one, Sell all (a stack of potions) and{' '}
 					<b>Discard</b> (destroys it for good, after a confirmation, no gold). Click gear to take it off, drag to
 					rearrange, or press <b>Organize</b> to merge stacks and sort the bag. Gear cannot be changed during a fight. Items give Damage (weapons), Armor, Max HP, Crit, Super Crit, HP Regen and Luck;
 					hover for a tooltip.
@@ -329,10 +328,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Merchant</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					The <b>Resources</b> tab sells resources and farm products for gold; buying resources costs{' '}
+					The <b>Resources</b> tab is one table: pick an amount (1, 10, 100, 25 %, 50 % or Max) and use the Sell and Buy buttons of each row; sell prices include Haggler, and farm products only sell. Buying resources costs{' '}
 					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. <b>Goods</b> shows a shelf of
-					six pieces of gear that is reshuffled every {MERCHANT_GOODS.rotateSec / 60} minutes of play (or at once for gold with Refresh), potions,
-					and your bag to sell spare gear from. <b>Upgrades</b> has click power and the permanent bonuses (Haggler, Bulk Discount,
+					six pieces of gear, mixed with the potions that are always in stock, that is reshuffled every {MERCHANT_GOODS.rotateSec / 60} minutes of play (or at once for gold with Refresh);
+					hover a Buy button for the price. Below it is your bag to sell spare gear from. <b>Upgrades</b> has click power and the permanent bonuses (Haggler, Bulk Discount,
 					Lucky Charm, Pack Rat). The shelf never holds legendary gear and Rattatui gear is not for sale: the Rat King drops it.
 				</p>
 				<div className='grid grid-cols-2 md:grid-cols-5 gap-2'>
@@ -382,10 +381,10 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Leveling</h3>
 				<p className='text-[#d8c8a0] text-xs px-card font-mono'>
-					XP to leave level N = {BASE_XP_PER_LEVEL} x {XP_GROWTH_FACTOR}^(N-1) up to level {XP_LEVEL_SOFT.fromLevel}, then x{XP_LEVEL_SOFT.growth} per level
+					Each level needs more XP than the one before: level {LEVELING.anchors[0][0]} takes about {formatCompact(LEVELING.anchors[0][1])} XP in all, level {LEVELING.anchors[1][0]} {formatCompact(LEVELING.anchors[1][1])}, the soft cap (level {LEVELING.softCapLevel}) {formatCompact(LEVELING.anchors[2][1])} and the maximum (level {LEVELING.maxLevel}) {formatCompact(LEVELING.anchors[4][1])}
 				</p>
 				<p className='text-[#a89878] mt-1'>
-					XP comes from time (more with the castle and some buildings) and from every tile you buy.
+					XP comes from time (more with the castle and some buildings) and from every tile you buy. Your level, XP and attributes are kept when you rebirth: the soft cap (level {LEVELING.softCapLevel}) takes about three rebirths, the maximum many more.
 				</p>
 			</section>
 

@@ -9,6 +9,7 @@ import { plainItem, sellValueOf } from '../src/lib/itemInstance';
 import { calculateCombatStats, sellPayout } from '../src/utils/gameUtils';
 import { maxMana } from '../src/lib/combat';
 import { generateLoot } from '../src/lib/loot';
+import { useUiStore } from '../src/stores/uiStore';
 import { patchTile } from '../src/utils/world';
 import type { CombatView, FightEvent } from '../src/lib/offline/fightTypes';
 import type { FightReply } from '../src/lib/offline/types';
@@ -203,6 +204,88 @@ test('hotkeys, switches and dismissals are requests to the server: a key per pre
 	} finally {
 		globalThis.fetch = realFetch;
 	}
+});
+
+test('a click on a monster asks the server for that monster\'s ticket: no such monster, no ticket or a fight already open send nothing', async () => {
+	syncedGame();
+	store.setState({
+		monsters: [
+			{ id: 3, type: 'rat', level: 1, spawnLevel: 1, x: CASTLE_X + 2, y: CASTLE_Y, ageSec: 0, ticket: 7 },
+			{ id: 4, type: 'rat', level: 1, spawnLevel: 1, x: CASTLE_X + 3, y: CASTLE_Y, ageSec: 0 },
+		],
+	});
+	const calls = record();
+	try {
+		assert.equal(api().startFight(99), false, 'not on the map');
+		assert.equal(api().startFight(4), false, 'a monster the server has no ticket for');
+		assert.equal(api().startFight(3), true);
+		openFight();
+		assert.equal(api().startFight(3), false, 'a fight is already open');
+		await flush();
+		assert.equal(calls.length, 1);
+		assert.equal(calls[0].path, '/api/fight');
+		assert.equal(calls[0].body.action, 'use');
+		assert.deepEqual(calls[0].body.command, { kind: 'fight', n: 7 });
+		assert.match(String(calls[0].body.key), /^[A-Za-z0-9_-]{8,64}$/);
+	} finally {
+		closeFight();
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('a click opens the combat window at once (maximized, loading) and the answer fills it in; a second click while it waits does nothing', async () => {
+	syncedGame();
+	store.setState({ monsters: [{ id: 3, type: 'rat', level: 4, spawnLevel: 4, x: CASTLE_X + 2, y: CASTLE_Y, ageSec: 0, ticket: 7 }] });
+	useUiStore.getState().setPref('combatMinimized', true);
+	const calls = record();
+	try {
+		assert.equal(api().combat.pending, null);
+		assert.equal(api().startFight(3), true);
+		assert.deepEqual(api().combat.pending, { type: 'rat', level: 4 }, 'the window is up before the server has answered');
+		assert.equal(useUiStore.getState().combatMinimized, false, 'a minimized window opens for a click');
+		assert.equal(api().startFight(3), false, 'one click at a time');
+		// the server opens the fight: the loading state is over
+		api().applyFightReply(reply(view({ eventNo: 0, fight: { n: 7, type: 'rat', level: 4, lucky: false, monsterHp: 100, monsterMaxHp: 100, stunLeft: 0, timeLeftSec: null, x: 1, y: 2 } })));
+		assert.equal(api().combat.pending, null);
+		assert.ok(api().combat.fight);
+		await flush();
+		assert.equal(calls.length, 1);
+	} finally {
+		closeFight();
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('a click the server does not take (no fight in the answer) closes the loading window again', async () => {
+	syncedGame();
+	store.setState({ monsters: [{ id: 3, type: 'rat', level: 4, spawnLevel: 4, x: CASTLE_X + 2, y: CASTLE_Y, ageSec: 0, ticket: 7 }] });
+	const calls = record();
+	try {
+		assert.equal(api().startFight(3), true);
+		assert.ok(api().combat.pending);
+		await flush();
+		assert.equal(calls.length, 1);
+		assert.equal(api().combat.pending, null, 'the answer had no fight: nothing waits any more');
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('a won fight stays in the window as a result: the notice carries the monster and its loot until it is closed', () => {
+	syncedGame();
+	api().applyFightReply(reply(view({ eventNo: 1, events: [won(1, ratDrops(), { gold: 80, xp: 30 })] })));
+	const notice = api().combat.notice;
+	assert.ok(notice && notice.kind === 'won' && notice.summary);
+	assert.equal(notice.type, 'rat');
+	assert.equal(api().combat.fight, null, 'no fight is open, only the result');
+	api().clearCombatNotice();
+	assert.equal(api().combat.notice, null);
+});
+
+test('auto-battle starts switched off, in the browser as on the server', () => {
+	freshGame();
+	assert.equal(api().combat.autoBattle, false);
+	assert.equal(api().combat.autoUse, true);
 });
 
 // ---------------------------------------------------------------------------------------------------- the clock between answers

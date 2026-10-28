@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import Grid from '@/components/game/Grid';
 import MenuOverlay from '@/components/game/overlays/MenuOverlay';
-import VictoryToast from '@/components/game/overlays/VictoryToast';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import GameDebug from '@/components/game/GameDebug';
@@ -125,7 +124,6 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			{/* one stack for every notice: chest rewards, fight loot, and the short messages (merchant, bag, saves) */}
 			<div className='notice-stack'>
 				<ChestNotification loot={lastChestLoot} show={showChestNotification} onClose={() => setShowChestNotification(false)} />
-				<VictoryToast />
 				<Toast />
 			</div>
 		</main>
