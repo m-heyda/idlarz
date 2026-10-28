@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FARM_BONUS, FarmCritterType } from '@/config/gameConfig';
-import type { ClickInput } from '@/types/game';
+import React, { useEffect, useState } from 'react';
+import { FARM_CRITTERS, FarmCritterType } from '@/config/gameConfig';
 import type { Insets } from './farmGeometry';
-import ResourceIcon from '../ResourceIcon';
 
 // sheet = 2 frames (flap / hop), frame size in native px
 export const CRITTER_SHEETS: Record<FarmCritterType, { name: string; w: number; h: number; ms: number }> = {
@@ -15,7 +13,6 @@ export const CRITTER_SHEETS: Record<FarmCritterType, { name: string; w: number; 
 export interface Critter {
 	id: number;
 	type: FarmCritterType;
-	golden: boolean;
 	x: number;
 	y: number;
 	dx: number;
@@ -25,7 +22,7 @@ export interface Critter {
 
 let nextId = 1;
 
-/** Pick a spot on the meadow that is not under a panel or the stats readout in the top-left corner (so it can be clicked). */
+/** Pick a spot on the meadow that is not under a panel or the stats readout in the top-left corner (so it stays in view). */
 const pickSpot = (w: number, h: number, insets: Insets) => {
 	const spot = () => ({
 		x: 36 + Math.random() * Math.max(10, w - insets.right - 90),
@@ -39,7 +36,7 @@ const pickSpot = (w: number, h: number, insets: Insets) => {
 };
 
 const pickType = (): FarmCritterType => {
-	const entries = Object.entries(FARM_BONUS.critters) as [FarmCritterType, { weight: number }][];
+	const entries = Object.entries(FARM_CRITTERS.critters) as [FarmCritterType, { weight: number }][];
 	let roll = Math.random() * entries.reduce((a, [, c]) => a + c.weight, 0);
 	for (const [type, c] of entries) {
 		roll -= c.weight;
@@ -53,7 +50,6 @@ export const makeCritter = (w: number, h: number, insets: Insets): Critter => {
 	return {
 		id: nextId++,
 		type: pickType(),
-		golden: Math.random() < FARM_BONUS.goldenChance,
 		x,
 		y,
 		dx: Math.round((Math.random() < 0.5 ? -1 : 1) * (50 + Math.random() * 60)),
@@ -62,7 +58,7 @@ export const makeCritter = (w: number, h: number, insets: Insets): Critter => {
 	};
 };
 
-/** Spawns critters on a timer while mounted and removes each after FARM_BONUS.lifetimeMs. */
+/** Spawns critters on a timer while mounted; each leaves again after FARM_CRITTERS.lifetimeMs. */
 export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>, insets: React.RefObject<Insets>) => {
 	const [critters, setCritters] = useState<Critter[]>([]);
 
@@ -73,15 +69,15 @@ export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>,
 				const el = stage.current;
 				if (el) {
 					setCritters((prev) =>
-						prev.length >= FARM_BONUS.maxActive
+						prev.length >= FARM_CRITTERS.maxActive
 							? prev
 							: [...prev, makeCritter(el.clientWidth, el.clientHeight, insets.current)]
 					);
 				}
-				schedule(FARM_BONUS.minGapMs + Math.random() * (FARM_BONUS.maxGapMs - FARM_BONUS.minGapMs));
+				schedule(FARM_CRITTERS.minGapMs + Math.random() * (FARM_CRITTERS.maxGapMs - FARM_CRITTERS.minGapMs));
 			}, delay);
 		};
-		schedule(FARM_BONUS.firstDelayMs);
+		schedule(FARM_CRITTERS.firstDelayMs);
 		return () => clearTimeout(timer);
 	}, [stage, insets]);
 
@@ -91,21 +87,16 @@ export const useMeadowCritters = (stage: React.RefObject<HTMLDivElement | null>,
 
 interface MeadowCritterProps {
 	critter: Critter;
-	onCatch: (critter: Critter, x: number, y: number, input: ClickInput) => void;
 	onExpire: (id: number) => void;
 }
 
-/** One bonus critter: wanders about for 10 seconds (blinking at the end) and gives a gift when clicked. */
-export const MeadowCritter: React.FC<MeadowCritterProps> = ({ critter, onCatch, onExpire }) => {
+/** One meadow critter: wanders about for 10 seconds (blinking at the end) and leaves. Decoration only: it takes no clicks. */
+export const MeadowCritter: React.FC<MeadowCritterProps> = ({ critter, onExpire }) => {
 	const scale = 2; // critters keep their size whatever the pen zoom
 	const sheet = CRITTER_SHEETS[critter.type];
-	const gift = FARM_BONUS.critters[critter.type].resource;
-	const caught = useRef(false);
 
 	useEffect(() => {
-		const t = setTimeout(() => {
-			if (!caught.current) onExpire(critter.id);
-		}, FARM_BONUS.lifetimeMs);
+		const t = setTimeout(() => onExpire(critter.id), FARM_CRITTERS.lifetimeMs);
 		return () => clearTimeout(t);
 	}, [critter.id, onExpire]);
 
@@ -113,7 +104,6 @@ export const MeadowCritter: React.FC<MeadowCritterProps> = ({ critter, onCatch, 
 		<div
 			className='meadow-critter'
 			data-type={critter.type}
-			data-golden={critter.golden}
 			style={
 				{
 					left: critter.x,
@@ -121,28 +111,10 @@ export const MeadowCritter: React.FC<MeadowCritterProps> = ({ critter, onCatch, 
 					'--dx': `${critter.dx}px`,
 					'--dy': `${critter.dy}px`,
 					'--f': critter.flip ? -1 : 1,
-					'--life': `${FARM_BONUS.lifetimeMs}ms`,
+					'--life': `${FARM_CRITTERS.lifetimeMs}ms`,
 				} as React.CSSProperties
 			}>
-			<div
-				className='mc-move'
-				role='button'
-				aria-label={`${FARM_BONUS.critters[critter.type].label} - click for a gift`}
-				onClick={(e) => {
-					// Gifts are for real clicks only (a script cannot farm the meadow)
-					if (caught.current || !e.isTrusted) return;
-					caught.current = true;
-					onCatch(critter, e.clientX, e.clientY, {
-						eventId: e.nativeEvent.timeStamp,
-						now: performance.now(),
-						trusted: e.nativeEvent.isTrusted,
-					});
-					onExpire(critter.id);
-				}}>
-				<span className='mc-gift'>
-					<ResourceIcon resource={gift} />
-					{critter.golden && <b>x{FARM_BONUS.goldenMultiplier}</b>}
-				</span>
+			<div className='mc-move'>
 				<span
 					className='mc-sprite'
 					style={
@@ -156,9 +128,6 @@ export const MeadowCritter: React.FC<MeadowCritterProps> = ({ critter, onCatch, 
 						} as React.CSSProperties
 					}
 				/>
-				<span className='mc-timer'>
-					<i />
-				</span>
 			</div>
 		</div>
 	);

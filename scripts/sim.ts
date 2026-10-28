@@ -188,10 +188,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 	let t = 0; // game seconds
 	let eventId = 0;
-	let giftClock = 0;
-	// a gift critter turns up on the map every spawn gap x (1 / giftChance); a farm critter every farm gap (while the window is open)
-	const GIFT_CLOCK_SEC = ((cfg.AMBIENT_LIFE.spawnMinMs + cfg.AMBIENT_LIFE.spawnMaxMs) / 2000) / cfg.AMBIENT_LIFE.giftChance;
-	const FARM_CRITTER_GAP_SEC = (cfg.FARM_BONUS.minGapMs + cfg.FARM_BONUS.maxGapMs) / 2000;
 	let ownedTiles: [number, number][] = [];
 	const refreshOwned = () => {
 		ownedTiles = [];
@@ -508,22 +504,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		}
 		const active = isActive(t);
 		const step = active ? (t < FINE_STEP_DAYS * 86400 ? 20 : 60) : 120;
-
-		// Bonus critters: a golden map critter now and then (about half are caught), farm-window critters rarely
-		if (active) {
-			giftClock += step;
-			if (giftClock >= GIFT_CLOCK_SEC) {
-				giftClock = 0;
-				if (Math.random() < 0.5) {
-					const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
-					api().claimCritterGift({ source: 'map', type, golden: true }, { eventId: ++eventId, now: t * 1000, trusted: true });
-				}
-			}
-			if (Math.random() < (step / FARM_CRITTER_GAP_SEC) * 0.1 * 0.7) {
-				const type = (['butterfly', 'bee', 'ladybug', 'rabbit'] as const)[Math.floor(Math.random() * 4)];
-				api().claimCritterGift({ source: 'farm', type, golden: Math.random() < 0.12 }, { eventId: ++eventId, now: t * 1000, trusted: true });
-			}
-		}
 
 		// Clicks during the step (each one is a separate physical click for the limiter)
 		if (active && profile.cps > 0) {

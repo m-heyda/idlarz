@@ -58,7 +58,6 @@ const FloatingText: React.FC = () => {
 					} as React.CSSProperties
 				}>
 				<span className='gold-popup-inner'>
-					{p.lucky && <span className='float-lucky'>✦ Lucky tap! ✦</span>}
 					{p.items.map((item) => (
 						<span
 							key={item.resource}

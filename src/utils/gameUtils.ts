@@ -111,8 +111,6 @@ export const getStatDescription = (
 		luck: 'Influences random events and rare item finds.',
 		critChance:
 			'Percentage chance to land a critical hit for increased damage.',
-		critDmgMultiplier:
-			'Percentage of additional damage dealt on critical hits.',
 		atkSpeedIncrease:
 			'Percentage increase to attack speed. Clicks do not use it yet: it is the base for the speed-based combat.',
 		xpGainMultiplier:
@@ -414,8 +412,6 @@ export const calculateCombatStats = (
 		def: statArmor(stats),
 		luck: stats.charisma, // +1 per charisma
 		critChance: stats.dexterity * 0.25 + stats.charisma * 0.5, // +0.25% per dex, +0.5% per cha
-		critDmgMultiplier:
-			100 + stats.strength + stats.dexterity * 0.5 + stats.charisma * 0.5, // Base 100% + str + dex/2 + cha/2 (lucky tile taps)
 		atkSpeedIncrease: atkSpeedPercent(stats),
 		xpGainMultiplier:
 			stats.intelligence * CHARACTER_STAT_CONFIG.xpGainPercentPerPoint.intelligence +

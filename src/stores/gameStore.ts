@@ -8,10 +8,8 @@ import {
 import {
 	ANIMALS,
 	BUILDINGS,
-	AMBIENT_LIFE,
 	CASTLE_UPGRADE,
 	STARTING_GEMS,
-	FARM_BONUS,
 	CLICK_LADDER,
 	DEFAULT_PLAYER_NAME,
 	CASTLE_X,
@@ -99,10 +97,8 @@ import type {
 	ClickInput,
 	CombatClientState,
 	CombatNotice,
-	CritterGift,
 	EquipmentSlot,
 	GameState,
-	GiftResult,
 	MerchantStock,
 	Monster,
 	PrestigeState,
@@ -114,11 +110,8 @@ import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedC
 // Last tap time per tile (not persisted) - enforces TILE_TAP.cooldownMs
 const lastTapAt: Record<string, number> = {};
 
-// Last accepted critter gift per source (not persisted) - enforces the gift cooldowns
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
 const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'>): LimitContext => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige });
-
-const lastGiftAt: Record<string, number> = {};
 
 // Shared by the gold click and the tile tap: one token per physical click
 const clickLimiter = createClickLimiter();
@@ -444,7 +437,6 @@ const createGameSlice = (
 			clickLimiter.reset();
 			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
-			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			set({ ...createInitialData(), isHydrated: true });
 		},
 
@@ -464,7 +456,6 @@ const createGameSlice = (
 			clickLimiter.reset();
 			lastOwnOpen = { opened: 0, at: 0 }; // a new run counts its chests from zero
 			Object.keys(lastTapAt).forEach((key) => delete lastTapAt[key]);
-			Object.keys(lastGiftAt).forEach((key) => delete lastGiftAt[key]);
 			const fresh = createInitialData(prestige);
 			// settle the level first: XP bought a moment ago may not have been counted by a tick yet (its points are credited here)
 			const settled = calculateLevel(state.resources.xp);
@@ -695,30 +686,6 @@ const createGameSlice = (
 			return gold;
 		},
 
-		// A bonus critter was clicked (farm meadow or map): a few seconds of that resource's income.
-		// The amount is computed here from the current rates (the UI cannot name its own reward), the click must be a real
-		// one that passes the shared limiter, and each source has a cooldown.
-		claimCritterGift: (gift: CritterGift, input: ClickInput): GiftResult | null => {
-			const def = FARM_BONUS.critters[gift?.type];
-			if (!def || (gift.source !== 'farm' && gift.source !== 'map')) return null;
-			if (!clickLimiter.take(input)) return null;
-
-			const cooldown =
-				gift.source === 'farm' ? AMBIENT_LIFE.farmGiftCooldownMs : AMBIENT_LIFE.giftCooldownMs;
-			if (input.now - (lastGiftAt[gift.source] ?? -Infinity) < cooldown) return null;
-
-			const state = get();
-			const seconds = gift.source === 'farm' ? def.seconds : AMBIENT_LIFE.giftSeconds;
-			const rate = state.resourceRates.total[def.resource] ?? 0;
-			let amount = Math.max(def.min, rate * seconds);
-			if (gift.golden) amount *= FARM_BONUS.goldenMultiplier;
-			amount = Math.round(amount * 10) / 10;
-
-			lastGiftAt[gift.source] = input.now;
-			get().addResources({ [def.resource]: amount });
-			return { resource: def.resource, amount };
-		},
-
 		// Combat is the server's: it engages the monsters, swings both ways at each side's attack speed and pays the kills (src/lib/offline/fight.ts).
 		// Nothing here hits anything. These are the few things a player may still ask for - a hotkey, a switch, a dismissal - and each is sent
 		// to the server, whose answer (not a guess made here) changes the picture.
@@ -867,14 +834,9 @@ const createGameSlice = (
 			if (input.now - (lastTapAt[key] ?? -Infinity) < TILE_TAP.cooldownMs) return null;
 
 			const perSecond = calculateTileTapYield(state.tiles, x, y, state.resourceRates);
-			const lucky =
-				TILE_TAP.luckyEnabled && Math.random() * 100 < state.characterStats.critChance;
-			const mult =
-				TILE_TAP.seconds *
-				(lucky ? 1 + state.characterStats.critDmgMultiplier / 100 : 1);
 
 			const items = (Object.entries(perSecond) as [keyof Resources, number][])
-				.map(([resource, rate]) => ({ resource, amount: rate * mult }))
+				.map(([resource, rate]) => ({ resource, amount: rate * TILE_TAP.seconds }))
 				.filter((item) => item.amount > 0);
 			if (items.length === 0) return null;
 
@@ -884,7 +846,7 @@ const createGameSlice = (
 				gained[resource] = amount;
 			});
 			get().addResources(gained);
-			return { items, lucky };
+			return { items };
 		},
 
 		tick: (deltaTime: number) => {

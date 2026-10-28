@@ -135,7 +135,7 @@ const Tile: React.FC<TileProps> = ({
 			});
 			if (tap) {
 				audioManager.playSound('click');
-				queueTileTap(tap.items, tap.lucky);
+				queueTileTap(tap.items);
 				setTapped(true);
 				setCooling(true);
 				setTimeout(() => setTapped(false), 160);

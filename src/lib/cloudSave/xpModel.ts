@@ -16,12 +16,12 @@ import type { Snapshot } from './verify';
 export const XP_MODEL = {
 	/** Tile XP is exact; this is rounding and the XP bonus changing between saves. */
 	tileSlack: 1.02,
-	/** Passive XP (and the small gifts that come with play: critters) may be this much above rates x time. */
+	/** Passive XP (and the small extras that come with play) may be this much above rates x time. */
 	passiveSlack: 1.25,
 	/** Play time can not be longer than the real time between the saves (plus this slack and a grace). */
 	playtimeSlack: 1.05,
 	playtimeGraceSec: 30,
-	/** One-off gains the model does not itemise (a gift, a lucky stretch) are allowed up to this many seconds of income, plus a floor. */
+	/** One-off gains the model does not itemise (a lucky stretch) are allowed up to this many seconds of income, plus a floor. */
 	headroomSec: 900,
 	floor: 2000,
 	/** The first save the server sees of an account holds the whole history, kills and chests of the time before the server paid them included. */

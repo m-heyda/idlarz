@@ -132,18 +132,17 @@ goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle l
        price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh); rarity common 60 / uncommon 40; item level centre = min(world level, avgWorn + 3), max avgWorn + 5
 bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Embers of a rebirth = floor(gain × (1 + 0.05 × Tithe))
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
-tap:   resource = tile output/s × 0.5 s    (+ crit multiplier on lucky taps), tile cooldown 1.2 s
+tap:   resource = tile output/s × 0.5 s, tile cooldown 1.2 s
 chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s, ≤ 5 waiting
 building cost = floor({500 gold, 250 wood, 150 stone} × 1.6^(buildings already built))
-critter gift = max(min, N s of that resource's income)  (×2 golden); N = 10 on the farm, 5 on the map (AMBIENT_LIFE.giftSeconds)
              cooldown: farm 8 s, map 20 s, both gated by the click limiter, amount computed in the store
 ```
 
-Click limiter (gold clicks, tile taps, critter gifts; NOT fight hits): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
+Click limiter (gold clicks, tile taps; NOT fight hits): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
 
 ## 7. Character-derived stats
 
-`calculateCombatStats`: physicalAtk = STR; magicAtk = INT; hp = 3·VIT + 0.25·CHA; mp = 2·INT; def = DEX + 0.5·STR + 0.5·VIT + 0.25·CHA; magicDef = INT + 0.5·VIT + 0.25·CHA; luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; critDmg % = 100 + STR + 0.5·DEX + 0.5·CHA; atkSpeed % = 0.25·DEX; **xpGainMultiplier** and **tileCostDiscount** as above. Only luck (chests), crit stats (lucky taps), xpGainMultiplier and tileCostDiscount affect gameplay; the rest is display-only.
+`calculateCombatStats`: physicalAtk = STR; magicAtk = INT; hp = 3·VIT + 0.25·CHA; mp = 2·INT; def = DEX + 0.5·STR + 0.5·VIT + 0.25·CHA; magicDef = INT + 0.5·VIT + 0.25·CHA; luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; atkSpeed % = 0.25·DEX; **xpGainMultiplier** and **tileCostDiscount** as above. Only luck (chests), crit stats (lucky taps), xpGainMultiplier and tileCostDiscount affect gameplay; the rest is display-only.
 
 ## 8. What the pacing looks like
 

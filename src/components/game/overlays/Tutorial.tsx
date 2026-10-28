@@ -17,7 +17,6 @@ import {
 	SPAWN_LIMIT,
 	CLICK_LADDER,
 	CLICK_LIMIT,
-	FARM_BONUS,
 	MERCHANT_BUY_MULTIPLIER,
 	MERCHANT_GOODS,
 	MERCHANT_RESOURCE_PRICES,
@@ -320,8 +319,8 @@ const Tutorial: React.FC = () => {
 					))}
 				</div>
 				<p className='text-[#a89878] text-xs mt-2'>
-					While the Farm tab of the Menu is open, a critter wanders by now and then: click it for a gift worth about{' '}
-					{FARM_BONUS.critters.butterfly.seconds} seconds of that resource&apos;s income.
+					Butterflies, bees and other little critters wander over your land and through the farm meadow. They are just for show:
+					they take no clicks and give nothing.
 				</p>
 			</section>
 

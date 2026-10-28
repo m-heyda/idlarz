@@ -29,7 +29,7 @@ src/
 │   ├── playerClasses.ts, pixelIcons.ts
 ├── types/game.ts             Resources, Tile, CharacterStats, GameState (store interface), ClickInput, TileCost ...
 ├── stores/
-│   ├── gameStore.ts          the single game store: every action (buyTile, tick, upgradeCastle, clickForGold, tapTile, rebirth, buyEmberUpgrade, claimCritterGift ...)
+│   ├── gameStore.ts          the single game store: every action (buyTile, tick, upgradeCastle, clickForGold, tapTile, rebirth, buyEmberUpgrade ...)
 │   ├── uiStore.ts            transient UI flags (class dialog, save menu, settings, rebirth, tutorial, right-click menu, highlight, toast, view options)
 │   ├── viewStore.ts          where the map is on the screen (pan x/y, zoom, window size), clamped to the explored land; read by Grid and the minimap
 │   └── settingsStore.ts      sound / volume / ambient-life preferences (localStorage `idlarz-settings`, not game state)
@@ -41,7 +41,7 @@ src/
 │   ├── terrain.ts            dual-grid map terrain: ground rank, dual-cell layers, tile depth, prop + dock placement (port of scripts/pixel/terrain_logic.py), plus the chunk helpers (worldGround, chunkSignature, chunkSprites, chunkPads)
 │   ├── formatters.ts, audioManager.ts
 ├── lib/
-│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks, tile taps and critter gifts (NOT fight hits)
+│   ├── clickLimiter.ts       token-bucket limiter shared by gold clicks and tile taps (NOT fight hits)
 │   ├── hitGuard.ts           fight hits: trusted clicks only, one DOM event counts once, no rate limit
 │   ├── fightSim.ts           a bot that fights with the real combat rules (scripts/fight-sim.ts, tests/fightBalance.test.ts)
 │   ├── castleWard.ts         the castle's ward (castle level 7+): isInWard, monstersOutsideWard, fortressWallTier; the growing violet range area: castleRangeRadius, inCastleRange
@@ -106,7 +106,7 @@ Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `p
 
 Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a token from the same limiter (one token per physical click, trusted clicks only).
 
-`useClickIncome` (called by `GameHeader`) registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold` (and the tile's `onClick` calls `tapTile` for the same event); both ask the shared limiter with the event's `timeStamp` as id, so one physical click costs one token. Catching a critter gift (`claimCritterGift`, map or farm window) goes through the same limiter and also has a per-source cooldown; the amount is always computed by the store.
+`useClickIncome` (called by `GameHeader`) registers one window `click` listener. A click counts only if it is trusted and lands inside `[data-click-area]` (the map). It calls `clickForGold` (and the tile's `onClick` calls `tapTile` for the same event); both ask the shared limiter with the event's `timeStamp` as id, so one physical click costs one token.
 
 ## Rebirth
 
@@ -114,7 +114,7 @@ Fight hits (`hitMonster`) come from the fight modal, outside the map, and take a
 
 ## Ambient life
 
-`AmbientLife` (inside `Grid`) spawns a critter every few seconds on an owned tile in view; they are decorative. About 1 in 12 carries a gift and is clickable; the click goes through `claimCritterGift`. It is off when disabled in Settings, when the tab is hidden, and with `prefers-reduced-motion`.
+`AmbientLife` (inside `Grid`) spawns a critter every few seconds on an owned tile in view; they are purely decorative (no clicks, no rewards). It is off when disabled in Settings, when the tab is hidden, and with `prefers-reduced-motion`.
 
 ## Rendering notes
 
