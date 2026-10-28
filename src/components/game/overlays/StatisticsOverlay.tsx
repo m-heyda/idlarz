@@ -190,7 +190,6 @@ const StatisticsOverlay: React.FC = () => {
 						<Line label='Gold find' value={pct(fx.goldFind, 1)} valueClass='text-yellow-400' />
 						<Line label='Mana regen' value={`${formatCompact(fx.manaRegen, 2)}/s`} valueClass='text-blue-400' />
 						<Line label='Spell power' value={pct(fx.spellPower, 1)} valueClass='text-purple-300' />
-						<Line label='Lucky tap damage' value={pct(characterStats.critDmgMultiplier, 2)} valueClass='text-orange-400' />
 						<Line label='XP gain' value={pct(fx.xpGain, 2)} valueClass='text-green-400' />
 						<Line label='Tile discount' value={pct(fx.tileDiscount, 2)} valueClass='text-blue-400' />
 						{fx.clickMastery > 0 && <Line label='Click mastery (rebirth)' value={`+${pct(fx.clickMastery, 0)} gold per click`} valueClass='text-purple-300' />}

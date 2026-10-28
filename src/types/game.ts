@@ -38,7 +38,6 @@ export interface CharacterStats {
 	def: number; // armor the attributes add to the gear's
 	luck: number;
 	critChance: number;
-	critDmgMultiplier: number; // % for lucky tile taps (fights use statBonuses.critDamagePercent)
 	atkSpeedIncrease: number; // % attack speed
 	xpGainMultiplier: number;
 	tileCostDiscount: number;
@@ -307,21 +306,8 @@ export interface PrestigeState {
 	upgrades: Partial<Record<EmberUpgradeId, number>>;
 }
 
-// A bonus critter that was clicked (farm meadow or map)
-export interface CritterGift {
-	source: 'farm' | 'map';
-	type: 'butterfly' | 'bee' | 'ladybug' | 'rabbit';
-	golden: boolean;
-}
-
-export interface GiftResult {
-	resource: keyof Resources;
-	amount: number;
-}
-
 export interface TapResult {
 	items: { resource: keyof Resources; amount: number }[];
-	lucky: boolean;
 }
 
 import type { ChestLoot } from '@/lib/chests';
@@ -379,7 +365,6 @@ export interface GameState {
 	resetGame: () => void;
 	rebirth: () => boolean;
 	buyEmberUpgrade: (id: EmberUpgradeId) => boolean;
-	claimCritterGift: (gift: CritterGift, input: ClickInput) => GiftResult | null;
 	upgradeCastle: () => boolean;
 	purchaseAnimal: (animalId: string, count?: number | 'max') => number; // animals bought
 	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;

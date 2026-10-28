@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import type { ClickInput } from '@/types/game';
-import { queueTileTap } from '@/lib/floatText';
-import type { Critter } from './MeadowLayer';
-import audioManager from '@/utils/audioManager';
 import '@/styles/Farm.css';
 import FarmScene from './FarmScene';
 import FarmHud from './FarmHud';
@@ -18,7 +14,6 @@ const UPGRADE_DOCK_HEIGHT = { open: 140, closed: 36 };
  * shop along the right edge and the upgrade shelf along the bottom.
  */
 const FarmOverlay: React.FC = () => {
-	const claimCritterGift = useGameStore((state) => state.claimCritterGift);
 	const purchaseAnimal = useGameStore((state) => state.purchaseAnimal);
 	const farmLevels = useGameStore((state) => state.farmLevels);
 	const [highlightId, setHighlightId] = useState<string | null>(null);
@@ -32,15 +27,6 @@ const FarmOverlay: React.FC = () => {
 		const t = setTimeout(() => setCelebrate(null), 1100);
 		return () => clearTimeout(t);
 	}, [celebrate]);
-
-	// A meadow critter was clicked: gift = some seconds of that resource's income (bigger if golden).
-	// The amount rides the click's cursor popup together with the usual click gold.
-	const catchCritter = (critter: Critter, _x: number, _y: number, input: ClickInput) => {
-		const gift = claimCritterGift({ source: 'farm', type: critter.type, golden: critter.golden }, input);
-		if (!gift) return;
-		queueTileTap([{ resource: gift.resource, amount: gift.amount }], critter.golden);
-		audioManager.playSound('click');
-	};
 
 	const buy = (animalId: string, count: number) => {
 		if (purchaseAnimal(animalId, count) > 0) setCelebrate(animalId);
@@ -57,7 +43,6 @@ const FarmOverlay: React.FC = () => {
 					bottom: upgradesOpen ? UPGRADE_DOCK_HEIGHT.open : UPGRADE_DOCK_HEIGHT.closed,
 					hudOpen,
 				}}
-				onCatchCritter={catchCritter}
 			/>
 			<FarmHud open={hudOpen} onToggle={() => setHudOpen(!hudOpen)} />
 			<FarmAnimalDock open={animalsOpen} onToggle={() => setAnimalsOpen(!animalsOpen)} onBuy={buy} onHover={setHighlightId} />

@@ -9,7 +9,6 @@ export interface FloatDetail {
 	x: number;
 	y: number;
 	items: FloatItem[];
-	lucky?: boolean;
 }
 
 export const FLOAT_EVENT = 'idlarz:float';
@@ -21,10 +20,10 @@ export const emitFloat = (detail: FloatDetail) => {
 
 // A tile's onClick runs before the window-level click listener, so it parks its tap result here
 // and the global click handler merges it into the single popup for that click.
-let pendingTap: { items: FloatItem[]; lucky: boolean } | null = null;
+let pendingTap: { items: FloatItem[] } | null = null;
 
-export const queueTileTap = (items: FloatItem[], lucky: boolean) => {
-	pendingTap = { items, lucky };
+export const queueTileTap = (items: FloatItem[]) => {
+	pendingTap = { items };
 };
 
 export const takeTileTap = () => {

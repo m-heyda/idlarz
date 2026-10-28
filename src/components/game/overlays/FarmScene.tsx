@@ -1,8 +1,8 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { MeadowCritter, useMeadowCritters, Critter } from './MeadowLayer';
+import { MeadowCritter, useMeadowCritters } from './MeadowLayer';
 import { ANIMALS, FARM } from '@/config/gameConfig';
 import { ANIMAL_PIXEL_ICONS } from '@/config/pixelIcons';
-import { Animal, ClickInput } from '@/types/game';
+import { Animal } from '@/types/game';
 import PixelIcon from '../PixelIcon';
 import {
 	ANCHOR,
@@ -58,15 +58,13 @@ interface FarmSceneProps {
 	celebrate: string | null;
 	/** Panels laid over the window (CSS px): animals and critters keep clear of them */
 	insets: Insets;
-	/** a bonus critter was clicked (cursor position for the popup) */
-	onCatchCritter: (critter: Critter, x: number, y: number, input: ClickInput) => void;
 }
 
 /**
  * The farm as a tiny game: an isometric pen (barn, trough, hay, gate) with your animals wandering about, on a meadow that
  * fills the whole window. The animals are scenery: buying happens in the panel beside the scene.
  */
-const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrate, insets, onCatchCritter }) => {
+const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrate, insets }) => {
 	const stageRef = useRef<HTMLDivElement>(null);
 	const [zoom, setZoom] = useState(3);
 	const zoomRef = useRef(zoom);
@@ -273,7 +271,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 			</div>
 
 			{critters.map((c) => (
-				<MeadowCritter key={c.id} critter={c} onCatch={onCatchCritter} onExpire={remove} />
+				<MeadowCritter key={c.id} critter={c} onExpire={remove} />
 			))}
 		</div>
 	);

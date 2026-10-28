@@ -1441,14 +1441,6 @@ body {
 	gap: 4px;
 }
 
-.float-lucky {
-	font-size: 0.8125rem;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	color: #fff6c0;
-	text-shadow: 0 1px 0 #6a3a00, 0 0 8px rgba(255, 220, 90, 0.9);
-}
-
 /* --- Hero HUD: stone alcove scene, flickering torches, flasks flanking the hero, stony XP bar --- */
 .hero-hud {
 	position: relative;

@@ -195,12 +195,13 @@
 	z-index: 40;
 }
 
-/* --- bonus critters: wander for 10s, click for a gift --- */
+/* --- meadow critters: decoration that wanders for 10s and leaves --- */
 .meadow-critter {
 	position: absolute;
 	z-index: 60;
 	width: 0;
 	height: 0;
+	pointer-events: none;
 	animation: mc-in 0.35s steps(4) both;
 }
 
@@ -223,8 +224,6 @@
 	flex-direction: column;
 	align-items: center;
 	transform: translate(-50%, -50%);
-	padding: 14px;
-	cursor: pointer;
 	animation: mc-wander 5s ease-in-out infinite;
 }
 
@@ -288,75 +287,9 @@
 	}
 }
 
-.mc-move:hover .mc-sprite {
-	filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.25)) brightness(1.2) drop-shadow(0 0 6px #fff6c0);
-}
-
-.mc-gift {
-	display: flex;
-	align-items: center;
-	gap: 2px;
-	margin-bottom: 2px;
-	padding: 0 4px;
-	font-size: 0.7rem;
-	font-weight: 700;
-	color: #ffe27a;
-	background: rgba(12, 8, 6, 0.85);
-	border: 2px solid #7a5224;
-	animation: mc-bob 0.6s steps(2) infinite alternate;
-}
-
-@keyframes mc-bob {
-	to {
-		transform: translateY(-3px);
-	}
-}
-
-.mc-timer {
-	display: block;
-	width: 28px;
-	height: 4px;
-	margin-top: 2px;
-	background: rgba(0, 0, 0, 0.55);
-	border: 1px solid #080504;
-}
-
-.mc-timer i {
-	display: block;
-	height: 100%;
-	background: #8cee50;
-	transform-origin: left;
-	animation: mc-time var(--life) linear both;
-}
-
-@keyframes mc-time {
-	0% {
-		transform: scaleX(1);
-		background: #8cee50;
-	}
-	70% {
-		background: #ffd23a;
-	}
-	100% {
-		transform: scaleX(0);
-		background: #ff5a4a;
-	}
-}
-
-/* golden: shimmering aura, triple gift */
-.meadow-critter[data-golden='true'] .mc-sprite {
-	filter: drop-shadow(0 0 4px #ffd23a) drop-shadow(0 0 10px #ffb020) sepia(0.4) saturate(1.6) brightness(1.15);
-}
-
-.meadow-critter[data-golden='true'] .mc-gift {
-	border-color: #ffd23a;
-	box-shadow: 0 0 10px rgba(255, 210, 60, 0.7);
-}
-
 @media (prefers-reduced-motion: reduce) {
 	.mc-move,
-	.mc-sprite,
-	.mc-gift {
+	.mc-sprite {
 		animation: none;
 	}
 }

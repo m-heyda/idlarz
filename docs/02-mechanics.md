@@ -77,7 +77,7 @@ Gold, wood, stone, coal (drawn as charcoal "fuel"), food, meat, the farm product
 - Meat and product income = `Σ production × upgrades × (1 + castle modifier + 0.05 × Plains tiles for meat)`.
 - **Upgrades** (bought in the Farm window with resources, 10 levels, the pen 8): Feed Trough +5 % meat, Hen House +15 % eggs, Dairy +15 % milk, Tannery +15 % hide, Pen Expansion +4 animals per kind and +2 % all farm output per level. Each costs ×1.6–1.9 more per level; the product upgrades are paid partly in the product itself.
 - **The window** is one meadow filling the whole dialog with the pen and its animals in it (animals are scenery, there is nothing to click on them). The **animal shop** is a panel along the right edge (one card per kind: owned/limit, output per animal, Buy ×1 / ×10 / Max; hovering a card lights up that kind in the pen), a corner readout (fixed width, so ticking numbers never move it; it folds up to its title) shows the output and stock, and the upgrade shelf sits along the bottom. The shop and the shelf can be collapsed too. Animals spread out over the meadow instead of bunching up.
-- While the Farm window is open a critter wanders by every 60–120 s (one at a time, 10 s lifetime; the first after 45 s): click it for a gift (golden ones ×2). The store decides the amount (about 10 s of income, never less than the critter's minimum) and enforces an 8 s cooldown for the window; the click limiter applies.
+- While the Farm window is open a critter wanders by every 60–120 s (one at a time, 10 s lifetime; the first after 45 s). It is decoration only: it cannot be clicked and gives nothing.
 
 ## 7. Merchant
 
@@ -90,7 +90,7 @@ Gold, wood, stone, coal (drawn as charcoal "fuel"), food, meat, the farm product
 
 ## 8. Clicking
 
-- A **real click on the map** pays `gold/s × click power`. A click on an owned tile also taps it: `0.5 s` of that tile's output (each tile has a 1.2 s cooldown; critical "lucky" taps use your crit stats).
+- A **real click on the map** pays `gold/s × click power`. A click on an owned tile also taps it: `0.5 s` of that tile's output (each tile has a 1.2 s cooldown).
 - Clicks on menus, the header, buttons and dialogs never pay. Script-dispatched (untrusted) clicks never pay.
 - **Rate limit** (token buckets, shared by gold click and tile tap): up to 8 clicks in a burst, 5 clicks/s sustained, plus a long-run allowance (20 000 clicks bank, refilling 1.5 clicks/s ≈ 130 K paid clicks/day). A fast human is never limited; an auto-clicker is capped at roughly a dedicated human ([07](07-security-and-exploits.md)).
 
@@ -140,7 +140,7 @@ Header (one compact row: the hero's **avatar with the level orb** (click: the ch
 - **Save game / Export**: *Save game* writes the save at once (`saveNow`) and shows a toast; autosave (2 s after a change, and on close/hide of the tab) is unchanged. *Export game save* copies the same `IDLZ2.` text as Import / backup to the clipboard.
 - **Admin panel** (development builds only; resources, *Loot: chest*, *Heal* and the map tools): the cheat buttons in the game's own frame, folded into an icon with *Hide*; the choice is remembered (`idlarz.ui.*` in localStorage).
 - **Map decor and water**: plains carry tiny flowers and grass tufts, swamps fallen dead trees (a second hash pass, purely visual), open lake water also glitters (a soft drifting-highlight strip over every open-water lake tile, `water_shimmer`), and open lake water plus deep swamp pools show small animated ripples (open water gets one to three per tile) (Settings > Life on the map turns the ripples and the critters off; reduced motion hides the ripples).
-- **Ambient life**: every 14–30 s (the first after 6 s, at most 3 at once) a critter wanders over an owned tile in view for 6–10 s, chosen by biome: butterflies and bees on plains, forest, lake and coast, ladybugs on swamp, rabbits on hills and tundra, plus decoration-only **fish** (lakes, only on tiles with water on all four sides), **frogs** (swamp), **crabs** (coast), **goats** (hills) and **small wolves** (forest). A tile with a building uses its own biome. About 1 in 12 of the four farm critters (butterfly, bee, ladybug, rabbit) is golden and glows; clicking it gives about 5 s of income (store-decided, 20 s cooldown, shares the click limiter, real clicks only). Fish, frogs, crabs, goats and wolves never carry a gift. Off in Settings, with a hidden tab, or with reduced-motion.
+- **Ambient life**: every 14–30 s (the first after 6 s, at most 3 at once) a critter wanders over an owned tile in view for 6–10 s, chosen by biome: butterflies and bees on plains, forest, lake and coast, ladybugs on swamp, rabbits on hills and tundra, plus decoration-only **fish** (lakes, only on tiles with water on all four sides), **frogs** (swamp), **crabs** (coast), **goats** (hills) and **small wolves** (forest). A tile with a building uses its own biome. They are decoration only: they take no clicks and give nothing. Off in Settings, with a hidden tab, or with reduced-motion.
 
 ## 15. Monsters and combat
 

@@ -31,7 +31,6 @@ export function useClickIncome() {
 				x: e.clientX,
 				y: e.clientY,
 				items: mergeItems(items, tap?.items ?? []),
-				lucky: tap?.lucky,
 			});
 		},
 		[clickForGold]

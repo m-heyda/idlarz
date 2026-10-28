@@ -3,10 +3,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { AMBIENT_LIFE } from '@/config/gameConfig';
 import { nextSpawnDelay, pickAmbientCritter, type AmbientCritter, type Viewport } from '@/lib/ambientLife';
-import { queueTileTap } from '@/lib/floatText';
-import audioManager from '@/utils/audioManager';
 import { CRITTER_SHEETS } from './overlays/MeadowLayer';
-import type { FarmCritterType } from '@/config/gameConfig';
 import '@/styles/Ambient.css';
 
 /** Sprite sheets of every ambient critter: the four farm critters plus the decorative fish, frog, crab, goat and wolf (2 frames each). */
@@ -20,14 +17,12 @@ const AMBIENT_SHEETS: Record<AmbientCritter['type'], { name: string; w: number; 
 };
 
 /**
- * Little animals wandering over your land. Decorative, except the rare golden one which can be clicked for a
- * small gift (the store decides the amount and enforces a cooldown). Switched off in Settings, while the tab is
- * hidden and for people who prefer reduced motion.
+ * Little animals wandering over your land. Purely decorative: they take no clicks and give nothing. Switched off in
+ * Settings, while the tab is hidden and for people who prefer reduced motion.
  */
 const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport }) => {
 	const enabled = useSettingsStore((state) => state.ambientLife);
 	const tiles = useGameStore((state) => state.tiles);
-	const claimCritterGift = useGameStore((state) => state.claimCritterGift);
 	const [critters, setCritters] = useState<AmbientCritter[]>([]);
 	const tilesRef = useRef(tiles);
 	tilesRef.current = tiles;
@@ -66,7 +61,6 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 					<div
 						key={c.id}
 						className='amb-critter'
-						data-gift={c.golden}
 						data-type={c.type}
 						style={
 							{
@@ -78,22 +72,7 @@ const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport })
 								'--life': `${c.lifeMs}ms`,
 							} as React.CSSProperties
 						}>
-						<div
-							className='amb-move'
-							role={c.golden ? 'button' : undefined}
-							aria-label={c.golden ? 'Golden critter - click for a gift' : undefined}
-							onClick={(e) => {
-								if (!c.golden || !e.isTrusted) return;
-								const gift = claimCritterGift(
-									{ source: 'map', type: c.type as FarmCritterType, golden: true },
-									{ eventId: e.nativeEvent.timeStamp, now: performance.now(), trusted: e.nativeEvent.isTrusted }
-								);
-								if (gift) {
-									queueTileTap([{ resource: gift.resource, amount: gift.amount }], true);
-									audioManager.playSound('click');
-									remove(c.id);
-								}
-							}}>
+						<div className='amb-move'>
 							<span
 								className='amb-sprite'
 								style={

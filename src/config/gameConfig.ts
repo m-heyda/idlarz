@@ -32,7 +32,6 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
 	def: 0,
 luck: 0,
 	critChance: 0,
-	critDmgMultiplier: 0,
 	atkSpeedIncrease: 0,
 	xpGainMultiplier: 0,
 	tileCostDiscount: 0,
@@ -777,29 +776,25 @@ export const BUILDINGS: Record<BuildingType, Building> = {
 export const TILE_TAP = {
 	seconds: 0.5,
 	cooldownMs: 1200,
-	// Lucky tap: chance = the player's crit chance (%), payout = 1 + crit damage multiplier (%)/100
-	luckyEnabled: true,
 };
 
-// Farm meadow bonuses: little critters wander into the meadow while the Farm window is open; click one before
-// it leaves (lifetimeMs) for a gift worth `seconds` of that resource's income (at least `min`).
-export const FARM_BONUS = {
+// Farm meadow critters: little animals wander into the meadow while the Farm window is open, stay for `lifetimeMs` and leave.
+// Purely cosmetic: they cannot be clicked and give nothing.
+export const FARM_CRITTERS = {
 	lifetimeMs: 10000,
-	firstDelayMs: 45000, // rare on purpose: a visit is a treat, not a chore
+	firstDelayMs: 45000,
 	minGapMs: 60000,
 	maxGapMs: 120000,
 	maxActive: 1,
-	goldenChance: 0.12,
-	goldenMultiplier: 2,
 	critters: {
-		butterfly: { label: 'Butterfly', resource: 'gold', seconds: 10, min: 5, weight: 3 },
-		bee: { label: 'Bee', resource: 'food', seconds: 10, min: 3, weight: 3 },
-		ladybug: { label: 'Ladybug', resource: 'xp', seconds: 10, min: 3, weight: 2 },
-		rabbit: { label: 'Rabbit', resource: 'meat', seconds: 10, min: 2, weight: 2 },
+		butterfly: { label: 'Butterfly', weight: 3 },
+		bee: { label: 'Bee', weight: 3 },
+		ladybug: { label: 'Ladybug', weight: 2 },
+		rabbit: { label: 'Rabbit', weight: 2 },
 	},
 } as const;
 
-export type FarmCritterType = keyof typeof FARM_BONUS.critters;
+export type FarmCritterType = keyof typeof FARM_CRITTERS.critters;
 
 // Gold per click = total gold/s x click power. Four upgrade levels, bought from the merchant.
 export const CLICK_LADDER = [
@@ -981,7 +976,7 @@ export const EMBER_UPGRADES = {
 export type EmberUpgradeId = keyof typeof EMBER_UPGRADES;
 
 // Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
-// Purely decorative, except the rare golden one, which can be clicked for a small gift (see claimCritterGift).
+// Purely decorative: they never take a click and give nothing.
 export const AMBIENT_LIFE = {
 	firstSpawnMs: 6000, // the first critter shows up this long after the map opens
 	spawnMinMs: 14000,
@@ -990,12 +985,8 @@ export const AMBIENT_LIFE = {
 	lifeMinMs: 6000,
 	lifeMaxMs: 10000,
 	roamTiles: 1.5, // how far a critter strays from where it appears
-	giftChance: 1 / 12, // share of critters that carry a gift
-	giftSeconds: 5, // a map gift is worth this many seconds of that resource's income (x goldenMultiplier)
-	giftCooldownMs: 20000, // at most one map gift per this long
-	farmGiftCooldownMs: 8000, // same for the farm meadow critters
 	// which critter likes which biome (a name twice = twice as common). Fish only swim where the lake has water on all four
-	// sides, and fish, frogs, crabs, goats and wolves are decoration only: the golden gift critters are the four from FARM_BONUS.
+	// sides.
 	byBiome: {
 		forest: ['butterfly', 'bee', 'wolf'],
 		plains: ['bee', 'butterfly'],
