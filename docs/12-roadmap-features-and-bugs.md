@@ -30,7 +30,7 @@ Not part of this change; reviewed later. State today, so the rework starts from 
 | R6 | A fight uses the gear of the last accepted save, frozen when the fight starts. The cloud save goes out soon after an equip, but not at once | `useCloudSync` | equipping is blocked while a fight is open in the browser |
 | R7 | `dangerBonus` (one level per 8 tiles from the castle) is now 0 or 1: rats stand at most 9 tiles out | `lib/monsters.ts` | the frontier is no longer more dangerous than the home land; rework with the biomes |
 | R8 | The King's balance changed with auto-attack: his HP is 1000 (was 9600 for a clicker) so the best gear wins comfortably, obsidian narrowly, steel not | `MONSTERS.ratKing`, `docs/generated/fight-sim.md` | needs a real playtest |
-| R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back |
+| R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix, `storageScope.ts`) |
 | R10 | `legacyVault.ts` (the IndexedDB and `idle-explorer-v11/v12` import) and the `IDLZ1.` import format are still shipped | `lib/legacyVault.ts`, `saveStorage.ts` | delete when nobody can still hold such a save |
 
 ## 3. Server migration backlog (ranked)

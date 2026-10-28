@@ -28,7 +28,7 @@ The game sits behind email/password login. The browser never talks to Supabase: 
 2. Copy `.env.example` to `.env.local` and fill `SUPABASE_URL` and `SUPABASE_ANON_KEY` (the publishable key). On Vercel add the same two as server-side env vars (no `NEXT_PUBLIC_`).
 3. Cloud save (optional, needs a second server-only secret): add `SUPABASE_SERVICE_ROLE_KEY` (Settings > API Keys > secret key) to `.env.local` / Vercel. Without it the game still runs, the account just has no cloud copy. See [docs/09-cloud-saves.md](docs/09-cloud-saves.md).
 4. Add `LOOT_SECRET` (16+ characters, see `.env.example`): spawns, chests and fights are sealed with it, and **without it (or without Supabase) the game shows a retry screen and cannot be played** - there is no play-without-account mode. Run the newest file in `supabase/migrations/` (`combat_ledger.sql`) before deploying.
-5. Restart `npm run dev`.
+5. Restart `npm run dev`. On localhost every browser key the game writes carries a `.dev` suffix (`src/lib/storageScope.ts`), so a dev session starts from a fresh local game and never touches a save of the real site; the account (cloud) save is the same wherever you sign in.
 
 ## Documentation
 

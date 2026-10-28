@@ -1,6 +1,8 @@
 // Remembered view options (not game state): plain booleans in localStorage, every access guarded
 // (private windows and blocked storage throw, and the server render has no window).
 
+import { scoped } from '@/lib/storageScope';
+
 export type UiPrefKey = 'showAdmin' | 'adminCollapsed' | 'showMinimap' | 'combatMinimized';
 
 /** What a first visit (and the server render) sees: the dev admin panel starts open, the minimap on */
@@ -11,7 +13,7 @@ export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
 	combatMinimized: false, // the combat panel starts open
 };
 
-const storageKey = (key: UiPrefKey) => `idlarz.ui.${key}`;
+const storageKey = (key: UiPrefKey) => scoped(`idlarz.ui.${key}`);
 
 export const readPref = (key: UiPrefKey): boolean => {
 	try {

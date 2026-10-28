@@ -1,4 +1,5 @@
 import type { ClaimResult } from '@/lib/offline/types';
+import { scoped } from '@/lib/storageScope';
 
 /** The browser side of /api/offline. */
 export type ClaimResponse =
@@ -26,7 +27,7 @@ export const requestClaim = async (claimId: string): Promise<ClaimResponse> => {
 
 // The idempotency key of a claim that has not been applied yet. It is kept until the answer is in hand, so a reload while the request is
 // in flight repeats the SAME claim and the server replays its answer instead of paying again (or losing the payment).
-const PENDING_KEY = 'idlarz.offline.pending';
+const PENDING_KEY = scoped('idlarz.offline.pending');
 
 interface Pending {
 	userId: string;

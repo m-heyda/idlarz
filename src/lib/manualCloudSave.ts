@@ -1,4 +1,5 @@
 import type { PushOutcome } from '@/lib/syncPolicy';
+import { scoped } from '@/lib/storageScope';
 
 /**
  * "Save game" in the menu: always saves to this browser, and when an account is signed in it also uploads the game to the
@@ -27,7 +28,7 @@ export const registerCloudSaver = (next: CloudSaver): (() => void) => {
 
 // ---- the remembered time of the last manual cloud save (survives a reload, so refreshing does not reset the limit) -------
 
-const KEY = 'idlarz.cloud.manual';
+const KEY = scoped('idlarz.cloud.manual');
 
 export interface ManualStore {
 	read: (userId: string) => number | null;

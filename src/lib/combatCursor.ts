@@ -1,8 +1,9 @@
+import { scoped } from '@/lib/storageScope';
 // Where this browser is in the server's combat log: the number of the last event it applied (a win's loot, a drunk potion). Kept in
 // localStorage next to the game save, so a reload asks for "everything after N" and neither loses the loot of a fight that ended while
 // the page was away nor applies a result twice. Every access is guarded (private windows and blocked storage throw).
 
-const KEY = 'idlarz.combat.cursor';
+const KEY = scoped('idlarz.combat.cursor');
 
 let user: string | null = null;
 

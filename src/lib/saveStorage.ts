@@ -2,6 +2,7 @@ import type { PersistStorage, StorageValue } from 'zustand/middleware';
 import { legacyVault, parseLegacy, LEGACY_PREFIX, type LegacyVault } from '@/lib/legacyVault';
 import { decodeSave, encodeSave, type DecodeResult } from '@/lib/saveFormat';
 import type { PersistedGame } from '@/lib/sanitizeSave';
+import { isLocalDev, scoped } from '@/lib/storageScope';
 
 /**
  * Where the game is kept: the browser's localStorage, one text line (see saveFormat.ts).
@@ -20,12 +21,12 @@ import type { PersistedGame } from '@/lib/sanitizeSave';
  */
 
 export const PERSIST_VERSION = 1; // for the zustand persist option only; the real schema lives in saveFormat.ts
-export const PERSIST_NAME = 'idlarz-save';
+export const PERSIST_NAME = scoped('idlarz-save');
 
-const KEY_CURRENT = 'idlarz.save';
-const KEY_BACKUP = 'idlarz.save.backup';
-const KEY_DAMAGED = 'idlarz.save.damaged';
-const KEY_PREVIOUS_GAME = 'idlarz.save.previous-game'; // the game a New Game replaced; reset never removes it
+const KEY_CURRENT = scoped('idlarz.save');
+const KEY_BACKUP = scoped('idlarz.save.backup');
+const KEY_DAMAGED = scoped('idlarz.save.damaged');
+const KEY_PREVIOUS_GAME = scoped('idlarz.save.previous-game'); // the game a New Game replaced; reset never removes it
 const BARELY_PLAYED_SEC = 300;
 const FLUSH_DELAY_MS = 2000;
 const ROTATE_EVERY_MS = 10 * 60 * 1000;
@@ -353,7 +354,7 @@ const persistence = () => (typeof navigator !== 'undefined' ? navigator.storage 
 
 const saves = createSaveStorage({
 	kv: browserKv(),
-	legacy: legacyVault,
+	legacy: isLocalDev() ? undefined : legacyVault, // a dev session starts fresh: it never adopts (or wipes) an old vault
 	requestPersist: async () => (await persistence()?.persist?.()) ?? null,
 	queryPersisted: async () => (await persistence()?.persisted?.()) ?? null,
 });
