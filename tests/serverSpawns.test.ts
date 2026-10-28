@@ -1,14 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, setResources } from './helpers';
-import { CASTLE_X, CASTLE_Y, MAX_CATCHUP_SEC } from '../src/config/gameConfig';
-import { COMBAT, MONSTERS } from '../src/config/combatConfig';
-import { castleDistance, dangerBonus, maxSpawnLevel, newMonster, rollSpawnLevel, spawnLevelRange } from '../src/lib/monsters';
+import { api, freshGame, growTo, patchTileAt } from './helpers';
+import { CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
+import { MONSTERS } from '../src/config/combatConfig';
+import { castleDistance, dangerBonus, rollSpawnLevel, spawnLevelRange } from '../src/lib/monsters';
 import { generateLoot } from '../src/lib/loot/generate';
 import { rollKillLoot } from '../src/lib/loot';
 import { mulberry32 } from '../src/lib/rng';
-import { patchTileAt } from './helpers';
-import type { ChestReward, KillReward } from '../src/lib/offline/types';
+import type { ChestReward } from '../src/lib/offline/types';
+
+// Spawns and chests are the server's: the browser puts what the server lists on the map, opens a chest by asking, and rolls nothing.
 
 const realFetch = globalThis.fetch;
 const mockFetch = (handler: (path: string, body: Record<string, unknown>) => { status: number; body: unknown }) => {
@@ -19,31 +20,15 @@ const mockFetch = (handler: (path: string, body: Record<string, unknown>) => { s
 };
 const restore = () => {
 	globalThis.fetch = realFetch;
-	api().setServerSpawns(false);
 };
 const flush = () => new Promise((resolve) => setTimeout(resolve, 20));
 const tickets = { chests: 0, rats: [], king: null };
-
-// ---------------------------------------------------------------------------------------------------- the local timers stand still
-
-test('with server spawns on, no chest or monster appears from the local timers; guests keep them', () => {
-	freshGame();
-	growTo(30);
-	api().setServerSpawns(true);
-	for (let i = 0; i < 80; i++) api().tick(MAX_CATCHUP_SEC * 1000); // 6.7 hours of local time
-	assert.equal(api().monsters.length, 0);
-	assert.equal(api().activeChests, 0);
-	api().setServerSpawns(false);
-	for (let i = 0; i < 20; i++) api().tick(MAX_CATCHUP_SEC * 1000);
-	assert.ok(api().monsters.length > 0 || api().activeChests > 0, 'a guest still gets the local spawns');
-});
 
 // ---------------------------------------------------------------------------------------------------- opening a chest on the server
 
 test('a chest opens through the server: the reward is the server\'s, the gems are its balance', async () => {
 	freshGame();
 	growTo(30);
-	api().setServerSpawns(true);
 	patchTileAt(CASTLE_X + 1, CASTLE_Y, { hasChest: true });
 	const before = api().resources.gold;
 	const reward: ChestReward = { ok: true, loot: { kind: 'gold', gold: 777, minutes: 10, goldRate: 1 }, gems: 12, gemsTotal: 1012, tickets, serverNowSec: 1 };
@@ -70,7 +55,6 @@ test('a chest opens through the server: the reward is the server\'s, the gems ar
 test('a chest the server does not know crumbles and pays nothing', async () => {
 	freshGame();
 	growTo(30);
-	api().setServerSpawns(true);
 	patchTileAt(CASTLE_X + 1, CASTLE_Y, { hasChest: true });
 	const before = api().resources.gold;
 	mockFetch(() => ({ status: 200, body: { ok: false, reason: 'no_ticket', tickets, serverNowSec: 1, gemsTotal: 1000 } satisfies ChestReward }));
@@ -87,7 +71,6 @@ test('a chest the server does not know crumbles and pays nothing', async () => {
 test('when the server cannot be reached the chest is put back, nothing is lost', async () => {
 	freshGame();
 	growTo(30);
-	api().setServerSpawns(true);
 	patchTileAt(CASTLE_X + 1, CASTLE_Y, { hasChest: true });
 	const before = api().resources.gold;
 	mockFetch(() => ({ status: 503, body: {} }));
@@ -101,88 +84,26 @@ test('when the server cannot be reached the chest is put back, nothing is lost',
 	}
 });
 
-// ---------------------------------------------------------------------------------------------------- killing on the server
+// ---------------------------------------------------------------------------------------------------- the monsters on the map
 
-test('a kill is paid with what the server rolled, and the monster leaves the map', async () => {
+test('the monsters on the map are the server list, where the server put them', () => {
 	freshGame();
 	growTo(30);
-	setResources({ gold: 0 });
-	api().setServerSpawns(true);
-	const placed = api().applyServerTickets({ tickets: { chests: 0, rats: [{ n: 4, at: 0, lucky: true }], king: null }, serverNowSec: 0, gemsTotal: 1000, nextInSec: null });
-	assert.equal(placed.monsters, 1);
-	const monster = api().monsters[0];
-	assert.equal(monster.ticket, 4);
-	assert.equal(monster.lucky, true);
-
-	const reward: KillReward = { ok: true, dismissed: false, level: monster.level, lucky: true, gold: 5000, xp: 90, items: [], pity: { 'p:t': 2 }, tickets, serverNowSec: 1, gemsTotal: 1000 };
-	let sent: Record<string, unknown> = {};
-	mockFetch((path, body) => {
-		sent = body;
-		assert.equal(path, '/api/kill');
-		return { status: 200, body: reward };
-	});
-	try {
-		assert.equal(api().startFight(monster.id), true);
-		let guard = 0;
-		let eventId = 1;
-		while (api().fight?.phase === 'active' && guard++ < 5000) api().hitMonster({ eventId: eventId++, now: eventId * 1000, trusted: true });
-		assert.equal(api().fight?.phase, 'won');
-		assert.equal(api().fight?.summary, null, 'nothing is paid before the server answers');
-		assert.equal(api().monsters.length, 1, 'the monster stays until then');
-		await flush();
-		assert.equal(api().monsters.length, 0);
-		assert.equal(api().resources.gold, 5000);
-		assert.equal(api().fight?.summary?.lucky, true);
-		assert.deepEqual(api().lootPity, { 'p:t': 2 });
-		assert.equal(sent.n, 4);
-		assert.equal(sent.level, monster.level);
-		assert.equal('gold' in sent, false, 'the request names no reward');
-	} finally {
-		restore();
-	}
-});
-
-test('a monster without a ticket pays nothing and is gone', async () => {
-	freshGame();
-	growTo(30);
-	api().setServerSpawns(true);
-	setResources({ gold: 0 });
-	api().applyServerTickets({ tickets: { chests: 0, rats: [{ n: 1, at: 0, lucky: false }], king: null }, serverNowSec: 0, gemsTotal: 1000, nextInSec: null });
-	const monster = api().monsters[0];
-	// the server forgets the ticket (spent elsewhere): the answer is "no ticket"
-	mockFetch(() => ({ status: 200, body: { ok: false, reason: 'no_ticket', tickets, serverNowSec: 1, gemsTotal: 1000 } satisfies KillReward }));
-	try {
-		api().startFight(monster.id);
-		let guard = 0;
-		let eventId = 1;
-		while (api().fight?.phase === 'active' && guard++ < 5000) api().hitMonster({ eventId: eventId++, now: eventId * 1000, trusted: true });
-		await flush();
-		assert.equal(api().resources.gold, 0);
-		assert.equal(api().monsters.length, 0);
-	} finally {
-		restore();
-	}
-});
-
-test('dismissing a monster tells the server so the ticket does not bring it back', async () => {
-	freshGame();
-	growTo(30);
-	api().setServerSpawns(true);
-	api().applyServerTickets({ tickets: { chests: 0, rats: [{ n: 3, at: 0, lucky: false }], king: null }, serverNowSec: 0, gemsTotal: 1000, nextInSec: null });
-	const monster = api().monsters[0];
-	let sent: Record<string, unknown> = {};
-	mockFetch((_path, body) => {
-		sent = body;
-		return { status: 200, body: { ok: true, dismissed: true, tickets, serverNowSec: 1, gemsTotal: 1000 } satisfies KillReward };
-	});
-	try {
-		assert.equal(api().dismissMonster(monster.id), true);
-		await flush();
-		assert.equal(sent.dismiss, true);
-		assert.equal(sent.n, 3);
-	} finally {
-		restore();
-	}
+	const sync = {
+		tickets: { chests: 0, rats: [{ n: 4, at: 1000 - 100, lucky: true, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 2 }], king: { n: 9, at: 1000, x: CASTLE_X, y: CASTLE_Y - 4, spawnLevel: 16 } },
+		serverNowSec: 1000,
+		gemsTotal: 1100,
+		nextInSec: 30,
+		combat: { hp: 90, mp: 30, maxHp: 101, maxMp: 40, cd: { heal: 0, stun: 0, potion: 0 }, fight: null, autoBattle: true, autoUse: true, retrySec: 0, at: 1, eventNo: 0, events: [], behind: false, nextPollSec: 8 },
+	};
+	const placed = api().applyServerTickets(sync);
+	assert.equal(placed.monsters, 2);
+	assert.deepEqual(api().monsters.map((m) => [m.id, m.type, m.x, m.y, m.level, m.ticket]), [[4, 'rat', CASTLE_X + 3, CASTLE_Y, 2, 4], [9, 'ratKing', CASTLE_X, CASTLE_Y - 4, 16, 9]]);
+	assert.equal(api().monsters[0].lucky, true);
+	assert.equal(api().gems, 1100);
+	// the next answer lists only the King: the rat is gone from the map
+	api().applyServerTickets({ ...sync, tickets: { ...sync.tickets, rats: [] }, combat: { ...sync.combat, at: 2 } });
+	assert.deepEqual(api().monsters.map((m) => m.id), [9]);
 });
 
 // ---------------------------------------------------------------------------------------------------- Luck in the loot
@@ -241,14 +162,6 @@ test('monsters spawn a level higher for every 8 tiles from the castle, never abo
 	const far = rollSpawnLevel('rat', 1, 11, 24);
 	assert.equal(far, Math.min(MONSTERS.rat.spawnWindow.cap, near + 3), 'the same id rolls the same offset into a window three levels higher');
 	assert.equal(rollSpawnLevel('rat', 10, 11, 10_000), MONSTERS.rat.spawnWindow.cap);
-	const spot = { x: CASTLE_X + 16, y: CASTLE_Y };
-	assert.equal(castleDistance(spot), 16);
-	assert.equal(newMonster('rat', 5, spot, 1).spawnLevel, rollSpawnLevel('rat', 1, 5, 16));
-	assert.ok(spawnLevelRange('rat', 1).min <= newMonster('rat', 5, spot, 1).spawnLevel);
-});
-
-test('the highest level the server will pay for grows with the land but stays under the cap', () => {
-	assert.ok(maxSpawnLevel('rat', 1, 400) > maxSpawnLevel('rat', 1, 20));
-	assert.ok(maxSpawnLevel('rat', 10, 1e9) <= MONSTERS.rat.spawnWindow.cap);
-	assert.ok(COMBAT.spawn.dangerStep > 0);
+	assert.equal(castleDistance({ x: CASTLE_X + 16, y: CASTLE_Y }), 16);
+	assert.ok(spawnLevelRange('rat', 1).min <= rollSpawnLevel('rat', 1, 5, 16));
 });

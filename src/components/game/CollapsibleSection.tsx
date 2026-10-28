@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { scoped } from '@/lib/storageScope';
 
-const storageKey = (id: string) => `idlarz.section.${id}`;
+const storageKey = (id: string) => scoped(`idlarz.section.${id}`);
 
 const readOpen = (id: string, defaultOpen: boolean) => {
 	try {

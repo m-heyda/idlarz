@@ -1,5 +1,6 @@
 import type { CloudInfo, CloudLink } from '@/lib/startPlan';
 import { shouldKeepalive } from '@/lib/syncPolicy';
+import { scoped } from '@/lib/storageScope';
 
 /** The browser side of /api/save. Saves stay local first; the cloud copy follows. */
 export type FetchCloud = { status: 'empty' } | { status: 'ok'; cloud: CloudInfo } | { status: 'unavailable' };
@@ -48,7 +49,7 @@ export const pushCloud = async (text: string, baseRev: number, keepalive = false
 
 // ---- the link between this browser's save and an account's cloud save ----------------------------------------------
 
-const LINK_KEY = 'idlarz.cloud';
+const LINK_KEY = scoped('idlarz.cloud');
 
 export const readLink = (): CloudLink | null => {
 	try {
@@ -76,7 +77,7 @@ export const writeLink = (link: CloudLink | null): void => {
 // "newer save": but the newer save is this browser's own. So every upload is remembered until one is confirmed, and a conflict
 // first checks whether the account's save is one of them (same revision step, same play time) before calling it another browser.
 
-const ATTEMPTS_KEY = 'idlarz.cloud.attempts';
+const ATTEMPTS_KEY = scoped('idlarz.cloud.attempts');
 const ATTEMPTS_KEEP = 5;
 
 export interface PushAttempt {

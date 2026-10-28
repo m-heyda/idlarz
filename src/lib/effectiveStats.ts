@@ -5,7 +5,7 @@ import {
 	armorReduction as armorReductionOf,
 	attacksPerSecond,
 	critOdds,
-	damagePerClick,
+	damagePerHit,
 	dodgeChance,
 	lifeLeechPercent,
 	manaRegenPerSec,
@@ -43,7 +43,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		maxMana: maxMana(characterStats, equipment),
 		hpRegen: COMBAT.regenPerSec + gear.regen,
 		manaRegen: manaRegenPerSec(characterStats, equipment),
-		damage: damagePerClick(equipment, characterStats),
+		damage: damagePerHit(equipment, characterStats),
 		attacksPerSecond: attacksPerSecond(equipment, characterStats),
 		armor,
 		/** % of the damage of a monster's hit the armor takes away */

@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import audioManager from '@/utils/audioManager';
+import { scoped } from '@/lib/storageScope';
 
 // Pure UI preferences. They are NOT game state (no effect on progress), so they live in plain localStorage
 // and are never part of the encrypted save.
-const STORAGE_KEY = 'idlarz-settings';
+const STORAGE_KEY = scoped('idlarz-settings');
 
 export interface SettingsState {
 	soundEnabled: boolean;

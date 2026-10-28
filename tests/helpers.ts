@@ -20,6 +20,13 @@ useGameStore.persist.setOptions({
 });
 
 export const store = useGameStore;
+
+/** Shows a fight as open (the server's picture of one: what the store keeps in `combat.fight`). */
+export const openFight = (patch: Partial<NonNullable<ReturnType<typeof useGameStore.getState>['combat']['fight']>> = {}) =>
+	useGameStore.setState((s) => ({
+		combat: { ...s.combat, fight: { n: 1, type: 'rat', level: 1, lucky: false, monsterHp: 10, monsterMaxHp: 10, stunLeft: 0, timeLeftSec: null, x: 0, y: 0, ...patch } },
+	}));
+export const closeFight = () => useGameStore.setState((s) => ({ combat: { ...s.combat, fight: null } }));
 export const api = () => useGameStore.getState();
 
 /** The 50 x 50 rows the map used to be stored as (a fresh copy): for tests that scan or build the map row by row. */

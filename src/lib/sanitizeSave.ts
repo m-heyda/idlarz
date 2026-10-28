@@ -5,7 +5,6 @@ import {
 	BUILDINGS,
 	BUILDING_COST,
 	CASTLE_UPGRADE,
-	CHEST,
 	GEMS_CAP,
 	STARTING_GEMS,
 	CLICK_LADDER,
@@ -29,11 +28,8 @@ import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES, STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { instanceProblem } from '@/lib/itemInstance';
 import { maxHp, maxMana } from '@/lib/combat';
-import { isInWard } from '@/lib/castleWard';
 import { starterBag } from '@/lib/inventory';
 import { limitOf } from '@/lib/limits';
-import { levelAtAge, spawnLevelRange } from '@/lib/monsters';
-import { MONSTERS } from '@/config/combatConfig';
 import {
 	calculateCombatStats,
 	calculateLevel,
@@ -45,10 +41,8 @@ import {
 } from '@/utils/gameUtils';
 import { RING } from '@/utils/biomeRules';
 import {
-	COORD_LIMIT,
 	EMPTY_WORLD,
 	MAX_OWNED_TILES,
-	getTile,
 	inRange,
 	keyX,
 	keyY,
@@ -65,7 +59,6 @@ import type {
 	GameState,
 	ItemInstance,
 	MerchantStock,
-	Monster,
 	PrestigeState,
 	Resources,
 	Tile,
@@ -88,17 +81,12 @@ export const PERSISTED_KEYS = [
 	'prestige',
 	'freeTiles',
 	'playSeconds',
-	'chestSpawnTimer',
 	'activeChests',
 	'gems',
 	'equipment',
 	'bag',
 	'playerHp',
 	'playerMp',
-'monsters',
-	'monsterSpawnTimer',
-	'bossSpawnTimer',
-	'nextMonsterId',
 	'lootPity',
 	'autoSellUpTo',
 	'merchantStock',
@@ -154,7 +142,6 @@ const OPTIONAL_RESOURCES = new Set<keyof Resources>(['eggs', 'milk', 'hide']);
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
-const MONSTER_KEYS = new Set(['id', 'type', 'level', 'spawnLevel', 'x', 'y', 'ageSec', 'ticket', 'lucky']);
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);
 const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes']);
@@ -448,52 +435,6 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		playerMp = v;
 	}
 
-	const nextMonsterId = raw.nextMonsterId === undefined ? 1 : int(raw.nextMonsterId, 1, 1e9);
-	if (nextMonsterId === null) return fail('next monster id');
-	const monsterSpawnTimer = raw.monsterSpawnTimer === undefined ? 0 : num(raw.monsterSpawnTimer, 0, COMBAT.spawn.intervalSec);
-	if (monsterSpawnTimer === null) return fail('monster spawn timer');
-	const bossSpawnTimer = raw.bossSpawnTimer === undefined ? 0 : num(raw.bossSpawnTimer, 0, COMBAT.spawn.bossIntervalSec);
-	if (bossSpawnTimer === null) return fail('boss spawn timer');
-	const monsters: Monster[] = [];
-	if (raw.monsters !== undefined) {
-		if (!Array.isArray(raw.monsters) || raw.monsters.length > tiles.stats.owned) return fail('monsters'); // one per tile at most (the duplicate check below)
-		const ids = new Set<number>();
-		const spots = new Set<string>();
-		let kings = 0;
-		for (const m of raw.monsters) {
-			if (!isObject(m)) return fail('monster shape');
-			for (const key of Object.keys(m)) if (!MONSTER_KEYS.has(key)) return fail('monster key');
-			const id = int(m.id, 1, nextMonsterId - 1);
-			const x = int(m.x, -COORD_LIMIT, COORD_LIMIT);
-			const y = int(m.y, -COORD_LIMIT, COORD_LIMIT);
-			const ageSec = num(m.ageSec, 0, 1e8);
-			if (id === null || x === null || y === null || ageSec === null) return fail('monster numbers');
-			if (typeof m.type !== 'string' || !Object.hasOwn(MONSTERS, m.type)) return fail('monster type');
-			const type = m.type as keyof typeof MONSTERS;
-			// the level it appeared at is inside what the type can spawn at; its level is that plus at most the growth its age can have
-			// earned (up to the hard ceiling: the growth limit can be raised later, never above it)
-			const spawnLevel = int(m.spawnLevel, 1, MONSTERS[type].spawnWindow.cap);
-			const level = int(m.level, 1, 1000);
-			if (spawnLevel === null || level === null) return fail('monster level');
-			if (spawnLevel < spawnLevelRange(type, 1).min) return fail('monster spawn level');
-			if (level < spawnLevel || level > levelAtAge(spawnLevel, ageSec, { hardCap: true })) return fail('monster level');
-			const tile = getTile(tiles, x, y);
-			if (!tile || tile.biome === 'castle' || tile.hasChest) return fail('monster tile');
-			if (isInWard(x, y, castleLevel)) return fail('monster inside the castle ward');
-			// monsters never stand on a building: one a save from an older version left there is dropped, not a reason to refuse the save
-			if (tile.building) continue;
-			if (ids.has(id) || spots.has(`${x},${y}`)) return fail('duplicate monster');
-			ids.add(id);
-			spots.add(`${x},${y}`);
-			if (m.type === 'ratKing' && ++kings > 1) return fail('more than one king');
-			// the server's ticket number (a signed-in player's monster is backed by one) and the lucky flag: both optional, both only ever read back by the server
-			const ticket = m.ticket === undefined ? null : int(m.ticket, 1, 1_000_000_000);
-			if (m.ticket !== undefined && ticket === null) return fail('monster ticket');
-			if (m.lucky !== undefined && typeof m.lucky !== 'boolean') return fail('monster lucky');
-			monsters.push({ id, type, level, spawnLevel, x, y, ageSec, ...(ticket !== null ? { ticket } : {}), ...(m.lucky === true ? { lucky: true } : {}) });
-		}
-	}
-
 	// ---- farm, click power, castle timer, misc -------------------------------------------------------
 	if (!isObject(raw.farmLevels)) return fail('farm');
 	const farmLevels: Record<string, number> = {};
@@ -556,9 +497,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	const gems = raw.gems === undefined ? STARTING_GEMS : int(raw.gems, 0, GEMS_CAP);
 	if (gems === null) return fail('gems');
 
-	const chestSpawnTimer = num(raw.chestSpawnTimer, 0, CHEST.intervalSec);
 	const playSeconds = num(raw.playSeconds, 0, 1e9);
-	if (chestSpawnTimer === null || playSeconds === null) return fail('timers');
+	if (playSeconds === null) return fail('timers');
 
 	// The merchant's goods (optional: older saves get a fresh shelf on the next tick). Every offer is a full item check.
 	let merchantStock: MerchantStock | null = null;
@@ -604,17 +544,12 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			prestige,
 			freeTiles,
 			playSeconds,
-			chestSpawnTimer,
 			activeChests: chests,
 			gems,
 			equipment,
 			bag,
 			playerHp,
 			playerMp,
-			monsters,
-			monsterSpawnTimer,
-			bossSpawnTimer,
-			nextMonsterId,
 			lootPity,
 			autoSellUpTo,
 			merchantStock,

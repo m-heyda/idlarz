@@ -8,7 +8,6 @@ import { acceptSave, type SaveRepo, type StatsRow, type StoredSave, type WorldPa
 import { summarize } from '../src/lib/cloudSave/summary';
 import type { Ledger, LedgerRepo } from '../src/lib/offline/ledger';
 import { seedLedger } from '../src/lib/offline/ledger';
-import { ownedRowMajor } from '../src/utils/world';
 import { claimOffline, type ClaimResult, type ServiceDeps } from '../src/lib/offline/service';
 
 const memory = () => {
@@ -145,24 +144,21 @@ test('an account under review (a poison flag on its latest save) is not paid', a
 	assert.equal(result.reason, 'flagged');
 });
 
-test('a claim made before the ledger exists seeds it from the save: standing monsters become tickets', async () => {
+test('a claim made before the ledger exists seeds it from the save: the gems start at the gift, and a save from before server-placed monsters brings its rats as unplaced tickets', async () => {
 	const m = memory();
 	const state = game();
-	const spots = ownedRowMajor(state.tiles).filter(({ tile }) => tile.biome !== 'castle' && tile.biome !== 'lake' && !tile.building);
-	state.monsters = [
-		{ id: 1, type: 'rat', level: 2, spawnLevel: 2, x: spots[0].x, y: spots[0].y, ageSec: 100 },
-		{ id: 2, type: 'rat', level: 3, spawnLevel: 3, x: spots[1].x, y: spots[1].y, ageSec: 50 },
-	];
-	state.nextMonsterId = 3;
 	const out = await save(m, 'u1', state, 0, T0);
 	assert.equal(out.kind, 'ok');
 	const ledger = m.ledgers.get('u1')!;
-	assert.equal(ledger.bank.rats.length, 2);
-	assert.deepEqual(ledger.bank.rats.map((r) => r.n), [1, 2]);
 	assert.equal(ledger.gems, STARTING_GEMS);
-	// the seed alone behaves the same (a save that predates the ledger)
+	assert.equal(ledger.combat, null, 'combat is seeded by the first fight request, not here');
+	// a stored save written before monsters moved to the server still lists them: they become tickets with no tile yet (the server places them)
 	const stored = (await m.saves.load('u1'))!;
-	assert.equal(seedLedger(stored, T0).bank.rats.length, 2);
+	const legacy = { ...stored, core: { ...stored.core, monsters: [{ id: 1, type: 'rat', ageSec: 100 }, { id: 2, type: 'rat', ageSec: 50 }], nextMonsterId: 3 } };
+	const seeded = seedLedger(legacy, T0);
+	assert.equal(seeded.bank.rats.length, 2);
+	assert.deepEqual(seeded.bank.rats.map((r) => r.n), [1, 2]);
+	assert.ok(seeded.bank.rats.every((r) => r.x === undefined && r.spawnLevel === undefined), 'not placed yet');
 });
 
 // ---------------------------------------------------------------------------------------------------- the verifier knows the grants

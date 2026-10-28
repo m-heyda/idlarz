@@ -1,4 +1,5 @@
 import type { PlayerClassId } from '@/config/playerClasses';
+import { scoped } from '@/lib/storageScope';
 
 /** The browser side of /api/auth/*: the page only ever talks to our own routes, never to Supabase. */
 export interface Profile {
@@ -47,15 +48,15 @@ export const logout = async (): Promise<void> => {
 
 // ---- "this tab is already playing" flag -----------------------------------------------------------------------------
 
-const ENTERED_KEY = 'idlarz.entered';
+const ENTERED_KEY = scoped('idlarz.entered');
 
-/** 'account': past the start page with a session; 'offline': playing without an account. Lives only as long as the tab. */
-export type EnteredMode = 'account' | 'offline';
+/** 'account': past the start page with a session. Lives only as long as the tab. */
+export type EnteredMode = 'account';
 
 export const readEntered = (): EnteredMode | null => {
 	try {
 		const value = window.sessionStorage.getItem(ENTERED_KEY);
-		return value === 'account' || value === 'offline' ? value : null;
+		return value === 'account' ? value : null;
 	} catch {
 		return null;
 	}

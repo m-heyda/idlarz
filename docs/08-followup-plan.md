@@ -31,7 +31,7 @@ Order matters because each step needs the previous one.
 4. **C4 Building levels / demolish** (U13, M): another resource sink (BL5).
 5. **C5 Gambling** (U4, M): uses `luck`; every payout computed in the store, limited by cooldown and the click limiter.
 6. ~~**C6 Combat decision**~~ **decided**: click combat on the map (rats, Rat King). Remaining: let the stat points feed combat (U5) and balance it with a fighting bot (05 BL12).
-7. **C7 Offline progress** (U9, M): needs trusted time (Phase D) or a conservative cap (8 h at 50 %).
+7. ~~**C7 Offline progress**~~ **built** (server-held, 8 h at 50 %): [11](11-offline-and-sealed-rolls.md).
 8. **C8 Mobile layout** (U14, L): responsive modals, bigger tap targets, test on a real phone.
 
 ## Phase D — server-verified saves (only if leaderboards or online features are planned)

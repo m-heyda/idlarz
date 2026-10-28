@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo, store } from './helpers';
+import { api, freshGame, growTo, openFight, store } from './helpers';
 import { CASTLE_X, CASTLE_Y, REBIRTH } from '../src/config/gameConfig';
 import { ITEM_CATALOG, STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { emptyBag, gearOf } from '../src/lib/inventory';
 import { plainItem } from '../src/lib/itemInstance';
-import { maxHp, newFight } from '../src/lib/combat';
+import { maxHp } from '../src/lib/combat';
 import type { BagSlot } from '../src/types/game';
 import { patchTile } from '../src/utils/world';
 
@@ -24,8 +24,7 @@ test('new game starts with sword and shield equipped, 2 potions and full HP', ()
 	assert.equal(api().playerHp, max());
 	assert.equal(max(), 101);
 	assert.deepEqual(api().monsters, []);
-	assert.equal(api().nextMonsterId, 1);
-	assert.equal(api().fight, null);
+	assert.equal(api().combat.fight, null);
 });
 
 test('equipItem swaps with the equipped item and nothing is lost', () => {
@@ -74,7 +73,8 @@ test('moveBagItem swaps slots and rejects bad indexes', () => {
 
 test('equip actions are refused during a fight', () => {
 	freshGame();
-	store.setState({ bag: bagWith('rattatui_fang_blade'), fight: newFight({ id: 1, type: 'rat', level: 1 }) });
+	store.setState({ bag: bagWith('rattatui_fang_blade') });
+	openFight();
 	assert.equal(api().equipItem(0), false);
 	assert.equal(api().unequipItem('offHand'), false);
 	assert.equal(api().moveBagItem(0, 1), false);
@@ -97,5 +97,5 @@ test('rebirth keeps equipment and bag and refills HP', () => {
 	assert.deepEqual(api().bag, bag);
 	assert.equal(api().playerHp, max());
 	assert.deepEqual(api().monsters, []);
-	assert.equal(api().fight, null);
+	assert.equal(api().combat.fight, null);
 });

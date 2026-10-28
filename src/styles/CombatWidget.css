@@ -1,0 +1,135 @@
+/* The combat panel in the bottom right corner, and the icon it shrinks to. Fight.css holds the bars, numbers and slots they share. */
+
+.combat-widget {
+	width: 300px;
+	max-width: calc(100vw - 32px);
+	padding: 6px 8px 8px;
+	pointer-events: auto;
+}
+
+.combat-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 0 2px 4px;
+	color: #f0d27a;
+}
+
+.combat-min {
+	width: 24px;
+	height: 22px;
+	line-height: 14px;
+	font-weight: 700;
+	color: #f0e6d0;
+	background: #1c120a;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c;
+	cursor: pointer;
+}
+
+.combat-widget .fight-body {
+	gap: 6px;
+	padding: 0;
+}
+
+.combat-stage {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 110px;
+	background: radial-gradient(closest-side, rgba(90, 40, 30, 0.45), transparent);
+	cursor: default;
+	user-select: none;
+}
+
+.combat-idle {
+	padding: 0 12px;
+	text-align: center;
+	font-size: 0.85rem;
+	color: #a89878;
+}
+
+.combat-widget .fight-bar {
+	height: 20px;
+}
+
+.combat-widget .fight-bar-text {
+	font-size: 0.7rem;
+}
+
+.combat-widget .fight-bar[data-kind='mana'] {
+	height: 14px;
+}
+
+.combat-widget .fight-skill {
+	cursor: default;
+	padding: 4px 4px 4px 20px;
+}
+
+.combat-widget .fight-number {
+	font-size: 1.1rem;
+}
+
+.combat-switches {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 0.75rem;
+	color: #d8c8a0;
+}
+
+.combat-switches label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	cursor: pointer;
+}
+
+/* --- the icon --- */
+.combat-icon {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 3px;
+	width: 56px;
+	height: 56px;
+	background: #1c120a;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #5a3f1c, inset 0 0 0 2px #2a1a0c;
+	cursor: pointer;
+}
+
+.combat-icon[data-fighting='true'] {
+	box-shadow: 0 0 0 2px #c0392b, inset 0 0 0 2px #2a1a0c;
+}
+
+.combat-icon-art {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	overflow: hidden;
+}
+
+.combat-icon-swords {
+	font-size: 1.4rem;
+	color: #f0d27a;
+}
+
+.combat-icon-hp {
+	display: block;
+	width: 42px;
+	height: 6px;
+	background: #120a06;
+	border: 1px solid #0a0605;
+}
+
+.combat-icon-hp i {
+	display: block;
+	height: 100%;
+	background: #38a030;
+}

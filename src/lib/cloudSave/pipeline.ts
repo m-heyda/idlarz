@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { STARTING_GEMS } from '@/config/gameConfig';
 import { emptyBank } from '@/lib/offline/tickets';
+import { markConsumedSeen } from '@/lib/offline/fight';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
 import { checkNetWorth } from './netWorth';
@@ -72,6 +73,12 @@ export type SaveOutcome =
 	| { kind: 'conflict'; rev: number; serverSavedAt: number }
 	| { kind: 'invalid'; reason: string }
 	| { kind: 'too_soon'; retryAfterMs: number };
+
+/** Whether the ledger counts potions as drunk that no accepted save has seen yet. */
+const unsavedPotions = (ledger: Ledger): boolean => {
+	const combat = ledger.combat;
+	return !!combat && Object.entries(combat.consumed).some(([id, count]) => count > (combat.consumedSeen[id] ?? 0));
+};
 
 const hashWorld = (land: unknown, extra: unknown): string => createHash('sha256').update(JSON.stringify([land, extra])).digest('hex');
 
@@ -192,10 +199,12 @@ export const acceptSave = async (
 				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1 });
 			} else if (newRun) {
 				// a rebirth or a new game: the map and its monsters start over, so do the tickets, and rolls start again from ordinal 1 in a new run
-				const next: Ledger = { ...ledger, ver: ledger.ver + 1, runId: ledger.runId + 1, rebirths: summary.rebirths, anchorAt: nowMs, bank: emptyBank(nowMs / 1000), ordChest: 0, ordKill: 0, grantedSeen: ledger.granted, lastKey: null, lastResult: null };
+				// (the player's combat starts over too: HP and mana come from the new game, no fight is open)
+				const next: Ledger = { ...ledger, ver: ledger.ver + 1, runId: ledger.runId + 1, rebirths: summary.rebirths, anchorAt: nowMs, bank: emptyBank(nowMs / 1000), ordChest: 0, ordKill: 0, grantedSeen: ledger.granted, lastKey: null, lastResult: null, combat: null };
 				await ledgers.commit(userId, ledger.ver, next);
-			} else if (grants && Object.values(grants).some((amount) => amount > 0)) {
-				await ledgers.commit(userId, ledger.ver, { ...ledger, ver: ledger.ver + 1, grantedSeen: ledger.granted });
+			} else if ((grants && Object.values(grants).some((amount) => amount > 0)) || unsavedPotions(ledger)) {
+				// the save knows what was granted so far, and the potions the server counted as drunk
+				await ledgers.commit(userId, ledger.ver, { ...ledger, ver: ledger.ver + 1, grantedSeen: ledger.granted, combat: ledger.combat ? markConsumedSeen(ledger.combat) : null });
 			}
 		} catch {
 			// the save is stored; the next one brings the ledger up to date

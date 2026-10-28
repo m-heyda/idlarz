@@ -12,10 +12,13 @@ import { applyOfflineGrant } from '../src/lib/offline/apply';
 import { computeOfflineGrant, zeroGrant, type OfflineInput } from '../src/lib/offline/grant';
 import { offlineCapHours, offlineCapSec, offlineEfficiency, offlineMinGapSec } from '../src/lib/offline/limits';
 import { sealedRng } from '../src/lib/offline/seal';
-import { advanceBank, emptyBank, takeChest, takeMonster, ticketCap, TICKET_CAP, type BankContext } from '../src/lib/offline/tickets';
+import { advanceBank, emptyBank, takeChest, takeMonster, ticketCap, TICKET_CAP, type BankContext, type TicketBank } from '../src/lib/offline/tickets';
 import { calculateCombatStats, calculateResourceRates } from '../src/utils/gameUtils';
 import { castleUpgradeDuration } from '../src/utils/gameUtils';
 import type { PrestigeState, Resources } from '../src/types/game';
+
+/** A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none). */
+const openBank = (): TicketBank => ({ ...emptyBank(0), sites: { rat: 1000, king: 1000 } });
 
 const prestige = (upgrades: PrestigeState['upgrades'] = {}): PrestigeState => ({ rebirths: 1, legacyPoints: 0, legacyEarned: 0, upgrades });
 const res = (over: Partial<Resources> = {}): Resources => ({ ...zeroGrant(), ...over });
@@ -143,7 +146,7 @@ const NO_LUCKY = () => () => 0.9999; // never under a lucky chance
 const ALL_LUCKY = () => () => 0;
 
 test('the first rat comes after 2 minutes, the next ones every 15, chests every 10', () => {
-	const hour = advanceBank(emptyBank(0), 3600, ctx(), NO_LUCKY);
+	const hour = advanceBank(openBank(), 3600, ctx(), NO_LUCKY);
 	assert.equal(hour.minted.chests.length, 6);
 	assert.equal(hour.minted.rats.length, 1 + Math.floor((3600 - COMBAT.spawn.firstSec) / COMBAT.spawn.intervalSec));
 	assert.equal(hour.minted.rats[0].at, COMBAT.spawn.firstSec);
@@ -156,8 +159,8 @@ test('the first rat comes after 2 minutes, the next ones every 15, chests every 
 });
 
 test('tickets are the same however the time is cut up', () => {
-	const whole = advanceBank(emptyBank(0), 7200, ctx(), NO_LUCKY).bank;
-	let bank = emptyBank(0);
+	const whole = advanceBank(openBank(), 7200, ctx(), NO_LUCKY).bank;
+	let bank = openBank();
 	for (let i = 0; i < 72; i++) bank = advanceBank(bank, 100, ctx(), NO_LUCKY).bank;
 	assert.deepEqual(bank.chests.map(Math.round), whole.chests.map(Math.round));
 	assert.deepEqual(bank.rats.map((r) => Math.round(r.at)), whole.rats.map((r) => Math.round(r.at)));
@@ -165,8 +168,8 @@ test('tickets are the same however the time is cut up', () => {
 });
 
 test('Luck makes chests come faster', () => {
-	const slow = advanceBank(emptyBank(0), 4 * 3600, ctx({ luck: 0 }), NO_LUCKY).minted.chests.length;
-	const fast = advanceBank(emptyBank(0), 4 * 3600, ctx({ luck: 100 }), NO_LUCKY).minted.chests.length;
+	const slow = advanceBank(openBank(), 4 * 3600, ctx({ luck: 0 }), NO_LUCKY).minted.chests.length;
+	const fast = advanceBank(openBank(), 4 * 3600, ctx({ luck: 100 }), NO_LUCKY).minted.chests.length;
 	assert.ok(fast > slow, `${fast} > ${slow}`);
 });
 
@@ -174,48 +177,53 @@ test('the bank stops when the map is full, and then holds its timers at zero', (
 	const small = ctx({ tilesOwned: 12 });
 	const cap = ticketCap(small);
 	assert.ok(cap >= 2 && cap <= TICKET_CAP);
-	const { bank } = advanceBank(emptyBank(0), 24 * 3600, small, NO_LUCKY);
+	const { bank } = advanceBank(openBank(), 24 * 3600, small, NO_LUCKY);
 	assert.equal(bank.chests.length + bank.rats.length + (bank.king ? 1 : 0), cap);
 	assert.equal(bank.chestAcc, 0);
 	assert.equal(bank.ratAcc, 0);
 });
 
 test('never more than the ticket cap, even on a huge map', () => {
-	const { bank } = advanceBank(emptyBank(0), 72 * 3600, ctx({ tilesOwned: 100000 }), NO_LUCKY);
+	const { bank } = advanceBank(openBank(), 72 * 3600, ctx({ tilesOwned: 100000 }), NO_LUCKY);
 	assert.ok(bank.chests.length + bank.rats.length + (bank.king ? 1 : 0) <= TICKET_CAP);
 });
 
 test('one King at a time, after three hours', () => {
 	const wide = ctx({ tilesOwned: 10000 });
-	const early = advanceBank(emptyBank(0), 3 * 3600 - 1, wide, NO_LUCKY);
+	const early = advanceBank(openBank(), 3 * 3600 - 1, wide, NO_LUCKY);
 	assert.equal(early.bank.king, null);
-	const later = advanceBank(emptyBank(0), 3 * 3600 + 1, wide, NO_LUCKY);
+	const later = advanceBank(openBank(), 3 * 3600 + 1, wide, NO_LUCKY);
 	assert.ok(later.bank.king);
 	const again = advanceBank(later.bank, 9 * 3600, wide, NO_LUCKY);
 	assert.equal(again.minted.king, null, 'the King is still waiting, so no second one');
 });
 
-test('no monsters on a land smaller than the minimum', () => {
-	const { minted } = advanceBank(emptyBank(0), 3600, ctx({ tilesOwned: COMBAT.spawn.minOwnedTiles - 1 }), NO_LUCKY);
-	assert.equal(minted.rats.length, 0);
-	assert.equal(minted.king, null);
+test('no monsters while the land has no tile for them, and they start once it does', () => {
+	const none = advanceBank({ ...emptyBank(0), sites: { rat: 0, king: 0 } }, 3600, ctx(), NO_LUCKY);
+	assert.equal(none.minted.rats.length, 0);
+	assert.equal(none.minted.king, null);
+	const unknown = advanceBank(emptyBank(0), 3600, ctx(), NO_LUCKY);
+	assert.equal(unknown.minted.rats.length, 0, 'the land has not been looked at yet: nothing comes');
+	const some = advanceBank({ ...emptyBank(0), sites: { rat: 3, king: 3 } }, 3600, ctx(), NO_LUCKY);
+	assert.ok(some.minted.rats.length >= 1);
+	assert.ok(some.bank.rats.length + (some.bank.king ? 1 : 0) <= 3, 'never more monsters than tiles for them');
 });
 
 test('lucky rats are decided by the ticket roll, and only the server holds it', () => {
-	assert.ok(advanceBank(emptyBank(0), 3600, ctx(), ALL_LUCKY).minted.rats.every((rat) => rat.lucky));
-	assert.ok(advanceBank(emptyBank(0), 3600, ctx(), NO_LUCKY).minted.rats.every((rat) => !rat.lucky));
+	assert.ok(advanceBank(openBank(), 3600, ctx(), ALL_LUCKY).minted.rats.every((rat) => rat.lucky));
+	assert.ok(advanceBank(openBank(), 3600, ctx(), NO_LUCKY).minted.rats.every((rat) => !rat.lucky));
 });
 
 test('an absence is credited at its efficiency but the tickets are stamped across the real time', () => {
 	// 6 h away at 50 %: the bank runs 3 h, the stamps spread over the 6 h
-	const { bank, minted } = advanceBank(emptyBank(0), 3 * 3600, ctx({ tilesOwned: 10000 }), NO_LUCKY, { realDtSec: 6 * 3600 });
+	const { bank, minted } = advanceBank(openBank(), 3 * 3600, ctx({ tilesOwned: 10000 }), NO_LUCKY, { realDtSec: 6 * 3600 });
 	assert.equal(bank.accAt, 6 * 3600);
 	const lastChest = minted.chests[minted.chests.length - 1];
 	assert.ok(lastChest > 5 * 3600 && lastChest <= 6 * 3600, `${lastChest}`);
 });
 
 test('taking tickets removes exactly one and refuses what does not exist', () => {
-	const { bank } = advanceBank(emptyBank(0), 7200, ctx(), NO_LUCKY);
+	const { bank } = advanceBank(openBank(), 7200, ctx(), NO_LUCKY);
 	const chest = takeChest(bank)!;
 	assert.equal(chest.bank.chests.length, bank.chests.length - 1);
 	assert.equal(chest.at, bank.chests[0], 'the oldest chest goes first');
@@ -225,7 +233,7 @@ test('taking tickets removes exactly one and refuses what does not exist', () =>
 	assert.equal(monster.bank.rats.length, bank.rats.length - 1);
 	assert.equal(takeMonster(monster.bank, bank.rats[0].n), null, 'a ticket is spent once');
 	assert.equal(takeMonster(bank, 9999), null);
-	assert.equal(bank.rats.length, advanceBank(emptyBank(0), 7200, ctx(), NO_LUCKY).bank.rats.length, 'the input bank is never changed');
+	assert.equal(bank.rats.length, advanceBank(openBank(), 7200, ctx(), NO_LUCKY).bank.rats.length, 'the input bank is never changed');
 });
 
 // ---------------------------------------------------------------------------------------------------- sealed rolls

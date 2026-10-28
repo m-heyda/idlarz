@@ -33,9 +33,3 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 };
 
 export const RARITY_ORDER = (Object.keys(RARITIES) as EquipmentRarity[]).sort((a, b) => RARITIES[a].order - RARITIES[b].order);
-
-/** Rarity ids that can be rolled, lowest rank first. */
-export const enabledRarities = (table: Record<string, RarityDef> = RARITIES): RarityDef[] =>
-	Object.values(table)
-		.filter((rarity) => rarity.enabled)
-		.sort((a, b) => a.order - b.order);

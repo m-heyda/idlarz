@@ -89,6 +89,8 @@ interface UiState {
 	showToast: (text: string) => void;
 	/** Remembered view options (localStorage, see lib/uiPrefs): the minimap and the dev admin panel */
 	showMinimap: boolean;
+	/** The combat panel is shrunk to its icon (a win or defeat is still announced) */
+	combatMinimized: boolean;
 	showAdmin: boolean;
 	adminCollapsed: boolean;
 	setPref: (key: UiPrefKey, value: boolean) => void;
@@ -158,5 +160,6 @@ export const useUiStore = create<UiState>((set) => ({
 		set({
 			showAdmin: readPref('showAdmin'),
 			adminCollapsed: readPref('adminCollapsed'),
+			combatMinimized: readPref('combatMinimized'),
 		}),
 }));

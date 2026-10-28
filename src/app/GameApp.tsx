@@ -4,11 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import Grid from '@/components/game/Grid';
 import MenuOverlay from '@/components/game/overlays/MenuOverlay';
-import FightModal from '@/components/game/overlays/FightModal';
 import VictoryToast from '@/components/game/overlays/VictoryToast';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
-import NamePrompt from '@/components/game/overlays/NamePrompt';
 import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/gameConfig';
 import GameHeader from '@/components/game/GameHeader';
@@ -39,9 +37,9 @@ import OfflineDialog from '@/components/game/overlays/OfflineDialog';
 
 interface GameAppProps {
 	/** The account's name and hero, given to a brand-new game only (never to one that has been played). */
-	profile: Profile | null;
-	/** The signed-in account whose cloud save follows this game (null: play without an account, nothing is synced). */
-	userId: string | null;
+	profile: Profile;
+	/** The signed-in account whose cloud save follows this game (the game is played with an account only). */
+	userId: string;
 }
 
 export default function GameApp({ profile, userId }: GameAppProps) {
@@ -66,12 +64,12 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 	// What the absence was worth is claimed before the game starts running and before the first upload (the claim changes the game)
 	const claim = useOfflineClaim(userId, isHydrated && tabStatus === 'owner');
 	useCloudSync(userId, isHydrated && tabStatus === 'owner' && claim === 'done');
-	// ... and from then on the server says when a chest or a monster appears (and what is in it)
+	// ... and from then on the server says when a chest or a monster appears (and what is in it), and runs the fights
 	useSpawnSync(userId, isHydrated && tabStatus === 'owner' && claim === 'done');
 	const applyProfileToFreshGame = useGameStore((state) => state.applyProfileToFreshGame);
 	useEffect(() => {
 		// Before the first tick: a brand-new game becomes the account's character (a played game is never touched)
-		if (!profile || !isHydrated || tabStatus !== 'owner') return;
+		if (!isHydrated || tabStatus !== 'owner') return;
 		applyProfileToFreshGame(profile.characterName, profile.playerClass);
 	}, [profile, isHydrated, tabStatus, applyProfileToFreshGame]);
 
@@ -109,12 +107,9 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<Grid />
 			<FloatingText />
 			<MenuOverlay />
-			<FightModal />
 			<ClassPickerDialog />
 			<LevelUpNotification />
 			<LoadingScreen />
-			{/* with an account the name comes from the profile; the old prompt is only for play without one */}
-				{!profile && <NamePrompt />}
 			<GameDebug />
 			<SaveMenuDialog />
 			<SettingsDialog />

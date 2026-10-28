@@ -1,12 +1,13 @@
-import type { ChestReward, KillReward, SyncResult } from '@/lib/offline/types';
+import type { CombatCommand } from '@/lib/offline/fightTypes';
+import type { ChestReward, FightReply, SyncResult } from '@/lib/offline/types';
 
-// The browser side of /api/spawn, /api/chest and /api/kill: the server decides what exists and what is inside, the browser asks.
+// The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
 
 export type Reply<T> =
 	| { status: 'ok'; value: T }
 	| { status: 'need_claim' } // an absence has to be claimed first (POST /api/offline)
 	| { status: 'no_save' } // no cloud save yet: nothing to ask about
-	| { status: 'not_configured' } // the server has no LOOT_SECRET: it cannot seal rolls, so the game keeps its local spawns
+	| { status: 'not_configured' } // the server has no LOOT_SECRET: it cannot seal rolls
 	| { status: 'unavailable' }; // not set up, an outage, signed out
 
 const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
@@ -29,9 +30,20 @@ const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 	}
 };
 
-export const requestSync = (): Promise<Reply<SyncResult>> => post<SyncResult>('/api/spawn', {});
+/** `since`: the number of the last combat event this browser has applied (leave it out to take none: the answer says where the log stands). */
+export const requestSync = (since?: number): Promise<Reply<SyncResult>> => post<SyncResult>('/api/spawn', since === undefined ? {} : { since });
 
 export const requestChest = (key: string): Promise<Reply<ChestReward>> => post<ChestReward>('/api/chest', { key });
 
-export const requestKill = (key: string, n: number, level: number, dismiss = false): Promise<Reply<KillReward>> =>
-	post<KillReward>('/api/kill', { key, n, level, dismiss });
+/** Carries the player's fight forward and answers with it. */
+export const requestFightSync = (since: number | undefined): Promise<Reply<FightReply>> => post<FightReply>('/api/fight', { action: 'sync', since });
+
+/** A hotkey: drink a potion or cast a skill. One key per press: the server replays the answer if it is sent twice. */
+export const requestUse = (key: string, command: CombatCommand, since: number | undefined): Promise<Reply<FightReply>> => post<FightReply>('/api/fight', { action: 'use', key, command, since });
+
+/** Switches auto-battle and/or auto-use. */
+export const requestAuto = (switches: { autoBattle?: boolean; autoUse?: boolean }, since: number | undefined): Promise<Reply<FightReply>> =>
+	post<FightReply>('/api/fight', { action: 'auto', ...switches, since });
+
+/** Takes a monster off the map with no reward. */
+export const requestDismiss = (key: string, n: number, since: number | undefined): Promise<Reply<FightReply>> => post<FightReply>('/api/fight', { action: 'dismiss', key, n, since });

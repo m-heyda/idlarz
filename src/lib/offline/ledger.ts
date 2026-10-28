@@ -1,4 +1,5 @@
 import { STARTING_GEMS } from '@/config/gameConfig';
+import type { CombatState } from '@/lib/offline/fightTypes';
 import { emptyBank, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
 import type { Resources } from '@/types/game';
 
@@ -48,6 +49,8 @@ export interface Ledger {
 	/** The idempotency key and result of the last claim or redemption: a repeated request (a lost response) gets the same answer */
 	lastKey: string | null;
 	lastResult: unknown;
+	/** The player's combat: HP and mana, cooldowns, the open fight (null until the first combat request seeds it from the save) */
+	combat: CombatState | null;
 }
 
 export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
@@ -63,6 +66,7 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	gems: STARTING_GEMS,
 	lastKey: null,
 	lastResult: null,
+	combat: null,
 });
 
 /** Storage of the ledger: Supabase in the app, a Map in tests. */

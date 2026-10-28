@@ -1,5 +1,5 @@
 -- Idlarz accounts and cloud saves: the schema as it stands on the Supabase project (applied as migrations create_profiles,
--- cloud_save_v2_split, harden_policies_and_rpc, test_account_marker, autosave_history_by_time). Run once in the SQL editor of a fresh project.
+-- cloud_save_v2_split, harden_policies_and_rpc, test_account_marker, autosave_history_by_time, offline_ledger, combat_ledger). Run once in the SQL editor of a fresh project.
 -- Design and rules: docs/09-cloud-saves.md.
 
 -- ---- profiles: character name and hero, owner-only ------------------------------------------------------------------
@@ -115,6 +115,7 @@ create table public.player_ledger (
   gems          integer     not null,                 -- THE gem balance: a save can never raise it
   last_key      text,                                 -- idempotency key of the last claim / redemption ...
   last_result   jsonb,                                -- ... and its answer, replayed when a response got lost
+  combat        jsonb,                                -- HP and mana, cooldowns, the open fight, auto-battle switches, recent events (migration combat_ledger)
   updated_at    timestamptz not null default now(),
   constraint ledger_ver_positive check (ver >= 1),
   constraint ledger_gems_range   check (gems >= 0 and gems <= 1000000000)

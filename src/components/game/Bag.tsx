@@ -14,7 +14,7 @@ import { slotProps } from './itemUi';
 const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) => {
 	const bag = useGameStore((state) => state.bag);
 	const equipItem = useGameStore((state) => state.equipItem);
-	const drinkPotion = useGameStore((state) => state.drinkPotion);
+	const requestPotion = useGameStore((state) => state.requestPotion);
 	const moveBagItem = useGameStore((state) => state.moveBagItem);
 	const unequipItem = useGameStore((state) => state.unequipItem);
 	const sellItem = useGameStore((state) => state.sellItem);
@@ -23,9 +23,10 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 		const slot = bag[index];
 		if (!slot) return;
 		if ('id' in slot && ITEM_CATALOG[slot.id]?.consumable) {
-			if (!drinkPotion(index)) onNotice('Not now - full health or still recovering');
+			if (useGameStore.getState().playerHp >= useGameStore.getState().combat.maxHp && useGameStore.getState().combat.maxHp > 0) onNotice('Already at full health');
+			else requestPotion(slot.id);
 		} else if (!equipItem(index)) {
-			onNotice(useGameStore.getState().fight ? 'Finish the fight first' : 'Cannot equip that');
+			onNotice(useGameStore.getState().combat.fight ? 'Finish the fight first' : 'Cannot equip that');
 		}
 	};
 
@@ -37,7 +38,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 		const def = resolved?.def ?? (slot && 'id' in slot ? ITEM_CATALOG[slot.id] : undefined);
 		if (!slot || !def) return;
 		const ui = useUiStore.getState();
-		const fighting = !!useGameStore.getState().fight;
+		const fighting = !!useGameStore.getState().combat.fight;
 		const items: ContextMenuItem[] = [
 			{ id: 'use', label: def.consumable ? 'Drink' : 'Equip', onSelect: () => activate(index) },
 			{
@@ -60,7 +61,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 		if (!drag) return;
 		if (drag.kind === 'bag') moveBagItem(drag.index, index);
 		else if (!unequipItem(drag.slot as Parameters<typeof unequipItem>[0])) {
-			onNotice(useGameStore.getState().fight ? 'Finish the fight first' : 'Your bag is full');
+			onNotice(useGameStore.getState().combat.fight ? 'Finish the fight first' : 'Your bag is full');
 		}
 	};
 

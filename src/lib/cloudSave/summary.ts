@@ -42,8 +42,7 @@ export interface SaveDerived {
 	/** Total Luck (attributes + Lucky Charm + gear) and the gear's Gold Find %: they decide server-rolled rewards */
 	luck: number;
 	goldFind: number;
-	/** Monsters and chests standing on the map: the ledger is seeded from them the first time it is created */
-	monsters: number;
+	/** Chests standing on the map: the ledger is seeded from them the first time it is created (monsters are the ledger's own) */
 	chests: number;
 	/** What the Legacy upgrades made of the away-time cap (seconds) and efficiency (0-1) */
 	offlineCapSec: number;
@@ -55,7 +54,6 @@ export const DEFAULT_DERIVED: SaveDerived = {
 	ratesAfterCastle: null,
 	luck: 0,
 	goldFind: 0,
-	monsters: 0,
 	chests: 0,
 	offlineCapSec: offlineCapSec(),
 	offlineEfficiency: offlineEfficiency(),
@@ -95,7 +93,6 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			ratesAfterCastle: ratesAfterUpgrade(state),
 			luck: fx.luck,
 			goldFind: fx.goldFind,
-			monsters: state.monsters.length,
 			chests: state.tiles.stats.chests,
 			offlineCapSec: offlineCapSec(limits),
 			offlineEfficiency: offlineEfficiency(limits),

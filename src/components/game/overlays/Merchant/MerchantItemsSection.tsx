@@ -20,7 +20,7 @@ import '@/styles/Inventory.css';
 export const MerchantItemsSection: React.FC = () => {
 	const bag = useGameStore((state) => state.bag);
 	const sellCtx = useGameStore(useShallow((state) => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige })));
-	const fighting = useGameStore((state) => !!state.fight);
+	const fighting = useGameStore((state) => !!state.combat.fight);
 	const sellItem = useGameStore((state) => state.sellItem);
 	const sellJunk = useGameStore((state) => state.sellJunk);
 	const autoSellUpTo = useGameStore((state) => state.autoSellUpTo);

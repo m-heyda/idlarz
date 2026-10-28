@@ -4,7 +4,6 @@ import type { FarmUpgradeId, LegacyUpgradeId, MerchantUpgradeId } from '@/config
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
 import type { SkillId } from '@/catalog/skills';
-import type { CritKind } from '@/lib/combat';
 import type { World } from '@/utils/world';
 
 export type { ItemStats };
@@ -202,23 +201,35 @@ export interface KillSummary {
 	lucky?: boolean;
 }
 
-export type FightPhase = 'active' | 'won' | 'knockedOut' | 'timeout';
-
-export interface FightState {
-	monsterId: number;
+/** What the server says about a won fight, as the victory notice shows it (the bag has already taken the drops) */
+export interface CombatNotice {
+	id: number;
+	kind: 'won' | 'defeated' | 'timeout';
 	type: MonsterType;
-	/** The monster's level when the fight started: its HP, attack and armor stay what that level gave for the whole fight */
 	level: number;
-	monsterHp: number;
-	monsterMaxHp: number;
-	attackTimer: number;
-	timeLeftSec: number | null;
-	potionCd: number;
-	/** Seconds the monster stays stunned: its attack timer does not run (the King's time limit does) */
-	stunLeftSec: number;
-	phase: FightPhase;
 	summary: KillSummary | null;
+	/** A boss's parting words after a defeat or a timeout */
 	taunt: string | null;
+}
+
+/** The browser's copy of the server's combat picture (read-only: the server runs every fight, see src/lib/offline/fight.ts). */
+export interface CombatClientState {
+	/** The fight that is open (null: resting, or nothing to fight) */
+	fight: FightView | null;
+	autoBattle: boolean;
+	autoUse: boolean;
+	/** Seconds left on each cooldown (counted down locally between answers) */
+	cd: Cooldowns;
+	maxHp: number;
+	maxMp: number;
+	/** Seconds until the soonest monster that beat the player is tried again (0: none is waiting out) */
+	retrySec: number;
+	/** Server clock of the picture shown (an older answer than this is ignored) */
+	at: number;
+	/** The last combat event applied: null until the server has said where its log stands */
+	eventNo: number | null;
+	/** The win or defeat the player has not read yet */
+	notice: CombatNotice | null;
 }
 
 export interface TileProps {
@@ -311,7 +322,8 @@ export interface TapResult {
 
 import type { ChestLoot } from '@/lib/chests';
 import type { OfflineReport } from '@/lib/offline/apply';
-import type { ClaimResult, SyncResult } from '@/lib/offline/types';
+import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
+import type { ClaimResult, FightReply, SyncResult } from '@/lib/offline/types';
 
 export interface GameState {
 	previousLevel: number;
@@ -330,14 +342,10 @@ export interface GameState {
 	playerHp: number;
 	/** Mana: spent by skills, refills over time (persisted; clamped to the max on load) */
 	playerMp: number;
-	/** Seconds left on each skill's cooldown (transient: a cooldown never outlives the tab) */
-	skillCd: Partial<Record<SkillId, number>>;
+	/** The monsters the server has put on the map (a mirror of its tickets, see lib/offline/reconcile) */
 	monsters: Monster[];
-	monsterSpawnTimer: number;
-	/** Seconds towards the next boss (counts only while no boss is on the map and there is room) */
-	bossSpawnTimer: number;
-	nextMonsterId: number;
-	fight: FightState | null; // transient: never saved
+	/** The server's picture of the player's fights (transient: asked again on every load) */
+	combat: CombatClientState;
 	farmLevels: Record<string, number>; // animals owned per kind
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
@@ -349,7 +357,6 @@ export interface GameState {
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
 	castleUpgrade: CastleUpgradeState | null;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
-	chestSpawnTimer: number;
 	activeChests: number;
 	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Legacy points of `prestige`. */
 	gems: number;
@@ -383,9 +390,6 @@ export interface GameState {
 	tick: (deltaTime: number) => void;
 	/** Applies what the server paid for an absence (income, castle progress, monster growth) and puts its chests and monsters on the map. Null when there was nothing to apply. */
 	applyOfflineClaim: (result: ClaimResult) => OfflineReport | null;
-	/** True for a signed-in player: chests and monsters come from the server (transient, never saved) */
-	serverSpawns: boolean;
-	setServerSpawns: (on: boolean) => void;
 	/** Brings the map in line with the server's tickets and takes its gem balance; returns what was placed */
 	applyServerTickets: (sync: SyncResult) => { chests: number; monsters: number; strongestLevel: number };
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
@@ -396,12 +400,14 @@ export interface GameState {
 	applyProfileToFreshGame: (name: string, playerClass: PlayerClassId) => boolean;
 	addResources: (resourceToAdd: Partial<Resources>) => void;
 	collectChest: (x: number, y: number) => boolean;
-	startFight: (monsterId: number) => boolean;
-	hitMonster: (input: ClickInput) => { damage: number; killed: boolean; crit: CritKind } | null;
-	leaveFight: () => void;
-	dismissMonster: (id: number) => boolean; // removes a monster from the map, no loot; false for the one being fought
-	drinkPotion: (bagIndex: number) => boolean;
-	castSkill: (id: SkillId) => boolean;
+	/** Hotkeys and switches: each is a request to the server, whose answer changes what is shown */
+	requestPotion: (id: string) => boolean;
+	requestSkill: (id: SkillId) => boolean;
+	setAutoBattle: (on: boolean) => void;
+	setAutoUse: (on: boolean) => void;
+	applyFightReply: (reply: FightReply) => void;
+	clearCombatNotice: () => void;
+	dismissMonster: (id: number) => boolean; // takes a monster off the map, no loot; the server ends the fight against it
 	equipItem: (bagIndex: number) => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;

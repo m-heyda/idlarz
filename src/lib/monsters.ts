@@ -17,7 +17,8 @@ export interface MonsterStats {
 	critMult: number;
 	/** % chance that Stun does not work */
 	stunResist: number;
-	attackIntervalSec: number;
+	/** Attacks per second */
+	attackSpeed: number;
 	rewardSec: number;
 }
 
@@ -49,16 +50,6 @@ export const dangerBonus = (distance: number): number => Math.floor(Math.max(0, 
 /** How far a tile is from the castle, the way the chest placement and the danger bonus measure it. */
 export const castleDistance = (spot: { x: number; y: number }): number => Math.max(Math.abs(spot.x - CASTLE_X), Math.abs(spot.y - CASTLE_Y));
 
-/** The highest level a monster can spawn at in a world this size (the danger bonus cannot exceed what the land could reach), for the server's check of a claimed kill level. */
-export const maxSpawnLevel = (type: MonsterType, castleLevel: number, tilesOwned: number): number =>
-	Math.min(MONSTERS[type].spawnWindow.cap, spawnLevelRange(type, castleLevel).max + dangerBonus(tilesOwned));
-
-/** A new monster standing on `spot`, at a level rolled for the world it appears in (and how far from the castle it stands). */
-export const newMonster = (type: MonsterType, id: number, spot: { x: number; y: number }, castleLevel: number): Monster => {
-	const level = rollSpawnLevel(type, castleLevel, id, castleDistance(spot));
-	return { id, type, level, spawnLevel: level, x: spot.x, y: spot.y, ageSec: 0 };
-};
-
 /** The highest level a monster that appeared at `spawnLevel` can grow to. */
 export const maxLevelOf = (spawnLevel: number, ctx: LimitContext = {}): number => spawnLevel + limitOf('monsterGrowthLevels', ctx);
 
@@ -81,7 +72,7 @@ export const monsterStats = (type: MonsterType, level: number): MonsterStats => 
 		critChance: d.critChance,
 		critMult: d.critMult,
 		stunResist: d.stunResist,
-		attackIntervalSec: d.attackIntervalSec,
+		attackSpeed: d.attackSpeed,
 		rewardSec: d.rewardSec * Math.pow(d.rewardPerLevel, steps),
 	};
 };
@@ -90,43 +81,46 @@ export const monsterAt = (monsters: Monster[], x: number, y: number): Monster | 
 	monsters.find((mon) => mon.x === x && mon.y === y);
 
 /**
- * A random owned tile without the castle, a chest, a monster or a building on it, not a lake, and outside the castle's ward
- * from level 7. (A chest may lie on a lake - it is drawn as a glowing ripple there - but a monster cannot stand on water.)
+ * Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance
+ * (Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are `MonsterDef.spawn`.
  */
-export const pickSpawnTile = (
-	tiles: World,
-	monsters: Monster[],
-	rng: () => number
-): { x: number; y: number } | null => {
-	const taken = new Set(monsters.map((mon) => `${mon.x},${mon.y}`));
+export const canSpawnOn = (
+	type: MonsterType,
+	x: number,
+	y: number,
+	tile: { biome: string; building?: string; hasChest?: boolean },
+	castleLevel: number,
+	rebirths = 0
+): boolean => {
+	const rule = monsterDef(type).spawn;
+	if (rebirths < (rule.minRebirths ?? 0)) return false;
+	if (!(rule.biomes as readonly string[]).includes(tile.biome)) return false;
+	const distance = castleDistance({ x, y });
+	return distance >= rule.minCastleDistance && distance <= rule.maxCastleDistance && !tile.building && !tile.hasChest && !isInWard(x, y, castleLevel);
+};
+
+/** Every owned tile a monster of this type may appear on, not counting the `taken` ones ("x,y" keys of monsters already standing). */
+export const spawnTiles = (type: MonsterType, tiles: World, taken: ReadonlySet<string>, rebirths = 0): { x: number; y: number }[] => {
 	const castleLevel = castleLevelOf(tiles);
 	const eligible: { x: number; y: number }[] = [];
 	for (const { x, y, tile } of ownedRowMajor(tiles)) {
-		if (
-			tile.biome !== 'castle' &&
-			tile.biome !== 'lake' &&
-			!tile.building &&
-			!tile.hasChest &&
-			!taken.has(`${x},${y}`) &&
-			!isInWard(x, y, castleLevel)
-		) {
-			eligible.push({ x, y });
-		}
+		if (!taken.has(`${x},${y}`) && canSpawnOn(type, x, y, tile, castleLevel, rebirths)) eligible.push({ x, y });
 	}
+	return eligible;
+};
+
+/** A random tile of `spawnTiles`, or null when there is none. */
+export const pickSpawnTile = (type: MonsterType, tiles: World, taken: ReadonlySet<string>, rng: () => number, rebirths = 0): { x: number; y: number } | null => {
+	const eligible = spawnTiles(type, tiles, taken, rebirths);
 	return eligible.length === 0 ? null : eligible[Math.floor(rng() * eligible.length) % eligible.length];
 };
 
-/** Seconds the spawn timer must reach before the next monster appears. */
-export const spawnThreshold = (nextMonsterId: number): number =>
-	nextMonsterId === 1 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec;
-
 /**
- * Ages every monster (except `frozenId`, the one being fought) and raises its level as it earns growth. There is no random
- * element: a monster of an age always has the same level.
+ * Ages every monster and raises its level as it earns growth. There is no random element: a monster of an age always has the
+ * same level. (The server ages its tickets the same way; this keeps the picture on the map moving between two answers.)
  */
-export const advanceMonsters = (monsters: Monster[], dtSec: number, frozenId: number | null, ctx: LimitContext = {}): Monster[] =>
+export const advanceMonsters = (monsters: Monster[], dtSec: number, ctx: LimitContext = {}): Monster[] =>
 	monsters.map((mon) => {
-		if (mon.id === frozenId) return mon;
 		const ageSec = mon.ageSec + dtSec;
 		return { ...mon, ageSec, level: levelAtAge(mon.spawnLevel, ageSec, ctx) };
 	});
@@ -138,9 +132,3 @@ export const growthSecondsLeft = (mon: Monster, ctx: LimitContext = {}): number 
 	return interval * (mon.level - mon.spawnLevel + 1) - mon.ageSec;
 };
 
-/** Seconds the boss timer must reach before the next boss appears. */
-export const bossThreshold = (): number => COMBAT.spawn.bossIntervalSec;
-
-/** The kind of boss that appears next: one at a time, so the first kind that is not on the map (only the Rat King for now). */
-export const nextBossType = (monsters: Monster[]): MonsterType | null =>
-	(Object.keys(MONSTERS) as MonsterType[]).find((type) => isBoss(type) && !monsters.some((mon) => mon.type === type)) ?? null;

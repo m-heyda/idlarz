@@ -57,7 +57,7 @@ test('a played game survives encode -> decode exactly', () => {
 	if (!result.ok) return;
 	assert.equal(result.savedAt, 1_700_000_000_000);
 	assert.equal(result.schema, SAVE_SCHEMA);
-	for (const key of ['tiles', 'resources', 'bag', 'equipment', 'monsters', 'farmLevels', 'prestige', 'freeTiles', 'playerName', 'activeChests'] as const) {
+	for (const key of ['tiles', 'resources', 'bag', 'equipment', 'farmLevels', 'prestige', 'freeTiles', 'playerName', 'activeChests'] as const) {
 		assert.deepEqual(result.state[key], game[key], key);
 	}
 	assert.equal(result.state.playerName, 'Zoë', 'non-ASCII survives the base64 text');

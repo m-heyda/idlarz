@@ -11,7 +11,7 @@ import { fetchCloud, readLink, writeLink } from '@/lib/cloudClient';
 import { planStart, type CloudInfo } from '@/lib/startPlan';
 import { archiveForNewGame, installSave, peekSave, type SavePeek } from '@/lib/saveStorage';
 
-// The game (and its save hydration) is only loaded once the gate lets the player in: a guest never touches a save.
+// The game (and its save hydration) is only loaded once the gate lets the player in: the game is played with an account only.
 const GameApp = dynamic(() => import('./GameApp'), { ssr: false, loading: () => <LoadingView /> });
 
 interface Player {
@@ -27,14 +27,14 @@ type Phase =
 	| { name: 'profile' } // signed in but the profile row is missing
 	| { name: 'unavailable'; reason: UnavailableReason }
 	| HubPhase
-	| { name: 'game'; player: Player | null };
+	| { name: 'game'; player: Player };
 
 /** The gate in front of the game: login / register, then Continue / choose / New Game when a save exists here or in the account. */
 export default function Home() {
 	const [phase, setPhase] = useState<Phase>({ name: 'checking' });
 
-	const enterGame = useCallback((player: Player | null) => {
-		writeEntered(player ? 'account' : 'offline');
+	const enterGame = useCallback((player: Player) => {
+		writeEntered('account');
 		setPhase({ name: 'game', player });
 	}, []);
 
@@ -56,15 +56,10 @@ export default function Home() {
 		[enterGame],
 	);
 
-	/**
-	 * Who is signed in. `quiet` keeps the current screen while it looks (the "accounts unavailable" dialog retrying).
-	 * A tab that went offline because accounts were down looks again on every load: while they stay down it keeps playing
-	 * offline, and once they are back it returns to the account flow, so a session is never lost to one outage.
-	 */
+	/** Who is signed in. `quiet` keeps the current screen while it looks (the "accounts unavailable" dialog retrying). */
 	const check = useCallback(async (quiet = false) => {
 		if (!quiet) setPhase({ name: 'checking' });
 		const result = await fetchMe();
-		if (readEntered() === 'offline' && result.status === 'unavailable') return enterGame(null);
 		if (result.status === 'guest') return setPhase({ name: 'guest' });
 		if (result.status !== 'ok') return setPhase({ name: 'unavailable', reason: result.status === 'unavailable' ? result.reason : 'outage' });
 		if (!result.profile) return setPhase({ name: 'profile' });
@@ -107,7 +102,7 @@ export default function Home() {
 		case 'profile':
 			return <StartDialog startMode='profile' onSignedIn={signedIn}onUnavailable={() => setPhase({ name: 'unavailable', reason: 'outage' })} />;
 		case 'unavailable':
-			return <AuthUnavailable reason={phase.reason} onRetry={() => check(true)} onPlayOffline={() => enterGame(null)} />;
+			return <AuthUnavailable reason={phase.reason} onRetry={() => check(true)} />;
 		case 'hub':
 			return (
 				<SaveHub
@@ -129,6 +124,6 @@ export default function Home() {
 				/>
 			);
 		case 'game':
-			return <GameApp profile={phase.player?.profile ?? null} userId={phase.player?.userId ?? null} />;
+			return <GameApp profile={phase.player.profile} userId={phase.player.userId} />;
 	}
 }

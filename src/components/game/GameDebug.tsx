@@ -12,10 +12,8 @@ import { addGear, addToBag } from '@/lib/inventory';
 import { plainItem, resolveItem } from '@/lib/itemInstance';
 import { generateLoot, receiveDrops } from '@/lib/loot';
 import { maxHp } from '@/lib/combat';
-import { isBoss, newMonster, pickSpawnTile } from '@/lib/monsters';
-import { MONSTERS } from '@/config/combatConfig';
 import { calculateResourceRates, calculateXpGain, countOwnedTiles, economyTiles } from '@/utils/gameUtils';
-import type { MonsterType, Resources } from '@/types/game';
+import type { Resources } from '@/types/game';
 import PixelIcon from './PixelIcon';
 
 type Tone = 'gold' | 'red' | 'blue' | 'gray' | '';
@@ -38,17 +36,6 @@ const spawnChest = () => {
 		activeChests: st.activeChests + 1,
 	}));
 	toast(`Chest spawned at tile (${spot.x}, ${spot.y})`);
-};
-
-const spawnMonster = (type: MonsterType) => {
-	const state = useGameStore.getState();
-	if (isBoss(type) && state.monsters.some((m) => m.type === type)) return toast(`There is already a ${MONSTERS[type].label} on the map`);
-	const spot = pickSpawnTile(state.tiles, state.monsters, Math.random);
-	if (!spot) return toast('No free explored tile for a monster: buy more tiles first');
-	useGameStore.setState({
-		monsters: [...state.monsters, newMonster(type, state.nextMonsterId, spot, castleLevelOf(state.tiles))],
-		nextMonsterId: state.nextMonsterId + 1,
-	});
 };
 
 const giveSet = () => {
@@ -141,8 +128,6 @@ const GROUPS: { title: string; actions: DebugAction[] }[] = [
 		title: 'Spawn',
 		actions: [
 			{ label: 'Chest', tone: 'blue', run: spawnChest },
-			{ label: 'Rat', tone: 'red', run: () => spawnMonster('rat') },
-			{ label: 'Rat King', tone: 'red', run: () => spawnMonster('ratKing') },
 			{ label: 'Rattatui set', tone: '', run: giveSet },
 			{ label: 'Loot: rat lv 9', tone: 'gray', run: () => rollLoot('rat', 9) },
 			{ label: 'Loot: Rat King', tone: 'gray', run: () => rollLoot('ratKing', 15) },

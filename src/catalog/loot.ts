@@ -1,10 +1,6 @@
-import type { ItemDef } from '@/types/game';
 import { ITEMS } from './items';
 
-// What drops where is loot config (lootConfig.ts) run by src/lib/loot; this file keeps the small item-kind helpers and the shop list.
-
-export const isConsumable = (def: ItemDef): boolean => def.kind === 'consumable';
-export const isGear = (def: ItemDef): boolean => def.kind !== 'consumable';
+// What drops where is loot config (lootConfig.ts) run by src/lib/loot; this file keeps the shop list.
 
 /** Items the merchant sells, cheapest first. */
 export const shopItems = (): { id: string; price: number }[] =>

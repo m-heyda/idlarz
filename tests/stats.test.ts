@@ -7,7 +7,7 @@ import {
 	armorOf,
 	attacksPerSecond,
 	damageMultiplier,
-	damagePerClick,
+	damagePerHit,
 	damagePerSecond,
 	leechHeal,
 	lifeLeechPercent,
@@ -39,7 +39,7 @@ test('a fresh character has no attribute bonuses: it plays exactly like before t
 	assert.equal(statArmor(fresh), 0);
 	assert.equal(critDamagePercent(fresh), 0);
 	assert.equal(atkSpeedPercent(fresh), 0);
-	assert.equal(damagePerClick(STARTER_EQUIPMENT, fresh), 6);
+	assert.equal(damagePerHit(STARTER_EQUIPMENT, fresh), 6);
 	assert.equal(armorOf(STARTER_EQUIPMENT, fresh), 2);
 	assert.equal(maxHp(fresh, STARTER_EQUIPMENT), 101);
 	assert.deepEqual(rollHit(fresh, STARTER_EQUIPMENT, () => 0), { damage: 6, crit: 'none' });
@@ -53,19 +53,19 @@ test('Strength adds 2% to physical weapon damage per point above 5, and nothing 
 	const strong = character({ strength: 15 });
 	assert.equal(physicalDamagePercent(strong), 20);
 	assert.equal(damageMultiplier(sword, strong), 1.2);
-	assert.equal(damagePerClick(sword, strong), 7.2);
-	assert.equal(damagePerClick(staff, strong), damagePerClick(staff, fresh), 'a staff ignores Strength');
+	assert.equal(damagePerHit(sword, strong), 7.2);
+	assert.equal(damagePerHit(staff, strong), damagePerHit(staff, fresh), 'a staff ignores Strength');
 	assert.equal(weaponDamageType({}), 'physical', 'bare hands are physical');
-	assert.equal(damagePerClick({}, strong), 1, 'but they deal the flat 1 whatever the bonus');
+	assert.equal(damagePerHit({}, strong), 1, 'but they deal the flat 1 whatever the bonus');
 });
 
 test('Intelligence adds 2.4% to magic weapon damage per point above 5: 1.2x the physical rate, and nothing to physical weapons', () => {
 	assert.equal(STAT_RULES.magicDamagePerIntelligence / STAT_RULES.physicalDamagePerStrength, 1.2);
 	const wise = character({ intelligence: 15 });
 	assert.equal(magicDamagePercent(wise), 24);
-	assert.equal(damagePerClick(staff, wise), Math.round(8 * 1.24 * 10) / 10);
-	assert.equal(damagePerClick(wand, wise), Math.round(5 * 1.24 * 10) / 10);
-	assert.equal(damagePerClick(sword, wise), 6, 'a sword ignores Intelligence');
+	assert.equal(damagePerHit(staff, wise), Math.round(8 * 1.24 * 10) / 10);
+	assert.equal(damagePerHit(wand, wise), Math.round(5 * 1.24 * 10) / 10);
+	assert.equal(damagePerHit(sword, wise), 6, 'a sword ignores Intelligence');
 	assert.equal(weaponDamageType(staff), 'magic');
 	assert.equal(weaponDamageType(wand), 'magic');
 	assert.equal(weaponDamageType(sword), 'physical');

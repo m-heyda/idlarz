@@ -15,9 +15,9 @@ import { registerCloudSaver } from '@/lib/manualCloudSave';
  * stays the primary copy; a failed upload is retried with backoff.
  * Stops for the session when the account's save moved on elsewhere (409), the server refuses this save, or the login is gone.
  */
-export const useCloudSync = (userId: string | null, active: boolean) => {
+export const useCloudSync = (userId: string, active: boolean) => {
 	useEffect(() => {
-		if (!userId || !active) return;
+		if (!active) return;
 		let lastSentPlay = -1;
 
 		const push = async (reason: PushReason): Promise<PushOutcome> => {

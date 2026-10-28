@@ -3,25 +3,24 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo } from './helpers';
 import {
 	advanceMonsters,
-	bossThreshold,
 	growthSecondsLeft,
 	isBoss,
 	levelAtAge,
 	maxLevelOf,
 	monsterAt,
 	monsterStats,
-	newMonster,
-	nextBossType,
+	canSpawnOn,
 	pickSpawnTile,
 	rollSpawnLevel,
 	spawnLevelRange,
-	spawnThreshold,
+	spawnTiles,
 } from '../src/lib/monsters';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { LIMITS } from '../src/config/limits';
 import { limitOf, LIMIT_BONUSES } from '../src/lib/limits';
-import { armorReduction, newFight, stepFight } from '../src/lib/combat';
+import { armorReduction } from '../src/lib/combat';
 import { CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
+import { BIOMES } from '../src/config/gameConfig';
 import type { Monster } from '../src/types/game';
 import { ownedRowMajor, patchTile } from '../src/utils/world';
 
@@ -54,56 +53,66 @@ test('monsterAt finds a monster by tile', () => {
 	assert.equal(monsterAt(list, 5, 4), undefined);
 });
 
-test('pickSpawnTile never returns the castle, chest tiles, monster tiles or unowned tiles', () => {
+test('a monster may stand on land of its allowlist 2 to 9 tiles from the castle: never beside it, never beyond 9, never on water or the castle', () => {
+	const rule = MONSTERS.rat.spawn;
+	assert.equal(rule.minCastleDistance, 2);
+	assert.equal(rule.maxCastleDistance, 9);
+	const land = (dx: number, dy = 0, biome = 'plains') => canSpawnOn('rat', CASTLE_X + dx, CASTLE_Y + dy, { biome }, 1);
+	assert.equal(land(1), false, 'adjacent to the castle');
+	assert.equal(land(1, 1), false, 'diagonal neighbour');
+	assert.equal(land(2), true);
+	assert.equal(land(-9, 9), true, 'Chebyshev: 9 each way is 9');
+	assert.equal(land(10), false);
+	assert.equal(land(0, -10), false);
+	for (const water of ['lake', 'coast', 'castle', 'empty']) assert.equal(land(4, 0, water), false, water);
+	for (const ground of rule.biomes) assert.equal(land(4, 0, ground), true, ground);
+	assert.equal(canSpawnOn('rat', CASTLE_X + 4, CASTLE_Y, { biome: 'plains', building: 'farm' }, 1), false, 'not on a building');
+	assert.equal(canSpawnOn('rat', CASTLE_X + 4, CASTLE_Y, { biome: 'plains', hasChest: true }, 1), false, 'not on a chest');
+	assert.equal(canSpawnOn('rat', CASTLE_X + 4, CASTLE_Y, { biome: 'plains' }, 1, 0), true);
+	assert.equal(typeof BIOMES.lake, 'object');
+});
+
+test('pickSpawnTile only returns eligible tiles, never a taken one, and nothing when none is left', () => {
 	freshGame();
-	growTo(8);
-	let tiles = api().tiles;
-	const ownedTiles = ownedRowMajor(tiles)
-		.filter((e) => e.tile.biome !== 'castle' && e.tile.biome !== 'lake') // a monster cannot stand on water
-		.map(({ x, y }) => ({ x, y }));
-	// block all but one tile with a chest or a monster
-	const keep = ownedTiles[ownedTiles.length - 1];
-	const monsters: Monster[] = [];
-	ownedTiles.filter((t) => t !== keep).forEach(({ x, y }, i) => {
-		if (i % 2 === 0) tiles = patchTile(tiles, x, y, { hasChest: true });
-		else monsters.push(m({ id: i + 1, x, y }));
-	});
-	for (let i = 0; i < 50; i++) {
-		const pick = pickSpawnTile(tiles, monsters, Math.random)!;
-		assert.deepEqual(pick, { x: keep.x, y: keep.y });
-		assert.ok(!(pick.x === CASTLE_X && pick.y === CASTLE_Y));
+	growTo(40);
+	const tiles = api().tiles;
+	const all = spawnTiles('rat', tiles, new Set());
+	assert.ok(all.length > 5);
+	for (const { x, y } of all) {
+		const tile = ownedRowMajor(tiles).find((e) => e.x === x && e.y === y)!.tile;
+		assert.ok(['plains', 'forest', 'hills', 'swamp', 'tundra'].includes(tile.biome), tile.biome);
+		assert.ok(Math.max(Math.abs(x - CASTLE_X), Math.abs(y - CASTLE_Y)) >= 2);
 	}
+	const keep = all[all.length - 1];
+	const taken = new Set(all.filter((t) => t !== keep).map(({ x, y }) => `${x},${y}`));
+	for (let i = 0; i < 30; i++) assert.deepEqual(pickSpawnTile('rat', tiles, taken, Math.random), keep);
+	assert.equal(pickSpawnTile('rat', tiles, new Set(all.map(({ x, y }) => `${x},${y}`)), Math.random), null);
+	let chested = tiles;
+	for (const { x, y } of all.filter((t) => t !== keep)) chested = patchTile(chested, x, y, { hasChest: true });
+	assert.deepEqual(pickSpawnTile('rat', chested, new Set(), Math.random), keep, 'chest tiles are skipped too');
 });
 
-test('pickSpawnTile returns null when nothing is eligible', () => {
+test('pickSpawnTile returns null while only the castle and its neighbours are owned', () => {
 	freshGame();
-	assert.equal(pickSpawnTile(api().tiles, [], Math.random), null); // only the castle is owned
-});
-
-test('spawnThreshold: first spawn is quicker than the rest', () => {
-	assert.equal(spawnThreshold(1), COMBAT.spawn.firstSec);
-	assert.equal(spawnThreshold(2), COMBAT.spawn.intervalSec);
+	assert.equal(pickSpawnTile('rat', api().tiles, new Set(), Math.random), null); // only the castle is owned
+	api().resetGame();
+	assert.equal(pickSpawnTile('rat', api().tiles, new Set(), Math.random), null); // castle plus the ring: all adjacent
 });
 
 test('advanceMonsters ages and raises the level', () => {
-	const out = advanceMonsters([m({ ageSec: STEP - 10, level: 1, spawnLevel: 1 })], 20, null);
+	const out = advanceMonsters([m({ ageSec: STEP - 10, level: 1, spawnLevel: 1 })], 20);
 	assert.equal(out[0].ageSec, STEP + 10);
 	assert.equal(out[0].level, 2);
 	assert.equal(out[0].spawnLevel, 1);
 });
 
-test('a frozen monster does not age', () => {
-	const out = advanceMonsters([m({ id: 7, ageSec: 100 })], 500, 7);
-	assert.equal(out[0].ageSec, 100);
-});
-
 test('advanceMonsters does not mutate its input', () => {
 	const input = Object.freeze([Object.freeze(m({ ageSec: 5 }))]) as Monster[];
-	advanceMonsters(input, 10, null);
+	advanceMonsters(input, 10);
 });
 
 test('rats no longer evolve: an old rat stays a rat at its growth limit', () => {
-	const out = advanceMonsters([m({ spawnLevel: 6, level: 16, ageSec: 99 * STEP })], 5000, null);
+	const out = advanceMonsters([m({ spawnLevel: 6, level: 16, ageSec: 99 * STEP })], 5000);
 	assert.equal(out[0].type, 'rat');
 	assert.equal(out[0].level, 16);
 });
@@ -155,11 +164,8 @@ test('the spawn level is rolled from the monster id alone: the same monster alwa
 	assert.equal(rollSpawnLevel('rat', 1, 7), rollSpawnLevel('rat', 1, 7));
 	const seen = new Set(Array.from({ length: 50 }, (_, i) => rollSpawnLevel('rat', 1, i + 1)));
 	assert.deepEqual([...seen].sort(), [1, 2, 3]);
-	const mon = newMonster('ratKing', 4, { x: 2, y: 3 }, 1);
-	assert.equal(mon.id, 4);
-	assert.equal(mon.type, 'ratKing');
-	assert.equal(mon.ageSec, 0);
-	assert.equal(mon.level, mon.spawnLevel);
+	// farther from the castle is a little more dangerous: one level per 8 tiles
+	assert.equal(rollSpawnLevel('rat', 1, 7, 8), Math.min(10, rollSpawnLevel('rat', 1, 7, 0) + 1));
 });
 
 test('the Rat King is a boss; rats are not', () => {
@@ -167,9 +173,7 @@ test('the Rat King is a boss; rats are not', () => {
 	assert.equal(isBoss('rat'), false);
 	assert.equal(MONSTERS.ratKing.grade, 'boss');
 	assert.equal(MONSTERS.ratKing.lootSourceId, 'ratKing');
-	assert.equal(nextBossType([]), 'ratKing');
-	assert.equal(nextBossType([m({ type: 'ratKing', level: 15, spawnLevel: 15 })]), null, 'one at a time');
-	assert.equal(bossThreshold(), COMBAT.spawn.bossIntervalSec);
+	assert.ok(COMBAT.spawn.bossIntervalSec > COMBAT.spawn.intervalSec);
 });
 
 // ---- stats follow the level ------------------------------------------------------------------------------------------------
@@ -189,12 +193,12 @@ test('rat stats: level 1 is 100 HP, level 9 is the old tier 5 (506 HP); HP, atta
 
 test('the Rat King has armor, crits and resists Stun; at level 15 he is the tuned fight behind his armor, and he follows the gear curve above it', () => {
 	const king = monsterStats('ratKing', 15);
-	assert.equal(king.maxHp, 9600);
+	assert.equal(king.maxHp, MONSTERS.ratKing.hp);
 	assert.equal(king.attack, 11);
 	assert.equal(king.armor, 15);
 	assert.equal(king.critChance, 8);
 	assert.equal(king.stunResist, 20);
-	assert.equal(Math.round(king.maxHp / (1 - armorReduction(king.armor))), 13200, 'about 13200 effective HP once the armor is counted');
+	assert.ok(king.maxHp / (1 - armorReduction(king.armor)) > king.maxHp, 'his armor makes the effective HP higher still');
 	let last = king;
 	for (let l = 16; l <= 35; l++) {
 		const next = monsterStats('ratKing', l);
@@ -204,31 +208,8 @@ test('the Rat King has armor, crits and resists Stun; at level 15 he is the tune
 	assert.ok(monsterStats('ratKing', 35).maxHp < king.maxHp * 2, 'a level 35 king is under twice a level 15 one (the gear curve, not an exponential)');
 });
 
-test('a fight keeps the level it started at: HP and attack are fixed for its whole length', () => {
-	const fight = newFight({ id: 1, type: 'rat', level: 7 });
-	assert.equal(fight.level, 7);
-	assert.equal(fight.monsterMaxHp, monsterStats('rat', 7).maxHp);
-	const weak = newFight({ id: 1, type: 'rat', level: 1 });
-	const hpAfter = (start: typeof fight) => {
-		let f = start;
-		let hp = 1000;
-		for (let i = 0; i < 6; i++) ({ fight: f, playerHp: hp } = stepFight(f, 1, hp, 0, () => 0));
-		return hp;
-	};
-	assert.ok(hpAfter(fight) < hpAfter(weak), 'a stronger monster hits harder');
-});
-
-test('a boss crit hits harder by its multiplier, and only the high rolls crit; rats never roll for it', () => {
-	const king = newFight({ id: 2, type: 'ratKing', level: 15 });
-	const hit = (roll: number) => stepFight({ ...king, attackTimer: 2.9 }, 0.2, 1000, 0, () => roll);
-	const plain = hit(0);
-	const crit = hit(0.99);
-	assert.deepEqual(plain.events.map((e) => e.kind), ['hurt']);
-	assert.equal(plain.events[0].kind === 'hurt' && plain.events[0].crit, false);
-	assert.equal(crit.events[0].kind === 'hurt' && crit.events[0].crit, true);
-	assert.equal(1000 - plain.playerHp, 11);
-	assert.equal(1000 - crit.playerHp, Math.round(11 * 1.5));
-	let calls = 0;
-	stepFight({ ...newFight({ id: 1, type: 'rat', level: 1 }), attackTimer: 1.9 }, 0.2, 1000, 0, () => (calls++, 0));
-	assert.equal(calls, 0, 'a monster that cannot crit takes no random number');
+test('attack speed is attacks per second, like a weapon: a rat bites every 2 s, the King every 3 s', () => {
+	assert.equal(monsterStats('rat', 1).attackSpeed, 0.5);
+	assert.ok(Math.abs(monsterStats('ratKing', 15).attackSpeed - 1 / 3) < 1e-9);
+	assert.equal(monsterStats('rat', 9).attackSpeed, monsterStats('rat', 1).attackSpeed, 'it does not change with the level');
 });

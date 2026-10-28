@@ -5,7 +5,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL } from '@/config/itemCatalog';
 import { MERCHANT_GOODS } from '@/config/gameConfig';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
-import { armorOf, armorReduction, critOdds, damagePerClick, maxHp } from '@/lib/combat';
+import { armorOf, armorReduction, critOdds, damagePerHit, maxHp } from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { effectiveStats } from '@/lib/effectiveStats';
@@ -27,14 +27,14 @@ const CharacterOverlay: React.FC = () => {
 	const equipItem = useGameStore((state) => state.equipItem);
 	const prestige = useGameStore((state) => state.prestige);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
-	const castSkill = useGameStore((state) => state.castSkill);
-	const skillCd = useGameStore((state) => state.skillCd);
+	const requestSkill = useGameStore((state) => state.requestSkill);
+	const skillCd = useGameStore((state) => state.combat.cd);
 	const level = useGameStore((state) => state.level.level);
 	const unequipItem = useGameStore((state) => state.unequipItem);
 	const openClassDialog = useUiStore((state) => state.openClassDialog);
 	const setNotice = useUiStore((state) => state.showToast);
 
-	const blocked = () => (useGameStore.getState().fight ? 'Finish the fight first' : null);
+	const blocked = () => (useGameStore.getState().combat.fight ? 'Finish the fight first' : null);
 
 	const takeOff = (slot: EquipmentSlot) => {
 		if (!equipment[slot]) return;
@@ -82,7 +82,7 @@ const CharacterOverlay: React.FC = () => {
 				className='inv-ability'
 				data-locked={locked}
 				disabled={locked || skill.fightOnly}
-				onClick={() => castSkill(id)}
+				onClick={() => requestSkill(id)}
 				title={`${skill.name}: ${skillDescription(skill)} (${detail})`}>
 				<span className='inv-ability-name'>{skill.name}</span>
 				<span className='inv-ability-sub'>{locked ? `Lv ${skill.unlockLevel}` : cd > 0 ? `${cd} s` : `${skill.manaCost} MP`}</span>
@@ -125,7 +125,7 @@ const CharacterOverlay: React.FC = () => {
 				<div className='inv-readouts eq-readouts'>
 					<div className='inv-readout'>
 						<span className='inv-readout-label'>Damage</span>
-						<span className='inv-readout-value'>{formatCompact(damagePerClick(equipment, characterStats))}</span>
+						<span className='inv-readout-value'>{formatCompact(damagePerHit(equipment, characterStats))}</span>
 					</div>
 					<div className='inv-readout' title={`${formatPct(mitigation, 0)} less damage taken (armor has diminishing returns past ${Math.round(COMBAT.armorSoftCap * 100)}% and never gives more than 75%)`}>
 						<span className='inv-readout-label'>Armor</span>

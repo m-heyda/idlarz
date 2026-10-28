@@ -6,8 +6,10 @@ import { encodeSave } from '../src/lib/saveFormat';
 import { acceptSave, type SaveRepo, type StatsRow, type StoredSave, type WorldPart } from '../src/lib/cloudSave/pipeline';
 import type { Ledger, LedgerRepo } from '../src/lib/offline/ledger';
 import { claimOffline, type ServiceDeps } from '../src/lib/offline/service';
-import { redeemChest, redeemKill, syncTickets, type Online } from '../src/lib/offline/online';
-import { maxSpawnLevel } from '../src/lib/monsters';
+import { fightStep, redeemChest, syncTickets, type Online } from '../src/lib/offline/online';
+import { castleDistance } from '../src/lib/monsters';
+import { MONSTERS } from '../src/config/combatConfig';
+import type { FightReply } from '../src/lib/offline/types';
 
 const memory = () => {
 	const rows = new Map<string, StoredSave>();
@@ -60,10 +62,11 @@ const ok = <T>(out: Online<T>): T => {
 	return (out as { kind: 'ok'; value: T }).value;
 };
 
-/** A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save. */
-const playing = async (minutes: number, id = 'u1') => {
+/** A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save. Auto-battle is off unless asked, so the monsters stay for the tests to look at. */
+const playing = async (minutes: number, id = 'u1', autoBattle = false) => {
 	const m = memory();
 	await save(m, id, game(), 0, T0);
+	if (!autoBattle) ok(await fightStep(m.deps, id, null, { action: 'auto', autoBattle: false }, T0 + 1000));
 	// the player stays around: the game asks the server every ten minutes or so, which is what keeps "last seen" fresh
 	for (let t = 10; t < minutes; t += 10) ok(await syncTickets(m.deps, id, T0 + t * MIN));
 	const now = T0 + minutes * MIN;
@@ -135,38 +138,54 @@ test('gems found in chests raise the server balance and are never flagged in the
 	assert.equal(ledger.granted.gems, found);
 });
 
-test('a kill is paid against its ticket; the reward comes from the server and a ticket is spent once', async () => {
-	const { m, now } = await playing(25);
+test('the server puts every monster on land: 2 to 9 tiles from the castle, never on water, and gives it the level it appeared at', async () => {
+	const { m, now } = await playing(60 * 5);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
-	const ticket = sync.tickets.rats[0];
-	const kill = ok(await redeemKill(m.deps, 'u1', 'kill-key-0001', { n: ticket.n, level: 2 }, now + 1000));
-	assert.ok(kill.ok && !kill.dismissed);
-	if (kill.ok && !kill.dismissed) {
-		assert.ok(kill.gold >= 10 && kill.xp >= 5);
-		assert.equal(kill.level, 2);
+	assert.ok(sync.tickets.rats.length > 0);
+	const stored = (await m.saves.load('u1'))!;
+	for (const rat of sync.tickets.rats) {
+		const distance = castleDistance(rat);
+		assert.ok(distance >= MONSTERS.rat.spawn.minCastleDistance && distance <= MONSTERS.rat.spawn.maxCastleDistance, `distance ${distance}`);
+		assert.ok(rat.spawnLevel >= 1);
 	}
-	const second = ok(await redeemKill(m.deps, 'u1', 'kill-key-0002', { n: ticket.n, level: 2 }, now + 2000));
-	assert.equal(second.ok, false, 'the same monster cannot be killed twice');
-	const unknown = ok(await redeemKill(m.deps, 'u1', 'kill-key-0003', { n: 9999, level: 2 }, now + 3000));
-	assert.equal(unknown.ok, false, 'a monster the server never made pays nothing');
+	assert.equal(new Set(sync.tickets.rats.map((r) => `${r.x},${r.y}`)).size, sync.tickets.rats.length, 'one monster per tile');
+	assert.ok(stored.summary.tilesOwned > 9);
 });
 
-test('a kill never pays a level above what the ticket could have reached', async () => {
+test('with auto-battle on the server fights the monsters one at a time and pays each kill once', async () => {
+	const { m, now } = await playing(25, 'u1', true);
+	// the server walks the fights forward each time it is asked: the starter kit beats the low-level rats of a young castle
+	let won = 0;
+	let t = now;
+	let since: number | undefined = 0;
+	for (let i = 0; i < 40; i++) {
+		t += 20_000;
+		const out: FightReply = ok(await fightStep(m.deps, 'u1', null, { action: 'sync', since }, t));
+		since = out.combat.eventNo;
+		won += out.combat.events.filter((e) => e.kind === 'won').length;
+		assert.ok(out.combat.fight === null || out.combat.fight.monsterHp > 0);
+	}
+	const ledger = m.ledgers.get('u1')!;
+	assert.ok(won >= 1, 'at least one rat fell');
+	assert.equal(ledger.ordKill, won, 'each win rolled one sealed reward');
+	assert.ok(ledger.granted.gold > 0 && ledger.granted.xp > 0);
+});
+
+test('a hotkey carries the same key twice and is applied once; an unknown action is refused by the route, a monster the server never made cannot be dismissed', async () => {
 	const { m, now } = await playing(25);
-	const sync = ok(await syncTickets(m.deps, 'u1', now));
-	const stored = (await m.saves.load('u1'))!;
-	const ticket = sync.tickets.rats[0];
-	const kill = ok(await redeemKill(m.deps, 'u1', 'kill-key-0001', { n: ticket.n, level: 99 }, now + 1000));
-	assert.ok(kill.ok && !kill.dismissed);
-	if (kill.ok && !kill.dismissed) assert.ok(kill.level <= maxSpawnLevel('rat', stored.summary.castleLevel, stored.summary.tilesOwned) + 1, `level ${kill.level}`);
+	const first = ok(await fightStep(m.deps, 'u1', 'use-key-00001', { action: 'use', command: { kind: 'potion', id: 'potion_minor' } }, now));
+	const replay = ok(await fightStep(m.deps, 'u1', 'use-key-00001', { action: 'use', command: { kind: 'potion', id: 'potion_minor' } }, now + 1000));
+	assert.deepEqual(replay, first, 'a lost answer is replayed');
+	const unknown = ok(await fightStep(m.deps, 'u1', 'dismiss-key-01', { action: 'dismiss', n: 9999 }, now + 2000));
+	assert.equal(unknown.accepted, false);
 });
 
 test('dismissing a monster spends its ticket without a reward', async () => {
 	const { m, now } = await playing(25);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
 	const n = sync.tickets.rats[0].n;
-	const out = ok(await redeemKill(m.deps, 'u1', 'kill-key-0001', { n, level: 1, dismiss: true }, now + 1000));
-	assert.ok(out.ok && out.dismissed);
+	const out = ok(await fightStep(m.deps, 'u1', 'dismiss-key-02', { action: 'dismiss', n }, now + 1000));
+	assert.equal(out.accepted, true);
 	assert.equal(m.ledgers.get('u1')!.granted.gold, 0);
 	assert.equal(m.ledgers.get('u1')!.bank.rats.some((r) => r.n === n), false);
 });

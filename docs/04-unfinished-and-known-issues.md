@@ -10,9 +10,9 @@ Only what is **still open** is listed here; items that were fixed are removed (s
 | U2 | **Item upgrading** | not built: the merchant's Upgrades tab holds click power and the merchant bonuses, not gear enhancement | `MerchantOverlay.tsx` | needs U1; gold/resource sink (salvage and reroll are in [10](10-loot-system.md)) |
 | U3 | **Merchant → Quests** | placeholder | same | quest model, rewards (items), tracking in store |
 | U4 | **Merchant → Gambling** | placeholder | same | RNG games using `luck`; must stay inside the exploit rules ([07](07-security-and-exploits.md)) |
-| U5 | **Stat points in combat** | click combat exists (rats, Rat King) but fight damage and armor come from gear only; `physicalAtk, magicAtk, mp, def, magicDef, critChance, critDmg, atkSpeed` are still display-only; `vitality` adds a little HP, `luck` raises kill gold | `calculateCombatStats`, `combat.ts` (`damagePerClick` is the hook) | stat rework: let the five stats feed damage, armor, crit and speed |
+| U5 | **Stat points in combat** | auto-combat on the server (rats, Rat King): damage and armor come from gear and the five attributes (Strength/Intelligence for damage, Dexterity for attack speed and armor); `physicalAtk, magicAtk, mp, def, magicDef, critChance, critDmg, atkSpeed` are still display-only; `vitality` adds a little HP, `luck` raises kill gold | `calculateCombatStats`, `combat.ts` (`damagePerClick` is the hook) | stat rework: let the five stats feed damage, armor, crit and speed |
 | U6 | **Reputation** | +100 per tile (derived on load); shown; nothing reads it | `StatisticsOverlay.tsx` | tie to quests/merchant discounts or remove |
-| U9 | **Offline progress** | none (a closed tab does not progress; a throttled tab catches up in 5-min steps) | `tick`, `saveStorage.ts` | needs trusted time (see [07 §6](07-security-and-exploits.md)) to avoid a clock exploit; cap e.g. 8 h at 50 % |
+| U9 | ~~**Offline progress**~~ | **built**: the server pays an absence (8 h at 50 %, Legacy raises both), see [11](11-offline-and-sealed-rolls.md) | `lib/offline/` | - |
 | U13 | **Building management** | buildings are permanent (no demolish/swap/upgrade) | `Tile.tsx`, `BuildingSelectionDialog.tsx` | demolish with refund, building levels |
 | U14 | **Mobile / small screens** | pixel UI is desktop-first; touch pan exists, rest untested | `Grid.tsx`, modals | responsive pass |
 
