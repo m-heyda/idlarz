@@ -1,3 +1,4 @@
+import type { GrantTotals } from '@/lib/offline/ledger';
 import type { SaveSummary } from './summary';
 
 /**
@@ -47,7 +48,12 @@ export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_
 
 const xpRate = (s: SaveSummary) => s.rates.xp * (1 + s.xpGainPct / 100);
 
-export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs: number): SaveFlag[] => {
+/**
+ * `grants`: what the server itself handed out since the previous save (income while away, chest and kill rewards): a save may
+ * contain that much more than its income explains. When it is given the server also holds the gem balance, so the gem check
+ * happens against that balance in the pipeline instead of here.
+ */
+export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs: number, grants?: GrantTotals): SaveFlag[] => {
 	const flags = new Set<SaveFlag>();
 
 	if (!prev) {
@@ -67,16 +73,16 @@ export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs
 	if (playedSec > elapsedSec * VERIFY.playtimeSlack + VERIFY.playtimeGraceSec) flags.add('playtime_fast');
 
 	if (next.rebirths < before.rebirths || next.legacyEarned < before.legacyEarned) flags.add('prestige_regress');
-	if (next.gems > before.gems) flags.add('gems_increase'); // gems have no source in the game yet
+	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);
 		const goldRate = Math.max(before.rates.gold, next.rates.gold);
-		const goldAllowed = goldRate * played * VERIFY.gainSlack + goldRate * VERIFY.burstSec + VERIFY.goldFloor;
+		const goldAllowed = goldRate * played * VERIFY.gainSlack + goldRate * VERIFY.burstSec + VERIFY.goldFloor + (grants?.gold ?? 0);
 		if (next.gold - before.gold > goldAllowed) flags.add('gold_jump');
 
 		const rate = Math.max(xpRate(before), xpRate(next));
-		const xpAllowed = rate * played * VERIFY.gainSlack + rate * VERIFY.burstSec + VERIFY.xpFloor;
+		const xpAllowed = rate * played * VERIFY.gainSlack + rate * VERIFY.burstSec + VERIFY.xpFloor + (grants?.xp ?? 0);
 		if (next.xp - before.xp > xpAllowed) flags.add('xp_jump');
 	}
 

@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Resources } from '@/types/game';
 import type { SaveRepo, StoredSave, WorldPart } from './pipeline';
 import type { SaveFlag } from './verify';
+import { DEFAULT_DERIVED, type SaveDerived } from './summary';
 
 interface Row {
 	rev: number;
@@ -24,6 +25,8 @@ interface Row {
 	legacy_earned: number;
 	xp_gain_pct: number;
 	rates: Resources;
+	/** Added by the offline-ledger migration: rows written before it have none until their next save */
+	derived: SaveDerived | null;
 	flags: SaveFlag[];
 	audit_ratio: number;
 	fresh_start: boolean;
@@ -33,7 +36,7 @@ interface Row {
 }
 
 const COLUMNS =
-	'rev, schema, server_saved_at, created_at, core, world_hash, play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, flags, audit_ratio, fresh_start, ever_flagged, test_account, last_archive_at';
+	'rev, schema, server_saved_at, created_at, core, world_hash, play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, derived, flags, audit_ratio, fresh_start, ever_flagged, test_account, last_archive_at';
 
 const iso = (ms: number) => new Date(ms).toISOString();
 
@@ -58,6 +61,7 @@ const toRow = (save: StoredSave) => ({
 	legacy_earned: save.summary.legacyEarned,
 	xp_gain_pct: save.summary.xpGainPct,
 	rates: save.summary.rates,
+	derived: save.summary.derived,
 	gold_per_min: save.summary.rates.gold * 60,
 	flags: save.flags,
 	audit_ratio: save.auditRatio,
@@ -87,6 +91,7 @@ const fromRow = (row: Row): StoredSave => ({
 		legacyEarned: row.legacy_earned,
 		xpGainPct: Number(row.xp_gain_pct),
 		playSeconds: Number(row.play_seconds),
+		derived: { ...DEFAULT_DERIVED, ...(row.derived ?? {}) },
 	},
 	flags: row.flags ?? [],
 	auditRatio: Number(row.audit_ratio),

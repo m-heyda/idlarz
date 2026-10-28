@@ -1,5 +1,6 @@
 import { COMBAT, MONSTERS, type MonsterDef } from '@/config/combatConfig';
 import { levelScale } from '@/catalog/stats';
+import { CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
 import { limitOf, type LimitContext } from '@/lib/limits';
 import { mulberry32, randomInt } from '@/lib/rng';
@@ -35,14 +36,26 @@ export const spawnLevelRange = (type: MonsterType, castleLevel = 1): { min: numb
  * The level a new monster starts at. Rolled from a generator seeded by its id and nothing else, so it takes no number from
  * Math.random (the rest of the game's randomness is the same with or without it) and the same monster always rolls the same.
  */
-export const rollSpawnLevel = (type: MonsterType, castleLevel: number, monsterId: number): number => {
+export const rollSpawnLevel = (type: MonsterType, castleLevel: number, monsterId: number, distance = 0): number => {
 	const { min, max } = spawnLevelRange(type, castleLevel);
-	return randomInt(mulberry32(monsterId * 2654435761 + 17), min, max);
+	const bonus = dangerBonus(distance);
+	const cap = MONSTERS[type].spawnWindow.cap;
+	return randomInt(mulberry32(monsterId * 2654435761 + 17), Math.min(cap, min + bonus), Math.min(cap, max + bonus));
 };
 
-/** A new monster standing on `spot`, at a level rolled for the world it appears in. */
+/** Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: danger grows toward the frontier. */
+export const dangerBonus = (distance: number): number => Math.floor(Math.max(0, Number.isFinite(distance) ? distance : 0) / COMBAT.spawn.dangerStep);
+
+/** How far a tile is from the castle, the way the chest placement and the danger bonus measure it. */
+export const castleDistance = (spot: { x: number; y: number }): number => Math.max(Math.abs(spot.x - CASTLE_X), Math.abs(spot.y - CASTLE_Y));
+
+/** The highest level a monster can spawn at in a world this size (the danger bonus cannot exceed what the land could reach), for the server's check of a claimed kill level. */
+export const maxSpawnLevel = (type: MonsterType, castleLevel: number, tilesOwned: number): number =>
+	Math.min(MONSTERS[type].spawnWindow.cap, spawnLevelRange(type, castleLevel).max + dangerBonus(tilesOwned));
+
+/** A new monster standing on `spot`, at a level rolled for the world it appears in (and how far from the castle it stands). */
 export const newMonster = (type: MonsterType, id: number, spot: { x: number; y: number }, castleLevel: number): Monster => {
-	const level = rollSpawnLevel(type, castleLevel, id);
+	const level = rollSpawnLevel(type, castleLevel, id, castleDistance(spot));
 	return { id, type, level, spawnLevel: level, x: spot.x, y: spot.y, ageSec: 0 };
 };
 

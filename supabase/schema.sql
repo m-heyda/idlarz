@@ -42,6 +42,7 @@ create table public.player_saves (
   legacy_earned    integer     not null,
   xp_gain_pct      numeric     not null,
   rates            jsonb       not null,   -- per second, every resource
+  derived          jsonb,                  -- castle upgrade + rates after it, Luck, away-time cap and efficiency (migration offline_ledger)
   gold_per_min     numeric     not null,
   -- verification
   flags            text[]      not null default '{}',
@@ -97,13 +98,36 @@ create index save_history_user_rev    on public.save_history (user_id, rev desc)
 create index save_history_user_pinned on public.save_history (user_id, rev desc) where pinned;
 comment on table public.save_history is 'Deliberately no policies: only the service role reads or writes it.';
 
+-- ---- player_ledger: the server's own record of a player (away-time anchor, spawn tickets, sealed-roll counters, gems) -----
+-- One small row per player. Written ONLY by the server (service role, compare-and-swap on ver); a player may read their own gems and
+-- nothing else. Design: docs/11-offline-and-sealed-rolls.md.
+create table public.player_ledger (
+  user_id       uuid primary key references auth.users (id) on delete cascade,
+  ver           integer     not null,                 -- compare-and-swap counter
+  run_id        integer     not null default 1,       -- bumped by a rebirth or a new game: sealed rolls never repeat across runs
+  rebirths      integer     not null default 0,
+  anchor_at     timestamptz not null,                 -- away time is counted from the later of this and the last accepted save
+  bank          jsonb       not null,                 -- spawn timers and the chest / rat / king tickets (a few dozen numbers)
+  ord_chest     integer     not null default 0,       -- chest and kill rewards rolled this run (the next one is sealed on this number)
+  ord_kill      integer     not null default 0,
+  granted       jsonb       not null,                 -- lifetime totals the server handed out: what a save may contain on top of its income
+  granted_seen  jsonb       not null,                 -- the same, as of the last accepted save
+  gems          integer     not null,                 -- THE gem balance: a save can never raise it
+  last_key      text,                                 -- idempotency key of the last claim / redemption ...
+  last_result   jsonb,                                -- ... and its answer, replayed when a response got lost
+  updated_at    timestamptz not null default now(),
+  constraint ledger_ver_positive check (ver >= 1),
+  constraint ledger_gems_range   check (gems >= 0 and gems <= 1000000000)
+);
+
 -- ---- access ----------------------------------------------------------------------------------------------------------
 alter table public.player_saves  enable row level security;
 alter table public.player_worlds enable row level security;
 alter table public.player_stats  enable row level security;
 alter table public.save_history  enable row level security;
+alter table public.player_ledger enable row level security;
 
-revoke all on table public.player_saves, public.player_worlds, public.player_stats, public.save_history from anon, authenticated, public;
+revoke all on table public.player_saves, public.player_worlds, public.player_stats, public.save_history, public.player_ledger from anon, authenticated, public;
 
 -- owners read their own save (never write); the leaderboard is readable by everyone, trusted rows and listed columns only
 grant select on public.player_saves to authenticated;
@@ -114,8 +138,12 @@ grant select (user_id, display_name, level, tiles_owned, castle_level, rebirths,
   on public.player_stats to anon, authenticated;
 create policy "player_stats_public_trusted" on public.player_stats for select to anon, authenticated using (trusted);
 
+-- a player may read their own gem balance and nothing else of the ledger
+grant select (user_id, gems) on public.player_ledger to authenticated;
+create policy "player_ledger_select_own" on public.player_ledger for select to authenticated using (user_id = (select auth.uid()));
+
 -- this project does not hand service_role table access by default: be explicit
-grant select, insert, update, delete on public.player_saves, public.player_worlds, public.player_stats, public.save_history to service_role;
+grant select, insert, update, delete on public.player_saves, public.player_worlds, public.player_stats, public.save_history, public.player_ledger to service_role;
 grant usage, select on sequence public.save_history_id_seq to service_role;
 
 -- ---- the only write path: one atomic call (compare-and-swap on rev, map upsert, leaderboard row) --------------------------
@@ -137,7 +165,7 @@ begin
       rev = r.rev, schema = r.schema, server_saved_at = r.server_saved_at, core = r.core, world_hash = r.world_hash,
       play_seconds = r.play_seconds, level = r.level, xp = r.xp, gold = r.gold, gems = r.gems, click_level = r.click_level,
       castle_level = r.castle_level, tiles_owned = r.tiles_owned, buildings_owned = r.buildings_owned, rebirths = r.rebirths,
-      legacy_points = r.legacy_points, legacy_earned = r.legacy_earned, xp_gain_pct = r.xp_gain_pct, rates = r.rates,
+      legacy_points = r.legacy_points, legacy_earned = r.legacy_earned, xp_gain_pct = r.xp_gain_pct, rates = r.rates, derived = r.derived,
       gold_per_min = r.gold_per_min, flags = r.flags, audit_ratio = r.audit_ratio, ever_flagged = r.ever_flagged,
       test_account = r.test_account, last_archive_at = coalesce(r.last_archive_at, t.last_archive_at)
     from jsonb_populate_record(null::public.player_saves, p_save) r

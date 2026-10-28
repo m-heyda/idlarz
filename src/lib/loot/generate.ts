@@ -2,6 +2,8 @@ import type { BonusTable, ItemLevelDef, LootProfile, RollsDef, SourceLevelDef } 
 import type { RarityDef } from '@/catalog/rarity';
 import { MAX_ITEM_LEVEL, clampItemLevel } from '@/catalog/stats';
 import { affixFits } from '@/lib/itemInstance';
+import { LUCK } from '@/config/gameConfig';
+import { dropChanceMultiplier, rarityLuckMultiplier } from '@/lib/luck';
 import { randomInt, weightedPick, type Rng } from '@/lib/rng';
 import type { Drop, ItemDef, ItemInstance } from '@/types/game';
 import { LOOT_DATA, type LootData } from './data';
@@ -25,6 +27,10 @@ export interface LootRequest {
 	owned?: readonly string[];
 	/** Bad-luck counters from the save, by `profile:table` */
 	pity?: Readonly<Record<string, number>>;
+	/** The player's Luck: raises the chance of the general gear roll and moves the rarity odds toward rare and better (src/lib/luck.ts) */
+	luck?: number;
+	/** Extra guaranteed rolls on the general pool (a lucky monster) */
+	extraGearRolls?: number;
 }
 
 /** Why one roll gave what it gave (dev tools, the simulator, bug reports). */
@@ -70,9 +76,9 @@ export const rollItemLevel = (sourceLevel: number, def: Pick<ItemLevelDef, 'offs
 };
 
 /** How many of a roll group succeed: a random count in min..max, the first `guaranteed` always, the rest by chance. */
-const countSuccesses = (rolls: RollsDef, level: number, rng: Rng): number => {
+const countSuccesses = (rolls: RollsDef, level: number, rng: Rng, chanceMultiplier = 1): number => {
 	const count = randomInt(rng, rolls.min, rolls.max);
-	const chance = clamp01(rolls.chancePerRoll + (rolls.chancePerLevel ?? 0) * (level - 1));
+	const chance = clamp01((rolls.chancePerRoll + (rolls.chancePerLevel ?? 0) * (level - 1)) * chanceMultiplier);
 	let hits = 0;
 	for (let i = 0; i < count; i++) {
 		if (i < (rolls.guaranteed ?? 0) || chance >= 1 || rng() < chance) hits++;
@@ -139,11 +145,13 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		const rarity = data.rarities[id];
 		if (!rarity?.enabled || !(weight > 0)) continue;
 		if (itemLevel < (profile.rarityLevelGate?.[id] ?? 1)) continue;
+		// Luck moves the odds toward rare and better; the weights are normalised after, so the other rarities lose share, not weight
+		const lucky = rarity.order >= LUCK.rarityFromOrder ? rarityLuckMultiplier(ctx.req.luck ?? 0) : 1;
 		const candidates = all.filter((c) => c.def.generation === 'base' && c.def.allowedRarities?.includes(id));
 		trace.eligible[id] = candidates.length;
 		if (candidates.length === 0) continue;
 		byRarity[id] = candidates;
-		weights.push({ id, weight });
+		weights.push({ id, weight: weight * lucky });
 	}
 	const total = weights.reduce((sum, w) => sum + w.weight, 0);
 	for (const w of weights) trace.rarityChances[w.id] = w.weight / total;
@@ -246,7 +254,7 @@ export const generateLoot = (req: LootRequest, rng: Rng, data: LootData = LOOT_D
 
 	let drops: LootDrop[] = [];
 	if (profile.generalPoolId) {
-		const hits = countSuccesses(profile.rolls, level, rng);
+		const hits = countSuccesses(profile.rolls, level, rng, dropChanceMultiplier(req.luck ?? 0)) + Math.max(0, Math.floor(req.extraGearRolls ?? 0));
 		for (let i = 0; i < hits; i++) {
 			const itemLevel = rollItemLevel(sourceLevel, capped(ctx, profile.itemLevel), rng);
 			const drop = rollRarityGear(ctx, 'general', profile.generalPoolId, itemLevel);

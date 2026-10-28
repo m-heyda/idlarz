@@ -725,6 +725,25 @@ export const CHEST = {
 	luckRewardBonusPerPoint: 0.01, // each Luck point shifts this share of the gold weight into boost and item chances
 };
 
+// What Luck (the Charisma attribute + the merchant's Lucky Charm + gear) does besides the gold bonuses above. Read through the
+// functions of src/lib/luck.ts, which are also what the Character window shows.
+export const LUCK = {
+	/** Chests come this much faster per Luck point (interval / (1 + n x Luck)), never faster than `chestIntervalFloor` x the base interval */
+	chestSpeedPerPoint: 0.004,
+	chestIntervalFloor: 0.6,
+	/** Weights of rare-and-better gear grow by this much per point, capped at x`rarityCap` (the other weights stay, the roll is normalised) */
+	rarityPerPoint: 0.004,
+	rarityCap: 1.6,
+	/** Rarities from this rank up (`RarityDef.order`: 2 = Rare) count as "rare and better" */
+	rarityFromOrder: 2,
+	/** Monster gear drop chance grows by this much per point */
+	dropChancePerPoint: 0.002,
+	/** A bonus roll on every chest (it never replaces the normal reward): chance, and how many gems (skewed to the low end) */
+	gem: { base: 0.03, perPoint: 0.0006, cap: 0.15, min: 5, max: 50 },
+	/** A newly arrived rat is a golden "lucky" one with this chance: same stats, bigger reward */
+	luckyRat: { base: 0.02, perPoint: 0.0005, cap: 0.1, rewardMultiplier: 3, extraGearRolls: 1 },
+};
+
 // Buildings stand on any explored tile (not the castle or a lake) and cost resources; every building costs more than the last.
 // The first few are cheap (`starter` = share of `base` for building 1, 2, 3 ...), then the price grows in three stages the way
 // tile prices do: steeply for the next `earlyCount` buildings, gentler for `midCount` more, gentler again after that.
@@ -805,6 +824,20 @@ export const LEGACY_UPGRADES = {
 		costGrowth: 1.4,
 		effectPerLevel: 1, // levels of the starting bundle below
 		bundle: { gold: 1500, wood: 400, stone: 400 } as Partial<Resources>, // per level, given at the start of every run
+	},
+	nightwatch: {
+		label: 'Night Watch',
+		maxLevel: 10,
+		baseCost: 2,
+		costGrowth: 1.4,
+		effectPerLevel: 1, // +1 hour of away time the kingdom works for you, per level (base: LIMITS.offlineCapHours)
+	},
+	steward: {
+		label: 'Steward',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.05, // +5% of the normal income while you are away, per level (base: LIMITS.offlineEfficiency)
 	},
 } as const;
 

@@ -100,6 +100,7 @@ const VictoryToast: React.FC = () => {
 			) : (
 				<div className='victory-note'>No drops this time</div>
 			)}
+			{summary.lucky && <div className='victory-note text-yellow-300'>Lucky monster! x3 gold and XP and an extra piece of gear roll</div>}
 			{summary.autoSold.count > 0 && (
 				<div className='victory-note'>
 					Auto-sold {summary.autoSold.count} piece{summary.autoSold.count === 1 ? '' : 's'} of gear for {formatNumber(summary.autoSold.gold)} gold

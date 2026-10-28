@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { PREF_DEFAULTS, readPref, writePref, type UiPrefKey } from '@/lib/uiPrefs';
+import type { OfflineReport } from '@/lib/offline/apply';
 import { connectedCluster } from '@/utils/cluster';
 import { getTile, type World } from '@/utils/world';
 
@@ -62,6 +63,10 @@ interface UiState {
 	saveMenuOpen: boolean;
 	toggleSaveMenu: () => void;
 	closeSaveMenu: () => void;
+	/** The welcome-back window after an absence (what the server paid); null when there is none to show */
+	offlineReport: OfflineReport | null;
+	showOfflineReport: (report: OfflineReport) => void;
+	closeOfflineReport: () => void;
 	/** The one right-click / dropdown menu: opened at a screen position with its entries already worked out */
 	contextMenu: ContextMenuState | null;
 	openContextMenu: (menu: ContextMenuState) => void;
@@ -112,6 +117,9 @@ export const useUiStore = create<UiState>((set) => ({
 	saveMenuOpen: false,
 	toggleSaveMenu: () => set((state) => ({ saveMenuOpen: !state.saveMenuOpen })),
 	closeSaveMenu: () => set({ saveMenuOpen: false }),
+	offlineReport: null,
+	showOfflineReport: (report) => set({ offlineReport: report }),
+	closeOfflineReport: () => set({ offlineReport: null }),
 	contextMenu: null,
 	openContextMenu: (menu) => set({ contextMenu: menu }),
 	closeContextMenu: () => set((state) => (state.contextMenu ? { contextMenu: null } : state)),

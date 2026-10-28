@@ -154,7 +154,7 @@ const OPTIONAL_RESOURCES = new Set<keyof Resources>(['eggs', 'milk', 'hide']);
 const TILE_KEYS = new Set(['biome', 'isOwned', 'level', 'upgradeCost', 'building', 'hasChest']);
 const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
-const MONSTER_KEYS = new Set(['id', 'type', 'level', 'spawnLevel', 'x', 'y', 'ageSec']);
+const MONSTER_KEYS = new Set(['id', 'type', 'level', 'spawnLevel', 'x', 'y', 'ageSec', 'ticket', 'lucky']);
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);
 const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes']);
@@ -486,7 +486,11 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			ids.add(id);
 			spots.add(`${x},${y}`);
 			if (m.type === 'ratKing' && ++kings > 1) return fail('more than one king');
-			monsters.push({ id, type, level, spawnLevel, x, y, ageSec });
+			// the server's ticket number (a signed-in player's monster is backed by one) and the lucky flag: both optional, both only ever read back by the server
+			const ticket = m.ticket === undefined ? null : int(m.ticket, 1, 1_000_000_000);
+			if (m.ticket !== undefined && ticket === null) return fail('monster ticket');
+			if (m.lucky !== undefined && typeof m.lucky !== 'boolean') return fail('monster lucky');
+			monsters.push({ id, type, level, spawnLevel, x, y, ageSec, ...(ticket !== null ? { ticket } : {}), ...(m.lucky === true ? { lucky: true } : {}) });
 		}
 	}
 

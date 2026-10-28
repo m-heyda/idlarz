@@ -30,6 +30,7 @@ export const COMBAT = {
 		intervalSec: 900, // then one per this long (chests: 600 s)
 		bossIntervalSec: 10800, // a boss (one at a time) appears this long after the last one left, or after the start
 		minOwnedTiles: 5,
+		dangerStep: 8, // a monster that appears this many tiles (Chebyshev) further from the castle spawns one level higher: the frontier is more dangerous than the home land
 	},
 	// What drops (how often, which rarity and item level) is loot config: src/catalog/lootConfig.ts
 	rewards: { minGold: 10, minXp: 5 },

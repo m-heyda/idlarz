@@ -12,7 +12,7 @@
 | ESLint | 9 (flat config) | `npm run lint` = `eslint .` (CLI; `next lint` is gone) |
 | Test / sim runner | `tsx` (devDependency) | `npm test` (node:test), `npm run sim`, `npm run report` |
 
-No backend, no API routes. The whole game is client-side state.
+The game state is client-side. For signed-in players a small server layer (`src/app/api/*`, Supabase) stores the cloud save and, since [11](11-offline-and-sealed-rolls.md), decides offline progress, chest and monster tickets, sealed rolls and gems. Guests play entirely client-side.
 
 ## File map
 
@@ -94,7 +94,7 @@ Persisted (`PERSISTED_KEYS`): `tiles`, `resources`, `level`, `previousLevel`, `p
 
 ## The loop
 
-`page.tsx` runs `setInterval(…, 100 ms)` **only** in the owning tab and only after the save is loaded. Each interval computes `deltaTime = performance.now() − last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 … MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. There is no offline progress.
+`GameApp.tsx` runs `setInterval(…, 100 ms)` **only** in the owning tab and only after the save is loaded. Each interval computes `deltaTime = performance.now() − last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 … MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a signed-in player's absence is claimed from the server before the loop starts ([11](11-offline-and-sealed-rolls.md)).
 
 `tick` order: accumulate resources → XP (with `xpGainMultiplier`) → castle upgrade timer (finishing recomputes the rates) → chests (never on a monster tile) → monsters (age, evolve, spawn; the monster being fought is frozen) → fight step (monster attacks, King timer) or HP regeneration → level / stat points → one `set()`. The fight step clamps its delta to 1 s, so a throttled background tab slows a fight down instead of replaying minutes of attacks.
 

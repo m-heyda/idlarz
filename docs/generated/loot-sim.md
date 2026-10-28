@@ -20,6 +20,19 @@ Config validation: 0 errors, 0 warnings.
 | Chest, castle 5 | 16 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 16 / 17 / 17 | 5.9% | 0.0190 | 0 |
 | Chest, castle 10 | 31 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 31 / 32 / 32 | 5.9% | 0.0190 | 0 |
 
+## What Luck does
+
+Rat level 9 and a castle 5 chest at several Luck totals (Charisma + Lucky Charm + gear). Gems and lucky monsters exist only for signed-in players (the server rolls them).
+
+| Luck | Chest every | Rat gear / kill | Rare+ share of rat gear | Rare+ share of chest gear | Gem find / chest | Gems / chest | Lucky rat |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 10.0 min | 0.201 | 8.2% | 16.0% | 3.0% | 0.59 | 2.0% |
+| 10 | 9.6 min | 0.204 | 8.5% | 16.5% | 3.6% | 0.71 | 2.5% |
+| 30 | 8.9 min | 0.212 | 9.0% | 17.3% | 4.8% | 0.95 | 3.5% |
+| 60 | 8.1 min | 0.224 | 9.7% | 18.5% | 6.6% | 1.32 | 5.0% |
+| 100 | 7.1 min | 0.240 | 10.7% | 20.0% | 9.0% | 1.79 | 7.0% |
+| 200 | 6.0 min | 0.281 | 12.4% | 22.1% | 15.0% | 2.99 | 10.0% |
+
 ## Item power over the level range
 
 Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, no affixes), straight from the level curve. Items below their first level are shown at it.
@@ -38,4 +51,4 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 - **normal_monster**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
 - **boss**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_set, king_legendary, king_potions
 - **basic_chest**: 1-1 roll(s), 0 guaranteed, 82% per roll; rarity weights common 62.0%, uncommon 24.0%, rare 9.0%, epic 4.0%, legendary 1.0%; bonus: chest_legendary, chest_potion
-- **merchant_stock**: 12-12 roll(s), 12 guaranteed, 100% per roll; rarity weights common 50.0%, uncommon 32.0%, rare 14.0%, epic 4.0%; bonus: none
+- **merchant_stock**: 12-12 roll(s), 12 guaranteed, 100% per roll; rarity weights common 60.0%, uncommon 40.0%; bonus: none

@@ -10,6 +10,8 @@ import { generateLoot } from '../src/lib/loot/generate';
 import { LOOT_DATA } from '../src/lib/loot/data';
 import { validateLootData } from '../src/lib/loot/validate';
 import { mulberry32 } from '../src/lib/rng';
+import { LUCK } from '../src/config/gameConfig';
+import { chestIntervalSec, gemChance, luckyRatChance, rollGemFind } from '../src/lib/luck';
 
 const arg = (name: string, fallback: number) => {
 	const at = process.argv.indexOf(`--${name}`);
@@ -89,6 +91,35 @@ for (const s of SCENARIOS) {
 	out(
 		`| ${s.label} | ${sourceLevel} | ${(gear / KILLS).toFixed(3)} | ${RARITY_ORDER.map((r) => pct(byRarity.get(r) ?? 0, gear)).join(' | ')} | ${percentile(levels, 0.5)} / ${percentile(levels, 0.9)} / ${levels[levels.length - 1] ?? 0} | ${pct(high, KILLS)} | ${(named / KILLS).toFixed(4)} | ${warnings} |`
 	);
+}
+
+out();
+out('## What Luck does');
+out();
+out('Rat level 9 and a castle 5 chest at several Luck totals (Charisma + Lucky Charm + gear). Gems and lucky monsters exist only for signed-in players (the server rolls them).');
+out();
+out('| Luck | Chest every | Rat gear / kill | Rare+ share of rat gear | Rare+ share of chest gear | Gem find / chest | Gems / chest | Lucky rat |');
+out('|---:|---:|---:|---:|---:|---:|---:|---:|');
+for (const luck of [0, 10, 30, 60, 100, 200]) {
+	const share = (sourceId: string, level: number | undefined, castleLevel: number | undefined) => {
+		const rng = mulberry32(SEED);
+		let gear = 0;
+		let rare = 0;
+		for (let i = 0; i < KILLS; i++) {
+			for (const d of generateLoot({ sourceId, level, castleLevel, luck }, rng).drops) {
+				if (d.kind !== 'gear') continue;
+				gear++;
+				if (LOOT_DATA.rarities[d.item.rarity].order >= LUCK.rarityFromOrder) rare++;
+			}
+		}
+		return { perKill: gear / KILLS, rare: pct(rare, gear) };
+	};
+	const rat = share('rat', 9, undefined);
+	const chest = share('chest', undefined, 5);
+	const rng = mulberry32(SEED + 1);
+	let gems = 0;
+	for (let i = 0; i < KILLS; i++) gems += rollGemFind(luck, rng);
+	out(`| ${luck} | ${(chestIntervalSec(luck) / 60).toFixed(1)} min | ${rat.perKill.toFixed(3)} | ${rat.rare} | ${chest.rare} | ${(gemChance(luck) * 100).toFixed(1)}% | ${(gems / KILLS).toFixed(2)} | ${(luckyRatChance(luck) * 100).toFixed(1)}% |`);
 }
 
 out();

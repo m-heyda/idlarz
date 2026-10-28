@@ -14,6 +14,7 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 | [06-playtest-and-pacing-report.md](06-playtest-and-pacing-report.md) | Why the old game finished in ~3 days, what the rebalance changed, simulated results incl. castle 7–10 and Rebirth |
 | [07-security-and-exploits.md](07-security-and-exploits.md) | Save vault, validation, hidden save tools, exploit audit, server-verified saves (later) |
 | [08-followup-plan.md](08-followup-plan.md) | What to build next, in order, with sizes and acceptance criteria |
+| [11-offline-and-sealed-rolls.md](11-offline-and-sealed-rolls.md) | Server-held offline progress, sealed chest and kill rolls, spawn tickets, gems, Luck effects and the threat model |
 | [10-loot-system.md](10-loot-system.md) | The loot pipeline: profiles, rarity, item level, affixes, pools, saves, and how to add items, affixes and rarities |
 | [superpowers/specs/2026-10-24-combat-and-inventory-design.md](superpowers/specs/2026-10-24-combat-and-inventory-design.md) | Design of the combat / monsters / items system and the long roadmap; the implementation plan sits next to it in `superpowers/plans/` |
 | [generated/balance-tables.md](generated/balance-tables.md) | Auto-generated tables (tile cost, levels, castle, animals, biomes, rates, Rebirth/Legacy) |

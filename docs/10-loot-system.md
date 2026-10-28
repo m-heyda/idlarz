@@ -68,10 +68,14 @@ The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs 
 
 ## Not done yet (kept on purpose)
 
-Salvage / materials and reroll / upgrade (real gear sinks), flat set bonuses that fade at high level, `requiredLevel`, weapon attack speed in combat, offline loot (there is no offline progress), elite monsters and premium chests, a Luck effect on rarity weights, and rebalancing the monsters with the world level (see the follow-up list in the design spec).
+Salvage / materials and reroll / upgrade (real gear sinks), flat set bonuses that fade at high level, `requiredLevel`, weapon attack speed in combat, elite monsters and premium chests, and rebalancing the monsters with the world level (see the follow-up list in the design spec).
 
 A monster source has no level of its own: `LootRequest.level` is the monster's level, and the source's `levels` range (rat 1-20, King 15-35) is what `validateLootData` checks the pools against. Per-level chances (`chancePerLevel`) replace the old per-tier ones (half the size: a tier was two levels). A boss is a monster def with `grade: 'boss'` whose `lootSourceId` names its own source and profile, so boss-only drops need data only.
 
 ## What gear is worth
 
 `sellValueOf` = the rarity's value at level 1 (common 300 ... legendary 45000) x `valueCurve(level)` x the quality roll x the affixes (`ITEM_VALUE`, `catalog/stats.ts`): steep up to level 10 (x1.3 per level) and flatter after (x1.12), so an item is worth minutes of the income of the stage it drops in, a well rolled rare clearly more than a plain one. The merchant sells at 5x.
+
+## Luck and sealed rolls
+
+`LootRequest.luck` raises the chance of the general gear roll (`dropChanceMultiplier`) and multiplies the weights of rare-and-better rarities (`rarityLuckMultiplier`, from `LUCK.rarityFromOrder`); `extraGearRolls` adds guaranteed rolls (lucky monsters). Luck 0 changes nothing. For signed-in players the server runs the same pipeline with a sealed random source (`lib/offline/seal.ts`) - see [11](11-offline-and-sealed-rolls.md).

@@ -5,7 +5,7 @@ import type { World } from '@/utils/world';
 // with them. O(1) (world counters only), because the tick asks every second while the spawn timers are paused at the limit.
 
 /** Tiles the ward keeps clear (the walled range around the castle, without the castle itself); 0 below the fortress level. */
-const wardTiles = (castleLevel: number): number =>
+export const wardTiles = (castleLevel: number): number =>
 	castleLevel >= CASTLE_FORTRESS.fromLevel ? (2 * CASTLE_RANGE.radius + 1) ** 2 - 1 : 0;
 
 /** Owned land a monster or chest can stand on: not the castle, not a lake, no building, outside the ward. An estimate, never below 0. */

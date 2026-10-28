@@ -13,6 +13,8 @@ import {
 	maxMana,
 } from '@/lib/combat';
 import { critDamagePercent } from '@/lib/statBonuses';
+import { chestRateBonusPct, gemChance, luckyRatChance, rarityLuckMultiplier } from '@/lib/luck';
+import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
 import { effectiveTileDiscount, legacyEffect, merchantLuck, type MerchantUpgrades } from '@/utils/gameUtils';
 import type { CharacterStats, Equipment, PrestigeState } from '@/types/game';
 
@@ -34,6 +36,8 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 	const odds = critOdds(characterStats, equipment);
 	const critExtra = 1 + critDamagePercent(characterStats) / 100;
 	const armor = armorOf(equipment, characterStats);
+	const luck = characterStats.luck + merchantLuck(merchantUpgrades) + gear.luck;
+	const limits = { prestige, merchantUpgrades };
 	return {
 		maxHp: maxHp(characterStats, equipment),
 		maxMana: maxMana(characterStats, equipment),
@@ -53,7 +57,18 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		/** % chance that a crit becomes a super crit */
 		superCritChance: odds.superCrit * 100,
 		superCritMultiplier: COMBAT.crit.superMult * critExtra,
-		luck: characterStats.luck + merchantLuck(merchantUpgrades) + gear.luck,
+		luck,
+		/** % more chests than without Luck */
+		chestRateBonus: chestRateBonusPct(luck),
+		/** % better odds for rare-and-better gear from Luck */
+		rarityLuckBonus: (rarityLuckMultiplier(luck) - 1) * 100,
+		/** % chance that a chest also holds 5-50 gems */
+		gemChance: gemChance(luck) * 100,
+		/** % chance that a newly arrived rat is a lucky one */
+		luckyRatChance: luckyRatChance(luck) * 100,
+		/** Hours of away time the kingdom works for you (base + Night Watch) and the % of the normal income it pays (base + Steward) */
+		offlineCapHours: offlineCapHours(limits),
+		offlineEfficiency: offlineEfficiency(limits) * 100,
 		goldFind: gear.goldFind,
 		spellPower: gear.spellPower,
 		xpGain: characterStats.xpGainMultiplier,
