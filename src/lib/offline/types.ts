@@ -6,7 +6,7 @@ import type { OfflineGrant } from '@/lib/offline/grant';
  * The waiting chests and monsters as the client needs to see them (a chest is just a count: nothing tells chests apart). A monster
  * is listed once the server has given it a tile: `x`, `y` and the level it appeared at (`spawnLevel`, which grows with its age) are the server's.
  */
-export interface PublicMonster {
+interface PublicMonster {
 	n: number;
 	at: number;
 	x: number;

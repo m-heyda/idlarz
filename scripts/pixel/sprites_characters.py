@@ -1,4 +1,4 @@
-"""Character art: the four hero classes (warrior/paladin/ranger/mage) and the merchant.
+"""Character art: the four hero classes (warrior/paladin/ranger/mage).
 
 Each figure is built from the same body kit (legs, torso, arms, head with a proper face, hair) and dressed per
 class, rendered by the ray-caster at 56x80 plus a head-and-shoulders bust (40x40) for the header.
@@ -6,13 +6,11 @@ Figure space: +x = screen right, -y = toward the camera, +z = up; feet at z=0, h
 import math
 from render3d import Scene, Prim, rot, between, place, I3
 from materials import MATS
-from sprites_resources import coin_tex
 import fx
 
 FULL = dict(size=(56, 80), scale=12.2, origin=(28, 76))
 BUST = dict(size=(40, 40), scale=14.6, origin=(20, 86))
 HEAD_Z = 5.2
-SHOP = dict(size=(76, 96), scale=12.2, origin=(38, 76))     # the merchant stands behind his market table
 
 
 class Fig:
@@ -312,89 +310,6 @@ def mage(view=FULL):
     return img
 
 
-# ----------------------------------------------------------------- MERCHANT (human trader)
-def merchant(view=SHOP):
-    f = Fig(view)
-    # huge pack with bedroll, spare cooking pan and a ledger satchel
-    f.ell((0, 0.9, 3.3), (1.0, 0.62, 1.2), 'pleather', I3, 1)
-    f.cyl((0, 0.85, 4.7), 0.36, 1.0, 'cloth', rot(0, 90, 0), 2)
-    f.ell((0.85, 0.8, 2.3), (0.42, 0.32, 0.44), 'leather', I3, 3)
-    f.ell((-0.92, 0.72, 2.4), (0.34, 0.1, 0.34), 'steel', I3, 4)
-    for sx in (-1, 1):
-        f.ell((0.38 * sx, -0.18, 0.3), (0.34, 0.6, 0.3), 'leather', I3, 5)
-        f.rod((0.38 * sx, 0, 2.3), (0.38 * sx, 0, 0.75), 0.28, 'trouser', 6)
-        f.cyl((0.38 * sx, 0, 0.95), 0.31, 0.2, 'leather', I3, 7)
-    # round coat with long skirts, waistcoat, belt and coin purse
-    f.ell((0, 0, 2.3), (1.02, 0.8, 1.0), 'coat', I3, 7)
-    f.box((0, -0.8, 2.15), (0.08, 0.04, 0.8), 'gold')
-    f.ell((0, -0.04, 3.35), (1.0, 0.7, 0.95), 'coat', I3, 8)
-    f.ell((0, -0.5, 3.25), (0.58, 0.28, 0.6), 'tunic', I3, 9)
-    f.box((0, -0.8, 3.25), (0.05, 0.03, 0.55), 'gold')
-    for k in range(4):
-        f.ell((0.16, -0.78, 3.55 - k * 0.2), (0.045, 0.03, 0.045), 'gold')
-    f.cyl((0, -0.02, 2.75), 1.0, 0.1, 'pleather', I3, 10)
-    f.box((0.0, -0.88, 2.75), (0.15, 0.04, 0.11), 'gold')
-    f.ell((-0.82, -0.36, 2.5), (0.28, 0.22, 0.34), 'pleather', I3, 11)
-    f.ell((-0.82, -0.48, 2.9), (0.1, 0.1, 0.08), 'cloth')
-    f.cyl((0, 0, 4.3), 0.52, 0.1, 'cloth', I3, 13)                                  # red scarf
-    f.cyl((0, 0, 4.5), 0.3, 0.1, 'skin', I3, 13)
-    # arms: right lifts a coin, left hugs a ledger
-    f.rod((1.05, 0, 3.95), (1.3, -0.15, 3.45), 0.27, 'coat', 14)
-    f.rod((1.3, -0.15, 3.45), (1.34, -0.42, 3.95), 0.23, 'coat', 15)
-    f.ell((1.34, -0.46, 4.1), (0.18, 0.18, 0.18), 'skin', I3, 16)
-    f.cyl((1.36, -0.56, 4.65), 0.36, 0.07, 'gold', rot(90, 0, 0), 17, coin_tex)
-    f.rod((-1.05, 0, 3.95), (-1.25, -0.25, 3.35), 0.27, 'coat', 18)
-    f.rod((-1.25, -0.25, 3.35), (-0.7, -0.62, 3.25), 0.23, 'coat', 19)
-    f.ell((-0.55, -0.65, 3.2), (0.18, 0.18, 0.18), 'skin', I3, 20)
-    f.box((-0.35, -0.72, 3.25), (0.34, 0.08, 0.44), 'door', rot(0, 0, 8), 21)       # ledger
-    f.box((-0.35, -0.8, 3.25), (0.25, 0.02, 0.34), 'cream', rot(0, 0, 8), 22)
-    # head: round and ruddy, big nose, bushy white beard and moustache
-    z = HEAD_Z
-    f.ell((0, 0.02, z), (0.68, 0.64, 0.7), 'skin', I3, 23)
-    f.ell((0, -0.66, z - 0.1), (0.15, 0.16, 0.16), 'skin', I3, 24)
-    f.ell((0, -0.22, z - 0.6), (0.6, 0.5, 0.5), 'beard', I3, 25)
-    f.ell((0, -0.28, z - 0.98), (0.36, 0.3, 0.32), 'beard', I3, 26)
-    f.ell((0, -0.56, z - 0.3), (0.36, 0.1, 0.1), 'beard', I3, 27)
-    for sx in (-1, 1):
-        f.ell((0.26 * sx, -0.56, z + 0.04), (0.13, 0.06, 0.11), 'cream')
-        f.ell((0.27 * sx, -0.61, z + 0.03), (0.075, 0.03, 0.095), 'dark')
-        f.ell((0.28 * sx, -0.54, z + 0.26), (0.19, 0.06, 0.05), 'beard', rot(0, -14 * sx, 0), 28)
-        f.ell((0.67 * sx, 0.02, z - 0.06), (0.08, 0.11, 0.17), 'skin')
-    f.cyl((0, 0, z + 0.66), 1.02, 0.06, 'leather', I3, 29)                           # wide-brim hat
-    f.ell((0, 0, z + 0.92), (0.68, 0.64, 0.44), 'leather', I3, 30)
-    f.cyl((0, 0, z + 0.78), 0.7, 0.07, 'cloth')
-    f.ell((0.58, -0.1, z + 1.16), (0.07, 0.46, 0.18), 'gold', rot(0, 25, 0), 31)
-    # market table in front: planks, red-and-cream cloth skirt, hanging sign, and the goods he sells
-    f.box((0, -1.5, 2.34), (2.3, 0.62, 0.07), 'plank', I3, 60)
-    f.box((0, -2.1, 1.5), (2.3, 0.04, 0.84), 'cloth', I3, 61)
-    f.box((-2.3, -1.5, 1.5), (0.04, 0.62, 0.84), 'cloth', I3, 62)
-    for k in range(5):
-        f.box((-2.0 + k * 1.0, -2.14, 1.5), (0.18, 0.02, 0.84), 'cream', I3, 63 + k)
-    for sx in (-1, 1):
-        f.box((2.15 * sx, -2.0, 0.55), (0.07, 0.07, 0.55), 'plank', I3, 70)
-    f.box((1.35, -2.18, 1.0), (0.5, 0.03, 0.26), 'plank', I3, 71)                 # price sign
-    f.ell((1.35, -2.22, 1.0), (0.14, 0.02, 0.14), 'gold')
-    # bread, coin stacks, potions, apples, grain sack
-    for i, (x, y, z, r) in enumerate(((-1.95, -1.45, 2.58, 0.3), (-1.5, -1.75, 2.55, 0.27), (-1.75, -1.2, 2.55, 0.26))):
-        f.ell((x, y, z), (r * 1.3, r, r * 0.75), 'bread', rot(0, 0, 25 * (i - 1)), 80 + i)
-    for i, (x, y, n) in enumerate(((-0.8, -1.75, 5), (-0.45, -1.5, 3), (-1.0, -1.35, 2))):
-        for k in range(n):
-            f.cyl((x, y, 2.45 + 0.07 * k), 0.2, 0.035, 'gold', I3, 90 + i)
-    for i, (x, m) in enumerate(((0.5, 'ruby'), (0.9, 'ice'))):
-        f.cyl((x, -1.6, 2.58), 0.17, 0.17, m, I3, 100 + i)
-        f.cyl((x, -1.6, 2.86), 0.06, 0.1, 'cream', I3, 102 + i)
-    f.cyl((1.35, -1.25, 2.52), 0.38, 0.1, 'wood_cut', I3, 105)                    # apple bowl
-    for i, (dx, dy) in enumerate(((-0.1, 0.0), (0.12, -0.05), (0.0, 0.14), (0.05, -0.15))):
-        f.ell((1.35 + dx, -1.25 + dy, 2.72), (0.12, 0.12, 0.12), 'cloth', I3, 106 + i)
-    f.ell((1.95, -1.55, 2.65), (0.34, 0.3, 0.3), 'tunic', I3, 110)                 # grain sack
-    f.cyl((1.95, -1.55, 2.92), 0.12, 0.04, 'cloth', I3, 111)
-    img = f.render()
-    if view is SHOP:
-        fx.glint(img, 55, 8, 2)
-        fx.glint(img, 13, 63, 1)
-    return img
-
-
 # ----------------------------------------------------------------- public sprite set
 CLASSES = {'warrior': warrior, 'paladin': paladin, 'ranger': ranger, 'mage': mage}
 
@@ -402,4 +317,3 @@ SPRITES = {}
 for _name, _fn in CLASSES.items():
     SPRITES[f'hero_{_name}'] = (lambda fn=_fn: fn(FULL))
     SPRITES[f'bust_{_name}'] = (lambda fn=_fn: fn(BUST))
-SPRITES['merchant'] = lambda: merchant(SHOP)

@@ -24,7 +24,7 @@ export interface ContextMenuItem {
 	separator?: boolean;
 }
 
-export interface ContextMenuState {
+interface ContextMenuState {
 	/** Screen position (viewport px) the menu opens at */
 	x: number;
 	y: number;

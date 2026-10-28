@@ -68,7 +68,7 @@ export const CHUNK_PX = CHUNK_TILES * CELL;
  * pixels there). Zoomed to a fraction the canvas edges fall between screen pixels, and without the overlap a hairline of
  * background would show along every chunk border.
  */
-export const CHUNK_OVERLAP_PX = 2;
+const CHUNK_OVERLAP_PX = 2;
 export const CHUNK_CANVAS_PX = CHUNK_PX + CHUNK_OVERLAP_PX;
 
 const prepare = (canvas: HTMLCanvasElement, cx: number, cy: number): CanvasRenderingContext2D | null => {

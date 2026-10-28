@@ -13,7 +13,8 @@
     "report": "tsx scripts/balance-report.ts",
     "fight-sim": "tsx scripts/fight-sim.ts",
     "catalog-report": "tsx scripts/catalog-report.ts",
-    "loot-sim": "tsx scripts/loot-sim.ts"
+    "loot-sim": "tsx scripts/loot-sim.ts",
+    "docs:gen": "npm run report && npm run sim && npm run catalog-report && npm run fight-sim -- --md && npm run loot-sim -- --md"
   },
   "dependencies": {
     "@fontsource-variable/mozilla-headline": "^5.3.0",

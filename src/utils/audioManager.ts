@@ -83,7 +83,7 @@ class AudioManager {
   }
 }
 
-export const audioManager = AudioManager.getInstance();
+const audioManager = AudioManager.getInstance();
 
 // Initialize game sounds
 if (typeof window !== 'undefined') {

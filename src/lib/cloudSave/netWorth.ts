@@ -26,7 +26,7 @@ import type { SaveSummary } from './summary';
  * (clicks, chests and loot are not modelled, the slack covers them). A save that owns 55,000 tiles after 12 minutes
  * is orders of magnitude over it, however its rates look, because the price of tile 55,000 does not depend on them.
  */
-export const NETWORTH = {
+const NETWORTH = {
 	slack: 3,
 	burstSec: 3600,
 	floor: 50_000,
@@ -63,7 +63,7 @@ const stockValue = (resources: Resources, state: PersistedGame): number => {
 };
 
 /** Gold-equivalent income per second at the save's own rates: gold plus every sellable resource at its merchant price. */
-export const incomePerSec = (summary: SaveSummary, state: PersistedGame): number => {
+const incomePerSec = (summary: SaveSummary, state: PersistedGame): number => {
 	let perSec = summary.rates.gold;
 	for (const [key, price] of Object.entries(MERCHANT_RESOURCE_PRICES) as [keyof Resources, number][]) {
 		perSec += sellPayout(price, summary.rates[key], state);
@@ -80,7 +80,7 @@ export interface NetWorthCheck {
 }
 
 /** Gold-equivalent worth of everything the server ever granted this account (the sellable resources at merchant prices). */
-export const grantedValue = (granted: GrantTotals, state: PersistedGame): number => {
+const grantedValue = (granted: GrantTotals, state: PersistedGame): number => {
 	let value = granted.gold;
 	for (const [key, price] of Object.entries(MERCHANT_RESOURCE_PRICES) as [keyof Resources, number][]) {
 		value += sellPayout(price, granted[key] ?? 0, state);

@@ -6,8 +6,6 @@ import type { ItemStats } from '@/catalog/stats';
 import type { SkillId } from '@/catalog/skills';
 import type { World } from '@/utils/world';
 
-export type { ItemStats };
-
 export type BiomeType = keyof typeof BIOMES;
 
 export interface Resources {
@@ -383,7 +381,6 @@ export interface GameState {
 	applyServerTickets: (sync: SyncResult) => { chests: number; monsters: number; strongestLevel: number };
 	sellResources: (resource: keyof Resources, amount: number) => boolean;
 	addStatPoint: (stat: keyof CharacterStats) => boolean;
-	setPlayerName: (name: string) => void;
 	setPlayerClass: (playerClass: PlayerClassId) => void;
 	/** Gives a brand-new game (no play time, default name) the account's name and hero; any played game is left alone. */
 	applyProfileToFreshGame: (name: string, playerClass: PlayerClassId) => boolean;

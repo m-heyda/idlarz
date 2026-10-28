@@ -69,7 +69,7 @@ export const emptyBank = (nowSec: number): TicketBank => ({
 	ratsMinted: 0,
 });
 
-export const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.rats.length + (bank.king ? 1 : 0);
+const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.rats.length + (bank.king ? 1 : 0);
 
 /**
  * How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
@@ -80,12 +80,12 @@ export const ticketCap = (ctx: BankContext): number => {
 	return Math.min(TICKET_CAP, Math.max(SPAWN_LIMIT.minAllowed, Math.floor(free * SPAWN_LIMIT.maxFraction)));
 };
 
-export const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, ticketCap(ctx) - ticketCount(bank));
+const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, ticketCap(ctx) - ticketCount(bank));
 
 const ratThreshold = (bank: TicketBank): number => (bank.ratsMinted === 0 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec);
 
 /** Monsters waiting (rats and the King), placed or not. */
-export const monsterCount = (bank: TicketBank): number => bank.rats.length + (bank.king ? 1 : 0);
+const monsterCount = (bank: TicketBank): number => bank.rats.length + (bank.king ? 1 : 0);
 
 /** Whether another rat / the King can come: the map has a tile for it that no waiting monster has taken. */
 const ratSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.rat;

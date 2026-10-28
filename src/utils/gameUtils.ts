@@ -239,7 +239,7 @@ export const calculateLevel = (
 	return { level, progress: step > 0 ? remainingXp / step : 0 };
 };
 
-export const countAdjacentSameBiomes = (
+const countAdjacentSameBiomes = (
 	tiles: GameState['tiles'],
 	x: number,
 	y: number,

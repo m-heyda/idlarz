@@ -60,7 +60,7 @@ interface BodyProps {
  * `comparison` every number carries its change against the worn piece, stats the worn piece has and this one lacks are
  * listed as lost, and the set block shows the state after the swap.
  */
-export const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice }) => {
+const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const resolved = item ? resolveItem(item) : null;
 	const def = resolved?.def ?? (itemId ? ITEM_CATALOG[itemId] : undefined);

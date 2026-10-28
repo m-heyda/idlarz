@@ -57,6 +57,7 @@ import {
 } from '../src/utils/gameUtils';
 import { ITEM_CATALOG } from '../src/config/itemCatalog';
 import { formatTime } from '../src/utils/formatters';
+import { mulberry32 } from '../src/lib/rng';
 import type { Resources } from '../src/types/game';
 
 const out: string[] = [];
@@ -293,8 +294,10 @@ line();
 // ---------------------------------------------------------------------------
 line('## 7. Rates of a brand-new game');
 line();
+line('A real game rolls its 8 start tiles at random; this table uses one fixed ring (seed 1) so the file is reproducible.');
+line();
 {
-	const r = calculateResourceRates(createInitialWorld(), INITIAL_CHARACTER_STATS, {});
+	const r = calculateResourceRates(createInitialWorld(mulberry32(1)), INITIAL_CHARACTER_STATS, {});
 	const keys = Object.keys(r.total) as (keyof Resources)[];
 	table(
 		['Resource', 'BASE_GENERATION_RATES', 'CASTLE_BASE_RATES', 'base (computed)', 'modifier (computed)', 'total /s'],

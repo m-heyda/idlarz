@@ -56,7 +56,7 @@ export interface SimInput {
 	seed: string;
 }
 
-export interface SimResult {
+interface SimResult {
 	won: boolean;
 	outcome: 'won' | 'timeout' | 'defeated' | 'stalled';
 	timeSec: number;
@@ -97,7 +97,7 @@ export const simSetup = ({ equipment = {}, character = freshCharacter(), potions
 	return { ledger, env, start: START, stored };
 };
 
-export const simulateFight = ({ equipment, monster, character, potions, level, autoUse = true, seed }: SimInput): SimResult => {
+const simulateFight = ({ equipment, monster, character, potions, level, autoUse = true, seed }: SimInput): SimResult => {
 	const { ledger, env } = simSetup({ equipment, character, potions, level, monsters: [monster], seed });
 
 	// the first request engages the monster; then the clock runs on one second at a time until the fight is decided

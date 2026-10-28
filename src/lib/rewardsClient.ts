@@ -35,9 +35,6 @@ export const requestSync = (since?: number): Promise<Reply<SyncResult>> => post<
 
 export const requestChest = (key: string): Promise<Reply<ChestReward>> => post<ChestReward>('/api/chest', { key });
 
-/** Carries the player's fight forward and answers with it. */
-export const requestFightSync = (since: number | undefined): Promise<Reply<FightReply>> => post<FightReply>('/api/fight', { action: 'sync', since });
-
 /** A hotkey: drink a potion or cast a skill. One key per press: the server replays the answer if it is sent twice. */
 export const requestUse = (key: string, command: CombatCommand, since: number | undefined): Promise<Reply<FightReply>> => post<FightReply>('/api/fight', { action: 'use', key, command, since });
 

@@ -33,7 +33,7 @@ forest: '#2dff9a',
 	coast: '#ff5a3c',
 };
 
-export const FALLBACK_HIGHLIGHT = '#ffffff';
+const FALLBACK_HIGHLIGHT = '#ffffff';
 
 /** The map colour of a biome (a neutral grey for anything unknown). */
 export const biomeColor = (biome: string): string => BIOME_COLORS[biome] ?? '#555555';

@@ -9,7 +9,7 @@ export interface Candidate {
 }
 
 /** Whether an item belongs to a pool: listed by id, naming the pool in its own `pools`, or carrying every required tag. */
-export const inPool = (item: ItemDef, pool: PoolDef): boolean => {
+const inPool = (item: ItemDef, pool: PoolDef): boolean => {
 	if (!pool.enabled || item.enabled === false) return false;
 	if (pool.excludeIds?.includes(item.id)) return false;
 	if (pool.excludeTags?.some((tag) => item.tags?.includes(tag))) return false;
@@ -24,7 +24,7 @@ export const poolMembers = (data: LootData, poolId: string): ItemDef[] => {
 };
 
 /** Relative chance of a member inside its pool: the pool's own weight if it has one, else the item's. */
-export const weightIn = (item: ItemDef, pool: PoolDef): number => pool.weights?.[item.id] ?? item.poolWeight ?? 1;
+const weightIn = (item: ItemDef, pool: PoolDef): number => pool.weights?.[item.id] ?? item.poolWeight ?? 1;
 
 /** Members that exist at this item level (item window and the pool's own minimum), with their weights. */
 export const eligibleCandidates = (data: LootData, poolId: string, level: number): Candidate[] => {

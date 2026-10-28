@@ -23,7 +23,7 @@ export const STAT_DEFS = {
 	damage: { label: 'Damage', integer: true },
 	armor: { label: 'Armor', integer: true },
 	maxHp: { label: 'Max HP', integer: true },
-	critChance: { label: 'Crit Chance', unit: '%', levelShare: 0.3 }, // chance in % that a click crits (x2 damage), added to the character's own
+	critChance: { label: 'Crit Chance', unit: '%', levelShare: 0.3 }, // chance in % that a hit crits (x2 damage), added to the character's own
 	superCrit: { label: 'Super Crit', unit: '%', levelShare: 0.3 }, // chance in % that a crit becomes a super crit (x5), on top of the base chance
 	regen: { label: 'HP Regen', unit: '/s', decimals: 1, levelShare: 0.6 }, // HP per second, in and out of fights
 	luck: { label: 'Luck', integer: true, levelShare: 0.5 }, // adds to the Luck of the character: better chest and kill gold and rarer chest finds
@@ -32,7 +32,7 @@ export const STAT_DEFS = {
 	maxMana: { label: 'Max Mana', integer: true, levelShare: 0.7 }, // added to the character's mana pool (skills spend it)
 	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
 	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
-	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of click damage returned as HP (capped by STAT_RULES.lifeLeechCap)
+	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
 } as const satisfies Record<string, StatDef>;
 
 export type StatKey = keyof typeof STAT_DEFS;
@@ -77,7 +77,7 @@ export type StatTotals = Record<StatKey, number>;
 export const MAX_ITEM_LEVEL = 100;
 
 /** Each item level adds this share of the level-1 power (linear: 1 at level 1, 1.63 at 10, 7.9 at 100). */
-export const POWER_PER_LEVEL = 0.07;
+const POWER_PER_LEVEL = 0.07;
 
 export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL, Math.max(1, Math.round(level)));
 
@@ -86,7 +86,7 @@ export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL
 // early game's income climbs (levels up to the knee), flatter after it. The merchant pays `rarity base x curve x quality x
 // affixes` (`sellValueOf`) and sells at a multiple of that (`MERCHANT_GOODS.priceFactor`). One place to retune the whole market.
 
-export const ITEM_VALUE = {
+const ITEM_VALUE = {
 	/** Growth of the value per item level up to `kneeLevel`, and above it */
 	growthLow: 1.3,
 	growthHigh: 1.12,
@@ -117,7 +117,7 @@ export const affixesValue = (rolls: readonly number[]): number =>
 export const levelScale = (itemLevel: number): number => 1 + POWER_PER_LEVEL * (clampItemLevel(itemLevel) - 1);
 
 /** The quality roll moves base stats by at most this much either way (quality 0-100, 50 = the authored value). */
-export const QUALITY_SPREAD = 0.08;
+const QUALITY_SPREAD = 0.08;
 
 export const qualityMultiplier = (quality: number): number => 1 + ((Math.min(100, Math.max(0, quality)) - 50) / 50) * QUALITY_SPREAD;
 
@@ -130,7 +130,7 @@ export const roundStat = (key: StatKey, value: number): number => {
 };
 
 /** The part of a level ratio a stat follows: `1 + (ratio - 1) x levelShare`. A ratio of 1 stays 1. */
-export const statLevelFactor = (key: StatKey, ratio: number): number => 1 + (ratio - 1) * ((STAT_DEFS[key] as StatDef).levelShare ?? 1);
+const statLevelFactor = (key: StatKey, ratio: number): number => 1 + (ratio - 1) * ((STAT_DEFS[key] as StatDef).levelShare ?? 1);
 
 /**
  * Scales a stat block from one item level to another (`levelRatio`, each stat following its own share of it) and by a plain

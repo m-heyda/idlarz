@@ -80,5 +80,3 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		buildTimeReduction: emberEffect(prestige, 'builders') * 100,
 	};
 };
-
-export type EffectiveStats = ReturnType<typeof effectiveStats>;

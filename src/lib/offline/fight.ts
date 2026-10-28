@@ -43,7 +43,7 @@ const EPS = 1e-9;
 const round1 = (value: number): number => Math.round(value * 10) / 10;
 
 /** The combat record of a ledger, seeded from the saved HP and mana the first time. */
-export const combatOf = (ledger: Ledger, env: CombatEnv): CombatState => {
+const combatOf = (ledger: Ledger, env: CombatEnv): CombatState => {
 	if (ledger.combat) return ledger.combat;
 	const vitals = savedVitals(env.stored.core);
 	return freshCombat(env.nowSec, vitals.hp, vitals.mp);

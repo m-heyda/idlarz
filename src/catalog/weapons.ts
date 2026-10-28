@@ -2,8 +2,8 @@ import type { ItemDef, WeaponType } from '@/types/game';
 
 /**
  * Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; an item can override it with
- * `attackSpeed`). Light weapons swing fast, heavy ones slowly. Click combat does not read this yet: it is the base for the
- * attack-speed combat that replaces clicking, together with each weapon's damage per hit.
+ * `attackSpeed`). Light weapons swing fast, heavy ones slowly. Server fights swing at this speed (lib/offline/profile.ts),
+ * together with each weapon's damage per hit.
  */
 export const WEAPON_ATTACK_SPEED: Partial<Record<WeaponType, number>> = {
 	dagger: 1.6,

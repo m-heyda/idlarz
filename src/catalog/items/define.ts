@@ -30,7 +30,7 @@ const KIND_OF_SLOT: Record<EquipmentSlot | 'ring', ItemKind> = {
  * Rat tier 1-5 are source levels 1,3,5,7,9, the Rat King 12 (see catalog/lootConfig), so the old "steel from tier 3,
  * obsidian from tier 5" gating survives as these windows.
  */
-export const LEVEL_WINDOW_BY_TIER: Record<number, readonly [number, number]> = {
+const LEVEL_WINDOW_BY_TIER: Record<number, readonly [number, number]> = {
 	1: [1, 20],
 	2: [4, 50],
 	3: [8, MAX_ITEM_LEVEL],

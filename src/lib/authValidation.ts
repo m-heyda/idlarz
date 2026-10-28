@@ -1,8 +1,8 @@
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config/playerClasses';
 
-/** Same limit as the in-game name (setPlayerName) and the `profiles.character_name` check constraint. */
+/** Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint. */
 export const CHARACTER_NAME_MAX = 9;
-export const PASSWORD_MIN = 8;
+const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 72; // bcrypt (what Supabase uses) ignores anything beyond 72 bytes
 const EMAIL_MAX = 254;
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,25 +20,25 @@ type Checked<T> = { ok: true; value: T } | { ok: false; error: string };
 
 const asRecord = (body: unknown): Record<string, unknown> => (body && typeof body === 'object' && !Array.isArray(body) ? (body as Record<string, unknown>) : {});
 
-export const checkEmail = (raw: unknown): Checked<string> => {
+const checkEmail = (raw: unknown): Checked<string> => {
 	const email = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
 	if (!email || email.length > EMAIL_MAX || !EMAIL_SHAPE.test(email)) return { ok: false, error: 'Enter a valid email address.' };
 	return { ok: true, value: email };
 };
 
-export const checkPassword = (raw: unknown): Checked<string> => {
+const checkPassword = (raw: unknown): Checked<string> => {
 	if (typeof raw !== 'string' || raw.length < PASSWORD_MIN) return { ok: false, error: `Password needs at least ${PASSWORD_MIN} characters.` };
 	if (new TextEncoder().encode(raw).length > PASSWORD_MAX) return { ok: false, error: `Password can be at most ${PASSWORD_MAX} bytes.` };
 	return { ok: true, value: raw };
 };
 
-export const checkCharacterName = (raw: unknown): Checked<string> => {
+const checkCharacterName = (raw: unknown): Checked<string> => {
 	const name = typeof raw === 'string' ? raw.trim() : '';
 	if (!name || name.length > CHARACTER_NAME_MAX) return { ok: false, error: `Character name needs 1 to ${CHARACTER_NAME_MAX} characters.` };
 	return { ok: true, value: name };
 };
 
-export const checkPlayerClass = (raw: unknown): Checked<PlayerClassId> => {
+const checkPlayerClass = (raw: unknown): Checked<PlayerClassId> => {
 	if (typeof raw !== 'string' || !(PLAYER_CLASS_ORDER as string[]).includes(raw) || !PLAYER_CLASSES[raw as PlayerClassId]) {
 		return { ok: false, error: 'Pick one of the four heroes.' };
 	}

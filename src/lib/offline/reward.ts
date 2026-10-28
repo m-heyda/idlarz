@@ -11,7 +11,7 @@ import type { Drop } from '@/types/game';
 const asRecord = (value: unknown): Record<string, unknown> => (value && typeof value === 'object' ? (value as Record<string, unknown>) : {});
 
 /** What the last accepted save says the player owns (for "prefer a piece you do not have") and their bad-luck counters. */
-export const rollInputs = (stored: StoredSave): { owned: string[]; pity: Record<string, number> } => {
+const rollInputs = (stored: StoredSave): { owned: string[]; pity: Record<string, number> } => {
 	const equipment = asRecord(stored.core.equipment) as Record<string, { base?: string } | undefined>;
 	const bag = Array.isArray(stored.core.bag) ? (stored.core.bag as ({ item?: { base?: string }; id?: string } | null)[]) : [];
 	const owned = [...Object.values(equipment).map((item) => item?.base), ...bag.map((slot) => slot?.item?.base ?? slot?.id)].filter((id): id is string => typeof id === 'string');
