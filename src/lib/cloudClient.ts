@@ -88,7 +88,7 @@ export interface PushAttempt {
 	playSeconds: number;
 }
 
-export const readAttempts = (): PushAttempt[] => {
+const readAttempts = (): PushAttempt[] => {
 	try {
 		const list = JSON.parse(window.localStorage.getItem(ATTEMPTS_KEY) ?? '[]') as Partial<PushAttempt>[];
 		return Array.isArray(list)

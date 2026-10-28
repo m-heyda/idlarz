@@ -13,7 +13,7 @@ import { pickPersisted } from '../src/lib/sanitizeSave';
 import { hasOwnedNeighbour, isOwnedAt, ownedBounds, ownedCount, patchTile, setTile, worldToRows, type World } from '../src/utils/world';
 import type { Resources, Tile } from '../src/types/game';
 
-export { tileAt, getTile, worldFromRows } from '../src/utils/world';
+export { tileAt, worldFromRows } from '../src/utils/world';
 
 useGameStore.persist.setOptions({
 	storage: { getItem: () => null, setItem: () => undefined, removeItem: () => undefined },
@@ -40,15 +40,11 @@ export const gridCells = (tiles: World = api().tiles) =>
 export const patchTileAt = (x: number, y: number, patch: Partial<Tile>) =>
 	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, x, y, patch) }));
 
-/** Replaces (or, with undefined, removes) the tile at (x, y) of the game. */
-export const setTileAt = (x: number, y: number, tile: Tile | undefined) =>
-	useGameStore.setState((s) => ({ tiles: setTile(s.tiles, x, y, tile) }));
-
 /**
  * The pre-ring start most economy tests were written for: the castle alone, one free tile. (A real new game owns the
  * castle and its 8 neighbours; that is covered in biomeSpawn.test.ts.)
  */
-export const classicStart = () => {
+const classicStart = () => {
 	const s = api();
 	let tiles = s.tiles;
 	RING.forEach(([dx, dy]) => {

@@ -28,13 +28,13 @@ const statsOf = (core: Core): CharacterStats => {
 	return stats;
 };
 
-export const equipmentOf = (core: Core): Equipment => (isRecord(core.equipment) ? (core.equipment as Equipment) : {});
+const equipmentOf = (core: Core): Equipment => (isRecord(core.equipment) ? (core.equipment as Equipment) : {});
 
 /**
  * The character's level. A stored save does not hold it (it is derived from the XP, see saveFormat NOT_WRITTEN), so it is worked out from the
  * XP exactly as the game does; a record that carries a level but no XP (the engine tests) is still read.
  */
-export const characterLevelOf = (core: Core): number => {
+const characterLevelOf = (core: Core): number => {
 	const xp = isRecord(core.resources) ? core.resources.xp : undefined;
 	if (typeof xp === 'number' && Number.isFinite(xp)) return calculateLevel(xp).level;
 	const level = isRecord(core.level) ? core.level.level : undefined;

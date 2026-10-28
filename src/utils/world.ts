@@ -26,7 +26,7 @@ export const inRange = (x: number, y: number): boolean =>
 	Number.isInteger(x) && Number.isInteger(y) && Math.abs(x) <= COORD_LIMIT && Math.abs(y) <= COORD_LIMIT;
 
 /** What an unexplored position looks like to callers that index the map the old way. */
-export const EMPTY_TILE: Readonly<Tile> = Object.freeze({ biome: 'empty', isOwned: false } as Tile);
+const EMPTY_TILE: Readonly<Tile> = Object.freeze({ biome: 'empty', isOwned: false } as Tile);
 
 /** Inclusive tile-coordinate rectangle. */
 export interface Bounds {
@@ -36,7 +36,7 @@ export interface Bounds {
 	maxY: number;
 }
 
-export interface WorldStats {
+interface WorldStats {
 	owned: number;
 	buildings: number;
 	chests: number;

@@ -35,7 +35,7 @@ export const emitSaveEvent = (reason: SaveEventReason): void => {
 };
 
 /** Actions that count as an event when they succeed (return something truthy). Frequent small ones (clicks, sells, hits, bag moves) are left out on purpose. */
-export const SAVE_EVENT_ACTIONS = [
+const SAVE_EVENT_ACTIONS = [
 	'buyTile',
 	'buildOnTile',
 	'upgradeCastle',

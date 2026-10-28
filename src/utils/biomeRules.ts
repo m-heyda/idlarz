@@ -25,7 +25,7 @@ export function neighbourBiomes(tiles: World, x: number, y: number) {
 }
 
 /** An owned non-castle tile with no same-biome 4-neighbour: a 1x1 speck that the next purchase beside it should join. */
-export function isLonely(tiles: World, x: number, y: number): boolean {
+function isLonely(tiles: World, x: number, y: number): boolean {
 	const biome = ownedBiome(getTile(tiles, x, y));
 	return biome !== null && !SIDES4.some(([dx, dy]) => getTile(tiles, x + dx, y + dy)?.biome === biome);
 }
@@ -62,7 +62,7 @@ const DIAGONALS: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
  *   `avoid`   biomes that would meet a diagonal tile of the same biome with both tiles between them owned and different;
  *   `require` biomes of a diagonal pair of owned tiles whose fourth corner is owned and different: the new tile must join them.
  */
-export function saddleRules(tiles: World, x: number, y: number): { avoid: Set<BiomeType>; require: Set<BiomeType> } {
+function saddleRules(tiles: World, x: number, y: number): { avoid: Set<BiomeType>; require: Set<BiomeType> } {
 	const avoid = new Set<BiomeType>();
 	const require = new Set<BiomeType>();
 	for (const [dx, dy] of DIAGONALS) {

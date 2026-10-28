@@ -35,7 +35,7 @@ export interface ManualStore {
 	write: (userId: string, at: number) => void;
 }
 
-export const browserManualStore: ManualStore = {
+const browserManualStore: ManualStore = {
 	read: (userId) => {
 		try {
 			const raw = window.localStorage.getItem(KEY);

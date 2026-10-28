@@ -41,6 +41,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# editor and agent working folders
+.claude/
+.vscode/
+.idea/
+*.log
+
 # generated review sheets and python caches
 scripts/pixel/previews/
 __pycache__/

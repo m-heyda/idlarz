@@ -1,7 +1,7 @@
 import { AMBIENT_LIFE, TILE_SIZE, type AmbientCritterType } from '@/config/gameConfig';
 import { getTile, ownedBounds, type World } from '@/utils/world';
 
-export type AmbientType = AmbientCritterType;
+type AmbientType = AmbientCritterType;
 
 /** Visible part of the map in tile coordinates (inclusive). */
 export interface Viewport {

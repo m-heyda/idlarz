@@ -307,12 +307,13 @@ Derived stats for the starting stats (all 5):
 | def | 0 | 0 |
 | luck | 5 | 0 |
 | critChance | 3.75 | 0 |
-| critDmgMultiplier | 110 | 0 |
 | atkSpeedIncrease | 0 | 0 |
 | xpGainMultiplier | 2.25 | 0 |
 | tileCostDiscount | 2.5 | 0 |
 
 ## 7. Rates of a brand-new game
+
+A real game rolls its 8 start tiles at random; this table uses one fixed ring (seed 1) so the file is reproducible.
 
 | Resource | BASE_GENERATION_RATES | CASTLE_BASE_RATES | base (computed) | modifier (computed) | total /s |
 | --- | --- | --- | --- | --- | --- |

@@ -4,7 +4,7 @@ import { createInitialWorld } from '@/utils/gameUtils';
 import { getTile, hasOwnedNeighbour, isOwnedAt, ownedBounds, setTile, type World } from '@/utils/world';
 
 /** Seeded generator (mulberry32): the same seed always gives the same stream. */
-export const seededRandom = (seed: number): (() => number) => {
+const seededRandom = (seed: number): (() => number) => {
 	let a = (seed + 1) * 0x9e3779b1;
 	return () => {
 		a = (a + 0x6d2b79f5) | 0;
@@ -20,7 +20,7 @@ export type BuyPolicy = 'nearest' | 'random';
 const SIDES: [number, number][] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
 /** Every unowned tile with an owned 4-neighbour. */
-export function frontierTiles(world: World): [number, number][] {
+function frontierTiles(world: World): [number, number][] {
 	const b = ownedBounds(world);
 	const out: [number, number][] = [];
 	if (!b) return out;

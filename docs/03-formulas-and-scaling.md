@@ -20,9 +20,9 @@ discount%= min(0.5 × Charisma, 25)
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | gold (cha 5) | 60 | 181 | 469 | 925 | 3.6 K | 19.4 K | 105 K | 150 K | 212 K | 426 K | 1.6 M | 4.2 M | 96 M |
 
-Cumulative gold for the first 100 / 200 / 300 / 400 / 500 tiles: 1.7 M / 17 M / 49 M / 142 M / 422 M (the extra wood, stone, coal and food shares come on top).
+Cumulative gold for the first 100 / 200 / 300 / 400 / 500 tiles: 1.6 M / 17 M / 48 M / 138 M / 412 M (the extra wood, stone, coal and food shares come on top).
 
-**The tail (no tile limit).** Up to 300 tiles the price is the three exponential stages (×1.13 to 15 tiles, ×1.07 to 100, then only ×1.007 per tile, the soft middle). Past `TILE_PRICE.tailFrom` (300) it grows like `(n / 300)^4.5` (`TILE_PRICE.tailExponent`), much steeper than the stretch before, and is capped at `TILE_PRICE.ceiling` (`RESOURCE_CAP / 100`), so it is always finite and a map of tens of thousands of tiles stays buyable (table in [generated/balance-tables.md](generated/balance-tables.md)). `RESOURCE_CAP` was raised from 1e15 to 1e21 for it. There is no tile limit any more (see 02 §1, map). The numbers are tuned with `npm run sim` against the pacing targets in [06](06-playtest-and-pacing-report.md) (100 tiles within the first day, 200-300 tiles in 2-3 days, a visibly harder climb after 300) for a game that will later be built around rebirths (bigger starting resources, much bigger maps): see BL16 in [05](05-balance-backlog-and-roadmap.md).
+**The tail (no tile limit).** Up to 300 tiles the price is the three exponential stages (×1.13 to 15 tiles, ×1.07 to 100, then only ×1.007 per tile, the soft middle). Past `TILE_PRICE.tailFrom` (300) it grows like `(n / 300)^4.5` (`TILE_PRICE.tailExponent`), much steeper than the stretch before, and is capped at `TILE_PRICE.ceiling` (`RESOURCE_CAP / 100`), so it is always finite and a map of tens of thousands of tiles stays buyable (table in [generated/balance-tables.md](generated/balance-tables.md)). `RESOURCE_CAP` was raised from 1e15 to 1e21 for it. There is no tile limit any more (see 02 §1, map). The numbers are tuned with `npm run sim` against the pacing targets in [06](06-pacing-targets.md) (100 tiles within the first day, 200-300 tiles in 2-3 days, a visibly harder climb after 300) for a game that will later be built around rebirths (bigger starting resources, much bigger maps); the tail is also on the balance backlog in [ROADMAP](ROADMAP.md).
 
 Every purchase rolls its biome (no picker). XP and reputation per purchase in §2.
 
@@ -55,14 +55,16 @@ modifiers[r] = castleModifier(C)                    castle, all resources (§4)
              + stat modifiers                       2.5 % per point, see 02 §11 (XP: +0.2 %/INT, +0.25 %/CHA)
              + 0.05 × plainsTiles                   (r = meat only)
 
-total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × embersEarned)     (second factor only after a Rebirth, §9)
+total[r] = base[r] × (1 + modifiers[r]) × (1 + 0.05 × embersEarned) × (1 + Foreman)     (second factor only after a Rebirth, §9; Foreman = merchant upgrade, +1 % per level, every resource but XP)
+
+The merchant's Skinner upgrade (+5 % per level) multiplies the farm's meat and hide inside `base` before the modifiers.
 ```
 
 The old hidden +10 % gold / +25 % XP modifier is gone (modifiers start at 0). Everything is additive inside the single `(1 + Σ)`.
 
-`calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Ember factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Stats tab's *Where the income comes from* section shows exactly these numbers per resource.
+`calculateResourceBreakdown` (`src/utils/gameUtils.ts`) is the one place this formula lives: per resource it returns the pieces (realm start, farm, biome tiles, buildings, castle-level XP), the bonuses (castle, plains, attributes, the Ember factor) and the totals, and `calculateResourceRates` is built on it (`tests/uiActions.test.ts` checks that base, modifier and total are identical and that the pieces add up). The Character tab's *Where the income comes from* section shows exactly these numbers per resource.
 
-**New game**: gold 0.2 base × 1.45 = **0.29/s**, wood and food 0.05 × 1.45, stone 0.1 × 1.325, xp 0.75 × 1.223 = 0.92/s.
+**New game**: the castle plus the 8 free start tiles (a random ring of plains and forest) give roughly 3-4 gold/s, about 0.1 wood and 0.2 stone/s and a few food per second, under the castle's +45 % modifier (+32.5 % stone), and about 1.2 xp/s. The exact rows for one fixed ring are in [generated/balance-tables.md §7](generated/balance-tables.md).
 
 ## 4. Castle
 
@@ -86,7 +88,7 @@ upgrade C→C+1      = pay upgradeCosts[C−1] up front, then wait durationsSec[
 | 8→9 | 5 d | 76.8 M | 7.6 M | 7.6 M | 4 M | 41 M | 2 M |
 | 9→10 | 7 d | 122.8 M | 12.2 M | 12.2 M | 6.6 M | 65.6 M | 3.2 M |
 
-Build time to level 6 is 4 d 5 h (1 h + 4 h + 12 h + 1 d + 2 d), to level 10 23 d 5 h (before Ember discounts); the timers are the floor of the first run, so the cost of 5→6 is what a player who plays a few times a day must be able to pay while the 4→5 timer runs. Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
+Build time to level 6 is 3 d 17 h (1 h + 4 h + 12 h + 1 d + 2 d), to level 10 22 d 17 h (before Ember discounts); the timers are the floor of the first run, so the cost of 5→6 is what a player who plays a few times a day must be able to pay while the 4→5 timer runs. Cost rows come straight from `CASTLE_UPGRADE.upgradeCosts`; the generated tables show the same numbers.
 
 ## 5. Farm animals
 
@@ -128,25 +130,24 @@ buy:   gold = ceil(amount × price × 2)                         wood, stone, co
 item:  sell = floor(rarityValue × valueCurve(level) × qualityValue × affixesValue × Haggler)   rarityValue 300 / 1200 / 3600 / 12000 / 45000; potions 20 / 90
        valueCurve = 1.3^(min(L,10)−1) × 1.12^max(0,L−10);  qualityValue 0.75..1.25;  affixesValue = 1 + Σ(0.15 + 0.35 × roll/100)   (ITEM_VALUE in catalog/stats.ts)
        supplies (potions) price >= 3 × sellValue (> 3.9 × with a max Haggler), so buy + sell never gains gold
-goods: shelf = 6 pieces of loot source `merchant` (item level 4 + 3 per castle level above 1, +-2; common 50 / uncommon 32 / rare 14 / epic 4)
-       price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh); rarity common 60 / uncommon 40; item level centre = min(world level, avgWorn + 3), max avgWorn + 5
+goods: shelf = 6 pieces of loot source `merchant` (profile `merchant_stock`: common 60 / uncommon 40, nothing better); item level centre = min(castle-based level, avgWorn + 3), never above avgWorn + 5 (MERCHANT_GOODS)
+       price = ceil(sellValue × 5), reshuffle after 1800 s of play time, refresh = 5000 × (k+1) for the k-th paid refresh (k < 10), then 50000 × (k−8) (MERCHANT_GOODS.refresh)
 bonuses: price = ceil(base × growth^level)   Haggler 100 K ×1.9, Bulk Discount 250 K ×2.1, Lucky Charm 150 K ×1.9, Pack Rat 500 K ×3, Foreman 400 K ×1.9, Skinner 300 K ×1.9, Quick Hands / Keen Eye / Deadly Aim / Might 250 K ×1.9, Arcana 250 K ×2, Vampiric Fang / Second Wind 300 K ×2, Ancestral Tithe 600 K ×1.9 (all start again on a rebirth but Pack Rat); Embers of a rebirth = floor(gain × (1 + 0.05 × Tithe))
 click: gold = total gold/s × clickPower    0.5 → 0.9 → 1.3 → 1.8   (750 K, 2.5 M, 10 M)
 tap:   resource = tile output/s × 0.5 s, tile cooldown 1.2 s
-chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s, ≤ 5 waiting
-building cost = floor({500 gold, 250 wood, 150 stone} × 1.6^(buildings already built))
-             cooldown: farm 8 s, map 20 s, both gated by the click limiter, amount computed in the store
+chest: gold = floor(total gold/s × U{600…3600} s × (1 + 0.005 × Luck))      one per 600 s of server time (Luck shortens it), counted with the monsters against min(40, 30 % of the free land)
+building cost: see §11
 ```
 
-Click limiter (gold clicks, tile taps; NOT fight hits): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
+Click limiter (gold clicks and tile taps): burst bucket 8 tokens refilling 5/s × stamina bucket 20 000 refilling 1.5/s; each paid click takes one token from both.
 
 ## 7. Character-derived stats
 
-`calculateCombatStats`: physicalAtk = STR; magicAtk = INT; hp = 3·VIT + 0.25·CHA; mp = 2·INT; def = DEX + 0.5·STR + 0.5·VIT + 0.25·CHA; magicDef = INT + 0.5·VIT + 0.25·CHA; luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; atkSpeed % = 0.25·DEX; **xpGainMultiplier** and **tileCostDiscount** as above. Only luck (chests), crit stats (lucky taps), xpGainMultiplier and tileCostDiscount affect gameplay; the rest is display-only.
+`calculateCombatStats` (`gameUtils.ts`; the combat parts come from `lib/statBonuses.ts`, the same functions the server's fights use, and count the points above the starting 5): physicalAtk % = 2·(STR−5); magicAtk % = 2.4·(INT−5); hp = 3·VIT + 0.25·CHA (on top of the base 85); mp = 20 + 4·INT; def = 0.5·(DEX−5) + 0.5·(VIT−5) + 0.25·(STR−5); luck = CHA; critChance % = 0.25·DEX + 0.5·CHA; atkSpeed % = 0.25·(DEX−5); **xpGainMultiplier** = 0.2·INT + 0.25·CHA and **tileCostDiscount** = 0.5·CHA (max 25) as above. Damage, armor, crit damage and attack speed feed the fight engine (§10), luck feeds chests and kills, xpGainMultiplier and tileCostDiscount the economy; reputation is display-only.
 
 ## 8. What the pacing looks like
 
-From `npm run sim` (bot players, real store; see [06 §0b](06-playtest-and-pacing-report.md)): castle 4 ≈ 1 d, castle 5 ≈ 2.1-3.6 d, castle 6 ≈ 4.2 d (bots) / 5.8 d (the `human` profile, who plays a few times a day and never sells surplus), castle 10 ≈ 24-26 d; the first rebirth is available around day 6-7 for a person, level ~40 by then. Older numbers below the heading are history. The 24 h/day auto-clicker bot is faster still (castle 6 ≈ 24 d) because it also manages the economy around the clock, see [06 §3](06-playtest-and-pacing-report.md).
+Pacing is measured, not written here: `npm run sim` drives the real store with bot players and writes [generated/sim-milestones.md](generated/sim-milestones.md); the targets and what they mean are in [06](06-pacing-targets.md).
 
 ## 9. Rebirth and Embers
 
@@ -167,24 +168,23 @@ provisions  : start each run with level × (1500 gold, 400 wood, 400 stone)
 | 8 | 42 | 60 | 73 |
 | 10 | 71 | 100 | 123 |
 
-Conservation rule used by the save check: `legacyPoints + Σ shop spending = legacyEarned`, and `rebirths = 0` implies `legacyEarned = 0` ([07 §3](07-security-and-exploits.md)). More tables in [generated/balance-tables.md](generated/balance-tables.md).
+Conservation rule used by the save check: `legacyPoints + Σ shop spending = legacyEarned`, and `rebirths = 0` implies `legacyEarned = 0` ([07](07-saves-and-security.md)). More tables in [generated/balance-tables.md](generated/balance-tables.md).
 
 ## 10. Combat, monsters and items
 
 ```
 maxHp        = round(85 + characterStats.hp + Σ gear maxHp + set bonuses)       COMBAT.baseHp   (101 at the start)
-damage/click = max(1, Σ gear damage + set bonuses)                              Wooden Sword 6 ... Titan Maul 45 at their first level (COMBAT.maxItemDamage 50 caps the authored base damage; gear grows with its item level)
-click        : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
+damage/hit   = max(1, Σ gear damage + set bonuses)                              Wooden Sword 6 ... Titan Maul 45 at their first level (COMBAT.maxItemDamage 50 caps the authored base damage; gear grows with its item level)
+hit          : crit with  (character critChance + gear critChance) %  (max 75 %)  → damage × 2
                then a super crit with (5 + gear superCrit) %  (max 50 %)          → damage × 5   (COMBAT.crit)
-fight hits   : not rate limited; trusted real clicks only, one DOM event counts once (lib/hitGuard.ts)
 hit taken    = max(1, round(attack × (1 − armorReduction(armor))))              COMBAT.armorK, armorSoftCap, armorSoftSlope
 armorReduction(a) = r = a/(a+40);  r ≤ 0.5 ? r : 0.5 + (r − 0.5) × 0.5       (ceiling 75 %)
 stat bonuses : counted above the starting 5 (STAT_RULES)
                damage = gear damage × (1 + 0.02 × (STR−5))  physical weapons;  × (1 + 0.024 × (INT−5))  staff and wand
                armor  = gear armor + 0.5 × (DEX−5) + 0.5 × (VIT−5) + 0.25 × (STR−5)       hit taken × (1 − armorReduction(armor))
                crit multipliers x2 / x5 × (1 + (1 × (STR−5) + 0.5 × (DEX−5) + 0.5 × (CHA−5)) / 100)
-               attacks/s = weapon speed × (1 + 0.0025 × (DEX−5))   (hook for speed combat; clicks ignore it)
-mana         = 20 + 4 × INT + gear;  regen = 0.5 + 0.05 × INT + gear  per second;  life leech = min(15, gear %) of the click damage as HP
+               attacks/s = weapon speed × (1 + 0.0025 × (DEX−5))   (the speed the server's fight engine swings at)
+mana         = 20 + 4 × INT + gear;  regen = 0.5 + 0.05 × INT + gear  per second;  life leech = min(15, gear %) of the damage dealt as HP
 Heal         = round(25 % max HP × (1 + 0.024 × (INT−5)) × (1 + Spell Power %)), level 5, 20 mana, 12 s cooldown
 Stun         = the monster's attack timer is frozen 10 s, level 10, 15 mana, 30 s cooldown (the King's limit keeps running); a monster's stunResist % can make it fail
 regen        = (1 + gear regen) HP/s with no active fight, gear regen only during one; knockout restores 30 % of max HP
@@ -192,8 +192,8 @@ potion       = +35 / +90 HP (not above max), 8 s cooldown shared by all potions 
 monster level: level = spawnLevel + min(growthLevels, floor(age / growthInterval))    growthLevels 10, interval 1800 s (LIMITS, via limitOf); age counts only while not being fought
                spawn level: rat window [1 + (castle−1), +2] capped at 10; King [15 + floor(0.8 × (castle−1)), +3] capped at 25; rolled from the monster id (no Math.random)
 rat level L  : HP = round(100 × 1.5^((L−1)/2))  → level 1 / 3 / 5 / 7 / 9 = 100 / 150 / 225 / 338 / 506     attack = round(4 × 1.25^((L−1)/2))     armor = 0.5 × (L−1)
-King level L : HP, attack = base × levelScale(L) / levelScale(15)  (9600 HP, 11 attack at 15), armor 15 + 0.5 × (L−15), 8 % crit x1.5, 20 % Stun resist
-click damage = max(1, your damage × (1 − armorReduction(armor)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
+King level L : HP, attack = base × levelScale(L) / levelScale(15)  (1000 HP, 11 attack at 15), armor 15 + 0.5 × (L−15), 8 % crit x1.5, 20 % Stun resist
+hit dealt    = max(1, your damage × (1 − armorReduction(armor)))     monster hit = mitigate(attack [× 1.5 on a crit], your armor)
 rewards      : rewardSec = 90 × 1.17^(L−1) (rat), 3600 × 1.03^(L−15) (King)
                gold = floor(max(10, gold/s × rewardSec × (1 + 0.005 × Luck)))   Luck = character + merchant + gear
                xp   = max(5, xp/s × (1 + xpGain%) × rewardSec)
@@ -204,23 +204,23 @@ drops        : see [10-loot-system.md](10-loot-system.md): profile -> rolls -> s
                Rat King: 1 item of his own (rolled rarity) + 1 Rattatui piece (missing ones first) + 40 % a second one + 5 % (pity up to 15 %) a legendary weapon + 2 Minor and 1 Greater potion
                chest (item result, 8 % of chests): one item - gear 82 % (rolled rarity) or a potion, 1.9 % a legendary weapon instead
 item level   : a monster's drops are at its own level (rat 1-20, King 15-35); chest 4 and the merchant 4, +3 per castle level; gear power x levelScale(level) = 1 + 0.07 x (level - 1)
-spawn        : first rat 120 s after 5 owned tiles, then 900 s; a boss (one at a time) every 10800 s of spawn time (COMBAT.spawn.bossIntervalSec)
-Rat King     : level 15: 9600 HP + 15 armor (about 13200 effective), attack 11 every 3 s, 75 s limit
+spawn        : first rat 120 s after the start (a valid site must be free: owned land 2-9 tiles from the castle), then every 900 s, at most min(40, 30 % of the free land) waiting per kind; a boss (one at a time) every 10800 s of spawn time (COMBAT.spawn.bossIntervalSec)
+Rat King     : level 15: 1000 HP behind 15 armor, attack 11 every 3 s, 75 s limit
 ```
 
 The King's numbers were tuned with `npm run fight-sim` (a bot with the real combat rules; tables in [generated/fight-sim.md](generated/fight-sim.md)) and are
-held by `tests/fightBalance.test.ts`: the starter kit and plain wood never win, steel needs fast clicking, obsidian a steady pace, the Rattatui set is comfortable,
+held by `tests/fightBalance.test.ts`: the starter kit and plain wood never win, full steel does not, full obsidian wins with seconds to spare, the Rattatui set comfortably,
 and no loadout trivialises him. Rats are basic enemies and are not tuned around him.
 
 Items, sets, rarities, stats, drop pools and the merchant stock are generated into [generated/item-catalog.md](generated/item-catalog.md) from `src/catalog`.
 Combat numbers live in `src/config/combatConfig.ts`.
 
-## Building cost
+## 11. Building cost
 
 ```
 building number n (1-based, `built = n - 1` already stand)   factor(built) =
   built < 4              : starter[built]                       x0.4, x0.6, x0.8, x1.0     (BUILDING_COST.starter)
-  k = built - 3           : 1.35^min(k, 12) x 1.25^clamp(k - 12, 0, 16) x 1.15^max(k - 28, 0)
+  k = built - 3           : 1.15^min(k, 12) x 1.09^clamp(k - 12, 0, 16) x 1.025^max(k - 28, 0)
 cost (gold / wood / stone) = floor(base x factor x (1 - Thrift))     base = 500 / 250 / 150
 ```
 
@@ -230,16 +230,16 @@ cost (gold / wood / stone) = floor(base x factor x (1 - Thrift))     base = 500 
 | 2 | 0.6 | 300 |
 | 3 | 0.8 | 400 |
 | 4 | 1.0 | 500 |
-| 5 | 1.35 | 675 |
-| 10 | 6.05 | 3.0K |
-| 16 | 36.6 | 18.3K |
-| 20 | 89.5 | 44.7K |
-| 32 | 1302 | 651K |
-| 40 | 3982 | 1.99M |
+| 5 | 1.15 | 575 |
+| 10 | 2.31 | 1,157 |
+| 16 | 5.35 | 2,675 |
+| 20 | 7.55 | 3,776 |
+| 32 | 21.2 | 10,621 |
+| 40 | 25.9 | 12,941 |
 
 The price follows the tile curve in shape (steep, then gentler, then gentler again) but starts lower, so a building is a fraction of a tile at the same point of the game.
 `src/config/gameConfig.ts` `BUILDING_COST` and `buildingCostFactor` in `src/utils/gameUtils.ts`; `tests/buildOnTile.test.ts` holds the shape.
 
-## 7. Limits and bonus hooks (what upgrades and rebirth will extend)
+## 12. Limits and bonus hooks (what upgrades and rebirth will extend)
 
-Bounds that progression is meant to raise live in `src/config/limits.ts` (`LIMITS`: monster growth levels and interval, merchant shelf size, rotation and refresh cost, bag size) with a `HARD_LIMITS` ceiling for what a save may hold. Code reads them through `limitOf(key, ctx)` (`src/lib/limits.ts`), which adds the bonuses registered in `LIMIT_BONUSES` (today only Pack Rat on the bag size); a new upgrade or Ember effect is one entry there and every reader follows. Likewise every gold payout for something the player sells goes through `sellMultiplier(ctx)` / `sellPayout` (`utils/gameUtils.ts`) with the bonuses in `SELL_BONUSES` (today Haggler): resources, bag gear, junk, auto-sold drops, the merchant previews and the cloud net-worth check all use it, so a "+20 % selling" effect applies to all of them alike (`tests/monsterLevels.test.ts` proves it with a registered bonus).
+Bounds that progression is meant to raise live in `src/config/limits.ts` (`LIMITS`: monster growth levels and interval, merchant shelf size, rotation and refresh cost, bag size) with a `HARD_LIMITS` ceiling for what a save may hold. Code reads them through `limitOf(key, ctx)` (`src/lib/limits.ts`), which adds the bonuses registered in `LIMIT_BONUSES` (today only Pack Rat on the bag size); a new upgrade or Ember effect is one entry there and every reader follows. Likewise every gold payout for something the player sells goes through `sellMultiplier(ctx)` / `sellPayout` (`utils/gameUtils.ts`) with the bonuses in `SELL_BONUSES` (today Haggler): resources, bag gear, junk, auto-sold drops, the merchant previews and the cloud net-worth check all use it, so a "+20 % selling" effect applies to all of them alike (`tests/limitsAndSelling.test.ts` proves it with a registered bonus).

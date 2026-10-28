@@ -24,7 +24,7 @@ const SPARKS = [
 ];
 
 /** 0 for the first glowing level, +1 for every level above it. */
-export const castleTier = (level: number) => Math.max(0, level - CASTLE_UPGRADE.glowFromLevel);
+const castleTier = (level: number) => Math.max(0, level - CASTLE_UPGRADE.glowFromLevel);
 
 /**
  * The castle for a given upgrade level. Levels 1-5 are ever bigger sprites; from `glowFromLevel` on it is the

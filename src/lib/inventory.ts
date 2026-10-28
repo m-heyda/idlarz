@@ -157,7 +157,7 @@ export const organizeBag = (bag: BagSlot[]): BagSlot[] => {
 };
 
 /** The gear slot an item goes into: rings take the first free ring slot (else replace the first), everything else its own slot. */
-export const targetSlot = (def: ItemDef, equipment: Equipment): EquipmentSlot | null => {
+const targetSlot = (def: ItemDef, equipment: Equipment): EquipmentSlot | null => {
 	if (!def.slot) return null;
 	if (def.slot === 'ring') return !equipment.ring1 ? 'ring1' : !equipment.ring2 ? 'ring2' : 'ring1';
 	return def.slot;
@@ -235,7 +235,7 @@ export const compareToEquipped = (item: ItemInstance, equipment: Equipment): Ite
 	return { slot, equipped: equipment[slot], deltas };
 };
 
-export type StatRowStatus = 'new' | 'lost' | 'up' | 'down' | 'same';
+type StatRowStatus = 'new' | 'lost' | 'up' | 'down' | 'same';
 
 /** One stat line of a comparison: what the worn piece gives (`was`), what the hovered piece would give (`now`). */
 export interface StatRow {
@@ -248,7 +248,7 @@ export interface StatRow {
 }
 
 /** A set whose piece count changes with the swap, and the bonus tiers that switch on (gained) or off (lost). */
-export interface SetChange {
+interface SetChange {
 	setId: string;
 	label: string;
 	from: number;
@@ -259,7 +259,7 @@ export interface SetChange {
 }
 
 /** The headline number of a card (weapon damage, or armor) with the worn piece's value, like the big Armor line of an action-RPG card. */
-export interface PrimaryRow {
+interface PrimaryRow {
 	key: 'damage' | 'armor';
 	was: number;
 	now: number;
@@ -267,7 +267,7 @@ export interface PrimaryRow {
 }
 
 /** A weapon's swing: attacks per second and damage per second, the hovered piece against the worn one. */
-export interface SwingRow {
+interface SwingRow {
 	speed: { was: number; now: number; delta: number };
 	dps: { was: number; now: number; delta: number };
 }

@@ -10,7 +10,7 @@ import { ownedRowMajor, type World } from '@/utils/world';
 export interface MonsterStats {
 	maxHp: number;
 	attack: number;
-	/** Reduces the damage of the player's clicks (same curve as the player's armor) */
+	/** Reduces the damage of every hit the player lands (same curve as the player's armor) */
 	armor: number;
 	/** % chance and multiplier of a crit on one of its hits */
 	critChance: number;

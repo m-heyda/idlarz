@@ -1,6 +1,6 @@
 # 10 · Loot system
 
-One shared, data-driven pipeline gives out gear for every source (rats, the Rat King and later bosses, chests and the merchant's shelf). Design: [superpowers/specs/2026-10-27-loot-system-design.md](superpowers/specs/2026-10-27-loot-system-design.md). Numbers: [generated/loot-sim.md](generated/loot-sim.md) and [generated/item-catalog.md](generated/item-catalog.md).
+One shared, data-driven pipeline gives out gear for every source (rats, the Rat King and later bosses, chests and the merchant's shelf). Numbers: [generated/loot-sim.md](generated/loot-sim.md) and [generated/item-catalog.md](generated/item-catalog.md).
 
 ## The five separate ideas
 
@@ -26,16 +26,16 @@ Rarity never decides the item level and the item level never decides the rarity.
 8. Instance: quality roll (0-100, 50 = authored), affix count from the rarity, affixes picked without replacement (one per group, item level and tag checks).
 9. Bonus tables run after as extra rolls: named set pieces, the legendary pool, potions. `placement`: `extra` (default) adds, `fallback` only when no gear dropped yet, `replace` cancels the general gear roll when it triggers (a chest's legendary).
 
-An empty pool never silently drops something else: the result carries a `warnings` entry and a `trace` per roll (source, profile, levels, eligible counts, rarity chances, chosen rarity/item, affixes) for bug reports. In the browser, the admin panel's *Loot: rat T5 / Rat King / chest* buttons roll through the real pipeline and `console.table` the trace.
+An empty pool never silently drops something else: the result carries a `warnings` entry and a `trace` per roll (source, profile, levels, eligible counts, rarity chances, chosen rarity/item, affixes) for bug reports. In the browser, the admin panel's *Loot: chest* button rolls through the real pipeline and `console.table` the trace.
 
 ## Stats
 
 ```
 statsAtLevel = baseStats × levelScale(level) / levelScale(minItemLevel) × qualityMultiplier(quality) × rarity.statMultiplier   (rounded per stat)
 levelScale(L) = 1 + 0.07 × (L − 1)            POWER_PER_LEVEL, MAX_ITEM_LEVEL 100      (catalog/stats.ts)
-per stat      : factor = 1 + (levelScale ratio − 1) × STAT_DEFS[stat].levelShare   damage/armor/maxHp 1.0, regen 0.6, luck/goldFind 0.5, crit/superCrit/dodge 0.3
+per stat      : factor = 1 + (levelScale ratio − 1) × STAT_DEFS[stat].levelShare   damage/armor/maxHp 1.0, maxMana 0.7, regen 0.6, luck/goldFind/manaRegen 0.5, spellPower 0.4, crit/superCrit/dodge/lifeLeech 0.3
 affix value   = affixMagnitude(stat, L) × power × (roll range)                           (catalog/affixes.ts)
-sell value    = rarity.sellValue × levelScale(level)                                     (itemInstance.sellValueOf)
+sell value    = rarity.sellValue × valueCurve(level) × qualityValue × affixesValue       (itemInstance.sellValueOf; see "What gear is worth")
 ```
 
 Capped percentage stats (crit, dodge) follow only a share of the curve, or they would hit their caps (crit 75 %, dodge 40 %) within a few levels.
@@ -55,11 +55,11 @@ Stats are derived at load and never stored, so retuning the curve retunes every 
 
 ## Saves
 
-Schema 3 stores gear as instances: equipment `{ slot: { base, level, rarity, quality, affixes: [{ id, roll }] } }`, bag gear `{ item: {...} }`, consumables `{ id, qty }` as before. Schema 2 saves (bare item ids) are converted by `MIGRATIONS[2]` using the frozen table in `src/lib/legacyGear.ts`: each old id becomes the item at its authored level, neutral quality, no affixes and its old rarity, so its stats do not change (`tests/saves.test.ts` checks all 76 gear ids). The old encrypted vault format goes through the same step. New optional fields: `lootPity` (bad-luck counters by `profile:table`) and `autoSellUpTo` (rarity id).
+Gear is saved as instances (since schema 3; the current schema is 6, see [07](07-saves-and-security.md)): equipment `{ slot: { base, level, rarity, quality, affixes: [{ id, roll }] } }`, bag gear `{ item: {...} }`, consumables `{ id, qty }` as before. Schema 2 saves (bare item ids) are converted by `MIGRATIONS[2]` using the frozen table in `src/lib/legacyGear.ts`: each old id becomes the item at its authored level, neutral quality, no affixes and its old rarity, so its stats do not change (`tests/saves.test.ts` checks all 76 gear ids). The old encrypted vault format goes through the same step. New optional fields: `lootPity` (bad-luck counters by `profile:table`) and `autoSellUpTo` (rarity id).
 
 ## The merchant's shelf
 
-The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs the `merchant_stock` profile: twelve guaranteed rolls on the general pool (the shelf keeps the first six) at +-2 item levels, rarity weights common 50 / uncommon 32 / rare 14 / epic 4 (gated by item level like chests), no legendary and no bonus tables. `generateMerchantStock` (src/lib/merchant.ts) turns the drops into the shelf; the price is `ceil(sellValueOf(item) × 5)`, derived each time, never saved. The shelf is the optional save key `merchantStock` (`{ at, offers }`, every offer read by the same item validation as the bag, at most 12 offers).
+The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs the `merchant_stock` profile: twelve guaranteed rolls on the general pool (the shelf keeps the first six) at +-2 item levels, rarity weights common 60 / uncommon 40 (nothing better), no legendary and no bonus tables. `generateMerchantStock` (src/lib/merchant.ts) turns the drops into the shelf; the price is `ceil(sellValueOf(item) × 5)`, derived each time, never saved. The shelf is the optional save key `merchantStock` (`{ at, offers }`, every offer read by the same item validation as the bag, at most 12 offers).
 
 ## Player-facing
 
@@ -68,7 +68,7 @@ The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs 
 
 ## Not done yet (kept on purpose)
 
-Salvage / materials and reroll / upgrade (real gear sinks), flat set bonuses that fade at high level, `requiredLevel`, weapon attack speed in combat, elite monsters and premium chests, and rebalancing the monsters with the world level (see the follow-up list in the design spec).
+Salvage / materials and reroll / upgrade (real gear sinks), flat set bonuses that fade at high level, `requiredLevel`, elite monsters and premium chests, and rebalancing the monsters with the world level (see [ROADMAP](ROADMAP.md)).
 
 A monster source has no level of its own: `LootRequest.level` is the monster's level, and the source's `levels` range (rat 1-20, King 15-35) is what `validateLootData` checks the pools against. Per-level chances (`chancePerLevel`) replace the old per-tier ones (half the size: a tier was two levels). A boss is a monster def with `grade: 'boss'` whose `lootSourceId` names its own source and profile, so boss-only drops need data only.
 
@@ -78,4 +78,4 @@ A monster source has no level of its own: `LootRequest.level` is the monster's l
 
 ## Luck and sealed rolls
 
-`LootRequest.luck` raises the chance of the general gear roll (`dropChanceMultiplier`) and multiplies the weights of rare-and-better rarities (`rarityLuckMultiplier`, from `LUCK.rarityFromOrder`); `extraGearRolls` adds guaranteed rolls (lucky monsters). Luck 0 changes nothing. For signed-in players the server runs the same pipeline with a sealed random source (`lib/offline/seal.ts`) - see [11](11-offline-and-sealed-rolls.md).
+`LootRequest.luck` raises the chance of the general gear roll (`dropChanceMultiplier`) and multiplies the weights of rare-and-better rarities (`rarityLuckMultiplier`, from `LUCK.rarityFromOrder`); `extraGearRolls` adds guaranteed rolls (lucky monsters). Luck 0 changes nothing. For signed-in players the server runs the same pipeline with a sealed random source (`lib/offline/seal.ts`) - see [11](11-server-authority.md).

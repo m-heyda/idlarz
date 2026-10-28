@@ -177,20 +177,6 @@ export const HEADER_DISPLAYED_RESOURCES_INFO = fromResources(
 	}
 ) as { [K in Exclude<ResourceKey, 'gems' | 'embers'>]: { icon: string; label: string; description: string; usedFor: string; source: string } };
 
-// The two currencies that are not resources: Embers (rebirth, lives in the prestige state) and Gems (their own balance)
-export const EMBERS_INFO = {
-	label: RESOURCES.embers.label,
-	description: RESOURCES.embers.description,
-	usedFor: RESOURCES.embers.usedFor,
-	source: RESOURCES.embers.source,
-};
-export const GEMS_INFO = {
-	label: RESOURCES.gems.label,
-	description: RESOURCES.gems.description,
-	usedFor: RESOURCES.gems.usedFor,
-	source: RESOURCES.gems.source,
-};
-
 // The castle's own per-second output (single source of truth: BIOMES.castle reads from it).
 export const CASTLE_BASE_RATES = {
 	gold: 0.1,
@@ -397,7 +383,7 @@ export const MERCHANT_RESOURCE_PRICES = fromResources(
 // Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
 // starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
 // They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
-// ladders together cost over a billion; tests/merchantShop.test.ts keeps it that way) and are bought over several runs.
+// ladders together cost over a billion; tests/merchantUpgrades.test.ts keeps it that way) and are bought over several runs.
 // `group` only decides the heading of the card in the Upgrades tab.
 export const MERCHANT_UPGRADE_GROUPS = {
 	economy: 'Economy',

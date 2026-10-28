@@ -1,6 +1,8 @@
 # Idle Explorer
 
-An idle / incremental territory game. Start with a castle on an unbounded map, buy adjacent tiles that turn into biomes (forest, plains, hills, swamp, tundra, lake, coast), then right-click any explored tile to build on it, grow your income, upgrade the castle (levels 1-10, timed builds), raise farm animals, trade with the merchant, fight the rats (and the Rat King) that wander onto your land, collect and equip gear, level up and spend stat points. Once the castle is strong enough you can **Rebirth** for permanent Ember bonuses. The game is played with an account: the server places the monsters, runs every fight (automatic, no clicking), rolls chests and kills and pays time away. Progress is saved automatically in the browser (localStorage) and in the account, and can be exported and imported as one line of text.
+An idle / incremental territory game. Start with a castle on an unbounded map, buy adjacent tiles that turn into biomes (forest, plains, hills, swamp, tundra, lake, coast), then right-click any explored tile to build on it, grow your income, upgrade the castle (levels 1-10, timed builds), raise farm animals, trade with the merchant, fight the rats (and the Rat King) that wander onto your land, collect and equip gear, level up and spend stat points. Once the castle is strong enough you can **Rebirth** for permanent Ember bonuses.
+
+The game is played with an account. The server places the monsters and chests, runs every fight (a click on a monster starts it; the server then swings both ways on its own, and auto-battle unlocks after the first rebirth), rolls chests and kills, and pays time away. Progress is saved automatically in the browser (localStorage) and in the account, and can be exported and imported as one line of text.
 
 Live: https://idler-rose.vercel.app/
 
@@ -9,6 +11,7 @@ Live: https://idler-rose.vercel.app/
 - **Next.js 15.5** (App Router) · **React 19** · **TypeScript 5.9**
 - **Tailwind CSS 4** · `clsx` + `tailwind-merge`
 - **Zustand 5** with `persist` into localStorage as one line of text (Settings → Save & backup: export / import)
+- **Supabase** for accounts, cloud saves and the server ledger (only the `/api/*` route handlers talk to it)
 
 ## Getting started
 
@@ -17,35 +20,30 @@ npm install
 npm run dev      # http://localhost:3000 (dev build shows a cheat/debug panel bottom-left)
 npm run build
 npm run lint
-npm test         # click limiter, economy/exploit, save, castle, rebirth and ambient tests
+npm test         # node:test over tests/**/*.test.ts
 ```
 
-## Accounts (Supabase)
+## Accounts and server setup (Supabase)
 
-The game sits behind email/password login. The browser never talks to Supabase: the `/api/auth/*` route handlers do, with HttpOnly cookies. The save stays primary in the browser (localStorage); the account holds the character name and hero (`profiles`) and, when the cloud save is set up, a verified copy of the game (`player_saves`).
+The game sits behind email/password login and **cannot be played without a working server**: there is no guest or offline mode. The browser never talks to Supabase: the `/api/auth/*` route handlers do, with HttpOnly cookies. The account holds the character name and hero (`profiles`), a verified copy of the save (`player_saves`) and the ledger that decides spawns, fights, rewards and gems (`player_ledger`).
 
-1. Supabase → Authentication → Providers: Email on, **Confirm email off**. On a **fresh** project run [`supabase/schema.sql`](supabase/schema.sql) in the SQL editor (profiles, cloud save tables, access rules, the atomic save function). The production project already has it applied; a project that has an older version runs the newer files in [`supabase/migrations/`](supabase/migrations) instead (before deploying the code that needs them).
-2. Copy `.env.example` to `.env.local` and fill `SUPABASE_URL` and `SUPABASE_ANON_KEY` (the publishable key). On Vercel add the same two as server-side env vars (no `NEXT_PUBLIC_`).
-3. Cloud save (optional, needs a second server-only secret): add `SUPABASE_SERVICE_ROLE_KEY` (Settings > API Keys > secret key) to `.env.local` / Vercel. Without it the game still runs, the account just has no cloud copy. See [docs/09-cloud-saves.md](docs/09-cloud-saves.md).
-4. Add `LOOT_SECRET` (16+ characters, see `.env.example`): spawns, chests and fights are sealed with it, and **without it (or without Supabase) the game shows a retry screen and cannot be played** - there is no play-without-account mode. Run the newest file in `supabase/migrations/` (`combat_ledger.sql`) before deploying.
-5. Restart `npm run dev`. On localhost every browser key the game writes carries a `.dev` suffix (`src/lib/storageScope.ts`), so a dev session starts from a fresh local game and never touches a save of the real site; the account (cloud) save is the same wherever you sign in.
+1. Supabase → Authentication → Providers: Email on, **Confirm email off**.
+2. Database: on a **fresh** project run [`supabase/schema.sql`](supabase/schema.sql) in the SQL editor (profiles, cloud save and ledger tables, access rules, the atomic save function). A project with an older version runs the files in [`supabase/migrations/`](supabase/migrations) instead, **in this order**: `autosave_history_by_time.sql`, `offline_ledger.sql`, `combat_ledger.sql`, and before deploying the code that needs them.
+3. Copy `.env.example` to `.env.local` and fill the variables below. On Vercel add the same ones as server-side env vars (no `NEXT_PUBLIC_`).
+4. Restart `npm run dev`. On localhost every browser key the game writes carries a `.dev` suffix (`src/lib/storageScope.ts`), so a dev session starts from a fresh local game and never touches a save of the real site; the account (cloud) save is the same wherever you sign in.
+
+| Variable | Needed for | If missing |
+| --- | --- | --- |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` (publishable key) | login and every route | the game shows the "accounts unavailable" screen with a retry button |
+| `SUPABASE_SERVICE_ROLE_KEY` (secret key) | the ledger and cloud saves (`/api/save`, `/api/offline`, `/api/spawn`, `/api/chest`, `/api/fight`) | those routes answer 503: nothing spawns, no fight starts, nothing reaches the account |
+| `LOOT_SECRET` (16+ characters) | sealing spawns, chests and fights | `/api/offline`, `/api/spawn`, `/api/chest` and `/api/fight` answer 503 `not_configured`; the game loads, but nothing spawns and the offline claim times out after 6 s |
+
+See [docs/09-cloud-saves.md](docs/09-cloud-saves.md) and [docs/11-server-authority.md](docs/11-server-authority.md).
 
 ## Documentation
 
-Full design and technical docs live in [`docs/`](docs/README.md):
-
-- [Architecture](docs/01-architecture.md) — files, state, tick loop, persistence
-- [Mechanics](docs/02-mechanics.md) — every rule as implemented
-- [Formulas & scaling](docs/03-formulas-and-scaling.md) — all maths with tables
-- [Unfinished features & known issues](docs/04-unfinished-and-known-issues.md)
-- [Balance backlog & upgrade notes](docs/05-balance-backlog-and-roadmap.md)
-- [Playtest & pacing report](docs/06-playtest-and-pacing-report.md) — why the old game finished in ~3 days and what the rebalance changed
-- [Saves, security & exploit audit](docs/07-security-and-exploits.md)
-- [Loot system](docs/10-loot-system.md) — profiles, rarity, item level, affixes, pools, how to add items
-- [Follow-up plan](docs/08-followup-plan.md) — ordered work: polish, balance, content, server-verified saves
-- [Roadmap: features, bugs, server migration](docs/12-roadmap-features-and-bugs.md) — building rework, known bugs, what moves to the server next
-- [Cloud saves](docs/09-cloud-saves.md) and [offline progress, sealed rolls & combat](docs/11-offline-and-sealed-rolls.md)
+Start at [`docs/README.md`](docs/README.md): architecture, mechanics, formulas, saves and security, cloud saves, server authority, the loot system, pacing targets, the generated tables and the [ROADMAP](docs/ROADMAP.md) (open work, known issues, what moves to the server next).
 
 Pixel art is generated by the Python scripts in `scripts/pixel/` (`python scripts/pixel/build.py`, style rules in `scripts/pixel/reference/STYLE.md`).
 
-Tables and pacing numbers are generated from the real config: `npm run report` (tables), `npm run sim` (bot simulation); `npm test` runs the exploit/save tests.
+Tables and pacing numbers in `docs/generated/` come from the real config. After tuning balance run `npm run docs:gen` (it runs `report`, `sim`, `catalog-report`, `fight-sim -- --md` and `loot-sim -- --md`) and commit the diff.

@@ -1,4 +1,4 @@
--- offline_ledger: server-held offline progress, sealed rolls and gems (docs/11-offline-and-sealed-rolls.md).
+-- offline_ledger: server-held offline progress, sealed rolls and gems (docs/11-server-authority.md).
 -- Run ONCE on a project that already has the cloud-save schema, BEFORE deploying the code that reads these columns. Additive:
 -- player_saves gets one nullable column (rows written before this simply have no `derived` until their next save), and a new table.
 alter table public.player_saves add column if not exists derived jsonb;

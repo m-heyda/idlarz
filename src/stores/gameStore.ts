@@ -136,7 +136,7 @@ const seededRandom = (seed: number) => () => {
 };
 
 /** What the browser knows about combat before the server has said anything: no fight, auto-battle off and auto-use on (the server's own defaults). */
-export const initialCombat = (): CombatClientState => ({
+const initialCombat = (): CombatClientState => ({
 	fight: null,
 	autoBattle: false,
 	autoUse: true,
@@ -151,7 +151,7 @@ export const initialCombat = (): CombatClientState => ({
 });
 
 /** All game data of a brand-new game (no actions). */
-export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () => number = Math.random) => {
+const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () => number = Math.random) => {
 	const grid = createInitialWorld(random);
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
@@ -988,12 +988,6 @@ const createGameSlice = (
 				strongestMonster: map.placed.strongestLevel,
 				gems: result.gems,
 			};
-		},
-
-		setPlayerName: (name: string) => {
-			if (name && name.trim().length > 0) {
-				set({ playerName: name.trim().substring(0, 9) }); // max 9 characters
-			}
 		},
 
 		setPlayerClass: (playerClass: PlayerClassId) => {

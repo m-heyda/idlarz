@@ -1,19 +1,19 @@
 # Cloud saves (accounts)
 
-The browser save (localStorage) stays the primary copy and the game works offline. A signed-in player's game is also
-copied to Supabase so it follows them to another browser and survives cleared site data. The server verifies what it stores
-and derives the numbers a leaderboard or offline progress will need.
+The game is played with an account only (there is no offline or guest play). The browser keeps a local copy (localStorage: a cache and the export path), and every
+player's game is also copied to Supabase so it follows them to another browser and survives cleared site data. The server verifies what it stores
+and derives the numbers a leaderboard or offline progress needs. What the server *decides* (spawns, fights, rewards, gems, the XP ceiling) is in [11](11-server-authority.md).
 
-## Tables (migrations `cloud_save_v2_split`, `harden_policies_and_rpc`, `autosave_history_by_time`)
+## Tables (`supabase/schema.sql`; an older project adds `autosave_history_by_time`, then `offline_ledger`, then `combat_ledger` from `supabase/migrations/`, in that order)
 
 The save is split by how it is used, not stored as one blob:
 
 | Table | Rows | Written | Holds |
 |---|---|---|---|
 | `profiles` | 1 / account | at registration | character name, hero (owner-only RLS) |
-| `player_saves` | 1 / account | **every accepted save** (small, ~1 KB core) | `core` (bag, gear, upgrades, monsters, timers: everything but the map), `world_hash`, and typed columns derived by the **server**: `play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, gold_per_min`, plus `rev`, `schema`, `server_saved_at`, `flags`, `audit_ratio`, `fresh_start`, `ever_flagged`, `last_archive_at` |
+| `player_saves` | 1 / account | **every accepted save** (small, ~1 KB core) | `core` (bag, gear, upgrades, timers: everything but the map; monsters are not saved, the server holds them), `world_hash`, and typed columns derived by the **server**: `play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, derived, gold_per_min`, plus `rev`, `schema`, `server_saved_at`, `flags`, `audit_ratio`, `fresh_start`, `ever_flagged`, `last_archive_at` |
 | `player_worlds` | 1 / account | **only when the map changed** (a purchase), by `hash` | `land` (runs), `extra`, `tiles`. ~98 % of a save's bytes; a 55,000-tile map is 63 KB of JSON (27 KB stored) |
-| `player_ledger` | 1 / account | only on claim, spawn sync, chest, kill and a rebirth / new game | the server's own record: away-time anchor, spawn tickets, reward counters, lifetime grants, the gem balance ([11](11-offline-and-sealed-rolls.md)) |
+| `player_ledger` | 1 / account | on claim, spawn sync, chest, every fight request and a rebirth / new game | the server's own record: away-time anchor, spawn tickets, reward counters, lifetime grants, the gem balance, and `combat` (HP, mana, cooldowns, the open fight, auto switches; [11](11-server-authority.md)) |
 | `player_stats` | 1 / account | with every save | narrow leaderboard row: `display_name` (from `profiles`, never from the save), `level, tiles_owned, castle_level, rebirths, legacy_earned, gold_per_min, play_seconds, trusted`. Public read, **trusted rows only**, never any game state. Partial indexes per ranking |
 | `save_history` | sparse | first save, one copy per 30 min of the clock (`last_archive_at`), the first save with a new flag; pinned when a game is replaced by a much younger one (New Game) | full body for rollback. 6 newest + 3 pinned per player |
 
@@ -34,14 +34,14 @@ The **cloud** copy is about milestones and safety, not about every second:
 | Trigger | Upload |
 |---|---|
 | game start | once, after 4 s |
-| milestone: tile bought, building built, castle upgrade started / finished, rebirth, Ember shop / farm / merchant / click upgrade, stat point, gear equipped or removed, level up | after a 5 s settle (a burst of purchases is ONE upload), never closer than 30 s to the previous attempt |
+| milestone (`SaveEventReason` in `saveEvents.ts`): tile bought, building built, castle upgrade started / finished, rebirth, Ember shop / farm / merchant / click upgrade, merchant purchase or refresh, stat point, gear equipped or removed, level up, offline claim | after a 5 s settle (a burst of purchases is ONE upload), never closer than 30 s to the previous attempt |
 | idle | every 5 min (idle income is rebuilt from `rates` on the server, so more frequent uploads add nothing) |
 | tab hidden / closed | at once, unless an upload was tried in the last 11 s (the server accepts one per 10 s); `keepalive` only while the body is under 60 kB (browsers cap it at 64 KiB) |
 | menu **Save game** (right-click or the header menu) | saves to this browser always; with an account it also uploads at once, at most **once per 10 minutes** (the entry shows `cloud in 7:55` / `cloud ready`; the time survives a reload, per account). It runs through the same scheduler, so it never overlaps another upload and the next heartbeat waits a full period after it. Only an upload that went through starts the 10 minutes; a failure can be retried at once |
 | failure (outage, 429) | backoff 30 s, 1 min, 2 min, then 5 min; normal again after a success |
 | 409 conflict, 422 refused, 401 signed out | stop for the session and tell the player (toast) |
 
-Clicks, hits, sales, potions and bag moves are not milestones. An idle tab costs 12 uploads an hour (it used to be 40).
+Clicks, sales, potions and bag moves are not milestones (nor are fights: the server records those itself). An idle tab costs 12 uploads an hour (it used to be 40).
 The events are emitted by the store (`withSaveEvents` in `saveEvents.ts`) only when the action succeeded.
 The server still enforces its own floor of one accepted save per 10 s, whatever the client does.
 
@@ -70,8 +70,8 @@ Filter tuning queries with `where not test_account`. To undo it: `update player_
 The dev cheat panel and the `window.__game` console handle exist only when `NODE_ENV` is `development`; neither string is in a production bundle.
 
 ### Known limits (be honest about them)
-- The client is still authoritative; the server sees snapshots, not actions. A cheater who stays within the spending bound (roughly 3x honest progress at any time) is not caught.
-- The save text is not signed (its check code is a plain FNV hash for catching typos), so editing an exported save or localStorage is easy. The server, not the file, is what is trusted: edits that go beyond the spending bound are flagged and unranked. Server-signed checkpoints are the next step (see 07 section 6).
+- The economy is still client-authoritative: the server sees snapshots, not actions (spawns, fights, rewards, gems and the XP ceiling are the server's, [11](11-server-authority.md); the XP model in `cloudSave/xpModel.ts` clamps a save's XP to what bought tiles, play time and server payouts can explain, and `/api/save` returns the clamped `xp` and the server's `gems`). A cheater who stays within the spending bound (roughly 3x honest progress at any time) is not caught.
+- The save text is not signed (its check code is a plain FNV hash for catching typos), so editing an exported save or localStorage is easy. The server, not the file, is what is trusted: edits that go beyond the spending bound are flagged and unranked. Server-signed checkpoints and server-owned actions are the next step ([ROADMAP](ROADMAP.md)).
 - Gear and bag contents cannot be verified (drops are random): never rank by items.
 - The first save of an existing player cannot be delta-checked; its play time is taken as claimed. That is why such accounts are not ranking-eligible (`fresh_start`).
 - Gem increases are flagged, not rejected: restoring an older save in the hub can legitimately raise gems relative to a newer cloud save.
@@ -80,8 +80,8 @@ The dev cheat panel and the `window.__game` console handle exist only when `NODE
 
 Each browser remembers which account and revision its save continues (`idlarz.cloud`). Login compares this browser, the link and the account:
 nothing anywhere = new game; this browser continues the account = Continue; new browser = the account save; both exist and differ = choose
-(the one not chosen is copied aside: local to `idlarz.save.previous-game`, cloud stays in `save_history`). If the account cannot be reached the local save just plays on.
+(the one not chosen is copied aside: local to `idlarz.save.previous-game`, cloud stays in `save_history`). If the account's cloud save cannot be fetched (outage, no service key) this browser's save carries on without syncing, but the ledger routes need the same server, so nothing spawns and no fight starts until it is back ([11](11-server-authority.md)).
 
 ## Offline progress (built)
 
-See [11-offline-and-sealed-rolls.md](11-offline-and-sealed-rolls.md). On login `POST /api/offline` pays `min(gap, cap) x efficiency x rates` from the last accepted save and the server clock, and the save verifier now allows what the server granted (`player_ledger.granted`). The ledger also holds the gem balance, which a save can no longer raise.
+See [11-server-authority.md](11-server-authority.md). On login `POST /api/offline` pays `min(gap, cap) x efficiency x rates` from the last accepted save and the server clock, and the save verifier now allows what the server granted (`player_ledger.granted`). The ledger also holds the gem balance, which a save can no longer raise.

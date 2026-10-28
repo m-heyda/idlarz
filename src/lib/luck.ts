@@ -31,5 +31,5 @@ export const rollGemAmount = (rng: Rng): number => {
 /** Chance (0-1) that a newly arrived rat is a lucky one. */
 export const luckyRatChance = (luck: number): number => Math.min(LUCK.luckyRat.cap, LUCK.luckyRat.base + points(luck) * LUCK.luckyRat.perPoint);
 
-/** The bonus gem roll of one chest: 0 (most of the time) or a gem find. Server only: guests have no gems to find. */
+/** The bonus gem roll of one chest: 0 (most of the time) or a gem find. Server only: the browser never rolls it. */
 export const rollGemFind = (luck: number, rng: Rng): number => (rng() < gemChance(luck) ? rollGemAmount(rng) : 0);

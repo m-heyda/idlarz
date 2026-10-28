@@ -78,7 +78,7 @@ export function groundOf(tile: Tile | undefined): Ground | null {
 export const isBuilt = (tile: Tile | undefined): boolean => !!tile && tile.isOwned && !!tile.building;
 
 /** The biomes that have a foundation pad; a building on anything else (the castle's neighbours are never built on) gets the plains pad. */
-export const FOUNDATION_ORDER = ['hills', 'forest', 'tundra', 'swamp', 'plains', 'coast'] as const;
+const FOUNDATION_ORDER = ['hills', 'forest', 'tundra', 'swamp', 'plains', 'coast'] as const;
 const PAD_VARIANTS = 2;
 
 const nameOf = groundOf;

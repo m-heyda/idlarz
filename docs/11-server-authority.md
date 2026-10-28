@@ -1,8 +1,8 @@
-# 11 · Offline progress, sealed rolls, Luck and gems
+# 11 · Server authority: offline progress, spawns, fights, sealed rolls, Luck and gems
 
-For a **signed-in** player the server now decides three things the browser used to decide alone: how long the player was away and what that was worth, which chests and monsters have appeared (and what is in them), and how many gems the player holds. There is no guest mode any more (the game needs an account, [12](12-roadmap-features-and-bugs.md)), so these rules apply to every player.
+For a **signed-in** player the server now decides three things the browser used to decide alone: how long the player was away and what that was worth, which chests and monsters have appeared (and what is in them), and how many gems the player holds. The server also runs every fight (see "Combat"). There is no guest mode (the game needs an account, see the [root README](../README.md)), so these rules apply to every player. Saves and their verification are in [09](09-cloud-saves.md); what is still the browser's and moves here next is in [ROADMAP](ROADMAP.md).
 
-There is no scheduled job and nothing runs while nobody is playing. Everything is computed **lazily on a request**, from timestamps, so the free Supabase tier is enough for idle play (about 10 tiny calls an hour). **That figure does not hold during an open fight**: the browser then polls `/api/spawn` / `/api/fight` every 2 s (8 s when minimised), and each request does an auth check, two reads and a ledger write, see [12 §3b](12-roadmap-features-and-bugs.md#3b-server-authority-and-free-tier-notes).
+There is no scheduled job and nothing runs while nobody is playing. Everything is computed **lazily on a request**, from timestamps, so the free Supabase tier is enough for idle play (about 10 tiny calls an hour). **That figure does not hold during an open fight**: the browser then polls `/api/spawn` / `/api/fight` every 2 s (8 s when minimised), and each request does an auth check, two reads and a ledger write, see the free-tier notes in [ROADMAP](ROADMAP.md).
 
 ## What the server guarantees (and what it cannot)
 
@@ -15,7 +15,7 @@ There is no scheduled job and nothing runs while nobody is playing. Everything i
 | Gems are the server's | `player_ledger.gems` is the balance; an upload can never raise it (it is checked, flagged `gems_increase`, then replaced); a new account starts at the 1000 gift at most |
 | Two browsers cannot both claim | every ledger write is a compare-and-swap on `ver` |
 
-**Known limits.** The browser still holds the game state, so someone editing local memory can add anything that stays inside the verifier's bounds without being caught; flags only un-rank an account (shadow mode), they do not reject. Positions of chests and monsters are chosen by the browser (they carry no value). The level a kill is paid at is claimed by the client but capped by what the ticket's age and the land allow (`maxSpawnLevel`).
+**Known limits.** The browser still holds the game state, so someone editing local memory can add anything that stays inside the verifier's bounds without being caught; flags only un-rank an account (shadow mode), they do not reject. Monsters are placed by the server (`lib/offline/placement.ts`); chests are still placed by the browser (a chest's spot carries no value). The level a kill is paid at is not claimed by the client: it comes from the ticket's spawn level and age (`levelAtAge` in `lib/monsters.ts`).
 
 ## The flow
 
@@ -36,13 +36,13 @@ upload  ── POST /api/save ─────> verifier knows the grants; gems r
 
 If the server says `409 needClaim` (the player was away more than 15 minutes since it last saw them, for instance a laptop that slept with the tab open) the client runs the claim first and then carries on.
 
-## Data (migration `offline_ledger`, also in `supabase/schema.sql`)
+## Data (migrations `offline_ledger` and `combat_ledger`, both also in `supabase/schema.sql`)
 
-- `player_ledger` (one row per player): `ver`, `run_id`, `rebirths`, `anchor_at`, `bank` (spawn timers and the ticket lists, a few dozen numbers), `ord_chest`, `ord_kill`, `granted`, `granted_seen`, `gems`, `last_key`, `last_result`.
+- `player_ledger` (one row per player): `ver`, `run_id`, `rebirths`, `anchor_at`, `bank` (spawn timers and the ticket lists, a few dozen numbers), `ord_chest`, `ord_kill`, `granted`, `granted_seen`, `gems`, `last_key`, `last_result`, `combat` (the fight state, see Combat).
 - `player_saves.derived` (jsonb): the castle upgrade and the rates after it, Luck and Gold Find, monster and chest counts, the away-time cap and efficiency. Written by the server from the sanitised save; rows from before the migration have none until their next upload (their first claim answers "no save yet").
 - RLS is on; everything is revoked from `anon`/`authenticated`; an owner may `select (user_id, gems)` of their own row and nothing else; the server writes with the service role. There is no SQL logic: the compare-and-swap and all maths live in TypeScript, which is unit-tested against an in-memory repo.
 
-Environment: `LOOT_SECRET` (server only, 16+ characters). Without it `/api/offline` and the reward routes answer 503 `not_configured` and the game cannot spawn anything (there is no local fallback any more; the client shows the retry screen).
+Environment: `LOOT_SECRET` (server only, 16+ characters). Without it `/api/offline`, `/api/spawn`, `/api/chest` and `/api/fight` answer 503 `not_configured`: the game still loads (the retry screen is only for missing Supabase variables), the offline claim gives up after 6 s, and nothing spawns or fights, because there is no local fallback. `SUPABASE_SERVICE_ROLE_KEY` is needed too: the routes cannot reach the ledger without it.
 
 ## Offline numbers (`src/config/limits.ts`, read with `limitOf`)
 
@@ -60,7 +60,7 @@ A ticket is the server's record of a chest or monster waiting on the map. Chests
 
 ## Luck (`src/lib/luck.ts`, `LUCK` in `gameConfig.ts`)
 
-Luck = Charisma + the merchant's Lucky Charm + gear. Besides the gold multipliers it now gives: faster chests, rare-and-better gear odds (x`1 + 0.004 Luck`, cap 1.6), a higher monster gear drop chance, a bonus **gem roll** on every chest (`3 % + 0.06 % x Luck`, cap 15 %, 5 to 50 gems skewed low) and **lucky rats** (`2 % + 0.05 % x Luck`, cap 10 %: golden, x3 gold and XP, one extra gear roll). `npm run loot-sim` prints the effect per Luck level (docs/generated/loot-sim.md). There is no guest mode any more: every roll is the server's.
+Luck = Charisma + the merchant's Lucky Charm + gear. Besides the gold multipliers it now gives: faster chests, rare-and-better gear odds (x`1 + 0.004 Luck`, cap 1.6), a higher monster gear drop chance, a bonus **gem roll** on every chest (`3 % + 0.06 % x Luck`, cap 15 %, 5 to 50 gems skewed low) and **lucky rats** (`2 % + 0.05 % x Luck`, cap 10 %: golden, x3 gold and XP, one extra gear roll). `npm run loot-sim` prints the effect per Luck level ([generated/loot-sim.md](generated/loot-sim.md)).
 
 ## Monsters
 
@@ -70,7 +70,7 @@ Monsters carry an integer level (there are no tiers any more). A monster spawns 
 
 ## Combat (`lib/offline/fight.ts`, `POST /api/fight`, `POST /api/spawn`)
 
-Combat is the server's and automatic. Nothing in the browser hits a monster.
+Combat is the server's. Nothing in the browser hits a monster: a click on a monster only starts a fight, and auto-battle (unlocked by the first rebirth) chains the next ones.
 
 - **A tick of `COMBAT.tickSec` (0.1 s).** There is no background process: every request fast-forwards the player's combat from where it stopped to the server clock (at most `COMBAT.maxCatchUpSec` of fighting, then it says `behind` and the next request goes on), so a missed poll loses nothing and asking more often does not speed anything up. The random numbers are sealed per swing (`fight`, ordinal of the fight and swing).
 - **Speed.** The player swings every `1 / attacksPerSecond` (weapon speed and Dexterity), a monster every `1 / attackSpeed` (`MonsterDef.attackSpeed`, attacks per second). Crits, armor, dodge, life leech, stun and the King's clock follow `lib/combat.ts`. The player's numbers are frozen into the fight when it starts (`PlayerProfile`).
@@ -83,4 +83,4 @@ Combat is the server's and automatic. Nothing in the browser hits a monster.
 
 ## Where the code is
 
-`src/lib/offline/` (grant, tickets, placement, ledger, seal, service, online, fight, fightTypes, profile, reward, apply, reconcile, limits, types), `src/app/api/{offline,spawn,chest,fight}`, `src/lib/{offlineClient,rewardsClient,offlineFlow,serverSession,offlineRoute,playerRoute,combatCursor}.ts`, `src/hooks/{useOfflineClaim,useSpawnSync}.ts`, `src/components/game/overlays/{OfflineDialog,CombatWidget,VictoryToast}.tsx`. Tests: `tests/offline*.test.ts`, `tests/serverSpawns.test.ts`, `tests/fightEngine.test.ts`, `tests/fightBalance.test.ts`, `tests/clientCombat.test.ts`, `tests/spawnPlacement.test.ts`, `tests/monsterConfig.test.ts`, `tests/serverBoundary.test.ts`.
+`src/lib/offline/` (grant, tickets, placement, ledger, seal, service, online, fight, fightTypes, profile, reward, apply, reconcile, limits, types), `src/app/api/{offline,spawn,chest,fight}`, `src/lib/{offlineClient,rewardsClient,offlineFlow,serverSession,offlineRoute,playerRoute,combatCursor}.ts`, `src/hooks/{useOfflineClaim,useSpawnSync}.ts`, `src/stores/rewardPendingStore.ts`, `src/components/game/overlays/{OfflineDialog,CombatWidget,RewardPendingChest,ChestNotification}.tsx`. Tests: `tests/offline*.test.ts`, `tests/serverSpawns.test.ts`, `tests/fightEngine.test.ts`, `tests/fightBalance.test.ts`, `tests/clientCombat.test.ts`, `tests/spawnPlacement.test.ts`, `tests/monsterConfig.test.ts`, `tests/serverBoundary.test.ts`.

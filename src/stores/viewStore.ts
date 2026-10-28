@@ -28,7 +28,7 @@ interface ViewState {
 	reclamp: () => void;
 }
 
-export const DEFAULT_ZOOM = 1;
+const DEFAULT_ZOOM = 1;
 
 const clampNow = (pos: Point, zoom: number, w: number, h: number): Point =>
 	clampPosition(pos, zoom, { w, h }, ownedBounds(useGameStore.getState().tiles));

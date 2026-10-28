@@ -45,7 +45,7 @@ export const COMBAT = {
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
 	victoryToastSec: 15, // how long the result of a fight (the dead monster and its loot) stays in the combat window (hover pauses it)
 	spawn: {
-		firstSec: 120, // first monster this long after the territory reaches minOwnedTiles
+		firstSec: 120, // first rat this long after the game starts (lib/offline/tickets.ts counts it on the server)
 		intervalSec: 900, // then one per this long (chests: 600 s)
 		bossIntervalSec: 10800, // a boss (one at a time) appears this long after the last one left, or after the start
 		dangerStep: 8, // a monster that appears this many tiles (Chebyshev) further from the castle spawns one level higher: the frontier is more dangerous than the home land
@@ -66,10 +66,10 @@ export const STAT_RULES = {
 	armorPerVitality: 0.5,
 	armorPerStrength: 0.25,
 	critDamagePerPoint: { strength: 1, dexterity: 0.5, charisma: 0.5 }, // % extra on the x2 crit and x5 super crit multipliers
-	atkSpeedPerDexterity: 0.25, // % attack speed (the hook for speed-based combat; clicks ignore it)
+	atkSpeedPerDexterity: 0.25, // % attack speed (fights run on it)
 	mana: { base: 20, perIntelligence: 4, regenBase: 0.5, regenPerIntelligence: 0.05 }, // max mana and mana per second
 	magicWeaponTypes: ['staff', 'wand'] as readonly string[], // these scale with Intelligence, every other weapon with Strength
-	lifeLeechCap: 15, // % of click damage returned as HP: the gear's Life Leech never counts above this
+	lifeLeechCap: 15, // % of the damage dealt returned as HP: the gear's Life Leech never counts above this
 };
 
 /** `boss` monsters get their own spawn timer, a banner in the fight and boss-only drops (the loot source `lootSourceId` names the profile). */
@@ -100,7 +100,7 @@ export interface MonsterDef {
 	label: string;
 	hp: number;
 	attack: number;
-	/** Reduces the damage of every click like a player's armor does (armor / (armor + armorK)) */
+	/** Reduces the damage of every hit like a player's armor does (armor / (armor + armorK)) */
 	armor: number;
 	/** % chance that one of its hits is a crit, and the multiplier of that crit */
 	critChance: number;

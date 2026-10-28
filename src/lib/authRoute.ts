@@ -3,18 +3,13 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Profile } from '@/lib/authClient';
 import { supabaseConfigured } from '@/lib/supabase/server';
 
-export interface SessionUser {
-	id: string;
-	email: string | null;
-}
-
 const BODY_MAX = 4096;
 
 export const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 export const fail = (error: string, status: number) => json({ error }, status);
 
 /**
- * The auth service cannot be reached or is not set up: the client treats this as "play without an account", never as "logged out".
+ * The auth service cannot be reached or is not set up: the client shows the "accounts unavailable" screen, never "logged out".
  * `reason` tells the two apart: `not_configured` (the server has no Supabase variables: retrying cannot help) or `outage`.
  */
 export type UnavailableReason = 'not_configured' | 'outage';

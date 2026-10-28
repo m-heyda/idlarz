@@ -100,7 +100,7 @@ comment on table public.save_history is 'Deliberately no policies: only the serv
 
 -- ---- player_ledger: the server's own record of a player (away-time anchor, spawn tickets, sealed-roll counters, gems) -----
 -- One small row per player. Written ONLY by the server (service role, compare-and-swap on ver); a player may read their own gems and
--- nothing else. Design: docs/11-offline-and-sealed-rolls.md.
+-- nothing else. Design: docs/11-server-authority.md.
 create table public.player_ledger (
   user_id       uuid primary key references auth.users (id) on delete cascade,
   ver           integer     not null,                 -- compare-and-swap counter
