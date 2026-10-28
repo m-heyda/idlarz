@@ -1,3 +1,4 @@
+import { autoBattleUnlocked } from '@/lib/combat';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import { pickPersisted } from '@/lib/sanitizeSave';
@@ -22,7 +23,8 @@ const exportGame = async () => {
  */
 export const globalMenuItems = (full = false): ContextMenuItem[] => {
 	const ui = useUiStore.getState();
-	const { combat } = useGameStore.getState();
+	const { combat, prestige } = useGameStore.getState();
+	const locked = !autoBattleUnlocked(prestige.rebirths);
 	const items: ContextMenuItem[] = [
 		...(full
 			? [
@@ -44,8 +46,9 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 			id: 'autoBattle',
 			label: 'Auto-battle',
 			separator: true,
-			hint: 'monsters one by one',
+			hint: locked ? 'after your first rebirth' : 'monsters one by one',
 			checked: combat.autoBattle,
+			disabled: locked,
 			onSelect: () => useGameStore.getState().setAutoBattle(!combat.autoBattle),
 		},
 		{

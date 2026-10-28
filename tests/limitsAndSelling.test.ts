@@ -68,6 +68,15 @@ test('a new sell bonus applies to resources, bag gear, junk, auto-sold drops and
 
 // ---- Organize is a bag function, in the global menu too -------------------------------------------------------------------------
 
+test('the auto-battle entry is greyed out until the first rebirth', () => {
+	freshGame();
+	const locked = globalMenuItems().find((entry) => entry.id === 'autoBattle')!;
+	assert.equal(locked.disabled, true);
+	assert.match(locked.hint ?? '', /rebirth/);
+	store.setState({ prestige: { ...api().prestige, rebirths: 1 } } as never);
+	assert.equal(globalMenuItems().find((entry) => entry.id === 'autoBattle')!.disabled, false);
+});
+
 test('the global menu keeps the battle switches apart: a section of their own, at the bottom, above the view options', () => {
 	freshGame();
 	const ids = globalMenuItems().map((entry) => entry.id);

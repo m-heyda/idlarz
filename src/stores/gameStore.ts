@@ -69,7 +69,7 @@ import {
 import { rollBiome } from '@/utils/biomeRules';
 import { type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
-import { manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
+import { autoBattleUnlocked, manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
 import { writeCursor } from '@/lib/combatCursor';
 import { emitCombat } from '@/lib/combatFx';
 import type { SkillId } from '@/catalog/skills';
@@ -752,6 +752,10 @@ const createGameSlice = (
 		// Auto-battle (the server picks the next monster itself, one after the other; off by default, a click always starts a fight) and
 		// auto-use (it drinks, heals and stuns for you with fixed rules; on by default)
 		setAutoBattle: (on: boolean) => {
+			if (on && !autoBattleUnlocked(get().prestige.rebirths)) {
+				toast('Auto-battle unlocks after your first rebirth.');
+				return;
+			}
 			set((state) => ({ combat: { ...state.combat, autoBattle: on } }));
 			void requestAuto({ autoBattle: on }, sinceNow()).then((reply) => {
 				settleFight(reply);
