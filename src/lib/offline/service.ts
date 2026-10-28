@@ -4,7 +4,7 @@ import { computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
 import { addTotals, seedLedger, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
 import { restThrough } from '@/lib/offline/fight';
-import { isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
+import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
 import { sealedRng } from '@/lib/offline/seal';
 import { advanceBank, type BankContext, type TicketBank } from '@/lib/offline/tickets';
 import { offlineMinGapSec } from '@/lib/offline/limits';
@@ -26,9 +26,9 @@ export type { ClaimResult, PublicTickets };
 /** An online call is refused with `claim_first` when more than this long passed since the player was last seen (the absence is claimed first). */
 export const UNCLAIMED_SEC = 900;
 
-/** The tickets as the browser may see them: a monster shows once the server has given it a tile. */
+/** The tickets as the browser may see them: a monster or chest shows once the server has given it a tile. */
 export const publicTickets = (bank: TicketBank, opened?: number): PublicTickets => ({
-	chests: bank.chests.length,
+	chests: bank.chests.filter(isChestPlaced).map(({ n, x, y }) => ({ n, x: x!, y: y! })),
 	...(opened === undefined ? {} : { opened }),
 	rats: bank.rats.filter(isPlaced).map(({ n, at, lucky, x, y, spawnLevel }) => ({ n, at, lucky, x: x!, y: y!, spawnLevel: spawnLevel! })),
 	king: bank.king && isPlaced(bank.king) ? { n: bank.king.n, at: bank.king.at, x: bank.king.x!, y: bank.king.y!, spawnLevel: bank.king.spawnLevel! } : null,

@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CombatState } from './fightTypes';
 import { zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
-import { emptyBank, type TicketBank } from './tickets';
+import { emptyBank, upgradeBank, type TicketBank } from './tickets';
 
 interface Row {
 	ver: number;
@@ -43,7 +43,7 @@ const fromRow = (row: Row): Ledger => ({
 	runId: row.run_id,
 	rebirths: row.rebirths,
 	anchorAt: Date.parse(row.anchor_at),
-	bank: { ...emptyBank(0), ...row.bank },
+	bank: upgradeBank({ ...emptyBank(0), ...row.bank } as Parameters<typeof upgradeBank>[0]),
 	ordChest: row.ord_chest,
 	ordKill: row.ord_kill,
 	granted: { ...zeroTotals(), ...row.granted },

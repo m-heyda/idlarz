@@ -15,7 +15,7 @@ There is no scheduled job and nothing runs while nobody is playing. Everything i
 | Gems are the server's | `player_ledger.gems` is the balance; an upload can never raise it (it is checked, flagged `gems_increase`, then replaced); a new account starts at the 1000 gift at most |
 | Two browsers cannot both claim | every ledger write is a compare-and-swap on `ver` |
 
-**Known limits.** The browser still holds the game state, so someone editing local memory can add anything that stays inside the verifier's bounds without being caught; flags only un-rank an account (shadow mode), they do not reject. Monsters are placed by the server (`lib/offline/placement.ts`); chests are still placed by the browser (a chest's spot carries no value). The level a kill is paid at is not claimed by the client: it comes from the ticket's spawn level and age (`levelAtAge` in `lib/monsters.ts`).
+**Known limits.** The browser still holds the game state, so someone editing local memory can add anything that stays inside the verifier's bounds without being caught; flags only un-rank an account (shadow mode), they do not reject. Monsters and chests are placed by the server (`lib/offline/placement.ts`). The level a kill is paid at is not claimed by the client: it comes from the ticket's spawn level and age (`levelAtAge` in `lib/monsters.ts`).
 
 ## The flow
 
@@ -27,12 +27,14 @@ login ── GameApp waits for ──> POST /api/offline {claimId}        (useOf
                                client: applyOfflineClaim -> income, castle progress, monsters age by the whole absence,
                                         tickets become monsters/chests on the map, welcome-back window (OfflineDialog)
 playing ── useSpawnSync ───────> POST /api/spawn      ask again when the next ticket is due (answer says when), on tab focus
-           collectChest ───────> POST /api/chest {key}   reward is sealed and returned; the chest leaves the map at once, comes back if the server was unreachable
+           collectChest ───────> POST /api/chest {key, x, y}   the chest on that tile is opened; reward is sealed and returned; the chest leaves the map at once, comes back if the server was unreachable
            fights (auto or by hand) ──> POST /api/fight {sync | use | auto | dismiss}  the server runs the whole fight (HP, hits, potions, rewards) and rolls the loot against the monster's ticket; dismiss gives the ticket back
 upload  ── POST /api/save ─────> verifier knows the grants; gems replaced by the ledger balance; a rebirth or new game starts a new run (tickets cleared)
 ```
 
-**Chest counts and the poll race.** Every ticket answer carries `tickets.opened`, the number of chests the run has opened when the server made it. The browser places a missing chest on the map only from an answer that is not older than its own opens (none in flight, and `opened` at least the count the server returned for the player's last open; the guard lasts 15 s and starts again with every run). Without it a poll answered just before the server opened a chest still counted that chest, and while a fight is open (a poll every 2 s) the map put it back a moment after the player opened it. Extra chests on the map are always taken off. A chest that could not be opened because the server has no readable save yet (`404`, for example an account whose save predates the ledger, until its next upload) stays on the map with a message saying so.
+**Chests are placed like monsters.** A chest ticket has a number and, once the server has found it a tile, `x` and `y` (`placeTickets`: a tile the browser may draw a chest on, chosen by `pickChestSpot` from a sealed roll, one tile per chest or monster; a chest keeps its tile while it can stand there and is placed again when a building, the ward or a monster would take it). The answers list the placed chests as `{n, x, y}`; the browser draws exactly those and opens one by naming its tile, and a tile with no chest answers `no_ticket` and spends nothing. Rows from before this stored a chest as a bare time; `upgradeBank` reads them as numbered tickets without a tile.
+
+**The poll race.** Every ticket answer carries `tickets.opened`, the number of chests the run has opened when the server made it. The browser puts a listed chest on the map only from an answer that is not older than its own opens (none in flight, and `opened` at least the count the server returned for the player's last open; the guard lasts 15 s and starts again with every run). Without it a poll answered just before the server opened a chest still counted that chest, and while a fight is open (a poll every 2 s) the map put it back a moment after the player opened it. Chests on the map that the answer does not list are always taken off. A chest that could not be opened because the server has no readable save yet (`404`, for example an account whose save predates the ledger, until its next upload) stays on the map with a message saying so.
 
 If the server says `409 needClaim` (the player was away more than 15 minutes since it last saw them, for instance a laptop that slept with the tab open) the client runs the claim first and then carries on.
 
@@ -56,7 +58,7 @@ Income, XP and the arrival of chests/monsters use the efficiency; **castle build
 
 ## Tickets (`lib/offline/tickets.ts`)
 
-A ticket is the server's record of a chest or monster waiting on the map. Chests come every `600 s / (1 + 0.004 x Luck)` (floor 0.6x), the first rat after 120 s then one per 900 s, a King every 10800 s while none waits. At most `min(40, 30 % of the free land)` tickets wait; with no room the timers sit at 0 like the old client timers. Monsters carry their ticket number (`Monster.ticket`) and `lucky`; their age (and so their level) is measured from the ticket's `at`.
+A ticket is the server's record of a chest or monster waiting on the map (chests and monsters share one numbering). Chests come every `600 s / (1 + 0.004 x Luck)` (floor 0.6x), the first rat after 120 s then one per 900 s, a King every 10800 s while none waits. At most `min(40, 30 % of the free land)` tickets wait; with no room the timers sit at 0 like the old client timers. Monsters carry their ticket number (`Monster.ticket`) and `lucky`; their age (and so their level) is measured from the ticket's `at`.
 
 ## Luck (`src/lib/luck.ts`, `LUCK` in `gameConfig.ts`)
 
@@ -68,7 +70,7 @@ Luck = Charisma + the merchant's Lucky Charm + gear. Besides the gold multiplier
 
 Monsters carry an integer level (there are no tiers any more). A monster spawns one level higher for every 8 tiles (`COMBAT.spawn.dangerStep`) it stands from the castle.
 
-**Where they stand is the server's** (`lib/offline/placement.ts`). Each ticket gets a tile from the land of the last accepted save and the monster's `spawn` rule (`MonsterDef.spawn` in `config/combatConfig.ts`): a biome allowlist (water and the castle never), a castle distance of **2 to 9 tiles** (Chebyshev: never beside the castle), not on a building, a chest or another monster, outside the castle's ward from level 7. The map row is read only when the land changed (`TicketBank.sitesKey`) or a monster waits for a tile; `TicketBank.sites` counts the tiles there are, and monsters stop coming when they are all taken. A ticket with no tile stays hidden; a monster whose tile stops being valid is placed again. The kill no longer takes a level from the browser: the ticket knows the level it appeared at and its age says the rest.
+**Where they stand is the server's** (`lib/offline/placement.ts`). Each ticket gets a tile from the land of the last accepted save and the monster's `spawn` rule (`MonsterDef.spawn` in `config/combatConfig.ts`): a biome allowlist (water and the castle never), a castle distance of **2 to 9 tiles** (Chebyshev: never beside the castle), not on a building, a chest or another monster, outside the castle's ward from level 7. The map row is read only when the land changed (`TicketBank.sitesKey`) or a monster or chest waits for a tile; `TicketBank.sites` counts the tiles there are, and monsters stop coming when they are all taken. A ticket with no tile stays hidden; a monster whose tile stops being valid is placed again. The kill no longer takes a level from the browser: the ticket knows the level it appeared at and its age says the rest.
 
 ## Combat (`lib/offline/fight.ts`, `POST /api/fight`, `POST /api/spawn`)
 

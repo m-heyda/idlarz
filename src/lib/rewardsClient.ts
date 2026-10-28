@@ -33,7 +33,8 @@ const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 /** `since`: the number of the last combat event this browser has applied (leave it out to take none: the answer says where the log stands). */
 export const requestSync = (since?: number): Promise<Reply<SyncResult>> => post<SyncResult>('/api/spawn', since === undefined ? {} : { since });
 
-export const requestChest = (key: string): Promise<Reply<ChestReward>> => post<ChestReward>('/api/chest', { key });
+/** Opens the chest on this tile (the server put it there; a tile with no chest answers `no_ticket`). */
+export const requestChest = (key: string, x: number, y: number): Promise<Reply<ChestReward>> => post<ChestReward>('/api/chest', { key, x, y });
 
 /** A hotkey: drink a potion or cast a skill. One key per press: the server replays the answer if it is sent twice. */
 export const requestUse = (key: string, command: CombatCommand, since: number | undefined): Promise<Reply<FightReply>> => post<FightReply>('/api/fight', { action: 'use', key, command, since });

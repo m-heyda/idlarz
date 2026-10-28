@@ -4,7 +4,7 @@ import { api, freshGame, growTo, patchTileAt } from './helpers';
 import { CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
 import { MONSTERS } from '../src/config/combatConfig';
 import { castleDistance } from '../src/lib/monsters';
-import { isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '../src/lib/offline/placement';
+import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '../src/lib/offline/placement';
 import { emptyBank, type TicketBank } from '../src/lib/offline/tickets';
 import { sealedRng } from '../src/lib/offline/seal';
 import { packBody } from '../src/lib/saveFormat';
@@ -57,7 +57,7 @@ test('a map with no tile for them leaves the tickets hidden, and they appear onc
 	const ringOnly = world(1); // the castle and its 4 neighbours: all adjacent
 	const hidden = placeTickets(bankWith(2), ringOnly, 'ring', 0, rollFor);
 	assert.equal(hidden.rats.filter(isPlaced).length, 0);
-	assert.deepEqual(hidden.sites, { rat: 0, king: 0 });
+	assert.deepEqual({ rat: hidden.sites!.rat, king: hidden.sites!.king }, { rat: 0, king: 0 });
 	assert.equal(needsLook(hidden, 'ring'), false, 'nothing to do until the land changes');
 	assert.equal(needsLook(hidden, 'grown'), true, 'a different land is looked at again');
 	const grown = placeTickets(hidden, world(40), 'grown', 0, rollFor);
@@ -91,4 +91,59 @@ test('the map the server reads is the one the save wrote: castle, land and chest
 	assert.equal(read.stats.owned, api().tiles.stats.owned);
 	assert.equal(read.stats.chests, 1);
 	assert.notEqual(siteKey(summary), siteKey({ ...summary, tilesOwned: summary.tilesOwned + 1 }));
+});
+
+// ---------------------------------------------------------------------------------------------------- chests
+
+const chestBank = (chests: number): TicketBank => ({
+	...emptyBank(0),
+	nextN: chests + 1,
+	chests: Array.from({ length: chests }, (_, i) => ({ n: i + 1, at: 0 })),
+});
+
+test('every chest gets a tile the browser may draw it on: owned, no castle, no building, outside the ward, one per tile', () => {
+	const tiles = world(60);
+	const out = placeTickets(chestBank(8), tiles, 'k', 0, rollFor);
+	assert.ok(out.chests.every(isChestPlaced));
+	assert.equal(new Set(out.chests.map((c) => `${c.x},${c.y}`)).size, 8);
+	for (const c of out.chests) {
+		const tile = ownedRowMajor(tiles).find((e) => e.x === c.x && e.y === c.y)!.tile;
+		assert.notEqual(tile.biome, 'castle');
+		assert.ok(!tile.building && !tile.hasChest);
+	}
+	assert.ok(out.sites!.chest! > 8);
+});
+
+test('chests and monsters never share a tile, and the same land and seal always give the same map', () => {
+	const tiles = world(60);
+	const bank: TicketBank = { ...bankWith(6, true), chests: chestBank(8).chests, nextN: 200 };
+	const a = placeTickets(bank, tiles, 'k', 0, rollFor);
+	const b = placeTickets(bank, tiles, 'k', 0, rollFor);
+	assert.deepEqual(a, b);
+	const spots = [...a.rats, a.king!, ...a.chests].map((t) => `${t.x},${t.y}`);
+	assert.equal(new Set(spots).size, spots.length);
+});
+
+test('a chest keeps its tile while the tile is valid, and is placed again when a building takes it', () => {
+	const tiles = world(60);
+	const first = placeTickets(chestBank(3), tiles, 'k', 0, rollFor);
+	const again = placeTickets(first, tiles, 'k2', 0, rollFor);
+	assert.deepEqual(again.chests, first.chests, 'nothing changed: nothing moved');
+	const { x, y } = first.chests[0] as { x: number; y: number };
+	patchTileAt(x, y, { building: 'tavern' });
+	const moved = placeTickets(first, api().tiles, 'k3', 0, rollFor);
+	assert.ok(isChestPlaced(moved.chests[0]));
+	assert.notDeepEqual([moved.chests[0].x, moved.chests[0].y], [x, y]);
+	assert.deepEqual(moved.chests.slice(1), first.chests.slice(1));
+});
+
+test('a chest with no tile left stays hidden until the land grows', () => {
+	const tiles = world(1);
+	const hidden = placeTickets(chestBank(2), tiles, 'ring', 0, rollFor);
+	const free = hidden.sites!.chest!;
+	assert.equal(hidden.chests.filter(isChestPlaced).length, Math.min(2, free));
+	const grown = placeTickets(hidden, world(60), 'grown', 0, rollFor);
+	assert.equal(grown.chests.filter(isChestPlaced).length, 2);
+	assert.equal(needsLook(grown, 'grown'), false);
+	assert.equal(needsLook({ ...grown, chests: [...grown.chests, { n: 9, at: 1 }] }, 'grown'), true, 'a new chest is looked at');
 });

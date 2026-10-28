@@ -3,8 +3,9 @@ import type { OfflineGrant } from '@/lib/offline/grant';
 // What goes over the wire between /api/offline and the browser. Kept apart from service.ts (which pulls in node:crypto) so the client can import it.
 
 /**
- * The waiting chests and monsters as the client needs to see them (a chest is just a count: nothing tells chests apart). A monster
- * is listed once the server has given it a tile: `x`, `y` and the level it appeared at (`spawnLevel`, which grows with its age) are the server's.
+ * The waiting chests and monsters as the client needs to see them. A monster is listed once the server has given it a tile: `x`, `y` and
+ * the level it appeared at (`spawnLevel`, which grows with its age) are the server's. A chest is listed the same way, by number and tile;
+ * opening it names that tile.
  */
 interface PublicMonster {
 	n: number;
@@ -14,8 +15,14 @@ interface PublicMonster {
 	spawnLevel: number;
 }
 
+export interface PublicChest {
+	n: number;
+	x: number;
+	y: number;
+}
+
 export interface PublicTickets {
-	chests: number;
+	chests: PublicChest[];
 	/**
 	 * How many chests this run has opened, as the server counted when it made this answer. The browser uses it to tell an answer that
 	 * was made before one of its own chest opens (it still counts that chest) from one made after it. Left out by older servers.

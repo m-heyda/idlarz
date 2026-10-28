@@ -15,16 +15,11 @@ const SIDES4: [number, number][] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 const isBuilt = (t: Tile) => !!t.building;
 
 /**
- * Where the next chest goes. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys), no building,
- * outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
+ * The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys),
+ * no building, outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
  * penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.
  */
-export function pickChestSpot(
-	tiles: World,
-	taken: Set<string>,
-	castleLevel: number,
-	random: () => number = Math.random
-): { x: number; y: number } | null {
+export function chestSpots(tiles: World, taken: Set<string>, castleLevel: number): { x: number; y: number; w: number }[] {
 	const P = CHEST.placement;
 	const chests: [number, number][] = [];
 	const entries = ownedRowMajor(tiles);
@@ -39,6 +34,17 @@ export function pickChestSpot(
 		if (chests.some(([cx, cy]) => Math.max(Math.abs(cx - x), Math.abs(cy - y)) <= P.nearbyRadius)) w *= P.nearbyFactor;
 		spots.push({ x, y, w });
 	}
+	return spots;
+}
+
+/** Where the next chest goes: one of `chestSpots`, picked by weight (null when the land has no room). The server does this (offline/placement.ts). */
+export function pickChestSpot(
+	tiles: World,
+	taken: Set<string>,
+	castleLevel: number,
+	random: () => number = Math.random
+): { x: number; y: number } | null {
+	const spots = chestSpots(tiles, taken, castleLevel);
 	if (spots.length === 0) return null;
 	let r = random() * spots.reduce((s, p) => s + p.w, 0);
 	for (const p of spots) {

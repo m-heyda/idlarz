@@ -8,7 +8,7 @@ import type { CombatCommand } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { sealedRng } from '@/lib/offline/seal';
 import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps } from '@/lib/offline/service';
-import { advanceBank, secondsToNext, takeChest, type TicketBank } from '@/lib/offline/tickets';
+import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
 import type { ChestReward, FightReply, SyncResult } from '@/lib/offline/types';
 
 // The server's side of play while the player is here: spawns, chests and fights. The server mints the tickets from its own clock, puts
@@ -74,10 +74,13 @@ export const syncTickets = (deps: ServiceDeps, userId: string, nowMs: number, si
 		};
 	});
 
-/** Opens one waiting chest. The reward is sealed on the number of chests opened this run, so reloading or retrying cannot roll it again. */
-export const redeemChest = (deps: ServiceDeps, userId: string, key: string, nowMs: number): Promise<Online<ChestReward>> =>
+/**
+ * Opens the waiting chest that stands on tile (x, y); a tile without one gives `no_ticket`. The reward is sealed on the number of
+ * chests opened this run, so reloading or retrying cannot roll it again.
+ */
+export const redeemChest = (deps: ServiceDeps, userId: string, key: string, spot: { x: number; y: number }, nowMs: number): Promise<Online<ChestReward>> =>
 	onlineStep(deps, userId, key, nowMs, ({ ledger, stored, bank, nowSec }): { ledger: Ledger; value: ChestReward } => {
-		const taken = takeChest(bank);
+		const taken = takeChestAt(bank, spot.x, spot.y);
 		if (!taken) {
 			return { ledger: { ...ledger, bank }, value: { ok: false, reason: 'no_ticket', tickets: publicTickets(bank, ledger.ordChest), serverNowSec: nowSec, gemsTotal: ledger.gems } };
 		}

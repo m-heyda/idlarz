@@ -33,7 +33,7 @@ const SERVER_ONLY = [
 	'@/lib/offline/supabaseLedger',
 	'@/lib/cloudSave/pipeline',
 ];
-const ROLLERS = ['rollChestLoot', 'rollKillLoot', 'rollGemFind', 'sealedRng', 'advanceBank', 'placeTickets', 'runCombat', 'payKill'];
+const ROLLERS = ['rollChestLoot', 'rollKillLoot', 'rollGemFind', 'sealedRng', 'advanceBank', 'placeTickets', 'runCombat', 'payKill', 'pickChestSpot', 'chestSpots'];
 
 test('no browser code imports the modules that roll, seal, place or fight', () => {
 	assert.ok(browserFiles.length > 50, 'the check reads the real sources');

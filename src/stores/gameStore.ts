@@ -285,8 +285,8 @@ const createGameSlice = (
 		useRewardPendingStore.getState().begin(); // the little chest animation covers the wait for the loot
 		let reply: Reply<ChestReward>;
 		try {
-			reply = await requestChest(key);
-			if (reply.status === 'unavailable') reply = await requestChest(key);
+			reply = await requestChest(key, x, y);
+			if (reply.status === 'unavailable') reply = await requestChest(key, x, y);
 		} finally {
 			chestOpensInFlight--;
 			useRewardPendingStore.getState().end();
@@ -406,7 +406,6 @@ const createGameSlice = (
 			{ tiles: state.tiles, monsters: state.monsters, activeChests: state.activeChests },
 			tickets,
 			serverNowSec,
-			Math.random,
 			limitCtx(state),
 			{ placeChests: chestsMayBePlaced(tickets) }
 		);
@@ -957,7 +956,6 @@ const createGameSlice = (
 				{ tiles: after.tiles, monsters: after.monsters, activeChests: after.activeChests },
 				result.tickets,
 				result.serverNowSec,
-				Math.random,
 				limitCtx(state)
 			);
 			set({ ...patch, tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, gems: result.gems });

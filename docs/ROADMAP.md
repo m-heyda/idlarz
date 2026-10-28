@@ -15,7 +15,6 @@ The big plan is to move more of the economy to the server (see "Server authority
 
 | # | What | Where | Note |
 |---|---|---|---|
-| R2 | Chests are placed on a tile by the browser (`pickChestSpot`); only their count is the server's | `lib/chests.ts`, `lib/offline/reconcile.ts` | harmless today (a position carries no value); move it to the server with monster placement |
 | R3 | `luck`, `goldFind`, income `rates`, equipment and the bag the server rolls with come from the **last accepted save**, which the client wrote; `cloudSave/verify.ts` only flags | `cloudSave/summary.ts`, `lib/offline/profile.ts` | the fight profile is read from the save when a fight starts; a forged save can claim gear it never found. Closing this is the ledger-owned inventory below |
 | R4 | No "can I win this?" gate: auto-battle engages the weakest waiting monster at 80 % HP, loses to anything too strong and rests; a monster that beat the player is left alone for 5 min (a boss 10) | `COMBAT.auto` | enough for now; a win-chance estimate would let it skip hopeless fights |
 | R5 | Potions the server drank are removed from the **browser's** bag when the event arrives; the server counts them against the saved bag (`consumed` minus `consumedSeen`). A reload in the middle can leave the local bag one potion too full for a moment | `lib/offline/fight.ts`, `cloudSave/pipeline.ts` | the server never lets a potion be drunk twice; the right fix is the server-owned bag |
@@ -36,8 +35,7 @@ What still runs in the browser and is only checked by plausibility. Tile buying 
 3. **Economy actions** by the server where they pay out: castle upgrade, rebirth/Embers, farm purchases, building costs. Batch them (one call per few seconds) rather than one per click.
 4. **XP award** of tile purchases and the attribute allocation (the server already models and clamps XP, `cloudSave/xpModel.ts`, and derives the fight level from the saved XP).
 5. **Merchant and sell** (gold for gear, resource sell/buy, upgrades): server-priced. Every merchant action is a store action over `buyOffer`, `buyItem`, `sellResources`, `buyResource` and `buyMerchantUpgrade`, so moving them behind routes changes no UI.
-6. **Chest placement** (R2) next to monster placement.
-7. **Spawn caps from the real map**: monsters count free tiles from the map; chests and the overall share (`SPAWN_LIMIT`) still use an estimate from the owned-tile count.
+6. **Spawn caps from the real map**: monsters and chests count free tiles from the map; the overall share (`SPAWN_LIMIT`, `ticketCap`) still use an estimate from the owned-tile count.
 
 Notes from reading the code (not measured against the live project):
 

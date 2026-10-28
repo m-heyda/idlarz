@@ -103,12 +103,15 @@ export const seedLedger = (source: LedgerSeedSource, nowMs: number): Ledger => {
 		if (monster.type === 'ratKing') king = king ?? ticket;
 		else rats.push(ticket);
 	}
+	// the chests standing on the saved map become numbered tickets; the server finds them a tile at the first look at the map
+	const chestCount = Math.max(0, Math.floor(num(source.summary.derived.chests)));
+	const chests = Array.from({ length: chestCount }, (_, i) => ({ n: n + i, at: savedSec }));
 	ledger.bank = {
 		...emptyBank(nowMs / 1000),
-		chests: Array.from({ length: Math.max(0, Math.floor(num(source.summary.derived.chests))) }, () => savedSec),
+		chests,
 		rats,
 		king,
-		nextN: n,
+		nextN: n + chestCount,
 		ratsMinted: Math.max(rats.length, num(source.core.nextMonsterId, 1) > 1 ? 1 : 0),
 		chestAcc: Math.max(0, num(source.core.chestSpawnTimer)),
 		ratAcc: Math.max(0, num(source.core.monsterSpawnTimer)),

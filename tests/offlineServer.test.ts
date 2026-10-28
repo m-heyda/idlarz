@@ -78,7 +78,7 @@ test('three hours away pay half the income of those hours, and chests and rats c
 	assert.equal(result.reason, 'paid');
 	assert.equal(result.grant?.elapsedSec, 3 * 3600);
 	assert.equal(result.grant?.resources.gold, Math.floor(rates.gold * 3 * 3600 * 0.5));
-	assert.ok(result.tickets.chests > 0, 'chests appeared while away');
+	assert.ok(result.tickets.chests.length > 0, 'chests appeared while away (and the server gave them a tile)');
 	assert.ok(result.tickets.rats.length > 0, 'rats appeared while away');
 	assert.ok(result.tickets.rats.every((rat) => rat.at > T0 / 1000 && rat.at <= (T0 + 3 * HOUR) / 1000), 'stamped inside the absence, so they have grown by the time you are back');
 });

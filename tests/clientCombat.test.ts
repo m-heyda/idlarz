@@ -35,7 +35,7 @@ const view = (over: Partial<CombatView> = {}): CombatView => ({
 	nextPollSec: 8,
 	...over,
 });
-const reply = (combat: CombatView, over: Partial<FightReply> = {}): FightReply => ({ combat, tickets: { chests: 0, rats: [], king: null }, serverNowSec: clock, gemsTotal: 1000, accepted: true, ...over });
+const reply = (combat: CombatView, over: Partial<FightReply> = {}): FightReply => ({ combat, tickets: { chests: [], rats: [], king: null }, serverNowSec: clock, gemsTotal: 1000, accepted: true, ...over });
 const event = (no: number, kind: FightEvent['kind'], extra: Partial<FightEvent> = {}): FightEvent => ({ no, t: clock, kind, ...extra });
 const won = (no: number, drops: Drop[], over: { gold?: number; xp?: number; lucky?: boolean; level?: number } = {}): FightEvent =>
 	event(no, 'won', { n: 1, type: 'rat', level: over.level ?? 1, reward: { gold: over.gold ?? 50, xp: over.xp ?? 20, items: drops, pity: {}, lucky: over.lucky ?? false } });

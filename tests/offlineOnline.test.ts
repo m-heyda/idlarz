@@ -81,21 +81,21 @@ const playing = async (minutes: number, id = 'u1', autoBattle = false, rebirths 
 test('a sync mints what the server clock says has appeared, and says when the next one is due', async () => {
 	const { m, now } = await playing(25);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
-	assert.equal(sync.tickets.chests, 2, 'a chest every ten minutes');
+	assert.equal(sync.tickets.chests.length, 2, 'a chest every ten minutes, each on a tile the server chose');
 	assert.equal(sync.tickets.rats.length, 2, 'a rat after 2 minutes and the next 15 later');
 	assert.ok(sync.nextInSec !== null && sync.nextInSec > 0 && sync.nextInSec <= 600);
 	// asking again changes nothing
 	const again = ok(await syncTickets(m.deps, 'u1', now + 1000));
-	assert.equal(again.tickets.chests, sync.tickets.chests);
+	assert.deepEqual(again.tickets.chests, sync.tickets.chests, 'the chests stay where they were put');
 	assert.deepEqual(again.tickets.rats, sync.tickets.rats);
 });
 
 test('a chest opens against a ticket, pays what the server rolled, and the same key replays the same reward', async () => {
 	const { m, now } = await playing(25);
-	ok(await syncTickets(m.deps, 'u1', now));
-	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-0001', now + 1000));
+	const [spot] = ok(await syncTickets(m.deps, 'u1', now)).tickets.chests;
+	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-0001', spot, now + 1000));
 	assert.equal(first.ok, true);
-	const replay = ok(await redeemChest(m.deps, 'u1', 'chest-key-0001', now + 2000));
+	const replay = ok(await redeemChest(m.deps, 'u1', 'chest-key-0001', spot, now + 2000));
 	assert.deepEqual(replay, first, 'a lost answer is replayed, never rolled again');
 	assert.equal(m.ledgers.get('u1')!.ordChest, 1);
 	assert.equal(m.ledgers.get('u1')!.bank.chests.length, 1, 'one ticket was spent');
@@ -105,19 +105,23 @@ test('every ticket answer says how many chests the run has opened, so the browse
 	const { m, now } = await playing(25);
 	const before = ok(await syncTickets(m.deps, 'u1', now));
 	assert.equal(before.tickets.opened, 0);
-	const opened = ok(await redeemChest(m.deps, 'u1', 'chest-key-0002', now + 1000));
+	const opened = ok(await redeemChest(m.deps, 'u1', 'chest-key-0002', before.tickets.chests[0], now + 1000));
 	assert.equal(opened.tickets.opened, 1);
 	const after = ok(await syncTickets(m.deps, 'u1', now + 2000));
 	assert.equal(after.tickets.opened, 1);
-	assert.equal(after.tickets.chests, before.tickets.chests - 1);
+	assert.equal(after.tickets.chests.length, before.tickets.chests.length - 1);
+	assert.ok(!after.tickets.chests.some((c) => c.n === before.tickets.chests[0].n), 'the opened chest is gone from the list');
 });
 
 test('opening more chests than have appeared gives nothing: five clicks in five seconds earn what the clock allows', async () => {
 	const { m, now } = await playing(25); // two chests have appeared
+	const listed = ok(await syncTickets(m.deps, 'u1', now)).tickets.chests;
+	assert.equal(listed.length, 2);
 	let opened = 0;
 	let refused = 0;
 	for (let i = 0; i < 5; i++) {
-		const result = ok(await redeemChest(m.deps, 'u1', `chest-key-${1000 + i}`, now + i * 1000));
+		// the first two clicks are on the chests, the rest on tiles with none
+		const result = ok(await redeemChest(m.deps, 'u1', `chest-key-${1000 + i}`, listed[i] ?? { x: 1, y: 1 }, now + i * 1000));
 		if (result.ok) opened++;
 		else refused++;
 	}
@@ -131,9 +135,10 @@ test('chest rewards are sealed: the same account and number always roll the same
 	const a = await playing(25, 'u1');
 	const c = await playing(25, 'u1'); // the same history again
 	const b = await playing(25, 'u2');
-	const first = ok(await redeemChest(a.m.deps, 'u1', 'chest-key-0001', a.now));
-	const again = ok(await redeemChest(c.m.deps, 'u1', 'chest-key-0001', c.now));
-	const other = ok(await redeemChest(b.m.deps, 'u2', 'chest-key-0001', b.now));
+	const spot = async (x: typeof a) => ok(await syncTickets(x.m.deps, x === b ? 'u2' : 'u1', x.now)).tickets.chests[0];
+	const first = ok(await redeemChest(a.m.deps, 'u1', 'chest-key-0001', await spot(a), a.now));
+	const again = ok(await redeemChest(c.m.deps, 'u1', 'chest-key-0001', await spot(c), c.now));
+	const other = ok(await redeemChest(b.m.deps, 'u2', 'chest-key-0001', await spot(b), b.now));
 	assert.ok(first.ok && again.ok && other.ok);
 	if (first.ok && again.ok && other.ok) {
 		assert.deepEqual(first.loot, again.loot);
@@ -145,8 +150,10 @@ test('chest rewards are sealed: the same account and number always roll the same
 test('gems found in chests raise the server balance and are never flagged in the next save', async () => {
 	const { m, now } = await playing(60 * 8);
 	let found = 0;
-	for (let i = 0; i < 20; i++) {
-		const result = ok(await redeemChest(m.deps, 'u1', `chest-key-${2000 + i}`, now + i * 1000));
+	const listed = ok(await syncTickets(m.deps, 'u1', now)).tickets.chests.slice(0, 20);
+	assert.ok(listed.length >= 10);
+	for (const [i, spot] of listed.entries()) {
+		const result = ok(await redeemChest(m.deps, 'u1', `chest-key-${2000 + i}`, spot, now + i * 1000));
 		if (result.ok) found += result.gems;
 	}
 	const ledger = m.ledgers.get('u1')!;
@@ -219,11 +226,11 @@ test('after a long absence every online call asks for the claim first, and the c
 	const later = T0 + 5 * 3_600_000;
 	const blocked = await syncTickets(m.deps, 'u1', later);
 	assert.equal(blocked.kind, 'claim_first');
-	assert.equal((await redeemChest(m.deps, 'u1', 'chest-key-0001', later)).kind, 'claim_first');
+	assert.equal((await redeemChest(m.deps, 'u1', 'chest-key-0001', { x: 1, y: 1 }, later)).kind, 'claim_first');
 	const claim = await claimOffline(m.deps, 'u1', 'claim-0001', later);
 	assert.equal(claim.kind, 'ok');
 	const sync = ok(await syncTickets(m.deps, 'u1', later + 1000));
-	assert.ok(sync.tickets.chests > 0, 'the absence made chests appear (at the efficiency)');
+	assert.ok(sync.tickets.chests.length > 0, 'the absence made chests appear (at the efficiency)');
 });
 
 test('an account with no cloud save gets no tickets', async () => {
@@ -233,7 +240,8 @@ test('an account with no cloud save gets no tickets', async () => {
 
 test('two chest opens at the same moment spend two tickets, never the same one twice', async () => {
 	const { m, now } = await playing(25);
-	const [a, b] = await Promise.all([redeemChest(m.deps, 'u1', 'chest-key-aaaa', now), redeemChest(m.deps, 'u1', 'chest-key-bbbb', now)]);
+	const [one, two] = ok(await syncTickets(m.deps, 'u1', now)).tickets.chests;
+	const [a, b] = await Promise.all([redeemChest(m.deps, 'u1', 'chest-key-aaaa', one, now), redeemChest(m.deps, 'u1', 'chest-key-bbbb', two, now)]);
 	const results = [ok(a), ok(b)];
 	assert.equal(results.filter((r) => r.ok).length, 2);
 	assert.equal(m.ledgers.get('u1')!.ordChest, 2);
@@ -242,20 +250,22 @@ test('two chest opens at the same moment spend two tickets, never the same one t
 
 test('a poll between a lost answer and its retry does not erase the idempotency record: the retry replays, no second ticket is spent', async () => {
 	const { m, now } = await playing(25);
-	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11a', now));
+	const [spot] = ok(await syncTickets(m.deps, 'u1', now)).tickets.chests;
+	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11a', spot, now));
 	assert.equal(first.ok, true);
 	const spent = m.ledgers.get('u1')!.ordChest;
 	// the answer was lost; before the retry the game polls (a sync carries no key)
 	ok(await syncTickets(m.deps, 'u1', now + 1000));
 	assert.equal(m.ledgers.get('u1')!.lastKey, 'chest-key-r11a', 'the poll left the record alone');
-	const retry = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11a', now + 2000));
+	const retry = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11a', spot, now + 2000));
 	assert.deepEqual(retry, first);
 	assert.equal(m.ledgers.get('u1')!.ordChest, spent, 'no second chest was opened');
 });
 
 test('a fight poll keeps the record of the last keyed request too', async () => {
 	const { m, now } = await playing(25);
-	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11b', now));
+	const [spot] = ok(await syncTickets(m.deps, 'u1', now)).tickets.chests;
+	const first = ok(await redeemChest(m.deps, 'u1', 'chest-key-r11b', spot, now));
 	ok(await fightStep(m.deps, 'u1', null, { action: 'sync' }, now + 1000));
-	assert.deepEqual(ok(await redeemChest(m.deps, 'u1', 'chest-key-r11b', now + 2000)), first);
+	assert.deepEqual(ok(await redeemChest(m.deps, 'u1', 'chest-key-r11b', spot, now + 2000)), first);
 });

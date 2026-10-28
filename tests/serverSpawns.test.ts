@@ -22,7 +22,7 @@ const restore = () => {
 	globalThis.fetch = realFetch;
 };
 const flush = () => new Promise((resolve) => setTimeout(resolve, 20));
-const tickets = { chests: 0, rats: [], king: null };
+const tickets = { chests: [], rats: [], king: null };
 
 // ---------------------------------------------------------------------------------------------------- opening a chest on the server
 
@@ -46,7 +46,8 @@ test('a chest opens through the server: the reward is the server\'s, the gems ar
 		assert.equal(api().resources.gold, before + 777);
 		assert.equal(api().gems, 1012);
 		assert.equal(api().lastChestLoot?.gems, 12);
-		assert.deepEqual(Object.keys(sentBody), ['key'], 'the request names no amount and no chest');
+		assert.deepEqual(Object.keys(sentBody).sort(), ['key', 'x', 'y'], 'the request names the tile, no amount');
+		assert.deepEqual([sentBody.x, sentBody.y], [CASTLE_X + 1, CASTLE_Y]);
 	} finally {
 		restore();
 	}
@@ -90,7 +91,7 @@ test('the monsters on the map are the server list, where the server put them', (
 	freshGame();
 	growTo(30);
 	const sync = {
-		tickets: { chests: 0, rats: [{ n: 4, at: 1000 - 100, lucky: true, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 2 }], king: { n: 9, at: 1000, x: CASTLE_X, y: CASTLE_Y - 4, spawnLevel: 16 } },
+		tickets: { chests: [], rats: [{ n: 4, at: 1000 - 100, lucky: true, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 2 }], king: { n: 9, at: 1000, x: CASTLE_X, y: CASTLE_Y - 4, spawnLevel: 16 } },
 		serverNowSec: 1000,
 		gemsTotal: 1100,
 		nextInSec: 30,
