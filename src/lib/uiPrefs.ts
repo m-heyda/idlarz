@@ -3,7 +3,15 @@
 
 import { scoped } from '@/lib/storageScope';
 
-export type UiPrefKey = 'showAdmin' | 'adminCollapsed' | 'showMinimap' | 'combatMinimized' | 'compactHeader';
+export type UiPrefKey =
+	| 'showAdmin'
+	| 'adminCollapsed'
+	| 'showMinimap'
+	| 'combatMinimized'
+	| 'compactHeader'
+	| 'farmAnimalsOpen'
+	| 'farmHudOpen'
+	| 'farmUpgradesOpen';
 
 /** What a first visit (and the server render) sees: the dev admin panel starts open, the minimap on */
 export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
@@ -12,6 +20,9 @@ export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
 	showMinimap: true,
 	combatMinimized: false, // the combat panel starts open
 	compactHeader: false, // the header shows each resource with its amount; compact leaves only the icons (the amounts are in the dropdown of each group)
+	farmAnimalsOpen: true, // the Farm window's animal shop, stats readout and upgrade drawer: what is folded stays folded
+	farmHudOpen: true,
+	farmUpgradesOpen: false,
 };
 
 const storageKey = (key: UiPrefKey) => scoped(`idlarz.ui.${key}`);
