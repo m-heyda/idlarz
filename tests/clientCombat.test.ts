@@ -396,3 +396,33 @@ test('a rebirth refills mana to the pool of the gear that survives', () => {
 	assert.equal(api().playerMp, 48);
 	assert.ok(max() > 0 && COMBAT.regenPerSec > 0);
 });
+
+test('flee leaves the open fight at once, asks the server to retreat (auto-battle off) and shows no result', async () => {
+	syncedGame();
+	api().applyFightReply(reply(view({ eventNo: 0, autoBattle: true, fight: { n: 7, type: 'rat', level: 4, lucky: false, monsterHp: 60, monsterMaxHp: 100, stunLeft: 0, timeLeftSec: null, x: 1, y: 2 } })));
+	assert.ok(api().combat.fight);
+	const calls = record();
+	try {
+		api().flee();
+		assert.equal(api().combat.fight, null, 'the window does not wait for the answer');
+		assert.equal(api().combat.autoBattle, false, 'auto-battle would start the next fight at once');
+		assert.equal(api().combat.notice, null);
+		await flush();
+		assert.equal(calls.length, 1);
+		assert.equal(calls[0].body.action, 'auto');
+		assert.equal(calls[0].body.autoBattle, false);
+		api().flee();
+		await flush();
+		assert.equal(calls.length, 1, 'no fight, nothing to flee from: nothing is sent');
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('a retreat the server reports clears an older result instead of showing it again', () => {
+	syncedGame();
+	api().applyFightReply(reply(view({ eventNo: 1, events: [won(1, ratDrops())] })));
+	assert.equal(api().combat.notice?.kind, 'won');
+	api().applyFightReply(reply(view({ eventNo: 2, events: [event(2, 'retreat', { n: 2, type: 'rat', level: 1 })] })));
+	assert.equal(api().combat.notice, null);
+});

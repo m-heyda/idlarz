@@ -410,6 +410,8 @@ export interface GameState {
 	/** A click on a monster of the map: asks the server to start the fight against it (false when nothing was asked: no such monster, or a fight is open) */
 	startFight: (id: number) => boolean;
 	setAutoBattle: (on: boolean) => void;
+	/** Leaves the open fight (no reward, no penalty, the monster stays) and switches auto-battle off, which would start the next fight at once */
+	flee: () => void;
 	setAutoUse: (on: boolean) => void;
 	/** The server kept less XP than the game held (it could not be earned): take it, the level follows and attribute points the new level has not earned go back to be spent again */
 	applyServerXp: (xp: number) => void;

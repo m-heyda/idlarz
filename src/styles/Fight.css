@@ -224,16 +224,6 @@
 	100% { transform: translateY(-48px); opacity: 0; }
 }
 
-.fight-result {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	z-index: 8;
-	min-width: 300px;
-	padding: 8px 14px;
-	transform: translate(-50%, -50%);
-}
-
 /* --- actions --- */
 .fight-actions {
 	display: flex;
