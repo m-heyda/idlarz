@@ -349,6 +349,9 @@ const createGameSlice = (
 				};
 			} else if ((e.kind === 'defeated' || e.kind === 'timeout') && e.type) {
 				notice = { id: noticeId++, kind: e.kind, type: e.type, level: e.level ?? 1, summary: null, taunt: tauntOf(e.type) };
+			} else if (e.kind === 'retreat') {
+				// a fled fight has no result of its own, and the one from before must not come back in its place
+				notice = null;
 			}
 		}
 		set({
@@ -725,6 +728,14 @@ const createGameSlice = (
 				settleFight(reply);
 				if (on) signalSyncNow();
 			});
+		},
+
+		// Flee: the server ends the fight as a retreat (no reward, no penalty, the monster stays full), which is what switching auto-battle
+		// off does; with it on the next fight would start at once, so fleeing turns it off. The window closes at once, the answer confirms.
+		flee: () => {
+			if (!get().combat.fight) return;
+			set((state) => ({ combat: { ...state.combat, fight: null, pending: null, notice: null, autoBattle: false } }));
+			void requestAuto({ autoBattle: false }, sinceNow()).then((reply) => settleFight(reply));
 		},
 
 		setAutoUse: (on: boolean) => {

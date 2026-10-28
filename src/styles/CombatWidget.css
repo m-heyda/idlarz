@@ -138,8 +138,8 @@
 	text-shadow: 1px 1px 0 #000;
 }
 
-/* the result: the monster lies dead, grey, with a red cross over it */
-.fight-result {
+/* the result, in the same window as the fight: the monster lies dead on the stage (grey, a red cross over it) and its loot is under it */
+.fight-reward {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -179,4 +179,20 @@
 
 .combat-head .combat-min + .combat-min {
 	margin-left: 2px;
+}
+
+.combat-flee {
+	height: 22px;
+	padding: 0 8px;
+	line-height: 14px;
+	font-weight: 700;
+	color: #ffd8d0;
+	background: #5a1410;
+	border: 2px solid #0a0605;
+	box-shadow: 0 0 0 2px #c0392b;
+	cursor: pointer;
+}
+
+.combat-flee:hover {
+	background: #7a1c16;
 }
