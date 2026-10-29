@@ -37,7 +37,7 @@ reward: {
 - Bosses: one per biome, own timer and own `minCastleDistance`, `minRebirths` (the Rat King pattern).
 
 ## 5. Families (placeholders to fill later)
-Each biome: 3-4 monsters and a boss, names and stats open ([12](12-rebirth-biomes.md) section 5). A family entry needs: biome allowlist, distance band, `minRebirths`, level window and `spawnWindow`, stats at `refLevel` with per-level scaling, `reward` block above, `lootSourceId` plus pool tags, `goods`, art (sprite and a short attack animation), and a `taunts` list for bosses. The tests `monsterConfig.test.ts`, `fightBalance.test.ts` and the sims (`fight-sim`, `loot-sim`) read the registry, so a new family appears in them without code changes.
+Each biome: 3-4 monsters and a boss, names and stats open ([12](12-rebirth-biomes.md) section 5). A family entry needs: biome allowlist, distance band, `minRebirths`, level window and `spawnWindow`, stats at `refLevel` with per-level scaling, `reward` block above, `lootSourceId` plus pool tags, `goods`, art (sprite and a short attack animation; finished images live in `public/pixel/enemies/<biome>/<monster-id>.png`, prompts and naming in [monster-art-prompts](monster-art-prompts.md)), and a `taunts` list for bosses. The tests `monsterConfig.test.ts`, `fightBalance.test.ts` and the sims (`fight-sim`, `loot-sim`) read the registry, so a new family appears in them without code changes.
 
 ## 6. Server changes
 1. Generic ticket list in `player_ledger.bank`: `{ n, type, at, x, y, spawnLevel, lucky }` instead of `rats` and `king` (`upgradeBank` reads old rows; no data migration needed, a lazy read).
