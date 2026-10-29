@@ -32,7 +32,7 @@ Suggested order: **[19](19-first-build-steps.md) A castle timers, then B resourc
 
 - **The map and its biomes reset on every rebirth, always.** What persists: character (level, attributes budget), crafting level, Embers and the shop, `discovered` biomes, and the **Idol levels** (re-placed free at their level; cap 5 for now).
 - **Soft caps everywhere, raised with legacy points (Embers) later.** Every limit goes through `limitOf` / `LIMITS` with a `HARD_LIMITS` ceiling so a raise never invalidates a save ([18](18-biome-buildings-and-material-tiers.md) section 6 has the table: Idol level, building level, builder slots, crafting level, bag, offline cap ...). New Ember shop items have this shape (caps and slots), not just flat percentages.
-- **The castle's area bonus also multiplies the buildings in its range** (Producer, Extractor, and the Idol with a cap); the far biomes can never be in range ([18](18-biome-buildings-and-material-tiers.md) rule 7).
+- **Position bonus on buildings:** the castle's area bonus multiplies every building in its range (Producers and Extractors in full, Idols capped at x2), and buildings beyond the range get a frontier bonus that grows with distance, so the far biomes stay competitive ([18](18-biome-buildings-and-material-tiers.md) rule 7).
 - **Content will grow: about ten new items, new monsters and biomes are coming.** Crafting, loot and rewards are data-driven by tag and tier, never tuned against today's gear alone ([17](17-crafting.md), [20](20-monster-families-and-rewards.md)).
 - **Monster rewards are capped per monster and multiplied by level**, so weak monsters fade and strong ones pay (gold, hide/food, tiered items) ([20](20-monster-families-and-rewards.md)).
 

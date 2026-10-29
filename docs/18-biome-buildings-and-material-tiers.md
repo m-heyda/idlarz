@@ -18,7 +18,12 @@ Related: [12 biomes](12-rebirth-biomes.md) (the five new biomes and T2), [17 cra
 4. **Relocate** (proposal): a building can be moved for 50 % of its cost (levels are kept), because one-per-type punishes a bad first placement.
 5. **Levels and timers** (section 5). **The map and its biomes always reset on rebirth**, and with them every Producer and Extractor. **Idols are the exception: their levels persist** (section 6).
 6. **Legacy buildings** (the 16 old types) disappear (section 8).
-7. **The castle's area bonus multiplies buildings.** Tiles inside the castle's range already get `CASTLE_AREA_BONUS` (+50 % below castle level 7; from level 7 `+100 %` per range radius tile, up to `+400 %` at castle 10, `config/gameConfig.ts`) for the tile *and the building on it*. This stays and is extended: the multiplier applies to **every building effect in the range**, i.e. Producer and Extractor output and the Idol's bonus. Consequences to design for: (a) the range is only 3x3 up to castle 7 and 9x9 at castle 10 (80 tiles), so which of the 36 buildings stand in it is a placement puzzle; (b) the start ring and the land near the castle are the basic biomes, and the five rebirth biomes begin 10+ tiles out ([12](12-rebirth-biomes.md)), **outside the maximum range of radius 4**, so Fields, Jungle, Orchard, Blight and Battlefield buildings can never get the area bonus: give them a higher base value instead (open question); (c) an Idol inside a +400 % range would be five times stronger, so the area multiplier on an Idol is **capped** (proposal: the Idol's value times `min(1 + areaBonus, 2)`), see section 6.
+7. **Position bonus: the castle's area bonus near the castle, a frontier bonus far from it (decided 2026-10-29).** One pure function `positionBonus(distance, castleLevel)` gives the building on that tile its bonus, so near and far buildings stay comparable:
+   - **Inside the castle range** (the existing `CASTLE_AREA_BONUS`, `config/gameConfig.ts`: +50 % below castle level 7; from level 7 `+100 %` per range radius tile, up to `+400 %` at castle 10; range 3x3 growing to 9x9): unchanged for tiles, now **also applied to every building on them**.
+   - **Beyond the range** (the rebirth biomes begin 10+ tiles out, outside the maximum radius 4): a **frontier bonus** that grows with distance, proposal `min(+100 %, 5 % x (distance - 9))` from distance 10 (so +5 % at 10, +65 % at 22, +100 % from 29). Between the range edge and distance 9 there is no bonus. Exactly one of the two applies to a tile.
+   - **Who gets it:** Producers and **Extractors in full** (decided: the same as Producers; Extractor rates in [17](17-crafting.md)'s pacing must therefore be set with the castle-10 case of x5 in mind), and **Idols capped at x2**: Idol value x `min(1 + positionBonus, 2)`. The cap is what keeps an Idol next to a castle 10 from being five times stronger.
+   - Consequences to design for: the range holds at most 80 tiles, so which of the 36 buildings stand in it is a placement puzzle; the castle region is the start ring's basic biomes, so basic-biome buildings compete for it while the late biomes are rewarded by the frontier bonus; the frontier bonus rewards expanding outward, which fits the map-exploration goal of [12](12-rebirth-biomes.md).
+   - **Server:** pure function of the saved map (building tile, castle position and level), folded into `buildingEconomy(world, legacy)` like the Obsidian set, so offline grants, `verify.ts` and `netWorth.ts` agree. Relocating a building ([rule 4]) changes its bonus, so relocation cost matters (open).
 
 ## 3. The buildings (36 proposals)
 
@@ -133,6 +138,7 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 ## 11. Decisions and open questions
 
 **Decided (2026-10-29):**
+- Position bonus (rule 7): castle area bonus applies to every building in range; Idols capped at x2; Extractors in full like Producers; buildings beyond the range get a frontier bonus mirroring it.
 - Producers scale with the owned size of their biome (+2 % per tile, cap +100 %), one of each type per map.
 - ~~Idol bonuses reset with the map~~ **Superseded (see section 6): Idol levels persist across rebirths and are re-placed for free; the cap is 5 for now and raised with legacy points.**
 - The merchant trades T0 and T1 only; T2-T4 are never sold. This overrides the earlier "tradable once discovered" plan in [12](12-rebirth-biomes.md).
@@ -140,7 +146,7 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 - One shared builder: the castle and all buildings share one upgrade queue (one timer runs at a time). Ember Master Builders and the Dwarf Statue shorten timers; extra builder slots can become an Ember shop item later (also adds a shape to BL9).
 
 **Still open:**
-0. The castle area bonus on Idols (capped at x2 proposed) and on the far, late-biome buildings that can never be in range.
+0. The frontier bonus numbers (5 % per tile beyond 9, cap +100 %) and whether they should count the global distance offset of [12](12-rebirth-biomes.md); the castle-10 x5 on Extractors against the crafting pace.
 1. Relocation cost (proposal 50 % of the building's cost) and the level cap of 5.
 2. The Idol effect values per level, the extractor rates and the Producer base outputs: set with the sim.
 3. T4 Relics: what they are and where they drop (needs the monster families, [12](12-rebirth-biomes.md) section 5).
