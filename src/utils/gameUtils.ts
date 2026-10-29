@@ -59,6 +59,7 @@ import {
 	type Placed,
 	type World,
 } from '@/utils/world';
+import { isLandmarkTile } from '@/utils/terrain';
 
 /** Number of owned tiles on the map (kept up to date by the world, so this is O(1)). */
 export const countOwnedTiles = (tiles: World): number => ownedCount(tiles);
@@ -743,6 +744,9 @@ export const calculateBuildingCost = (
 /** An explored tile that can take a building: not water or the castle, and nothing built on it yet. */
 export const canBuildOn = (tile: Tile | undefined): boolean =>
 	!!tile && tile.isOwned && !BUILDING_COST.blockedBiomes.includes(tile.biome) && !tile.building;
+
+/** canBuildOn plus the map: a landmark's 6x6 area (a big cosmetic scene on a block of one biome) is kept free of buildings. */
+export const canBuildAt = (world: World, x: number, y: number): boolean => canBuildOn(getTile(world, x, y)) && !isLandmarkTile(world, x, y);
 
 /**
  * Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each

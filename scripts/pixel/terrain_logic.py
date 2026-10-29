@@ -246,6 +246,58 @@ def dock_at(m, g, x, y):
     return out
 
 
+# Landmarks: a 6x6 window of one land ground (and no building) gets one big cosmetic sprite (landmarks.py). Windows compete by a hash
+# so overlapping ones never both win, and an anchor is the best window of its own ground within LANDMARK_RADIUS tiles: one landmark per ~9x9 area.
+LANDMARK_SPAN = 6
+LANDMARK_RADIUS = 8
+LANDMARK_GROUNDS = ('plains', 'forest', 'hills', 'swamp', 'tundra', 'lake', 'coast')
+
+
+def _landmark_key(x, y):
+    return (hash32(x, y, 820), y, x)
+
+
+def landmark_anchors(g, built, x0, y0, x1, y1):
+    """[(x, y, ground)] top-left tiles of the landmark windows whose top-left lies in [x0..x1] x [y0..y1] (inclusive).
+    `built`: set of (x, y) building tiles; a window holding one does not qualify."""
+    memo = {}
+
+    def window(x, y):
+        k = (x, y)
+        if k not in memo:
+            me = at(g, x, y)
+            ok = me in LANDMARK_GROUNDS
+            for dy in range(LANDMARK_SPAN) if ok else ():
+                for dx in range(LANDMARK_SPAN):
+                    if at(g, x + dx, y + dy) != me or (built and (x + dx, y + dy) in built):
+                        ok = False
+                        break
+                if not ok:
+                    break
+            memo[k] = me if ok else None
+        return memo[k]
+
+    out = []
+    r = LANDMARK_RADIUS
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            me = window(x, y)
+            if not me:
+                continue
+            mine = _landmark_key(x, y)
+            if any((ox or oy) and _landmark_key(x + ox, y + oy) > mine and window(x + ox, y + oy) == me
+                   for oy in range(-r, r + 1) for ox in range(-r, r + 1)):
+                continue
+            out.append((x, y, me))
+    return out
+
+
+def landmark_sprite(m, ax, ay, ground):
+    """(sprite_id, world_x, world_y_bottom): centred on the window, standing on its lower third."""
+    pid = f'lm_{ground}'
+    return (pid, (ax + LANDMARK_SPAN // 2) * CELL - m['sprites'][pid][2] // 2, (ay + LANDMARK_SPAN - 1) * CELL)
+
+
 def all_pads(owned, built):
     """[(pad_id, world_x, world_y)] top-left corners of the 48x48 foundation pads (drawn under every sprite). `built`: coordinates of building tiles."""
     out = []
@@ -260,8 +312,13 @@ def all_pads(owned, built):
 def all_sprites(m, g, built=None):
     """Every sprite of the map as (sprite_id, world_x, world_y_bottom), in draw order (bottom edge, then x)."""
     items = []
+    anchors = landmark_anchors(g, built, 0, 0, len(g[0]) - 1, len(g) - 1) if 'lm_forest' in m['sprites'] else []
+    covered = {(ax + dx, ay + dy) for ax, ay, _ in anchors for dx in range(LANDMARK_SPAN) for dy in range(LANDMARK_SPAN)}
     for y in range(len(g)):
         for x in range(len(g[0])):
+            if (x, y) in covered:
+                continue                                              # the landmark stands here: no props, decor or docks
             props = [] if built and (x, y) in built else tile_sprites(m, g, x, y)
             items += props + ([] if built and (x, y) in built else tile_decor(m, g, x, y, props)) + dock_at(m, g, x, y)
+    items += [landmark_sprite(m, ax, ay, ground) for ax, ay, ground in anchors]
     return sorted(items, key=lambda it: (it[2], it[1]))

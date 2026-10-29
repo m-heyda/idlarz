@@ -20,7 +20,7 @@ export type LabTool = 'pan' | 'paint' | 'extend' | 'erase' | 'chest' | 'unchest'
 /** The tools that draw while the button is held (the others act on a click). */
 export const STROKE_TOOLS: readonly LabTool[] = ['paint', 'extend', 'erase', 'chest', 'unchest'];
 
-export type LabPreset = 'start' | 'rolled60' | 'rolled400' | 'showcase';
+export type LabPreset = 'start' | 'rolled60' | 'rolled400' | 'showcase' | 'landmarks';
 
 /** The biomes a tile can be painted with (everything but the empty placeholder and the castle, which is fixed). */
 export const PAINT_BIOMES = Object.keys(BIOMES).filter((b) => b !== 'empty' && b !== 'castle');
@@ -51,6 +51,19 @@ const showcaseWorld = (): World => {
 	return setTiles(base, changes);
 };
 
+/** A 6x6 block of each biome with a tile between them: each one is exactly the luck a landmark needs (a 5x5 block would get none). */
+const landmarksWorld = (): World => {
+	const base = createInitialWorld(seededRandom(1));
+	const size = 6;
+	const changes: { x: number; y: number; tile: { biome: string; isOwned: true } }[] = [];
+	PAINT_BIOMES.forEach((biome, i) => {
+		const x0 = CASTLE_X + 2 + (i % 4) * (size + 1);
+		const y0 = CASTLE_Y - 1 + Math.floor(i / 4) * (size + 1);
+		for (let dy = 0; dy < size; dy++) for (let dx = 0; dx < size; dx++) changes.push({ x: x0 + dx, y: y0 + dy, tile: { biome, isOwned: true } });
+	});
+	return setTiles(base, changes);
+};
+
 export const presetWorld = (preset: LabPreset, seed: number): World => {
 	switch (preset) {
 		case 'rolled60':
@@ -59,6 +72,8 @@ export const presetWorld = (preset: LabPreset, seed: number): World => {
 			return growWorld(400, seed);
 		case 'showcase':
 			return showcaseWorld();
+		case 'landmarks':
+			return landmarksWorld();
 		default:
 			return createInitialWorld(seededRandom(seed));
 	}

@@ -32,7 +32,7 @@ import {
 	affordableAnimals,
 	animalBatchCost,
 	calculateBuildingCost,
-	canBuildOn,
+	canBuildAt,
 	calculateCombatStats,
 	calculateLevel,
 	calculateResourceRates,
@@ -705,12 +705,12 @@ const createGameSlice = (
 			return true;
 		},
 
-		// Builds on an explored tile of any biome (not the castle or a lake; one building per tile, nothing on a tile with a chest or a monster).
+		// Builds on an explored tile of any biome (not the castle or a lake, not inside a landmark's 6x6 area; one building per tile, nothing on a tile with a chest or a monster).
 		// The tile keeps its biome and its output; the building adds its own. Each building costs more than the last (calculateBuildingCost).
 		buildOnTile: (x: number, y: number, buildingType: string) => {
 			const state = get();
 			const tile = getTile(state.tiles, x, y);
-			if (!tile || !canBuildOn(tile) || tile.hasChest || monsterAt(state.monsters, x, y)) return false;
+			if (!tile || !canBuildAt(state.tiles, x, y) || tile.hasChest || monsterAt(state.monsters, x, y)) return false;
 			if (!(buildingType in BUILDINGS)) return false;
 
 			const cost = calculateBuildingCost(state.tiles, state.prestige);

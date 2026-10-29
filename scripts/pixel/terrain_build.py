@@ -13,6 +13,7 @@ import terrain_art as art
 import terrain_logic as logic
 import terrain_pads as pads
 import terrain_props as props
+import landmarks
 from terrain_field import CELL, hash32
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -63,6 +64,8 @@ def collect():
                 images[f'pier_ice_{d}_{length}_{barrel}'] = props.cached(props.pier, d, length, bool(barrel), 'ice')
     for pid, make in pads.PADS.items():
         images[pid] = make()
+    for lm_id, make, _ in landmarks.LANDMARKS:                       # one big cosmetic scene per biome (landmarks.py), ids lm_<ground>
+        images[lm_id] = make()
     for kind, name in (('', 'boat'), ('ice', 'boat_ice'), ('bog', 'boat_bog')):
         images[f'{name}_h'] = props.cached(props.boat, False, kind)
         images[f'{name}_v'] = props.cached(props.boat, True, kind)
@@ -173,6 +176,47 @@ def layout_owned(rows, names):
     return owned, built
 
 
+def landmark_layout():
+    """A canned map for the landmark rules: one big block per ground, a block with a building inside, and a 6x6 that is one short."""
+    rows = [
+        '..............................',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '.FFFFFFFFFF.HHHHHHHHHH........',
+        '..............................',
+        '.PPPPPPP.TTTTTTT.SSSSSSS......',
+        '.PPPPPPP.TTTTTTT.SSSSSSS......',
+        '.PPPPPPP.TTTTTTT.SSSSSSS......',
+        '.PPPPPPP.TTTTTTT.SSSSSSS......',
+        '.PPPPPPP.TTTTTTT.SSSSSSS......',
+        '.PPPPPPP.TTTTTTT.SSSSSSS......',
+        '.PPPPPPP.TTTTTTT.SSSSSSS......',
+        '..............................',
+        '.LLLLLLL.BBBBBBB.PPPPPp.......',
+        '.LLLLLLL.BBBBBBB.PPPPPP.......',
+        '.LLLLLLL.BBBBBBB.PPPPPP.......',
+        '.LLLLLLL.BBBBBBB.PPPPPP.......',
+        '.LLLLLLL.BBBBBBB.PPPPP........',
+        '.LLLLLLL.BBBBBBB.PPPPPP.......',
+        '..............................',
+    ]
+    return rows
+
+
+def build_landmarks(m):
+    rows = landmark_layout()
+    _, names = parity_layout()
+    owned, built = layout_owned(rows, names)
+    g = logic.ground_grid(owned)
+    return {'layout': rows, 'anchors': [list(a) for a in logic.landmark_anchors(g, built, 0, 0, len(g[0]) - 1, len(g) - 1)],
+            'sprites': [list(s) for s in logic.all_sprites(m, g, built)]}
+
+
 def build_parity(m):
     rows, names = parity_layout()
     owned, built = layout_owned(rows, names)
@@ -186,6 +230,7 @@ def build_parity(m):
                   for cy in range(len(g) + 1) for cx in range(len(g[0]) + 1)],
         'sprites': [list(s) for s in logic.all_sprites(m, g, built)],
         'pads': [list(p) for p in logic.all_pads(owned, built)],
+        'landmarks': build_landmarks(m),
     }
 
 

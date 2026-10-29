@@ -375,6 +375,94 @@ export function dockAt(g: GroundSrc, x: number, y: number, m: TerrainAtlas = ATL
 	return out;
 }
 
+// ------------------------------------------------------------------ landmarks
+/**
+ * A 6x6 window of one land ground (with no building on it) gets one big cosmetic sprite, `lm_<ground>` (scripts/pixel/landmarks.py).
+ * Windows compete by a hash so overlapping ones never both win; an anchor is the best window of its own ground within
+ * LANDMARK_RADIUS tiles, so a big forest gets one landmark per ~9x9 area. The landmark's tiles carry no props, decor or docks, and
+ * nothing can be built on them (isLandmarkTile). Port of landmark_anchors in terrain_logic.py.
+ */
+export const LANDMARK_SPAN = 6;
+const LANDMARK_RADIUS = 8;
+const LANDMARK_GROUNDS: string[] = ['plains', 'forest', 'hills', 'swamp', 'tundra', 'lake', 'coast'];
+
+export interface Landmark {
+	x: number;
+	y: number;
+	ground: Ground;
+}
+
+/** True where a building stands (the map reads it from the World, a test from a set). */
+export type BuiltFn = (x: number, y: number) => boolean;
+
+/** Does window A beat window B: the higher hash wins, then the lower row, then the lower column (same order as the Python tuple compare). */
+const landmarkBeats = (ax: number, ay: number, bx: number, by: number): boolean => {
+	const ha = hash32(ax, ay, 820);
+	const hb = hash32(bx, by, 820);
+	if (ha !== hb) return ha > hb;
+	return ay !== by ? ay > by : ax > bx;
+};
+
+/** The anchors (top-left tile of the window) whose top-left lies in [x0..x1] x [y0..y1], inclusive. */
+export function landmarkAnchors(g: GroundSrc, built: BuiltFn | undefined, x0: number, y0: number, x1: number, y1: number): Landmark[] {
+	const memo = new Map<number, Ground | null>();
+	const windowAt = (x: number, y: number): Ground | null => {
+		const key = (x + 20000) * 40000 + (y + 20000);
+		const known = memo.get(key);
+		if (known !== undefined) return known;
+		const me = at(g, x, y);
+		let ok = me !== null && LANDMARK_GROUNDS.includes(me);
+		for (let dy = 0; ok && dy < LANDMARK_SPAN; dy++)
+			for (let dx = 0; dx < LANDMARK_SPAN; dx++)
+				if (at(g, x + dx, y + dy) !== me || built?.(x + dx, y + dy)) {
+					ok = false;
+					break;
+				}
+		const result = ok ? me : null;
+		memo.set(key, result);
+		return result;
+	};
+	const out: Landmark[] = [];
+	for (let y = y0; y <= y1; y++)
+		for (let x = x0; x <= x1; x++) {
+			const me = windowAt(x, y);
+			if (!me) continue;
+			let beaten = false;
+			for (let oy = -LANDMARK_RADIUS; oy <= LANDMARK_RADIUS && !beaten; oy++)
+				for (let ox = -LANDMARK_RADIUS; ox <= LANDMARK_RADIUS; ox++)
+					if ((ox || oy) && landmarkBeats(x + ox, y + oy, x, y) && windowAt(x + ox, y + oy) === me) {
+						beaten = true;
+						break;
+					}
+			if (!beaten) out.push({ x, y, ground: me });
+		}
+	return out;
+}
+
+/** The sprite of a landmark: centred on its window, standing on the window's lower third. */
+export function landmarkSprite(a: Landmark, m: TerrainAtlas = ATLAS): Placed {
+	const id = `lm_${a.ground}`;
+	return { id, x: (a.x + LANDMARK_SPAN / 2) * CELL - Math.floor(m.sprites[id][2] / 2), bottom: (a.y + LANDMARK_SPAN - 1) * CELL };
+}
+
+const hasLandmarks = (m: TerrainAtlas) => 'lm_forest' in m.sprites;
+
+const coverKey = (x: number, y: number) => `${x},${y}`;
+const coveredTiles = (anchors: Landmark[]): Set<string> => {
+	const out = new Set<string>();
+	for (const a of anchors) for (let dy = 0; dy < LANDMARK_SPAN; dy++) for (let dx = 0; dx < LANDMARK_SPAN; dx++) out.add(coverKey(a.x + dx, a.y + dy));
+	return out;
+};
+
+/** The landmark whose 6x6 area holds the tile, if any (what keeps buildings off it). */
+export function landmarkAt(world: World, x: number, y: number): Landmark | null {
+	const g = worldGround(world);
+	return landmarkAnchors(g, (bx, by) => isBuilt(getTile(world, bx, by)), x - LANDMARK_SPAN + 1, y - LANDMARK_SPAN + 1, x, y)[0] ?? null;
+}
+
+/** A landmark stands on this tile: no building can go there. */
+export const isLandmarkTile = (world: World, x: number, y: number): boolean => landmarkAt(world, x, y) !== null;
+
 /** Coordinates ("x,y") of building tiles: they carry no props, the building stands there. */
 export function builtSet(tiles: Tile[][] | undefined): Set<string> {
 	const out = new Set<string>();
@@ -385,12 +473,16 @@ export function builtSet(tiles: Tile[][] | undefined): Set<string> {
 /** Every sprite of the map in draw order (bottom edge, then x). */
 export function allSprites(g: GroundGrid, m: TerrainAtlas = ATLAS, built?: Set<string>): Placed[] {
 	const items: Placed[] = [];
+	const anchors = hasLandmarks(m) && g.length ? landmarkAnchors(g, built && ((x, y) => built.has(`${x},${y}`)), 0, 0, g[0].length - 1, g.length - 1) : [];
+	const covered = coveredTiles(anchors);
 	for (let y = 0; y < g.length; y++)
 		for (let x = 0; x < g[0].length; x++) {
+			if (covered.has(coverKey(x, y))) continue; // the landmark stands here
 			const skip = built?.has(`${x},${y}`);
 			const props = skip ? [] : tileSprites(g, x, y, m);
 			items.push(...props, ...(skip ? [] : decorSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
 		}
+	items.push(...anchors.map((a) => landmarkSprite(a, m)));
 	return items.sort((a, b) => a.bottom - b.bottom || a.x - b.x);
 }
 
@@ -399,9 +491,10 @@ export function allSprites(g: GroundGrid, m: TerrainAtlas = ATLAS, built?: Set<s
 export const CHUNK_TILES = 16;
 /**
  * How far from a chunk the drawing can depend on the ground: the deepest ring (2), a neighbour's neighbour for docks (3)
- * and the margin of `fits` all stay inside 5 tiles, so a chunk's picture is a function of the ground in chunk + 5.
+ * and the margin of `fits` stay inside 5 tiles, but a landmark is picked among windows up to LANDMARK_RADIUS away and covers
+ * the tiles of its 6x6 window, which reaches 15 tiles: a chunk's picture is a function of the ground in chunk + 15.
  */
-export const CHUNK_HALO = 5;
+export const CHUNK_HALO = 15;
 /** Sprites of tiles this close to a chunk can reach into it (a pier is under one tile long). */
 const SPRITE_REACH = 2;
 
@@ -475,13 +568,23 @@ export function chunkPads(world: World, cx: number, cy: number): Placed[] {
 export function chunkSprites(world: World, cx: number, cy: number, m: TerrainAtlas = ATLAS): Placed[] {
 	const g = worldGround(world);
 	const items: Placed[] = [];
-	for (let y = cy * CHUNK_TILES - SPRITE_REACH; y < (cy + 1) * CHUNK_TILES + SPRITE_REACH; y++) {
-		for (let x = cx * CHUNK_TILES - SPRITE_REACH; x < (cx + 1) * CHUNK_TILES + SPRITE_REACH; x++) {
-			if (!g(x, y)) continue;
+	const x0 = cx * CHUNK_TILES - SPRITE_REACH;
+	const y0 = cy * CHUNK_TILES - SPRITE_REACH;
+	const x1 = (cx + 1) * CHUNK_TILES + SPRITE_REACH;
+	const y1 = (cy + 1) * CHUNK_TILES + SPRITE_REACH;
+	// the landmarks whose window touches the sprite area (a tile at its edge is covered by a window starting up to 5 tiles before it)
+	const anchors = hasLandmarks(m)
+		? landmarkAnchors(g, (bx, by) => isBuilt(getTile(world, bx, by)), x0 - LANDMARK_SPAN + 1, y0 - LANDMARK_SPAN + 1, x1 - 1, y1 - 1)
+		: [];
+	const covered = coveredTiles(anchors);
+	for (let y = y0; y < y1; y++) {
+		for (let x = x0; x < x1; x++) {
+			if (!g(x, y) || covered.has(coverKey(x, y))) continue;
 			const built = isBuilt(getTile(world, x, y));
 			const props = built ? [] : tileSprites(g, x, y, m);
 			items.push(...props, ...(built ? [] : decorSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
 		}
 	}
+	items.push(...anchors.map((a) => landmarkSprite(a, m)));
 	return items.sort((a, b) => a.bottom - b.bottom || a.x - b.x || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
