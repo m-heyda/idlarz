@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { AMBIENT_LIFE } from '@/config/gameConfig';
 import { nextSpawnDelay, pickAmbientCritter, type AmbientCritter, type Viewport } from '@/lib/ambientLife';
 import '@/styles/Ambient.css';
+import { useMapGame } from './mapSource';
 
 /** Sprite sheets of every ambient critter (2 frames each: flap / hop / swing), frame size in native px. */
 const AMBIENT_SHEETS: Record<AmbientCritter['type'], { name: string; w: number; h: number; ms: number }> = {
@@ -23,8 +23,9 @@ const AMBIENT_SHEETS: Record<AmbientCritter['type'], { name: string; w: number; 
  * Settings, while the tab is hidden and for people who prefer reduced motion.
  */
 const AmbientLife: React.FC<{ getViewport: () => Viewport }> = ({ getViewport }) => {
+	const game = useMapGame();
 	const enabled = useSettingsStore((state) => state.ambientLife);
-	const tiles = useGameStore((state) => state.tiles);
+	const tiles = game((state) => state.tiles);
 	const [critters, setCritters] = useState<AmbientCritter[]>([]);
 	const tilesRef = useRef(tiles);
 	tilesRef.current = tiles;

@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CHUNK_TILES, chunkOf, chunkSignature, worldGround } from '@/utils/terrain';
 import {
@@ -25,6 +24,7 @@ import {
 } from '@/utils/water';
 import { ownedBounds, type World } from '@/utils/world';
 import { pixelIconSrc } from '@/config/pixelIcons';
+import { useMapGame } from './mapSource';
 
 interface WaterLayerProps {
 	/** Visible tile range (inclusive-exclusive), so only the ripples on screen are in the DOM */
@@ -235,7 +235,8 @@ const WaterChunk: React.FC<WaterChunkProps> = React.memo(({ cx, cy, tiles, minX,
 WaterChunk.displayName = 'WaterChunk';
 
 const WaterLayer: React.FC<WaterLayerProps> = React.memo(({ minX, maxX, minY, maxY }) => {
-	const tiles = useGameStore((state) => state.tiles);
+	const game = useMapGame();
+	const tiles = game((state) => state.tiles);
 	const enabled = useSettingsStore((state) => state.ambientLife);
 	const bounds = ownedBounds(tiles);
 	if (!enabled || !bounds) return null;

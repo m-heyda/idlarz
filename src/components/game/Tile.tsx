@@ -13,7 +13,7 @@ import {
 	TILE_SIZE,
 } from '@/config/gameConfig';
 import '@/styles/Buildings.css';
-import { useGameStore } from '@/stores/gameStore';
+import { useMapSource } from './mapSource';
 import { castleLevelOf, inCastleRange, MAX_CASTLE_RANGE_RADIUS } from '@/lib/castleWard';
 import { getTile } from '@/utils/world';
 import { canBuildOn } from '@/utils/gameUtils';
@@ -35,7 +35,7 @@ import '@/styles/ContextMenu.css';
 
 /** Hover card of a monster: level, HP, time to its next level, boss traits and the call to fight. Reads the age at render time. */
 const MonsterTip: React.FC<{ id: number; type: 'rat' | 'ratKing'; level: number }> = ({ id, type, level }) => {
-	const state = useGameStore.getState();
+	const state = useMapSource().game.getState();
 	const monster = state.monsters.find((m) => m.id === id);
 	const nextLevel = monster ? growthSecondsLeft(monster, { merchantUpgrades: state.merchantUpgrades, prestige: state.prestige }) : null;
 	const stats = monsterStats(type, level);
@@ -68,12 +68,13 @@ const Tile: React.FC<TileProps> = ({
 	building,
 	canAfford = false,
 }) => {
+	const { game, onTile, drag } = useMapSource();
 	// Only primitives are read from the store: a tile re-renders for its own chest, monster or castle level, not for every change of the map
-	const buyTile = useGameStore((state) => state.buyTile);
-	const collectChest = useGameStore((state) => state.collectChest);
-	const startFight = useGameStore((state) => state.startFight);
+	const buyTile = game((state) => state.buyTile);
+	const collectChest = game((state) => state.collectChest);
+	const startFight = game((state) => state.startFight);
 	// string selector: the tile re-renders when its monster appears, changes level or leaves, not on every tick
-	const monsterKey = useGameStore((state) => {
+	const monsterKey = game((state) => {
 		const m = monsterAt(state.monsters, x, y);
 		return m ? `${m.id}:${m.type}:${m.level}:${m.lucky ? 1 : 0}` : '';
 	});
@@ -85,13 +86,13 @@ const Tile: React.FC<TileProps> = ({
 	const tipLayer = useMapTipLayer();
 
 	// Check if this tile has a chest
-	const hasChest = useGameStore((state) => isOwned && !!getTile(state.tiles, x, y)?.hasChest);
+	const hasChest = game((state) => isOwned && !!getTile(state.tiles, x, y)?.hasChest);
 
 	// The map only mounts a tile that is not explored when it touches explored land: it can be bought
 	const isAdjacent = !isOwned;
 
 	const hasBuilding = !!building;
-	const castleLevel = useGameStore((state) => (biome === 'castle' ? castleLevelOf(state.tiles) : 1));
+	const castleLevel = game((state) => (biome === 'castle' ? castleLevelOf(state.tiles) : 1));
 	const isGlowingCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.glowFromLevel;
 	// from the fortress level the castle stands on cobbles inside walls: no purple border, no golden tile aura
 	const isFortress = biome === 'castle' && castleLevel >= CASTLE_FORTRESS.fromLevel;
@@ -102,9 +103,15 @@ const Tile: React.FC<TileProps> = ({
 		isOwned &&
 		biome !== 'castle' &&
 		Math.max(Math.abs(x - CASTLE_X), Math.abs(y - CASTLE_Y)) <= MAX_CASTLE_RANGE_RADIUS;
-	const inRange = useGameStore((state) => mayBeInRange && inCastleRange(x, y, castleLevelOf(state.tiles)));
+	const inRange = game((state) => mayBeInRange && inCastleRange(x, y, castleLevelOf(state.tiles)));
 
 	const handleClick = (e: React.MouseEvent) => {
+		// the map lab: a drawing tool already used the press (see Grid); otherwise the lab decides what a click does
+		if (drag) return;
+		if (onTile) {
+			onTile(x, y, 0);
+			return;
+		}
 		// A monster on this tile: a (real) click asks the server to start the fight against it, auto-battle or not; no chest, no gold
 		if (isOwned && monsterKey) {
 			e.stopPropagation();
@@ -152,6 +159,11 @@ const Tile: React.FC<TileProps> = ({
 	// Right click on an explored tile: what can be done here (dismiss a monster, open a chest, build, highlight the area),
 	// then the global entries. Unexplored tiles fall through to the global menu alone.
 	const handleContextMenu = (e: React.MouseEvent) => {
+		if (onTile || drag) {
+			e.preventDefault();
+			onTile?.(x, y, 2);
+			return;
+		}
 		if (!isOwned) return;
 		e.preventDefault();
 		const ui = useUiStore.getState();
@@ -171,7 +183,7 @@ const Tile: React.FC<TileProps> = ({
 				own.push({
 					id: 'build',
 					label: 'Build here...',
-					disabled: blocked || !canBuildOn(getTile(useGameStore.getState().tiles, x, y)),
+					disabled: blocked || !canBuildOn(getTile(game.getState().tiles, x, y)),
 					hint: blocked ? 'tile in use' : undefined,
 					onSelect: () => ui.openBuildDialog(x, y),
 				});
@@ -179,7 +191,7 @@ const Tile: React.FC<TileProps> = ({
 			own.push({
 				id: 'highlight',
 				label: `Highlight this ${BIOMES[biome]?.label ?? biome} area`,
-				onSelect: () => ui.flashCluster(useGameStore.getState().tiles, x, y),
+				onSelect: () => ui.flashCluster(game.getState().tiles, x, y),
 			});
 		}
 		openMenuAt(e.clientX, e.clientY, biome === 'castle' ? 'Castle' : BIOMES[biome]?.label ?? biome, own);

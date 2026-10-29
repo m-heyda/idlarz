@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { TILE_SIZE } from '@/config/gameConfig';
 import { CHEST_COLOR, MONSTER_COLOR, minimapLayout, minimapMarkers, minimapToTile, paintChestGlow, paintMinimap, viewRectangle } from '@/lib/minimap';
-import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { useViewStore } from '@/stores/viewStore';
 import '@/styles/Minimap.css';
+import { useMapGame, useMapView } from './mapSource';
 
 /** Size of the overview (css px) */
 const BOX = { w: 176, h: 132 };
@@ -12,9 +11,11 @@ const BOX = { w: 176, h: 132 };
 const REPAINT_MS = 200;
 
 const MinimapBody: React.FC = () => {
-	const tiles = useGameStore((state) => state.tiles);
+	const game = useMapGame();
+	const view = useMapView();
+	const tiles = game((state) => state.tiles);
 	// Where the monsters stand, as one string: the monster list itself is a new array every tick (they age), their places rarely change
-	const monsterPlaces = useGameStore((state) => state.monsters.map((m) => `${m.x},${m.y}`).join(';'));
+	const monsterPlaces = game((state) => state.monsters.map((m) => `${m.x},${m.y}`).join(';'));
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const glowRef = useRef<HTMLCanvasElement>(null);
 	const viewRef = useRef<HTMLDivElement>(null);
@@ -59,7 +60,7 @@ const MinimapBody: React.FC = () => {
 		const place = () => {
 			const el = viewRef.current;
 			if (!el) return;
-			const { x, y, zoom, w, h } = useViewStore.getState();
+			const { x, y, zoom, w, h } = view.getState();
 			const tilePx = TILE_SIZE * zoom;
 			const rect = viewRectangle(layout, { minX: -x / tilePx, maxX: (w - x) / tilePx, minY: -y / tilePx, maxY: (h - y) / tilePx });
 			el.style.left = `${rect.left}px`;
@@ -68,17 +69,17 @@ const MinimapBody: React.FC = () => {
 			el.style.height = `${Math.max(2, rect.height)}px`;
 		};
 		place();
-		return useViewStore.subscribe(place);
-	}, [layout]);
+		return view.subscribe(place);
+	}, [layout, view]);
 
 	const moveTo = useCallback(
 		(e: React.PointerEvent<HTMLDivElement>) => {
 			const box = canvasRef.current?.getBoundingClientRect();
 			if (!box) return;
 			const t = minimapToTile(layout, ((e.clientX - box.left) / box.width) * layout.width, ((e.clientY - box.top) / box.height) * layout.height);
-			useViewStore.getState().centerOn(t.x * TILE_SIZE, t.y * TILE_SIZE);
+			view.getState().centerOn(t.x * TILE_SIZE, t.y * TILE_SIZE);
 		},
-		[layout]
+		[layout, view]
 	);
 
 	const summary = [

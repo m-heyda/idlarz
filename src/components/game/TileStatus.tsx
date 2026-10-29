@@ -1,7 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { BiomeType } from '@/types/game';
 import { BIOMES } from '@/config/gameConfig';
-import { useGameStore } from '@/stores/gameStore';
 import {
 	calculateTileCost,
 	canAffordBundle,
@@ -11,6 +10,7 @@ import {
 } from '@/utils/gameUtils';
 import { BiomeTooltip } from './BiomeTooltip';
 import CostList from './CostList';
+import { useMapGame } from './mapSource';
 
 export const TileStatus = memo(
 	({
@@ -28,12 +28,13 @@ export const TileStatus = memo(
 		x: number;
 		y: number;
 	}) => {
-		const tiles = useGameStore((state) => state.tiles);
-		const resources = useGameStore((state) => state.resources);
-		const characterStats = useGameStore((state) => state.characterStats);
-		const prestige = useGameStore((state) => state.prestige);
-		const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
-		const freeTiles = useGameStore((state) => state.freeTiles);
+		const game = useMapGame();
+		const tiles = game((state) => state.tiles);
+		const resources = game((state) => state.resources);
+		const characterStats = game((state) => state.characterStats);
+		const prestige = game((state) => state.prestige);
+		const merchantUpgrades = game((state) => state.merchantUpgrades);
+		const freeTiles = game((state) => state.freeTiles);
 		const discount = effectiveTileDiscount(characterStats, prestige, merchantUpgrades);
 
 		const cost = useMemo(

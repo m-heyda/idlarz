@@ -18,6 +18,7 @@ Live: https://idler-rose.vercel.app/
 ```bash
 npm install
 npm run dev      # http://localhost:3000 (dev build shows a cheat/debug panel bottom-left)
+#                 # http://localhost:3000/map-lab: art playground, no login or Supabase needed (see docs/01-architecture.md)
 npm run build
 npm run lint
 npm test         # node:test over tests/**/*.test.ts

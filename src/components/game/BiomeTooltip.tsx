@@ -1,7 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { BiomeType, Resources } from '@/types/game';
 import { BIOMES, CASTLE_AREA_BONUS, BUILDINGS, BuildingType } from '@/config/gameConfig';
-import { useGameStore } from '@/stores/gameStore';
 import { calculateTileOutput, canBuildOn, castleModifier } from '@/utils/gameUtils';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import { getTile } from '@/utils/world';
@@ -9,6 +8,7 @@ import { formatPercent, formatNumber, formatTime } from '@/utils/formatters';
 import ResourceIcon from './ResourceIcon';
 import PixelIcon from './PixelIcon';
 import { BUILDING_PIXEL_ICONS } from '@/config/pixelIcons';
+import { useMapGame } from './mapSource';
 
 const formatRate = (rate: number) => {
 	if (rate === 0) return '0/s';
@@ -29,9 +29,10 @@ export const BiomeTooltip = memo(
 		x?: number;
 		y?: number;
 	}) => {
+		const game = useMapGame();
 		const biomeInfo = BIOMES[biome];
-		const tiles = useGameStore((state) => state.tiles);
-		const castleUpgrade = useGameStore((state) => state.castleUpgrade);
+		const tiles = game((state) => state.tiles);
+		const castleUpgrade = game((state) => state.castleUpgrade);
 		const building = x !== undefined && y !== undefined ? getTile(tiles, x, y)?.building : undefined;
 		const buildingInfo = building ? BUILDINGS[building as BuildingType] : undefined;
 		const canBuild = x !== undefined && y !== undefined && canBuildOn(getTile(tiles, x, y));
