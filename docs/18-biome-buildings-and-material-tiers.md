@@ -15,7 +15,7 @@ Related: [12 biomes](12-rebirth-biomes.md) (the five new biomes and T2), [17 cra
 1. **One of each type.** Every building type exists at most once per map. A biome has exactly three types, so a full map has at most 3 x 12 biomes = 36 buildings.
 2. **The tile decides the menu.** Right-click a tile -> Build lists the three buildings of that biome (greyed with a reason if already built, if the castle level is too low, or if you cannot pay). Lakes get buildings too (piers and platforms over the water; `BUILDING_COST.blockedBiomes` loses `lake`; fish need water). Still not on the castle, a chest or a monster tile.
 3. **Location matters.** The building stands on one tile of its biome; the **Producer's output grows with how much of that biome you own** (proposal: +2 % per owned tile of the biome, capped at +100 %, counting only tiles of that biome), so a big forest makes the Lumberyard great and one lone forest tile makes it mediocre. This is the "specialisation bonus" BL8 wanted, without needing a cluster test, and it keeps "one building per type" interesting.
-4. **Relocate** (proposal): a building can be moved for 50 % of its cost (levels are kept), because one-per-type punishes a bad first placement.
+4. **Relocate** (decided): a building can be moved for 50 % of its current build cost, instantly (levels are kept), because one-per-type punishes a bad first placement.
 5. **Levels and timers** (section 5). **The map and its biomes always reset on rebirth**, and with them every Producer and Extractor. **Idols are the exception: their levels persist** (section 6).
 6. **Legacy buildings** (the 16 old types) disappear (section 8).
 7. **Position bonus: the castle's area bonus near the castle, a frontier bonus far from it (decided 2026-10-29).** One pure function `positionBonus(distance, castleLevel)` gives the building on that tile its bonus, so near and far buildings stay comparable:
@@ -96,7 +96,7 @@ A road is a per-tile overlay that connects a building to the castle. A **connect
 
 - **Connected** means: the building's tile is 4-adjacent to a road tile, and that road tile belongs to a 4-connected road network that reaches the castle's 3x3 block (a road tile at distance 1 from the castle, the "gate" ring). One network serves every building beside it, so a trunk road to a far biome connects many buildings.
 - **A road tile is occupied**: no building, chest or monster stands on it (`canSpawnOn` and `chestSpots` skip it; a ticket on a tile that becomes road is placed again by the existing `settle`). Roads need an owned tile; they are not built on the castle.
-- **Cost: gold and resources, built instantly (no timer).** Proposal: per tile = a share of the current tile price (gold, wood, stone at about 3 % each, tuned with the "minutes to cover" check of the sim) x a **biome multiplier** x `(1 + 0.1 x distance from the castle)`, so a long road to a far biome is a real expense and the frontier bonus has a price. Multipliers (proposals): fields 0.8 (old farm tracks), plains 1.0, orchard 1.0, battlefield 1.0, forest 1.2 (clearing), coast 1.2, jungle 1.8, hills 1.5, **swamp 2.0** and **tundra 2.0** (causeway / frozen ground, as you asked: more expensive), blight 2.5, **lake bridge 3.0**. Bridges can later ask for Hardwood.
+- **Cost: gold and resources, built instantly (no timer).** **Decided: about 3 % of the current tile price per tile** (gold, wood, stone at 3 % each, tuned with the "minutes to cover" check of the sim) x a **biome multiplier** x `(1 + 0.1 x distance from the castle)`, so a long road to a far biome is a real expense and the frontier bonus has a price. Multipliers (proposals): fields 0.8 (old farm tracks), plains 1.0, orchard 1.0, battlefield 1.0, forest 1.2 (clearing), coast 1.2, jungle 1.8, hills 1.5, **swamp 2.0** and **tundra 2.0** (causeway / frozen ground, as you asked: more expensive), blight 2.5, **lake bridge 3.0**. Bridges can later ask for Hardwood.
 - **Different roads per biome** (art, one set per ground family): packed dirt path (plains, fields, orchard, forest), cobble (coast, the castle area), stone causeway (hills), **snow-packed road with sled ruts (tundra)**, **plank causeway on stilts (swamp, jungle)**, **wooden or stone bridge (lakes)**, bone-and-ash track (blight), trampled mud with wheel ruts (battlefield). Each is a 4-neighbour autotile (16 variants, plus end caps and a small entrance stub toward a building), drawn as an overlay above the ground by the pixel pipeline (`terrain_props.py` style, no dual-grid needed). Where two biomes meet, the road keeps the style of the tile it stands on and a short blend sprite covers the join. Extras: carts and travellers on roads through `AmbientLife`, and a lit road (a thin glow) when connected so the player sees at once which buildings are doubled.
 - **UI**: a road tool (build menu on any tile, "Build road"): click a start tile and drag or click along a path to the castle or the network; the cost of the whole path is previewed, one confirm pays it, and one autosave carries it. A road tile can be removed for a partial refund (proposal 50 %).
 - **Rebirth**: roads belong to the map and reset with it.
@@ -168,12 +168,19 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 - Legacy buildings are removed with a server-granted refund (section 8).
 - One shared builder: the castle and all buildings share one upgrade queue (one timer runs at a time). Ember Master Builders and the Dwarf Statue shorten timers; extra builder slots can become an Ember shop item later (also adds a shape to BL9).
 
+**Decided in the numbers round (2026-10-29):**
+- **Producer base:** a level 1 Producer is worth about **15 tiles** of its main material (4.5/s for a 0.3/s tile), before the biome-size bonus, levels, position and road.
+- **Idol value:** **+2 % per level** (level 5 = +10 %, level 10 with Idol Mastery = +20 %), multiplied by up to x2 by the position bonus cap; Luck is expressed in points (open below).
+- **Relocation:** 50 % of the building's current build cost, instant.
+- **Road tile:** about 3 % of the current tile price in gold, wood and stone, times the biome multiplier and the distance factor.
+
 **Decided (Ember shop, 2026-10-29):** Idol Mastery (global, +1 cap per level, 5 levels, base 10 x2.2), Master Craftsmen (+1 Producer/Extractor cap, 3 levels), Extra Builder (+1 parallel slot, 2 levels, base 40 x2.2 = 40 and 88 Embers); see section 6.
 
 **Still open:**
 00. Road numbers: the 3 % share, the biome multipliers, the distance factor, the refund; whether a lake needs a pier building first; whether roads should also speed anything else (monster travel, chest rewards).
 0. The frontier bonus numbers (5 % per tile beyond 9, cap +100 %) and whether they should count the global distance offset of [12](12-rebirth-biomes.md); the castle-10 x5 on Extractors against the crafting pace.
-1. Relocation cost (proposal 50 % of the building's cost) and the level cap of 5.
-2. The Idol effect values per level, the extractor rates and the Producer base outputs: set with the sim.
+1. Extractor rates per level (set from "crafts per day at the crafting pace", [17](17-crafting.md)) and the Producer/Extractor timers for levels 6-15.
+2. The Luck Idol is in points, not percent: its per-level Luck points (proposal 4 per level) and the click-gold Idol's exact form.
+3. A sim line for all twelve Idols maxed against the Ember income bonus (+6 % per Ember ever earned).
 3. T4 Relics: decided to come from the biome bosses and persist; what they are and what they are used for is still open ([20](20-monster-families-and-rewards.md)).
 4. With one shared queue, the castle and a building compete for the builder: should the castle upgrade be able to cut in line?
