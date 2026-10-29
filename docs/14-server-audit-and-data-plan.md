@@ -35,6 +35,7 @@ Done and sound (no action): chest/monster timing, placement and rewards; offline
 
 New server-owned things the features add (all follow the lazy, additive, ledger pattern):
 - **Crafting state** (crafting XP and level, crafting pity): `player_ledger.craft jsonb`, additive nullable column (migration `crafting_ledger.sql`), applied **before** the code that reads it (the deploy-order rule in the ROADMAP). Details in [17](17-crafting.md).
+- **Roads** ([18](18-biome-buildings-and-material-tiers.md) section 5.2): an optional `road` flag per tile in `player_worlds.extra`, a breadth-first connection check in `buildingEconomy`, priced in `netWorth.ts`; no SQL.
 - **Legacy record** (`player_ledger.legacy jsonb`: Idol levels and later cap upgrades, [18](18-biome-buildings-and-material-tiers.md) section 6): additive nullable column, migration `legacy_ledger.sql`, applied before the code; Idol level-ups are server operations because Idols change server-computed values (Luck, kill rewards, XP, offline, damage, HP).
 - **Generic monster tickets** ([20](20-monster-families-and-rewards.md)): `bank` keeps its jsonb column, `upgradeBank` reads old rows lazily.
 - **Paragon level**: derived from clamped XP, nothing stored besides the leaderboard copy.

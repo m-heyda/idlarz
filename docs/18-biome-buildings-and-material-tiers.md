@@ -24,6 +24,7 @@ Related: [12 biomes](12-rebirth-biomes.md) (the five new biomes and T2), [17 cra
    - **Who gets it:** Producers and **Extractors in full** (decided: the same as Producers; Extractor rates in [17](17-crafting.md)'s pacing must therefore be set with the castle-10 case of x5 in mind), and **Idols capped at x2**: Idol value x `min(1 + positionBonus, 2)`. The cap is what keeps an Idol next to a castle 10 from being five times stronger.
    - Consequences to design for: the range holds at most 80 tiles, so which of the 36 buildings stand in it is a placement puzzle; the castle region is the start ring's basic biomes, so basic-biome buildings compete for it while the late biomes are rewarded by the frontier bonus; the frontier bonus rewards expanding outward, which fits the map-exploration goal of [12](12-rebirth-biomes.md).
    - **Server:** pure function of the saved map (building tile, castle position and level), folded into `buildingEconomy(world, legacy)` like the Obsidian set, so offline grants, `verify.ts` and `netWorth.ts` agree. Relocating a building ([rule 4]) changes its bonus, so relocation cost matters (open).
+8. **Roads** (decided 2026-10-29): a Producer or Extractor connected to the castle by road gets +100 % production, added to its position bonus (section 5.2).
 
 ## 3. The buildings (36 proposals)
 
@@ -70,6 +71,7 @@ Rules: the **merchant trades T0 and T1 only** (your instruction); T2-T4 are craf
 - Buildings have **levels 1-5** (proposal). Level 1 is built for resources immediately (as today); each further level is bought with resources and takes a **timer**, like the castle.
 - **Level cap follows the castle level** (`max building level = min(5, castle level)`): a rebirth restarts the climb, and the castle stays the gate.
 - Timers (proposal): level 2: 10 min, 3: 45 min, 4: 3 h, 5: 8 h. **One shared builder** (decided): the castle and all buildings share a single upgrade queue, so a timer is a real choice about what to upgrade next. Idol and Extractor upgrades from level 3 cost T2/T3 materials.
+- **Levels 6-15 (Master Craftsmen)**: the effect step stays the same as levels 1-5 (decided), the timer keeps growing (proposal x1.35 per level on the level-5 timer of 8 h, capped at 7 days), and the cost uses the same material rule with larger multipliers; the total effect has to be checked against the position and road bonuses (below): a Producer at level 15 is x8 before them. If that is too much, flatten the step above level 10.
 - Effects per level (proposal): Producer x(1 + 0.5 x (level-1)) on top of the biome-size bonus; Extractor rate x(1 + 0.4 x (level-1)); Idol bonus = `base x level` (e.g. +2 % XP per level, so level 5 = +10 %). All small: the Idols together must not out-scale the Ember shop (BL9/BL10).
 - **Server**: the castle timer's pattern generalizes to a list of `timers` in the save (castle + buildings) checked against the server clock (`castle_jump` becomes `timer_jump`); once the castle upgrade is server-owned ([ROADMAP](ROADMAP.md) "Economy actions") the buildings ride along. Until then they are the browser's, verified by plausibility, with `netWorth.ts` pricing building levels.
 - **Save**: today a tile with a building "never has a level" (`sanitizeSave`). Buildings need `level` (and `upgradeEndsAt`/remaining seconds) as **optional** tile fields in `extra`. No `SAVE_SCHEMA` bump: absent means level 1.
@@ -88,6 +90,19 @@ Today levels 2-6 take 1 h, 4 h, 12 h, **24 h**, 48 h = 3 d 17 h. Proposal to tak
 
 **Measured with the sim ([19](19-first-build-steps.md)): these timers save 1.0 d for the hardcore bot but only 0.5 d for the owner-like `human` profile (its sleep windows and resource waits dominate); with the first five castle costs x0.75 it saves 1.0 d for both (decided, see [19](19-first-build-steps.md)).** Levels 7-10 (3, 4, 5, 7 days) stay for now. Checks before shipping, from [06](06-pacing-targets.md): the cost of 5 -> 6 must still be payable while the (now 16 h) 4 -> 5 timer runs; `sim` first-rebirth day moves from about 5-7 to about 4-6 and the run-2 ratio target (65-70 %) must be re-measured; Master Builders (-5 %/level) and the Dwarf Statue stack, so cap the combined reduction (proposal 60 %). Update `CASTLE_UPGRADE.durationsSec` and the first five `upgradeCosts` rows; no save change.
 
+### 5.2 Roads (decided 2026-10-29)
+
+A road is a per-tile overlay that connects a building to the castle. A **connected Producer or Extractor** (not Idols) gets **+100 % production, added to its position bonus** (decided: additive), so the multiplier is `1 + positionBonus + (connected ? 1 : 0)`: x6 at castle 10 inside the range, up to x3 at the frontier.
+
+- **Connected** means: the building's tile is 4-adjacent to a road tile, and that road tile belongs to a 4-connected road network that reaches the castle's 3x3 block (a road tile at distance 1 from the castle, the "gate" ring). One network serves every building beside it, so a trunk road to a far biome connects many buildings.
+- **A road tile is occupied**: no building, chest or monster stands on it (`canSpawnOn` and `chestSpots` skip it; a ticket on a tile that becomes road is placed again by the existing `settle`). Roads need an owned tile; they are not built on the castle.
+- **Cost: gold and resources, built instantly (no timer).** Proposal: per tile = a share of the current tile price (gold, wood, stone at about 3 % each, tuned with the "minutes to cover" check of the sim) x a **biome multiplier** x `(1 + 0.1 x distance from the castle)`, so a long road to a far biome is a real expense and the frontier bonus has a price. Multipliers (proposals): fields 0.8 (old farm tracks), plains 1.0, orchard 1.0, battlefield 1.0, forest 1.2 (clearing), coast 1.2, jungle 1.8, hills 1.5, **swamp 2.0** and **tundra 2.0** (causeway / frozen ground, as you asked: more expensive), blight 2.5, **lake bridge 3.0**. Bridges can later ask for Hardwood.
+- **Different roads per biome** (art, one set per ground family): packed dirt path (plains, fields, orchard, forest), cobble (coast, the castle area), stone causeway (hills), **snow-packed road with sled ruts (tundra)**, **plank causeway on stilts (swamp, jungle)**, **wooden or stone bridge (lakes)**, bone-and-ash track (blight), trampled mud with wheel ruts (battlefield). Each is a 4-neighbour autotile (16 variants, plus end caps and a small entrance stub toward a building), drawn as an overlay above the ground by the pixel pipeline (`terrain_props.py` style, no dual-grid needed). Where two biomes meet, the road keeps the style of the tile it stands on and a short blend sprite covers the join. Extras: carts and travellers on roads through `AmbientLife`, and a lit road (a thin glow) when connected so the player sees at once which buildings are doubled.
+- **UI**: a road tool (build menu on any tile, "Build road"): click a start tile and drag or click along a path to the castle or the network; the cost of the whole path is previewed, one confirm pays it, and one autosave carries it. A road tile can be removed for a partial refund (proposal 50 %).
+- **Rebirth**: roads belong to the map and reset with it.
+- **Server and save**: `road: true` is an optional flag in the tile's `extra` (no `SAVE_SCHEMA` bump); `sanitizeSave` allows it on owned non-castle tiles that carry no building, chest or monster; `netWorth.ts` prices roads (so a forged map of free roads shows as spending the player never made); `buildingEconomy(world)` runs a breadth-first search from the castle over road tiles (O(tiles), once per save) to decide which buildings are connected, so offline grants, `verify.ts` and the browser agree. New shadow flag `road_off_land`.
+- **Balance to check**: connected x2 plus the area bonus makes the castle-10 core very strong (x6 on a Producer that is already level 15 = x8 before position, [Master Craftsmen above]); the sim needs a "buildings connected" profile, and the Producer step above level 10 may have to flatten. Also compare the road cost for a far Producer to the extra output it buys (the payback time should be hours, not days, in the middle of a run).
+
 ## 6. Idols survive rebirth (decided), soft caps and legacy points
 
 **Decided (2026-10-29, overrides the earlier "Idols reset with the map"):**
@@ -105,7 +120,7 @@ Today levels 2-6 take 1 h, 4 h, 12 h, **24 h**, 48 h = 3 d 17 h. Proposal to tak
 | Cap (key) | Base now | Raised by (planned) | Hard ceiling (proposal) |
 |---|---|---|---|
 | `idolMaxLevel` (new) | 5 | Ember shop "Idol Mastery", +1 per purchase | 10 |
-| `buildingMaxLevel` (new, Producers/Extractors) | 5 | Ember shop, castle level | 8 |
+| `buildingMaxLevel` (new, Producers/Extractors) | 5 | Ember shop (Master Craftsmen, up to +10) | 20 |
 | `bagSize` | 36 | Pack Rat (merchant) | existing |
 | `offlineCapHours` / `offlineEfficiency` | 8 / 50 % | Night Watch / Steward | existing |
 | `monsterGrowthLevels` | 10 | later rebirth effects | existing |
@@ -118,10 +133,10 @@ Today levels 2-6 take 1 h, 4 h, 12 h, **24 h**, 48 h = 3 d 17 h. Proposal to tak
 | Shop item | Effect | Levels | Cost curve (`ceil(base x growth^N)`) | Cost per level |
 |---|---|---|---|---|
 | **Idol Mastery** | +1 level cap on **all** Idols (one global item, not per Idol) | 5 (cap 5 -> 10) | base 10, x2.2 ("very steep") | 10, 22, 48, 106, 233 (419 total) |
-| **Master Craftsmen** | +1 level cap on Producers and Extractors, separate from the Idol cap | 3 (cap 5 -> 8) | base 10, x2.2 | 10, 22, 48 (80 total) |
+| **Master Craftsmen** | +1 level cap on Producers and Extractors, separate from the Idol cap | **10 (cap 5 -> 15)** (decided 2026-10-29, was 3) | base 10, **x1.6** (gentler, because the ladder is long) | 10, 16, 26, 41, 66, 105, 168, 269, 430, 688 (1,819 total) |
 | **Extra Builder** | +1 parallel upgrade slot (castle and buildings) | 2 (1 -> 3 slots) | **decided: base 40, x2.2** (the slot is the strongest of the three) | 40, 88 (128 total) |
 
-  They are plain `EMBER_UPGRADES` entries (`maxLevel`, `baseCost`, `costGrowth`) whose effects register as `LIMIT_BONUSES` on `idolMaxLevel`, `buildingMaxLevel` and `builderSlots`, so no call site changes; the hard ceilings in the table above (10, 8, 3) keep every save valid. Pacing check: the first rebirth earns about 9 Embers and rebirth 5 about 40 or more (`REBIRTH.gain`: 3 x (castle - 5) x sqrt(tiles / 10)), so these roughly 630 Embers are a ten-rebirth-plus sink next to the six existing percent items (about 140 each to max); the first Idol Mastery level is affordable around the second rebirth and the first Extra Builder around the third to fifth. Re-check with `sim` once Embers are modelled per rebirth. Cap items must not be refundable or respeccable (Embers stay permanent, BL9).
+  They are plain `EMBER_UPGRADES` entries (`maxLevel`, `baseCost`, `costGrowth`) whose effects register as `LIMIT_BONUSES` on `idolMaxLevel`, `buildingMaxLevel` and `builderSlots`, so no call site changes; the hard ceilings in the table above (10, 20, 3) keep every save valid. Pacing check: the first rebirth earns about 9 Embers and rebirth 5 about 40 or more (`REBIRTH.gain`: 3 x (castle - 5) x sqrt(tiles / 10)), so these roughly 2,400 Embers (Idol Mastery 419, Master Craftsmen 1,819, Extra Builder 128) are a long-game sink, far beyond ten rebirths next to the six existing percent items (about 140 each to max); the first Idol Mastery level is affordable around the second rebirth and the first Extra Builder around the third to fifth. Re-check with `sim` once Embers are modelled per rebirth. Cap items must not be refundable or respeccable (Embers stay permanent, BL9).
 - T2 and T3 stock resets at rebirth; **T4 relics survive it** (decided 2026-10-29: boss-gated drops, [20](20-monster-families-and-rewards.md)).
 - The Dwarf Statue's build-time bonus is capped (above), so rebirth speed-ups cannot stack out of the 65-70 % run-2 target.
 
@@ -138,7 +153,7 @@ All 16 old types go. The documented pattern for removed content is lenient repai
 - Gold remains the tile limiter; Producers must not make a material a non-issue: the Producer bonus is capped and level-gated.
 - Idols are small permanent bonuses in six to ten mechanics: add a sim line "income/XP/kill/chest with all idols maxed" and compare to the Ember shop's contribution.
 - Extractors are slow by design (crafting is a 1-month+ system, [17](17-crafting.md)): set rates from "crafts per day at the target crafting pace".
-- The art load is large: 36 building sprites at 3 levels each if levels change the look (proposal: 2 looks, level 1-2 and 3-5, plus a glow on level 5). Spread across the biome releases ([12](12-rebirth-biomes.md)): each biome ships with its three buildings.
+- The art load is large: ten road sets (16 variants each plus bridges), and 36 building sprites at 3 levels each if levels change the look (proposal: 2 looks, level 1-2 and 3-5, plus a glow on level 5). Spread across the biome releases ([12](12-rebirth-biomes.md)): each biome ships with its three buildings.
 
 ## 10. Rollout
 P0 key-list refactor and the registry; P1 new building model (one-per-type, per-biome menu, levels, timers, Producer only) behind the existing 7 biomes + refund; P2 Extractors + T3 materials (needed by crafting) ; P3 Idols + `buildingEconomy`; P4 castle timer change (can go first, it is one array); P5 buildings of each new biome with its art; P6 Guide pages and the `verify.ts` flags.
@@ -156,6 +171,7 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 **Decided (Ember shop, 2026-10-29):** Idol Mastery (global, +1 cap per level, 5 levels, base 10 x2.2), Master Craftsmen (+1 Producer/Extractor cap, 3 levels), Extra Builder (+1 parallel slot, 2 levels, base 40 x2.2 = 40 and 88 Embers); see section 6.
 
 **Still open:**
+00. Road numbers: the 3 % share, the biome multipliers, the distance factor, the refund; whether a lake needs a pier building first; whether roads should also speed anything else (monster travel, chest rewards).
 0. The frontier bonus numbers (5 % per tile beyond 9, cap +100 %) and whether they should count the global distance offset of [12](12-rebirth-biomes.md); the castle-10 x5 on Extractors against the crafting pace.
 1. Relocation cost (proposal 50 % of the building's cost) and the level cap of 5.
 2. The Idol effect values per level, the extractor rates and the Producer base outputs: set with the sim.
