@@ -26,8 +26,9 @@ Protection, in two layers: (1) a `middleware.ts` matcher on `/play` that refresh
 
 ## 4. Login / register / avatar polish
 - Split `StartDialog` into a form component and its frame so the landing overlay and `/play` fallbacks share it. Keep the validation in `lib/authValidation.ts`.
-- Avatar assets: today four class heroes (`PLAYER_CLASSES`). Needed: finished portraits at one size, selected-state frames, hover animation, and (if wanted) an avatar separate from class (`profiles.avatar_id`, additive nullable column + migration). Ranking and preview ([15](15-leaderboard-and-world-preview.md)) read it.
-- Error and loading states with the pixel UI kit (`ui_art.py`): field errors, "accounts unavailable" (`AuthUnavailable`), password rules shown up front, "forgot password" is **not** in scope until email is configured on the Supabase project (decision needed).
+- **Class and avatar are separate (decided):** the class (warrior, paladin, ranger, mage) is for small bonuses; the avatar is a visual portrait chosen from **8 starters**, with more unlocked by server achievements ([21](21-classes-avatars-achievements-offline-report.md)). Sign-up asks for name, class and avatar. Needed assets: the 8 portraits at one size, a selected frame and hover state, and a locked-silhouette for the unlockables.
+- Error and loading states with the pixel UI kit (`ui_art.py`): field errors, "accounts unavailable" (`AuthUnavailable`), password rules shown up front.
+- **Password reset: on. Email confirmation: off while the game is in testing** (decided). Needs the project's email sender configured; the free tier sends only a few emails per hour, so a "reset" request is rate-limited per account and per IP in the route. Turn confirmation on before a public release.
 
 ## 5. Rollout
 1. Move the gate to `/play` (no behaviour change), add middleware, redirect `/` -> `/play` for signed-in visitors (optional "Continue" button instead).
@@ -35,8 +36,13 @@ Protection, in two layers: (1) a `middleware.ts` matcher on `/play` that refresh
 3. Baked animated map, feature cards, polish and avatar assets.
 Each step is deployable alone. Risk to check: the cookie `sameSite: 'lax'` + redirects keep sessions across `/` and `/play`; Vercel preview URLs need the Supabase redirect list updated if email confirmation is used.
 
-## 6. Open questions
-1. Final game name for the landing lettering?
-2. Signed-in visitors on `/`: auto-redirect to `/play`, or show the landing with a Continue button?
-3. Email confirmation / password reset: on or off for now?
-4. Separate avatars from classes now, or later?
+## 6. Decisions and open questions
+
+**Decided (2026-10-29):**
+- **Name: IDLE REALM.** The banner spells a big **IDLE** in hills tiles (all straight strokes: I, D, L, E), with **REALM** smaller underneath. The name lives in one constant (`config/branding.ts`: `GAME_TITLE`, used by `layout.tsx` metadata, the landing, the Guide and the README; today's metadata still says "Idle Explorer"), so a rename is a one-line change plus a re-bake of the landing strip.
+- **Signed in at `/`:** the landing with a **Continue** button, plus a small **character card**: name, avatar, class, level and Paragon, rebirths, and a **bar of the time away against the offline cap** (read-only, never claims; [21](21-classes-avatars-achievements-offline-report.md) section 5). The data comes from one extended `/api/auth/me` answer (profile plus the `player_stats` row plus the ledger anchor and the cap), so the landing costs at most two small reads for a signed-in visitor and none for a guest.
+- Password reset on, email confirmation off for now; avatars and classes separate (section 4).
+
+**Still open:**
+1. Final wording of the feature cards and the order of the biomes in the scroll.
+2. Whether the landing shows a public "players online / total rebirths" number (needs a cached count; not in the first version).

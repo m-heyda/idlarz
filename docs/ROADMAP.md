@@ -37,6 +37,13 @@ Suggested order: **[19](19-first-build-steps.md) A castle timers, then B resourc
 - **Content will grow: about ten new items, new monsters and biomes are coming.** Crafting, loot and rewards are data-driven by tag and tier, never tuned against today's gear alone ([17](17-crafting.md), [20](20-monster-families-and-rewards.md)).
 - **Monster rewards are capped per monster and multiplied by level**, so weak monsters fade and strong ones pay (gold, hide/food, tiered items) ([20](20-monster-families-and-rewards.md)).
 
+**Later features agreed in principle (drafts, see [21](21-classes-avatars-achievements-offline-report.md))**
+
+- **Class bonuses**: classes stop being cosmetic and give small passives (one economy, one combat); avatars are separate (8 to choose, more unlocked by achievements).
+- **Server-based achievements** (a simple draft: catalog in code, table written only by the server, evaluated on requests it already handles) and a **Glossary** generated from the catalogs; both will be designed properly later.
+- **Offline report rework**: a bar of away time against the cap, a clear "capped, N h earned nothing" state with a Night Watch / Steward hint, also on the landing's Continue card.
+- **Landing**: name **IDLE REALM** (a big IDLE patch in hills tiles), Continue card for signed-in players, password reset on and email confirmation off for now ([16](16-landing-and-play-route.md)).
+
 Cross-cutting rules for all of it: additive save fields only (no `SAVE_SCHEMA` bump), nullable ledger columns applied before the code that reads them, no new per-click server calls, catalogs stay in TypeScript ([14](14-server-audit-and-data-plan.md)).
 
 ## Known bugs and leftovers

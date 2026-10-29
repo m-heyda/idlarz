@@ -30,7 +30,12 @@ Goal: a read-only look at another player's world: biomes and castle only, in a c
 - **Rendering**: reuse `TerrainLayer`, `Minimap` and the biome art with an empty building/monster layer; the world is built with `packLand`'s inverse (`worldFromPart` in `lib/offline/placement.ts` already does it).
 - **Tests**: preview store has no path to `saveStorage`; a route test that `extra` never leaves the server; a rate-limit test.
 
-## 4. Open questions
-1. Avatar = class portrait for now; will the "polish login, create account, avatar assets" work ([16](16-landing-and-play-route.md)) add pickable avatars (then `player_class` becomes `avatar_id`)?
-2. Re-trust testers (their saves are `freshStart = false` / imported) or keep rankings for new accounts only?
-3. Add the `listed` opt-out and the lazy daily snapshot with the first migration (recommended), or later?
+## 4. Decisions and open questions
+
+**Decided (2026-10-29):**
+- **Avatar is separate from the class** (`player_stats.avatar_id`, from `profiles.avatar_id`; [21](21-classes-avatars-achievements-offline-report.md)); the leaderboard shows avatar, name, level/paragon, rebirths, gold/h.
+- **Trusted players are listed by default, with an opt-out `listed` switch** in Settings. A player who is not listed has no ranking row and **cannot be previewed**; the preview route checks `listed` and `trusted`.
+
+**Still open:**
+1. Re-trust testers (their saves are `freshStart = false` / imported) or keep rankings for new accounts only?
+2. Add the lazy daily snapshot with the first migration (recommended: one row per player and day written inside the same save RPC, 30-day retention), or later?
