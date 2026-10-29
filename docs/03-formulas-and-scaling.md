@@ -151,7 +151,7 @@ Pacing is measured, not written here: `npm run sim` drives the real store with b
 ## 9. Rebirth and Embers
 
 ```
-available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 100 (REBIRTH.minTiles), no castle upgrade running
+available   : castle ≥ 6 (REBIRTH.minCastleLevel), tiles ≥ 400 + 25 per rebirth done (REBIRTH.tilesNeeded); Embers add 0.02 per tile above that inside the sqrt term's bracket, no castle upgrade running
 points      = floor(3 × (C − 5) × sqrt(n / 10))                     REBIRTH.gain
 income      × (1 + 0.06 × legacyEarned)                                folded into the modifiers, spending never lowers it
 shop cost   = ceil(base × 1.4^level)        base: thrift 2, builders 3, mastery 2, provisions 2; max level 10

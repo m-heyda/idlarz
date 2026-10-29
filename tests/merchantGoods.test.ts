@@ -79,14 +79,12 @@ test('the goods are never a bargain: every price is far above what he pays, even
 	}
 });
 
-test('the refresh costs 5k, then 5k more each time, then 50k more each time after the tenth; the rotation is a countdown in play time', () => {
-	assert.equal(refreshCost(0), 5000, 'the first one');
-	assert.equal(refreshCost(1), 10_000);
-	assert.equal(refreshCost(9), 50_000, 'the tenth');
-	assert.equal(refreshCost(10), 100_000, 'the eleventh: 50k more');
-	assert.equal(refreshCost(11), 150_000);
-	assert.equal(refreshCost(19), 550_000);
-	for (let n = 1; n < 40; n++) assert.ok(refreshCost(n) > refreshCost(n - 1));
+test('the refresh costs 10k and doubles up to 1b; the rotation is a countdown in play time', () => {
+	assert.equal(refreshCost(0), 10_000, 'the first one');
+	assert.equal(refreshCost(1), 20_000, 'it doubles');
+	assert.equal(refreshCost(10), 10_240_000);
+	assert.equal(refreshCost(40), 1_000_000_000, 'and stops at 1b');
+	for (let n = 1; n < 17; n++) assert.ok(refreshCost(n) > refreshCost(n - 1));
 	const s: MerchantStock = { at: 100, offers: [] };
 	assert.equal(secondsToRotation(s, 100), MERCHANT_GOODS.rotateSec);
 	assert.equal(secondsToRotation(s, 100 + MERCHANT_GOODS.rotateSec - 1), 1);
@@ -145,23 +143,45 @@ test('buyOffer: too little gold or a full bag buys nothing, and an empty shelf i
 	assert.equal(api().buyOffer(0), false);
 });
 
-test('refreshMerchantStock: costs gold, reshuffles at once and restarts the half hour', () => {
+test('refreshMerchantStock: three free per 12 h, then gold; a cooldown between any two', () => {
+	const { freePerWindow, windowSec, cooldownSec } = MERCHANT_GOODS.refresh;
+	// waiting without a tick, so no income muddies the gold
+	const wait = (sec: number) => store.setState((s) => ({ playSeconds: s.playSeconds + sec }));
 	freshGame({ gold: 1e9 });
 	api().tick(1000);
 	const before = api().merchantStock!;
-	tick(30);
+	wait(30);
 	const gold = api().resources.gold;
-	assert.equal(api().refreshMerchantStock(), true);
-	assert.equal(api().resources.gold, gold - refreshCost(0));
+	for (let i = 0; i < freePerWindow; i++) {
+		assert.equal(api().refreshMerchantStock(), true, `free ${i}`);
+		assert.equal(api().merchantStock!.at, api().playSeconds, 'restarts the half hour');
+		assert.equal(api().refreshMerchantStock(), false, 'the cooldown');
+		wait(cooldownSec);
+	}
+	assert.equal(api().resources.gold, gold, 'the free ones cost nothing');
+	assert.equal(api().merchantRefreshes, 0);
 	assert.notEqual(api().merchantStock, before);
 	assert.equal(api().merchantStock!.offers.length, MERCHANT_GOODS.offers);
-	assert.equal(api().merchantStock!.at, api().playSeconds);
-	assert.equal(api().merchantRefreshes, 1);
 	assert.equal(api().refreshMerchantStock(), true);
-	assert.equal(api().resources.gold, gold - refreshCost(0) - refreshCost(1), 'the second one costs more');
+	assert.equal(api().resources.gold, gold - refreshCost(0), 'the fourth one is paid');
+	assert.equal(api().merchantRefreshes, 1);
+	wait(cooldownSec);
+	assert.equal(api().refreshMerchantStock(), true);
+	assert.equal(api().resources.gold, gold - refreshCost(0) - refreshCost(1), 'the next one costs more');
 	assert.equal(api().merchantRefreshes, 2);
+	// a new window of play time gives the free ones back
+	wait(windowSec);
+	assert.equal(api().refreshMerchantStock(), true);
+	assert.equal(api().resources.gold, gold - refreshCost(0) - refreshCost(1), 'free again');
+	assert.equal(api().merchantRefreshes, 2);
+
 	freshGame({ gold: refreshCost(0) - 1 });
 	api().tick(1000);
+	for (let i = 0; i < freePerWindow; i++) {
+		wait(cooldownSec);
+		api().refreshMerchantStock();
+	}
+	wait(cooldownSec);
 	const shelf = api().merchantStock;
 	assert.equal(api().refreshMerchantStock(), false);
 	assert.equal(api().merchantStock, shelf, 'nothing happens without the gold');

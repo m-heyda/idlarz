@@ -12,7 +12,7 @@ export const LIMITS = {
 	/** Seconds of play time until the shelf is reshuffled */
 	merchantRotateSec: 1800,
 	/** Gold of the first paid shelf refresh (each one after it costs this much more, see MERCHANT_GOODS.refresh) */
-	merchantRefreshBase: 5000,
+	merchantRefreshBase: 10_000,
 	/** Bag slots (the Pack Rat bonus adds to it) */
 	bagSize: 36,
 	/** Hours of away time the server pays out when the player comes back (the Night Watch Ember upgrade adds to it) */

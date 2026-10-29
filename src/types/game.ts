@@ -260,6 +260,13 @@ export interface MerchantStock {
 	offers: ItemInstance[];
 }
 
+/** When the current 12 h window of free refreshes began, how many of them are used, and when the last refresh of any kind was (play seconds). */
+export interface MerchantRefresh {
+	windowAt: number;
+	freeUsed: number;
+	lastAt: number;
+}
+
 export interface MerchantTabInfo {
 	id: MerchantTab;
 	label: string;
@@ -337,7 +344,8 @@ export interface GameState {
 	farmUpgrades: Record<string, number>; // level per FARM_UPGRADES id
 	merchantUpgrades: Record<string, number>; // level per MERCHANT_UPGRADES id
 	merchantStock: MerchantStock | null; // the goods on offer (null until the first shelf is rolled)
-	merchantRefreshes: number; // paid shelf refreshes bought this run: each one costs more (see MERCHANT_GOODS.refresh)
+	merchantRefreshes: number; // paid shelf refreshes ever bought (kept over a rebirth): each one costs more (see MERCHANT_GOODS.refresh)
+	merchantRefresh: MerchantRefresh; // the free-refresh window and the cooldown, in play seconds
 	isHydrated: boolean;
 	freeTiles: number; // owned tiles that cost nothing (castle + the four starting tiles); see economyTiles()
 	prestige: PrestigeState;

@@ -49,7 +49,7 @@ A Web Lock (`navigator.locks`) lets only one tab run the game; another tab shows
 | Chests, kills, gems | none: a chest opens only against a server ticket | sealed rolls (`HMAC(LOOT_SECRET, user / run / kind / ordinal)`), the ledger holds the gem balance, a save can never raise it |
 | Monsters and fights | none: the browser only displays and asks | the server places monsters, runs every fight and pays the win; HP, mana and potions are the ledger's |
 | Gold jumps / forged land | none | `networth_exceeds`, `gold_jump`, `playtime_*`, `prestige_regress`, `castle_jump`, `baseline_rich` flags, **shadow mode**: stored, the save is accepted; flagged accounts are never ranked ([09](09-cloud-saves.md)) |
-| Rebirth | needs castle ≥ 6 and 100 tiles; points computed in the store; shop spending is checked by the point-conservation rule on every load | the ledger starts a new run (sealed rolls never repeat) |
+| Rebirth | needs castle ≥ 6 and 400 tiles (+25 per rebirth); points computed in the store; shop spending is checked by the point-conservation rule on every load | the ledger starts a new run (sealed rolls never repeat) |
 | Settings in `localStorage` | cosmetic only | not stored |
 
 The honest summary: the browser still owns the economy (income, purchases, the map). A cheater who stays inside the spending bound (about 3x honest progress) is not caught, and flags only un-rank, they do not reject. Server-owned inventory, enforcing checks and server-run economy actions are the planned next steps ([ROADMAP](ROADMAP.md)).

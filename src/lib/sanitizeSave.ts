@@ -60,6 +60,7 @@ import type {
 	EquipmentSlot,
 	GameState,
 	ItemInstance,
+	MerchantRefresh,
 	MerchantStock,
 	PrestigeState,
 	Resources,
@@ -93,6 +94,7 @@ export const PERSISTED_KEYS = [
 	'autoSellUpTo',
 	'merchantStock',
 	'merchantRefreshes',
+	'merchantRefresh',
 ] as const;
 
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]>;
@@ -525,6 +527,17 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	const merchantRefreshes = raw.merchantRefreshes === undefined ? 0 : int(raw.merchantRefreshes, 0, 100_000);
 	if (merchantRefreshes === null) return fail('merchant refreshes');
 
+	let merchantRefresh: MerchantRefresh = { windowAt: 0, freeUsed: 0, lastAt: 0 };
+	if (raw.merchantRefresh !== undefined) {
+		const r = raw.merchantRefresh;
+		if (!isObject(r)) return fail('merchant refresh');
+		const windowAt = num(r.windowAt, 0, playSeconds);
+		const freeUsed = int(r.freeUsed, 0, MERCHANT_GOODS.refresh.freePerWindow);
+		const lastAt = num(r.lastAt, 0, playSeconds);
+		if (windowAt === null || freeUsed === null || lastAt === null) return fail('merchant refresh');
+		merchantRefresh = { windowAt, freeUsed, lastAt };
+	}
+
 	const rawName = typeof raw.playerName === 'string' ? raw.playerName.trim().slice(0, 9) : '';
 	const playerClass: PlayerClassId =
 		typeof raw.playerClass === 'string' && raw.playerClass in PLAYER_CLASSES
@@ -559,6 +572,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			autoSellUpTo,
 			merchantStock,
 			merchantRefreshes,
+			merchantRefresh,
 		},
 	};
 };

@@ -531,10 +531,11 @@ export const MERCHANT_GOODS = {
 	rotateSec: LIMITS.merchantRotateSec, // the shelf is reshuffled after this much play time (limitOf('merchantRotateSec', ctx))
 	maxOffers: HARD_LIMITS.merchantOffers, // what a save may hold
 	priceFactor: 5, // gold per gold of sell value: above the 3.9x a max Haggler could resell at, so buying and selling never gains
-	// A paid refresh costs `refreshBase` x (refreshes bought so far + 1) for the first `stepRefreshes` of them (5k, 10k ... 50k), then
-	// every further one costs `bigStep` more than the one before (100k, 150k ...). Counted per run (a rebirth starts it again).
+	// A paid refresh costs `refreshBase` x growth^(refreshes bought so far), capped (10k, 20k, 40k ... 10m at the 11th, 1b from the 18th).
+	// Counted for good (a rebirth does not start it again). `freePerWindow` refreshes are free every `windowSec` of play time, and
+	// any refresh, free or paid, needs `cooldownSec` since the last one.
 	refreshBase: LIMITS.merchantRefreshBase, // limitOf('merchantRefreshBase', ctx)
-	refresh: { stepRefreshes: 10, bigStep: 50_000 },
+	refresh: { growth: 2, cap: 1_000_000_000, freePerWindow: 3, windowSec: 43_200, cooldownSec: 30 },
 	// What the shelf may hold: never above uncommon (the rarer pieces stay a reward for fights and chests), and never more than
 	// `maxAboveAverage` item levels above the average level of the gear the player wears. The shelf is built around the world (castle)
 	// level, held down to `centreAboveAverage` above that average.
@@ -875,13 +876,19 @@ export const CHARACTER_STAT_CONFIG = {
 // Rebirth: restart with a permanent bonus paid in Embers. Available once the castle reaches `minCastleLevel`.
 export const REBIRTH = {
 	minCastleLevel: 6,
-	minTiles: 100, // a rebirth also needs this much territory (the first ~100 tiles come within a day, so it is the castle that gates it)
-	gainScale: 3, // Embers = gainScale x (castle level - 5) x sqrt(tiles / 10), rounded down
+	minTiles: 400, // the first rebirth also needs this much territory (300+ tiles come before castle level 6, so it has to be more than that)
+	tilesPerRebirth: 25, // every rebirth done so far raises the territory the next one needs by this much
+	surplusPerTile: 0.02, // every tile above the requirement adds this to the tile term of the Embers (times the castle term)
+	gainScale: 3, // Embers = gainScale x (castle level - 5) x (sqrt(tiles / 10) + surplusPerTile x tiles over the requirement), rounded down
+	/** Tiles the next rebirth needs, after `rebirths` of them */
+	tilesNeeded: (rebirths: number) => REBIRTH.minTiles + REBIRTH.tilesPerRebirth * Math.max(0, rebirths),
 	incomePerPoint: 0.06, // +6% of all income per Ember ever earned (spending points never lowers it)
 	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile
 	// Embers granted for a rebirth with this castle level and territory
-	gain: (castleLevel: number, tiles: number) =>
-		Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * Math.sqrt(Math.max(0, tiles) / 10)),
+	gain: (castleLevel: number, tiles: number, rebirths = 0) => {
+		const surplus = Math.max(0, tiles - REBIRTH.tilesNeeded(rebirths));
+		return Math.floor(REBIRTH.gainScale * Math.max(0, castleLevel - 5) * (Math.sqrt(Math.max(0, tiles) / 10) + REBIRTH.surplusPerTile * surplus));
+	},
 };
 
 // The Ember shop: permanent upgrades bought with unspent Embers. The N+1-th level costs

@@ -98,10 +98,11 @@ export const HeaderButtons: React.FC = () => {
 	const freeTiles = useGameStore((state) => state.freeTiles);
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
+	const prestige = useGameStore((state) => state.prestige);
 	// recomputed when the map, a castle upgrade or the merchant changes, not on every income tick
 	const status = useMemo(
-		() => rebirthStatus({ tiles, freeTiles, castleUpgrade, merchantUpgrades }),
-		[tiles, freeTiles, castleUpgrade, merchantUpgrades]
+		() => rebirthStatus({ tiles, freeTiles, castleUpgrade, merchantUpgrades, prestige }),
+		[tiles, freeTiles, castleUpgrade, merchantUpgrades, prestige]
 	);
 	const reached = status.requirements.every((r) => r.met);
 	// a minute-resolution text above an hour, so the chip re-renders once a second only in the last hour

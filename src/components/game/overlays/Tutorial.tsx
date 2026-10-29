@@ -286,7 +286,7 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Rebirth &amp; Embers</h3>
 				<p className='text-[#d8c8a0]'>
-					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles you can
+					When your castle reaches level {REBIRTH.minCastleLevel} and you own at least {REBIRTH.minTiles} tiles (+{REBIRTH.tilesPerRebirth} for every rebirth done) you can
 					Rebirth from the Rebirth window: the map, resources, castle, farm and level start again, and you keep your name,
 					hero and Embers. Every Ember is worth +{pct(REBIRTH.incomePerPoint)} income for ever and can be spent in
 					the shop ({Object.values(EMBER_UPGRADES).map((u) => u.label).join(', ')}). A higher castle level and more tiles
@@ -325,7 +325,7 @@ const Tutorial: React.FC = () => {
 				<p className='text-[#d8c8a0] mb-2'>
 					The <b>Resources</b> tab is one table: pick an amount (1, 10, 100, 25 %, 50 % or Max) and use the Sell and Buy buttons of each row; sell prices include Haggler, and farm products only sell. Buying resources costs{' '}
 					{MERCHANT_BUY_MULTIPLIER}x the selling price, so trading back and forth never gains anything. <b>Goods</b> shows a shelf of
-					six pieces of gear, mixed with the potions that are always in stock, that is reshuffled every {MERCHANT_GOODS.rotateSec / 60} minutes of play (or at once for gold with Refresh);
+					six pieces of gear, mixed with the potions that are always in stock, that is reshuffled every {MERCHANT_GOODS.rotateSec / 60} minutes of play (or at once with Refresh: {MERCHANT_GOODS.refresh.freePerWindow} free every {MERCHANT_GOODS.refresh.windowSec / 3600} hours of play, after that for gold, doubling each time);
 					hover a Buy button for the price. Below it is your bag to sell spare gear from. <b>Upgrades</b> has click power and the permanent bonuses (Haggler, Bulk Discount,
 					Lucky Charm, Pack Rat). The shelf never holds legendary gear and Rattatui gear is not for sale: the Rat King drops it.
 				</p>

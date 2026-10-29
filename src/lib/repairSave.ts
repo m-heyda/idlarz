@@ -263,6 +263,7 @@ const FIXES: [RegExp, Fix][] = [
 	[/^(unknown )?merchant upgrade/, fixMerchantUpgrades],
 	[/^merchant (stock|offer)/, (raw) => replace(raw, 'merchantStock', null)],
 	[/^merchant refreshes/, (raw) => replace(raw, 'merchantRefreshes', 0)],
+	[/^merchant refresh$/, drop('merchantRefresh')],
 	[/loot/, drop('lootPity')],
 	[/^auto-sell/, drop('autoSellUpTo')],
 	[/^(farm|unknown animal|animal count)$/, fixFarm],
