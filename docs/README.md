@@ -14,6 +14,15 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 | [09-cloud-saves.md](09-cloud-saves.md) | Account saves: pipeline, history, sync timing, verification |
 | [10-loot-system.md](10-loot-system.md) | Loot profiles, rarity, item level, affixes, pools, and how to add items |
 | [11-server-authority.md](11-server-authority.md) | Everything the server decides: offline progress, spawn tickets, fights, sealed rolls, gems, Luck, the threat model |
+| [12-rebirth-biomes.md](12-rebirth-biomes.md) | *Draft.* Five rebirth-unlocked biomes, distance rules, T2 materials, monster slots |
+| [13-rebirth-reset-and-paragon.md](13-rebirth-reset-and-paragon.md) | *Draft.* Respec, +20 points, inventory wipe on rebirth, Paragon after level 100 |
+| [14-server-audit-and-data-plan.md](14-server-audit-and-data-plan.md) | *Draft.* What is server-side, what must move, catalogs, free-plan budget, save compatibility |
+| [15-leaderboard-and-world-preview.md](15-leaderboard-and-world-preview.md) | *Draft.* Rankings from `player_stats`, preview of another player's map |
+| [16-landing-and-play-route.md](16-landing-and-play-route.md) | *Draft.* Landing page, auth-protected `/play`, account and avatar polish |
+| [17-crafting.md](17-crafting.md) | *Draft.* Luck/Intelligence crafting with a persistent crafting level |
+| [18-biome-buildings-and-material-tiers.md](18-biome-buildings-and-material-tiers.md) | *Draft.* Three buildings per biome, upgrade timers, material tiers T0-T4, shorter castle timers |
+| [19-first-build-steps.md](19-first-build-steps.md) | *Spec.* Step A shorter castle timers (with the in-progress-upgrade trap), Step B resource-key registry |
+| [20-monster-families-and-rewards.md](20-monster-families-and-rewards.md) | *Draft.* Monster families per biome, capped absolute rewards scaled by level, goods and tiered drops, spawn pressure |
 | [ROADMAP.md](ROADMAP.md) | Open work: known issues, balance backlog, the building rework, server migration, planned features |
 | [generated/](generated/) | Auto-generated: `balance-tables.md`, `sim-milestones.md`, `item-catalog.md`, `loot-sim.md`, `fight-sim.md` |
 
