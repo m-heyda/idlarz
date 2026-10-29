@@ -11,7 +11,7 @@ How the monster system grows from "rats and one king" to three or four monsters 
 ## 2. The problem to solve
 Because a kill pays *seconds of current income*, a low-level monster keeps paying a share of a huge income forever, and more monster types would multiply that. We want: weak monsters irrelevant later, strong ones worth hunting, no flood of cheap kills.
 
-## 3. The reward model (proposal)
+## 3. The reward model (decided: `min(income share, cap) x level multiplier`)
 
 Every family gets an absolute reward block next to the income-based one, and the **cap** decides which monsters stay relevant:
 
@@ -25,15 +25,15 @@ reward: {
 ```
 
 - `gold = min(rewardSec x gold/s, cap) x levelMult^(level - refLevel)` (same for XP). Early the income is small, so `rewardSec` decides (as today); later the **cap** decides, so a rat that paid 90 s of income at day 1 pays a flat, small amount at day 30. A boss has a much higher cap and level multiplier, so it stays valuable.
-- `goods` are the "some hide or food and gold" of the idea: beasts drop **hide**, herd and humanoid monsters **food/meat**, each with a per-kill chance, an amount that scales with the level multiplier, and a cap. They replace the single `hideShare` rule.
+- `goods` are the "some hide or food and gold" of the idea, **by family type (decided)**: beasts drop **hide**, herd and humanoid monsters **food/meat**, slimes and the undead **coal** or small T2 shards, each with a per-kill chance, an amount that scales with the level multiplier, and a cap. They replace the single `hideShare` rule.
 - **Items by tier** stay in the loot profile: item level = monster level, the pool is picked by the family's tag (beast leather, blight cores, battlefield steel), so a higher-level monster drops higher-tier items. Caps never apply to items; they are limited by drop chance, pity and the bag.
 - Luck, Gold Find and Kill Rewards % multiply after the cap (they are the player's investment, the cap is the monster's).
 - The numbers are placeholders until a sim exists: first targets, kill income stays a small share of total income (BL12) and the per-kill gold of the weakest family falls below about 1 % of a 10-minute income by the middle of a run.
 
 ## 4. Spawn pressure (do not flood the map)
 - Replace the single rat timer with **spawn tables per distance band** ([12](12-rebirth-biomes.md) `DISTANCE_BANDS`): each band lists families with weights and level windows; a ticket first picks a band-compatible tile, then a family by weight. The overall rate stays `COMBAT.spawn` (one monster per interval) and the ticket cap stays; only the mix changes.
-- **Relevance fade**: a family whose maximum spawn level is more than `retireGap` levels below the castle-based window stops being picked (weight 0) and its tickets are not renewed; the rat is the first. Rats stay near the castle (distance 2-6).
-- Weak families spawn **fewer** per interval as the player advances (weight x `relevance`, from the level gap), while higher-level families keep or raise their weight, so the map fills with what is worth fighting.
+- **Relevance fade (decided: rarer only, never gone)**: a family whose maximum spawn level is below the castle-based window gets its weight multiplied by a `relevance` factor that falls with the level gap down to a floor (proposal 0.1), so outgrown monsters still turn up now and then but no longer fill the map. The rat is the first. Rats stay near the castle (distance 2-6).
+- Weak families spawn **less often** as the player advances (weight x `relevance`), while higher-level families keep or raise their weight, so the map fills with what is worth fighting.
 - Bosses: one per biome, own timer and own `minCastleDistance`, `minRebirths` (the Rat King pattern).
 
 ## 5. Families (placeholders to fill later)
@@ -46,8 +46,15 @@ Each biome: 3-4 monsters and a boss, names and stats open ([12](12-rebirth-biome
 4. Offline: the "monsters that would have appeared" count uses the same tables.
 5. No SQL. Save: monster tickets are server-owned; the save only draws them, so old saves are unaffected.
 
-## 7. Open questions
-1. Is `min(rewardSec x income, cap) x levelMult` the right shape for "a cap per monster, multiplied by level"?
-2. How aggressive should the relevance fade be (monster disappears from spawning vs just rarer)?
-3. Which basic goods per family (hide for beasts, food/meat for herd animals, anything for undead/slimes: coal or ichor shards)?
-4. Do bosses of the new biomes drop the T4 relics ([18](18-biome-buildings-and-material-tiers.md))?
+## 7. Decisions and open questions
+
+**Decided (2026-10-29):**
+- Reward shape: gold and XP = `min(rewardSec x income, cap) x levelMult^(level - refLevel)`.
+- Outgrown monsters become rarer (floor weight, proposal 0.1) but never stop spawning.
+- Goods by family type (beasts hide, herd/humanoid food or meat, slimes/undead coal or small T2 shards).
+- **T4 relics** come from the biome bosses (a small drop chance each) and **survive rebirth**, because they are rare and boss-gated ([18](18-biome-buildings-and-material-tiers.md)).
+
+**Still open:**
+1. The numbers: per-family `rewardSec`, caps, `levelMult`, goods chance/amount/cap and the relevance floor; set with a new kill-reward sim so that kill income stays a small share of total income (BL12).
+2. Relic drop chance per boss and what relics are used for (top legendary crafts, Idol cap upgrades?).
+3. Whether Luck / Gold Find multiply before or after the cap (proposed: after).

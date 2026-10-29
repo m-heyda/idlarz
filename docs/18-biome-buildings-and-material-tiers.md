@@ -114,7 +114,7 @@ Today levels 2-6 take 1 h, 4 h, 12 h, **24 h**, 48 h = 3 d 17 h. Proposal to tak
 | `builderSlots` (new) | 1 | Ember shop (parallel upgrades) | 3 |
 
 - The Ember shop gains items of a different shape, which BL9/BL10 asked for: caps and slots instead of flat percentages.
-- T2-T4 stock resets at rebirth, **T4 relics** might not (open, [20](20-monster-families-and-rewards.md)).
+- T2 and T3 stock resets at rebirth; **T4 relics survive it** (decided 2026-10-29: boss-gated drops, [20](20-monster-families-and-rewards.md)).
 - The Dwarf Statue's build-time bonus is capped (above), so rebirth speed-ups cannot stack out of the 65-70 % run-2 target.
 
 ## 7. Server and data
@@ -149,5 +149,5 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 0. The frontier bonus numbers (5 % per tile beyond 9, cap +100 %) and whether they should count the global distance offset of [12](12-rebirth-biomes.md); the castle-10 x5 on Extractors against the crafting pace.
 1. Relocation cost (proposal 50 % of the building's cost) and the level cap of 5.
 2. The Idol effect values per level, the extractor rates and the Producer base outputs: set with the sim.
-3. T4 Relics: what they are and where they drop (needs the monster families, [12](12-rebirth-biomes.md) section 5).
+3. T4 Relics: decided to come from the biome bosses and persist; what they are and what they are used for is still open ([20](20-monster-families-and-rewards.md)).
 4. With one shared queue, the castle and a building compete for the builder: should the castle upgrade be able to cut in line?
