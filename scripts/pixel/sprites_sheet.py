@@ -5,13 +5,13 @@ twinkle, now for every shiny resource). Sheets are one row of equal frames, draw
 from PIL import Image
 import fx
 from sprites_resources import sheet_sprite
+import sprites_resource_art
 
 # game name -> asset name (they match; kept explicit so the build list reads as the sheet mapping)
-SHEET_NAMES = ('gold', 'wood', 'stone', 'coal', 'meat', 'res_iron', 'res_fish', 'res_mana', 'res_crystal',
-               'res_sapphire', 'res_mystery', 'legacy', 'chest_map', 'bonus_chest')
+SHEET_NAMES = ('res_mana', 'res_crystal', 'res_sapphire', 'res_mystery', 'chest_map', 'bonus_chest')
 
 # sprites that twinkle, and how many glints each carries
-SHINE = {'gold': 2, 'legacy': 2, 'res_crystal': 2, 'res_sapphire': 2, 'res_mana': 2, 'res_mystery': 1}
+SHINE = {'gold': 2, 'legacy': 2, 'diamond': 2, 'res_crystal': 2, 'res_sapphire': 2, 'res_mana': 2, 'res_mystery': 1}
 CHEST_FRAMES = 4
 
 
@@ -38,9 +38,14 @@ def _bright_spots(img, n, min_dist, warm=False):
     return picked
 
 
+def _base(name):
+    """The sprite a strip is made from: the supplied resource art when there is one, else the sheet."""
+    return sprites_resource_art.art(name) if name in sprites_resource_art.USED else sheet_sprite(name)
+
+
 def shine_strip(name):
-    """6-frame twinkle strip for a sheet sprite."""
-    base = sheet_sprite(name)
+    """6-frame twinkle strip for a sprite."""
+    base = _base(name)
     spots = _bright_spots(base, SHINE[name], 12)
     frames = fx.shine_frames(base, spots)
     w, h = base.size
@@ -68,19 +73,6 @@ def chest_anim():
     return strip
 
 
-def diamond_shine():
-    """Twinkle strip of the Gems diamond (procedural, so it is built from the glint-free sprite)."""
-    from sprites_resources import diamond
-    base = diamond(glints=False)
-    frames = fx.shine_frames(base, _bright_spots(base, 2, 12))
-    w, h = base.size
-    strip = Image.new('RGBA', (w * len(frames), h), (0, 0, 0, 0))
-    for i, f in enumerate(frames):
-        strip.alpha_composite(f, (i * w, 0))
-    return strip
-
-
 SPRITES = {name: (lambda n=name: sheet_sprite(n)) for name in SHEET_NAMES}
 SHEETS = {f'{name}_shine': (lambda n=name: shine_strip(n)) for name in SHINE}
 SHEETS['chest_map_anim'] = chest_anim
-SHEETS['diamond_shine'] = diamond_shine

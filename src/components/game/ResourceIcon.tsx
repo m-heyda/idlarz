@@ -5,13 +5,13 @@ import PixelIcon from './PixelIcon';
 
 interface ResourceIconProps {
 	resource: string;
-	/** 0.5 = 20px inline icon (default), 1 = full 40px sprite */
+	/** 0.6 = 24px inline icon (default), 1 = full 40px sprite */
 	scale?: number;
 	className?: string;
 }
 
 /** Pixel sprite for a resource, falling back to the old emoji for resources without one (e.g. xp). */
-const ResourceIcon: React.FC<ResourceIconProps> = ({ resource, scale = 0.5, className }) => {
+const ResourceIcon: React.FC<ResourceIconProps> = ({ resource, scale = 0.6, className }) => {
 	const name = RESOURCE_PIXEL_ICONS[resource];
 	if (!name) {
 		return (
