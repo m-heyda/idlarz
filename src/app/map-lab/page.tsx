@@ -2,12 +2,13 @@
 
 import React, { useEffect, useMemo } from 'react';
 import Grid from '@/components/game/Grid';
-import Minimap from '@/components/game/Minimap';
+import BottomRightStack from '@/components/game/BottomRightStack';
 import { MapSourceProvider, type MapSource } from '@/components/game/mapSource';
 import { createStroke } from '@/lib/dragPaint';
 import { STROKE_TOOLS, useLabStore } from '@/stores/labStore';
 import { createViewStore } from '@/stores/viewStore';
 import { useUiStore } from '@/stores/uiStore';
+import CombatPreview from './CombatPreview';
 import LabPanel from './LabPanel';
 
 /**
@@ -19,6 +20,7 @@ const labView = createViewStore(() => useLabStore.getState().tiles);
 const MapLab: React.FC = () => {
 	const tool = useLabStore((s) => s.tool);
 	const brush = useLabStore((s) => s.brush);
+	const previewing = useLabStore((s) => s.combatPreview !== null);
 
 	const source = useMemo<MapSource>(() => {
 		const lab = () => useLabStore.getState();
@@ -61,7 +63,8 @@ const MapLab: React.FC = () => {
 	return (
 		<MapSourceProvider value={source}>
 			<Grid />
-			<Minimap />
+			{/* the real bottom right stack (combat window above the minimap); the combat window is the preview's mock */}
+				<BottomRightStack combat={previewing ? <CombatPreview /> : null} />
 			<LabPanel />
 		</MapSourceProvider>
 	);

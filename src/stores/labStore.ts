@@ -86,6 +86,8 @@ interface LabState extends MapGameState {
 	brush: number;
 	monsterLevel: number;
 	lucky: boolean;
+	/** Roster id shown in the combat preview (the game's combat window with a mock fight), or null when it is closed */
+	combatPreview: string | null;
 	seed: number;
 	history: World[];
 	nextId: number;
@@ -95,6 +97,7 @@ interface LabState extends MapGameState {
 	setBrush: (brush: number) => void;
 	setMonsterLevel: (level: number) => void;
 	setLucky: (lucky: boolean) => void;
+	setCombatPreview: (id: string | null) => void;
 	setSeed: (seed: number) => void;
 	/** Remembers the world so Undo can come back to it (a stroke calls it once, on its first cell). */
 	snapshot: () => void;
@@ -171,6 +174,7 @@ export const useLabStore = create<LabState>((set, get) => {
 		brush: 1,
 		monsterLevel: 3,
 		lucky: false,
+		combatPreview: null,
 		seed: 1,
 		history: [],
 		nextId: 1,
@@ -180,6 +184,7 @@ export const useLabStore = create<LabState>((set, get) => {
 		setBrush: (brush) => set({ brush }),
 		setMonsterLevel: (monsterLevel) => set({ monsterLevel: Math.max(1, Math.round(monsterLevel) || 1) }),
 		setLucky: (lucky) => set({ lucky }),
+		setCombatPreview: (combatPreview) => set({ combatPreview }),
 		setSeed: (seed) => set({ seed: Math.round(seed) || 1 }),
 
 		snapshot: () => set((s) => ({ history: [...s.history.slice(-(HISTORY_LIMIT - 1)), s.tiles] })),

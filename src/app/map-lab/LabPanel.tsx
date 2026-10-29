@@ -3,7 +3,8 @@
 import React, { useRef, useState } from 'react';
 import { BIOMES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { biomeColor } from '@/config/biomePalette';
-import { MONSTER_CATALOG } from '@/catalog/monsters';
+import PixelIcon from '@/components/game/PixelIcon';
+import { WIP_MONSTERS } from './CombatPreview';
 import { castleLevelOf } from '@/lib/castleWard';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -30,8 +31,6 @@ const PRESETS: { id: LabPreset; label: string }[] = [
 	{ id: 'landmarks', label: 'Landmarks (6x6)' },
 ];
 
-/** Roster monsters with finished art that are not enabled in the game yet: previewed here, by biome */
-const WIP_MONSTERS = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
 const WIP_BIOMES = [...new Set(WIP_MONSTERS.map((m) => m.biomes[0] as string))];
 
 const btn =
@@ -124,8 +123,7 @@ const LabPanel: React.FC = () => {
 					</Section>
 
 					<Section title='Spawn'>
-							<div className='flex gap-1'>
-								<select value={wipId} onChange={(e) => setWipId(e.target.value)} className='min-w-0 flex-1 rounded bg-white/10 px-1 py-1 text-xs'>
+							<select value={wipId} onChange={(e) => setWipId(e.target.value)} className='w-full rounded bg-white/10 px-1 py-1 text-xs'>
 									{WIP_BIOMES.map((biome) => (
 										<optgroup key={biome} label={BIOMES[biome]?.label ?? biome}>
 											{WIP_MONSTERS.filter((m) => m.biomes[0] === biome).map((m) => (
@@ -137,8 +135,13 @@ const LabPanel: React.FC = () => {
 										</optgroup>
 									))}
 								</select>
-								<button className={btn} title='Place WIP monsters (art only) on their own biome' onClick={() => lab.spawnWip(wipId, count)}>
+							<div className='flex gap-1'>
+								<button className={`${btn} flex-1`} title='Place WIP monsters (art only) on their own biome' onClick={() => lab.spawnWip(wipId, count)}>
 									Spawn WIP
+								</button>
+								<button className={`${btn} flex items-center gap-1`} title='Combat preview: the game&apos;s combat window with this monster, facing left' aria-label='Combat preview' onClick={() => lab.setCombatPreview(wipId)}>
+									<PixelIcon name='item_iron_sword' alt='' scale={0.5} />
+									Fight
 								</button>
 							</div>
 						<label className='flex items-center gap-2 text-xs'>
