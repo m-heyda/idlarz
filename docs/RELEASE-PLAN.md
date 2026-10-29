@@ -287,7 +287,7 @@ Item upgrading (replaced by crafting's enchant), the Quests and Gambling merchan
 |---|---|---|---|
 | **v1 simple** | P1, with the reset in P2 adding the pickers | a title banner "IDLE REALM" (big IDLE in hills tiles, REALM smaller), one **static** background still of the seven current biomes, a login / create-account window (collapses to a bottom sheet on phones), five feature cards, a **Continue** card for signed-in visitors with the character card and the offline bar; signed-in visitors reach the game via `/play` | one baked still (existing renderer), lettering pattern, 5 small feature icons |
 | **v1.1 animated** (optional, any time after P2) | between phases when engineering is free | the baked tall strip scrolling bottom to top with ambient critters, `prefers-reduced-motion` gives the static frame | `npm run landing:bake` output, seven biomes only |
-| **v2 MVP** | P13 | re-baked strip with **all twelve biomes**, the two special biomes as the finale, building and road clusters in view, a new Open Graph image; the progress it shows is the point: visitors who saw v1 see a bigger world | baked strip from the final art; reuses `art_style_reference/landing/` samples |
+| **v2 MVP** | P13 | re-baked strip with **all twelve biomes**, the two special biomes as the finale, building and road clusters in view, a new Open Graph image; the progress it shows is the point: visitors who saw v1 see a bigger world | baked strip from the final art; built from the map renderer (no sample art needed) |
 
 Switching is cheap by design: the background is one baked file and the title lives in `GAME_TITLE`, so v2 is a new file plus a copy edit, with no change to the route or the login flow. Open (❓ D10): final wording of the feature cards, whether the landing shows a public players-online number (not in v1).
 
@@ -307,11 +307,15 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 | Road sets (one per ground family, 16 autotile variants plus end caps and bridge) | about 10 sets | none (P6c) | `roads/` |
 | New biomes: Jungle, Fields, Orchard, Blight, Battlefield (ground, rim, props, decor, pads, critters, minimap colour) | 5 | flat-colour dev palettes | `biomes/` |
 | Monsters: home families (3), 3-4 per new biome plus a boss (about 20 more) | about 25 | `monster_generic` tinted | `monsters/` |
-| Landing: lettering pattern, 5 icons, baked strips v1 and v2 | | the still of v1 | `landing/` |
+| Landing: lettering pattern, 5 icons, baked strips v1 and v2 | | the still of v1 | none (built from the map renderer; the `landing/` reference folder was removed) |
+| **Equipment: 12 items per slot (9 grades + 3 set pieces), 3 special sets, potions** | about 170 icons | existing `item_*` icons until the swap | `equip/` |
+| Monster roster: 3-4 per biome plus a boss for all 12 biomes, rat rework with hurt / attack / death frames | about 60 | `monster_generic` tinted | `monsters/` |
 
 **The two special biomes (Blight, Battlefield) brief.** Same tile geometry and outline discipline as every other biome, but richer: an extra animated layer (pulsing slime pools, drifting embers and ash, flapping banners), a deeper interior tier with its own prop set, 2 building pad variants instead of 1, a fuller rim set against every neighbour, a distinct minimap and highlight colour, and building sprites with a **glow on level 3+**, so reaching them feels like arriving somewhere. Keep the palette tied to the established 28-colour discipline so they do not look pasted in. Upload the references you like most for these two and I will build the brief around them.
 
-**What I need from you in `art_style_reference/`**: samples of resources (ingots, ores, goods), buildings (any style you want matched), biome mood images, monster samples, and any road or landing inspiration. Name files `<group>/<what>-<note>.png` (the README explains).
+**Reference material is in `art_style_reference/` (added 2026-10-29).** Each folder has a README with a file index, what we want and what agents must do with it: `biomes/`, `buildings/`, `equip/` (includes the grading plan), `monsters/` (includes the roster plan), `resources/`, `roads/`, `ui-and-portraits/`, and `farm/` (**ignore for now**, future farm update). Licences are unconfirmed and some sheets are watermarked: see the table in its root README; direct cuts need the owner's confirmation first.
+
+**Equipment track (floating, after P2).** E1 build the 12-per-slot catalog as data with new icon ids (not yet in any drop table); E2 put the nine normal grades into loot profiles and craft tiers, tuned with `loot-sim` and `fight-sim`; E3 add the three special sets (Sunhoney, Ashen Warlord, Blightbound) through bosses, relics and enchanted crafts (P11-P12); E4 delete the old `item_*` icons and gear scripts. The deletion waits for the P2 reset (every bag is empty afterwards); the retired Rattatui pieces are the only items that may still need an icon until then. New weapon types and a belt slot are design decisions, not art, and are not part of E1.
 
 ## 7. Decisions
 
@@ -349,9 +353,3 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 | Build-time bonuses stack past the run-2 target | P6 | combined reduction cap (proposal 60 %), sim check |
 | Placeholder art mistaken for final | P3, P6 | placeholders are catalog keys listed in section 6, swapped per phase, tracked in each phase's acceptance |
 | Docs drift: doc 21 says "three active players", doc 14 says five accounts; doc 12 section 4's merchant bullet is void | credibility of the docs | tidy in the first docs PR after approval |
-
-## 9. What I will do after your review
-
-1. Apply your answers (D1-D10) and edit this plan.
-2. Trim ROADMAP's two tables as triaged in section 2 (only after you approve each row, as the backlog requires).
-3. Start P0.1 on its own branch.
