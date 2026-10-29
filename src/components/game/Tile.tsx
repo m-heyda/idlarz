@@ -16,7 +16,8 @@ import '@/styles/Buildings.css';
 import { useMapSource } from './mapSource';
 import { castleLevelOf, inCastleRange, MAX_CASTLE_RANGE_RADIUS } from '@/lib/castleWard';
 import { getTile } from '@/utils/world';
-import { canBuildOn } from '@/utils/gameUtils';
+import { canBuildAt } from '@/utils/gameUtils';
+import { isLandmarkTile } from '@/utils/terrain';
 import { cn } from '@/lib/utils';
 import audioManager from '@/utils/audioManager';
 import PixelIcon, { PixelSheet } from './PixelIcon';
@@ -183,8 +184,8 @@ const Tile: React.FC<TileProps> = ({
 				own.push({
 					id: 'build',
 					label: 'Build here...',
-					disabled: blocked || !canBuildOn(getTile(game.getState().tiles, x, y)),
-					hint: blocked ? 'tile in use' : undefined,
+					disabled: blocked || !canBuildAt(game.getState().tiles, x, y),
+					hint: blocked ? 'tile in use' : isLandmarkTile(game.getState().tiles, x, y) ? 'landmark' : undefined,
 					onSelect: () => ui.openBuildDialog(x, y),
 				});
 			}

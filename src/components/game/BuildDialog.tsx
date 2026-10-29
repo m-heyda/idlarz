@@ -4,8 +4,9 @@ import audioManager from '@/utils/audioManager';
 import { BIOMES, BIOME_YIELD, BUILDINGS } from '@/config/gameConfig';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { calculateBuildingCost, canAffordBundle, canBuildOn, countBuildings } from '@/utils/gameUtils';
+import { calculateBuildingCost, canAffordBundle, canBuildAt, countBuildings } from '@/utils/gameUtils';
 import { getTile } from '@/utils/world';
+import { isLandmarkTile } from '@/utils/terrain';
 import { BUILDING_PIXEL_ICONS } from '@/config/pixelIcons';
 import ResourceIcon from './ResourceIcon';
 import CostList from './CostList';
@@ -25,7 +26,7 @@ const BuildDialogBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const cost = calculateBuildingCost(tiles, prestige);
 	const canAfford = canAffordBundle(resources, cost);
 	const built = countBuildings(tiles);
-	const free = !!tile && canBuildOn(tile);
+	const free = !!tile && canBuildAt(tiles, x, y);
 
 	const build = (type: string) => {
 		const ok = buildOnTile(x, y, type);
@@ -42,7 +43,11 @@ const BuildDialogBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					{built} built - each costs more than the last
 				</span>
 			</div>
-			{!free && <div className='text-amber-300 text-sm mb-2'>This tile cannot be built on right now.</div>}
+			{!free && (
+				<div className='text-amber-300 text-sm mb-2'>
+					{isLandmarkTile(tiles, x, y) ? 'A landmark stands here: its 6x6 area is kept free of buildings.' : 'This tile cannot be built on right now.'}
+				</div>
+			)}
 			<div className='build-menu-grid'>
 				{Object.values(BUILDINGS).map((building) => (
 					<button

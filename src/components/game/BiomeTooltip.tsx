@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import { BiomeType, Resources } from '@/types/game';
 import { BIOMES, CASTLE_AREA_BONUS, BUILDINGS, BuildingType } from '@/config/gameConfig';
-import { calculateTileOutput, canBuildOn, castleModifier } from '@/utils/gameUtils';
+import { calculateTileOutput, canBuildAt, castleModifier } from '@/utils/gameUtils';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import { getTile } from '@/utils/world';
 import { formatPercent, formatNumber, formatTime } from '@/utils/formatters';
@@ -35,7 +35,7 @@ export const BiomeTooltip = memo(
 		const castleUpgrade = game((state) => state.castleUpgrade);
 		const building = x !== undefined && y !== undefined ? getTile(tiles, x, y)?.building : undefined;
 		const buildingInfo = building ? BUILDINGS[building as BuildingType] : undefined;
-		const canBuild = x !== undefined && y !== undefined && canBuildOn(getTile(tiles, x, y));
+		const canBuild = x !== undefined && y !== undefined && canBuildAt(tiles, x, y);
 
 		const castleLevel = castleLevelOf(tiles);
 		const output = useMemo(

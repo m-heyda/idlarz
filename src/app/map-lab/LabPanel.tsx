@@ -26,6 +26,7 @@ const PRESETS: { id: LabPreset; label: string }[] = [
 	{ id: 'rolled60', label: 'Rolled 60' },
 	{ id: 'rolled400', label: 'Rolled 400' },
 	{ id: 'showcase', label: 'Every biome' },
+	{ id: 'landmarks', label: 'Landmarks (6x6)' },
 ];
 
 const btn =

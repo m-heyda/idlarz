@@ -13,7 +13,10 @@ import {
 	cellLayers,
 	depth,
 	groundOf,
-hash32,
+	hash32,
+	isLandmarkTile,
+	landmarkAnchors,
+	LANDMARK_SPAN,
 	terrainKey,
 	tileSprites,
 } from '../src/utils/terrain';
@@ -199,4 +202,58 @@ test('manifest: every style has an atlas entry and every prop references a sprit
 		assert.ok(ATLAS.styles.includes(r), `style ${r}`);
 		for (let t = 1; t <= (MAX_DEPTH[r] ?? 0); t++) assert.ok(ATLAS.styles.includes(`${r}_d${t}`), `${r}_d${t}`);
 	}
+});
+
+// ---- landmarks: one big cosmetic sprite on a 6x6 window of one biome
+
+test('landmarks match the Python logic on the canned landmark map', () => {
+	const rows = parity.landmarks.layout;
+	const tiles = grid(rows);
+	const g = buildGroundGrid(tiles);
+	const built = builtSet(tiles);
+	const anchors = landmarkAnchors(g, (x, y) => built.has(`${x},${y}`), 0, 0, g[0].length - 1, g.length - 1);
+	assert.deepEqual(anchors.map((a) => [a.x, a.y, a.ground]), parity.landmarks.anchors);
+	assert.deepEqual(allSprites(g, undefined, built).map((s) => [s.id, s.x, s.bottom]), parity.landmarks.sprites);
+	assert.equal(anchors.length, 7, 'one landmark per biome block');
+	for (const a of anchors) assert.ok(ATLAS.sprites[`lm_${a.ground}`], `lm_${a.ground} is in the atlas`);
+});
+
+test('landmarks: a block one tile short gets none, a building inside a window removes it, and anchors never overlap', () => {
+	const five = buildGroundGrid(grid(['.......', '.FFFFF.', '.FFFFF.', '.FFFFF.', '.FFFFF.', '.FFFFF.', '.......']));
+	assert.equal(landmarkAnchors(five, undefined, 0, 0, 6, 6).length, 0, '5x5 is not enough');
+	const six = ['........', '.FFFFFF.', '.FFFFFF.', '.FFFFFF.', '.FFFFFF.', '.FFFFFF.', '.FFFFFF.', '........'];
+	assert.equal(landmarkAnchors(buildGroundGrid(grid(six)), undefined, 0, 0, 7, 7).length, 1, '6x6 is exactly enough');
+	const built = six.map((r, y) => (y === 3 ? r.replace('FFFFFF', 'FFfFFF') : r));
+	const t = grid(built);
+	assert.equal(landmarkAnchors(buildGroundGrid(t), (x, y) => builtSet(t).has(`${x},${y}`), 0, 0, 7, 7).length, 0, 'a building inside takes the landmark away');
+	const big = buildGroundGrid(grid(['.'.repeat(32), ...Array.from({ length: 30 }, () => '.' + 'P'.repeat(30) + '.'), '.'.repeat(32)]));
+	const a = landmarkAnchors(big, undefined, 0, 0, 31, 31);
+	assert.ok(a.length >= 1 && a.length <= 16, `a 30x30 plain gets a few landmarks (${a.length}), not one per window`);
+	for (let i = 0; i < a.length; i++)
+		for (let j = i + 1; j < a.length; j++)
+			assert.ok(Math.abs(a[i].x - a[j].x) >= LANDMARK_SPAN || Math.abs(a[i].y - a[j].y) >= LANDMARK_SPAN, 'two landmark windows never overlap');
+});
+
+test('landmarks: props, decor and docks stay off the landmark area; the rest of the biome keeps them', () => {
+	const g = buildGroundGrid(grid(['.'.repeat(24), ...Array.from({ length: 20 }, () => '.' + 'F'.repeat(22) + '.'), '.'.repeat(24)]));
+	const anchors = landmarkAnchors(g, undefined, 0, 0, 23, 21);
+	const sprites = allSprites(g);
+	assert.ok(sprites.some((s) => s.id.startsWith('lm_')), 'the landmark is drawn');
+	for (const a of anchors) {
+		const inside = sprites.filter((s) => !s.id.startsWith('lm_') && s.bottom > a.y * CELL + 24 && s.bottom <= (a.y + LANDMARK_SPAN) * CELL && s.x >= a.x * CELL && s.x < (a.x + LANDMARK_SPAN) * CELL - 24); // a neighbour's tree may overhang the edge a little
+		assert.equal(inside.length, 0, 'no prop starts inside the landmark window');
+	}
+	assert.ok(sprites.length > anchors.length + 20, 'the forest around it still has its trees');
+});
+
+test('landmarks: isLandmarkTile covers exactly the 6x6 window', async () => {
+	const { EMPTY_WORLD, setTiles } = await import('../src/utils/world');
+	const base = EMPTY_WORLD;
+	const changes: { x: number; y: number; tile: Tile }[] = [];
+	for (let y = 30; y < 36; y++) for (let x = 30; x < 36; x++) changes.push({ x, y, tile: { biome: 'forest', isOwned: true } });
+	const w = setTiles(base, changes);
+	assert.equal(isLandmarkTile(w, 30, 30), true);
+	assert.equal(isLandmarkTile(w, 35, 35), true);
+	assert.equal(isLandmarkTile(w, 36, 35), false);
+	assert.equal(isLandmarkTile(w, 29, 30), false);
 });

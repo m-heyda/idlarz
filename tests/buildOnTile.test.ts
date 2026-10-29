@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, setResources, store, tileAt, gridCells, rowsOf } from './helpers';
 import { BIOMES, BUILDINGS, BUILDING_COST, CASTLE_X, CASTLE_Y } from '../src/config/gameConfig';
-import { buildingCostFactor, calculateBuildingCost, canBuildOn, countBuildings } from '../src/utils/gameUtils';
+import { buildingCostFactor, calculateBuildingCost, canBuildAt, canBuildOn, countBuildings } from '../src/utils/gameUtils';
 import { allPads, isBuilt, terrainKey } from '../src/utils/terrain';
 import { pickChestSpot } from '../src/lib/chests';
 import { SELECTABLE_BIOMES } from '../src/utils/biomeRules';
 import type { BiomeType, Tile } from '../src/types/game';
-import { biomeCount, patchTile } from '../src/utils/world';
+import { biomeCount, patchTile, setTiles } from '../src/utils/world';
 
 // Buildings: right-click any explored tile (not the castle or a lake) and build. One per tile, the price rises with every building.
 
@@ -124,4 +124,18 @@ test('chests never land on a building', () => {
 		const spot = pickChestSpot(api().tiles, new Set(), 1, () => i / 40);
 		if (spot) assert.ok(!tileAt(api().tiles, spot.x, spot.y).building);
 	}
+});
+
+test('a landmark keeps buildings off its 6x6 area; a lone tile of the same biome beside it can still be built on', () => {
+	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
+	const cells: { x: number; y: number; tile: Tile }[] = [];
+	for (let y = 60; y < 66; y++) for (let x = 60; x < 66; x++) cells.push({ x, y, tile: { biome: 'forest', isOwned: true } });
+	cells.push({ x: 67, y: 60, tile: { biome: 'forest', isOwned: true } });
+	store.setState((s) => ({ tiles: setTiles(s.tiles, cells) }));
+	assert.equal(canBuildAt(api().tiles, 62, 62), false, 'inside the landmark');
+	assert.equal(api().buildOnTile(62, 62, 'market'), false);
+	assert.equal(api().buildOnTile(60, 65, 'market'), false, 'its corner too');
+	assert.equal(isBuilt(tileAt(api().tiles, 62, 62)), false);
+	assert.equal(canBuildAt(api().tiles, 67, 60), true, 'a tile outside the 6x6 is free');
+	assert.equal(api().buildOnTile(67, 60, 'market'), true);
 });
