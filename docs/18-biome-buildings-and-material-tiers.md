@@ -14,7 +14,7 @@ Related: [12 biomes](12-rebirth-biomes.md) (the five new biomes and T2), [17 cra
 ## 2. The rules
 1. **One of each type.** Every building type exists at most once per map. A biome has exactly three types, so a full map has at most 3 x 12 biomes = 36 buildings.
 2. **The tile decides the menu.** Right-click a tile -> Build lists the three buildings of that biome (greyed with a reason if already built, if the castle level is too low, or if you cannot pay). Lakes get buildings too (piers and platforms over the water; `BUILDING_COST.blockedBiomes` loses `lake`; fish need water). Still not on the castle, a chest or a monster tile.
-3. **Location matters.** The building stands on one tile of its biome; the **Producer's output grows with how much of that biome you own** (proposal: +2 % per owned tile of the biome, capped at +100 %, counting only tiles of that biome), so a big forest makes the Lumberyard great and one lone forest tile makes it mediocre. This is the "specialisation bonus" BL8 wanted, without needing a cluster test, and it keeps "one building per type" interesting.
+3. **Location matters.** The building stands on one tile of its biome; the **Producer's output grows with how much of that biome you own** (decided: +2 % per owned tile of the biome, capped at +100 %, counting only tiles of that biome), so a big forest makes the Lumberyard great and one lone forest tile makes it mediocre. This is the "specialisation bonus" BL8 wanted, without needing a cluster test, and it keeps "one building per type" interesting.
 4. **Relocate** (decided): a building can be moved for 50 % of its current build cost, instantly (levels are kept), because one-per-type punishes a bad first placement.
 5. **Levels and timers** (section 5). **The map and its biomes always reset on rebirth**, and with them every Producer and Extractor. **Idols are the exception: their levels persist** (section 6).
 6. **Legacy buildings** (the 16 old types) disappear (section 8).
@@ -30,7 +30,7 @@ Related: [12 biomes](12-rebirth-biomes.md) (the five new biomes and T2), [17 cra
 
 Producer = base material x many tiles' worth. Extractor = a crafting material (T3 below). Idol = a permanent multiplier at its level. One Idol effect per mechanic, so nothing is stacked twice and each biome has a reason to exist.
 
-| Biome | Producer | Extractor -> T3 | Idol -> effect (per level, proposal) |
+| Biome | Producer | Extractor -> T3 | Idol -> effect (+2 % per level, decided; Luck in points) |
 |---|---|---|---|
 | **Plains** | Granary: food | Herb Garden -> **Herbs** | Harvest Scarecrow: +farm animal output % |
 | **Forest** | Lumberyard: wood | Sap Tapper -> **Sap** | Elder Tree Statue: +XP gain % |
@@ -68,8 +68,8 @@ Rules: the **merchant trades T0 and T1 only** (your instruction); T2-T4 are craf
 
 ## 5. Upgrades and timers
 
-- Buildings have **levels 1-5** (proposal). Level 1 is built for resources immediately (as today); each further level is bought with resources and takes a **timer**, like the castle.
-- **Level cap follows the castle level** (`max building level = min(5, castle level)`): a rebirth restarts the climb, and the castle stays the gate.
+- Buildings have **levels 1-5 as the base cap** (decided; Master Craftsmen raises it to 15). Level 1 is built for resources immediately (as today); each further level is bought with resources and takes a **timer**, like the castle.
+- **Level cap**: levels 1-5 are gated by the castle level (`min(5, castle level)`): a rebirth restarts the climb, and the castle stays the gate. Levels 6 and above need no castle level; they are limited only by the purchased cap (`buildingMaxLevel`, raised by Master Craftsmen up to 15, section 6).
 - Timers (proposal): level 2: 10 min, 3: 45 min, 4: 3 h, 5: 8 h. **One shared builder** (decided): the castle and all buildings share a single upgrade queue, so a timer is a real choice about what to upgrade next. Idol and Extractor upgrades from level 3 cost T2/T3 materials.
 - **Levels 6-15 (Master Craftsmen)**: the effect step stays the same as levels 1-5 (decided), the timer keeps growing (proposal x1.35 per level on the level-5 timer of 8 h, capped at 7 days), and the cost uses the same material rule with larger multipliers; the total effect has to be checked against the position and road bonuses (below): a Producer at level 15 is x8 before them. If that is too much, flatten the step above level 10.
 - Effects per level (proposal): Producer x(1 + 0.5 x (level-1)) on top of the biome-size bonus; Extractor rate x(1 + 0.4 x (level-1)); Idol bonus = `base x level` (e.g. +2 % XP per level, so level 5 = +10 %). All small: the Idols together must not out-scale the Ember shop (BL9/BL10).
@@ -77,7 +77,7 @@ Rules: the **merchant trades T0 and T1 only** (your instruction); T2-T4 are craf
 - **Save**: today a tile with a building "never has a level" (`sanitizeSave`). Buildings need `level` (and `upgradeEndsAt`/remaining seconds) as **optional** tile fields in `extra`. No `SAVE_SCHEMA` bump: absent means level 1.
 
 ### 5.1 Castle timers: shorter early levels
-Today levels 2-6 take 1 h, 4 h, 12 h, **24 h**, 48 h = 3 d 17 h. Proposal to take about **1 day** off the first run:
+Today levels 2-6 take 1 h, 4 h, 12 h, **24 h**, 48 h = 3 d 17 h. **Decided** (with the first five castle costs x0.75, sim-measured in [19](19-first-build-steps.md)) to take about **1 day** off the first run:
 
 | Upgrade | Now | Proposed |
 |---|---|---|
@@ -113,7 +113,7 @@ A road is a per-tile overlay that connects a building to the castle. A **connect
 
 **How it works**
 - State: `legacy.idols = { forest: 3, hills: 5, ... }` (level per biome Idol), plus the cap level from the Ember shop. Building a *new* Idol (never built before) costs materials as a level-1 building; every level up costs materials (T2/T3 from level 3) and takes the shared builder's time **during a run** (the Idol must stand to be upgraded). The cost is paid once per level for the account.
-- The **castle-level cap** (`min(5, castle level)`) applies to *upgrading* an Idol, not to placing it at its remembered level: a fresh run places the level-5 Idol at castle level 1 and the power is back at once. Because the power now persists, the per-level values must be small and the sum over the 12 Idols must be tested against the Ember shop's total (BL9/BL10); the area-bonus cap above is part of that.
+- The **castle-level gate** (levels 1-5: `min(5, castle level)`; above 5 only the Idol Mastery cap) applies to *upgrading* an Idol, not to placing it at its remembered level: a fresh run places the level-5 Idol at castle level 1 and the power is back at once. Because the power now persists, the per-level values must be small and the sum over the 12 Idols must be tested against the Ember shop's total (BL9/BL10); the area-bonus cap above is part of that.
 - Who owns it: the Idols change what the server computes (Luck, kill rewards, XP, offline efficiency, chest speed, crafting XP, damage, HP), so their levels belong in the **ledger**, not in the save (an edited save must not grant level 5 for free). New nullable column `player_ledger.legacy jsonb` (migration `legacy_ledger.sql`, applied before the code, lazy-seeded like `inv`); an Idol level-up is a server operation priced in the ledger, and `buildingEconomy(world, legacy)` takes the levels from there. The build menu shows "free (level N)" when the legacy level exists.
 - **Soft caps as one mechanism.** The code already has it: `LIMITS` (base values) read through `limitOf(key, ctx)` with `LIMIT_BONUSES`, and `HARD_LIMITS` (what a save may ever hold, so raising a limit later never invalidates a save, `config/limits.ts`). Every new cap goes there, and the Ember shop (legacy points) is the first source of raises, later also rebirth milestones and paragon ([13](13-rebirth-reset-and-paragon.md)):
 
@@ -147,7 +147,7 @@ A road is a per-tile overlay that connects a building to the castle. A **connect
 - Extract production also reaches the ledger totals (`granted`, `zeroTotals`): done by the key-list refactor in section 4.
 
 ## 8. Existing saves and the removed buildings
-All 16 old types go. The documented pattern for removed content is lenient repair (`repairSave.ts`): a tile whose `building` is not in the new set loses it. **Refund** (proposal): the gold, wood and stone it cost by the old ladder (`calculateBuildingCost` for the n-th building), credited once. A refund raises resources outside the server's income model, so the server must grant it: on the first accepted save that still contains a legacy building (checked on the *stored* map), add the computed refund to `granted` and set an idempotent marker in the ledger. Live data: 5 players today; `buildings_owned` per row tells how many refunds there will be (query before release, `scripts/check-live-saves.ts` from [14](14-server-audit-and-data-plan.md)). Economy sets/bonuses tied to old buildings (the `blacksmith` all-resources, `tower` etc.) go with them; the sim's `BUILD_ORDER` must be rewritten around the 36.
+All 16 old types go. The documented pattern for removed content is lenient repair (`repairSave.ts`): a tile whose `building` is not in the new set loses it. **Refund** (decided; **unnecessary if the class-release reset ships first or together with the buildings**, because the reset wipes every map, [21](21-classes-avatars-achievements-offline-report.md) section 6): the gold, wood and stone it cost by the old ladder (`calculateBuildingCost` for the n-th building), credited once. A refund raises resources outside the server's income model, so the server must grant it: on the first accepted save that still contains a legacy building (checked on the *stored* map), add the computed refund to `granted` and set an idempotent marker in the ledger. Live data: 5 players today; `buildings_owned` per row tells how many refunds there will be (query before release, `scripts/check-live-saves.ts` from [14](14-server-audit-and-data-plan.md)). Economy sets/bonuses tied to old buildings (the `blacksmith` all-resources, `tower` etc.) go with them; the sim's `BUILD_ORDER` must be rewritten around the 36.
 
 ## 9. Impact on balance (what to measure)
 - Gold remains the tile limiter; Producers must not make a material a non-issue: the Producer bonus is capped and level-gated.
@@ -156,7 +156,7 @@ All 16 old types go. The documented pattern for removed content is lenient repai
 - The art load is large: ten road sets (16 variants each plus bridges), and 36 building sprites at 3 levels each if levels change the look (proposal: 2 looks, level 1-2 and 3-5, plus a glow on level 5). Spread across the biome releases ([12](12-rebirth-biomes.md)): each biome ships with its three buildings.
 
 ## 10. Rollout
-P0 key-list refactor and the registry; P1 new building model (one-per-type, per-biome menu, levels, timers, Producer only) behind the existing 7 biomes + refund; P2 Extractors + T3 materials (needed by crafting) ; P3 Idols + `buildingEconomy`; P4 castle timer change (can go first, it is one array); P5 buildings of each new biome with its art; P6 Guide pages and the `verify.ts` flags.
+P0 key-list refactor and the registry; P1 new building model (one-per-type, per-biome menu, levels, timers, Producer only) behind the existing 7 biomes + refund; P2 Extractors + T3 materials (needed by crafting) ; P3 Idols + `buildingEconomy`; P4 castle timer change (can go first, it is one array); P5 buildings of each new biome with its art; P6 Guide pages and the `verify.ts` flags; roads (section 5.2) after P3, since they need the Producer/Extractor bonus to exist; the `legacy` ledger column with P3; Master Craftsmen and Extra Builder with the first Ember shop update. If the class-release reset has shipped by then, P1 needs no legacy-building refund.
 
 ## 11. Decisions and open questions
 
@@ -165,7 +165,7 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 - Producers scale with the owned size of their biome (+2 % per tile, cap +100 %), one of each type per map.
 - ~~Idol bonuses reset with the map~~ **Superseded (see section 6): Idol levels persist across rebirths and are re-placed for free; the cap is 5 for now and raised with legacy points.**
 - The merchant trades T0 and T1 only; T2-T4 are never sold. This overrides the earlier "tradable once discovered" plan in [12](12-rebirth-biomes.md).
-- Legacy buildings are removed with a server-granted refund (section 8).
+- Legacy buildings are removed with a server-granted refund (section 8), which is unnecessary if the class-release reset ships first or together with the buildings.
 - One shared builder: the castle and all buildings share one upgrade queue (one timer runs at a time). Ember Master Builders and the Dwarf Statue shorten timers; extra builder slots can become an Ember shop item later (also adds a shape to BL9).
 
 **Decided in the numbers round (2026-10-29):**
@@ -174,13 +174,13 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 - **Relocation:** 50 % of the building's current build cost, instant.
 - **Road tile:** about 3 % of the current tile price in gold, wood and stone, times the biome multiplier and the distance factor.
 
-**Decided (Ember shop, 2026-10-29):** Idol Mastery (global, +1 cap per level, 5 levels, base 10 x2.2), Master Craftsmen (+1 Producer/Extractor cap, 3 levels), Extra Builder (+1 parallel slot, 2 levels, base 40 x2.2 = 40 and 88 Embers); see section 6.
+**Decided (Ember shop, 2026-10-29):** Idol Mastery (global, +1 cap per level, 5 levels, base 10 x2.2), Master Craftsmen (+1 Producer/Extractor cap, 10 levels, cap 5 -> 15, base 10 x1.6), Extra Builder (+1 parallel slot, 2 levels, base 40 x2.2 = 40 and 88 Embers); see section 6.
 
 **Still open:**
-00. Road numbers: the 3 % share, the biome multipliers, the distance factor, the refund; whether a lake needs a pier building first; whether roads should also speed anything else (monster travel, chest rewards).
-0. The frontier bonus numbers (5 % per tile beyond 9, cap +100 %) and whether they should count the global distance offset of [12](12-rebirth-biomes.md); the castle-10 x5 on Extractors against the crafting pace.
+0a. Road numbers: the biome multipliers, the distance factor and the road refund (the 3 % share is decided); whether a lake needs a pier building first; whether roads should also speed anything else (monster travel, chest rewards).
+0b. The frontier bonus numbers (5 % per tile beyond 9, cap +100 %) and whether they should count the global distance offset of [12](12-rebirth-biomes.md); the castle-10 x5 on Extractors against the crafting pace.
 1. Extractor rates per level (set from "crafts per day at the crafting pace", [17](17-crafting.md)) and the Producer/Extractor timers for levels 6-15.
 2. The Luck Idol is in points, not percent: its per-level Luck points (proposal 4 per level) and the click-gold Idol's exact form.
 3. A sim line for all twelve Idols maxed against the Ember income bonus (+6 % per Ember ever earned).
-3. T4 Relics: decided to come from the biome bosses and persist; what they are and what they are used for is still open ([20](20-monster-families-and-rewards.md)).
-4. With one shared queue, the castle and a building compete for the builder: should the castle upgrade be able to cut in line?
+4. T4 Relics: decided to come from the biome bosses and persist; what they are and what they are used for is still open ([20](20-monster-families-and-rewards.md)).
+5. With one shared queue, the castle and a building compete for the builder: should the castle upgrade be able to cut in line?

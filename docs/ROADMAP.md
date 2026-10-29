@@ -13,7 +13,7 @@ The big plan is to move more of the economy to the server (see "Server authority
 
 ## The next update: the rebirth world (design drafts, nothing built)
 
-One theme, six feature docs. Each doc lists what exists in the code, the design, the server and save impact, and its open questions. Numbers and names in them are proposals until the questions are answered.
+One theme, ten docs. Each doc lists what exists in the code, the design, the server and save impact, and its open questions. Numbers and names in them are proposals until the questions are answered.
 
 | Doc | Feature | Size | Needs first |
 |---|---|---|---|
@@ -24,9 +24,11 @@ One theme, six feature docs. Each doc lists what exists in the code, the design,
 | [16](16-landing-and-play-route.md) | **Landing page**, auth-protected `/play`, login and avatar polish | M-L | rebirth-biome art for the final background |
 | [18](18-biome-buildings-and-material-tiers.md) | **Biome buildings** (Producer, Extractor, Idol per biome, one of each, upgrade timers), **material tiers T0-T4**, **shorter early castle timers**, the resource-key registry refactor | L | key-list refactor first; Extractors feed crafting |
 | [20](20-monster-families-and-rewards.md) | **Monster families and rewards**: capped absolute rewards multiplied by level, hide/food goods, tiered item drops, spawn pressure, generic tickets | L | the biomes; rats to distance 2-6 |
+| [19](19-first-build-steps.md) | **First build steps**: castle timers 1/3/9/16/36 h + first five castle costs x0.75 (sim-measured), resource-key registry | S + M | nothing |
+| [21](21-classes-avatars-achievements-offline-report.md) | **Class bonuses, separate avatars, the one-time progress reset (reserved unique names), guided tutorial, offline report bar**; achievements and glossary as drafts | M-L | avatar art, class numbers |
 | [17](17-crafting.md) | **Crafting** (Luck = rarity, Intelligence = affix quality, persistent crafting level, about 10 weeks to level 100, instant crafts, slot-themed extract recipes), enchanted craft (reroll/add one affix) locked behind Ichor | L | T2 materials; server-priced merchant to enforce it |
 
-Suggested order: **[19](19-first-build-steps.md) A castle timers, then B resource registry -> 14 polling fix -> 12 P0-P1 (rules + first biome art) -> 13 respec and +20 pool (without the wipe) -> 15 rankings -> 12 P2-P4 (T2 materials, merchant, flags, Guide) -> 18 buildings P1-P3 (levels, Extractors, Idols) -> 17 crafting -> 13 wipe -> 12 P5-P6 (distance bands, rats 2-6, generic tickets, monster families) -> 16 landing**. Biomes, rankings and the landing are independent; the gear wipe must not ship before crafting. Items 1-5 of the *Server authority* list below are the dependencies that turn these features from "flagged" into "enforced".
+Suggested order: **[19](19-first-build-steps.md) A castle timers, then B resource registry -> 14 polling fix -> the "New chapter" release ([21](21-classes-avatars-achievements-offline-report.md): classes, avatars, reserved names, the one-time reset, initial tutorial, with [16](16-landing-and-play-route.md) landing and the sign-up pickers) -> 12 P0-P1 (rules + first biome art) with 18 buildings P1-P3 (the reset has already wiped old maps, so no legacy-building refund) -> 13 respec and +20 pool (without the wipe) -> 15 rankings -> 12 P2-P4 (T2 materials, flags, Guide entries) -> 17 crafting together with the 13 gear wipe -> 20 and 12 P5-P6 (distance bands, rats 2-6, generic tickets, monster families)**. Ship the reset exactly once: put everything that would otherwise need another wipe (class and avatar columns, unique names, the epoch) into that release. Biomes, rankings and the landing are otherwise independent; the gear wipe must not ship before crafting. Items 1-5 of the *Server authority* list below are the dependencies that turn these features from "flagged" into "enforced".
 
 **Principles agreed for the whole update**
 

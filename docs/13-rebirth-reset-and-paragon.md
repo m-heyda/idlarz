@@ -15,7 +15,7 @@ On the server the rebirth is only *noticed*: the upload carries `rebirths + 1`, 
 On every rebirth:
 1. **Respec**: all attribute points return to the pool.
 2. **Bonus pool**: the pool grows by **+20 per rebirth**. Total bonus points = `20 x rebirths` (20 after the first, 40 after the second ... 100 after the fifth). *(Decided: the flat reading; the cumulative 20/60/120/200/300 reading would exceed the 157 points level 100 gives today.)*
-3. **Inventory wipe**: the **bag and the worn gear** are cleared. Kept (assumption, confirm): gems, Embers and shop, Pack Rat (it is a bag-size upgrade, not items), character level and XP, crafting level and crafting XP, discovered biomes, name/class/play time.
+3. **Inventory wipe**: the **bag and the worn gear** are cleared and the **loot pity resets** (decided). Kept (decided): gems, Embers and shop, Pack Rat (it is a bag-size upgrade, not items), character level and XP, crafting level and crafting XP, discovered biomes, name/class/play time.
 4. Map, **biomes**, resources, castle, farm and all Producers/Extractors reset as today (the map is always rolled anew).
 5. **Kept and growing**: Idol levels ([18](18-biome-buildings-and-material-tiers.md) section 6: persistent, re-placed for free at their level, cap 5 raised with Embers) and the other soft caps; they are the long-term sinks for legacy points (Embers).
 

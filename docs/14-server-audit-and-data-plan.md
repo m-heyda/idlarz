@@ -75,7 +75,9 @@ Not secret either: the catalogs are in the client bundle by design. The secrets 
 
 Each is applied with Supabase's migration tool on the project, then added to `supabase/migrations/` and `supabase/schema.sql` (the existing convention).
 
-## 8. Open questions
-1. OK to keep catalogs in code (recommended)?
-2. Do you want enforcing `verify.ts` (reject) before the leaderboard goes public, or flag-only while testing?
-3. Should the polling fix be scheduled before the features (recommended) or as a parallel track?
+## 8. Assumptions
+
+**Assumed (no objection raised; say so if wrong):**
+1. Catalogs stay in code, not in the database.
+2. `verify.ts` stays flag-only while the game is in testing; enforcing (rejecting) comes before the rankings go public.
+3. The fight-polling write fix is scheduled before the new features ([ROADMAP](ROADMAP.md) order), not as a parallel track.

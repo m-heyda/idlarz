@@ -1,8 +1,8 @@
 # 12 · Rebirth biomes, distance rules and T2 materials (design draft, nothing built)
 
-Five new biomes, one unlocked per rebirth (1 to 5). Each new tile produces a new tier-2 (T2) material, the merchant trades that material only after the biome has been discovered, and *where* a biome can appear depends on the distance from the castle. The same distance counter later drives monster spawns. Status: **design draft for review**; names, numbers and art are proposals marked *(proposal)*.
+Five new biomes, one unlocked per rebirth (1 to 5). Each new tile produces a new tier-2 (T2) material, the material is crafting-only (the merchant trades T0-T1 only), and *where* a biome can appear depends on the distance from the castle. The same distance counter later drives monster spawns. Status: **design draft for review**; names, numbers and art are proposals marked *(proposal)*.
 
-Related: [02 mechanics](02-mechanics.md) (current biome rules), [11 server authority](11-server-authority.md), [13 rebirth reset](13-rebirth-reset.md), [17 crafting](17-crafting.md) (what the T2 materials are for), [ROADMAP](ROADMAP.md).
+Related: [02 mechanics](02-mechanics.md) (current biome rules), [11 server authority](11-server-authority.md), [13 rebirth reset](13-rebirth-reset-and-paragon.md), [17 crafting](17-crafting.md) (what the T2 materials are for), [ROADMAP](ROADMAP.md).
 
 ## 1. What exists today (read from the code)
 
@@ -22,7 +22,7 @@ Related: [02 mechanics](02-mechanics.md) (current biome rules), [11 server autho
 | Rebirth 4 | **Blight** (slug / blob corruption) | **coal** | **Ichor** *(placeholder name)* | 22 |
 | Rebirth 5 | **Battlefield** | **stone**, **wood** | **War Medals** (badges of fallen warriors) | 22 |
 
-Why these distances: a compact map of N tiles has a radius of about `sqrt(N)/2` (300 tiles is about 9; 1000 about 16; 2500 about 25). The 5 players saved today own 158 tiles on median and 339 at most (castle level 4, nobody has rebirthed yet), so 10 is "just beyond a first-run map" and 22 asks for a 2000+ tile run or a deliberate expedition. Calibrate with the sim (section 7) before shipping.
+Why these distances: a compact map of N tiles has a radius of about `sqrt(N)/2` (300 tiles is about 9; 1000 about 16; 2500 about 25). The 5 players saved today own 158 tiles on median and 339 at most (castle level 4, nobody has rebirthed yet), so 10 is "just beyond a first-run map" and 22 asks for a 2000+ tile run or a deliberate expedition. These are the **base** values; a global **+12 offset** (section 9) moves the effective minimums to 22 / 26 / 30 / 34 / 34 until the art and balance land. Calibrate with the sim (section 7) before shipping.
 
 ### 2.1 The third biome: decided
 **Blossom Orchard.** Fruit trees in rows and wild clumps, bees and hives, cows grazing in clover, petals drifting. Milk fits the cows, Honey is the new T2 material. Bees already exist as ambient critters, so the sprite work is smaller. Rejected: Crystal Downs, Highlands/Moor.
@@ -62,8 +62,8 @@ A player can buy a straight line of tiles outward (about 10 tiles for the jungle
 ## 4. T2 materials and the merchant
 
 - New tier `t2` in `catalog/resources.ts` (`RESOURCE_TIERS`), new keys `hardwood`, `cloth`, `honey`, `ichor`, `medals` *(proposal)*, drawn as one more boxed header group, **hidden until discovered**.
-- **Discovered** means "this account has owned at least one tile of that biome". Stored as a small optional list in the save core (`discovered: string[]`), checked by the server against the map on upload (a biome letter present in the land makes it legal). It survives rebirth (decision: yes, since the Guide and the merchant stay unlocked; *confirm*).
-- Merchant: sells and buys a T2 material only when discovered (UI and the store action; the server prices it once the merchant moves to the server, [ROADMAP](ROADMAP.md) item 4). Ichor and War Medals are crafting-only and **not sold** *(proposal)*; hardwood, cloth and honey sell above hide's price (hide 2): about 4, 4, 5 *(proposal)*.
+- **Discovered** means "this account has owned at least one tile of that biome". Stored as a small optional list in the save core (`discovered: string[]`), checked by the server against the map on upload (a biome letter present in the land makes it legal). It survives rebirth (decided: yes, since the header slot and the Guide entry stay unlocked; *confirm*).
+- **Merchant: T2 is never sold or bought** (decided; the merchant trades T0 and T1 only, [18](18-biome-buildings-and-material-tiers.md)). T2 materials are crafting and building-upgrade inputs; "discovered" only unlocks the header slot and the Guide entry. Ichor and War Medals are crafting-only anyway.
 - Production: each new-biome tile adds the T2 rate (**decided: 0.1/s, a third of a T0 tile's 0.3/s**) plus the basic outputs in the table. The adjacency bonus applies as for other biomes.
 - Rules from the roadmap's T2 checklist apply: key lists to touch together are `Resources`, `INITIAL_RESOURCES`, `BASE_GENERATION_RATES`, `CASTLE_BASE_RATES`, `zeroResources`, `sanitizeSave` `OPTIONAL_RESOURCES`, `offline/grant.ts`, `offline/ledger.ts` `zeroTotals`; at least two sources and one sink on day one (sources: tile, later kill drops; sinks: crafting, [17](17-crafting.md), plus the merchant); a "minutes to cover" line in the sim. Decide whether chests and offline income include T2 (`LIMITS`, `CHEST.bundle`): proposal, offline yes at the normal efficiency, chests no.
 - T2 materials reset on rebirth (as the roadmap proposed), except what the Ember shop later buys back.
@@ -110,7 +110,7 @@ Phases (each shippable): **P0** rules, config and dev tools with placeholder col
 
 **Decided (2026-10-29):**
 - Third biome: Blossom Orchard (milk + Honey).
-- Distances stay as in section 3 **plus one global offset constant** `BIOME_DISTANCE_OFFSET` (proposal +12) added to every biome minimum, so the biomes sit far out for players but stay testable: the dev panel's "unlock all" ignores it. Lower it when the art and balance are ready.
+- Distances stay as in section 3 **plus one global offset constant** `BIOME_DISTANCE_OFFSET` (+12, decided in the detail round below) added to every biome minimum, so the biomes sit far out for players but stay testable: the dev panel's "unlock all" ignores it. Lower it when the art and balance are ready.
 - Beelining: a new (gated) biome only rolls on a tile with **at least 2 owned neighbours** (4-neighbourhood), which stops one-tile tunnels outward. Watch the sim; the distance toll stays an option.
 - Ichor and War Medals are crafting-only (not sold). Hardwood, Cloth and Honey were to be tradable once discovered, **but that was overridden (decided): the merchant trades T0-T1 only, so no T2 material is sold ([18](18-biome-buildings-and-material-tiers.md)).** Section 4's merchant bullet is void; "discovered" now only unlocks the header slot and the Guide entry.
 - Discovery is permanent across rebirth (header slot, Guide entry); only the stock resets. **The map and its biomes reset on every rebirth, always** (a new map is rolled; only `discovered` and the Idol levels of [18](18-biome-buildings-and-material-tiers.md) persist).
