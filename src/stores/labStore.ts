@@ -4,7 +4,8 @@ import type { MapGameState } from '@/components/game/mapSource';
 import type { Cell } from '@/lib/dragPaint';
 import { applyStroke, chestTool, eraseTool, extendRing, extendTool, paintTool, unchestTool, type StrokeTool } from '@/lib/mapEdit';
 import { castleDistance, monsterAt, pickSpawnTile, rollSpawnLevel } from '@/lib/monsters';
-import { castleLevelOf } from '@/lib/castleWard';
+import { castleLevelOf, isInWard } from '@/lib/castleWard';
+import { MONSTER_CATALOG } from '@/catalog/monsters';
 import type { Monster } from '@/types/game';
 import { calculateCombatStats, createInitialWorld, EMPTY_PRESTIGE, STARTER_FREE_TILES, startingResources } from '@/utils/gameUtils';
 import { growWorld } from '@/utils/growWorld';
@@ -107,6 +108,8 @@ interface LabState extends MapGameState {
 	setCastleLevel: (level: number) => void;
 	spawnChests: (count: number) => void;
 	spawnMonsters: (type: Monster['type'], count: number) => void;
+	/** Work-in-progress roster monsters (art only, no stats yet) placed on tiles of their own biome, at the placed monster level */
+	spawnWip: (id: string, count: number) => void;
 	clearMonsters: () => void;
 	clearChests: () => void;
 	exportJson: () => string;
@@ -253,6 +256,27 @@ export const useLabStore = create<LabState>((set, get) => {
 				taken.add(`${spot.x},${spot.y}`);
 				const lvl = rollSpawnLevel(type, level, nextId, castleDistance(spot));
 				monsters = [...monsters, { id: nextId, type, level: lvl, spawnLevel: lvl, x: spot.x, y: spot.y, ageSec: 0 }];
+				nextId += 1;
+			}
+			set({ monsters, nextId });
+		},
+		spawnWip: (id, count) => {
+			const entry = MONSTER_CATALOG.find((m) => m.id === id);
+			if (!entry) return;
+			const { tiles, seed, monsterLevel } = get();
+			let monsters = get().monsters;
+			let nextId = get().nextId;
+			const random = seededRandom(seed + nextId * 104729);
+			const taken = takenSpots(tiles, monsters);
+			const castleLevel = castleLevelOf(tiles);
+			// the monster's own biome (its art folder), clear of the castle ward, buildings, chests and other monsters
+			const eligible = ownedEntries(tiles).filter(
+				({ x, y, tile }) =>
+					tile.biome === entry.biomes[0] && !tile.building && !tile.hasChest && !taken.has(`${x},${y}`) && !isInWard(x, y, castleLevel)
+			);
+			for (let i = 0; i < count && eligible.length; i++) {
+				const { x, y } = eligible.splice(Math.floor(random() * eligible.length), 1)[0];
+				monsters = [...monsters, { id: nextId, type: 'rat', level: monsterLevel, spawnLevel: monsterLevel, x, y, ageSec: 0, art: id }];
 				nextId += 1;
 			}
 			set({ monsters, nextId });

@@ -52,6 +52,14 @@
 	border-color: #ffd860;
 }
 
+/* a still roster picture (map lab preview): fits the sprite box, only the bob moves */
+.tile-monster-still {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	animation: monster-bob 0.9s steps(2) infinite alternate;
+}
+
 .tile-has-monster {
 	cursor: pointer;
 }
