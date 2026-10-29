@@ -34,7 +34,7 @@ Release order (confirmed 2026-10-29), after the UI quick wins above: **[19](19-f
 **Quick wins (UI only, no server change, can ship any time, even before step A)**
 
 - **Monster growth indicator.** Monsters grow in level after they spawn (one level per 30 minutes, up to +10 above the spawn level: `LIMITS.monsterGrowthIntervalSec`, `monsterGrowthLevels`, `growthSecondsLeft` in `lib/monsters.ts`), but on the map the level badge (`tile-monster-tier` in `components/game/MonsterSprite.tsx`) always looks the same, so a player cannot tell a fresh monster from a fully grown one. Plan: (1) **a blue frame and soft glow on the level badge when the monster has reached its maximum level**; (2) a thin **progress ring or underline on the badge** for the time to its next level while it is still growing; (3) the tooltip says "Level 7 of 12, grows in 14 min" (the tile tooltip already computes the time left); (4) the existing flags keep their looks: boss (skull), lucky (gold), and the unknown state of [22](22-glossary-and-mastery.md) (black). Optional later: a danger tint on the badge from the server's win-chance estimate. This is also the place to show the new level-scaled rewards of [20](20-monster-families-and-rewards.md) (a monster that grew pays more). Size S.
-- Follow-ups it feeds: the monster rework fixes (R7 danger bonus, R8 King balance), the family spawn tables and the glossary.
+- Follow-ups it feeds: the monster rework (per-band danger offsets, the demoted Rat King), the family spawn tables and the glossary.
 
 **Principles agreed for the whole update**
 
@@ -58,13 +58,12 @@ Cross-cutting rules for all of it: additive save fields only (no `SAVE_SCHEMA` b
 
 ## Known bugs and leftovers
 
-| # | What | Where | Note |
-|---|---|---|---|
-| R7 | `dangerBonus` (one level per 8 tiles from the castle) is now 0 or 1: monsters stand at most 9 tiles out | `lib/monsters.ts` | the frontier is no longer more dangerous than the home land; rework with the biomes (planned as per-band danger offsets, [12](12-rebirth-biomes.md) section 5) |
-| R8 | The King's balance changed with auto-attack (1000 HP, 75 s clock): the Rattatui set wins in 26-35 s, obsidian in 51-64 s, steel and wood not at all (steel lost its old set bonus) | `MONSTERS.ratKing`, [generated/fight-sim.md](generated/fight-sim.md) | needs a real playtest |
-| R9 | Local development needs a Supabase project and `LOOT_SECRET`: there is no guest mode to run the game without them | `README.md` | a dev-only fake backend would bring that back. Dev sessions on localhost use their own browser keys (`.dev` suffix) |
-| ⚠️ B6 | Chests and map clicks are small next to the rest of the economy (the click is the only click income for now; the tile tap was removed) | | decide whether they should scale with progress, together with the click rework (BL3) |
-| ⚠️ B7 | `sim.ts` bots build on the first free explored tile (round-robin through six buildings), do not use the class picker, allocate stat points by a fixed policy, and play one reasonable style (reserve for the castle, top up at the merchant) | `scripts/sim.ts` | fine for pacing checks; extend the bot before tuning small effects |
+Triaged in [RELEASE-PLAN.md](RELEASE-PLAN.md) section 2 (2026-10-29); no open item remains in this table.
+
+- **R7** (`dangerBonus` is 0 or 1 because monsters stand at most 9 tiles out, `lib/monsters.ts`) is still true in the code. It is absorbed by the monster engine: per-band danger offsets in release step P3.4 ([12](12-rebirth-biomes.md) section 5).
+- **R8** (King balance) is resolved by decision: the Rat King becomes a basic monster and the Rattatui set is retired in step P3.6 (existing pieces stay valid, nothing drops them any more).
+- **R9** (local dev needs Supabase and `LOOT_SECRET`) is accepted as is; the README says what is needed.
+- **B6** (chests and clicks are small) moved into BL3 below. **B7** (sim bots are simple) is now an acceptance line of each release step that changes player choices (class picker, `BUILD_ORDER`, respec, craft-sim).
 
 ## Server authority (the migration backlog, ranked)
 
@@ -181,22 +180,11 @@ Measure with `npm run sim -- --seeds=3`, never from numbers copied into prose: [
 
 | # | Topic | Observation | Idea |
 | --- | --- | --- | --- |
-| BL1 | **Gap between active and idle players is small** | gold is only part of the economy; the castle timers (3 d 17 h to level 6) and resource costs dominate | raise click power further, or let clicks pay a small share of other resources; re-run the sim |
-| BL2 | **Levels and stat points barely matter for income** | levels 2-30 give 3 points, later levels 1; +2.5 % each on a pool the castle multiplies | gate castle levels by player level, raise per-point effects, or add respec |
-| BL3 | **Chests and map clicks are small** next to income | chest = 10-60 min of *passive* gold; a click = 50-180 % of one second of gold | scale chests with click-inclusive income, give resource packs, or rework clicking altogether |
-| BL4 | **Meat/food is the strongest engine** (animal stacking × castle multiplier) | animals dominate mid-game income in the sim traces | revisit `costScaling` or add upkeep |
-| BL5 | **Resource sinks are thin after the castle and tiles** | wood/stone/coal beyond tile and castle needs only sell for 0.4-1.1 gold | equipment upgrades, buildings with levels, storage caps tied to the castle |
-| BL6 | **Merchant has little depth** | flat prices, no saturation; bonuses, supplies and a shuffling gear shelf exist | optional "market saturation" (price drops with volume sold, recovers over ~30 min) if burst selling shows up again |
-| BL7 | **Late tiles are very expensive** | steep `(n/300)^4.5` tail after 300 (table in [generated/balance-tables.md](generated/balance-tables.md)) | fine as an endgame sink; revisit if the Ember discount (cap 45 %) makes late rebirth runs too cheap |
-| BL8 | **Idle tile income** | with `BIOME_YIELD.scale` = 1.3 a tile adds ~0.1-0.5 gold-equivalent/s | per-biome specialisation bonuses (e.g. +x % per 4 same biome) |
-| BL9 | **Ember shop is six items**, all flat percentages | the choice is mostly "which first" | add one or two with a different shape (longer chest timer cap, a free animal slot). A purchase stays permanent: the shop is not rerolled or respecced, it only gains items |
-| BL10 | **Late Ember runs flatten** | gain grows with `sqrt(tiles)` and castle level, the shop caps at 10 levels each | a second prestige tier or a sink for surplus points |
-| BL11 | **Biome luck and the 24 h player** | seed spread is large and the 24 h auto-clicker bot is faster than the 8 h/day hardcore bot | tune `BIOME_SPAWN` weights (fewer water tiles early) and re-run `sim --seeds=3` |
-| BL12 | **Combat rewards and difficulty** | kill gold / XP / hide are `rewardSec` seconds of income; the `human*` sim profiles fight on an assumed `GEAR_SCHEDULE` | check the share of income from fights stays small, tune `COMBAT.spawn`, `MONSTERS.rat.rewardSec`, armor `K` once real playtests exist |
-| BL13 | **Round 2 numbers are first guesses** | the ten newer buildings, the chest reward table (50 / 25 / 12 / 10 / 8), the unlock thresholds and cluster chances were set by feel | run `npm run sim`, then tune `BUILDINGS`, `CHEST.rewards`, `BIOME_RULES` |
-| BL14 | **Reserved resources** | iron, fish, mana, blue crystal, sapphire, ability shard and the random-item box exist as icons only | design them as end-game / rebirth currencies and add them to `Resources` + the merchant + `sanitizeSave` together (see the tier rules above) |
-| BL15 | **The four free start tiles shape the opening** | 4 free tiles (north, east, south, west of the castle) produce from second 0; the corners are the first tiles to buy | if the opening is too slow or too fast: scale the start tiles' yield, change the start gold, or `SCALING_CONFIG.growthEarly` |
-| BL16 | **Late tile price and map scale (rebirth-centred)** | the map is limited only by `COORD_LIMIT` (±16,000) and `MAX_OWNED_TILES` (250,000); price tail `tailFrom` 300, exponent 4.5, `RESOURCE_CAP` 1e21; placeholders until rebirth is designed | pick the intended map size per rebirth tier, then move `tailFrom` / `tailExponent` (and the `TILE_RESOURCE_COST` shares); also check building price, income vs price at 1k+ tiles, the XP curve at 10k+ tiles, and float precision of gold past 2^53 |
+| BL1 + BL3 | **Active vs idle gap, and chests and map clicks are small** (decision D2: scale chest rewards with click-inclusive income, keep clicks small, revisit with the click Idol) | gold is only part of the economy; the castle timers and resource costs dominate; chest = 10-60 min of *passive* gold; a click = 50-180 % of one second of gold; the click is the only click income (the tile tap was removed) | scale chests with click-inclusive income, give resource packs; decide before the Idols (release step P6c) |
+| BL4 | **Meat/food is the strongest engine** (animal stacking × castle multiplier) (decision D3: tune `costScaling`, no upkeep) | animals dominate mid-game income in the sim traces; the Harvest Scarecrow Idol would stack on it | revisit `costScaling` before the farm Idol (P6c) |
+| BL16 (incl. BL7) | **Late tile price and map scale (rebirth-centred)** (decision D4: settle with the sim run of step P5.5, keep the +12 biome distance offset until then) | the map is limited only by `COORD_LIMIT` (±16,000) and `MAX_OWNED_TILES` (250,000); price tail `tailFrom` 300, exponent 4.5 (steep by design as an endgame sink; revisit if the Ember discount, cap 45 %, makes late rebirth runs too cheap), `RESOURCE_CAP` 1e21 | pick the intended map size per rebirth tier, then move `tailFrom` / `tailExponent` (and the `TILE_RESOURCE_COST` shares); also check building price, income vs price at 1k+ tiles, the XP curve at 10k+ tiles, and float precision of gold past 2^53 |
+
+Removed on 2026-10-29 because the release plan answers them ([RELEASE-PLAN.md](RELEASE-PLAN.md) section 2.2): BL2 (respec and +20 points, [13](13-rebirth-reset-and-paragon.md)), BL5 and BL14 (building levels, roads, crafting and the T2/T3 ladder are the sinks; reserved icons become placeholder T3 icons), BL8 (Producer +2 % per owned tile, [18](18-biome-buildings-and-material-tiers.md)), BL9 and BL10 (Idol Mastery, Master Craftsmen, Extra Builder), BL12 (the capped reward model of [20](20-monster-families-and-rewards.md)), BL13 (the ten old buildings are replaced), BL11 (covered by the identical-roll test of step P5.1), BL15 (re-measured once in P0.4), BL6 (kept under *Draft ideas*).
 
 ## Technical risks
 
