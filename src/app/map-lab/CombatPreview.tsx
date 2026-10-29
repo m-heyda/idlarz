@@ -1,48 +1,52 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { BIOMES } from '@/config/gameConfig';
-import { biomeColor } from '@/config/biomePalette';
-import { MONSTER_CATALOG, monsterArtUrl } from '@/catalog/monsters';
-import { monsterArtSize } from '@/config/monsterArtSize';
+import { MONSTER_CATALOG } from '@/catalog/monsters';
+import CombatPanel, { type FloatNumber } from '@/components/game/overlays/CombatPanel';
+import { monsterStats } from '@/lib/monsters';
 import { useLabStore } from '@/stores/labStore';
+import type { FightView } from '@/lib/offline/fightTypes';
 
 /** Same list as the lab's spawn dropdown: roster monsters with finished art that are not enabled yet */
 export const WIP_MONSTERS = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
 
-const HEROES = ['warrior', 'mage', 'ranger', 'paladin'] as const;
-
 const btn = 'px-2 py-1 rounded border border-white/15 bg-white/5 hover:bg-white/15 text-xs';
+const noop = () => {};
 
 /**
- * Map lab only: a big stand-in for the combat window's stage, to judge a monster's art at fight size. The hero stands on the left,
- * the monster on the right and (by default) flipped to face the hero. Nothing here talks to the game or the server.
+ * Map lab only: the game's own combat window (CombatPanel), fed a mock fight, enlarged so the art can be judged on a big screen.
+ * The monster is mirrored to face left by default. Nothing here talks to the game or the server.
  */
 const CombatPreview: React.FC<{ initialId: string; onClose: () => void }> = ({ initialId, onClose }) => {
 	const level = useLabStore((s) => s.monsterLevel);
-	const lucky = useLabStore((s) => s.lucky);
 	const [id, setId] = useState(initialId);
 	const [flip, setFlip] = useState(true);
-	const [hero, setHero] = useState<(typeof HEROES)[number]>('warrior');
-	const [size, setSize] = useState(220);
-	const [attacking, setAttacking] = useState(true);
+	const [zoom, setZoom] = useState(2);
+	const [swinging, setSwinging] = useState(true);
+	const [tick, setTick] = useState(0);
+	const [numbers, setNumbers] = useState<FloatNumber[]>([]);
 	const entry = WIP_MONSTERS.find((m) => m.id === id) ?? WIP_MONSTERS[0];
-	const ground = biomeColor(entry.biomes[0]);
-	const boss = entry.grade === 'boss';
-	const stageSize = boss ? Math.round(size * 1.35) : size;
+
+	// the real window is driven by the server's hits; here a hit lands every 1.6 s so the flash, the numbers and the bob can be seen
+	useEffect(() => {
+		if (!swinging) return;
+		const timer = setInterval(() => {
+			setTick((t) => t + 1);
+			const nid = Date.now();
+			setNumbers((prev) => [...prev.slice(-4), { id: nid, text: `-${Math.round(40 + Math.random() * 60)}`, kind: 'dmg', x: 20 + Math.random() * 60 }]);
+			setTimeout(() => setNumbers((prev) => prev.filter((n) => n.id !== nid)), 900);
+		}, 1600);
+		return () => clearInterval(timer);
+	}, [swinging]);
+
+	const stats = monsterStats('rat', level);
+	const fight: FightView = { n: 1, type: 'rat', level, lucky: false, monsterHp: stats.maxHp * 0.65, monsterMaxHp: stats.maxHp, stunLeft: 0, timeLeftSec: entry.grade === 'boss' ? 42 : null, x: 0, y: 0 };
 
 	// a portal: the panel's backdrop blur would otherwise make it the box this overlay is fixed to
 	return createPortal(
 		<div className='fixed inset-0 z-[60] flex flex-col bg-black/85 text-white' role='dialog' aria-label='Combat preview'>
-			<style>{`
-				@keyframes cp-lunge { 0%, 70%, 100% { transform: translateX(0); } 80% { transform: translateX(40px); } }
-				@keyframes cp-hit { 0%, 78%, 100% { filter: none; } 82% { filter: brightness(2.2) saturate(0.3); transform: translateX(8px) scale(0.96); } }
-				@keyframes cp-bob { to { translate: 0 -4px; } }
-				.cp-hero[data-on='true'] { animation: cp-lunge 1.6s steps(8) infinite; }
-				.cp-monster[data-on='true'] { animation: cp-hit 1.6s steps(8) infinite; }
-				.cp-monster-img { animation: cp-bob 0.9s steps(2) infinite alternate; }
-			`}</style>
 			<header className='flex flex-wrap items-center gap-3 border-b border-white/15 p-3 text-xs'>
 				<b className='text-sm'>Combat preview</b>
 				<select value={entry.id} onChange={(e) => setId(e.target.value)} className='rounded bg-white/10 px-1 py-1'>
@@ -57,65 +61,42 @@ const CombatPreview: React.FC<{ initialId: string; onClose: () => void }> = ({ i
 					<input type='checkbox' checked={flip} onChange={(e) => setFlip(e.target.checked)} /> Face left
 				</label>
 				<label className='flex items-center gap-1'>
-					<input type='checkbox' checked={attacking} onChange={(e) => setAttacking(e.target.checked)} /> Swing / hit flash
+					<input type='checkbox' checked={swinging} onChange={(e) => setSwinging(e.target.checked)} /> Hit flash
 				</label>
 				<label className='flex items-center gap-1'>
-					Hero
-					<select value={hero} onChange={(e) => setHero(e.target.value as (typeof HEROES)[number])} className='rounded bg-white/10 px-1 py-0.5'>
-						{HEROES.map((h) => (
-							<option key={h} value={h} className='text-black'>
-								{h}
-							</option>
-						))}
-					</select>
+					Zoom {zoom}x
+					<input type='range' min={1} max={3} step={0.25} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} />
 				</label>
-				<label className='flex items-center gap-1'>
-					Monster size {size}px
-					<input type='range' min={64} max={480} step={16} value={size} onChange={(e) => setSize(Number(e.target.value))} />
-				</label>
-				<button className={btn} onClick={() => setSize(monsterArtSize(entry.id, entry.grade) * 4)} title='The map size from config/monsterArtSize.ts, times 4'>
-					Map size x4
-				</button>
 				<button className={`${btn} ml-auto`} onClick={onClose}>
 					Close
 				</button>
 			</header>
-
-			<div className='relative flex-1 overflow-hidden' style={{ background: `linear-gradient(#10141c 0%, #1d2430 55%, ${ground} 55%, #000 130%)` }}>
-				<div className='absolute inset-x-0 top-3 text-center text-sm font-bold'>
-					{boss ? '☠ ' : ''}
-					{lucky ? '★ ' : ''}
-					{entry.label} - Lv {level}
-				</div>
-				<div className='absolute inset-x-0 flex items-end justify-center gap-[12vw]' style={{ bottom: '40%' }}>
-					<img
-						className='cp-hero [image-rendering:pixelated]'
-						data-on={attacking}
-						src={`/pixel/icons/hero_${hero}.png`}
-						alt='Hero'
-						draggable={false}
-						style={{ width: 56 * 4, height: 80 * 4, filter: 'drop-shadow(0 6px 0 rgba(0,0,0,.5))' }}
+			<div className='flex flex-1 items-center justify-center overflow-auto p-6'>
+				<div style={{ zoom }}>
+					<CombatPanel
+						monster={{ type: 'rat', level, art: entry.id }}
+						flip={flip}
+						fight={fight}
+						loading={false}
+						over={null}
+						monsterHp={fight.monsterHp}
+						monsterMaxHp={fight.monsterMaxHp}
+						snapKey='lab'
+						player={{ hp: 700, maxHp: 1000, mp: 60, maxMp: 100, level: 10 }}
+						cd={{ heal: 0, stun: 0, potion: 0 }}
+						potions={[]}
+						autoBattle={false}
+						autoLocked
+						autoUse={false}
+						numbers={numbers}
+						hitTick={tick}
+						shake={false}
+						onFlee={noop}
+						onCloseResult={noop}
+						onMinimize={noop}
+						onAutoBattle={noop}
+						onAutoUse={noop}
 					/>
-					<span className='cp-monster' data-on={attacking} style={{ display: 'block', transform: flip ? 'scaleX(-1)' : undefined }}>
-						<img
-							className='cp-monster-img [image-rendering:pixelated]'
-							src={monsterArtUrl(entry)}
-							alt={entry.label}
-							draggable={false}
-							style={{ width: stageSize, height: stageSize, objectFit: 'contain', filter: `drop-shadow(0 6px 0 rgba(0,0,0,.5))${lucky ? ' sepia(1) saturate(4) hue-rotate(-10deg)' : ''}` }}
-						/>
-					</span>
-				</div>
-				<div className='absolute bottom-4 left-1/2 w-[min(640px,90vw)] -translate-x-1/2 space-y-1.5 text-[11px]'>
-					{[
-						['Monster', '#c0392b'],
-						['You', '#3fa34d'],
-					].map(([label, color]) => (
-						<div key={label} className='relative h-5 border border-black bg-black/60'>
-							<i className='absolute inset-y-0 left-0' style={{ width: '70%', background: color }} />
-							<span className='absolute inset-0 flex items-center justify-center font-bold'>{label}</span>
-						</div>
-					))}
 				</div>
 			</div>
 		</div>,
