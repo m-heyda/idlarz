@@ -102,7 +102,7 @@ Each biome gets **3-4 monsters and one boss** (names are placeholders; ideas in 
 
 ## 8. Game Guide and rollout
 
-Update the in-game Guide (`overlays/Tutorial.tsx`): a **Biomes** page (what each does, when it unlocks, how far out it appears, its materials) and a line in the Rebirth dialog ("Rebirth 2 unlocks Fields"). The Guide is later reworked into a guided tutorial; keep the biome text as data in `catalog/` so that rework reuses it.
+Update the in-game Guide (`overlays/Tutorial.tsx`): a **Biomes** page (what each does, when it unlocks, how far out it appears, its materials) and a line in the Rebirth dialog ("Rebirth 2 unlocks Fields"). The Guide is reworked into a guided tutorial that unlocks entries when a biome is discovered ([21](21-classes-avatars-achievements-offline-report.md) section 7); keep the biome text as data in `catalog/` so that rework reuses it.
 
 Phases (each shippable): **P0** rules, config and dev tools with placeholder colours; **P1** art, one biome per release; **P2** T2 resources, merchant gating, `discovered`; **P3** server flags in `verify.ts`; **P4** Guide and Rebirth dialog text; **P5** distance bands, rats 2-6 and the generic ticket list; **P6** monster families and bosses.
 

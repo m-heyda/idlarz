@@ -42,8 +42,23 @@ When class bonuses and avatars ship, **every player's progress is reset once** a
 - **Communication.** A banner in the game and on the landing page a few days before the release ("a new chapter is coming: classes, new biomes, crafting; progress will reset, names are kept"), and the release screen above. The reset happens together with the first release that contains classes **and** avatars, never before, so it happens only once for this feature set.
 - **Compat and tests.** No save fields change; the reset deletes rows. Tests: the epoch gate in `authRoute` (needsReset true/false), the endpoint is idempotent, the archive row is created and pinned, a stale tab with an old save cannot upload over the fresh row (the pipeline's compare-and-swap on `rev` and `ledger.ver` already rejects it; add a test for the case where the row was deleted), unique-name collisions. Run the live-save dry run of [14](14-server-audit-and-data-plan.md) first to count affected rows.
 
-## 7. Open questions
+## 7. Guided tutorial: replace the wall of text (roadmap item, designed)
+
+**Today:** the Guide is one 402-line component (`overlays/Tutorial.tsx`, 17 sections from "Game Basics" to "Tips"), opened from Settings in a modal. It is a wall of text: everything at once, nothing tied to what the player has reached, no memory of what was read, and much of it describes features the player has not unlocked yet.
+
+**Goal:** a **guided tutorial whose steps unlock together with the features and when the player discovers them**, and a Guide journal that only shows what has been unlocked. It also becomes the initial tutorial the class-release reset replays ([section 6](#6-introducing-classes-a-one-time-progress-reset-decided-2026-10-29)).
+
+- **Content as data** (`catalog/tutorial.ts`): each step has `id`, the `feature` it belongs to, a `trigger` (a game event plus a condition: first click, first tile bought, first building, castle level 2, first monster appears, first chest, first fight won, rebirth available, merchant opened, farm unlocked, a biome discovered, first Idol, first road, crafting unlocked ...), a short text (one to three sentences, **numbers read from the config**, never typed in), an optional UI target to highlight, optional prerequisites and an optional "try it" completion check (e.g. "buy a tile"). No hand-written page per feature: a new feature or biome adds catalog entries, and the glossary ([section 4](#4-glossary-draft-later)) links to the same data.
+- **Presentation:** small non-blocking coach tips next to the relevant control (a bottom sheet on phones) plus a `NotifyDot` on the Guide button when a new entry unlocks; the **Guide journal** lists unlocked entries with the full text, and shows locked ones as "???" with a hint of what unlocks them, which doubles as a gentle teaser of the game's depth. "Skip tutorial" and "Replay" are always available, and `prefers-reduced-motion` is respected.
+- **The initial tutorial** (after class and avatar pick): a short linear path of about eight steps (click for gold, buy the first tile, build, buy an animal, start the castle upgrade, open a chest, fight the first monster, find the merchant) that ends with an achievement ([section 3](#3-server-achievements-draft-later)); later steps appear as features unlock.
+- **State:** the set of seen/completed step ids as an optional list in the save core (`tutorial.seen`, additive, no schema bump; it is cosmetic, so it does not need the ledger). Triggers use the existing store/events; new biomes use the `discovered` set ([12](12-rebirth-biomes.md)).
+- **Server:** nothing is needed, except the optional "tutorial finished" achievement.
+- **Tests:** every step id is unique; every feature that unlocks has at least one step; every trigger names an event that exists; text templates only use keys that exist in the config; a snapshot of the unlock order so a reorder is deliberate.
+- **Size and order:** M-L, most of it writing. It ships **after the reset flow** (it is its second half) and each later feature (biomes, buildings, crafting, rankings) adds its own steps in the same release. The old `Tutorial.tsx` is removed once every section has a catalog entry.
+
+## 8. Open questions
 1. Class passive values and the class-change price.
 2. How many achievements to launch with, and which avatars are the unlockables.
 3. Whether the glossary comes before or with the guided tutorial.
 4. Date and announcement text for the reset; whether to keep the old save downloadable (an "export your old save" button on the new-chapter screen for a few weeks).
+6. The tone and length of tutorial steps, and whether completing steps gives small rewards (gold, gems) or only the achievement.
