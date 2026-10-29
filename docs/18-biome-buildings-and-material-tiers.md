@@ -113,7 +113,15 @@ Today levels 2-6 take 1 h, 4 h, 12 h, **24 h**, 48 h = 3 d 17 h. Proposal to tak
 | `craftingLevelCap` (new, [17](17-crafting.md)) | 100 | paragon-style steps | 150 |
 | `builderSlots` (new) | 1 | Ember shop (parallel upgrades) | 3 |
 
-- The Ember shop gains items of a different shape, which BL9/BL10 asked for: caps and slots instead of flat percentages.
+- The Ember shop gains items of a different shape, which BL9/BL10 asked for: caps and slots instead of flat percentages. **Decided (2026-10-29):**
+
+| Shop item | Effect | Levels | Cost curve (`ceil(base x growth^N)`) | Cost per level |
+|---|---|---|---|---|
+| **Idol Mastery** | +1 level cap on **all** Idols (one global item, not per Idol) | 5 (cap 5 -> 10) | base 10, x2.2 ("very steep") | 10, 22, 48, 106, 233 (419 total) |
+| **Master Craftsmen** | +1 level cap on Producers and Extractors, separate from the Idol cap | 3 (cap 5 -> 8) | base 10, x2.2 | 10, 22, 48 (80 total) |
+| **Extra Builder** | +1 parallel upgrade slot (castle and buildings) | 2 (1 -> 3 slots) | proposal: base 40, x2.2 (the slot is the strongest of the three) | 40, 88 (128 total) |
+
+  They are plain `EMBER_UPGRADES` entries (`maxLevel`, `baseCost`, `costGrowth`) whose effects register as `LIMIT_BONUSES` on `idolMaxLevel`, `buildingMaxLevel` and `builderSlots`, so no call site changes; the hard ceilings in the table above (10, 8, 3) keep every save valid. Pacing check: the first rebirth earns about 9 Embers and rebirth 5 about 40 or more (`REBIRTH.gain`: 3 x (castle - 5) x sqrt(tiles / 10)), so these roughly 630 Embers are a ten-rebirth-plus sink next to the six existing percent items (about 140 each to max); the first Idol Mastery level is affordable around the second rebirth and the first Extra Builder around the third to fifth. Re-check with `sim` once Embers are modelled per rebirth. Cap items must not be refundable or respeccable (Embers stay permanent, BL9).
 - T2 and T3 stock resets at rebirth; **T4 relics survive it** (decided 2026-10-29: boss-gated drops, [20](20-monster-families-and-rewards.md)).
 - The Dwarf Statue's build-time bonus is capped (above), so rebirth speed-ups cannot stack out of the 65-70 % run-2 target.
 
@@ -144,6 +152,8 @@ P0 key-list refactor and the registry; P1 new building model (one-per-type, per-
 - The merchant trades T0 and T1 only; T2-T4 are never sold. This overrides the earlier "tradable once discovered" plan in [12](12-rebirth-biomes.md).
 - Legacy buildings are removed with a server-granted refund (section 8).
 - One shared builder: the castle and all buildings share one upgrade queue (one timer runs at a time). Ember Master Builders and the Dwarf Statue shorten timers; extra builder slots can become an Ember shop item later (also adds a shape to BL9).
+
+**Decided (Ember shop, 2026-10-29):** Idol Mastery (global, +1 cap per level, 5 levels, base 10 x2.2), Master Craftsmen (+1 Producer/Extractor cap, 3 levels), Extra Builder (+1 parallel slot, 2 levels, proposal base 40); see section 6.
 
 **Still open:**
 0. The frontier bonus numbers (5 % per tile beyond 9, cap +100 %) and whether they should count the global distance offset of [12](12-rebirth-biomes.md); the castle-10 x5 on Extractors against the crafting pace.
