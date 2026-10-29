@@ -44,8 +44,14 @@ You still level past 100: the same lifetime XP keeps counting and each further l
 - **Leaderboard order**: level, then paragon level, then lifetime XP ([15](15-leaderboard-and-world-preview.md)). `player_stats` stores `xp` (or `level` + `paragon`), derived by the server from the save, never from the client.
 - Server: the XP model (`cloudSave/xpModel.ts`) already clamps XP; paragon level is a pure function of clamped XP, so the server can always recompute it. Display only until the bonuses are designed.
 
-## 6. Open questions
-1. Is `lootPity` reset by the wipe (proposal: yes) and is Pack Rat kept (proposal: yes)?
-2. Ship the wipe together with crafting, or earlier with a "sell all before rebirth" button?
-3. Paragon: points per level, the caps of each bonus, respec yes/no, and a paragon cap (proposal 1000)?
-4. Should the rebirth dialog show the +20 pool and the refund as a preview before confirming (recommended)?
+## 6. Decisions and open questions
+
+**Decided (2026-10-29):**
+- On the wipe, **loot pity resets and Pack Rat is kept** (it is a bag-size capacity, not items).
+- **Timing: the bag and gear wipe ships with crafting, not before.** Respec and the +20 point pool ship first, on their own.
+- **Paragon points buy small, capped, account-wide bonuses** (income, XP gain, Luck, offline efficiency, crafting luck); no attribute points; not wiped on rebirth.
+- **Rebirth dialog preview**: it shows the refunded attribute points, the +20 pool, exactly what is wiped, and a confirm that lists worn rare-or-better and set pieces.
+
+**Still open:**
+1. Paragon numbers: points per level, the cap of each bonus, respec yes/no, and a paragon cap (proposal 1000).
+2. A "sell all for gold before rebirth" button (cheap, softens the wipe even later).
