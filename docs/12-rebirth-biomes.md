@@ -14,7 +14,7 @@ Related: [02 mechanics](02-mechanics.md) (current biome rules), [11 server autho
 
 ## 2. The five biomes
 
-| Unlock | Biome *(name: proposal)* | Basic output | New T2 material | Min distance *(proposal)* |
+| Unlock | Biome *(name: proposal)* | Basic output | New T2 material | Min distance (base, + the global offset 12) |
 |---|---|---|---|---|
 | Rebirth 1 | **Jungle** | gold, **hide** | **Hardwood** | 10 |
 | Rebirth 2 | **Fields** (wheat, scarecrows, ravens) | gold, **eggs** | **Cloth** (flax) | 14 |
@@ -45,7 +45,7 @@ New fields in `BIOME_RULES` (names *proposal*):
 ```ts
 unlockAfterRebirths: { jungle: 1, fields: 2, orchard: 3, blight: 4, battlefield: 5 },
 minCastleDistance:   { jungle: 10, fields: 14, orchard: 18, blight: 22, battlefield: 22 },
-conflicts: [ ...existing, ['blight','lake'], ['blight','coast'], ['battlefield','swamp'] ],   // proposals
+conflicts: [ ...existing, ['blight','lake'], ['blight','coast'], ['blight','orchard'], ['battlefield','swamp'], ['jungle','tundra'] ],   // decided
 distanceWeights: {            // how the roll changes with Chebyshev distance d from the castle
   basicFadeFrom: 10, basicFadeTo: 30, basicFloor: 0.25,   // basic biome weight x1 up to 10, down to x0.25 at 30+
   newMaxWeight: 3, rampTiles: 8,                           // a new biome goes from 0 at its min distance to x3 over 8 tiles
@@ -64,7 +64,7 @@ A player can buy a straight line of tiles outward (about 10 tiles for the jungle
 - New tier `t2` in `catalog/resources.ts` (`RESOURCE_TIERS`), new keys `hardwood`, `cloth`, `honey`, `ichor`, `medals` *(proposal)*, drawn as one more boxed header group, **hidden until discovered**.
 - **Discovered** means "this account has owned at least one tile of that biome". Stored as a small optional list in the save core (`discovered: string[]`), checked by the server against the map on upload (a biome letter present in the land makes it legal). It survives rebirth (decision: yes, since the Guide and the merchant stay unlocked; *confirm*).
 - Merchant: sells and buys a T2 material only when discovered (UI and the store action; the server prices it once the merchant moves to the server, [ROADMAP](ROADMAP.md) item 4). Ichor and War Medals are crafting-only and **not sold** *(proposal)*; hardwood, cloth and honey sell above hide's price (hide 2): about 4, 4, 5 *(proposal)*.
-- Production: each new-biome tile adds the T2 rate (about 0.15-0.2/s as a first guess, one third of a T0 rate; the sim sets it) plus the basic outputs in the table. The adjacency bonus applies as for other biomes.
+- Production: each new-biome tile adds the T2 rate (**decided: 0.1/s, a third of a T0 tile's 0.3/s**) plus the basic outputs in the table. The adjacency bonus applies as for other biomes.
 - Rules from the roadmap's T2 checklist apply: key lists to touch together are `Resources`, `INITIAL_RESOURCES`, `BASE_GENERATION_RATES`, `CASTLE_BASE_RATES`, `zeroResources`, `sanitizeSave` `OPTIONAL_RESOURCES`, `offline/grant.ts`, `offline/ledger.ts` `zeroTotals`; at least two sources and one sink on day one (sources: tile, later kill drops; sinks: crafting, [17](17-crafting.md), plus the merchant); a "minutes to cover" line in the sim. Decide whether chests and offline income include T2 (`LIMITS`, `CHEST.bundle`): proposal, offline yes at the normal efficiency, chests no.
 - T2 materials reset on rebirth (as the roadmap proposed), except what the Ember shop later buys back.
 
@@ -116,6 +116,12 @@ Phases (each shippable): **P0** rules, config and dev tools with placeholder col
 - Discovery is permanent across rebirth (header slot, Guide entry); only the stock resets. **The map and its biomes reset on every rebirth, always** (a new map is rolled; only `discovered` and the Idol levels of [18](18-biome-buildings-and-material-tiers.md) persist).
 - The castle's area bonus (radius up to 4) can never reach these biomes (they start 10+ tiles out); see [18](18-biome-buildings-and-material-tiers.md) rule 7.
 
+**Decided in the detail round (2026-10-29):**
+- **Global distance offset +12.** Effective minimums: Jungle 22, Fields 26, Orchard 30, Blight 34, Battlefield 34 (the table above lists the base values). The biggest live map today is 339 tiles (radius about 9), so these are reachable only by 800+ tile maps or a deliberate expedition and are tested with the dev tools until art and balance land. The frontier bonus of [18](18-biome-buildings-and-material-tiers.md) counts the real distance from the castle, not the offset.
+- **Conflicts** (no biome may touch another in its 8-neighbourhood): the existing tundra/swamp, tundra/coast, hills/coast, plus **blight x lake, blight x coast, blight x orchard, battlefield x swamp, jungle x tundra**. Fields and orchard are mild neighbours of most land.
+- **T2 production 0.1/s per tile** (a third of T0).
+
 **Still open:**
-1. Exact offset value and when to remove it; the minimums (10/14/18/22) are still proposals to calibrate with the sim.
-2. Biome conflict list (blight vs lake/coast, battlefield vs swamp) and the per-biome T2 rates: to set with the sim.
+1. When to remove or lower the offset; the base minimums (10/14/18/22/22) calibrate with the sim once expedition play exists.
+2. The basic-output rates of each new biome (gold, hide, eggs, milk, coal, stone, wood) next to the T2 rate: set with the sim and the "minutes to cover" check.
+3. Which neighbouring biomes make a good natural *transition* for each new biome (a coast-like beach for the jungle, a farm fringe for fields) for the art, not the rules.
