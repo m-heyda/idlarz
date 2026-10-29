@@ -12,9 +12,9 @@ A late-game system: spend run materials to craft gear. Luck decides rarity, Inte
 - The merchant's **Quests / Gambling** tabs are placeholders; crafting gets its own overlay (header menu) rather than a merchant tab.
 
 ## 2. The loop
-1. Pick a **recipe** (a slot/base family and a tier), see its material cost and the odds panel (rarity chances at your Luck, item-level range at your crafting level).
+1. Pick a **slot and a tier** (decided: you do not pick the exact item; rarity and affixes are random, see the decisions below), see its material cost and the odds panel (rarity chances at your Luck, item-level range at your crafting level).
 2. **Craft** (basic): materials are spent, the server rolls the result, the item lands in the bag (full bag -> the usual overflow-to-gold rule). Crafting XP is awarded **only for crafting**.
-3. **Craft enchanted** (locked for now): costs Ichor ([12](12-rebirth-biomes.md)); rolls or improves affixes. The button is present and disabled with the reason ("Needs Ichor from the Blight").
+3. **Craft enchanted** (locked for now; decided shape): costs Ichor ([12](12-rebirth-biomes.md)) and, at higher tiers, a Corrupted Core; it **rerolls one chosen affix of an item, or adds one affix up to the rarity's maximum**. Intelligence gives a chance of one extra affix on it. The button is present and disabled with the reason ("Needs Ichor from the Blight").
 
 ### Stats
 | Stat | Effect on crafting |
@@ -37,11 +37,11 @@ Each recipe's cost is a few **minutes of income** at the matching tier (the rule
 
 ## 4. Crafting level and pacing (target: 1 month or more to max, never reset)
 - XP only from crafting: `xp = baseXp(tier) x (1 + 0.1 x min(rarityRank, 4))`, with a small bonus when the craft's item level is within 5 of the player's current tier ceiling (so crafting the highest unlocked tier is the best XP, but not by much).
-- Curve as anchors (same technique as `LEVELING.anchors`), **proposal for a daily active player**: level 10 after day 1, 30 after about 1 week, 60 after about 3 weeks, 80 after about 4-5 weeks, **100 after about 6 weeks**; faster than that only with the paragon-style bonuses later. The real durations come from a `scripts/craft-sim.ts` (new): a seeded bot that crafts the best affordable recipe each visit on top of the economy sim's per-day material income. The target is then enforced by tests like `fightBalance.test.ts`.
+- Curve as anchors (same technique as `LEVELING.anchors`), **decided target: about 10 weeks to level 100 for a daily active player** (was 6; slower for casual players, faster only with later paragon-style bonuses). Proposal for the anchors: level 10 after about 3 days, 30 after 3 weeks, 60 after 6 weeks, 80 after 8 weeks, **100 after about 10 weeks**. Because crafts are instant, the pace is set by the **material supply and the recipe cost** (the Extractors' output at the castle area/road bonuses, [18](18-biome-buildings-and-material-tiers.md)), not by a timer: the real durations come from a `scripts/craft-sim.ts` (new), a seeded bot that crafts the best affordable recipe each visit on top of the economy sim's per-day material income. The target is then enforced by tests like `fightBalance.test.ts`.
 - The level is character progression: **kept on rebirth**, shown with its own XP bar in the crafting overlay and a line in the Character window. It is stored on the server (section 5).
 
 ## 5. Server and data
-- **State**: `player_ledger.craft jsonb` `{ xp, ord, pity }` (additive nullable column, migration `crafting_ledger.sql`, applied before the deploy; rows without it are read as zeros, like `inv`). Crafting level is derived from `xp` (never stored independently).
+- **State**: `player_ledger.craft jsonb` `{ xp, ord, pity }` (pity is **per tier**, kept across rebirths) (additive nullable column, migration `crafting_ledger.sql`, applied before the deploy; rows without it are read as zeros, like `inv`). Crafting level is derived from `xp` (never stored independently).
 - **Request**: `POST /api/craft { key, recipeId, count (1-10) }`. The server checks the recipe, tier unlocked at the ledger's crafting level, and rolls with a seed `HMAC(LOOT_SECRET, userId / "craft" / ord)`. **`ord` is lifetime, not per run**: the per-run counters (`ord_chest`, `ord_kill`) restart with a rebirth under a new `run_id`; crafting must not, or every run would roll the same sequence. The result goes into the ledger bag through `receiveInto` like a chest item; the answer includes the new `inv` and `craft` state. The same key replays the same answer.
 - **Materials are the weak point.** Resources are still client-held (the economy is the browser's, [ROADMAP](ROADMAP.md) items 2 and 4), so the server cannot deduct them. First version, same trade-off as `buyShop`: the browser pays the materials, the server records the spend in `granted.spent` (a new total) and the save verifier counts it in the spending audit (`audit_ratio`), so a client that does not pay is flagged and unranked. The proper fix is the server-priced merchant / server-owned resources; crafting is a strong reason to schedule it, so mark it as the dependency for *enforced* crafting.
 - **Limits**: max 10 crafts per request, 1 request per second per player, the bag-full rule, and a daily craft count in the ledger purely as a guard (no gameplay cap).
@@ -53,8 +53,21 @@ Each recipe's cost is a few **minutes of income** at the matching tier (the rule
 - **Sell value**: crafted items sell for gold like others (`sellValueOf`); the craft cost must exceed the sell value of the average result, or crafting is a gold printer.
 - **Ichor/medals** do not exist before the Blight and Battlefield (rebirths 4 and 5), so "enhanced" crafting and the legendary tier are naturally late.
 
-## 7. Open questions
-1. Iron: add as a real material (a hills/Battlefield output) or use stone/coal as the metal stand-in?
-2. Should Intelligence also affect the *number* of affixes in basic crafts, or only magnitudes (proposed)?
-3. Crafting progression target: is "about 6 weeks for a daily player" the right reading of "1 month+ to craft top-tier legendaries"?
-4. Ship order: crafting before or together with the gear wipe ([13](13-rebirth-reset-and-paragon.md))? (Recommended: crafting first, or the same release.)
+## 7. Decisions and open questions
+
+**Decided (2026-10-29):**
+- **Intelligence** raises affix **quality** (magnitudes roll toward the top of their range) and, in the later enchanted craft, the chance of one extra affix. It does not touch rarity (Luck's job) or the affix count of a basic craft.
+- **Control in a basic craft:** the player picks the **slot and the tier**; rarity (Luck) and affixes (random, quality by Intelligence) are random. Not the exact base item.
+- **Enchanted craft** (needs Ichor, locked until the Blight exists): reroll one chosen affix or add one affix up to the rarity maximum.
+- **No failure:** every craft yields an item; bad luck is limited by a **pity counter per tier** (the `lootPity` pattern: each craft that misses the tier's top rarity raises the chance, a hit resets it; stored in `craft.pity`, never reset by a rebirth).
+- **Instant crafts** (batch up to 10 per request); the material supply is the limiter.
+- **Recipe costs are slot-themed extracts** (each Extractor has a use): weapons Iron Ore plus Sap or Venom, armor Salt and Dye or Scrap Steel, trinkets Pearls and Frostshard, potions and enchant prep Herbs, Spores and Royal Jelly; tiers scale the amounts and add T2 goods (Hardwood for handles and bows, Cloth for armor, Honey for potions) and T0/T1 goods early.
+- **Pacing target about 10 weeks to crafting level 100** for a daily player.
+- Iron is solved: Iron Ore comes from the Hills' Deep Mine ([18](18-biome-buildings-and-material-tiers.md)).
+- The gear wipe ships **with** crafting ([13](13-rebirth-reset-and-paragon.md)).
+
+**Still open:**
+1. The anchors, XP per craft by tier and rarity, and the exact amount of each extract per recipe (set with `craft-sim.ts` and the Extractor rates).
+2. The tier unlock levels (proposal: starter 1, steel 15, cloth/leather 30, obsidian 50, legendary bases 80+) once the ten new items exist ([17](17-crafting.md) content note).
+3. The rarity floor/ceiling per tier and the pity curve (per-miss bonus and cap).
+4. Whether crafted items carry a "crafted by" marker (flavor, and to tell them apart in the sell-junk filter).
