@@ -185,6 +185,8 @@ export interface Monster {
 	ticket?: number;
 	/** A lucky monster (decided by the server): golden, bigger reward */
 	lucky?: boolean;
+	/** Map lab only: id of a work-in-progress roster monster (catalog/monsters.ts) drawn in place of `type`'s art. Never saved or sent. */
+	art?: string;
 }
 
 export interface KillSummary {

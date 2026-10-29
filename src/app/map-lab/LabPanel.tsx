@@ -3,6 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { BIOMES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { biomeColor } from '@/config/biomePalette';
+import { MONSTER_CATALOG } from '@/catalog/monsters';
 import { castleLevelOf } from '@/lib/castleWard';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -29,6 +30,10 @@ const PRESETS: { id: LabPreset; label: string }[] = [
 	{ id: 'landmarks', label: 'Landmarks (6x6)' },
 ];
 
+/** Roster monsters with finished art that are not enabled in the game yet: previewed here, by biome */
+const WIP_MONSTERS = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
+const WIP_BIOMES = [...new Set(WIP_MONSTERS.map((m) => m.biomes[0] as string))];
+
 const btn =
 	'px-2 py-1 rounded border border-white/15 bg-white/5 hover:bg-white/15 text-xs text-left disabled:opacity-40 disabled:hover:bg-white/5';
 const active = 'border-amber-300 bg-amber-300/20';
@@ -46,7 +51,8 @@ const LabPanel: React.FC = () => {
 	const showMinimap = useUiStore((s) => s.showMinimap);
 	const [open, setOpen] = useState(true);
 	const [count, setCount] = useState(5);
-	const [message, setMessage] = useState('');
+	const [wipId, setWipId] = useState(WIP_MONSTERS[0].id);
+		const [message, setMessage] = useState('');
 	const fileRef = useRef<HTMLInputElement>(null);
 	const castleLevel = castleLevelOf(lab.tiles);
 	const tool = TOOLS.find((t) => t.id === lab.tool);
@@ -118,6 +124,23 @@ const LabPanel: React.FC = () => {
 					</Section>
 
 					<Section title='Spawn'>
+							<div className='flex gap-1'>
+								<select value={wipId} onChange={(e) => setWipId(e.target.value)} className='min-w-0 flex-1 rounded bg-white/10 px-1 py-1 text-xs'>
+									{WIP_BIOMES.map((biome) => (
+										<optgroup key={biome} label={BIOMES[biome]?.label ?? biome}>
+											{WIP_MONSTERS.filter((m) => m.biomes[0] === biome).map((m) => (
+												<option key={m.id} value={m.id} className='text-black'>
+													{m.grade === 'boss' ? '☠ ' : ''}
+													{m.label}
+												</option>
+											))}
+										</optgroup>
+									))}
+								</select>
+								<button className={btn} title='Place WIP monsters (art only) on their own biome' onClick={() => lab.spawnWip(wipId, count)}>
+									Spawn WIP
+								</button>
+							</div>
 						<label className='flex items-center gap-2 text-xs'>
 							Count
 							<input

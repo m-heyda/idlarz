@@ -6,7 +6,7 @@ import type { BiomeType } from '@/types/game';
  *
  * This is a roster, not a balance sheet. It carries no stats, rewards or loot. A monster only spawns when `enabled` is true, and then
  * it needs an entry in `MONSTERS` (config/combatConfig.ts) under the same id, which is where stats, spawn window and loot go. Today
- * only the rats are enabled; everything else is art that is ready and waiting for the monster rework (docs/20).
+ * only the rats are enabled; everything else is art that is ready and waiting for the monster rework (docs/20). On-map size of the art: `config/monsterArtSize.ts` (tuned in /map-lab, used by `MonsterSprite` for real game monsters too).
  */
 
 /** Biomes planned in docs/12 that are not in `BIOMES` yet (unlocked by rebirth). */
