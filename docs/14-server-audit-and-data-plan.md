@@ -68,6 +68,7 @@ Not secret either: the catalogs are in the client bundle by design. The secrets 
 |---|---|---|
 | `leaderboard_columns.sql` | `player_stats` + `xp numeric`, `paragon int`, `player_class text`, `trusted_at`; extend the public column grant; keep RLS (trusted rows only) | [15](15-leaderboard-and-world-preview.md) |
 | `crafting_ledger.sql` | `player_ledger.craft jsonb` nullable, no default | [17](17-crafting.md) |
+| `profiles_epoch.sql` | `profiles.epoch smallint not null default 0`, unique index on `lower(character_name)` (after a collision check), `avatar_id text` nullable | [21](21-classes-avatars-achievements-offline-report.md) (the reset when classes ship) |
 | `legacy_ledger.sql` | `player_ledger.legacy jsonb` nullable (Idol levels, cap upgrades) | [18](18-biome-buildings-and-material-tiers.md) |
 | `ledger_skip_noop_writes` (code, not SQL) | do not write the ledger when only the anchor changed | section 5 |
 | `public_world_rpc.sql` *(optional)* | `security definer` function returning biome letters of one player's map; or do it in a route with the service role (recommended, easier to rate-limit) | [15](15-leaderboard-and-world-preview.md) |

@@ -39,6 +39,7 @@ Suggested order: **[19](19-first-build-steps.md) A castle timers, then B resourc
 
 **Later features agreed in principle (drafts, see [21](21-classes-avatars-achievements-offline-report.md))**
 
+- **One-time progress reset when classes ship**: every player keeps account and **reserved name** (unique names enforced), picks class and avatar and replays the initial tutorial; old state is archived to `save_history` (pinned); an epoch column and `needsReset` gate make it repeatable ([21](21-classes-avatars-achievements-offline-report.md) section 6).
 - **Class bonuses**: classes stop being cosmetic and give small passives (one economy, one combat); avatars are separate (8 to choose, more unlocked by achievements).
 - **Server-based achievements** (a simple draft: catalog in code, table written only by the server, evaluated on requests it already handles) and a **Glossary** generated from the catalogs; both will be designed properly later.
 - **Offline report rework**: a bar of away time against the cap, a clear "capped, N h earned nothing" state with a Night Watch / Steward hint, also on the landing's Continue card.
