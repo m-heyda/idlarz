@@ -46,7 +46,10 @@ Each biome: 3-4 monsters and a boss, names and stats open ([12](12-rebirth-biome
 4. Offline: the "monsters that would have appeared" count uses the same tables.
 5. No SQL. Save: monster tickets are server-owned; the save only draws them, so old saves are unaffected.
 
-## 7. Decisions and open questions
+## 7. Monster UI rework (quick win, see the ROADMAP)
+Monsters grow in level on the map but look the same at every age. The first UI step needs no server change: a **blue frame and glow on the level badge at the maximum level**, a small **progress ring to the next level**, and a tooltip with "Level N of M, grows in X min". The same badge later carries the other states (boss skull, lucky gold, unknown black, [22](22-glossary-and-mastery.md)) and, once the reward model exists, a hint that a grown monster pays more.
+
+## 8. Decisions and open questions
 
 **Decided (2026-10-29):**
 - Reward shape: gold and XP = `min(rewardSec x income, cap) x levelMult^(level - refLevel)`.

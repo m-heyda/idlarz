@@ -27,7 +27,10 @@ Small account-level features that came out of the landing page and rankings work
 - Open for the real design: points, categories, hidden achievements, titles, seasonal ones.
 
 ## 4. Glossary (draft, later; ships after the tutorial)
-An in-game encyclopedia generated from the catalogs (biomes, monsters, materials and their tiers, items, buildings, Idols), with entries unlocked by discovery (`discovered` biomes already exist). **Monsters are revealed by kill counts per type** (from `stats.kills`, section 3): the first kill reveals the name and portrait, further thresholds reveal its stats, then its drops and rewards, then its lore and boss taunts (proposal: 1, 10, 50, 200 kills). Because the catalogs are data, the glossary is data too: no hand-written page per item. The **guided tutorial ships first** (decided); the glossary follows with the biomes and crafting and reuses the same catalog entries. The guided tutorial later links into it.
+
+> **The full glossary design (unknown black monsters, kill-count reveals, mastery rewards) is in [22](22-glossary-and-mastery.md); the reveal thresholds below are superseded by it (every 100 kills reveals a layer).**
+
+An in-game encyclopedia generated from the catalogs (biomes, monsters, materials and their tiers, items, buildings, Idols), with entries unlocked by discovery (`discovered` biomes already exist). **Monsters are revealed by kill counts per type** (from `stats.kills`, section 3): the first kill reveals the name and portrait, further thresholds reveal its stats, then its drops and rewards, then its lore and boss taunts (superseded by [22](22-glossary-and-mastery.md): 100 / 200 / 300 / 400 kills). Because the catalogs are data, the glossary is data too: no hand-written page per item. The **guided tutorial ships first** (decided); the glossary follows with the biomes and crafting and reuses the same catalog entries. The guided tutorial later links into it.
 
 ## 5. Offline report rework (decided direction)
 - **Today:** `OfflineDialog` (welcome-back window) shows what the away time paid; the cap is 8 h plus Night Watch and the efficiency 50 % plus Steward ([11](11-server-authority.md)).
