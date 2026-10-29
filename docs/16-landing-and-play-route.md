@@ -42,6 +42,7 @@ Each step is deployable alone. Risk to check: the cookie `sameSite: 'lax'` + red
 - **Name: IDLE REALM.** The banner spells a big **IDLE** in hills tiles (all straight strokes: I, D, L, E), with **REALM** smaller underneath. The name lives in one constant (`config/branding.ts`: `GAME_TITLE`, used by `layout.tsx` metadata, the landing, the Guide and the README; today's metadata still says "Idle Explorer"), so a rename is a one-line change plus a re-bake of the landing strip.
 - **Signed in at `/`:** the landing with a **Continue** button, plus a small **character card**: name, avatar, class, level and Paragon, rebirths, and a **bar of the time away against the offline cap** (read-only, never claims; [21](21-classes-avatars-achievements-offline-report.md) section 5). The data comes from one extended `/api/auth/me` answer (profile plus the `player_stats` row plus the ledger anchor and the cap), so the landing costs at most two small reads for a signed-in visitor and none for a guest.
 - Password reset on, email confirmation off for now; avatars and classes separate (section 4).
+- **Landing scroll: only the seven current biomes** (hills at the start, then plains, forest, lake, coast, swamp, tundra); the baked strip is re-made when the rebirth biomes ship. Tone: cozy-adventurous.
 
 **Still open:**
 1. Final wording of the feature cards and the order of the biomes in the scroll.

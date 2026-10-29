@@ -37,5 +37,5 @@ Goal: a read-only look at another player's world: biomes and castle only, in a c
 - **Trusted players are listed by default, with an opt-out `listed` switch** in Settings. A player who is not listed has no ranking row and **cannot be previewed**; the preview route checks `listed` and `trusted`.
 
 **Still open:**
-1. Re-trust testers (their saves are `freshStart = false` / imported) or keep rankings for new accounts only?
+1. ~~Re-trust testers?~~ **Moot (decided by the plan):** the class-release reset ([21](21-classes-avatars-achievements-offline-report.md) section 6) deletes every save, so every game is fresh and `freshStart` is true for all; rankings start empty with everyone eligible.
 2. Add the lazy daily snapshot with the first migration (recommended: one row per player and day written inside the same save RPC, 30-day retention), or later?
