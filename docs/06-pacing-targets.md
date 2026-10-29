@@ -9,7 +9,7 @@ What pace the economy is tuned for, why, and how to check it. The measured numbe
 | First ~100 tiles | easy: hours for an active bot, between a day and a half and two days for the `human` profile (the four free start tiles make the first hours a little slower than the old 3x3 start) |
 | 200-300 tiles | a 2-3 day project |
 | After 300 tiles | clearly steeper (`(n/300)^4.5` tail, [03 §1](03-formulas-and-scaling.md#1-tile-cost)); a map of tens of thousands of tiles stays buyable |
-| First Rebirth (castle 6 + 100 tiles) | available around day 5-7 for a person who checks in a few times a day |
+| First Rebirth (castle 6 + 100 tiles) | available around day 5-7 for a person who checks in a few times a day (**to become about day 4-6** when the shorter castle timers and cheaper early castle costs of [19](19-first-build-steps.md) ship; the sim measured 4.6 d for the `human` profile) |
 | Every later run | faster than the run before it (castle 6 again in roughly 60-70 % of the first run), flattening after the third run because the castle timers bound it |
 | Level 80 / 100 | about the 3rd / 10th rebirth (the level curve is lifetime and carries over a rebirth, [03 §2](03-formulas-and-scaling.md#2-xp-and-levels)) |
 | First 10 minutes | first tile at about a minute, first animal before the first castle upgrade |
