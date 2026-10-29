@@ -13,6 +13,7 @@ export * from './loot';
 export * from './affixes';
 export * from './lootConfig';
 export * from './monsters';
+export * from './resourceArt';
 export type { SetDef } from './sets';
 
 // No prototype: `ITEM_CATALOG['constructor']` must be undefined, or a forged save could name an item that is not one

@@ -152,7 +152,7 @@ export const RESOURCES = {
 		description: 'The rebirth currency: what a rebirth leaves behind.',
 		usedFor: 'Permanent upgrades in the Ember shop; they survive every rebirth, and every Ember adds to your income.',
 		source: 'Rebirthing from castle level 6: the higher your castle and land, the more you get.',
-		color: '#6ae88a',
+		color: '#ffb04a',
 	},
 } as const satisfies Record<string, ResourceDef>;
 

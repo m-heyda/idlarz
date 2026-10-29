@@ -37,6 +37,7 @@ import sprites_monsters  # noqa: E402
 import sprites_meadow  # noqa: E402
 import sprites_props  # noqa: E402
 import sprites_resources  # noqa: E402
+import sprites_resource_art  # noqa: E402
 import sprites_sheet  # noqa: E402
 import terrain_art  # noqa: E402
 import terrain_build  # noqa: E402
@@ -73,6 +74,8 @@ SPRITES = {
     **sprites_water.SPRITES,
     **sprites_monsters.SPRITES,
     **sprites_gear.SPRITES,
+    # supplied resource art (public/pixel/resources/) wins over the procedural and sheet versions above
+    **sprites_resource_art.SPRITES,
 }
 
 UI = {

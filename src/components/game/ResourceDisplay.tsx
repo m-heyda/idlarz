@@ -10,7 +10,7 @@ import PixelIcon from './PixelIcon';
 import StableNumber from './StableNumber';
 import HeaderTip from './HeaderTip';
 
-const ICON_SCALE = 0.5; // the 40px sprites drawn at 20px
+const ICON_SCALE = 0.6; // the 40px sprites drawn at 24px
 /** Room for the longest ordinary amount ("12.3K") at the small header size, so a chip keeps its width while its number ticks */
 const AMOUNT_SLOT = '2.8em';
 
