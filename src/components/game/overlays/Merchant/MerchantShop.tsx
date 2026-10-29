@@ -5,7 +5,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { ITEM_CATALOG } from '@/config/itemCatalog';
 import { averageItemLevel } from '@/lib/inventory';
 import { resolveItem } from '@/lib/itemInstance';
-import { refreshCost, secondsToRotation, shelfCells, shopPriceOf } from '@/lib/merchant';
+import { freeRefreshesLeft, refreshCooldown, refreshCost, secondsToRotation, shelfCells, shopPriceOf } from '@/lib/merchant';
 import { MERCHANT_GOODS, MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, MERCHANT_UPGRADE_GROUPS, type MerchantUpgradeId } from '@/config/gameConfig';
 import type { Box } from '@/lib/tipPlacement';
 import type { ItemInstance } from '@/types/game';
@@ -140,7 +140,10 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 	const buyItem = useGameStore((state) => state.buyItem);
 	const refresh = useGameStore((state) => state.refreshMerchantStock);
 	const showToast = useUiStore((state) => state.showToast);
-	const cost = refreshCost(refreshes);
+	const refreshState = useGameStore((state) => state.merchantRefresh);
+	const freeLeft = freeRefreshesLeft(refreshState, playSeconds);
+	const wait = refreshCooldown(refreshState, playSeconds);
+	const cost = freeLeft > 0 ? 0 : refreshCost(refreshes);
 	const left = stock ? secondsToRotation(stock, playSeconds) : 0;
 	const cells = shelfCells(stock, MERCHANT_SHOP_ITEMS.map(({ id }) => id));
 	// the cells stand on planks, SHELF_SLOTS to a plank
@@ -190,13 +193,21 @@ export const MerchantGoods: React.FC<BoughtProps> = ({ onBought }) => {
 					<span className='text-xs text-[#a89878]'>New goods in {formatTime(left)}</span>
 					<button
 						className='px-btn px-btn-sm'
-						disabled={gold < cost}
-						title='Shuffle the shelf now'
+						disabled={gold < cost || wait > 0}
+						title={`Shuffle the shelf now. ${MERCHANT_GOODS.refresh.freePerWindow} refreshes are free every ${MERCHANT_GOODS.refresh.windowSec / 3600} hours of play, then each one costs double the last; ${MERCHANT_GOODS.refresh.cooldownSec} s between refreshes.`}
 						onClick={() => {
 							if (refresh()) onBought('a new shelf of goods', cost);
 						}}>
 						<span className='inline-flex items-center gap-1'>
-							Refresh {formatNumber(cost)} <ResourceIcon resource='gold' />
+							{wait > 0 ? (
+								`Wait ${formatTime(wait)}`
+							) : freeLeft > 0 ? (
+								`Refresh free (${freeLeft} left)`
+							) : (
+								<>
+									Refresh {formatNumber(cost)} <ResourceIcon resource='gold' />
+								</>
+							)}
 						</span>
 					</button>
 				</div>

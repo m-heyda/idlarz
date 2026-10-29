@@ -152,10 +152,24 @@ test('the shop: cost curve, max level, not enough points, validated ids', () => 
 	assert.ok(emberUpgradeCost('thrift', 5) > emberUpgradeCost('thrift', 0));
 });
 
+test('each rebirth needs more tiles, and tiles above the requirement pay extra Embers', () => {
+	assert.equal(REBIRTH.tilesNeeded(0), REBIRTH.minTiles);
+	assert.equal(REBIRTH.tilesNeeded(3), REBIRTH.minTiles + 3 * REBIRTH.tilesPerRebirth);
+	const need = REBIRTH.tilesNeeded(2);
+	assert.ok(REBIRTH.gain(8, need + 100, 2) > REBIRTH.gain(8, need, 2));
+	freshGame();
+	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 1, legacyEarned: 1 } }));
+	setCastleLevel(REBIRTH.minCastleLevel);
+	growTo(REBIRTH.minTiles);
+	assert.equal(rebirthStatus(api()).canRebirth, false, 'the second rebirth needs more than the first');
+	growTo(REBIRTH.tilesNeeded(1));
+	assert.equal(rebirthStatus(api()).canRebirth, true);
+});
+
 test('shop effects: thrift, master builders, click mastery, provisions', () => {
 	freshGame();
 	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 500, legacyEarned: 500 } }));
-	growTo(REBIRTH.minTiles);
+	growTo(REBIRTH.tilesNeeded(1));
 	const tileBefore = calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, api().prestige)).gold;
 	const buildingBefore = calculateBuildingCost(api().tiles, api().prestige).gold!;
 	const durationBefore = castleUpgradeDuration(1, api().prestige);

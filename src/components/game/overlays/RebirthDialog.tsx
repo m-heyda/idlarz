@@ -44,9 +44,10 @@ const RebirthDialog: React.FC = () => {
 
 	const ownedTiles = economyTiles(tiles, freeTiles); // purchases + 1: the free starting tiles do not count
 	const castleLevel = castleLevelOf(tiles);
-	const gain = emberGain(castleLevel, ownedTiles, merchantUpgrades);
+	const tilesNeeded = REBIRTH.tilesNeeded(prestige.rebirths);
+	const gain = emberGain(castleLevel, ownedTiles, merchantUpgrades, prestige.rebirths);
 	const levelOk = castleLevel >= REBIRTH.minCastleLevel;
-	const tilesOk = ownedTiles >= REBIRTH.minTiles;
+	const tilesOk = ownedTiles >= tilesNeeded;
 	const idleOk = !castleUpgrade;
 	const canRebirth = levelOk && tilesOk && idleOk && gain >= 1;
 
@@ -113,7 +114,7 @@ const RebirthDialog: React.FC = () => {
 					</p>
 					<div className='mb-3'>
 						<Check ok={levelOk}>Castle level {REBIRTH.minCastleLevel}+ (now {castleLevel})</Check>
-						<Check ok={tilesOk}>At least {REBIRTH.minTiles} tiles (now {formatHeaderAmount(ownedTiles)})</Check>
+						<Check ok={tilesOk}>At least {tilesNeeded} tiles (now {formatHeaderAmount(ownedTiles)})</Check>
 						<Check ok={idleOk}>No castle upgrade in progress</Check>
 					</div>
 					<div className='text-xs text-[#a89878] mb-2'>

@@ -868,8 +868,8 @@ export const startingResources = (prestige: PrestigeState | undefined): Resource
 };
 
 /** Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus. */
-export const emberGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades): number =>
-	Math.floor(REBIRTH.gain(castleLevel, tiles) * (1 + merchantEffect(merchant, 'tithe')));
+export const emberGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades, rebirths = 0): number =>
+	Math.floor(REBIRTH.gain(castleLevel, tiles, rebirths) * (1 + merchantEffect(merchant, 'tithe')));
 
 export interface RebirthRequirement {
 	id: 'castle' | 'tiles' | 'idle';
@@ -895,12 +895,13 @@ export interface RebirthStatus {
  * all read this one function, so what the tooltip promises is what the action checks.
  */
 export const rebirthStatus = (
-	state: Pick<GameState, 'tiles' | 'freeTiles' | 'castleUpgrade' | 'merchantUpgrades'>
+	state: Pick<GameState, 'tiles' | 'freeTiles' | 'castleUpgrade' | 'merchantUpgrades' | 'prestige'>
 ): RebirthStatus => {
 	const castleTile = getTile(state.tiles, CASTLE_X, CASTLE_Y);
 	const castleLevel = castleTile && castleTile.biome === 'castle' ? castleTile.level ?? 1 : 0; // 0: no castle (lost)
 	const ownedTiles = economyTiles(state.tiles, state.freeTiles);
-	const gain = emberGain(castleLevel, ownedTiles, state.merchantUpgrades);
+	const tilesNeeded = REBIRTH.tilesNeeded(state.prestige.rebirths);
+	const gain = emberGain(castleLevel, ownedTiles, state.merchantUpgrades, state.prestige.rebirths);
 	const idle = !state.castleUpgrade;
 	const requirements: RebirthRequirement[] = [
 		{
@@ -912,10 +913,10 @@ export const rebirthStatus = (
 		},
 		{
 			id: 'tiles',
-			label: `${REBIRTH.minTiles} tiles`,
+			label: `${tilesNeeded} tiles`,
 			current: ownedTiles,
-			needed: REBIRTH.minTiles,
-			met: ownedTiles >= REBIRTH.minTiles,
+			needed: tilesNeeded,
+			met: ownedTiles >= tilesNeeded,
 		},
 		{ id: 'idle', label: 'No castle upgrade in progress', current: idle ? 1 : 0, needed: 1, met: idle },
 	];

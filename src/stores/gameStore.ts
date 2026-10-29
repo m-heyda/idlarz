@@ -70,7 +70,7 @@ import { writeCursor } from '@/lib/combatCursor';
 import { emitCombat } from '@/lib/combatFx';
 import type { SkillId } from '@/catalog/skills';
 import type { LimitContext } from '@/lib/limits';
-import { generateMerchantStock, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
+import { afterRefresh, freeRefreshesLeft, generateMerchantStock, refreshCooldown, refreshCost, rotationRng, shopPriceOf, stockDue } from '@/lib/merchant';
 import { emitSaveEvent, withSaveEvents } from '@/lib/saveEvents';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { addDrop, aggregateStats, averageItemLevel, equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
@@ -99,6 +99,7 @@ import type {
 	Equipment,
 	EquipmentSlot,
 	GameState,
+	MerchantRefresh,
 	MerchantStock,
 	Monster,
 	PrestigeState,
@@ -181,6 +182,7 @@ const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, random: () 
 		merchantUpgrades: {} as Record<string, number>,
 		merchantStock: null as MerchantStock | null,
 		merchantRefreshes: 0,
+		merchantRefresh: { windowAt: 0, freeUsed: 0, lastAt: 0 } as MerchantRefresh,
 		isHydrated: false,
 		freeTiles: STARTER_FREE_TILES,
 		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
@@ -553,6 +555,8 @@ const createGameSlice = (
 				lootPity: state.lootPity,
 				autoSellUpTo: state.autoSellUpTo,
 				merchantUpgrades,
+				merchantRefreshes: state.merchantRefreshes, // the refresh price and the free window are not reset by a rebirth
+				merchantRefresh: state.merchantRefresh,
 				playerHp: maxHp(characterStats, state.equipment),
 				playerMp: maxMana(characterStats, state.equipment),
 				playerName: state.playerName,
@@ -1218,12 +1222,15 @@ const createGameSlice = (
 		refreshMerchantStock: () => {
 			const state = get();
 			const castle = castleLevelOf(state.tiles);
-			const cost = refreshCost(state.merchantRefreshes, limitCtx(state));
+			if (refreshCooldown(state.merchantRefresh, state.playSeconds) > 0) return false;
+			const free = freeRefreshesLeft(state.merchantRefresh, state.playSeconds) > 0;
+			const cost = free ? 0 : refreshCost(state.merchantRefreshes, limitCtx(state));
 			if (state.resources.gold < cost) return false;
 			set({
 				resources: { ...state.resources, gold: state.resources.gold - cost },
 				merchantStock: generateMerchantStock(castle, averageItemLevel(state.equipment), Math.random, state.playSeconds, limitCtx(state)),
-				merchantRefreshes: state.merchantRefreshes + 1,
+				merchantRefreshes: state.merchantRefreshes + (free ? 0 : 1),
+				merchantRefresh: afterRefresh(state.merchantRefresh, state.playSeconds, free),
 			});
 			emitSaveEvent('refreshMerchantStock');
 			return true;
