@@ -152,3 +152,13 @@ npm run build && npm run lint
 npm test         # node:test over tests/**/*.test.ts
 npm run docs:gen # regenerate everything in docs/generated (report, sim, catalog-report, fight-sim, loot-sim)
 ```
+
+## Map lab (`/map-lab`)
+
+A public, client-only page to look at and tweak the art. It renders the real map components (`Grid`, `Tile`, terrain, minimap) over a simulated world: no login, no `/api/*` call, nothing saved. The panel offers biome painting, extending land, erasing, chests and monsters (by hand or random spawns), brush size, castle level, presets (start ring, rolled 60 / 400, every biome), undo (Ctrl+Z) and JSON export / import (a lab file, not a game save).
+
+- `components/game/mapSource.tsx`: the map components read their store from this context. The game gets the real `useGameStore` / `useViewStore` by default; the lab provides `stores/labStore.ts` and its own view store (`createViewStore` in `stores/viewStore.ts`).
+- `lib/dragPaint.ts` (pure): hold-and-drag drawing. `createStroke(apply)` turns pointer moves into the new cells of one stroke (line interpolation, brush, no repeats, capped). `Grid` feeds it the pointer's tiles while the main button is held and keeps the map from panning meanwhile (the middle button still pans).
+- `lib/mapEdit.ts` (pure): `applyStroke(world, cells, tool)` plus the tools (`paintTool`, `extendTool`, `eraseTool`, `chestTool`, `extendRing`). A new tool (a road, say) is one more `(world, cell) => Tile | undefined | 'skip'` function; the real game can reuse both files with its own tools and rules.
+- The lab's random chests use a plain picker on purpose: the game's weighted chest placement stays server-side (`tests/serverBoundary.test.ts`).
+

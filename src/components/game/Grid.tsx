@@ -6,11 +6,11 @@ import React, {
 	useMemo,
 	JSX,
 } from 'react';
-import { useGameStore } from '@/stores/gameStore';
-import { CASTLE_FORTRESS, CASTLE_RANGE } from '@/config/gameConfig';
+import { CASTLE_FORTRESS, CASTLE_RANGE, TILE_SIZE } from '@/config/gameConfig';
 import { castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import { visibleTileRange } from '@/lib/mapView';
-import { useViewStore } from '@/stores/viewStore';
+import { pointerToTile } from '@/lib/dragPaint';
+import { useMapSource } from './mapSource';
 import { calculateTileCost, canAffordBundle, economyTiles, effectiveTileDiscount, tileCostAsResources } from '@/utils/gameUtils';
 import { getTile, hasOwnedNeighbour } from '@/utils/world';
 import Tile from './Tile';
@@ -46,11 +46,12 @@ const WHEEL_STEP_PX = 50; // accumulated wheel delta needed for one zoom step
 const WHEEL_LOCKOUT_MS = 140; // swallow trackpad inertia after a step
 
 const Grid: React.FC = () => {
-	const tiles = useGameStore((state) => state.tiles);
+	const { game, view, drag } = useMapSource();
+	const tiles = game((state) => state.tiles);
 	const castleLevel = castleLevelOf(tiles);
 	const rangeRadius = castleRangeRadius(castleLevel);
 	// whether the next tile can be paid: the price is the same for every tile that can be bought, so it is worked out once here
-	const canAffordNext = useGameStore((state) =>
+	const canAffordNext = game((state) =>
 		canAffordBundle(
 			state.resources,
 			tileCostAsResources(
@@ -59,18 +60,19 @@ const Grid: React.FC = () => {
 		)
 	);
 	const gridRef = useRef<HTMLDivElement>(null);
-	const { x: viewX, y: viewY, zoom, w: windowW, h: windowH } = useViewStore();
+	const { x: viewX, y: viewY, zoom, w: windowW, h: windowH } = view();
 	const velocityRef = useRef<Velocity>({ x: 0, y: 0 });
 	const [isDragging, setIsDragging] = useState(false);
 	const [lastMousePos, setLastMousePos] = useState<Position | null>(null);
 	const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
 	const animationFrameRef = useRef<number | null>(null);
 	const wheelAccRef = useRef({ delta: 0, lockedUntil: 0 });
+	const strokingRef = useRef(false);
 
 	useEffect(() => {
-		const updateWindowSize = () => useViewStore.getState().setSize(window.innerWidth, window.innerHeight);
+		const updateWindowSize = () => view.getState().setSize(window.innerWidth, window.innerHeight);
 		updateWindowSize();
-		useViewStore.getState().centerOnCastle();
+		view.getState().centerOnCastle();
 		window.addEventListener('resize', updateWindowSize);
 		return () => {
 			window.removeEventListener('resize', updateWindowSize);
@@ -78,17 +80,17 @@ const Grid: React.FC = () => {
 				cancelAnimationFrame(animationFrameRef.current);
 			}
 		};
-	}, []);
+	}, [view]);
 
 	// the explored land changed (a purchase at the edge, rebirth, reset, load): the view may no longer be allowed
 	useEffect(() => {
-		useViewStore.getState().reclamp();
-	}, [tiles.bounds]);
+		view.getState().reclamp();
+	}, [tiles.bounds, view]);
 
 	const pan = useCallback((dx: number, dy: number) => {
-		const v = useViewStore.getState();
+		const v = view.getState();
 		v.setPosition({ x: v.x + dx, y: v.y + dy });
-	}, []);
+	}, [view]);
 
 	// Wheel zoom around the cursor. Native listener: React's onWheel is passive and cannot stop the page zooming.
 	useEffect(() => {
@@ -105,34 +107,50 @@ const Grid: React.FC = () => {
 			acc.delta = 0;
 			acc.lockedUntil = now + WHEEL_LOCKOUT_MS;
 
-			const from = useViewStore.getState().zoom;
+			const from = view.getState().zoom;
 			const idx = ZOOM_LEVELS.indexOf(from);
 			const base = idx === -1 ? ZOOM_LEVELS.findIndex((l) => l >= from) : idx;
 			const next = ZOOM_LEVELS[Math.max(0, Math.min(ZOOM_LEVELS.length - 1, (base === -1 ? ZOOM_LEVELS.length - 1 : base) + dir))];
 			if (next === from) return;
 
 			velocityRef.current = { x: 0, y: 0 };
-			useViewStore.getState().setZoom(next, { x: e.clientX, y: e.clientY });
+			view.getState().setZoom(next, { x: e.clientX, y: e.clientY });
 		};
 		el.addEventListener('wheel', onWheel, { passive: false });
 		return () => el.removeEventListener('wheel', onWheel);
-	}, []);
+	}, [view]);
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent | React.TouchEvent) => {
-			// only the main button pans: a right press belongs to the context menu
-			if ('button' in e && e.button !== 0) return;
+			// only the main (and the middle) button pans: a right press belongs to the context menu
+			const middle = 'button' in e && e.button === 1;
+			if ('button' in e && e.button !== 0 && !middle) return;
 			e.preventDefault();
 			const pos = 'touches' in e ? e.touches[0] : e;
+			// a drawing tool owns the main button: the map holds still and the pointer's tiles go to the stroke
+			if (drag && !middle) {
+				velocityRef.current = { x: 0, y: 0 };
+				const t = pointerToTile(pos.clientX, pos.clientY, view.getState(), TILE_SIZE);
+				strokingRef.current = true;
+				drag.begin(t.x, t.y);
+				return;
+			}
 			setIsDragging(true);
 			setLastMousePos({ x: pos.clientX, y: pos.clientY });
 			velocityRef.current = { x: 0, y: 0 };
 		},
-		[]
+		[drag, view]
 	);
 
 	const handleMouseMove = useCallback(
 		(e: React.MouseEvent | React.TouchEvent) => {
+			if (strokingRef.current && drag) {
+				e.preventDefault();
+				const pos = 'touches' in e ? e.touches[0] : e;
+				const t = pointerToTile(pos.clientX, pos.clientY, view.getState(), TILE_SIZE);
+				drag.move(t.x, t.y);
+				return;
+			}
 			if (!isDragging || !lastMousePos) return;
 			e.preventDefault();
 
@@ -154,16 +172,20 @@ const Grid: React.FC = () => {
 			setLastMousePos({ x: pos.clientX, y: pos.clientY });
 			setLastUpdateTime(currentTime);
 		},
-		[isDragging, lastMousePos, lastUpdateTime, pan]
+		[isDragging, lastMousePos, lastUpdateTime, pan, drag, view]
 	);
 
 	const handleMouseUp = useCallback(() => {
+		if (strokingRef.current) {
+			strokingRef.current = false;
+			drag?.end();
+		}
 		setIsDragging(false);
 		setLastMousePos(null);
 		if (performance.now() - lastUpdateTime > FLING_MAX_IDLE_MS) {
 			velocityRef.current = { x: 0, y: 0 };
 		}
-	}, [lastUpdateTime]);
+	}, [lastUpdateTime, drag]);
 
 	const animate = useCallback(() => {
 		const vel = velocityRef.current;

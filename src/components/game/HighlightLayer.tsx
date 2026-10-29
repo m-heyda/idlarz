@@ -3,8 +3,8 @@ import { TILE_SIZE } from '@/config/gameConfig';
 import { highlightColor } from '@/config/biomePalette';
 import { visibleTileRange } from '@/lib/mapView';
 import { useUiStore, HIGHLIGHT_MS } from '@/stores/uiStore';
-import { useViewStore } from '@/stores/viewStore';
 import { tileKey } from '@/utils/world';
+import { useMapView } from './mapSource';
 
 const FADE_IN_MS = 150;
 const FADE_OUT_MS = 500;
@@ -16,9 +16,10 @@ const PULSE_MS = 1100;
  * costs the same for a 20-tile area as for a 20,000-tile one: only the tiles on screen are looked at.
  */
 const HighlightLayer: React.FC = () => {
+	const viewStore = useMapView();
 	const highlight = useUiStore((state) => state.highlight);
-	const w = useViewStore((state) => state.w);
-	const h = useViewStore((state) => state.h);
+	const w = viewStore((state) => state.w);
+	const h = viewStore((state) => state.h);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
 	useEffect(() => {
@@ -44,7 +45,7 @@ const HighlightLayer: React.FC = () => {
 			const pulse = reduced ? 0.5 : 0.5 + 0.5 * Math.sin((elapsed / PULSE_MS) * Math.PI * 2);
 			const alpha = (0.34 + 0.2 * pulse) * fade;
 
-			const view = useViewStore.getState();
+			const view = viewStore.getState();
 			const size = { w: view.w, h: view.h };
 			const range = visibleTileRange({ x: view.x, y: view.y }, view.zoom, size, 1);
 			const tilePx = TILE_SIZE * view.zoom;
@@ -68,7 +69,7 @@ const HighlightLayer: React.FC = () => {
 			cancelAnimationFrame(raf);
 			clear();
 		};
-	}, [highlight]);
+	}, [highlight, viewStore]);
 
 	return <canvas ref={canvasRef} className='highlight-layer' width={w} height={h} aria-hidden />;
 };

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useGameStore } from '@/stores/gameStore';
 import { CHUNK_TILES, chunkOf, chunkSignature } from '@/utils/terrain';
 import { ownedBounds, type World } from '@/utils/world';
 import { CHUNK_CANVAS_PX, CHUNK_PX, drawChunk, drawChunkFlat, loadTerrainAssets, scheduleDraw, type TerrainAssets } from '@/lib/terrainRenderer';
+import { useMapGame } from './mapSource';
 
 /**
  * The map's ground: one canvas per chunk of CHUNK_TILES x CHUNK_TILES tiles, behind the tiles (see terrainRenderer.ts), and
@@ -69,7 +69,8 @@ const TerrainChunk: React.FC<ChunkProps> = React.memo(({ cx, cy, tiles, assets }
 TerrainChunk.displayName = 'TerrainChunk';
 
 const TerrainLayer: React.FC<TerrainLayerProps> = React.memo(({ minX, maxX, minY, maxY }) => {
-	const tiles = useGameStore((state) => state.tiles);
+	const game = useMapGame();
+	const tiles = game((state) => state.tiles);
 	const [assets, setAssets] = useState<TerrainAssets | null>(null);
 
 	useEffect(() => {
