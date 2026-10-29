@@ -25,6 +25,7 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 | [20-monster-families-and-rewards.md](20-monster-families-and-rewards.md) | *Draft.* Monster families per biome, capped absolute rewards scaled by level, goods and tiered drops, spawn pressure |
 | [21-classes-avatars-achievements-offline-report.md](21-classes-avatars-achievements-offline-report.md) | *Draft.* Class bonuses, separate avatars, achievements and glossary sketches, offline report bar |
 | [22-glossary-and-mastery.md](22-glossary-and-mastery.md) | *Draft.* Unknown monsters, glossary tabs, kill-count reveals, monster and resource mastery |
+| [RELEASE-PLAN.md](RELEASE-PLAN.md) | *Proposal.* Phases P0-P13 in release order, triage of the roadmap's bug and balance tables, landing v1 to v2, asset plan, decisions needed |
 | [ROADMAP.md](ROADMAP.md) | Open work: known issues, balance backlog, the building rework, server migration, planned features |
 | [generated/](generated/) | Auto-generated: `balance-tables.md`, `sim-milestones.md`, `item-catalog.md`, `loot-sim.md`, `fight-sim.md` |
 
