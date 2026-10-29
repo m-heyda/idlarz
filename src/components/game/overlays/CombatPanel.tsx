@@ -131,8 +131,8 @@ const FightResult: React.FC<{ notice: CombatNotice }> = ({ notice }) => {
 	);
 };
 
-/** On the fight stage a roster picture is drawn this many times its map size (the rats' sheets are drawn at scale 4 / 3) */
-const STAGE_ART_FACTOR = 3;
+/** On the fight stage a roster picture is drawn this many times its map size, so it fits the compact window (the rats' sheets are drawn at scale 4 / 3) */
+const STAGE_ART_FACTOR = 2.6;
 
 export interface CombatPanelProps {
 	/** The monster the window is about; `art` (a roster id, map lab / future monsters) draws its still picture instead of the rat sheet */

@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { BIOMES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { biomeColor } from '@/config/biomePalette';
 import PixelIcon from '@/components/game/PixelIcon';
-import CombatPreview, { WIP_MONSTERS } from './CombatPreview';
+import { WIP_MONSTERS } from './CombatPreview';
 import { castleLevelOf } from '@/lib/castleWard';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -51,7 +51,6 @@ const LabPanel: React.FC = () => {
 	const [open, setOpen] = useState(true);
 	const [count, setCount] = useState(5);
 	const [wipId, setWipId] = useState(WIP_MONSTERS[0].id);
-	const [previewOpen, setPreviewOpen] = useState(false);
 		const [message, setMessage] = useState('');
 	const fileRef = useRef<HTMLInputElement>(null);
 	const castleLevel = castleLevelOf(lab.tiles);
@@ -140,7 +139,7 @@ const LabPanel: React.FC = () => {
 								<button className={`${btn} flex-1`} title='Place WIP monsters (art only) on their own biome' onClick={() => lab.spawnWip(wipId, count)}>
 									Spawn WIP
 								</button>
-								<button className={`${btn} flex items-center gap-1`} title='Combat preview: the game&apos;s combat window with this monster, facing left' aria-label='Combat preview' onClick={() => setPreviewOpen(true)}>
+								<button className={`${btn} flex items-center gap-1`} title='Combat preview: the game&apos;s combat window with this monster, facing left' aria-label='Combat preview' onClick={() => lab.setCombatPreview(wipId)}>
 									<PixelIcon name='item_iron_sword' alt='' scale={0.5} />
 									Fight
 								</button>
@@ -245,7 +244,6 @@ const LabPanel: React.FC = () => {
 					</Section>
 				</>
 			)}
-			{previewOpen && <CombatPreview initialId={wipId} onClose={() => setPreviewOpen(false)} />}
 		</aside>
 	);
 };

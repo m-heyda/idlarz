@@ -5,6 +5,7 @@
 	max-width: calc(100vw - 32px);
 	padding: 6px 8px 8px;
 	pointer-events: auto;
+	backdrop-filter: blur(6px);
 }
 
 .combat-head {
