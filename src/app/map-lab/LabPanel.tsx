@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { BIOMES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/gameConfig';
 import { biomeColor } from '@/config/biomePalette';
-import { MONSTER_CATALOG } from '@/catalog/monsters';
+import CombatPreview, { WIP_MONSTERS } from './CombatPreview';
 import { castleLevelOf } from '@/lib/castleWard';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -30,8 +30,6 @@ const PRESETS: { id: LabPreset; label: string }[] = [
 	{ id: 'landmarks', label: 'Landmarks (6x6)' },
 ];
 
-/** Roster monsters with finished art that are not enabled in the game yet: previewed here, by biome */
-const WIP_MONSTERS = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
 const WIP_BIOMES = [...new Set(WIP_MONSTERS.map((m) => m.biomes[0] as string))];
 
 const btn =
@@ -52,6 +50,7 @@ const LabPanel: React.FC = () => {
 	const [open, setOpen] = useState(true);
 	const [count, setCount] = useState(5);
 	const [wipId, setWipId] = useState(WIP_MONSTERS[0].id);
+	const [previewOpen, setPreviewOpen] = useState(false);
 		const [message, setMessage] = useState('');
 	const fileRef = useRef<HTMLInputElement>(null);
 	const castleLevel = castleLevelOf(lab.tiles);
@@ -139,6 +138,9 @@ const LabPanel: React.FC = () => {
 								</select>
 								<button className={btn} title='Place WIP monsters (art only) on their own biome' onClick={() => lab.spawnWip(wipId, count)}>
 									Spawn WIP
+								</button>
+								<button className={btn} title='Big fight-window mock-up of this monster, facing left' onClick={() => setPreviewOpen(true)}>
+									Combat preview
 								</button>
 							</div>
 						<label className='flex items-center gap-2 text-xs'>
@@ -241,6 +243,7 @@ const LabPanel: React.FC = () => {
 					</Section>
 				</>
 			)}
+			{previewOpen && <CombatPreview initialId={wipId} onClose={() => setPreviewOpen(false)} />}
 		</aside>
 	);
 };
