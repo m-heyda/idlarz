@@ -137,6 +137,18 @@ A road is a per-tile overlay that connects a building to the castle. A **connect
 | **Extra Builder** | +1 parallel upgrade slot (castle and buildings) | 2 (1 -> 3 slots) | **decided: base 40, x2.2** (the slot is the strongest of the three) | 40, 88 (128 total) |
 
   They are plain `EMBER_UPGRADES` entries (`maxLevel`, `baseCost`, `costGrowth`) whose effects register as `LIMIT_BONUSES` on `idolMaxLevel`, `buildingMaxLevel` and `builderSlots`, so no call site changes; the hard ceilings in the table above (10, 20, 3) keep every save valid. Pacing check: the first rebirth earns about 9 Embers and rebirth 5 about 40 or more (`REBIRTH.gain`: 3 x (castle - 5) x sqrt(tiles / 10)), so these roughly 2,400 Embers (Idol Mastery 419, Master Craftsmen 1,819, Extra Builder 128) are a long-game sink, far beyond ten rebirths next to the six existing percent items (about 140 each to max); the first Idol Mastery level is affordable around the second rebirth and the first Extra Builder around the third to fifth. Re-check with `sim` once Embers are modelled per rebirth. Cap items must not be refundable or respeccable (Embers stay permanent, BL9).
+- **Ember price book and sinks (decided 2026-11-07, IDL-97, IDL-132, IDL-162, IDL-184, IDL-185, IDL-195).** The three cap items above stay as priced (re-check the totals against the new Ember gain, castle term (castle - 5)^1.3, with `sim`). Added items, all permanent and kept across rebirth:
+
+| Item | Effect | Levels | Cost per level |
+|---|---|---|---|
+| **Vault slot** | +1 legendary Vault slot (1 -> 3) | 2 | 60, 150 |
+| **Deep Pockets** | +4 bag slots per level (under `HARD_LIMITS.bagSize`) | 3 | 30, 54, 98 |
+| **Auto tiles** | unlocks the tile buyer | 1 | 40 |
+| **Auto castle** | unlocks castle auto-upgrade | 1 | 100 |
+| **Auto sell** | unlocks surplus auto-sell | 1 | 40 |
+
+  - **Cosmetic Ember shop v1 (pure sink, no number changes):** about 20 titles (50 to 2,000 Embers, a few reachable only through achievements) and 8 name colours; shown in the header and the rankings. Castle skins and map themes come later with an art pass. Ownership is server-held; cosmetics count as spent (`legacyPoints + spent = earned` holds); rebirth keeps them.
+  - **Monument (gold sink):** one per map, 30 levels, resets at rebirth. **+0.5 % income per level, max +15 %, as its own deliberate multiplier bucket** (shown in "Where the income comes from", docs/25 item 12). Gold cost starts at 0.5 hours of end-run income (a constant computed from the castle-10 reference economy) and grows x1.10 per level (about 82 hours in total, level 30 about 8.7 h), plus a small wood and stone share. The sim keeps its end-run income share under 10 % and the +-15 % pacing guard.
 - T2 and T3 stock resets at rebirth; **T4 relics survive it** (decided 2026-10-29: boss-gated drops, [20](20-monster-families-and-rewards.md)).
 - The Dwarf Statue's build-time bonus is capped (above), so rebirth speed-ups cannot stack out of the 65-70 % run-2 target.
 
