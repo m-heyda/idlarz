@@ -178,6 +178,8 @@ Handlers (launch set of two, deterministic from the sealed fight stream):
 
 Sources and pity (IDL-146): top-tier items come only from bosses and T4 relics (pity as `king_legendary`: 5 % + 1 % per miss, max +10 %); the first legendary is guaranteed from the first boss kill after level 15. Mid and handler items come from the `legendary_weapons` pool through the 1.9 % chest replace roll and the 0.2 % to 1 % monster legendary rarity weight (level gate 12 to 15). Everything wipes at rebirth except the one Vault item (IDL-148). Unique: a second copy of the same id never drops while one is in the bag, gear or Vault.
 
+The eight non-top legendaries can also be crafted late (crafting level 95, 50 War Medals + G9 materials, docs/17 section 7); the three top-tier ones never.
+
 Classic legendaries (`emberbrand`, `starfall_bow`, `titan_maul`) stay as stat-only legendaries without perks.
 
 **Rattatui set removed (2026-11-07, owner):** it was for beta testers while rats existed. Drops stop with IDL-55 (out of every pool and boss source); the definitions are deleted at the epoch reset (IDL-76) because every bag is wiped there, so no `retired` compatibility flag is needed beyond that.

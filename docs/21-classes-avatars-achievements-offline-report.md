@@ -19,7 +19,24 @@ Small account-level features that came out of the landing page and rankings work
 - Catalog in code (`catalog/achievements.ts`): `{ id, title, description, condition tag, reward: avatar | title | none }`.
 - Table `player_achievements (user_id, achievement_id, unlocked_at)`, additive, written only by the server (service role, `insert ... on conflict do nothing`), read by the owner. Counts, not the list, may appear in rankings.
 - Evaluated **lazily on requests the server already handles** (save, fight win, chest, offline claim) by pure functions of the summary, the ledger and the lifetime counters below, so no cron and no extra calls on the free plan.
-- **Launch set (decided): about 12, mostly tutorial and first-time milestones**: finish the tutorial, first tile, first building, castle level 2 / 6 / 10, first fight won, first rebirth, Rat King defeated, plus the **early tester** achievement granted by the reset migration. They unlock 4 of the extra avatars; more come with the biomes and crafting.
+- **Launch set (decided 2026-11-07, owner; IDL-73, IDL-194):** 12 achievements, 600 gems in total, 4 avatars. "Rat King defeated" is replaced by the first boss, The Great Auroch.
+
+  | # | Achievement | Gems | Reward |
+  | --- | --- | --- | --- |
+  | 1 | Finish the tutorial | 25 | none |
+  | 2 | Buy the first tile | 25 | none |
+  | 3 | Build the first building | 25 | none |
+  | 4 | Win the first fight | 25 | none |
+  | 5 | Open the first chest | 25 | none |
+  | 6 | Castle level 2 | 25 | none |
+  | 7 | Castle level 6 | 75 | none |
+  | 8 | Castle level 10 | 100 | avatar "Architect" |
+  | 9 | First rebirth | 75 | avatar "Reborn" |
+  | 10 | Defeat The Great Auroch | 50 | avatar "Boss slayer" |
+  | 11 | Kill a golden monster | 50 | none |
+  | 12 | Early tester (granted by the reset migration) | 100 | avatar and title "Early tester" |
+
+  More avatars (7 unlockables in IDL-72) come with the biomes and crafting.
 - **Grind achievements (decided, later release): "insane" cumulative goals.** Lifetime gold earned (1 million, 1 billion, 1 trillion, 1 quadrillion ...), **one ladder per resource** (every resource in the catalog, T0 to T3), tiles placed (500 and up), monsters killed in total and **per monster type**, chests opened, rebirths, crafting level, items crafted, and so on. They need **lifetime counters that survive rebirth**:
   - New ledger record `player_ledger.stats jsonb` (additive nullable column, migration `stats_ledger.sql`, lazy-seeded): `{ goldEarned, earned: { <resource>: n }, tilesPlaced, chestsOpened, kills: { <monsterType>: n }, crafted, ... }`.
   - Exact for what the server decides (kills, chests, crafts, offline grants). For the client-held economy (gold and resources from income, tiles placed) the server adds the **verified** gain of every accepted save, bounded by the same allowance the verifier uses (`income x time + granted`), so a forged save cannot jump a ladder. Numbers can reach 1e15 and beyond; they are doubles (`RESOURCE_CAP` 1e21) and are formatted with the existing number formatter.
@@ -59,7 +76,7 @@ When class bonuses and avatars ship, **every player's progress is reset once** a
 - **Content as data** (`catalog/tutorial.ts`): each step has `id`, the `feature` it belongs to, a `trigger` (a game event plus a condition: first click, first tile bought, first building, castle level 2, first monster appears, first chest, first fight won, rebirth available, merchant opened, farm unlocked, a biome discovered, first Idol, first road, crafting unlocked ...), a short text (one to three sentences, **numbers read from the config**, never typed in), an optional UI target to highlight, optional prerequisites and an optional "try it" completion check (e.g. "buy a tile"). No hand-written page per feature: a new feature or biome adds catalog entries, and the glossary ([section 4](#4-glossary-draft-later)) links to the same data.
 - **Presentation:** small non-blocking coach tips next to the relevant control (a bottom sheet on phones) plus a `NotifyDot` on the Guide button when a new entry unlocks; the **Guide journal** lists unlocked entries with the full text, and shows locked ones as "???" with a hint of what unlocks them, which doubles as a gentle teaser of the game's depth. "Skip tutorial" and "Replay" are always available, and `prefers-reduced-motion` is respected.
 - **The initial tutorial** (after class and avatar pick): a short linear path of about eight steps (click for gold, buy the first tile, build, buy an animal, start the castle upgrade, open a chest, fight the first monster, find the merchant) that ends with an achievement ([section 3](#3-server-achievements-draft-later)); later steps appear as features unlock.
-- **Rewards (decided): small starter bundles on a few key steps** (e.g. a little gold, wood and stone at "buy a tile" and "start the castle upgrade"), granted **once per account by the server** (recorded in `stats`, added to `granted` so the save passes the checks); the other steps give only progress and the final achievement.
+- **Rewards (decided): small starter bundles on a few key steps** (e.g. a little gold, wood and stone at "buy a tile" and "start the castle upgrade"), granted **once per account by the server** (recorded in `stats`, added to `granted` so the save passes the checks); the other steps give only progress and the final achievement. **Numbers (decided 2026-11-07, IDL-74):** "buy a tile" pays 5 minutes of the player's income (at least 100 gold) plus 40 wood and 40 stone; "start the castle upgrade" pays 10 minutes of income plus 60 wood and 60 stone. The sim bot checks that the bundles move the first-hour pace by no more than a few percent (IDL-78).
 - **State:** the set of seen/completed step ids as an optional list in the save core (`tutorial.seen`, additive, no schema bump; it is cosmetic, so it does not need the ledger). Triggers use the existing store/events; new biomes use the `discovered` set ([12](12-rebirth-biomes.md)).
 - **Server:** nothing is needed, except the optional "tutorial finished" achievement.
 - **Tests:** every step id is unique; every feature that unlocks has at least one step; every trigger names an event that exists; text templates only use keys that exist in the config; a snapshot of the unlock order so a reorder is deliberate.

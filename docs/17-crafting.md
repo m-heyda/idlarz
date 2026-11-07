@@ -66,6 +66,13 @@ Each recipe's cost is a few **minutes of income** at the matching tier (the rule
 - Iron is solved: Iron Ore comes from the Hills' Deep Mine ([18](18-biome-buildings-and-material-tiers.md)).
 - The gear wipe ships **with** crafting ([13](13-rebirth-reset-and-paragon.md)).
 
+**Decided (2026-11-07, owner):**
+- **Tier unlocks by crafting level, per grade:** G1 1, G2 8, G3 15, G4 25, G5 35, G6 (Obsidian) 50, G7 65, G8 80, G9 95. Replaces the proposal above.
+- **Rarity ceiling:** up to rare below crafting level 30, epic from 50. A plain craft never rolls legendary.
+- **Legendary by War Medals:** one fixed roster item per craft ([28](28-reuse-items-and-stats.md) section 6), only the eight mid and handler legendaries (the three top-tier items stay boss and relic drops), from crafting level 95, cost 50 War Medals plus G9 materials; one copy at a time (unique id), pity does not apply.
+- **Rebirth salvage:** each unworn item gives its sell value / 4 in T0/T1 materials (wood, stone, coal, hide, equal gold value at merchant prices); the total is capped at 20 minutes of early-run income; legendaries are never salvaged (Vault or lost); the cap is tuned by the run-2 ratio (60 to 70 %).
+- Crafted items carry a "crafted" marker (tooltip and sell-junk filter).
+
 **Still open:**
 1. The anchors, XP per craft by tier and rarity, and the exact amount of each extract per recipe (set with `craft-sim.ts` and the Extractor rates).
 2. The tier unlock levels (proposal: starter 1, steel 15, cloth/leather 30, obsidian 50, legendary bases 80+) once the ten new items exist ([17](17-crafting.md) content note).

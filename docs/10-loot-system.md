@@ -85,6 +85,17 @@ Legendary perks and set bonuses use the same families. Each family is its own `(
 
 Which items carry what: see docs/28 section 6 (11 legendaries, one headline family each, two launch handlers). The Rattatui set is removed (IDL-55); sets S1-S3 carry the set bonuses of docs/28 section 10.
 
+## Monster chests (decided 2026-11-07, IDL-163; not built)
+
+A kill sometimes drops a **chest item** into the bag, opened later from the inventory (`open` op on `/api/inventory`).
+
+- **No keys in v1.** A chest opens free; keys can return later for locked Royal chests.
+- **Drop chance:** 2 % per normal kill, a boss always drops its Royal chest, a golden monster drops an Arcane chest. Always `placement: 'extra'`, never `replace`.
+- **Tiers by biome:** Wooden (home), Iron Strongbox, Mossy, Coral, Frost, Magma as the biomes arrive; Royal (boss) and Arcane (golden) on top. Chest level = the dropping monster's level, capped.
+- **Contents:** gear, potions (including buffs), materials, XP orbs and gold, from the existing loot pipeline. **No permanent stat gifts. No gems** (gem sources stay achievements and the daily bonus, IDL-188/194). Legendary rolls stay inside the legendary rules (docs/28 section 6).
+- **Safety:** the roll is sealed on a counter (a reload cannot reroll); gold is recorded as `granted`; a full bag converts the chest to its sell value; "Sell common" never sweeps chests.
+- **Budget:** the expected value of chests must stay at 10 % of hourly income or less at every tier; `loot-sim` gets a chest-tier table and fails the check above that.
+
 ## Not done yet (kept on purpose)
 
 Salvage / materials and reroll / upgrade (real gear sinks), set bonuses that follow the item level (today a set bonus is a fixed amount, bigger on purpose so it matters before the first rebirth), `requiredLevel`, elite monsters and premium chests, and rebalancing the monsters with the world level (see [ROADMAP](ROADMAP.md)).
