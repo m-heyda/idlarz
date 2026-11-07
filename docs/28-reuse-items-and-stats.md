@@ -200,6 +200,13 @@ None of these exists yet; adding one means `STAT_DEFS`, `STAT_BASE_BY_TIER`, a c
 | Boss Timer +s | head, shoulder | boss clock in `fight.ts` (180 s) | needs a cap |
 | Potion Cooldown %, Bag Slots | belt | already decided in IDL-138 | floor 4 s; small capped bag slots |
 
+**Accessory themes and affix rules (decided 2026-11-07, IDL-164, IDL-45, IDL-176):**
+- **Themes:** rings (2 slots) = precision: crit chance, super crit, max mana on cloth, plus Crit Damage and Heal on Kill; neck = survival and gold: max HP, regen, Gold Find, plus Crit Damage and Tile Discount; cape = armor, dodge, plus Tile Discount; charm = Luck and XP quality, plus Heal on Kill. The main stat scales with item level like a weapon's (today `steel_ring` gives only `maxHp: 4`). Economy bonuses stay legendary perks.
+- **Economy stats are fixed base stats on their own slots, never random affixes:** Build Speed on hands and chest (gear max 15 %, inside the −60 % shared cap), Tile Discount on cape and neck (gear max 10 %, total stays under the 45 % cap with Charisma and Bulk), Farm Yield on hands (gear max 25 %), Boss Timer on head and shoulder (gear max +30 s).
+- **Random affixes among the new stats:** Crit Damage (ring, neck), Armor Penetration (weapons), Thorns (shields), Heal on Kill (ring, charm).
+- **Affix tiers:** no new mechanic. Magnitude already grows with item level (`affixMagnitude`); the tooltip shows a tier label derived from item level (I 1-19, II 20-39, III 40-59, IV 60-79, V 80+).
+- **Rarity windows, pity and auto-sell defaults (IDL-47)** are sim-driven; drop the Rattatui rows from its tables.
+
 Not taken (stay out of the plan for now): Potion Power %, Sell Price %, and Chest Speed % as a rolled stat (chest speed stays a legendary perk family only).
 
 ## 8. Asset gaps (nothing in `reuse/` covers these)
