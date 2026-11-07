@@ -18,6 +18,9 @@ export interface CloudSaver {
 
 let saver: CloudSaver | null = null;
 
+/** The registered saver, if cloud saving is active (the rebirth uploads through it before it asks the server to run the rebirth). */
+export const currentCloudSaver = (): CloudSaver | null => saver;
+
 /** The sync hook registers itself while it runs; returns the function that removes it again. */
 export const registerCloudSaver = (next: CloudSaver): (() => void) => {
 	saver = next;

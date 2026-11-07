@@ -141,7 +141,7 @@ const main = async () => {
 			['Farm animals / upgrades', 'client', 'level bounds only'],
 			['Merchant upgrades', 'client', 'levels are part of the net-worth floor (Pack Rat excepted); unpaid levels go back to the last trusted ones (**CLAMPED**, IDL-168)'],
 			['Ember shop', 'client', 'conservation: unspent + spent = earned (**REJECTED** if not)'],
-			['Rebirth Ember gain', 'client', 'bounded by the castle and territory of the previous save, one rebirth per save (**CLAMPED**, flag `ember_jump`, IDL-166)'],
+			['Rebirth Ember gain', 'server (`POST /api/rebirth`, IDL-102), the browser as a fallback', 'the route judges the stored save and records the gain: the rebirth save is capped at exactly it; without the route, bounded by the castle and territory of the previous save, one rebirth per save (**CLAMPED**, flag `ember_jump`, IDL-166)'],
 			['Click gold', 'client (rate-limited in the browser)', 'none: no click endpoint'],
 			['Sell resources', 'client', '`gold_jump` (stock held + income + grants; refused once enforcement is on, IDL-112) / net worth'],
 			['Sell / buy gear', 'server (`/api/inventory`)', 'server inventory'],
