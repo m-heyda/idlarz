@@ -66,6 +66,25 @@ The `merchant` source (level 4 + 3 per castle level above 1, like a chest) runs 
 - **Pity**: the King's legendary weapon table adds +1 % per miss up to +10 %; a drop resets it. Set pieces already prefer ones you do not own.
 - **Auto-sell**: *Merchant → Goods → Sell items → Auto-sell new gear up to ...* sells matching drops the moment they drop (with the Haggler bonus), so a bigger drop volume does not clog the bag. Never offered for the two rarest tiers.
 
+## Perk families and caps (decided 2026-11-07, IDL-149; sim checks pending)
+
+Legendary perks and set bonuses use the same families. Each family is its own `(1 + sum)` bucket (docs/25 item 12); the gear bucket (sets plus legendary perks) is clamped at the family cap. Tier magnitudes are fixed numbers, they do not scale with item level.
+
+| Family | Common | Rare | Top | Gear cap | Combines with |
+| --- | --- | --- | --- | --- | --- |
+| Income | 8 % | 15 % | 25 % | 50 % | Embers (+6 % each), Paragon: separate buckets |
+| XP | 8 % | 15 % | 25 % | 40 % | Paragon account bucket |
+| Kill reward | 8 % | 15 % | 25 % | 60 % | Luck / Gold Find apply after the monster reward cap |
+| Click gold | 8 % | 15 % | 25 % | 40 % | click Idol |
+| Damage | 4 % | 6 % | 10 % | 45 % | S2 38, S3 40; set plus one legendary hits the cap |
+| Offline efficiency | 8 | 15 | 25 points | HARD_LIMITS 100 % | Steward, Night Watch |
+| Offline cap hours | +2 h | +4 h | +6 h | HARD_LIMITS 72 h | Ember shop |
+| Max HP | 8 % | 15 % | 25 % | 50 % | attributes |
+| Building time | 8 % | 15 % | 25 % | -60 % combined | Embers (Builders, max -50 %) and Idols; tooltip shows the capped total |
+| Chest interval | 8 % | 15 % | 25 % | -40 %, floor 8 min | chest Idol, Beacon potion |
+
+Which items carry what: see docs/28 section 6 (11 legendaries, one headline family each, two launch handlers). The Rattatui set is removed (IDL-55); sets S1-S3 carry the set bonuses of docs/28 section 10.
+
 ## Not done yet (kept on purpose)
 
 Salvage / materials and reroll / upgrade (real gear sinks), set bonuses that follow the item level (today a set bonus is a fixed amount, bigger on purpose so it matters before the first rebirth), `requiredLevel`, elite monsters and premium chests, and rebalancing the monsters with the world level (see [ROADMAP](ROADMAP.md)).

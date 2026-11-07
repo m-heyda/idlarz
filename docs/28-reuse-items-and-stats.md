@@ -156,21 +156,31 @@ The three planned special sets get a palette from what exists:
 
 ## 6. Legendary perk drafts (IDL-42, IDL-149)
 
-Perks are not wired and are not in the stats. Perk families are those of IDL-149 (income, XP, kill reward, offline, click, damage, building time, chest speed), one per item, magnitudes tiered and capped per family. Placeholder pairing:
+Perks are not wired and are not in the stats. **Roster decided 2026-11-07 (owner, IDL-144/146/149):** one headline family per item (no two legendaries share a family), fixed numbers per tier (a perk does not scale with item level), 11 items, two special-effect handlers at launch. The Rattatui set is deleted (see below), so the 35 % damage anchor is gone; the damage cap of 45 % is now met by S2 (38) or S3 (40) plus one 10 % legendary, which keeps "set or legendary".
 
-| Item | Perk draft |
-| --- | --- |
-| `runeforged_titanhammer` | −25 % building time |
-| `dawnbringer_trident` | +25 % income |
-| `cindercrescent_glaive` | +10 % damage |
-| `frostbloom_fan` | +15 % XP |
-| `voidrune_blade` | +15 % away income |
-| `reapers_crescent` | +20 % kill rewards |
-| `nightfall_edge` | +25 % click gold |
-| `tidecaller_axe` | −25 % chest opening time |
-| `stormtrident` | +10 % damage (second damage perk: check the family cap) |
-| `amethyst_spire` | +15 % XP (second XP perk: check the family cap) |
-| `cinderflight_bow` | +20 % kill rewards (second: check the cap) |
+| Item | Headline perk | Tier | Source |
+| --- | --- | --- | --- |
+| `dawnbringer_trident` | +25 % income | top | boss / T4 relic |
+| `runeforged_titanhammer` | −25 % building time (shares the −60 % combined cap with Embers and Idols) | top | boss / T4 relic |
+| `reapers_crescent` | +25 % kill reward (cap 60 %) | top | boss / T4 relic |
+| `frostbloom_fan` | +15 % XP | mid | chest / rare monster |
+| `voidrune_blade` | +15 points offline efficiency | mid | chest / rare monster |
+| `nightfall_edge` | +15 % click gold | mid | chest / rare monster |
+| `tidecaller_axe` | −15 % chest interval (floor 8 min) | mid | chest / rare monster |
+| `stormtrident` | +15 % max HP | mid | chest / rare monster |
+| `cinderflight_bow` | +15 Gold Find | mid | chest / rare monster |
+| `cindercrescent_glaive` | +10 % damage and **Burn** | combat | chest / rare monster |
+| `amethyst_spire` | **Potion refund** 15 % | handler | chest / rare monster |
+
+Handlers (launch set of two, deterministic from the sealed fight stream):
+- **Burn**: a critical hit sets the monster alight for 3 s; it takes 30 % of that hit per second. A re-crit refreshes, never stacks.
+- **Potion refund**: a drunk potion is not consumed with 15 % chance (rolled from the same sealed stream; never refunds a buff potion that has a cooldown).
+
+Sources and pity (IDL-146): top-tier items come only from bosses and T4 relics (pity as `king_legendary`: 5 % + 1 % per miss, max +10 %); the first legendary is guaranteed from the first boss kill after level 15. Mid and handler items come from the `legendary_weapons` pool through the 1.9 % chest replace roll and the 0.2 % to 1 % monster legendary rarity weight (level gate 12 to 15). Everything wipes at rebirth except the one Vault item (IDL-148). Unique: a second copy of the same id never drops while one is in the bag, gear or Vault.
+
+Classic legendaries (`emberbrand`, `starfall_bow`, `titan_maul`) stay as stat-only legendaries without perks.
+
+**Rattatui set removed (2026-11-07, owner):** it was for beta testers while rats existed. Drops stop with IDL-55 (out of every pool and boss source); the definitions are deleted at the epoch reset (IDL-76) because every bag is wiped there, so no `retired` compatibility flag is needed beyond that.
 
 ## 7. New item stats (decided 2026-11-07)
 
