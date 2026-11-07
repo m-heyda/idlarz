@@ -526,11 +526,13 @@ const createGameSlice = (
 		},
 
 		// Rebirth: restart with the Ember bonus. Keeps name, class, play time, all Embers and the character (XP, level, attributes).
-		rebirth: () => {
+		// `serverGain`: the Embers the server computed (POST /api/rebirth); the game never takes more than it works out itself
+		rebirth: (serverGain?: number) => {
 			const state = get();
 			const status = rebirthStatus(state);
 			if (!status.canRebirth) return false;
-			const gain = status.gain;
+			const gain = serverGain === undefined ? status.gain : Math.min(status.gain, Math.max(0, Math.floor(serverGain)));
+			if (gain < 1) return false;
 
 			const prestige: PrestigeState = {
 				...state.prestige,

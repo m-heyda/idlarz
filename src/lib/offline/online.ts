@@ -10,7 +10,9 @@ import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } f
 import { sealedRng } from '@/lib/offline/seal';
 import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps, type StepOutcome } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
-import type { ChestReward, FightReply, Inventory, InventoryReply, SyncResult } from '@/lib/offline/types';
+import type { ChestReward, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import { rebirthInventory } from '@/lib/offline/inventory';
+import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 
 // The server's side of play while the player is here: spawns, chests and fights. The server mints the tickets from its own clock, puts
 // the monsters on the map, rolls the contents from a secret and runs every fight (see fight.ts). Each call is one compare-and-swap on the
@@ -136,6 +138,25 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 		if (!result || !result.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
 		const next: Ledger = { ...ledger, inv: result.inv, granted: result.gold > 0 ? addTotals(ledger.granted, { gold: result.gold }) : ledger.granted };
 		return { ledger: next, value: { ok: true, gold: result.gold, count: result.count, inv: result.inv, serverNowSec: ctx.nowSec } };
+	});
+
+/**
+ * The server runs the rebirth (IDL-102): from the last STORED save it checks the requirements, computes the Embers and wipes the bag, the gear
+ * and the pity to the starter kit (Pack Rat kept), all in one ledger write, BEFORE the browser starts over and uploads the new run. A modified
+ * client can no longer sell the old gear in the seconds before the rebirth save lands, and the save that follows is capped at exactly the
+ * Embers the server computed here (`settleEmbers`). Idempotent twice over: the same key replays the same answer, and a second call for the same
+ * rebirth (another key) neither wipes again nor pays again, it answers with what the first one recorded in `inv.rebirth`.
+ * The browser uploads its save first, so the stored save the server judges is the one the player is looking at.
+ */
+export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowMs: number): Promise<Online<RebirthReply>> =>
+	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: RebirthReply } => {
+		const inv = ctx.ledger.inv!;
+		const judged = judgeRebirth(ctx.stored.summary, ctx.stored.core.merchantUpgrades as Record<string, number> | undefined);
+		// already run for this very rebirth: the record is the answer (the wipe and the gain happen once)
+		if (judged.ok && inv.rebirth?.to === judged.to) return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, serverNowSec: ctx.nowSec } };
+		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
+		const wiped: Inventory = { ...rebirthInventory(inv, ctx.stored.core.merchantUpgrades), rebirth: { to: judged.to, gain: judged.gain } };
+		return { ledger: { ...ctx.ledger, inv: wiped }, value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec } };
 	});
 
 export type FightRequest =

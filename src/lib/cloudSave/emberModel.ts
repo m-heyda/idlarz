@@ -14,7 +14,7 @@ import type { Snapshot } from './verify';
  *  - A rebirth is believable when the previous save was at castle level 6 or more (a running upgrade counts) with the territory the
  *    next rebirth needs, give or take the tiles bought since; at most one rebirth fits between two saves.
  *  - The gain is at most what the previous save's castle and territory pay, with the Ancestral Tithe at its maximum (the merchant
- *    upgrades are not paid for on the server yet, IDL-168).
+ *    upgrades bought without gold are put back by the trusted economy, IDL-168, but a Tithe bought since the last upload is not known here).
  *  - A first save (nothing to compare with) holds a whole history: its rebirths are bounded by the play time and its Embers by the
  *    best rebirth the game can pay.
  */
@@ -25,6 +25,11 @@ export const EMBER_MODEL = {
 	minRunSec: 4 * 3600,
 	/** A first save is bounded by the best rebirth: the highest castle level and a territory above the medium-map target (docs/06). */
 	firstSaveTiles: 1000,
+	/**
+	 * Once the browser asks the server to run every rebirth (`POST /api/rebirth`, IDL-102), a rebirth with no server record can be refused.
+	 * Off while old tabs and builds may still rebirth on their own: those fall back to the bound above.
+	 */
+	requireServerRebirth: false as boolean,
 } as const;
 
 const MAX_CASTLE_LEVEL = CASTLE_UPGRADE.durationsSec.length + 1;
@@ -55,7 +60,13 @@ const settled = (claim: EmberClaim, rebirths: number, legacyEarned: number): Emb
 	return { rebirths: kept, legacyEarned: earned, clamped };
 };
 
-export const settleEmbers = (prev: Snapshot | null, claim: EmberClaim): EmberVerdict => {
+/** The rebirth the server ran itself (`POST /api/rebirth`, kept in the ledger's inventory): the count it leads to and the Embers it computed. */
+export interface ServerRebirth {
+	to: number;
+	gain: number;
+}
+
+export const settleEmbers = (prev: Snapshot | null, claim: EmberClaim, serverRebirth: ServerRebirth | null = null, requireServer: boolean = EMBER_MODEL.requireServerRebirth): EmberVerdict => {
 	if (!prev) {
 		const rebirths = Math.min(claim.rebirths, Math.floor(Math.max(0, claim.playSeconds) / EMBER_MODEL.minRunSec));
 		const best = maxGainFrom(MAX_CASTLE_LEVEL, EMBER_MODEL.firstSaveTiles, 0);
@@ -66,6 +77,11 @@ export const settleEmbers = (prev: Snapshot | null, claim: EmberClaim): EmberVer
 	if (claim.rebirths <= before.rebirths) {
 		return settled(claim, claim.rebirths, Math.min(claim.legacyEarned, Math.max(before.legacyEarned, 0)));
 	}
+	// the server ran this very rebirth: the gain is exactly what it computed from the stored save, no margin needed
+	if (serverRebirth && serverRebirth.to === before.rebirths + 1 && claim.rebirths === serverRebirth.to) {
+		return settled(claim, serverRebirth.to, Math.min(claim.legacyEarned, before.legacyEarned + serverRebirth.gain));
+	}
+	if (requireServer) return settled(claim, before.rebirths, before.legacyEarned);
 	const castle = Math.max(before.castleLevel, before.derived.castleUpgrade?.toLevel ?? 0);
 	const tiles = before.derived.purchased + EMBER_MODEL.runEndTiles;
 	const believable = castle >= REBIRTH.minCastleLevel && tiles >= REBIRTH.tilesNeeded(before.rebirths);

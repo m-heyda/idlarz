@@ -15,6 +15,8 @@ export interface Inventory {
 	equipment: Equipment;
 	lootPity: Record<string, number>;
 	autoSellUpTo: string | null;
+	/** Set by POST /api/rebirth: the server ran the rebirth to this count and computed its Embers. The save that carries the rebirth is capped at exactly this gain, and the bag is not wiped a second time. */
+	rebirth?: { to: number; gain: number };
 }
 
 /** One of the player's own changes to what they carry: what the browser previews at once and asks the server (`/api/inventory`) to do. */
@@ -96,6 +98,18 @@ export interface InventoryReply {
 	gold: number;
 	count: number;
 	/** The player's things as they stand now (always sent: the answer to an operation is the new truth) */
+	inv: Inventory;
+	serverNowSec: number;
+}
+
+/** What /api/rebirth answers: whether the server ran the rebirth, the Embers it pays, and the inventory the new run starts with (the starter kit). */
+export interface RebirthReply {
+	ok: boolean;
+	/** Why not (the stored save does not meet the requirements, or the rebirth would pay nothing) */
+	reason?: 'not_ready' | 'no_embers';
+	/** The rebirth count this rebirth leads to, and the Embers it pays (0 when refused) */
+	to: number;
+	gain: number;
 	inv: Inventory;
 	serverNowSec: number;
 }

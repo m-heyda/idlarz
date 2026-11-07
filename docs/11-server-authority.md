@@ -58,6 +58,15 @@ The bag, the worn gear, the loot pity and the auto-sell filter belong to the led
 
 Closes the old "gear and bag come from the last accepted save" limits: a fight can no longer use gear the player does not own (the profile is built from the ledger's gear), an equip is refused during a fight on the server's own clock, and the potions a fight drinks are the ledger's, never counted against a save. What is still the browser's: the merchant's prices and its shelf (`merchantStock` is rolled and priced in the browser, so a purchase is checked only for being a valid item), the gold itself, and the Pack Rat level that sizes the bag.
 
+## Rebirth (`POST /api/rebirth`, IDL-102)
+
+The browser asks the server to run the rebirth **before** it starts over: it uploads the save first (so the server judges the game the player is looking at), then `POST /api/rebirth { key }`. `rebirthStep` (`lib/offline/online.ts`) reads the **stored** save only (the body carries no number): castle level 6+, the territory `REBIRTH.tilesNeeded`, no castle upgrade running, and the Embers from `emberGain` with the stored Tithe level (`cloudSave/serverRebirth.ts`). If the rules hold it wipes the ledger's bag, gear and pity to the starter kit (Pack Rat kept) in the same write that records `inv.rebirth = { to, gain }`, and answers `{ ok, to, gain, inv }`; otherwise `ok: false` (`not_ready` / `no_embers`) and nothing changes. The browser then calls `rebirth(gain)` with the server's number (never more than it works out itself).
+
+- **Idempotent twice over.** The same `key` replays the stored answer; another key for the same rebirth neither wipes nor pays again, it answers from `inv.rebirth`. Items picked up after the wipe stay.
+- **The save that follows is capped at exactly that gain.** `settleEmbers` takes the record: `legacyEarned` cannot exceed the previous save's plus `gain` (anything above is clamped and flagged `ember_jump`), and `acceptSave` does not wipe the inventory a second time.
+- **Fallback.** With no cloud save this session, or an unreachable server, the browser rebirths on its own and the save is bounded by the looser IDL-166 model. `EMBER_MODEL.requireServerRebirth` (off) turns that fallback into a refusal once every client goes through the route.
+- No migration: the record lives in the `inv` jsonb of `player_ledger`.
+
 ## Offline numbers (`src/config/limits.ts`, read with `limitOf`)
 
 | Limit | Base | Raised by |

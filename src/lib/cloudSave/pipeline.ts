@@ -135,11 +135,6 @@ export const acceptSave = async (
 
 	const previous: Snapshot | null = current ? { summary: current.summary, serverSavedAt: current.serverSavedAt } : null;
 
-	// Embers and rebirths are the browser's until the server runs the rebirth itself (IDL-102): a save that holds more than the previous one
-	// could have paid is clamped to what it explains (before anything is derived from it) and flagged `ember_jump` (IDL-166)
-	const emberVerdict = settleEmbers(previous, { rebirths: state.prestige.rebirths, legacyEarned: state.prestige.legacyEarned, playSeconds: state.playSeconds });
-	if (emberVerdict.clamped) state = { ...state, prestige: clampPrestige(state.prestige, emberVerdict) };
-
 	// The ledger knows what the server itself granted since the last save (income while away, chest and kill rewards), so a save may
 	// contain that on top of its income, and it holds the real gem balance: whatever the save claims is checked against it, then replaced.
 	let ledger: Ledger | null = null;
@@ -152,6 +147,11 @@ export const acceptSave = async (
 			ledgerUsable = false;
 		}
 	}
+	// Embers and rebirths: a rebirth the server ran itself (`POST /api/rebirth`, recorded in the ledger's inventory) pays exactly the Embers it
+	// computed (IDL-102). One that did not go through it is bounded by what the previous save's castle and territory could have paid (IDL-166).
+	// Either way a save that holds more is clamped before anything is derived from it, and flagged `ember_jump`.
+	const emberVerdict = settleEmbers(previous, { rebirths: state.prestige.rebirths, legacyEarned: state.prestige.legacyEarned, playSeconds: state.playSeconds }, ledger?.inv?.rebirth ?? null);
+	if (emberVerdict.clamped) state = { ...state, prestige: clampPrestige(state.prestige, emberVerdict) };
 	const gemsClaimed = state.gems;
 	// The bag, the worn gear, the loot pity and the auto-sell filter are the ledger's: the stored copy carries the server's, whatever the upload
 	// held. A New Game (the same run's play time going back) starts them again from the new game's own; a ledger without them yet is seeded
@@ -159,7 +159,9 @@ export const acceptSave = async (
 	const newGame = !!(current && state.prestige.rebirths === current.summary.rebirths && state.playSeconds < current.summary.playSeconds - 1);
 	// A rebirth wipes the gear and the bag: the server's inventory starts again from the starter kit, whatever the upload carried
 	const rebirthed = !!(current && !newGame && state.prestige.rebirths > current.summary.rebirths);
-	const inventory = ledger?.inv && rebirthed ? rebirthInventory(ledger.inv, state.merchantUpgrades) : ledger?.inv ?? null;
+	// ... unless the server already did it when it ran the rebirth (`/api/rebirth`): the wipe happens once, and what was picked up since stays
+	const serverWiped = ledger?.inv?.rebirth?.to === state.prestige.rebirths;
+	const inventory = ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades) : ledger?.inv ?? null;
 	if (inventory && !newGame) state = stampInventory(state, inventory);
 	let summary = summarize(state);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;

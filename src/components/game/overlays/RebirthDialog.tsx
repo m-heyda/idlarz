@@ -7,6 +7,7 @@ import { castleModifier, economyTiles, emberGain, emberIncomeBonus, emberIncomeM
 import { castleLevelOf } from '@/lib/castleWard';
 import { formatHeaderAmount, formatNumber, formatPercent } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
+import { askServerRebirth } from '@/lib/serverRebirth';
 import PixelModal from '../PixelModal';
 import PixelIcon from '../PixelIcon';
 import EmberIcon from '../EmberIcon';
@@ -39,6 +40,8 @@ const RebirthDialog: React.FC = () => {
 	const rebirth = useGameStore((state) => state.rebirth);
 	const buyEmberUpgrade = useGameStore((state) => state.buyEmberUpgrade);
 	const [confirming, setConfirming] = useState(false);
+	const [asking, setAsking] = useState(false);
+	const showToast = useUiStore((state) => state.showToast);
 
 	if (!open) return null;
 
@@ -56,10 +59,23 @@ const RebirthDialog: React.FC = () => {
 		close();
 	};
 
-	const doRebirth = () => {
-		if (rebirth()) {
-			audioManager.playSound('fanfare');
-			handleClose();
+	// The server runs the rebirth first (it uploads the game, judges it, computes the Embers and wipes its bag and gear); the browser then starts
+	// the new run with the Embers the server named. Without a cloud save this session the browser rebirths on its own, as before.
+	const doRebirth = async () => {
+		if (asking) return;
+		setAsking(true);
+		try {
+			const answer = await askServerRebirth();
+			if (answer.status === 'refused') {
+				showToast('The server does not see your rebirth yet. Give the game a few seconds to save, then try again.');
+				return;
+			}
+			if (rebirth(answer.status === 'ok' ? answer.gain : undefined)) {
+				audioManager.playSound('fanfare');
+				handleClose();
+			}
+		} finally {
+			setAsking(false);
 		}
 	};
 
@@ -100,8 +116,8 @@ const RebirthDialog: React.FC = () => {
 						<button className='px-btn' onClick={() => setConfirming(false)}>
 							Not yet
 						</button>
-						<button className='px-btn px-btn-red' onClick={doRebirth}>
-							Rebirth
+						<button className='px-btn px-btn-red' onClick={doRebirth} disabled={asking}>
+							{asking ? 'Asking the server...' : 'Rebirth'}
 						</button>
 					</div>
 				</div>
