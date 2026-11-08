@@ -10,7 +10,8 @@ import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } f
 import { sealedRng } from '@/lib/offline/seal';
 import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps, type StepOutcome } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
-import type { ChestReward, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import { applyCraft } from '@/lib/offline/craft';
+import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 
@@ -189,6 +190,34 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 	});
 
 /**
+ * One craft request (docs/plan/crafting-v0.md): `count` crafts of a recipe. The components come out of the ledger's stock, a potion goes into the
+ * bag (a full bag refuses the whole request with nothing taken), the crafting XP is added. The browser has already paid the resources; the
+ * server counts their gold value in `craft.spent`. The answer is always the bag and the crafting state as they stand.
+ */
+export const craftStep = (
+	deps: ServiceDeps,
+	userId: string,
+	key: string,
+	request: { recipeId: string; count: number },
+	nowMs: number,
+): Promise<Online<CraftReply>> =>
+	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: CraftReply } => {
+		const ledger = ctx.ledger;
+		// count 0 only looks: the overlay asks for the crafting state when it opens
+		if (request.count === 0) return { ledger, value: { ok: true, crafted: 0, inv: ledger.inv!, craft: ledger.craft, serverNowSec: ctx.nowSec } };
+		const result = applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs);
+		const value: CraftReply = {
+			ok: result.ok,
+			...(result.reason ? { reason: result.reason } : {}),
+			crafted: result.ok ? request.count : 0,
+			inv: result.inv,
+			craft: result.craft,
+			serverNowSec: ctx.nowSec,
+		};
+		return { ledger: result.ok ? { ...ledger, inv: result.inv, craft: result.craft } : ledger, value };
+	});
+
+/**
  * The server runs the rebirth (IDL-102): from the last STORED save it checks the requirements, computes the Embers and wipes the bag, the gear
  * and the pity to the starter kit (Pack Rat kept), all in one ledger write, BEFORE the browser starts over and uploads the new run. A modified
  * client can no longer sell the old gear in the seconds before the rebirth save lands, and the save that follows is capped at exactly the
@@ -205,7 +234,10 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 			return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, serverNowSec: ctx.nowSec } };
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = { ...rebirthInventory(inv, ctx.stored.core.merchantUpgrades), rebirth: { to: judged.to, gain: judged.gain } };
-		return { ledger: { ...ctx.ledger, inv: wiped }, value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec } };
+		return {
+			ledger: { ...ctx.ledger, inv: wiped, craft: { ...ctx.ledger.craft, stock: {} } },
+			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec },
+		};
 	});
 
 export type FightRequest =

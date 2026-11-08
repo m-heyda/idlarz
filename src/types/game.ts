@@ -416,4 +416,5 @@ export interface GameState {
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;
 	organizeBag: () => boolean;
+	applyServerInventory: (inv: import('@/lib/offline/types').Inventory | undefined) => void;
 }

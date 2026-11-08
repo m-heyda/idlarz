@@ -9,6 +9,7 @@ import CharacterOverlay from './CharacterOverlay';
 import StatisticsOverlay from './StatisticsOverlay';
 import MerchantOverlay from './Merchant/MerchantOverlay';
 import FarmOverlay from './FarmOverlay';
+import CraftingOverlay from './CraftingOverlay';
 
 /**
  * Every game window, each open or not on its own: Equipment, Character, Merchant, Farm and the castle upgrade. They sit side by side,
@@ -46,6 +47,11 @@ const GameWindows: React.FC = () => {
 			{open.includes('farm') && (
 				<PixelWindow id='farm' title='Farm' icon={<PixelIcon name='menu_farm' alt='' />} width={1120} height={760} flush>
 					<FarmOverlay />
+				</PixelWindow>
+			)}
+			{open.includes('crafting') && (
+				<PixelWindow id='crafting' title='Crafting' icon={<PixelIcon name='menu_merchant' alt='' />} width={760} height={620}>
+					<CraftingOverlay />
 				</PixelWindow>
 			)}
 			{open.includes('castle') && <CastleUpgradeDialog />}

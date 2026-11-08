@@ -15,4 +15,8 @@ export const CRAFTING = {
 	] as readonly (readonly [number, number])[],
 	/** Most crafts one request may do (docs/17 section 5) */
 	maxCount: 10,
+	/** One craft request per second per player */
+	minGapMs: 1000,
+	/** Most of one component the stock holds */
+	componentCap: 999,
 };

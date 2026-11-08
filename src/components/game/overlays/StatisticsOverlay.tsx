@@ -13,6 +13,8 @@ import { getStatDescriptionGroups } from '@/utils/game/character';
 import { formatNumber, formatPercent, formatRate, formatCompact } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { useUiStore, type CharacterTab } from '@/stores/uiStore';
+import { craftLevelOf } from '@/lib/crafting';
+import { useCraftStore } from '@/stores/craftStore';
 import RebirthsPanel from './RebirthsPanel';
 
 const CHARACTER_TAB_LABELS: { id: CharacterTab; label: string }[] = [
@@ -78,6 +80,7 @@ const BreakdownBody: React.FC<{ entry: ResourceBreakdownEntry }> = ({ entry }) =
 };
 
 const StatisticsOverlay: React.FC = () => {
+	const craftXp = useCraftStore((state) => state.craft?.xp ?? 0);
 	const addStatPoint = useGameStore((state) => state.addStatPoint);
 	const resourceRates = useGameStore((state) => state.resourceRates);
 	const tiles = useGameStore((state) => state.tiles);
@@ -190,6 +193,7 @@ const StatisticsOverlay: React.FC = () => {
 							<Line label='Next level' value={pct(level.progress * 100, 1)} valueClass='text-purple-400' />
 							<Line label='XP' value={`${formatNumber(resources.xp)} (${formatRate(resourceRates.total.xp)})`} valueClass='text-green-400' />
 							<Line label='Gold' value={formatNumber(resources.gold)} valueClass='text-yellow-400' />
+							<Line label='Crafting level' value={craftLevelOf(craftXp).level} valueClass='text-orange-300' />
 							<Line label='Tiles' value={formatCompact(countOwnedTiles(tiles))} valueClass='text-blue-400' />
 							<Line
 								label='Rebirths'

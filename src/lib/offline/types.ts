@@ -104,6 +104,38 @@ export interface InventoryReply {
 	serverNowSec: number;
 }
 
+/**
+ * The player's crafting (ledger column `craft`, docs/plan/crafting-v0.md). The crafting level is derived from `xp` and never stored on its own,
+ * and survives a rebirth; `stock` (components) is a run's material and is emptied by one. A row without the column reads as `emptyCraft()`.
+ */
+export interface CraftState {
+	/** Lifetime crafting XP */
+	xp: number;
+	/** Crafts done, lifetime (the seed counter for the random crafts to come: gear) */
+	ord: number;
+	/** Components held: component id -> count */
+	stock: Record<string, number>;
+	/** Bad-luck counters per tier (gear, later); empty in v0.0 */
+	pity: Record<string, number>;
+	/** Gold value of the resources the crafts took, lifetime: the browser pays them, the server only counts them (for the spending audit to come) */
+	spent: number;
+	/** Epoch ms of the last craft that went through (the 1 request per second limit) */
+	last: number;
+}
+
+/** Why a craft was refused (nothing is charged and nothing is changed) */
+export type CraftRefusal = 'bad_request' | 'unknown_recipe' | 'not_craftable' | 'locked' | 'too_fast' | 'no_components' | 'stock_full' | 'bag_full';
+
+/** What /api/craft answers: whether it was done, why not, how many were made, and the bag and crafting state as they stand now. */
+export interface CraftReply {
+	ok: boolean;
+	reason?: CraftRefusal;
+	crafted: number;
+	inv: Inventory;
+	craft: CraftState;
+	serverNowSec: number;
+}
+
 /** What /api/rebirth answers: whether the server ran the rebirth, the Embers it pays, and the inventory the new run starts with (the starter kit). */
 export interface RebirthReply {
 	ok: boolean;

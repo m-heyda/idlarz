@@ -2,7 +2,8 @@ import { zeroResources } from '@/catalog/resourceKeys';
 import { STARTING_GEMS } from '@/config/economy';
 import type { CombatState } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
-import type { Inventory } from '@/lib/offline/types';
+import { emptyCraft } from '@/lib/crafting';
+import type { CraftState, Inventory } from '@/lib/offline/types';
 import { emptyBank, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
 import type { Resources } from '@/types/game';
 
@@ -29,6 +30,24 @@ export const subtractTotals = (a: GrantTotals, b: GrantTotals): GrantTotals => {
 		out[key] = Math.max(0, (a[key] ?? 0) - (b[key] ?? 0));
 	});
 	return out;
+};
+
+/** True for the state of a player who never crafted (stored as null, so the column stays empty for most rows). */
+export const isEmptyCraft = (c: CraftState): boolean =>
+	c.xp === 0 && c.ord === 0 && c.spent === 0 && Object.keys(c.stock).length === 0 && Object.keys(c.pity).length === 0;
+
+/** Reads the stored column back: a missing column, null or anything malformed reads as zeros. */
+export const craftFromJson = (raw: unknown): CraftState => {
+	const out = emptyCraft();
+	if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out;
+	const r = raw as Record<string, unknown>;
+	const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0);
+	const counts = (v: unknown): Record<string, number> => {
+		const res: Record<string, number> = {};
+		if (typeof v === 'object' && v !== null && !Array.isArray(v)) for (const [k, x] of Object.entries(v)) if (n(x) > 0) res[k] = Math.floor(n(x));
+		return res;
+	};
+	return { xp: n(r.xp), ord: Math.floor(n(r.ord)), stock: counts(r.stock), pity: counts(r.pity), spent: n(r.spent), last: n(r.last) };
 };
 
 export interface Ledger {
@@ -58,6 +77,8 @@ export interface Ledger {
 	combat: CombatState | null;
 	/** The bag, the worn gear, the loot pity and the auto-sell filter: the server's, not the save's (null only in rows from before the inventory moved here; the first request seeds it from the save) */
 	inv: Inventory | null;
+	/** Crafting: level XP, craft counter, component stock (migration crafting_ledger; zeros for a row without the column) */
+	craft: CraftState;
 }
 
 export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
@@ -76,6 +97,7 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	lastResult: null,
 	combat: null,
 	inv: null,
+	craft: emptyCraft(),
 });
 
 /**

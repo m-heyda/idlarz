@@ -1,6 +1,6 @@
 # Crafting v0 (potions first)
 
-Status: PR 1 (data and pure logic) built; server (PR 2) and overlay (PR 3) follow. The long-term design is [17-crafting](../17-crafting.md) (gear, tiers, Ichor); this file is the small first slice and wins where they differ for v0.
+Status: v0.0 built in three PRs (data and pure logic, server, overlay). The long-term design is [17-crafting](../17-crafting.md) (gear, tiers, Ichor); this file is the small first slice and wins where they differ for v0.
 
 ## Owner decision (2026-11-08)
 Crafting makes three things: **usable items**, **half-products** and **sellable goods**. v0 starts with **potions only**, then components and goods, then gear.
@@ -30,11 +30,26 @@ Numbers and the cost table: [generated/craft-sim.md](../generated/craft-sim.md) 
 - **Crafting level** comes only from crafting, is kept on rebirth, and is derived from lifetime crafting XP (never stored separately). The curve is anchors in `src/config/crafting.ts` (level 10 at 1,500 XP, 30 at 40k, 60 at 1M, 100 at 30M), solved like `LEVELING`. Level 10 is roughly 250 minor potions, the first days of play.
 - **Limits** (PR 2): 1 to 10 crafts per request, 1 request per second, idempotent by key.
 - **Bag full.** A potion craft that needs a new bag slot when none is free is refused and nothing is charged (the stack is topped up first, so a full bag with room in the potion stack still works).
-- **Materials are client-held**, so the browser pays the resources and the server records the spend in `granted.spent` and the verifier counts it ([17](../17-crafting.md) section 5). Components are the exception: they are server state (`craft.stock`), so the server checks and takes them itself.
+- **Materials are client-held**, so the browser pays the resources. `buyShop` records no spend and `verify.ts` has no spending audit yet, so v0.0 only counts the gold value of the resources in `craft.spent` (the data a later audit needs); it does not touch `granted` or the verifier ([17](../17-crafting.md) section 5). Components are the exception: they are server state (`craft.stock`), so the server checks and takes them itself.
 - **No failure and no randomness in v0.0.** A craft always succeeds, so there is no seed or pity yet (`craft.ord` and `craft.pity` are reserved in the column for gear).
 
 ## Server shape (PR 2)
-`player_ledger.craft jsonb { xp, ord, stock, pity }`, nullable; a row without it reads as zeros. `POST /api/craft { key, recipeId, count }` answers with the new `inv` and `craft` state.
+`player_ledger.craft jsonb { xp, ord, stock, pity, spent, last }` (`last` = the 1 request per second limit), nullable; a row without it reads as zeros. `POST /api/craft { key, recipeId, count }` answers with the new `inv` and `craft` state.
+
+## Progression and rankings (owner, 2026-11-08)
+- **Crafting is a grind with gates.** New recipes unlock only at a crafting level (`Recipe.unlock`), and the level comes only from crafting, so the player has to craft the cheap recipes in volume to reach the better ones. Each tier of recipes is a step up in cost and in XP per craft, but the XP needed per level grows faster than the XP per craft, so the same recipe is not enough for long. Rule for new recipes: the first craft of a recipe is reachable after a day or more of the previous tier, never by one big purchase.
+- **Crafting level is a ranking column later** ([15](../15-leaderboard-and-world-preview.md)). It is derived from `craft.xp` in the ledger, never from the save, so it is enforced and not poisoned by a forged upload; the leaderboard row would copy the level when the ledger changes. Not in v0.0.
+
+## Timed batch queue (v0.1, owner request 2026-11-08)
+Linear: IDL-233 (queue, urgent), IDL-235 (upgrades).
+v0.0 crafts instantly (1 to 10 per request) but is built so the next step is a **queue**, not a rewrite:
+- **A craft takes time per item** (`Recipe.timeSec`, 0 = instant in v0.0). The player queues a **batch of up to 1,000 items** (for example 1,000 potions at 14 s each is about 4 h) and the batch **keeps running while the player is away**, like the offline grant.
+- **The server owns the clock.** The ledger holds one queue entry `{ recipeId, count, startedAt, timeSec, done }`; the output is not stored as a timer per item but derived: `done = min(count, floor((now - startedAt) / timeSec))`. A claim (opening the overlay, `POST /api/craft/claim`) pays the finished items with the usual bag-full rule (the rest waits in the queue, it is never converted to gold), adds the XP and shortens the entry. Idempotent by key, like every route.
+- **The resources are paid up front for the whole batch** (the browser pays, the server counts it in `craft.spent`); cancelling refunds the unfinished part (browser-held resources: the cancel answer names the refund and the browser adds it). Components are taken from `craft.stock` when the batch is queued.
+- **Limits stay data**, so upgrades can raise them: queue length (slots), the batch cap (10 now, 1,000 later), the offline run cap (hours the queue may run unattended), and a speed multiplier on `timeSec`.
+- **Upgrade hooks** (all optional, Ember shop or building shaped, `limitOf` with a `HARD_LIMITS` ceiling): *Workbench* (faster crafts), *Second queue slot*, *Apprentice* (longer offline run), *Efficient hands* (a chance or a flat % off the resource cost, which must keep the no-printer rule). Resources are the other lever: scarcer inputs make a batch a real decision.
+- **Pacing.** With time per item the crafting level is limited by time as well as by material; `craft-sim` must report items per hour, hours per level and the gold value burned per hour, so a 4 h batch pays about the same XP per hour as hand-crafting.
+- Open: do crafts of a running batch count for the `ord` seed of gear; does the batch pause during a fight (proposal: no, crafting is a workshop and runs on its own).
 
 ## Open questions
 1. Is one vial per potion the right ratio, or should a vial craft yield two? It decides how often the vial recipe is pressed.

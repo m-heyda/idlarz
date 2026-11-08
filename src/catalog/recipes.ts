@@ -33,6 +33,8 @@ export interface Recipe {
 	unlock: number;
 	/** Crafting XP per craft */
 	xp: number;
+	/** Seconds one craft takes (the timed batch queue of v0.1, docs/plan/crafting-v0.md); left out = instant, as every v0.0 recipe */
+	timeSec?: number;
 }
 
 export const RECIPES: Recipe[] = [

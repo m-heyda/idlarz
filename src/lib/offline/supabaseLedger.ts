@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CombatState } from './fightTypes';
-import type { Inventory } from './types';
-import { zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
+import type { CraftState, Inventory } from './types';
+import { craftFromJson, isEmptyCraft, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
 import { emptyBank, type TicketBank } from './tickets';
 
 interface Row {
@@ -20,9 +20,10 @@ interface Row {
 	last_result: unknown;
 	combat: CombatState | null;
 	inv: Inventory | null;
+	craft: CraftState | null;
 }
 
-const COLUMNS = 'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv';
+const COLUMNS = 'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft';
 
 const toRow = (ledger: Ledger) => ({
 	ver: ledger.ver,
@@ -40,6 +41,7 @@ const toRow = (ledger: Ledger) => ({
 	last_result: ledger.lastResult,
 	combat: ledger.combat,
 	inv: ledger.inv,
+	craft: isEmptyCraft(ledger.craft) ? null : ledger.craft,
 	updated_at: new Date().toISOString(),
 });
 
@@ -59,6 +61,7 @@ const fromRow = (row: Row): Ledger => ({
 	lastResult: row.last_result,
 	combat: row.combat ? { ...row.combat, queue: row.combat.queue ?? [] } : null,
 	inv: row.inv ?? null,
+	craft: craftFromJson(row.craft),
 });
 
 /**

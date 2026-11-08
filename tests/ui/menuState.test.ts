@@ -90,3 +90,11 @@ test('an affordable farm upgrade lights the dot even when no animal is', () => {
 	const [short] = Object.keys(cost) as (keyof typeof cost)[];
 	assert.equal(farmHasPurchase({ ...exact, [short]: (cost[short] ?? 1) - 1 }, full, {}), false);
 });
+
+test('the crafting window opens and closes like the others', () => {
+	closeAll();
+	win().toggleWindow('crafting');
+	assert.deepEqual(win().order, ['crafting']);
+	win().toggleWindow('crafting');
+	assert.deepEqual(win().order, []);
+});
