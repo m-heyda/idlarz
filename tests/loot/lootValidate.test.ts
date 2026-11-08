@@ -127,10 +127,7 @@ test('every weighted rarity needs an eligible item at every level the source can
 		if (item.generation === 'base' && item.enabled !== false) item.allowedRarities = item.allowedRarities!.filter((r) => r !== 'rare');
 	assert.ok(has(d, /rarity rare has weight but no eligible item/));
 	// ...is fine when the weight is zero
-	d.profiles.normal_monster.rarityWeights.rare = 0;
-	d.profiles.basic_chest.rarityWeights.rare = 0;
-	d.profiles.boss.rarityWeights.rare = 0;
-	d.profiles.merchant_stock.rarityWeights.rare = 0;
+	for (const profile of Object.values(d.profiles)) profile.rarityWeights.rare = 0;
 	assert.deepEqual(validateLootData(d).errors, []);
 });
 

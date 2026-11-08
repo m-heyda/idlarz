@@ -1,3 +1,5 @@
+import { GRADES, type Grade } from '@/catalog/items/grades';
+
 // Loot configuration: which sources give what. Pure data; the pipeline in src/lib/loot reads it and nothing here is
 // code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/game/loot.md).
 //
@@ -12,6 +14,8 @@ export interface PoolDef {
 	includeIds?: string[];
 	/** An item must have ALL of these tags (ItemDef.tags) */
 	requireTags?: string[];
+	/** No item of a higher ladder grade is in the pool (a biome's ceiling). Items outside the ladder (no `grade:` tag) are not held back. */
+	maxGrade?: Grade;
 	excludeTags?: string[];
 	excludeIds?: string[];
 	/** Per-item weight in this pool when it should differ from the item's `poolWeight` (potions drop differently per source) */
@@ -100,8 +104,35 @@ export interface LootSource {
 	levels?: { min: number; max: number };
 }
 
+/**
+ * The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7).
+ * The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; the legacy pieces with no grade tag, e.g. Obsidian, stay in every pool as before); the floor needs no tag because an item only exists inside its grade's item level
+ * window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
+ * a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items,
+ * so today every biome drops the same items; raising the ceiling's live grade is what moves a biome.
+ */
+export const BIOME_LOOT = {
+	plains: { ceiling: 3, levels: { min: 1, max: 20 } },
+	forest: { ceiling: 4, levels: { min: 4, max: 24 } },
+	swamp: { ceiling: 5, levels: { min: 8, max: 28 } },
+	tundra: { ceiling: 7, levels: { min: 12, max: 30 } },
+} as const satisfies Record<string, { ceiling: number; levels: { min: number; max: number } }>;
+export type LootBiome = keyof typeof BIOME_LOOT;
+
+/** The loot source a normal monster of this biome drops from (`monster_plains`...) */
+export const monsterSourceId = (biome: string): string => `monster_${biome}`;
+
+const biomePools = (): Record<string, PoolDef> =>
+	Object.fromEntries(
+		Object.entries(BIOME_LOOT).map(([biome, { ceiling }]) => {
+			const id = `equipment_${biome}`;
+			return [id, { id, requireTags: ['gear'], excludeTags: ['named'], maxGrade: GRADES[ceiling - 1], enabled: true } satisfies PoolDef];
+		}),
+	);
+
 export const LOOT_POOLS: Record<string, PoolDef> = {
 	general_equipment: { id: 'general_equipment', requireTags: ['gear'], excludeTags: ['named'], enabled: true },
+	...biomePools(),
 	legendary_weapons: { id: 'legendary_weapons', enabled: true },
 	potions_rat: {
 		id: 'potions_rat',
@@ -114,17 +145,26 @@ export const LOOT_POOLS: Record<string, PoolDef> = {
 	potions_chest: { id: 'potions_chest', includeIds: ['potion_minor', 'potion_greater'], weights: { potion_minor: 60, potion_greater: 25 }, enabled: true },
 };
 
+/** A normal monster's profile; each biome gets a copy that draws from its own pool (same rolls, same rarities) */
+const NORMAL_MONSTER: LootProfile = {
+	id: 'normal_monster',
+	rolls: { min: 1, max: 1, chancePerRoll: 0.12, chancePerLevel: 0.01 },
+	itemLevel: { offset: 0, variance: 1, min: 1, max: 100 },
+	rarityWeights: { common: 70, uncommon: 22, rare: 7, epic: 1, legendary: 0.2 },
+	rarityLevelGate: { rare: 3, epic: 8, legendary: 15 },
+	generalPoolId: 'general_equipment',
+	bonusTables: [{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerLevel: 0.015, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } }],
+	enabled: true,
+};
+
 export const LOOT_PROFILES: Record<string, LootProfile> = {
-	normal_monster: {
-		id: 'normal_monster',
-		rolls: { min: 1, max: 1, chancePerRoll: 0.12, chancePerLevel: 0.01 },
-		itemLevel: { offset: 0, variance: 1, min: 1, max: 100 },
-		rarityWeights: { common: 70, uncommon: 22, rare: 7, epic: 1, legendary: 0.2 },
-		rarityLevelGate: { rare: 3, epic: 8, legendary: 15 },
-		generalPoolId: 'general_equipment',
-		bonusTables: [{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerLevel: 0.015, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } }],
-		enabled: true,
-	},
+	normal_monster: NORMAL_MONSTER,
+	...Object.fromEntries(
+		Object.keys(BIOME_LOOT).map((biome) => [
+			`normal_monster_${biome}`,
+			{ ...NORMAL_MONSTER, id: `normal_monster_${biome}`, generalPoolId: `equipment_${biome}` } satisfies LootProfile,
+		]),
+	),
 	boss: {
 		id: 'boss',
 		rolls: { min: 1, max: 1, guaranteed: 1, chancePerRoll: 1 },
@@ -174,7 +214,14 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 
 /** Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45). */
 export const LOOT_SOURCES: Record<string, LootSource> = {
+	// A biome-less normal monster (the debug panel, tests): the whole general pool. The game's monsters use their biome's source below.
 	monster: { id: 'monster', lootProfileId: 'normal_monster', levels: { min: 1, max: 30 } },
+	...Object.fromEntries(
+		Object.entries(BIOME_LOOT).map(([biome, { levels }]) => [
+			monsterSourceId(biome),
+			{ id: monsterSourceId(biome), lootProfileId: `normal_monster_${biome}`, levels } satisfies LootSource,
+		]),
+	),
 	boss: { id: 'boss', lootProfileId: 'boss', levels: { min: 15, max: 45 } },
 	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perCastleLevel: 3 } },
 	merchant: { id: 'merchant', lootProfileId: 'merchant_stock', level: { base: 4, perCastleLevel: 3 } },

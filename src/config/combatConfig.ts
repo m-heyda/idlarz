@@ -1,3 +1,4 @@
+import { monsterSourceId } from '@/catalog/lootConfig';
 import { LIMITS } from '@/config/limits';
 import type { BiomeType } from '@/types/game';
 
@@ -283,7 +284,7 @@ const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof type
 		attackPerLevel: Math.sqrt(1.25), // the old 1.25 per tier
 		armorPerLevel: 0.5,
 		spawnWindow: tier.window,
-		lootSourceId: 'monster',
+		lootSourceId: monsterSourceId(biome),
 	};
 };
 

@@ -4,7 +4,8 @@
 //   npm run loot-sim -- --kills 20000 --seed 7
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { ITEM_CATALOG, LOOT_PROFILES, RARITIES, RARITY_ORDER } from '../src/catalog';
+import { BIOME_LOOT, ITEM_CATALOG, LOOT_PROFILES, RARITIES, RARITY_ORDER, monsterSourceId } from '../src/catalog';
+import { gradeOfItem } from '../src/catalog/items/grades';
 import { baseStatsAt } from '../src/lib/itemInstance';
 import { generateLoot } from '../src/lib/loot/generate';
 import { LOOT_DATA } from '../src/lib/loot/data';
@@ -94,6 +95,44 @@ for (const s of SCENARIOS) {
 	levels.sort((a, b) => a - b);
 	out(
 		`| ${s.label} | ${sourceLevel} | ${(gear / KILLS).toFixed(3)} | ${RARITY_ORDER.map((r) => pct(byRarity.get(r) ?? 0, gear)).join(' | ')} | ${percentile(levels, 0.5)} / ${percentile(levels, 0.9)} / ${levels[levels.length - 1] ?? 0} | ${pct(high, KILLS)} | ${(named / KILLS).toFixed(4)} | ${warnings} |`,
+	);
+}
+
+out();
+out('## Per biome');
+out();
+out(
+	'Normal monsters drop from the source of their biome (`monster_<biome>`, pool `equipment_<biome>`: ladder grades up to the ceiling of the biome, plus the legacy pieces with no grade). Each row is a monster level inside the range of the biome: gear per kill, the grade mix of what dropped (`-` = a piece outside the ladder) and the share of drops per slot kind. Only the live grades (G1-G3) have enabled items, so the ceilings above G3 change nothing yet.',
+);
+out();
+out('| Source | Level | Gear / kill | Grades | Weapon | Off hand | Armor | Accessory |');
+out('|---|---:|---:|---|---:|---:|---:|---:|');
+const biomeRows = [
+	...Object.entries(BIOME_LOOT).flatMap(([biome, { levels }]) =>
+		[levels.min, Math.round((levels.min + levels.max) / 2), levels.max].map((level) => ({ id: monsterSourceId(biome), level })),
+	),
+	{ id: 'monster', level: 9 },
+];
+for (const row of biomeRows) {
+	const rng = mulberry32(SEED);
+	const grades = new Map<string, number>();
+	const kinds = new Map<string, number>();
+	let gear = 0;
+	for (let i = 0; i < KILLS; i++) {
+		for (const d of generateLoot({ sourceId: row.id, level: row.level }, rng).drops) {
+			if (d.kind !== 'gear') continue;
+			gear++;
+			const def = ITEM_CATALOG[d.item.base];
+			grades.set(gradeOfItem(def) ?? '-', (grades.get(gradeOfItem(def) ?? '-') ?? 0) + 1);
+			kinds.set(def.kind, (kinds.get(def.kind) ?? 0) + 1);
+		}
+	}
+	const gradeMix = [...grades.entries()]
+		.sort()
+		.map(([g, n]) => `${g} ${pct(n, gear)}`)
+		.join(', ');
+	out(
+		`| ${row.id} | ${row.level} | ${(gear / KILLS).toFixed(3)} | ${gradeMix} | ${['weapon', 'offhand', 'armor', 'accessory'].map((k) => pct(kinds.get(k) ?? 0, gear)).join(' | ')} |`,
 	);
 }
 

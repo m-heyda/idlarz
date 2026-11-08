@@ -7,7 +7,7 @@ import { calculateLevel, totalStatPoints } from '@/utils/game/character';
 import { calculateResourceRates } from '@/utils/game/income';
 import { merchantCombat } from '@/utils/game/merchant';
 import { manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
-import { generateMerchantStock, rotationRng, stockDue } from '@/lib/merchant';
+import { bestWornGrade, generateMerchantStock, rotationRng, stockDue } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
 import { gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
@@ -115,7 +115,14 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			playerHp: newPlayerHp,
 			playerMp: newPlayerMp,
 			merchantStock: stockDue(state.merchantStock, newPlaySeconds, limitCtx(state))
-				? generateMerchantStock(castleLevelOf(state.tiles), averageItemLevel(state.equipment), rotationRng(newPlaySeconds), newPlaySeconds, limitCtx(state))
+				? generateMerchantStock(
+						castleLevelOf(state.tiles),
+						averageItemLevel(state.equipment),
+						rotationRng(newPlaySeconds),
+						newPlaySeconds,
+						limitCtx(state),
+						bestWornGrade(state.equipment),
+					)
 				: state.merchantStock,
 			playSeconds: newPlaySeconds,
 		});

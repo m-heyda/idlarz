@@ -20,6 +20,26 @@ Config validation: 0 errors, 0 warnings.
 | Chest, castle 5 | 16 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 16 / 17 / 17 | 5.9% | 0.0190 | 0 |
 | Chest, castle 10 | 31 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 31 / 32 / 32 | 5.9% | 0.0190 | 0 |
 
+## Per biome
+
+Normal monsters drop from the source of their biome (`monster_<biome>`, pool `equipment_<biome>`: ladder grades up to the ceiling of the biome, plus the legacy pieces with no grade). Each row is a monster level inside the range of the biome: gear per kill, the grade mix of what dropped (`-` = a piece outside the ladder) and the share of drops per slot kind. Only the live grades (G1-G3) have enabled items, so the ceilings above G3 change nothing yet.
+
+| Source | Level | Gear / kill | Grades | Weapon | Off hand | Armor | Accessory |
+|---|---:|---:|---|---:|---:|---:|---:|
+| monster_plains | 1 | 0.119 | - 60.3%, G1 39.7% | 22.8% | 10.7% | 41.8% | 24.7% |
+| monster_plains | 11 | 0.221 | - 68.1%, G2 31.9% | 21.7% | 8.2% | 40.4% | 29.7% |
+| monster_plains | 20 | 0.310 | - 91.8%, G3 8.2% | 24.6% | 7.5% | 40.4% | 27.5% |
+| monster_forest | 4 | 0.150 | - 68.8%, G1 31.2% | 22.7% | 9.7% | 42.7% | 24.9% |
+| monster_forest | 14 | 0.250 | - 68.5%, G2 31.5% | 22.0% | 8.3% | 40.1% | 29.7% |
+| monster_forest | 24 | 0.349 | - 89.7%, G3 10.3% | 28.6% | 7.0% | 38.2% | 26.2% |
+| monster_swamp | 8 | 0.191 | - 72.1%, G1 17.2%, G2 10.6% | 23.3% | 8.7% | 40.9% | 27.2% |
+| monster_swamp | 18 | 0.289 | - 76.4%, G2 21.1%, G3 2.5% | 22.4% | 7.8% | 40.7% | 29.1% |
+| monster_swamp | 28 | 0.389 | - 89.6%, G3 10.4% | 28.3% | 7.0% | 38.6% | 26.1% |
+| monster_tundra | 12 | 0.231 | - 68.1%, G2 31.9% | 21.7% | 8.3% | 40.2% | 29.8% |
+| monster_tundra | 21 | 0.318 | - 90.7%, G3 9.3% | 26.6% | 7.2% | 39.5% | 26.7% |
+| monster_tundra | 30 | 0.408 | - 93.1%, G3 6.9% | 28.0% | 7.0% | 38.9% | 26.0% |
+| monster | 9 | 0.201 | - 71.0%, G1 8.0%, G2 21.1% | 22.6% | 8.6% | 40.3% | 28.5% |
+
 ## What Luck does
 
 A level 9 monster and a castle 5 chest at several Luck totals (Charisma + Lucky Charm + gear). Gems and lucky monsters exist only for signed-in players (the server rolls them).
@@ -48,6 +68,10 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 ## Profiles
 
 - **normal_monster**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
+- **normal_monster_plains**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
+- **normal_monster_forest**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
+- **normal_monster_swamp**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
+- **normal_monster_tundra**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
 - **boss**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_legendary, king_potions
 - **basic_chest**: 1-1 roll(s), 0 guaranteed, 82% per roll; rarity weights common 62.0%, uncommon 24.0%, rare 9.0%, epic 4.0%, legendary 1.0%; bonus: chest_legendary, chest_potion
 - **merchant_stock**: 12-12 roll(s), 12 guaranteed, 100% per roll; rarity weights common 60.0%, uncommon 40.0%; bonus: none

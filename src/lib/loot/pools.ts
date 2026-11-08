@@ -1,5 +1,6 @@
 import type { PoolDef } from '@/catalog/lootConfig';
 import { MAX_ITEM_LEVEL } from '@/catalog/stats';
+import { gradeAllowed, type Grade } from '@/catalog/items/grades';
 import type { ItemDef } from '@/types/game';
 import type { LootData } from './data';
 
@@ -12,6 +13,7 @@ export interface Candidate {
 const inPool = (item: ItemDef, pool: PoolDef): boolean => {
 	if (!pool.enabled || item.enabled === false) return false;
 	if (pool.excludeIds?.includes(item.id)) return false;
+	if (pool.maxGrade && !gradeAllowed(item, pool.maxGrade)) return false;
 	if (pool.excludeTags?.some((tag) => item.tags?.includes(tag))) return false;
 	if (pool.includeIds?.includes(item.id)) return true;
 	if (item.pools?.includes(pool.id)) return true;
@@ -27,12 +29,13 @@ export const poolMembers = (data: LootData, poolId: string): ItemDef[] => {
 const weightIn = (item: ItemDef, pool: PoolDef): number => pool.weights?.[item.id] ?? item.poolWeight ?? 1;
 
 /** Members that exist at this item level (item window and the pool's own minimum), with their weights. */
-export const eligibleCandidates = (data: LootData, poolId: string, level: number): Candidate[] => {
+export const eligibleCandidates = (data: LootData, poolId: string, level: number, maxGrade?: Grade): Candidate[] => {
 	const pool = data.pools[poolId];
 	if (!pool) return [];
 	const out: Candidate[] = [];
 	for (const def of Object.values(data.items)) {
 		if (!inPool(def, pool)) continue;
+		if (maxGrade && !gradeAllowed(def, maxGrade)) continue;
 		const min = Math.max(def.minItemLevel ?? 1, pool.minLevels?.[def.id] ?? 1);
 		const max = def.maxItemLevel ?? MAX_ITEM_LEVEL;
 		if (level < min || level > max) continue;
