@@ -13,8 +13,8 @@ export const CRAFTING = {
 		[60, 5_000_000],
 		[80, 30_000_000],
 	] as readonly (readonly [number, number])[],
-	/** Most crafts one request may do (docs/plan/17-crafting.md section 5) */
-	maxCount: 10,
+	// The batch cap, queue slots, offline run hours and speed are limits (config/limits.ts: craftBatchCap, craftQueueSlots, craftOfflineHours,
+	// craftSpeed), read through `craftLimit` in lib/crafting.ts.
 	/** One craft request per second per player */
 	minGapMs: 1000,
 	/** Most of one component the stock holds */

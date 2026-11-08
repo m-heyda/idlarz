@@ -33,7 +33,7 @@ export interface Recipe {
 	unlock: number;
 	/** Crafting XP per craft */
 	xp: number;
-	/** Seconds one craft takes (the timed batch queue of v0.1, docs/plan/crafting-v0.md); left out = instant, as every v0.0 recipe */
+	/** Seconds one craft takes (the timed batch queue, docs/plan/crafting-v0.md); left out = instant, as every v0.0 recipe */
 	timeSec?: number;
 }
 
@@ -49,6 +49,7 @@ export const RECIPES: Recipe[] = [
 		output: { component: 'glass_vial', qty: 1 },
 		unlock: 1,
 		xp: 2,
+		timeSec: 10,
 	},
 	{
 		id: 'potion_minor',
@@ -61,6 +62,7 @@ export const RECIPES: Recipe[] = [
 		output: { item: 'potion_minor', qty: 1 },
 		unlock: 1,
 		xp: 6,
+		timeSec: 14,
 	},
 	{
 		id: 'potion_greater',
@@ -74,6 +76,7 @@ export const RECIPES: Recipe[] = [
 		output: { item: 'potion_greater', qty: 1 },
 		unlock: 5,
 		xp: 25,
+		timeSec: 30,
 	},
 ];
 

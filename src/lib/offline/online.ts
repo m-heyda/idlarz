@@ -10,7 +10,7 @@ import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } f
 import { sealedRng } from '@/lib/offline/seal';
 import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps, type StepOutcome } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
-import { applyCraft } from '@/lib/offline/craft';
+import { applyCancel, applyClaim, applyCraft } from '@/lib/offline/craft';
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
@@ -189,27 +189,33 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 		return { ledger: next, value: { ok: true, gold: result.gold, count: result.count, inv: result.inv, serverNowSec: ctx.nowSec } };
 	});
 
+/** A crafting request: queue (or do) crafts of a recipe, or claim / cancel a running batch by its slot. */
+export type CraftRequest = { action?: 'craft'; recipeId: string; count: number } | { action: 'claim' | 'cancel'; slot: number };
+
 /**
- * One craft request (docs/plan/crafting-v0.md): `count` crafts of a recipe. The components come out of the ledger's stock, a potion goes into the
- * bag (a full bag refuses the whole request with nothing taken), the crafting XP is added. The browser has already paid the resources; the
- * server counts their gold value in `craft.spent`. The answer is always the bag and the crafting state as they stand.
+ * One crafting request (docs/plan/crafting-v0.md): `count` crafts of a recipe are queued as a timed batch (a recipe without a time is done at
+ * once), or a batch is claimed (the finished crafts reach the bag or the stock, with their XP) or cancelled (the unfinished part is refunded).
+ * The components come out of the ledger's stock; the browser has already paid the resources and the server counts their gold value in
+ * `craft.spent`. The answer is always the bag and the crafting state as they stand.
  */
-export const craftStep = (
-	deps: ServiceDeps,
-	userId: string,
-	key: string,
-	request: { recipeId: string; count: number },
-	nowMs: number,
-): Promise<Online<CraftReply>> =>
+export const craftStep = (deps: ServiceDeps, userId: string, key: string, request: CraftRequest, nowMs: number): Promise<Online<CraftReply>> =>
 	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: CraftReply } => {
 		const ledger = ctx.ledger;
 		// count 0 only looks: the overlay asks for the crafting state when it opens
-		if (request.count === 0) return { ledger, value: { ok: true, crafted: 0, inv: ledger.inv!, craft: ledger.craft, serverNowSec: ctx.nowSec } };
-		const result = applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs);
+		if ('recipeId' in request && request.count === 0)
+			return { ledger, value: { ok: true, crafted: 0, inv: ledger.inv!, craft: ledger.craft, serverNowSec: ctx.nowSec } };
+		const result =
+			'recipeId' in request
+				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs)
+				: request.action === 'claim'
+					? applyClaim(ledger.inv!, ledger.craft, request.slot, nowMs)
+					: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs);
 		const value: CraftReply = {
 			ok: result.ok,
 			...(result.reason ? { reason: result.reason } : {}),
-			crafted: result.ok ? request.count : 0,
+			crafted: result.ok ? (result.crafted ?? 0) : 0,
+			...(result.ok && result.queued ? { queued: result.queued } : {}),
+			...(result.ok && result.refund ? { refund: result.refund } : {}),
 			inv: result.inv,
 			craft: result.craft,
 			serverNowSec: ctx.nowSec,
@@ -235,7 +241,7 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = { ...rebirthInventory(inv, ctx.stored.core.merchantUpgrades), rebirth: { to: judged.to, gain: judged.gain } };
 		return {
-			ledger: { ...ctx.ledger, inv: wiped, craft: { ...ctx.ledger.craft, stock: {} } },
+			ledger: { ...ctx.ledger, inv: wiped, craft: { ...ctx.ledger.craft, stock: {}, queue: [] } },
 			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec },
 		};
 	});

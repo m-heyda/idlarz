@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { COMPONENTS, RECIPES, type Recipe } from '@/catalog/recipes';
 import { ITEM_CATALOG } from '@/catalog';
-import { CRAFTING } from '@/config/crafting';
-import { craftBlock, craftLevelOf, craftNeeds, craftXpToNext } from '@/lib/crafting';
-import { selectStock, useCraftStore } from '@/stores/craftStore';
+import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpToNext, finishedOf } from '@/lib/crafting';
+import { RECIPE_BY_ID } from '@/catalog/recipes';
+import { selectQueue, selectStock, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { formatNumber } from '@/utils/formatters';
+import { formatNumber, formatTime } from '@/utils/formatters';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
 import { itemIconName } from '../itemUi';
@@ -18,11 +18,13 @@ const RecipeRow: React.FC<{ recipe: Recipe; count: number; craftLevel: number }>
 	const resources = useGameStore((state) => state.resources);
 	const stock = useCraftStore(selectStock);
 	const busy = useCraftStore((state) => state.busy);
+	const slotsFull = useCraftStore(selectQueue).length >= craftLimit('craftQueueSlots') && !!recipe.timeSec;
 	const craftItem = useCraftStore((state) => state.craftItem);
 	const showToast = useUiStore((state) => state.showToast);
 	const needs = craftNeeds(recipe, count);
 	const block = craftBlock(recipe, count, { craftLevel, resources, stock });
 	const locked = craftLevel < recipe.unlock;
+	const perCraft = craftTimeSec(recipe);
 	const held = 'component' in recipe.output ? (stock[recipe.output.component] ?? 0) : null;
 
 	return (
@@ -36,6 +38,11 @@ const RecipeRow: React.FC<{ recipe: Recipe; count: number; craftLevel: number }>
 				</h3>
 				<span className='text-xs text-orange-300'>+{formatNumber(recipe.xp * count)} XP</span>
 			</div>
+			{perCraft > 0 && (
+				<p className='text-xs text-[#a89878]'>
+					{formatTime(perCraft)} each, {formatTime(perCraft * count)} for {count}
+				</p>
+			)}
 			{held !== null && <p className='text-xs text-[#a89878]'>You hold {held}</p>}
 			{locked ? (
 				<p className='text-xs text-[#ff8a6a] mt-1'>Unlocks at crafting level {recipe.unlock}</p>
@@ -56,14 +63,72 @@ const RecipeRow: React.FC<{ recipe: Recipe; count: number; craftLevel: number }>
 					</span>
 					<button
 						className='px-btn px-btn-sm'
-						disabled={!!block || busy}
-						aria-label={`Craft ${count} ${outputName(recipe)}`}
+						disabled={!!block || busy || slotsFull}
+						aria-label={`${recipe.timeSec ? 'Queue' : 'Craft'} ${count} ${outputName(recipe)}`}
 						onClick={() => void craftItem(recipe.id, count).then((text) => showToast(text))}
 					>
-						Craft
+						{recipe.timeSec ? 'Queue' : 'Craft'}
 					</button>
 				</div>
 			)}
+		</div>
+	);
+};
+
+/** The server's clock in ms, ticking once a second (the queue is drawn on it; nothing here decides anything, the server derives the finished count itself). */
+const useServerNow = (): number => {
+	const offset = useCraftStore((state) => state.clockOffsetMs);
+	const [now, setNow] = useState(() => Date.now());
+	useEffect(() => {
+		const id = setInterval(() => setNow(Date.now()), 1000);
+		return () => clearInterval(id);
+	}, []);
+	return now + offset;
+};
+
+/** The running batches: progress, a claim button for what is finished, a cancel button for the rest. */
+const QueuePanel: React.FC = () => {
+	const queue = useCraftStore(selectQueue);
+	const busy = useCraftStore((state) => state.busy);
+	const claim = useCraftStore((state) => state.claim);
+	const cancel = useCraftStore((state) => state.cancel);
+	const showToast = useUiStore((state) => state.showToast);
+	const now = useServerNow();
+	if (queue.length === 0) return null;
+	return (
+		<div className='space-y-2'>
+			{queue.map((entry, slot) => {
+				const recipe = RECIPE_BY_ID[entry.recipeId];
+				const done = finishedOf(entry, now);
+				const left = (entry.count - done) * entry.timeSec - Math.max(0, now - entry.startedAt - done * entry.timeSec * 1000) / 1000;
+				const stalled = done < entry.count && now - entry.startedAt >= craftLimit('craftOfflineHours') * 3_600_000;
+				return (
+					<div key={`${entry.recipeId}-${entry.startedAt}`} className='px-card'>
+						<div className='flex justify-between items-baseline gap-2 text-sm'>
+							<span className='font-semibold text-[#ecdcb4]'>{recipe ? recipe.name : entry.recipeId}</span>
+							<span className='tabular-nums text-yellow-400'>
+								{formatNumber(done)} / {formatNumber(entry.count)} ready
+							</span>
+						</div>
+						<div className='hero-xp' style={{ '--pct': (done / entry.count) * 100 } as React.CSSProperties}>
+							<div className='hero-xp-text'>{stalled ? 'Waiting for you' : done >= entry.count ? 'Done' : formatTime(Math.max(0, left))}</div>
+						</div>
+						<div className='flex justify-end gap-2 mt-2'>
+							<button className='px-btn px-btn-sm' disabled={busy} aria-label='Cancel batch' onClick={() => void cancel(slot).then((text) => showToast(text))}>
+								Cancel
+							</button>
+							<button
+								className='px-btn px-btn-sm'
+								disabled={busy || done < 1}
+								aria-label='Collect finished crafts'
+								onClick={() => void claim(slot).then((text) => showToast(text))}
+							>
+								Collect {done > 0 ? formatNumber(done) : ''}
+							</button>
+						</div>
+					</div>
+				);
+			})}
 		</div>
 	);
 };
@@ -94,9 +159,18 @@ const CraftingOverlay: React.FC = () => {
 
 			<div className='flex items-center gap-2 text-sm'>
 				<span className='text-[#d8c8a0]'>Quantity</span>
-				<input type='range' min={1} max={CRAFTING.maxCount} value={count} onChange={(event) => setCount(Number(event.target.value))} aria-label='Quantity' />
-				<span className='tabular-nums w-6 text-yellow-400'>{count}</span>
+				<input
+					type='range'
+					min={1}
+					max={craftLimit('craftBatchCap')}
+					value={count}
+					onChange={(event) => setCount(Number(event.target.value))}
+					aria-label='Quantity'
+				/>
+				<span className='tabular-nums w-10 text-yellow-400'>{count}</span>
 			</div>
+
+			<QueuePanel />
 
 			<div className='space-y-2'>
 				{RECIPES.map((recipe) => (

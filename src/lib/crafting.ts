@@ -3,7 +3,9 @@
 import { RESOURCES, type MerchantResourceKey } from '@/catalog/resources';
 import { RECIPES, type Recipe } from '@/catalog/recipes';
 import { CRAFTING } from '@/config/crafting';
-import type { CraftState } from '@/lib/offline/types';
+import { HARD_LIMITS } from '@/config/limits';
+import { limitOf, type LimitContext } from '@/lib/limits';
+import type { CraftQueueEntry, CraftState } from '@/lib/offline/types';
 
 /** XP steps, index L - 1 = XP from level L to L + 1. Same technique as the character curve: a constant ratio between anchors, solved by bisection. */
 const buildSteps = (): number[] => {
@@ -46,7 +48,36 @@ const buildSteps = (): number[] => {
 const STEPS = buildSteps();
 
 /** The crafting state of a player who never crafted (the ledger column reads as this when it is missing). */
-export const emptyCraft = (): CraftState => ({ xp: 0, ord: 0, stock: {}, pity: {}, spent: 0, last: 0 });
+export const emptyCraft = (): CraftState => ({ xp: 0, ord: 0, stock: {}, pity: {}, spent: 0, last: 0, queue: [] });
+
+type CraftLimitKey = 'craftBatchCap' | 'craftQueueSlots' | 'craftOfflineHours' | 'craftSpeed';
+
+/** A crafting limit: base plus bonuses (`limitOf`), never above its hard ceiling and never below 1. Whole numbers except the speed. */
+export const craftLimit = (key: CraftLimitKey, ctx: LimitContext = {}): number => {
+	const value = Math.min(limitOf(key, ctx), HARD_LIMITS[key]);
+	return Math.max(1, key === 'craftSpeed' ? value : Math.floor(value));
+};
+
+/** Seconds one craft of a recipe takes now (the speed multiplier applied); 0 for an instant recipe. */
+export const craftTimeSec = (recipe: Recipe, ctx: LimitContext = {}): number => (recipe.timeSec ? recipe.timeSec / craftLimit('craftSpeed', ctx) : 0);
+
+/**
+ * Crafts of a batch that are done at `nowMs`: min(count, floor(running time / timeSec)). The running time stops at the offline run cap
+ * (a batch nobody claims waits there; the next claim moves `startedAt` forward and the clock runs on). No per-item timers.
+ */
+export const finishedOf = (entry: CraftQueueEntry, nowMs: number, ctx: LimitContext = {}): number => {
+	if (!(entry.timeSec > 0)) return entry.count;
+	const runMs = Math.min(Math.max(0, nowMs - entry.startedAt), craftLimit('craftOfflineHours', ctx) * 3_600_000);
+	return Math.min(entry.count, Math.floor(runMs / (entry.timeSec * 1000)));
+};
+
+/** Epoch ms the batch's next craft is done (null: the batch is finished, or stopped at the offline run cap). */
+export const nextDoneAt = (entry: CraftQueueEntry, nowMs: number, ctx: LimitContext = {}): number | null => {
+	const done = finishedOf(entry, nowMs, ctx);
+	if (done >= entry.count) return null;
+	const at = entry.startedAt + (done + 1) * entry.timeSec * 1000;
+	return at - entry.startedAt > craftLimit('craftOfflineHours', ctx) * 3_600_000 ? null : at;
+};
 
 /** Crafting XP to go from `level` to the next one (Infinity at the maximum). */
 export const craftXpToNext = (level: number): number => {

@@ -7,7 +7,8 @@ import { ITEM_CATALOG } from '../src/catalog';
 import { COMPONENTS, RECIPES } from '../src/catalog/recipes';
 import { RESOURCES } from '../src/catalog/resources';
 import { CRAFTING } from '../src/config/crafting';
-import { craftCumulativeXp, recipeCostGold } from '../src/lib/crafting';
+import { HARD_LIMITS } from '../src/config/limits';
+import { craftCumulativeXp, craftLimit, craftTimeSec, recipeCostGold } from '../src/lib/crafting';
 
 const WRITE_MD = process.argv.includes('--md');
 const lines: string[] = [];
@@ -56,7 +57,53 @@ for (const level of [2, 5, 10, 20, 30, 45, 60, 80, 100]) {
 	);
 }
 out();
-out(`Maximum level ${CRAFTING.maxLevel}; at most ${CRAFTING.maxCount} crafts per request.`);
+out(`Maximum level ${CRAFTING.maxLevel}; at most ${craftLimit('craftBatchCap')} crafts per batch (hard ceiling ${HARD_LIMITS.craftBatchCap}).`);
+
+out();
+out('## Timed batches');
+out();
+out(
+	'Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-v0.md, Timed batch queue). Per hour of a batch running without a pause. Gold burned is the gold value of the whole input chain (a potion includes its vial) at merchant prices.',
+);
+out();
+out('| Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch of the cap (minutes) | Batch of the hard ceiling (hours) |');
+out('|---|---:|---:|---:|---:|---:|---:|');
+const timed = RECIPES.filter((r) => r.timeSec);
+for (const r of timed) {
+	const sec = craftTimeSec(r);
+	const crafts = 3600 / sec;
+	out(
+		`| ${r.name} | ${g(sec)} | ${Math.round(crafts * r.output.qty).toLocaleString('en')} | ${Math.round(crafts * r.xp).toLocaleString('en')} | ${Math.round(crafts * recipeCostGold(r)).toLocaleString('en')} | ${g((craftLimit('craftBatchCap') * sec) / 60)} | ${g((HARD_LIMITS.craftBatchCap * sec) / 3600)} |`,
+	);
+}
+out();
+out('## Hours per level');
+out();
+out(
+	'Crafting nonstop, always the recipe with the most XP per hour among those unlocked. A level also needs the materials; the gold burned is what that costs at merchant prices.',
+);
+out();
+out('| Reached level | Hours for this level | Hours in total | Gold burned in total | Recipe used |');
+out('|---:|---:|---:|---:|---|');
+const xph = (r: (typeof timed)[number]) => (3600 / craftTimeSec(r)) * r.xp;
+let totalHours = 0;
+let totalGold = 0;
+for (let level = 1; level < CRAFTING.maxLevel; level++) {
+	const open = timed.filter((r) => r.unlock <= level);
+	if (open.length === 0) break;
+	const pick = open.reduce((a, b) => (xph(a) >= xph(b) ? a : b));
+	const step = craftCumulativeXp(level + 1) - craftCumulativeXp(level);
+	totalHours += step / xph(pick);
+	totalGold += (step / pick.xp) * recipeCostGold(pick);
+	if ([2, 5, 10, 20, 30, 45, 60, 80].includes(level + 1))
+		out(
+			`| ${level + 1} | ${g(Math.round((step / xph(pick)) * 100) / 100)} | ${g(Math.round(totalHours * 10) / 10)} | ${Math.round(totalGold).toLocaleString('en')} | ${pick.name} |`,
+		);
+}
+out();
+out(
+	`Crafting nonstop, level ${CRAFTING.maxLevel} would take about ${Math.round(totalHours).toLocaleString('en')} hours of batches; the materials, not the clock, are the limit long before that.`,
+);
 
 console.log(lines.join('\n'));
 if (WRITE_MD) {
