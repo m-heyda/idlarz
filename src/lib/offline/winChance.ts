@@ -58,7 +58,8 @@ export const estimateWin = (p: PlayerProfile, hp: number, type: MonsterType, lev
 
 	// what comes back while the fight lasts: regeneration, life leech, and the potions that fit between their shared cooldown
 	const healPerSec = Math.max(0, p.hpRegen) + (dps * Math.max(0, p.leechPct)) / 100;
-	const potionHp = potions.reduce((sum, potion) => sum + potion.healHp * Math.min(potion.count, Math.floor(killSec / COMBAT.potionCooldownSec) + 1), 0);
+	const cooldown = p.potionCooldownSec ?? COMBAT.potionCooldownSec;
+	const potionHp = potions.reduce((sum, potion) => sum + potion.healHp * (p.potionPower ?? 1) * Math.min(potion.count, Math.floor(killSec / cooldown) + 1), 0);
 	const net = monsterDps(p, type, level) - healPerSec;
 	const surviveSec = net <= 0 ? Infinity : (Math.max(0, hp) + potionHp) / net;
 	if (!Number.isFinite(surviveSec)) return { chance: 1, killSec, surviveSec };

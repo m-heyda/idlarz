@@ -27,6 +27,9 @@ export interface PlayerProfile {
 	mpRegen: number;
 	/** What a Heal restores */
 	heal: number;
+	/** The shared potion cooldown in seconds and the multiplier on what a potion heals, from the worn belt (absent in a fight frozen before belts: the base cooldown, 1) */
+	potionCooldownSec?: number;
+	potionPower?: number;
 }
 
 /** The one fight a player has open. The monster stands on its ticket; the player's numbers are frozen in `profile`. */

@@ -61,8 +61,13 @@ const LEVEL_SHARE: Record<string, number> = {
 	manaRegen: 0.5,
 	maxMana: 0.7,
 	spellPower: 0.4,
+	// belt stats follow no item level
+	potionCooldownPct: 0,
+	potionPowerPct: 0,
+	potionSlots: 0,
+	bagSlots: 0,
 };
-const INTEGER_STATS = new Set(['damage', 'armor', 'maxHp', 'luck', 'maxMana']);
+const INTEGER_STATS = new Set(['damage', 'armor', 'maxHp', 'luck', 'maxMana', 'potionSlots', 'bagSlots']);
 const TIER1: Record<string, number> = {
 	damage: 6,
 	armor: 1,

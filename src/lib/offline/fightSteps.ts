@@ -22,13 +22,15 @@ const tickCooldowns = (ctx: FightCtx, dt: number): void => {
 
 export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	const c = ctx.c;
-	const healHp = ITEM_CATALOG[id]?.consumable?.healHp;
-	if (!healHp || stockOf(ctx, id) < 1 || c.hp >= maxHpNow(ctx) - EPS) return false;
+	const baseHeal = ITEM_CATALOG[id]?.consumable?.healHp;
+	if (!baseHeal || stockOf(ctx, id) < 1 || c.hp >= maxHpNow(ctx) - EPS) return false;
+	const profile = c.fight ? c.fight.profile : ctx.profileNow; // the belt worn when the fight began
+	const healHp = baseHeal * (profile.potionPower ?? 1);
 	if (c.fight && c.cd.potion > 0) return false;
 	const healed = Math.min(healHp, maxHpNow(ctx) - c.hp);
 	c.hp += healed;
 	ctx.ledger = { ...ctx.ledger, inv: takeOne(ctx.ledger.inv!, id) ?? ctx.ledger.inv! };
-	if (c.fight) c.cd.potion = COMBAT.potionCooldownSec;
+	if (c.fight) c.cd.potion = profile.potionCooldownSec ?? COMBAT.potionCooldownSec;
 	pushEvent(ctx, t, 'potion', { id, amount: Math.round(healed) });
 	return true;
 };

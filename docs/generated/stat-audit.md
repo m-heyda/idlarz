@@ -79,7 +79,7 @@ The flat base is pinned at 1000 per second and never raised (castle output, biom
 | leather_cloak | cape | armor | 1 | 1 | 2 | 4 | 8 |
 | wooden_ring | ring | maxHp | 1 | 2 | 3 | 9 | 16 |
 | acorn_charm | charm | maxHp | 1 | 3 | 5 | 13 | 24 |
-| worn_leather_belt | belt | armor | 1 | 1 | 2 | 4 | 8 |
+| worn_leather_belt | belt | potionCooldownPct | 1 | 5 | 5 | 5 | 5 |
 
 Level factor: `1 + 0.07 x (level - 1)` relative to the base's authored level; capped stats follow only a share of it (crit, dodge, leech 30 %; regen 60 %; luck, gold find, mana regen 50 %; mana 70 %; spell power 40 %).
 

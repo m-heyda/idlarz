@@ -15,6 +15,7 @@ import MonsterArt from '../MonsterArt';
 import NotifyDot from '../NotifyDot';
 import CombatPanel, { drainMs, type FloatNumber } from './CombatPanel';
 import PixelIcon from '../PixelIcon';
+import { potionIndexOfKey, potionSlotCount } from '@/lib/beltEffects';
 import type { FightView } from '@/lib/offline/fightTypes';
 import type { MonsterType } from '@/types/game';
 
@@ -60,6 +61,7 @@ const CombatWidget: React.FC = () => {
 	const playerHp = useGameStore((state) => state.playerHp);
 	const playerMp = useGameStore((state) => state.playerMp);
 	const bag = useGameStore((state) => state.bag);
+	const equipment = useGameStore((state) => state.equipment);
 	const level = useGameStore((state) => state.level.level);
 	const autoLocked = useGameStore((state) => !autoBattleUnlocked(state.prestige.rebirths));
 	const requestPotion = useGameStore((state) => state.requestPotion);
@@ -159,11 +161,11 @@ const CombatWidget: React.FC = () => {
 		return () => clearTimeout(closeTimer.current);
 	}, [showResult, noticeId, noticeKind, armClose]);
 
-	// Up to three potion stacks from the bag, with hotkeys 1-3
+	// Up to three potion stacks from the bag (more with a belt), the first three on hotkeys 1-3 and the belt's on 6, 7, 8...
 	const potions = bag
 		.map((slot, index) => ({ slot, index }))
 		.filter(({ slot }) => slot && 'id' in slot && ITEM_CATALOG[slot.id]?.consumable)
-		.slice(0, 3);
+		.slice(0, potionSlotCount(equipment));
 
 	// Hotkeys: 1-3 drink the potions, 4 and 5 cast the skills (the server decides whether it goes through)
 	useEffect(() => {
@@ -171,8 +173,8 @@ const CombatWidget: React.FC = () => {
 			if (typingInField(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
 			const n = Number(e.key);
 			if (!Number.isInteger(n) || n < 1) return;
-			const potion = potions[n - 1]?.slot;
-			if (n <= 3 && potion && 'id' in potion) requestPotion(potion.id);
+			const potion = potions[potionIndexOfKey(n)]?.slot;
+			if (potionIndexOfKey(n) >= 0 && potion && 'id' in potion) requestPotion(potion.id);
 			else if (n >= 4 && n < 4 + SKILL_IDS.length) requestSkill(SKILL_IDS[n - 4]);
 		};
 		window.addEventListener('keydown', onKey);

@@ -197,6 +197,23 @@ const targetSlot = (def: ItemDef, equipment: Equipment): EquipmentSlot | null =>
 	return def.slot;
 };
 
+/**
+ * Bag slots the worn gear adds to the bag (a belt's `bagSlots`). Read from the authored item, not the rolled instance, so the size of the
+ * bag never depends on a quality roll: a save and the server always agree on it.
+ */
+export const gearBagSlots = (equipment: Equipment): number =>
+	Object.values(equipment).reduce((sum, item) => sum + (item ? (ITEM_CATALOG[item.base]?.stats?.bagSlots ?? 0) : 0), 0);
+
+/**
+ * The bag after the gear's bag slots changed from `before` to `after`: padded with empty slots, or cut at the end. Null when the slots to
+ * cut hold something (a belt cannot come off while the bag slots it gives are in use: nothing is ever lost).
+ */
+const refitBag = (bag: BagSlot[], before: Equipment, after: Equipment): BagSlot[] | null => {
+	const size = bag.length + gearBagSlots(after) - gearBagSlots(before);
+	if (size >= bag.length) return [...bag, ...Array.from({ length: size - bag.length }, () => null)];
+	return bag.slice(size).every((slot) => slot === null) ? bag.slice(0, size) : null;
+};
+
 /** Equips the gear in a bag slot, sending whatever was in that gear slot back into the freed bag slot. */
 export const equipFromBag = (bag: BagSlot[], equipment: Equipment, index: number): { bag: BagSlot[]; equipment: Equipment } | null => {
 	if (!validIndex(bag, index)) return null;
@@ -208,7 +225,9 @@ export const equipFromBag = (bag: BagSlot[], equipment: Equipment, index: number
 	const displaced = equipment[target];
 	const nextBag = bag.map(copySlot);
 	nextBag[index] = displaced ? { item: displaced } : null;
-	return { bag: nextBag, equipment: { ...equipment, [target]: item } };
+	const nextEquipment = { ...equipment, [target]: item };
+	const fitted = refitBag(nextBag, equipment, nextEquipment);
+	return fitted ? { bag: fitted, equipment: nextEquipment } : null;
 };
 
 /** Moves an equipped item into the first free bag slot; null if the slot is empty or the bag is full. */
@@ -221,7 +240,8 @@ export const unequip = (bag: BagSlot[], equipment: Equipment, slot: EquipmentSlo
 	nextBag[free] = { item };
 	const nextEquipment = { ...equipment };
 	delete nextEquipment[slot];
-	return { bag: nextBag, equipment: nextEquipment };
+	const fitted = refitBag(nextBag, equipment, nextEquipment);
+	return fitted ? { bag: fitted, equipment: nextEquipment } : null;
 };
 
 /** The average item level of what is worn (empty slots do not count; 0 with nothing on): the number shown as "Item level" and the one the merchant's goods are held to. */

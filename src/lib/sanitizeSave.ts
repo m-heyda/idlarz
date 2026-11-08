@@ -15,7 +15,7 @@ import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES } from '@/catal
 import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { instanceProblem } from '@/lib/itemInstance';
 import { maxHp, maxMana } from '@/lib/combat';
-import { starterBag } from '@/lib/inventory';
+import { gearBagSlots, starterBag } from '@/lib/inventory';
 import { limitOf } from '@/lib/limits';
 import { calculateCombatStats, calculateLevel, totalStatPoints, calculateXpGain } from '@/utils/game/character';
 import { castleUpgradeDuration } from '@/utils/game/castle';
@@ -302,14 +302,15 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (v > 0) merchantUpgrades[id] = v;
 		}
 	}
-	const bagSize = limitOf('bagSize', { merchantUpgrades });
+	const baseBagSize = limitOf('bagSize', { merchantUpgrades });
+	let bagSize = baseBagSize; // plus what a worn belt adds, once the gear is read
 
 	// ---- gear, bag, HP, monsters (all optional: a save from before combat gets the starter kit) ------------------
 	let equipment: Equipment;
 	let bag: BagSlot[];
 	if (raw.equipment === undefined && raw.bag === undefined) {
 		equipment = { ...STARTER_EQUIPMENT };
-		bag = [...starterBag(), ...Array.from({ length: bagSize - COMBAT.bagSize }, () => null)];
+		bag = [...starterBag(), ...Array.from({ length: baseBagSize - COMBAT.bagSize }, () => null)];
 	} else {
 		if (raw.equipment === undefined || raw.bag === undefined) return fail('equipment and bag belong together');
 		if (!isRecord(raw.equipment)) return fail('equipment');
@@ -323,6 +324,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (!fits) return fail('equipped item in the wrong slot');
 			equipment[slot as EquipmentSlot] = item;
 		}
+		bagSize += gearBagSlots(equipment);
 		if (!Array.isArray(raw.bag) || raw.bag.length !== bagSize) return fail('bag size');
 		bag = [];
 		for (const entry of raw.bag) {

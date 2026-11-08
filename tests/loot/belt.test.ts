@@ -25,7 +25,7 @@ test('a belt equips into the belt slot, shows in the stats and unequips back int
 	const bag = addGear(emptyBag(), belt).bag;
 	const worn = equipFromBag(bag, {}, 0)!;
 	assert.deepEqual(worn.equipment.belt, belt);
-	assert.ok(aggregateStats(worn.equipment).maxHp > 0, 'the belt counts in the totals');
+	assert.ok(aggregateStats(worn.equipment).potionCooldownPct > 0, 'the belt counts in the totals');
 	const off = unequip(worn.bag, worn.equipment, 'belt')!;
 	assert.equal(off.equipment.belt, undefined);
 	assert.deepEqual(off.bag[0] && 'item' in off.bag[0] ? off.bag[0].item : null, belt);
@@ -38,6 +38,9 @@ test('a save with and without a belt round-trips, and a belt in the wrong slot i
 	assert.equal(sanitizeSave(plain).ok, true, 'an old save has no belt key');
 	const withBelt = rawSnapshot();
 	withBelt.equipment = { ...STARTER_EQUIPMENT, belt: rare('obsidian_belt') };
+	const unsized = sanitizeSave(withBelt);
+	assert.equal(unsized.ok, false, 'the belt gives 2 bag slots: the bag of an unbelted size is wrong');
+	withBelt.bag = [...withBelt.bag, null, null];
 	const result = sanitizeSave(withBelt);
 	assert.ok(result.ok, result.ok ? '' : result.reason);
 	if (result.ok) assert.deepEqual(result.state.equipment.belt, withBelt.equipment.belt);

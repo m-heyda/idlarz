@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { aggregateStats } from '@/lib/inventory';
+import { aggregateStats, gearBagSlots } from '@/lib/inventory';
 import {
 	armorOf,
 	armorReduction as armorReductionOf,
@@ -13,6 +13,7 @@ import {
 	maxMana,
 } from '@/lib/combat';
 import { critDamagePercent } from '@/lib/statBonuses';
+import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/beltEffects';
 import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
 import { chestRateBonusPct, gemChance, luckyRatChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
@@ -74,6 +75,11 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		offlineCapHours: offlineCapHours(limits),
 		offlineEfficiency: offlineEfficiency(limits) * 100,
 		goldFind: gear.goldFind,
+		/** The shared potion cooldown in seconds, what a potion heals as a multiplier, the potion hotkey slots and the bag slots a belt adds */
+		potionCooldownSec: potionCooldownSec(equipment),
+		potionPower: potionPower(equipment),
+		potionSlots: potionSlotCount(equipment),
+		bagSlots: gearBagSlots(equipment),
 		spellPower: gear.spellPower,
 		xpGain: xpGainPct(characterStats, equipment),
 		/** % off TILES (not buildings): Charisma, the rebirth Thrift and the merchant's Bulk Discount, capped. Building cost takes the Ember Thrift only (calculateBuildingCost) */

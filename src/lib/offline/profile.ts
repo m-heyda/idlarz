@@ -2,6 +2,7 @@ import { isRecord } from '@/lib/isRecord';
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { aggregateStats } from '@/lib/inventory';
 import { attacksPerSecond, critOdds, damagePerHit, dodgeChance, lifeLeechPercent, manaRegenPerSec, maxHp, maxMana, armorOf } from '@/lib/combat';
+import { potionCooldownSec, potionPower } from '@/lib/beltEffects';
 import { healAmount } from '@/lib/skills';
 import { critDamagePercent } from '@/lib/statBonuses';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
@@ -69,6 +70,8 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		hpRegen: aggregateStats(equipment).regen + bonus.regen,
 		mpRegen: manaRegenPerSec(stats, equipment),
 		heal: healAmount(stats, equipment),
+		potionCooldownSec: potionCooldownSec(equipment),
+		potionPower: potionPower(equipment),
 	};
 };
 

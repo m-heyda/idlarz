@@ -44,6 +44,8 @@ export const COMBAT = {
 	},
 	bagSize: LIMITS.bagSize, // base bag slots; read the current size through limitOf('bagSize', ctx) (Pack Rat and later effects add to it)
 	potionCooldownSec: 8, // shared cooldown between potions inside a fight
+	potionCooldownMinSec: 4, // the floor belts can bring it down to
+	potionSlots: 3, // potion hotkey slots before any belt
 	victoryToastSec: 15, // how long the result of a fight (the dead monster and its loot) stays in the combat window (hover pauses it)
 	spawn: {
 		firstSec: 120, // first monster this long after the game starts (lib/offline/tickets.ts counts it on the server)

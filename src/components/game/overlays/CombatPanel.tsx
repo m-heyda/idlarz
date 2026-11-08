@@ -234,7 +234,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 					<div className='fight-potions'>
 						{p.potions.length === 0 && <span className='px-tip-muted text-xs'>No potions</span>}
 						{p.potions.map(({ slot }, i) => (
-							<div key={i} className='fight-potion' title={`Press ${i + 1} to drink`}>
+							<div key={i} className='fight-potion' title={`Press ${i < 3 ? i + 1 : i + 3} to drink`}>
 								<ItemSlot {...slotProps(slot)} />
 								<span className='fight-hotkey'>{i + 1}</span>
 								{cd.potion > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (cd.potion / COMBAT.potionCooldownSec) * 100)}%` }} />}

@@ -100,7 +100,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Obsidian Cloak | `obsidian_cloak` | accessory | 3 | base | 8-100 | +3 Armor, +5 Max HP, +2.0% Dodge |  | general pool |
 | Obsidian Ring | `obsidian_ring` | accessory | 3 | base | 8-100 | +6 Max HP, +1.5% Crit Chance |  | general pool |
 | Obsidian Charm | `obsidian_charm` | accessory | 3 | base | 8-100 | +1 Armor, +7 Max HP, +1% Super Crit |  | general pool |
-| Obsidian Belt | `obsidian_belt` | accessory | 3 | base | 55-66 | +7 Armor, +13 Max HP |  | general pool |
+| Obsidian Belt | `obsidian_belt` | accessory | 3 | base | 55-66 | +25% shorter Potion Cooldown, +10% Potion Healing, +2 Bag Slots, +1 Potion Slots |  | general pool |
 | Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +61 Armor, +61 Max HP |  | general pool |
 | Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +50 Armor, +50 Max HP |  | general pool |
 | Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +101 Armor, +121 Max HP |  | general pool |
@@ -111,7 +111,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Sunhoney Cape | `sunhoney_cape` | accessory | 5 | base | 100-100 | +30 Armor, +50 Max HP, +4.0% Dodge |  | general pool |
 | Honeycomb Ring | `honeycomb_ring` | accessory | 5 | base | 100-100 | +61 Max HP, +7.68% Crit Chance |  | general pool |
 | Hive Charm | `hive_charm` | accessory | 5 | base | 100-100 | +10 Armor, +71 Max HP, +5.12% Super Crit |  | general pool |
-| Sunforged Cincture | `sunforged_cincture` | accessory | 5 | base | 100-100 | +20 Armor, +40 Max HP |  | general pool |
+| Sunforged Cincture | `sunforged_cincture` | accessory | 5 | base | 100-100 | +50% shorter Potion Cooldown, +24% Potion Healing, +3 Bag Slots, +2 Potion Slots |  | general pool |
 | Honeycomb Scepter | `honeycomb_scepter` | weapon (mace) | 5 | base | 100-100 | +278 Damage |  | general pool |
 | Golden Ledger | `golden_ledger` | offhand (tome) | 5 | base | 100-100 | +61 Max HP, +10.7/s HP Regen, +24 Max Mana, +3.24/s Mana Regen, +23.62% Spell Power |  | general pool |
 | Ashen Warlord's Visor | `ashen_warlords_visor` | armor | 5 | base | 100-100 | +77 Armor, +77 Max HP |  | general pool |
@@ -124,7 +124,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Warlord's Banner Cloak | `warlords_banner_cloak` | accessory | 5 | base | 100-100 | +39 Armor, +64 Max HP, +4.0% Dodge |  | general pool |
 | Warlord's Signet | `warlords_signet` | accessory | 5 | base | 100-100 | +77 Max HP, +9.78% Crit Chance |  | general pool |
 | War Medal Charm | `war_medal_charm` | accessory | 5 | base | 100-100 | +13 Armor, +90 Max HP, +6.52% Super Crit |  | general pool |
-| Warden Plate Belt | `warden_plate_belt` | accessory | 5 | base | 100-100 | +26 Armor, +51 Max HP |  | general pool |
+| Warden Plate Belt | `warden_plate_belt` | accessory | 5 | base | 100-100 | +50% shorter Potion Cooldown, +24% Potion Healing, +3 Bag Slots, +2 Potion Slots |  | general pool |
 | Ashen Warlord's Greataxe | `ashen_warlords_greataxe` | weapon (axe) | 5 | base | 100-100 | +269 Damage, +9.31% Crit Chance |  | general pool |
 | Ashen Tower Shield | `ashen_tower_shield` | offhand (shield) | 5 | base | 100-100 | +141 Armor, +154 Max HP |  | general pool |
 | Blightbound Cowl | `blightbound_cowl` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
@@ -137,7 +137,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Blightbound Shroud | `blightbound_shroud` | accessory | 5 | base | 100-100 | +4.0% Dodge, +10 Luck |  | general pool |
 | Ichor Ring | `ichor_ring` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck |  | general pool |
 | Core Charm | `core_charm` | accessory | 5 | base | 100-100 | +7.45% Super Crit, +10 Luck |  | general pool |
-| Hunter Trophy Belt | `hunter_trophy_belt` | accessory | 5 | base | 100-100 | +10 Luck |  | general pool |
+| Hunter Trophy Belt | `hunter_trophy_belt` | accessory | 5 | base | 100-100 | +50% shorter Potion Cooldown, +24% Potion Healing, +3 Bag Slots, +2 Potion Slots |  | general pool |
 | Blight Staff | `blight_staff` | weapon (staff) | 5 | base | 100-100 | +291 Damage, +11.2/s HP Regen, +33 Max Mana, +30.13% Spell Power |  | general pool |
 | Blight Orb | `blight_orb` | offhand (tome) | 5 | base | 100-100 | +15.6/s HP Regen, +35 Max Mana, +4.71/s Mana Regen, +34.35% Spell Power, +10 Luck |  | general pool |
 

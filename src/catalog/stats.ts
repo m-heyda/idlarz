@@ -39,6 +39,12 @@ export const STAT_DEFS = {
 	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
 
+	// ---- belt stats (IDL-138/139): only belts carry them, none follows the item level (a belt is a fixed tool, not a stat stick) --------
+	potionCooldownPct: { label: 'Potion Cooldown', unit: '% shorter', levelShare: 0 }, // % off the shared potion cooldown (the cooldown never goes under COMBAT.potionCooldownMinSec)
+	potionPowerPct: { label: 'Potion Healing', unit: '%', levelShare: 0 }, // % more HP from every potion
+	potionSlots: { label: 'Potion Slots', integer: true, levelShare: 0 }, // potion hotkey slots added to the base three
+	bagSlots: { label: 'Bag Slots', integer: true, levelShare: 0 }, // bag slots added to the bag while the belt is worn
+
 	// ---- set-only stats: percentages and economy effects that only a set bonus gives ---------------------------------------
 	damagePct: { label: 'Damage', unit: '%', setOnly: true }, // % more damage per hit, on top of the flat damage and the attributes
 	maxHpPct: { label: 'Max HP', unit: '%', setOnly: true }, // % more max HP (applied to attributes + gear)
@@ -70,6 +76,10 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	critChance: 'combat',
 	superCrit: 'combat',
 	lifeLeech: 'combat',
+	potionCooldownPct: 'defense',
+	potionPowerPct: 'defense',
+	potionSlots: 'defense',
+	bagSlots: 'economy',
 	damagePct: 'combat',
 	armor: 'defense',
 	maxHp: 'defense',
@@ -113,6 +123,10 @@ export const STAT_BASE_BY_TIER: Record<ItemStatKey, readonly [number, number, nu
 	manaRegen: [0.2, 0.3, 0.45, 0.65, 0.9],
 	spellPower: [4, 7, 10, 14, 18],
 	lifeLeech: [0.5, 1, 1.5, 2, 3],
+	potionCooldownPct: [5, 10, 18, 30, 50],
+	potionPowerPct: [4, 8, 12, 18, 24],
+	potionSlots: [1, 2, 3, 4, 5],
+	bagSlots: [1, 2, 3, 4, 5],
 };
 
 /** The base value of a stat for a tier (1-5) at the item's authored level. */
