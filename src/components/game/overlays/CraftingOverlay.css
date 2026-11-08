@@ -1,0 +1,235 @@
+/* Crafting window: anvil column, level bar, recipe tiles (bag view) and the detail pane */
+
+.cr-root {
+	display: flex;
+	gap: 16px;
+	height: 100%;
+	color: var(--px-parch);
+}
+
+.cr-side {
+	flex: 0 0 140px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 8px;
+	padding-top: 12px;
+}
+
+.cr-level {
+	font-family: var(--font-pixel);
+	color: var(--px-gold);
+	font-size: var(--text-lg);
+}
+
+.cr-main {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.cr-xpline {
+	display: flex;
+	justify-content: space-between;
+	font-size: var(--text-sm);
+}
+
+.cr-level-text {
+	color: var(--px-gold);
+}
+
+.cr-xpbar {
+	position: relative;
+	height: 18px;
+	background: var(--px-ink);
+	border: 2px solid #5a4a38;
+	overflow: hidden;
+}
+
+.cr-xpfill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	background: linear-gradient(#f0a53a, #b8651a);
+	box-shadow: inset 0 2px 0 rgba(255, 235, 170, 0.45);
+	transition: width 0.3s steps(8);
+}
+
+.cr-xptext {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: var(--text-xs);
+	text-shadow: 1px 1px 0 var(--px-ink);
+}
+
+.cr-body {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	gap: 12px;
+}
+
+.cr-grid {
+	flex: 0 0 auto;
+	width: 232px;
+	align-content: flex-start;
+	display: grid;
+	grid-template-columns: repeat(4, 48px);
+	gap: 6px;
+	padding: 8px;
+	background: rgba(10, 6, 5, 0.55);
+	border: 2px solid #3a2e22;
+}
+
+.cr-tile {
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+}
+
+.cr-tile[data-selected='true'] {
+	outline: 2px solid var(--px-gold);
+	outline-offset: 0;
+}
+
+.cr-tile[data-state='short'] {
+	opacity: 0.7;
+}
+
+.cr-tile[data-state='locked'] {
+	filter: grayscale(1) brightness(0.65);
+}
+
+.cr-tile-lock {
+	position: absolute;
+	right: 2px;
+	bottom: 1px;
+	font-size: 10px;
+	color: #ff8a6a;
+	text-shadow: 1px 1px 0 var(--px-ink);
+}
+
+.cr-detail {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px 12px;
+	background: rgba(10, 6, 5, 0.55);
+	border: 2px solid #3a2e22;
+}
+
+.cr-detail-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.cr-detail-icon {
+	flex: 0 0 auto;
+	display: inline-flex;
+	padding: 4px;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+.cr-name {
+	font-size: var(--text-lg);
+	color: var(--px-gold);
+}
+
+.cr-desc {
+	font-size: var(--text-sm);
+	color: #a89878;
+}
+
+.cr-label {
+	font-size: var(--text-xs);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #a89878;
+}
+
+.cr-cost {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	font-size: var(--text-sm);
+}
+
+.cr-cost > span {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.cr-ok {
+	color: #5fd35f;
+}
+
+.cr-lack {
+	color: #ff6a5a;
+}
+
+.cr-xp {
+	font-size: var(--text-sm);
+	color: #f0a53a;
+}
+
+.cr-qty {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.cr-qty .px-range {
+	flex: 1;
+	min-width: 0;
+}
+
+.cr-qty-n {
+	min-width: 56px;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	color: var(--px-gold);
+}
+
+.cr-infuse {
+	flex: 1;
+}
+
+.cr-infuse:empty {
+	min-height: 0;
+}
+
+.cr-craft {
+	align-self: flex-end;
+	min-width: 140px;
+}
+
+.cr-progress {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 22px;
+	background: var(--px-ink);
+	border: 2px solid #3a2e22;
+}
+
+.cr-foot {
+	font-size: var(--text-xs);
+	color: #7a6a52;
+}
+
+.cr-tip {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 160px;
+	padding: 4px 6px;
+}

@@ -97,4 +97,37 @@ def bars():
     return img
 
 
-SPRITES = {'menu_settings': gear, 'menu_legacy': legacy, 'menu_main': journal, 'menu_stats': bars}
+# ----------------------------------------------------------------- crafting: a steel anvil on a stump
+def anvil():
+    sc = Scene(MATS, scale=9.6, origin=(25, 35))
+    A = lambda *a: sc.add(place(Prim(*a), -45))
+    A('cyl', (0, 0, 0.35), (0.8, 0.35), 'bark', I3, None, 1)                                 # stump
+    A('cyl', (0, 0, 0.72), (0.82, 0.04), 'dark')                                             # shadow gap
+    A('box', (0, 0, 0.95), (0.62, 0.34, 0.2), 'steel', I3, None, 2)                          # foot
+    A('box', (0, 0, 1.3), (0.34, 0.26, 0.2), 'steel', I3, None, 3)                           # waist
+    A('box', (0.05, 0, 1.68), (1.05, 0.4, 0.2), 'steel', I3, None, 4)                        # face
+    A('box', (0.05, -0.41, 1.88), (1.0, 0.02, 0.03), 'plate')                                # lit top edge
+    A('ell', (-1.2, 0, 1.68), (0.45, 0.3, 0.2), 'steel', I3, None, 5)                       # horn
+    A('box', (0.75, 0, 1.74), (0.22, 0.34, 0.12), 'plate_dk', I3, None, 6)                   # hardy hole block
+    A('ell', (0.0, -0.5, 1.15), (0.06, 0.05, 0.06), 'gold')                                  # rivet
+    img = sc.render()
+    fx.glint(img, 12, 14, 2)
+    return img
+
+
+# ----------------------------------------------------------------- crafting component: a corked glass vial
+def vial():
+    sc = Scene(MATS, scale=12.0, origin=(20, 34))
+    A = lambda *a: sc.add(place(Prim(*a), -45))
+    A('ell', (0, 0, 0.85), (0.7, 0.7, 0.72), 'glass', I3, None, 1)                           # bulb
+    A('cyl', (0, 0, 1.75), (0.26, 0.5), 'glass', I3, None, 2)                                # neck
+    A('cyl', (0, 0, 2.28), (0.34, 0.1), 'gold')                                              # collar
+    A('cyl', (0, 0, 2.55), (0.24, 0.2), 'plank', I3, None, 3)                                # cork
+    A('ell', (0, -0.05, 0.75), (0.66, 0.66, 0.5), 'water', I3, None, 4)                      # liquid hint
+    img = sc.render()
+    fx.glint(img, 15, 17, 2)
+    return img
+
+
+SPRITES = {'menu_settings': gear, 'menu_legacy': legacy, 'menu_main': journal, 'menu_stats': bars,
+           'menu_crafting': anvil, 'comp_glass_vial': vial}

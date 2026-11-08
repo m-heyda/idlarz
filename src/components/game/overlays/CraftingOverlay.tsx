@@ -1,69 +1,172 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { COMPONENTS, RECIPES, type Recipe } from '@/catalog/recipes';
 import { ITEM_CATALOG } from '@/catalog';
-import { CRAFTING } from '@/config/crafting';
-import { craftBlock, craftLevelOf, craftNeeds, craftXpToNext } from '@/lib/crafting';
+import { craftBlock, craftLevelOf, craftNeeds, craftXpToNext, maxCraftable } from '@/lib/crafting';
+import type { Box } from '@/lib/tipPlacement';
 import { useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber } from '@/utils/formatters';
+import type { PixelIconName } from '@/config/pixelIcons';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
+import { FloatingTip } from '../ItemSlot';
 import { itemIconName } from '../itemUi';
+import './CraftingOverlay.css';
 
 const outputName = (recipe: Recipe) => ('item' in recipe.output ? ITEM_CATALOG[recipe.output.item].name : COMPONENTS[recipe.output.component].name);
 
-/** One recipe: what it makes, what it costs for the chosen quantity (red = missing), its lock, and the craft button. */
-const RecipeRow: React.FC<{ recipe: Recipe; count: number; craftLevel: number }> = ({ recipe, count, craftLevel }) => {
-	const resources = useGameStore((state) => state.resources);
-	const stock = useCraftStore((state) => state.craft?.stock ?? {});
+/** Components have no catalog item, so their sprite is named here. */
+const COMPONENT_ICONS: Record<string, PixelIconName> = { glass_vial: 'comp_glass_vial' };
+
+const recipeIcon = (recipe: Recipe): PixelIconName =>
+	'item' in recipe.output ? itemIconName(ITEM_CATALOG[recipe.output.item]) : (COMPONENT_ICONS[recipe.output.component] ?? 'comp_glass_vial');
+
+interface Have {
+	craftLevel: number;
+	resources: Partial<Record<string, number>>;
+	stock: Record<string, number>;
+}
+
+/** What one craft takes, as chips: green when the player has it, red when not. `count` scales the numbers. */
+const CostChips: React.FC<{ recipe: Recipe; count: number; have: Have }> = ({ recipe, count, have }) => {
+	const needs = craftNeeds(recipe, count);
+	return (
+		<span className='cr-cost'>
+			{needs.resources.map((n) => (
+				<span key={n.key} className={(have.resources[n.key] ?? 0) >= n.qty ? 'cr-ok' : 'cr-lack'}>
+					<ResourceIcon resource={n.key} />
+					{formatNumber(n.qty)}
+				</span>
+			))}
+			{needs.components.map((n) => (
+				<span key={n.id} className={(have.stock[n.id] ?? 0) >= n.qty ? 'cr-ok' : 'cr-lack'}>
+					<PixelIcon name={COMPONENT_ICONS[n.id] ?? 'comp_glass_vial'} scale={0.6} alt='' />
+					{n.qty} x {COMPONENTS[n.id].name}
+				</span>
+			))}
+		</span>
+	);
+};
+
+/** One recipe as a bag tile: its sprite; grey with a lock while the level is too low, dim while it cannot be afforded. Hover shows the cost card. */
+const RecipeTile: React.FC<{ recipe: Recipe; have: Have; selected: boolean; onSelect: () => void }> = ({ recipe, have, selected, onSelect }) => {
+	const [tip, setTip] = useState<Box | null>(null);
+	const ref = useRef<HTMLButtonElement>(null);
+	const locked = have.craftLevel < recipe.unlock;
+	const state = locked ? 'locked' : maxCraftable(recipe, have) > 0 ? 'ready' : 'short';
+	const open = () => {
+		const r = ref.current?.getBoundingClientRect();
+		if (r) setTip({ left: r.left, top: r.top, right: r.right, bottom: r.bottom });
+	};
+	return (
+		<>
+			<button
+				ref={ref}
+				className='cr-tile inv-slot'
+				data-state={state}
+				data-selected={selected}
+				aria-label={`${outputName(recipe)}${locked ? `, unlocks at crafting level ${recipe.unlock}` : ''}`}
+				onClick={onSelect}
+				onPointerEnter={open}
+				onPointerLeave={() => setTip(null)}
+				onFocus={open}
+				onBlur={() => setTip(null)}
+			>
+				<PixelIcon name={recipeIcon(recipe)} alt='' />
+				{locked && <span className='cr-tile-lock'>L{recipe.unlock}</span>}
+			</button>
+			{tip && (
+				<FloatingTip anchor={tip}>
+					<div className='px-tooltip cr-tip'>
+						<div className='px-tip-title'>{outputName(recipe)}</div>
+						<div className='px-tip-muted'>{recipe.kind}</div>
+						{locked ? (
+							<div className='cr-lack'>Unlocks at crafting level {recipe.unlock}</div>
+						) : (
+							<>
+								<CostChips recipe={recipe} count={1} have={have} />
+								<div className='cr-xp'>+{formatNumber(recipe.xp)} XP</div>
+							</>
+						)}
+					</div>
+				</FloatingTip>
+			)}
+		</>
+	);
+};
+
+/** The chosen recipe: what it makes, what it costs for the chosen amount, the 0..max slider and the craft button. */
+const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) => {
 	const busy = useCraftStore((state) => state.busy);
 	const craftItem = useCraftStore((state) => state.craftItem);
 	const showToast = useUiStore((state) => state.showToast);
-	const needs = craftNeeds(recipe, count);
-	const block = craftBlock(recipe, count, { craftLevel, resources, stock });
-	const locked = craftLevel < recipe.unlock;
-	const held = 'component' in recipe.output ? (stock[recipe.output.component] ?? 0) : null;
+	const max = maxCraftable(recipe, have);
+	const [wanted, setWanted] = useState(1);
+	// the slider keeps its value while the stock changes, but never above what can be made now
+	const count = Math.min(wanted, max);
+	const locked = have.craftLevel < recipe.unlock;
+	const held = 'component' in recipe.output ? (have.stock[recipe.output.component] ?? 0) : null;
+	const description = 'component' in recipe.output ? COMPONENTS[recipe.output.component].description : null;
+	const block = count > 0 ? craftBlock(recipe, count, have) : 'resources';
 
 	return (
-		<div className={`px-card ${locked ? 'opacity-60' : ''}`}>
-			<div className='flex justify-between items-baseline gap-2'>
-				<h3 className='font-semibold text-sm text-[#ecdcb4] inline-flex items-center gap-2'>
-					{'item' in recipe.output && <PixelIcon name={itemIconName(ITEM_CATALOG[recipe.output.item])} alt='' />}
-					{outputName(recipe)}
-					{recipe.output.qty > 1 ? ` x${recipe.output.qty}` : ''}
-					<span className='ml-2 text-xs text-[#a89878]'>{recipe.kind}</span>
-				</h3>
-				<span className='text-xs text-orange-300'>+{formatNumber(recipe.xp * count)} XP</span>
-			</div>
-			{held !== null && <p className='text-xs text-[#a89878]'>You hold {held}</p>}
-			{locked ? (
-				<p className='text-xs text-[#ff8a6a] mt-1'>Unlocks at crafting level {recipe.unlock}</p>
-			) : (
-				<div className='flex flex-wrap items-center justify-between gap-2 mt-2 text-sm'>
-					<span className='inline-flex flex-wrap items-center gap-x-3 gap-y-1'>
-						{needs.resources.map((n) => (
-							<span key={n.key} className={`inline-flex items-center gap-1 ${resources[n.key] >= n.qty ? 'text-green-400' : 'text-red-400'}`}>
-								<ResourceIcon resource={n.key} />
-								{formatNumber(n.qty)}
-							</span>
-						))}
-						{needs.components.map((n) => (
-							<span key={n.id} className={(stock[n.id] ?? 0) >= n.qty ? 'text-green-400' : 'text-red-400'}>
-								{n.qty} x {COMPONENTS[n.id].name}
-							</span>
-						))}
-					</span>
-					<button
-						className='px-btn px-btn-sm'
-						disabled={!!block || busy}
-						aria-label={`Craft ${count} ${outputName(recipe)}`}
-						onClick={() => void craftItem(recipe.id, count).then((text) => showToast(text))}
-					>
-						Craft
-					</button>
+		<div className='cr-detail'>
+			<div className='cr-detail-head'>
+				<span className='cr-detail-icon'>
+					<PixelIcon name={recipeIcon(recipe)} scale={1.5} alt='' />
+				</span>
+				<div>
+					<h3 className='cr-name'>
+						{outputName(recipe)}
+						{recipe.output.qty > 1 ? ` x${recipe.output.qty}` : ''}
+					</h3>
+					<div className='px-tip-muted'>
+						{recipe.kind}
+						{held !== null ? ` - you hold ${held}` : ''}
+					</div>
 				</div>
+			</div>
+			{description && <p className='cr-desc'>{description}</p>}
+
+			{locked ? (
+				<p className='cr-lack'>Unlocks at crafting level {recipe.unlock}</p>
+			) : (
+				<>
+					<div className='cr-label'>Cost{count > 1 ? ` (x${count})` : ''}</div>
+					<CostChips recipe={recipe} count={Math.max(1, count)} have={have} />
+
+					<div className='cr-qty'>
+						<span className='cr-label'>Amount</span>
+						<input
+							className='px-range'
+							type='range'
+							min={0}
+							max={max}
+							value={count}
+							disabled={max === 0}
+							aria-label='Amount to craft'
+							onChange={(event) => setWanted(Number(event.target.value))}
+						/>
+						<span className='cr-qty-n'>
+							{count} / {max}
+						</span>
+					</div>
+					<div className='cr-xp'>+{formatNumber(recipe.xp * count)} XP</div>
+				</>
 			)}
+
+			{/* reserved for the later "infuse with affixes" options (gear, legendaries); empty while no recipe has any */}
+			<div className='cr-infuse' data-slot='infuse' />
+
+			<button
+				className='px-btn cr-craft'
+				disabled={locked || !!block || busy || count === 0}
+				aria-label={`Craft ${count} ${outputName(recipe)}`}
+				onClick={() => void craftItem(recipe.id, count).then((text) => showToast(text))}
+			>
+				Craft{count > 0 ? ` x${count}` : ''}
+			</button>
 		</div>
 	);
 };
@@ -71,39 +174,55 @@ const RecipeRow: React.FC<{ recipe: Recipe; count: number; craftLevel: number }>
 const CraftingOverlay: React.FC = () => {
 	const craft = useCraftStore((state) => state.craft);
 	const refresh = useCraftStore((state) => state.refresh);
-	const [count, setCount] = useState(1);
+	const resources = useGameStore((state) => state.resources);
+	const [selectedId, setSelectedId] = useState<string | null>(null);
 	useEffect(() => void refresh(), [refresh]);
 
 	const xp = craft?.xp ?? 0;
 	const { level, progress } = craftLevelOf(xp);
 	const next = craftXpToNext(level);
+	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
+	const selected = RECIPES.find((r) => r.id === selectedId) ?? RECIPES.find((r) => r.unlock <= level) ?? RECIPES[0];
 
 	return (
-		<div className='space-y-3 text-white'>
-			<div>
-				<div className='flex justify-between text-sm'>
-					<span className='text-orange-300'>Crafting level {level}</span>
-					<span className='text-[#a89878] tabular-nums'>
-						{Number.isFinite(next) ? `${formatNumber(Math.floor(next * progress))} / ${formatNumber(next)} XP` : 'MAX'}
-					</span>
-				</div>
-				<div className='hero-xp' style={{ '--pct': progress * 100 } as React.CSSProperties}>
-					<div className='hero-xp-text'>{Math.floor(progress * 100)}%</div>
-				</div>
-			</div>
+		<div className='cr-root'>
+			<aside className='cr-side'>
+				<PixelIcon name='menu_crafting' scale={3} alt='Anvil' />
+				<div className='cr-level'>Level {level}</div>
+			</aside>
 
-			<div className='flex items-center gap-2 text-sm'>
-				<span className='text-[#d8c8a0]'>Quantity</span>
-				<input type='range' min={1} max={CRAFTING.maxCount} value={count} onChange={(event) => setCount(Number(event.target.value))} aria-label='Quantity' />
-				<span className='tabular-nums w-6 text-yellow-400'>{count}</span>
-			</div>
+			<div className='cr-main'>
+				<div className='cr-xpline'>
+					<span className='cr-level-text'>Crafting level {level}</span>
+					<span className='px-tip-muted'>{Number.isFinite(next) ? `${formatNumber(Math.floor(next * progress))} / ${formatNumber(next)} XP` : 'MAX'}</span>
+				</div>
+				<div
+					className='cr-xpbar'
+					role='progressbar'
+					aria-valuemin={0}
+					aria-valuemax={100}
+					aria-valuenow={Math.floor(progress * 100)}
+					aria-label='Crafting level progress'
+				>
+					<div className='cr-xpfill' style={{ width: `${progress * 100}%` }} />
+					<span className='cr-xptext'>{Math.floor(progress * 100)}%</span>
+				</div>
 
-			<div className='space-y-2'>
-				{RECIPES.map((recipe) => (
-					<RecipeRow key={recipe.id} recipe={recipe} count={count} craftLevel={level} />
-				))}
+				<div className='cr-body'>
+					<div className='cr-grid'>
+						{RECIPES.map((recipe) => (
+							<RecipeTile key={recipe.id} recipe={recipe} have={have} selected={recipe.id === selected.id} onSelect={() => setSelectedId(recipe.id)} />
+						))}
+					</div>
+					<RecipeDetail key={selected.id} recipe={selected} have={have} />
+				</div>
+
+				{/* reserved for the craft timer's progress bar */}
+				<div className='cr-progress' data-slot='craft-progress'>
+					<span className='px-tip-muted'>Idle</span>
+				</div>
+				<p className='cr-foot'>Crafting level never resets. New recipes unlock as it grows.</p>
 			</div>
-			<p className='text-xs text-[#7a6a52]'>Crafting level never resets. New recipes unlock as it grows.</p>
 		</div>
 	);
 };

@@ -44,6 +44,8 @@ const BASE_ICON_SIZES = {
 	menu_legacy: [40, 40],
 	menu_main: [40, 40],
 	menu_stats: [40, 40],
+	menu_crafting: [40, 40],
+	comp_glass_vial: [40, 40],
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
 	water_ripple_swamp: [96, 5], // 8 frames of 12x5
 	water_shimmer: [192, 48], // 4 frames of a whole open-water tile: drifting light dashes (WaterLayer)
