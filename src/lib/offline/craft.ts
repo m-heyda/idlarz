@@ -61,6 +61,6 @@ export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, 
 
 /** Parses the body of /api/craft (null: not one). The numbers are checked again by `applyCraft`. */
 export const parseCraft = (raw: Record<string, unknown>): { recipeId: string; count: number } | null =>
-	typeof raw.recipeId === 'string' && raw.recipeId.length <= 40 && typeof raw.count === 'number' && Number.isInteger(raw.count)
+	typeof raw.recipeId === 'string' && raw.recipeId.length <= 40 && typeof raw.count === 'number' && Number.isInteger(raw.count) && raw.count >= 0
 		? { recipeId: raw.recipeId, count: raw.count }
 		: null;

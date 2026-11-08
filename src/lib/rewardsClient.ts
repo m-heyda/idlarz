@@ -1,5 +1,5 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
-import type { ChestReward, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 
 // The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
 
@@ -46,6 +46,10 @@ export const requestChest = (key: string, x: number, y: number): Promise<Reply<C
 
 /** One of the player's own changes to what they carry. The answer is the inventory as it stands, and the gold a sale paid. */
 export const requestInventory = (key: string, op: InventoryOp): Promise<Reply<InventoryReply>> => post<InventoryReply>('/api/inventory', { key, ...op });
+
+/** Crafts `count` of a recipe (1-10); count 0 only asks for the crafting state. The browser has paid the resources already. */
+export const requestCraft = (key: string, recipeId: string, count: number): Promise<Reply<CraftReply>> =>
+	post<CraftReply>('/api/craft', { key, recipeId, count });
 
 /** Asks the server to run the rebirth (it judges the last stored save, computes the Embers and wipes its bag and gear). One key per rebirth attempt. */
 export const requestRebirth = (key: string): Promise<Reply<RebirthReply>> => post<RebirthReply>('/api/rebirth', { key });

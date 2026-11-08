@@ -4,7 +4,7 @@ import { COMPONENTS, RECIPES, RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { ITEM_CATALOG } from '../../src/catalog';
 import { RESOURCES } from '../../src/catalog/resources';
 import { CRAFTING } from '../../src/config/crafting';
-import { craftCumulativeXp, craftLevelOf, craftXpToNext, recipeCostGold } from '../../src/lib/crafting';
+import { craftBlock, craftCumulativeXp, craftLevelOf, craftNeeds, craftXpToNext, recipeCostGold } from '../../src/lib/crafting';
 
 test('recipe ids are unique and every input and output exists', () => {
 	assert.equal(new Set(RECIPES.map((r) => r.id)).size, RECIPES.length);
@@ -67,4 +67,16 @@ test('bad XP reads as level 1', () => {
 
 test('the greater potion unlocks after a few dozen crafts', () => {
 	assert.ok(craftCumulativeXp(RECIPE_BY_ID.potion_greater.unlock) <= 200);
+});
+
+test('craftNeeds scales with the count and craftBlock says why a craft cannot be done', () => {
+	const minor = RECIPE_BY_ID.potion_minor;
+	const needs = craftNeeds(minor, 3);
+	assert.deepEqual(needs.resources, [{ key: 'food', qty: 120 }]);
+	assert.deepEqual(needs.components, [{ id: 'glass_vial', qty: 3 }]);
+	const have = { craftLevel: 1, resources: { food: 120 }, stock: { glass_vial: 3 } };
+	assert.equal(craftBlock(minor, 3, have), null);
+	assert.equal(craftBlock(minor, 3, { ...have, resources: { food: 119 } }), 'resources');
+	assert.equal(craftBlock(minor, 3, { ...have, stock: { glass_vial: 2 } }), 'components');
+	assert.equal(craftBlock(RECIPE_BY_ID.potion_greater, 1, { craftLevel: 4, resources: { food: 1e6, coal: 1e6 }, stock: { glass_vial: 9 } }), 'locked');
 });

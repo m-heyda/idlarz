@@ -8,7 +8,8 @@ import { acceptSave, type SaveRepo, type StatsRow, type StoredSave, type WorldPa
 import type { ServiceDeps } from '../../src/lib/offline/service';
 import { craftStep, syncTickets, type Online } from '../../src/lib/offline/online';
 import { applyCraft, parseCraft } from '../../src/lib/offline/craft';
-import { craftFromJson, emptyCraft, isEmptyCraft } from '../../src/lib/offline/ledger';
+import { craftFromJson, isEmptyCraft } from '../../src/lib/offline/ledger';
+import { emptyCraft } from '../../src/lib/crafting';
 import { addDrop, stackOf } from '../../src/lib/inventory';
 import { plainItem } from '../../src/lib/itemInstance';
 import { CRAFTING } from '../../src/config/crafting';
@@ -171,7 +172,7 @@ test('the component stock has a cap', () => {
 test('bad requests are refused', () => {
 	const inv = { ver: 1, bag: [], equipment: {}, lootPity: {}, autoSellUpTo: null };
 	const c = emptyCraft();
-	for (const count of [0, -1, 11, 1.5, NaN]) assert.equal(applyCraft(inv, c, 'glass_vial', count, 5000).reason, 'bad_request', String(count));
+	for (const count of [-1, 11, 1.5, NaN, 0]) assert.equal(applyCraft(inv, c, 'glass_vial', count, 5000).reason, 'bad_request', String(count));
 	assert.equal(applyCraft(inv, c, 'nope', 1, 5000).reason, 'unknown_recipe');
 	assert.equal(applyCraft(inv, c, 'constructor', 1, 5000).reason, 'unknown_recipe');
 	assert.equal(parseCraft({ recipeId: 'glass_vial', count: 2 })?.count, 2);
@@ -191,4 +192,16 @@ test('a ledger row without the column, or with a damaged one, reads as zeros', (
 		last: 9,
 	});
 	assert.equal(stackOf(null), null);
+});
+
+test('count 0 only looks: it answers the crafting state and changes nothing', async () => {
+	const p = await player();
+	await craft(p, 'glass_vial', 2, 10 * SEC);
+	const before = structuredClone(p.ledger().craft);
+	const r = await craft(p, 'glass_vial', 0, 11 * SEC);
+	assert.equal(r.ok, true);
+	assert.equal(r.crafted, 0);
+	assert.deepEqual(r.craft, before);
+	assert.deepEqual(p.ledger().craft, before);
+	assert.equal(parseCraft({ recipeId: 'glass_vial', count: -1 }), null);
 });

@@ -1,6 +1,6 @@
 # Crafting v0 (potions first)
 
-Status: PR 1 (data and pure logic) built; server (PR 2) and overlay (PR 3) follow. The long-term design is [17-crafting](../17-crafting.md) (gear, tiers, Ichor); this file is the small first slice and wins where they differ for v0.
+Status: v0.0 built in three PRs (data and pure logic, server, overlay). The long-term design is [17-crafting](../17-crafting.md) (gear, tiers, Ichor); this file is the small first slice and wins where they differ for v0.
 
 ## Owner decision (2026-11-08)
 Crafting makes three things: **usable items**, **half-products** and **sellable goods**. v0 starts with **potions only**, then components and goods, then gear.

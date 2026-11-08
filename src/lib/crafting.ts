@@ -1,8 +1,9 @@
 // Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 // overlay both use these, so a level and a price are the same on both sides.
-import { RESOURCES } from '@/catalog/resources';
+import { RESOURCES, type MerchantResourceKey } from '@/catalog/resources';
 import { RECIPES, type Recipe } from '@/catalog/recipes';
 import { CRAFTING } from '@/config/crafting';
+import type { CraftState } from '@/lib/offline/types';
 
 /** XP steps, index L - 1 = XP from level L to L + 1. Same technique as the character curve: a constant ratio between anchors, solved by bisection. */
 const buildSteps = (): number[] => {
@@ -43,6 +44,9 @@ const buildSteps = (): number[] => {
 	return steps;
 };
 const STEPS = buildSteps();
+
+/** The crafting state of a player who never crafted (the ledger column reads as this when it is missing). */
+export const emptyCraft = (): CraftState => ({ xp: 0, ord: 0, stock: {}, pity: {}, spent: 0, last: 0 });
 
 /** Crafting XP to go from `level` to the next one (Infinity at the maximum). */
 export const craftXpToNext = (level: number): number => {
@@ -90,4 +94,30 @@ export const recipeCostGold = (recipe: Recipe, seen: readonly string[] = []): nu
 		sum += (input.qty * recipeCostGold(maker, [...seen, recipe.id])) / maker.output.qty;
 	}
 	return sum;
+};
+
+/** What `count` crafts of a recipe take: the merchant resources (paid by the browser) and the components (taken by the server from its stock). */
+export const craftNeeds = (recipe: Recipe, count: number) => {
+	const resources: { key: MerchantResourceKey; qty: number }[] = [];
+	const components: { id: string; qty: number }[] = [];
+	for (const input of recipe.inputs) {
+		if ('resource' in input) resources.push({ key: input.resource, qty: input.qty * count });
+		else components.push({ id: input.component, qty: input.qty * count });
+	}
+	return { resources, components };
+};
+
+export type CraftBlock = 'locked' | 'resources' | 'components';
+
+/** Why `count` crafts cannot be done now (null: they can). The server checks the level and the components again; the resources are the browser's. */
+export const craftBlock = (
+	recipe: Recipe,
+	count: number,
+	have: { craftLevel: number; resources: Partial<Record<string, number>>; stock: Record<string, number> },
+): CraftBlock | null => {
+	if (have.craftLevel < recipe.unlock) return 'locked';
+	const needs = craftNeeds(recipe, count);
+	if (needs.resources.some((n) => (have.resources[n.key] ?? 0) < n.qty)) return 'resources';
+	if (needs.components.some((n) => (have.stock[n.id] ?? 0) < n.qty)) return 'components';
+	return null;
 };

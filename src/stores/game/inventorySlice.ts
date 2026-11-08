@@ -16,6 +16,9 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 	const { sendInventoryOp, settleSale } = inv;
 
 	return {
+		/** Takes the inventory a server answer carries (a craft puts a potion in the bag) unless it is older than the one held */
+		applyServerInventory: inv.applyInventory,
+
 		// Gear actions: refused while a fight is open; max HP can drop when gear comes off, so playerHp follows it down
 		equipItem: (bagIndex: number) => {
 			const state = get();

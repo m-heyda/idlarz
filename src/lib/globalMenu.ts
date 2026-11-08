@@ -1,5 +1,6 @@
 import { autoBattleUnlocked } from '@/lib/combat';
 import { useGameStore } from '@/stores/gameStore';
+import { useWindowStore } from '@/stores/windowStore';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import { pickPersisted } from '@/lib/sanitizeSave';
 import { exportSaveText, saveNow } from '@/lib/saveStorage';
@@ -28,6 +29,7 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 	const items: ContextMenuItem[] = [
 		...(full
 			? [
+					{ id: 'crafting', label: 'Crafting', onSelect: () => useWindowStore.getState().toggleWindow('crafting') },
 					{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings },
 					{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
 				]

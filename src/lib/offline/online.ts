@@ -203,6 +203,8 @@ export const craftStep = (
 ): Promise<Online<CraftReply>> =>
 	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: CraftReply } => {
 		const ledger = ctx.ledger;
+		// count 0 only looks: the overlay asks for the crafting state when it opens
+		if (request.count === 0) return { ledger, value: { ok: true, crafted: 0, inv: ledger.inv!, craft: ledger.craft, serverNowSec: ctx.nowSec } };
 		const result = applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs);
 		const value: CraftReply = {
 			ok: result.ok,

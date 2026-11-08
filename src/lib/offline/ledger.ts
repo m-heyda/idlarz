@@ -2,6 +2,7 @@ import { zeroResources } from '@/catalog/resourceKeys';
 import { STARTING_GEMS } from '@/config/economy';
 import type { CombatState } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
+import { emptyCraft } from '@/lib/crafting';
 import type { CraftState, Inventory } from '@/lib/offline/types';
 import { emptyBank, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
 import type { Resources } from '@/types/game';
@@ -30,8 +31,6 @@ export const subtractTotals = (a: GrantTotals, b: GrantTotals): GrantTotals => {
 	});
 	return out;
 };
-
-export const emptyCraft = (): CraftState => ({ xp: 0, ord: 0, stock: {}, pity: {}, spent: 0, last: 0 });
 
 /** True for the state of a player who never crafted (stored as null, so the column stays empty for most rows). */
 export const isEmptyCraft = (c: CraftState): boolean =>
