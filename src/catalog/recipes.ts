@@ -4,7 +4,7 @@
  *   potion     usable items (a bag stack of a consumable)
  *   component  half-products that sit in a ledger counter (craft.stock), never in the bag
  *   good       sellable goods (later)
- *   gear       equipment through the loot pipeline (later, docs/17)
+ *   gear       equipment through the loot pipeline (later, docs/plan/17-crafting.md)
  */
 import type { MerchantResourceKey } from './resources';
 

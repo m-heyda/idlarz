@@ -11,7 +11,7 @@ export interface PacingBaseline {
 /** The milestones a pacing change must not move unannounced: the first finish (castle 6 + click power + rebirth territory), the rebirths, the late castle, the level ladder, the tile ladder. */
 export const GUARDED_MILESTONE = /^(finished|r\d+\.finished|rebirthDay\d+|castle(6|8|10)|level(50|80|90)|tiles(100|400))$/;
 
-/** docs/ROADMAP: the PR fails when a guarded milestone moves by more than 15 %. */
+/** docs/plan/ROADMAP.md: the PR fails when a guarded milestone moves by more than 15 %. */
 export const PACING_TOLERANCE = 0.15;
 
 /** Below this many game days a relative change is noise (a milestone at 1.2 h moving by 0.1 h is not a pacing change). */
