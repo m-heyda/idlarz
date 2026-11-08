@@ -39,6 +39,12 @@ const LEVEL_WINDOW_BY_TIER: Record<number, readonly [number, number]> = {
 	5: [3, MAX_ITEM_LEVEL],
 };
 
+/**
+ * Pool weight of a main-hand base against 10 for every other slot. Ten weapon types now have bases in each grade, which would lift
+ * weapons from about a quarter of the gear drops to about a third (IDL-220); 7 keeps the weapon share near where it was.
+ */
+const WEAPON_POOL_WEIGHT = 7;
+
 /** What affixes and pools match an item by: its category, slot, weapon type, set (or plain family) and ladder grade. */
 const tagsFor = (
 	kind: ItemKind,
@@ -104,7 +110,7 @@ export const gear = (
 	minItemLevel: (levelWindow ?? LEVEL_WINDOW_BY_TIER[tier])[0],
 	maxItemLevel: (levelWindow ?? LEVEL_WINDOW_BY_TIER[tier])[1],
 	...(named ? { fixedRarity: rarity, pools: pools ?? [] } : { allowedRarities: Object.keys(RARITIES) }),
-	poolWeight: named ? 1 : 10,
+	poolWeight: named ? 1 : slot === 'mainHand' ? WEAPON_POOL_WEIGHT : 10,
 	...(KIND_OF_SLOT[slot] === 'weapon' ? { attackSpeed: attackSpeed ?? (rest.weaponType && WEAPON_ATTACK_SPEED[rest.weaponType]) ?? 1 } : {}),
 	stats,
 	sellValue: sellValue ?? RARITIES[rarity].sellValue,
