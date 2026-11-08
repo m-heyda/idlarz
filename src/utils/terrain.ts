@@ -19,7 +19,7 @@ const SW = 4;
 const SE = 8;
 
 /**
- * Low to high: the higher ground draws its rim over the lower one. The five rebirth biomes (docs/12) sit between the shipped
+ * Low to high: the higher ground draws its rim over the lower one. The five rebirth biomes (docs/plan/12-rebirth-biomes.md) sit between the shipped
  * grounds, so every ground has a fixed hash id (`HASH_ID`, append only): a shipped ground's cell variants never move.
  */
 export const RANK = [

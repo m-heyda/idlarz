@@ -9,7 +9,7 @@ import type { Drop, ItemDef, ItemInstance } from '@/types/game';
 import { LOOT_DATA, type LootData } from './data';
 import { eligibleCandidates, type Candidate } from './pools';
 
-// The one loot pipeline (docs/10-loot-system.md). Every source (rat, Rat King, chest) goes through it:
+// The one loot pipeline (docs/game/loot.md). Every source (rat, Rat King, chest) goes through it:
 //   profile -> roll count -> source level -> item level -> eligible items -> rarity -> item -> instance (+ bonus tables)
 // Quantity, rarity, level and eligibility are separate steps; nothing here names a rarity, an item or a monster.
 

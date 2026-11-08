@@ -13,7 +13,7 @@
 - Buildings with **more detail than the current 48x60 town sprites** (`scripts/pixel/reference/town.png`): visible materials (stone courses, planks, shingles), 1-2 small props at the door, a lit window or fire, an identity you can read at a glance in a 48 px tile.
 - Drawn in **our** pixel style and palette so they sit on our tiles: coloured 1 px outline, 5-tone ramp lit from the top left, hard alpha, **no ground shadow and no grass base disc** (the sheets draw a base; our tile provides the ground).
 - **A building may go off the tile a little**: canvas **56x68** (the current 48x60 plus about 4 px each side and 8 px up), anchored bottom-centre on the tile. Anything taller than the canvas (a spire, a chimney, a tree crown) is cropped or redesigned, not enlarged.
-- Two looks per building (level 1-2 and level 3-5) and a glow on level 5 ([docs/18](../../docs/18-biome-buildings-and-material-tiers.md) section 9). Interior and furniture pieces in the kit sample are **not** needed.
+- Two looks per building (level 1-2 and level 3-5) and a glow on level 5 ([docs/plan/18-biome-buildings-and-material-tiers.md](../../docs/plan/18-biome-buildings-and-material-tiers.md) section 9). Interior and furniture pieces in the kit sample are **not** needed.
 
 ## Mapping: which reference suits which of the 36 buildings
 
@@ -32,7 +32,7 @@ Biome rules: Idols are statues, totems and shrines (small footprint, monument lo
 
 ## What agents should do with it later
 
-1. Before drawing a building, read the biome's three entries in [docs/18](../../docs/18-biome-buildings-and-material-tiers.md) section 3 and pick the archetype row above.
+1. Before drawing a building, read the biome's three entries in [docs/plan/18-biome-buildings-and-material-tiers.md](../../docs/plan/18-biome-buildings-and-material-tiers.md) section 3 and pick the archetype row above.
 2. Draw it in `scripts/pixel/sprites_buildings.py` style (procedural, the shared body kits and materials), 56x68 canvas, and add it to the build manifest; the 16 old sprites stay as **placeholders** until each building's real sprite is registered (RELEASE-PLAN P6.3, P6.9).
 3. Cutting from `f33ile.jpg` is licensed (see the [Licence](../README.md#licence)) but rarely useful: the cells carry a grass base and another pixel density. Use them for proportions, roof and window treatment, and the amount of small props; cut a cell only if you remove the base and it fits the 56x68 canvas.
 4. Check each building next to its biome's ground at 1x in the map before approving.

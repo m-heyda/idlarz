@@ -94,7 +94,7 @@ The merchant's prices and shelf are still the browser's: a purchase through `inv
 
 ## 9. Season resets
 
-`npm run reset-players` writes `app_settings.last_reset`; a player whose ledger `resetAt` is older is reset once at their next login (`ensureSeasonReset` in `src/lib/offline/season.ts`). Operating guide: [23-reset-players-cli.md](../23-reset-players-cli.md).
+`npm run reset-players` writes `app_settings.last_reset`; a player whose ledger `resetAt` is older is reset once at their next login (`ensureSeasonReset` in `src/lib/offline/season.ts`). Operating guide: [reset-players-cli](../ops/reset-players-cli.md).
 
 ## 10. Honest limits
 
@@ -103,3 +103,51 @@ The merchant's prices and shelf are still the browser's: a purchase through `inv
 - Gear and bag contents cannot be verified from a save, which is why the server owns them.
 - Gems cannot be raised by a save; the first save of an existing player cannot be delta-checked.
 - Tile purchases, building costs, farm and castle upgrades are paid in the browser, not by the server.
+
+## 11. Threat model and how to extend the save
+
+### What the server guarantees (and what it cannot)
+
+| Guarantee | How |
+|---|---|
+| Away time is server time | `now - max(ledger.anchor_at, last accepted save)` on the server clock; the client sends no duration |
+| Value only comes from server answers | income while away, chest and kill rewards and gems are computed by the server; the **grant ledger** (`granted`) holds the lifetime totals, and the save verifier allows a gain only up to `income x time + what the server granted since the last save` |
+| Rolls cannot be re-rolled or predicted | a reward is seeded by `HMAC(LOOT_SECRET, userId / run / kind / ordinal)` (`lib/offline/seal.ts`); the ordinal is consumed on the server, a repeated request with the same key replays the stored answer |
+| Opening 5 chests in 5 seconds earns nothing extra | a chest opens only against a **ticket** the server minted from its own clock; no ticket, no reward. The same logic catches a forged gold jump in the next upload (`gold_jump`, `networth_exceeds`) |
+| Gems are the server's | `player_ledger.gems` is the balance; an upload can never raise it (a larger number is flagged `gems_increase` and replaced by the ledger balance); a new account starts at the 1000 gift at most |
+| Two browsers cannot both claim | every ledger write is a compare-and-swap on `ver` |
+
+**Known limits.** The browser still holds the game state, so someone editing local memory can add anything that stays inside the verifier's bounds without being caught; flags only un-rank an account (shadow mode), they do not reject. Monsters and chests are placed by the server (`lib/offline/placement.ts`). The level a kill is paid at is not claimed by the client: it comes from the ticket's spawn level and age (`levelAtAge` in `lib/monsters.ts`).
+
+### Who checks what
+
+| Thing | Browser | Server |
+| --- | --- | --- |
+| Time | game time from `performance.now()`, a tick is clamped to 0…300 s, castle timers count tick time | away time is the server clock since the last save or claim; claims are idempotent and compare-and-swap |
+| Clicks | only trusted clicks on the map pay; shared token buckets (burst 8, 5/s, long-run 1.5/s) | none needed: click income is bounded by the save checks |
+| Merchant | buy rounds up, sell rounds down, shelf price is 5x the sell value; tests sweep every resource | none |
+| Edited save text | `sanitizeSave` rejects impossible data and recomputes derived values | the cloud copy is rebuilt from the sanitized state; gold, XP and gems are checked against income and grants |
+| XP and level | save floor (XP the owned tiles must have produced) | `cloudSave/xpModel.ts` clamps a save's XP to what bought tiles, play time and server payouts can explain; the browser takes the lower number (`applyServerXp`) |
+| Chests, kills, gems | none: a chest opens only against a server ticket | sealed rolls (`HMAC(LOOT_SECRET, user / run / kind / ordinal)`), the ledger holds the gem balance, a save can never raise it |
+| Monsters and fights | none: the browser only displays and asks | the server places monsters, runs every fight and pays the win; HP, mana and potions are the ledger's |
+| Gold jumps / forged land | none | `networth_exceeds`, `gold_jump`, `playtime_*`, `prestige_regress`, `castle_jump`, `baseline_rich`, `ember_jump` flags, **shadow mode**: stored, the save is accepted; flagged accounts are never ranked (section 4) |
+| Rebirth | needs castle ≥ 6 and 400 tiles (+50 per rebirth); points computed in the store; shop spending is checked by the point-conservation rule on every load | the ledger starts a new run (sealed rolls never repeat) |
+| Settings in `localStorage` | cosmetic only | not stored |
+
+The honest summary: the browser still owns the economy (income, purchases, the map). A cheater who stays inside the spending bound (about 3x honest progress) is not caught, and flags only un-rank, they do not reject. Enforcing the checks and server-run economy actions are planned ([ROADMAP](../plan/ROADMAP.md)); the inventory is already the server's.
+
+### Save & Backup dialog (Settings → *Save & backup*, or Control x5)
+
+- **Status**: when it last saved and how big it is, whether the browser protects the storage, and any storage error or load problem.
+- **Export**: the whole game as one line of text with *Copy* and *Download file* (`idlarz-YYYYMMDD-HHMM.sav`).
+- **Import**: paste the text or open a file. The text is checked as it arrives and shows level / castle / tiles / play time / save date; only on confirmation does it replace the save (the old one becomes the backup) and reload. Damaged, cut-off, foreign, impossible and *newer-version* saves are refused with a reason.
+- **Reset**: confirmation, then wipes the save, the backup and the damaged copy, and reloads.
+
+### How to extend the save safely
+
+- **New persisted field**: add it to `PERSISTED_KEYS`, make `sanitizeSave` accept it as *optional with a default* (old saves simply lack it) and validate it. No version bump. Add the field to a test that round-trips it (`tests/saves/saveStorage.test.ts`).
+- **Renamed, moved or reinterpreted field, or removed content** (an item, a building, a biome): bump `SAVE_SCHEMA` in `src/lib/saveFormat.ts`. Older saves are then refused. If they must survive, write the conversion for that bump (a `MIGRATIONS`-style step in `decodeSave`) and a frozen fixture save of the old version in `tests/fixtures/saves/`; the project does not carry any today.
+- A save from a *newer* schema than the running game is refused with a clear message instead of being half-loaded.
+- **New action that moves resources**: validate inputs (type, range, finiteness, ownership), check affordability against the full cost bundle, and add a test in `tests/economy/economy.test.ts`.
+- **Anything that decides a reward or a fight** belongs on the server side (`src/lib/offline/`), seeded by the sealed random source, not in the store (section 11 above).
+- **Balance changes**: run `npm run docs:gen` and `npm test` (the click limiter, arbitrage and fight-balance tests guard the main exploits).

@@ -13,7 +13,7 @@ import { WOODEN_ITEMS } from './starter';
 import { STEEL_ITEMS } from './steel';
 
 // The grade ladder (IDL-37, 38, 39, 142; art_style_reference/equip/README.md sections 3-5): 9 normal grades G1-G9 and three special
-// sets S1-S3 for every slot, as data. Only the live grades (G1-G3, grades.ts) are enabled and drop; the rest drops, is sold or crafted nowhere yet (docs/26). The grade is a tag (`grade:G3`), never an id, so pools and recipes select by it.
+// sets S1-S3 for every slot, as data. Only the live grades (G1-G3, grades.ts) are enabled and drop; the rest drops, is sold or crafted nowhere yet (docs/plan/26-next-updates-plan.md). The grade is a tag (`grade:G3`), never an id, so pools and recipes select by it.
 //
 // Where a ladder cell already exists as a live item (Iron Sword, the Steel pieces, the Obsidian family, Emberbrand) the live item
 // stays and fills that cell; `LADDER` says which id sits in which cell. Everything else is generated from the tables in this file,
@@ -157,7 +157,7 @@ const ARMOUR_NAMES: Record<ArmourSlot, string[]> = {
 	charm: list(
 		'Acorn Charm, Rabbit Foot, Bone Token, Bronze Medal, Lucky Coin, Obsidian Idol, Runed Totem, Ancient Relic, Heartstone, Hive Charm, War Medal Charm, Core Charm',
 	),
-	// docs/28 section 3 names the belt art; the sets take the Sunhoney, Warlord and hunter belts
+	// docs/plan/28-reuse-items-and-stats.md section 3 names the belt art; the sets take the Sunhoney, Warlord and hunter belts
 	belt: list(
 		"Worn Leather Belt, Tanned Sash, Ironbuckle Belt, Chain Girdle, Knight's Girdle, Obsidian Belt, Runebound Girdle, Ancient Cincture, Alchemist Bandolier, Sunforged Cincture, Warden Plate Belt, Hunter Trophy Belt",
 	),

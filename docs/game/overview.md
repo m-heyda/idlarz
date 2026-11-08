@@ -1,6 +1,6 @@
 # Overview: the game as it is today
 
-Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. This folder describes **only what the code does now**, with the file each number comes from. Plans and drafts live in the numbered docs and the roadmap; [ROADMAP-COMPARE.md](ROADMAP-COMPARE.md) says which of their sections are done, open or superseded; [DISAGREEMENTS.md](DISAGREEMENTS.md) lists where the older docs are wrong.
+Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. This folder describes **only what the code does now**, with the file each number comes from. Plans and drafts live in [../plan/](../plan/ROADMAP.md); [CHANGELOG-audit.md](CHANGELOG-audit.md) lists the open code-side findings of the doc audit.
 
 | Page | Covers |
 | --- | --- |
@@ -23,7 +23,7 @@ Idle Realm (code name idlarz) is an idle/incremental map game for signed-in play
 
 ## Time scale
 
-Timers that set the pace: castle upgrades 30 min to 3.5 days per level (`src/config/castle.ts`); a monster every 15 minutes and a boss every 3 hours (`COMBAT.spawn`); a chest every 10 minutes (`CHEST.intervalSec`); away time paid up to 8 hours at 50% (`LIMITS`). Measured pacing from the bot simulation is in [generated/sim-milestones.md](../generated/sim-milestones.md); targets in [06-pacing-targets.md](../06-pacing-targets.md).
+Timers that set the pace: castle upgrades 30 min to 3.5 days per level (`src/config/castle.ts`); a monster every 15 minutes and a boss every 3 hours (`COMBAT.spawn`); a chest every 10 minutes (`CHEST.intervalSec`); away time paid up to 8 hours at 50% (`LIMITS`). Measured pacing from the bot simulation is in [generated/sim-milestones.md](../generated/sim-milestones.md); targets in [pacing-targets.md](pacing-targets.md).
 
 ## Where the numbers live
 
@@ -39,4 +39,4 @@ Generated reports (do not edit by hand, `npm run docs:gen`): [balance-tables](..
 
 ## What is not in the game yet
 
-Hills, coast and lake monsters; jungle, fields, orchard, blight and battlefield biomes (dev-only entries); the Producer/Extractor/Idol building rework; crafting; quests; gambling; achievements, glossary and mastery; real class bonuses; paragon levels; rankings and the preview map; landing page and `/play` route; the guided tutorial rework; gem sinks. Details per item: [ROADMAP-COMPARE.md](ROADMAP-COMPARE.md).
+Hills, coast and lake monsters; jungle, fields, orchard, blight and battlefield biomes (dev-only entries); the Producer/Extractor/Idol building rework; crafting; quests; gambling; achievements, glossary and mastery; real class bonuses; paragon levels; rankings and the preview map; landing page and `/play` route; the guided tutorial rework; gem sinks. Details: [plan/ROADMAP.md](../plan/ROADMAP.md).

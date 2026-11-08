@@ -19,8 +19,8 @@
 
 1. When the Blight and Battlefield releases start (P12), open both sheets and make a **prop list** per biome: Blight = veined rocks (3 sizes), eye blobs (3 sizes), root tendrils (rim pieces), dead trees (2), thorn vines; Battlefield = bone piles, skulls, ribcage, tombstones (4), broken weapons and banners (not in these sheets: draw new), scorch marks. Pick the props by silhouette, 24-48 px wide on our scale.
 2. **Redraw** each chosen prop in `scripts/pixel/terrain_props.py` style (coloured 1 px outline, 5-tone ramp lit from the top left). A clean direct cut is fine (licensed, rule 1 and the Licence section of the root README); the soft shadow under each prop must be removed.
-3. Add the props to the biome's manifest (`terrain_build.py`), the TypeScript port (`utils/terrain.ts`, the parity test must pass) and `biomePalette.ts`. Pick the ground colours **from the current map**, not from these sheets: Blight is violet-black with sickly green pools, Battlefield is churned mud and ash ([docs/12](../../docs/12-rebirth-biomes.md) section 2.2).
-4. Keep an unknown-state in mind ([docs/22](../../docs/22-glossary-and-mastery.md)): props must read as dark shapes too.
+3. Add the props to the biome's manifest (`terrain_build.py`), the TypeScript port (`utils/terrain.ts`, the parity test must pass) and `biomePalette.ts`. Pick the ground colours **from the current map**, not from these sheets: Blight is violet-black with sickly green pools, Battlefield is churned mud and ash ([docs/plan/12-rebirth-biomes.md](../../docs/plan/12-rebirth-biomes.md) section 2.2).
+4. Keep an unknown-state in mind ([docs/plan/22-glossary-and-mastery.md](../../docs/plan/22-glossary-and-mastery.md)): props must read as dark shapes too.
 5. Do not touch the seven existing biomes (forest, plains, hills, swamp, tundra, lake, coast). They stay unchanged.
 
 ## Provenance of anything cut from here

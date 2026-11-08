@@ -2,21 +2,17 @@
 
 > **Status note (2026-11-07):** the steps below are tracked as Linear issues (R0 for phase A, R1 and R2 for B and C, R3 for D). A step is done when its issue is Done, not when it is listed here. Decisions made after this plan was written (docs 06, 10, 13, 15, 17, 18, 20, 21, 28 and the "Where each decision lives" table in the [ROADMAP](ROADMAP.md)) win over any older line below.
 
-Written after the balancing pass (castle timers, rebirth wipe and respec, the Ember curve, the merchant clock, the 16-monster roster, the growth badge and the battle queue are built; see git history, nothing of it is repeated here). This is a **proposal**: the order is meant to make the core readable and cheap to change first, then fill the game with content, then go back to the rebirth world ([ROADMAP](ROADMAP.md), [RELEASE-PLAN](RELEASE-PLAN.md)). Sizes: S ≈ half a day, M ≈ 1-2 days, L ≈ a week.
+Written after the balancing pass (castle timers, rebirth wipe and respec, the Ember curve, the merchant clock, the 16-monster roster, the growth badge and the battle queue are built, and so is the icon registry (B1); see [game/](../game/overview.md)). This is a **proposal**: the order is meant to make the core readable and cheap to change first, then fill the game with content, then go back to the rebirth world ([ROADMAP](ROADMAP.md), [RELEASE-PLAN](RELEASE-PLAN.md)). Sizes: S ≈ half a day, M ≈ 1-2 days, L ≈ a week.
 
 ## Why this order
 
 1. The next stretch is **content** (items, affixes, loot pools, biome goods). Content work touches the same few files again and again (`gameStore.ts` 1,350 lines, `gameConfig.ts` 940, `gameUtils.ts` 920, `fight.ts` 480 (sizes before A2-A4, which split them), `lootConfig.ts`, `sanitizeSave.ts` 550). Cleaning those first makes every later change smaller and the diffs readable.
-2. The art is **already here and unused**: `art_style_reference/equip` holds about 600 equipment icons and 48 potions per sheet, a 12-grades-per-slot plan and three special sets ([equip/README](../art_style_reference/equip/README.md)); the monster art in `public/pixel/enemies` is already wired for four biomes. Wiring item art is mechanical and has no balance risk, so it comes before the loot work that needs it.
+2. The art is **already here and unused**: `art_style_reference/equip` holds about 600 equipment icons and 48 potions per sheet, a 12-grades-per-slot plan and three special sets ([equip/README](../../art_style_reference/equip/README.md)); the monster art in `public/pixel/enemies` is already wired for four biomes. Wiring item art is mechanical and has no balance risk, so it comes before the loot work that needs it.
 3. Loot depends on the monsters (done) and on the items that exist. Once the items exist as data, the pools, affixes and uniques can be tuned with `npm run loot-sim` and `npm run monster-ladder`.
-
-## Phase 0 · Core cleanup (done)
-
-The old-save support, the duplicate helpers and the dead code were removed before Phase A; git history is the record.
 
 ## Phase A · Core you can read (M-L in total, no behaviour change)
 
-Built and removed from this table: A1 (line endings, Prettier, `format:check` in CI), A2 (the store split into slices, `src/stores/game/*`), A3 (the config split by domain, `src/config/*`, and the game maths split by domain, `src/utils/game/*`; the old `gameConfig.ts` and `gameUtils.ts` are gone), A4 (the fight engine split into `fightContext`, `fightProfile`, `fightTargets`, `fightSteps` and `fightView` in `src/lib/offline/`, `fight.ts` is the orchestrator; `tests/goldenFight.test.ts` pins it), A6 (`Tile.tsx` split into `Tile`, `TileMonster`, `TileMenu` and `TileTooltip`; the Tutorial split is dropped because the guided tutorial, IDL-74, replaces `Tutorial.tsx`). A8 (the pacing guard is blocking: the CI job `generated` runs `scripts/pacing-guard.ts` against the base branch, IDL-17). A7 is split: its generated-docs half is built (`npm run docs:gen` in the CI job `generated` with a no-diff check, IDL-9); its tests-by-area half is open (Linear IDL-214). Left: A5 (Linear IDL-7, ships together with the epoch reset IDL-76, see its row) and the tests-by-area half of A7 (IDL-214).
+Built and removed from this section: A1 (Prettier), A2 (store slices), A3 (config and maths split), A4 (fight engine split), A6 (`Tile.tsx` split), A8 (the pacing guard). A7 is split: its generated-docs half is built; the tests-by-area half is IDL-214.
 
 Rule for every step: **no gameplay change, the sim and the generated docs stay identical** (`npm run sim -- --no-write human hardcore` before and after), one PR each.
 
@@ -31,7 +27,6 @@ Goal: every item we will ship exists as **data with an icon**, behind a switch, 
 | # | Step | Size | Notes |
 |---|---|---|---|
 | B0 | **Three art passes** (see [ROADMAP](ROADMAP.md) "Item art in three passes"): pass 1 wire the existing good icons first (IDL-26..31), pass 2 generate placeholders in Python for everything that has none, pass 3 replace with Sprite Fusion in later releases, one registry line each. | M | Decided 2026-11-08 (IDL-217 pass 2, IDL-218 pass 3). Pass 2 is what lets B3 (all 12 grades as data) finish without waiting for art. |
-| B1 | **An icon registry that is one line per icon.** Today `pixelIcons.ts` and `scripts/pixel/sprites_*.py` are edited by hand per item. Make a registry (id -> file, slot, grade) read by both the build script and `pixelIcons.ts`. | S-M | Same idea as the resource-key registry. **Built (IDL-18):** `src/config/itemIcons/*.json`, one file per slot / weapon type and one line per icon (115 supplied 64x64 pieces under `public/pixel/items/` and the 78 built `item_*` icons), read by `pixelIcons.ts` and by `scripts/pixel/item_registry.py` (checked at the start of the build); see its README and `tests/catalog/itemIcons.test.ts`. |
 | B2 | **Cut and register the prepared sheets** by the procedure in the art README (`extract_sheet.py`, nearest-neighbour, our 40 px, no baked glow): potions first (hp, mana, buffs, antidotes), then weapons by type (sword, dagger, axe, mace, spear, bow, crossbow, staff, wand), then armour by slot (head, shoulder, chest, hands, legs, feet), then neck/ring/charm/cape. Gaps to draw in our kit: shields and off-hands, tomes, quivers, shoulders, gloves, capes. | L | One PR per family; the PR description names the sheet and region (art README rule 8). |
 | B3 | **Item definitions for the 12-grade ladder** (G1-G9 plus three special sets S1-S3) as entries in `catalog/items/*.ts` with `enabled: false` (new flag) and the grade as a tag, so they exist and are validated by `tests/catalog.test.ts` but nothing drops them yet. | M | The names are working titles in the equip README section 4. **Partly built (2026-11-07):** the `enabled` flag exists and `src/catalog/items/reuse.ts` holds 91 disabled items (feet, legs, neck, ring, off-hand, sword, mace/maul, legendary), never sold and never dropped (tests). Still open: grade mapping G1-G9 and S1-S3, the belt slot, dagger/axe/spear/bow/crossbow/staff/wand, and chest/head/shoulder/hands/cape/charm art. |
 | B4 | **Consumables beyond HP potions**: mana, stamina/regen, buff potions, antidotes with their effects as data (`consumable: { healHp | healMp | buff }`), shown in the bag and hotkeys. Needs a buff model on the server (a timed modifier in `CombatState`); a design for consumables, buffs and drop chests exists on another branch (`agntc/mystifying-turing-7454b2`, not merged yet) and should be taken from there. | M-L | Server-side effect first, art second. Decided in IDL-22 and IDL-160 (timed combat buffs, 4 utility potions); the 12 potion icons sit in `public/pixel/items/consumable/`, no definitions yet. |
@@ -69,9 +64,9 @@ The rats had a **golden ("lucky") variant** and we keep that for every monster: 
 
 ## Small things to do on the way
 
-- Show the **estimated win chance** of each queued monster in the Next strip ([24](24-battle-queue.md)); decide whether a defeat should also switch Auto-battle off. **Decided 2026-11-07 (IDL-59): coloured Safe/Risky/Unlikely bucket with the percent on hover; three defeats in a row pause Auto-battle.**
+- Show the **estimated win chance** of each queued monster in the Next strip (`offline/winChance.ts` already computes it); decide whether a defeat should also switch Auto-battle off. **Decided 2026-11-07 (IDL-59): coloured Safe/Risky/Unlikely bucket with the percent on hover; three defeats in a row pause Auto-battle.**
 - Per-band danger offsets (`dangerBonus` is 0 or 1, ROADMAP R7).
-- Docs 02, 06 and 19: the castle timer tables still show the old numbers.
+- Doc 19 and [game/pacing-targets.md](../game/pacing-targets.md): check that their castle timer numbers match `CASTLE_UPGRADE.durationsSec`.
 - Look at the growth badge, the queue markers and the Next strip in a real browser session once (nobody has yet), and write a Playwright smoke test for them.
 
 ## Decisions needed

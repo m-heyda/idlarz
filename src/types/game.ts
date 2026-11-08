@@ -112,7 +112,7 @@ export interface ItemDef {
 	/** Merchant price in gold; absent = not sold */
 	shop?: number;
 
-	// ---- loot generation (see src/lib/loot and docs/10-loot-system.md); gear only ----
+	// ---- loot generation (see src/lib/loot and docs/game/loot.md); gear only ----
 	/** false takes the item out of every loot pool (and stops saves from holding it); default true */
 	enabled?: boolean;
 	/** true: the item no longer drops, is not in any pool or the shop, but pieces already owned keep loading, equipping and selling (until its definition is deleted at the epoch reset, IDL-76) */
@@ -235,7 +235,7 @@ export interface CombatClientState {
 	notice: CombatNotice | null;
 	/** A monster was just clicked and the server has not opened the fight yet: the window is already up, loading (transient) */
 	pending: { type: MonsterType; level: number } | null;
-	/** The monsters waiting for their turn, first to fight first (docs/24-battle-queue.md), and how many the queue holds */
+	/** The monsters waiting for their turn, first to fight first (docs/game/combat.md), and how many the queue holds */
 	queue: { n: number; type: MonsterType; level: number; lucky?: boolean }[];
 	queueMax: number;
 	/** No fight is open and the hero rests before the queue's next monster (it starts by itself), and for how many seconds more at the server's answer */

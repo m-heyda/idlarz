@@ -25,7 +25,7 @@ export const EMBER_MODEL = {
 	runEndTiles: 100,
 	/** No honest run is shorter (the fastest measured one, a hardcore player, takes more than a day): play time per rebirth in a first save. */
 	minRunSec: 4 * 3600,
-	/** A first save is bounded by the best rebirth: the highest castle level and a territory above the medium-map target (docs/06). */
+	/** A first save is bounded by the best rebirth: the highest castle level and a territory above the medium-map target (docs/game/pacing-targets.md). */
 	firstSaveTiles: 1000,
 	/**
 	 * Once the browser asks the server to run every rebirth (`POST /api/rebirth`, IDL-102), a rebirth with no server record can be refused.

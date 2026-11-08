@@ -1,6 +1,6 @@
 # farm/ : IGNORE FOR NOW (reference for a future farm update)
 
-**Agents: do not use, cut or implement anything from this folder until the owner starts the farm update.** The current farm UI stays exactly as it is (`scripts/pixel/reference/farm.png`, the pen back and front layers). Nothing here is scheduled in [RELEASE-PLAN](../../docs/RELEASE-PLAN.md).
+**Agents: do not use, cut or implement anything from this folder until the owner starts the farm update.** The current farm UI stays exactly as it is (`scripts/pixel/reference/farm.png`, the pen back and front layers). Nothing here is scheduled in [RELEASE-PLAN](../../docs/plan/RELEASE-PLAN.md).
 
 ## What it is for
 
@@ -8,7 +8,7 @@ A far-future update: the farm gets **crops, not only animals**. The idea so far 
 
 - Crops grown in **plots the player places by clicking**, in **frames on a grid** (plant, grow through stages, harvest).
 - A **top-down view**, **not isometric / 45 degrees**, so a grid of plots reads clearly and clicks are precise; animals and buildings drawn from the same top-down angle in the farm screen.
-- It would feed the T1 farm goods ([docs/18](../../docs/18-biome-buildings-and-material-tiers.md) section 4) and the Fields and Orchard biomes.
+- It would feed the T1 farm goods ([docs/plan/18-biome-buildings-and-material-tiers.md](../../docs/plan/18-biome-buildings-and-material-tiers.md) section 4) and the Fields and Orchard biomes.
 
 ## Files
 
@@ -24,4 +24,4 @@ A far-future update: the farm gets **crops, not only animals**. The idea so far 
 
 - The files here are licensed to the owner for free use in the game (root [Licence](../README.md#licence)), so they can be cut directly when the farm update starts. Until then they stay reference only because the farm update is not scheduled, not because of licensing.
 - Start with a design doc (grid size, stages, timers on the server clock, where the harvest goes), then the art.
-- Check the current farm items and server rules first: [docs/02](../../docs/02-mechanics.md) farm section and [docs/11](../../docs/11-server-authority.md).
+- Check the current farm items and server rules first: [docs/game/economy.md](../../docs/game/economy.md) farm section and [docs/game/saves-and-server.md](../../docs/game/saves-and-server.md).

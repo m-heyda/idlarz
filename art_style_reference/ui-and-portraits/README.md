@@ -1,6 +1,6 @@
 # ui-and-portraits/ : avatars, skill icons and battle backgrounds
 
-**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: avatars are separate from classes ([docs/21](../../docs/21-classes-avatars-achievements-offline-report.md) section 2, RELEASE-PLAN P2.4); the fight screen has a background that may be reworked.
+**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: avatars are separate from classes ([docs/plan/21-classes-avatars-achievements-offline-report.md](../../docs/plan/21-classes-avatars-achievements-offline-report.md) section 2, RELEASE-PLAN P2.4); the fight screen has a background that may be reworked.
 
 ## 1. Files
 
@@ -24,7 +24,7 @@
 
 ## 2. What we want
 
-- **Avatars**: 8 starter portraits and unlockable ones, a coherent set in our bust style (40x40, framed, coloured outline) and **independent of class**. Use the human and dwarf set for starters; the orc, tiefling, drow and undead sets are the **unlockable** pool (each unlocked by a server achievement). A locked silhouette and a selected frame are also needed ([docs/16](../../docs/16-landing-and-play-route.md) section 4).
+- **Avatars**: 8 starter portraits and unlockable ones, a coherent set in our bust style (40x40, framed, coloured outline) and **independent of class**. Use the human and dwarf set for starters; the orc, tiefling, drow and undead sets are the **unlockable** pool (each unlocked by a server achievement). A locked silhouette and a selected frame are also needed ([docs/plan/16-landing-and-play-route.md](../../docs/plan/16-landing-and-play-route.md) section 4).
 - **Battle screen**: maybe a reworked fight background. Today the fight modal has a plain scene; the references show a **backdrop plus an arena floor** layout that fits a 3/4 monster standing on the floor. Consider one backdrop per biome family (day sky outdoor, dusk, dark hall, dead forest for the two special biomes).
 - **UI**: skill and ability icons for later (the two ability slots hold Heal and Stun today), plus an NPC style for quests and the merchant.
 

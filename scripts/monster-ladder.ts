@@ -1,4 +1,4 @@
-// Monster ladder: win rate of each gear tier against every monster at the levels it spawns at (docs/ROADMAP.md, enemy rework).
+// Monster ladder: win rate of each gear tier against every monster at the levels it spawns at (docs/plan/ROADMAP.md, enemy rework).
 //   npm run monster-ladder            print the table
 //   npm run monster-ladder -- --md    also write docs/generated/monster-ladder.md (and docs/generated/spawn-mix.md)
 //   npm run monster-ladder -- --hero=1,5,10   only the spawn mix: what a hero of that level meets at castle 1 (see scripts/spawnMix.ts)

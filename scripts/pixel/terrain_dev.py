@@ -1,4 +1,4 @@
-"""DEV-ONLY art for the five rebirth biomes (docs/12): jungle, fields, orchard, blight, battlefield.
+"""DEV-ONLY art for the five rebirth biomes (docs/plan/12-rebirth-biomes.md): jungle, fields, orchard, blight, battlefield.
 
 Importing this module registers them into the terrain pipeline (palettes, textures, rims, props, decor); terrain_build.py imports it,
 so they are built into public/pixel/terrain and src/config/terrainAtlas.json like every other ground. Whether the *game* uses a biome is

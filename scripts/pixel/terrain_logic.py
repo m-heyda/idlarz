@@ -8,7 +8,7 @@ from terrain_field import hash32
 
 CELL = 48
 NW, NE, SW, SE = 1, 2, 4, 8
-# Draw order, low to high (the higher ground draws its own rim over the lower one). The five rebirth biomes (docs/12) sit between
+# Draw order, low to high (the higher ground draws its own rim over the lower one). The five rebirth biomes (docs/plan/12-rebirth-biomes.md) sit between
 # the shipped grounds, so they have their own fixed hash id: the variant of a cell must not change for the shipped grounds.
 RANK = ['mist', 'coast', 'plains', 'fields', 'orchard', 'swamp', 'battlefield', 'tundra', 'blight', 'forest', 'jungle', 'hills', 'lake', 'yard', 'castle']
 HASH_ID = {'mist': 0, 'coast': 1, 'plains': 2, 'swamp': 3, 'tundra': 4, 'forest': 5, 'hills': 6, 'lake': 7, 'yard': 8, 'castle': 9,

@@ -1,5 +1,5 @@
 // Smoke test of the real game in a real browser (IDL-124). It runs against the Supabase project in .env.local with the ONE test account
-// (docs/29-e2e-test-account.md): clear it with `npm run reset-test-account -- --yes`, run `npm run e2e`, and SIGN IN BY HAND in the window that opens.
+// (docs/ops/e2e-test-account.md): clear it with `npm run reset-test-account -- --yes`, run `npm run e2e`, and SIGN IN BY HAND in the window that opens.
 // The test never types a password; it waits for the session and refuses to go on when the account is not the test account.
 // The dev server exposes the store as `window.__game` (GameDebug), which the steps below use to read state and to do what has no stable button.
 import { expect, test, type Page } from '@playwright/test';

@@ -5,7 +5,7 @@ import { estimateWin } from '@/lib/offline/winChance';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { MonsterType } from '@/types/game';
 
-// How beatable a monster is for the player decides how often the server picks it for a new spawn (docs/20 section 8, "relevance"): a new
+// How beatable a monster is for the player decides how often the server picks it for a new spawn (docs/plan/20-monster-families-and-rewards.md section 8, "relevance"): a new
 // player on land of four biomes should meet mostly monsters worth fighting, with the scary ones still on the horizon. Pure maths on the
 // frozen PlayerProfile; no random numbers, so a ticket places the same way for the same profile.
 
@@ -13,7 +13,7 @@ import type { MonsterType } from '@/types/game';
 export const WORTH_FIGHTING = { from: 0.4, to: 0.95 } as const;
 /** Chance at (and below) which a monster has the lowest weight. */
 const HOPELESS_AT = 0.05;
-/** Never gone: a monster the player cannot beat still appears now and then (docs/20 section 8). */
+/** Never gone: a monster the player cannot beat still appears now and then (docs/plan/20-monster-families-and-rewards.md section 8). */
 export const HOPELESS_WEIGHT = 0.1;
 /** A monster that is no challenge any more is not rare, only a little less common. */
 export const TRIVIAL_WEIGHT = 0.75;

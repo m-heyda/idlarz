@@ -19,7 +19,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *
  * A save written by any other schema than this game's is refused with a clear message, never half-loaded. When the format changes
  * (a renamed, moved or reinterpreted field, removed content), bump SAVE_SCHEMA; write a migration only if old saves must survive
- * (today they do not: player progress is reset between seasons, see docs/23-reset-players-cli.md). A new OPTIONAL field needs no bump:
+ * (today they do not: player progress is reset between seasons, see docs/ops/reset-players-cli.md). A new OPTIONAL field needs no bump:
  * add it to PERSISTED_KEYS and let `sanitizeSave` accept it with a default.
  */
 
@@ -44,7 +44,7 @@ export const BIOME_CODES: Readonly<Record<string, string>> = {
 	tundra: 't',
 	lake: 'l',
 	coast: 'c',
-	// the rebirth biomes (docs/12 section 6); dev-only for now (config/biomeStage.ts), the letters are frozen from here on
+	// the rebirth biomes (docs/plan/12-rebirth-biomes.md section 6); dev-only for now (config/biomeStage.ts), the letters are frozen from here on
 	jungle: 'j',
 	fields: 'd',
 	orchard: 'o',

@@ -1,6 +1,6 @@
 # 25 · Idle-game research: formulas, big numbers, offline progress
 
-*Research note, written 2026-11-07. Nothing here is built and no number in it is a decision.* It compares what the incremental-game literature teaches with what the game does today ([03](03-formulas-and-scaling.md), [06](06-pacing-targets.md), [11](11-server-authority.md)) and with the plans in [ROADMAP](ROADMAP.md), and ends with a ranked list of improvements. The code wins wherever this note and the code disagree.
+*Research note, written 2026-11-07. Nothing here is built and no number in it is a decision.* It compares what the incremental-game literature teaches with what the game does today ([economy](../game/economy.md), [pacing targets](../game/pacing-targets.md), [saves and server](../game/saves-and-server.md)) and with the plans in [ROADMAP](ROADMAP.md), and ends with a ranked list of improvements. The code wins wherever this note and the code disagree.
 
 ## 1. Skills for building idle games with Claude
 
@@ -14,7 +14,7 @@ A search of the skills ecosystem (`npx skills find`, 2026-11-07) found **no skil
 | `…@godot-economy-system`, `…@godot-monte-carlo-balancer` | 478 / 215 | Godot |
 | `davila7/claude-code-templates` `game-development` | n/a | generic orchestrator, found by web search |
 
-Recommendation: install none. `scripts/sim.ts` (real store, seeded bot profiles, [06](06-pacing-targets.md)) already does what a balancing skill would suggest, with the game's own numbers. The genre knowledge is in the articles of section 2.
+Recommendation: install none. `scripts/sim.ts` (real store, seeded bot profiles, [pacing targets](../game/pacing-targets.md)) already does what a balancing skill would suggest, with the game's own numbers. The genre knowledge is in the articles of section 2.
 
 ## 2. What the literature says
 
@@ -41,7 +41,7 @@ Recommendation: install none. `scripts/sim.ts` (real store, seeded bot profiles,
 | Topic | Genre practice | This game | Verdict |
 | --- | --- | --- | --- |
 | Cost curve | exponential, one rate | staged: x1.13 to 15 tiles, x1.07 to 100, x1.007 to 300, then `(n/300)^4.5` capped at `RESOURCE_CAP/100` | fits a map game; the tail is the wall rebirth exists for |
-| Prestige | `x^(1/2..1/3)` of earnings | `3·(C−5)·(√(n/10) + 0.02·tiles over the requirement)`, +6 % income per Ember ([03 §9](03-formulas-and-scaling.md)) | see item 6 |
+| Prestige | `x^(1/2..1/3)` of earnings | `3·(C−5)·(√(n/10) + 0.02·tiles over the requirement)`, +6 % income per Ember ([03 §9](../game/economy.md)) | see item 6 |
 | Multiplier buckets | several independent `(1+Σ)` groups | castle, Embers, Foreman, set income | good, this is where big totals come from |
 | Milestone multipliers | thresholds per generator | none on ownership counts; kills/resources only ([22](22-glossary-and-mastery.md)) | gap |
 | Offline | capped, scaled, extendable | server-owned: 8 h cap, 50 % efficiency, Night Watch +1 h and Steward +5 % per level, hard limit 72 h / 100 % (`config/limits.ts`) | ahead of most games (no clock cheating) |
@@ -60,12 +60,12 @@ Recommendation: install none. `scripts/sim.ts` (real store, seeded bot profiles,
 4. **Notation.** Extend `SUFFIXES` past `Sx` (Sp, Oc, No, Dc, then aa, ab…), add a Settings switch for suffix / scientific / engineering, and unify the K threshold (`formatNumber` starts at 10,000, `formatHeaderAmount` at 1,000).
 5. **Milestone multipliers with varied thresholds.** For example a permanent x2 at 50, 100, 200 and 400 owned tiles, and building-count thresholds that differ per biome ([18](18-biome-buildings-and-material-tiers.md)). This keeps old-biome buildings relevant after rebirth 5 and breaks the "newest generator dominates" pattern. Run the sim's `idle` and `casual` profiles before and after, since a milestone shifts pacing.
 6. **Check the Ember formula against marginal cost.** The sqrt term alone would need 4x the tiles to double the gain, which costs roughly `4^5.5` (about 2,000x) the gold in the `n^4.5` tail. The surplus term is linear instead: 0.02 per tile over the requirement, i.e. one extra `3·(C−5)` Ember per 50 tiles. So late gain per gold falls steeply and the castle level `(C−5)` dominates the decision, which the castle timers already bound. Fine if intended; confirm with the `human-rebirth*` profiles that nobody is rewarded for waiting past the requirement.
-7. **Doc check.** The table in [03 §9](03-formulas-and-scaling.md) (castle 6: 14 / 20 / 24 Embers for 100 / 200 / 300 tiles) cannot come from the current `REBIRTH.gain` for those inputs, because rebirth needs 400+ tiles. Regenerate it with `npm run report` or relabel the columns.
+7. **Doc check.** The table in [03 §9](../game/economy.md) (castle 6: 14 / 20 / 24 Embers for 100 / 200 / 300 tiles) cannot come from the current `REBIRTH.gain` for those inputs, because rebirth needs 400+ tiles. Regenerate it with `npm run report` or relabel the columns.
 8. **An endless Ember sink.** The Ember shop is finite (four items, level 10, cost `x1.4` per level) and each Ember adds only +6 % additively, so income grows about linearly in total Embers. Paragon ([13](13-rebirth-reset-and-paragon.md)) is the endless sink; if "crazy numbers" is a goal, give it or Idol mastery a compounding term, not only a flat bonus.
 9. **Autobuyers and bulk buy.** Auto-battle exists after rebirth 1. Candidates: "buy the cheapest tile", auto-build, "buy next N tiles" with a cost preview. The closed-form bulk sum only works inside one cost stage, so sum stage by stage or use a prefix table.
 10. **Offline overflow.** The planned report says "capped, N h earned nothing". An option from the weak evidence: store the overflow as a small time bank the player can spend. Optional, and it needs server work in the ledger.
 11. **Softcap audit.** Every `LIMITS` / `HARD_LIMITS` entry is a softcap in disguise. After each biome ships, run `idle` and `casual` and check that no early stage stalls.
-12. **Keep the economy simple to read.** Everything is additive inside one `(1 + Σ)` per bucket ([03 §3](03-formulas-and-scaling.md)); adding a fifth bucket multiplies totals, so add one only on purpose and show it in the "Where the income comes from" panel.
+12. **Keep the economy simple to read.** Everything is additive inside one `(1 + Σ)` per bucket ([03 §3](../game/economy.md)); adding a fifth bucket multiplies totals, so add one only on purpose and show it in the "Where the income comes from" panel.
 
 ## 5. Suggested pairing with the roadmap
 

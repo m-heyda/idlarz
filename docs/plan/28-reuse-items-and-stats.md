@@ -178,7 +178,7 @@ Handlers (launch set of two, deterministic from the sealed fight stream):
 
 Sources and pity (IDL-146), as **two pools** so a roll can never hand out the wrong tier: `legendary_top` (the three top-tier items) is used only by the boss bonus table (pity as `king_legendary`: 5 % + 1 % per miss, max +10 %) and by the relic exchange; the first legendary is guaranteed from the first boss kill after level 15. `legendary_mid` (the eight mid, combat and handler items plus the three classic stat-only legendaries) is used by the chest replace roll (`chest_legendary`, 1.9 %) and by a new `fixed`-mode **monster bonus table** (`monster_legendary`, 0.2 % per kill, item-level gate 15, `placement: 'extra'`). The monster rarity weight of `normal_monster` draws from `general_equipment`, which excludes named items, so it can only produce legendary-rarity bases, never these items; the bonus table is what makes them droppable. Everything wipes at rebirth except the one Vault item (IDL-148). Unique: a second copy of the same id never drops while one is in the bag, gear or Vault.
 
-The eight non-top legendaries can also be crafted late (crafting level 95, 50 War Medals + G9 materials, docs/17 section 7); the three top-tier ones never.
+The eight non-top legendaries can also be crafted late (crafting level 95, 50 War Medals + G9 materials, docs/plan/17-crafting.md section 7); the three top-tier ones never.
 
 Classic legendaries (`emberbrand`, `starfall_bow`, `titan_maul`) stay as stat-only legendaries without perks.
 
@@ -211,7 +211,7 @@ Not taken (stay out of the plan for now): Potion Power %, Sell Price %, and Ches
 
 ## 8. Asset gaps (nothing in `reuse/` covers these)
 
-head, shoulder, chest, hands, cape, charm, axe, spear, dagger, bow, crossbow, staff, wand, tome. They stay on the legacy items; generation prompts are in `docs/item-resource-art-prompts.md` (Linear IDL-32..36).
+head, shoulder, chest, hands, cape, charm, axe, spear, dagger, bow, crossbow, staff, wand, tome. They stay on the legacy items; generation prompts are in `docs/plan/item-resource-art-prompts.md` (Linear IDL-32..36).
 
 ## 9. Enabling checklist
 

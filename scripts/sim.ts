@@ -102,7 +102,7 @@ const main = async () => {
 		'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
 		// the long game: ten rebirths, to see the character level (carried over each rebirth) reach the soft cap and the maximum
 		'hardcore-rebirth6-x10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 10 },
-		// the owner's pace (docs/06): a person who checks in a few times a day, fights with auto-battle, never optimises
+		// the owner's pace (docs/game/pacing-targets.md): a person who checks in a few times a day, fights with auto-battle, never optimises
 		human: { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18 },
 		'human-rebirth6': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 6, rebirths: 5 },
 		'human-rebirth8': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 8, rebirths: 4 },
@@ -143,7 +143,7 @@ const main = async () => {
 
 	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
 	console.log(md);
-	for (const w of renderMagnitudes(selected).warnings) console.error(`WARNING outside the docs/06 band: ${w}`);
+	for (const w of renderMagnitudes(selected).warnings) console.error(`WARNING outside the docs/game/pacing-targets.md band: ${w}`);
 	// The milestones of every selected profile as data (game days, rounded so a rerun on another machine writes the same bytes): scripts/pacing-guard.ts compares it against the base branch's copy
 	const json = JSON.stringify(
 		{
@@ -179,7 +179,7 @@ interface Profile {
 
 type Milestones = Record<string, number | null>; // key -> game day (fractional), null if never
 
-/** Magnitudes measured per profile (docs/06 "Magnitude targets", IDL-128): gold/s, stock hours, Embers; rendered and checked against the bands by `renderMagnitudes`. The last seed of a profile wins. */
+/** Magnitudes measured per profile (docs/game/pacing-targets.md "Magnitude targets", IDL-128): gold/s, stock hours, Embers; rendered and checked against the bands by `renderMagnitudes`. The last seed of a profile wins. */
 const magnitudes: Record<string, Record<string, number | string>> = {};
 
 /** Minutes the income needs to pay each part of the next tile, read at tile counts (the hide-versus-gold diagnostic). */
@@ -212,7 +212,7 @@ const HARDCORE_WINDOWS: [number, number][] = [
 	[12, 13],
 	[18, 23],
 ];
-// SIM_DECISION / SIM_HOARD: calibration knobs (docs/06: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus (calibrated to the owner: ~185 tiles after 3.3 days))
+// SIM_DECISION / SIM_HOARD: calibration knobs (docs/game/pacing-targets.md: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus (calibrated to the owner: ~185 tiles after 3.3 days))
 const HUMAN = {
 	decisionSec: Number(process.env.SIM_DECISION ?? 3600),
 	hoard: Number(process.env.SIM_HOARD ?? 1e9),
@@ -723,7 +723,7 @@ const ORDER = [
 	'finished',
 ];
 
-/** The bands of docs/06 "Magnitude targets" (IDL-128). Change them there and here together. */
+/** The bands of docs/game/pacing-targets.md "Magnitude targets" (IDL-128). Change them there and here together. */
 const MAGNITUDE_BANDS = {
 	gpsRun1Castle10: [3000, 6000], // was 2,500-5,000 before the gentler tile tail of IDL-181 (casual and hardcore measure 5,480)
 	unspentGoldHours: 4,
@@ -735,7 +735,7 @@ const MAGNITUDE_BANDS = {
 	incomeMultiplier: { 5: [3, 6], 10: [7, 15] } as Record<number, [number, number]>,
 };
 
-/** The magnitude table of docs/06, per profile, with a status per line; `warnings` lists the lines outside their band. */
+/** The magnitude table of docs/game/pacing-targets.md, per profile, with a status per line; `warnings` lists the lines outside their band. */
 function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[] } {
 	const rows: string[] = [];
 	const warnings: string[] = [];
@@ -781,7 +781,7 @@ function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[
 			const band = castle == null ? undefined : byCastle[castle];
 			if (v != null && band) row(p, `after rebirth ${n} at castle ${castle}: lifetime Embers`, v, `${band[0]}-${band[1]}`, inBand(v, band));
 		}
-		// income multiplier: run N+1 against run 1 at the highest castle level both reached (docs/06 defines it at castle 10; the sim bot rebirths earlier)
+		// income multiplier: run N+1 against run 1 at the highest castle level both reached (docs/game/pacing-targets.md defines it at castle 10; the sim bot rebirths earlier)
 		for (const [n, band] of Object.entries(MAGNITUDE_BANDS.incomeMultiplier)) {
 			const run = Number(n) + 1;
 			for (const c of [10, 8, 6]) {
@@ -855,7 +855,7 @@ function renderMarkdown(results: Record<string, Milestones>, legacy: boolean, sp
 		lines.push(`| ${key} | ${names.map(cell).join(' | ')} |`);
 	});
 	lines.push('');
-	// How much faster each further run reaches "finished" than the first one (target band 60-70 %, docs/06; used to tune the Ember curve)
+	// How much faster each further run reaches "finished" than the first one (target band 60-70 %, docs/game/pacing-targets.md; used to tune the Ember curve)
 	const ratioRows = names.flatMap((n) => {
 		const first = results[n].finished;
 		if (first == null) return [];

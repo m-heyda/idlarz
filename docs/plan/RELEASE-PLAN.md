@@ -1,6 +1,6 @@
 # Release plan: from today's game to the rebirth world (proposal v1, for review)
 
-Status: **decisions D1-D11 accepted (2026-10-29); ready to start P0.1.** Written 2026-10-29 against `main` at `0728da3`. Nothing from docs 12-22 is built (checked: no `middleware.ts`, no `config/branding.ts`, no v6 fixture, no `legacyDurationsSec`, no generic ticket bank, no `/play` route). This file orders the work of [ROADMAP](ROADMAP.md) and drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) into small, independently shippable steps, written as a product brief (what the player gets, what is needed, what is still open), not as implementation.
+Status: decisions D1-D11 accepted (2026-10-29). **P0 (foundation) is built and its text, and the triage tables of section 2, were removed on 2026-11-08**; what is built is described in [game/](../game/overview.md). This file orders the work of [ROADMAP](ROADMAP.md) and drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) into small, independently shippable steps, written as a product brief (what the player sees first, then the technical steps).
 
 Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 🧱 = ships with a placeholder asset first. ❓ = needs your answer. Every step is its own pull request to `m-heyda/idlarz` and must leave `tsc`, `lint`, `npm test` and `npm run sim` green.
 
@@ -11,7 +11,7 @@ Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 
 | Section | What it holds |
 |---|---|
 | 1 | Rules every step follows (game integrity) |
-| 2 | Triage of **Known bugs and leftovers** and the **Balance backlog**: fix first / absorbed by the plan / ignore |
+| 2 | (removed: the triage is done) |
 | 3 | Overview: the releases in order |
 | 4 | The phases P0-P13 with their steps |
 | 5 | The landing page, v1 to v2 |
@@ -21,7 +21,7 @@ Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 
 
 ## 1. Integrity rules for every step
 
-1. **Additive saves only**: optional fields, new biome letters, nullable ledger columns; no `SAVE_SCHEMA` bump. A moved rule that would refuse existing saves needs a reset (`reset-players`) or a conversion written for it ([07](07-saves-and-security.md)).
+1. **Additive saves only**: optional fields, new biome letters, nullable ledger columns; no `SAVE_SCHEMA` bump. A moved rule that would refuse existing saves needs a reset (`reset-players`) or a conversion written for it ([saves and server](../game/saves-and-server.md)).
 2. **SQL before code**: apply a migration on the project first, then deploy the code that reads it ([ROADMAP](ROADMAP.md) deploy-order note). Rehearse each migration on a **Supabase branch** first.
 3. **Run `scripts/check-live-saves.ts`** (new in P0) against the real rows before every release that touches save or ledger rules.
 4. **Dark first, switch later**: server code and data shapes ship before the UI or the content that uses them, behind a constant (`GAME_EPOCH`, an unlock count) so the release moment is a one-line change.
@@ -30,42 +30,9 @@ Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 
 7. **The reset happens exactly once** (P2). Everything that would need another wipe goes into that release or is designed not to need one.
 8. One small behaviour change per release where possible, so a bad number is easy to attribute and roll back.
 
-## 2. Triage of the two ROADMAP sections
+## 2. Triage of the ROADMAP sections (removed)
 
-### 2.1 Known bugs and leftovers
-
-| # | Verdict | Why | What happens |
-|---|---|---|---|
-| **R7** `dangerBonus` is 0 or 1 | **Absorb, fix in P3.4** | monsters stand at most 9 tiles out, `dangerStep` is 8; after "rats 2-6" it is always 0. No bug today, a dead rule | replaced by a per-band danger offset on `DISTANCE_BANDS` (P0.6 adds the bands, P3.4 uses them); delete the row when P3.4 ships |
-| **R8** King balance (steel and wood cannot win) | **Resolved by decision (2026-10-29): delete the row** | the Rat King was a beta-test boss. It becomes a basic monster, and the **Rattatui set is retired** (see P3.6): it no longer drops, existing pieces stay valid, nothing is balanced around it | P3.6 retires the set and re-tunes the King as a normal monster. The crafting gate (P11.3) now asks that a craftable starter tier beats the home-land monsters, not the King |
-| **R9** local dev needs Supabase and `LOOT_SECRET` | **Ignore / delete from the roadmap** | offline play is gone by decision; the README already says what is needed | keep one README sentence; a fake backend is a different project |
-| ⚠️ **B6** chests and clicks are small | **Merge into BL3, decide before P6.3** | same question; and the Scarecrow King Idol (+gold per click) and the ranger's chest speed build on the answer | ❓ D2 |
-| ⚠️ **B7** sim bots are simple | **Delete as a standalone item** | it is a duty, not a bug: each phase that changes player choices updates the bot (class picker P2, `BUILD_ORDER` P6, respec P7, craft-sim P11) | becomes an acceptance line in those phases |
-
-Also fixed first, because they endanger later steps (not in the roadmap tables, found in the docs and code): fight-polling ledger writes (P0.3), the castle-timer in-progress-save trap (P0.4), hand-kept resource key lists (P0.5), the example `LOOT_SECRET` (P2.7), the hard-wired rat/king ticket bank (P3.1).
-
-### 2.2 Balance backlog (each needs your approval; nothing is changed by this file)
-
-| # | Verdict | Reason |
-|---|---|---|
-| BL1 active vs idle gap | **Keep, merge with BL3** | decided together (D2) |
-| BL2 levels barely matter | **Answered by the plan, delete** | respec + 20 points per rebirth ([13](13-rebirth-reset-and-paragon.md)), class bonuses, Idols. Becomes a sim check in P7 |
-| BL3 chests and clicks | **Keep ❓ D2** | blocks the click Idol and the ranger passive tuning |
-| BL4 food/meat is the strongest engine | **Keep ❓ D3** | the Harvest Scarecrow Idol (+farm output) would stack on it; decide the farm cost scaling before P6.3 |
-| BL5 thin resource sinks | **Answered, delete** | building levels, roads, crafting, castle 7-10 and T2/T3 recipes are all sinks; checked by the "minutes to cover" table each phase |
-| BL6 merchant depth | **Move to Draft ideas (already listed there)** | the merchant becomes server-priced later; saturation only if burst selling shows up |
-| BL7 late tiles expensive | **Merge into BL16** | |
-| BL8 idle tile income / specialisation | **Answered, delete** | Producer +2 % per owned tile of its biome ([18](18-biome-buildings-and-material-tiers.md) rule 3) |
-| BL9 Ember shop shape | **Answered, delete** | Idol Mastery, Master Craftsmen, Extra Builder decided ([18](18-biome-buildings-and-material-tiers.md) section 6), built in P6.4 |
-| BL10 late Ember runs flatten | **Answered in part, delete** | cap items are the sink; re-check with the sim after P6.4 |
-| BL11 biome luck vs 24 h bot | **Delete as a standalone** | covered by the "rebirths = 0 gives the identical roll" regression test in P5.1 |
-| BL12 combat rewards | **Replaced by [20](20-monster-families-and-rewards.md), delete** | the capped reward model plus a kill-reward sim in P3.3 |
-| BL13 round-2 numbers | **Mostly obsolete, delete** | the ten newer buildings are replaced by the 36 biome buildings; the chest table stays under BL3 |
-| BL14 reserved resources | **Superseded, delete** | the T2/T3 ladder replaces it; the reserved icons (`res_iron`, `res_fish`, `res_mana`, `res_crystal`, `res_sapphire`, `res_shard`) are reused as placeholder T3 icons |
-| BL15 four free start tiles | **Delete, measure only** | re-check the opening once in the P0.4 sim run |
-| BL16 late tile price and map scale | **Keep ❓ D4, decide before P5** | the biome distances (22-34 tiles out with the +12 offset) and the price tail `(n/300)^4.5` need one agreed map-size target per rebirth |
-
-**Applied 2026-10-29:** the ROADMAP tables were trimmed. They now hold only BL1+BL3 (one row), BL4, BL16. The "Combat and items: known limits" section of the ROADMAP also loses its Rat King / Rattatui paragraph when P3.6 ships.
+The bug and balance triage is done: the fixed items left the ROADMAP, the open ones are its "Known bugs" and "Balance backlog" sections.
 
 ## 3. The releases in order
 
@@ -73,7 +40,6 @@ Deviation from the confirmed order of [ROADMAP](ROADMAP.md) (**approved as D1**)
 
 | Phase | Release name | Player sees | Size | Art |
 |---|---|---|---|---|
-| **P0** | Foundation | shorter castle timers (3 d 17 h to 2 d 17 h); nothing else | M | none |
 | **P1** | Front door | landing v1 at `/`, game at `/play`, monster growth badge, offline bar | M | 🧱 one still |
 | **P2** | **New chapter (v1 launch)** | reset once; class bonuses, avatars, reserved names, achievements, guided tutorial | L | 🎨 8 portraits |
 | **P3** | Monster engine | more monster kinds in the home land with real stats and rewards; rats stay near the castle | L | 🧱 generic sprite |
@@ -90,20 +56,9 @@ Deviation from the confirmed order of [ROADMAP](ROADMAP.md) (**approved as D1**)
 
 ## 4. The phases
 
-### P0 · Foundation (invisible hardening)
+### P0 · Foundation (built, text removed)
 
-Goal: remove every known edge-case hazard before anything is built on top.
-
-| Step | What | Size | Notes |
-|---|---|---|---|
-| 0.1 | **CI**: GitHub Action running `tsc`, `lint`, `test`, `build`; sim pacing guard (first-finish time moves by more than 15 % fails) after 0.4 | S | no `.github` exists today |
-| 0.2 | **Fixtures and dry run**: freeze a `v6` save fixture; new `scripts/check-live-saves.ts` (dev machine, service role, counts and reasons only) | S | [14](14-server-audit-and-data-plan.md) section 6; also reports who is mid castle upgrade |
-| 0.3 | **Fight-polling write fix**: skip the ledger write when only the anchor moved; poll slower while a fight is only watched | M | free-plan hot spot (about 1,800 requests an hour per open fight); must land before crafting and rankings add load |
-| 0.4 | **Castle timers** 1/3/9/16/36 h and first five castle costs x0.75 ([19](19-first-build-steps.md) step A) with its three compatibility fixes (`sanitizeSave` bound, `castle_jump` clamp, offline note), the sim "waiting" diagnostic, docs | S | the only player-visible change of P0; update the first-rebirth target to day 4-6 |
-| 0.5 | **Resource registry** ([19](19-first-build-steps.md) step B): one catalog entry per resource, tier ladder `t0`-`t4`, empty tiers hidden | M | pure refactor; acceptance is identical sim output and an empty `docs:gen` diff |
-| 0.6 | **Distance helper and bands**: `castleDistance` to `lib/distance.ts`, `DISTANCE_BANDS` (home 1-6, outskirts 7-12, frontier 13-21, wilds 22+) read by biome, monster and chest code | S | no behaviour change; prerequisite of P3.4 and P5 |
-
-Acceptance of P0: tests green; sim summary and the live-save dry run pasted in the PRs; no `castle_jump` flag when replaying an old in-progress upgrade. Ship order inside P0: 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 (each can be merged alone).
+CI, fixtures and `check-live-saves`, the fight-polling write fix, the halved castle timers, the resource registry and the distance helper with its bands are in the code (`.github/workflows/ci.yml`, `scripts/check-live-saves.ts`, `ANCHOR_REFRESH_MS`, `CASTLE_UPGRADE.durationsSec`, `src/catalog/resourceKeys.ts`, `src/lib/distance.ts`). The first five castle costs x0.75 were never applied: see [19](19-first-build-steps.md).
 
 ### P1 · Front door (landing v1, `/play`, small UI wins)
 
@@ -112,7 +67,6 @@ Acceptance of P0: tests green; sim summary and the live-save dry run pasted in t
 | 1.1 | `config/branding.ts` with `GAME_TITLE` = **IDLE REALM**; metadata, Guide and README read it (today still "Idle Explorer") | S |
 | 1.2 | **`/play` route**: today's gate and game move there unchanged; `middleware.ts` refreshes the session and redirects guests to `/?login=1&next=/play`; the "entered" marker and logout behaviour stay ([16](16-landing-and-play-route.md) sections 2 and 5) | M |
 | 1.3 | **Landing v1** at `/` (see section 5): title banner, login/register window, five feature cards, a **Continue** button and character card (name, class, level, rebirths) for signed-in visitors, redirect to `/play` after login | M |
-| 1.4 | **Monster growth indicator** (UI only): blue frame and glow at maximum level, progress ring to the next level, tooltip "Level 7 of 12, grows in 14 min" | S |
 | 1.5 | **Offline report bar**: "Away 6 h 20 m of 8 h", a "capped, N h earned nothing" state with Night Watch / Steward hint, read from the server claim (not recomputed); also on the Continue card via an extended `/api/auth/me` | M |
 | 1.6 | Password reset on, email confirmation off (needs the project's email sender; rate-limited per account and IP) ❓ D5 | S-M |
 
@@ -146,10 +100,7 @@ Goal: more monster kinds with **real stats, rewards and spawn rules** in the exi
 |---|---|---|
 | 3.1 | **Generic ticket bank**: `{ n, type, at, x, y, spawnLevel, lucky }` list in `player_ledger.bank`; `upgradeBank` reads old rows lazily; in-flight rat and King tickets survive the deploy; remove the `'rat' \| 'king'` unions. Behaviour identical | M |
 | 3.2 | **Placeholder art mechanism**: `MonsterDef.sprite` key with fallback `monster_generic` (one 2-frame sheet in the house style) tinted per family by a CSS variable; bosses use a scaled generic with a crown. 🧱 | S |
-| 3.3 | **Reward model** ([20](20-monster-families-and-rewards.md)): gold and XP `min(rewardSec x income, cap) x levelMult^(level - refLevel)`, goods by family type, caps tuned so rats and King pay the same on day 1; new `scripts/kill-sim.ts` (kill income stays a small share of income) | M |
 | 3.4 | **Spawn tables per distance band and relevance fade** (outgrown families rarer, floor 0.1, never gone); **rats 2-6**; per-band danger offset (closes R7). **IDL-215 built the first slice early:** the type pick is weighted by the hero's win chance (floor 0.1) and new spawns and their growth are capped near what the hero beats (`offline/spawnWeights.ts`); P3.4 replaces the window-midpoint estimate with per-band weights and keeps the floor | M |
-| 3.5 | **Home families**: wolf (forest), bog thing (swamp), frost hare (tundra), each with stats, `refLevel`, drops and a loot pool tag; `fight-sim`, `loot-sim`, `monsterConfig.test.ts` cover them without code changes | M |
-| 3.6 | **Retire the Rattatui set and demote the Rat King** (R8 resolved): the King is a basic monster with the normal reward model and a normal loot source; the 12 Rattatui pieces and their set bonus leave every loot pool and the `ratKing` source, but **their item definitions stay** so existing pieces keep loading, equipping and selling (flag `retired: true` on the base, excluded from `LOOT_POOLS` and drop generators). Update `fightBalance.test.ts`, `fight-sim`, `loot-sim`, `item-catalog` doc, the sim `GEAR_SCHEDULE` and doc 20. Note: the P2 reset wipes every bag anyway, so "keep your items" matters only between this step and P2 if 3.6 ships first | M |
 
 Clarify ❓ D7: stats, `rewardSec` and caps of the three families (I will propose numbers from the sim, you approve); whether Luck / Gold Find apply after the cap (proposed yes); what the demoted King keeps (HP, boss timer, spawn distance, see D11). Assets: one generic sprite sheet (small); real sprites for wolf, bog thing, frost hare listed in section 6 and swapped in later.
 
@@ -209,8 +160,8 @@ Clarify ❓: **D2 and D3 must be answered before 6.6** (the click Idol and the f
 
 | Step | What | Size |
 |---|---|---|
-| 7.1 | Respec on rebirth (all attribute points back to the pool) and **+20 points per rebirth** (`totalStatPoints(level) + 20 x rebirths`) | M |
-| 7.2 | Server sum check: `reconcileCharacter` uses `rebirths` from the ledger inside `acceptSave`; a save above the maximum is clamped by the server, not refused | S |
+| 7.1 | **+20 points per rebirth** (`totalStatPoints(level) + 20 x rebirths`); the respec on rebirth is built | M |
+| 7.2 | Server sum check: `reconcileCharacter` (built) gets the `20 x rebirths` term | S |
 | 7.3 | Rebirth dialog preview (refunded points, +20, what is wiped later) and **sell all for gold** button | S |
 | 7.4 | Sim bot learns to respec (B7); re-measure BL2 and the run-2 ratio | S |
 
@@ -252,10 +203,9 @@ Same pattern as P8, twice: art 🎨, **Cloth** and **Honey**, three buildings ea
 | 11.1 | `player_ledger.craft` (migration first); `POST /api/craft`, lifetime `ord`, sealed rolls, per-tier pity | M |
 | 11.2 | Recipes as data keyed by tag and tier (slot-themed extract costs), crafting overlay with the odds panel, crafting XP and level (target about 10 weeks to 100, never resets) | L |
 | 11.3 | `scripts/craft-sim.ts`, craft source in `loot-sim`, gate: the cheapest craftable tier beats the home-land monsters of the matching level (the King is no longer a benchmark) | M |
-| 11.4 | **Server-side idempotent inventory wipe** on rebirth (bag, gear, pity reset; Pack Rat kept) called before the upload; the rebirth dialog confirms and lists worn rare-or-better pieces | M |
 | 11.5 | Enchanted craft button present but disabled ("Needs Ichor from the Blight") | S |
 
-The wipe **must not ship before 11.1-11.3 are live**. Materials are still paid by the browser and audited by `granted.spent`; enforcing them waits for the server-priced merchant (decision D9: schedule that item next to P11 or accept flagging only).
+The gear wipe on rebirth is already live (`rebirthSlice.ts`, `/api/rebirth`) without a crafting sink; 11.1-11.3 are the sink it was meant to wait for. Materials are still paid by the browser and audited by `granted.spent`; enforcing them waits for the server-priced merchant (decision D9: schedule that item next to P11 or accept flagging only).
 
 ### P12 · Blight and Battlefield (the two special biomes)
 
@@ -345,7 +295,7 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 | **D4** | Target map size per rebirth (BL16), tile price tail | decide with the P5.5 sim run; keep the +12 offset until then | P5 |
 | **D5** | Password reset in P1 or P2? | P1 (small, and it is landing polish) | P1.6 |
 | **D6** | Launch achievements, avatar unlocks, tutorial bundles and tone | I draft the list, you cut it | P2 |
-| **D7** | Home family stats and reward caps | Decided (IDL-49, IDL-182): home families = the 16 existing monsters. Reward `min(rewardSec x income, cap) x levelMult^(level - refLevel)`, Luck / Gold Find / Kill Rewards % after the cap, normal monsters 1.08 per level with gold caps 300 / 600 / 1,200 / 2,400 (plains / forest / swamp / tundra), bosses 3600 s, 1.03, cap 600,000 gold; numbers from `kill-sim` ([docs/20](20-monster-families-and-rewards.md) section 8), **awaiting owner approval** | P3 |
+| **D7** | Home family stats and reward caps | Decided (IDL-49, IDL-182): home families = the 16 existing monsters. Reward `min(rewardSec x income, cap) x levelMult^(level - refLevel)`, Luck / Gold Find / Kill Rewards % after the cap, normal monsters 1.08 per level with gold caps 300 / 600 / 1,200 / 2,400 (plains / forest / swamp / tundra), bosses 3600 s, 1.03, cap 600,000 gold; numbers from `kill-sim` ([docs/plan/20-monster-families-and-rewards.md](20-monster-families-and-rewards.md) section 8), **awaiting owner approval** | P3 |
 | **D8** | Mastery caps and the ladder above 1 trillion | caps as in [22](22-glossary-and-mastery.md), ladder later | P4 |
 | **D9** | Server-priced merchant: schedule it next to crafting or accept flagging only | schedule it right after P11 | enforced crafting |
 | **D10** | Landing wording and whether to show a players-online number | no number in v1 | P1.3 |

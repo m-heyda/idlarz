@@ -4,10 +4,10 @@
  *
  * - enabled (art in the game today): gold, gems, embers, xp, wood, stone, coal, food, meat, eggs, milk, hide, fish. The build
  *   (scripts/pixel/sprites_resource_art.py) pads these to 40 x 40 and writes them to public/pixel/icons/, which is what the game draws.
- * - planned (disabled): the T2 biome goods and T3 extracts of docs/12 and docs/18. `art: false` = no picture yet.
+ * - planned (disabled): the T2 biome goods and T3 extracts of docs/plan/12-rebirth-biomes.md and docs/plan/18-biome-buildings-and-material-tiers.md. `art: false` = no picture yet.
  * - spare: files named `_<name>.png` are generated art nobody needs yet; they are not in this list (see public/pixel/resources/README.md).
  *
- * Pictures are 32 x 32. A planned key joins `RESOURCES` only when it is enabled (see the T2 checklist in docs/ROADMAP.md).
+ * Pictures are 32 x 32. A planned key joins `RESOURCES` only when it is enabled (see the T2 checklist in docs/plan/ROADMAP.md).
  */
 
 export type ResourceArtTier = 'currency' | 't0' | 't1' | 't2' | 't3';
@@ -17,7 +17,7 @@ export interface ResourceArtEntry {
 	id: string;
 	label: string;
 	tier: ResourceArtTier;
-	/** Biome the planned resource belongs to (docs/12, docs/18) */
+	/** Biome the planned resource belongs to (docs/plan/12-rebirth-biomes.md, docs/plan/18-biome-buildings-and-material-tiers.md) */
 	biome?: string;
 	/** true = the resource exists in the game today (and its icon is built from this picture) */
 	enabled: boolean;
@@ -55,14 +55,14 @@ export const RESOURCE_ART: readonly ResourceArtEntry[] = [
 	// A reserved icon (RESERVED_RESOURCES in config/pixelIcons.ts), not a header resource
 	live('fish', 'Fish', 't0'),
 
-	// T2 biome goods (docs/12)
+	// T2 biome goods (docs/plan/12-rebirth-biomes.md)
 	planned('hardwood', 'Hardwood', 't2', 'jungle', true),
 	planned('cloth', 'Cloth', 't2', 'fields', true),
 	planned('honey', 'Honey', 't2', 'orchard', true),
 	planned('ichor', 'Ichor', 't2', 'blight', false),
 	planned('medals', 'War Medals', 't2', 'battlefield', false),
 
-	// T3 extracts, one per biome (docs/18)
+	// T3 extracts, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md)
 	planned('herbs', 'Herbs', 't3', 'plains', true),
 	planned('sap', 'Sap', 't3', 'forest', true),
 	planned('ironOre', 'Iron Ore', 't3', 'hills', true), // the same picture is the reserved `iron` icon (res_iron)

@@ -1,4 +1,4 @@
-// Kill sim: how much of a player's income the monsters pay (docs/20 sections 3 and 8, IDL-182).
+// Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 //   npm run kill-sim            print the tables
 //   npm run kill-sim -- --md    also write docs/generated/kill-sim.md
 //   npm run kill-sim -- --set=thistleBoar.reward.gold.cap=400   try a number without editing the config (any field of MonsterDef; may be repeated)

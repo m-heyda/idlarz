@@ -33,7 +33,7 @@ export const SET_DEFS: SetDef[] = [
 			12: { incomePct: 12, xpPct: 15, killRewardPct: 25, offlineCapHours: 3, goldFind: 20, armor: 10, superCrit: 6 },
 		},
 	},
-	// ---- the special sets S1-S3 (decided 2026-11-07, IDL-39; docs/28 section 10): 14 pieces each, thresholds 3 / 6 / 9 / 12 / 14. Their
+	// ---- the special sets S1-S3 (decided 2026-11-07, IDL-39; docs/plan/28-reuse-items-and-stats.md section 10): 14 pieces each, thresholds 3 / 6 / 9 / 12 / 14. Their
 	// pieces are `enabled: false` (catalog/items/ladder.ts), so nobody can wear them yet. NUMBERS ARE PLACEHOLDERS, TODO tune in R2 C5
 	// with fight-sim and sim: a full set reaches 70-90 % of the family caps of IDL-149 (income 50, XP 40, kill reward 60, click 40, damage 45).
 	{

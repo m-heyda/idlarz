@@ -2,7 +2,7 @@
 
 Prompts for the image tool, written in the same shape as the swamp sample ("A slugish purple monster from the swamps with debris in it and trash"): one sentence, a silhouette, a biome cue, two or three concrete details. Paste the **Prompt** line and add your `same style` option.
 
-Source of the biome list: `docs/12-rebirth-biomes.md` (the 7 current biomes and the 5 rebirth biomes) and `docs/20-monster-families-and-rewards.md` (3-4 monsters and one boss per biome).
+Source of the biome list: `docs/plan/12-rebirth-biomes.md` (the 7 current biomes and the 5 rebirth biomes) and `docs/plan/20-monster-families-and-rewards.md` (3-4 monsters and one boss per biome).
 
 ## How to use
 

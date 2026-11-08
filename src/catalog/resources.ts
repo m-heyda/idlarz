@@ -14,7 +14,7 @@ export const RESOURCE_TIERS: readonly { id: ResourceTier; label: string }[] = [
 	{ id: 'currency', label: 'Currency' },
 	{ id: 't0', label: 'Base materials' },
 	{ id: 't1', label: 'Farm products' },
-	// planned (docs/18): nothing sits in these yet, and the header skips a tier without resources
+	// planned (docs/plan/18-biome-buildings-and-material-tiers.md): nothing sits in these yet, and the header skips a tier without resources
 	{ id: 't2', label: 'Biome goods' },
 	{ id: 't3', label: 'Extracts' },
 	{ id: 't4', label: 'Relics' },
