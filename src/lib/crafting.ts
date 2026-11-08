@@ -152,3 +152,16 @@ export const craftBlock = (
 	if (needs.components.some((n) => (have.stock[n.id] ?? 0) < n.qty)) return 'components';
 	return null;
 };
+
+/** Most crafts of a recipe the player can start now: the scarcest input decides, capped at the batch cap (0 when locked). */
+export const maxCraftable = (
+	recipe: Recipe,
+	have: { craftLevel: number; resources: Partial<Record<string, number>>; stock: Record<string, number> },
+): number => {
+	if (have.craftLevel < recipe.unlock) return 0;
+	const one = craftNeeds(recipe, 1);
+	let most = craftLimit('craftBatchCap');
+	for (const n of one.resources) most = Math.min(most, Math.floor((have.resources[n.key] ?? 0) / n.qty));
+	for (const n of one.components) most = Math.min(most, Math.floor((have.stock[n.id] ?? 0) / n.qty));
+	return Math.max(0, most);
+};
