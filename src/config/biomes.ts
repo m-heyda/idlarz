@@ -131,8 +131,8 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		resourceIcons: [RESOURCE_ICONS.gold, RESOURCE_ICONS.food],
 		description: 'Sandy shores provide gold and food, and border the water',
 	},
-	// The five rebirth biomes (docs/12). DEV ONLY: `config/biomeStage.ts` keeps them out of purchases, saves and the guide. The output is a
-	// placeholder (none) until the numbers of docs/12 section 2 and 4 are set with the sim.
+	// The five rebirth biomes (docs/plan/12-rebirth-biomes.md). DEV ONLY: `config/biomeStage.ts` keeps them out of purchases, saves and the guide. The output is a
+	// placeholder (none) until the numbers of docs/plan/12-rebirth-biomes.md section 2 and 4 are set with the sim.
 	jungle: {
 		name: 'jungle',
 		label: 'Jungle',

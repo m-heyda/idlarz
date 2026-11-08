@@ -94,7 +94,7 @@ test('every set reaches its highest threshold with the pieces it has, and no set
 		const total: Record<string, number> = {};
 		for (const bonus of Object.values(set.bonuses)) for (const [k, v] of Object.entries(bonus)) total[k] = (total[k] ?? 0) + v;
 		for (const key of Object.keys(total)) assert.ok(key in STAT_DEFS, `${set.id}: ${key}`);
-		// family caps of IDL-149 (docs/28 section 10)
+		// family caps of IDL-149 (docs/plan/28-reuse-items-and-stats.md section 10)
 		const caps: Record<string, number> = { incomePct: 50, xpPct: 40, killRewardPct: 60, clickPct: 40, damagePct: 45 };
 		for (const [key, cap] of Object.entries(caps)) assert.ok((total[key] ?? 0) <= cap, `${set.id} ${key} ${total[key]} > ${cap}`);
 		assert.ok((total.offlineCapHours ?? 0) <= HARD_LIMITS.offlineCapHours, set.id);

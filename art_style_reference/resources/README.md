@@ -1,6 +1,6 @@
 # resources/ : materials, currencies, drops and consumables
 
-**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: the tier ladder in [docs/18](../../docs/18-biome-buildings-and-material-tiers.md) section 4, the five T2 materials in [docs/12](../../docs/12-rebirth-biomes.md), the registry in [docs/19](../../docs/19-first-build-steps.md) step B.
+**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: the tier ladder in [docs/plan/18-biome-buildings-and-material-tiers.md](../../docs/plan/18-biome-buildings-and-material-tiers.md) section 4, the five T2 materials in [docs/plan/12-rebirth-biomes.md](../../docs/plan/12-rebirth-biomes.md), the registry in [docs/plan/19-first-build-steps.md](../../docs/plan/19-first-build-steps.md) step B.
 
 ## 1. Files (grids of 48 icons on brown cells unless noted; JPG)
 
@@ -37,11 +37,11 @@ Cross-references: `../monsters/yoaPlM.png` (right panel) has **small items**: ri
 | **T4 relics** | boss relics (crowns, cores, sigils) | `ArQkEU.jpg` crowns, `4YF8Ye.jpg` crowns (arcane relics: draw new) |
 | Reserved art already in the repo | iron, fish, mana, blue crystal, sapphire, shard, mystery crate | stays as **placeholder T3 icons** until the new set exists |
 
-- **Drops and consumables** (for later, assets only now): **potions** (HP, mana, buffs; use the 48 flasks in `../equip/0tP6Sm.jpg`), **edible items with buffs** (cooked meat, bread, fruit, honey cakes, mushrooms, fish), monster parts (fangs, claws, hearts, eyes, hides), keys, scrolls, trinkets. These are not resources in the registry; they become items ([docs/10](../../docs/10-loot-system.md)) and buff foods later.
+- **Drops and consumables** (for later, assets only now): **potions** (HP, mana, buffs; use the 48 flasks in `../equip/0tP6Sm.jpg`), **edible items with buffs** (cooked meat, bread, fruit, honey cakes, mushrooms, fish), monster parts (fangs, claws, hearts, eyes, hides), keys, scrolls, trinkets. These are not resources in the registry; they become items ([docs/game/loot.md](../../docs/game/loot.md)) and buff foods later.
 
 ## 3. What agents should do with it later
 
-1. **Resource art swap** is its own PR after the registry exists ([docs/19](../../docs/19-first-build-steps.md) step B, RELEASE-PLAN P0.5): one catalog entry per resource carries the icon id, so the swap is data, not code.
+1. **Resource art swap** is its own PR after the registry exists ([docs/plan/19-first-build-steps.md](../../docs/plan/19-first-build-steps.md) step B, RELEASE-PLAN P0.5): one catalog entry per resource carries the icon id, so the swap is data, not code.
 2. For each resource: choose the cell(s), **recreate** at 40 px in `scripts/pixel/sprites_resources.py` / `sprites_sheet.py` style (coloured outline, 5-tone ramp, one to three pieces, hard alpha, no shadow, twinkle strip only for gold and crystals). A direct cut is allowed (licensed, see the [Licence](../README.md#licence)) when the result is clean; the sheets are **JPG**, so cuts carry compression noise: quantizing to the shared palette removes most of it, otherwise redraw.
 3. Test at 20 px and 16 px in the header strip, in a tier group beside the other icons, in light and dark UI. Reject an icon that is confused with another resource (food vs gold was an old problem: carrots, not bread).
 4. Keep ids stable: saves store resource keys, not icon ids, but the catalog, tests and docs name them.

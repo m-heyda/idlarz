@@ -13,7 +13,7 @@ export const CRAFTING = {
 		[60, 1_000_000],
 		[100, 30_000_000],
 	] as readonly (readonly [number, number])[],
-	/** Most crafts one request may do (docs/17 section 5) */
+	/** Most crafts one request may do (docs/plan/17-crafting.md section 5) */
 	maxCount: 10,
 	/** One craft request per second per player */
 	minGapMs: 1000,

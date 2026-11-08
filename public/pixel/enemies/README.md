@@ -11,4 +11,4 @@ Layout: `public/pixel/enemies/<biome>/<monster-id>.png`, one folder per biome, b
 
 The roster and its `enabled` flag are in `src/catalog/monsters.ts`; `tests/monsters/monsterCatalog.test.ts` checks that every entry marked `art: true` has its file here.
 
-On-map size: `src/config/monsterArtSize.ts` (px per monster id, with a default per grade). `MonsterSprite` reads it for any monster with `art` set, so when a monster is enabled (docs/20) its in-game sprite should pass `art: <catalog id>` and keeps the size tuned in the map lab.
+On-map size: `src/config/monsterArtSize.ts` (px per monster id, with a default per grade). `MonsterSprite` reads it for any monster with `art` set, so when a monster is enabled (docs/plan/20-monster-families-and-rewards.md) its in-game sprite should pass `art: <catalog id>` and keeps the size tuned in the map lab.

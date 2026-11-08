@@ -94,7 +94,7 @@ const devBlocksWorld = (): World => {
 	return setTiles(base, changes);
 };
 
-/** Seeds of the comparison map: (kind, x, y) in tiles from the castle. Nearest seed (with a little noise) wins; no forbidden pair touches (docs/12 section 9). */
+/** Seeds of the comparison map: (kind, x, y) in tiles from the castle. Nearest seed (with a little noise) wins; no forbidden pair touches (docs/plan/12-rebirth-biomes.md section 9). */
 const DEV_MAP_SEEDS: [string, number, number][] = [
 	['tundra', -30, -17],
 	['hills', -12, -19],

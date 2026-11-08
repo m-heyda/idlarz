@@ -1,64 +1,17 @@
-# Idle Explorer — design & technical docs
+# Idle Realm: design and technical docs
 
-Stack: Next.js 15.5 (App Router) · React 19 · Tailwind 4 · Zustand 5 · Supabase (accounts, cloud saves, server ledger) · localStorage text saves with export / import. The game is played with an account only. Live build and server setup: see the [root README](../README.md).
+Stack: Next.js 15.5 (App Router), React 19, Tailwind 4, Zustand 5, Supabase (accounts, cloud saves, server ledger), localStorage text saves with export / import. The game is played with an account only. Live build and server setup: see the [root README](../README.md).
 
-These documents describe the game **as the code behaves**. Numbers are traceable to a file; the large tables and the pacing numbers are generated from the real config (`npm run docs:gen`) so they can be refreshed after tuning. Prefer linking to `generated/` over copying numbers into prose, because copied numbers go stale.
+When a doc and the code disagree, the code wins; fix the doc in the same change. Rates are per second and before modifiers unless stated; modifiers are fractions (0.25 = +25 %). Prefer linking to `generated/` over copying numbers into prose.
 
-| Doc | What it answers |
+| Folder | What it holds |
 | --- | --- |
-| [01-architecture.md](01-architecture.md) | Code layout, state shape, tick loop, server layer, persistence, rendering |
-| [02-mechanics.md](02-mechanics.md) | Every player-visible mechanic and its rules |
-| [03-formulas-and-scaling.md](03-formulas-and-scaling.md) | Every formula and constant |
-| [06-pacing-targets.md](06-pacing-targets.md) | What pace the economy is tuned for, and the early-game targets |
-| [07-saves-and-security.md](07-saves-and-security.md) | Save format and migrations, validation, what the client checks and what the server owns, how to add saved fields safely |
-| [09-cloud-saves.md](09-cloud-saves.md) | Account saves: pipeline, history, sync timing, verification |
-| [10-loot-system.md](10-loot-system.md) | Loot profiles, rarity, item level, affixes, pools, and how to add items |
-| [11-server-authority.md](11-server-authority.md) | Everything the server decides: offline progress, spawn tickets, fights, sealed rolls, gems, Luck, the threat model |
-| [12-rebirth-biomes.md](12-rebirth-biomes.md) | *Draft.* Five rebirth-unlocked biomes, distance rules, T2 materials, monster slots |
-| [13-rebirth-reset-and-paragon.md](13-rebirth-reset-and-paragon.md) | *Draft.* Respec, +20 points, inventory wipe on rebirth, Paragon after level 100 |
-| [14-server-audit-and-data-plan.md](14-server-audit-and-data-plan.md) | *Draft.* What is server-side, what must move, catalogs, free-plan budget, save compatibility |
-| [15-leaderboard-and-world-preview.md](15-leaderboard-and-world-preview.md) | *Draft.* Rankings from `player_stats`, preview of another player's map |
-| [16-landing-and-play-route.md](16-landing-and-play-route.md) | *Draft.* Landing page, auth-protected `/play`, account and avatar polish |
-| [17-crafting.md](17-crafting.md) | *Draft.* Luck/Intelligence crafting with a persistent crafting level |
-| [18-biome-buildings-and-material-tiers.md](18-biome-buildings-and-material-tiers.md) | *Draft.* Three buildings per biome, upgrade timers, material tiers T0-T4, shorter castle timers |
-| [19-first-build-steps.md](19-first-build-steps.md) | Open points left from the first build steps: the castle costs (the timers and the resource registry are built) |
-| [20-monster-families-and-rewards.md](20-monster-families-and-rewards.md) | *Draft.* Monster families per biome, capped absolute rewards scaled by level, goods and tiered drops, spawn pressure |
-| [21-classes-avatars-achievements-offline-report.md](21-classes-avatars-achievements-offline-report.md) | *Draft.* Class bonuses, separate avatars, achievements and glossary sketches, offline report bar |
-| [22-glossary-and-mastery.md](22-glossary-and-mastery.md) | *Draft.* Unknown monsters, glossary tabs, kill-count reveals, monster and resource mastery |
-| [23-reset-players-cli.md](23-reset-players-cli.md) | Operator CLI `npm run reset-players`: season restart that wipes progress but keeps names, classes and gems |
-| [29-e2e-test-account.md](29-e2e-test-account.md) | The one test account (`lepryko@gmail.com`) every browser test uses, how to run `npm run e2e` and clear the account with `npm run reset-test-account` |
-| [30-gem-sinks.md](30-gem-sinks.md) | *Draft.* What gems can be spent on: the Gem shop window, Cap Breaks, convenience, time savers, affix re-roll, prestige tail; the fair-play line; release slices G1-G5 |
-| [24-battle-queue.md](24-battle-queue.md) | *Built.* The server-owned battle queue: how it works and what is left |
-| [25-idle-game-research.md](25-idle-game-research.md) | *Research note.* Idle-game formulas, big numbers and offline progress compared with this game; ranked improvements |
-| [26-next-updates-plan.md](26-next-updates-plan.md) | *Proposal.* The order of the next updates: readable core, item assets, loot pools and variety, the rest of the monsters, then the rebirth world |
-| [RELEASE-PLAN.md](RELEASE-PLAN.md) | *Proposal.* Phases P0-P13 in release order, triage of the roadmap's bug and balance tables, landing v1 to v2, asset plan, decisions needed |
-| [ROADMAP.md](ROADMAP.md) | Open work: known issues, balance backlog, the building rework, server migration, planned features |
-| [generated/](generated/) | Auto-generated: `balance-tables.md`, `sim-milestones.md`, `item-catalog.md`, `loot-sim.md`, `fight-sim.md`, `monster-ladder.md` |
-
-## Commands
-
-```bash
-npm run docs:gen              # regenerate everything in docs/generated (the five commands below, in order)
-npm run report                # docs/generated/balance-tables.md from the config
-npm run sim                   # bot simulation on the real store -> docs/generated/sim-milestones.md
-npm run sim -- --seeds=3 hardcore         # median and min-max over 3 seeds (profiles: idle casual hardcore autoclicker human human-rebirth6 human-rebirth8 hardcore-rebirth6 hardcore-rebirth6-x10 hardcore-rebirth10)
-npm run sim -- --maxdays=60 hardcore      # stop early
-npm run sim -- --no-write hardcore        # print only, leave the file alone
-npm run sim -- --legacy hardcore          # approximate the pre-rebalance game
-npm run sim -- --set=SCALING_CONFIG.growthLate=1.25 castleCostScale=...   # try a tweak without editing files
-npm run catalog-report        # the two sets, their items, affixes, loot sources -> docs/generated/item-catalog.md (tests/catalog/catalogDoc.test.ts keeps it current)
-npm run fight-sim -- --md     # fight balance tables -> docs/generated/fight-sim.md (without --md it only prints)
-npm run monster-ladder -- --md # which gear tier beats which monster at which level -> docs/generated/monster-ladder.md
-npm run loot-sim -- --md      # seeded loot simulation -> docs/generated/loot-sim.md (without --md it only prints)
-npm run perf                  # timings of the map at 5k / 50k / 250k tiles
-npm run lint
-npm test                      # node:test over tests/**/*.test.ts
-```
-
-Run `npm run docs:gen` and commit the diff whenever balance values change.
+| [game/](game/overview.md) | How the game works **now**, read from the code: [overview](game/overview.md), [economy](game/economy.md), [combat](game/combat.md), [monsters](game/monsters.md), [loot](game/loot.md), [progression](game/progression.md), [saves and server](game/saves-and-server.md) (with the threat model), [architecture](game/architecture.md), [pacing targets](game/pacing-targets.md), [audit findings](game/CHANGELOG-audit.md) |
+| [plan/](plan/ROADMAP.md) | What is **not built**: [ROADMAP](plan/ROADMAP.md), [RELEASE-PLAN](plan/RELEASE-PLAN.md), [next updates](plan/26-next-updates-plan.md), [loot decisions](plan/loot-decisions.md), [gem sinks](plan/30-gem-sinks.md), the drafts 12-22 and 28, the idle-game research (25) and the art prompt sheets |
+| [ops/](ops/commands.md) | Operator guides: [commands](ops/commands.md) (docs:gen, sim, reports, pacing guard), [reset-players CLI](ops/reset-players-cli.md), [E2E test account](ops/e2e-test-account.md) |
+| [generated/](generated/) | Auto-generated by `npm run docs:gen`, never edited by hand: `balance-tables.md`, `sim-milestones.md`, `item-catalog.md`, `loot-sim.md`, `fight-sim.md`, `monster-ladder.md`, `kill-sim.md`, `spawn-mix.md`, `stat-audit.md` |
 
 ## Conventions
 
-- Rates are per second and *before* modifiers unless stated; modifiers are fractions (0.25 = +25 %).
-- Anything that moves resources must be validated in the store action and covered in `tests/economy/economy.test.ts`; anything that is saved must be validated in `src/lib/sanitizeSave.ts` ([07](07-saves-and-security.md)); anything that decides a reward or a fight lives on the server side ([11](11-server-authority.md)).
-- When a doc and the code disagree, the code wins; fix the doc in the same change.
+- Anything that moves resources is validated in the store action and covered in `tests/economy/economy.test.ts`; anything that is saved is validated in `src/lib/sanitizeSave.ts` ([saves and server](game/saves-and-server.md)); anything that decides a reward or a fight lives on the server side.
+- A built draft leaves `plan/`: delete the finished sections and describe the result in `game/`. `tests/docs/links.test.ts` fails when a relative link in `docs/` or the root README does not resolve.

@@ -26,7 +26,7 @@
 
 ## What the reset clears
 
-`npm run reset-test-account` ([scripts/reset-test-account.ts](../scripts/reset-test-account.ts)) finds the account by e-mail and runs [reset-players](23-reset-players-cli.md) for that one user with `--hard --reset-gems --purge-history --no-backup`:
+`npm run reset-test-account` ([scripts/reset-test-account.ts](../../scripts/reset-test-account.ts)) finds the account by e-mail and runs [reset-players](reset-players-cli.md) for that one user with `--hard --reset-gems --purge-history --no-backup`:
 
 | Cleared | Kept |
 |---|---|

@@ -1,6 +1,6 @@
 # art_style_reference
 
-**Reference material for new art. Nothing in this folder is imported by the game.** It is the visual brief for resources, buildings, roads, biomes, monsters, equipment, portraits and UI. Which assets are needed and when: [docs/RELEASE-PLAN.md](../docs/RELEASE-PLAN.md) section 6.
+**Reference material for new art. Nothing in this folder is imported by the game.** It is the visual brief for resources, buildings, roads, biomes, monsters, equipment, portraits and UI. Which assets are needed and when: [docs/plan/RELEASE-PLAN.md](../docs/plan/RELEASE-PLAN.md) section 6.
 
 Every sub-folder has its own `README.md`: an index of the files in it (what each sheet contains), what we want from it, and **what agents must do with it later**. Read the folder README before touching a file. The approved current style lives in `scripts/pixel/reference/` (`STYLE.md` and its images); where a reference here disagrees with `STYLE.md`, **`STYLE.md` and the current map win**.
 

@@ -11,7 +11,7 @@ import { ratesWithGear, toast, type GameGet, type GameSet } from './base';
 
 export const createInventorySync = (set: GameSet, get: GameGet) => {
 	// ---- the player's things are the server's -------------------------------------------------------------------------
-	// The bag, the worn gear, the loot pity and the auto-sell filter belong to the server's ledger (docs/11-server-authority.md): drops, drunk
+	// The bag, the worn gear, the loot pity and the auto-sell filter belong to the server's ledger (docs/game/saves-and-server.md): drops, drunk
 	// potions and chest items already happened there, and the player's own changes are asked of it (`/api/inventory`). The browser previews
 	// each change at once and the server's answer, which carries the inventory as it stands, settles it. Changes are sent one at a time, in
 	// order (a bag index means the bag as the previous change left it), and while any is on its way a picture from another answer is not taken.

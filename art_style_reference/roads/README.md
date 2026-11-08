@@ -1,6 +1,6 @@
 # roads/ : road materials, blending, and bridges
 
-**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: roads connect a Producer or Extractor to the castle for +100 % production ([docs/18](../../docs/18-biome-buildings-and-material-tiers.md) section 5.2, RELEASE-PLAN P6.8).
+**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: roads connect a Producer or Extractor to the castle for +100 % production ([docs/plan/18-biome-buildings-and-material-tiers.md](../../docs/plan/18-biome-buildings-and-material-tiers.md) section 5.2, RELEASE-PLAN P6.8).
 
 ## 1. Files
 
@@ -14,7 +14,7 @@
 
 - Variety of roads **per biome**, built so they **match our current map art style** (48 px tiles, the dual-grid look): the road is an **overlay above the ground**, an environment piece that must stay clearly visible but is not a building. Match our edge language: the road keeps the colours of its own material and a short blend where it meets the ground.
 - A **4-neighbour autotile** per road (16 variants plus end caps and a small entrance stub toward a building), plus bridge pieces for lakes and a plank causeway for swamp and jungle.
-- Planned set per ground family, from [docs/18](../../docs/18-biome-buildings-and-material-tiers.md): packed dirt path (plains, fields, orchard, forest), cobble (coast, castle area), stone causeway (hills), **snow-packed road with sled ruts (tundra)**, **plank causeway on stilts (swamp, jungle)**, **wooden or stone bridge (lakes)**, bone-and-ash track (Blight), trampled mud with wheel ruts (Battlefield).
+- Planned set per ground family, from [docs/plan/18-biome-buildings-and-material-tiers.md](../../docs/plan/18-biome-buildings-and-material-tiers.md): packed dirt path (plains, fields, orchard, forest), cobble (coast, castle area), stone causeway (hills), **snow-packed road with sled ruts (tundra)**, **plank causeway on stilts (swamp, jungle)**, **wooden or stone bridge (lakes)**, bone-and-ash track (Blight), trampled mud with wheel ruts (Battlefield).
 
 ## 3. Mapping from the references
 
@@ -34,7 +34,7 @@
 2. Do **not** copy the tiles: they are a different tile size and a flat shaded look. Take the **materials, the edge softness and the junction coverage** from the references, then draw at 48 px with our outline and ramp rules.
 3. Verify each set on **all neighbouring biomes** (a road crossing from plains into forest must still read), and next to the castle area.
 4. Include end caps and the entrance stub toward buildings, the corner-with-bridge case, and a bridge over lake tiles.
-5. Cost, multipliers and the build UI are design items in docs/18 and are not decided here.
+5. Cost, multipliers and the build UI are design items in docs/plan/18-biome-buildings-and-material-tiers.md and are not decided here.
 
 ## Provenance of anything cut from here
 

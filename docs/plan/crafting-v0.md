@@ -1,6 +1,6 @@
 # Crafting v0 (potions first)
 
-Status: v0.0 built in three PRs (data and pure logic, server, overlay). The long-term design is [17-crafting](../17-crafting.md) (gear, tiers, Ichor); this file is the small first slice and wins where they differ for v0.
+Status: v0.0 built in three PRs (data and pure logic, server, overlay). The long-term design is [17-crafting](17-crafting.md) (gear, tiers, Ichor); this file is the small first slice and wins where they differ for v0.
 
 ## Owner decision (2026-11-08)
 Crafting makes three things: **usable items**, **half-products** and **sellable goods**. v0 starts with **potions only**, then components and goods, then gear.
@@ -11,7 +11,7 @@ Crafting makes three things: **usable items**, **half-products** and **sellable 
 | `potion` | the bag, as a stack (consumable, `stackMax` 20) | yes |
 | `component` | a ledger counter `craft.stock` (never in the bag) | yes |
 | `good` | the bag, sellable (later) | no |
-| `gear` | the bag, through the loot pipeline ([17](../17-crafting.md)) | no |
+| `gear` | the bag, through the loot pipeline ([17](17-crafting.md)) | no |
 
 A recipe (`src/catalog/recipes.ts`) is data: `kind`, `inputs` (merchant resources and components), one `output` (item id or component id plus quantity), the crafting level that unlocks it and the XP of one craft. Adding a recipe is one entry.
 
@@ -30,7 +30,7 @@ Numbers and the cost table: [generated/craft-sim.md](../generated/craft-sim.md) 
 - **Crafting level** comes only from crafting, is kept on rebirth, and is derived from lifetime crafting XP (never stored separately). The curve is anchors in `src/config/crafting.ts` (level 10 at 1,500 XP, 30 at 40k, 60 at 1M, 100 at 30M), solved like `LEVELING`. Level 10 is roughly 250 minor potions, the first days of play.
 - **Limits** (PR 2): 1 to 10 crafts per request, 1 request per second, idempotent by key.
 - **Bag full.** A potion craft that needs a new bag slot when none is free is refused and nothing is charged (the stack is topped up first, so a full bag with room in the potion stack still works).
-- **Materials are client-held**, so the browser pays the resources. `buyShop` records no spend and `verify.ts` has no spending audit yet, so v0.0 only counts the gold value of the resources in `craft.spent` (the data a later audit needs); it does not touch `granted` or the verifier ([17](../17-crafting.md) section 5). Components are the exception: they are server state (`craft.stock`), so the server checks and takes them itself.
+- **Materials are client-held**, so the browser pays the resources. `buyShop` records no spend and `verify.ts` has no spending audit yet, so v0.0 only counts the gold value of the resources in `craft.spent` (the data a later audit needs); it does not touch `granted` or the verifier ([17](17-crafting.md) section 5). Components are the exception: they are server state (`craft.stock`), so the server checks and takes them itself.
 - **No failure and no randomness in v0.0.** A craft always succeeds, so there is no seed or pity yet (`craft.ord` and `craft.pity` are reserved in the column for gear).
 
 ## Server shape (PR 2)
@@ -38,7 +38,7 @@ Numbers and the cost table: [generated/craft-sim.md](../generated/craft-sim.md) 
 
 ## Progression and rankings (owner, 2026-11-08)
 - **Crafting is a grind with gates.** New recipes unlock only at a crafting level (`Recipe.unlock`), and the level comes only from crafting, so the player has to craft the cheap recipes in volume to reach the better ones. Each tier of recipes is a step up in cost and in XP per craft, but the XP needed per level grows faster than the XP per craft, so the same recipe is not enough for long. Rule for new recipes: the first craft of a recipe is reachable after a day or more of the previous tier, never by one big purchase.
-- **Crafting level is a ranking column later** ([15](../15-leaderboard-and-world-preview.md)). It is derived from `craft.xp` in the ledger, never from the save, so it is enforced and not poisoned by a forged upload; the leaderboard row would copy the level when the ledger changes. Not in v0.0.
+- **Crafting level is a ranking column later** ([15](15-leaderboard-and-world-preview.md)). It is derived from `craft.xp` in the ledger, never from the save, so it is enforced and not poisoned by a forged upload; the leaderboard row would copy the level when the ledger changes. Not in v0.0.
 
 ## Timed batch queue (v0.1, owner request 2026-11-08)
 Linear: IDL-233 (queue, urgent), IDL-235 (upgrades).
@@ -53,7 +53,7 @@ v0.0 crafts instantly (1 to 10 per request) but is built so the next step is a *
 
 ## Open questions
 1. Is one vial per potion the right ratio, or should a vial craft yield two? It decides how often the vial recipe is pressed.
-2. XP per recipe and the anchors are a first draft; check them against real play and the 10-week target in [17](../17-crafting.md).
-3. Where do goods (sellable) and the second component families (herbs, extracts from [18](../18-biome-buildings-and-material-tiers.md)) enter, and at which crafting level?
+2. XP per recipe and the anchors are a first draft; check them against real play and the 10-week target in [17](17-crafting.md).
+3. Where do goods (sellable) and the second component families (herbs, extracts from [18](18-biome-buildings-and-material-tiers.md)) enter, and at which crafting level?
 4. Should the crafted potion carry a "crafted" marker, or stay identical to the shop's so the stacks merge (v0.0 assumes identical)?
 5. Do crafted potions need the sell-junk filter to ignore them?

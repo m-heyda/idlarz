@@ -341,7 +341,7 @@ One batch of the whole category first, then single prompts for the ones that are
 
 #### A2. The unlockable avatars (7: 4 at launch, 3 with biomes and crafting)
 
-Tied to server achievements (docs/21 section 3, `catalog/achievements.ts`). Looks should feel "earned": rarer materials, more ornament, a touch of glow in the eyes is fine, no baked halo.
+Tied to server achievements (docs/plan/21-classes-avatars-achievements-offline-report.md section 3, `catalog/achievements.ts`). Looks should feel "earned": rarer materials, more ornament, a touch of glow in the eyes is fine, no baked halo.
 
 | Avatar | Unlock | Prompt (then the tail) | Cue |
 |---|---|---|---|

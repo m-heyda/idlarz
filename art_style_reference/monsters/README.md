@@ -1,6 +1,6 @@
 # monsters/ : monster samples and the roster plan
 
-**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: [docs/20](../../docs/20-monster-families-and-rewards.md) (families, rewards), [docs/12](../../docs/12-rebirth-biomes.md) section 5 (monsters per biome), [docs/22](../../docs/22-glossary-and-mastery.md) (unknown black monsters), [RELEASE-PLAN](../../docs/RELEASE-PLAN.md) P3.
+**Reference material. Nothing here is imported by the game.** Read [../README.md](../README.md) first. Context: [docs/plan/20-monster-families-and-rewards.md](../../docs/plan/20-monster-families-and-rewards.md) (families, rewards), [docs/plan/12-rebirth-biomes.md](../../docs/plan/12-rebirth-biomes.md) section 5 (monsters per biome), [docs/plan/22-glossary-and-mastery.md](../../docs/plan/22-glossary-and-mastery.md) (unknown black monsters), [RELEASE-PLAN](../../docs/plan/RELEASE-PLAN.md) P3.
 
 ## 1. Files
 
@@ -15,9 +15,9 @@
 ## 2. What we want
 
 - **Our current rat stays the baseline** (it is nice): 3/4 view, head to the lower left, 2-frame idle, 40x40. Rework it **a little** to sit better next to the new monsters (slightly stronger outline contrast and more saturated accents, like `Pj5W12.jpg`), and **add animation**: a hurt flash, an attack lunge and a short death, in addition to the idle (today `monster_rat` is a 2-frame idle sheet played by `MonsterArt` at 520 ms per frame).
-- **A lot of monsters**: **3-4 per biome plus one boss, for all 12 biomes** (the 7 current ones and the 5 planned ones), so the whole art style can be seen and compared early. They ship as **placeholder tinted generic sprites first** ([RELEASE-PLAN](../../docs/RELEASE-PLAN.md) P3.2) and are replaced by the real sprites one family at a time.
+- **A lot of monsters**: **3-4 per biome plus one boss, for all 12 biomes** (the 7 current ones and the 5 planned ones), so the whole art style can be seen and compared early. They ship as **placeholder tinted generic sprites first** ([RELEASE-PLAN](../../docs/plan/RELEASE-PLAN.md) P3.2) and are replaced by the real sprites one family at a time.
 - **Sizes**: for the first release phase **every monster almost fits one tile** (about 40-48 px, the boss up to 56 px as the Rat King is today). Bigger monsters are allowed as long as they do not go much off the tile. **Idea for later (not decided, needs a map and placement feature):** end-game bosses on **2x2 tiles** with a double-size sprite. Design the large boss sprites at 96x96 if they are made now, but do not build a 2x2 occupancy rule without a decision.
-- **Readable silhouettes**: a monster must read as a black shape too (unknown monsters are drawn as the real sprite in black, [docs/22](../../docs/22-glossary-and-mastery.md)), so avoid sprites that are only distinguishable by colour.
+- **Readable silhouettes**: a monster must read as a black shape too (unknown monsters are drawn as the real sprite in black, [docs/plan/22-glossary-and-mastery.md](../../docs/plan/22-glossary-and-mastery.md)), so avoid sprites that are only distinguishable by colour.
 
 ## 3. Roster plan (names are placeholders; bases are the reference cells to start from)
 
@@ -36,7 +36,7 @@
 | Blight (4, special) | slime, blob swarm, eye cluster, tendril husk | The Maw | `Pj5W12.jpg` slimes and eyes, `../biomes/ixzlDW.jpg` eye blobs |
 | Battlefield (5, special) | skeleton soldier, deserter, siege remnant, war hound | Bone Warlord | `AAi1qG.png` skeletons, `../biomes/AEcKbU.jpg` bones, reaper silhouettes |
 
-Existing home-land families in the plan ([docs/12](../../docs/12-rebirth-biomes.md) section 5): wolf (forest), bog thing (swamp), frost hare (tundra). The two special biomes get the most detailed monsters and bosses.
+Existing home-land families in the plan ([docs/plan/12-rebirth-biomes.md](../../docs/plan/12-rebirth-biomes.md) section 5): wolf (forest), bog thing (swamp), frost hare (tundra). The two special biomes get the most detailed monsters and bosses.
 
 ## 4. What agents should do with it later
 

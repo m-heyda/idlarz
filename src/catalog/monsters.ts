@@ -2,14 +2,14 @@ import { MONSTERS } from '@/config/combatConfig';
 import type { BiomeType } from '@/types/game';
 
 /**
- * The monster roster: who lives in which biome and where their art is. Names and prompts: docs/monster-art-prompts.md.
+ * The monster roster: who lives in which biome and where their art is. Names and prompts: docs/plan/monster-art-prompts.md.
  *
  * This is a roster, not a balance sheet. It carries no stats, rewards or loot. A monster spawns when it has an entry in `MONSTERS`
  * (config/combatConfig.ts) under the same id (`enabled` follows that), which is where stats, spawn window and loot go. The rats are gone:
- * plains, forest, swamp and tundra have their three monsters and a boss; the rest is art waiting for its turn (docs/20). On-map size of the art: `config/monsterArtSize.ts` (tuned in /map-lab, used by `MonsterSprite` for real game monsters too).
+ * plains, forest, swamp and tundra have their three monsters and a boss; the rest is art waiting for its turn (docs/plan/20-monster-families-and-rewards.md). On-map size of the art: `config/monsterArtSize.ts` (tuned in /map-lab, used by `MonsterSprite` for real game monsters too).
  */
 
-/** Biomes planned in docs/12 that are not in `BIOMES` yet (unlocked by rebirth). */
+/** Biomes planned in docs/plan/12-rebirth-biomes.md that are not in `BIOMES` yet (unlocked by rebirth). */
 export type PlannedBiome = 'jungle' | 'fields' | 'orchard' | 'blight' | 'battlefield';
 export type CatalogBiome = BiomeType | PlannedBiome;
 
@@ -86,7 +86,7 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 	normal('pikeLurker', 'Pike Lurker', 'lake', false),
 	boss('bossLakeHydra', 'The Lake Hydra', 'lake', true),
 
-	// Rebirth biomes (docs/12): the biomes themselves are not built yet
+	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the biomes themselves are not built yet
 	normal('shadowJaguar', 'Shadow Jaguar', 'jungle', false),
 	normal('orchidSpider', 'Orchid Spider', 'jungle', false),
 	normal('poisonToad', 'Poison Toad', 'jungle', false),

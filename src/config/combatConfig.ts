@@ -127,7 +127,7 @@ export interface MonsterDef {
 	/** Where it may appear. Distances are in tiles (Chebyshev) from the castle: a minimum of 2 keeps it off the castle's neighbours. */
 	spawn: MonsterSpawnRule;
 	/**
-	 * What a kill pays (docs/20 section 3): gold and XP are `min(rewardSec x income per second, cap) x levelMult^(level - refLevel)`, then the
+	 * What a kill pays (docs/plan/20-monster-families-and-rewards.md section 3): gold and XP are `min(rewardSec x income per second, cap) x levelMult^(level - refLevel)`, then the
 	 * player's Luck, Gold Find and Kill Rewards % on top (lib/loot/kill.ts). Early the income is small, so `rewardSec` decides; later the
 	 * absolute `cap` does, so a weak monster stops mattering. `cap` is in gold / XP at `refLevel`.
 	 */
@@ -146,7 +146,7 @@ export interface MonsterDef {
 }
 
 /**
- * The roster. Three normal monsters and one boss per biome, each biome a step up from the one before (docs/ROADMAP.md, enemy rework):
+ * The roster. Three normal monsters and one boss per biome, each biome a step up from the one before (docs/plan/ROADMAP.md, enemy rework):
  * the stats below come from `BIOME_TIER` and a per-monster `build` (tanky, quick, hard-hitting), so the whole ladder is retuned in one place.
  * The first plains monster and the plains boss carry the numbers of the old rat and Rat King, so fights.md and the sims keep their meaning.
  */

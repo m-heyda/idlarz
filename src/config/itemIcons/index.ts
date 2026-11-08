@@ -37,7 +37,7 @@ export interface ItemIconEntry {
 	slot: string;
 	/** Weapon type of a main-hand or off-hand icon */
 	weapon: string | null;
-	/** G1-G9 or S1-S3 (docs/26, art_style_reference/equip/README.md section 3); null until the item is graded */
+	/** G1-G9 or S1-S3 (docs/plan/26-next-updates-plan.md, art_style_reference/equip/README.md section 3); null until the item is graded */
 	grade: string | null;
 	/** Where the picture came from: sheet and region, Sprite Fusion prompt, or the generator (art README rules 5 and 8) */
 	provenance: string;

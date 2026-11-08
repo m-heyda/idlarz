@@ -1,5 +1,5 @@
 /**
- * Clears the game data of the ONE account the end-to-end tests use (docs/29-e2e-test-account.md), so a test run starts from a new game.
+ * Clears the game data of the ONE account the end-to-end tests use (docs/ops/e2e-test-account.md), so a test run starts from a new game.
  *
  *   npm run reset-test-account             DRY RUN: shows what would be cleared
  *   npm run reset-test-account -- --yes    really clear it

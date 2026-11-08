@@ -1,5 +1,5 @@
 // Loot configuration: which sources give what. Pure data; the pipeline in src/lib/loot reads it and nothing here is
-// code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/10-loot-system.md).
+// code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/game/loot.md).
 //
 //   source (monster, boss, chest) --lootProfileId--> profile --generalPoolId / bonusTables--> pools --> item definitions
 //
@@ -132,7 +132,7 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 		rarityWeights: { common: 20, uncommon: 30, rare: 30, epic: 15, legendary: 5 },
 		generalPoolId: 'general_equipment',
 		bonusTables: [
-			// Bosses own their drops from IDL-44 on (docs/20)
+			// Bosses own their drops from IDL-44 on (docs/plan/20-monster-families-and-rewards.md)
 			{
 				id: 'king_legendary',
 				poolId: 'legendary_weapons',

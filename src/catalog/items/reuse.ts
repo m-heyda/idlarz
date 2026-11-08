@@ -8,7 +8,7 @@ import { GRADE_INFO, LIVE_GRADES, type Grade } from './grades';
 // Reserve items: the second equipment art pass (64 px art under public/pixel/items, config/itemIcons/). Every item here is
 // DISABLED: it is in the catalog so its id, icon and stats can be checked, but no loot pool, shop or chest hands it out and
 // the legacy items above still carry the game. Enabling a category is one flag (`enabled`) plus the tuning in
-// docs/28-reuse-items-and-stats.md. Names and set homes are a proposal there too.
+// docs/plan/28-reuse-items-and-stats.md. Names and set homes are a proposal there too.
 //
 // Stats stay inside the 13 item stat keys, are whole numbers or `baseStat` values (clean two-decimal numbers), and sit near
 // the legacy item of the same tier so the numbers are not a surprise when they go live.
@@ -226,7 +226,7 @@ const RESERVE_BASE: ItemDef[] = [
 	reserve('iron_warhammer', 'Iron Warhammer', 'mainHand', 2, { damage: 19 }, 'A square head and a hook for a thumb.', maul),
 	reserve('runed_warhammer', 'Runed Warhammer', 'mainHand', 3, { damage: 30 }, 'Heavy steel with a carved rune.', maul),
 
-	// ---- legendary: named, tier 5. Perks are only drafted in docs/28 until the perk channel exists (IDL-143..149).
+	// ---- legendary: named, tier 5. Perks are only drafted in docs/plan/28-reuse-items-and-stats.md until the perk channel exists (IDL-143..149).
 	reserve(
 		'runeforged_titanhammer',
 		'Runeforged Titanhammer',

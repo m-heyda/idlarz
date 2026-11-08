@@ -8,7 +8,7 @@
  * fixed reason texts of the code only: no names, no ids, no numbers out of a game. Read-only: it only SELECTs, nothing is written anywhere.
  *
  * Dev machine only. Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or the git-ignored .env.local); neither is ever printed.
- * Check which project they point at first (the same rule as reset-players). See docs/14 section 6 and docs/23.
+ * Check which project they point at first (the same rule as reset-players). See docs/plan/14-server-audit-and-data-plan.md section 6 and docs/ops/reset-players-cli.md.
  */
 import { resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';

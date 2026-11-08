@@ -4,7 +4,7 @@ import { MONSTERS } from '../../src/config/combatConfig';
 import { CHEST } from '../../src/config/spawns';
 import { killIncome } from '../../src/lib/loot/kill';
 
-// The capped reward model (docs/20 section 3): gold and XP = min(rewardSec x income, cap) x levelMult^(level - refLevel), then Luck, Gold Find, Kill Rewards %.
+// The capped reward model (docs/plan/20-monster-families-and-rewards.md section 3): gold and XP = min(rewardSec x income, cap) x levelMult^(level - refLevel), then Luck, Gold Find, Kill Rewards %.
 
 const rat = MONSTERS.thistleBoar;
 const boss = MONSTERS.bossGreatAuroch;

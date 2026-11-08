@@ -1,6 +1,6 @@
 # Economy: income, tiles, buildings, castle, farm, merchant, clicks, chests
 
-What the game does today, read from the code. Every number has the file it lives in; big tables are linked from [docs/generated](../generated), not copied. Where this page and an older doc disagree, this page is right and the older line is listed in [DISAGREEMENTS.md](DISAGREEMENTS.md).
+What the game does today, read from the code. Every number has the file it lives in; big tables are linked from [docs/generated](../generated), not copied. Where this page and a plan or draft disagree, this page describes the present.
 
 ## 1. Basics
 
@@ -187,4 +187,4 @@ Data: `CHEST`, `LUCK`, `SPAWN_LIMIT` in `src/config/spawns.ts`; rolls `src/lib/c
 
 - Pacing: [generated/sim-milestones.md](../generated/sim-milestones.md) (`npm run sim`), guarded in CI by `scripts/pacing-guard.ts`.
 - Prices, XP and castle tables: [generated/balance-tables.md](../generated/balance-tables.md) (`npm run report`).
-- Targets the numbers are checked against: [06-pacing-targets.md](../06-pacing-targets.md).
+- Targets the numbers are checked against: [pacing-targets.md](pacing-targets.md).
