@@ -214,7 +214,14 @@ const QueuePanel: React.FC = () => {
 				return (
 					<div key={`${entry.recipeId}-${entry.startedAt}`} className='cr-queue-row'>
 						<span className='cr-queue-name'>{recipe ? outputName(recipe) : entry.recipeId}</span>
-						<div className='cr-xpbar cr-queue-bar' role='progressbar' aria-valuemin={0} aria-valuemax={entry.count} aria-valuenow={done} aria-label='Batch progress'>
+						<div
+							className='cr-xpbar cr-queue-bar'
+							role='progressbar'
+							aria-valuemin={0}
+							aria-valuemax={entry.count}
+							aria-valuenow={done}
+							aria-label='Batch progress'
+						>
 							<div className='cr-xpfill' style={{ width: `${(done / entry.count) * 100}%` }} />
 							<span className='cr-xptext'>
 								{formatNumber(done)} / {formatNumber(entry.count)} - {stalled ? 'waiting for you' : done >= entry.count ? 'done' : formatTime(left)}
@@ -223,7 +230,12 @@ const QueuePanel: React.FC = () => {
 						<button className='px-btn' disabled={busy} aria-label='Cancel batch' onClick={() => void cancel(slot).then((text) => showToast(text))}>
 							Cancel
 						</button>
-						<button className='px-btn' disabled={busy || done < 1} aria-label='Collect finished crafts' onClick={() => void claim(slot).then((text) => showToast(text))}>
+						<button
+							className='px-btn'
+							disabled={busy || done < 1}
+							aria-label='Collect finished crafts'
+							onClick={() => void claim(slot).then((text) => showToast(text))}
+						>
 							Collect{done > 0 ? ` ${formatNumber(done)}` : ''}
 						</button>
 					</div>
