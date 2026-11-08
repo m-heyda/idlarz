@@ -7,7 +7,7 @@ import { COMBAT, MONSTERS } from '../../src/config/combatConfig';
 import { ITEM_CATALOG } from '../../src/catalog';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { calculateCombatStats } from '../../src/utils/game/character';
-import { fullSet } from '../../src/lib/fightSim';
+import { fullSet } from '../../scripts/fightSim';
 import { plainItem } from '../../src/lib/itemInstance';
 import type { CharacterStats } from '../../src/types/game';
 

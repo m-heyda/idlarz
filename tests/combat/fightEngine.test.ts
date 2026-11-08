@@ -4,7 +4,7 @@ import { COMBAT, MONSTERS } from '../../src/config/combatConfig';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { SKILLS } from '../../src/catalog/skills';
 import { attacksPerSecond } from '../../src/lib/combat';
-import { fullSet, simSetup, spentCharacter, type SimSetup } from '../../src/lib/fightSim';
+import { fullSet, simSetup, spentCharacter, type SimSetup } from '../../scripts/fightSim';
 import { plainItem } from '../../src/lib/itemInstance';
 import { runCombat } from '../../src/lib/offline/fight';
 import type { FightEvent } from '../../src/lib/offline/fightTypes';

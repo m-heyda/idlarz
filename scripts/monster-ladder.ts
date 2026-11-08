@@ -8,7 +8,7 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { MONSTERS } from '../src/config/combatConfig';
-import { atItemLevel, fullSet, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import { atItemLevel, fullSet, simulateMany, spentCharacter } from './fightSim';
 import { spawnLevelRange } from '../src/lib/monsters';
 import type { Equipment, MonsterType } from '../src/types/game';
 

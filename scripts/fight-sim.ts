@@ -1,11 +1,11 @@
-// Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
+// Fight balance table: loadouts x monsters, run through the server's own fight engine (scripts/fightSim.ts -> src/lib/offline/fight.ts).
 //   npm run fight-sim            print the tables
 //   npm run fight-sim -- --md    also write docs/generated/fight-sim.md
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
-import { atItemLevel, freshCharacter, fullSet, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import { atItemLevel, freshCharacter, fullSet, simulateMany, spentCharacter } from './fightSim';
 import { monsterStats } from '../src/lib/monsters';
 import { armorOf, attacksPerSecond, damagePerHit, damagePerSecond, maxHp } from '../src/lib/combat';
 import { aggregateStats } from '../src/lib/inventory';

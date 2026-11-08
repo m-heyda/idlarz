@@ -2,13 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COMBAT } from '../../src/config/combatConfig';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
-import { fullSet, simSetup, simulateMany, spentCharacter } from '../../src/lib/fightSim';
+import { fullSet, simSetup, simulateMany, spentCharacter } from '../../scripts/fightSim';
 import { combatView, runCombat } from '../../src/lib/offline/fight';
 import { playerProfile } from '../../src/lib/offline/profile';
 import { estimateWin } from '../../src/lib/offline/winChance';
 import type { Equipment, MonsterType } from '../../src/types/game';
 
-// The closed-form "can I win this?" of auto-battle (offline/winChance.ts) against the real fight engine (lib/fightSim.ts).
+// The closed-form "can I win this?" of auto-battle (offline/winChance.ts) against the real fight engine (scripts/fightSim.ts).
 
 const LOADOUTS: { name: string; equipment: Equipment }[] = [
 	{ name: 'starter kit', equipment: STARTER_EQUIPMENT },

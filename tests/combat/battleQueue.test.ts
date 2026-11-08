@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { COMBAT } from '../../src/config/combatConfig';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { limitOf } from '../../src/lib/limits';
-import { fullSet, simSetup, type SimSetup } from '../../src/lib/fightSim';
+import { fullSet, simSetup, type SimSetup } from '../../scripts/fightSim';
 import { combatView, dismissTicket, restThrough, runCombat } from '../../src/lib/offline/fight';
 import type { FightEvent } from '../../src/lib/offline/fightTypes';
 import type { Ledger } from '../../src/lib/offline/ledger';

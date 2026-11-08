@@ -39,7 +39,7 @@ import { effectiveStats } from '../../src/lib/effectiveStats';
 import { healAmount } from '../../src/lib/skills';
 import { merchantCombat } from '../../src/utils/game/merchant';
 import { playerProfile } from '../../src/lib/offline/profile';
-import { fullSet, simSetup } from '../../src/lib/fightSim';
+import { fullSet, simSetup } from '../../scripts/fightSim';
 import { runCombat } from '../../src/lib/offline/fight';
 import { weaponDps } from '../../src/catalog/weapons';
 import type { CharacterStats, Equipment, EquipmentSlot, ItemInstance } from '../../src/types/game';

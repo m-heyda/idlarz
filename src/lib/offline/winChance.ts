@@ -7,7 +7,7 @@ import type { MonsterType } from '@/types/game';
 // "Can I win this?": an estimate of the chance that the player beats a monster, worked out in closed form from the same numbers the fight
 // engine runs on (the frozen PlayerProfile and monsterStats). O(1), no random numbers, so auto-battle can ask about every waiting monster
 // on every request. It compares how long the player needs to kill the monster with how long the player lasts, then turns the ratio into a
-// chance. tests/combat/winChance.test.ts holds it to the real fight simulation (lib/fightSim.ts).
+// chance. tests/combat/winChance.test.ts holds it to the real fight simulation (scripts/fightSim.ts).
 
 /** How sharply the chance rises with the time-to-survive over time-to-kill ratio (1 = a coin flip; the fight is a race of many swings, so it is steep). */
 const STEEPNESS = 6;
