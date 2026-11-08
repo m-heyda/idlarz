@@ -8,6 +8,7 @@ import { SKILL_IDS } from '@/catalog/skills';
 import { ITEM_CATALOG } from '@/catalog';
 import { autoBattleUnlocked } from '@/lib/combat';
 import { monsterDef, monsterStats } from '@/lib/monsters';
+import { slashFor, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import { COMBAT_EVENT, hitNumberText, type CombatFx } from '@/lib/combatFx';
 import audioManager from '@/utils/audioManager';
 import { formatRest, useRestCountdown } from '@/hooks/useRestCountdown';
@@ -28,7 +29,7 @@ const typingInField = (target: EventTarget | null): boolean => {
 /**
  * The combat window. It opens the moment a monster is clicked (a loading state until the server answers), shows the fight (HP bars that
  * drain smoothly between the server's answers), and when the fight is over it is the same window with the result in it: the bars finish
- * draining, then the monster lies dead (red cross) with its loot under it, until the window is closed (or after a while). A click on a
+ * draining, then the monster lies dead (a skull and crossbones) with its loot under it, until the window is closed (or after a while). A click on a
  * monster starts the fight (or Auto-battle does, one monster after the other); the server swings both ways at each side's attack speed
  * (see src/lib/offline/fight.ts), so this only shows what it says. Flee leaves a fight (and switches Auto-battle off).
  * Potions and skills are used with the number keys (their slots are not buttons); the switches (also in the right-click menu) are
@@ -73,6 +74,7 @@ const CombatWidget: React.FC = () => {
 	const setPref = useUiStore((state) => state.setPref);
 
 	const [numbers, setNumbers] = useState<FloatNumber[]>([]);
+	const [slashes, setSlashes] = useState<SlashFx[]>([]);
 	const [hitTick, setHitTick] = useState(0);
 	const [shake, setShake] = useState(false);
 	const nextId = useRef(1);
@@ -90,6 +92,13 @@ const CombatWidget: React.FC = () => {
 		setTimeout(() => setNumbers((prev) => prev.filter((n) => n.id !== id)), 900);
 	}, []);
 
+	const pushSlash = useCallback((kind: Parameters<typeof slashFor>[0], onHero: boolean) => {
+		const id = nextId.current++;
+		const name = slashFor(kind, id);
+		setSlashes((prev) => [...prev.slice(-3), { id, name, onHero, mirror: id % 2 === 0 }]);
+		setTimeout(() => setSlashes((prev) => prev.filter((s) => s.id !== id)), SLASH_SHEETS[name].ms + 40);
+	}, []);
+
 	// The picture is driven by the events the server reported (see the store's playFx). Being hit makes the window shake and flash, with no
 	// sound: a sound on every bite was confusing next to the sounds of the rest of the game.
 	useEffect(() => {
@@ -97,8 +106,10 @@ const CombatWidget: React.FC = () => {
 			const fx = (e as CustomEvent<CombatFx>).detail;
 			if (fx.kind === 'hit') {
 				setHitTick((t) => t + 1);
+				pushSlash(fx.crit === 'none' ? 'hit' : fx.crit, false);
 				pushNumber(hitNumberText(fx.damage, fx.crit), fx.crit === 'none' ? 'dmg' : fx.crit);
 			} else if (fx.kind === 'hurt') {
+				pushSlash('hurt', true);
 				setShake(true);
 				clearTimeout(shakeTimer.current);
 				shakeTimer.current = setTimeout(() => setShake(false), 320);
@@ -107,14 +118,17 @@ const CombatWidget: React.FC = () => {
 				pushNumber(`+${formatCompact(fx.amount)}`, 'heal');
 				audioManager.playSound('purchase');
 			} else if (fx.kind === 'resist') pushNumber('Resisted!', 'resist');
-			else if (fx.kind === 'stun') pushNumber('Stunned!', 'stun');
+			else if (fx.kind === 'stun') {
+				pushNumber('Stunned!', 'stun');
+				pushSlash('stun', false);
+			}
 		};
 		window.addEventListener(COMBAT_EVENT, onFx);
 		return () => {
 			window.removeEventListener(COMBAT_EVENT, onFx);
 			clearTimeout(shakeTimer.current);
 		};
-	}, [pushNumber]);
+	}, [pushNumber, pushSlash]);
 
 	// The last fight the server reported stays in hand after it ends: the window keeps showing it while its bars finish draining
 	const lastFight = useRef<{ fight: FightView; at: number } | null>(null);
@@ -283,6 +297,7 @@ const CombatWidget: React.FC = () => {
 			autoUse={combat.autoUse}
 			autoNote={combat.autoNote}
 			numbers={numbers}
+			slashes={slashes}
 			hitTick={hitTick}
 			shake={shake}
 			queue={combat.queue}

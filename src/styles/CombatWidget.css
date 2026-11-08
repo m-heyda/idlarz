@@ -1,7 +1,7 @@
 /* The combat panel in the bottom right corner, and the icon it shrinks to. Fight.css holds the bars, numbers and slots they share. */
 
 .combat-widget {
-	width: 360px;
+	width: 440px;
 	max-width: calc(100vw - 32px);
 	padding: 6px 8px 8px;
 	pointer-events: auto;
@@ -224,7 +224,7 @@
 	text-shadow: 1px 1px 0 #000;
 }
 
-/* the result, in the same window as the fight: the monster lies dead on the stage (grey, a red cross over it) and its loot is under it */
+/* the result, in the same window as the fight: a skull and crossbones lies on the stage where the monster fell, its loot is under it */
 .fight-reward {
 	display: flex;
 	flex-direction: column;
@@ -233,38 +233,49 @@
 	color: #f0e6d0;
 }
 
-.fight-dead {
-	position: relative;
-	display: inline-block;
-	isolation: isolate;
+.fight-dead-art {
+	display: block;
+	image-rendering: pixelated;
+	filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.5));
 }
 
-.fight-dead .monster-art {
-	filter: grayscale(1) brightness(0.55);
-	animation-play-state: paused;
-}
-
-.fight-dead::before,
-.fight-dead::after {
-	content: '';
+/* a slash effect (one-row sprite sheet, stepped) over the stage: blows on the monster in the middle, the monster's own blows low and mirrored */
+.fight-slash {
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	width: 120%;
-	height: 7px;
-	z-index: 2; /* the grey sprite is its own layer (filter); the cross goes over it */
-	background: #d8261c;
-	box-shadow:
-		0 0 0 2px #0a0605,
-		inset 0 2px 0 rgba(255, 255, 255, 0.35);
+	z-index: 5;
+	width: var(--slash-w);
+	height: var(--slash-h);
+	margin: calc(var(--slash-h) / -2) 0 0 calc(var(--slash-w) / -2);
+	background: var(--slash-sheet) 0 0 / calc(var(--slash-w) * var(--slash-frames)) var(--slash-h) no-repeat;
+	pointer-events: none;
+	animation: fight-slash-play var(--slash-ms) steps(var(--slash-frames)) 1 forwards;
 }
 
-.fight-dead::before {
-	transform: translate(-50%, -50%) rotate(40deg);
+.fight-slash[data-mirror='true'] {
+	transform: scaleX(-1);
 }
 
-.fight-dead::after {
-	transform: translate(-50%, -50%) rotate(-40deg);
+.fight-slash[data-hero='true'] {
+	top: 78%;
+	scale: 0.8;
+	filter: hue-rotate(-20deg);
+}
+
+@keyframes fight-slash-play {
+	from {
+		background-position-x: 0;
+	}
+	to {
+		background-position-x: calc(var(--slash-w) * var(--slash-frames) * -1);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fight-slash {
+		display: none;
+	}
 }
 
 .combat-head .combat-min + .combat-min {
