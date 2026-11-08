@@ -128,12 +128,14 @@ test('luck raises gold', () => {
 	assert.ok(lucky > base);
 });
 
-test('every base a level 1 rat can drop comes up, in even shares (all pool weights are equal)', () => {
+test('every base a level 1 rat can drop comes up, in even shares among the commons (all pool weights are equal)', () => {
 	const rng = mulberry32(34);
 	const counts = new Map<string, number>();
 	let total = 0;
 	for (let i = 0; i < 120000; i++) {
+		// Common only: a G1 base is common-only (grades.ts), so above common the shares differ by who may roll that rarity
 		for (const d of gearOnly(rollKillLoot(T1, ctx, rng).items)) {
+			if (d.kind !== 'gear' || d.item.rarity !== 'common') continue;
 			counts.set(baseOf(d), (counts.get(baseOf(d)) ?? 0) + 1);
 			total++;
 		}

@@ -175,7 +175,7 @@ test('every weapon swings at a positive attack speed and nothing else has one', 
 test('weapon DPS rises with the tier within a weapon type', () => {
 	const best = new Map<string, number>(); // weaponType -> DPS of the previous (lower) tier
 	const weapons = Object.values(ITEM_CATALOG)
-		.filter((d) => d.slot === 'mainHand' && d.enabled !== false) // the ladder is checked in tests/catalog/ladder.test.ts
+		.filter((d) => d.slot === 'mainHand' && d.enabled !== false && !d.tags?.some((t) => t.startsWith('grade:'))) // graded items are checked in tests/catalog/ladder.test.ts
 		.sort((a, b) => a.tier - b.tier);
 	const byType = new Map<string, typeof weapons>();
 	for (const w of weapons) byType.set(w.weaponType!, [...(byType.get(w.weaponType!) ?? []), w]);

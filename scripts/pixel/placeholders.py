@@ -66,6 +66,11 @@ def gaps():
     return {fam: counts.get(fam, 0) for fam in FAMILIES if counts.get(fam, 0) < LADDER}
 
 
+# Families with a full set of registered icons still lack art for the early grades the catalog now enables (IDL-220): the real
+# G1-G3 icons there belong to the reuse items, so the ladder cells of these grades get placeholders too.
+EXTRA = {fam: ('G1', 'G2', 'G3') for fam in ('feet', 'legs', 'neck', 'ring', 'mainHand-sword', 'offHand-shield')}
+
+
 class Pen:
     def __init__(self, ramp, accent, grade):
         self.img = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
@@ -322,19 +327,25 @@ def main():
             print(f'{fam}: {n} registered icons of {LADDER} -> placeholders G1-G9, S1-S3')
         return
     lines = []
-    for fam in todo:
+    # `item` is set by hand in the line once a catalog item uses the placeholder; regenerating keeps it
+    kept = {}
+    if os.path.exists(OUT_JSON):
+        with open(OUT_JSON, encoding='utf8') as fh:
+            kept = {e['icon']: e['item'] for e in json.load(fh)}
+    plan = [(fam, GRADES) for fam in todo] + [(fam, gs) for fam, gs in EXTRA.items() if fam not in todo]
+    for fam, grades in plan:
         slot, weapon = FAMILIES[fam]
-        for g in GRADES:
+        for g in grades:
             f = rel_file(fam, g)
             path = os.path.join(item_registry.ART_DIR, *f.split('/')) + '.png'
             os.makedirs(os.path.dirname(path), exist_ok=True)
             render(fam, g).save(path)
             icon = 'art_ph_' + slot + ('_' + weapon if weapon else '') + '_' + g.lower()
-            lines.append(dict(icon=icon, item=None, file=f, slot=slot, weapon=weapon, grade=g,
+            lines.append(dict(icon=icon, item=kept.get(icon), file=f, slot=slot, weapon=weapon, grade=g,
                               provenance='placeholder, scripts/pixel/placeholders.py'))
     with open(OUT_JSON, 'w', encoding='utf8', newline='\n') as fh:
         fh.write('[\n' + ',\n'.join('\t' + json.dumps(line, ensure_ascii=False) for line in lines) + '\n]\n')
-    print(f'{len(lines)} placeholders in {len(todo)} families')
+    print(f'{len(lines)} placeholders in {len(plan)} families')
 
 
 if __name__ == '__main__':

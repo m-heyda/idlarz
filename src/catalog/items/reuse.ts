@@ -1,7 +1,9 @@
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { EquipmentRarity, ItemDef } from '@/types/game';
 import { baseStat } from '../stats';
+import { ITEM_ICONS } from '@/config/itemIcons';
 import { gear, type GearOptions } from './define';
+import { GRADE_INFO, LIVE_GRADES, type Grade } from './grades';
 
 // Reserve items: the second equipment art pass (64 px art under public/pixel/items, config/itemIcons/). Every item here is
 // DISABLED: it is in the catalog so its id, icon and stats can be checked, but no loot pool, shop or chest hands it out and
@@ -33,7 +35,7 @@ const mace = { weaponType: 'mace' } as const;
 const maul = { weaponType: 'maul' } as const;
 const shield = { weaponType: 'shield' } as const;
 
-export const RESERVE_ITEMS: ItemDef[] = [
+const RESERVE_BASE: ItemDef[] = [
 	// ---- feet (9)
 	reserve('wanderer_boots', "Wanderer's Boots", 'feet', 1, { armor: 1, maxHp: 3 }, 'Patched at the toe, buckled at the shin.'),
 	reserve('fur_lined_boots', 'Fur-lined Boots', 'feet', 2, { armor: 2, maxHp: 3, regen: b('regen', 2) }, 'Warm enough for the tundra.'),
@@ -310,3 +312,25 @@ export const RESERVE_ITEMS: ItemDef[] = [
 		pools: ['legendary_weapons'],
 	}),
 ];
+
+/** Grade of a reserve item = the grade its art is registered with (config/itemIcons), so one table says it */
+const gradeOfIcon = new Map(ITEM_ICONS.flatMap((e) => (e.grade ? [[e.icon, e.grade as Grade] as const] : [])));
+
+/**
+ * Reserve items by grade (IDL-224): a base item takes the tag `grade:Gx`, the grade's item level window and rarities, so pools and
+ * affixes treat it like a ladder item of its grade. The live grades (G1-G3) are enabled; the rest, and every named item (legendary
+ * folder), stay disabled. Ids and icons never change.
+ */
+export const RESERVE_ITEMS: ItemDef[] = RESERVE_BASE.map((def) => {
+	const grade = def.generation === 'named' ? undefined : gradeOfIcon.get(def.icon as string);
+	if (!grade) return def;
+	const info = GRADE_INFO[grade];
+	return {
+		...def,
+		tags: [...(def.tags ?? []), `grade:${grade}`],
+		minItemLevel: info.levels[0],
+		maxItemLevel: info.levels[1],
+		allowedRarities: [...info.rarities],
+		enabled: LIVE_GRADES.includes(grade),
+	};
+});
