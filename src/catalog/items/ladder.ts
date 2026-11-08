@@ -1,18 +1,19 @@
+import type { PixelIconName } from '@/config/pixelIcons';
+import { ITEM_ICONS } from '@/config/itemIcons';
 import type { EquipmentSlot, ItemDef, WeaponType } from '@/types/game';
-import { MAX_ITEM_LEVEL, STAT_DEFS, baseStat, levelScale, type ItemStatKey, type ItemStats, type StatDef } from '../stats';
+import { STAT_DEFS, baseStat, levelScale, type ItemStatKey, type ItemStats, type StatDef } from '../stats';
 import { WEAPON_ATTACK_SPEED } from '../weapons';
 import { CLOTH_ITEMS } from './cloth';
 import { gear } from './define';
+import { GRADES, GRADE_INFO, LIVE_GRADES, type Grade } from './grades';
 import { LEGENDARY_ITEMS } from './legendary';
 import { OBSIDIAN_ITEMS } from './obsidian';
 import { RESERVE_ITEMS } from './reuse';
 import { WOODEN_ITEMS } from './starter';
 import { STEEL_ITEMS } from './steel';
-import type { EquipmentRarity } from '@/types/game';
 
 // The grade ladder (IDL-37, 38, 39, 142; art_style_reference/equip/README.md sections 3-5): 9 normal grades G1-G9 and three special
-// sets S1-S3 for every slot, as DISABLED data. Nothing here drops, is sold or can be crafted yet: the loot work of phase C (docs/26)
-// decides that. The grade is a tag (`grade:G3`), never an id, so pools and recipes select by it.
+// sets S1-S3 for every slot, as data. Only the live grades (G1-G3, grades.ts) are enabled and drop; the rest drops, is sold or crafted nowhere yet (docs/26). The grade is a tag (`grade:G3`), never an id, so pools and recipes select by it.
 //
 // Where a ladder cell already exists as a live item (Iron Sword, the Steel pieces, the Obsidian family, Emberbrand) the live item
 // stays and fills that cell; `LADDER` says which id sits in which cell. Everything else is generated from the tables in this file,
@@ -20,36 +21,7 @@ import type { EquipmentRarity } from '@/types/game';
 // `WEAPON_DPS_FACTOR`. THE NUMBERS ARE PLACEHOLDERS (TODO tune in R2 C5 with loot-sim and fight-sim), not balance decisions; they are
 // anchored so that G6 matches the live Obsidian pieces.
 
-export const GRADES = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8', 'G9', 'S1', 'S2', 'S3'] as const;
-export type Grade = (typeof GRADES)[number];
-
-interface GradeInfo {
-	/** Name of the grade in the planning doc */
-	label: string;
-	/** Relative planning strength (not a stat): 1.0 for G1 up to 32 for the strongest set */
-	index: number;
-	/** The item level window the grade can be generated in */
-	levels: readonly [number, number];
-	/** The material tier (1-5) the grade belongs to, for the code that still reads `tier` */
-	tier: 1 | 2 | 3 | 4 | 5;
-	/** Rarities a base of this grade may roll as */
-	rarities: readonly EquipmentRarity[];
-}
-
-export const GRADE_INFO: Record<Grade, GradeInfo> = {
-	G1: { label: 'Starter', index: 1, levels: [1, 8], tier: 1, rarities: ['common'] },
-	G2: { label: 'Hide', index: 1.6, levels: [9, 18], tier: 1, rarities: ['common', 'uncommon'] },
-	G3: { label: 'Iron', index: 2.4, levels: [19, 30], tier: 2, rarities: ['uncommon'] },
-	G4: { label: 'Steel', index: 3.5, levels: [31, 42], tier: 2, rarities: ['uncommon', 'rare'] },
-	G5: { label: 'Knight', index: 5, levels: [43, 54], tier: 3, rarities: ['rare'] },
-	G6: { label: 'Obsidian', index: 7, levels: [55, 66], tier: 3, rarities: ['rare', 'epic'] },
-	G7: { label: 'Runed', index: 10, levels: [67, 78], tier: 4, rarities: ['epic'] },
-	G8: { label: 'Ancient', index: 14, levels: [79, 90], tier: 4, rarities: ['epic', 'legendary'] },
-	G9: { label: 'Legendary', index: 20, levels: [91, MAX_ITEM_LEVEL], tier: 5, rarities: ['legendary'] },
-	S1: { label: 'Sunhoney', index: 22, levels: [MAX_ITEM_LEVEL, MAX_ITEM_LEVEL], tier: 5, rarities: ['legendary'] },
-	S2: { label: 'Ashen Warlord', index: 28, levels: [MAX_ITEM_LEVEL, MAX_ITEM_LEVEL], tier: 5, rarities: ['legendary'] },
-	S3: { label: 'Blightbound', index: 32, levels: [MAX_ITEM_LEVEL, MAX_ITEM_LEVEL], tier: 5, rarities: ['legendary'] },
-};
+export { GRADES, GRADE_INFO, LIVE_GRADES, type Grade } from './grades';
 
 /** The set a special grade's pieces belong to (SetDef ids in catalog/sets.ts) */
 export const SPECIAL_SET: Record<'S1' | 'S2' | 'S3', string> = { S1: 'sunhoney', S2: 'ashen_warlord', S3: 'blightbound' };
@@ -269,6 +241,8 @@ export const LADDER: Record<Grade, Partial<Record<LadderCell, string>>> = Object
 	Partial<Record<LadderCell, string>>
 >;
 
+const iconOf = new Map(ITEM_ICONS.flatMap((e) => (e.item ? [[e.item, e.icon] as const] : [])));
+
 const generated: ItemDef[] = [];
 
 const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<ItemDef['slot']>, stats: ItemStats, weaponType?: WeaponType): void => {
@@ -279,12 +253,15 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 	const info = GRADE_INFO[grade];
 	// the Obsidian belt is the only generated piece of the Obsidian set; the other G6 gaps are plain items
 	const set = isSpecial(grade) ? SPECIAL_SET[grade] : grade === 'G6' && key === 'belt' ? 'obsidian' : undefined;
-	// No icon here: the registry (config/itemIcons, lane A) binds icons to items by grade and slot; until then the slot silhouette shows.
+	// The icon comes from the registry (config/itemIcons): the line whose `item` is this id, real pass 1 art where there is a free one,
+	// else the art_ph_ placeholder of the cell. A grade with no such line yet shows the slot silhouette.
 	const def = gear(id, name, slot, info.rarities[0], stats, {
 		tier: info.tier,
 		grade,
 		levelWindow: info.levels,
-		enabled: false,
+		// G1-G3 are live (IDL-220); the rest stay disabled data
+		enabled: LIVE_GRADES.includes(grade),
+		...(iconOf.get(id) ? { icon: iconOf.get(id) as PixelIconName } : {}),
 		...(set ? { set } : {}),
 		...(weaponType ? { weaponType } : {}),
 		description: `${info.label} grade, placeholder numbers.`,
@@ -307,7 +284,7 @@ GRADES.forEach((grade, g) => {
 	for (const type of WEAPON_TYPES) cell(grade, type, WEAPON_NAMES[type][g], 'mainHand', weaponStats(type, index, tier), type);
 });
 
-/** The generated ladder items, every one `enabled: false`. Live items that fill a cell (Iron Sword, Emberbrand, the Steel pieces, the Obsidian family) are not repeated. */
+/** The generated ladder items, enabled for the live grades (G1-G3) and `enabled: false` above. Live items that fill a cell (Iron Sword, Emberbrand, the Steel pieces, the Obsidian family) are not repeated. */
 export const LADDER_ITEMS: ItemDef[] = generated;
 
 /** Slots a full set fills, for tests (`EquipmentSlot` names; both rings) */

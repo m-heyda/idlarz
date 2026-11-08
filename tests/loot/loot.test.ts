@@ -128,19 +128,25 @@ test('luck raises gold', () => {
 	assert.ok(lucky > base);
 });
 
-test('every base a level 1 rat can drop comes up, in even shares (all pool weights are equal)', () => {
+test('every base a level 1 rat can drop comes up, in shares that follow the pool weights, among the commons', () => {
 	const rng = mulberry32(34);
 	const counts = new Map<string, number>();
 	let total = 0;
 	for (let i = 0; i < 120000; i++) {
+		// Common only: a G1 base is common-only (grades.ts), so above common the shares differ by who may roll that rarity
 		for (const d of gearOnly(rollKillLoot(T1, ctx, rng).items)) {
+			if (d.kind !== 'gear' || d.item.rarity !== 'common') continue;
 			counts.set(baseOf(d), (counts.get(baseOf(d)) ?? 0) + 1);
 			total++;
 		}
 	}
 	assert.equal(counts.size, BASIC_GEAR.length);
-	const expected = total / BASIC_GEAR.length;
-	for (const [id, n] of counts) assert.ok(Math.abs(n - expected) < expected * 0.3, `${id}: ${n} vs ${expected.toFixed(0)}`);
+	const weightOf = (id: string) => ITEM_CATALOG[id].poolWeight ?? 1;
+	const weightSum = BASIC_GEAR.reduce((sum, id) => sum + weightOf(id), 0);
+	for (const [id, n] of counts) {
+		const expected = (total * weightOf(id)) / weightSum;
+		assert.ok(Math.abs(n - expected) < expected * 0.3, `${id}: ${n} vs ${expected.toFixed(0)}`);
+	}
 });
 
 test('the monster level sets the item level of kill drops; the pity counters come back updated', () => {

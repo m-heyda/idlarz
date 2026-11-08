@@ -444,14 +444,14 @@
 				"heal": 168,
 				"potion": 280
 			},
-			"digest": "d6bbc71581b2a7511d0cb0c44aabae3966ae0312",
+			"digest": "594e496be940f4a26cae7ff5a007f9ffc7e69263",
 			"results": [
 				"1|1000000|engage||||1|thistleBoar|2",
 				"2|1000000.1|stun|10|||||",
 				"24|1000015.9|won||||1|thistleBoar|2 reward={\"gold\":97,\"xp\":45.36,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
 				"25|1000015.9|engage||||3|thistleBoar|4",
 				"49|1000030.1|stun|10|||||",
-				"65|1000041.8|won||||3|thistleBoar|4 reward={\"gold\":340,\"xp\":158.72371200000003,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"gear\\\",\\\"item\\\":{\\\"base\\\":\\\"cloth_trousers\\\",\\\"level\\\":3,\\\"rarity\\\":\\\"common\\\",\\\"quality\\\":11,\\\"affixes\\\":[]}}\"],\"stored\":[{\"kind\":\"gear\",\"item\":{\"base\":\"cloth_trousers\",\"level\":3,\"rarity\":\"common\",\"quality\":11,\"affixes\":[]}}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":true}",
+				"65|1000041.8|won||||3|thistleBoar|4 reward={\"gold\":340,\"xp\":158.72371200000003,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"gear\\\",\\\"item\\\":{\\\"base\\\":\\\"rag_cloak\\\",\\\"level\\\":3,\\\"rarity\\\":\\\"common\\\",\\\"quality\\\":11,\\\"affixes\\\":[]}}\"],\"stored\":[{\"kind\":\"gear\",\"item\":{\"base\":\"rag_cloak\",\"level\":3,\"rarity\":\"common\",\"quality\":11,\"affixes\":[]}}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":true}",
 				"66|1000071.6|engage||||2|thistleBoar|9",
 				"67|1000071.7|stun|10|||||",
 				"93|1000089.7|heal|28|||||",

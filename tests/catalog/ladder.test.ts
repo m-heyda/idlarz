@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ITEM_CATALOG, SETS, STAT_DEFS, levelScale, weaponDps } from '../../src/catalog';
-import { ARMOUR_SLOTS, GRADES, GRADE_INFO, LADDER, LADDER_ITEMS, SPECIAL_SET, WEAPON_TYPES } from '../../src/catalog/items/ladder';
+import { ARMOUR_SLOTS, GRADES, GRADE_INFO, LADDER, LIVE_GRADES, LADDER_ITEMS, SPECIAL_SET, WEAPON_TYPES } from '../../src/catalog/items/ladder';
 import { shopItems } from '../../src/catalog/loot';
 import { HARD_LIMITS } from '../../src/config/limits';
 import { fullSet } from '../../src/lib/fightSim';
@@ -11,6 +11,7 @@ import { kit, STRONG_KIT } from '../builders';
 
 const ladderIds = new Set(LADDER_ITEMS.map((d) => d.id));
 type Grade = (typeof GRADES)[number];
+const gradeOf = (def: { tags?: string[] }) => def.tags!.find((t) => t.startsWith('grade:'))!.slice(6) as Grade;
 
 test('every cell of the ladder resolves to an item', () => {
 	for (const grade of GRADES) {
@@ -24,25 +25,36 @@ test('every cell of the ladder resolves to an item', () => {
 	}
 });
 
-test('generated ladder items are disabled, graded by tag, inside the grade window and never droppable', () => {
+test('generated ladder items are graded by tag, inside the grade window, and enabled only for the live grades (G1-G3)', () => {
 	for (const def of LADDER_ITEMS) {
-		assert.equal(def.enabled, false, def.id);
-		const grade = def.tags!.find((t) => t.startsWith('grade:'))!.slice(6) as Grade;
-		assert.ok(GRADES.includes(grade), def.id);
-		assert.deepEqual([def.minItemLevel, def.maxItemLevel], GRADE_INFO[grade].levels, def.id);
-		assert.deepEqual(def.allowedRarities, GRADE_INFO[grade].rarities, def.id);
+		assert.equal(def.enabled, LIVE_GRADES.includes(gradeOf(def)), def.id);
+		assert.ok(GRADES.includes(gradeOf(def)), def.id);
+		assert.deepEqual([def.minItemLevel, def.maxItemLevel], GRADE_INFO[gradeOf(def)].levels, def.id);
+		assert.deepEqual(def.allowedRarities, GRADE_INFO[gradeOf(def)].rarities, def.id);
 	}
 	for (const s of shopItems()) assert.ok(!ladderIds.has(s.id), `${s.id} is for sale`);
+});
+
+test('G1-G3 drop for every slot and weapon type, and nothing above G3 drops from any source at any level', () => {
 	const rng = mulberry32(7);
-	for (const sourceId of ['monster', 'boss', 'chest']) {
-		for (let level = 1; level <= 100; level += 3) {
-			for (let i = 0; i < 6; i++) {
+	const seen = new Set<string>();
+	for (const sourceId of ['monster', 'boss', 'chest', 'merchant']) {
+		for (let level = 1; level <= 100; level += 1) {
+			for (let i = 0; i < 40; i++) {
 				for (const drop of generateLoot({ sourceId, level }, rng).drops) {
-					if (drop.kind === 'gear') assert.ok(!ladderIds.has(drop.item.base), `${drop.item.base} dropped`);
+					if (drop.kind !== 'gear') continue;
+					const grade = ITEM_CATALOG[drop.item.base].tags?.find((t) => t.startsWith('grade:'))?.slice(6);
+					if (grade) assert.ok(LIVE_GRADES.includes(grade as Grade), `${drop.item.base} (${grade}) dropped from ${sourceId} L${level}`);
+					seen.add(drop.item.base);
 				}
 			}
 		}
 	}
+	// every cell of G1-G3 is reachable (a live item fills some cells; the generated ones are in the ladder)
+	for (const grade of LIVE_GRADES) {
+		for (const [cell, id] of Object.entries(LADDER[grade])) assert.equal(ITEM_CATALOG[id!].enabled !== false, true, `${grade} ${cell}`);
+	}
+	for (const def of LADDER_ITEMS.filter((d) => LIVE_GRADES.includes(gradeOf(d)))) assert.ok(seen.has(def.id), `${def.id} never dropped`);
 });
 
 test('the 12 belts exist (9 grades and 3 set pieces) and the Obsidian set has its belt', () => {

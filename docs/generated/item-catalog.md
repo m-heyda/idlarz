@@ -176,19 +176,19 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 
 Rarity chances are the profile weights normalised over the rarities that pass their item level gate; level is the item level at the source (the monster level; castle level 1 for chests).
 
-- **monster level 1** (profile `normal_monster`, item level 1): 27 bases eligible; Common 76.1%, Uncommon 23.9%
-- **monster level 5** (profile `normal_monster`, item level 5): 44 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **monster level 9** (profile `normal_monster`, item level 9): 61 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster level 20** (profile `normal_monster`, item level 20): 61 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster level 1** (profile `normal_monster`, item level 1): 58 bases eligible; Common 76.1%, Uncommon 23.9%
+- **monster level 5** (profile `normal_monster`, item level 5): 75 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
+- **monster level 9** (profile `normal_monster`, item level 9): 93 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
+- **monster level 20** (profile `normal_monster`, item level 20): 93 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **boss level 15** (profile `boss`, item level 15): 61 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss level 15** (profile `boss`, item level 15): 93 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss level 45** (profile `boss`, item level 45): 34 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_legendary` from pool `legendary_weapons`, chance 0.05
   - bonus `king_potions` from pool `potions_king`
-- **chest** (profile `basic_chest`, item level 4): 44 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
+- **chest** (profile `basic_chest`, item level 4): 75 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
   - bonus `chest_legendary` from pool `legendary_weapons`, chance 0.019, replace
   - bonus `chest_potion` from pool `potions_chest`, fallback
-- **merchant** (profile `merchant_stock`, item level 4): 44 bases eligible; Common 60.0%, Uncommon 40.0%
+- **merchant** (profile `merchant_stock`, item level 4): 75 bases eligible; Common 60.0%, Uncommon 40.0%
 
 Pools: `general_equipment`, `legendary_weapons`, `potions_rat`, `potions_king`, `potions_chest`
 
