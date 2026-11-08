@@ -43,7 +43,6 @@ npm run sim                   # bot simulation on the real store -> docs/generat
 npm run sim -- --seeds=3 hardcore         # median and min-max over 3 seeds (profiles: idle casual hardcore autoclicker human human-rebirth6 human-rebirth8 hardcore-rebirth6 hardcore-rebirth6-x10 hardcore-rebirth10)
 npm run sim -- --maxdays=60 hardcore      # stop early
 npm run sim -- --no-write hardcore        # print only, leave the file alone
-npm run sim -- --legacy hardcore          # approximate the pre-rebalance game
 npm run sim -- --set=SCALING_CONFIG.growthLate=1.25 castleCostScale=...   # try a tweak without editing files
 npm run catalog-report        # the two sets, their items, affixes, loot sources -> docs/generated/item-catalog.md (tests/catalog/catalogDoc.test.ts keeps it current)
 npm run fight-sim -- --md     # fight balance tables -> docs/generated/fight-sim.md (without --md it only prints)

@@ -4,10 +4,9 @@
  *
  *   npx tsx scripts/sim.ts                  all profiles
  *   npx tsx scripts/sim.ts hardcore casual  selected profiles
- *   npx tsx scripts/sim.ts --legacy hardcore   approximate the pre-rebalance game (sanity check of the sim)
  *   npx tsx scripts/sim.ts --no-write hardcore-rebirth6 --maxdays=500   do not touch docs/generated (for tuning runs)
  *
- * Output: docs/generated/sim-milestones.md (not written for --legacy).
+ * Output: docs/generated/sim-milestones.md.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -69,7 +68,6 @@ const loadUtils = async (): Promise<GameUtils> =>
 
 const main = async () => {
 	const args = process.argv.slice(2);
-	const legacy = args.includes('--legacy');
 	const names = args.filter((a) => !a.startsWith('--'));
 	// --set Path.to.value=1.5   (tuning experiments without touching the config files)
 	const overrides = args.filter((a) => a.startsWith('--set=')).map((a) => a.slice(6));
@@ -82,14 +80,13 @@ const main = async () => {
 	const combatCfg = await import('../src/config/combatConfig');
 	const kill = await import('../src/lib/loot/kill');
 	const gearEco = await import('../src/lib/gearEconomy');
-	const fightSim = await import('../src/lib/fightSim');
+	const fightSim = await import('./fightSim');
 	const { useGameStore } = await import('../src/stores/gameStore');
 
 	useGameStore.persist.setOptions({
 		storage: { getItem: () => null, setItem: () => undefined, removeItem: () => undefined },
 	});
 
-	if (legacy) applyLegacy(cfg);
 	overrides.forEach((o) => applyOverride(cfg, o));
 
 	const PROFILES: Record<string, Profile> = {
@@ -120,7 +117,7 @@ const main = async () => {
 		const started = Date.now();
 		const runs: Milestones[] = [];
 		for (let seed = 0; seed < seeds; seed++) {
-			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore, monsters, combatCfg, kill, gearEco, fightSim }, legacy, seed));
+			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore, monsters, combatCfg, kill, gearEco, fightSim }, seed));
 		}
 		// median per milestone, plus the min-max over seeds
 		results[name] = {};
@@ -141,7 +138,7 @@ const main = async () => {
 		console.error(`${name}: done in ${((Date.now() - started) / 1000).toFixed(1)}s (${seeds} seed${seeds > 1 ? 's' : ''})`);
 	}
 
-	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
+	const md = renderMarkdown(results, seeds > 1 ? spreads : undefined);
 	console.log(md);
 	for (const w of renderMagnitudes(selected).warnings) console.error(`WARNING outside the docs/06 band: ${w}`);
 	// The milestones of every selected profile as data (game days, rounded so a rerun on another machine writes the same bytes): scripts/pacing-guard.ts compares it against the base branch's copy
@@ -153,7 +150,7 @@ const main = async () => {
 		(_key, value) => (typeof value === 'number' ? Number(value.toPrecision(6)) : value),
 		1,
 	);
-	if (!legacy && !args.includes('--no-write')) {
+	if (!args.includes('--no-write')) {
 		const dir = resolve(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../docs/generated');
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(resolve(dir, 'sim-milestones.md'), md);
@@ -199,7 +196,7 @@ const GEAR_SCHEDULE: { day: number; maxRat: number; king: number; set?: string; 
 interface Ctx {
 	kill: typeof import('../src/lib/loot/kill');
 	gearEco: typeof import('../src/lib/gearEconomy');
-	fightSim: typeof import('../src/lib/fightSim');
+	fightSim: typeof import('./fightSim');
 	monsters: typeof import('../src/lib/monsters');
 	combatCfg: typeof import('../src/config/combatConfig');
 	cfg: GameConfig;
@@ -227,7 +224,7 @@ let MAX_DAYS = 300;
 const FINE_STEP_DAYS = 45; // 20 s steps for the first weeks, coarser afterwards (keeps long runs fast)
 const FIRST_FINISH_CASTLE = 6; // the first finish line (castle 6 + best click + the rebirth territory) is unchanged by castle levels 7-10
 
-function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, seed = 0): Milestones {
+function runProfile(name: string, profile: Profile, ctx: Ctx, seed = 0): Milestones {
 	const { cfg, utils, store, monsters, combatCfg, kill, gearEco, fightSim } = ctx;
 	const realRandom = Math.random;
 	Math.random = mulberry32(12345 + seed * 7919);
@@ -678,7 +675,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 	Math.random = realRandom;
 	void name;
-	void legacy;
 	return milestones;
 }
 
@@ -814,11 +810,11 @@ function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[
 	return { lines, warnings };
 }
 
-function renderMarkdown(results: Record<string, Milestones>, legacy: boolean, spreads?: Record<string, Record<string, [number, number]>>): string {
+function renderMarkdown(results: Record<string, Milestones>, spreads?: Record<string, Record<string, [number, number]>>): string {
 	const names = Object.keys(results);
 	const fmt = (d: number | null | undefined) => (d == null ? '—' : d < 1 ? `${(d * 24).toFixed(1)} h` : `${d.toFixed(1)} d`);
 	const lines: string[] = [];
-	lines.push(`# Simulation milestones${legacy ? ' (LEGACY parameters — sanity check only)' : ''}`);
+	lines.push('# Simulation milestones');
 	lines.push('');
 	lines.push(
 		'> Generated by `npm run sim` (scripts/sim.ts): the real game store driven by a bot with a seeded RNG. ' +
@@ -910,31 +906,6 @@ function applyOverride(cfg: object, spec: string) {
 	let target: any = cfg;
 	for (let i = 0; i < keys.length - 1; i++) target = target[keys[i]];
 	target[keys[keys.length - 1]] = value;
-}
-
-/** Approximate the game before the rebalance by overriding config at runtime (for validating the sim). */
-function applyLegacy(cfg: GameConfig) {
-	const c = cfg as unknown as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-	c.CLICK_LADDER.forEach((l: { power: number; price: number }, i: number) => {
-		l.power = [2, 4, 8, 16][i];
-		l.price = [0, 250000, 500000, 2000000][i];
-	});
-	c.CLICK_LIMIT.capacity = 1e9;
-	c.CLICK_LIMIT.staminaCapacity = 1e15;
-	c.CLICK_LIMIT.staminaRefillPerSec = 1e9;
-	c.CLICK_LIMIT.refillPerSec = 1e9;
-	c.MERCHANT_RESOURCE_PRICES.meat = 15;
-	c.CASTLE_UPGRADE.durationsSec.fill(0);
-	c.TILE_RESOURCE_COST.length = 0;
-	c.BUILDING_COST.base = {};
-	c.CHEST.minMinutes = 5;
-	c.CHEST.maxMinutes = 50;
-	c.SCALING_CONFIG.costFormula = (n: number) => {
-		const tier = Math.floor(n / 24);
-		const f = 1.42 * (1 + 0.01 * (tier > 20 ? tier : tier / 1.2));
-		return Math.floor(55 * Math.pow(f, n));
-	};
-	c.BIOME_YIELD.scale = 1;
 }
 
 main().catch((e) => {

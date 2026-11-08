@@ -60,7 +60,6 @@ src/
 │   ├── saveFormat.ts         the save text (IDLZ2.<base64 JSON>.<check>): compact body, `SAVE_SCHEMA`, encode/decode
 │   ├── saveStorage.ts, storageScope.ts   localStorage storage: sync flush on close, backup + damaged copy, `.dev` key suffix on localhost, persist(), import/reset
 │   ├── sanitizeSave.ts       validation/normalisation of any loaded or imported save; PERSISTED_KEYS
-│   ├── fightSim.ts           a bot that fights with the real engine (scripts/fight-sim.ts, tests/combat/fightBalance.test.ts)
 │   └── castleWard, castleFinder, mapView, minimap, terrainRenderer, tipPlacement, ambientLife, floatText, inventoryDrag, globalMenu, uiPrefs, clipboard
 ├── hooks/
 │   ├── useHydration, useSingleTab (Web Lock: one tab owns the game), useCtrlSequence, useClickIncome, useGlobalContextMenu, useMenuAttention

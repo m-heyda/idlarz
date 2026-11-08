@@ -5,7 +5,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { COMBAT } from '../../src/config/combatConfig';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
-import { fullSet, simSetup, spentCharacter, type SimSetup } from '../../src/lib/fightSim';
+import { fullSet, simSetup, spentCharacter, type SimSetup } from '../../scripts/fightSim';
 import { bagCountOf } from '../../src/lib/offline/inventory';
 import { combatView, restThrough, runCombat } from '../../src/lib/offline/fight';
 import { COSMETIC_EVENTS, type CombatCommand, type FightEvent } from '../../src/lib/offline/fightTypes';

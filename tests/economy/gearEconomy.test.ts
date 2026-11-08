@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { freshGame, api } from '../helpers';
 import { SETS, formatStat } from '../../src/catalog';
-import { fullSet } from '../../src/lib/fightSim';
+import { fullSet } from '../../scripts/fightSim';
 import { gearEconomy, gearIncomePct, xpGainPct, NO_GEAR_ECONOMY } from '../../src/lib/gearEconomy';
 import { summarize, DEFAULT_DERIVED } from '../../src/lib/cloudSave/summary';
 import { pickPersisted } from '../../src/lib/sanitizeSave';

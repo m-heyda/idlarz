@@ -4,7 +4,7 @@ import { COMBAT, MONSTERS } from '../../src/config/combatConfig';
 import { ITEM_CATALOG } from '../../src/catalog';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { plainItem } from '../../src/lib/itemInstance';
-import { atItemLevel, fullSet, simulateMany, spentCharacter } from '../../src/lib/fightSim';
+import { atItemLevel, fullSet, simulateMany, spentCharacter } from '../../scripts/fightSim';
 import type { Equipment } from '../../src/types/game';
 
 // The fights run on the server's engine (lib/offline/fight.ts) with the player swinging at the weapon's attack speed: nobody clicks, so
