@@ -14,6 +14,9 @@ import { FloatingTip } from '../ItemSlot';
 import { itemIconName } from '../itemUi';
 import './CraftingOverlay.css';
 
+/** Whole crafts are counted as integers (formatNumber would show 7.00) */
+const whole = (n: number) => n.toLocaleString('en');
+
 const outputName = (recipe: Recipe) => ('item' in recipe.output ? ITEM_CATALOG[recipe.output.item].name : COMPONENTS[recipe.output.component].name);
 
 /** Components have no catalog item, so their sprite is named here. */
@@ -224,7 +227,7 @@ const QueuePanel: React.FC = () => {
 						>
 							<div className='cr-xpfill' style={{ width: `${(done / entry.count) * 100}%` }} />
 							<span className='cr-xptext'>
-								{formatNumber(done)} / {formatNumber(entry.count)} - {stalled ? 'waiting for you' : done >= entry.count ? 'done' : formatTime(left)}
+								{whole(done)} / {whole(entry.count)} - {stalled ? 'waiting for you' : done >= entry.count ? 'done' : formatTime(left)}
 							</span>
 						</div>
 						<button className='px-btn' disabled={busy} aria-label='Cancel batch' onClick={() => void cancel(slot).then((text) => showToast(text))}>
@@ -236,7 +239,7 @@ const QueuePanel: React.FC = () => {
 							aria-label='Collect finished crafts'
 							onClick={() => void claim(slot).then((text) => showToast(text))}
 						>
-							Collect{done > 0 ? ` ${formatNumber(done)}` : ''}
+							Collect{done > 0 ? ` ${whole(done)}` : ''}
 						</button>
 					</div>
 				);
