@@ -21,8 +21,9 @@
 		"catalog-report": "tsx scripts/catalog-report.ts",
 		"loot-sim": "tsx scripts/loot-sim.ts",
 		"kill-sim": "tsx scripts/kill-sim.ts",
+		"craft-sim": "tsx scripts/craft-sim.ts",
 		"docs:gen": "npm run docs:gen:rest && npm run docs:gen:sim",
-		"docs:gen:rest": "npm run report && npm run stat-audit && npm run catalog-report && npm run fight-sim -- --md && npm run monster-ladder -- --md && npm run loot-sim -- --md && npm run kill-sim -- --md",
+		"docs:gen:rest": "npm run report && npm run stat-audit && npm run catalog-report && npm run fight-sim -- --md && npm run monster-ladder -- --md && npm run loot-sim -- --md && npm run kill-sim -- --md && npm run craft-sim -- --md",
 		"docs:gen:sim": "npm run sim",
 		"format": "prettier --write .",
 		"format:check": "prettier --check ."
