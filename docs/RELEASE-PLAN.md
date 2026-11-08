@@ -279,6 +279,20 @@ Same release pattern, with a deliberately **richer look**: they are the last two
 | 13.4 | Public checklist: email confirmation on, `verify.ts` enforcing (done in 9.4), rotated secrets, rate limits, free-plan load check |
 | 13.5 | Drop `BIOME_DISTANCE_OFFSET` to the calibrated value if the sim says so |
 
+### Gem track (G1-G5): the gem sinks ride on the phases above (added 2026-11-08)
+
+Gems are the premium currency and nothing spends them yet. The track is not a phase of its own: each slice ships **with** the phase it depends on, so the order of P0-P13 does not change. Full design, prices and tasks: [30](30-gem-sinks.md). Same rules as section 1 (additive ledger fields, SQL before code, sim and docs in the PR); every spend is a server operation on the ledger, idempotent by claim id.
+
+| Slice | Ships with | What the player gets | Linear | Size |
+|---|---|---|---|---|
+| **G1** | **P2 New chapter** (R5) | the Gem shop window (header gem chip), class change 500, name change, respec outside a rebirth; gems from achievements and a daily bonus | IDL-189, 230, 190, 194; price check IDL-229 | L |
+| **G2** | after P2, before P6; builder queue with P6 | bigger bag, longer battle queue, longer away time, auto-sell slots; Hourglass, Chest Beacon, timed boosts once the server owns the economy | IDL-191, 234, 192, 193 | M |
+| **G3** | after **P7 Respec** (server rebirth, R8), before P10 | **Cap Breaks**: +1 max level (at most 3) on merchant economy ladders, then farm and Ember shop. D12 decided: economy only (waits for the gem sim IDL-229) | IDL-228, 231, 232 | M-L |
+| **G4** | after **P11 Crafting** | re-roll one affix of a piece of gear for gems | IDL-236 | M |
+| **G5** | with **P9 Rankings** | patron titles on the board, the Monument, premium skins | IDL-237, 184 | S-M |
+
+Why these slots: G1 must exist when class change goes live (500 gems, P2.3). G3 needs the server-run rebirth to enforce "kept through a rebirth" and a ledger `rebirths` count for its gate. G4 needs the crafting sealed-roll hooks. G5 needs the rankings board to show titles.
+
 ### Not in this plan (parked, from the ROADMAP lists)
 
 Item upgrading (replaced by crafting's enchant), the Quests and Gambling merchant tabs, ambient weather, zoom 0.5, market saturation, caravans, second Ember currency, gem sockets, skill tree. Paragon **bonuses** (points to spend) wait for their own design after P9.
@@ -335,6 +349,7 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 | **D8** | Mastery caps and the ladder above 1 trillion | caps as in [22](22-glossary-and-mastery.md), ladder later | P4 |
 | **D9** | Server-priced merchant: schedule it next to crafting or accept flagging only | schedule it right after P11 | enforced crafting |
 | **D10** | Landing wording and whether to show a players-online number | no number in v1 | P1.3 |
+| **D12** | Do gem **Cap Breaks** (+1 max level on economy ladders, at most 3 per ladder) fit the fair-play line "gems never buy permanent power"? Combat ladders in or out, counted in rankings, unlock gate | **Decided 2026-11-08 (IDL-228): yes, economy ladders only.** Combat out; counted in rankings and gate `rebirths >= 2` as recommended | G3 |
 | **D11** | ~~What does the demoted Rat King keep?~~ Moot: the rats and the Rat King are gone (IDL-49); bosses keep their 3 h timer and 75-90 s clocks. Original question:  (a) stays a rare boss-tagged monster, 1000 HP lowered to a fair number, same 3 h timer; (b) becomes a plain strong monster in the normal spawn table | (a) with HP and timer re-tuned by `fight-sim`, since it is the only boss until the biome bosses exist | P3.6 |
 
 ## 8. Risk register (edge cases found in the code and docs)
@@ -354,4 +369,5 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 | New biome roll drifts the sim baselines | P5 | the `rebirths = 0` identical-roll regression test |
 | Build-time bonuses stack past the run-2 target | P6 | combined reduction cap (proposal 60 %), sim check |
 | Placeholder art mistaken for final | P3, P6 | placeholders are catalog keys listed in section 6, swapped per phase, tracked in each phase's acceptance |
+| Cap Breaks make gems feel pay-to-win once they are sold; an old save refused after the level clamp widens | G3 | D12 decides; clamp to `maxLevel + 3`, never lower; sim budget under 5 % income ([30](30-gem-sinks.md) section 4) |
 | Docs drift: doc 21 says "three active players", doc 14 says five accounts; doc 12 section 4's merchant bullet is void | credibility of the docs | tidy in the first docs PR after approval |

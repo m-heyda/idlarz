@@ -28,6 +28,7 @@ The one place to look when planning the next step. It lists only what is **still
 | Tile price tail, map size, milestones, roads | [18](18-biome-buildings-and-material-tiers.md), balance table below | IDL-79, 181, 131, 198, 98 |
 | Rankings (four boards, daily snapshot), preview map, +20 attribute points | [15](15-leaderboard-and-world-preview.md), [13](13-rebirth-reset-and-paragon.md) | IDL-113, 115, 100 |
 | Paragon | [13](13-rebirth-reset-and-paragon.md) section 5 | IDL-104, 186, 187 |
+| Gem sinks, the Gem shop, Cap Breaks | [30](30-gem-sinks.md) | IDL-188..194, 228..232, 234, 236, 237 |
 
 ## Item art in three passes (decided 2026-11-08, owner)
 
@@ -143,6 +144,17 @@ Notes from reading the code (not measured against the live project):
 
 **Paragon levels (draft, not built; the current design is in [13](13-rebirth-reset-and-paragon.md) section 5, the leaderboard ranks level then paragon).** The level curve ends at 100 (soft cap 80, level 90 around the 5th rebirth, 100 around the 10th). Past it a paragon track would give the endless part of the game without feeding the attribute economy (a level-100 character already holds 157 attribute points): the same lifetime XP keeps counting, each paragon level gives one point, points go into a few small, capped, account-wide bonuses (income, XP gain, Luck, offline efficiency), and the leaderboard ranks level then paragon level. **Decided 2026-11-07 (IDL-104; build tasks IDL-186 levels and points, IDL-187 bonuses):** the paragon level comes from clamped XP (step growth 1.06, cap 400 levels), points are server-held and spent or respecced for gems, bonuses are an income and XP account bucket, Luck, offline efficiency and Ember Power; months to the top is intended.
 
+## Gem sinks and the Gem shop (design draft, nothing built; spec [30](30-gem-sinks.md))
+
+Gems are the premium currency (start purse 1,000, a gem roll on every chest, a server-held balance that survives rebirth) and **nothing spends them yet**. The decided base is IDL-188 (fair-play line: convenience, time within limits, identity, cosmetics, temporary boosts; never bulk resources or permanent stat power; gems may be sold later). Added 2026-11-08 (owner): a **Gem shop window** and **Cap Breaks**, gems as the late-game currency that permanently raises the cap of upgrade ladders. Rejected the same day: keeping a % of a resource through a rebirth, skipping a stage of the tile requirement, instantly finishing a castle timer.
+
+1. 🚧 **G1 Engine, shop window, identity, sources** (L, with R5): spend engine IDL-189, Gem shop window IDL-230 (header gem chip, five tabs), class/name/respec IDL-190, achievement and daily-login gems IDL-194, price check with the gem sim IDL-229.
+2. 🚧 **G2 Convenience and time** (M): bag and battle-queue slots IDL-191, longer away time and filter slots IDL-234, Hourglass and Chest Beacon IDL-192, timed boosts IDL-193 (the last two need the server-owned economy, IDL-134).
+3. 🚧 **G3 Cap Breaks** (M-L, after R8): +1 max level, at most 3 per ladder, economy ladders only (merchant IDL-231, farm and Ember shop IDL-232). **Decided 2026-11-08 (IDL-228):** accepted as an explicit exception to the IDL-188 fair-play line, economy only; prices wait for the gem sim (IDL-229).
+4. 🚧 **G4 Affix re-roll** (M, after crafting v0, IDL-236) and **G5 patron titles and Monument** (S-M, with rankings, IDL-237).
+
+Placement in the release order: [RELEASE-PLAN](RELEASE-PLAN.md) section 4, "Gem track".
+
 ## Draft ideas for later (not committed to)
 
 Loose ideas, not scheduled and not sized; each needs a design pass before it enters the lists above.
@@ -155,7 +167,7 @@ Loose ideas, not scheduled and not sized; each needs a design pass before it ent
 - *Building auto-upgrade and auto-build* (draft, **not scheduled**): when buildings get levels and specialisation (the building rework of [18](18-biome-buildings-and-material-tiers.md), Linear project R7) an autobuyer can build the best producer for a tile's biome and raise building levels by a cheapest-first rule. It needs the building level costs and caps first, and the same Ember-unlock shape as above (priced when the levels exist). Kept here so the building design leaves room for it: costs must be computable as a pure function of (building, level) and a purchase must be one batched request on the server.
 
 **Combat upgrades** (the two ability slots hold Heal and Stun; one weapon per rarity tier)
-- *Gem sockets* in gear, and gems as the thing the premium currency buys.
+- *Gem sockets* in gear (parked, IDL-137; the gem sinks that are planned are in [30](30-gem-sinks.md)).
 - *Skills rework: a skill tree with levels and player choice (draft only, nothing decided).* Today there are two ability slots holding Heal and Stun with fixed behaviour (`catalog/skills.ts`, `lib/skills.ts`), and classes are cosmetic. Idea: skills get **levels** (spent skill points, earned with character level and rebirths) and a **tree** per class or per school (for example healing, control, damage), where the player **chooses** which branch to deepen and which skills fill the slots, so builds differ. Draft questions: where points come from (character level, a separate pool that survives rebirth, respec cost); how many slots and when they unlock; whether a level changes numbers only (heal amount, stun length, cooldown, mana cost) or also adds modifiers (heal over time, stun chance on crit); how the choice interacts with *Auto-use* (`COMBAT.auto` uses a fixed preset today, it would follow the chosen loadout); that fights run on the server, so skill effects must be computed there and the chosen tree stored in the ledger or a validated save field; class bonuses of [21](21-classes-avatars-achievements-offline-report.md) as the entry point. A new tutorial step for each unlock.
 - *Set depth*: more sets per gear tier, set bonuses that scale with the item level (today they are fixed amounts), loadout swapping between an economy set and a combat set.
 
