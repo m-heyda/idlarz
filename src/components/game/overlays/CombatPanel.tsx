@@ -5,6 +5,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { MONSTER_CATALOG, monsterArtUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
+import { SLASH_FRAME, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import { isBoss, monsterDef, monsterStats } from '@/lib/monsters';
 import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
 import type { BagSlot, CombatNotice, MonsterType } from '@/types/game';
@@ -91,7 +92,7 @@ const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | '
 	);
 };
 
-/** What a fight left behind, under the monster on the stage (dead, with a red cross, after a win): the gold, XP and hide, the drops (hover for the item card). */
+/** What a fight left behind, under the monster on the stage (dead, a skull and crossbones, after a win): the gold, XP and hide, the drops (hover for the item card). */
 const FightResult: React.FC<{ notice: CombatNotice }> = ({ notice }) => {
 	const def = monsterDef(notice.type);
 	const { summary } = notice;
@@ -172,6 +173,8 @@ export interface CombatPanelProps {
 	/** The server's reason Auto-battle is idle, when it is */
 	autoNote?: string | null;
 	numbers: FloatNumber[];
+	/** Slash effects playing over the stage (blows landed and taken) */
+	slashes?: SlashFx[];
 	hitTick: number;
 	shake: boolean;
 	/** The monsters waiting for their turn (the battle queue) and a way to take one out; both left out in the lab */
@@ -322,8 +325,13 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 				)}
 				<div className='combat-stage' data-lucky={!!monster.lucky && !dead}>
 					<span key={hpKey} className='fight-sprite' data-hit={!over && p.hitTick > 0} data-loading={p.loading}>
-						<span className={dead ? 'fight-dead' : undefined} style={flip ? { display: 'block', transform: 'scaleX(-1)' } : undefined}>
-							{art}
+						<span style={flip && !dead ? { display: 'block', transform: 'scaleX(-1)' } : undefined}>
+							{dead ? (
+								// eslint-disable-next-line @next/next/no-img-element
+								<img className='fight-dead-art' src='/fx/dead.png' alt={`${label} defeated`} draggable={false} width={48 * 3} height={40 * 3} />
+							) : (
+								art
+							)}
 						</span>
 					</span>
 					{p.loading && <div className='fight-loading'>Engaging...</div>}
@@ -337,6 +345,24 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						</span>
 					)}
 					{fight && fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {fight.stunLeft.toFixed(1)} s</div>}
+					{p.slashes?.map((fx) => (
+						<span
+							key={fx.id}
+							className='fight-slash'
+							data-hero={fx.onHero}
+							data-mirror={fx.mirror}
+							aria-hidden
+							style={
+								{
+									'--slash-w': `${SLASH_FRAME.w}px`,
+									'--slash-h': `${SLASH_FRAME.h}px`,
+									'--slash-frames': SLASH_SHEETS[fx.name].frames,
+									'--slash-ms': `${SLASH_SHEETS[fx.name].ms}ms`,
+									'--slash-sheet': `url(/fx/slash/${fx.name}.png)`,
+								} as React.CSSProperties
+							}
+						/>
+					))}
 					{p.numbers.map((n) => (
 						<span key={n.id} className='fight-number' data-kind={n.kind} style={{ left: `${n.x}%` }}>
 							{n.text}

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { BIOMES } from '@/config/biomes';
 import { MONSTER_CATALOG } from '@/catalog/monsters';
 import { hitNumberText } from '@/lib/combatFx';
+import { slashFor, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import CombatPanel, { type FloatNumber } from '@/components/game/overlays/CombatPanel';
 import { MONSTERS } from '@/config/combatConfig';
 import { monsterStats } from '@/lib/monsters';
@@ -28,6 +29,7 @@ const CombatPreview: React.FC = () => {
 	const [swinging, setSwinging] = useState(true);
 	const [tick, setTick] = useState(0);
 	const [numbers, setNumbers] = useState<FloatNumber[]>([]);
+	const [slashes, setSlashes] = useState<SlashFx[]>([]);
 	const entry = WIP_MONSTERS.find((m) => m.id === id) ?? WIP_MONSTERS[0];
 
 	// the real window is driven by the server's hits; here a hit lands every 1.6 s so the flash and the numbers can be seen
@@ -48,6 +50,9 @@ const CombatPreview: React.FC = () => {
 				},
 			]);
 			setTimeout(() => setNumbers((prev) => prev.filter((n) => n.id !== nid)), 900);
+			const name = slashFor(crit === 'none' ? 'hit' : crit, nid);
+			setSlashes((prev) => [...prev.slice(-3), { id: nid, name, onHero: false, mirror: nid % 2 === 0 }]);
+			setTimeout(() => setSlashes((prev) => prev.filter((s) => s.id !== nid)), SLASH_SHEETS[name].ms + 40);
 		}, 1600);
 		return () => clearInterval(timer);
 	}, [swinging]);
@@ -101,6 +106,7 @@ const CombatPreview: React.FC = () => {
 				autoLocked
 				autoUse={false}
 				numbers={numbers}
+				slashes={slashes}
 				hitTick={tick}
 				shake={false}
 				onFlee={() => setId(null)}
