@@ -21,6 +21,11 @@ const REFUSAL: Record<CraftRefusal, string> = {
 	bag_full: 'Your bag is full.',
 };
 
+/** One shared empty stock: a selector must hand back the same reference every time, or Zustand re-renders forever (the Crafting window crashed on it). */
+export const EMPTY_STOCK: Readonly<Record<string, number>> = Object.freeze({});
+
+export const selectStock = (state: { craft: CraftState | null }): Readonly<Record<string, number>> => state.craft?.stock ?? EMPTY_STOCK;
+
 interface CraftStore {
 	/** The last state the server sent; null until the overlay has asked */
 	craft: CraftState | null;

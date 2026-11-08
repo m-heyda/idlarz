@@ -4,14 +4,14 @@
 // The curve is written as ANCHORS like LEVELING (config/character.ts): the total crafting XP at which a level is reached. Between two
 // anchors every step to the next level is the one before times a constant ratio (see lib/crafting.ts). Retune the anchors, not the code.
 export const CRAFTING = {
-	maxLevel: 100,
+	maxLevel: 80,
 	firstStepXp: 20,
-	/** [level, total crafting XP needed to reach it], increasing, ending at maxLevel. Level 10 is ~250 minor potions' worth of XP. */
+	/** [level, total crafting XP needed to reach it], increasing, ending at maxLevel. Level 10 is ~1,250 minor potions' worth of XP (the curve was 5x faster in the first draft). */
 	anchors: [
-		[10, 1_500],
-		[30, 40_000],
-		[60, 1_000_000],
-		[100, 30_000_000],
+		[10, 7_500],
+		[30, 200_000],
+		[60, 5_000_000],
+		[80, 30_000_000],
 	] as readonly (readonly [number, number])[],
 	/** Most crafts one request may do (docs/plan/17-crafting.md section 5) */
 	maxCount: 10,

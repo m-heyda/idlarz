@@ -97,4 +97,22 @@ def bars():
     return img
 
 
-SPRITES = {'menu_settings': gear, 'menu_legacy': legacy, 'menu_main': journal, 'menu_stats': bars}
+# ----------------------------------------------------------------- crafting: a steel anvil with a gold-headed hammer on it
+def anvil():
+    sc = Scene(MATS, scale=12.0, origin=(20, 33))
+    A = lambda *a: sc.add(Prim(*a))
+    A('box', (0, 0, 0.12), (0.78, 0.5, 0.12), 'stone', I3, None, 1)                          # block it stands on
+    A('box', (0, 0, 0.42), (0.42, 0.34, 0.18), 'dark', I3, None, 2)                          # foot
+    A('box', (0, 0, 0.8), (0.28, 0.3, 0.2), 'steel', I3, None, 3)                            # waist
+    A('box', (0, 0, 1.2), (0.95, 0.4, 0.2), 'steel', I3, None, 4)                            # face
+    A('box', (1.12, 0, 1.28), (0.4, 0.26, 0.12), 'steel', I3, None, 5)                       # horn
+    A('box', (-0.9, 0, 1.2), (0.3, 0.38, 0.17), 'dark', I3, None, 6)                         # heel
+    A('box', (0.1, -0.41, 1.3), (0.7, 0.02, 0.05), 'cream')                                  # lit edge
+    A('box', (-0.15, -0.08, 1.7), (0.09, 0.09, 0.42), 'barn', rot(0, 24, 0), None, 7)        # hammer handle
+    A('box', (0.06, -0.08, 2.18), (0.34, 0.2, 0.17), 'gold', rot(0, 24, 0), None, 8)         # hammer head
+    img = sc.render()
+    fx.glint(img, 24, 9, 2)
+    return img
+
+
+SPRITES = {'menu_settings': gear, 'menu_legacy': legacy, 'menu_main': journal, 'menu_stats': bars, 'menu_crafting': anvil}

@@ -101,6 +101,7 @@ const WINDOW_BUTTONS: { id: WinId; label: string; icon: PixelIconName }[] = [
 	{ id: 'equipment', label: 'Equipment', icon: 'menu_character' },
 	{ id: 'merchant', label: 'Merchant', icon: 'menu_merchant' },
 	{ id: 'farm', label: 'Farm', icon: 'menu_farm' },
+	{ id: 'crafting', label: 'Crafting', icon: 'menu_crafting' },
 ];
 
 /** One button per window (the character screen is the avatar): each opens (or, when it is the front one, closes) its window; several can be open together. */

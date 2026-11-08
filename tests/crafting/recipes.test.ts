@@ -65,8 +65,8 @@ test('bad XP reads as level 1', () => {
 	for (const bad of [NaN, -5, -Infinity]) assert.deepEqual(craftLevelOf(bad), { level: 1, progress: 0 });
 });
 
-test('the greater potion unlocks after a few dozen crafts', () => {
-	assert.ok(craftCumulativeXp(RECIPE_BY_ID.potion_greater.unlock) <= 200);
+test('the greater potion unlocks after a few hundred crafts (slow XP, owner 2026-11-09)', () => {
+	assert.ok(craftCumulativeXp(RECIPE_BY_ID.potion_greater.unlock) <= 1_000);
 });
 
 test('craftNeeds scales with the count and craftBlock says why a craft cannot be done', () => {

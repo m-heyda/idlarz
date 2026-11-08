@@ -10,6 +10,7 @@ import StatisticsOverlay from './StatisticsOverlay';
 import MerchantOverlay from './Merchant/MerchantOverlay';
 import FarmOverlay from './FarmOverlay';
 import CraftingOverlay from './CraftingOverlay';
+import WindowErrorBoundary from '../WindowErrorBoundary';
 
 /**
  * Every game window, each open or not on its own: Equipment, Character, Merchant, Farm and the castle upgrade. They sit side by side,
@@ -31,27 +32,37 @@ const GameWindows: React.FC = () => {
 		<>
 			{open.includes('equipment') && (
 				<PixelWindow id='equipment' title='Equipment' icon={<PixelIcon name='menu_character' alt='' />} width={1040} height={720}>
-					<CharacterOverlay />
+					<WindowErrorBoundary name='Equipment'>
+						<CharacterOverlay />
+					</WindowErrorBoundary>
 				</PixelWindow>
 			)}
 			{open.includes('character') && (
 				<PixelWindow id='character' title='Character' icon={<PixelIcon name='menu_stats' alt='' />} width={1180}>
-					<StatisticsOverlay />
+					<WindowErrorBoundary name='Character'>
+						<StatisticsOverlay />
+					</WindowErrorBoundary>
 				</PixelWindow>
 			)}
 			{open.includes('merchant') && (
 				<PixelWindow id='merchant' title='Merchant' icon={<PixelIcon name='menu_merchant' alt='' />} width={980} height={720}>
-					<MerchantOverlay />
+					<WindowErrorBoundary name='Merchant'>
+						<MerchantOverlay />
+					</WindowErrorBoundary>
 				</PixelWindow>
 			)}
 			{open.includes('farm') && (
 				<PixelWindow id='farm' title='Farm' icon={<PixelIcon name='menu_farm' alt='' />} width={1120} height={760} flush>
-					<FarmOverlay />
+					<WindowErrorBoundary name='Farm'>
+						<FarmOverlay />
+					</WindowErrorBoundary>
 				</PixelWindow>
 			)}
 			{open.includes('crafting') && (
-				<PixelWindow id='crafting' title='Crafting' icon={<PixelIcon name='menu_merchant' alt='' />} width={760} height={620}>
-					<CraftingOverlay />
+				<PixelWindow id='crafting' title='Crafting' icon={<PixelIcon name='menu_crafting' alt='' />} width={760} height={620}>
+					<WindowErrorBoundary name='Crafting'>
+						<CraftingOverlay />
+					</WindowErrorBoundary>
 				</PixelWindow>
 			)}
 			{open.includes('castle') && <CastleUpgradeDialog />}

@@ -3,7 +3,7 @@ import { COMPONENTS, RECIPES, type Recipe } from '@/catalog/recipes';
 import { ITEM_CATALOG } from '@/catalog';
 import { CRAFTING } from '@/config/crafting';
 import { craftBlock, craftLevelOf, craftNeeds, craftXpToNext } from '@/lib/crafting';
-import { useCraftStore } from '@/stores/craftStore';
+import { selectStock, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber } from '@/utils/formatters';
@@ -16,7 +16,7 @@ const outputName = (recipe: Recipe) => ('item' in recipe.output ? ITEM_CATALOG[r
 /** One recipe: what it makes, what it costs for the chosen quantity (red = missing), its lock, and the craft button. */
 const RecipeRow: React.FC<{ recipe: Recipe; count: number; craftLevel: number }> = ({ recipe, count, craftLevel }) => {
 	const resources = useGameStore((state) => state.resources);
-	const stock = useCraftStore((state) => state.craft?.stock ?? {});
+	const stock = useCraftStore(selectStock);
 	const busy = useCraftStore((state) => state.busy);
 	const craftItem = useCraftStore((state) => state.craftItem);
 	const showToast = useUiStore((state) => state.showToast);
