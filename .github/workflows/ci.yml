@@ -40,7 +40,7 @@ jobs:
   # docs/generated must be exactly what it writes: a change to the game config or the sim that was not followed by `npm run docs:gen` fails
   # here. Then the sim baseline (docs/generated/sim-baseline.json) is compared with the copy on the branch the PR targets, so regenerating the
   # baseline cannot hide a pacing change: a guarded milestone (the first finish, the rebirths, castle 6/8/10, the level and tile ladders) that
-  # moved by more than 15 % fails the PR. An intended change carries the `pacing-change` label (then re-run the job): the guard still reports
+  # moved by more than 15 % or 5 game days fails the PR. An intended change carries the `pacing-change` label (then re-run the job): the guard still reports
   # but does not block (a broken baseline file still does).
   #
   # It takes about 9 minutes, so it only runs when it can matter: on a PR only if the diff touches what the docs are generated from (src,

@@ -25,6 +25,7 @@
 		"docs:gen": "npm run docs:gen:rest && npm run docs:gen:sim",
 		"docs:gen:rest": "npm run report && npm run stat-audit && npm run catalog-report && npm run fight-sim -- --md && npm run monster-ladder -- --md && npm run loot-sim -- --md && npm run kill-sim -- --md && npm run craft-sim -- --md",
 		"docs:gen:sim": "npm run sim",
+		"docs:check": "npm run docs:gen && git add -N docs/generated && git diff --exit-code docs/generated",
 		"format": "prettier --write .",
 		"format:check": "prettier --check ."
 	},

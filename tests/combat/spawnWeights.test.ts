@@ -1,14 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { api, freshGame, growTo } from './helpers';
-import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
-import { MONSTERS } from '../src/config/combatConfig';
-import { atItemLevel, simSetup, spentCharacter } from '../src/lib/fightSim';
-import { STRONG_KIT } from './builders';
-import { levelAtAge, maxLevelOf, rollSpawnLevel, spawnLevelRange } from '../src/lib/monsters';
-import { placeTickets } from '../src/lib/offline/placement';
-import { playerProfile } from '../src/lib/offline/profile';
-import { sealedRng } from '../src/lib/offline/seal';
+import { api, freshGame, growTo } from '../helpers';
+import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
+import { MONSTERS } from '../../src/config/combatConfig';
+import { atItemLevel, simSetup, spentCharacter } from '../../src/lib/fightSim';
+import { STRONG_KIT } from '../builders';
+import { levelAtAge, maxLevelOf, rollSpawnLevel, spawnLevelRange } from '../../src/lib/monsters';
+import { placeTickets } from '../../src/lib/offline/placement';
+import { playerProfile } from '../../src/lib/offline/profile';
+import { sealedRng } from '../../src/lib/offline/seal';
 import {
 	HOPELESS_WEIGHT,
 	TRIVIAL_WEIGHT,
@@ -20,10 +20,10 @@ import {
 	spawnWeight,
 	typeWeights,
 	winChanceAt,
-} from '../src/lib/offline/spawnWeights';
-import { emptyBank } from '../src/lib/offline/tickets';
-import type { PlayerProfile } from '../src/lib/offline/fightTypes';
-import type { MonsterType } from '../src/types/game';
+} from '../../src/lib/offline/spawnWeights';
+import { emptyBank } from '../../src/lib/offline/tickets';
+import type { PlayerProfile } from '../../src/lib/offline/fightTypes';
+import type { MonsterType } from '../../src/types/game';
 
 // Early-game spawns (IDL-215): the type of a new monster is weighted by how beatable it is for the player, and its level is capped.
 

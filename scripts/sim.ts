@@ -13,6 +13,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { getTile, isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
 import { mulberry32 } from '../src/lib/rng';
+import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/loadGame';
 
 // zustand's persist middleware needs *a* storage; the sim replaces it with a no-op one below
 (globalThis as unknown as { localStorage: unknown }).localStorage = {
@@ -20,52 +21,6 @@ import { mulberry32 } from '../src/lib/rng';
 	setItem: () => undefined,
 	removeItem: () => undefined,
 };
-
-/** The config and the game maths as one object each (the sim reads and overrides them by name; they are loaded late because the store needs the localStorage mock above). */
-type GameConfig = typeof import('../src/config/economy') &
-	typeof import('../src/config/resources') &
-	typeof import('../src/config/character') &
-	typeof import('../src/config/castle') &
-	typeof import('../src/config/biomes') &
-	typeof import('../src/config/buildings') &
-	typeof import('../src/config/merchant') &
-	typeof import('../src/config/farm') &
-	typeof import('../src/config/rebirth') &
-	typeof import('../src/config/spawns');
-type GameUtils = typeof import('../src/utils/game/castle') &
-	typeof import('../src/utils/game/character') &
-	typeof import('../src/utils/game/costs') &
-	typeof import('../src/utils/game/farm') &
-	typeof import('../src/utils/game/income') &
-	typeof import('../src/utils/game/merchant') &
-	typeof import('../src/utils/game/rebirth') &
-	typeof import('../src/utils/game/tiles');
-const loadConfig = async (): Promise<GameConfig> =>
-	Object.assign(
-		{},
-		await import('../src/config/economy'),
-		await import('../src/config/resources'),
-		await import('../src/config/character'),
-		await import('../src/config/castle'),
-		await import('../src/config/biomes'),
-		await import('../src/config/buildings'),
-		await import('../src/config/merchant'),
-		await import('../src/config/farm'),
-		await import('../src/config/rebirth'),
-		await import('../src/config/spawns'),
-	) as GameConfig;
-const loadUtils = async (): Promise<GameUtils> =>
-	Object.assign(
-		{},
-		await import('../src/utils/game/castle'),
-		await import('../src/utils/game/character'),
-		await import('../src/utils/game/costs'),
-		await import('../src/utils/game/farm'),
-		await import('../src/utils/game/income'),
-		await import('../src/utils/game/merchant'),
-		await import('../src/utils/game/rebirth'),
-		await import('../src/utils/game/tiles'),
-	) as GameUtils;
 
 const main = async () => {
 	const args = process.argv.slice(2);
@@ -800,13 +755,13 @@ function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[
 			}
 		}
 	}
-	const lines = ['', '## Magnitude targets (docs/06, IDL-128)', ''];
+	const lines = ['', '## Magnitude targets (docs/game/pacing-targets.md, IDL-128)', ''];
 	if (rows.length === 0) {
 		lines.push('No selected profile reached a checkpoint (castle 10 in run 1, a rebirth, lifetime Embers at rebirth 5 or 10).', '');
 		return { lines, warnings };
 	}
 	lines.push(
-		'Measured with the real store at the checkpoints of docs/06; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.',
+		'Measured with the real store at the checkpoints of docs/game/pacing-targets.md; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.',
 		'',
 	);
 	lines.push('| profile | checkpoint | measured | band | status |', '| --- | --- | --- | --- | --- |', ...rows, '');
