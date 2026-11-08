@@ -27,6 +27,7 @@ These documents describe the game **as the code behaves**. Numbers are traceable
 | [22-glossary-and-mastery.md](22-glossary-and-mastery.md) | *Draft.* Unknown monsters, glossary tabs, kill-count reveals, monster and resource mastery |
 | [23-reset-players-cli.md](23-reset-players-cli.md) | Operator CLI `npm run reset-players`: season restart that wipes progress but keeps names, classes and gems |
 | [29-e2e-test-account.md](29-e2e-test-account.md) | The one test account (`lepryko@gmail.com`) every browser test uses, how to run `npm run e2e` and clear the account with `npm run reset-test-account` |
+| [30-gem-sinks.md](30-gem-sinks.md) | *Draft.* What gems can be spent on: the Gem shop window, Cap Breaks, convenience, time savers, affix re-roll, prestige tail; the fair-play line; release slices G1-G5 |
 | [24-battle-queue.md](24-battle-queue.md) | *Built.* The server-owned battle queue: how it works and what is left |
 | [25-idle-game-research.md](25-idle-game-research.md) | *Research note.* Idle-game formulas, big numbers and offline progress compared with this game; ranked improvements |
 | [26-next-updates-plan.md](26-next-updates-plan.md) | *Proposal.* The order of the next updates: readable core, item assets, loot pools and variety, the rest of the monsters, then the rebirth world |
