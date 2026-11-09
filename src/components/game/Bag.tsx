@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { ITEM_CATALOG } from '@/catalog';
+import { hasEffects } from '@/catalog/buffs';
 import { gearOf, slotQty } from '@/lib/inventory';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
 import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
@@ -26,7 +27,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 	const activate = (index: number) => {
 		const slot = bag[index];
 		if (!slot) return;
-		if ('id' in slot && ITEM_CATALOG[slot.id]?.consumable) {
+		if ('id' in slot && hasEffects(ITEM_CATALOG[slot.id])) {
 			if (useGameStore.getState().playerHp >= useGameStore.getState().combat.maxHp && useGameStore.getState().combat.maxHp > 0)
 				onNotice('Already at full health');
 			else requestPotion(slot.id);
@@ -54,7 +55,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 			ui.showToast(gold > 0 ? `Sold ${n > 1 ? `${formatNumber(n)} x ` : ''}${name} for ${formatNumber(gold)} Gold` : 'Finish the fight first');
 		};
 		const items: ContextMenuItem[] = [
-			{ id: 'use', label: def.consumable ? 'Drink' : 'Equip', onSelect: () => activate(index) },
+			{ id: 'use', label: hasEffects(def) ? 'Drink' : 'Equip', onSelect: () => activate(index) },
 			{
 				id: 'sell',
 				label: `Sell${qty > 1 ? ' one' : ''}`,

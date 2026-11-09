@@ -1,4 +1,5 @@
 import { ITEM_CATALOG } from '@/catalog';
+import { healHpOf } from '@/catalog/buffs';
 import { COMBAT } from '@/config/combatConfig';
 import { levelAtAge, monsterDef, monsterStats } from '@/lib/monsters';
 import { pushEvent, type FightCtx } from '@/lib/offline/fightContext';
@@ -16,8 +17,8 @@ import type { MonsterType } from '@/types/game';
 export const potionsForEstimate = (inv: Inventory, c: CombatState): PotionStock[] =>
 	c.autoUse
 		? Object.keys(ITEM_CATALOG)
-				.filter((id) => ITEM_CATALOG[id].consumable?.healHp)
-				.map((id) => ({ healHp: ITEM_CATALOG[id].consumable!.healHp, count: bagCountOf(inv, id) }))
+				.filter((id) => healHpOf(ITEM_CATALOG[id]) > 0)
+				.map((id) => ({ healHp: healHpOf(ITEM_CATALOG[id]), count: bagCountOf(inv, id) }))
 		: [];
 
 /**

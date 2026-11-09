@@ -1,6 +1,7 @@
 import { SKILLS, type SkillId } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
+import { healHpOf } from '@/catalog/buffs';
 import { armorReduction, mitigate, swing } from '@/lib/combat';
 import { isBoss, monsterStats } from '@/lib/monsters';
 import { EPS, levelNow, maxHpNow, pushEvent, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
@@ -22,7 +23,7 @@ const tickCooldowns = (ctx: FightCtx, dt: number): void => {
 
 export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	const c = ctx.c;
-	const healHp = ITEM_CATALOG[id]?.consumable?.healHp;
+	const healHp = healHpOf(ITEM_CATALOG[id]);
 	if (!healHp || stockOf(ctx, id) < 1 || c.hp >= maxHpNow(ctx) - EPS) return false;
 	if (c.fight && c.cd.potion > 0) return false;
 	const healed = Math.min(healHp, maxHpNow(ctx) - c.hp);
@@ -68,10 +69,8 @@ export const autoUse = (ctx: FightCtx, t: number): void => {
 	const hpPct = (c.hp / maxHpNow(ctx)) * 100;
 	if (c.cd.potion <= 0 && hpPct < COMBAT.auto.potionBelowHpPct) {
 		const missing = maxHpNow(ctx) - c.hp;
-		const options = ctx.potionIds
-			.filter((id) => stockOf(ctx, id) > 0)
-			.sort((a, b) => ITEM_CATALOG[a].consumable!.healHp! - ITEM_CATALOG[b].consumable!.healHp!);
-		const fit = options.find((id) => ITEM_CATALOG[id].consumable!.healHp! >= missing) ?? options[options.length - 1];
+		const options = ctx.potionIds.filter((id) => stockOf(ctx, id) > 0).sort((a, b) => healHpOf(ITEM_CATALOG[a]) - healHpOf(ITEM_CATALOG[b]));
+		const fit = options.find((id) => healHpOf(ITEM_CATALOG[id]) >= missing) ?? options[options.length - 1];
 		if (fit) drink(ctx, t, fit);
 	}
 	if (hpPct < COMBAT.auto.healBelowHpPct) cast(ctx, t, 'heal');

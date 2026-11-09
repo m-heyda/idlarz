@@ -23,6 +23,7 @@ import { compareDetailed, primaryKeyOf, type DetailedComparison, type StatRow } 
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
 import type { Equipment, ItemInstance } from '@/types/game';
 import { formatCompact, formatNumber } from '@/utils/formatters';
+import { describeEffect, hasEffects } from '@/catalog/buffs';
 import ResourceIcon from './ResourceIcon';
 import { RARITY_COLOR } from './itemUi';
 
@@ -137,7 +138,11 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 			)}
 			{emptySlot && <div className='px-tip-muted text-xs mt-1'>Empty {EQUIPMENT_SLOT_LABEL[comparison!.slot]} slot</div>}
 
-			{def.consumable && <div className='px-tip-bullet px-diff-up'>Restores {formatCompact(def.consumable.healHp)} HP</div>}
+			{(def.effects ?? []).map((effect, i) => (
+				<div key={i} className='px-tip-bullet px-diff-up'>
+					{describeEffect(effect)}
+				</div>
+			))}
 			{/* base stats and affixes, grouped by what they are for: a long list is read by its colored headings */}
 			{STAT_CATEGORIES.map((category) => {
 				const catRows = rows.filter((row) => STAT_CATEGORY[row.key] === category.id);
@@ -157,7 +162,7 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 					</div>
 				);
 			})}
-			{!primary && rows.length === 0 && !def.consumable && <div className='px-tip-muted text-xs'>No stats</div>}
+			{!primary && rows.length === 0 && !hasEffects(def) && <div className='px-tip-muted text-xs'>No stats</div>}
 
 			{lost.length > 0 && (
 				<div className='px-tip-lost'>

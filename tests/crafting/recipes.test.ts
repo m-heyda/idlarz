@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COMPONENTS, RECIPES, RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { ITEM_CATALOG } from '../../src/catalog';
+import { healHpOf } from '../../src/catalog/buffs';
 import { RESOURCES } from '../../src/catalog/resources';
 import { CRAFTING } from '../../src/config/crafting';
 import { craftBlock, craftCumulativeXp, craftLevelOf, craftLimit, craftNeeds, craftXpToNext, maxCraftable, recipeCostGold } from '../../src/lib/crafting';
@@ -32,8 +33,8 @@ test('v0.1 uses potion, component and good recipes; potions are stackable consum
 		const def = ITEM_CATALOG[(r.output as { item: string }).item];
 		assert.equal(def.kind, 'consumable');
 		assert.ok((def.stackMax ?? 1) > 1);
-		if (r.kind === 'potion') assert.ok(def.consumable?.healHp);
-		else assert.equal(def.consumable, undefined, `${r.id}: a trade good has no effect`);
+		if (r.kind === 'potion') assert.ok(healHpOf(def) > 0);
+		else assert.equal(def.effects, undefined, `${r.id}: a trade good has no effect`);
 	}
 });
 

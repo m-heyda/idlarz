@@ -1,5 +1,6 @@
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
+import { healHpOf } from '@/catalog/buffs';
 import { autoBattleUnlocked } from '@/lib/combat';
 import { combatOf, EPS, type CombatEnv, type FightCtx } from '@/lib/offline/fightContext';
 import { engage, queueHasTarget } from '@/lib/offline/fightTargets';
@@ -74,7 +75,7 @@ export const runCombat = (
 		c,
 		ledger,
 		profileNow: playerProfile(env.stored.core),
-		potionIds: Object.keys(ITEM_CATALOG).filter((id) => ITEM_CATALOG[id].consumable?.healHp),
+		potionIds: Object.keys(ITEM_CATALOG).filter((id) => healHpOf(ITEM_CATALOG[id]) > 0),
 	};
 	let queued: QueueResult | undefined;
 	// auto-battle is locked until the first rebirth: a save that has it on from before (or a request for it) does not get it
