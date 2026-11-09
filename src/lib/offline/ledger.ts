@@ -3,7 +3,7 @@ import { STARTING_GEMS } from '@/config/economy';
 import type { CombatState } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
 import { emptyCraft } from '@/lib/crafting';
-import type { CraftState, Inventory } from '@/lib/offline/types';
+import type { CraftQueueEntry, CraftState, Inventory } from '@/lib/offline/types';
 import { emptyBank, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
 import type { Resources } from '@/types/game';
 
@@ -34,7 +34,7 @@ export const subtractTotals = (a: GrantTotals, b: GrantTotals): GrantTotals => {
 
 /** True for the state of a player who never crafted (stored as null, so the column stays empty for most rows). */
 export const isEmptyCraft = (c: CraftState): boolean =>
-	c.xp === 0 && c.ord === 0 && c.spent === 0 && Object.keys(c.stock).length === 0 && Object.keys(c.pity).length === 0;
+	c.xp === 0 && c.ord === 0 && c.spent === 0 && Object.keys(c.stock).length === 0 && Object.keys(c.pity).length === 0 && c.queue.length === 0;
 
 /** Reads the stored column back: a missing column, null or anything malformed reads as zeros. */
 export const craftFromJson = (raw: unknown): CraftState => {
@@ -47,7 +47,16 @@ export const craftFromJson = (raw: unknown): CraftState => {
 		if (typeof v === 'object' && v !== null && !Array.isArray(v)) for (const [k, x] of Object.entries(v)) if (n(x) > 0) res[k] = Math.floor(n(x));
 		return res;
 	};
-	return { xp: n(r.xp), ord: Math.floor(n(r.ord)), stock: counts(r.stock), pity: counts(r.pity), spent: n(r.spent), last: n(r.last) };
+	const queue: CraftQueueEntry[] = [];
+	if (Array.isArray(r.queue))
+		for (const e of r.queue as unknown[]) {
+			if (typeof e !== 'object' || e === null) continue;
+			const q = e as Record<string, unknown>;
+			const count = Math.floor(n(q.count));
+			if (typeof q.recipeId === 'string' && q.recipeId.length <= 40 && count > 0 && n(q.startedAt) > 0 && n(q.timeSec) > 0)
+				queue.push({ recipeId: q.recipeId, count, startedAt: n(q.startedAt), timeSec: n(q.timeSec) });
+		}
+	return { xp: n(r.xp), ord: Math.floor(n(r.ord)), stock: counts(r.stock), pity: counts(r.pity), spent: n(r.spent), last: n(r.last), queue };
 };
 
 export interface Ledger {

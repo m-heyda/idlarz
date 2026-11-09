@@ -1,3 +1,4 @@
+import type { MerchantResourceKey } from '@/catalog/resources';
 import type { OfflineGrant } from '@/lib/offline/grant';
 import type { BagSlot, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
 
@@ -121,16 +122,48 @@ export interface CraftState {
 	spent: number;
 	/** Epoch ms of the last craft that went through (the 1 request per second limit) */
 	last: number;
+	/** The timed batches that are running (docs/plan/crafting-v0.md, Timed batch queue); at most `craftQueueSlots` of them. Empty for most players. */
+	queue: CraftQueueEntry[];
+}
+
+/**
+ * One timed batch. Nothing is stored per item: the finished count is derived from the clock (`finishedOf`, lib/crafting.ts). A claim pays the
+ * finished ones and shortens the entry (count down, startedAt forward by the time those took), so the same four fields stay true.
+ */
+export interface CraftQueueEntry {
+	recipeId: string;
+	/** Crafts still in this batch (finished and waiting ones included) */
+	count: number;
+	/** Epoch ms the first of the remaining crafts started */
+	startedAt: number;
+	/** Seconds one craft takes, speed multiplier included, fixed when the batch was queued */
+	timeSec: number;
 }
 
 /** Why a craft was refused (nothing is charged and nothing is changed) */
-export type CraftRefusal = 'bad_request' | 'unknown_recipe' | 'not_craftable' | 'locked' | 'too_fast' | 'no_components' | 'stock_full' | 'bag_full';
+export type CraftRefusal =
+	| 'bad_request'
+	| 'unknown_recipe'
+	| 'not_craftable'
+	| 'locked'
+	| 'too_fast'
+	| 'no_components'
+	| 'stock_full'
+	| 'bag_full'
+	| 'queue_full'
+	| 'no_batch'
+	| 'nothing_ready';
 
 /** What /api/craft answers: whether it was done, why not, how many were made, and the bag and crafting state as they stand now. */
 export interface CraftReply {
 	ok: boolean;
 	reason?: CraftRefusal;
+	/** Crafts delivered by this request (instant crafts, or the claimed ones) */
 	crafted: number;
+	/** Crafts this request put into the queue */
+	queued?: number;
+	/** What a cancel gives back of the browser-held resources (the browser adds it) */
+	refund?: { key: MerchantResourceKey; qty: number }[];
 	inv: Inventory;
 	craft: CraftState;
 	serverNowSec: number;

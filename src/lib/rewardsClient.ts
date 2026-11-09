@@ -47,9 +47,15 @@ export const requestChest = (key: string, x: number, y: number): Promise<Reply<C
 /** One of the player's own changes to what they carry. The answer is the inventory as it stands, and the gold a sale paid. */
 export const requestInventory = (key: string, op: InventoryOp): Promise<Reply<InventoryReply>> => post<InventoryReply>('/api/inventory', { key, ...op });
 
-/** Crafts `count` of a recipe (1-10); count 0 only asks for the crafting state. The browser has paid the resources already. */
+/** Queues `count` crafts of a recipe as a timed batch (up to the batch cap; a recipe without a time is done at once); count 0 only asks for the crafting state. The browser has paid the resources already. */
 export const requestCraft = (key: string, recipeId: string, count: number): Promise<Reply<CraftReply>> =>
 	post<CraftReply>('/api/craft', { key, recipeId, count });
+
+/** Delivers the finished crafts of a batch (the bag, or the component stock) with their XP. */
+export const requestCraftClaim = (key: string, slot = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/claim', { key, slot });
+
+/** Ends a batch: the finished crafts are delivered, the unfinished ones refunded (the answer names the resources to give back). */
+export const requestCraftCancel = (key: string, slot = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/cancel', { key, slot });
 
 /** Asks the server to run the rebirth (it judges the last stored save, computes the Embers and wipes its bag and gear). One key per rebirth attempt. */
 export const requestRebirth = (key: string): Promise<Reply<RebirthReply>> => post<RebirthReply>('/api/rebirth', { key });

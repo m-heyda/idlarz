@@ -23,6 +23,14 @@ export const LIMITS = {
 	offlineEfficiency: 0.5,
 	/** Shorter absences pay nothing and show no welcome-back window (a reload, a lunch break) */
 	offlineMinGapSec: 300,
+	/** Crafts one request may queue or do at once (docs/plan/crafting-v0.md; the design goal is up to 1,000) */
+	craftBatchCap: 10,
+	/** Batches that can run side by side in the crafting queue */
+	craftQueueSlots: 1,
+	/** Hours a batch may run without a claim (it stops there and waits; the next claim restarts the clock) */
+	craftOfflineHours: 8,
+	/** Speed multiplier on the seconds one craft takes (2 = twice as fast) */
+	craftSpeed: 1,
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
@@ -37,4 +45,8 @@ export const HARD_LIMITS = {
 	battleQueue: 16,
 	offlineCapHours: 72,
 	offlineEfficiency: 1,
+	craftBatchCap: 1000,
+	craftQueueSlots: 5,
+	craftOfflineHours: 72,
+	craftSpeed: 4,
 } as const;

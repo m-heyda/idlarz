@@ -30,4 +30,31 @@ Reference recipe: Minor Healing Potion (5.1 gold per XP).
 | 80 | 29,999,957 | 4,999,993 | 152,499,787 |
 | 100 | 29,999,957 | 4,999,993 | 152,499,787 |
 
-Maximum level 80; at most 10 crafts per request.
+Maximum level 80; at most 10 crafts per batch (hard ceiling 1000).
+
+## Timed batches
+
+Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-v0.md, Timed batch queue). Per hour of a batch running without a pause. Gold burned is the gold value of the whole input chain (a potion includes its vial) at merchant prices.
+
+| Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch of the cap (minutes) | Batch of the hard ceiling (hours) |
+|---|---:|---:|---:|---:|---:|---:|
+| Glass Vial | 10 | 360 | 720 | 5,220 | 1.7 | 2.8 |
+| Minor Healing Potion | 14 | 257 | 1,543 | 7,843 | 2.3 | 3.9 |
+| Greater Healing Potion | 30 | 120 | 3,000 | 16,860 | 5 | 8.3 |
+
+## Hours per level
+
+Crafting nonstop, always the recipe with the most XP per hour among those unlocked. A level also needs the materials; the gold burned is what that costs at merchant prices.
+
+| Reached level | Hours for this level | Hours in total | Gold burned in total | Recipe used |
+|---:|---:|---:|---:|---|
+| 2 | 0.0 | 0 | 102 | Minor Healing Potion |
+| 5 | 0.1 | 0.2 | 1,378 | Minor Healing Potion |
+| 10 | 1.2 | 2.6 | 41,982 | Greater Healing Potion |
+| 20 | 2.8 | 22 | 369,999 | Greater Healing Potion |
+| 30 | 6.3 | 66.7 | 1,123,770 | Greater Healing Potion |
+| 45 | 33.1 | 323.1 | 5,445,713 | Greater Healing Potion |
+| 60 | 173.6 | 1666.7 | 28,099,675 | Greater Healing Potion |
+| 80 | 773.4 | 10000.1 | 168,599,613 | Greater Healing Potion |
+
+Crafting nonstop, level 80 would take about 10,000 hours of batches; the materials, not the clock, are the limit long before that.

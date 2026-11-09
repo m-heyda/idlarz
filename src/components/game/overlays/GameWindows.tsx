@@ -59,7 +59,7 @@ const GameWindows: React.FC = () => {
 				</PixelWindow>
 			)}
 			{open.includes('crafting') && (
-				<PixelWindow id='crafting' title='Crafting' icon={<PixelIcon name='menu_crafting' alt='' />} width={760} height={620}>
+				<PixelWindow id='crafting' title='Crafting' icon={<PixelIcon name='menu_crafting' alt='' />} width={860} height={560}>
 					<WindowErrorBoundary name='Crafting'>
 						<CraftingOverlay />
 					</WindowErrorBoundary>
