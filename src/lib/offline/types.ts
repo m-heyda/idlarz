@@ -1,4 +1,5 @@
 import type { MerchantResourceKey } from '@/catalog/resources';
+import type { ActiveBuff } from '@/lib/buffs';
 import type { OfflineGrant } from '@/lib/offline/grant';
 import type { BagSlot, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
 
@@ -31,7 +32,9 @@ export type InventoryOp =
 	| { action: 'sellJunk'; maxRarity: string }
 	| { action: 'autoSell'; rarity: string | null }
 	| { action: 'buyShop'; id: string; qty: number }
-	| { action: 'buyOffer'; item: ItemInstance };
+	| { action: 'buyOffer'; item: ItemInstance }
+	/** Drinks one potion from the bag slot `index` (instant effects fill HP and mana, a buff is recorded with an end time) */
+	| { action: 'use'; index: number };
 
 /**
  * The waiting chests and monsters as the client needs to see them. A monster is listed once the server has given it a tile: `x`, `y` and
@@ -103,6 +106,10 @@ export interface InventoryReply {
 	/** The player's things as they stand now (always sent: the answer to an operation is the new truth) */
 	inv: Inventory;
 	serverNowSec: number;
+	/** Why a refused operation was refused, when the player should be told (a `use` that did nothing, a sixth buff) */
+	message?: string;
+	/** The running buffs after a `use` (only on that operation) */
+	buffs?: ActiveBuff[];
 }
 
 /**

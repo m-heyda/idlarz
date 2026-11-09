@@ -1,5 +1,6 @@
 import { zeroResources } from '@/catalog/resourceKeys';
 import { STARTING_GEMS } from '@/config/economy';
+import type { ActiveBuff } from '@/lib/buffs';
 import type { CombatState } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
 import { emptyCraft } from '@/lib/crafting';
@@ -103,6 +104,8 @@ export interface Ledger {
 	inv: Inventory | null;
 	/** Crafting: level XP, craft counter, component stock (migration crafting_ledger; zeros for a row without the column) */
 	craft: CraftState;
+	/** The potion buffs running (migration player_ledger_buffs): family, stat, percent and the second each ends; an empty list is stored as null */
+	buffs: ActiveBuff[];
 }
 
 export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
@@ -122,6 +125,7 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	combat: null,
 	inv: null,
 	craft: emptyCraft(),
+	buffs: [],
 });
 
 /**

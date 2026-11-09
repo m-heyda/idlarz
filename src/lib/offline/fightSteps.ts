@@ -1,10 +1,10 @@
 import { SKILLS, type SkillId } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
-import { healHpOf } from '@/catalog/buffs';
+import { quickHealOf } from '@/catalog/buffs';
 import { armorReduction, mitigate, swing } from '@/lib/combat';
 import { isBoss, monsterStats } from '@/lib/monsters';
-import { EPS, levelNow, maxHpNow, pushEvent, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
+import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
 import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { engageTicket, queueTicket, restFor, unqueueTicket } from '@/lib/offline/fightTargets';
 import { takeOne } from '@/lib/offline/inventory';
@@ -23,7 +23,7 @@ const tickCooldowns = (ctx: FightCtx, dt: number): void => {
 
 export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	const c = ctx.c;
-	const healHp = healHpOf(ITEM_CATALOG[id]);
+	const healHp = quickHealOf(ITEM_CATALOG[id]);
 	if (!healHp || stockOf(ctx, id) < 1 || c.hp >= maxHpNow(ctx) - EPS) return false;
 	if (c.fight && c.cd.potion > 0) return false;
 	const healed = Math.min(healHp, maxHpNow(ctx) - c.hp);
@@ -69,8 +69,8 @@ export const autoUse = (ctx: FightCtx, t: number): void => {
 	const hpPct = (c.hp / maxHpNow(ctx)) * 100;
 	if (c.cd.potion <= 0 && hpPct < COMBAT.auto.potionBelowHpPct) {
 		const missing = maxHpNow(ctx) - c.hp;
-		const options = ctx.potionIds.filter((id) => stockOf(ctx, id) > 0).sort((a, b) => healHpOf(ITEM_CATALOG[a]) - healHpOf(ITEM_CATALOG[b]));
-		const fit = options.find((id) => healHpOf(ITEM_CATALOG[id]) >= missing) ?? options[options.length - 1];
+		const options = ctx.potionIds.filter((id) => stockOf(ctx, id) > 0).sort((a, b) => quickHealOf(ITEM_CATALOG[a]) - quickHealOf(ITEM_CATALOG[b]));
+		const fit = options.find((id) => quickHealOf(ITEM_CATALOG[id]) >= missing) ?? options[options.length - 1];
 		if (fit) drink(ctx, t, fit);
 	}
 	if (hpPct < COMBAT.auto.healBelowHpPct) cast(ctx, t, 'heal');
@@ -109,7 +109,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	const p = f.profile;
 	const monster = monsterStats(f.type, f.level);
 	f.elapsed += dt;
-	c.hp = Math.min(p.maxHp, c.hp + p.hpRegen * dt);
+	c.hp = Math.min(p.maxHp, c.hp + p.hpRegen * dt + regenGain(c, t - dt, dt));
 	c.mp = Math.min(p.maxMp, c.mp + p.mpRegen * dt);
 	tickCooldowns(ctx, dt);
 	if (f.timeLeftSec !== null) f.timeLeftSec = Math.max(0, f.timeLeftSec - dt);
@@ -178,7 +178,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 export const idleStep = (ctx: FightCtx, t: number, now: number): number => {
 	const { c, profileNow } = ctx;
 	const dt = restFor(ctx, t, now);
-	c.hp = Math.min(profileNow.maxHp, c.hp + (COMBAT.regenPerSec + profileNow.hpRegen) * dt);
+	c.hp = Math.min(profileNow.maxHp, c.hp + (COMBAT.regenPerSec + profileNow.hpRegen) * dt + regenGain(c, t, dt));
 	c.mp = Math.min(profileNow.maxMp, c.mp + profileNow.mpRegen * dt);
 	tickCooldowns(ctx, dt);
 	return dt;

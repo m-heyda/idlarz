@@ -1,3 +1,6 @@
+import type { BuffStat } from '@/catalog/buffs';
+import { buffTotals, type ActiveBuff } from '@/lib/buffs';
+import { COMBAT } from '@/config/combatConfig';
 import { isRecord } from '@/lib/isRecord';
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { aggregateStats } from '@/lib/inventory';
@@ -78,6 +81,35 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		heal: healAmount(stats, equipment),
 	};
 };
+
+/**
+ * A profile with the running potion buffs on top ({@link buffTotals}): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object),
+ * so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.
+ *
+ * @category Combat/Consumables
+ * @formula
+ * hit' = hit x (1 + damagePct/100)         attacksPerSec' = attacksPerSec x (1 + atkSpeedPct/100)
+ * armor' = armor x (1 + armorPct/100)       maxHp' = maxHp x (1 + maxHpPct/100)
+ * crit' = min(maxCritChance, crit + critChance/100)       dodge' = min(maxDodge, dodge + dodge/100)
+ * @order 8
+ */
+export const withBuffs = (profile: PlayerProfile, totals: Partial<Record<BuffStat, number>>): PlayerProfile => {
+	if (Object.values(totals).every((value) => !value)) return profile;
+	const pct = (stat: BuffStat) => 1 + (totals[stat] ?? 0) / 100;
+	return {
+		...profile,
+		hit: profile.hit * pct('damagePct'),
+		attacksPerSec: profile.attacksPerSec * pct('atkSpeedPct'),
+		armor: profile.armor * pct('armorPct'),
+		maxHp: Math.round(profile.maxHp * pct('maxHpPct')),
+		crit: Math.min(COMBAT.crit.maxCritChance / 100, profile.crit + (totals.critChance ?? 0) / 100),
+		dodge: Math.min(COMBAT.maxDodge / 100, profile.dodge + (totals.dodge ?? 0) / 100),
+	};
+};
+
+/** The player's profile at `nowSec` with the buffs that are running then. */
+export const profileWithBuffs = (core: Core, buffs: readonly ActiveBuff[], nowSec: number): PlayerProfile =>
+	withBuffs(playerProfile(core), buffTotals(buffs, nowSec));
 
 /** The HP and mana the save says the player has: where a new combat record starts. */
 export const savedVitals = (core: Core): { hp: number; mp: number } => {

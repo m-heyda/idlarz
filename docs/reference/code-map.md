@@ -141,6 +141,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The 6x6 bag.
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
+- [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
 - [`BuildDialog.tsx`](../../src/components/game/BuildDialog.tsx) — ~ The build dialog of one explored tile, opened from its right-click menu ("Build here").
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
 - [`CastleFortress.tsx`](../../src/components/game/CastleFortress.tsx) — ~ The castle's fortress (castle level 7+):
@@ -349,6 +350,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/lib/offline/**
 
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
+- [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 - [`craft.ts`](../../src/lib/offline/craft.ts) — ~ Crafts delivered (instant crafts, or claimed)
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
@@ -569,6 +571,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`skills.test.ts`](../../tests/combat/skills.test.ts)
 - [`spawnWeights.test.ts`](../../tests/combat/spawnWeights.test.ts) — ~ A hero nothing on the map can hurt:
 - [`stats.test.ts`](../../tests/combat/stats.test.ts)
+- [`useOp.test.ts`](../../tests/combat/useOp.test.ts)
 - [`winChance.test.ts`](../../tests/combat/winChance.test.ts)
 - [`xpModel.test.ts`](../../tests/combat/xpModel.test.ts) — ~ A summary of a character that bought `purchased` tiles and holds `xp`, `playSeconds` into the game.
 
@@ -698,6 +701,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
 - [`inventory_ledger.sql`](../../supabase/migrations/inventory_ledger.sql)
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
+- [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
 - [`rebirth_history.sql`](../../supabase/migrations/rebirth_history.sql)
 - [`season_reset.sql`](../../supabase/migrations/season_reset.sql)
 

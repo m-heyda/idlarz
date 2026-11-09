@@ -8,6 +8,7 @@ import { equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, st
 import { sellValueOf } from '@/lib/itemInstance';
 import { isAutoSold } from '@/lib/loot';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
+import { hasEffects } from '@/catalog/buffs';
 import type { EquipmentSlot } from '@/types/game';
 import { ratesWithGear, type GameGet, type GameSet } from './base';
 import type { InventorySync } from './inventorySync';
@@ -18,6 +19,16 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 	return {
 		/** Takes the inventory a server answer carries (a craft puts a potion in the bag) unless it is older than the one held */
 		applyServerInventory: inv.applyInventory,
+
+		// Drinks the potion in a bag slot: the server takes it from the bag, fills HP / mana and records the buff in one step, so nothing is previewed
+		// (a refusal, such as the sixth buff, leaves the bag as it is and says why in a toast)
+		drinkBagItem: (bagIndex: number) => {
+			const slot = Number.isInteger(bagIndex) ? get().bag[bagIndex] : null;
+			const stack = slot ? stackOf(slot) : null;
+			if (!stack || !hasEffects(ITEM_CATALOG[stack.id])) return false;
+			sendInventoryOp({ action: 'use', index: bagIndex });
+			return true;
+		},
 
 		// Gear actions: refused while a fight is open; max HP can drop when gear comes off, so playerHp follows it down
 		equipItem: (bagIndex: number) => {

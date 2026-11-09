@@ -1,3 +1,4 @@
+import type { ActiveBuff } from '@/lib/buffs';
 import type { SkillId } from '@/catalog/skills';
 import type { Drop, MonsterType } from '@/types/game';
 
@@ -112,6 +113,8 @@ export interface CombatState {
 	/** Potions drunk this run by id, and how many of those the last accepted save already knew about */
 	/** Ticket numbers of the monsters waiting to be fought after the open fight, in the order clicked (docs/reference/combat.md). Rows from before have none: read it as empty. */
 	queue: number[];
+	/** A heal over time from a potion (`regen` effect): HP per second until the second `untilSec` (absent: none) */
+	regen?: { hpPerSec: number; untilSec: number };
 	/** Number of the last event, and the most recent ones */
 	eventNo: number;
 	log: FightEvent[];
@@ -189,4 +192,6 @@ export interface CombatView {
 	restSec?: number;
 	/** Why auto-battle is idle although monsters wait: none of them looks winnable (see offline/winChance.ts); a click fights one anyway */
 	autoNote?: 'no_winnable' | null;
+	/** The potion buffs running at `at` (left out when none) */
+	buffs?: ActiveBuff[];
 }

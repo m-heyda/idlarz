@@ -251,6 +251,8 @@ export interface CombatClientState {
 	restSec: number;
 	/** When that rest is over by this browser's clock (epoch ms), for the countdown; null when no rest is going on */
 	restEndsAt: number | null;
+	/** The potion buffs running at `at` (the server's list: family, stat, percent, second it ends) */
+	buffs: import('@/lib/buffs').ActiveBuff[];
 }
 
 export interface TileProps {
@@ -436,4 +438,5 @@ export interface GameState {
 	moveBagItem: (from: number, to: number) => boolean;
 	organizeBag: () => boolean;
 	applyServerInventory: (inv: import('@/lib/offline/types').Inventory | undefined) => void;
+	drinkBagItem: (bagIndex: number) => boolean;
 }
