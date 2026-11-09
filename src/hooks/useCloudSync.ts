@@ -7,13 +7,16 @@ import { adoptOwnSave, pushCloud, readLink, recordAttempt, writeAttempts, writeL
 import { onSaveEvent } from '@/lib/saveEvents';
 import { createSyncScheduler, type PushOutcome, type PushReason } from '@/lib/syncPolicy';
 import { registerCloudSaver } from '@/lib/manualCloudSave';
+import { writeEntered } from '@/lib/authClient';
+import { cloudSaveGone } from '@/lib/startPlan';
 
 /**
  * Copies the game to the signed-in account's cloud save (cadence and limits: syncPolicy.ts): shortly after the game starts,
  * soon after a milestone (purchase, castle upgrade, rebirth, level up), every 5 min while idle, and when the tab is hidden
  * or closed, and on demand from the menu's "Save game" (registered below, at most once per 10 min, lib/manualCloudSave.ts). The local save
  * stays the primary copy; a failed upload is retried with backoff.
- * Stops for the session when the account's save moved on elsewhere (409), the server refuses this save, or the login is gone.
+ * Stops for the session when the account's save moved on elsewhere (409), the server refuses this save, or the login is gone. A 409 that
+ * reports revision 0 means the account has no save at all (reset): the link is dropped and the page reloads so the start check begins a new game.
  */
 export const useCloudSync = (userId: string, active: boolean) => {
 	useEffect(() => {
@@ -49,6 +52,15 @@ export const useCloudSync = (userId: string, active: boolean) => {
 					writeAttempts([]);
 					return 'ok';
 				case 'conflict':
+					if (cloudSaveGone(result.rev)) {
+						// the account has no save at all (a season reset or New Game removed it): this browser's link is stale, so the start check runs again
+						useUiStore.getState().showToast('Your account was reset. Reloading to start a new game.');
+						writeLink(null);
+						writeAttempts([]);
+						writeEntered(null);
+						window.location.reload();
+						return 'stop';
+					}
 					useUiStore.getState().showToast('Your account has a newer save from another browser. Reload to choose.');
 					return 'stop';
 				case 'rejected':
