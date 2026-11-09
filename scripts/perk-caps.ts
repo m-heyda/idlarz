@@ -114,13 +114,15 @@ for (const f of FAMILIES) {
 out();
 out('#### Damage: what a stronger weapon legendary does to S2 / S3 (13 pieces plus the weapon)');
 out();
+const WEAPON_CAPS = [tight.damagePct, 50, 55];
 out(
-	`| Weapon legendary damage | ${['ashen_warlord', 'blightbound'].map((id) => `${SET_DEFS.find((s) => s.id === id)!.label} total`).join(' | ')} | Tight cap |`,
+	`| Weapon legendary damage | ${['ashen_warlord', 'blightbound'].map((id) => `${SET_DEFS.find((s) => s.id === id)!.label} total`).join(' | ')} | Cut at cap ${WEAPON_CAPS.join(' / ')} (S2, S3) |`,
 );
 out('|---|---|---|---|');
-for (const top of [TIERS.damagePct.top, 12, 15, 20]) {
+for (const top of [TIERS.damagePct.top, 15, 20, 25]) {
 	const totals = ['ashen_warlord', 'blightbound'].map((id) => setValue(id, withLegendary(id), 'damagePct') + top);
-	out(`| +${top} | ${totals.map((t) => `${t}${t > tight.damagePct ? ` > (cut ${t - tight.damagePct})` : ''}`).join(' | ')} | ${tight.damagePct} |`);
+	const cuts = totals.map((t) => WEAPON_CAPS.map((cap) => Math.max(0, t - cap)).join('/'));
+	out(`| +${top} | ${totals.join(' | ')} | ${cuts.join(', ')} |`);
 }
 
 // ---- 5. damage in the real fight engine --------------------------------------------------------------------------------------------

@@ -99,12 +99,12 @@ Set only = the live bonuses at the full piece count. Set + legendary adds the To
 
 #### Damage: what a stronger weapon legendary does to S2 / S3 (13 pieces plus the weapon)
 
-| Weapon legendary damage | Ashen Warlord total | Blightbound total | Tight cap |
+| Weapon legendary damage | Ashen Warlord total | Blightbound total | Cut at cap 45 / 50 / 55 (S2, S3) |
 |---|---|---|---|
-| +10 | 38 | 40 | 45 |
-| +12 | 40 | 42 | 45 |
-| +15 | 43 | 45 | 45 |
-| +20 | 48 > (cut 3) | 50 > (cut 5) | 45 |
+| +10 | 38 | 40 | 0/0/0, 0/0/0 |
+| +15 | 43 | 45 | 0/0/0, 0/0/0 |
+| +20 | 48 | 50 | 3/0/0, 5/0/0 |
+| +25 | 53 | 55 | 8/3/0, 10/5/0 |
 
 #### Damage against the fight engine
 
@@ -160,7 +160,7 @@ Live fact: no boss can stand farther than 9 tiles from the castle, the outskirts
 ## Recommendation
 
 - Set the caps to **income 50, XP 50, kill reward 60, click 40, damage 45**.
-- **Damage and weapon legendaries (owner wants them a little OP):** keep the cap at 45 and do not lower it. Give *weapon* legendaries a larger top damage tier than the 10 of other slots. The weapon table shows +15 puts S2 at 43 and S3 at 45, exactly on the cap, so a weapon legendary is the strongest single item and a second damage perk is the only thing that gets cut. Going above 15 (20 cuts 5 points on S3) wastes points under this cap; if weapons should go higher, raise the cap with them (for example 50).
+- **Damage and weapon legendaries (owner: higher than +15, a little OP):** set weapon legendaries to a **top damage tier of +20** (other slots stay +10) and raise the damage cap from 45 to **50**. The weapon table shows S2 at 48 and S3 at 50 with a +20 weapon: the best set plus the best weapon sits exactly on the cap, nothing is wasted, and only a second damage perk is cut. At cap 45 the same weapon would waste 3 and 5 points. +25 would need cap 55 to waste nothing. This changes the decided damage cap (45), so it needs your explicit yes.
 - The 14th-piece loss stays as designed; no code change is needed for it.
 
 ## IDL-222: boss band (waiting)
