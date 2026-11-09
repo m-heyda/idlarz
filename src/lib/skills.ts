@@ -8,7 +8,14 @@ import type { CharacterStats, Equipment } from '@/types/game';
 
 export const isSkillId = (value: unknown): value is SkillId => typeof value === 'string' && Object.hasOwn(SKILLS, value);
 
-/** HP a Heal restores: its share of max HP, times the Intelligence bonus (the same one magic weapons get) and the gear's Spell Power. */
+/**
+ * HP a Heal restores: its share of max HP, times the Intelligence bonus (the same one magic weapons get) and the gear's Spell Power.
+ *
+ * @category Combat/Potions and skills
+ * @order 2
+ * @formula
+ * heal = 25% of max HP x (1 + magic damage% / 100) x (1 + Spell Power / 100)
+ */
 export const healAmount = (characterStats: CharacterStats, equipment: Equipment, skill: SkillDef = SKILLS.heal): number => {
 	const base = maxHp(characterStats, equipment) * (skill.healFraction ?? 0);
 	const attributes: Attributes = characterStats;

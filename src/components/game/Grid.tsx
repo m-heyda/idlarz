@@ -1,3 +1,26 @@
+/**
+ * Rendering notes.
+ *
+ * - `Grid` mounts only the tiles that matter on screen: explored tiles and the unexplored ones touching them (what can be bought), inside the visible range plus two tiles. The list is rebuilt when that integer range or the map changes, not on every pixel of panning.
+ *   The pan / zoom position lives in `viewStore`; fling inertia keeps its velocity in a ref with friction (no per-frame React state). The world div is a zero-size origin placed with `translate() scale()`; everything inside is positioned in world pixels, negative ones included.
+ * - **Wheel zoom** is stepped (0.75 / 1 / 1.5 / 2, one step per 50 px of wheel delta) so the pixel art stays crisp and zooms around the cursor. The zoom is exposed to CSS as `--map-zoom`; tile tooltips scale with it, castle/building dialogs do not.
+ * - **Terrain**: the ground is drawn in **chunks** of 16 x 16 tiles (768 px, `CHUNK_TILES`), one `<canvas>` each (`TerrainLayer` / `TerrainChunk`), only for the chunks on screen plus a ring around them, by `terrainRenderer.ts` from the atlas in `public/pixel/terrain/`
+ *   + `src/config/terrainAtlas.json`. A chunk's picture depends only on the ground inside the chunk plus `CHUNK_HALO` (5) tiles, so its `chunkSignature` (one character per tile of that window, building tiles upper case) decides when it is redrawn: a purchase redraws
+ *   the chunks next to it, never pan, zoom or a chest toggle. Draws are queued and run within a 6 ms frame budget (at least one chunk per frame); flat colours show first and until the atlas loads. Tiles are transparent hit areas that carry the castle, buildings,
+ *   chest, '?' marker and hover overlays. Buyable unexplored tiles are drawn as the dark 'mist' sea. `tests/world/terrainChunks.test.ts` checks the halo is enough, that equal signatures mean equal pictures, and that nothing is cut at a border.
+ * - **Highlight**: the tile menu's "Highlight this ... area" tints the connected same-biome area (`connectedCluster`, an iterative flood fill) with the biome's colour from `biomePalette.ts` for 3 s, drawn by `HighlightLayer` as one screen-space canvas.
+ * - **Minimap**: `Minimap` paints one square per explored tile in its biome colour into one `ImageData` (`src/lib/minimap.ts`, repainted at most every 200 ms), a gold marker on the castle, purple ones on workshops, and outlines the visible part.
+ *   Click or drag centres the view there; it is outside the map's click area, so it never pays gold.
+ * - **Buildings** keep their tile's own ground and get a pad of that biome (`allPads()` in `terrain.ts`, art in `terrain_pads.py`); the same rule is ported to `terrain_logic.py` and covered by the parity fixture.
+ * - Tile tooltips are portalled into `MapTipLayer`, a layer above the critters, because every tile is its own stacking context. `NotifyDot` is the one "needs attention" marker (unspent stat points, an affordable farm animal or upgrade).
+ * - A `Tile` reads only primitives from the store and takes `canAfford` from `Grid`, which works the price of the next tile out once for all of them; unchanged tiles are skipped by `React.memo`, so panning mounts only the tiles that enter the view.
+ * - `AmbientLife` spawns a critter every few seconds on an owned tile in view; they are purely decorative (no clicks, no rewards) and off when disabled in Settings, when the tab is hidden, and with `prefers-reduced-motion`.
+ * - Tutorial, stat tooltips and cost lists are generated from config constants, so they cannot drift from the rules. Font: Mozilla Headline (self-hosted, `--font-pixel`).
+ *
+ * @title Rendering the map
+ * @category Architecture/Rendering
+ * @order 1
+ */
 import React, { useRef, useEffect, useState, useCallback, useMemo, JSX } from 'react';
 import { CASTLE_FORTRESS, CASTLE_RANGE } from '@/config/castle';
 import { TILE_SIZE } from '@/config/biomes';

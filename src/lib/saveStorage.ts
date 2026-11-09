@@ -64,6 +64,14 @@ interface Options {
 	queryPersisted?: () => Promise<boolean | null>;
 }
 
+/**
+ * Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`). Written 2 s after a change (`FLUSH_DELAY_MS`)
+ * and on hide/close; the backup rotates every 10 minutes. A read goes through `sanitizeSave`; if `current` is refused the game starts from `backup`, keeps the bad text as `damaged`, then falls back to a new game.
+ * One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
+ *
+ * @category Saves & Server/The save
+ * @order 2
+ */
 export const createSaveStorage = (options: Options) => {
 	const { kv } = options;
 	const now = options.now ?? Date.now;

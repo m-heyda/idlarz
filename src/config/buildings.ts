@@ -28,6 +28,15 @@ interface Building {
 }
 
 // Buildings configuration
+/**
+ * Buildings: one per tile, on any owned tile that is not the castle, a lake or empty (`BUILDING_COST.blockedBiomes`), not inside a landmark area, not under a monster or chest.
+ * A building's output is added to the tile's own output (same 1.3 scale and neighbour bonus). 16 types, config output per second:
+ *
+ * @category Economy/Buildings
+ * @order 1
+ * @table buildings-output
+ * @see BUILDING_COST, buildingCostFactor
+ */
 export const BUILDINGS: Record<BuildingType, Building> = {
 	farm: {
 		name: 'farm',
@@ -93,6 +102,12 @@ export const BUILDINGS: Record<BuildingType, Building> = {
 // Buildings stand on any explored tile (not the castle or a lake) and cost resources; every building costs more than the last.
 // The first few are cheap (`starter` = share of `base` for building 1, 2, 3 ...), then the price grows in three stages the way
 // tile prices do: steeply for the next `earlyCount` buildings, gentler for `midCount` more, gentler again after that.
+/**
+ * The building price constants: base cost 500 gold / 250 wood / 150 stone, the four cheap starter steps, the three growth stages (1.15 for 12 buildings, 1.09 for 16, 1.025 after) and the biomes a building cannot stand on.
+ *
+ * @category Economy/Buildings
+ * @order 4
+ */
 export const BUILDING_COST = {
 	base: { gold: 500, wood: 250, stone: 150 } as Partial<Resources>,
 	starter: [0.4, 0.6, 0.8, 1] as number[],

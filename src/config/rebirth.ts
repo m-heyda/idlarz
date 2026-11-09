@@ -3,6 +3,22 @@
 import { Resources } from '@/types/game';
 
 // Rebirth: restart with a permanent bonus paid in Embers. Available once the castle reaches `minCastleLevel`.
+/**
+ * Rebirth: restart with a permanent bonus paid in Embers. The rules live in `REBIRTH` and are checked by {@link rebirthStatus}, the one function the button, the dialog, the store and the server share.
+ *
+ * - **Requirements**: castle level >= 6 (`minCastleLevel`), economy tile count >= `400 + 50 x rebirths already done` (`minTiles`, `tilesPerRebirth`), no castle upgrade running, and at least 1 Ember of gain.
+ * - **Embers gained**: see {@link emberGain}. **Income bonus**: see {@link emberIncomeBonus}.
+ * - **What resets** (`rebirth` in `src/stores/game/rebirthSlice.ts`): map (new start ring), resources, castle, animals, buildings, chests, monsters and any open fight, click level, farm upgrades, all merchant upgrades except Pack Rat,
+ *   the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept), loot pity, attributes (all points are handed back to spend again), HP and mana refilled.
+ * - **What is kept**: name, class, play time, gems, all Embers and shop levels, lifetime XP and level, the auto-sell setting, the merchant's shelf with its rotation clock and the refresh count (a rebirth is no free reshuffle).
+ * - The server runs the rebirth first (`POST /api/rebirth`): it checks the stored save, wipes the ledger's inventory to the starter kit and pays at most its own computed gain; the browser takes the lower number.
+ * - Auto-battle unlocks after the first rebirth (`COMBAT.auto.minRebirths`).
+ *
+ * @category Progression/Rebirth
+ * @order 1
+ * @see rebirthStatus, emberGain
+ * @knownissue IDL-223 the gear wipe on rebirth is live without a crafting sink (RELEASE-PLAN P11); needs an owner decision.
+ */
 export const REBIRTH = {
 	minCastleLevel: 6,
 	minTiles: 400, // the first rebirth also needs this much territory (300+ tiles come before castle level 6, so it has to be more than that)
@@ -31,6 +47,14 @@ export const REBIRTH = {
 
 // The Ember shop: permanent upgrades bought with unspent Embers. The N+1-th level costs
 // ceil(baseCost x costGrowth^N) points.
+/**
+ * The Ember shop: level N+1 costs `ceil(baseCost x 1.4^N)` Embers ({@link emberUpgradeCost}); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers.
+ * The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
+ *
+ * @category Progression/Ember shop
+ * @order 1
+ * @table ember-shop
+ */
 export const EMBER_UPGRADES = {
 	thrift: {
 		label: 'Thrift',

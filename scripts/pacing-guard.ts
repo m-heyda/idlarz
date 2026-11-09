@@ -1,3 +1,19 @@
+/**
+ * The pacing guard, and how CI generates the docs.
+ *
+ * `npm run sim` writes `docs/generated/sim-baseline.json`; CI (job `generated`) runs this script, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than +-15 % **or by more than 5 game days**
+ * (`PACING_MAX_DRIFT_DAYS` in `scripts/pacingCompare.ts`; without it a milestone at day 220 could drift for a month inside 15 %). The job log starts with a table per profile (guarded milestones, how many moved, the largest move in percent and days).
+ * Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label only takes effect on a new run,
+ * so **re-run the job after adding it**.
+ *
+ * **CI sharding.** The job `generated` is three stages: `scope` (does the PR touch what the docs come from), `generate` (a matrix that runs in parallel: the profile `hardcore-rebirth6-x10` alone, about 5 minutes; every other sim profile via `--except`;
+ * the three groups `docs:gen:rest:quick|fights|loot` of the other generators; a new generator goes into one of those scripts), and `generated` (the required check), which downloads the shards, runs `sim --merge` and then the two gates (stale docs, pacing guard).
+ * Wall time is about the slowest shard, not the sum. A new sim profile joins the `sim-rest` shard by itself; a profile in two shards or in none fails the merge.
+ *
+ * @title The pacing guard and CI sharding
+ * @category Ops/CI
+ * @order 1
+ */
 // The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % or more than 5 game days against a base. Prints a summary table first.
 //
 //   npx tsx scripts/pacing-guard.ts --base=<baseline.json> [--current=docs/generated/sim-baseline.json] [--allow-violations]

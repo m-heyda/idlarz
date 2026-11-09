@@ -12,6 +12,23 @@ import type { Tile } from '@/types/game';
  * keys that are V8 small integers is several times faster than one with doubles).
  */
 
+/**
+ * The map has no edge. `GameState.tiles` is a `World`: an immutable, sparse set of the **explored** tiles on an integer grid with negative coordinates, stored as `ReadonlyMap<number, Tile>` under a small-integer key (`tileKey(x, y)`,
+ * `|x|, |y| <= COORD_LIMIT = 16,000`, at most `MAX_OWNED_TILES = 250,000` tiles). Unexplored land is simply absent (`getTile` gives `undefined`, `tileAt` an empty tile). Updates are copy-on-write (`setTile`, `patchTile`, batched `setTiles`),
+ * so `state.tiles` changes exactly when the map does; the owned / building / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).
+ *
+ * Tiles an old save knew by row and column keep their logical coordinates: the castle stays at (25, 25), so old saves and the procedural art (which hashes absolute coordinates, parity-tested against Python) are unchanged.
+ *
+ * - Reads go through `getTile` / `tileAt` / `isOwnedAt` / `hasOwnedNeighbour` / `forEachOwned` / `ownedRowMajor` (a cached row-then-column order, so seeded pickers and saves do not depend on the order tiles were added).
+ *   `buyTile` checks `hasOwnedNeighbour`, the coordinate range and the tile limit.
+ * - A purchase costs one Map copy (about 16 ms at 50,000 tiles, mostly that copy plus the income pass); `npm run perf` prints the timings at 5k / 50k / 250k tiles.
+ * - Tests that were written for the old 50 x 50 array use `worldFromRows` / `rowsOf` / `gridCells` / `tileAt` from `tests/helpers.ts`.
+ * - The map you can pan over is limited by `clampPosition` (`src/lib/mapView.ts`): the middle of the screen stays within the explored land's bounding box plus `PAN_MARGIN_TILES` (6). Nothing else limits panning, and zoom steps do not depend on the map size.
+ *
+ * @title The map (World)
+ * @category Architecture/State
+ * @order 1
+ */
 export const COORD_LIMIT = 16_000;
 export const MAX_OWNED_TILES = 250_000;
 

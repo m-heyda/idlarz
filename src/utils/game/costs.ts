@@ -6,7 +6,15 @@ import { buildingCount, getTile, type World } from '@/utils/world';
 import { isLandmarkTile } from '@/utils/terrain';
 import { emberEffect } from '@/utils/game/rebirth';
 
-/** Everything buying the next tile costs, given how many tiles are owned and the Charisma discount (percent). */
+/**
+ * Everything buying the next tile costs, given how many tiles are owned and the Charisma discount (percent).
+ *
+ * `discountPercent` removes that percent from the gold and from every extra part ({@link effectiveTileDiscount} computes it).
+ *
+ * @category Economy/Tiles
+ * @order 3
+ * @see tilePrice, effectiveTileDiscount, TILE_RESOURCE_COST
+ */
 export const calculateTileCost = (ownedTiles: number, discountPercent = 0): TileCost => {
 	const keep = 1 - discountPercent / 100;
 	const base = SCALING_CONFIG.costFormula(ownedTiles);
@@ -37,7 +45,21 @@ export const subtractBundle = (resources: Resources, cost: Partial<Resources>): 
 
 export const countBuildings = (tiles: World): number => buildingCount(tiles);
 
-/** Price factor of the next building when `built` buildings stand: the cheap starter steps, then three stages of growth. */
+/**
+ * Price factor of the next building when `built` buildings stand: the cheap starter steps, then three stages of growth.
+ *
+ * Price of the next building: base 500 gold / 250 wood / 150 stone ({@link BUILDING_COST}) times this factor, which depends on how many buildings stand, times `1 - Thrift`.
+ * Only Thrift discounts buildings (not Charisma or Bulk Discount). Each resource is capped at `RESOURCE_CAP / 100`.
+ *
+ * @category Economy/Buildings
+ * @order 2
+ * @formula
+ * factor(built) = starter[built]                      for the first four: 0.4, 0.6, 0.8, 1.0
+ *               = 1.15^min(k,12) x 1.09^clamp(k-12, 0, 16) x 1.025^max(k-28, 0)     with k = built - 3
+ * cost[r]       = floor(min(base[r] x factor x (1 - Thrift), RESOURCE_CAP / 100))
+ * @table building-cost-examples
+ * @see calculateBuildingCost
+ */
 export const buildingCostFactor = (built: number): number => {
 	const C = BUILDING_COST;
 	if (built < C.starter.length) return C.starter[built];
@@ -49,7 +71,14 @@ export const buildingCostFactor = (built: number): number => {
 	);
 };
 
-/** Cost of the next building: base cost x the factor for the number of buildings already built. */
+/**
+ * Cost of the next building: base cost x the factor for the number of buildings already built.
+ *
+ * Cost of the next building: base cost x {@link buildingCostFactor} x `(1 - Thrift)`, each resource floored and capped at `RESOURCE_CAP / 100`.
+ *
+ * @category Economy/Buildings
+ * @order 3
+ */
 export const calculateBuildingCost = (tiles: World, prestige?: PrestigeState): Partial<Resources> => {
 	const factor = buildingCostFactor(countBuildings(tiles)) * (1 - emberEffect(prestige, 'thrift'));
 	const cost: Partial<Resources> = {};

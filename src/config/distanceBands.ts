@@ -16,6 +16,12 @@ export interface DistanceBand {
 }
 
 // Ordered by `from`, ascending (checked by tests/world/distance.test.ts).
+/**
+ * Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by {@link bandOf}. No spawn rule reads them yet.
+ *
+ * @category Monsters/Spawning
+ * @order 6
+ */
 export const DISTANCE_BANDS: readonly DistanceBand[] = [
 	{ id: 'home', from: 1, dangerOffset: 0 }, // 1-6
 	{ id: 'outskirts', from: 7, dangerOffset: 0 }, // 7-12

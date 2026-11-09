@@ -92,6 +92,12 @@ export interface GearOptions {
 	levelWindow?: readonly [number, number];
 }
 
+/**
+ * The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier's window (`LEVEL_WINDOW_BY_TIER`: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).
+ *
+ * @category Loot/Adding content
+ * @order 2
+ */
 export const gear = (
 	id: string,
 	name: string,

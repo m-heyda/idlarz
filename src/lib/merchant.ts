@@ -11,10 +11,24 @@ import type { Equipment, ItemInstance, MerchantRefresh, MerchantStock } from '@/
 // The merchant's shuffling goods: a few pieces of gear rolled by the shared loot pipeline (source `merchant`), refreshed on a
 // timer of play time or for gold. Pure; the store applies the results and saves the stock (the price is derived, never stored).
 
-/** What a piece of gear costs at the merchant: far above what he pays for it, so buying and selling can never print gold. */
+/**
+ * What a piece of gear costs at the merchant: far above what he pays for it, so buying and selling can never print gold.
+ *
+ * @category Economy/Merchant
+ * @order 9
+ * @formula
+ * shelf price = ceil(sellValueOf(item) x 5)
+ */
 export const shopPriceOf = (item: ItemInstance): number => Math.ceil(sellValueOf(item) * MERCHANT_GOODS.priceFactor);
 
-/** The gold the next paid refresh costs, when `refreshesBought` have been bought: it doubles each time, up to a cap of 1b. */
+/**
+ * The gold the next paid refresh costs, when `refreshesBought` have been bought: it doubles each time, up to a cap of 1b.
+ *
+ * @category Economy/Merchant
+ * @order 10
+ * @formula
+ * paid refresh price = min(1e9, 10,000 x 2^(paid refreshes so far))
+ */
 export const refreshCost = (refreshesBought: number, ctx: LimitContext = {}): number => {
 	const { growth, cap } = MERCHANT_GOODS.refresh;
 	const n = Math.max(0, Math.floor(refreshesBought));
@@ -40,6 +54,9 @@ export const afterRefresh = (refresh: MerchantRefresh, playSeconds: number, free
 /**
  * The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). The shelf never sells above it:
  * the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).
+ *
+ * @category Economy/Merchant
+ * @order 11
  */
 export const bestWornGrade = (equipment: Equipment): Grade => {
 	let best = 0;
@@ -65,6 +82,10 @@ export const shelfLevels = (castleLevel: number, averageLevel: number, grade?: G
 /**
  * A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made.
  * `grade` is the best grade the player wears (`bestWornGrade`): nothing above it is on the shelf. Pure, so the server can take it as is.
+ *
+ * @category Economy/Merchant
+ * @order 8
+ * @see bestWornGrade, shopPriceOf, MERCHANT_GOODS
  */
 export const generateMerchantStock = (
 	castleLevel: number,

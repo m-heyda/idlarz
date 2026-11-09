@@ -72,6 +72,14 @@ export const getStatDescriptionGroups = (stat: keyof Omit<CharacterStats, 'avail
 /**
  * Calculate XP gain scaling based on owned tiles
  * The more tiles owned, the more XP gained
+ *
+ * XP a tile purchase gives, for the `k`-th purchase (`BASE_XP_PER_TILE` 45, `XP_TILE` in `src/config/economy.ts`); multiplied by `1 + XP gain %` of the character.
+ * Tile XP is small on purpose: levels come from passive XP, kills and rebirth-paced play, see {@link LEVELING}.
+ *
+ * @category Economy/Tiles
+ * @order 5
+ * @formula
+ * xp(k) = 45 x 1.02^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
  */
 export const calculateXpGain = (ownedTiles: number): number => {
 	// Basic XP gain increases with the number of tiles owned: each tile contributes XP that grows slightly with more tiles.
@@ -126,7 +134,18 @@ const buildLevelSteps = (): number[] => {
 };
 const LEVEL_STEPS = buildLevelSteps();
 
-/** The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING). */
+/**
+ * The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING).
+ *
+ * `reconcileCharacter` hands every point back when a character holds more than its level has earned.
+ *
+ * @category Progression/Levels
+ * @order 3
+ * @formula
+ * totalStatPoints(level) = (level - 1) + (min(level, 30) - 1) x 2
+ * @table stat-points-examples
+ * @see reconcileCharacter
+ */
 export const totalStatPoints = (level: number): number => {
 	const l = Math.max(1, Math.min(Math.floor(level), LEVELING.maxLevel));
 	return l - 1 + Math.max(0, Math.min(l, LEVELING.earlyBonusUntil) - 1) * LEVELING.earlyBonusPoints;
@@ -138,6 +157,9 @@ const ATTRIBUTES = ['strength', 'dexterity', 'intelligence', 'vitality', 'charis
  * Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned
  * (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every
  * point the level has earned is left to spend again. A character that is within its points is returned as it is.
+ *
+ * @category Progression/Levels
+ * @order 6
  */
 export const reconcileCharacter = (stats: CharacterStats, xp: number): CharacterStats => {
 	const level = calculateLevel(xp).level;
@@ -152,6 +174,12 @@ export const reconcileCharacter = (stats: CharacterStats, xp: number): Character
 /**
  * XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config);
  * everything that shows or checks a level threshold uses this.
+ *
+ * @category Progression/Levels
+ * @order 2
+ * @formula
+ * step(level -> level+1) = previous step x ratio of its anchor segment      (ratio solved so the segment sums to the anchor)
+ * cumulativeXp(level)    = sum of steps up to level                         hits every LEVELING.anchors entry exactly
  */
 export const xpToNextLevel = (level: number): number => {
 	if (!(level >= 1)) return LEVEL_STEPS[0];
@@ -159,7 +187,12 @@ export const xpToNextLevel = (level: number): number => {
 	return LEVEL_STEPS[Math.floor(level) - 1];
 };
 
-/** The total XP at which `level` is reached (level 1 is 0). */
+/**
+ * The total XP at which `level` is reached (level 1 is 0).
+ *
+ * @category Progression/Levels
+ * @order 4
+ */
 export const cumulativeXp = (level: number): number => {
 	let total = 0;
 	for (let l = 1; l < Math.min(level, LEVELING.maxLevel); l++) total += xpToNextLevel(l);
@@ -168,6 +201,9 @@ export const cumulativeXp = (level: number): number => {
 
 /**
  * Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.
+ *
+ * @category Progression/Levels
+ * @order 5
  */
 export const calculateLevel = (xp: number): { level: number; progress: number } => {
 	let level = 1;
@@ -185,6 +221,14 @@ export const calculateLevel = (xp: number): { level: number; progress: number } 
 
 // Resource Management
 // Calculate stat-based resource modifiers
+/**
+ * What the five attributes add to the income modifier of each resource (all points count, not only those above 5).
+ *
+ * @category Progression/Attributes
+ * @order 2
+ * @formula
+ * modifier[r] += 0.025 per attribute point on each resource the attribute feeds; xp: +0.2% (Int) / +0.25% (Cha) per point
+ */
 export const calculateStatResourceModifiers = (stats: CharacterStats): Resources => {
 	const modifiers: Resources = {
 		gold: 0,
@@ -212,6 +256,12 @@ export const calculateStatResourceModifiers = (stats: CharacterStats): Resources
 };
 
 // Calculate combat stats from base stats
+/**
+ * The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.
+ *
+ * @category Progression/Attributes
+ * @order 3
+ */
 export const calculateCombatStats = (stats: CharacterStats): Partial<CharacterStats> => {
 	return {
 		// the combat ones come from lib/statBonuses.ts (the same functions the fight uses); bonuses count points above 5

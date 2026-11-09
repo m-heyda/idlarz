@@ -95,6 +95,13 @@ export const resolveItem = (instance: ItemInstance, data: LootData = LOOT_DATA):
 /**
  * What a merchant pays for an instance: the rarity's value at level 1, grown with the item level (`valueCurve`), then by the
  * quality roll and by every affix, so a well rolled rare is worth clearly more than a plain one. Always at least 1.
+ *
+ * The merchant buys at this value (times the Haggler bonus, {@link sellPayout}) and sells at 5 times it ({@link shopPriceOf}).
+ *
+ * @category Loot/Items
+ * @order 4
+ * @formula
+ * sellValue = max(1, round(rarity.sellValue x valueCurve(item level) x qualityValue(quality) x affixesValue(rolls)))
  */
 export const sellValueOf = (instance: ItemInstance, data: LootData = LOOT_DATA): number => {
 	const rarity = data.rarities[instance.rarity];

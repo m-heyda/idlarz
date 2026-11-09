@@ -15,7 +15,12 @@ export interface Received {
 	autoSold: { count: number; gold: number };
 }
 
-/** Hands drops to the player: the auto-sell filter takes what it matches, the rest goes into the bag, and what does not fit turns into gold. */
+/**
+ * Hands drops to the player: the auto-sell filter takes what it matches, the rest goes into the bag, and what does not fit turns into gold.
+ *
+ * @category Loot/Pipeline
+ * @order 5
+ */
 export const receiveDrops = (bag: BagSlot[], drops: readonly Drop[], autoSellUpTo: string | null, sellCtx: SellContext): Received => {
 	let current = bag;
 	const stored: Drop[] = [];

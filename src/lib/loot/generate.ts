@@ -10,7 +10,7 @@ import type { Drop, ItemDef, ItemInstance } from '@/types/game';
 import { LOOT_DATA, type LootData } from './data';
 import { eligibleCandidates, type Candidate } from './pools';
 
-// The one loot pipeline (docs/game/loot.md). Every source (rat, Rat King, chest) goes through it:
+// The one loot pipeline (docs/reference/loot.md). Every source (rat, Rat King, chest) goes through it:
 //   profile -> roll count -> source level -> item level -> eligible items -> rarity -> item -> instance (+ bonus tables)
 // Quantity, rarity, level and eligibility are separate steps; nothing here names a rarity, an item or a monster.
 
@@ -67,11 +67,25 @@ export interface LootResult {
 
 const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
 
-/** The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level. */
+/**
+ * The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.
+ *
+ * @category Loot/Pipeline
+ * @order 3
+ * @formula
+ * source level = clamp(base + perCastleLevel x (castle level - 1), 1..100)
+ */
 export const resolveSourceLevel = (level: SourceLevelDef, castleLevel = 1): number =>
 	clampItemLevel(level.base + level.perCastleLevel * (Math.max(1, castleLevel) - 1));
 
-/** Rolls the item level around the source level, inside the profile's bounds. */
+/**
+ * Rolls the item level around the source level, inside the profile's bounds.
+ *
+ * @category Loot/Pipeline
+ * @order 4
+ * @formula
+ * item level = clamp(randomInt(source level + offset - variance, source level + offset + variance), min, max)
+ */
 export const rollItemLevel = (
 	sourceLevel: number,
 	def: Pick<ItemLevelDef, 'offset' | 'variance'> & Partial<Pick<ItemLevelDef, 'min' | 'max'>>,
@@ -243,7 +257,33 @@ const runTable = (ctx: Ctx, table: BonusTable): { drops: LootDrop[]; triggered: 
 	return { drops, triggered: true };
 };
 
-/** Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible. */
+/**
+ * Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.
+ *
+ * The one loot pipeline. Every source (monster, boss, chest, the merchant's shelf) goes through it:
+ *
+ * `source -> loot profile -> roll count -> source level -> item level -> eligible items -> rarity -> item -> instance (+ bonus tables)`
+ *
+ * Quantity, rarity, level and eligibility are separate steps; nothing in the generator names a rarity, an item or a monster. Data is `src/catalog/lootConfig.ts` (sources, profiles, pools), `src/catalog/rarity.ts`,
+ * `src/catalog/affixes.ts` and the item catalog; the code is pure, with an injectable `rng`, so tests and `npm run loot-sim` are reproducible.
+ *
+ * 1. A **source** ({@link LOOT_SOURCES}) names a **profile**. A monster passes its own level; a chest and the shelf get theirs from the castle level ({@link resolveSourceLevel}); never from the player's level.
+ * 2. The profile's `rolls` decide how many equipment rolls succeed: a random count in `min..max`, the first `guaranteed` always, the rest at `chancePerRoll + chancePerLevel x (level - 1)`,
+ *    times the Luck drop-chance multiplier ({@link dropChanceMultiplier}). A lucky monster adds `extraGearRolls`.
+ * 3. Each success rolls an **item level** around the source level (`offset +/- variance`, clamped to the profile and to `maxItemLevel`, {@link rollItemLevel}).
+ * 4. The **eligible** items are the profile's pool members whose item level window contains that level (and whose grade is at most `maxGrade`).
+ * 5. The **rarity** is rolled from the profile's relative `rarityWeights` among the rarities that have an eligible base at that level and pass `rarityLevelGate`; Luck multiplies the weights of rare and better
+ *    ({@link rarityLuckMultiplier}), so the other rarities lose share, not weight.
+ * 6. The **item** is a weighted pick among the candidates of that rarity; an **instance** gets a quality roll (0-100) and, from the rarity's affix count, affixes picked without replacement, one per group.
+ * 7. **Bonus tables** add reward channels on top: a targeted pool (named items), potions, a boss's own pool. `placement` says how a table combines with the general rolls: `extra` adds (default),
+ *    `fallback` only runs when no equipment has dropped, `replace` cancels the gear when it triggers (a chest's legendary weapon). A table may carry pity: each miss adds `perMiss` to its chance (up to `maxBonus`), a drop resets it.
+ *
+ * Drops reach the bag through {@link receiveDrops}: the auto-sell filter ({@link isAutoSold}) sells what it matches, the rest goes into the bag, and what does not fit turns into gold.
+ *
+ * @category Loot/Pipeline
+ * @order 1
+ * @see LOOT_SOURCES, LOOT_PROFILES, receiveDrops, validateLootData
+ */
 export const generateLoot = (req: LootRequest, rng: Rng, data: LootData = LOOT_DATA): LootResult => {
 	const warnings: string[] = [];
 	const source = data.sources[req.sourceId];

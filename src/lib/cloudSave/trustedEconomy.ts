@@ -28,6 +28,11 @@ const scaled = (rates: Resources | null, factor: number): Resources | null => {
  * `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). With a baseline the rates
  * and the castle are the previous save's; without one (the account's first save, or the first of a new run) there is nothing trusted to fall
  * back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.
+ *
+ * After `castle_jump` or `networth_exceeds` the rates, castle level and castle timer the server pays from are those of the last trusted save of the same run; unpaid merchant levels are put back to the last trusted level (Pack Rat excepted).
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 3
  */
 export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, ratio: number): SaveSummary => {
 	if (sameRunAs(prev, claimed)) {

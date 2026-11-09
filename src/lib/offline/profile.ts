@@ -49,6 +49,13 @@ const merchantOf = (core: Core): Record<string, number> => {
 	return out;
 };
 
+/**
+ * Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear.
+ *
+ *
+ * @category Combat/A fight
+ * @order 5
+ */
 export const playerProfile = (core: Core): PlayerProfile => {
 	const stats = statsOf(core);
 	const equipment = equipmentOf(core);

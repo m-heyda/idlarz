@@ -1,7 +1,7 @@
 import { GRADES, type Grade } from '@/catalog/items/grades';
 
 // Loot configuration: which sources give what. Pure data; the pipeline in src/lib/loot reads it and nothing here is
-// code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/game/loot.md).
+// code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/reference/loot.md).
 //
 //   source (monster, boss, chest) --lootProfileId--> profile --generalPoolId / bonusTables--> pools --> item definitions
 //
@@ -110,6 +110,15 @@ export interface LootSource {
  * window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
  * a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items,
  * so today every biome drops the same items; going live with the next grade is what moves a biome.
+ *
+ * A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G3, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
+ * Every base that drops carries a `grade:` tag (IDL-243): the legacy wood, steel and Obsidian pieces that fill a ladder cell are graded by it (Wooden Club G1, Hunting Bow G2, Iron Sword G3, six Steel armour pieces G4, the Obsidian family G6; they keep their ids, art and set bonuses),
+ * the rest of wood, steel and all of cloth are retired (`enabled: false`, ids kept, owned pieces keep working). A graded legacy piece is generated only in its grade's window and rarities (`dropLevels`, `dropRarities`) but stays valid at its old level range for pieces already owned.
+ * The highest live grade is open at the top and takes every rarity ({@link gradeLevels}, {@link gradeRarities} in `src/catalog/items/grades.ts`) so nothing is left without a base while the next grade is dark; a rarity with no base at an item level is left out of the roll there.
+ * The merchant's shelf passes `maxGrade` = the best grade the player wears ({@link bestWornGrade}).
+ *
+ * @category Loot/Config
+ * @order 3
  */
 export const BIOME_LOOT = {
 	plains: { ceiling: 3, levels: { min: 1, max: 20 } },
@@ -130,6 +139,24 @@ const biomePools = (): Record<string, PoolDef> =>
 		}),
 	);
 
+/**
+ * Adding loot content is data only; the generator needs no change.
+ *
+ * - **A base item**: add `gear(id, name, slot, rarity, stats, { tier, ... })` ({@link gear}) to a file in `src/catalog/items/`. Its stats are authored at the first level of its tier's window (`LEVEL_WINDOW_BY_TIER`).
+ *   It joins the general pool automatically (tags `gear`, not `named`). Register its icon as one line in `src/config/itemIcons/<slot>.json` if it has art (see its README).
+ * - **A named item** (fixed identity and rarity): the same builder with `named: true, pools: ['some_pool']`, then put the pool in a profile's `bonusTables`.
+ * - **A biome's grade ceiling**: {@link BIOME_LOOT}.
+ * - **An affix**: one row in `src/catalog/affixes.ts` (`pair(...)` makes a prefix and a suffix of a stat).
+ * - **A rarity**: one row in {@link RARITIES}, then a weight for it in each profile that should drop it; `allowedRarities` already includes every rarity key for bases. No generator change
+ *   (`tests/loot/lootGenerate.test.ts` proves it with a fake rarity).
+ * - **A profile / source** (an elite monster, a premium chest): add the profile and a {@link LOOT_SOURCES} entry, then point the monster or chest at it.
+ * - **Tuning**: weights, chances, levels and curve are all config. Run `npm run loot-sim -- --md`, then {@link validateLootData} (the tests) tells you what no longer fits.
+ *
+ * @title Adding loot content (data only)
+ * @category Loot/Adding content
+ * @order 1
+ * @see gear, RARITIES, LOOT_SOURCES
+ */
 export const LOOT_POOLS: Record<string, PoolDef> = {
 	general_equipment: { id: 'general_equipment', requireTags: ['gear'], excludeTags: ['named'], enabled: true },
 	...biomePools(),
@@ -157,6 +184,13 @@ const NORMAL_MONSTER: LootProfile = {
 	enabled: true,
 };
 
+/**
+ * Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.
+ *
+ * @category Loot/Config
+ * @order 2
+ * @table loot-profiles
+ */
 export const LOOT_PROFILES: Record<string, LootProfile> = {
 	normal_monster: NORMAL_MONSTER,
 	...Object.fromEntries(
@@ -212,7 +246,16 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 	},
 };
 
-/** Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45). */
+/**
+ * Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).
+ *
+ * Sources, keyed by the `DropSource` (a monster's biome source `monster_<biome>`, `boss`, `chest`, the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45); a chest and the shelf
+ * start at item level 4 plus 3 per castle level above 1.
+ *
+ * @category Loot/Config
+ * @order 1
+ * @table loot-sources
+ */
 export const LOOT_SOURCES: Record<string, LootSource> = {
 	// A biome-less normal monster (the debug panel, tests): the whole general pool. The game's monsters use their biome's source below.
 	monster: { id: 'monster', lootProfileId: 'normal_monster', levels: { min: 1, max: 30 } },

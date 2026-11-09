@@ -1,4 +1,13 @@
 /**
+ * Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that
+ * tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT`
+ * would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.
+ *
+ * @title Checking live saves before a release
+ * @category Ops/Operator guides
+ * @order 2
+ */
+/**
  * Dry run of today's save rules against the REAL rows (IDL-12), before a release that tightens them (the epoch reset IDL-76, the enforcement IDL-208).
  *
  *   npm run check-live-saves
@@ -8,7 +17,7 @@
  * fixed reason texts of the code only: no names, no ids, no numbers out of a game. Read-only: it only SELECTs, nothing is written anywhere.
  *
  * Dev machine only. Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or the git-ignored .env.local); neither is ever printed.
- * Check which project they point at first (the same rule as reset-players). See docs/plan/14-server-audit-and-data-plan.md section 6 and docs/ops/reset-players-cli.md.
+ * Check which project they point at first (the same rule as reset-players). See docs/plan/14-server-audit-and-data-plan.md section 6 and docs/reference/ops.md.
  */
 import { resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';

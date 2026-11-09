@@ -6,6 +6,12 @@ import { emberEffect } from '@/utils/game/rebirth';
 /**
  * Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each
  * level up to `doublingUntil`, then a fixed step per level (so levels 7-10 stay a long climb, not an explosion).
+ *
+ * @category Economy/Castle
+ * @order 2
+ * @formula
+ * castleModifier(L) = 0.2 x 2^(L-1)                 for L <= 6   (+20%, +40%, +80%, +160%, +320%, +640%)
+ *                   = 0.2 x 2^5 + 3.2 x (L - 6)     for L > 6    (+960%, +1280%, +1600%, +1920%)
  */
 export const castleModifier = (level: number): number => {
 	const lvl = Math.max(1, Math.floor(level));
@@ -17,6 +23,13 @@ export const castleModifier = (level: number): number => {
 	return bonus;
 };
 
-/** Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`. */
+/**
+ * Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`.
+ *
+ * @category Economy/Castle
+ * @order 3
+ * @formula
+ * seconds = floor(durationsSec[fromLevel - 1] x (1 - 0.05 x Master Builders level))
+ */
 export const castleUpgradeDuration = (fromLevel: number, prestige?: PrestigeState): number =>
 	Math.floor((CASTLE_UPGRADE.durationsSec[fromLevel - 1] ?? 0) * (1 - emberEffect(prestige, 'builders')));

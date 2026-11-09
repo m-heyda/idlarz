@@ -109,6 +109,19 @@ function weighted<T>(items: [T, number][], roll: number): T {
  * The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra
  * same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore
  * (BIOME_SPAWN). Always returns an allowed biome (plains is never blocked).
+ *
+ * Which biome a purchase becomes is **rolled when you buy; there is no picker**. Rules and numbers are `BIOME_RULES` in `src/config/biomeRules.ts` and `BIOME_SPAWN` in `src/config/biomes.ts`.
+ *
+ * - Plains, forest, hills and lake from the start; swamp after 6 purchases, tundra after 10; coast only beside a lake or coast.
+ * - Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast. Plains is neutral.
+ * - Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40) plus 10 per extra same-biome 4-neighbour,
+ *   capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
+ * - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water.
+ * - Jungle, fields, orchard, blight and battlefield exist in `BIOMES` as dev-only entries; no rule gives them to players.
+ * - The start ring (the four free tiles) is plains and forest only, at least two plains ({@link generateStartRing}).
+ *
+ * @category Economy/Biomes
+ * @order 1
  */
 export function rollBiome(tiles: World, x: number, y: number, purchased: number, random: () => number = Math.random): BiomeType {
 	const everyAllowed = biomeVerdicts(tiles, x, y, purchased)
@@ -166,6 +179,9 @@ export const RING: [number, number][] = [
 /**
  * The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains`
  * plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.
+ *
+ * @category Economy/Biomes
+ * @order 3
  */
 export function generateStartRing(random: () => number = Math.random): BiomeType[] {
 	const { weights, minPlains, maxOfOther } = BIOME_RULES.startRing;

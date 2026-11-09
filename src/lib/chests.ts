@@ -24,6 +24,9 @@ const isBuilt = (t: Tile) => !!t.building;
  * The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys),
  * no building, outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
  * penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.
+ *
+ * @category Economy/Chests and Luck
+ * @order 4
  */
 export function chestSpots(tiles: World, taken: Set<string>, castleLevel: number): { x: number; y: number; w: number }[] {
 	const P = CHEST.placement;
@@ -78,7 +81,15 @@ export interface ChestContext {
 
 const between = (random: () => number, [lo, hi]: [number, number]) => lo + random() * (hi - lo);
 
-/** Relative chances with Luck shifted from plain gold toward the lucky chest and the item. */
+/**
+ * Relative chances with Luck shifted from plain gold toward the lucky chest and the item.
+ *
+ * @category Economy/Chests and Luck
+ * @order 5
+ * @formula
+ * shift       = min(0.6 x gold weight, gold weight x Luck x 1%)
+ * gold weight -= shift;  boost += 0.8 x shift;  item += 0.2 x shift
+ */
 export function rewardWeights(luck: number): Record<keyof typeof CHEST.rewards, number> {
 	const w = { ...CHEST.rewards };
 	const shift = Math.min(w.gold * 0.6, w.gold * luck * CHEST.luckRewardBonusPerPoint);
@@ -88,7 +99,14 @@ export function rewardWeights(luck: number): Record<keyof typeof CHEST.rewards, 
 	return w;
 }
 
-/** Rolls the contents of a chest. Gold is "minutes of income", like before; a full bag turns an item into gold. */
+/**
+ * Rolls the contents of a chest. Gold is "minutes of income", like before; a full bag turns an item into gold.
+ *
+ * @category Economy/Chests and Luck
+ * @order 6
+ * @formula
+ * gold chest  = floor(gold/s x U(10..60 min) x 60 x (1 + 0.005 x Luck) x (1 + Gold Find%))      boost chest: x1.5
+ */
 export function rollChestLoot(ctx: ChestContext, random: () => number = Math.random): ChestLoot {
 	const weights = rewardWeights(ctx.luck);
 	const entries = Object.entries(weights) as [keyof typeof weights, number][];

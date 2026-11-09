@@ -1,0 +1,9 @@
+#!/bin/sh
+# Regenerates docs/reference from the JSDoc in the code and stages the result, so the reference can never be older than the code it describes.
+# Installed by `npm install` (the `prepare` script sets core.hooksPath to .githooks). Skip it for one commit with `git commit --no-verify`
+# (CI and tests/docs/reference.test.ts still fail on a stale reference).
+npm run --silent docs:code || {
+	echo "pre-commit: docs:code failed; fix the JSDoc above (or skip with --no-verify)" >&2
+	exit 1
+}
+git add docs/reference

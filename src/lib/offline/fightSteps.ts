@@ -57,7 +57,12 @@ export const cast = (ctx: FightCtx, t: number, id: SkillId): boolean => {
 	return true;
 };
 
-/** Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. */
+/**
+ * Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready.
+ *
+ * @category Combat/Potions and skills
+ * @order 3
+ */
 export const autoUse = (ctx: FightCtx, t: number): void => {
 	const c = ctx.c;
 	const hpPct = (c.hp / maxHpNow(ctx)) * 100;
@@ -73,6 +78,12 @@ export const autoUse = (ctx: FightCtx, t: number): void => {
 	if (COMBAT.auto.stunWhenReady && c.fight && c.fight.stunLeft <= 0) cast(ctx, t, 'stun');
 };
 
+/**
+ * Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.
+ *
+ * @category Combat/A fight
+ * @order 7
+ */
 export const endFight = (ctx: FightCtx, t: number, kind: 'defeated' | 'timeout' | 'retreat'): void => {
 	const c = ctx.c;
 	const f = c.fight!;
@@ -85,7 +96,14 @@ export const endFight = (ctx: FightCtx, t: number, kind: 'defeated' | 'timeout' 
 	c.queue = []; // the hero lost, ran out the clock or left: the plan is off (a win keeps the queue)
 };
 
-/** One tick of the open fight. Returns when the fight ended. */
+/**
+ * One tick of the open fight. Returns when the fight ended.
+ *
+ * One tick of the open fight, in the order of the numbered list on {@link runCombat}.
+ *
+ * @category Combat/A fight
+ * @order 6
+ */
 export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	const { c, env } = ctx;
 	const f = c.fight!;

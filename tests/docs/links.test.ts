@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
 // Every relative markdown link in docs/ and the root README must point at a file or folder that exists.
-// docs/generated is written by `npm run docs:gen` and checked by the CI `generated` job, so it is skipped.
+// docs/generated is written by `npm run docs:gen` and checked by the CI `generated` job, and docs/reference by `npm run docs:code` (tests/docs/reference.test.ts), so both are skipped.
 
 const ROOT = resolve(__dirname, '..', '..');
 
@@ -13,7 +13,7 @@ function markdownFiles(dir: string): string[] {
 	for (const name of readdirSync(dir)) {
 		const full = join(dir, name);
 		if (statSync(full).isDirectory()) {
-			if (name === 'generated') continue;
+			if (name === 'generated' || name === 'reference') continue;
 			out.push(...markdownFiles(full));
 		} else if (name.endsWith('.md')) out.push(full);
 	}

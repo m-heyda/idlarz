@@ -92,6 +92,12 @@ const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.rats
 /**
  * How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
  * estimated from the owned tiles because the server never opens the map, and never more than `TICKET_CAP` per kind.
+ *
+ * The room for new tickets: monsters and chests together hold at most 30% of the free land, at least 2, at most 40 tickets in all.
+ *
+ * @category Monsters/Spawning
+ * @order 5
+ * @knownissue IDL-221 `ticketCap` estimates free land as `owned - 1 - buildings - ward` and does not subtract lakes.
  */
 export const ticketCap = (ctx: BankContext): number => {
 	const free = Math.max(0, ctx.tilesOwned - 1 - ctx.buildingsOwned - wardTiles(ctx.castleLevel));
@@ -123,6 +129,15 @@ export interface Minted {
  *
  * `realDtSec` is the real time the `dtSec` stand for: an absence is credited at a share of its length (the efficiency), but the
  * tickets are stamped across the whole real stretch so that they have the ages they would have had.
+ *
+ * Where and when monsters appear (server only).
+ *
+ * - **Timers** (`COMBAT.spawn`): the first normal monster 120 s after the run starts, then one per 900 s; one boss at a time, 10,800 s after the last one left (or after the start). The timers pause when the map has no room or no free tile for it.
+ * - **Room**: monsters and chests together hold at most 30% of the free tiles, at least 2, at most 40 tickets ({@link ticketCap}, `SPAWN_LIMIT`, `TICKET_CAP`).
+ * - **Golden (lucky) monsters**: chance `min(10%, 2% + 0.05% x Luck)` per new normal monster; a kill pays x3 gold, XP and hide and adds one guaranteed gear roll (`LUCK.luckyRat`). Bosses are never golden.
+ *
+ * @category Monsters/Spawning
+ * @order 1
  */
 export const advanceBank = (
 	bank: TicketBank,

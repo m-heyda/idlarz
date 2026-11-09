@@ -2,7 +2,7 @@
 
 > **Status note (2026-11-07):** the steps below are tracked as Linear issues (R0 for phase A, R1 and R2 for B and C, R3 for D). A step is done when its issue is Done, not when it is listed here. Decisions made after this plan was written (docs 06, 10, 13, 15, 17, 18, 20, 21, 28 and the "Where each decision lives" table in the [ROADMAP](ROADMAP.md)) win over any older line below.
 
-Written after the balancing pass (castle timers, rebirth wipe and respec, the Ember curve, the merchant clock, the 16-monster roster, the growth badge and the battle queue are built, and so is the icon registry (B1); see [game/](../game/overview.md)). This is a **proposal**: the order is meant to make the core readable and cheap to change first, then fill the game with content, then go back to the rebirth world ([ROADMAP](ROADMAP.md), [RELEASE-PLAN](RELEASE-PLAN.md)). Sizes: S ≈ half a day, M ≈ 1-2 days, L ≈ a week.
+Written after the balancing pass (castle timers, rebirth wipe and respec, the Ember curve, the merchant clock, the 16-monster roster, the growth badge and the battle queue are built, and so is the icon registry (B1); see [game/](../reference/overview.md)). This is a **proposal**: the order is meant to make the core readable and cheap to change first, then fill the game with content, then go back to the rebirth world ([ROADMAP](ROADMAP.md), [RELEASE-PLAN](RELEASE-PLAN.md)). Sizes: S ≈ half a day, M ≈ 1-2 days, L ≈ a week.
 
 ## Why this order
 
@@ -66,7 +66,7 @@ The rats had a **golden ("lucky") variant** and we keep that for every monster: 
 
 - Show the **estimated win chance** of each queued monster in the Next strip (`offline/winChance.ts` already computes it); decide whether a defeat should also switch Auto-battle off. **Decided 2026-11-07 (IDL-59): coloured Safe/Risky/Unlikely bucket with the percent on hover; three defeats in a row pause Auto-battle.**
 - Per-band danger offsets (`dangerBonus` is 0 or 1, ROADMAP R7).
-- Doc 19 and [game/pacing-targets.md](../game/pacing-targets.md): check that their castle timer numbers match `CASTLE_UPGRADE.durationsSec`.
+- Doc 19 and [game/pacing-targets.md](../reference/pacing.md): check that their castle timer numbers match `CASTLE_UPGRADE.durationsSec`.
 - Look at the growth badge, the queue markers and the Next strip in a real browser session once (nobody has yet), and write a Playwright smoke test for them.
 
 ## Decisions needed

@@ -9,7 +9,7 @@ import { isPlaced } from '@/lib/offline/placement';
 import { monsterTypeOf, type MonsterTicket } from '@/lib/offline/tickets';
 import type { MonsterType } from '@/types/game';
 
-// SERVER ONLY. Who the hero fights next: the monsters standing on the map, auto-battle's pick, the battle queue (docs/game/combat.md) and
+// SERVER ONLY. Who the hero fights next: the monsters standing on the map, auto-battle's pick, the battle queue (docs/reference/combat.md) and
 // the waiting between fights.
 
 type Target = { ticket: MonsterTicket; type: MonsterType };
@@ -25,6 +25,18 @@ export const placedTarget = (ledger: Ledger, n: number): Target | null => {
 /**
  * The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the King. One that
  * beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.
+ *
+ * Starting a fight.
+ *
+ * - **Click** on a monster (`CombatCommand` `fight`): fights it at once whatever the HP, the retry time, and with auto-battle on or off. Refused with a fight open (it queues instead), at 0 HP, or while the server is `behind`.
+ * - **Auto-battle** (switch, default off, locked until the first rebirth: `COMBAT.auto.minRebirths` = 1, {@link autoBattleUnlocked}): when HP is at least 80% of max (`resumeHpPct`) the server picks the next placed monster:
+ *   weakest level first (`engageOrder`), normal monsters before a boss, skipping any monster whose win chance is below 0.5 (`minWinChance`) or whose retry time has not passed.
+ *   A monster that beat the player (or timed out) waits 300 s (a boss 600 s) (`retryCooldownSec`, `bossRetryCooldownSec`). See also {@link engage}.
+ * - **Dismiss** removes a monster for good (no loot), not allowed for the monster being fought ({@link dismissTicket}).
+ *
+ * @category Combat/A fight
+ * @order 2
+ * @see engage, queueTicket
  */
 export const pickTarget = (
 	ledger: Ledger,
@@ -62,7 +74,17 @@ export const queueHasTarget = (ctx: FightCtx): boolean => {
 	return c.queue.length > 0;
 };
 
-/** A click while a fight is open: the monster joins the queue, or leaves it when it was already there. */
+/**
+ * A click while a fight is open: the monster joins the queue, or leaves it when it was already there.
+ *
+ * The battle queue: a click on another monster while a fight is open (or while resting for the next queued one) queues it; clicking it again removes it. Size `LIMITS.battleQueue` = 10 (hard 16).
+ * The queue's head starts as soon as HP is back at 80%, ignoring retry time and win estimate; it works before the first rebirth; it is cleared by a defeat, timeout, retreat, rebirth or an absence, kept by a win.
+ *
+ * @category Combat/A fight
+ * @order 3
+ * @see engage, endFight
+ * @knownissue IDL-59 the win-chance bucket and the three-defeat pause of the battle queue are still open.
+ */
 export const queueTicket = (ctx: FightCtx, n: number): QueueResult => {
 	const c = ctx.c;
 	if (c.queue.includes(n)) {
@@ -82,7 +104,12 @@ export const unqueueTicket = (ctx: FightCtx, n: number): boolean => {
 	return true;
 };
 
-/** The next fight: the queue's head (the player chose it, so no retry time and no win estimate stop it, but the hero must be back on his feet), then auto-battle's pick. */
+/**
+ * The next fight: the queue's head (the player chose it, so no retry time and no win estimate stop it, but the hero must be back on his feet), then auto-battle's pick.
+ *
+ * @category Combat/A fight
+ * @order 8
+ */
 export const engage = (ctx: FightCtx, t: number): boolean => {
 	const c = ctx.c;
 	if (queueHasTarget(ctx)) {

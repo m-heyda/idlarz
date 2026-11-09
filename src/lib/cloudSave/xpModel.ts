@@ -12,6 +12,11 @@ import type { Snapshot } from './verify';
  *
  * Generous on purpose: an honest player is never clamped (the numbers include a margin for gifts and rounding), while XP out of thin air is
  * bounded by what the player has really bought and played.
+ *
+ * In short: allowed = tile XP of the bought tiles x 1.02 + passive XP x 1.25 + server grants, plus a headroom of 900 s of income or 2,000. The first save may hold 3x that. The browser takes the lower XP the server returns.
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 4
  */
 export const XP_MODEL = {
 	/** Tile XP is exact; this is rounding and the XP bonus changing between saves. */

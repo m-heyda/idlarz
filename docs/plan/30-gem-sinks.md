@@ -7,13 +7,13 @@
 | Fact | Value | Where |
 | --- | --- | --- |
 | Start purse | 1,000 (also granted to saves from before gems existed) | `STARTING_GEMS` in `src/config/economy.ts` |
-| Balance | held by the server in `player_ledger.gems`; an upload can never raise it (`gems_increase` flag, then replaced) | [saves and server](../game/saves-and-server.md) |
-| Rebirth | keeps gems | [economy](../game/economy.md) |
-| Faucet 1: chests | a gem roll on every chest, `min(15%, 3% + 0.06% x Luck)`, 5-50 gems skewed low (about 65-300 gems a day if every chest is collected) | `LUCK.gem`, [saves and server](../game/saves-and-server.md) |
+| Balance | held by the server in `player_ledger.gems`; an upload can never raise it (`gems_increase` flag, then replaced) | [saves and server](../reference/saves-and-server.md) |
+| Rebirth | keeps gems | [economy](../reference/economy.md) |
+| Faucet 1: chests | a gem roll on every chest, `min(15%, 3% + 0.06% x Luck)`, 5-50 gems skewed low (about 65-300 gems a day if every chest is collected) | `LUCK.gem`, [saves and server](../reference/saves-and-server.md) |
 | Faucet 2 (planned) | 12 launch achievements, 25-100 gems each, about 600 in total | IDL-73, [21](21-classes-avatars-achievements-offline-report.md) |
 | Faucet 3 (planned) | daily first-login bonus, about 20-50 gems, weekly peak | IDL-194 |
 | Faucet 4 (later) | rewarded ads; purchase by SMS or store (a separate project, only the rules are decided) | IDL-188 |
-| Not a faucet | monster chests hold **no gems** | [loot](../game/loot.md), IDL-163 |
+| Not a faucet | monster chests hold **no gems** | [loot](../reference/loot.md), IDL-163 |
 | Sinks today | **none** | |
 
 Decisions that bind this document: gems may be **sold later**, so every sink obeys the fair-play line in section 2; gambling is **gold only, never gems** (IDL-205).
@@ -50,7 +50,7 @@ Status: **Planned** = decided in IDL-188, task exists. **New** = proposed 2026-1
 
 ### Rejected on 2026-11-08 (owner)
 
-- **Keep a % of one resource through a rebirth.** It makes rebirth cheaper for gems and breaks the pacing that [pacing targets](../game/pacing-targets.md) and [13](13-rebirth-reset-and-paragon.md) tune around.
+- **Keep a % of one resource through a rebirth.** It makes rebirth cheaper for gems and breaks the pacing that [pacing targets](../reference/pacing.md) and [13](13-rebirth-reset-and-paragon.md) tune around.
 - **Skip a stage of the rebirth tile requirement.** The requirement is the rebirth gate (`REBIRTH.tilesNeeded`); selling a way past it sells the game's pacing.
 - **Instantly finish a castle upgrade timer.** The bounded time saver of row 7 stays (the Hourglass shares the 3-per-upgrade and 50 %-of-the-upgrade limit with found Hourglasses, IDL-177); a full instant finish does not exist.
 
@@ -95,7 +95,7 @@ A rebirth-payout bonus ("a small, capped extra of Embers") was floated in the sa
 
 ## 6. Gear sink: affix re-roll
 
-Re-roll **one** affix of a bagged or worn piece. The server rolls it with a sealed seed (`HMAC(LOOT_SECRET, user / run / 'reroll' / ordinal)`, [saves and server](../game/saves-and-server.md)), idempotent by claim id. The result is final (no undo; a gem sink must not be a free retry). At most 3 re-rolls per item, never the fixed effect of a legendary, and the new value stays inside the perk family caps of [loot](../game/loot.md) / IDL-149. It ships on the crafting hooks (IDL-117), so it follows crafting v0. **Gem sockets** remain parked; if they ever return, the socketed stone needs another name than "gem".
+Re-roll **one** affix of a bagged or worn piece. The server rolls it with a sealed seed (`HMAC(LOOT_SECRET, user / run / 'reroll' / ordinal)`, [saves and server](../reference/saves-and-server.md)), idempotent by claim id. The result is final (no undo; a gem sink must not be a free retry). At most 3 re-rolls per item, never the fixed effect of a legendary, and the new value stays inside the perk family caps of [loot](../reference/loot.md) / IDL-149. It ships on the crafting hooks (IDL-117), so it follows crafting v0. **Gem sockets** remain parked; if they ever return, the socketed stone needs another name than "gem".
 
 ## 7. Prestige tail
 

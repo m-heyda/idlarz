@@ -13,18 +13,50 @@ export const CASTLE_BASE_RATES = amounts({ gold: 0.1, wood: 0.05, stone: 0.1, fo
 // Castle range: tiles within this many steps of the castle (3x3 at radius 1) will get the castle's range bonus. `radius` is
 // also the ward and the fortress walls. From `growFromLevel` the violet area (not the ward) grows by `growPerLevel` tiles on
 // every side per level: 3x3 up to level 7, then 5x5, 7x7 and 9x9 at level 10.
+/**
+ * The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it grows one tile per level: 5x5 at 8, 7x7 at 9, 9x9 at 10 ({@link castleRangeRadius}).
+ *
+ * @category Economy/Castle
+ * @order 4
+ */
 export const CASTLE_RANGE = { radius: 1, growFromLevel: 8, growPerLevel: 1 };
 
 // Production bonus inside the castle range: below `fromLevel` (no walls yet) every tile of the 3x3 range, and the building on
 // it, produces `earlyBonus` extra (+50%, x1.5). From `fromLevel` it produces `perRadiusTile` times its output extra for every
 // tile the range reaches out: +100% at radius 1 (level 7) up to +400% at radius 4 (level 10).
+/**
+ * Area bonus: tiles in range (and their buildings) make extra output, +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10)
+ * ({@link castleAreaBonus}). It is part of the base income, so the modifiers apply on top.
+ *
+ * @category Economy/Castle
+ * @order 5
+ */
 export const CASTLE_AREA_BONUS = { fromLevel: 7, perRadiusTile: 1, earlyBonus: 0.5 };
 
 // From this castle level the 3x3 range becomes a walled fortress (walls on its edges, a tower on each corner): no monsters
 // and no chests spawn inside it and monsters already there are driven out.
+/**
+ * The ward: from castle level 7 the 3x3 around the castle is a walled fortress, no monsters or chests spawn there and monsters standing in it are driven out (`isInWard`, `wardTiles`).
+ *
+ * @category Economy/Castle
+ * @order 6
+ */
 export const CASTLE_FORTRESS = { fromLevel: 7 };
 
 // Exponential castle upgrade system
+/**
+ * The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.
+ *
+ * - **Modifier** added to every resource: see {@link castleModifier}. **Flat XP**: +0.5 xp/s per level above 1 (`xpBonus`).
+ * - **Timers** (`durationsSec`), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d. Master Builders (Ember shop) cuts them 5% per level ({@link castleUpgradeDuration}).
+ * - **Costs** per step (`upgradeCosts`): coal appears from 2 to 3, food and meat from 3 to 4. The full per-step table is in `docs/generated/balance-tables.md`.
+ * - **Range** (violet area), **area bonus** and **ward**: {@link CASTLE_RANGE}, {@link CASTLE_AREA_BONUS}, {@link CASTLE_FORTRESS}.
+ *
+ * @category Economy/Castle
+ * @order 1
+ * @table castle-levels
+ * @see castleModifier, castleUpgradeDuration
+ */
 export const CASTLE_UPGRADE = {
 	maxLevel: 10,
 	baseResourceMultiplier: 0.2, // +20% to every resource at level 1

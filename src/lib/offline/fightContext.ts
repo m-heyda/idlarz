@@ -63,7 +63,12 @@ export const pushEvent = (ctx: FightCtx, t: number, kind: FightEvent['kind'], ex
 	if (c.log.length > LOG_HARD_CAP) c.log.splice(0, c.log.length - LOG_HARD_CAP);
 };
 
-/** The next random stream of a fight: sealed on the secret, the user, the run and the fight's ordinal, one draw per call. */
+/**
+ * The next random stream of a fight: sealed on the secret, the user, the run and the fight's ordinal, one draw per call.
+ *
+ * @category Combat/A fight
+ * @order 11
+ */
 export const rngFor = (ctx: FightCtx, f: FightRecord): Rng =>
 	sealedRng(ctx.env.secret, ctx.env.userId, ctx.ledger.runId, 'fight', f.ord * 100000 + (f.seq++ % 100000));
 

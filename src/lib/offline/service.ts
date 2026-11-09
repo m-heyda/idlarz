@@ -1,3 +1,14 @@
+/**
+ * The endpoints under `src/app/api`. Each route handler only authenticates and calls the pure service in `src/lib/offline/`.
+ *
+ * `inventory` operations except the two purchases and `autoSell` are refused while a fight is open. The merchant's prices and shelf are still the browser's: a purchase through `inventory` is checked for being a valid item,
+ * and its gold is paid in the browser.
+ *
+ * @title Endpoints (the API routes)
+ * @category Saves & Server/Endpoints
+ * @order 1
+ * @table api-routes
+ */
 import { PINNED_KEEP, type SaveRepo, type StoredSave } from '@/lib/cloudSave/pipeline';
 import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';

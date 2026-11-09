@@ -22,9 +22,15 @@ const SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.rig
 const isProb = (n: unknown): boolean => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
 
 /**
- * Checks the whole loot configuration (docs/game/loot.md): references resolve, weights and ranges make sense, and every
+ * Checks the whole loot configuration (docs/reference/loot.md): references resolve, weights and ranges make sense, and every
  * weighted rarity has an eligible item at every item level a source can reach. Run by the tests (and so CI) and available
  * to the dev tooling; pure and cheap.
+ *
+ * `validateLootData` (run by `tests/loot/lootValidate.test.ts`, and so CI) checks: sources reference profiles, profiles reference pools and rarities, weights are non-negative with at least one positive, roll counts and guarantees,
+ * level windows, known slots/tags/rarities, no empty enabled pool, and that every weighted rarity has an eligible base at **every item level the source can reach** (a monster source's `levels` range, or castle 1-10 for chests and the shelf).
+ *
+ * @category Loot/Pipeline
+ * @order 2
  */
 export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 10 }: ValidateOptions = {}): LootValidation => {
 	const errors: string[] = [];

@@ -59,6 +59,21 @@ export const craftFromJson = (raw: unknown): CraftState => {
 	return { xp: n(r.xp), ord: Math.floor(n(r.ord)), stock: counts(r.stock), pity: counts(r.pity), spent: n(r.spent), last: n(r.last), queue };
 };
 
+/**
+ * The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor,
+ * the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result,
+ * `combat` (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), `inv` (bag, gear, pity, auto-sell, Pack Rat size) and `resetAt`.
+ *
+ * - **Idempotency**: a repeated request with the same key replays the stored answer; two browsers cannot both claim (compare-and-swap).
+ * - **Tickets**: a chest or monster exists only as a ticket the server minted from its own clock. Opening a chest names a tile; no ticket on that tile, no reward. Timers and caps: {@link advanceBank} and {@link ticketCap}.
+ *   The browser draws exactly the tickets the server lists (`reconcileTickets` in `src/lib/offline/reconcile.ts`).
+ * - **Tables** (`supabase/schema.sql`, `supabase/migrations/*`): `profiles`, `player_saves` (small row: `core`, typed columns, `rev`, `flags`), `player_worlds` (the map, written only when it changed, by hash), `player_stats` (leaderboard row, trusted only),
+ *   `save_history`, `player_ledger`, `rebirth_history`, `app_settings` (season reset marker). The only write path for a save is `save_player_state`, executable by the service role.
+ *
+ * @category Saves & Server/The ledger
+ * @order 1
+ * @see sealedRng, computeOfflineGrant
+ */
 export interface Ledger {
 	/** Compare-and-swap counter: a write only lands if nobody else wrote since this was read (0 = the row does not exist yet) */
 	ver: number;

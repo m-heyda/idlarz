@@ -66,6 +66,24 @@ export type SaveFlag =
  */
 export type FlagDecision = 'flag' | 'clamp' | 'reject';
 
+/**
+ * The flags and what the server does with each. Meaning of each flag:
+ *
+ * - `baseline_rich`: the first save holds more gold than its rates and play time explain.
+ * - `networth_exceeds`: land, buildings, castle, merchant levels, gold and stock worth more than income x time x 3 + 3,600 s of burst (`netWorth.ts`).
+ * - `playtime_regress`: play time went back within a run. `playtime_fast`: more play time than real time passed (x1.05 + 30 s).
+ * - `gold_jump`: gold gain above income x time x 1.5 + burst + 1,000 + 2% of the balance + server grants.
+ * - `xp_jump`: XP above what bought tiles, play time and server payouts explain ({@link XP_MODEL}).
+ * - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
+ * - `castle_jump`: castle level or timer faster than real time. `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
+ *
+ * **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ({@link POISON_FLAGS}).
+ * With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save (HTTP 422).
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 2
+ * @table flag-policy
+ */
 export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	baseline_rich: 'flag', // a first save holds a whole history (an imported or older game): nothing to compare with, so it cannot be refused
 	networth_exceeds: 'clamp', // land, buildings, castle and merchant levels are paid from the last trusted rates, not the claimed ones
@@ -88,6 +106,9 @@ export interface Enforcement {
  * The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
  * accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`
  * in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 10
  */
 export const ENFORCEMENT: Enforcement = {
 	enabled: false,
@@ -98,7 +119,12 @@ export const ENFORCEMENT: Enforcement = {
 export const rejectedFlags = (flags: readonly SaveFlag[], enforcement: Enforcement = ENFORCEMENT): SaveFlag[] =>
 	enforcement.enabled ? flags.filter((flag) => FLAG_POLICY[flag] === 'reject' && enforcement.reject.has(flag)) : [];
 
-/** Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat. */
+/**
+ * Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 9
+ */
 export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
 	'baseline_rich',
 	'networth_exceeds',
@@ -141,6 +167,12 @@ const goldWorthRate = (summary: SaveSummary): number => {
 	return perSec;
 };
 
+/**
+ * Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 7
+ */
 export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs: number, grants?: GrantTotals): SaveFlag[] => {
 	const flags = new Set<SaveFlag>();
 

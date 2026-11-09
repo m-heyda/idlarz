@@ -168,9 +168,9 @@ Minutes the income needs to cover what is still missing of each part of the next
 | human-rebirth8 | 300 | 0 | 0 | 0 | 0 | 0 | 0 |
 | human-rebirth8 | 400 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-## Magnitude targets (docs/game/pacing-targets.md, IDL-128)
+## Magnitude targets (docs/reference/pacing.md, IDL-128)
 
-Measured with the real store at the checkpoints of docs/game/pacing-targets.md; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.
+Measured with the real store at the checkpoints of docs/reference/pacing.md; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.
 
 | profile | checkpoint | measured | band | status |
 | --- | --- | --- | --- | --- |

@@ -19,6 +19,11 @@ export const STARTER_FREE_TILES = 5;
  * Owned-tile count as the economy sees it: purchases + 1 (the old castle-only start). Tile cost, XP per tile, the extra
  * resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting tiles do not
  * make the first purchases expensive. Pass the state's `freeTiles`.
+ *
+ * @category Economy/Tiles
+ * @order 6
+ * @formula
+ * economyTiles = owned tiles - freeTiles + 1       (freeTiles = STARTER_FREE_TILES = 5 in a new game)
  */
 export const economyTiles = (tiles: World, freeTiles: number): number => countOwnedTiles(tiles) - freeTiles + 1;
 

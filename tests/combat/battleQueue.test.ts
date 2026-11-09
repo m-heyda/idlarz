@@ -9,7 +9,7 @@ import { combatView, dismissTicket, restThrough, runCombat } from '../../src/lib
 import type { FightEvent } from '../../src/lib/offline/fightTypes';
 import type { Ledger } from '../../src/lib/offline/ledger';
 
-// The battle queue (docs/game/combat.md): clicks during a fight line monsters up, the server fights them one after the other.
+// The battle queue (docs/reference/combat.md): clicks during a fight line monsters up, the server fights them one after the other.
 
 // the win-chance gate is for auto-battle only and has its own tests; a queued fight ignores it by design, but the help below also fights with auto-battle on
 (COMBAT.auto as { minWinChance: number }).minWinChance = 0;

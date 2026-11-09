@@ -25,7 +25,17 @@ export const monsterDef = (type: MonsterType): MonsterDef => MONSTERS[type];
 
 export const isBoss = (type: MonsterType): boolean => MONSTERS[type].grade === 'boss';
 
-/** The levels a new monster of this type can appear at in a world of this castle level (both ends included). */
+/**
+ * The levels a new monster of this type can appear at in a world of this castle level (both ends included).
+ *
+ * Spawn window. Plains normal: base 1, +1 per castle level, spread 2, cap 10; forest 4/+1/2/14; swamp 8/+1/2/18; tundra 12/+0.5/2/20. Bosses: base 15 / 20 / 25 / 30, +0.8 per castle level, spread 3, cap 25 / 30 / 35 / 40.
+ *
+ * @category Monsters/Level scaling
+ * @order 2
+ * @formula
+ * min = max(1, min(cap - spread, base + floor(perCastleLevel x (castle level - 1))))
+ * max = min(cap, min + spread)
+ */
 export const spawnLevelRange = (type: MonsterType, castleLevel = 1): { min: number; max: number } => {
 	const { base, perCastleLevel, spread, cap } = MONSTERS[type].spawnWindow;
 	const min = Math.max(1, Math.min(cap - spread, base + Math.floor(perCastleLevel * (Math.max(1, castleLevel) - 1))));
@@ -36,6 +46,12 @@ export const spawnLevelRange = (type: MonsterType, castleLevel = 1): { min: numb
  * The level a new monster starts at. Rolled from a generator seeded by its id and nothing else, so it takes no number from
  * Math.random (the rest of the game's randomness is the same with or without it) and the same monster always rolls the same.
  * `levelCap` (optional) is the highest level the player can still beat (see offline/spawnWeights.ts): a roll above it comes down to it, never below `min`.
+ *
+ * The level is rolled from a generator seeded by the monster's ticket number only, plus a **danger bonus** of 1 level per 8 tiles of Chebyshev distance from the castle ({@link dangerBonus}, `COMBAT.spawn.dangerStep`).
+ * The per-band `dangerOffset` in `DISTANCE_BANDS` is 0 everywhere and unused.
+ *
+ * @category Monsters/Level scaling
+ * @order 3
  */
 export const rollSpawnLevel = (type: MonsterType, castleLevel: number, monsterId: number, distance = 0, levelCap?: number): number => {
 	const { min, max } = spawnLevelRange(type, castleLevel);
@@ -47,7 +63,14 @@ export const rollSpawnLevel = (type: MonsterType, castleLevel: number, monsterId
 	return levelCap === undefined ? rolled : Math.max(lo, Math.min(rolled, levelCap));
 };
 
-/** Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: danger grows toward the frontier. */
+/**
+ * Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: danger grows toward the frontier.
+ *
+ * @category Monsters/Level scaling
+ * @order 5
+ * @formula
+ * danger bonus = floor(Chebyshev distance from the castle / 8) levels
+ */
 export const dangerBonus = (distance: number): number => Math.floor(Math.max(0, Number.isFinite(distance) ? distance : 0) / COMBAT.spawn.dangerStep);
 
 /** How many levels a monster can grow: the growth limit, or less when the server capped it for a weak player (`growCap`, set when it appeared). */
@@ -56,14 +79,41 @@ const growthLevels = (ctx: LimitContext, growCap?: number): number => Math.min(l
 /** The highest level a monster that appeared at `spawnLevel` can grow to. */
 export const maxLevelOf = (spawnLevel: number, ctx: LimitContext = {}, growCap?: number): number => spawnLevel + growthLevels(ctx, growCap);
 
-/** The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit. */
+/**
+ * The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit.
+ *
+ * Growth: +1 level per 1,800 s on the map (`LIMITS.monsterGrowthIntervalSec`), at most +10 above the spawn level (`LIMITS.monsterGrowthLevels`, hard 40). The level is a function of age.
+ * A monster whose spawn was capped for a weak player has a smaller `growCap`.
+ *
+ * @category Monsters/Level scaling
+ * @order 4
+ * @formula
+ * level = spawnLevel + min(growthLevels, floor(ageSec / 1800))
+ */
 export const levelAtAge = (spawnLevel: number, ageSec: number, ctx: LimitContext = {}, growCap?: number): number =>
 	spawnLevel + Math.min(growthLevels(ctx, growCap), Math.floor(Math.max(0, ageSec) / limitOf('monsterGrowthIntervalSec', ctx)));
 
 /** Rounds .5 up even when the power of an irrational growth factor lands a hair below it (337.4999... is 338, like the old exact 1.5 per tier). */
 const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
 
-/** HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). */
+/**
+ * HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`).
+ *
+ * Level scaling: a monster has an integer level. Stats follow `monsterStats`.
+ *
+ * - **Normal** (`scaling: 'exp'`): `HP = round(hp x sqrt(1.5)^(level-1))`, `attack = round(attack x sqrt(1.25)^(level-1))`, `armor = armor + 0.5 x (level-1)`. A level 9 plains monster has 506 HP.
+ * - **Boss** (`scaling: 'gear'`): HP and attack `x levelScale(level) / levelScale(refLevel)` (`1 + 0.07 x (level - 1)`, `src/catalog/stats.ts`); armor `+0.5` per level away from `refLevel`. The plains boss has 1,000 HP and 11 attack at level 15.
+ * - Reference levels: plains 15, forest 20, swamp 25, tundra 30.
+ *
+ * @category Monsters/Level scaling
+ * @order 1
+ * @formula
+ * normal: HP     = round(hp     x sqrt(1.5)^(level - 1))
+ *         attack = round(attack x sqrt(1.25)^(level - 1))
+ *         armor  = armor + 0.5 x (level - 1)
+ * boss:   HP, attack = base x levelScale(level) / levelScale(refLevel)         levelScale(L) = 1 + 0.07 x (L - 1)
+ *         armor  = armor + 0.5 x (level - refLevel)
+ */
 export const monsterStats = (type: MonsterType, level: number): MonsterStats => {
 	const d = monsterDef(type);
 	const steps = Math.max(1, Math.floor(level)) - d.refLevel;
@@ -90,6 +140,12 @@ export const monsterAt = (monsters: Monster[], x: number, y: number): Monster | 
 /**
  * Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance
  * (Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are `MonsterDef.spawn`.
+ *
+ * The tile: an owned tile whose biome is in the monster's list (`MonsterDef.spawn`), Chebyshev distance from the castle 2 to 9 (`minCastleDistance`, `maxCastleDistance`), no building, no chest, no other monster,
+ * outside the castle ward from castle level 7. `minRebirths` exists in the rule but no monster uses it.
+ *
+ * @category Monsters/Spawning
+ * @order 2
  */
 export const canSpawnOn = (
 	type: MonsterType,

@@ -19,13 +19,19 @@ import type { Snapshot } from './verify';
  *    upgrades bought without gold are put back by the trusted economy, IDL-168, but a Tithe bought since the last upload is not known here).
  *  - A first save (nothing to compare with) holds a whole history: its rebirths are bounded by the play time and its Embers by the
  *    best rebirth the game can pay.
+ *
+ * In short: Embers only rise with the rebirth count; one rebirth fits between two saves and it must be believable from the previous castle and land; a first save is bounded by 4 hours of play per rebirth and a 1,000-tile best case.
+ * `requireServerRebirth` is off.
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 5
  */
 export const EMBER_MODEL = {
 	/** The old run may have bought this many more tiles after the save it is judged from (same margin as the XP model). */
 	runEndTiles: 100,
 	/** No honest run is shorter (the fastest measured one, a hardcore player, takes more than a day): play time per rebirth in a first save. */
 	minRunSec: 4 * 3600,
-	/** A first save is bounded by the best rebirth: the highest castle level and a territory above the medium-map target (docs/game/pacing-targets.md). */
+	/** A first save is bounded by the best rebirth: the highest castle level and a territory above the medium-map target (docs/reference/pacing.md). */
 	firstSaveTiles: 1000,
 	/**
 	 * Once the browser asks the server to run every rebirth (`POST /api/rebirth`, IDL-102), a rebirth with no server record can be refused.

@@ -18,6 +18,13 @@ export const BIOME_SPAWN = {
 	nearCoast: { lake: 2, coast: 2 } as Record<string, number>,
 };
 
+/**
+ * Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.
+ *
+ * @category Economy/Biomes
+ * @order 2
+ * @table biome-output
+ */
 export const BIOMES: Record<string, BiomeInfo> = {
 	empty: {
 		name: 'empty',

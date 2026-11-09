@@ -12,6 +12,14 @@ export const merchantLevel = (upgrades: MerchantUpgrades | undefined, id: Mercha
 export const merchantEffect = (upgrades: MerchantUpgrades | undefined, id: MerchantUpgradeId): number =>
 	merchantLevel(upgrades, id) * MERCHANT_UPGRADES[id].effectPerLevel;
 
+/**
+ * Gold price of the next level of a merchant upgrade.
+ *
+ * @category Economy/Merchant
+ * @order 7
+ * @formula
+ * cost of level N+1 = ceil(baseCost x growth^N)
+ */
 export const merchantUpgradeCost = (id: MerchantUpgradeId, level: number): number =>
 	Math.ceil(MERCHANT_UPGRADES[id].baseCost * Math.pow(MERCHANT_UPGRADES[id].costGrowth, level));
 
@@ -31,10 +39,25 @@ export const SELL_BONUSES: ((ctx: SellContext) => number)[] = [(ctx) => merchant
 /** Multiplier on every gold payout from selling to the merchant. */
 export const sellMultiplier = (ctx: SellContext | undefined): number => 1 + SELL_BONUSES.reduce((sum, bonus) => sum + (ctx ? bonus(ctx) : 0), 0);
 
-/** Gold for selling `qty` of something worth `unit` each. */
+/**
+ * Gold for selling `qty` of something worth `unit` each.
+ *
+ * @category Economy/Merchant
+ * @order 4
+ * @formula
+ * payout = floor(units x unit price x (1 + 0.03 x Haggler level))
+ * @see sellMultiplier (src/utils/game/merchant.ts)
+ */
 export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefined): number => Math.floor(unit * qty * sellMultiplier(ctx));
 
-/** Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this). */
+/**
+ * Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this).
+ *
+ * @category Economy/Merchant
+ * @order 5
+ * @formula
+ * cost = ceil(units x sell price x 2)
+ */
 export const buyCost = (resource: keyof typeof MERCHANT_RESOURCE_PRICES, units: number): number =>
 	Math.ceil(units * MERCHANT_RESOURCE_PRICES[resource] * MERCHANT_BUY_MULTIPLIER);
 

@@ -18,6 +18,19 @@ export interface SkillDef {
 	stunSec?: number;
 }
 
+/**
+ * Potions and skills.
+ *
+ * - Potions (`healHp` in the item catalog): Minor Healing 35 HP, Greater Healing 90 HP; they work in and out of fights, share an 8 s cooldown inside a fight (`COMBAT.potionCooldownSec`), cannot be drunk at full HP. Hotkeys 1-3 are requests the server checks.
+ * - Skills, mana spent on cast, cooldown after: **Heal** (level 5, 20 mana, 12 s) restores `25% of max HP x (1 + magic damage% / 100) x (1 + Spell Power / 100)` in or out of a fight ({@link healAmount});
+ *   **Stun** (level 10, 15 mana, 30 s) freezes the monster's attack timer for 10 s, fights only; the monster's `stunResist` % can make it fail (mana and cooldown are still spent).
+ * - **Auto-use** (switch, default on; a fixed preset in `COMBAT.auto`, {@link autoUse}): a potion below 40% HP (best fit for the missing HP), Heal below 50%, Stun whenever it is ready.
+ *
+ * Nothing else is learned or levelled. Four classes (warrior, paladin, ranger, mage) are cosmetic: a portrait and a name (`PLAYER_CLASSES`), no class gives a bonus.
+ *
+ * @category Combat/Potions and skills
+ * @table skills
+ */
 export const SKILLS: Record<SkillId, SkillDef> = {
 	heal: { id: 'heal', name: 'Heal', unlockLevel: 5, manaCost: 20, cooldownSec: 12, fightOnly: false, healFraction: 0.25 },
 	stun: { id: 'stun', name: 'Stun', unlockLevel: 10, manaCost: 15, cooldownSec: 30, fightOnly: true, stunSec: 10 },

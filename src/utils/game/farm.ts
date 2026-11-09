@@ -2,6 +2,15 @@
 import { ANIMALS, FARM, FARM_PEN, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import type { Animal, Resources } from '@/types/game';
 
+/**
+ * Food cost of the next animal of a kind when `level` of them are owned: `floor(baseCost x costScaling^level)`.
+ *
+ *
+ * @category Economy/Farm
+ * @order 4
+ * @formula
+ * cost = floor(baseCost x costScaling^owned)
+ */
 export const calculateAnimalCost = (animal: Animal, level: number): number => {
 	return Math.floor(animal.baseCost * Math.pow(animal.costScaling, level));
 };
@@ -14,7 +23,14 @@ export const farmUpgradeLevel = (upgrades: FarmUpgrades | undefined, id: FarmUpg
 /** Animals of one kind the pen holds (the base cap plus Pen Expansion). A save with more is never trimmed. */
 export const farmCap = (upgrades: FarmUpgrades | undefined): number => FARM.baseCap + farmUpgradeLevel(upgrades, 'pen') * FARM_PEN.capPerLevel;
 
-/** Cost of the next level of a farm upgrade, given its current level (one entry per resource). */
+/**
+ * Cost of the next level of a farm upgrade, given its current level (one entry per resource).
+ *
+ * @category Economy/Farm
+ * @order 5
+ * @formula
+ * cost[r] = ceil(base[r] x growth^level)          per resource of the upgrade
+ */
 export const farmUpgradeCost = (id: FarmUpgradeId, level: number): Partial<Resources> => {
 	const def = FARM_UPGRADES[id];
 	const out: Partial<Resources> = {};
@@ -29,7 +45,17 @@ export type FarmOutput = Record<'meat' | 'eggs' | 'milk' | 'hide', number>;
 
 const emptyOutput = (): FarmOutput => ({ meat: 0, eggs: 0, milk: 0, hide: 0 });
 
-/** Output of `count` animals of one kind (every purchase adds one more animal). */
+/**
+ * Output of `count` animals of one kind (every purchase adds one more animal).
+ *
+ * Output of N animals of one kind. Meat uses Feed Trough, the products use their own upgrade and Pasture.
+ *
+ * @category Economy/Farm
+ * @order 2
+ * @formula
+ * meat    = baseProduction x N x (1 + 0.02 x pen level) x (1 + 0.05 x feed trough level)
+ * product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery effect) x (1 + 0.08 x pasture level)
+ */
 export const animalOutput = (animal: Animal, count: number, upgrades?: FarmUpgrades): FarmOutput => {
 	const out = emptyOutput();
 	if (count <= 0) return out;
@@ -44,6 +70,12 @@ export const animalOutput = (animal: Animal, count: number, upgrades?: FarmUpgra
 // Meat/s of `level` animals of one kind (every purchase adds one more animal)
 export const calculateAnimalProduction = (animal: Animal, level: number, upgrades?: FarmUpgrades): number => animalOutput(animal, level, upgrades).meat;
 
+/**
+ * The whole farm's output per second: the sum of {@link animalOutput} over the animal kinds. The merchant's Skinner multiplies meat and hide afterwards ({@link calculateResourceBreakdown}).
+ *
+ * @category Economy/Farm
+ * @order 6
+ */
 export const calculateFarmOutput = (farmLevels: Record<string, number>, upgrades?: FarmUpgrades): FarmOutput => {
 	const total = emptyOutput();
 	ANIMALS.forEach((animal) => {

@@ -69,7 +69,14 @@ interface TileOutput {
 	areaBonus: number;
 }
 
-/** The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it. */
+/**
+ * The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.
+ *
+ * Neighbour bonus: +25% per same-biome 4-neighbour (`SCALING_CONFIG.adjacencyBonus`). A tile inside the castle range also gets the castle area bonus ({@link castleAreaBonus}).
+ *
+ * @category Economy/Income
+ * @order 3
+ */
 export const calculateTileOutput = (tiles: World, x: number, y: number, castleLevel: number): TileOutput | null => {
 	const tile = getTile(tiles, x, y);
 	if (!tile) return null;
@@ -98,7 +105,31 @@ export const calculateTileOutput = (tiles: World, x: number, y: number, castleLe
 	return out;
 };
 
-/** Income per second of every resource, split into its sources and modifiers (the one place the income formula lives). */
+/**
+ * Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).
+ *
+ * The one function that builds the income. Every number the UI shows as "per second" (header, tooltips, the tick) comes from here.
+ *
+ * Everything inside the first bracket is added, the three multipliers after it are multiplied. The meat and hide of the farm are multiplied by the merchant's
+ * Skinner before they enter `base`. The castle tile itself gets no yield scale and no neighbour bonus.
+ *
+ * - `plainsMod`: +5% meat per owned Plains tile (`CHARACTER_STAT_CONFIG.plainsMeatModifier`).
+ * - `statMod`: +2.5% per attribute point on the resources each attribute feeds, and +0.2% / +0.25% XP per Intelligence / Charisma point, see {@link calculateStatResourceModifiers}.
+ * - `emberMult`: see {@link emberIncomeBonus}.
+ * - `foreman`: the merchant upgrade, +1% per level on every resource but XP. `gearIncome`: the set bonus Income %, on every resource but XP (`src/lib/gearEconomy.ts`).
+ *
+ * @category Economy/Income
+ * @order 2
+ * @formula
+ * base[r]  = BASE_GENERATION_RATES[r]
+ *          + farm output (meat, eggs, milk, hide; the farm has no other source of those four)
+ *          + sum over owned tiles of (biome output[r] + building output[r]) x BIOME_YIELD.scale x (1 + 0.25 x same-biome 4-neighbours)
+ *          + sum over tiles inside the castle range of the same tile output x castleAreaBonus(castle level)
+ *          + 0.5 x (castle level - 1)                      (xp only)
+ * modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
+ * total[r] = base[r] x (1 + modifier[r])
+ * @see calculateTileOutput, castleModifier, castleAreaBonus, calculateFarmOutput
+ */
 export const calculateResourceBreakdown = (
 	tiles: World,
 	characterStats?: CharacterStats,

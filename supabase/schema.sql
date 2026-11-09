@@ -1,6 +1,6 @@
 -- Idlarz accounts and cloud saves: the schema as it stands on the Supabase project (applied as migrations create_profiles,
 -- cloud_save_v2_split, harden_policies_and_rpc, test_account_marker, autosave_history_by_time, offline_ledger, combat_ledger). Run once in the SQL editor of a fresh project.
--- Design and rules: docs/game/saves-and-server.md.
+-- Design and rules: docs/reference/saves-and-server.md.
 
 -- ---- profiles: character name and hero, owner-only ------------------------------------------------------------------
 create table public.profiles (
@@ -100,7 +100,7 @@ comment on table public.save_history is 'Deliberately no policies: only the serv
 
 -- ---- player_ledger: the server's own record of a player (away-time anchor, spawn tickets, sealed-roll counters, gems) -----
 -- One small row per player. Written ONLY by the server (service role, compare-and-swap on ver); a player may read their own gems and
--- nothing else. Design: docs/game/saves-and-server.md.
+-- nothing else. Design: docs/reference/saves-and-server.md.
 create table public.player_ledger (
   user_id       uuid primary key references auth.users (id) on delete cascade,
   ver           integer     not null,                 -- compare-and-swap counter

@@ -36,6 +36,17 @@ export interface KillLoot {
  * Rewards for a kill. Gold and XP are "seconds of income" (like chests) so they scale with the economy. The items come from
  * the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which
  * item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.
+ *
+ * What a kill pays. Luck, Gold Find and Kill Rewards are applied after the cap, so pay can exceed it. Minimums: 10 gold, 5 XP (`COMBAT.rewards`). `levelMult` is 1.08 per level for normal monsters and 1.03 for bosses.
+ * Items: see {@link generateLoot}. Measured share of income: `docs/generated/kill-sim.md`.
+ *
+ * @category Monsters/Rewards
+ * @formula
+ * goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
+ * gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%))
+ * xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel)) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xp/s includes the XP gain %)
+ * hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
+ * @table kill-rewards
  */
 export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillContext): { gold: number; xp: number; hide: number } => {
 	const { reward } = monsterDef(monster.type);
