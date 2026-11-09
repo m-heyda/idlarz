@@ -62,6 +62,18 @@ export const HISTORY_EVERY_MS = 30 * 60_000;
 /** How many history copies are kept per player, and how many extra pinned ones. */
 export const HISTORY_KEEP = 6;
 export const PINNED_KEEP = 3;
+
+type Headline = Pick<SaveSummary, 'rebirths' | 'level' | 'tilesOwned'>;
+
+/**
+ * True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
+ * resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 10
+ */
+export const losesProgress = (previous: Headline, next: Headline): boolean =>
+	next.rebirths < previous.rebirths || (next.rebirths === previous.rebirths && (next.level < previous.level || next.tilesOwned < previous.tilesOwned));
 /**
  * Saves from one player are accepted at most this often (an honest client sends every ~90 s).
  *
@@ -136,6 +148,8 @@ export type SaveOutcome =
 			/** The XP the server kept, only when the save held more than it could have earned (the browser takes the lower number) */ xp?: number;
 			/** The Embers and rebirths the server kept, only when the save held more than a rebirth could have paid (the browser takes them) */ prestige?: PrestigeState;
 			/** Set when the server paid this save from the last trusted economy instead of the claimed one (IDL-167); the flags say why */ economy?: 'trusted';
+			/** Set when this save replaced one that held more (a New Game, or a browser re-basing a game that is behind): that save was pinned in the history first */
+			replaced?: { fromRev: number; level: number; tilesOwned: number; playSeconds: number };
 	  }
 	| { kind: 'conflict'; rev: number; serverSavedAt: number }
 	/** Enforcement is on and the save raised a flag that refuses it: nothing was stored (the account keeps its last accepted save) */
@@ -299,8 +313,10 @@ export const acceptSave = async (
 	}
 	const newRun = !!(ledger && current && (summary.rebirths > current.summary.rebirths || flags.includes('playtime_regress')));
 
-	// Starting over (New Game) must not push the old game out of the history: pin the save that is about to be replaced
-	if (current && flags.includes('playtime_regress')) {
+	// Starting over (New Game), or a browser re-basing its game over an account save that is further along (client `resolveConflict`) must not
+	// push the old game out of the history: pin the save that is about to be replaced
+	const replacesFurther = !!current && (flags.includes('playtime_regress') || losesProgress(current.summary, summary));
+	if (current && replacesFurther) {
 		const old = await repo.load(userId, { world: true });
 		if (old?.world && old.rev === current.rev) await repo.pin(userId, old, PINNED_KEEP);
 	}
@@ -416,5 +432,9 @@ export const acceptSave = async (
 		xp: xpVerdict.clamped ? xpVerdict.xp : undefined,
 		prestige: emberVerdict.clamped ? state.prestige : undefined,
 		economy: trusted ? 'trusted' : undefined,
+		replaced:
+			replacesFurther && current
+				? { fromRev: current.rev, level: current.summary.level, tilesOwned: current.summary.tilesOwned, playSeconds: current.summary.playSeconds }
+				: undefined,
 	};
 };

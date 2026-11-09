@@ -8,25 +8,37 @@ export interface Progress {
 	rebirths: number;
 }
 
+/** How long the account's save must have been untouched before a browser that is behind may replace it: longer than one upload heartbeat (`SYNC.heartbeatMs`, 5 min) plus a minute. */
+export const QUIET_MS = 6 * 60_000;
+
 /**
- * Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player: this browser's game is the same
- * game as the account's save and is at least as far along, so uploading it on top of the cloud revision loses nothing. Decided from numbers
- * both sides hold, never from anything the server could be asked to trust:
+ * Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. Decided from numbers both
+ * sides hold, never from anything the server could be asked to trust. The server's own revision check stays as it was: the browser only
+ * re-bases on the revision it is told about.
  *
- *   - the cloud revision is above the one this browser's link holds (the account's save continued from the one this browser knew; a New Game
- *     on another device starts the revisions again and is never "continued"), and
- *   - the cloud save is not ahead in play time, level or tiles, and is in the same rebirth (a higher rebirth count is another run).
- *
- * Anything else (the cloud is ahead in any of them, or the rebirths differ) is a real divergence: the player chooses in the hub and nothing is
- * overwritten. The server's own revision check stays as it was; this only lets the browser re-base on the revision it is told about.
+ *   - `ahead`: this browser's game is the same game and at least as far along (cloud revision above the link's; cloud not ahead in play time, level
+ *     or tiles; same rebirth). Uploading over it loses nothing.
+ *   - `overwrite`: the account's save continued from this browser's link (revision above the link's) but holds more than this browser's game, and
+ *     nobody has saved it for `QUIET_MS`: the other session is gone, so this browser's game replaces it (owner decision). The server pins
+ *     the replaced save in the history first (`losesProgress`), and the player is told. While the other session is still saving, the browser waits
+ *     (`wait`), so two live sessions never trade overwrites.
+ *   - `never`: the revision is not above the link's (a New Game elsewhere starts the revisions again): another game, the player chooses in the hub.
  *
  * @category Saves & Server/Uploading
  * @order 2
- * @formula recover = cloud.rev > link.rev && cloud.playSeconds <= local.playSeconds && cloud.level <= local.level && cloud.tilesOwned <= local.tilesOwned && cloud.rebirths == local.rebirths
+ * @formula continued = cloud.rev > link.rev; ahead = continued && cloud.playSeconds <= local.playSeconds && cloud.level <= local.level && cloud.tilesOwned <= local.tilesOwned && cloud.rebirths == local.rebirths; overwrite = continued && !ahead && now - cloud.serverSavedAt >= QUIET_MS
  */
-export const canRebase = (link: Pick<CloudLink, 'rev'>, local: Progress, cloud: Progress, cloudRev: number): boolean =>
-	cloudRev > link.rev &&
-	cloud.playSeconds <= local.playSeconds &&
-	cloud.level <= local.level &&
-	cloud.tilesOwned <= local.tilesOwned &&
-	cloud.rebirths === local.rebirths;
+export const judgeRebase = (
+	link: Pick<CloudLink, 'rev'>,
+	local: Progress,
+	cloud: Progress,
+	cloudRev: number,
+	cloudSavedAt: number,
+	now: number,
+): 'ahead' | 'overwrite' | 'wait' | 'never' => {
+	if (cloudRev <= link.rev) return 'never';
+	const ahead =
+		cloud.playSeconds <= local.playSeconds && cloud.level <= local.level && cloud.tilesOwned <= local.tilesOwned && cloud.rebirths === local.rebirths;
+	if (ahead) return 'ahead';
+	return now - cloudSavedAt >= QUIET_MS ? 'overwrite' : 'wait';
+};

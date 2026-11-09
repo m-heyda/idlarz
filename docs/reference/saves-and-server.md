@@ -8,8 +8,8 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 
 - Threat model: [The server's rule and the threat model](#the-server-s-rule-and-the-threat-model)
 - The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog)
-- Uploading: [`SYNC`](#sync), [`canRebase`](#canrebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
-- Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`POISON_FLAGS`](#poison-flags), [`ENFORCEMENT`](#enforcement)
+- Uploading: [`SYNC`](#sync), [`judgeRebase`](#judgerebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
+- Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
@@ -167,27 +167,28 @@ so the cadence is tested without a browser.
 | menu "Save game" | at most once per 10 minutes |
 | failure | backoff 30 s, 1 min, 2 min, 5 min |
 
-<a id="canrebase"></a>
+<a id="judgerebase"></a>
 
-### `canRebase` <small>function</small>
+### `judgeRebase` <small>function</small>
 
-Source: [`src/lib/cloudRecovery.ts:27`](../../src/lib/cloudRecovery.ts)
+Source: [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts)
 
-Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player: this browser's game is the same
-game as the account's save and is at least as far along, so uploading it on top of the cloud revision loses nothing. Decided from numbers
-both sides hold, never from anything the server could be asked to trust:
+Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. Decided from numbers both
+sides hold, never from anything the server could be asked to trust. The server's own revision check stays as it was: the browser only
+re-bases on the revision it is told about.
 
-  - the cloud revision is above the one this browser's link holds (the account's save continued from the one this browser knew; a New Game
-    on another device starts the revisions again and is never "continued"), and
-  - the cloud save is not ahead in play time, level or tiles, and is in the same rebirth (a higher rebirth count is another run).
-
-Anything else (the cloud is ahead in any of them, or the rebirths differ) is a real divergence: the player chooses in the hub and nothing is
-overwritten. The server's own revision check stays as it was; this only lets the browser re-base on the revision it is told about.
+  - `ahead`: this browser's game is the same game and at least as far along (cloud revision above the link's; cloud not ahead in play time, level
+    or tiles; same rebirth). Uploading over it loses nothing.
+  - `overwrite`: the account's save continued from this browser's link (revision above the link's) but holds more than this browser's game, and
+    nobody has saved it for `QUIET_MS`: the other session is gone, so this browser's game replaces it (owner decision). The server pins
+    the replaced save in the history first (`losesProgress`), and the player is told. While the other session is still saving, the browser waits
+    (`wait`), so two live sessions never trade overwrites.
+  - `never`: the revision is not above the link's (a New Game elsewhere starts the revisions again): another game, the player chooses in the hub.
 
 **Formula**
 
 ```text
-recover = cloud.rev > link.rev && cloud.playSeconds <= local.playSeconds && cloud.level <= local.level && cloud.tilesOwned <= local.tilesOwned && cloud.rebirths == local.rebirths
+continued = cloud.rev > link.rev; ahead = continued && cloud.playSeconds <= local.playSeconds && cloud.level <= local.level && cloud.tilesOwned <= local.tilesOwned && cloud.rebirths == local.rebirths; overwrite = continued && !ahead && now - cloud.serverSavedAt >= QUIET_MS
 ```
 
 <a id="manual-cloud-cooldown-ms"></a>
@@ -207,12 +208,15 @@ The menu's "Save game" button uploads at most once per 10 minutes.
 
 ### `resolveConflict` <small>function</small>
 
-Source: [`src/lib/cloudClient.ts:211`](../../src/lib/cloudClient.ts)
+Source: [`src/lib/cloudClient.ts:215`](../../src/lib/cloudClient.ts)
 
 After a 409, decide whether it needs the player. Looks at the account's save once and answers:
   - it is one of this browser's own lost uploads (`isOwnSave`), or this browser's game is the same game and at least as far along
-    (`canRebase`): the link is moved to its revision and the caller uploads again (`rebased`);
-  - it is ahead of, or another game than, this browser's: `diverged`, the player picks in the hub;
+    (`judgeRebase`): the link is moved to its revision and the caller uploads again (`rebased`);
+  - it holds more than this browser's game but nobody has saved it for `QUIET_MS` (the other session is gone): this browser's game replaces it
+    (`rebased` via `overwrite`, owner decision; the server pins the replaced save in the history and the caller tells the player);
+  - it holds more and is still being saved, or its revision is not above the link's (a New Game elsewhere restarts the revisions): `diverged`,
+    nothing is uploaded, the caller looks again later (the player can choose in the hub meanwhile);
   - the account has no save (`gone`), or could not be read (`unknown`).
 Nothing is uploaded here, so the server's revision check stays the only thing that decides what is stored.
 
@@ -233,7 +237,7 @@ still happens is resolved by `resolveConflict`. The lock dies with the page, so 
 
 ### `acceptSave` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:186`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:200`](../../src/lib/cloudSave/pipeline.ts)
 
 Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet).
   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`
@@ -344,7 +348,7 @@ In short: Embers only rise with the rebirth count; one rebirth fits between two 
 
 ### `MIN_SAVE_INTERVAL_MS` <small>const</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:71`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:83`](../../src/lib/cloudSave/pipeline.ts)
 
 Saves from one player are accepted at most this often (an honest client sends every ~90 s).
 
@@ -376,6 +380,15 @@ variables were not exposed, real players must stay in the checks, not slip out o
 Source: [`src/lib/cloudSave/verify.ts:128`](../../src/lib/cloudSave/verify.ts)
 
 Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
+
+<a id="losesprogress"></a>
+
+### `losesProgress` <small>function</small>
+
+Source: [`src/lib/cloudSave/pipeline.ts:75`](../../src/lib/cloudSave/pipeline.ts)
+
+True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
+resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).
 
 <a id="enforcement"></a>
 

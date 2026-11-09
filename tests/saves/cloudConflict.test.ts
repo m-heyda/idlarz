@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveConflict, type FetchCloud, type PushAttempt, type ResolveDeps } from '../../src/lib/cloudClient';
-import { canRebase, type Progress } from '../../src/lib/cloudRecovery';
+import { QUIET_MS, judgeRebase, type Progress } from '../../src/lib/cloudRecovery';
 import { withPushLock } from '../../src/lib/pushLock';
 import { encodeSave } from '../../src/lib/saveFormat';
 import { createSyncScheduler, SYNC, type PushOutcome } from '../../src/lib/syncPolicy';
@@ -20,13 +20,17 @@ const stateOf = (p: Progress) => {
 	return structuredClone(pickPersisted(api()));
 };
 
-const cloudAt = (rev: number, over: Partial<Progress> = {}, text?: string): FetchCloud => {
+const NOW = 50_000_000;
+const FRESH = NOW - 60_000; // the other session saved a minute ago
+const QUIET = NOW - QUIET_MS - 1; // ... or has not saved for longer than a heartbeat
+
+const cloudAt = (rev: number, over: Partial<Progress> = {}, text?: string, savedAt = FRESH): FetchCloud => {
 	const p = { ...local, ...over };
 	return {
 		status: 'ok',
 		cloud: {
 			rev,
-			serverSavedAt: 1,
+			serverSavedAt: savedAt,
 			text: text ?? encodeSave(stateOf(p)),
 			summary: { level: p.level, tilesOwned: p.tilesOwned, playSeconds: p.playSeconds, gold: 1 },
 		},
@@ -42,6 +46,7 @@ const harness = (latest: FetchCloud, link: CloudLink | null, attempts: PushAttem
 		readLink: () => link,
 		writeLink: (l) => void links.push(l),
 		clearAttempts: () => void cleared++,
+		now: () => NOW,
 	};
 	return { deps, links, cleared: () => cleared };
 };
@@ -56,23 +61,29 @@ test('another writer saved twice between uploads: the game that is ahead re-base
 	assert.equal(h.cleared(), 1);
 });
 
-test('a cloud save that is ahead in play time, level or tiles is never overwritten', async () => {
-	for (const over of [{ playSeconds: 5001 }, { level: 11 }, { tilesOwned: 41 }]) {
+test('a cloud save that holds more and is still being saved is left alone: nothing is uploaded, the caller looks again later', async () => {
+	for (const over of [{ playSeconds: 5001 }, { level: 11 }, { tilesOwned: 41 }, { rebirths: 2 }]) {
 		const h = harness(cloudAt(418, over), link);
 		assert.deepEqual(await resolveConflict('u1', local, h.deps), { kind: 'diverged', rev: 418 }, JSON.stringify(over));
 		assert.deepEqual(h.links, []);
 	}
 });
 
-test('another rebirth count is another run: the player chooses', async () => {
-	assert.equal((await resolveConflict('u1', local, harness(cloudAt(418, { rebirths: 0 }), link).deps)).kind, 'diverged');
-	assert.equal((await resolveConflict('u1', local, harness(cloudAt(418, { rebirths: 2 }), link).deps)).kind, 'diverged');
+test('the same save, untouched for longer than a heartbeat, is replaced by this browser (owner decision); the server pins it', async () => {
+	for (const over of [{ playSeconds: 5001 }, { level: 11 }, { tilesOwned: 41 }, { rebirths: 0 }]) {
+		const h = harness(cloudAt(418, over, undefined, QUIET), link);
+		assert.deepEqual(await resolveConflict('u1', local, h.deps), { kind: 'rebased', rev: 418, via: 'overwrite' }, JSON.stringify(over));
+		assert.deepEqual(h.links, [{ userId: 'u1', rev: 418 }]);
+	}
+	assert.equal(judgeRebase({ rev: 416 }, local, { ...local, level: 11 }, 418, NOW - QUIET_MS, NOW), 'overwrite', 'exactly QUIET_MS counts as quiet');
+	assert.equal(judgeRebase({ rev: 416 }, local, { ...local, level: 11 }, 418, NOW - QUIET_MS + 1, NOW), 'wait');
 });
 
-test('a New Game on another device (revisions start again) is not continued, even when the old game is further along', async () => {
-	const h = harness(cloudAt(3, { playSeconds: 10, level: 1, tilesOwned: 1, rebirths: 1 }), link);
+test('a New Game on another device (revisions start again) is never continued, however quiet and whatever the old game holds', async () => {
+	const h = harness(cloudAt(3, { playSeconds: 10, level: 1, tilesOwned: 1 }, undefined, QUIET), link);
 	assert.equal((await resolveConflict('u1', local, h.deps)).kind, 'diverged');
-	assert.equal(canRebase({ rev: 416 }, local, { ...local, playSeconds: 10 }, 416), false, 'the same revision is not newer');
+	assert.equal(judgeRebase({ rev: 416 }, local, { ...local, playSeconds: 10 }, 416, QUIET, NOW), 'never', 'the same revision is not newer');
+	assert.equal(judgeRebase({ rev: 416 }, local, { ...local, playSeconds: 10 }, 418, FRESH, NOW), 'ahead');
 });
 
 test('without a link of this account, or with an unreadable cloud text, nothing is re-based', async () => {
