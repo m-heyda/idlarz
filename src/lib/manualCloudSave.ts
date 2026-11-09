@@ -62,6 +62,15 @@ const browserManualStore: ManualStore = {
 	},
 };
 
+/** Forgets the remembered time (the epoch guard: a new chapter's first manual save must not wait on the old game's cooldown). */
+export const clearManualCloudStamp = (): void => {
+	try {
+		window.localStorage.removeItem(KEY);
+	} catch {
+		/* nothing to forget */
+	}
+};
+
 /** Milliseconds until the next manual cloud save is allowed; 0 when it is allowed now. A clock set back never locks it for longer than the limit. */
 export const cooldownLeftMs = (userId: string, now: number, store: ManualStore = browserManualStore): number => {
 	const last = store.read(userId);

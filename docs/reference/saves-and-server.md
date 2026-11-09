@@ -13,6 +13,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
+- Browser state: [`BASELINE_EPOCH`](#baseline-epoch)
 
 ## Threat model
 
@@ -506,3 +507,24 @@ Resets the player's game when a season reset happened that their ledger does not
 drops a local save older than it) and whether a reset was done now. A failure to read the marker never blocks a login.
 
 Season resets: `npm run reset-players` writes `app_settings.last_reset`; a player whose ledger `resetAt` is older is reset once at their next login. Operating guide: the Ops page (season reset CLI).
+
+## Browser state
+
+<a id="baseline-epoch"></a>
+
+### `BASELINE_EPOCH` <small>const</small>
+
+Source: [`src/lib/epochGuard.ts:26`](../../src/lib/epochGuard.ts)
+
+The browser's half of the data epoch. A server reset (the New chapter release flips the server's `GAME_EPOCH`, IDL-76) leaves this browser holding state
+that belongs to the old game: the cloud link (a revision the account no longer has: 409 loops, or `no_save` 404s), upload attempts, the combat log cursor, a
+pending offline claim, the manual save cooldown, the conflict counters, the tab's "entered" flag and the local save itself.
+
+The browser remembers the epoch it last saw (`localStorage` `idlarz.epoch`). When `/api/auth/me` reports a higher one (`epochVerdict` says `wipe`),
+the local save is put aside (`archiveForNewGame`) and reset, every key above is cleared (`wipeStaleBrowser`), the new epoch is recorded last (a
+failed wipe is simply tried again on the next load) and the page reloads into the normal start check, which finds an account with no save and starts a new
+game with a fresh link. No epoch in the reply (the server does not send one yet) means the guard does nothing. A browser with no stored epoch counts as
+`BASELINE_EPOCH`, the value the server has today, so every browser that predates the guard is wiped on the flip and a brand new one is not.
+
+What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server (a save from an old
+epoch has to be refused there), not by this guard. See `docs/plan/reset-proof-browsers.md`.

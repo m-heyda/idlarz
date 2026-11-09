@@ -254,6 +254,15 @@ export const readConflictStats = (): ConflictStats => {
 	}
 };
 
+/** Zeroes the counters (the epoch guard: they describe the old game's sessions). */
+export const clearConflictStats = (): void => {
+	try {
+		window.localStorage.removeItem(CONFLICTS_KEY);
+	} catch {
+		/* a counter only */
+	}
+};
+
 /** Counts one 409 (kept in this browser, and written to the console so a bug report carries it). Server side the same event is the `save_conflict` log line. */
 export const noteConflict = (resolution: ConflictResolution['kind'], now: number = Date.now()): ConflictStats => {
 	const stats = readConflictStats();
