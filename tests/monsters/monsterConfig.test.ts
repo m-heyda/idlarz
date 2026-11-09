@@ -21,7 +21,7 @@ test('every monster says where it may spawn: known land only, never water or the
 	}
 });
 
-test('normal monsters spawn 2 to 9 tiles from the castle and bosses 10 or more (IDL-222), each in its own biome only', () => {
+test('normal monsters spawn 2 to 9 tiles from the castle and bosses 8 or more (IDL-222), each in its own biome only', () => {
 	for (const [id, def] of Object.entries(MONSTERS)) {
 		const boss = def.grade === 'boss';
 		assert.equal(def.spawn.maxCastleDistance, boss ? BOSS_MAX_DISTANCE : 9, id);

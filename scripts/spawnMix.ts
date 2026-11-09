@@ -38,7 +38,7 @@ export const heroProfile = (level: number): PlayerProfile => {
 	return playerProfile(stored.core as Record<string, unknown>);
 };
 
-/** Castle level 1, the land 2-14 tiles out (monsters use 2-9, bosses 10 and more), a quarter of it in each of the four biomes. */
+/** Castle level 1, the land 2-14 tiles out (monsters use 2-9, bosses 8 and more), a quarter of it in each of the four biomes. */
 const mixWorld = () => {
 	const placed: Placed[] = [{ x: CASTLE_X, y: CASTLE_Y, tile: { biome: 'castle', isOwned: true, level: 1 } }];
 	for (let dx = -14; dx <= 14; dx++)
@@ -80,12 +80,12 @@ const measure = (hero: PlayerProfile, world: ReturnType<typeof mixWorld>, weight
 
 const pct = (x: number) => `${Math.round(x * 100)} %`;
 
-/** The markdown lines of the table for these hero levels: normal monsters first, then bosses (10 or more tiles out, same weights and level cap). */
+/** The markdown lines of the table for these hero levels: normal monsters first, then bosses (8 or more tiles out, same weights and level cap). */
 export const spawnMixLines = (heroLevels: number[]): string[] => {
 	const world = mixWorld();
 	const out: string[] = [];
 	for (const boss of [false, true]) {
-		if (boss) out.push('', 'Bosses (stand 10 or more tiles from the castle; the same weights and level cap as normal monsters):', '');
+		if (boss) out.push('', 'Bosses (stand 8 or more tiles from the castle; the same weights and level cap as normal monsters):', '');
 		out.push(
 			'| Hero | Pick | ' + BUCKETS.map((b) => b.label).join(' | ') + ' | Win chance above 50 % | ...once grown fully |',
 			'|---|---|' + BUCKETS.map(() => '---').join('|') + '|---|---|',

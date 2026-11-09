@@ -149,9 +149,9 @@ test('a chest with no tile left stays hidden until the land grows', () => {
 	assert.equal(needsLook({ ...grown, chests: [...grown.chests, { n: 9, at: 1 }] }, 'grown'), true, 'a new chest is looked at');
 });
 
-test('IDL-222: a boss stands 10 or more tiles out, and a kingdom that small has no tile for one', () => {
+test('IDL-222: a boss stands 8 or more tiles out, and a kingdom that small has no tile for one', () => {
 	const small = placeTickets(bankWith(0, true), world(60), 'k', 0, rollFor);
-	assert.equal(small.sites!.king, 0, 'the 60 tiles bought first all lie within 9 of the castle');
+	assert.equal(small.sites!.king, 0, 'the 60 tiles bought first all lie within 7 of the castle');
 	assert.equal(isPlaced(small.king!), false);
 	const big = syntheticWorld(1500, 4);
 	const out = placeTickets(bankWith(0, true), big, 'k', 0, rollFor);
@@ -159,4 +159,15 @@ test('IDL-222: a boss stands 10 or more tiles out, and a kingdom that small has 
 	assert.ok(isPlaced(out.king!));
 	assert.equal(MONSTERS[monsterTypeOf(out.king!, 'king')].grade, 'boss');
 	assert.ok(castleDistance({ x: out.king!.x!, y: out.king!.y! }) >= BOSS_MIN_DISTANCE);
+});
+
+test('IDL-222: at distance 8 and 9 normal monsters and bosses share the land, never a tile', () => {
+	const big = syntheticWorld(1500, 4);
+	const out = placeTickets(bankWith(12, true), big, 'k', 0, rollFor);
+	const all = [...out.rats, out.king!];
+	assert.ok(all.every(isPlaced));
+	assert.equal(new Set(all.map((t) => `${t.x},${t.y}`)).size, all.length, 'one monster per tile');
+	const rule = MONSTERS.thistleBoar.spawn;
+	assert.ok(BOSS_MIN_DISTANCE <= rule.maxCastleDistance, 'the 8-9 overlap is intended: both kinds may stand there');
+	for (const t of out.rats) assert.ok(castleDistance({ x: t.x!, y: t.y! }) <= 9);
 });

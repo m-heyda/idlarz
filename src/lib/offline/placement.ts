@@ -65,7 +65,7 @@ export const needsLook = (bank: TicketBank, key: string): boolean => {
  * them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`).
  * With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped
  * near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types
- * that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 10 or more tiles from the castle (`BOSS_MIN_DISTANCE`).
+ * that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 8 or more tiles from the castle (`BOSS_MIN_DISTANCE`).
  *
  * @category Monsters/Spawning
  * @order 4
