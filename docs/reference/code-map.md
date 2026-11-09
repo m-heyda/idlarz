@@ -535,6 +535,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`catalogDoc.test.ts`](../../tests/catalog/catalogDoc.test.ts)
 - [`itemIcons.test.ts`](../../tests/catalog/itemIcons.test.ts) — ~ Files under public/pixel/items that are deliberately not registered:
 - [`ladder.test.ts`](../../tests/catalog/ladder.test.ts)
+- [`legacyGrades.test.ts`](../../tests/catalog/legacyGrades.test.ts)
 - [`pixelIcons.test.ts`](../../tests/catalog/pixelIcons.test.ts) — ~ Width and height from a PNG's IHDR chunk
 - [`resourceArt.test.ts`](../../tests/catalog/resourceArt.test.ts)
 
@@ -610,7 +611,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`equipment.test.ts`](../../tests/loot/equipment.test.ts)
 - [`inventory.test.ts`](../../tests/loot/inventory.test.ts)
 - [`itemInstance.test.ts`](../../tests/loot/itemInstance.test.ts)
-- [`items.test.ts`](../../tests/loot/items.test.ts)
+- [`items.test.ts`](../../tests/loot/items.test.ts) — ~ The weapons of the legacy families (some retired, some graded since IDL-243)
 - [`loot.test.ts`](../../tests/loot/loot.test.ts)
 - [`lootGenerate.test.ts`](../../tests/loot/lootGenerate.test.ts)
 - [`lootValidate.test.ts`](../../tests/loot/lootValidate.test.ts)

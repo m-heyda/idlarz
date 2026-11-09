@@ -45,7 +45,14 @@ export const fullSet = (setId: string, weapon?: string): Equipment => {
 	return eq;
 };
 
-/** A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet. */
+/**
+ * A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.
+ *
+ * Test and simulation helper: a full kit of one ladder grade, so fight balance (`fight-sim`, `monster-ladder`, `fightBalance`) is pinned to grades rather than to named legacy sets.
+ *
+ * @category Loot/Items
+ * @order 9
+ */
 export const kit = (grade: Grade, weapon: WeaponType = 'sword'): Equipment => {
 	const row = LADDER[grade];
 	const eq: Equipment = {};

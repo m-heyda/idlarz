@@ -28,7 +28,12 @@ export const poolMembers = (data: LootData, poolId: string): ItemDef[] => {
 /** Relative chance of a member inside its pool: the pool's own weight if it has one, else the item's. */
 const weightIn = (item: ItemDef, pool: PoolDef): number => pool.weights?.[item.id] ?? item.poolWeight ?? 1;
 
-/** Members that exist at this item level (item window and the pool's own minimum), with their weights. */
+/**
+ * Members that exist at this item level (item window and the pool's own minimum), with their weights.
+ *
+ * @category Loot/Pipeline
+ * @order 7
+ */
 export const eligibleCandidates = (data: LootData, poolId: string, level: number, maxGrade?: Grade): Candidate[] => {
 	const pool = data.pools[poolId];
 	if (!pool) return [];

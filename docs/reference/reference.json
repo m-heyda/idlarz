@@ -50,8 +50,56 @@
   "kind": "function",
   "category": "Loot/Adding content",
   "file": "src/catalog/items/define.ts",
-  "line": 100,
+  "line": 101,
   "summary": "The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier's window (`LEVEL_WINDOW_BY_TIER`: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).",
+  "see": []
+ },
+ {
+  "id": "live-grades",
+  "name": "LIVE_GRADES",
+  "symbol": "LIVE_GRADES",
+  "kind": "const",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/grades.ts",
+  "line": 50,
+  "summary": "The grades whose items are enabled and so drop (IDL-220, IDL-224, IDL-243): the early game, G1-G3. G4 and up (the legacy Steel armour at G4 and the Obsidian family at G6 included) stay disabled data until the biomes that hand them out exist. Enabling the next grade is adding it here; the loot pools select by the `grade:` tag, never by id.",
+  "see": [
+   "gradeLevels",
+   "gradeRarities",
+   "gradeLegacyItems"
+  ]
+ },
+ {
+  "id": "gradelevels",
+  "name": "gradeLevels",
+  "symbol": "gradeLevels",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/grades.ts",
+  "line": 79,
+  "summary": "The item level window an item of this grade is generated in. It is the grade's own window (`GRADE_INFO`), except for the highest live grade, which stays open at the top until the next grade goes live: bosses (levels 15-45), chests and the shelf reach item levels past G3's 30 today, and with the legacy Steel and Obsidian gone from the pool they would have nothing to drop (IDL-243). Enabling the next grade (adding it to `LIVE_GRADES`) closes the window of the one below by itself.",
+  "see": []
+ },
+ {
+  "id": "graderarities",
+  "name": "gradeRarities",
+  "symbol": "gradeRarities",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/grades.ts",
+  "line": 94,
+  "summary": "The rarities an item of this grade may roll as: the grade's own (`GRADE_INFO`), except for the highest live grade, which takes every rarity until a grade that carries the others is live (today the loot profiles roll common to legendary at item levels 19 and up, and a rolled rarity must find a base). Enabling the next grade narrows the one below to its own rarities by itself.",
+  "see": []
+ },
+ {
+  "id": "gradelegacyitems",
+  "name": "gradeLegacyItems",
+  "symbol": "gradeLegacyItems",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/ladder.ts",
+  "line": 306,
+  "summary": "Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece: - a piece that fills a ladder cell (Wooden Club, Hunting Bow, Acorn Charm, Iron Sword, the six Steel armour pieces, the Obsidian family) keeps its id, name, art, set and the validity window of the pieces already owned, and takes the cell's grade tag and the grade's drop window and rarities (`dropLevels`, `dropRarities`); it is enabled with the rest of its grade (`LIVE_GRADES`), so Steel (G4) and Obsidian (G6) are on the ladder but not dropped yet; - every other legacy piece (cloth, the rest of wood and steel, the starter sword and shield) is retired: `enabled: false`, the id stays so owned pieces load and work. The starter sword and shield are still what a new hero wears (catalog STARTER_EQUIPMENT_IDS).",
   "see": []
  },
  {
@@ -61,8 +109,8 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 120,
-  "summary": "The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7). The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; the legacy pieces with no grade tag, e.g. Obsidian, stay in every pool as before); the floor needs no tag because an item only exists inside its grade's item level window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items, so today every biome drops the same items; raising the ceiling's live grade is what moves a biome.",
+  "line": 123,
+  "summary": "The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7). The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items, so today every biome drops the same items; going live with the next grade is what moves a biome.",
   "see": []
  },
  {
@@ -72,7 +120,7 @@
   "kind": "const",
   "category": "Loot/Adding content",
   "file": "src/catalog/lootConfig.ts",
-  "line": 157,
+  "line": 160,
   "summary": "Adding loot content is data only; the generator needs no change.",
   "see": [
    "gear",
@@ -87,7 +135,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 191,
+  "line": 194,
   "summary": "Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.",
   "see": []
  },
@@ -98,7 +146,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 256,
+  "line": 259,
   "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
   "see": []
  },
@@ -572,7 +620,7 @@
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
   "line": 1,
-  "summary": "All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: `python scripts/pixel/build.py [name ...]` (Pillow) rewrites `public/pixel/{icons,ui,bg,terrain}/` in place and prunes stale files afterwards, so a running dev server never 404s. `python scripts/pixel/build.py terrain` rebuilds only the terrain, `src/config/terrainAtlas.json` and `tests/fixtures/terrain-parity.json`; `python scripts/pixel/terrain_preview.py` renders mock maps to `scripts/pixel/previews/`. Resource icons come from the supplied pictures in `public/pixel/resources/` (padded 32 -> 40 px by `sprites_resource_art.py`). Monster art is the exception: it is hand-supplied in `public/pixel/enemies/<biome>/` and never touched by the build. `--refs` also refreshes the curated images in `scripts/pixel/reference/`; the visual rules (top-down buildings, outlines, palette, ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Icons are registered in this file; item icons are one JSON line each in `src/config/itemIcons/` (see its README).",
+  "summary": "All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: `python scripts/pixel/build.py [name ...]` (Pillow) rewrites `public/pixel/{icons,ui,bg,terrain}/` in place and prunes stale files afterwards, so a running dev server never 404s. `python scripts/pixel/build.py terrain` rebuilds only the terrain, `src/config/terrainAtlas.json` and `tests/fixtures/terrain-parity.json`; `python scripts/pixel/terrain_preview.py` renders mock maps to `scripts/pixel/previews/`. Resource icons come from the supplied pictures in `public/pixel/resources/` (padded 32 -> 40 px by `sprites_resource_art.py`). Monster art is the exception: it is hand-supplied in `public/pixel/enemies/<biome>/` and never touched by the build. `--refs` also refreshes the curated images in `scripts/pixel/reference/`; the visual rules (top-down buildings, outlines, palette, ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Unsorted supplied art waits in `public/pixel/assets_to_assess_and_use/<folder>/` (potions, buildings, map details, trees, ruins ...): each folder has a README with what is inside and what it could be used for, and nothing there is wired into the game until it is registered. Icons are registered in this file; item icons are one JSON line each in `src/config/itemIcons/` (see its README).",
   "see": []
  },
  {
@@ -960,6 +1008,17 @@
   "see": []
  },
  {
+  "id": "kit",
+  "name": "kit",
+  "symbol": "kit",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/lib/fightSim.ts",
+  "line": 56,
+  "summary": "A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.",
+  "see": []
+ },
+ {
   "id": "sellvalueof",
   "name": "sellValueOf",
   "symbol": "sellValueOf",
@@ -1039,6 +1098,17 @@
   "file": "src/lib/loot/kill.ts",
   "line": 51,
   "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
+  "see": []
+ },
+ {
+  "id": "eligiblecandidates",
+  "name": "eligibleCandidates",
+  "symbol": "eligibleCandidates",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/pools.ts",
+  "line": 37,
+  "summary": "Members that exist at this item level (item window and the pool's own minimum), with their weights.",
   "see": []
  },
  {
@@ -1584,7 +1654,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 332,
+  "line": 338,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

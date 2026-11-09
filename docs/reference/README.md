@@ -49,7 +49,7 @@ when the code changes, change the block in the same edit. `tests/docs/reference.
 - [Economy](economy.md) (60): Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - [Combat](combat.md) (30): The player's numbers, the server's fight engine, auto-battle, skills and win chance.
 - [Monsters](monsters.md) (14): The roster, levels, growth, spawning and what a kill pays.
-- [Loot](loot.md) (15): The loot pipeline, rarities, affixes, sets, sell values and how to add content.
+- [Loot](loot.md) (21): The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - [Progression](progression.md) (19): Levels, attributes, skills, rebirth, Embers, limits and gems.
 - [Saves & Server](saves-and-server.md) (23): The save, cloud-save checks, the ledger, sealed rolls, away time and the threat model.
 - [Architecture](architecture.md) (6): Stack, state, the tick loop, the map, rendering and the art pipeline.

@@ -3,7 +3,7 @@
  * stale files afterwards, so a running dev server never 404s. `python scripts/pixel/build.py terrain` rebuilds only the terrain, `src/config/terrainAtlas.json` and `tests/fixtures/terrain-parity.json`;
  * `python scripts/pixel/terrain_preview.py` renders mock maps to `scripts/pixel/previews/`. Resource icons come from the supplied pictures in `public/pixel/resources/` (padded 32 -> 40 px by `sprites_resource_art.py`).
  * Monster art is the exception: it is hand-supplied in `public/pixel/enemies/<biome>/` and never touched by the build. `--refs` also refreshes the curated images in `scripts/pixel/reference/`; the visual rules (top-down buildings, outlines, palette,
- * ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Icons are registered in this file; item icons are one JSON line each in `src/config/itemIcons/` (see its README).
+ * ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Unsorted supplied art waits in `public/pixel/assets_to_assess_and_use/<folder>/` (potions, buildings, map details, trees, ruins ...): each folder has a README with what is inside and what it could be used for, and nothing there is wired into the game until it is registered. Icons are registered in this file; item icons are one JSON line each in `src/config/itemIcons/` (see its README).
  *
  * @title Pixel art pipeline
  * @category Architecture/Art
