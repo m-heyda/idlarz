@@ -1,4 +1,7 @@
 [
 	{"icon": "art_frostbloom_fan", "item": "frostbloom_fan", "file": "legendary/frostbloom_fan", "slot": "mainHand", "weapon": "wand", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
-	{"icon": "item_apprentice_wand", "item": "apprentice_wand", "file": null, "slot": "mainHand", "weapon": "wand", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_apprentice_wand", "item": "apprentice_wand", "file": null, "slot": "mainHand", "weapon": "wand", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_twig_wand", "item": "twig_wand", "file": null, "slot": "mainHand", "weapon": "wand", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_bronze_wand", "item": "bronze_wand", "file": null, "slot": "mainHand", "weapon": "wand", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_wand", "item": "iron_wand", "file": null, "slot": "mainHand", "weapon": "wand", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

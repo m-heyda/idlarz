@@ -3,5 +3,7 @@
 	{"icon": "item_hunting_bow", "item": "hunting_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_recurve_bow", "item": "recurve_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_obsidian_longbow", "item": "obsidian_longbow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_starfall_bow", "item": "starfall_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_starfall_bow", "item": "starfall_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_twig_bow", "item": "twig_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_yew_bow", "item": "yew_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

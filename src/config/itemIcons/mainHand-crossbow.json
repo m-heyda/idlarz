@@ -1,3 +1,6 @@
 [
-	{"icon": "item_obsidian_crossbow", "item": "obsidian_crossbow", "file": null, "slot": "mainHand", "weapon": "crossbow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_crossbow", "item": "obsidian_crossbow", "file": null, "slot": "mainHand", "weapon": "crossbow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_wooden_crossbow", "item": "wooden_crossbow", "file": null, "slot": "mainHand", "weapon": "crossbow", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_bronze_crossbow", "item": "bronze_crossbow", "file": null, "slot": "mainHand", "weapon": "crossbow", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_crossbow", "item": "iron_crossbow", "file": null, "slot": "mainHand", "weapon": "crossbow", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

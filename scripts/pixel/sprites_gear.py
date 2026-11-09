@@ -563,3 +563,40 @@ SPRITES.update({
     'item_starfall_bow': lambda: _bow('gold', 'glow', 'ember', 'glow', 'glow', glints=((13, 5, 3),), spread=1.2),
     'item_titan_maul': lambda: _maul('bark', 'ember', 'gold', 'glow'),
 })
+
+# --- G1-G3 ladder cells (IDL-239): the supplied packs hold no equipment art, so these live ladder items borrow the built
+# pictures of the starter families (rag = cloth, hide = leather, iron = steel) or a recoloured weapon of the same type.
+# MVP stand-ins: the owner said they need not fit as a set and may be replaced; each has its own icon so art can swap one cell.
+LADDER_ALIAS = {
+    'rag_hood': 'cloth_hat', 'hide_cap': 'leather_cap', 'iron_cap': 'steel_helm',
+    'patched_mantle': 'cloth_mantle', 'hide_pauldrons': 'leather_pauldrons', 'iron_spaulders': 'steel_pauldrons',
+    'rag_tunic': 'cloth_robe', 'hide_jerkin': 'leather_vest', 'iron_mail': 'steel_cuirass',
+    'rag_wraps': 'cloth_gloves', 'hide_gloves': 'leather_gloves', 'iron_gauntlets': 'steel_gauntlets',
+    'rag_cloak': 'cloth_cape', 'hide_cloak': 'leather_cloak', 'travellers_cape': 'steel_cloak',
+    'rabbit_foot': 'acorn_charm', 'bone_token': 'cloth_charm',
+    'bound_scraps': 'apprentice_tome',
+    'iron_dagger': 'steel_dagger', 'iron_axe': 'battle_axe', 'iron_spear': 'steel_spear',
+    'twig_bow': 'hunting_bow', 'yew_bow': 'recurve_bow', 'walking_stick': 'oak_staff', 'twig_wand': 'apprentice_wand',
+}
+LADDER_DRAWN = {
+    'hide_primer': lambda: _tome('leather', 'bark', 'linen', 'moss', 'bark', glints=()),
+    'iron_codex': lambda: _tome('plate', 'steel', 'linen', 'crystal', 'steel'),
+    'bone_knife': lambda: _dagger('bone', 'bark', 'leather', 'bone', glints=()),
+    'bronze_dirk': lambda: _dagger('gold', 'bark', 'leather', 'ruby'),
+    'hatchet': lambda: _axe('bark', 'wood_cut', 'bark', 'pleather', glints=()),
+    'bronze_axe': lambda: _axe('bark', 'gold', 'gold', 'pleather'),
+    'sharpened_stick': lambda: _spear('bark', 'wood_cut', 'bark', 'cloth', glints=()),
+    'bronze_spear': lambda: _spear('bark', 'gold', 'gold', 'cloth'),
+    'bronze_hammer': lambda: _maul('bark', 'gold', 'bark', None),
+    'wooden_crossbow': lambda: _crossbow('bark', 'wood_cut', 'bone', 'bark', glints=()),
+    'bronze_crossbow': lambda: _crossbow('bark', 'gold', 'bone', 'gold'),
+    'iron_crossbow': lambda: _crossbow('bark', 'steel', 'bone', 'steel', 'crystal'),
+    'hide_bound_staff': lambda: _staff('bark', 'pleather', 'moss', 'bark', glints=()),
+    'iron_shod_staff': lambda: _staff('bark', 'steel', 'crystal', 'steel'),
+    'bronze_wand': lambda: _wand('bark', 'gold', 'ruby'),
+    'iron_wand': lambda: _wand('plate', 'steel', 'crystal'),
+}
+for _id, _src in LADDER_ALIAS.items():
+    SPRITES[f'item_{_id}'] = SPRITES[f'item_{_src}']
+for _id, _fn in LADDER_DRAWN.items():
+    SPRITES[f'item_{_id}'] = _fn

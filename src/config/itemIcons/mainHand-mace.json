@@ -9,5 +9,7 @@
 	{"icon": "art_deathgrin_mace", "item": "deathgrin_mace", "file": "mainHand/mace/deathgrin_mace", "slot": "mainHand", "weapon": "mace", "grade": "G6", "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry); graded by look in art pass 1, no baked halo"},
 	{"icon": "art_iron_morningstar", "item": "iron_morningstar", "file": "mainHand/mace/iron_morningstar", "slot": "mainHand", "weapon": "mace", "grade": "G3", "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry); graded by look in art pass 1, no baked halo"},
 	{"icon": "item_wooden_club", "item": "wooden_club", "file": null, "slot": "mainHand", "weapon": "mace", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_steel_mace", "item": "steel_mace", "file": null, "slot": "mainHand", "weapon": "mace", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_steel_mace", "item": "steel_mace", "file": null, "slot": "mainHand", "weapon": "mace", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_bronze_mace", "item": "bronze_mace", "file": "mainHand/mace/bronze_mace", "slot": "mainHand", "weapon": "mace", "grade": "G2", "provenance": "MVP stand-in (IDL-239): copy of the art of art_verdigris_mace (supplied 64 px art); replace when real G2 art exists"},
+	{"icon": "art_iron_mace", "item": "iron_mace", "file": "mainHand/mace/iron_mace", "slot": "mainHand", "weapon": "mace", "grade": "G3", "provenance": "MVP stand-in (IDL-239): copy of the art of art_spiked_mace (supplied 64 px art); replace when real G3 art exists"}
 ]

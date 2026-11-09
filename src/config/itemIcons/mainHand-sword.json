@@ -16,5 +16,7 @@
 	{"icon": "item_wooden_sword", "item": "wooden_sword", "file": null, "slot": "mainHand", "weapon": "sword", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_iron_sword", "item": "iron_sword", "file": null, "slot": "mainHand", "weapon": "sword", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_obsidian_blade", "item": "obsidian_blade", "file": null, "slot": "mainHand", "weapon": "sword", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_emberbrand", "item": "emberbrand", "file": null, "slot": "mainHand", "weapon": "sword", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_emberbrand", "item": "emberbrand", "file": null, "slot": "mainHand", "weapon": "sword", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_rusty_shortsword", "item": "rusty_shortsword", "file": "mainHand/sword/rusty_shortsword", "slot": "mainHand", "weapon": "sword", "grade": "G1", "provenance": "MVP stand-in (IDL-239): copy of the art of art_old_rusted_blade (supplied 64 px art); replace when real G1 art exists"},
+	{"icon": "art_bronze_sword", "item": "bronze_sword", "file": "mainHand/sword/bronze_sword", "slot": "mainHand", "weapon": "sword", "grade": "G2", "provenance": "MVP stand-in (IDL-239): copy of the art of art_rusty_broadsword (supplied 64 px art); replace when real G2 art exists"}
 ]

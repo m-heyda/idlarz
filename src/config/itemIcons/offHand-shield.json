@@ -13,5 +13,8 @@
 	{"icon": "art_royal_lion_crest", "item": "royal_lion_crest", "file": "offHand/royal_lion_crest", "slot": "offHand", "weapon": "shield", "grade": "G8", "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry); graded by look in art pass 1, no baked halo"},
 	{"icon": "item_wooden_shield", "item": "wooden_shield", "file": null, "slot": "offHand", "weapon": "shield", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_shield", "item": "steel_shield", "file": null, "slot": "offHand", "weapon": "shield", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_aegis", "item": "obsidian_aegis", "file": null, "slot": "offHand", "weapon": "shield", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_aegis", "item": "obsidian_aegis", "file": null, "slot": "offHand", "weapon": "shield", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_wooden_buckler", "item": "wooden_buckler", "file": "offHand/wooden_buckler", "slot": "offHand", "weapon": "shield", "grade": "G1", "provenance": "MVP stand-in (IDL-239): copy of the art of art_battered_buckler (supplied 64 px art); replace when real G1 art exists"},
+	{"icon": "art_hide_shield", "item": "hide_shield", "file": "offHand/hide_shield", "slot": "offHand", "weapon": "shield", "grade": "G2", "provenance": "MVP stand-in (IDL-239): copy of the art of art_oak_roundshield (supplied 64 px art); replace when real G2 art exists"},
+	{"icon": "art_iron_kite_shield", "item": "iron_kite_shield", "file": "offHand/iron_kite_shield", "slot": "offHand", "weapon": "shield", "grade": "G3", "provenance": "MVP stand-in (IDL-239): copy of the art of art_ironbound_pavise (supplied 64 px art); replace when real G3 art exists"}
 ]
