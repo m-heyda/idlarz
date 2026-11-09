@@ -6,6 +6,7 @@ import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { MONSTER_CATALOG, monsterArtUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import { SLASH_FRAME, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
+import { winBucketOf, type WinBucket } from '@/lib/combat';
 import { isBoss, monsterDef, monsterStats } from '@/lib/monsters';
 import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
 import type { BagSlot, CombatNotice, MonsterType } from '@/types/game';
@@ -93,6 +94,13 @@ const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | '
 };
 
 /** What a fight left behind, under the monster on the stage (dead, a skull and crossbones, after a win): the gold, XP and hide, the drops (hover for the item card). */
+/** How a queued monster's win chance is shown in the Next strip: a shape and a word besides the colour, which the stylesheet gives by `data-win`. */
+const WIN_BUCKETS: Record<WinBucket, { word: string; icon: string }> = {
+	safe: { word: 'Safe', icon: '✔' },
+	risky: { word: 'Risky', icon: '!' },
+	unlikely: { word: 'Unlikely', icon: '✖' },
+};
+
 const FightResult: React.FC<{ notice: CombatNotice }> = ({ notice }) => {
 	const def = monsterDef(notice.type);
 	const { summary } = notice;
@@ -178,7 +186,7 @@ export interface CombatPanelProps {
 	hitTick: number;
 	shake: boolean;
 	/** The monsters waiting for their turn (the battle queue) and a way to take one out; both left out in the lab */
-	queue?: { n: number; type: MonsterType; level: number; lucky?: boolean }[];
+	queue?: { n: number; type: MonsterType; level: number; lucky?: boolean; winPct?: number }[];
 	queueMax?: number;
 	onUnqueue?: (n: number) => void;
 	/** The hero rests before the queue's next fight: seconds left (counted down by the caller) and the next monster's name; left out in the lab */
@@ -390,30 +398,39 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						<span className='fight-queue-title' title='Monsters waiting for their turn (the queue holds this many)'>
 							{p.queue.length}/{p.queueMax ?? p.queue.length}
 						</span>
-						{p.queue.map((q, i) => (
-							<span
-								key={q.n}
-								className='fight-queue-item'
-								data-boss={monsterDef(q.type).grade === 'boss'}
-								data-lucky={!!q.lucky}
-								title={`${i + 1}. ${q.lucky ? 'Lucky ' : ''}${monsterDef(q.type).label}, level ${q.level}`}
-							>
-								<span className='fight-queue-art'>
-									<MonsterArt type={q.type} scale={0.8} />
+						{p.queue.map((q, i) => {
+							const bucket = q.winPct === undefined ? null : WIN_BUCKETS[winBucketOf(q.winPct)];
+							return (
+								<span
+									key={q.n}
+									className='fight-queue-item'
+									data-boss={monsterDef(q.type).grade === 'boss'}
+									data-lucky={!!q.lucky}
+									data-win={bucket ? winBucketOf(q.winPct!) : undefined}
+									title={`${i + 1}. ${q.lucky ? 'Lucky ' : ''}${monsterDef(q.type).label}, level ${q.level}${bucket ? `, ${bucket.word}: ${q.winPct}% win chance` : ''}`}
+								>
+									<span className='fight-queue-art'>
+										<MonsterArt type={q.type} scale={0.8} />
+									</span>
+									<i className='fight-queue-lv'>{formatCompact(q.level)}</i>
+									{bucket && (
+										<b className='fight-queue-win' aria-label={`${bucket.word}, ${q.winPct}% win chance`}>
+											{bucket.icon}
+										</b>
+									)}
+									{p.onUnqueue && (
+										<button
+											className='fight-queue-x'
+											onClick={() => p.onUnqueue!(q.n)}
+											aria-label={`Take ${monsterDef(q.type).label} out of the queue`}
+											title='Take it out of the queue'
+										>
+											x
+										</button>
+									)}
 								</span>
-								<i className='fight-queue-lv'>{formatCompact(q.level)}</i>
-								{p.onUnqueue && (
-									<button
-										className='fight-queue-x'
-										onClick={() => p.onUnqueue!(q.n)}
-										aria-label={`Take ${monsterDef(q.type).label} out of the queue`}
-										title='Take it out of the queue'
-									>
-										x
-									</button>
-								)}
-							</span>
-						))}
+							);
+						})}
 					</div>
 				)}
 				{p.restSec != null && (

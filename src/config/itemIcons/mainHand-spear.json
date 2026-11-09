@@ -2,5 +2,8 @@
 	{"icon": "art_cindercrescent_glaive", "item": "cindercrescent_glaive", "file": "legendary/cindercrescent_glaive", "slot": "mainHand", "weapon": "spear", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "art_stormtrident", "item": "stormtrident", "file": "legendary/stormtrident", "slot": "mainHand", "weapon": "spear", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "art_dawnbringer_trident", "item": "dawnbringer_trident", "file": "legendary/dawnbringer_trident", "slot": "mainHand", "weapon": "spear", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
-	{"icon": "item_steel_spear", "item": "steel_spear", "file": null, "slot": "mainHand", "weapon": "spear", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_steel_spear", "item": "steel_spear", "file": null, "slot": "mainHand", "weapon": "spear", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_sharpened_stick", "item": "sharpened_stick", "file": null, "slot": "mainHand", "weapon": "spear", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_bronze_spear", "item": "bronze_spear", "file": null, "slot": "mainHand", "weapon": "spear", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_spear", "item": "iron_spear", "file": null, "slot": "mainHand", "weapon": "spear", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

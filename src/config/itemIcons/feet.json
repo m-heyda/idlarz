@@ -11,5 +11,8 @@
 	{"icon": "item_leather_boots", "item": "leather_boots", "file": null, "slot": "feet", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_slippers", "item": "cloth_slippers", "file": null, "slot": "feet", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_sabatons", "item": "steel_sabatons", "file": null, "slot": "feet", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_sabatons", "item": "obsidian_sabatons", "file": null, "slot": "feet", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_sabatons", "item": "obsidian_sabatons", "file": null, "slot": "feet", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_rag_shoes", "item": "rag_shoes", "file": "feet/rag_shoes", "slot": "feet", "weapon": null, "grade": "G1", "provenance": "MVP stand-in (IDL-239): copy of the art of art_wanderer_boots (supplied 64 px art); replace when real G1 art exists"},
+	{"icon": "art_hide_boots", "item": "hide_boots", "file": "feet/hide_boots", "slot": "feet", "weapon": null, "grade": "G2", "provenance": "MVP stand-in (IDL-239): copy of the art of art_fur_lined_boots (supplied 64 px art); replace when real G2 art exists"},
+	{"icon": "art_iron_boots", "item": "iron_boots", "file": "feet/iron_boots", "slot": "feet", "weapon": null, "grade": "G3", "provenance": "MVP stand-in (IDL-239): copy of the art of art_ironbound_boots (supplied 64 px art); replace when real G3 art exists"}
 ]

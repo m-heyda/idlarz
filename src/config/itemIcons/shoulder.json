@@ -2,5 +2,8 @@
 	{"icon": "item_leather_pauldrons", "item": "leather_pauldrons", "file": null, "slot": "shoulder", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_mantle", "item": "cloth_mantle", "file": null, "slot": "shoulder", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_pauldrons", "item": "steel_pauldrons", "file": null, "slot": "shoulder", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_pauldrons", "item": "obsidian_pauldrons", "file": null, "slot": "shoulder", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_pauldrons", "item": "obsidian_pauldrons", "file": null, "slot": "shoulder", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_patched_mantle", "item": "patched_mantle", "file": null, "slot": "shoulder", "weapon": null, "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_hide_pauldrons", "item": "hide_pauldrons", "file": null, "slot": "shoulder", "weapon": null, "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_spaulders", "item": "iron_spaulders", "file": null, "slot": "shoulder", "weapon": null, "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

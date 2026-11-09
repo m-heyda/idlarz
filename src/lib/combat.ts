@@ -44,6 +44,23 @@ export const maxHp = (characterStats: CharacterStats, equipment: Equipment): num
  */
 export const autoBattleUnlocked = (rebirths: number): boolean => rebirths >= COMBAT.auto.minRebirths;
 
+/** The bucket the Next strip shows for a queued monster. */
+export type WinBucket = 'safe' | 'risky' | 'unlikely';
+
+/**
+ * The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it):
+ * Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red).
+ * The strip also shows the word and the exact percent on hover, so colour is never the only cue.
+ *
+ * @category Combat/Win chance
+ * @order 2
+ * @formula
+ * pct    = round(chance x 100)
+ * bucket = Safe if pct >= 100 x safeWinChance (80), Risky if pct >= 100 x minWinChance (50), else Unlikely
+ */
+export const winBucketOf = (winPct: number): WinBucket =>
+	winPct >= COMBAT.auto.safeWinChance * 100 ? 'safe' : winPct >= COMBAT.auto.minWinChance * 100 ? 'risky' : 'unlikely';
+
 export type DamageType = 'physical' | 'magic';
 
 /** Magic weapons (staves, wands) scale with Intelligence; everything else, bare hands included, with Strength. */

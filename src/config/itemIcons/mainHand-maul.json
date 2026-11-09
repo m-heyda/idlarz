@@ -4,5 +4,8 @@
 	{"icon": "art_runed_warhammer", "item": "runed_warhammer", "file": "mainHand/maul/runed_warhammer", "slot": "mainHand", "weapon": "maul", "grade": "G5", "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry); graded by look in art pass 1, no baked halo"},
 	{"icon": "art_runeforged_titanhammer", "item": "runeforged_titanhammer", "file": "legendary/runeforged_titanhammer", "slot": "mainHand", "weapon": "maul", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "item_obsidian_maul", "item": "obsidian_maul", "file": null, "slot": "mainHand", "weapon": "maul", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_titan_maul", "item": "titan_maul", "file": null, "slot": "mainHand", "weapon": "maul", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_titan_maul", "item": "titan_maul", "file": null, "slot": "mainHand", "weapon": "maul", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_log_maul", "item": "log_maul", "file": "mainHand/maul/log_maul", "slot": "mainHand", "weapon": "maul", "grade": "G1", "provenance": "MVP stand-in (IDL-239): copy of the art of art_stone_hammer (supplied 64 px art); replace when real G1 art exists"},
+	{"icon": "item_bronze_hammer", "item": "bronze_hammer", "file": null, "slot": "mainHand", "weapon": "maul", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "art_iron_maul", "item": "iron_maul", "file": "mainHand/maul/iron_maul", "slot": "mainHand", "weapon": "maul", "grade": "G3", "provenance": "MVP stand-in (IDL-239): copy of the art of art_iron_warhammer (supplied 64 px art); replace when real G3 art exists"}
 ]

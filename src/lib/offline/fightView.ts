@@ -2,7 +2,7 @@ import { activeBuffs } from '@/lib/buffs';
 import { COMBAT } from '@/config/combatConfig';
 import { limitOf } from '@/lib/limits';
 import { combatOf, type CombatEnv } from '@/lib/offline/fightContext';
-import { potionsForEstimate, resumeHpOf, winnableBy } from '@/lib/offline/fightProfile';
+import { potionsForEstimate, resumeHpOf, winnableBy, winPctBy } from '@/lib/offline/fightProfile';
 import { nextRetry, pickTarget, placedTarget, queueView } from '@/lib/offline/fightTargets';
 import { projectFight } from '@/lib/offline/fightProject';
 import type { CombatView, FightPlan } from '@/lib/offline/fightTypes';
@@ -46,6 +46,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		else if (!waiting && Number.isFinite(retry)) nextPollSec = Math.min(nextSpawnSec ?? 600, Math.min(600, Math.ceil(retry - c.at) + 1));
 		else if (!waiting) nextPollSec = Math.min(600, Math.max(COMBAT.poll.minimizedSec, Math.ceil(nextSpawnSec ?? 600) + 1));
 	}
+	const potions = potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c);
 	const runningBuffs = activeBuffs(ledger.buffs, c.at);
 	return {
 		hp: c.hp,
@@ -68,7 +69,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 				}
 			: null,
 		...(plan ? { plan } : {}),
-		queue: queueView(ledger, c),
+		queue: queueView(ledger, c, winPctBy(p, c.hp, potions)),
 		queueMax: limitOf('battleQueue'),
 		autoBattle: c.autoBattle,
 		autoUse: c.autoUse,

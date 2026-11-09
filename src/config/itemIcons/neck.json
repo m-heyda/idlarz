@@ -14,5 +14,8 @@
 	{"icon": "item_wooden_pendant", "item": "wooden_pendant", "file": null, "slot": "neck", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_amulet", "item": "cloth_amulet", "file": null, "slot": "neck", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_gorget", "item": "steel_gorget", "file": null, "slot": "neck", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_pendant", "item": "obsidian_pendant", "file": null, "slot": "neck", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_pendant", "item": "obsidian_pendant", "file": null, "slot": "neck", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_cord_pendant", "item": "cord_pendant", "file": "neck/cord_pendant", "slot": "neck", "weapon": null, "grade": "G1", "provenance": "MVP stand-in (IDL-239): copy of the art of art_leaf_amulet (supplied 64 px art); replace when real G1 art exists"},
+	{"icon": "art_bone_beads", "item": "bone_beads", "file": "neck/bone_beads", "slot": "neck", "weapon": null, "grade": "G2", "provenance": "MVP stand-in (IDL-239): copy of the art of art_fang_necklace (supplied 64 px art); replace when real G2 art exists"},
+	{"icon": "art_copper_pendant", "item": "copper_pendant", "file": "neck/copper_pendant", "slot": "neck", "weapon": null, "grade": "G3", "provenance": "MVP stand-in (IDL-239): copy of the art of art_amethyst_shard_necklace (supplied 64 px art); replace when real G3 art exists"}
 ]
