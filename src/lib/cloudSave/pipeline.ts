@@ -309,7 +309,7 @@ export const acceptSave = async (
 			};
 		const restored = summarize(state);
 		restored.derived.xpBase = summary.derived.xpBase;
-		summary = trustedEconomy(baseline?.summary ?? null, restored, worth.ratio);
+		summary = trustedEconomy(baseline?.summary ?? null, restored, worth.ratio, baseline ? Math.max(0, nowMs - baseline.serverSavedAt) / 1000 : 0);
 	}
 	const newRun = !!(ledger && current && (summary.rebirths > current.summary.rebirths || flags.includes('playtime_regress')));
 

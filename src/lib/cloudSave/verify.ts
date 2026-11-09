@@ -75,7 +75,7 @@ export type FlagDecision = 'flag' | 'clamp' | 'reject';
  * - `gold_jump`: gold gain above income x time x 1.5 + burst + 1,000 + 2% of the balance + server grants.
  * - `xp_jump`: XP above what bought tiles, play time and server payouts explain ({@link XP_MODEL}).
  * - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
- * - `castle_jump`: castle level or timer faster than real time. `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
+ * - `castle_jump`: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock ({@link trustedEconomy}), so one flag does not repeat on every later honest save (IDL-250). `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
  *
  * **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ({@link POISON_FLAGS}).
  * With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save (HTTP 422).
