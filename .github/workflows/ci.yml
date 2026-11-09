@@ -47,7 +47,7 @@ jobs:
   # lockfile, tsconfig, this workflow), not on a push to main (the PR already ran it) and every night.
   #
   # Three jobs: `scope` decides whether it matters; `generate` is a matrix that runs in parallel (the slow sim profile hardcore-rebirth6-x10
-  # alone, about 7 minutes; every other sim profile; the other generators) and uploads what each wrote; `generated` (the required check)
+  # alone, about 5 minutes; every other sim profile; the other generators in three groups) and uploads what each wrote; `generated` (the required check)
   # puts the shards together with `scripts/sim.ts --merge` (which fails if a profile is missing or twice) and runs the two gates. The wall
   # time is about the slowest shard plus the install, not the sum.
 
@@ -81,21 +81,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # the long game: the one profile that takes about 7 minutes
+          # the long game: the one profile that takes about 5 minutes
           - shard: sim-x10
             command: npx tsx scripts/sim.ts --dump=shard/sim-x10.json hardcore-rebirth6-x10
-            upload: shard/sim-x10.json
           # every other profile (a new profile lands here on its own)
           - shard: sim-rest
             command: npx tsx scripts/sim.ts --dump=shard/sim-rest.json --except=hardcore-rebirth6-x10
-            upload: shard/sim-rest.json
-          # the other generators: they write docs/generated except the two sim files
-          - shard: docs-rest
-            command: npm run docs:gen:rest
-            upload: |
-              docs/generated
-              !docs/generated/sim-milestones.md
-              !docs/generated/sim-baseline.json
+          # the other generators, in three groups of about 3 minutes or less (the groups are the docs:gen:rest:* scripts in package.json)
+          - shard: docs-quick
+            command: npm run docs:gen:rest:quick
+          - shard: docs-fights
+            command: npm run docs:gen:rest:fights
+          - shard: docs-loot
+            command: npm run docs:gen:rest:loot
     name: generate (${{ matrix.shard }})
     steps:
       - uses: actions/checkout@v4
@@ -109,10 +107,13 @@ jobs:
       - run: mkdir -p shard
       - name: Run the shard
         run: ${{ matrix.command }}
+      - name: Pack what a generator shard wrote (only the files that differ from the checkout, so shards cannot overwrite each other)
+        if: startsWith(matrix.shard, 'docs-')
+        run: git ls-files --modified --others --exclude-standard docs/generated | tar -cf shard/docs.tar -T -
       - uses: actions/upload-artifact@v4
         with:
           name: shard-${{ matrix.shard }}
-          path: ${{ matrix.upload }}
+          path: shard/
           if-no-files-found: error
           retention-days: 3
 
@@ -149,8 +150,8 @@ jobs:
           # the sim shards: one flat folder of dumps, merged into sim-milestones.md and sim-baseline.json
           mkdir sim-dumps
           cp shards/shard-sim-*/*.json sim-dumps/
-          # the other generators: their files go over the committed ones
-          cp -r shards/shard-docs-rest/. docs/generated/
+          # the other generators: the files each wrote go over the committed ones
+          for t in shards/shard-docs-*/docs.tar; do tar -xf "$t"; done
           npx tsx scripts/sim.ts --merge=sim-dumps > /dev/null
       - name: Generated docs are up to date
         if: needs.scope.outputs.run == 'true'
