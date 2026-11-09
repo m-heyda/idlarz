@@ -61,7 +61,13 @@ const CostTiles: React.FC<{ recipe: Recipe; count: number; have: Have }> = ({ re
 				</span>
 			))}
 			{needs.components.map((n) => (
-				<span key={n.id} className='cr-cost-tile inv-slot' data-ok={(have.stock[n.id] ?? 0) >= n.qty} title={COMPONENTS[n.id].name} aria-label={`${COMPONENTS[n.id].name} ${n.qty}`}>
+				<span
+					key={n.id}
+					className='cr-cost-tile inv-slot'
+					data-ok={(have.stock[n.id] ?? 0) >= n.qty}
+					title={COMPONENTS[n.id].name}
+					aria-label={`${COMPONENTS[n.id].name} ${n.qty}`}
+				>
 					<PixelIcon name={COMPONENT_ICONS[n.id] ?? 'comp_glass_vial'} alt='' />
 					<span className='cr-cost-n'>{formatInt(n.qty)}</span>
 				</span>
@@ -361,7 +367,13 @@ const CraftingOverlay: React.FC = () => {
 									{isOpen && (
 										<div className='cr-grid'>
 											{recipes.map((recipe) => (
-												<RecipeTile key={recipe.id} recipe={recipe} have={have} selected={recipe.id === selected.id} onSelect={() => setSelectedId(recipe.id)} />
+												<RecipeTile
+													key={recipe.id}
+													recipe={recipe}
+													have={have}
+													selected={recipe.id === selected.id}
+													onSelect={() => setSelectedId(recipe.id)}
+												/>
 											))}
 										</div>
 									)}
