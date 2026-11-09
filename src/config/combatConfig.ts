@@ -41,6 +41,8 @@ export const COMBAT = {
 	auto: {
 		minRebirths: 1, // auto-battle is locked until the player has rebirthed this many times (clicking a monster to fight it never is)
 		resumeHpPct: 80, // auto-battle only starts a fight with HP at this share of max or more (after a knockout it rests up to it)
+		pauseAfterDefeats: 3, // auto-battle stays on after a defeat and switches itself off after this many defeats in a row (one win resets the count)
+		safeWinChance: 0.8, // the Next strip calls a monster Safe from this win chance up, Risky from minWinChance up, Unlikely below it
 		minWinChance: 0.5, // ...and only against a monster it expects to beat at least as often as lose to (offline/winChance.ts); a click on a monster fights it anyway
 		engageOrder: 'weakest' as 'weakest' | 'oldest', // which waiting monster is next: the lowest level first (an unbeatable one never blocks the easy ones), or the one that came first
 		retryCooldownSec: 300, // a monster that beat you (or ran out the clock) is not tried again for this long...

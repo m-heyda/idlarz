@@ -1,6 +1,7 @@
 // combatSync.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
+import { COMBAT } from '@/config/combatConfig';
 import { RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { writeCursor } from '@/lib/combatCursor';
 import { emitCombat } from '@/lib/combatFx';
@@ -118,6 +119,8 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 				};
 			} else if ((e.kind === 'defeated' || e.kind === 'timeout') && e.type) {
 				notice = { id: noticeId++, kind: e.kind, type: e.type, level: e.level ?? 1, summary: null, taunt: tauntOf(e.type) };
+			} else if (e.kind === 'paused') {
+				toast(`Auto-battle paused: ${COMBAT.auto.pauseAfterDefeats} defeats in a row`);
 			} else if (e.kind === 'retreat') {
 				// a fled fight has no result of its own, and the one from before must not come back in its place
 				notice = null;

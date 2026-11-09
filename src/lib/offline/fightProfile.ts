@@ -30,6 +30,15 @@ export const winnableBy =
 	(type: MonsterType, level: number): boolean =>
 		estimateWin(profile, Math.max(hp, resumeHpOf(profile)), type, level, potions).chance >= COMBAT.auto.minWinChance;
 
+/**
+ * The win estimate of one monster as a whole percent (0-100), judged like {@link winnableBy} (HP at least the resume line, the potions auto-use would
+ * drink). The Next strip shows it as a bucket ({@link winBucketOf}) with the exact value on hover; the browser never recomputes it.
+ */
+export const winPctBy =
+	(profile: PlayerProfile, hp: number, potions: PotionStock[]) =>
+	(type: MonsterType, level: number): number =>
+		Math.round(estimateWin(profile, Math.max(hp, resumeHpOf(profile)), type, level, potions).chance * 100);
+
 /** What auto-battle checks a monster against: the numbers it would fight with and the potions auto-use would drink. */
 export const winnable = (ctx: FightCtx) => winnableBy(ctx.profileNow, ctx.c.hp, potionsForEstimate(ctx.ledger.inv!, ctx.c));
 

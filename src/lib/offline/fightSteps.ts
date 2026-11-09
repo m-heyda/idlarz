@@ -80,6 +80,8 @@ export const autoUse = (ctx: FightCtx, t: number): void => {
 /**
  * Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.
  *
+ * **Defeat streak**: auto-battle stays on after a defeat. Each defeat adds one to `CombatState.defeatStreak`; a win resets it; at `COMBAT.auto.pauseAfterDefeats` (3) defeats in a row auto-battle is switched off, a `paused` event is logged (the browser says 'Auto-battle paused: 3 defeats in a row') and the count starts again. A timeout or a retreat neither adds nor resets. The player turns the switch back on.
+ *
  * @category Combat/A fight
  * @order 7
  */
@@ -88,7 +90,17 @@ export const endFight = (ctx: FightCtx, t: number, kind: 'defeated' | 'timeout' 
 	const f = c.fight!;
 	pushEvent(ctx, t, kind, { n: f.n, type: f.type, level: f.level });
 	if (kind !== 'retreat') {
-		if (kind === 'defeated') c.hp = Math.round(f.profile.maxHp * COMBAT.knockoutHpFraction);
+		if (kind === 'defeated') {
+			c.hp = Math.round(f.profile.maxHp * COMBAT.knockoutHpFraction);
+			c.defeatStreak = (c.defeatStreak ?? 0) + 1;
+			if (c.defeatStreak >= COMBAT.auto.pauseAfterDefeats) {
+				c.defeatStreak = 0;
+				if (c.autoBattle) {
+					c.autoBattle = false;
+					pushEvent(ctx, t, 'paused');
+				}
+			}
+		}
 		c.retryAt[f.n] = t + (isBoss(f.type) ? COMBAT.auto.bossRetryCooldownSec : COMBAT.auto.retryCooldownSec);
 	}
 	c.fight = null;
@@ -152,6 +164,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 			},
 		});
 		c.fight = null;
+		c.defeatStreak = 0;
 		return;
 	}
 

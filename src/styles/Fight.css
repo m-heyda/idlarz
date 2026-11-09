@@ -421,6 +421,43 @@
 	border: 1px solid #7a5a20;
 }
 
+/* the win-chance bucket of a queued monster: the border and the corner mark; the mark's shape (tick, bang, cross) and the title carry it without the colour */
+.fight-queue-item[data-win='safe'] {
+	border-color: #4caf50;
+}
+
+.fight-queue-item[data-win='risky'] {
+	border-color: #e0a020;
+}
+
+.fight-queue-item[data-win='unlikely'] {
+	border-color: #d84a3a;
+}
+
+.fight-queue-win {
+	position: absolute;
+	left: 0;
+	top: 0;
+	min-width: 12px;
+	padding: 0 2px;
+	font-size: 0.6rem;
+	line-height: 1.2;
+	text-align: center;
+	color: #111;
+}
+
+.fight-queue-item[data-win='safe'] .fight-queue-win {
+	background: #4caf50;
+}
+
+.fight-queue-item[data-win='risky'] .fight-queue-win {
+	background: #e0a020;
+}
+
+.fight-queue-item[data-win='unlikely'] .fight-queue-win {
+	background: #d84a3a;
+}
+
 .fight-queue-item[data-boss='true'] {
 	border-color: #ffd860;
 }

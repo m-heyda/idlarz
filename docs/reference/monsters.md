@@ -17,7 +17,7 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:350`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:352`](../../src/config/combatConfig.ts)
 
 The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`).
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
