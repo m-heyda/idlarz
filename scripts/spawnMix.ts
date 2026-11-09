@@ -38,11 +38,11 @@ export const heroProfile = (level: number): PlayerProfile => {
 	return playerProfile(stored.core as Record<string, unknown>);
 };
 
-/** Castle level 1, the ring 2-9 tiles out, a quarter of it in each of the four biomes. */
+/** Castle level 1, the land 2-14 tiles out (monsters use 2-9, bosses 10 and more), a quarter of it in each of the four biomes. */
 const mixWorld = () => {
 	const placed: Placed[] = [{ x: CASTLE_X, y: CASTLE_Y, tile: { biome: 'castle', isOwned: true, level: 1 } }];
-	for (let dx = -9; dx <= 9; dx++)
-		for (let dy = -9; dy <= 9; dy++) {
+	for (let dx = -14; dx <= 14; dx++)
+		for (let dy = -14; dy <= 14; dy++) {
 			const x = CASTLE_X + dx;
 			const y = CASTLE_Y + dy;
 			if (castleDistance({ x, y }) < 2) continue;
@@ -59,14 +59,16 @@ export interface Mix {
 	grownAbove50: number;
 }
 
-const measure = (hero: PlayerProfile, world: ReturnType<typeof mixWorld>, weighted: boolean): Mix => {
+const measure = (hero: PlayerProfile, world: ReturnType<typeof mixWorld>, weighted: boolean, boss = false): Mix => {
 	const counts = BUCKETS.map(() => 0);
 	let above = 0;
 	let grownAbove = 0;
 	for (let n = 1; n <= SAMPLES; n++) {
 		const rollFor = (kind: string, k: number) => sealedRng('spawn-mix-secret-0123456789', 'mix', 1, kind, k);
-		const bank = { ...emptyBank(0), rats: [{ n, at: 0, lucky: false }] };
-		const t = placeTickets(bank, world, 'k', 0, rollFor, weighted ? hero : undefined).rats[0];
+		const ticket = { n, at: 0, lucky: false };
+		const bank = boss ? { ...emptyBank(0), king: ticket } : { ...emptyBank(0), rats: [ticket] };
+		const placed = placeTickets(bank, world, 'k', 0, rollFor, weighted ? hero : undefined);
+		const t = boss ? placed.king! : placed.rats[0];
 		const chance = winChanceAt(hero, t.type!, t.spawnLevel!);
 		counts[BUCKETS.findIndex((b) => chance >= b.from && chance < b.to)]++;
 		if (chance > 0.5) above++;
@@ -78,19 +80,22 @@ const measure = (hero: PlayerProfile, world: ReturnType<typeof mixWorld>, weight
 
 const pct = (x: number) => `${Math.round(x * 100)} %`;
 
-/** The markdown lines of the table for these hero levels. */
+/** The markdown lines of the table for these hero levels: normal monsters first, then bosses (10 or more tiles out, same weights and level cap). */
 export const spawnMixLines = (heroLevels: number[]): string[] => {
 	const world = mixWorld();
 	const out: string[] = [];
-	out.push(
-		'| Hero | Pick | ' + BUCKETS.map((b) => b.label).join(' | ') + ' | Win chance above 50 % | ...once grown fully |',
-		'|---|---|' + BUCKETS.map(() => '---').join('|') + '|---|---|',
-	);
-	for (const level of heroLevels) {
-		const hero = heroProfile(level);
-		for (const [name, weighted] of [['uniform (before)', false] as const, ['weighted (now)', true] as const]) {
-			const m = measure(hero, world, weighted);
-			out.push(`| level ${level} | ${name} | ${m.shares.map(pct).join(' | ')} | **${pct(m.above50)}** | ${pct(m.grownAbove50)} |`);
+	for (const boss of [false, true]) {
+		if (boss) out.push('', 'Bosses (stand 10 or more tiles from the castle; the same weights and level cap as normal monsters):', '');
+		out.push(
+			'| Hero | Pick | ' + BUCKETS.map((b) => b.label).join(' | ') + ' | Win chance above 50 % | ...once grown fully |',
+			'|---|---|' + BUCKETS.map(() => '---').join('|') + '|---|---|',
+		);
+		for (const level of heroLevels) {
+			const hero = heroProfile(level);
+			for (const [name, weighted] of [['uniform (before)', false] as const, ['weighted (now)', true] as const]) {
+				const m = measure(hero, world, weighted, boss);
+				out.push(`| level ${level} | ${name} | ${m.shares.map(pct).join(' | ')} | **${pct(m.above50)}** | ${pct(m.grownAbove50)} |`);
+			}
 		}
 	}
 	return out;

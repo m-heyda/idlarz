@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { COMBAT, MONSTERS } from '../../src/config/combatConfig';
+import { BOSS_MAX_DISTANCE, BOSS_MIN_DISTANCE, COMBAT, MONSTERS } from '../../src/config/combatConfig';
 import { BIOMES } from '../../src/config/biomes';
 
 // Every monster is one entry of config/combatConfig: adding a monster (or a biome) later must not need code, so the shape is checked here.
@@ -21,10 +21,11 @@ test('every monster says where it may spawn: known land only, never water or the
 	}
 });
 
-test('monsters may spawn up to 9 tiles from the castle but never beside it, each in its own biome only', () => {
+test('normal monsters spawn 2 to 9 tiles from the castle and bosses 10 or more (IDL-222), each in its own biome only', () => {
 	for (const [id, def] of Object.entries(MONSTERS)) {
-		assert.equal(def.spawn.maxCastleDistance, 9, id);
-		assert.equal(def.spawn.minCastleDistance, 2, id);
+		const boss = def.grade === 'boss';
+		assert.equal(def.spawn.maxCastleDistance, boss ? BOSS_MAX_DISTANCE : 9, id);
+		assert.equal(def.spawn.minCastleDistance, boss ? BOSS_MIN_DISTANCE : 2, id);
 		assert.equal(def.spawn.biomes.length, 1, id);
 	}
 	assert.deepEqual([...MONSTERS.thistleBoar.spawn.biomes], ['plains']);

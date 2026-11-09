@@ -11,7 +11,3 @@ Open code-side findings, each written as `@knownissue` on the code it is about. 
 ### [`queueTicket`](combat.md#queueticket) — [`src/lib/offline/fightTargets.ts:88`](../../src/lib/offline/fightTargets.ts)
 
 - IDL-59 the win-chance bucket and the three-defeat pause of the battle queue are still open.
-
-### [`placeTickets`](monsters.md#placetickets) — [`src/lib/offline/placement.ts:75`](../../src/lib/offline/placement.ts)
-
-- IDL-222 bosses are never weighted by win chance (a uniform pick); needs an owner decision.

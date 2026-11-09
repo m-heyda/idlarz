@@ -41,7 +41,7 @@ export const expectedSpawnLevel = (type: MonsterType, castleLevel: number): numb
  *
  * Which type spawns. Each type is weighted by the player's win chance against it ({@link estimateWin}) at the middle of its spawn window: full weight (1) for 40-95%, falling to 0.75 for a trivial monster (chance 1)
  * and to 0.1 for a hopeless one (chance <= 5%); equal weights give the plain uniform pick. The spawn level is capped at the highest level the player still beats (never below the window's bottom) and so is its growth (`growCap`),
- * for new spawns only. Bosses are never weighted or capped: among the boss types that still have a free tile the pick is uniform ({@link placeTickets}). Measured: `docs/generated/spawn-mix.md`.
+ * for new spawns only. Bosses follow the same rules (IDL-222): among the boss types that have a free tile the pick is weighted and the level capped ({@link placeTickets}). Measured: `docs/generated/spawn-mix.md`.
  *
  * @category Monsters/Spawning
  * @order 3

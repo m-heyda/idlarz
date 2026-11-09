@@ -64,13 +64,11 @@ export const needsLook = (bank: TicketBank, key: string): boolean => {
  * grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals
  * them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`).
  * With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped
- * near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are never weighted or capped.
- *
- * Bosses are placed with a uniform pick among the boss types that still have a free tile, while normal monsters are weighted by win chance.
+ * near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types
+ * that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 10 or more tiles from the castle (`BOSS_MIN_DISTANCE`).
  *
  * @category Monsters/Spawning
  * @order 4
- * @knownissue IDL-222 bosses are never weighted by win chance (a uniform pick); needs an owner decision.
  */
 export const placeTickets = (
 	bank: TicketBank,
@@ -121,9 +119,9 @@ export const placeTickets = (
 			.map((type) => ({ type, free: spawnTiles(type, world, taken, rebirths) }))
 			.filter((entry) => entry.free.length > 0);
 		if (open.length === 0) return ticket;
-		const rat = !!hero && kind === 'rat';
+		const informed = !!hero;
 		const weights =
-			rat && open.length > 1
+			informed && open.length > 1
 				? typeWeights(
 						hero,
 						open.map((entry) => entry.type),
@@ -134,9 +132,9 @@ export const placeTickets = (
 		const { type, free } = open[weights ? pickWeighted(weights, roll) : Math.floor(roll * open.length) % open.length];
 		const spot = free[Math.floor(rollFor('spawnpos', ticket.n)() * free.length) % free.length];
 		taken.add(`${spot.x},${spot.y}`);
-		const cap = rat ? spawnLevelCap(hero, type, castleLevel) : Infinity;
+		const cap = informed ? spawnLevelCap(hero, type, castleLevel) : Infinity;
 		const spawnLevel = rollSpawnLevel(type, castleLevel, ticket.n, castleDistance(spot), Number.isFinite(cap) ? cap : undefined);
-		const grow = rat ? growthCap(hero, type, spawnLevel) : undefined;
+		const grow = informed ? growthCap(hero, type, spawnLevel) : undefined;
 		return { ...ticket, type, x: spot.x, y: spot.y, spawnLevel, ...(grow !== undefined ? { growCap: grow } : {}) };
 	};
 

@@ -17,7 +17,7 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:350`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:357`](../../src/config/combatConfig.ts)
 
 The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`).
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
@@ -179,26 +179,21 @@ Weight of each type for this player and castle level, in the order given.
 
 Which type spawns. Each type is weighted by the player's win chance against it ([`estimateWin`](combat.md#estimatewin)) at the middle of its spawn window: full weight (1) for 40-95%, falling to 0.75 for a trivial monster (chance 1)
 and to 0.1 for a hopeless one (chance <= 5%); equal weights give the plain uniform pick. The spawn level is capped at the highest level the player still beats (never below the window's bottom) and so is its growth (`growCap`),
-for new spawns only. Bosses are never weighted or capped: among the boss types that still have a free tile the pick is uniform ([`placeTickets`](monsters.md#placetickets)). Measured: `docs/generated/spawn-mix.md`.
+for new spawns only. Bosses follow the same rules (IDL-222): among the boss types that have a free tile the pick is weighted and the level capped ([`placeTickets`](monsters.md#placetickets)). Measured: `docs/generated/spawn-mix.md`.
 
 <a id="placetickets"></a>
 
 ### `placeTickets` <small>function</small>
 
-Source: [`src/lib/offline/placement.ts:75`](../../src/lib/offline/placement.ts)
+Source: [`src/lib/offline/placement.ts:73`](../../src/lib/offline/placement.ts)
 
 Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
 grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals
 them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`).
 With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped
-near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are never weighted or capped.
-
-Bosses are placed with a uniform pick among the boss types that still have a free tile, while normal monsters are weighted by win chance.
-
-**Known issues**
-
-- IDL-222 bosses are never weighted by win chance (a uniform pick); needs an owner decision.
+near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types
+that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 10 or more tiles from the castle (`BOSS_MIN_DISTANCE`).
 
 <a id="ticketcap"></a>
 
