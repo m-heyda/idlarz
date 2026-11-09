@@ -133,9 +133,10 @@ test('the Rat King is killable at every level he can have (15 to 35): matching g
 		assert.ok(matching.winRate >= 0.9, `obsidian at item level ${level} vs the King at ${level}: ${matching.winRate}`);
 		assert.ok(matching.meanTimeSec > 30, `${level}: not a pushover (${matching.meanTimeSec} s)`);
 	}
-	// gear that fell behind (item level 15 against a level 35 King) is harder: the best set still wins, obsidian no longer does
+	// gear that fell behind (item level 15 against a level 35 King) is harder: the best set still wins, obsidian no longer wins comfortably
 	assert.ok(sim(atItemLevel(BEST, 15), kingAt(35)).winRate >= 0.9);
-	assert.ok(sim(atItemLevel(OBSIDIAN, 15), kingAt(35)).winRate < 0.5);
+	// the Obsidian Maul was raised to its G6 cell (IDL-238): a stale set (item level 15) now wins 75 % of the time instead of under half, but no longer comfortably
+	assert.ok(sim(atItemLevel(OBSIDIAN, 15), kingAt(35)).winRate < 0.9);
 });
 
 test('weak gear never beats the King at any level', () => {

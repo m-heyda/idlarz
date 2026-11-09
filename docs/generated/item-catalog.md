@@ -100,7 +100,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Obsidian Cloak | `obsidian_cloak` | accessory | 3 | base | 8-100 | +3 Armor, +5 Max HP, +2.0% Dodge |  | general pool |
 | Obsidian Ring | `obsidian_ring` | accessory | 3 | base | 8-100 | +6 Max HP, +1.5% Crit Chance |  | general pool |
 | Obsidian Charm | `obsidian_charm` | accessory | 3 | base | 8-100 | +1 Armor, +7 Max HP, +1% Super Crit |  | general pool |
-| Obsidian Belt | `obsidian_belt` | accessory | 3 | base | 55-66 | +7 Armor, +13 Max HP |  | general pool |
+| Obsidian Belt | `obsidian_belt` | accessory | 3 | base | 55-100 | +7 Armor, +13 Max HP |  | general pool |
 | Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +61 Armor, +61 Max HP |  | general pool |
 | Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +50 Armor, +50 Max HP |  | general pool |
 | Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +101 Armor, +121 Max HP |  | general pool |
@@ -194,7 +194,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **monster_tundra level 30** (profile `normal_monster_tundra`, item level 30): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
 - **boss level 15** (profile `boss`, item level 15): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
-- **boss level 45** (profile `boss`, item level 45): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss level 45** (profile `boss`, item level 45): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_legendary` from pool `legendary_weapons`, chance 0.05
   - bonus `king_potions` from pool `potions_king`
 - **chest** (profile `basic_chest`, item level 4): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%

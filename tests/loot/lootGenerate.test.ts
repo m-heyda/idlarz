@@ -97,19 +97,23 @@ test('rarity is rolled independently of the drop chance and follows the normalis
 	assert.equal(counts.rare ?? 0, 0);
 });
 
-test('higher monster levels raise the item level, and rarer rarities unlock', () => {
-	const rng = mulberry32(4);
-	const rarities = new Set<string>();
-	let maxLevel = 0;
-	for (let i = 0; i < 40000; i++) {
-		for (const item of gear(generateLoot({ sourceId: 'monster', level: 20 }, rng).drops)) {
-			rarities.add(item.rarity);
-			maxLevel = Math.max(maxLevel, item.level);
-			assert.equal(instanceProblem(item), null);
+test('higher monster levels raise the item level, and rarer rarities unlock with the grade', () => {
+	const rarities = (level: number) => {
+		const rng = mulberry32(4);
+		const seen = new Set<string>();
+		let maxLevel = 0;
+		for (let i = 0; i < 40000; i++) {
+			for (const item of gear(generateLoot({ sourceId: 'monster', level }, rng).drops)) {
+				seen.add(item.rarity);
+				maxLevel = Math.max(maxLevel, item.level);
+				assert.equal(instanceProblem(item), null);
+			}
 		}
-	}
-	assert.equal(maxLevel, 20 + 1); // source level 20, +1 variance
-	for (const r of ['common', 'uncommon', 'rare', 'epic', 'legendary']) assert.ok(rarities.has(r), r);
+		assert.equal(maxLevel, level + 1); // source level, +1 variance
+		return [...seen].sort();
+	};
+	assert.deepEqual(rarities(20), ['uncommon'], 'G3 carries uncommon only');
+	assert.deepEqual(rarities(36), ['rare', 'uncommon'], 'G4 carries uncommon and rare');
 });
 
 test('every rolled instance is valid and resolves', () => {
@@ -273,7 +277,11 @@ test('new content is data only: a fake rarity drops through the unchanged genera
 		statMultiplier: 1,
 		enabled: true,
 	};
-	for (const item of Object.values(data.items)) if (item.generation === 'base') item.allowedRarities = [...(item.allowedRarities ?? []), 'mythic'];
+	for (const item of Object.values(data.items))
+		if (item.generation === 'base') {
+			item.allowedRarities = [...(item.allowedRarities ?? []), 'mythic'];
+			if (item.dropRarities) item.dropRarities = [...item.dropRarities, 'mythic'];
+		}
 	data.profiles.normal_monster.rarityWeights.mythic = 50;
 	data.profiles.normal_monster.rolls = { min: 1, max: 1, guaranteed: 1, chancePerRoll: 1 };
 	const rng = mulberry32(14);

@@ -109,7 +109,8 @@ export interface LootSource {
  * The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level
  * window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
  * a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items,
- * so today every biome drops the same items; going live with the next grade is what moves a biome.
+ * so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides: the plains pool stops at G3, so a plains monster
+ * grown past item level 30 (its levels 1-20 plus 10 levels of growth, plus 1 of variance) finds no base and drops nothing (about half the drops at 31; see docs/plan/31-grade-by-biome-and-source.md).
  *
  * A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G3, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
  * Every base that drops carries a `grade:` tag (IDL-243): the legacy wood, steel and Obsidian pieces that fill a ladder cell are graded by it (Wooden Club G1, Hunting Bow G2, Iron Sword G3, six Steel armour pieces G4, the Obsidian family G6; they keep their ids, art and set bonuses),

@@ -8,13 +8,13 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 |---|---|---|---|---|---|---|---|
 | Thistle Boar | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Thistle Boar | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Thistle Boar | 20 (grown) | 0% | 0% | 0% | 0% | 10% | 100% |
+| Thistle Boar | 20 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Burrow Badger | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Burrow Badger | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Burrow Badger | 20 (grown) | 0% | 0% | 0% | 0% | 55% | 100% |
+| Burrow Badger | 20 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Dust Strider | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Dust Strider | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Dust Strider | 20 (grown) | 0% | 0% | 0% | 0% | 0% | 100% |
+| Dust Strider | 20 (grown) | 0% | 0% | 0% | 0% | 70% | 100% |
 | The Great Auroch | 15 (castle 1) | 80% | 88% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 23 (castle 8) | 5% | 35% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 33 (grown) | 0% | 3% | 100% | 100% | 100% | 100% |
@@ -27,11 +27,11 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Rotcap Stag | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Rotcap Stag | 13 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Rotcap Stag | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 0% | 93% | 100% |
-| The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 0% | 45% | 100% |
-| The Elder Stag | 38 (grown) | 0% | 0% | 0% | 0% | 30% | 100% |
+| The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Elder Stag | 38 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Garbage Ogre | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Garbage Ogre | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 100% |
+| Garbage Ogre | 17 (castle 8) | 0% | 0% | 0% | 0% | 10% | 100% |
 | Garbage Ogre | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Dumpback | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Dumpback | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 75% |
@@ -39,10 +39,10 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Rot Heron | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Rot Heron | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 20% |
 | Rot Heron | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 3% | 100% |
-| The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 0% | 100% |
-| The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 0% | 100% |
-| Frost Hare | 12 (castle 1) | 0% | 0% | 0% | 0% | 45% | 100% |
+| The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 90% | 100% |
+| The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 75% | 100% |
+| The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 50% | 100% |
+| Frost Hare | 12 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Frost Hare | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Hare | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Icetusk Calf | 12 (castle 1) | 0% | 0% | 0% | 100% | 100% | 100% |

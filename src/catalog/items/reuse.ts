@@ -3,7 +3,7 @@ import type { EquipmentRarity, ItemDef } from '@/types/game';
 import { baseStat } from '../stats';
 import { ITEM_ICONS } from '@/config/itemIcons';
 import { gear, type GearOptions } from './define';
-import { LIVE_GRADES, gradeLevels, gradeRarities, type Grade } from './grades';
+import { LIVE_GRADES, gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities, type Grade } from './grades';
 
 // Reserve items: the second equipment art pass (64 px art under public/pixel/items, config/itemIcons/). Every item here is
 // DISABLED: it is in the catalog so its id, icon and stats can be checked, but no loot pool, shop or chest hands it out and
@@ -327,9 +327,11 @@ export const RESERVE_ITEMS: ItemDef[] = RESERVE_BASE.map((def) => {
 	return {
 		...def,
 		tags: [...(def.tags ?? []), `grade:${grade}`],
-		minItemLevel: gradeLevels(grade)[0],
-		maxItemLevel: gradeLevels(grade)[1],
-		allowedRarities: [...gradeRarities(grade)],
+		minItemLevel: gradeOwnedLevels(grade)[0],
+		maxItemLevel: gradeOwnedLevels(grade)[1],
+		allowedRarities: [...gradeOwnedRarities(grade)],
+		dropLevels: gradeLevels(grade),
+		dropRarities: gradeRarities(grade),
 		enabled: LIVE_GRADES.includes(grade),
 	};
 });
