@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [Asset library](#asset-library)
 
 ## The loop
 
@@ -126,3 +126,16 @@ The panel offers biome painting, extending land, erasing, chests and monsters (b
 - `lib/dragPaint.ts` (pure): hold-and-drag drawing. `createStroke(apply)` turns pointer moves into the new cells of one stroke (line interpolation, brush, no repeats, capped).
 - `lib/mapEdit.ts` (pure): `applyStroke(world, cells, tool)` plus the tools (`paintTool`, `extendTool`, `eraseTool`, `chestTool`, `extendRing`). A new tool is one more `(world, cell) => Tile | undefined | 'skip'` function.
 - The lab's random chests use a plain picker on purpose: the game's weighted chest placement stays server-side (`tests/server/serverBoundary.test.ts`).
+
+<a id="asset-library"></a>
+
+### Asset library
+
+Source: [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts)
+
+The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
+accessories, monsters, buildings, resources, map-details, ui, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
+Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/`
+get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
+`npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
+(`npm run storybook`) and `tests/docs/assets.test.ts` keeps current. Never edit `docs/assets/` by hand.

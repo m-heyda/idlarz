@@ -16,6 +16,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `applyUse` | Combat / Consumables | [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts) | Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now). |
 | `armorOf` | Combat / Player numbers | [`src/lib/combat.ts:176`](../../src/lib/combat.ts) | Armor against monster hits: |
 | `armorReduction` | Combat / Player numbers | [`src/lib/combat.ts:207`](../../src/lib/combat.ts) | The share (0-0.75) of a hit that `armor` takes away: |
+| Asset library | Architecture / Art | [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts) | The asset library: |
 | `attacksPerSecond` | Combat / Player numbers | [`src/lib/combat.ts:120`](../../src/lib/combat.ts) | Attacks per second: |
 | `autoBattleUnlocked` | Combat / A fight | [`src/lib/combat.ts:45`](../../src/lib/combat.ts) | Auto-battle (the server picking the next monster) is a reward for the first rebirth; |
 | `autoUse` | Combat / Potions and skills | [`src/lib/offline/fightSteps.ts:67`](../../src/lib/offline/fightSteps.ts) | Auto-use's rules for one tick: |

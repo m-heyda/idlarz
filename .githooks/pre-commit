@@ -7,3 +7,8 @@ npm run --silent docs:code || {
 	exit 1
 }
 git add docs/reference
+npm run --silent assets:catalog || {
+	echo "pre-commit: assets:catalog failed (skip with --no-verify)" >&2
+	exit 1
+}
+git add docs/assets
