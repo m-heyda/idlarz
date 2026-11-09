@@ -2,5 +2,8 @@
 	{"icon": "item_leather_cloak", "item": "leather_cloak", "file": null, "slot": "cape", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_cape", "item": "cloth_cape", "file": null, "slot": "cape", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_cloak", "item": "steel_cloak", "file": null, "slot": "cape", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_cloak", "item": "obsidian_cloak", "file": null, "slot": "cape", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_cloak", "item": "obsidian_cloak", "file": null, "slot": "cape", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_rag_cloak", "item": "rag_cloak", "file": null, "slot": "cape", "weapon": null, "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_hide_cloak", "item": "hide_cloak", "file": null, "slot": "cape", "weapon": null, "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_travellers_cape", "item": "travellers_cape", "file": null, "slot": "cape", "weapon": null, "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

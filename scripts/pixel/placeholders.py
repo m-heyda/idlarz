@@ -66,10 +66,9 @@ def gaps():
     return {fam: counts.get(fam, 0) for fam in FAMILIES if counts.get(fam, 0) < LADDER}
 
 
-# Families with a full set of registered icons still lack art for the early grades the catalog now enables (IDL-220): the real
-# G1-G3 icons there belong to the reuse items, so the ladder cells of these grades get placeholders too.
-EXTRA = {fam: ('G1', 'G2', 'G3') for fam in ('feet', 'legs', 'neck', 'ring', 'mainHand-sword', 'offHand-shield')}
-
+# No extra G1-G3 placeholders any more (IDL-239): feet, legs, neck, ring, sword and shield got their ladder icons from the
+# reserve art, and every other ladder cell lost its placeholder the same way, so only the gap-filling ladder above remains.
+# Do not re-run the generator over a family whose cells were swapped: it would draw those placeholders again.
 
 class Pen:
     def __init__(self, ramp, accent, grade):
@@ -332,7 +331,7 @@ def main():
     if os.path.exists(OUT_JSON):
         with open(OUT_JSON, encoding='utf8') as fh:
             kept = {e['icon']: e['item'] for e in json.load(fh)}
-    plan = [(fam, GRADES) for fam in todo] + [(fam, gs) for fam, gs in EXTRA.items() if fam not in todo]
+    plan = [(fam, GRADES) for fam in todo]
     for fam, grades in plan:
         slot, weapon = FAMILIES[fam]
         for g in grades:

@@ -14,5 +14,8 @@
 	{"icon": "item_leather_leggings", "item": "leather_leggings", "file": null, "slot": "legs", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_trousers", "item": "cloth_trousers", "file": null, "slot": "legs", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_greaves", "item": "steel_greaves", "file": null, "slot": "legs", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_greaves", "item": "obsidian_greaves", "file": null, "slot": "legs", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_greaves", "item": "obsidian_greaves", "file": null, "slot": "legs", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_rag_trousers", "item": "rag_trousers", "file": "legs/rag_trousers", "slot": "legs", "weapon": null, "grade": "G1", "provenance": "MVP stand-in (IDL-239): copy of the art of art_patched_trousers (supplied 64 px art); replace when real G1 art exists"},
+	{"icon": "art_hide_leggings", "item": "hide_leggings", "file": "legs/hide_leggings", "slot": "legs", "weapon": null, "grade": "G2", "provenance": "MVP stand-in (IDL-239): copy of the art of art_tanned_leather_pants (supplied 64 px art); replace when real G2 art exists"},
+	{"icon": "art_iron_chausses", "item": "iron_chausses", "file": "legs/iron_chausses", "slot": "legs", "weapon": null, "grade": "G3", "provenance": "MVP stand-in (IDL-239): copy of the art of art_chainmail_leggings (supplied 64 px art); replace when real G3 art exists"}
 ]

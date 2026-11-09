@@ -1,5 +1,8 @@
 [
 	{"icon": "art_reapers_crescent", "item": "reapers_crescent", "file": "legendary/reapers_crescent", "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "art_tidecaller_axe", "item": "tidecaller_axe", "file": "legendary/tidecaller_axe", "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
-	{"icon": "item_battle_axe", "item": "battle_axe", "file": null, "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_battle_axe", "item": "battle_axe", "file": null, "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_hatchet", "item": "hatchet", "file": null, "slot": "mainHand", "weapon": "axe", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_bronze_axe", "item": "bronze_axe", "file": null, "slot": "mainHand", "weapon": "axe", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_axe", "item": "iron_axe", "file": null, "slot": "mainHand", "weapon": "axe", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

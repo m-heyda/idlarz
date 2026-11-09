@@ -1,3 +1,6 @@
 [
-	{"icon": "item_apprentice_tome", "item": "apprentice_tome", "file": null, "slot": "offHand", "weapon": "tome", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_apprentice_tome", "item": "apprentice_tome", "file": null, "slot": "offHand", "weapon": "tome", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_bound_scraps", "item": "bound_scraps", "file": null, "slot": "offHand", "weapon": "tome", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_hide_primer", "item": "hide_primer", "file": null, "slot": "offHand", "weapon": "tome", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_codex", "item": "iron_codex", "file": null, "slot": "offHand", "weapon": "tome", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

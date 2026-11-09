@@ -2,5 +2,7 @@
 	{"icon": "item_acorn_charm", "item": "acorn_charm", "file": null, "slot": "charm", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_charm", "item": "cloth_charm", "file": null, "slot": "charm", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_charm", "item": "steel_charm", "file": null, "slot": "charm", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_charm", "item": "obsidian_charm", "file": null, "slot": "charm", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_charm", "item": "obsidian_charm", "file": null, "slot": "charm", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_rabbit_foot", "item": "rabbit_foot", "file": null, "slot": "charm", "weapon": null, "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_bone_token", "item": "bone_token", "file": null, "slot": "charm", "weapon": null, "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

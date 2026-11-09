@@ -2,5 +2,8 @@
 	{"icon": "item_leather_vest", "item": "leather_vest", "file": null, "slot": "chest", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_robe", "item": "cloth_robe", "file": null, "slot": "chest", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_cuirass", "item": "steel_cuirass", "file": null, "slot": "chest", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_cuirass", "item": "obsidian_cuirass", "file": null, "slot": "chest", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_cuirass", "item": "obsidian_cuirass", "file": null, "slot": "chest", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_rag_tunic", "item": "rag_tunic", "file": null, "slot": "chest", "weapon": null, "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_hide_jerkin", "item": "hide_jerkin", "file": null, "slot": "chest", "weapon": null, "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_mail", "item": "iron_mail", "file": null, "slot": "chest", "weapon": null, "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]

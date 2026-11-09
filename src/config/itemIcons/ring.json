@@ -13,5 +13,8 @@
 	{"icon": "item_wooden_ring", "item": "wooden_ring", "file": null, "slot": "ring", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_cloth_ring", "item": "cloth_ring", "file": null, "slot": "ring", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_steel_ring", "item": "steel_ring", "file": null, "slot": "ring", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_ring", "item": "obsidian_ring", "file": null, "slot": "ring", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_ring", "item": "obsidian_ring", "file": null, "slot": "ring", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_twig_ring", "item": "twig_ring", "file": "ring/twig_ring", "slot": "ring", "weapon": null, "grade": "G1", "provenance": "MVP stand-in (IDL-239): copy of the art of art_thornvine_ring (supplied 64 px art); replace when real G1 art exists"},
+	{"icon": "art_copper_band", "item": "copper_band", "file": "ring/copper_band", "slot": "ring", "weapon": null, "grade": "G2", "provenance": "MVP stand-in (IDL-239): copy of the art of art_turquoise_band (supplied 64 px art); replace when real G2 art exists"},
+	{"icon": "art_iron_signet", "item": "iron_signet", "file": "ring/iron_signet", "slot": "ring", "weapon": null, "grade": "G3", "provenance": "MVP stand-in (IDL-239): copy of the art of art_iron_band (supplied 64 px art); replace when real G3 art exists"}
 ]

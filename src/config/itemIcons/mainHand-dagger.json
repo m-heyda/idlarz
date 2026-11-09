@@ -1,4 +1,7 @@
 [
 	{"icon": "item_steel_dagger", "item": "steel_dagger", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_obsidian_kris", "item": "obsidian_kris", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_obsidian_kris", "item": "obsidian_kris", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "item_bone_knife", "item": "bone_knife", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_bronze_dirk", "item": "bronze_dirk", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "item_iron_dagger", "item": "iron_dagger", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
 ]
