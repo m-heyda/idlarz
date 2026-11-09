@@ -318,8 +318,8 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `offlineCapHours` | 8 | 72 | Night Watch +1 h per level, set bonus hours |
 | `offlineEfficiency` | 0.5 | 1 | Steward +0.05 per level, set bonus points |
 | `offlineMinGapSec` | 300 | n/a | nothing yet |
-| `craftBatchCap` | 10 | 1,000 | nothing yet |
-| `craftQueueSlots` | 1 | 5 | nothing yet |
+| `craftBatchCap` | 1 B | 1 B | nothing yet |
+| `craftQueueSlots` | 3 | 5 | nothing yet |
 | `craftOfflineHours` | 8 | 72 | nothing yet |
 | `craftSpeed` | 1 | 4 | nothing yet |
 

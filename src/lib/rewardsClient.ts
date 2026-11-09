@@ -52,7 +52,11 @@ export const requestCraft = (key: string, recipeId: string, count: number): Prom
 	post<CraftReply>('/api/craft', { key, recipeId, count });
 
 /** Delivers the finished crafts of a batch (the bag, or the component stock) with their XP. */
-export const requestCraftClaim = (key: string, slot = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/claim', { key, slot });
+export const requestCraftClaim = (key: string, slot: number | 'all' = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/claim', { key, slot });
+
+/** Moves crafted potions or trade goods from the crafting stash into the bag (as many as fit). */
+export const requestCraftWithdraw = (key: string, id: string, qty: number): Promise<Reply<CraftReply>> =>
+	post<CraftReply>('/api/craft/stash', { key, id, qty });
 
 /** Ends a batch: the finished crafts are delivered, the unfinished ones refunded (the answer names the resources to give back). */
 export const requestCraftCancel = (key: string, slot = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/cancel', { key, slot });

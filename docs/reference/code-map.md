@@ -47,6 +47,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/craft/route.ts) — ~ Crafts:
 
+**src/app/api/craft/stash/**
+
+- [`route.ts`](../../src/app/api/craft/stash/route.ts) — ~ Withdraw crafted potions or trade goods from the crafting stash into the bag:
+
 **src/app/api/fight/**
 
 - [`route.ts`](../../src/app/api/fight/route.ts) — ~ `{ key, action, ...
@@ -149,6 +153,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
 - [`CostList.tsx`](../../src/components/game/CostList.tsx) — ~ A bundle of resource costs; each entry is green when affordable and red when not.
+- [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
 - [`GameDebug.tsx`](../../src/components/game/GameDebug.tsx) — ~ Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table).

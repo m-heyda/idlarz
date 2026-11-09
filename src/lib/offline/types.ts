@@ -152,7 +152,8 @@ export type CraftRefusal =
 	| 'bag_full'
 	| 'queue_full'
 	| 'no_batch'
-	| 'nothing_ready';
+	| 'nothing_ready'
+	| 'not_in_stash';
 
 /** What /api/craft answers: whether it was done, why not, how many were made, and the bag and crafting state as they stand now. */
 export interface CraftReply {
@@ -162,6 +163,8 @@ export interface CraftReply {
 	crafted: number;
 	/** Crafts this request put into the queue */
 	queued?: number;
+	/** Items a stash withdrawal moved into the bag */
+	moved?: number;
 	/** What a cancel gives back of the browser-held resources (the browser adds it) */
 	refund?: { key: MerchantResourceKey; qty: number }[];
 	inv: Inventory;

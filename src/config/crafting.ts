@@ -25,6 +25,6 @@ export const CRAFTING = {
 	// craftSpeed), read through `craftLimit` in lib/crafting.ts.
 	/** One craft request per second per player */
 	minGapMs: 1000,
-	/** Most of one component the stock holds */
-	componentCap: 999,
+	/** Most of one thing (a component, a potion or a trade good) the crafting stash holds; the stash is counters, not bag slots, and a rebirth keeps it */
+	componentCap: 1_000_000,
 };

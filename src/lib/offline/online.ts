@@ -10,7 +10,7 @@ import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } f
 import { sealedRng } from '@/lib/offline/seal';
 import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps, type StepOutcome } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
-import { applyCancel, applyClaim, applyCraft } from '@/lib/offline/craft';
+import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw } from '@/lib/offline/craft';
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
@@ -190,7 +190,11 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 	});
 
 /** A crafting request: queue (or do) crafts of a recipe, or claim / cancel a running batch by its slot. */
-export type CraftRequest = { action?: 'craft'; recipeId: string; count: number } | { action: 'claim' | 'cancel'; slot: number };
+export type CraftRequest =
+	| { action?: 'craft'; recipeId: string; count: number }
+	| { action: 'claim'; slot: number | 'all' }
+	| { action: 'cancel'; slot: number }
+	| { action: 'withdraw'; id: string; qty: number };
 
 /**
  * One crafting request (docs/plan/crafting-v0.md): `count` crafts of a recipe are queued as a timed batch (a recipe without a time is done at
@@ -208,13 +212,18 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 			'recipeId' in request
 				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs)
 				: request.action === 'claim'
-					? applyClaim(ledger.inv!, ledger.craft, request.slot, nowMs)
-					: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs);
+					? request.slot === 'all'
+						? applyClaimAll(ledger.inv!, ledger.craft, nowMs)
+						: applyClaim(ledger.inv!, ledger.craft, request.slot, nowMs)
+					: request.action === 'withdraw'
+						? applyWithdraw(ledger.inv!, ledger.craft, request.id, request.qty, nowMs)
+						: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs);
 		const value: CraftReply = {
 			ok: result.ok,
 			...(result.reason ? { reason: result.reason } : {}),
 			crafted: result.ok ? (result.crafted ?? 0) : 0,
 			...(result.ok && result.queued ? { queued: result.queued } : {}),
+			...(result.ok && result.moved ? { moved: result.moved } : {}),
 			...(result.ok && result.refund ? { refund: result.refund } : {}),
 			inv: result.inv,
 			craft: result.craft,
@@ -241,7 +250,7 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = { ...rebirthInventory(inv, ctx.stored.core.merchantUpgrades), rebirth: { to: judged.to, gain: judged.gain } };
 		return {
-			ledger: { ...ctx.ledger, inv: wiped, craft: { ...ctx.ledger.craft, stock: {}, queue: [] } },
+			ledger: { ...ctx.ledger, inv: wiped },
 			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec },
 		};
 	});

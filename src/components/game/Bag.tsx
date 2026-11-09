@@ -9,11 +9,13 @@ import { openMenuAt } from '@/lib/globalMenu';
 import { formatNumber } from '@/utils/formatters';
 import { sellPayout } from '@/utils/game/merchant';
 import ItemSlot from './ItemSlot';
+import CraftStash from './CraftStash';
 import OrganizeButton from './OrganizeButton';
 import { slotProps } from './itemUi';
 
 /** The 6x6 bag. Double-click equips gear or drinks a potion; right-click opens its menu (use, sell, discard); drag to rearrange or to unequip. */
 const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) => {
+	const [tab, setTab] = React.useState<'bag' | 'crafting'>('bag');
 	const bag = useGameStore((state) => state.bag);
 	const equipItem = useGameStore((state) => state.equipItem);
 	const requestPotion = useGameStore((state) => state.requestPotion);
@@ -89,23 +91,33 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 
 	return (
 		<div>
-			<div className='flex justify-center mb-2'>
-				<OrganizeButton onNotice={onNotice} />
+			<div className='flex justify-center gap-2 mb-2'>
+				<button className='px-btn px-btn-sm' data-active={tab === 'bag'} aria-pressed={tab === 'bag'} onClick={() => setTab('bag')}>
+					Bag
+				</button>
+				<button className='px-btn px-btn-sm' data-active={tab === 'crafting'} aria-pressed={tab === 'crafting'} onClick={() => setTab('crafting')}>
+					Crafting
+				</button>
+				{tab === 'bag' && <OrganizeButton onNotice={onNotice} />}
 			</div>
-			<div className='inv-bag'>
-				{bag.map((slot, i) => (
-					<ItemSlot
-						key={i}
-						{...slotProps(slot)}
-						draggable
-						compare
-						onDragStart={() => setDrag({ kind: 'bag', index: i })}
-						onDrop={() => drop(i)}
-						onDoubleClick={() => activate(i)}
-						onContextMenu={(e) => menu(i, e)}
-					/>
-				))}
-			</div>
+			{tab === 'crafting' ? (
+				<CraftStash />
+			) : (
+				<div className='inv-bag'>
+					{bag.map((slot, i) => (
+						<ItemSlot
+							key={i}
+							{...slotProps(slot)}
+							draggable
+							compare
+							onDragStart={() => setDrag({ kind: 'bag', index: i })}
+							onDrop={() => drop(i)}
+							onDoubleClick={() => activate(i)}
+							onContextMenu={(e) => menu(i, e)}
+						/>
+					))}
+				</div>
+			)}
 		</div>
 	);
 };
