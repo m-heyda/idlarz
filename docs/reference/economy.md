@@ -16,7 +16,7 @@ Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`bestWornGrade`](#bestworngrade)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`luckyRatChance`](#luckyratchance)
-- Crafting: [`TRADE_GOODS`](#trade-goods)
+- Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
 
 ## Basics
 
@@ -984,8 +984,36 @@ golden monster chance = min(10%, 2% + 0.05% x Luck)
 
 ### `TRADE_GOODS` <small>const</small>
 
-Source: [`src/catalog/recipes.ts:34`](../../src/catalog/recipes.ts)
+Source: [`src/catalog/recipes.ts:36`](../../src/catalog/recipes.ts)
 
 The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot
 pools, so nothing drops them. The value is set against the input value at merchant prices (`recipeCostGold`): at most 1.4x, so crafting a good pays a little
 better than selling its raw inputs and never turns into the main income (tests/crafting/recipes.test.ts, `npm run craft-sim`).
+
+<a id="gear-recipes"></a>
+
+### `GEAR_RECIPES` <small>const</small>
+
+Source: [`src/catalog/recipes.ts:337`](../../src/catalog/recipes.ts)
+
+The gear recipes (IDL-241): one per grade G1-G4 and slot, 13 slots, 52 recipes. The player picks the grade and the slot; the server rolls the base, rarity and affixes at claim time through the `craft` loot source (rarity by Luck and the
+pity counter, quality by Intelligence, item level by the crafting level inside the grade's window; see [`CRAFT_GEAR`](progression.md#craft-gear)). Every gear recipe is timed (`CRAFT_GEAR.timeSec`) and runs in the batch queue.
+Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.timeSec`; adding a slot is one in the tables above.
+
+**Gear recipe costs (gold value of the inputs at merchant prices) and crafting XP** _(computed from the code)_
+
+| Slot | G1 cost / XP | G2 cost / XP | G3 cost / XP | G4 cost / XP |
+| --- | --- | --- | --- | --- |
+| mainHand | 3,165 / 78 | 27.7 K / 1040 | 284 K / 3250 | 2.03 M / 7800 |
+| offHand | 2,760 / 69 | 24.3 K / 920 | 260 K / 2875 | 1.8 M / 6900 |
+| head | 2,539 / 63 | 22.5 K / 840 | 234 K / 2625 | 1.67 M / 6300 |
+| shoulder | 2,539 / 63 | 22.5 K / 840 | 234 K / 2625 | 1.67 M / 6300 |
+| chest | 3,135 / 78 | 27.8 K / 1040 | 289 K / 3250 | 2.09 M / 7800 |
+| hands | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+| legs | 2,745 / 69 | 24.6 K / 920 | 255 K / 2875 | 1.81 M / 6900 |
+| feet | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+| neck | 2,425 / 60 | 21.5 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+| ring | 2,425 / 60 | 21.5 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+| charm | 2,425 / 60 | 21.5 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+| cape | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+| belt | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |

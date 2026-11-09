@@ -311,6 +311,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`combat.ts`](../../src/lib/combat.ts) — ~ The player's numbers (all pure functions in `src/lib/combat.ts`, used by the server engine and the UI):
 - [`combatCursor.ts`](../../src/lib/combatCursor.ts) — ~ Which account the cursor belongs to (a cursor written for another account is ignored).
 - [`combatFx.ts`](../../src/lib/combatFx.ts) — ~ The floating number of a hit the player lands:
+- [`craftGear.ts`](../../src/lib/craftGear.ts) — Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
@@ -349,7 +350,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/lib/offline/**
 
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
-- [`craft.ts`](../../src/lib/offline/craft.ts) — ~ Crafts delivered (instant crafts, or claimed)
+- [`craft.ts`](../../src/lib/offline/craft.ts) — ~ What rolling a gear craft needs besides the ledger:
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
 - [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off), for the win estimate.
@@ -577,6 +578,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`craftQueue.test.ts`](../../tests/crafting/craftQueue.test.ts)
 - [`craftServer.test.ts`](../../tests/crafting/craftServer.test.ts) — ~ Queues `count` of a recipe at `at` seconds, waits until all of them are done and claims them.
 - [`craftingOverlaySelectors.test.ts`](../../tests/crafting/craftingOverlaySelectors.test.ts)
+- [`gearRecipes.test.ts`](../../tests/crafting/gearRecipes.test.ts) — ~ A state that has crafting level `level`
 - [`recipes.test.ts`](../../tests/crafting/recipes.test.ts)
 
 **tests/docs/**

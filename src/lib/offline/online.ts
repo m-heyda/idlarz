@@ -10,7 +10,7 @@ import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } f
 import { sealedRng } from '@/lib/offline/seal';
 import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps, type StepOutcome } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
-import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw } from '@/lib/offline/craft';
+import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type CraftEnv } from '@/lib/offline/craft';
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
@@ -208,16 +208,18 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 		// count 0 only looks: the overlay asks for the crafting state when it opens
 		if ('recipeId' in request && request.count === 0)
 			return { ledger, value: { ok: true, crafted: 0, inv: ledger.inv!, craft: ledger.craft, serverNowSec: ctx.nowSec } };
+		// what a gear craft is rolled with: the sealing secret and the Luck and Intelligence of the last accepted save
+		const env: CraftEnv = { secret: deps.secret, userId, luck: ctx.stored.summary.derived.luck, intelligence: ctx.stored.summary.derived.intelligence ?? 0 };
 		const result =
 			'recipeId' in request
 				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs)
 				: request.action === 'claim'
 					? request.slot === 'all'
-						? applyClaimAll(ledger.inv!, ledger.craft, nowMs)
-						: applyClaim(ledger.inv!, ledger.craft, request.slot, nowMs)
+						? applyClaimAll(ledger.inv!, ledger.craft, nowMs, env)
+						: applyClaim(ledger.inv!, ledger.craft, request.slot, nowMs, env)
 					: request.action === 'withdraw'
 						? applyWithdraw(ledger.inv!, ledger.craft, request.id, request.qty, nowMs)
-						: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs);
+						: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs, env);
 		const value: CraftReply = {
 			ok: result.ok,
 			...(result.reason ? { reason: result.reason } : {}),

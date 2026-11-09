@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { COMPONENTS, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
-import { ITEM_CATALOG } from '@/catalog';
+import { ITEMS, ITEM_CATALOG, RARITIES } from '@/catalog';
+import { GRADE_INFO, gradeOfItem } from '@/catalog/items/grades';
+import { effectiveStats } from '@/lib/effectiveStats';
+import { gearOdds } from '@/lib/craftGear';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
 import type { Box } from '@/lib/tipPlacement';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
@@ -14,13 +17,24 @@ import { FloatingTip } from '../ItemSlot';
 import { itemIconName } from '../itemUi';
 import './CraftingOverlay.css';
 
-const outputName = (recipe: Recipe) => ('item' in recipe.output ? ITEM_CATALOG[recipe.output.item].name : COMPONENTS[recipe.output.component].name);
+const outputName = (recipe: Recipe) =>
+	'item' in recipe.output ? ITEM_CATALOG[recipe.output.item].name : 'component' in recipe.output ? COMPONENTS[recipe.output.component].name : recipe.name;
 
 /** Components have no catalog item, so their sprite is named here. */
 const COMPONENT_ICONS: Record<string, PixelIconName> = { glass_vial: 'comp_glass_vial' };
 
+/** A gear recipe is drawn with the first base of its grade and slot (the result is random, the sprite is the grade's look). */
+const gearIcon = (grade: string, slot: string): PixelIconName => {
+	const base = ITEMS.find((def) => def.enabled !== false && !def.tags?.includes('named') && gradeOfItem(def) === grade && def.slot === slot);
+	return base ? itemIconName(base) : 'food';
+};
+
 export const recipeIcon = (recipe: Recipe): PixelIconName =>
-	'item' in recipe.output ? itemIconName(ITEM_CATALOG[recipe.output.item]) : (COMPONENT_ICONS[recipe.output.component] ?? 'comp_glass_vial');
+	'item' in recipe.output
+		? itemIconName(ITEM_CATALOG[recipe.output.item])
+		: 'component' in recipe.output
+			? (COMPONENT_ICONS[recipe.output.component] ?? 'comp_glass_vial')
+			: gearIcon(recipe.output.gear.grade, recipe.output.gear.slot);
 
 interface Have {
 	craftLevel: number;
@@ -123,6 +137,41 @@ const RecipeTile: React.FC<{ recipe: Recipe; have: Have; selected: boolean; onSe
 	);
 };
 
+/** The odds of a gear craft at the player's Luck, Intelligence and crafting level and the grade's pity counter: the same request the server rolls (src/lib/craftGear.ts). */
+const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recipe, craftLevel }) => {
+	const characterStats = useGameStore((state) => state.characterStats);
+	const equipment = useGameStore((state) => state.equipment);
+	const prestige = useGameStore((state) => state.prestige);
+	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
+	const pity = useCraftStore((state) => state.craft?.pity);
+	if (!('gear' in recipe.output)) return null;
+	const target = recipe.output.gear;
+	const luck = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades }).luck;
+	const odds = gearOdds(target, { craftLevel, luck, intelligence: characterStats.intelligence, pity: pity?.[target.grade] ?? 0 });
+	const levels = odds.itemLevel.min === odds.itemLevel.max ? `${odds.itemLevel.min}` : `${odds.itemLevel.min}-${odds.itemLevel.max}`;
+	const best = odds.rarities[odds.rarities.length - 1];
+	return (
+		<div className='cr-odds' data-slot='gear-odds'>
+			<div className='cr-label'>Odds (Luck {formatInt(Math.round(luck))})</div>
+			<div className='cr-odds-rows'>
+				{odds.rarities.map((row) => (
+					<span key={row.id} className='cr-odds-row' style={{ color: RARITIES[row.id as keyof typeof RARITIES]?.color }}>
+						{RARITIES[row.id as keyof typeof RARITIES]?.label ?? row.id} {(row.chance * 100).toFixed(row.chance < 0.1 ? 1 : 0)}%
+					</span>
+				))}
+			</div>
+			<div className='px-tip-muted'>Item level {levels} (it grows with your crafting level)</div>
+			<div className='px-tip-muted'>
+				Quality leans up +{Math.round(odds.qualityBias * 100)}% (Intelligence)
+				{odds.pityMultiplier > 1 && best
+					? `, bad luck bonus x${odds.pityMultiplier.toFixed(2)} on ${RARITIES[best.id as keyof typeof RARITIES]?.label ?? best.id}`
+					: ''}
+			</div>
+			<div className='px-tip-muted'>You choose the grade and the slot; the piece is random. It goes to your bag, marked Crafted.</div>
+		</div>
+	);
+};
+
 /** The chosen recipe: what it makes, what it costs for the chosen amount, the 0..max slider and the craft button. */
 const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) => {
 	const busy = useCraftStore((state) => state.busy);
@@ -138,6 +187,7 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 	const locked = have.craftLevel < recipe.unlock;
 	const held = have.stock[stashKeyOf(recipe)] ?? 0;
 	const description = 'component' in recipe.output ? COMPONENTS[recipe.output.component].description : null;
+	const isGear = 'gear' in recipe.output;
 	const block = count > 0 ? craftBlock(recipe, count, have) : 'resources';
 
 	return (
@@ -153,7 +203,7 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 					</h3>
 					<div className='px-tip-muted'>
 						{recipe.kind}
-						{` - you hold ${formatInt(held)}`}
+						{isGear ? ' - goes to your bag' : ` - you hold ${formatInt(held)}`}
 					</div>
 				</div>
 			</div>
@@ -207,7 +257,9 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 				</>
 			)}
 
-			{/* reserved for the later "infuse with affixes" options (gear, legendaries); empty while no recipe has any */}
+			{isGear && !locked && <GearOddsPanel recipe={recipe} craftLevel={have.craftLevel} />}
+
+			{/* reserved for the later "infuse with affixes" options (enchanted crafts, legendaries); empty while no recipe has any */}
 			<div className='cr-infuse' data-slot='infuse' />
 
 			<button
@@ -305,6 +357,18 @@ const QueuePanel: React.FC = () => {
 
 /** The accordion groups of the recipe list, in display order; a kind with no recipe is not shown. */
 const KIND_LABELS: Record<RecipeKind, string> = { component: 'Components', potion: 'Potions', good: 'Trade goods', gear: 'Gear' };
+/** Gear recipes are shown in a grid per grade ("Hide - from crafting level 8"); every other kind is one grid. */
+const groupsOf = (recipes: Recipe[]): { label: string; recipes: Recipe[] }[] => {
+	const groups: { label: string; recipes: Recipe[] }[] = [];
+	for (const recipe of recipes) {
+		const label = 'gear' in recipe.output ? `${GRADE_INFO[recipe.output.gear.grade].label} - from crafting level ${recipe.unlock}` : '';
+		const group = groups.find((g) => g.label === label);
+		if (group) group.recipes.push(recipe);
+		else groups.push({ label, recipes: [recipe] });
+	}
+	return groups;
+};
+
 const KINDS = (Object.keys(KIND_LABELS) as RecipeKind[]).filter((kind) => RECIPES.some((r) => r.kind === kind));
 
 const CraftingOverlay: React.FC = () => {
@@ -365,17 +429,24 @@ const CraftingOverlay: React.FC = () => {
 										<span className='cr-acc-count'>{recipes.length}</span>
 									</button>
 									{isOpen && (
-										<div className='cr-grid'>
-											{recipes.map((recipe) => (
-												<RecipeTile
-													key={recipe.id}
-													recipe={recipe}
-													have={have}
-													selected={recipe.id === selected.id}
-													onSelect={() => setSelectedId(recipe.id)}
-												/>
+										<>
+											{groupsOf(recipes).map((group) => (
+												<React.Fragment key={group.label || kind}>
+													{group.label && <div className='cr-sub'>{group.label}</div>}
+													<div className='cr-grid'>
+														{group.recipes.map((recipe) => (
+															<RecipeTile
+																key={recipe.id}
+																recipe={recipe}
+																have={have}
+																selected={recipe.id === selected.id}
+																onSelect={() => setSelectedId(recipe.id)}
+															/>
+														))}
+													</div>
+												</React.Fragment>
 											))}
-										</div>
+										</>
 									)}
 								</section>
 							);

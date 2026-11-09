@@ -6,7 +6,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 
 **Contents**
 
-- Pipeline: [`generateLoot`](#generateloot), [`validateLootData`](#validatelootdata), [`resolveSourceLevel`](#resolvesourcelevel), [`rollItemLevel`](#rollitemlevel), [`receiveDrops`](#receivedrops), [`isAutoSold`](#isautosold), [`eligibleCandidates`](#eligiblecandidates)
+- Pipeline: [`generateLoot`](#generateloot), [`validateLootData`](#validatelootdata), [`resolveSourceLevel`](#resolvesourcelevel), [`rollItemLevel`](#rollitemlevel), [`receiveDrops`](#receivedrops), [`isAutoSold`](#isautosold), [`eligibleCandidates`](#eligiblecandidates), [`rollLeaning`](#rollleaning)
 - Config: [`LOOT_SOURCES`](#loot-sources), [`LOOT_PROFILES`](#loot-profiles), [`BIOME_LOOT`](#biome-loot)
 - Items: [`RARITIES`](#rarities), [`levelScale`](#levelscale), [`valueCurve`](#valuecurve), [`sellValueOf`](#sellvalueof), [`LIVE_GRADES`](#live-grades), [`gradeLevels`](#gradelevels), [`gradeRarities`](#graderarities), [`gradeLegacyItems`](#gradelegacyitems), [`kit`](#kit)
 - Adding content: [Adding loot content (data only)](#loot-pools), [`gear`](#gear)
@@ -17,7 +17,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 
 ### `generateLoot` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:287`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:317`](../../src/lib/loot/generate.ts)
 
 Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.
 
@@ -60,7 +60,7 @@ level windows, known slots/tags/rarities, no empty enabled pool, that something 
 
 ### `resolveSourceLevel` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:78`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:99`](../../src/lib/loot/generate.ts)
 
 The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.
 
@@ -74,7 +74,7 @@ source level = clamp(base + perCastleLevel x (castle level - 1), 1..100)
 
 ### `rollItemLevel` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:89`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts)
 
 Rolls the item level around the source level, inside the profile's bounds.
 
@@ -108,13 +108,27 @@ Source: [`src/lib/loot/pools.ts:37`](../../src/lib/loot/pools.ts)
 
 Members that exist at this item level (item window and the pool's own minimum), with their weights.
 
+<a id="rollleaning"></a>
+
+### `rollLeaning` <small>function</small>
+
+Source: [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts)
+
+A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). Used for the quality and the affix magnitudes of crafted gear (Intelligence).
+
+**Formula**
+
+```text
+roll = floor(101 x u ^ (1 / (1 + bias)))        u uniform in [0, 1); bias 0 is a plain 0-100 roll, bias 1 has a mean of 67
+```
+
 ## Config
 
 <a id="loot-sources"></a>
 
 ### `LOOT_SOURCES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:261`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:278`](../../src/catalog/lootConfig.ts)
 
 Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).
 
@@ -133,12 +147,13 @@ start at item level 4 plus 3 per castle level above 1.
 | boss | boss | the caller's level, range 15-45 |
 | chest | basic_chest | own level: 4 + 3 per castle level above 1 |
 | merchant | merchant_stock | own level: 4 + 3 per castle level above 1 |
+| craft | craft | the caller's level, range 1-41 |
 
 <a id="loot-profiles"></a>
 
 ### `LOOT_PROFILES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:195`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:198`](../../src/catalog/lootConfig.ts)
 
 Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.
 
@@ -153,13 +168,14 @@ Profiles: how many rolls, which rarity weights, which pool, which bonus tables. 
 | normal_monster_tundra | 1 x 12% +1%/level from equipment_tundra | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
 | boss | 1 x 100%, 1 guaranteed from general_equipment | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_legendary (legendary_weapons, fixed, 5%); king_potions (potions_king, fixed) |
 | basic_chest | 1 x 82% from general_equipment | source level +0 +-1 | common 62, uncommon 24, rare 9, epic 4, legendary 1 | chest_legendary (legendary_weapons, fixed, 1.9%, replace); chest_potion (potions_chest, fixed, fallback) |
+| craft | 1 x 100%, 1 guaranteed from equipment_craft | source level +0 +-1 | common 70, uncommon 22, rare 6 | - |
 | merchant_stock | 12 x 100%, 12 guaranteed from general_equipment | source level +0 +-2 | common 60, uncommon 40 | - |
 
 <a id="biome-loot"></a>
 
 ### `BIOME_LOOT` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:123`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:124`](../../src/catalog/lootConfig.ts)
 
 The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7).
 The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level
@@ -317,7 +333,7 @@ Test and simulation helper: a full kit of one ladder grade, so fight balance (`f
 
 ### Adding loot content (data only)
 
-Source: [`src/catalog/lootConfig.ts:160`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:161`](../../src/catalog/lootConfig.ts)
 
 Adding loot content is data only; the generator needs no change.
 

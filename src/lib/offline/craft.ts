@@ -1,7 +1,10 @@
 import { RECIPES, RECIPE_BY_ID, type Recipe } from '@/catalog/recipes';
 import { CRAFTING } from '@/config/crafting';
 import { addDrop } from '@/lib/inventory';
+import { rollGear } from '@/lib/craftGear';
+import { sealedRng } from '@/lib/offline/seal';
 import { craftLevelOf, craftLimit, craftNeeds, craftTimeSec, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
+import type { GearTarget } from '@/catalog/recipes';
 import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState, Inventory } from '@/lib/offline/types';
 
 // SERVER ONLY (with the ledger). The crafting requests (docs/plan/crafting-v0.md):
@@ -10,9 +13,19 @@ import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState, Inventory }
 //  - claim:  the finished crafts of a batch (or of every batch, `applyClaimAll`) go into the crafting stash `craft.stock` (components, potions and
 //            trade goods alike, counted by id; a rebirth keeps it) and their XP is added. What does not fit the stash cap waits in the batch (never gold).
 //  - withdraw: potions and trade goods move from the stash into the bag (as many as fit) to be drunk or sold.
+//  - gear:   a gear recipe (IDL-241) is queued like any timed recipe; when its finished crafts are claimed the server rolls each piece (the `craft` loot source, sealed on the lifetime
+//            counter `craft.ord`, so a replayed claim rolls the same pieces) and puts it in the BAG, marked `crafted`. A full bag stops the delivery (the rest waits in the batch, never gold).
 //  - cancel: the unfinished crafts of a batch end; their components go back to the stock and the answer names the resources to give back.
 // A refusal changes nothing and charges nothing. The resources themselves are paid by the browser (they are still client-held); the gold value
 // of them is only counted in `craft.spent`.
+
+/** What rolling a gear craft needs besides the ledger: the sealing secret and the player's Luck and Intelligence (from the last accepted save). Absent: gear cannot be delivered (the queue still works). */
+export interface CraftEnv {
+	secret: string;
+	userId: string;
+	luck: number;
+	intelligence: number;
+}
 
 export interface CraftResult {
 	ok: boolean;
@@ -56,7 +69,7 @@ export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, 
 	const recipe = recipeOf(recipeId);
 	if (!Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return refuse('bad_request', inv, craft);
 	if (!recipe) return refuse('unknown_recipe', inv, craft);
-	if (recipe.kind === 'gear') return refuse('not_craftable', inv, craft);
+	if (recipe.kind === 'gear' && !recipe.timeSec) return refuse('not_craftable', inv, craft);
 	if (craftLevelOf(craft.xp).level < recipe.unlock) return refuse('locked', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
 
@@ -82,17 +95,57 @@ export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, 
 	};
 };
 
+const isGear = (entry: CraftQueueEntry): boolean => {
+	const recipe = recipeOf(entry.recipeId);
+	return !!recipe && 'gear' in recipe.output;
+};
+
 /** How many of `want` crafts of a recipe fit into the stash now (its cap per entry); the rest has to wait in the batch. */
 const fitting = (recipe: Recipe, want: number, stock: Record<string, number>): number => {
 	const room = Math.max(0, CRAFTING.componentCap - (stock[stashKeyOf(recipe)] ?? 0));
 	return Math.min(want, Math.floor(room / recipe.output.qty));
 };
 
+/**
+ * Rolls and delivers the finished pieces of a gear batch into the bag, one sealed roll each (`craft.ord` + 1, + 2 ...), stopping at the first piece that does not fit (it is rolled again by a later claim, from the same
+ * ordinal, so the same piece). The grade's pity counter moves with every delivered piece. Null when the server cannot roll (no env) or the catalog has nothing to roll.
+ */
+const deliverGear = (inv: Inventory, craft: CraftState, index: number, nowMs: number, recipe: Recipe, target: GearTarget, env?: CraftEnv) => {
+	if (!env) return null;
+	const entry = craft.queue[index];
+	const craftLevel = craftLevelOf(craft.xp).level;
+	let bag = inv.bag;
+	let pity = craft.pity[target.grade] ?? 0;
+	let n = 0;
+	for (const want = finishedOf(entry, nowMs); n < want; n++) {
+		const rng = sealedRng(env.secret, env.userId, 0, 'craft', craft.ord + n + 1);
+		const rolled = rollGear(target, { craftLevel, luck: env.luck, intelligence: env.intelligence, pity }, rng);
+		if (!rolled) break;
+		const added = addDrop(bag, { kind: 'gear', item: rolled.item });
+		if (added.overflow > 0) break;
+		bag = added.bag;
+		pity = rolled.pity;
+	}
+	const left = entry.count - n;
+	const queue = craft.queue.slice();
+	if (left > 0) queue[index] = { ...entry, count: left, startedAt: Math.round(entry.startedAt + n * entry.timeSec * 1000) };
+	else queue.splice(index, 1);
+	const pities = { ...craft.pity };
+	if (pity > 0) pities[target.grade] = pity;
+	else delete pities[target.grade];
+	return {
+		n,
+		inv: n > 0 ? { ...inv, bag, ver: inv.ver + 1 } : inv,
+		craft: { ...craft, xp: craft.xp + recipe.xp * n, ord: craft.ord + n, pity: pities, queue },
+	};
+};
+
 /** Pays the finished crafts of one entry into the stash as far as they fit; returns the new state (null when the batch is unknown). */
-const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number) => {
+const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number, env?: CraftEnv) => {
 	const entry = craft.queue[index];
 	const recipe = recipeOf(entry.recipeId);
 	if (!recipe) return null;
+	if ('gear' in recipe.output) return deliverGear(inv, craft, index, nowMs, recipe, recipe.output.gear, env);
 	const stock = { ...craft.stock };
 	const n = fitting(recipe, finishedOf(entry, nowMs), stock);
 	if (n > 0) stock[stashKeyOf(recipe)] = (stock[stashKeyOf(recipe)] ?? 0) + recipe.output.qty * n;
@@ -104,49 +157,53 @@ const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number
 };
 
 /** Delivers what is finished in batch `slot`. Whatever does not fit stays in the batch and is delivered by a later claim. */
-export const applyClaim = (inv: Inventory, craft: CraftState, slot: number, nowMs: number): CraftResult => {
+export const applyClaim = (inv: Inventory, craft: CraftState, slot: number, nowMs: number, env?: CraftEnv): CraftResult => {
 	const entry = Number.isInteger(slot) ? craft.queue[slot] : undefined;
 	if (!entry || !recipeOf(entry.recipeId)) return refuse('no_batch', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
 	if (finishedOf(entry, nowMs) < 1) return refuse('nothing_ready', inv, craft);
-	const done = deliver(inv, craft, slot, nowMs);
+	const done = deliver(inv, craft, slot, nowMs, env);
 	if (!done) return refuse('no_batch', inv, craft);
-	if (done.n < 1) return refuse('stock_full', inv, craft);
+	if (done.n < 1) return refuse(isGear(entry) ? 'bag_full' : 'stock_full', inv, craft);
 	return { ok: true, crafted: done.n, inv: done.inv, craft: { ...done.craft, last: nowMs } };
 };
 
 /** Delivers what is finished in every batch in one request (Collect all). Refused only when nothing is ready or nothing fits. */
-export const applyClaimAll = (inv: Inventory, craft: CraftState, nowMs: number): CraftResult => {
+export const applyClaimAll = (inv: Inventory, craft: CraftState, nowMs: number, env?: CraftEnv): CraftResult => {
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
 	let state = craft;
+	let inventory = inv;
 	let crafted = 0;
 	let ready = false;
+	let gearWaiting = false;
 	// last to first, so removing a used-up batch never shifts one still to do
 	for (let index = craft.queue.length - 1; index >= 0; index--) {
 		const entry = state.queue[index];
 		if (!recipeOf(entry.recipeId) || finishedOf(entry, nowMs) < 1) continue;
 		ready = true;
-		const done = deliver(inv, state, index, nowMs);
+		const done = deliver(inventory, state, index, nowMs, env);
 		if (!done) continue;
+		if (done.n < finishedOf(entry, nowMs) && isGear(entry)) gearWaiting = true;
 		crafted += done.n;
 		state = done.craft;
+		inventory = done.inv;
 	}
 	if (!ready) return refuse('nothing_ready', inv, craft);
-	if (crafted < 1) return refuse('stock_full', inv, craft);
-	return { ok: true, crafted, inv, craft: { ...state, last: nowMs } };
+	if (crafted < 1) return refuse(gearWaiting ? 'bag_full' : 'stock_full', inv, craft);
+	return { ok: true, crafted, inv: inventory, craft: { ...state, last: nowMs } };
 };
 
 /**
  * Ends batch `slot`: the finished crafts are delivered first (as a claim does; those that do not fit keep waiting as a smaller batch), the
  * unfinished ones are cancelled, their components go back into the stock and their resources are named in `refund`.
  */
-export const applyCancel = (inv: Inventory, craft: CraftState, slot: number, nowMs: number): CraftResult => {
+export const applyCancel = (inv: Inventory, craft: CraftState, slot: number, nowMs: number, env?: CraftEnv): CraftResult => {
 	const entry = Number.isInteger(slot) ? craft.queue[slot] : undefined;
 	const recipe = entry && recipeOf(entry.recipeId);
 	if (!entry || !recipe) return refuse('no_batch', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
 
-	const delivered = finishedOf(entry, nowMs) > 0 ? deliver(inv, craft, slot, nowMs) : null;
+	const delivered = finishedOf(entry, nowMs) > 0 ? deliver(inv, craft, slot, nowMs, env) : null;
 	const after = delivered?.craft ?? craft;
 	const outInv = delivered?.inv ?? inv;
 	const index = delivered && delivered.craft.queue.length < craft.queue.length ? -1 : slot; // -1: the delivery used the entry up

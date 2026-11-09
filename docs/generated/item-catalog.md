@@ -201,8 +201,10 @@ Rarity chances are the profile weights normalised over the rarities that pass th
   - bonus `chest_legendary` from pool `legendary_weapons`, chance 0.019, replace
   - bonus `chest_potion` from pool `potions_chest`, fallback
 - **merchant** (profile `merchant_stock`, item level 4): 33 bases eligible; Common 60.0%, Uncommon 40.0%
+- **craft level 1** (profile `craft`, item level 1): 33 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
+- **craft level 41** (profile `craft`, item level 41): 32 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 
-Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `legendary_weapons`, `potions_rat`, `potions_king`, `potions_chest`
+Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `equipment_craft`, `legendary_weapons`, `potions_rat`, `potions_king`, `potions_chest`
 
 ## Merchant stock
 

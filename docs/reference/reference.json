@@ -120,7 +120,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 123,
+  "line": 124,
   "summary": "The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7). The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items, so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides, and a ceiling must reach the grade of the highest item level the biome can produce: plains monsters (levels 1-20, growing up to 30, plus 1 of variance) reach item level 31, so plains stops at G4, where G3 would leave a grown monster with nothing to drop.",
   "see": []
  },
@@ -131,7 +131,7 @@
   "kind": "const",
   "category": "Loot/Adding content",
   "file": "src/catalog/lootConfig.ts",
-  "line": 160,
+  "line": 161,
   "summary": "Adding loot content is data only; the generator needs no change.",
   "see": [
    "gear",
@@ -146,7 +146,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 195,
+  "line": 198,
   "summary": "Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.",
   "see": []
  },
@@ -157,7 +157,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 261,
+  "line": 278,
   "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
   "see": []
  },
@@ -179,8 +179,19 @@
   "kind": "const",
   "category": "Economy/Crafting",
   "file": "src/catalog/recipes.ts",
-  "line": 34,
+  "line": 36,
   "summary": "The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot pools, so nothing drops them. The value is set against the input value at merchant prices (`recipeCostGold`): at most 1.4x, so crafting a good pays a little better than selling its raw inputs and never turns into the main income (tests/crafting/recipes.test.ts, `npm run craft-sim`).",
+  "see": []
+ },
+ {
+  "id": "gear-recipes",
+  "name": "GEAR_RECIPES",
+  "symbol": "GEAR_RECIPES",
+  "kind": "const",
+  "category": "Economy/Crafting",
+  "file": "src/catalog/recipes.ts",
+  "line": 337,
+  "summary": "The gear recipes (IDL-241): one per grade G1-G4 and slot, 13 slots, 52 recipes. The player picks the grade and the slot; the server rolls the base, rarity and affixes at claim time through the `craft` loot source (rarity by Luck and the pity counter, quality by Intelligence, item level by the crafting level inside the grade's window; see {@link CRAFT_GEAR}). Every gear recipe is timed (`CRAFT_GEAR.timeSec`) and runs in the batch queue. Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.timeSec`; adding a slot is one in the tables above.",
   "see": []
  },
  {
@@ -394,6 +405,17 @@
   "file": "src/config/crafting.ts",
   "line": 14,
   "summary": "Crafting: the crafting level curve and the per-request limits. First draft, see `docs/plan/crafting-v0.md`. The curve is written as anchors like {@link LEVELING}: the total crafting XP at which a level is reached; between two anchors every step is the one before times a constant ratio (`src/lib/crafting.ts`). Recipes are data in `src/catalog/recipes.ts`. The crafting level is kept on rebirth (like the character level). Batch cap, queue slots, offline run hours and speed are limits ({@link LIMITS}: `craftBatchCap`, `craftQueueSlots`, `craftOfflineHours`, `craftSpeed`).",
+  "see": []
+ },
+ {
+  "id": "craft-gear",
+  "name": "CRAFT_GEAR",
+  "symbol": "CRAFT_GEAR",
+  "kind": "const",
+  "category": "Progression/Crafting",
+  "file": "src/config/crafting.ts",
+  "line": 46,
+  "summary": "Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.",
   "see": []
  },
  {
@@ -1074,6 +1096,64 @@
   "see": []
  },
  {
+  "id": "gearitemlevels",
+  "name": "gearItemLevels",
+  "symbol": "gearItemLevels",
+  "kind": "function",
+  "category": "Progression/Crafting",
+  "file": "src/lib/craftGear.ts",
+  "line": 37,
+  "summary": "The item level a recipe of this grade makes, by crafting level: the grade's window (`gradeLevels`) is climbed from its bottom at the grade's unlock to its top at the next grade's unlock, and the roll is +-1 around that centre, never outside the window.",
+  "see": []
+ },
+ {
+  "id": "qualitybiasof",
+  "name": "qualityBiasOf",
+  "symbol": "qualityBiasOf",
+  "kind": "function",
+  "category": "Progression/Crafting",
+  "file": "src/lib/craftGear.ts",
+  "line": 57,
+  "summary": "Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`.",
+  "see": []
+ },
+ {
+  "id": "pitymultiplier",
+  "name": "pityMultiplier",
+  "symbol": "pityMultiplier",
+  "kind": "function",
+  "category": "Progression/Crafting",
+  "file": "src/lib/craftGear.ts",
+  "line": 78,
+  "summary": "The pity multiplier on the grade's best rarity after `misses` crafts that missed it.",
+  "see": []
+ },
+ {
+  "id": "rollgear",
+  "name": "rollGear",
+  "symbol": "rollGear",
+  "kind": "function",
+  "category": "Progression/Crafting",
+  "file": "src/lib/craftGear.ts",
+  "line": 114,
+  "summary": "One crafted piece: the `craft` loot source rolls rarity (Luck, pity, ceiling), base, quality and affixes (Intelligence) for the recipe's slot inside the grade's item level window, and the piece is marked `crafted`. Null when nothing is eligible (a configuration error, never silently replaced).",
+  "see": [
+   "gearOdds",
+   "CRAFT_GEAR"
+  ]
+ },
+ {
+  "id": "gearodds",
+  "name": "gearOdds",
+  "symbol": "gearOdds",
+  "kind": "function",
+  "category": "Progression/Crafting",
+  "file": "src/lib/craftGear.ts",
+  "line": 140,
+  "summary": "What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.",
+  "see": []
+ },
+ {
   "id": "bandof",
   "name": "bandOf",
   "symbol": "bandOf",
@@ -1129,13 +1209,24 @@
   "see": []
  },
  {
+  "id": "rollleaning",
+  "name": "rollLeaning",
+  "symbol": "rollLeaning",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/generate.ts",
+  "line": 88,
+  "summary": "A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). Used for the quality and the affix magnitudes of crafted gear (Intelligence).",
+  "see": []
+ },
+ {
   "id": "resolvesourcelevel",
   "name": "resolveSourceLevel",
   "symbol": "resolveSourceLevel",
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 78,
+  "line": 99,
   "summary": "The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.",
   "see": []
  },
@@ -1146,7 +1237,7 @@
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 89,
+  "line": 110,
   "summary": "Rolls the item level around the source level, inside the profile's bounds.",
   "see": []
  },
@@ -1157,7 +1248,7 @@
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 287,
+  "line": 317,
   "summary": "Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.",
   "see": [
    "LOOT_SOURCES",
@@ -1673,7 +1764,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 185,
+  "line": 193,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -1731,7 +1822,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 340,
+  "line": 342,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

@@ -112,7 +112,15 @@ export const readInstance = (value: unknown): ItemInstance | string => {
 		if (typeof a.id !== 'string' || typeof a.roll !== 'number') return 'malformed affix';
 		affixes.push({ id: a.id, roll: a.roll });
 	}
-	const item: ItemInstance = { base: value.base, level: value.level as number, rarity: value.rarity, quality: value.quality as number, affixes };
+	if (value.crafted !== undefined && value.crafted !== true) return 'malformed crafted marker';
+	const item: ItemInstance = {
+		base: value.base,
+		level: value.level as number,
+		rarity: value.rarity,
+		quality: value.quality as number,
+		affixes,
+		...(value.crafted ? { crafted: true } : {}),
+	};
 	return instanceProblem(item) ?? item;
 };
 
@@ -130,7 +138,7 @@ export const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);
-const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes']);
+const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes', 'crafted']);
 const AFFIX_KEYS = new Set(['id', 'roll']);
 /** Longest pity counter a save may hold: far past any cap, so only a forged value exceeds it */
 const MAX_PITY = 100000;

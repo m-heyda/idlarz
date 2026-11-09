@@ -91,4 +91,5 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 - **normal_monster_tundra**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 69.9%, uncommon 22.0%, rare 7.0%, epic 1.0%, legendary 0.2%; bonus: rat_potion
 - **boss**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_legendary, king_potions
 - **basic_chest**: 1-1 roll(s), 0 guaranteed, 82% per roll; rarity weights common 62.0%, uncommon 24.0%, rare 9.0%, epic 4.0%, legendary 1.0%; bonus: chest_legendary, chest_potion
+- **craft**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 71.4%, uncommon 22.4%, rare 6.1%; bonus: none
 - **merchant_stock**: 12-12 roll(s), 12 guaranteed, 100% per roll; rarity weights common 60.0%, uncommon 40.0%; bonus: none

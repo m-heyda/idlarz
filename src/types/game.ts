@@ -162,6 +162,8 @@ export interface ItemInstance {
 	/** Base-stat quality roll 0-100; 50 is the authored value */
 	quality: number;
 	affixes: AffixRoll[];
+	/** Made by the player in the Crafting window (IDL-241): only the server sets it; the tooltip says so. Absent on drops, the shelf and gifts. */
+	crafted?: true;
 }
 
 /** Equipped gear by slot: instances (rolled rarity, level, quality, affixes) */
