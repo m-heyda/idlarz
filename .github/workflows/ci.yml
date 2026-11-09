@@ -38,17 +38,24 @@ jobs:
 
   # Generated docs and the pacing guard (IDL-9, IDL-17). `npm run docs:gen` reruns every report, including the full sim, and the committed
   # docs/generated must be exactly what it writes: a change to the game config or the sim that was not followed by `npm run docs:gen` fails
-  # here. Then the sim baseline (docs/generated/sim-baseline.json) is compared with the copy on the branch the PR targets, so regenerating the
-  # baseline cannot hide a pacing change: a guarded milestone (the first finish, the rebirths, castle 6/8/10, the level and tile ladders) that
-  # moved by more than 15 % or 5 game days fails the PR. An intended change carries the `pacing-change` label (then re-run the job): the guard still reports
-  # but does not block (a broken baseline file still does).
+  # in `generated`. Then the sim baseline (docs/generated/sim-baseline.json) is compared with the copy on the branch the PR targets, so
+  # regenerating the baseline cannot hide a pacing change: a guarded milestone (the first finish, the rebirths, castle 6/8/10, the level and
+  # tile ladders) that moved by more than 15 % or 5 game days fails the PR. An intended change carries the `pacing-change` label (then
+  # re-run the job): the guard still reports but does not block (a broken baseline file still does).
   #
-  # It takes about 9 minutes, so it only runs when it can matter: on a PR only if the diff touches what the docs are generated from (src,
-  # scripts, docs/generated, the lockfile, tsconfig, this workflow), not on a push to main (the PR already ran it) and every night. The sim
-  # (about 9 minutes alone, 7 of them one profile) runs next to the other generators on the runner's 4 cores.
-  generated:
+  # It runs only when it can matter: on a PR only if the diff touches what the docs are generated from (src, scripts, docs/generated, the
+  # lockfile, tsconfig, this workflow), not on a push to main (the PR already ran it) and every night.
+  #
+  # Three jobs: `scope` decides whether it matters; `generate` is a matrix that runs in parallel (the slow sim profile hardcore-rebirth6-x10
+  # alone, about 7 minutes; every other sim profile; the other generators) and uploads what each wrote; `generated` (the required check)
+  # puts the shards together with `scripts/sim.ts --merge` (which fails if a profile is missing or twice) and runs the two gates. The wall
+  # time is about the slowest shard plus the install, not the sum.
+
+  scope:
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.scope.outputs.run }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,37 +66,99 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ] || ! git rev-parse --verify -q HEAD^2 >/dev/null; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-          elif git diff --name-only HEAD^1 HEAD | grep -Eq '^(src/|scripts/|docs/generated/|package-lock\.json$|package\.json$|tsconfig\.json$|\.github/workflows/ci\.yml$)'; then
+          elif git diff --name-only HEAD^1 HEAD | grep -Eq '^(src/|scripts/|docs/generated/|package-lock.json$|package.json$|tsconfig.json$|.github/workflows/ci.yml$)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
             echo "::notice::No change under src, scripts, docs/generated or the build files: the generated docs cannot differ, skipping."
           fi
+
+  generate:
+    needs: scope
+    if: needs.scope.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # the long game: the one profile that takes about 7 minutes
+          - shard: sim-x10
+            command: npx tsx scripts/sim.ts --dump=shard/sim-x10.json hardcore-rebirth6-x10
+            upload: shard/sim-x10.json
+          # every other profile (a new profile lands here on its own)
+          - shard: sim-rest
+            command: npx tsx scripts/sim.ts --dump=shard/sim-rest.json --except=hardcore-rebirth6-x10
+            upload: shard/sim-rest.json
+          # the other generators: they write docs/generated except the two sim files
+          - shard: docs-rest
+            command: npm run docs:gen:rest
+            upload: |
+              docs/generated
+              !docs/generated/sim-milestones.md
+              !docs/generated/sim-baseline.json
+    name: generate (${{ matrix.shard }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
-        if: steps.scope.outputs.run == 'true'
         with:
           node-version: 22
           cache: npm
-      - if: steps.scope.outputs.run == 'true'
-        run: npm ci
-      - name: Generate the docs (the sim next to the other generators)
-        if: steps.scope.outputs.run == 'true'
+      - run: npm ci
+      - run: mkdir -p shard
+      - name: Run the shard
+        run: ${{ matrix.command }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ matrix.shard }}
+          path: ${{ matrix.upload }}
+          if-no-files-found: error
+          retention-days: 3
+
+  generated:
+    needs: [scope, generate]
+    # runs (and so reports green when everything was skipped) unless the PR is a push; a failed or cancelled shard fails it in the first step
+    if: ${{ !cancelled() && github.event_name != 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: A shard must not have failed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: |
-          npm run docs:gen:sim &
-          sim=$!
-          npm run docs:gen:rest &
-          rest=$!
-          status=0
-          wait "$sim" || status=1
-          wait "$rest" || status=1
-          exit $status
+          echo '::error::a generate shard (or the scope job) failed, see above'
+          exit 1
+      - uses: actions/checkout@v4
+        if: needs.scope.outputs.run == 'true'
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        if: needs.scope.outputs.run == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: needs.scope.outputs.run == 'true'
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        if: needs.scope.outputs.run == 'true'
+        with:
+          pattern: shard-*
+          path: shards
+      - name: Put the shards together
+        if: needs.scope.outputs.run == 'true'
+        run: |
+          # the sim shards: one flat folder of dumps, merged into sim-milestones.md and sim-baseline.json
+          mkdir sim-dumps
+          cp shards/shard-sim-*/*.json sim-dumps/
+          # the other generators: their files go over the committed ones
+          cp -r shards/shard-docs-rest/. docs/generated/
+          npx tsx scripts/sim.ts --merge=sim-dumps > /dev/null
       - name: Generated docs are up to date
-        if: steps.scope.outputs.run == 'true'
+        if: needs.scope.outputs.run == 'true'
         run: |
           git add -N docs/generated
           git diff --exit-code docs/generated || { echo '::error::docs/generated is stale: run npm run docs:gen and commit the result'; exit 1; }
       - name: Pacing guard against the base branch
-        if: steps.scope.outputs.run == 'true' && github.event_name == 'pull_request'
+        if: needs.scope.outputs.run == 'true' && github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref }}
           PACING_CHANGE: ${{ contains(github.event.pull_request.labels.*.name, 'pacing-change') }}
