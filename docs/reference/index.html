@@ -3829,7 +3829,7 @@ get a generated name (<code>&lt;pack&gt;_&lt;file&gt;</code>, e.g. <code>tree_au
 <p>The sound library: every audio file under <code>public/</code> (the game&#39;s own mp3s and the CC0 Kenney packs in <code>public/sfx/</code>) under one stable name, with its
 duration and what it is used for. <code>npm run assets:catalog</code> renders it to <code>docs/assets/sounds.json</code> and <code>sounds.md</code>; Storybook&#39;s Sounds page plays them.
 Names are <code>&lt;pack&gt;_&lt;file&gt;</code> (<code>uiaudio_click1</code>, <code>interface_confirmation_001</code>, <code>game_click</code>); rename one in <code>scripts/assets/names.json</code> by its <code>src</code>.
-The game plays only the four <code>game_*</code> files (src/utils/audioManager.ts); the Kenney packs are <code>reuse</code> until one is wired.</p>
+The game plays only the four <code>game_*</code> files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in <code>public/sfx/</code>, the rest of the pack was deleted); what each is for is in <code>scripts/assets/sound-notes.json</code>, and they stay <code>reuse</code> until wired.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-pacing">Pacing</h2><p class="blurb">The pace the economy is tuned for, and the bot simulation that checks it.</p><h2>Targets</h2><article><p><a id="pacing-targets"></a></p>
 <h3>Pacing targets</h3>
 <p>Source: <a href="../../scripts/sim.ts"><code>scripts/sim.ts:16</code></a></p>

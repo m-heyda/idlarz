@@ -2,7 +2,7 @@
  * The sound library: every audio file under `public/` (the game's own mp3s and the CC0 Kenney packs in `public/sfx/`) under one stable name, with its
  * duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
  * Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
- * The game plays only the four `game_*` files (src/utils/audioManager.ts); the Kenney packs are `reuse` until one is wired.
+ * The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.
  *
  * @title Sound library
  * @category Architecture/Art
@@ -24,11 +24,12 @@ export interface SoundEntry {
 	status: 'used' | 'reuse';
 	usedBy: string[];
 	durationMs: number;
+	/** What it is meant for (scripts/assets/sound-notes.json, keyed by `src`); empty until someone decides */
+	use: string;
 }
 
 const PUBLIC = join(ROOT, 'public');
 const PACKS: Record<string, { prefix: string; label: string }> = {
-	'sfx/kenney-ui-audio': { prefix: 'uiaudio', label: 'Kenney UI Audio (CC0)' },
 	'sfx/kenney-interface-sounds': { prefix: 'interface', label: 'Kenney Interface Sounds (CC0)' },
 };
 const GAME_SOUNDS: Record<string, string> = { 'click.mp3': 'click', 'purchase.mp3': 'purchase', 'wrong.mp3': 'wrong', 'fanfare.mp3': 'fanfare' };
@@ -52,7 +53,7 @@ const wavMs = (file: string): number => {
 	return 0;
 };
 
-export const buildSounds = (names: Record<string, string> = {}): SoundEntry[] => {
+export const buildSounds = (names: Record<string, string> = {}, notes: Record<string, string> = {}): SoundEntry[] => {
 	const out: SoundEntry[] = [];
 	for (const [file, key] of Object.entries(GAME_SOUNDS)) {
 		const full = join(PUBLIC, file);
@@ -65,6 +66,7 @@ export const buildSounds = (names: Record<string, string> = {}): SoundEntry[] =>
 				status: 'used',
 				usedBy: [key],
 				durationMs: 0,
+				use: '',
 			});
 	}
 	for (const [dir, pack] of Object.entries(PACKS)) {
@@ -82,9 +84,13 @@ export const buildSounds = (names: Record<string, string> = {}): SoundEntry[] =>
 				status: 'reuse',
 				usedBy: [],
 				durationMs: wavMs(join(root, f)),
+				use: '',
 			});
 		}
 	}
-	for (const e of out) if (names[e.src]) e.name = names[e.src];
+	for (const e of out) {
+		if (names[e.src]) e.name = names[e.src];
+		e.use = notes[e.src] ?? '';
+	}
 	return out.sort((a, b) => a.group.localeCompare(b.group) || a.name.localeCompare(b.name, undefined, { numeric: true }));
 };

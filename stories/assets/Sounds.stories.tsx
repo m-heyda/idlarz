@@ -10,6 +10,7 @@ interface Sound {
 	status: string;
 	usedBy: string[];
 	durationMs: number;
+	use: string;
 }
 
 const ALL = sounds as Sound[];
@@ -52,8 +53,10 @@ const SoundBoard: React.FC = () => {
 		a.onended = () => setPlaying('');
 		a.play().catch(() => setPlaying(''));
 	};
-	const shown = ALL.filter((s) => (group === 'all' || s.group === group) && (!onlyNoted || notes[s.name]) && (!query || s.name.includes(query.toLowerCase())));
-	const noted = ALL.filter((s) => notes[s.name]);
+	const shown = ALL.filter(
+		(s) => (group === 'all' || s.group === group) && (!onlyNoted || notes[s.name] || s.use) && (!query || s.name.includes(query.toLowerCase())),
+	);
+	const noted = ALL.filter((s) => notes[s.name] || s.use);
 	const copy = () => {
 		const text = noted.map((s) => `- ${s.name} (${s.src.slice(1)}): ${notes[s.name].replace(/\n/g, ' ')}`).join('\n');
 		navigator.clipboard?.writeText(text).catch(() => {});
@@ -95,7 +98,7 @@ const SoundBoard: React.FC = () => {
 				{shown.map((s) => (
 					<div
 						key={s.name}
-						style={{ background: '#1d1814', border: `1px solid ${notes[s.name] ? '#c9a24a' : '#3a3029'}`, borderRadius: 6, padding: 8 }}
+						style={{ background: '#1d1814', border: `1px solid ${notes[s.name] || s.use ? '#c9a24a' : '#3a3029'}`, borderRadius: 6, padding: 8 }}
 						title={s.pack}
 					>
 						<div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -111,7 +114,7 @@ const SoundBoard: React.FC = () => {
 							</div>
 						</div>
 						<textarea
-							value={notes[s.name] ?? ''}
+							value={notes[s.name] ?? s.use}
 							onChange={(e) => setNote(s.name, e.target.value)}
 							placeholder='use for: ...'
 							rows={2}

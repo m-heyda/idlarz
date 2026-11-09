@@ -149,4 +149,4 @@ Source: [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts)
 The sound library: every audio file under `public/` (the game's own mp3s and the CC0 Kenney packs in `public/sfx/`) under one stable name, with its
 duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
 Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
-The game plays only the four `game_*` files (src/utils/audioManager.ts); the Kenney packs are `reuse` until one is wired.
+The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.

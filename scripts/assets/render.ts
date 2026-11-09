@@ -78,10 +78,10 @@ export const renderSounds = (sounds: SoundEntry[]): string => {
 		'',
 	];
 	for (const group of [...new Set(sounds.map((e) => e.group))]) {
-		out.push(`## ${group}`, '', '| Name | Length | Status | Used by | Source file |', '| --- | --- | --- | --- | --- |');
+		out.push(`## ${group}`, '', '| Name | Length | Status | Use for | Source file |', '| --- | --- | --- | --- | --- |');
 		for (const e of sounds.filter((x) => x.group === group))
 			out.push(
-				`| \`${e.name}\` | ${e.durationMs ? `${(e.durationMs / 1000).toFixed(2)} s` : ''} | ${e.status} | ${e.usedBy.join(', ')} | \`${e.src.slice(1)}\` |`,
+				`| \`${e.name}\` | ${e.durationMs ? `${(e.durationMs / 1000).toFixed(2)} s` : ''} | ${e.status} | ${[...e.usedBy, e.use].filter(Boolean).join(', ')} | \`${e.src.slice(1)}\` |`,
 			);
 		out.push('');
 	}
