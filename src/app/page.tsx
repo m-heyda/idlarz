@@ -8,7 +8,7 @@ import SaveHub, { type HubChoice } from '@/components/auth/SaveHub';
 import AuthUnavailable from '@/components/auth/AuthUnavailable';
 import { fetchMe, logout, readEntered, writeEntered, type Profile, type UnavailableReason } from '@/lib/authClient';
 import { fetchCloud, readLink, writeAttempts, writeLink } from '@/lib/cloudClient';
-import { planStart, type CloudInfo } from '@/lib/startPlan';
+import { canResumeTab, planStart, type CloudInfo } from '@/lib/startPlan';
 import { archiveForNewGame, installSave, peekSave, resetSave, type SavePeek } from '@/lib/saveStorage';
 
 // The game (and its save hydration) is only loaded once the gate lets the player in: the game is played with an account only.
@@ -73,7 +73,7 @@ export default function Home() {
 			if (result.status !== 'ok') return setPhase({ name: 'unavailable', reason: result.status === 'unavailable' ? result.reason : 'outage' });
 			if (!result.profile) return setPhase({ name: 'profile' });
 			const player = { userId: result.userId, profile: result.profile };
-			if (readEntered() === 'account') return enterGame(player); // same tab, refreshed while playing
+			if (readEntered() === 'account' && canResumeTab(readLink(), player.userId)) return enterGame(player); // same tab, refreshed while playing
 			await admit(player);
 		},
 		[admit, enterGame],

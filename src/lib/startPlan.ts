@@ -23,6 +23,19 @@ export interface CloudLink {
  */
 export type StartPlan = { kind: 'enter' } | { kind: 'hub'; mode: 'local' | 'cloud' | 'choose' };
 
+/**
+ * Whether a tab that is already playing may skip the start check on a refresh. It may only while this browser still holds the link to this
+ * account's cloud save: without it (cleared when a pre-reset local game was put aside) nothing would ever upload, so the start check runs again
+ * and writes a fresh link.
+ */
+export const canResumeTab = (link: CloudLink | null, userId: string): boolean => link !== null && link.userId === userId;
+
+/**
+ * True when a refused upload (409) means "the account has no cloud save at all" rather than "another browser saved": the server answers revision 0
+ * only when no row exists (a season reset or a New Game removed it). The link this browser holds is stale then and the start check has to run again.
+ */
+export const cloudSaveGone = (conflictRev: number): boolean => conflictRev === 0;
+
 export const planStart = (local: SavePeek, cloud: CloudInfo | null | 'unavailable', link: CloudLink | null, userId: string): StartPlan => {
 	if (cloud === 'unavailable' || cloud === null) {
 		return local.kind === 'none' ? { kind: 'enter' } : { kind: 'hub', mode: 'local' };
