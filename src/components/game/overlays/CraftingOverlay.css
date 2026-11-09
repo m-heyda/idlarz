@@ -1,26 +1,25 @@
-/* Crafting window: anvil column, level bar, recipe tiles (bag view) and the detail pane */
+/* Crafting window: header with anvil and level bar, accordion of recipe tiles (bag view), recipe tiles (bag view) and the detail pane */
 
 .cr-root {
 	display: flex;
-	gap: 16px;
+	flex-direction: column;
+	gap: 8px;
 	height: 100%;
 	color: var(--px-parch);
 }
 
-.cr-side {
-	flex: 0 0 140px;
+.cr-head {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
-	justify-content: flex-start;
-	gap: 8px;
-	padding-top: 12px;
+	gap: 10px;
 }
 
-.cr-level {
-	font-family: var(--font-pixel);
-	color: var(--px-gold);
-	font-size: var(--text-lg);
+.cr-head-main {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 }
 
 .cr-main {
@@ -80,25 +79,57 @@
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+	overflow-y: auto;
 }
 
-.cr-kinds {
+.cr-acc {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.cr-acc-head {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	text-align: left;
+}
+
+.cr-acc-name {
+	flex: 1;
+}
+
+.cr-acc-count {
+	color: #a89878;
+	font-size: var(--text-xs);
+}
+
+.cr-cost-grid {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 4px;
+	gap: 6px;
 }
 
-.cr-kinds .px-btn[data-active='false'] {
-	opacity: 0.45;
+.cr-cost-tile {
+	position: relative;
 }
 
-.cr-chips {
-	display: flex;
-	gap: 4px;
+.cr-cost-n {
+	position: absolute;
+	right: 3px;
+	bottom: 1px;
+	font-size: 12px;
+	text-shadow: 1px 1px 0 var(--px-ink);
+	color: #5fd35f;
+}
+
+.cr-cost-tile[data-ok='false'] .cr-cost-n {
+	color: #ff6a5a;
 }
 
 .cr-qty-input {
-	width: 110px;
+	width: 64px;
 	padding: 2px 6px;
 	background: var(--px-ink);
 	border: 2px solid #5a4a38;
@@ -232,7 +263,7 @@
 }
 
 .cr-qty-n {
-	min-width: 56px;
+	min-width: 40px;
 	text-align: right;
 	font-variant-numeric: tabular-nums;
 	color: var(--px-gold);

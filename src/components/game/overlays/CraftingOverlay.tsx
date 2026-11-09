@@ -6,16 +6,13 @@ import type { Box } from '@/lib/tipPlacement';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { formatNumber, formatTime, parseAmount } from '@/utils/formatters';
+import { formatInt, formatTime, parseAmount } from '@/utils/formatters';
 import type { PixelIconName } from '@/config/pixelIcons';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
 import { FloatingTip } from '../ItemSlot';
 import { itemIconName } from '../itemUi';
 import './CraftingOverlay.css';
-
-/** Whole crafts are counted as integers (formatNumber would show 7.00) */
-const whole = (n: number) => n.toLocaleString('en');
 
 const outputName = (recipe: Recipe) => ('item' in recipe.output ? ITEM_CATALOG[recipe.output.item].name : COMPONENTS[recipe.output.component].name);
 
@@ -39,7 +36,7 @@ const CostChips: React.FC<{ recipe: Recipe; count: number; have: Have }> = ({ re
 			{needs.resources.map((n) => (
 				<span key={n.key} className={(have.resources[n.key] ?? 0) >= n.qty ? 'cr-ok' : 'cr-lack'}>
 					<ResourceIcon resource={n.key} />
-					{formatNumber(n.qty)}
+					{formatInt(n.qty)}
 				</span>
 			))}
 			{needs.components.map((n) => (
@@ -49,6 +46,27 @@ const CostChips: React.FC<{ recipe: Recipe; count: number; have: Have }> = ({ re
 				</span>
 			))}
 		</span>
+	);
+};
+
+/** What the chosen amount costs, as bag tiles: the icon with the required quantity bottom-right, green when owned, red when lacking. */
+const CostTiles: React.FC<{ recipe: Recipe; count: number; have: Have }> = ({ recipe, count, have }) => {
+	const needs = craftNeeds(recipe, count);
+	return (
+		<div className='cr-cost-grid'>
+			{needs.resources.map((n) => (
+				<span key={n.key} className='cr-cost-tile inv-slot' data-ok={(have.resources[n.key] ?? 0) >= n.qty} title={n.key} aria-label={`${n.key} ${n.qty}`}>
+					<ResourceIcon resource={n.key} />
+					<span className='cr-cost-n'>{formatInt(n.qty)}</span>
+				</span>
+			))}
+			{needs.components.map((n) => (
+				<span key={n.id} className='cr-cost-tile inv-slot' data-ok={(have.stock[n.id] ?? 0) >= n.qty} title={COMPONENTS[n.id].name} aria-label={`${COMPONENTS[n.id].name} ${n.qty}`}>
+					<PixelIcon name={COMPONENT_ICONS[n.id] ?? 'comp_glass_vial'} alt='' />
+					<span className='cr-cost-n'>{formatInt(n.qty)}</span>
+				</span>
+			))}
+		</div>
 	);
 };
 
@@ -89,7 +107,7 @@ const RecipeTile: React.FC<{ recipe: Recipe; have: Have; selected: boolean; onSe
 						) : (
 							<>
 								<CostChips recipe={recipe} count={1} have={have} />
-								<div className='cr-xp'>+{formatNumber(recipe.xp)} XP</div>
+								<div className='cr-xp'>+{formatInt(recipe.xp)} XP</div>
 							</>
 						)}
 					</div>
@@ -129,7 +147,7 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 					</h3>
 					<div className='px-tip-muted'>
 						{recipe.kind}
-						{` - you hold ${formatNumber(held)}`}
+						{` - you hold ${formatInt(held)}`}
 					</div>
 				</div>
 			</div>
@@ -139,15 +157,29 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 				<p className='cr-lack'>Unlocks at crafting level {recipe.unlock}</p>
 			) : (
 				<>
-					<div className='cr-label'>Cost{count > 1 ? ` (x${formatNumber(count)})` : ''}</div>
-					<CostChips recipe={recipe} count={Math.max(1, count)} have={have} />
+					<div className='cr-label'>Cost{count > 1 ? ` (x${formatInt(count)})` : ''}</div>
+					<CostTiles recipe={recipe} count={Math.max(1, count)} have={have} />
 
 					<div className='cr-qty'>
 						<span className='cr-label'>Amount</span>
 						<input
+							type='range'
+							className='px-range'
+							min={1}
+							max={Math.max(1, max)}
+							step={1}
+							value={Math.max(1, count)}
+							disabled={max === 0}
+							aria-label='Amount to craft'
+							onChange={(event) => {
+								setDraft(null);
+								setWanted(Number(event.target.value));
+							}}
+						/>
+						<input
 							className='cr-qty-input'
 							inputMode='text'
-							value={draft ?? whole(count)}
+							value={draft ?? formatInt(count)}
 							disabled={max === 0}
 							aria-label='Amount to craft (1500, 1.5k, 2M)'
 							onFocus={(event) => event.target.select()}
@@ -158,37 +190,12 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 							}}
 							onBlur={() => setDraft(null)}
 						/>
-						<span className='cr-qty-n'>/ {formatNumber(max)}</span>
+						<span className='cr-qty-n'>/ {formatInt(max)}</span>
 					</div>
-					<div className='cr-chips'>
-						{[1, 10, 100, 1000].map((n) => (
-							<button
-								key={n}
-								className='px-btn px-btn-sm'
-								disabled={max === 0}
-								onClick={() => {
-									setDraft(null);
-									setWanted(n);
-								}}
-							>
-								x{formatNumber(n)}
-							</button>
-						))}
-						<button
-							className='px-btn px-btn-sm'
-							disabled={max === 0}
-							onClick={() => {
-								setDraft(null);
-								setWanted(max);
-							}}
-						>
-							Max
-						</button>
-					</div>
-					<div className='cr-xp'>+{formatNumber(recipe.xp * count)} XP</div>
+					<div className='cr-xp'>+{formatInt(recipe.xp * count)} XP</div>
 					{perCraft > 0 && (
 						<div className='px-tip-muted'>
-							{formatTime(perCraft)} each{count > 1 ? `, ${formatTime(perCraft * count)} for ${formatNumber(count)}` : ''}
+							{formatTime(perCraft)} each{count > 1 ? `, ${formatTime(perCraft * count)} for ${formatInt(count)}` : ''}
 						</div>
 					)}
 				</>
@@ -204,7 +211,7 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 				onClick={() => void craftItem(recipe.id, count).then((text) => showToast(text))}
 			>
 				{recipe.timeSec ? 'Queue' : 'Craft'}
-				{count > 0 ? ` x${formatNumber(count)}` : ''}
+				{count > 0 ? ` x${formatInt(count)}` : ''}
 			</button>
 		</div>
 	);
@@ -269,7 +276,7 @@ const QueuePanel: React.FC = () => {
 						>
 							<div className='cr-xpfill' style={{ width: `${(done / entry.count) * 100}%` }} />
 							<span className='cr-xptext'>
-								{whole(done)} / {whole(entry.count)} - {stalled ? 'waiting for you' : done >= entry.count ? 'done' : formatTime(left)}
+								{formatInt(done)} / {formatInt(entry.count)} - {stalled ? 'waiting for you' : done >= entry.count ? 'done' : formatTime(left)}
 							</span>
 						</div>
 						<button className='px-btn' disabled={busy} aria-label='Cancel batch' onClick={() => void cancel(slot).then((text) => showToast(text))}>
@@ -281,7 +288,7 @@ const QueuePanel: React.FC = () => {
 							aria-label='Collect finished crafts'
 							onClick={() => void claim(slot).then((text) => showToast(text))}
 						>
-							Collect{done > 0 ? ` ${whole(done)}` : ''}
+							Collect{done > 0 ? ` ${formatInt(done)}` : ''}
 						</button>
 					</div>
 				);
@@ -290,7 +297,7 @@ const QueuePanel: React.FC = () => {
 	);
 };
 
-/** The category chips above the recipe grid, in display order; a kind with no recipe is not shown. */
+/** The accordion groups of the recipe list, in display order; a kind with no recipe is not shown. */
 const KIND_LABELS: Record<RecipeKind, string> = { component: 'Components', potion: 'Potions', good: 'Trade goods', gear: 'Gear' };
 const KINDS = (Object.keys(KIND_LABELS) as RecipeKind[]).filter((kind) => RECIPES.some((r) => r.kind === kind));
 
@@ -299,17 +306,16 @@ const CraftingOverlay: React.FC = () => {
 	const refresh = useCraftStore((state) => state.refresh);
 	const resources = useGameStore((state) => state.resources);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
-	const [hidden, setHidden] = useState<ReadonlySet<RecipeKind>>(new Set());
+	const [closed, setClosed] = useState<ReadonlySet<RecipeKind>>(new Set());
 	useEffect(() => void refresh(), [refresh]);
 
 	const xp = craft?.xp ?? 0;
 	const { level, progress } = craftLevelOf(xp);
 	const next = craftXpToNext(level);
 	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
-	const shown = useMemo(() => RECIPES.filter((r) => !hidden.has(r.kind)), [hidden]);
-	const selected = shown.find((r) => r.id === selectedId) ?? shown.find((r) => r.unlock <= level) ?? shown[0] ?? RECIPES[0];
+	const selected = RECIPES.find((r) => r.id === selectedId) ?? RECIPES.find((r) => r.unlock <= level) ?? RECIPES[0];
 	const toggleKind = (kind: RecipeKind) =>
-		setHidden((before) => {
+		setClosed((before) => {
 			const next = new Set(before);
 			if (next.has(kind)) next.delete(kind);
 			else next.add(kind);
@@ -318,48 +324,50 @@ const CraftingOverlay: React.FC = () => {
 
 	return (
 		<div className='cr-root'>
-			<aside className='cr-side'>
-				<PixelIcon name='menu_crafting' scale={3} alt='Anvil' />
-				<div className='cr-level'>Level {level}</div>
-			</aside>
+			<div className='cr-head'>
+				<PixelIcon name='menu_crafting' scale={1.5} alt='Anvil' />
+				<div className='cr-head-main'>
+					<div className='cr-xpline'>
+						<span className='cr-level-text'>Crafting level {level}</span>
+						<span className='px-tip-muted'>{Number.isFinite(next) ? `${formatInt(Math.floor(next * progress))} / ${formatInt(next)} XP` : 'MAX'}</span>
+					</div>
+					<div
+						className='cr-xpbar'
+						role='progressbar'
+						aria-valuemin={0}
+						aria-valuemax={100}
+						aria-valuenow={Math.floor(progress * 100)}
+						aria-label='Crafting level progress'
+					>
+						<div className='cr-xpfill' style={{ width: `${progress * 100}%` }} />
+						<span className='cr-xptext'>{Math.floor(progress * 100)}%</span>
+					</div>
+				</div>
+			</div>
 
 			<div className='cr-main'>
-				<div className='cr-xpline'>
-					<span className='cr-level-text'>Crafting level {level}</span>
-					<span className='px-tip-muted'>{Number.isFinite(next) ? `${formatNumber(Math.floor(next * progress))} / ${formatNumber(next)} XP` : 'MAX'}</span>
-				</div>
-				<div
-					className='cr-xpbar'
-					role='progressbar'
-					aria-valuemin={0}
-					aria-valuemax={100}
-					aria-valuenow={Math.floor(progress * 100)}
-					aria-label='Crafting level progress'
-				>
-					<div className='cr-xpfill' style={{ width: `${progress * 100}%` }} />
-					<span className='cr-xptext'>{Math.floor(progress * 100)}%</span>
-				</div>
-
 				<div className='cr-body'>
 					<div className='cr-left'>
-						<div className='cr-kinds' role='group' aria-label='Recipe categories'>
-							{KINDS.map((kind) => (
-								<button
-									key={kind}
-									className='px-btn px-btn-sm'
-									data-active={!hidden.has(kind)}
-									aria-pressed={!hidden.has(kind)}
-									onClick={() => toggleKind(kind)}
-								>
-									{KIND_LABELS[kind]}
-								</button>
-							))}
-						</div>
-						<div className='cr-grid'>
-							{shown.map((recipe) => (
-								<RecipeTile key={recipe.id} recipe={recipe} have={have} selected={recipe.id === selected.id} onSelect={() => setSelectedId(recipe.id)} />
-							))}
-						</div>
+						{KINDS.map((kind) => {
+							const isOpen = !closed.has(kind);
+							const recipes = RECIPES.filter((r) => r.kind === kind);
+							return (
+								<section key={kind} className='cr-acc'>
+									<button className='px-btn cr-acc-head' aria-expanded={isOpen} onClick={() => toggleKind(kind)}>
+										<span className='cr-acc-chev'>{isOpen ? '▾' : '▸'}</span>
+										<span className='cr-acc-name'>{KIND_LABELS[kind]}</span>
+										<span className='cr-acc-count'>{recipes.length}</span>
+									</button>
+									{isOpen && (
+										<div className='cr-grid'>
+											{recipes.map((recipe) => (
+												<RecipeTile key={recipe.id} recipe={recipe} have={have} selected={recipe.id === selected.id} onSelect={() => setSelectedId(recipe.id)} />
+											))}
+										</div>
+									)}
+								</section>
+							);
+						})}
 					</div>
 					<RecipeDetail key={selected.id} recipe={selected} have={have} />
 				</div>
