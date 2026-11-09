@@ -357,6 +357,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
 - [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off), for the win estimate.
+- [`fightProject.ts`](../../src/lib/offline/fightProject.ts) — ~ The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands something first), as the picture the browser animates:
 - [`fightSteps.ts`](../../src/lib/offline/fightSteps.ts) — ~ Auto-use's rules for one tick:
 - [`fightTargets.ts`](../../src/lib/offline/fightTargets.ts) — ~ A placed monster by ticket number, with what it is (null:
 - [`fightTypes.ts`](../../src/lib/offline/fightTypes.ts) — ~ What the player brings to a fight, worked out from the last accepted save when the fight starts and then frozen for that fight.
@@ -385,6 +386,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.ts`](../../src/lib/offlineClient.ts) — ~ The browser side of /api/offline.
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
+- [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP and the monster's HP `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The signed-in player's id from the session cookie (never from the request body), or the response to send instead.
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
@@ -569,6 +571,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`emberModel.test.ts`](../../tests/combat/emberModel.test.ts)
 - [`fightBalance.test.ts`](../../tests/combat/fightBalance.test.ts) — ~ A full kit of one grade (a mace unless said otherwise), at the start of the grade window
 - [`fightEngine.test.ts`](../../tests/combat/fightEngine.test.ts) — ~ Runs the clock forward `seconds` seconds, one request per `stepSec`, and returns the ledger and every event seen.
+- [`fightPlan.test.ts`](../../tests/combat/fightPlan.test.ts)
 - [`goldenFight.test.ts`](../../tests/combat/goldenFight.test.ts) — ~ Numbers are written to 6 decimals so a platform's last-bit noise cannot fail the comparison.
 - [`leveling.test.ts`](../../tests/combat/leveling.test.ts)
 - [`skills.test.ts`](../../tests/combat/skills.test.ts)

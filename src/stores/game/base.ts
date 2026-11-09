@@ -71,6 +71,8 @@ export const initialCombat = (): CombatClientState => ({
 	restSec: 0,
 	restEndsAt: null,
 	queueMax: LIMITS.battleQueue,
+	plan: null,
+	pollSec: 0,
 	buffs: [],
 });
 

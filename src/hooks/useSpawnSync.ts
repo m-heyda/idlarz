@@ -5,7 +5,7 @@ import { useUiStore } from '@/stores/uiStore';
 import { readCursor, setCursorUser } from '@/lib/combatCursor';
 import { requestSync } from '@/lib/rewardsClient';
 import { runOfflineClaim } from '@/lib/offlineFlow';
-import { setNeedClaimHandler } from '@/lib/serverSession';
+import { setNeedClaimHandler, setPollHandler } from '@/lib/serverSession';
 import { currentCloudSaver } from '@/lib/manualCloudSave';
 
 const MIN_WAIT_SEC = 20;
@@ -16,7 +16,9 @@ const RETRY_SEC = 60;
  * The one poll of the game. The server decides when a chest or a monster has appeared, where the monster stands, and how every fight
  * goes (lazily: each request carries the fight forward to the server's clock), so this asks it: when the game starts, when the next
  * spawn is due, when the tab comes back into view, when an action finds out the server wants an absence claimed first - and while a
- * fight runs, every few seconds (`COMBAT.poll`: quick with the combat panel open, slow when it is minimized or the tab is hidden).
+ * fight runs, when the server says the fight will be over: it runs the open fight to its end and sends the plan (`CombatView.plan`), which the
+ * browser draws in between, so a fight costs one poll and not one every 2 s. Only a fight the server could not plan (it is `behind`) is asked about
+ * every few seconds (`COMBAT.poll`: quick with the combat panel open, slow when it is minimized or the tab is hidden).
  * Each answer carries the tickets and the player's combat, and the server says when it would like to be asked again.
  */
 export const useSpawnSync = (userId: string, active: boolean) => {
@@ -30,6 +32,7 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 		let stopped = false;
 		let running = false;
 		let timer: ReturnType<typeof setTimeout> | undefined;
+		let spawnDueAt = Infinity; // when the next spawn is due by this browser's clock (epoch ms)
 
 		const schedule = (sec: number) => {
 			clearTimeout(timer);
@@ -45,9 +48,10 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 					useGameStore.getState().applyServerTickets(reply.value);
 					const { combat, nextInSec } = reply.value;
 					const spawnWait = Math.min(MAX_WAIT_SEC, Math.max(MIN_WAIT_SEC, (nextInSec ?? MAX_WAIT_SEC) + 2));
+					spawnDueAt = Date.now() + spawnWait * 1000;
 					const watching = !useUiStore.getState().combatMinimized && document.visibilityState === 'visible';
 					// a running fight is asked about at the pace of the panel; an idle player when something can change
-					const combatWait = combat.fight && !watching ? Math.max(combat.nextPollSec, COMBAT.poll.minimizedSec) : combat.nextPollSec;
+					const combatWait = combat.fight && !combat.plan && !watching ? Math.max(combat.nextPollSec, COMBAT.poll.minimizedSec) : combat.nextPollSec;
 					schedule(Math.max(0.5, Math.min(spawnWait, combatWait)));
 				} else if (reply.status === 'need_claim') {
 					await runOfflineClaim(userId, true);
@@ -66,6 +70,11 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 		};
 
 		setNeedClaimHandler(() => void run());
+		// an answer to a click or a hotkey brought a new plan: the poll follows it (but never later than the next spawn is due)
+		setPollHandler((sec) => {
+			if (running) return;
+			schedule(Math.max(0.5, Math.min(sec, (spawnDueAt - Date.now()) / 1000)));
+		});
 		const onVisible = () => {
 			if (document.visibilityState === 'visible') void run();
 		};
@@ -76,6 +85,7 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 			stopped = true;
 			clearTimeout(timer);
 			setNeedClaimHandler(null);
+			setPollHandler(null);
 			document.removeEventListener('visibilitychange', onVisible);
 		};
 	}, [userId, active]);
