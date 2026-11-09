@@ -53,9 +53,17 @@ test('the plan is a few rows: at most 60 samples, and it starts and ends where t
 	const c = ledger.combat!;
 	const plan = projectFight(ledger, s.env(c.at), c)!;
 	assert.ok(plan.samples.length <= 60);
-	assert.deepEqual(plan.samples[0].slice(1), [Math.round(c.hp * 10) / 10, Math.round(c.fight!.monsterHp * 10) / 10]);
+	assert.deepEqual(plan.samples[0].slice(1), [Math.round(c.hp * 10) / 10, Math.round(c.fight!.monsterHp * 10) / 10, Math.round(c.mp * 10) / 10]);
 	assert.equal(plan.samples[plan.samples.length - 1][0], plan.endsInSec);
 	if (plan.outcome === 'won') assert.equal(plan.samples[plan.samples.length - 1][2], 0);
+});
+
+test('every sample carries the hero mana: it starts at the mana of the open fight', () => {
+	const { s, ledger } = open('plan-d', 'bossGreatAuroch');
+	const c = ledger.combat!;
+	const plan = projectFight(ledger, s.env(c.at), c)!;
+	assert.ok(plan.samples.every((row) => typeof row[3] === 'number' && row[3] >= 0));
+	assert.equal(plan.samples[0][3], Math.round(c.mp * 10) / 10);
 });
 
 test('planPictureAt draws straight lines between samples and holds the last one', () => {
@@ -63,14 +71,28 @@ test('planPictureAt draws straight lines between samples and holds the last one'
 		endsInSec: 4,
 		outcome: 'won' as const,
 		samples: [
+			[0, 100, 50, 40],
+			[2, 80, 30, 20],
+			[4, 80, 0, 30],
+		] as [number, number, number, number][],
+		fx: [],
+	};
+	assert.deepEqual(planPictureAt(plan, 0), { hp: 100, monsterHp: 50, mp: 40 });
+	assert.deepEqual(planPictureAt(plan, 1), { hp: 90, monsterHp: 40, mp: 30 });
+	assert.deepEqual(planPictureAt(plan, 3), { hp: 80, monsterHp: 15, mp: 25 });
+	assert.deepEqual(planPictureAt(plan, 99), { hp: 80, monsterHp: 0, mp: 30 });
+});
+
+test('planPictureAt gives no mana for a plan without the mana column (an older server)', () => {
+	const plan = {
+		endsInSec: 2,
+		outcome: 'won' as const,
+		samples: [
 			[0, 100, 50],
-			[2, 80, 30],
-			[4, 80, 0],
+			[2, 80, 0],
 		] as [number, number, number][],
 		fx: [],
 	};
-	assert.deepEqual(planPictureAt(plan, 0), { hp: 100, monsterHp: 50 });
-	assert.deepEqual(planPictureAt(plan, 1), { hp: 90, monsterHp: 40 });
-	assert.deepEqual(planPictureAt(plan, 3), { hp: 80, monsterHp: 15 });
-	assert.deepEqual(planPictureAt(plan, 99), { hp: 80, monsterHp: 0 });
+	assert.equal(planPictureAt(plan, 1).mp, null);
+	assert.equal(planPictureAt(plan, 9).mp, null);
 });

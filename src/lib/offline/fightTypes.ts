@@ -167,13 +167,14 @@ export const PLAN_FX_KINDS = ['hit', 'crit', 'super', 'hurt', 'hurtCrit', 'heal'
 
 /**
  * Where an open fight is going, so the browser can animate it and ask again only when it is over: the server runs the fight to its end on a copy.
- * `samples` are `[seconds from the view's `at`, hero HP, monster HP]` (first row at 0, last at the end, linear in between); `fx` are the swings
- * and spells to fly, `[seconds from the view, index into PLAN_FX_KINDS, amount]`. A hotkey, a click or any other command makes a new plan.
+ * `samples` are `[seconds from the view's `at`, hero HP, monster HP, hero mana]` (first row at 0, last at the end, linear in between; the mana
+ * column may be missing on a plan from an older server); `fx` are the swings and spells to fly, `[seconds from the view, index into PLAN_FX_KINDS,
+ * amount]`. A hotkey, a click or any other command makes a new plan.
  */
 export interface FightPlan {
 	endsInSec: number;
 	outcome: 'won' | 'defeated' | 'timeout' | 'retreat';
-	samples: [number, number, number][];
+	samples: [number, number, number, number?][];
 	fx: [number, number, number][];
 }
 

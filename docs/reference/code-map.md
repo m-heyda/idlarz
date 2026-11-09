@@ -385,7 +385,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.ts`](../../src/lib/offlineClient.ts) — ~ The browser side of /api/offline.
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
-- [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP and the monster's HP `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
+- [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The signed-in player's id from the session cookie (never from the request body), or the response to send instead.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:

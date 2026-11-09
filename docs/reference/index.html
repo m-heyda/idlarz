@@ -1571,9 +1571,10 @@ The queue&#39;s head starts as soon as HP is back at 80%, ignoring retry time an
 <p>Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). Ends the fight against it.</p>
 </article><article><p><a id="projectfight"></a></p>
 <h3><code>projectFight</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightProject.ts"><code>src/lib/offline/fightProject.ts:31</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightProject.ts"><code>src/lib/offline/fightProject.ts:32</code></a></p>
 <p>The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player
-commands something first), as the picture the browser animates: HP of both sides about once a second, and the swings and spells to fly.
+commands something first), as the picture the browser animates: HP of both sides and the hero&#39;s mana about once a second, and the swings and
+spells to fly.
 Nothing of the ledger is written. Returns null with no fight open or one that does not end within <code>COMBAT.maxFightSec</code>.</p>
 </article><article><p><a id="paykill"></a></p>
 <h3><code>payKill</code> <small>function</small></h3>
@@ -3552,7 +3553,7 @@ Each interval computes <code>deltaTime = performance.now() - last</code> (monoto
 but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player&#39;s absence is claimed from the server before the loop starts (<a href="#computeofflinegrant"><code>computeOfflineGrant</code></a>).</p>
 <p><code>tick</code> order: accumulate resources -&gt; XP (with <code>xpGainMultiplier</code>) -&gt; castle upgrade timer (finishing recomputes the rates) -&gt; age the monsters on the map (<code>advanceMonsters</code>; the server places them) -&gt; HP / mana regeneration and cooldowns
 (in a fight the server&#39;s HP is left alone) -&gt; merchant stock rotation -&gt; level / stat points -&gt; one <code>set()</code>. <strong>The tick does not spawn chests or monsters and does not run fights.</strong></p>
-<p><code>useSpawnSync</code> polls <code>/api/spawn</code> (it waits until the next ticket is due, 20 to 600 s; an open fight is polled every 2 s, a minimized one every 8 s; a fight action also triggers an immediate sync): the server answers with the chests and monsters
+<p><code>useSpawnSync</code> polls <code>/api/spawn</code> (it waits until the next ticket is due, 20 to 600 s; an open fight is polled once, when the plan it was sent says it ends (a fight the server could not plan: every 2 s, a minimized one every 8 s), and the boss timer and the bars run on the browser between answers; a fight action also triggers an immediate sync): the server answers with the chests and monsters
 that have appeared (<code>applyServerTickets</code> -&gt; <code>reconcileMap</code> places them on the map), the gem balance and the combat view (HP, mana, cooldowns, the open fight). A click on a monster calls <code>startFight</code>, which asks <code>/api/fight</code> to open the fight;
 from then on the server swings both ways in fixed ticks, with or without the browser.</p>
 <p><strong>Clicks.</strong> <code>useClickIncome</code> (called by <code>GameHeader</code>) registers one window <code>click</code> listener. A click counts only if it is trusted and lands inside <code>[data-click-area]</code> (the map). It calls <code>clickForGold</code>, which asks the limiter (<a href="#createclicklimiter"><code>createClickLimiter</code></a>)

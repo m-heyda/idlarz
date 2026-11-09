@@ -22,7 +22,8 @@ const FX_INDEX: Partial<Record<FightEvent['kind'], number>> = {
 
 /**
  * The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player
- * commands something first), as the picture the browser animates: HP of both sides about once a second, and the swings and spells to fly.
+ * commands something first), as the picture the browser animates: HP of both sides and the hero's mana about once a second, and the swings and
+ * spells to fly.
  * Nothing of the ledger is written. Returns null with no fight open or one that does not end within `COMBAT.maxFightSec`.
  *
  * @category Combat/A fight
@@ -34,11 +35,12 @@ export const projectFight = (ledger: Ledger, env: CombatEnv, c: CombatState): Fi
 	const sim: CombatState = { ...c, cd: { ...c.cd }, fight: { ...f }, queue: [...c.queue], retryAt: { ...c.retryAt }, log: [] };
 	const ctx: FightCtx = { env, c: sim, ledger, profileNow: f.profile, potionIds: healingPotionIds() };
 	const start = c.at;
-	const samples: FightPlan['samples'] = [[0, round1(c.hp), round1(f.monsterHp)]];
+	const samples: FightPlan['samples'] = [[0, round1(c.hp), round1(f.monsterHp), round1(c.mp)]];
 	const fx: FightPlan['fx'] = [];
 	let outcome: FightPlan['outcome'] | null = null;
 	let lastHp = c.hp;
 	let lastMonsterHp = f.monsterHp;
+	let lastMp = c.mp;
 	let t = start;
 	let nextSample = 1;
 	const steps = Math.ceil((COMBAT.maxFightSec - f.elapsed + 1) / COMBAT.tickSec);
@@ -57,8 +59,9 @@ export const projectFight = (ledger: Ledger, env: CombatEnv, c: CombatState): Fi
 		if (sim.fight) {
 			lastHp = sim.hp;
 			lastMonsterHp = sim.fight.monsterHp;
+			lastMp = sim.mp;
 			if (t - start >= nextSample) {
-				samples.push([round1(t - start), round1(lastHp), round1(lastMonsterHp)]);
+				samples.push([round1(t - start), round1(lastHp), round1(lastMonsterHp), round1(lastMp)]);
 				nextSample += 1;
 			}
 		}
@@ -66,7 +69,7 @@ export const projectFight = (ledger: Ledger, env: CombatEnv, c: CombatState): Fi
 	if (sim.fight || !outcome) return null;
 	const endsInSec = round1(t - start);
 	// the last picture: the monster is down on a win; the hero is down on a defeat (the knockout's refill is the next view's business)
-	samples.push([endsInSec, outcome === 'defeated' ? 0 : round1(lastHp), outcome === 'won' ? 0 : round1(lastMonsterHp)]);
+	samples.push([endsInSec, outcome === 'defeated' ? 0 : round1(lastHp), outcome === 'won' ? 0 : round1(lastMonsterHp), round1(lastMp)]);
 	if (samples.length > MAX_SAMPLES) {
 		const every = Math.ceil(samples.length / MAX_SAMPLES);
 		const thinned = samples.filter((_, i) => i % every === 0);

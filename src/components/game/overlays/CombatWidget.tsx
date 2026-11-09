@@ -33,7 +33,7 @@ const typingInField = (target: EventTarget | null): boolean => {
  * draining, then the monster lies dead (a skull and crossbones) with its loot under it, until the window is closed (or after a while). A click on a
  * monster starts the fight (or Auto-battle does, one monster after the other); the server swings both ways at each side's attack speed
  * (see src/lib/offline/fight.ts), so this only shows what it says. Flee leaves a fight (and switches Auto-battle off).
- * Potions and skills are used with the number keys (their slots are not buttons); the switches (also in the right-click menu) are
+ * Potions and skills are used with the number keys or a click on their slot; the switches (also in the right-click menu) are
  * Auto-battle and Auto-use (it drinks, heals and stuns with fixed rules).
  * The window shrinks to an icon (a click on a monster opens it again).
  */
@@ -306,6 +306,8 @@ const CombatWidget: React.FC = () => {
 			restSec={!fight && restLeft !== null && combat.queue.length > 0 ? restLeft : null}
 			restLabel={combat.queue[0] ? monsterDef(combat.queue[0].type).label : undefined}
 			onUnqueue={unqueueMonster}
+			onSkill={requestSkill}
+			onPotion={requestPotion}
 			onFlee={flee}
 			onCloseResult={clearNotice}
 			onMinimize={() => setPref('combatMinimized', true)}

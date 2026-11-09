@@ -84,14 +84,16 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 					? state.playerHp
 					: regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen + merchantCombat(state.merchantUpgrades).regen),
 		);
+		// mana follows the plan too (it has the spell costs and the regen the server counted), else it just fills
 		const newPlayerMp = Math.min(
 			maxMana(state.characterStats, state.equipment),
-			state.playerMp + manaRegenPerSec(state.characterStats, state.equipment) * secondsElapsed,
+			shown?.mp != null ? shown.mp : state.playerMp + manaRegenPerSec(state.characterStats, state.equipment) * secondsElapsed,
 		);
 		const cd = state.combat.cd;
+		const timed = (state.combat.fight?.timeLeftSec ?? 0) > 0; // a boss's clock runs down here between the server's answers, which reset it
 		const cooling = cd.heal > 0 || cd.stun > 0 || cd.potion > 0 || (state.combat.fight?.stunLeft ?? 0) > 0;
 		const newCombat =
-			cooling || shown
+			cooling || shown || timed
 				? {
 						...state.combat,
 						cd: cooling
@@ -101,6 +103,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 							? {
 									...state.combat.fight,
 									stunLeft: Math.max(0, state.combat.fight.stunLeft - secondsElapsed),
+									...(timed ? { timeLeftSec: Math.max(0, (state.combat.fight.timeLeftSec ?? 0) - secondsElapsed) } : {}),
 									...(shown ? { monsterHp: shown.monsterHp } : {}),
 								}
 							: null,

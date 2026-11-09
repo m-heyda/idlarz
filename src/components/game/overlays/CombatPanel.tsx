@@ -184,6 +184,9 @@ export interface CombatPanelProps {
 	/** The hero rests before the queue's next fight: seconds left (counted down by the caller) and the next monster's name; left out in the lab */
 	restSec?: number | null;
 	restLabel?: string;
+	/** A click on a skill slot or a potion slot does what its hotkey does (the server decides whether it goes through); left out in the lab */
+	onSkill?: (id: (typeof SKILL_IDS)[number]) => void;
+	onPotion?: (id: string) => void;
 	onFlee: () => void;
 	onCloseResult: () => void;
 	onMinimize: () => void;
@@ -212,36 +215,45 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 		<>
 			{!switchesOnly && (
 				<>
-					{/* Hotkey slots: they show what is ready, they are not buttons */}
+					{/* Hotkey slots: a click does what the key does */}
 					<div className='fight-skills'>
 						{SKILL_IDS.map((id, i) => {
 							const skill = SKILLS[id];
 							const locked = player.level < skill.unlockLevel;
 							const left = cd[id];
 							return (
-								<div
+								<button
+									type='button'
 									key={id}
+									disabled={locked}
+									onClick={() => p.onSkill?.(id)}
 									className='fight-skill'
 									data-locked={locked}
 									data-nomana={!locked && player.mp < skill.manaCost}
-									title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${4 + i}.`}
+									title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${4 + i} or click.`}
 								>
 									<span className='fight-skill-name'>{skill.name}</span>
 									<span className='fight-skill-cost'>{locked ? `Lv ${skill.unlockLevel}` : `${skill.manaCost} MP`}</span>
 									<span className='fight-hotkey'>{4 + i}</span>
 									{!locked && left > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />}
-								</div>
+								</button>
 							);
 						})}
 					</div>
 					<div className='fight-potions'>
 						{p.potions.length === 0 && <span className='px-tip-muted text-xs'>No potions</span>}
 						{p.potions.map(({ slot }, i) => (
-							<div key={i} className='fight-potion' title={`Press ${i + 1} to drink`}>
+							<button
+								type='button'
+								key={i}
+								className='fight-potion'
+								onClick={() => slot && 'id' in slot && p.onPotion?.(slot.id)}
+								title={`Press ${i + 1} or click to drink`}
+							>
 								<ItemSlot {...slotProps(slot)} />
 								<span className='fight-hotkey'>{i + 1}</span>
 								{cd.potion > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (cd.potion / COMBAT.potionCooldownSec) * 100)}%` }} />}
-							</div>
+							</button>
 						))}
 					</div>
 				</>
