@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatHeaderAmount, formatRateAuto, parseAmount, pickRateUnit } from '../../src/utils/formatters';
+import { formatHeaderAmount, formatInt, formatRateAuto, parseAmount, pickRateUnit } from '../../src/utils/formatters';
 import { castleTimerLabel } from '../../src/lib/castleTimer';
 
 test('header amounts below 1,000 are whole numbers, so they never grow decimals', () => {
@@ -90,4 +90,13 @@ test('the castle timer text: nothing without an upgrade, never below one second,
 	assert.equal(castleTimerLabel({ remainingSec: 59.4 }), '1m 0s');
 	assert.equal(castleTimerLabel({ remainingSec: 4 * 3600 + 5 * 60 }), '4h 5m');
 	assert.equal(castleTimerLabel({ remainingSec: 3 * 86400 + 7200 }), '3d 2h');
+});
+
+test('formatInt prints whole numbers without decimals and shortens from 10,000', () => {
+	assert.equal(formatInt(7), '7');
+	assert.equal(formatInt(73), '73');
+	assert.equal(formatInt(62.4), '62');
+	assert.equal(formatInt(9999), '9,999');
+	assert.equal(formatInt(18130), '18.1K');
+	assert.equal(formatInt(undefined), '0');
 });

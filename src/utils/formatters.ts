@@ -97,6 +97,13 @@ export const formatCompact = (n: number | undefined, decimals = 1): string => {
 	return trimmed(n, decimals);
 };
 
+/** A whole count for counters and costs: 7, 73, 9,999 as is (never 7.00), from 10,000 short (12.3K, 1.23M) */
+export const formatInt = (n: number | undefined): string => {
+	if (n === undefined || n === null || Number.isNaN(n)) return '0';
+	if (!Number.isFinite(n) || Math.abs(n) >= 10_000) return formatHeaderAmount(n);
+	return Math.round(n).toLocaleString('en');
+};
+
 /** A percentage with decimals (27.3%) that turns into 5.01K% / 1.20M% from 5,000 */
 export const formatPct = (pct: number | undefined, decimals = 1): string => {
 	if (pct === undefined || pct === null || Number.isNaN(pct)) return '0%';
