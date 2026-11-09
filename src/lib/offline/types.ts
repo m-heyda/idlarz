@@ -46,7 +46,7 @@ interface PublicMonster {
 	spawnLevel: number;
 	/** Growth levels it may gain, when capped for a weak player (left out: the full growth limit) */
 	growCap?: number;
-	/** Which monster it is (left out by older servers: a rat or the Rat King) */
+	/** Which monster it is (left out by older servers: tickets then carry the fallback monster or boss) */
 	type?: import('@/types/game').MonsterType;
 }
 

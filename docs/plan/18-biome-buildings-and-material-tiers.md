@@ -60,7 +60,7 @@ The tiers become a ladder with one job each, so crafting recipes ([17](17-crafti
 | **T1 Farm** | animal products | eggs, milk, hide | farm, some Producers | buys and sells |
 | **T2 Biome goods** | the new biomes' tile output | Hardwood, Cloth, Honey, Ichor, War Medals | tiles of the five rebirth biomes | **no** |
 | **T3 Extracts** | one per biome, from its Extractor | the twelve in section 3 | Extractors | **no** |
-| **T4 Relics** | rare, from bosses and the deepest content | e.g. Rat King's Crown, boss cores *(placeholders)* | boss kills, late events | **no** |
+| **T4 Relics** | rare, from bosses and the deepest content | e.g. a boss crown, boss cores *(placeholders)* | boss kills, late events | **no** |
 
 Rules: the **merchant trades T0 and T1 only** (your instruction); T2-T4 are crafting and building-upgrade inputs, so they have a real sink and cannot be converted to gold. This replaces the earlier idea in [12](12-rebirth-biomes.md) of selling Hardwood, Cloth and Honey (flagged there). Higher tiers appear in recipes in order: basic gear = T0/T1, the middle tiers = T2 + T3, the top tiers and enchanted crafts = T3 + T4 plus Ichor/Medals. Building upgrades past level 3 also take T2/T3 (so Extractors feed the economy as well as crafting).
 

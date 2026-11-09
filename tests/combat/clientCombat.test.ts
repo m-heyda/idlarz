@@ -233,7 +233,7 @@ test("a potion the server drank leaves the bag because the server's inventory sa
 	assert.equal(qty(), 1, 'a picture older than the one held is ignored');
 });
 
-test('a defeat or a timeout is announced; the King taunts, a rat stays silent; the monster is not touched', () => {
+test('a defeat or a timeout is announced; a boss taunts, a plain monster stays silent; the monster is not touched', () => {
 	syncedGame();
 	api().applyFightReply(reply(view({ eventNo: 1, events: [event(1, 'defeated', { n: 2, type: 'bossGreatAuroch', level: 15 })] })));
 	assert.equal(api().combat.notice?.kind, 'defeated');

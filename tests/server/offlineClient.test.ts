@@ -65,7 +65,7 @@ test('placed tickets become monsters exactly where the server put them, aged as 
 	assert.equal(out.placed.strongestLevel, Math.max(...out.monsters.map((m) => m.level)));
 });
 
-test('the King ticket becomes the King', () => {
+test('the boss ticket becomes the boss', () => {
 	freshGame();
 	growTo(30);
 	const out = reconcileTickets(state(), tickets({ king: { n: 5, at: NOW - 10, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 15 } }), NOW);

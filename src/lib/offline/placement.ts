@@ -39,7 +39,7 @@ export const worldFromPart = (part: { land: unknown; extra: unknown }): World | 
 	return createWorld(placed);
 };
 
-/** The monsters a ticket of this kind can turn into: every `MONSTERS` entry of the matching grade (normal monsters for a rat ticket, bosses for the King's). */
+/** The monsters a ticket of this kind can turn into: every `MONSTERS` entry of the matching grade (normal monsters for a `rat` ticket, bosses for a `king` one). */
 const typesOf = (kind: 'rat' | 'king'): MonsterType[] =>
 	(Object.keys(MONSTERS) as MonsterType[]).filter((type) => (MONSTERS[type].grade === 'boss') === (kind === 'king'));
 

@@ -192,7 +192,7 @@ export const withLedger = async <T>(
 /**
  * Pays an absence. The gap is measured on the server clock from the later of the last accepted save and the last claim, so it
  * cannot be lengthened by the client; it is capped (8 h + Night Watch) and paid at the efficiency (50 % + Steward) of the income the
- * last accepted save earns. Chests, rats and a King that would have appeared come with it as tickets. The claim moves the anchor to
+ * last accepted save earns. Chests, normal monsters and a boss that would have appeared come with it as tickets. The claim moves the anchor to
  * now (a second claim a moment later pays nothing) and is remembered under `claimId`, so a response lost on the way is simply replayed.
  */
 export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: string, nowMs: number): Promise<ClaimOutcome> => {

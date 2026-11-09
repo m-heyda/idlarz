@@ -128,7 +128,7 @@ test('the monsters on the map are the server list, where the server put them', (
 	);
 	assert.equal(api().monsters[0].lucky, true);
 	assert.equal(api().gems, 1100);
-	// the next answer lists only the King: the rat is gone from the map
+	// the next answer lists only the boss: the normal monster is gone from the map
 	api().applyServerTickets({ ...sync, tickets: { ...sync.tickets, rats: [] }, combat: { ...sync.combat, at: 2 } });
 	assert.deepEqual(
 		api().monsters.map((m) => m.id),

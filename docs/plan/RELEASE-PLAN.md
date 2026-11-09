@@ -82,7 +82,7 @@ Goal: classes become real, avatars exist, names are reserved, the game teaches i
 | 2.2 | **Lifetime counters** in `player_ledger.stats` (kills per type, chests, tiles placed, resources earned from verified save gains); additive, lazily seeded; nothing shows them yet | M |
 | 2.3 | **Class passives**: +5 % each, one economy and one combat per class (warrior armor and kill gold, paladin regeneration and offline efficiency, ranger crit and chest speed, mage mana/spell power and XP); folded into `summarize()` and the fight profile; class change costs 500 gems, never mid-fight | M |
 | 2.4 | **Avatars**: catalog of 8 starters (knight, druid, scout, scholar, miner, farmer, bard, alchemist), picker, server accepts only starter or unlocked ids 🎨 | M |
-| 2.5 | **Achievements**: catalog in code, about 12 launch achievements (tutorial, first tile, first building, castle 2/6/10, first fight, first rebirth, first Rat King kill, early tester), 4 extra avatars as rewards; evaluated lazily on existing requests | M |
+| 2.5 | **Achievements**: catalog in code, about 12 launch achievements (tutorial, first tile, first building, castle 2/6/10, first fight, first rebirth, first boss kill, early tester), 4 extra avatars as rewards; evaluated lazily on existing requests | M |
 | 2.6 | **Guided tutorial**: `catalog/tutorial.ts` steps, coach tips, Guide journal with "???" for locked entries, initial path of about eight steps, small starter bundles granted once by the server; replaces `Tutorial.tsx` when every section has an entry | L |
 | 2.7 | **Secrets hygiene**: new `LOOT_SECRET` per deployment, placeholder in `.env.example`. Free here because the reset invalidates every sealed roll anyway | S |
 | 2.8 | **Epoch flow**: `GAME_EPOCH`, `/api/auth/me` returns `needsReset`, "A new chapter" screen (before `SaveHub`) with class, avatar, tutorial; idempotent `POST /api/auth/epoch` archives to a **pinned** `save_history` row, resets saves, stats and ledger, keeps account, reserved name and gems; local save archived through `archiveForNewGame()`; early-tester grant. Flip the constant = the release | M |
@@ -102,7 +102,7 @@ Goal: more monster kinds with **real stats, rewards and spawn rules** in the exi
 | 3.2 | **Placeholder art mechanism**: `MonsterDef.sprite` key with fallback `monster_generic` (one 2-frame sheet in the house style) tinted per family by a CSS variable; bosses use a scaled generic with a crown. 🧱 | S |
 | 3.4 | **Spawn tables per distance band and relevance fade** (outgrown families rarer, floor 0.1, never gone); **rats 2-6**; per-band danger offset (closes R7). **IDL-215 built the first slice early:** the type pick is weighted by the hero's win chance (floor 0.1) and new spawns and their growth are capped near what the hero beats (`offline/spawnWeights.ts`); P3.4 replaces the window-midpoint estimate with per-band weights and keeps the floor | M |
 
-Clarify ❓ D7: stats, `rewardSec` and caps of the three families (I will propose numbers from the sim, you approve); whether Luck / Gold Find apply after the cap (proposed yes); what the demoted King keeps (HP, boss timer, spawn distance, see D11). Assets: one generic sprite sheet (small); real sprites for wolf, bog thing, frost hare listed in section 6 and swapped in later.
+Clarify ❓ D7: stats, `rewardSec` and caps of the three families (I will propose numbers from the sim, you approve); whether Luck / Gold Find apply after the cap (proposed yes); what the plains boss keeps (HP, boss timer, spawn distance, see D11). Assets: one generic sprite sheet (small); real sprites for wolf, bog thing, frost hare listed in section 6 and swapped in later.
 
 ### P4 · Glossary and mastery
 
@@ -202,7 +202,7 @@ Same pattern as P8, twice: art 🎨, **Cloth** and **Honey**, three buildings ea
 |---|---|---|
 | 11.1 | `player_ledger.craft` (migration first); `POST /api/craft`, lifetime `ord`, sealed rolls, per-tier pity | M |
 | 11.2 | Recipes as data keyed by tag and tier (slot-themed extract costs), crafting overlay with the odds panel, crafting XP and level (target about 10 weeks to 100, never resets) | L |
-| 11.3 | `scripts/craft-sim.ts`, craft source in `loot-sim`, gate: the cheapest craftable tier beats the home-land monsters of the matching level (the King is no longer a benchmark) | M |
+| 11.3 | `scripts/craft-sim.ts`, craft source in `loot-sim`, gate: the cheapest craftable tier beats the home-land monsters of the matching level (no boss is a benchmark any more: the grade kits are) | M |
 | 11.5 | Enchanted craft button present but disabled ("Needs Ichor from the Blight") | S |
 
 The gear wipe on rebirth is already live (`rebirthSlice.ts`, `/api/rebirth`) without a crafting sink; 11.1-11.3 are the sink it was meant to wait for. Materials are still paid by the browser and audited by `granted.spent`; enforcing them waits for the server-priced merchant (decision D9: schedule that item next to P11 or accept flagging only).

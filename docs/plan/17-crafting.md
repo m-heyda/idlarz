@@ -48,7 +48,7 @@ Each recipe's cost is a few **minutes of income** at the matching tier (the rule
 - **Rankings**: crafting level may become a ranking column later ([15](15-leaderboard-and-world-preview.md)); it is derived from the ledger, never from the client.
 
 ## 6. Impact checks before building
-- **Loot economy**: crafted gear competes with drops. The craft profile's rarity weights must stay at or below the Rat King and chest weights for the same item level, or crafting makes bosses pointless. Add the craft source to `npm run loot-sim`.
+- **Loot economy**: crafted gear competes with drops. The craft profile's rarity weights must stay at or below the boss and chest weights for the same item level, or crafting makes bosses pointless. Add the craft source to `npm run loot-sim`.
 - **Wipe synergy**: a run starts with no gear; the cheapest craftable tier must be good enough to fight the first rats. Starter recipes at crafting level 1 should produce roughly the starter kit.
 - **Sell value**: crafted items sell for gold like others (`sellValueOf`); the craft cost must exceed the sell value of the average result, or crafting is a gold printer.
 - **Ichor/medals** do not exist before the Blight and Battlefield (rebirths 4 and 5), so "enhanced" crafting and the legendary tier are naturally late.

@@ -15,7 +15,7 @@ import { wardTiles } from '@/lib/spawnLimits';
 /** Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny). */
 export const TICKET_CAP = 40;
 
-/** What `kind` of ticket: a chest, a rat or the Rat King (a boss: one at a time). */
+/** What `kind` of ticket: a chest, a normal monster (`rat`) or a boss (`king`: one at a time). The `rat` / `king` names are legacy ticket and save keys from when the game had a rat and a Rat King; they now mean "normal monster" and "boss". */
 export type TicketKind = 'chest' | 'rat' | 'king';
 
 /** A waiting chest. Like a monster it has a number and (once the server found a tile for it, see placement.ts) a tile: the browser draws it there and opens it by naming that tile. */
@@ -49,7 +49,7 @@ export const monsterTypeOf = (ticket: Pick<MonsterTicket, 'type'>, kind: 'rat' |
 	ticket.type && ticket.type in MONSTERS ? ticket.type : kind === 'king' ? FALLBACK_BOSS : FALLBACK_MONSTER;
 
 export interface TicketBank {
-	/** Seconds the timers have run towards the next chest / rat / king (they stop while the map is full) */
+	/** Seconds the timers have run towards the next chest / monster / boss (they stop while the map is full) */
 	chestAcc: number;
 	ratAcc: number;
 	kingAcc: number;
@@ -62,7 +62,7 @@ export interface TicketBank {
 	/** The number of the next monster ticket, and how many rats this run has had (the first one comes sooner) */
 	nextN: number;
 	ratsMinted: number;
-	/** How many tiles a rat / the King may stand on right now (from the last look at the map: `sitesKey` says which land that was). Monsters stop coming when they are all taken; unknown (never looked) means none come yet. `chest` counts the tiles a chest may stand on (absent in rows from before chests were placed here). */
+	/** How many tiles a normal monster / the boss may stand on right now (from the last look at the map: `sitesKey` says which land that was). Monsters stop coming when they are all taken; unknown (never looked) means none come yet. `chest` counts the tiles a chest may stand on (absent in rows from before chests were placed here). */
 	sites?: { rat: number; king: number; chest?: number };
 	sitesKey?: string;
 }
@@ -108,10 +108,10 @@ const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, t
 
 const ratThreshold = (bank: TicketBank): number => (bank.ratsMinted === 0 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec);
 
-/** Monsters waiting (rats and the King), placed or not. */
+/** Monsters waiting (normal monsters and the boss), placed or not. */
 const monsterCount = (bank: TicketBank): number => bank.rats.length + (bank.king ? 1 : 0);
 
-/** Whether another rat / the King can come: the map has a tile for it that no waiting monster has taken. */
+/** Whether another normal monster / the boss can come: the map has a tile for it that no waiting monster has taken. */
 const ratSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.rat;
 const kingSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.king;
 
@@ -123,7 +123,7 @@ export interface Minted {
 
 /**
  * Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
- * (shorter with Luck), a rat every 15, the first after 2, a King every 3 hours while none waits), as long as there is room.
+ * (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
  * With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket
  * `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.
  *

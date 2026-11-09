@@ -168,6 +168,7 @@ export const LOOT_POOLS: Record<string, PoolDef> = {
 		minLevels: { potion_greater: 7 },
 		enabled: true,
 	},
+	/** Legacy id: the boss potion pool (named for the Rat King, which is gone). Kept because pool ids can appear in saves. */
 	potions_king: { id: 'potions_king', includeIds: ['potion_minor', 'potion_greater'], quantities: { potion_minor: 2, potion_greater: 1 }, enabled: true },
 	potions_chest: { id: 'potions_chest', includeIds: ['potion_minor', 'potion_greater'], weights: { potion_minor: 60, potion_greater: 25 }, enabled: true },
 };
@@ -207,6 +208,7 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 		generalPoolId: 'general_equipment',
 		bonusTables: [
 			// Bosses own their drops from IDL-44 on (docs/plan/20-monster-families-and-rewards.md)
+			/** `king_legendary` is a legacy id (from the Rat King): it is stored in saves as the pity key `boss:king_legendary`, so it is not renamed. */
 			{
 				id: 'king_legendary',
 				poolId: 'legendary_weapons',

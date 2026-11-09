@@ -58,7 +58,7 @@ test('mitigate: armor 2 turns 4 into 4, armor 40 halves 10 to 5, never below 1',
 	assert.equal(mitigate(4, 0), 4);
 });
 
-test('rat stats: level 1 100 HP, level 9 506 HP, attack grows per level; the King at level 15 is his config', () => {
+test('plains monster stats: level 1 100 HP, level 9 506 HP, attack grows per level; the boss at level 15 is its config', () => {
 	assert.equal(monsterStats('thistleBoar', 1).maxHp, 100);
 	assert.equal(monsterStats('thistleBoar', 9).maxHp, 506);
 	assert.ok(monsterStats('thistleBoar', 9).attack > monsterStats('thistleBoar', 1).attack);

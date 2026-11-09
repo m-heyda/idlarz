@@ -205,7 +205,7 @@ See also: [`fightStep`](combat.md#fightstep), [`estimateWin`](combat.md#estimate
 
 Source: [`src/lib/offline/fightTargets.ts:41`](../../src/lib/offline/fightTargets.ts)
 
-The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the King. One that
+The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the boss. One that
 beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.
 
 Starting a fight.

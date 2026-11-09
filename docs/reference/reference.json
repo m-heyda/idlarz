@@ -135,7 +135,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 194,
+  "line": 195,
   "summary": "Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.",
   "see": []
  },
@@ -146,7 +146,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 259,
+  "line": 261,
   "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
   "see": []
  },
@@ -1413,7 +1413,7 @@
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightTargets.ts",
   "line": 41,
-  "summary": "The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the King. One that beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.",
+  "summary": "The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the boss. One that beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.",
   "see": [
    "engage",
    "queueTicket"
@@ -1575,7 +1575,7 @@
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
   "line": 142,
-  "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a rat every 15, the first after 2, a King every 3 hours while none waits), as long as there is room. With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.",
+  "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.",
   "see": []
  },
  {
