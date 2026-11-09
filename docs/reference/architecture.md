@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [Asset library](#asset-library)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [Asset library](#asset-library), [Sound library](#sound-library)
 
 ## The loop
 
@@ -139,3 +139,14 @@ Registered art keeps its registry id (item icons, monster and resource rosters, 
 get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
 `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
 (`npm run storybook`) and `tests/docs/assets.test.ts` keeps current. Never edit `docs/assets/` by hand.
+
+<a id="sound-library"></a>
+
+### Sound library
+
+Source: [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts)
+
+The sound library: every audio file under `public/` (the game's own mp3s and the CC0 Kenney packs in `public/sfx/`) under one stable name, with its
+duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
+Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
+The game plays only the four `game_*` files (src/utils/audioManager.ts); the Kenney packs are `reuse` until one is wired.

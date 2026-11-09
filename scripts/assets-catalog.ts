@@ -3,12 +3,15 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { join } from 'node:path';
 import { ROOT, buildManifest } from './assets/manifest';
 import { renderAll } from './assets/render';
+import { buildSounds } from './assets/sounds';
+
+const readNames = (): Record<string, string> => JSON.parse(readFileSync(join(ROOT, 'scripts', 'assets', 'names.json'), 'utf8'));
 
 export const OUT = join(ROOT, 'docs', 'assets');
 
 /** Names of files in docs/assets that are out of date (missing, different or stale) */
 export const staleFiles = (): string[] => {
-	const files = renderAll(buildManifest());
+	const files = renderAll(buildManifest(), buildSounds(readNames()));
 	const stale = Object.entries(files)
 		.filter(([n, text]) => !existsSync(join(OUT, n)) || readFileSync(join(OUT, n), 'utf8') !== text)
 		.map(([n]) => n);
@@ -25,7 +28,7 @@ if (require.main === module) {
 		}
 		console.log('docs/assets is up to date');
 	} else {
-		const files = renderAll(buildManifest());
+		const files = renderAll(buildManifest(), buildSounds(readNames()));
 		mkdirSync(OUT, { recursive: true });
 		for (const n of readdirSync(OUT)) if (!(n in files)) rmSync(join(OUT, n));
 		for (const [n, text] of Object.entries(files)) writeFileSync(join(OUT, n), text);

@@ -2360,6 +2360,16 @@
   "see": []
  },
  {
+  "id": "sound-library",
+  "name": "Sound library",
+  "kind": "topic",
+  "category": "Architecture/Art",
+  "file": "scripts/assets/sounds.ts",
+  "line": 1,
+  "summary": "The sound library: every audio file under `public/` (the game's own mp3s and the CC0 Kenney packs in `public/sfx/`) under one stable name, with its duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them. Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`. The game plays only the four `game_*` files (src/utils/audioManager.ts); the Kenney packs are `reuse` until one is wired.",
+  "see": []
+ },
+ {
   "id": "checking-live-saves-before-a-release",
   "name": "Checking live saves before a release",
   "kind": "topic",
