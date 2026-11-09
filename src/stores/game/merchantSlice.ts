@@ -5,7 +5,7 @@ import { MERCHANT_BUYABLE, MERCHANT_RESOURCE_PRICES, MERCHANT_SHOP_ITEMS, MERCHA
 import { RESOURCE_CAP } from '@/config/economy';
 import { calculateResourceRates } from '@/utils/game/income';
 import { buyCost, merchantLevel, merchantUpgradeCost, sellPayout } from '@/utils/game/merchant';
-import { afterRefresh, freeRefreshesLeft, generateMerchantStock, refreshCooldown, refreshCost, shopPriceOf } from '@/lib/merchant';
+import { afterRefresh, bestWornGrade, freeRefreshesLeft, generateMerchantStock, refreshCooldown, refreshCost, shopPriceOf } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { addDrop, averageItemLevel } from '@/lib/inventory';
@@ -106,7 +106,14 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			if (state.resources.gold < cost) return false;
 			set({
 				resources: { ...state.resources, gold: state.resources.gold - cost },
-				merchantStock: generateMerchantStock(castle, averageItemLevel(state.equipment), Math.random, state.playSeconds, limitCtx(state)),
+				merchantStock: generateMerchantStock(
+					castle,
+					averageItemLevel(state.equipment),
+					Math.random,
+					state.playSeconds,
+					limitCtx(state),
+					bestWornGrade(state.equipment),
+				),
 				merchantRefreshes: state.merchantRefreshes + (free ? 0 : 1),
 				merchantRefresh: afterRefresh(state.merchantRefresh, state.playSeconds, free),
 			});

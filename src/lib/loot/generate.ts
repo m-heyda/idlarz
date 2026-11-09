@@ -1,5 +1,6 @@
 import type { BonusTable, ItemLevelDef, LootProfile, RollsDef, SourceLevelDef } from '@/catalog/lootConfig';
 import type { RarityDef } from '@/catalog/rarity';
+import type { Grade } from '@/catalog/items/grades';
 import { MAX_ITEM_LEVEL, clampItemLevel } from '@/catalog/stats';
 import { affixFits } from '@/lib/itemInstance';
 import { LUCK } from '@/config/spawns';
@@ -23,6 +24,8 @@ export interface LootRequest {
 	castleLevel?: number;
 	/** No item rolled for this request gets a higher item level than this (the merchant's shelf is held to the player's gear) */
 	maxItemLevel?: number;
+	/** No gear rolled for this request is of a higher ladder grade (the merchant never sells above the best grade the player wears) */
+	maxGrade?: Grade;
 	/** Base item ids the player already has (bag + worn), for tables that prefer missing pieces */
 	owned?: readonly string[];
 	/** Bad-luck counters from the save, by `profile:table` */
@@ -141,7 +144,7 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 	const { data, profile } = ctx;
 	const trace = baseTrace(ctx, table, poolId, itemLevel);
 	ctx.trace.push(trace);
-	const all = eligibleCandidates(data, poolId, itemLevel);
+	const all = eligibleCandidates(data, poolId, itemLevel, ctx.req.maxGrade);
 
 	const byRarity: Record<string, Candidate[]> = {};
 	const weights: { id: string; weight: number }[] = [];

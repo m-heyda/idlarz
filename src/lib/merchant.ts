@@ -1,10 +1,12 @@
+import { GRADES, GRADE_INFO, gradeOfItem, type Grade } from '@/catalog/items/grades';
+import { ITEM_CATALOG } from '@/catalog';
 import { MERCHANT_GOODS } from '@/config/merchant';
 import { LOOT_SOURCES } from '@/catalog/lootConfig';
 import { limitOf, type LimitContext } from '@/lib/limits';
 import { generateLoot, resolveSourceLevel } from '@/lib/loot';
 import { sellValueOf } from '@/lib/itemInstance';
 import { mulberry32, type Rng } from '@/lib/rng';
-import type { ItemInstance, MerchantRefresh, MerchantStock } from '@/types/game';
+import type { Equipment, ItemInstance, MerchantRefresh, MerchantStock } from '@/types/game';
 
 // The merchant's shuffling goods: a few pieces of gear rolled by the shared loot pipeline (source `merchant`), refreshed on a
 // timer of play time or for gold. Pure; the store applies the results and saves the stock (the price is derived, never stored).
@@ -36,19 +38,44 @@ export const afterRefresh = (refresh: MerchantRefresh, playSeconds: number, free
 };
 
 /**
- * The item level the goods are built around and the one they may never pass. The world (castle) level sets how far the shelf can
- * go; the gear the player wears (its average item level) holds it down, so it never sells much better than what is already worn.
+ * The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). The shelf never sells above it:
+ * the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).
  */
-export const shelfLevels = (castleLevel: number, averageLevel: number): { centre: number; max: number } => {
-	const worn = Math.max(1, Math.round(averageLevel));
-	const world = resolveSourceLevel(LOOT_SOURCES.merchant.level!, castleLevel);
-	return { centre: Math.min(world, worn + MERCHANT_GOODS.centreAboveAverage), max: worn + MERCHANT_GOODS.maxAboveAverage };
+export const bestWornGrade = (equipment: Equipment): Grade => {
+	let best = 0;
+	for (const item of Object.values(equipment)) {
+		const grade = item ? gradeOfItem(ITEM_CATALOG[item.base] ?? {}) : undefined;
+		if (grade) best = Math.max(best, GRADES.indexOf(grade));
+	}
+	return GRADES[best];
 };
 
-/** A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. */
-export const generateMerchantStock = (castleLevel: number, averageLevel: number, rng: Rng, playSeconds: number, ctx: LimitContext = {}): MerchantStock => {
-	const { centre, max } = shelfLevels(castleLevel, averageLevel);
-	const result = generateLoot({ sourceId: 'merchant', castleLevel, level: centre, maxItemLevel: max }, rng);
+/**
+ * The item level the goods are built around and the one they may never pass. The world (castle) level sets how far the shelf can
+ * go; the gear the player wears (its average item level) holds it down, so it never sells much better than what is already worn.
+ * With a `grade` the shelf is also held inside that grade's item level window (a grade has no items above it).
+ */
+export const shelfLevels = (castleLevel: number, averageLevel: number, grade?: Grade): { centre: number; max: number } => {
+	const worn = Math.max(1, Math.round(averageLevel));
+	const world = resolveSourceLevel(LOOT_SOURCES.merchant.level!, castleLevel);
+	const top = grade ? GRADE_INFO[grade].levels[1] : Infinity;
+	return { centre: Math.min(world, worn + MERCHANT_GOODS.centreAboveAverage, top), max: Math.min(worn + MERCHANT_GOODS.maxAboveAverage, top) };
+};
+
+/**
+ * A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made.
+ * `grade` is the best grade the player wears (`bestWornGrade`): nothing above it is on the shelf. Pure, so the server can take it as is.
+ */
+export const generateMerchantStock = (
+	castleLevel: number,
+	averageLevel: number,
+	rng: Rng,
+	playSeconds: number,
+	ctx: LimitContext = {},
+	grade?: Grade,
+): MerchantStock => {
+	const { centre, max } = shelfLevels(castleLevel, averageLevel, grade);
+	const result = generateLoot({ sourceId: 'merchant', castleLevel, level: centre, maxItemLevel: max, maxGrade: grade }, rng);
 	if (result.warnings.length) console.warn('[loot]', ...result.warnings);
 	const offers = result.drops.flatMap((drop) => (drop.kind === 'gear' ? [drop.item] : []));
 	return { at: playSeconds, offers: offers.slice(0, limitOf('merchantOffers', ctx)) };

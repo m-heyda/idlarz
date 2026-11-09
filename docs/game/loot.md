@@ -4,6 +4,7 @@
 
 - **A base item**: add `gear(id, name, slot, rarity, stats, { tier, ... })` to a file in `src/catalog/items/`. Its stats are authored at the first level of its tier's window (`LEVEL_WINDOW_BY_TIER`). It joins the general pool automatically (tags `gear`, not `named`). Register its icon as one line in `src/config/itemIcons/<slot>.json` if it has art (see its README).
 - **A named item** (fixed identity and rarity): same builder with `named: true, pools: ['some_pool']`, then put the pool in a profile's `bonusTables`.
+- **A biome's grade ceiling**: normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`, `BIOME_LOOT` in `src/catalog/lootConfig.ts`): ladder grades up to the biome's ceiling (plains G3, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade. Pieces with no `grade:` tag (the legacy wooden, cloth, steel, obsidian items) are in every pool. The merchant's shelf passes `maxGrade` = the best grade the player wears (`bestWornGrade`, `src/lib/merchant.ts`).
 - **An affix**: one row in `src/catalog/affixes.ts` (`pair(...)` makes a prefix and a suffix of a stat).
 - **A rarity**: one row in `RARITIES`, then a weight for it in each profile that should drop it, and `allowedRarities` already includes every rarity key for bases. No generator change (`tests/loot/lootGenerate.test.ts` proves it with a fake rarity).
 - **A profile / source** (elite monster, premium chest): add the profile and a `LOOT_SOURCES` entry, then point the monster or chest at it.

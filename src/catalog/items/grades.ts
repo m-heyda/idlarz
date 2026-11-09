@@ -39,3 +39,16 @@ export const GRADE_INFO: Record<Grade, GradeInfo> = {
  * biomes that hand them out exist. Enabling the next grade is adding it here; the loot pools select by the `grade:` tag, never by id.
  */
 export const LIVE_GRADES: readonly Grade[] = ['G1', 'G2', 'G3'];
+
+/** The grade an item belongs to, read from its `grade:G3` tag (undefined for the pieces outside the ladder) */
+export const gradeOfItem = (item: { tags?: readonly string[] }): Grade | undefined => {
+	const tag = item.tags?.find((t) => t.startsWith('grade:'));
+	const grade = tag?.slice('grade:'.length);
+	return GRADES.find((g) => g === grade);
+};
+
+/** Whether an item is at most `maxGrade`; an item outside the ladder has no grade and passes. */
+export const gradeAllowed = (item: { tags?: readonly string[] }, maxGrade: Grade): boolean => {
+	const grade = gradeOfItem(item);
+	return !grade || GRADES.indexOf(grade) <= GRADES.indexOf(maxGrade);
+};
