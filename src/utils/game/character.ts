@@ -82,8 +82,10 @@ export const getStatDescriptionGroups = (stat: keyof Omit<CharacterStats, 'avail
  * xp(k) = 45 x 1.02^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
  */
 export const calculateXpGain = (ownedTiles: number): number => {
-	// Basic XP gain increases with the number of tiles owned: each tile contributes XP that grows slightly with more tiles.
-	// Up to XP_TILE.growthUntil tiles that is exponential (1.02 per tile); beyond it a polynomial tail keeps it finite.
+	/**
+	 * Basic XP gain increases with the number of tiles owned: each tile contributes XP that grows slightly with more tiles.
+	 * Up to XP_TILE.growthUntil tiles that is exponential (1.02 per tile); beyond it a polynomial tail keeps it finite.
+	 */
 	const k = Math.min(ownedTiles, XP_TILE.growthUntil);
 	const xp = BASE_XP_PER_TILE * Math.pow(XP_TILE.growth, k - 1) * (k / 4);
 	return ownedTiles > XP_TILE.growthUntil ? xp * Math.pow(ownedTiles / XP_TILE.growthUntil, XP_TILE.tailExponent) : xp;

@@ -168,7 +168,7 @@ and a changed system clock can neither skip nor reverse time. Away time is not c
 <p>The most any stockpile (XP included) can hold; a save above it is refused by <code>sanitizeSave</code>. Raised to 1e21 so a map of tens of thousands of tiles stays buyable.</p>
 </article><article><p><a id="initial-resources"></a></p>
 <h3><code>INITIAL_RESOURCES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:142</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:148</code></a></p>
 <p>What a new game starts with: 125 gold (and <a href="#starting-gems"><code>STARTING_GEMS</code></a> gems).</p>
 </article><h2>Income</h2><article><p><a id="calculateresourcebreakdown"></a></p>
 <h3><code>calculateResourceBreakdown</code> <small>function</small></h3>
@@ -200,17 +200,17 @@ total[r] = base[r] x (1 + modifier[r])
 <p>Neighbour bonus: +25% per same-biome 4-neighbour (<code>SCALING_CONFIG.adjacencyBonus</code>). A tile inside the castle range also gets the castle area bonus (<a href="#castleareabonus"><code>castleAreaBonus</code></a>).</p>
 </article><article><p><a id="biome-yield"></a></p>
 <h3><code>BIOME_YIELD</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:135</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:141</code></a></p>
 <p>Biome and building output is multiplied by <code>scale</code> (1.3). The castle tile&#39;s own output and the base rates are not scaled.</p>
 <p>See also: <a href="#calculatetileoutput"><code>calculateTileOutput</code></a></p>
 </article><article><p><a id="base-generation-rates"></a></p>
 <h3><code>BASE_GENERATION_RATES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:152</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:158</code></a></p>
 <p>Income of the realm itself, per second, before any tile: gold 0.1 and XP 0.25. Meat, eggs, milk and hide are 0 here: they come from the farm alone.</p>
 <p>See also: <a href="#calculateresourcebreakdown"><code>calculateResourceBreakdown</code></a></p>
 </article><h2>Tiles</h2><article><p><a id="tileprice"></a></p>
 <h3><code>tilePrice</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:100</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:106</code></a></p>
 <p>Gold price of the next tile when <code>ownedTiles</code> are owned, before discounts: the three exponential stages of SCALING_CONFIG
 up to TILE_PRICE.tailFrom, then the polynomial tail, never above TILE_PRICE.ceiling. Always finite.</p>
 <p>Buying a tile: a tile can be bought when it touches an owned tile on one of its four sides and the whole bundle is paid.</p>
@@ -285,7 +285,7 @@ ceiling  = RESOURCE_CAP / 100
 <p>See also: <a href="#calculatetilecost"><code>calculateTileCost</code></a>, <a href="#tile-resource-cost"><code>TILE_RESOURCE_COST</code></a>, <a href="#economytiles"><code>economyTiles</code></a></p>
 </article><article><p><a id="tile-resource-cost"></a></p>
 <h3><code>TILE_RESOURCE_COST</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:120</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:126</code></a></p>
 <p>Extra resources a tile purchase costs: from the tile count shown, the price also asks for a share of the gold price. Hide is the late one, because milk and eggs are kept for other uses.</p>
 <p><strong>Extra resources per tile purchase (share of the gold price)</strong> <em>(computed from the code)</em></p>
 <table>
@@ -374,7 +374,7 @@ capped at 90%; a lone tile joins a neighbour with <code>buddyPct</code> 100.</li
 </ul>
 </article><article><p><a id="biomes"></a></p>
 <h3><code>BIOMES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/biomes.ts"><code>src/config/biomes.ts:28</code></a></p>
+<p>Source: <a href="../../src/config/biomes.ts"><code>src/config/biomes.ts:30</code></a></p>
 <p>Every biome with its config output per second. Multiply by <code>BIOME_YIELD.scale</code> (1.3) for what a tile really makes; the castle is not scaled.</p>
 <p><strong>Config output per second (x BIOME_YIELD.scale for a real tile)</strong> <em>(computed from the code)</em></p>
 <table>
@@ -587,7 +587,7 @@ cost[r]       = floor(min(base[r] x factor x (1 - Thrift), RESOURCE_CAP / 100))
 <p>The building price constants: base cost 500 gold / 250 wood / 150 stone, the four cheap starter steps, the three growth stages (1.15 for 12 buildings, 1.09 for 16, 1.025 after) and the biomes a building cannot stand on.</p>
 </article><h2>Castle</h2><article><p><a id="castle-upgrade"></a></p>
 <h3><code>CASTLE_UPGRADE</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:60</code></a></p>
+<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:62</code></a></p>
 <p>The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.</p>
 <ul>
 <li><strong>Modifier</strong> added to every resource: see <a href="#castlemodifier"><code>castleModifier</code></a>. <strong>Flat XP</strong>: +0.5 xp/s per level above 1 (<code>xpBonus</code>).</li>
@@ -707,16 +707,16 @@ level up to <code>doublingUntil</code>, then a fixed step per level (so levels 7
 </code></pre>
 </article><article><p><a id="castle-range"></a></p>
 <h3><code>CASTLE_RANGE</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:22</code></a></p>
+<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:24</code></a></p>
 <p>The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it grows one tile per level: 5x5 at 8, 7x7 at 9, 9x9 at 10 (<a href="#castlerangeradius"><code>castleRangeRadius</code></a>).</p>
 </article><article><p><a id="castle-area-bonus"></a></p>
 <h3><code>CASTLE_AREA_BONUS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:34</code></a></p>
+<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:36</code></a></p>
 <p>Area bonus: tiles in range (and their buildings) make extra output, +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10)
 (<a href="#castleareabonus"><code>castleAreaBonus</code></a>). It is part of the base income, so the modifiers apply on top.</p>
 </article><article><p><a id="castle-fortress"></a></p>
 <h3><code>CASTLE_FORTRESS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:44</code></a></p>
+<p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:46</code></a></p>
 <p>The ward: from castle level 7 the 3x3 around the castle is a walled fortress, no monsters or chests spawn there and monsters standing in it are driven out (<code>isInWard</code>, <code>wardTiles</code>).</p>
 </article><article><p><a id="castlerangeradius"></a></p>
 <h3><code>castleRangeRadius</code> <small>function</small></h3>
@@ -789,7 +789,7 @@ product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery effe
 </code></pre>
 </article><article><p><a id="farm-upgrades"></a></p>
 <h3><code>FARM_UPGRADES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/farm.ts"><code>src/config/farm.ts:79</code></a></p>
+<p>Source: <a href="../../src/config/farm.ts"><code>src/config/farm.ts:81</code></a></p>
 <p>Farm upgrades: the cost of level N+1 is <code>ceil(base x growth^N)</code> per resource (<a href="#farmupgradecost"><code>farmUpgradeCost</code></a>). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9);
 the others have 10 levels and growth 1.6.</p>
 <p><strong>Farm upgrades</strong> <em>(computed from the code)</em></p>
@@ -921,7 +921,7 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 </tbody></table>
 </article><article><p><a id="merchant-goods"></a></p>
 <h3><code>MERCHANT_GOODS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:189</code></a></p>
+<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:193</code></a></p>
 <p>The goods shelf and its refresh rules (<a href="#generatemerchantstock"><code>generateMerchantStock</code></a>). Potions are always in stock at their catalog <code>shop</code> price (<code>MERCHANT_SHOP_ITEMS</code>).</p>
 <ul>
 <li><strong>Shelf</strong>: 6 pieces of gear (<code>LIMITS.merchantOffers</code>) from the loot source <code>merchant</code> (common 60 / uncommon 40, see <a href="#generateloot"><code>generateLoot</code></a>), item level centred at most 3 above the average worn item
@@ -932,7 +932,7 @@ The count is never reset, not even by a rebirth.</li>
 </ul>
 </article><article><p><a id="merchant-upgrades"></a></p>
 <h3><code>MERCHANT_UPGRADES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:41</code></a></p>
+<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:43</code></a></p>
 <p>Merchant upgrades are bought with gold; the cost of level N+1 is <code>ceil(baseCost x growth^N)</code> (<a href="#merchantupgradecost"><code>merchantUpgradeCost</code></a>). All but Pack Rat start again on a rebirth.</p>
 <p><strong>Merchant upgrades</strong> <em>(computed from the code)</em></p>
 <table>
@@ -1076,7 +1076,7 @@ The count is never reset, not even by a rebirth.</li>
 </code></pre>
 </article><article><p><a id="merchant-buy-multiplier"></a></p>
 <h3><code>MERCHANT_BUY_MULTIPLIER</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:217</code></a></p>
+<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:221</code></a></p>
 <p>The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).</p>
 </article><article><p><a id="merchantupgradecost"></a></p>
 <h3><code>merchantUpgradeCost</code> <small>function</small></h3>
@@ -1112,7 +1112,7 @@ The count is never reset, not even by a rebirth.</li>
 the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).</p>
 </article><h2>Clicks</h2><article><p><a id="click-ladder"></a></p>
 <h3><code>CLICK_LADDER</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:164</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:170</code></a></p>
 <p>Clicking: a trusted click on the map pays <code>max(gold/s x power, floor) x multiplier</code> (<a href="#clickgold"><code>clickGold</code></a>). The multiplier is Click Mastery (+25% gold per Ember shop level) and the set&#39;s Click Gold %.
 The ladder is bought from the merchant. Clicking a tile or building pays nothing else.</p>
 <p><strong>Click ladder</strong> <em>(computed from the code)</em></p>
@@ -1152,12 +1152,12 @@ The ladder is bought from the merchant. Clicking a tile or building pays nothing
 </tbody></table>
 </article><article><p><a id="click-limit"></a></p>
 <h3><code>CLICK_LIMIT</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:197</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:203</code></a></p>
 <p>The click rate limit: two token buckets, a click needs a token from both. Burst: 8 clicks refilling 5 per second; stamina: 20,000 clicks refilling 1.5 per second (about 130K paid clicks a day,
 so an auto-clicker is no better than a very dedicated human). Script-dispatched clicks do not pay (<code>requireTrusted</code>). Implementation: <a href="#createclicklimiter"><code>createClickLimiter</code></a>.</p>
 </article><article><p><a id="clickgold"></a></p>
 <h3><code>clickGold</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:180</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:186</code></a></p>
 <p>Gold of one click at a ladder level: gold/s x power (at least the level&#39;s floor), then the multipliers (Click Mastery, set bonus).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">gold per click = max(gold/s x power, floor) x multiplier        power and floor from CLICK_LADDER[click level]
@@ -1169,7 +1169,7 @@ so an auto-clicker is no better than a very dedicated human). Script-dispatched 
 <p>Creates the click rate limiter: two token buckets (burst and stamina, see <a href="#click-limit"><code>CLICK_LIMIT</code></a>); a click is paid only if it can take a token from both. The click&#39;s event id makes one physical click cost one token.</p>
 </article><h2>Chests and Luck</h2><article><p><a id="chest"></a></p>
 <h3><code>CHEST</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/spawns.ts"><code>src/config/spawns.ts:32</code></a></p>
+<p>Source: <a href="../../src/config/spawns.ts"><code>src/config/spawns.ts:34</code></a></p>
 <p>Chests. The server mints and places them (see <a href="#ticketcap"><code>ticketCap</code></a> and <a href="#advancebank"><code>advanceBank</code></a>); data is <code>CHEST</code>, <code>LUCK</code> and <code>SPAWN_LIMIT</code> in <code>src/config/spawns.ts</code>, rolls are in <code>src/lib/chests.ts</code> and <code>src/lib/luck.ts</code>.</p>
 <ul>
 <li><strong>Timer</strong>: one chest ticket every 600 s of server time, faster with Luck (<a href="#chestintervalsec"><code>chestIntervalSec</code></a>).</li>
@@ -1190,7 +1190,7 @@ so an auto-clicker is no better than a very dedicated human). Script-dispatched 
 </code></pre>
 </article><article><p><a id="luck"></a></p>
 <h3><code>LUCK</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/spawns.ts"><code>src/config/spawns.ts:72</code></a></p>
+<p>Source: <a href="../../src/config/spawns.ts"><code>src/config/spawns.ts:74</code></a></p>
 <p>Luck = Charisma + Lucky Charm + gear Luck. Other effects (<code>LUCK</code>):</p>
 <ul>
 <li>rare-and-better rarity weights x <code>min(1.6, 1 + 0.004 x Luck)</code> (<a href="#rarityluckmultiplier"><code>rarityLuckMultiplier</code></a>);</li>
@@ -1541,7 +1541,7 @@ The browser polls every 2 s with the combat panel open, 8 s minimised or hidden 
 <p>The longest gap the server treats as the same session: past it an online call is refused with <code>claim_first</code>, and the hero rests (heals fully) through the gap. The client uses the same number, so the picture never jumps back.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-monsters">Monsters</h2><p class="blurb">The roster, levels, growth, spawning and what a kill pays.</p><h2>Roster</h2><article><p><a id="monsters"></a></p>
 <h3><code>MONSTERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:347</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:349</code></a></p>
 <p>The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its <code>spawn.biomes</code>).
 Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a href="#monsterstats"><code>monsterStats</code></a>; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.</p>
 <ul>
@@ -2248,7 +2248,7 @@ The soft cap level is 80 (<code>softCapLevel</code>, informational). Retune the 
 <p>See also: <a href="#xptonextlevel"><code>xpToNextLevel</code></a>, <a href="#totalstatpoints"><code>totalStatPoints</code></a></p>
 </article><article><p><a id="xptonextlevel"></a></p>
 <h3><code>xpToNextLevel</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:184</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:186</code></a></p>
 <p>XP to go from <code>level</code> to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config);
 everything that shows or checks a level threshold uses this.</p>
 <p><strong>Formula</strong></p>
@@ -2257,7 +2257,7 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 </code></pre>
 </article><article><p><a id="totalstatpoints"></a></p>
 <h3><code>totalStatPoints</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:149</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:151</code></a></p>
 <p>The attribute points a character that has reached <code>level</code> has earned in all (a level gives 1; the early levels give extra, see LEVELING).</p>
 <p><code>reconcileCharacter</code> hands every point back when a character holds more than its level has earned.</p>
 <p><strong>Formula</strong></p>
@@ -2295,15 +2295,15 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 <p>See also: <a href="#reconcilecharacter"><code>reconcileCharacter</code></a></p>
 </article><article><p><a id="cumulativexp"></a></p>
 <h3><code>cumulativeXp</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:196</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:198</code></a></p>
 <p>The total XP at which <code>level</code> is reached (level 1 is 0).</p>
 </article><article><p><a id="calculatelevel"></a></p>
 <h3><code>calculateLevel</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:208</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:210</code></a></p>
 <p>Level from total XP: each level needs more than the one before (see <code>xpToNextLevel</code>), up to MAX_LEVEL, where the bar is full.</p>
 </article><article><p><a id="reconcilecharacter"></a></p>
 <h3><code>reconcileCharacter</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:164</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:166</code></a></p>
 <p>Puts a character&#39;s attributes in line with an XP total: when more points are spent (and left to spend) than that XP&#39;s level has earned
 (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every
 point the level has earned is left to spend again. A character that is within its points is returned as it is.</p>
@@ -2349,14 +2349,14 @@ point the level has earned is left to spend again. A character that is within it
 <p>See also: <a href="#calculatestatresourcemodifiers"><code>calculateStatResourceModifiers</code></a>, <a href="#calculatecombatstats"><code>calculateCombatStats</code></a></p>
 </article><article><p><a id="calculatestatresourcemodifiers"></a></p>
 <h3><code>calculateStatResourceModifiers</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:232</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:234</code></a></p>
 <p>What the five attributes add to the income modifier of each resource (all points count, not only those above 5).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">modifier[r] += 0.025 per attribute point on each resource the attribute feeds; xp: +0.2% (Int) / +0.25% (Cha) per point
 </code></pre>
 </article><article><p><a id="calculatecombatstats"></a></p>
 <h3><code>calculateCombatStats</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:265</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:267</code></a></p>
 <p>The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.</p>
 </article><h2>Rebirth</h2><article><p><a id="rebirth"></a></p>
 <h3><code>REBIRTH</code> <small>const</small></h3>
@@ -2650,7 +2650,7 @@ Steward and set bonuses the away efficiency). <code>HARD_LIMITS</code> is the mo
 </code></pre>
 </article><h2>Gems</h2><article><p><a id="starting-gems"></a></p>
 <h3><code>STARTING_GEMS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:213</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:219</code></a></p>
 <p>Gems every player starts with (also granted to saves from before Gems existed).</p>
 <p>Gems: premium currency, not part of <code>Resources</code>. Every player starts with 1,000 (also saves from before gems existed), the cap is 1e9 (<code>GEMS_CAP</code>), a rebirth keeps them and nothing spends them yet.
 The only gem source is the chest bonus roll. The server&#39;s ledger holds the real balance, an upload can never raise it.</p>
@@ -3317,7 +3317,7 @@ Gold must stay the biggest number; if hide or stone becomes the limiter, adjust 
 <p>See also: <a href="#magnitude-bands"><code>MAGNITUDE_BANDS</code></a>, <a href="#castle-upgrade"><code>CASTLE_UPGRADE</code></a></p>
 </article><h2>Magnitude targets</h2><article><p><a id="magnitude-bands"></a></p>
 <h3><code>MAGNITUDE_BANDS</code> <small>const</small></h3>
-<p>Source: <a href="../../scripts/sim.ts"><code>scripts/sim.ts:790</code></a></p>
+<p>Source: <a href="../../scripts/sim.ts"><code>scripts/sim.ts:792</code></a></p>
 <p>The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.</p>
 <p>Magnitude targets (decided 2026-11-07, IDL-128): measured with the real store (<code>casual</code>, trace to day 16; <code>human-rebirth8</code>, <code>hardcore-rebirth6-x10</code>) and set as the design ceiling every cap decision is checked against.
 &quot;Income multiplier&quot; is total income at castle 10 relative to run 1 at castle 10, all sources together (Embers, gear, Idols, Monument, Paragon). The bands are the constants below: they are the only copy, the sim prints them next to the measured value

@@ -49,8 +49,10 @@ const owned = () => page.evaluate(() => (window as unknown as GameWindow).__game
 const gold = () => page.evaluate(() => (window as unknown as GameWindow).__game!.getState().resources.gold);
 
 test('sign in as the test account', async () => {
-	// E2E_TEST_PASSWORD (git-ignored .env.local) signs in through the app's own login route; without it a person signs in by hand.
-	// E2E_MANUAL_LOGIN=1 forces the by-hand path even when the password is set.
+	/**
+	 * E2E_TEST_PASSWORD (git-ignored .env.local) signs in through the app's own login route; without it a person signs in by hand.
+	 * E2E_MANUAL_LOGIN=1 forces the by-hand path even when the password is set.
+	 */
 	const password = process.env.E2E_MANUAL_LOGIN ? '' : (process.env.E2E_TEST_PASSWORD ?? '');
 	if (password) {
 		const login = await page.request.post('/api/auth/login', { data: { email: TEST_ACCOUNT_EMAIL, password } });

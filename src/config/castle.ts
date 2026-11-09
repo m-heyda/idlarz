@@ -2,8 +2,10 @@
 // Part of the former gameConfig.ts (split in IDL-15); the values are unchanged.
 import { amounts } from '@/catalog/resourceKeys';
 
-// Map. The map itself is unbounded (utils/world.ts): there is no grid size. The castle stays at its logical position, so
-// old saves and the procedural art (which hashes absolute coordinates) are unchanged.
+/**
+ * Map. The map itself is unbounded (utils/world.ts): there is no grid size. The castle stays at its logical position, so
+ * old saves and the procedural art (which hashes absolute coordinates) are unchanged.
+ */
 export const CASTLE_X = 25;
 export const CASTLE_Y = 25;
 

@@ -51,7 +51,7 @@ See also: [`MAGNITUDE_BANDS`](pacing.md#magnitude-bands), [`CASTLE_UPGRADE`](eco
 
 ### `MAGNITUDE_BANDS` <small>const</small>
 
-Source: [`scripts/sim.ts:790`](../../scripts/sim.ts)
+Source: [`scripts/sim.ts:792`](../../scripts/sim.ts)
 
 The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.
 

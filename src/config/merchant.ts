@@ -20,11 +20,13 @@ export const MERCHANT_RESOURCE_PRICES = fromResources(
 	(key) => (RESOURCES[key] as { merchant: { price: number } }).merchant.price,
 ) as { [K in MerchantResourceKey]: number };
 
-// Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
-// starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
-// They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
-// ladders together cost over a billion; tests/economy/merchantUpgrades.test.ts keeps it that way) and are bought over several runs.
-// `group` only decides the heading of the card in the Upgrades tab.
+/**
+ * Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
+ * starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
+ * They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
+ * ladders together cost over a billion; tests/economy/merchantUpgrades.test.ts keeps it that way) and are bought over several runs.
+ * `group` only decides the heading of the card in the Upgrades tab.
+ */
 export const MERCHANT_UPGRADE_GROUPS = {
 	economy: 'Economy',
 	combat: 'Combat',
@@ -169,8 +171,10 @@ export const MERCHANT_UPGRADES = {
 
 export type MerchantUpgradeId = keyof typeof MERCHANT_UPGRADES;
 
-// Supplies (potions) the merchant always sells, each at its own `shop` price in the catalog. Every price is at least 3x the item's
-// sell value (x1.3 for a maxed Haggler), so buying and selling can never print gold: tests/economy/merchantShop.test.ts checks every entry.
+/**
+ * Supplies (potions) the merchant always sells, each at its own `shop` price in the catalog. Every price is at least 3x the item's
+ * sell value (x1.3 for a maxed Haggler), so buying and selling can never print gold: tests/economy/merchantShop.test.ts checks every entry.
+ */
 export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems();
 
 // The merchant's shuffling goods (Goods tab): pieces of gear rolled by the loot pipeline (source `merchant`, see lootConfig).

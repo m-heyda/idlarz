@@ -535,8 +535,10 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		byName[key] = Object.fromEntries(Object.entries(need).map(([r, v]) => [r, rate[r] > 0 ? Math.round(Math.max(0, v - stock[r]) / rate[r] / 60) : Infinity]));
 	};
 
-	// Fights (profile.combat): the server spawns a rat every COMBAT.spawn.intervalSec and a Rat King every bossIntervalSec, and
-	// auto-battle fights them while the player plays. A monster waits, growing a level per growth interval, until it is fought.
+	/**
+	 * Fights (profile.combat): the server spawns a rat every COMBAT.spawn.intervalSec and a Rat King every bossIntervalSec, and
+	 * auto-battle fights them while the player plays. A monster waits, growing a level per growth interval, until it is fought.
+	 */
 	const spawn = combatCfg.COMBAT.spawn;
 	let nextRatAt = 0;
 	let nextKingAt = spawn.bossIntervalSec;

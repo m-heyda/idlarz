@@ -53,13 +53,15 @@ export const ANIMALS: Animal[] = [
 	},
 ];
 
-// The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
-// once sold). Products were 50 % slower (and their upgrade bonuses 33 % smaller) until the second-tier resources felt too
-// slow to earn; the merchant prices were lowered by the same factor, so a product still sells for the same share of its
-// animal's meat and gold income is unchanged: the products themselves, and what they unlock, come faster.
-// Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
-// Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
-// then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
+/**
+ * The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
+ * once sold). Products were 50 % slower (and their upgrade bonuses 33 % smaller) until the second-tier resources felt too
+ * slow to earn; the merchant prices were lowered by the same factor, so a product still sells for the same share of its
+ * animal's meat and gold income is unchanged: the products themselves, and what they unlock, come faster.
+ * Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
+ * Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
+ * then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
+ */
 export const FARM = {
 	baseCap: 12, // animals of one kind the pen holds before it is expanded
 	unitsDrawn: 8, // most sprites drawn per kind in the pen (the animal panel shows the real count)

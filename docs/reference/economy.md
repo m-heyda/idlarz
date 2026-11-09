@@ -70,7 +70,7 @@ The most any stockpile (XP included) can hold; a save above it is refused by `sa
 
 ### `INITIAL_RESOURCES` <small>const</small>
 
-Source: [`src/config/economy.ts:142`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:148`](../../src/config/economy.ts)
 
 What a new game starts with: 125 gold (and [`STARTING_GEMS`](progression.md#starting-gems) gems).
 
@@ -122,7 +122,7 @@ Neighbour bonus: +25% per same-biome 4-neighbour (`SCALING_CONFIG.adjacencyBonus
 
 ### `BIOME_YIELD` <small>const</small>
 
-Source: [`src/config/economy.ts:135`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:141`](../../src/config/economy.ts)
 
 Biome and building output is multiplied by `scale` (1.3). The castle tile's own output and the base rates are not scaled.
 
@@ -132,7 +132,7 @@ See also: [`calculateTileOutput`](economy.md#calculatetileoutput)
 
 ### `BASE_GENERATION_RATES` <small>const</small>
 
-Source: [`src/config/economy.ts:152`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:158`](../../src/config/economy.ts)
 
 Income of the realm itself, per second, before any tile: gold 0.1 and XP 0.25. Meat, eggs, milk and hide are 0 here: they come from the farm alone.
 
@@ -144,7 +144,7 @@ See also: [`calculateResourceBreakdown`](economy.md#calculateresourcebreakdown)
 
 ### `tilePrice` <small>function</small>
 
-Source: [`src/config/economy.ts:100`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:106`](../../src/config/economy.ts)
 
 Gold price of the next tile when `ownedTiles` are owned, before discounts: the three exponential stages of SCALING_CONFIG
 up to TILE_PRICE.tailFrom, then the polynomial tail, never above TILE_PRICE.ceiling. Always finite.
@@ -184,7 +184,7 @@ See also: [`calculateTileCost`](economy.md#calculatetilecost), [`TILE_RESOURCE_C
 
 ### `TILE_RESOURCE_COST` <small>const</small>
 
-Source: [`src/config/economy.ts:120`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:126`](../../src/config/economy.ts)
 
 Extra resources a tile purchase costs: from the tile count shown, the price also asks for a share of the gold price. Hide is the late one, because milk and eggs are kept for other uses.
 
@@ -287,7 +287,7 @@ Which biome a purchase becomes is **rolled when you buy; there is no picker**. R
 
 ### `BIOMES` <small>const</small>
 
-Source: [`src/config/biomes.ts:28`](../../src/config/biomes.ts)
+Source: [`src/config/biomes.ts:30`](../../src/config/biomes.ts)
 
 Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.
 
@@ -406,7 +406,7 @@ The building price constants: base cost 500 gold / 250 wood / 150 stone, the fou
 
 ### `CASTLE_UPGRADE` <small>const</small>
 
-Source: [`src/config/castle.ts:60`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:62`](../../src/config/castle.ts)
 
 The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.
 
@@ -466,7 +466,7 @@ seconds = floor(durationsSec[fromLevel - 1] x (1 - 0.05 x Master Builders level)
 
 ### `CASTLE_RANGE` <small>const</small>
 
-Source: [`src/config/castle.ts:22`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:24`](../../src/config/castle.ts)
 
 The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it grows one tile per level: 5x5 at 8, 7x7 at 9, 9x9 at 10 ([`castleRangeRadius`](economy.md#castlerangeradius)).
 
@@ -474,7 +474,7 @@ The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it gr
 
 ### `CASTLE_AREA_BONUS` <small>const</small>
 
-Source: [`src/config/castle.ts:34`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:36`](../../src/config/castle.ts)
 
 Area bonus: tiles in range (and their buildings) make extra output, +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10)
 ([`castleAreaBonus`](economy.md#castleareabonus)). It is part of the base income, so the modifiers apply on top.
@@ -483,7 +483,7 @@ Area bonus: tiles in range (and their buildings) make extra output, +50% below l
 
 ### `CASTLE_FORTRESS` <small>const</small>
 
-Source: [`src/config/castle.ts:44`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:46`](../../src/config/castle.ts)
 
 The ward: from castle level 7 the 3x3 around the castle is a walled fortress, no monsters or chests spawn there and monsters standing in it are driven out (`isInWard`, `wardTiles`).
 
@@ -558,7 +558,7 @@ product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery effe
 
 ### `FARM_UPGRADES` <small>const</small>
 
-Source: [`src/config/farm.ts:79`](../../src/config/farm.ts)
+Source: [`src/config/farm.ts:81`](../../src/config/farm.ts)
 
 Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ([`farmUpgradeCost`](economy.md#farmupgradecost)). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9);
 the others have 10 levels and growth 1.6.
@@ -638,7 +638,7 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 
 ### `MERCHANT_GOODS` <small>const</small>
 
-Source: [`src/config/merchant.ts:189`](../../src/config/merchant.ts)
+Source: [`src/config/merchant.ts:193`](../../src/config/merchant.ts)
 
 The goods shelf and its refresh rules ([`generateMerchantStock`](economy.md#generatemerchantstock)). Potions are always in stock at their catalog `shop` price (`MERCHANT_SHOP_ITEMS`).
 
@@ -652,7 +652,7 @@ The goods shelf and its refresh rules ([`generateMerchantStock`](economy.md#gene
 
 ### `MERCHANT_UPGRADES` <small>const</small>
 
-Source: [`src/config/merchant.ts:41`](../../src/config/merchant.ts)
+Source: [`src/config/merchant.ts:43`](../../src/config/merchant.ts)
 
 Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost x growth^N)` ([`merchantUpgradeCost`](economy.md#merchantupgradecost)). All but Pack Rat start again on a rebirth.
 
@@ -709,7 +709,7 @@ cost = ceil(units x sell price x 2)
 
 ### `MERCHANT_BUY_MULTIPLIER` <small>const</small>
 
-Source: [`src/config/merchant.ts:217`](../../src/config/merchant.ts)
+Source: [`src/config/merchant.ts:221`](../../src/config/merchant.ts)
 
 The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).
 
@@ -781,7 +781,7 @@ the next grade stays a reward for fights and chests until the player has worn th
 
 ### `CLICK_LADDER` <small>const</small>
 
-Source: [`src/config/economy.ts:164`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:170`](../../src/config/economy.ts)
 
 Clicking: a trusted click on the map pays `max(gold/s x power, floor) x multiplier` ([`clickGold`](economy.md#clickgold)). The multiplier is Click Mastery (+25% gold per Ember shop level) and the set's Click Gold %.
 The ladder is bought from the merchant. Clicking a tile or building pays nothing else.
@@ -799,7 +799,7 @@ The ladder is bought from the merchant. Clicking a tile or building pays nothing
 
 ### `CLICK_LIMIT` <small>const</small>
 
-Source: [`src/config/economy.ts:197`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:203`](../../src/config/economy.ts)
 
 The click rate limit: two token buckets, a click needs a token from both. Burst: 8 clicks refilling 5 per second; stamina: 20,000 clicks refilling 1.5 per second (about 130K paid clicks a day,
 so an auto-clicker is no better than a very dedicated human). Script-dispatched clicks do not pay (`requireTrusted`). Implementation: [`createClickLimiter`](economy.md#createclicklimiter).
@@ -808,7 +808,7 @@ so an auto-clicker is no better than a very dedicated human). Script-dispatched 
 
 ### `clickGold` <small>function</small>
 
-Source: [`src/config/economy.ts:180`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:186`](../../src/config/economy.ts)
 
 Gold of one click at a ladder level: gold/s x power (at least the level's floor), then the multipliers (Click Mastery, set bonus).
 
@@ -834,7 +834,7 @@ Creates the click rate limiter: two token buckets (burst and stamina, see [`CLIC
 
 ### `CHEST` <small>const</small>
 
-Source: [`src/config/spawns.ts:32`](../../src/config/spawns.ts)
+Source: [`src/config/spawns.ts:34`](../../src/config/spawns.ts)
 
 Chests. The server mints and places them (see [`ticketCap`](monsters.md#ticketcap) and [`advanceBank`](monsters.md#advancebank)); data is `CHEST`, `LUCK` and `SPAWN_LIMIT` in `src/config/spawns.ts`, rolls are in `src/lib/chests.ts` and `src/lib/luck.ts`.
 
@@ -859,7 +859,7 @@ interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck))       seconds between chest ti
 
 ### `LUCK` <small>const</small>
 
-Source: [`src/config/spawns.ts:72`](../../src/config/spawns.ts)
+Source: [`src/config/spawns.ts:74`](../../src/config/spawns.ts)
 
 Luck = Charisma + Lucky Charm + gear Luck. Other effects (`LUCK`):
 

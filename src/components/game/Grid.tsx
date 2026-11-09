@@ -58,8 +58,10 @@ const FRAME_MS = 8; // converts px/ms to px/frame (tuned so a flick travels ~80x
 const FRICTION = 0.9; // per-frame velocity decay while flinging
 const FLING_MAX_IDLE_MS = 100; // releasing after pausing longer than this does not fling
 const VISIBLE_PADDING = 2;
-// Wheel zoom. Stepped (not continuous) so the pixel art stays crisp; the range is kept narrow enough that tiles stay
-// readable (0.75 = 36px tiles) and sprites never get blurry-big (2 = a clean 2x).
+/**
+ * Wheel zoom. Stepped (not continuous) so the pixel art stays crisp; the range is kept narrow enough that tiles stay
+ * readable (0.75 = 36px tiles) and sprites never get blurry-big (2 = a clean 2x).
+ */
 const ZOOM_LEVELS = [0.75, 1, 1.5, 2];
 const WHEEL_STEP_PX = 50; // accumulated wheel delta needed for one zoom step
 const WHEEL_LOCKOUT_MS = 140; // swallow trackpad inertia after a step
@@ -243,8 +245,10 @@ const Grid: React.FC = () => {
 	// Tile range on screen (one tile of slack): the terrain chunks and the water ripples render only inside it
 	const seen = visibleTileRange({ x: viewX, y: viewY }, zoom, size, 1);
 
-	// The tiles that exist on screen: explored ones and the unexplored ones that touch them (what can be bought). Rebuilt when the
-	// range of tiles changes or the map does, not on every pixel of panning.
+	/**
+	 * The tiles that exist on screen: explored ones and the unexplored ones that touch them (what can be bought). Rebuilt when the
+	 * range of tiles changes or the map does, not on every pixel of panning.
+	 */
 	const padded = visibleTileRange({ x: viewX, y: viewY }, zoom, size, VISIBLE_PADDING);
 	const { minX, maxX, minY, maxY } = padded;
 	const visibleTiles = useMemo(() => {

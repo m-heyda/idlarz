@@ -70,8 +70,10 @@ export const COMBAT = {
 	rewards: { minGold: 10, minXp: 5, hideShare: 0.6 },
 };
 
-// How the five attributes feed combat (read through lib/statBonuses.ts). Every attribute starts at `base`; bonuses count the
-// points ABOVE it, so a new character plays exactly like one with no stat bonuses and every point spent is a real step up.
+/**
+ * How the five attributes feed combat (read through lib/statBonuses.ts). Every attribute starts at `base`; bonuses count the
+ * points ABOVE it, so a new character plays exactly like one with no stat bonuses and every point spent is a real step up.
+ */
 export const STAT_RULES = {
 	base: 5,
 	physicalDamagePerStrength: 2, // % damage with physical weapons per point above base

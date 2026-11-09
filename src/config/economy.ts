@@ -43,29 +43,35 @@ export const MAX_CATCHUP_SEC = 300; // one tick never advances the game by more 
 export const RESOURCE_CAP = 1e21;
 export const XP_CAP = RESOURCE_CAP;
 
-// The late part of the tile price. Up to `tailFrom` owned tiles the price is the three exponential stages of SCALING_CONFIG;
-// beyond it grows like (n / tailFrom)^tailExponent, which is far gentler than any exponential, so the map can keep growing
-// for as long as the player keeps earning. `ceiling` keeps the price a finite, affordable-in-principle number.
-// The first 300 tiles are the "fill the map" part of a run (about 2-3 days); past them the price climbs much faster than the
-// income, so 400 tiles take about twice as long per 100 as the stretch before. This is the knob for the later rebirth design:
-// bigger starting resources and bigger maps mean raising `tailFrom` or lowering `tailExponent`.
+/**
+ * The late part of the tile price. Up to `tailFrom` owned tiles the price is the three exponential stages of SCALING_CONFIG;
+ * beyond it grows like (n / tailFrom)^tailExponent, which is far gentler than any exponential, so the map can keep growing
+ * for as long as the player keeps earning. `ceiling` keeps the price a finite, affordable-in-principle number.
+ * The first 300 tiles are the "fill the map" part of a run (about 2-3 days); past them the price climbs much faster than the
+ * income, so 400 tiles take about twice as long per 100 as the stretch before. This is the knob for the later rebirth design:
+ * bigger starting resources and bigger maps mean raising `tailFrom` or lowering `tailExponent`.
+ */
 export const TILE_PRICE = {
 	tailFrom: 300,
 	tailExponent: 3.5, // was 4.5: the medium-map decision (IDL-79, applied in IDL-181)
 	ceiling: RESOURCE_CAP / 100,
 };
 
-// XP a tile purchase gives: BASE_XP_PER_TILE x growth^(k-1) x k/4 up to tile `growthUntil`, then a polynomial tail. The level curve above is
-// fitted to the XP these numbers give the sim bot, so change them together (re-run the sim and move the anchors).
+/**
+ * XP a tile purchase gives: BASE_XP_PER_TILE x growth^(k-1) x k/4 up to tile `growthUntil`, then a polynomial tail. The level curve above is
+ * fitted to the XP these numbers give the sim bot, so change them together (re-run the sim and move the anchors).
+ */
 export const XP_TILE = {
 	growth: 1.02,
 	growthUntil: 300,
 	tailExponent: 1.5,
 };
 
-// Tile cost curve: exponential growth that is steepest early (cheap first tiles), gentler through the mid game and
-// gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number. Tuned with scripts/sim.ts
-// so the first ~100 tiles come within the first day, 200-300 within 2-3 days (docs/reference/pacing.md).
+/**
+ * Tile cost curve: exponential growth that is steepest early (cheap first tiles), gentler through the mid game and
+ * gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number. Tuned with scripts/sim.ts
+ * so the first ~100 tiles come within the first day, 200-300 within 2-3 days (docs/reference/pacing.md).
+ */
 export const SCALING_CONFIG = {
 	growthEarly: 1.13, // cost multiplier per owned tile up to `earlyTiles`
 	earlyTiles: 15,

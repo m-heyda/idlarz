@@ -157,8 +157,10 @@ export const calculateResourceBreakdown = (
 		farmPart[key] = farm[key];
 	}
 
-	// Calculate base rates from tiles. Tiles are counted by (biome, same-biome neighbours, building) first and each group is
-	// priced once, so a map of tens of thousands of tiles costs one cheap pass instead of an allocation per tile.
+	/**
+	 * Calculate base rates from tiles. Tiles are counted by (biome, same-biome neighbours, building) first and each group is
+	 * priced once, so a map of tens of thousands of tiles costs one cheap pass instead of an allocation per tile.
+	 */
 	const biomeNames = Object.keys(BIOMES);
 	const biomeSlot = new Map(biomeNames.map((name, i) => [name, i]));
 	const buildingNames = ['', ...Object.keys(BUILDINGS)];

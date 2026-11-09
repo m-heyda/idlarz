@@ -1,8 +1,10 @@
 // Chests, monster spawn limits and Luck.
 // Part of the former gameConfig.ts (split in IDL-15); the values are unchanged.
 
-// Monsters and chests together never take more than `maxFraction` of the free tiles (see src/lib/spawnLimits.ts); the spawn
-// timers pause at that limit. `minAllowed` keeps a tiny early map playable: one rat and one chest can always coexist.
+/**
+ * Monsters and chests together never take more than `maxFraction` of the free tiles (see src/lib/spawnLimits.ts); the spawn
+ * timers pause at that limit. `minAllowed` keeps a tiny early map playable: one rat and one chest can always coexist.
+ */
 export const SPAWN_LIMIT = {
 	maxFraction: 0.3,
 	minAllowed: 2,

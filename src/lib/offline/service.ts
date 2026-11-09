@@ -220,8 +220,10 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 
 		const ctx = bankContext(stored);
 		const rollFor = (kind: string, n: number) => sealedRng(deps.secret, userId, ledger.runId, kind, n);
-		// first the stretch the player was still here (their own spawn timers were running), then the absence at its efficiency
-		// the land is looked at first (monsters only come while it has a free tile for them), and again for the monsters this claim makes
+		/**
+		 * first the stretch the player was still here (their own spawn timers were running), then the absence at its efficiency
+		 * the land is looked at first (monsters only come while it has a free tile for them), and again for the monsters this claim makes
+		 */
 		let bank = await lookAtMap(loadMap, ledger.bank, stored, rollFor);
 		const hereSec = Math.max(0, anchorMs / 1000 - bank.accAt);
 		if (hereSec > 0) bank = advanceBank(bank, hereSec, ctx, rollFor).bank;

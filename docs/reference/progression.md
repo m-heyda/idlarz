@@ -53,7 +53,7 @@ See also: [`xpToNextLevel`](progression.md#xptonextlevel), [`totalStatPoints`](p
 
 ### `xpToNextLevel` <small>function</small>
 
-Source: [`src/utils/game/character.ts:184`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:186`](../../src/utils/game/character.ts)
 
 XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config);
 everything that shows or checks a level threshold uses this.
@@ -69,7 +69,7 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 
 ### `totalStatPoints` <small>function</small>
 
-Source: [`src/utils/game/character.ts:149`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:151`](../../src/utils/game/character.ts)
 
 The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING).
 
@@ -97,7 +97,7 @@ See also: [`reconcileCharacter`](progression.md#reconcilecharacter)
 
 ### `cumulativeXp` <small>function</small>
 
-Source: [`src/utils/game/character.ts:196`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:198`](../../src/utils/game/character.ts)
 
 The total XP at which `level` is reached (level 1 is 0).
 
@@ -105,7 +105,7 @@ The total XP at which `level` is reached (level 1 is 0).
 
 ### `calculateLevel` <small>function</small>
 
-Source: [`src/utils/game/character.ts:208`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:210`](../../src/utils/game/character.ts)
 
 Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.
 
@@ -113,7 +113,7 @@ Level from total XP: each level needs more than the one before (see `xpToNextLev
 
 ### `reconcileCharacter` <small>function</small>
 
-Source: [`src/utils/game/character.ts:164`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:166`](../../src/utils/game/character.ts)
 
 Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned
 (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every
@@ -145,7 +145,7 @@ See also: [`calculateStatResourceModifiers`](progression.md#calculatestatresourc
 
 ### `calculateStatResourceModifiers` <small>function</small>
 
-Source: [`src/utils/game/character.ts:232`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:234`](../../src/utils/game/character.ts)
 
 What the five attributes add to the income modifier of each resource (all points count, not only those above 5).
 
@@ -159,7 +159,7 @@ modifier[r] += 0.025 per attribute point on each resource the attribute feeds; x
 
 ### `calculateCombatStats` <small>function</small>
 
-Source: [`src/utils/game/character.ts:265`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:267`](../../src/utils/game/character.ts)
 
 The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.
 
@@ -345,7 +345,7 @@ limit = LIMITS[key] + LIMIT_BONUSES[key](context)           or HARD_LIMITS[key] 
 
 ### `STARTING_GEMS` <small>const</small>
 
-Source: [`src/config/economy.ts:213`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:219`](../../src/config/economy.ts)
 
 Gems every player starts with (also granted to saves from before Gems existed).
 

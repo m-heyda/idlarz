@@ -210,8 +210,10 @@ export const acceptSave = async (
 
 	const previous: Snapshot | null = current ? { summary: current.summary, serverSavedAt: current.serverSavedAt } : null;
 
-	// The ledger knows what the server itself granted since the last save (income while away, chest and kill rewards), so a save may
-	// contain that on top of its income, and it holds the real gem balance: whatever the save claims is checked against it, then replaced.
+	/**
+	 * The ledger knows what the server itself granted since the last save (income while away, chest and kill rewards), so a save may
+	 * contain that on top of its income, and it holds the real gem balance: whatever the save claims is checked against it, then replaced.
+	 */
 	let ledger: Ledger | null = null;
 	let ledgerUsable = false;
 	if (ledgers) {
@@ -222,9 +224,11 @@ export const acceptSave = async (
 			ledgerUsable = false;
 		}
 	}
-	// Embers and rebirths: a rebirth the server ran itself (`POST /api/rebirth`, recorded in the ledger's inventory) pays exactly the Embers it
-	// computed (IDL-102). One that did not go through it is bounded by what the previous save's castle and territory could have paid (IDL-166).
-	// Either way a save that holds more is clamped before anything is derived from it, and flagged `ember_jump`.
+	/**
+	 * Embers and rebirths: a rebirth the server ran itself (`POST /api/rebirth`, recorded in the ledger's inventory) pays exactly the Embers it
+	 * computed (IDL-102). One that did not go through it is bounded by what the previous save's castle and territory could have paid (IDL-166).
+	 * Either way a save that holds more is clamped before anything is derived from it, and flagged `ember_jump`.
+	 */
 	const emberVerdict = settleEmbers(
 		previous,
 		{ rebirths: state.prestige.rebirths, legacyEarned: state.prestige.legacyEarned, playSeconds: state.playSeconds },
@@ -232,9 +236,11 @@ export const acceptSave = async (
 	);
 	if (emberVerdict.clamped) state = { ...state, prestige: clampPrestige(state.prestige, emberVerdict) };
 	const gemsClaimed = state.gems;
-	// The bag, the worn gear, the loot pity and the auto-sell filter are the ledger's: the stored copy carries the server's, whatever the upload
-	// held. A New Game (the same run's play time going back) starts them again from the new game's own; a ledger without them yet is seeded
-	// from this save. Everything below (the summary, the checks, the stored copy) is worked out from the stamped state.
+	/**
+	 * The bag, the worn gear, the loot pity and the auto-sell filter are the ledger's: the stored copy carries the server's, whatever the upload
+	 * held. A New Game (the same run's play time going back) starts them again from the new game's own; a ledger without them yet is seeded
+	 * from this save. Everything below (the summary, the checks, the stored copy) is worked out from the stamped state.
+	 */
 	const newGame = !!(current && state.prestige.rebirths === current.summary.rebirths && state.playSeconds < current.summary.playSeconds - 1);
 	// A rebirth wipes the gear and the bag: the server's inventory starts again from the starter kit, whatever the upload carried
 	const rebirthed = !!(current && !newGame && state.prestige.rebirths > current.summary.rebirths);
@@ -244,9 +250,11 @@ export const acceptSave = async (
 	if (inventory && !newGame) state = stampInventory(state, inventory);
 	let summary = summarize(state);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
-	// XP is the server's to bound: a save that holds more than the tiles bought, the time played and what the server paid can explain is
-	// clamped to what they explain (and its attribute points to the level that XP gives), and the stored copy, the level on the ranking
-	// and everything the server derives (rates, rewards) are computed from that
+	/**
+	 * XP is the server's to bound: a save that holds more than the tiles bought, the time played and what the server paid can explain is
+	 * clamped to what they explain (and its attribute points to the level that XP gives), and the stored copy, the level on the ranking
+	 * and everything the server derives (rates, rewards) are computed from that
+	 */
 	const claimed = summary;
 	const xpVerdict = settleXp(previous, claimed, nowMs, grants);
 	if (xpVerdict.clamped) {
@@ -265,14 +273,18 @@ export const acceptSave = async (
 	const worth = checkNetWorth(state, summary, ledger?.granted);
 	if (worth.exceeds) flags.push('networth_exceeds');
 
-	// Enforcement (IDL-112): while it is on, a save that raised a `reject` flag is refused whole, before anything is stored, pinned or granted.
-	// Off by default (shadow mode); the decision per flag is `FLAG_POLICY`.
+	/**
+	 * Enforcement (IDL-112): while it is on, a save that raised a `reject` flag is refused whole, before anything is stored, pinned or granted.
+	 * Off by default (shadow mode); the decision per flag is `FLAG_POLICY`.
+	 */
 	const refused = rejectedFlags(flags, enforcement);
 	if (refused.length) return { kind: 'rejected', flags: refused };
 
-	// Trusted economy (IDL-167, IDL-168): a castle level its timer never paid for, or land, buildings and merchant levels worth more than the game
-	// could have paid, are stored as claimed (the flag stays) but never paid: the merchant levels go back to the last trusted save's, and the rates
-	// and the castle the server pays from are that save's too
+	/**
+	 * Trusted economy (IDL-167, IDL-168): a castle level its timer never paid for, or land, buildings and merchant levels worth more than the game
+	 * could have paid, are stored as claimed (the flag stays) but never paid: the merchant levels go back to the last trusted save's, and the rates
+	 * and the castle the server pays from are that save's too
+	 */
 	const trusted = flags.includes('castle_jump') || worth.exceeds;
 	if (trusted) {
 		const baseline = sameRunAs(previous?.summary ?? null, summary) ? current : null;
@@ -360,9 +372,11 @@ export const acceptSave = async (
 					inv: inventoryFromCore(split.core),
 				});
 			} else if (newRun) {
-				// a rebirth or a new game: the map and its monsters start over, so do the tickets, and rolls start again from ordinal 1 in a new run
-				// (the player's combat starts over too: HP and mana come from the new game, no fight is open)
-				// (a rebirth wipes gear and bag, see `rebirthed`; a New Game takes the new game's own)
+				/**
+				 * a rebirth or a new game: the map and its monsters start over, so do the tickets, and rolls start again from ordinal 1 in a new run
+				 * (the player's combat starts over too: HP and mana come from the new game, no fight is open)
+				 * (a rebirth wipes gear and bag, see `rebirthed`; a New Game takes the new game's own)
+				 */
 				const inv = newGame || !ledger.inv ? inventoryFromCore(split.core) : (inventory ?? ledger.inv);
 				const next: Ledger = {
 					...ledger,

@@ -154,7 +154,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`GameDebug.tsx`](../../src/components/game/GameDebug.tsx) — ~ Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table).
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
 - [`GemIcon.tsx`](../../src/components/game/GemIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
-- [`Grid.tsx`](../../src/components/game/Grid.tsx)
+- [`Grid.tsx`](../../src/components/game/Grid.tsx) — ~ Wheel zoom.
 - [`HeaderMenu.tsx`](../../src/components/game/HeaderMenu.tsx) — ~ The hero:
 - [`HeaderTip.tsx`](../../src/components/game/HeaderTip.tsx) — ~ Which edge of the control the card lines up with:
 - [`HighlightLayer.tsx`](../../src/components/game/HighlightLayer.tsx) — ~ The "Highlight" tint:

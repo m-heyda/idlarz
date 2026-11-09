@@ -201,9 +201,11 @@ export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs
 	if (sameRun) {
 		const played = Math.max(0, playedSec);
 		const rate = Math.max(goldWorthRate(before), goldWorthRate(next));
-		// What may have been added to the balance since the previous save: income over the time played; selling the stock the previous save held
-		// (it was earned before, so it is no burst of the income); a burst bounded by the time that REALLY passed, not a flat amount per upload;
-		// a floor that grows with the balance; and what the server itself granted. A row from before the stock was recorded keeps the old burst.
+		/**
+		 * What may have been added to the balance since the previous save: income over the time played; selling the stock the previous save held
+		 * (it was earned before, so it is no burst of the income); a burst bounded by the time that REALLY passed, not a flat amount per upload;
+		 * a floor that grows with the balance; and what the server itself granted. A row from before the stock was recorded keeps the old burst.
+		 */
 		const stock = before.derived.stockWorth;
 		const burst = stock === undefined ? rate * VERIFY.burstSec : stock + rate * Math.min(VERIFY.burstSec, elapsedSec);
 		const floor = VERIFY.goldFloor + VERIFY.goldFloorShare * Math.max(0, before.gold);

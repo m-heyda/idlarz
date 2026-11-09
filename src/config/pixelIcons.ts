@@ -298,8 +298,10 @@ export const BUILDING_GLOW: Record<string, string> = {
 	barracks: '#ff7a7a',
 };
 
-// Art-only resources for a later end-game / rebirth system. They are NOT in `Resources` or
-// RESOURCE_PIXEL_ICONS on purpose: nothing in the game produces or spends them yet.
+/**
+ * Art-only resources for a later end-game / rebirth system. They are NOT in `Resources` or
+ * RESOURCE_PIXEL_ICONS on purpose: nothing in the game produces or spends them yet.
+ */
 export const RESERVED_RESOURCES: Record<string, PixelIconName> = {
 	iron: 'res_iron',
 	fish: 'res_fish',

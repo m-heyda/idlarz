@@ -184,7 +184,7 @@
   "kind": "const",
   "category": "Economy/Biomes",
   "file": "src/config/biomes.ts",
-  "line": 28,
+  "line": 30,
   "summary": "Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.",
   "see": []
  },
@@ -220,7 +220,7 @@
   "kind": "const",
   "category": "Economy/Castle",
   "file": "src/config/castle.ts",
-  "line": 22,
+  "line": 24,
   "summary": "The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it grows one tile per level: 5x5 at 8, 7x7 at 9, 9x9 at 10 ({@link castleRangeRadius}).",
   "see": []
  },
@@ -231,7 +231,7 @@
   "kind": "const",
   "category": "Economy/Castle",
   "file": "src/config/castle.ts",
-  "line": 34,
+  "line": 36,
   "summary": "Area bonus: tiles in range (and their buildings) make extra output, +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10) ({@link castleAreaBonus}). It is part of the base income, so the modifiers apply on top.",
   "see": []
  },
@@ -242,7 +242,7 @@
   "kind": "const",
   "category": "Economy/Castle",
   "file": "src/config/castle.ts",
-  "line": 44,
+  "line": 46,
   "summary": "The ward: from castle level 7 the 3x3 around the castle is a walled fortress, no monsters or chests spawn there and monsters standing in it are driven out (`isInWard`, `wardTiles`).",
   "see": []
  },
@@ -253,7 +253,7 @@
   "kind": "const",
   "category": "Economy/Castle",
   "file": "src/config/castle.ts",
-  "line": 60,
+  "line": 62,
   "summary": "The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.",
   "see": [
    "castleModifier",
@@ -311,7 +311,7 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 347,
+  "line": 349,
   "summary": "The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`). Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
@@ -384,7 +384,7 @@
   "kind": "function",
   "category": "Economy/Tiles",
   "file": "src/config/economy.ts",
-  "line": 100,
+  "line": 106,
   "summary": "Gold price of the next tile when `ownedTiles` are owned, before discounts: the three exponential stages of SCALING_CONFIG up to TILE_PRICE.tailFrom, then the polynomial tail, never above TILE_PRICE.ceiling. Always finite.",
   "see": [
    "calculateTileCost",
@@ -399,7 +399,7 @@
   "kind": "const",
   "category": "Economy/Tiles",
   "file": "src/config/economy.ts",
-  "line": 120,
+  "line": 126,
   "summary": "Extra resources a tile purchase costs: from the tile count shown, the price also asks for a share of the gold price. Hide is the late one, because milk and eggs are kept for other uses.",
   "see": []
  },
@@ -410,7 +410,7 @@
   "kind": "const",
   "category": "Economy/Income",
   "file": "src/config/economy.ts",
-  "line": 135,
+  "line": 141,
   "summary": "Biome and building output is multiplied by `scale` (1.3). The castle tile's own output and the base rates are not scaled.",
   "see": [
    "calculateTileOutput"
@@ -423,7 +423,7 @@
   "kind": "const",
   "category": "Economy/Basics",
   "file": "src/config/economy.ts",
-  "line": 142,
+  "line": 148,
   "summary": "What a new game starts with: 125 gold (and {@link STARTING_GEMS} gems).",
   "see": []
  },
@@ -434,7 +434,7 @@
   "kind": "const",
   "category": "Economy/Income",
   "file": "src/config/economy.ts",
-  "line": 152,
+  "line": 158,
   "summary": "Income of the realm itself, per second, before any tile: gold 0.1 and XP 0.25. Meat, eggs, milk and hide are 0 here: they come from the farm alone.",
   "see": [
    "calculateResourceBreakdown"
@@ -447,7 +447,7 @@
   "kind": "const",
   "category": "Economy/Clicks",
   "file": "src/config/economy.ts",
-  "line": 164,
+  "line": 170,
   "summary": "Clicking: a trusted click on the map pays `max(gold/s x power, floor) x multiplier` ({@link clickGold}). The multiplier is Click Mastery (+25% gold per Ember shop level) and the set's Click Gold %. The ladder is bought from the merchant. Clicking a tile or building pays nothing else.",
   "see": []
  },
@@ -458,7 +458,7 @@
   "kind": "function",
   "category": "Economy/Clicks",
   "file": "src/config/economy.ts",
-  "line": 180,
+  "line": 186,
   "summary": "Gold of one click at a ladder level: gold/s x power (at least the level's floor), then the multipliers (Click Mastery, set bonus).",
   "see": [
    "CLICK_LADDER"
@@ -471,7 +471,7 @@
   "kind": "const",
   "category": "Economy/Clicks",
   "file": "src/config/economy.ts",
-  "line": 197,
+  "line": 203,
   "summary": "The click rate limit: two token buckets, a click needs a token from both. Burst: 8 clicks refilling 5 per second; stamina: 20,000 clicks refilling 1.5 per second (about 130K paid clicks a day, so an auto-clicker is no better than a very dedicated human). Script-dispatched clicks do not pay (`requireTrusted`). Implementation: {@link createClickLimiter}.",
   "see": []
  },
@@ -482,7 +482,7 @@
   "kind": "const",
   "category": "Progression/Gems",
   "file": "src/config/economy.ts",
-  "line": 213,
+  "line": 219,
   "summary": "Gems every player starts with (also granted to saves from before Gems existed).",
   "see": []
  },
@@ -504,7 +504,7 @@
   "kind": "const",
   "category": "Economy/Farm",
   "file": "src/config/farm.ts",
-  "line": 79,
+  "line": 81,
   "summary": "Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ({@link farmUpgradeCost}). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9); the others have 10 levels and growth 1.6.",
   "see": []
  },
@@ -539,7 +539,7 @@
   "kind": "const",
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
-  "line": 41,
+  "line": 43,
   "summary": "Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost x growth^N)` ({@link merchantUpgradeCost}). All but Pack Rat start again on a rebirth.",
   "see": []
  },
@@ -550,7 +550,7 @@
   "kind": "const",
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
-  "line": 189,
+  "line": 193,
   "summary": "The goods shelf and its refresh rules ({@link generateMerchantStock}). Potions are always in stock at their catalog `shop` price (`MERCHANT_SHOP_ITEMS`).",
   "see": []
  },
@@ -561,7 +561,7 @@
   "kind": "const",
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
-  "line": 217,
+  "line": 221,
   "summary": "The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).",
   "see": []
  },
@@ -607,7 +607,7 @@
   "kind": "const",
   "category": "Economy/Chests and Luck",
   "file": "src/config/spawns.ts",
-  "line": 32,
+  "line": 34,
   "summary": "Chests. The server mints and places them (see {@link ticketCap} and {@link advanceBank}); data is `CHEST`, `LUCK` and `SPAWN_LIMIT` in `src/config/spawns.ts`, rolls are in `src/lib/chests.ts` and `src/lib/luck.ts`.",
   "see": []
  },
@@ -618,7 +618,7 @@
   "kind": "const",
   "category": "Economy/Chests and Luck",
   "file": "src/config/spawns.ts",
-  "line": 72,
+  "line": 74,
   "summary": "Luck = Charisma + Lucky Charm + gear Luck. Other effects (`LUCK`):",
   "see": []
  },
@@ -1652,7 +1652,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 149,
+  "line": 151,
   "summary": "The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING).",
   "see": [
    "reconcileCharacter"
@@ -1665,7 +1665,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 164,
+  "line": 166,
   "summary": "Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every point the level has earned is left to spend again. A character that is within its points is returned as it is.",
   "see": []
  },
@@ -1676,7 +1676,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 184,
+  "line": 186,
   "summary": "XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config); everything that shows or checks a level threshold uses this.",
   "see": []
  },
@@ -1687,7 +1687,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 196,
+  "line": 198,
   "summary": "The total XP at which `level` is reached (level 1 is 0).",
   "see": []
  },
@@ -1698,7 +1698,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 208,
+  "line": 210,
   "summary": "Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.",
   "see": []
  },
@@ -1709,7 +1709,7 @@
   "kind": "function",
   "category": "Progression/Attributes",
   "file": "src/utils/game/character.ts",
-  "line": 232,
+  "line": 234,
   "summary": "What the five attributes add to the income modifier of each resource (all points count, not only those above 5).",
   "see": []
  },
@@ -1720,7 +1720,7 @@
   "kind": "function",
   "category": "Progression/Attributes",
   "file": "src/utils/game/character.ts",
-  "line": 265,
+  "line": 267,
   "summary": "The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.",
   "see": []
  },
@@ -2018,7 +2018,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 790,
+  "line": 792,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },
