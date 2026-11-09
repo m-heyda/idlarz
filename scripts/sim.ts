@@ -7,9 +7,14 @@
  *   npx tsx scripts/sim.ts --legacy hardcore   approximate the pre-rebalance game (sanity check of the sim)
  *   npx tsx scripts/sim.ts --no-write hardcore-rebirth6 --maxdays=500   do not touch docs/generated (for tuning runs)
  *
- * Output: docs/generated/sim-milestones.md (not written for --legacy).
+ *   npx tsx scripts/sim.ts --except=hardcore-rebirth6-x10   all profiles but the named ones (comma separated)
+ *   npx tsx scripts/sim.ts --dump=shard.json hardcore   run the selected profiles and save their raw results, write nothing else
+ *   npx tsx scripts/sim.ts --merge=dir   run nothing: merge the --dump files in dir (every profile exactly once) and write the docs as a full run does
+ *
+ * Output: docs/generated/sim-milestones.md and sim-baseline.json (not written for --legacy).
+ * CI runs the profiles as parallel shards (--dump) and merges them (--merge): the result is byte-identical to one full run.
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { getTile, isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
 import { mulberry32 } from '../src/lib/rng';
@@ -62,14 +67,35 @@ const main = async () => {
 		'human-rebirth6': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 6, rebirths: 5 },
 		'human-rebirth8': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 8, rebirths: 4 },
 	};
-	const selected = names.length ? names : Object.keys(PROFILES);
+	const except = new Set((args.find((a) => a.startsWith('--except='))?.slice(9) ?? '').split(',').filter(Boolean));
+	for (const name of except) if (!PROFILES[name]) throw new Error(`--except names an unknown profile ${name}`);
+	const mergeDir = args.find((a) => a.startsWith('--merge='))?.slice(8);
+	const dumpFile = args.find((a) => a.startsWith('--dump='))?.slice(7);
+	const selected = mergeDir ? Object.keys(PROFILES) : names.length ? names : Object.keys(PROFILES).filter((n) => !except.has(n));
 
 	const seedsArg = args.find((a) => a.startsWith('--seeds='));
 	const seeds = seedsArg ? Math.max(1, Number(seedsArg.slice(8))) : 1;
 
 	const results: Record<string, Milestones> = {};
 	const spreads: Record<string, Record<string, [number, number]>> = {};
-	for (const name of selected) {
+	// --merge: the shards' raw results in place of a run; every profile must be there exactly once, so a profile added to PROFILES but missing from a CI shard fails loudly
+	if (mergeDir) {
+		const shards = readdirSync(mergeDir)
+			.filter((f) => f.endsWith('.json'))
+			.sort()
+			.map((f) => JSON.parse(readFileSync(resolve(mergeDir, f), 'utf8')) as SimDump);
+		for (const name of selected) {
+			const found = shards.filter((d) => d.results[name]);
+			if (found.length !== 1) throw new Error(`--merge: profile ${name} is in ${found.length} shard files under ${mergeDir}, expected exactly 1`);
+			results[name] = found[0].results[name];
+			spreads[name] = found[0].spreads[name];
+			if (found[0].magnitudes[name]) magnitudes[name] = found[0].magnitudes[name];
+			if (found[0].tileWaits[name]) tileWaits[name] = found[0].tileWaits[name];
+		}
+		for (const d of shards)
+			for (const name of Object.keys(d.results)) if (!selected.includes(name)) throw new Error(`--merge: shard has unknown profile ${name}`);
+	}
+	for (const name of mergeDir ? [] : selected) {
 		const profile = PROFILES[name];
 		if (!profile) throw new Error(`unknown profile ${name}`);
 		const started = Date.now();
@@ -94,6 +120,12 @@ const main = async () => {
 			spreads[name][key] = [values[0], values[values.length - 1]];
 		});
 		console.error(`${name}: done in ${((Date.now() - started) / 1000).toFixed(1)}s (${seeds} seed${seeds > 1 ? 's' : ''})`);
+	}
+
+	if (dumpFile) {
+		writeFileSync(resolve(dumpFile), JSON.stringify({ results, spreads, magnitudes, tileWaits } satisfies SimDump));
+		console.error(`Wrote ${resolve(dumpFile)} (${selected.join(', ')}); nothing else`);
+		return;
 	}
 
 	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
@@ -136,6 +168,14 @@ type Milestones = Record<string, number | null>; // key -> game day (fractional)
 
 /** Magnitudes measured per profile (docs/game/pacing-targets.md "Magnitude targets", IDL-128): gold/s, stock hours, Embers; rendered and checked against the bands by `renderMagnitudes`. The last seed of a profile wins. */
 const magnitudes: Record<string, Record<string, number | string>> = {};
+
+/** What one CI shard saves for `--merge`: the raw per-profile results and the two side tables the markdown renders. */
+interface SimDump {
+	results: Record<string, Milestones>;
+	spreads: Record<string, Record<string, [number, number]>>;
+	magnitudes: Record<string, Record<string, number | string>>;
+	tileWaits: Record<string, Record<string, Record<string, number>>>;
+}
 
 /** Minutes the income needs to pay each part of the next tile, read at tile counts (the hide-versus-gold diagnostic). */
 const tileWaits: Record<string, Record<string, Record<string, number>>> = {};
