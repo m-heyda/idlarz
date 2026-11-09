@@ -1,5 +1,6 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { ITEM_CATALOG, familyPieces } from '@/catalog';
+import { GRADE_INFO } from '@/catalog/items/grades';
 import { ARMOUR_SLOTS, LADDER, type Grade, type LadderCell } from '@/catalog/items/ladder';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { COMBAT } from '@/config/combatConfig';
@@ -8,7 +9,7 @@ import { runCombat, type CombatEnv } from '@/lib/offline/fight';
 import { freshCombat, type FightEvent } from '@/lib/offline/fightTypes';
 import { newLedger } from '@/lib/offline/ledger';
 import { savedVitals } from '@/lib/offline/profile';
-import { plainItem } from '@/lib/itemInstance';
+import { plainItem as plain } from '@/lib/itemInstance';
 import { calculateCombatStats } from '@/utils/game/character';
 import type { CharacterStats, Equipment, EquipmentSlot, MonsterType, WeaponType } from '@/types/game';
 
@@ -38,10 +39,10 @@ export const fullSet = (setId: string, weapon?: string): Equipment => {
 	for (const id of familyPieces(setId)) {
 		if (ITEM_CATALOG[id].slot === 'belt') continue;
 		const slot = ITEM_CATALOG[id].slot!;
-		if (slot === 'ring') eq.ring1 = eq.ring2 = plainItem(id);
-		else eq[slot as EquipmentSlot] = plainItem(id);
+		if (slot === 'ring') eq.ring1 = eq.ring2 = plain(id);
+		else eq[slot as EquipmentSlot] = plain(id);
 	}
-	if (weapon) eq.mainHand = plainItem(weapon);
+	if (weapon) eq.mainHand = plain(weapon);
 	return eq;
 };
 
@@ -55,6 +56,11 @@ export const fullSet = (setId: string, weapon?: string): Equipment => {
  */
 export const kit = (grade: Grade, weapon: WeaponType = 'sword'): Equipment => {
 	const row = LADDER[grade];
+	// every piece at the start of the grade's window, so a piece that predates the ladder (authored at a lower level) is not a grade behind
+	const plainItem = (id: string) => {
+		const item = plain(id);
+		return { ...item, level: Math.max(item.level, GRADE_INFO[grade].levels[0]) };
+	};
 	const eq: Equipment = {};
 	for (const slot of ARMOUR_SLOTS) {
 		const id = row[slot];

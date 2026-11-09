@@ -36,18 +36,19 @@ export const GRADE_INFO: Record<Grade, GradeInfo> = {
 };
 
 /**
- * The grades whose items are enabled and so drop (IDL-220, IDL-224, IDL-243): the early game, G1-G3. G4 and up (the legacy Steel armour at G4 and
- * the Obsidian family at G6 included) stay disabled data until the
- * biomes that hand them out exist. Enabling the next grade is adding it here; the loot pools select by the `grade:` tag, never by id.
+ * The grade ladder's live grades (IDL-220, IDL-224, IDL-243, IDL-238): G1-G6. Only their items are enabled and so drop; G7-G9 and the special
+ * sets S1-S3 stay disabled data (the legendary named weapons wait for the rebirth biomes). Enabling the next grade is adding it here; the loot
+ * pools select by the `grade:` tag, never by id. The highest entry is open at the top and takes every rarity (`gradeLevels`,
+ * `gradeRarities`), so adding a grade closes the window of the one below.
  *
- * The grade ladder: G1-G9 plus the special sets S1-S3, each with an item level window, rarities and tier (`GRADE_INFO`). Only the grades listed here have enabled items and so drop: today G1-G3.
- * Enabling the next grade is adding it here; the loot pools select by the `grade:` tag, never by id. The legacy Steel armour (G4) and the Obsidian family (G6) are on the ladder but stay dark until their grades are live.
+ * Reachable item levels today are monsters 1-30 plus up to 10 of growth, bosses 15-45 and chests and the shelf up to 31, so G1-G4 are real
+ * content, G5 (43-54) comes from the last bosses only, and G6 (55+, the Obsidian set) is not reachable yet.
  *
  * @category Loot/Items
  * @order 5
  * @see gradeLevels, gradeRarities, gradeLegacyItems
  */
-export const LIVE_GRADES: readonly Grade[] = ['G1', 'G2', 'G3'];
+export const LIVE_GRADES: readonly Grade[] = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'];
 
 /** The grade an item belongs to, read from its `grade:G3` tag (undefined for the pieces outside the ladder) */
 export const gradeOfItem = (item: { tags?: readonly string[] }): Grade | undefined => {
@@ -69,9 +70,8 @@ const topLive = (): Grade => LIVE_GRADES.reduce((top, g) => (GRADES.indexOf(g) >
  * The item level window an item of this grade is generated in. It is the grade's own window (`GRADE_INFO`), except for the highest
  * live grade, which stays open at the top until the next grade goes live: bosses (levels 15-45), chests and the shelf reach item
  * levels past G3's 30 today, and with the legacy Steel and Obsidian gone from the pool they would have nothing to drop (IDL-243).
- * Enabling the next grade (adding it to `LIVE_GRADES`) closes the window of the one below by itself.
- *
- * The highest live grade is open at the top, so adding the next grade to `LIVE_GRADES` closes it by itself.
+ * Enabling the next grade (adding it to `LIVE_GRADES`) closes the window of the one below by itself: with G6 live, G3 ends at item level 30, G4 at 42 and G5 at 54.
+ * What a save may hold is wider for a grade that was once open (`gradeOwnedLevels`).
  *
  * @category Loot/Items
  * @order 6
@@ -92,3 +92,17 @@ export const gradeLevels = (grade: Grade): readonly [number, number] => {
  * @order 7
  */
 export const gradeRarities = (grade: Grade): readonly EquipmentRarity[] => (grade === topLive() ? RARITY_ORDER : GRADE_INFO[grade].rarities);
+
+/** Grades that were the highest live grade at some point, so their pieces were generated at any item level from the window start up, in any rarity (G3, PR 130) */
+const WAS_OPEN: readonly Grade[] = ['G3'];
+
+/**
+ * The item levels a piece of this grade may have when it is loaded from a save: the generation window (`gradeLevels`), widened to the top for a
+ * grade that was once open there (`WAS_OPEN`), so a piece generated while the grade was the highest live one stays valid after the next grade
+ * closes its window.
+ */
+export const gradeOwnedLevels = (grade: Grade): readonly [number, number] =>
+	WAS_OPEN.includes(grade) ? [GRADE_INFO[grade].levels[0], MAX_ITEM_LEVEL] : gradeLevels(grade);
+
+/** The rarities a piece of this grade may have when it is loaded from a save (see {@link gradeOwnedLevels}) */
+export const gradeOwnedRarities = (grade: Grade): readonly EquipmentRarity[] => (WAS_OPEN.includes(grade) ? RARITY_ORDER : gradeRarities(grade));

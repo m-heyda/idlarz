@@ -8,28 +8,30 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | Loadout | Damage/hit | Swings/s | DPS | Armor | Max HP | Crit % | Super % |
 |---|---|---|---|---|---|---|---|
 | starter kit | 6 | 1.2 | 7.2 | 2 | 101 | 3.8 | 5 |
-| woodland set + club | 9 | 0.8 | 7.2 | 11 | 127 | 3.8 | 5 |
-| apprentice set + wand | 5 | 1.3 | 6.5 | 4 | 145 | 10.8 | 5 |
-| knight's set + mace | 18 | 0.8 | 14.4 | 36 | 143 | 3.8 | 5 |
-| knight's set + recurve bow | 9 | 1 | 9 | 36 | 143 | 15.8 | 5 |
-| obsidian set + maul | 32 | 0.6 | 19.2 | 68 | 243 | 9.8 | 12 |
-| obsidian set + longbow | 20 | 1 | 20 | 68 | 243 | 24.8 | 15 |
-| obsidian + titan maul | 50 | 0.6 | 30 | 68 | 243 | 13.8 | 18 |
-| obsidian + starfall bow | 29 | 1 | 29 | 68 | 243 | 29.8 | 22 |
+| G1 kit + mace | 9 | 0.8 | 7.2 | 24 | 140 | 5.2 | 5 |
+| G2 kit + mace | 20 | 0.8 | 16 | 38 | 164 | 6.0 | 5 |
+| G3 kit + mace | 30 | 0.8 | 24 | 58 | 195 | 7.1 | 6 |
+| G3 kit + bow | 21 | 1 | 21 | 58 | 195 | 10.7 | 6 |
+| G4 kit + mace | 44 | 0.8 | 35.2 | 93 | 229 | 7.4 | 6 |
+| G4 kit + bow | 30 | 1 | 30 | 93 | 229 | 12.7 | 6 |
+| G5 kit + mace | 63 | 0.8 | 50.4 | 124 | 296 | 10.8 | 6 |
+| G6 kit + mace | 93 | 0.8 | 74.4 | 189 | 436 | 13.7 | 13 |
+| G6 kit + bow | 66 | 1 | 66 | 189 | 436 | 38.7 | 18 |
 
 # No potions, no skills
 
 | Loadout | Boar level 1 | Boar level 5 | Boar level 9 | Great Auroch (1000 HP, 75 s) |
 |---|---|---|---|---|
 | starter kit | 100% (14s) | 100% (32s) | 0% | 0% |
-| woodland set + club | 100% (14s) | 100% (33s) | 0% | 0% |
-| apprentice set + wand | 100% (14s) | 100% (32s) | 0% | 0% |
-| knight's set + mace | 100% (7s) | 100% (17s) | 100% (37s) | 0% |
-| knight's set + recurve bow | 100% (11s) | 100% (23s) | 100% (53s) | 0% |
-| obsidian set + maul | 100% (6s) | 100% (12s) | 100% (27s) | 100% (64s) |
-| obsidian set + longbow | 100% (4s) | 100% (9s) | 100% (21s) | 100% (51s) |
-| obsidian + titan maul | 100% (3s) | 100% (7s) | 100% (16s) | 100% (38s) |
-| obsidian + starfall bow | 100% (3s) | 100% (6s) | 100% (14s) | 100% (33s) |
+| G1 kit + mace | 100% (14s) | 100% (32s) | 0% | 0% |
+| G2 kit + mace | 100% (6s) | 100% (14s) | 100% (33s) | 7% (73s) |
+| G3 kit + mace | 100% (5s) | 100% (10s) | 100% (22s) | 100% (53s) |
+| G3 kit + bow | 100% (5s) | 100% (11s) | 100% (24s) | 100% (59s) |
+| G4 kit + mace | 100% (4s) | 100% (7s) | 100% (15s) | 100% (37s) |
+| G4 kit + bow | 100% (4s) | 100% (7s) | 100% (16s) | 100% (40s) |
+| G5 kit + mace | 100% (2s) | 100% (5s) | 100% (10s) | 100% (24s) |
+| G6 kit + mace | 100% (2s) | 100% (3s) | 100% (7s) | 100% (16s) |
+| G6 kit + bow | 100% (2s) | 100% (3s) | 100% (6s) | 100% (14s) |
 
 # Level 30 builds
 
@@ -37,16 +39,16 @@ The same fight with 25 spare attribute points spent as shown (bonuses count poin
 
 | Build + gear | Damage/hit | Swings/s | Armor | Boar level 9 | Great Auroch |
 |---|---|---|---|---|---|
-| no points spent, obsidian set + maul (physical) | 32 | 0.6 | 68 | 100% (27s) | 100% (63s) |
-| warrior: +25 Strength, obsidian set + maul (physical) | 48 | 0.6 | 74.3 | 100% (17s) | 100% (41s) |
-| mage: +25 Intelligence, obsidian set + maul (physical) | 32 | 0.6 | 68 | 100% (27s) | 100% (64s) |
-| tank: +15 Vitality, +10 Dexterity, obsidian set + maul (physical) | 32 | 0.61 | 80.5 | 100% (26s) | 100% (60s) |
-| balanced: +5 each, obsidian set + maul (physical) | 35.2 | 0.61 | 74.3 | 100% (23s) | 100% (54s) |
-| no points spent, obsidian set + staff (magic) | 22 | 0.9 | 68 | 100% (26s) | 100% (62s) |
-| warrior: +25 Strength, obsidian set + staff (magic) | 22 | 0.9 | 74.3 | 100% (24s) | 100% (59s) |
-| mage: +25 Intelligence, obsidian set + staff (magic) | 35.2 | 0.9 | 68 | 100% (16s) | 100% (40s) |
-| tank: +15 Vitality, +10 Dexterity, obsidian set + staff (magic) | 22 | 0.92 | 80.5 | 100% (24s) | 100% (58s) |
-| balanced: +5 each, obsidian set + staff (magic) | 24.6 | 0.91 | 74.3 | 100% (21s) | 100% (52s) |
+| no points spent, G6 kit + mace (physical) | 93 | 0.8 | 189 | 100% (6s) | 100% (16s) |
+| warrior: +25 Strength, G6 kit + mace (physical) | 139.5 | 0.8 | 195.3 | 100% (4s) | 100% (10s) |
+| mage: +25 Intelligence, G6 kit + mace (physical) | 93 | 0.8 | 189 | 100% (6s) | 100% (16s) |
+| tank: +15 Vitality, +10 Dexterity, G6 kit + mace (physical) | 93 | 0.82 | 201.5 | 100% (6s) | 100% (15s) |
+| balanced: +5 each, G6 kit + mace (physical) | 102.3 | 0.81 | 195.3 | 100% (6s) | 100% (14s) |
+| no points spent, G6 kit + staff (magic) | 60 | 0.9 | 189 | 100% (10s) | 100% (21s) |
+| warrior: +25 Strength, G6 kit + staff (magic) | 60 | 0.9 | 195.3 | 100% (9s) | 100% (21s) |
+| mage: +25 Intelligence, G6 kit + staff (magic) | 96 | 0.9 | 189 | 100% (6s) | 100% (14s) |
+| tank: +15 Vitality, +10 Dexterity, G6 kit + staff (magic) | 60 | 0.92 | 201.5 | 100% (9s) | 100% (20s) |
+| balanced: +5 each, G6 kit + staff (magic) | 67.2 | 0.91 | 195.3 | 100% (8s) | 100% (18s) |
 
 # Auto-use (level 30)
 
@@ -57,37 +59,27 @@ Auto-use drinks a potion below 40% HP, casts Heal below 50% and Stun whenever it
 | starter kit | nothing | 0% | 0% |
 | starter kit | Heal + Stun | 0% | 0% |
 | starter kit | Heal + Stun + 5 greater potions | 100% (74s, 62% HP) | 0% |
-| woodland set + club | nothing | 0% | 0% |
-| woodland set + club | Heal + Stun | 100% (74s, 7% HP) | 0% |
-| woodland set + club | Heal + Stun + 5 greater potions | 100% (75s, 69% HP) | 0% |
-| knight's set + mace | nothing | 100% (37s, 37% HP) | 0% |
-| knight's set + mace | Heal + Stun | 100% (37s, 66% HP) | 0% |
-| knight's set + mace | Heal + Stun + 5 greater potions | 100% (37s, 66% HP) | 0% |
-| obsidian set + maul | nothing | 100% (26s, 79% HP) | 100% (63s, 57% HP) |
-| obsidian set + maul | Heal + Stun | 100% (26s, 88% HP) | 100% (63s, 71% HP) |
-| obsidian set + maul | Heal + Stun + 5 greater potions | 100% (27s, 87% HP) | 100% (64s, 71% HP) |
-| obsidian + titan maul | nothing | 100% (17s, 87% HP) | 100% (39s, 74% HP) |
-| obsidian + titan maul | Heal + Stun | 100% (17s, 95% HP) | 100% (39s, 84% HP) |
-| obsidian + titan maul | Heal + Stun + 5 greater potions | 100% (17s, 95% HP) | 100% (39s, 84% HP) |
+| G1 kit + mace | nothing | 0% | 0% |
+| G1 kit + mace | Heal + Stun | 100% (74s, 45% HP) | 0% |
+| G1 kit + mace | Heal + Stun + 5 greater potions | 100% (73s, 45% HP) | 0% |
+| G3 kit + mace | nothing | 100% (22s, 74% HP) | 100% (53s, 55% HP) |
+| G3 kit + mace | Heal + Stun | 100% (22s, 86% HP) | 100% (53s, 69% HP) |
+| G3 kit + mace | Heal + Stun + 5 greater potions | 100% (22s, 86% HP) | 100% (53s, 69% HP) |
+| G6 kit + mace | nothing | 100% (7s, 98% HP) | 100% (16s, 96% HP) |
+| G6 kit + mace | Heal + Stun | 100% (6s, 100% HP) | 100% (16s, 98% HP) |
+| G6 kit + mace | Heal + Stun + 5 greater potions | 100% (7s, 100% HP) | 100% (16s, 98% HP) |
 
 # The Great Auroch by level
 
-A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 8 % crits, 20 % Stun resistance. HP, attack and armor follow the item level curve. Gear "at the level" is the same set at the item level of the King; "behind" is item level 15. Win % (mean seconds). No skills, no potions.
+A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 8 % crits, 20 % Stun resistance. HP, attack and armor follow the item level curve. A grade kit is a full kit of one grade of the ladder (the cells of catalog/items/ladder.ts) worn at the boss level ("at the level") or at the start of its own window when that is higher; "behind" is the kit of the grade two below, at its window start. Win % (mean seconds). No skills, no potions.
 
-| King level | Loadout | Gear | Result |
+| Boss level | Loadout | Gear | Result |
 |---|---|---|---|
-| 15 (1000 HP, armor 15) | knight's set + mace | at the level | 100% (58s) |
-| 15 (1000 HP, armor 15) | obsidian set + maul | at the level | 100% (50s) |
-| 15 (1000 HP, armor 15) | obsidian + titan maul | at the level | 100% (23s) |
-| 25 (1354 HP, armor 20) | knight's set + mace | at the level | 100% (61s) |
-| 25 (1354 HP, armor 20) | knight's set + mace | behind | 0% |
-| 25 (1354 HP, armor 20) | obsidian set + maul | at the level | 100% (56s) |
-| 25 (1354 HP, armor 20) | obsidian set + maul | behind | 65% (71s) |
-| 25 (1354 HP, armor 20) | obsidian + titan maul | at the level | 100% (25s) |
-| 25 (1354 HP, armor 20) | obsidian + titan maul | behind | 100% (33s) |
-| 35 (1707 HP, armor 25) | knight's set + mace | at the level | 100% (68s) |
-| 35 (1707 HP, armor 25) | knight's set + mace | behind | 0% |
-| 35 (1707 HP, armor 25) | obsidian set + maul | at the level | 100% (62s) |
-| 35 (1707 HP, armor 25) | obsidian set + maul | behind | 0% |
-| 35 (1707 HP, armor 25) | obsidian + titan maul | at the level | 100% (27s) |
-| 35 (1707 HP, armor 25) | obsidian + titan maul | behind | 100% (46s) |
+| 15 (1000 HP, armor 15) | G2 kit + mace | at the level | 100% (64s) |
+| 15 (1000 HP, armor 15) | G1 kit + mace | behind | 0% |
+| 25 (1354 HP, armor 20) | G3 kit + mace | at the level | 100% (66s) |
+| 25 (1354 HP, armor 20) | G1 kit + mace | behind | 0% |
+| 35 (1707 HP, armor 25) | G4 kit + mace | at the level | 100% (67s) |
+| 35 (1707 HP, armor 25) | G2 kit + mace | behind | 0% |
+| 45 (2061 HP, armor 30) | G5 kit + mace | at the level | 100% (62s) |
+| 45 (2061 HP, armor 30) | G3 kit + mace | behind | 0% |

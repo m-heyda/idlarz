@@ -115,24 +115,24 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Thistle Boar | 6 | 100 % | 440 | 62 | 1.5 s | 0.2 % | 0.02 % |
 | Burrow Badger | 6 | 100 % | 440 | 62 | 1.5 s | 0.2 % | 0.02 % |
 | Dust Strider | 6 | 100 % | 440 | 62 | 1.5 s | 0.2 % | 0.02 % |
-| The Great Auroch (boss) | 20 | 100 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 5.36 % |
+| The Great Auroch (boss) | 20 | 100 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 5.37 % |
 | *plains total (if every spawn were here)* | | | | | | | *0.2 %* |
 | Mossback Wolf | 9 | 100 % | 1,110 | 157 | 3.7 s | 0.6 % | 0.04 % |
 | Bramble Imp | 9 | 100 % | 1,110 | 157 | 3.7 s | 0.6 % | 0.04 % |
 | Rotcap Stag | 9 | 100 % | 1,110 | 157 | 3.7 s | 0.6 % | 0.04 % |
-| The Elder Stag (boss) | 25 | 98 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 5.25 % |
+| The Elder Stag (boss) | 25 | 100 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 5.35 % |
 | *forest total (if every spawn were here)* | | | | | | | *0.4 %* |
-| Garbage Ogre | 13 | 97 % | 3,021 | 431 | 10 s | 1.7 % | 0.13 % |
-| Dumpback | 13 | 91 % | 3,021 | 431 | 10 s | 1.7 % | 0.13 % |
-| Rot Heron | 13 | 72 % | 3,021 | 431 | 10 s | 1.7 % | 0.11 % |
-| The Mire Matriarch (boss) | 30 | 87 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 4.69 % |
-| *swamp total (if every spawn were here)* | | | | | | | *1.0 %* |
-| Frost Hare | 15 | 1 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.00 % |
-| Icetusk Calf | 15 | 5 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.00 % |
+| Garbage Ogre | 13 | 100 % | 3,021 | 431 | 10 s | 1.7 % | 0.11 % |
+| Dumpback | 13 | 99 % | 3,021 | 431 | 10 s | 1.7 % | 0.11 % |
+| Rot Heron | 13 | 95 % | 3,021 | 431 | 10 s | 1.7 % | 0.13 % |
+| The Mire Matriarch (boss) | 30 | 98 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 5.27 % |
+| *swamp total (if every spawn were here)* | | | | | | | *1.1 %* |
+| Frost Hare | 15 | 5 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.00 % |
+| Icetusk Calf | 15 | 28 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.06 % |
 | Rime Wraith | 15 | 0 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.00 % |
 | The Winter Wyrm (boss) | 35 | 0 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 0.00 % |
-| *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **15.8 %** (bosses 15.3 %; XP 18.3 %) |
+| *tundra total (if every spawn were here)* | | | | | | | *0.6 %* |
+| **All kills together** | | | | | | | **16.6 %** (bosses 16.0 %; XP 19.2 %) |
 
 ## castle 6: hero level 42, obsidian + titan maul, 700 gold/s, 50.00 XP/s
 
@@ -246,7 +246,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | castle 2 | 12 | 9.6 % | 4.8 % | 4.9 % | 7.5 % | Thistle Boar (level 3) | 4.8 % |
 | castle 3 | 40 | 16.6 % | 14.9 % | 1.7 % | 16.5 % | Thistle Boar (level 4) | 1.6 % |
 | castle 4 | 100 | 17.0 % | 16.3 % | 0.7 % | 17.1 % | Thistle Boar (level 5) | 0.7 % |
-| castle 5 | 300 | 15.8 % | 15.3 % | 0.5 % | 18.3 % | Thistle Boar (level 6) | 0.2 % |
+| castle 5 | 300 | 16.6 % | 16.0 % | 0.6 % | 19.2 % | Thistle Boar (level 6) | 0.2 % |
 | castle 6 | 700 | 9.7 % | 9.3 % | 0.4 % | 10.6 % | Thistle Boar (level 7) | 0.1 % |
 | castle 7 | 1,300 | 5.3 % | 5.0 % | 0.2 % | 6.7 % | Thistle Boar (level 8) | 0.1 % |
 | castle 8 | 2,200 | 3.2 % | 3.1 % | 0.1 % | 4.6 % | Thistle Boar (level 9) | 0.0 % |

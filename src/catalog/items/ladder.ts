@@ -5,7 +5,7 @@ import { STAT_DEFS, baseStat, levelScale, type ItemStatKey, type ItemStats, type
 import { WEAPON_ATTACK_SPEED } from '../weapons';
 import { CLOTH_ITEMS } from './cloth';
 import { gear } from './define';
-import { GRADES, GRADE_INFO, LIVE_GRADES, gradeLevels, gradeRarities, type Grade } from './grades';
+import { GRADES, GRADE_INFO, LIVE_GRADES, gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities, type Grade } from './grades';
 import { LEGENDARY_ITEMS } from './legendary';
 import { OBSIDIAN_ITEMS } from './obsidian';
 import { RESERVE_ITEMS } from './reuse';
@@ -264,7 +264,7 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 	const def = gear(id, name, slot, info.rarities[0], stats, {
 		tier: info.tier,
 		grade,
-		levelWindow: gradeLevels(grade),
+		levelWindow: gradeOwnedLevels(grade),
 		// G1-G3 are live (IDL-220); the rest stay disabled data
 		enabled: LIVE_GRADES.includes(grade),
 		...(iconOf.get(id) ? { icon: iconOf.get(id) as PixelIconName } : {}),
@@ -272,7 +272,7 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 		...(weaponType ? { weaponType } : {}),
 		description: `${info.label} grade, placeholder numbers.`,
 	});
-	generated.push({ ...def, allowedRarities: [...gradeRarities(grade)] });
+	generated.push({ ...def, allowedRarities: [...gradeOwnedRarities(grade)], dropLevels: gradeLevels(grade), dropRarities: gradeRarities(grade) });
 };
 
 GRADES.forEach((grade, g) => {
@@ -290,11 +290,21 @@ GRADES.forEach((grade, g) => {
 	for (const type of WEAPON_TYPES) cell(grade, type, WEAPON_NAMES[type][g], 'mainHand', weaponStats(type, index, tier), type);
 });
 
+/** The Obsidian weapons that were below their G6 cell (maul 87, longbow 48, crossbow 58 against 124, 61, 84 at level 55); their damage is raised to the cell's (IDL-238) */
+const FIT_DAMAGE: ReadonlySet<string> = new Set(['obsidian_maul', 'obsidian_longbow', 'obsidian_crossbow']);
+
+/** The damage to author at the piece's `minItemLevel` so that it equals `target` at `level` (the inverse of the level curve, damage's share of it) */
+const fitDamage = (def: ItemDef, target: number, level: number): number => {
+	const ratio = levelScale(level) / levelScale(def.minItemLevel ?? 1);
+	const share = (STAT_DEFS.damage as StatDef).levelShare ?? 1;
+	return Math.round(target / (1 + (ratio - 1) * share));
+};
+
 /**
  * Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece:
  *  - a piece that fills a ladder cell (Wooden Club, Hunting Bow, Acorn Charm, Iron Sword, the six Steel armour pieces, the Obsidian
  *    family) keeps its id, name, art, set and the validity window of the pieces already owned, and takes the cell's grade tag and the
- *    grade's drop window and rarities (`dropLevels`, `dropRarities`); it is enabled with the rest of its grade (`LIVE_GRADES`), so Steel (G4) and Obsidian (G6) are on the ladder but not dropped yet;
+ *    grade's drop window and rarities (`dropLevels`, `dropRarities`); it is enabled with the rest of its grade (`LIVE_GRADES`), so Steel (G4) and Obsidian (G6) drop with their grades;
  *  - every other legacy piece (cloth, the rest of wood and steel, the starter sword and shield) is retired: `enabled: false`, the id stays
  *    so owned pieces load and work. The starter sword and shield are still what a new hero wears (catalog STARTER_EQUIPMENT_IDS).
  *
@@ -310,6 +320,7 @@ export const gradeLegacyItems = (defs: ItemDef[]): ItemDef[] =>
 		const { grade } = mapped;
 		return {
 			...def,
+			...(FIT_DAMAGE.has(def.id) ? { stats: { ...def.stats, damage: fitDamage(def, mapped.stats.damage ?? 0, GRADE_INFO[grade].levels[0]) } } : {}),
 			tier: GRADE_INFO[grade].tier,
 			tags: [...(def.tags ?? []), `grade:${grade}`],
 			// what it is generated at is the grade's; what a piece already owned may be (minItemLevel .. maxItemLevel, allowedRarities) stays, so no save breaks

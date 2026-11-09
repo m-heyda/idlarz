@@ -9,7 +9,8 @@ const has = (data: LootData, text: RegExp) => validateLootData(data).errors.some
 test('the shipped loot configuration is valid', () => {
 	const { errors, warnings } = validateLootData();
 	assert.deepEqual(errors, []);
-	assert.deepEqual(warnings, []);
+	// A rarity follows the grade that carries it, so a weight may sit on a grade no source reaches yet (epic and legendary on normal monsters until G6 content): a warning, nothing else
+	for (const w of warnings) assert.match(w, /rarity [a-z]+ has weight but no eligible item at any item level the source can reach/);
 });
 
 test('a source must reference an existing profile, a profile existing pools and rarities', () => {
@@ -124,7 +125,7 @@ test('every weighted rarity needs an eligible item at every level the source can
 			item.maxItemLevel = 5;
 			delete item.dropLevels;
 		}
-	assert.ok(has(d, /nothing can drop at item level|has weight but no eligible item/));
+	assert.ok(has(d, /nothing can drop at item level/));
 	// A rarity nobody may roll
 	d = copy();
 	for (const item of Object.values(d.items))
@@ -132,15 +133,15 @@ test('every weighted rarity needs an eligible item at every level the source can
 			item.allowedRarities = item.allowedRarities!.filter((r) => r !== 'rare');
 			if (item.dropRarities) item.dropRarities = item.dropRarities.filter((r) => r !== 'rare');
 		}
-	assert.ok(has(d, /rarity rare has weight but no eligible item/));
+	assert.ok(validateLootData(d).warnings.some((w) => /source boss: rarity rare has weight but no eligible item/.test(w)));
 	// ...is fine when the weight is zero
 	for (const profile of Object.values(d.profiles)) profile.rarityWeights.rare = 0;
-	assert.deepEqual(validateLootData(d).errors, []);
+	assert.ok(!validateLootData(d).warnings.some((w) => /source boss: rarity rare/.test(w)));
 });
 
 test('an item that cannot take the affix count its rarity asks for is flagged', () => {
 	const d = copy();
-	d.rarities.legendary.minAffixes = 12;
-	d.rarities.legendary.maxAffixes = 12;
+	d.rarities.rare.minAffixes = 12;
+	d.rarities.rare.maxAffixes = 12;
 	assert.ok(validateLootData(d).warnings.some((w) => /can only roll/.test(w)));
 });

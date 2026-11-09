@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ITEM_CATALOG, SETS } from '../../src/catalog';
+import { ITEM_CATALOG, SETS, levelScale } from '../../src/catalog';
 import { GRADES, gradeLevels, gradeOfItem, gradeRarities, LIVE_GRADES } from '../../src/catalog/items/grades';
 import { LADDER } from '../../src/catalog/items/ladder';
 import { CLOTH_ITEMS } from '../../src/catalog/items/cloth';
@@ -83,4 +83,21 @@ test('the top live grade is open at the top and takes every rarity, the ones bel
 	assert.equal(gradeLevels(top)[1], 100);
 	assert.deepEqual([...gradeRarities(top)], RARITY_ORDER);
 	for (const g of LIVE_GRADES.slice(0, -1)) assert.ok(gradeLevels(g)[1] < 100, g);
+});
+
+test('pieces generated while G3 was the top live grade stay valid after G4-G6 closed its window (level 35, any rarity)', () => {
+	const owned = (base: string, level: number, rarity: string): ItemInstance => ({ base, level, rarity, quality: 50, affixes: [] });
+	assert.equal(instanceProblem(owned(LADDER.G3.head!, 35, 'epic')), null);
+	assert.equal(instanceProblem(owned('iron_sword', 35, 'rare')), null);
+	assert.equal(instanceProblem(owned('arming_sword', 50, 'legendary')), null, 'a graded reuse item of G3 too');
+	assert.deepEqual(ITEM_CATALOG[LADDER.G3.head!].dropLevels, [19, 30], 'but it is generated only inside the G3 window');
+});
+
+test('the Obsidian weapons are at their G6 cell at the window start (damage within 5 % of the ladder table)', () => {
+	const table = { obsidian_maul: 124, obsidian_longbow: 61, obsidian_crossbow: 84 };
+	for (const [id, damage] of Object.entries(table)) {
+		const def = ITEM_CATALOG[id];
+		const at55 = def.stats!.damage! * (1 + (levelScale(55) / levelScale(def.minItemLevel!) - 1));
+		assert.ok(Math.abs(at55 - damage) / damage < 0.05, `${id}: ${at55} vs ${damage}`);
+	}
 });

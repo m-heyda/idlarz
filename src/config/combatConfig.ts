@@ -27,7 +27,7 @@ export const COMBAT = {
 	// tops out at softCap + (1 - softCap) x softSlope = 75 % and the rest of the survival has to come from HP, regen, dodge and Stun.
 	armorSoftCap: 0.5,
 	armorSoftSlope: 0.5,
-	maxItemDamage: 50, // sanity ceiling for one item's damage (tests/loot/items.test.ts); fights are balanced by tests/combat/fightBalance.test.ts, not by a cap
+	maxItemDamage: 200, // sanity ceiling for one item's damage (tests/loot/items.test.ts); fights are balanced by tests/combat/fightBalance.test.ts, not by a cap
 	// Fights run on the server in fixed ticks: the player swings at the weapon's attack speed, a monster at its own. Nobody clicks to hit: a click on a monster only starts the fight.
 	tickSec: 0.1, // the server's fight step
 	maxCatchUpSec: 120, // one request runs a fight forward by at most this long (a longer silence is simulated by the next request)

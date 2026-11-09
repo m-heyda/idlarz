@@ -182,7 +182,10 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 
 			if (!any) err(`source ${source.id}: nothing can drop at item level ${level}`);
 		}
 		for (const r of weighted)
-			if (!reachable.has(r)) err(`source ${source.id}: rarity ${r} has weight but no eligible item at any item level the source can reach`);
+			if (!reachable.has(r))
+				warnings.push(
+					`source ${source.id}: rarity ${r} has weight but no eligible item at any item level the source can reach (its grade is not reachable there yet)`,
+				);
 	}
 
 	return { errors, warnings: [...new Set(warnings)] };

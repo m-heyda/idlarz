@@ -2094,8 +2094,8 @@ start at item level 4 plus 3 per castle level above 1.</p>
 The pool admits every ladder grade up to the biome&#39;s ceiling (<code>maxGrade</code>; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade&#39;s item level
 window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
 a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in <code>LIVE_GRADES</code> have enabled items,
-so today every biome drops the same items; going live with the next grade is what moves a biome.</p>
-<p>A biome&#39;s grade ceiling. Normal monsters drop from <code>monster_&lt;biome&gt;</code> (pool <code>equipment_&lt;biome&gt;</code>): ladder grades up to the biome&#39;s ceiling (plains G3, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
+so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides, and a ceiling must reach the grade of the highest item level the biome can produce: plains monsters (levels 1-20, growing up to 30, plus 1 of variance) reach item level 31, so plains stops at G4, where G3 would leave a grown monster with nothing to drop.</p>
+<p>A biome&#39;s grade ceiling. Normal monsters drop from <code>monster_&lt;biome&gt;</code> (pool <code>equipment_&lt;biome&gt;</code>): ladder grades up to the biome&#39;s ceiling (plains G4, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
 Every base that drops carries a <code>grade:</code> tag (IDL-243): the legacy wood, steel and Obsidian pieces that fill a ladder cell are graded by it (Wooden Club G1, Hunting Bow G2, Iron Sword G3, six Steel armour pieces G4, the Obsidian family G6; they keep their ids, art and set bonuses),
 the rest of wood, steel and all of cloth are retired (<code>enabled: false</code>, ids kept, owned pieces keep working). A graded legacy piece is generated only in its grade&#39;s window and rarities (<code>dropLevels</code>, <code>dropRarities</code>) but stays valid at its old level range for pieces already owned.
 The highest live grade is open at the top and takes every rarity (<a href="#gradelevels"><code>gradeLevels</code></a>, <a href="#graderarities"><code>gradeRarities</code></a> in <code>src/catalog/items/grades.ts</code>) so nothing is left without a base while the next grade is dark; a rarity with no base at an item level is left out of the roll there.
@@ -2182,12 +2182,13 @@ quality roll and by every affix, so a well rolled rare is worth clearly more tha
 </code></pre>
 </article><article><p><a id="live-grades"></a></p>
 <h3><code>LIVE_GRADES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/items/grades.ts"><code>src/catalog/items/grades.ts:50</code></a></p>
-<p>The grades whose items are enabled and so drop (IDL-220, IDL-224, IDL-243): the early game, G1-G3. G4 and up (the legacy Steel armour at G4 and
-the Obsidian family at G6 included) stay disabled data until the
-biomes that hand them out exist. Enabling the next grade is adding it here; the loot pools select by the <code>grade:</code> tag, never by id.</p>
-<p>The grade ladder: G1-G9 plus the special sets S1-S3, each with an item level window, rarities and tier (<code>GRADE_INFO</code>). Only the grades listed here have enabled items and so drop: today G1-G3.
-Enabling the next grade is adding it here; the loot pools select by the <code>grade:</code> tag, never by id. The legacy Steel armour (G4) and the Obsidian family (G6) are on the ladder but stay dark until their grades are live.</p>
+<p>Source: <a href="../../src/catalog/items/grades.ts"><code>src/catalog/items/grades.ts:51</code></a></p>
+<p>The grade ladder&#39;s live grades (IDL-220, IDL-224, IDL-243, IDL-238): G1-G6. Only their items are enabled and so drop; G7-G9 and the special
+sets S1-S3 stay disabled data (the legendary named weapons wait for the rebirth biomes). Enabling the next grade is adding it here; the loot
+pools select by the <code>grade:</code> tag, never by id. The highest entry is open at the top and takes every rarity (<code>gradeLevels</code>,
+<code>gradeRarities</code>), so adding a grade closes the window of the one below.</p>
+<p>Reachable item levels today are monsters 1-30 plus up to 10 of growth, bosses 15-45 and chests and the shelf up to 31, so G1-G4 are real
+content, G5 (43-54) comes from the last bosses only, and G6 (55+, the Obsidian set) is not reachable yet.</p>
 <p>See also: <a href="#gradelevels"><code>gradeLevels</code></a>, <a href="#graderarities"><code>gradeRarities</code></a>, <a href="#gradelegacyitems"><code>gradeLegacyItems</code></a></p>
 </article><article><p><a id="gradelevels"></a></p>
 <h3><code>gradeLevels</code> <small>function</small></h3>
@@ -2195,8 +2196,8 @@ Enabling the next grade is adding it here; the loot pools select by the <code>gr
 <p>The item level window an item of this grade is generated in. It is the grade&#39;s own window (<code>GRADE_INFO</code>), except for the highest
 live grade, which stays open at the top until the next grade goes live: bosses (levels 15-45), chests and the shelf reach item
 levels past G3&#39;s 30 today, and with the legacy Steel and Obsidian gone from the pool they would have nothing to drop (IDL-243).
-Enabling the next grade (adding it to <code>LIVE_GRADES</code>) closes the window of the one below by itself.</p>
-<p>The highest live grade is open at the top, so adding the next grade to <code>LIVE_GRADES</code> closes it by itself.</p>
+Enabling the next grade (adding it to <code>LIVE_GRADES</code>) closes the window of the one below by itself: with G6 live, G3 ends at item level 30, G4 at 42 and G5 at 54.
+What a save may hold is wider for a grade that was once open (<code>gradeOwnedLevels</code>).</p>
 </article><article><p><a id="graderarities"></a></p>
 <h3><code>gradeRarities</code> <small>function</small></h3>
 <p>Source: <a href="../../src/catalog/items/grades.ts"><code>src/catalog/items/grades.ts:94</code></a></p>
@@ -2206,19 +2207,19 @@ rolled rarity must find a base). Enabling the next grade narrows the one below t
 <p>The highest live grade takes every rarity until a grade that carries the others is live.</p>
 </article><article><p><a id="gradelegacyitems"></a></p>
 <h3><code>gradeLegacyItems</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/items/ladder.ts"><code>src/catalog/items/ladder.ts:306</code></a></p>
+<p>Source: <a href="../../src/catalog/items/ladder.ts"><code>src/catalog/items/ladder.ts:316</code></a></p>
 <p>Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece:</p>
 <ul>
 <li>a piece that fills a ladder cell (Wooden Club, Hunting Bow, Acorn Charm, Iron Sword, the six Steel armour pieces, the Obsidian
 family) keeps its id, name, art, set and the validity window of the pieces already owned, and takes the cell&#39;s grade tag and the
-grade&#39;s drop window and rarities (<code>dropLevels</code>, <code>dropRarities</code>); it is enabled with the rest of its grade (<code>LIVE_GRADES</code>), so Steel (G4) and Obsidian (G6) are on the ladder but not dropped yet;</li>
+grade&#39;s drop window and rarities (<code>dropLevels</code>, <code>dropRarities</code>); it is enabled with the rest of its grade (<code>LIVE_GRADES</code>), so Steel (G4) and Obsidian (G6) drop with their grades;</li>
 <li>every other legacy piece (cloth, the rest of wood and steel, the starter sword and shield) is retired: <code>enabled: false</code>, the id stays
 so owned pieces load and work. The starter sword and shield are still what a new hero wears (catalog STARTER_EQUIPMENT_IDS).</li>
 </ul>
 <p>Pieces that predate the ladder keep their ids, art and set bonuses, and a save of an old piece stays valid: <code>minItemLevel</code>, <code>maxItemLevel</code> and <code>allowedRarities</code> stay what an owned piece may be, while <code>dropLevels</code> and <code>dropRarities</code> (see <a href="#eligiblecandidates"><code>eligibleCandidates</code></a>) say what it is generated at.</p>
 </article><article><p><a id="kit"></a></p>
 <h3><code>kit</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/fightSim.ts"><code>src/lib/fightSim.ts:56</code></a></p>
+<p>Source: <a href="../../src/lib/fightSim.ts"><code>src/lib/fightSim.ts:57</code></a></p>
 <p>A full kit of one ladder grade: all 13 slots plus the belt (both rings), <code>weapon</code> as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.</p>
 <p>Test and simulation helper: a full kit of one ladder grade, so fight balance (<code>fight-sim</code>, <code>monster-ladder</code>, <code>fightBalance</code>) is pinned to grades rather than to named legacy sets.</p>
 </article><h2>Adding content</h2><article><p><a id="loot-pools"></a></p>
