@@ -26,7 +26,7 @@ but a changed system clock can neither skip nor reverse time. Offline progress i
 `tick` order: accumulate resources -> XP (with `xpGainMultiplier`) -> castle upgrade timer (finishing recomputes the rates) -> age the monsters on the map (`advanceMonsters`; the server places them) -> HP / mana regeneration and cooldowns
 (in a fight the server's HP is left alone) -> merchant stock rotation -> level / stat points -> one `set()`. **The tick does not spawn chests or monsters and does not run fights.**
 
-`useSpawnSync` polls `/api/spawn` (it waits until the next ticket is due, 20 to 600 s; an open fight is polled every 2 s, a minimized one every 8 s; a fight action also triggers an immediate sync): the server answers with the chests and monsters
+`useSpawnSync` polls `/api/spawn` (it waits until the next ticket is due, 20 to 600 s; an open fight is polled once, when the plan it was sent says it ends (a fight the server could not plan: every 2 s, a minimized one every 8 s), and the boss timer and the bars run on the browser between answers; a fight action also triggers an immediate sync): the server answers with the chests and monsters
 that have appeared (`applyServerTickets` -> `reconcileMap` places them on the map), the gem balance and the combat view (HP, mana, cooldowns, the open fight). A click on a monster calls `startFight`, which asks `/api/fight` to open the fight;
 from then on the server swings both ways in fixed ticks, with or without the browser.
 

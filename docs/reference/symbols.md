@@ -149,7 +149,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:75`](../../src/lib/offline/placement.ts) | Looks at the land: |
 | `playerProfile` | Combat / A fight | [`src/lib/offline/profile.ts:62`](../../src/lib/offline/profile.ts) | Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, l... |
 | `POISON_FLAGS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:128`](../../src/lib/cloudSave/verify.ts) | Flags that make an account ineligible for rankings for good. |
-| `projectFight` | Combat / A fight | [`src/lib/offline/fightProject.ts:31`](../../src/lib/offline/fightProject.ts) | The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands someth... |
+| `projectFight` | Combat / A fight | [`src/lib/offline/fightProject.ts:32`](../../src/lib/offline/fightProject.ts) | The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands someth... |
 | `qualityBiasOf` | Progression / Crafting | [`src/lib/craftGear.ts:57`](../../src/lib/craftGear.ts) | Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`. |
 | `queueTicket` | Combat / A fight | [`src/lib/offline/fightTargets.ts:88`](../../src/lib/offline/fightTargets.ts) | A click while a fight is open: |
 | `RARITIES` | Loot / Items | [`src/catalog/rarity.ts:34`](../../src/catalog/rarity.ts) | Rarities: |

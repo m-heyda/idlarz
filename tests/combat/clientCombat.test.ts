@@ -629,3 +629,17 @@ test('a resting hero with a queue is remembered: the minimized icon shows the re
 	assert.equal(api().combat.restEndsAt, null, 'no countdown once the fight is open');
 	assert.equal(api().combat.restSec, 0);
 });
+
+test('the time left of a boss fight runs down with the clock between answers, never below 0, and stays null with no limit', () => {
+	freshGame();
+	openFight({ timeLeftSec: 71 });
+	api().tick(1000);
+	api().tick(500);
+	assert.ok(Math.abs(api().combat.fight!.timeLeftSec! - 69.5) < 1e-9);
+	api().tick(120_000);
+	assert.equal(api().combat.fight!.timeLeftSec, 0);
+	openFight({ timeLeftSec: null });
+	api().tick(1000);
+	assert.equal(api().combat.fight!.timeLeftSec, null);
+	closeFight();
+});

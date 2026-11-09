@@ -290,10 +290,11 @@ Takes a monster off the map without a fight (a monster that cannot be beaten, or
 
 ### `projectFight` <small>function</small>
 
-Source: [`src/lib/offline/fightProject.ts:31`](../../src/lib/offline/fightProject.ts)
+Source: [`src/lib/offline/fightProject.ts:32`](../../src/lib/offline/fightProject.ts)
 
 The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player
-commands something first), as the picture the browser animates: HP of both sides about once a second, and the swings and spells to fly.
+commands something first), as the picture the browser animates: HP of both sides and the hero's mana about once a second, and the swings and
+spells to fly.
 Nothing of the ledger is written. Returns null with no fight open or one that does not end within `COMBAT.maxFightSec`.
 
 <a id="paykill"></a>

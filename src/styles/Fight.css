@@ -244,6 +244,20 @@
 
 .fight-potion {
 	position: relative;
+	padding: 0;
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+.fight-potion:hover,
+.fight-skill:not(:disabled):hover {
+	filter: brightness(1.25);
+}
+
+.fight-potion:active,
+.fight-skill:not(:disabled):active {
+	transform: translateY(1px);
 }
 
 .fight-hotkey {
