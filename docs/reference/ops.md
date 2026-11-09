@@ -44,6 +44,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run reset-players` | `tsx scripts/reset-players.ts` |
 | `npm run check-live-saves` | `tsx scripts/check-live-saves.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
+| `npm run perk-caps` | `tsx scripts/perk-caps.ts` |
 | `npm run monster-ladder` | `tsx scripts/monster-ladder.ts` |
 | `npm run catalog-report` | `tsx scripts/catalog-report.ts` |
 | `npm run loot-sim` | `tsx scripts/loot-sim.ts` |
