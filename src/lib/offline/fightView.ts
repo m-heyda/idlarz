@@ -1,3 +1,4 @@
+import { activeBuffs } from '@/lib/buffs';
 import { COMBAT } from '@/config/combatConfig';
 import { limitOf } from '@/lib/limits';
 import { combatOf, type CombatEnv } from '@/lib/offline/fightContext';
@@ -6,14 +7,14 @@ import { nextRetry, pickTarget, placedTarget, queueView } from '@/lib/offline/fi
 import type { CombatView } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
 import type { Ledger } from '@/lib/offline/ledger';
-import { playerProfile } from '@/lib/offline/profile';
+import { profileWithBuffs } from '@/lib/offline/profile';
 
 // SERVER ONLY. The picture of the player's combat the browser is given (and when it should ask again). Reads the ledger, changes nothing.
 
 /** The picture the browser is given: vitals, cooldowns, the open fight and the events it has not seen. */
 export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind: boolean, nextSpawnSec: number | null): CombatView => {
 	const c = combatOf(ledger, env);
-	const p = c.fight ? c.fight.profile : playerProfile(env.stored.core);
+	const p = c.fight ? c.fight.profile : profileWithBuffs(env.stored.core, ledger.buffs, c.at);
 	const f = c.fight;
 	let nextPollSec: number = COMBAT.poll.minimizedSec;
 	let waiting = false;
@@ -40,6 +41,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		else if (!waiting && Number.isFinite(retry)) nextPollSec = Math.min(nextSpawnSec ?? 600, Math.min(600, Math.ceil(retry - c.at) + 1));
 		else if (!waiting) nextPollSec = Math.min(600, Math.max(COMBAT.poll.minimizedSec, Math.ceil(nextSpawnSec ?? 600) + 1));
 	}
+	const runningBuffs = activeBuffs(ledger.buffs, c.at);
 	return {
 		hp: c.hp,
 		mp: c.mp,
@@ -73,6 +75,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		resting,
 		...(resting ? { restSec } : {}),
 		// auto-battle is idle with monsters standing around: they are all beyond the player (or still waiting out a retry, which has its own line)
+		...(runningBuffs.length > 0 ? { buffs: runningBuffs } : {}),
 		autoNote: c.autoBattle && !f && !waiting && pickTarget(ledger, c, c.at) !== null ? 'no_winnable' : null,
 	};
 };

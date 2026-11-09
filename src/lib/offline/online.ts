@@ -3,6 +3,8 @@ import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
 import { rollGemFind } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
+import { clearBuffsOnRebirth } from '@/lib/buffs';
+import { applyUse } from '@/lib/offline/consumables';
 import { combatView, dismissTicket, runCombat, type CombatEnv } from '@/lib/offline/fight';
 import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
@@ -182,6 +184,11 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: InventoryReply } => {
 		const ran = runCombat(ctx.ledger, ctx.env);
 		const ledger = ran.ledger;
+		if (op.action === 'use') {
+			const used = applyUse(ledger, ctx.env, op.index);
+			if (!used.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, message: used.message } };
+			return { ledger: used.ledger, value: { ok: true, gold: 0, count: 0, inv: used.ledger.inv!, serverNowSec: ctx.nowSec, buffs: used.buffs } };
+		}
 		const blocked = needsNoFight(op) && !!ledger.combat?.fight;
 		const result = blocked ? null : applyOp(ledger.inv!, op, sellContextOf(ctx.stored.core));
 		if (!result || !result.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
@@ -252,7 +259,7 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = { ...rebirthInventory(inv, ctx.stored.core.merchantUpgrades), rebirth: { to: judged.to, gain: judged.gain } };
 		return {
-			ledger: { ...ctx.ledger, inv: wiped },
+			ledger: { ...ctx.ledger, inv: wiped, buffs: clearBuffsOnRebirth() },
 			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec },
 		};
 	});

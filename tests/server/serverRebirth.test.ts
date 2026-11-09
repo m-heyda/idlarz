@@ -191,3 +191,10 @@ test('the browser starts the new run with the Embers the server named, never mor
 	assert.equal(api().rebirth(1e9), true);
 	assert.ok(api().prestige.legacyEarned < 1e6, "a server number above the game's own is not taken");
 });
+
+test('a rebirth ends every running potion buff (IDL-155)', async () => {
+	const { m } = await ready();
+	m.ledgers.set(ID, { ...m.ledgers.get(ID)!, buffs: [{ family: 'might', stat: 'damagePct', amount: 10, untilSec: T0 / 1000 + 9999 }] });
+	assert.equal(ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000)).ok, true);
+	assert.deepEqual(m.ledgers.get(ID)!.buffs, []);
+});

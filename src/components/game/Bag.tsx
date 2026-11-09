@@ -12,6 +12,7 @@ import { sellPayout } from '@/utils/game/merchant';
 import ItemSlot from './ItemSlot';
 import CraftStash from './CraftStash';
 import OrganizeButton from './OrganizeButton';
+import BuffRow from './BuffRow';
 import { slotProps } from './itemUi';
 
 /** The 6x6 bag. Double-click equips gear or drinks a potion; right-click opens its menu (use, sell, discard); drag to rearrange or to unequip. */
@@ -19,7 +20,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 	const [tab, setTab] = React.useState<'bag' | 'crafting'>('bag');
 	const bag = useGameStore((state) => state.bag);
 	const equipItem = useGameStore((state) => state.equipItem);
-	const requestPotion = useGameStore((state) => state.requestPotion);
+	const drinkBagItem = useGameStore((state) => state.drinkBagItem);
 	const moveBagItem = useGameStore((state) => state.moveBagItem);
 	const unequipItem = useGameStore((state) => state.unequipItem);
 	const sellItem = useGameStore((state) => state.sellItem);
@@ -27,11 +28,8 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 	const activate = (index: number) => {
 		const slot = bag[index];
 		if (!slot) return;
-		if ('id' in slot && hasEffects(ITEM_CATALOG[slot.id])) {
-			if (useGameStore.getState().playerHp >= useGameStore.getState().combat.maxHp && useGameStore.getState().combat.maxHp > 0)
-				onNotice('Already at full health');
-			else requestPotion(slot.id);
-		} else if (!equipItem(index)) {
+		if ('id' in slot && hasEffects(ITEM_CATALOG[slot.id])) drinkBagItem(index);
+		else if (!equipItem(index)) {
 			onNotice(useGameStore.getState().combat.fight ? 'Finish the fight first' : 'Cannot equip that');
 		}
 	};
@@ -101,6 +99,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 				</button>
 				{tab === 'bag' && <OrganizeButton onNotice={onNotice} />}
 			</div>
+			<BuffRow />
 			{tab === 'crafting' ? (
 				<CraftStash />
 			) : (
@@ -114,6 +113,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 							onDragStart={() => setDrag({ kind: 'bag', index: i })}
 							onDrop={() => drop(i)}
 							onDoubleClick={() => activate(i)}
+							onDrink={slotProps(slot).itemId && hasEffects(ITEM_CATALOG[slotProps(slot).itemId!]) ? () => activate(i) : undefined}
 							onContextMenu={(e) => menu(i, e)}
 						/>
 					))}

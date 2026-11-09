@@ -59,8 +59,13 @@ export const createInventorySync = (set: GameSet, get: GameGet) => {
 			invOpsInFlight--;
 			if (reply.status === 'ok') {
 				settle?.(reply.value);
-				if (!reply.value.ok) toast('The server did not do that: it is undone.');
+				if (!reply.value.ok) toast(reply.value.message ?? 'The server did not do that: it is undone.');
 				applyInventory(reply.value.inv);
+				// a drunk potion changed HP, mana and the buffs: the combat picture is the server's, ask for it
+				if (reply.value.ok && op.action === 'use') {
+					if (reply.value.buffs) set((state) => ({ combat: { ...state.combat, buffs: reply.value.buffs! } }));
+					signalSyncNow();
+				}
 				return;
 			}
 			settle?.(null);

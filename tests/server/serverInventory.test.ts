@@ -11,7 +11,7 @@ import { applyOp, bagCountOf, inventoryFromCore, parseOp, stampInventory } from 
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { plainItem, sellValueOf } from '../../src/lib/itemInstance';
 import { sellPayout } from '../../src/utils/game/merchant';
-import { LOOT_PROFILES } from '../../src/catalog';
+import { ITEM_CATALOG, LOOT_PROFILES } from '../../src/catalog';
 import type { Inventory } from '../../src/lib/offline/types';
 import type { BagSlot } from '../../src/types/game';
 
@@ -366,4 +366,92 @@ test("a chest's item goes into the ledger's bag (or the auto-sell filter), and t
 		}
 	}
 	assert.ok(items >= 0);
+});
+
+// ---------------------------------------------------------------------------------------------------- the use operation (IDL-155)
+
+ITEM_CATALOG.t_might = {
+	...ITEM_CATALOG.potion_minor,
+	id: 't_might',
+	name: 'Test Might',
+	effects: [{ kind: 'buff', family: 'might', stat: 'damagePct', amount: 10, durationSec: 120 }],
+};
+ITEM_CATALOG.t_haste = {
+	...ITEM_CATALOG.potion_minor,
+	id: 't_haste',
+	name: 'Test Haste',
+	effects: [{ kind: 'buff', family: 'haste', stat: 'atkSpeedPct', amount: 8, durationSec: 120 }],
+};
+
+const withBag = (p: Awaited<ReturnType<typeof player>>, ...slots: BagSlot[]) =>
+	p.m.ledgers.set(p.id, { ...p.m.ledgers.get(p.id)!, inv: { ...p.inv(), bag: bag(...slots) } });
+const potionsLeft = (p: Awaited<ReturnType<typeof player>>, id: string) => bagCountOf(p.inv(), id);
+
+test('use: the potion leaves the bag and the buff is recorded in one write; a replayed key consumes once', async () => {
+	const p = await player();
+	withBag(p, { id: 't_might', qty: 3 });
+	const sameKey = key();
+	const parsed = parseOp({ action: 'use', index: 0 })!;
+	const first = ok(await inventoryStep(p.m.deps, p.id, sameKey, parsed, T0 + MIN));
+	assert.equal(first.ok, true);
+	assert.equal(potionsLeft(p, 't_might'), 2);
+	assert.equal(first.buffs?.length, 1);
+	assert.equal(first.buffs![0].untilSec, (T0 + MIN) / 1000 + 120);
+	assert.deepEqual(p.m.ledgers.get(p.id)!.buffs, first.buffs);
+	const replay = ok(await inventoryStep(p.m.deps, p.id, sameKey, parsed, T0 + 2 * MIN));
+	assert.deepEqual(replay, first, 'the stored answer comes back');
+	assert.equal(potionsLeft(p, 't_might'), 2, 'consumed once');
+	assert.equal(p.m.ledgers.get(p.id)!.buffs.length, 1);
+});
+
+test('use: a sixth family is refused with a message and nothing is consumed; a refresh and a buff expiring still work', async () => {
+	const p = await player();
+	withBag(p, { id: 't_might', qty: 2 }, { id: 't_haste', qty: 1 });
+	const at = T0 + MIN;
+	const sec = at / 1000;
+	const five = [
+		{ family: 'ironskin', stat: 'armorPct', amount: 5, untilSec: sec + 500 },
+		{ family: 'keenEye', stat: 'critChance', amount: 5, untilSec: sec + 500 },
+		{ family: 'fortitude', stat: 'maxHpPct', amount: 5, untilSec: sec + 500 },
+		{ family: 'warding', stat: 'dodge', amount: 5, untilSec: sec + 500 },
+		{ family: 'haste', stat: 'atkSpeedPct', amount: 5, untilSec: sec + 500 },
+	] as const;
+	p.m.ledgers.set(p.id, { ...p.m.ledgers.get(p.id)!, buffs: [...five] });
+	const refused = await op(p, { action: 'use', index: 0 }, at);
+	assert.equal(refused.ok, false);
+	assert.match(refused.message ?? '', /Only 5/);
+	assert.equal(potionsLeft(p, 't_might'), 2, 'nothing consumed');
+	// haste is running: another haste potion refreshes it even at five
+	const refreshed = await op(p, { action: 'use', index: 1 }, at);
+	assert.equal(refreshed.ok, true);
+	assert.equal(refreshed.buffs!.length, 5);
+	assert.equal(refreshed.buffs!.find((b) => b.family === 'haste')!.untilSec, sec + 120 > sec + 500 ? sec + 120 : sec + 500, 'the longer one wins');
+	// 600 s later the old ones are over: a sixth is no longer a sixth
+	const later = await op(p, { action: 'use', index: 0 }, at + 600_000);
+	assert.equal(later.ok, true);
+	assert.deepEqual(
+		later.buffs!.map((b) => b.family),
+		['might'],
+	);
+});
+
+test('use: a slot that is not a potion, and an out-of-range slot, are refused', async () => {
+	const p = await player();
+	withBag(p, { item: plainItem('steel_helm') });
+	assert.equal((await op(p, { action: 'use', index: 0 })).ok, false);
+	assert.equal((await op(p, { action: 'use', index: 20 })).ok, false);
+});
+
+test('use: an instant potion (mana) fills the pool through the same op, in the same write that takes it from the bag', async () => {
+	const p = await player();
+	ok(await syncTickets(p.m.deps, p.id, T0 + MIN));
+	withBag(p, { id: 'potion_mana', qty: 1 });
+	const ledger = p.m.ledgers.get(p.id)!;
+	assert.ok(ledger.combat, 'the first combat request seeded the record');
+	p.m.ledgers.set(p.id, { ...ledger, combat: { ...ledger.combat!, mp: 0 } });
+	const reply = await op(p, { action: 'use', index: 0 }, T0 + MIN);
+	assert.equal(reply.ok, true, reply.message);
+	assert.ok(p.m.ledgers.get(p.id)!.combat!.mp > 0, 'mana restored');
+	assert.equal(potionsLeft(p, 'potion_mana'), 0);
+	assert.deepEqual(p.m.ledgers.get(p.id)!.buffs, [], 'no buff for an instant potion');
 });

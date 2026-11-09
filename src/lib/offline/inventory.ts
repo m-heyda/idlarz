@@ -136,7 +136,8 @@ export const receiveInto = (
 export type { InventoryOp };
 
 /** Operations that change what the player carries while a fight is open are refused (the fight swings with the gear it started with). */
-export const needsNoFight = (op: InventoryOp): boolean => op.action !== 'buyShop' && op.action !== 'buyOffer' && op.action !== 'autoSell';
+export const needsNoFight = (op: InventoryOp): boolean =>
+	op.action !== 'buyShop' && op.action !== 'buyOffer' && op.action !== 'autoSell' && op.action !== 'use';
 
 export interface OpResult {
 	ok: boolean;
@@ -244,6 +245,9 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 			}
 			return done(bump(inv, { bag }));
 		}
+		case 'use':
+			// drinking touches the hero's HP, mana and buffs too: it is applied by applyUse (consumables.ts), never here
+			return refused(inv);
 		case 'buyOffer': {
 			if (!isRecord(op.item) || instanceProblem(op.item as ItemInstance)) return refused(inv);
 			const added = addDrop(inv.bag, { kind: 'gear', item: op.item as ItemInstance });
@@ -276,6 +280,8 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 			return raw.rarity === null || typeof raw.rarity === 'string' ? { action: 'autoSell', rarity: raw.rarity as string | null } : null;
 		case 'buyShop':
 			return typeof raw.id === 'string' && int(raw.qty) ? { action: 'buyShop', id: raw.id, qty: raw.qty } : null;
+		case 'use':
+			return int(raw.index) ? { action: 'use', index: raw.index } : null;
 		case 'buyOffer':
 			return isRecord(raw.item) ? { action: 'buyOffer', item: raw.item as unknown as ItemInstance } : null;
 		default:

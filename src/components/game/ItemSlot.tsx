@@ -30,6 +30,8 @@ interface ItemSlotProps {
 	buyPrice?: number;
 	onClick?: (event: React.MouseEvent) => void;
 	onDoubleClick?: () => void;
+	/** A potion in the bag: the hover card shows a Drink button that calls this */
+	onDrink?: () => void;
 	onContextMenu?: (event: React.MouseEvent) => void;
 	onDragStart?: () => void;
 	onDrop?: () => void;
@@ -87,6 +89,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 	buyPrice,
 	onClick,
 	onDoubleClick,
+	onDrink,
 	onContextMenu,
 	onDragStart,
 	onDrop,
@@ -182,7 +185,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				createPortal(
 					<FloatingTip anchor={tip} onPointerEnter={cancelClose} onPointerLeave={scheduleClose}>
 						{def ? (
-							<ItemTooltipStack item={item ?? undefined} itemId={itemId ?? undefined} compare={compare} buyPrice={buyPrice} />
+							<ItemTooltipStack item={item ?? undefined} itemId={itemId ?? undefined} compare={compare} buyPrice={buyPrice} onDrink={onDrink} />
 						) : (
 							<div className='px-tooltip'>
 								<div className='px-tip-muted text-sm'>{label}</div>
