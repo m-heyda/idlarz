@@ -31,10 +31,10 @@ const TIERS: Record<Family, { common: number; rare: number; top: number }> = {
 	damagePct: { common: 4, rare: 6, top: 10 },
 };
 
-/** Cap candidates per family (% of the gear bucket). The first is the owner's tight set (IDL-149 decision 2); roomy is +10 points; none is no cap. */
+/** Cap candidates per family (% of the gear bucket). The first is the owner's tight set (IDL-149 decision 2, XP raised 40 to 50 by the owner on 2026-11-09); roomy is +10 points; none is no cap. */
 const CAPS: { id: string; caps: Record<Family, number> }[] = [
-	{ id: 'tight', caps: { incomePct: 50, xpPct: 40, killRewardPct: 60, clickPct: 40, damagePct: 45 } },
-	{ id: 'roomy', caps: { incomePct: 60, xpPct: 50, killRewardPct: 70, clickPct: 50, damagePct: 55 } },
+	{ id: 'tight', caps: { incomePct: 50, xpPct: 50, killRewardPct: 60, clickPct: 40, damagePct: 45 } },
+	{ id: 'roomy', caps: { incomePct: 60, xpPct: 60, killRewardPct: 70, clickPct: 50, damagePct: 55 } },
 	{ id: 'none', caps: { incomePct: Infinity, xpPct: Infinity, killRewardPct: Infinity, clickPct: Infinity, damagePct: Infinity } },
 ];
 const tight = CAPS[0].caps;
@@ -108,6 +108,19 @@ for (const f of FAMILIES) {
 	const need = (cap: number, base: number) => Math.max(0, Math.ceil((cap - base) / top));
 	const [t, r] = [CAPS[0].caps[f.key], CAPS[1].caps[f.key]];
 	out(`| ${f.label} | ${top} | ${t} | ${need(t, 0)} | ${need(t, obsidian)} | ${r} | ${need(r, 0)} | ${need(r, obsidian)} |`);
+}
+
+// ---- 4b. a stronger weapon legendary ----------------------------------------------------------------------------------------------
+out();
+out('#### Damage: what a stronger weapon legendary does to S2 / S3 (13 pieces plus the weapon)');
+out();
+out(
+	`| Weapon legendary damage | ${['ashen_warlord', 'blightbound'].map((id) => `${SET_DEFS.find((s) => s.id === id)!.label} total`).join(' | ')} | Tight cap |`,
+);
+out('|---|---|---|---|');
+for (const top of [TIERS.damagePct.top, 12, 15, 20]) {
+	const totals = ['ashen_warlord', 'blightbound'].map((id) => setValue(id, withLegendary(id), 'damagePct') + top);
+	out(`| +${top} | ${totals.map((t) => `${t}${t > tight.damagePct ? ` > (cut ${t - tight.damagePct})` : ''}`).join(' | ')} | ${tight.damagePct} |`);
 }
 
 // ---- 5. damage in the real fight engine --------------------------------------------------------------------------------------------

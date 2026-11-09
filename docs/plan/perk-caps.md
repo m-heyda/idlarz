@@ -4,13 +4,10 @@ Read time about 10 minutes. This is analysis only: no game rule or constant is c
 
 The tables in the generated block are computed by `npm run perk-caps -- --md` (`scripts/perk-caps.ts`) from the live set bonuses (`setBonusStats`), the live distance bands and spawn rules, and the server's own fight engine. Edit the candidate caps and tiers at the top of that script, rerun it, then run `npm run format` (the script does not format its output). Do not type numbers into this file by hand.
 
-Already decided (IDL-149, owner, 2026-11-07): tiers 8 / 15 / 25 % for every family (damage 4 / 6 / 10 %), each family its own `(1 + sum)` bucket, tight caps income 50, XP 40, kill reward 60, click 40, damage 45 on the gear bucket (sets and legendary perks added together). What is open is whether those numbers survive the sim.
+## Decided
 
-## What to decide
-
-1. Keep the tight caps as decided, or loosen some (the table shows how many points each one cuts).
-2. IDL-222: should bosses start at castle distance 13+ or 8+.
-3. The legendary slot rule: a 14-piece set loses its top bonus when a legendary takes a slot.
+- IDL-149 (owner, 2026-11-07): tiers 8 / 15 / 25 % for every family (damage 4 / 6 / 10 %), each family its own `(1 + sum)` bucket, caps on the gear bucket (sets and legendary perks added together): income 50, XP 40, kill reward 60, click 40, damage 45.
+- Owner, 2026-11-09, answering this sheet: **XP cap is 50** (not 40). **A legendary that takes a set slot costs the set its top bonus on purpose**: it is a choice of set or legendary, so legendaries are meant to be powerful. **Weapon legendaries should be a little overpowered.** **The IDL-222 boss band waits** (noted in Linear). Nothing below has been applied to the code yet.
 
 ## The numbers
 
@@ -21,7 +18,7 @@ Already decided (IDL-149, owner, 2026-11-07): tiers 8 / 15 / 25 % for every fami
 | Family | Common | Rare | Top | Cap: tight | Cap: roomy | Cap: none |
 |---|---|---|---|---|---|---|
 | Income | 8 | 15 | 25 | 50 | 60 | none |
-| XP | 8 | 15 | 25 | 40 | 50 | none |
+| XP | 8 | 15 | 25 | 50 | 60 | none |
 | Kill reward | 8 | 15 | 25 | 60 | 70 | none |
 | Click gold | 8 | 15 | 25 | 40 | 50 | none |
 | Damage | 4 | 6 | 10 | 45 | 55 | none |
@@ -39,12 +36,12 @@ Set only = the live bonuses at the full piece count. Set + legendary adds the To
 | Ashen Warlord | 14 / 13 | 0 (x1.00) | 25 (x1.25) | 25 (x1.25) | no |
 | Blightbound | 14 / 13 | 0 (x1.00) | 25 (x1.25) | 25 (x1.25) | no |
 
-**XP** (tight cap 40, top legendary +25)
+**XP** (tight cap 50, top legendary +25)
 
 | Set | Pieces (alone / with legendary) | Set only | Set + top legendary | Legendary alone | Over the tight cap? |
 |---|---|---|---|---|---|
-| Obsidian Set | 12 / 12 | 25 (x1.25) | 50 > (x1.40) | 25 (x1.25) | yes, 10 points cut |
-| Sunhoney Raiment | 14 / 13 | 32 (x1.32) | 45 > (x1.40) | 25 (x1.25) | yes, 5 points cut |
+| Obsidian Set | 12 / 12 | 25 (x1.25) | 50 (x1.50) | 25 (x1.25) | no |
+| Sunhoney Raiment | 14 / 13 | 32 (x1.32) | 45 (x1.45) | 25 (x1.25) | no |
 | Ashen Warlord | 14 / 13 | 0 (x1.00) | 25 (x1.25) | 25 (x1.25) | no |
 | Blightbound | 14 / 13 | 0 (x1.00) | 25 (x1.25) | 25 (x1.25) | no |
 
@@ -80,11 +77,11 @@ Set only = the live bonuses at the full piece count. Set + legendary adds the To
 | Set | Family | Raw total | Cut by tight | Cut by roomy | Cut by none |
 |---|---|---|---|---|---|
 | Obsidian Set | Income | 51 | 1 | 0 | 0 |
-| Obsidian Set | XP | 50 | 10 | 0 | 0 |
+| Obsidian Set | XP | 50 | 0 | 0 | 0 |
 | Obsidian Set | Kill reward | 62 | 2 | 0 | 0 |
 | Obsidian Set | Click gold | 35 | 0 | 0 | 0 |
 | Sunhoney Raiment | Income | 53 | 3 | 0 | 0 |
-| Sunhoney Raiment | XP | 45 | 5 | 0 | 0 |
+| Sunhoney Raiment | XP | 45 | 0 | 0 | 0 |
 | Sunhoney Raiment | Kill reward | 45 | 0 | 0 | 0 |
 | Sunhoney Raiment | Click gold | 39 | 0 | 0 | 0 |
 | Ashen Warlord | Damage | 38 | 0 | 0 | 0 |
@@ -95,10 +92,19 @@ Set only = the live bonuses at the full piece count. Set + legendary adds the To
 | Family | Top | Tight cap | Legendaries alone | With Obsidian 12 | Roomy cap | Legendaries alone | With Obsidian 12 |
 |---|---|---|---|---|---|---|---|
 | Income | 25 | 50 | 2 | 1 | 60 | 3 | 2 |
-| XP | 25 | 40 | 2 | 1 | 50 | 2 | 1 |
+| XP | 25 | 50 | 2 | 1 | 60 | 3 | 2 |
 | Kill reward | 25 | 60 | 3 | 1 | 70 | 3 | 2 |
 | Click gold | 25 | 40 | 2 | 2 | 50 | 2 | 2 |
 | Damage | 10 | 45 | 5 | 5 | 55 | 6 | 6 |
+
+#### Damage: what a stronger weapon legendary does to S2 / S3 (13 pieces plus the weapon)
+
+| Weapon legendary damage | Ashen Warlord total | Blightbound total | Tight cap |
+|---|---|---|---|
+| +10 | 38 | 40 | 45 |
+| +12 | 40 | 42 | 45 |
+| +15 | 43 | 45 | 45 |
+| +20 | 48 > (cut 3) | 50 > (cut 5) | 45 |
 
 #### Damage against the fight engine
 
@@ -142,36 +148,29 @@ Live fact: no boss can stand farther than 9 tiles from the castle, the outskirts
 
 <!-- perk-caps:end -->
 
-## Reading the tables
+## Reading the tables (caps: income 50, XP 50, kill reward 60, click 40, damage 45)
 
-- **Income, kill reward**: with Obsidian 12 plus one top legendary the totals are 51 and 62 against caps of 50 and 60. The cap cuts 1 and 2 points: the owner's "a choice of set or legendary, not both" holds, but the cut is so small a player will not notice it. Sunhoney 14 alone is already 38 income and 48 kill reward.
-- **XP is where the tight cap hurts.** Obsidian 12 is 25, a top legendary adds 25, the cap is 40: 10 of the legendary's 25 points (40 %) are thrown away, and Sunhoney 14 (32) loses 5. A top XP legendary is worth +15 on an XP set, which reads as a trap in a tooltip that says +25.
-- **Click gold** never reaches the tight cap (35 and 39 with a legendary). The cap is only a guard against two click legendaries.
-- **Damage**: no set plus one top damage legendary reaches 45 (S2 28 + 10 = 38, S3 30 + 10 = 40). Five top damage legendaries are needed to fill it. In the fight engine the S2 kit already beats every boss at 100 % at castle 8 gear levels, and the time to win barely moves between 38, 45 and 48 % (about one second on the hardest boss), so damage is not what limits those fights. The cap protects against stacking, not against a single item.
-- **A legendary can cost more than it gives.** Sunhoney 14 alone is 48 kill reward; with a top kill-reward legendary in one slot it drops to 13 pieces and totals 20 + 25 = 45, lower than without it. That is the 14th-piece rule, not the cap, and it will affect every 14-piece economy set.
-- **Caveats**: the S1-S3 sets are `enabled: false` placeholders (their numbers are "70-90 % of the caps" by design), and no legendary exists yet (IDL-144), so "top legendary" here is the +25 headline from the tier table, not an item.
+- **Income, kill reward**: Obsidian 12 plus one top legendary totals 51 and 62 against caps of 50 and 60, so the cap cuts 1 and 2 points. "Set or legendary, not both" holds, and the cut is too small for a player to notice.
+- **XP at 50**: Obsidian 12 (25) plus a top legendary (25) lands exactly on the cap, and Sunhoney (45 with the legendary) is under it. The headline +25 is fully paid for these builds, which the old cap of 40 was not (it threw away 10 points).
+- **Click gold** never reaches 40 with one legendary (35 and 39); the cap guards only against two click legendaries.
+- **Damage**: one top damage legendary leaves S2 at 38 and S3 at 40, under 45. In the fight engine the S2 kit beats every boss at 100 % at castle 8 gear levels and the time to win moves by about a second between 38, 45 and 48 %, so damage is not what limits those fights (gear at authored level; placeholder sets).
+- **Legendary versus set**: Sunhoney 14 alone is 48 kill reward; with a top kill-reward legendary it is 20 + 25 = 45. That is the intended "set or legendary" choice, but it means a legendary can be worth less than the set piece it replaces. Tuning the set bonuses (R2 C5) should keep that in mind.
+- **Caveats**: S1-S3 are `enabled: false` placeholders and no legendary exists yet (IDL-144), so "top legendary" is the headline tier, not an item.
 
 ## Recommendation
 
-- Keep **income 50, kill reward 60, click 40 and damage 45** as decided: they cut little or nothing today and leave real headroom for the later set re-tune.
-- Raise **XP from 40 to 50.** At 40 an Obsidian player gains 15 of 25 from the headline legendary and an XP set is capped by its own bonuses; at 50 the cut is gone for Sunhoney and Obsidian plus one legendary lands exactly on the cap (50). If the owner wants XP slow on purpose, keep 40 but then lower the XP top tier or print the capped total in the tooltip (already planned for build time).
-- Do not tune damage from this sheet: the fight engine shows no boss pressure at 38-48 %, so 45 is a guard, not a balance lever. Re-check it with the real S2/S3 pieces after the placeholder bonuses are tuned (R2 C5).
-- Decide the **14th-piece rule** before IDL-144 fixes the legendary slots (open question 2).
+- Set the caps to **income 50, XP 50, kill reward 60, click 40, damage 45**.
+- **Damage and weapon legendaries (owner wants them a little OP):** keep the cap at 45 and do not lower it. Give *weapon* legendaries a larger top damage tier than the 10 of other slots. The weapon table shows +15 puts S2 at 43 and S3 at 45, exactly on the cap, so a weapon legendary is the strongest single item and a second damage perk is the only thing that gets cut. Going above 15 (20 cuts 5 points on S3) wastes points under this cap; if weapons should go higher, raise the cap with them (for example 50).
+- The 14th-piece loss stays as designed; no code change is needed for it.
 
-## IDL-222: 13+ or 8+
+## IDL-222: boss band (waiting)
 
-The code supports neither number as written:
+Owner decision: wait and decide later; a note is on the Linear issue. The evidence for when it is picked up:
 
-- Every monster, bosses included, may stand only 2 to 9 tiles from the castle (`MonsterSpawnRule`, `maxCastleDistance` 9 in `src/config/combatConfig.ts`). The frontier band starts at 13 (`DISTANCE_BANDS`), so "bosses from 13+" means **no boss would ever spawn** unless the spawn range is widened in the same change (IDL-53).
-- With today's range an **8+ band** is non-empty (tiles at distance 8 and 9), and it sits just past the outskirts start (7), so it keeps bosses out of the home ring where a new player lives.
-- Win chance gives no help in choosing the number: at castle 8 gear levels an Obsidian 12 hero (level 30) beats the plains boss most of the time and none of the other three, so a distance band alone does not make them fair; only the weighting and level cap of option (b) would.
+- Every monster, bosses included, stands only 2 to 9 tiles from the castle (`maxCastleDistance` 9 in `src/config/combatConfig.ts`), while the frontier band starts at 13 (`DISTANCE_BANDS`). A "13+" band therefore needs the spawn range widened in the same change (IDL-53) or no boss ever spawns.
+- With today's range an 8+ band is not empty (distances 8 and 9) and sits past the outskirts start (7).
+- A distance band does not make bosses fair: at castle 8 gear levels an Obsidian 12 hero (level 30) beats the plains boss most of the time and none of the other three; only the weighting and level cap of IDL-222 option (b) would.
 
-Recommendation: use **8+ now** (it works with today's rules and needs only a `minCastleDistance` change on the four bosses), and move to 13+ together with the IDL-53 spawn tables that widen the spawn range, not before.
+## Not in this sheet
 
-## Open questions
-
-1. XP cap: 40 (as decided) or 50 (recommended)?
-2. Should a legendary that takes a set slot keep the set's top bonus (a 14-piece set counts 13 pieces plus the legendary as the 14th), or is the loss deliberate to make "set or legendary" a real choice?
-3. Does the damage cap need to be 45 while the tier is 10 and one legendary gets nowhere near it, or should it follow the tier (a cap of 40 would make the second damage legendary matter)?
-4. Boss band: 8+ now and 13+ with IDL-53, or wait and decide once?
-5. Offline efficiency, offline cap hours, max HP % and chest speed are not in this sheet: offline keeps `HARD_LIMITS`, the rest need their own rows once the set tuning is final.
+Offline efficiency, offline cap hours, max HP % and chest speed. Offline keeps `HARD_LIMITS` (100 % and 72 h); the others need their own rows once the set tuning is final.
