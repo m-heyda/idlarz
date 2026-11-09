@@ -3418,7 +3418,7 @@ Ranking eligibility (<code>trusted</code>): the first save was a young game (&lt
 <li><code>gold_jump</code>: gold gain above income x time x 1.5 + burst + 1,000 + 2% of the balance + server grants.</li>
 <li><code>xp_jump</code>: XP above what bought tiles, play time and server payouts explain (<a href="#xp-model"><code>XP_MODEL</code></a>).</li>
 <li><code>gems_increase</code>: gems above the server&#39;s balance. <code>prestige_regress</code>: rebirths or Embers earned went down.</li>
-<li><code>castle_jump</code>: castle level or timer faster than real time. <code>ember_jump</code>: Embers above what the last save&#39;s castle and land can pay (<a href="#ember-model"><code>EMBER_MODEL</code></a>).</li>
+<li><code>castle_jump</code>: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock (<a href="#trustedeconomy"><code>trustedEconomy</code></a>), so one flag does not repeat on every later honest save (IDL-250). <code>ember_jump</code>: Embers above what the last save&#39;s castle and land can pay (<a href="#ember-model"><code>EMBER_MODEL</code></a>).</li>
 </ul>
 <p><strong>Rejection is switched off</strong>: <code>ENFORCEMENT.enabled = false</code>. In this shadow mode flagged saves are stored and only the account&#39;s ranking eligibility suffers (<a href="#poison-flags"><code>POISON_FLAGS</code></a>).
 With it on, only <code>playtime_fast</code>, <code>gold_jump</code> and <code>gems_increase</code> refuse a save (HTTP 422).</p>
@@ -3495,11 +3495,15 @@ With it on, only <code>playtime_fast</code>, <code>gold_jump</code> and <code>ge
 </tbody></table>
 </article><article><p><a id="trustedeconomy"></a></p>
 <h3><code>trustedEconomy</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/trustedEconomy.ts"><code>src/lib/cloudSave/trustedEconomy.ts:37</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/trustedEconomy.ts"><code>src/lib/cloudSave/trustedEconomy.ts:44</code></a></p>
 <p><code>ratio</code> is the net-worth check&#39;s <code>required / allowed</code> (over 1 = the save claims more than its time can explain). With a baseline the rates
 and the castle are the previous save&#39;s; without one (the account&#39;s first save, or the first of a new run) there is nothing trusted to fall
 back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.</p>
-<p>After <code>castle_jump</code> or <code>networth_exceeds</code> the rates, castle level and castle timer the server pays from are those of the last trusted save of the same run; unpaid merchant levels are put back to the last trusted level (Pack Rat excepted).</p>
+<p>After <code>castle_jump</code> or <code>networth_exceeds</code> the rates, castle level and castle timer the server pays from are those of the last trusted save of the same run; unpaid merchant levels are put back to the last trusted level (Pack Rat excepted).
+The kept castle timer counts down by the real seconds since the save it comes from (<code>elapsedSec</code>, the server clock), never faster than real time and never below 0 (IDL-250).</p>
+<p><strong>Formula</strong></p>
+<pre><code class="language-text">frozen castle remaining = max(0, last trusted remaining - elapsedSec between the saves)
+</code></pre>
 </article><article><p><a id="xp-model"></a></p>
 <h3><code>XP_MODEL</code> <small>const</small></h3>
 <p>Source: <a href="../../src/lib/cloudSave/xpModel.ts"><code>src/lib/cloudSave/xpModel.ts:21</code></a></p>

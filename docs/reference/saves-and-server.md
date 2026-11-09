@@ -272,7 +272,7 @@ The flags and what the server does with each. Meaning of each flag:
 - `gold_jump`: gold gain above income x time x 1.5 + burst + 1,000 + 2% of the balance + server grants.
 - `xp_jump`: XP above what bought tiles, play time and server payouts explain ([`XP_MODEL`](saves-and-server.md#xp-model)).
 - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
-- `castle_jump`: castle level or timer faster than real time. `ember_jump`: Embers above what the last save's castle and land can pay ([`EMBER_MODEL`](saves-and-server.md#ember-model)).
+- `castle_jump`: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock ([`trustedEconomy`](saves-and-server.md#trustedeconomy)), so one flag does not repeat on every later honest save (IDL-250). `ember_jump`: Embers above what the last save's castle and land can pay ([`EMBER_MODEL`](saves-and-server.md#ember-model)).
 
 **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ([`POISON_FLAGS`](saves-and-server.md#poison-flags)).
 With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save (HTTP 422).
@@ -296,13 +296,20 @@ With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save 
 
 ### `trustedEconomy` <small>function</small>
 
-Source: [`src/lib/cloudSave/trustedEconomy.ts:37`](../../src/lib/cloudSave/trustedEconomy.ts)
+Source: [`src/lib/cloudSave/trustedEconomy.ts:44`](../../src/lib/cloudSave/trustedEconomy.ts)
 
 `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). With a baseline the rates
 and the castle are the previous save's; without one (the account's first save, or the first of a new run) there is nothing trusted to fall
 back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.
 
 After `castle_jump` or `networth_exceeds` the rates, castle level and castle timer the server pays from are those of the last trusted save of the same run; unpaid merchant levels are put back to the last trusted level (Pack Rat excepted).
+The kept castle timer counts down by the real seconds since the save it comes from (`elapsedSec`, the server clock), never faster than real time and never below 0 (IDL-250).
+
+**Formula**
+
+```text
+frozen castle remaining = max(0, last trusted remaining - elapsedSec between the saves)
+```
 
 <a id="xp-model"></a>
 

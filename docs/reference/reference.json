@@ -977,7 +977,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/trustedEconomy.ts",
-  "line": 37,
+  "line": 44,
   "summary": "`ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). With a baseline the rates and the castle are the previous save's; without one (the account's first save, or the first of a new run) there is nothing trusted to fall back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.",
   "see": []
  },

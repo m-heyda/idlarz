@@ -204,7 +204,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
 | `totalStatPoints` | Progression / Levels | [`src/utils/game/character.ts:151`](../../src/utils/game/character.ts) | The attribute points a character that has reached `level` has earned in all (a level gives 1; |
 | `TRADE_GOODS` | Economy / Crafting | [`src/catalog/recipes.ts:36`](../../src/catalog/recipes.ts) | The trade goods crafting makes (IDL-227): |
-| `trustedEconomy` | Saves & Server / Accepting a save | [`src/lib/cloudSave/trustedEconomy.ts:37`](../../src/lib/cloudSave/trustedEconomy.ts) | `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). |
+| `trustedEconomy` | Saves & Server / Accepting a save | [`src/lib/cloudSave/trustedEconomy.ts:44`](../../src/lib/cloudSave/trustedEconomy.ts) | `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). |
 | `typeWeights` | Monsters / Spawning | [`src/lib/offline/spawnWeights.ts:49`](../../src/lib/offline/spawnWeights.ts) | Weight of each type for this player and castle level, in the order given. |
 | `UNCLAIMED_SEC` | Combat / Results and rest | [`src/lib/offline/grant.ts:46`](../../src/lib/offline/grant.ts) | The longest gap the server treats as the same session: |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |
