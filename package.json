@@ -17,6 +17,7 @@
 		"reset-players": "tsx scripts/reset-players.ts",
 		"check-live-saves": "tsx scripts/check-live-saves.ts",
 		"fight-sim": "tsx scripts/fight-sim.ts",
+		"perk-caps": "tsx scripts/perk-caps.ts",
 		"monster-ladder": "tsx scripts/monster-ladder.ts",
 		"catalog-report": "tsx scripts/catalog-report.ts",
 		"loot-sim": "tsx scripts/loot-sim.ts",

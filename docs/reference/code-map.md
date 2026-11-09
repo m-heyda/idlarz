@@ -500,6 +500,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pacing-guard.ts`](../../scripts/pacing-guard.ts) — The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % or more than 5 game days against a base. Prints a summary table first.
 - [`pacingCompare.ts`](../../scripts/pacingCompare.ts) — The pure part of the pacing guard (scripts/pacing-guard.ts, tests/economy/pacingGuard.test.ts): compares two sim baselines
 - [`perf-world.ts`](../../scripts/perf-world.ts) — How the game copes with a big map:
+- [`perk-caps.ts`](../../scripts/perk-caps.ts) — Perk family cap sim (IDL-149): how the gear bucket of each family behaves against the set bonuses and a top legendary, for several cap candidates.
 - [`reset-players.ts`](../../scripts/reset-players.ts) — Season restart:
 - [`reset-test-account.ts`](../../scripts/reset-test-account.ts) — Clears the game data of the ONE account the end-to-end tests use (docs/reference/ops.md), so a test run starts from a new game.
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
