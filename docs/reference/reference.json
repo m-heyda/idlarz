@@ -1391,13 +1391,24 @@
   "see": []
  },
  {
+  "id": "applyuse",
+  "name": "applyUse",
+  "symbol": "applyUse",
+  "kind": "function",
+  "category": "Combat/Consumables",
+  "file": "src/lib/offline/consumables.ts",
+  "line": 27,
+  "summary": "Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).",
+  "see": []
+ },
+ {
   "id": "runcombat",
   "name": "runCombat",
   "symbol": "runCombat",
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fight.ts",
-  "line": 62,
+  "line": 63,
   "summary": "Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battle allows. Returns the new ledger. All events are in `ledger.combat.log`.",
   "see": [
    "fightStep",
@@ -1412,7 +1423,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fight.ts",
-  "line": 136,
+  "line": 147,
   "summary": "Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). Ends the fight against it.",
   "see": []
  },
@@ -1423,7 +1434,7 @@
   "kind": "function",
   "category": "Combat/Results and rest",
   "file": "src/lib/offline/fight.ts",
-  "line": 155,
+  "line": 166,
   "summary": "After an absence the player is back on their feet: HP and mana refilled by resting for `gapSec`, no fight open, cooldowns over.",
   "see": []
  },
@@ -1434,7 +1445,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightContext.ts",
-  "line": 72,
+  "line": 76,
   "summary": "The next random stream of a fight: sealed on the secret, the user, the run and the fight's ordinal, one draw per call.",
   "see": []
  },
@@ -1539,7 +1550,7 @@
   "kind": "interface",
   "category": "Saves & Server/The ledger",
   "file": "src/lib/offline/ledger.ts",
-  "line": 77,
+  "line": 78,
   "summary": "The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor, the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result, `combat` (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), `inv` (bag, gear, pity, auto-sell, Pack Rat size) and `resetAt`.",
   "see": [
    "sealedRng",
@@ -1564,8 +1575,19 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/profile.ts",
-  "line": 59,
+  "line": 62,
   "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear.",
+  "see": []
+ },
+ {
+  "id": "withbuffs",
+  "name": "withBuffs",
+  "symbol": "withBuffs",
+  "kind": "function",
+  "category": "Combat/Consumables",
+  "file": "src/lib/offline/profile.ts",
+  "line": 96,
+  "summary": "A profile with the running potion buffs on top ({@link buffTotals}): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object), so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.",
   "see": []
  },
  {
@@ -1731,7 +1753,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 340,
+  "line": 342,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

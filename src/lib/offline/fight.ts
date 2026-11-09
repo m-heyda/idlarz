@@ -1,13 +1,14 @@
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
-import { healHpOf } from '@/catalog/buffs';
+import { quickHealOf } from '@/catalog/buffs';
 import { autoBattleUnlocked } from '@/lib/combat';
 import { combatOf, EPS, type CombatEnv, type FightCtx } from '@/lib/offline/fightContext';
 import { engage, queueHasTarget } from '@/lib/offline/fightTargets';
 import { applyCommand, endFight, fightStep, idleStep } from '@/lib/offline/fightSteps';
-import { COSMETIC_EVENTS, freshCooldowns, type CombatCommand, type CombatState, type QueueResult } from '@/lib/offline/fightTypes';
+import { COSMETIC_EVENTS, freshCooldowns, type CombatCommand, type CombatState, type PlayerProfile, type QueueResult } from '@/lib/offline/fightTypes';
 import type { Ledger } from '@/lib/offline/ledger';
-import { playerProfile } from '@/lib/offline/profile';
+import { buffTotals } from '@/lib/buffs';
+import { playerProfile, profileWithBuffs, withBuffs } from '@/lib/offline/profile';
 import { inventoryFromCore } from '@/lib/offline/inventory';
 import { takeMonster } from '@/lib/offline/tickets';
 
@@ -70,12 +71,20 @@ export const runCombat = (
 	// what the browser has told us it applied (its `since`) is not kept: only cosmetic events are ever dropped unacknowledged
 	const log = ask.ack === undefined ? [...base.log] : base.log.filter((event) => COSMETIC_EVENTS.has(event.kind) || event.no > ask.ack!);
 	const c: CombatState = { ...base, cd: { ...base.cd }, log, fight: base.fight ? { ...base.fight } : null, queue: [...(base.queue ?? [])] };
+	// the potion buffs ride on the profile: it is worked out once, again only when a buff ends (`buffsEndAt`), and a fight freezes whatever it is when the fight starts
+	const baseProfile = playerProfile(env.stored.core);
+	let buffsEndAt = Infinity;
+	const profileAt = (t: number): PlayerProfile => {
+		const running = ledger.buffs.filter((buff) => buff.untilSec > t);
+		buffsEndAt = running.reduce((soonest, buff) => Math.min(soonest, buff.untilSec), Infinity);
+		return withBuffs(baseProfile, buffTotals(running, t));
+	};
 	const ctx: FightCtx = {
 		env,
 		c,
 		ledger,
-		profileNow: playerProfile(env.stored.core),
-		potionIds: Object.keys(ITEM_CATALOG).filter((id) => healHpOf(ITEM_CATALOG[id]) > 0),
+		profileNow: profileAt(Math.min(c.at, env.nowSec)),
+		potionIds: Object.keys(ITEM_CATALOG).filter((id) => quickHealOf(ITEM_CATALOG[id]) > 0),
 	};
 	let queued: QueueResult | undefined;
 	// auto-battle is locked until the first rebirth: a save that has it on from before (or a request for it) does not get it
@@ -89,6 +98,7 @@ export const runCombat = (
 	let behind = false;
 	for (let guard = 0; t < now - EPS && guard < 200000; guard++) {
 		if (!c.fight) {
+			if (t >= buffsEndAt) ctx.profileNow = profileAt(t);
 			if (engage(ctx, t)) continue;
 			// nothing to fight yet: rest until something can change
 			t += idleStep(ctx, t, now);
@@ -106,6 +116,7 @@ export const runCombat = (
 	c.at = t;
 
 	// ---- what the player asked for, at the clock's time ----
+	if (!c.fight && t >= buffsEndAt) ctx.profileNow = profileAt(t);
 	if (ask.autoUse !== undefined) c.autoUse = ask.autoUse;
 	if (ask.autoBattle !== undefined) {
 		c.autoBattle = ask.autoBattle && autoAllowed;
@@ -154,7 +165,7 @@ export const dismissTicket = (ledger: Ledger, env: CombatEnv, n: number): { ledg
  */
 export const restThrough = (ledger: Ledger, env: CombatEnv, gapSec: number): Ledger => {
 	const base = combatOf(ledger, env);
-	const p = playerProfile(env.stored.core);
+	const p = profileWithBuffs(env.stored.core, ledger.buffs, env.nowSec);
 	const rest = Math.max(0, gapSec);
 	const combat: CombatState = {
 		...base,

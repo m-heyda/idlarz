@@ -59,6 +59,8 @@ interface BodyProps {
 	wornLabel?: boolean;
 	/** The item is on the merchant's shelf: the card shows what it costs instead of what it sells for */
 	buyPrice?: number;
+	/** Shows a Drink button under the effects (a potion in the bag) */
+	onDrink?: () => void;
 }
 
 /**
@@ -67,7 +69,7 @@ interface BodyProps {
  * `comparison` every number carries its change against the worn piece, stats the worn piece has and this one lacks are
  * listed as lost, and the set block shows the state after the swap.
  */
-const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice }) => {
+const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const resolved = item ? resolveItem(item) : null;
 	const def = resolved?.def ?? (itemId ? ITEM_CATALOG[itemId] : undefined);
@@ -143,6 +145,11 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 					{describeEffect(effect)}
 				</div>
 			))}
+			{onDrink && hasEffects(def) && (
+				<button type='button' className='px-btn px-btn-sm mt-1' onClick={onDrink}>
+					Drink
+				</button>
+			)}
 			{/* base stats and affixes, grouped by what they are for: a long list is read by its colored headings */}
 			{STAT_CATEGORIES.map((category) => {
 				const catRows = rows.filter((row) => STAT_CATEGORY[row.key] === category.id);
@@ -242,13 +249,19 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
  * The hover card of an item. With `compare` (the bag) and a piece worn in the same slot it becomes two cards side by side:
  * the worn piece (marked Equipped) and the hovered one with every number set against it.
  */
-const ItemTooltipStack: React.FC<{ item?: ItemInstance; itemId?: string; compare?: boolean; buyPrice?: number }> = ({ item, itemId, compare, buyPrice }) => {
+const ItemTooltipStack: React.FC<{ item?: ItemInstance; itemId?: string; compare?: boolean; buyPrice?: number; onDrink?: () => void }> = ({
+	item,
+	itemId,
+	compare,
+	buyPrice,
+	onDrink,
+}) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const comparison = compare && item ? compareDetailed(item, equipment) : null;
 	return (
 		<div className='flex items-start gap-2'>
 			<div className='px-tooltip'>
-				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} />
+				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} onDrink={onDrink} />
 			</div>
 			{comparison?.equipped && (
 				<div className='px-tooltip px-tooltip-worn'>

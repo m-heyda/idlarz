@@ -112,7 +112,7 @@ function categoryPage(def: (typeof CATEGORIES)[number], sections: Map<string, Do
 
 /** One short sentence for the index: links flattened, cut at the first sentence end or 150 characters. */
 const shortSummary = (text: string): string => {
-	const plain = text.replace(/{@links+([^}s]+)}/g, '$1').replace(/|/g, '\|');
+	const plain = text.replace(/{@link\s+([^}\s]+)}/g, '$1').replace(/\|/g, '\\|');
 	const end = plain.search(/[.:;] /);
 	const sentence = end > 0 ? plain.slice(0, end + 1) : plain;
 	return sentence.length > 150 ? `${sentence.slice(0, 147).trimEnd()}...` : sentence;

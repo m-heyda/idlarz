@@ -57,6 +57,13 @@ export type ConsumableEffect =
 export const healHpOf = (def: Pick<ItemDef, 'effects'> | undefined): number =>
 	(def?.effects ?? []).reduce((sum, effect) => sum + (effect.kind === 'healHp' ? effect.amount : 0), 0);
 
+/**
+ * The HP of a potion that the hotkeys and auto-use may drink: its `healHp`, or 0 when it also carries a timed buff (those are only drunk by hand, from the bag, so auto-use
+ * never spends a buff the player did not choose).
+ */
+export const quickHealOf = (def: Pick<ItemDef, 'effects'> | undefined): number =>
+	(def?.effects ?? []).some((effect) => effect.kind === 'buff') ? 0 : healHpOf(def);
+
 /** The mana one potion restores at once. */
 export const healMpOf = (def: Pick<ItemDef, 'effects'> | undefined): number =>
 	(def?.effects ?? []).reduce((sum, effect) => sum + (effect.kind === 'healMp' ? effect.amount : 0), 0);

@@ -113,6 +113,7 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 				restSec: view.restSec ?? 0,
 				restEndsAt: view.resting ? Date.now() + (view.restSec ?? 0) * 1000 : null,
 				queueMax: view.queueMax ?? state.combat.queueMax,
+				buffs: view.buffs ?? [],
 			},
 		});
 		writeCursor(view.eventNo);

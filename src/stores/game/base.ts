@@ -71,6 +71,7 @@ export const initialCombat = (): CombatClientState => ({
 	restSec: 0,
 	restEndsAt: null,
 	queueMax: LIMITS.battleQueue,
+	buffs: [],
 });
 
 /** All game data of a brand-new game (no actions). */

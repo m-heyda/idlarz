@@ -12,7 +12,7 @@ The player's numbers, the server's fight engine, auto-battle, skills and win cha
 - Win chance: [`estimateWin`](#estimatewin)
 - Potions and skills: [`healAmount`](#healamount), [`autoUse`](#autouse), [`SKILLS`](#skills)
 - Results and rest: [`restThrough`](#restthrough), [`UNCLAIMED_SEC`](#unclaimed-sec)
-- Consumables: [`BUFF_FAMILIES`](#buff-families), [`MAX_ACTIVE_BUFFS`](#max-active-buffs), [`readBuffs`](#readbuffs), [`addBuff`](#addbuff), [`buffTotals`](#bufftotals), [`drink`](#drink)
+- Consumables: [`BUFF_FAMILIES`](#buff-families), [`MAX_ACTIVE_BUFFS`](#max-active-buffs), [`readBuffs`](#readbuffs), [`addBuff`](#addbuff), [`buffTotals`](#bufftotals), [`drink`](#drink), [`withBuffs`](#withbuffs), [`applyUse`](#applyuse)
 
 ## Overview
 
@@ -177,7 +177,7 @@ Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(a
 
 ### `runCombat` <small>function</small>
 
-Source: [`src/lib/offline/fight.ts:62`](../../src/lib/offline/fight.ts)
+Source: [`src/lib/offline/fight.ts:63`](../../src/lib/offline/fight.ts)
 
 Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when
 auto-battle allows. Returns the new ledger. All events are in `ledger.combat.log`.
@@ -248,7 +248,7 @@ Auto-battle (the server picking the next monster) is a reward for the first rebi
 
 ### `playerProfile` <small>function</small>
 
-Source: [`src/lib/offline/profile.ts:59`](../../src/lib/offline/profile.ts)
+Source: [`src/lib/offline/profile.ts:62`](../../src/lib/offline/profile.ts)
 
 Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear.
 
@@ -282,7 +282,7 @@ The next fight: the queue's head (the player chose it, so no retry time and no w
 
 ### `dismissTicket` <small>function</small>
 
-Source: [`src/lib/offline/fight.ts:136`](../../src/lib/offline/fight.ts)
+Source: [`src/lib/offline/fight.ts:147`](../../src/lib/offline/fight.ts)
 
 Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). Ends the fight against it.
 
@@ -301,7 +301,7 @@ The kill is paid from the ticket's spawn level and age ([`levelAtAge`](monsters.
 
 ### `rngFor` <small>function</small>
 
-Source: [`src/lib/offline/fightContext.ts:72`](../../src/lib/offline/fightContext.ts)
+Source: [`src/lib/offline/fightContext.ts:76`](../../src/lib/offline/fightContext.ts)
 
 The next random stream of a fight: sealed on the secret, the user, the run and the fight's ordinal, one draw per call.
 
@@ -379,7 +379,7 @@ Nothing else is learned or levelled. Four classes (warrior, paladin, ranger, mag
 
 ### `restThrough` <small>function</small>
 
-Source: [`src/lib/offline/fight.ts:155`](../../src/lib/offline/fight.ts)
+Source: [`src/lib/offline/fight.ts:166`](../../src/lib/offline/fight.ts)
 
 After an absence the player is back on their feet: HP and mana refilled by resting for `gapSec`, no fight open, cooldowns over.
 
@@ -478,3 +478,33 @@ already full for every one of them.
 hp' = min(maxHp, hp + healHp)      mp' = min(maxMp, mp + healMp)
 buffs: each buff effect through addBuff; a refusal by any of them refuses the potion
 ```
+
+<a id="withbuffs"></a>
+
+### `withBuffs` <small>function</small>
+
+Source: [`src/lib/offline/profile.ts:96`](../../src/lib/offline/profile.ts)
+
+A profile with the running potion buffs on top ([`buffTotals`](combat.md#bufftotals)): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object),
+so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.
+
+**Formula**
+
+```text
+hit' = hit x (1 + damagePct/100)         attacksPerSec' = attacksPerSec x (1 + atkSpeedPct/100)
+armor' = armor x (1 + armorPct/100)       maxHp' = maxHp x (1 + maxHpPct/100)
+crit' = min(maxCritChance, crit + critChance/100)       dodge' = min(maxDodge, dodge + dodge/100)
+```
+
+<a id="applyuse"></a>
+
+### `applyUse` <small>function</small>
+
+Source: [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts)
+
+Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
+
+- Refused, with nothing consumed, when the slot holds no consumable with effects, when a fight is open and the potion cooldown still runs, when the
+  potion would do nothing (full HP / mana) or when a sixth buff would be needed ([`drink`](combat.md#drink)).
+- Otherwise one potion leaves the bag (the inventory `ver` grows), HP and mana are filled (capped by the max the running buffs give), a buff is
+  recorded in `ledger.buffs` with its end time, a heal over time starts on the combat record, and in a fight the potion cooldown starts.

@@ -51,6 +51,10 @@ export const combatOf = (ledger: Ledger, env: CombatEnv): CombatState => {
 	return freshCombat(env.nowSec, vitals.hp, vitals.mp);
 };
 
+/** The HP a potion's heal over time gives over the `dt` seconds that begin at `from` (0 when none runs). */
+export const regenGain = (c: CombatState, from: number, dt: number): number =>
+	c.regen ? c.regen.hpPerSec * Math.max(0, Math.min(dt, c.regen.untilSec - from)) : 0;
+
 /** Adds an event to the log (numbered), dropping the cosmetic ones first when the log is over its size. */
 export const pushEvent = (ctx: FightCtx, t: number, kind: FightEvent['kind'], extra: Partial<FightEvent> = {}): void => {
 	const c = ctx.c;
