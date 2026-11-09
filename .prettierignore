@@ -9,3 +9,4 @@ supabase
 test-results
 playwright-report
 src/config/itemIcons
+storybook-static

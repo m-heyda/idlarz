@@ -62,6 +62,10 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run format` | `prettier --write .` |
 | `npm run format:check` | `prettier --check .` |
 | `npm run prepare` | `git config core.hooksPath .githooks && chmod +x .githooks/pre-commit || exit 0` |
+| `npm run assets:catalog` | `tsx scripts/assets-catalog.ts` |
+| `npm run assets:catalog:check` | `tsx scripts/assets-catalog.ts --check` |
+| `npm run storybook` | `storybook dev -p 6006` |
+| `npm run build-storybook` | `storybook build` |
 
 ## CI
 

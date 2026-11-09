@@ -16,6 +16,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `applyUse` | Combat / Consumables | [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts) | Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now). |
 | `armorOf` | Combat / Player numbers | [`src/lib/combat.ts:176`](../../src/lib/combat.ts) | Armor against monster hits: |
 | `armorReduction` | Combat / Player numbers | [`src/lib/combat.ts:207`](../../src/lib/combat.ts) | The share (0-0.75) of a hit that `armor` takes away: |
+| Asset library | Architecture / Art | [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts) | The asset library: |
 | `attacksPerSecond` | Combat / Player numbers | [`src/lib/combat.ts:120`](../../src/lib/combat.ts) | Attacks per second: |
 | `autoBattleUnlocked` | Combat / A fight | [`src/lib/combat.ts:45`](../../src/lib/combat.ts) | Auto-battle (the server picking the next monster) is a reward for the first rebirth; |
 | `autoUse` | Combat / Potions and skills | [`src/lib/offline/fightSteps.ts:67`](../../src/lib/offline/fightSteps.ts) | Auto-use's rules for one tick: |
@@ -190,6 +191,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
 | `SKILLS` | Combat / Potions and skills | [`src/catalog/skills.ts:34`](../../src/catalog/skills.ts) | Potions and skills. |
+| Sound library | Architecture / Art | [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts) | The sound library: |
 | `spawnLevelRange` | Monsters / Level scaling | [`src/lib/monsters.ts:39`](../../src/lib/monsters.ts) | The levels a new monster of this type can appear at in a world of this castle level (both ends included). |
 | `STARTING_GEMS` | Progression / Gems | [`src/config/economy.ts:219`](../../src/config/economy.ts) | Gems every player starts with (also granted to saves from before Gems existed). |
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:157`](../../src/lib/combat.ts) | One swing: |

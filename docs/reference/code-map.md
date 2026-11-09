@@ -482,8 +482,15 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 ## scripts/
 
 
+**scripts/assets/**
+
+- [`manifest.ts`](../../scripts/assets/manifest.ts) — ~ used = live in the game now (enabled item, monster or resource; icon referenced by code); planned = its item/monster/resource exists but is disabled; retired = item no longer drops, old saves keep it; unused = registered art that nothing references (an icon no item uses, an icon no code mentions); placeholder = a stand-in silhouette; spare = generated art nobody asked for (`_name.png`); reuse = raw pack art, not wired.
+- [`render.ts`](../../scripts/assets/render.ts) — Renders docs/assets/ (manifest.json, README.md and one page per category) from the manifest. Pure: same manifest in, same text out.
+- [`sounds.ts`](../../scripts/assets/sounds.ts) — ~ The stable name to refer to this sound by
+
 **scripts/**
 
+- [`assets-catalog.ts`](../../scripts/assets-catalog.ts) — `npm run assets:catalog` writes docs/assets/; `--check` fails when the committed files differ (used by tests/docs/assets.test.ts and the pre-commit hook).
 - [`balance-report.ts`](../../scripts/balance-report.ts) — Generates docs/generated/balance-tables.md from the REAL game config + utils, so the documentation can be regenerated after any tuning change.
 - [`catalog-report.ts`](../../scripts/catalog-report.ts) — Writes docs/generated/item-catalog.md: the sets, their items and the drop pools, straight from src/catalog (never edit that file by hand).
 - [`catalogDoc.ts`](../../scripts/catalogDoc.ts) — Renders docs/generated/item-catalog.md straight from src/catalog (never edit that file by hand): `npm run catalog-report` writes it and
@@ -595,6 +602,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/docs/**
 
+- [`assets.test.ts`](../../tests/docs/assets.test.ts)
 - [`links.test.ts`](../../tests/docs/links.test.ts)
 - [`reference.test.ts`](../../tests/docs/reference.test.ts)
 
