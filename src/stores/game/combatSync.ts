@@ -30,8 +30,7 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 		else if (kind === 'stun') emitCombat({ kind: 'stun', sec: amount });
 		else if (kind === 'resist') emitCombat({ kind: 'resist' });
 	};
-	const fxClass = (kind: string): string =>
-		kind === 'crit' || kind === 'super' ? 'hit' : kind === 'hurtCrit' ? 'hurt' : kind === 'potion' ? 'heal' : kind;
+	const fxClass = (kind: string): string => (kind === 'crit' || kind === 'super' ? 'hit' : kind === 'hurtCrit' ? 'hurt' : kind === 'potion' ? 'heal' : kind);
 
 	// The fight plan being played: its swings are flown on a timer between the server's answers, and the same swings, when they come back as
 	// events in the next answer, are not flown twice (keyed by tenth of a second after the plan's start and kind of effect).

@@ -81,8 +81,8 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			shown
 				? shown.hp
 				: inFight
-				? state.playerHp
-				: regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen + merchantCombat(state.merchantUpgrades).regen),
+					? state.playerHp
+					: regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen + merchantCombat(state.merchantUpgrades).regen),
 		);
 		const newPlayerMp = Math.min(
 			maxMana(state.characterStats, state.equipment),

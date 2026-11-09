@@ -29,7 +29,10 @@ test('a plan says when the open fight ends, and the real request at that time en
 	assert.ok(before.fight, 'still fighting just before the projected end');
 	const after = runCombat(ledger, s.env(c.at + plan.endsInSec + COMBAT.poll.afterEndSec)).ledger.combat!;
 	assert.ok(!after.fight || after.fight.n !== c.fight!.n, 'the fight is over at the projected end');
-	assert.ok(after.log.some((e) => e.kind === plan.outcome), `the log has the projected ${plan.outcome}`);
+	assert.ok(
+		after.log.some((e) => e.kind === plan.outcome),
+		`the log has the projected ${plan.outcome}`,
+	);
 	assert.equal(c.fight!.monsterHp, hpBefore, 'the ledger was not touched');
 });
 
@@ -56,7 +59,16 @@ test('the plan is a few rows: at most 60 samples, and it starts and ends where t
 });
 
 test('planPictureAt draws straight lines between samples and holds the last one', () => {
-	const plan = { endsInSec: 4, outcome: 'won' as const, samples: [[0, 100, 50], [2, 80, 30], [4, 80, 0]] as [number, number, number][], fx: [] };
+	const plan = {
+		endsInSec: 4,
+		outcome: 'won' as const,
+		samples: [
+			[0, 100, 50],
+			[2, 80, 30],
+			[4, 80, 0],
+		] as [number, number, number][],
+		fx: [],
+	};
 	assert.deepEqual(planPictureAt(plan, 0), { hp: 100, monsterHp: 50 });
 	assert.deepEqual(planPictureAt(plan, 1), { hp: 90, monsterHp: 40 });
 	assert.deepEqual(planPictureAt(plan, 3), { hp: 80, monsterHp: 15 });

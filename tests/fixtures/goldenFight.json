@@ -721,9 +721,7 @@
 				"xp": 279.2785376472079,
 				"gems": 0
 			},
-			"ratsLeft": [
-				3
-			],
+			"ratsLeft": [3],
 			"king": 5,
 			"retryAt": {},
 			"potions": {
