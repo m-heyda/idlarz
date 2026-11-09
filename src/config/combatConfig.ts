@@ -306,10 +306,14 @@ const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof type
 };
 
 /**
- * The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 10 or more tiles from the castle, past the outskirts' start (7) and
- * into land a new kingdom has not bought yet, and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9.
+ * The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
+ *
+ * @category Monsters/Spawning
+ * @order 7
+ * @formula
+ * boss tile: BOSS_MIN_DISTANCE (8) <= castle distance <= BOSS_MAX_DISTANCE; normal monster tile: 2 <= castle distance <= 9
  */
-export const BOSS_MIN_DISTANCE = 10;
+export const BOSS_MIN_DISTANCE = 8;
 export const BOSS_MAX_DISTANCE = 999;
 
 /** A boss always has a clock and taunts (the type says so, so a caller need not check) */

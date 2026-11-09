@@ -8,7 +8,7 @@ The roster, levels, growth, spawning and what a kill pays.
 
 - Roster: [`MONSTERS`](#monsters)
 - Level scaling: [`monsterStats`](#monsterstats), [`spawnLevelRange`](#spawnlevelrange), [`rollSpawnLevel`](#rollspawnlevel), [`levelAtAge`](#levelatage), [`dangerBonus`](#dangerbonus)
-- Spawning: [`advanceBank`](#advancebank), [`canSpawnOn`](#canspawnon), [`typeWeights`](#typeweights), [`placeTickets`](#placetickets), [`ticketCap`](#ticketcap), [`DISTANCE_BANDS`](#distance-bands), [`bandOf`](#bandof)
+- Spawning: [`advanceBank`](#advancebank), [`canSpawnOn`](#canspawnon), [`typeWeights`](#typeweights), [`placeTickets`](#placetickets), [`ticketCap`](#ticketcap), [`DISTANCE_BANDS`](#distance-bands), [`BOSS_MIN_DISTANCE`](#boss-min-distance), [`bandOf`](#bandof)
 - Rewards: [`killIncome`](#killincome)
 
 ## Roster
@@ -17,7 +17,7 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:359`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:363`](../../src/config/combatConfig.ts)
 
 The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`).
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
@@ -193,7 +193,7 @@ grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFo
 them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`).
 With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped
 near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types
-that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 10 or more tiles from the castle (`BOSS_MIN_DISTANCE`).
+that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 8 or more tiles from the castle (`BOSS_MIN_DISTANCE`).
 
 <a id="ticketcap"></a>
 
@@ -213,6 +213,20 @@ The room for new tickets: monsters and chests together hold at most 30% of the f
 Source: [`src/config/distanceBands.ts:25`](../../src/config/distanceBands.ts)
 
 Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`bandOf`](monsters.md#bandof). No spawn rule reads them yet.
+
+<a id="boss-min-distance"></a>
+
+### `BOSS_MIN_DISTANCE` <small>const</small>
+
+Source: [`src/config/combatConfig.ts:316`](../../src/config/combatConfig.ts)
+
+The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
+
+**Formula**
+
+```text
+boss tile: BOSS_MIN_DISTANCE (8) <= castle distance <= BOSS_MAX_DISTANCE; normal monster tile: 2 <= castle distance <= 9
+```
 
 <a id="bandof"></a>
 
