@@ -18,6 +18,7 @@ import { LOOT_DATA } from '../src/lib/loot/data';
 import { resolveSourceLevel } from '../src/lib/loot/generate';
 import { eligibleCandidates } from '../src/lib/loot/pools';
 import { RESOURCES } from '../src/catalog/resources';
+import { describeEffect } from '../src/catalog/buffs';
 import type { ItemDef } from '../src/types/game';
 
 export const renderItemCatalog = (): string => {
@@ -27,7 +28,7 @@ export const renderItemCatalog = (): string => {
 	const stats = (def: ItemDef) =>
 		Object.entries(def.stats ?? {})
 			.map(([k, v]) => formatStat(k, v as number))
-			.join(', ') || (def.consumable ? `heals ${def.consumable.healHp} HP` : '');
+			.join(', ') || (def.effects ?? []).map(describeEffect).join(', ').toLowerCase();
 	const window = (def: ItemDef) => (def.minItemLevel !== undefined ? `${def.minItemLevel}-${def.maxItemLevel}` : '');
 	const where = (def: ItemDef) => (def.generation === 'named' ? (def.pools ?? []).join(', ') : def.generation === 'base' ? 'general pool' : '');
 

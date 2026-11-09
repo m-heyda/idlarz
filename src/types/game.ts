@@ -8,6 +8,7 @@ import type { MerchantUpgradeId } from '@/config/merchant';
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
 import type { SkillId } from '@/catalog/skills';
+import type { ConsumableEffect } from '@/catalog/buffs';
 import type { World } from '@/utils/world';
 import type { ChestLoot } from '@/lib/chests';
 import type { OfflineReport } from '@/lib/offline/apply';
@@ -105,7 +106,8 @@ export interface ItemDef {
 	/** A plain loot family (wood, cloth, steel): matches affixes and pools like a set does, but gives no set bonus */
 	family?: string;
 	description?: string;
-	consumable?: { healHp: number };
+	/** What drinking it does (instant heals, a regen, timed buffs); see catalog/buffs.ts. Absent: it does nothing (trade goods). */
+	effects?: ConsumableEffect[];
 	stackMax?: number;
 	sellValue: number;
 	icon?: PixelIconName;

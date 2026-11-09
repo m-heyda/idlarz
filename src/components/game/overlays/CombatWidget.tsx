@@ -6,6 +6,7 @@ import { useRewardPendingStore } from '@/stores/rewardPendingStore';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILL_IDS } from '@/catalog/skills';
 import { ITEM_CATALOG } from '@/catalog';
+import { healHpOf } from '@/catalog/buffs';
 import { autoBattleUnlocked } from '@/lib/combat';
 import { monsterDef, monsterStats } from '@/lib/monsters';
 import { slashFor, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
@@ -176,7 +177,7 @@ const CombatWidget: React.FC = () => {
 	// Up to three potion stacks from the bag, with hotkeys 1-3
 	const potions = bag
 		.map((slot, index) => ({ slot, index }))
-		.filter(({ slot }) => slot && 'id' in slot && ITEM_CATALOG[slot.id]?.consumable)
+		.filter(({ slot }) => slot && 'id' in slot && healHpOf(ITEM_CATALOG[slot.id]) > 0)
 		.slice(0, 3);
 
 	// Hotkeys: 1-3 drink the potions, 4 and 5 cast the skills (the server decides whether it goes through)

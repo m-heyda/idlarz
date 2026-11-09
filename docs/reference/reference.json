@@ -44,6 +44,17 @@
   "see": []
  },
  {
+  "id": "buff-families",
+  "name": "BUFF_FAMILIES",
+  "symbol": "BUFF_FAMILIES",
+  "kind": "const",
+  "category": "Combat/Consumables",
+  "file": "src/catalog/buffs.ts",
+  "line": 25,
+  "summary": "The buff families. A saved buff names its family, so removing a family here makes saved buffs of it disappear on the next read (they are dropped, never an error): see {@link readBuffs}.",
+  "see": []
+ },
+ {
   "id": "gear",
   "name": "gear",
   "symbol": "gear",
@@ -679,6 +690,61 @@
   "file": "src/config/spawns.ts",
   "line": 74,
   "summary": "Luck = Charisma + Lucky Charm + gear Luck. Other effects (`LUCK`):",
+  "see": []
+ },
+ {
+  "id": "max-active-buffs",
+  "name": "MAX_ACTIVE_BUFFS",
+  "symbol": "MAX_ACTIVE_BUFFS",
+  "kind": "const",
+  "category": "Combat/Consumables",
+  "file": "src/lib/buffs.ts",
+  "line": 18,
+  "summary": "How many different buffs can run at once. A sixth family is refused; drinking a family that already runs (a refresh) is always allowed.",
+  "see": []
+ },
+ {
+  "id": "readbuffs",
+  "name": "readBuffs",
+  "symbol": "readBuffs",
+  "kind": "function",
+  "category": "Combat/Consumables",
+  "file": "src/lib/buffs.ts",
+  "line": 30,
+  "summary": "Cleans a stored buff list: anything that is not a well-formed buff of a known family is dropped, never an error, so a retired family or a damaged row cannot reject the whole save. Also drops the buffs that have ended, keeps one per family (the one that lasts longest) and at most {@link MAX_ACTIVE_BUFFS}. The stat is taken from the family, not from the stored row.",
+  "see": []
+ },
+ {
+  "id": "addbuff",
+  "name": "addBuff",
+  "symbol": "addBuff",
+  "kind": "function",
+  "category": "Combat/Consumables",
+  "file": "src/lib/buffs.ts",
+  "line": 63,
+  "summary": "Adds one buff effect to the running buffs.",
+  "see": []
+ },
+ {
+  "id": "bufftotals",
+  "name": "buffTotals",
+  "symbol": "buffTotals",
+  "kind": "function",
+  "category": "Combat/Consumables",
+  "file": "src/lib/buffs.ts",
+  "line": 84,
+  "summary": "The summed bonus per stat of the running buffs: additive percent, so two buffs on one stat add (families differ, the stat may not). An empty list gives `{}`, so a fight with no potions reads no change.",
+  "see": []
+ },
+ {
+  "id": "drink",
+  "name": "drink",
+  "symbol": "drink",
+  "kind": "function",
+  "category": "Combat/Consumables",
+  "file": "src/lib/buffs.ts",
+  "line": 125,
+  "summary": "Drinks one potion: every effect applies together or none does, so a refusal means nothing is consumed.",
   "see": []
  },
  {
@@ -1331,7 +1397,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fight.ts",
-  "line": 61,
+  "line": 62,
   "summary": "Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battle allows. Returns the new ledger. All events are in `ledger.combat.log`.",
   "see": [
    "fightStep",
@@ -1346,7 +1412,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fight.ts",
-  "line": 135,
+  "line": 136,
   "summary": "Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). Ends the fight against it.",
   "see": []
  },
@@ -1357,7 +1423,7 @@
   "kind": "function",
   "category": "Combat/Results and rest",
   "file": "src/lib/offline/fight.ts",
-  "line": 154,
+  "line": 155,
   "summary": "After an absence the player is back on their feet: HP and mana refilled by resting for `gapSec`, no fight open, cooldowns over.",
   "see": []
  },
@@ -1379,7 +1445,7 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 66,
+  "line": 67,
   "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready.",
   "see": []
  },
@@ -1390,7 +1456,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 87,
+  "line": 86,
   "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
   "see": []
  },
@@ -1401,7 +1467,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 107,
+  "line": 106,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -1665,7 +1731,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 338,
+  "line": 340,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

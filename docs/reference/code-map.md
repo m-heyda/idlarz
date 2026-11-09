@@ -97,6 +97,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/catalog/**
 
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
+- [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 
 **src/catalog/items/**
@@ -282,6 +283,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authClient.ts`](../../src/lib/authClient.ts) — ~ The browser side of /api/auth/*:
 - [`authRoute.ts`](../../src/lib/authRoute.ts) — ~ The auth service cannot be reached or is not set up:
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
+- [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
 - [`castleWard.ts`](../../src/lib/castleWard.ts) — ~ How far (tiles, every side) the violet range area reaches:
@@ -552,6 +554,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/combat/**
 
 - [`battleQueue.test.ts`](../../tests/combat/battleQueue.test.ts) — ~ A request at `t` seconds after the start.
+- [`buffs.test.ts`](../../tests/combat/buffs.test.ts)
 - [`clickLimiter.test.ts`](../../tests/combat/clickLimiter.test.ts)
 - [`clientCombat.test.ts`](../../tests/combat/clientCombat.test.ts) — ~ The player's things as the server would hold them right now:
 - [`combat.test.ts`](../../tests/combat/combat.test.ts)

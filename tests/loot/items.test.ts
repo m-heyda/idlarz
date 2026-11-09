@@ -19,10 +19,10 @@ test('catalog keys equal item ids', () => {
 	for (const [key, def] of Object.entries(ITEM_CATALOG)) assert.equal(def.id, key);
 });
 
-test('gear has a slot, potions have healHp and stackMax, trade goods are slotless stacks', () => {
+test('gear has a slot, potions have effects and stackMax, trade goods are slotless stacks', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
-		if (def.consumable) {
-			assert.ok(def.consumable.healHp > 0, def.id);
+		if (def.effects) {
+			assert.ok(def.effects.length > 0, def.id);
 			assert.ok((def.stackMax ?? 0) > 1, def.id);
 			assert.equal(def.slot, undefined, def.id);
 		} else if (TRADE_GOODS.includes(def)) {

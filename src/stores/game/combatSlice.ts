@@ -9,6 +9,7 @@ import { requestAuto, requestDismiss, requestUse } from '@/lib/rewardsClient';
 import { signalSyncNow } from '@/lib/serverSession';
 import { useUiStore } from '@/stores/uiStore';
 import { ITEM_CATALOG } from '@/catalog';
+import { healHpOf } from '@/catalog/buffs';
 import { toast, type GameGet, type GameSet } from './base';
 import type { CombatSync } from './combatSync';
 import type { InventorySync } from './inventorySync';
@@ -24,7 +25,7 @@ export const createCombatSlice = (set: GameSet, get: GameGet, inv: InventorySync
 		// Nothing here hits anything. These are the few things a player may still ask for - a hotkey, a switch, a dismissal - and each is sent
 		// to the server, whose answer (not a guess made here) changes the picture.
 		requestPotion: (id: string) => {
-			if (!ITEM_CATALOG[id]?.consumable?.healHp) return false;
+			if (!healHpOf(ITEM_CATALOG[id])) return false;
 			void requestUse(newClaimId(), { kind: 'potion', id }, sinceNow()).then((reply) => settleFight(reply, 'No potion was drunk.'));
 			return true;
 		},
