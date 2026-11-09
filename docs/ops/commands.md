@@ -4,6 +4,7 @@ Generated reports go to `docs/generated` and are never edited by hand. Run `npm 
 
 ```bash
 npm run docs:gen              # regenerate everything in docs/generated (the five commands below, in order)
+npm run docs:check            # docs:gen, then git diff --exit-code docs/generated: the gate CI runs, in one local command (about 9 minutes, the sim is most of it)
 npm run report                # docs/generated/balance-tables.md from the config
 npm run sim                   # bot simulation on the real store -> docs/generated/sim-milestones.md
 npm run sim -- --seeds=3 hardcore         # median and min-max over 3 seeds (profiles: idle casual hardcore autoclicker human human-rebirth6 human-rebirth8 hardcore-rebirth6 hardcore-rebirth6-x10 hardcore-rebirth10)
@@ -20,7 +21,7 @@ npm run lint
 npm test                      # node:test over tests/**/*.test.ts
 ```
 
-**The pacing guard.** `npm run sim` writes `docs/generated/sim-baseline.json`; CI (job `generated`) runs `scripts/pacing-guard.ts`, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than ±15 %. Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label only takes effect on a new run, so **re-run the job after adding it**.
+**The pacing guard.** `npm run sim` writes `docs/generated/sim-baseline.json`; CI (job `generated`) runs `scripts/pacing-guard.ts`, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than ±15 % **or by more than 5 game days** (`PACING_MAX_DRIFT_DAYS` in `scripts/pacingCompare.ts`; without it a milestone at day 220 could drift for a month inside 15 %). The job log starts with a table per profile (guarded milestones, how many moved, the largest move in percent and days). Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label only takes effect on a new run, so **re-run the job after adding it**.
 
 
 Other operator guides: [reset-players-cli.md](reset-players-cli.md) (season restart), [e2e-test-account.md](e2e-test-account.md) (the browser test account).

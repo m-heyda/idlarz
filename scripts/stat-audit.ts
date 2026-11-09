@@ -193,7 +193,7 @@ const main = async () => {
 	);
 	line('- **SILENT**: accepted with no flag at all.');
 	line();
-	line('### Who computes what (from the code, `docs/11-server-authority.md` and `docs/14`)');
+	line('### Who computes what (from the code, `docs/game/saves-and-server.md` and `docs/plan/14-server-audit-and-data-plan.md`)');
 	line();
 	table(
 		['Action', 'Cost / payout computed by', 'Server check'],

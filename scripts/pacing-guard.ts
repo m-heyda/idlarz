@@ -1,4 +1,4 @@
-// The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % against a base.
+// The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % or more than 5 game days against a base. Prints a summary table first.
 //
 //   npx tsx scripts/pacing-guard.ts --base=<baseline.json> [--current=docs/generated/sim-baseline.json] [--allow-violations]
 //
@@ -8,7 +8,7 @@
 // Only violations are excused: a missing or malformed file still exits non-zero (2), and so does a crash.
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { PACING_TOLERANCE, comparePacing, formatViolations, type PacingBaseline } from './pacingCompare';
+import { PACING_MAX_DRIFT_DAYS, PACING_TOLERANCE, comparePacing, formatSummary, formatViolations, type PacingBaseline } from './pacingCompare';
 
 const arg = (name: string): string | undefined => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const fail = (message: string): never => {
@@ -30,13 +30,16 @@ const basePath = arg('base');
 if (!basePath) fail('usage: pacing-guard.ts --base=<baseline.json> [--current=docs/generated/sim-baseline.json] [--allow-violations]');
 const currentPath = arg('current') ?? 'docs/generated/sim-baseline.json';
 
-const violations = comparePacing(load(basePath as string), load(currentPath));
+const baseData = load(basePath as string);
+const currentData = load(currentPath);
+console.log(formatSummary(baseData, currentData));
+const violations = comparePacing(baseData, currentData);
 if (violations.length === 0) {
-	console.log(`Pacing guard: every guarded milestone is within ±${PACING_TOLERANCE * 100} % of the base.`);
+	console.log(`Pacing guard: every guarded milestone is within ±${PACING_TOLERANCE * 100} % and ±${PACING_MAX_DRIFT_DAYS} days of the base.`);
 } else {
 	const allowed = process.argv.includes('--allow-violations');
 	console.error(
-		`Pacing guard: ${violations.length} milestone(s) moved by more than ±${PACING_TOLERANCE * 100} % (game days, ${currentPath} against ${basePath}):`,
+		`Pacing guard: ${violations.length} milestone(s) moved by more than ±${PACING_TOLERANCE * 100} % or ±${PACING_MAX_DRIFT_DAYS} days (game days, ${currentPath} against ${basePath}):`,
 	);
 	console.error(formatViolations(violations));
 	if (allowed) {
