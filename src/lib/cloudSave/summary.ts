@@ -6,7 +6,7 @@ import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
 import { calculateResourceRates } from '@/utils/game/income';
 import { countBuildings } from '@/utils/game/costs';
 import { countOwnedTiles, economyTiles } from '@/utils/game/tiles';
-import { getTile, setTile } from '@/utils/world';
+import { biomeCount, getTile, setTile } from '@/utils/world';
 import type { PersistedGame } from '@/lib/sanitizeSave';
 import { stockValue } from './netWorth';
 import type { CastleUpgradeState, Resources } from '@/types/game';
@@ -44,6 +44,8 @@ export interface SaveDerived {
 	/** Total Luck (attributes + Lucky Charm + gear) and the gear's Gold Find %: they decide server-rolled rewards */
 	luck: number;
 	goldFind: number;
+	/** Lake tiles owned: they hold no monster or chest, so the server's ticket cap subtracts them (spawnLimits.freeLand). Absent on rows from before (read as 0). */
+	lakesOwned?: number;
 	/** The character's Intelligence attribute: it leans the quality of crafted gear (src/lib/craftGear.ts). Absent on rows from before (read as 0). */
 	intelligence?: number;
 	/** The set bonuses' Kill Rewards %: extra gold and XP from a kill */
@@ -128,6 +130,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		xpGainPct: xpGainPct(state.characterStats, state.equipment),
 		playSeconds: state.playSeconds,
 		derived: {
+			lakesOwned: biomeCount(state.tiles, 'lake'),
 			castleUpgrade: state.castleUpgrade ? { ...state.castleUpgrade } : null,
 			ratesAfterCastle: ratesAfterUpgrade(state),
 			luck: fx.luck,

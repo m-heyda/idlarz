@@ -9,7 +9,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `acceptSave` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:200`](../../src/lib/cloudSave/pipeline.ts) | Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). |
 | `addBuff` | Combat / Consumables | [`src/lib/buffs.ts:63`](../../src/lib/buffs.ts) | Adds one buff effect to the running buffs. |
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:161`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
-| `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:142`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
+| `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:143`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:240`](../../src/lib/inventory.ts) | The one place gear is summed: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
@@ -141,7 +141,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `merchantUpgradeCost` | Economy / Merchant | [`src/utils/game/merchant.ts:23`](../../src/utils/game/merchant.ts) | Gold price of the next level of a merchant upgrade. |
 | `MIN_SAVE_INTERVAL_MS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:83`](../../src/lib/cloudSave/pipeline.ts) | Saves from one player are accepted at most this often (an honest client sends every ~90 s). |
 | `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:220`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
-| `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:352`](../../src/config/combatConfig.ts) | The roster: |
+| `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:359`](../../src/config/combatConfig.ts) | The roster: |
 | `monsterStats` | Monsters / Level scaling | [`src/lib/monsters.ts:117`](../../src/lib/monsters.ts) | HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). |
 | Pacing targets | Pacing / Targets | [`scripts/sim.ts:16`](../../scripts/sim.ts) | What pace the economy is tuned for, why, and how to check it. |
 | `payKill` | Combat / A fight | [`src/lib/offline/reward.ts:35`](../../src/lib/offline/reward.ts) | Pays the kill of ticket `n`: |
@@ -150,7 +150,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `pickTarget` | Combat / A fight | [`src/lib/offline/fightTargets.ts:41`](../../src/lib/offline/fightTargets.ts) | The next monster to engage: |
 | `pityMultiplier` | Progression / Crafting | [`src/lib/craftGear.ts:78`](../../src/lib/craftGear.ts) | The pity multiplier on the grade's best rarity after `misses` crafts that missed it. |
 | Pixel art pipeline | Architecture / Art | [`src/config/pixelIcons.ts:1`](../../src/config/pixelIcons.ts) | All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: |
-| `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:75`](../../src/lib/offline/placement.ts) | Looks at the land: |
+| `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:73`](../../src/lib/offline/placement.ts) | Looks at the land: |
 | `playerProfile` | Combat / A fight | [`src/lib/offline/profile.ts:62`](../../src/lib/offline/profile.ts) | Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, l... |
 | `POISON_FLAGS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:128`](../../src/lib/cloudSave/verify.ts) | Flags that make an account ineligible for rankings for good. |
 | `projectFight` | Combat / A fight | [`src/lib/offline/fightProject.ts:32`](../../src/lib/offline/fightProject.ts) | The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands someth... |
@@ -199,7 +199,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
 | The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:111`](../../src/app/GameApp.tsx) | The tick loop. |
-| `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:102`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
+| `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:103`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
 | `totalStatPoints` | Progression / Levels | [`src/utils/game/character.ts:151`](../../src/utils/game/character.ts) | The attribute points a character that has reached `level` has earned in all (a level gives 1; |

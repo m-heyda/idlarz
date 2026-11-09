@@ -5,7 +5,8 @@ import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { MONSTERS } from '../../src/config/combatConfig';
 import { atItemLevel, simSetup, spentCharacter } from '../../src/lib/fightSim';
 import { STRONG_KIT } from '../builders';
-import { levelAtAge, maxLevelOf, rollSpawnLevel, spawnLevelRange } from '../../src/lib/monsters';
+import { castleDistance } from '../../src/lib/distance';
+import { dangerBonus, levelAtAge, maxLevelOf, rollSpawnLevel, spawnLevelRange } from '../../src/lib/monsters';
 import { placeTickets } from '../../src/lib/offline/placement';
 import { playerProfile } from '../../src/lib/offline/profile';
 import { sealedRng } from '../../src/lib/offline/seal';
@@ -21,6 +22,7 @@ import {
 	typeWeights,
 	winChanceAt,
 } from '../../src/lib/offline/spawnWeights';
+import { syntheticWorld } from '../../src/utils/worldGen';
 import { mulberry32 } from '../../src/lib/rng';
 import { emptyBank } from '../../src/lib/offline/tickets';
 import type { PlayerProfile } from '../../src/lib/offline/fightTypes';
@@ -139,4 +141,33 @@ test('placement: the same hero gives the same map, a weak hero meets far more be
 test('new gear is a different look at the land', () => {
 	assert.notEqual(powerKey(rookie()), powerKey(veteran()));
 	assert.equal(powerKey(rookie()), powerKey(rookie()));
+});
+
+test('IDL-222: bosses are weighted by win chance and level-capped like normal monsters', () => {
+	const land = syntheticWorld(2500, 4);
+	const bosses = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => MONSTERS[type].grade === 'boss');
+	const placeBoss = (n: number, hero?: PlayerProfile) => placeTickets({ ...emptyBank(0), king: { n, at: 0, lucky: false } }, land, 'k', 0, rollFor, hero).king!;
+	const weak = rookie();
+	const castle = 1;
+	const weights = typeWeights(weak, bosses, castle);
+	assert.ok(
+		weights.every((w) => w === HOPELESS_WEIGHT),
+		'a level 1 starter kit has no chance against any boss: the lowest weight for all',
+	);
+	let capped = 0;
+	for (let n = 1; n <= 40; n++) {
+		const boss = placeBoss(n, weak);
+		const { min, max } = spawnLevelRange(boss.type!, castle);
+		const bonus = dangerBonus(castleDistance({ x: boss.x!, y: boss.y! }));
+		assert.ok(boss.spawnLevel! >= min && boss.spawnLevel! <= max + bonus);
+		assert.ok(
+			boss.spawnLevel! <= Math.max(min + bonus, spawnLevelCap(weak, boss.type!, castle)),
+			'capped at what the hero beats, but never below the window bottom (plus the danger bonus of a far tile)',
+		);
+		if (boss.growCap !== undefined) capped++;
+		assert.equal(boss.growCap, growthCap(weak, boss.type!, boss.spawnLevel!));
+	}
+	assert.ok(capped > 0, 'a hero who cannot beat a boss does not meet one that grows without limit');
+	const free = placeBoss(1);
+	assert.equal(free.growCap, undefined, 'without a profile nothing is capped');
 });
