@@ -4,10 +4,10 @@
 import { RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { writeCursor } from '@/lib/combatCursor';
 import { emitCombat } from '@/lib/combatFx';
-import type { CombatView, FightEvent } from '@/lib/offline/fightTypes';
+import { PLAN_FX_KINDS, type CombatView, type FightEvent } from '@/lib/offline/fightTypes';
 import type { FightReply } from '@/lib/offline/types';
 import { type Reply } from '@/lib/rewardsClient';
-import { signalNeedClaim } from '@/lib/serverSession';
+import { signalNeedClaim, signalPollSec } from '@/lib/serverSession';
 import { monsterDef } from '@/lib/monsters';
 import type { CombatNotice, Monster } from '@/types/game';
 import { toast, type GameGet, type GameSet } from './base';
@@ -23,20 +23,55 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 		return taunts && taunts.length > 0 ? taunts[Math.floor(Math.random() * taunts.length)] : null;
 	};
 
+	const emitKind = (kind: string, amount: number): void => {
+		if (kind === 'hit' || kind === 'crit' || kind === 'super') emitCombat({ kind: 'hit', damage: amount, killed: false, crit: kind === 'hit' ? 'none' : kind });
+		else if (kind === 'hurt' || kind === 'hurtCrit') emitCombat({ kind: 'hurt', amount, crit: kind === 'hurtCrit' });
+		else if (kind === 'heal' || kind === 'potion') emitCombat({ kind: 'heal', amount });
+		else if (kind === 'stun') emitCombat({ kind: 'stun', sec: amount });
+		else if (kind === 'resist') emitCombat({ kind: 'resist' });
+	};
+	const fxClass = (kind: string): string =>
+		kind === 'crit' || kind === 'super' ? 'hit' : kind === 'hurtCrit' ? 'hurt' : kind === 'potion' ? 'heal' : kind;
+
+	// The fight plan being played: its swings are flown on a timer between the server's answers, and the same swings, when they come back as
+	// events in the next answer, are not flown twice (keyed by tenth of a second after the plan's start and kind of effect).
+	let planStart = 0;
+	let planKeys = new Map<string, number>();
+	let planTimers: ReturnType<typeof setTimeout>[] = [];
+	const planKey = (secAfterStart: number, kind: string) => `${Math.round(secAfterStart * 10)}:${fxClass(kind)}`;
+
+	const startPlanFx = (view: CombatView) => {
+		for (const timer of planTimers) clearTimeout(timer);
+		planTimers = [];
+		planKeys = new Map();
+		planStart = view.at;
+		if (!view.plan) return;
+		for (const [sec, index, amount] of view.plan.fx) {
+			const kind = PLAN_FX_KINDS[index];
+			if (!kind) continue;
+			const key = planKey(sec, kind);
+			planKeys.set(key, (planKeys.get(key) ?? 0) + 1);
+			planTimers.push(setTimeout(() => emitKind(kind, amount), Math.max(0, sec * 1000)));
+		}
+	};
+
 	/** Shows what the server says happened in a fight, with the numbers flying in the order (and roughly the rhythm) they happened. */
 	const playFx = (events: FightEvent[]) => {
-		const recent = events.filter((e) => ['hit', 'crit', 'super', 'hurt', 'heal', 'potion', 'stun', 'resist'].includes(e.kind));
+		const recent = events.filter((e) => {
+			if (!['hit', 'crit', 'super', 'hurt', 'heal', 'potion', 'stun', 'resist'].includes(e.kind)) return false;
+			// the plan already flew this one
+			const key = planKey(e.t - planStart, e.kind);
+			const left = planKeys.get(key) ?? 0;
+			if (left > 0) {
+				planKeys.set(key, left - 1);
+				return false;
+			}
+			return true;
+		});
 		const first = recent[0]?.t ?? 0;
 		for (const e of recent.slice(-24)) {
 			const delay = Math.min(2500, Math.max(0, (e.t - first) * 1000));
-			const fx = () => {
-				if (e.kind === 'hit' || e.kind === 'crit' || e.kind === 'super')
-					emitCombat({ kind: 'hit', damage: e.amount ?? 0, killed: false, crit: e.kind === 'hit' ? 'none' : e.kind });
-				else if (e.kind === 'hurt') emitCombat({ kind: 'hurt', amount: e.amount ?? 0, crit: e.crit });
-				else if (e.kind === 'heal' || e.kind === 'potion') emitCombat({ kind: 'heal', amount: e.amount ?? 0 });
-				else if (e.kind === 'stun') emitCombat({ kind: 'stun', sec: e.amount ?? 0 });
-				else if (e.kind === 'resist') emitCombat({ kind: 'resist' });
-			};
+			const fx = () => emitKind(e.kind === 'hurt' && e.crit ? 'hurtCrit' : e.kind, e.amount ?? 0);
 			if (delay === 0) fx();
 			else setTimeout(fx, delay);
 		}
@@ -112,12 +147,16 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 				resting: !!view.resting,
 				restSec: view.restSec ?? 0,
 				restEndsAt: view.resting ? Date.now() + (view.restSec ?? 0) * 1000 : null,
+				plan: view.plan ? { startedAt: Date.now(), data: view.plan } : null,
+				pollSec: view.nextPollSec,
 				queueMax: view.queueMax ?? state.combat.queueMax,
 				buffs: view.buffs ?? [],
 			},
 		});
 		writeCursor(view.eventNo);
 		playFx(fresh);
+		startPlanFx(view);
+		signalPollSec(view.nextPollSec);
 	};
 
 	const sinceNow = () => get().combat.eventNo ?? undefined;

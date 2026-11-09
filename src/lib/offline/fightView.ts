@@ -4,7 +4,8 @@ import { limitOf } from '@/lib/limits';
 import { combatOf, type CombatEnv } from '@/lib/offline/fightContext';
 import { potionsForEstimate, resumeHpOf, winnableBy } from '@/lib/offline/fightProfile';
 import { nextRetry, pickTarget, placedTarget, queueView } from '@/lib/offline/fightTargets';
-import type { CombatView } from '@/lib/offline/fightTypes';
+import { projectFight } from '@/lib/offline/fightProject';
+import type { CombatView, FightPlan } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
 import type { Ledger } from '@/lib/offline/ledger';
 import { profileWithBuffs } from '@/lib/offline/profile';
@@ -17,12 +18,16 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 	const p = c.fight ? c.fight.profile : profileWithBuffs(env.stored.core, ledger.buffs, c.at);
 	const f = c.fight;
 	let nextPollSec: number = COMBAT.poll.minimizedSec;
+	let plan: FightPlan | undefined;
 	let waiting = false;
 	let resting = false;
 	let restSec = 0;
 	if (behind) nextPollSec = 0.5;
-	else if (f) nextPollSec = COMBAT.poll.fightSec;
-	else {
+	else if (f) {
+		// the fight is run to its end here: the browser animates it and asks again when it is over (a command it sends meanwhile gets a new plan)
+		plan = projectFight(ledger, env, c) ?? undefined;
+		nextPollSec = plan ? Math.max(0.5, Math.min(600, plan.endsInSec + COMBAT.poll.afterEndSec)) : COMBAT.poll.fightSec;
+	} else {
 		// idle: ask again when something can change
 		const winnable = winnableBy(p, c.hp, potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c));
 		waiting = pickTarget(ledger, c, c.at, winnable) !== null;
@@ -62,6 +67,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 					y: f.y,
 				}
 			: null,
+		...(plan ? { plan } : {}),
 		queue: queueView(ledger, c),
 		queueMax: limitOf('battleQueue'),
 		autoBattle: c.autoBattle,

@@ -392,7 +392,7 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 349,
+  "line": 350,
   "summary": "The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`). Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
@@ -1499,7 +1499,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fight.ts",
-  "line": 63,
+  "line": 61,
   "summary": "Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battle allows. Returns the new ledger. All events are in `ledger.combat.log`.",
   "see": [
    "fightStep",
@@ -1514,7 +1514,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fight.ts",
-  "line": 147,
+  "line": 145,
   "summary": "Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). Ends the fight against it.",
   "see": []
  },
@@ -1525,7 +1525,7 @@
   "kind": "function",
   "category": "Combat/Results and rest",
   "file": "src/lib/offline/fight.ts",
-  "line": 166,
+  "line": 164,
   "summary": "After an absence the player is back on their feet: HP and mana refilled by resting for `gapSec`, no fight open, cooldowns over.",
   "see": []
  },
@@ -1536,8 +1536,19 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightContext.ts",
-  "line": 76,
+  "line": 81,
   "summary": "The next random stream of a fight: sealed on the secret, the user, the run and the fight's ordinal, one draw per call.",
+  "see": []
+ },
+ {
+  "id": "projectfight",
+  "name": "projectFight",
+  "symbol": "projectFight",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fightProject.ts",
+  "line": 31,
+  "summary": "The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands something first), as the picture the browser animates: HP of both sides about once a second, and the swings and spells to fly. Nothing of the ledger is written. Returns null with no fight open or one that does not end within `COMBAT.maxFightSec`.",
   "see": []
  },
  {
@@ -1844,7 +1855,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 344,
+  "line": 348,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"
