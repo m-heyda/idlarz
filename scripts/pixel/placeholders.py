@@ -68,6 +68,10 @@ def gaps():
 
 # Families with a full set of registered icons still lack art for the early grades the catalog now enables (IDL-220): the real
 # G1-G3 icons there belong to the reuse items, so the ladder cells of these grades get placeholders too.
+# EXTRA stays until real ladder art exists for every cell (IDL-239, 2026-11-09): the supplied packs under
+# public/pixel/assets_to_assess_and_use hold no equipment art (map props, buildings, potions only), and the procedural
+# sprites_gear.py icons already belong to the starter items. Drop a family from EXTRA (and its placeholder lines) only
+# in the PR that registers its real G1-G3 icons.
 EXTRA = {fam: ('G1', 'G2', 'G3') for fam in ('feet', 'legs', 'neck', 'ring', 'mainHand-sword', 'offHand-shield')}
 
 
