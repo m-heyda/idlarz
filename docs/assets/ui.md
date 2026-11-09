@@ -12,7 +12,7 @@ Menu icons, equipment slot icons, portraits, banners, bars, frames, effects.
 | --- | --- | --- | --- | --- | --- |
 | `bonus_bee` | <img src="../../public/pixel/icons/bonus_bee.png" width="96" alt="bonus_bee"> | 56x26 | used |  | `pixel/icons/bonus_bee.png` |
 | `bonus_butterfly` | <img src="../../public/pixel/icons/bonus_butterfly.png" width="96" alt="bonus_butterfly"> | 56x28 | used |  | `pixel/icons/bonus_butterfly.png` |
-| `bonus_chest` | <img src="../../public/pixel/icons/bonus_chest.png" width="64" alt="bonus_chest"> | 32x32 | reserve |  | `pixel/icons/bonus_chest.png` |
+| `bonus_chest` | <img src="../../public/pixel/icons/bonus_chest.png" width="64" alt="bonus_chest"> | 32x32 | unused |  | `pixel/icons/bonus_chest.png` |
 | `bonus_crab` | <img src="../../public/pixel/icons/bonus_crab.png" width="96" alt="bonus_crab"> | 60x20 | used |  | `pixel/icons/bonus_crab.png` |
 | `bonus_fish` | <img src="../../public/pixel/icons/bonus_fish.png" width="96" alt="bonus_fish"> | 64x22 | used |  | `pixel/icons/bonus_fish.png` |
 | `bonus_frog` | <img src="../../public/pixel/icons/bonus_frog.png" width="96" alt="bonus_frog"> | 52x22 | used |  | `pixel/icons/bonus_frog.png` |
@@ -34,7 +34,7 @@ Menu icons, equipment slot icons, portraits, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `chest_map` | <img src="../../public/pixel/icons/chest_map.png" width="96" alt="chest_map"> | 48x40 | reserve |  | `pixel/icons/chest_map.png` |
+| `chest_map` | <img src="../../public/pixel/icons/chest_map.png" width="96" alt="chest_map"> | 48x40 | unused |  | `pixel/icons/chest_map.png` |
 | `chest_map_anim` | <img src="../../public/pixel/icons/chest_map_anim.png" width="96" alt="chest_map_anim"> | 192x40 | used |  | `pixel/icons/chest_map_anim.png` |
 
 ## effects
@@ -108,8 +108,8 @@ Menu icons, equipment slot icons, portraits, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `level_orb` | <img src="../../public/pixel/icons/level_orb.png" width="48" alt="level_orb"> | 24x24 | reserve |  | `pixel/icons/level_orb.png` |
-| `level_orb_shine` | <img src="../../public/pixel/icons/level_orb_shine.png" width="96" alt="level_orb_shine"> | 144x24 | reserve |  | `pixel/icons/level_orb_shine.png` |
+| `level_orb` | <img src="../../public/pixel/icons/level_orb.png" width="48" alt="level_orb"> | 24x24 | unused |  | `pixel/icons/level_orb.png` |
+| `level_orb_shine` | <img src="../../public/pixel/icons/level_orb_shine.png" width="96" alt="level_orb_shine"> | 144x24 | unused |  | `pixel/icons/level_orb_shine.png` |
 
 ## menu
 
@@ -119,7 +119,7 @@ Menu icons, equipment slot icons, portraits, banners, bars, frames, effects.
 | `menu_crafting` | <img src="../../public/pixel/icons/menu_crafting.png" width="80" alt="menu_crafting"> | 40x40 | used |  | `pixel/icons/menu_crafting.png` |
 | `menu_farm` | <img src="../../public/pixel/icons/menu_farm.png" width="80" alt="menu_farm"> | 40x40 | used |  | `pixel/icons/menu_farm.png` |
 | `menu_legacy` | <img src="../../public/pixel/icons/menu_legacy.png" width="80" alt="menu_legacy"> | 40x40 | used |  | `pixel/icons/menu_legacy.png` |
-| `menu_main` | <img src="../../public/pixel/icons/menu_main.png" width="80" alt="menu_main"> | 40x40 | reserve |  | `pixel/icons/menu_main.png` |
+| `menu_main` | <img src="../../public/pixel/icons/menu_main.png" width="80" alt="menu_main"> | 40x40 | unused |  | `pixel/icons/menu_main.png` |
 | `menu_merchant` | <img src="../../public/pixel/icons/menu_merchant.png" width="80" alt="menu_merchant"> | 40x40 | used |  | `pixel/icons/menu_merchant.png` |
 | `menu_settings` | <img src="../../public/pixel/icons/menu_settings.png" width="80" alt="menu_settings"> | 40x40 | used |  | `pixel/icons/menu_settings.png` |
 | `menu_stats` | <img src="../../public/pixel/icons/menu_stats.png" width="80" alt="menu_stats"> | 40x40 | used |  | `pixel/icons/menu_stats.png` |

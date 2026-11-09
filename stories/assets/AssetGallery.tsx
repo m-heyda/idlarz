@@ -14,7 +14,15 @@ export interface ManifestEntry {
 }
 
 const ALL = manifest as ManifestEntry[];
-const STATUS_COLOR: Record<string, string> = { used: '#5fbf6a', reserve: '#e0b04a', placeholder: '#8a8a8a', spare: '#6a9fd8', reuse: '#c07ad8' };
+const STATUS_COLOR: Record<string, string> = {
+	used: '#5fbf6a',
+	planned: '#e0b04a',
+	retired: '#d8806a',
+	unused: '#e05a5a',
+	placeholder: '#8a8a8a',
+	spare: '#6a9fd8',
+	reuse: '#c07ad8',
+};
 
 /** Card grid of one manifest category: search by name, filter by status/subcategory/variant, click a card to copy its name. */
 export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ category, scale = 2 }) => {

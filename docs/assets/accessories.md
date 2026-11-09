@@ -11,9 +11,9 @@ Neck, ring and charm icons.
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `item_acorn_charm` | <img src="../../public/pixel/icons/item_acorn_charm.png" width="80" alt="item_acorn_charm"> | 40x40 | used | acorn_charm | `pixel/icons/item_acorn_charm.png` |
-| `item_cloth_charm` | <img src="../../public/pixel/icons/item_cloth_charm.png" width="80" alt="item_cloth_charm"> | 40x40 | reserve | cloth_charm | `pixel/icons/item_cloth_charm.png` |
+| `item_cloth_charm` | <img src="../../public/pixel/icons/item_cloth_charm.png" width="80" alt="item_cloth_charm"> | 40x40 | planned | cloth_charm | `pixel/icons/item_cloth_charm.png` |
 | `item_obsidian_charm` | <img src="../../public/pixel/icons/item_obsidian_charm.png" width="80" alt="item_obsidian_charm"> | 40x40 | used | obsidian_charm | `pixel/icons/item_obsidian_charm.png` |
-| `item_steel_charm` | <img src="../../public/pixel/icons/item_steel_charm.png" width="80" alt="item_steel_charm"> | 40x40 | reserve | steel_charm | `pixel/icons/item_steel_charm.png` |
+| `item_steel_charm` | <img src="../../public/pixel/icons/item_steel_charm.png" width="80" alt="item_steel_charm"> | 40x40 | planned | steel_charm | `pixel/icons/item_steel_charm.png` |
 
 ## charm G1
 
@@ -91,10 +91,10 @@ Neck, ring and charm icons.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_amulet` | <img src="../../public/pixel/icons/item_cloth_amulet.png" width="80" alt="item_cloth_amulet"> | 40x40 | reserve | cloth_amulet | `pixel/icons/item_cloth_amulet.png` |
+| `item_cloth_amulet` | <img src="../../public/pixel/icons/item_cloth_amulet.png" width="80" alt="item_cloth_amulet"> | 40x40 | planned | cloth_amulet | `pixel/icons/item_cloth_amulet.png` |
 | `item_obsidian_pendant` | <img src="../../public/pixel/icons/item_obsidian_pendant.png" width="80" alt="item_obsidian_pendant"> | 40x40 | used | obsidian_pendant | `pixel/icons/item_obsidian_pendant.png` |
-| `item_steel_gorget` | <img src="../../public/pixel/icons/item_steel_gorget.png" width="80" alt="item_steel_gorget"> | 40x40 | reserve | steel_gorget | `pixel/icons/item_steel_gorget.png` |
-| `item_wooden_pendant` | <img src="../../public/pixel/icons/item_wooden_pendant.png" width="80" alt="item_wooden_pendant"> | 40x40 | reserve | wooden_pendant | `pixel/icons/item_wooden_pendant.png` |
+| `item_steel_gorget` | <img src="../../public/pixel/icons/item_steel_gorget.png" width="80" alt="item_steel_gorget"> | 40x40 | planned | steel_gorget | `pixel/icons/item_steel_gorget.png` |
+| `item_wooden_pendant` | <img src="../../public/pixel/icons/item_wooden_pendant.png" width="80" alt="item_wooden_pendant"> | 40x40 | planned | wooden_pendant | `pixel/icons/item_wooden_pendant.png` |
 
 ## neck G1
 
@@ -143,22 +143,22 @@ Neck, ring and charm icons.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_winged_sapphire_pendant` | <img src="../../public/pixel/items/neck/winged_sapphire_pendant.png" width="96" alt="art_winged_sapphire_pendant"> | 64x64 | reserve | winged_sapphire_pendant | `pixel/items/neck/winged_sapphire_pendant.png` |
+| `art_winged_sapphire_pendant` | <img src="../../public/pixel/items/neck/winged_sapphire_pendant.png" width="96" alt="art_winged_sapphire_pendant"> | 64x64 | planned | winged_sapphire_pendant | `pixel/items/neck/winged_sapphire_pendant.png` |
 
 ## neck G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_seraph_collar` | <img src="../../public/pixel/items/neck/seraph_collar.png" width="96" alt="art_seraph_collar"> | 64x64 | reserve | seraph_collar | `pixel/items/neck/seraph_collar.png` |
+| `art_seraph_collar` | <img src="../../public/pixel/items/neck/seraph_collar.png" width="96" alt="art_seraph_collar"> | 64x64 | planned | seraph_collar | `pixel/items/neck/seraph_collar.png` |
 
 ## ring
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_ring` | <img src="../../public/pixel/icons/item_cloth_ring.png" width="80" alt="item_cloth_ring"> | 40x40 | reserve | cloth_ring | `pixel/icons/item_cloth_ring.png` |
+| `item_cloth_ring` | <img src="../../public/pixel/icons/item_cloth_ring.png" width="80" alt="item_cloth_ring"> | 40x40 | planned | cloth_ring | `pixel/icons/item_cloth_ring.png` |
 | `item_obsidian_ring` | <img src="../../public/pixel/icons/item_obsidian_ring.png" width="80" alt="item_obsidian_ring"> | 40x40 | used | obsidian_ring | `pixel/icons/item_obsidian_ring.png` |
-| `item_steel_ring` | <img src="../../public/pixel/icons/item_steel_ring.png" width="80" alt="item_steel_ring"> | 40x40 | reserve | steel_ring | `pixel/icons/item_steel_ring.png` |
-| `item_wooden_ring` | <img src="../../public/pixel/icons/item_wooden_ring.png" width="80" alt="item_wooden_ring"> | 40x40 | reserve | wooden_ring | `pixel/icons/item_wooden_ring.png` |
+| `item_steel_ring` | <img src="../../public/pixel/icons/item_steel_ring.png" width="80" alt="item_steel_ring"> | 40x40 | planned | steel_ring | `pixel/icons/item_steel_ring.png` |
+| `item_wooden_ring` | <img src="../../public/pixel/icons/item_wooden_ring.png" width="80" alt="item_wooden_ring"> | 40x40 | planned | wooden_ring | `pixel/icons/item_wooden_ring.png` |
 
 ## ring G1
 
@@ -206,10 +206,10 @@ Neck, ring and charm icons.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_sapphire_teardrop_ring` | <img src="../../public/pixel/items/ring/sapphire_teardrop_ring.png" width="96" alt="art_sapphire_teardrop_ring"> | 64x64 | reserve | sapphire_teardrop_ring | `pixel/items/ring/sapphire_teardrop_ring.png` |
+| `art_sapphire_teardrop_ring` | <img src="../../public/pixel/items/ring/sapphire_teardrop_ring.png" width="96" alt="art_sapphire_teardrop_ring"> | 64x64 | planned | sapphire_teardrop_ring | `pixel/items/ring/sapphire_teardrop_ring.png` |
 
 ## ring G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_crimson_crown_ring` | <img src="../../public/pixel/items/ring/crimson_crown_ring.png" width="96" alt="art_crimson_crown_ring"> | 64x64 | reserve | crimson_crown_ring | `pixel/items/ring/crimson_crown_ring.png` |
+| `art_crimson_crown_ring` | <img src="../../public/pixel/items/ring/crimson_crown_ring.png" width="96" alt="art_crimson_crown_ring"> | 64x64 | planned | crimson_crown_ring | `pixel/items/ring/crimson_crown_ring.png` |

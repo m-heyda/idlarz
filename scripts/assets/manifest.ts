@@ -30,10 +30,10 @@ const PUBLIC = join(ROOT, 'public');
 
 export type AssetCategory = 'potions' | 'weapons' | 'armor' | 'accessories' | 'monsters' | 'buildings' | 'resources' | 'map-details' | 'ui' | 'unsorted';
 /**
- * used = wired into the game now; reserve = registered, but its item/resource/monster is disabled or does not exist yet;
+ * used = live in the game now (enabled item, monster or resource; icon referenced by code); planned = its item/monster/resource exists but is disabled; retired = item no longer drops, old saves keep it; unused = registered art that nothing references (an icon no item uses, an icon no code mentions);
  * placeholder = a stand-in silhouette; spare = generated art nobody asked for (`_name.png`); reuse = raw pack art, not wired.
  */
-export type AssetStatus = 'used' | 'reserve' | 'placeholder' | 'spare' | 'reuse';
+export type AssetStatus = 'used' | 'planned' | 'retired' | 'unused' | 'placeholder' | 'spare' | 'reuse';
 
 export interface AssetEntry {
 	/** The stable name to refer to this asset by (an agent can be told "use `potion_pack_07`" or "delete `tree_autumn_tree1`") */
@@ -149,7 +149,15 @@ export const buildManifest = (): AssetEntry[] => {
 						? 'accessories'
 						: 'armor';
 		const def = e.item ? itemDefs.get(e.item) : undefined;
-		const status: AssetStatus = e.provenance.startsWith('placeholder') ? 'placeholder' : def && def.enabled !== false ? 'used' : 'reserve';
+		const status: AssetStatus = e.provenance.startsWith('placeholder')
+			? 'placeholder'
+			: !def
+				? 'unused'
+				: def.retired
+					? 'retired'
+					: def.enabled !== false
+						? 'used'
+						: 'planned';
 		add({
 			name: e.icon,
 			category,
@@ -192,7 +200,7 @@ export const buildManifest = (): AssetEntry[] => {
 			category: 'monsters',
 			subcategory: `${m.biomes[0]} ${m.grade}`,
 			src,
-			status: m.enabled ? 'used' : 'reserve',
+			status: m.enabled ? 'used' : 'planned',
 			usedBy: [m.id],
 			source: 'monster roster',
 		});
@@ -209,7 +217,7 @@ export const buildManifest = (): AssetEntry[] => {
 			category: 'resources',
 			subcategory: r.tier + (r.biome ? ` ${r.biome}` : ''),
 			src,
-			status: r.enabled ? 'used' : 'reserve',
+			status: r.enabled ? 'used' : 'planned',
 			usedBy: [r.id],
 			source: 'resource roster',
 		});
@@ -262,7 +270,7 @@ export const buildManifest = (): AssetEntry[] => {
 			category,
 			subcategory: id.replace(/_.*/, ''),
 			src: url(f),
-			status: reserved.has(id as never) ? 'reserve' : wired ? 'used' : 'reserve',
+			status: reserved.has(id as never) ? 'planned' : wired ? 'used' : 'unused',
 			usedBy: users,
 			source: 'public/pixel/icons',
 		});

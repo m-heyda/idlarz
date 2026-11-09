@@ -98,17 +98,17 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `res_crystal` | <img src="../../public/pixel/icons/res_crystal.png" width="80" alt="res_crystal"> | 40x40 | reserve |  | `pixel/icons/res_crystal.png` |
+| `res_crystal` | <img src="../../public/pixel/icons/res_crystal.png" width="80" alt="res_crystal"> | 40x40 | planned |  | `pixel/icons/res_crystal.png` |
 | `res_crystal_shine` | <img src="../../public/pixel/icons/res_crystal_shine.png" width="96" alt="res_crystal_shine"> | 240x40 | used | shine:res_crystal | `pixel/icons/res_crystal_shine.png` |
-| `res_fish` | <img src="../../public/pixel/icons/res_fish.png" width="80" alt="res_fish"> | 40x40 | reserve |  | `pixel/icons/res_fish.png` |
-| `res_iron` | <img src="../../public/pixel/icons/res_iron.png" width="80" alt="res_iron"> | 40x40 | reserve |  | `pixel/icons/res_iron.png` |
-| `res_mana` | <img src="../../public/pixel/icons/res_mana.png" width="80" alt="res_mana"> | 40x40 | reserve |  | `pixel/icons/res_mana.png` |
+| `res_fish` | <img src="../../public/pixel/icons/res_fish.png" width="80" alt="res_fish"> | 40x40 | planned |  | `pixel/icons/res_fish.png` |
+| `res_iron` | <img src="../../public/pixel/icons/res_iron.png" width="80" alt="res_iron"> | 40x40 | planned |  | `pixel/icons/res_iron.png` |
+| `res_mana` | <img src="../../public/pixel/icons/res_mana.png" width="80" alt="res_mana"> | 40x40 | planned |  | `pixel/icons/res_mana.png` |
 | `res_mana_shine` | <img src="../../public/pixel/icons/res_mana_shine.png" width="96" alt="res_mana_shine"> | 240x40 | used | shine:res_mana | `pixel/icons/res_mana_shine.png` |
-| `res_mystery` | <img src="../../public/pixel/icons/res_mystery.png" width="80" alt="res_mystery"> | 40x40 | reserve |  | `pixel/icons/res_mystery.png` |
+| `res_mystery` | <img src="../../public/pixel/icons/res_mystery.png" width="80" alt="res_mystery"> | 40x40 | planned |  | `pixel/icons/res_mystery.png` |
 | `res_mystery_shine` | <img src="../../public/pixel/icons/res_mystery_shine.png" width="96" alt="res_mystery_shine"> | 240x40 | used | shine:res_mystery | `pixel/icons/res_mystery_shine.png` |
-| `res_sapphire` | <img src="../../public/pixel/icons/res_sapphire.png" width="80" alt="res_sapphire"> | 40x40 | reserve |  | `pixel/icons/res_sapphire.png` |
+| `res_sapphire` | <img src="../../public/pixel/icons/res_sapphire.png" width="80" alt="res_sapphire"> | 40x40 | planned |  | `pixel/icons/res_sapphire.png` |
 | `res_sapphire_shine` | <img src="../../public/pixel/icons/res_sapphire_shine.png" width="96" alt="res_sapphire_shine"> | 240x40 | used | shine:res_sapphire | `pixel/icons/res_sapphire_shine.png` |
-| `res_shard` | <img src="../../public/pixel/icons/res_shard.png" width="80" alt="res_shard"> | 40x40 | reserve |  | `pixel/icons/res_shard.png` |
+| `res_shard` | <img src="../../public/pixel/icons/res_shard.png" width="80" alt="res_shard"> | 40x40 | planned |  | `pixel/icons/res_shard.png` |
 
 ## spare
 
@@ -179,79 +179,79 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_cloth` | <img src="../../public/pixel/resources/cloth.png" width="64" alt="resource_cloth"> | 32x32 | reserve | cloth | `pixel/resources/cloth.png` |
+| `resource_cloth` | <img src="../../public/pixel/resources/cloth.png" width="64" alt="resource_cloth"> | 32x32 | planned | cloth | `pixel/resources/cloth.png` |
 
 ## t2 jungle
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_hardwood` | <img src="../../public/pixel/resources/hardwood.png" width="64" alt="resource_hardwood"> | 32x32 | reserve | hardwood | `pixel/resources/hardwood.png` |
+| `resource_hardwood` | <img src="../../public/pixel/resources/hardwood.png" width="64" alt="resource_hardwood"> | 32x32 | planned | hardwood | `pixel/resources/hardwood.png` |
 
 ## t2 orchard
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_honey` | <img src="../../public/pixel/resources/honey.png" width="64" alt="resource_honey"> | 32x32 | reserve | honey | `pixel/resources/honey.png` |
+| `resource_honey` | <img src="../../public/pixel/resources/honey.png" width="64" alt="resource_honey"> | 32x32 | planned | honey | `pixel/resources/honey.png` |
 
 ## t3 battlefield
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_scrap_steel` | <img src="../../public/pixel/resources/scrap-steel.png" width="64" alt="resource_scrap_steel"> | 32x32 | reserve | scrapSteel | `pixel/resources/scrap-steel.png` |
+| `resource_scrap_steel` | <img src="../../public/pixel/resources/scrap-steel.png" width="64" alt="resource_scrap_steel"> | 32x32 | planned | scrapSteel | `pixel/resources/scrap-steel.png` |
 
 ## t3 blight
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_corrupted_core` | <img src="../../public/pixel/resources/corrupted-core.png" width="64" alt="resource_corrupted_core"> | 32x32 | reserve | corruptedCore | `pixel/resources/corrupted-core.png` |
+| `resource_corrupted_core` | <img src="../../public/pixel/resources/corrupted-core.png" width="64" alt="resource_corrupted_core"> | 32x32 | planned | corruptedCore | `pixel/resources/corrupted-core.png` |
 
 ## t3 coast
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_salt` | <img src="../../public/pixel/resources/salt.png" width="64" alt="resource_salt"> | 32x32 | reserve | salt | `pixel/resources/salt.png` |
+| `resource_salt` | <img src="../../public/pixel/resources/salt.png" width="64" alt="resource_salt"> | 32x32 | planned | salt | `pixel/resources/salt.png` |
 
 ## t3 fields
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_dye` | <img src="../../public/pixel/resources/dye.png" width="64" alt="resource_dye"> | 32x32 | reserve | dye | `pixel/resources/dye.png` |
+| `resource_dye` | <img src="../../public/pixel/resources/dye.png" width="64" alt="resource_dye"> | 32x32 | planned | dye | `pixel/resources/dye.png` |
 
 ## t3 forest
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_sap` | <img src="../../public/pixel/resources/sap.png" width="64" alt="resource_sap"> | 32x32 | reserve | sap | `pixel/resources/sap.png` |
+| `resource_sap` | <img src="../../public/pixel/resources/sap.png" width="64" alt="resource_sap"> | 32x32 | planned | sap | `pixel/resources/sap.png` |
 
 ## t3 hills
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_iron_ore` | <img src="../../public/pixel/resources/iron-ore.png" width="64" alt="resource_iron_ore"> | 32x32 | reserve | ironOre | `pixel/resources/iron-ore.png` |
+| `resource_iron_ore` | <img src="../../public/pixel/resources/iron-ore.png" width="64" alt="resource_iron_ore"> | 32x32 | planned | ironOre | `pixel/resources/iron-ore.png` |
 
 ## t3 lake
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_pearls` | <img src="../../public/pixel/resources/pearls.png" width="64" alt="resource_pearls"> | 32x32 | reserve | pearls | `pixel/resources/pearls.png` |
+| `resource_pearls` | <img src="../../public/pixel/resources/pearls.png" width="64" alt="resource_pearls"> | 32x32 | planned | pearls | `pixel/resources/pearls.png` |
 
 ## t3 plains
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_herbs` | <img src="../../public/pixel/resources/herbs.png" width="64" alt="resource_herbs"> | 32x32 | reserve | herbs | `pixel/resources/herbs.png` |
+| `resource_herbs` | <img src="../../public/pixel/resources/herbs.png" width="64" alt="resource_herbs"> | 32x32 | planned | herbs | `pixel/resources/herbs.png` |
 
 ## t3 swamp
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_spores` | <img src="../../public/pixel/resources/spores.png" width="64" alt="resource_spores"> | 32x32 | reserve | spores | `pixel/resources/spores.png` |
+| `resource_spores` | <img src="../../public/pixel/resources/spores.png" width="64" alt="resource_spores"> | 32x32 | planned | spores | `pixel/resources/spores.png` |
 
 ## t3 tundra
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `resource_frostshard` | <img src="../../public/pixel/resources/frostshard.png" width="64" alt="resource_frostshard"> | 32x32 | reserve | frostshard | `pixel/resources/frostshard.png` |
+| `resource_frostshard` | <img src="../../public/pixel/resources/frostshard.png" width="64" alt="resource_frostshard"> | 32x32 | planned | frostshard | `pixel/resources/frostshard.png` |
 
 ## wood
 

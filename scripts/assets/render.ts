@@ -6,7 +6,9 @@ const HEADER =
 
 const STATUS_TEXT: Record<AssetEntry['status'], string> = {
 	used: 'in the game now',
-	reserve: 'registered, but nothing live uses it (disabled or unwritten item/resource/monster, or an icon no code references)',
+	planned: 'its item, monster or resource exists but is disabled (not in the game yet)',
+	retired: 'item no longer drops or sells; saves that already hold it keep working',
+	unused: 'registered art that nothing uses: an icon with no item, or an icon no code references (safe to delete once checked)',
 	placeholder: 'stand-in silhouette until real art arrives',
 	spare: 'generated art nobody needs yet (`_name.png`)',
 	reuse: 'raw pack art, not wired; copy only what you use',
@@ -42,7 +44,7 @@ export const renderIndex = (m: AssetEntry[]): string => {
 		'## How to use it with an agent',
 		'',
 		'- **Use an asset:** "use `building_village_blacksmith_house` for the Blacksmith". The agent finds the file in `manifest.json` (`src`), copies it into the game folder and registers it (`src/config/pixelIcons.ts` or `src/config/itemIcons/`; rules in `art_style_reference/README.md`).',
-		'- **Delete an asset:** "delete `potion_pack_07`". Only `reuse` and `spare` assets are safe to delete outright; for a `used` or `reserve` asset the agent first switches the catalog entry to another picture (never delete a wired file before its replacement is wired).',
+		'- **Delete an asset:** "delete `potion_pack_07`". Only `reuse` and `spare` assets are safe to delete outright; for a `used`, `planned` or `retired` asset the agent first switches the catalog entry to another picture (never delete a wired file before its replacement is wired).',
 		'- **Rename:** add `"<src as in manifest.json>": "new_name"` to `scripts/assets/names.json` and run `npm run assets:catalog`.',
 		'- **Map details:** pack objects come in up to four renderings of the same object (`none`, `shadow`, `texture`, `texture-dark`); the page lists them as `variants`. Pick the one that sits on your ground.',
 		'',

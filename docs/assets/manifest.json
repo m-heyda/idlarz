@@ -5,7 +5,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/arcane_swirl.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -18,7 +18,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/glass_vial.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -61,7 +61,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/hourglass_draught.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -89,7 +89,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/phoenix_elixir.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -102,7 +102,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/prism_shard.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -115,7 +115,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/starwater_elixir.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -128,7 +128,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/stoneskin_tonic.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -141,7 +141,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/toxin_vial.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -154,7 +154,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/venom_flask.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -167,7 +167,7 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/vitality_heart.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -836,7 +836,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/items/legendary/reapers_crescent.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -851,7 +851,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/items/legendary/tidecaller_axe.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -866,7 +866,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/icons/item_battle_axe.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1043,7 +1043,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/items/legendary/cinderflight_bow.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1088,7 +1088,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/icons/item_recurve_bow.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1470,7 +1470,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/dagger",
 		"src": "/pixel/icons/item_steel_dagger.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1647,7 +1647,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/mace",
 		"src": "/pixel/icons/item_steel_mace.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1864,7 +1864,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/mace G7",
 		"src": "/pixel/items/mainHand/mace/frostcrystal_mace.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1879,7 +1879,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/mace G7",
 		"src": "/pixel/items/mainHand/mace/magma_flail.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1972,7 +1972,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/maul",
 		"src": "/pixel/items/legendary/runeforged_titanhammer.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2224,7 +2224,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/cindercrescent_glaive.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2239,7 +2239,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/dawnbringer_trident.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2254,7 +2254,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/stormtrident.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2269,7 +2269,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/icons/item_steel_spear.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2446,7 +2446,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/staff",
 		"src": "/pixel/items/legendary/amethyst_spire.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2461,7 +2461,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/staff",
 		"src": "/pixel/icons/item_oak_staff.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2653,7 +2653,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/items/legendary/nightfall_edge.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2668,7 +2668,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/items/legendary/voidrune_blade.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2728,7 +2728,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/icons/item_wooden_sword.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2906,7 +2906,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword G7",
 		"src": "/pixel/items/mainHand/sword/cinderfang_sword.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2921,7 +2921,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword G7",
 		"src": "/pixel/items/mainHand/sword/frostbrand.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2936,7 +2936,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword G7",
 		"src": "/pixel/items/mainHand/sword/runed_jade_blade.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2951,7 +2951,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword G8",
 		"src": "/pixel/items/mainHand/sword/seraph_blade.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2966,7 +2966,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/wand",
 		"src": "/pixel/items/legendary/frostbloom_fan.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2981,7 +2981,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/wand",
 		"src": "/pixel/icons/item_apprentice_wand.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3173,7 +3173,7 @@
 		"category": "weapons",
 		"subcategory": "offHand/shield",
 		"src": "/pixel/icons/item_steel_shield.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3188,7 +3188,7 @@
 		"category": "weapons",
 		"subcategory": "offHand/shield",
 		"src": "/pixel/icons/item_wooden_shield.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3368,7 +3368,7 @@
 		"category": "weapons",
 		"subcategory": "offHand/shield G7",
 		"src": "/pixel/items/offHand/runeward_roundel.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3383,7 +3383,7 @@
 		"category": "weapons",
 		"subcategory": "offHand/shield G8",
 		"src": "/pixel/items/offHand/frostcrystal_aegis.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3398,7 +3398,7 @@
 		"category": "weapons",
 		"subcategory": "offHand/shield G8",
 		"src": "/pixel/items/offHand/royal_lion_crest.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3413,7 +3413,7 @@
 		"category": "weapons",
 		"subcategory": "offHand/shield G8",
 		"src": "/pixel/items/offHand/verdant_kite_shield.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3428,7 +3428,7 @@
 		"category": "weapons",
 		"subcategory": "offHand/tome",
 		"src": "/pixel/icons/item_apprentice_tome.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3648,7 +3648,7 @@
 		"category": "armor",
 		"subcategory": "belt G4",
 		"src": "/pixel/items/belt/alchemist_bandolier.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3661,7 +3661,7 @@
 		"category": "armor",
 		"subcategory": "belt G4",
 		"src": "/pixel/items/belt/chain_girdle.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3674,7 +3674,7 @@
 		"category": "armor",
 		"subcategory": "belt G5",
 		"src": "/pixel/items/belt/hunter_trophy_belt.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3687,7 +3687,7 @@
 		"category": "armor",
 		"subcategory": "belt G6",
 		"src": "/pixel/items/belt/studded_nightbelt.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3700,7 +3700,7 @@
 		"category": "armor",
 		"subcategory": "belt G7",
 		"src": "/pixel/items/belt/runebound_girdle.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3713,7 +3713,7 @@
 		"category": "armor",
 		"subcategory": "belt G8",
 		"src": "/pixel/items/belt/ruby_cincture.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3726,7 +3726,7 @@
 		"category": "armor",
 		"subcategory": "belt G9",
 		"src": "/pixel/items/belt/crownguard_belt.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3739,7 +3739,7 @@
 		"category": "armor",
 		"subcategory": "belt S1",
 		"src": "/pixel/items/belt/sunforged_cincture.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3752,7 +3752,7 @@
 		"category": "armor",
 		"subcategory": "belt S2",
 		"src": "/pixel/items/belt/warden_plate_belt.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3767,7 +3767,7 @@
 		"category": "armor",
 		"subcategory": "cape",
 		"src": "/pixel/icons/item_cloth_cape.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3782,7 +3782,7 @@
 		"category": "armor",
 		"subcategory": "cape",
 		"src": "/pixel/icons/item_leather_cloak.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3812,7 +3812,7 @@
 		"category": "armor",
 		"subcategory": "cape",
 		"src": "/pixel/icons/item_steel_cloak.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3989,7 +3989,7 @@
 		"category": "armor",
 		"subcategory": "chest",
 		"src": "/pixel/icons/item_cloth_robe.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4004,7 +4004,7 @@
 		"category": "armor",
 		"subcategory": "chest",
 		"src": "/pixel/icons/item_leather_vest.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4211,7 +4211,7 @@
 		"category": "armor",
 		"subcategory": "feet",
 		"src": "/pixel/icons/item_cloth_slippers.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4226,7 +4226,7 @@
 		"category": "armor",
 		"subcategory": "feet",
 		"src": "/pixel/icons/item_leather_boots.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4406,7 +4406,7 @@
 		"category": "armor",
 		"subcategory": "feet G7",
 		"src": "/pixel/items/feet/frostglass_boots.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4421,7 +4421,7 @@
 		"category": "armor",
 		"subcategory": "feet G8",
 		"src": "/pixel/items/feet/drake_scale_boots.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4436,7 +4436,7 @@
 		"category": "armor",
 		"subcategory": "feet G8",
 		"src": "/pixel/items/feet/sunsilk_boots.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4451,7 +4451,7 @@
 		"category": "armor",
 		"subcategory": "hands",
 		"src": "/pixel/icons/item_cloth_gloves.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4466,7 +4466,7 @@
 		"category": "armor",
 		"subcategory": "hands",
 		"src": "/pixel/icons/item_leather_gloves.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4673,7 +4673,7 @@
 		"category": "armor",
 		"subcategory": "head",
 		"src": "/pixel/icons/item_cloth_hat.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4688,7 +4688,7 @@
 		"category": "armor",
 		"subcategory": "head",
 		"src": "/pixel/icons/item_leather_cap.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4895,7 +4895,7 @@
 		"category": "armor",
 		"subcategory": "legs",
 		"src": "/pixel/icons/item_cloth_trousers.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4910,7 +4910,7 @@
 		"category": "armor",
 		"subcategory": "legs",
 		"src": "/pixel/icons/item_leather_leggings.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5135,7 +5135,7 @@
 		"category": "armor",
 		"subcategory": "legs G7",
 		"src": "/pixel/items/legs/runed_skirt.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5150,7 +5150,7 @@
 		"category": "armor",
 		"subcategory": "legs G7",
 		"src": "/pixel/items/legs/verdant_greaves.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5165,7 +5165,7 @@
 		"category": "armor",
 		"subcategory": "legs G8",
 		"src": "/pixel/items/legs/royal_silk_trousers.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5180,7 +5180,7 @@
 		"category": "armor",
 		"subcategory": "shoulder",
 		"src": "/pixel/icons/item_cloth_mantle.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5195,7 +5195,7 @@
 		"category": "armor",
 		"subcategory": "shoulder",
 		"src": "/pixel/icons/item_leather_pauldrons.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5417,7 +5417,7 @@
 		"category": "accessories",
 		"subcategory": "charm",
 		"src": "/pixel/icons/item_cloth_charm.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5447,7 +5447,7 @@
 		"category": "accessories",
 		"subcategory": "charm",
 		"src": "/pixel/icons/item_steel_charm.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5622,7 +5622,7 @@
 		"category": "accessories",
 		"subcategory": "neck",
 		"src": "/pixel/icons/item_cloth_amulet.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5652,7 +5652,7 @@
 		"category": "accessories",
 		"subcategory": "neck",
 		"src": "/pixel/icons/item_steel_gorget.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5667,7 +5667,7 @@
 		"category": "accessories",
 		"subcategory": "neck",
 		"src": "/pixel/icons/item_wooden_pendant.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5877,7 +5877,7 @@
 		"category": "accessories",
 		"subcategory": "neck G7",
 		"src": "/pixel/items/neck/winged_sapphire_pendant.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5892,7 +5892,7 @@
 		"category": "accessories",
 		"subcategory": "neck G8",
 		"src": "/pixel/items/neck/seraph_collar.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5907,7 +5907,7 @@
 		"category": "accessories",
 		"subcategory": "ring",
 		"src": "/pixel/icons/item_cloth_ring.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5937,7 +5937,7 @@
 		"category": "accessories",
 		"subcategory": "ring",
 		"src": "/pixel/icons/item_steel_ring.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5952,7 +5952,7 @@
 		"category": "accessories",
 		"subcategory": "ring",
 		"src": "/pixel/icons/item_wooden_ring.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -6147,7 +6147,7 @@
 		"category": "accessories",
 		"subcategory": "ring G7",
 		"src": "/pixel/items/ring/sapphire_teardrop_ring.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6162,7 +6162,7 @@
 		"category": "accessories",
 		"subcategory": "ring G8",
 		"src": "/pixel/items/ring/crimson_crown_ring.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6177,7 +6177,7 @@
 		"category": "monsters",
 		"subcategory": "coast boss",
 		"src": "/pixel/enemies/coast/boss-reef-leviathan.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -6192,7 +6192,7 @@
 		"category": "monsters",
 		"subcategory": "coast normal",
 		"src": "/pixel/enemies/coast/drowned-sailor.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -6207,7 +6207,7 @@
 		"category": "monsters",
 		"subcategory": "coast normal",
 		"src": "/pixel/enemies/coast/net-gull.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "monster roster",
 		"size": [
 			65,
@@ -6222,7 +6222,7 @@
 		"category": "monsters",
 		"subcategory": "coast normal",
 		"src": "/pixel/enemies/coast/wreck-crab.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -6297,7 +6297,7 @@
 		"category": "monsters",
 		"subcategory": "lake boss",
 		"src": "/pixel/enemies/lake/boss-lake-hydra.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "monster roster",
 		"size": [
 			65,
@@ -6312,7 +6312,7 @@
 		"category": "monsters",
 		"subcategory": "lake normal",
 		"src": "/pixel/enemies/lake/moss-snapper.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -6327,7 +6327,7 @@
 		"category": "monsters",
 		"subcategory": "lake normal",
 		"src": "/pixel/enemies/lake/reed-nymph.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -10089,7 +10089,7 @@
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_crystal.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -10117,7 +10117,7 @@
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_fish.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -10130,7 +10130,7 @@
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_iron.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -10143,7 +10143,7 @@
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_mana.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -10171,7 +10171,7 @@
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_mystery.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -10199,7 +10199,7 @@
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_sapphire.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -10227,7 +10227,7 @@
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_shard.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -10847,7 +10847,7 @@
 		"category": "resources",
 		"subcategory": "t2 fields",
 		"src": "/pixel/resources/cloth.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10862,7 +10862,7 @@
 		"category": "resources",
 		"subcategory": "t2 jungle",
 		"src": "/pixel/resources/hardwood.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10877,7 +10877,7 @@
 		"category": "resources",
 		"subcategory": "t2 orchard",
 		"src": "/pixel/resources/honey.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10892,7 +10892,7 @@
 		"category": "resources",
 		"subcategory": "t3 battlefield",
 		"src": "/pixel/resources/scrap-steel.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10907,7 +10907,7 @@
 		"category": "resources",
 		"subcategory": "t3 blight",
 		"src": "/pixel/resources/corrupted-core.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10922,7 +10922,7 @@
 		"category": "resources",
 		"subcategory": "t3 coast",
 		"src": "/pixel/resources/salt.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10937,7 +10937,7 @@
 		"category": "resources",
 		"subcategory": "t3 fields",
 		"src": "/pixel/resources/dye.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10952,7 +10952,7 @@
 		"category": "resources",
 		"subcategory": "t3 forest",
 		"src": "/pixel/resources/sap.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10967,7 +10967,7 @@
 		"category": "resources",
 		"subcategory": "t3 hills",
 		"src": "/pixel/resources/iron-ore.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10982,7 +10982,7 @@
 		"category": "resources",
 		"subcategory": "t3 lake",
 		"src": "/pixel/resources/pearls.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -10997,7 +10997,7 @@
 		"category": "resources",
 		"subcategory": "t3 plains",
 		"src": "/pixel/resources/herbs.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -11012,7 +11012,7 @@
 		"category": "resources",
 		"subcategory": "t3 swamp",
 		"src": "/pixel/resources/spores.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -11027,7 +11027,7 @@
 		"category": "resources",
 		"subcategory": "t3 tundra",
 		"src": "/pixel/resources/frostshard.png",
-		"status": "reserve",
+		"status": "planned",
 		"source": "resource roster",
 		"size": [
 			32,
@@ -17927,7 +17927,7 @@
 		"category": "ui",
 		"subcategory": "bonus",
 		"src": "/pixel/icons/bonus_chest.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			32,
@@ -18083,7 +18083,7 @@
 		"category": "ui",
 		"subcategory": "chest",
 		"src": "/pixel/icons/chest_map.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			48,
@@ -18746,7 +18746,7 @@
 		"category": "ui",
 		"subcategory": "level",
 		"src": "/pixel/icons/level_orb.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			24,
@@ -18759,7 +18759,7 @@
 		"category": "ui",
 		"subcategory": "level",
 		"src": "/pixel/icons/level_orb_shine.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			144,
@@ -18824,7 +18824,7 @@
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_main.png",
-		"status": "reserve",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			40,

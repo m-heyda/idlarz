@@ -484,7 +484,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **scripts/assets/**
 
-- [`manifest.ts`](../../scripts/assets/manifest.ts) — ~ used = wired into the game now; reserve = registered, but its item/resource/monster is disabled or does not exist yet; placeholder = a stand-in silhouette; spare = generated art nobody asked for (`_name.png`); reuse = raw pack art, not wired.
+- [`manifest.ts`](../../scripts/assets/manifest.ts) — ~ used = live in the game now (enabled item, monster or resource; icon referenced by code); planned = its item/monster/resource exists but is disabled; retired = item no longer drops, old saves keep it; unused = registered art that nothing references (an icon no item uses, an icon no code mentions); placeholder = a stand-in silhouette; spare = generated art nobody asked for (`_name.png`); reuse = raw pack art, not wired.
 - [`render.ts`](../../scripts/assets/render.ts) — Renders docs/assets/ (manifest.json, README.md and one page per category) from the manifest. Pure: same manifest in, same text out.
 
 **scripts/**

@@ -10,9 +10,9 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_reapers_crescent` | <img src="../../public/pixel/items/legendary/reapers_crescent.png" width="96" alt="art_reapers_crescent"> | 64x64 | reserve | reapers_crescent | `pixel/items/legendary/reapers_crescent.png` |
-| `art_tidecaller_axe` | <img src="../../public/pixel/items/legendary/tidecaller_axe.png" width="96" alt="art_tidecaller_axe"> | 64x64 | reserve | tidecaller_axe | `pixel/items/legendary/tidecaller_axe.png` |
-| `item_battle_axe` | <img src="../../public/pixel/icons/item_battle_axe.png" width="80" alt="item_battle_axe"> | 40x40 | reserve | battle_axe | `pixel/icons/item_battle_axe.png` |
+| `art_reapers_crescent` | <img src="../../public/pixel/items/legendary/reapers_crescent.png" width="96" alt="art_reapers_crescent"> | 64x64 | planned | reapers_crescent | `pixel/items/legendary/reapers_crescent.png` |
+| `art_tidecaller_axe` | <img src="../../public/pixel/items/legendary/tidecaller_axe.png" width="96" alt="art_tidecaller_axe"> | 64x64 | planned | tidecaller_axe | `pixel/items/legendary/tidecaller_axe.png` |
+| `item_battle_axe` | <img src="../../public/pixel/icons/item_battle_axe.png" width="80" alt="item_battle_axe"> | 40x40 | planned | battle_axe | `pixel/icons/item_battle_axe.png` |
 
 ## mainHand/axe G1
 
@@ -90,10 +90,10 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_cinderflight_bow` | <img src="../../public/pixel/items/legendary/cinderflight_bow.png" width="96" alt="art_cinderflight_bow"> | 64x64 | reserve | cinderflight_bow | `pixel/items/legendary/cinderflight_bow.png` |
+| `art_cinderflight_bow` | <img src="../../public/pixel/items/legendary/cinderflight_bow.png" width="96" alt="art_cinderflight_bow"> | 64x64 | planned | cinderflight_bow | `pixel/items/legendary/cinderflight_bow.png` |
 | `item_hunting_bow` | <img src="../../public/pixel/icons/item_hunting_bow.png" width="80" alt="item_hunting_bow"> | 40x40 | used | hunting_bow | `pixel/icons/item_hunting_bow.png` |
 | `item_obsidian_longbow` | <img src="../../public/pixel/icons/item_obsidian_longbow.png" width="80" alt="item_obsidian_longbow"> | 40x40 | used | obsidian_longbow | `pixel/icons/item_obsidian_longbow.png` |
-| `item_recurve_bow` | <img src="../../public/pixel/icons/item_recurve_bow.png" width="80" alt="item_recurve_bow"> | 40x40 | reserve | recurve_bow | `pixel/icons/item_recurve_bow.png` |
+| `item_recurve_bow` | <img src="../../public/pixel/icons/item_recurve_bow.png" width="80" alt="item_recurve_bow"> | 40x40 | planned | recurve_bow | `pixel/icons/item_recurve_bow.png` |
 | `item_starfall_bow` | <img src="../../public/pixel/icons/item_starfall_bow.png" width="80" alt="item_starfall_bow"> | 40x40 | used | starfall_bow | `pixel/icons/item_starfall_bow.png` |
 
 ## mainHand/bow G1
@@ -251,7 +251,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `item_obsidian_kris` | <img src="../../public/pixel/icons/item_obsidian_kris.png" width="80" alt="item_obsidian_kris"> | 40x40 | used | obsidian_kris | `pixel/icons/item_obsidian_kris.png` |
-| `item_steel_dagger` | <img src="../../public/pixel/icons/item_steel_dagger.png" width="80" alt="item_steel_dagger"> | 40x40 | reserve | steel_dagger | `pixel/icons/item_steel_dagger.png` |
+| `item_steel_dagger` | <img src="../../public/pixel/icons/item_steel_dagger.png" width="80" alt="item_steel_dagger"> | 40x40 | planned | steel_dagger | `pixel/icons/item_steel_dagger.png` |
 
 ## mainHand/dagger G1
 
@@ -329,7 +329,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_steel_mace` | <img src="../../public/pixel/icons/item_steel_mace.png" width="80" alt="item_steel_mace"> | 40x40 | reserve | steel_mace | `pixel/icons/item_steel_mace.png` |
+| `item_steel_mace` | <img src="../../public/pixel/icons/item_steel_mace.png" width="80" alt="item_steel_mace"> | 40x40 | planned | steel_mace | `pixel/icons/item_steel_mace.png` |
 | `item_wooden_club` | <img src="../../public/pixel/icons/item_wooden_club.png" width="80" alt="item_wooden_club"> | 40x40 | used | wooden_club | `pixel/icons/item_wooden_club.png` |
 
 ## mainHand/mace G1
@@ -379,8 +379,8 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_frostcrystal_mace` | <img src="../../public/pixel/items/mainHand/mace/frostcrystal_mace.png" width="96" alt="art_frostcrystal_mace"> | 64x64 | reserve | frostcrystal_mace | `pixel/items/mainHand/mace/frostcrystal_mace.png` |
-| `art_magma_flail` | <img src="../../public/pixel/items/mainHand/mace/magma_flail.png" width="96" alt="art_magma_flail"> | 64x64 | reserve | magma_flail | `pixel/items/mainHand/mace/magma_flail.png` |
+| `art_frostcrystal_mace` | <img src="../../public/pixel/items/mainHand/mace/frostcrystal_mace.png" width="96" alt="art_frostcrystal_mace"> | 64x64 | planned | frostcrystal_mace | `pixel/items/mainHand/mace/frostcrystal_mace.png` |
+| `art_magma_flail` | <img src="../../public/pixel/items/mainHand/mace/magma_flail.png" width="96" alt="art_magma_flail"> | 64x64 | planned | magma_flail | `pixel/items/mainHand/mace/magma_flail.png` |
 | `art_ph_mainHand_mace_g7` | <img src="../../public/pixel/items/mainHand/mace/ph_g7.png" width="96" alt="art_ph_mainHand_mace_g7"> | 64x64 | placeholder |  | `pixel/items/mainHand/mace/ph_g7.png` |
 
 ## mainHand/mace G8
@@ -417,7 +417,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runeforged_titanhammer` | <img src="../../public/pixel/items/legendary/runeforged_titanhammer.png" width="96" alt="art_runeforged_titanhammer"> | 64x64 | reserve | runeforged_titanhammer | `pixel/items/legendary/runeforged_titanhammer.png` |
+| `art_runeforged_titanhammer` | <img src="../../public/pixel/items/legendary/runeforged_titanhammer.png" width="96" alt="art_runeforged_titanhammer"> | 64x64 | planned | runeforged_titanhammer | `pixel/items/legendary/runeforged_titanhammer.png` |
 | `item_obsidian_maul` | <img src="../../public/pixel/icons/item_obsidian_maul.png" width="80" alt="item_obsidian_maul"> | 40x40 | used | obsidian_maul | `pixel/icons/item_obsidian_maul.png` |
 | `item_titan_maul` | <img src="../../public/pixel/icons/item_titan_maul.png" width="80" alt="item_titan_maul"> | 40x40 | used | titan_maul | `pixel/icons/item_titan_maul.png` |
 
@@ -500,10 +500,10 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_cindercrescent_glaive` | <img src="../../public/pixel/items/legendary/cindercrescent_glaive.png" width="96" alt="art_cindercrescent_glaive"> | 64x64 | reserve | cindercrescent_glaive | `pixel/items/legendary/cindercrescent_glaive.png` |
-| `art_dawnbringer_trident` | <img src="../../public/pixel/items/legendary/dawnbringer_trident.png" width="96" alt="art_dawnbringer_trident"> | 64x64 | reserve | dawnbringer_trident | `pixel/items/legendary/dawnbringer_trident.png` |
-| `art_stormtrident` | <img src="../../public/pixel/items/legendary/stormtrident.png" width="96" alt="art_stormtrident"> | 64x64 | reserve | stormtrident | `pixel/items/legendary/stormtrident.png` |
-| `item_steel_spear` | <img src="../../public/pixel/icons/item_steel_spear.png" width="80" alt="item_steel_spear"> | 40x40 | reserve | steel_spear | `pixel/icons/item_steel_spear.png` |
+| `art_cindercrescent_glaive` | <img src="../../public/pixel/items/legendary/cindercrescent_glaive.png" width="96" alt="art_cindercrescent_glaive"> | 64x64 | planned | cindercrescent_glaive | `pixel/items/legendary/cindercrescent_glaive.png` |
+| `art_dawnbringer_trident` | <img src="../../public/pixel/items/legendary/dawnbringer_trident.png" width="96" alt="art_dawnbringer_trident"> | 64x64 | planned | dawnbringer_trident | `pixel/items/legendary/dawnbringer_trident.png` |
+| `art_stormtrident` | <img src="../../public/pixel/items/legendary/stormtrident.png" width="96" alt="art_stormtrident"> | 64x64 | planned | stormtrident | `pixel/items/legendary/stormtrident.png` |
+| `item_steel_spear` | <img src="../../public/pixel/icons/item_steel_spear.png" width="80" alt="item_steel_spear"> | 40x40 | planned | steel_spear | `pixel/icons/item_steel_spear.png` |
 
 ## mainHand/spear G1
 
@@ -581,8 +581,8 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_amethyst_spire` | <img src="../../public/pixel/items/legendary/amethyst_spire.png" width="96" alt="art_amethyst_spire"> | 64x64 | reserve | amethyst_spire | `pixel/items/legendary/amethyst_spire.png` |
-| `item_oak_staff` | <img src="../../public/pixel/icons/item_oak_staff.png" width="80" alt="item_oak_staff"> | 40x40 | reserve | oak_staff | `pixel/icons/item_oak_staff.png` |
+| `art_amethyst_spire` | <img src="../../public/pixel/items/legendary/amethyst_spire.png" width="96" alt="art_amethyst_spire"> | 64x64 | planned | amethyst_spire | `pixel/items/legendary/amethyst_spire.png` |
+| `item_oak_staff` | <img src="../../public/pixel/icons/item_oak_staff.png" width="80" alt="item_oak_staff"> | 40x40 | planned | oak_staff | `pixel/icons/item_oak_staff.png` |
 | `item_obsidian_staff` | <img src="../../public/pixel/icons/item_obsidian_staff.png" width="80" alt="item_obsidian_staff"> | 40x40 | used | obsidian_staff | `pixel/icons/item_obsidian_staff.png` |
 
 ## mainHand/staff G1
@@ -661,12 +661,12 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_nightfall_edge` | <img src="../../public/pixel/items/legendary/nightfall_edge.png" width="96" alt="art_nightfall_edge"> | 64x64 | reserve | nightfall_edge | `pixel/items/legendary/nightfall_edge.png` |
-| `art_voidrune_blade` | <img src="../../public/pixel/items/legendary/voidrune_blade.png" width="96" alt="art_voidrune_blade"> | 64x64 | reserve | voidrune_blade | `pixel/items/legendary/voidrune_blade.png` |
+| `art_nightfall_edge` | <img src="../../public/pixel/items/legendary/nightfall_edge.png" width="96" alt="art_nightfall_edge"> | 64x64 | planned | nightfall_edge | `pixel/items/legendary/nightfall_edge.png` |
+| `art_voidrune_blade` | <img src="../../public/pixel/items/legendary/voidrune_blade.png" width="96" alt="art_voidrune_blade"> | 64x64 | planned | voidrune_blade | `pixel/items/legendary/voidrune_blade.png` |
 | `item_emberbrand` | <img src="../../public/pixel/icons/item_emberbrand.png" width="80" alt="item_emberbrand"> | 40x40 | used | emberbrand | `pixel/icons/item_emberbrand.png` |
 | `item_iron_sword` | <img src="../../public/pixel/icons/item_iron_sword.png" width="80" alt="item_iron_sword"> | 40x40 | used | iron_sword | `pixel/icons/item_iron_sword.png` |
 | `item_obsidian_blade` | <img src="../../public/pixel/icons/item_obsidian_blade.png" width="80" alt="item_obsidian_blade"> | 40x40 | used | obsidian_blade | `pixel/icons/item_obsidian_blade.png` |
-| `item_wooden_sword` | <img src="../../public/pixel/icons/item_wooden_sword.png" width="80" alt="item_wooden_sword"> | 40x40 | reserve | wooden_sword | `pixel/icons/item_wooden_sword.png` |
+| `item_wooden_sword` | <img src="../../public/pixel/icons/item_wooden_sword.png" width="80" alt="item_wooden_sword"> | 40x40 | planned | wooden_sword | `pixel/icons/item_wooden_sword.png` |
 
 ## mainHand/sword G1
 
@@ -713,22 +713,22 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_cinderfang_sword` | <img src="../../public/pixel/items/mainHand/sword/cinderfang_sword.png" width="96" alt="art_cinderfang_sword"> | 64x64 | reserve | cinderfang_sword | `pixel/items/mainHand/sword/cinderfang_sword.png` |
-| `art_frostbrand` | <img src="../../public/pixel/items/mainHand/sword/frostbrand.png" width="96" alt="art_frostbrand"> | 64x64 | reserve | frostbrand | `pixel/items/mainHand/sword/frostbrand.png` |
-| `art_runed_jade_blade` | <img src="../../public/pixel/items/mainHand/sword/runed_jade_blade.png" width="96" alt="art_runed_jade_blade"> | 64x64 | reserve | runed_jade_blade | `pixel/items/mainHand/sword/runed_jade_blade.png` |
+| `art_cinderfang_sword` | <img src="../../public/pixel/items/mainHand/sword/cinderfang_sword.png" width="96" alt="art_cinderfang_sword"> | 64x64 | planned | cinderfang_sword | `pixel/items/mainHand/sword/cinderfang_sword.png` |
+| `art_frostbrand` | <img src="../../public/pixel/items/mainHand/sword/frostbrand.png" width="96" alt="art_frostbrand"> | 64x64 | planned | frostbrand | `pixel/items/mainHand/sword/frostbrand.png` |
+| `art_runed_jade_blade` | <img src="../../public/pixel/items/mainHand/sword/runed_jade_blade.png" width="96" alt="art_runed_jade_blade"> | 64x64 | planned | runed_jade_blade | `pixel/items/mainHand/sword/runed_jade_blade.png` |
 
 ## mainHand/sword G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_seraph_blade` | <img src="../../public/pixel/items/mainHand/sword/seraph_blade.png" width="96" alt="art_seraph_blade"> | 64x64 | reserve | seraph_blade | `pixel/items/mainHand/sword/seraph_blade.png` |
+| `art_seraph_blade` | <img src="../../public/pixel/items/mainHand/sword/seraph_blade.png" width="96" alt="art_seraph_blade"> | 64x64 | planned | seraph_blade | `pixel/items/mainHand/sword/seraph_blade.png` |
 
 ## mainHand/wand
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_frostbloom_fan` | <img src="../../public/pixel/items/legendary/frostbloom_fan.png" width="96" alt="art_frostbloom_fan"> | 64x64 | reserve | frostbloom_fan | `pixel/items/legendary/frostbloom_fan.png` |
-| `item_apprentice_wand` | <img src="../../public/pixel/icons/item_apprentice_wand.png" width="80" alt="item_apprentice_wand"> | 40x40 | reserve | apprentice_wand | `pixel/icons/item_apprentice_wand.png` |
+| `art_frostbloom_fan` | <img src="../../public/pixel/items/legendary/frostbloom_fan.png" width="96" alt="art_frostbloom_fan"> | 64x64 | planned | frostbloom_fan | `pixel/items/legendary/frostbloom_fan.png` |
+| `item_apprentice_wand` | <img src="../../public/pixel/icons/item_apprentice_wand.png" width="80" alt="item_apprentice_wand"> | 40x40 | planned | apprentice_wand | `pixel/icons/item_apprentice_wand.png` |
 
 ## mainHand/wand G1
 
@@ -807,8 +807,8 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `item_obsidian_aegis` | <img src="../../public/pixel/icons/item_obsidian_aegis.png" width="80" alt="item_obsidian_aegis"> | 40x40 | used | obsidian_aegis | `pixel/icons/item_obsidian_aegis.png` |
-| `item_steel_shield` | <img src="../../public/pixel/icons/item_steel_shield.png" width="80" alt="item_steel_shield"> | 40x40 | reserve | steel_shield | `pixel/icons/item_steel_shield.png` |
-| `item_wooden_shield` | <img src="../../public/pixel/icons/item_wooden_shield.png" width="80" alt="item_wooden_shield"> | 40x40 | reserve | wooden_shield | `pixel/icons/item_wooden_shield.png` |
+| `item_steel_shield` | <img src="../../public/pixel/icons/item_steel_shield.png" width="80" alt="item_steel_shield"> | 40x40 | planned | steel_shield | `pixel/icons/item_steel_shield.png` |
+| `item_wooden_shield` | <img src="../../public/pixel/icons/item_wooden_shield.png" width="80" alt="item_wooden_shield"> | 40x40 | planned | wooden_shield | `pixel/icons/item_wooden_shield.png` |
 
 ## offHand/shield G1
 
@@ -855,21 +855,21 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runeward_roundel` | <img src="../../public/pixel/items/offHand/runeward_roundel.png" width="96" alt="art_runeward_roundel"> | 64x64 | reserve | runeward_roundel | `pixel/items/offHand/runeward_roundel.png` |
+| `art_runeward_roundel` | <img src="../../public/pixel/items/offHand/runeward_roundel.png" width="96" alt="art_runeward_roundel"> | 64x64 | planned | runeward_roundel | `pixel/items/offHand/runeward_roundel.png` |
 
 ## offHand/shield G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_frostcrystal_aegis` | <img src="../../public/pixel/items/offHand/frostcrystal_aegis.png" width="96" alt="art_frostcrystal_aegis"> | 64x64 | reserve | frostcrystal_aegis | `pixel/items/offHand/frostcrystal_aegis.png` |
-| `art_royal_lion_crest` | <img src="../../public/pixel/items/offHand/royal_lion_crest.png" width="96" alt="art_royal_lion_crest"> | 64x64 | reserve | royal_lion_crest | `pixel/items/offHand/royal_lion_crest.png` |
-| `art_verdant_kite_shield` | <img src="../../public/pixel/items/offHand/verdant_kite_shield.png" width="96" alt="art_verdant_kite_shield"> | 64x64 | reserve | verdant_kite_shield | `pixel/items/offHand/verdant_kite_shield.png` |
+| `art_frostcrystal_aegis` | <img src="../../public/pixel/items/offHand/frostcrystal_aegis.png" width="96" alt="art_frostcrystal_aegis"> | 64x64 | planned | frostcrystal_aegis | `pixel/items/offHand/frostcrystal_aegis.png` |
+| `art_royal_lion_crest` | <img src="../../public/pixel/items/offHand/royal_lion_crest.png" width="96" alt="art_royal_lion_crest"> | 64x64 | planned | royal_lion_crest | `pixel/items/offHand/royal_lion_crest.png` |
+| `art_verdant_kite_shield` | <img src="../../public/pixel/items/offHand/verdant_kite_shield.png" width="96" alt="art_verdant_kite_shield"> | 64x64 | planned | verdant_kite_shield | `pixel/items/offHand/verdant_kite_shield.png` |
 
 ## offHand/tome
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_apprentice_tome` | <img src="../../public/pixel/icons/item_apprentice_tome.png" width="80" alt="item_apprentice_tome"> | 40x40 | reserve | apprentice_tome | `pixel/icons/item_apprentice_tome.png` |
+| `item_apprentice_tome` | <img src="../../public/pixel/icons/item_apprentice_tome.png" width="80" alt="item_apprentice_tome"> | 40x40 | planned | apprentice_tome | `pixel/icons/item_apprentice_tome.png` |
 
 ## offHand/tome G1
 

@@ -10,15 +10,15 @@ The monster roster art, per biome, plus planned monsters that have no picture ye
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `monster_boss_reef_leviathan` | <img src="../../public/pixel/enemies/coast/boss-reef-leviathan.png" width="96" alt="monster_boss_reef_leviathan"> | 64x64 | reserve | bossReefLeviathan | `pixel/enemies/coast/boss-reef-leviathan.png` |
+| `monster_boss_reef_leviathan` | <img src="../../public/pixel/enemies/coast/boss-reef-leviathan.png" width="96" alt="monster_boss_reef_leviathan"> | 64x64 | planned | bossReefLeviathan | `pixel/enemies/coast/boss-reef-leviathan.png` |
 
 ## coast normal
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `monster_drowned_sailor` | <img src="../../public/pixel/enemies/coast/drowned-sailor.png" width="96" alt="monster_drowned_sailor"> | 64x64 | reserve | drownedSailor | `pixel/enemies/coast/drowned-sailor.png` |
-| `monster_net_gull` | <img src="../../public/pixel/enemies/coast/net-gull.png" width="96" alt="monster_net_gull"> | 65x65 | reserve | netGull | `pixel/enemies/coast/net-gull.png` |
-| `monster_wreck_crab` | <img src="../../public/pixel/enemies/coast/wreck-crab.png" width="96" alt="monster_wreck_crab"> | 64x64 | reserve | wreckCrab | `pixel/enemies/coast/wreck-crab.png` |
+| `monster_drowned_sailor` | <img src="../../public/pixel/enemies/coast/drowned-sailor.png" width="96" alt="monster_drowned_sailor"> | 64x64 | planned | drownedSailor | `pixel/enemies/coast/drowned-sailor.png` |
+| `monster_net_gull` | <img src="../../public/pixel/enemies/coast/net-gull.png" width="96" alt="monster_net_gull"> | 65x65 | planned | netGull | `pixel/enemies/coast/net-gull.png` |
+| `monster_wreck_crab` | <img src="../../public/pixel/enemies/coast/wreck-crab.png" width="96" alt="monster_wreck_crab"> | 64x64 | planned | wreckCrab | `pixel/enemies/coast/wreck-crab.png` |
 
 ## forest boss
 
@@ -38,14 +38,14 @@ The monster roster art, per biome, plus planned monsters that have no picture ye
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `monster_boss_lake_hydra` | <img src="../../public/pixel/enemies/lake/boss-lake-hydra.png" width="96" alt="monster_boss_lake_hydra"> | 65x65 | reserve | bossLakeHydra | `pixel/enemies/lake/boss-lake-hydra.png` |
+| `monster_boss_lake_hydra` | <img src="../../public/pixel/enemies/lake/boss-lake-hydra.png" width="96" alt="monster_boss_lake_hydra"> | 65x65 | planned | bossLakeHydra | `pixel/enemies/lake/boss-lake-hydra.png` |
 
 ## lake normal
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `monster_moss_snapper` | <img src="../../public/pixel/enemies/lake/moss-snapper.png" width="96" alt="monster_moss_snapper"> | 64x64 | reserve | mossSnapper | `pixel/enemies/lake/moss-snapper.png` |
-| `monster_reed_nymph` | <img src="../../public/pixel/enemies/lake/reed-nymph.png" width="96" alt="monster_reed_nymph"> | 64x64 | reserve | reedNymph | `pixel/enemies/lake/reed-nymph.png` |
+| `monster_moss_snapper` | <img src="../../public/pixel/enemies/lake/moss-snapper.png" width="96" alt="monster_moss_snapper"> | 64x64 | planned | mossSnapper | `pixel/enemies/lake/moss-snapper.png` |
+| `monster_reed_nymph` | <img src="../../public/pixel/enemies/lake/reed-nymph.png" width="96" alt="monster_reed_nymph"> | 64x64 | planned | reedNymph | `pixel/enemies/lake/reed-nymph.png` |
 
 ## monster
 

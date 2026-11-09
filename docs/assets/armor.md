@@ -28,59 +28,59 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_alchemist_bandolier` | <img src="../../public/pixel/items/belt/alchemist_bandolier.png" width="96" alt="art_alchemist_bandolier"> | 64x64 | reserve |  | `pixel/items/belt/alchemist_bandolier.png` |
-| `art_chain_girdle` | <img src="../../public/pixel/items/belt/chain_girdle.png" width="96" alt="art_chain_girdle"> | 64x64 | reserve |  | `pixel/items/belt/chain_girdle.png` |
+| `art_alchemist_bandolier` | <img src="../../public/pixel/items/belt/alchemist_bandolier.png" width="96" alt="art_alchemist_bandolier"> | 64x64 | unused |  | `pixel/items/belt/alchemist_bandolier.png` |
+| `art_chain_girdle` | <img src="../../public/pixel/items/belt/chain_girdle.png" width="96" alt="art_chain_girdle"> | 64x64 | unused |  | `pixel/items/belt/chain_girdle.png` |
 
 ## belt G5
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_hunter_trophy_belt` | <img src="../../public/pixel/items/belt/hunter_trophy_belt.png" width="96" alt="art_hunter_trophy_belt"> | 64x64 | reserve |  | `pixel/items/belt/hunter_trophy_belt.png` |
+| `art_hunter_trophy_belt` | <img src="../../public/pixel/items/belt/hunter_trophy_belt.png" width="96" alt="art_hunter_trophy_belt"> | 64x64 | unused |  | `pixel/items/belt/hunter_trophy_belt.png` |
 
 ## belt G6
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_studded_nightbelt` | <img src="../../public/pixel/items/belt/studded_nightbelt.png" width="96" alt="art_studded_nightbelt"> | 64x64 | reserve |  | `pixel/items/belt/studded_nightbelt.png` |
+| `art_studded_nightbelt` | <img src="../../public/pixel/items/belt/studded_nightbelt.png" width="96" alt="art_studded_nightbelt"> | 64x64 | unused |  | `pixel/items/belt/studded_nightbelt.png` |
 
 ## belt G7
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runebound_girdle` | <img src="../../public/pixel/items/belt/runebound_girdle.png" width="96" alt="art_runebound_girdle"> | 64x64 | reserve |  | `pixel/items/belt/runebound_girdle.png` |
+| `art_runebound_girdle` | <img src="../../public/pixel/items/belt/runebound_girdle.png" width="96" alt="art_runebound_girdle"> | 64x64 | unused |  | `pixel/items/belt/runebound_girdle.png` |
 
 ## belt G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ruby_cincture` | <img src="../../public/pixel/items/belt/ruby_cincture.png" width="96" alt="art_ruby_cincture"> | 64x64 | reserve |  | `pixel/items/belt/ruby_cincture.png` |
+| `art_ruby_cincture` | <img src="../../public/pixel/items/belt/ruby_cincture.png" width="96" alt="art_ruby_cincture"> | 64x64 | unused |  | `pixel/items/belt/ruby_cincture.png` |
 
 ## belt G9
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_crownguard_belt` | <img src="../../public/pixel/items/belt/crownguard_belt.png" width="96" alt="art_crownguard_belt"> | 64x64 | reserve |  | `pixel/items/belt/crownguard_belt.png` |
+| `art_crownguard_belt` | <img src="../../public/pixel/items/belt/crownguard_belt.png" width="96" alt="art_crownguard_belt"> | 64x64 | unused |  | `pixel/items/belt/crownguard_belt.png` |
 
 ## belt S1
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_sunforged_cincture` | <img src="../../public/pixel/items/belt/sunforged_cincture.png" width="96" alt="art_sunforged_cincture"> | 64x64 | reserve |  | `pixel/items/belt/sunforged_cincture.png` |
+| `art_sunforged_cincture` | <img src="../../public/pixel/items/belt/sunforged_cincture.png" width="96" alt="art_sunforged_cincture"> | 64x64 | unused |  | `pixel/items/belt/sunforged_cincture.png` |
 
 ## belt S2
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_warden_plate_belt` | <img src="../../public/pixel/items/belt/warden_plate_belt.png" width="96" alt="art_warden_plate_belt"> | 64x64 | reserve |  | `pixel/items/belt/warden_plate_belt.png` |
+| `art_warden_plate_belt` | <img src="../../public/pixel/items/belt/warden_plate_belt.png" width="96" alt="art_warden_plate_belt"> | 64x64 | unused |  | `pixel/items/belt/warden_plate_belt.png` |
 
 ## cape
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_cape` | <img src="../../public/pixel/icons/item_cloth_cape.png" width="80" alt="item_cloth_cape"> | 40x40 | reserve | cloth_cape | `pixel/icons/item_cloth_cape.png` |
-| `item_leather_cloak` | <img src="../../public/pixel/icons/item_leather_cloak.png" width="80" alt="item_leather_cloak"> | 40x40 | reserve | leather_cloak | `pixel/icons/item_leather_cloak.png` |
+| `item_cloth_cape` | <img src="../../public/pixel/icons/item_cloth_cape.png" width="80" alt="item_cloth_cape"> | 40x40 | planned | cloth_cape | `pixel/icons/item_cloth_cape.png` |
+| `item_leather_cloak` | <img src="../../public/pixel/icons/item_leather_cloak.png" width="80" alt="item_leather_cloak"> | 40x40 | planned | leather_cloak | `pixel/icons/item_leather_cloak.png` |
 | `item_obsidian_cloak` | <img src="../../public/pixel/icons/item_obsidian_cloak.png" width="80" alt="item_obsidian_cloak"> | 40x40 | used | obsidian_cloak | `pixel/icons/item_obsidian_cloak.png` |
-| `item_steel_cloak` | <img src="../../public/pixel/icons/item_steel_cloak.png" width="80" alt="item_steel_cloak"> | 40x40 | reserve | steel_cloak | `pixel/icons/item_steel_cloak.png` |
+| `item_steel_cloak` | <img src="../../public/pixel/icons/item_steel_cloak.png" width="80" alt="item_steel_cloak"> | 40x40 | planned | steel_cloak | `pixel/icons/item_steel_cloak.png` |
 
 ## cape G1
 
@@ -158,8 +158,8 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_robe` | <img src="../../public/pixel/icons/item_cloth_robe.png" width="80" alt="item_cloth_robe"> | 40x40 | reserve | cloth_robe | `pixel/icons/item_cloth_robe.png` |
-| `item_leather_vest` | <img src="../../public/pixel/icons/item_leather_vest.png" width="80" alt="item_leather_vest"> | 40x40 | reserve | leather_vest | `pixel/icons/item_leather_vest.png` |
+| `item_cloth_robe` | <img src="../../public/pixel/icons/item_cloth_robe.png" width="80" alt="item_cloth_robe"> | 40x40 | planned | cloth_robe | `pixel/icons/item_cloth_robe.png` |
+| `item_leather_vest` | <img src="../../public/pixel/icons/item_leather_vest.png" width="80" alt="item_leather_vest"> | 40x40 | planned | leather_vest | `pixel/icons/item_leather_vest.png` |
 | `item_obsidian_cuirass` | <img src="../../public/pixel/icons/item_obsidian_cuirass.png" width="80" alt="item_obsidian_cuirass"> | 40x40 | used | obsidian_cuirass | `pixel/icons/item_obsidian_cuirass.png` |
 | `item_steel_cuirass` | <img src="../../public/pixel/icons/item_steel_cuirass.png" width="80" alt="item_steel_cuirass"> | 40x40 | used | steel_cuirass | `pixel/icons/item_steel_cuirass.png` |
 
@@ -239,8 +239,8 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_slippers` | <img src="../../public/pixel/icons/item_cloth_slippers.png" width="80" alt="item_cloth_slippers"> | 40x40 | reserve | cloth_slippers | `pixel/icons/item_cloth_slippers.png` |
-| `item_leather_boots` | <img src="../../public/pixel/icons/item_leather_boots.png" width="80" alt="item_leather_boots"> | 40x40 | reserve | leather_boots | `pixel/icons/item_leather_boots.png` |
+| `item_cloth_slippers` | <img src="../../public/pixel/icons/item_cloth_slippers.png" width="80" alt="item_cloth_slippers"> | 40x40 | planned | cloth_slippers | `pixel/icons/item_cloth_slippers.png` |
+| `item_leather_boots` | <img src="../../public/pixel/icons/item_leather_boots.png" width="80" alt="item_leather_boots"> | 40x40 | planned | leather_boots | `pixel/icons/item_leather_boots.png` |
 | `item_obsidian_sabatons` | <img src="../../public/pixel/icons/item_obsidian_sabatons.png" width="80" alt="item_obsidian_sabatons"> | 40x40 | used | obsidian_sabatons | `pixel/icons/item_obsidian_sabatons.png` |
 | `item_steel_sabatons` | <img src="../../public/pixel/icons/item_steel_sabatons.png" width="80" alt="item_steel_sabatons"> | 40x40 | used | steel_sabatons | `pixel/icons/item_steel_sabatons.png` |
 
@@ -282,21 +282,21 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_frostglass_boots` | <img src="../../public/pixel/items/feet/frostglass_boots.png" width="96" alt="art_frostglass_boots"> | 64x64 | reserve | frostglass_boots | `pixel/items/feet/frostglass_boots.png` |
+| `art_frostglass_boots` | <img src="../../public/pixel/items/feet/frostglass_boots.png" width="96" alt="art_frostglass_boots"> | 64x64 | planned | frostglass_boots | `pixel/items/feet/frostglass_boots.png` |
 
 ## feet G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_drake_scale_boots` | <img src="../../public/pixel/items/feet/drake_scale_boots.png" width="96" alt="art_drake_scale_boots"> | 64x64 | reserve | drake_scale_boots | `pixel/items/feet/drake_scale_boots.png` |
-| `art_sunsilk_boots` | <img src="../../public/pixel/items/feet/sunsilk_boots.png" width="96" alt="art_sunsilk_boots"> | 64x64 | reserve | sunsilk_boots | `pixel/items/feet/sunsilk_boots.png` |
+| `art_drake_scale_boots` | <img src="../../public/pixel/items/feet/drake_scale_boots.png" width="96" alt="art_drake_scale_boots"> | 64x64 | planned | drake_scale_boots | `pixel/items/feet/drake_scale_boots.png` |
+| `art_sunsilk_boots` | <img src="../../public/pixel/items/feet/sunsilk_boots.png" width="96" alt="art_sunsilk_boots"> | 64x64 | planned | sunsilk_boots | `pixel/items/feet/sunsilk_boots.png` |
 
 ## hands
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_gloves` | <img src="../../public/pixel/icons/item_cloth_gloves.png" width="80" alt="item_cloth_gloves"> | 40x40 | reserve | cloth_gloves | `pixel/icons/item_cloth_gloves.png` |
-| `item_leather_gloves` | <img src="../../public/pixel/icons/item_leather_gloves.png" width="80" alt="item_leather_gloves"> | 40x40 | reserve | leather_gloves | `pixel/icons/item_leather_gloves.png` |
+| `item_cloth_gloves` | <img src="../../public/pixel/icons/item_cloth_gloves.png" width="80" alt="item_cloth_gloves"> | 40x40 | planned | cloth_gloves | `pixel/icons/item_cloth_gloves.png` |
+| `item_leather_gloves` | <img src="../../public/pixel/icons/item_leather_gloves.png" width="80" alt="item_leather_gloves"> | 40x40 | planned | leather_gloves | `pixel/icons/item_leather_gloves.png` |
 | `item_obsidian_gauntlets` | <img src="../../public/pixel/icons/item_obsidian_gauntlets.png" width="80" alt="item_obsidian_gauntlets"> | 40x40 | used | obsidian_gauntlets | `pixel/icons/item_obsidian_gauntlets.png` |
 | `item_steel_gauntlets` | <img src="../../public/pixel/icons/item_steel_gauntlets.png" width="80" alt="item_steel_gauntlets"> | 40x40 | used | steel_gauntlets | `pixel/icons/item_steel_gauntlets.png` |
 
@@ -376,8 +376,8 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_hat` | <img src="../../public/pixel/icons/item_cloth_hat.png" width="80" alt="item_cloth_hat"> | 40x40 | reserve | cloth_hat | `pixel/icons/item_cloth_hat.png` |
-| `item_leather_cap` | <img src="../../public/pixel/icons/item_leather_cap.png" width="80" alt="item_leather_cap"> | 40x40 | reserve | leather_cap | `pixel/icons/item_leather_cap.png` |
+| `item_cloth_hat` | <img src="../../public/pixel/icons/item_cloth_hat.png" width="80" alt="item_cloth_hat"> | 40x40 | planned | cloth_hat | `pixel/icons/item_cloth_hat.png` |
+| `item_leather_cap` | <img src="../../public/pixel/icons/item_leather_cap.png" width="80" alt="item_leather_cap"> | 40x40 | planned | leather_cap | `pixel/icons/item_leather_cap.png` |
 | `item_obsidian_helm` | <img src="../../public/pixel/icons/item_obsidian_helm.png" width="80" alt="item_obsidian_helm"> | 40x40 | used | obsidian_helm | `pixel/icons/item_obsidian_helm.png` |
 | `item_steel_helm` | <img src="../../public/pixel/icons/item_steel_helm.png" width="80" alt="item_steel_helm"> | 40x40 | used | steel_helm | `pixel/icons/item_steel_helm.png` |
 
@@ -457,8 +457,8 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_trousers` | <img src="../../public/pixel/icons/item_cloth_trousers.png" width="80" alt="item_cloth_trousers"> | 40x40 | reserve | cloth_trousers | `pixel/icons/item_cloth_trousers.png` |
-| `item_leather_leggings` | <img src="../../public/pixel/icons/item_leather_leggings.png" width="80" alt="item_leather_leggings"> | 40x40 | reserve | leather_leggings | `pixel/icons/item_leather_leggings.png` |
+| `item_cloth_trousers` | <img src="../../public/pixel/icons/item_cloth_trousers.png" width="80" alt="item_cloth_trousers"> | 40x40 | planned | cloth_trousers | `pixel/icons/item_cloth_trousers.png` |
+| `item_leather_leggings` | <img src="../../public/pixel/icons/item_leather_leggings.png" width="80" alt="item_leather_leggings"> | 40x40 | planned | leather_leggings | `pixel/icons/item_leather_leggings.png` |
 | `item_obsidian_greaves` | <img src="../../public/pixel/icons/item_obsidian_greaves.png" width="80" alt="item_obsidian_greaves"> | 40x40 | used | obsidian_greaves | `pixel/icons/item_obsidian_greaves.png` |
 | `item_steel_greaves` | <img src="../../public/pixel/icons/item_steel_greaves.png" width="80" alt="item_steel_greaves"> | 40x40 | used | steel_greaves | `pixel/icons/item_steel_greaves.png` |
 
@@ -508,21 +508,21 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runed_skirt` | <img src="../../public/pixel/items/legs/runed_skirt.png" width="96" alt="art_runed_skirt"> | 64x64 | reserve | runed_skirt | `pixel/items/legs/runed_skirt.png` |
-| `art_verdant_greaves` | <img src="../../public/pixel/items/legs/verdant_greaves.png" width="96" alt="art_verdant_greaves"> | 64x64 | reserve | verdant_greaves | `pixel/items/legs/verdant_greaves.png` |
+| `art_runed_skirt` | <img src="../../public/pixel/items/legs/runed_skirt.png" width="96" alt="art_runed_skirt"> | 64x64 | planned | runed_skirt | `pixel/items/legs/runed_skirt.png` |
+| `art_verdant_greaves` | <img src="../../public/pixel/items/legs/verdant_greaves.png" width="96" alt="art_verdant_greaves"> | 64x64 | planned | verdant_greaves | `pixel/items/legs/verdant_greaves.png` |
 
 ## legs G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_royal_silk_trousers` | <img src="../../public/pixel/items/legs/royal_silk_trousers.png" width="96" alt="art_royal_silk_trousers"> | 64x64 | reserve | royal_silk_trousers | `pixel/items/legs/royal_silk_trousers.png` |
+| `art_royal_silk_trousers` | <img src="../../public/pixel/items/legs/royal_silk_trousers.png" width="96" alt="art_royal_silk_trousers"> | 64x64 | planned | royal_silk_trousers | `pixel/items/legs/royal_silk_trousers.png` |
 
 ## shoulder
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `item_cloth_mantle` | <img src="../../public/pixel/icons/item_cloth_mantle.png" width="80" alt="item_cloth_mantle"> | 40x40 | reserve | cloth_mantle | `pixel/icons/item_cloth_mantle.png` |
-| `item_leather_pauldrons` | <img src="../../public/pixel/icons/item_leather_pauldrons.png" width="80" alt="item_leather_pauldrons"> | 40x40 | reserve | leather_pauldrons | `pixel/icons/item_leather_pauldrons.png` |
+| `item_cloth_mantle` | <img src="../../public/pixel/icons/item_cloth_mantle.png" width="80" alt="item_cloth_mantle"> | 40x40 | planned | cloth_mantle | `pixel/icons/item_cloth_mantle.png` |
+| `item_leather_pauldrons` | <img src="../../public/pixel/icons/item_leather_pauldrons.png" width="80" alt="item_leather_pauldrons"> | 40x40 | planned | leather_pauldrons | `pixel/icons/item_leather_pauldrons.png` |
 | `item_obsidian_pauldrons` | <img src="../../public/pixel/icons/item_obsidian_pauldrons.png" width="80" alt="item_obsidian_pauldrons"> | 40x40 | used | obsidian_pauldrons | `pixel/icons/item_obsidian_pauldrons.png` |
 | `item_steel_pauldrons` | <img src="../../public/pixel/icons/item_steel_pauldrons.png" width="80" alt="item_steel_pauldrons"> | 40x40 | used | steel_pauldrons | `pixel/icons/item_steel_pauldrons.png` |
 

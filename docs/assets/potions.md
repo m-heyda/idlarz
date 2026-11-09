@@ -10,19 +10,19 @@ Consumables in the game and the 48 raw potion icons waiting in the reuse pool.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_arcane_swirl` | <img src="../../public/pixel/items/consumable/arcane_swirl.png" width="96" alt="art_arcane_swirl"> | 64x64 | reserve |  | `pixel/items/consumable/arcane_swirl.png` |
-| `art_glass_vial` | <img src="../../public/pixel/items/consumable/glass_vial.png" width="96" alt="art_glass_vial"> | 64x64 | reserve |  | `pixel/items/consumable/glass_vial.png` |
+| `art_arcane_swirl` | <img src="../../public/pixel/items/consumable/arcane_swirl.png" width="96" alt="art_arcane_swirl"> | 64x64 | unused |  | `pixel/items/consumable/arcane_swirl.png` |
+| `art_glass_vial` | <img src="../../public/pixel/items/consumable/glass_vial.png" width="96" alt="art_glass_vial"> | 64x64 | unused |  | `pixel/items/consumable/glass_vial.png` |
 | `art_greater_healing_flask` | <img src="../../public/pixel/items/consumable/greater_healing_flask.png" width="96" alt="art_greater_healing_flask"> | 64x64 | used | potion_greater | `pixel/items/consumable/greater_healing_flask.png` |
 | `art_healing_flask` | <img src="../../public/pixel/items/consumable/healing_flask.png" width="96" alt="art_healing_flask"> | 64x64 | used | potion_minor | `pixel/items/consumable/healing_flask.png` |
-| `art_hourglass_draught` | <img src="../../public/pixel/items/consumable/hourglass_draught.png" width="96" alt="art_hourglass_draught"> | 64x64 | reserve |  | `pixel/items/consumable/hourglass_draught.png` |
+| `art_hourglass_draught` | <img src="../../public/pixel/items/consumable/hourglass_draught.png" width="96" alt="art_hourglass_draught"> | 64x64 | unused |  | `pixel/items/consumable/hourglass_draught.png` |
 | `art_mana_potion` | <img src="../../public/pixel/items/consumable/mana_potion.png" width="96" alt="art_mana_potion"> | 64x64 | used | potion_mana | `pixel/items/consumable/mana_potion.png` |
-| `art_phoenix_elixir` | <img src="../../public/pixel/items/consumable/phoenix_elixir.png" width="96" alt="art_phoenix_elixir"> | 64x64 | reserve |  | `pixel/items/consumable/phoenix_elixir.png` |
-| `art_prism_shard` | <img src="../../public/pixel/items/consumable/prism_shard.png" width="96" alt="art_prism_shard"> | 64x64 | reserve |  | `pixel/items/consumable/prism_shard.png` |
-| `art_starwater_elixir` | <img src="../../public/pixel/items/consumable/starwater_elixir.png" width="96" alt="art_starwater_elixir"> | 64x64 | reserve |  | `pixel/items/consumable/starwater_elixir.png` |
-| `art_stoneskin_tonic` | <img src="../../public/pixel/items/consumable/stoneskin_tonic.png" width="96" alt="art_stoneskin_tonic"> | 64x64 | reserve |  | `pixel/items/consumable/stoneskin_tonic.png` |
-| `art_toxin_vial` | <img src="../../public/pixel/items/consumable/toxin_vial.png" width="96" alt="art_toxin_vial"> | 64x64 | reserve |  | `pixel/items/consumable/toxin_vial.png` |
-| `art_venom_flask` | <img src="../../public/pixel/items/consumable/venom_flask.png" width="96" alt="art_venom_flask"> | 64x64 | reserve |  | `pixel/items/consumable/venom_flask.png` |
-| `art_vitality_heart` | <img src="../../public/pixel/items/consumable/vitality_heart.png" width="96" alt="art_vitality_heart"> | 64x64 | reserve |  | `pixel/items/consumable/vitality_heart.png` |
+| `art_phoenix_elixir` | <img src="../../public/pixel/items/consumable/phoenix_elixir.png" width="96" alt="art_phoenix_elixir"> | 64x64 | unused |  | `pixel/items/consumable/phoenix_elixir.png` |
+| `art_prism_shard` | <img src="../../public/pixel/items/consumable/prism_shard.png" width="96" alt="art_prism_shard"> | 64x64 | unused |  | `pixel/items/consumable/prism_shard.png` |
+| `art_starwater_elixir` | <img src="../../public/pixel/items/consumable/starwater_elixir.png" width="96" alt="art_starwater_elixir"> | 64x64 | unused |  | `pixel/items/consumable/starwater_elixir.png` |
+| `art_stoneskin_tonic` | <img src="../../public/pixel/items/consumable/stoneskin_tonic.png" width="96" alt="art_stoneskin_tonic"> | 64x64 | unused |  | `pixel/items/consumable/stoneskin_tonic.png` |
+| `art_toxin_vial` | <img src="../../public/pixel/items/consumable/toxin_vial.png" width="96" alt="art_toxin_vial"> | 64x64 | unused |  | `pixel/items/consumable/toxin_vial.png` |
+| `art_venom_flask` | <img src="../../public/pixel/items/consumable/venom_flask.png" width="96" alt="art_venom_flask"> | 64x64 | unused |  | `pixel/items/consumable/venom_flask.png` |
+| `art_vitality_heart` | <img src="../../public/pixel/items/consumable/vitality_heart.png" width="96" alt="art_vitality_heart"> | 64x64 | unused |  | `pixel/items/consumable/vitality_heart.png` |
 | `item_potion_greater` | <img src="../../public/pixel/icons/item_potion_greater.png" width="80" alt="item_potion_greater"> | 40x40 | used | potion_greater | `pixel/icons/item_potion_greater.png` |
 | `item_potion_hp` | <img src="../../public/pixel/icons/item_potion_hp.png" width="80" alt="item_potion_hp"> | 40x40 | used | potion_minor | `pixel/icons/item_potion_hp.png` |
 
