@@ -13,6 +13,7 @@ import { gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { castleLevelOf } from '@/lib/castleWard';
 import { advanceMonsters } from '@/lib/monsters';
+import { planPictureAt } from '@/lib/planPicture';
 import type { Resources } from '@/types/game';
 import { setTile } from '@/utils/world';
 import { findCastle, limitCtx, type GameGet, type GameSet } from './base';
@@ -72,11 +73,16 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 		// (in a fight the server's picture is the only one, so HP is left alone and only the cooldowns and the stun run down)
 		const playerMaxHp = maxHp(state.characterStats, state.equipment);
 		const inFight = state.combat.fight !== null;
+		// a fight the server ran to its end: the HP of both sides follow its plan (the next answer, at the end, is the truth)
+		const plan = inFight ? state.combat.plan : null;
+		const shown = plan ? planPictureAt(plan.data, (Date.now() - plan.startedAt) / 1000) : null;
 		const newPlayerHp = Math.min(
 			playerMaxHp,
-			inFight
-				? state.playerHp
-				: regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen + merchantCombat(state.merchantUpgrades).regen),
+			shown
+				? shown.hp
+				: inFight
+					? state.playerHp
+					: regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen + merchantCombat(state.merchantUpgrades).regen),
 		);
 		const newPlayerMp = Math.min(
 			maxMana(state.characterStats, state.equipment),
@@ -84,13 +90,22 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 		);
 		const cd = state.combat.cd;
 		const cooling = cd.heal > 0 || cd.stun > 0 || cd.potion > 0 || (state.combat.fight?.stunLeft ?? 0) > 0;
-		const newCombat = cooling
-			? {
-					...state.combat,
-					cd: { heal: Math.max(0, cd.heal - secondsElapsed), stun: Math.max(0, cd.stun - secondsElapsed), potion: Math.max(0, cd.potion - secondsElapsed) },
-					fight: state.combat.fight ? { ...state.combat.fight, stunLeft: Math.max(0, state.combat.fight.stunLeft - secondsElapsed) } : null,
-				}
-			: state.combat;
+		const newCombat =
+			cooling || shown
+				? {
+						...state.combat,
+						cd: cooling
+							? { heal: Math.max(0, cd.heal - secondsElapsed), stun: Math.max(0, cd.stun - secondsElapsed), potion: Math.max(0, cd.potion - secondsElapsed) }
+							: cd,
+						fight: state.combat.fight
+							? {
+									...state.combat.fight,
+									stunLeft: Math.max(0, state.combat.fight.stunLeft - secondsElapsed),
+									...(shown ? { monsterHp: shown.monsterHp } : {}),
+								}
+							: null,
+					}
+				: state.combat;
 
 		const newPlaySeconds = state.playSeconds + secondsElapsed;
 

@@ -1,3 +1,5 @@
+import { ITEM_CATALOG } from '@/catalog';
+import { quickHealOf } from '@/catalog/buffs';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import {
 	COSMETIC_EVENTS,
@@ -43,6 +45,9 @@ export interface FightCtx {
 	/** Catalog ids of the potions that heal */
 	potionIds: string[];
 }
+
+/** Catalog ids of the potions that heal. */
+export const healingPotionIds = (): string[] => Object.keys(ITEM_CATALOG).filter((id) => quickHealOf(ITEM_CATALOG[id]) > 0);
 
 /** The combat record of a ledger, seeded from the saved HP and mana the first time. */
 export const combatOf = (ledger: Ledger, env: CombatEnv): CombatState => {

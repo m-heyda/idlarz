@@ -12,7 +12,7 @@ import type { ConsumableEffect } from '@/catalog/buffs';
 import type { World } from '@/utils/world';
 import type { ChestLoot } from '@/lib/chests';
 import type { OfflineReport } from '@/lib/offline/apply';
-import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
+import type { Cooldowns, FightPlan, FightView } from '@/lib/offline/fightTypes';
 import type { ClaimResult, FightReply, SyncResult } from '@/lib/offline/types';
 
 export type BiomeType = keyof typeof BIOMES;
@@ -253,6 +253,10 @@ export interface CombatClientState {
 	restSec: number;
 	/** When that rest is over by this browser's clock (epoch ms), for the countdown; null when no rest is going on */
 	restEndsAt: number | null;
+	/** The open fight run to its end by the server, and when this browser got it (epoch ms): HP is drawn from it between answers (null: poll for the fight) */
+	plan: { startedAt: number; data: FightPlan } | null;
+	/** Seconds after `at` the server asked to be polled again */
+	pollSec: number;
 	/** The potion buffs running at `at` (the server's list: family, stat, percent, second it ends) */
 	buffs: import('@/lib/buffs').ActiveBuff[];
 }

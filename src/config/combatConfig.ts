@@ -33,8 +33,9 @@ export const COMBAT = {
 	maxCatchUpSec: 120, // one request runs a fight forward by at most this long (a longer silence is simulated by the next request)
 	maxFightSec: 180, // a fight that has not been decided by now is called off (the monster stays, no reward)
 	poll: {
-		fightSec: 2, // the open combat panel asks the server for the fight this often...
+		fightSec: 2, // a fight the server could not run to its end (it is `behind`) is asked about this often with the panel open...
 		minimizedSec: 8, // ...the minimized icon (or a hidden tab) this often
+		afterEndSec: 0.4, // a fight the server ran to its end (`CombatView.plan`) is asked about this long after the end it projected
 	},
 	// What the server does for a player in a fight, and when it starts one. Fixed on purpose: players only switch auto-battle and auto-use on or off.
 	auto: {

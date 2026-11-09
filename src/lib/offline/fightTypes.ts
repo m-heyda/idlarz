@@ -162,6 +162,21 @@ export interface FightView {
 	y: number;
 }
 
+/** The kinds of animated event a plan carries, by the index its `fx` rows use. */
+export const PLAN_FX_KINDS = ['hit', 'crit', 'super', 'hurt', 'hurtCrit', 'heal', 'stun', 'resist'] as const;
+
+/**
+ * Where an open fight is going, so the browser can animate it and ask again only when it is over: the server runs the fight to its end on a copy.
+ * `samples` are `[seconds from the view's `at`, hero HP, monster HP]` (first row at 0, last at the end, linear in between); `fx` are the swings
+ * and spells to fly, `[seconds from the view, index into PLAN_FX_KINDS, amount]`. A hotkey, a click or any other command makes a new plan.
+ */
+export interface FightPlan {
+	endsInSec: number;
+	outcome: 'won' | 'defeated' | 'timeout' | 'retreat';
+	samples: [number, number, number][];
+	fx: [number, number, number][];
+}
+
 export interface CombatView {
 	hp: number;
 	mp: number;
@@ -169,6 +184,8 @@ export interface CombatView {
 	maxMp: number;
 	cd: Cooldowns;
 	fight: FightView | null;
+	/** The open fight run to its end (left out when there is none, or the server is `behind`): the browser polls again when it is over */
+	plan?: FightPlan;
 	autoBattle: boolean;
 	autoUse: boolean;
 	/** Seconds until the soonest monster that beat the player may be tried again (0: none is waiting out) */
