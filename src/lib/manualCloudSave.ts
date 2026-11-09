@@ -6,6 +6,11 @@ import { scoped } from '@/lib/storageScope';
  * account's cloud save, at most once every 10 minutes. The automatic uploads (milestones, the 5 minute heartbeat, hiding the
  * tab) keep running on their own; this is the player's manual button, so the limit is about how often it may be pressed.
  * Pure apart from the small registry and the remembered time: the clock, the storage and the uploader are injected.
+ *
+ * The menu's "Save game" button uploads at most once per 10 minutes.
+ *
+ * @category Saves & Server/Uploading
+ * @order 2
  */
 export const MANUAL_CLOUD_COOLDOWN_MS = 10 * 60_000;
 

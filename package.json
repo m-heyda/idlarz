@@ -22,6 +22,8 @@
 		"loot-sim": "tsx scripts/loot-sim.ts",
 		"kill-sim": "tsx scripts/kill-sim.ts",
 		"craft-sim": "tsx scripts/craft-sim.ts",
+		"docs:code": "tsx scripts/docs-reference.ts",
+		"docs:code:check": "tsx scripts/docs-reference.ts --check",
 		"docs:gen": "npm run docs:gen:rest && npm run docs:gen:sim",
 		"docs:gen:rest": "npm run docs:gen:rest:quick && npm run docs:gen:rest:fights && npm run docs:gen:rest:loot",
 		"docs:gen:rest:quick": "npm run report && npm run stat-audit && npm run catalog-report && npm run kill-sim -- --md && npm run craft-sim -- --md",
@@ -30,7 +32,8 @@
 		"docs:gen:sim": "npm run sim",
 		"docs:check": "npm run docs:gen && git add -N docs/generated && git diff --exit-code docs/generated",
 		"format": "prettier --write .",
-		"format:check": "prettier --check ."
+		"format:check": "prettier --check .",
+		"prepare": "git config core.hooksPath .githooks && chmod +x .githooks/pre-commit || exit 0"
 	},
 	"dependencies": {
 		"@fontsource-variable/mozilla-headline": "^5.3.0",
@@ -55,6 +58,7 @@
 		"@types/react-dom": "^19",
 		"eslint": "^9",
 		"eslint-config-next": "15.5.28",
+		"marked": "^14.1.4",
 		"prettier": "3.3.3",
 		"tailwindcss": "^4.0.11",
 		"tsx": "^4.23.15",

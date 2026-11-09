@@ -1,6 +1,6 @@
 # Loot decisions not built yet
 
-Loot decisions of 2026-11-07 that the code does not do yet. The loot system as built is [game/loot.md](../game/loot.md). Moved here from the old `10-loot-system.md` when `docs/` was split into `game/`, `plan/` and `ops/`.
+Loot decisions of 2026-11-07 that the code does not do yet. The loot system as built is [game/loot.md](../reference/loot.md). Moved here from the old `10-loot-system.md` when `docs/` was split into `game/`, `plan/` and `ops/`.
 
 ## Perk families and caps (decided 2026-11-07, IDL-149; sim checks pending)
 

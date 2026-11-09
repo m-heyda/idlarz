@@ -7,22 +7,39 @@ import { resourceKeys, fromResources } from './resources';
 
 // Merchant
 // Resource pricing constants (gold per unit)
+/**
+ * The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ({@link sellPayout}).
+ * Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); farm products are never sold to the player.
+ *
+ * @category Economy/Merchant
+ * @order 1
+ * @table merchant-prices
+ */
 export const MERCHANT_RESOURCE_PRICES = fromResources(
 	resourceKeys.filter((key) => 'merchant' in RESOURCES[key]),
 	(key) => (RESOURCES[key] as { merchant: { price: number } }).merchant.price,
 ) as { [K in MerchantResourceKey]: number };
 
-// Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
-// starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
-// They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
-// ladders together cost over a billion; tests/economy/merchantUpgrades.test.ts keeps it that way) and are bought over several runs.
-// `group` only decides the heading of the card in the Upgrades tab.
+/**
+ * Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
+ * starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
+ * They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
+ * ladders together cost over a billion; tests/economy/merchantUpgrades.test.ts keeps it that way) and are bought over several runs.
+ * `group` only decides the heading of the card in the Upgrades tab.
+ */
 export const MERCHANT_UPGRADE_GROUPS = {
 	economy: 'Economy',
 	combat: 'Combat',
 	rebirth: 'Rebirth',
 } as const;
 
+/**
+ * Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost x growth^N)` ({@link merchantUpgradeCost}). All but Pack Rat start again on a rebirth.
+ *
+ * @category Economy/Merchant
+ * @order 3
+ * @table merchant-upgrades
+ */
 export const MERCHANT_UPGRADES = {
 	haggler: {
 		label: 'Haggler',
@@ -154,11 +171,25 @@ export const MERCHANT_UPGRADES = {
 
 export type MerchantUpgradeId = keyof typeof MERCHANT_UPGRADES;
 
-// Supplies (potions) the merchant always sells, each at its own `shop` price in the catalog. Every price is at least 3x the item's
-// sell value (x1.3 for a maxed Haggler), so buying and selling can never print gold: tests/economy/merchantShop.test.ts checks every entry.
+/**
+ * Supplies (potions) the merchant always sells, each at its own `shop` price in the catalog. Every price is at least 3x the item's
+ * sell value (x1.3 for a maxed Haggler), so buying and selling can never print gold: tests/economy/merchantShop.test.ts checks every entry.
+ */
 export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems();
 
 // The merchant's shuffling goods (Goods tab): pieces of gear rolled by the loot pipeline (source `merchant`, see lootConfig).
+/**
+ * The goods shelf and its refresh rules ({@link generateMerchantStock}). Potions are always in stock at their catalog `shop` price (`MERCHANT_SHOP_ITEMS`).
+ *
+ * - **Shelf**: 6 pieces of gear (`LIMITS.merchantOffers`) from the loot source `merchant` (common 60 / uncommon 40, see {@link generateLoot}), item level centred at most 3 above the average worn item
+ *   level and never more than 5 above it, otherwise built from the castle level (4 + 3 per castle level above 1). Price is `ceil(sell value x 5)` ({@link shopPriceOf}). Reshuffled every 1,800 s of play time.
+ * - **Refresh**: 3 free per 12 h of play time (`windowSec` 43,200), 30 s between any two, then the paid price `10,000 x 2^(paid refreshes)` capped at 1e9 ({@link refreshCost}).
+ *   The count is never reset, not even by a rebirth.
+ * - **Item sale value**: see {@link sellValueOf}.
+ *
+ * @category Economy/Merchant
+ * @order 2
+ */
 export const MERCHANT_GOODS = {
 	offers: LIMITS.merchantOffers, // pieces on the shelf (base value: read it through limitOf('merchantOffers', ctx))
 	rotateSec: LIMITS.merchantRotateSec, // the shelf is reshuffled after this much play time (limitOf('merchantRotateSec', ctx))
@@ -180,6 +211,13 @@ export const MERCHANT_GOODS = {
 export const MERCHANT_BUYABLE = ['wood', 'stone', 'coal', 'food', 'meat'] as const;
 
 // Buying resources from the merchant costs this many times the sell price
+/**
+ * The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).
+ *
+ *
+ * @category Economy/Merchant
+ * @order 6
+ */
 export const MERCHANT_BUY_MULTIPLIER = 2;
 
 // Resource display information

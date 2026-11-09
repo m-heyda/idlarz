@@ -2,12 +2,21 @@
 // merchant shelf, ...). These are the BASE values; read them through `limitOf(key, ctx)` (lib/limits.ts), which adds whatever bonuses
 // are registered for that key, so a new effect is one entry in `LIMIT_BONUSES` and no call site changes.
 
+/**
+ * Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours;
+ * Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.
+ *
+ * @category Progression/Limits
+ * @order 1
+ * @table limits
+ * @see limitOf
+ */
 export const LIMITS = {
 	/** Levels a monster may grow above the level it spawned at */
 	monsterGrowthLevels: 10,
 	/** Seconds of map time per level of growth */
 	monsterGrowthIntervalSec: 1800,
-	/** Monsters that can wait in the battle queue while a fight is open (docs/game/combat.md) */
+	/** Monsters that can wait in the battle queue while a fight is open (docs/reference/combat.md) */
 	battleQueue: 10,
 	/** Pieces of gear on the merchant's shelf */
 	merchantOffers: 6,

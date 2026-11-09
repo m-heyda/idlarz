@@ -36,7 +36,16 @@ export const expectedSpawnLevel = (type: MonsterType, castleLevel: number): numb
 	return Math.round((min + max) / 2);
 };
 
-/** Weight of each type for this player and castle level, in the order given. */
+/**
+ * Weight of each type for this player and castle level, in the order given.
+ *
+ * Which type spawns. Each type is weighted by the player's win chance against it ({@link estimateWin}) at the middle of its spawn window: full weight (1) for 40-95%, falling to 0.75 for a trivial monster (chance 1)
+ * and to 0.1 for a hopeless one (chance <= 5%); equal weights give the plain uniform pick. The spawn level is capped at the highest level the player still beats (never below the window's bottom) and so is its growth (`growCap`),
+ * for new spawns only. Bosses are never weighted or capped: among the boss types that still have a free tile the pick is uniform ({@link placeTickets}). Measured: `docs/generated/spawn-mix.md`.
+ *
+ * @category Monsters/Spawning
+ * @order 3
+ */
 export const typeWeights = (profile: PlayerProfile, types: readonly MonsterType[], castleLevel: number): number[] =>
 	types.map((type) => spawnWeight(winChanceAt(profile, type, expectedSpawnLevel(type, castleLevel))));
 

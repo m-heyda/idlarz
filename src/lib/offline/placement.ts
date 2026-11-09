@@ -65,6 +65,12 @@ export const needsLook = (bank: TicketBank, key: string): boolean => {
  * them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`).
  * With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped
  * near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are never weighted or capped.
+ *
+ * Bosses are placed with a uniform pick among the boss types that still have a free tile, while normal monsters are weighted by win chance.
+ *
+ * @category Monsters/Spawning
+ * @order 4
+ * @knownissue IDL-222 bosses are never weighted by win chance (a uniform pick); needs an owner decision.
  */
 export const placeTickets = (
 	bank: TicketBank,

@@ -38,7 +38,25 @@ import type {
 	Tile,
 } from '@/types/game';
 
-/** The part of the game state that is saved. Rates, window flags and the like are recomputed on load. */
+/**
+ * The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
+ *
+ * **How to extend the save safely.**
+ *
+ * - **New persisted field**: add it to `PERSISTED_KEYS`, make `sanitizeSave` accept it as *optional with a default* (old saves simply lack it) and validate it. No version bump. Add the field to a test that round-trips it (`tests/saves/saveStorage.test.ts`).
+ * - **Renamed, moved or reinterpreted field, or removed content** (an item, a building, a biome): bump `SAVE_SCHEMA` in `src/lib/saveFormat.ts`. Older saves are then refused. If they must survive, write the conversion for that bump
+ *   (a `MIGRATIONS`-style step in `decodeSave`) and a frozen fixture save of the old version in `tests/fixtures/saves/`; the project does not carry any today. A save from a *newer* schema than the running game is refused with a clear message.
+ * - **New action that moves resources**: validate inputs (type, range, finiteness, ownership), check affordability against the full cost bundle, and add a test in `tests/economy/economy.test.ts`.
+ * - **Anything that decides a reward or a fight** belongs on the server side (`src/lib/offline/`), seeded by the sealed random source, not in the store.
+ * - **Balance changes**: run `npm run docs:gen` and `npm test` (the click limiter, arbitrage and fight-balance tests guard the main exploits).
+ *
+ * The list below is the one list of persisted state: `tiles`, `resources`, `level`, `playerName`, `characterStats`, `farmLevels`, `merchantUpgrades`, `prestige`, `equipment`, `bag`, ... Everything not listed is rebuilt on load
+ * (`resourceRates`, derived combat stats, every window flag) or belongs to the server (`monsters`, the open fight).
+ *
+ * @category Saves & Server/The save
+ * @order 4
+ * @table persisted-keys
+ */
 export const PERSISTED_KEYS = [
 	'tiles',
 	'resources',
@@ -157,6 +175,12 @@ const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
  * (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
  * pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
  * cost) are recomputed instead of trusted. Returns the cleaned persisted slice.
+ *
+ * Validation of any loaded or imported save. It rejects what the game cannot produce: bad land, a second castle, unconnected tiles, unknown ids, values below 0 or above 1e21, wrong attribute sums, impossible castle upgrades,
+ * a click level outside the ladder, a prestige block that does not add up, less XP than the owned tiles produced; gear must be valid item instances (`instanceProblem` in `src/lib/itemInstance.ts`). Gear stats are derived, never read from the save.
+ *
+ * @category Saves & Server/The save
+ * @order 3
  */
 export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (!isRecord(raw)) return fail('not an object');

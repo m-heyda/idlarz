@@ -29,7 +29,7 @@
 ## 2. What we want
 
 - **Replace all current equipment graphics** (the `item_*` icons, the gear sprites in `scripts/pixel/sprites_gear.py`, `sprites_equipment.py` and the slot icons) with new ones that are either **recreated in our pipeline from these references** or **cut directly as PNG** (licensed, see the [Licence](../README.md#licence); root README rules 1 and 5). Direct cuts must match our look: no baked glow or cell background (the game adds the rarity glow), 40 px canvas, coloured outline.
-- A **big catalog**: 12 items per slot and 3 special sets, graded by strength (below). They go into the **drop tables and crafting later** (docs [loot](../../docs/game/loot.md), [17](../../docs/plan/17-crafting.md)); for now the plan is only art and a grading.
+- A **big catalog**: 12 items per slot and 3 special sets, graded by strength (below). They go into the **drop tables and crafting later** (docs [loot](../../docs/reference/loot.md), [17](../../docs/plan/17-crafting.md)); for now the plan is only art and a grading.
 - **Content is data**: items are entries in `src/catalog/items/*.ts` and recipes are keyed by tag and tier, never by id ([docs/plan/17-crafting.md](../../docs/plan/17-crafting.md) note), so adding items must not need code changes.
 
 ## 3. The grading ladder (12 grades per slot)
@@ -113,7 +113,7 @@ Sheet: `sets/special-sets-palette-draft.png` (ramps are light to dark, the last 
 
 ## 6. New weapon types and a belt slot (design decisions, not art)
 
-`xJe32g.jpg` shows weapons our `WeaponType` does not have (whip, claws/fist, sickle/scythe, throwing blades, chains, hooks). `nrfbhC.jpg` shows 48 belts, but there is **no belt slot**. Adding either changes combat, loot or the Character window, so it needs a design decision first ([docs/game/loot.md](../../docs/game/loot.md), `WEAPON_ATTACK_SPEED` in `catalog/weapons.ts`, `EquipmentSlot` in `types/game.ts`). **Agents: do not add a type or slot on their own.** Use these sheets only as inspiration for existing types (a whip may become a `dagger`-speed one-hander in art terms only) until the owner decides.
+`xJe32g.jpg` shows weapons our `WeaponType` does not have (whip, claws/fist, sickle/scythe, throwing blades, chains, hooks). `nrfbhC.jpg` shows 48 belts, but there is **no belt slot**. Adding either changes combat, loot or the Character window, so it needs a design decision first ([docs/reference/loot.md](../../docs/reference/loot.md), `WEAPON_ATTACK_SPEED` in `catalog/weapons.ts`, `EquipmentSlot` in `types/game.ts`). **Agents: do not add a type or slot on their own.** Use these sheets only as inspiration for existing types (a whip may become a `dagger`-speed one-hander in art terms only) until the owner decides.
 
 ## 7. What agents should do with this folder later
 

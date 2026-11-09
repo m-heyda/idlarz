@@ -5,20 +5,48 @@ import type { Rng } from '@/lib/rng';
 
 const points = (luck: number): number => (Number.isFinite(luck) ? Math.max(0, luck) : 0);
 
-/** Seconds between two chests: Luck shortens it, never below `LUCK.chestIntervalFloor` of the base. */
+/**
+ * Seconds between two chests: Luck shortens it, never below `LUCK.chestIntervalFloor` of the base.
+ *
+ * @category Economy/Chests and Luck
+ * @order 3
+ * @formula
+ * interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck))
+ */
 export const chestIntervalSec = (luck: number): number =>
 	CHEST.intervalSec * Math.max(LUCK.chestIntervalFloor, 1 / (1 + points(luck) * LUCK.chestSpeedPerPoint));
 
 /** % more chests than at Luck 0 (what the Character window shows). */
 export const chestRateBonusPct = (luck: number): number => (CHEST.intervalSec / chestIntervalSec(luck) - 1) * 100;
 
-/** What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear). */
+/**
+ * What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear).
+ *
+ * @category Economy/Chests and Luck
+ * @order 8
+ * @formula
+ * multiplier = min(1.6, 1 + 0.004 x Luck)             applies to the weights of rare and better
+ */
 export const rarityLuckMultiplier = (luck: number): number => Math.min(LUCK.rarityCap, 1 + points(luck) * LUCK.rarityPerPoint);
 
-/** Multiplier on a monster's gear drop chance. */
+/**
+ * Multiplier on a monster's gear drop chance.
+ *
+ * @category Economy/Chests and Luck
+ * @order 9
+ * @formula
+ * multiplier = 1 + 0.002 x Luck
+ */
 export const dropChanceMultiplier = (luck: number): number => 1 + points(luck) * LUCK.dropChancePerPoint;
 
-/** Chance (0-1) that a chest also holds gems. */
+/**
+ * Chance (0-1) that a chest also holds gems.
+ *
+ * @category Economy/Chests and Luck
+ * @order 7
+ * @formula
+ * gem chance = min(15%, 3% + 0.06% x Luck)             amount 5-50, skewed to the low end
+ */
 export const gemChance = (luck: number): number => Math.min(LUCK.gem.cap, LUCK.gem.base + points(luck) * LUCK.gem.perPoint);
 
 /** How many gems a gem find holds: LUCK.gem.min..max, skewed toward the low end. */
@@ -28,7 +56,14 @@ export const rollGemAmount = (rng: Rng): number => {
 	return Math.min(max, min + Math.floor((max - min + 1) * u * u));
 };
 
-/** Chance (0-1) that a newly arrived rat is a lucky one. */
+/**
+ * Chance (0-1) that a newly arrived rat is a lucky one.
+ *
+ * @category Economy/Chests and Luck
+ * @order 10
+ * @formula
+ * golden monster chance = min(10%, 2% + 0.05% x Luck)
+ */
 export const luckyRatChance = (luck: number): number => Math.min(LUCK.luckyRat.cap, LUCK.luckyRat.base + points(luck) * LUCK.luckyRat.perPoint);
 
 /** The bonus gem roll of one chest: 0 (most of the time) or a gem find. Server only: the browser never rolls it. */

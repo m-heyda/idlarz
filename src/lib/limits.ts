@@ -23,6 +23,13 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
 	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward') + (ctx.gear?.offlineEff ?? 0) / 100,
 };
 
-/** The current value of a limit: its base plus the registered bonuses. */
+/**
+ * The current value of a limit: its base plus the registered bonuses.
+ *
+ * @category Progression/Limits
+ * @order 2
+ * @formula
+ * limit = LIMITS[key] + LIMIT_BONUSES[key](context)           or HARD_LIMITS[key] with ctx.hardCap
+ */
 export const limitOf = (key: LimitKey, ctx: LimitContext = {}): number =>
 	ctx.hardCap && key in HARD_LIMITS ? HARD_LIMITS[key as keyof typeof HARD_LIMITS] : LIMITS[key] + (LIMIT_BONUSES[key]?.(ctx) ?? 0);

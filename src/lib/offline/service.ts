@@ -1,3 +1,14 @@
+/**
+ * The endpoints under `src/app/api`. Each route handler only authenticates and calls the pure service in `src/lib/offline/`.
+ *
+ * `inventory` operations except the two purchases and `autoSell` are refused while a fight is open. The merchant's prices and shelf are still the browser's: a purchase through `inventory` is checked for being a valid item,
+ * and its gold is paid in the browser.
+ *
+ * @title Endpoints (the API routes)
+ * @category Saves & Server/Endpoints
+ * @order 1
+ * @table api-routes
+ */
 import { PINNED_KEEP, type SaveRepo, type StoredSave } from '@/lib/cloudSave/pipeline';
 import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';
@@ -209,8 +220,10 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 
 		const ctx = bankContext(stored);
 		const rollFor = (kind: string, n: number) => sealedRng(deps.secret, userId, ledger.runId, kind, n);
-		// first the stretch the player was still here (their own spawn timers were running), then the absence at its efficiency
-		// the land is looked at first (monsters only come while it has a free tile for them), and again for the monsters this claim makes
+		/**
+		 * first the stretch the player was still here (their own spawn timers were running), then the absence at its efficiency
+		 * the land is looked at first (monsters only come while it has a free tile for them), and again for the monsters this claim makes
+		 */
 		let bank = await lookAtMap(loadMap, ledger.bank, stored, rollFor);
 		const hereSec = Math.max(0, anchorMs / 1000 - bank.accAt);
 		if (hereSec > 0) bank = advanceBank(bank, hereSec, ctx, rollFor).bank;

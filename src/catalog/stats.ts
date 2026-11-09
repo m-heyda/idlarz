@@ -153,7 +153,18 @@ const ITEM_VALUE = {
 	affix: { base: 0.15, perRoll: 0.35 },
 } as const;
 
-/** Value multiplier of an item level (1 at level 1). */
+/**
+ * Value multiplier of an item level (1 at level 1).
+ *
+ * What gear is worth in gold follows its own curve, because the economy grows far faster than gear power: steep up to the knee (level 10), flatter after it.
+ *
+ * @category Loot/Items
+ * @order 3
+ * @formula
+ * valueCurve(L) = 1.3^(min(L,10) - 1) x 1.12^max(L - 10, 0)
+ * quality value = 0.75 + 0.5 x quality / 100
+ * affix value   = 1 + sum over affixes of (0.15 + 0.35 x roll / 100)
+ */
 export const valueCurve = (itemLevel: number): number => {
 	const level = clampItemLevel(itemLevel);
 	const low = Math.min(level, ITEM_VALUE.kneeLevel) - 1;
@@ -169,7 +180,18 @@ export const qualityValue = (quality: number): number =>
 export const affixesValue = (rolls: readonly number[]): number =>
 	1 + rolls.reduce((sum, roll) => sum + ITEM_VALUE.affix.base + ITEM_VALUE.affix.perRoll * (Math.min(100, Math.max(0, roll)) / 100), 0);
 
-/** Power multiplier of an item level (1 at level 1). */
+/**
+ * Power multiplier of an item level (1 at level 1).
+ *
+ * Item power grows linearly with item level: each level adds 7% of the level-1 power (1 at level 1, 1.63 at 10, 7.9 at 100). Gear is authored at its own `minItemLevel`; an instance of level L has
+ * `baseStats x levelScale(L) / levelScale(minItemLevel)`, then the quality roll (+/-8%). Affix values use the same curve. Boss stats use it too ({@link monsterStats}).
+ *
+ * @category Loot/Items
+ * @order 2
+ * @formula
+ * levelScale(L) = 1 + 0.07 x (L - 1)         L clamped to 1..100 (MAX_ITEM_LEVEL)
+ * stats(instance) = baseStats x levelScale(L) / levelScale(minItemLevel) x (1 + (quality - 50) / 50 x 0.08)
+ */
 export const levelScale = (itemLevel: number): number => 1 + POWER_PER_LEVEL * (clampItemLevel(itemLevel) - 1);
 
 /** The quality roll moves base stats by at most this much either way (quality 0-100, 50 = the authored value). */

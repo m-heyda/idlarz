@@ -26,6 +26,11 @@ export interface KillPayout {
 /**
  * Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll
  * it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.
+ *
+ * The kill is paid from the ticket's spawn level and age ({@link levelAtAge}), never from a level the client claims; the roll is sealed on the number of kills this run ({@link sealedRng}).
+ *
+ * @category Combat/A fight
+ * @order 10
  */
 export const payKill = (
 	secret: string,

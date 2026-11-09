@@ -2,7 +2,7 @@
 
 Five new biomes, one unlocked per rebirth (1 to 5). Each new tile produces a new tier-2 (T2) material, the material is crafting-only (the merchant trades T0-T1 only), and *where* a biome can appear depends on the distance from the castle. The same distance counter later drives monster spawns. Status: **design draft for review**; names, numbers and art are proposals marked *(proposal)*.
 
-Related: [02 mechanics](../game/economy.md) (current biome rules), [11 server authority](../game/saves-and-server.md), [13 rebirth reset](13-rebirth-reset-and-paragon.md), [17 crafting](17-crafting.md) (what the T2 materials are for), [ROADMAP](ROADMAP.md).
+Related: [02 mechanics](../reference/economy.md) (current biome rules), [11 server authority](../reference/saves-and-server.md), [13 rebirth reset](13-rebirth-reset-and-paragon.md), [17 crafting](17-crafting.md) (what the T2 materials are for), [ROADMAP](ROADMAP.md).
 
 ## 1. What exists today (read from the code)
 

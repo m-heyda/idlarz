@@ -1,4 +1,31 @@
 /**
+ * Season restart: `npm run reset-players` gives every player a fresh game while keeping who they are. It talks to Supabase with the service role, so it is run by hand from a trusted machine, never from the app. The usage and flags are in the header
+ * of the script. Needs `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (environment or `.env.local`); they decide which project is wiped: check them first, and try one account with `--user` before running it for everyone.
+ *
+ * | Data | Result |
+ * | --- | --- |
+ * | Auth account, `profiles` (`character_name`, `player_class`) | **kept** |
+ * | `player_ledger.gems` | **kept** (a player with a save but no ledger row keeps the save's gems) |
+ * | `player_saves` | **deleted**: level, XP, gold, castle, tiles, buildings, rebirths, everything in `core` |
+ * | `player_worlds`, `player_stats` | deleted by cascade; the leaderboard row returns after the player's first new save |
+ * | `player_ledger` (all but `gems`) | **reset** to new-game values: spawn timers and tickets, granted totals, combat, inventory (bag and gear), rebirths. `run_id` and `ver` are bumped, so sealed rolls never repeat across the restart |
+ * | `rebirth_history` | **deleted** (the log of the season that ended; it is in the JSON backup). Needs the `rebirth_history` migration |
+ * | `save_history` | kept by default (rollback copies); deleted with `--purge-history` |
+ *
+ * Before a real reset the tool writes `backups/reset-<timestamp>.json` (gitignored: it holds player data). Procedure: run the dry run and check the player list and the project URL; do it while few people are online (a player with the game open must reload:
+ * their old save no longer matches the server and is rejected, then they start a new game); run with `--yes`.
+ *
+ * **Local copies in browsers.** The server side is fully reset, but a browser may still hold its own local save. The tool cannot touch browsers, so the client does it: the reset ships together with a `SAVE_SCHEMA` bump ({@link SAVE_SCHEMA}).
+ * A local save of any older schema is refused ("from an older season, start a new game"). Gems stay the server's. After a later restart, bump `SAVE_SCHEMA` again in the same release.
+ *
+ * **Undoing it**: restore from the JSON backup, or from `save_history` when it was kept (the latest copy per player is at most about 30 minutes older than their last save). There is no automated restore tool yet.
+ *
+ * @title Season restart (reset-players)
+ * @category Ops/Operator guides
+ * @order 1
+ * @see ensureSeasonReset
+ */
+/**
  * Season restart: wipes every player's game progress but keeps their account, character name/class and gem balance.
  *
  *   npm run reset-players                      DRY RUN: lists what would happen, changes nothing

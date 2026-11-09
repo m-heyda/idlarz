@@ -47,6 +47,15 @@ const monsterDps = (p: PlayerProfile, type: MonsterType, level: number): number 
 /**
  * The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that
  * cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.
+ *
+ * Win chance: a closed form from the frozen profile and `monsterStats`. If `killSec > limit` the chance is 0. The same estimate weights new spawns ({@link typeWeights}).
+ * `limit` is min(180 s, the boss's own clock).
+ *
+ * @category Combat/Win chance
+ * @formula
+ * killSec    = monster HP / (attacks/s x expectedHit)           expectedHit: crits and super crits weighted, monster armor applied
+ * surviveSec = (HP + potions that fit between cooldowns) / (monster dps - regen - leech)
+ * chance     = min(logistic(6 x ln(surviveSec / killSec)), logistic(6 x ln(limit / killSec)))
  */
 export const estimateWin = (p: PlayerProfile, hp: number, type: MonsterType, level: number, potions: PotionStock[] = []): WinEstimate => {
 	const m = monsterStats(type, level);

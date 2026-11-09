@@ -297,6 +297,11 @@ GRADES.forEach((grade, g) => {
  *    grade's drop window and rarities (`dropLevels`, `dropRarities`); it is enabled with the rest of its grade (`LIVE_GRADES`), so Steel (G4) and Obsidian (G6) are on the ladder but not dropped yet;
  *  - every other legacy piece (cloth, the rest of wood and steel, the starter sword and shield) is retired: `enabled: false`, the id stays
  *    so owned pieces load and work. The starter sword and shield are still what a new hero wears (catalog STARTER_EQUIPMENT_IDS).
+ *
+ * Pieces that predate the ladder keep their ids, art and set bonuses, and a save of an old piece stays valid: `minItemLevel`, `maxItemLevel` and `allowedRarities` stay what an owned piece may be, while `dropLevels` and `dropRarities` (see {@link eligibleCandidates}) say what it is generated at.
+ *
+ * @category Loot/Items
+ * @order 8
  */
 export const gradeLegacyItems = (defs: ItemDef[]): ItemDef[] =>
 	defs.map((def) => {

@@ -37,7 +37,12 @@ export interface OfflineGrant {
 	castle: { toLevel: number; finished: boolean } | null;
 }
 
-/** The longest gap the server treats as the same session: past it an online call is refused with `claim_first`, and the hero rests (heals fully) through the gap. The client uses the same number, so the picture never jumps back. */
+/**
+ * The longest gap the server treats as the same session: past it an online call is refused with `claim_first`, and the hero rests (heals fully) through the gap. The client uses the same number, so the picture never jumps back.
+ *
+ * @category Combat/Results and rest
+ * @order 2
+ */
 export const UNCLAIMED_SEC = 900;
 
 export const zeroGrant = (): Resources => zeroResources();
@@ -45,6 +50,22 @@ export const zeroGrant = (): Resources => zeroResources();
 /**
  * The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the
  * castle upgrade finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.
+ *
+ * Away time (`/api/offline`).
+ *
+ * - Gap = server clock now minus the later of the ledger anchor and the last accepted save. Gaps shorter than 300 s (`offlineMinGapSec`) pay nothing.
+ * - `elapsed = min(gap, cap)` with cap = 8 h + Night Watch + set hours (hard 72 h).
+ * - Paid = `rates x elapsed x efficiency`, efficiency = 50% + Steward + set points (hard 100%); XP also times `(1 + XP gain %)`; floored. If the castle upgrade finishes during `elapsed`, the rest is paid at the higher rates.
+ * - Castle timers and monster growth run at full speed for the whole `elapsed`; chests and monsters arrive at the efficiency rate.
+ * - Online calls are refused with `claim_first` when more than {@link UNCLAIMED_SEC} passed since the player was last seen; a gap over 900 s also rests the hero ({@link restThrough}).
+ *   The client heals HP/mana fully for a gap of 600 s or more (`FULL_HEAL_AFTER_SEC` in `src/lib/offline/apply.ts`).
+ * - Write-skipping: a poll that moved only the clock does not write the ledger unless the anchor fell 120 s behind (`ANCHOR_REFRESH_MS`).
+ *
+ * @category Saves & Server/Away time
+ * @order 1
+ * @formula
+ * elapsed = min(gap, 8 h + Night Watch hours + set hours)           (hard cap 72 h)
+ * paid[r] = floor(rate[r] x elapsed x efficiency)                    efficiency = min(1, 0.5 + 0.05 x Steward level + set points)
  */
 export const computeOfflineGrant = (input: OfflineInput): OfflineGrant | null => {
 	const gap = Number.isFinite(input.gapSec) ? input.gapSec : 0;

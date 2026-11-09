@@ -1,3 +1,16 @@
+/**
+ * The Save & Backup dialog (Settings, *Save & backup*, or Control x5).
+ *
+ * - **Status**: when it last saved and how big it is, whether the browser protects the storage, and any storage error or load problem.
+ * - **Export**: the whole game as one line of text with *Copy* and *Download file* (`idlarz-YYYYMMDD-HHMM.sav`).
+ * - **Import**: paste the text or open a file. The text is checked as it arrives and shows level / castle / tiles / play time / save date; only on confirmation does it replace the save (the old one becomes the backup) and reload.
+ *   Damaged, cut-off, foreign, impossible and *newer-version* saves are refused with a reason.
+ * - **Reset**: confirmation, then wipes the save, the backup and the damaged copy, and reloads.
+ *
+ * @title Save and Backup dialog
+ * @category Saves & Server/The save
+ * @order 5
+ */
 import React, { useEffect, useRef, useState } from 'react';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';

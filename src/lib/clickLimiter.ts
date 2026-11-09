@@ -25,6 +25,13 @@ export interface ClickLimitConfig {
 	requireTrusted: boolean;
 }
 
+/**
+ * Creates the click rate limiter: two token buckets (burst and stamina, see {@link CLICK_LIMIT}); a click is paid only if it can take a token from both. The click's event id makes one physical click cost one token.
+ *
+ *
+ * @category Economy/Clicks
+ * @order 4
+ */
 export const createClickLimiter = (config: ClickLimitConfig = CLICK_LIMIT): ClickLimiter => {
 	let burst = config.capacity;
 	let stamina = config.staminaCapacity;

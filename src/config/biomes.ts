@@ -10,14 +10,23 @@ export const TILE_SIZE = 48; // Balanced for visibility
 export const SPECIAL_SINGLE_TYPE_BIOMES: BiomeType[] = ['castle'];
 export const EMPTY_BIOMES: BiomeType[] = ['empty'];
 
-// Which biome a random purchase turns up. Everything weighs 1 unless listed; water clusters and gets a shore:
-// next to a lake or a coast both become likelier, so ponds grow into bays with beaches instead of single specks.
+/**
+ * Which biome a random purchase turns up. Everything weighs 1 unless listed; water clusters and gets a shore:
+ * next to a lake or a coast both become likelier, so ponds grow into bays with beaches instead of single specks.
+ */
 export const BIOME_SPAWN = {
 	weights: { coast: 0.6 } as Record<string, number>,
 	nearLake: { lake: 3, coast: 3 } as Record<string, number>,
 	nearCoast: { lake: 2, coast: 2 } as Record<string, number>,
 };
 
+/**
+ * Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.
+ *
+ * @category Economy/Biomes
+ * @order 2
+ * @table biome-output
+ */
 export const BIOMES: Record<string, BiomeInfo> = {
 	empty: {
 		name: 'empty',
@@ -185,8 +194,10 @@ export const BIOMES: Record<string, BiomeInfo> = {
 	},
 } as const;
 
-// Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
-// Purely decorative: they never take a click and give nothing.
+/**
+ * Cute life on the map: butterflies, bees, ladybugs and rabbits wander over owned land of a matching biome.
+ * Purely decorative: they never take a click and give nothing.
+ */
 export const AMBIENT_LIFE = {
 	firstSpawnMs: 6000, // the first critter shows up this long after the map opens
 	spawnMinMs: 14000,

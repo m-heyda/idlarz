@@ -24,6 +24,11 @@ export const writeLastReset = async (db: SupabaseClient, atMs: number): Promise<
 /**
  * Resets the player's game when a season reset happened that their ledger does not know about. Returns the marker (for the browser, which
  * drops a local save older than it) and whether a reset was done now. A failure to read the marker never blocks a login.
+ *
+ * Season resets: `npm run reset-players` writes `app_settings.last_reset`; a player whose ledger `resetAt` is older is reset once at their next login. Operating guide: the Ops page (season reset CLI).
+ *
+ * @category Saves & Server/Away time
+ * @order 2
  */
 export const ensureSeasonReset = async (
 	deps: Pick<ServiceDeps, 'ledgers' | 'saves'>,

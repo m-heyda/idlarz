@@ -24,4 +24,4 @@ A far-future update: the farm gets **crops, not only animals**. The idea so far 
 
 - The files here are licensed to the owner for free use in the game (root [Licence](../README.md#licence)), so they can be cut directly when the farm update starts. Until then they stay reference only because the farm update is not scheduled, not because of licensing.
 - Start with a design doc (grid size, stages, timers on the server clock, where the harvest goes), then the art.
-- Check the current farm items and server rules first: [docs/game/economy.md](../../docs/game/economy.md) farm section and [docs/game/saves-and-server.md](../../docs/game/saves-and-server.md).
+- Check the current farm items and server rules first: [docs/reference/economy.md](../../docs/reference/economy.md) farm section and [docs/reference/saves-and-server.md](../../docs/reference/saves-and-server.md).

@@ -1,3 +1,46 @@
+/**
+ * What the browser keeps, what the server keeps, and what the server decides.
+ *
+ * **The rule of the game.** The game needs an account (there is no guest mode). The browser holds the game state and runs the economy (income, purchases, the map, the farm, the merchant's prices, stat allocation, rebirth bookkeeping).
+ * The server owns what is worth cheating for: when chests and monsters appear and where they stand, every kill and chest reward, every fight, the gem balance, the bag and worn gear, away-time pay, the XP ceiling and the Ember bound.
+ * The server judges the browser's save by plausibility, not by replaying actions.
+ *
+ * **What the server guarantees (and what it cannot)**
+ *
+ * | Guarantee | How |
+ * | --- | --- |
+ * | Away time is server time | `now - max(ledger.anchor_at, last accepted save)` on the server clock; the client sends no duration |
+ * | Value only comes from server answers | income while away, chest and kill rewards and gems are computed by the server; the grant ledger (`granted`) holds the lifetime totals, and the save verifier allows a gain only up to `income x time + what the server granted since the last save` |
+ * | Rolls cannot be re-rolled or predicted | a reward is seeded by `HMAC(LOOT_SECRET, userId / run / kind / ordinal)` ({@link sealedRng}); the ordinal is consumed on the server, a repeated request with the same key replays the stored answer |
+ * | Opening 5 chests in 5 seconds earns nothing extra | a chest opens only against a **ticket** the server minted from its own clock; no ticket, no reward. The same logic catches a forged gold jump in the next upload (`gold_jump`, `networth_exceeds`) |
+ * | Gems are the server's | `player_ledger.gems` is the balance; an upload can never raise it (a larger number is flagged `gems_increase` and replaced by the ledger balance); a new account starts at the 1000 gift at most |
+ * | Two browsers cannot both claim | every ledger write is a compare-and-swap on `ver` |
+ *
+ * **Who checks what**
+ *
+ * | Thing | Browser | Server |
+ * | --- | --- | --- |
+ * | Time | game time from `performance.now()`, a tick is clamped to 0...300 s, castle timers count tick time | away time is the server clock since the last save or claim; claims are idempotent and compare-and-swap |
+ * | Clicks | only trusted clicks on the map pay; shared token buckets (burst 8, 5/s, long-run 1.5/s) | none needed: click income is bounded by the save checks |
+ * | Merchant | buy rounds up, sell rounds down, shelf price is 5x the sell value; tests sweep every resource | none |
+ * | Edited save text | `sanitizeSave` rejects impossible data and recomputes derived values | the cloud copy is rebuilt from the sanitized state; gold, XP and gems are checked against income and grants |
+ * | XP and level | save floor (XP the owned tiles must have produced) | `xpModel.ts` clamps a save's XP to what bought tiles, play time and server payouts can explain; the browser takes the lower number (`applyServerXp`) |
+ * | Chests, kills, gems | none: a chest opens only against a server ticket | sealed rolls, the ledger holds the gem balance, a save can never raise it |
+ * | Monsters and fights | none: the browser only displays and asks | the server places monsters, runs every fight and pays the win; HP, mana and potions are the ledger's |
+ * | Gold jumps / forged land | none | the flags of {@link FLAG_POLICY}, in **shadow mode**: stored, the save is accepted; flagged accounts are never ranked |
+ * | Rebirth | needs castle >= 6 and 400 tiles (+50 per rebirth); points computed in the store; shop spending is checked by the point-conservation rule on every load | the ledger starts a new run (sealed rolls never repeat) |
+ * | Settings in `localStorage` | cosmetic only | not stored |
+ *
+ * **Honest limits.** A cheater who stays inside the spending bound (about 3x honest progress) is not caught; flags only un-rank because enforcement is off. The save text is not signed; editing localStorage is easy and the server is what is trusted.
+ * Gear and bag contents cannot be verified from a save, which is why the server owns them. Gems cannot be raised by a save; the first save of an existing player cannot be delta-checked.
+ * Tile purchases, building costs, farm and castle upgrades are paid in the browser, not by the server. Monsters and chests are placed by the server ({@link placeTickets}). The level a kill is paid at is not claimed by the client:
+ * it comes from the ticket's spawn level and age ({@link levelAtAge}). Enforcing the checks and server-run economy actions are planned (`docs/plan/ROADMAP.md`); the inventory is already the server's.
+ *
+ * @title The server's rule and the threat model
+ * @category Saves & Server/Threat model
+ * @order 1
+ * @see acceptSave, FLAG_POLICY, ENFORCEMENT
+ */
 import { createHash } from 'node:crypto';
 import { STARTING_GEMS } from '@/config/economy';
 import { emptyBank } from '@/lib/offline/tickets';
@@ -19,7 +62,12 @@ export const HISTORY_EVERY_MS = 30 * 60_000;
 /** How many history copies are kept per player, and how many extra pinned ones. */
 export const HISTORY_KEEP = 6;
 export const PINNED_KEEP = 3;
-/** Saves from one player are accepted at most this often (an honest client sends every ~90 s). */
+/**
+ * Saves from one player are accepted at most this often (an honest client sends every ~90 s).
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 6
+ */
 export const MIN_SAVE_INTERVAL_MS = 10_000;
 
 /** The map: large, changes only when land is bought or built on. Stored apart so a save that did not change it never rewrites it. */
@@ -119,6 +167,21 @@ export const storedToText = (stored: StoredSave): string => {
  *   - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here
  *   - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise)
  *   - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history
+ *
+ * Accepting a save (`POST /api/save`):
+ *
+ * 1. The user id comes from the session cookie only; the body is capped at 600,000 bytes (`SAVE_BODY_MAX`); at most one accepted save per 10 s per account ({@link MIN_SAVE_INTERVAL_MS}).
+ * 2. The text must decode (checksum, schema, `sanitizeSave`). The stored copy is rebuilt from the sanitized state; rates and headline numbers are computed on the server (`summarize` in `cloudSave/summary.ts`).
+ * 3. `baseRev` must equal the stored `rev` (compare-and-swap) or the answer is `conflict`.
+ * 4. The server's inventory (bag, gear, pity, auto-sell) is stamped over the upload before anything is derived (a rebirth wipes it once, a New Game takes the new game's).
+ * 5. The checks of {@link verifyTransition} run, each producing a flag with a policy in {@link FLAG_POLICY}.
+ *
+ * History: a full copy goes to `save_history` every 30 minutes of the clock and when a new flag appears; 6 newest + 3 pinned per player (`HISTORY_EVERY_MS`, `HISTORY_KEEP`, `PINNED_KEEP`).
+ * Test accounts: a save through a non-production server marks the account `test_account` (sticky); its flags never count and it is never ranked ({@link isNonProduction}).
+ * Ranking eligibility (`trusted`): the first save was a young game (<= 900 s of play) and no poison flag was ever raised ({@link POISON_FLAGS}).
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 1
  */
 export const acceptSave = async (
 	repo: SaveRepo,
@@ -147,8 +210,10 @@ export const acceptSave = async (
 
 	const previous: Snapshot | null = current ? { summary: current.summary, serverSavedAt: current.serverSavedAt } : null;
 
-	// The ledger knows what the server itself granted since the last save (income while away, chest and kill rewards), so a save may
-	// contain that on top of its income, and it holds the real gem balance: whatever the save claims is checked against it, then replaced.
+	/**
+	 * The ledger knows what the server itself granted since the last save (income while away, chest and kill rewards), so a save may
+	 * contain that on top of its income, and it holds the real gem balance: whatever the save claims is checked against it, then replaced.
+	 */
 	let ledger: Ledger | null = null;
 	let ledgerUsable = false;
 	if (ledgers) {
@@ -159,9 +224,11 @@ export const acceptSave = async (
 			ledgerUsable = false;
 		}
 	}
-	// Embers and rebirths: a rebirth the server ran itself (`POST /api/rebirth`, recorded in the ledger's inventory) pays exactly the Embers it
-	// computed (IDL-102). One that did not go through it is bounded by what the previous save's castle and territory could have paid (IDL-166).
-	// Either way a save that holds more is clamped before anything is derived from it, and flagged `ember_jump`.
+	/**
+	 * Embers and rebirths: a rebirth the server ran itself (`POST /api/rebirth`, recorded in the ledger's inventory) pays exactly the Embers it
+	 * computed (IDL-102). One that did not go through it is bounded by what the previous save's castle and territory could have paid (IDL-166).
+	 * Either way a save that holds more is clamped before anything is derived from it, and flagged `ember_jump`.
+	 */
 	const emberVerdict = settleEmbers(
 		previous,
 		{ rebirths: state.prestige.rebirths, legacyEarned: state.prestige.legacyEarned, playSeconds: state.playSeconds },
@@ -169,9 +236,11 @@ export const acceptSave = async (
 	);
 	if (emberVerdict.clamped) state = { ...state, prestige: clampPrestige(state.prestige, emberVerdict) };
 	const gemsClaimed = state.gems;
-	// The bag, the worn gear, the loot pity and the auto-sell filter are the ledger's: the stored copy carries the server's, whatever the upload
-	// held. A New Game (the same run's play time going back) starts them again from the new game's own; a ledger without them yet is seeded
-	// from this save. Everything below (the summary, the checks, the stored copy) is worked out from the stamped state.
+	/**
+	 * The bag, the worn gear, the loot pity and the auto-sell filter are the ledger's: the stored copy carries the server's, whatever the upload
+	 * held. A New Game (the same run's play time going back) starts them again from the new game's own; a ledger without them yet is seeded
+	 * from this save. Everything below (the summary, the checks, the stored copy) is worked out from the stamped state.
+	 */
 	const newGame = !!(current && state.prestige.rebirths === current.summary.rebirths && state.playSeconds < current.summary.playSeconds - 1);
 	// A rebirth wipes the gear and the bag: the server's inventory starts again from the starter kit, whatever the upload carried
 	const rebirthed = !!(current && !newGame && state.prestige.rebirths > current.summary.rebirths);
@@ -181,9 +250,11 @@ export const acceptSave = async (
 	if (inventory && !newGame) state = stampInventory(state, inventory);
 	let summary = summarize(state);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
-	// XP is the server's to bound: a save that holds more than the tiles bought, the time played and what the server paid can explain is
-	// clamped to what they explain (and its attribute points to the level that XP gives), and the stored copy, the level on the ranking
-	// and everything the server derives (rates, rewards) are computed from that
+	/**
+	 * XP is the server's to bound: a save that holds more than the tiles bought, the time played and what the server paid can explain is
+	 * clamped to what they explain (and its attribute points to the level that XP gives), and the stored copy, the level on the ranking
+	 * and everything the server derives (rates, rewards) are computed from that
+	 */
 	const claimed = summary;
 	const xpVerdict = settleXp(previous, claimed, nowMs, grants);
 	if (xpVerdict.clamped) {
@@ -202,14 +273,18 @@ export const acceptSave = async (
 	const worth = checkNetWorth(state, summary, ledger?.granted);
 	if (worth.exceeds) flags.push('networth_exceeds');
 
-	// Enforcement (IDL-112): while it is on, a save that raised a `reject` flag is refused whole, before anything is stored, pinned or granted.
-	// Off by default (shadow mode); the decision per flag is `FLAG_POLICY`.
+	/**
+	 * Enforcement (IDL-112): while it is on, a save that raised a `reject` flag is refused whole, before anything is stored, pinned or granted.
+	 * Off by default (shadow mode); the decision per flag is `FLAG_POLICY`.
+	 */
 	const refused = rejectedFlags(flags, enforcement);
 	if (refused.length) return { kind: 'rejected', flags: refused };
 
-	// Trusted economy (IDL-167, IDL-168): a castle level its timer never paid for, or land, buildings and merchant levels worth more than the game
-	// could have paid, are stored as claimed (the flag stays) but never paid: the merchant levels go back to the last trusted save's, and the rates
-	// and the castle the server pays from are that save's too
+	/**
+	 * Trusted economy (IDL-167, IDL-168): a castle level its timer never paid for, or land, buildings and merchant levels worth more than the game
+	 * could have paid, are stored as claimed (the flag stays) but never paid: the merchant levels go back to the last trusted save's, and the rates
+	 * and the castle the server pays from are that save's too
+	 */
 	const trusted = flags.includes('castle_jump') || worth.exceeds;
 	if (trusted) {
 		const baseline = sameRunAs(previous?.summary ?? null, summary) ? current : null;
@@ -297,9 +372,11 @@ export const acceptSave = async (
 					inv: inventoryFromCore(split.core),
 				});
 			} else if (newRun) {
-				// a rebirth or a new game: the map and its monsters start over, so do the tickets, and rolls start again from ordinal 1 in a new run
-				// (the player's combat starts over too: HP and mana come from the new game, no fight is open)
-				// (a rebirth wipes gear and bag, see `rebirthed`; a New Game takes the new game's own)
+				/**
+				 * a rebirth or a new game: the map and its monsters start over, so do the tickets, and rolls start again from ordinal 1 in a new run
+				 * (the player's combat starts over too: HP and mana come from the new game, no fight is open)
+				 * (a rebirth wipes gear and bag, see `rebirthed`; a New Game takes the new game's own)
+				 */
 				const inv = newGame || !ledger.inv ? inventoryFromCore(split.core) : (inventory ?? ledger.inv);
 				const next: Ledger = {
 					...ledger,

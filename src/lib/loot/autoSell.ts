@@ -1,7 +1,12 @@
 import type { ItemInstance } from '@/types/game';
 import { LOOT_DATA, type LootData } from './data';
 
-/** Whether the auto-sell filter takes a piece of gear: its rarity ranks at or below the chosen one. `upTo` null keeps everything. */
+/**
+ * Whether the auto-sell filter takes a piece of gear: its rarity ranks at or below the chosen one. `upTo` null keeps everything.
+ *
+ * @category Loot/Pipeline
+ * @order 6
+ */
 export const isAutoSold = (item: ItemInstance, upTo: string | null, data: LootData = LOOT_DATA): boolean => {
 	if (upTo === null) return false;
 	const limit = data.rarities[upTo];

@@ -1,7 +1,7 @@
 /**
  * How the map grows: which biomes a new tile may turn into, and how likely it is to continue a neighbouring area. Every purchase is a
  * random roll (there is no biome picker); buildings are put on explored tiles afterwards (right-click).
- * Pure data - the logic is in src/utils/biomeRules.ts, the player-facing description in docs/game/economy.md.
+ * Pure data - the logic is in src/utils/biomeRules.ts, the player-facing description in docs/reference/economy.md.
  *
  * "purchased tiles" = tiles bought so far (the castle and the four free starting tiles do not count).
  */

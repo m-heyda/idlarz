@@ -5,6 +5,18 @@ import type { BiomeType } from '@/types/game';
 // Combat tunables. Every number the fight, the monsters and the loot depend on lives here.
 // SERVER-OWNED: the server rolls spawns, places monsters and runs every fight from these numbers; the browser only shows them.
 
+/**
+ * Combat tunables. Fights run on the server; the browser only asks for a fight and draws the answer. Everything a fight needs is frozen into a `PlayerProfile` when the fight starts
+ * ({@link playerProfile}, built from the last accepted save and the ledger's gear).
+ *
+ * Where things live: this config (`COMBAT`, `STAT_RULES`), the pure rules in `src/lib/combat.ts`, the engine in `src/lib/offline/fight*.ts`, the win estimate in `src/lib/offline/winChance.ts`,
+ * skills in `src/catalog/skills.ts` and `src/lib/skills.ts`. Monsters and their numbers: {@link MONSTERS}. Drops: {@link generateLoot}.
+ *
+ * @title Combat overview and tunables
+ * @category Combat/Overview
+ * @order 1
+ * @see maxHp, runCombat, estimateWin, MONSTERS
+ */
 export const COMBAT = {
 	baseHp: 85, // max HP = baseHp + vitality-derived hp + gear maxHp (about 100 at game start)
 	regenPerSec: 1, // HP per second while no fight is open
@@ -58,8 +70,10 @@ export const COMBAT = {
 	rewards: { minGold: 10, minXp: 5, hideShare: 0.6 },
 };
 
-// How the five attributes feed combat (read through lib/statBonuses.ts). Every attribute starts at `base`; bonuses count the
-// points ABOVE it, so a new character plays exactly like one with no stat bonuses and every point spent is a real step up.
+/**
+ * How the five attributes feed combat (read through lib/statBonuses.ts). Every attribute starts at `base`; bonuses count the
+ * points ABOVE it, so a new character plays exactly like one with no stat bonuses and every point spent is a real step up.
+ */
 export const STAT_RULES = {
 	base: 5,
 	physicalDamagePerStrength: 2, // % damage with physical weapons per point above base
@@ -319,6 +333,19 @@ const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly st
 export const FALLBACK_MONSTER = 'thistleBoar' as const;
 export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
 
+/**
+ * The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`).
+ * Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
+ *
+ * - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
+ * - Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses: crit 8 / 9 / 10 / 13 %, Stun resistance 20 / 25 / 30 / 45 %, time limit 75 / 80 / 85 / 90 s, one hit every 3 s (`BIOME_TIER`).
+ * - Tier numbers per biome (`BIOME_TIER`): plains HP 100 attack 4; forest 160 / 6; swamp 220 / 7; tundra 300 / 8.
+ * - The ladder against gear: `docs/generated/monster-ladder.md`.
+ *
+ * @category Monsters/Roster
+ * @order 1
+ * @table monster-roster
+ */
 export const MONSTERS = {
 	// plains
 	thistleBoar: normal('plains', 'Thistle Boar', 'even'),

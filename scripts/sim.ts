@@ -1,4 +1,50 @@
 /**
+ * The sim (`scripts/sim.ts`): a bot drives the **real store** with a seeded RNG and a mocked clock. Profiles: `idle`, `casual`, `hardcore`, `autoclicker` (24 h of perfect play, an upper bound), `human` (one click a second, plays 8-9, 12-13 and 18-23,
+ * a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
+ * (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
+ *
+ * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones),
+ * `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
+ *
+ * **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
+ * baseline with the base branch in CI.
+ *
+ * @title The bot simulation
+ * @category Pacing/The sim
+ * @order 1
+ */
+/**
+ * What pace the economy is tuned for, why, and how to check it. The measured numbers are **not** copied here: they live in `docs/generated/sim-milestones.md` (`npm run sim`, refreshed by `npm run docs:gen`) and `docs/generated/balance-tables.md`.
+ * Open balance questions are in `docs/plan/ROADMAP.md`.
+ *
+ * | Stage | Target |
+ * | --- | --- |
+ * | First ~100 tiles | easy: hours for an active bot, between a day and a half and two days for the `human` profile (the four free start tiles make the first hours a little slower than the old 3x3 start) |
+ * | 200-300 tiles | a 2-3 day project |
+ * | After 300 tiles | clearly steeper (the `(n/300)^3.5` tail, {@link tilePrice}); a map of tens of thousands of tiles stays buyable |
+ * | First Rebirth (castle 6 + 400 tiles) | around day 5-7 for a person who checks in a few times a day (to become about day 4-6 when the shorter castle timers and cheaper early castle costs of `docs/plan/19-first-build-steps.md` ship; the sim measured 4.6 d for the `human` profile) |
+ * | Every later run | faster than the run before it (castle 6 again in roughly 60-70 % of the first run), flattening after the third run because the castle timers bound it |
+ * | Level 80 / 100 | about the 3rd / 10th rebirth (the level curve is lifetime and carries over a rebirth, {@link LEVELING}) |
+ * | First 10 minutes | first tile at about a minute, first animal before the first castle upgrade |
+ *
+ * **What the pace rests on**
+ *
+ * - **Castle timers are the floor of the first run.** Levels 2-6 take 30 min, 2 h, 6 h, 12 h and 24 h (1 d 20 h 30 min in all), levels 7-10 another 1.5, 2, 2.5 and 3.5 days (11 d 8 h 30 min to castle 10); Master Builders shortens them.
+ *   The cost of 5 to 6 is what a player who plays a few times a day must be able to pay while the 4 to 5 timer runs, so a player who hoards instead of selling must not be locked out of it (the sim's `human` never sells surplus on purpose).
+ * - **Tile price in materials** ({@link TILE_RESOURCE_COST}). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (table at the end of `sim-milestones.md`).
+ *   Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (deer and pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.
+ * - **Tile XP is small on purpose** (`BASE_XP_PER_TILE` 45) and the level curve is slow and lifetime, so levels come from passive XP, kills and rebirth-paced play, not from buying tiles.
+ * - **Combat is in the sim**: the `human*` profiles fight a rat every 900 s and the King every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from `docs/generated/fight-sim.md`), paying the real kill income.
+ *
+ * **Caveats.** The `human` is one calibration point, not a measurement of players; the bots still beat it by 2-3x. After the first rebirth the sim bot spends its Embers builders-first and stops getting faster after the third run;
+ * "max the rebirth shop" is a later design (ROADMAP). If the first run must be longer once more content exists, lengthen `CASTLE_UPGRADE.durationsSec` and keep an eye on the minutes-to-cover table.
+ *
+ * @title Pacing targets
+ * @category Pacing/Targets
+ * @order 1
+ * @see MAGNITUDE_BANDS, CASTLE_UPGRADE
+ */
+/**
  * Headless balance simulation. Drives the REAL game store (same actions the UI calls) with a bot,
  * a mocked clock and a seeded RNG, for several player profiles, and prints / writes a milestone table.
  *
@@ -62,7 +108,7 @@ const main = async () => {
 		'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
 		// the long game: ten rebirths, to see the character level (carried over each rebirth) reach the soft cap and the maximum
 		'hardcore-rebirth6-x10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 10 },
-		// the owner's pace (docs/game/pacing-targets.md): a person who checks in a few times a day, fights with auto-battle, never optimises
+		// the owner's pace (docs/reference/pacing.md): a person who checks in a few times a day, fights with auto-battle, never optimises
 		human: { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18 },
 		'human-rebirth6': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 6, rebirths: 5 },
 		'human-rebirth8': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 8, rebirths: 4 },
@@ -130,7 +176,7 @@ const main = async () => {
 
 	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
 	console.log(md);
-	for (const w of renderMagnitudes(selected).warnings) console.error(`WARNING outside the docs/game/pacing-targets.md band: ${w}`);
+	for (const w of renderMagnitudes(selected).warnings) console.error(`WARNING outside the docs/reference/pacing.md band: ${w}`);
 	// The milestones of every selected profile as data (game days, rounded so a rerun on another machine writes the same bytes): scripts/pacing-guard.ts compares it against the base branch's copy
 	const json = JSON.stringify(
 		{
@@ -166,7 +212,7 @@ interface Profile {
 
 type Milestones = Record<string, number | null>; // key -> game day (fractional), null if never
 
-/** Magnitudes measured per profile (docs/game/pacing-targets.md "Magnitude targets", IDL-128): gold/s, stock hours, Embers; rendered and checked against the bands by `renderMagnitudes`. The last seed of a profile wins. */
+/** Magnitudes measured per profile (docs/reference/pacing.md "Magnitude targets", IDL-128): gold/s, stock hours, Embers; rendered and checked against the bands by `renderMagnitudes`. The last seed of a profile wins. */
 const magnitudes: Record<string, Record<string, number | string>> = {};
 
 /** What one CI shard saves for `--merge`: the raw per-profile results and the two side tables the markdown renders. */
@@ -207,7 +253,7 @@ const HARDCORE_WINDOWS: [number, number][] = [
 	[12, 13],
 	[18, 23],
 ];
-// SIM_DECISION / SIM_HOARD: calibration knobs (docs/game/pacing-targets.md: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus (calibrated to the owner: ~185 tiles after 3.3 days))
+// SIM_DECISION / SIM_HOARD: calibration knobs (docs/reference/pacing.md: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus (calibrated to the owner: ~185 tiles after 3.3 days))
 const HUMAN = {
 	decisionSec: Number(process.env.SIM_DECISION ?? 3600),
 	hoard: Number(process.env.SIM_HOARD ?? 1e9),
@@ -489,8 +535,10 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		byName[key] = Object.fromEntries(Object.entries(need).map(([r, v]) => [r, rate[r] > 0 ? Math.round(Math.max(0, v - stock[r]) / rate[r] / 60) : Infinity]));
 	};
 
-	// Fights (profile.combat): the server spawns a rat every COMBAT.spawn.intervalSec and a Rat King every bossIntervalSec, and
-	// auto-battle fights them while the player plays. A monster waits, growing a level per growth interval, until it is fought.
+	/**
+	 * Fights (profile.combat): the server spawns a rat every COMBAT.spawn.intervalSec and a Rat King every bossIntervalSec, and
+	 * auto-battle fights them while the player plays. A monster waits, growing a level per growth interval, until it is fought.
+	 */
 	const spawn = combatCfg.COMBAT.spawn;
 	let nextRatAt = 0;
 	let nextKingAt = spawn.bossIntervalSec;
@@ -718,7 +766,29 @@ const ORDER = [
 	'finished',
 ];
 
-/** The bands of docs/game/pacing-targets.md "Magnitude targets" (IDL-128). Change them there and here together. */
+/**
+ * The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.
+ *
+ * Magnitude targets (decided 2026-11-07, IDL-128): measured with the real store (`casual`, trace to day 16; `human-rebirth8`, `hardcore-rebirth6-x10`) and set as the design ceiling every cap decision is checked against.
+ * "Income multiplier" is total income at castle 10 relative to run 1 at castle 10, all sources together (Embers, gear, Idols, Monument, Paragon). The bands are the constants below: they are the only copy, the sim prints them next to the measured value
+ * with a status (lines outside a band are also printed as `WARNING` on stderr, the run does not fail).
+ *
+ * | Checkpoint | Gold per second | Income multiplier | Lifetime Embers | Unspent gold |
+ * | --- | --- | --- | --- | --- |
+ * | Run 1, castle 10 (day ~13, ~850 tiles) | 3,000 to 6,000 (was 2,500 to 5,000 before the gentler tile tail, IDL-181) | x1 | 0 | <= 4 h |
+ * | Rebirth 5 (run 6 at castle 10) | x3 to x6 of run 1 | **x4** | about 90 to 140 with rebirths at castle 6, 350 to 500 at castle 8 | <= 4 h |
+ * | Rebirth 10 (run 11 at castle 10) | x7 to x15 of run 1 | **x10** | about 190 to 300 with rebirths at castle 6 | <= 4 h |
+ *
+ * - **Embers per rebirth** (fits the decided formula, IDL-183, with the +50 tiles per rebirth of IDL-181): castle 6 about 18 to 28 (400 to 460 tiles), castle 8 about 70 to 100 (450 tiles), castle 10 about 400 to 650 (850 to 1,000 tiles). See {@link emberGain}.
+ * - **Stocks**: any non-gold resource at most 24 hours of its production rate at castle 10; above it the sim warns. The merchant, auto-sell and the Monument are the sinks.
+ * - **Ember path alone** (`1 + 0.1 x E^0.6`): x4 to x6 at 300 to 600 lifetime Embers; capped gear, Idols and the Monument add about x2.5 on top, which is how x10 at rebirth 10 is reached without Paragon doing the heavy lifting.
+ * - **Finding to keep in mind**: `human-rebirth8` finishes run 2 in 99 % of run 1's time (castle timers set the pace), while hardcore falls to 48 to 72 %. The run-2 ratio of 60 to 70 % is therefore a hardcore-profile target;
+ *   humans feel the Ember gain as bigger numbers and a larger map, not as shorter runs.
+ * - The multiplier compares the same castle level in two runs because the bots rebirth before castle 10, so it is an indication. The existing +-15 % pacing guard (IDL-17) is separate.
+ *
+ * @category Pacing/Magnitude targets
+ * @order 1
+ */
 const MAGNITUDE_BANDS = {
 	gpsRun1Castle10: [3000, 6000], // was 2,500-5,000 before the gentler tile tail of IDL-181 (casual and hardcore measure 5,480)
 	unspentGoldHours: 4,
@@ -730,7 +800,7 @@ const MAGNITUDE_BANDS = {
 	incomeMultiplier: { 5: [3, 6], 10: [7, 15] } as Record<number, [number, number]>,
 };
 
-/** The magnitude table of docs/game/pacing-targets.md, per profile, with a status per line; `warnings` lists the lines outside their band. */
+/** The magnitude table of docs/reference/pacing.md, per profile, with a status per line; `warnings` lists the lines outside their band. */
 function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[] } {
 	const rows: string[] = [];
 	const warnings: string[] = [];
@@ -776,7 +846,7 @@ function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[
 			const band = castle == null ? undefined : byCastle[castle];
 			if (v != null && band) row(p, `after rebirth ${n} at castle ${castle}: lifetime Embers`, v, `${band[0]}-${band[1]}`, inBand(v, band));
 		}
-		// income multiplier: run N+1 against run 1 at the highest castle level both reached (docs/game/pacing-targets.md defines it at castle 10; the sim bot rebirths earlier)
+		// income multiplier: run N+1 against run 1 at the highest castle level both reached (docs/reference/pacing.md defines it at castle 10; the sim bot rebirths earlier)
 		for (const [n, band] of Object.entries(MAGNITUDE_BANDS.incomeMultiplier)) {
 			const run = Number(n) + 1;
 			for (const c of [10, 8, 6]) {
@@ -795,13 +865,13 @@ function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[
 			}
 		}
 	}
-	const lines = ['', '## Magnitude targets (docs/game/pacing-targets.md, IDL-128)', ''];
+	const lines = ['', '## Magnitude targets (docs/reference/pacing.md, IDL-128)', ''];
 	if (rows.length === 0) {
 		lines.push('No selected profile reached a checkpoint (castle 10 in run 1, a rebirth, lifetime Embers at rebirth 5 or 10).', '');
 		return { lines, warnings };
 	}
 	lines.push(
-		'Measured with the real store at the checkpoints of docs/game/pacing-targets.md; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.',
+		'Measured with the real store at the checkpoints of docs/reference/pacing.md; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.',
 		'',
 	);
 	lines.push('| profile | checkpoint | measured | band | status |', '| --- | --- | --- | --- | --- |', ...rows, '');
@@ -850,7 +920,7 @@ function renderMarkdown(results: Record<string, Milestones>, legacy: boolean, sp
 		lines.push(`| ${key} | ${names.map(cell).join(' | ')} |`);
 	});
 	lines.push('');
-	// How much faster each further run reaches "finished" than the first one (target band 60-70 %, docs/game/pacing-targets.md; used to tune the Ember curve)
+	// How much faster each further run reaches "finished" than the first one (target band 60-70 %, docs/reference/pacing.md; used to tune the Ember curve)
 	const ratioRows = names.flatMap((n) => {
 		const first = results[n].finished;
 		if (first == null) return [];

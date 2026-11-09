@@ -1,0 +1,12 @@
+# Working in this repo
+
+**The JSDoc in the code is the single source of truth for how the game works.** Find a rule before you change it: open `docs/reference/symbols.md` (function to file and line) or the category page
+(`docs/reference/economy.md`, `combat.md`, `monsters.md`, `loot.md`, `progression.md`, `saves-and-server.md`, `architecture.md`, `pacing.md`, `ops.md`). `docs/reference/` is **generated** from JSDoc blocks that carry a
+`@category` tag; never edit it by hand.
+
+- Changing a formula, constant or rule? Edit its JSDoc block in the same change (`@category Top/Section`, `@formula`, `@table id` for numbers computed from the live config; the tag list is in `docs/reference/README.md`).
+- `npm run docs:code` regenerates the reference; the pre-commit hook (`.githooks/pre-commit`, installed by `npm install`) does it for every commit and stages the result. `tests/docs/reference.test.ts` fails on a stale reference.
+- Tables in the reference come from `scripts/docs/tableDefs.ts` (they call the real config and maths); add one there instead of typing numbers into prose.
+- `docs/plan/` (ROADMAP, RELEASE-PLAN, drafts) are the only hand-written docs: they describe what is **not built**. Do not rewrite them when documenting code.
+- `docs/generated/` is measured output of `npm run docs:gen` (sim, balance tables, ...); never edit it by hand.
+- Code is pure config + pure functions where possible; anything that decides a reward or a fight lives on the server side (`src/lib/offline/`).

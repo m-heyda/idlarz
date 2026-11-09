@@ -1,6 +1,6 @@
 # Release plan: from today's game to the rebirth world (proposal v1, for review)
 
-Status: decisions D1-D11 accepted (2026-10-29). **P0 (foundation) is built and its text, and the triage tables of section 2, were removed on 2026-11-08**; what is built is described in [game/](../game/overview.md). This file orders the work of [ROADMAP](ROADMAP.md) and drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) into small, independently shippable steps, written as a product brief (what the player sees first, then the technical steps).
+Status: decisions D1-D11 accepted (2026-10-29). **P0 (foundation) is built and its text, and the triage tables of section 2, were removed on 2026-11-08**; what is built is described in [game/](../reference/overview.md). This file orders the work of [ROADMAP](ROADMAP.md) and drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) into small, independently shippable steps, written as a product brief (what the player sees first, then the technical steps).
 
 Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 🧱 = ships with a placeholder asset first. ❓ = needs your answer. Every step is its own pull request to `m-heyda/idlarz` and must leave `tsc`, `lint`, `npm test` and `npm run sim` green.
 
@@ -21,7 +21,7 @@ Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 
 
 ## 1. Integrity rules for every step
 
-1. **Additive saves only**: optional fields, new biome letters, nullable ledger columns; no `SAVE_SCHEMA` bump. A moved rule that would refuse existing saves needs a reset (`reset-players`) or a conversion written for it ([saves and server](../game/saves-and-server.md)).
+1. **Additive saves only**: optional fields, new biome letters, nullable ledger columns; no `SAVE_SCHEMA` bump. A moved rule that would refuse existing saves needs a reset (`reset-players`) or a conversion written for it ([saves and server](../reference/saves-and-server.md)).
 2. **SQL before code**: apply a migration on the project first, then deploy the code that reads it ([ROADMAP](ROADMAP.md) deploy-order note). Rehearse each migration on a **Supabase branch** first.
 3. **Run `scripts/check-live-saves.ts`** (new in P0) against the real rows before every release that touches save or ledger rules.
 4. **Dark first, switch later**: server code and data shapes ship before the UI or the content that uses them, behind a constant (`GAME_EPOCH`, an unlock count) so the release moment is a one-line change.

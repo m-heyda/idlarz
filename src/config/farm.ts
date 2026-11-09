@@ -7,6 +7,13 @@ import { FARM_KEYS, type FarmKey } from '@/catalog/resourceKeys';
 export const FARM_PRODUCT_KEYS = FARM_KEYS.filter((key): key is Exclude<FarmKey, 'meat'> => key !== 'meat'); // the farm's products without meat (meat is bought with food, the rest only earned)
 
 // Farm animal configurations
+/**
+ * The farm: animals are bought with food. The N-th animal of a kind costs `floor(baseCost x costScaling^owned)` ({@link calculateAnimalCost}); a pen holds 12 per kind (`FARM.baseCap`), +4 per Pen Expansion level.
+ *
+ * @category Economy/Farm
+ * @order 1
+ * @table farm-animals
+ */
 export const ANIMALS: Animal[] = [
 	{
 		id: 'chicken',
@@ -46,13 +53,15 @@ export const ANIMALS: Animal[] = [
 	},
 ];
 
-// The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
-// once sold). Products were 50 % slower (and their upgrade bonuses 33 % smaller) until the second-tier resources felt too
-// slow to earn; the merchant prices were lowered by the same factor, so a product still sells for the same share of its
-// animal's meat and gold income is unchanged: the products themselves, and what they unlock, come faster.
-// Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
-// Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
-// then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
+/**
+ * The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
+ * once sold). Products were 50 % slower (and their upgrade bonuses 33 % smaller) until the second-tier resources felt too
+ * slow to earn; the merchant prices were lowered by the same factor, so a product still sells for the same share of its
+ * animal's meat and gold income is unchanged: the products themselves, and what they unlock, come faster.
+ * Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
+ * Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
+ * then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
+ */
 export const FARM = {
 	baseCap: 12, // animals of one kind the pen holds before it is expanded
 	unitsDrawn: 8, // most sprites drawn per kind in the pen (the animal panel shows the real count)
@@ -61,6 +70,14 @@ export const FARM = {
 // Pen Expansion: per level, every animal kind may hold `capPerLevel` more animals and all farm output grows
 export const FARM_PEN = { outputPerLevel: 0.02, capPerLevel: 4 };
 
+/**
+ * Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ({@link farmUpgradeCost}). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9);
+ * the others have 10 levels and growth 1.6.
+ *
+ * @category Economy/Farm
+ * @order 3
+ * @table farm-upgrades
+ */
 export const FARM_UPGRADES = {
 	feed: {
 		label: 'Feed Trough',

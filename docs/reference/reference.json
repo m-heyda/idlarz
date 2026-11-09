@@ -1,0 +1,2106 @@
+[
+ {
+  "id": "conventions",
+  "name": "Conventions",
+  "kind": "topic",
+  "category": "Overview/The game",
+  "file": "src/app/GameApp.tsx",
+  "line": 2,
+  "summary": "Conventions that hold for the whole code base.",
+  "see": []
+ },
+ {
+  "id": "the-game-at-a-glance",
+  "name": "The game at a glance",
+  "kind": "topic",
+  "category": "Overview/The game",
+  "file": "src/app/GameApp.tsx",
+  "line": 17,
+  "summary": "Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. Everything here describes **only what the code does now**, with the symbol each number comes from.",
+  "see": []
+ },
+ {
+  "id": "gameapp",
+  "name": "The tick loop and persistence",
+  "symbol": "GameApp",
+  "kind": "function",
+  "category": "Architecture/The loop",
+  "file": "src/app/GameApp.tsx",
+  "line": 111,
+  "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
+  "see": [
+   "computeOfflineGrant",
+   "SAVE_SCHEMA"
+  ]
+ },
+ {
+  "id": "map-lab",
+  "name": "Map lab",
+  "kind": "topic",
+  "category": "Architecture/Art",
+  "file": "src/app/map-lab/page.tsx",
+  "line": 2,
+  "summary": "Map lab (`/map-lab`): a public, client-only page to look at and tweak the art. It renders the real map components (`Grid`, `Tile`, terrain, minimap) over a simulated world: no login, no `/api/*` call, nothing saved. The panel offers biome painting, extending land, erasing, chests and monsters (by hand or random spawns), brush size, castle level, presets (start ring, rolled 60 / 400, every biome), undo (Ctrl+Z) and JSON export / import (a lab file, not a game save).",
+  "see": []
+ },
+ {
+  "id": "gear",
+  "name": "gear",
+  "symbol": "gear",
+  "kind": "function",
+  "category": "Loot/Adding content",
+  "file": "src/catalog/items/define.ts",
+  "line": 101,
+  "summary": "The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier's window (`LEVEL_WINDOW_BY_TIER`: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).",
+  "see": []
+ },
+ {
+  "id": "live-grades",
+  "name": "LIVE_GRADES",
+  "symbol": "LIVE_GRADES",
+  "kind": "const",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/grades.ts",
+  "line": 50,
+  "summary": "The grades whose items are enabled and so drop (IDL-220, IDL-224, IDL-243): the early game, G1-G3. G4 and up (the legacy Steel armour at G4 and the Obsidian family at G6 included) stay disabled data until the biomes that hand them out exist. Enabling the next grade is adding it here; the loot pools select by the `grade:` tag, never by id.",
+  "see": [
+   "gradeLevels",
+   "gradeRarities",
+   "gradeLegacyItems"
+  ]
+ },
+ {
+  "id": "gradelevels",
+  "name": "gradeLevels",
+  "symbol": "gradeLevels",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/grades.ts",
+  "line": 79,
+  "summary": "The item level window an item of this grade is generated in. It is the grade's own window (`GRADE_INFO`), except for the highest live grade, which stays open at the top until the next grade goes live: bosses (levels 15-45), chests and the shelf reach item levels past G3's 30 today, and with the legacy Steel and Obsidian gone from the pool they would have nothing to drop (IDL-243). Enabling the next grade (adding it to `LIVE_GRADES`) closes the window of the one below by itself.",
+  "see": []
+ },
+ {
+  "id": "graderarities",
+  "name": "gradeRarities",
+  "symbol": "gradeRarities",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/grades.ts",
+  "line": 94,
+  "summary": "The rarities an item of this grade may roll as: the grade's own (`GRADE_INFO`), except for the highest live grade, which takes every rarity until a grade that carries the others is live (today the loot profiles roll common to legendary at item levels 19 and up, and a rolled rarity must find a base). Enabling the next grade narrows the one below to its own rarities by itself.",
+  "see": []
+ },
+ {
+  "id": "gradelegacyitems",
+  "name": "gradeLegacyItems",
+  "symbol": "gradeLegacyItems",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/items/ladder.ts",
+  "line": 306,
+  "summary": "Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece: - a piece that fills a ladder cell (Wooden Club, Hunting Bow, Acorn Charm, Iron Sword, the six Steel armour pieces, the Obsidian family) keeps its id, name, art, set and the validity window of the pieces already owned, and takes the cell's grade tag and the grade's drop window and rarities (`dropLevels`, `dropRarities`); it is enabled with the rest of its grade (`LIVE_GRADES`), so Steel (G4) and Obsidian (G6) are on the ladder but not dropped yet; - every other legacy piece (cloth, the rest of wood and steel, the starter sword and shield) is retired: `enabled: false`, the id stays so owned pieces load and work. The starter sword and shield are still what a new hero wears (catalog STARTER_EQUIPMENT_IDS).",
+  "see": []
+ },
+ {
+  "id": "biome-loot",
+  "name": "BIOME_LOOT",
+  "symbol": "BIOME_LOOT",
+  "kind": "const",
+  "category": "Loot/Config",
+  "file": "src/catalog/lootConfig.ts",
+  "line": 123,
+  "summary": "The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7). The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items, so today every biome drops the same items; going live with the next grade is what moves a biome.",
+  "see": []
+ },
+ {
+  "id": "loot-pools",
+  "name": "Adding loot content (data only)",
+  "symbol": "LOOT_POOLS",
+  "kind": "const",
+  "category": "Loot/Adding content",
+  "file": "src/catalog/lootConfig.ts",
+  "line": 160,
+  "summary": "Adding loot content is data only; the generator needs no change.",
+  "see": [
+   "gear",
+   "RARITIES",
+   "LOOT_SOURCES"
+  ]
+ },
+ {
+  "id": "loot-profiles",
+  "name": "LOOT_PROFILES",
+  "symbol": "LOOT_PROFILES",
+  "kind": "const",
+  "category": "Loot/Config",
+  "file": "src/catalog/lootConfig.ts",
+  "line": 194,
+  "summary": "Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.",
+  "see": []
+ },
+ {
+  "id": "loot-sources",
+  "name": "LOOT_SOURCES",
+  "symbol": "LOOT_SOURCES",
+  "kind": "const",
+  "category": "Loot/Config",
+  "file": "src/catalog/lootConfig.ts",
+  "line": 259,
+  "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
+  "see": []
+ },
+ {
+  "id": "rarities",
+  "name": "RARITIES",
+  "symbol": "RARITIES",
+  "kind": "const",
+  "category": "Loot/Items",
+  "file": "src/catalog/rarity.ts",
+  "line": 34,
+  "summary": "Rarities: everything the game knows about one, in one place: label, colour, glow, how many affixes it rolls, what it is worth and how it ranks. Adding a tier is one row here plus a weight in the loot profiles that should drop it.",
+  "see": []
+ },
+ {
+  "id": "skills",
+  "name": "SKILLS",
+  "symbol": "SKILLS",
+  "kind": "const",
+  "category": "Combat/Potions and skills",
+  "file": "src/catalog/skills.ts",
+  "line": 34,
+  "summary": "Potions and skills.",
+  "see": []
+ },
+ {
+  "id": "valuecurve",
+  "name": "valueCurve",
+  "symbol": "valueCurve",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/stats.ts",
+  "line": 168,
+  "summary": "Value multiplier of an item level (1 at level 1).",
+  "see": []
+ },
+ {
+  "id": "levelscale",
+  "name": "levelScale",
+  "symbol": "levelScale",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/catalog/stats.ts",
+  "line": 195,
+  "summary": "Power multiplier of an item level (1 at level 1).",
+  "see": []
+ },
+ {
+  "id": "weapon-attack-speed",
+  "name": "WEAPON_ATTACK_SPEED",
+  "symbol": "WEAPON_ATTACK_SPEED",
+  "kind": "const",
+  "category": "Combat/Player numbers",
+  "file": "src/catalog/weapons.ts",
+  "line": 13,
+  "summary": "Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; an item can override it with `attackSpeed`). Light weapons swing fast, heavy ones slowly. Server fights swing at this speed (lib/offline/profile.ts), together with each weapon's damage per hit.",
+  "see": []
+ },
+ {
+  "id": "rendering-the-map",
+  "name": "Rendering the map",
+  "kind": "topic",
+  "category": "Architecture/Rendering",
+  "file": "src/components/game/Grid.tsx",
+  "line": 1,
+  "summary": "Rendering notes.",
+  "see": []
+ },
+ {
+  "id": "save-and-backup-dialog",
+  "name": "Save and Backup dialog",
+  "kind": "topic",
+  "category": "Saves & Server/The save",
+  "file": "src/components/game/overlays/SaveMenuDialog.tsx",
+  "line": 1,
+  "summary": "The Save & Backup dialog (Settings, *Save & backup*, or Control x5).",
+  "see": []
+ },
+ {
+  "id": "biomes",
+  "name": "BIOMES",
+  "symbol": "BIOMES",
+  "kind": "const",
+  "category": "Economy/Biomes",
+  "file": "src/config/biomes.ts",
+  "line": 30,
+  "summary": "Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.",
+  "see": []
+ },
+ {
+  "id": "buildings",
+  "name": "BUILDINGS",
+  "symbol": "BUILDINGS",
+  "kind": "const",
+  "category": "Economy/Buildings",
+  "file": "src/config/buildings.ts",
+  "line": 40,
+  "summary": "Buildings: one per tile, on any owned tile that is not the castle, a lake or empty (`BUILDING_COST.blockedBiomes`), not inside a landmark area, not under a monster or chest. A building's output is added to the tile's own output (same 1.3 scale and neighbour bonus). 16 types, config output per second:",
+  "see": [
+   "BUILDING_COST",
+   "buildingCostFactor"
+  ]
+ },
+ {
+  "id": "building-cost",
+  "name": "BUILDING_COST",
+  "symbol": "BUILDING_COST",
+  "kind": "const",
+  "category": "Economy/Buildings",
+  "file": "src/config/buildings.ts",
+  "line": 111,
+  "summary": "The building price constants: base cost 500 gold / 250 wood / 150 stone, the four cheap starter steps, the three growth stages (1.15 for 12 buildings, 1.09 for 16, 1.025 after) and the biomes a building cannot stand on.",
+  "see": []
+ },
+ {
+  "id": "castle-range",
+  "name": "CASTLE_RANGE",
+  "symbol": "CASTLE_RANGE",
+  "kind": "const",
+  "category": "Economy/Castle",
+  "file": "src/config/castle.ts",
+  "line": 24,
+  "summary": "The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it grows one tile per level: 5x5 at 8, 7x7 at 9, 9x9 at 10 ({@link castleRangeRadius}).",
+  "see": []
+ },
+ {
+  "id": "castle-area-bonus",
+  "name": "CASTLE_AREA_BONUS",
+  "symbol": "CASTLE_AREA_BONUS",
+  "kind": "const",
+  "category": "Economy/Castle",
+  "file": "src/config/castle.ts",
+  "line": 36,
+  "summary": "Area bonus: tiles in range (and their buildings) make extra output, +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10) ({@link castleAreaBonus}). It is part of the base income, so the modifiers apply on top.",
+  "see": []
+ },
+ {
+  "id": "castle-fortress",
+  "name": "CASTLE_FORTRESS",
+  "symbol": "CASTLE_FORTRESS",
+  "kind": "const",
+  "category": "Economy/Castle",
+  "file": "src/config/castle.ts",
+  "line": 46,
+  "summary": "The ward: from castle level 7 the 3x3 around the castle is a walled fortress, no monsters or chests spawn there and monsters standing in it are driven out (`isInWard`, `wardTiles`).",
+  "see": []
+ },
+ {
+  "id": "castle-upgrade",
+  "name": "CASTLE_UPGRADE",
+  "symbol": "CASTLE_UPGRADE",
+  "kind": "const",
+  "category": "Economy/Castle",
+  "file": "src/config/castle.ts",
+  "line": 62,
+  "summary": "The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.",
+  "see": [
+   "castleModifier",
+   "castleUpgradeDuration"
+  ]
+ },
+ {
+  "id": "leveling",
+  "name": "LEVELING",
+  "symbol": "LEVELING",
+  "kind": "const",
+  "category": "Progression/Levels",
+  "file": "src/config/character.ts",
+  "line": 55,
+  "summary": "Character level 1-100 (`maxLevel`). XP is lifetime and **carries over a rebirth**, so the curve is paced over rebirths, not days.",
+  "see": [
+   "xpToNextLevel",
+   "totalStatPoints"
+  ]
+ },
+ {
+  "id": "character-stat-config",
+  "name": "CHARACTER_STAT_CONFIG",
+  "symbol": "CHARACTER_STAT_CONFIG",
+  "kind": "const",
+  "category": "Progression/Attributes",
+  "file": "src/config/character.ts",
+  "line": 92,
+  "summary": "Attributes. Five attributes start at 5 (`INITIAL_CHARACTER_STATS`). Resource effects use **all** points; combat effects count the points **above 5** (`STAT_RULES.base`).",
+  "see": [
+   "calculateStatResourceModifiers",
+   "calculateCombatStats"
+  ]
+ },
+ {
+  "id": "combat",
+  "name": "Combat overview and tunables",
+  "symbol": "COMBAT",
+  "kind": "const",
+  "category": "Combat/Overview",
+  "file": "src/config/combatConfig.ts",
+  "line": 20,
+  "summary": "Combat tunables. Fights run on the server; the browser only asks for a fight and draws the answer. Everything a fight needs is frozen into a `PlayerProfile` when the fight starts ({@link playerProfile}, built from the last accepted save and the ledger's gear).",
+  "see": [
+   "maxHp",
+   "runCombat",
+   "estimateWin",
+   "MONSTERS"
+  ]
+ },
+ {
+  "id": "monsters",
+  "name": "MONSTERS",
+  "symbol": "MONSTERS",
+  "kind": "const",
+  "category": "Monsters/Roster",
+  "file": "src/config/combatConfig.ts",
+  "line": 349,
+  "summary": "The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`). Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
+  "see": []
+ },
+ {
+  "id": "crafting",
+  "name": "CRAFTING",
+  "symbol": "CRAFTING",
+  "kind": "const",
+  "category": "Progression/Crafting",
+  "file": "src/config/crafting.ts",
+  "line": 14,
+  "summary": "Crafting: the crafting level curve and the per-request limits. First draft, see `docs/plan/crafting-v0.md`. The curve is written as anchors like {@link LEVELING}: the total crafting XP at which a level is reached; between two anchors every step is the one before times a constant ratio (`src/lib/crafting.ts`). Recipes are data in `src/catalog/recipes.ts`. The crafting level is kept on rebirth (like the character level). Batch cap, queue slots, offline run hours and speed are limits ({@link LIMITS}: `craftBatchCap`, `craftQueueSlots`, `craftOfflineHours`, `craftSpeed`).",
+  "see": []
+ },
+ {
+  "id": "distance-bands",
+  "name": "DISTANCE_BANDS",
+  "symbol": "DISTANCE_BANDS",
+  "kind": "const",
+  "category": "Monsters/Spawning",
+  "file": "src/config/distanceBands.ts",
+  "line": 25,
+  "summary": "Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by {@link bandOf}. No spawn rule reads them yet.",
+  "see": []
+ },
+ {
+  "id": "tick-rate",
+  "name": "Basics: tick, caps, start",
+  "symbol": "TICK_RATE",
+  "kind": "const",
+  "category": "Economy/Basics",
+  "file": "src/config/economy.ts",
+  "line": 22,
+  "summary": "Game constants the economy runs on: the tick, the caps, the start.",
+  "see": [
+   "MAX_CATCHUP_SEC",
+   "RESOURCE_CAP",
+   "BASE_GENERATION_RATES",
+   "INITIAL_RESOURCES"
+  ]
+ },
+ {
+  "id": "max-catchup-sec",
+  "name": "MAX_CATCHUP_SEC",
+  "symbol": "MAX_CATCHUP_SEC",
+  "kind": "const",
+  "category": "Economy/Basics",
+  "file": "src/config/economy.ts",
+  "line": 35,
+  "summary": "A tick never advances the game by more than this many seconds (device sleep, clock edits).",
+  "see": [
+   "TICK_RATE"
+  ]
+ },
+ {
+  "id": "resource-cap",
+  "name": "RESOURCE_CAP",
+  "symbol": "RESOURCE_CAP",
+  "kind": "const",
+  "category": "Economy/Basics",
+  "file": "src/config/economy.ts",
+  "line": 43,
+  "summary": "The most any stockpile (XP included) can hold; a save above it is refused by `sanitizeSave`. Raised to 1e21 so a map of tens of thousands of tiles stays buyable.",
+  "see": []
+ },
+ {
+  "id": "tileprice",
+  "name": "tilePrice",
+  "symbol": "tilePrice",
+  "kind": "function",
+  "category": "Economy/Tiles",
+  "file": "src/config/economy.ts",
+  "line": 106,
+  "summary": "Gold price of the next tile when `ownedTiles` are owned, before discounts: the three exponential stages of SCALING_CONFIG up to TILE_PRICE.tailFrom, then the polynomial tail, never above TILE_PRICE.ceiling. Always finite.",
+  "see": [
+   "calculateTileCost",
+   "TILE_RESOURCE_COST",
+   "economyTiles"
+  ]
+ },
+ {
+  "id": "tile-resource-cost",
+  "name": "TILE_RESOURCE_COST",
+  "symbol": "TILE_RESOURCE_COST",
+  "kind": "const",
+  "category": "Economy/Tiles",
+  "file": "src/config/economy.ts",
+  "line": 126,
+  "summary": "Extra resources a tile purchase costs: from the tile count shown, the price also asks for a share of the gold price. Hide is the late one, because milk and eggs are kept for other uses.",
+  "see": []
+ },
+ {
+  "id": "biome-yield",
+  "name": "BIOME_YIELD",
+  "symbol": "BIOME_YIELD",
+  "kind": "const",
+  "category": "Economy/Income",
+  "file": "src/config/economy.ts",
+  "line": 141,
+  "summary": "Biome and building output is multiplied by `scale` (1.3). The castle tile's own output and the base rates are not scaled.",
+  "see": [
+   "calculateTileOutput"
+  ]
+ },
+ {
+  "id": "initial-resources",
+  "name": "INITIAL_RESOURCES",
+  "symbol": "INITIAL_RESOURCES",
+  "kind": "const",
+  "category": "Economy/Basics",
+  "file": "src/config/economy.ts",
+  "line": 148,
+  "summary": "What a new game starts with: 125 gold (and {@link STARTING_GEMS} gems).",
+  "see": []
+ },
+ {
+  "id": "base-generation-rates",
+  "name": "BASE_GENERATION_RATES",
+  "symbol": "BASE_GENERATION_RATES",
+  "kind": "const",
+  "category": "Economy/Income",
+  "file": "src/config/economy.ts",
+  "line": 158,
+  "summary": "Income of the realm itself, per second, before any tile: gold 0.1 and XP 0.25. Meat, eggs, milk and hide are 0 here: they come from the farm alone.",
+  "see": [
+   "calculateResourceBreakdown"
+  ]
+ },
+ {
+  "id": "click-ladder",
+  "name": "CLICK_LADDER",
+  "symbol": "CLICK_LADDER",
+  "kind": "const",
+  "category": "Economy/Clicks",
+  "file": "src/config/economy.ts",
+  "line": 170,
+  "summary": "Clicking: a trusted click on the map pays `max(gold/s x power, floor) x multiplier` ({@link clickGold}). The multiplier is Click Mastery (+25% gold per Ember shop level) and the set's Click Gold %. The ladder is bought from the merchant. Clicking a tile or building pays nothing else.",
+  "see": []
+ },
+ {
+  "id": "clickgold",
+  "name": "clickGold",
+  "symbol": "clickGold",
+  "kind": "function",
+  "category": "Economy/Clicks",
+  "file": "src/config/economy.ts",
+  "line": 186,
+  "summary": "Gold of one click at a ladder level: gold/s x power (at least the level's floor), then the multipliers (Click Mastery, set bonus).",
+  "see": [
+   "CLICK_LADDER"
+  ]
+ },
+ {
+  "id": "click-limit",
+  "name": "CLICK_LIMIT",
+  "symbol": "CLICK_LIMIT",
+  "kind": "const",
+  "category": "Economy/Clicks",
+  "file": "src/config/economy.ts",
+  "line": 203,
+  "summary": "The click rate limit: two token buckets, a click needs a token from both. Burst: 8 clicks refilling 5 per second; stamina: 20,000 clicks refilling 1.5 per second (about 130K paid clicks a day, so an auto-clicker is no better than a very dedicated human). Script-dispatched clicks do not pay (`requireTrusted`). Implementation: {@link createClickLimiter}.",
+  "see": []
+ },
+ {
+  "id": "starting-gems",
+  "name": "STARTING_GEMS",
+  "symbol": "STARTING_GEMS",
+  "kind": "const",
+  "category": "Progression/Gems",
+  "file": "src/config/economy.ts",
+  "line": 219,
+  "summary": "Gems every player starts with (also granted to saves from before Gems existed).",
+  "see": []
+ },
+ {
+  "id": "animals",
+  "name": "ANIMALS",
+  "symbol": "ANIMALS",
+  "kind": "const",
+  "category": "Economy/Farm",
+  "file": "src/config/farm.ts",
+  "line": 17,
+  "summary": "The farm: animals are bought with food. The N-th animal of a kind costs `floor(baseCost x costScaling^owned)` ({@link calculateAnimalCost}); a pen holds 12 per kind (`FARM.baseCap`), +4 per Pen Expansion level.",
+  "see": []
+ },
+ {
+  "id": "farm-upgrades",
+  "name": "FARM_UPGRADES",
+  "symbol": "FARM_UPGRADES",
+  "kind": "const",
+  "category": "Economy/Farm",
+  "file": "src/config/farm.ts",
+  "line": 81,
+  "summary": "Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ({@link farmUpgradeCost}). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9); the others have 10 levels and growth 1.6.",
+  "see": []
+ },
+ {
+  "id": "limits",
+  "name": "LIMITS",
+  "symbol": "LIMITS",
+  "kind": "const",
+  "category": "Progression/Limits",
+  "file": "src/config/limits.ts",
+  "line": 14,
+  "summary": "Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours; Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.",
+  "see": [
+   "limitOf"
+  ]
+ },
+ {
+  "id": "merchant-resource-prices",
+  "name": "MERCHANT_RESOURCE_PRICES",
+  "symbol": "MERCHANT_RESOURCE_PRICES",
+  "kind": "const",
+  "category": "Economy/Merchant",
+  "file": "src/config/merchant.ts",
+  "line": 18,
+  "summary": "The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ({@link sellPayout}). Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); farm products are never sold to the player.",
+  "see": []
+ },
+ {
+  "id": "merchant-upgrades",
+  "name": "MERCHANT_UPGRADES",
+  "symbol": "MERCHANT_UPGRADES",
+  "kind": "const",
+  "category": "Economy/Merchant",
+  "file": "src/config/merchant.ts",
+  "line": 43,
+  "summary": "Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost x growth^N)` ({@link merchantUpgradeCost}). All but Pack Rat start again on a rebirth.",
+  "see": []
+ },
+ {
+  "id": "merchant-goods",
+  "name": "MERCHANT_GOODS",
+  "symbol": "MERCHANT_GOODS",
+  "kind": "const",
+  "category": "Economy/Merchant",
+  "file": "src/config/merchant.ts",
+  "line": 193,
+  "summary": "The goods shelf and its refresh rules ({@link generateMerchantStock}). Potions are always in stock at their catalog `shop` price (`MERCHANT_SHOP_ITEMS`).",
+  "see": []
+ },
+ {
+  "id": "merchant-buy-multiplier",
+  "name": "MERCHANT_BUY_MULTIPLIER",
+  "symbol": "MERCHANT_BUY_MULTIPLIER",
+  "kind": "const",
+  "category": "Economy/Merchant",
+  "file": "src/config/merchant.ts",
+  "line": 221,
+  "summary": "The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).",
+  "see": []
+ },
+ {
+  "id": "pixel-art-pipeline",
+  "name": "Pixel art pipeline",
+  "kind": "topic",
+  "category": "Architecture/Art",
+  "file": "src/config/pixelIcons.ts",
+  "line": 1,
+  "summary": "All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: `python scripts/pixel/build.py [name ...]` (Pillow) rewrites `public/pixel/{icons,ui,bg,terrain}/` in place and prunes stale files afterwards, so a running dev server never 404s. `python scripts/pixel/build.py terrain` rebuilds only the terrain, `src/config/terrainAtlas.json` and `tests/fixtures/terrain-parity.json`; `python scripts/pixel/terrain_preview.py` renders mock maps to `scripts/pixel/previews/`. Resource icons come from the supplied pictures in `public/pixel/resources/` (padded 32 -> 40 px by `sprites_resource_art.py`). Monster art is the exception: it is hand-supplied in `public/pixel/enemies/<biome>/` and never touched by the build. `--refs` also refreshes the curated images in `scripts/pixel/reference/`; the visual rules (top-down buildings, outlines, palette, ~40 px detail) are in `scripts/pixel/reference/STYLE.md`. Unsorted supplied art waits in `public/pixel/assets_to_assess_and_use/<folder>/` (potions, buildings, map details, trees, ruins ...): each folder has a README with what is inside and what it could be used for, and nothing there is wired into the game until it is registered. Icons are registered in this file; item icons are one JSON line each in `src/config/itemIcons/` (see its README).",
+  "see": []
+ },
+ {
+  "id": "rebirth",
+  "name": "REBIRTH",
+  "symbol": "REBIRTH",
+  "kind": "const",
+  "category": "Progression/Rebirth",
+  "file": "src/config/rebirth.ts",
+  "line": 22,
+  "summary": "Rebirth: restart with a permanent bonus paid in Embers. The rules live in `REBIRTH` and are checked by {@link rebirthStatus}, the one function the button, the dialog, the store and the server share.",
+  "see": [
+   "rebirthStatus",
+   "emberGain"
+  ]
+ },
+ {
+  "id": "ember-upgrades",
+  "name": "EMBER_UPGRADES",
+  "symbol": "EMBER_UPGRADES",
+  "kind": "const",
+  "category": "Progression/Ember shop",
+  "file": "src/config/rebirth.ts",
+  "line": 58,
+  "summary": "The Ember shop: level N+1 costs `ceil(baseCost x 1.4^N)` Embers ({@link emberUpgradeCost}); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.",
+  "see": []
+ },
+ {
+  "id": "chest",
+  "name": "CHEST",
+  "symbol": "CHEST",
+  "kind": "const",
+  "category": "Economy/Chests and Luck",
+  "file": "src/config/spawns.ts",
+  "line": 34,
+  "summary": "Chests. The server mints and places them (see {@link ticketCap} and {@link advanceBank}); data is `CHEST`, `LUCK` and `SPAWN_LIMIT` in `src/config/spawns.ts`, rolls are in `src/lib/chests.ts` and `src/lib/luck.ts`.",
+  "see": []
+ },
+ {
+  "id": "luck",
+  "name": "LUCK",
+  "symbol": "LUCK",
+  "kind": "const",
+  "category": "Economy/Chests and Luck",
+  "file": "src/config/spawns.ts",
+  "line": 74,
+  "summary": "Luck = Charisma + Lucky Charm + gear Luck. Other effects (`LUCK`):",
+  "see": []
+ },
+ {
+  "id": "castlerangeradius",
+  "name": "castleRangeRadius",
+  "symbol": "castleRangeRadius",
+  "kind": "function",
+  "category": "Economy/Castle",
+  "file": "src/lib/castleWard.ts",
+  "line": 22,
+  "summary": "How far (tiles, every side) the violet range area reaches: 1 (3x3) up to level 7, then one more tile per level (5x5 at 8, 9x9 at 10).",
+  "see": []
+ },
+ {
+  "id": "castleareabonus",
+  "name": "castleAreaBonus",
+  "symbol": "castleAreaBonus",
+  "kind": "function",
+  "category": "Economy/Castle",
+  "file": "src/lib/castleWard.ts",
+  "line": 41,
+  "summary": "The extra output (as a fraction: 1 = +100%) every tile inside the castle range gets: +50% below level 7 (no walls), then one step per tile of range.",
+  "see": []
+ },
+ {
+  "id": "chestspots",
+  "name": "chestSpots",
+  "symbol": "chestSpots",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/chests.ts",
+  "line": 31,
+  "summary": "The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = \"x,y\" keys), no building, outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.",
+  "see": []
+ },
+ {
+  "id": "rewardweights",
+  "name": "rewardWeights",
+  "symbol": "rewardWeights",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/chests.ts",
+  "line": 93,
+  "summary": "Relative chances with Luck shifted from plain gold toward the lucky chest and the item.",
+  "see": []
+ },
+ {
+  "id": "rollchestloot",
+  "name": "rollChestLoot",
+  "symbol": "rollChestLoot",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/chests.ts",
+  "line": 110,
+  "summary": "Rolls the contents of a chest. Gold is \"minutes of income\", like before; a full bag turns an item into gold.",
+  "see": []
+ },
+ {
+  "id": "createclicklimiter",
+  "name": "createClickLimiter",
+  "symbol": "createClickLimiter",
+  "kind": "function",
+  "category": "Economy/Clicks",
+  "file": "src/lib/clickLimiter.ts",
+  "line": 35,
+  "summary": "Creates the click rate limiter: two token buckets (burst and stamina, see {@link CLICK_LIMIT}); a click is paid only if it can take a token from both. The click's event id makes one physical click cost one token.",
+  "see": []
+ },
+ {
+  "id": "ember-model",
+  "name": "EMBER_MODEL",
+  "symbol": "EMBER_MODEL",
+  "kind": "const",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/emberModel.ts",
+  "line": 29,
+  "summary": "The server's model of how many Embers (and rebirths) an account can hold. Embers multiply the income of every resource but XP (`1 + 0.1 x earned^0.6`), and the server derives offline pay, kill rewards and chest gold from the stored save, so a save that claims Embers no rebirth paid would pay out for real. Until the server runs the rebirth itself (`/api/rebirth`, IDL-102) the browser still does, so the server bounds what two consecutive saves can explain, from numbers it already holds (IDL-166):",
+  "see": []
+ },
+ {
+  "id": "isnonproduction",
+  "name": "isNonProduction",
+  "symbol": "isNonProduction",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/environment.ts",
+  "line": 12,
+  "summary": "Is this server a production server? Decided from the server's own environment only; nothing the client sends can influence it, so a player cannot claim to be a tester (or a tester claim to be a player).",
+  "see": []
+ },
+ {
+  "id": "the-server-s-rule-and-the-threat-model",
+  "name": "The server's rule and the threat model",
+  "kind": "topic",
+  "category": "Saves & Server/Threat model",
+  "file": "src/lib/cloudSave/pipeline.ts",
+  "line": 1,
+  "summary": "What the browser keeps, what the server keeps, and what the server decides.",
+  "see": [
+   "acceptSave",
+   "FLAG_POLICY",
+   "ENFORCEMENT"
+  ]
+ },
+ {
+  "id": "min-save-interval-ms",
+  "name": "MIN_SAVE_INTERVAL_MS",
+  "symbol": "MIN_SAVE_INTERVAL_MS",
+  "kind": "const",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/pipeline.ts",
+  "line": 71,
+  "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
+  "see": []
+ },
+ {
+  "id": "acceptsave",
+  "name": "acceptSave",
+  "symbol": "acceptSave",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/pipeline.ts",
+  "line": 186,
+  "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
+  "see": []
+ },
+ {
+  "id": "trustedeconomy",
+  "name": "trustedEconomy",
+  "symbol": "trustedEconomy",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/trustedEconomy.ts",
+  "line": 37,
+  "summary": "`ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). With a baseline the rates and the castle are the previous save's; without one (the account's first save, or the first of a new run) there is nothing trusted to fall back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.",
+  "see": []
+ },
+ {
+  "id": "flag-policy",
+  "name": "FLAG_POLICY",
+  "symbol": "FLAG_POLICY",
+  "kind": "const",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/verify.ts",
+  "line": 87,
+  "summary": "The flags and what the server does with each. Meaning of each flag:",
+  "see": []
+ },
+ {
+  "id": "enforcement",
+  "name": "ENFORCEMENT",
+  "symbol": "ENFORCEMENT",
+  "kind": "const",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/verify.ts",
+  "line": 113,
+  "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
+  "see": []
+ },
+ {
+  "id": "poison-flags",
+  "name": "POISON_FLAGS",
+  "symbol": "POISON_FLAGS",
+  "kind": "const",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/verify.ts",
+  "line": 128,
+  "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
+  "see": []
+ },
+ {
+  "id": "verifytransition",
+  "name": "verifyTransition",
+  "symbol": "verifyTransition",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/verify.ts",
+  "line": 176,
+  "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
+  "see": []
+ },
+ {
+  "id": "xp-model",
+  "name": "XP_MODEL",
+  "symbol": "XP_MODEL",
+  "kind": "const",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/xpModel.ts",
+  "line": 21,
+  "summary": "The server's model of how much XP a character can have. XP is lifetime progress (it carries over a rebirth), and most of it comes from buying tiles, which the browser does by itself. The server therefore adds up what two consecutive saves can explain, from numbers it derives itself: the XP of the tiles bought in between (the same `calculateXpGain` the game uses), the passive XP of the play time (rates x the time that really passed), and what the server itself paid (kills, chests, absences: the ledger's grants). That sum is kept from save to save as `derived.xpBase`; a save that holds more than the base plus a one-off headroom is clamped to it (and flagged).",
+  "see": []
+ },
+ {
+  "id": "maxhp",
+  "name": "maxHp",
+  "symbol": "maxHp",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 34,
+  "summary": "The player's numbers (all pure functions in `src/lib/combat.ts`, used by the server engine and the UI):",
+  "see": [
+   "armorReduction",
+   "damagePerHit",
+   "critOdds"
+  ]
+ },
+ {
+  "id": "autobattleunlocked",
+  "name": "autoBattleUnlocked",
+  "symbol": "autoBattleUnlocked",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/combat.ts",
+  "line": 45,
+  "summary": "Auto-battle (the server picking the next monster) is a reward for the first rebirth; a click on a monster starts a fight from the start.",
+  "see": []
+ },
+ {
+  "id": "damageperhit",
+  "name": "damagePerHit",
+  "symbol": "damagePerHit",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 92,
+  "summary": "Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.",
+  "see": []
+ },
+ {
+  "id": "attackspersecond",
+  "name": "attacksPerSecond",
+  "symbol": "attacksPerSecond",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 103,
+  "summary": "Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.",
+  "see": []
+ },
+ {
+  "id": "critodds",
+  "name": "critOdds",
+  "symbol": "critOdds",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 122,
+  "summary": "Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.",
+  "see": []
+ },
+ {
+  "id": "swing",
+  "name": "swing",
+  "symbol": "swing",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 140,
+  "summary": "One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.",
+  "see": []
+ },
+ {
+  "id": "armorof",
+  "name": "armorOf",
+  "symbol": "armorOf",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 159,
+  "summary": "Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.",
+  "see": []
+ },
+ {
+  "id": "lifeleechpercent",
+  "name": "lifeLeechPercent",
+  "symbol": "lifeLeechPercent",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 173,
+  "summary": "The Life Leech in %, the gear's and the merchant's together, never above the cap.",
+  "see": []
+ },
+ {
+  "id": "armorreduction",
+  "name": "armorReduction",
+  "symbol": "armorReduction",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 190,
+  "summary": "The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much, so no amount of armor makes anything unkillable (the asymptote is 75 %).",
+  "see": []
+ },
+ {
+  "id": "mitigate",
+  "name": "mitigate",
+  "symbol": "mitigate",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 203,
+  "summary": "Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.",
+  "see": []
+ },
+ {
+  "id": "regen",
+  "name": "regen",
+  "symbol": "regen",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 211,
+  "summary": "HP regeneration outside fights: the base rate plus the gear's regen stat.",
+  "see": []
+ },
+ {
+  "id": "dodgechance",
+  "name": "dodgeChance",
+  "symbol": "dodgeChance",
+  "kind": "function",
+  "category": "Combat/Player numbers",
+  "file": "src/lib/combat.ts",
+  "line": 222,
+  "summary": "Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.",
+  "see": []
+ },
+ {
+  "id": "bandof",
+  "name": "bandOf",
+  "symbol": "bandOf",
+  "kind": "function",
+  "category": "Monsters/Spawning",
+  "file": "src/lib/distance.ts",
+  "line": 13,
+  "summary": "The band a castle distance falls in. Anything below the first band (the castle tile itself) or NaN is the first band.",
+  "see": []
+ },
+ {
+  "id": "kit",
+  "name": "kit",
+  "symbol": "kit",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/lib/fightSim.ts",
+  "line": 56,
+  "summary": "A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.",
+  "see": []
+ },
+ {
+  "id": "sellvalueof",
+  "name": "sellValueOf",
+  "symbol": "sellValueOf",
+  "kind": "function",
+  "category": "Loot/Items",
+  "file": "src/lib/itemInstance.ts",
+  "line": 106,
+  "summary": "What a merchant pays for an instance: the rarity's value at level 1, grown with the item level (`valueCurve`), then by the quality roll and by every affix, so a well rolled rare is worth clearly more than a plain one. Always at least 1.",
+  "see": []
+ },
+ {
+  "id": "limitof",
+  "name": "limitOf",
+  "symbol": "limitOf",
+  "kind": "function",
+  "category": "Progression/Limits",
+  "file": "src/lib/limits.ts",
+  "line": 34,
+  "summary": "The current value of a limit: its base plus the registered bonuses.",
+  "see": []
+ },
+ {
+  "id": "isautosold",
+  "name": "isAutoSold",
+  "symbol": "isAutoSold",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/autoSell.ts",
+  "line": 10,
+  "summary": "Whether the auto-sell filter takes a piece of gear: its rarity ranks at or below the chosen one. `upTo` null keeps everything.",
+  "see": []
+ },
+ {
+  "id": "resolvesourcelevel",
+  "name": "resolveSourceLevel",
+  "symbol": "resolveSourceLevel",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/generate.ts",
+  "line": 78,
+  "summary": "The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.",
+  "see": []
+ },
+ {
+  "id": "rollitemlevel",
+  "name": "rollItemLevel",
+  "symbol": "rollItemLevel",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/generate.ts",
+  "line": 89,
+  "summary": "Rolls the item level around the source level, inside the profile's bounds.",
+  "see": []
+ },
+ {
+  "id": "generateloot",
+  "name": "generateLoot",
+  "symbol": "generateLoot",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/generate.ts",
+  "line": 287,
+  "summary": "Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.",
+  "see": [
+   "LOOT_SOURCES",
+   "LOOT_PROFILES",
+   "receiveDrops",
+   "validateLootData"
+  ]
+ },
+ {
+  "id": "killincome",
+  "name": "killIncome",
+  "symbol": "killIncome",
+  "kind": "function",
+  "category": "Monsters/Rewards",
+  "file": "src/lib/loot/kill.ts",
+  "line": 51,
+  "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
+  "see": []
+ },
+ {
+  "id": "eligiblecandidates",
+  "name": "eligibleCandidates",
+  "symbol": "eligibleCandidates",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/pools.ts",
+  "line": 37,
+  "summary": "Members that exist at this item level (item window and the pool's own minimum), with their weights.",
+  "see": []
+ },
+ {
+  "id": "receivedrops",
+  "name": "receiveDrops",
+  "symbol": "receiveDrops",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/receive.ts",
+  "line": 24,
+  "summary": "Hands drops to the player: the auto-sell filter takes what it matches, the rest goes into the bag, and what does not fit turns into gold.",
+  "see": []
+ },
+ {
+  "id": "validatelootdata",
+  "name": "validateLootData",
+  "symbol": "validateLootData",
+  "kind": "function",
+  "category": "Loot/Pipeline",
+  "file": "src/lib/loot/validate.ts",
+  "line": 35,
+  "summary": "Checks the whole loot configuration (docs/reference/loot.md): references resolve, weights and ranges make sense, and every weighted rarity has an eligible item at every item level a source can reach. Run by the tests (and so CI) and available to the dev tooling; pure and cheap.",
+  "see": []
+ },
+ {
+  "id": "chestintervalsec",
+  "name": "chestIntervalSec",
+  "symbol": "chestIntervalSec",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/luck.ts",
+  "line": 16,
+  "summary": "Seconds between two chests: Luck shortens it, never below `LUCK.chestIntervalFloor` of the base.",
+  "see": []
+ },
+ {
+  "id": "rarityluckmultiplier",
+  "name": "rarityLuckMultiplier",
+  "symbol": "rarityLuckMultiplier",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/luck.ts",
+  "line": 30,
+  "summary": "What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear).",
+  "see": []
+ },
+ {
+  "id": "dropchancemultiplier",
+  "name": "dropChanceMultiplier",
+  "symbol": "dropChanceMultiplier",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/luck.ts",
+  "line": 40,
+  "summary": "Multiplier on a monster's gear drop chance.",
+  "see": []
+ },
+ {
+  "id": "gemchance",
+  "name": "gemChance",
+  "symbol": "gemChance",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/luck.ts",
+  "line": 50,
+  "summary": "Chance (0-1) that a chest also holds gems.",
+  "see": []
+ },
+ {
+  "id": "luckyratchance",
+  "name": "luckyRatChance",
+  "symbol": "luckyRatChance",
+  "kind": "function",
+  "category": "Economy/Chests and Luck",
+  "file": "src/lib/luck.ts",
+  "line": 67,
+  "summary": "Chance (0-1) that a newly arrived rat is a lucky one.",
+  "see": []
+ },
+ {
+  "id": "manual-cloud-cooldown-ms",
+  "name": "MANUAL_CLOUD_COOLDOWN_MS",
+  "symbol": "MANUAL_CLOUD_COOLDOWN_MS",
+  "kind": "const",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/manualCloudSave.ts",
+  "line": 15,
+  "summary": "\"Save game\" in the menu: always saves to this browser, and when an account is signed in it also uploads the game to the account's cloud save, at most once every 10 minutes. The automatic uploads (milestones, the 5 minute heartbeat, hiding the tab) keep running on their own; this is the player's manual button, so the limit is about how often it may be pressed. Pure apart from the small registry and the remembered time: the clock, the storage and the uploader are injected.",
+  "see": []
+ },
+ {
+  "id": "shoppriceof",
+  "name": "shopPriceOf",
+  "symbol": "shopPriceOf",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/merchant.ts",
+  "line": 22,
+  "summary": "What a piece of gear costs at the merchant: far above what he pays for it, so buying and selling can never print gold.",
+  "see": []
+ },
+ {
+  "id": "refreshcost",
+  "name": "refreshCost",
+  "symbol": "refreshCost",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/merchant.ts",
+  "line": 32,
+  "summary": "The gold the next paid refresh costs, when `refreshesBought` have been bought: it doubles each time, up to a cap of 1b.",
+  "see": []
+ },
+ {
+  "id": "bestworngrade",
+  "name": "bestWornGrade",
+  "symbol": "bestWornGrade",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/merchant.ts",
+  "line": 61,
+  "summary": "The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). The shelf never sells above it: the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).",
+  "see": []
+ },
+ {
+  "id": "generatemerchantstock",
+  "name": "generateMerchantStock",
+  "symbol": "generateMerchantStock",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/merchant.ts",
+  "line": 90,
+  "summary": "A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. `grade` is the best grade the player wears (`bestWornGrade`): nothing above it is on the shelf. Pure, so the server can take it as is.",
+  "see": [
+   "bestWornGrade",
+   "shopPriceOf",
+   "MERCHANT_GOODS"
+  ]
+ },
+ {
+  "id": "spawnlevelrange",
+  "name": "spawnLevelRange",
+  "symbol": "spawnLevelRange",
+  "kind": "function",
+  "category": "Monsters/Level scaling",
+  "file": "src/lib/monsters.ts",
+  "line": 39,
+  "summary": "The levels a new monster of this type can appear at in a world of this castle level (both ends included).",
+  "see": []
+ },
+ {
+  "id": "rollspawnlevel",
+  "name": "rollSpawnLevel",
+  "symbol": "rollSpawnLevel",
+  "kind": "function",
+  "category": "Monsters/Level scaling",
+  "file": "src/lib/monsters.ts",
+  "line": 56,
+  "summary": "The level a new monster starts at. Rolled from a generator seeded by its id and nothing else, so it takes no number from Math.random (the rest of the game's randomness is the same with or without it) and the same monster always rolls the same. `levelCap` (optional) is the highest level the player can still beat (see offline/spawnWeights.ts): a roll above it comes down to it, never below `min`.",
+  "see": []
+ },
+ {
+  "id": "dangerbonus",
+  "name": "dangerBonus",
+  "symbol": "dangerBonus",
+  "kind": "function",
+  "category": "Monsters/Level scaling",
+  "file": "src/lib/monsters.ts",
+  "line": 74,
+  "summary": "Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: danger grows toward the frontier.",
+  "see": []
+ },
+ {
+  "id": "levelatage",
+  "name": "levelAtAge",
+  "symbol": "levelAtAge",
+  "kind": "function",
+  "category": "Monsters/Level scaling",
+  "file": "src/lib/monsters.ts",
+  "line": 93,
+  "summary": "The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit.",
+  "see": []
+ },
+ {
+  "id": "monsterstats",
+  "name": "monsterStats",
+  "symbol": "monsterStats",
+  "kind": "function",
+  "category": "Monsters/Level scaling",
+  "file": "src/lib/monsters.ts",
+  "line": 117,
+  "summary": "HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`).",
+  "see": []
+ },
+ {
+  "id": "canspawnon",
+  "name": "canSpawnOn",
+  "symbol": "canSpawnOn",
+  "kind": "function",
+  "category": "Monsters/Spawning",
+  "file": "src/lib/monsters.ts",
+  "line": 150,
+  "summary": "Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance (Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are `MonsterDef.spawn`.",
+  "see": []
+ },
+ {
+  "id": "runcombat",
+  "name": "runCombat",
+  "symbol": "runCombat",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fight.ts",
+  "line": 61,
+  "summary": "Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battle allows. Returns the new ledger. All events are in `ledger.combat.log`.",
+  "see": [
+   "fightStep",
+   "estimateWin",
+   "restThrough"
+  ]
+ },
+ {
+  "id": "dismissticket",
+  "name": "dismissTicket",
+  "symbol": "dismissTicket",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fight.ts",
+  "line": 135,
+  "summary": "Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). Ends the fight against it.",
+  "see": []
+ },
+ {
+  "id": "restthrough",
+  "name": "restThrough",
+  "symbol": "restThrough",
+  "kind": "function",
+  "category": "Combat/Results and rest",
+  "file": "src/lib/offline/fight.ts",
+  "line": 154,
+  "summary": "After an absence the player is back on their feet: HP and mana refilled by resting for `gapSec`, no fight open, cooldowns over.",
+  "see": []
+ },
+ {
+  "id": "rngfor",
+  "name": "rngFor",
+  "symbol": "rngFor",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fightContext.ts",
+  "line": 72,
+  "summary": "The next random stream of a fight: sealed on the secret, the user, the run and the fight's ordinal, one draw per call.",
+  "see": []
+ },
+ {
+  "id": "autouse",
+  "name": "autoUse",
+  "symbol": "autoUse",
+  "kind": "function",
+  "category": "Combat/Potions and skills",
+  "file": "src/lib/offline/fightSteps.ts",
+  "line": 66,
+  "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready.",
+  "see": []
+ },
+ {
+  "id": "endfight",
+  "name": "endFight",
+  "symbol": "endFight",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fightSteps.ts",
+  "line": 87,
+  "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
+  "see": []
+ },
+ {
+  "id": "fightstep",
+  "name": "fightStep",
+  "symbol": "fightStep",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fightSteps.ts",
+  "line": 107,
+  "summary": "One tick of the open fight. Returns when the fight ended.",
+  "see": []
+ },
+ {
+  "id": "picktarget",
+  "name": "pickTarget",
+  "symbol": "pickTarget",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fightTargets.ts",
+  "line": 41,
+  "summary": "The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the King. One that beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.",
+  "see": [
+   "engage",
+   "queueTicket"
+  ]
+ },
+ {
+  "id": "queueticket",
+  "name": "queueTicket",
+  "symbol": "queueTicket",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fightTargets.ts",
+  "line": 88,
+  "summary": "A click while a fight is open: the monster joins the queue, or leaves it when it was already there.",
+  "see": [
+   "engage",
+   "endFight"
+  ]
+ },
+ {
+  "id": "engage",
+  "name": "engage",
+  "symbol": "engage",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/fightTargets.ts",
+  "line": 113,
+  "summary": "The next fight: the queue's head (the player chose it, so no retry time and no win estimate stop it, but the hero must be back on his feet), then auto-battle's pick.",
+  "see": []
+ },
+ {
+  "id": "unclaimed-sec",
+  "name": "UNCLAIMED_SEC",
+  "symbol": "UNCLAIMED_SEC",
+  "kind": "const",
+  "category": "Combat/Results and rest",
+  "file": "src/lib/offline/grant.ts",
+  "line": 46,
+  "summary": "The longest gap the server treats as the same session: past it an online call is refused with `claim_first`, and the hero rests (heals fully) through the gap. The client uses the same number, so the picture never jumps back.",
+  "see": []
+ },
+ {
+  "id": "computeofflinegrant",
+  "name": "computeOfflineGrant",
+  "symbol": "computeOfflineGrant",
+  "kind": "function",
+  "category": "Saves & Server/Away time",
+  "file": "src/lib/offline/grant.ts",
+  "line": 70,
+  "summary": "The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the castle upgrade finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.",
+  "see": []
+ },
+ {
+  "id": "ledger",
+  "name": "Ledger",
+  "symbol": "Ledger",
+  "kind": "interface",
+  "category": "Saves & Server/The ledger",
+  "file": "src/lib/offline/ledger.ts",
+  "line": 77,
+  "summary": "The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor, the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result, `combat` (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), `inv` (bag, gear, pity, auto-sell, Pack Rat size) and `resetAt`.",
+  "see": [
+   "sealedRng",
+   "computeOfflineGrant"
+  ]
+ },
+ {
+  "id": "placetickets",
+  "name": "placeTickets",
+  "symbol": "placeTickets",
+  "kind": "function",
+  "category": "Monsters/Spawning",
+  "file": "src/lib/offline/placement.ts",
+  "line": 75,
+  "summary": "Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`). With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are never weighted or capped.",
+  "see": []
+ },
+ {
+  "id": "playerprofile",
+  "name": "playerProfile",
+  "symbol": "playerProfile",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/profile.ts",
+  "line": 59,
+  "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear.",
+  "see": []
+ },
+ {
+  "id": "paykill",
+  "name": "payKill",
+  "symbol": "payKill",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/offline/reward.ts",
+  "line": 35,
+  "summary": "Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.",
+  "see": []
+ },
+ {
+  "id": "sealedrng",
+  "name": "sealedRng",
+  "symbol": "sealedRng",
+  "kind": "function",
+  "category": "Saves & Server/The ledger",
+  "file": "src/lib/offline/seal.ts",
+  "line": 18,
+  "summary": "A random source for one reward: `kind` and `ordinal` name it (the 7th chest of this run, rat ticket 12, ...), `runId` separates a player's runs (a rebirth or a new game starts again at ordinal 1 without repeating the old rewards). Every draw is a fresh HMAC of (secret, key, draw number), so there is no short seed to brute-force.",
+  "see": []
+ },
+ {
+  "id": "ensureseasonreset",
+  "name": "ensureSeasonReset",
+  "symbol": "ensureSeasonReset",
+  "kind": "function",
+  "category": "Saves & Server/Away time",
+  "file": "src/lib/offline/season.ts",
+  "line": 33,
+  "summary": "Resets the player's game when a season reset happened that their ledger does not know about. Returns the marker (for the browser, which drops a local save older than it) and whether a reset was done now. A failure to read the marker never blocks a login.",
+  "see": []
+ },
+ {
+  "id": "endpoints-the-api-routes",
+  "name": "Endpoints (the API routes)",
+  "kind": "topic",
+  "category": "Saves & Server/Endpoints",
+  "file": "src/lib/offline/service.ts",
+  "line": 1,
+  "summary": "The endpoints under `src/app/api`. Each route handler only authenticates and calls the pure service in `src/lib/offline/`.",
+  "see": []
+ },
+ {
+  "id": "typeweights",
+  "name": "typeWeights",
+  "symbol": "typeWeights",
+  "kind": "function",
+  "category": "Monsters/Spawning",
+  "file": "src/lib/offline/spawnWeights.ts",
+  "line": 49,
+  "summary": "Weight of each type for this player and castle level, in the order given.",
+  "see": []
+ },
+ {
+  "id": "ticketcap",
+  "name": "ticketCap",
+  "symbol": "ticketCap",
+  "kind": "function",
+  "category": "Monsters/Spawning",
+  "file": "src/lib/offline/tickets.ts",
+  "line": 102,
+  "summary": "How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together), estimated from the owned tiles because the server never opens the map, and never more than `TICKET_CAP` per kind.",
+  "see": []
+ },
+ {
+  "id": "advancebank",
+  "name": "advanceBank",
+  "symbol": "advanceBank",
+  "kind": "function",
+  "category": "Monsters/Spawning",
+  "file": "src/lib/offline/tickets.ts",
+  "line": 142,
+  "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a rat every 15, the first after 2, a King every 3 hours while none waits), as long as there is room. With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.",
+  "see": []
+ },
+ {
+  "id": "estimatewin",
+  "name": "estimateWin",
+  "symbol": "estimateWin",
+  "kind": "function",
+  "category": "Combat/Win chance",
+  "file": "src/lib/offline/winChance.ts",
+  "line": 60,
+  "summary": "The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.",
+  "see": []
+ },
+ {
+  "id": "persisted-keys",
+  "name": "PERSISTED_KEYS",
+  "symbol": "PERSISTED_KEYS",
+  "kind": "const",
+  "category": "Saves & Server/The save",
+  "file": "src/lib/sanitizeSave.ts",
+  "line": 60,
+  "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
+  "see": []
+ },
+ {
+  "id": "sanitizesave",
+  "name": "sanitizeSave",
+  "symbol": "sanitizeSave",
+  "kind": "function",
+  "category": "Saves & Server/The save",
+  "file": "src/lib/sanitizeSave.ts",
+  "line": 185,
+  "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
+  "see": []
+ },
+ {
+  "id": "save-schema",
+  "name": "SAVE_SCHEMA",
+  "symbol": "SAVE_SCHEMA",
+  "kind": "const",
+  "category": "Saves & Server/The save",
+  "file": "src/lib/saveFormat.ts",
+  "line": 35,
+  "summary": "The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters. The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level, building or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load. Not saved: monsters and the open fight (the server's).",
+  "see": [
+   "PERSISTED_KEYS",
+   "sanitizeSave"
+  ]
+ },
+ {
+  "id": "createsavestorage",
+  "name": "createSaveStorage",
+  "symbol": "createSaveStorage",
+  "kind": "function",
+  "category": "Saves & Server/The save",
+  "file": "src/lib/saveStorage.ts",
+  "line": 75,
+  "summary": "Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`). Written 2 s after a change (`FLUSH_DELAY_MS`) and on hide/close; the backup rotates every 10 minutes. A read goes through `sanitizeSave`; if `current` is refused the game starts from `backup`, keeps the bad text as `damaged`, then falls back to a new game. One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).",
+  "see": []
+ },
+ {
+  "id": "healamount",
+  "name": "healAmount",
+  "symbol": "healAmount",
+  "kind": "function",
+  "category": "Combat/Potions and skills",
+  "file": "src/lib/skills.ts",
+  "line": 19,
+  "summary": "HP a Heal restores: its share of max HP, times the Intelligence bonus (the same one magic weapons get) and the gear's Spell Power.",
+  "see": []
+ },
+ {
+  "id": "sync",
+  "name": "SYNC",
+  "symbol": "SYNC",
+  "kind": "const",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/syncPolicy.ts",
+  "line": 16,
+  "summary": "When the game is copied to the account's cloud save. Pure: the clock, the timers and the upload itself are injected, so the cadence is tested without a browser.",
+  "see": []
+ },
+ {
+  "id": "gamestate",
+  "name": "GameState",
+  "symbol": "GameState",
+  "kind": "interface",
+  "category": "Architecture/State",
+  "file": "src/types/game.ts",
+  "line": 338,
+  "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
+  "see": [
+   "PERSISTED_KEYS"
+  ]
+ },
+ {
+  "id": "rollbiome",
+  "name": "rollBiome",
+  "symbol": "rollBiome",
+  "kind": "function",
+  "category": "Economy/Biomes",
+  "file": "src/utils/biomeRules.ts",
+  "line": 126,
+  "summary": "The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore (BIOME_SPAWN). Always returns an allowed biome (plains is never blocked).",
+  "see": []
+ },
+ {
+  "id": "generatestartring",
+  "name": "generateStartRing",
+  "symbol": "generateStartRing",
+  "kind": "function",
+  "category": "Economy/Biomes",
+  "file": "src/utils/biomeRules.ts",
+  "line": 186,
+  "summary": "The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains` plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.",
+  "see": []
+ },
+ {
+  "id": "castlemodifier",
+  "name": "castleModifier",
+  "symbol": "castleModifier",
+  "kind": "function",
+  "category": "Economy/Castle",
+  "file": "src/utils/game/castle.ts",
+  "line": 16,
+  "summary": "Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each level up to `doublingUntil`, then a fixed step per level (so levels 7-10 stay a long climb, not an explosion).",
+  "see": []
+ },
+ {
+  "id": "castleupgradeduration",
+  "name": "castleUpgradeDuration",
+  "symbol": "castleUpgradeDuration",
+  "kind": "function",
+  "category": "Economy/Castle",
+  "file": "src/utils/game/castle.ts",
+  "line": 34,
+  "summary": "Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`.",
+  "see": []
+ },
+ {
+  "id": "calculatexpgain",
+  "name": "calculateXpGain",
+  "symbol": "calculateXpGain",
+  "kind": "function",
+  "category": "Economy/Tiles",
+  "file": "src/utils/game/character.ts",
+  "line": 84,
+  "summary": "Calculate XP gain scaling based on owned tiles The more tiles owned, the more XP gained",
+  "see": []
+ },
+ {
+  "id": "totalstatpoints",
+  "name": "totalStatPoints",
+  "symbol": "totalStatPoints",
+  "kind": "function",
+  "category": "Progression/Levels",
+  "file": "src/utils/game/character.ts",
+  "line": 151,
+  "summary": "The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING).",
+  "see": [
+   "reconcileCharacter"
+  ]
+ },
+ {
+  "id": "reconcilecharacter",
+  "name": "reconcileCharacter",
+  "symbol": "reconcileCharacter",
+  "kind": "function",
+  "category": "Progression/Levels",
+  "file": "src/utils/game/character.ts",
+  "line": 166,
+  "summary": "Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every point the level has earned is left to spend again. A character that is within its points is returned as it is.",
+  "see": []
+ },
+ {
+  "id": "xptonextlevel",
+  "name": "xpToNextLevel",
+  "symbol": "xpToNextLevel",
+  "kind": "function",
+  "category": "Progression/Levels",
+  "file": "src/utils/game/character.ts",
+  "line": 186,
+  "summary": "XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config); everything that shows or checks a level threshold uses this.",
+  "see": []
+ },
+ {
+  "id": "cumulativexp",
+  "name": "cumulativeXp",
+  "symbol": "cumulativeXp",
+  "kind": "function",
+  "category": "Progression/Levels",
+  "file": "src/utils/game/character.ts",
+  "line": 198,
+  "summary": "The total XP at which `level` is reached (level 1 is 0).",
+  "see": []
+ },
+ {
+  "id": "calculatelevel",
+  "name": "calculateLevel",
+  "symbol": "calculateLevel",
+  "kind": "function",
+  "category": "Progression/Levels",
+  "file": "src/utils/game/character.ts",
+  "line": 210,
+  "summary": "Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.",
+  "see": []
+ },
+ {
+  "id": "calculatestatresourcemodifiers",
+  "name": "calculateStatResourceModifiers",
+  "symbol": "calculateStatResourceModifiers",
+  "kind": "function",
+  "category": "Progression/Attributes",
+  "file": "src/utils/game/character.ts",
+  "line": 234,
+  "summary": "What the five attributes add to the income modifier of each resource (all points count, not only those above 5).",
+  "see": []
+ },
+ {
+  "id": "calculatecombatstats",
+  "name": "calculateCombatStats",
+  "symbol": "calculateCombatStats",
+  "kind": "function",
+  "category": "Progression/Attributes",
+  "file": "src/utils/game/character.ts",
+  "line": 267,
+  "summary": "The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.",
+  "see": []
+ },
+ {
+  "id": "calculatetilecost",
+  "name": "calculateTileCost",
+  "symbol": "calculateTileCost",
+  "kind": "function",
+  "category": "Economy/Tiles",
+  "file": "src/utils/game/costs.ts",
+  "line": 18,
+  "summary": "Everything buying the next tile costs, given how many tiles are owned and the Charisma discount (percent).",
+  "see": [
+   "tilePrice",
+   "effectiveTileDiscount",
+   "TILE_RESOURCE_COST"
+  ]
+ },
+ {
+  "id": "buildingcostfactor",
+  "name": "buildingCostFactor",
+  "symbol": "buildingCostFactor",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/utils/game/costs.ts",
+  "line": 63,
+  "summary": "Price factor of the next building when `built` buildings stand: the cheap starter steps, then three stages of growth.",
+  "see": [
+   "calculateBuildingCost"
+  ]
+ },
+ {
+  "id": "calculatebuildingcost",
+  "name": "calculateBuildingCost",
+  "symbol": "calculateBuildingCost",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/utils/game/costs.ts",
+  "line": 82,
+  "summary": "Cost of the next building: base cost x the factor for the number of buildings already built.",
+  "see": []
+ },
+ {
+  "id": "calculateanimalcost",
+  "name": "calculateAnimalCost",
+  "symbol": "calculateAnimalCost",
+  "kind": "function",
+  "category": "Economy/Farm",
+  "file": "src/utils/game/farm.ts",
+  "line": 14,
+  "summary": "Food cost of the next animal of a kind when `level` of them are owned: `floor(baseCost x costScaling^level)`.",
+  "see": []
+ },
+ {
+  "id": "farmupgradecost",
+  "name": "farmUpgradeCost",
+  "symbol": "farmUpgradeCost",
+  "kind": "function",
+  "category": "Economy/Farm",
+  "file": "src/utils/game/farm.ts",
+  "line": 34,
+  "summary": "Cost of the next level of a farm upgrade, given its current level (one entry per resource).",
+  "see": []
+ },
+ {
+  "id": "animaloutput",
+  "name": "animalOutput",
+  "symbol": "animalOutput",
+  "kind": "function",
+  "category": "Economy/Farm",
+  "file": "src/utils/game/farm.ts",
+  "line": 59,
+  "summary": "Output of `count` animals of one kind (every purchase adds one more animal).",
+  "see": []
+ },
+ {
+  "id": "calculatefarmoutput",
+  "name": "calculateFarmOutput",
+  "symbol": "calculateFarmOutput",
+  "kind": "function",
+  "category": "Economy/Farm",
+  "file": "src/utils/game/farm.ts",
+  "line": 79,
+  "summary": "The whole farm's output per second: the sum of {@link animalOutput} over the animal kinds. The merchant's Skinner multiplies meat and hide afterwards ({@link calculateResourceBreakdown}).",
+  "see": []
+ },
+ {
+  "id": "calculatetileoutput",
+  "name": "calculateTileOutput",
+  "symbol": "calculateTileOutput",
+  "kind": "function",
+  "category": "Economy/Income",
+  "file": "src/utils/game/income.ts",
+  "line": 80,
+  "summary": "The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.",
+  "see": []
+ },
+ {
+  "id": "calculateresourcebreakdown",
+  "name": "calculateResourceBreakdown",
+  "symbol": "calculateResourceBreakdown",
+  "kind": "function",
+  "category": "Economy/Income",
+  "file": "src/utils/game/income.ts",
+  "line": 133,
+  "summary": "Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).",
+  "see": [
+   "calculateTileOutput",
+   "castleModifier",
+   "castleAreaBonus",
+   "calculateFarmOutput"
+  ]
+ },
+ {
+  "id": "merchantupgradecost",
+  "name": "merchantUpgradeCost",
+  "symbol": "merchantUpgradeCost",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/utils/game/merchant.ts",
+  "line": 23,
+  "summary": "Gold price of the next level of a merchant upgrade.",
+  "see": []
+ },
+ {
+  "id": "sellpayout",
+  "name": "sellPayout",
+  "symbol": "sellPayout",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/utils/game/merchant.ts",
+  "line": 51,
+  "summary": "Gold for selling `qty` of something worth `unit` each.",
+  "see": [
+   "sellMultiplier (src/utils/game/merchant.ts)"
+  ]
+ },
+ {
+  "id": "buycost",
+  "name": "buyCost",
+  "symbol": "buyCost",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/utils/game/merchant.ts",
+  "line": 61,
+  "summary": "Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this).",
+  "see": []
+ },
+ {
+  "id": "emberupgradecost",
+  "name": "emberUpgradeCost",
+  "symbol": "emberUpgradeCost",
+  "kind": "function",
+  "category": "Progression/Ember shop",
+  "file": "src/utils/game/rebirth.ts",
+  "line": 25,
+  "summary": "Cost in Embers of buying the next level of an upgrade, given its current level.",
+  "see": []
+ },
+ {
+  "id": "emberincomebonus",
+  "name": "emberIncomeBonus",
+  "symbol": "emberIncomeBonus",
+  "kind": "function",
+  "category": "Progression/Rebirth",
+  "file": "src/utils/game/rebirth.ts",
+  "line": 48,
+  "summary": "The income bonus (0.5 = +50 %) that `earned` Embers ever earned give: linear when `incomeExponent` is 1, flatter when it is below 1.",
+  "see": []
+ },
+ {
+  "id": "effectivetilediscount",
+  "name": "effectiveTileDiscount",
+  "symbol": "effectiveTileDiscount",
+  "kind": "function",
+  "category": "Economy/Tiles",
+  "file": "src/utils/game/rebirth.ts",
+  "line": 63,
+  "summary": "Percent off tile cost: Charisma plus Thrift, capped.",
+  "see": []
+ },
+ {
+  "id": "embergain",
+  "name": "emberGain",
+  "symbol": "emberGain",
+  "kind": "function",
+  "category": "Progression/Rebirth",
+  "file": "src/utils/game/rebirth.ts",
+  "line": 91,
+  "summary": "Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.",
+  "see": []
+ },
+ {
+  "id": "rebirthstatus",
+  "name": "rebirthStatus",
+  "symbol": "rebirthStatus",
+  "kind": "function",
+  "category": "Progression/Rebirth",
+  "file": "src/utils/game/rebirth.ts",
+  "line": 122,
+  "summary": "Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store's `rebirth` all read this one function, so what the tooltip promises is what the action checks.",
+  "see": []
+ },
+ {
+  "id": "economytiles",
+  "name": "economyTiles",
+  "symbol": "economyTiles",
+  "kind": "function",
+  "category": "Economy/Tiles",
+  "file": "src/utils/game/tiles.ts",
+  "line": 28,
+  "summary": "Owned-tile count as the economy sees it: purchases + 1 (the old castle-only start). Tile cost, XP per tile, the extra resource costs, the biome picker cadence and the rebirth requirements all use this, so the free starting tiles do not make the first purchases expensive. Pass the state's `freeTiles`.",
+  "see": []
+ },
+ {
+  "id": "coord-limit",
+  "name": "The map (World)",
+  "symbol": "COORD_LIMIT",
+  "kind": "const",
+  "category": "Architecture/State",
+  "file": "src/utils/world.ts",
+  "line": 32,
+  "summary": "The map has no edge. `GameState.tiles` is a `World`: an immutable, sparse set of the **explored** tiles on an integer grid with negative coordinates, stored as `ReadonlyMap<number, Tile>` under a small-integer key (`tileKey(x, y)`, `|x|, |y| <= COORD_LIMIT = 16,000`, at most `MAX_OWNED_TILES = 250,000` tiles). Unexplored land is simply absent (`getTile` gives `undefined`, `tileAt` an empty tile). Updates are copy-on-write (`setTile`, `patchTile`, batched `setTiles`), so `state.tiles` changes exactly when the map does; the owned / building / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).",
+  "see": []
+ },
+ {
+  "id": "checking-live-saves-before-a-release",
+  "name": "Checking live saves before a release",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "scripts/check-live-saves.ts",
+  "line": 1,
+  "summary": "Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT` would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.",
+  "see": []
+ },
+ {
+  "id": "commands-and-documentation-generation",
+  "name": "Commands and documentation generation",
+  "kind": "topic",
+  "category": "Ops/Commands",
+  "file": "scripts/docs-reference.ts",
+  "line": 1,
+  "summary": "Commands. Generated reports go to `docs/generated` and are never edited by hand; the documentation of how the game works is generated from the JSDoc into `docs/reference` (`build`).",
+  "see": []
+ },
+ {
+  "id": "the-pacing-guard-and-ci-sharding",
+  "name": "The pacing guard and CI sharding",
+  "kind": "topic",
+  "category": "Ops/CI",
+  "file": "scripts/pacing-guard.ts",
+  "line": 1,
+  "summary": "The pacing guard, and how CI generates the docs.",
+  "see": []
+ },
+ {
+  "id": "season-restart-reset-players",
+  "name": "Season restart (reset-players)",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "scripts/reset-players.ts",
+  "line": 1,
+  "summary": "Season restart: `npm run reset-players` gives every player a fresh game while keeping who they are. It talks to Supabase with the service role, so it is run by hand from a trusted machine, never from the app. The usage and flags are in the header of the script. Needs `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (environment or `.env.local`); they decide which project is wiped: check them first, and try one account with `--user` before running it for everyone.",
+  "see": [
+   "ensureSeasonReset"
+  ]
+ },
+ {
+  "id": "the-bot-simulation",
+  "name": "The bot simulation",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/sim.ts",
+  "line": 1,
+  "summary": "The sim (`scripts/sim.ts`): a bot drives the **real store** with a seeded RNG and a mocked clock. Profiles: `idle`, `casual`, `hardcore`, `autoclicker` (24 h of perfect play, an upper bound), `human` (one click a second, plays 8-9, 12-13 and 18-23, a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10` (ten runs, used to fit the level anchors). \"finished\" in the milestone table = castle 6 + best click power + the Rebirth territory.",
+  "see": []
+ },
+ {
+  "id": "pacing-targets",
+  "name": "Pacing targets",
+  "kind": "topic",
+  "category": "Pacing/Targets",
+  "file": "scripts/sim.ts",
+  "line": 16,
+  "summary": "What pace the economy is tuned for, why, and how to check it. The measured numbers are **not** copied here: they live in `docs/generated/sim-milestones.md` (`npm run sim`, refreshed by `npm run docs:gen`) and `docs/generated/balance-tables.md`. Open balance questions are in `docs/plan/ROADMAP.md`.",
+  "see": [
+   "MAGNITUDE_BANDS",
+   "CASTLE_UPGRADE"
+  ]
+ },
+ {
+  "id": "magnitude-bands",
+  "name": "MAGNITUDE_BANDS",
+  "symbol": "MAGNITUDE_BANDS",
+  "kind": "const",
+  "category": "Pacing/Magnitude targets",
+  "file": "scripts/sim.ts",
+  "line": 792,
+  "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
+  "see": []
+ },
+ {
+  "id": "test-account-email",
+  "name": "The end-to-end test account",
+  "symbol": "TEST_ACCOUNT_EMAIL",
+  "kind": "const",
+  "category": "Ops/Operator guides",
+  "file": "e2e/account.ts",
+  "line": 23,
+  "summary": "The one account every end-to-end test signs in with (docs/reference/ops.md). The password is never in the repo: the person running the test types it.",
+  "see": []
+ }
+]

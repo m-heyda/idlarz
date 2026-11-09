@@ -19,10 +19,19 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *
  * A save written by any other schema than this game's is refused with a clear message, never half-loaded. When the format changes
  * (a renamed, moved or reinterpreted field, removed content), bump SAVE_SCHEMA; write a migration only if old saves must survive
- * (today they do not: player progress is reset between seasons, see docs/ops/reset-players-cli.md). A new OPTIONAL field needs no bump:
+ * (today they do not: player progress is reset between seasons, see docs/reference/ops.md). A new OPTIONAL field needs no bump:
  * add it to PERSISTED_KEYS and let `sanitizeSave` accept it with a default.
  */
 
+/**
+ * The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters.
+ * The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level, building or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
+ * Not saved: monsters and the open fight (the server's).
+ *
+ * @category Saves & Server/The save
+ * @order 1
+ * @see PERSISTED_KEYS, sanitizeSave
+ */
 export const SAVE_SCHEMA = 7;
 export const SAVE_PREFIX = 'IDLZ2.';
 

@@ -24,6 +24,13 @@ export interface RarityDef {
 	enabled: boolean;
 }
 
+/**
+ * Rarities: everything the game knows about one, in one place: label, colour, glow, how many affixes it rolls, what it is worth and how it ranks. Adding a tier is one row here plus a weight in the loot profiles that should drop it.
+ *
+ * @category Loot/Items
+ * @order 1
+ * @table rarities
+ */
 export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 	common: {
 		id: 'common',

@@ -37,7 +37,7 @@ Cross-references: `../monsters/yoaPlM.png` (right panel) has **small items**: ri
 | **T4 relics** | boss relics (crowns, cores, sigils) | `ArQkEU.jpg` crowns, `4YF8Ye.jpg` crowns (arcane relics: draw new) |
 | Reserved art already in the repo | iron, fish, mana, blue crystal, sapphire, shard, mystery crate | stays as **placeholder T3 icons** until the new set exists |
 
-- **Drops and consumables** (for later, assets only now): **potions** (HP, mana, buffs; use the 48 flasks in `../equip/0tP6Sm.jpg`), **edible items with buffs** (cooked meat, bread, fruit, honey cakes, mushrooms, fish), monster parts (fangs, claws, hearts, eyes, hides), keys, scrolls, trinkets. These are not resources in the registry; they become items ([docs/game/loot.md](../../docs/game/loot.md)) and buff foods later.
+- **Drops and consumables** (for later, assets only now): **potions** (HP, mana, buffs; use the 48 flasks in `../equip/0tP6Sm.jpg`), **edible items with buffs** (cooked meat, bread, fruit, honey cakes, mushrooms, fish), monster parts (fangs, claws, hearts, eyes, hides), keys, scrolls, trinkets. These are not resources in the registry; they become items ([docs/reference/loot.md](../../docs/reference/loot.md)) and buff foods later.
 
 ## 3. What agents should do with it later
 

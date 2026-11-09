@@ -8,9 +8,9 @@ The one place to look when planning the next step. It lists only what is **still
 
 | Topic | Spec | Linear |
 | --- | --- | --- |
-| Magnitude targets (gold/s, income multiplier, Embers, stocks) | [pacing targets](../game/pacing-targets.md) | IDL-128 |
-| Perk families, caps and the legendary roster (11, two pools, Vault, relics) | [loot](../game/loot.md), [28](28-reuse-items-and-stats.md) section 6, [20](20-monster-families-and-rewards.md) | IDL-143..149, 111 |
-| Monster chests (no keys, 2 % per kill) | [loot](../game/loot.md) | IDL-163 |
+| Magnitude targets (gold/s, income multiplier, Embers, stocks) | [pacing targets](../reference/pacing.md) | IDL-128 |
+| Perk families, caps and the legendary roster (11, two pools, Vault, relics) | [loot](../reference/loot.md), [28](28-reuse-items-and-stats.md) section 6, [20](20-monster-families-and-rewards.md) | IDL-143..149, 111 |
+| Monster chests (no keys, 2 % per kill) | [loot](../reference/loot.md) | IDL-163 |
 | Spawn tables per distance band, boss rules, rosters for hills, coast and lake | [20](20-monster-families-and-rewards.md), [12](12-rebirth-biomes.md) | IDL-53, 55, 201 |
 | Five rebirth biomes (names, rosters, tile output rule) | [12](12-rebirth-biomes.md) | IDL-105, 199 |
 | Set bonuses, palettes, accessory themes, new stats, affix tier labels | [28](28-reuse-items-and-stats.md), [art README](../../art_style_reference/equip/README.md) | IDL-39, 23, 164, 176, 45 |
@@ -73,7 +73,7 @@ Release order (confirmed 2026-10-29; the castle timers, the resource registry an
 - **Server-based achievements**: 12 at launch (decided, 600 gems and 4 avatars: [21](21-classes-avatars-achievements-offline-report.md) section 3), then **grind ladders** (lifetime gold 1M / 1B / 1T / 1Q ..., one ladder per resource, tiles placed, monsters killed in total and per type) fed by lifetime counters in a new ledger record; and a **Glossary** generated from the catalogs. **Monsters start unknown (the real sprite in black, no HP or level), unlock on the first fight, reveal a layer every 100 kills, and give permanent mastery bonuses (500 kills: +XP/loot; resources: 1 million unlocks the entry, 1 trillion gives +25 % income of that resource)** ([22](22-glossary-and-mastery.md)). The tutorial ships first, the glossary later ([21](21-classes-avatars-achievements-offline-report.md) sections 3-4).
 - **Offline report rework**: a bar of away time against the cap, a clear "capped, N h earned nothing" state with a Night Watch / Steward hint, also on the landing's Continue card.
 - **Landing**: name **IDLE REALM** (a big IDLE patch in hills tiles), Continue card for signed-in players, password reset on and email confirmation off for now ([16](16-landing-and-play-route.md)).
-  - **Paint the landing scene in the Map lab.** When the landing page is built, compose its background in `/map-lab` ([01 Map lab](../game/architecture.md)): paint the big **IDLE** lettering with the hills biome and surround it with the other biomes (tundra, forest, swamp ...) so the page looks like a real corner of the realm. Export the lab file (JSON) as the source and keep it in the repo, so the strip can be re-baked when the name or the art changes (see the re-bake note in [16](16-landing-and-play-route.md)). The lab already has biome painting, brush size, undo and export; if the lettering needs a straight-line or stamp tool, it is one more function in `lib/mapEdit.ts`. Size S, part of the landing work (release step with [16](16-landing-and-play-route.md)).
+  - **Paint the landing scene in the Map lab.** When the landing page is built, compose its background in `/map-lab` ([01 Map lab](../reference/architecture.md)): paint the big **IDLE** lettering with the hills biome and surround it with the other biomes (tundra, forest, swamp ...) so the page looks like a real corner of the realm. Export the lab file (JSON) as the source and keep it in the repo, so the strip can be re-baked when the name or the art changes (see the re-bake note in [16](16-landing-and-play-route.md)). The lab already has biome painting, brush size, undo and export; if the lettering needs a straight-line or stamp tool, it is one more function in `lib/mapEdit.ts`. Size S, part of the landing work (release step with [16](16-landing-and-play-route.md)).
 
 Cross-cutting rules for all of it: additive save fields only (no `SAVE_SCHEMA` bump), nullable ledger columns applied before the code that reads them, no new per-click server calls, catalogs stay in TypeScript ([14](14-server-audit-and-data-plan.md)).
 
@@ -108,7 +108,7 @@ Notes from reading the code (not measured against the live project):
 
 ## Features and content (in suggested order)
 
-**Small polish and safety nets** (CI and the Playwright smoke test `e2e/smoke.spec.ts` are built: [ops/commands.md](../ops/commands.md))
+**Small polish and safety nets** (CI and the Playwright smoke test `e2e/smoke.spec.ts` are built: [ops/commands.md](../reference/ops.md))
 
 | Item | Size | Acceptance |
 |---|---|---|
@@ -169,7 +169,7 @@ Loose ideas, not scheduled and not sized; each needs a design pass before it ent
 
 > The rework itself is [18](18-biome-buildings-and-material-tiers.md): three buildings per biome (Producer, Extractor, Idol) with timed levels replace the 16 generic ones (`BUILDINGS`, one permanent building per tile). This section keeps only the rules the rework must not break.
 
-**What the first-run pacing fixed in place (do not undo)** - targets are in [pacing targets](../game/pacing-targets.md):
+**What the first-run pacing fixed in place (do not undo)** - targets are in [pacing targets](../reference/pacing.md):
 
 - Rebirth is the first real goal and arrives around day 5-7 (castle 6 plus 400 tiles, +50 per rebirth).
 - **Gold is the tile limiter, never a material.** Any new building or resource that adds a tile cost must pass the sim's "minutes to cover what is missing" check.
@@ -194,19 +194,19 @@ The five T2 materials of the rebirth biomes (Hardwood, Cloth, Honey, Ichor, War 
 
 ## Balance backlog (each needs approval before changing)
 
-Measure with `npm run sim -- --seeds=3`, never from numbers copied into prose: [generated/sim-milestones.md](../generated/sim-milestones.md). Keep the targets of [pacing-targets](../game/pacing-targets.md). How the pacing guard works: [ops/commands.md](../ops/commands.md).
+Measure with `npm run sim -- --seeds=3`, never from numbers copied into prose: [generated/sim-milestones.md](../generated/sim-milestones.md). Keep the targets of [pacing-targets](../reference/pacing.md). How the pacing guard works: [ops/commands.md](../reference/ops.md).
 
 | # | Topic | Observation | Idea |
 | --- | --- | --- | --- |
 | BL1 + BL3 | **Active vs idle gap, and chests and map clicks are small** (decided 2026-11-07, IDL-80) | gold is not the limiter (casual sits on 11-27M unspent gold; casual vs idle is only 4-20 % apart on pacing) | gold click ladder and chest gold stay; chest bundles get a bigger resource share and size (build task IDL-197); the click Idol and ranger passive give resources or chest speed, never gold; target casual 15-25 % faster than idle |
 | BL4 | **Meat/food is the strongest engine** (decided 2026-11-07, IDL-81) | farm is about 60 % of sellable income; `costScaling` +0.10 moves it only to 55 % (food piles up, the pen cap limits the count) | no cost change, no upkeep; the Harvest Scarecrow Idol adds inside the existing farm bracket, hard cap +25 % |
 
-The magnitude targets these rows are checked against are in [pacing targets](../game/pacing-targets.md) (IDL-128).
+The magnitude targets these rows are checked against are in [pacing targets](../reference/pacing.md) (IDL-128).
 
 ## Technical risks
 
 - **Performance on a big map** (`npm run perf`, and synthetic maps in the admin panel): at 50,000 tiles a purchase takes ~16 ms, the income pass ~11 ms, saving 12 ms (75 KB), loading and validating a save ~80 ms, the minimap ~4 ms; the screen mounts ~550 tile elements and ~20 terrain canvases. Panning stays at 60 fps with an occasional 33-60 ms frame while tiles enter the view. Follow-ups if it matters: one lightweight component (or event delegation) for plain explored tiles, incremental income on a purchase, chunk drawing off the main thread (OffscreenCanvas), minimap filters and "go to castle/workshop".
 - **No UI tests**: logic is covered by `npm test`; components are verified manually.
-- **Save compatibility**: an unreadable save falls back to the backup, then to a new game, and the damaged text is kept. A new field is optional (no bump); a renamed or removed one bumps `SAVE_SCHEMA` and older saves are refused (no migrations are kept, see [saves and server](../game/saves-and-server.md)). Between seasons the server data is reset with `npm run reset-players` ([23](../ops/reset-players-cli.md)).
+- **Save compatibility**: an unreadable save falls back to the backup, then to a new game, and the damaged text is kept. A new field is optional (no bump); a renamed or removed one bumps `SAVE_SCHEMA` and older saves are refused (no migrations are kept, see [saves and server](../reference/saves-and-server.md)). Between seasons the server data is reset with `npm run reset-players` ([23](../reference/ops.md)).
 - **Float drift**: resources are doubles capped at 1e21 (`RESOURCE_CAP`). With castle 10 and Ember bonuses the income grows by orders of magnitude, so watch the cap when adding multipliers.
 - **Per-tile store subscriptions**: a `Tile` reads only primitives and is `React.memo`'d; the 10 Hz `set()` that rebuilds `resources` is the remaining cost. Measure before optimising.

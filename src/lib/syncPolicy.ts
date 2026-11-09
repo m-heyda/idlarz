@@ -8,6 +8,10 @@
  *   heartbeat        every 5 min (idle income is rebuilt from the rates on the server, so frequent uploads add nothing)
  *   hiding the tab   uploaded at once, unless an upload was tried in the last 11 s (the server accepts one per 10 s)
  *   failure          30 s, 1 min, 2 min, 5 min, then 5 min; back to normal after a success
+ *
+ * @category Saves & Server/Uploading
+ * @order 1
+ * @table sync-triggers
  */
 export const SYNC = {
 	firstMs: 4000,

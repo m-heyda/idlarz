@@ -110,7 +110,7 @@ export interface CombatState {
 	/** Monsters that beat the player (or ran out the clock) by ticket number: not tried again before this (epoch seconds) */
 	retryAt: Record<string, number>;
 	/** Potions drunk this run by id, and how many of those the last accepted save already knew about */
-	/** Ticket numbers of the monsters waiting to be fought after the open fight, in the order clicked (docs/game/combat.md). Rows from before have none: read it as empty. */
+	/** Ticket numbers of the monsters waiting to be fought after the open fight, in the order clicked (docs/reference/combat.md). Rows from before have none: read it as empty. */
 	queue: number[];
 	/** Number of the last event, and the most recent ones */
 	eventNo: number;

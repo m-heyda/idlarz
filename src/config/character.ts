@@ -36,6 +36,22 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
 //   level 90 around the 5th (6.5e9) and the maximum (100) around the 10th (1.85e10).
 // Between two anchors the step to the next level grows by a constant factor, chosen so the total hits the anchor and the steps never
 // shrink at a join; the first step is `firstStepXp`. Retune the anchors (not the code) when the sim's XP supply changes.
+/**
+ * Character level 1-100 (`maxLevel`). XP is lifetime and **carries over a rebirth**, so the curve is paced over rebirths, not days.
+ *
+ * The curve is written as anchors, the total XP needed to reach a level: 10 -> 1.4e5, 30 -> 1.0e8, 80 -> 3.0e9, 90 -> 6.5e9, 100 -> 1.85e10. The first step (level 1 to 2) is 5,000 XP (`firstStepXp`).
+ * Between two anchors each step is the one before times a constant ratio, solved by bisection so the segment sums to the anchor and steps never shrink at a join ({@link xpToNextLevel}, {@link cumulativeXp}, {@link calculateLevel}).
+ * The soft cap level is 80 (`softCapLevel`, informational). Retune the anchors (not the code) when the sim's XP supply changes.
+ *
+ * XP sources: passive `rates.xp x (1 + XP gain %)`, every tile purchase ({@link calculateXpGain}), and server payouts (kills, chests, away time).
+ *
+ * **Attribute points**: 1 per level, plus 2 extra per level for levels 2-30 (`earlyBonusUntil` 30, `earlyBonusPoints` 2), see {@link totalStatPoints}. There is no paragon level and no +20 points per rebirth in the code.
+ *
+ * @category Progression/Levels
+ * @order 1
+ * @table level-curve-examples
+ * @see xpToNextLevel, totalStatPoints
+ */
 export const LEVELING = {
 	maxLevel: 100,
 	softCapLevel: 80,
@@ -56,6 +72,23 @@ export const LEVELING = {
 export const MAX_LEVEL = LEVELING.maxLevel;
 
 // What each base stat does per point. Used by the maths (utils/game/character.ts) AND by every tooltip/tutorial text.
+/**
+ * Attributes. Five attributes start at 5 (`INITIAL_CHARACTER_STATS`). Resource effects use **all** points; combat effects count the points **above 5** (`STAT_RULES.base`).
+ *
+ * | Attribute | Economy per point | Combat per point (above 5 unless noted) |
+ * | --- | --- | --- |
+ * | Strength | +2.5% stone and coal | +2% damage with physical weapons, +0.25 armor, +1% crit damage |
+ * | Dexterity | +2.5% wood and food | +0.5 armor, +0.25% attack speed, +0.5% crit damage; +0.25% crit chance (all points) |
+ * | Intelligence | +2.5% gold; +0.2% XP production; +0.2% XP gained | +2.4% damage with staves and wands (and Heal), +4 max mana (all points), +0.05 mana/s (all points) |
+ * | Vitality | +2.5% food and wood | +0.5 armor; +3 max HP (all points) |
+ * | Charisma | +2.5% gold and coal; +0.25% XP production; +0.25% XP gained; -0.5% tile cost (max 25%); +1 Luck | +0.5% crit damage; +0.5% crit chance (all points); +0.25 HP (all points) |
+ *
+ * Sources: this config, `STAT_RULES` ({@link COMBAT}), {@link calculateStatResourceModifiers}, {@link calculateCombatStats}. Mana base is 20, so a new character has 40 mana.
+ *
+ * @category Progression/Attributes
+ * @order 1
+ * @see calculateStatResourceModifiers, calculateCombatStats
+ */
 export const CHARACTER_STAT_CONFIG = {
 	// Fraction added to the modifier of each listed resource, per point
 	resourceModifierPerPoint: 0.025,
