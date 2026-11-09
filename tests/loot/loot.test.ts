@@ -89,11 +89,13 @@ test('the King now also rolls one general item of his own (rolled rarity, at the
 	}
 });
 
-test('older rats unlock better material: steel from level 5, obsidian from level 9, the greater potion from level 7', () => {
-	const bases = (level: number) => new Set(eligibleCandidates(LOOT_DATA, 'general_equipment', level).map((c) => ITEM_CATALOG[c.def.id].tier));
-	assert.deepEqual([...bases(1)], [1]);
-	assert.ok(!bases(3).has(2) && bases(5).has(2), 'steel (tier 2) arrives with level 5 rats');
-	assert.ok(!bases(7).has(3) && bases(9).has(3), 'obsidian (tier 3) arrives with level 9 rats');
+test('older rats unlock better material: hide (G2) from item level 9, iron (G3) from 19, the greater potion from level 7', () => {
+	const grades = (level: number) =>
+		new Set(eligibleCandidates(LOOT_DATA, 'general_equipment', level).flatMap((c) => c.def.tags?.filter((t) => t.startsWith('grade:')) ?? []));
+	assert.deepEqual([...grades(1)], ['grade:G1']);
+	assert.ok(!grades(8).has('grade:G2') && grades(9).has('grade:G2'), 'G2 arrives with item level 9');
+	assert.ok(!grades(18).has('grade:G3') && grades(19).has('grade:G3'), 'G3 arrives with item level 19');
+	assert.ok(![...grades(100)].some((g) => g > 'grade:G3'), 'nothing above the live grades (G1-G3) at any level');
 	const seen = (level: number) => {
 		const rng = mulberry32(40 + level);
 		const ids = new Set<string>();

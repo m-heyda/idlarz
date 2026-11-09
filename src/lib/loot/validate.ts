@@ -129,7 +129,7 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 
 		if (!data.profiles[source.lootProfileId]) err(`source ${id}: unknown loot profile ${source.lootProfileId}`);
 	}
 
-	// ---- coverage: every weighted rarity needs an eligible base at every item level the source can produce
+	// ---- coverage: something must be able to drop at every item level the source can produce, and every weighted rarity at some level
 	for (const source of Object.values(data.sources)) {
 		const profile = data.profiles[source.lootProfileId];
 		if (!profile?.enabled || !profile.generalPoolId || !data.pools[profile.generalPoolId]) continue;
@@ -144,15 +144,22 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 
 				levels.add(Math.min(profile.itemLevel.max, Math.max(profile.itemLevel.min, base + d)));
 			}
 		}
+		const weighted = new Set<string>();
+		const reachable = new Set<string>();
 		for (const level of [...levels].sort((a, b) => a - b)) {
 			const candidates = eligibleCandidates(data, profile.generalPoolId, level).filter((c) => c.def.generation === 'base');
 			let any = false;
 			for (const [r, w] of Object.entries(profile.rarityWeights)) {
 				const rarity = data.rarities[r];
 				if (!rarity?.enabled || !(w > 0) || level < (profile.rarityLevelGate?.[r] ?? 1)) continue;
-				const fits = candidates.filter((c) => c.def.allowedRarities?.includes(r));
-				if (fits.length === 0) err(`source ${source.id}: rarity ${r} has weight but no eligible item at item level ${level}`);
-				else any = true;
+				weighted.add(r);
+				const fits = candidates.filter((c) => (c.def.dropRarities ?? c.def.allowedRarities)?.includes(r));
+				// A rarity follows the grade of a base (items/grades.ts), so it may have no base at some levels: it is left out of the roll there.
+				// It is an error only if no level of the source offers it at all.
+				if (fits.length > 0) {
+					any = true;
+					reachable.add(r);
+				}
 				for (const c of fits) {
 					const room = Object.values(data.affixes).filter((a) => affixFits(a, c.def, level, rarity)).length;
 					const groups = new Set(
@@ -168,6 +175,8 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 
 			}
 			if (!any) err(`source ${source.id}: nothing can drop at item level ${level}`);
 		}
+		for (const r of weighted)
+			if (!reachable.has(r)) err(`source ${source.id}: rarity ${r} has weight but no eligible item at any item level the source can reach`);
 	}
 
 	return { errors, warnings: [...new Set(warnings)] };

@@ -9,17 +9,20 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { MONSTERS } from '../src/config/combatConfig';
-import { atItemLevel, fullSet, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import { GRADE_INFO } from '../src/catalog/items/grades';
+import { atItemLevel, fullSet, kit, simulateMany, spentCharacter } from '../src/lib/fightSim';
 import { spawnLevelRange } from '../src/lib/monsters';
 import type { Equipment, MonsterType } from '../src/types/game';
 import { spawnMixLines } from './spawnMix';
 
 const RUNS = 40;
-const LOADOUTS: { name: string; equipment: Equipment }[] = [
+// `minLevel`: a grade kit is never worn below its own item level window (its stats are authored at the window start)
+const LOADOUTS: { name: string; equipment: Equipment; minLevel?: number }[] = [
 	{ name: 'starter', equipment: STARTER_EQUIPMENT },
-	{ name: 'woodland + club', equipment: fullSet('woodland', 'wooden_club') },
-	{ name: 'knight + mace', equipment: fullSet('knight', 'steel_mace') },
-	{ name: 'obsidian + maul', equipment: fullSet('obsidian', 'obsidian_maul') },
+	{ name: 'G1 kit + club', equipment: { ...kit('G1', 'mace') }, minLevel: GRADE_INFO.G1.levels[0] },
+	{ name: 'G2 kit + club', equipment: { ...kit('G2', 'mace') }, minLevel: GRADE_INFO.G2.levels[0] },
+	{ name: 'G3 kit + mace', equipment: { ...kit('G3', 'mace') }, minLevel: GRADE_INFO.G3.levels[0] },
+	{ name: 'obsidian (G6) + maul', equipment: fullSet('obsidian', 'obsidian_maul') },
 	{ name: 'obsidian + titan maul', equipment: fullSet('obsidian', 'titan_maul') },
 ];
 
@@ -80,9 +83,9 @@ for (const type of types) {
 		['grown', Math.min(late.max + 10, def.spawnWindow.cap + 10)],
 	];
 	for (const [label, level] of rows) {
-		const cells = LOADOUTS.map(({ name, equipment }) => {
+		const cells = LOADOUTS.map(({ name, equipment, minLevel = 0 }) => {
 			const r = simulateMany(
-				{ equipment: atItemLevel(equipment, level), monster: { type, level }, character: HERO, level: 30, autoUse: true },
+				{ equipment: atItemLevel(equipment, Math.max(level, minLevel)), monster: { type, level }, character: HERO, level: 30, autoUse: true },
 				RUNS,
 				`ladder-${type}-${level}-${name}`,
 			);

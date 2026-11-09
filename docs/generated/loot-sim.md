@@ -8,37 +8,37 @@ Config validation: 0 errors, 0 warnings.
 
 | Source | Source level | Gear / kill | Common | Uncommon | Rare | Epic | Legendary | Item level p50 / p90 / max | P(epic+ per kill) | Named / kill | Empty-pool warnings |
 |---|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|
-| Monster level 1 | 1 | 0.119 | 76.4% | 23.6% | 0.0% | 0.0% | 0.0% | 1 / 2 / 2 | 0.0% | 0.0000 | 0 |
-| Monster level 5 | 5 | 0.160 | 70.7% | 22.0% | 7.3% | 0.0% | 0.0% | 5 / 6 / 6 | 0.0% | 0.0000 | 0 |
-| Monster level 9 | 9 | 0.201 | 70.2% | 21.6% | 7.1% | 1.1% | 0.0% | 9 / 10 / 10 | 0.2% | 0.0000 | 0 |
-| Monster level 15 | 15 | 0.260 | 70.1% | 21.9% | 6.8% | 1.0% | 0.1% | 15 / 16 / 16 | 0.3% | 0.0000 | 0 |
+| Monster level 1 | 1 | 0.119 | 100.0% | 0.0% | 0.0% | 0.0% | 0.0% | 1 / 2 / 2 | 0.0% | 0.0000 | 0 |
+| Monster level 5 | 5 | 0.160 | 100.0% | 0.0% | 0.0% | 0.0% | 0.0% | 5 / 6 / 6 | 0.0% | 0.0000 | 0 |
+| Monster level 9 | 9 | 0.201 | 84.1% | 15.9% | 0.0% | 0.0% | 0.0% | 9 / 10 / 10 | 0.0% | 0.0000 | 0 |
+| Monster level 15 | 15 | 0.261 | 76.2% | 23.8% | 0.0% | 0.0% | 0.0% | 15 / 16 / 16 | 0.0% | 0.0000 | 0 |
 | Monster level 20 | 20 | 0.310 | 70.0% | 21.7% | 7.1% | 1.1% | 0.2% | 20 / 21 / 21 | 0.4% | 0.0000 | 0 |
-| Boss level 15 | 15 | 1.050 | 19.3% | 28.4% | 28.7% | 14.1% | 9.5% | 15 / 15 / 15 | 23.7% | 0.0498 | 0 |
+| Boss level 15 | 15 | 1.050 | 37.9% | 57.3% | 0.0% | 0.0% | 4.7% | 15 / 15 / 15 | 5.0% | 0.0498 | 0 |
 | Boss level 25 | 25 | 1.050 | 19.3% | 28.4% | 28.7% | 14.1% | 9.5% | 25 / 25 / 25 | 23.7% | 0.0498 | 0 |
 | Boss level 35 | 35 | 1.050 | 19.3% | 28.4% | 28.7% | 14.1% | 9.5% | 35 / 35 / 35 | 23.7% | 0.0498 | 0 |
-| Chest, castle 1 | 4 | 0.825 | 63.6% | 24.9% | 9.2% | 0.0% | 2.3% | 4 / 5 / 5 | 1.9% | 0.0186 | 0 |
-| Chest, castle 5 | 16 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 16 / 17 / 17 | 5.9% | 0.0190 | 0 |
+| Chest, castle 1 | 4 | 0.824 | 97.6% | 0.0% | 0.0% | 0.0% | 2.4% | 4 / 5 / 5 | 2.0% | 0.0198 | 0 |
+| Chest, castle 5 | 16 | 0.823 | 70.4% | 27.3% | 0.0% | 0.0% | 2.2% | 16 / 17 / 17 | 1.8% | 0.0184 | 0 |
 | Chest, castle 10 | 31 | 0.823 | 60.4% | 23.6% | 8.8% | 3.9% | 3.3% | 31 / 32 / 32 | 5.9% | 0.0190 | 0 |
 
 ## Per biome
 
-Normal monsters drop from the source of their biome (`monster_<biome>`, pool `equipment_<biome>`: ladder grades up to the ceiling of the biome, plus the legacy pieces with no grade). Each row is a monster level inside the range of the biome: gear per kill, the grade mix of what dropped (`-` = a piece outside the ladder) and the share of drops per slot kind. Only the live grades (G1-G3) have enabled items, so the ceilings above G3 change nothing yet.
+Normal monsters drop from the source of their biome (`monster_<biome>`, pool `equipment_<biome>`: ladder grades up to the ceiling of the biome; every piece that drops is on the ladder since IDL-243). Each row is a monster level inside the range of the biome: gear per kill, the grade mix of what dropped (`-` = a piece outside the ladder, none today) and the share of drops per slot kind. Only the live grades (G1-G3) have enabled items, so the ceilings above G3 change nothing yet.
 
 | Source | Level | Gear / kill | Grades | Weapon | Off hand | Armor | Accessory |
 |---|---:|---:|---|---:|---:|---:|---:|
-| monster_plains | 1 | 0.119 | - 60.3%, G1 39.7% | 22.8% | 10.7% | 41.8% | 24.7% |
-| monster_plains | 11 | 0.221 | - 68.1%, G2 31.9% | 21.7% | 8.2% | 40.4% | 29.7% |
-| monster_plains | 20 | 0.310 | - 91.8%, G3 8.2% | 24.6% | 7.5% | 40.4% | 27.5% |
-| monster_forest | 4 | 0.150 | - 68.8%, G1 31.2% | 22.7% | 9.7% | 42.7% | 24.9% |
-| monster_forest | 14 | 0.250 | - 68.5%, G2 31.5% | 22.0% | 8.3% | 40.1% | 29.7% |
-| monster_forest | 24 | 0.349 | - 89.7%, G3 10.3% | 28.6% | 7.0% | 38.2% | 26.2% |
-| monster_swamp | 8 | 0.191 | - 72.1%, G1 17.2%, G2 10.6% | 23.3% | 8.7% | 40.9% | 27.2% |
-| monster_swamp | 18 | 0.289 | - 76.4%, G2 21.1%, G3 2.5% | 22.4% | 7.8% | 40.7% | 29.1% |
-| monster_swamp | 28 | 0.389 | - 89.6%, G3 10.4% | 28.3% | 7.0% | 38.6% | 26.1% |
-| monster_tundra | 12 | 0.231 | - 68.1%, G2 31.9% | 21.7% | 8.3% | 40.2% | 29.8% |
-| monster_tundra | 21 | 0.318 | - 90.7%, G3 9.3% | 26.6% | 7.2% | 39.5% | 26.7% |
-| monster_tundra | 30 | 0.408 | - 93.1%, G3 6.9% | 28.0% | 7.0% | 38.9% | 26.0% |
-| monster | 9 | 0.201 | - 71.0%, G1 8.0%, G2 21.1% | 22.6% | 8.6% | 40.3% | 28.5% |
+| monster_plains | 1 | 0.119 | G1 100.0% | 25.6% | 16.8% | 36.7% | 20.9% |
+| monster_plains | 11 | 0.221 | G2 100.0% | 16.5% | 11.7% | 38.2% | 33.6% |
+| monster_plains | 20 | 0.310 | G3 100.0% | 25.0% | 12.7% | 37.7% | 24.6% |
+| monster_forest | 4 | 0.150 | G1 100.0% | 25.0% | 16.6% | 37.3% | 21.1% |
+| monster_forest | 14 | 0.251 | G2 100.0% | 16.5% | 11.3% | 38.2% | 34.1% |
+| monster_forest | 24 | 0.349 | G3 100.0% | 25.1% | 12.6% | 37.8% | 24.5% |
+| monster_swamp | 8 | 0.192 | G1 67.2%, G2 32.8% | 22.0% | 15.2% | 37.1% | 25.6% |
+| monster_swamp | 18 | 0.288 | G2 67.1%, G3 32.9% | 19.0% | 11.5% | 37.9% | 31.5% |
+| monster_swamp | 28 | 0.389 | G3 100.0% | 25.1% | 12.6% | 37.7% | 24.7% |
+| monster_tundra | 12 | 0.231 | G2 100.0% | 16.5% | 11.7% | 38.2% | 33.7% |
+| monster_tundra | 21 | 0.318 | G3 100.0% | 25.0% | 12.7% | 37.6% | 24.7% |
+| monster_tundra | 30 | 0.408 | G3 100.0% | 25.0% | 12.6% | 37.8% | 24.7% |
+| monster | 9 | 0.201 | G1 33.2%, G2 66.8% | 19.4% | 13.3% | 38.1% | 29.2% |
 
 ## What Luck does
 
@@ -46,12 +46,12 @@ A level 9 monster and a castle 5 chest at several Luck totals (Charisma + Lucky 
 
 | Luck | Chest every | Monster gear / kill | Rare+ share of monster gear | Rare+ share of chest gear | Gem find / chest | Gems / chest | Golden monster |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 0 | 10.0 min | 0.201 | 8.2% | 16.0% | 3.0% | 0.59 | 2.0% |
-| 10 | 9.6 min | 0.204 | 8.5% | 16.5% | 3.6% | 0.71 | 2.5% |
-| 30 | 8.9 min | 0.212 | 9.0% | 17.3% | 4.8% | 0.95 | 3.5% |
-| 60 | 8.1 min | 0.224 | 9.7% | 18.5% | 6.6% | 1.32 | 5.0% |
-| 100 | 7.1 min | 0.240 | 10.7% | 20.0% | 9.0% | 1.79 | 7.0% |
-| 200 | 6.0 min | 0.281 | 12.4% | 22.1% | 15.0% | 2.99 | 10.0% |
+| 0 | 10.0 min | 0.201 | 0.0% | 2.2% | 3.0% | 0.59 | 2.0% |
+| 10 | 9.6 min | 0.205 | 0.0% | 2.2% | 3.6% | 0.71 | 2.5% |
+| 30 | 8.9 min | 0.213 | 0.0% | 2.2% | 4.8% | 0.95 | 3.5% |
+| 60 | 8.1 min | 0.224 | 0.0% | 2.1% | 6.6% | 1.32 | 5.0% |
+| 100 | 7.1 min | 0.239 | 0.0% | 2.0% | 9.0% | 1.79 | 7.0% |
+| 200 | 6.0 min | 0.279 | 0.0% | 1.9% | 15.0% | 2.99 | 10.0% |
 
 ## Item power over the level range
 

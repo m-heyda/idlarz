@@ -143,7 +143,7 @@ test('Luck raises the chance of gear from a monster and moves the odds toward ra
 		let gear = 0;
 		let rare = 0;
 		for (let seed = 1; seed <= 4000; seed++) {
-			const result = generateLoot({ sourceId: 'monster', level: 6, luck }, mulberry32(seed));
+			const result = generateLoot({ sourceId: 'monster', level: 22, luck }, mulberry32(seed));
 			for (const drop of result.drops) {
 				if (drop.kind !== 'gear') continue;
 				gear++;

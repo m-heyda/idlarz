@@ -5,7 +5,7 @@ import { STAT_DEFS, baseStat, levelScale, type ItemStatKey, type ItemStats, type
 import { WEAPON_ATTACK_SPEED } from '../weapons';
 import { CLOTH_ITEMS } from './cloth';
 import { gear } from './define';
-import { GRADES, GRADE_INFO, LIVE_GRADES, type Grade } from './grades';
+import { GRADES, GRADE_INFO, LIVE_GRADES, gradeLevels, gradeRarities, type Grade } from './grades';
 import { LEGENDARY_ITEMS } from './legendary';
 import { OBSIDIAN_ITEMS } from './obsidian';
 import { RESERVE_ITEMS } from './reuse';
@@ -229,9 +229,12 @@ const slug = (name: string): string =>
 		.replace(/^_|_$/g, '');
 
 /** Items that exist outside the ladder: a cell whose id is one of these is not generated again, the live item fills it. */
-const existingIds = new Set<string>(
-	[...WOODEN_ITEMS, ...CLOTH_ITEMS, ...STEEL_ITEMS, ...OBSIDIAN_ITEMS, ...LEGENDARY_ITEMS, ...RESERVE_ITEMS].map((def) => def.id),
-);
+const LEGACY_ITEMS = [...WOODEN_ITEMS, ...CLOTH_ITEMS, ...STEEL_ITEMS, ...OBSIDIAN_ITEMS];
+const existingIds = new Set<string>([...LEGACY_ITEMS, ...LEGENDARY_ITEMS, ...RESERVE_ITEMS].map((def) => def.id));
+const legacyIds = new Set<string>(LEGACY_ITEMS.map((def) => def.id));
+
+/** The legacy pieces that fill a ladder cell (IDL-243): id -> the grade and the ladder's numbers for the cell. `gradeLegacyItems` applies them. */
+const MAPPED = new Map<string, { grade: Grade; stats: ItemStats }>();
 
 /** A cell of the ladder: a slot, a weapon type, `shield` or `tome` (normal grades), or a special set's `weapon` and `offHand` */
 export type LadderCell = ArmourSlot | LadderWeapon | 'shield' | 'tome' | 'weapon' | 'offHand';
@@ -249,6 +252,9 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 	const id = slug(name);
 	const obsidian = grade === 'G6' ? OBSIDIAN_CELLS[key] : undefined;
 	LADDER[grade][key] = obsidian ?? id;
+	// a legacy piece that fills the cell keeps its id, name and art; its numbers, grade and level window become the cell's (gradeLegacyItems)
+	const live = obsidian ?? id;
+	if (legacyIds.has(live)) MAPPED.set(live, { grade, stats });
 	if (obsidian || existingIds.has(id) || generated.some((def) => def.id === id)) return;
 	const info = GRADE_INFO[grade];
 	// the Obsidian belt is the only generated piece of the Obsidian set; the other G6 gaps are plain items
@@ -258,7 +264,7 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 	const def = gear(id, name, slot, info.rarities[0], stats, {
 		tier: info.tier,
 		grade,
-		levelWindow: info.levels,
+		levelWindow: gradeLevels(grade),
 		// G1-G3 are live (IDL-220); the rest stay disabled data
 		enabled: LIVE_GRADES.includes(grade),
 		...(iconOf.get(id) ? { icon: iconOf.get(id) as PixelIconName } : {}),
@@ -266,7 +272,7 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 		...(weaponType ? { weaponType } : {}),
 		description: `${info.label} grade, placeholder numbers.`,
 	});
-	generated.push({ ...def, allowedRarities: [...info.rarities] });
+	generated.push({ ...def, allowedRarities: [...gradeRarities(grade)] });
 };
 
 GRADES.forEach((grade, g) => {
@@ -283,6 +289,30 @@ GRADES.forEach((grade, g) => {
 	cell(grade, 'tome', TOME_NAMES[g], 'offHand', scaled(TOME_STATS, index, tier), 'tome');
 	for (const type of WEAPON_TYPES) cell(grade, type, WEAPON_NAMES[type][g], 'mainHand', weaponStats(type, index, tier), type);
 });
+
+/**
+ * Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece:
+ *  - a piece that fills a ladder cell (Wooden Club, Hunting Bow, Acorn Charm, Iron Sword, the six Steel armour pieces, the Obsidian
+ *    family) keeps its id, name, art, set and the validity window of the pieces already owned, and takes the cell's grade tag and the
+ *    grade's drop window and rarities (`dropLevels`, `dropRarities`); it is enabled with the rest of its grade (`LIVE_GRADES`), so Steel (G4) and Obsidian (G6) are on the ladder but not dropped yet;
+ *  - every other legacy piece (cloth, the rest of wood and steel, the starter sword and shield) is retired: `enabled: false`, the id stays
+ *    so owned pieces load and work. The starter sword and shield are still what a new hero wears (catalog STARTER_EQUIPMENT_IDS).
+ */
+export const gradeLegacyItems = (defs: ItemDef[]): ItemDef[] =>
+	defs.map((def) => {
+		const mapped = MAPPED.get(def.id);
+		if (!mapped) return { ...def, enabled: false };
+		const { grade } = mapped;
+		return {
+			...def,
+			tier: GRADE_INFO[grade].tier,
+			tags: [...(def.tags ?? []), `grade:${grade}`],
+			// what it is generated at is the grade's; what a piece already owned may be (minItemLevel .. maxItemLevel, allowedRarities) stays, so no save breaks
+			dropLevels: gradeLevels(grade),
+			dropRarities: gradeRarities(grade),
+			enabled: LIVE_GRADES.includes(grade),
+		};
+	});
 
 /** The generated ladder items, enabled for the live grades (G1-G3) and `enabled: false` above. Live items that fill a cell (Iron Sword, Emberbrand, the Steel pieces, the Obsidian family) are not repeated. */
 export const LADDER_ITEMS: ItemDef[] = generated;

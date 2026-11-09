@@ -80,18 +80,18 @@ test('a weak source never drops items above its level cap', () => {
 });
 
 test('rarity is rolled independently of the drop chance and follows the normalised weights', () => {
-	// Rat level 1: item level 1-2, so only common (70) and uncommon (22) pass the level gates
+	// Rat level 11: item level 10-12, grade G2, which carries common (70) and uncommon (22) only
 	const rng = mulberry32(11);
 	const counts: Record<string, number> = {};
 	let total = 0;
 	for (let i = 0; i < 60000; i++) {
-		for (const item of gear(generateLoot({ sourceId: 'monster', level: 1 }, rng).drops)) {
+		for (const item of gear(generateLoot({ sourceId: 'monster', level: 11 }, rng).drops)) {
 			counts[item.rarity] = (counts[item.rarity] ?? 0) + 1;
 			total++;
 		}
 	}
-	// drop chance 0.12 per kill
-	assert.ok(Math.abs(total / 60000 - 0.12) < 0.01, `drops per kill ${total / 60000}`);
+	// drop chance 0.12 + 0.01 per level above 1
+	assert.ok(Math.abs(total / 60000 - 0.22) < 0.01, `drops per kill ${total / 60000}`);
 	assert.ok(Math.abs(counts.common / total - 70 / 92) < 0.03, `common ${counts.common / total}`);
 	assert.ok(Math.abs(counts.uncommon / total - 22 / 92) < 0.03);
 	assert.equal(counts.rare ?? 0, 0);

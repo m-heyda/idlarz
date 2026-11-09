@@ -1,5 +1,6 @@
 import type { EquipmentRarity } from '@/types/game';
 import { MAX_ITEM_LEVEL } from '../stats';
+import { RARITY_ORDER } from '../rarity';
 
 // The grade ladder's grades and what each one is (split out of ladder.ts so reuse.ts can read the windows without an import cycle).
 
@@ -35,7 +36,8 @@ export const GRADE_INFO: Record<Grade, GradeInfo> = {
 };
 
 /**
- * The grades whose items are enabled and so drop (IDL-220, IDL-224): the early game, G1-G3. G4 and up stay disabled data until the
+ * The grades whose items are enabled and so drop (IDL-220, IDL-224, IDL-243): the early game, G1-G3. G4 and up (the legacy Steel armour at G4 and
+ * the Obsidian family at G6 included) stay disabled data until the
  * biomes that hand them out exist. Enabling the next grade is adding it here; the loot pools select by the `grade:` tag, never by id.
  */
 export const LIVE_GRADES: readonly Grade[] = ['G1', 'G2', 'G3'];
@@ -52,3 +54,24 @@ export const gradeAllowed = (item: { tags?: readonly string[] }, maxGrade: Grade
 	const grade = gradeOfItem(item);
 	return !grade || GRADES.indexOf(grade) <= GRADES.indexOf(maxGrade);
 };
+
+/** The highest grade that is live: while the next one is dark, nothing may be left without an item above it (see `gradeLevels`) */
+const topLive = (): Grade => LIVE_GRADES.reduce((top, g) => (GRADES.indexOf(g) > GRADES.indexOf(top) ? g : top), LIVE_GRADES[0]);
+
+/**
+ * The item level window an item of this grade is generated in. It is the grade's own window (`GRADE_INFO`), except for the highest
+ * live grade, which stays open at the top until the next grade goes live: bosses (levels 15-45), chests and the shelf reach item
+ * levels past G3's 30 today, and with the legacy Steel and Obsidian gone from the pool they would have nothing to drop (IDL-243).
+ * Enabling the next grade (adding it to `LIVE_GRADES`) closes the window of the one below by itself.
+ */
+export const gradeLevels = (grade: Grade): readonly [number, number] => {
+	const [min, max] = GRADE_INFO[grade].levels;
+	return grade === topLive() ? [min, MAX_ITEM_LEVEL] : [min, max];
+};
+
+/**
+ * The rarities an item of this grade may roll as: the grade's own (`GRADE_INFO`), except for the highest live grade, which takes every
+ * rarity until a grade that carries the others is live (today the loot profiles roll common to legendary at item levels 19 and up, and a
+ * rolled rarity must find a base). Enabling the next grade narrows the one below to its own rarities by itself.
+ */
+export const gradeRarities = (grade: Grade): readonly EquipmentRarity[] => (grade === topLive() ? RARITY_ORDER : GRADE_INFO[grade].rarities);

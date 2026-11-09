@@ -40,10 +40,11 @@ const LEVEL_WINDOW_BY_TIER: Record<number, readonly [number, number]> = {
 };
 
 /**
- * Pool weight of a main-hand base against 10 for every other slot. Ten weapon types now have bases in each grade, which would lift
- * weapons from about a quarter of the gear drops to about a third (IDL-220); 7 keeps the weapon share near where it was.
+ * Pool weight of a main-hand base against 10 for every other slot. Ten weapon types have bases in each grade, which lifts weapons from
+ * about a quarter of the gear drops to about a third (IDL-220: 7 with the legacy gear still in the pool). With the legacy wood, cloth, steel
+ * and Obsidian pieces off the ladder (IDL-243) only the grades fill the pool, and 4 keeps the weapon share at 23-25 %.
  */
-const WEAPON_POOL_WEIGHT = 7;
+const WEAPON_POOL_WEIGHT = 4;
 
 /** What affixes and pools match an item by: its category, slot, weapon type, set (or plain family) and ladder grade. */
 const tagsFor = (
