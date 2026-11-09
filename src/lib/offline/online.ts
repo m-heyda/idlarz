@@ -190,7 +190,11 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 	});
 
 /** A crafting request: queue (or do) crafts of a recipe, or claim / cancel a running batch by its slot. */
-export type CraftRequest = { action?: 'craft'; recipeId: string; count: number } | { action: 'claim'; slot: number | 'all' } | { action: 'cancel'; slot: number } | { action: 'withdraw'; id: string; qty: number };
+export type CraftRequest =
+	| { action?: 'craft'; recipeId: string; count: number }
+	| { action: 'claim'; slot: number | 'all' }
+	| { action: 'cancel'; slot: number }
+	| { action: 'withdraw'; id: string; qty: number };
 
 /**
  * One crafting request (docs/plan/crafting-v0.md): `count` crafts of a recipe are queued as a timed batch (a recipe without a time is done at

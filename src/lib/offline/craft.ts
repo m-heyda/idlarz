@@ -202,7 +202,9 @@ export const applyWithdraw = (inv: Inventory, craft: CraftState, id: string, qty
 
 /** Parses the body of /api/craft/stash: what to withdraw and how many (null: not one). */
 export const parseWithdraw = (raw: Record<string, unknown>): { id: string; qty: number } | null =>
-	typeof raw.id === 'string' && raw.id.length <= 40 && typeof raw.qty === 'number' && Number.isInteger(raw.qty) && raw.qty >= 1 ? { id: raw.id, qty: raw.qty } : null;
+	typeof raw.id === 'string' && raw.id.length <= 40 && typeof raw.qty === 'number' && Number.isInteger(raw.qty) && raw.qty >= 1
+		? { id: raw.id, qty: raw.qty }
+		: null;
 
 /** Parses the body of /api/craft/claim: a batch slot (default 0) or 'all' (Collect all). */
 export const parseClaimSlot = (raw: Record<string, unknown>): { slot: number | 'all' } | null => (raw.slot === 'all' ? { slot: 'all' } : parseSlot(raw));
