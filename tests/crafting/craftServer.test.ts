@@ -275,3 +275,30 @@ test('claiming twice with the same key delivers once; cancelling refunds the unf
 	assert.deepEqual(again, c);
 	assert.equal((await claim(p, 70 * SEC)).reason, 'no_batch');
 });
+
+test('a trade good is level-gated, takes its components when queued, and lands in the bag as a stack when claimed', () => {
+	const inv = { ver: 1, bag: Array.from({ length: 36 }, () => null), equipment: {}, lootPity: {}, autoSellUpTo: null } as unknown as Parameters<
+		typeof applyCraft
+	>[0];
+	const satchel = RECIPE_BY_ID.leather_satchel;
+	const rich: CraftState = { ...emptyCraft(), xp: craftCumulativeXp(satchel.unlock), stock: { cured_leather: 7 } };
+
+	assert.equal(applyCraft(inv, { ...rich, xp: 0 }, 'leather_satchel', 1, T0).reason, 'locked');
+	assert.equal(applyCraft(inv, { ...rich, stock: { cured_leather: 2 } }, 'leather_satchel', 1, T0).reason, 'no_components');
+
+	const queued = applyCraft(inv, rich, 'leather_satchel', 2, T0);
+	assert.equal(queued.ok, true);
+	assert.equal(queued.craft.stock.cured_leather, 1, '2 satchels take 6 of 7 pieces of cured leather');
+	assert.equal(bagCountOf(queued.inv, 'leather_satchel'), 0, 'nothing in the bag before the claim');
+
+	const claimed = applyClaim(queued.inv, queued.craft, 0, T0 + 2 * satchel.timeSec! * SEC + SEC);
+	assert.equal(claimed.crafted, 2);
+	assert.equal(bagCountOf(claimed.inv, 'leather_satchel'), 2);
+	assert.equal(claimed.craft.xp, rich.xp + 2 * satchel.xp);
+
+	let bag = inv.bag;
+	for (let i = 0; i < 36; i++) bag = addDrop(bag, { kind: 'gear', item: plainItem('iron_sword') }).bag as typeof bag;
+	const full = { ...inv, bag };
+	const stuck = applyClaim(full, queued.craft, 0, T0 + 2 * satchel.timeSec! * SEC + SEC);
+	assert.equal(stuck.reason, 'bag_full');
+});

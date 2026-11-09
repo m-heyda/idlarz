@@ -77,6 +77,43 @@ for (const r of timed) {
 	);
 }
 out();
+out('## Trade goods income');
+out();
+out(
+	'Gold from selling crafted trade goods (IDL-227) against the gold per second of the sim profiles. A good sells for at most 1.4x its inputs, and a queue only makes so many per hour, so goods stay a small side income: the gate is at most `GOODS_SHARE_MAX` of income. Income is the lowest gold per second a profile is expected to have at castle 10 (`MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/sim.ts), which is the most favourable case for the goods; gold from selling the goods is counted gross (the raw inputs would also have sold).',
+);
+out();
+const goods = RECIPES.filter((r) => r.kind === 'good');
+const queues = [
+	{ label: 'base limits (1 queue, speed 1)', slots: craftLimit('craftQueueSlots'), speed: craftLimit('craftSpeed') },
+	{ label: 'hard ceilings (5 queues, speed 4)', slots: HARD_LIMITS.craftQueueSlots, speed: HARD_LIMITS.craftSpeed },
+];
+out('| Good | Unlock | Inputs | Input value | Sell value | Sell / input | Gold / hour in one queue |');
+out('|---|---:|---|---:|---:|---:|---:|');
+let bestGood = 0;
+for (const r of goods) {
+	const cost = recipeCostGold(r) / r.output.qty;
+	const sell = ITEM_CATALOG[(r.output as { item: string }).item].sellValue;
+	const perHour = (3600 / craftTimeSec(r)) * r.output.qty * sell;
+	bestGood = Math.max(bestGood, perHour);
+	out(`| ${r.name} | ${r.unlock} | ${inputText(r)} | ${g(cost)} | ${sell} | ${(sell / cost).toFixed(2)} | ${Math.round(perHour).toLocaleString('en')} |`);
+}
+out();
+const GOODS_SHARE_MAX = 0.1;
+const INCOME_GPS = 3000;
+out('| Queues | Best good, gold / hour | Gold / second | Share of income (castle 10, 3,000 gold/s) | Gate |');
+out('|---|---:|---:|---:|---|');
+let gateFailed = false;
+for (const q of queues) {
+	const perHour = bestGood * q.slots * q.speed;
+	const share = perHour / 3600 / INCOME_GPS;
+	const pass = share <= GOODS_SHARE_MAX;
+	gateFailed ||= !pass;
+	out(
+		`| ${q.label} | ${Math.round(perHour).toLocaleString('en')} | ${g(perHour / 3600)} | ${(share * 100).toFixed(1)}% | ${pass ? 'ok' : `**over ${GOODS_SHARE_MAX * 100}%**`} |`,
+	);
+}
+out();
 out('## Hours per level');
 out();
 out(

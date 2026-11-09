@@ -53,7 +53,7 @@ export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, 
 	const recipe = recipeOf(recipeId);
 	if (!Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return refuse('bad_request', inv, craft);
 	if (!recipe) return refuse('unknown_recipe', inv, craft);
-	if (recipe.kind !== 'potion' && recipe.kind !== 'component') return refuse('not_craftable', inv, craft);
+	if (recipe.kind === 'gear') return refuse('not_craftable', inv, craft);
 	if (craftLevelOf(craft.xp).level < recipe.unlock) return refuse('locked', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
 
@@ -125,7 +125,7 @@ export const applyClaim = (inv: Inventory, craft: CraftState, slot: number, nowM
 	if (finishedOf(entry, nowMs) < 1) return refuse('nothing_ready', inv, craft);
 	const done = deliver(inv, craft, slot, nowMs);
 	if (!done) return refuse('no_batch', inv, craft);
-	if (done.n < 1) return refuse(recipeOf(entry.recipeId)!.kind === 'potion' ? 'bag_full' : 'stock_full', inv, craft);
+	if (done.n < 1) return refuse('item' in recipeOf(entry.recipeId)!.output ? 'bag_full' : 'stock_full', inv, craft);
 	return { ok: true, crafted: done.n, inv: done.inv, craft: { ...done.craft, last: nowMs } };
 };
 

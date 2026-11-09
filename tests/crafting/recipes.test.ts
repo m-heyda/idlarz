@@ -21,15 +21,40 @@ test('recipe ids are unique and every input and output exists', () => {
 	}
 });
 
-test('v0.0 uses potion and component recipes only; potions make stackable consumables, components make components', () => {
+test('v0.1 uses potion, component and good recipes; potions are stackable consumables, goods are stacks with no effect, components stay in the stock', () => {
 	for (const r of RECIPES) {
-		assert.ok(r.kind === 'potion' || r.kind === 'component', r.id);
-		if (r.kind === 'potion') {
-			assert.ok('item' in r.output);
-			const def = ITEM_CATALOG[(r.output as { item: string }).item];
-			assert.equal(def.kind, 'consumable');
-			assert.ok((def.stackMax ?? 1) > 1);
-		} else assert.ok('component' in r.output);
+		assert.ok(r.kind === 'potion' || r.kind === 'component' || r.kind === 'good', r.id);
+		if (r.kind === 'component') {
+			assert.ok('component' in r.output);
+			continue;
+		}
+		assert.ok('item' in r.output);
+		const def = ITEM_CATALOG[(r.output as { item: string }).item];
+		assert.equal(def.kind, 'consumable');
+		assert.ok((def.stackMax ?? 1) > 1);
+		if (r.kind === 'potion') assert.ok(def.consumable?.healHp);
+		else assert.equal(def.consumable, undefined, `${r.id}: a trade good has no effect`);
+	}
+});
+
+test('trade goods sell for at most 1.4x their inputs at merchant prices (and never below them), unlock by crafting level, and nothing drops them', () => {
+	const goods = RECIPES.filter((r) => r.kind === 'good');
+	assert.ok(goods.length >= 4);
+	for (const r of goods) {
+		const def = ITEM_CATALOG[(r.output as { item: string }).item];
+		const cost = recipeCostGold(r) / r.output.qty;
+		assert.ok(def.sellValue <= 1.4 * cost, `${r.id}: sells for ${def.sellValue}, inputs are worth ${cost}`);
+		assert.ok(def.sellValue >= cost, `${r.id}: sells for less (${def.sellValue}) than its inputs (${cost})`);
+		assert.equal(def.shop, undefined, `${r.id} is not sold by the merchant`);
+		assert.equal(def.pools, undefined, `${r.id} is in no loot pool`);
+		assert.ok(r.unlock >= 2, `${r.id} unlocks by crafting level`);
+	}
+	assert.ok(new Set(goods.map((r) => r.unlock)).size > 1, 'goods do not all unlock at once');
+});
+
+test('every component has exactly one recipe that makes it, and every component is used or is a gear input to come', () => {
+	for (const id of Object.keys(COMPONENTS)) {
+		assert.equal(RECIPES.filter((r) => 'component' in r.output && r.output.component === id).length, 1, id);
 	}
 });
 

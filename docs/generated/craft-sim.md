@@ -11,24 +11,30 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Glass Vial | component | 1 | 10 Stone + 5 Coal | 14.5 | - | - | - | 2 | 7.3 |
 | Minor Healing Potion | potion | 1 | 40 Food + 1 Glass Vial | 30.5 | 20 | 80 | 38% | 6 | 5.1 |
 | Greater Healing Potion | potion | 5 | 150 Food + 60 Coal + 1 Glass Vial | 140.5 | 90 | 360 | 39% | 25 | 5.6 |
+| Cured Leather | component | 3 | 5 Hide + 3 Coal | 13.3 | - | - | - | 3 | 4.4 |
+| Plank Bundle | component | 4 | 12 Wood + 6 Stone | 14.4 | - | - | - | 3 | 4.8 |
+| Preserved Rations | good | 2 | 20 Meat + 40 Food | 36 | 46 | - | - | 5 | 7.2 |
+| Honey Cake | good | 4 | 6 Eggs + 4 Milk + 30 Food | 36 | 46 | - | - | 7 | 5.1 |
+| Leather Satchel | good | 6 | 3 Cured Leather | 39.9 | 52 | - | - | 12 | 3.3 |
+| Carved Trinket | good | 8 | 40 Wood + 20 Stone | 48 | 62 | - | - | 18 | 2.7 |
 
 ## Crafting level
 
 Total crafting XP to reach a level, and how many crafts of the cheapest XP-per-gold recipe that is.
 
-Reference recipe: Minor Healing Potion (5.1 gold per XP).
+Reference recipe: Carved Trinket (2.7 gold per XP).
 
 | Level | Total XP | Crafts of the reference recipe | Gold value of the inputs |
 |---:|---:|---:|---:|
-| 2 | 20 | 4 | 122 |
-| 5 | 271 | 46 | 1,403 |
-| 10 | 7,496 | 1,250 | 38,125 |
-| 20 | 65,862 | 10,977 | 334,799 |
-| 30 | 199,985 | 33,331 | 1,016,596 |
-| 45 | 969,014 | 161,503 | 4,925,842 |
-| 60 | 4,999,968 | 833,328 | 25,416,504 |
-| 80 | 29,999,957 | 4,999,993 | 152,499,787 |
-| 100 | 29,999,957 | 4,999,993 | 152,499,787 |
+| 2 | 20 | 2 | 96 |
+| 5 | 271 | 16 | 768 |
+| 10 | 7,496 | 417 | 20,016 |
+| 20 | 65,862 | 3,659 | 175,632 |
+| 30 | 199,985 | 11,111 | 533,328 |
+| 45 | 969,014 | 53,835 | 2,584,080 |
+| 60 | 4,999,968 | 277,776 | 13,333,248 |
+| 80 | 29,999,957 | 1,666,665 | 79,999,920 |
+| 100 | 29,999,957 | 1,666,665 | 79,999,920 |
 
 Maximum level 80; at most 10 crafts per batch (hard ceiling 1000).
 
@@ -41,6 +47,28 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Glass Vial | 10 | 360 | 720 | 5,220 | 1.7 | 2.8 |
 | Minor Healing Potion | 14 | 257 | 1,543 | 7,843 | 2.3 | 3.9 |
 | Greater Healing Potion | 30 | 120 | 3,000 | 16,860 | 5 | 8.3 |
+| Cured Leather | 12 | 300 | 900 | 3,990 | 2 | 3.3 |
+| Plank Bundle | 12 | 300 | 900 | 4,320 | 2 | 3.3 |
+| Preserved Rations | 15 | 240 | 1,200 | 8,640 | 2.5 | 4.2 |
+| Honey Cake | 20 | 180 | 1,260 | 6,480 | 3.3 | 5.6 |
+| Leather Satchel | 30 | 120 | 1,440 | 4,788 | 5 | 8.3 |
+| Carved Trinket | 30 | 120 | 2,160 | 5,760 | 5 | 8.3 |
+
+## Trade goods income
+
+Gold from selling crafted trade goods (IDL-227) against the gold per second of the sim profiles. A good sells for at most 1.4x its inputs, and a queue only makes so many per hour, so goods stay a small side income: the gate is at most `GOODS_SHARE_MAX` of income. Income is the lowest gold per second a profile is expected to have at castle 10 (`MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/sim.ts), which is the most favourable case for the goods; gold from selling the goods is counted gross (the raw inputs would also have sold).
+
+| Good | Unlock | Inputs | Input value | Sell value | Sell / input | Gold / hour in one queue |
+|---|---:|---|---:|---:|---:|---:|
+| Preserved Rations | 2 | 20 Meat + 40 Food | 36 | 46 | 1.28 | 11,040 |
+| Honey Cake | 4 | 6 Eggs + 4 Milk + 30 Food | 36 | 46 | 1.28 | 8,280 |
+| Leather Satchel | 6 | 3 Cured Leather | 39.9 | 52 | 1.30 | 6,240 |
+| Carved Trinket | 8 | 40 Wood + 20 Stone | 48 | 62 | 1.29 | 7,440 |
+
+| Queues | Best good, gold / hour | Gold / second | Share of income (castle 10, 3,000 gold/s) | Gate |
+|---|---:|---:|---:|---|
+| base limits (1 queue, speed 1) | 11,040 | 3.1 | 0.1% | ok |
+| hard ceilings (5 queues, speed 4) | 220,800 | 61.3 | 2.0% | ok |
 
 ## Hours per level
 

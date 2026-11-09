@@ -162,6 +162,17 @@
   "see": []
  },
  {
+  "id": "trade-goods",
+  "name": "TRADE_GOODS",
+  "symbol": "TRADE_GOODS",
+  "kind": "const",
+  "category": "Economy/Crafting",
+  "file": "src/catalog/recipes.ts",
+  "line": 34,
+  "summary": "The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot pools, so nothing drops them. The value is set against the input value at merchant prices (`recipeCostGold`): at most 1.4x, so crafting a good pays a little better than selling its raw inputs and never turns into the main income (tests/crafting/recipes.test.ts, `npm run craft-sim`).",
+  "see": []
+ },
+ {
   "id": "skills",
   "name": "SKILLS",
   "symbol": "SKILLS",

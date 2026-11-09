@@ -16,6 +16,7 @@ Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`bestWornGrade`](#bestworngrade)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`luckyRatChance`](#luckyratchance)
+- Crafting: [`TRADE_GOODS`](#trade-goods)
 
 ## Basics
 
@@ -976,3 +977,15 @@ Chance (0-1) that a newly arrived rat is a lucky one.
 ```text
 golden monster chance = min(10%, 2% + 0.05% x Luck)
 ```
+
+## Crafting
+
+<a id="trade-goods"></a>
+
+### `TRADE_GOODS` <small>const</small>
+
+Source: [`src/catalog/recipes.ts:34`](../../src/catalog/recipes.ts)
+
+The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot
+pools, so nothing drops them. The value is set against the input value at merchant prices (`recipeCostGold`): at most 1.4x, so crafting a good pays a little
+better than selling its raw inputs and never turns into the main income (tests/crafting/recipes.test.ts, `npm run craft-sim`).
