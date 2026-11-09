@@ -6,6 +6,7 @@ import { readCursor, setCursorUser } from '@/lib/combatCursor';
 import { requestSync } from '@/lib/rewardsClient';
 import { runOfflineClaim } from '@/lib/offlineFlow';
 import { setNeedClaimHandler } from '@/lib/serverSession';
+import { currentCloudSaver } from '@/lib/manualCloudSave';
 
 const MIN_WAIT_SEC = 20;
 const MAX_WAIT_SEC = 600;
@@ -51,8 +52,13 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 				} else if (reply.status === 'need_claim') {
 					await runOfflineClaim(userId, true);
 					schedule(3);
+				} else if (reply.status === 'no_save') {
+					// the account has no cloud save, so nothing can spawn: upload now instead of waiting for the next scheduled save, then ask again
+					const saver = currentCloudSaver();
+					if (saver) await saver.run();
+					schedule(saver ? 5 : RETRY_SEC);
 				} else {
-					schedule(RETRY_SEC); // no cloud save yet, the server is not set up, or an outage: nothing to run until it is back
+					schedule(RETRY_SEC); // the server is not set up, or an outage: nothing to run until it is back
 				}
 			} finally {
 				running = false;
