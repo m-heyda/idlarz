@@ -12721,32 +12721,11 @@
 		"src": "/pixel/assets_to_assess_and_use/bushes_map_details_mostly/Assets_source.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/bushes_map_details_mostly",
-		"size": [
-			432,
-			112
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "bush_sheet_assets_texture_shadow_dark_source",
-		"category": "map-details",
-		"subcategory": "bushes (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/bushes_map_details_mostly/Assets_texture_shadow_dark_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/bushes_map_details_mostly",
-		"size": [
-			432,
-			112
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "bush_sheet_assets_texture_shadow_source",
-		"category": "map-details",
-		"subcategory": "bushes (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/bushes_map_details_mostly/Assets_texture_shadow_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/bushes_map_details_mostly",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/bushes_map_details_mostly/Assets_source.png",
+			"texture": "/pixel/assets_to_assess_and_use/bushes_map_details_mostly/Assets_texture_shadow_source.png",
+			"texture-dark": "/pixel/assets_to_assess_and_use/bushes_map_details_mostly/Assets_texture_shadow_dark_source.png"
+		},
 		"size": [
 			432,
 			112
@@ -14177,6 +14156,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Beige_green_mushroom1.png"
+		},
 		"size": [
 			64,
 			64
@@ -14190,6 +14173,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Beige_green_mushroom2.png"
+		},
 		"size": [
 			64,
 			64
@@ -14203,6 +14190,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Beige_green_mushroom3.png"
+		},
 		"size": [
 			32,
 			32
@@ -14216,6 +14207,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Blue-green_balls_tree1.png"
+		},
 		"size": [
 			64,
 			64
@@ -14229,6 +14224,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Blue-green_balls_tree2.png"
+		},
 		"size": [
 			64,
 			64
@@ -14242,6 +14241,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Blue-green_balls_tree3.png"
+		},
 		"size": [
 			32,
 			32
@@ -14255,6 +14258,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Chanterelles1.png"
+		},
 		"size": [
 			32,
 			32
@@ -14268,6 +14275,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Chanterelles2.png"
+		},
 		"size": [
 			32,
 			32
@@ -14281,6 +14292,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Chanterelles3.png"
+		},
 		"size": [
 			32,
 			32
@@ -14294,6 +14309,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Curved_tree1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14307,6 +14326,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Curved_tree2.png"
+		},
 		"size": [
 			128,
 			128
@@ -14320,6 +14343,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Curved_tree3.png"
+		},
 		"size": [
 			64,
 			64
@@ -14333,6 +14360,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_man.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_man.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Ent_man.png"
+		},
 		"size": [
 			128,
 			128
@@ -14346,6 +14377,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_woman.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_woman.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Ent_woman.png"
+		},
 		"size": [
 			128,
 			128
@@ -14359,6 +14394,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Light_balls_tree1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14372,6 +14411,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Light_balls_tree2.png"
+		},
 		"size": [
 			128,
 			128
@@ -14385,6 +14428,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Light_balls_tree3.png"
+		},
 		"size": [
 			64,
 			64
@@ -14398,6 +14445,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Living gazebo1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14411,6 +14462,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Living gazebo2.png"
+		},
 		"size": [
 			128,
 			128
@@ -14424,6 +14479,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14437,6 +14496,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree2.png"
+		},
 		"size": [
 			128,
 			128
@@ -14450,6 +14513,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree3.png"
+		},
 		"size": [
 			64,
 			64
@@ -14463,6 +14530,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree4.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree4.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree4.png"
+		},
 		"size": [
 			64,
 			64
@@ -14476,6 +14547,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Mega_tree1.png"
+		},
 		"size": [
 			256,
 			256
@@ -14489,6 +14564,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Mega_tree2.png"
+		},
 		"size": [
 			128,
 			128
@@ -14502,6 +14581,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Swirling tree1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14515,6 +14598,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Swirling tree2.png"
+		},
 		"size": [
 			128,
 			128
@@ -14528,6 +14615,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Swirling tree3.png"
+		},
 		"size": [
 			64,
 			64
@@ -14541,6 +14632,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_deer.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_deer.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_deer.png"
+		},
 		"size": [
 			128,
 			128
@@ -14554,6 +14649,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_dragon.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_dragon.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_dragon.png"
+		},
 		"size": [
 			256,
 			256
@@ -14567,6 +14666,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_human.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_human.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_human.png"
+		},
 		"size": [
 			128,
 			128
@@ -14580,6 +14683,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_wolf.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_wolf.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_wolf.png"
+		},
 		"size": [
 			128,
 			128
@@ -14593,6 +14700,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White-red_mushroom1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14606,6 +14717,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White-red_mushroom2.png"
+		},
 		"size": [
 			64,
 			64
@@ -14619,6 +14734,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White-red_mushroom3.png"
+		},
 		"size": [
 			64,
 			64
@@ -14632,6 +14751,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White_tree1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14645,6 +14768,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White_tree2.png"
+		},
 		"size": [
 			64,
 			64
@@ -14658,6 +14785,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow1.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow1.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Willow1.png"
+		},
 		"size": [
 			128,
 			128
@@ -14671,6 +14802,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow2.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow2.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Willow2.png"
+		},
 		"size": [
 			128,
 			128
@@ -14684,6 +14819,10 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow3.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/misc_map_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Willow3.png"
+		},
 		"size": [
 			64,
 			64
@@ -15508,32 +15647,11 @@
 		"src": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_source.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc",
-		"size": [
-			640,
-			144
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "mineral_sheet_assets_texture_shadow_dark_source",
-		"category": "map-details",
-		"subcategory": "minerals (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_texture_shadow_dark_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc",
-		"size": [
-			640,
-			144
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "mineral_sheet_assets_texture_shadow_source",
-		"category": "map-details",
-		"subcategory": "minerals (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_texture_shadow_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_source.png",
+			"texture": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_texture_shadow_source.png",
+			"texture-dark": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_texture_shadow_dark_source.png"
+		},
 		"size": [
 			640,
 			144
@@ -15547,6 +15665,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -15560,6 +15682,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -15573,6 +15699,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -15586,6 +15716,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -15599,6 +15733,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock1_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -15742,6 +15880,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -15755,6 +15897,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -15768,6 +15914,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -15781,6 +15931,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -15794,6 +15948,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock2_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -15937,6 +16095,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -15950,6 +16112,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -15963,6 +16129,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -15976,6 +16146,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -15989,6 +16163,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock3_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -16002,6 +16180,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -16015,6 +16197,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -16028,6 +16214,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -16041,6 +16231,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -16054,6 +16248,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock4_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -16197,6 +16395,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -16210,6 +16412,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -16223,6 +16429,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -16236,6 +16446,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -16249,6 +16463,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock5_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -16392,6 +16610,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -16405,6 +16627,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -16418,6 +16644,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -16431,6 +16661,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -16444,6 +16678,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock6_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -16587,6 +16825,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -16600,6 +16842,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -16613,6 +16859,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -16626,6 +16876,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -16639,6 +16893,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock7_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -16782,6 +17040,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_1_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_1_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_1.png"
+		},
 		"size": [
 			64,
 			64
@@ -16795,6 +17057,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_2_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_2_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_2.png"
+		},
 		"size": [
 			64,
 			64
@@ -16808,6 +17074,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_3_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_3_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_3.png"
+		},
 		"size": [
 			32,
 			32
@@ -16821,6 +17091,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_4_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_4_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_4.png"
+		},
 		"size": [
 			32,
 			32
@@ -16834,6 +17108,10 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_5_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_5_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Objects_separately/Rock8_5.png"
+		},
 		"size": [
 			16,
 			16
@@ -17107,32 +17385,12 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_no_shadow.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_3",
-		"size": [
-			256,
-			304
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "rock_sheet_rocks_source_texture_shadow",
-		"category": "map-details",
-		"subcategory": "rocks (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_texture_shadow.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/map_details_3",
-		"size": [
-			256,
-			304
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "rock_sheet_rocks_source_texture_shadow_dark",
-		"category": "map-details",
-		"subcategory": "rocks (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_texture_shadow_dark.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/map_details_3",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_no_shadow.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source.png",
+			"texture": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_texture_shadow.png",
+			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_texture_shadow_dark.png"
+		},
 		"size": [
 			256,
 			304
@@ -17919,32 +18177,11 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_source.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"size": [
-			496,
-			432
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ruin_sheet_assets_texture_shadow_dark_source",
-		"category": "map-details",
-		"subcategory": "ruins (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"size": [
-			496,
-			432
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ruin_sheet_assets_texture_shadow_source",
-		"category": "map-details",
-		"subcategory": "ruins (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_source.png",
+			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_source.png",
+			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark_source.png"
+		},
 		"size": [
 			496,
 			432
@@ -18755,32 +18992,11 @@
 		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_source.png",
 		"status": "reuse",
 		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"size": [
-			800,
-			192
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_sheet_trees_texture_shadow_source",
-		"category": "map-details",
-		"subcategory": "trees (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_texture_shadow_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"size": [
-			800,
-			192
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_sheet_trees_texture_shadows_dark_source",
-		"category": "map-details",
-		"subcategory": "trees (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_texture_shadows_dark_source.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_source.png",
+			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_texture_shadow_source.png",
+			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_texture_shadows_dark_source.png"
+		},
 		"size": [
 			800,
 			192

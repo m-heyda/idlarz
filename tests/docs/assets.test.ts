@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
 import { OUT, staleFiles } from '../../scripts/assets-catalog';
 import { buildManifest } from '../../scripts/assets/manifest';
 
@@ -15,4 +15,23 @@ test('asset names are unique and every picture exists', () => {
 	const m = buildManifest();
 	assert.equal(new Set(m.map((e) => e.name)).size, m.length);
 	for (const e of m) assert.ok(existsSync(join(OUT, '..', '..', 'public', e.src)), `${e.name}: missing ${e.src}`);
+});
+
+// Every picture under public/ is either in the library or deliberately left out (map ground: bg, terrain atlases, biome/meadow/water icons; pack title cards).
+test('every picture in public/ is in the asset library', () => {
+	const listed = new Set(buildManifest().flatMap((e) => [e.src, ...Object.values(e.variants ?? {})]));
+	const skip = /^\/pixel\/(bg|terrain)\/|^\/pixel\/icons\/(biome|meadow|water)_|^\/pixel\/assets_to_assess_and_use\/more_buildings\/(Titel|text)\./;
+	const missing: string[] = [];
+	const walk = (dir: string) => {
+		for (const n of readdirSync(dir)) {
+			const full = join(dir, n);
+			if (statSync(full).isDirectory()) walk(full);
+			else if (n.endsWith('.png')) {
+				const src = '/' + relative(join(OUT, '..', '..', 'public'), full).split(sep).join('/');
+				if (!listed.has(src) && !skip.test(src)) missing.push(src);
+			}
+		}
+	};
+	walk(join(OUT, '..', '..', 'public'));
+	assert.deepEqual(missing, [], `not in the asset library: ${missing.join(', ')}`);
 });

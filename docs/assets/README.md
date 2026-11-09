@@ -32,6 +32,6 @@ One name per picture, grouped by what it is. Biomes, roads, terrain atlases and 
 | [Monsters](monsters.md) | 25 | 18 | 0 |
 | [Buildings](buildings.md) | 244 | 36 | 208 |
 | [Resources](resources.md) | 93 | 38 | 0 |
-| [Map details](map-details.md) | 453 | 0 | 453 |
+| [Map details](map-details.md) | 443 | 0 | 443 |
 | [UI and portraits](ui.md) | 76 | 71 | 0 |
 | [Unsorted cuts](unsorted.md) | 7 | 0 | 7 |

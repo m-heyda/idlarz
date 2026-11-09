@@ -298,22 +298,23 @@ export const buildManifest = (): AssetEntry[] => {
 
 	// 6. Reuse pools
 	const POOL = join(PUBLIC, 'pixel', 'assets_to_assess_and_use');
-	const variantOf = (rel: string, file: string): string => {
+	// `plain` = what a file with no variant marker is: most packs keep the no-shadow art in `Assets/`, but rocks and fantasy trees ship the shadowed art plain and mark the other `no_shadow`
+	const variantOf = (rel: string, file: string, plain: string): string => {
 		const low = rel.toLowerCase();
 		if (/texture_shadows?_dark/.test(low)) return 'texture-dark';
 		if (/texture_shadow/.test(low)) return 'texture';
 		if (/no_shadow/.test(low) || /no_shadow/.test(file.toLowerCase())) return 'none';
 		if (/_shadow(\/|$)|\/shadow/.test(low)) return 'shadow';
-		return 'none';
+		return plain;
 	};
-	const PACKS: Record<string, { prefix: string; category: AssetCategory; sub: string }> = {
+	const PACKS: Record<string, { prefix: string; category: AssetCategory; sub: string; plain?: string }> = {
 		trees_mapp_details: { prefix: 'tree', category: 'map-details', sub: 'trees' },
 		bushes_map_details_mostly: { prefix: 'bush', category: 'map-details', sub: 'bushes' },
-		map_details_3: { prefix: 'rock', category: 'map-details', sub: 'rocks' },
+		map_details_3: { prefix: 'rock', category: 'map-details', sub: 'rocks', plain: 'shadow' },
 		minerals_map_details_or_resources_crafting_etc: { prefix: 'mineral', category: 'map-details', sub: 'minerals' },
 		map_details_ruins_buildings: { prefix: 'ruin', category: 'map-details', sub: 'ruins' },
 		misc: { prefix: 'prop', category: 'map-details', sub: 'dark and bone props' },
-		misc_map_details: { prefix: 'fantasy', category: 'map-details', sub: 'fantasy trees and mushrooms' },
+		misc_map_details: { prefix: 'fantasy', category: 'map-details', sub: 'fantasy trees and mushrooms', plain: 'shadow' },
 		map_details_misc: { prefix: 'mapmisc', category: 'map-details', sub: 'creatures and temple sheets' },
 		map_details: { prefix: 'farmplants', category: 'map-details', sub: 'farm plants sheet' },
 	};
@@ -324,10 +325,11 @@ export const buildManifest = (): AssetEntry[] => {
 			const file = basename(f);
 			const sheet = /source/i.test(file) || !rel.includes('/');
 			const sizeDir = /\/(\d+)\//.exec(rel)?.[1];
-			const base = snake(file.replace(/_?no_shadow/i, '')) + (sizeDir ? `_s${sizeDir}` : '');
+			const base =
+				snake(file.replace(/_?(no_shadow|texture_shadows?(_dark)?)(?=\.png$|_source)/i, '').replace(/_?no_shadow/i, '')) + (sizeDir ? `_s${sizeDir}` : '');
 			const key = (sheet ? `sheet_${base}` : base).replace(/^_/, '');
 			const g = groups.get(key) ?? { variants: {}, sheet };
-			const v = sheet ? 'none' : variantOf(rel, file);
+			const v = variantOf(rel, file, def.plain ?? 'none');
 			if (!g.variants[v] || v === 'none') g.variants[v] = url(f);
 			groups.set(key, g);
 		}
