@@ -2,11 +2,12 @@
 //   npm run perk-caps            print the tables
 //   npm run perk-caps -- --md    also rewrite the generated block of docs/plan/perk-caps.md
 // Analysis only: it reads the live set bonuses (catalog/sets.ts via setBonusStats), the live distance bands and monster spawn rules and the server's own
-// fight engine, and changes nothing. The caps and the legendary tiers below are the CANDIDATES being decided; no game code reads them yet.
+// fight engine, and changes nothing. The decided caps and tiers are the live ones (src/catalog/perkCaps.ts, applied by IDL-252); only the roomy and none columns are candidates.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { setBonusStats } from '../src/catalog';
 import { SET_DEFS } from '../src/catalog/sets';
+import { LEGENDARY_PERK_TIERS, PERK_CAPS, WEAPON_LEGENDARY_DAMAGE_TOP } from '../src/catalog/perkCaps';
 import { MONSTERS } from '../src/config/combatConfig';
 import { DISTANCE_BANDS } from '../src/config/distanceBands';
 import { kit, fullSet, simulateMany, spentCharacter } from '../src/lib/fightSim';
@@ -22,22 +23,16 @@ const FAMILIES: { key: Family; label: string }[] = [
 	{ key: 'damagePct', label: 'Damage' },
 ];
 
-/** Legendary tier magnitudes in % (IDL-149 decision 1: 8 / 15 / 25 for every family; damage 4 / 6 / 10 after the owner's update of 2026-11-07). */
-const TIERS: Record<Family, { common: number; rare: number; top: number }> = {
-	incomePct: { common: 8, rare: 15, top: 25 },
-	xpPct: { common: 8, rare: 15, top: 25 },
-	killRewardPct: { common: 8, rare: 15, top: 25 },
-	clickPct: { common: 8, rare: 15, top: 25 },
-	damagePct: { common: 4, rare: 6, top: 10 },
-};
+/** Legendary tier magnitudes in % (IDL-149 decision 1), read from the live data. */
+const TIERS: Record<Family, { common: number; rare: number; top: number }> = LEGENDARY_PERK_TIERS;
 
-/** Cap candidates per family (% of the gear bucket). The first is the owner's tight set (IDL-149 decision 2, XP raised 40 to 50 by the owner on 2026-11-09); roomy is +10 points; none is no cap. */
+/** Cap columns: the decided caps (live, `PERK_CAPS`), a roomy +10 points and no cap, to show what the decision costs. */
 const CAPS: { id: string; caps: Record<Family, number> }[] = [
-	{ id: 'tight', caps: { incomePct: 50, xpPct: 50, killRewardPct: 60, clickPct: 40, damagePct: 45 } },
-	{ id: 'roomy', caps: { incomePct: 60, xpPct: 60, killRewardPct: 70, clickPct: 50, damagePct: 55 } },
+	{ id: 'decided', caps: PERK_CAPS },
+	{ id: 'roomy', caps: { incomePct: 60, xpPct: 60, killRewardPct: 70, clickPct: 50, damagePct: 60 } },
 	{ id: 'none', caps: { incomePct: Infinity, xpPct: Infinity, killRewardPct: Infinity, clickPct: Infinity, damagePct: Infinity } },
 ];
-const tight = CAPS[0].caps;
+const decided = CAPS[0].caps;
 
 /** Pieces a full set has: the highest threshold of its bonuses. A top legendary takes one slot, so a 14-piece set drops to 13 pieces (loses its 14 bonus). */
 const fullPieces = (id: string): number => Math.max(...Object.keys(SET_DEFS.find((s) => s.id === id)!.bonuses).map(Number));
@@ -64,19 +59,19 @@ out();
 out('#### Set bonuses reached, with and without one top legendary');
 out();
 out(
-	'Set only = the live bonuses at the full piece count. Set + legendary adds the Top tier of the family; the legendary takes a slot, so a 14-piece set is counted at 13 pieces (it loses its 14-piece bonus: S2 damage is 28 + 10 = 38 and not 38 + 10 = 48). Obsidian has 12 pieces and the legendary takes a 13th or 14th slot, so it keeps all 12. Cells: gear bucket % (multiplier after the tight cap); `>` marks a total over the tight cap.',
+	'Set only = the live bonuses at the full piece count. Set + legendary adds the Top tier of the family; the legendary takes a slot, so a 14-piece set is counted at 13 pieces (it loses its 14-piece bonus: S2 damage is 28 + 10 = 38 and not 38 + 10 = 48). Obsidian has 12 pieces and the legendary takes a 13th or 14th slot, so it keeps all 12. Cells: gear bucket % (multiplier after the decided cap); `>` marks a total over the decided cap.',
 );
 for (const f of FAMILIES) {
 	out();
-	out(`**${f.label}** (tight cap ${tight[f.key]}, top legendary +${TIERS[f.key].top})`);
+	out(`**${f.label}** (decided cap ${decided[f.key]}, top legendary +${TIERS[f.key].top})`);
 	out();
-	out('| Set | Pieces (alone / with legendary) | Set only | Set + top legendary | Legendary alone | Over the tight cap? |');
+	out('| Set | Pieces (alone / with legendary) | Set only | Set + top legendary | Legendary alone | Over the decided cap? |');
 	out('|---|---|---|---|---|---|');
 	for (const def of SET_DEFS) {
 		const set = setValue(def.id, fullPieces(def.id), f.key);
 		const both = setValue(def.id, withLegendary(def.id), f.key) + TIERS[f.key].top;
-		const cell = (v: number) => `${v}${v > tight[f.key] ? ' >' : ''} (${mult(Math.min(v, tight[f.key]))})`;
-		const limited = both > tight[f.key] ? `yes, ${both - tight[f.key]} points cut` : 'no';
+		const cell = (v: number) => `${v}${v > decided[f.key] ? ' >' : ''} (${mult(Math.min(v, decided[f.key]))})`;
+		const limited = both > decided[f.key] ? `yes, ${both - decided[f.key]} points cut` : 'no';
 		out(`| ${def.label} | ${fullPieces(def.id)} / ${withLegendary(def.id)} | ${cell(set)} | ${cell(both)} | ${cell(TIERS[f.key].top)} | ${limited} |`);
 	}
 }
@@ -114,12 +109,12 @@ for (const f of FAMILIES) {
 out();
 out('#### Damage: what a stronger weapon legendary does to S2 / S3 (13 pieces plus the weapon)');
 out();
-const WEAPON_CAPS = [tight.damagePct, 50, 55];
+const WEAPON_CAPS = [45, decided.damagePct, 55];
 out(
 	`| Weapon legendary damage | ${['ashen_warlord', 'blightbound'].map((id) => `${SET_DEFS.find((s) => s.id === id)!.label} total`).join(' | ')} | Cut at cap ${WEAPON_CAPS.join(' / ')} (S2, S3) |`,
 );
 out('|---|---|---|---|');
-for (const top of [TIERS.damagePct.top, 15, 20, 25]) {
+for (const top of [TIERS.damagePct.top, 15, WEAPON_LEGENDARY_DAMAGE_TOP, 25]) {
 	const totals = ['ashen_warlord', 'blightbound'].map((id) => setValue(id, withLegendary(id), 'damagePct') + top);
 	const cuts = totals.map((t) => WEAPON_CAPS.map((cap) => Math.max(0, t - cap)).join('/'));
 	out(`| +${top} | ${totals.join(' | ')} | ${cuts.join(', ')} |`);
@@ -144,7 +139,7 @@ out();
 out('#### Damage against the fight engine');
 out();
 out(
-	`Level 30 hero (25 points: 12 Strength, 8 Vitality, 5 Dexterity), Heal, Stun and potions by the fixed auto-use rules, ${RUNS} seeded fights per cell, win % (mean seconds). Each boss at the highest level its spawn window reaches at castle level 8. Gear at its authored level, so this shows the shape and not the final balance (the S1-S3 pieces are disabled placeholders today). With a top damage legendary (+${TIERS.damagePct.top}) S2 reaches ${s2 + TIERS.damagePct.top} and S3 ${s3 + TIERS.damagePct.top}: ${mult(s2 + TIERS.damagePct.top)} and ${mult(s3 + TIERS.damagePct.top)} per hit against the tight cap ${tight.damagePct} (${mult(tight.damagePct)}), so the cap bites only if more than one damage perk is stacked.`,
+	`Level 30 hero (25 points: 12 Strength, 8 Vitality, 5 Dexterity), Heal, Stun and potions by the fixed auto-use rules, ${RUNS} seeded fights per cell, win % (mean seconds). Each boss at the highest level its spawn window reaches at castle level 8. Gear at its authored level, so this shows the shape and not the final balance (the S1-S3 pieces are disabled placeholders today). With a top damage legendary (+${TIERS.damagePct.top}) S2 reaches ${s2 + TIERS.damagePct.top} and S3 ${s3 + TIERS.damagePct.top}: ${mult(s2 + TIERS.damagePct.top)} and ${mult(s3 + TIERS.damagePct.top)} per hit against the decided cap ${decided.damagePct} (${mult(decided.damagePct)}), so the cap bites only if more than one damage perk is stacked.`,
 );
 out();
 out(`| Loadout | ${BOSSES.map((b) => `${b} L${spawnLevelRange(b, 8).max}`).join(' | ')} |`);
@@ -164,12 +159,12 @@ const withDamage = <T>(total: number, run: () => T): T => {
 		bonus.damagePct = before;
 	}
 };
-const TOTALS = [0, 28, 38, tight.damagePct, 48];
+const TOTALS = [0, 28, 38, 48, decided.damagePct];
 out();
 out('#### Damage total sweep (Ashen Warlord kit)');
 out();
 out(
-	`Same kit, same hero, only the set's damage total changes: 0 = none, 28 = S2 at 13 pieces, 38 = S2 at 14, ${tight.damagePct} = the tight cap, 48 = S2 at 14 plus a top legendary with no cap. Win % (mean seconds), ${RUNS} seeded fights.`,
+	`Same kit, same hero, only the set's damage total changes: 0 = none, 28 = S2 at 13 pieces, 38 = S2 at 14, 48 = S2 at 13 plus the +20 weapon legendary, ${decided.damagePct} = the decided cap. Win % (mean seconds), ${RUNS} seeded fights.`,
 );
 out();
 out(`| Damage total | ${BOSSES.map((b) => `${b} L${spawnLevelRange(b, 8).max}`).join(' | ')} |`);

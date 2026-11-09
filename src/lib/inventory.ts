@@ -15,6 +15,7 @@ import {
 	type StatTotals,
 } from '@/catalog';
 import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
+import { capPerks } from '@/catalog/perkCaps';
 import { limitOf } from '@/lib/limits';
 import { resolveItem } from '@/lib/itemInstance';
 import type { BagSlot, Drop, Equipment, EquipmentSlot, ItemDef, ItemInstance } from '@/types/game';
@@ -230,11 +231,16 @@ export const averageItemLevel = (equipment: Equipment): number => {
 	return levels.length ? levels.reduce((sum, level) => sum + level, 0) / levels.length : 0;
 };
 
-/** The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached. */
+/**
+ * The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families
+ * (income, XP, kill reward, click, damage) are capped by {@link capPerks}. The server reads gear through this too, so both sides agree.
+ *
+ * @category Economy/Perk caps
+ */
 export const aggregateStats = (equipment: Equipment): StatTotals & { setCount: number } => {
 	const worn = Object.values(equipment).map((item) => (item ? resolveItem(item)?.stats : undefined));
 	const counts = setCounts(equipment);
-	const total = sumStats(...worn, setBonusStats(counts));
+	const total = capPerks(sumStats(...worn, setBonusStats(counts)));
 	return { ...total, setCount: Math.max(0, ...Object.values(counts)) };
 };
 

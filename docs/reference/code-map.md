@@ -119,6 +119,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`loot.ts`](../../src/catalog/loot.ts) — ~ Items the merchant sells, cheapest first (a disabled item is never sold, whatever its `shop` price).
 - [`lootConfig.ts`](../../src/catalog/lootConfig.ts) — ~ A set of items a profile can draw from.
 - [`monsters.ts`](../../src/catalog/monsters.ts) — ~ The monster roster:
+- [`perkCaps.ts`](../../src/catalog/perkCaps.ts) — ~ The stat families whose gear bucket is capped (IDL-149 / IDL-252).
 - [`rarity.ts`](../../src/catalog/rarity.ts) — ~ Everything the game knows about a rarity, in one place:
 - [`recipes.ts`](../../src/catalog/recipes.ts) — Crafting recipes (docs/plan/crafting-v0.md).
 - [`resourceArt.ts`](../../src/catalog/resourceArt.ts) — The resource art roster:
@@ -538,6 +539,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`combat.test.ts`](../../tests/audit/combat.test.ts) — Stat audit, part 2: items, sets and combat numbers, one modifier at a time, against independent oracles.
 - [`economy.test.ts`](../../tests/audit/economy.test.ts) — Stat audit, part 1: the economy under a strict environment.
 - [`helpers.ts`](../../tests/audit/helpers.ts) — Stat audit helpers: a strict economy environment and independent oracles.
+- [`perkCaps.test.ts`](../../tests/audit/perkCaps.test.ts) — Perk family caps (IDL-252): the gear bucket of income, XP, kill reward, click and damage is capped; client and server read the same capped number.
 - [`server.test.ts`](../../tests/audit/server.test.ts) — Stat audit, part 3: what the server does with cheating saves.
 
 **tests/**
