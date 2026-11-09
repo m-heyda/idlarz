@@ -251,7 +251,7 @@ test('forged inventories and HP are rejected', () => {
 	bad((r) => (r.autoSellUpTo = 'constructor'), 'auto-sell up to a prototype name');
 	bad((r) => (r.bag = r.bag.slice(1)), 'bag of 35');
 	bad((r) => (r.bag = [...r.bag, null]), 'bag of 37');
-	bad((r) => (r.bag[4].qty = 21), 'potion stack of 21');
+	bad((r) => (r.bag[4].qty = 101), 'potion stack of 101');
 	bad((r) => (r.bag[4].qty = 0), 'empty stack');
 	bad((r) => (r.bag[4].qty = 2.5), 'fractional stack');
 	bad((r) => (r.bag[3].qty = 2), 'gear with qty 2');

@@ -1,14 +1,15 @@
-import { RECIPE_BY_ID, type Recipe } from '@/catalog/recipes';
+import { RECIPES, RECIPE_BY_ID, type Recipe } from '@/catalog/recipes';
 import { CRAFTING } from '@/config/crafting';
 import { addDrop } from '@/lib/inventory';
-import { craftLevelOf, craftLimit, craftNeeds, craftTimeSec, finishedOf, recipeResourceGold } from '@/lib/crafting';
+import { craftLevelOf, craftLimit, craftNeeds, craftTimeSec, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
 import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState, Inventory } from '@/lib/offline/types';
 
 // SERVER ONLY (with the ledger). The crafting requests (docs/plan/crafting-v0.md):
 //  - craft:  a recipe WITH a time (`timeSec`) is queued as a batch (components taken from the stock now, the clock starts); a recipe without
 //            one is done at once (v0.0). Nothing goes to the bag yet.
-//  - claim:  the finished crafts of a batch are delivered (a potion into the bag, a component into the stock) and their XP is added. What does
-//            not fit waits in the batch (it is never turned into gold).
+//  - claim:  the finished crafts of a batch (or of every batch, `applyClaimAll`) go into the crafting stash `craft.stock` (components, potions and
+//            trade goods alike, counted by id; a rebirth keeps it) and their XP is added. What does not fit the stash cap waits in the batch (never gold).
+//  - withdraw: potions and trade goods move from the stash into the bag (as many as fit) to be drunk or sold.
 //  - cancel: the unfinished crafts of a batch end; their components go back to the stock and the answer names the resources to give back.
 // A refusal changes nothing and charges nothing. The resources themselves are paid by the browser (they are still client-held); the gold value
 // of them is only counted in `craft.spent`.
@@ -22,6 +23,8 @@ export interface CraftResult {
 	crafted?: number;
 	/** Crafts put into the queue */
 	queued?: number;
+	/** Items a stash withdrawal moved into the bag */
+	moved?: number;
 	refund?: CraftReply['refund'];
 }
 
@@ -67,54 +70,37 @@ export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, 
 		return { ok: true, inv, queued: count, craft: { ...craft, stock: dropEmpty(stock), spent, last: nowMs, queue: [...craft.queue, entry] } };
 	}
 
-	let bag = inv.bag;
-	if ('item' in recipe.output) {
-		const added = addDrop(bag, { kind: 'consumable', id: recipe.output.item, qty: recipe.output.qty * count });
-		if (added.overflow > 0) return refuse('bag_full', inv, craft);
-		bag = added.bag;
-	} else {
-		const made = (stock[recipe.output.component] ?? 0) + recipe.output.qty * count;
-		if (made > CRAFTING.componentCap) return refuse('stock_full', inv, craft);
-		stock[recipe.output.component] = made;
-	}
+	const key = stashKeyOf(recipe);
+	const made = (stock[key] ?? 0) + recipe.output.qty * count;
+	if (made > CRAFTING.componentCap) return refuse('stock_full', inv, craft);
+	stock[key] = made;
 	return {
 		ok: true,
 		crafted: count,
-		inv: 'item' in recipe.output ? { ...inv, bag, ver: inv.ver + 1 } : inv,
+		inv,
 		craft: { ...craft, xp: craft.xp + recipe.xp * count, ord: craft.ord + count, stock: dropEmpty(stock), spent, last: nowMs },
 	};
 };
 
-/** How many of `want` crafts of a recipe fit now (the bag, or the component stock cap); the rest has to wait. */
-const fitting = (recipe: Recipe, want: number, inv: Inventory, stock: Record<string, number>): { n: number; bag: Inventory['bag'] } => {
-	if ('item' in recipe.output) {
-		const out = recipe.output;
-		const all = addDrop(inv.bag, { kind: 'consumable', id: out.item, qty: out.qty * want });
-		if (all.overflow === 0) return { n: want, bag: all.bag };
-		const n = Math.floor((out.qty * want - all.overflow) / out.qty);
-		return n > 0 ? { n, bag: addDrop(inv.bag, { kind: 'consumable', id: out.item, qty: out.qty * n }).bag } : { n: 0, bag: inv.bag };
-	}
-	const room = Math.max(0, CRAFTING.componentCap - (stock[recipe.output.component] ?? 0));
-	return { n: Math.min(want, Math.floor(room / recipe.output.qty)), bag: inv.bag };
+/** How many of `want` crafts of a recipe fit into the stash now (its cap per entry); the rest has to wait in the batch. */
+const fitting = (recipe: Recipe, want: number, stock: Record<string, number>): number => {
+	const room = Math.max(0, CRAFTING.componentCap - (stock[stashKeyOf(recipe)] ?? 0));
+	return Math.min(want, Math.floor(room / recipe.output.qty));
 };
 
-/** Pays the finished crafts of one entry into the bag or the stock as far as they fit; returns the new entry (null when it is used up). */
+/** Pays the finished crafts of one entry into the stash as far as they fit; returns the new state (null when the batch is unknown). */
 const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number) => {
 	const entry = craft.queue[index];
 	const recipe = recipeOf(entry.recipeId);
 	if (!recipe) return null;
 	const stock = { ...craft.stock };
-	const { n, bag } = fitting(recipe, finishedOf(entry, nowMs), inv, stock);
-	if (n > 0 && 'component' in recipe.output) stock[recipe.output.component] = (stock[recipe.output.component] ?? 0) + recipe.output.qty * n;
+	const n = fitting(recipe, finishedOf(entry, nowMs), stock);
+	if (n > 0) stock[stashKeyOf(recipe)] = (stock[stashKeyOf(recipe)] ?? 0) + recipe.output.qty * n;
 	const left = entry.count - n;
 	const queue = craft.queue.slice();
 	if (left > 0) queue[index] = { ...entry, count: left, startedAt: Math.round(entry.startedAt + n * entry.timeSec * 1000) };
 	else queue.splice(index, 1);
-	return {
-		n,
-		inv: n > 0 && 'item' in recipe.output ? { ...inv, bag, ver: inv.ver + 1 } : inv,
-		craft: { ...craft, xp: craft.xp + recipe.xp * n, ord: craft.ord + n, stock, queue },
-	};
+	return { n, inv, craft: { ...craft, xp: craft.xp + recipe.xp * n, ord: craft.ord + n, stock, queue } };
 };
 
 /** Delivers what is finished in batch `slot`. Whatever does not fit stays in the batch and is delivered by a later claim. */
@@ -125,8 +111,29 @@ export const applyClaim = (inv: Inventory, craft: CraftState, slot: number, nowM
 	if (finishedOf(entry, nowMs) < 1) return refuse('nothing_ready', inv, craft);
 	const done = deliver(inv, craft, slot, nowMs);
 	if (!done) return refuse('no_batch', inv, craft);
-	if (done.n < 1) return refuse('item' in recipeOf(entry.recipeId)!.output ? 'bag_full' : 'stock_full', inv, craft);
+	if (done.n < 1) return refuse('stock_full', inv, craft);
 	return { ok: true, crafted: done.n, inv: done.inv, craft: { ...done.craft, last: nowMs } };
+};
+
+/** Delivers what is finished in every batch in one request (Collect all). Refused only when nothing is ready or nothing fits. */
+export const applyClaimAll = (inv: Inventory, craft: CraftState, nowMs: number): CraftResult => {
+	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
+	let state = craft;
+	let crafted = 0;
+	let ready = false;
+	// last to first, so removing a used-up batch never shifts one still to do
+	for (let index = craft.queue.length - 1; index >= 0; index--) {
+		const entry = state.queue[index];
+		if (!recipeOf(entry.recipeId) || finishedOf(entry, nowMs) < 1) continue;
+		ready = true;
+		const done = deliver(inv, state, index, nowMs);
+		if (!done) continue;
+		crafted += done.n;
+		state = done.craft;
+	}
+	if (!ready) return refuse('nothing_ready', inv, craft);
+	if (crafted < 1) return refuse('stock_full', inv, craft);
+	return { ok: true, crafted, inv, craft: { ...state, last: nowMs } };
 };
 
 /**
@@ -174,6 +181,31 @@ export const parseCraft = (raw: Record<string, unknown>): { recipeId: string; co
 	typeof raw.recipeId === 'string' && raw.recipeId.length <= 40 && typeof raw.count === 'number' && Number.isInteger(raw.count) && raw.count >= 0
 		? { recipeId: raw.recipeId, count: raw.count }
 		: null;
+
+/**
+ * Moves `qty` of a crafted potion or trade good from the crafting stash into the bag (as many as fit; the rest stays in the stash). Components
+ * cannot be withdrawn: they only sit in the stash for recipes. A refusal changes nothing.
+ */
+export const applyWithdraw = (inv: Inventory, craft: CraftState, id: string, qty: number, nowMs: number): CraftResult => {
+	if (!Number.isInteger(qty) || qty < 1) return refuse('bad_request', inv, craft);
+	if (!RECIPES.some((r) => 'item' in r.output && r.output.item === id)) return refuse('bad_request', inv, craft);
+	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
+	const held = craft.stock[id] ?? 0;
+	if (held < 1) return refuse('not_in_stash', inv, craft);
+	const want = Math.min(qty, held);
+	const added = addDrop(inv.bag, { kind: 'consumable', id, qty: want });
+	const moved = want - added.overflow;
+	if (moved < 1) return refuse('bag_full', inv, craft);
+	const stock = dropEmpty({ ...craft.stock, [id]: held - moved });
+	return { ok: true, moved, inv: { ...inv, bag: added.bag, ver: inv.ver + 1 }, craft: { ...craft, stock, last: nowMs } };
+};
+
+/** Parses the body of /api/craft/stash: what to withdraw and how many (null: not one). */
+export const parseWithdraw = (raw: Record<string, unknown>): { id: string; qty: number } | null =>
+	typeof raw.id === 'string' && raw.id.length <= 40 && typeof raw.qty === 'number' && Number.isInteger(raw.qty) && raw.qty >= 1 ? { id: raw.id, qty: raw.qty } : null;
+
+/** Parses the body of /api/craft/claim: a batch slot (default 0) or 'all' (Collect all). */
+export const parseClaimSlot = (raw: Record<string, unknown>): { slot: number | 'all' } | null => (raw.slot === 'all' ? { slot: 'all' } : parseSlot(raw));
 
 /** Parses the body of /api/craft/claim and /api/craft/cancel: the batch slot (default 0). */
 export const parseSlot = (raw: Record<string, unknown>): { slot: number } | null =>

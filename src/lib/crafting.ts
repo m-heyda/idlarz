@@ -105,6 +105,9 @@ export const craftLevelOf = (xp: number): { level: number; progress: number } =>
 	return { level, progress: remaining / craftXpToNext(level) };
 };
 
+/** The key of what a recipe makes in the crafting stash (`craft.stock`): the item id for a potion or a trade good, the component id for a component. */
+export const stashKeyOf = (recipe: Recipe): string => ('item' in recipe.output ? recipe.output.item : recipe.output.component);
+
 /** The recipe that makes a component (the first one, there is one per component). */
 const makerOf = (component: string): Recipe | undefined => RECIPES.find((r) => 'component' in r.output && r.output.component === component);
 

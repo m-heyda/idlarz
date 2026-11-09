@@ -28,3 +28,16 @@ test('the queue selector returns one shared empty list before the server answers
 	const state = { craft: { xp: 0, ord: 0, stock: {}, pity: {}, spent: 0, last: 0, queue } };
 	assert.equal(selectQueue(state), queue);
 });
+
+// The Crafting window crashed again when the trade goods arrived: they had no icon, so `PixelIcon` read the size of `undefined`.
+test('every item a recipe makes has a sprite the icon set knows', async () => {
+	const { RECIPES } = await import('@/catalog/recipes');
+	const { ITEM_CATALOG } = await import('@/catalog');
+	const { itemIconName } = await import('@/components/game/itemUi');
+	const { PIXEL_ICON_SIZES } = await import('@/config/pixelIcons');
+	for (const recipe of RECIPES) {
+		if (!('item' in recipe.output)) continue;
+		const name = itemIconName(ITEM_CATALOG[recipe.output.item]);
+		assert.ok(name && name in PIXEL_ICON_SIZES, `${recipe.id}: icon ${String(name)}`);
+	}
+});

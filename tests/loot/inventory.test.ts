@@ -43,13 +43,13 @@ test('emptyBag has 36 empty slots and starterBag holds the 2 starter potions', (
 	assert.deepEqual(bag[0], { id: 'potion_minor', qty: 2 });
 });
 
-test('addToBag stacks potions to 20 then spills into a new slot', () => {
+test('addToBag stacks potions to 100 then spills into a new slot', () => {
 	let bag = emptyBag();
-	const first = addToBag(bag, 'potion_minor', 25);
-	assert.equal(first.added, 25);
+	const first = addToBag(bag, 'potion_minor', 105);
+	assert.equal(first.added, 105);
 	assert.equal(first.overflow, 0);
 	bag = first.bag;
-	assert.deepEqual(bag[0], { id: 'potion_minor', qty: 20 });
+	assert.deepEqual(bag[0], { id: 'potion_minor', qty: 100 });
 	assert.deepEqual(bag[1], { id: 'potion_minor', qty: 5 });
 	const more = addToBag(bag, 'potion_minor', 3);
 	assert.deepEqual(more.bag[1], { id: 'potion_minor', qty: 8 });
@@ -163,10 +163,10 @@ test('unequip refuses when the bag is full and loses nothing', () => {
 
 test('moveSlot merges stacks and swaps others', () => {
 	let bag = emptyBag();
-	bag[0] = { id: 'potion_minor', qty: 15 };
+	bag[0] = { id: 'potion_minor', qty: 95 };
 	bag[1] = { id: 'potion_minor', qty: 10 };
 	let moved = moveSlot(bag, 0, 1);
-	assert.deepEqual(moved[1], { id: 'potion_minor', qty: 20 });
+	assert.deepEqual(moved[1], { id: 'potion_minor', qty: 100 });
 	assert.deepEqual(moved[0], { id: 'potion_minor', qty: 5 });
 	bag = emptyBag();
 	bag[0] = { item: p('wooden_sword') };

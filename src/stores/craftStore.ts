@@ -1,9 +1,10 @@
 import { create } from 'zustand';
+import { ITEM_CATALOG } from '@/catalog';
 import { RECIPE_BY_ID } from '@/catalog/recipes';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, emptyCraft } from '@/lib/crafting';
 import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
-import { requestCraft, requestCraftCancel, requestCraftClaim } from '@/lib/rewardsClient';
+import { requestCraft, requestCraftCancel, requestCraftClaim, requestCraftWithdraw } from '@/lib/rewardsClient';
 import { useGameStore } from '@/stores/gameStore';
 
 // The browser's picture of the player's crafting. The server's ledger owns it (level XP, component stock); this store only holds the last
@@ -18,6 +19,7 @@ const REFUSAL: Record<CraftRefusal, string> = {
 	no_components: 'Not enough components.',
 	stock_full: 'The component stock is full.',
 	bag_full: 'Your bag is full.',
+	not_in_stash: 'None of that in the crafting stash.',
 	queue_full: 'The crafting queue is full.',
 	no_batch: 'That batch is gone.',
 	nothing_ready: 'Nothing is ready yet.',
@@ -44,7 +46,9 @@ interface CraftStore {
 	/** Pays the resources, asks the server to craft, settles. Returns the toast text. */
 	craftItem: (recipeId: string, count: number) => Promise<string>;
 	/** Delivers the finished crafts of a batch. Returns the toast text. */
-	claim: (slot?: number) => Promise<string>;
+	claim: (slot?: number | 'all') => Promise<string>;
+	/** Moves crafted potions or goods from the stash into the bag. Returns the toast text. */
+	withdraw: (id: string, qty: number) => Promise<string>;
 	/** Ends a batch and takes the refund. Returns the toast text. */
 	cancel: (slot?: number) => Promise<string>;
 }
@@ -102,15 +106,30 @@ export const useCraftStore = create<CraftStore>((set, get) => ({
 		return recipe.timeSec ? `Queued ${count} x ${recipe.name}` : `Crafted ${count} x ${recipe.name}`;
 	},
 
-	claim: async (slot = 0) => {
+	claim: async (slot: number | 'all' = 0) => {
 		if (get().busy) return 'Wait a moment.';
-		const entry = get().craft?.queue[slot];
+		const entry = slot === 'all' ? undefined : get().craft?.queue[slot];
 		set({ busy: true });
 		const answer = await send(requestCraftClaim, slot);
 		set({ busy: false });
 		if (typeof answer === 'string') return answer;
 		if (!answer.ok) return REFUSAL[answer.reason ?? 'bad_request'];
 		return `Collected ${answer.crafted} x ${entry ? nameOf(entry.recipeId) : 'crafts'}`;
+	},
+
+	withdraw: async (id, qty) => {
+		if (get().busy || !Number.isInteger(qty) || qty < 1) return 'Wait a moment.';
+		set({ busy: true });
+		const key = newClaimId();
+		let reply = await requestCraftWithdraw(key, id, qty);
+		if (reply.status === 'unavailable') reply = await requestCraftWithdraw(key, id, qty);
+		set({ busy: false });
+		if (reply.status !== 'ok') return 'Could not reach the server.';
+		const answer = reply.value;
+		set({ craft: answer.craft, clockOffsetMs: answer.serverNowSec * 1000 - Date.now() });
+		useGameStore.getState().applyServerInventory(answer.inv);
+		if (!answer.ok) return REFUSAL[answer.reason ?? 'bad_request'];
+		return `Moved ${answer.moved ?? 0} x ${ITEM_CATALOG[id]?.name ?? id} to the bag`;
 	},
 
 	cancel: async (slot = 0) => {
@@ -132,10 +151,10 @@ export const useCraftStore = create<CraftStore>((set, get) => ({
 }));
 
 /** Sends a claim or cancel (one retry with the same key after an outage), stores the answer and the bag. A string is the failure toast. */
-const send = async (request: typeof requestCraftClaim, slot: number): Promise<CraftReply | string> => {
+const send = async (request: (key: string, slot: never) => ReturnType<typeof requestCraftClaim>, slot: number | 'all'): Promise<CraftReply | string> => {
 	const key = newClaimId();
-	let reply = await request(key, slot);
-	if (reply.status === 'unavailable') reply = await request(key, slot);
+	let reply = await request(key, slot as never);
+	if (reply.status === 'unavailable') reply = await request(key, slot as never);
 	if (reply.status !== 'ok') return 'Could not reach the server.';
 	const answer = reply.value;
 	useCraftStore.setState({ craft: answer.craft, clockOffsetMs: answer.serverNowSec * 1000 - Date.now() });

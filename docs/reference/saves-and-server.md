@@ -398,6 +398,7 @@ and its gold is paid in the browser.
 | `/api/craft/cancel` | POST | `src/app/api/craft/cancel/route.ts` |
 | `/api/craft/claim` | POST | `src/app/api/craft/claim/route.ts` |
 | `/api/craft` | POST | `src/app/api/craft/route.ts` |
+| `/api/craft/stash` | POST | `src/app/api/craft/stash/route.ts` |
 | `/api/fight` | POST | `src/app/api/fight/route.ts` |
 | `/api/inventory` | POST | `src/app/api/inventory/route.ts` |
 | `/api/offline` | POST | `src/app/api/offline/route.ts` |
