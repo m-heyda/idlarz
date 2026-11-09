@@ -292,6 +292,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`clickLimiter.ts`](../../src/lib/clickLimiter.ts) — ~ Click limiter made of two token buckets (a paid click needs a token from both).
 - [`clipboard.ts`](../../src/lib/clipboard.ts) — Copies text to the clipboard.
 - [`cloudClient.ts`](../../src/lib/cloudClient.ts) — ~ The browser side of /api/save.
+- [`cloudRecovery.ts`](../../src/lib/cloudRecovery.ts) — ~ The numbers of a game that say how far along it is.
 
 **src/lib/cloudSave/**
 
@@ -385,6 +386,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The signed-in player's id from the session cookie (never from the request body), or the response to send instead.
+- [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
@@ -648,6 +650,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`auth.test.ts`](../../tests/saves/auth.test.ts)
 - [`authClient.test.ts`](../../tests/saves/authClient.test.ts)
 - [`cloudAdopt.test.ts`](../../tests/saves/cloudAdopt.test.ts)
+- [`cloudConflict.test.ts`](../../tests/saves/cloudConflict.test.ts)
 - [`cloudSave.test.ts`](../../tests/saves/cloudSave.test.ts) — ~ The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null:
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)

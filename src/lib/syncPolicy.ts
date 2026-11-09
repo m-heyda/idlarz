@@ -7,7 +7,8 @@
  *                    upload, and never closer than 30 s to the previous attempt
  *   heartbeat        every 5 min (idle income is rebuilt from the rates on the server, so frequent uploads add nothing)
  *   hiding the tab   uploaded at once, unless an upload was tried in the last 11 s (the server accepts one per 10 s)
- *   failure          30 s, 1 min, 2 min, 5 min, then 5 min; back to normal after a success
+ *   failure          30 s, 1 min, 2 min, 5 min, then 5 min; back to normal after a success. A 409 the browser cannot resolve on its own
+ *                    (the account's save is ahead) is a failure too: re-checked on this schedule, never given up for the session
  *
  * @category Saves & Server/Uploading
  * @order 1
@@ -25,7 +26,7 @@ export const SYNC = {
 } as const;
 
 export type PushReason = 'first' | 'event' | 'heartbeat' | 'hide' | 'retry' | 'manual';
-/** `ok`: nothing to do (also when there was nothing new to send); `retry`: try again with backoff; `stop`: give up for this session. */
+/** `ok`: nothing to do (also when there was nothing new to send); `retry`: try again with backoff; `stop`: give up for this session (a refused save, a lost login; never a 409). */
 export type PushOutcome = 'ok' | 'retry' | 'stop';
 
 export interface SyncDeps {

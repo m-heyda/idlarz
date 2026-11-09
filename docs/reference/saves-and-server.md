@@ -8,7 +8,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 
 - Threat model: [The server's rule and the threat model](#the-server-s-rule-and-the-threat-model)
 - The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog)
-- Uploading: [`SYNC`](#sync), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms)
+- Uploading: [`SYNC`](#sync), [`canRebase`](#canrebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
 - Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`POISON_FLAGS`](#poison-flags), [`ENFORCEMENT`](#enforcement)
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
@@ -143,7 +143,7 @@ The Save & Backup dialog (Settings, *Save & backup*, or Control x5).
 
 ### `SYNC` <small>const</small>
 
-Source: [`src/lib/syncPolicy.ts:16`](../../src/lib/syncPolicy.ts)
+Source: [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts)
 
 When the game is copied to the account's cloud save. Pure: the clock, the timers and the upload itself are injected,
 so the cadence is tested without a browser.
@@ -153,7 +153,8 @@ so the cadence is tested without a browser.
                    upload, and never closer than 30 s to the previous attempt
   heartbeat        every 5 min (idle income is rebuilt from the rates on the server, so frequent uploads add nothing)
   hiding the tab   uploaded at once, unless an upload was tried in the last 11 s (the server accepts one per 10 s)
-  failure          30 s, 1 min, 2 min, 5 min, then 5 min; back to normal after a success
+  failure          30 s, 1 min, 2 min, 5 min, then 5 min; back to normal after a success. A 409 the browser cannot resolve on its own
+                   (the account's save is ahead) is a failure too: re-checked on this schedule, never given up for the session
 
 **When the game is uploaded to the account** _(computed from the code)_
 
@@ -165,6 +166,29 @@ so the cadence is tested without a browser.
 | tab hidden | at once unless an attempt was made in the last 11 s; `keepalive` only below 60 K bytes |
 | menu "Save game" | at most once per 10 minutes |
 | failure | backoff 30 s, 1 min, 2 min, 5 min |
+
+<a id="canrebase"></a>
+
+### `canRebase` <small>function</small>
+
+Source: [`src/lib/cloudRecovery.ts:27`](../../src/lib/cloudRecovery.ts)
+
+Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player: this browser's game is the same
+game as the account's save and is at least as far along, so uploading it on top of the cloud revision loses nothing. Decided from numbers
+both sides hold, never from anything the server could be asked to trust:
+
+  - the cloud revision is above the one this browser's link holds (the account's save continued from the one this browser knew; a New Game
+    on another device starts the revisions again and is never "continued"), and
+  - the cloud save is not ahead in play time, level or tiles, and is in the same rebirth (a higher rebirth count is another run).
+
+Anything else (the cloud is ahead in any of them, or the rebirths differ) is a real divergence: the player chooses in the hub and nothing is
+overwritten. The server's own revision check stays as it was; this only lets the browser re-base on the revision it is told about.
+
+**Formula**
+
+```text
+recover = cloud.rev > link.rev && cloud.playSeconds <= local.playSeconds && cloud.level <= local.level && cloud.tilesOwned <= local.tilesOwned && cloud.rebirths == local.rebirths
+```
 
 <a id="manual-cloud-cooldown-ms"></a>
 
@@ -178,6 +202,30 @@ tab) keep running on their own; this is the player's manual button, so the limit
 Pure apart from the small registry and the remembered time: the clock, the storage and the uploader are injected.
 
 The menu's "Save game" button uploads at most once per 10 minutes.
+
+<a id="resolveconflict"></a>
+
+### `resolveConflict` <small>function</small>
+
+Source: [`src/lib/cloudClient.ts:211`](../../src/lib/cloudClient.ts)
+
+After a 409, decide whether it needs the player. Looks at the account's save once and answers:
+  - it is one of this browser's own lost uploads (`isOwnSave`), or this browser's game is the same game and at least as far along
+    (`canRebase`): the link is moved to its revision and the caller uploads again (`rebased`);
+  - it is ahead of, or another game than, this browser's: `diverged`, the player picks in the hub;
+  - the account has no save (`gone`), or could not be read (`unknown`).
+Nothing is uploaded here, so the server's revision check stays the only thing that decides what is stored.
+
+<a id="withpushlock"></a>
+
+### `withPushLock` <small>const</small>
+
+Source: [`src/lib/pushLock.ts:19`](../../src/lib/pushLock.ts)
+
+One upload at a time per browser. Everything that reads the link, uploads and writes the new link back runs inside this lock, so a second
+tab (a tab that took the game over from the first, or a browser without the game-owner lock) waits for the upload in flight and then reads the
+revision it left, instead of sending the one it read before. Without Web Locks the work simply runs (graceful fallback), and a conflict that
+still happens is resolved by `resolveConflict`. The lock dies with the page, so a closing tab never holds it up.
 
 ## Accepting a save
 

@@ -836,6 +836,28 @@
   "see": []
  },
  {
+  "id": "resolveconflict",
+  "name": "resolveConflict",
+  "symbol": "resolveConflict",
+  "kind": "function",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/cloudClient.ts",
+  "line": 211,
+  "summary": "After a 409, decide whether it needs the player. Looks at the account's save once and answers: - it is one of this browser's own lost uploads (`isOwnSave`), or this browser's game is the same game and at least as far along (`canRebase`): the link is moved to its revision and the caller uploads again (`rebased`); - it is ahead of, or another game than, this browser's: `diverged`, the player picks in the hub; - the account has no save (`gone`), or could not be read (`unknown`). Nothing is uploaded here, so the server's revision check stays the only thing that decides what is stored.",
+  "see": []
+ },
+ {
+  "id": "canrebase",
+  "name": "canRebase",
+  "symbol": "canRebase",
+  "kind": "function",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/cloudRecovery.ts",
+  "line": 27,
+  "summary": "Whether a refused upload (409, \"the account has a newer save\") may be resolved without asking the player: this browser's game is the same game as the account's save and is at least as far along, so uploading it on top of the cloud revision loses nothing. Decided from numbers both sides hold, never from anything the server could be asked to trust:",
+  "see": []
+ },
+ {
   "id": "ember-model",
   "name": "EMBER_MODEL",
   "symbol": "EMBER_MODEL",
@@ -1769,6 +1791,17 @@
   "see": []
  },
  {
+  "id": "withpushlock",
+  "name": "withPushLock",
+  "symbol": "withPushLock",
+  "kind": "const",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/pushLock.ts",
+  "line": 19,
+  "summary": "One upload at a time per browser. Everything that reads the link, uploads and writes the new link back runs inside this lock, so a second tab (a tab that took the game over from the first, or a browser without the game-owner lock) waits for the upload in flight and then reads the revision it left, instead of sending the one it read before. Without Web Locks the work simply runs (graceful fallback), and a conflict that still happens is resolved by `resolveConflict`. The lock dies with the page, so a closing tab never holds it up.",
+  "see": []
+ },
+ {
   "id": "persisted-keys",
   "name": "PERSISTED_KEYS",
   "symbol": "PERSISTED_KEYS",
@@ -1833,7 +1866,7 @@
   "kind": "const",
   "category": "Saves & Server/Uploading",
   "file": "src/lib/syncPolicy.ts",
-  "line": 16,
+  "line": 17,
   "summary": "When the game is copied to the account's cloud save. Pure: the clock, the timers and the upload itself are injected, so the cadence is tested without a browser.",
   "see": []
  },
