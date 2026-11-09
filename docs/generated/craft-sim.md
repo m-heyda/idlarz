@@ -36,7 +36,7 @@ Reference recipe: Carved Trinket (2.7 gold per XP).
 | 80 | 29,999,957 | 1,666,665 | 79,999,920 |
 | 100 | 29,999,957 | 1,666,665 | 79,999,920 |
 
-Maximum level 80; at most 10 crafts per batch (hard ceiling 1000).
+Maximum level 80; at most 1000000000 crafts per batch (hard ceiling 1000000000).
 
 ## Timed batches
 
@@ -44,15 +44,15 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 
 | Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch of the cap (minutes) | Batch of the hard ceiling (hours) |
 |---|---:|---:|---:|---:|---:|---:|
-| Glass Vial | 10 | 360 | 720 | 5,220 | 1.7 | 2.8 |
-| Minor Healing Potion | 14 | 257 | 1,543 | 7,843 | 2.3 | 3.9 |
-| Greater Healing Potion | 30 | 120 | 3,000 | 16,860 | 5 | 8.3 |
-| Cured Leather | 12 | 300 | 900 | 3,990 | 2 | 3.3 |
-| Plank Bundle | 12 | 300 | 900 | 4,320 | 2 | 3.3 |
-| Preserved Rations | 15 | 240 | 1,200 | 8,640 | 2.5 | 4.2 |
-| Honey Cake | 20 | 180 | 1,260 | 6,480 | 3.3 | 5.6 |
-| Leather Satchel | 30 | 120 | 1,440 | 4,788 | 5 | 8.3 |
-| Carved Trinket | 30 | 120 | 2,160 | 5,760 | 5 | 8.3 |
+| Glass Vial | 10 | 360 | 720 | 5,220 | 166666666.7 | 2777777.8 |
+| Minor Healing Potion | 14 | 257 | 1,543 | 7,843 | 233333333.3 | 3888888.9 |
+| Greater Healing Potion | 30 | 120 | 3,000 | 16,860 | 500000000 | 8333333.3 |
+| Cured Leather | 12 | 300 | 900 | 3,990 | 200000000 | 3333333.3 |
+| Plank Bundle | 12 | 300 | 900 | 4,320 | 200000000 | 3333333.3 |
+| Preserved Rations | 15 | 240 | 1,200 | 8,640 | 250000000 | 4166666.7 |
+| Honey Cake | 20 | 180 | 1,260 | 6,480 | 333333333.3 | 5555555.6 |
+| Leather Satchel | 30 | 120 | 1,440 | 4,788 | 500000000 | 8333333.3 |
+| Carved Trinket | 30 | 120 | 2,160 | 5,760 | 500000000 | 8333333.3 |
 
 ## Trade goods income
 
@@ -67,7 +67,7 @@ Gold from selling crafted trade goods (IDL-227) against the gold per second of t
 
 | Queues | Best good, gold / hour | Gold / second | Share of income (castle 10, 3,000 gold/s) | Gate |
 |---|---:|---:|---:|---|
-| base limits (1 queue, speed 1) | 11,040 | 3.1 | 0.1% | ok |
+| base limits (1 queue, speed 1) | 33,120 | 9.2 | 0.3% | ok |
 | hard ceilings (5 queues, speed 4) | 220,800 | 61.3 | 2.0% | ok |
 
 ## Hours per level
