@@ -163,7 +163,7 @@ export interface MonsterDef {
 /**
  * The roster. Three normal monsters and one boss per biome, each biome a step up from the one before (docs/plan/ROADMAP.md, enemy rework):
  * the stats below come from `BIOME_TIER` and a per-monster `build` (tanky, quick, hard-hitting), so the whole ladder is retuned in one place.
- * The first plains monster and the plains boss carry the numbers of the old rat and Rat King, so fights.md and the sims keep their meaning.
+ * The first plains monster and the plains boss carry the numbers of the retired rat and Rat King (a level 1 rat's stats, a 1000 HP boss), so fights.md and the sims keep their meaning.
  */
 type Tier = {
 	hp: number;
@@ -329,7 +329,7 @@ const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly st
 	};
 };
 
-/** What a ticket or a monster without a (valid) type becomes: tickets written when the game had rats and a Rat King carry no type. */
+/** What a ticket or a monster without a (valid) type becomes: tickets written before monster types existed carry no type. */
 export const FALLBACK_MONSTER = 'thistleBoar' as const;
 export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
 

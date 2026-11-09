@@ -200,14 +200,14 @@ test('never more than the ticket cap, even on a huge map', () => {
 	assert.ok(bank.chests.length + bank.rats.length + (bank.king ? 1 : 0) <= TICKET_CAP);
 });
 
-test('one King at a time, after three hours', () => {
+test('one boss at a time, after three hours', () => {
 	const wide = ctx({ tilesOwned: 10000 });
 	const early = advanceBank(openBank(), 3 * 3600 - 1, wide, NO_LUCKY);
 	assert.equal(early.bank.king, null);
 	const later = advanceBank(openBank(), 3 * 3600 + 1, wide, NO_LUCKY);
 	assert.ok(later.bank.king);
 	const again = advanceBank(later.bank, 9 * 3600, wide, NO_LUCKY);
-	assert.equal(again.minted.king, null, 'the King is still waiting, so no second one');
+	assert.equal(again.minted.king, null, 'the boss is still waiting, so no second one');
 });
 
 test('no monsters while the land has no tile for them, and they start once it does', () => {

@@ -188,7 +188,7 @@ const clickQueue = () =>
 		['potion_minor'],
 	);
 
-/** A King against a weak hero with auto-use off: a long fight that ends by the clock or the knockout, a retreat, a long idle gap and a rest. */
+/** A boss against a weak hero with auto-use off: a long fight that ends by the clock or the knockout, a retreat, a long idle gap and a rest. */
 const kingAndRest = () => {
 	const s = simSetup({
 		equipment: STARTER_EQUIPMENT,

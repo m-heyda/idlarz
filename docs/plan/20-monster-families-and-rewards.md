@@ -1,9 +1,9 @@
 # 20 · Monster families, rewards and spawn pressure (reward model built: IDL-182)
 
-How the monster system grows from "rats and one king" to three or four monsters plus a boss per biome ([12](12-rebirth-biomes.md)), with a reward model in which **low-level monsters stop mattering as the player grows** and high-level monsters pay much more, in gold, in basic goods and in tiered items.
+How the monster system grows from "one plains monster and one boss" to three or four monsters plus a boss per biome ([12](12-rebirth-biomes.md)), with a reward model in which **low-level monsters stop mattering as the player grows** and high-level monsters pay much more, in gold, in basic goods and in tiered items.
 
 ## 1. What exists (read from the code)
-- `MONSTERS` in `config/combatConfig.ts`: `rat` and `ratKing` (a boss). A `MonsterDef` carries stats per `refLevel`, per-level scaling, `spawnWindow` (the level range by castle level), `spawn` (biomes, castle distance, `minRebirths`), `rewardSec`, `lootSourceId`.
+- `MONSTERS` in `config/combatConfig.ts`: the plains monsters and one boss per biome (the plains boss is `bossGreatAuroch`). A `MonsterDef` carries stats per `refLevel`, per-level scaling, `spawnWindow` (the level range by castle level), `spawn` (biomes, castle distance, `minRebirths`), `rewardSec`, `lootSourceId`.
 - **A kill pays seconds of the player's current income**: gold = `min(rewardSec x gold/s, cap)`, XP likewise, times `levelMult^(level - refLevel)` (`reward` block of `MonsterDef`, `lib/loot/kill.ts`, `payKill` in `lib/offline/reward.ts`); `COMBAT.rewards.minGold` 10 and `minXp` 5 are floors, hide = a share (`hideShare` 0.6) of the hide rate. Luck, Gold Find and the set's Kill Rewards % apply after the cap. See section 8 for the numbers.
 - Spawn: one rat ticket per 900 s, a boss per 10,800 s (`COMBAT.spawn`), at most `min(40, 30 % of the free land)` tickets; the level comes from `spawnWindow` by castle level plus the distance danger bonus. A monster grows one level per 30 minutes up to +10 (`LIMITS`).
 - Loot: `LOOT_SOURCES` profiles (`catalog/lootConfig.ts`): rolls, rarity weights, item level window, pools; `bonusTables` for potions.
@@ -34,7 +34,7 @@ reward: {
 - Replace the single rat timer with **spawn tables per distance band** ([12](12-rebirth-biomes.md) `DISTANCE_BANDS`): each band lists families with weights and level windows; a ticket first picks a band-compatible tile, then a family by weight. The overall rate stays `COMBAT.spawn` (one monster per interval) and the ticket cap stays; only the mix changes.
 - **Relevance fade (decided: rarer only, never gone)**: a family whose maximum spawn level is below the castle-based window gets its weight multiplied by a `relevance` factor that falls with the level gap down to a floor (proposal 0.1), so outgrown monsters still turn up now and then but no longer fill the map. The rat is the first. Rats stay near the castle (distance 2-6).
 - Weak families spawn **less often** as the player advances (weight x `relevance`), while higher-level families keep or raise their weight, so the map fills with what is worth fighting.
-- Bosses: one per biome, own timer and own `minCastleDistance`, `minRebirths` (the Rat King pattern).
+- Bosses: one per biome, own timer and own `minCastleDistance`, `minRebirths` (the Great Auroch pattern).
 
 ## 5. Families (placeholders to fill later)
 Each biome: 3-4 monsters and a boss, names and stats open ([12](12-rebirth-biomes.md) section 5). A family entry needs: biome allowlist, distance band, `minRebirths`, level window and `spawnWindow`, stats at `refLevel` with per-level scaling, `reward` block above, `lootSourceId` plus pool tags, `goods`, art (sprite and a short attack animation; finished images live in `public/pixel/enemies/<biome>/<monster-id>.png`, prompts and naming in [monster-art-prompts](monster-art-prompts.md)), and a `taunts` list for bosses. The tests `monsterConfig.test.ts`, `fightBalance.test.ts` and the sims (`fight-sim`, `loot-sim`) read the registry, so a new family appears in them without code changes.

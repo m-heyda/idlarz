@@ -114,7 +114,7 @@ Members that exist at this item level (item window and the pool's own minimum), 
 
 ### `LOOT_SOURCES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:259`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:261`](../../src/catalog/lootConfig.ts)
 
 Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).
 
@@ -138,7 +138,7 @@ start at item level 4 plus 3 per castle level above 1.
 
 ### `LOOT_PROFILES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:194`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:195`](../../src/catalog/lootConfig.ts)
 
 Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.
 

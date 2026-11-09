@@ -75,13 +75,13 @@ A player can buy a straight line of tiles outward (about 10 tiles for the jungle
 
 > The reward model (absolute caps multiplied by level, goods drops, tiered items, spawn pressure and relevance fade) and the families template are in [20](20-monster-families-and-rewards.md).
 
-Today: rat (and the Rat King) on `LAND_BIOMES`, distance 2-9 (`MONSTERS` in `config/combatConfig.ts`). Change: **rats 2-6** (weak monsters only near the castle; your "5-6 at most"), and the freed bands are for new families. `canSpawnOn` already does this; the change is data plus the shared `DISTANCE_BANDS`. Existing monsters standing beyond the new maximum are put on a new tile by the next `placeTickets` pass (`settle`), so no migration is needed. This also closes roadmap item R7 (the danger bonus was 0 or 1 because of the 9-tile cap): the danger offset becomes a per-band value.
+Today: the weak plains monsters (and the Great Auroch boss) on `LAND_BIOMES`, distance 2-9 (`MONSTERS` in `config/combatConfig.ts`). Change: **rats 2-6** (weak monsters only near the castle; your "5-6 at most"), and the freed bands are for new families. `canSpawnOn` already does this; the change is data plus the shared `DISTANCE_BANDS`. Existing monsters standing beyond the new maximum are put on a new tile by the next `placeTickets` pass (`settle`), so no migration is needed. This also closes roadmap item R7 (the danger bonus was 0 or 1 because of the 9-tile cap): the danger offset becomes a per-band value.
 
 Each biome gets **3-4 monsters and one boss** (names are placeholders; ideas in brackets are suggestions to confirm):
 
 | Biome | Monsters (3-4) | Boss |
 |---|---|---|
-| Home land (plains, forest, hills, swamp, tundra) | Rat; *later* wolf (forest), bog thing (swamp), frost hare (tundra) | Rat King |
+| Home land (plains, forest, hills, swamp, tundra) | Thistle Boar; *later* wolf (forest), bog thing (swamp), frost hare (tundra) | The Great Auroch |
 | Jungle | M1, M2, M3, M4 *(jaguar, giant spider, viper, poison toad)* | B-jungle |
 | Fields | M1, M2, M3 *(crow flock, scarecrow, field boar)* | B-fields |
 | Blossom Orchard | M1, M2, M3 *(hornet swarm, bear, thorn dryad)* | B-orchard |

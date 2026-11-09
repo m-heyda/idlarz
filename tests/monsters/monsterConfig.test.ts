@@ -50,7 +50,7 @@ test('each biome is a step up: its monsters and its boss start at higher levels,
 	}
 });
 
-test('the plains monster and boss carry the numbers of the old rat and Rat King (the balance sims keep their meaning)', () => {
+test('the plains monster and boss carry the numbers of the retired rat and Rat King (the balance sims keep their meaning)', () => {
 	assert.deepEqual(
 		[MONSTERS.thistleBoar.hp, MONSTERS.thistleBoar.attack, MONSTERS.thistleBoar.attackSpeed, MONSTERS.thistleBoar.reward.gold.rewardSec],
 		[100, 4, 0.5, 90],

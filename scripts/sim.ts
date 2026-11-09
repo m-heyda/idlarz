@@ -34,7 +34,7 @@
  * - **Tile price in materials** ({@link TILE_RESOURCE_COST}). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (table at the end of `sim-milestones.md`).
  *   Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (deer and pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.
  * - **Tile XP is small on purpose** (`BASE_XP_PER_TILE` 45) and the level curve is slow and lifetime, so levels come from passive XP, kills and rebirth-paced play, not from buying tiles.
- * - **Combat is in the sim**: the `human*` profiles fight a rat every 900 s and the King every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from `docs/generated/fight-sim.md`), paying the real kill income.
+ * - **Combat is in the sim**: the `human*` profiles fight a normal monster every 900 s and the plains boss every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from `docs/generated/fight-sim.md`), paying the real kill income.
  *
  * **Caveats.** The `human` is one calibration point, not a measurement of players; the bots still beat it by 2-3x. After the first rebirth the sim bot spends its Embers builders-first and stops getting faster after the third run;
  * "max the rebirth shop" is a later design (ROADMAP). If the first run must be longer once more content exists, lengthen `CASTLE_UPGRADE.durationsSec` and keep an eye on the minutes-to-cover table.
@@ -204,7 +204,7 @@ interface Profile {
 	rebirths?: number; // how many rebirths to simulate (default 1 when rebirthAtCastle is set)
 	/** A person, not a script: decides only this often while playing, buys at most `tilesPerVisit` tiles per visit, keeps `hoard` x what it might need */
 	human?: { decisionSec: number; hoard: number; tilesPerVisit: number };
-	/** Fight the rat and the Rat King the way the server's auto-battle does (see GEAR_SCHEDULE) */
+	/** Fight a normal monster and the boss the way the server's auto-battle does (see GEAR_SCHEDULE) */
 	combat?: boolean;
 	/** Hour of the day the game starts at (a new player starts playing at once; the bots start at midnight) */
 	startHour?: number;
@@ -227,8 +227,8 @@ interface SimDump {
 const tileWaits: Record<string, Record<string, Record<string, number>>> = {};
 
 /**
- * What the player wears, by game day: the strongest rat they beat, the Rat King win chance (docs/generated/fight-sim.md: the
- * starter kit beats level 5 rats, knight gear level 9-10 rats but never the King, obsidian gear the King always).
+ * What the player wears, by game day: the strongest normal monster level they beat (`maxRat`), the boss win chance (`king`; docs/generated/fight-sim.md: the
+ * starter kit beats level 5 monsters, knight gear level 9-10 ones but never the boss, obsidian gear the boss always).
  */
 const GEAR_SCHEDULE: { day: number; maxRat: number; king: number; set?: string; weapon?: string }[] = [
 	{ day: 0, maxRat: 5, king: 0 },
@@ -536,7 +536,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	};
 
 	/**
-	 * Fights (profile.combat): the server spawns a rat every COMBAT.spawn.intervalSec and a Rat King every bossIntervalSec, and
+	 * Fights (profile.combat): the server spawns a normal monster every COMBAT.spawn.intervalSec and a boss every bossIntervalSec, and
 	 * auto-battle fights them while the player plays. A monster waits, growing a level per growth interval, until it is fought.
 	 */
 	const spawn = combatCfg.COMBAT.spawn;

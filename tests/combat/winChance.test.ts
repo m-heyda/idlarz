@@ -55,7 +55,7 @@ test('potions and regeneration make a fight easier to survive, a monster that ca
 		estimateWin(profile, profile.maxHp, 'thistleBoar', 9, [{ healHp: 90, count: 5 }]).chance > 0.6,
 		'five greater potions carry the starter kit past a level 9 rat',
 	);
-	assert.equal(estimateWin(profile, profile.maxHp, 'bossGreatAuroch', 15).chance, 0, 'the starter kit cannot kill the King inside his clock');
+	assert.equal(estimateWin(profile, profile.maxHp, 'bossGreatAuroch', 15).chance, 0, 'the starter kit cannot kill the boss inside its clock');
 	const weak = estimateWin({ ...profile, hit: 1 }, profile.maxHp, 'thistleBoar', 9);
 	assert.ok(weak.chance < 0.05, 'one damage a swing against a level 9 rat is hopeless');
 	const none = estimateWin(profile, 0, 'thistleBoar', 1);

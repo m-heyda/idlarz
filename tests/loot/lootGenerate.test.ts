@@ -230,7 +230,7 @@ test('a bonus table adds to the general loot and never removes it', () => {
 });
 
 test('pity raises the chance after misses and resets on a drop', () => {
-	// King legendary: base 5%, +1% per miss up to +10%
+	// Boss legendary (pity key `boss:king_legendary`, a legacy name): base 5%, +1% per miss up to +10%
 	const miss = () => 0.999;
 	let pity: Record<string, number> = {};
 	for (let i = 0; i < 4; i++) pity = generateLoot({ sourceId: 'boss', level: 15, pity }, miss).pity;

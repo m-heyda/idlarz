@@ -80,7 +80,7 @@ test('a boss gives a legendary weapon about 5% of the time', () => {
 	assert.ok(Math.abs(legendary / n - 0.05) < 0.007, `legendary ${legendary / n}`);
 });
 
-test('the King now also rolls one general item of his own (rolled rarity, at the King level)', () => {
+test('the boss also rolls one general item of its own (rolled rarity, at the boss level)', () => {
 	const rng = mulberry32(33);
 	for (let i = 0; i < 300; i++) {
 		const general = gearOnly(rollKillLoot({ type: 'bossGreatAuroch', level: 15 }, ctx, rng).items).filter((d) => !isLegendaryWeapon(d));
@@ -185,7 +185,7 @@ test("a kill pays pelts: a share of the farm hide income for the monster's rewar
 	assert.equal(rollKillLoot({ type: 'thistleBoar', level: 5 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide, Math.floor(4 * rat * COMBAT.rewards.hideShare));
 	assert.equal(rollKillLoot({ type: 'thistleBoar', level: 5 }, ctx, () => 0.5).hide, 0, 'no hide income, no pelts');
 	const king = rollKillLoot({ type: 'bossGreatAuroch', level: 15 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide;
-	assert.ok(king > rollKillLoot({ type: 'thistleBoar', level: 9 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide, 'the King pays more than any rat');
+	assert.ok(king > rollKillLoot({ type: 'thistleBoar', level: 9 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide, 'the boss pays more than any normal monster');
 	const lucky = rollKillLoot({ type: 'thistleBoar', level: 5 }, { ...ctx, hidePerSec: 4, lucky: true }, () => 0.5).hide;
 	assert.ok(lucky > Math.floor(4 * rat * COMBAT.rewards.hideShare), 'a lucky monster pays its multiplier on pelts too');
 });

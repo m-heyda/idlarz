@@ -144,7 +144,7 @@ danger bonus = floor(Chebyshev distance from the castle / 8) levels
 Source: [`src/lib/offline/tickets.ts:142`](../../src/lib/offline/tickets.ts)
 
 Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
-(shorter with Luck), a rat every 15, the first after 2, a King every 3 hours while none waits), as long as there is room.
+(shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
 With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket
 `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.
 

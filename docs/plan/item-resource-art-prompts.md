@@ -40,7 +40,7 @@ Source: <https://www.spritefusion.com/docs/pixel-art-generator/api/generate-and-
 |---|---|
 | T2 biome goods | Hardwood (jungle), Cloth (fields), Honey (orchard), Ichor (blight), War Medals (battlefield) |
 | T3 extracts | Herbs (plains), Sap (forest), Iron Ore (hills), Spores (swamp), Frostshard (tundra), Pearls (lake), Salt (coast), Venom (jungle), Dye (fields), Royal Jelly (orchard), Corrupted Core (blight), Scrap Steel (battlefield) |
-| T4 relics | boss drops, names open (placeholders: Rat King's Crown, boss cores) |
+| T4 relics | boss drops, names open (placeholders: a boss crown, boss cores) |
 
 ### 2.3 Potions and consumables
 

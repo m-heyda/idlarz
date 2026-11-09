@@ -1413,7 +1413,7 @@ Neither costs anything; the monster stays. <code>retreat</code> (switching auto-
 </article><article><p><a id="picktarget"></a></p>
 <h3><code>pickTarget</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/offline/fightTargets.ts"><code>src/lib/offline/fightTargets.ts:41</code></a></p>
-<p>The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the King. One that
+<p>The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the boss. One that
 beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.</p>
 <p>Starting a fight.</p>
 <ul>
@@ -1785,7 +1785,7 @@ A monster whose spawn was capped for a weak player has a smaller <code>growCap</
 <h3><code>advanceBank</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:142</code></a></p>
 <p>Runs the timers for <code>dtSec</code> seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
-(shorter with Luck), a rat every 15, the first after 2, a King every 3 hours while none waits), as long as there is room.
+(shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
 With no room the chest and rat timers sit at 0, like the client&#39;s own timers. <code>rollFor(kind, n)</code> gives the random source of ticket
 <code>n</code> (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.</p>
 <p><code>realDtSec</code> is the real time the <code>dtSec</code> stand for: an absence is credited at a share of its length (the efficiency), but the
@@ -1961,7 +1961,7 @@ level windows, known slots/tags/rarities, no empty enabled pool, that something 
 <p>Members that exist at this item level (item window and the pool&#39;s own minimum), with their weights.</p>
 </article><h2>Config</h2><article><p><a id="loot-sources"></a></p>
 <h3><code>LOOT_SOURCES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:259</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:261</code></a></p>
 <p>Keyed by the <code>DropSource</code> (a monster type, <code>chest</code> or the merchant&#39;s <code>merchant</code> shelf). A monster&#39;s drops are at its own level (monsters 1-30, bosses 15-45).</p>
 <p>Sources, keyed by the <code>DropSource</code> (a monster&#39;s biome source <code>monster_&lt;biome&gt;</code>, <code>boss</code>, <code>chest</code>, the merchant&#39;s <code>merchant</code> shelf). A monster&#39;s drops are at its own level (monsters 1-30, bosses 15-45); a chest and the shelf
 start at item level 4 plus 3 per castle level above 1.</p>
@@ -2017,7 +2017,7 @@ start at item level 4 plus 3 per castle level above 1.</p>
 </tbody></table>
 </article><article><p><a id="loot-profiles"></a></p>
 <h3><code>LOOT_PROFILES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:194</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:195</code></a></p>
 <p>Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster&#39;s profile is copied per biome and draws from that biome&#39;s pool. All numbers are STARTING POINTS to be tuned with <code>npm run loot-sim -- --md</code>.</p>
 <p><strong>Loot profiles</strong> <em>(computed from the code)</em></p>
 <table>
@@ -3370,7 +3370,7 @@ The cost of 5 to 6 is what a player who plays a few times a day must be able to 
 <li><strong>Tile price in materials</strong> (<a href="#tile-resource-cost"><code>TILE_RESOURCE_COST</code></a>). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (table at the end of <code>sim-milestones.md</code>).
 Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (deer and pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.</li>
 <li><strong>Tile XP is small on purpose</strong> (<code>BASE_XP_PER_TILE</code> 45) and the level curve is slow and lifetime, so levels come from passive XP, kills and rebirth-paced play, not from buying tiles.</li>
-<li><strong>Combat is in the sim</strong>: the <code>human*</code> profiles fight a rat every 900 s and the King every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from <code>docs/generated/fight-sim.md</code>), paying the real kill income.</li>
+<li><strong>Combat is in the sim</strong>: the <code>human*</code> profiles fight a normal monster every 900 s and the plains boss every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from <code>docs/generated/fight-sim.md</code>), paying the real kill income.</li>
 </ul>
 <p><strong>Caveats.</strong> The <code>human</code> is one calibration point, not a measurement of players; the bots still beat it by 2-3x. After the first rebirth the sim bot spends its Embers builders-first and stops getting faster after the third run;
 &quot;max the rebirth shop&quot; is a later design (ROADMAP). If the first run must be longer once more content exists, lengthen <code>CASTLE_UPGRADE.durationsSec</code> and keep an eye on the minutes-to-cover table.</p>

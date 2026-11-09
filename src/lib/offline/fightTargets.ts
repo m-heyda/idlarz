@@ -23,7 +23,7 @@ export const placedTarget = (ledger: Ledger, n: number): Target | null => {
 };
 
 /**
- * The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the King. One that
+ * The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the boss. One that
  * beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.
  *
  * Starting a fight.
@@ -133,7 +133,7 @@ export const engageTicket = (ctx: FightCtx, t: number, n: number): boolean => {
 };
 
 /**
- * With no fight open: how long to rest from `t` before something can change (HP back above the resume line, the King's retry time, or `now`).
+ * With no fight open: how long to rest from `t` before something can change (HP back above the resume line, the boss's retry time, or `now`).
  * Never less than one tick (or what is left of the request).
  */
 export const restFor = (ctx: FightCtx, t: number, now: number): number => {

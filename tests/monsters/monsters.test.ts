@@ -141,7 +141,7 @@ test('the growth limit is a config value that upgrades can raise: every reader f
 
 // ---- spawn levels, bosses --------------------------------------------------------------------------------------------------
 
-test('rats spawn up to level 10, the Rat King between 15 and 25, and the window rises with the castle level', () => {
+test('normal monsters spawn up to level 10, the plains boss between 15 and 25, and the window rises with the castle level', () => {
 	assert.deepEqual(spawnLevelRange('thistleBoar', 1), { min: 1, max: 3 });
 	assert.deepEqual(spawnLevelRange('thistleBoar', 8), { min: 8, max: 10 });
 	assert.deepEqual(spawnLevelRange('thistleBoar', 10), { min: 8, max: 10 }, 'capped at 10');
@@ -158,7 +158,7 @@ test('rats spawn up to level 10, the Rat King between 15 and 25, and the window 
 			assert.ok(king >= 15 && king <= 25);
 		}
 	}
-	// a king can grow +10: level 35 at most
+	// a boss can grow +10: level 35 at most
 	assert.equal(maxLevelOf(25), 35);
 });
 
@@ -170,7 +170,7 @@ test('the spawn level is rolled from the monster id alone: the same monster alwa
 	assert.equal(rollSpawnLevel('thistleBoar', 1, 7, 8), Math.min(10, rollSpawnLevel('thistleBoar', 1, 7, 0) + 1));
 });
 
-test('the Rat King is a boss; rats are not', () => {
+test('the plains boss is a boss; normal monsters are not', () => {
 	assert.equal(isBoss('bossGreatAuroch'), true);
 	assert.equal(isBoss('thistleBoar'), false);
 	assert.equal(MONSTERS.bossGreatAuroch.grade, 'boss');
@@ -202,24 +202,24 @@ test('rat stats: level 1 is 100 HP, level 9 is the old tier 5 (506 HP); HP, atta
 	assert.equal(monsterStats('thistleBoar', 1).stunResist, 0);
 });
 
-test('the Rat King has armor, crits and resists Stun; at level 15 he is the tuned fight behind his armor, and he follows the gear curve above it', () => {
+test('the plains boss has armor, crits and resists Stun; at level 15 it is the tuned fight behind its armor, and it follows the gear curve above it', () => {
 	const king = monsterStats('bossGreatAuroch', 15);
 	assert.equal(king.maxHp, MONSTERS.bossGreatAuroch.hp);
 	assert.equal(king.attack, 11);
 	assert.equal(king.armor, 15);
 	assert.equal(king.critChance, 8);
 	assert.equal(king.stunResist, 20);
-	assert.ok(king.maxHp / (1 - armorReduction(king.armor)) > king.maxHp, 'his armor makes the effective HP higher still');
+	assert.ok(king.maxHp / (1 - armorReduction(king.armor)) > king.maxHp, 'its armor makes the effective HP higher still');
 	let last = king;
 	for (let l = 16; l <= 35; l++) {
 		const next = monsterStats('bossGreatAuroch', l);
 		assert.ok(next.maxHp > last.maxHp && next.attack >= last.attack && next.armor > last.armor, `level ${l}`);
 		last = next;
 	}
-	assert.ok(monsterStats('bossGreatAuroch', 35).maxHp < king.maxHp * 2, 'a level 35 king is under twice a level 15 one (the gear curve, not an exponential)');
+	assert.ok(monsterStats('bossGreatAuroch', 35).maxHp < king.maxHp * 2, 'a level 35 boss is under twice a level 15 one (the gear curve, not an exponential)');
 });
 
-test('attack speed is attacks per second, like a weapon: a rat bites every 2 s, the King every 3 s', () => {
+test('attack speed is attacks per second, like a weapon: a normal monster bites every 2 s, the boss every 3 s', () => {
 	assert.equal(monsterStats('thistleBoar', 1).attackSpeed, 0.5);
 	assert.ok(Math.abs(monsterStats('bossGreatAuroch', 15).attackSpeed - 1 / 3) < 1e-9);
 	assert.equal(monsterStats('thistleBoar', 9).attackSpeed, monsterStats('thistleBoar', 1).attackSpeed, 'it does not change with the level');

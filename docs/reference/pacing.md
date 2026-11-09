@@ -38,7 +38,7 @@ Open balance questions are in `docs/plan/ROADMAP.md`.
 - **Tile price in materials** ([`TILE_RESOURCE_COST`](economy.md#tile-resource-cost)). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (table at the end of `sim-milestones.md`).
   Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (deer and pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.
 - **Tile XP is small on purpose** (`BASE_XP_PER_TILE` 45) and the level curve is slow and lifetime, so levels come from passive XP, kills and rebirth-paced play, not from buying tiles.
-- **Combat is in the sim**: the `human*` profiles fight a rat every 900 s and the King every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from `docs/generated/fight-sim.md`), paying the real kill income.
+- **Combat is in the sim**: the `human*` profiles fight a normal monster every 900 s and the plains boss every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from `docs/generated/fight-sim.md`), paying the real kill income.
 
 **Caveats.** The `human` is one calibration point, not a measurement of players; the bots still beat it by 2-3x. After the first rebirth the sim bot spends its Embers builders-first and stops getting faster after the third run;
 "max the rebirth shop" is a later design (ROADMAP). If the first run must be longer once more content exists, lengthen `CASTLE_UPGRADE.durationsSec` and keep an eye on the minutes-to-cover table.

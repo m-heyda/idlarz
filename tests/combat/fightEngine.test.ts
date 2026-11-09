@@ -46,7 +46,7 @@ const kinds = (events: FightEvent[], ...wanted: FightEvent['kind'][]) => events.
 // ---------------------------------------------------------------------------------------------------- speed
 
 test('the player swings at the weapon speed and a monster at its own: swings in 10 seconds follow attacks per second', () => {
-	const s = setup({ equipment: DAGGER, monsters: [{ type: 'bossGreatAuroch', level: 15 }] }); // a King has HP for a long fight
+	const s = setup({ equipment: DAGGER, monsters: [{ type: 'bossGreatAuroch', level: 15 }] }); // a boss has HP for a long fight
 	const first = runCombat(s.ledger, s.env(s.start)).ledger;
 	const { events } = advance(s, first, 10);
 	const swings = kinds(events, 'hit', 'crit', 'super').length;
@@ -251,7 +251,7 @@ test('a click is refused for a monster that is not there, during a fight, at 0 H
 	assert.notEqual(late.ledger.combat!.fight?.n, on.bank.rats[5].n);
 });
 
-test('the King can be clicked too, with auto-battle off', () => {
+test('the boss can be clicked too, with auto-battle off', () => {
 	const s = setup({
 		equipment: STRONG,
 		monsters: [
@@ -265,7 +265,7 @@ test('the King can be clicked too, with auto-battle off', () => {
 	assert.equal(clicked.combat!.fight?.type, 'bossGreatAuroch');
 });
 
-test('a King is fought only when no other monster is ready, and a King that ran out the clock waits out the boss cooldown', () => {
+test('a boss is fought only when no other monster is ready, and a boss that ran out the clock waits out the boss cooldown', () => {
 	const s = setup({
 		equipment: STRONG,
 		monsters: [
@@ -279,7 +279,7 @@ test('a King is fought only when no other monster is ready, and a King that ran 
 	const start = runCombat(weak.ledger, weak.env(weak.start)).ledger;
 	const { ledger, events } = advance(weak, start, MONSTERS.bossGreatAuroch.timeLimitSec + 40, 5);
 	const ended = kinds(events, 'defeated', 'timeout')[0];
-	assert.ok(ended, 'a starter kit cannot beat the King');
+	assert.ok(ended, 'a starter kit cannot beat the boss');
 	assert.ok((ledger.combat!.retryAt['1'] ?? 0) >= ended.t + COMBAT.auto.bossRetryCooldownSec - 1);
 	assert.equal(kinds(events, 'engage').filter((e) => e.t > ended.t).length, 0);
 });
@@ -336,7 +336,7 @@ test('skills: Heal needs its level, mana and a cooldown; Stun needs a fight and 
 	const log = stunned.combat!.log;
 	assert.ok(
 		log.some((e) => e.kind === 'stun' || e.kind === 'resist'),
-		'a King may resist (20 %), but the cast went through',
+		'a boss may resist (20 %), but the cast went through',
 	);
 	assert.equal(stunned.combat!.cd.stun, SKILLS.stun.cooldownSec);
 

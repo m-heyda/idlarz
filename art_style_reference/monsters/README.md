@@ -16,14 +16,14 @@
 
 - **Our current rat stays the baseline** (it is nice): 3/4 view, head to the lower left, 2-frame idle, 40x40. Rework it **a little** to sit better next to the new monsters (slightly stronger outline contrast and more saturated accents, like `Pj5W12.jpg`), and **add animation**: a hurt flash, an attack lunge and a short death, in addition to the idle (today `monster_rat` is a 2-frame idle sheet played by `MonsterArt` at 520 ms per frame).
 - **A lot of monsters**: **3-4 per biome plus one boss, for all 12 biomes** (the 7 current ones and the 5 planned ones), so the whole art style can be seen and compared early. They ship as **placeholder tinted generic sprites first** ([RELEASE-PLAN](../../docs/plan/RELEASE-PLAN.md) P3.2) and are replaced by the real sprites one family at a time.
-- **Sizes**: for the first release phase **every monster almost fits one tile** (about 40-48 px, the boss up to 56 px as the Rat King is today). Bigger monsters are allowed as long as they do not go much off the tile. **Idea for later (not decided, needs a map and placement feature):** end-game bosses on **2x2 tiles** with a double-size sprite. Design the large boss sprites at 96x96 if they are made now, but do not build a 2x2 occupancy rule without a decision.
+- **Sizes**: for the first release phase **every monster almost fits one tile** (about 40-48 px, the boss up to 56 px as the plains boss is today). Bigger monsters are allowed as long as they do not go much off the tile. **Idea for later (not decided, needs a map and placement feature):** end-game bosses on **2x2 tiles** with a double-size sprite. Design the large boss sprites at 96x96 if they are made now, but do not build a 2x2 occupancy rule without a decision.
 - **Readable silhouettes**: a monster must read as a black shape too (unknown monsters are drawn as the real sprite in black, [docs/plan/22-glossary-and-mastery.md](../../docs/plan/22-glossary-and-mastery.md)), so avoid sprites that are only distinguishable by colour.
 
 ## 3. Roster plan (names are placeholders; bases are the reference cells to start from)
 
 | Biome | 3-4 monsters | Boss | Start from |
 |---|---|---|---|
-| Plains | rat (existing), field mouse swarm, wild boar, crow | Rat King (existing, demoted to a basic monster, RELEASE-PLAN P3.6) | our own rat sprite, `moqxOO.jpg` bottom rows (boar, rodents, goose) |
+| Plains | rat (existing), field mouse swarm, wild boar, crow | The Great Auroch (plains boss) | our own rat sprite, `moqxOO.jpg` bottom rows (boar, rodents, goose) |
 | Forest | wolf, giant spider, forest sprite, bear | Alpha Wolf | `Pj5W12.jpg` spiders; the wolf is drawn new from the rat body kit |
 | Hills | rock lizard, goblin raider, stone golem, hill troll | Hill Giant | `AAi1qG.png` goblins/orcs; the golem is drawn new |
 | Swamp | bog thing (slime), giant toad, leech swarm, will-o-wisp | Bog Hydra | `moqxOO.jpg` slimes, toad row |

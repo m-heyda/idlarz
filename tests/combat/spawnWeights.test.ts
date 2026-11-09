@@ -21,6 +21,7 @@ import {
 	typeWeights,
 	winChanceAt,
 } from '../../src/lib/offline/spawnWeights';
+import { mulberry32 } from '../../src/lib/rng';
 import { emptyBank } from '../../src/lib/offline/tickets';
 import type { PlayerProfile } from '../../src/lib/offline/fightTypes';
 import type { MonsterType } from '../../src/types/game';
@@ -39,9 +40,16 @@ const normalTypes = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => MO
 const forestType = normalTypes.find((type) => (MONSTERS[type].spawn.biomes as readonly string[]).includes('forest'))!;
 
 const rollFor = (kind: string, n: number) => sealedRng('weights-secret-0123456789', 'u1', 1, kind, n);
+/** The biome of each bought tile is drawn from Math.random, so the land is built from a fixed seed: a random land made this test flaky. */
 const world = () => {
-	freshGame();
-	growTo(60);
+	const random = Math.random;
+	Math.random = mulberry32(20261109);
+	try {
+		freshGame();
+		growTo(60);
+	} finally {
+		Math.random = random;
+	}
 	return api().tiles;
 };
 /** Ticket `n` placed alone on the land (every ticket is placed on its own, so the first ones do not use up the tiles of the later ones). */
