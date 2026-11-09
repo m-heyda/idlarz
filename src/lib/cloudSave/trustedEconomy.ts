@@ -10,6 +10,10 @@ import type { SaveSummary } from './summary';
  * pinned to an earlier honest one, so a cheat never raises what the account is paid; and since the claim stays out of range, the next save
  * is judged the same way (the cheat is frozen, not rewarded at the second try).
  *
+ * The frozen castle timer keeps running on the server's clock (IDL-250): a baseline whose timer stood still while real time passed would
+ * flag every later save of an honest player for good (the claimed upgrade finishes while the frozen one never does). So a claim is judged
+ * against the timer as it would be had the player only waited: a level is believed once the real time since the last trusted save covers what was left.
+ *
  * Not pinned: the headline figures that feed the XP and Ember models (tiles bought, XP), which are judged against the claim on their own.
  */
 
@@ -30,11 +34,14 @@ const scaled = (rates: Resources | null, factor: number): Resources | null => {
  * back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.
  *
  * After `castle_jump` or `networth_exceeds` the rates, castle level and castle timer the server pays from are those of the last trusted save of the same run; unpaid merchant levels are put back to the last trusted level (Pack Rat excepted).
+ * The kept castle timer counts down by the real seconds since the save it comes from (`elapsedSec`, the server clock), never faster than real time and never below 0 (IDL-250).
+ *
+ * @formula frozen castle remaining = max(0, last trusted remaining - elapsedSec between the saves)
  *
  * @category Saves & Server/Accepting a save
  * @order 3
  */
-export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, ratio: number): SaveSummary => {
+export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, ratio: number, elapsedSec = 0): SaveSummary => {
 	if (sameRunAs(prev, claimed)) {
 		return {
 			...claimed,
@@ -42,7 +49,9 @@ export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, r
 			castleLevel: prev.castleLevel,
 			derived: {
 				...claimed.derived,
-				castleUpgrade: prev.derived.castleUpgrade ? { ...prev.derived.castleUpgrade } : null,
+				castleUpgrade: prev.derived.castleUpgrade
+					? { ...prev.derived.castleUpgrade, remainingSec: Math.max(0, prev.derived.castleUpgrade.remainingSec - Math.max(0, elapsedSec)) }
+					: null,
 				ratesAfterCastle: prev.derived.ratesAfterCastle ? { ...prev.derived.ratesAfterCastle } : null,
 			},
 		};

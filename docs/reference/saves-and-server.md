@@ -13,6 +13,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
+- Browser state: [`BASELINE_EPOCH`](#baseline-epoch)
 
 ## Threat model
 
@@ -272,7 +273,7 @@ The flags and what the server does with each. Meaning of each flag:
 - `gold_jump`: gold gain above income x time x 1.5 + burst + 1,000 + 2% of the balance + server grants.
 - `xp_jump`: XP above what bought tiles, play time and server payouts explain ([`XP_MODEL`](saves-and-server.md#xp-model)).
 - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
-- `castle_jump`: castle level or timer faster than real time. `ember_jump`: Embers above what the last save's castle and land can pay ([`EMBER_MODEL`](saves-and-server.md#ember-model)).
+- `castle_jump`: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock ([`trustedEconomy`](saves-and-server.md#trustedeconomy)), so one flag does not repeat on every later honest save (IDL-250). `ember_jump`: Embers above what the last save's castle and land can pay ([`EMBER_MODEL`](saves-and-server.md#ember-model)).
 
 **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ([`POISON_FLAGS`](saves-and-server.md#poison-flags)).
 With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save (HTTP 422).
@@ -296,13 +297,20 @@ With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save 
 
 ### `trustedEconomy` <small>function</small>
 
-Source: [`src/lib/cloudSave/trustedEconomy.ts:37`](../../src/lib/cloudSave/trustedEconomy.ts)
+Source: [`src/lib/cloudSave/trustedEconomy.ts:44`](../../src/lib/cloudSave/trustedEconomy.ts)
 
 `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). With a baseline the rates
 and the castle are the previous save's; without one (the account's first save, or the first of a new run) there is nothing trusted to fall
 back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.
 
 After `castle_jump` or `networth_exceeds` the rates, castle level and castle timer the server pays from are those of the last trusted save of the same run; unpaid merchant levels are put back to the last trusted level (Pack Rat excepted).
+The kept castle timer counts down by the real seconds since the save it comes from (`elapsedSec`, the server clock), never faster than real time and never below 0 (IDL-250).
+
+**Formula**
+
+```text
+frozen castle remaining = max(0, last trusted remaining - elapsedSec between the saves)
+```
 
 <a id="xp-model"></a>
 
@@ -506,3 +514,24 @@ Resets the player's game when a season reset happened that their ledger does not
 drops a local save older than it) and whether a reset was done now. A failure to read the marker never blocks a login.
 
 Season resets: `npm run reset-players` writes `app_settings.last_reset`; a player whose ledger `resetAt` is older is reset once at their next login. Operating guide: the Ops page (season reset CLI).
+
+## Browser state
+
+<a id="baseline-epoch"></a>
+
+### `BASELINE_EPOCH` <small>const</small>
+
+Source: [`src/lib/epochGuard.ts:26`](../../src/lib/epochGuard.ts)
+
+The browser's half of the data epoch. A server reset (the New chapter release flips the server's `GAME_EPOCH`, IDL-76) leaves this browser holding state
+that belongs to the old game: the cloud link (a revision the account no longer has: 409 loops, or `no_save` 404s), upload attempts, the combat log cursor, a
+pending offline claim, the manual save cooldown, the conflict counters, the tab's "entered" flag and the local save itself.
+
+The browser remembers the epoch it last saw (`localStorage` `idlarz.epoch`). When `/api/auth/me` reports a higher one (`epochVerdict` says `wipe`),
+the local save is put aside (`archiveForNewGame`) and reset, every key above is cleared (`wipeStaleBrowser`), the new epoch is recorded last (a
+failed wipe is simply tried again on the next load) and the page reloads into the normal start check, which finds an account with no save and starts a new
+game with a fresh link. No epoch in the reply (the server does not send one yet) means the guard does nothing. A browser with no stored epoch counts as
+`BASELINE_EPOCH`, the value the server has today, so every browser that predates the guard is wiped on the flip and a brand new one is not.
+
+What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server (a save from an old
+epoch has to be refused there), not by this guard. See `docs/plan/reset-proof-browsers.md`.

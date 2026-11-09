@@ -23,6 +23,15 @@ export const readCursor = (userId: string): number | null => {
 	}
 };
 
+/** Forgets the cursor (a reset restarts the server's log, so an old number would skip the new game's first events). */
+export const clearCursor = (): void => {
+	try {
+		window.localStorage.removeItem(KEY);
+	} catch {
+		/* nothing to forget */
+	}
+};
+
 export const writeCursor = (no: number): void => {
 	if (!user) return;
 	try {

@@ -988,7 +988,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/trustedEconomy.ts",
-  "line": 37,
+  "line": 44,
   "summary": "`ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). With a baseline the rates and the castle are the previous save's; without one (the account's first save, or the first of a new run) there is nothing trusted to fall back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.",
   "see": []
  },
@@ -1261,6 +1261,17 @@
   "file": "src/lib/distance.ts",
   "line": 13,
   "summary": "The band a castle distance falls in. Anything below the first band (the castle tile itself) or NaN is the first band.",
+  "see": []
+ },
+ {
+  "id": "baseline-epoch",
+  "name": "BASELINE_EPOCH",
+  "symbol": "BASELINE_EPOCH",
+  "kind": "const",
+  "category": "Saves & Server/Browser state",
+  "file": "src/lib/epochGuard.ts",
+  "line": 26,
+  "summary": "The browser's half of the data epoch. A server reset (the New chapter release flips the server's `GAME_EPOCH`, IDL-76) leaves this browser holding state that belongs to the old game: the cloud link (a revision the account no longer has: 409 loops, or `no_save` 404s), upload attempts, the combat log cursor, a pending offline claim, the manual save cooldown, the conflict counters, the tab's \"entered\" flag and the local save itself.",
   "see": []
  },
  {

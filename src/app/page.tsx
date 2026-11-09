@@ -9,6 +9,7 @@ import AuthUnavailable from '@/components/auth/AuthUnavailable';
 import { fetchMe, logout, readEntered, writeEntered, type Profile, type UnavailableReason } from '@/lib/authClient';
 import { fetchCloud, readLink, writeAttempts, writeLink } from '@/lib/cloudClient';
 import { canResumeTab, planStart, type CloudInfo } from '@/lib/startPlan';
+import { epochVerdict, readSeenEpoch, wipeStaleBrowser, writeSeenEpoch } from '@/lib/epochGuard';
 import { archiveForNewGame, installSave, peekSave, resetSave, type SavePeek } from '@/lib/saveStorage';
 
 // The game (and its save hydration) is only loaded once the gate lets the player in: the game is played with an account only.
@@ -64,6 +65,20 @@ export default function Home() {
 		[enterGame],
 	);
 
+	/**
+	 * The epoch guard (`lib/epochGuard`): a browser holding state from an older server epoch is wiped and reloaded before anything syncs with it.
+	 * True when the caller may go on; false when the page is reloading or the wipe failed (the phase is set then).
+	 */
+	const guardEpoch = useCallback(async (me: { epoch?: number }): Promise<boolean> => {
+		const verdict = epochVerdict(readSeenEpoch(), me.epoch);
+		if (verdict === 'record') writeSeenEpoch(me.epoch as number);
+		if (verdict !== 'wipe') return true;
+		if (!(await wipeStaleBrowser(me.epoch as number)))
+			setPhase({ name: 'unavailable', reason: 'outage' }); // no copy of the old game could be kept: never sync on with the stale link
+		else window.location.reload();
+		return false;
+	}, []);
+
 	/** Who is signed in. `quiet` keeps the current screen while it looks (the "accounts unavailable" dialog retrying). */
 	const check = useCallback(
 		async (quiet = false) => {
@@ -71,12 +86,13 @@ export default function Home() {
 			const result = await fetchMe();
 			if (result.status === 'guest') return setPhase({ name: 'guest' });
 			if (result.status !== 'ok') return setPhase({ name: 'unavailable', reason: result.status === 'unavailable' ? result.reason : 'outage' });
+			if (!(await guardEpoch(result))) return;
 			if (!result.profile) return setPhase({ name: 'profile' });
 			const player = { userId: result.userId, profile: result.profile };
 			if (readEntered() === 'account' && canResumeTab(readLink(), player.userId)) return enterGame(player); // same tab, refreshed while playing
 			await admit(player);
 		},
-		[admit, enterGame],
+		[admit, enterGame, guardEpoch],
 	);
 
 	useEffect(() => {
@@ -87,6 +103,7 @@ export default function Home() {
 		if (!profile) return setPhase({ name: 'profile' });
 		const me = await fetchMe();
 		if (me.status !== 'ok') return setPhase({ name: 'unavailable', reason: me.status === 'unavailable' ? me.reason : 'outage' });
+		if (!(await guardEpoch(me))) return;
 		await admit({ userId: me.userId, profile });
 	};
 
