@@ -47,6 +47,8 @@ import { PERSISTED_KEYS } from '../../src/lib/sanitizeSave';
 import { SYNC } from '../../src/lib/syncPolicy';
 import { MANUAL_CLOUD_COOLDOWN_MS } from '../../src/lib/manualCloudSave';
 import { ENFORCEMENT, FLAG_POLICY, POISON_FLAGS } from '../../src/lib/cloudSave/verify';
+import { LEGENDARY_PERK_TIERS, PERK_CAPS, PERK_FAMILIES, WEAPON_LEGENDARY_DAMAGE_TOP } from '../../src/catalog/perkCaps';
+import { STAT_DEFS } from '../../src/catalog/stats';
 import { TABLES, fmt, mdTable } from './tables';
 
 const ROOT = resolve(__dirname, '..', '..');
@@ -394,5 +396,24 @@ TABLES['craft-gear-recipes'] = () => ({
 				return `${fmt(recipeCostGold(r))} / ${r.xp}`;
 			}),
 		]),
+	),
+});
+
+TABLES['perk-caps'] = () => ({
+	title: 'Perk family caps',
+	md: mdTable(
+		['Family', 'Cap (% of the gear bucket)', 'Multiplier at the cap'],
+		PERK_FAMILIES.map((f) => [STAT_DEFS[f].label, PERK_CAPS[f], `x${(1 + PERK_CAPS[f] / 100).toFixed(2)}`]),
+	),
+});
+
+TABLES['perk-tiers'] = () => ({
+	title: 'Legendary perk tiers',
+	md: mdTable(
+		['Family', 'Common', 'Rare', 'Top', 'Top legendaries to fill the cap'],
+		PERK_FAMILIES.map((f): (string | number)[] => {
+			const t = LEGENDARY_PERK_TIERS[f];
+			return [STAT_DEFS[f].label, t.common, t.rare, t.top, Math.ceil(PERK_CAPS[f] / t.top)];
+		}).concat([['Damage, weapon legendary', '', '', WEAPON_LEGENDARY_DAMAGE_TOP, Math.ceil(PERK_CAPS.damagePct / WEAPON_LEGENDARY_DAMAGE_TOP)]]),
 	),
 });

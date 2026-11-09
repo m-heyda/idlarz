@@ -17,6 +17,7 @@ Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`luckyRatChance`](#luckyratchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
+- Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
 
@@ -1017,3 +1018,83 @@ Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.
 | charm | 2,425 / 60 | 21.5 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
 | cape | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
 | belt | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+
+## Perk caps
+
+<a id="perk-caps"></a>
+
+### `PERK_CAPS` <small>const</small>
+
+Source: [`src/catalog/perkCaps.ts:15`](../../src/catalog/perkCaps.ts)
+
+The cap on the gear bucket of each perk family, in percent. Each family is its own `(1 + sum)` bucket; the sum is everything gear gives: item stats, set
+bonuses and legendary perks added together BEFORE the cap. Decided by the owner (IDL-149 on 2026-11-07, XP raised to 50 and damage to 50 on 2026-11-09).
+
+**Formula**
+
+```text
+bucket = min(cap, sum of gear + set bonus + legendary perks)       multiplier = 1 + bucket / 100
+```
+
+**Perk family caps** _(computed from the code)_
+
+| Family | Cap (% of the gear bucket) | Multiplier at the cap |
+| --- | --- | --- |
+| Income | 50 | x1.50 |
+| XP Gain | 50 | x1.50 |
+| Kill Rewards | 60 | x1.60 |
+| Click Gold | 40 | x1.40 |
+| Damage | 50 | x1.50 |
+
+<a id="legendary-perk-tiers"></a>
+
+### `LEGENDARY_PERK_TIERS` <small>const</small>
+
+Source: [`src/catalog/perkCaps.ts:30`](../../src/catalog/perkCaps.ts)
+
+The magnitude of a legendary perk by tier, in percent of its family (IDL-149: 8 / 15 / 25 for every family, damage 4 / 6 / 10). Data for the legendary
+roster (IDL-144): no item carries these yet, so nothing reads them in the game today.
+
+**Legendary perk tiers** _(computed from the code)_
+
+| Family | Common | Rare | Top | Top legendaries to fill the cap |
+| --- | --- | --- | --- | --- |
+| Income | 8 | 15 | 25 | 2 |
+| XP Gain | 8 | 15 | 25 | 2 |
+| Kill Rewards | 8 | 15 | 25 | 3 |
+| Click Gold | 8 | 15 | 25 | 2 |
+| Damage | 4 | 6 | 10 | 5 |
+| Damage, weapon legendary |  |  | 20 | 3 |
+
+<a id="weapon-legendary-damage-top"></a>
+
+### `WEAPON_LEGENDARY_DAMAGE_TOP` <small>const</small>
+
+Source: [`src/catalog/perkCaps.ts:44`](../../src/catalog/perkCaps.ts)
+
+The top damage tier of a WEAPON legendary: +20 % where every other slot tops out at [`LEGENDARY_PERK_TIERS`](economy.md#legendary-perk-tiers) damage +10 (owner, 2026-11-09: weapon
+legendaries are a little overpowered on purpose). With the best set (S3, 13 pieces: 40) it reaches exactly the damage cap of 50. Data for IDL-144.
+
+<a id="capperks"></a>
+
+### `capPerks` <small>const</small>
+
+Source: [`src/catalog/perkCaps.ts:57`](../../src/catalog/perkCaps.ts)
+
+The one function that caps the perk families of a summed gear block. `aggregateStats` calls it, and the server reads gear only through `aggregateStats`
+(fight profile, income summary), so the browser and the server cannot disagree. A new object is returned; stats without a cap pass through unchanged.
+
+**Formula**
+
+```text
+totals[f] = min(PERK_CAPS[f], totals[f])    for the five families, nothing else changes
+```
+
+<a id="aggregatestats"></a>
+
+### `aggregateStats` <small>function</small>
+
+Source: [`src/lib/inventory.ts:240`](../../src/lib/inventory.ts)
+
+The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families
+(income, XP, kill reward, click, damage) are capped by [`capPerks`](economy.md#capperks). The server reads gear through this too, so both sides agree.
