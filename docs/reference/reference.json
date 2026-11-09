@@ -1264,6 +1264,17 @@
   "see": []
  },
  {
+  "id": "baseline-epoch",
+  "name": "BASELINE_EPOCH",
+  "symbol": "BASELINE_EPOCH",
+  "kind": "const",
+  "category": "Saves & Server/Browser state",
+  "file": "src/lib/epochGuard.ts",
+  "line": 26,
+  "summary": "The browser's half of the data epoch. A server reset (the New chapter release flips the server's `GAME_EPOCH`, IDL-76) leaves this browser holding state that belongs to the old game: the cloud link (a revision the account no longer has: 409 loops, or `no_save` 404s), upload attempts, the combat log cursor, a pending offline claim, the manual save cooldown, the conflict counters, the tab's \"entered\" flag and the local save itself.",
+  "see": []
+ },
+ {
   "id": "kit",
   "name": "kit",
   "symbol": "kit",
