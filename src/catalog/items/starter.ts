@@ -28,7 +28,7 @@ export const WOODEN_ITEMS: ItemDef[] = [
 		'Hunting Bow',
 		'mainHand',
 		'common',
-		{ damage: 6, critChance: 6 },
+		{ damage: 8, critChance: 6 },
 		{ tier: 1, weaponType: 'bow', art: true, description: 'Springy yew. Aims for the weak spot.' },
 	),
 	gear(

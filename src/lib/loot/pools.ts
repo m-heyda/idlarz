@@ -36,8 +36,8 @@ export const eligibleCandidates = (data: LootData, poolId: string, level: number
 	for (const def of Object.values(data.items)) {
 		if (!inPool(def, pool)) continue;
 		if (maxGrade && !gradeAllowed(def, maxGrade)) continue;
-		const min = Math.max(def.minItemLevel ?? 1, pool.minLevels?.[def.id] ?? 1);
-		const max = def.maxItemLevel ?? MAX_ITEM_LEVEL;
+		const min = Math.max(def.dropLevels?.[0] ?? def.minItemLevel ?? 1, pool.minLevels?.[def.id] ?? 1);
+		const max = def.dropLevels?.[1] ?? def.maxItemLevel ?? MAX_ITEM_LEVEL;
 		if (level < min || level > max) continue;
 		const weight = weightIn(def, pool);
 		if (weight > 0) out.push({ def, weight });

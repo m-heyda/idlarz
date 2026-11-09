@@ -1,5 +1,6 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { ITEM_CATALOG, familyPieces } from '@/catalog';
+import { ARMOUR_SLOTS, LADDER, type Grade, type LadderCell } from '@/catalog/items/ladder';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { COMBAT } from '@/config/combatConfig';
 import { isBoss } from '@/lib/monsters';
@@ -9,7 +10,7 @@ import { newLedger } from '@/lib/offline/ledger';
 import { savedVitals } from '@/lib/offline/profile';
 import { plainItem } from '@/lib/itemInstance';
 import { calculateCombatStats } from '@/utils/game/character';
-import type { CharacterStats, Equipment, EquipmentSlot, MonsterType } from '@/types/game';
+import type { CharacterStats, Equipment, EquipmentSlot, MonsterType, WeaponType } from '@/types/game';
 
 // A fight run by the server's own engine (lib/offline/fight.ts): used by scripts/fight-sim.ts to tune the monsters and the gear, and by
 // tests/combat/fightBalance.test.ts to keep that tuning honest. The player swings at the weapon's attack speed, so there is no "click speed" any
@@ -29,18 +30,36 @@ export const spentCharacter = (spend: Partial<Pick<CharacterStats, 'strength' | 
 
 /**
  * Every piece of a set worn, plus a weapon (and the set's own off hand is part of the set). Both rings are filled. Items are plain: their
- * authored level, neutral quality, no affixes. Disabled pieces (the Obsidian belt, until the belt is live) are left out: this is the kit
+ * authored level, neutral quality, no affixes. The belt (the Obsidian belt) is left out until its stats are live (IDL-138): this is the kit
  * the game's balance is tested against, and a piece nobody can get is not part of it; `ladderKit` (tests/builders.ts) wears them.
  */
 export const fullSet = (setId: string, weapon?: string): Equipment => {
 	const eq: Equipment = {};
 	for (const id of familyPieces(setId)) {
-		if (ITEM_CATALOG[id].enabled === false) continue;
+		if (ITEM_CATALOG[id].slot === 'belt') continue;
 		const slot = ITEM_CATALOG[id].slot!;
 		if (slot === 'ring') eq.ring1 = eq.ring2 = plainItem(id);
 		else eq[slot as EquipmentSlot] = plainItem(id);
 	}
 	if (weapon) eq.mainHand = plainItem(weapon);
+	return eq;
+};
+
+/** A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet. */
+export const kit = (grade: Grade, weapon: WeaponType = 'sword'): Equipment => {
+	const row = LADDER[grade];
+	const eq: Equipment = {};
+	for (const slot of ARMOUR_SLOTS) {
+		const id = row[slot];
+		if (!id) throw new Error(`kit(${grade}): no ${slot}`);
+		if (slot === 'ring') eq.ring1 = eq.ring2 = plainItem(id);
+		else eq[slot] = plainItem(id);
+	}
+	const special = grade === 'S1' || grade === 'S2' || grade === 'S3';
+	const hand = (special ? row.weapon : row[weapon as LadderCell]) ?? row.sword;
+	const offHand = special ? row.offHand : row.shield;
+	if (hand) eq.mainHand = plainItem(hand);
+	if (offHand) eq.offHand = plainItem(offHand);
 	return eq;
 };
 

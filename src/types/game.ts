@@ -126,6 +126,12 @@ export interface ItemDef {
 	maxItemLevel?: number;
 	/** Bases: rarities this base may roll as */
 	allowedRarities?: string[];
+	/**
+	 * Narrower than the window above, for a piece that existed before the grade ladder (IDL-243): the item levels and rarities it is
+	 * GENERATED at. `minItemLevel`, `maxItemLevel` and `allowedRarities` stay what a piece already owned may be, so no save breaks.
+	 */
+	dropLevels?: readonly [number, number];
+	dropRarities?: readonly string[];
 	/** Named items: the rarity every instance has */
 	fixedRarity?: string;
 	/** Relative chance inside a pool, after the rarity is known */

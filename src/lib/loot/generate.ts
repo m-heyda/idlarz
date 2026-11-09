@@ -154,7 +154,7 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		if (itemLevel < (profile.rarityLevelGate?.[id] ?? 1)) continue;
 		// Luck moves the odds toward rare and better; the weights are normalised after, so the other rarities lose share, not weight
 		const lucky = rarity.order >= LUCK.rarityFromOrder ? rarityLuckMultiplier(ctx.req.luck ?? 0) : 1;
-		const candidates = all.filter((c) => c.def.generation === 'base' && c.def.allowedRarities?.includes(id));
+		const candidates = all.filter((c) => c.def.generation === 'base' && (c.def.dropRarities ?? c.def.allowedRarities)?.includes(id));
 		trace.eligible[id] = candidates.length;
 		if (candidates.length === 0) continue;
 		byRarity[id] = candidates;

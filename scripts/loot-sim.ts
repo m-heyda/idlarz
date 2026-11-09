@@ -102,7 +102,7 @@ out();
 out('## Per biome');
 out();
 out(
-	'Normal monsters drop from the source of their biome (`monster_<biome>`, pool `equipment_<biome>`: ladder grades up to the ceiling of the biome, plus the legacy pieces with no grade). Each row is a monster level inside the range of the biome: gear per kill, the grade mix of what dropped (`-` = a piece outside the ladder) and the share of drops per slot kind. Only the live grades (G1-G3) have enabled items, so the ceilings above G3 change nothing yet.',
+	'Normal monsters drop from the source of their biome (`monster_<biome>`, pool `equipment_<biome>`: ladder grades up to the ceiling of the biome; every piece that drops is on the ladder since IDL-243). Each row is a monster level inside the range of the biome: gear per kill, the grade mix of what dropped (`-` = a piece outside the ladder, none today) and the share of drops per slot kind. Only the live grades (G1-G3) have enabled items, so the ceilings above G3 change nothing yet.',
 );
 out();
 out('| Source | Level | Gear / kill | Grades | Weapon | Off hand | Armor | Accessory |');

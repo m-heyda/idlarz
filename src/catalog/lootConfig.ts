@@ -106,10 +106,10 @@ export interface LootSource {
 
 /**
  * The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7).
- * The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; the legacy pieces with no grade tag, e.g. Obsidian, stay in every pool as before); the floor needs no tag because an item only exists inside its grade's item level
+ * The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level
  * window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
  * a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items,
- * so today every biome drops the same items; raising the ceiling's live grade is what moves a biome.
+ * so today every biome drops the same items; going live with the next grade is what moves a biome.
  */
 export const BIOME_LOOT = {
 	plains: { ceiling: 3, levels: { min: 1, max: 20 } },

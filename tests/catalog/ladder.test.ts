@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ITEM_CATALOG, SETS, STAT_DEFS, levelScale, weaponDps } from '../../src/catalog';
 import { ARMOUR_SLOTS, GRADES, GRADE_INFO, LADDER, LIVE_GRADES, LADDER_ITEMS, SPECIAL_SET, WEAPON_TYPES } from '../../src/catalog/items/ladder';
+import { gradeLevels, gradeRarities } from '../../src/catalog/items/grades';
 import { shopItems } from '../../src/catalog/loot';
 import { HARD_LIMITS } from '../../src/config/limits';
 import { fullSet } from '../../src/lib/fightSim';
@@ -29,8 +30,8 @@ test('generated ladder items are graded by tag, inside the grade window, and ena
 	for (const def of LADDER_ITEMS) {
 		assert.equal(def.enabled, LIVE_GRADES.includes(gradeOf(def)), def.id);
 		assert.ok(GRADES.includes(gradeOf(def)), def.id);
-		assert.deepEqual([def.minItemLevel, def.maxItemLevel], GRADE_INFO[gradeOf(def)].levels, def.id);
-		assert.deepEqual(def.allowedRarities, GRADE_INFO[gradeOf(def)].rarities, def.id);
+		assert.deepEqual([def.minItemLevel, def.maxItemLevel], gradeLevels(gradeOf(def)), def.id);
+		assert.deepEqual(def.allowedRarities, gradeRarities(gradeOf(def)), def.id);
 	}
 	for (const s of shopItems()) assert.ok(!ladderIds.has(s.id), `${s.id} is for sale`);
 });

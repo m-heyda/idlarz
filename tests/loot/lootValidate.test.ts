@@ -119,12 +119,19 @@ test('an enabled pool with no items is an error', () => {
 test('every weighted rarity needs an eligible item at every level the source can reach', () => {
 	// Only low-level bases left: the castle pushes rat levels far past their windows
 	let d = copy();
-	for (const item of Object.values(d.items)) if (item.generation === 'base') item.maxItemLevel = 5;
+	for (const item of Object.values(d.items))
+		if (item.generation === 'base') {
+			item.maxItemLevel = 5;
+			delete item.dropLevels;
+		}
 	assert.ok(has(d, /nothing can drop at item level|has weight but no eligible item/));
 	// A rarity nobody may roll
 	d = copy();
 	for (const item of Object.values(d.items))
-		if (item.generation === 'base' && item.enabled !== false) item.allowedRarities = item.allowedRarities!.filter((r) => r !== 'rare');
+		if (item.generation === 'base' && item.enabled !== false) {
+			item.allowedRarities = item.allowedRarities!.filter((r) => r !== 'rare');
+			if (item.dropRarities) item.dropRarities = item.dropRarities.filter((r) => r !== 'rare');
+		}
 	assert.ok(has(d, /rarity rare has weight but no eligible item/));
 	// ...is fine when the weight is zero
 	for (const profile of Object.values(d.profiles)) profile.rarityWeights.rare = 0;

@@ -2,10 +2,9 @@
 // Only pure, behaviour-free helpers live here; helpers.ts builds whole games.
 import { CASTLE_X, CASTLE_Y } from '../src/config/castle';
 import type { Ledger, LedgerRepo } from '../src/lib/offline/ledger';
-import { ARMOUR_SLOTS, LADDER, type Grade, type LadderCell } from '../src/catalog/items/ladder';
-import { fullSet } from '../src/lib/fightSim';
+import { fullSet, kit } from '../src/lib/fightSim';
 import { plainItem } from '../src/lib/itemInstance';
-import type { Equipment, Monster, WeaponType } from '../src/types/game';
+import type { Equipment, Monster } from '../src/types/game';
 
 /** A ledger repo kept in a Map (optimistic version check, values cloned on the way in and out), plus the Map for assertions. */
 export const memoryLedgers = () => {
@@ -38,23 +37,7 @@ export const makeMonster = (patch: Partial<Monster> = {}): Monster => ({
 // The tests used to spell out `fullSet('obsidian', 'titan_maul')` as "the strong kit". Obsidian is only grade G6 of the ladder
 // (catalog/items/ladder.ts), so the benchmark is now a named kit per grade and ONE place that says which kit is the strong one.
 
-/** A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet. */
-export const kit = (grade: Grade, weapon: WeaponType = 'sword'): Equipment => {
-	const row = LADDER[grade];
-	const eq: Equipment = {};
-	for (const slot of ARMOUR_SLOTS) {
-		const id = row[slot];
-		if (!id) throw new Error(`kit(${grade}): no ${slot}`);
-		if (slot === 'ring') eq.ring1 = eq.ring2 = plainItem(id);
-		else eq[slot] = plainItem(id);
-	}
-	const special = grade === 'S1' || grade === 'S2' || grade === 'S3';
-	const hand = (special ? row.weapon : row[weapon as LadderCell]) ?? row.sword;
-	const offHand = special ? row.offHand : row.shield;
-	if (hand) eq.mainHand = plainItem(hand);
-	if (offHand) eq.offHand = plainItem(offHand);
-	return eq;
-};
+export { kit };
 
 /**
  * The strongest kit that exists in the game today (what a player can actually wear): the Obsidian set plus the top legendary maul.

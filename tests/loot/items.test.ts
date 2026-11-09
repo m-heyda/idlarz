@@ -4,8 +4,14 @@ import { COMBAT } from '../../src/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '../../src/catalog';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { ITEM_STAT_KEYS, MAX_ITEM_LEVEL, familyPieces, STAT_BASE_BY_TIER, WEAPON_ATTACK_SPEED, baseStat, levelScale, weaponDps } from '../../src/catalog';
+import { CLOTH_ITEMS } from '../../src/catalog/items/cloth';
+import { OBSIDIAN_ITEMS } from '../../src/catalog/items/obsidian';
+import { WOODEN_ITEMS } from '../../src/catalog/items/starter';
+import { STEEL_ITEMS } from '../../src/catalog/items/steel';
 import type { EquipmentSlot } from '../../src/types/game';
 
+/** The weapons of the legacy families (some retired, some graded since IDL-243) */
+const LEGACY_WEAPONS = new Set([...WOODEN_ITEMS, ...CLOTH_ITEMS, ...STEEL_ITEMS, ...OBSIDIAN_ITEMS].filter((d) => d.slot === 'mainHand').map((d) => d.id));
 const ALL_SLOTS: EquipmentSlot[] = [...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom];
 
 test('catalog keys equal item ids', () => {
@@ -175,7 +181,13 @@ test('every weapon swings at a positive attack speed and nothing else has one', 
 test('weapon DPS rises with the tier within a weapon type', () => {
 	const best = new Map<string, number>(); // weaponType -> DPS of the previous (lower) tier
 	const weapons = Object.values(ITEM_CATALOG)
-		.filter((d) => d.slot === 'mainHand' && d.enabled !== false && !d.tags?.some((t) => t.startsWith('grade:'))) // graded items are checked in tests/catalog/ladder.test.ts
+		// the wood, steel and Obsidian weapons keep their original tiers (graded ones are checked on the ladder in tests/catalog/ladder.test.ts)
+		.filter(
+			(d) =>
+				d.slot === 'mainHand' &&
+				(LEGACY_WEAPONS.has(d.id) || d.enabled !== false) &&
+				(LEGACY_WEAPONS.has(d.id) || !d.tags?.some((t) => t.startsWith('grade:'))),
+		)
 		.sort((a, b) => a.tier - b.tier);
 	const byType = new Map<string, typeof weapons>();
 	for (const w of weapons) byType.set(w.weaponType!, [...(byType.get(w.weaponType!) ?? []), w]);
