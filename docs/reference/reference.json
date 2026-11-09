@@ -162,6 +162,50 @@
   "see": []
  },
  {
+  "id": "perk-caps",
+  "name": "PERK_CAPS",
+  "symbol": "PERK_CAPS",
+  "kind": "const",
+  "category": "Economy/Perk caps",
+  "file": "src/catalog/perkCaps.ts",
+  "line": 15,
+  "summary": "The cap on the gear bucket of each perk family, in percent. Each family is its own `(1 + sum)` bucket; the sum is everything gear gives: item stats, set bonuses and legendary perks added together BEFORE the cap. Decided by the owner (IDL-149 on 2026-11-07, XP raised to 50 and damage to 50 on 2026-11-09).",
+  "see": []
+ },
+ {
+  "id": "legendary-perk-tiers",
+  "name": "LEGENDARY_PERK_TIERS",
+  "symbol": "LEGENDARY_PERK_TIERS",
+  "kind": "const",
+  "category": "Economy/Perk caps",
+  "file": "src/catalog/perkCaps.ts",
+  "line": 30,
+  "summary": "The magnitude of a legendary perk by tier, in percent of its family (IDL-149: 8 / 15 / 25 for every family, damage 4 / 6 / 10). Data for the legendary roster (IDL-144): no item carries these yet, so nothing reads them in the game today.",
+  "see": []
+ },
+ {
+  "id": "weapon-legendary-damage-top",
+  "name": "WEAPON_LEGENDARY_DAMAGE_TOP",
+  "symbol": "WEAPON_LEGENDARY_DAMAGE_TOP",
+  "kind": "const",
+  "category": "Economy/Perk caps",
+  "file": "src/catalog/perkCaps.ts",
+  "line": 44,
+  "summary": "The top damage tier of a WEAPON legendary: +20 % where every other slot tops out at {@link LEGENDARY_PERK_TIERS} damage +10 (owner, 2026-11-09: weapon legendaries are a little overpowered on purpose). With the best set (S3, 13 pieces: 40) it reaches exactly the damage cap of 50. Data for IDL-144.",
+  "see": []
+ },
+ {
+  "id": "capperks",
+  "name": "capPerks",
+  "symbol": "capPerks",
+  "kind": "const",
+  "category": "Economy/Perk caps",
+  "file": "src/catalog/perkCaps.ts",
+  "line": 57,
+  "summary": "The one function that caps the perk families of a summed gear block. `aggregateStats` calls it, and the server reads gear only through `aggregateStats` (fight profile, income summary), so the browser and the server cannot disagree. A new object is returned; stats without a cap pass through unchanged.",
+  "see": []
+ },
+ {
   "id": "rarities",
   "name": "RARITIES",
   "symbol": "RARITIES",
@@ -1217,6 +1261,17 @@
   "file": "src/lib/fightSim.ts",
   "line": 57,
   "summary": "A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.",
+  "see": []
+ },
+ {
+  "id": "aggregatestats",
+  "name": "aggregateStats",
+  "symbol": "aggregateStats",
+  "kind": "function",
+  "category": "Economy/Perk caps",
+  "file": "src/lib/inventory.ts",
+  "line": 240,
+  "summary": "The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families (income, XP, kill reward, click, damage) are capped by {@link capPerks}. The server reads gear through this too, so both sides agree.",
   "see": []
  },
  {

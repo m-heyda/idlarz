@@ -46,7 +46,7 @@ when the code changes, change the block in the same edit. `tests/docs/reference.
 ## Pages
 
 - [Overview](overview.md) (2): What the game is and how the loop fits together.
-- [Economy](economy.md) (62): Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
+- [Economy](economy.md) (67): Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - [Combat](combat.md) (40): The player's numbers, the server's fight engine, auto-battle, skills and win chance.
 - [Monsters](monsters.md) (14): The roster, levels, growth, spawning and what a kill pays.
 - [Loot](loot.md) (22): The loot pipeline, rarities, affixes, sets, sell values and how to add content.
