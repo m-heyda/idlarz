@@ -1967,7 +1967,7 @@ A monster whose spawn was capped for a weak player has a smaller <code>growCap</
 </code></pre>
 </article><h2>Spawning</h2><article><p><a id="advancebank"></a></p>
 <h3><code>advanceBank</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:142</code></a></p>
+<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:143</code></a></p>
 <p>Runs the timers for <code>dtSec</code> seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
 (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
 With no room the chest and rat timers sit at 0, like the client&#39;s own timers. <code>rollFor(kind, n)</code> gives the random source of ticket
@@ -2010,14 +2010,10 @@ near what the player can beat; without it every type is equally likely and nothi
 </ul>
 </article><article><p><a id="ticketcap"></a></p>
 <h3><code>ticketCap</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:102</code></a></p>
+<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:103</code></a></p>
 <p>How many more tickets may wait: the same share of the free land as the client&#39;s own spawn limit (monsters and chests together),
-estimated from the owned tiles because the server never opens the map, and never more than <code>TICKET_CAP</code> per kind.</p>
+(<code>freeLand</code>, the client&#39;s own formula) estimated from the save&#39;s counts because the server never opens the map, and never more than <code>TICKET_CAP</code> per kind.</p>
 <p>The room for new tickets: monsters and chests together hold at most 30% of the free land, at least 2, at most 40 tickets in all.</p>
-<p><strong>Known issues</strong></p>
-<ul>
-<li>IDL-221 <code>ticketCap</code> estimates free land as <code>owned - 1 - buildings - ward</code> and does not subtract lakes.</li>
-</ul>
 </article><article><p><a id="distance-bands"></a></p>
 <h3><code>DISTANCE_BANDS</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/distanceBands.ts"><code>src/config/distanceBands.ts:25</code></a></p>

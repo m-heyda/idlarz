@@ -15,7 +15,3 @@ Open code-side findings, each written as `@knownissue` on the code it is about. 
 ### [`placeTickets`](monsters.md#placetickets) — [`src/lib/offline/placement.ts:75`](../../src/lib/offline/placement.ts)
 
 - IDL-222 bosses are never weighted by win chance (a uniform pick); needs an owner decision.
-
-### [`ticketCap`](monsters.md#ticketcap) — [`src/lib/offline/tickets.ts:102`](../../src/lib/offline/tickets.ts)
-
-- IDL-221 `ticketCap` estimates free land as `owned - 1 - buildings - ward` and does not subtract lakes.
