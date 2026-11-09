@@ -12,7 +12,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof)
 - Gems: [`STARTING_GEMS`](#starting-gems)
-- Crafting: [`CRAFTING`](#crafting)
+- Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 
 ## Levels
 
@@ -363,3 +363,92 @@ Source: [`src/config/crafting.ts:14`](../../src/config/crafting.ts)
 Crafting: the crafting level curve and the per-request limits. First draft, see `docs/plan/crafting-v0.md`. The curve is written as anchors like [`LEVELING`](progression.md#leveling): the total crafting XP at which a level is reached; between two anchors every step
 is the one before times a constant ratio (`src/lib/crafting.ts`). Recipes are data in `src/catalog/recipes.ts`. The crafting level is kept on rebirth (like the character level). Batch cap, queue slots, offline run hours and speed are limits
 ([`LIMITS`](progression.md#limits): `craftBatchCap`, `craftQueueSlots`, `craftOfflineHours`, `craftSpeed`).
+
+<a id="craft-gear"></a>
+
+### `CRAFT_GEAR` <small>const</small>
+
+Source: [`src/config/crafting.ts:46`](../../src/config/crafting.ts)
+
+Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through
+the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.
+
+- **Grades**: G1-G4 (`ceilingGrade`); a recipe unlocks at the crafting level of its grade (`unlock` in `src/catalog/recipes.ts`: G1 1, G2 8, G3 15, G4 25, owner 2026-11-07).
+- **Item level**: inside the grade's window, rising with the crafting level from the grade's unlock to the next grade's (`gradeLevel`), +-1 around the centre. Never above the window, so a Hide recipe always makes Hide gear.
+- **Rarity**: the profile's weights among the rarities the grade carries (`GRADE_INFO`), Luck multiplying rare and better (`rarityLuckMultiplier`); the crafting level caps it (`rarityCeiling`: up to rare, epic from 50, never legendary).
+- **Pity**, per grade, kept in `craft.pity` across rebirths: every craft that misses the grade's best rarity adds `pity.perMiss` to a multiplier on that rarity's weight (up to `pity.maxMultiplier`), a hit resets it. A grade with one rarity has none.
+- **Intelligence** leans the quality and every affix magnitude toward the top (`rollLeaning`): bias = (Intelligence - 5) x `qualityPerInt`, at most `qualityBiasCap`. It never touches the rarity or the affix count.
+
+**Gear crafting by grade** _(computed from the code)_
+
+| Grade | Unlock (crafting level) | Item level at unlock / at the next unlock | Seconds each | Rarities | Rarity chances at Luck 0 | at Luck 250 (cap) | Best rarity (pity) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| G1 Starter | 1 | 1-2 / 7-8 | 20 | common | common 100% | common 100% | none (one rarity) |
+| G2 Hide | 8 | 9-10 / 17-18 | 30 | common, uncommon | common 76.09%, uncommon 23.91% | common 76.09%, uncommon 23.91% | uncommon |
+| G3 Iron | 15 | 19-20 / 29-30 | 45 | uncommon | uncommon 100% | uncommon 100% | none (one rarity) |
+| G4 Steel | 25 | 31-32 / 41-42 | 60 | uncommon, rare | uncommon 78.57%, rare 21.43% | uncommon 69.62%, rare 30.38% | rare |
+
+<a id="gearitemlevels"></a>
+
+### `gearItemLevels` <small>function</small>
+
+Source: [`src/lib/craftGear.ts:37`](../../src/lib/craftGear.ts)
+
+The item level a recipe of this grade makes, by crafting level: the grade's window (`gradeLevels`) is climbed from its bottom at the grade's unlock to its top at the next grade's unlock, and the roll is +-1 around that centre, never outside the window.
+
+**Formula**
+
+```text
+centre = round(window low + (window high - window low) x clamp((crafting level - unlock) / (next unlock - unlock), 0, 1))
+item level = centre - 1 .. centre + 1, held inside the grade's window
+```
+
+<a id="qualitybiasof"></a>
+
+### `qualityBiasOf` <small>function</small>
+
+Source: [`src/lib/craftGear.ts:57`](../../src/lib/craftGear.ts)
+
+Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`.
+
+**Formula**
+
+```text
+bias = min(1, 0.01 x (Intelligence - 5)), 0 at 5 or less
+```
+
+<a id="pitymultiplier"></a>
+
+### `pityMultiplier` <small>function</small>
+
+Source: [`src/lib/craftGear.ts:78`](../../src/lib/craftGear.ts)
+
+The pity multiplier on the grade's best rarity after `misses` crafts that missed it.
+
+**Formula**
+
+```text
+multiplier = min(1.5, 1 + 0.05 x misses)        a hit resets the counter; a grade with one rarity has none
+```
+
+<a id="rollgear"></a>
+
+### `rollGear` <small>function</small>
+
+Source: [`src/lib/craftGear.ts:114`](../../src/lib/craftGear.ts)
+
+One crafted piece: the `craft` loot source rolls rarity (Luck, pity, ceiling), base, quality and affixes (Intelligence) for the recipe's slot inside the grade's item level window, and the piece is marked `crafted`. Null when nothing is eligible (a
+configuration error, never silently replaced).
+
+The roll of one gear craft. The server calls it once per delivered piece with `sealedRng(secret, user, 0, 'craft', craft.ord + n)`: the lifetime counter, not the run's, so a rebirth never repeats a sequence and a replayed claim rolls the same pieces.
+Rarity: the `craft` profile's weights among the grade's rarities, Luck on rare and better, the pity multiplier on the grade's best rarity, the crafting level's ceiling. Item level: [`gearItemLevels`](progression.md#gearitemlevels). Quality and affix magnitudes: [`qualityBiasOf`](progression.md#qualitybiasof).
+
+See also: [`gearOdds`](progression.md#gearodds), [`CRAFT_GEAR`](progression.md#craft-gear)
+
+<a id="gearodds"></a>
+
+### `gearOdds` <small>function</small>
+
+Source: [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts)
+
+What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.

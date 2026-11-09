@@ -18,12 +18,13 @@ test('recipe ids are unique and every input and output exists', () => {
 		}
 		assert.ok(r.output.qty > 0 && Number.isInteger(r.output.qty));
 		if ('item' in r.output) assert.ok(ITEM_CATALOG[r.output.item], `${r.id}: item ${r.output.item}`);
-		else assert.ok(COMPONENTS[r.output.component]);
+		else if ('component' in r.output) assert.ok(COMPONENTS[r.output.component]);
+		else assert.ok(r.kind === 'gear' && r.output.gear.grade && r.output.gear.slot, `${r.id}: a gear output names a grade and a slot`);
 	}
 });
 
-test('v0.1 uses potion, component and good recipes; potions are stackable consumables, goods are stacks with no effect, components stay in the stock', () => {
-	for (const r of RECIPES) {
+test('potion, component and good recipes: potions are stackable consumables, goods are stacks with no effect, components stay in the stock (gear is in gearRecipes.test.ts)', () => {
+	for (const r of RECIPES.filter((x) => x.kind !== 'gear')) {
 		assert.ok(r.kind === 'potion' || r.kind === 'component' || r.kind === 'good', r.id);
 		if (r.kind === 'component') {
 			assert.ok('component' in r.output);

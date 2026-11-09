@@ -4,12 +4,23 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ITEM_CATALOG } from '../src/catalog';
-import { COMPONENTS, RECIPES } from '../src/catalog/recipes';
+import { COMPONENTS, CRAFT_GRADES, CRAFT_SLOTS, GEAR_RECIPES, GEAR_UNLOCK, RECIPES as ALL_RECIPES } from '../src/catalog/recipes';
+import { GRADE_INFO, gradeLevels } from '../src/catalog/items/grades';
+import { CRAFT_GEAR } from '../src/config/crafting';
+import { gearItemLevels, rollGear } from '../src/lib/craftGear';
+import { generateLoot } from '../src/lib/loot/generate';
+import { sellValueOf } from '../src/lib/itemInstance';
+import { sealedRng } from '../src/lib/offline/seal';
+import { freshCharacter, simulateMany } from '../src/lib/fightSim';
+import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
+import type { Equipment, ItemInstance } from '../src/types/game';
 import { RESOURCES } from '../src/catalog/resources';
 import { CRAFTING } from '../src/config/crafting';
 import { HARD_LIMITS } from '../src/config/limits';
 import { craftCumulativeXp, craftLimit, craftTimeSec, recipeCostGold } from '../src/lib/crafting';
 
+// the gear recipes get their own section (one row per grade); the other tables are about potions, components and trade goods
+const RECIPES = ALL_RECIPES.filter((r) => r.kind !== 'gear');
 const WRITE_MD = process.argv.includes('--md');
 const lines: string[] = [];
 const out = (s = '') => lines.push(s);
@@ -114,6 +125,127 @@ for (const q of queues) {
 	);
 }
 out();
+out('## Gear recipes (IDL-241)');
+out();
+out(
+	"Gear recipes (grade x slot) are rolled by the server through the loot pipeline's `craft` source when a batch is claimed. Four gates keep crafting from replacing drops. (1) **No gold printer**: the cheapest recipe of a grade costs more (gold value of the inputs at merchant prices) than the mean sell value of its piece at the top of the grade's item level window, even with Intelligence 105 and the Luck cap. (2) **Crafting never out-scales drops**: at Luck 0 and the same item level a crafted piece is worth no more than a chest's. (3) **The cheapest tier beats the home land**: a crafted G1 kit beats the plains boars a starter kit beats, and a crafted G2 kit beats the level 9 boar. (4) What the income can pay for.",
+);
+out();
+const SAMPLES = 1500;
+type Grade = (typeof CRAFT_GRADES)[number];
+const sample = (grade: Grade, craftLevel: number, luck: number, intelligence: number, tag: string) => {
+	const items: ItemInstance[] = [];
+	for (let i = 0; i < SAMPLES; i++)
+		items.push(
+			rollGear({ grade, slot: CRAFT_SLOTS[i % CRAFT_SLOTS.length] }, { craftLevel, luck, intelligence }, sealedRng('craft-sim', 'u', 0, tag + grade, i))!.item,
+		);
+	return items;
+};
+const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
+const dropSample = (sourceId: string, level: number) => {
+	const values: number[] = [];
+	for (let i = 0; values.length < SAMPLES && i < SAMPLES * 4; i++)
+		for (const d of generateLoot({ sourceId, level, castleLevel: 1 }, sealedRng('craft-sim-drops', sourceId, 0, 'd', i)).drops)
+			if (d.kind === 'gear') values.push(sellValueOf(d.item));
+	return mean(values);
+};
+const nextOf = (grade: Grade) => GEAR_UNLOCK[CRAFT_GRADES[CRAFT_GRADES.indexOf(grade) + 1]] ?? CRAFT_GEAR.nextUnlock;
+
+out('Gate 1:');
+out();
+out(
+	'| Grade | Unlock | Seconds each | Item level (unlock / top) | Cheapest cost | Mean sell at unlock | Mean sell at top | Worst mean sell (Int 105, Luck cap) | Cost / worst sell | XP (chest) | Pieces to the next unlock | Gate 1 |',
+);
+out('|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|');
+for (const grade of CRAFT_GRADES) {
+	const recipes = GEAR_RECIPES.filter((r) => 'gear' in r.output && r.output.gear.grade === grade);
+	const cheapest = Math.min(...recipes.map((r) => recipeCostGold(r)));
+	const chest = recipes.find((r) => 'gear' in r.output && r.output.gear.slot === 'chest')!;
+	const atUnlock = mean(sample(grade, GEAR_UNLOCK[grade], 0, 5, 'unlock').map((item) => sellValueOf(item)));
+	const atTop = mean(sample(grade, 80, 0, 5, 'top').map((item) => sellValueOf(item)));
+	const worst = Math.max(
+		mean(sample(grade, 80, 0, 105, 'w0').map((item) => sellValueOf(item))),
+		mean(sample(grade, 80, 250, 105, 'w1').map((item) => sellValueOf(item))),
+	);
+	const ratio = cheapest / worst;
+	const pass = ratio >= 1.05;
+	gateFailed ||= !pass;
+	const climb = (craftCumulativeXp(nextOf(grade)) - craftCumulativeXp(GEAR_UNLOCK[grade])) / chest.xp;
+	const lo = gearItemLevels(grade, GEAR_UNLOCK[grade]);
+	const hi = gearItemLevels(grade, 80);
+	out(
+		`| ${grade} ${GRADE_INFO[grade].label} | ${GEAR_UNLOCK[grade]} | ${CRAFT_GEAR.timeSec[grade]} | ${lo.min}-${lo.max} / ${hi.min}-${hi.max} | ${Math.round(cheapest).toLocaleString('en')} | ${Math.round(atUnlock).toLocaleString('en')} | ${Math.round(atTop).toLocaleString('en')} | ${Math.round(worst).toLocaleString('en')} | ${ratio.toFixed(2)} | ${chest.xp} | ${Math.round(climb)} | ${pass ? 'ok' : '**below 1.05**'} |`,
+	);
+}
+out();
+out('Gate 2: mean sell value of one piece near the top item level of each grade (Luck 0, Intelligence 5), crafted against drops at the same item level.');
+out();
+out('| Grade | Item level | Crafted | Chest | Boss | Monster | Crafted / chest | Gate 2 |');
+out('|---|---:|---:|---:|---:|---:|---:|---|');
+for (const grade of CRAFT_GRADES) {
+	const level = gradeLevels(grade)[1] - 1;
+	const crafted = mean(sample(grade, 80, 0, 5, 'g2').map((item) => sellValueOf(item)));
+	const chest = dropSample('chest', level);
+	const boss = dropSample('boss', level);
+	const monster = dropSample('monster', level);
+	const pass = crafted <= chest * 1.03;
+	gateFailed ||= !pass;
+	out(
+		`| ${grade} | ${level} | ${Math.round(crafted).toLocaleString('en')} | ${Math.round(chest).toLocaleString('en')} | ${Math.round(boss).toLocaleString('en')} | ${Math.round(monster).toLocaleString('en')} | ${(crafted / chest).toFixed(2)} | ${pass ? 'ok' : '**over a chest**'} |`,
+	);
+}
+out();
+out(
+	"Gate 3: a full kit of crafted pieces (13 slots, a random weapon type, rolled at the crafting level that unlocks the grade) in the server's fight engine, 8 kits x 6 fights per cell, no potions, plains boars.",
+);
+out();
+const kitOf = (grade: Grade, n: number): Equipment => {
+	const eq: Equipment = {};
+	CRAFT_SLOTS.forEach((slot, i) => {
+		const piece = rollGear(
+			{ grade, slot },
+			{ craftLevel: GEAR_UNLOCK[grade], luck: 0, intelligence: 5 },
+			sealedRng('craft-sim-kit', grade, 0, slot, n * 100 + i),
+		)!.item;
+		if (slot === 'ring') eq.ring1 = eq.ring2 = piece;
+		else eq[slot] = piece;
+	});
+	return eq;
+};
+const winRate = (equipment: Equipment, level: number, fights: number) =>
+	simulateMany({ equipment, monster: { type: 'thistleBoar', level }, character: freshCharacter(), autoUse: false }, fights, 'craft-sim-fight').winRate;
+const avgKit = (grade: Grade, level: number) => mean(Array.from({ length: 8 }, (_, n) => winRate(kitOf(grade, n), level, 6)));
+const pctText = (ws: number[]) => ws.map((w) => `${Math.round(w * 100)}%`).join(' | ');
+out('| Kit | Boar level 1 | Boar level 5 | Boar level 9 |');
+out('|---|---:|---:|---:|');
+const starter = [1, 5, 9].map((l) => winRate(STARTER_EQUIPMENT, l, 24));
+out(`| starter kit | ${pctText(starter)} |`);
+const g1 = [1, 5, 9].map((l) => avgKit('G1', l));
+out(`| crafted G1 kit | ${pctText(g1)} |`);
+const g2 = [1, 5, 9].map((l) => avgKit('G2', l));
+out(`| crafted G2 kit | ${pctText(g2)} |`);
+const gate3 = g1[0] >= 0.9 && g1[1] >= 0.9 && g1.every((w, i) => w >= starter[i] - 0.05) && g2[2] >= 0.9;
+gateFailed ||= !gate3;
+out();
+out(
+	`Gate 3: ${gate3 ? 'ok' : '**FAIL**'} (crafted G1 wins boar levels 1 and 5 at 90% or more and never does worse than the starter kit; crafted G2 wins level 9 at 90% or more).`,
+);
+out();
+out(
+	"Gate 4, what income can pay for: gold income per second at castle 10 (the two ends of `MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/sim.ts) counted as if it were all spent on the grade's cheapest recipe, against the pieces a queue makes nonstop at base limits. An unpaid queue is idle, so the pieces per hour is the smaller of the two; by gate 1 the gold value of what is crafted never exceeds what it cost.",
+);
+out();
+out('| Grade | Cost in minutes of income (3,000 / 6,000 gold/s) | Pieces / hour one queue makes | Pieces / hour paid at 3,000 gold/s | at 6,000 gold/s |');
+out('|---|---|---:|---:|---:|');
+for (const grade of CRAFT_GRADES) {
+	const cheapest = Math.min(...GEAR_RECIPES.filter((r) => 'gear' in r.output && r.output.gear.grade === grade).map((r) => recipeCostGold(r)));
+	const queue = 3600 / CRAFT_GEAR.timeSec[grade];
+	const paid = (gps: number) => (gps * 3600) / cheapest;
+	out(
+		`| ${grade} | ${g(cheapest / 3000 / 60)} / ${g(cheapest / 6000 / 60)} | ${g(queue)} | ${g(Math.min(queue, paid(3000)))} | ${g(Math.min(queue, paid(6000)))} |`,
+	);
+}
+out();
 out('## Hours per level');
 out();
 out(
@@ -122,11 +254,12 @@ out(
 out();
 out('| Reached level | Hours for this level | Hours in total | Gold burned in total | Recipe used |');
 out('|---:|---:|---:|---:|---|');
-const xph = (r: (typeof timed)[number]) => (3600 / craftTimeSec(r)) * r.xp;
+const leveling = ALL_RECIPES.filter((r) => r.timeSec);
+const xph = (r: (typeof leveling)[number]) => (3600 / craftTimeSec(r)) * r.xp;
 let totalHours = 0;
 let totalGold = 0;
 for (let level = 1; level < CRAFTING.maxLevel; level++) {
-	const open = timed.filter((r) => r.unlock <= level);
+	const open = leveling.filter((r) => r.unlock <= level);
 	if (open.length === 0) break;
 	const pick = open.reduce((a, b) => (xph(a) >= xph(b) ? a : b));
 	const step = craftCumulativeXp(level + 1) - craftCumulativeXp(level);
@@ -143,6 +276,10 @@ out(
 );
 
 console.log(lines.join('\n'));
+if (gateFailed) {
+	console.error('craft-sim: a gate failed (see the lines marked below, over or FAIL above)');
+	process.exitCode = 1;
+}
 if (WRITE_MD) {
 	const path = resolve(__dirname, '..', 'docs', 'generated', 'craft-sim.md');
 	writeFileSync(path, lines.join('\n') + '\n');

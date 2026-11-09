@@ -44,6 +44,8 @@ export interface SaveDerived {
 	/** Total Luck (attributes + Lucky Charm + gear) and the gear's Gold Find %: they decide server-rolled rewards */
 	luck: number;
 	goldFind: number;
+	/** The character's Intelligence attribute: it leans the quality of crafted gear (src/lib/craftGear.ts). Absent on rows from before (read as 0). */
+	intelligence?: number;
 	/** The set bonuses' Kill Rewards %: extra gold and XP from a kill */
 	killRewardPct: number;
 	/** Chests standing on the map: the ledger is seeded from them the first time it is created (monsters are the ledger's own) */
@@ -130,6 +132,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			ratesAfterCastle: ratesAfterUpgrade(state),
 			luck: fx.luck,
 			goldFind: fx.goldFind,
+			intelligence: state.characterStats.intelligence,
 			killRewardPct: gear.killRewardPct,
 			chests: state.tiles.stats.chests,
 			offlineCapSec: offlineCapSec(limits),

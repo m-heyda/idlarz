@@ -105,8 +105,13 @@ export const craftLevelOf = (xp: number): { level: number; progress: number } =>
 	return { level, progress: remaining / craftXpToNext(level) };
 };
 
-/** The key of what a recipe makes in the crafting stash (`craft.stock`): the item id for a potion or a trade good, the component id for a component. */
-export const stashKeyOf = (recipe: Recipe): string => ('item' in recipe.output ? recipe.output.item : recipe.output.component);
+/** The key of what a recipe makes in the crafting stash (`craft.stock`): the item id for a potion or a trade good, the component id for a component. Gear never sits in the stash (it goes to the bag), so its key is one nothing is stored under. */
+export const stashKeyOf = (recipe: Recipe): string =>
+	'item' in recipe.output
+		? recipe.output.item
+		: 'component' in recipe.output
+			? recipe.output.component
+			: `gear:${recipe.output.gear.grade}:${recipe.output.gear.slot}`;
 
 /** The recipe that makes a component (the first one, there is one per component). */
 const makerOf = (component: string): Recipe | undefined => RECIPES.find((r) => 'component' in r.output && r.output.component === component);

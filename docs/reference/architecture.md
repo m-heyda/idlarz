@@ -63,7 +63,7 @@ Tiles an old save knew by row and column keep their logical coordinates: the cas
 
 ### `GameState` <small>interface</small>
 
-Source: [`src/types/game.ts:342`](../../src/types/game.ts)
+Source: [`src/types/game.ts:344`](../../src/types/game.ts)
 
 State. The persisted keys are `PERSISTED_KEYS` ([`PERSISTED_KEYS`](saves-and-server.md#persisted-keys)), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.
 

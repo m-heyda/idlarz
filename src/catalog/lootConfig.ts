@@ -1,4 +1,5 @@
 import { GRADES, type Grade } from '@/catalog/items/grades';
+import { CRAFT_GEAR } from '@/config/crafting';
 
 // Loot configuration: which sources give what. Pure data; the pipeline in src/lib/loot reads it and nothing here is
 // code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/reference/loot.md).
@@ -160,6 +161,8 @@ const biomePools = (): Record<string, PoolDef> =>
 export const LOOT_POOLS: Record<string, PoolDef> = {
 	general_equipment: { id: 'general_equipment', requireTags: ['gear'], excludeTags: ['named'], enabled: true },
 	...biomePools(),
+	/** The craft source's pool (IDL-241): ladder gear up to the highest crafted grade; the request names the slot and the item level window, so the grade follows. */
+	equipment_craft: { id: 'equipment_craft', requireTags: ['gear'], excludeTags: ['named'], maxGrade: CRAFT_GEAR.ceilingGrade, enabled: true },
 	legendary_weapons: { id: 'legendary_weapons', enabled: true },
 	potions_rat: {
 		id: 'potions_rat',
@@ -235,6 +238,20 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 		],
 		enabled: true,
 	},
+	/**
+	 * Crafted gear (IDL-241, `craft` source): one guaranteed roll per craft. The weights are held at or below the chest's and the boss's for the same rarities (common 62/20, uncommon 24/30, rare 9/30: rare share
+	 * among uncommon and rare is 21% here, 27% in a chest, 50% from a boss), and there is no epic or legendary: crafting never out-scales drops (`npm run craft-sim`). Luck, the pity counter, the crafting level's
+	 * rarity ceiling and Intelligence come in with the request (`LootRequest`).
+	 */
+	craft: {
+		id: 'craft',
+		rolls: { min: 1, max: 1, guaranteed: 1, chancePerRoll: 1 },
+		itemLevel: { offset: 0, variance: 1, min: 1, max: 100 },
+		rarityWeights: { common: 70, uncommon: 22, rare: 6 },
+		generalPoolId: 'equipment_craft',
+		bonusTables: [],
+		enabled: true,
+	},
 	// The merchant's shelf: plain pieces of gear (common and uncommon only; the rest stays a reward for fights and chests) at the world
 	// level, held to what the player wears (lib/merchant.ts, MERCHANT_GOODS)
 	merchant_stock: {
@@ -270,4 +287,6 @@ export const LOOT_SOURCES: Record<string, LootSource> = {
 	boss: { id: 'boss', lootProfileId: 'boss', levels: { min: 15, max: 45 } },
 	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perCastleLevel: 3 } },
 	merchant: { id: 'merchant', lootProfileId: 'merchant_stock', level: { base: 4, perCastleLevel: 3 } },
+	// Crafted gear: the caller passes the item level (a recipe's grade window), see CRAFT_GEAR. Levels 1-42 (41 and the variance of 1) are G1-G4.
+	craft: { id: 'craft', lootProfileId: 'craft', levels: { min: 1, max: 41 } },
 };

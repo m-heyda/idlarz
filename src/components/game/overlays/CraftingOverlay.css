@@ -353,3 +353,25 @@
 	font-variant-numeric: tabular-nums;
 	color: var(--px-gold);
 }
+
+.cr-sub {
+	margin: 6px 0 2px;
+	font-size: var(--text-sm);
+	color: var(--px-gold);
+}
+
+.cr-odds {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.cr-odds-rows {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 12px;
+}
+
+.cr-odds-row {
+	font-variant-numeric: tabular-nums;
+}

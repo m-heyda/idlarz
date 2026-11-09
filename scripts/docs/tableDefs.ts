@@ -30,6 +30,11 @@ import { SKILLS } from '../../src/catalog/skills';
 import { RARITIES } from '../../src/catalog/rarity';
 import { RESOURCE_TIERS, resourcesInTier } from '../../src/catalog/resources';
 import { LOOT_PROFILES, LOOT_SOURCES } from '../../src/catalog/lootConfig';
+import { CRAFT_SLOTS, CRAFT_GRADES, GEAR_RECIPES, GEAR_UNLOCK, type CraftGrade } from '../../src/catalog/recipes';
+import { GRADE_INFO } from '../../src/catalog/items/grades';
+import { CRAFT_GEAR } from '../../src/config/crafting';
+import { gearItemLevels, gearOdds, pityRarityOf } from '../../src/lib/craftGear';
+import { recipeCostGold } from '../../src/lib/crafting';
 import { castleAreaBonus, castleRangeRadius } from '../../src/lib/castleWard';
 import { castleModifier } from '../../src/utils/game/castle';
 import { buildingCostFactor } from '../../src/utils/game/costs';
@@ -351,3 +356,43 @@ TABLES['npm-scripts'] = () => {
 	const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
 	return { title: 'npm scripts (from package.json)', md: mdTable(['Script', 'Runs'], Object.entries(pkg.scripts).map(([k, v]) => [`\`npm run ${k}\``, `\`${v}\``])) };
 };
+
+TABLES['craft-gear'] = () => ({
+	title: 'Gear crafting by grade',
+	md: mdTable(
+		['Grade', 'Unlock (crafting level)', 'Item level at unlock / at the next unlock', 'Seconds each', 'Rarities', 'Rarity chances at Luck 0', 'at Luck 250 (cap)', 'Best rarity (pity)'],
+		CRAFT_GRADES.map((grade) => {
+			const target = { grade, slot: 'chest' } as const;
+			const at = (luck: number) =>
+				gearOdds(target, { craftLevel: GEAR_UNLOCK[grade], luck, intelligence: 5 })
+					.rarities.map((r) => `${r.id} ${pct(r.chance)}`)
+					.join(', ');
+			const low = gearItemLevels(grade, GEAR_UNLOCK[grade]);
+			const high = gearItemLevels(grade, 80);
+			return [
+				`${grade} ${GRADE_INFO[grade].label}`,
+				GEAR_UNLOCK[grade],
+				`${low.min}-${low.max} / ${high.min}-${high.max}`,
+				CRAFT_GEAR.timeSec[grade],
+				GRADE_INFO[grade].rarities.join(', '),
+				at(0),
+				at(250),
+				pityRarityOf(grade, GEAR_UNLOCK[grade]) ?? 'none (one rarity)',
+			];
+		}),
+	),
+});
+
+TABLES['craft-gear-recipes'] = () => ({
+	title: 'Gear recipe costs (gold value of the inputs at merchant prices) and crafting XP',
+	md: mdTable(
+		['Slot', ...CRAFT_GRADES.map((g: CraftGrade) => `${g} cost / XP`)],
+		CRAFT_SLOTS.map((slot) => [
+			slot,
+			...CRAFT_GRADES.map((grade: CraftGrade) => {
+				const r = GEAR_RECIPES.find((x) => 'gear' in x.output && x.output.gear.grade === grade && x.output.gear.slot === slot)!;
+				return `${fmt(recipeCostGold(r))} / ${r.xp}`;
+			}),
+		]),
+	),
+});

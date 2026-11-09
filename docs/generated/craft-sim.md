@@ -70,19 +70,60 @@ Gold from selling crafted trade goods (IDL-227) against the gold per second of t
 | base limits (1 queue, speed 1) | 33,120 | 9.2 | 0.3% | ok |
 | hard ceilings (5 queues, speed 4) | 220,800 | 61.3 | 2.0% | ok |
 
+## Gear recipes (IDL-241)
+
+Gear recipes (grade x slot) are rolled by the server through the loot pipeline's `craft` source when a batch is claimed. Four gates keep crafting from replacing drops. (1) **No gold printer**: the cheapest recipe of a grade costs more (gold value of the inputs at merchant prices) than the mean sell value of its piece at the top of the grade's item level window, even with Intelligence 105 and the Luck cap. (2) **Crafting never out-scales drops**: at Luck 0 and the same item level a crafted piece is worth no more than a chest's. (3) **The cheapest tier beats the home land**: a crafted G1 kit beats the plains boars a starter kit beats, and a crafted G2 kit beats the level 9 boar. (4) What the income can pay for.
+
+Gate 1:
+
+| Grade | Unlock | Seconds each | Item level (unlock / top) | Cheapest cost | Mean sell at unlock | Mean sell at top | Worst mean sell (Int 105, Luck cap) | Cost / worst sell | XP (chest) | Pieces to the next unlock | Gate 1 |
+|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|
+| G1 Starter | 1 | 20 | 1-2 / 7-8 | 2,395 | 357 | 1,732 | 1,891 | 1.27 | 78 | 26 | ok |
+| G2 Hide | 8 | 30 | 9-10 / 17-18 | 21,330 | 6,029 | 14,550 | 17,201 | 1.24 | 1040 | 28 | ok |
+| G3 Iron | 15 | 45 | 19-20 / 29-30 | 223,036 | 50,378 | 156,209 | 177,502 | 1.26 | 3250 | 27 | ok |
+| G4 Steel | 25 | 60 | 31-32 / 41-42 | 1,603,173 | 343,282 | 1,008,652 | 1,348,973 | 1.19 | 7800 | 27 | ok |
+
+Gate 2: mean sell value of one piece near the top item level of each grade (Luck 0, Intelligence 5), crafted against drops at the same item level.
+
+| Grade | Item level | Crafted | Chest | Boss | Monster | Crafted / chest | Gate 2 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| G1 | 7 | 1,746 | 5,186 | 10,156 | 1,483 | 0.34 | ok |
+| G2 | 17 | 15,483 | 41,609 | 77,035 | 13,989 | 0.37 | ok |
+| G3 | 29 | 158,147 | 227,330 | 325,770 | 144,627 | 0.70 | ok |
+| G4 | 41 | 1,013,337 | 1,448,198 | 2,088,984 | 987,892 | 0.70 | ok |
+
+Gate 3: a full kit of crafted pieces (13 slots, a random weapon type, rolled at the crafting level that unlocks the grade) in the server's fight engine, 8 kits x 6 fights per cell, no potions, plains boars.
+
+| Kit | Boar level 1 | Boar level 5 | Boar level 9 |
+|---|---:|---:|---:|
+| starter kit | 100% | 100% | 0% |
+| crafted G1 kit | 100% | 100% | 0% |
+| crafted G2 kit | 100% | 100% | 100% |
+
+Gate 3: ok (crafted G1 wins boar levels 1 and 5 at 90% or more and never does worse than the starter kit; crafted G2 wins level 9 at 90% or more).
+
+Gate 4, what income can pay for: gold income per second at castle 10 (the two ends of `MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/sim.ts) counted as if it were all spent on the grade's cheapest recipe, against the pieces a queue makes nonstop at base limits. An unpaid queue is idle, so the pieces per hour is the smaller of the two; by gate 1 the gold value of what is crafted never exceeds what it cost.
+
+| Grade | Cost in minutes of income (3,000 / 6,000 gold/s) | Pieces / hour one queue makes | Pieces / hour paid at 3,000 gold/s | at 6,000 gold/s |
+|---|---|---:|---:|---:|
+| G1 | 0.0 / 0.0 | 180 | 180 | 180 |
+| G2 | 0.1 / 0.1 | 120 | 120 | 120 |
+| G3 | 1.2 / 0.6 | 80 | 48.4 | 80 |
+| G4 | 8.9 / 4.5 | 60 | 6.7 | 13.5 |
+
 ## Hours per level
 
 Crafting nonstop, always the recipe with the most XP per hour among those unlocked. A level also needs the materials; the gold burned is what that costs at merchant prices.
 
 | Reached level | Hours for this level | Hours in total | Gold burned in total | Recipe used |
 |---:|---:|---:|---:|---|
-| 2 | 0.0 | 0 | 102 | Minor Healing Potion |
-| 5 | 0.1 | 0.2 | 1,378 | Minor Healing Potion |
-| 10 | 1.2 | 2.6 | 41,982 | Greater Healing Potion |
-| 20 | 2.8 | 22 | 369,999 | Greater Healing Potion |
-| 30 | 6.3 | 66.7 | 1,123,770 | Greater Healing Potion |
-| 45 | 33.1 | 323.1 | 5,445,713 | Greater Healing Potion |
-| 60 | 173.6 | 1666.7 | 28,099,675 | Greater Healing Potion |
-| 80 | 773.4 | 10000.1 | 168,599,613 | Greater Healing Potion |
+| 2 | 0 | 0 | 812 | Starter Weapon |
+| 5 | 0.0 | 0 | 10,996 | Starter Weapon |
+| 10 | 0.0 | 0.2 | 227,733 | Hide Weapon |
+| 20 | 0.0 | 0.5 | 3,913,575 | Iron Weapon |
+| 30 | 0.0 | 0.9 | 29,548,422 | Steel Weapon |
+| 45 | 0.2 | 2.5 | 229,222,897 | Steel Weapon |
+| 60 | 1.1 | 11.1 | 1,275,839,639 | Steel Weapon |
+| 80 | 5.0 | 64.6 | 7,766,959,859 | Steel Weapon |
 
-Crafting nonstop, level 80 would take about 10,000 hours of batches; the materials, not the clock, are the limit long before that.
+Crafting nonstop, level 80 would take about 65 hours of batches; the materials, not the clock, are the limit long before that.

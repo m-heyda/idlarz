@@ -34,6 +34,16 @@ export interface LootRequest {
 	luck?: number;
 	/** Extra guaranteed rolls on the general pool (a lucky monster) */
 	extraGearRolls?: number;
+	/** Only items of this slot are eligible (a crafting recipe picks the slot, not the item) */
+	slot?: ItemDef['slot'];
+	/** No item rolled for this request gets a lower item level than this (a crafting recipe stays inside its grade's window) */
+	minItemLevel?: number;
+	/** No rarity above this one is rolled (the crafting level's rarity ceiling) */
+	maxRarity?: string;
+	/** 0 and up: rolls toward the top of the quality and of every affix magnitude (Intelligence, crafting only). 0 changes nothing, not even the random numbers drawn. */
+	qualityBias?: number;
+	/** Multiplies the weight of one rarity (a crafting pity counter makes the tier's best rarity likelier) */
+	rarityBoost?: { rarity: string; multiplier: number };
 }
 
 /** Why one roll gave what it gave (dev tools, the simulator, bug reports). */
@@ -66,6 +76,17 @@ export interface LootResult {
 }
 
 const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
+
+/**
+ * A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). Used for the quality and the affix magnitudes of crafted gear (Intelligence).
+ *
+ * @category Loot/Pipeline
+ * @order 8
+ * @formula
+ * roll = floor(101 x u ^ (1 / (1 + bias)))        u uniform in [0, 1); bias 0 is a plain 0-100 roll, bias 1 has a mean of 67
+ */
+export const rollLeaning = (rng: Rng, bias = 0): number =>
+	bias > 0 ? Math.min(100, Math.floor(101 * Math.pow(rng(), 1 / (1 + bias)))) : randomInt(rng, 0, 100);
 
 /**
  * The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.
@@ -108,7 +129,7 @@ const countSuccesses = (rolls: RollsDef, level: number, rng: Rng, chanceMultipli
 };
 
 /** Rolls the affixes of an item: a count from the rarity, picked without replacement, one per group, respecting item level and tags. */
-const rollAffixes = (def: ItemDef, level: number, rarity: RarityDef, data: LootData, rng: Rng): { id: string; roll: number }[] => {
+const rollAffixes = (def: ItemDef, level: number, rarity: RarityDef, data: LootData, rng: Rng, bias = 0): { id: string; roll: number }[] => {
 	if (def.generation === 'named') return [];
 	const want = randomInt(rng, rarity.minAffixes, rarity.maxAffixes);
 	const picked: { id: string; roll: number }[] = [];
@@ -118,15 +139,15 @@ const rollAffixes = (def: ItemDef, level: number, rarity: RarityDef, data: LootD
 		const affix = weightedPick(options, (a) => a.weight, rng);
 		if (!affix) break; // fewer compatible affixes than the rarity wants: take what exists (the validator reports it)
 		groups.add(affix.group);
-		picked.push({ id: affix.id, roll: randomInt(rng, 0, 100) });
+		picked.push({ id: affix.id, roll: rollLeaning(rng, bias) });
 	}
 	return picked;
 };
 
-const makeInstance = (def: ItemDef, level: number, rarityId: string, data: LootData, rng: Rng): ItemInstance => {
+const makeInstance = (def: ItemDef, level: number, rarityId: string, data: LootData, rng: Rng, bias = 0): ItemInstance => {
 	const rarity = data.rarities[rarityId];
-	const quality = randomInt(rng, 0, 100);
-	return { base: def.id, level, rarity: rarityId, quality, affixes: rollAffixes(def, level, rarity, data, rng) };
+	const quality = rollLeaning(rng, bias);
+	return { base: def.id, level, rarity: rarityId, quality, affixes: rollAffixes(def, level, rarity, data, rng, bias) };
 };
 
 interface Ctx {
@@ -166,13 +187,18 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		const rarity = data.rarities[id];
 		if (!rarity?.enabled || !(weight > 0)) continue;
 		if (itemLevel < (profile.rarityLevelGate?.[id] ?? 1)) continue;
+		const ceiling = ctx.req.maxRarity ? data.rarities[ctx.req.maxRarity] : undefined;
+		if (ceiling && rarity.order > ceiling.order) continue;
 		// Luck moves the odds toward rare and better; the weights are normalised after, so the other rarities lose share, not weight
 		const lucky = rarity.order >= LUCK.rarityFromOrder ? rarityLuckMultiplier(ctx.req.luck ?? 0) : 1;
-		const candidates = all.filter((c) => c.def.generation === 'base' && (c.def.dropRarities ?? c.def.allowedRarities)?.includes(id));
+		const candidates = all.filter(
+			(c) => c.def.generation === 'base' && (c.def.dropRarities ?? c.def.allowedRarities)?.includes(id) && (!ctx.req.slot || c.def.slot === ctx.req.slot),
+		);
 		trace.eligible[id] = candidates.length;
 		if (candidates.length === 0) continue;
 		byRarity[id] = candidates;
-		weights.push({ id, weight: weight * lucky });
+		const boost = ctx.req.rarityBoost?.rarity === id ? Math.max(0, ctx.req.rarityBoost.multiplier) : 1;
+		weights.push({ id, weight: weight * lucky * boost });
 	}
 	const total = weights.reduce((sum, w) => sum + w.weight, 0);
 	for (const w of weights) trace.rarityChances[w.id] = w.weight / total;
@@ -184,7 +210,7 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		return null;
 	}
 	const def = weightedPick(byRarity[rarityId], (c) => c.weight, ctx.rng)!.def;
-	const item = makeInstance(def, itemLevel, rarityId, data, ctx.rng);
+	const item = makeInstance(def, itemLevel, rarityId, data, ctx.rng, ctx.req.qualityBias);
 	trace.rarity = rarityId;
 	trace.itemId = def.id;
 	trace.quality = item.quality;
@@ -225,7 +251,11 @@ const drawFixed = (ctx: Ctx, trace: RollTrace, def: ItemDef, itemLevel: number, 
 	return { kind: 'gear', item };
 };
 
-const capped = (ctx: Ctx, def: ItemLevelDef): ItemLevelDef => ({ ...def, max: Math.min(def.max ?? MAX_ITEM_LEVEL, ctx.req.maxItemLevel ?? MAX_ITEM_LEVEL) });
+const capped = (ctx: Ctx, def: ItemLevelDef): ItemLevelDef => ({
+	...def,
+	min: Math.max(def.min, ctx.req.minItemLevel ?? 1),
+	max: Math.min(def.max ?? MAX_ITEM_LEVEL, ctx.req.maxItemLevel ?? MAX_ITEM_LEVEL),
+});
 
 /** Runs one bonus table; returns what it dropped and whether it triggered. */
 const runTable = (ctx: Ctx, table: BonusTable): { drops: LootDrop[]; triggered: boolean } => {

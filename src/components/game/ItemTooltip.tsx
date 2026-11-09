@@ -116,6 +116,7 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 				<div className='px-tip-level'>
 					Item Level {formatCompact(resolved.instance.level)}
 					<span className='px-tip-muted'> · Quality {Math.round(qualityMultiplier(resolved.instance.quality) * 100)}%</span>
+					{resolved.instance.crafted && <span className='px-tip-muted'> · Crafted</span>}
 				</div>
 			)}
 			<div className='px-tip-sep' />
