@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COMBAT } from '../../src/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '../../src/catalog';
+import { TRADE_GOODS } from '../../src/catalog/recipes';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { ITEM_STAT_KEYS, MAX_ITEM_LEVEL, familyPieces, STAT_BASE_BY_TIER, WEAPON_ATTACK_SPEED, baseStat, levelScale, weaponDps } from '../../src/catalog';
 import { CLOTH_ITEMS } from '../../src/catalog/items/cloth';
@@ -18,12 +19,14 @@ test('catalog keys equal item ids', () => {
 	for (const [key, def] of Object.entries(ITEM_CATALOG)) assert.equal(def.id, key);
 });
 
-test('gear has a slot, consumables have healHp and stackMax', () => {
+test('gear has a slot, potions have healHp and stackMax, trade goods are slotless stacks', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
 		if (def.consumable) {
 			assert.ok(def.consumable.healHp > 0, def.id);
 			assert.ok((def.stackMax ?? 0) > 1, def.id);
 			assert.equal(def.slot, undefined, def.id);
+		} else if (TRADE_GOODS.includes(def)) {
+			assert.ok((def.stackMax ?? 0) > 1 && !def.slot, def.id);
 		} else {
 			assert.ok(def.slot, `${def.id} needs a slot`);
 			assert.equal(def.stackMax ?? 1, 1, def.id);

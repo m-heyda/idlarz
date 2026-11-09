@@ -1,5 +1,6 @@
 import type { Equipment, EquipmentSlot, ItemDef } from '@/types/game';
 import { ITEMS } from './items';
+import { TRADE_GOODS } from './recipes';
 import { SET_DEFS, type SetDef } from './sets';
 import { sumStats, type ItemStats, type StatTotals } from './stats';
 
@@ -19,7 +20,7 @@ export type { SetDef } from './sets';
 // No prototype: `ITEM_CATALOG['constructor']` must be undefined, or a forged save could name an item that is not one
 export const ITEM_CATALOG: Record<string, ItemDef> = Object.assign(
 	Object.create(null) as Record<string, ItemDef>,
-	Object.fromEntries(ITEMS.map((item) => [item.id, item])),
+	Object.fromEntries([...ITEMS, ...TRADE_GOODS].map((item) => [item.id, item])),
 );
 
 export interface ArmourSet extends SetDef {

@@ -12,5 +12,6 @@
 	{"icon": "art_mana_potion", "item": null, "file": "consumable/mana_potion", "slot": "consumable", "weapon": null, "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "art_greater_healing_flask", "item": "potion_greater", "file": "consumable/greater_healing_flask", "slot": "consumable", "weapon": null, "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "item_potion_hp", "item": "potion_minor", "file": null, "slot": "consumable", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_potion_greater", "item": "potion_greater", "file": null, "slot": "consumable", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"}
+	{"icon": "item_potion_greater", "item": "potion_greater", "file": null, "slot": "consumable", "weapon": null, "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_glass_vial", "item": null, "file": "consumable/glass_vial", "slot": "consumable", "weapon": null, "grade": null, "provenance": "supplied 32 px potion sheet public/pixel/assets_to_assess_and_use/potions/Icon8.png (owner-confirmed free licence, 2026-11-09), nearest-neighbour 2x to 64 px; for the Glass Vial component (IDL-227)"}
 ]
