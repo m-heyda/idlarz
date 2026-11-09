@@ -5,6 +5,7 @@ import '@fontsource-variable/mozilla-headline';
 // Titan One (Google Fonts, OFL) for the floating damage numbers of the combat window; only the latin subset is loaded
 import '@fontsource/titan-one/latin-400.css';
 import './globals.css';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
 	title: 'Idle Explorer',
@@ -18,7 +19,10 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body>{children}</body>
+			<body>
+				{children}
+				<Analytics />
+			</body>
 		</html>
 	);
 }
