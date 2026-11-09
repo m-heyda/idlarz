@@ -68,7 +68,7 @@ export interface FightEvent {
 	no: number;
 	/** Server clock (epoch seconds) */
 	t: number;
-	kind: 'engage' | 'hit' | 'crit' | 'super' | 'hurt' | 'dodged' | 'heal' | 'potion' | 'stun' | 'resist' | 'won' | 'defeated' | 'timeout' | 'retreat';
+	kind: 'engage' | 'hit' | 'crit' | 'super' | 'hurt' | 'dodged' | 'heal' | 'potion' | 'stun' | 'resist' | 'won' | 'defeated' | 'timeout' | 'retreat' | 'paused';
 	/** Damage dealt/taken or HP healed */
 	amount?: number;
 	/** `hurt` by a crit */
@@ -110,9 +110,10 @@ export interface CombatState {
 	ord: number;
 	/** Monsters that beat the player (or ran out the clock) by ticket number: not tried again before this (epoch seconds) */
 	retryAt: Record<string, number>;
-	/** Potions drunk this run by id, and how many of those the last accepted save already knew about */
 	/** Ticket numbers of the monsters waiting to be fought after the open fight, in the order clicked (docs/reference/combat.md). Rows from before have none: read it as empty. */
 	queue: number[];
+	/** Defeats in a row since the last win (absent: none); at `COMBAT.auto.pauseAfterDefeats` auto-battle switches itself off and this goes back to 0. Rows from before have none. */
+	defeatStreak?: number;
 	/** A heal over time from a potion (`regen` effect): HP per second until the second `untilSec` (absent: none) */
 	regen?: { hpPerSec: number; untilSec: number };
 	/** Number of the last event, and the most recent ones */
@@ -192,7 +193,7 @@ export interface CombatView {
 	/** Seconds until the soonest monster that beat the player may be tried again (0: none is waiting out) */
 	retrySec: number;
 	/** The monsters waiting for their turn, first to fight first (derived from the tickets: one that is gone is not listed) */
-	queue?: { n: number; type: MonsterType; level: number; lucky?: boolean }[];
+	queue?: { n: number; type: MonsterType; level: number; lucky?: boolean; winPct?: number }[];
 	/** How many the queue can hold */
 	queueMax?: number;
 	/** Server clock (epoch seconds) of this picture */

@@ -392,7 +392,7 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 350,
+  "line": 352,
   "summary": "The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`). Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
@@ -1019,13 +1019,24 @@
   "see": []
  },
  {
+  "id": "winbucketof",
+  "name": "winBucketOf",
+  "symbol": "winBucketOf",
+  "kind": "function",
+  "category": "Combat/Win chance",
+  "file": "src/lib/combat.ts",
+  "line": 61,
+  "summary": "The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red). The strip also shows the word and the exact percent on hover, so colour is never the only cue.",
+  "see": []
+ },
+ {
   "id": "damageperhit",
   "name": "damagePerHit",
   "symbol": "damagePerHit",
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 92,
+  "line": 109,
   "summary": "Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.",
   "see": []
  },
@@ -1036,7 +1047,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 103,
+  "line": 120,
   "summary": "Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.",
   "see": []
  },
@@ -1047,7 +1058,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 122,
+  "line": 139,
   "summary": "Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.",
   "see": []
  },
@@ -1058,7 +1069,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 140,
+  "line": 157,
   "summary": "One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.",
   "see": []
  },
@@ -1069,7 +1080,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 159,
+  "line": 176,
   "summary": "Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.",
   "see": []
  },
@@ -1080,7 +1091,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 173,
+  "line": 190,
   "summary": "The Life Leech in %, the gear's and the merchant's together, never above the cap.",
   "see": []
  },
@@ -1091,7 +1102,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 190,
+  "line": 207,
   "summary": "The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much, so no amount of armor makes anything unkillable (the asymptote is 75 %).",
   "see": []
  },
@@ -1102,7 +1113,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 203,
+  "line": 220,
   "summary": "Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.",
   "see": []
  },
@@ -1113,7 +1124,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 211,
+  "line": 228,
   "summary": "HP regeneration outside fights: the base rate plus the gear's regen stat.",
   "see": []
  },
@@ -1124,7 +1135,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 222,
+  "line": 239,
   "summary": "Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.",
   "see": []
  },
@@ -1602,7 +1613,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 86,
+  "line": 88,
   "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
   "see": []
  },
@@ -1613,7 +1624,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 106,
+  "line": 118,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -1638,7 +1649,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightTargets.ts",
-  "line": 88,
+  "line": 87,
   "summary": "A click while a fight is open: the monster joins the queue, or leaves it when it was already there.",
   "see": [
    "engage",
@@ -1652,7 +1663,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightTargets.ts",
-  "line": 113,
+  "line": 112,
   "summary": "The next fight: the queue's head (the player chose it, so no retry time and no win estimate stop it, but the hero must be back on his feet), then auto-battle's pick.",
   "see": []
  },

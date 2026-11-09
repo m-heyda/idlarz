@@ -83,7 +83,6 @@ export const queueHasTarget = (ctx: FightCtx): boolean => {
  * @category Combat/A fight
  * @order 3
  * @see engage, endFight
- * @knownissue IDL-59 the win-chance bucket and the three-defeat pause of the battle queue are still open.
  */
 export const queueTicket = (ctx: FightCtx, n: number): QueueResult => {
 	const c = ctx.c;
@@ -150,16 +149,15 @@ export const restFor = (ctx: FightCtx, t: number, now: number): number => {
 };
 
 /** The monsters waiting for their turn as the browser is shown them, first to fight first (one that is gone is not listed). */
-export const queueView = (ledger: Ledger, c: CombatState): { n: number; type: MonsterType; level: number; lucky: boolean }[] =>
+export const queueView = (
+	ledger: Ledger,
+	c: CombatState,
+	/** The win estimate for a monster, as a whole percent (the server's own, offline/winChance.ts) */
+	winPctOf: (type: MonsterType, level: number) => number,
+): { n: number; type: MonsterType; level: number; lucky: boolean; winPct: number }[] =>
 	(c.queue ?? []).flatMap((n) => {
 		const target = placedTarget(ledger, n);
 		if (!target) return [];
-		return [
-			{
-				n,
-				type: target.type,
-				level: levelAtAge(target.ticket.spawnLevel ?? 1, c.at - target.ticket.at, {}, target.ticket.growCap),
-				lucky: !!target.ticket.lucky,
-			},
-		];
+		const level = levelAtAge(target.ticket.spawnLevel ?? 1, c.at - target.ticket.at, {}, target.ticket.growCap);
+		return [{ n, type: target.type, level, lucky: !!target.ticket.lucky, winPct: winPctOf(target.type, level) }];
 	});

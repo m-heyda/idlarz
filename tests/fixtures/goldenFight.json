@@ -759,25 +759,26 @@
 			"t=700 at=700 hp=101 mp=40 cd=0/0/0 fight=#2:bossGreatAuroch:L15:hp1000:stun0:el0:pt0:mt0:left75:ord4:seq0 queue= ev=91   poll=27.4   retry=0",
 			"t=701 at=701 hp=101 mp=40 cd=0/0/0 fight=#2:bossGreatAuroch:L15:hp995.6:stun0:el1:pt0.166667:mt1:left74:ord4:seq1 queue= ev=92   poll=26.4   retry=0",
 			"t=702 at=702 hp=101 mp=40 cd=0/0/0 fight=#2:bossGreatAuroch:L15:hp991.2:stun0:el2:pt0.333333:mt2:left73:ord4:seq2 queue= ev=93   poll=25.4   retry=0",
-			"t=2000 at=2000 hp=46 mp=40 cd=0/0/0 fight=- queue= ev=224   poll=30   retry=584"
+			"t=2000 at=2000 hp=46 mp=40 cd=0/0/0 fight=- queue= ev=225   poll=600   retry=584"
 		],
 		"events": {
 			"count": 126,
 			"kinds": {
 				"engage": 6,
-				"hit": 87,
+				"hit": 86,
 				"hurt": 26,
 				"defeated": 4,
 				"won": 1,
 				"crit": 1,
-				"retreat": 1
+				"retreat": 1,
+				"paused": 1
 			},
 			"amounts": {
-				"hit": 407.8,
+				"hit": 403.5,
 				"hurt": 236,
 				"crit": 8.7
 			},
-			"digest": "c8b87dc57ca3a298d15334be7b9090bbe7ed65ab",
+			"digest": "e2ce236fd02504e073a35e65c8079f0bcc618cde",
 			"results": [
 				"1|1000000|engage||||2|bossGreatAuroch|15",
 				"52|1000033|defeated||||2|bossGreatAuroch|15",
@@ -790,7 +791,8 @@
 				"134|1001327|engage||||2|bossGreatAuroch|15",
 				"181|1001357|defeated||||2|bossGreatAuroch|15",
 				"182|1001957|engage||||2|bossGreatAuroch|16",
-				"224|1001984|defeated||||2|bossGreatAuroch|16"
+				"224|1001984|defeated||||2|bossGreatAuroch|16",
+				"225|1001984|paused||||||"
 			]
 		},
 		"final": {

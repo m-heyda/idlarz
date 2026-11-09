@@ -9,7 +9,7 @@ The player's numbers, the server's fight engine, auto-battle, skills and win cha
 - Overview: [Combat overview and tunables](#combat)
 - Player numbers: [`maxHp`](#maxhp), [`armorReduction`](#armorreduction), [`WEAPON_ATTACK_SPEED`](#weapon-attack-speed), [`damagePerHit`](#damageperhit), [`attacksPerSecond`](#attackspersecond), [`critOdds`](#critodds), [`swing`](#swing), [`armorOf`](#armorof), [`dodgeChance`](#dodgechance), [`lifeLeechPercent`](#lifeleechpercent), [`regen`](#regen), [`mitigate`](#mitigate)
 - A fight: [`runCombat`](#runcombat), [`pickTarget`](#picktarget), [`queueTicket`](#queueticket), [`autoBattleUnlocked`](#autobattleunlocked), [`playerProfile`](#playerprofile), [`fightStep`](#fightstep), [`endFight`](#endfight), [`engage`](#engage), [`dismissTicket`](#dismissticket), [`projectFight`](#projectfight), [`payKill`](#paykill), [`rngFor`](#rngfor)
-- Win chance: [`estimateWin`](#estimatewin)
+- Win chance: [`winBucketOf`](#winbucketof), [`estimateWin`](#estimatewin)
 - Potions and skills: [`healAmount`](#healamount), [`autoUse`](#autouse), [`SKILLS`](#skills)
 - Results and rest: [`restThrough`](#restthrough), [`UNCLAIMED_SEC`](#unclaimed-sec)
 - Consumables: [`BUFF_FAMILIES`](#buff-families), [`MAX_ACTIVE_BUFFS`](#max-active-buffs), [`readBuffs`](#readbuffs), [`addBuff`](#addbuff), [`buffTotals`](#bufftotals), [`drink`](#drink), [`withBuffs`](#withbuffs), [`applyUse`](#applyuse)
@@ -63,7 +63,7 @@ See also: [`armorReduction`](combat.md#armorreduction), [`damagePerHit`](combat.
 
 ### `armorReduction` <small>function</small>
 
-Source: [`src/lib/combat.ts:190`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:207`](../../src/lib/combat.ts)
 
 The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much,
 so no amount of armor makes anything unkillable (the asymptote is 75 %).
@@ -95,7 +95,7 @@ Attacks per second of each weapon type: dagger 1.6, wand 1.3, sword 1.2, spear 1
 
 ### `damagePerHit` <small>function</small>
 
-Source: [`src/lib/combat.ts:92`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:109`](../../src/lib/combat.ts)
 
 Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.
 
@@ -103,7 +103,7 @@ Damage of one swing (before crits): the gear's total damage times the attribute 
 
 ### `attacksPerSecond` <small>function</small>
 
-Source: [`src/lib/combat.ts:103`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:120`](../../src/lib/combat.ts)
 
 Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.
 
@@ -111,7 +111,7 @@ Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and 
 
 ### `critOdds` <small>function</small>
 
-Source: [`src/lib/combat.ts:122`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:139`](../../src/lib/combat.ts)
 
 Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.
 
@@ -119,7 +119,7 @@ Chance (0-1) that a swing crits, and that a crit becomes a super crit: character
 
 ### `swing` <small>function</small>
 
-Source: [`src/lib/combat.ts:140`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:157`](../../src/lib/combat.ts)
 
 One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never
 does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.
@@ -135,7 +135,7 @@ critExtra = 1 + (Str-5 x 1 + Dex-5 x 0.5 + Cha-5 x 0.5) / 100
 
 ### `armorOf` <small>function</small>
 
-Source: [`src/lib/combat.ts:159`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:176`](../../src/lib/combat.ts)
 
 Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.
 
@@ -143,7 +143,7 @@ Armor against monster hits: the gear's plus (when the attributes are given) what
 
 ### `dodgeChance` <small>function</small>
 
-Source: [`src/lib/combat.ts:222`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:239`](../../src/lib/combat.ts)
 
 Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.
 
@@ -151,7 +151,7 @@ Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.
 
 ### `lifeLeechPercent` <small>function</small>
 
-Source: [`src/lib/combat.ts:173`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:190`](../../src/lib/combat.ts)
 
 The Life Leech in %, the gear's and the merchant's together, never above the cap.
 
@@ -159,7 +159,7 @@ The Life Leech in %, the gear's and the merchant's together, never above the cap
 
 ### `regen` <small>function</small>
 
-Source: [`src/lib/combat.ts:211`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:228`](../../src/lib/combat.ts)
 
 HP regeneration outside fights: the base rate plus the gear's regen stat.
 
@@ -167,7 +167,7 @@ HP regeneration outside fights: the base rate plus the gear's regen stat.
 
 ### `mitigate` <small>function</small>
 
-Source: [`src/lib/combat.ts:203`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:220`](../../src/lib/combat.ts)
 
 Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.
 
@@ -223,16 +223,12 @@ See also: [`engage`](combat.md#engage), [`queueTicket`](combat.md#queueticket)
 
 ### `queueTicket` <small>function</small>
 
-Source: [`src/lib/offline/fightTargets.ts:88`](../../src/lib/offline/fightTargets.ts)
+Source: [`src/lib/offline/fightTargets.ts:87`](../../src/lib/offline/fightTargets.ts)
 
 A click while a fight is open: the monster joins the queue, or leaves it when it was already there.
 
 The battle queue: a click on another monster while a fight is open (or while resting for the next queued one) queues it; clicking it again removes it. Size `LIMITS.battleQueue` = 10 (hard 16).
 The queue's head starts as soon as HP is back at 80%, ignoring retry time and win estimate; it works before the first rebirth; it is cleared by a defeat, timeout, retreat, rebirth or an absence, kept by a win.
-
-**Known issues**
-
-- IDL-59 the win-chance bucket and the three-defeat pause of the battle queue are still open.
 
 See also: [`engage`](combat.md#engage), [`endFight`](combat.md#endfight)
 
@@ -256,7 +252,7 @@ Freezes everything a fight needs about the player into a `PlayerProfile` (max HP
 
 ### `fightStep` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:106`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:118`](../../src/lib/offline/fightSteps.ts)
 
 One tick of the open fight. Returns when the fight ended.
 
@@ -266,15 +262,17 @@ One tick of the open fight, in the order of the numbered list on [`runCombat`](c
 
 ### `endFight` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:86`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:88`](../../src/lib/offline/fightSteps.ts)
 
 Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.
+
+**Defeat streak**: auto-battle stays on after a defeat. Each defeat adds one to `CombatState.defeatStreak`; a win resets it; at `COMBAT.auto.pauseAfterDefeats` (3) defeats in a row auto-battle is switched off, a `paused` event is logged (the browser says 'Auto-battle paused: 3 defeats in a row') and the count starts again. A timeout or a retreat neither adds nor resets. The player turns the switch back on.
 
 <a id="engage"></a>
 
 ### `engage` <small>function</small>
 
-Source: [`src/lib/offline/fightTargets.ts:113`](../../src/lib/offline/fightTargets.ts)
+Source: [`src/lib/offline/fightTargets.ts:112`](../../src/lib/offline/fightTargets.ts)
 
 The next fight: the queue's head (the player chose it, so no retry time and no win estimate stop it, but the hero must be back on his feet), then auto-battle's pick.
 
@@ -317,6 +315,23 @@ Source: [`src/lib/offline/fightContext.ts:81`](../../src/lib/offline/fightContex
 The next random stream of a fight: sealed on the secret, the user, the run and the fight's ordinal, one draw per call.
 
 ## Win chance
+
+<a id="winbucketof"></a>
+
+### `winBucketOf` <small>function</small>
+
+Source: [`src/lib/combat.ts:61`](../../src/lib/combat.ts)
+
+The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it):
+Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red).
+The strip also shows the word and the exact percent on hover, so colour is never the only cue.
+
+**Formula**
+
+```text
+pct    = round(chance x 100)
+bucket = Safe if pct >= 100 x safeWinChance (80), Risky if pct >= 100 x minWinChance (50), else Unlikely
+```
 
 <a id="estimatewin"></a>
 

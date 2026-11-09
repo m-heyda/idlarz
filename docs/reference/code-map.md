@@ -567,6 +567,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`combat.test.ts`](../../tests/combat/combat.test.ts)
 - [`combatFloatText.test.ts`](../../tests/combat/combatFloatText.test.ts)
 - [`curves.test.ts`](../../tests/combat/curves.test.ts) — ~ The three exponential stages written out from the config, kept here as the reference.
+- [`defeatPause.test.ts`](../../tests/combat/defeatPause.test.ts) — ~ Runs second by second (the engine's own request limit) until `stop` says so or `maxSec` passed.
 - [`effectiveStats.test.ts`](../../tests/combat/effectiveStats.test.ts)
 - [`emberModel.test.ts`](../../tests/combat/emberModel.test.ts)
 - [`fightBalance.test.ts`](../../tests/combat/fightBalance.test.ts) — ~ A full kit of one grade (a mace unless said otherwise), at the start of the grade window
