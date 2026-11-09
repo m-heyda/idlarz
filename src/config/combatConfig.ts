@@ -305,6 +305,13 @@ const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof type
 	};
 };
 
+/**
+ * The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 10 or more tiles from the castle, past the outskirts' start (7) and
+ * into land a new kingdom has not bought yet, and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9.
+ */
+export const BOSS_MIN_DISTANCE = 10;
+export const BOSS_MAX_DISTANCE = 999;
+
 /** A boss always has a clock and taunts (the type says so, so a caller need not check) */
 const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly string[]): MonsterDef & { timeLimitSec: number; taunts: readonly string[] } => {
 	const b = BIOME_TIER[biome].boss;
@@ -318,7 +325,7 @@ const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly st
 		critMult: 1.5,
 		stunResist: b.stunResist,
 		attackSpeed: 1 / 3, // one hit every 3 s; armor decides how many hits you survive, potions fill the gap
-		spawn: { biomes: [biome], minCastleDistance: 2, maxCastleDistance: 9 },
+		spawn: { biomes: [biome], minCastleDistance: BOSS_MIN_DISTANCE, maxCastleDistance: BOSS_MAX_DISTANCE },
 		reward: { gold: { rewardSec: 3600, cap: b.cap.gold }, xp: { rewardSec: 3600, cap: b.cap.xp }, levelMult: 1.03 },
 		refLevel: b.refLevel,
 		scaling: 'gear',

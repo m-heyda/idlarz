@@ -143,7 +143,7 @@ test('gems found in chests raise the server balance and are never flagged in the
 	const { m, now } = await playing(60 * 8);
 	let found = 0;
 	const listed = ok(await syncTickets(m.deps, 'u1', now)).tickets.chests.slice(0, 20);
-	assert.ok(listed.length >= 10);
+	assert.ok(listed.length >= 5, 'the 60-tile map has room for several chests once its lakes are left out of the cap (IDL-221)');
 	for (const [i, spot] of listed.entries()) {
 		const result = ok(await redeemChest(m.deps, 'u1', `chest-key-${2000 + i}`, spot, now + i * 1000));
 		if (result.ok) found += result.gems;

@@ -392,7 +392,7 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 352,
+  "line": 359,
   "summary": "The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`). Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
@@ -1710,8 +1710,8 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/placement.ts",
-  "line": 75,
-  "summary": "Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`). With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are never weighted or capped.",
+  "line": 73,
+  "summary": "Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`). With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 10 or more tiles from the castle (`BOSS_MIN_DISTANCE`).",
   "see": []
  },
  {
@@ -1797,8 +1797,8 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 102,
-  "summary": "How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together), estimated from the owned tiles because the server never opens the map, and never more than `TICKET_CAP` per kind.",
+  "line": 103,
+  "summary": "How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together), (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.",
   "see": []
  },
  {
@@ -1808,7 +1808,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 142,
+  "line": 143,
   "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.",
   "see": []
  },

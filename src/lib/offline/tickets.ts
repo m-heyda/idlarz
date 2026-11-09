@@ -3,7 +3,7 @@ import { SPAWN_LIMIT } from '@/config/spawns';
 import { chestIntervalSec, luckyRatChance } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import type { MonsterType } from '@/types/game';
-import { wardTiles } from '@/lib/spawnLimits';
+import { freeLand } from '@/lib/spawnLimits';
 
 // The spawn bank. For a signed-in player the SERVER decides when a chest or a monster has appeared (from its own clock) and what is in
 // it; the browser only places the picture on the map. A "ticket" is the server's record of one chest or monster that is waiting to be
@@ -72,6 +72,8 @@ export interface BankContext {
 	luck: number;
 	tilesOwned: number;
 	buildingsOwned: number;
+	/** Owned lake tiles (from the save summary's `derived.lakesOwned`; 0 when absent): they cannot hold a monster or chest */
+	lakesOwned: number;
 	castleLevel: number;
 }
 
@@ -91,16 +93,15 @@ const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.rats
 
 /**
  * How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
- * estimated from the owned tiles because the server never opens the map, and never more than `TICKET_CAP` per kind.
+ * (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.
  *
  * The room for new tickets: monsters and chests together hold at most 30% of the free land, at least 2, at most 40 tickets in all.
  *
  * @category Monsters/Spawning
  * @order 5
- * @knownissue IDL-221 `ticketCap` estimates free land as `owned - 1 - buildings - ward` and does not subtract lakes.
  */
 export const ticketCap = (ctx: BankContext): number => {
-	const free = Math.max(0, ctx.tilesOwned - 1 - ctx.buildingsOwned - wardTiles(ctx.castleLevel));
+	const free = freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.buildingsOwned, ctx.castleLevel);
 	return Math.min(TICKET_CAP, Math.max(SPAWN_LIMIT.minAllowed, Math.floor(free * SPAWN_LIMIT.maxFraction)));
 };
 

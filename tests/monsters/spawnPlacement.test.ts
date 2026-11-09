@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, patchTileAt } from '../helpers';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
-import { MONSTERS } from '../../src/config/combatConfig';
+import { BOSS_MIN_DISTANCE, MONSTERS } from '../../src/config/combatConfig';
+import { syntheticWorld } from '../../src/utils/worldGen';
 import { castleDistance } from '../../src/lib/distance';
 import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '../../src/lib/offline/placement';
 import { emptyBank, monsterTypeOf, type TicketBank } from '../../src/lib/offline/tickets';
@@ -30,8 +31,8 @@ const world = (tiles: number) => {
 
 test('every ticket gets a tile on land 2 to 9 tiles from the castle, never twice the same, and the level it appeared at', () => {
 	const tiles = world(60);
-	const out = placeTickets(bankWith(6, true), tiles, 'k', 0, rollFor);
-	const all = [...out.rats, out.king!];
+	const out = placeTickets(bankWith(6), tiles, 'k', 0, rollFor);
+	const all = out.rats;
 	assert.ok(all.every(isPlaced));
 	assert.equal(new Set(all.map((t) => `${t.x},${t.y}`)).size, all.length);
 	for (const t of all) {
@@ -146,4 +147,16 @@ test('a chest with no tile left stays hidden until the land grows', () => {
 	assert.equal(grown.chests.filter(isChestPlaced).length, 2);
 	assert.equal(needsLook(grown, 'grown'), false);
 	assert.equal(needsLook({ ...grown, chests: [...grown.chests, { n: 9, at: 1 }] }, 'grown'), true, 'a new chest is looked at');
+});
+
+test('IDL-222: a boss stands 10 or more tiles out, and a kingdom that small has no tile for one', () => {
+	const small = placeTickets(bankWith(0, true), world(60), 'k', 0, rollFor);
+	assert.equal(small.sites!.king, 0, 'the 60 tiles bought first all lie within 9 of the castle');
+	assert.equal(isPlaced(small.king!), false);
+	const big = syntheticWorld(1500, 4);
+	const out = placeTickets(bankWith(0, true), big, 'k', 0, rollFor);
+	assert.ok(out.sites!.king > 0);
+	assert.ok(isPlaced(out.king!));
+	assert.equal(MONSTERS[monsterTypeOf(out.king!, 'king')].grade, 'boss');
+	assert.ok(castleDistance({ x: out.king!.x!, y: out.king!.y! }) >= BOSS_MIN_DISTANCE);
 });
