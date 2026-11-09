@@ -46,6 +46,10 @@ export interface AssetEntry {
 	status: AssetStatus;
 	/** What uses it: item id, monster id, building type, resource key ... */
 	usedBy: string[];
+	/** Gear only: equipment slot (`head`, `neck`, `ring`, `mainHand`, `offHand` ...), and weapon type / grade where known, for sorting and filtering */
+	slot?: string;
+	weaponType?: string;
+	grade?: string;
 	/** Folder or registry the picture came from */
 	source: string;
 	/** Other renderings of the same object (no shadow, soft shadow, shadow on grass ...), variant -> URL */
@@ -165,6 +169,9 @@ export const buildManifest = (): AssetEntry[] => {
 			src,
 			status,
 			usedBy: e.item ? [e.item] : [],
+			slot: e.slot,
+			weaponType: e.weapon ?? undefined,
+			grade: e.grade ?? undefined,
 			source: 'itemIcons registry',
 		});
 	}

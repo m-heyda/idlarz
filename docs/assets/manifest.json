@@ -6,6 +6,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/arcane_swirl.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -19,6 +20,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/glass_vial.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -34,6 +36,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/greater_healing_flask.png",
 		"status": "used",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -49,6 +52,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/healing_flask.png",
 		"status": "used",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -62,6 +66,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/hourglass_draught.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -77,6 +82,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/mana_potion.png",
 		"status": "used",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -90,6 +96,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/phoenix_elixir.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -103,6 +110,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/prism_shard.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -116,6 +124,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/starwater_elixir.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -129,6 +138,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/stoneskin_tonic.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -142,6 +152,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/toxin_vial.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -155,6 +166,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/venom_flask.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -168,6 +180,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/vitality_heart.png",
 		"status": "unused",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -183,6 +196,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/icons/item_potion_greater.png",
 		"status": "used",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -198,6 +212,7 @@
 		"subcategory": "consumable",
 		"src": "/pixel/icons/item_potion_hp.png",
 		"status": "used",
+		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -837,6 +852,8 @@
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/items/legendary/reapers_crescent.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "axe",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -852,6 +869,8 @@
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/items/legendary/tidecaller_axe.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "axe",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -867,6 +886,8 @@
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/icons/item_battle_axe.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "axe",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -882,6 +903,9 @@
 		"subcategory": "mainHand/axe G1",
 		"src": "/pixel/icons/item_hatchet.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -897,6 +921,9 @@
 		"subcategory": "mainHand/axe G2",
 		"src": "/pixel/icons/item_bronze_axe.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -912,6 +939,9 @@
 		"subcategory": "mainHand/axe G3",
 		"src": "/pixel/icons/item_iron_axe.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -925,6 +955,9 @@
 		"subcategory": "mainHand/axe G4",
 		"src": "/pixel/items/mainHand/axe/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -938,6 +971,9 @@
 		"subcategory": "mainHand/axe G5",
 		"src": "/pixel/items/mainHand/axe/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -951,6 +987,9 @@
 		"subcategory": "mainHand/axe G6",
 		"src": "/pixel/items/mainHand/axe/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -964,6 +1003,9 @@
 		"subcategory": "mainHand/axe G7",
 		"src": "/pixel/items/mainHand/axe/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -977,6 +1019,9 @@
 		"subcategory": "mainHand/axe G8",
 		"src": "/pixel/items/mainHand/axe/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -990,6 +1035,9 @@
 		"subcategory": "mainHand/axe G9",
 		"src": "/pixel/items/mainHand/axe/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1003,6 +1051,9 @@
 		"subcategory": "mainHand/axe S1",
 		"src": "/pixel/items/mainHand/axe/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1016,6 +1067,9 @@
 		"subcategory": "mainHand/axe S2",
 		"src": "/pixel/items/mainHand/axe/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1029,6 +1083,9 @@
 		"subcategory": "mainHand/axe S3",
 		"src": "/pixel/items/mainHand/axe/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1044,6 +1101,8 @@
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/items/legendary/cinderflight_bow.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "bow",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1059,6 +1118,8 @@
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/icons/item_hunting_bow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "bow",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1074,6 +1135,8 @@
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/icons/item_obsidian_longbow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "bow",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1089,6 +1152,8 @@
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/icons/item_recurve_bow.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "bow",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1104,6 +1169,8 @@
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/icons/item_starfall_bow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "bow",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1119,6 +1186,9 @@
 		"subcategory": "mainHand/bow G1",
 		"src": "/pixel/icons/item_twig_bow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1132,6 +1202,9 @@
 		"subcategory": "mainHand/bow G2",
 		"src": "/pixel/items/mainHand/bow/ph_g2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1147,6 +1220,9 @@
 		"subcategory": "mainHand/bow G3",
 		"src": "/pixel/icons/item_yew_bow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1160,6 +1236,9 @@
 		"subcategory": "mainHand/bow G4",
 		"src": "/pixel/items/mainHand/bow/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1173,6 +1252,9 @@
 		"subcategory": "mainHand/bow G5",
 		"src": "/pixel/items/mainHand/bow/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1186,6 +1268,9 @@
 		"subcategory": "mainHand/bow G6",
 		"src": "/pixel/items/mainHand/bow/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1199,6 +1284,9 @@
 		"subcategory": "mainHand/bow G7",
 		"src": "/pixel/items/mainHand/bow/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1212,6 +1300,9 @@
 		"subcategory": "mainHand/bow G8",
 		"src": "/pixel/items/mainHand/bow/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1225,6 +1316,9 @@
 		"subcategory": "mainHand/bow G9",
 		"src": "/pixel/items/mainHand/bow/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1238,6 +1332,9 @@
 		"subcategory": "mainHand/bow S1",
 		"src": "/pixel/items/mainHand/bow/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1251,6 +1348,9 @@
 		"subcategory": "mainHand/bow S2",
 		"src": "/pixel/items/mainHand/bow/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1264,6 +1364,9 @@
 		"subcategory": "mainHand/bow S3",
 		"src": "/pixel/items/mainHand/bow/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1279,6 +1382,8 @@
 		"subcategory": "mainHand/crossbow",
 		"src": "/pixel/icons/item_obsidian_crossbow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1294,6 +1399,9 @@
 		"subcategory": "mainHand/crossbow G1",
 		"src": "/pixel/icons/item_wooden_crossbow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1309,6 +1417,9 @@
 		"subcategory": "mainHand/crossbow G2",
 		"src": "/pixel/icons/item_bronze_crossbow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1324,6 +1435,9 @@
 		"subcategory": "mainHand/crossbow G3",
 		"src": "/pixel/icons/item_iron_crossbow.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1337,6 +1451,9 @@
 		"subcategory": "mainHand/crossbow G4",
 		"src": "/pixel/items/mainHand/crossbow/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1350,6 +1467,9 @@
 		"subcategory": "mainHand/crossbow G5",
 		"src": "/pixel/items/mainHand/crossbow/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1363,6 +1483,9 @@
 		"subcategory": "mainHand/crossbow G6",
 		"src": "/pixel/items/mainHand/crossbow/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1376,6 +1499,9 @@
 		"subcategory": "mainHand/crossbow G7",
 		"src": "/pixel/items/mainHand/crossbow/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1389,6 +1515,9 @@
 		"subcategory": "mainHand/crossbow G8",
 		"src": "/pixel/items/mainHand/crossbow/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1402,6 +1531,9 @@
 		"subcategory": "mainHand/crossbow G9",
 		"src": "/pixel/items/mainHand/crossbow/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1415,6 +1547,9 @@
 		"subcategory": "mainHand/crossbow S1",
 		"src": "/pixel/items/mainHand/crossbow/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1428,6 +1563,9 @@
 		"subcategory": "mainHand/crossbow S2",
 		"src": "/pixel/items/mainHand/crossbow/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1441,6 +1579,9 @@
 		"subcategory": "mainHand/crossbow S3",
 		"src": "/pixel/items/mainHand/crossbow/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "crossbow",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1456,6 +1597,8 @@
 		"subcategory": "mainHand/dagger",
 		"src": "/pixel/icons/item_obsidian_kris.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "dagger",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1471,6 +1614,8 @@
 		"subcategory": "mainHand/dagger",
 		"src": "/pixel/icons/item_steel_dagger.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "dagger",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1486,6 +1631,9 @@
 		"subcategory": "mainHand/dagger G1",
 		"src": "/pixel/icons/item_bone_knife.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1501,6 +1649,9 @@
 		"subcategory": "mainHand/dagger G2",
 		"src": "/pixel/icons/item_bronze_dirk.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1516,6 +1667,9 @@
 		"subcategory": "mainHand/dagger G3",
 		"src": "/pixel/icons/item_iron_dagger.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1529,6 +1683,9 @@
 		"subcategory": "mainHand/dagger G4",
 		"src": "/pixel/items/mainHand/dagger/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1542,6 +1699,9 @@
 		"subcategory": "mainHand/dagger G5",
 		"src": "/pixel/items/mainHand/dagger/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1555,6 +1715,9 @@
 		"subcategory": "mainHand/dagger G6",
 		"src": "/pixel/items/mainHand/dagger/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1568,6 +1731,9 @@
 		"subcategory": "mainHand/dagger G7",
 		"src": "/pixel/items/mainHand/dagger/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1581,6 +1747,9 @@
 		"subcategory": "mainHand/dagger G8",
 		"src": "/pixel/items/mainHand/dagger/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1594,6 +1763,9 @@
 		"subcategory": "mainHand/dagger G9",
 		"src": "/pixel/items/mainHand/dagger/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1607,6 +1779,9 @@
 		"subcategory": "mainHand/dagger S1",
 		"src": "/pixel/items/mainHand/dagger/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1620,6 +1795,9 @@
 		"subcategory": "mainHand/dagger S2",
 		"src": "/pixel/items/mainHand/dagger/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1633,6 +1811,9 @@
 		"subcategory": "mainHand/dagger S3",
 		"src": "/pixel/items/mainHand/dagger/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "dagger",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1648,6 +1829,8 @@
 		"subcategory": "mainHand/mace",
 		"src": "/pixel/icons/item_steel_mace.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "mace",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1663,6 +1846,8 @@
 		"subcategory": "mainHand/mace",
 		"src": "/pixel/icons/item_wooden_club.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -1678,6 +1863,9 @@
 		"subcategory": "mainHand/mace G1",
 		"src": "/pixel/items/mainHand/mace/gnarled_club.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1693,6 +1881,9 @@
 		"subcategory": "mainHand/mace G1",
 		"src": "/pixel/items/mainHand/mace/knotted_cudgel.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1706,6 +1897,9 @@
 		"subcategory": "mainHand/mace G1",
 		"src": "/pixel/items/mainHand/mace/ph_g1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1721,6 +1915,9 @@
 		"subcategory": "mainHand/mace G2",
 		"src": "/pixel/items/mainHand/mace/bronze_mace.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1736,6 +1933,9 @@
 		"subcategory": "mainHand/mace G2",
 		"src": "/pixel/items/mainHand/mace/verdigris_mace.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1751,6 +1951,9 @@
 		"subcategory": "mainHand/mace G3",
 		"src": "/pixel/items/mainHand/mace/iron_mace.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1766,6 +1969,9 @@
 		"subcategory": "mainHand/mace G3",
 		"src": "/pixel/items/mainHand/mace/iron_morningstar.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1781,6 +1987,9 @@
 		"subcategory": "mainHand/mace G3",
 		"src": "/pixel/items/mainHand/mace/spiked_mace.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1794,6 +2003,9 @@
 		"subcategory": "mainHand/mace G4",
 		"src": "/pixel/items/mainHand/mace/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1807,6 +2019,9 @@
 		"subcategory": "mainHand/mace G5",
 		"src": "/pixel/items/mainHand/mace/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1822,6 +2037,9 @@
 		"subcategory": "mainHand/mace G5",
 		"src": "/pixel/items/mainHand/mace/sunburst_mace.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1837,6 +2055,9 @@
 		"subcategory": "mainHand/mace G6",
 		"src": "/pixel/items/mainHand/mace/deathgrin_mace.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1850,6 +2071,9 @@
 		"subcategory": "mainHand/mace G6",
 		"src": "/pixel/items/mainHand/mace/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1865,6 +2089,9 @@
 		"subcategory": "mainHand/mace G7",
 		"src": "/pixel/items/mainHand/mace/frostcrystal_mace.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1880,6 +2107,9 @@
 		"subcategory": "mainHand/mace G7",
 		"src": "/pixel/items/mainHand/mace/magma_flail.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1893,6 +2123,9 @@
 		"subcategory": "mainHand/mace G7",
 		"src": "/pixel/items/mainHand/mace/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1906,6 +2139,9 @@
 		"subcategory": "mainHand/mace G8",
 		"src": "/pixel/items/mainHand/mace/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1919,6 +2155,9 @@
 		"subcategory": "mainHand/mace G9",
 		"src": "/pixel/items/mainHand/mace/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1932,6 +2171,9 @@
 		"subcategory": "mainHand/mace S1",
 		"src": "/pixel/items/mainHand/mace/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1945,6 +2187,9 @@
 		"subcategory": "mainHand/mace S2",
 		"src": "/pixel/items/mainHand/mace/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1958,6 +2203,9 @@
 		"subcategory": "mainHand/mace S3",
 		"src": "/pixel/items/mainHand/mace/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "mace",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1973,6 +2221,8 @@
 		"subcategory": "mainHand/maul",
 		"src": "/pixel/items/legendary/runeforged_titanhammer.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "maul",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -1988,6 +2238,8 @@
 		"subcategory": "mainHand/maul",
 		"src": "/pixel/icons/item_obsidian_maul.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2003,6 +2255,8 @@
 		"subcategory": "mainHand/maul",
 		"src": "/pixel/icons/item_titan_maul.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2018,6 +2272,9 @@
 		"subcategory": "mainHand/maul G1",
 		"src": "/pixel/items/mainHand/maul/log_maul.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2033,6 +2290,9 @@
 		"subcategory": "mainHand/maul G1",
 		"src": "/pixel/items/mainHand/maul/stone_hammer.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2048,6 +2308,9 @@
 		"subcategory": "mainHand/maul G2",
 		"src": "/pixel/icons/item_bronze_hammer.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2063,6 +2326,9 @@
 		"subcategory": "mainHand/maul G3",
 		"src": "/pixel/items/mainHand/maul/iron_maul.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2078,6 +2344,9 @@
 		"subcategory": "mainHand/maul G3",
 		"src": "/pixel/items/mainHand/maul/iron_warhammer.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2091,6 +2360,9 @@
 		"subcategory": "mainHand/maul G4",
 		"src": "/pixel/items/mainHand/maul/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2104,6 +2376,9 @@
 		"subcategory": "mainHand/maul G5",
 		"src": "/pixel/items/mainHand/maul/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2119,6 +2394,9 @@
 		"subcategory": "mainHand/maul G5",
 		"src": "/pixel/items/mainHand/maul/runed_warhammer.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2132,6 +2410,9 @@
 		"subcategory": "mainHand/maul G6",
 		"src": "/pixel/items/mainHand/maul/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2145,6 +2426,9 @@
 		"subcategory": "mainHand/maul G7",
 		"src": "/pixel/items/mainHand/maul/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2158,6 +2442,9 @@
 		"subcategory": "mainHand/maul G8",
 		"src": "/pixel/items/mainHand/maul/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2171,6 +2458,9 @@
 		"subcategory": "mainHand/maul G9",
 		"src": "/pixel/items/mainHand/maul/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2184,6 +2474,9 @@
 		"subcategory": "mainHand/maul S1",
 		"src": "/pixel/items/mainHand/maul/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2197,6 +2490,9 @@
 		"subcategory": "mainHand/maul S2",
 		"src": "/pixel/items/mainHand/maul/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2210,6 +2506,9 @@
 		"subcategory": "mainHand/maul S3",
 		"src": "/pixel/items/mainHand/maul/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "maul",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2225,6 +2524,8 @@
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/cindercrescent_glaive.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "spear",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2240,6 +2541,8 @@
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/dawnbringer_trident.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "spear",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2255,6 +2558,8 @@
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/stormtrident.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "spear",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2270,6 +2575,8 @@
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/icons/item_steel_spear.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "spear",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2285,6 +2592,9 @@
 		"subcategory": "mainHand/spear G1",
 		"src": "/pixel/icons/item_sharpened_stick.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2300,6 +2610,9 @@
 		"subcategory": "mainHand/spear G2",
 		"src": "/pixel/icons/item_bronze_spear.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2315,6 +2628,9 @@
 		"subcategory": "mainHand/spear G3",
 		"src": "/pixel/icons/item_iron_spear.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2328,6 +2644,9 @@
 		"subcategory": "mainHand/spear G4",
 		"src": "/pixel/items/mainHand/spear/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2341,6 +2660,9 @@
 		"subcategory": "mainHand/spear G5",
 		"src": "/pixel/items/mainHand/spear/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2354,6 +2676,9 @@
 		"subcategory": "mainHand/spear G6",
 		"src": "/pixel/items/mainHand/spear/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2367,6 +2692,9 @@
 		"subcategory": "mainHand/spear G7",
 		"src": "/pixel/items/mainHand/spear/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2380,6 +2708,9 @@
 		"subcategory": "mainHand/spear G8",
 		"src": "/pixel/items/mainHand/spear/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2393,6 +2724,9 @@
 		"subcategory": "mainHand/spear G9",
 		"src": "/pixel/items/mainHand/spear/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2406,6 +2740,9 @@
 		"subcategory": "mainHand/spear S1",
 		"src": "/pixel/items/mainHand/spear/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2419,6 +2756,9 @@
 		"subcategory": "mainHand/spear S2",
 		"src": "/pixel/items/mainHand/spear/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2432,6 +2772,9 @@
 		"subcategory": "mainHand/spear S3",
 		"src": "/pixel/items/mainHand/spear/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "spear",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2447,6 +2790,8 @@
 		"subcategory": "mainHand/staff",
 		"src": "/pixel/items/legendary/amethyst_spire.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "staff",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2462,6 +2807,8 @@
 		"subcategory": "mainHand/staff",
 		"src": "/pixel/icons/item_oak_staff.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "staff",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2477,6 +2824,8 @@
 		"subcategory": "mainHand/staff",
 		"src": "/pixel/icons/item_obsidian_staff.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "staff",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2492,6 +2841,9 @@
 		"subcategory": "mainHand/staff G1",
 		"src": "/pixel/icons/item_walking_stick.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2507,6 +2859,9 @@
 		"subcategory": "mainHand/staff G2",
 		"src": "/pixel/icons/item_hide_bound_staff.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2522,6 +2877,9 @@
 		"subcategory": "mainHand/staff G3",
 		"src": "/pixel/icons/item_iron_shod_staff.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2535,6 +2893,9 @@
 		"subcategory": "mainHand/staff G4",
 		"src": "/pixel/items/mainHand/staff/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2548,6 +2909,9 @@
 		"subcategory": "mainHand/staff G5",
 		"src": "/pixel/items/mainHand/staff/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2561,6 +2925,9 @@
 		"subcategory": "mainHand/staff G6",
 		"src": "/pixel/items/mainHand/staff/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2574,6 +2941,9 @@
 		"subcategory": "mainHand/staff G7",
 		"src": "/pixel/items/mainHand/staff/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2587,6 +2957,9 @@
 		"subcategory": "mainHand/staff G8",
 		"src": "/pixel/items/mainHand/staff/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2600,6 +2973,9 @@
 		"subcategory": "mainHand/staff G9",
 		"src": "/pixel/items/mainHand/staff/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2613,6 +2989,9 @@
 		"subcategory": "mainHand/staff S1",
 		"src": "/pixel/items/mainHand/staff/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2626,6 +3005,9 @@
 		"subcategory": "mainHand/staff S2",
 		"src": "/pixel/items/mainHand/staff/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2639,6 +3021,9 @@
 		"subcategory": "mainHand/staff S3",
 		"src": "/pixel/items/mainHand/staff/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2654,6 +3039,8 @@
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/items/legendary/nightfall_edge.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "sword",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2669,6 +3056,8 @@
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/items/legendary/voidrune_blade.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "sword",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2684,6 +3073,8 @@
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/icons/item_emberbrand.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2699,6 +3090,8 @@
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/icons/item_iron_sword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2714,6 +3107,8 @@
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/icons/item_obsidian_blade.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2729,6 +3124,8 @@
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/icons/item_wooden_sword.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "sword",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2744,6 +3141,9 @@
 		"subcategory": "mainHand/sword G1",
 		"src": "/pixel/items/mainHand/sword/old_rusted_blade.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2759,6 +3159,9 @@
 		"subcategory": "mainHand/sword G1",
 		"src": "/pixel/items/mainHand/sword/rusty_broadsword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2774,6 +3177,9 @@
 		"subcategory": "mainHand/sword G1",
 		"src": "/pixel/items/mainHand/sword/rusty_shortsword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2789,6 +3195,9 @@
 		"subcategory": "mainHand/sword G2",
 		"src": "/pixel/items/mainHand/sword/bronze_sword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2804,6 +3213,9 @@
 		"subcategory": "mainHand/sword G3",
 		"src": "/pixel/items/mainHand/sword/arming_sword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2819,6 +3231,9 @@
 		"subcategory": "mainHand/sword G3",
 		"src": "/pixel/items/mainHand/sword/notched_broadsword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2832,6 +3247,9 @@
 		"subcategory": "mainHand/sword G3",
 		"src": "/pixel/items/mainHand/sword/ph_g3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2847,6 +3265,9 @@
 		"subcategory": "mainHand/sword G4",
 		"src": "/pixel/items/mainHand/sword/blue_pommel_longsword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2862,6 +3283,9 @@
 		"subcategory": "mainHand/sword G4",
 		"src": "/pixel/items/mainHand/sword/silver_scimitar.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2877,6 +3301,9 @@
 		"subcategory": "mainHand/sword G5",
 		"src": "/pixel/items/mainHand/sword/gilded_longsword.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2892,6 +3319,9 @@
 		"subcategory": "mainHand/sword G6",
 		"src": "/pixel/items/mainHand/sword/voidiron_blade.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2907,6 +3337,9 @@
 		"subcategory": "mainHand/sword G7",
 		"src": "/pixel/items/mainHand/sword/cinderfang_sword.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2922,6 +3355,9 @@
 		"subcategory": "mainHand/sword G7",
 		"src": "/pixel/items/mainHand/sword/frostbrand.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2937,6 +3373,9 @@
 		"subcategory": "mainHand/sword G7",
 		"src": "/pixel/items/mainHand/sword/runed_jade_blade.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2952,6 +3391,9 @@
 		"subcategory": "mainHand/sword G8",
 		"src": "/pixel/items/mainHand/sword/seraph_blade.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "sword",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2967,6 +3409,8 @@
 		"subcategory": "mainHand/wand",
 		"src": "/pixel/items/legendary/frostbloom_fan.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "wand",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -2982,6 +3426,8 @@
 		"subcategory": "mainHand/wand",
 		"src": "/pixel/icons/item_apprentice_wand.png",
 		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "wand",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -2997,6 +3443,9 @@
 		"subcategory": "mainHand/wand G1",
 		"src": "/pixel/icons/item_twig_wand.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3012,6 +3461,9 @@
 		"subcategory": "mainHand/wand G2",
 		"src": "/pixel/icons/item_bronze_wand.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3027,6 +3479,9 @@
 		"subcategory": "mainHand/wand G3",
 		"src": "/pixel/icons/item_iron_wand.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3040,6 +3495,9 @@
 		"subcategory": "mainHand/wand G4",
 		"src": "/pixel/items/mainHand/wand/ph_g4.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3053,6 +3511,9 @@
 		"subcategory": "mainHand/wand G5",
 		"src": "/pixel/items/mainHand/wand/ph_g5.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3066,6 +3527,9 @@
 		"subcategory": "mainHand/wand G6",
 		"src": "/pixel/items/mainHand/wand/ph_g6.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3079,6 +3543,9 @@
 		"subcategory": "mainHand/wand G7",
 		"src": "/pixel/items/mainHand/wand/ph_g7.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3092,6 +3559,9 @@
 		"subcategory": "mainHand/wand G8",
 		"src": "/pixel/items/mainHand/wand/ph_g8.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3105,6 +3575,9 @@
 		"subcategory": "mainHand/wand G9",
 		"src": "/pixel/items/mainHand/wand/ph_g9.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3118,6 +3591,9 @@
 		"subcategory": "mainHand/wand S1",
 		"src": "/pixel/items/mainHand/wand/ph_s1.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3131,6 +3607,9 @@
 		"subcategory": "mainHand/wand S2",
 		"src": "/pixel/items/mainHand/wand/ph_s2.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3144,6 +3623,9 @@
 		"subcategory": "mainHand/wand S3",
 		"src": "/pixel/items/mainHand/wand/ph_s3.png",
 		"status": "placeholder",
+		"slot": "mainHand",
+		"weaponType": "wand",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3159,6 +3641,8 @@
 		"subcategory": "offHand/shield",
 		"src": "/pixel/icons/item_obsidian_aegis.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3174,6 +3658,8 @@
 		"subcategory": "offHand/shield",
 		"src": "/pixel/icons/item_steel_shield.png",
 		"status": "planned",
+		"slot": "offHand",
+		"weaponType": "shield",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3189,6 +3675,8 @@
 		"subcategory": "offHand/shield",
 		"src": "/pixel/icons/item_wooden_shield.png",
 		"status": "planned",
+		"slot": "offHand",
+		"weaponType": "shield",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3204,6 +3692,9 @@
 		"subcategory": "offHand/shield G1",
 		"src": "/pixel/items/offHand/battered_buckler.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3219,6 +3710,9 @@
 		"subcategory": "offHand/shield G1",
 		"src": "/pixel/items/offHand/oak_roundshield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3234,6 +3728,9 @@
 		"subcategory": "offHand/shield G1",
 		"src": "/pixel/items/offHand/wooden_buckler.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3249,6 +3746,9 @@
 		"subcategory": "offHand/shield G2",
 		"src": "/pixel/items/offHand/bronze_crossbar_shield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3264,6 +3764,9 @@
 		"subcategory": "offHand/shield G2",
 		"src": "/pixel/items/offHand/hide_shield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3279,6 +3782,9 @@
 		"subcategory": "offHand/shield G3",
 		"src": "/pixel/items/offHand/iron_kite_shield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3294,6 +3800,9 @@
 		"subcategory": "offHand/shield G3",
 		"src": "/pixel/items/offHand/ironbound_pavise.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3309,6 +3818,9 @@
 		"subcategory": "offHand/shield G4",
 		"src": "/pixel/items/offHand/crusader_shield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3324,6 +3836,9 @@
 		"subcategory": "offHand/shield G5",
 		"src": "/pixel/items/offHand/lionguard_shield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3339,6 +3854,9 @@
 		"subcategory": "offHand/shield G5",
 		"src": "/pixel/items/offHand/steel_tower_shield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3354,6 +3872,9 @@
 		"subcategory": "offHand/shield G6",
 		"src": "/pixel/items/offHand/thornspike_shield.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3369,6 +3890,9 @@
 		"subcategory": "offHand/shield G7",
 		"src": "/pixel/items/offHand/runeward_roundel.png",
 		"status": "planned",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3384,6 +3908,9 @@
 		"subcategory": "offHand/shield G8",
 		"src": "/pixel/items/offHand/frostcrystal_aegis.png",
 		"status": "planned",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3399,6 +3926,9 @@
 		"subcategory": "offHand/shield G8",
 		"src": "/pixel/items/offHand/royal_lion_crest.png",
 		"status": "planned",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3414,6 +3944,9 @@
 		"subcategory": "offHand/shield G8",
 		"src": "/pixel/items/offHand/verdant_kite_shield.png",
 		"status": "planned",
+		"slot": "offHand",
+		"weaponType": "shield",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3429,6 +3962,8 @@
 		"subcategory": "offHand/tome",
 		"src": "/pixel/icons/item_apprentice_tome.png",
 		"status": "planned",
+		"slot": "offHand",
+		"weaponType": "tome",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3444,6 +3979,9 @@
 		"subcategory": "offHand/tome G1",
 		"src": "/pixel/icons/item_bound_scraps.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3459,6 +3997,9 @@
 		"subcategory": "offHand/tome G2",
 		"src": "/pixel/icons/item_hide_primer.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3474,6 +4015,9 @@
 		"subcategory": "offHand/tome G3",
 		"src": "/pixel/icons/item_iron_codex.png",
 		"status": "used",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3487,6 +4031,9 @@
 		"subcategory": "offHand/tome G4",
 		"src": "/pixel/items/offHand/tome/ph_g4.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3500,6 +4047,9 @@
 		"subcategory": "offHand/tome G5",
 		"src": "/pixel/items/offHand/tome/ph_g5.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3513,6 +4063,9 @@
 		"subcategory": "offHand/tome G6",
 		"src": "/pixel/items/offHand/tome/ph_g6.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3526,6 +4079,9 @@
 		"subcategory": "offHand/tome G7",
 		"src": "/pixel/items/offHand/tome/ph_g7.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3539,6 +4095,9 @@
 		"subcategory": "offHand/tome G8",
 		"src": "/pixel/items/offHand/tome/ph_g8.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3552,6 +4111,9 @@
 		"subcategory": "offHand/tome G9",
 		"src": "/pixel/items/offHand/tome/ph_g9.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3565,6 +4127,9 @@
 		"subcategory": "offHand/tome S1",
 		"src": "/pixel/items/offHand/tome/ph_s1.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3578,6 +4143,9 @@
 		"subcategory": "offHand/tome S2",
 		"src": "/pixel/items/offHand/tome/ph_s2.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3591,6 +4159,9 @@
 		"subcategory": "offHand/tome S3",
 		"src": "/pixel/items/offHand/tome/ph_s3.png",
 		"status": "placeholder",
+		"slot": "offHand",
+		"weaponType": "tome",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3606,6 +4177,8 @@
 		"subcategory": "belt G1",
 		"src": "/pixel/items/belt/worn_leather_belt.png",
 		"status": "used",
+		"slot": "belt",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3621,6 +4194,8 @@
 		"subcategory": "belt G2",
 		"src": "/pixel/items/belt/tanned_sash.png",
 		"status": "used",
+		"slot": "belt",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3636,6 +4211,8 @@
 		"subcategory": "belt G3",
 		"src": "/pixel/items/belt/ironbuckle_belt.png",
 		"status": "used",
+		"slot": "belt",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3649,6 +4226,8 @@
 		"subcategory": "belt G4",
 		"src": "/pixel/items/belt/alchemist_bandolier.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3662,6 +4241,8 @@
 		"subcategory": "belt G4",
 		"src": "/pixel/items/belt/chain_girdle.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3675,6 +4256,8 @@
 		"subcategory": "belt G5",
 		"src": "/pixel/items/belt/hunter_trophy_belt.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3688,6 +4271,8 @@
 		"subcategory": "belt G6",
 		"src": "/pixel/items/belt/studded_nightbelt.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3701,6 +4286,8 @@
 		"subcategory": "belt G7",
 		"src": "/pixel/items/belt/runebound_girdle.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3714,6 +4301,8 @@
 		"subcategory": "belt G8",
 		"src": "/pixel/items/belt/ruby_cincture.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3727,6 +4316,8 @@
 		"subcategory": "belt G9",
 		"src": "/pixel/items/belt/crownguard_belt.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3740,6 +4331,8 @@
 		"subcategory": "belt S1",
 		"src": "/pixel/items/belt/sunforged_cincture.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3753,6 +4346,8 @@
 		"subcategory": "belt S2",
 		"src": "/pixel/items/belt/warden_plate_belt.png",
 		"status": "unused",
+		"slot": "belt",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3768,6 +4363,7 @@
 		"subcategory": "cape",
 		"src": "/pixel/icons/item_cloth_cape.png",
 		"status": "planned",
+		"slot": "cape",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3783,6 +4379,7 @@
 		"subcategory": "cape",
 		"src": "/pixel/icons/item_leather_cloak.png",
 		"status": "planned",
+		"slot": "cape",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3798,6 +4395,7 @@
 		"subcategory": "cape",
 		"src": "/pixel/icons/item_obsidian_cloak.png",
 		"status": "used",
+		"slot": "cape",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3813,6 +4411,7 @@
 		"subcategory": "cape",
 		"src": "/pixel/icons/item_steel_cloak.png",
 		"status": "planned",
+		"slot": "cape",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3828,6 +4427,8 @@
 		"subcategory": "cape G1",
 		"src": "/pixel/icons/item_rag_cloak.png",
 		"status": "used",
+		"slot": "cape",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3843,6 +4444,8 @@
 		"subcategory": "cape G2",
 		"src": "/pixel/icons/item_hide_cloak.png",
 		"status": "used",
+		"slot": "cape",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3858,6 +4461,8 @@
 		"subcategory": "cape G3",
 		"src": "/pixel/icons/item_travellers_cape.png",
 		"status": "used",
+		"slot": "cape",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -3871,6 +4476,8 @@
 		"subcategory": "cape G4",
 		"src": "/pixel/items/cape/ph_g4.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3884,6 +4491,8 @@
 		"subcategory": "cape G5",
 		"src": "/pixel/items/cape/ph_g5.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3897,6 +4506,8 @@
 		"subcategory": "cape G6",
 		"src": "/pixel/items/cape/ph_g6.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3910,6 +4521,8 @@
 		"subcategory": "cape G7",
 		"src": "/pixel/items/cape/ph_g7.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3923,6 +4536,8 @@
 		"subcategory": "cape G8",
 		"src": "/pixel/items/cape/ph_g8.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3936,6 +4551,8 @@
 		"subcategory": "cape G9",
 		"src": "/pixel/items/cape/ph_g9.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3949,6 +4566,8 @@
 		"subcategory": "cape S1",
 		"src": "/pixel/items/cape/ph_s1.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3962,6 +4581,8 @@
 		"subcategory": "cape S2",
 		"src": "/pixel/items/cape/ph_s2.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3975,6 +4596,8 @@
 		"subcategory": "cape S3",
 		"src": "/pixel/items/cape/ph_s3.png",
 		"status": "placeholder",
+		"slot": "cape",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -3990,6 +4613,7 @@
 		"subcategory": "chest",
 		"src": "/pixel/icons/item_cloth_robe.png",
 		"status": "planned",
+		"slot": "chest",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4005,6 +4629,7 @@
 		"subcategory": "chest",
 		"src": "/pixel/icons/item_leather_vest.png",
 		"status": "planned",
+		"slot": "chest",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4020,6 +4645,7 @@
 		"subcategory": "chest",
 		"src": "/pixel/icons/item_obsidian_cuirass.png",
 		"status": "used",
+		"slot": "chest",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4035,6 +4661,7 @@
 		"subcategory": "chest",
 		"src": "/pixel/icons/item_steel_cuirass.png",
 		"status": "used",
+		"slot": "chest",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4050,6 +4677,8 @@
 		"subcategory": "chest G1",
 		"src": "/pixel/icons/item_rag_tunic.png",
 		"status": "used",
+		"slot": "chest",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4065,6 +4694,8 @@
 		"subcategory": "chest G2",
 		"src": "/pixel/icons/item_hide_jerkin.png",
 		"status": "used",
+		"slot": "chest",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4080,6 +4711,8 @@
 		"subcategory": "chest G3",
 		"src": "/pixel/icons/item_iron_mail.png",
 		"status": "used",
+		"slot": "chest",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4093,6 +4726,8 @@
 		"subcategory": "chest G4",
 		"src": "/pixel/items/chest/ph_g4.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4106,6 +4741,8 @@
 		"subcategory": "chest G5",
 		"src": "/pixel/items/chest/ph_g5.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4119,6 +4756,8 @@
 		"subcategory": "chest G6",
 		"src": "/pixel/items/chest/ph_g6.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4132,6 +4771,8 @@
 		"subcategory": "chest G7",
 		"src": "/pixel/items/chest/ph_g7.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4145,6 +4786,8 @@
 		"subcategory": "chest G8",
 		"src": "/pixel/items/chest/ph_g8.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4158,6 +4801,8 @@
 		"subcategory": "chest G9",
 		"src": "/pixel/items/chest/ph_g9.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4171,6 +4816,8 @@
 		"subcategory": "chest S1",
 		"src": "/pixel/items/chest/ph_s1.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4184,6 +4831,8 @@
 		"subcategory": "chest S2",
 		"src": "/pixel/items/chest/ph_s2.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4197,6 +4846,8 @@
 		"subcategory": "chest S3",
 		"src": "/pixel/items/chest/ph_s3.png",
 		"status": "placeholder",
+		"slot": "chest",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4212,6 +4863,7 @@
 		"subcategory": "feet",
 		"src": "/pixel/icons/item_cloth_slippers.png",
 		"status": "planned",
+		"slot": "feet",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4227,6 +4879,7 @@
 		"subcategory": "feet",
 		"src": "/pixel/icons/item_leather_boots.png",
 		"status": "planned",
+		"slot": "feet",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4242,6 +4895,7 @@
 		"subcategory": "feet",
 		"src": "/pixel/icons/item_obsidian_sabatons.png",
 		"status": "used",
+		"slot": "feet",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4257,6 +4911,7 @@
 		"subcategory": "feet",
 		"src": "/pixel/icons/item_steel_sabatons.png",
 		"status": "used",
+		"slot": "feet",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4272,6 +4927,8 @@
 		"subcategory": "feet G1",
 		"src": "/pixel/items/feet/rag_shoes.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4287,6 +4944,8 @@
 		"subcategory": "feet G1",
 		"src": "/pixel/items/feet/wanderer_boots.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4302,6 +4961,8 @@
 		"subcategory": "feet G2",
 		"src": "/pixel/items/feet/fur_lined_boots.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4317,6 +4978,8 @@
 		"subcategory": "feet G2",
 		"src": "/pixel/items/feet/hide_boots.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4332,6 +4995,8 @@
 		"subcategory": "feet G2",
 		"src": "/pixel/items/feet/mossweave_boots.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4347,6 +5012,8 @@
 		"subcategory": "feet G3",
 		"src": "/pixel/items/feet/iron_boots.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4362,6 +5029,8 @@
 		"subcategory": "feet G3",
 		"src": "/pixel/items/feet/ironbound_boots.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4377,6 +5046,8 @@
 		"subcategory": "feet G4",
 		"src": "/pixel/items/feet/plated_sabatons.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4392,6 +5063,8 @@
 		"subcategory": "feet G6",
 		"src": "/pixel/items/feet/shadowstep_boots.png",
 		"status": "used",
+		"slot": "feet",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4407,6 +5080,8 @@
 		"subcategory": "feet G7",
 		"src": "/pixel/items/feet/frostglass_boots.png",
 		"status": "planned",
+		"slot": "feet",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4422,6 +5097,8 @@
 		"subcategory": "feet G8",
 		"src": "/pixel/items/feet/drake_scale_boots.png",
 		"status": "planned",
+		"slot": "feet",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4437,6 +5114,8 @@
 		"subcategory": "feet G8",
 		"src": "/pixel/items/feet/sunsilk_boots.png",
 		"status": "planned",
+		"slot": "feet",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4452,6 +5131,7 @@
 		"subcategory": "hands",
 		"src": "/pixel/icons/item_cloth_gloves.png",
 		"status": "planned",
+		"slot": "hands",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4467,6 +5147,7 @@
 		"subcategory": "hands",
 		"src": "/pixel/icons/item_leather_gloves.png",
 		"status": "planned",
+		"slot": "hands",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4482,6 +5163,7 @@
 		"subcategory": "hands",
 		"src": "/pixel/icons/item_obsidian_gauntlets.png",
 		"status": "used",
+		"slot": "hands",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4497,6 +5179,7 @@
 		"subcategory": "hands",
 		"src": "/pixel/icons/item_steel_gauntlets.png",
 		"status": "used",
+		"slot": "hands",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4512,6 +5195,8 @@
 		"subcategory": "hands G1",
 		"src": "/pixel/icons/item_rag_wraps.png",
 		"status": "used",
+		"slot": "hands",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4527,6 +5212,8 @@
 		"subcategory": "hands G2",
 		"src": "/pixel/icons/item_hide_gloves.png",
 		"status": "used",
+		"slot": "hands",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4542,6 +5229,8 @@
 		"subcategory": "hands G3",
 		"src": "/pixel/icons/item_iron_gauntlets.png",
 		"status": "used",
+		"slot": "hands",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4555,6 +5244,8 @@
 		"subcategory": "hands G4",
 		"src": "/pixel/items/hands/ph_g4.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4568,6 +5259,8 @@
 		"subcategory": "hands G5",
 		"src": "/pixel/items/hands/ph_g5.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4581,6 +5274,8 @@
 		"subcategory": "hands G6",
 		"src": "/pixel/items/hands/ph_g6.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4594,6 +5289,8 @@
 		"subcategory": "hands G7",
 		"src": "/pixel/items/hands/ph_g7.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4607,6 +5304,8 @@
 		"subcategory": "hands G8",
 		"src": "/pixel/items/hands/ph_g8.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4620,6 +5319,8 @@
 		"subcategory": "hands G9",
 		"src": "/pixel/items/hands/ph_g9.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4633,6 +5334,8 @@
 		"subcategory": "hands S1",
 		"src": "/pixel/items/hands/ph_s1.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4646,6 +5349,8 @@
 		"subcategory": "hands S2",
 		"src": "/pixel/items/hands/ph_s2.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4659,6 +5364,8 @@
 		"subcategory": "hands S3",
 		"src": "/pixel/items/hands/ph_s3.png",
 		"status": "placeholder",
+		"slot": "hands",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4674,6 +5381,7 @@
 		"subcategory": "head",
 		"src": "/pixel/icons/item_cloth_hat.png",
 		"status": "planned",
+		"slot": "head",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4689,6 +5397,7 @@
 		"subcategory": "head",
 		"src": "/pixel/icons/item_leather_cap.png",
 		"status": "planned",
+		"slot": "head",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4704,6 +5413,7 @@
 		"subcategory": "head",
 		"src": "/pixel/icons/item_obsidian_helm.png",
 		"status": "used",
+		"slot": "head",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4719,6 +5429,7 @@
 		"subcategory": "head",
 		"src": "/pixel/icons/item_steel_helm.png",
 		"status": "used",
+		"slot": "head",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4734,6 +5445,8 @@
 		"subcategory": "head G1",
 		"src": "/pixel/icons/item_rag_hood.png",
 		"status": "used",
+		"slot": "head",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4749,6 +5462,8 @@
 		"subcategory": "head G2",
 		"src": "/pixel/icons/item_hide_cap.png",
 		"status": "used",
+		"slot": "head",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4764,6 +5479,8 @@
 		"subcategory": "head G3",
 		"src": "/pixel/icons/item_iron_cap.png",
 		"status": "used",
+		"slot": "head",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4777,6 +5494,8 @@
 		"subcategory": "head G4",
 		"src": "/pixel/items/head/ph_g4.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4790,6 +5509,8 @@
 		"subcategory": "head G5",
 		"src": "/pixel/items/head/ph_g5.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4803,6 +5524,8 @@
 		"subcategory": "head G6",
 		"src": "/pixel/items/head/ph_g6.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4816,6 +5539,8 @@
 		"subcategory": "head G7",
 		"src": "/pixel/items/head/ph_g7.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4829,6 +5554,8 @@
 		"subcategory": "head G8",
 		"src": "/pixel/items/head/ph_g8.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4842,6 +5569,8 @@
 		"subcategory": "head G9",
 		"src": "/pixel/items/head/ph_g9.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4855,6 +5584,8 @@
 		"subcategory": "head S1",
 		"src": "/pixel/items/head/ph_s1.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4868,6 +5599,8 @@
 		"subcategory": "head S2",
 		"src": "/pixel/items/head/ph_s2.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4881,6 +5614,8 @@
 		"subcategory": "head S3",
 		"src": "/pixel/items/head/ph_s3.png",
 		"status": "placeholder",
+		"slot": "head",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4896,6 +5631,7 @@
 		"subcategory": "legs",
 		"src": "/pixel/icons/item_cloth_trousers.png",
 		"status": "planned",
+		"slot": "legs",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4911,6 +5647,7 @@
 		"subcategory": "legs",
 		"src": "/pixel/icons/item_leather_leggings.png",
 		"status": "planned",
+		"slot": "legs",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4926,6 +5663,7 @@
 		"subcategory": "legs",
 		"src": "/pixel/icons/item_obsidian_greaves.png",
 		"status": "used",
+		"slot": "legs",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4941,6 +5679,7 @@
 		"subcategory": "legs",
 		"src": "/pixel/icons/item_steel_greaves.png",
 		"status": "used",
+		"slot": "legs",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -4956,6 +5695,8 @@
 		"subcategory": "legs G1",
 		"src": "/pixel/items/legs/drover_breeches.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4971,6 +5712,8 @@
 		"subcategory": "legs G1",
 		"src": "/pixel/items/legs/patched_trousers.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -4986,6 +5729,8 @@
 		"subcategory": "legs G1",
 		"src": "/pixel/items/legs/rag_trousers.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5001,6 +5746,8 @@
 		"subcategory": "legs G2",
 		"src": "/pixel/items/legs/fur_trimmed_leggings.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5016,6 +5763,8 @@
 		"subcategory": "legs G2",
 		"src": "/pixel/items/legs/hide_leggings.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5031,6 +5780,8 @@
 		"subcategory": "legs G2",
 		"src": "/pixel/items/legs/tanned_leather_pants.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5046,6 +5797,8 @@
 		"subcategory": "legs G3",
 		"src": "/pixel/items/legs/chainmail_leggings.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5061,6 +5814,8 @@
 		"subcategory": "legs G3",
 		"src": "/pixel/items/legs/iron_chausses.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5076,6 +5831,8 @@
 		"subcategory": "legs G3",
 		"src": "/pixel/items/legs/ranger_pants.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5091,6 +5848,8 @@
 		"subcategory": "legs G4",
 		"src": "/pixel/items/legs/steel_legplates.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5106,6 +5865,8 @@
 		"subcategory": "legs G5",
 		"src": "/pixel/items/legs/knightly_legguards.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5121,6 +5882,8 @@
 		"subcategory": "legs G6",
 		"src": "/pixel/items/legs/shadow_trousers.png",
 		"status": "used",
+		"slot": "legs",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5136,6 +5899,8 @@
 		"subcategory": "legs G7",
 		"src": "/pixel/items/legs/runed_skirt.png",
 		"status": "planned",
+		"slot": "legs",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5151,6 +5916,8 @@
 		"subcategory": "legs G7",
 		"src": "/pixel/items/legs/verdant_greaves.png",
 		"status": "planned",
+		"slot": "legs",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5166,6 +5933,8 @@
 		"subcategory": "legs G8",
 		"src": "/pixel/items/legs/royal_silk_trousers.png",
 		"status": "planned",
+		"slot": "legs",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5181,6 +5950,7 @@
 		"subcategory": "shoulder",
 		"src": "/pixel/icons/item_cloth_mantle.png",
 		"status": "planned",
+		"slot": "shoulder",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5196,6 +5966,7 @@
 		"subcategory": "shoulder",
 		"src": "/pixel/icons/item_leather_pauldrons.png",
 		"status": "planned",
+		"slot": "shoulder",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5211,6 +5982,7 @@
 		"subcategory": "shoulder",
 		"src": "/pixel/icons/item_obsidian_pauldrons.png",
 		"status": "used",
+		"slot": "shoulder",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5226,6 +5998,7 @@
 		"subcategory": "shoulder",
 		"src": "/pixel/icons/item_steel_pauldrons.png",
 		"status": "used",
+		"slot": "shoulder",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5241,6 +6014,8 @@
 		"subcategory": "shoulder G1",
 		"src": "/pixel/icons/item_patched_mantle.png",
 		"status": "used",
+		"slot": "shoulder",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5256,6 +6031,8 @@
 		"subcategory": "shoulder G2",
 		"src": "/pixel/icons/item_hide_pauldrons.png",
 		"status": "used",
+		"slot": "shoulder",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5271,6 +6048,8 @@
 		"subcategory": "shoulder G3",
 		"src": "/pixel/icons/item_iron_spaulders.png",
 		"status": "used",
+		"slot": "shoulder",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5284,6 +6063,8 @@
 		"subcategory": "shoulder G4",
 		"src": "/pixel/items/shoulder/ph_g4.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5297,6 +6078,8 @@
 		"subcategory": "shoulder G5",
 		"src": "/pixel/items/shoulder/ph_g5.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5310,6 +6093,8 @@
 		"subcategory": "shoulder G6",
 		"src": "/pixel/items/shoulder/ph_g6.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5323,6 +6108,8 @@
 		"subcategory": "shoulder G7",
 		"src": "/pixel/items/shoulder/ph_g7.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5336,6 +6123,8 @@
 		"subcategory": "shoulder G8",
 		"src": "/pixel/items/shoulder/ph_g8.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5349,6 +6138,8 @@
 		"subcategory": "shoulder G9",
 		"src": "/pixel/items/shoulder/ph_g9.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5362,6 +6153,8 @@
 		"subcategory": "shoulder S1",
 		"src": "/pixel/items/shoulder/ph_s1.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5375,6 +6168,8 @@
 		"subcategory": "shoulder S2",
 		"src": "/pixel/items/shoulder/ph_s2.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5388,6 +6183,8 @@
 		"subcategory": "shoulder S3",
 		"src": "/pixel/items/shoulder/ph_s3.png",
 		"status": "placeholder",
+		"slot": "shoulder",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5403,6 +6200,7 @@
 		"subcategory": "charm",
 		"src": "/pixel/icons/item_acorn_charm.png",
 		"status": "used",
+		"slot": "charm",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5418,6 +6216,7 @@
 		"subcategory": "charm",
 		"src": "/pixel/icons/item_cloth_charm.png",
 		"status": "planned",
+		"slot": "charm",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5433,6 +6232,7 @@
 		"subcategory": "charm",
 		"src": "/pixel/icons/item_obsidian_charm.png",
 		"status": "used",
+		"slot": "charm",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5448,6 +6248,7 @@
 		"subcategory": "charm",
 		"src": "/pixel/icons/item_steel_charm.png",
 		"status": "planned",
+		"slot": "charm",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5461,6 +6262,8 @@
 		"subcategory": "charm G1",
 		"src": "/pixel/items/charm/ph_g1.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5476,6 +6279,8 @@
 		"subcategory": "charm G2",
 		"src": "/pixel/icons/item_rabbit_foot.png",
 		"status": "used",
+		"slot": "charm",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5491,6 +6296,8 @@
 		"subcategory": "charm G3",
 		"src": "/pixel/icons/item_bone_token.png",
 		"status": "used",
+		"slot": "charm",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5504,6 +6311,8 @@
 		"subcategory": "charm G4",
 		"src": "/pixel/items/charm/ph_g4.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5517,6 +6326,8 @@
 		"subcategory": "charm G5",
 		"src": "/pixel/items/charm/ph_g5.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5530,6 +6341,8 @@
 		"subcategory": "charm G6",
 		"src": "/pixel/items/charm/ph_g6.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5543,6 +6356,8 @@
 		"subcategory": "charm G7",
 		"src": "/pixel/items/charm/ph_g7.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5556,6 +6371,8 @@
 		"subcategory": "charm G8",
 		"src": "/pixel/items/charm/ph_g8.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5569,6 +6386,8 @@
 		"subcategory": "charm G9",
 		"src": "/pixel/items/charm/ph_g9.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "G9",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5582,6 +6401,8 @@
 		"subcategory": "charm S1",
 		"src": "/pixel/items/charm/ph_s1.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "S1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5595,6 +6416,8 @@
 		"subcategory": "charm S2",
 		"src": "/pixel/items/charm/ph_s2.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "S2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5608,6 +6431,8 @@
 		"subcategory": "charm S3",
 		"src": "/pixel/items/charm/ph_s3.png",
 		"status": "placeholder",
+		"slot": "charm",
+		"grade": "S3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5623,6 +6448,7 @@
 		"subcategory": "neck",
 		"src": "/pixel/icons/item_cloth_amulet.png",
 		"status": "planned",
+		"slot": "neck",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5638,6 +6464,7 @@
 		"subcategory": "neck",
 		"src": "/pixel/icons/item_obsidian_pendant.png",
 		"status": "used",
+		"slot": "neck",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5653,6 +6480,7 @@
 		"subcategory": "neck",
 		"src": "/pixel/icons/item_steel_gorget.png",
 		"status": "planned",
+		"slot": "neck",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5668,6 +6496,7 @@
 		"subcategory": "neck",
 		"src": "/pixel/icons/item_wooden_pendant.png",
 		"status": "planned",
+		"slot": "neck",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5683,6 +6512,8 @@
 		"subcategory": "neck G1",
 		"src": "/pixel/items/neck/cord_pendant.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5698,6 +6529,8 @@
 		"subcategory": "neck G2",
 		"src": "/pixel/items/neck/bone_beads.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5713,6 +6546,8 @@
 		"subcategory": "neck G2",
 		"src": "/pixel/items/neck/fang_necklace.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5728,6 +6563,8 @@
 		"subcategory": "neck G2",
 		"src": "/pixel/items/neck/leaf_amulet.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5743,6 +6580,8 @@
 		"subcategory": "neck G3",
 		"src": "/pixel/items/neck/copper_pendant.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5758,6 +6597,8 @@
 		"subcategory": "neck G4",
 		"src": "/pixel/items/neck/amethyst_shard_necklace.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5773,6 +6614,8 @@
 		"subcategory": "neck G5",
 		"src": "/pixel/items/neck/ember_medallion.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5788,6 +6631,8 @@
 		"subcategory": "neck G5",
 		"src": "/pixel/items/neck/emerald_amulet.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5803,6 +6648,8 @@
 		"subcategory": "neck G5",
 		"src": "/pixel/items/neck/heartstone_pendant.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5818,6 +6665,8 @@
 		"subcategory": "neck G5",
 		"src": "/pixel/items/neck/moon_pendant.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5833,6 +6682,8 @@
 		"subcategory": "neck G5",
 		"src": "/pixel/items/neck/sun_locket.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5848,6 +6699,8 @@
 		"subcategory": "neck G6",
 		"src": "/pixel/items/neck/nightshard_pendant.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5863,6 +6716,8 @@
 		"subcategory": "neck G6",
 		"src": "/pixel/items/neck/ruby_teardrop.png",
 		"status": "used",
+		"slot": "neck",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5878,6 +6733,8 @@
 		"subcategory": "neck G7",
 		"src": "/pixel/items/neck/winged_sapphire_pendant.png",
 		"status": "planned",
+		"slot": "neck",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5893,6 +6750,8 @@
 		"subcategory": "neck G8",
 		"src": "/pixel/items/neck/seraph_collar.png",
 		"status": "planned",
+		"slot": "neck",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5908,6 +6767,7 @@
 		"subcategory": "ring",
 		"src": "/pixel/icons/item_cloth_ring.png",
 		"status": "planned",
+		"slot": "ring",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5923,6 +6783,7 @@
 		"subcategory": "ring",
 		"src": "/pixel/icons/item_obsidian_ring.png",
 		"status": "used",
+		"slot": "ring",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5938,6 +6799,7 @@
 		"subcategory": "ring",
 		"src": "/pixel/icons/item_steel_ring.png",
 		"status": "planned",
+		"slot": "ring",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5953,6 +6815,7 @@
 		"subcategory": "ring",
 		"src": "/pixel/icons/item_wooden_ring.png",
 		"status": "planned",
+		"slot": "ring",
 		"source": "itemIcons registry",
 		"size": [
 			40,
@@ -5968,6 +6831,8 @@
 		"subcategory": "ring G1",
 		"src": "/pixel/items/ring/twig_ring.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G1",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5983,6 +6848,8 @@
 		"subcategory": "ring G2",
 		"src": "/pixel/items/ring/copper_band.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -5998,6 +6865,8 @@
 		"subcategory": "ring G2",
 		"src": "/pixel/items/ring/thornvine_ring.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6013,6 +6882,8 @@
 		"subcategory": "ring G2",
 		"src": "/pixel/items/ring/turquoise_band.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G2",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6028,6 +6899,8 @@
 		"subcategory": "ring G3",
 		"src": "/pixel/items/ring/iron_band.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6043,6 +6916,8 @@
 		"subcategory": "ring G3",
 		"src": "/pixel/items/ring/iron_signet.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G3",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6058,6 +6933,8 @@
 		"subcategory": "ring G4",
 		"src": "/pixel/items/ring/emerald_signet.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6073,6 +6950,8 @@
 		"subcategory": "ring G4",
 		"src": "/pixel/items/ring/gold_signet.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6088,6 +6967,8 @@
 		"subcategory": "ring G4",
 		"src": "/pixel/items/ring/ruby_signet.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G4",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6103,6 +6984,8 @@
 		"subcategory": "ring G5",
 		"src": "/pixel/items/ring/amethyst_ring.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6118,6 +7001,8 @@
 		"subcategory": "ring G5",
 		"src": "/pixel/items/ring/steel_sapphire_ring.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G5",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6133,6 +7018,8 @@
 		"subcategory": "ring G6",
 		"src": "/pixel/items/ring/skull_ring.png",
 		"status": "used",
+		"slot": "ring",
+		"grade": "G6",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6148,6 +7035,8 @@
 		"subcategory": "ring G7",
 		"src": "/pixel/items/ring/sapphire_teardrop_ring.png",
 		"status": "planned",
+		"slot": "ring",
+		"grade": "G7",
 		"source": "itemIcons registry",
 		"size": [
 			64,
@@ -6163,6 +7052,8 @@
 		"subcategory": "ring G8",
 		"src": "/pixel/items/ring/crimson_crown_ring.png",
 		"status": "planned",
+		"slot": "ring",
+		"grade": "G8",
 		"source": "itemIcons registry",
 		"size": [
 			64,

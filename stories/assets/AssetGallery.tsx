@@ -9,6 +9,9 @@ export interface ManifestEntry {
 	size: [number, number];
 	status: string;
 	usedBy: string[];
+	slot?: string;
+	weaponType?: string;
+	grade?: string;
 	source: string;
 	variants?: Record<string, string>;
 }
@@ -30,17 +33,30 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 	const [query, setQuery] = useState('');
 	const [status, setStatus] = useState('all');
 	const [sub, setSub] = useState('all');
+	const [slot, setSlot] = useState('all');
+	const [sort, setSort] = useState('default');
 	const [variant, setVariant] = useState('default');
 	const [copied, setCopied] = useState('');
 	const statuses = [...new Set(rows.map((e) => e.status))];
 	const subs = [...new Set(rows.map((e) => e.subcategory))];
 	const hasVariants = rows.some((e) => e.variants);
+	const slots = [...new Set(rows.flatMap((e) => (e.slot ? [e.slot] : [])))];
+	const keyOf = (e: ManifestEntry) =>
+		sort === 'slot'
+			? `${e.slot ?? ''} ${e.weaponType ?? ''} ${e.grade ?? ''} ${e.name}`
+			: sort === 'grade'
+				? `${e.grade ?? 'zz'} ${e.slot ?? ''} ${e.name}`
+				: sort === 'status'
+					? `${e.status} ${e.name}`
+					: '';
 	const shown = rows.filter(
 		(e) =>
 			(status === 'all' || e.status === status) &&
 			(sub === 'all' || e.subcategory === sub) &&
+			(slot === 'all' || e.slot === slot) &&
 			(!query || e.name.includes(query.toLowerCase()) || e.usedBy.some((u) => u.includes(query))),
 	);
+	if (sort !== 'default') shown.sort((a, b) => keyOf(a).localeCompare(keyOf(b), undefined, { numeric: true }));
 	const srcOf = (e: ManifestEntry) => (variant !== 'default' && e.variants?.[variant]) || e.src;
 	const copy = (name: string) => {
 		navigator.clipboard?.writeText(name).catch(() => {});
@@ -74,6 +90,21 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 					<option value='all'>all groups</option>
 					{subs.map((s) => (
 						<option key={s}>{s}</option>
+					))}
+				</select>
+				{slots.length > 0 && (
+					<select value={slot} onChange={(e) => setSlot(e.target.value)} style={field}>
+						<option value='all'>all slots</option>
+						{slots.map((s) => (
+							<option key={s}>{s}</option>
+						))}
+					</select>
+				)}
+				<select value={sort} onChange={(e) => setSort(e.target.value)} style={field}>
+					{['default', 'slot', 'grade', 'status'].map((v) => (
+						<option key={v} value={v}>
+							{v === 'default' ? 'sort: group' : `sort: ${v}`}
+						</option>
 					))}
 				</select>
 				{hasVariants && (
