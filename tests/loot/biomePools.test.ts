@@ -31,9 +31,9 @@ test('every normal monster drops from the source of its own biome, bosses from t
 	}
 });
 
-test('a biome pool stops at its grade ceiling: plains G3, forest G4, swamp G5, tundra G7', () => {
+test('a biome pool stops at its grade ceiling: plains G4, forest G4, swamp G5, tundra G7', () => {
 	const d = allGradesLive();
-	const ceilings = { plains: 'G3', forest: 'G4', swamp: 'G5', tundra: 'G7' } satisfies Record<keyof typeof BIOME_LOOT, Grade>;
+	const ceilings = { plains: 'G4', forest: 'G4', swamp: 'G5', tundra: 'G7' } satisfies Record<keyof typeof BIOME_LOOT, Grade>;
 	for (const [biome, ceiling] of Object.entries(ceilings)) {
 		let top = -1;
 		for (let level = 1; level <= 100; level++) top = Math.max(top, topGrade(d, `equipment_${biome}`, level));
@@ -41,7 +41,7 @@ test('a biome pool stops at its grade ceiling: plains G3, forest G4, swamp G5, t
 	}
 });
 
-test('with all grades live a plains monster never drops G4 and a forest monster never G5', () => {
+test('with all grades live a plains and a forest monster never drop G5', () => {
 	const d = allGradesLive();
 	const rng = mulberry32(5);
 	const gradesFrom = (sourceId: string, level: number) => {
@@ -51,7 +51,8 @@ test('with all grades live a plains monster never drops G4 and a forest monster 
 				if (drop.kind === 'gear') seen.add(gradeOfItem(d.items[drop.item.base]) ?? '-');
 		return seen;
 	};
-	assert.ok(!gradesFrom(monsterSourceId('plains'), 40).has('G4'));
+	assert.ok(!gradesFrom(monsterSourceId('plains'), 52).has('G5'));
+	assert.ok(gradesFrom(monsterSourceId('plains'), 40).has('G4'), 'plains reaches the G4 window a grown monster rolls');
 	assert.ok(gradesFrom(monsterSourceId('forest'), 40).has('G4'));
 	assert.ok(!gradesFrom(monsterSourceId('forest'), 52).has('G5'));
 	assert.ok(gradesFrom(monsterSourceId('swamp'), 52).has('G5'));

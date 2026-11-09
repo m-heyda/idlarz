@@ -1,7 +1,7 @@
 import type { ItemDef } from '@/types/game';
 import { gear } from './define';
 
-// Legendary weapons: chase drops. Rare from chests, and a small chance from the Rat King.
+// Legendary weapons: chase drops. Rare from chests, and a small chance from a boss.
 export const LEGENDARY_ITEMS: ItemDef[] = [
 	gear(
 		'emberbrand',

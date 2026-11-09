@@ -114,7 +114,7 @@ Members that exist at this item level (item window and the pool's own minimum), 
 
 ### `LOOT_SOURCES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:260`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:259`](../../src/catalog/lootConfig.ts)
 
 Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).
 
@@ -138,7 +138,7 @@ start at item level 4 plus 3 per castle level above 1.
 
 ### `LOOT_PROFILES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:195`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:194`](../../src/catalog/lootConfig.ts)
 
 Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.
 
@@ -159,16 +159,15 @@ Profiles: how many rolls, which rarity weights, which pool, which bonus tables. 
 
 ### `BIOME_LOOT` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:124`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:123`](../../src/catalog/lootConfig.ts)
 
 The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7).
 The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level
 window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
 a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items,
-so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides: the plains pool stops at G3, so a plains monster
-grown past item level 30 (its levels 1-20 plus 10 levels of growth, plus 1 of variance) finds no base and drops nothing (about half the drops at 31; see docs/plan/31-grade-by-biome-and-source.md).
+so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides, and a ceiling must reach the grade of the highest item level the biome can produce: plains monsters (levels 1-20, growing up to 30, plus 1 of variance) reach item level 31, so plains stops at G4, where G3 would leave a grown monster with nothing to drop.
 
-A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G3, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
+A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G4, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
 Every base that drops carries a `grade:` tag (IDL-243): the legacy wood, steel and Obsidian pieces that fill a ladder cell are graded by it (Wooden Club G1, Hunting Bow G2, Iron Sword G3, six Steel armour pieces G4, the Obsidian family G6; they keep their ids, art and set bonuses),
 the rest of wood, steel and all of cloth are retired (`enabled: false`, ids kept, owned pieces keep working). A graded legacy piece is generated only in its grade's window and rarities (`dropLevels`, `dropRarities`) but stays valid at its old level range for pieces already owned.
 The highest live grade is open at the top and takes every rarity ([`gradeLevels`](loot.md#gradelevels), [`gradeRarities`](loot.md#graderarities) in `src/catalog/items/grades.ts`) so nothing is left without a base while the next grade is dark; a rarity with no base at an item level is left out of the roll there.
@@ -306,7 +305,7 @@ Pieces that predate the ladder keep their ids, art and set bonuses, and a save o
 
 ### `kit` <small>function</small>
 
-Source: [`src/lib/fightSim.ts:56`](../../src/lib/fightSim.ts)
+Source: [`src/lib/fightSim.ts:57`](../../src/lib/fightSim.ts)
 
 A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.
 
@@ -318,7 +317,7 @@ Test and simulation helper: a full kit of one ladder grade, so fight balance (`f
 
 ### Adding loot content (data only)
 
-Source: [`src/catalog/lootConfig.ts:161`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:160`](../../src/catalog/lootConfig.ts)
 
 Adding loot content is data only; the generator needs no change.
 

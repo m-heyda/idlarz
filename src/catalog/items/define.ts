@@ -28,7 +28,7 @@ const KIND_OF_SLOT: Record<EquipmentSlot | 'ring', ItemKind> = {
 /**
  * The item level window of a material tier. Gear is authored at the window's start (`minItemLevel`) and stronger at higher
  * levels (catalog/stats `levelScale`). Wood and cloth stop dropping once the game is past them; the rest scale to the cap.
- * Rat tier 1-5 are source levels 1,3,5,7,9, the Rat King 12 (see catalog/lootConfig), so the old "steel from tier 3,
+ * Rat tier 1-5 were source levels 1,3,5,7,9 and the first boss 12 (see catalog/lootConfig), so the old "steel from tier 3,
  * obsidian from tier 5" gating survives as these windows.
  */
 const LEVEL_WINDOW_BY_TIER: Record<number, readonly [number, number]> = {

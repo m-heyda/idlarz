@@ -5,7 +5,8 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
-import { atItemLevel, freshCharacter, fullSet, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import { GRADE_INFO, type Grade } from '../src/catalog/items/grades';
+import { atItemLevel, freshCharacter, kit, simulateMany, spentCharacter } from '../src/lib/fightSim';
 import { monsterStats } from '../src/lib/monsters';
 import { armorOf, attacksPerSecond, damagePerHit, damagePerSecond, maxHp } from '../src/lib/combat';
 import { aggregateStats } from '../src/lib/inventory';
@@ -13,16 +14,20 @@ import type { Equipment } from '../src/types/game';
 
 const RUNS = 60;
 
+/** A full kit of one grade of the ladder (the cells of catalog/items/ladder.ts), so the table survives a change of sets */
+const gradeKit = (grade: Grade, weapon: Parameters<typeof kit>[1] = 'mace'): Equipment => kit(grade, weapon);
+
 export const LOADOUTS: { name: string; equipment: Equipment }[] = [
 	{ name: 'starter kit', equipment: STARTER_EQUIPMENT },
-	{ name: 'woodland set + club', equipment: fullSet('woodland', 'wooden_club') },
-	{ name: 'apprentice set + wand', equipment: fullSet('apprentice', 'apprentice_wand') },
-	{ name: "knight's set + mace", equipment: fullSet('knight', 'steel_mace') },
-	{ name: "knight's set + recurve bow", equipment: fullSet('knight', 'recurve_bow') },
-	{ name: 'obsidian set + maul', equipment: fullSet('obsidian', 'obsidian_maul') },
-	{ name: 'obsidian set + longbow', equipment: fullSet('obsidian', 'obsidian_longbow') },
-	{ name: 'obsidian + titan maul', equipment: fullSet('obsidian', 'titan_maul') },
-	{ name: 'obsidian + starfall bow', equipment: fullSet('obsidian', 'starfall_bow') },
+	{ name: 'G1 kit + mace', equipment: gradeKit('G1') },
+	{ name: 'G2 kit + mace', equipment: gradeKit('G2') },
+	{ name: 'G3 kit + mace', equipment: gradeKit('G3') },
+	{ name: 'G3 kit + bow', equipment: gradeKit('G3', 'bow') },
+	{ name: 'G4 kit + mace', equipment: gradeKit('G4') },
+	{ name: 'G4 kit + bow', equipment: gradeKit('G4', 'bow') },
+	{ name: 'G5 kit + mace', equipment: gradeKit('G5') },
+	{ name: 'G6 kit + mace', equipment: gradeKit('G6') },
+	{ name: 'G6 kit + bow', equipment: gradeKit('G6', 'bow') },
 ];
 
 const MONSTER_ROWS = [
@@ -78,8 +83,8 @@ const BUILDS = [
 	{ name: 'balanced: +5 each', spend: { strength: 5, dexterity: 5, intelligence: 5, vitality: 5, charisma: 5 } },
 ];
 const BUILD_GEAR = [
-	{ name: 'obsidian set + maul (physical)', equipment: fullSet('obsidian', 'obsidian_maul') },
-	{ name: 'obsidian set + staff (magic)', equipment: fullSet('obsidian', 'obsidian_staff') },
+	{ name: 'G6 kit + mace (physical)', equipment: gradeKit('G6') },
+	{ name: 'G6 kit + staff (magic)', equipment: gradeKit('G6', 'staff') },
 ];
 out();
 out('# Level 30 builds');
@@ -117,9 +122,7 @@ out(
 out();
 out('| Loadout | Kit | Boar level 9 | Great Auroch |');
 out('|---|---|---|---|');
-for (const { name, equipment } of LOADOUTS.filter((l) =>
-	['starter kit', 'woodland set + club', "knight's set + mace", 'obsidian set + maul', 'obsidian + titan maul'].includes(l.name),
-)) {
+for (const { name, equipment } of LOADOUTS.filter((l) => ['starter kit', 'G1 kit + mace', 'G3 kit + mace', 'G6 kit + mace'].includes(l.name))) {
 	for (const kit of [
 		{ label: 'nothing', level: 1, potions: [] as { id: string; qty: number }[], autoUse: false },
 		{ label: 'Heal + Stun', level: 30, potions: [], autoUse: true },
@@ -136,28 +139,30 @@ out();
 out('# The Great Auroch by level');
 out();
 out(
-	'A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 8 % crits, 20 % Stun resistance. HP, attack and armor follow the item level curve. Gear "at the level" is the same set at the item level of the King; "behind" is item level 15. Win % (mean seconds). No skills, no potions.',
+	'A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he grows, armor, 8 % crits, 20 % Stun resistance. HP, attack and armor follow the item level curve. A grade kit is a full kit of one grade of the ladder (the cells of catalog/items/ladder.ts) worn at the boss level ("at the level") or at the start of its own window when that is higher; "behind" is the kit of the grade two below, at its window start. Win % (mean seconds). No skills, no potions.',
 );
-const KING_LEVELS = [15, 25, 35];
-const GEARS = [
-	{ name: "knight's set + mace", equipment: fullSet('knight', 'steel_mace') },
-	{ name: 'obsidian set + maul', equipment: fullSet('obsidian', 'obsidian_maul') },
-	{ name: 'obsidian + titan maul', equipment: fullSet('obsidian', 'titan_maul') },
+const BOSS_ROWS: { level: number; grade: Grade; behind: Grade }[] = [
+	{ level: 15, grade: 'G2', behind: 'G1' },
+	{ level: 25, grade: 'G3', behind: 'G1' },
+	{ level: 35, grade: 'G4', behind: 'G2' },
+	{ level: 45, grade: 'G5', behind: 'G3' },
 ];
 out();
-out('| King level | Loadout | Gear | Result |');
+out('| Boss level | Loadout | Gear | Result |');
 out('|---|---|---|---|');
-for (const level of KING_LEVELS) {
+for (const { level, grade, behind } of BOSS_ROWS) {
 	const stats = monsterStats('bossGreatAuroch', level);
-	for (const { name, equipment } of GEARS) {
-		for (const gearLevel of level === 15 ? [15] : [level, 15]) {
-			const r = simulateMany(
-				{ equipment: atItemLevel(equipment, gearLevel), monster: { type: 'bossGreatAuroch', level }, autoUse: false },
-				RUNS,
-				`king-${name}-${level}`,
-			);
-			out(`| ${level} (${stats.maxHp} HP, armor ${Math.round(stats.armor)}) | ${name} | ${gearLevel === level ? 'at the level' : 'behind'} | ${cell(r)} |`);
-		}
+	for (const [kitGrade, label] of [
+		[grade, 'at the level'],
+		[behind, 'behind'],
+	] as const) {
+		const itemLevel = Math.max(label === 'behind' ? 1 : level, GRADE_INFO[kitGrade].levels[0]);
+		const r = simulateMany(
+			{ equipment: atItemLevel(gradeKit(kitGrade), itemLevel), monster: { type: 'bossGreatAuroch', level }, autoUse: false },
+			RUNS,
+			`boss-${kitGrade}-${level}`,
+		);
+		out(`| ${level} (${stats.maxHp} HP, armor ${Math.round(stats.armor)}) | ${kitGrade} kit + mace | ${label} | ${cell(r)} |`);
 	}
 }
 

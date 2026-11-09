@@ -6,7 +6,7 @@
 
 | Source | Item levels | Pool |
 | --- | --- | --- |
-| Normal monster, plains | 1-20, grown up to 30 (+1 variance) | `equipment_plains`, ceiling G3 |
+| Normal monster, plains | 1-20, grown up to 30 (+1 variance) | `equipment_plains`, ceiling G4 |
 | Normal monster, forest | 4-24, grown up to 34 | ceiling G4 |
 | Normal monster, swamp | 8-28, grown up to 38 | ceiling G5 |
 | Normal monster, tundra | 12-30, grown up to 40 | ceiling G7 |
@@ -20,7 +20,7 @@
 | --- | --- | --- | --- |
 | G1 | 1-8 | common | every source at those levels |
 | G2 | 9-18 | common, uncommon | likewise |
-| G3 | 19-30 | uncommon | likewise (plains ends here) |
+| G3 | 19-30 | uncommon | likewise |
 | G4 | 31-42 | uncommon, rare | grown monsters of forest, swamp, tundra; bosses 31-42; chests of castle 10 (2 of 3 drops) |
 | G5 | 43-54 | rare | bosses 43-45 only (every drop of a level 43+ boss) |
 | G6 (Obsidian set) | 55-66, then open | rare, epic, legendary and the rest | nothing reaches it yet (a safe no-op) |
@@ -59,6 +59,10 @@ So from chests alone at castle 10 a G4 weapon takes about 1.7 hours and a given 
 
 A rarity follows its grade, and G6 is now the open top grade instead of G3. So **rare** gear drops only at item level 31+ (G4 and G5), **epic and legendary** non-named gear drops nowhere until G6 content exists, and item levels 19-30 give uncommon only (before: the usual 70 / 22 / 7 / 1 / 0.2 mix of common to legendary). The loot validator reports these weights as unreachable (a warning, not an error).
 
-## 5. The plains dead zone (decision wanted)
+## 5. The plains ceiling (decided 2026-11-09, owner)
 
-The plains pool stops at G3, whose window ends at item level 30. A plains monster grown beyond that (levels 1-20 plus 10 levels of growth) rolls an item level of 31 and finds no base: at monster level 31 a kill drops 0.142 gear instead of about 0.31, at level 30 0.276 (the +1 variance). Options: plains ceiling G4 (one number in `BIOME_LOOT`), or leave it (those monsters are rare and the player has outgrown plains gear). Not changed here.
+The plains pool used to stop at G3, whose window ends at item level 30, so a plains monster grown past that (levels 1-20 plus 10 levels of growth) rolled item level 31 and found no base (0.142 gear per kill at monster level 31). The plains ceiling is now G4. Plains monsters now drop 0.309 gear per kill at level 20, 0.359 at 25, 0.409 at 30 (G3 67 %, G4 33 %) and 0.420 at 31 (G4 66 %, G3 34 %), with no empty-pool warnings.
+
+## 6. Rarity (decided 2026-11-09, owner)
+
+G3-G5 carry only their own rarities (uncommon-only at item level 19-30) and the loot validator reports the unreachable epic and legendary weights as a warning. Accepted.

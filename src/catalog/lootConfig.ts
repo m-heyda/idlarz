@@ -64,7 +64,7 @@ export interface BonusTable {
 	mode: 'rolled' | 'fixed';
 	/** Take every item in the pool once, with its quantity (a boss's potions) */
 	takeAll?: boolean;
-	/** Prefer pool items the player does not own yet while any remain (the King's set pieces) */
+	/** Prefer pool items the player does not own yet while any remain (a boss's set pieces) */
 	preferMissing?: boolean;
 	/** Own item level window; default: the profile's */
 	itemLevel?: Pick<ItemLevelDef, 'offset' | 'variance'>;
@@ -109,10 +109,9 @@ export interface LootSource {
  * The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level
  * window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
  * a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items,
- * so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides: the plains pool stops at G3, so a plains monster
- * grown past item level 30 (its levels 1-20 plus 10 levels of growth, plus 1 of variance) finds no base and drops nothing (about half the drops at 31; see docs/plan/31-grade-by-biome-and-source.md).
+ * so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides, and a ceiling must reach the grade of the highest item level the biome can produce: plains monsters (levels 1-20, growing up to 30, plus 1 of variance) reach item level 31, so plains stops at G4, where G3 would leave a grown monster with nothing to drop.
  *
- * A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G3, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
+ * A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G4, forest G4, swamp G5, tundra G7); the floor is the item level window of each grade.
  * Every base that drops carries a `grade:` tag (IDL-243): the legacy wood, steel and Obsidian pieces that fill a ladder cell are graded by it (Wooden Club G1, Hunting Bow G2, Iron Sword G3, six Steel armour pieces G4, the Obsidian family G6; they keep their ids, art and set bonuses),
  * the rest of wood, steel and all of cloth are retired (`enabled: false`, ids kept, owned pieces keep working). A graded legacy piece is generated only in its grade's window and rarities (`dropLevels`, `dropRarities`) but stays valid at its old level range for pieces already owned.
  * The highest live grade is open at the top and takes every rarity ({@link gradeLevels}, {@link gradeRarities} in `src/catalog/items/grades.ts`) so nothing is left without a base while the next grade is dark; a rarity with no base at an item level is left out of the roll there.
@@ -122,7 +121,7 @@ export interface LootSource {
  * @order 3
  */
 export const BIOME_LOOT = {
-	plains: { ceiling: 3, levels: { min: 1, max: 20 } },
+	plains: { ceiling: 4, levels: { min: 1, max: 20 } },
 	forest: { ceiling: 4, levels: { min: 4, max: 24 } },
 	swamp: { ceiling: 5, levels: { min: 8, max: 28 } },
 	tundra: { ceiling: 7, levels: { min: 12, max: 30 } },
