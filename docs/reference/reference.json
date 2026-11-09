@@ -836,6 +836,28 @@
   "see": []
  },
  {
+  "id": "resolveconflict",
+  "name": "resolveConflict",
+  "symbol": "resolveConflict",
+  "kind": "function",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/cloudClient.ts",
+  "line": 215,
+  "summary": "After a 409, decide whether it needs the player. Looks at the account's save once and answers: - it is one of this browser's own lost uploads (`isOwnSave`), or this browser's game is the same game and at least as far along (`judgeRebase`): the link is moved to its revision and the caller uploads again (`rebased`); - it holds more than this browser's game but nobody has saved it for `QUIET_MS` (the other session is gone): this browser's game replaces it (`rebased` via `overwrite`, owner decision; the server pins the replaced save in the history and the caller tells the player); - it holds more and is still being saved, or its revision is not above the link's (a New Game elsewhere restarts the revisions): `diverged`, nothing is uploaded, the caller looks again later (the player can choose in the hub meanwhile); - the account has no save (`gone`), or could not be read (`unknown`). Nothing is uploaded here, so the server's revision check stays the only thing that decides what is stored.",
+  "see": []
+ },
+ {
+  "id": "judgerebase",
+  "name": "judgeRebase",
+  "symbol": "judgeRebase",
+  "kind": "function",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/cloudRecovery.ts",
+  "line": 31,
+  "summary": "Whether a refused upload (409, \"the account has a newer save\") may be resolved without asking the player, and how. Decided from numbers both sides hold, never from anything the server could be asked to trust. The server's own revision check stays as it was: the browser only re-bases on the revision it is told about.",
+  "see": []
+ },
+ {
   "id": "ember-model",
   "name": "EMBER_MODEL",
   "symbol": "EMBER_MODEL",
@@ -872,13 +894,24 @@
   ]
  },
  {
+  "id": "losesprogress",
+  "name": "losesProgress",
+  "symbol": "losesProgress",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/pipeline.ts",
+  "line": 75,
+  "summary": "True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).",
+  "see": []
+ },
+ {
   "id": "min-save-interval-ms",
   "name": "MIN_SAVE_INTERVAL_MS",
   "symbol": "MIN_SAVE_INTERVAL_MS",
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 71,
+  "line": 83,
   "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
   "see": []
  },
@@ -889,7 +922,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 186,
+  "line": 200,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1780,6 +1813,17 @@
   "see": []
  },
  {
+  "id": "withpushlock",
+  "name": "withPushLock",
+  "symbol": "withPushLock",
+  "kind": "const",
+  "category": "Saves & Server/Uploading",
+  "file": "src/lib/pushLock.ts",
+  "line": 19,
+  "summary": "One upload at a time per browser. Everything that reads the link, uploads and writes the new link back runs inside this lock, so a second tab (a tab that took the game over from the first, or a browser without the game-owner lock) waits for the upload in flight and then reads the revision it left, instead of sending the one it read before. Without Web Locks the work simply runs (graceful fallback), and a conflict that still happens is resolved by `resolveConflict`. The lock dies with the page, so a closing tab never holds it up.",
+  "see": []
+ },
+ {
   "id": "persisted-keys",
   "name": "PERSISTED_KEYS",
   "symbol": "PERSISTED_KEYS",
@@ -1844,7 +1888,7 @@
   "kind": "const",
   "category": "Saves & Server/Uploading",
   "file": "src/lib/syncPolicy.ts",
-  "line": 16,
+  "line": 17,
   "summary": "When the game is copied to the account's cloud save. Pure: the clock, the timers and the upload itself are injected, so the cadence is tested without a browser.",
   "see": []
  },

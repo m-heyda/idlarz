@@ -9,6 +9,7 @@ import {
 	MIN_SAVE_INTERVAL_MS,
 	PINNED_KEEP,
 	acceptSave,
+	losesProgress,
 	storedToText,
 	type SaveRepo,
 	type StatsRow,
@@ -240,6 +241,36 @@ test('starting over (a much younger game) pins the replaced game so history neve
 		'the old game is still there',
 	);
 	assert.ok(history.filter((h) => h.pinned).length <= PINNED_KEEP);
+});
+
+test('a save that holds less than the one it replaces (a browser re-basing a game that is behind) pins the replaced save and says so', async () => {
+	const { repo, history } = memoryRepo();
+	const big = game();
+	let now = T0;
+	await accept(repo, 'u1', big, 0, now);
+	now += MIN_SAVE_INTERVAL_MS + 1000;
+	api().resetGame();
+	store.setState({ playSeconds: 1200 } as never);
+	const small = structuredClone(pickPersisted(api()));
+	const out = await accept(repo, 'u1', small, 1, now);
+	assert.ok(out.kind === 'ok' && !out.flags.includes('playtime_regress'), 'more play time, so not a New Game');
+	assert.ok(out.kind === 'ok' && out.replaced?.fromRev === 1, 'the replaced save is reported');
+	assert.equal(
+		history.some((h) => h.rev === 1 && h.pinned),
+		true,
+		'and kept in the history',
+	);
+	const same = await accept(repo, 'u1', { ...small, playSeconds: small.playSeconds + 20 }, 2, now + MIN_SAVE_INTERVAL_MS + 1000);
+	assert.ok(same.kind === 'ok' && same.replaced === undefined, 'an ordinary save replaces nothing');
+});
+
+test('losesProgress: fewer rebirths, or the same rebirths with a lower level or fewer tiles; a rebirth resets both and is not a loss', () => {
+	const at = (rebirths: number, level: number, tilesOwned: number) => ({ rebirths, level, tilesOwned });
+	assert.equal(losesProgress(at(1, 10, 40), at(1, 9, 40)), true);
+	assert.equal(losesProgress(at(1, 10, 40), at(1, 10, 39)), true);
+	assert.equal(losesProgress(at(1, 10, 40), at(0, 20, 90)), true);
+	assert.equal(losesProgress(at(1, 10, 40), at(1, 10, 40)), false);
+	assert.equal(losesProgress(at(1, 10, 40), at(2, 1, 1)), false);
 });
 
 // ---- trust: fresh start, flags, leaderboard row ------------------------------------------------------------------

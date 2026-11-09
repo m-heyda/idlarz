@@ -2,6 +2,8 @@ import type { CloudInfo, CloudLink } from '@/lib/startPlan';
 import type { PrestigeState } from '@/types/game';
 import { shouldKeepalive } from '@/lib/syncPolicy';
 import { scoped } from '@/lib/storageScope';
+import { decodeSave } from '@/lib/saveFormat';
+import { judgeRebase, type Progress } from '@/lib/cloudRecovery';
 
 /** The browser side of /api/save. Saves stay local first; the cloud copy follows. */
 /** `lastReset` is when the last season reset happened (epoch ms): a browser save older than it belongs to a game that was reset */
@@ -170,4 +172,113 @@ export const adoptOwnSave = async (userId: string, deps: AdoptDeps = REAL_ADOPT_
 	deps.writeLink({ userId, rev: latest.cloud.rev });
 	deps.clearAttempts();
 	return latest.cloud.rev;
+};
+
+// ---- resolving a 409 -----------------------------------------------------------------------------------------------------------
+
+/** What a 409 turned out to be, after looking at the account's save. */
+export type ConflictResolution =
+	| { kind: 'rebased'; rev: number; via: 'own' | 'ahead' | 'overwrite' } // upload again on top of `rev`
+	| { kind: 'gone' } // the account has no save at all
+	| { kind: 'diverged'; rev: number } // the account's save is ahead of, or another game than, this browser's: the player chooses
+	| { kind: 'unknown' }; // the account could not be read: nothing was decided
+
+export interface ResolveDeps extends AdoptDeps {
+	readLink: () => CloudLink | null;
+	now?: () => number;
+}
+
+const REAL_RESOLVE_DEPS: ResolveDeps = { ...REAL_ADOPT_DEPS, readLink };
+
+/** The headline numbers of a cloud save, read from the text the server handed out (the rebirth count is not in the summary). */
+const cloudProgress = (cloud: CloudInfo): Progress | null => {
+	const decoded = decodeSave(cloud.text);
+	if (!decoded.ok) return null;
+	const { level, tilesOwned, playSeconds } = cloud.summary;
+	return { level, tilesOwned, playSeconds, rebirths: decoded.state.prestige.rebirths };
+};
+
+/**
+ * After a 409, decide whether it needs the player. Looks at the account's save once and answers:
+ *   - it is one of this browser's own lost uploads (`isOwnSave`), or this browser's game is the same game and at least as far along
+ *     (`judgeRebase`): the link is moved to its revision and the caller uploads again (`rebased`);
+ *   - it holds more than this browser's game but nobody has saved it for `QUIET_MS` (the other session is gone): this browser's game replaces it
+ *     (`rebased` via `overwrite`, owner decision; the server pins the replaced save in the history and the caller tells the player);
+ *   - it holds more and is still being saved, or its revision is not above the link's (a New Game elsewhere restarts the revisions): `diverged`,
+ *     nothing is uploaded, the caller looks again later (the player can choose in the hub meanwhile);
+ *   - the account has no save (`gone`), or could not be read (`unknown`).
+ * Nothing is uploaded here, so the server's revision check stays the only thing that decides what is stored.
+ *
+ * @category Saves & Server/Uploading
+ * @order 3
+ */
+export const resolveConflict = async (userId: string, local: Progress, deps: ResolveDeps = REAL_RESOLVE_DEPS): Promise<ConflictResolution> => {
+	const latest = await deps.fetchCloud();
+	if (latest.status === 'empty') return { kind: 'gone' };
+	if (latest.status !== 'ok') return { kind: 'unknown' };
+	const { cloud } = latest;
+	const link = deps.readLink();
+	const own = isOwnSave(deps.readAttempts(), userId, cloud);
+	let via: 'own' | 'ahead' | 'overwrite' = 'own';
+	if (!own) {
+		const cloudSide = cloudProgress(cloud);
+		const verdict =
+			cloudSide && link && link.userId === userId ? judgeRebase(link, local, cloudSide, cloud.rev, cloud.serverSavedAt, (deps.now ?? Date.now)()) : 'never';
+		if (verdict === 'never' || verdict === 'wait') return { kind: 'diverged', rev: cloud.rev };
+		via = verdict;
+	}
+	deps.writeLink({ userId, rev: cloud.rev });
+	deps.clearAttempts();
+	return { kind: 'rebased', rev: cloud.rev, via };
+};
+
+// ---- how often it happens --------------------------------------------------------------------------------------------------------
+
+const CONFLICTS_KEY = scoped('idlarz.cloud.conflicts');
+
+export interface ConflictStats {
+	/** 409s seen by this browser */ total: number;
+	/** ... that were resolved without the player */ rebased: number;
+	/** ... that needed the player (the account's save is ahead and still being saved, or another game) */ diverged: number;
+	/** Times this browser's game replaced a cloud save that held more (the replaced save is pinned in the history) */ overwrites: number;
+	/** The last one (epoch ms) */ lastAt: number;
+}
+
+export const readConflictStats = (): ConflictStats => {
+	try {
+		const raw = JSON.parse(window.localStorage.getItem(CONFLICTS_KEY) ?? '{}') as Partial<ConflictStats>;
+		const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+		return { total: n(raw.total), rebased: n(raw.rebased), diverged: n(raw.diverged), overwrites: n(raw.overwrites), lastAt: n(raw.lastAt) };
+	} catch {
+		return { total: 0, rebased: 0, diverged: 0, overwrites: 0, lastAt: 0 };
+	}
+};
+
+/** Counts one 409 (kept in this browser, and written to the console so a bug report carries it). Server side the same event is the `save_conflict` log line. */
+export const noteConflict = (resolution: ConflictResolution['kind'], now: number = Date.now()): ConflictStats => {
+	const stats = readConflictStats();
+	const next: ConflictStats = {
+		total: stats.total + 1,
+		rebased: stats.rebased + (resolution === 'rebased' ? 1 : 0),
+		diverged: stats.diverged + (resolution === 'diverged' ? 1 : 0),
+		overwrites: stats.overwrites,
+		lastAt: now,
+	};
+	return store(next, `Cloud save conflict: ${resolution}`);
+};
+
+/** Counts one time this browser's game replaced a cloud save that held more (called once the server accepted it). */
+export const noteOverwrite = (now: number = Date.now()): ConflictStats => {
+	const stats = readConflictStats();
+	return store({ ...stats, overwrites: stats.overwrites + 1, lastAt: now }, 'Cloud save replaced by this browser (the old one is pinned in the history)');
+};
+
+const store = (stats: ConflictStats, message: string): ConflictStats => {
+	try {
+		window.localStorage.setItem(CONFLICTS_KEY, JSON.stringify(stats));
+	} catch {
+		/* a counter only */
+	}
+	console.info(message, stats);
+	return stats;
 };

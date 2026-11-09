@@ -3,27 +3,38 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { pickPersisted } from '@/lib/sanitizeSave';
 import { exportSaveText, flushSaves } from '@/lib/saveStorage';
-import { adoptOwnSave, pushCloud, readLink, recordAttempt, writeAttempts, writeLink } from '@/lib/cloudClient';
+import { noteConflict, noteOverwrite, pushCloud, readLink, recordAttempt, resolveConflict, writeAttempts, writeLink } from '@/lib/cloudClient';
+import { withPushLock } from '@/lib/pushLock';
 import { onSaveEvent } from '@/lib/saveEvents';
 import { createSyncScheduler, type PushOutcome, type PushReason } from '@/lib/syncPolicy';
 import { registerCloudSaver } from '@/lib/manualCloudSave';
 import { writeEntered } from '@/lib/authClient';
 import { cloudSaveGone } from '@/lib/startPlan';
+import { countOwnedTiles } from '@/utils/game/tiles';
 
 /**
  * Copies the game to the signed-in account's cloud save (cadence and limits: syncPolicy.ts): shortly after the game starts,
  * soon after a milestone (purchase, castle upgrade, rebirth, level up), every 5 min while idle, and when the tab is hidden
  * or closed, and on demand from the menu's "Save game" (registered below, at most once per 10 min, lib/manualCloudSave.ts). The local save
  * stays the primary copy; a failed upload is retried with backoff.
- * Stops for the session when the account's save moved on elsewhere (409), the server refuses this save, or the login is gone. A 409 that
+ * Stops for the session when the server refuses this save or the login is gone. A 409 (the account's save moved on) is looked at first
+ * (`resolveConflict`): our own lost upload, or a save this browser's game is at least as far along as, is taken as the new base and uploaded over;
+ * a save that holds more than this browser's game but has not been saved for `QUIET_MS` is replaced by it (the server pins the replaced save in the history; the player is told, `noteOverwrite`);
+ * one still being saved (or another game: revisions restart after a New Game) tells the player once and is re-checked with backoff, never given up for good.
+ * Uploads run one at a time per browser (`withPushLock`, a Web Lock). A 409 that
  * reports revision 0 means the account has no save at all (reset): the link is dropped and the page reloads so the start check begins a new game.
  */
 export const useCloudSync = (userId: string, active: boolean) => {
 	useEffect(() => {
 		if (!active) return;
 		let lastSentPlay = -1;
+		let toldDiverged = false;
 
-		const push = async (reason: PushReason): Promise<PushOutcome> => {
+		const push = (reason: PushReason): Promise<PushOutcome> =>
+			// a closing tab must not wait for another tab's upload: its last upload goes out at once, like before
+			reason === 'hide' ? pushOnce(reason) : withPushLock(() => pushOnce(reason));
+
+		const pushOnce = async (reason: PushReason): Promise<PushOutcome> => {
 			const hiding = reason === 'hide';
 			const manual = reason === 'manual';
 			const link = readLink();
@@ -33,12 +44,20 @@ export const useCloudSync = (userId: string, active: boolean) => {
 			const text = exportSaveText(state);
 			recordAttempt({ userId, baseRev: link.rev, playSeconds: state.playSeconds }); // the page may die before the answer comes
 			let result = await pushCloud(text, link.rev, hiding);
-			if (result.status === 'conflict') {
-				// "newer save" can be this browser's own upload whose answer was lost (a reload sends one as the page closes): carry on from it
-				const rev = await adoptOwnSave(userId);
-				if (rev !== null) {
-					recordAttempt({ userId, baseRev: rev, playSeconds: state.playSeconds });
-					result = await pushCloud(text, rev, hiding);
+			let overwrote = false;
+			if (result.status === 'conflict' && !cloudSaveGone(result.rev)) {
+				// "newer save" is often this browser's own upload whose answer was lost, or a save this game is already ahead of: carry on from it
+				const resolution = await resolveConflict(userId, {
+					playSeconds: state.playSeconds,
+					level: state.level.level,
+					tilesOwned: countOwnedTiles(state.tiles),
+					rebirths: state.prestige.rebirths,
+				});
+				noteConflict(resolution.kind);
+				if (resolution.kind === 'rebased') {
+					overwrote = resolution.via === 'overwrite';
+					recordAttempt({ userId, baseRev: resolution.rev, playSeconds: state.playSeconds });
+					result = await pushCloud(text, resolution.rev, hiding);
 				}
 			}
 			switch (result.status) {
@@ -48,6 +67,11 @@ export const useCloudSync = (userId: string, active: boolean) => {
 					// ... and the same for Embers and rebirths a rebirth could not have paid
 					if (result.prestige) useGameStore.getState().applyServerPrestige(result.prestige);
 					lastSentPlay = state.playSeconds;
+					if (overwrote) {
+						// once per overwrite, never silent: the account's save held more, nobody had saved it for a while, this game replaced it (the old one is pinned in the history)
+						noteOverwrite();
+						useUiStore.getState().showToast("Your cloud save was from another session and has been replaced by this browser's game.");
+					}
 					writeLink({ userId, rev: result.rev });
 					writeAttempts([]);
 					return 'ok';
@@ -61,8 +85,17 @@ export const useCloudSync = (userId: string, active: boolean) => {
 						window.location.reload();
 						return 'stop';
 					}
-					useUiStore.getState().showToast('Your account has a newer save from another browser. Reload to choose.');
-					return 'stop';
+					// the account's save holds more and is still being saved by another session (or is another game): nothing is uploaded now. Say so
+					// once, look again on the backoff: when that session has been quiet for QUIET_MS this game replaces its save
+					if (!toldDiverged) {
+						toldDiverged = true;
+						useUiStore
+							.getState()
+							.showToast(
+								"Your account has a newer save from another session. If it stays unchanged, this browser's game will replace it. Reload to choose instead.",
+							);
+					}
+					return 'retry';
 				case 'rejected':
 					useUiStore.getState().showToast(`Cloud save paused: the server refused this save (${result.message}).`);
 					console.warn('Cloud save refused:', result.message);

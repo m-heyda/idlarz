@@ -6,7 +6,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 
 | Name | Category | Source | What |
 | --- | --- | --- | --- |
-| `acceptSave` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:186`](../../src/lib/cloudSave/pipeline.ts) | Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). |
+| `acceptSave` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:200`](../../src/lib/cloudSave/pipeline.ts) | Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). |
 | `addBuff` | Combat / Consumables | [`src/lib/buffs.ts:63`](../../src/lib/buffs.ts) | Adds one buff effect to the running buffs. |
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:161`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:142`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
@@ -109,6 +109,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
 | `isNonProduction` | Saves & Server / Accepting a save | [`src/lib/cloudSave/environment.ts:12`](../../src/lib/cloudSave/environment.ts) | Is this server a production server? Decided from the server's own environment only; |
+| `judgeRebase` | Saves & Server / Uploading | [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts) | Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. |
 | `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:51`](../../src/lib/loot/kill.ts) | Rewards for a kill. |
 | `kit` | Loot / Items | [`src/lib/fightSim.ts:57`](../../src/lib/fightSim.ts) | A full kit of one ladder grade: |
 | `Ledger` | Saves & Server / The ledger | [`src/lib/offline/ledger.ts:78`](../../src/lib/offline/ledger.ts) | The ledger: |
@@ -121,6 +122,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `LIVE_GRADES` | Loot / Items | [`src/catalog/items/grades.ts:51`](../../src/catalog/items/grades.ts) | The grade ladder's live grades (IDL-220, IDL-224, IDL-243, IDL-238): |
 | `LOOT_PROFILES` | Loot / Config | [`src/catalog/lootConfig.ts:198`](../../src/catalog/lootConfig.ts) | Profiles: |
 | `LOOT_SOURCES` | Loot / Config | [`src/catalog/lootConfig.ts:278`](../../src/catalog/lootConfig.ts) | Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). |
+| `losesProgress` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:75`](../../src/lib/cloudSave/pipeline.ts) | True when a new save holds less than the one it replaces: |
 | `LUCK` | Economy / Chests and Luck | [`src/config/spawns.ts:74`](../../src/config/spawns.ts) | Luck = Charisma + Lucky Charm + gear Luck. |
 | `luckyRatChance` | Economy / Chests and Luck | [`src/lib/luck.ts:67`](../../src/lib/luck.ts) | Chance (0-1) that a newly arrived rat is a lucky one. |
 | `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/sim.ts:792`](../../scripts/sim.ts) | The bands of the magnitude targets (IDL-128): |
@@ -134,7 +136,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `MERCHANT_RESOURCE_PRICES` | Economy / Merchant | [`src/config/merchant.ts:18`](../../src/config/merchant.ts) | The merchant buys resources at these gold prices per unit. |
 | `MERCHANT_UPGRADES` | Economy / Merchant | [`src/config/merchant.ts:43`](../../src/config/merchant.ts) | Merchant upgrades are bought with gold; |
 | `merchantUpgradeCost` | Economy / Merchant | [`src/utils/game/merchant.ts:23`](../../src/utils/game/merchant.ts) | Gold price of the next level of a merchant upgrade. |
-| `MIN_SAVE_INTERVAL_MS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:71`](../../src/lib/cloudSave/pipeline.ts) | Saves from one player are accepted at most this often (an honest client sends every ~90 s). |
+| `MIN_SAVE_INTERVAL_MS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:83`](../../src/lib/cloudSave/pipeline.ts) | Saves from one player are accepted at most this often (an honest client sends every ~90 s). |
 | `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:203`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
 | `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:350`](../../src/config/combatConfig.ts) | The roster: |
 | `monsterStats` | Monsters / Level scaling | [`src/lib/monsters.ts:117`](../../src/lib/monsters.ts) | HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). |
@@ -160,6 +162,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` have been bought: |
 | `regen` | Combat / Player numbers | [`src/lib/combat.ts:211`](../../src/lib/combat.ts) | HP regeneration outside fights: |
 | Rendering the map | Architecture / Rendering | [`src/components/game/Grid.tsx:1`](../../src/components/game/Grid.tsx) | Rendering notes. |
+| `resolveConflict` | Saves & Server / Uploading | [`src/lib/cloudClient.ts:215`](../../src/lib/cloudClient.ts) | After a 409, decide whether it needs the player. |
 | `resolveSourceLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:99`](../../src/lib/loot/generate.ts) | The level of a chest or shelf: |
 | `RESOURCE_CAP` | Economy / Basics | [`src/config/economy.ts:43`](../../src/config/economy.ts) | The most any stockpile (XP included) can hold; |
 | `restThrough` | Combat / Results and rest | [`src/lib/offline/fight.ts:164`](../../src/lib/offline/fight.ts) | After an absence the player is back on their feet: |
@@ -184,7 +187,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `spawnLevelRange` | Monsters / Level scaling | [`src/lib/monsters.ts:39`](../../src/lib/monsters.ts) | The levels a new monster of this type can appear at in a world of this castle level (both ends included). |
 | `STARTING_GEMS` | Progression / Gems | [`src/config/economy.ts:219`](../../src/config/economy.ts) | Gems every player starts with (also granted to saves from before Gems existed). |
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:140`](../../src/lib/combat.ts) | One swing: |
-| `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:16`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
+| `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
 | The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |
 | The end-to-end test account | Ops / Operator guides | [`e2e/account.ts:23`](../../e2e/account.ts) | The one account every end-to-end test signs in with (docs/reference/ops.md). |
 | The game at a glance | Overview / The game | [`src/app/GameApp.tsx:17`](../../src/app/GameApp.tsx) | Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. |
@@ -205,5 +208,6 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `verifyTransition` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:176`](../../src/lib/cloudSave/verify.ts) | Runs every plausibility check between two consecutive saves and returns the flags that fired; |
 | `WEAPON_ATTACK_SPEED` | Combat / Player numbers | [`src/catalog/weapons.ts:13`](../../src/catalog/weapons.ts) | Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; |
 | `withBuffs` | Combat / Consumables | [`src/lib/offline/profile.ts:96`](../../src/lib/offline/profile.ts) | A profile with the running potion buffs on top (buffTotals): |
+| `withPushLock` | Saves & Server / Uploading | [`src/lib/pushLock.ts:19`](../../src/lib/pushLock.ts) | One upload at a time per browser. |
 | `XP_MODEL` | Saves & Server / Accepting a save | [`src/lib/cloudSave/xpModel.ts:21`](../../src/lib/cloudSave/xpModel.ts) | The server's model of how much XP a character can have. |
 | `xpToNextLevel` | Progression / Levels | [`src/utils/game/character.ts:186`](../../src/utils/game/character.ts) | XP to go from `level` to the next one (Infinity at the maximum level). |

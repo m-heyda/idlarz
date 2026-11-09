@@ -81,8 +81,24 @@ export async function POST(request: Request) {
 		);
 		switch (outcome.kind) {
 			case 'ok':
+				// a save that replaced one holding more (the browser re-based its game over it): the replaced save is pinned in the history, and this line says which
+				if (outcome.replaced)
+					console.warn(
+						JSON.stringify({ event: 'save_overwrite', userId: player.userId, rev: outcome.rev, ...outcome.replaced, nonProduction: isNonProduction() }),
+					);
 				return json({ rev: outcome.rev, serverSavedAt: outcome.serverSavedAt, gems: outcome.gems, xp: outcome.xp, prestige: outcome.prestige });
 			case 'conflict':
+				// counted in the server log so the frequency of stale uploads is visible (the client resolves most of them on its own)
+				console.warn(
+					JSON.stringify({
+						event: 'save_conflict',
+						userId: player.userId,
+						baseRev: body.baseRev,
+						rev: outcome.rev,
+						ageMs: Date.now() - outcome.serverSavedAt,
+						nonProduction: isNonProduction(),
+					}),
+				);
 				return json({ error: 'Your account has a newer save.', conflict: true, rev: outcome.rev, serverSavedAt: outcome.serverSavedAt }, 409);
 			case 'too_soon':
 				return json({ error: 'Saving too often.', retryAfterMs: outcome.retryAfterMs }, 429);
