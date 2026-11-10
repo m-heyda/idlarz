@@ -659,7 +659,7 @@ body {
 }
 
 /* ======================================================================================
-   Pixel UI kit - modals, panels, buttons, tooltips, sliders, flasks, hero HUD
+   Pixel UI kit - modals, panels, buttons, tooltips, sliders, hero card
    Art: public/pixel/ui (scripts/pixel/ui_art.py). Style guide: scripts/pixel/reference/STYLE.md
    ====================================================================================== */
 
@@ -1262,87 +1262,6 @@ body {
 	font-family: var(--font-pixel);
 }
 
-/* --- HP / MP flasks --- */
-.px-flask {
-	--s: 1; /* integer pixel multiplier */
-	position: relative;
-	width: calc(40px * var(--s));
-	height: calc(56px * var(--s));
-	image-rendering: pixelated;
-}
-
-.px-flask-liquid-wrap {
-	position: absolute;
-	inset: 0;
-	-webkit-mask: url('/pixel/ui/flask_mask.png') center / 100% 100% no-repeat;
-	mask: url('/pixel/ui/flask_mask.png') center / 100% 100% no-repeat;
-}
-
-.px-flask-liquid {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: calc(4px * var(--s));
-	height: calc(41px * var(--s) * var(--p, 1));
-	transition: height 0.7s cubic-bezier(0.3, 0.8, 0.3, 1);
-	background: linear-gradient(var(--c1) 0 calc(3px * var(--s)), var(--c2) calc(3px * var(--s)) 38%, var(--c3) 38% 74%, var(--c4) 74%);
-
-	&::before {
-		/* rippling surface */
-		content: '';
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: calc(-2px * var(--s));
-		height: calc(4px * var(--s));
-		background: repeating-linear-gradient(90deg, var(--c1) 0 calc(5px * var(--s)), var(--c2) calc(5px * var(--s)) calc(10px * var(--s)));
-		animation: px-ripple 2.4s linear infinite;
-	}
-
-	&::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: url('/pixel/ui/flask_bubbles.png') 0 0 / 100% calc(24px * var(--s)) repeat-y;
-		animation: px-bubbles 3.2s linear infinite;
-		image-rendering: pixelated;
-	}
-}
-
-.px-flask-hp {
-	--c1: #ff9a9a;
-	--c2: #f0384a;
-	--c3: #c01c34;
-	--c4: #8a1028;
-}
-
-.px-flask-mp {
-	--c1: #9ad0ff;
-	--c2: #3a7cf0;
-	--c3: #2a50c8;
-	--c4: #1c2e90;
-}
-
-.px-flask-glass {
-	position: absolute;
-	inset: 0;
-	background: url('/pixel/ui/flask_glass.png') 0 0 / 100% 100% no-repeat;
-	image-rendering: pixelated;
-	pointer-events: none;
-}
-
-@keyframes px-bubbles {
-	to {
-		background-position: 0 calc(-24px * var(--s));
-	}
-}
-
-@keyframes px-ripple {
-	to {
-		background-position: calc(10px * var(--s)) 0;
-	}
-}
-
 .px-equip-empty {
 	filter: grayscale(1) brightness(0.55) contrast(0.8);
 	opacity: 0.55;
@@ -1363,83 +1282,7 @@ body {
 	gap: 4px;
 }
 
-/* --- Hero HUD: stone alcove scene, flickering torches, flasks flanking the hero, stony XP bar --- */
-.hero-hud {
-	position: relative;
-	width: 288px; /* hero_scene.png is 144x112, shown at 2x */
-	height: 224px;
-	margin: 0 auto;
-	background: url('/pixel/ui/hero_scene.png') 0 0 / 288px 224px no-repeat;
-	image-rendering: pixelated;
-	box-shadow:
-		0 0 0 2px #080504,
-		0 0 0 4px #5a3f1c;
-}
-
-.hero-torch {
-	position: absolute;
-	top: 56px;
-	width: 20px;
-	height: 32px;
-	background: url('/pixel/ui/torch.png') 0 0 / 60px 32px no-repeat;
-	image-rendering: pixelated;
-	filter: drop-shadow(0 0 6px rgba(255, 150, 40, 0.75));
-	animation: torch-flicker 0.5s steps(3) infinite;
-}
-
-@keyframes torch-flicker {
-	to {
-		background-position-x: -60px;
-	}
-}
-
-.hero-figure {
-	position: absolute;
-	left: 50%;
-	bottom: 40px;
-	transform: translateX(-50%);
-	animation: hero-idle 1.8s steps(2) infinite alternate; /* 2px = one native pixel */
-}
-
-@keyframes hero-idle {
-	to {
-		transform: translateX(-50%) translateY(-2px);
-	}
-}
-
-.hero-flask {
-	position: absolute;
-	bottom: 22px;
-	width: 80px;
-	height: 112px;
-	cursor: help;
-
-	&[data-side='left'] {
-		left: 6px;
-	}
-
-	&[data-side='right'] {
-		right: 6px;
-	}
-}
-
-.hero-flask-val {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 64px;
-	text-align: center;
-	font-size: 0.8125rem;
-	font-weight: 700;
-	color: #fff;
-	text-shadow:
-		0 1px 0 #1a0408,
-		1px 0 0 #1a0408,
-		-1px 0 0 #1a0408,
-		0 -1px 0 #1a0408;
-	pointer-events: none;
-}
-
+/* --- Hero card: the stony XP bar (the alcove scene and the potion flasks are gone) --- */
 /* stony XP bar: 9-slice chiselled frame, emerald fill that flows, tick marks every 10% */
 .hero-xp {
 	position: absolute;
@@ -1500,44 +1343,7 @@ body {
 		0 -1px 0 #0a1a06;
 }
 
-.hero-orb {
-	position: absolute;
-	left: -6px;
-	bottom: -2px;
-	width: 48px;
-	height: 48px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	filter: drop-shadow(0 0 5px rgba(150, 90, 255, 0.8));
-}
-
 /* name plate hanging at the top of the alcove */
-.hero-nameplate {
-	position: absolute;
-	top: 6px;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 2;
-	min-width: 132px;
-	padding: 3px 14px 4px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	line-height: 1.15;
-	color: #fff1c0;
-	text-shadow: 0 2px 0 #1a0f06;
-	background: rgba(12, 8, 6, 0.82);
-	border: 2px solid #7a5224;
-	box-shadow:
-		0 0 0 2px #080504,
-		inset 0 1px 0 rgba(240, 210, 122, 0.35);
-}
-
-.hero-nameplate .px-name {
-	font-size: 1rem;
-}
-
 .hero-class {
 	font-size: 0.6875rem;
 	letter-spacing: 1px;
@@ -1546,8 +1352,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.hero-torch,
-	.hero-figure,
 	.hero-xp-fill {
 		animation: none;
 	}

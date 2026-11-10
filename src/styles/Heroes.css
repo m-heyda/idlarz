@@ -161,6 +161,12 @@
 	box-shadow: 0 0 0 2px #e0a040;
 }
 
+.avatar-card:focus-visible,
+.class-card:focus-visible {
+	outline: 2px solid #f0d27a;
+	outline-offset: 2px;
+}
+
 .avatar-card[data-locked='true'] {
 	cursor: not-allowed;
 	color: #7c6e56;
@@ -171,9 +177,11 @@
 	font-weight: 700;
 	letter-spacing: 1px;
 	text-transform: uppercase;
+	overflow-wrap: anywhere;
 }
 
 .avatar-card-how {
+	overflow-wrap: anywhere;
 	font-size: 0.65rem;
 	line-height: 1.15;
 }

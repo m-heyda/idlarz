@@ -29,9 +29,9 @@ Starters are candidates for the 8 starter avatars (IDL-71): human, elf and dwarf
 | 654654 | `avatar_horned_fur_collar.png` | warrior with a fur collar, red frame | unlockable pool |
 | 34543543 | `avatar_horned_chainmail.png` | grizzled warrior in chainmail and horns, purple frame | unlockable: Early tester |
 
-## achievements/ (13 medals)
+## achievements/ (21 medals)
 
-One family: a round medal with a ribbon. **Bronze** = first-time actions, **silver** = milestones. No gold, fire or boss medals yet (needed: castle 10, first rebirth, The Great Auroch, golden monster, early tester).
+One family: a round medal with a ribbon. **Bronze** = first-time actions, **silver** = milestones. Every launch achievement has its own medal now.
 
 | Old | File | Glyph | Suggested achievement |
 | --- | ---- | ----- | --------------------- |
@@ -48,6 +48,12 @@ One family: a round medal with a ribbon. **Bronze** = first-time actions, **silv
 | 13 | `badge_sword_silver.png` | sword | spare: kills |
 | 14 | `badge_star_silver.png` | gold star | spare |
 | 15 | `badge_shield_silver.png` | blue shield | spare: defence |
+| new | `badge_castle_10_gold.png` | gold medal with a castle tower | castle 10 (Architect) |
+| new | `badge_first_rebirth_fire.png` | fiery medal with a flame | first rebirth (Reborn) |
+| new | `badge_great_auroch_boss.png` | dark iron medal with an auroch skull and red gems | defeat The Great Auroch |
+| new | `badge_golden_monster_gold.png` | gold medal with a golden monster silhouette | kill a golden monster |
+| new | `badge_early_tester_special.png` | purple and gold medal with a wrench and star | early tester |
+| new | `badge_castle_10_gold_alt.png`, `badge_first_rebirth_fire_alt.png`, `badge_early_tester_special_alt.png` | second variants of the three above | spare |
 
 ## Before it ships
 
