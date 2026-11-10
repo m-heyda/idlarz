@@ -90,7 +90,7 @@ test('shop items exist and cost at least 3x what they sell for (bought as a plai
 	}
 });
 
-test('named items sit in pools that exist, and only bosses and chests reach them', () => {
+test('named items sit in pools that exist, and only bosses and chests reach them (a boss through its own pool)', () => {
 	for (const profile of Object.values(LOOT_PROFILES)) {
 		for (const table of profile.bonusTables) assert.ok(LOOT_POOLS[table.poolId], `${profile.id}/${table.id}`);
 	}
@@ -98,7 +98,7 @@ test('named items sit in pools that exist, and only bosses and chests reach them
 		Object.values(LOOT_PROFILES)
 			.filter((p) => p.bonusTables.some((t) => t.poolId === poolId))
 			.map((p) => p.id);
-	assert.deepEqual(reach('legendary_weapons').sort(), ['basic_chest', 'boss'].sort());
+	assert.deepEqual(reach('legendary_weapons'), ['basic_chest'], 'a boss draws its unique from its own pool (tests/loot/bossOwnership.test.ts)');
 });
 
 test('the resource registry is the one place resources are listed', () => {

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { BIOME_LOOT, monsterSourceId } from '@/catalog';
+import { BIOME_LOOT, bossSourceId, monsterSourceId } from '@/catalog';
 import { GRADES, gradeOfItem, type Grade } from '@/catalog/items/grades';
 import { MONSTERS } from '@/config/combatConfig';
 import { generateLoot } from '@/lib/loot/generate';
@@ -23,7 +23,7 @@ const topGrade = (d: LootData, pool: string, level: number): number =>
 
 test('every normal monster drops from the source of its own biome, bosses from the boss source', () => {
 	for (const def of Object.values(MONSTERS)) {
-		if (def.grade === 'boss') assert.equal(def.lootSourceId, 'boss');
+		if (def.grade === 'boss') assert.equal(def.lootSourceId, bossSourceId(def.spawn.biomes[0]));
 		else {
 			assert.equal(def.lootSourceId, monsterSourceId(def.spawn.biomes[0]));
 			assert.ok(LOOT_DATA.sources[def.lootSourceId], `${def.lootSourceId} exists`);

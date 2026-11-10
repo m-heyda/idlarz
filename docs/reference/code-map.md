@@ -677,6 +677,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`belt.test.ts`](../../tests/loot/belt.test.ts) — ~ A plain instance at a rarity the grade allows (plainItem is common, which the ladder's grades above G2 do not roll)
 - [`biomePools.test.ts`](../../tests/loot/biomePools.test.ts) — ~ The data as it will be when every grade is live (IDL-238):
+- [`bossOwnership.test.ts`](../../tests/loot/bossOwnership.test.ts) — ~ Sets with no boss yet and no open pool either:
 - [`chestRace.test.ts`](../../tests/loot/chestRace.test.ts) — ~ /api/chest answers only when `release` is called
 - [`chests.test.ts`](../../tests/loot/chests.test.ts) — ~ A tiny territory:
 - [`equipment.test.ts`](../../tests/loot/equipment.test.ts)

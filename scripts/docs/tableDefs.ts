@@ -31,7 +31,7 @@ import { MONSTERS } from '../../src/config/combatConfig';
 import { SKILLS } from '../../src/catalog/skills';
 import { RARITIES } from '../../src/catalog/rarity';
 import { RESOURCE_TIERS, resourcesInTier } from '../../src/catalog/resources';
-import { LOOT_PROFILES, LOOT_SOURCES } from '../../src/catalog/lootConfig';
+import { BOSS_LOOT, BOSS_SET_CHANCE, BOSS_UNIQUE_CHANCE, LOOT_PROFILES, LOOT_SOURCES, OPEN_SETS, bossSourceId } from '../../src/catalog/lootConfig';
 import { CRAFT_SLOTS, CRAFT_GRADES, GEAR_RECIPES, GEAR_UNLOCK, type CraftGrade } from '../../src/catalog/recipes';
 import { GRADE_INFO } from '../../src/catalog/items/grades';
 import { CRAFT_GEAR } from '../../src/config/crafting';
@@ -271,6 +271,20 @@ TABLES['loot-sources'] = () => ({
 	md: mdTable(
 		['Source', 'Profile', 'Levels'],
 		Object.values(LOOT_SOURCES).map((s) => [s.id, s.lootProfileId, s.level ? `own level: ${s.level.base} + ${s.level.perCastleLevel} per castle level above 1` : `the caller's level, range ${s.levels?.min}-${s.levels?.max}`]),
+	),
+});
+
+TABLES['boss-loot'] = () => ({
+	title: 'What each boss owns',
+	md: mdTable(
+		['Boss source', 'Boss levels', 'Unique (per kill)', 'Set (per kill)', 'General roll from'],
+		Object.entries(BOSS_LOOT).map(([biome, d]) => [
+			bossSourceId(biome),
+			`${d.levels.min}-${d.levels.max}`,
+			d.uniques.length ? `${d.uniques.join(', ')} (${pct(BOSS_UNIQUE_CHANCE)} + pity)` : 'none yet',
+			d.setId ? `${d.setId} (${pct(BOSS_SET_CHANCE)} + pity)` : `none yet (open sets still in the general pools: ${OPEN_SETS.join(', ')})`,
+			`boss_general_${biome}`,
+		]),
 	),
 });
 

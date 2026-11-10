@@ -1,5 +1,6 @@
 import { GRADES, type Grade } from '@/catalog/items/grades';
 import { CRAFT_GEAR } from '@/config/crafting';
+import { SET_DEFS } from './sets';
 
 // Loot configuration: which sources give what. Pure data; the pipeline in src/lib/loot reads it and nothing here is
 // code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/reference/loot.md).
@@ -65,7 +66,7 @@ export interface BonusTable {
 	mode: 'rolled' | 'fixed';
 	/** Take every item in the pool once, with its quantity (a boss's potions) */
 	takeAll?: boolean;
-	/** Prefer pool items the player does not own yet while any remain (a boss's set pieces) */
+	/** Prefer pool items the player does not own yet while any remain (a boss's set pieces); works in both modes (`rolled` per rarity) */
 	preferMissing?: boolean;
 	/** Own item level window; default: the profile's */
 	itemLevel?: Pick<ItemLevelDef, 'offset' | 'variance'>;
@@ -132,13 +133,141 @@ export type LootBiome = keyof typeof BIOME_LOOT;
 /** The loot source a normal monster of this biome drops from (`monster_plains`...) */
 export const monsterSourceId = (biome: string): string => `monster_${biome}`;
 
+/**
+ * Every set's id is also the tag its pieces carry. Set pieces are boss loot (IDL-44): a boss's general roll ({@link bossGeneralPool}) never contains a set piece, and the only way a boss gives one is its own `set` table ({@link BOSS_LOOT}).
+ * The rest of the sources keep the pieces of {@link OPEN_SETS} in their pools and leave every other set out: the special sets S1-S3 wait for their bosses (their pieces are disabled anyway).
+ */
+const SET_TAGS: readonly string[] = SET_DEFS.filter((set) => !set.retired).map((set) => set.id);
+
+/**
+ * Sets whose pieces still drop from the general pools (monsters, chests, the shelf is plain gear only). Today that is the Obsidian set, which predates the boss sets and has no owner yet (its pieces are grade G6, item level 55 and up, beyond what any
+ * source reaches). TODO: give it to a boss when G6 becomes reachable, then empty this list; `tests/loot/bossOwnership.test.ts` fails if a set is neither owned nor listed here.
+ */
+export const OPEN_SETS: readonly string[] = ['obsidian'];
+const GENERAL_EXCLUDED_TAGS: readonly string[] = ['named', ...SET_TAGS.filter((tag) => !OPEN_SETS.includes(tag))];
+
+/** The pool of a boss's general roll: ladder gear up to the biome's ceiling (none: every grade) with no named item and no set piece at all */
+export const bossGeneralPool = (biome?: string): string => (biome ? `boss_general_${biome}` : 'boss_general');
+
 const biomePools = (): Record<string, PoolDef> =>
 	Object.fromEntries(
 		Object.entries(BIOME_LOOT).map(([biome, { ceiling }]) => {
 			const id = `equipment_${biome}`;
-			return [id, { id, requireTags: ['gear'], excludeTags: ['named'], maxGrade: GRADES[ceiling - 1], enabled: true } satisfies PoolDef];
+			return [id, { id, requireTags: ['gear'], excludeTags: [...GENERAL_EXCLUDED_TAGS], maxGrade: GRADES[ceiling - 1], enabled: true } satisfies PoolDef];
 		}),
 	);
+
+const bossPools = (): Record<string, PoolDef> => ({
+	[bossGeneralPool()]: { id: bossGeneralPool(), requireTags: ['gear'], excludeTags: ['named', ...SET_TAGS], enabled: true },
+	...Object.fromEntries(
+		Object.entries(BIOME_LOOT).map(([biome, { ceiling }]) => {
+			const id = bossGeneralPool(biome);
+			return [id, { id, requireTags: ['gear'], excludeTags: ['named', ...SET_TAGS], maxGrade: GRADES[ceiling - 1], enabled: true } satisfies PoolDef];
+		}),
+	),
+});
+
+/** What one biome's boss owns (IDL-44) */
+export interface BossLootDef {
+	/** Named unique items (ids in the `legendary_weapons` pool) only this boss drops, as one table with a small chance and pity. Empty: the boss has none yet. */
+	uniques: readonly string[];
+	/**
+	 * The set this boss owns (a `SetDef` id, also the tag of its pieces): the boss gives one piece of it per kill that triggers its set table, preferring pieces the player does not own yet.
+	 * `null`: no set is wired to this boss yet. No set of the four biomes that exist today has live pieces, so every entry is `null`; the set table appears as soon as an id is filled in.
+	 */
+	setId: string | null;
+	/** The levels the boss can have: its spawn window plus the growth (`limitOf('monsterGrowthLevels')`); `validateLootData` checks the biome's pool covers every item level they reach */
+	levels: { min: number; max: number };
+}
+
+/** The loot source a biome's boss drops from (`boss_plains`...) */
+export const bossSourceId = (biome: string): string => `boss_${biome}`;
+
+/**
+ * Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): each biome's boss has a source of its own (`boss_<biome>`, profile `boss_<biome>`) with
+ *
+ * - a guaranteed general roll from its own general pool (`boss_general_<biome>`: no named item, no set piece; the grades the biome's monsters drop up to the ceiling, at the boss's level),
+ * - its potions (every kill),
+ * - its **unique** table (`unique`, pool `boss_unique_<biome>`): `BOSS_UNIQUE_CHANCE` per kill, plus `BOSS_UNIQUE_PITY` per miss, a drop resets the counter (the ledger's `lootPity`, key `boss_<biome>:unique`),
+ * - its **set** table (`set`, pool `boss_set_<biome>`), only when `setId` is filled in: `BOSS_SET_CHANCE` per kill with pity (`BOSS_SET_PITY`), one guaranteed roll of the set's pieces, missing pieces first.
+ *
+ * No boss drops another boss's unique or set: set pieces are kept out of every general pool (`GENERAL_EXCLUDED_TAGS`, the boss pools exclude all of them) and each unique sits in exactly one boss's pool. `tests/loot/bossOwnership.test.ts` enumerates every boss's source.
+ *
+ * **Adding a biome's boss (post release):** add the biome to {@link BIOME_LOOT}, its boss to `MONSTERS` with `lootSourceId: bossSourceId(biome)`, and one entry here. **Wiring a set:** fill in `setId`; its pieces must be enabled and have item levels the boss reaches (the validator reports an empty set pool).
+ * The sets S1-S3 and Obsidian have no boss yet (their pieces are disabled or out of item level reach), so `setId` is `null` for all four bosses; `PENDING_SETS` in the test lists them so a set cannot be forgotten.
+ * The uniques are the three legendary weapons, one per boss from the hardest down (Titan Maul from the Winter Wyrm, Emberbrand from the Mire Matriarch, Starfall Bow from the Elder Stag); the Great Auroch has none yet. Chests still drop them too (`basic_chest`, 1.9 %).
+ *
+ * @category Loot/Config
+ * @order 4
+ * @table boss-loot
+ */
+export const BOSS_LOOT: Record<LootBiome, BossLootDef> = {
+	plains: { uniques: [], setId: null, levels: { min: 15, max: 35 } },
+	forest: { uniques: ['starfall_bow'], setId: null, levels: { min: 20, max: 40 } },
+	swamp: { uniques: ['emberbrand'], setId: null, levels: { min: 25, max: 45 } },
+	tundra: { uniques: ['titan_maul'], setId: null, levels: { min: 30, max: 50 } },
+};
+
+/** A boss's chance per kill of its unique, and the bad-luck protection on it (the numbers of the old single boss table: 5 %, +1 % per miss up to +10 %) */
+export const BOSS_UNIQUE_CHANCE = 0.05;
+export const BOSS_UNIQUE_PITY = { perMiss: 0.01, maxBonus: 0.1 };
+/** A boss's chance per kill that a piece of its set drops, and its pity: +15 % per miss up to +50 %, so a piece is certain after at most 4 kills in a row without one. TODO tune with `loot-sim` once a set is wired. */
+export const BOSS_SET_CHANCE = 0.5;
+export const BOSS_SET_PITY = { perMiss: 0.15, maxBonus: 0.5 };
+
+/** The profile every boss starts from: one guaranteed general roll and the potions. The generic `boss` source (debug panel, `craft-sim`) uses it as is. */
+const BOSS_BASE: LootProfile = {
+	id: 'boss',
+	rolls: { min: 1, max: 1, guaranteed: 1, chancePerRoll: 1 },
+	itemLevel: { offset: 0, variance: 0, min: 1, max: 100 },
+	rarityWeights: { common: 20, uncommon: 30, rare: 30, epic: 15, legendary: 5 },
+	generalPoolId: bossGeneralPool(),
+	// `king_potions` is a legacy id (from the Rat King): it names the roll in explain traces only
+	bonusTables: [{ id: 'king_potions', poolId: 'potions_king', mode: 'fixed', takeAll: true }],
+	enabled: true,
+};
+
+/** The pools, profiles and sources of the bosses in `loot` (data in, data out, so a test can try a boss with a set that does not exist yet). The unique and set tables run before the potions. */
+export const buildBossLoot = (
+	loot: Record<string, BossLootDef>,
+): { pools: Record<string, PoolDef>; profiles: Record<string, LootProfile>; sources: Record<string, LootSource> } => {
+	const pools: Record<string, PoolDef> = {};
+	const profiles: Record<string, LootProfile> = {};
+	const sources: Record<string, LootSource> = {};
+	for (const [biome, def] of Object.entries(loot)) {
+		const id = bossSourceId(biome);
+		const tables: BonusTable[] = [];
+		if (def.uniques.length) {
+			pools[`boss_unique_${biome}`] = { id: `boss_unique_${biome}`, includeIds: [...def.uniques], enabled: true };
+			tables.push({
+				id: 'unique',
+				poolId: `boss_unique_${biome}`,
+				mode: 'fixed',
+				chance: BOSS_UNIQUE_CHANCE,
+				pity: BOSS_UNIQUE_PITY,
+				itemLevel: { offset: 0, variance: 0 },
+			});
+		}
+		if (def.setId) {
+			pools[`boss_set_${biome}`] = { id: `boss_set_${biome}`, requireTags: [def.setId], enabled: true };
+			tables.push({
+				id: 'set',
+				poolId: `boss_set_${biome}`,
+				mode: 'rolled',
+				chance: BOSS_SET_CHANCE,
+				pity: BOSS_SET_PITY,
+				rolls: { min: 1, max: 1, guaranteed: 1, chancePerRoll: 1 },
+				preferMissing: true,
+				itemLevel: { offset: 0, variance: 0 },
+			});
+		}
+		profiles[id] = { ...BOSS_BASE, id, generalPoolId: bossGeneralPool(biome), bonusTables: [...tables, ...BOSS_BASE.bonusTables] };
+		sources[id] = { id, lootProfileId: id, levels: def.levels };
+	}
+	return { pools, profiles, sources };
+};
+
+const BOSSES = buildBossLoot(BOSS_LOOT);
 
 /**
  * Adding loot content is data only; the generator needs no change.
@@ -159,11 +288,13 @@ const biomePools = (): Record<string, PoolDef> =>
  * @see gear, RARITIES, LOOT_SOURCES
  */
 export const LOOT_POOLS: Record<string, PoolDef> = {
-	general_equipment: { id: 'general_equipment', requireTags: ['gear'], excludeTags: ['named'], enabled: true },
+	general_equipment: { id: 'general_equipment', requireTags: ['gear'], excludeTags: [...GENERAL_EXCLUDED_TAGS], enabled: true },
 	...biomePools(),
 	/** The craft source's pool (IDL-241): ladder gear up to the highest crafted grade; the request names the slot and the item level window, so the grade follows. */
-	equipment_craft: { id: 'equipment_craft', requireTags: ['gear'], excludeTags: ['named'], maxGrade: CRAFT_GEAR.ceilingGrade, enabled: true },
+	equipment_craft: { id: 'equipment_craft', requireTags: ['gear'], excludeTags: [...GENERAL_EXCLUDED_TAGS], maxGrade: CRAFT_GEAR.ceilingGrade, enabled: true },
 	legendary_weapons: { id: 'legendary_weapons', enabled: true },
+	...bossPools(),
+	...BOSSES.pools,
 	potions_rat: {
 		id: 'potions_rat',
 		includeIds: ['potion_minor', 'potion_greater'],
@@ -203,27 +334,8 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 			{ ...NORMAL_MONSTER, id: `normal_monster_${biome}`, generalPoolId: `equipment_${biome}` } satisfies LootProfile,
 		]),
 	),
-	boss: {
-		id: 'boss',
-		rolls: { min: 1, max: 1, guaranteed: 1, chancePerRoll: 1 },
-		itemLevel: { offset: 0, variance: 0, min: 1, max: 100 },
-		rarityWeights: { common: 20, uncommon: 30, rare: 30, epic: 15, legendary: 5 },
-		generalPoolId: 'general_equipment',
-		bonusTables: [
-			// Bosses own their drops from IDL-44 on (docs/plan/20-monster-families-and-rewards.md)
-			/** `king_legendary` is a legacy id (from the Rat King): it is stored in saves as the pity key `boss:king_legendary`, so it is not renamed. */
-			{
-				id: 'king_legendary',
-				poolId: 'legendary_weapons',
-				mode: 'fixed',
-				chance: 0.05,
-				pity: { perMiss: 0.01, maxBonus: 0.1 },
-				itemLevel: { offset: 0, variance: 0 },
-			},
-			{ id: 'king_potions', poolId: 'potions_king', mode: 'fixed', takeAll: true },
-		],
-		enabled: true,
-	},
+	boss: BOSS_BASE,
+	...BOSSES.profiles,
 	basic_chest: {
 		id: 'basic_chest',
 		// The chest's item reward is one item: gear 82% of the time, else a potion (the old pool's gear:potion weight ratio)
@@ -285,6 +397,7 @@ export const LOOT_SOURCES: Record<string, LootSource> = {
 		]),
 	),
 	boss: { id: 'boss', lootProfileId: 'boss', levels: { min: 15, max: 45 } },
+	...BOSSES.sources,
 	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perCastleLevel: 3 } },
 	merchant: { id: 'merchant', lootProfileId: 'merchant_stock', level: { base: 4, perCastleLevel: 3 } },
 	// Crafted gear: the caller passes the item level (a recipe's grade window), see CRAFT_GEAR. Levels 1-42 (41 and the variance of 1) are G1-G4.

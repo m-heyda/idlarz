@@ -120,8 +120,19 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 124,
+  "line": 125,
   "summary": "The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7). The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items, so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides, and a ceiling must reach the grade of the highest item level the biome can produce: plains monsters (levels 1-20, growing up to 30, plus 1 of variance) reach item level 31, so plains stops at G4, where G3 would leave a grown monster with nothing to drop.",
+  "see": []
+ },
+ {
+  "id": "boss-loot",
+  "name": "BOSS_LOOT",
+  "symbol": "BOSS_LOOT",
+  "kind": "const",
+  "category": "Loot/Config",
+  "file": "src/catalog/lootConfig.ts",
+  "line": 204,
+  "summary": "Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): each biome's boss has a source of its own (`boss_<biome>`, profile `boss_<biome>`) with",
   "see": []
  },
  {
@@ -131,7 +142,7 @@
   "kind": "const",
   "category": "Loot/Adding content",
   "file": "src/catalog/lootConfig.ts",
-  "line": 161,
+  "line": 290,
   "summary": "Adding loot content is data only; the generator needs no change.",
   "see": [
    "gear",
@@ -146,7 +157,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 198,
+  "line": 329,
   "summary": "Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.",
   "see": []
  },
@@ -157,7 +168,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 278,
+  "line": 390,
   "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
   "see": []
  },
@@ -1397,7 +1408,7 @@
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 317,
+  "line": 320,
   "summary": "Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.",
   "see": [
    "LOOT_SOURCES",
