@@ -1695,7 +1695,7 @@ spells to fly.
 Nothing of the ledger is written. Returns null with no fight open or one that does not end within <code>COMBAT.maxFightSec</code>.</p>
 </article><article><p><a id="paykill"></a></p>
 <h3><code>payKill</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/reward.ts"><code>src/lib/offline/reward.ts:35</code></a></p>
+<p>Source: <a href="../../src/lib/offline/reward.ts"><code>src/lib/offline/reward.ts:36</code></a></p>
 <p>Pays the kill of ticket <code>n</code>: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll
 it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.</p>
 <p>The kill is paid from the ticket&#39;s spawn level and age (<a href="#levelatage"><code>levelAtAge</code></a>), never from a level the client claims; the roll is sealed on the number of kills this run (<a href="#sealedrng"><code>sealedRng</code></a>).</p>
@@ -3394,7 +3394,7 @@ revision it left, instead of sending the one it read before. Without Web Locks t
 still happens is resolved by <code>resolveConflict</code>. The lock dies with the page, so a closing tab never holds it up.</p>
 </article><h2>Accepting a save</h2><article><p><a id="acceptsave"></a></p>
 <h3><code>acceptSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:200</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:201</code></a></p>
 <p>Accepts a save from a client that says it was based on revision <code>baseRev</code> (0 = this account has no save yet).</p>
 <ul>
 <li>the text must decode (checksum, schema, <code>sanitizeSave</code>), otherwise <code>invalid</code></li>
@@ -3543,7 +3543,7 @@ best rebirth the game can pay.</li>
 <code>requireServerRebirth</code> is off.</p>
 </article><article><p><a id="min-save-interval-ms"></a></p>
 <h3><code>MIN_SAVE_INTERVAL_MS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:83</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:84</code></a></p>
 <p>Saves from one player are accepted at most this often (an honest client sends every ~90 s).</p>
 </article><article><p><a id="verifytransition"></a></p>
 <h3><code>verifyTransition</code> <small>function</small></h3>
@@ -3563,7 +3563,7 @@ variables were not exposed, real players must stay in the checks, not slip out o
 <p>Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.</p>
 </article><article><p><a id="losesprogress"></a></p>
 <h3><code>losesProgress</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:75</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:76</code></a></p>
 <p>True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game&#39;s (<code>PINNED_KEEP</code>).</p>
 </article><article><p><a id="enforcement"></a></p>
@@ -3574,10 +3574,10 @@ accounts have been read (<code>check-live-saves</code>), no honest account is am
 in <code>FLAG_POLICY</code> AND listed here refuse a save, so one noisy check can be taken out without touching the others.</p>
 </article><h2>The ledger</h2><article><p><a id="ledger"></a></p>
 <h3><code>Ledger</code> <small>interface</small></h3>
-<p>Source: <a href="../../src/lib/offline/ledger.ts"><code>src/lib/offline/ledger.ts:78</code></a></p>
+<p>Source: <a href="../../src/lib/offline/ledger.ts"><code>src/lib/offline/ledger.ts:79</code></a></p>
 <p>The ledger: one row per player, written only by the server (<code>player_ledger</code>; the only SQL logic is the atomic save function, the compare-and-swap on <code>ver</code> is in TypeScript). It holds the run id and rebirth count, the away-time anchor,
 the <strong>ticket bank</strong> (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, <code>granted</code> and <code>grantedSeen</code> (what the server paid), the gem balance, the last idempotency key and result,
-<code>combat</code> (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), <code>inv</code> (bag, gear, pity, auto-sell, Pack Rat size) and <code>resetAt</code>.</p>
+<code>combat</code> (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), <code>inv</code> (bag, gear, pity, auto-sell, Pack Rat size), <code>stats</code> (lifetime counters: kills per monster type, chests, tiles bought, income earned; see <code>stats.ts</code>) and <code>resetAt</code>.</p>
 <ul>
 <li><strong>Idempotency</strong>: a repeated request with the same key replays the stored answer; two browsers cannot both claim (compare-and-swap).</li>
 <li><strong>Tickets</strong>: a chest or monster exists only as a ticket the server minted from its own clock. Opening a chest names a tile; no ticket on that tile, no reward. Timers and caps: <a href="#advancebank"><code>advanceBank</code></a> and <a href="#ticketcap"><code>ticketCap</code></a>.

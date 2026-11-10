@@ -3,6 +3,7 @@ import { readBuffs } from '@/lib/buffs';
 import type { CombatState } from './fightTypes';
 import type { CraftState, Inventory } from './types';
 import { craftFromJson, isEmptyCraft, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
+import { isEmptyStats, readStats } from './stats';
 import { upgradeStoredBank, type TicketBank } from './tickets';
 
 interface Row {
@@ -23,10 +24,11 @@ interface Row {
 	inv: Inventory | null;
 	craft: CraftState | null;
 	buffs: unknown;
+	stats: unknown;
 }
 
 const COLUMNS =
-	'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs';
+	'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs, stats';
 
 const toRow = (ledger: Ledger) => ({
 	ver: ledger.ver,
@@ -46,6 +48,7 @@ const toRow = (ledger: Ledger) => ({
 	inv: ledger.inv,
 	craft: isEmptyCraft(ledger.craft) ? null : ledger.craft,
 	buffs: ledger.buffs.length === 0 ? null : ledger.buffs,
+	stats: isEmptyStats(ledger.stats) ? null : ledger.stats,
 	updated_at: new Date().toISOString(),
 });
 
@@ -67,6 +70,7 @@ const fromRow = (row: Row): Ledger => ({
 	inv: row.inv ?? null,
 	craft: craftFromJson(row.craft),
 	buffs: readBuffs(row.buffs, 0),
+	stats: readStats(row.stats),
 });
 
 /**

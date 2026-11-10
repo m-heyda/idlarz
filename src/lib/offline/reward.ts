@@ -4,6 +4,7 @@ import { levelAtAge } from '@/lib/monsters';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
 import { ownedBases, receiveInto, sellContextOf } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
+import { recordKill } from '@/lib/offline/stats';
 import { monsterTypeOf, takeMonster, type MonsterTicket } from '@/lib/offline/tickets';
 import type { Drop } from '@/types/game';
 
@@ -71,6 +72,7 @@ export const payKill = (
 			...ledger,
 			bank: taken.bank,
 			ordKill,
+			stats: recordKill(ledger.stats, { type, lucky: ticket.lucky, boss: ticket.kind === 'boss' }),
 			inv: received.inv,
 			granted: addTotals(ledger.granted, { gold: loot.gold + received.received.convertedGold + received.received.autoSold.gold, xp: loot.xp, hide: loot.hide }),
 		},

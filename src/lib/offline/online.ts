@@ -10,6 +10,7 @@ import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
+import { recordChest } from '@/lib/offline/stats';
 import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps, type StepOutcome } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
 import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type CraftEnv } from '@/lib/offline/craft';
@@ -154,6 +155,7 @@ export const redeemChest = (
 				...ledger,
 				bank: taken.bank,
 				ordChest,
+				stats: recordChest(ledger.stats),
 				inv,
 				gems: Math.min(GEMS_CAP, ledger.gems + gems),
 				granted: addTotals(ledger.granted, granted),
