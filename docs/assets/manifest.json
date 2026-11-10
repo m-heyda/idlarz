@@ -20641,7 +20641,10 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/GameWindows.tsx"
+		],
 		"name": "menu_achievements",
 		"category": "ui",
 		"subcategory": "menu",
