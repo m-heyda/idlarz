@@ -17,7 +17,7 @@ export const PINNED_BASE = 1000;
 /**
  * Makes the base income exactly `base` per second for every resource and removes every other flat source: the castle's own
  * output, all biome output, the castle XP bonus. Call once at the top of a test file (each file is its own process).
- * Farms and buildings are never created in the strict environment, so they add nothing.
+ * Farms are never created in the strict environment, so they add nothing.
  */
 export const pinEconomy = (base = PINNED_BASE) => {
 	for (const key of Object.keys(BASE_GENERATION_RATES) as (keyof Resources)[]) BASE_GENERATION_RATES[key] = base;
@@ -29,10 +29,10 @@ export const pinEconomy = (base = PINNED_BASE) => {
 export const castleWorld = (level = 1): World => setTiles(EMPTY_WORLD, [{ x: CASTLE_X, y: CASTLE_Y, tile: { biome: 'castle', isOwned: true, level } as Tile }]);
 
 /** The castle plus `n` extra owned tiles of `biome`, in a row (the tiles carry no output in the strict environment). */
-export const worldWithTiles = (n: number, biome = 'plains', building?: string, level = 1): World => {
+export const worldWithTiles = (n: number, biome = 'plains', level = 1): World => {
 	const changes: { x: number; y: number; tile: Tile }[] = [{ x: CASTLE_X, y: CASTLE_Y, tile: { biome: 'castle', isOwned: true, level } as Tile }];
 	for (let i = 0; i < n; i++) {
-		changes.push({ x: CASTLE_X + 1 + i, y: CASTLE_Y, tile: { biome, isOwned: true, ...(building ? { building } : {}) } as Tile });
+		changes.push({ x: CASTLE_X + 1 + i, y: CASTLE_Y, tile: { biome, isOwned: true } as Tile });
 	}
 	return setTiles(EMPTY_WORLD, changes);
 };
@@ -121,14 +121,6 @@ export const oracle = {
 		[40, 'food', 0.1],
 		[100, 'hide', 0.02],
 	] as [number, string, number][],
-
-	/** Price factor of the next building when `built` stand: 0.4, 0.6, 0.8, 1, then x1.15 (12), x1.09 (16), x1.025 */
-	buildingFactor: (built: number) => {
-		const starter = [0.4, 0.6, 0.8, 1];
-		if (built < 4) return starter[built];
-		const k = built - 3;
-		return 1.15 ** Math.min(k, 12) * 1.09 ** Math.min(Math.max(k - 12, 0), 16) * 1.025 ** Math.max(k - 28, 0);
-	},
 
 	/** Embers for a rebirth */
 	emberGain: (castle: number, tiles: number, rebirths: number, titheLevel: number) => {

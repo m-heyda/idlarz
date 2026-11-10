@@ -13,8 +13,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *
  * The game inside is stored compactly and without derived values:
  *   - the map is only the OWNED tiles, as runs: `land` is a list of `[y, x0, letters]` (one letter per biome, for the
- *     tiles x0, x0 + 1, ... of row y) and `extra` lists the tiles that carry more than a biome, `[x, y, { level?, building?,
- *     chest? }]`. A 50,000-tile map is about 60 KB of text. Coordinates may be negative.
+ *     tiles x0, x0 + 1, ... of row y) and `extra` lists the tiles that carry more than a biome, `[x, y, { level?, chest? }]`. A 50,000-tile map is about 60 KB of text. Coordinates may be negative.
  *   - level, activeChests, previousLevel, tile upgrade costs and combat stats are left out (rebuilt on load).
  *
  * A save written by any other schema than this game's is refused with a clear message, never half-loaded. When the format changes
@@ -25,7 +24,7 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
 
 /**
  * The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters.
- * The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level, building or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
+ * The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
  * Not saved: monsters and the open fight (the server's).
  *
  * @category Saves & Server/The save
@@ -73,7 +72,6 @@ interface LandCell {
 	y: number;
 	biome: string;
 	level?: unknown;
-	building?: unknown;
 	chest?: boolean;
 }
 
@@ -98,10 +96,9 @@ const packCells = (cells: Iterable<LandCell>): PackedLand => {
 			runNext = cell.x + 1;
 			letters = code;
 		}
-		if (cell.level !== undefined || cell.building !== undefined || cell.chest) {
+		if (cell.level !== undefined || cell.chest) {
 			const props: SaveBody = {};
 			if (cell.level !== undefined) props.level = cell.level;
-			if (cell.building !== undefined) props.building = cell.building;
 			if (cell.chest) props.chest = true;
 			extra.push([cell.x, cell.y, props]);
 		}
@@ -119,7 +116,7 @@ export const packLand = (world: World): PackedLand => {
 		packed = packCells(
 			(function* () {
 				for (const { x, y, tile } of ownedRowMajor(world)) {
-					yield { x, y, biome: tile.biome, level: tile.level, building: tile.building, chest: tile.hasChest };
+					yield { x, y, biome: tile.biome, level: tile.level, chest: tile.hasChest };
 				}
 			})(),
 		);
@@ -172,10 +169,11 @@ export const packBody = (state: PersistedGame): SaveBody => {
 	return body;
 };
 
+// `building` is only read: saves written before the old buildings were removed (IDL-259) carry it, and sanitizeSave drops it
 const EXTRA_KEYS = new Set(['level', 'building', 'chest']);
 
 /**
- * The body as `sanitizeSave` reads it: the runs are expanded to one `{ x, y, biome, level?, building?, chest? }` entry per
+ * The body as `sanitizeSave` reads it: the runs are expanded to one `{ x, y, biome, level?, chest? }` entry per
  * tile (sanitizeSave checks those: duplicates, the castle, connectivity, what a tile may carry). Only the layout is checked
  * here; a layout error is returned as text.
  */

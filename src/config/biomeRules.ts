@@ -44,7 +44,20 @@ export const BIOME_RULES = {
 
 	/** Random purchases: chance (%) to copy a neighbouring biome instead of rolling from the weights. */
 	cluster: {
-		basePct: { forest: 60, hills: 55, lake: 50, swamp: 55, tundra: 65, plains: 45, coast: 40, jungle: 55, fields: 55, orchard: 55, blight: 60, battlefield: 55 } as Record<string, number>,
+		basePct: {
+			forest: 60,
+			hills: 55,
+			lake: 50,
+			swamp: 55,
+			tundra: 65,
+			plains: 45,
+			coast: 40,
+			jungle: 55,
+			fields: 55,
+			orchard: 55,
+			blight: 60,
+			battlefield: 55,
+		} as Record<string, number>,
 		perExtraNeighbourPct: 10, // +10 for every same-biome 4-neighbour beyond the first
 		capPct: 90,
 		neverCopy: [] as string[],

@@ -25,7 +25,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/api/auth/me/**
 
-- [`route.ts`](../../src/app/api/auth/me/route.ts) — ~ Who is signed in (from the cookie only), their own profile row and the data epoch state (`epoch`, `needsReset`, see `config/epoch.ts`).
+- [`route.ts`](../../src/app/api/auth/me/route.ts) — ~ The player's own level and rebirth count from their `player_stats` row; null when there is no row yet (a new account) or the read failed.
 
 **src/app/api/auth/profile/**
 
@@ -91,12 +91,23 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`CombatPreview.tsx`](../../src/app/map-lab/CombatPreview.tsx) — ~ Same list as the lab's spawn dropdown:
 - [`LabPanel.tsx`](../../src/app/map-lab/LabPanel.tsx)
+
+**src/app/map-lab/landing-bake/**
+
+- [`page.tsx`](../../src/app/map-lab/landing-bake/page.tsx) — ~ /map-lab/landing-bake:
+
+**src/app/map-lab/**
+
 - [`layout.tsx`](../../src/app/map-lab/layout.tsx)
 - [`page.tsx`](../../src/app/map-lab/page.tsx) — ~ /map-lab:
 
 **src/app/**
 
-- [`page.tsx`](../../src/app/page.tsx) — ~ The gate in front of the game:
+- [`page.tsx`](../../src/app/page.tsx) — ~ The public landing page (`/`):
+
+**src/app/play/**
+
+- [`page.tsx`](../../src/app/play/page.tsx) — ~ The gate in front of the game (route `/play`; a guest is sent to the landing page to log in):
 
 **src/catalog/**
 
@@ -136,6 +147,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/auth/**
 
+- [`AuthForm.tsx`](../../src/components/auth/AuthForm.tsx) — ~ Which form opens first.
 - [`AuthUnavailable.tsx`](../../src/components/auth/AuthUnavailable.tsx) — ~ An outage may pass on its own:
 - [`NewChapterScreen.tsx`](../../src/components/auth/NewChapterScreen.tsx) — ~ The account's current hero:
 - [`SaveHub.tsx`](../../src/components/auth/SaveHub.tsx) — ~ local:
@@ -148,7 +160,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
-- [`BuildDialog.tsx`](../../src/components/game/BuildDialog.tsx) — ~ The build dialog of one explored tile, opened from its right-click menu ("Build here").
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
 - [`CastleFortress.tsx`](../../src/components/game/CastleFortress.tsx) — ~ The castle's fortress (castle level 7+):
 - [`CastleRange.tsx`](../../src/components/game/CastleRange.tsx) — ~ Violet patch drawn over the tiles the castle's range bonus covers (the bonus itself comes later):
@@ -190,7 +201,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
 - [`Tile.tsx`](../../src/components/game/Tile.tsx)
-- [`TileMenu.ts`](../../src/components/game/TileMenu.ts) — ~ The monster on the tile; undefined:
+- [`TileMenu.ts`](../../src/components/game/TileMenu.ts) — ~ Right click on an explored tile:
 - [`TileMonster.tsx`](../../src/components/game/TileMonster.tsx) — ~ The monster on the map with its growth shown:
 - [`TileStatus.tsx`](../../src/components/game/TileStatus.tsx)
 - [`TileTooltip.tsx`](../../src/components/game/TileTooltip.tsx) — ~ Hover card of a monster:
@@ -240,6 +251,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`TutorialDialog.tsx`](../../src/components/game/overlays/TutorialDialog.tsx) — ~ The full guide, reopened on demand from Settings.
 - [`farmGeometry.ts`](../../src/components/game/overlays/farmGeometry.ts) — Geometry of the farm pasture drawn by scripts/pixel/sprites_farm.py (keep the constants and prop lists in sync with that file).
 
+**src/components/landing/**
+
+- [`LandingPage.tsx`](../../src/components/landing/LandingPage.tsx) — ~ The size the landing is designed for (content width, and the height from the top of the map to the bottom of the feature cards).
+
 **src/config/**
 
 - [`biomePalette.ts`](../../src/config/biomePalette.ts) — One colour per biome, the single place for them:
@@ -247,8 +262,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`biomeStage.ts`](../../src/config/biomeStage.ts) — Which biomes are part of the game today and which exist only for development (the map lab).
 - [`biomes.ts`](../../src/config/biomes.ts) — The map: tile size, biome list and spawn weights, and the ambient critters.
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
-- [`buildings.ts`](../../src/config/buildings.ts) — Buildings and what they cost.
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
+- [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`). Newest first; add an entry here with every update worth telling players about.
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
 - [`combatConfig.ts`](../../src/config/combatConfig.ts) — ~ Combat tunables.
 - [`crafting.ts`](../../src/config/crafting.ts) — Crafting: the crafting level curve and the per-request limits. First draft (docs/plan/crafting-v0.md): level 10 in the first days of
@@ -264,6 +279,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/config/**
 
+- [`landing.ts`](../../src/config/landing.ts) — The words and art on the landing page (`/`): the five feature cards and the monsters that sit on the edges of the boxes. Pure config; the page (components/landing) only lays them out.
 - [`limits.ts`](../../src/config/limits.ts) — Bounds and caps that later upgrades and the rebirth system are meant to raise (more bag room, longer monster growth, a bigger
 - [`merchant.ts`](../../src/config/merchant.ts) — The merchant: resource prices, upgrades, shop goods.
 - [`monsterArtSize.ts`](../../src/config/monsterArtSize.ts) — How big a roster monster's picture is drawn on the map, in px (a tile is TILE_SIZE = 48 wide).
@@ -297,7 +313,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
 - [`castleWard.ts`](../../src/lib/castleWard.ts) — ~ How far (tiles, every side) the violet range area reaches:
-- [`chests.ts`](../../src/lib/chests.ts) — ~ A tile with a building:
+- [`chests.ts`](../../src/lib/chests.ts) — ~ The tiles a chest could go on, with their weights.
 - [`clickLimiter.ts`](../../src/lib/clickLimiter.ts) — ~ Click limiter made of two token buckets (a paid click needs a token from both).
 - [`clipboard.ts`](../../src/lib/clipboard.ts) — Copies text to the clipboard.
 - [`cloudClient.ts`](../../src/lib/cloudClient.ts) — ~ The browser side of /api/save.
@@ -337,6 +353,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
 - [`itemInstance.ts`](../../src/lib/itemInstance.ts) — ~ The base stats at this level and quality (no affixes)
+- [`landingWorld.ts`](../../src/lib/landingWorld.ts) — ~ The world behind the landing page:
 - [`limits.ts`](../../src/lib/limits.ts) — ~ What can raise a limit:
 
 **src/lib/loot/**
@@ -400,6 +417,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
 - [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
+- [`playRoute.ts`](../../src/lib/playRoute.ts) — The route of the game itself (the gate in front of it, then the game).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
@@ -427,9 +445,14 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`syncPolicy.ts`](../../src/lib/syncPolicy.ts) — ~ Browsers refuse a keepalive request body above 64 KiB (the fetch throws):
 - [`terrainRenderer.ts`](../../src/lib/terrainRenderer.ts) — ~ Draws the map terrain one chunk at a time (CHUNK_TILES x CHUNK_TILES tiles per canvas; 1 canvas px = 1 art px = 1 world px, scaled by the world div's CSS transform, so pan and zoom never redraw).
+- [`tileMenuItems.ts`](../../src/lib/tileMenuItems.ts) — ~ Id of the disabled Buildings entry, the hook for the new building system (R7, IDL-91; see {@link tileMenuItems}).
 - [`tipPlacement.ts`](../../src/lib/tipPlacement.ts) — Where a hover card goes: flush against the edge of the item box it belongs to, not under the cursor. Pure, so the
 - [`uiPrefs.ts`](../../src/lib/uiPrefs.ts) — Remembered view options (not game state): plain booleans in localStorage, every access guarded
 - [`utils.ts`](../../src/lib/utils.ts)
+
+**src/**
+
+- [`middleware.ts`](../../src/middleware.ts) — ~ Guards `/play` (IDL-61):
 
 **src/stores/**
 
@@ -476,7 +499,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`castle.ts`](../../src/utils/game/castle.ts) — The castle's income bonus and upgrade time (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`character.ts`](../../src/utils/game/character.ts) — Attributes, the level curve, XP and the combat stats derived from the attributes (part of the former utils/gameUtils.ts, split in IDL-15).
-- [`costs.ts`](../../src/utils/game/costs.ts) — What buying a tile or a building costs, and paying for it (part of the former utils/gameUtils.ts, split in IDL-15).
+- [`costs.ts`](../../src/utils/game/costs.ts) — What buying a tile costs, and paying for it (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`farm.ts`](../../src/utils/game/farm.ts) — The farm: animal costs and output, pen and upgrades (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`income.ts`](../../src/utils/game/income.ts) — Income per second: what one tile produces, and the full breakdown and rates (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`merchant.ts`](../../src/utils/game/merchant.ts) — The merchant's upgrades, what selling pays and what buying costs (part of the former utils/gameUtils.ts, split in IDL-15).
@@ -539,6 +562,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`perk-caps.ts`](../../scripts/perk-caps.ts) — Perk family cap sim (IDL-149): how the gear bucket of each family behaves against the set bonuses and a top legendary, for several cap candidates.
 - [`reset-players.ts`](../../scripts/reset-players.ts) — Season restart:
 - [`reset-test-account.ts`](../../scripts/reset-test-account.ts) — Clears the game data of the ONE account the end-to-end tests use (docs/reference/ops.md), so a test run starts from a new game.
+- [`sim-parallel.ts`](../../scripts/sim-parallel.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
 - [`spawnMix.ts`](../../scripts/spawnMix.ts) — What a hero of a given level meets on a castle level 1 map that owns all four biomes: the share of new spawns by the hero's chance to beat them,
 - [`stat-audit.ts`](../../scripts/stat-audit.ts) — Writes docs/generated/stat-audit.md:
@@ -621,8 +645,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/economy/**
 
-- [`buildOnTile.test.ts`](../../tests/economy/buildOnTile.test.ts) — ~ The first explored non-castle tile, turned into `biome`.
-- [`buildings.test.ts`](../../tests/economy/buildings.test.ts)
 - [`castle.test.ts`](../../tests/economy/castle.test.ts) — ~ Pays for and waits out one castle upgrade with the real actions.
 - [`castleFinder.test.ts`](../../tests/economy/castleFinder.test.ts) — ~ A view whose screen centre is the world point (wx, wy) in tiles.
 - [`castleWard.test.ts`](../../tests/economy/castleWard.test.ts) — ~ Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3).
@@ -684,7 +706,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
-- [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with buildings, a chest, gear and a monster, as a plain persisted slice.
+- [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with a chest, gear and a monster, as a plain persisted slice.
 - [`saveWorld.test.ts`](../../tests/saves/saveWorld.test.ts) — ~ The game with a synthetic map of `count` tiles that is valid for sanitizeSave (XP pays for it, stat points follow the level).
 - [`saves.test.ts`](../../tests/saves/saves.test.ts) — ~ A plain JSON copy of a (valid) persisted game, as it would come out of a save file.
 - [`storageScope.test.ts`](../../tests/saves/storageScope.test.ts)
@@ -713,6 +735,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
+- [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
 - [`uiActions.test.ts`](../../tests/ui/uiActions.test.ts)
 

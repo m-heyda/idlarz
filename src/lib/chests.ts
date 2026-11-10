@@ -4,7 +4,7 @@ import { addDrop } from '@/lib/inventory';
 import { generateLoot } from '@/lib/loot/generate';
 import { isAutoSold } from '@/lib/loot/autoSell';
 import { isInWard } from '@/lib/castleWard';
-import type { BagSlot, Drop, Resources, Tile } from '@/types/game';
+import type { BagSlot, Drop, Resources } from '@/types/game';
 import { isOwnedAt, ownedRowMajor, type World } from '@/utils/world';
 
 // Treasure chests: where they appear and what is inside. Pure, with an injectable random(), unit-tested in chests.test.ts.
@@ -17,12 +17,9 @@ const SIDES4: [number, number][] = [
 	[-1, 0],
 ];
 
-/** A tile with a building: the building stands on it, so no chest goes there. */
-const isBuilt = (t: Tile) => !!t.building;
-
 /**
  * The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys),
- * no building, outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
+ * outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
  * penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.
  *
  * @category Economy/Chests and Luck
@@ -36,7 +33,7 @@ export function chestSpots(tiles: World, taken: Set<string>, castleLevel: number
 
 	const spots: { x: number; y: number; w: number }[] = [];
 	for (const { x, y, tile: t } of entries) {
-		if (t.biome === 'castle' || t.hasChest || isBuilt(t) || taken.has(`${x},${y}`) || isInWard(x, y, castleLevel)) continue;
+		if (t.biome === 'castle' || t.hasChest || taken.has(`${x},${y}`) || isInWard(x, y, castleLevel)) continue;
 		let w = 1;
 		if (SIDES4.some(([dx, dy]) => !isOwnedAt(tiles, x + dx, y + dy))) w += P.frontierBonus;
 		w += Math.floor(Math.max(Math.abs(x - CASTLE_X), Math.abs(y - CASTLE_Y)) / P.distanceStep);

@@ -63,7 +63,7 @@ test('the verdict names the rebirth that unlocks a biome, and a neighbour cannot
 	assert.equal(at(5, 'battlefield').reason === undefined || at(5, 'battlefield').allowed === false, true);
 });
 
-test('the buy action rolls with the run\'s rebirth count: rebirth 0 never grows a rebirth biome, rebirth 5 can', () => {
+test("the buy action rolls with the run's rebirth count: rebirth 0 never grows a rebirth biome, rebirth 5 can", () => {
 	const seenAt = (rebirths: number) => {
 		freshGame();
 		store.setState((s) => ({ prestige: { ...s.prestige, rebirths } }));
@@ -73,7 +73,10 @@ test('the buy action rolls with the run\'s rebirth count: rebirth 0 never grows 
 	const first = seenAt(0);
 	for (const b of NEW_BIOMES) assert.ok(!first.has(b), `${b} in a first run`);
 	const late = seenAt(5);
-	assert.ok(NEW_BIOMES.some((b) => late.has(b)), 'a rebirth 5 run grows at least one of the new biomes');
+	assert.ok(
+		NEW_BIOMES.some((b) => late.has(b)),
+		'a rebirth 5 run grows at least one of the new biomes',
+	);
 });
 
 test('conflicts: blight keeps off lake, coast and orchard; battlefield off swamp; jungle off tundra (never touching in 8 directions)', () => {
@@ -84,7 +87,11 @@ test('conflicts: blight keeps off lake, coast and orchard; battlefield off swamp
 		['battlefield', 'swamp'],
 		['jungle', 'tundra'],
 	];
-	for (const pair of pairs) assert.ok(BIOME_RULES.conflicts.some(([a, b]) => (a === pair[0] && b === pair[1]) || (a === pair[1] && b === pair[0])), pair.join('-'));
+	for (const pair of pairs)
+		assert.ok(
+			BIOME_RULES.conflicts.some(([a, b]) => (a === pair[0] && b === pair[1]) || (a === pair[1] && b === pair[0])),
+			pair.join('-'),
+		);
 	for (let seed = 1; seed <= 10; seed++) {
 		const world = growWorld(300, seed, 'nearest', 6);
 		const biomeAt = new Map(ownedEntries(world).map((e) => [`${e.x},${e.y}`, e.tile.biome as string]));
@@ -101,10 +108,13 @@ test('conflicts: blight keeps off lake, coast and orchard; battlefield off swamp
 
 test('output: existing resources only, a flat multiple x1.5 to x2 of the basic tile, rising with the rebirth', () => {
 	// pinned: change these numbers on purpose, together with docs/plan and the pacing baseline
-	assert.deepEqual(
-		Object.fromEntries(NEW_BIOMES.map((b) => [b, REBIRTH_BIOME_OUTPUT[b].multiplier])),
-		{ jungle: 1.5, fields: 1.6, orchard: 1.75, blight: 1.9, battlefield: 2 },
-	);
+	assert.deepEqual(Object.fromEntries(NEW_BIOMES.map((b) => [b, REBIRTH_BIOME_OUTPUT[b].multiplier])), {
+		jungle: 1.5,
+		fields: 1.6,
+		orchard: 1.75,
+		blight: 1.9,
+		battlefield: 2,
+	});
 	assert.deepEqual(BIOMES.jungle.resourceGeneration, { gold: 0.15, wood: 0.45 });
 	assert.deepEqual(BIOMES.fields.resourceGeneration, { gold: 0.16, food: 0.48 });
 	assert.deepEqual(BIOMES.orchard.resourceGeneration, { gold: 0.175, food: 0.35, wood: 0.175 });
@@ -128,7 +138,9 @@ test('a save that holds the new biomes round-trips (letters, sanitizeSave, encod
 	growTo(20);
 	let tiles = api().tiles;
 	// connected land: turn five owned tiles (not the castle) into the five new biomes
-	const spots = ownedEntries(tiles).filter((e) => e.tile.biome !== 'castle').slice(0, NEW_BIOMES.length);
+	const spots = ownedEntries(tiles)
+		.filter((e) => e.tile.biome !== 'castle')
+		.slice(0, NEW_BIOMES.length);
 	NEW_BIOMES.forEach((b, i) => (tiles = patchTile(tiles, spots[i].x, spots[i].y, { biome: b as never })));
 	store.setState({ tiles });
 	for (const b of NEW_BIOMES) assert.ok(BIOME_CODES[b], `${b} has a save letter`);
@@ -165,16 +177,58 @@ test('art: every new biome has colours, a ground texture, shapes, props, decor, 
 test('monsters: nothing spawns on a new-biome tile, whatever the distance, castle level or rebirths', () => {
 	for (const type of Object.keys(MONSTERS) as MonsterType[])
 		for (const biome of NEW_BIOMES)
-			for (const distance of [2, 5, 9, 20, 40]) assert.equal(canSpawnOn(type, CASTLE_X + distance, CASTLE_Y, { biome }, 1, 9), false, `${type} on ${biome} at ${distance}`);
+			for (const distance of [2, 5, 9, 20, 40])
+				assert.equal(canSpawnOn(type, CASTLE_X + distance, CASTLE_Y, { biome }, 1, 9), false, `${type} on ${biome} at ${distance}`);
 });
 
 test('the "what you unlocked" screen: one biome per rebirth 1-5, with its output, multiplier and the later-update note; nothing from the sixth', () => {
 	const expected: Record<number, { biome: string; label: string; multiplier: number; outputs: [string, number][] }> = {
-		1: { biome: 'jungle', label: 'Jungle', multiplier: 1.5, outputs: [['gold', 0.195], ['wood', 0.585]] },
-		2: { biome: 'fields', label: 'Fields', multiplier: 1.6, outputs: [['gold', 0.208], ['food', 0.624]] },
-		3: { biome: 'orchard', label: 'Blossom Orchard', multiplier: 1.75, outputs: [['gold', 0.227], ['food', 0.455], ['wood', 0.227]] },
-		4: { biome: 'blight', label: 'Blight', multiplier: 1.9, outputs: [['gold', 0.247], ['coal', 0.865]] },
-		5: { biome: 'battlefield', label: 'Battlefield', multiplier: 2, outputs: [['stone', 0.78], ['wood', 0.52]] },
+		1: {
+			biome: 'jungle',
+			label: 'Jungle',
+			multiplier: 1.5,
+			outputs: [
+				['gold', 0.195],
+				['wood', 0.585],
+			],
+		},
+		2: {
+			biome: 'fields',
+			label: 'Fields',
+			multiplier: 1.6,
+			outputs: [
+				['gold', 0.208],
+				['food', 0.624],
+			],
+		},
+		3: {
+			biome: 'orchard',
+			label: 'Blossom Orchard',
+			multiplier: 1.75,
+			outputs: [
+				['gold', 0.227],
+				['food', 0.455],
+				['wood', 0.227],
+			],
+		},
+		4: {
+			biome: 'blight',
+			label: 'Blight',
+			multiplier: 1.9,
+			outputs: [
+				['gold', 0.247],
+				['coal', 0.865],
+			],
+		},
+		5: {
+			biome: 'battlefield',
+			label: 'Battlefield',
+			multiplier: 2,
+			outputs: [
+				['stone', 0.78],
+				['wood', 0.52],
+			],
+		},
 	};
 	assert.equal(BIOME_YIELD.scale, 1.3, 'the screen shows the real per-second output (config x BIOME_YIELD.scale); update the numbers above if the scale moves');
 	for (const [rebirths, want] of Object.entries(expected)) {

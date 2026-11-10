@@ -2,7 +2,7 @@
 
 > Generated from the JSDoc in the code by `npm run docs:code`. Do not edit: change the JSDoc next to the code and commit (the pre-commit hook regenerates this).
 
-Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
+Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 
 **Contents**
 
@@ -10,7 +10,6 @@ Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - Income: [`calculateResourceBreakdown`](#calculateresourcebreakdown), [`calculateTileOutput`](#calculatetileoutput), [`BIOME_YIELD`](#biome-yield), [`BASE_GENERATION_RATES`](#base-generation-rates)
 - Tiles: [`tilePrice`](#tileprice), [`TILE_RESOURCE_COST`](#tile-resource-cost), [`calculateTileCost`](#calculatetilecost), [`effectiveTileDiscount`](#effectivetilediscount), [`calculateXpGain`](#calculatexpgain), [`economyTiles`](#economytiles)
 - Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`REBIRTH_BIOME_OUTPUT`](#rebirth-biome-output), [`generateStartRing`](#generatestartring)
-- Buildings: [`BUILDINGS`](#buildings), [`buildingCostFactor`](#buildingcostfactor), [`calculateBuildingCost`](#calculatebuildingcost), [`BUILDING_COST`](#building-cost)
 - Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_FORTRESS`](#castle-fortress), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
 - Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
 - Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`bestWornGrade`](#bestworngrade)
@@ -82,7 +81,7 @@ What a new game starts with: 125 gold (and [`STARTING_GEMS`](progression.md#star
 
 ### `calculateResourceBreakdown` <small>function</small>
 
-Source: [`src/utils/game/income.ts:133`](../../src/utils/game/income.ts)
+Source: [`src/utils/game/income.ts:123`](../../src/utils/game/income.ts)
 
 Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).
 
@@ -101,7 +100,7 @@ Skinner before they enter `base`. The castle tile itself gets no yield scale and
 ```text
 base[r]  = BASE_GENERATION_RATES[r]
          + farm output (meat, eggs, milk, hide; the farm has no other source of those four)
-         + sum over owned tiles of (biome output[r] + building output[r]) x BIOME_YIELD.scale x (1 + 0.25 x same-biome 4-neighbours)
+         + sum over owned tiles of biome output[r] x BIOME_YIELD.scale x (1 + 0.25 x same-biome 4-neighbours)
          + sum over tiles inside the castle range of the same tile output x castleAreaBonus(castle level)
          + 0.5 x (castle level - 1)                      (xp only)
 modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
@@ -114,7 +113,7 @@ See also: [`calculateTileOutput`](economy.md#calculatetileoutput), [`castleModif
 
 ### `calculateTileOutput` <small>function</small>
 
-Source: [`src/utils/game/income.ts:80`](../../src/utils/game/income.ts)
+Source: [`src/utils/game/income.ts:77`](../../src/utils/game/income.ts)
 
 The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.
 
@@ -204,7 +203,7 @@ Extra resources a tile purchase costs: from the tile count shown, the price also
 
 ### `calculateTileCost` <small>function</small>
 
-Source: [`src/utils/game/costs.ts:18`](../../src/utils/game/costs.ts)
+Source: [`src/utils/game/costs.ts:14`](../../src/utils/game/costs.ts)
 
 Everything buying the next tile costs, given how many tiles are owned and the Charisma discount (percent).
 
@@ -341,92 +340,6 @@ Source: [`src/utils/biomeRules.ts:189`](../../src/utils/biomeRules.ts)
 
 The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains`
 plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.
-
-## Buildings
-
-<a id="buildings"></a>
-
-### `BUILDINGS` <small>const</small>
-
-Source: [`src/config/buildings.ts:40`](../../src/config/buildings.ts)
-
-Buildings: one per tile, on any owned tile that is not the castle, a lake or empty (`BUILDING_COST.blockedBiomes`), not inside a landmark area, not under a monster or chest.
-A building's output is added to the tile's own output (same 1.3 scale and neighbour bonus). 16 types, config output per second:
-
-**Buildings and their config output per second** _(computed from the code)_
-
-| Building | Output / s |
-| --- | --- |
-| Farm | food 0.2 |
-| Mine | stone 0.2, coal 0.2 |
-| Lumber Mill | wood 0.2 |
-| Market | gold 0.2 |
-| Blacksmith | stone 0.07, coal 0.07, gold 0.07, food 0.07, wood 0.07 |
-| Workshop | xp 0.2 |
-| Lumber Camp | wood 0.18 |
-| Quarry | stone 0.25 |
-| Fishing Hut | food 0.16, gold 0.05 |
-| Hunter's Lodge | meat 0.15 |
-| Tavern | food 0.12, xp 0.08 |
-| Tower | stone 0.08, xp 0.12 |
-| Well | food 0.15 |
-| Alchemy Lab | xp 0.12, gold 0.08 |
-| Stone Craft | stone 0.15, gold 0.08 |
-| Barracks | gold 0.1, xp 0.1 |
-
-See also: [`BUILDING_COST`](economy.md#building-cost), [`buildingCostFactor`](economy.md#buildingcostfactor)
-
-<a id="buildingcostfactor"></a>
-
-### `buildingCostFactor` <small>function</small>
-
-Source: [`src/utils/game/costs.ts:63`](../../src/utils/game/costs.ts)
-
-Price factor of the next building when `built` buildings stand: the cheap starter steps, then three stages of growth.
-
-Price of the next building: base 500 gold / 250 wood / 150 stone ([`BUILDING_COST`](economy.md#building-cost)) times this factor, which depends on how many buildings stand, times `1 - Thrift`.
-Only Thrift discounts buildings (not Charisma or Bulk Discount). Each resource is capped at `RESOURCE_CAP / 100`.
-
-**Formula**
-
-```text
-factor(built) = starter[built]                      for the first four: 0.4, 0.6, 0.8, 1.0
-              = 1.15^min(k,12) x 1.09^clamp(k-12, 0, 16) x 1.025^max(k-28, 0)     with k = built - 3
-cost[r]       = floor(min(base[r] x factor x (1 - Thrift), RESOURCE_CAP / 100))
-```
-
-**Price of the Nth building (before Thrift)** _(computed from the code)_
-
-| Building number | gold | wood | stone |
-| --- | --- | --- | --- |
-| 1 | 200 | 100 | 60 |
-| 2 | 300 | 150 | 90 |
-| 3 | 400 | 200 | 120 |
-| 4 | 500 | 250 | 150 |
-| 5 | 575 | 287 | 172 |
-| 10 | 1,156 | 578 | 346 |
-| 20 | 3,776 | 1,888 | 1,132 |
-| 40 | 12.9 K | 6,470 | 3,882 |
-
-See also: [`calculateBuildingCost`](economy.md#calculatebuildingcost)
-
-<a id="calculatebuildingcost"></a>
-
-### `calculateBuildingCost` <small>function</small>
-
-Source: [`src/utils/game/costs.ts:82`](../../src/utils/game/costs.ts)
-
-Cost of the next building: base cost x the factor for the number of buildings already built.
-
-Cost of the next building: base cost x [`buildingCostFactor`](economy.md#buildingcostfactor) x `(1 - Thrift)`, each resource floored and capped at `RESOURCE_CAP / 100`.
-
-<a id="building-cost"></a>
-
-### `BUILDING_COST` <small>const</small>
-
-Source: [`src/config/buildings.ts:111`](../../src/config/buildings.ts)
-
-The building price constants: base cost 500 gold / 250 wood / 150 stone, the four cheap starter steps, the three growth stages (1.15 for 12 buildings, 1.09 for 16, 1.025 after) and the biomes a building cannot stand on.
 
 ## Castle
 
@@ -914,17 +827,17 @@ interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck))
 
 ### `chestSpots` <small>function</small>
 
-Source: [`src/lib/chests.ts:31`](../../src/lib/chests.ts)
+Source: [`src/lib/chests.ts:28`](../../src/lib/chests.ts)
 
 The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys),
-no building, outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
+outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
 penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.
 
 <a id="rewardweights"></a>
 
 ### `rewardWeights` <small>function</small>
 
-Source: [`src/lib/chests.ts:93`](../../src/lib/chests.ts)
+Source: [`src/lib/chests.ts:90`](../../src/lib/chests.ts)
 
 Relative chances with Luck shifted from plain gold toward the lucky chest and the item.
 
@@ -939,7 +852,7 @@ gold weight -= shift;  boost += 0.8 x shift;  item += 0.2 x shift
 
 ### `rollChestLoot` <small>function</small>
 
-Source: [`src/lib/chests.ts:110`](../../src/lib/chests.ts)
+Source: [`src/lib/chests.ts:107`](../../src/lib/chests.ts)
 
 Rolls the contents of a chest. Gold is "minutes of income", like before; a full bag turns an item into gold.
 

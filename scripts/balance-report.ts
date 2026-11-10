@@ -12,14 +12,13 @@ import { ANIMALS, FARM, FARM_UPGRADES, type FarmUpgradeId } from '../src/config/
 import { BASE_GENERATION_RATES, BIOME_YIELD, CLICK_LADDER, TILE_RESOURCE_COST, TILE_PRICE, RESOURCE_CAP, SCALING_CONFIG, XP_TILE } from '../src/config/economy';
 import { LEVELING, CHARACTER_STAT_CONFIG, INITIAL_CHARACTER_STATS } from '../src/config/character';
 import { BIOMES } from '../src/config/biomes';
-import { BUILDING_COST } from '../src/config/buildings';
 import { CASTLE_BASE_RATES, CASTLE_UPGRADE } from '../src/config/castle';
 import { MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, type MerchantUpgradeId, MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES } from '../src/config/merchant';
 import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../src/config/rebirth';
 import { calculateAnimalCost, calculateAnimalProduction, farmUpgradeCost } from '../src/utils/game/farm';
 import { calculateCombatStats, calculateStatResourceModifiers, calculateXpGain, cumulativeXp, xpToNextLevel } from '../src/utils/game/character';
 import { calculateResourceRates } from '../src/utils/game/income';
-import { calculateTileCost, buildingCostFactor } from '../src/utils/game/costs';
+import { calculateTileCost } from '../src/utils/game/costs';
 import { castleModifier } from '../src/utils/game/castle';
 import { createInitialWorld } from '../src/utils/game/tiles';
 import { merchantUpgradeCost } from '../src/utils/game/merchant';
@@ -212,7 +211,7 @@ table(
 );
 
 // ---------------------------------------------------------------------------
-line('## 5. Biomes and buildings');
+line('## 5. Biomes');
 line();
 line(
 	`Per-second output of one tile before adjacency and modifiers (already multiplied by BIOME_YIELD.scale = ${BIOME_YIELD.scale}; the castle is not scaled).`,
@@ -226,13 +225,6 @@ line();
 			.join(', ') || '—',
 	]);
 	table(['Biome', 'Output per second'], rows);
-	line(
-		`Building cost: ${Object.entries(BUILDING_COST.base)
-			.map(([r, v]) => `${fmt(v as number)} ${r}`)
-			.join(
-				', ',
-			)} as the base price. Building number n costs base × ${[0, 1, 2, 3, 4, 8, 16, 32].map((n) => `${n + 1}: ×${+buildingCostFactor(n).toFixed(2)}`).join(', ')} (first ${BUILDING_COST.starter.length} cheap, then ×${BUILDING_COST.growthEarly} for ${BUILDING_COST.earlyCount}, ×${BUILDING_COST.growthMid} for ${BUILDING_COST.midCount}, ×${BUILDING_COST.growthLate} after).`,
-	);
 	line();
 }
 

@@ -22,7 +22,6 @@ const Run: React.FC<{ entry: RebirthEntry; latest: boolean }> = ({ entry, latest
 		</div>
 		<div className='grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-0.5'>
 			<Stat label='Tiles' value={formatCompact(entry.tiles)} />
-			<Stat label='Buildings' value={formatCompact(entry.buildings)} />
 			<Stat label='Castle' value={`level ${entry.castleLevel}`} />
 			<Stat label='Gold income' value={formatRate(entry.goldPerSec)} tone='text-yellow-300' />
 			<Stat label='Gold held' value={formatNumber(entry.gold)} tone='text-yellow-400' />

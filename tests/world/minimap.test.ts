@@ -10,7 +10,6 @@ import {
 	MINIMAP_MARGIN,
 	MINIMAP_MAX_SCALE,
 	MONSTER_COLOR,
-	WORKSHOP_COLOR,
 	clusterPoints,
 	clusterSize,
 	minimapLayout,
@@ -105,9 +104,9 @@ test('painting: every explored tile gets its biome colour, the rest stays backgr
 		for (let dx = 0; dx < l.scale; dx++) assert.deepEqual(pixel(data, l.width, Math.floor(p.x) + dx, Math.floor(p.y) + dy), rgb(BIOME_COLORS.forest));
 });
 
-test('markers: the castle is gold and a workshop is purple with a dark outline, on top of the biome colour', () => {
+test('markers: the castle is gold, on top of the biome colour', () => {
 	let w = createInitialWorld(() => 0.5);
-	w = setTile(w, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', isOwned: true, building: 'workshop' });
+	w = setTile(w, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', isOwned: true });
 	const l = minimapLayout(ownedBounds(w), BOX);
 	const data = image(l);
 	paintMinimap(data, w, l);
@@ -117,34 +116,13 @@ test('markers: the castle is gold and a workshop is purple with a dark outline, 
 		return pixel(data, l.width, Math.floor(p.x) + Math.floor(size / 2) - 1, Math.floor(p.y) + Math.floor(size / 2) - 1);
 	};
 	assert.deepEqual(centre(CASTLE_X, CASTLE_Y), rgb(CASTLE_MARKER_COLOR));
-	assert.deepEqual(centre(CASTLE_X + 1, CASTLE_Y), rgb(WORKSHOP_COLOR));
+	assert.deepEqual(centre(CASTLE_X + 1, CASTLE_Y), rgb(BIOME_COLORS.forest), 'a plain land tile has no marker');
 	// a plain tile has no marker
 	const plain = tileToMinimap(l, CASTLE_X, CASTLE_Y - 1);
 	assert.deepEqual(
 		pixel(data, l.width, Math.floor(plain.x) + 1, Math.floor(plain.y) + 1),
 		rgb(BIOME_COLORS[ownedEntries(w).find((e) => e.x === CASTLE_X && e.y === CASTLE_Y - 1)!.tile.biome]),
 	);
-});
-
-test('a workshop is found among thousands of tiles, even at a fraction of a pixel per tile', () => {
-	let w = syntheticWorld(40_000, 6);
-	const target = ownedEntries(w).find((e) => e.tile.biome === 'plains' || e.tile.biome === 'forest')!;
-	w = setTile(w, target.x, target.y, { ...target.tile, building: 'workshop' });
-	const l = minimapLayout(ownedBounds(w), BOX);
-	assert.ok(l.scale < 6);
-	const data = image(l);
-	const t0 = performance.now();
-	paintMinimap(data, w, l);
-	const ms = performance.now() - t0;
-	assert.ok(ms < 150, `${ms.toFixed(0)} ms for 40,000 tiles`);
-	const [wr, wg, wb] = rgb(WORKSHOP_COLOR);
-	let purple = 0;
-	for (let i = 0; i < data.length; i += 4) if (data[i] === wr && data[i + 1] === wg && data[i + 2] === wb) purple++;
-	assert.ok(purple >= 9, `${purple} purple pixels: a 3x3 dot`);
-	const painted = new Set<string>();
-	for (let i = 0; i < data.length; i += 4)
-		if (!(data[i] === 10 && data[i + 1] === 14 && data[i + 2] === 28)) painted.add(`${data[i]},${data[i + 1]},${data[i + 2]}`);
-	assert.ok(painted.size >= 5, 'several biome colours appear');
 });
 
 /** The castle with a straight row of plains to its east, x = CASTLE_X+1 .. CASTLE_X+15, at 6 px per tile on the overview. */

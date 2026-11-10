@@ -7,7 +7,6 @@ import {
 	COORD_LIMIT,
 	EMPTY_WORLD,
 	biomeCount,
-	buildingCount,
 	createWorld,
 	forEachOwned,
 	getTile,
@@ -64,10 +63,9 @@ test('the empty world: nothing owned, tileAt answers an empty tile', () => {
 
 test('setTile / patchTile / removal keep the counters and bounds exact', () => {
 	let w = setTile(EMPTY_WORLD, 5, 5, own('plains'));
-	w = setTile(w, -3, 7, own('forest', { building: 'workshop' } as Partial<Tile>));
+	w = setTile(w, -3, 7, own('forest'));
 	w = setTile(w, 6, 5, own('forest', { hasChest: true } as Partial<Tile>));
 	assert.equal(ownedCount(w), 3);
-	assert.equal(buildingCount(w), 1);
 	assert.equal(w.stats.chests, 1);
 	assert.equal(biomeCount(w, 'forest'), 2);
 	assert.equal(biomeCount(w, 'plains'), 1);
@@ -76,7 +74,7 @@ test('setTile / patchTile / removal keep the counters and bounds exact', () => {
 	// the original is untouched (copy on write)
 	assert.equal(ownedCount(EMPTY_WORLD), 0);
 
-	// patching merges, and a chest or a building moves the counters
+	// patching merges, and a chest moves the counters
 	const patched = patchTile(w, 5, 5, { hasChest: true } as Partial<Tile>);
 	assert.equal(patched.stats.chests, 2);
 	assert.equal(getTile(patched, 5, 5)?.biome, 'plains');
@@ -85,7 +83,6 @@ test('setTile / patchTile / removal keep the counters and bounds exact', () => {
 	// removing the extreme tile shrinks the bounds
 	const removed = setTile(w, -3, 7, undefined);
 	assert.equal(ownedCount(removed), 2);
-	assert.equal(buildingCount(removed), 0);
 	assert.deepEqual(ownedBounds(removed), { minX: 5, maxX: 6, minY: 5, maxY: 5 });
 	// an unowned tile counts as removal
 	assert.equal(ownedCount(setTile(w, 5, 5, { biome: 'plains', isOwned: false })), 2);
@@ -170,9 +167,6 @@ test('connected cluster: same biome, 4-neighbour, the castle and unexplored grou
 	// diagonal tiles are separate clusters
 	const diag = worldFromRows(parse(['F.', '.F']));
 	assert.equal(connectedCluster(diag, 0, 0).size, 1);
-	// a building does not change the biome of the cluster
-	const built = patchTile(w, 1, 0, { building: 'workshop' } as Partial<Tile>);
-	assert.deepEqual(label(connectedCluster(built, 0, 0)), ['0,0', '0,1', '1,0', '1,1']);
 });
 
 test('syntheticWorld is deterministic, connected, holds the castle and reaches negative coordinates', () => {

@@ -5,10 +5,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { castleWorld, character, near, oracle, pinEconomy, prestigeWith, worldWithTiles, PINNED_BASE, type Attr } from './helpers';
-import { BUILDING_COST } from '../../src/config/buildings';
 import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
 import { TILE_RESOURCE_COST } from '../../src/config/economy';
-import { buildingCostFactor, calculateBuildingCost, calculateTileCost } from '../../src/utils/game/costs';
+import { calculateTileCost } from '../../src/utils/game/costs';
 import { calculateResourceBreakdown } from '../../src/utils/game/income';
 import { castleModifier } from '../../src/utils/game/castle';
 import { emberGain, emberIncomeMultiplier, emberSpent, emberUpgradeCost, rebirthStatus } from '../../src/utils/game/rebirth';
@@ -40,7 +39,7 @@ interface Setup {
 const run = (o: Setup = {}) => {
 	const castle = o.castle ?? 1;
 	const c = character(o.attrs);
-	const tiles = o.plains ? worldWithTiles(o.plains, 'plains', undefined, castle) : castleWorld(castle);
+	const tiles = o.plains ? worldWithTiles(o.plains, 'plains', castle) : castleWorld(castle);
 	const breakdown = calculateResourceBreakdown(tiles, c, {}, prestigeWith(o.earned ?? 0), undefined, { foreman: o.foreman ?? 0 }, o.gearPct ?? 0);
 	return { breakdown, attrs: attrsOf(c) };
 };
@@ -207,26 +206,7 @@ test('tile cost: extra resources start at their tile counts, and the discount ta
 	}
 });
 
-test('building price factor: 0.4, 0.6, 0.8, 1, then three growth stages; cost = base x factor x (1 - Thrift)', () => {
-	for (let built = 0; built <= 60; built++) near(buildingCostFactor(built), oracle.buildingFactor(built), `factor for ${built} built`);
-	for (const built of [0, 1, 3, 4, 10, 20, 40]) {
-		const tiles = worldWithTiles(built, 'plains', 'farm');
-		const cost = calculateBuildingCost(tiles);
-		assert.equal(cost.gold, Math.floor(500 * oracle.buildingFactor(built)), `gold for ${built} buildings`);
-		assert.equal(cost.wood, Math.floor(250 * oracle.buildingFactor(built)));
-		assert.equal(cost.stone, Math.floor(150 * oracle.buildingFactor(built)));
-		const thrifty = calculateBuildingCost(tiles, prestigeWith(20, { thrift: 5 }));
-		assert.equal(thrifty.gold, Math.floor(500 * oracle.buildingFactor(built) * (1 - 0.1)), `Thrift 5 on ${built} buildings`);
-	}
-	assert.deepEqual(BUILDING_COST.starter, [0.4, 0.6, 0.8, 1]);
-});
-
-test('MISMATCH 1: building cost takes no Charisma and no Bulk Discount, so Bulk says "tile cost" (IDL-169)', () => {
-	// calculateBuildingCost(tiles, prestige) has no stats or merchant argument, so only Thrift can ever lower the price.
-	assert.equal(calculateBuildingCost.length, 2, 'signature: (tiles, prestige?) only');
-	const tiles = worldWithTiles(10, 'plains', 'farm');
-	assert.deepEqual(calculateBuildingCost(tiles), calculateBuildingCost(tiles, prestigeWith(0, {})));
-	// ...while the tile cost does take both: Charisma 5 alone is already 2.5 %
+test('tile cost takes Charisma and Bulk Discount: Charisma 5 alone is 2.5 % (IDL-169)', () => {
 	assert.equal(calculateTileCost(100, 2.5).gold, Math.floor(oracle.tilePrice(100) * 0.975));
 });
 
@@ -258,7 +238,7 @@ test('Ember income bonus: +10 % x earned^0.6, from Embers ever EARNED (spending 
 });
 
 test('rebirth gates: castle 6, 400 + 50 per past rebirth in tiles, no upgrade running, gain of at least 1', () => {
-	const base = { tiles: worldWithTiles(10, 'plains', undefined, 6), freeTiles: 1, castleUpgrade: null, merchantUpgrades: {}, prestige: prestigeWith(0, {}, 0) };
+	const base = { tiles: worldWithTiles(10, 'plains', 6), freeTiles: 1, castleUpgrade: null, merchantUpgrades: {}, prestige: prestigeWith(0, {}, 0) };
 	const status = (over: object) => rebirthStatus({ ...base, ...over } as never);
 	// 10 extra tiles is far from 400: the tile requirement fails
 	assert.equal(status({}).canRebirth, false);

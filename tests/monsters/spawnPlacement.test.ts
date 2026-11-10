@@ -12,7 +12,7 @@ import { packBody } from '../../src/lib/saveFormat';
 import { pickPersisted } from '../../src/lib/sanitizeSave';
 import { splitBody } from '../../src/lib/cloudSave/pipeline';
 import { summarize } from '../../src/lib/cloudSave/summary';
-import { ownedRowMajor } from '../../src/utils/world';
+import { ownedRowMajor, setTile } from '../../src/utils/world';
 
 // The server puts each monster on a tile: land of its allowlist, 2 to 9 tiles from the castle, one monster per tile.
 
@@ -72,10 +72,10 @@ test('a monster keeps its tile while it is valid, and is placed again when it st
 	const first = placeTickets(bankWith(1), tiles, 'k', 0, rollFor);
 	const { x, y } = normalsOf(first)[0];
 	assert.deepEqual(normalsOf(placeTickets(first, tiles, 'k2', 0, rollFor))[0].x, x, 'valid: stays');
-	patchTileAt(x!, y!, { building: 'farm' });
+	patchTileAt(x!, y!, { hasChest: true });
 	const moved = placeTickets(first, api().tiles, 'k3', 0, rollFor);
 	assert.ok(isPlaced(normalsOf(moved)[0]));
-	assert.notDeepEqual([normalsOf(moved)[0].x, normalsOf(moved)[0].y], [x, y], 'a built-on tile is no place for a rat');
+	assert.notDeepEqual([normalsOf(moved)[0].x, normalsOf(moved)[0].y], [x, y], 'a tile with a chest is no place for a rat');
 });
 
 test('an old ticket (placed by the browser, before the server placed monsters) has no tile until the server looks', () => {
@@ -104,7 +104,7 @@ const chestBank = (chests: number): TicketBank => ({
 	chests: Array.from({ length: chests }, (_, i) => ({ n: i + 1, at: 0 })),
 });
 
-test('every chest gets a tile the browser may draw it on: owned, no castle, no building, outside the ward, one per tile', () => {
+test('every chest gets a tile the browser may draw it on: owned, no castle, outside the ward, one per tile', () => {
 	const tiles = world(60);
 	const out = placeTickets(chestBank(8), tiles, 'k', 0, rollFor);
 	assert.ok(out.chests.every(isChestPlaced));
@@ -112,7 +112,7 @@ test('every chest gets a tile the browser may draw it on: owned, no castle, no b
 	for (const c of out.chests) {
 		const tile = ownedRowMajor(tiles).find((e) => e.x === c.x && e.y === c.y)!.tile;
 		assert.notEqual(tile.biome, 'castle');
-		assert.ok(!tile.building && !tile.hasChest);
+		assert.ok(!tile.hasChest);
 	}
 	assert.ok(out.sites!.chest! > 8);
 });
@@ -127,14 +127,13 @@ test('chests and monsters never share a tile, and the same land and seal always 
 	assert.equal(new Set(spots).size, spots.length);
 });
 
-test('a chest keeps its tile while the tile is valid, and is placed again when a building takes it', () => {
+test('a chest keeps its tile while the tile is valid, and is placed again when the tile is gone', () => {
 	const tiles = world(60);
 	const first = placeTickets(chestBank(3), tiles, 'k', 0, rollFor);
 	const again = placeTickets(first, tiles, 'k2', 0, rollFor);
 	assert.deepEqual(again.chests, first.chests, 'nothing changed: nothing moved');
 	const { x, y } = first.chests[0] as { x: number; y: number };
-	patchTileAt(x, y, { building: 'tavern' });
-	const moved = placeTickets(first, api().tiles, 'k3', 0, rollFor);
+	const moved = placeTickets(first, setTile(tiles, x, y, undefined), 'k3', 0, rollFor);
 	assert.ok(isChestPlaced(moved.chests[0]));
 	assert.notDeepEqual([moved.chests[0].x, moved.chests[0].y], [x, y]);
 	assert.deepEqual(moved.chests.slice(1), first.chests.slice(1));

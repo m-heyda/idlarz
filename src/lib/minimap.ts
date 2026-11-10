@@ -1,12 +1,11 @@
 import { CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { BIOME_COLORS } from '@/config/biomePalette';
-import { BUILDING_GLOW } from '@/config/pixelIcons';
 import type { Size } from '@/lib/mapView';
 import { forEachOwned, type Bounds, type World } from '@/utils/world';
 
 /**
  * The minimap: an overview of the explored map as one tiny coloured square per tile (like the navigator of an image
- * editor), purple markers on workshops, a gold one on the castle. Pure layout and pixel painting here; Minimap.tsx owns
+ * editor), a gold one on the castle. Pure layout and pixel painting here; Minimap.tsx owns
  * the canvas, the viewport rectangle and the pointer.
  */
 
@@ -15,7 +14,6 @@ export const MINIMAP_MARGIN = 2;
 /** Biggest square a tile gets (px); a small map is shown larger than a huge one, but never as chunky blocks */
 export const MINIMAP_MAX_SCALE = 6;
 
-export const WORKSHOP_COLOR = BUILDING_GLOW.workshop ?? '#b27aff';
 export const CASTLE_MARKER_COLOR = '#ffd860';
 export const MONSTER_COLOR = '#ff4d4d';
 export const CHEST_COLOR = '#ffd23a';
@@ -212,7 +210,7 @@ export const paintChestGlow = (data: Uint8ClampedArray, l: MinimapLayout, chests
 
 /**
  * Paints the whole overview into `data` (RGBA, layout.width x layout.height): background, a square per explored tile in its
- * biome colour, then the markers on top so they are never covered by a neighbour: castle and workshops, then chests (yellow),
+ * biome colour, then the markers on top so they are never covered by a neighbour: the castle, then chests (yellow),
  * then monsters (red) above everything, when `markers` are given.
  */
 export const paintMinimap = (data: Uint8ClampedArray, world: World, l: MinimapLayout, markers?: MinimapMarkers): void => {
@@ -223,18 +221,15 @@ export const paintMinimap = (data: Uint8ClampedArray, world: World, l: MinimapLa
 		data[i * 4 + 3] = 255;
 	}
 	const size = Math.max(1, Math.ceil(l.scale));
-	const workshops: { px: number; py: number }[] = [];
 	const castle: { px: number; py: number }[] = [];
 	forEachOwned(world, (tile, x, y) => {
 		const px = Math.floor(l.offsetX + (x - l.x0) * l.scale);
 		const py = Math.floor(l.offsetY + (y - l.y0) * l.scale);
 		fillRect(data, l.width, l.height, px, py, size, size, rgbOfBiome(tile.biome));
-		if (tile.building === 'workshop') workshops.push({ px, py });
-		else if (tile.biome === 'castle') castle.push({ px, py });
+		if (tile.biome === 'castle') castle.push({ px, py });
 	});
 	const cell = Math.max(size, 3);
 	for (const { px, py } of castle) drawMarker(data, l, px, py, cell, hexToRgb(CASTLE_MARKER_COLOR));
-	for (const { px, py } of workshops) drawMarker(data, l, px, py, cell, hexToRgb(WORKSHOP_COLOR));
 	if (!markers) return;
 	for (const c of markers.chests) drawDot(data, l, c.px, c.py, clusterSize(c.n), hexToRgb(CHEST_COLOR));
 	for (const c of markers.monsters) drawDot(data, l, c.px, c.py, clusterSize(c.n), hexToRgb(MONSTER_COLOR));

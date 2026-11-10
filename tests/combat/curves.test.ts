@@ -2,9 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import '../helpers';
 import { BASE_TILE_COST, BASE_XP_PER_TILE, RESOURCE_CAP, SCALING_CONFIG, TILE_PRICE, XP_CAP, XP_TILE } from '../../src/config/economy';
-import { calculateBuildingCost } from '../../src/utils/game/costs';
 import { calculateLevel, calculateXpGain } from '../../src/utils/game/character';
-import { setTiles, EMPTY_WORLD } from '../../src/utils/world';
 import { formatCompact, formatNumber, formatPct, formatPercent, formatRate } from '../../src/utils/formatters';
 
 // The tile price and the XP per tile used to be pure exponentials that stopped being payable at ~157 tiles. They now have a
@@ -114,16 +112,4 @@ test('stats and percentages use the same short notation: plain below 10,000 (5,0
 	assert.equal(formatPercent(4999), '4999%');
 	assert.equal(formatPercent(5000), '5.00K%');
 	assert.equal(formatPercent(450), '450%');
-});
-
-test('building cost stays finite however many buildings stand', () => {
-	const built = Array.from({ length: 6000 }, (_, i) => ({
-		x: i % 100,
-		y: Math.floor(i / 100),
-		tile: { biome: 'plains' as const, isOwned: true, building: 'farm' },
-	}));
-	const cost = calculateBuildingCost(setTiles(EMPTY_WORLD, built));
-	for (const [resource, amount] of Object.entries(cost)) {
-		assert.ok(Number.isFinite(amount) && (amount as number) <= RESOURCE_CAP / 100, `${resource}: ${amount}`);
-	}
 });

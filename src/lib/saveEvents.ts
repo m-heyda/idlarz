@@ -3,7 +3,6 @@
 
 export type SaveEventReason =
 	| 'buyTile'
-	| 'buildOnTile'
 	| 'upgradeCastle'
 	| 'castleUpgraded'
 	| 'rebirth'
@@ -37,7 +36,6 @@ export const emitSaveEvent = (reason: SaveEventReason): void => {
 /** Actions that count as an event when they succeed (return something truthy). Frequent small ones (clicks, sells, hits, bag moves) are left out on purpose. */
 const SAVE_EVENT_ACTIONS = [
 	'buyTile',
-	'buildOnTile',
 	'upgradeCastle',
 	'rebirth',
 	'buyEmberUpgrade',

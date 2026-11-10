@@ -3,7 +3,7 @@
  * a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
  * (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
  *
- * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones),
+ * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names),
  * `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
  *
  * **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
@@ -62,7 +62,7 @@
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { getTile, isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
+import { isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
 import { mulberry32 } from '../src/lib/rng';
 import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/loadGame';
 
@@ -113,6 +113,11 @@ const main = async () => {
 		'human-rebirth6': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 6, rebirths: 5 },
 		'human-rebirth8': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 8, rebirths: 4 },
 	};
+	// --list: the profile names, one per line (scripts/sim-parallel.ts asks for them so its list cannot drift from this one)
+	if (args.includes('--list')) {
+		console.log(Object.keys(PROFILES).join('\n'));
+		return;
+	}
 	const except = new Set((args.find((a) => a.startsWith('--except='))?.slice(9) ?? '').split(',').filter(Boolean));
 	for (const name of except) if (!PROFILES[name]) throw new Error(`--except names an unknown profile ${name}`);
 	const mergeDir = args.find((a) => a.startsWith('--merge='))?.slice(8);
@@ -313,15 +318,8 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 	let t = 0; // game seconds
 	let eventId = 0;
-	let ownedTiles: [number, number][] = [];
-	const refreshOwned = () => {
-		ownedTiles = [];
-		for (const { x, y } of ownedRowMajor(api().tiles)) ownedTiles.push([x, y]);
-	};
 	let frontier: [number, number] | null = null;
 	let frontierDirty = true;
-	let buildingCursor = 0;
-	const BUILD_ORDER = ['market', 'farm', 'lumbermill', 'mine', 'blacksmith', 'workshop'];
 
 	const isActive = (sec: number) => {
 		const hour = ((sec + (profile.startHour ?? 0) * 3600) % 86400) / 3600;
@@ -438,18 +436,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const cost = utils.farmUpgradeCost(id, level);
 			const roomy = Object.entries(cost).every(([r, v]) => s.resources[r as keyof typeof s.resources] >= (v ?? 0) * 1.5 + (castleNeed[r] ?? 0));
 			if (roomy && api().buyFarmUpgrade(id)) s = api();
-		}
-
-		// Buildings: on the first explored tile that can take one, while the gold is comfortably there (the price rises with every one)
-		{
-			const bc = utils.calculateBuildingCost(s.tiles, s.prestige);
-			if (utils.canAffordBundle(s.resources, bc) && s.resources.gold > (bc.gold ?? 0) * 3) {
-				const spot = ownedTiles.find(([x, y]) => utils.canBuildOn(getTile(s.tiles, x, y)));
-				if (spot && api().buildOnTile(spot[0], spot[1], BUILD_ORDER[buildingCursor % BUILD_ORDER.length])) {
-					buildingCursor++;
-					s = api();
-				}
-			}
 		}
 
 		// Tile purchases: as many as affordable
@@ -653,7 +639,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			// Attempts above what the limiter could ever pay are skipped (they would all be denied anyway)
 			const n = Math.min(Math.floor(profile.cps * step), Math.ceil(cfg.CLICK_LIMIT.refillPerSec * 1.2 * step));
 			const gap = (step * 1000) / Math.max(n, 1);
-			if (ownedTiles.length === 0 || frontierDirty) refreshOwned();
 			for (let i = 0; i < n; i++) {
 				const input = { eventId: ++eventId, now: t * 1000 + i * gap, trusted: true };
 				api().clickForGold(input);
@@ -706,7 +691,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 					runStart = t;
 					castleIdleSince = t;
 					frontierDirty = true;
-					buildingCursor = 0;
 					if (profile.combat) resetCombat();
 				}
 			}
@@ -991,7 +975,6 @@ function applyLegacy(cfg: GameConfig) {
 	c.MERCHANT_RESOURCE_PRICES.meat = 15;
 	c.CASTLE_UPGRADE.durationsSec.fill(0);
 	c.TILE_RESOURCE_COST.length = 0;
-	c.BUILDING_COST.base = {};
 	c.CHEST.minMinutes = 5;
 	c.CHEST.maxMinutes = 50;
 	c.SCALING_CONFIG.costFormula = (n: number) => {

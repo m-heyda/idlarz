@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 111,
+  "line": 110,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -322,31 +322,6 @@
   "file": "src/config/biomes.ts",
   "line": 53,
   "summary": "Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.",
-  "see": []
- },
- {
-  "id": "buildings",
-  "name": "BUILDINGS",
-  "symbol": "BUILDINGS",
-  "kind": "const",
-  "category": "Economy/Buildings",
-  "file": "src/config/buildings.ts",
-  "line": 40,
-  "summary": "Buildings: one per tile, on any owned tile that is not the castle, a lake or empty (`BUILDING_COST.blockedBiomes`), not inside a landmark area, not under a monster or chest. A building's output is added to the tile's own output (same 1.3 scale and neighbour bonus). 16 types, config output per second:",
-  "see": [
-   "BUILDING_COST",
-   "buildingCostFactor"
-  ]
- },
- {
-  "id": "building-cost",
-  "name": "BUILDING_COST",
-  "symbol": "BUILDING_COST",
-  "kind": "const",
-  "category": "Economy/Buildings",
-  "file": "src/config/buildings.ts",
-  "line": 111,
-  "summary": "The building price constants: base cost 500 gold / 250 wood / 150 stone, the four cheap starter steps, the three growth stages (1.15 for 12 buildings, 1.09 for 16, 1.025 after) and the biomes a building cannot stand on.",
   "see": []
  },
  {
@@ -875,8 +850,8 @@
   "kind": "function",
   "category": "Economy/Chests and Luck",
   "file": "src/lib/chests.ts",
-  "line": 31,
-  "summary": "The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = \"x,y\" keys), no building, outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.",
+  "line": 28,
+  "summary": "The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = \"x,y\" keys), outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.",
   "see": []
  },
  {
@@ -886,7 +861,7 @@
   "kind": "function",
   "category": "Economy/Chests and Luck",
   "file": "src/lib/chests.ts",
-  "line": 93,
+  "line": 90,
   "summary": "Relative chances with Luck shifted from plain gold toward the lucky chest and the item.",
   "see": []
  },
@@ -897,7 +872,7 @@
   "kind": "function",
   "category": "Economy/Chests and Luck",
   "file": "src/lib/chests.ts",
-  "line": 110,
+  "line": 107,
   "summary": "Rolls the contents of a chest. Gold is \"minutes of income\", like before; a full bag turns an item into gold.",
   "see": []
  },
@@ -1329,6 +1304,16 @@
   "see": []
  },
  {
+  "id": "the-landing-world",
+  "name": "The landing world",
+  "kind": "topic",
+  "category": "Architecture/Art",
+  "file": "src/lib/landingWorld.ts",
+  "line": 4,
+  "summary": "The world behind the landing page: a vast, seeded land of the basic biomes (plains, forest, swamp, tundra, coast) with a sea around it, a river and ponds, and the word IDLE spelled out in hills on a snow plain that is part of the mainland (patches of the biomes, not slabs). `/map-lab/landing-bake` draws it with the real terrain renderer and saves `public/landing/map.png`, which the landing page shows (so the landing never runs the generator). Deterministic: the same seed gives the same picture. Pure: no canvas, no store.",
+  "see": []
+ },
+ {
   "id": "limitof",
   "name": "limitOf",
   "symbol": "limitOf",
@@ -1620,7 +1605,7 @@
   "category": "Monsters/Spawning",
   "file": "src/lib/monsters.ts",
   "line": 150,
-  "summary": "Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance (Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are `MonsterDef.spawn`.",
+  "summary": "Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance (Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are `MonsterDef.spawn`.",
   "see": []
  },
  {
@@ -1819,7 +1804,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/placement.ts",
-  "line": 72,
+  "line": 71,
   "summary": "Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`). With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 8 or more tiles from the castle (`BOSS_MIN_DISTANCE`).",
   "see": []
  },
@@ -1906,7 +1891,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 113,
+  "line": 112,
   "summary": "How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together), (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.",
   "see": []
  },
@@ -1917,7 +1902,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 153,
+  "line": 152,
   "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.",
   "see": []
  },
@@ -1930,6 +1915,16 @@
   "file": "src/lib/offline/winChance.ts",
   "line": 60,
   "summary": "The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.",
+  "see": []
+ },
+ {
+  "id": "the-play-route-and-its-redirects",
+  "name": "The /play route and its redirects",
+  "kind": "topic",
+  "category": "Architecture/Routes",
+  "file": "src/lib/playRoute.ts",
+  "line": 1,
+  "summary": "The front door's routes (IDL-61). The game lives at `/play`; `/` is the public landing. A guest who asks for `/play` is sent to the landing with the login window open (`/?login=1&next=/play`) and, once signed in, goes back to where they were headed. `next` comes from the address bar, so it is only ever followed when it is a path on this site (`safeNextPath`): anything else (another host, `//host`, a backslash trick, a control character) falls back to `/play`. This is a convenience for the player, not a security boundary: every API route answers 401 on its own.",
   "see": []
  },
  {
@@ -1950,7 +1945,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 60,
+  "line": 59,
   "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
   "see": []
  },
@@ -1961,7 +1956,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 193,
+  "line": 192,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -1972,8 +1967,8 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/saveFormat.ts",
-  "line": 35,
-  "summary": "The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters. The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level, building or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load. Not saved: monsters and the open fight (the server's).",
+  "line": 34,
+  "summary": "The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters. The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load. Not saved: monsters and the open fight (the server's).",
   "see": [
    "PERSISTED_KEYS",
    "sanitizeSave"
@@ -2019,7 +2014,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 348,
+  "line": 352,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"
@@ -2166,37 +2161,13 @@
   "kind": "function",
   "category": "Economy/Tiles",
   "file": "src/utils/game/costs.ts",
-  "line": 18,
+  "line": 14,
   "summary": "Everything buying the next tile costs, given how many tiles are owned and the Charisma discount (percent).",
   "see": [
    "tilePrice",
    "effectiveTileDiscount",
    "TILE_RESOURCE_COST"
   ]
- },
- {
-  "id": "buildingcostfactor",
-  "name": "buildingCostFactor",
-  "symbol": "buildingCostFactor",
-  "kind": "function",
-  "category": "Economy/Buildings",
-  "file": "src/utils/game/costs.ts",
-  "line": 63,
-  "summary": "Price factor of the next building when `built` buildings stand: the cheap starter steps, then three stages of growth.",
-  "see": [
-   "calculateBuildingCost"
-  ]
- },
- {
-  "id": "calculatebuildingcost",
-  "name": "calculateBuildingCost",
-  "symbol": "calculateBuildingCost",
-  "kind": "function",
-  "category": "Economy/Buildings",
-  "file": "src/utils/game/costs.ts",
-  "line": 82,
-  "summary": "Cost of the next building: base cost x the factor for the number of buildings already built.",
-  "see": []
  },
  {
   "id": "calculateanimalcost",
@@ -2249,7 +2220,7 @@
   "kind": "function",
   "category": "Economy/Income",
   "file": "src/utils/game/income.ts",
-  "line": 80,
+  "line": 77,
   "summary": "The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.",
   "see": []
  },
@@ -2260,7 +2231,7 @@
   "kind": "function",
   "category": "Economy/Income",
   "file": "src/utils/game/income.ts",
-  "line": 133,
+  "line": 123,
   "summary": "Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).",
   "see": [
    "calculateTileOutput",
@@ -2389,7 +2360,7 @@
   "category": "Architecture/State",
   "file": "src/utils/world.ts",
   "line": 32,
-  "summary": "The map has no edge. `GameState.tiles` is a `World`: an immutable, sparse set of the **explored** tiles on an integer grid with negative coordinates, stored as `ReadonlyMap<number, Tile>` under a small-integer key (`tileKey(x, y)`, `|x|, |y| <= COORD_LIMIT = 16,000`, at most `MAX_OWNED_TILES = 250,000` tiles). Unexplored land is simply absent (`getTile` gives `undefined`, `tileAt` an empty tile). Updates are copy-on-write (`setTile`, `patchTile`, batched `setTiles`), so `state.tiles` changes exactly when the map does; the owned / building / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).",
+  "summary": "The map has no edge. `GameState.tiles` is a `World`: an immutable, sparse set of the **explored** tiles on an integer grid with negative coordinates, stored as `ReadonlyMap<number, Tile>` under a small-integer key (`tileKey(x, y)`, `|x|, |y| <= COORD_LIMIT = 16,000`, at most `MAX_OWNED_TILES = 250,000` tiles). Unexplored land is simply absent (`getTile` gives `undefined`, `tileAt` an empty tile). Updates are copy-on-write (`setTile`, `patchTile`, batched `setTiles`), so `state.tiles` changes exactly when the map does; the owned / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).",
   "see": []
  },
  {
@@ -2455,6 +2426,16 @@
   ]
  },
  {
+  "id": "the-parallel-sim-runner",
+  "name": "The parallel sim runner",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/sim-parallel.ts",
+  "line": 1,
+  "summary": "`npm run sim:parallel`: the full sim on all your cores. `scripts/sim.ts` plays one profile after another on one core; CI already runs the profiles as shards (`--dump`) and puts them together (`--merge`), whose result is byte-identical to one full run. This script does the same on one machine: one child process per profile (at most `--jobs=N`, default the number of cores minus one), then the merge. The wall time drops from the sum of all profiles to about the slowest one (`hardcore-rebirth6-x10`).",
+  "see": []
+ },
+ {
   "id": "the-bot-simulation",
   "name": "The bot simulation",
   "kind": "topic",
@@ -2484,7 +2465,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 792,
+  "line": 776,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

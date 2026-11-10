@@ -17,10 +17,10 @@ test('asset names are unique and every picture exists', () => {
 	for (const e of m) assert.ok(existsSync(join(OUT, '..', '..', 'public', e.src)), `${e.name}: missing ${e.src}`);
 });
 
-// Every picture under public/ is either in the library or deliberately left out (map ground: bg, terrain atlases, biome/meadow/water icons; pack title cards).
+// Every picture under public/ is either in the library or deliberately left out (map ground: bg, terrain atlases, the baked landing backdrop, biome/meadow/water icons; pack title cards).
 test('every picture in public/ is in the asset library', () => {
 	const listed = new Set(buildManifest().flatMap((e) => [e.src, ...Object.values(e.variants ?? {})]));
-	const skip = /^\/pixel\/(bg|terrain)\/|^\/pixel\/icons\/(biome|meadow|water)_|^\/pixel\/assets_to_assess_and_use\/more_buildings\/(Titel|text)\./;
+	const skip = /^\/landing\/|^\/pixel\/(bg|terrain)\/|^\/pixel\/icons\/(biome|meadow|water)_|^\/pixel\/assets_to_assess_and_use\/more_buildings\/(Titel|text)\./;
 	const missing: string[] = [];
 	const walk = (dir: string) => {
 		for (const n of readdirSync(dir)) {
