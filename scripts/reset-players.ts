@@ -225,7 +225,7 @@ const main = async () => {
 	);
 	console.log(
 		users.length
-			? 'Each reset player's browser drops its copy of the old game at the next sign-in (a per-player marker was written).'
+			? 'The browser of each reset player drops its copy of the old game at the next sign-in (a per-player marker was written).'
 			: 'A browser that still holds the old game locally drops it at the next sign-in (the season marker).',
 	);
 };
