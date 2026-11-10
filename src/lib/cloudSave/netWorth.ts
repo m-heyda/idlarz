@@ -1,4 +1,6 @@
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { CASTLE_UPGRADE } from '@/config/castle';
+import { builtBuildings, buildingTotalCost } from '@/lib/buildings';
 import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
 import { MAX_OWNED_TILES } from '@/utils/world';
 import { calculateTileCost } from '@/utils/game/costs';
@@ -47,6 +49,13 @@ export const merchantGoldSpent = (upgrades: Record<string, number> | undefined):
 	return spent;
 };
 
+/**
+ * Gold the buildings cost at least (zero while the building system is off): each one's levels at the price of the very first tile count, the cheapest it could ever have been bought for.
+ * A floor like the tile prices above, so only a forged map full of high-level buildings stands out.
+ */
+export const buildingGoldSpent = (state: PersistedGame): number =>
+	BUILDINGS_FLAG.enabled ? builtBuildings(state.tiles).reduce((sum, b) => sum + (buildingTotalCost(b.level, 1).gold ?? 0), 0) : 0;
+
 /** Gold the owned land and castle cost at least (gold part of each price only). */
 export const minimumSpend = (state: PersistedGame): number => {
 	const discount = effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass);
@@ -54,7 +63,7 @@ export const minimumSpend = (state: PersistedGame): number => {
 	let spent = 0;
 	for (let k = 1; k <= purchases; k++) spent += calculateTileCost(k, discount).gold;
 
-	return spent + castleGoldSpent(castleLevelOf(state.tiles)) + merchantGoldSpent(state.merchantUpgrades);
+	return spent + castleGoldSpent(castleLevelOf(state.tiles)) + merchantGoldSpent(state.merchantUpgrades) + buildingGoldSpent(state);
 };
 
 /** Gold the stock of sellable resources is worth at the merchant (with the player's own sell bonuses). */

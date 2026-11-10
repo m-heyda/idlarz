@@ -69,7 +69,7 @@ See also: [`acceptSave`](saves-and-server.md#acceptsave), [`FLAG_POLICY`](saves-
 
 ### `SAVE_SCHEMA` <small>const</small>
 
-Source: [`src/lib/saveFormat.ts:34`](../../src/lib/saveFormat.ts)
+Source: [`src/lib/saveFormat.ts:35`](../../src/lib/saveFormat.ts)
 
 The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters.
 The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
@@ -91,7 +91,7 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:191`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:201`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -105,7 +105,7 @@ a click level outside the ladder, a prestige block that does not add up, less XP
 
 ### `PERSISTED_KEYS` <small>const</small>
 
-Source: [`src/lib/sanitizeSave.ts:58`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:62`](../../src/lib/sanitizeSave.ts)
 
 The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
 
@@ -264,7 +264,7 @@ Ranking eligibility (`trusted`): the first save was a young game (<= 900 s of pl
 
 ### `FLAG_POLICY` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:87`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:90`](../../src/lib/cloudSave/verify.ts)
 
 The flags and what the server does with each. Meaning of each flag:
 
@@ -274,6 +274,7 @@ The flags and what the server does with each. Meaning of each flag:
 - `gold_jump`: gold gain above income x time x 1.5 + burst + 1,000 + 2% of the balance + server grants.
 - `xp_jump`: XP above what bought tiles, play time and server payouts explain ([`XP_MODEL`](saves-and-server.md#xp-model)).
 - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
+- `timer_jump`: a building level or timer faster than real time (the building system, off unless `BUILDINGS_FLAG` is on): the same rule as `castle_jump`, with the buildings sharing the castle's builder. A new building is level 1; every later level needs a running upgrade whose timer the real time between the saves covers.
 - `castle_jump`: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock ([`trustedEconomy`](saves-and-server.md#trustedeconomy)), so one flag does not repeat on every later honest save (IDL-250). `ember_jump`: Embers above what the last save's castle and land can pay ([`EMBER_MODEL`](saves-and-server.md#ember-model)).
 
 **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ([`POISON_FLAGS`](saves-and-server.md#poison-flags)).
@@ -292,6 +293,7 @@ With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save 
 | `gems_increase` | reject | yes | yes |
 | `prestige_regress` | flag | no | yes |
 | `castle_jump` | clamp | no | yes |
+| `timer_jump` | clamp | no | yes |
 | `ember_jump` | clamp | no | yes |
 
 <a id="trustedeconomy"></a>
@@ -365,7 +367,7 @@ Saves from one player are accepted at most this often (an honest client sends ev
 
 ### `verifyTransition` <small>function</small>
 
-Source: [`src/lib/cloudSave/verify.ts:176`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:208`](../../src/lib/cloudSave/verify.ts)
 
 Runs every plausibility check between two consecutive saves and returns the flags that fired; see [`FLAG_POLICY`](saves-and-server.md#flag-policy) for what each one means and does.
 
@@ -386,7 +388,7 @@ variables were not exposed, real players must stay in the checks, not slip out o
 
 ### `POISON_FLAGS` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:128`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:132`](../../src/lib/cloudSave/verify.ts)
 
 Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
 
@@ -403,7 +405,7 @@ resets level and tiles, so a higher rebirth count never counts). The replaced sa
 
 ### `ENFORCEMENT` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:113`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:117`](../../src/lib/cloudSave/verify.ts)
 
 The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
 accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`

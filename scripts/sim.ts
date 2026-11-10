@@ -54,6 +54,7 @@
  *   npx tsx scripts/sim.ts --no-write hardcore-rebirth6 --maxdays=500   do not touch docs/generated (for tuning runs)
  *
  *   npx tsx scripts/sim.ts --except=hardcore-rebirth6-x10   all profiles but the named ones (comma separated)
+ *   npx tsx scripts/sim.ts --buildings hardcore   play with the building system switched on (BUILDINGS_FLAG, docs/plan/18): the bots follow BUILD_ORDER; writes nothing. Without the flag nothing about the sim changes.
  *   npx tsx scripts/sim.ts --dump=shard.json hardcore   run the selected profiles and save their raw results, write nothing else
  *   npx tsx scripts/sim.ts --merge=dir   run nothing: merge the --dump files in dir (every profile exactly once) and write the docs as a full run does
  *
@@ -77,6 +78,13 @@ import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/lo
 
 const main = async () => {
 	const args = process.argv.slice(2);
+	// --buildings: the building system is switched on for this run and the bots build (BUILD_ORDER); such a run writes nothing
+	const buildingsOn = args.includes('--buildings');
+	let bld: typeof import('../src/lib/buildings') | null = null;
+	if (buildingsOn) {
+		(await import('../src/config/buildings')).BUILDINGS_FLAG.enabled = true;
+		bld = await import('../src/lib/buildings');
+	}
 	const legacy = args.includes('--legacy');
 	const names = args.filter((a) => !a.startsWith('--'));
 	// --set Path.to.value=1.5   (tuning experiments without touching the config files)
@@ -158,7 +166,7 @@ const main = async () => {
 		const started = Date.now();
 		const runs: Milestones[] = [];
 		for (let seed = 0; seed < seeds; seed++) {
-			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore, monsters, combatCfg, kill, gearEco, fightSim }, legacy, seed));
+			runs.push(runProfile(name, profile, { cfg, utils, store: useGameStore, monsters, combatCfg, kill, gearEco, fightSim, bld }, legacy, seed));
 		}
 		// median per milestone, plus the min-max over seeds
 		results[name] = {};
@@ -197,7 +205,7 @@ const main = async () => {
 		(_key, value) => (typeof value === 'number' ? Number(value.toPrecision(6)) : value),
 		1,
 	);
-	if (!legacy && simClass === 'none' && !args.includes('--no-write')) {
+	if (!legacy && simClass === 'none' && !buildingsOn && !args.includes('--no-write')) {
 		const dir = resolve(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../docs/generated');
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(resolve(dir, 'sim-milestones.md'), md);
@@ -249,6 +257,8 @@ const GEAR_SCHEDULE: { day: number; maxRat: number; king: number; set?: string; 
 ];
 
 interface Ctx {
+	/** The building rules (lib/buildings.ts) when the run has the building system on (`--buildings`), else null */
+	bld: typeof import('../src/lib/buildings') | null;
 	kill: typeof import('../src/lib/loot/kill');
 	gearEco: typeof import('../src/lib/gearEconomy');
 	fightSim: typeof import('../src/lib/fightSim');
@@ -258,6 +268,12 @@ interface Ctx {
 	utils: GameUtils;
 	store: typeof import('../src/stores/gameStore').useGameStore;
 }
+
+/**
+ * What the bots build with `--buildings`, in this order (docs/plan/18: Producers only for now). The first affordable one whose biome the map has is built; once all stand, the bot levels the lowest one the castle allows.
+ * The order follows what the early game lacks: wood and stone for the castle and tiles, then food, then coal.
+ */
+const BUILD_ORDER = ['lumberyard', 'quarry', 'granary', 'coalpit', 'fishery', 'harbor', 'peatworks'];
 
 const HARDCORE_WINDOWS: [number, number][] = [
 	[7, 9],
@@ -282,7 +298,7 @@ const FINE_STEP_DAYS = 45; // 20 s steps for the first weeks, coarser afterwards
 const FIRST_FINISH_CASTLE = 6; // the first finish line (castle 6 + best click + the rebirth territory) is unchanged by castle levels 7-10
 
 function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, seed = 0): Milestones {
-	const { cfg, utils, store, monsters, combatCfg, kill, gearEco, fightSim } = ctx;
+	const { cfg, utils, store, monsters, combatCfg, kill, gearEco, fightSim, bld } = ctx;
 	const realRandom = Math.random;
 	Math.random = mulberry32(12345 + seed * 7919);
 
@@ -426,6 +442,51 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 		}
 		mark(`castle${castle.level ?? 1}`, t);
+
+		// Buildings (--buildings only): level the lowest Producer or build the next of BUILD_ORDER, never while the castle is about to take the builder
+		if (bld) {
+			s = api();
+			const castleNow = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
+			const castleNear =
+				!!castleNow.upgradeCost &&
+				(castleNow.level ?? 1) < cfg.CASTLE_UPGRADE.maxLevel &&
+				Object.entries(castleNow.upgradeCost).every(([r, v]) => s.resources[r as keyof typeof s.resources] >= (v ?? 0) * 0.95);
+			if (!s.castleUpgrade && !s.buildingUpgrade && !castleNear) {
+				const built = bld.builtBuildings(s.tiles);
+				const owned = utils.economyTiles(s.tiles, s.freeTiles);
+				const castleLvl = castleNow.level ?? 1;
+				const pay = (cost: Partial<Record<string, number>>) => utils.canAffordBundle(s.resources, cost) || topUp(cost);
+				const lowest = built.filter((b) => b.level < bld.buildingLevelCap(castleLvl)).sort((a, b) => a.level - b.level)[0];
+				const next = BUILD_ORDER.find((id) => !built.some((b) => b.id === id));
+				if (next) {
+					const spot = ownedRowMajor(s.tiles).find(
+						({ x, y, tile }) =>
+							!tile.building &&
+							!tile.hasChest &&
+							!s.monsters.some((m) => m.x === x && m.y === y) &&
+							bld.buildProblem(
+								{
+									tiles: s.tiles,
+									monsters: s.monsters,
+									castleLevel: castleLvl,
+									castleUpgrade: s.castleUpgrade,
+									buildingUpgrade: s.buildingUpgrade,
+									ownedTiles: owned,
+								},
+								x,
+								y,
+								next,
+							) === null,
+					);
+					if (spot && pay(bld.buildingLevelCost(1, owned)) && api().buildBuilding(spot.x, spot.y, next)) {
+						mark(`building${built.length + 1}`, t);
+						s = api();
+					}
+				} else if (lowest && pay(bld.buildingLevelCost(lowest.level + 1, owned)) && api().upgradeBuilding(lowest.x, lowest.y)) {
+					mark(`buildingLevel${lowest.level + 1}`, t);
+				}
+			}
+		}
 		if ([6, 8, 10].includes(castle.level ?? 1)) recordMagnitude(`r${run}.c${castle.level}`);
 
 		// Click power

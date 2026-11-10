@@ -6,7 +6,10 @@ import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { CHARACTER_STAT_CONFIG } from '@/config/character';
 import type { BiomeType, CharacterStats, GameState, PrestigeState, ResourceRates, Resources } from '@/types/game';
 import { castleAreaBonus, castleRangeRadius, inCastleRange } from '@/lib/castleWard';
-import { forEachOwned, getTile, type World } from '@/utils/world';
+import { biomeCount, forEachOwned, getTile, type World } from '@/utils/world';
+import { BUILDINGS_FLAG } from '@/config/buildings';
+import { buildingDef } from '@/catalog/buildings';
+import { producerOutput } from '@/lib/buildingOutput';
 import { castleModifier } from '@/utils/game/castle';
 import { calculateStatResourceModifiers } from '@/utils/game/character';
 import { calculateFarmOutput, type FarmUpgrades } from '@/utils/game/farm';
@@ -26,7 +29,7 @@ export interface ResourceBreakdownEntry {
 	start: number;
 	/** Farm animals */
 	farm: number;
-	/** Biome tiles, with the adjacency bonus and the yield scale applied */
+	/** Biome tiles, with the adjacency bonus and the yield scale applied (and the Producers while the buildings flag is on) */
 	biome: number;
 	/** What the castle area bonus adds on the tiles inside the castle range */
 	castleArea: number;
@@ -118,6 +121,7 @@ export const calculateTileOutput = (tiles: World, x: number, y: number, castleLe
  *          + 0.5 x (castle level - 1)                      (xp only)
  * modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
  * total[r] = base[r] x (1 + modifier[r])
+ *          + sum over Producers (buildings flag on) of {@link producerOutput}   (counted with the biome tiles)
  * @see calculateTileOutput, castleModifier, castleAreaBonus, calculateFarmOutput
  */
 export const calculateResourceBreakdown = (
@@ -176,6 +180,18 @@ export const calculateResourceBreakdown = (
 				}
 			}
 		}
+	}
+
+	// Producers (the per-biome building system, off unless BUILDINGS_FLAG is on): each adds its output to the biome part, so the castle, Ember and gear modifiers apply to it like to a tile
+	if (BUILDINGS_FLAG.enabled) {
+		forEachOwned(tiles, (tile) => {
+			const def = buildingDef(tile.building);
+			if (!def) return;
+			for (const [resource, gain] of Object.entries(producerOutput(def, tile.buildingLevel ?? 1, biomeCount(tiles, def.biome)))) {
+				base[resource as keyof Resources] += gain;
+				biomePart[resource as keyof Resources] += gain;
+			}
+		});
 	}
 
 	// Calculate castle modifier (exponential growth - doubles each level after level 1)

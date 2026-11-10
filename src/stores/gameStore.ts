@@ -10,6 +10,7 @@ import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type { GameState } from '@/types/game';
 import { createCharacterSlice } from './game/characterSlice';
 import { createChestSync } from './game/chestSync';
+import { createBuildingSlice } from './game/buildingSlice';
 import { createClockSlice } from './game/clockSlice';
 import { createCombatSlice } from './game/combatSlice';
 import { createCombatSync } from './game/combatSync';
@@ -34,6 +35,7 @@ const createGameSlice = (set: GameSet, get: GameGet) => {
 		...createInitialData(EMPTY_PRESTIGE, mulberry32(1)),
 		...createRebirthSlice(set, get, inv, chests),
 		...createEconomySlice(set, get),
+		...createBuildingSlice(set, get),
 		...createClockSlice(set, get),
 		...createFarmSlice(set, get),
 		...createCharacterSlice(set, get),

@@ -1,4 +1,6 @@
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
+import { builtBuildings } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
@@ -8,7 +10,7 @@ import { countOwnedTiles, economyTiles } from '@/utils/game/tiles';
 import { biomeCount, getTile, setTile } from '@/utils/world';
 import type { PersistedGame } from '@/lib/sanitizeSave';
 import { stockValue } from './netWorth';
-import type { CastleUpgradeState, Resources } from '@/types/game';
+import type { BuildingUpgradeState, CastleUpgradeState, Resources } from '@/types/game';
 
 /**
  * What the server derives from a save by itself (never from numbers the client sends): per-second rates computed from
@@ -36,6 +38,10 @@ export interface SaveSummary {
 }
 
 export interface SaveDerived {
+	/** The building level being built (absent while the building system is off, and on rows from before it) */
+	buildingUpgrade?: BuildingUpgradeState | null;
+	/** Level of each building type on the map (absent while the building system is off): the server judges level changes against `buildingUpgrade` (`timer_jump` in verify.ts) */
+	buildings?: Record<string, number>;
 	/** The castle upgrade that was running, and the per-second rates once it is done (null with none running) */
 	castleUpgrade: CastleUpgradeState | null;
 	ratesAfterCastle: Resources | null;
@@ -129,6 +135,12 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		playSeconds: state.playSeconds,
 		derived: {
 			lakesOwned: biomeCount(state.tiles, 'lake'),
+			...(BUILDINGS_FLAG.enabled
+				? {
+						buildingUpgrade: state.buildingUpgrade ? { ...state.buildingUpgrade } : null,
+						buildings: Object.fromEntries(builtBuildings(state.tiles).map((b) => [b.id, b.level])),
+					}
+				: {}),
 			castleUpgrade: state.castleUpgrade ? { ...state.castleUpgrade } : null,
 			ratesAfterCastle: ratesAfterUpgrade(state),
 			luck: fx.luck,

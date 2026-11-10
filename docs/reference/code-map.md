@@ -123,6 +123,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71):
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
+- [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 
 **src/catalog/items/**
@@ -283,6 +284,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`biomeStage.ts`](../../src/config/biomeStage.ts) — Which biomes are part of the game today and which exist only for development (the map lab).
 - [`biomes.ts`](../../src/config/biomes.ts) — The map: tile size, biome list and spawn weights, and the ambient critters.
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
+- [`buildings.ts`](../../src/config/buildings.ts) — ~ The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
 - [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`): one release note per version, written as markdown in `content/changelog/` (format in its README).
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
@@ -333,6 +335,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
 - [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
+- [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ "1.2K gold, 300 wood":
+- [`buildingOutput.ts`](../../src/lib/buildingOutput.ts) — ~ The Producer's bonus from the size of its biome, as a fraction (0.5 = +50 %):
+- [`buildings.ts`](../../src/lib/buildings.ts) — ~ Whether the building system is switched on (`BUILDINGS_FLAG`, off by default).
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
 - [`castleWard.ts`](../../src/lib/castleWard.ts) — ~ How far (tiles, every side) the violet range area reaches:
@@ -473,7 +478,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`syncPolicy.ts`](../../src/lib/syncPolicy.ts) — ~ Browsers refuse a keepalive request body above 64 KiB (the fetch throws):
 - [`terrainRenderer.ts`](../../src/lib/terrainRenderer.ts) — ~ Draws the map terrain one chunk at a time (CHUNK_TILES x CHUNK_TILES tiles per canvas; 1 canvas px = 1 art px = 1 world px, scaled by the world div's CSS transform, so pan and zoom never redraw).
-- [`tileMenuItems.ts`](../../src/lib/tileMenuItems.ts) — ~ Id of the disabled Buildings entry, the hook for the new building system (R7, IDL-91; see {@link tileMenuItems}).
+- [`tileMenuItems.ts`](../../src/lib/tileMenuItems.ts) — ~ Id of the disabled Buildings entry shown while the building system is off (R7, IDL-91; the flag is `BUILDINGS_FLAG`, see {@link tileMenuItems}).
 - [`tipPlacement.ts`](../../src/lib/tipPlacement.ts) — Where a hover card goes: flush against the edge of the item box it belongs to, not under the cursor. Pure, so the
 
 **src/lib/tutorial/**
@@ -502,6 +507,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/stores/game/**
 
 - [`base.ts`](../../src/stores/game/base.ts) — base.ts
+- [`buildingSlice.ts`](../../src/stores/game/buildingSlice.ts) — buildingSlice.ts
 - [`characterSlice.ts`](../../src/stores/game/characterSlice.ts) — characterSlice.ts
 - [`chestSync.ts`](../../src/stores/game/chestSync.ts) — chestSync.ts
 - [`clockSlice.ts`](../../src/stores/game/clockSlice.ts) — clockSlice.ts
@@ -689,6 +695,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/economy/**
 
+- [`buildings.test.ts`](../../tests/economy/buildings.test.ts) — ~ Runs `fn` with the building system switched on, and puts the flag back.
+- [`buildingsFlagOff.test.ts`](../../tests/economy/buildingsFlagOff.test.ts) — ~ The guarantee of the dark release:
 - [`castle.test.ts`](../../tests/economy/castle.test.ts) — ~ Pays for and waits out one castle upgrade with the real actions.
 - [`castleFinder.test.ts`](../../tests/economy/castleFinder.test.ts) — ~ A view whose screen centre is the world point (wx, wy) in tiles.
 - [`castleWard.test.ts`](../../tests/economy/castleWard.test.ts) — ~ Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3).
@@ -810,6 +818,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **supabase/migrations/**
 
 - [`autosave_history_by_time.sql`](../../supabase/migrations/autosave_history_by_time.sql)
+- [`buildings_v1.sql`](../../supabase/migrations/buildings_v1.sql)
+- [`buildings_v1_rollback.sql`](../../supabase/migrations/buildings_v1_rollback.sql)
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
 - [`inventory_ledger.sql`](../../supabase/migrations/inventory_ledger.sql)

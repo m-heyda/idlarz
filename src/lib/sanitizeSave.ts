@@ -4,6 +4,9 @@ import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS, type PlayerClassId } from '@/conf
 import { isLiveBiome } from '@/config/biomeStage';
 import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { BIOMES } from '@/config/biomes';
+import { BUILDING_RULES, BUILDINGS_FLAG } from '@/config/buildings';
+import { buildingDef } from '@/catalog/buildings';
+import { buildingLevelCap, buildingUpgradeDuration, levelOfTile } from '@/lib/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { GEMS_CAP, STARTING_GEMS, CLICK_LADDER, INITIAL_RESOURCES, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { DEFAULT_PLAYER_NAME, INITIAL_CHARACTER_STATS } from '@/config/character';
@@ -23,6 +26,7 @@ import { RING } from '@/utils/biomeRules';
 import { EMPTY_WORLD, MAX_OWNED_TILES, inRange, keyX, keyY, setTiles, tileKey, type Placed } from '@/utils/world';
 import type {
 	BagSlot,
+	BuildingUpgradeState,
 	CastleUpgradeState,
 	CharacterStats,
 	Equipment,
@@ -84,13 +88,15 @@ export const PERSISTED_KEYS = [
 	'merchantRefresh',
 ] as const;
 
-export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]>;
+/** The saved slice of the game. `buildingUpgrade` is outside {@link PERSISTED_KEYS} on purpose: it exists only while BUILDINGS_FLAG is on, so a flag-off save is byte-identical to one from before the building system. */
+export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]> & { buildingUpgrade?: GameState['buildingUpgrade'] };
 
 export const pickPersisted = (state: GameState): PersistedGame => {
 	const out: Record<string, unknown> = {};
 	PERSISTED_KEYS.forEach((key) => {
 		out[key] = state[key];
 	});
+	if (BUILDINGS_FLAG.enabled) out.buildingUpgrade = state.buildingUpgrade;
 	return out as unknown as PersistedGame;
 };
 
@@ -143,7 +149,7 @@ const MAX_PITY = 100000;
 /** Level-ups are awarded by the tick, so a save written a moment after a purchase can be a few points behind. */
 const POINT_TOLERANCE = 5;
 
-const LAND_KEYS = new Set(['x', 'y', 'biome', 'level', 'building', 'chest']);
+const LAND_KEYS = new Set(['x', 'y', 'biome', 'level', 'building', 'bl', 'chest']);
 /** A biome a real save may hold: in the catalog and live (the dev-only biomes of config/biomeStage.ts exist only in the map lab). */
 const hasBiome = (name: unknown): name is string => typeof name === 'string' && Object.prototype.hasOwnProperty.call(BIOMES, name) && isLiveBiome(name);
 
@@ -164,13 +170,17 @@ const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
 	for (const entry of raw.land) {
 		if (!isRecord(entry)) return 'land entry shape';
 		for (const key of Object.keys(entry)) if (!LAND_KEYS.has(key)) return 'land entry key';
-		// `building` is accepted and dropped: saves from before the old building system was removed (IDL-259) still load, minus their buildings
-		const { x, y, biome, level, chest } = entry;
+		// `building` and `bl` are accepted and dropped unless the building system is on (BUILDINGS_FLAG): saves from before the old building system was removed (IDL-259), or written with the flag on, still load, minus their buildings
+		const { x, y, biome, level, chest, building, bl } = entry;
 		if (typeof x !== 'number' || typeof y !== 'number' || !inRange(x, y)) return 'land entry position';
 		if (!hasBiome(biome)) return 'tile biome';
 		const t: Record<string, unknown> = { biome, isOwned: true };
 		if (level !== undefined) t.level = level;
 		if (chest !== undefined) t.hasChest = chest;
+		if (BUILDINGS_FLAG.enabled && building !== undefined) {
+			t.building = building;
+			if (bl !== undefined) t.buildingLevel = bl;
+		}
 		out.push({ x, y, t });
 	}
 	return out;
@@ -200,6 +210,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	let castleTile: Tile | null = null;
 	let owned = 0;
 	let chests = 0;
+	const buildingIds = new Set<string>();
 	for (const { x, y, t } of land) {
 		const key = tileKey(x, y);
 		if (at.has(key)) return fail('two tiles share a position');
@@ -226,6 +237,16 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (t.hasChest !== true || t.biome === 'castle') return fail('chest');
 			tile.hasChest = true;
 			chests++;
+		}
+		if (t.building !== undefined) {
+			// only present while the building system is on (readLand): a known type, on its own biome, one of each type, never with a chest
+			const def = typeof t.building === 'string' ? buildingDef(t.building) : undefined;
+			if (!def || def.biome !== t.biome || tile.hasChest || buildingIds.has(def.id)) return fail('building');
+			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, BUILDING_RULES.maxLevel);
+			if (bl === null) return fail('building level');
+			buildingIds.add(def.id);
+			tile.building = def.id;
+			if (bl > 1) tile.buildingLevel = bl;
 		}
 		placed.push({ x, y, tile });
 	}
@@ -440,6 +461,26 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		castleUpgrade = { toLevel, remainingSec: remaining };
 	}
 
+	// ---- Building system (only read while BUILDINGS_FLAG is on; absent means none) --------------------------
+	let buildingUpgrade: BuildingUpgradeState | null = null;
+	if (BUILDINGS_FLAG.enabled) {
+		const cap = buildingLevelCap(castleLevel);
+		for (const { tile } of placed) if (tile.building && levelOfTile(tile) > cap) return fail('building level above the castle gate');
+		if (raw.buildingUpgrade !== null && raw.buildingUpgrade !== undefined) {
+			const b = raw.buildingUpgrade;
+			if (!isRecord(b) || castleUpgrade) return fail('building upgrade');
+			const bx = int(b.x, -16000, 16000);
+			const by = int(b.y, -16000, 16000);
+			const toLevel = int(b.toLevel, 2, BUILDING_RULES.maxLevel);
+			if (bx === null || by === null || toLevel === null) return fail('building upgrade');
+			const at = placed.find((p) => p.x === bx && p.y === by);
+			if (!at || levelOfTile(at.tile) !== toLevel - 1 || toLevel > cap) return fail('building upgrade tile');
+			const remaining = num(b.remainingSec, 0, buildingUpgradeDuration(toLevel - 1));
+			if (remaining === null) return fail('building upgrade time');
+			buildingUpgrade = { x: bx, y: by, toLevel, remainingSec: remaining };
+		}
+	}
+
 	// ---- Rebirth / Embers (optional so saves from before it existed stay valid) -----------------------------
 	let prestige: PrestigeState = { ...EMPTY_PRESTIGE, upgrades: {} };
 	if (raw.prestige !== undefined) {
@@ -538,6 +579,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			merchantStock,
 			merchantRefreshes,
 			merchantRefresh,
+			...(BUILDINGS_FLAG.enabled ? { buildingUpgrade } : {}),
 		},
 	};
 };

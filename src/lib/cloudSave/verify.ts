@@ -1,3 +1,4 @@
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import type { GrantTotals } from '@/lib/offline/ledger';
 import type { Resources } from '@/types/game';
@@ -55,6 +56,7 @@ export type SaveFlag =
 	| 'gems_increase'
 	| 'prestige_regress'
 	| 'castle_jump'
+	| 'timer_jump'
 	| 'ember_jump';
 
 /**
@@ -75,6 +77,7 @@ export type FlagDecision = 'flag' | 'clamp' | 'reject';
  * - `gold_jump`: gold gain above income x time x 1.5 + burst + 1,000 + 2% of the balance + server grants.
  * - `xp_jump`: XP above what bought tiles, play time and server payouts explain ({@link XP_MODEL}).
  * - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
+ * - `timer_jump`: a building level or timer faster than real time (the building system, off unless `BUILDINGS_FLAG` is on): the same rule as `castle_jump`, with the buildings sharing the castle's builder. A new building is level 1; every later level needs a running upgrade whose timer the real time between the saves covers.
  * - `castle_jump`: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock ({@link trustedEconomy}), so one flag does not repeat on every later honest save (IDL-250). `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
  *
  * **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ({@link POISON_FLAGS}).
@@ -94,6 +97,7 @@ export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	gems_increase: 'reject', // gems are the ledger's; a save that claims more is forged
 	prestige_regress: 'flag', // a New Game or an older save
 	castle_jump: 'clamp',
+	timer_jump: 'clamp', // building levels and rates are paid from the last trusted save, like the castle
 	ember_jump: 'clamp',
 };
 
@@ -134,6 +138,7 @@ export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
 	'gems_increase',
 	'prestige_regress',
 	'castle_jump',
+	'timer_jump',
 	'ember_jump',
 ]);
 
@@ -157,6 +162,33 @@ const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number
 	}
 	// still the same level: a timer that carries on must not have run faster than the clock
 	return !!was && !!now && was.toLevel === now.toLevel && was.remainingSec - now.remainingSec > allowed;
+};
+
+/**
+ * The building timer, judged like the castle's: a building is born at level 1, every later level needs an upgrade that was running in the previous save for this very level
+ * and whose remaining time the real seconds between the saves cover, and a running timer cannot have lost more seconds than passed. Always false while the building system is off.
+ */
+const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number): boolean => {
+	if (!BUILDINGS_FLAG.enabled) return false;
+	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
+	const was = before.derived.buildingUpgrade ?? null;
+	const now = next.derived.buildingUpgrade ?? null;
+	const prev = before.derived.buildings ?? {};
+	let raised = 0;
+	for (const [id, level] of Object.entries(next.derived.buildings ?? {})) {
+		const old = prev[id];
+		if (old === undefined) {
+			if (level > 1) return true;
+			continue;
+		}
+		if (level < old) return true;
+		if (level > old) {
+			if (level > old + 1 || !was || was.toLevel !== level || was.remainingSec > allowed) return true;
+			raised++;
+		}
+	}
+	if (raised > 1) return true;
+	return !raised && !!was && !!now && was.toLevel === now.toLevel && was.x === now.x && was.y === now.y && was.remainingSec - now.remainingSec > allowed;
 };
 
 /** Gold-equivalent income per second: gold plus every sellable resource at the merchant's best price (stock sold is gold gained). */
@@ -197,6 +229,7 @@ export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs
 	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
 
 	if (sameRun && castleJumped(before, next, elapsedSec)) flags.add('castle_jump');
+	if (sameRun && timerJumped(before, next, elapsedSec)) flags.add('timer_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);
