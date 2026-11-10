@@ -59,8 +59,8 @@ The monster roster art, per biome, plus planned monsters that have no picture ye
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `monster_rat` | <img src="../../public/pixel/icons/monster_rat.png" width="96" alt="monster_rat"> | 80x40 | used |  | `pixel/icons/monster_rat.png` |
-| `monster_ratking` | <img src="../../public/pixel/icons/monster_ratking.png" width="96" alt="monster_ratking"> | 112x56 | used |  | `pixel/icons/monster_ratking.png` |
+| `monster_rat` | <img src="../../public/pixel/icons/monster_rat.png" width="96" alt="monster_rat"> | 80x40 | used | src/catalog/lootConfig.ts | `pixel/icons/monster_rat.png` |
+| `monster_ratking` | <img src="../../public/pixel/icons/monster_ratking.png" width="96" alt="monster_ratking"> | 112x56 | used | src/catalog/lootConfig.ts | `pixel/icons/monster_ratking.png` |
 
 ## new biome monsters (not wired)
 

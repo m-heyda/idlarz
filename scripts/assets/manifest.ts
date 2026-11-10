@@ -138,29 +138,31 @@ const walk = (dir: string): string[] =>
 				})
 		: [];
 
-/** Source text of src/ outside the icon-size table, to see whether an icon name is mentioned by any code */
-const srcText = (() => {
+/** Source files of src/ (path relative to src, text) outside the icon-size table, to see which code mentions an icon name */
+const srcFiles = (() => {
 	const files = (dir: string): string[] =>
 		readdirSync(dir).flatMap((n) => {
 			const f = join(dir, n);
 			return statSync(f).isDirectory() ? files(f) : /\.(ts|tsx|css)$/.test(n) ? [f] : [];
 		});
-	return files(join(ROOT, 'src'))
-		.map((f) => {
-			const t = readFileSync(f, 'utf8');
-			return f.endsWith('pixelIcons.ts')
+	return files(join(ROOT, 'src')).map((f) => {
+		const t = readFileSync(f, 'utf8');
+		return {
+			file: relative(join(ROOT, 'src'), f).split(sep).join('/'),
+			text: f.endsWith('pixelIcons.ts')
 				? t
 						.split('\n')
 						.filter((l) => !/^\s*\w+:\s*\[\d+,\s*\d+\],?/.test(l))
 						.join('\n')
-				: t;
-		})
-		.join('\n');
+				: t,
+		};
+	});
 })();
-const mentioned = (name: string) => {
-	if (new RegExp(`['"\`]${name}['"\`]`).test(srcText)) return true;
-	// icon names built at run time, e.g. `menu_${key}` or `level_${n}`
-	return [...name.matchAll(/_/g)].some((m) => srcText.includes(`${name.slice(0, m.index! + 1)}\${`));
+/** Source files that mention an icon: its quoted name, its file in a CSS/URL path, or a run-time built name such as `menu_${key}` */
+const mentionedIn = (name: string): string[] => {
+	const quoted = new RegExp(`['"\`]${name}['"\`]|/${name}\\.png`);
+	const prefixes = [...name.matchAll(/_/g)].map((m) => `${name.slice(0, m.index! + 1)}\${`);
+	return srcFiles.filter((f) => quoted.test(f.text) || prefixes.some((p) => f.text.includes(p))).map((f) => f.file);
 };
 
 export const buildManifest = (): AssetEntry[] => {
@@ -318,14 +320,20 @@ export const buildManifest = (): AssetEntry[] => {
 					? 'monsters'
 					: 'ui';
 		const users = usage.get(id) ?? [];
-		const wired = users.length > 0 || mentioned(id);
+		const code = mentionedIn(id);
+		const wired = users.length > 0 || code.length > 0;
 		add({
 			name: id,
 			category,
 			subcategory: id.replace(/_.*/, ''),
 			src: url(f),
 			status: reserved.has(id as never) ? 'planned' : wired ? 'used' : 'unused',
-			usedBy: users,
+			usedBy: users.length
+				? users
+				: code
+						.filter((f) => f !== 'config/pixelIcons.ts')
+						.slice(0, 3)
+						.map((f) => `src/${f}`),
 			source: 'public/pixel/icons',
 		});
 	}

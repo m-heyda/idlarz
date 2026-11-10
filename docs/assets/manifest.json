@@ -7271,7 +7271,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/catalog/lootConfig.ts"
+		],
 		"name": "monster_rat",
 		"category": "monsters",
 		"subcategory": "monster",
@@ -7284,7 +7286,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/catalog/lootConfig.ts"
+		],
 		"name": "monster_ratking",
 		"category": "monsters",
 		"subcategory": "monster",
@@ -10999,7 +11003,10 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/CraftStash.tsx",
+			"src/components/game/overlays/CraftingOverlay.tsx"
+		],
 		"name": "comp_glass_vial",
 		"category": "resources",
 		"subcategory": "comp",
@@ -20067,7 +20074,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_bee",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20080,7 +20089,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_butterfly",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20106,7 +20117,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_crab",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20119,7 +20132,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_fish",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20132,7 +20147,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_frog",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20145,7 +20162,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_goat",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20158,7 +20177,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_ladybug",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20171,7 +20192,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_rabbit",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20184,7 +20207,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AmbientLife.tsx"
+		],
 		"name": "bonus_wolf",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20197,7 +20222,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "bust_mage",
 		"category": "ui",
 		"subcategory": "bust",
@@ -20210,7 +20237,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "bust_paladin",
 		"category": "ui",
 		"subcategory": "bust",
@@ -20223,7 +20252,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "bust_ranger",
 		"category": "ui",
 		"subcategory": "bust",
@@ -20236,7 +20267,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "bust_warrior",
 		"category": "ui",
 		"subcategory": "bust",
@@ -20262,7 +20295,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/Tile.tsx"
+		],
 		"name": "chest_map_anim",
 		"category": "ui",
 		"subcategory": "chest",
@@ -20860,7 +20895,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "hero_mage",
 		"category": "ui",
 		"subcategory": "hero",
@@ -20873,7 +20910,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "hero_paladin",
 		"category": "ui",
 		"subcategory": "hero",
@@ -20886,7 +20925,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "hero_ranger",
 		"category": "ui",
 		"subcategory": "hero",
@@ -20899,7 +20940,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/playerClasses.ts"
+		],
 		"name": "hero_warrior",
 		"category": "ui",
 		"subcategory": "hero",
@@ -20925,12 +20968,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/app/globals.css"
+		],
 		"name": "level_orb_shine",
 		"category": "ui",
 		"subcategory": "level",
 		"src": "/pixel/icons/level_orb_shine.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			144,
@@ -20964,7 +21009,10 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/AvatarDialog.tsx",
+			"src/components/game/ClassPickerDialog.tsx"
+		],
 		"name": "menu_character",
 		"category": "ui",
 		"subcategory": "menu",
@@ -20977,7 +21025,11 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/CraftingOverlay.tsx",
+			"src/components/game/overlays/GameWindows.tsx"
+		],
 		"name": "menu_crafting",
 		"category": "ui",
 		"subcategory": "menu",
@@ -20990,7 +21042,10 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/GameWindows.tsx"
+		],
 		"name": "menu_equipment",
 		"category": "ui",
 		"subcategory": "menu",
@@ -21003,7 +21058,10 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/GameWindows.tsx"
+		],
 		"name": "menu_farm",
 		"category": "ui",
 		"subcategory": "menu",
@@ -21042,7 +21100,10 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/RebirthDialog.tsx"
+		],
 		"name": "menu_legacy",
 		"category": "ui",
 		"subcategory": "menu",
@@ -21068,7 +21129,10 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/GameWindows.tsx"
+		],
 		"name": "menu_merchant",
 		"category": "ui",
 		"subcategory": "menu",
@@ -21081,7 +21145,11 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/GameDebug.tsx",
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/SettingsDialog.tsx"
+		],
 		"name": "menu_settings",
 		"category": "ui",
 		"subcategory": "menu",
@@ -21094,7 +21162,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/overlays/GameWindows.tsx"
+		],
 		"name": "menu_stats",
 		"category": "ui",
 		"subcategory": "menu",
@@ -21107,7 +21177,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/overlays/CombatWidget.tsx"
+		],
 		"name": "skull",
 		"category": "ui",
 		"subcategory": "skull",
@@ -21120,7 +21192,11 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/Tile.tsx",
+			"src/lib/cloudClient.ts",
+			"src/lib/offline/tutorial.ts"
+		],
 		"name": "unknown",
 		"category": "ui",
 		"subcategory": "unknown",
