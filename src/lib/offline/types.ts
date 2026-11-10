@@ -203,6 +203,8 @@ export interface SyncResult {
 	/** The player's combat as of now (a running fight is carried forward by every request) */
 	combat: import('@/lib/offline/fightTypes').CombatView;
 	inv?: Inventory;
+	/** Earned achievements (always on this poll) and any paid by this request */
+	achievements?: import('@/lib/offline/achievements').AchievementReport;
 }
 
 /** What /api/fight answers: the combat picture, plus the tickets and gems (a won fight changes both). */

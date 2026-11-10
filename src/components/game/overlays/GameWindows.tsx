@@ -10,6 +10,7 @@ import StatisticsOverlay from './StatisticsOverlay';
 import MerchantOverlay from './Merchant/MerchantOverlay';
 import FarmOverlay from './FarmOverlay';
 import CraftingOverlay from './CraftingOverlay';
+import AchievementsOverlay from './AchievementsOverlay';
 import WindowErrorBoundary from '../WindowErrorBoundary';
 
 /**
@@ -62,6 +63,13 @@ const GameWindows: React.FC = () => {
 				<PixelWindow id='crafting' title='Crafting' icon={<PixelIcon name='menu_crafting' alt='' />} width={860} height={560}>
 					<WindowErrorBoundary name='Crafting'>
 						<CraftingOverlay />
+					</WindowErrorBoundary>
+				</PixelWindow>
+			)}
+			{open.includes('achievements') && (
+				<PixelWindow id='achievements' title='Achievements' icon={<PixelIcon name='diamond' alt='' />} width={560} height={620}>
+					<WindowErrorBoundary name='Achievements'>
+						<AchievementsOverlay />
 					</WindowErrorBoundary>
 				</PixelWindow>
 			)}

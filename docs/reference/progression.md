@@ -14,6 +14,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
+- Achievements: [`settleAchievements`](#settleachievements), [Achievements](#achievements)
 - Guided tutorial: [`guideLive`](#guidelive), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
 ## Levels
@@ -508,6 +509,55 @@ The gear's XP bucket with the class's XP added, held under the XP perk-family ca
 ```text
 xp bucket = min(PERK_CAPS.xpPct, gear XP% + class XP%)          then + the attributes' XP gain
 ```
+
+## Achievements
+
+<a id="settleachievements"></a>
+
+### `settleAchievements` <small>function</small>
+
+Source: [`src/lib/offline/achievements.ts:111`](../../src/lib/offline/achievements.ts)
+
+Lazy evaluation, once per online request: the achievements that became due are paid and recorded in the same ledger write (a compare-and-swap, so two requests
+at once cannot both pay; a replayed request finds the id recorded and pays nothing). The caller mirrors the ids into `player_achievements` with
+`insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
+
+- **Gems**: `rewards.gems` is added to `ledger.gems` (capped by `GEMS_CAP`) and to `granted.gems`, like a chest's gem find. Gems are not an economy input, so the pacing sim does not move.
+- **Avatar and title** are only recorded with the achievement; the avatar picker (IDL-71) offers the avatars of the earned ones.
+- **Early tester** is never checked here: the new chapter reset grants it.
+- **Dark until the new chapter**: while the guide is dark (`guideLive`: `GAME_EPOCH` still the baseline and no `NEXT_PUBLIC_GUIDE=on`) nothing is paid, so the live game gets no surprise gems and the first achievement
+  (the tutorial's end) cannot be reached anyway. The one-line epoch flip switches it on together with the guide.
+
+See also: `achievementsDue`, `payAchievements`
+
+<a id="achievements"></a>
+
+### Achievements
+
+Source: [`src/catalog/achievements.ts:51`](../../src/catalog/achievements.ts)
+
+The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds
+([`settleAchievements`](progression.md#settleachievements)); the early tester is granted by the new chapter reset instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
+The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
+
+**The launch achievements (12, 600 gems in total)** _(computed from the code)_
+
+| # | Id | Title | Condition | Gems | Avatar / title |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `tutorial` | Learned the ropes | last step of the starter path done | 25 | - |
+| 2 | `first-tile` | Landowner | tiles >= 1 | 25 | - |
+| 3 | `first-building` | Builder | buildings >= 1 | 25 | - |
+| 4 | `first-fight` | First blood | kills >= 1 | 25 | - |
+| 5 | `first-chest` | Treasure hunter | chests >= 1 | 25 | - |
+| 6 | `castle-2` | Growing keep | castle level 2 | 25 | - |
+| 7 | `castle-6` | Stout walls | castle level 6 | 75 | - |
+| 8 | `castle-10` | Architect | castle level 10 | 100 | architect |
+| 9 | `first-rebirth` | Reborn | rebirths >= 1 | 75 | reborn |
+| 10 | `great-auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss-slayer |
+| 11 | `golden-kill` | Golden touch | golden >= 1 | 50 | - |
+| 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early-tester / early-tester |
+
+See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
 ## Guided tutorial
 

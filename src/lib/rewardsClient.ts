@@ -1,6 +1,7 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
+import type { AchievementReport } from '@/lib/offline/achievements';
 import { epochFetch } from '@/lib/epochFetch';
 
 // The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
@@ -16,6 +17,12 @@ export type Reply<T> =
 let invVerOf: () => number | null = () => null;
 export const provideInvVer = (fn: () => number | null): void => {
 	invVerOf = fn;
+};
+
+// Where the achievements an answer carries go (the achievement store registers itself here): every online answer can have paid one, whichever request found it.
+let achievementSink: ((report: AchievementReport) => void) | null = null;
+export const provideAchievementSink = (fn: (report: AchievementReport) => void): void => {
+	achievementSink = fn;
 };
 
 const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
@@ -34,7 +41,10 @@ const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 			const reply = (await response.json().catch(() => ({}))) as { reason?: string };
 			return reply.reason === 'not_configured' ? { status: 'not_configured' } : { status: 'unavailable' };
 		}
-		return { status: 'ok', value: (await response.json()) as T };
+		const value = (await response.json()) as T;
+		const report = (value as { achievements?: AchievementReport } | null)?.achievements;
+		if (report && Array.isArray(report.earned)) achievementSink?.(report);
+		return { status: 'ok', value };
 	} catch {
 		return { status: 'unavailable' };
 	}

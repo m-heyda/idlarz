@@ -115,6 +115,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/catalog/**
 
+- [`achievements.ts`](../../src/catalog/achievements.ts) — The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
@@ -218,6 +219,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/overlays/**
 
+- [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
 - [`CharacterOverlay.tsx`](../../src/components/game/overlays/CharacterOverlay.tsx)
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
@@ -392,6 +394,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/lib/offline/**
 
+- [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read.
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
@@ -482,6 +485,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/stores/**
 
+- [`achievementStore.ts`](../../src/stores/achievementStore.ts) — ~ The achievements the server says the player has earned (an id list it sends with the spawn poll) and the toast when a request pays a new one.
 - [`craftStore.ts`](../../src/stores/craftStore.ts) — ~ One shared empty stock:
 
 **src/stores/game/**
@@ -745,6 +749,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/server/**
 
+- [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)

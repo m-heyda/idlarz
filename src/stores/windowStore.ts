@@ -5,8 +5,8 @@ import { readJsonPref, writeJsonPref } from '@/lib/uiPrefs';
  * The game's windows: Equipment, Character, Merchant, Farm and the castle upgrade. Any number can be open at once, each can be dragged,
  * and the one you click comes to the front (`order` is back to front: the last id is on top). Where a window was left is remembered.
  */
-export type WinId = 'equipment' | 'character' | 'merchant' | 'farm' | 'castle' | 'crafting';
-export const WIN_IDS: readonly WinId[] = ['equipment', 'character', 'merchant', 'farm', 'castle', 'crafting'];
+export type WinId = 'equipment' | 'character' | 'merchant' | 'farm' | 'castle' | 'crafting' | 'achievements';
+export const WIN_IDS: readonly WinId[] = ['equipment', 'character', 'merchant', 'farm', 'castle', 'crafting', 'achievements'];
 
 export interface WinPos {
 	x: number;
@@ -21,6 +21,7 @@ export const DEFAULT_WINDOW_POS: Record<WinId, WinPos> = {
 	farm: { x: 190, y: 172 },
 	castle: { x: 240, y: 196 },
 	crafting: { x: 290, y: 220 },
+	achievements: { x: 340, y: 244 },
 };
 
 export interface WinSize {

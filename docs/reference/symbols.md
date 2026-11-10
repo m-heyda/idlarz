@@ -7,6 +7,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Name | Category | Source | What |
 | --- | --- | --- | --- |
 | `acceptSave` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:207`](../../src/lib/cloudSave/pipeline.ts) | Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). |
+| Achievements | Progression / Achievements | [`src/catalog/achievements.ts:51`](../../src/catalog/achievements.ts) | The 12 launch achievements: |
 | `addBuff` | Combat / Consumables | [`src/lib/buffs.ts:63`](../../src/lib/buffs.ts) | Adds one buff effect to the running buffs. |
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:290`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
@@ -194,6 +195,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Season restart (reset-players) | Ops / Operator guides | [`scripts/reset-players.ts:1`](../../scripts/reset-players.ts) | Season restart: |
 | `sellPayout` | Economy / Merchant | [`src/utils/game/merchant.ts:51`](../../src/utils/game/merchant.ts) | Gold for selling `qty` of something worth `unit` each. |
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
+| `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:111`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
 | `SKILLS` | Combat / Potions and skills | [`src/catalog/skills.ts:34`](../../src/catalog/skills.ts) | Potions and skills. |
 | Sound library | Architecture / Art | [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts) | The sound library: |

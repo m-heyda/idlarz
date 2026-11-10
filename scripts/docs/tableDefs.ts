@@ -29,6 +29,7 @@ import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
 import { MONSTERS } from '../../src/config/combatConfig';
 import { SKILLS } from '../../src/catalog/skills';
+import { ACHIEVEMENTS, type AchievementCondition } from '../../src/catalog/achievements';
 import { TUTORIAL_LESSONS, TUTORIAL_PATH, type TutorialReward } from '../../src/catalog/tutorial';
 import { RARITIES } from '../../src/catalog/rarity';
 import { RESOURCE_TIERS, resourcesInTier } from '../../src/catalog/resources';
@@ -377,6 +378,31 @@ TABLES['tutorial-lessons'] = () => ({
 		TUTORIAL_LESSONS.map((l) => [`\`${l.id}\``, l.title, typeof l.target === 'string' ? `\`${l.target}\`` : 'none']),
 	),
 });
+
+TABLES['achievement-list'] = () => {
+	const when = (c: AchievementCondition): string => {
+		switch (c.kind) {
+			case 'tutorial':
+				return 'last step of the starter path done';
+			case 'castle':
+				return `castle level ${c.level}`;
+			case 'kill':
+				return `${c.min} x \`${c.monster}\``;
+			case 'manual':
+				return 'granted by the new chapter reset';
+			default:
+				return `${c.kind} >= ${c.min}`;
+		}
+	};
+	const total = ACHIEVEMENTS.reduce((sum, a) => sum + a.rewards.gems, 0);
+	return {
+		title: `The launch achievements (${ACHIEVEMENTS.length}, ${total} gems in total)`,
+		md: mdTable(
+			['#', 'Id', 'Title', 'Condition', 'Gems', 'Avatar / title'],
+			ACHIEVEMENTS.map((a, i) => [i + 1, `\`${a.id}\``, a.title, when(a.when), a.rewards.gems, [a.rewards.avatarId, a.rewards.titleId].filter(Boolean).join(' / ') || '-']),
+		),
+	};
+};
 
 TABLES['stack-versions'] = () => {
 	const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { dependencies: Record<string, string>; devDependencies: Record<string, string> };
