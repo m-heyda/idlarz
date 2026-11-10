@@ -201,13 +201,16 @@ const Tutorial: React.FC = () => {
 						(gear Regen adds to that and also heals in fights) and at 0 you are knocked out with {pct(COMBAT.knockoutHpFraction)} HP back; nothing is lost.
 						Fleeing resets the monster.
 					</li>
-					<li>Potions (hotkeys 1-3 in a fight, a shared {COMBAT.potionCooldownSec}s cooldown) heal 35 or 90 HP and work outside fights too.</li>
+					<li>
+						Potions (hotkeys 1-{COMBAT.potionBaseSlots} in a fight, more with a belt; a shared {COMBAT.potionCooldownSec}s cooldown) heal 35 or 90 HP and work
+						outside fights too.
+					</li>
 					<li>
 						<b>Skills</b> cost mana (Intelligence and some gear raise it and how fast it refills). <b>{SKILLS.heal.name}</b> (level {SKILLS.heal.unlockLevel},
-						hotkey 4, {SKILLS.heal.manaCost} mana, {SKILLS.heal.cooldownSec}s cooldown) restores {pct(SKILLS.heal.healFraction ?? 0)} of your max HP, more with
-						Intelligence and Spell Power, and works outside fights too. <b>{SKILLS.stun.name}</b> (level {SKILLS.stun.unlockLevel}, hotkey 5,{' '}
-						{SKILLS.stun.manaCost} mana, {SKILLS.stun.cooldownSec}s cooldown) freezes the monster&apos;s attacks for {SKILLS.stun.stunSec} seconds. They do no
-						damage: they buy time for your clicks.
+						hotkey {COMBAT.potionBaseSlots + 1}, {SKILLS.heal.manaCost} mana, {SKILLS.heal.cooldownSec}s cooldown) restores {pct(SKILLS.heal.healFraction ?? 0)}{' '}
+						of your max HP, more with Intelligence and Spell Power, and works outside fights too. <b>{SKILLS.stun.name}</b> (level {SKILLS.stun.unlockLevel},
+						hotkey {COMBAT.potionBaseSlots + 2}, {SKILLS.stun.manaCost} mana, {SKILLS.stun.cooldownSec}s cooldown) freezes the monster&apos;s attacks for{' '}
+						{SKILLS.stun.stunSec} seconds. They do no damage: they buy time for your clicks.
 					</li>
 					<li>
 						Winning pays gold and XP worth some seconds of your income, a share of the hide your farm makes, plus a chance of gear and potions. Monsters drop

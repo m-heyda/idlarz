@@ -13,6 +13,8 @@ export interface Inventory {
 	ver: number;
 	/** The Pack Rat level the server holds: it sizes the bag, and the browser takes it with the bag (absent in rows from before it was kept) */
 	packrat?: number;
+	/** The most bag slots a belt has given this player (the `bagSlots` stat of the worn belt, kept like Pack Rat: slots are never taken back, so nothing in the bag is lost and a rebirth keeps them; absent: none) */
+	beltSlots?: number;
 	bag: BagSlot[];
 	equipment: Equipment;
 	lootPity: Record<string, number>;

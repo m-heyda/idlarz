@@ -10,7 +10,7 @@ The player's numbers, the server's fight engine, auto-battle, skills and win cha
 - Player numbers: [`maxHp`](#maxhp), [`armorReduction`](#armorreduction), [`WEAPON_ATTACK_SPEED`](#weapon-attack-speed), [`damagePerHit`](#damageperhit), [`attacksPerSecond`](#attackspersecond), [`critOdds`](#critodds), [`swing`](#swing), [`armorOf`](#armorof), [`dodgeChance`](#dodgechance), [`lifeLeechPercent`](#lifeleechpercent), [`regen`](#regen), [`mitigate`](#mitigate)
 - A fight: [`runCombat`](#runcombat), [`pickTarget`](#picktarget), [`queueTicket`](#queueticket), [`autoBattleUnlocked`](#autobattleunlocked), [`playerProfile`](#playerprofile), [`fightStep`](#fightstep), [`endFight`](#endfight), [`engage`](#engage), [`dismissTicket`](#dismissticket), [`projectFight`](#projectfight), [`payKill`](#paykill), [`rngFor`](#rngfor)
 - Win chance: [`winBucketOf`](#winbucketof), [`estimateWin`](#estimatewin)
-- Potions and skills: [`healAmount`](#healamount), [`autoUse`](#autouse), [`SKILLS`](#skills)
+- Potions and skills: [`healAmount`](#healamount), [`autoUse`](#autouse), [`potionCooldownSec`](#potioncooldownsec), [`potionPower`](#potionpower), [`potionSlotCount`](#potionslotcount), [`SKILLS`](#skills)
 - Results and rest: [`restThrough`](#restthrough), [`UNCLAIMED_SEC`](#unclaimed-sec)
 - Consumables: [`BUFF_FAMILIES`](#buff-families), [`MAX_ACTIVE_BUFFS`](#max-active-buffs), [`readBuffs`](#readbuffs), [`addBuff`](#addbuff), [`buffTotals`](#bufftotals), [`drink`](#drink), [`withBuffs`](#withbuffs), [`applyUse`](#applyuse)
 
@@ -244,15 +244,15 @@ Auto-battle (the server picking the next monster) is a reward for the first rebi
 
 ### `playerProfile` <small>function</small>
 
-Source: [`src/lib/offline/profile.ts:62`](../../src/lib/offline/profile.ts)
+Source: [`src/lib/offline/profile.ts:63`](../../src/lib/offline/profile.ts)
 
-Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).
+Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt's potion cooldown, power and slots), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).
 
 <a id="fightstep"></a>
 
 ### `fightStep` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:118`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:124`](../../src/lib/offline/fightSteps.ts)
 
 One tick of the open fight. Returns when the fight ended.
 
@@ -262,7 +262,7 @@ One tick of the open fight, in the order of the numbered list on [`runCombat`](c
 
 ### `endFight` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:88`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:94`](../../src/lib/offline/fightSteps.ts)
 
 Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.
 
@@ -373,9 +373,51 @@ heal = 25% of max HP x (1 + magic damage% / 100) x (1 + (gear Spell Power + clas
 
 ### `autoUse` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:67`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:73`](../../src/lib/offline/fightSteps.ts)
 
-Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready.
+Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.
+
+<a id="potioncooldownsec"></a>
+
+### `potionCooldownSec` <small>function</small>
+
+Source: [`src/lib/potionBelt.ts:17`](../../src/lib/potionBelt.ts)
+
+The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).
+
+**Formula**
+
+```text
+cooldown = max(potionCooldownMinSec, potionCooldownSec x (1 - potionCooldownPct / 100))       8 s base, 4 s floor
+```
+
+<a id="potionpower"></a>
+
+### `potionPower` <small>function</small>
+
+Source: [`src/lib/potionBelt.ts:28`](../../src/lib/potionBelt.ts)
+
+What a drunk potion's healing is multiplied by: the belt's Potion Power, capped at `COMBAT.potionPowerMaxPct`. It scales the HP and mana a potion restores and its heal over time, not the strength of a buff.
+
+**Formula**
+
+```text
+power = 1 + min(potionPowerMaxPct, potionPowerPct) / 100
+```
+
+<a id="potionslotcount"></a>
+
+### `potionSlotCount` <small>function</small>
+
+Source: [`src/lib/potionBelt.ts:38`](../../src/lib/potionBelt.ts)
+
+Potion stacks on the hotkey bar: `potionBaseSlots` (3) plus the belt's Potion Slots, at most `potionMaxSlots` (5). Keys 1..N drink the first N potion stacks, the skills follow on the next keys.
+
+**Formula**
+
+```text
+slots = min(potionMaxSlots, potionBaseSlots + potionSlots)
+```
 
 <a id="skills"></a>
 
@@ -491,7 +533,7 @@ total[stat] = sum of amount over the running buffs that change `stat`
 
 ### `drink` <small>function</small>
 
-Source: [`src/lib/buffs.ts:125`](../../src/lib/buffs.ts)
+Source: [`src/lib/buffs.ts:126`](../../src/lib/buffs.ts)
 
 Drinks one potion: every effect applies together or none does, so a refusal means nothing is consumed.
 
@@ -501,7 +543,8 @@ already full for every one of them.
 **Formula**
 
 ```text
-hp' = min(maxHp, hp + healHp)      mp' = min(maxMp, mp + healMp)
+hp' = min(maxHp, hp + healHp x power)      mp' = min(maxMp, mp + healMp x power)      regen' = hpPerSec x power
+power = the belt's Potion Power multiplier (1 without a belt, {@link potionPower})
 buffs: each buff effect through addBuff; a refusal by any of them refuses the potion
 ```
 
@@ -509,7 +552,7 @@ buffs: each buff effect through addBuff; a refusal by any of them refuses the po
 
 ### `withBuffs` <small>function</small>
 
-Source: [`src/lib/offline/profile.ts:98`](../../src/lib/offline/profile.ts)
+Source: [`src/lib/offline/profile.ts:103`](../../src/lib/offline/profile.ts)
 
 A profile with the running potion buffs on top ([`buffTotals`](combat.md#bufftotals)): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object),
 so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.

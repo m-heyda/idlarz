@@ -1,8 +1,22 @@
 import { isRecord } from '@/lib/isRecord';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { MERCHANT_SHOP_ITEMS } from '@/config/merchant';
-import { addDrop, equipFromBag, gearOf, moveSlot, organizeBag, rebirthKit, removeFromBag, slotQty, stackOf, starterBag, unequip } from '@/lib/inventory';
+import {
+	addDrop,
+	aggregateStats,
+	equipFromBag,
+	gearOf,
+	moveSlot,
+	organizeBag,
+	rebirthKit,
+	removeFromBag,
+	slotQty,
+	stackOf,
+	starterBag,
+	unequip,
+} from '@/lib/inventory';
 import { instanceProblem, plainItem, sellValueOf } from '@/lib/itemInstance';
+import { HARD_LIMITS } from '@/config/limits';
 import { limitOf } from '@/lib/limits';
 import { isAutoSold } from '@/lib/loot/autoSell';
 import { receiveDrops, type Received } from '@/lib/loot/receive';
@@ -34,12 +48,27 @@ const packratOf = (merchantUpgrades: unknown): number => {
  */
 const packratFor = (inv: Pick<Inventory, 'packrat'> | null, merchantUpgrades: unknown): number => Math.max(inv?.packrat ?? 0, packratOf(merchantUpgrades));
 
+/** The bag slots the worn belt gives (its `bagSlots` stat), rounded down. Read from the server's own equipment, never from the client. */
+const wornBeltSlots = (equipment: Equipment): number => Math.max(0, Math.floor(aggregateStats(equipment).bagSlots));
+
+/**
+ * The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up,
+ * so taking a belt off, or a rebirth, never shrinks the bag below the items in it.
+ *
+ * @category Progression/Limits
+ * @order 3
+ * @formula
+ * beltSlots = max(Inventory.beltSlots, bagSlots of the worn gear)
+ */
+export const beltSlotsFor = (inv: Pick<Inventory, 'beltSlots' | 'equipment'> | null, equipment: Equipment = inv?.equipment ?? {}): number =>
+	Math.max(inv?.beltSlots ?? 0, wornBeltSlots(equipment));
+
 /**
  * The bag size the server entitles a player to, always through `limitOf('bagSize', ctx)`: the base, the Pack Rat level, the Deep Pockets level the
- * save's Embers hold (and later the belt). The one place the server's bag sizes come from.
+ * save's Embers hold and the belt's bag slots, all under `HARD_LIMITS.bagSize`. The one place the server's bag sizes come from.
  */
-const sizeAt = (packrat: number, prestige: unknown): number =>
-	limitOf('bagSize', { merchantUpgrades: packrat > 0 ? { packrat } : {}, prestige: prestigeOf(prestige) });
+const sizeAt = (packrat: number, prestige: unknown, beltSlots = 0): number =>
+	limitOf('bagSize', { merchantUpgrades: packrat > 0 ? { packrat } : {}, prestige: prestigeOf(prestige), beltSlots });
 
 /** A bag brought to `size` slots: it only ever grows (Pack Rat, Deep Pockets, a raised base), never loses an item. */
 const padBag = (bag: BagSlot[], size: number): BagSlot[] => (bag.length >= size ? bag : [...bag, ...Array.from({ length: size - bag.length }, () => null)]);
@@ -51,11 +80,14 @@ export const inventoryFromCore = (core: Core): Inventory => {
 	if (isRecord(core.lootPity))
 		for (const [id, misses] of Object.entries(core.lootPity)) if (typeof misses === 'number' && Number.isFinite(misses)) lootPity[id] = misses;
 	const packrat = packratOf(core.merchantUpgrades);
+	const equipment = isRecord(core.equipment) ? (core.equipment as Equipment) : {};
+	const beltSlots = wornBeltSlots(equipment);
 	return {
 		ver: 1,
 		packrat,
-		bag: padBag(bag, sizeAt(packrat, core.prestige)),
-		equipment: isRecord(core.equipment) ? (core.equipment as Equipment) : {},
+		...(beltSlots > 0 ? { beltSlots } : {}),
+		bag: padBag(bag, sizeAt(packrat, core.prestige, beltSlots)),
+		equipment,
 		lootPity,
 		autoSellUpTo: typeof core.autoSellUpTo === 'string' ? core.autoSellUpTo : null,
 	};
@@ -64,14 +96,24 @@ export const inventoryFromCore = (core: Core): Inventory => {
 /** The inventory a rebirth leaves: the starter kit (see `rebirthKit`); only the auto-sell filter, a setting, carries over. A newer `ver`, so the browser takes it. */
 export const rebirthInventory = (before: Inventory, merchantUpgrades: unknown, prestige?: unknown): Inventory => {
 	const packrat = packratFor(before, merchantUpgrades);
-	return { ver: before.ver + 1, packrat, ...rebirthKit(packrat > 0 ? { packrat } : undefined, prestigeOf(prestige)), autoSellUpTo: before.autoSellUpTo };
+	const beltSlots = beltSlotsFor(before);
+	return {
+		ver: before.ver + 1,
+		packrat,
+		...(beltSlots > 0 ? { beltSlots } : {}),
+		...rebirthKit(packrat > 0 ? { packrat } : undefined, prestigeOf(prestige), beltSlots),
+		autoSellUpTo: before.autoSellUpTo,
+	};
 };
 
 /** The inventory with a bag as big as the save's Pack Rat and Deep Pockets levels entitle it to (a bigger bag shows as a new version). */
 export const fitInventory = (inv: Inventory, core: Core): Inventory => {
 	const packrat = packratFor(inv, core.merchantUpgrades);
-	const size = sizeAt(packrat, core.prestige);
-	return inv.bag.length >= size && (inv.packrat ?? 0) === packrat ? inv : { ...inv, packrat, bag: padBag(inv.bag, size), ver: inv.ver + 1 };
+	const beltSlots = beltSlotsFor(inv);
+	const size = sizeAt(packrat, core.prestige, beltSlots);
+	return inv.bag.length >= size && (inv.packrat ?? 0) === packrat && (inv.beltSlots ?? 0) === beltSlots
+		? inv
+		: { ...inv, packrat, ...(beltSlots > 0 ? { beltSlots } : {}), bag: padBag(inv.bag, size), ver: inv.ver + 1 };
 };
 
 /** A save with the server's bag, gear, pity and auto-sell filter in place of the ones it carried. */
@@ -84,7 +126,7 @@ export const stampInventory = <T extends Pick<PersistedGame, 'bag' | 'equipment'
 		...state,
 		// the server's Pack Rat level wins over a lower one in the upload (the bag is sized by it)
 		merchantUpgrades: packrat > packratOf(state.merchantUpgrades) ? { ...state.merchantUpgrades, packrat } : state.merchantUpgrades,
-		bag: padBag(inv.bag, sizeAt(packrat, state.prestige)),
+		bag: padBag(inv.bag, sizeAt(packrat, state.prestige, beltSlotsFor(inv))),
 		equipment: inv.equipment,
 		lootPity: inv.lootPity,
 		autoSellUpTo: inv.autoSellUpTo,
@@ -186,7 +228,12 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 	switch (op.action) {
 		case 'equip': {
 			const result = Number.isInteger(op.index) ? equipFromBag(inv.bag, inv.equipment, op.index) : null;
-			return result ? done(bump(inv, result)) : refused(inv);
+			if (!result) return refused(inv);
+			// a belt with bag slots grows the bag at once (and the slots stay when it comes off again)
+			const beltSlots = beltSlotsFor(inv, result.equipment);
+			const gained = beltSlots - (inv.beltSlots ?? 0);
+			if (gained <= 0) return done(bump(inv, result));
+			return done(bump(inv, { ...result, beltSlots, bag: padBag(result.bag, Math.min(HARD_LIMITS.bagSize, result.bag.length + gained)) }));
 		}
 		case 'unequip': {
 			if (!EQUIPMENT_SLOTS.includes(op.slot)) return refused(inv);

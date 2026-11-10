@@ -28,6 +28,10 @@ export interface PlayerProfile {
 	mpRegen: number;
 	/** What a Heal restores */
 	heal: number;
+	/** The belt's numbers (lib/potionBelt.ts): the shared potion cooldown in seconds, the multiplier on a potion's healing and the potion stacks on the hotkey bar. Absent in a fight stored before belts: the base values */
+	potionCooldownSec?: number;
+	potionPower?: number;
+	potionSlots?: number;
 }
 
 /** The one fight a player has open. The monster stands on its ticket; the player's numbers are frozen in `profile`. */

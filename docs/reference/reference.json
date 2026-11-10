@@ -281,7 +281,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 168,
+  "line": 184,
   "summary": "Value multiplier of an item level (1 at level 1).",
   "see": []
  },
@@ -292,7 +292,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 195,
+  "line": 211,
   "summary": "Power multiplier of an item level (1 at level 1).",
   "see": []
  },
@@ -473,7 +473,7 @@
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 316,
+  "line": 320,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -484,7 +484,7 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 363,
+  "line": 367,
   "summary": "The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`). Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
@@ -901,7 +901,7 @@
   "kind": "function",
   "category": "Combat/Consumables",
   "file": "src/lib/buffs.ts",
-  "line": 125,
+  "line": 126,
   "summary": "Drinks one potion: every effect applies together or none does, so a refusal means nothing is consumed.",
   "see": []
  },
@@ -1394,7 +1394,7 @@
   "kind": "function",
   "category": "Economy/Perk caps",
   "file": "src/lib/inventory.ts",
-  "line": 241,
+  "line": 242,
   "summary": "The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families (income, XP, kill reward, click, damage) are capped by {@link capPerks}. The server reads gear through this too, so both sides agree.",
   "see": []
  },
@@ -1426,7 +1426,7 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/limits.ts",
-  "line": 37,
+  "line": 40,
   "summary": "The current value of a limit: its base plus the registered bonuses.",
   "see": []
  },
@@ -1816,8 +1816,8 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 67,
-  "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready.",
+  "line": 73,
+  "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.",
   "see": []
  },
  {
@@ -1827,7 +1827,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 88,
+  "line": 94,
   "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
   "see": []
  },
@@ -1838,7 +1838,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 118,
+  "line": 124,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -1904,6 +1904,17 @@
   "see": []
  },
  {
+  "id": "beltslotsfor",
+  "name": "beltSlotsFor",
+  "symbol": "beltSlotsFor",
+  "kind": "function",
+  "category": "Progression/Limits",
+  "file": "src/lib/offline/inventory.ts",
+  "line": 63,
+  "summary": "The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up, so taking a belt off, or a rebirth, never shrinks the bag below the items in it.",
+  "see": []
+ },
+ {
   "id": "ledger",
   "name": "Ledger",
   "symbol": "Ledger",
@@ -1935,8 +1946,8 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/profile.ts",
-  "line": 62,
-  "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).",
+  "line": 63,
+  "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt's potion cooldown, power and slots), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).",
   "see": []
  },
  {
@@ -1946,7 +1957,7 @@
   "kind": "function",
   "category": "Combat/Consumables",
   "file": "src/lib/offline/profile.ts",
-  "line": 98,
+  "line": 103,
   "summary": "A profile with the running potion buffs on top ({@link buffTotals}): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object), so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.",
   "see": []
  },
@@ -2058,6 +2069,39 @@
   "file": "src/lib/playRoute.ts",
   "line": 1,
   "summary": "The front door's routes (IDL-61). The game lives at `/play`; `/` is the public landing. A guest who asks for `/play` is sent to the landing with the login window open (`/?login=1&next=/play`) and, once signed in, goes back to where they were headed. `next` comes from the address bar, so it is only ever followed when it is a path on this site (`safeNextPath`): anything else (another host, `//host`, a backslash trick, a control character) falls back to `/play`. This is a convenience for the player, not a security boundary: every API route answers 401 on its own.",
+  "see": []
+ },
+ {
+  "id": "potioncooldownsec",
+  "name": "potionCooldownSec",
+  "symbol": "potionCooldownSec",
+  "kind": "function",
+  "category": "Combat/Potions and skills",
+  "file": "src/lib/potionBelt.ts",
+  "line": 17,
+  "summary": "The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).",
+  "see": []
+ },
+ {
+  "id": "potionpower",
+  "name": "potionPower",
+  "symbol": "potionPower",
+  "kind": "function",
+  "category": "Combat/Potions and skills",
+  "file": "src/lib/potionBelt.ts",
+  "line": 28,
+  "summary": "What a drunk potion's healing is multiplied by: the belt's Potion Power, capped at `COMBAT.potionPowerMaxPct`. It scales the HP and mana a potion restores and its heal over time, not the strength of a buff.",
+  "see": []
+ },
+ {
+  "id": "potionslotcount",
+  "name": "potionSlotCount",
+  "symbol": "potionSlotCount",
+  "kind": "function",
+  "category": "Combat/Potions and skills",
+  "file": "src/lib/potionBelt.ts",
+  "line": 38,
+  "summary": "Potion stacks on the hotkey bar: `potionBaseSlots` (3) plus the belt's Potion Slots, at most `potionMaxSlots` (5). Keys 1..N drink the first N potion stacks, the skills follow on the next keys.",
   "see": []
  },
  {
