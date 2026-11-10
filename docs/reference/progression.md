@@ -553,9 +553,9 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 7 | `castle_6` | Stout walls | castle level 6 | 75 | - |
 | 8 | `castle_10` | Architect | castle level 10 | 100 | architect |
 | 9 | `first_rebirth` | Reborn | rebirths >= 1 | 75 | reborn |
-| 10 | `boss_auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss-slayer |
+| 10 | `boss_auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss_slayer |
 | 11 | `golden_kill` | Golden touch | golden >= 1 | 50 | - |
-| 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early-tester / early-tester |
+| 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early_tester / early-tester |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 

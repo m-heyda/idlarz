@@ -75,7 +75,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Boss slayer',
 		description: 'Defeat The Great Auroch.',
 		when: { kind: 'kill', monster: 'bossGreatAuroch', min: 1 },
-		rewards: { gems: 50, avatarId: 'boss-slayer' },
+		rewards: { gems: 50, avatarId: 'boss_slayer' },
 	},
 	{ id: 'golden_kill', title: 'Golden touch', description: 'Kill a golden monster.', when: { kind: 'golden', min: 1 }, rewards: { gems: 50 } },
 	{
@@ -83,7 +83,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Early tester',
 		description: 'Played before the new chapter.',
 		when: { kind: 'manual' },
-		rewards: { gems: 100, avatarId: 'early-tester', titleId: 'early-tester' },
+		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester' },
 	},
 ];
 
