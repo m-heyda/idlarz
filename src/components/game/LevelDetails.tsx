@@ -3,6 +3,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { formatCompact, formatNumber } from '@/utils/formatters';
 import { MAX_LEVEL } from '@/config/character';
 import { xpToNextLevel } from '@/utils/game/character';
+import { useUiStore } from '@/stores/uiStore';
 import { LevelUpTimer } from './LevelUpTimer';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import CharacterPortrait from './CharacterPortrait';
@@ -10,23 +11,6 @@ import LevelOrb from './LevelOrb';
 import { maxHp, maxMana } from '@/lib/combat';
 
 type FlaskKind = 'hp' | 'mp';
-
-// Potion flask: liquid level is driven by value/max, with rippling surface and rising bubbles
-const Flask: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({ kind, value, max }) => {
-	const fill = max > 0 ? Math.max(0, Math.min(1, value / max)) : 0;
-	const label = kind === 'hp' ? 'HP' : 'MP';
-	return (
-		<div className='hero-flask' data-side={kind === 'hp' ? 'left' : 'right'} title={`${label}: ${formatNumber(value)} / ${formatNumber(max)}`}>
-			<div className={`px-flask px-flask-${kind}`} style={{ '--s': 2 } as React.CSSProperties}>
-				<div className='px-flask-liquid-wrap'>
-					<div className='px-flask-liquid' style={{ '--p': fill } as React.CSSProperties} />
-				</div>
-				<div className='px-flask-glass' />
-			</div>
-			<div className='hero-flask-val'>{formatNumber(value)}</div>
-		</div>
-	);
-};
 
 /** The text of an XP bar: "42% · 1.2K / 2.9K", or "MAX" at the maximum level (the bar is full). */
 const xpLabel = (level: { level: number; progress: number }) => {
@@ -77,49 +61,29 @@ export const LevelBar: React.FC = () => {
 };
 
 /**
- * The character "scene": the hero standing in a torch-lit stone alcove, HP/MP flasks flanking him
- * and a stony XP bar along the floor with the level on a gem. Shared by the Character and Statistics windows.
+ * The hero card of the Character and Statistics windows: the avatar (a click opens the avatar dialog, there is no extra button), the name and class, then the level, the XP bar and the
+ * HP and MP bars (`LevelBar`). It replaced the torch-lit alcove scene with its potion flasks (a first simplification, the card is reworked later).
  */
 const LevelDetails: React.FC = () => {
-	const { resources, level, resourceRates, characterStats, playerClass, playerHp, playerMp, equipment, playerName } = useGameStore();
-	const hpMax = maxHp(characterStats, equipment);
-	const mpMax = maxMana(characterStats, equipment, playerClass);
+	const playerClass = useGameStore((state) => state.playerClass);
+	const playerName = useGameStore((state) => state.playerName);
+	const openAvatarDialog = useUiStore((state) => state.openAvatarDialog);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
 	return (
-		<div className='hero-hud'>
-			<div className='hero-torch' style={{ left: 26 }} />
-			<div className='hero-torch' style={{ left: 240 }} />
-
-			<div className='hero-nameplate'>
-				<span className='px-name'>{playerName}</span>
-				<span className='hero-class'>
-					{info.race} {info.label}
-				</span>
-			</div>
-
-			<div className='hero-figure'>
-				<CharacterPortrait scale={2} />
-			</div>
-
-			<Flask kind='hp' value={Math.floor(playerHp)} max={hpMax} />
-			<Flask kind='mp' value={playerMp} max={mpMax} />
-
-			<div className='group'>
-				<div className='hero-xp' style={{ '--pct': level.progress * 100 } as React.CSSProperties}>
-					<div className='hero-xp-fill' />
-					<div className='hero-xp-text'>{xpLabel(level)}</div>
-				</div>
-				<div className='absolute left-1/2 top-full -translate-x-1/2 mt-2 w-max z-[60] opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150'>
-					<div className='px-tooltip'>
-						<LevelUpTimer resourceRates={resourceRates} resources={resources} level={level} />
-					</div>
+		<div className='hero-card'>
+			<div className='hero-card-top'>
+				<button type='button' className='hero-card-avatar' onClick={openAvatarDialog} title='Change avatar' aria-label='Change avatar'>
+					<CharacterPortrait variant='bust' scale={2} />
+				</button>
+				<div className='hero-card-id'>
+					<span className='px-name hero-card-name'>{playerName}</span>
+					<span className='hero-class'>
+						{info.race} {info.label}
+					</span>
 				</div>
 			</div>
-
-			<div className='hero-orb' title={`Level ${level.level}`}>
-				<LevelOrb scale={2} level={level.level} />
-			</div>
+			<LevelBar />
 		</div>
 	);
 };
