@@ -51,7 +51,7 @@ export const FileGallery: React.FC<{ files: FileEntry[]; minCard?: number }> = (
 					<input type='checkbox' checked={onlyTrash} onChange={(e) => setOnlyTrash(e.target.checked)} /> marked trash only
 				</label>
 				<button type='button' onClick={trash.copyList} style={field} title='Copy every trash mark from every gallery'>
-					copy trash list ({trash.list.length})
+					{trash.status || `copy trash list (${trash.list.length})`}
 				</button>
 				<span style={{ opacity: 0.7 }}>
 					{shown.length} / {files.length}

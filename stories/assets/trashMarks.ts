@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { copyText } from './clipboard';
 
 const KEY = 'idlarz-asset-trash';
 
@@ -29,6 +30,11 @@ export const useTrashMarks = () => {
 		});
 	}, []);
 	const list = Object.keys(marks).sort();
-	const copyList = () => navigator.clipboard?.writeText(list.map((p) => `- ${p}`).join('\n')).catch(() => {});
-	return { marks, toggle, list, copyList };
+	/** what the last copy did, for the button label (empty until the first click) */
+	const [status, setStatus] = useState('');
+	const copyList = async () => {
+		setStatus((await copyText(list.map((p) => `- ${p}`).join('\n'))) ? `copied ${list.length}` : 'copy failed');
+		setTimeout(() => setStatus(''), 2500);
+	};
+	return { marks, toggle, list, copyList, status };
 };

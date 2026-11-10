@@ -1,3 +1,4 @@
+import { copyText } from './clipboard';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import sounds from '../../docs/assets/sounds.json';
@@ -59,8 +60,7 @@ const SoundBoard: React.FC = () => {
 	const noted = ALL.filter((s) => notes[s.name] || s.use);
 	const copy = () => {
 		const text = noted.map((s) => `- ${s.name} (${s.src.slice(1)}): ${notes[s.name].replace(/\n/g, ' ')}`).join('\n');
-		navigator.clipboard?.writeText(text).catch(() => {});
-		setCopied(true);
+		copyText(text).then(setCopied);
 	};
 	return (
 		<div style={{ padding: 16, fontFamily: 'system-ui, sans-serif', color: '#f1e6c8', minHeight: '100vh', background: '#14110f' }}>

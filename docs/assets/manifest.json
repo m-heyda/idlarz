@@ -21677,32 +21677,6 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "biome_battlefield_2",
-		"category": "biomes",
-		"subcategory": "battlefield (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_battlefield_2.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_battlefield_3",
-		"category": "biomes",
-		"subcategory": "battlefield (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_battlefield_3.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
 		"usedBy": [
 			"RebirthUnlockModal"
 		],
@@ -21711,45 +21685,6 @@
 		"subcategory": "battlefield (in the game)",
 		"src": "/pixel/new_assets/biomes/biome_battlefield_1.png",
 		"status": "used",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_blight_2",
-		"category": "biomes",
-		"subcategory": "blight (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_blight_2.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_blight_3",
-		"category": "biomes",
-		"subcategory": "blight (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_blight_3.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_blight_4",
-		"category": "biomes",
-		"subcategory": "blight (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_blight_4.png",
-		"status": "reuse",
 		"source": "new_assets/biomes",
 		"size": [
 			80,
@@ -21824,32 +21759,6 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "biome_fields_2",
-		"category": "biomes",
-		"subcategory": "fields (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_fields_2.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_fields_3",
-		"category": "biomes",
-		"subcategory": "fields (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_fields_3.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
 		"usedBy": [
 			"RebirthUnlockModal"
 		],
@@ -21858,19 +21767,6 @@
 		"subcategory": "fields (in the game)",
 		"src": "/pixel/new_assets/biomes/biome_fields_1.png",
 		"status": "used",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_jungle_2",
-		"category": "biomes",
-		"subcategory": "jungle (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_jungle_2.png",
-		"status": "reuse",
 		"source": "new_assets/biomes",
 		"size": [
 			80,
@@ -21893,19 +21789,6 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "biome_orchard_2",
-		"category": "biomes",
-		"subcategory": "orchard (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_orchard_2.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
 		"usedBy": [
 			"RebirthUnlockModal"
 		],
@@ -21914,32 +21797,6 @@
 		"subcategory": "orchard (in the game)",
 		"src": "/pixel/new_assets/biomes/biome_orchard_1.png",
 		"status": "used",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_tundra_1",
-		"category": "biomes",
-		"subcategory": "tundra (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_tundra_1.png",
-		"status": "reuse",
-		"source": "new_assets/biomes",
-		"size": [
-			80,
-			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "biome_tundra_2",
-		"category": "biomes",
-		"subcategory": "tundra (alternatives)",
-		"src": "/pixel/new_assets/biomes/biome_tundra_2.png",
-		"status": "reuse",
 		"source": "new_assets/biomes",
 		"size": [
 			80,
