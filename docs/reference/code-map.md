@@ -325,7 +325,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useCtrlSequence.ts`](../../src/hooks/useCtrlSequence.ts) — ~ Calls `onTrigger` when the Control key is pressed `count` times within `windowMs` (hidden menu shortcut).
 - [`useGlobalContextMenu.ts`](../../src/hooks/useGlobalContextMenu.ts) — ~ Takes over the right click for the whole page:
 - [`useHydration.ts`](../../src/hooks/useHydration.ts) — ~ True once the saved game has been loaded from the vault AND the splash has been shown for a moment.
-- [`useMenuAttention.ts`](../../src/hooks/useMenuAttention.ts) — ~ Which tabs of the main menu have something waiting:
+- [`useMenuAttention.ts`](../../src/hooks/useMenuAttention.ts) — ~ What in the header has something waiting:
 - [`useOfflineClaim.ts`](../../src/hooks/useOfflineClaim.ts) — ~ The game waits this long for the server before it starts anyway (a late answer is still applied when it arrives).
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
 - [`useSingleTab.ts`](../../src/hooks/useSingleTab.ts) — ~ Only one tab may run the game.
