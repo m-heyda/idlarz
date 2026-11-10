@@ -80,7 +80,7 @@ export const AVATARS: readonly AvatarInfo[] = [
 /**
  * The two starter avatars each class owns. The creation screens (sign-up, "Finish your hero", "A new chapter") show a hero the two of the class it picked, and the server accepts
  * only those at sign-up (`checkCreationAvatar`); every starter belongs to exactly one class. Afterwards the Avatar window lets the player wear any starter or earned avatar with any class.
- * The first of the two is the class's **default avatar** ({@link CLASS_DEFAULT_AVATAR}).
+ * The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
  *
  * @category Progression/Avatars
  * @order 3

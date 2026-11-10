@@ -11,7 +11,7 @@ import '@/styles/HeroCreator.css';
 export interface HeroCreatorProps {
 	name: string;
 	onName: (name: string) => void;
-	/** null: nothing chosen yet (the detail card asks for a pick) */
+	/** null: nothing chosen yet (the detail card shows a black silhouette and asks for a pick) */
 	playerClass: PlayerClassId | null;
 	onClass: (id: PlayerClassId) => void;
 	/** The chosen avatar id; the class's default while the player has not picked one */
@@ -22,11 +22,14 @@ export interface HeroCreatorProps {
 	disabled?: boolean;
 }
 
+/** The silhouette shown before a class is chosen: any starter's cut-out, so the card has the same size and layout in both states (no jump when a class is picked). */
+const SILHOUETTE_AVATAR = 'knight';
+
 /**
  * The hero creation block shared by sign-up, "Finish your hero" and "A new chapter": the name, four class tabs and, for the chosen class, a detail card. The card leads with the
- * chosen avatar as a large portrait (drawn at 3x its native 64 px, so it stays sharp), with its bio, and the two avatars the class owns (plus earned extras) to switch between; beside it
- * are the class's story, how it plays and its two bonuses (the real `CLASS_PASSIVES`, written out by `describeClassPassives`). No class figures: the avatar is the face of the hero.
- * The server decides again on every save (`checkCreationAvatar`).
+ * chosen avatar as a large portrait (drawn at 3x its native 64 px, so it stays sharp, with a slowly pulsing glow in the class colour), with its bio, and the two avatars the class owns
+ * (plus earned extras) to switch between; beside it are the class's story, how it plays and its bonuses on one line (the real `CLASS_PASSIVES`, written out by `describeClassPassives`).
+ * Before a class is chosen the same card shows a black silhouette, so nothing moves when one is picked. The server decides again on every save (`checkCreationAvatar`).
  */
 const HeroCreator: React.FC<HeroCreatorProps> = ({ name, onName, playerClass, onClass, avatarId, onAvatar, earned = [], disabled = false }) => {
 	const info = playerClass ? PLAYER_CLASSES[playerClass] : null;
@@ -69,69 +72,74 @@ const HeroCreator: React.FC<HeroCreatorProps> = ({ name, onName, playerClass, on
 				})}
 			</div>
 
-			{info && bonuses && playerClass ? (
-				<div className='hero-detail' style={{ '--accent': info.accent } as React.CSSProperties} aria-live='polite'>
-					<div className='hero-face'>
-						<div className='hero-portrait'>{shown && <AvatarArt id={shown.id} scale={4.8} />}</div>
-						<div className='hero-face-name'>{shown?.name}</div>
-						<p className='hero-face-bio'>{shown?.bio}</p>
-						<div className='hero-avatars' role='radiogroup' aria-label='Avatar'>
-							{[...CLASS_AVATARS[playerClass], ...extras.map((avatar) => avatar.id)].map((id) => {
-								const avatar = avatarById(id);
-								if (!avatar) return null;
-								const selected = id === avatarId;
-								return (
-									<button
-										key={id}
-										type='button'
-										role='radio'
-										aria-checked={selected}
-										className='hero-avatar'
-										data-selected={selected}
-										disabled={disabled}
-										title={avatar.name}
-										onClick={() => onAvatar(id)}
-									>
-										<AvatarArt id={id} scale={1.6} />
-									</button>
-								);
-							})}
-						</div>
+			<div className='hero-detail' data-empty={!info} style={info ? ({ '--accent': info.accent } as React.CSSProperties) : undefined} aria-live='polite'>
+				<div className='hero-face'>
+					<div className='hero-portrait'>
+						{shown && info ? <AvatarArt id={shown.id} scale={4.8} /> : <AvatarArt id={SILHOUETTE_AVATAR} scale={4.8} locked />}
 					</div>
-					<div className='hero-detail-body'>
-						<div className='hero-detail-title'>
-							<span className='hero-detail-name'>{info.label}</span>
-							<span className='hero-detail-race'>{info.race}</span>
-						</div>
-						<p className='hero-detail-play'>{info.playstyle}</p>
-						<p className='hero-detail-lore'>{info.lore}</p>
-						<div className='hero-bonuses'>
-							<div className='hero-bonus-group'>
-								<span className='hero-bonus-label'>Combat</span>
-								<span className='hero-bonus-list'>
+					<div className='hero-face-name'>{info ? shown?.name : '???'}</div>
+					<p className='hero-face-bio'>{info ? shown?.bio : 'Every hero has a face of its own.'}</p>
+					<div className='hero-avatars' role='radiogroup' aria-label='Avatar'>
+						{playerClass
+							? [...CLASS_AVATARS[playerClass], ...extras.map((avatar) => avatar.id)].map((id) => {
+									const avatar = avatarById(id);
+									if (!avatar) return null;
+									const selected = id === avatarId;
+									return (
+										<button
+											key={id}
+											type='button'
+											role='radio'
+											aria-checked={selected}
+											className='hero-avatar'
+											data-selected={selected}
+											disabled={disabled}
+											title={avatar.name}
+											onClick={() => onAvatar(id)}
+										>
+											<AvatarArt id={id} scale={1.6} />
+										</button>
+									);
+								})
+							: [0, 1].map((slot) => (
+									<span key={slot} className='hero-avatar' aria-hidden='true'>
+										<AvatarArt id={SILHOUETTE_AVATAR} scale={1.6} locked />
+									</span>
+								))}
+					</div>
+				</div>
+				<div className='hero-detail-body'>
+					<div className='hero-detail-title'>
+						<span className='hero-detail-name'>{info ? info.label : 'Choose your hero'}</span>
+						{info && <span className='hero-detail-race'>{info.race}</span>}
+					</div>
+					<p className='hero-detail-play'>{info ? info.playstyle : 'Four heroes, four ways to play.'}</p>
+					<p className='hero-detail-lore'>{info ? info.lore : 'Pick a class above to read its story, meet its two faces and see the bonuses it brings.'}</p>
+					<div className='hero-bonuses'>
+						<span className='hero-bonus-label'>Bonuses</span>
+						<span className='hero-bonus-list'>
+							{bonuses ? (
+								<>
 									{bonuses.combat.map((line) => (
 										<span key={line} className='hero-bonus' data-kind='combat'>
 											{line}
 										</span>
 									))}
-								</span>
-							</div>
-							<div className='hero-bonus-group'>
-								<span className='hero-bonus-label'>Economy</span>
-								<span className='hero-bonus-list'>
 									{bonuses.economy.map((line) => (
 										<span key={line} className='hero-bonus' data-kind='economy'>
 											{line}
 										</span>
 									))}
+								</>
+							) : (
+								<span className='hero-bonus' data-kind='empty' aria-hidden='true'>
+									?
 								</span>
-							</div>
-						</div>
+							)}
+						</span>
 					</div>
 				</div>
-			) : (
-				<p className='hero-detail-empty'>Choose a hero to read its story and see its bonuses.</p>
-			)}
+			</div>
 		</div>
 	);
 };

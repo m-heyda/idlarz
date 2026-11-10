@@ -91,6 +91,7 @@
 }
 
 .hero-portrait {
+	position: relative;
 	display: flex;
 	padding: 6px;
 	line-height: 0;
@@ -100,6 +101,77 @@
 		0 0 0 2px #000,
 		0 0 26px color-mix(in srgb, var(--accent) 45%, transparent);
 	image-rendering: pixelated;
+	animation: hero-glow 3.2s ease-in-out infinite;
+}
+
+/* a soft halo that breathes behind the portrait */
+.hero-portrait::before {
+	content: '';
+	position: absolute;
+	inset: -22px;
+	z-index: -1;
+	background: radial-gradient(circle, color-mix(in srgb, var(--accent) 55%, transparent), transparent 68%);
+	opacity: 0.5;
+	filter: blur(6px);
+	animation: hero-halo 3.2s ease-in-out infinite;
+	pointer-events: none;
+}
+
+/* a light that sweeps across the frame now and then */
+.hero-portrait::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.16) 50%, transparent 62%);
+	background-size: 260% 100%;
+	background-position: 140% 0;
+	animation: hero-sheen 5.5s ease-in-out infinite;
+	pointer-events: none;
+}
+
+@keyframes hero-glow {
+	0%,
+	100% {
+		box-shadow:
+			0 0 0 2px #000,
+			0 0 18px color-mix(in srgb, var(--accent) 35%, transparent);
+	}
+	50% {
+		box-shadow:
+			0 0 0 2px #000,
+			0 0 38px color-mix(in srgb, var(--accent) 70%, transparent);
+	}
+}
+
+@keyframes hero-halo {
+	0%,
+	100% {
+		opacity: 0.35;
+		transform: scale(0.96);
+	}
+	50% {
+		opacity: 0.75;
+		transform: scale(1.04);
+	}
+}
+
+@keyframes hero-sheen {
+	0%,
+	55% {
+		background-position: 140% 0;
+	}
+	85%,
+	100% {
+		background-position: -40% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero-portrait,
+	.hero-portrait::before,
+	.hero-portrait::after {
+		animation: none;
+	}
 }
 
 .hero-face-name {
@@ -112,7 +184,7 @@
 }
 
 .hero-face-bio {
-	min-height: 2.6em;
+	min-height: 2.8em;
 	margin: -4px 0 0;
 	text-align: center;
 	font-size: 0.74rem;
@@ -198,17 +270,12 @@
 
 .hero-bonuses {
 	display: flex;
-	flex-direction: column;
-	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px 12px;
 	margin-top: auto;
 	padding-top: 10px;
 	border-top: 1px solid #2e2418;
-}
-
-.hero-bonus-group {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
 }
 
 .hero-bonus-label {
@@ -244,11 +311,32 @@
 	background: rgba(122, 98, 38, 0.18);
 }
 
-.hero-detail-empty {
-	margin: 0;
-	padding: 56px 0;
-	text-align: center;
-	font-size: 0.95rem;
-	color: #a89878;
-	border: 1px dashed #4a3a28;
+.hero-bonus[data-kind='empty'] {
+	color: #6a5a40;
+	border-style: dashed;
+	border-color: #4a3a28;
+	background: transparent;
+}
+
+/* before a class is chosen: the same card with a neutral accent and a black silhouette, so nothing moves when a class is picked */
+.hero-detail[data-empty='true'] {
+	--accent: #8a7a5a;
+}
+
+.hero-detail[data-empty='true'] .hero-detail-name {
+	color: #b8a880;
+}
+
+.hero-detail[data-empty='true'] .hero-detail-lore,
+.hero-detail[data-empty='true'] .hero-face-bio {
+	color: #8e7e5e;
+}
+
+.hero-detail[data-empty='true'] .hero-portrait {
+	animation-duration: 5s;
+}
+
+.hero-avatar:not(button) {
+	cursor: default;
+	opacity: 0.5;
 }
