@@ -4,7 +4,6 @@ import { join } from 'node:path';
 import { ROOT, buildManifest } from './assets/manifest';
 import { renderAll } from './assets/render';
 
-
 export const OUT = join(ROOT, 'docs', 'assets');
 
 /** Names of files in docs/assets that are out of date (missing, different or stale) */
