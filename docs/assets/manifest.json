@@ -7252,6 +7252,149 @@
 		]
 	},
 	{
+		"usedBy": [],
+		"name": "monster_pack_eye_horror",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/eye_horror.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			67,
+			67
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_frost_flame_knight",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/frost_flame_knight.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_magma_knight",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/magma_knight.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			66,
+			66
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_mecha_triceratops",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/mecha_triceratops.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			70,
+			70
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_mushroom_wizard",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/mushroom_wizard.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_purple_ogre",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/purple_ogre.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_reaper_frost_scythe",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/reaper_frost_scythe.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			65,
+			65
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_skeleton_cleaver",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/skeleton_cleaver.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_skull_vine",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/skull_vine.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			65,
+			65
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_toxic_zombie",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/toxic_zombie.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			65,
+			65
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "monster_pack_zombie_triceratops",
+		"category": "monsters",
+		"subcategory": "new biome monsters (not wired)",
+		"src": "/pixel/assets_to_assess_and_use/monsters/zombie_triceratops.png",
+		"status": "reuse",
+		"source": "assets_to_assess_and_use/monsters",
+		"size": [
+			73,
+			73
+		]
+	},
+	{
 		"usedBy": [
 			"bossGreatAuroch"
 		],

@@ -377,6 +377,15 @@ export const buildManifest = (): AssetEntry[] => {
 			source: 'assets_to_assess_and_use/more_buildings',
 		});
 	}
+	for (const f of walk(join(POOL, 'monsters')))
+		add({
+			name: `monster_pack_${snake(basename(f))}`,
+			category: 'monsters',
+			subcategory: 'new biome monsters (not wired)',
+			src: url(f),
+			status: 'reuse',
+			source: 'assets_to_assess_and_use/monsters',
+		});
 	for (const f of walk(join(PUBLIC, 'pixel', 'reuse'))) {
 		const kind = relative(join(PUBLIC, 'pixel', 'reuse'), f).split(sep)[0];
 		add({
