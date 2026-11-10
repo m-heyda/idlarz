@@ -1318,6 +1318,16 @@
   "see": []
  },
  {
+  "id": "the-landing-world",
+  "name": "The landing world",
+  "kind": "topic",
+  "category": "Architecture/Art",
+  "file": "src/lib/landingWorld.ts",
+  "line": 4,
+  "summary": "The world behind the landing page: a vast, seeded land of the basic biomes (plains, forest, swamp, tundra, coast) with a sea around it, a river and ponds, and the word IDLE spelled out in hills on a snow plain that is part of the mainland (patches of the biomes, not slabs). `/map-lab/landing-bake` draws it with the real terrain renderer and saves `public/landing/map.png`, which the landing page shows (so the landing never runs the generator). Deterministic: the same seed gives the same picture. Pure: no canvas, no store.",
+  "see": []
+ },
+ {
   "id": "limitof",
   "name": "limitOf",
   "symbol": "limitOf",
@@ -1919,6 +1929,16 @@
   "file": "src/lib/offline/winChance.ts",
   "line": 60,
   "summary": "The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.",
+  "see": []
+ },
+ {
+  "id": "the-play-route-and-its-redirects",
+  "name": "The /play route and its redirects",
+  "kind": "topic",
+  "category": "Architecture/Routes",
+  "file": "src/lib/playRoute.ts",
+  "line": 1,
+  "summary": "The front door's routes (IDL-61). The game lives at `/play`; `/` is the public landing. A guest who asks for `/play` is sent to the landing with the login window open (`/?login=1&next=/play`) and, once signed in, goes back to where they were headed. `next` comes from the address bar, so it is only ever followed when it is a path on this site (`safeNextPath`): anything else (another host, `//host`, a backslash trick, a control character) falls back to `/play`. This is a convenience for the player, not a security boundary: every API route answers 401 on its own.",
   "see": []
  },
  {

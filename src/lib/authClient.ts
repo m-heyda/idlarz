@@ -7,12 +7,18 @@ export interface Profile {
 	playerClass: PlayerClassId;
 }
 
+/** The numbers on the landing's Continue card (from `player_stats`, absent for an account that has not played yet). */
+export interface ProfileStats {
+	level: number;
+	rebirths: number;
+}
+
 /** Why accounts cannot be used: the server has no Supabase setup (retrying cannot help), or it is an outage / network problem (it may pass). */
 export type UnavailableReason = 'not_configured' | 'outage';
 
 export type AuthResult =
 	// `epoch` / `needsReset`: what /api/auth/me says about the server's data epoch (IDL-76). Absent while the server does not send them (the guard is then a no-op).
-	| { status: 'ok'; userId: string; profile: Profile | null; epoch?: number; needsReset?: boolean }
+	| { status: 'ok'; userId: string; profile: Profile | null; epoch?: number; needsReset?: boolean; stats?: ProfileStats }
 	| { status: 'guest' } // no session (a clean 401)
 	| { status: 'unavailable'; reason: UnavailableReason } // outage, missing env, network: never treated as "logged out"
 	| { status: 'error'; message: string }; // the player's input was refused
@@ -31,11 +37,14 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			reason?: UnavailableReason;
 			epoch?: unknown;
 			needsReset?: unknown;
+			stats?: { level?: unknown; rebirths?: unknown } | null;
 		};
 		if (response.ok) {
 			const epoch = typeof body.epoch === 'number' && Number.isInteger(body.epoch) && body.epoch >= 1 ? { epoch: body.epoch } : {};
 			const needsReset = body.needsReset === true ? { needsReset: true } : {};
-			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset };
+			const { level, rebirths } = body.stats ?? {};
+			const stats = typeof level === 'number' && typeof rebirths === 'number' ? { stats: { level, rebirths } } : {};
+			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats };
 		}
 		if (response.status === 503 || response.status >= 500 || body.unavailable) {
 			return { status: 'unavailable', reason: body.reason === 'not_configured' ? 'not_configured' : 'outage' };

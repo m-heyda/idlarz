@@ -1,0 +1,330 @@
+/* Landing page (`/`): a baked map of the world behind everything (IDLE written in hills), the REALM stamp and crown, two windows (changelog | account) and a row of feature cards. */
+
+.ld-root {
+	position: relative;
+	min-height: 100vh;
+	overflow: hidden;
+	color: var(--px-parch);
+	background: #1f78b8; /* the sea, in case the map is still loading */
+}
+
+/* the map is wider and taller than most screens and drifts up and down by 75px (the picture is shown at 0.75 of its size); the title block is part of it, so the stamp stays under the letters */
+.ld-mapwrap {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	width: 0;
+	height: 0;
+	transform: scale(var(--ld-zoom, 1)); /* the whole page is scaled to fit the screen (LandingPage sets --ld-zoom) */
+	transform-origin: 0 0;
+}
+
+.ld-map {
+	position: absolute;
+	top: -75px;
+	left: 0;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	image-rendering: pixelated;
+	animation: ld-drift 26s ease-in-out infinite alternate;
+}
+
+@keyframes ld-drift {
+	from {
+		transform: translateY(0);
+	}
+	to {
+		transform: translateY(75px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ld-map {
+		animation: none;
+		transform: translateY(38px);
+	}
+}
+
+/* in the scaled page (not in the drifting map): the letters end at about y = 395 when the map rests, and the crown and stamp overlap their lower edge */
+.ld-title {
+	position: absolute;
+	left: -650px;
+	width: 1300px;
+	top: 243px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.ld-title h1 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.ld-crown {
+	position: relative;
+	z-index: 1;
+	margin-bottom: 10px;
+	filter: drop-shadow(3px 0 0 #0a0605) drop-shadow(-3px 0 0 #0a0605) drop-shadow(0 3px 0 #0a0605) drop-shadow(0 -3px 0 #0a0605)
+		drop-shadow(0 8px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* REALM as a stamp: a bronze plate with a double border, slightly crooked */
+.ld-stamp {
+	display: block;
+	padding: 6px 26px 6px 40px;
+	font-family: var(--font-pixel);
+	font-weight: 900;
+	font-size: 3.2rem;
+	letter-spacing: 0.5em;
+	line-height: 1.1;
+	color: var(--px-gold);
+	text-shadow: 0 3px 0 #0a0605;
+	background: linear-gradient(rgba(10, 7, 5, 0.9), rgba(10, 7, 5, 0.9)), url('/pixel/bg/crack.png');
+	border: 4px solid #c08a30;
+	outline: 4px solid #0a0605;
+	outline-offset: 0;
+	box-shadow:
+		inset 0 0 0 3px #0a0605,
+		0 10px 24px rgba(0, 0, 0, 0.55);
+	transform: rotate(-2deg);
+}
+
+.ld-tagline {
+	margin-top: 18px;
+	padding: 4px 16px;
+	background: rgba(10, 7, 5, 0.92);
+	border: 3px solid #c08a30;
+	font-size: 1.1rem;
+	color: #fff6dc;
+	text-shadow:
+		0 2px 0 #0a0605,
+		0 0 8px #0a0605;
+}
+
+/* --- content: starts under the title --- */
+.ld-content {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 28px;
+	padding: 462px 24px 20px;
+	zoom: var(--ld-zoom, 1);
+	min-height: calc(100vh / var(--ld-zoom, 1));
+}
+
+.ld-columns {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: 40px;
+	width: 100%;
+	max-width: 1060px;
+	margin: 0 auto;
+	align-items: stretch;
+}
+
+.ld-window {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: none;
+	animation: none;
+	overflow: visible; /* the monsters sit on the frame */
+}
+
+.ld-critter {
+	position: absolute;
+	z-index: 2;
+	pointer-events: none;
+	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45));
+}
+
+.ld-critter-tl {
+	top: -44px;
+	left: -6px;
+}
+
+.ld-critter-bl {
+	bottom: -22px;
+	left: -22px;
+	transform: scaleX(-1);
+}
+
+.ld-critter-tr {
+	top: -46px;
+	right: 8px;
+}
+
+.ld-critter-top {
+	top: -36px;
+	right: 8px;
+}
+
+/* --- changelog --- */
+.ld-log {
+	flex: 1;
+	min-height: 250px;
+}
+
+.ld-log article + article {
+	margin-top: 14px;
+}
+
+.ld-log-date {
+	font-size: 0.75rem;
+	color: #a89878;
+}
+
+.ld-log-title {
+	color: var(--px-gold);
+	font-weight: 700;
+}
+
+.ld-log ul {
+	margin-top: 4px;
+	padding-left: 18px;
+	list-style: square;
+	font-size: 0.9rem;
+	line-height: 1.4;
+	color: #d8ccaa;
+}
+
+/* --- account --- */
+.ld-tabs {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.ld-tab {
+	flex: 1;
+	padding: 6px 8px;
+	font-family: inherit;
+	color: #a89878;
+	background: rgba(10, 7, 6, 0.6);
+	border-bottom: 3px solid #3a2810;
+	cursor: pointer;
+}
+
+.ld-tab[aria-selected='true'] {
+	color: var(--px-gold);
+	border-bottom-color: #c08a30;
+}
+
+.ld-link {
+	align-self: center;
+	font-size: 0.75rem;
+	color: #a89878;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.ld-hint {
+	font-size: 0.75rem;
+	color: #a89878;
+	text-align: center;
+}
+
+.ld-continue {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	text-align: center;
+}
+
+.ld-continue-figure {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px;
+	background: rgba(10, 7, 6, 0.75);
+	border: 4px solid transparent;
+	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+}
+
+.ld-continue-name {
+	font-size: 1.4rem;
+	font-weight: 700;
+	color: var(--px-gold);
+}
+
+.ld-continue-class,
+.ld-continue-stats {
+	font-size: 0.95rem;
+	color: #d8ccaa;
+}
+
+.ld-continue-go {
+	margin-top: 6px;
+	min-width: 200px;
+	text-align: center;
+}
+
+/* --- features: one row of five, each card a small box with its monster on the top edge --- */
+.ld-features {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 34px 18px;
+	width: 100%;
+	max-width: 1200px;
+	margin: 14px auto 0;
+	list-style: none;
+}
+
+.ld-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 14px 16px 16px;
+	border: 4px solid transparent;
+	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+	image-rendering: pixelated;
+	background: rgba(10, 7, 5, 0.9);
+}
+
+.ld-card-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 52px;
+	padding-right: 36px; /* room for the monster on the edge */
+}
+
+.ld-card-icon {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 52px;
+}
+
+.ld-card-title {
+	color: var(--px-gold);
+	font-weight: 700;
+	line-height: 1.15;
+}
+
+.ld-card-text {
+	font-size: 0.82rem;
+	line-height: 1.35;
+	color: #d8ccaa;
+}
+
+/* narrow screens: stacked, no polish promised */
+@media (max-width: 1100px) {
+	.ld-columns {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ld-features {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ld-stamp {
+		font-size: 1.6rem;
+	}
+}
