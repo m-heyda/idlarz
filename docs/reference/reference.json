@@ -336,12 +336,12 @@
   "kind": "const",
   "category": "Progression/Guided tutorial",
   "file": "src/catalog/tutorial.ts",
-  "line": 131,
-  "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It ships dark: nothing is shown until `GAME_EPOCH` is raised (the new chapter release), or on a build with `NEXT_PUBLIC_GUIDE=on` ({@link guideLive}).",
+  "line": 133,
+  "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ({@link guideVisibleFor}).",
   "see": [
    "applyTutorial",
    "buildNumbers",
-   "guideLive"
+   "guideVisibleFor"
   ]
  },
  {
@@ -2229,14 +2229,14 @@
   "see": []
  },
  {
-  "id": "guidelive",
-  "name": "guideLive",
-  "symbol": "guideLive",
+  "id": "guidevisiblefor",
+  "name": "guideVisibleFor",
+  "symbol": "guideVisibleFor",
   "kind": "function",
   "category": "Progression/Guided tutorial",
   "file": "src/lib/tutorial/live.ts",
-  "line": 10,
-  "summary": "Whether Brother Alder is on at all. The tutorial ships dark with the new chapter: until `GAME_EPOCH` is raised (the release flip, IDL-253) nobody sees it, so accounts that are playing the old chapter get no bubbles. To try it on a build before the flip, set `NEXT_PUBLIC_GUIDE=on`.",
+  "line": 35,
+  "summary": "Whether Brother Alder is **shown** (the bubbles, the focus layer, the journal tab). That is `guideLiveFor`, and also every build that is not the production site: localhost (`next dev`, `NODE_ENV` is not 'production') and Vercel previews (`NEXT_PUBLIC_VERCEL_ENV` is 'preview' or 'development'), so the tutorial can be tried without touching `GAME_EPOCH`. The production deployment shows it only after the flip. `NEXT_PUBLIC_GUIDE=on` forces it on anywhere (set it in `.env.local` or the host's environment); `NEXT_PUBLIC_GUIDE=off` is not special.",
   "see": []
  },
  {

@@ -119,7 +119,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `gradeLegacyItems` | Loot / Items | [`src/catalog/items/ladder.ts:316`](../../src/catalog/items/ladder.ts) | Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece: |
 | `gradeLevels` | Loot / Items | [`src/catalog/items/grades.ts:79`](../../src/catalog/items/grades.ts) | The item level window an item of this grade is generated in. |
 | `gradeRarities` | Loot / Items | [`src/catalog/items/grades.ts:94`](../../src/catalog/items/grades.ts) | The rarities an item of this grade may roll as: |
-| `guideLive` | Progression / Guided tutorial | [`src/lib/tutorial/live.ts:10`](../../src/lib/tutorial/live.ts) | Whether Brother Alder is on at all. |
+| `guideVisibleFor` | Progression / Guided tutorial | [`src/lib/tutorial/live.ts:35`](../../src/lib/tutorial/live.ts) | Whether Brother Alder is **shown** (the bubbles, the focus layer, the journal tab). |
 | `healAmount` | Combat / Potions and skills | [`src/lib/skills.ts:20`](../../src/lib/skills.ts) | HP a Heal restores: |
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
@@ -220,7 +220,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The class picker acceptance | Pacing / The sim | [`scripts/sim-classes.ts:1`](../../scripts/sim-classes.ts) | `npm run sim:classes`: |
 | The end-to-end test account | Ops / Operator guides | [`e2e/account.ts:23`](../../e2e/account.ts) | The one account every end-to-end test signs in with (docs/reference/ops.md). |
 | The game at a glance | Overview / The game | [`src/app/GameApp.tsx:17`](../../src/app/GameApp.tsx) | Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. |
-| The guided tutorial | Progression / Guided tutorial | [`src/catalog/tutorial.ts:131`](../../src/catalog/tutorial.ts) | The guided tutorial (IDL-74): |
+| The guided tutorial | Progression / Guided tutorial | [`src/catalog/tutorial.ts:133`](../../src/catalog/tutorial.ts) | The guided tutorial (IDL-74): |
 | The landing world | Architecture / Art | [`src/lib/landingWorld.ts:4`](../../src/lib/landingWorld.ts) | The world behind the landing page: |
 | The map (World) | Architecture / State | [`src/utils/world.ts:32`](../../src/utils/world.ts) | The map has no edge. |
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |

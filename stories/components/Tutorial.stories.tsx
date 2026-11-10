@@ -23,6 +23,15 @@ const meta = {
 } satisfies Meta<typeof GuideBubble>;
 export default meta;
 
+/** Typing: the text appears letter by letter (about 30 characters a second) while Alder's mouth opens and closes; a click on the bubble or any key shows the rest. Reload the story to see it again. */
+export const Typing: StoryObj<typeof meta> = {};
+
+/** The finished bubble: the whole text, the mouth closed. The bubble has this height from the first letter, so nothing jumps. */
+export const Complete: StoryObj<typeof meta> = { args: { instant: true } };
+
+/** What `prefers-reduced-motion: reduce` does by itself: the whole text at once, no typing, no talking (shown here with `instant`). */
+export const ReducedMotion: StoryObj<typeof meta> = { args: { instant: true, text: INTRO[2].text(numbers), progress: '3 / 3', actionLabel: 'Let us go' } };
+
 /** The first intro page; the real intro also dims the whole screen (see IntroDim). */
 export const Bubble: StoryObj<typeof meta> = {};
 

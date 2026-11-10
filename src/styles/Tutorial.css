@@ -54,7 +54,9 @@
 	flex: none;
 	width: 134px;
 	height: 134px;
-	background-size: 100% 100%;
+	/* a sheet of two frames: closed mouth | open mouth */
+	background-size: 200% 100%;
+	background-position: 0 0;
 	background-repeat: no-repeat;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45));
@@ -79,6 +81,21 @@
 	bottom: 14px;
 	border: 6px solid transparent;
 	border-right: 6px solid #8a6a3a;
+}
+.guide-sprite[data-frame='1'] {
+	background-position: 100% 0;
+}
+/* the whole text is laid out invisibly so the bubble has its final size from the first letter; the typed part sits on top of it */
+.guide-text {
+	position: relative;
+	cursor: default;
+}
+.guide-text-full {
+	visibility: hidden;
+}
+.guide-text-typed {
+	position: absolute;
+	inset: 0;
 }
 .guide-name {
 	margin-bottom: 2px;

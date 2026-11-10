@@ -4,7 +4,7 @@ import { RESOURCE_CAP } from '@/config/economy';
 import { newClaimId } from '@/lib/offlineClient';
 import { requestTutorial, type Reply } from '@/lib/rewardsClient';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
-import { emptyProgress, withDone, withLesson, withSkip, type TutorialProgress } from '@/lib/tutorial/engine';
+import { emptyProgress, mergeProgress, withDone, withLesson, withSkip, type TutorialProgress } from '@/lib/tutorial/engine';
 import { emptyCounters, type TutorialCounters } from '@/lib/tutorial/facts';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -65,7 +65,7 @@ export const useTutorialStore = create<TutorialStoreState>((set, get) => {
 			reply = { status: 'unavailable' };
 		}
 		if (reply.status === 'ok' && reply.value.ok) {
-			set({ progress: reply.value.progress });
+			set((s) => ({ progress: mergeProgress(s.progress, reply.value.progress) }));
 			receivePaid(reply.value);
 			pending.delete(tag);
 			return;
@@ -95,7 +95,9 @@ export const useTutorialStore = create<TutorialStoreState>((set, get) => {
 		nextIntroPage: () => set((s) => ({ introPage: s.introPage + 1 })),
 		load: async () => {
 			const reply = await requestTutorial(newClaimId(), { action: 'sync' });
-			if (reply.status === 'ok') set({ progress: reply.value.progress, loaded: true });
+			if (reply.status === 'ok') set((s) => ({ progress: mergeProgress(s.progress, reply.value.progress), loaded: true }));
+			// a brand-new account has no cloud save for a moment (its first upload is on its way): the server holds no progress either, so the intro must not wait for it
+			else if (reply.status === 'no_save') set({ loaded: true });
 			else setTimeout(() => void get().load(), RETRY_MS);
 		},
 		completeStep: (id) => {

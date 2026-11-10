@@ -20823,6 +20823,36 @@
 		]
 	},
 	{
+		"usedBy": [
+			"tutorial:guide"
+		],
+		"name": "guide_brother_alder",
+		"category": "portraits",
+		"subcategory": "tutorial guide",
+		"src": "/pixel/reuse/misc/sprite-fusion-374f7430-0e77-437e-8e6a-a0f4c6ac3332.png",
+		"status": "used",
+		"source": "public/pixel/reuse",
+		"size": [
+			67,
+			67
+		]
+	},
+	{
+		"usedBy": [
+			"tutorial:guide"
+		],
+		"name": "guide_brother_alder_talk",
+		"category": "portraits",
+		"subcategory": "tutorial guide",
+		"src": "/pixel/guide/alder_talk.png",
+		"status": "used",
+		"source": "scripts/guide-sprite.ts",
+		"size": [
+			134,
+			67
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "reuse_legendary_sf_b4884690_b36",
 		"category": "unsorted",
@@ -20859,19 +20889,6 @@
 		"size": [
 			64,
 			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_misc_sf_374f7430_0e7",
-		"category": "unsorted",
-		"subcategory": "misc",
-		"src": "/pixel/reuse/misc/sprite-fusion-374f7430-0e77-437e-8e6a-a0f4c6ac3332.png",
-		"status": "reuse",
-		"source": "public/pixel/reuse",
-		"size": [
-			67,
-			67
 		]
 	},
 	{
