@@ -114,8 +114,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Architect',
 		description: 'Upgrade the castle to level 10.',
 		when: { kind: 'castle', level: 10 },
-		badge: 'badge_star_silver',
-		badgePlaceholder: true,
+		badge: 'badge_castle_10_gold',
 		rewards: { gems: 100, avatarId: 'architect' },
 	},
 	{
@@ -123,8 +122,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Reborn',
 		description: 'Rebirth for the first time.',
 		when: { kind: 'rebirths', min: 1 },
-		badge: 'badge_star_silver',
-		badgePlaceholder: true,
+		badge: 'badge_first_rebirth_fire',
 		rewards: { gems: 75, avatarId: 'reborn' },
 	},
 	{
@@ -132,8 +130,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Boss slayer',
 		description: 'Defeat The Great Auroch.',
 		when: { kind: 'kill', monster: 'bossGreatAuroch', min: 1 },
-		badge: 'badge_skull_bronze',
-		badgePlaceholder: true,
+		badge: 'badge_great_auroch_boss',
 		rewards: { gems: 50, avatarId: 'boss_slayer' },
 	},
 	{
@@ -141,8 +138,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Golden touch',
 		description: 'Kill a golden monster.',
 		when: { kind: 'golden', min: 1 },
-		badge: 'badge_star_silver',
-		badgePlaceholder: true,
+		badge: 'badge_golden_monster_gold',
 		rewards: { gems: 50 },
 	},
 	{
@@ -150,8 +146,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Early tester',
 		description: 'Played before the new chapter.',
 		when: { kind: 'manual' },
-		badge: 'badge_star_silver',
-		badgePlaceholder: true,
+		badge: 'badge_early_tester_special',
 		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester' },
 	},
 ];
