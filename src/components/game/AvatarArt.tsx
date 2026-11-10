@@ -7,7 +7,7 @@ interface AvatarArtProps {
 	/** Avatar id; null/unknown shows the default avatar of `playerClass` */
 	id: string | null | undefined;
 	playerClass?: PlayerClassId;
-	/** A black cut-out of the picture (an avatar the player has not unlocked) */
+	/** A dark, grey version of the picture with a question mark (an avatar the player has not unlocked); the face stays hidden */
 	locked?: boolean;
 	scale?: number;
 	className?: string;
@@ -21,11 +21,7 @@ const AvatarArt: React.FC<AvatarArtProps> = ({ id, playerClass = DEFAULT_PLAYER_
 	// the portraits are 64x64; `scale` 1 is the 40 px bust size of the old class busts, so every use keeps its layout
 	const size = Math.round(40 * scale);
 	return (
-		<span
-			className={className}
-			style={{ display: 'inline-flex', lineHeight: 0, filter: locked ? 'brightness(0) opacity(0.55)' : undefined }}
-			aria-hidden={locked}
-		>
+		<span className={className} style={{ position: 'relative', display: 'inline-flex', lineHeight: 0 }} aria-hidden={locked}>
 			<Image
 				src={avatarArtUrl(avatar)}
 				alt={locked ? '' : avatar.name}
@@ -34,7 +30,27 @@ const AvatarArt: React.FC<AvatarArtProps> = ({ id, playerClass = DEFAULT_PLAYER_
 				unoptimized
 				draggable={false}
 				className='pixelated shrink-0 select-none'
+				style={locked ? { filter: 'grayscale(1) brightness(0.18) contrast(0.9)' } : undefined}
 			/>
+			{locked && (
+				<span
+					aria-hidden='true'
+					style={{
+						position: 'absolute',
+						inset: 0,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontFamily: 'var(--font-pixel)',
+						fontSize: Math.round(size * 0.5),
+						lineHeight: 1,
+						color: '#a89878',
+						textShadow: '0 2px 0 #000',
+					}}
+				>
+					?
+				</span>
+			)}
 		</span>
 	);
 };

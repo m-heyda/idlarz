@@ -278,6 +278,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/config/**
 
+- [`biomeArt.ts`](../../src/config/biomeArt.ts) — ~ The picture of each rebirth biome:
 - [`biomePalette.ts`](../../src/config/biomePalette.ts) — One colour per biome, the single place for them:
 - [`biomeRules.ts`](../../src/config/biomeRules.ts) — How the map grows:
 - [`biomeStage.ts`](../../src/config/biomeStage.ts) — Which biomes are part of the game today and which exist only for development (the map lab).
@@ -785,6 +786,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)

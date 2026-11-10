@@ -17,6 +17,7 @@ import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
 import { AVATARS } from '../../src/catalog/avatars';
 import { GUIDE_SPRITE, GUIDE_TALK_SHEET } from '../../src/catalog/tutorial';
+import { BIOME_ART } from '../../src/config/biomeArt';
 import { ITEMS } from '../../src/catalog/items';
 import { RESOURCE_ART, resourceArtUrl } from '../../src/catalog/resourceArt';
 import {
@@ -42,6 +43,7 @@ export type AssetCategory =
 	| 'map-details'
 	| 'ui'
 	| 'portraits'
+	| 'biomes'
 	| 'unsorted';
 /**
  * used = live in the game now (enabled item, monster or resource; icon referenced by code); planned = its item/monster/resource exists but is disabled; retired = item no longer drops, old saves keep it; unused = registered art that nothing references (an icon no item uses, an icon no code mentions);
@@ -89,6 +91,12 @@ export const CATEGORIES: readonly { id: AssetCategory; title: string; blurb: str
 		title: 'Portraits',
 		blurb:
 			'NPC faces (48px busts): merchant, quest giver, gambler, blacksmith, innkeepers and more. A few stand behind the merchant counter, the rest are ready for quests and dialogue.',
+	},
+	{
+		id: 'biomes',
+		title: 'Biomes',
+		blurb:
+			'Framed 80px landscape vignettes per biome (Sprite Fusion). One per rebirth biome is shown in the "New land unlocked" window; the rest are alternatives, the older biomes and extras.',
 	},
 	{ id: 'unsorted', title: 'Unsorted cuts', blurb: 'Loose cuts in public/pixel/reuse, not classified yet.' },
 ];
@@ -454,6 +462,21 @@ export const buildManifest = (): AssetEntry[] => {
 		usedBy: ['tutorial:guide'],
 		source: 'scripts/guide-sprite.ts',
 	});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'biomes')))
+		if (f.endsWith('.png')) {
+			const name = basename(f, '.png');
+			const biome = name.replace(/^biome_/, '').replace(/_\d+$/, '');
+			const inGame = Object.values(BIOME_ART).includes(name);
+			add({
+				name: snake(basename(f)),
+				category: 'biomes',
+				subcategory: biome.startsWith('extra_') ? 'extras (no such biome in the game)' : inGame ? `${biome} (in the game)` : `${biome} (alternatives)`,
+				src: url(f),
+				status: inGame ? 'used' : 'reuse',
+				usedBy: inGame ? ['RebirthUnlockModal'] : [],
+				source: 'new_assets/biomes',
+			});
+		}
 	for (const f of walk(join(PUBLIC, 'pixel', 'reuse'))) {
 		const kind = relative(join(PUBLIC, 'pixel', 'reuse'), f).split(sep)[0];
 		if (url(f) === GUIDE_SPRITE) {
