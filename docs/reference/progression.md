@@ -16,7 +16,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_DEFAULT_AVATAR`](#class-default-avatar), [Avatars](#avatarinfo)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
 - Achievements: [`settleAchievements`](#settleachievements), [Achievements](#achievements)
-- Guided tutorial: [`guideLive`](#guidelive), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
+- Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
 ## Levels
 
@@ -621,14 +621,15 @@ See also: [`settleAchievements`](progression.md#settleachievements), `achievemen
 
 ## Guided tutorial
 
-<a id="guidelive"></a>
+<a id="guidevisiblefor"></a>
 
-### `guideLive` <small>function</small>
+### `guideVisibleFor` <small>function</small>
 
-Source: [`src/lib/tutorial/live.ts:10`](../../src/lib/tutorial/live.ts)
+Source: [`src/lib/tutorial/live.ts:35`](../../src/lib/tutorial/live.ts)
 
-Whether Brother Alder is on at all. The tutorial ships dark with the new chapter: until `GAME_EPOCH` is raised (the release flip, IDL-253) nobody sees it, so accounts that are
-playing the old chapter get no bubbles. To try it on a build before the flip, set `NEXT_PUBLIC_GUIDE=on`.
+Whether Brother Alder is **shown** (the bubbles, the focus layer, the journal tab). That is `guideLiveFor`, and also every build that is not the production site: localhost
+(`next dev`, `NODE_ENV` is not 'production') and Vercel previews (`NEXT_PUBLIC_VERCEL_ENV` is 'preview' or 'development'), so the tutorial can be tried without touching `GAME_EPOCH`.
+The production deployment shows it only after the flip. `NEXT_PUBLIC_GUIDE=on` forces it on anywhere (set it in `.env.local` or the host's environment); `NEXT_PUBLIC_GUIDE=off` is not special.
 
 <a id="buildnumbers"></a>
 
@@ -676,9 +677,9 @@ account's progress has arrived; a target that is not on screen shows the bubble 
 
 ### The guided tutorial
 
-Source: [`src/catalog/tutorial.ts:131`](../../src/catalog/tutorial.ts)
+Source: [`src/catalog/tutorial.ts:133`](../../src/catalog/tutorial.ts)
 
-The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It ships dark: nothing is shown until `GAME_EPOCH` is raised (the new chapter release), or on a build with `NEXT_PUBLIC_GUIDE=on` ([`guideLive`](progression.md#guidelive)).
+The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ([`guideVisibleFor`](progression.md#guidevisiblefor)).
 
 - **Intro**: on the first start of a chapter the screen dims and Alder speaks three short bubbles. **Starter path**: eight steps in the order of [`TUTORIAL_PATH`](progression.md#tutorial-path). The first step that is *ready* and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. **Milestone lessons** (`TUTORIAL_LESSONS`) fire the first time something is reached, in any order, after the path; each is kept in the Guide's journal tab (locked ones read '???').
 - **Focus**: `strict` dims and blurs the whole game with a cut-out around the `data-tutorial` target and blocks every click outside it (the intro and the first two steps); `soft` only dims. A target that is not on screen shows the bubble alone and never blocks the game. **Skip** is on every bubble and ends the starter path (lessons still come); the guide can be switched off in Settings.
@@ -716,4 +717,4 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 | `rebirth-embers` | Rebirth and Embers | `rebirth-button` |
 | `auto-battle` | Auto-battle | none |
 
-See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideLive`](progression.md#guidelive)
+See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideVisibleFor`](progression.md#guidevisiblefor)

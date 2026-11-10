@@ -336,12 +336,12 @@
   "kind": "const",
   "category": "Progression/Guided tutorial",
   "file": "src/catalog/tutorial.ts",
-  "line": 131,
-  "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It ships dark: nothing is shown until `GAME_EPOCH` is raised (the new chapter release), or on a build with `NEXT_PUBLIC_GUIDE=on` ({@link guideLive}).",
+  "line": 133,
+  "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ({@link guideVisibleFor}).",
   "see": [
    "applyTutorial",
    "buildNumbers",
-   "guideLive"
+   "guideVisibleFor"
   ]
  },
  {
@@ -384,6 +384,17 @@
   "file": "src/components/game/tutorial/TutorialGuide.tsx",
   "line": 39,
   "summary": "Brother Alder, the tutorial guide. Mounted once in the game (GameApp). It counts the few events the state does not keep (map clicks, chests opened, fights won), evaluates the triggers twice a second (`lib/tutorial/engine.ts`), records finished steps and fired lessons on the account (the server may pay a starter bundle), and draws the bubble and the focus layer for the beat that is on show. Nothing is drawn while the guide is dark (`guideLive`), switched off in Settings, or before the account's progress has arrived; a target that is not on screen shows the bubble alone and never blocks the game.",
+  "see": []
+ },
+ {
+  "id": "biome-art",
+  "name": "BIOME_ART",
+  "symbol": "BIOME_ART",
+  "kind": "const",
+  "category": "Architecture/Art",
+  "file": "src/config/biomeArt.ts",
+  "line": 11,
+  "summary": "The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in `public/pixel/new_assets/biomes/`. Today only the \"New land unlocked\" window shows them (`RebirthUnlockModal`); the other vignettes of the folder (alternatives, the older biomes and three extras) wait in the asset library, category Biomes. The file name is `biome_<name>.png`; change the value here to use another one.",
   "see": []
  },
  {
@@ -821,7 +832,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 251,
+  "line": 257,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -832,7 +843,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 266,
+  "line": 272,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },
@@ -2253,14 +2264,14 @@
   "see": []
  },
  {
-  "id": "guidelive",
-  "name": "guideLive",
-  "symbol": "guideLive",
+  "id": "guidevisiblefor",
+  "name": "guideVisibleFor",
+  "symbol": "guideVisibleFor",
   "kind": "function",
   "category": "Progression/Guided tutorial",
   "file": "src/lib/tutorial/live.ts",
-  "line": 10,
-  "summary": "Whether Brother Alder is on at all. The tutorial ships dark with the new chapter: until `GAME_EPOCH` is raised (the release flip, IDL-253) nobody sees it, so accounts that are playing the old chapter get no bubbles. To try it on a build before the flip, set `NEXT_PUBLIC_GUIDE=on`.",
+  "line": 35,
+  "summary": "Whether Brother Alder is **shown** (the bubbles, the focus layer, the journal tab). That is `guideLiveFor`, and also every build that is not the production site: localhost (`next dev`, `NODE_ENV` is not 'production') and Vercel previews (`NEXT_PUBLIC_VERCEL_ENV` is 'preview' or 'development'), so the tutorial can be tried without touching `GAME_EPOCH`. The production deployment shows it only after the flip. `NEXT_PUBLIC_GUIDE=on` forces it on anywhere (set it in `.env.local` or the host's environment); `NEXT_PUBLIC_GUIDE=off` is not special.",
   "see": []
  },
  {
