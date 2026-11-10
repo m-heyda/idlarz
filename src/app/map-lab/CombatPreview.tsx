@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { BIOMES } from '@/config/biomes';
-import { MONSTER_CATALOG } from '@/catalog/monsters';
+import { labMonsters } from '@/catalog/monsters';
 import { hitNumberText } from '@/lib/combatFx';
 import { slashFor, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import CombatPanel, { type FloatNumber } from '@/components/game/overlays/CombatPanel';
@@ -12,9 +12,8 @@ import type { MonsterType } from '@/types/game';
 import { useLabStore } from '@/stores/labStore';
 import type { FightView } from '@/lib/offline/fightTypes';
 
-/** Same list as the lab's spawn dropdown: roster monsters with finished art that are not enabled yet (once every monster with art is enabled, all of them, so the lab always has one to show) */
-const NOT_ENABLED = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
-export const WIP_MONSTERS = NOT_ENABLED.length > 0 ? NOT_ENABLED : MONSTER_CATALOG.filter((m) => m.art);
+/** Same list as the lab's spawn dropdown (catalog/monsters.ts `labMonsters`): never empty */
+export const WIP_MONSTERS = labMonsters();
 
 const noop = () => {};
 

@@ -97,7 +97,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/map-lab/**
 
-- [`CombatPreview.tsx`](../../src/app/map-lab/CombatPreview.tsx) — ~ Same list as the lab's spawn dropdown:
+- [`CombatPreview.tsx`](../../src/app/map-lab/CombatPreview.tsx) — ~ Same list as the lab's spawn dropdown (catalog/monsters.ts `labMonsters`):
 - [`LabPanel.tsx`](../../src/app/map-lab/LabPanel.tsx)
 
 **src/app/map-lab/landing-bake/**
