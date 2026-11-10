@@ -249,7 +249,7 @@ Rarities: everything the game knows about one, in one place: label, colour, glow
 
 ### `levelScale` <small>function</small>
 
-Source: [`src/catalog/stats.ts:195`](../../src/catalog/stats.ts)
+Source: [`src/catalog/stats.ts:211`](../../src/catalog/stats.ts)
 
 Power multiplier of an item level (1 at level 1).
 
@@ -267,7 +267,7 @@ stats(instance) = baseStats x levelScale(L) / levelScale(minItemLevel) x (1 + (q
 
 ### `valueCurve` <small>function</small>
 
-Source: [`src/catalog/stats.ts:168`](../../src/catalog/stats.ts)
+Source: [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts)
 
 Value multiplier of an item level (1 at level 1).
 

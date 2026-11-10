@@ -10,6 +10,8 @@ export interface LimitContext {
 	prestige?: PrestigeState;
 	/** What the worn gear's set bonuses add to the away-time limits (lib/gearEconomy.ts) */
 	gear?: { offlineEff: number; offlineCapHours: number };
+	/** Bag slots the worn belt gives (the `bagSlots` stat): the server keeps the most it has ever held (`Inventory.beltSlots`) */
+	beltSlots?: number;
 	/** The hero class: the Paladin adds offline efficiency (lib/classPassives.ts) */
 	playerClass?: unknown;
 	/** Validation only: use the hard ceilings (`HARD_LIMITS`) where there are any instead of the current value */
@@ -21,7 +23,7 @@ export interface LimitContext {
  * data so a test can register a bonus and prove that all the places that read the limit react to it.
  */
 export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } = {
-	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat') + emberEffect(ctx.prestige, 'deeppockets'),
+	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat') + emberEffect(ctx.prestige, 'deeppockets') + Math.max(0, Math.floor(ctx.beltSlots ?? 0)),
 	offlineCapHours: (ctx) => emberEffect(ctx.prestige, 'nightwatch') + (ctx.gear?.offlineCapHours ?? 0),
 	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward') + ((ctx.gear?.offlineEff ?? 0) + classPassives(ctx.playerClass).offlineEffPct) / 100,
 };
@@ -33,6 +35,11 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
  * @order 2
  * @formula
  * limit = LIMITS[key] + LIMIT_BONUSES[key](context)           or HARD_LIMITS[key] with ctx.hardCap
+ * bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat + Deep Pockets + belt bag slots)
  */
-export const limitOf = (key: LimitKey, ctx: LimitContext = {}): number =>
-	ctx.hardCap && key in HARD_LIMITS ? HARD_LIMITS[key as keyof typeof HARD_LIMITS] : LIMITS[key] + (LIMIT_BONUSES[key]?.(ctx) ?? 0);
+export const limitOf = (key: LimitKey, ctx: LimitContext = {}): number => {
+	if (ctx.hardCap && key in HARD_LIMITS) return HARD_LIMITS[key as keyof typeof HARD_LIMITS];
+	const value = LIMITS[key] + (LIMIT_BONUSES[key]?.(ctx) ?? 0);
+	// the bag is the one limit whose bonuses come from several uncapped sources (a belt next to Pack Rat and Deep Pockets): it never goes past the ceiling a save may hold
+	return key === 'bagSize' ? Math.min(value, HARD_LIMITS.bagSize) : value;
+};

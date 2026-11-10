@@ -10,7 +10,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Attributes: [`CHARACTER_STAT_CONFIG`](#character-stat-config), [`calculateStatResourceModifiers`](#calculatestatresourcemodifiers), [`calculateCombatStats`](#calculatecombatstats)
 - Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`rebirthUnlockIntro`](#rebirthunlockintro)
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
-- Limits: [`LIMITS`](#limits), [`limitOf`](#limitof)
+- Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
@@ -340,7 +340,7 @@ See also: [`limitOf`](progression.md#limitof)
 
 ### `limitOf` <small>function</small>
 
-Source: [`src/lib/limits.ts:37`](../../src/lib/limits.ts)
+Source: [`src/lib/limits.ts:40`](../../src/lib/limits.ts)
 
 The current value of a limit: its base plus the registered bonuses.
 
@@ -348,6 +348,22 @@ The current value of a limit: its base plus the registered bonuses.
 
 ```text
 limit = LIMITS[key] + LIMIT_BONUSES[key](context)           or HARD_LIMITS[key] with ctx.hardCap
+bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat + Deep Pockets + belt bag slots)
+```
+
+<a id="beltslotsfor"></a>
+
+### `beltSlotsFor` <small>function</small>
+
+Source: [`src/lib/offline/inventory.ts:63`](../../src/lib/offline/inventory.ts)
+
+The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up,
+so taking a belt off, or a rebirth, never shrinks the bag below the items in it.
+
+**Formula**
+
+```text
+beltSlots = max(Inventory.beltSlots, bagSlots of the worn gear)
 ```
 
 ## Gems

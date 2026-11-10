@@ -12,6 +12,7 @@ import {
 	maxHp,
 	maxMana,
 } from '@/lib/combat';
+import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/potionBelt';
 import { critDamagePercent } from '@/lib/statBonuses';
 import { classPassives, withClassBonus } from '@/lib/classPassives';
 import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
@@ -65,6 +66,10 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		/** % chance that a crit becomes a super crit */
 		superCritChance: odds.superCrit * 100,
 		superCritMultiplier: COMBAT.crit.superMult * critExtra,
+		/** The belt's numbers: the shared potion cooldown in seconds, % more healing from a potion and the potion stacks on the hotkey bar (lib/potionBelt.ts) */
+		potionCooldownSec: potionCooldownSec(gear),
+		potionPower: (potionPower(gear) - 1) * 100,
+		potionSlots: potionSlotCount(gear),
 		luck,
 		/** % more chests than without Luck */
 		chestRateBonus: chestRateBonusPct(luck, passives.chestSpeedPct),

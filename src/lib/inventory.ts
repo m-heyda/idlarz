@@ -35,8 +35,9 @@ export const starterBag = (): BagSlot[] => STARTER_BAG_ITEMS.reduce((bag, { id, 
 export const rebirthKit = (
 	merchantUpgrades: Record<string, number> | undefined,
 	prestige?: PrestigeState,
+	beltSlots = 0,
 ): { equipment: Equipment; bag: BagSlot[]; lootPity: Record<string, number> } => {
-	const size = limitOf('bagSize', { merchantUpgrades, prestige });
+	const size = limitOf('bagSize', { merchantUpgrades, prestige, beltSlots });
 	const bag = starterBag();
 	return {
 		equipment: { ...STARTER_EQUIPMENT },

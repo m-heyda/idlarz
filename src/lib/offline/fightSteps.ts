@@ -5,7 +5,7 @@ import { quickHealOf } from '@/catalog/buffs';
 import { armorReduction, mitigate, swing } from '@/lib/combat';
 import { isBoss, monsterStats } from '@/lib/monsters';
 import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
-import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
+import type { CombatCommand, PlayerProfile, QueueResult } from '@/lib/offline/fightTypes';
 import { engageTicket, queueTicket, restFor, unqueueTicket } from '@/lib/offline/fightTargets';
 import { takeOne } from '@/lib/offline/inventory';
 import { payKill } from '@/lib/offline/reward';
@@ -21,15 +21,21 @@ const tickCooldowns = (ctx: FightCtx, dt: number): void => {
 	c.cd = { heal: Math.max(0, c.cd.heal - dt), stun: Math.max(0, c.cd.stun - dt), potion: Math.max(0, c.cd.potion - dt) };
 };
 
+/** The profile a potion is judged on: the open fight's frozen numbers, else the saved ones. */
+const profileOf = (ctx: FightCtx): PlayerProfile => (ctx.c.fight ? ctx.c.fight.profile : ctx.profileNow);
+
+/** What a potion restores for this hero: its HP times the belt's Potion Power. */
+const potionHeal = (ctx: FightCtx, id: string): number => quickHealOf(ITEM_CATALOG[id]) * (profileOf(ctx).potionPower ?? 1);
+
 export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	const c = ctx.c;
-	const healHp = quickHealOf(ITEM_CATALOG[id]);
+	const healHp = potionHeal(ctx, id);
 	if (!healHp || stockOf(ctx, id) < 1 || c.hp >= maxHpNow(ctx) - EPS) return false;
 	if (c.fight && c.cd.potion > 0) return false;
 	const healed = Math.min(healHp, maxHpNow(ctx) - c.hp);
 	c.hp += healed;
 	ctx.ledger = { ...ctx.ledger, inv: takeOne(ctx.ledger.inv!, id) ?? ctx.ledger.inv! };
-	if (c.fight) c.cd.potion = COMBAT.potionCooldownSec;
+	if (c.fight) c.cd.potion = profileOf(ctx).potionCooldownSec ?? COMBAT.potionCooldownSec;
 	pushEvent(ctx, t, 'potion', { id, amount: Math.round(healed) });
 	return true;
 };
@@ -59,7 +65,7 @@ export const cast = (ctx: FightCtx, t: number, id: SkillId): boolean => {
 };
 
 /**
- * Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready.
+ * Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.
  *
  * @category Combat/Potions and skills
  * @order 3
@@ -69,8 +75,8 @@ export const autoUse = (ctx: FightCtx, t: number): void => {
 	const hpPct = (c.hp / maxHpNow(ctx)) * 100;
 	if (c.cd.potion <= 0 && hpPct < COMBAT.auto.potionBelowHpPct) {
 		const missing = maxHpNow(ctx) - c.hp;
-		const options = ctx.potionIds.filter((id) => stockOf(ctx, id) > 0).sort((a, b) => quickHealOf(ITEM_CATALOG[a]) - quickHealOf(ITEM_CATALOG[b]));
-		const fit = options.find((id) => quickHealOf(ITEM_CATALOG[id]) >= missing) ?? options[options.length - 1];
+		const options = ctx.potionIds.filter((id) => stockOf(ctx, id) > 0).sort((a, b) => potionHeal(ctx, a) - potionHeal(ctx, b));
+		const fit = options.find((id) => potionHeal(ctx, id) >= missing) ?? options[options.length - 1];
 		if (fit) drink(ctx, t, fit);
 	}
 	if (hpPct < COMBAT.auto.healBelowHpPct) cast(ctx, t, 'heal');

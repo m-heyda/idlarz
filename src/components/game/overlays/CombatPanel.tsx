@@ -173,8 +173,11 @@ export interface CombatPanelProps {
 	snapKey: unknown;
 	player: { hp: number; maxHp: number; mp: number; maxMp: number; level: number };
 	cd: Cooldowns;
-	/** Up to three potion stacks (hotkeys 1-3) */
+	/** The potion stacks on the hotkey bar (keys 1..N, N = `potionSlots`) */
 	potions: { slot: BagSlot }[];
+	/** Potion stacks on the bar and the shared potion cooldown in seconds, both shaped by the belt (lib/potionBelt.ts); the base values when left out (the lab) */
+	potionSlots?: number;
+	potionCooldownSec?: number;
 	autoBattle: boolean;
 	autoLocked: boolean;
 	autoUse: boolean;
@@ -238,11 +241,11 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 									className='fight-skill'
 									data-locked={locked}
 									data-nomana={!locked && player.mp < skill.manaCost}
-									title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${4 + i} or click.`}
+									title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${(p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i} or click.`}
 								>
 									<span className='fight-skill-name'>{skill.name}</span>
 									<span className='fight-skill-cost'>{locked ? `Lv ${skill.unlockLevel}` : `${skill.manaCost} MP`}</span>
-									<span className='fight-hotkey'>{4 + i}</span>
+									<span className='fight-hotkey'>{(p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i}</span>
 									{!locked && left > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />}
 								</button>
 							);
@@ -260,7 +263,12 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 							>
 								<ItemSlot {...slotProps(slot)} />
 								<span className='fight-hotkey'>{i + 1}</span>
-								{cd.potion > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (cd.potion / COMBAT.potionCooldownSec) * 100)}%` }} />}
+								{cd.potion > 0 && (
+									<span
+										className='fight-cooldown'
+										style={{ height: `${Math.min(100, (cd.potion / (p.potionCooldownSec ?? COMBAT.potionCooldownSec)) * 100)}%` }}
+									/>
+								)}
 							</button>
 						))}
 					</div>
