@@ -71,30 +71,45 @@ export function buildingMenuItems(game: MapGameStore, x: number, y: number): Con
 		];
 	}
 
-	const items: ContextMenuItem[] = [];
+	// "Build here..." opens a short list of the buildings of this biome: the ones already standing are greyed out ("Built"), the rest show what is missing or what they cost
+	const children: ContextMenuItem[] = [];
+	const moves: ContextMenuItem[] = [];
 	for (const def of buildingsOfBiome(tile.biome)) {
+		const kind = def.kind === 'extractor' ? 'Extractor' : 'Producer';
 		const elsewhere = builtBuildings(s.tiles).find((b) => b.id === def.id);
 		if (elsewhere) {
+			children.push({
+				id: `building-build-${def.id}`,
+				label: `${def.label} (${kind})`,
+				disabled: true,
+				hint: 'Built',
+				tooltip: `The ${def.label} already stands on another tile`,
+				onSelect: () => {},
+			});
 			const cost = relocationCost(elsewhere.level, ctx.ownedTiles);
 			const problem = moveProblem(ctx, elsewhere.x, elsewhere.y, x, y) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
-			items.push({
+			moves.push({
 				id: `building-move-${def.id}`,
-				label: `Move ${def.label} here (${costText(cost)})`,
+				label: `Move ${def.label} here`,
+				separator: moves.length === 0,
 				disabled: !!problem,
-				hint: problem ?? undefined,
+				hint: problem ?? 'half price',
+				tooltip: `Move it here for ${costText(cost)}, level kept`,
 				onSelect: () => void game.getState().moveBuilding?.(elsewhere.x, elsewhere.y, x, y),
 			});
 		} else {
 			const cost = buildingLevelCost(1, ctx.ownedTiles);
 			const problem = buildProblem(ctx, x, y, def.id) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
-			items.push({
+			children.push({
 				id: `building-build-${def.id}`,
-				label: `Build ${def.label} (${costText(cost)})`,
+				label: `${def.label} (${kind})`,
 				disabled: !!problem,
 				hint: problem ?? undefined,
+				tooltip: `${def.blurb} Costs ${costText(cost)}.`,
 				onSelect: () => void game.getState().buildBuilding?.(x, y, def.id),
 			});
 		}
 	}
-	return items;
+	if (children.length === 0) return [];
+	return [{ id: 'building-here', label: 'Build here...', onSelect: () => {}, children: [...children, ...moves] }];
 }

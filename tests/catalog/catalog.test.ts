@@ -138,8 +138,11 @@ test('the stored resource keys come from the catalog, in the order saves have al
 	const { FARM_PRODUCT_KEYS } = await import('../../src/config/farm');
 	const { zeroTotals } = await import('../../src/lib/offline/ledger');
 	// a snapshot: adding a resource changes this list on purpose, never by accident
-	assert.deepEqual([...STORED_KEYS], ['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'xp']);
-	assert.deepEqual([...OPTIONAL_KEYS], ['eggs', 'milk', 'hide']);
+	assert.deepEqual(
+		[...STORED_KEYS],
+		['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'xp', 'herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt'],
+	);
+	assert.deepEqual([...OPTIONAL_KEYS], ['eggs', 'milk', 'hide', 'herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt']);
 	assert.deepEqual([...FARM_KEYS], ['meat', 'eggs', 'milk', 'hide']);
 	assert.deepEqual([...FARM_PRODUCT_KEYS], ['eggs', 'milk', 'hide']);
 	for (const table of [INITIAL_RESOURCES, BASE_GENERATION_RATES, CASTLE_BASE_RATES, zeroResources()]) assert.deepEqual(Object.keys(table), [...STORED_KEYS]);

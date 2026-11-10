@@ -63,13 +63,13 @@ export const RESOURCE_ART: readonly ResourceArtEntry[] = [
 	planned('medals', 'War Medals', 't2', 'battlefield', false),
 
 	// T3 extracts, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md)
-	planned('herbs', 'Herbs', 't3', 'plains', true),
-	planned('sap', 'Sap', 't3', 'forest', true),
-	planned('ironOre', 'Iron Ore', 't3', 'hills', true), // the same picture is the reserved `iron` icon (res_iron)
-	planned('spores', 'Spores', 't3', 'swamp', true),
-	planned('frostshard', 'Frostshard', 't3', 'tundra', true),
-	planned('pearls', 'Pearls', 't3', 'lake', true),
-	planned('salt', 'Salt', 't3', 'coast', true),
+	live('herbs', 'Herbs', 't3'),
+	live('sap', 'Sap', 't3'),
+	live('ironOre', 'Iron Ore', 't3'),
+	live('spores', 'Spores', 't3'),
+	live('frostshard', 'Frostshard', 't3'),
+	live('pearls', 'Pearls', 't3'),
+	live('salt', 'Salt', 't3'),
 	planned('venom', 'Venom', 't3', 'jungle', false),
 	planned('dye', 'Dye', 't3', 'fields', true),
 	planned('royalJelly', 'Royal Jelly', 't3', 'orchard', false),

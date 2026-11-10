@@ -16,7 +16,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
-- Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`buildingLevelCost`](#buildinglevelcost)
+- Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`buildingLevelCost`](#buildinglevelcost)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
@@ -46,7 +46,7 @@ What the game does is read from the code; every number below is computed from th
 | Income with nothing built | gold 0.1, xp 0.25 per second | `BASE_GENERATION_RATES` |
 | Castle position | (25, 25) | `CASTLE_X`, `CASTLE_Y` |
 | Map size | unbounded; coordinates within +-16 K, at most 250 K owned tiles | `COORD_LIMIT`, `MAX_OWNED_TILES` |
-| Resource tiers | Currency: gold, gems, embers; Base materials: wood, stone, coal, food, meat; Farm products: eggs, milk, hide; Biome goods: none yet; Extracts: none yet; Relics: none yet | `RESOURCE_TIERS` |
+| Resource tiers | Currency: gold, gems, embers; Base materials: wood, stone, coal, food, meat; Farm products: eggs, milk, hide; Biome goods: none yet; Extracts: herbs, sap, ironOre, spores, frostshard, pearls, salt; Relics: none yet | `RESOURCE_TIERS` |
 
 See also: [`MAX_CATCHUP_SEC`](economy.md#max-catchup-sec), [`RESOURCE_CAP`](economy.md#resource-cap), [`BASE_GENERATION_RATES`](economy.md#base-generation-rates), [`INITIAL_RESOURCES`](economy.md#initial-resources)
 
@@ -106,7 +106,7 @@ base[r]  = BASE_GENERATION_RATES[r]
          + 0.5 x (castle level - 1)                      (xp only)
 modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
 total[r] = base[r] x (1 + modifier[r])
-         + sum over Producers (buildings flag on) of {@link producerOutput}   (counted with the biome tiles)
+         + sum over Producers and Extractors (buildings flag on) of {@link buildingOutput}   (counted with the biome tiles)
 ```
 
 See also: [`calculateTileOutput`](economy.md#calculatetileoutput), [`castleModifier`](economy.md#castlemodifier), [`castleAreaBonus`](economy.md#castleareabonus), [`calculateFarmOutput`](economy.md#calculatefarmoutput)
@@ -234,7 +234,7 @@ discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discou
 
 ### `calculateXpGain` <small>function</small>
 
-Source: [`src/utils/game/character.ts:84`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:85`](../../src/utils/game/character.ts)
 
 Calculate XP gain scaling based on owned tiles
 The more tiles owned, the more XP gained
@@ -971,9 +971,9 @@ Source: [`src/config/buildings.ts:17`](../../src/config/buildings.ts)
 The per-biome building system (R7, IDL-91, IDL-92), behind [`BUILDINGS_FLAG`](economy.md#buildings-flag), which is **ON** (owner decision: live on merge). Switching it off is the rollback: the game, the save format, the server checks and the sim are then byte-identical to a build
 that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
 
-What is in this first slice (Producers only, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
+What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
 the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share **one builder** (one timer at a time);
-a building can be **moved** for half its cost. Extractors (IDL-94), Idols, the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
+a building can be **moved** for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
 
 **Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrade is the optional top-level `buildingUpgrade` (`{ x, y, toLevel, remainingSec }`, like `castleUpgrade`). They are
 written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No `SAVE_SCHEMA` bump. The server derives income from the saved map
@@ -985,13 +985,14 @@ See also: `producerBonus`, [`buildingUpgradeDuration`](economy.md#buildingupgrad
 
 ### `BUILDING_RULES` <small>const</small>
 
-Source: [`src/config/buildings.ts:32`](../../src/config/buildings.ts)
+Source: [`src/config/buildings.ts:33`](../../src/config/buildings.ts)
 
 The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).
 
 - `maxLevel`: the base level cap, 5. Level `L` can only be bought while the castle is at least level `L` (`min(5, castle level)`).
 - `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once.
 - `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
+- `extractor`: a level 1 Extractor makes `baseRate` (0.3) of its T3 material per second, before the global modifiers; each level above 1 adds `levelStep` (+40 %) of that; it grows with the size of its biome like the Producer (same `perOwnedTile` and `bonusCap`). It has no gold or wood side effects: the material is for crafting and later building upgrades, and the merchant never trades it.
 - `cost`: level 1 costs `tilePrices` (14) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ([`calculateTileCost`](economy.md#calculatetilecost)).
 - `relocateShare`: moving a building costs this share (50 %) of what its current level cost to reach, at today's prices; it is instant and keeps the level.
 
@@ -1011,10 +1012,10 @@ The numbers of the building system (proposals from docs/plan/18, tuned with the 
 
 Source: [`src/catalog/buildings.ts:29`](../../src/catalog/buildings.ts)
 
-The Producer of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
+The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
 tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.
 
-**The Producers (one per home biome, level 1, with 0 and 25 owned tiles of the biome)** _(computed from the code)_
+**The Producers and Extractors (one of each per home biome, level 1, with 0 and 25 owned tiles of the biome)** _(computed from the code)_
 
 | Building | Biome | Makes per second at 0 biome tiles | at 25 biome tiles |
 | --- | --- | --- | --- |
@@ -1025,6 +1026,13 @@ tiles' worth, so the land under it decides what it is good at. The sprite is fir
 | Coal Pit | Tundra | coal 6.83, gold 1.95 | coal 10.2, gold 2.93 |
 | Fishery | Lake | food 4.88, gold 0.975 | food 7.31, gold 1.46 |
 | Harbor | Coast | gold 1.95, food 3.9 | gold 2.93, food 5.85 |
+| Herb Garden | Plains | herbs 0.3 | herbs 0.45 |
+| Sap Tapper | Forest | sap 0.3 | sap 0.45 |
+| Deep Mine | Hills | ironOre 0.3 | ironOre 0.45 |
+| Spore Cellar | Swamp | spores 0.3 | spores 0.45 |
+| Ice Cutter | Tundra | frostshard 0.3 | frostshard 0.45 |
+| Pearl Diver | Lake | pearls 0.3 | pearls 0.45 |
+| Salt Works | Coast | salt 0.3 | salt 0.45 |
 
 <a id="produceroutput"></a>
 
@@ -1038,6 +1046,22 @@ What a Producer of level `level` makes per second, before the global modifiers (
 
 ```text
 output[r] = tileEquivalents x biome tile rate[r] x BIOME_YIELD.scale x (1 + levelStep x (level - 1)) x (1 + min(bonusCap, perOwnedTile x owned tiles of the biome))
+```
+
+See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`
+
+<a id="extractoroutput"></a>
+
+### `extractorOutput` <small>function</small>
+
+Source: [`src/lib/buildingOutput.ts:42`](../../src/lib/buildingOutput.ts)
+
+What an Extractor of level `level` makes per second, before the global modifiers: its T3 material at `extractor.baseRate`, grown by level and by the size of its biome.
+
+**Formula**
+
+```text
+output = baseRate x (1 + levelStep x (level - 1)) x (1 + min(bonusCap, perOwnedTile x owned tiles of the biome))
 ```
 
 See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`

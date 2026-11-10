@@ -9,7 +9,7 @@ import { castleAreaBonus, castleRangeRadius, inCastleRange } from '@/lib/castleW
 import { biomeCount, forEachOwned, getTile, type World } from '@/utils/world';
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { buildingDef } from '@/catalog/buildings';
-import { producerOutput } from '@/lib/buildingOutput';
+import { buildingOutput } from '@/lib/buildingOutput';
 import { castleModifier } from '@/utils/game/castle';
 import { calculateStatResourceModifiers } from '@/utils/game/character';
 import { calculateFarmOutput, type FarmUpgrades } from '@/utils/game/farm';
@@ -121,7 +121,7 @@ export const calculateTileOutput = (tiles: World, x: number, y: number, castleLe
  *          + 0.5 x (castle level - 1)                      (xp only)
  * modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
  * total[r] = base[r] x (1 + modifier[r])
- *          + sum over Producers (buildings flag on) of {@link producerOutput}   (counted with the biome tiles)
+ *          + sum over Producers and Extractors (buildings flag on) of {@link buildingOutput}   (counted with the biome tiles)
  * @see calculateTileOutput, castleModifier, castleAreaBonus, calculateFarmOutput
  */
 export const calculateResourceBreakdown = (
@@ -187,7 +187,7 @@ export const calculateResourceBreakdown = (
 		forEachOwned(tiles, (tile) => {
 			const def = buildingDef(tile.building);
 			if (!def) return;
-			for (const [resource, gain] of Object.entries(producerOutput(def, tile.buildingLevel ?? 1, biomeCount(tiles, def.biome)))) {
+			for (const [resource, gain] of Object.entries(buildingOutput(def, tile.buildingLevel ?? 1, biomeCount(tiles, def.biome)))) {
 				base[resource as keyof Resources] += gain;
 				biomePart[resource as keyof Resources] += gain;
 			}

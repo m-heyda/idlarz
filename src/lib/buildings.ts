@@ -10,7 +10,7 @@ import type { BuildingUpgradeState, CastleUpgradeState, Monster, PrestigeState, 
 /** Whether the building system is switched on (`BUILDINGS_FLAG`, off by default). Every entry point of the system asks this first. */
 export const buildingsEnabled = (): boolean => BUILDINGS_FLAG.enabled;
 
-export { producerBonus, producerOutput } from '@/lib/buildingOutput';
+export { buildingOutput, extractorOutput, producerBonus, producerOutput } from '@/lib/buildingOutput';
 
 /** The highest level a building can be bought to at this castle level: `min(maxLevel, castle level)`. */
 export const buildingLevelCap = (castleLevel: number): number => Math.min(BUILDING_RULES.maxLevel, Math.max(1, Math.floor(castleLevel)));

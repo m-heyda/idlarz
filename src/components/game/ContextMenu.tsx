@@ -80,9 +80,20 @@ const ContextMenu: React.FC = () => {
 						className='ctx-item'
 						data-danger={!!item.danger}
 						disabled={item.disabled}
-						title={item.disabled ? item.hint : undefined}
+						title={item.tooltip ?? (item.disabled ? item.hint : undefined)}
 						onClick={() => {
 							audioManager.playSound('click');
+							if (item.children) {
+								// a submenu replaces this menu in place; Back puts this one back
+								const parent = menu;
+								useUiStore.getState().openContextMenu({
+									x: menu.x,
+									y: menu.y,
+									title: item.label.replace(/\.\.\.$/, ''),
+									items: [...item.children, { id: 'ctx-back', label: 'Back', separator: true, onSelect: () => useUiStore.getState().openContextMenu(parent) }],
+								});
+								return;
+							}
 							close();
 							item.onSelect();
 						}}

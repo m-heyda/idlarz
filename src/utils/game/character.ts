@@ -1,3 +1,4 @@
+import { zeroResources } from '@/catalog/resourceKeys';
 // Attributes, the level curve, XP and the combat stats derived from the attributes (part of the former utils/gameUtils.ts, split in IDL-15).
 import { BASE_XP_PER_TILE, XP_CAP, XP_TILE } from '@/config/economy';
 import { CHARACTER_STAT_CONFIG, INITIAL_CHARACTER_STATS, LEVELING, MAX_LEVEL } from '@/config/character';
@@ -232,18 +233,7 @@ export const calculateLevel = (xp: number): { level: number; progress: number } 
  * modifier[r] += 0.025 per attribute point on each resource the attribute feeds; xp: +0.2% (Int) / +0.25% (Cha) per point
  */
 export const calculateStatResourceModifiers = (stats: CharacterStats): Resources => {
-	const modifiers: Resources = {
-		gold: 0,
-		wood: 0,
-		stone: 0,
-		coal: 0,
-		food: 0,
-		meat: 0,
-		eggs: 0,
-		milk: 0,
-		hide: 0,
-		xp: 0,
-	};
+	const modifiers: Resources = zeroResources();
 
 	const cfg = CHARACTER_STAT_CONFIG;
 	(Object.keys(cfg.resourceTargets) as (keyof typeof cfg.resourceTargets)[]).forEach((stat) => {

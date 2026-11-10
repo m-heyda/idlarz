@@ -23,7 +23,7 @@ import { BIOMES, REBIRTH_BIOME_OUTPUT } from '../../src/config/biomes';
 import { BIOME_RULES } from '../../src/config/biomeRules';
 import { BUILDING_RULES } from '../../src/config/buildings';
 import { BUILDINGS } from '../../src/catalog/buildings';
-import { buildingLevelCost, buildingUpgradeDuration, producerOutput } from '../../src/lib/buildings';
+import { buildingLevelCost, buildingUpgradeDuration, buildingOutput } from '../../src/lib/buildings';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
 import { describeClassPassives } from '../../src/lib/classPassives';
 import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
@@ -151,14 +151,14 @@ TABLES['building-rules'] = () => ({
 });
 
 TABLES['building-catalog'] = () => ({
-	title: 'The Producers (one per home biome, level 1, with 0 and 25 owned tiles of the biome)',
+	title: 'The Producers and Extractors (one of each per home biome, level 1, with 0 and 25 owned tiles of the biome)',
 	md: mdTable(
 		['Building', 'Biome', 'Makes per second at 0 biome tiles', 'at 25 biome tiles'],
 		BUILDINGS.map((b) => [
 			b.label,
 			BIOMES[b.biome].label,
-			res(producerOutput(b, 1, 0) as Record<string, number>),
-			res(producerOutput(b, 1, 25) as Record<string, number>),
+			res(buildingOutput(b, 1, 0) as Record<string, number>),
+			res(buildingOutput(b, 1, 25) as Record<string, number>),
 		]),
 	),
 });

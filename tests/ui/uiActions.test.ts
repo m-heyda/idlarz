@@ -205,9 +205,30 @@ test('with the building system on the placeholder gives way to the real build me
 		false,
 		'no placeholder',
 	);
-	const build = items.find((i) => i.id === 'building-build-lumberyard');
-	assert.ok(build, 'Build Lumberyard is offered on a forest tile');
-	assert.match(build.label, /^Build Lumberyard/);
+	const here = items.find((i) => i.id === 'building-here');
+	assert.ok(here, 'a single "Build here..." entry');
+	assert.equal(here.label, 'Build here...');
+	const kids = here.children!;
+	assert.deepEqual(
+		kids.map((k) => k.id),
+		['building-build-lumberyard', 'building-build-saptapper'],
+		'the Producer and the Extractor of a forest',
+	);
+	assert.match(kids[0].label, /^Lumberyard \(Producer\)/);
+	assert.match(kids[1].label, /^Sap Tapper \(Extractor\)/);
+	// what already stands is greyed out, and can be moved here instead
+	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, at.x, at.y, { building: 'lumberyard', buildingLevel: 1 }) }));
+	const other = gridCells().find(({ t, x, y }) => t.isOwned && t.biome !== 'castle' && !(x === at.x && y === at.y))!;
+	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, other.x, other.y, { biome: 'forest', hasChest: false }) }));
+	const second = tileMenuItems({ ...ctx, x: other.x, y: other.y }).find((i) => i.id === 'building-here')!.children!;
+	const built = second.find((k) => k.id === 'building-build-lumberyard')!;
+	assert.equal(built.disabled, true);
+	assert.equal(built.hint, 'Built');
+	assert.ok(
+		second.some((k) => k.id === 'building-move-lumberyard'),
+		'a Move entry for it',
+	);
+	assert.equal(second.find((k) => k.id === 'building-build-saptapper')!.hint === 'Built', false, 'the Extractor is not built yet');
 	assert.ok(items.some((i) => i.id === 'highlight'));
 	assert.equal(
 		tileMenuItems({ ...ctx, x: CASTLE_X, y: CASTLE_Y, biome: 'castle' }).some((i) => i.id.startsWith('building')),
