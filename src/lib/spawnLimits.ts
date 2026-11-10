@@ -9,18 +9,18 @@ import type { World } from '@/utils/world';
 export const wardTiles = (castleLevel: number): number => (castleLevel >= CASTLE_FORTRESS.fromLevel ? (2 * CASTLE_RANGE.radius + 1) ** 2 - 1 : 0);
 
 /**
- * Owned land a monster or chest can stand on: not the castle, not a lake, no building, outside the ward. An estimate, never below 0.
+ * Owned land a monster or chest can stand on: not the castle, not a lake, outside the ward. An estimate, never below 0.
  * One formula for the client (`freeTiles`, from the live map) and the server (`ticketCap`, from the save's counts), so the same map gives the same cap.
  *
- * @formula free = max(0, owned - castle - lakes - buildings - wardTiles(castleLevel))
+ * @formula free = max(0, owned - castle - lakes - wardTiles(castleLevel))
  */
-export const freeLand = (owned: number, castle: number, lakes: number, buildings: number, castleLevel: number): number =>
-	Math.max(0, owned - castle - lakes - buildings - wardTiles(castleLevel));
+export const freeLand = (owned: number, castle: number, lakes: number, castleLevel: number): number =>
+	Math.max(0, owned - castle - lakes - wardTiles(castleLevel));
 
 /** `freeLand` of a live map (client). */
 export const freeTiles = (world: World, castleLevel: number): number => {
-	const { owned, buildings, byBiome } = world.stats;
-	return freeLand(owned, byBiome.castle ?? 0, byBiome.lake ?? 0, buildings, castleLevel);
+	const { owned, byBiome } = world.stats;
+	return freeLand(owned, byBiome.castle ?? 0, byBiome.lake ?? 0, castleLevel);
 };
 
 /** The most monsters and chests together: `SPAWN_LIMIT.maxFraction` of the free tiles (never below `minAllowed`). */

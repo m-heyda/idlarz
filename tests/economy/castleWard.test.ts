@@ -76,7 +76,7 @@ test('the range area: 3x3 up to level 7, then one more tile on every side per le
 	assert.equal(isInWard(CASTLE_X + R, CASTLE_Y + R, 10), true);
 });
 
-test('pickSpawnTile never picks a building, a lake or a chest tile, however often it is asked', () => {
+test('pickSpawnTile never picks a lake or a chest tile, however often it is asked', () => {
 	let w = setTile(EMPTY_WORLD, CASTLE_X, CASTLE_Y, { biome: 'castle', isOwned: true, level: 1 });
 	const plain: string[] = [];
 	for (let dy = -3; dy <= 3; dy++) {
@@ -86,7 +86,7 @@ test('pickSpawnTile never picks a building, a lake or a chest tile, however ofte
 			const y = CASTLE_Y + dy;
 			const kind = (Math.abs(dx) + 2 * Math.abs(dy)) % 4;
 			if (kind === 0) w = setTile(w, x, y, { biome: 'lake', isOwned: true });
-			else if (kind === 1) w = setTile(w, x, y, { biome: 'swamp', isOwned: true, building: 'farm' });
+			else if (kind === 1) w = setTile(w, x, y, { biome: 'swamp', isOwned: true, hasChest: true });
 			else if (kind === 2) w = setTile(w, x, y, { biome: 'plains', isOwned: true, hasChest: true });
 			else {
 				w = setTile(w, x, y, { biome: 'plains', isOwned: true });
@@ -105,7 +105,7 @@ test('pickSpawnTile never picks a building, a lake or a chest tile, however ofte
 	// when only unsuitable tiles are left, nothing spawns
 	let only = setTile(EMPTY_WORLD, CASTLE_X, CASTLE_Y, { biome: 'castle', isOwned: true, level: 1 });
 	only = setTile(only, CASTLE_X + 1, CASTLE_Y, { biome: 'lake', isOwned: true });
-	only = setTile(only, CASTLE_X - 1, CASTLE_Y, { biome: 'plains', isOwned: true, building: 'farm', level: 1 });
+	only = setTile(only, CASTLE_X - 1, CASTLE_Y, { biome: 'plains', isOwned: true });
 	assert.equal(pickSpawnTile('thistleBoar', only, new Set(), Math.random), null);
 });
 
@@ -154,11 +154,11 @@ test('castleAreaBonus: +50% below level 7 (no walls), then +1x (100%) per tile o
 	assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(castleAreaBonus), [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 2, 3, 4]);
 });
 
-test('the castle area bonus multiplies the output of the tiles (and buildings) inside the range only', () => {
+test('the castle area bonus multiplies the output of the tiles inside the range only', () => {
 	const world = (level: number) => {
 		let w = setTile(EMPTY_WORLD, CASTLE_X, CASTLE_Y, { biome: 'castle', isOwned: true, level });
 		w = setTile(w, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', isOwned: true }); // inside at every level
-		w = setTile(w, CASTLE_X + 3, CASTLE_Y, { biome: 'forest', isOwned: true, building: 'farm', level: 1 }); // inside from level 9
+		w = setTile(w, CASTLE_X + 3, CASTLE_Y, { biome: 'forest', isOwned: true }); // inside from level 9
 		w = setTile(w, CASTLE_X + 6, CASTLE_Y, { biome: 'plains', isOwned: true }); // never inside
 		return w;
 	};
@@ -172,7 +172,7 @@ test('the castle area bonus multiplies the output of the tiles (and buildings) i
 	assert.ok(Math.abs(area(7, 1).extra - area(7, 1).own) < 1e-9, 'level 7 doubles the tile');
 	assert.equal(area(7, 3).extra, 0, 'radius 1 does not reach 3 tiles out');
 	assert.ok(Math.abs(area(10, 1).extra - 4 * area(10, 1).own) < 1e-9, 'level 10: +400%');
-	assert.ok(Math.abs(area(9, 3).extra - 3 * area(9, 3).own) < 1e-9, 'the building tile counts with its building');
+	assert.ok(Math.abs(area(9, 3).extra - 3 * area(9, 3).own) < 1e-9, 'a tile three out counts from level 9');
 	assert.equal(area(10, 6).extra, 0, 'outside the range');
 	assert.equal(area(10, 6).bonus, 0);
 });
@@ -188,6 +188,6 @@ test('the income breakdown adds the area bonus to the base income', () => {
 	assert.ok(l6.castleArea > 0);
 	assert.ok(Math.abs(l7.castleArea - 2 * l6.castleArea) < 1e-9, '+100% at level 7 is twice the +50% before');
 	assert.ok(l7.castleArea > 0);
-	assert.ok(Math.abs(l7.base - (l7.start + l7.farm + l7.biome + l7.building + l7.castleArea + l7.castleXp)) < 1e-9);
+	assert.ok(Math.abs(l7.base - (l7.start + l7.farm + l7.biome + l7.castleArea + l7.castleXp)) < 1e-9);
 	assert.ok(Math.abs(entry(10).castleArea - 4 * l7.castleArea) < 1e-9, '4x at level 10, 1x at level 7');
 });

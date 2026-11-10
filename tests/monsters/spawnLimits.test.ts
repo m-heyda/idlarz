@@ -11,10 +11,10 @@ import { summarize } from '../../src/lib/cloudSave/summary';
 import { syntheticWorld } from '../../src/utils/worldGen';
 import { biomeCount, EMPTY_WORLD } from '../../src/utils/world';
 
-test('free tiles leave out the castle, lakes, buildings and (from the fortress level) the ward', () => {
+test('free tiles leave out the castle, lakes and (from the fortress level) the ward', () => {
 	const world = syntheticWorld(400, 3);
-	const { owned, buildings, byBiome } = world.stats;
-	assert.equal(freeTiles(world, 1), owned - (byBiome.castle ?? 0) - (byBiome.lake ?? 0) - buildings);
+	const { owned, byBiome } = world.stats;
+	assert.equal(freeTiles(world, 1), owned - (byBiome.castle ?? 0) - (byBiome.lake ?? 0));
 	assert.equal(freeTiles(world, CASTLE_FORTRESS.fromLevel), freeTiles(world, 1) - 8);
 	assert.equal(freeTiles(EMPTY_WORLD, 1), 0);
 });
@@ -40,9 +40,9 @@ test('IDL-221: the server cap (from the save counts) equals the client cap for t
 		[120, 9, 1],
 	] as const) {
 		const world = syntheticWorld(size, seed);
-		const { owned, buildings } = world.stats;
+		const { owned } = world.stats;
 		const lakes = biomeCount(world, 'lake');
-		const server = ticketCap({ luck: 0, tilesOwned: owned, buildingsOwned: buildings, lakesOwned: lakes, castleLevel });
+		const server = ticketCap({ luck: 0, tilesOwned: owned, lakesOwned: lakes, castleLevel });
 		const client = Math.min(TICKET_CAP, spawnCap(world, castleLevel));
 		assert.equal(server, client, `size ${size} seed ${seed} castle ${castleLevel} (${lakes} lakes)`);
 	}

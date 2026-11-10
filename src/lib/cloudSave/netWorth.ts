@@ -1,10 +1,9 @@
-import { BUILDING_COST } from '@/config/buildings';
 import { CASTLE_UPGRADE } from '@/config/castle';
 import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
 import { MAX_OWNED_TILES } from '@/utils/world';
-import { buildingCostFactor, calculateTileCost, countBuildings } from '@/utils/game/costs';
+import { calculateTileCost } from '@/utils/game/costs';
 import { economyTiles } from '@/utils/game/tiles';
-import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
+import { effectiveTileDiscount } from '@/utils/game/rebirth';
 import { merchantLevel, merchantUpgradeCost, sellPayout } from '@/utils/game/merchant';
 import { castleLevelOf } from '@/lib/castleWard';
 import type { PersistedGame } from '@/lib/sanitizeSave';
@@ -15,10 +14,10 @@ import type { SaveSummary } from './summary';
 /**
  * The spending check: what a save has *kept or bought* cannot be worth more than the game could have paid out.
  *
- *   required = gold held + stock held (at merchant prices) + the least gold the owned tiles, buildings and castle cost
+ *   required = gold held + stock held (at merchant prices) + the least gold the owned tiles and castle cost
  *   allowed  = income per second (gold + everything sellable) x play time x slack + a burst allowance
  *
- * `required` only counts prices that are fixed by the cost tables (tiles, buildings, castle levels), at the best
+ * `required` only counts prices that are fixed by the cost tables (tiles, castle levels), at the best
  * discount the state can claim, so it is a floor: an honest player is always far below it. `allowed` is generous
  * (clicks, chests and loot are not modelled, the slack covers them). A save that owns 55,000 tiles after 12 minutes
  * is orders of magnitude over it, however its rates look, because the price of tile 55,000 does not depend on them.
@@ -48,17 +47,12 @@ export const merchantGoldSpent = (upgrades: Record<string, number> | undefined):
 	return spent;
 };
 
-/** Gold the owned land, buildings and castle cost at least (gold part of each price only). */
+/** Gold the owned land and castle cost at least (gold part of each price only). */
 export const minimumSpend = (state: PersistedGame): number => {
 	const discount = effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades);
 	const purchases = Math.min(economyTiles(state.tiles, state.freeTiles) - 1, MAX_OWNED_TILES);
 	let spent = 0;
 	for (let k = 1; k <= purchases; k++) spent += calculateTileCost(k, discount).gold;
-
-	const factorKeep = 1 - emberEffect(state.prestige, 'thrift');
-	const buildingGold = BUILDING_COST.base.gold ?? 0;
-	const buildings = countBuildings(state.tiles);
-	for (let k = 0; k < buildings; k++) spent += Math.floor(buildingGold * buildingCostFactor(k) * factorKeep);
 
 	return spent + castleGoldSpent(castleLevelOf(state.tiles)) + merchantGoldSpent(state.merchantUpgrades);
 };

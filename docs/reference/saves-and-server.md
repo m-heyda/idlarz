@@ -69,10 +69,10 @@ See also: [`acceptSave`](saves-and-server.md#acceptsave), [`FLAG_POLICY`](saves-
 
 ### `SAVE_SCHEMA` <small>const</small>
 
-Source: [`src/lib/saveFormat.ts:35`](../../src/lib/saveFormat.ts)
+Source: [`src/lib/saveFormat.ts:34`](../../src/lib/saveFormat.ts)
 
 The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters.
-The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level, building or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
+The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
 Not saved: monsters and the open fight (the server's).
 
 See also: [`PERSISTED_KEYS`](saves-and-server.md#persisted-keys), [`sanitizeSave`](saves-and-server.md#sanitizesave)
@@ -91,7 +91,7 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:193`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:192`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -105,7 +105,7 @@ a click level outside the ladder, a prestige block that does not add up, less XP
 
 ### `PERSISTED_KEYS` <small>const</small>
 
-Source: [`src/lib/sanitizeSave.ts:60`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:59`](../../src/lib/sanitizeSave.ts)
 
 The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
 

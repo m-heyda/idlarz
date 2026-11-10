@@ -2,16 +2,11 @@ import React, { memo, useMemo } from 'react';
 import { BiomeType, Resources } from '@/types/game';
 import { BIOMES } from '@/config/biomes';
 import { CASTLE_AREA_BONUS } from '@/config/castle';
-import { BUILDINGS, BuildingType } from '@/config/buildings';
 import { calculateTileOutput } from '@/utils/game/income';
-import { canBuildAt } from '@/utils/game/costs';
 import { castleModifier } from '@/utils/game/castle';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
-import { getTile } from '@/utils/world';
 import { formatPercent, formatNumber, formatTime } from '@/utils/formatters';
 import ResourceIcon from './ResourceIcon';
-import PixelIcon from './PixelIcon';
-import { BUILDING_PIXEL_ICONS } from '@/config/pixelIcons';
 import { useMapGame } from './mapSource';
 
 const formatRate = (rate: number) => {
@@ -26,9 +21,6 @@ export const BiomeTooltip = memo(({ biome, level, x, y }: { biome: BiomeType; le
 	const biomeInfo = BIOMES[biome];
 	const tiles = game((state) => state.tiles);
 	const castleUpgrade = game((state) => state.castleUpgrade);
-	const building = x !== undefined && y !== undefined ? getTile(tiles, x, y)?.building : undefined;
-	const buildingInfo = building ? BUILDINGS[building as BuildingType] : undefined;
-	const canBuild = x !== undefined && y !== undefined && canBuildAt(tiles, x, y);
 
 	const castleLevel = castleLevelOf(tiles);
 	const output = useMemo(() => (x === undefined || y === undefined ? null : calculateTileOutput(tiles, x, y, castleLevel)), [x, y, tiles, castleLevel]);
@@ -48,14 +40,6 @@ export const BiomeTooltip = memo(({ biome, level, x, y }: { biome: BiomeType; le
 	return (
 		<div className='space-y-1 text-sm'>
 			{biome === 'castle' && level && <div className='mb-2 text-purple-300 font-semibold text-xs'>Level {level} Castle</div>}
-
-			{/* The building standing on this tile */}
-			{buildingInfo && (
-				<div className='mb-2 text-purple-300 font-semibold text-xs flex items-start gap-1'>
-					<PixelIcon name={BUILDING_PIXEL_ICONS[buildingInfo.name]} alt='' scale={0.5} className='mt-px' />
-					<span>{buildingInfo.label} built here</span>
-				</div>
-			)}
 
 			{lines.map(({ resource, own, bonus }) => (
 				<div key={resource} className='flex flex-wrap items-center gap-x-1'>
@@ -77,10 +61,10 @@ export const BiomeTooltip = memo(({ biome, level, x, y }: { biome: BiomeType; le
 			{biome === 'castle' && level && level > 1 && (
 				<div className='mt-2 text-purple-400 text-xs'>Castle Bonus: {formatPercent(castleModifier(level) * 100)} all resource generation</div>
 			)}
-			{/* The castle explains its bonus area: every tile (and building) inside it produces more */}
+			{/* The castle explains its bonus area: every tile inside it produces more */}
 			{biome === 'castle' && (
 				<div className='text-purple-300 text-xs'>
-					{`Castle area: ${percent(areaBonus)} production on every tile and building within ${castleRangeRadius(castleLevel)} tile${castleRangeRadius(castleLevel) > 1 ? 's' : ''}`}
+					{`Castle area: ${percent(areaBonus)} production on every tile within ${castleRangeRadius(castleLevel)} tile${castleRangeRadius(castleLevel) > 1 ? 's' : ''}`}
 					{castleLevel < CASTLE_AREA_BONUS.fromLevel && ` (walls at level ${CASTLE_AREA_BONUS.fromLevel} double it)`}
 				</div>
 			)}
@@ -89,7 +73,6 @@ export const BiomeTooltip = memo(({ biome, level, x, y }: { biome: BiomeType; le
 					Upgrading to level {castleUpgrade.toLevel}: {formatTime(castleUpgrade.remainingSec)} left
 				</div>
 			)}
-			{canBuild && <div className='text-amber-400 text-xs mt-1'>Right-click to build here</div>}
 		</div>
 	);
 });

@@ -4,7 +4,6 @@ import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS, type PlayerClassId } from '@/conf
 import { isLiveBiome } from '@/config/biomeStage';
 import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { BIOMES } from '@/config/biomes';
-import { BUILDINGS, BUILDING_COST } from '@/config/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { GEMS_CAP, STARTING_GEMS, CLICK_LADDER, INITIAL_RESOURCES, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { DEFAULT_PLAYER_NAME, INITIAL_CHARACTER_STATS } from '@/config/character';
@@ -166,12 +165,12 @@ const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
 	for (const entry of raw.land) {
 		if (!isRecord(entry)) return 'land entry shape';
 		for (const key of Object.keys(entry)) if (!LAND_KEYS.has(key)) return 'land entry key';
-		const { x, y, biome, level, building, chest } = entry;
+		// `building` is accepted and dropped: saves from before the old building system was removed (IDL-259) still load, minus their buildings
+		const { x, y, biome, level, chest } = entry;
 		if (typeof x !== 'number' || typeof y !== 'number' || !inRange(x, y)) return 'land entry position';
 		if (!hasBiome(biome)) return 'tile biome';
 		const t: Record<string, unknown> = { biome, isOwned: true };
 		if (level !== undefined) t.level = level;
-		if (building !== undefined) t.building = building;
 		if (chest !== undefined) t.hasChest = chest;
 		out.push({ x, y, t });
 	}
@@ -214,7 +213,6 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 
 		const tile: Tile = { biome: t.biome as Tile['biome'], isOwned: true };
 		if (t.biome === 'castle') {
-			if (t.building !== undefined) return fail('building on the castle');
 			const level = int(t.level, 1, CASTLE_UPGRADE.maxLevel);
 			if (level === null) return fail('castle level');
 			tile.level = level;
@@ -222,14 +220,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 				tile.upgradeCost = { ...CASTLE_UPGRADE.upgradeCosts[level - 1] };
 			}
 			castleTile = tile;
-		} else if (t.building !== undefined) {
-			// a building stands on any biome except water (BUILDING_COST.blockedBiomes) and never has a level
-			if (typeof t.building !== 'string' || !(t.building in BUILDINGS)) return fail('building');
-			if (BUILDING_COST.blockedBiomes.includes(t.biome as Tile['biome'])) return fail('building on a tile that cannot take one');
-			if (t.level !== undefined) return fail('building level');
-			tile.building = t.building;
 		} else if (t.level !== undefined) {
-			return fail('level without a building');
+			return fail('level on a tile that is not the castle');
 		}
 		if (t.hasChest !== undefined) {
 			if (t.hasChest !== true || t.biome === 'castle') return fail('chest');

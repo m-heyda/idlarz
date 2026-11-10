@@ -56,7 +56,7 @@ const toRow = (save: StoredSave) => ({
 	click_level: save.summary.clickLevel,
 	castle_level: save.summary.castleLevel,
 	tiles_owned: save.summary.tilesOwned,
-	buildings_owned: save.summary.buildingsOwned,
+	buildings_owned: 0, // the column outlives the old building system (IDL-259): NOT NULL, so it is written as 0
 	rebirths: save.summary.rebirths,
 	legacy_points: save.summary.legacyPoints,
 	legacy_earned: save.summary.legacyEarned,
@@ -85,7 +85,6 @@ const fromRow = (row: Row): StoredSave => ({
 		level: row.level,
 		clickLevel: row.click_level,
 		tilesOwned: row.tiles_owned,
-		buildingsOwned: row.buildings_owned,
 		castleLevel: row.castle_level,
 		rebirths: row.rebirths,
 		legacyPoints: row.legacy_points,
@@ -223,7 +222,7 @@ export const supabaseSaveRepo = (db: SupabaseClient): SaveRepo => {
 					run_seconds: runSecondsOf(record, last ? Number(last.play_seconds) : null),
 					play_seconds: record.playSeconds,
 					tiles: record.tiles,
-					buildings: record.buildings,
+					buildings: 0, // legacy column, see buildings_owned
 					castle_level: record.castleLevel,
 					level: record.level,
 					xp: record.xp,
@@ -254,7 +253,6 @@ export const loadRebirthHistory = async (db: SupabaseClient, userId: string, lim
 		runSeconds: Number(row.run_seconds),
 		playSeconds: Number(row.play_seconds),
 		tiles: row.tiles,
-		buildings: row.buildings,
 		castleLevel: row.castle_level,
 		level: row.level,
 		xp: Number(row.xp),

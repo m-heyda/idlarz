@@ -17,8 +17,8 @@ export const CATEGORIES: CategoryDef[] = [
 	{
 		name: 'Economy',
 		slug: 'economy',
-		blurb: 'Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.',
-		sections: ['Basics', 'Income', 'Tiles', 'Biomes', 'Buildings', 'Castle', 'Farm', 'Merchant', 'Clicks', 'Chests and Luck'],
+		blurb: 'Income, tiles, castle, farm, merchant, clicks, chests and Luck.',
+		sections: ['Basics', 'Income', 'Tiles', 'Biomes', 'Castle', 'Farm', 'Merchant', 'Clicks', 'Chests and Luck'],
 	},
 	{
 		name: 'Combat',

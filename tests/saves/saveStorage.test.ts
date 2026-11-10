@@ -9,7 +9,7 @@ import { plainItem } from '../../src/lib/itemInstance';
 import { emptyBag } from '../../src/lib/inventory';
 import { ownedCount, patchTile, setTile } from '../../src/utils/world';
 
-/** A played game with buildings, a chest, gear and a monster, as a plain persisted slice. */
+/** A played game with a chest, gear and a monster, as a plain persisted slice. */
 const playedGame = (): PersistedGame => {
 	api().resetGame();
 	growTo(16);
@@ -17,7 +17,7 @@ const playedGame = (): PersistedGame => {
 	bag[2] = { item: plainItem('obsidian_cuirass') };
 	store.setState((s) => {
 		const lots = gridCells(s.tiles).filter(({ t }) => t.isOwned && t.biome !== 'castle');
-		let tiles = setTile(s.tiles, lots[0].x, lots[0].y, { biome: 'forest', isOwned: true, building: 'tavern' });
+		let tiles = setTile(s.tiles, lots[0].x, lots[0].y, { biome: 'forest', isOwned: true });
 		tiles = patchTile(tiles, lots[1].x, lots[1].y, { hasChest: true });
 		return { tiles, activeChests: 1, bag, equipment: { ...STARTER_EQUIPMENT, head: plainItem('obsidian_helm') }, playerName: 'Zoë' } as never;
 	});

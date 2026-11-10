@@ -62,6 +62,10 @@ export interface Tile {
 	isOwned: boolean;
 	level?: number;
 	upgradeCost?: Partial<Resources>;
+	/**
+	 * Reserved for the per-biome building system (R7, IDL-91). Nothing sets it today: the old 16 buildings are gone (IDL-259) and
+	 * `sanitizeSave` strips the field from every loaded save. Only the map renderer (`utils/terrain.ts` pads) still reads it.
+	 */
 	building?: string;
 	hasChest?: boolean;
 }
@@ -408,7 +412,6 @@ export interface GameState {
 	buyItem: (id: string, qty?: number) => boolean;
 	buyOffer: (index: number) => boolean;
 	refreshMerchantStock: () => boolean;
-	buildOnTile: (x: number, y: number, buildingType: string) => boolean;
 	tick: (deltaTime: number) => void;
 	/** Applies what the server paid for an absence (income, castle progress, monster growth) and puts its chests and monsters on the map. Null when there was nothing to apply. */
 	applyOfflineClaim: (result: ClaimResult) => OfflineReport | null;

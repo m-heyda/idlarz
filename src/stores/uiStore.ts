@@ -114,10 +114,6 @@ interface UiState {
 	contextMenu: ContextMenuState | null;
 	openContextMenu: (menu: ContextMenuState) => void;
 	closeContextMenu: () => void;
-	/** The build dialog of one explored tile */
-	buildDialog: { x: number; y: number } | null;
-	openBuildDialog: (x: number, y: number) => void;
-	closeBuildDialog: () => void;
 	/** Confirmations: a monster to dismiss (id) and a bag stack to discard (slot index) */
 	dismissMonsterId: number | null;
 	askDismissMonster: (id: number | null) => void;
@@ -183,9 +179,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 	contextMenu: null,
 	openContextMenu: (menu) => set({ contextMenu: menu }),
 	closeContextMenu: () => set((state) => (state.contextMenu ? { contextMenu: null } : state)),
-	buildDialog: null,
-	openBuildDialog: (x, y) => set({ buildDialog: { x, y }, contextMenu: null }),
-	closeBuildDialog: () => set({ buildDialog: null }),
 	dismissMonsterId: null,
 	askDismissMonster: (id) => set({ dismissMonsterId: id, contextMenu: null }),
 	discardIndex: null,

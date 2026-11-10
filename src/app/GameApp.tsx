@@ -20,7 +20,7 @@
  * **The loop of the game**
  *
  * 1. You start with a castle and the four tiles beside it on an unbounded map, 125 gold and 1,000 gems. Gold, other resources and XP trickle in ({@link BASE_GENERATION_RATES}).
- * 2. Gold (plus wood, stone, coal, food and hide from tile 15 up) buys adjacent tiles ({@link tilePrice}); each becomes a randomly rolled biome ({@link rollBiome}) and adds income. Buildings stand on tiles and add output. Same-biome neighbours add 25% each.
+ * 2. Gold (plus wood, stone, coal, food and hide from tile 15 up) buys adjacent tiles ({@link tilePrice}); each becomes a randomly rolled biome ({@link rollBiome}) and adds income. Same-biome neighbours add 25% each.
  * 3. The **castle** is a timed upgrade (level 1-10) that adds a big modifier to every resource, a range bonus on nearby tiles, and a ward from level 7 that keeps monsters out ({@link CASTLE_UPGRADE}).
  * 4. The **farm** turns food into animals that make meat and small amounts of eggs, milk and hide ({@link ANIMALS}). The **merchant** buys resources, sells gear and potions, and sells permanent upgrades for gold ({@link MERCHANT_UPGRADES}).
  * 5. **Clicks** on the map and **chests** add active gold ({@link clickGold}, {@link CHEST}). Every level gives attribute points (Strength, Dexterity, Intelligence, Vitality, Charisma) that add income, combat strength, Luck and a tile discount ({@link CHARACTER_STAT_CONFIG}).
@@ -66,7 +66,6 @@ import { useCtrlSequence } from '@/hooks/useCtrlSequence';
 import { useUiStore } from '@/stores/uiStore';
 import { useGlobalContextMenu } from '@/hooks/useGlobalContextMenu';
 import ContextMenu from '@/components/game/ContextMenu';
-import BuildDialog from '@/components/game/BuildDialog';
 import ConfirmDialogs from '@/components/game/ConfirmDialogs';
 import BottomRightStack from '@/components/game/BottomRightStack';
 import CastleCompass from '@/components/game/CastleCompass';
@@ -175,7 +174,6 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<RebirthDialog />
 			<OfflineDialog />
 			<TutorialDialog />
-			<BuildDialog />
 			<ConfirmDialogs />
 			<BottomRightStack />
 			<CastleCompass />

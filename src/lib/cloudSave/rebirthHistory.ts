@@ -13,7 +13,6 @@ export interface RebirthRecord {
 	/** Total play time at the end of the run (seconds) */
 	playSeconds: number;
 	tiles: number;
-	buildings: number;
 	castleLevel: number;
 	level: number;
 	xp: number;
@@ -47,7 +46,6 @@ export const rebirthRecordOf = (previous: SaveSummary, next: SaveSummary, nowMs:
 		at: nowMs,
 		playSeconds: previous.playSeconds,
 		tiles: previous.tilesOwned,
-		buildings: previous.buildingsOwned,
 		castleLevel: previous.castleLevel,
 		level: previous.level,
 		xp: previous.xp,

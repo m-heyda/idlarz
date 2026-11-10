@@ -43,21 +43,21 @@ const rates = (over: Partial<Resources> = {}): Resources => ({
 	...over,
 });
 
-test('chest spot: only owned tiles, never the castle, a building, a monster or another chest', () => {
+test('chest spot: only owned tiles, never the castle, a monster or another chest', () => {
 	const g = territory(2);
-	g[CASTLE_Y][CASTLE_X + 1] = { biome: 'plains', isOwned: true, building: 'farm' };
+	g[CASTLE_Y][CASTLE_X + 1] = { biome: 'plains', isOwned: true, hasChest: true };
 	g[CASTLE_Y + 1][CASTLE_X].hasChest = true;
 	const taken = new Set([`${CASTLE_X - 1},${CASTLE_Y}`]);
 	const w = worldFromRows(g);
 	for (let i = 0; i < 400; i++) {
 		const spot = pickChestSpot(w, taken, 1, rng(i))!;
 		const t = tileAt(w, spot.x, spot.y);
-		assert.ok(t.isOwned && t.biome !== 'castle' && !t.hasChest && !t.building);
+		assert.ok(t.isOwned && t.biome !== 'castle' && !t.hasChest);
 		assert.ok(!taken.has(`${spot.x},${spot.y}`));
 	}
 });
 
-test('chest spot: a lake is fine (drawn as a glowing ripple), a building is not', () => {
+test('chest spot: a lake is fine (drawn as a glowing ripple), a tile that holds a chest is not', () => {
 	const g = territory(1);
 	for (const [dx, dy] of [
 		[1, 0],
@@ -69,8 +69,8 @@ test('chest spot: a lake is fine (drawn as a glowing ripple), a building is not'
 		[-1, 1],
 		[1, -1],
 	])
-		g[CASTLE_Y + dy][CASTLE_X + dx] = { biome: 'plains', isOwned: true, building: 'farm' };
-	g[CASTLE_Y + 1][CASTLE_X + 1] = { biome: 'lake', isOwned: true }; // the only tile left that is not castle or built
+		g[CASTLE_Y + dy][CASTLE_X + dx] = { biome: 'plains', isOwned: true, hasChest: true };
+	g[CASTLE_Y + 1][CASTLE_X + 1] = { biome: 'lake', isOwned: true }; // the only tile left that is not castle or taken
 	const w = worldFromRows(g);
 	for (let i = 0; i < 40; i++) assert.deepEqual(pickChestSpot(w, new Set(), 1, rng(i)), { x: CASTLE_X + 1, y: CASTLE_Y + 1 });
 });

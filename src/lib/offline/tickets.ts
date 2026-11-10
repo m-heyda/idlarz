@@ -76,7 +76,6 @@ export interface TicketBank {
 export interface BankContext {
 	luck: number;
 	tilesOwned: number;
-	buildingsOwned: number;
 	/** Owned lake tiles (from the save summary's `derived.lakesOwned`; 0 when absent): they cannot hold a monster or chest */
 	lakesOwned: number;
 	castleLevel: number;
@@ -111,7 +110,7 @@ const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.mons
  * @order 5
  */
 export const ticketCap = (ctx: BankContext): number => {
-	const free = freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.buildingsOwned, ctx.castleLevel);
+	const free = freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.castleLevel);
 	return Math.min(TICKET_CAP, Math.max(SPAWN_LIMIT.minAllowed, Math.floor(free * SPAWN_LIMIT.maxFraction)));
 };
 

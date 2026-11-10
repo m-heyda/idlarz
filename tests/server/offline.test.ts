@@ -153,7 +153,7 @@ test('efficiency is clamped to 0..1', () => {
 
 // ---------------------------------------------------------------------------------------------------- the ticket bank
 
-const ctx = (over: Partial<BankContext> = {}): BankContext => ({ luck: 0, tilesOwned: 100, buildingsOwned: 0, lakesOwned: 0, castleLevel: 1, ...over });
+const ctx = (over: Partial<BankContext> = {}): BankContext => ({ luck: 0, tilesOwned: 100, lakesOwned: 0, castleLevel: 1, ...over });
 const NO_LUCKY = () => () => 0.9999; // never under a lucky chance
 const ALL_LUCKY = () => () => 0;
 

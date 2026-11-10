@@ -7,7 +7,6 @@ export type GameConfig = typeof import('../../src/config/economy') &
 	typeof import('../../src/config/character') &
 	typeof import('../../src/config/castle') &
 	typeof import('../../src/config/biomes') &
-	typeof import('../../src/config/buildings') &
 	typeof import('../../src/config/merchant') &
 	typeof import('../../src/config/farm') &
 	typeof import('../../src/config/rebirth') &
@@ -28,7 +27,6 @@ export const loadConfig = async (): Promise<GameConfig> =>
 		await import('../../src/config/character'),
 		await import('../../src/config/castle'),
 		await import('../../src/config/biomes'),
-		await import('../../src/config/buildings'),
 		await import('../../src/config/merchant'),
 		await import('../../src/config/farm'),
 		await import('../../src/config/rebirth'),

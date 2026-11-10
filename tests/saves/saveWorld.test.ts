@@ -13,7 +13,7 @@ import { syntheticWorld } from '../../src/utils/worldGen';
 
 const sorted = (w: World) =>
 	ownedEntries(w)
-		.map((e) => `${e.x},${e.y},${e.tile.biome},${e.tile.level ?? ''},${e.tile.building ?? ''},${e.tile.hasChest ? 'c' : ''}`)
+		.map((e) => `${e.x},${e.y},${e.tile.biome},${e.tile.level ?? ''},${e.tile.hasChest ? 'c' : ''}`)
 		.sort();
 
 /** The game with a synthetic map of `count` tiles that is valid for sanitizeSave (XP pays for it, stat points follow the level). */

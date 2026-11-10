@@ -16,23 +16,22 @@ import { createWorld, getTile, type Placed, type World } from '@/utils/world';
 // draws a monster where the ticket says. The map is a large row that is only read when it matters (see `needsLook`).
 
 /** What the rules depend on: a different key means the land (or the castle) changed since the last look. */
-export const siteKey = (summary: { tilesOwned: number; buildingsOwned: number; castleLevel: number; rebirths: number }): string =>
-	`${summary.tilesOwned}:${summary.buildingsOwned}:${summary.castleLevel}:${summary.rebirths}`;
+export const siteKey = (summary: { tilesOwned: number; castleLevel: number; rebirths: number }): string =>
+	`${summary.tilesOwned}:${summary.castleLevel}:${summary.rebirths}`;
 
-type LandEntry = { x: number; y: number; biome: Tile['biome']; level?: number; building?: string; chest?: boolean };
+type LandEntry = { x: number; y: number; biome: Tile['biome']; level?: number; chest?: boolean };
 
 /** The owned tiles of a stored map (`land` and `extra` of a save, see saveFormat), or null when it cannot be read. */
 export const worldFromPart = (part: { land: unknown; extra: unknown }): World | null => {
 	const unpacked = unpackBody({ land: part.land, extra: part.extra } as SaveBody);
 	if ('error' in unpacked) return null;
-	const placed: Placed[] = (unpacked.raw.land as LandEntry[]).map(({ x, y, biome, level, building, chest }) => ({
+	const placed: Placed[] = (unpacked.raw.land as LandEntry[]).map(({ x, y, biome, level, chest }) => ({
 		x,
 		y,
 		tile: {
 			biome,
 			isOwned: true,
 			...(level !== undefined ? { level } : {}),
-			...(building !== undefined ? { building } : {}),
 			...(chest ? { hasChest: true } : {}),
 		},
 	}));
@@ -100,12 +99,12 @@ export const placeTickets = (
 		}
 		return { n: ticket.n, at: ticket.at, kind: ticket.kind, lucky: ticket.lucky };
 	};
-	// a chest keeps its tile while it can still stand there (a building, the castle's ward or a monster would stop it)
+	// a chest keeps its tile while it can still stand there (the castle's ward or a monster would stop it)
 	const settleChest = (ticket: ChestTicket): ChestTicket => {
 		if (!isChestPlaced(ticket)) return ticket;
 		const spot = `${ticket.x},${ticket.y}`;
 		const tile = getTile(world, ticket.x!, ticket.y!);
-		if (tile && tile.biome !== 'castle' && !tile.building && !taken.has(spot) && !isInWard(ticket.x!, ticket.y!, castleLevel)) {
+		if (tile && tile.biome !== 'castle' && !taken.has(spot) && !isInWard(ticket.x!, ticket.y!, castleLevel)) {
 			taken.add(spot);
 			return ticket;
 		}

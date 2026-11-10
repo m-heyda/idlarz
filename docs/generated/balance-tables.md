@@ -266,7 +266,7 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 | Pasture | +8% eggs, milk and hide | 10 | 5000 food + 2500 wood | 343.60K food + 171.80K wood |
 | Pen Expansion | +2% farm output, +4 animals per kind | 8 | 8000 food + 3000 wood + 3000 stone | 715.10K food + 268.16K wood + 268.16K stone |
 
-## 5. Biomes and buildings
+## 5. Biomes
 
 Per-second output of one tile before adjacency and modifiers (already multiplied by BIOME_YIELD.scale = 1.3; the castle is not scaled).
 
@@ -287,7 +287,6 @@ Per-second output of one tile before adjacency and modifiers (already multiplied
 | Blight | — |
 | Battlefield | — |
 
-Building cost: 500 gold, 250 wood, 150 stone as the base price. Building number n costs base × 1: ×0.4, 2: ×0.6, 3: ×0.8, 4: ×1, 5: ×1.15, 9: ×2.01, 17: ×5.83, 33: ×21.77 (first 4 cheap, then ×1.15 for 12, ×1.09 for 16, ×1.025 after).
 
 ## 6. Stats
 

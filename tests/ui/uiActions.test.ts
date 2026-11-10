@@ -4,8 +4,11 @@ import { api, freshGame, growTo, openFight, store, gridCells } from '../helpers'
 import { emptyBag } from '../../src/lib/inventory';
 import { calculateResourceBreakdown, calculateResourceRates } from '../../src/utils/game/income';
 import { useUiStore } from '../../src/stores/uiStore';
+import { BUILDINGS_ENTRY_ID, tileMenuItems } from '../../src/lib/tileMenuItems';
+import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { PREF_DEFAULTS, readPref, writePref } from '../../src/lib/uiPrefs';
-import type { BagSlot, Monster } from '../../src/types/game';
+import { useGameStore } from '../../src/stores/gameStore';
+import type { BagSlot, Monster, Tile } from '../../src/types/game';
 
 const spot = () => {
 	const found = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle');
@@ -79,8 +82,6 @@ test('discardItem rejects empty slots, bad amounts and anything during a fight',
 test('the income breakdown adds up to exactly what calculateResourceRates reports', () => {
 	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
 	growTo(14);
-	const at = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')!; // the land is rolled: a lake cannot take a farm
-	assert.equal(api().buildOnTile(at.x, at.y, 'farm'), true);
 	const s = api();
 	const rates = calculateResourceRates(s.tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);
 	const breakdown = calculateResourceBreakdown(s.tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades);
@@ -89,11 +90,10 @@ test('the income breakdown adds up to exactly what calculateResourceRates report
 		assert.equal(e.base, rates.base[key], `${key} base`);
 		assert.equal(e.modifier, rates.modifiers[key], `${key} modifier`);
 		assert.equal(e.total, rates.total[key], `${key} total`);
-		const parts = e.start + e.farm + e.biome + e.building + e.castleArea + e.castleXp;
+		const parts = e.start + e.farm + e.biome + e.castleArea + e.castleXp;
 		assert.ok(Math.abs(parts - e.base) < 1e-9, `${key}: the pieces add up to the base`);
 		assert.ok(Math.abs(e.base * (1 + e.modifier) - e.total) < 1e-9, `${key}: base x (1 + modifier) = total`);
 	}
-	assert.ok(breakdown.food.building > 0, 'the farm shows up as a building share');
 	assert.ok(breakdown.gold.biome > 0 || breakdown.wood.biome > 0);
 	assert.ok(breakdown.gold.castleMod > 0, 'the castle bonus is reported on its own');
 });
@@ -102,11 +102,10 @@ test('ui store: dialogs close the menu, confirmations track their target, prefs 
 	const ui = useUiStore.getState();
 	ui.openContextMenu({ x: 5, y: 6, title: 'a', items: [{ id: 'x', label: 'X', onSelect: () => undefined }] });
 	assert.equal(useUiStore.getState().contextMenu?.title, 'a');
-	ui.openBuildDialog(2, 3); // opening a dialog closes the menu
+	ui.askDiscard(2); // opening a dialog closes the menu
 	assert.equal(useUiStore.getState().contextMenu, null);
-	assert.deepEqual(useUiStore.getState().buildDialog, { x: 2, y: 3 });
-	ui.closeBuildDialog();
-	assert.equal(useUiStore.getState().buildDialog, null);
+	assert.equal(useUiStore.getState().discardIndex, 2);
+	ui.askDiscard(null);
 	ui.askDismissMonster(4);
 	assert.equal(useUiStore.getState().dismissMonsterId, 4);
 	ui.askDismissMonster(null);
@@ -148,4 +147,30 @@ test('the farm panels and the minimap are remembered: defaults first, then what 
 		delete g.window;
 		useUiStore.setState({ ...PREF_DEFAULTS });
 	}
+});
+
+test('the tile right-click menu keeps a disabled "Buildings: coming soon" placeholder (IDL-259), and none on the castle', () => {
+	freshGame();
+	growTo(6);
+	const at = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+	const context = (x: number, y: number, biome: Tile['biome'], over: object = {}) => ({
+		x,
+		y,
+		biome,
+		game: useGameStore as never,
+		queuePos: 0,
+		lineOpen: false,
+		hasChest: false,
+		...over,
+	});
+	const items = tileMenuItems(context(at.x, at.y, at.t.biome));
+	const entry = items.find((item) => item.id === BUILDINGS_ENTRY_ID);
+	assert.ok(entry, 'the entry is there');
+	assert.equal(entry.label, 'Buildings: coming soon');
+	assert.equal(entry.disabled, true);
+	assert.equal(items.some((item) => /build here/i.test(item.label)), false, 'the old "Build here..." entry is gone');
+	assert.ok(items.some((item) => item.id === 'highlight'), 'the other entries are unchanged');
+	// it stays out of the way of a chest or a monster on the tile, as before for the other entries
+	assert.ok(tileMenuItems(context(at.x, at.y, at.t.biome, { hasChest: true })).some((item) => item.id === BUILDINGS_ENTRY_ID));
+	assert.equal(tileMenuItems(context(CASTLE_X, CASTLE_Y, 'castle')).some((item) => item.id === BUILDINGS_ENTRY_ID), false, 'the castle takes no building');
 });

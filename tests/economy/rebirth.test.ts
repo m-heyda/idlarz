@@ -4,7 +4,7 @@ import { api, freshGame, growTo, owned, setResources, store, tileAt, rawSnapshot
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { CLICK_LADDER, INITIAL_RESOURCES, STARTING_GEMS } from '../../src/config/economy';
 import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
-import { calculateBuildingCost, calculateTileCost } from '../../src/utils/game/costs';
+import { calculateTileCost } from '../../src/utils/game/costs';
 import { castleUpgradeDuration } from '../../src/utils/game/castle';
 import { effectiveTileDiscount, emberGain, rebirthStatus, emberSpent, emberUpgradeCost, emberIncomeBonus } from '../../src/utils/game/rebirth';
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
@@ -168,7 +168,6 @@ test('shop effects: thrift, master builders, click mastery, provisions', () => {
 	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 500, legacyEarned: 500 } }));
 	growTo(REBIRTH.tilesNeeded(1));
 	const tileBefore = calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, api().prestige)).gold;
-	const buildingBefore = calculateBuildingCost(api().tiles, api().prestige).gold!;
 	const durationBefore = castleUpgradeDuration(1, api().prestige);
 	setResources({ gold: 0 });
 	const clickBefore = api().clickForGold({ eventId: 1, now: 0, trusted: true });
@@ -181,7 +180,6 @@ test('shop effects: thrift, master builders, click mastery, provisions', () => {
 	}
 	const p = api().prestige;
 	assert.ok(calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, p)).gold < tileBefore);
-	assert.ok(calculateBuildingCost(api().tiles, p).gold! < buildingBefore);
 	assert.ok(castleUpgradeDuration(1, p) < durationBefore);
 	assert.ok(Math.abs(castleUpgradeDuration(1, p) - Math.floor(durationBefore * (1 - 3 * EMBER_UPGRADES.builders.effectPerLevel))) <= 1);
 	setResources({ gold: 0 });

@@ -4,7 +4,6 @@ import { ANIMALS } from '@/config/farm';
 import { LEVELING, CHARACTER_STAT_CONFIG } from '@/config/character';
 import { BASE_TILE_COST, BIOME_YIELD, CLICK_LADDER, CLICK_LIMIT, SCALING_CONFIG, TILE_PRICE, TILE_RESOURCE_COST } from '@/config/economy';
 import { BIOMES } from '@/config/biomes';
-import { BUILDINGS, BUILDING_COST } from '@/config/buildings';
 import { CASTLE_FORTRESS, CASTLE_RANGE, CASTLE_UPGRADE } from '@/config/castle';
 import { CHEST, SPAWN_LIMIT } from '@/config/spawns';
 import { EMBER_UPGRADES, REBIRTH } from '@/config/rebirth';
@@ -12,10 +11,9 @@ import { MERCHANT_BUY_MULTIPLIER, MERCHANT_GOODS, MERCHANT_RESOURCE_PRICES } fro
 import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
 import { LIMITS } from '@/config/limits';
-import { RARITIES, RARITY_ORDER, SETS, sortedCostEntries } from '@/catalog';
+import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
 import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
-import { buildingCostFactor } from '@/utils/game/costs';
 import { castleModifier } from '@/utils/game/castle';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
@@ -38,8 +36,6 @@ const Res: React.FC<{ r: string; children?: React.ReactNode }> = ({ r, children 
 
 const Tutorial: React.FC = () => {
 	const biomes = Object.values(BIOMES).filter((b) => b.name !== 'castle' && b.name !== 'empty' && isLiveBiome(b.name));
-	const buildingBase = BUILDING_COST.base;
-	const buildingExamples = [0, 1, 2, 3, 4, 8, 16, 32].map((n) => ({ n, gold: Math.floor((buildingBase.gold ?? 0) * buildingCostFactor(n)) }));
 	const castleStart = castleModifier(1);
 	const castleAtDoublingEnd = castleModifier(CASTLE_UPGRADE.doublingUntil);
 	const castleMax = castleModifier(CASTLE_UPGRADE.maxLevel);
@@ -114,29 +110,10 @@ const Tutorial: React.FC = () => {
 			</section>
 
 			<section>
-				<h3 className='px-h'>Buildings</h3>
+				<h3 className='px-h'>Right-click</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					<b>Right-click</b> any explored tile (not the castle, not a lake, and not while a chest or a monster is on it) and choose <b>Build here</b> to open
-					the build window (<b>Highlight this area</b> in the same menu tints the connected area of that biome around the tile for a moment). Pick one of{' '}
-					{Object.keys(BUILDINGS).length} buildings:{' '}
-					{Object.values(BUILDINGS)
-						.map((b) => b.label)
-						.join(', ')}
-					. The tile keeps its biome and its output and the building adds its own on top, with the same neighbour bonus; a patch in the style of the biome
-					(packed earth, trampled snow, a plank landing ...) is laid under it. One building per tile, and it is permanent.
-				</p>
-				<p className='text-[#d8c8a0] mb-1'>
-					Every building costs more than the last. The first {BUILDING_COST.starter.length} are cheap ({BUILDING_COST.starter.map((f) => `x${f}`).join(', ')} of
-					the base price of{' '}
-					{sortedCostEntries(buildingBase)
-						.map(([r, v]) => `${short(v)} ${r}`)
-						.join(', ')}
-					), then the price grows x{BUILDING_COST.growthEarly} per building for {BUILDING_COST.earlyCount} buildings, x{BUILDING_COST.growthMid} for the next{' '}
-					{BUILDING_COST.midCount} and x{BUILDING_COST.growthLate} after that (the same three-stage shape as tile prices).
-				</p>
-				<p className='text-[#a89878] text-xs px-card font-mono'>
-					gold for building number: {buildingExamples.map((e) => `${e.n + 1}: ${short(e.gold)}`).join(' - ')} (wood and stone scale the same way; Thrift lowers
-					it)
+					<b>Right-click</b> an explored tile for its menu: <b>Highlight this area</b> tints the connected area of that biome around the tile for a moment. Buildings are
+					coming back in a new form and will be built from the same menu (the entry is there, greyed out, until then).
 				</p>
 			</section>
 
