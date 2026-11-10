@@ -10,3 +10,7 @@
 - `docs/plan/` (ROADMAP, RELEASE-PLAN, drafts) are the only hand-written docs: they describe what is **not built**. Do not rewrite them when documenting code.
 - `docs/generated/` is measured output of `npm run docs:gen` (sim, balance tables, ...); never edit it by hand.
 - Code is pure config + pure functions where possible; anything that decides a reward or a fight lives on the server side (`src/lib/offline/`).
+
+# Release notes
+
+Player-facing release notes are one `.md` file per version in `content/changelog/` (`<version>.md`; the format is in `content/changelog/README.md`). The landing page's Changelog window shows them, newest version first, read at build time. When the owner asks for them, collect the PRs merged since the last version, keep only what players can see, and write `content/changelog/<next version>.md`. `tests/ui/changelog.test.ts` rejects a malformed file.
