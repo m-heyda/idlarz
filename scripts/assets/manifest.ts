@@ -586,5 +586,11 @@ export const buildManifest = (): AssetEntry[] => {
 		const idol = IDOL_ART[e.src];
 		if (idol) Object.assign(e, { name: idol, category: 'buildings', subcategory: 'idols (planned)', status: 'planned', usedBy: ['Idols, IDL-96'] });
 	}
+	// art picked for features that are not built yet
+	for (const e of entries) {
+		if (e.status === 'reuse' && e.name.startsWith('avatar_horned_'))
+			Object.assign(e, { status: 'planned', usedBy: ['unlockable avatar (gems, achievements), IDL-266'] });
+		if (e.name === 'animal_rooster') Object.assign(e, { status: 'planned', usedBy: ['golden-egg chicken upgrade (late gem purchase), IDL-260'] });
+	}
 	return entries.sort((a, b) => rank.get(a.category)! - rank.get(b.category)! || a.subcategory.localeCompare(b.subcategory) || a.name.localeCompare(b.name));
 };

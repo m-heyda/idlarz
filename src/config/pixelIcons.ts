@@ -101,15 +101,11 @@ const BASE_ICON_SIZES = {
 	res_shard: [40, 40],
 	res_mystery: [40, 40],
 	unknown: [11, 14],
-	// portraits: full figure per hero class, head-and-shoulders bust for the header
+	// portraits: full figure per hero class
 	hero_warrior: [56, 80],
 	hero_paladin: [56, 80],
 	hero_ranger: [56, 80],
 	hero_mage: [56, 80],
-	bust_warrior: [40, 40],
-	bust_paladin: [40, 40],
-	bust_ranger: [40, 40],
-	bust_mage: [40, 40],
 	// equipment slots
 	equip_head: [40, 40],
 	equip_shoulder: [40, 40],

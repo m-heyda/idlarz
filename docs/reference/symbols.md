@@ -12,8 +12,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:301`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:242`](../../src/lib/inventory.ts) | The one place gear is summed: |
-| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:253`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
-| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:268`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
+| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:249`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
+| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:264`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyTutorial` | Progression / Guided tutorial | [`src/lib/offline/tutorial.ts:45`](../../src/lib/offline/tutorial.ts) | Applies one tutorial request to the ledger. |
@@ -219,7 +219,6 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:111`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
 | `SKILLS` | Combat / Potions and skills | [`src/catalog/skills.ts:34`](../../src/catalog/skills.ts) | Potions and skills. |
-| Sound library | Architecture / Art | [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts) | The sound library: |
 | `spawnLevelRange` | Monsters / Level scaling | [`src/lib/monsters.ts:39`](../../src/lib/monsters.ts) | The levels a new monster of this type can appear at in a world of this castle level (both ends included). |
 | `STARTING_GEMS` | Progression / Gems | [`src/config/economy.ts:219`](../../src/config/economy.ts) | Gems every player starts with (also granted to saves from before Gems existed). |
 | `startNewChapter` | Saves & Server / Epoch | [`src/lib/offline/chapter.ts:42`](../../src/lib/offline/chapter.ts) | Starts the new chapter for one account, once: |

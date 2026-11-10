@@ -1,7 +1,7 @@
 """Character art: the four hero classes (warrior/paladin/ranger/mage).
 
 Each figure is built from the same body kit (legs, torso, arms, head with a proper face, hair) and dressed per
-class, rendered by the ray-caster at 56x80 plus a head-and-shoulders bust (40x40) for the header.
+class, rendered by the ray-caster at 56x80.
 Figure space: +x = screen right, -y = toward the camera, +z = up; feet at z=0, head centre at HEAD_Z."""
 import math
 from render3d import Scene, Prim, rot, between, place, I3
@@ -9,7 +9,6 @@ from materials import MATS
 import fx
 
 FULL = dict(size=(56, 80), scale=12.2, origin=(28, 76))
-BUST = dict(size=(40, 40), scale=14.6, origin=(20, 86))
 HEAD_Z = 5.2
 
 
@@ -316,4 +315,3 @@ CLASSES = {'warrior': warrior, 'paladin': paladin, 'ranger': ranger, 'mage': mag
 SPRITES = {}
 for _name, _fn in CLASSES.items():
     SPRITES[f'hero_{_name}'] = (lambda fn=_fn: fn(FULL))
-    SPRITES[f'bust_{_name}'] = (lambda fn=_fn: fn(BUST))

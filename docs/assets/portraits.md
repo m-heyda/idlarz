@@ -27,12 +27,12 @@ NPC faces (48px busts): merchant, quest giver, gambler, blacksmith, innkeepers a
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `avatar_horned_black_helm` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_black_helm.png" width="96" alt="avatar_horned_black_helm"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_black_helm.png` |
-| `avatar_horned_fur_beard` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_fur_beard.png" width="96" alt="avatar_horned_fur_beard"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_fur_beard.png` |
-| `avatar_horned_fur_collar` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_fur_collar.png" width="96" alt="avatar_horned_fur_collar"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_fur_collar.png` |
-| `avatar_horned_graybeard` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_graybeard.png" width="96" alt="avatar_horned_graybeard"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_graybeard.png` |
-| `avatar_horned_green_veteran` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_green_veteran.png" width="96" alt="avatar_horned_green_veteran"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_green_veteran.png` |
-| `avatar_horned_ram_helm` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_ram_helm.png" width="96" alt="avatar_horned_ram_helm"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_ram_helm.png` |
+| `avatar_horned_black_helm` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_black_helm.png" width="96" alt="avatar_horned_black_helm"> | 64x64 | planned | unlockable avatar (gems, achievements), IDL-266 | `pixel/new_assets/heroes/avatar_horned_black_helm.png` |
+| `avatar_horned_fur_beard` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_fur_beard.png" width="96" alt="avatar_horned_fur_beard"> | 64x64 | planned | unlockable avatar (gems, achievements), IDL-266 | `pixel/new_assets/heroes/avatar_horned_fur_beard.png` |
+| `avatar_horned_fur_collar` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_fur_collar.png" width="96" alt="avatar_horned_fur_collar"> | 64x64 | planned | unlockable avatar (gems, achievements), IDL-266 | `pixel/new_assets/heroes/avatar_horned_fur_collar.png` |
+| `avatar_horned_graybeard` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_graybeard.png" width="96" alt="avatar_horned_graybeard"> | 64x64 | planned | unlockable avatar (gems, achievements), IDL-266 | `pixel/new_assets/heroes/avatar_horned_graybeard.png` |
+| `avatar_horned_green_veteran` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_green_veteran.png" width="96" alt="avatar_horned_green_veteran"> | 64x64 | planned | unlockable avatar (gems, achievements), IDL-266 | `pixel/new_assets/heroes/avatar_horned_green_veteran.png` |
+| `avatar_horned_ram_helm` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_ram_helm.png" width="96" alt="avatar_horned_ram_helm"> | 64x64 | planned | unlockable avatar (gems, achievements), IDL-266 | `pixel/new_assets/heroes/avatar_horned_ram_helm.png` |
 
 ## NPC busts 48px
 
