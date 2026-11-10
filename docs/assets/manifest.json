@@ -20256,6 +20256,32 @@
 	},
 	{
 		"usedBy": [],
+		"name": "menu_achievements",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_achievements.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "menu_bag_scroll",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_bag_scroll.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "menu_character",
 		"category": "ui",
 		"subcategory": "menu",
@@ -20276,8 +20302,21 @@
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "menu_equipment",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_equipment.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
 		]
 	},
 	{
@@ -20289,8 +20328,34 @@
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "menu_gems_pouch",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_gems_pouch.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "menu_glossary",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_glossary.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
 		]
 	},
 	{
@@ -20302,8 +20367,8 @@
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			64,
+			64
 		]
 	},
 	{
@@ -20328,8 +20393,8 @@
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			64,
+			64
 		]
 	},
 	{

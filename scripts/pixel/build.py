@@ -25,6 +25,7 @@ import ground_art  # noqa: E402
 import ui_art  # noqa: E402
 import sprites_animals  # noqa: E402
 import sprites_animal_art  # noqa: E402
+import sprites_menu_art  # noqa: E402
 import sprites_buildings  # noqa: E402
 import sprites_castle  # noqa: E402
 import sprites_characters  # noqa: E402
@@ -75,6 +76,7 @@ SPRITES = {
     **sprites_fortress.SPRITES,
     **sprites_buildings.SPRITES,
     **sprites_menu.SPRITES,
+    **sprites_menu_art.SPRITES,  # Sprite Fusion menu buttons: replace the built menu_merchant, menu_farm, menu_crafting, menu_legacy
     **sprites_water.SPRITES,
     **sprites_monsters.SPRITES,
     **sprites_gear.SPRITES,
