@@ -142,3 +142,30 @@ test('two consecutive saves of an honest account raise no transition flag', asyn
 		[],
 	);
 });
+
+test('the new chapter report counts affected accounts, saves, name collisions and ledger rows missing the new columns', async () => {
+	const { buildChapterReport, formatChapterReport } = await import('../scripts/liveSavesReport');
+	const profiles = [
+		{ characterName: 'Anna', epoch: null, hasSave: true },
+		{ characterName: 'anna', epoch: null, hasSave: false },
+		{ characterName: 'ANNA', epoch: null, hasSave: true },
+		{ characterName: 'Bob', epoch: 1, hasSave: true },
+		{ characterName: 'Cleo', epoch: 99, hasSave: true },
+	];
+	const report = buildChapterReport(profiles, [{ stats: null, legacy: null }, { stats: { kills: 1 }, legacy: null }, {}], { stats: true, legacy: true }, 1);
+	assert.equal(report.profiles, 5);
+	assert.equal(report.profilesWithoutEpoch, 3);
+	assert.equal(report.nameCollisionGroups, 1);
+	assert.equal(report.accountsToRename, 2, 'the oldest of three keeps the name');
+	assert.equal(report.affectedWithSave <= report.affected, true);
+	assert.equal(report.ledgerRows, 3);
+	assert.equal(report.ledgerRowsWithoutStats, 2);
+	assert.equal(report.ledgerRowsWithoutLegacy, 3);
+	const text = formatChapterReport(report);
+	assert.match(text, /names that collide ignoring case: 1 \(2 accounts/);
+	assert.doesNotMatch(text, /Anna|Bob|Cleo/i, 'counts only, no names');
+
+	const missing = formatChapterReport(buildChapterReport([], [], { stats: false, legacy: false }, 1));
+	assert.match(missing, /stats: COLUMN MISSING/);
+	assert.match(missing, /legacy: COLUMN MISSING/);
+});

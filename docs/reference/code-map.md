@@ -351,6 +351,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`netWorth.ts`](../../src/lib/cloudSave/netWorth.ts) — ~ The spending check:
 - [`pipeline.ts`](../../src/lib/cloudSave/pipeline.ts) — ~ Accepted saves are copied into the history when this long passed since the last copy (not every N revisions:
 - [`rebirthHistory.ts`](../../src/lib/cloudSave/rebirthHistory.ts) — ~ One rebirth, as the Rebirths tab lists it.
+- [`restoreTrust.ts`](../../src/lib/cloudSave/restoreTrust.ts) — ~ What `restoreTrust` did.
 - [`serverRebirth.ts`](../../src/lib/cloudSave/serverRebirth.ts) — ~ The server's own reading of "may this account rebirth, and what does it pay" (IDL-102), from the last STORED save (never from numbers the browser sends with the request):
 - [`summary.ts`](../../src/lib/cloudSave/summary.ts) — ~ What the server derives from a save by itself (never from numbers the client sends):
 - [`supabaseRepo.ts`](../../src/lib/cloudSave/supabaseRepo.ts) — ~ Null until the row's first save under the offline ledger; `DEFAULT_DERIVED` fills it
@@ -604,6 +605,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`perk-caps.ts`](../../scripts/perk-caps.ts) — Perk family cap sim (IDL-149): how the gear bucket of each family behaves against the set bonuses and a top legendary, for several cap candidates.
 - [`reset-players.ts`](../../scripts/reset-players.ts) — Season restart:
 - [`reset-test-account.ts`](../../scripts/reset-test-account.ts) — Clears the game data of the ONE account the end-to-end tests use (docs/reference/ops.md), so a test run starts from a new game.
+- [`restore-trust.ts`](../../scripts/restore-trust.ts)
 - [`sim-classes.ts`](../../scripts/sim-classes.ts) — ~ Runs one sim (`--dump`:
 - [`sim-parallel.ts`](../../scripts/sim-parallel.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
@@ -770,6 +772,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.
 - [`offlineServer.test.ts`](../../tests/server/offlineServer.test.ts)
+- [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)
 - [`serverRebirth.test.ts`](../../tests/server/serverRebirth.test.ts) — IDL-102: the server runs the rebirth. POST /api/rebirth judges the last stored save, computes the Embers, wipes the server's bag and gear once,

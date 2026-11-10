@@ -1129,6 +1129,17 @@
   "see": []
  },
  {
+  "id": "restoretrust",
+  "name": "restoreTrust",
+  "symbol": "restoreTrust",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/restoreTrust.ts",
+  "line": 39,
+  "summary": "The way back for a false positive (IDL-209). A save that fires `castle_jump` or `networth_exceeds` is paid from the last trusted economy ({@link trustedEconomy}) and the account loses its ranking for good (`everFlagged`). Nothing in the save path ever lifts that, so an honest account hit by a clock jump or a bug in a build would stay frozen. This is the owner's tool for it: it takes the account's stored game as the new baseline.",
+  "see": []
+ },
+ {
   "id": "trustedeconomy",
   "name": "trustedEconomy",
   "symbol": "trustedEconomy",
@@ -1151,13 +1162,26 @@
   "see": []
  },
  {
+  "id": "turning-enforcement-and-the-server-run-rebirth-on-together",
+  "name": "Turning enforcement and the server-run rebirth on together",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "src/lib/cloudSave/verify.ts",
+  "line": 105,
+  "summary": "**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).** Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:",
+  "see": [
+   "ENFORCEMENT",
+   "restoreTrust"
+  ]
+ },
+ {
   "id": "enforcement",
   "name": "ENFORCEMENT",
   "symbol": "ENFORCEMENT",
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 113,
+  "line": 130,
   "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
   "see": []
  },
@@ -1168,7 +1192,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 128,
+  "line": 145,
   "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
   "see": []
  },
@@ -1179,7 +1203,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 176,
+  "line": 193,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },
@@ -2644,7 +2668,7 @@
   "category": "Ops/Operator guides",
   "file": "scripts/check-live-saves.ts",
   "line": 1,
-  "summary": "Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT` would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.",
+  "summary": "Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT` would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. A last section is the new chapter dry run (IDL-254 item 2): accounts the flip would reset (and how many hold a save), name collisions with the forced renames they mean, and whether `player_ledger.stats` / `legacy` exist and how many rows are still null. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.",
   "see": []
  },
  {
@@ -2677,6 +2701,18 @@
   "summary": "Season restart: `npm run reset-players` gives every player a fresh game while keeping who they are. It talks to Supabase with the service role, so it is run by hand from a trusted machine, never from the app. The usage and flags are in the header of the script. Needs `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (environment or `.env.local`); they decide which project is wiped: check them first, and try one account with `--user` before running it for everyone.",
   "see": [
    "ensureSeasonReset"
+  ]
+ },
+ {
+  "id": "giving-a-flagged-account-its-trust-back-restore-trust",
+  "name": "Giving a flagged account its trust back (restore-trust)",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "scripts/restore-trust.ts",
+  "line": 1,
+  "summary": "The way back for a false-positive flag (IDL-209): `npm run restore-trust -- --user <uuid>` is a DRY RUN that shows what the account's save carries; add `--yes` to really give the account its trust back ({@link restoreTrust}: flags cleared, ranking eligibility back, the income paid from the stored game's own rates again). The save it replaces is pinned in `save_history` first, and one JSON audit line is printed (`event: 'trust_restored'`); keep it with the ticket. Running it twice is safe (the second run says `already_trusted`).",
+  "see": [
+   "restoreTrust"
   ]
  },
  {
