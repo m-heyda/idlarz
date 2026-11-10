@@ -240,6 +240,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`biomeRules.ts`](../../src/config/biomeRules.ts) — How the map grows:
 - [`biomeStage.ts`](../../src/config/biomeStage.ts) — Which biomes are part of the game today and which exist only for development (the map lab).
 - [`biomes.ts`](../../src/config/biomes.ts) — The map: tile size, biome list and spawn weights, and the ambient critters.
+- [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
 - [`buildings.ts`](../../src/config/buildings.ts) — Buildings and what they cost.
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.

@@ -7,10 +7,11 @@ import '@fontsource/titan-one/latin-400.css';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { GAME_TAGLINE, GAME_TITLE } from '@/config/branding';
 
 export const metadata: Metadata = {
-	title: 'Idle Explorer',
-	description: 'An idle territory-expansion game: buy tiles, grow your castle, farm and trade.',
+	title: GAME_TITLE,
+	description: GAME_TAGLINE,
 };
 
 export default function RootLayout({

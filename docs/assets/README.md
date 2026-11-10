@@ -29,7 +29,7 @@ One name per picture, grouped by what it is. Biomes, roads, terrain atlases and 
 | [Weapons](weapons.md) | 197 | 72 | 0 |
 | [Armor](armor.md) | 127 | 52 | 0 |
 | [Accessories](accessories.md) | 53 | 31 | 0 |
-| [Monsters](monsters.md) | 25 | 18 | 0 |
+| [Monsters](monsters.md) | 36 | 18 | 11 |
 | [Buildings](buildings.md) | 244 | 36 | 208 |
 | [Resources](resources.md) | 93 | 38 | 0 |
 | [Map details](map-details.md) | 443 | 0 | 443 |

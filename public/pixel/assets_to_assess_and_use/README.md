@@ -16,6 +16,7 @@ Art that was added for later features and is **not used by the game yet**. Nothi
 | [map_details_misc](map_details_misc/README.md)                                                              | temple ruin, gargoyles, graves, ghost, cultist      | 7     | Blight and Battlefield, animations                 |
 | [map_details](map_details/README.md)                                                                        | farm plants and trees sheet                         | 1     | farm crops, Fields and Orchard                     |
 | [potions](potions/README.md)                                                                                | 48 potion icons, 32x32                              | 48    | crafted and bought potions (crafting v0.1+)        |
+| [monsters](monsters/README.md)                                                                              | 11 monster sprites, 64-73 px (added 2026-11-10)     | 11    | monsters and bosses of the new biomes (R9)         |
 
 ## Before any of this ships (read this)
 
