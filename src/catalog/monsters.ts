@@ -134,3 +134,12 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 /** Roster entries that live in a biome. Spawning code passes `enabledOnly` so unfinished monsters never appear. */
 export const monstersInBiome = (biome: CatalogBiome, enabledOnly = true): MonsterCatalogEntry[] =>
 	MONSTER_CATALOG.filter((m) => m.biomes.includes(biome) && (!enabledOnly || m.enabled));
+
+/**
+ * The monsters the map lab can show (its spawn dropdown and combat preview): roster monsters with finished art that are not enabled yet, and once every monster with art is enabled, all of them.
+ * The lab reads `[0]` of this list, so it must never be empty (an empty list crashed the `/map-lab` prerender once every monster with art was enabled).
+ */
+export const labMonsters = (): MonsterCatalogEntry[] => {
+	const notEnabled = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
+	return notEnabled.length > 0 ? notEnabled : MONSTER_CATALOG.filter((m) => m.art);
+};

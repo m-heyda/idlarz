@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { MONSTER_CATALOG, monsterArtUrl, monsterSpriteUrl, monstersInBiome } from '../../src/catalog/monsters';
+import { MONSTER_CATALOG, labMonsters, monsterArtUrl, monsterSpriteUrl, monstersInBiome } from '../../src/catalog/monsters';
+import { BIOMES } from '../../src/config/biomes';
 import { MONSTERS } from '../../src/config/combatConfig';
 
 // The roster (catalog/monsters.ts) lists every planned monster; only enabled ones may spawn, and those must have real stats in MONSTERS.
@@ -69,4 +70,15 @@ test('monstersInBiome hides disabled monsters unless asked', () => {
 	assert.equal(monstersInBiome('jungle').length, 4, 'the jungle roster is enabled');
 	assert.equal(monstersInBiome('fields').length, 0, 'the later rebirth biomes have no monster yet');
 	assert.equal(monstersInBiome('fields', false).length, 4);
+});
+
+test('the map lab always has a monster to show, every MONSTERS entry has a catalog entry and a picture, and every spawn biome exists', () => {
+	// /map-lab reads the first entry of the list while it prerenders: an empty list broke `npm run build` once every monster with art was enabled
+	assert.ok(labMonsters().length > 0);
+	for (const [id, def] of Object.entries(MONSTERS)) {
+		const entry = MONSTER_CATALOG.find((m) => m.id === id);
+		assert.ok(entry, `${id} is in the catalog`);
+		assert.ok(fs.existsSync(path.join(__dirname, '..', '..', 'public', monsterSpriteUrl(entry!))), `${id}: its picture exists`);
+		for (const biome of def.spawn.biomes) assert.ok(biome in BIOMES, `${id}: ${biome} is a biome`);
+	}
 });
