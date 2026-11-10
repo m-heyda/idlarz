@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { MONSTER_CATALOG, monsterArtUrl, monstersInBiome } from '../../src/catalog/monsters';
+import { MONSTER_CATALOG, monsterArtUrl, monsterSpriteUrl, monstersInBiome } from '../../src/catalog/monsters';
 import { MONSTERS } from '../../src/config/combatConfig';
 
 // The roster (catalog/monsters.ts) lists every planned monster; only enabled ones may spawn, and those must have real stats in MONSTERS.
@@ -21,11 +21,11 @@ test('ids are unique and every biome has three monsters and one boss', () => {
 	}
 });
 
-test('the rats are gone: the four biomes with art are enabled, and exactly the enabled ones exist in MONSTERS', () => {
+test('the rats are gone: the seven home biomes are enabled, and exactly the enabled ones exist in MONSTERS', () => {
 	assert.ok(!('rat' in MONSTERS) && !('ratKing' in MONSTERS));
 	const enabledBiomes = new Set(MONSTER_CATALOG.filter((m) => m.enabled).map((m) => m.biomes[0]));
-	assert.deepEqual([...enabledBiomes].sort(), ['forest', 'plains', 'swamp', 'tundra']);
-	assert.equal(MONSTER_CATALOG.filter((m) => m.enabled).length, 16);
+	assert.deepEqual([...enabledBiomes].sort(), ['coast', 'forest', 'hills', 'lake', 'plains', 'swamp', 'tundra']);
+	assert.equal(MONSTER_CATALOG.filter((m) => m.enabled).length, 28);
 	assert.deepEqual(
 		Object.keys(MONSTERS).sort(),
 		MONSTER_CATALOG.filter((m) => m.enabled)
@@ -45,6 +45,17 @@ test('an entry says it has art exactly when the picture file exists', () => {
 	}
 });
 
+test('a monster without its own art has a stand-in file that exists; a monster with art needs none (swapping the art is a file and the flag)', () => {
+	for (const m of MONSTER_CATALOG) {
+		if (m.enabled && !m.art) assert.ok(m.placeholder, `${m.id}: an enabled monster without art needs a stand-in`);
+		const file = path.join(__dirname, '..', '..', 'public', monsterSpriteUrl(m));
+		if (m.enabled) assert.ok(fs.existsSync(file), `${m.id}: ${monsterSpriteUrl(m)}`);
+		if (m.art) assert.equal(monsterSpriteUrl(m), monsterArtUrl(m), `${m.id}: real art wins over the stand-in`);
+	}
+	const standIns = MONSTER_CATALOG.filter((m) => m.enabled && !m.art).map((m) => m.id);
+	assert.deepEqual(standIns.sort(), ['bossHillGiant', 'boulderBeetle', 'caveGoblinMiner', 'graniteRam', 'pikeLurker']);
+});
+
 test('monstersInBiome hides disabled monsters unless asked', () => {
 	assert.deepEqual(
 		monstersInBiome('swamp')
@@ -52,7 +63,9 @@ test('monstersInBiome hides disabled monsters unless asked', () => {
 			.sort(),
 		['bossMireMatriarch', 'dumpback', 'garbageOgre', 'rotHeron'],
 	);
-	assert.equal(monstersInBiome('lake').length, 0, 'no lake monster is enabled');
-	assert.equal(monstersInBiome('lake', false).length, 4);
-	assert.equal(monstersInBiome('hills').length, 0);
+	assert.equal(monstersInBiome('lake').length, 4, 'the lake roster is enabled');
+	assert.equal(monstersInBiome('hills').length, 4);
+	assert.equal(monstersInBiome('coast').length, 4);
+	assert.equal(monstersInBiome('jungle').length, 0, 'no rebirth biome has a monster yet');
+	assert.equal(monstersInBiome('jungle', false).length, 4);
 });

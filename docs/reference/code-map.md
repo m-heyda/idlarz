@@ -735,6 +735,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/monsters/**
 
 - [`biomeSpawn.test.ts`](../../tests/monsters/biomeSpawn.test.ts) — ~ A 5x5 map with the given owned tiles around the centre (2,2):
+- [`homeRoster.test.ts`](../../tests/monsters/homeRoster.test.ts) — ~ A castle with one tile of every home biome at the given offsets (x, y from the castle), all owned
 - [`killReward.test.ts`](../../tests/monsters/killReward.test.ts)
 - [`monsterCatalog.test.ts`](../../tests/monsters/monsterCatalog.test.ts)
 - [`monsterConfig.test.ts`](../../tests/monsters/monsterConfig.test.ts)

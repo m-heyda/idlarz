@@ -178,7 +178,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 204,
+  "line": 208,
   "summary": "Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): each biome's boss has a source of its own (`boss_<biome>`, profile `boss_<biome>`) with",
   "see": []
  },
@@ -189,7 +189,7 @@
   "kind": "const",
   "category": "Loot/Adding content",
   "file": "src/catalog/lootConfig.ts",
-  "line": 290,
+  "line": 298,
   "summary": "Adding loot content is data only; the generator needs no change.",
   "see": [
    "gear",
@@ -204,7 +204,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 329,
+  "line": 337,
   "summary": "Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.",
   "see": []
  },
@@ -215,7 +215,7 @@
   "kind": "const",
   "category": "Loot/Config",
   "file": "src/catalog/lootConfig.ts",
-  "line": 390,
+  "line": 398,
   "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
   "see": []
  },
@@ -506,7 +506,7 @@
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 320,
+  "line": 381,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -517,8 +517,8 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 367,
-  "summary": "The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`). Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
+  "line": 428,
+  "summary": "The roster: 28 monsters in seven biomes, three normal ones and a boss each: plains, forest, swamp and tundra, and since IDL-201 hills, coast and lake. A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes have no roster yet. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
  {

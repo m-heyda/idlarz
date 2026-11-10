@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { MONSTER_CATALOG, monsterArtUrl } from '@/catalog/monsters';
+import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import type { MonsterType } from '@/types/game';
 import '@/styles/Monsters.css';
@@ -13,7 +13,7 @@ const MonsterArt: React.FC<{ type: MonsterType; scale?: number; label?: string; 
 	return (
 		// eslint-disable-next-line @next/next/no-img-element
 		<img
-			src={monsterArtUrl(entry)}
+			src={monsterSpriteUrl(entry)}
 			alt={label ?? entry.label}
 			width={size}
 			height={size}

@@ -7068,7 +7068,7 @@
 		"category": "monsters",
 		"subcategory": "coast boss",
 		"src": "/pixel/enemies/coast/boss-reef-leviathan.png",
-		"status": "planned",
+		"status": "used",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -7083,7 +7083,7 @@
 		"category": "monsters",
 		"subcategory": "coast normal",
 		"src": "/pixel/enemies/coast/drowned-sailor.png",
-		"status": "planned",
+		"status": "used",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -7098,7 +7098,7 @@
 		"category": "monsters",
 		"subcategory": "coast normal",
 		"src": "/pixel/enemies/coast/net-gull.png",
-		"status": "planned",
+		"status": "used",
 		"source": "monster roster",
 		"size": [
 			65,
@@ -7113,7 +7113,7 @@
 		"category": "monsters",
 		"subcategory": "coast normal",
 		"src": "/pixel/enemies/coast/wreck-crab.png",
-		"status": "planned",
+		"status": "used",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -7188,7 +7188,7 @@
 		"category": "monsters",
 		"subcategory": "lake boss",
 		"src": "/pixel/enemies/lake/boss-lake-hydra.png",
-		"status": "planned",
+		"status": "used",
 		"source": "monster roster",
 		"size": [
 			65,
@@ -7203,7 +7203,7 @@
 		"category": "monsters",
 		"subcategory": "lake normal",
 		"src": "/pixel/enemies/lake/moss-snapper.png",
-		"status": "planned",
+		"status": "used",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -7218,7 +7218,7 @@
 		"category": "monsters",
 		"subcategory": "lake normal",
 		"src": "/pixel/enemies/lake/reed-nymph.png",
-		"status": "planned",
+		"status": "used",
 		"source": "monster roster",
 		"size": [
 			64,
@@ -7392,6 +7392,39 @@
 		"size": [
 			73,
 			73
+		]
+	},
+	{
+		"usedBy": [
+			"graniteRam",
+			"caveGoblinMiner",
+			"boulderBeetle",
+			"bossHillGiant"
+		],
+		"name": "monster_placeholder_hills",
+		"category": "monsters",
+		"subcategory": "placeholder (stand-in until the real sprite)",
+		"src": "/pixel/enemies/placeholder/hills.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			69,
+			69
+		]
+	},
+	{
+		"usedBy": [
+			"pikeLurker"
+		],
+		"name": "monster_placeholder_lake",
+		"category": "monsters",
+		"subcategory": "placeholder (stand-in until the real sprite)",
+		"src": "/pixel/enemies/placeholder/lake.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			69,
+			69
 		]
 	},
 	{
