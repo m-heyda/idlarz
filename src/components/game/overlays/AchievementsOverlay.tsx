@@ -9,7 +9,16 @@ export const AchievementRow: React.FC<{ def: AchievementDef; earned: boolean }> 
 		className={`flex items-center justify-between gap-3 px-3 py-2 border border-[#4a3a26] ${earned ? 'bg-[#2a2012] text-[#ecdcb4]' : 'bg-[#1a140c] text-[#7a6a52]'}`}
 		data-earned={earned}
 	>
-		<div className='min-w-0'>
+		{/* eslint-disable-next-line @next/next/no-img-element */}
+		<img
+			src={`/pixel/new_assets/achievements/${def.badge}.png`}
+			alt=''
+			width={40}
+			height={40}
+			className='shrink-0'
+			style={{ imageRendering: 'pixelated', ...(earned ? {} : { filter: 'brightness(0) opacity(0.35)' }) }}
+		/>
+		<div className='min-w-0 flex-1'>
 			<div className='font-semibold'>{earned ? def.title : LOCKED_LABEL}</div>
 			<div className='text-xs'>{earned ? def.description : LOCKED_LABEL}</div>
 			{earned && (def.rewards.avatarId || def.rewards.titleId) && (

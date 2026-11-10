@@ -252,3 +252,8 @@ test('finishing the end of the tutorial path pays the first achievement, once', 
 	ok(await tutorialStep(m.deps, 'u1', null, { action: 'sync' }, T0 + 3000));
 	assert.equal(m.ledgers.get('u1')!.gems, before + 25);
 });
+
+test('every achievement names a badge that exists in the asset library', async () => {
+	const { existsSync } = await import('node:fs');
+	for (const a of ACHIEVEMENTS) assert.ok(existsSync(`public/pixel/new_assets/achievements/${a.badge}.png`), `${a.id}: ${a.badge}`);
+});

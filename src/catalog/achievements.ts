@@ -35,6 +35,10 @@ export interface AchievementDef {
 	description: string;
 	when: AchievementCondition;
 	rewards: AchievementRewards;
+	/** File name (no extension) in `public/pixel/new_assets/achievements/`; swapping the art later is changing this string */
+	badge: string;
+	/** The badge is a stand-in until art for this achievement exists */
+	badgePlaceholder?: boolean;
 }
 
 /**
@@ -49,18 +53,69 @@ export interface AchievementDef {
  * @see settleAchievements, achievementsDue
  */
 export const ACHIEVEMENTS: readonly AchievementDef[] = [
-	{ id: 'tutorial', title: 'Learned the ropes', description: 'Finish the guided tutorial.', when: { kind: 'tutorial' }, rewards: { gems: 25 } },
-	{ id: 'first_tile', title: 'Landowner', description: 'Buy your first tile.', when: { kind: 'tiles', min: 1 }, rewards: { gems: 25 } },
-	{ id: 'first_building', title: 'Builder', description: 'Build your first building.', when: { kind: 'buildings', min: 1 }, rewards: { gems: 25 } },
-	{ id: 'first_fight', title: 'First blood', description: 'Win your first fight.', when: { kind: 'kills', min: 1 }, rewards: { gems: 25 } },
-	{ id: 'first_chest', title: 'Treasure hunter', description: 'Open your first chest.', when: { kind: 'chests', min: 1 }, rewards: { gems: 25 } },
-	{ id: 'castle_2', title: 'Growing keep', description: 'Upgrade the castle to level 2.', when: { kind: 'castle', level: 2 }, rewards: { gems: 25 } },
-	{ id: 'castle_6', title: 'Stout walls', description: 'Upgrade the castle to level 6.', when: { kind: 'castle', level: 6 }, rewards: { gems: 75 } },
+	{
+		id: 'tutorial',
+		title: 'Learned the ropes',
+		description: 'Finish the guided tutorial.',
+		when: { kind: 'tutorial' },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 25 },
+	},
+	{
+		id: 'first_tile',
+		title: 'Landowner',
+		description: 'Buy your first tile.',
+		when: { kind: 'tiles', min: 1 },
+		badge: 'badge_map_flag_bronze',
+		rewards: { gems: 25 },
+	},
+	{
+		id: 'first_building',
+		title: 'Builder',
+		description: 'Build your first building.',
+		when: { kind: 'buildings', min: 1 },
+		badge: 'badge_hammer_bronze',
+		rewards: { gems: 25 },
+	},
+	{
+		id: 'first_fight',
+		title: 'First blood',
+		description: 'Win your first fight.',
+		when: { kind: 'kills', min: 1 },
+		badge: 'badge_sword_shield_bronze',
+		rewards: { gems: 25 },
+	},
+	{
+		id: 'first_chest',
+		title: 'Treasure hunter',
+		description: 'Open your first chest.',
+		when: { kind: 'chests', min: 1 },
+		badge: 'badge_chest_bronze',
+		rewards: { gems: 25 },
+	},
+	{
+		id: 'castle_2',
+		title: 'Growing keep',
+		description: 'Upgrade the castle to level 2.',
+		when: { kind: 'castle', level: 2 },
+		badge: 'badge_tower_silver',
+		rewards: { gems: 25 },
+	},
+	{
+		id: 'castle_6',
+		title: 'Stout walls',
+		description: 'Upgrade the castle to level 6.',
+		when: { kind: 'castle', level: 6 },
+		badge: 'badge_tower_silver',
+		rewards: { gems: 75 },
+	},
 	{
 		id: 'castle_10',
 		title: 'Architect',
 		description: 'Upgrade the castle to level 10.',
 		when: { kind: 'castle', level: 10 },
+		badge: 'badge_star_silver',
+		badgePlaceholder: true,
 		rewards: { gems: 100, avatarId: 'architect' },
 	},
 	{
@@ -68,6 +123,8 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Reborn',
 		description: 'Rebirth for the first time.',
 		when: { kind: 'rebirths', min: 1 },
+		badge: 'badge_star_silver',
+		badgePlaceholder: true,
 		rewards: { gems: 75, avatarId: 'reborn' },
 	},
 	{
@@ -75,14 +132,26 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Boss slayer',
 		description: 'Defeat The Great Auroch.',
 		when: { kind: 'kill', monster: 'bossGreatAuroch', min: 1 },
+		badge: 'badge_skull_bronze',
+		badgePlaceholder: true,
 		rewards: { gems: 50, avatarId: 'boss_slayer' },
 	},
-	{ id: 'golden_kill', title: 'Golden touch', description: 'Kill a golden monster.', when: { kind: 'golden', min: 1 }, rewards: { gems: 50 } },
+	{
+		id: 'golden_kill',
+		title: 'Golden touch',
+		description: 'Kill a golden monster.',
+		when: { kind: 'golden', min: 1 },
+		badge: 'badge_star_silver',
+		badgePlaceholder: true,
+		rewards: { gems: 50 },
+	},
 	{
 		id: 'early_tester', // the id the new chapter reset writes (`EARLY_TESTER` in lib/offline/chapter.ts)
 		title: 'Early tester',
 		description: 'Played before the new chapter.',
 		when: { kind: 'manual' },
+		badge: 'badge_star_silver',
+		badgePlaceholder: true,
 		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester' },
 	},
 ];

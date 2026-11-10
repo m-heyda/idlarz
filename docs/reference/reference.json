@@ -50,7 +50,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 51,
+  "line": 55,
   "summary": "The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds ({@link settleAchievements}); the early tester is granted by the new chapter reset instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
