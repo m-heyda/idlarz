@@ -1,3 +1,4 @@
+import { copyText } from './clipboard';
 import React, { useMemo, useState } from 'react';
 import manifest from '../../docs/assets/manifest.json';
 import { useTrashMarks } from './trashMarks';
@@ -65,8 +66,7 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 	/** repo path of the picture shown (variant aware), as an agent finds it in the checkout */
 	const pathOf = (e: ManifestEntry) => `public${srcOf(e)}`;
 	const copy = (text: string, label = text) => {
-		navigator.clipboard?.writeText(text).catch(() => {});
-		setCopied(label);
+		copyText(text).then((ok) => setCopied(ok ? label : `copy failed (${label})`));
 	};
 	const field = { background: '#241e1a', color: '#f1e6c8', border: '1px solid #4a3f36', padding: '4px 8px', borderRadius: 4 } as const;
 	return (
@@ -132,7 +132,7 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 					copy shown paths
 				</button>
 				<button type='button' onClick={trash.copyList} style={field} title='Copy every trash mark from every gallery'>
-					copy trash list ({trash.list.length})
+					{trash.status || `copy trash list (${trash.list.length})`}
 				</button>
 				<span style={{ opacity: 0.7 }}>
 					{shown.length} / {rows.length}
