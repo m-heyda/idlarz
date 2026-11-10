@@ -113,7 +113,7 @@ export interface LootSource {
  * a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in `LIVE_GRADES` have enabled items,
  * so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides, and a ceiling must reach the grade of the highest item level the biome can produce: plains monsters (levels 1-20, growing up to 30, plus 1 of variance) reach item level 31, so plains stops at G4, where G3 would leave a grown monster with nothing to drop.
  *
- * A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G4, coast G4, forest G4, hills G4, swamp G5, lake G5, tundra G7); the floor is the item level window of each grade.
+ * A biome's grade ceiling. Normal monsters drop from `monster_<biome>` (pool `equipment_<biome>`): ladder grades up to the biome's ceiling (plains G4, coast G4, forest G4, hills G4, swamp G5, lake G5, tundra G7, jungle G7); the floor is the item level window of each grade.
  * Every base that drops carries a `grade:` tag (IDL-243): the legacy wood, steel and Obsidian pieces that fill a ladder cell are graded by it (Wooden Club G1, Hunting Bow G2, Iron Sword G3, six Steel armour pieces G4, the Obsidian family G6; they keep their ids, art and set bonuses),
  * the rest of wood, steel and all of cloth are retired (`enabled: false`, ids kept, owned pieces keep working). A graded legacy piece is generated only in its grade's window and rarities (`dropLevels`, `dropRarities`) but stays valid at its old level range for pieces already owned.
  * The highest live grade is open at the top and takes every rarity ({@link gradeLevels}, {@link gradeRarities} in `src/catalog/items/grades.ts`) so nothing is left without a base while the next grade is dark; a rarity with no base at an item level is left out of the roll there.
@@ -131,6 +131,8 @@ export const BIOME_LOOT = {
 	coast: { ceiling: 4, levels: { min: 2, max: 22 } },
 	hills: { ceiling: 4, levels: { min: 6, max: 26 } },
 	lake: { ceiling: 5, levels: { min: 10, max: 29 } },
+	// the jungle follows the tundra's band (rebirth 1 players wear the best grades there are)
+	jungle: { ceiling: 7, levels: { min: 14, max: 32 } },
 } as const satisfies Record<string, { ceiling: number; levels: { min: number; max: number } }>;
 export type LootBiome = keyof typeof BIOME_LOOT;
 
@@ -214,6 +216,7 @@ export const BOSS_LOOT: Record<LootBiome, BossLootDef> = {
 	coast: { uniques: [], setId: null, levels: { min: 17, max: 37 } },
 	hills: { uniques: [], setId: null, levels: { min: 22, max: 42 } },
 	lake: { uniques: [], setId: null, levels: { min: 27, max: 47 } },
+	jungle: { uniques: [], setId: null, levels: { min: 32, max: 52 } },
 };
 
 /** A boss's chance per kill of its unique, and the bad-luck protection on it (the numbers of the old single boss table: 5 %, +1 % per miss up to +10 %) */

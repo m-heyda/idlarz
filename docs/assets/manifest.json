@@ -7182,6 +7182,51 @@
 	},
 	{
 		"usedBy": [
+			"eyeHorror"
+		],
+		"name": "monster_eye_horror",
+		"category": "monsters",
+		"subcategory": "jungle normal",
+		"src": "/pixel/enemies/jungle/eye-horror.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			67,
+			67
+		]
+	},
+	{
+		"usedBy": [
+			"skullVine"
+		],
+		"name": "monster_skull_vine",
+		"category": "monsters",
+		"subcategory": "jungle normal",
+		"src": "/pixel/enemies/jungle/skull-vine.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			65,
+			65
+		]
+	},
+	{
+		"usedBy": [
+			"zombieTriceratops"
+		],
+		"name": "monster_zombie_triceratops",
+		"category": "monsters",
+		"subcategory": "jungle normal",
+		"src": "/pixel/enemies/jungle/zombie-triceratops.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			73,
+			73
+		]
+	},
+	{
+		"usedBy": [
 			"bossLakeHydra"
 		],
 		"name": "monster_boss_lake_hydra",
@@ -7405,6 +7450,21 @@
 		"category": "monsters",
 		"subcategory": "placeholder (stand-in until the real sprite)",
 		"src": "/pixel/enemies/placeholder/hills.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			69,
+			69
+		]
+	},
+	{
+		"usedBy": [
+			"bossHardwoodColossus"
+		],
+		"name": "monster_placeholder_jungle",
+		"category": "monsters",
+		"subcategory": "placeholder (stand-in until the real sprite)",
+		"src": "/pixel/enemies/placeholder/jungle.png",
 		"status": "used",
 		"source": "monster roster",
 		"size": [

@@ -17,14 +17,14 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:428`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:453`](../../src/config/combatConfig.ts)
 
-The roster: 28 monsters in seven biomes, three normal ones and a boss each: plains, forest, swamp and tundra, and since IDL-201 hills, coast and lake. A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes have no roster yet.
+The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
 
 - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
-- Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 s, one hit every 3 s (`BIOME_TIER`).
-- Tier numbers per biome (`BIOME_TIER`), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8.
+- Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra / jungle: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 / 14 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 / 50 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 / 100 s, one hit every 3 s (`BIOME_TIER`).
+- Tier numbers per biome (`BIOME_TIER`), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8; jungle 340 / 9.
 - The ladder against gear: `docs/generated/monster-ladder.md`.
 
 **The roster (level 1 stats; bosses at their reference level)** _(computed from the code)_
@@ -59,6 +59,10 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | lake | Reed Nymph | 1 | 260 | 8 | 2.5 | 0.5 | 10-12 -> 17-19 |
 | lake | Pike Lurker | 1 | 208 | 9 | 2.5 | 0.6 | 10-12 -> 17-19 |
 | lake | The Lake Hydra (boss) | 27 | 4,500 | 27 | 45 | 0.33 | 27-30 -> 34-37 |
+| jungle | Skull Vine | 1 | 340 | 9 | 4 | 0.5 | 14-16 -> 18-20 |
+| jungle | Eye Horror | 1 | 272 | 11 | 4 | 0.6 | 14-16 -> 18-20 |
+| jungle | Zombie Triceratops | 1 | 442 | 7 | 4 | 0.4 | 14-16 -> 18-20 |
+| jungle | The Hardwood Colossus (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
 
 ## Level scaling
 
@@ -230,7 +234,7 @@ Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`b
 
 ### `BOSS_MIN_DISTANCE` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:381`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:401`](../../src/config/combatConfig.ts)
 
 The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
 
@@ -284,3 +288,4 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 | hills | 120 | 800 | 114 | 1.08 |
 | coast | 100 | 450 | 64 | 1.08 |
 | lake | 160 | 1,800 | 257 | 1.08 |
+| jungle | 210 | 3,000 | 430 | 1.08 |

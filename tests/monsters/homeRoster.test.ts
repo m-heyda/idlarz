@@ -184,3 +184,54 @@ test('the bosses climb: the Reef Leviathan asks for G2 (the grade below loses), 
 	assert.equal(winRate(fullSet('obsidian', 'obsidian_maul'), 'bossLakeHydra', 27), 0, 'the Hydra beats the plain G6 set');
 	assert.ok(winRate(fullSet('obsidian', 'titan_maul'), 'bossLakeHydra', 27) >= 0.5, 'and gives way to the best gear');
 });
+
+// ------------------------------------------------------------------------------------------------ jungle (IDL-107)
+
+const JUNGLE = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => MONSTERS[type].spawn.biomes[0] === 'jungle');
+
+test('the jungle roster: three monsters and a boss on jungle tiles, from the first rebirth and not before', () => {
+	assert.equal(JUNGLE.length, 4);
+	const world = land([
+		['jungle', 3, 0],
+		['jungle', 9, 0],
+		['plains', 0, 3],
+	]);
+	for (const type of JUNGLE) assert.equal(MONSTERS[type].spawn.minRebirths, BIOME_RULES.unlockAfterRebirths.jungle, type);
+	for (const type of JUNGLE.filter((t) => MONSTERS[t].grade === 'normal')) {
+		assert.deepEqual(spawnTiles(type, world, new Set(), 0), [], `${type}: nothing before the first rebirth`);
+		assert.deepEqual(
+			spawnTiles(type, world, new Set(), 1).map(({ x, y }) => `${x - CASTLE_X},${y - CASTLE_Y}`),
+			['3,0', '9,0'],
+			type,
+		);
+	}
+	// a ticket placed before the first rebirth never lands on the jungle, and from rebirth 1 it may
+	const bank = { ...emptyBank(0), monsters: [1, 2, 3, 4].map((n) => ticket(n)) };
+	for (const t of placeTickets(bank, world, 'k', 0, rollFor).monsters) if (t.x !== undefined) assert.ok(!JUNGLE.includes(monsterTypeOf(t)));
+	const later = placeTickets(bank, world, 'k', 1, rollFor)
+		.monsters.filter((t) => t.x !== undefined)
+		.map((t) => monsterTypeOf(t));
+	assert.ok(later.length > 0);
+	const boss = placeTickets({ ...emptyBank(0), monsters: [ticket(1, 'boss')] }, world, 'k', 1, rollFor).monsters[0];
+	assert.equal(monsterTypeOf(boss), 'bossHardwoodColossus');
+	assert.equal(
+		placeTickets({ ...emptyBank(0), monsters: [ticket(1, 'boss')] }, world, 'k', 0, rollFor).monsters[0].x,
+		undefined,
+		'no jungle boss at rebirth 0',
+	);
+});
+
+test('the jungle fights the same however the requests are cut, and sits above the tundra: harder window, tougher boss, longer clock', () => {
+	for (const type of JUNGLE) {
+		const s = simSetup({ equipment: STRONG_KIT, monsters: [{ type, level: spawnLevelRange(type, 1).min }], seed: `jungle-${type}` });
+		const first = runCombat(s.ledger, s.env(s.start)).ledger;
+		let many = first;
+		for (let t = 1; t <= 30; t++) many = runCombat(many, s.env(s.start + t)).ledger;
+		const one = runCombat(first, s.env(s.start + 30)).ledger;
+		assert.equal(one.combat!.eventNo, many.combat!.eventNo, type);
+		assert.equal(Math.round(one.combat!.hp), Math.round(many.combat!.hp), type);
+	}
+	assert.ok(MONSTERS.skullVine.spawnWindow.base > MONSTERS.frostHare.spawnWindow.base);
+	assert.ok(MONSTERS.bossHardwoodColossus.hp > MONSTERS.bossWinterWyrm.hp && MONSTERS.bossHardwoodColossus.timeLimitSec > MONSTERS.bossWinterWyrm.timeLimitSec);
+	assert.equal(winRate(STARTER_EQUIPMENT, 'eyeHorror', 14), 0, 'the starter kit is not enough for a rebirth biome');
+});

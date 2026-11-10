@@ -109,10 +109,10 @@ export interface MonsterSpawnRule {
 }
 
 /**
- * The biomes that have a monster roster today (catalog/monsters.ts): the seven home biomes. A monster stands on tiles of its own biome, water included (a coast or lake tile holds
- * a monster like any other owned tile; IDL-58), so there is no shoreline rule. The rebirth biomes have no roster yet.
+ * The biomes that have a monster roster today (catalog/monsters.ts): the seven home biomes and the jungle (rebirth 1). A monster stands on tiles of its own biome, water included (a coast or lake tile holds
+ * a monster like any other owned tile; IDL-58), so there is no shoreline rule. Fields, orchard, blight and battlefield have no roster yet.
  */
-type MonsterBiome = 'plains' | 'forest' | 'hills' | 'coast' | 'swamp' | 'lake' | 'tundra';
+type MonsterBiome = 'plains' | 'forest' | 'hills' | 'coast' | 'swamp' | 'lake' | 'tundra' | 'jungle';
 
 export interface RewardPart {
 	rewardSec: number;
@@ -334,6 +334,26 @@ const BIOME_TIER = {
 			stunResist: 37,
 		},
 	},
+	// jungle (rebirth 1, IDL-107): after the tundra, for a player who has rebirthed once and brings better gear
+	jungle: {
+		hp: 340,
+		attack: 9,
+		armor: 4,
+		rewardSec: 210,
+		cap: { gold: 3000, xp: 430 },
+		window: { base: 14, perCastleLevel: 0.5, spread: 2, cap: 22 },
+		boss: {
+			hp: 9000,
+			attack: 40,
+			armor: 64,
+			refLevel: 32,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 100,
+			window: { base: 32, perCastleLevel: 0.8, spread: 3, cap: 42 },
+			crit: 14,
+			stunResist: 50,
+		},
+	},
 } as const satisfies Record<MonsterBiome, Tier>;
 
 /** How a normal monster fights, relative to its biome's tier */
@@ -345,7 +365,7 @@ const BUILD = {
 	elite: { hp: 2, attack: 1.5, speed: 0.45, armor: 8 },
 } as const;
 
-const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof typeof BUILD): MonsterDef => {
+const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof typeof BUILD, minRebirths?: number): MonsterDef => {
 	const tier = BIOME_TIER[biome];
 	const b = BUILD[build];
 	return {
@@ -358,7 +378,7 @@ const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof type
 		critMult: 1.5,
 		stunResist: 0,
 		attackSpeed: b.speed,
-		spawn: { biomes: [biome], minCastleDistance: 2, maxCastleDistance: 9 },
+		spawn: { biomes: [biome], minCastleDistance: 2, maxCastleDistance: 9, ...(minRebirths ? { minRebirths } : {}) },
 		reward: { gold: { rewardSec: tier.rewardSec, cap: tier.cap.gold }, xp: { rewardSec: tier.rewardSec, cap: tier.cap.xp }, levelMult: 1.08 },
 		refLevel: 1,
 		scaling: 'exp',
@@ -382,7 +402,12 @@ export const BOSS_MIN_DISTANCE = 8;
 export const BOSS_MAX_DISTANCE = 999;
 
 /** A boss always has a clock and taunts (the type says so, so a caller need not check) */
-const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly string[]): MonsterDef & { timeLimitSec: number; taunts: readonly string[] } => {
+const boss = (
+	biome: keyof typeof BIOME_TIER,
+	label: string,
+	taunts: readonly string[],
+	minRebirths?: number,
+): MonsterDef & { timeLimitSec: number; taunts: readonly string[] } => {
 	const b = BIOME_TIER[biome].boss;
 	return {
 		grade: 'boss',
@@ -394,7 +419,7 @@ const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly st
 		critMult: 1.5,
 		stunResist: b.stunResist,
 		attackSpeed: 1 / 3, // one hit every 3 s; armor decides how many hits you survive, potions fill the gap
-		spawn: { biomes: [biome], minCastleDistance: BOSS_MIN_DISTANCE, maxCastleDistance: BOSS_MAX_DISTANCE },
+		spawn: { biomes: [biome], minCastleDistance: BOSS_MIN_DISTANCE, maxCastleDistance: BOSS_MAX_DISTANCE, ...(minRebirths ? { minRebirths } : {}) },
 		reward: { gold: { rewardSec: 3600, cap: b.cap.gold }, xp: { rewardSec: 3600, cap: b.cap.xp }, levelMult: 1.03 },
 		refLevel: b.refLevel,
 		scaling: 'gear',
@@ -413,12 +438,12 @@ export const FALLBACK_MONSTER = 'thistleBoar' as const;
 export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
 
 /**
- * The roster: 28 monsters in seven biomes, three normal ones and a boss each: plains, forest, swamp and tundra, and since IDL-201 hills, coast and lake. A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes have no roster yet.
+ * The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet.
  * Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
  *
  * - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
- * - Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 s, one hit every 3 s (`BIOME_TIER`).
- * - Tier numbers per biome (`BIOME_TIER`), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8.
+ * - Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra / jungle: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 / 14 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 / 50 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 / 100 s, one hit every 3 s (`BIOME_TIER`).
+ * - Tier numbers per biome (`BIOME_TIER`), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8; jungle 340 / 9.
  * - The ladder against gear: `docs/generated/monster-ladder.md`.
  *
  * @category Monsters/Roster
@@ -461,4 +486,9 @@ export const MONSTERS = {
 	reedNymph: normal('lake', 'Reed Nymph', 'even'),
 	pikeLurker: normal('lake', 'Pike Lurker', 'fierce'),
 	bossLakeHydra: boss('lake', 'The Lake Hydra', ['Heads hiss from the reeds.', 'Cut one down and two more watch you.']),
+	// jungle: only after the first rebirth, like the biome itself (`BIOME_RULES.unlockAfterRebirths`)
+	skullVine: normal('jungle', 'Skull Vine', 'even', 1),
+	eyeHorror: normal('jungle', 'Eye Horror', 'fierce', 1),
+	zombieTriceratops: normal('jungle', 'Zombie Triceratops', 'tough', 1),
+	bossHardwoodColossus: boss('jungle', 'The Hardwood Colossus', ['The Colossus groans as it straightens.', 'The jungle has been growing a long time.'], 1),
 } as const satisfies Record<string, MonsterDef>;

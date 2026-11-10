@@ -1946,13 +1946,13 @@ recorded in <code>ledger.buffs</code> with its end time, a heal over time starts
 </ul>
 </article></section><section class="cat"><h2 class="cat" id="cat-monsters">Monsters</h2><p class="blurb">The roster, levels, growth, spawning and what a kill pays.</p><h2>Roster</h2><article><p><a id="monsters"></a></p>
 <h3><code>MONSTERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:428</code></a></p>
-<p>The roster: 28 monsters in seven biomes, three normal ones and a boss each: plains, forest, swamp and tundra, and since IDL-201 hills, coast and lake. A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes have no roster yet.
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:453</code></a></p>
+<p>The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet.
 Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a href="#monsterstats"><code>monsterStats</code></a>; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.</p>
 <ul>
 <li>Builds (<code>BUILD</code>): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.</li>
-<li>Normal monsters never crit (<code>critChance</code> 0, <code>critMult</code> 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 s, one hit every 3 s (<code>BIOME_TIER</code>).</li>
-<li>Tier numbers per biome (<code>BIOME_TIER</code>), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8.</li>
+<li>Normal monsters never crit (<code>critChance</code> 0, <code>critMult</code> 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra / jungle: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 / 14 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 / 50 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 / 100 s, one hit every 3 s (<code>BIOME_TIER</code>).</li>
+<li>Tier numbers per biome (<code>BIOME_TIER</code>), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8; jungle 340 / 9.</li>
 <li>The ladder against gear: <code>docs/generated/monster-ladder.md</code>.</li>
 </ul>
 <p><strong>The roster (level 1 stats; bosses at their reference level)</strong> <em>(computed from the code)</em></p>
@@ -2249,6 +2249,46 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <td>0.33</td>
 <td>27-30 -&gt; 34-37</td>
 </tr>
+<tr>
+<td>jungle</td>
+<td>Skull Vine</td>
+<td>1</td>
+<td>340</td>
+<td>9</td>
+<td>4</td>
+<td>0.5</td>
+<td>14-16 -&gt; 18-20</td>
+</tr>
+<tr>
+<td>jungle</td>
+<td>Eye Horror</td>
+<td>1</td>
+<td>272</td>
+<td>11</td>
+<td>4</td>
+<td>0.6</td>
+<td>14-16 -&gt; 18-20</td>
+</tr>
+<tr>
+<td>jungle</td>
+<td>Zombie Triceratops</td>
+<td>1</td>
+<td>442</td>
+<td>7</td>
+<td>4</td>
+<td>0.4</td>
+<td>14-16 -&gt; 18-20</td>
+</tr>
+<tr>
+<td>jungle</td>
+<td>The Hardwood Colossus (boss)</td>
+<td>32</td>
+<td>9,000</td>
+<td>40</td>
+<td>64</td>
+<td>0.33</td>
+<td>32-35 -&gt; 39-42</td>
+</tr>
 </tbody></table>
 </article><h2>Level scaling</h2><article><p><a id="monsterstats"></a></p>
 <h3><code>monsterStats</code> <small>function</small></h3>
@@ -2351,7 +2391,7 @@ that still have a free tile the pick is weighted by win chance and the boss&#39;
 <p>Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by <a href="#bandof"><code>bandOf</code></a>. No spawn rule reads them yet.</p>
 </article><article><p><a id="boss-min-distance"></a></p>
 <h3><code>BOSS_MIN_DISTANCE</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:381</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:401</code></a></p>
 <p>The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts&#39; start (7), and the band is open-ended (<code>BOSS_MAX_DISTANCE</code> is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">boss tile: BOSS_MIN_DISTANCE (8) &lt;= castle distance &lt;= BOSS_MAX_DISTANCE; normal monster tile: 2 &lt;= castle distance &lt;= 9
@@ -2441,6 +2481,13 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 <td>257</td>
 <td>1.08</td>
 </tr>
+<tr>
+<td>jungle</td>
+<td>210</td>
+<td>3,000</td>
+<td>430</td>
+<td>1.08</td>
+</tr>
 </tbody></table>
 </article></section><section class="cat"><h2 class="cat" id="cat-loot">Loot</h2><p class="blurb">The loot pipeline, rarities, affixes, sets, sell values and how to add content.</p><h2>Pipeline</h2><article><p><a id="generateloot"></a></p>
 <h3><code>generateLoot</code> <small>function</small></h3>
@@ -2507,7 +2554,7 @@ level windows, known slots/tags/rarities, no empty enabled pool, that something 
 </code></pre>
 </article><h2>Config</h2><article><p><a id="loot-sources"></a></p>
 <h3><code>LOOT_SOURCES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:398</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:401</code></a></p>
 <p>Keyed by the <code>DropSource</code> (a monster type, <code>chest</code> or the merchant&#39;s <code>merchant</code> shelf). A monster&#39;s drops are at its own level (monsters 1-30, bosses 15-45).</p>
 <p>Sources, keyed by the <code>DropSource</code> (a monster&#39;s biome source <code>monster_&lt;biome&gt;</code>, <code>boss</code>, <code>chest</code>, the merchant&#39;s <code>merchant</code> shelf). A monster&#39;s drops are at its own level (monsters 1-30, bosses 15-45); a chest and the shelf
 start at item level 4 plus 3 per castle level above 1.</p>
@@ -2561,6 +2608,11 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>the caller&#39;s level, range 10-29</td>
 </tr>
 <tr>
+<td>monster_jungle</td>
+<td>normal_monster_jungle</td>
+<td>the caller&#39;s level, range 14-32</td>
+</tr>
+<tr>
 <td>boss</td>
 <td>boss</td>
 <td>the caller&#39;s level, range 15-45</td>
@@ -2601,6 +2653,11 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>the caller&#39;s level, range 27-47</td>
 </tr>
 <tr>
+<td>boss_jungle</td>
+<td>boss_jungle</td>
+<td>the caller&#39;s level, range 32-52</td>
+</tr>
+<tr>
 <td>chest</td>
 <td>basic_chest</td>
 <td>own level: 4 + 3 per castle level above 1</td>
@@ -2618,7 +2675,7 @@ start at item level 4 plus 3 per castle level above 1.</p>
 </tbody></table>
 </article><article><p><a id="loot-profiles"></a></p>
 <h3><code>LOOT_PROFILES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:337</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:340</code></a></p>
 <p>Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster&#39;s profile is copied per biome and draws from that biome&#39;s pool. All numbers are STARTING POINTS to be tuned with <code>npm run loot-sim -- --md</code>.</p>
 <p><strong>Loot profiles</strong> <em>(computed from the code)</em></p>
 <table>
@@ -2688,6 +2745,13 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>rat_potion (potions_rat, fixed, 25%)</td>
 </tr>
 <tr>
+<td>normal_monster_jungle</td>
+<td>1 x 12% +1%/level from equipment_jungle</td>
+<td>source level +0 +-1</td>
+<td>common 70, uncommon 22, rare 7, epic 1, legendary 0.2</td>
+<td>rat_potion (potions_rat, fixed, 25%)</td>
+</tr>
+<tr>
 <td>boss</td>
 <td>1 x 100%, 1 guaranteed from boss_general</td>
 <td>source level +0 +-0</td>
@@ -2744,6 +2808,13 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>king_potions (potions_king, fixed)</td>
 </tr>
 <tr>
+<td>boss_jungle</td>
+<td>1 x 100%, 1 guaranteed from boss_general_jungle</td>
+<td>source level +0 +-0</td>
+<td>common 20, uncommon 30, rare 30, epic 15, legendary 5</td>
+<td>king_potions (potions_king, fixed)</td>
+</tr>
+<tr>
 <td>basic_chest</td>
 <td>1 x 82% from general_equipment</td>
 <td>source level +0 +-1</td>
@@ -2773,14 +2844,14 @@ The pool admits every ladder grade up to the biome&#39;s ceiling (<code>maxGrade
 window (items/grades.ts), so a level 30 monster cannot drop G1 whatever the pool says. (Excluding the lower grades by tag would leave
 a forest kill at level 4-8 with nothing eligible while G1 is the only live grade there.) Only the grades in <code>LIVE_GRADES</code> have enabled items,
 so a ceiling above the highest live grade changes nothing yet. With G1-G6 live (IDL-238) the item level decides, and a ceiling must reach the grade of the highest item level the biome can produce: plains monsters (levels 1-20, growing up to 30, plus 1 of variance) reach item level 31, so plains stops at G4, where G3 would leave a grown monster with nothing to drop.</p>
-<p>A biome&#39;s grade ceiling. Normal monsters drop from <code>monster_&lt;biome&gt;</code> (pool <code>equipment_&lt;biome&gt;</code>): ladder grades up to the biome&#39;s ceiling (plains G4, coast G4, forest G4, hills G4, swamp G5, lake G5, tundra G7); the floor is the item level window of each grade.
+<p>A biome&#39;s grade ceiling. Normal monsters drop from <code>monster_&lt;biome&gt;</code> (pool <code>equipment_&lt;biome&gt;</code>): ladder grades up to the biome&#39;s ceiling (plains G4, coast G4, forest G4, hills G4, swamp G5, lake G5, tundra G7, jungle G7); the floor is the item level window of each grade.
 Every base that drops carries a <code>grade:</code> tag (IDL-243): the legacy wood, steel and Obsidian pieces that fill a ladder cell are graded by it (Wooden Club G1, Hunting Bow G2, Iron Sword G3, six Steel armour pieces G4, the Obsidian family G6; they keep their ids, art and set bonuses),
 the rest of wood, steel and all of cloth are retired (<code>enabled: false</code>, ids kept, owned pieces keep working). A graded legacy piece is generated only in its grade&#39;s window and rarities (<code>dropLevels</code>, <code>dropRarities</code>) but stays valid at its old level range for pieces already owned.
 The highest live grade is open at the top and takes every rarity (<a href="#gradelevels"><code>gradeLevels</code></a>, <a href="#graderarities"><code>gradeRarities</code></a> in <code>src/catalog/items/grades.ts</code>) so nothing is left without a base while the next grade is dark; a rarity with no base at an item level is left out of the roll there.
 The merchant&#39;s shelf passes <code>maxGrade</code> = the best grade the player wears (<a href="#bestworngrade"><code>bestWornGrade</code></a>).</p>
 </article><article><p><a id="boss-loot"></a></p>
 <h3><code>BOSS_LOOT</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:208</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:210</code></a></p>
 <p>Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): each biome&#39;s boss has a source of its own (<code>boss_&lt;biome&gt;</code>, profile <code>boss_&lt;biome&gt;</code>) with</p>
 <ul>
 <li>a guaranteed general roll from its own general pool (<code>boss_general_&lt;biome&gt;</code>: no named item, no set piece; the grades the biome&#39;s monsters drop up to the ceiling, at the boss&#39;s level),</li>
@@ -2851,6 +2922,13 @@ The uniques are the three legendary weapons, one per boss from the hardest down 
 <td>none yet</td>
 <td>none yet (open sets still in the general pools: obsidian)</td>
 <td>boss_general_lake</td>
+</tr>
+<tr>
+<td>boss_jungle</td>
+<td>32-52</td>
+<td>none yet</td>
+<td>none yet (open sets still in the general pools: obsidian)</td>
+<td>boss_general_jungle</td>
 </tr>
 </tbody></table>
 </article><h2>Items</h2><article><p><a id="rarities"></a></p>
@@ -2977,7 +3055,7 @@ so owned pieces load and work. The starter sword and shield are still what a new
 <p>Test and simulation helper: a full kit of one ladder grade, so fight balance (<code>fight-sim</code>, <code>monster-ladder</code>, <code>fightBalance</code>) is pinned to grades rather than to named legacy sets.</p>
 </article><h2>Adding content</h2><article><p><a id="loot-pools"></a></p>
 <h3>Adding loot content (data only)</h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:298</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:301</code></a></p>
 <p>Adding loot content is data only; the generator needs no change.</p>
 <ul>
 <li><strong>A base item</strong>: add <code>gear(id, name, slot, rarity, stats, { tier, ... })</code> (<a href="#gear"><code>gear</code></a>) to a file in <code>src/catalog/items/</code>. Its stats are authored at the first level of its tier&#39;s window (<code>LEVEL_WINDOW_BY_TIER</code>).

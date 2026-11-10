@@ -33,7 +33,7 @@ test('every normal monster drops from the source of its own biome, bosses from t
 
 test('a biome pool stops at its grade ceiling: plains, coast, forest and hills G4, swamp and lake G5, tundra G7', () => {
 	const d = allGradesLive();
-	const ceilings = { plains: 'G4', coast: 'G4', forest: 'G4', hills: 'G4', swamp: 'G5', lake: 'G5', tundra: 'G7' } satisfies Record<
+	const ceilings = { plains: 'G4', coast: 'G4', forest: 'G4', hills: 'G4', swamp: 'G5', lake: 'G5', tundra: 'G7', jungle: 'G7' } satisfies Record<
 		keyof typeof BIOME_LOOT,
 		Grade
 	>;
