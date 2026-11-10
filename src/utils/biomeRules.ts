@@ -44,17 +44,19 @@ function isLonely(tiles: World, x: number, y: number): boolean {
 	return biome !== null && !SIDES4.some(([dx, dy]) => getTile(tiles, x + dx, y + dy)?.biome === biome);
 }
 
-/** Every biome a purchase can produce (castle, empty and the dev-only biomes of config/biomeStage.ts are not). */
+/** Every biome a purchase can produce at some point (castle, empty and the dev-only biomes of config/biomeStage.ts are not); which of them are allowed now depends on purchases and rebirths ({@link biomeVerdicts}). */
 export const SELECTABLE_BIOMES = Object.keys(BIOMES).filter(
 	(name) => !SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) && !EMPTY_BIOMES.includes(name as BiomeType) && isLiveBiome(name),
 ) as BiomeType[];
 
-/** Verdict for each biome a purchase can produce on tile (x, y) after `purchased` purchases. */
-export function biomeVerdicts(tiles: World, x: number, y: number, purchased: number): BiomeVerdict[] {
+/** Verdict for each biome a purchase can produce on tile (x, y) after `purchased` purchases in a run that follows `rebirths` completed rebirths (0 = a first run). */
+export function biomeVerdicts(tiles: World, x: number, y: number, purchased: number, rebirths = 0): BiomeVerdict[] {
 	const { four, eight } = neighbourBiomes(tiles, x, y);
 	const hasWater = eight.some((b) => b === 'lake' || b === 'coast');
 	return SELECTABLE_BIOMES.map((biome) => {
 		const ext = four.includes(biome);
+		const needRebirths = BIOME_RULES.unlockAfterRebirths[biome] ?? 0;
+		if (rebirths < needRebirths) return { biome, allowed: false, reason: `Unlocks after rebirth ${needRebirths}` };
 		const unlock = BIOME_RULES.unlockAfterPurchases[biome] ?? 0;
 		if (purchased < unlock) return { biome, allowed: false, reason: `Unlocks after ${unlock} tiles` };
 		if (!BIOME_RULES.neutral.includes(biome)) {
@@ -113,18 +115,19 @@ function weighted<T>(items: [T, number][], roll: number): T {
  * Which biome a purchase becomes is **rolled when you buy; there is no picker**. Rules and numbers are `BIOME_RULES` in `src/config/biomeRules.ts` and `BIOME_SPAWN` in `src/config/biomes.ts`.
  *
  * - Plains, forest, hills and lake from the start; swamp after 6 purchases, tundra after 10; coast only beside a lake or coast.
- * - Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast. Plains is neutral.
- * - Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40) plus 10 per extra same-biome 4-neighbour,
- *   capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
+ * - The rebirth biomes need completed rebirths (`BIOME_RULES.unlockAfterRebirths`): jungle after 1, fields 2, blossom orchard 3, blight 4, battlefield 5. `rebirths` is `prestige.rebirths`;
+ *   below it the biome is never allowed, so it can neither be rolled nor copied from a neighbour.
+ * - Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast, blight-lake, blight-coast, blight-orchard, battlefield-swamp, jungle-tundra. Plains is neutral.
+ * - Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40, jungle 55, fields 55, orchard 55, blight 60, battlefield 55)
+ *   plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
  * - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water.
- * - Jungle, fields, orchard, blight and battlefield exist in `BIOMES` as dev-only entries; no rule gives them to players.
  * - The start ring (the four free tiles) is plains and forest only, at least two plains ({@link generateStartRing}).
  *
  * @category Economy/Biomes
  * @order 1
  */
-export function rollBiome(tiles: World, x: number, y: number, purchased: number, random: () => number = Math.random): BiomeType {
-	const everyAllowed = biomeVerdicts(tiles, x, y, purchased)
+export function rollBiome(tiles: World, x: number, y: number, purchased: number, random: () => number = Math.random, rebirths = 0): BiomeType {
+	const everyAllowed = biomeVerdicts(tiles, x, y, purchased, rebirths)
 		.filter((v) => v.allowed)
 		.map((v) => v.biome);
 	const { four } = neighbourBiomes(tiles, x, y);

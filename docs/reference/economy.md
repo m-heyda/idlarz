@@ -9,7 +9,7 @@ Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - Basics: [Basics: tick, caps, start](#tick-rate), [`MAX_CATCHUP_SEC`](#max-catchup-sec), [`RESOURCE_CAP`](#resource-cap), [`INITIAL_RESOURCES`](#initial-resources)
 - Income: [`calculateResourceBreakdown`](#calculateresourcebreakdown), [`calculateTileOutput`](#calculatetileoutput), [`BIOME_YIELD`](#biome-yield), [`BASE_GENERATION_RATES`](#base-generation-rates)
 - Tiles: [`tilePrice`](#tileprice), [`TILE_RESOURCE_COST`](#tile-resource-cost), [`calculateTileCost`](#calculatetilecost), [`effectiveTileDiscount`](#effectivetilediscount), [`calculateXpGain`](#calculatexpgain), [`economyTiles`](#economytiles)
-- Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`generateStartRing`](#generatestartring)
+- Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`REBIRTH_BIOME_OUTPUT`](#rebirth-biome-output), [`generateStartRing`](#generatestartring)
 - Buildings: [`BUILDINGS`](#buildings), [`buildingCostFactor`](#buildingcostfactor), [`calculateBuildingCost`](#calculatebuildingcost), [`BUILDING_COST`](#building-cost)
 - Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_FORTRESS`](#castle-fortress), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
 - Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
@@ -269,7 +269,7 @@ economyTiles = owned tiles - freeTiles + 1       (freeTiles = STARTER_FREE_TILES
 
 ### `rollBiome` <small>function</small>
 
-Source: [`src/utils/biomeRules.ts:126`](../../src/utils/biomeRules.ts)
+Source: [`src/utils/biomeRules.ts:129`](../../src/utils/biomeRules.ts)
 
 The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra
 same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore
@@ -278,18 +278,19 @@ same-biome neighbour), otherwise a weighted roll among everything the rules allo
 Which biome a purchase becomes is **rolled when you buy; there is no picker**. Rules and numbers are `BIOME_RULES` in `src/config/biomeRules.ts` and `BIOME_SPAWN` in `src/config/biomes.ts`.
 
 - Plains, forest, hills and lake from the start; swamp after 6 purchases, tundra after 10; coast only beside a lake or coast.
-- Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast. Plains is neutral.
-- Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40) plus 10 per extra same-biome 4-neighbour,
-  capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
+- The rebirth biomes need completed rebirths (`BIOME_RULES.unlockAfterRebirths`): jungle after 1, fields 2, blossom orchard 3, blight 4, battlefield 5. `rebirths` is `prestige.rebirths`;
+  below it the biome is never allowed, so it can neither be rolled nor copied from a neighbour.
+- Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast, blight-lake, blight-coast, blight-orchard, battlefield-swamp, jungle-tundra. Plains is neutral.
+- Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40, jungle 55, fields 55, orchard 55, blight 60, battlefield 55)
+  plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
 - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water.
-- Jungle, fields, orchard, blight and battlefield exist in `BIOMES` as dev-only entries; no rule gives them to players.
 - The start ring (the four free tiles) is plains and forest only, at least two plains ([`generateStartRing`](economy.md#generatestartring)).
 
 <a id="biomes"></a>
 
 ### `BIOMES` <small>const</small>
 
-Source: [`src/config/biomes.ts:30`](../../src/config/biomes.ts)
+Source: [`src/config/biomes.ts:53`](../../src/config/biomes.ts)
 
 Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.
 
@@ -305,13 +306,38 @@ Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (
 | Tundra | gold 0.1, coal 0.35 |
 | Lake | gold 0.05, food 0.25 |
 | Coast | gold 0.1, food 0.2 |
+| Jungle | gold 0.15, wood 0.45 |
+| Fields | gold 0.16, food 0.48 |
+| Blossom Orchard | gold 0.175, food 0.35, wood 0.175 |
+| Blight | gold 0.19, coal 0.665 |
+| Battlefield | stone 0.6, wood 0.4 |
 | (scale) | x1.3 |
+
+<a id="rebirth-biome-output"></a>
+
+### `REBIRTH_BIOME_OUTPUT` <small>const</small>
+
+Source: [`src/config/biomes.ts:32`](../../src/config/biomes.ts)
+
+Output of the five rebirth biomes (unlocked one per rebirth, `BIOME_RULES.unlockAfterRebirths`): a **flat multiple of a basic tile's output**, existing resources only. `base` is the
+output of the basic tile it is measured against (per second, before `BIOME_YIELD.scale`); `multiplier` rises with the rebirth that unlocks it, from x1.5 (jungle) to x2
+(battlefield). No new resource types: T2 materials, monsters and buildings for these biomes come after the release. Pinned by tests/economy/rebirthBiomes.test.ts.
+
+**Rebirth biomes: unlock and output per second (x BIOME_YIELD.scale for a real tile)** _(computed from the code)_
+
+| Biome | Unlocks after rebirth | Measured against | Multiplier | Config output / s |
+| --- | --- | --- | --- | --- |
+| Jungle | 1 | forest | x1.5 | gold 0.15, wood 0.45 |
+| Fields | 2 | plains | x1.6 | gold 0.16, food 0.48 |
+| Blossom Orchard | 3 | a plains and forest mix | x1.75 | gold 0.175, food 0.35, wood 0.175 |
+| Blight | 4 | tundra | x1.9 | gold 0.19, coal 0.665 |
+| Battlefield | 5 | hills (stone) and swamp (wood) | x2 | stone 0.6, wood 0.4 |
 
 <a id="generatestartring"></a>
 
 ### `generateStartRing` <small>function</small>
 
-Source: [`src/utils/biomeRules.ts:186`](../../src/utils/biomeRules.ts)
+Source: [`src/utils/biomeRules.ts:189`](../../src/utils/biomeRules.ts)
 
 The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains`
 plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.

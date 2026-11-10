@@ -19,7 +19,8 @@ import {
 	TILE_RESOURCE_COST,
 	XP_CAP,
 } from '../../src/config/economy';
-import { BIOMES } from '../../src/config/biomes';
+import { BIOMES, REBIRTH_BIOME_OUTPUT } from '../../src/config/biomes';
+import { BIOME_RULES } from '../../src/config/biomeRules';
 import { BUILDING_COST, BUILDINGS } from '../../src/config/buildings';
 import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADE_GROUPS, MERCHANT_UPGRADES } from '../../src/config/merchant';
@@ -109,6 +110,14 @@ TABLES['biome-output'] = () => ({
 			...SELECTABLE_BIOMES.map((b) => [BIOMES[b].label, res(BIOMES[b].resourceGeneration as Record<string, number>) || '-']),
 			['(scale)', `x${BIOME_YIELD.scale}`],
 		],
+	),
+});
+
+TABLES['rebirth-biome-output'] = () => ({
+	title: 'Rebirth biomes: unlock and output per second (x BIOME_YIELD.scale for a real tile)',
+	md: mdTable(
+		['Biome', 'Unlocks after rebirth', 'Measured against', 'Multiplier', 'Config output / s'],
+		Object.entries(REBIRTH_BIOME_OUTPUT).map(([b, o]) => [BIOMES[b].label, BIOME_RULES.unlockAfterRebirths[b], o.measuredAgainst, `x${o.multiplier}`, res(BIOMES[b].resourceGeneration as Record<string, number>)]),
 	),
 });
 

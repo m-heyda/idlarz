@@ -8,7 +8,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 
 - Levels: [`LEVELING`](#leveling), [`xpToNextLevel`](#xptonextlevel), [`totalStatPoints`](#totalstatpoints), [`cumulativeXp`](#cumulativexp), [`calculateLevel`](#calculatelevel), [`reconcileCharacter`](#reconcilecharacter)
 - Attributes: [`CHARACTER_STAT_CONFIG`](#character-stat-config), [`calculateStatResourceModifiers`](#calculatestatresourcemodifiers), [`calculateCombatStats`](#calculatecombatstats)
-- Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus)
+- Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`rebirthUnlockIntro`](#rebirthunlockintro)
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof)
 - Gems: [`STARTING_GEMS`](#starting-gems)
@@ -256,6 +256,14 @@ all read this one function, so what the tooltip promises is what the action chec
 ```text
 can rebirth = castle level >= 6  and  economyTiles >= 400 + 50 x rebirths  and  no castle upgrade running  and  Embers gained >= 1
 ```
+
+<a id="rebirthunlockintro"></a>
+
+### `rebirthUnlockIntro` <small>function</small>
+
+Source: [`src/utils/game/rebirthUnlocks.ts:28`](../../src/utils/game/rebirthUnlocks.ts)
+
+The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. `null` when that rebirth unlocks nothing (the sixth and later).
 
 ## Ember shop
 

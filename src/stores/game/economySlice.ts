@@ -62,7 +62,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades));
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
-			return completePurchase(x, y, rollBiome(state.tiles, x, y, purchased));
+			return completePurchase(x, y, rollBiome(state.tiles, x, y, purchased, Math.random, state.prestige.rebirths));
 		},
 
 		// Starts the (timed) castle upgrade: resources are paid now, the level changes when the timer ends
