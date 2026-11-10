@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [Asset library](#asset-library), [Sound library](#sound-library)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [Sound library](#sound-library)
 - Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
 ## The loop
@@ -127,6 +127,16 @@ The panel offers biome painting, extending land, erasing, chests and monsters (b
 - `lib/dragPaint.ts` (pure): hold-and-drag drawing. `createStroke(apply)` turns pointer moves into the new cells of one stroke (line interpolation, brush, no repeats, capped).
 - `lib/mapEdit.ts` (pure): `applyStroke(world, cells, tool)` plus the tools (`paintTool`, `extendTool`, `eraseTool`, `chestTool`, `extendRing`). A new tool is one more `(world, cell) => Tile | undefined | 'skip'` function.
 - The lab's random chests use a plain picker on purpose: the game's weighted chest placement stays server-side (`tests/server/serverBoundary.test.ts`).
+
+<a id="the-landing-world"></a>
+
+### The landing world
+
+Source: [`src/lib/landingWorld.ts:4`](../../src/lib/landingWorld.ts)
+
+The world behind the landing page: a vast, seeded land of the basic biomes (plains, forest, swamp, tundra, coast) with a sea around it, a river and ponds, and the word IDLE spelled
+out in hills on a snow plain that is part of the mainland (patches of the biomes, not slabs). `/map-lab/landing-bake` draws it with the real terrain renderer and saves `public/landing/map.png`, which the landing page shows (so the landing never runs the generator).
+Deterministic: the same seed gives the same picture. Pure: no canvas, no store.
 
 <a id="asset-library"></a>
 

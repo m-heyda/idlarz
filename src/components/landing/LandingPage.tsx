@@ -1,16 +1,22 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import PixelIcon from '@/components/game/PixelIcon';
+import { CHANGELOG } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
-import { LANDING_BIOMES, LANDING_FEATURES, type LandingFeature } from '@/config/landing';
+import { LANDING_FEATURES, LANDING_MAP, type LandingFeature } from '@/config/landing';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { fetchMe, logout, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@/styles/Landing.css';
+
+/** The size the landing is designed for (content width, and the height from the top of the map to the bottom of the feature cards). */
+const DESIGN_W = 1300;
+const DESIGN_H = 1030;
 
 type Visitor =
 	| { name: 'checking' }
@@ -18,38 +24,84 @@ type Visitor =
 	| { name: 'member'; profile: Profile | null; stats: ProfileStats | null }
 	| { name: 'unavailable'; reason: UnavailableReason };
 
-/** "IDLE" in hills tiles, "REALM" smaller below. The name comes from `GAME_TITLE` ("Idle Realm"): the first word big, the rest small. */
-const Banner: React.FC = () => {
-	const [big, ...rest] = GAME_TITLE.split(' ');
+/** A monster from the game sitting on the edge of a box. */
+const Critter: React.FC<{ id: string; size?: number; className?: string }> = ({ id, size = 56, className }) => (
+	<Image src={`/pixel/enemies/${id}.png`} alt='' width={size} height={size} unoptimized draggable={false} className={`ld-critter pixelated ${className ?? ''}`} />
+);
+
+/** A pixel-art crown (15 x 8 cells): gold with a darker band and three gems. */
+const CROWN_ROWS = ['.#.....#.....#.', '.##...###...##.', '.###.#####.###.', '.#############.', '.#############.', '.#############.', '.=============.', '.=============.'];
+const Crown: React.FC = () => (
+	<svg className='ld-crown' viewBox='0 0 15 8' width={120} height={64} shapeRendering='crispEdges' aria-hidden='true'>
+		{CROWN_ROWS.flatMap((row, y) =>
+			row.split('').map((c, x) => (c === '.' ? null : <rect key={`${x},${y}`} x={x} y={y} width={1} height={1} fill={c === '#' ? '#f0d27a' : '#c08a30'} />)),
+		)}
+		<rect x={3} y={4} width={1} height={1} fill='#4aa3e8' />
+		<rect x={7} y={4} width={1} height={1} fill='#e04a4a' />
+		<rect x={11} y={4} width={1} height={1} fill='#4aa3e8' />
+	</svg>
+);
+
+/** The title: IDLE is written on the land itself (hills in the baked map); here the REALM stamp, the crown and the tagline sit under it, inside the drifting map so they move together. */
+const TitleBlock: React.FC = () => {
+	const rest = GAME_TITLE.split(' ').slice(1).join(' ').toUpperCase();
 	return (
-		<header className='ld-banner'>
+		<div className='ld-title'>
 			<h1 aria-label={GAME_TITLE}>
-				<span className='ld-title-big' aria-hidden='true'>
-					{big.toUpperCase()}
-				</span>
-				<span className='ld-title-small' aria-hidden='true'>
-					{rest.join(' ').toUpperCase()}
+				<Crown />
+				<span className='ld-stamp' aria-hidden='true'>
+					{rest}
 				</span>
 			</h1>
 			<p className='ld-tagline'>Build a realm. Leave it running. Come back to a bigger one.</p>
-		</header>
+		</div>
 	);
 };
 
+const WindowHead: React.FC<{ title: string }> = ({ title }) => (
+	<div className='px-modal-head'>
+		<span className='px-title-line' />
+		<h2 className='px-title'>{title}</h2>
+		<span className='px-title-line rev' />
+	</div>
+);
+
+const ChangelogWindow: React.FC = () => (
+	<div className='px-modal ld-window'>
+		<Critter id='forest/mossback-wolf' className='ld-critter-tl' />
+		<Critter id='coast/wreck-crab' size={48} className='ld-critter-bl' />
+		<WindowHead title='Changelog' />
+		<div className='px-modal-body ld-log'>
+			{CHANGELOG.map((entry) => (
+				<article key={entry.date + entry.title}>
+					<p className='ld-log-date'>{entry.date}</p>
+					<h3 className='ld-log-title'>{entry.title}</h3>
+					<ul>
+						{entry.items.map((item) => (
+							<li key={item}>{item}</li>
+						))}
+					</ul>
+				</article>
+			))}
+		</div>
+	</div>
+);
+
 const FeatureCard: React.FC<{ feature: LandingFeature }> = ({ feature }) => (
 	<li className='ld-card'>
-		<span className='ld-card-icon'>
-			<PixelIcon name={feature.icon} />
-		</span>
-		<span>
+		<Critter id={feature.critter} size={48} className='ld-critter-top' />
+		<div className='ld-card-head'>
+			<span className='ld-card-icon'>
+				<PixelIcon name={feature.icon} />
+			</span>
 			<h3 className='ld-card-title'>{feature.title}</h3>
-			<p className='ld-card-text'>{feature.text}</p>
-		</span>
+		</div>
+		<p className='ld-card-text'>{feature.text}</p>
 	</li>
 );
 
-/** The Continue card for a signed-in visitor: who they are and the way into the game. Read-only. */
-const ContinueCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null; onLogout: () => void }> = ({ profile, stats, onLogout }) => {
+/** The hero card for a signed-in visitor: portrait, name, class, level and rebirths, and the way into the game (Enter). Read-only. */
+const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null; onLogout: () => void }> = ({ profile, stats, onLogout }) => {
 	if (!profile) {
 		return (
 			<div className='ld-continue'>
@@ -78,32 +130,25 @@ const ContinueCard: React.FC<{ profile: Profile | null; stats: ProfileStats | nu
 					Level {stats.level} · {stats.rebirths} {stats.rebirths === 1 ? 'rebirth' : 'rebirths'}
 				</p>
 			)}
-			<Link className='px-btn ld-continue-go' href={PLAY_PATH}>
-				Continue
+			<Link className='px-btn ld-continue-go' href={PLAY_PATH} autoFocus>
+				Enter the realm
 			</Link>
+			<p className='ld-hint'>or press Enter</p>
 			<button type='button' className='ld-link' onClick={onLogout}>
-				Log out
+				Not you? Log out
 			</button>
 		</div>
 	);
 };
 
-const WindowHead: React.FC<{ title: string }> = ({ title }) => (
-	<div className='px-modal-head'>
-		<span className='px-title-line' />
-		<h2 className='px-title'>{title}</h2>
-		<span className='px-title-line rev' />
-	</div>
-);
-
-/** The public landing page: banner, a login / register window (a bottom sheet on phones), five feature cards and, for a signed-in visitor, the Continue card. */
+/** The public landing page: the baked map with the title, a changelog window and the account window (login / register, or the hero card with Enter), and the five feature cards. */
 const LandingPage: React.FC = () => {
 	const router = useRouter();
 	const [visitor, setVisitor] = useState<Visitor>({ name: 'checking' });
 	const [mode, setMode] = useState<AuthMode>('login');
 	const [formKey, setFormKey] = useState(0);
-	const [sheetOpen, setSheetOpen] = useState(false);
 	const [next, setNext] = useState<string>(PLAY_PATH);
+	const [zoom, setZoom] = useState(1);
 
 	const look = useCallback(async () => {
 		const me = await fetchMe();
@@ -112,12 +157,28 @@ const LandingPage: React.FC = () => {
 		else setVisitor({ name: 'unavailable', reason: me.status === 'unavailable' ? me.reason : 'outage' });
 	}, []);
 
+	// the page is laid out for DESIGN_W x DESIGN_H css px and scaled to fit whatever screen it is on (a big screen gets it bigger, not lost in a corner)
 	useEffect(() => {
-		const params = new URLSearchParams(window.location.search);
-		setNext(safeNextPath(params.get('next')));
-		if (params.get('login') === '1') setSheetOpen(true); // a guest sent here from /play: on a phone the sheet opens by itself
+		const fit = () => setZoom(Math.min(1.5, Math.max(0.5, Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H))));
+		fit();
+		window.addEventListener('resize', fit);
+		return () => window.removeEventListener('resize', fit);
+	}, []);
+
+	useEffect(() => {
+		setNext(safeNextPath(new URLSearchParams(window.location.search).get('next')));
 		void look();
 	}, [look]);
+
+	// Enter takes a signed-in visitor into the game (a guest's Enter submits the form as usual)
+	useEffect(() => {
+		if (visitor.name !== 'member') return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Enter' && !e.repeat && !(e.target instanceof HTMLButtonElement)) router.push(PLAY_PATH);
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}, [visitor.name, router]);
 
 	const pickMode = (picked: AuthMode) => {
 		setMode(picked);
@@ -129,53 +190,33 @@ const LandingPage: React.FC = () => {
 		setVisitor({ name: 'guest' });
 	};
 
-	const signedIn = () => router.push(next); // /play runs the gate (profile, new chapter, save hub)
-
 	return (
-		<main className='ld-root'>
-			<div className='ld-backdrop' aria-hidden='true'>
-				{LANDING_BIOMES.map((biome, i) => (
-					<div
-						key={biome}
-						className='ld-band'
-						style={{ top: `${(i * 100) / LANDING_BIOMES.length - 4}%`, backgroundImage: `url(/pixel/bg/ground_${biome}.png)` }}
-					/>
-				))}
-				<div className='ld-shade' />
+		<main className='ld-root' style={{ '--ld-zoom': zoom } as React.CSSProperties}>
+			<div className='ld-mapwrap'>
+				<div className='ld-map' style={{ backgroundImage: `url(${LANDING_MAP.src})`, width: LANDING_MAP.width * LANDING_MAP.scale, height: LANDING_MAP.height * LANDING_MAP.scale, marginLeft: (-LANDING_MAP.width * LANDING_MAP.scale) / 2 }}>
+					<TitleBlock />
+				</div>
 			</div>
 
 			<div className='ld-content'>
-				<Banner />
+				<div className='ld-columns'>
+					<ChangelogWindow />
 
-				<div className='ld-stage'>
-					<ul className='ld-cards ld-cards-left'>
-						{LANDING_FEATURES.slice(0, 3).map((f) => (
-							<FeatureCard key={f.id} feature={f} />
-						))}
-					</ul>
-
-					<section className='ld-window-wrap' aria-label='Account'>
-						{visitor.name === 'guest' && (
-							<button type='button' className='px-btn ld-open-sheet' onClick={() => setSheetOpen(true)}>
-								Log in / Register
-							</button>
-						)}
-						{visitor.name === 'member' && (
-							<div className='px-modal ld-window ld-window-continue'>
+					<div className='px-modal ld-window'>
+						<Critter id='swamp/rot-heron' className='ld-critter-tr' />
+						{visitor.name === 'member' ? (
+							<>
 								<WindowHead title='Welcome back' />
 								<div className='px-modal-body'>
-									<ContinueCard profile={visitor.profile} stats={visitor.stats} onLogout={() => void leave()} />
+									<MemberCard profile={visitor.profile} stats={visitor.stats} onLogout={() => void leave()} />
 								</div>
-							</div>
-						)}
-						{(visitor.name === 'guest' || visitor.name === 'unavailable') && (
-							<div className='px-modal ld-window' data-open={sheetOpen}>
-								<button type='button' className='px-close ld-sheet-close' onClick={() => setSheetOpen(false)} aria-label='Close'>
-									✕
-								</button>
+							</>
+						) : (
+							<>
 								<WindowHead title={visitor.name === 'unavailable' ? 'Accounts unavailable' : authTitle(mode)} />
 								<div className='px-modal-body'>
-									{visitor.name === 'unavailable' ? (
+									{visitor.name === 'checking' && <p className='ld-hint'>Looking for your hero...</p>}
+									{visitor.name === 'unavailable' && (
 										<div className='ld-continue'>
 											<p>
 												{visitor.reason === 'not_configured'
@@ -188,7 +229,8 @@ const LandingPage: React.FC = () => {
 												</button>
 											)}
 										</div>
-									) : (
+									)}
+									{visitor.name === 'guest' && (
 										<>
 											<div className='ld-tabs' role='tablist'>
 												{(['login', 'register'] as const).map((tab) => (
@@ -200,25 +242,23 @@ const LandingPage: React.FC = () => {
 											<AuthForm
 												key={formKey}
 												initialMode={mode === 'register' ? 'register' : 'login'}
-												onSignedIn={signedIn}
+												onSignedIn={() => router.push(next)} // /play runs the gate (profile, new chapter, save hub)
 												onUnavailable={() => setVisitor({ name: 'unavailable', reason: 'outage' })}
 												onModeChange={setMode}
 											/>
 										</>
 									)}
 								</div>
-							</div>
+							</>
 						)}
-					</section>
-
-					<ul className='ld-cards ld-cards-right'>
-						{LANDING_FEATURES.slice(3).map((f) => (
-							<FeatureCard key={f.id} feature={f} />
-						))}
-					</ul>
+					</div>
 				</div>
 
-				<footer className='ld-footer'>{GAME_TITLE}</footer>
+				<ul className='ld-features'>
+					{LANDING_FEATURES.map((f) => (
+						<FeatureCard key={f.id} feature={f} />
+					))}
+				</ul>
 			</div>
 		</main>
 	);

@@ -91,6 +91,13 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`CombatPreview.tsx`](../../src/app/map-lab/CombatPreview.tsx) — ~ Same list as the lab's spawn dropdown:
 - [`LabPanel.tsx`](../../src/app/map-lab/LabPanel.tsx)
+
+**src/app/map-lab/landing-bake/**
+
+- [`page.tsx`](../../src/app/map-lab/landing-bake/page.tsx) — ~ /map-lab/landing-bake:
+
+**src/app/map-lab/**
+
 - [`layout.tsx`](../../src/app/map-lab/layout.tsx)
 - [`page.tsx`](../../src/app/map-lab/page.tsx) — ~ /map-lab:
 
@@ -246,7 +253,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/landing/**
 
-- [`LandingPage.tsx`](../../src/components/landing/LandingPage.tsx) — ~ "IDLE" in hills tiles, "REALM" smaller below.
+- [`LandingPage.tsx`](../../src/components/landing/LandingPage.tsx) — ~ The size the landing is designed for (content width, and the height from the top of the map to the bottom of the feature cards).
 
 **src/config/**
 
@@ -257,6 +264,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
 - [`buildings.ts`](../../src/config/buildings.ts) — Buildings and what they cost.
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
+- [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`). Newest first; add an entry here with every update worth telling players about.
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
 - [`combatConfig.ts`](../../src/config/combatConfig.ts) — ~ Combat tunables.
 - [`crafting.ts`](../../src/config/crafting.ts) — Crafting: the crafting level curve and the per-request limits. First draft (docs/plan/crafting-v0.md): level 10 in the first days of
@@ -272,7 +280,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/config/**
 
-- [`landing.ts`](../../src/config/landing.ts) — The words and art on the landing page (`/`): the five feature cards. Pure config; the page (components/landing) only lays them out.
+- [`landing.ts`](../../src/config/landing.ts) — The words and art on the landing page (`/`): the five feature cards and the monsters that sit on the edges of the boxes. Pure config; the page (components/landing) only lays them out.
 - [`limits.ts`](../../src/config/limits.ts) — Bounds and caps that later upgrades and the rebirth system are meant to raise (more bag room, longer monster growth, a bigger
 - [`merchant.ts`](../../src/config/merchant.ts) — The merchant: resource prices, upgrades, shop goods.
 - [`monsterArtSize.ts`](../../src/config/monsterArtSize.ts) — How big a roster monster's picture is drawn on the map, in px (a tile is TILE_SIZE = 48 wide).
@@ -346,6 +354,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
 - [`itemInstance.ts`](../../src/lib/itemInstance.ts) — ~ The base stats at this level and quality (no affixes)
+- [`landingWorld.ts`](../../src/lib/landingWorld.ts) — ~ The world behind the landing page:
 - [`limits.ts`](../../src/lib/limits.ts) — ~ What can raise a limit:
 
 **src/lib/loot/**
