@@ -1,4 +1,4 @@
-import { monsterSourceId } from '@/catalog/lootConfig';
+import { bossSourceId, monsterSourceId } from '@/catalog/lootConfig';
 import { LIMITS } from '@/config/limits';
 import type { BiomeType } from '@/types/game';
 
@@ -337,7 +337,7 @@ const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly st
 		attackPerLevel: 1,
 		armorPerLevel: 0.5,
 		spawnWindow: b.window,
-		lootSourceId: 'boss',
+		lootSourceId: bossSourceId(biome),
 		timeLimitSec: b.timeLimitSec,
 		taunts,
 	};

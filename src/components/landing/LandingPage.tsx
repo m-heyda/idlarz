@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import PixelIcon from '@/components/game/PixelIcon';
-import { CHANGELOG } from '@/config/changelog';
+import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
 import { LANDING_FEATURES, LANDING_MAP, fitZoom, type LandingFeature } from '@/config/landing';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
@@ -93,26 +93,64 @@ const Skeleton: React.FC = () => (
 	</div>
 );
 
-const ChangelogWindow: React.FC = () => (
-	<div className='px-modal ld-window'>
-		<Critter id='forest/mossback-wolf' className='ld-critter-tl' />
-		<Critter id='coast/wreck-crab' size={48} className='ld-critter-bl' />
-		<WindowHead title='Changelog' />
-		<div className='px-modal-body ld-log'>
-			{CHANGELOG.map((entry) => (
-				<article key={entry.date + entry.title}>
-					<p className='ld-log-date'>{entry.date}</p>
-					<h3 className='ld-log-title'>{entry.title}</h3>
-					<ul>
-						{entry.items.map((item) => (
-							<li key={item}>{item}</li>
-						))}
-					</ul>
-				</article>
-			))}
+/** Renders `**bold**` as <strong>; everything else is plain text (no html is ever injected). */
+const Inline: React.FC<{ text: string }> = ({ text }) => <>{text.split('**').map((part, i) => (i % 2 === 1 ? <strong key={i}>{part}</strong> : part))}</>;
+
+const ChangelogRow: React.FC<{ entry: ChangelogEntry; open: boolean; onToggle: () => void }> = ({ entry, open, onToggle }) => {
+	const panelId = `ld-log-${entry.version}`;
+	return (
+		<article className='ld-log-entry'>
+			<button type='button' className='ld-log-head' aria-expanded={open} aria-controls={panelId} onClick={onToggle}>
+				<span className='ld-log-caret' aria-hidden='true'>
+					{open ? '▾' : '▸'}
+				</span>
+				<span className='ld-log-version'>{entry.version}</span>
+				<span className='ld-log-title'>{entry.title}</span>
+				<span className='ld-log-date'>{entry.date}</span>
+			</button>
+			<div id={panelId} className='ld-log-body' hidden={!open}>
+				{entry.body.map((block, i) =>
+					block.kind === 'p' ? (
+						<p key={i}>
+							<Inline text={block.text} />
+						</p>
+					) : (
+						<ul key={i}>
+							{block.items.map((item) => (
+								<li key={item}>
+									<Inline text={item} />
+								</li>
+							))}
+						</ul>
+					),
+				)}
+			</div>
+		</article>
+	);
+};
+
+/** The release notes, one collapsible row per version in a fixed-height scroll area (the newest starts open). */
+const ChangelogWindow: React.FC<{ entries: readonly ChangelogEntry[] }> = ({ entries }) => {
+	const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set(entries.slice(0, 1).map((e) => e.version)));
+	const toggle = (version: string) =>
+		setOpen((prev) => {
+			const next = new Set(prev);
+			if (!next.delete(version)) next.add(version);
+			return next;
+		});
+	return (
+		<div className='px-modal ld-window'>
+			<Critter id='forest/mossback-wolf' className='ld-critter-tl' />
+			<Critter id='coast/wreck-crab' size={48} className='ld-critter-bl' />
+			<WindowHead title='Changelog' />
+			<div className='px-modal-body ld-log'>
+				{entries.map((entry) => (
+					<ChangelogRow key={entry.version} entry={entry} open={open.has(entry.version)} onToggle={() => toggle(entry.version)} />
+				))}
+			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 const FeatureCard: React.FC<{ feature: LandingFeature }> = ({ feature }) => (
 	<li className='ld-card'>
@@ -181,7 +219,7 @@ const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null
 };
 
 /** The public landing page: the baked map with the title, a changelog window and the account window (login / register, or the hero card with Enter), and the five feature cards. */
-const LandingPage: React.FC = () => {
+const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ changelog }) => {
 	const router = useRouter();
 	const [visitor, setVisitor] = useState<Visitor>({ name: 'checking' });
 	const [mode, setMode] = useState<AuthMode>('login');
@@ -258,7 +296,7 @@ const LandingPage: React.FC = () => {
 
 			<div className='ld-content'>
 				<div className='ld-columns'>
-					<ChangelogWindow />
+					<ChangelogWindow entries={changelog} />
 
 					<div className='px-modal ld-window ld-account'>
 						<Critter id='swamp/rot-heron' className='ld-critter-tr' />

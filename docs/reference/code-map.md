@@ -274,7 +274,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`biomes.ts`](../../src/config/biomes.ts) — The map: tile size, biome list and spawn weights, and the ambient critters.
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
-- [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`). Newest first; add an entry here with every update worth telling players about.
+- [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`): one release note per version, written as markdown in `content/changelog/` (format in its README).
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
 - [`combatConfig.ts`](../../src/config/combatConfig.ts) — ~ Combat tunables.
 - [`crafting.ts`](../../src/config/crafting.ts) — Crafting: the crafting level curve and the per-request limits. First draft (docs/plan/crafting-v0.md): level 10 in the first days of
@@ -324,6 +324,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
 - [`castleWard.ts`](../../src/lib/castleWard.ts) — ~ How far (tiles, every side) the violet range area reaches:
+- [`changelogFiles.ts`](../../src/lib/changelogFiles.ts) — ~ The folder of release notes (`content/changelog/<version>.md`).
 - [`chests.ts`](../../src/lib/chests.ts) — ~ The tiles a chest could go on, with their weights.
 - [`classPassives.ts`](../../src/lib/classPassives.ts) — ~ The passives of a hero class (`CLASS_PASSIVES`, `src/config/playerClasses.ts`):
 - [`clickLimiter.ts`](../../src/lib/clickLimiter.ts) — ~ Click limiter made of two token buckets (a paid click needs a token from both).
@@ -702,6 +703,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`belt.test.ts`](../../tests/loot/belt.test.ts) — ~ A plain instance at a rarity the grade allows (plainItem is common, which the ladder's grades above G2 do not roll)
 - [`biomePools.test.ts`](../../tests/loot/biomePools.test.ts) — ~ The data as it will be when every grade is live (IDL-238):
+- [`bossOwnership.test.ts`](../../tests/loot/bossOwnership.test.ts) — ~ Sets with no boss yet and no open pool either:
 - [`chestRace.test.ts`](../../tests/loot/chestRace.test.ts) — ~ /api/chest answers only when `release` is called
 - [`chests.test.ts`](../../tests/loot/chests.test.ts) — ~ A tiny territory:
 - [`equipment.test.ts`](../../tests/loot/equipment.test.ts)
@@ -763,6 +765,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)

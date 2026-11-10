@@ -173,7 +173,7 @@ test('the plains boss is a boss; normal monsters are not', () => {
 	assert.equal(isBoss('bossGreatAuroch'), true);
 	assert.equal(isBoss('thistleBoar'), false);
 	assert.equal(MONSTERS.bossGreatAuroch.grade, 'boss');
-	assert.equal(MONSTERS.bossGreatAuroch.lootSourceId, 'boss');
+	assert.equal(MONSTERS.bossGreatAuroch.lootSourceId, 'boss_plains');
 	assert.ok(COMBAT.spawn.bossIntervalSec > COMBAT.spawn.intervalSec);
 });
 

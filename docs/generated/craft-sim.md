@@ -87,10 +87,10 @@ Gate 2: mean sell value of one piece near the top item level of each grade (Luck
 
 | Grade | Item level | Crafted | Chest | Boss | Monster | Crafted / chest | Gate 2 |
 |---|---:|---:|---:|---:|---:|---:|---|
-| G1 | 7 | 1,746 | 5,186 | 10,156 | 1,483 | 0.34 | ok |
-| G2 | 17 | 15,483 | 41,609 | 77,035 | 13,989 | 0.37 | ok |
-| G3 | 29 | 158,147 | 227,330 | 325,770 | 144,627 | 0.70 | ok |
-| G4 | 41 | 1,013,337 | 1,448,198 | 2,088,984 | 987,892 | 0.70 | ok |
+| G1 | 7 | 1,746 | 5,186 | 1,445 | 1,483 | 0.34 | ok |
+| G2 | 17 | 15,483 | 41,609 | 25,091 | 13,989 | 0.37 | ok |
+| G3 | 29 | 158,147 | 227,330 | 144,402 | 144,627 | 0.70 | ok |
+| G4 | 41 | 1,013,337 | 1,448,198 | 1,424,457 | 987,892 | 0.70 | ok |
 
 Gate 3: a full kit of crafted pieces (13 slots, a random weapon type, rolled at the crafting level that unlocks the grade) in the server's fight engine, 8 kits x 6 fights per cell, no potions, plains boars.
 

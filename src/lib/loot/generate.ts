@@ -175,7 +175,7 @@ const baseTrace = (ctx: Ctx, table: string, poolId: string, itemLevel: number): 
 });
 
 /** One equipment roll from a pool with the rarity rolled from the profile's weights (the general path). */
-const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: number): LootDrop | null => {
+const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: number, preferMissing = false): LootDrop | null => {
 	const { data, profile } = ctx;
 	const trace = baseTrace(ctx, table, poolId, itemLevel);
 	ctx.trace.push(trace);
@@ -196,7 +196,9 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		);
 		trace.eligible[id] = candidates.length;
 		if (candidates.length === 0) continue;
-		byRarity[id] = candidates;
+		// a table with `preferMissing` (a boss's set) takes a piece the player does not own yet while any of this rarity remain
+		const missing = preferMissing ? candidates.filter((c) => !ctx.taken.has(c.def.id)) : [];
+		byRarity[id] = missing.length ? missing : candidates;
 		const boost = ctx.req.rarityBoost?.rarity === id ? Math.max(0, ctx.req.rarityBoost.multiplier) : 1;
 		weights.push({ id, weight: weight * lucky * boost });
 	}
@@ -210,6 +212,7 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		return null;
 	}
 	const def = weightedPick(byRarity[rarityId], (c) => c.weight, ctx.rng)!.def;
+	if (preferMissing) ctx.taken.add(def.id);
 	const item = makeInstance(def, itemLevel, rarityId, data, ctx.rng, ctx.req.qualityBias);
 	trace.rarity = rarityId;
 	trace.itemId = def.id;
@@ -281,7 +284,7 @@ const runTable = (ctx: Ctx, table: BonusTable): { drops: LootDrop[]; triggered: 
 	const hits = countSuccesses(table.rolls ?? { min: 1, max: 1, chancePerRoll: 1 }, ctx.level, ctx.rng);
 	for (let i = 0; i < hits; i++) {
 		const itemLevel = rollItemLevel(ctx.sourceLevel, levelDef, ctx.rng);
-		const drop = table.mode === 'rolled' ? rollRarityGear(ctx, table.id, table.poolId, itemLevel) : rollFixed(ctx, table, itemLevel);
+		const drop = table.mode === 'rolled' ? rollRarityGear(ctx, table.id, table.poolId, itemLevel, table.preferMissing) : rollFixed(ctx, table, itemLevel);
 		if (drop) drops.push(drop);
 	}
 	return { drops, triggered: true };

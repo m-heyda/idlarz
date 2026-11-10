@@ -161,14 +161,57 @@
 	right: 8px;
 }
 
-/* --- changelog --- */
+/* --- changelog: a fixed-height scroll area (the window never grows with the notes), one collapsible row per version --- */
 .ld-log {
 	flex: 1;
-	min-height: 250px;
+	height: 250px;
+	max-height: 250px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
 }
 
-.ld-log article + article {
-	margin-top: 14px;
+.ld-log-entry + .ld-log-entry {
+	margin-top: 6px;
+}
+
+.ld-log-head {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	width: 100%;
+	padding: 6px 8px;
+	font-family: inherit;
+	text-align: left;
+	color: inherit;
+	background: rgba(10, 7, 6, 0.6);
+	border-bottom: 3px solid #3a2810;
+	cursor: pointer;
+}
+
+.ld-log-head[aria-expanded='true'] {
+	border-bottom-color: #c08a30;
+}
+
+.ld-log-head:focus-visible {
+	outline: 2px solid var(--px-gold);
+	outline-offset: 1px;
+}
+
+.ld-log-caret {
+	color: #a89878;
+}
+
+.ld-log-version {
+	color: var(--px-gold);
+	font-weight: 700;
+}
+
+.ld-log-title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .ld-log-date {
@@ -176,18 +219,30 @@
 	color: #a89878;
 }
 
-.ld-log-title {
-	color: var(--px-gold);
-	font-weight: 700;
-}
-
-.ld-log ul {
-	margin-top: 4px;
-	padding-left: 18px;
-	list-style: square;
+.ld-log-body {
+	padding: 6px 8px 2px 26px;
 	font-size: 0.9rem;
 	line-height: 1.4;
 	color: #d8ccaa;
+}
+
+.ld-log-body[hidden] {
+	display: none;
+}
+
+.ld-log-body p + p,
+.ld-log-body p + ul,
+.ld-log-body ul + p {
+	margin-top: 6px;
+}
+
+.ld-log-body ul {
+	padding-left: 18px;
+	list-style: square;
+}
+
+.ld-log-body strong {
+	color: var(--px-gold);
 }
 
 /* --- account --- */

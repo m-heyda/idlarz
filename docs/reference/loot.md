@@ -7,7 +7,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 **Contents**
 
 - Pipeline: [`generateLoot`](#generateloot), [`validateLootData`](#validatelootdata), [`resolveSourceLevel`](#resolvesourcelevel), [`rollItemLevel`](#rollitemlevel), [`receiveDrops`](#receivedrops), [`isAutoSold`](#isautosold), [`eligibleCandidates`](#eligiblecandidates), [`rollLeaning`](#rollleaning)
-- Config: [`LOOT_SOURCES`](#loot-sources), [`LOOT_PROFILES`](#loot-profiles), [`BIOME_LOOT`](#biome-loot)
+- Config: [`LOOT_SOURCES`](#loot-sources), [`LOOT_PROFILES`](#loot-profiles), [`BIOME_LOOT`](#biome-loot), [`BOSS_LOOT`](#boss-loot)
 - Items: [`RARITIES`](#rarities), [`levelScale`](#levelscale), [`valueCurve`](#valuecurve), [`sellValueOf`](#sellvalueof), [`LIVE_GRADES`](#live-grades), [`gradeLevels`](#gradelevels), [`gradeRarities`](#graderarities), [`gradeLegacyItems`](#gradelegacyitems), [`kit`](#kit)
 - Adding content: [Adding loot content (data only)](#loot-pools), [`gear`](#gear)
 
@@ -17,7 +17,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 
 ### `generateLoot` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:317`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:320`](../../src/lib/loot/generate.ts)
 
 Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.
 
@@ -128,7 +128,7 @@ roll = floor(101 x u ^ (1 / (1 + bias)))        u uniform in [0, 1); bias 0 is a
 
 ### `LOOT_SOURCES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:278`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:390`](../../src/catalog/lootConfig.ts)
 
 Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).
 
@@ -145,6 +145,10 @@ start at item level 4 plus 3 per castle level above 1.
 | monster_swamp | normal_monster_swamp | the caller's level, range 8-28 |
 | monster_tundra | normal_monster_tundra | the caller's level, range 12-30 |
 | boss | boss | the caller's level, range 15-45 |
+| boss_plains | boss_plains | the caller's level, range 15-35 |
+| boss_forest | boss_forest | the caller's level, range 20-40 |
+| boss_swamp | boss_swamp | the caller's level, range 25-45 |
+| boss_tundra | boss_tundra | the caller's level, range 30-50 |
 | chest | basic_chest | own level: 4 + 3 per castle level above 1 |
 | merchant | merchant_stock | own level: 4 + 3 per castle level above 1 |
 | craft | craft | the caller's level, range 1-41 |
@@ -153,7 +157,7 @@ start at item level 4 plus 3 per castle level above 1.
 
 ### `LOOT_PROFILES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:198`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:329`](../../src/catalog/lootConfig.ts)
 
 Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.
 
@@ -166,7 +170,11 @@ Profiles: how many rolls, which rarity weights, which pool, which bonus tables. 
 | normal_monster_forest | 1 x 12% +1%/level from equipment_forest | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
 | normal_monster_swamp | 1 x 12% +1%/level from equipment_swamp | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
 | normal_monster_tundra | 1 x 12% +1%/level from equipment_tundra | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
-| boss | 1 x 100%, 1 guaranteed from general_equipment | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_legendary (legendary_weapons, fixed, 5%); king_potions (potions_king, fixed) |
+| boss | 1 x 100%, 1 guaranteed from boss_general | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
+| boss_plains | 1 x 100%, 1 guaranteed from boss_general_plains | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
+| boss_forest | 1 x 100%, 1 guaranteed from boss_general_forest | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | unique (boss_unique_forest, fixed, 5%); king_potions (potions_king, fixed) |
+| boss_swamp | 1 x 100%, 1 guaranteed from boss_general_swamp | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | unique (boss_unique_swamp, fixed, 5%); king_potions (potions_king, fixed) |
+| boss_tundra | 1 x 100%, 1 guaranteed from boss_general_tundra | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | unique (boss_unique_tundra, fixed, 5%); king_potions (potions_king, fixed) |
 | basic_chest | 1 x 82% from general_equipment | source level +0 +-1 | common 62, uncommon 24, rare 9, epic 4, legendary 1 | chest_legendary (legendary_weapons, fixed, 1.9%, replace); chest_potion (potions_chest, fixed, fallback) |
 | craft | 1 x 100%, 1 guaranteed from equipment_craft | source level +0 +-1 | common 70, uncommon 22, rare 6 | - |
 | merchant_stock | 12 x 100%, 12 guaranteed from general_equipment | source level +0 +-2 | common 60, uncommon 40 | - |
@@ -175,7 +183,7 @@ Profiles: how many rolls, which rarity weights, which pool, which bonus tables. 
 
 ### `BIOME_LOOT` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:124`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:125`](../../src/catalog/lootConfig.ts)
 
 The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: plains G1-G3, forest G2-G4, swamp G3-G5, tundra G5-G7).
 The pool admits every ladder grade up to the biome's ceiling (`maxGrade`; since IDL-243 every piece that drops is on the ladder: the legacy wood, steel and Obsidian pieces are graded or retired); the floor needs no tag because an item only exists inside its grade's item level
@@ -188,6 +196,34 @@ Every base that drops carries a `grade:` tag (IDL-243): the legacy wood, steel a
 the rest of wood, steel and all of cloth are retired (`enabled: false`, ids kept, owned pieces keep working). A graded legacy piece is generated only in its grade's window and rarities (`dropLevels`, `dropRarities`) but stays valid at its old level range for pieces already owned.
 The highest live grade is open at the top and takes every rarity ([`gradeLevels`](loot.md#gradelevels), [`gradeRarities`](loot.md#graderarities) in `src/catalog/items/grades.ts`) so nothing is left without a base while the next grade is dark; a rarity with no base at an item level is left out of the roll there.
 The merchant's shelf passes `maxGrade` = the best grade the player wears ([`bestWornGrade`](economy.md#bestworngrade)).
+
+<a id="boss-loot"></a>
+
+### `BOSS_LOOT` <small>const</small>
+
+Source: [`src/catalog/lootConfig.ts:204`](../../src/catalog/lootConfig.ts)
+
+Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): each biome's boss has a source of its own (`boss_<biome>`, profile `boss_<biome>`) with
+
+- a guaranteed general roll from its own general pool (`boss_general_<biome>`: no named item, no set piece; the grades the biome's monsters drop up to the ceiling, at the boss's level),
+- its potions (every kill),
+- its **unique** table (`unique`, pool `boss_unique_<biome>`): `BOSS_UNIQUE_CHANCE` per kill, plus `BOSS_UNIQUE_PITY` per miss, a drop resets the counter (the ledger's `lootPity`, key `boss_<biome>:unique`),
+- its **set** table (`set`, pool `boss_set_<biome>`), only when `setId` is filled in: `BOSS_SET_CHANCE` per kill with pity (`BOSS_SET_PITY`), one guaranteed roll of the set's pieces, missing pieces first.
+
+No boss drops another boss's unique or set: set pieces are kept out of every general pool (`GENERAL_EXCLUDED_TAGS`, the boss pools exclude all of them) and each unique sits in exactly one boss's pool. `tests/loot/bossOwnership.test.ts` enumerates every boss's source.
+
+**Adding a biome's boss (post release):** add the biome to [`BIOME_LOOT`](loot.md#biome-loot), its boss to `MONSTERS` with `lootSourceId: bossSourceId(biome)`, and one entry here. **Wiring a set:** fill in `setId`; its pieces must be enabled and have item levels the boss reaches (the validator reports an empty set pool).
+The sets S1-S3 and Obsidian have no boss yet (their pieces are disabled or out of item level reach), so `setId` is `null` for all four bosses; `PENDING_SETS` in the test lists them so a set cannot be forgotten.
+The uniques are the three legendary weapons, one per boss from the hardest down (Titan Maul from the Winter Wyrm, Emberbrand from the Mire Matriarch, Starfall Bow from the Elder Stag); the Great Auroch has none yet. Chests still drop them too (`basic_chest`, 1.9 %).
+
+**What each boss owns** _(computed from the code)_
+
+| Boss source | Boss levels | Unique (per kill) | Set (per kill) | General roll from |
+| --- | --- | --- | --- | --- |
+| boss_plains | 15-35 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_plains |
+| boss_forest | 20-40 | starfall_bow (5% + pity) | none yet (open sets still in the general pools: obsidian) | boss_general_forest |
+| boss_swamp | 25-45 | emberbrand (5% + pity) | none yet (open sets still in the general pools: obsidian) | boss_general_swamp |
+| boss_tundra | 30-50 | titan_maul (5% + pity) | none yet (open sets still in the general pools: obsidian) | boss_general_tundra |
 
 ## Items
 
@@ -333,7 +369,7 @@ Test and simulation helper: a full kit of one ladder grade, so fight balance (`f
 
 ### Adding loot content (data only)
 
-Source: [`src/catalog/lootConfig.ts:161`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:290`](../../src/catalog/lootConfig.ts)
 
 Adding loot content is data only; the generator needs no change.
 
