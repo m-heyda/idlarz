@@ -11,12 +11,23 @@ import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
 import { recordChest } from '@/lib/offline/stats';
-import { UNCLAIMED_SEC, bankContext, lookAtMap, mapLoader, publicTickets, withLedger, type ServiceDeps, type StepOutcome } from '@/lib/offline/service';
+import {
+	UNCLAIMED_SEC,
+	bankContext,
+	lookAtMap,
+	mapLoader,
+	mirrorAchievements,
+	publicTickets,
+	withLedger,
+	type ServiceDeps,
+	type StepOutcome,
+} from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
 import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type CraftEnv } from '@/lib/offline/craft';
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
+import { reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
 import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
 
 // The server's side of play while the player is here: spawns, chests and fights. The server mints the tickets from its own clock, puts
@@ -46,9 +57,30 @@ type Body<T> = (ctx: StepContext) => { ledger: Ledger; value: T } | Promise<{ le
 const withInventory = <T>(value: T, inv: Inventory | null, invVer: number | undefined): T =>
 	inv && inv.ver !== invVer && typeof value === 'object' && value !== null ? { ...value, inv } : value;
 
-const onlineStep = async <T>(deps: ServiceDeps, userId: string, key: string | null, nowMs: number, body: Body<T>, invVer?: number): Promise<Online<T>> => {
+/**
+ * The answer with the achievements attached when this request paid one (the toast) or when the caller wants the full list (the spawn poll the browser starts from).
+ * Every online reply can carry it, so a payout is never missed whichever request found it.
+ */
+const withAchievements = <T>(value: T, ledger: Ledger, fresh: AchievementUnlock[], list: boolean): T => {
+	if (!(fresh.length > 0 || list) || typeof value !== 'object' || value === null) return value;
+	// the answer was made before the payout: a gem balance in it is brought up to date, so nothing in the browser sets the older number over the new one
+	const gems = fresh.length > 0 && 'gemsTotal' in value ? { gemsTotal: ledger.gems } : {};
+	return { ...value, ...gems, achievements: reportOf(ledger, fresh) };
+};
+
+const onlineStep = async <T>(
+	deps: ServiceDeps,
+	userId: string,
+	key: string | null,
+	nowMs: number,
+	body: Body<T>,
+	invVer?: number,
+	listAchievements = false,
+): Promise<Online<T>> => {
 	const loadMap = mapLoader(deps, userId);
+	let unlocked: AchievementUnlock[] = [];
 	const done = await withLedger(deps, userId, nowMs, async (ledger, stored): Promise<StepOutcome<{ claimFirst: true } | { claimFirst: false; value: T }>> => {
+		unlocked = [];
 		if (key && ledger.lastKey === key && ledger.lastResult) return { ledger, result: { claimFirst: false, value: ledger.lastResult as T } };
 		const anchorMs = Math.max(ledger.anchorAt, stored.serverSavedAt);
 		if ((nowMs - anchorMs) / 1000 > UNCLAIMED_SEC) return { ledger, result: { claimFirst: true } };
@@ -62,15 +94,21 @@ const onlineStep = async <T>(deps: ServiceDeps, userId: string, key: string | nu
 		const bank = await place(advanced);
 		const env: CombatEnv = { secret: deps.secret, userId, stored, nowSec };
 		const out = await body({ ledger: { ...ledger, bank }, stored, bank, nowSec, env, place });
+		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
+		const settled = settleAchievements(out.ledger, stored.summary);
+		unlocked = settled.unlocked;
+		const value = withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements);
 		// a poll (no key) keeps the record of the last keyed request: its answer may still have to be replayed for a retry
 		return {
-			ledger: { ...out.ledger, anchorAt: nowMs, ...(key ? { lastKey: key, lastResult: out.value } : {}) },
-			result: { claimFirst: false, value: out.value },
+			ledger: { ...settled.ledger, anchorAt: nowMs, ...(key ? { lastKey: key, lastResult: value } : {}) },
+			result: { claimFirst: false, value },
 			skipWrite: !key,
 		};
 	});
 	if (done.kind === 'no_save') return done;
-	return done.result.claimFirst ? { kind: 'claim_first' } : { kind: 'ok', value: withInventory(done.result.value, done.ledger.inv, invVer) };
+	if (done.result.claimFirst) return { kind: 'claim_first' };
+	await mirrorAchievements(deps, userId, unlocked, nowMs);
+	return { kind: 'ok', value: withInventory(done.result.value, done.ledger.inv, invVer) };
 };
 
 /** Carries the player's combat up to now, then the monsters it killed are paid and gone: the tickets in the answer are the ones that remain. */
@@ -101,6 +139,7 @@ export const syncTickets = (deps: ServiceDeps, userId: string, nowMs: number, si
 			};
 		},
 		invVer,
+		true,
 	);
 
 /**

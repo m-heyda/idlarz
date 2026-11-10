@@ -44,6 +44,20 @@
   "see": []
  },
  {
+  "id": "achievements",
+  "name": "Achievements",
+  "symbol": "ACHIEVEMENTS",
+  "kind": "const",
+  "category": "Progression/Achievements",
+  "file": "src/catalog/achievements.ts",
+  "line": 55,
+  "summary": "The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds ({@link settleAchievements}); the early tester is granted by the new chapter reset instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
+  "see": [
+   "settleAchievements",
+   "achievementsDue"
+  ]
+ },
+ {
   "id": "avatarinfo",
   "name": "Avatars",
   "symbol": "AvatarInfo",
@@ -1743,6 +1757,20 @@
   "line": 150,
   "summary": "Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance (Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are `MonsterDef.spawn`.",
   "see": []
+ },
+ {
+  "id": "settleachievements",
+  "name": "settleAchievements",
+  "symbol": "settleAchievements",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/offline/achievements.ts",
+  "line": 111,
+  "summary": "Lazy evaluation, once per online request: the achievements that became due are paid and recorded in the same ledger write (a compare-and-swap, so two requests at once cannot both pay; a replayed request finds the id recorded and pays nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
+  "see": [
+   "achievementsDue",
+   "payAchievements"
+  ]
  },
  {
   "id": "startnewchapter",

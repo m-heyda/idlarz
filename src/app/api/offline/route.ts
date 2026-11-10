@@ -2,7 +2,7 @@ import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { supabaseSaveRepo } from '@/lib/cloudSave/supabaseRepo';
 import { fail, json, readBody, unavailable } from '@/lib/authRoute';
 import { requirePlayer } from '@/lib/playerRoute';
-import { supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
+import { supabaseAchievementRepo, supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
 import { lootConfigured, lootSecret } from '@/lib/offline/secret';
 import { claimOffline } from '@/lib/offline/service';
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
 		const admin = createSupabaseAdmin();
 		const outcome = await claimOffline(
-			{ ledgers: supabaseLedgerRepo(admin), saves: supabaseSaveRepo(admin), secret: lootSecret() },
+			{ ledgers: supabaseLedgerRepo(admin), saves: supabaseSaveRepo(admin), secret: lootSecret(), achievements: supabaseAchievementRepo(admin) },
 			player.userId,
 			body.claimId,
 			Date.now(),
