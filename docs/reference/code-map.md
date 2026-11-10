@@ -120,7 +120,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/catalog/**
 
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
-- [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71):
+- [`avatars.ts`](../../src/catalog/avatars.ts) — ~ `starter`:
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 

@@ -3174,7 +3174,7 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 <p>What the Crafting window&#39;s odds panel shows for a recipe: the rarity chances at the player&#39;s Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll&#39;s own loot trace (<code>generateLoot</code> with a fixed rng), so the panel is the real odds and cannot drift from the roll.</p>
 </article><h2>Avatars</h2><article><p><a id="unlockedavatarids"></a></p>
 <h3><code>unlockedAvatarIds</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:71</code></a></p>
+<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:66</code></a></p>
 <p>The avatar ids an account may use: every starter plus each unlockable whose achievement is in <code>earned</code>. Unknown achievement ids are ignored.</p>
 </article><article><p><a id="checkavatar"></a></p>
 <h3><code>checkAvatar</code> <small>function</small></h3>
@@ -3183,14 +3183,14 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 (the account&#39;s <code>player_achievements</code>). A forged, unknown or locked id is refused; <code>null</code>/<code>undefined</code> means &quot;none chosen&quot; and passes. The client&#39;s own idea of what is unlocked is never trusted.</p>
 </article><article><p><a id="avatarinfo"></a></p>
 <h3>Avatars</h3>
-<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:17</code></a></p>
+<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:15</code></a></p>
 <p>Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are <strong>separate from classes</strong> and purely visual.
 Eight <strong>starters</strong> are open to everyone; the <strong>unlockables</strong> are rewards of server-side achievements (the id of the achievement is <code>unlockedBy</code>). Two rules, both enforced
 on the server (<code>checkAvatar</code> in <code>lib/authValidation.ts</code>, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the
 achievements the account has earned. The chosen id lives in <code>profiles.avatar_id</code> (null = none chosen yet, the hero&#39;s class bust is shown), which only the service role writes.</p>
-<p><strong>Art is a placeholder.</strong> Every avatar points at a class bust (<code>portrait</code>, 40x40) and gets its own hue (<code>hue</code>) so the picker is usable; a locked avatar shows the same bust as
-a black silhouette (<code>AVATAR_SILHOUETTE</code>). When the owner&#39;s portraits arrive (IDL-72: <code>public/pixel/portraits/avatars/&lt;id&gt;.png</code>, 40x40 bust, the sheet in
-<code>art_style_reference/ui-and-portraits/README.md</code>) the swap is this table only: point <code>portrait</code> at the registered icon and drop <code>hue</code>. Nothing else changes.</p>
+<p><strong>Art.</strong> The owner&#39;s framed busts (64x64, <code>public/pixel/new_assets/heroes/&lt;portrait&gt;.png</code>, listed in <code>public/pixel/new_assets/README.md</code>) are the portraits; <code>avatarArtUrl</code> is the only place that
+builds the path, so a new picture is a change to the <code>portrait</code> field. The six horned busts not used here stay in the pool for later unlocks. A locked avatar is shown as a black
+cut-out of its own picture (generated in <code>AvatarArt</code>, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.</p>
 </article><h2>Class passives</h2><article><p><a id="classpassives"></a></p>
 <h3><code>classPassives</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/classPassives.ts"><code>src/lib/classPassives.ts:24</code></a></p>

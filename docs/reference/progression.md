@@ -471,7 +471,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:71`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:66`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 
@@ -488,16 +488,16 @@ The server's rule for an avatar (IDL-71), the one place that decides: the id mus
 
 ### Avatars
 
-Source: [`src/catalog/avatars.ts:17`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:15`](../../src/catalog/avatars.ts)
 
 Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual.
 Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced
 on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the
 achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
 
-**Art is a placeholder.** Every avatar points at a class bust (`portrait`, 40x40) and gets its own hue (`hue`) so the picker is usable; a locked avatar shows the same bust as
-a black silhouette (`AVATAR_SILHOUETTE`). When the owner's portraits arrive (IDL-72: `public/pixel/portraits/avatars/<id>.png`, 40x40 bust, the sheet in
-`art_style_reference/ui-and-portraits/README.md`) the swap is this table only: point `portrait` at the registered icon and drop `hue`. Nothing else changes.
+**Art.** The owner's framed busts (64x64, `public/pixel/new_assets/heroes/<portrait>.png`, listed in `public/pixel/new_assets/README.md`) are the portraits; `avatarArtUrl` is the only place that
+builds the path, so a new picture is a change to the `portrait` field. The six horned busts not used here stay in the pool for later unlocks. A locked avatar is shown as a black
+cut-out of its own picture (generated in `AvatarArt`, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.
 
 ## Class passives
 

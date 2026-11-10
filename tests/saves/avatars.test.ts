@@ -2,9 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { AVATARS, STARTER_AVATAR_IDS, unlockedAvatarIds } from '../../src/catalog/avatars';
 import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
-import { PIXEL_ICON_SIZES } from '../../src/config/pixelIcons';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 
-test('the catalog has 8 starters and the 4 launch unlockables, each with a registered 40x40 bust', () => {
+test('the catalog has 8 starters and the 4 launch unlockables, each with its portrait file', () => {
 	assert.equal(STARTER_AVATAR_IDS.length, 8);
 	assert.deepEqual(
 		AVATARS.filter((a) => a.kind === 'unlock').map((a) => a.id),
@@ -12,7 +13,7 @@ test('the catalog has 8 starters and the 4 launch unlockables, each with a regis
 	);
 	assert.equal(new Set(AVATARS.map((a) => a.id)).size, AVATARS.length);
 	for (const avatar of AVATARS) {
-		assert.deepEqual(PIXEL_ICON_SIZES[avatar.portrait], [40, 40], avatar.id);
+		assert.ok(existsSync(join(__dirname, '..', '..', 'public', 'pixel', 'new_assets', 'heroes', `${avatar.portrait}.png`)), avatar.id);
 		assert.equal(avatar.kind === 'unlock', Boolean(avatar.unlockedBy && avatar.how), avatar.id);
 	}
 });

@@ -15,6 +15,7 @@ import { basename, join, relative, resolve, sep } from 'node:path';
 import { MERCHANT_PORTRAIT } from '../../src/config/npcPortraits';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
+import { AVATARS } from '../../src/catalog/avatars';
 import { ITEMS } from '../../src/catalog/items';
 import { RESOURCE_ART, resourceArtUrl } from '../../src/catalog/resourceArt';
 import {
@@ -426,9 +427,10 @@ export const buildManifest = (): AssetEntry[] => {
 			add({
 				name: snake(basename(f)),
 				category: 'portraits',
-				subcategory: 'avatar portraits (not wired)',
+				subcategory: AVATARS.some((a) => a.portrait === basename(f, '.png')) ? 'avatar portraits' : 'avatar portraits (spare, for later unlocks)',
 				src: url(f),
-				status: 'reuse',
+				status: AVATARS.some((a) => a.portrait === basename(f, '.png')) ? 'used' : 'reuse',
+				usedBy: AVATARS.filter((a) => a.portrait === basename(f, '.png')).map((a) => a.id),
 				source: 'new_assets/heroes',
 			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'achievements')))
