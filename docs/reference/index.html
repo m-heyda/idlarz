@@ -1292,7 +1292,7 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 that never had this system (<code>tests/economy/buildingsFlagOff.test.ts</code> pins it), and saves written with it on still load, minus their buildings.</p>
 <p>What is in this first slice (Producers only, the seven home biomes): the build menu of a tile shows the Producer of its biome; <strong>one of each type per map</strong>; a Producer makes <code>tileEquivalents</code> tiles&#39; worth of its biome&#39;s main materials, grown by
 the share of the biome the player owns; <strong>levels 1-5</strong>, a level above 1 gated by the castle level and bought with resources plus a <strong>timer</strong> counted by the tick loop; the castle and the buildings share <strong>one builder</strong> (one timer at a time);
-a building can be <strong>moved</strong> for half its cost. Extractors (IDL-94), Idols, roads, the position bonus and the Ember-shop caps come in later slices (<code>docs/plan/18-biome-buildings-and-material-tiers.md</code>).</p>
+a building can be <strong>moved</strong> for half its cost. Extractors (IDL-94), Idols, the position bonus and the Ember-shop caps come in later slices (<code>docs/plan/18-biome-buildings-and-material-tiers.md</code>).</p>
 <p><strong>Save and server.</strong> A building is two optional fields of a tile&#39;s <code>extra</code> entry (<code>building</code> = catalog id, <code>bl</code> = level) and the running upgrade is the optional top-level <code>buildingUpgrade</code> (<code>{ x, y, toLevel, remainingSec }</code>, like <code>castleUpgrade</code>). They are
 written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No <code>SAVE_SCHEMA</code> bump. The server derives income from the saved map
 with the same <a href="#calculateresourcebreakdown"><code>calculateResourceBreakdown</code></a> (so the client only displays), judges the timer from two summaries (<code>timer_jump</code> in <code>verify.ts</code>) and prices levels in the net-worth floor.</p>
@@ -4500,7 +4500,7 @@ Deterministic: the same seed gives the same picture. Pure: no canvas, no store.<
 <h3>Asset library</h3>
 <p>Source: <a href="../../scripts/assets/manifest.ts"><code>scripts/assets/manifest.ts:1</code></a></p>
 <p>The asset library: <code>buildManifest()</code> lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
-accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
+accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, terrain atlases and ground textures are left out on purpose.
 Registered art keeps its registry id (item icons, monster and resource rosters, <code>pixelIcons.ts</code>); raw pack files in <code>public/pixel/assets_to_assess_and_use/</code>
 get a generated name (<code>&lt;pack&gt;_&lt;file&gt;</code>, e.g. <code>tree_autumn_tree1</code>), with shadow renderings folded into <code>variants</code>; <code>scripts/assets/names.json</code> renames any of them.
 <code>npm run assets:catalog</code> renders it into <code>docs/assets/</code> (manifest.json plus one page per category), which <code>stories/assets/</code> shows in Storybook

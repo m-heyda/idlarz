@@ -17,7 +17,7 @@ The one place to look when planning the next step. It lists only what is **still
 | Launch achievements, tutorial steps and bundles | [21](21-classes-avatars-achievements-offline-report.md) | IDL-73, 74, 194 |
 | Crafting unlocks, salvage, War Medal legendary craft | [17](17-crafting.md) | IDL-152, 151, 120 |
 | Ember price book, cosmetics, Monument, autobuyers | [18](18-biome-buildings-and-material-tiers.md) section 6 | IDL-97, 184, 185, 195 |
-| Map size, milestones, roads (the tile price tail is built, IDL-79/181) | [18](18-biome-buildings-and-material-tiers.md) | IDL-131, 198, 98 |
+| Map size, milestones (the tile price tail is built, IDL-79/181) | [18](18-biome-buildings-and-material-tiers.md) | IDL-131, 198 |
 | Rankings (four boards, daily snapshot), preview map, +20 attribute points | [15](15-leaderboard-and-world-preview.md), [13](13-rebirth-reset-and-paragon.md) | IDL-113, 115, 100 |
 | Paragon | [13](13-rebirth-reset-and-paragon.md) section 5 | IDL-104, 186, 187 |
 | Gem sinks, the Gem shop, Cap Breaks | [30](30-gem-sinks.md) | IDL-188..194, 228..232, 234, 236, 237 |
@@ -60,7 +60,7 @@ Release order (confirmed 2026-10-29; the castle timers, the resource registry an
 - **The map and its biomes reset on every rebirth, always.** What persists: character (level, attributes budget), crafting level, Embers and the shop, `discovered` biomes, and the **Idol levels** (re-placed free at their level; cap 5 for now).
 - **Soft caps everywhere, raised with legacy points (Embers) later.** Every limit goes through `limitOf` / `LIMITS` with a `HARD_LIMITS` ceiling so a raise never invalidates a save ([18](18-biome-buildings-and-material-tiers.md) section 6 has the table: Idol level, building level, builder slots, crafting level, bag, offline cap ...). New Ember shop items have this shape (caps and slots), not just flat percentages.
 - **Position bonus on buildings:** the castle's area bonus multiplies every building in its range (Producers and Extractors in full, Idols capped at x2), and buildings beyond the range get a frontier bonus that grows with distance, so the far biomes stay competitive ([18](18-biome-buildings-and-material-tiers.md) rule 7).
-- **Roads connect buildings to the castle for +100 % (additive)**: per-tile, per-biome road art and cost (swamp, tundra and bridges dearer), built instantly, priced in gold and resources ([18](18-biome-buildings-and-material-tiers.md) section 5.2). **Building level caps go up to 15 with Ember purchases** (Master Craftsmen, 10 levels).
+- **Building level caps go up to 15 with Ember purchases** (Master Craftsmen, 10 levels).
 - **Content will grow: about ten new items, new monsters and biomes are coming.** Crafting, loot and rewards are data-driven by tag and tier, never tuned against today's gear alone ([17](17-crafting.md), [20](20-monster-families-and-rewards.md)).
 - **Monster rewards are capped per monster and multiplied by level**, so weak monsters fade and strong ones pay (gold, hide/food, tiered items) ([20](20-monster-families-and-rewards.md)).
 

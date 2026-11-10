@@ -7,8 +7,6 @@ import type { Cell } from './dragPaint';
  * Drawing on a World with a drag: the one function a tool needs (`applyStroke`) and the tools the map lab ships with.
  * Pure and safe: out-of-range cells are skipped, the castle and the last tile are never removed, land only grows from
  * land (no far-away islands the map could not show), and the world is never mutated.
- *
- * A road tool later is one more `StrokeTool`: `(world, cell) => Tile | undefined | 'skip'`.
  */
 
 /** What a tool does to one cell: a new tile, `undefined` to remove the tile, or 'skip' to leave it alone. */
