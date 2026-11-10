@@ -53,3 +53,10 @@ export const LANDING_FEATURES: readonly LandingFeature[] = [
 
 /** The baked picture behind the page (`/map-lab/landing-bake`, `lib/landingWorld`) and its size in px; it is shown at `scale` of that size (the CSS positions of the title block in Landing.css follow it). */
 export const LANDING_MAP = { src: '/landing/map.png', width: 3456, height: 1728, scale: 0.75 } as const;
+
+/** The size the landing is laid out for (css px: content width, and the height from the top of the map to the bottom of the feature cards). The page is scaled to fit the screen (`fitZoom`). */
+export const LANDING_DESIGN = { width: 1300, height: 1030 } as const;
+
+/** The scale that fits the design into a screen: a big screen gets the page bigger, a small one smaller (0.5 to 1.5). */
+export const fitZoom = (screenWidth: number, screenHeight: number): number =>
+	Math.min(1.5, Math.max(0.5, Math.min(screenWidth / LANDING_DESIGN.width, screenHeight / LANDING_DESIGN.height)));

@@ -9,7 +9,7 @@ import AuthUnavailable from '@/components/auth/AuthUnavailable';
 import NewChapterScreen from '@/components/auth/NewChapterScreen';
 import { fetchMe, logout, readEntered, writeEntered, type Profile, type UnavailableReason } from '@/lib/authClient';
 import { fetchCloud, readLink, writeAttempts, writeLink } from '@/lib/cloudClient';
-import { canResumeTab, planStart, type CloudInfo } from '@/lib/startPlan';
+import { canResumeTab, planStart, skipsHub, type CloudInfo } from '@/lib/startPlan';
 import { epochVerdict, readSeenEpoch, wipeStaleBrowser, writeSeenEpoch } from '@/lib/epochGuard';
 import { LANDING_PATH, loginRedirectPath } from '@/lib/playRoute';
 import { archiveForNewGame, installSave, peekSave, resetSave, type SavePeek } from '@/lib/saveStorage';
@@ -62,7 +62,13 @@ export default function PlayPage() {
 				if (cloud !== 'unavailable') writeLink({ userId: player.userId, rev: 0 });
 				return enterGame(player);
 			}
-			setPhase({ name: 'hub', player, mode: plan.mode, local, cloud: cloud === 'unavailable' ? null : cloud });
+			const cloudInfo = cloud === 'unavailable' ? null : cloud;
+			// one game, nothing to decide (the landing already showed it): straight in, as the hub's Continue would. `?hub=1` (the landing's "Start over") still opens the hub.
+			if (skipsHub(plan, local) && new URLSearchParams(window.location.search).get('hub') !== '1') {
+				writeLink({ userId: player.userId, rev: cloudInfo?.rev ?? 0 });
+				return enterGame(player);
+			}
+			setPhase({ name: 'hub', player, mode: plan.mode, local, cloud: cloudInfo });
 		},
 		[enterGame],
 	);

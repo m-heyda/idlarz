@@ -8,20 +8,20 @@ import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import PixelIcon from '@/components/game/PixelIcon';
 import { CHANGELOG } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
-import { LANDING_FEATURES, LANDING_MAP, type LandingFeature } from '@/config/landing';
+import { LANDING_FEATURES, LANDING_MAP, fitZoom, type LandingFeature } from '@/config/landing';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
+import { fetchCloud, readLink } from '@/lib/cloudClient';
+import { epochVerdict, readSeenEpoch } from '@/lib/epochGuard';
+import { peekSave } from '@/lib/saveStorage';
+import { planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
 import { fetchMe, logout, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@/styles/Landing.css';
 
-/** The size the landing is designed for (content width, and the height from the top of the map to the bottom of the feature cards). */
-const DESIGN_W = 1300;
-const DESIGN_H = 1030;
-
 type Visitor =
 	| { name: 'checking' }
 	| { name: 'guest' }
-	| { name: 'member'; profile: Profile | null; stats: ProfileStats | null }
+	| { name: 'member'; profile: Profile | null; stats: ProfileStats | null; game: GameSummary | null; asks: boolean }
 	| { name: 'unavailable'; reason: UnavailableReason };
 
 /** A monster from the game sitting on the edge of a box. */
@@ -83,6 +83,16 @@ const WindowHead: React.FC<{ title: string }> = ({ title }) => (
 	</div>
 );
 
+/** What the account window shows while it looks for a session: the shape of the login form, so nothing jumps when the real content arrives. */
+const Skeleton: React.FC = () => (
+	<div className='ld-skel' role='status' aria-label='Looking for your hero'>
+		<span className='ld-skel-bar ld-skel-tabs' />
+		<span className='ld-skel-bar ld-skel-input' />
+		<span className='ld-skel-bar ld-skel-input' />
+		<span className='ld-skel-bar ld-skel-button' />
+	</div>
+);
+
 const ChangelogWindow: React.FC = () => (
 	<div className='px-modal ld-window'>
 		<Critter id='forest/mossback-wolf' className='ld-critter-tl' />
@@ -118,7 +128,13 @@ const FeatureCard: React.FC<{ feature: LandingFeature }> = ({ feature }) => (
 );
 
 /** The hero card for a signed-in visitor: portrait, name, class, level and rebirths, and the way into the game (Enter). Read-only. */
-const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null; onLogout: () => void }> = ({ profile, stats, onLogout }) => {
+const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null; game: GameSummary | null; asks: boolean; onLogout: () => void }> = ({
+	profile,
+	stats,
+	game,
+	asks,
+	onLogout,
+}) => {
 	if (!profile) {
 		return (
 			<div className='ld-continue'>
@@ -142,18 +158,24 @@ const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null
 			<p className='ld-continue-class'>
 				{info.race} {info.label}
 			</p>
-			{stats && (
-				<p className='ld-continue-stats'>
-					Level {stats.level} · {stats.rebirths} {stats.rebirths === 1 ? 'rebirth' : 'rebirths'}
-				</p>
-			)}
+			<p className='ld-continue-stats'>
+				{game ? `Level ${game.level} · ${game.tiles} tiles` : stats ? `Level ${stats.level}` : 'A new game awaits'}
+				{stats ? ` · ${stats.rebirths} ${stats.rebirths === 1 ? 'rebirth' : 'rebirths'}` : ''}
+			</p>
 			<Link className='px-btn ld-continue-go' href={PLAY_PATH} autoFocus>
 				Enter the realm
 			</Link>
-			<p className='ld-hint'>or press Enter</p>
-			<button type='button' className='ld-link' onClick={onLogout}>
-				Not you? Log out
-			</button>
+			<p className='ld-hint'>{asks ? 'We will ask which save to keep' : 'or press Enter'}</p>
+			<div className='ld-links'>
+				<button type='button' className='ld-link' onClick={onLogout}>
+					Not you? Log out
+				</button>
+				{game && (
+					<Link className='ld-link' href={`${PLAY_PATH}?hub=1`}>
+						Start over...
+					</Link>
+				)}
+			</div>
 		</div>
 	);
 };
@@ -165,18 +187,30 @@ const LandingPage: React.FC = () => {
 	const [mode, setMode] = useState<AuthMode>('login');
 	const [formKey, setFormKey] = useState(0);
 	const [next, setNext] = useState<string>(PLAY_PATH);
-	const [zoom, setZoom] = useState(1);
+	const [zoom, setZoom] = useState<number | null>(null); // null until measured: the page script in app/page.tsx has set the same value before the first paint
 
 	const look = useCallback(async () => {
 		const me = await fetchMe();
-		if (me.status === 'ok') setVisitor({ name: 'member', profile: me.profile, stats: me.stats ?? null });
-		else if (me.status === 'guest') setVisitor({ name: 'guest' });
+		if (me.status === 'ok') {
+			// the start check happens here already: what this browser and the account hold, so the Continue card shows the game and /play goes straight in
+			let game: GameSummary | null = null;
+			let asks = false;
+			const stale = me.needsReset === true || epochVerdict(readSeenEpoch(), me.epoch) === 'wipe'; // an older chapter's game: /play puts it aside, the card shows nothing of it
+			if (me.profile && !stale) {
+				const local = peekSave();
+				const fetched = await fetchCloud();
+				const cloud = fetched.status === 'ok' ? fetched.cloud : fetched.status === 'empty' ? null : 'unavailable';
+				game = savedGameSummary(local, cloud);
+				asks = !skipsHub(planStart(local, cloud, readLink(), me.userId), local);
+			}
+			setVisitor({ name: 'member', profile: me.profile, stats: stale ? null : (me.stats ?? null), game, asks });
+		} else if (me.status === 'guest') setVisitor({ name: 'guest' });
 		else setVisitor({ name: 'unavailable', reason: me.status === 'unavailable' ? me.reason : 'outage' });
 	}, []);
 
-	// the page is laid out for DESIGN_W x DESIGN_H css px and scaled to fit whatever screen it is on (a big screen gets it bigger, not lost in a corner)
+	// the page is laid out for `LANDING_DESIGN` css px and scaled to fit whatever screen it is on (a big screen gets it bigger, not lost in a corner)
 	useEffect(() => {
-		const fit = () => setZoom(Math.min(1.5, Math.max(0.5, Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H))));
+		const fit = () => setZoom(fitZoom(window.innerWidth, window.innerHeight));
 		fit();
 		window.addEventListener('resize', fit);
 		return () => window.removeEventListener('resize', fit);
@@ -208,7 +242,7 @@ const LandingPage: React.FC = () => {
 	};
 
 	return (
-		<main className='ld-root' style={{ '--ld-zoom': zoom } as React.CSSProperties}>
+		<main className='ld-root' style={zoom === null ? undefined : ({ '--ld-zoom': zoom } as React.CSSProperties)}>
 			<div className='ld-mapwrap'>
 				<div
 					className='ld-map'
@@ -226,20 +260,20 @@ const LandingPage: React.FC = () => {
 				<div className='ld-columns'>
 					<ChangelogWindow />
 
-					<div className='px-modal ld-window'>
+					<div className='px-modal ld-window ld-account'>
 						<Critter id='swamp/rot-heron' className='ld-critter-tr' />
 						{visitor.name === 'member' ? (
 							<>
 								<WindowHead title='Welcome back' />
 								<div className='px-modal-body'>
-									<MemberCard profile={visitor.profile} stats={visitor.stats} onLogout={() => void leave()} />
+									<MemberCard profile={visitor.profile} stats={visitor.stats} game={visitor.game} asks={visitor.asks} onLogout={() => void leave()} />
 								</div>
 							</>
 						) : (
 							<>
 								<WindowHead title={visitor.name === 'unavailable' ? 'Accounts unavailable' : authTitle(mode)} />
 								<div className='px-modal-body'>
-									{visitor.name === 'checking' && <p className='ld-hint'>Looking for your hero...</p>}
+									{visitor.name === 'checking' && <Skeleton />}
 									{visitor.name === 'unavailable' && (
 										<div className='ld-continue'>
 											<p>
