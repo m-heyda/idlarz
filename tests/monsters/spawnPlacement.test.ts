@@ -6,7 +6,7 @@ import { BOSS_MIN_DISTANCE, MONSTERS } from '../../src/config/combatConfig';
 import { syntheticWorld } from '../../src/utils/worldGen';
 import { castleDistance } from '../../src/lib/distance';
 import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '../../src/lib/offline/placement';
-import { emptyBank, monsterTypeOf, type TicketBank } from '../../src/lib/offline/tickets';
+import { bossOf, emptyBank, monsterTypeOf, normalsOf, type TicketBank } from '../../src/lib/offline/tickets';
 import { sealedRng } from '../../src/lib/offline/seal';
 import { packBody } from '../../src/lib/saveFormat';
 import { pickPersisted } from '../../src/lib/sanitizeSave';
@@ -19,8 +19,10 @@ import { ownedRowMajor } from '../../src/utils/world';
 const rollFor = (kind: string, n: number) => sealedRng('placement-secret-0123456789', 'u1', 1, kind, n);
 const bankWith = (rats: number, king = false): TicketBank => ({
 	...emptyBank(0),
-	rats: Array.from({ length: rats }, (_, i) => ({ n: i + 1, at: 0, lucky: false })),
-	king: king ? { n: 100, at: 0, lucky: false } : null,
+	monsters: [
+		...Array.from({ length: rats }, (_, i) => ({ n: i + 1, at: 0, kind: 'normal' as const, lucky: false })),
+		...(king ? [{ n: 100, at: 0, kind: 'boss' as const, lucky: false }] : []),
+	],
 });
 
 const world = (tiles: number) => {
@@ -32,18 +34,18 @@ const world = (tiles: number) => {
 test('every ticket gets a tile on land 2 to 9 tiles from the castle, never twice the same, and the level it appeared at', () => {
 	const tiles = world(60);
 	const out = placeTickets(bankWith(6), tiles, 'k', 0, rollFor);
-	const all = out.rats;
+	const all = normalsOf(out);
 	assert.ok(all.every(isPlaced));
 	assert.equal(new Set(all.map((t) => `${t.x},${t.y}`)).size, all.length);
 	for (const t of all) {
-		const rule = MONSTERS[monsterTypeOf(t, 'rat')].spawn;
+		const rule = MONSTERS[monsterTypeOf(t)].spawn;
 		const d = castleDistance({ x: t.x!, y: t.y! });
 		assert.ok(d >= rule.minCastleDistance && d <= rule.maxCastleDistance, `distance ${d}`);
 		const tile = ownedRowMajor(tiles).find((e) => e.x === t.x && e.y === t.y)!.tile;
 		assert.ok((rule.biomes as readonly string[]).includes(tile.biome), tile.biome);
 		assert.ok(t.spawnLevel! >= 1);
 	}
-	assert.ok(out.sites!.rat > 6, 'the land says how many tiles there are for monsters');
+	assert.ok(out.sites!.monster > 6, 'the land says how many tiles there are for monsters');
 	assert.equal(out.sitesKey, 'k');
 });
 
@@ -57,29 +59,29 @@ test('the same land and the same seal always give the same map', () => {
 test('a map with no tile for them leaves the tickets hidden, and they appear once the land grows', () => {
 	const ringOnly = world(1); // the castle and its 4 neighbours: all adjacent
 	const hidden = placeTickets(bankWith(2), ringOnly, 'ring', 0, rollFor);
-	assert.equal(hidden.rats.filter(isPlaced).length, 0);
-	assert.deepEqual({ rat: hidden.sites!.rat, king: hidden.sites!.king }, { rat: 0, king: 0 });
+	assert.equal(normalsOf(hidden).filter(isPlaced).length, 0);
+	assert.deepEqual({ monster: hidden.sites!.monster, boss: hidden.sites!.boss }, { monster: 0, boss: 0 });
 	assert.equal(needsLook(hidden, 'ring'), false, 'nothing to do until the land changes');
 	assert.equal(needsLook(hidden, 'grown'), true, 'a different land is looked at again');
 	const grown = placeTickets(hidden, world(40), 'grown', 0, rollFor);
-	assert.equal(grown.rats.filter(isPlaced).length, 2);
+	assert.equal(normalsOf(grown).filter(isPlaced).length, 2);
 });
 
 test('a monster keeps its tile while it is valid, and is placed again when it stops being so', () => {
 	const tiles = world(60);
 	const first = placeTickets(bankWith(1), tiles, 'k', 0, rollFor);
-	const { x, y } = first.rats[0];
-	assert.deepEqual(placeTickets(first, tiles, 'k2', 0, rollFor).rats[0].x, x, 'valid: stays');
+	const { x, y } = normalsOf(first)[0];
+	assert.deepEqual(normalsOf(placeTickets(first, tiles, 'k2', 0, rollFor))[0].x, x, 'valid: stays');
 	patchTileAt(x!, y!, { building: 'farm' });
 	const moved = placeTickets(first, api().tiles, 'k3', 0, rollFor);
-	assert.ok(isPlaced(moved.rats[0]));
-	assert.notDeepEqual([moved.rats[0].x, moved.rats[0].y], [x, y], 'a built-on tile is no place for a rat');
+	assert.ok(isPlaced(normalsOf(moved)[0]));
+	assert.notDeepEqual([normalsOf(moved)[0].x, normalsOf(moved)[0].y], [x, y], 'a built-on tile is no place for a rat');
 });
 
 test('an old ticket (placed by the browser, before the server placed monsters) has no tile until the server looks', () => {
 	const old = bankWith(2);
 	assert.equal(needsLook(old, 'k'), true);
-	assert.deepEqual(old.rats.map(isPlaced), [false, false]);
+	assert.deepEqual(normalsOf(old).map(isPlaced), [false, false]);
 });
 
 test('the map the server reads is the one the save wrote: castle, land and chests', () => {
@@ -121,7 +123,7 @@ test('chests and monsters never share a tile, and the same land and seal always 
 	const a = placeTickets(bank, tiles, 'k', 0, rollFor);
 	const b = placeTickets(bank, tiles, 'k', 0, rollFor);
 	assert.deepEqual(a, b);
-	const spots = [...a.rats, a.king!, ...a.chests].map((t) => `${t.x},${t.y}`);
+	const spots = [...a.monsters, ...a.chests].map((t) => `${t.x},${t.y}`);
 	assert.equal(new Set(spots).size, spots.length);
 });
 
@@ -151,23 +153,23 @@ test('a chest with no tile left stays hidden until the land grows', () => {
 
 test('IDL-222: a boss stands 8 or more tiles out, and a kingdom that small has no tile for one', () => {
 	const small = placeTickets(bankWith(0, true), world(60), 'k', 0, rollFor);
-	assert.equal(small.sites!.king, 0, 'the 60 tiles bought first all lie within 7 of the castle');
-	assert.equal(isPlaced(small.king!), false);
+	assert.equal(small.sites!.boss, 0, 'the 60 tiles bought first all lie within 7 of the castle');
+	assert.equal(isPlaced(bossOf(small)!), false);
 	const big = syntheticWorld(1500, 4);
 	const out = placeTickets(bankWith(0, true), big, 'k', 0, rollFor);
-	assert.ok(out.sites!.king > 0);
-	assert.ok(isPlaced(out.king!));
-	assert.equal(MONSTERS[monsterTypeOf(out.king!, 'king')].grade, 'boss');
-	assert.ok(castleDistance({ x: out.king!.x!, y: out.king!.y! }) >= BOSS_MIN_DISTANCE);
+	assert.ok(out.sites!.boss > 0);
+	assert.ok(isPlaced(bossOf(out)!));
+	assert.equal(MONSTERS[monsterTypeOf(bossOf(out)!)].grade, 'boss');
+	assert.ok(castleDistance({ x: bossOf(out)!.x!, y: bossOf(out)!.y! }) >= BOSS_MIN_DISTANCE);
 });
 
 test('IDL-222: at distance 8 and 9 normal monsters and bosses share the land, never a tile', () => {
 	const big = syntheticWorld(1500, 4);
 	const out = placeTickets(bankWith(12, true), big, 'k', 0, rollFor);
-	const all = [...out.rats, out.king!];
+	const all = out.monsters;
 	assert.ok(all.every(isPlaced));
 	assert.equal(new Set(all.map((t) => `${t.x},${t.y}`)).size, all.length, 'one monster per tile');
 	const rule = MONSTERS.thistleBoar.spawn;
 	assert.ok(BOSS_MIN_DISTANCE <= rule.maxCastleDistance, 'the 8-9 overlap is intended: both kinds may stand there');
-	for (const t of out.rats) assert.ok(castleDistance({ x: t.x!, y: t.y! }) <= 9);
+	for (const t of normalsOf(out)) assert.ok(castleDistance({ x: t.x!, y: t.y! }) <= 9);
 });

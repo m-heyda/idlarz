@@ -15,6 +15,7 @@ import { fitInventory, inventoryFromCore, rebirthInventory, stampInventory } fro
 import { limitOf } from '../../src/lib/limits';
 import { starterBag } from '../../src/lib/inventory';
 import { claimOffline, startNewGame, type ClaimResult, type ServiceDeps } from '../../src/lib/offline/service';
+import { normalsOf } from '@/lib/offline/tickets';
 
 const memory = () => {
 	const rows = new Map<string, StoredSave>();
@@ -77,9 +78,9 @@ test('three hours away pay half the income of those hours, and chests and rats c
 	assert.equal(result.grant?.elapsedSec, 3 * 3600);
 	assert.equal(result.grant?.resources.gold, Math.floor(rates.gold * 3 * 3600 * 0.5));
 	assert.ok(result.tickets.chests.length > 0, 'chests appeared while away (and the server gave them a tile)');
-	assert.ok(result.tickets.rats.length > 0, 'rats appeared while away');
+	assert.ok(result.tickets.monsters.length > 0, 'rats appeared while away');
 	assert.ok(
-		result.tickets.rats.every((rat) => rat.at > T0 / 1000 && rat.at <= (T0 + 3 * HOUR) / 1000),
+		result.tickets.monsters.every((rat) => rat.at > T0 / 1000 && rat.at <= (T0 + 3 * HOUR) / 1000),
 		'stamped inside the absence, so they have grown by the time you are back',
 	);
 });
@@ -168,13 +169,13 @@ test('a claim made before the ledger exists seeds it from the save: the gems sta
 		},
 	};
 	const seeded = seedLedger(legacy, T0);
-	assert.equal(seeded.bank.rats.length, 2);
+	assert.equal(normalsOf(seeded.bank).length, 2);
 	assert.deepEqual(
-		seeded.bank.rats.map((r) => r.n),
+		normalsOf(seeded.bank).map((r) => r.n),
 		[1, 2],
 	);
 	assert.ok(
-		seeded.bank.rats.every((r) => r.x === undefined && r.spawnLevel === undefined),
+		normalsOf(seeded.bank).every((r) => r.x === undefined && r.spawnLevel === undefined),
 		'not placed yet',
 	);
 });

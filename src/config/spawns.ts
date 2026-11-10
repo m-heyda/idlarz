@@ -65,7 +65,7 @@ export const CHEST = {
  *
  * - rare-and-better rarity weights x `min(1.6, 1 + 0.004 x Luck)` ({@link rarityLuckMultiplier});
  * - monster gear roll chance x `(1 + 0.002 x Luck)` ({@link dropChanceMultiplier});
- * - golden ("lucky") monster chance `min(10%, 2% + 0.05% x Luck)` ({@link luckyRatChance});
+ * - golden ("lucky") monster chance `min(10%, 2% + 0.05% x Luck)` ({@link goldenMonsterChance});
  * - gem find on a chest ({@link gemChance}).
  *
  * @category Economy/Chests and Luck
@@ -85,5 +85,5 @@ export const LUCK = {
 	/** A bonus roll on every chest (it never replaces the normal reward): chance, and how many gems (skewed to the low end) */
 	gem: { base: 0.03, perPoint: 0.0006, cap: 0.15, min: 5, max: 50 },
 	/** A newly arrived rat is a golden "lucky" one with this chance: same stats, bigger reward */
-	luckyRat: { base: 0.02, perPoint: 0.0005, cap: 0.1, rewardMultiplier: 3, extraGearRolls: 1 },
+	goldenMonster: { base: 0.02, perPoint: 0.0005, cap: 0.1, rewardMultiplier: 3, extraGearRolls: 1 },
 };

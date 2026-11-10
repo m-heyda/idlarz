@@ -53,7 +53,7 @@ export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillCo
 	const levelMult = rewardLevelMult(monster.type, monster.level);
 	const luckBonus = 1 + ctx.luck * CHEST.luckBonusPerPoint;
 	const goldFind = 1 + (ctx.goldFind ?? 0) / 100;
-	const bonus = ctx.lucky ? LUCK.luckyRat.rewardMultiplier : 1;
+	const bonus = ctx.lucky ? LUCK.goldenMonster.rewardMultiplier : 1;
 	const kills = 1 + (ctx.killRewardPct ?? 0) / 100;
 	// the monster's part first (income share, capped, times its level), the player's investment (Luck, Gold Find, Kill Rewards %) after the cap
 	const goldBase = Math.min(ctx.goldPerSec * reward.gold.rewardSec, reward.gold.cap) * levelMult;
@@ -76,7 +76,7 @@ export const rollKillLoot = (monster: Pick<Monster, 'type' | 'level'>, ctx: Kill
 			owned: ctx.owned,
 			pity: ctx.pity,
 			luck: ctx.luck,
-			extraGearRolls: ctx.lucky ? LUCK.luckyRat.extraGearRolls : 0,
+			extraGearRolls: ctx.lucky ? LUCK.goldenMonster.extraGearRolls : 0,
 		},
 		rng,
 	);

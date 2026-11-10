@@ -688,6 +688,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)
 - [`serverRebirth.test.ts`](../../tests/server/serverRebirth.test.ts) — IDL-102: the server runs the rebirth. POST /api/rebirth judges the last stored save, computes the Embers, wipes the server's bag and gear once,
 - [`serverTrust.test.ts`](../../tests/server/serverTrust.test.ts) — Server trust: enforcement (IDL-112), the trusted economy (IDL-167) and paid merchant levels (IDL-168).
+- [`ticketBankUpgrade.test.ts`](../../tests/server/ticketBankUpgrade.test.ts)
 
 **tests/**
 

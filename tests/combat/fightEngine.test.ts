@@ -13,6 +13,7 @@ import type { Ledger } from '../../src/lib/offline/ledger';
 import { bagCountOf, inventoryFromCore } from '../../src/lib/offline/inventory';
 import { emptyBag } from '../../src/lib/inventory';
 import type { Equipment } from '../../src/types/game';
+import { bossOf, normalsOf } from '@/lib/offline/tickets';
 
 // The server's fight engine, run without a database: a player's saved strength, monsters placed on the map, a sealed random stream.
 
@@ -111,7 +112,7 @@ test('one monster at a time: a fight ends before the next begins, and every win 
 	}
 	assert.equal(kinds(events, 'won').length + kinds(first.combat!.log, 'won').length, 3);
 	assert.equal(ledger.ordKill, 3, 'one sealed reward per kill');
-	assert.equal(ledger.bank.rats.length, 0, 'the tickets are spent');
+	assert.equal(normalsOf(ledger.bank).length, 0, 'the tickets are spent');
 	assert.ok(ledger.granted.gold > 0 && ledger.granted.xp > 0);
 });
 
@@ -172,7 +173,7 @@ test('auto-battle off: nothing is engaged; on: the next fight starts at once; of
 	const retreat = runCombat(on, s.env(s.start + 32), { autoBattle: false }).ledger;
 	assert.equal(retreat.combat!.fight, null);
 	assert.equal(retreat.combat!.log.at(-1)?.kind, 'retreat');
-	assert.equal(retreat.bank.rats.length, 1, 'the monster is still there');
+	assert.equal(normalsOf(retreat.bank).length, 1, 'the monster is still there');
 	assert.equal(retreat.ordKill, 0, 'no reward');
 });
 
@@ -186,7 +187,7 @@ test('auto-battle is locked until the first rebirth: asking for it changes nothi
 	assert.equal(had.combat!.autoBattle, false);
 	assert.equal(had.combat!.fight, null);
 	// a click still fights
-	const clicked = runCombat(asked, s.env(s.start + 6), { commands: [{ kind: 'fight', n: asked.bank.rats[0].n }] }).ledger;
+	const clicked = runCombat(asked, s.env(s.start + 6), { commands: [{ kind: 'fight', n: normalsOf(asked.bank)[0].n }] }).ledger;
 	assert.ok(clicked.combat!.fight);
 });
 
@@ -200,7 +201,7 @@ test('a click starts a fight with auto-battle off, even below the resume HP, and
 	});
 	const off = runCombat(s.ledger, s.env(s.start), { autoBattle: false }).ledger;
 	assert.equal(off.combat!.fight, null, 'nothing is engaged by itself');
-	const [first, second] = off.bank.rats;
+	const [first, second] = normalsOf(off.bank);
 
 	// below the 80 % line auto-battle would rest first; a click does not wait
 	const tired = { ...off, combat: { ...off.combat!, hp: Math.round(off.combat!.hp * 0.5) } };
@@ -214,7 +215,7 @@ test('a click starts a fight with auto-battle off, even below the resume HP, and
 	assert.equal(kinds(events, 'engage').length, 0, 'no second engage');
 	assert.equal(ledger.combat!.fight, null);
 	assert.ok(
-		ledger.bank.rats.some((rat) => rat.n === first.n),
+		normalsOf(ledger.bank).some((rat) => rat.n === first.n),
 		'the other rat is still there',
 	);
 });
@@ -233,22 +234,22 @@ test('a click is refused for a monster that is not there, during a fight, at 0 H
 	assert.equal(click(off, 99).combat!.fight, null, 'no such ticket');
 	assert.equal(click(off, 0).combat!.fight, null);
 	assert.equal(
-		click({ ...off, combat: { ...off.combat!, hp: 0 } }, off.bank.rats[0].n, s.start).combat!.fight,
+		click({ ...off, combat: { ...off.combat!, hp: 0 } }, normalsOf(off.bank)[0].n, s.start).combat!.fight,
 		null,
 		'no HP (at the same clock: resting would give some back)',
 	);
 
-	const fighting = click(off, off.bank.rats[0].n);
-	assert.equal(fighting.combat!.fight?.n, off.bank.rats[0].n);
-	const again = click(fighting, off.bank.rats[1].n, s.start + 2);
-	assert.equal(again.combat!.fight?.n, off.bank.rats[0].n, 'a second click does not change the fight');
+	const fighting = click(off, normalsOf(off.bank)[0].n);
+	assert.equal(fighting.combat!.fight?.n, normalsOf(off.bank)[0].n);
+	const again = click(fighting, normalsOf(off.bank)[1].n, s.start + 2);
+	assert.equal(again.combat!.fight?.n, normalsOf(off.bank)[0].n, 'a second click does not change the fight');
 
 	// a request that is still catching up does not start a fight in the past
 	const busy = setup({ equipment: STARTER_EQUIPMENT, monsters: Array.from({ length: 20 }, () => ({ type: 'thistleBoar' as const, level: 3 })) });
 	const on = runCombat(busy.ledger, busy.env(busy.start)).ledger;
-	const late = runCombat(on, busy.env(busy.start + COMBAT.maxCatchUpSec * 3), { autoBattle: false, commands: [{ kind: 'fight', n: on.bank.rats[5].n }] });
+	const late = runCombat(on, busy.env(busy.start + COMBAT.maxCatchUpSec * 3), { autoBattle: false, commands: [{ kind: 'fight', n: normalsOf(on.bank)[5].n }] });
 	assert.equal(late.behind, true);
-	assert.notEqual(late.ledger.combat!.fight?.n, on.bank.rats[5].n);
+	assert.notEqual(late.ledger.combat!.fight?.n, normalsOf(on.bank)[5].n);
 });
 
 test('the boss can be clicked too, with auto-battle off', () => {
@@ -260,7 +261,7 @@ test('the boss can be clicked too, with auto-battle off', () => {
 		],
 	});
 	const off = runCombat(s.ledger, s.env(s.start), { autoBattle: false }).ledger;
-	const king = off.bank.king!;
+	const king = bossOf(off.bank)!;
 	const clicked = runCombat(off, s.env(s.start + 1), { commands: [{ kind: 'fight', n: king.n }] }).ledger;
 	assert.equal(clicked.combat!.fight?.type, 'bossGreatAuroch');
 });

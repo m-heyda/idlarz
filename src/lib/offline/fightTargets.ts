@@ -6,7 +6,7 @@ import { resumeHpOf, startFight, winnable } from '@/lib/offline/fightProfile';
 import type { CombatState, QueueResult } from '@/lib/offline/fightTypes';
 import type { Ledger } from '@/lib/offline/ledger';
 import { isPlaced } from '@/lib/offline/placement';
-import { monsterTypeOf, type MonsterTicket } from '@/lib/offline/tickets';
+import { bossOf, monsterTypeOf, normalsOf, type MonsterTicket } from '@/lib/offline/tickets';
 import type { MonsterType } from '@/types/game';
 
 // SERVER ONLY. Who the hero fights next: the monsters standing on the map, auto-battle's pick, the battle queue (docs/reference/combat.md) and
@@ -16,10 +16,8 @@ type Target = { ticket: MonsterTicket; type: MonsterType };
 
 /** A placed monster by ticket number, with what it is (null: gone, or not on the map yet). */
 export const placedTarget = (ledger: Ledger, n: number): Target | null => {
-	const rat = ledger.bank.rats.find((ticket) => ticket.n === n && isPlaced(ticket));
-	if (rat) return { ticket: rat, type: monsterTypeOf(rat, 'rat') };
-	const king = ledger.bank.king && ledger.bank.king.n === n && isPlaced(ledger.bank.king) ? ledger.bank.king : undefined;
-	return king ? { ticket: king, type: monsterTypeOf(king, 'king') } : null;
+	const ticket = ledger.bank.monsters.find((monster) => monster.n === n && isPlaced(monster));
+	return ticket ? { ticket, type: monsterTypeOf(ticket) } : null;
 };
 
 /**
@@ -46,21 +44,21 @@ export const pickTarget = (
 	winnable?: (type: MonsterType, level: number) => boolean,
 ): Target | null => {
 	const levelOf = (ticket: MonsterTicket) => levelAtAge(ticket.spawnLevel ?? 1, tSec - ticket.at, {}, ticket.growCap);
-	const ready = (ticket: MonsterTicket, kind: 'rat' | 'king') =>
-		isPlaced(ticket) && tSec >= (combat.retryAt[ticket.n] ?? 0) && (!winnable || winnable(monsterTypeOf(ticket, kind), levelOf(ticket)));
-	const rats = ledger.bank.rats
-		.filter((ticket) => ready(ticket, 'rat'))
+	const ready = (ticket: MonsterTicket) =>
+		isPlaced(ticket) && tSec >= (combat.retryAt[ticket.n] ?? 0) && (!winnable || winnable(monsterTypeOf(ticket), levelOf(ticket)));
+	const normals = normalsOf(ledger.bank)
+		.filter(ready)
 		.sort((a, b) => (COMBAT.auto.engageOrder === 'weakest' ? levelOf(a) - levelOf(b) : 0) || a.n - b.n);
-	if (rats[0]) return { ticket: rats[0], type: monsterTypeOf(rats[0], 'rat') };
-	const king = ledger.bank.king;
-	if (king && ready(king, 'king')) return { ticket: king, type: monsterTypeOf(king, 'king') };
+	if (normals[0]) return { ticket: normals[0], type: monsterTypeOf(normals[0]) };
+	const boss = bossOf(ledger.bank);
+	if (boss && ready(boss)) return { ticket: boss, type: monsterTypeOf(boss) };
 	return null;
 };
 
 /** The soonest time a monster that is waiting out its retry cooldown becomes a target again (Infinity: none). */
 export const nextRetry = (ledger: Ledger, combat: CombatState, tSec: number): number => {
 	let soonest = Infinity;
-	for (const ticket of [...ledger.bank.rats, ...(ledger.bank.king ? [ledger.bank.king] : [])]) {
+	for (const ticket of ledger.bank.monsters) {
 		const at = combat.retryAt[ticket.n] ?? 0;
 		if (isPlaced(ticket) && at > tSec) soonest = Math.min(soonest, at);
 	}

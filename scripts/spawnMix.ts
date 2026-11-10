@@ -65,10 +65,10 @@ const measure = (hero: PlayerProfile, world: ReturnType<typeof mixWorld>, weight
 	let grownAbove = 0;
 	for (let n = 1; n <= SAMPLES; n++) {
 		const rollFor = (kind: string, k: number) => sealedRng('spawn-mix-secret-0123456789', 'mix', 1, kind, k);
-		const ticket = { n, at: 0, lucky: false };
-		const bank = boss ? { ...emptyBank(0), king: ticket } : { ...emptyBank(0), rats: [ticket] };
+		const ticket = { n, at: 0, kind: boss ? ('boss' as const) : ('normal' as const), lucky: false };
+		const bank = { ...emptyBank(0), monsters: [ticket] };
 		const placed = placeTickets(bank, world, 'k', 0, rollFor, weighted ? hero : undefined);
-		const t = boss ? placed.king! : placed.rats[0];
+		const t = placed.monsters[0];
 		const chance = winChanceAt(hero, t.type!, t.spawnLevel!);
 		counts[BUCKETS.findIndex((b) => chance >= b.from && chance < b.to)]++;
 		if (chance > 0.5) above++;

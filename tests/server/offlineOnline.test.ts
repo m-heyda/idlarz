@@ -74,12 +74,12 @@ test('a sync mints what the server clock says has appeared, and says when the ne
 	const { m, now } = await playing(25);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
 	assert.equal(sync.tickets.chests.length, 2, 'a chest every ten minutes, each on a tile the server chose');
-	assert.equal(sync.tickets.rats.length, 2, 'a rat after 2 minutes and the next 15 later');
+	assert.equal(sync.tickets.monsters.length, 2, 'a rat after 2 minutes and the next 15 later');
 	assert.ok(sync.nextInSec !== null && sync.nextInSec > 0 && sync.nextInSec <= 600);
 	// asking again changes nothing
 	const again = ok(await syncTickets(m.deps, 'u1', now + 1000));
 	assert.deepEqual(again.tickets.chests, sync.tickets.chests, 'the chests stay where they were put');
-	assert.deepEqual(again.tickets.rats, sync.tickets.rats);
+	assert.deepEqual(again.tickets.monsters, sync.tickets.monsters);
 });
 
 test('a chest opens against a ticket, pays what the server rolled, and the same key replays the same reward', async () => {
@@ -156,14 +156,14 @@ test('gems found in chests raise the server balance and are never flagged in the
 test('the server puts every monster on land: 2 to 9 tiles from the castle, never on water, and gives it the level it appeared at', async () => {
 	const { m, now } = await playing(60 * 5);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
-	assert.ok(sync.tickets.rats.length > 0);
+	assert.ok(sync.tickets.monsters.length > 0);
 	const stored = (await m.saves.load('u1'))!;
-	for (const rat of sync.tickets.rats) {
+	for (const rat of sync.tickets.monsters) {
 		const distance = castleDistance(rat);
 		assert.ok(distance >= MONSTERS.thistleBoar.spawn.minCastleDistance && distance <= MONSTERS.thistleBoar.spawn.maxCastleDistance, `distance ${distance}`);
 		assert.ok(rat.spawnLevel >= 1);
 	}
-	assert.equal(new Set(sync.tickets.rats.map((r) => `${r.x},${r.y}`)).size, sync.tickets.rats.length, 'one monster per tile');
+	assert.equal(new Set(sync.tickets.monsters.map((r) => `${r.x},${r.y}`)).size, sync.tickets.monsters.length, 'one monster per tile');
 	assert.ok(stored.summary.tilesOwned > 9);
 });
 
@@ -172,7 +172,9 @@ test('with auto-battle on the server fights the monsters one at a time and pays 
 	// the server walks the fights forward each time it is asked: the starter kit beats the low-level plains monsters of a young castle
 	// (the land of this test has forest and swamp too, whose monsters start higher and are meant to be out of reach of the starter kit)
 	const row = m.ledgers.get('u1')!;
-	row.bank.rats = row.bank.rats.map((ticket) => ({ ...ticket, type: 'thistleBoar' as const, spawnLevel: Math.min(ticket.spawnLevel ?? 1, 3) }));
+	row.bank.monsters = row.bank.monsters.map((ticket) =>
+		ticket.kind === 'boss' ? ticket : { ...ticket, type: 'thistleBoar' as const, spawnLevel: Math.min(ticket.spawnLevel ?? 1, 3) },
+	);
 	let won = 0;
 	let t = now;
 	let since: number | undefined = 0;
@@ -209,12 +211,12 @@ test('a hotkey carries the same key twice and is applied once; an unknown action
 test('dismissing a monster spends its ticket without a reward', async () => {
 	const { m, now } = await playing(25);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
-	const n = sync.tickets.rats[0].n;
+	const n = sync.tickets.monsters[0].n;
 	const out = ok(await fightStep(m.deps, 'u1', 'dismiss-key-02', { action: 'dismiss', n }, now + 1000));
 	assert.equal(out.accepted, true);
 	assert.equal(m.ledgers.get('u1')!.granted.gold, 0);
 	assert.equal(
-		m.ledgers.get('u1')!.bank.rats.some((r) => r.n === n),
+		m.ledgers.get('u1')!.bank.monsters.some((r) => r.n === n),
 		false,
 	);
 });
@@ -290,6 +292,6 @@ test('skipped writes do not lose spawn time: polling often or rarely gives the s
 	const a = ok(await syncTickets(often.m.deps, 'u1', often.now + 600_000));
 	const b = ok(await syncTickets(rarely.m.deps, 'u1', rarely.now + 600_000));
 	// which tile a ticket gets depends on when the server first looked at the land (as before), but what appeared and when must not
-	const when = (t: typeof a.tickets) => ({ chests: t.chests.map((c) => c.n), rats: t.rats.map((r) => [r.n, r.at]), king: t.king?.n ?? null });
+	const when = (t: typeof a.tickets) => ({ chests: t.chests.map((c) => c.n), rats: t.monsters.map((r) => [r.n, r.at]), king: t.boss?.n ?? null });
 	assert.deepEqual(when(a.tickets), when(b.tickets));
 });

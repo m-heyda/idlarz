@@ -43,7 +43,7 @@ export const payKill = (
 	const taken = takeMonster(ledger.bank, n);
 	if (!taken) return null;
 	const ticket: MonsterTicket = taken.ticket;
-	const type = monsterTypeOf(ticket, taken.kind);
+	const type = monsterTypeOf(ticket);
 	const level = levelAtAge(ticket.spawnLevel ?? 1, nowSec - ticket.at, {}, ticket.growCap);
 	const ordKill = ledger.ordKill + 1;
 	const rng = sealedRng(secret, userId, ledger.runId, 'kill', ordKill);

@@ -12,7 +12,7 @@ import { LOOT_DATA } from '../src/lib/loot/data';
 import { validateLootData } from '../src/lib/loot/validate';
 import { mulberry32 } from '../src/lib/rng';
 import { LUCK } from '../src/config/spawns';
-import { chestIntervalSec, gemChance, luckyRatChance, rollGemFind } from '../src/lib/luck';
+import { chestIntervalSec, gemChance, goldenMonsterChance, rollGemFind } from '../src/lib/luck';
 
 const arg = (name: string, fallback: number) => {
 	const at = process.argv.indexOf(`--${name}`);
@@ -167,7 +167,7 @@ for (const luck of [0, 10, 30, 60, 100, 200]) {
 	let gems = 0;
 	for (let i = 0; i < KILLS; i++) gems += rollGemFind(luck, rng);
 	out(
-		`| ${luck} | ${(chestIntervalSec(luck) / 60).toFixed(1)} min | ${monster.perKill.toFixed(3)} | ${monster.rare} | ${chest.rare} | ${(gemChance(luck) * 100).toFixed(1)}% | ${(gems / KILLS).toFixed(2)} | ${(luckyRatChance(luck) * 100).toFixed(1)}% |`,
+		`| ${luck} | ${(chestIntervalSec(luck) / 60).toFixed(1)} min | ${monster.perKill.toFixed(3)} | ${monster.rare} | ${chest.rare} | ${(gemChance(luck) * 100).toFixed(1)}% | ${(gems / KILLS).toFixed(2)} | ${(goldenMonsterChance(luck) * 100).toFixed(1)}% |`,
 	);
 }
 

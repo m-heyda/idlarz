@@ -56,8 +56,8 @@ const world = () => {
 };
 /** Ticket `n` placed alone on the land (every ticket is placed on its own, so the first ones do not use up the tiles of the later ones). */
 const placeOne = (tiles: ReturnType<typeof world>, n: number, hero?: PlayerProfile) => {
-	const bank = { ...emptyBank(0), rats: [{ n, at: 0, lucky: false }] };
-	return placeTickets(bank, tiles, 'k', 0, rollFor, hero).rats[0];
+	const bank = { ...emptyBank(0), monsters: [{ n, at: 0, kind: 'normal' as const, lucky: false }] };
+	return placeTickets(bank, tiles, 'k', 0, rollFor, hero).monsters[0];
 };
 
 test('the weight is full for a fight worth taking, fades to the floor for a hopeless one and is never zero', () => {
@@ -146,7 +146,8 @@ test('new gear is a different look at the land', () => {
 test('IDL-222: bosses are weighted by win chance and level-capped like normal monsters', () => {
 	const land = syntheticWorld(2500, 4);
 	const bosses = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => MONSTERS[type].grade === 'boss');
-	const placeBoss = (n: number, hero?: PlayerProfile) => placeTickets({ ...emptyBank(0), king: { n, at: 0, lucky: false } }, land, 'k', 0, rollFor, hero).king!;
+	const placeBoss = (n: number, hero?: PlayerProfile) =>
+		placeTickets({ ...emptyBank(0), monsters: [{ n, at: 0, kind: 'boss' as const, lucky: false }] }, land, 'k', 0, rollFor, hero).monsters[0];
 	const weak = rookie();
 	const castle = 1;
 	const weights = typeWeights(weak, bosses, castle);

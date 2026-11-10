@@ -1281,7 +1281,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/lib/fightSim.ts",
-  "line": 57,
+  "line": 58,
   "summary": "A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.",
   "see": []
  },
@@ -1467,9 +1467,9 @@
   "see": []
  },
  {
-  "id": "luckyratchance",
-  "name": "luckyRatChance",
-  "symbol": "luckyRatChance",
+  "id": "goldenmonsterchance",
+  "name": "goldenMonsterChance",
+  "symbol": "goldenMonsterChance",
   "kind": "function",
   "category": "Economy/Chests and Luck",
   "file": "src/lib/luck.ts",
@@ -1712,7 +1712,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightTargets.ts",
-  "line": 41,
+  "line": 39,
   "summary": "The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the boss. One that beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.",
   "see": [
    "engage",
@@ -1726,7 +1726,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightTargets.ts",
-  "line": 87,
+  "line": 85,
   "summary": "A click while a fight is open: the monster joins the queue, or leaves it when it was already there.",
   "see": [
    "engage",
@@ -1740,7 +1740,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightTargets.ts",
-  "line": 112,
+  "line": 110,
   "summary": "The next fight: the queue's head (the player chose it, so no retry time and no win estimate stop it, but the hero must be back on his feet), then auto-battle's pick.",
   "see": []
  },
@@ -1787,7 +1787,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/placement.ts",
-  "line": 73,
+  "line": 72,
   "summary": "Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`). With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 8 or more tiles from the castle (`BOSS_MIN_DISTANCE`).",
   "see": []
  },
@@ -1874,7 +1874,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 103,
+  "line": 113,
   "summary": "How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together), (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.",
   "see": []
  },
@@ -1885,8 +1885,8 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 143,
-  "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.",
+  "line": 153,
+  "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.",
   "see": []
  },
  {

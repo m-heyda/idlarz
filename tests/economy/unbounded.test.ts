@@ -139,8 +139,8 @@ test('chests and monsters the server lists show on land with negative coordinate
 						.slice(0, 5)
 						.map(({ x, y }, i) => ({ n: 50 + i, x, y }))
 				: [],
-			rats: spots.slice(0, 3).map(({ x, y }, i) => ({ n: i + 1, at: 0, lucky: false, x, y, spawnLevel: 1 })),
-			king: null,
+			monsters: spots.slice(0, 3).map(({ x, y }, i) => ({ n: i + 1, at: 0, lucky: false, x, y, spawnLevel: 1 })),
+			boss: null,
 		},
 		serverNowSec: 10,
 		gemsTotal: 1000,

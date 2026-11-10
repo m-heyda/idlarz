@@ -23,7 +23,7 @@ const restore = () => {
 	globalThis.fetch = realFetch;
 };
 const flush = () => new Promise((resolve) => setTimeout(resolve, 20));
-const tickets = { chests: [], rats: [], king: null };
+const tickets = { chests: [], monsters: [], boss: null };
 
 // ---------------------------------------------------------------------------------------------------- opening a chest on the server
 
@@ -94,8 +94,8 @@ test('the monsters on the map are the server list, where the server put them', (
 	const sync = {
 		tickets: {
 			chests: [],
-			rats: [{ n: 4, at: 1000 - 100, lucky: true, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 2 }],
-			king: { n: 9, at: 1000, x: CASTLE_X, y: CASTLE_Y - 4, spawnLevel: 16 },
+			monsters: [{ n: 4, at: 1000 - 100, lucky: true, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 2 }],
+			boss: { n: 9, at: 1000, x: CASTLE_X, y: CASTLE_Y - 4, spawnLevel: 16 },
 		},
 		serverNowSec: 1000,
 		gemsTotal: 1100,
@@ -129,7 +129,7 @@ test('the monsters on the map are the server list, where the server put them', (
 	assert.equal(api().monsters[0].lucky, true);
 	assert.equal(api().gems, 1100);
 	// the next answer lists only the boss: the normal monster is gone from the map
-	api().applyServerTickets({ ...sync, tickets: { ...sync.tickets, rats: [] }, combat: { ...sync.combat, at: 2 } });
+	api().applyServerTickets({ ...sync, tickets: { ...sync.tickets, monsters: [] }, combat: { ...sync.combat, at: 2 } });
 	assert.deepEqual(
 		api().monsters.map((m) => m.id),
 		[9],

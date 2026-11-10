@@ -64,7 +64,8 @@ export const rollGemAmount = (rng: Rng): number => {
  * @formula
  * golden monster chance = min(10%, 2% + 0.05% x Luck)
  */
-export const luckyRatChance = (luck: number): number => Math.min(LUCK.luckyRat.cap, LUCK.luckyRat.base + points(luck) * LUCK.luckyRat.perPoint);
+export const goldenMonsterChance = (luck: number): number =>
+	Math.min(LUCK.goldenMonster.cap, LUCK.goldenMonster.base + points(luck) * LUCK.goldenMonster.perPoint);
 
 /** The bonus gem roll of one chest: 0 (most of the time) or a gem find. Server only: the browser never rolls it. */
 export const rollGemFind = (luck: number, rng: Rng): number => (rng() < gemChance(luck) ? rollGemAmount(rng) : 0);

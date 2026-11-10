@@ -38,9 +38,9 @@ export const reconcileTickets = (
 ): ReconcileResult => {
 	const standing = new Set(state.monsters.map((mon) => mon.ticket));
 	const waiting = [
-		...tickets.rats.map((t) => ({ ...t, type: t.type && t.type in MONSTERS ? t.type : (FALLBACK_MONSTER as MonsterType), lucky: t.lucky })),
-		...(tickets.king
-			? [{ ...tickets.king, type: tickets.king.type && tickets.king.type in MONSTERS ? tickets.king.type : (FALLBACK_BOSS as MonsterType), lucky: false }]
+		...tickets.monsters.map((t) => ({ ...t, type: t.type && t.type in MONSTERS ? t.type : (FALLBACK_MONSTER as MonsterType), lucky: t.lucky })),
+		...(tickets.boss
+			? [{ ...tickets.boss, type: tickets.boss.type && tickets.boss.type in MONSTERS ? tickets.boss.type : (FALLBACK_BOSS as MonsterType), lucky: false }]
 			: []),
 	].sort((a, b) => a.n - b.n);
 

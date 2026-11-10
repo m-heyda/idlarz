@@ -117,7 +117,7 @@ test('a picture from another answer is not taken while a change of ours is on it
 		await settle();
 		// a poll answer with an inventory arrives first: it does not know about the equip
 		api().applyServerTickets({
-			tickets: { chests: [], rats: [], king: null },
+			tickets: { chests: [], monsters: [], boss: null },
 			serverNowSec: 1,
 			gemsTotal: 1000,
 			nextInSec: null,

@@ -5,7 +5,7 @@ import { castleDistance } from '@/lib/distance';
 import { canSpawnOn, rollSpawnLevel, spawnTiles } from '@/lib/monsters';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import { growthCap, pickWeighted, spawnLevelCap, typeWeights } from '@/lib/offline/spawnWeights';
-import { monsterTypeOf, type ChestTicket, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
+import { monsterTypeOf, type ChestTicket, type MonsterKind, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
 import type { Rng } from '@/lib/rng';
 import { unpackBody, type SaveBody } from '@/lib/saveFormat';
 import type { MonsterType, Tile } from '@/types/game';
@@ -39,9 +39,9 @@ export const worldFromPart = (part: { land: unknown; extra: unknown }): World | 
 	return createWorld(placed);
 };
 
-/** The monsters a ticket of this kind can turn into: every `MONSTERS` entry of the matching grade (normal monsters for a `rat` ticket, bosses for a `king` one). */
-const typesOf = (kind: 'rat' | 'king'): MonsterType[] =>
-	(Object.keys(MONSTERS) as MonsterType[]).filter((type) => (MONSTERS[type].grade === 'boss') === (kind === 'king'));
+/** The monsters a ticket of this kind can turn into: every `MONSTERS` entry of the matching grade (normal monsters for a `normal` ticket, bosses for a `boss` one). */
+const typesOf = (kind: MonsterKind): MonsterType[] =>
+	(Object.keys(MONSTERS) as MonsterType[]).filter((type) => (MONSTERS[type].grade === 'boss') === (kind === 'boss'));
 
 /** A ticket that is on the map (it has a tile and the level it appeared at). */
 export const isPlaced = (ticket: MonsterTicket): boolean => ticket.x !== undefined && ticket.y !== undefined && ticket.spawnLevel !== undefined;
@@ -52,10 +52,9 @@ export const isChestPlaced = (ticket: ChestTicket): boolean => ticket.x !== unde
 /** Whether the map has to be looked at: the land changed since the last look, or a monster or chest is waiting for its tile and there may be room. */
 export const needsLook = (bank: TicketBank, key: string): boolean => {
 	if (bank.sitesKey !== key || !bank.sites) return true;
-	const waiting = bank.rats.some((ticket) => !isPlaced(ticket)) || (bank.king !== null && !isPlaced(bank.king));
-	if (waiting && bank.sites.rat > 0) return true;
-	const monsters = bank.rats.length + (bank.king ? 1 : 0);
-	return bank.chests.some((chest) => !isChestPlaced(chest)) && bank.chests.length + monsters < (bank.sites.chest ?? 0);
+	const waiting = bank.monsters.some((ticket) => !isPlaced(ticket));
+	if (waiting && bank.sites.monster > 0) return true;
+	return bank.chests.some((chest) => !isChestPlaced(chest)) && bank.chests.length + bank.monsters.length < (bank.sites.chest ?? 0);
 };
 
 /**
@@ -81,25 +80,25 @@ export const placeTickets = (
 	const castleLevel = castleLevelOf(world);
 	const noneTaken = new Set<string>();
 	// how many tiles some monster of the kind may stand on (a tile several monsters could use counts once)
-	const siteCount = (kind: 'rat' | 'king') =>
+	const siteCount = (kind: MonsterKind) =>
 		new Set(typesOf(kind).flatMap((type) => spawnTiles(type, world, noneTaken, rebirths).map((spot) => `${spot.x},${spot.y}`))).size;
 	const sites = {
-		rat: siteCount('rat'),
-		king: siteCount('king'),
+		monster: siteCount('normal'),
+		boss: siteCount('boss'),
 		chest: chestSpots(world, noneTaken, castleLevel).length,
 	};
 
 	const taken = new Set<string>();
 	// a monster keeps its tile while the tile is still valid for it (and nobody else stands there)
-	const settle = (ticket: MonsterTicket, kind: 'rat' | 'king'): MonsterTicket => {
+	const settle = (ticket: MonsterTicket): MonsterTicket => {
 		if (!isPlaced(ticket)) return ticket;
 		const spot = `${ticket.x},${ticket.y}`;
 		const tile = getTile(world, ticket.x!, ticket.y!);
-		if (tile && !taken.has(spot) && canSpawnOn(monsterTypeOf(ticket, kind), ticket.x!, ticket.y!, tile, castleLevel, rebirths)) {
+		if (tile && !taken.has(spot) && canSpawnOn(monsterTypeOf(ticket), ticket.x!, ticket.y!, tile, castleLevel, rebirths)) {
 			taken.add(spot);
 			return ticket;
 		}
-		return { n: ticket.n, at: ticket.at, lucky: ticket.lucky };
+		return { n: ticket.n, at: ticket.at, kind: ticket.kind, lucky: ticket.lucky };
 	};
 	// a chest keeps its tile while it can still stand there (a building, the castle's ward or a monster would stop it)
 	const settleChest = (ticket: ChestTicket): ChestTicket => {
@@ -112,10 +111,10 @@ export const placeTickets = (
 		}
 		return { n: ticket.n, at: ticket.at };
 	};
-	const place = (ticket: MonsterTicket, kind: 'rat' | 'king'): MonsterTicket => {
+	const place = (ticket: MonsterTicket): MonsterTicket => {
 		if (isPlaced(ticket)) return ticket;
 		// the monster comes with the tile: among the types that still have a free tile (the seal picks when there is a choice)
-		const open = typesOf(kind)
+		const open = typesOf(ticket.kind)
 			.map((type) => ({ type, free: spawnTiles(type, world, taken, rebirths) }))
 			.filter((entry) => entry.free.length > 0);
 		if (open.length === 0) return ticket;
@@ -138,14 +137,14 @@ export const placeTickets = (
 		return { ...ticket, type, x: spot.x, y: spot.y, spawnLevel, ...(grow !== undefined ? { growCap: grow } : {}) };
 	};
 
-	const settledRats = bank.rats.map((ticket) => settle(ticket, 'rat'));
-	const settledKing = bank.king ? settle(bank.king, 'king') : null;
+	// normal monsters settle and are placed first, the boss last (so the boss never takes a tile a normal monster could have used)
+	const settledMonsters = bank.monsters.map(settle);
 	// chests that stand stay where they are before anything new is placed, so a new monster never takes a chest's tile
 	const settledChests = bank.chests.map(settleChest);
 	// tickets are placed oldest first so the same land always gives the same map
-	const order = [...settledRats].sort((a, b) => a.n - b.n);
-	const placed = new Map(order.map((ticket) => [ticket.n, place(ticket, 'rat')]));
-	const king = settledKing ? place(settledKing, 'king') : null;
+	const order = settledMonsters.filter((ticket) => ticket.kind === 'normal').sort((a, b) => a.n - b.n);
+	const placed = new Map(order.map((ticket) => [ticket.n, place(ticket)]));
+	for (const boss of settledMonsters.filter((ticket) => ticket.kind === 'boss')) placed.set(boss.n, place(boss));
 	const placedChests = new Map(
 		[...settledChests]
 			.sort((a, b) => a.n - b.n)
@@ -159,8 +158,7 @@ export const placeTickets = (
 	);
 	return {
 		...bank,
-		rats: settledRats.map((ticket) => placed.get(ticket.n)!),
-		king,
+		monsters: settledMonsters.map((ticket) => placed.get(ticket.n)!),
 		chests: settledChests.map((ticket) => placedChests.get(ticket.n)!),
 		sites,
 		sitesKey: key,
