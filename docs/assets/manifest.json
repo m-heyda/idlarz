@@ -7904,6 +7904,266 @@
 		]
 	},
 	{
+		"usedBy": [],
+		"name": "idol_alt_flower_stall",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_flower_stall.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_alt_lava_obelisk",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_lava_obelisk.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_alt_mossy_tree_face",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_mossy_tree_face.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_alt_root_face",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_root_face.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_alt_rune_stone",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_rune_stone.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_alt_serpent_statue",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_serpent_statue.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_alt_torii_gate",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_torii_gate.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_alt_wooden_mask",
+		"category": "buildings",
+		"subcategory": "idol statues (alternatives)",
+		"src": "/pixel/new_assets/idols/idol_alt_wooden_mask.png",
+		"status": "reuse",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_battlefield_war_memorial",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_battlefield_war_memorial.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_blight_maw_crystal",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_blight_maw_crystal.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_coast_lighthouse",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_coast_lighthouse.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_fields_sun_statue",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_fields_sun_statue.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_forest_elder_tree",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_forest_elder_tree.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_hills_ram_statue",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_hills_ram_statue.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_jungle_totem_of_the_wild",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_jungle_totem_of_the_wild.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_lake_eye_obelisk",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_lake_eye_obelisk.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_orchard_blossom_shrine",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_orchard_blossom_shrine.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_plains_wind_stones",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_plains_wind_stones.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_swamp_witch_tree",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_swamp_witch_tree.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "idol_tundra_frost_totem",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/new_assets/idols/idol_tundra_frost_totem.png",
+		"status": "planned",
+		"source": "new_assets/idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [
 			"Idols, IDL-96"
 		],

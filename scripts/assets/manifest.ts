@@ -531,6 +531,16 @@ export const buildManifest = (): AssetEntry[] => {
 		usedBy: ['tutorial:guide'],
 		source: 'scripts/guide-sprite.ts',
 	});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'idols')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'buildings',
+				subcategory: basename(f).startsWith('idol_alt_') ? 'idol statues (alternatives)' : 'idol statues (primary, planned)',
+				src: url(f),
+				status: basename(f).startsWith('idol_alt_') ? 'reuse' : 'planned',
+				source: 'new_assets/idols',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'biomes')))
 		if (f.endsWith('.png')) {
 			const name = basename(f, '.png');

@@ -30,7 +30,7 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | [Armor](armor.md) | 127 | 52 | 0 |
 | [Accessories](accessories.md) | 53 | 31 | 0 |
 | [Monsters](monsters.md) | 38 | 27 | 11 |
-| [Buildings](buildings.md) | 228 | 25 | 194 |
+| [Buildings](buildings.md) | 248 | 25 | 202 |
 | [Resources](resources.md) | 102 | 53 | 0 |
 | [Map details](map-details.md) | 469 | 28 | 441 |
 | [UI](ui.md) | 94 | 66 | 21 |
