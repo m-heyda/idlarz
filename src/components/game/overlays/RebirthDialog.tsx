@@ -23,6 +23,8 @@ const shopText: Record<EmberUpgradeId, (levels: number) => string> = {
 	builders: (n) => `-${pct(EMBER_UPGRADES.builders.effectPerLevel)} castle build time per level (now -${pct(n * EMBER_UPGRADES.builders.effectPerLevel)})`,
 	nightwatch: (n) => `+${EMBER_UPGRADES.nightwatch.effectPerLevel} h of away time per level (now +${n * EMBER_UPGRADES.nightwatch.effectPerLevel} h)`,
 	steward: (n) => `+${pct(EMBER_UPGRADES.steward.effectPerLevel)} income while away per level (now +${pct(n * EMBER_UPGRADES.steward.effectPerLevel)})`,
+	deeppockets: (n) =>
+		`+${EMBER_UPGRADES.deeppockets.effectPerLevel} bag slots per level (now +${n * EMBER_UPGRADES.deeppockets.effectPerLevel}), kept through every rebirth`,
 	mastery: (n) => `+${pct(EMBER_UPGRADES.mastery.effectPerLevel)} gold per click per level (now +${pct(n * EMBER_UPGRADES.mastery.effectPerLevel)})`,
 	provisions: (n) =>
 		`Every new run starts with ${sortedCostEntries(EMBER_UPGRADES.provisions.bundle)

@@ -4,6 +4,7 @@ import { api, freshGame, growTo, openFight, store } from '../helpers';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { INITIAL_CHARACTER_STATS } from '../../src/config/character';
 import { REBIRTH } from '../../src/config/rebirth';
+import { LIMITS } from '../../src/config/limits';
 import { totalStatPoints } from '../../src/utils/game/character';
 import { ITEM_CATALOG } from '../../src/catalog';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
@@ -23,7 +24,7 @@ const bagWith = (...ids: string[]): BagSlot[] => {
 test('new game starts with sword and shield equipped, 2 potions and full HP', () => {
 	freshGame();
 	assert.deepEqual(api().equipment, STARTER_EQUIPMENT);
-	assert.equal(api().bag.length, 36);
+	assert.equal(api().bag.length, LIMITS.bagSize);
 	assert.deepEqual(api().bag[0], { id: 'potion_minor', qty: 2 });
 	assert.equal(api().playerHp, max());
 	assert.equal(max(), 101);

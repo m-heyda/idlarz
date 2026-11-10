@@ -71,9 +71,9 @@ export const MERCHANT_UPGRADES = {
 	packrat: {
 		label: 'Pack Rat',
 		group: 'economy',
-		description: (n: number) => `+${n * 4} bag slots`,
-		maxLevel: 4,
-		effectPerLevel: 4, // bag slots
+		description: (n: number) => `+${n * 8} bag slots`,
+		maxLevel: 6,
+		effectPerLevel: 8, // bag slots
 		baseCost: 500000,
 		costGrowth: 3,
 	},

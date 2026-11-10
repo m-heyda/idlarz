@@ -18,7 +18,7 @@ export interface LimitContext {
  * data so a test can register a bonus and prove that all the places that read the limit react to it.
  */
 export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } = {
-	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat'),
+	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat') + emberEffect(ctx.prestige, 'deeppockets'),
 	offlineCapHours: (ctx) => emberEffect(ctx.prestige, 'nightwatch') + (ctx.gear?.offlineCapHours ?? 0),
 	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward') + (ctx.gear?.offlineEff ?? 0) / 100,
 };

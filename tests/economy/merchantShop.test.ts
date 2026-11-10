@@ -16,6 +16,7 @@ import { REBIRTH } from '../../src/config/rebirth';
 import { ITEM_CATALOG, RARITY_ORDER } from '../../src/catalog';
 import { BASIC_GEAR } from '../../src/config/itemCatalog';
 import { SETS } from '../../src/catalog';
+import { limitOf } from '../../src/lib/limits';
 import { emptyBag, gearOf, slotItemId, stackOf } from '../../src/lib/inventory';
 import { plainItem, sellValueOf } from '../../src/lib/itemInstance';
 import type { ItemInstance } from '../../src/types/game';
@@ -229,12 +230,15 @@ test('saves: merchant upgrades round-trip, the bag size follows Pack Rat, and ba
 	assert.equal(ok.ok, true, ok.ok ? '' : ok.reason);
 	if (ok.ok) {
 		assert.deepEqual(ok.state.merchantUpgrades, { packrat: 1, haggler: 1 });
-		assert.equal(ok.state.bag.length, COMBAT.bagSize + 4);
+		assert.equal(ok.state.bag.length, COMBAT.bagSize + MERCHANT_UPGRADES.packrat.effectPerLevel);
 	}
 
 	const tooLow = JSON.parse(JSON.stringify(raw));
 	tooLow.merchantUpgrades = {};
-	assert.equal(sanitizeSave(tooLow).ok, false, 'the bag is bigger than the bonuses allow');
+	assert.equal(sanitizeSave(tooLow).ok, true, 'a bag above the bonuses is kept (the server owns the real size); only the ceiling refuses');
+	const forged = JSON.parse(JSON.stringify(raw));
+	forged.bag = [...forged.bag, ...Array.from({ length: limitOf('bagSize', { hardCap: true }) }, () => null)];
+	assert.equal(sanitizeSave(forged).ok, false, 'a forged bag above HARD_LIMITS.bagSize is refused');
 	const unknown = JSON.parse(JSON.stringify(raw));
 	unknown.merchantUpgrades.cheat = 1;
 	assert.equal(sanitizeSave(unknown).ok, false);
