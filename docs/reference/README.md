@@ -53,7 +53,7 @@ when the code changes, change the block in the same edit. `tests/docs/reference.
 - [Progression](progression.md) (25): Levels, attributes, skills, rebirth, Embers, limits and gems.
 - [Saves & Server](saves-and-server.md) (30): The save, cloud-save checks, the ledger, sealed rolls, away time and the threat model.
 - [Architecture](architecture.md) (8): Stack, state, the tick loop, the map, rendering and the art pipeline.
-- [Pacing](pacing.md) (3): The pace the economy is tuned for, and the bot simulation that checks it.
+- [Pacing](pacing.md) (4): The pace the economy is tuned for, and the bot simulation that checks it.
 - [Ops](ops.md) (5): Commands, CI, the pacing guard, season resets and the E2E test account.
 - [Known issues](known-issues.md): open code-side findings
 - [Symbol index](symbols.md): function → file and line

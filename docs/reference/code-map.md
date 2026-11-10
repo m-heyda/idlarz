@@ -537,6 +537,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`perk-caps.ts`](../../scripts/perk-caps.ts) — Perk family cap sim (IDL-149): how the gear bucket of each family behaves against the set bonuses and a top legendary, for several cap candidates.
 - [`reset-players.ts`](../../scripts/reset-players.ts) — Season restart:
 - [`reset-test-account.ts`](../../scripts/reset-test-account.ts) — Clears the game data of the ONE account the end-to-end tests use (docs/reference/ops.md), so a test run starts from a new game.
+- [`sim-parallel.ts`](../../scripts/sim-parallel.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
 - [`spawnMix.ts`](../../scripts/spawnMix.ts) — What a hero of a given level meets on a castle level 1 map that owns all four biomes: the share of new spawns by the hero's chance to beat them,
 - [`stat-audit.ts`](../../scripts/stat-audit.ts) — Writes docs/generated/stat-audit.md:
