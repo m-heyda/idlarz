@@ -26,11 +26,28 @@ type Visitor =
 
 /** A monster from the game sitting on the edge of a box. */
 const Critter: React.FC<{ id: string; size?: number; className?: string }> = ({ id, size = 56, className }) => (
-	<Image src={`/pixel/enemies/${id}.png`} alt='' width={size} height={size} unoptimized draggable={false} className={`ld-critter pixelated ${className ?? ''}`} />
+	<Image
+		src={`/pixel/enemies/${id}.png`}
+		alt=''
+		width={size}
+		height={size}
+		unoptimized
+		draggable={false}
+		className={`ld-critter pixelated ${className ?? ''}`}
+	/>
 );
 
 /** A pixel-art crown (15 x 8 cells): gold with a darker band and three gems. */
-const CROWN_ROWS = ['.#.....#.....#.', '.##...###...##.', '.###.#####.###.', '.#############.', '.#############.', '.#############.', '.=============.', '.=============.'];
+const CROWN_ROWS = [
+	'.#.....#.....#.',
+	'.##...###...##.',
+	'.###.#####.###.',
+	'.#############.',
+	'.#############.',
+	'.#############.',
+	'.=============.',
+	'.=============.',
+];
 const Crown: React.FC = () => (
 	<svg className='ld-crown' viewBox='0 0 15 8' width={120} height={64} shapeRendering='crispEdges' aria-hidden='true'>
 		{CROWN_ROWS.flatMap((row, y) =>
@@ -193,7 +210,15 @@ const LandingPage: React.FC = () => {
 	return (
 		<main className='ld-root' style={{ '--ld-zoom': zoom } as React.CSSProperties}>
 			<div className='ld-mapwrap'>
-				<div className='ld-map' style={{ backgroundImage: `url(${LANDING_MAP.src})`, width: LANDING_MAP.width * LANDING_MAP.scale, height: LANDING_MAP.height * LANDING_MAP.scale, marginLeft: (-LANDING_MAP.width * LANDING_MAP.scale) / 2 }} />
+				<div
+					className='ld-map'
+					style={{
+						backgroundImage: `url(${LANDING_MAP.src})`,
+						width: LANDING_MAP.width * LANDING_MAP.scale,
+						height: LANDING_MAP.height * LANDING_MAP.scale,
+						marginLeft: (-LANDING_MAP.width * LANDING_MAP.scale) / 2,
+					}}
+				/>
 				<TitleBlock />
 			</div>
 

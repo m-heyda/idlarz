@@ -128,14 +128,23 @@ export const buildLandingWorld = (): World => {
 			const inSnow = snow(x, y);
 			if (letters.has(`${x},${y}`)) biome = 'hills';
 			else if (edge < sea) biome = 'lake';
-			else if (y > 1 && ((rivers(x, y) < 0.45 + ponds(x, y) * 0.3 && wobble(x * 2.3 + 9, y * 2.3 + 9) > 0.3) || (!inSnow && ponds(x * 1.3 + 40, y * 1.3 + 40) > 0.8))) biome = 'lake';
+			else if (
+				y > 1 &&
+				((rivers(x, y) < 0.45 + ponds(x, y) * 0.3 && wobble(x * 2.3 + 9, y * 2.3 + 9) > 0.3) || (!inSnow && ponds(x * 1.3 + 40, y * 1.3 + 40) > 0.8))
+			)
+				biome = 'lake';
 			else if (!inSnow && patch(x * 1.7, y * 1.7) > 0.88) biome = 'hills';
 			row.push(biome);
 		}
 		ground.push(row);
 	}
 	// no lone specks: a land tile with no neighbour of its own biome takes the commonest neighbour (letters and water stay as they are)
-	const SIDES: [number, number][] = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+	const SIDES: [number, number][] = [
+		[1, 0],
+		[-1, 0],
+		[0, 1],
+		[0, -1],
+	];
 	for (let pass = 0; pass < 2; pass++)
 		for (let y = 1; y < height - 1; y++)
 			for (let x = 1; x < width - 1; x++) {

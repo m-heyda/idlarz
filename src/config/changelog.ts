@@ -12,6 +12,10 @@ export const CHANGELOG: readonly ChangelogEntry[] = [
 	{
 		date: '2026-11-10',
 		title: 'A new front door',
-		items: ['The game has a landing page and lives at /play now.', 'Sign in from the landing: it shows your hero and level, and Enter takes you in.', 'This window will carry the news of every update.'],
+		items: [
+			'The game has a landing page and lives at /play now.',
+			'Sign in from the landing: it shows your hero and level, and Enter takes you in.',
+			'This window will carry the news of every update.',
+		],
 	},
 ];

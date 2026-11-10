@@ -61,92 +61,92 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 
 	return (
 		<form onSubmit={submit} className='flex flex-col gap-3'>
-						{needsAccount && (
-							<>
-								<input
-									type='email'
-									className='px-input'
-									placeholder='Email'
-									autoComplete='email'
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									autoFocus
-								/>
-								<input
-									type='password'
-									className='px-input'
-									placeholder={mode === 'register' ? 'Password (8+ characters)' : 'Password'}
-									autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-								/>
-							</>
-						)}
-	
-						{needsHero && (
-							<>
-								<input
-									type='text'
-									className='px-input'
-									placeholder={`Character name (${CHARACTER_NAME_MAX} chars max)`}
-									maxLength={CHARACTER_NAME_MAX}
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-								/>
-								<p className='text-[#a89878] text-sm text-center'>Choose your hero (cosmetic for now).</p>
-								<div className='class-grid' role='radiogroup' aria-label='Hero'>
-									{PLAYER_CLASS_ORDER.map((id) => {
-										const info = PLAYER_CLASSES[id];
-										const selected = id === playerClass;
-										return (
-											<button
-												key={id}
-												type='button'
-												role='radio'
-												aria-checked={selected}
-												className='class-card'
-												data-selected={selected}
-												style={{ '--accent': info.accent } as React.CSSProperties}
-												onClick={() => setPlayerClass(id)}
-											>
-												<span className='class-card-stage'>
-													<PixelIcon name={info.full} scale={2} alt={`${info.race} ${info.label}`} />
-												</span>
-												<span className='class-card-name'>{info.label}</span>
-												<span className='class-card-race'>{info.race}</span>
-												<span className='class-card-tag'>{selected ? 'Chosen' : 'Choose'}</span>
-											</button>
-										);
-									})}
-								</div>
-							</>
-						)}
-	
-						{error && (
-							<p role='alert' className='text-sm text-center text-[#e07a6a]'>
-								{error}
-							</p>
-						)}
-	
-						<div className='flex justify-center'>
-							<button type='submit' className='px-btn' disabled={!ready || busy}>
-								{busy ? 'One moment...' : mode === 'login' ? 'Log in' : mode === 'register' ? 'Register and play' : 'Save and play'}
-							</button>
-						</div>
-	
-						{mode !== 'profile' && (
-							<button
-								type='button'
-								className='text-xs text-[#a89878] underline self-center'
-								onClick={() => {
-									setError(null);
-									setMode(mode === 'login' ? 'register' : 'login');
-								}}
-							>
-								{mode === 'login' ? 'New here? Register' : 'Already have an account? Log in'}
-							</button>
-						)}
-					</form>
+			{needsAccount && (
+				<>
+					<input
+						type='email'
+						className='px-input'
+						placeholder='Email'
+						autoComplete='email'
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						autoFocus
+					/>
+					<input
+						type='password'
+						className='px-input'
+						placeholder={mode === 'register' ? 'Password (8+ characters)' : 'Password'}
+						autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+					/>
+				</>
+			)}
+
+			{needsHero && (
+				<>
+					<input
+						type='text'
+						className='px-input'
+						placeholder={`Character name (${CHARACTER_NAME_MAX} chars max)`}
+						maxLength={CHARACTER_NAME_MAX}
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+					/>
+					<p className='text-[#a89878] text-sm text-center'>Choose your hero (cosmetic for now).</p>
+					<div className='class-grid' role='radiogroup' aria-label='Hero'>
+						{PLAYER_CLASS_ORDER.map((id) => {
+							const info = PLAYER_CLASSES[id];
+							const selected = id === playerClass;
+							return (
+								<button
+									key={id}
+									type='button'
+									role='radio'
+									aria-checked={selected}
+									className='class-card'
+									data-selected={selected}
+									style={{ '--accent': info.accent } as React.CSSProperties}
+									onClick={() => setPlayerClass(id)}
+								>
+									<span className='class-card-stage'>
+										<PixelIcon name={info.full} scale={2} alt={`${info.race} ${info.label}`} />
+									</span>
+									<span className='class-card-name'>{info.label}</span>
+									<span className='class-card-race'>{info.race}</span>
+									<span className='class-card-tag'>{selected ? 'Chosen' : 'Choose'}</span>
+								</button>
+							);
+						})}
+					</div>
+				</>
+			)}
+
+			{error && (
+				<p role='alert' className='text-sm text-center text-[#e07a6a]'>
+					{error}
+				</p>
+			)}
+
+			<div className='flex justify-center'>
+				<button type='submit' className='px-btn' disabled={!ready || busy}>
+					{busy ? 'One moment...' : mode === 'login' ? 'Log in' : mode === 'register' ? 'Register and play' : 'Save and play'}
+				</button>
+			</div>
+
+			{mode !== 'profile' && (
+				<button
+					type='button'
+					className='text-xs text-[#a89878] underline self-center'
+					onClick={() => {
+						setError(null);
+						setMode(mode === 'login' ? 'register' : 'login');
+					}}
+				>
+					{mode === 'login' ? 'New here? Register' : 'Already have an account? Log in'}
+				</button>
+			)}
+		</form>
 	);
 };
 

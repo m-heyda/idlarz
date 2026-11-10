@@ -8,7 +8,17 @@ test('safeNextPath keeps a path on this site', () => {
 });
 
 test('safeNextPath refuses anything that could leave the site', () => {
-	for (const bad of ['//evil.example', '/\\evil.example', 'https://evil.example', 'javascript:alert(1)', 'play', '', '/pl\nay', '/a\\b', '/' + 'x'.repeat(300)]) {
+	for (const bad of [
+		'//evil.example',
+		'/\\evil.example',
+		'https://evil.example',
+		'javascript:alert(1)',
+		'play',
+		'',
+		'/pl\nay',
+		'/a\\b',
+		'/' + 'x'.repeat(300),
+	]) {
 		assert.equal(safeNextPath(bad), '/play', JSON.stringify(bad));
 	}
 	assert.equal(safeNextPath(null), '/play');

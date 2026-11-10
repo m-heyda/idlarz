@@ -66,7 +66,8 @@
 	position: relative;
 	z-index: 1;
 	margin-bottom: 10px;
-	filter: drop-shadow(3px 0 0 #0a0605) drop-shadow(-3px 0 0 #0a0605) drop-shadow(0 3px 0 #0a0605) drop-shadow(0 -3px 0 #0a0605) drop-shadow(0 8px 4px rgba(0, 0, 0, 0.5));
+	filter: drop-shadow(3px 0 0 #0a0605) drop-shadow(-3px 0 0 #0a0605) drop-shadow(0 3px 0 #0a0605) drop-shadow(0 -3px 0 #0a0605)
+		drop-shadow(0 8px 4px rgba(0, 0, 0, 0.5));
 }
 
 /* REALM as a stamp: a bronze plate with a double border, slightly crooked */
