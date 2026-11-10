@@ -1,4 +1,5 @@
 import React from 'react';
+import { biomeArtUrl } from '@/config/biomeArt';
 import { biomeColor } from '@/config/biomePalette';
 import { formatNumber } from '@/utils/formatters';
 import type { RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
@@ -10,6 +11,17 @@ const RebirthUnlockModal: React.FC<{ intro: RebirthUnlockIntro; onClose: () => v
 	<PixelModal title='New land unlocked' size='sm' onClose={onClose}>
 		<div className='px-card mb-3 text-sm text-center'>
 			<div className='text-[#a89878] mb-2'>Rebirth {intro.rebirths}</div>
+			{biomeArtUrl(intro.biome) && (
+				// eslint-disable-next-line @next/next/no-img-element
+				<img
+					src={biomeArtUrl(intro.biome)}
+					alt={intro.label}
+					width={160}
+					height={160}
+					className='pixelated mx-auto mb-2'
+					style={{ imageRendering: 'pixelated' }}
+				/>
+			)}
 			<div className='flex items-center justify-center gap-2 text-lg text-[#f0d27a]'>
 				<i className='inline-block h-4 w-4 rounded-sm border border-black/50' style={{ background: biomeColor(intro.biome) }} />
 				{intro.label}

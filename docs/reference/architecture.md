@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [Sound library](#sound-library), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [Sound library](#sound-library), [`BIOME_ART`](#biome-art), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
 - Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
 ## The loop
@@ -172,6 +172,16 @@ The sound library: every audio file under `public/` (the game's own mp3s and the
 duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
 Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
 The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.
+
+<a id="biome-art"></a>
+
+### `BIOME_ART` <small>const</small>
+
+Source: [`src/config/biomeArt.ts:11`](../../src/config/biomeArt.ts)
+
+The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in `public/pixel/new_assets/biomes/`. Today only the "New land
+unlocked" window shows them (`RebirthUnlockModal`); the other vignettes of the folder (alternatives, the older biomes and three extras) wait in the asset library, category Biomes.
+The file name is `biome_<name>.png`; change the value here to use another one.
 
 <a id="animal-pixel-icons"></a>
 

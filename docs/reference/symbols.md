@@ -31,6 +31,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Basics: tick, caps, start | Economy / Basics | [`src/config/economy.ts:22`](../../src/config/economy.ts) | Game constants the economy runs on: |
 | `beltSlotsFor` | Progression / Limits | [`src/lib/offline/inventory.ts:63`](../../src/lib/offline/inventory.ts) | The belt bag slots the server holds for the player: |
 | `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
+| `BIOME_ART` | Architecture / Art | [`src/config/biomeArt.ts:11`](../../src/config/biomeArt.ts) | The picture of each rebirth biome: |
 | `BIOME_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:125`](../../src/catalog/lootConfig.ts) | The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: |
 | `BIOME_YIELD` | Economy / Income | [`src/config/economy.ts:141`](../../src/config/economy.ts) | Biome and building output is multiplied by `scale` (1.3). |
 | `BIOMES` | Economy / Biomes | [`src/config/biomes.ts:53`](../../src/config/biomes.ts) | Every biome with its config output per second. |

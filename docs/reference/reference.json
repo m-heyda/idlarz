@@ -387,6 +387,17 @@
   "see": []
  },
  {
+  "id": "biome-art",
+  "name": "BIOME_ART",
+  "symbol": "BIOME_ART",
+  "kind": "const",
+  "category": "Architecture/Art",
+  "file": "src/config/biomeArt.ts",
+  "line": 11,
+  "summary": "The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in `public/pixel/new_assets/biomes/`. Today only the \"New land unlocked\" window shows them (`RebirthUnlockModal`); the other vignettes of the folder (alternatives, the older biomes and three extras) wait in the asset library, category Biomes. The file name is `biome_<name>.png`; change the value here to use another one.",
+  "see": []
+ },
+ {
   "id": "rebirth-biome-output",
   "name": "REBIRTH_BIOME_OUTPUT",
   "symbol": "REBIRTH_BIOME_OUTPUT",
