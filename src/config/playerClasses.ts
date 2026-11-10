@@ -9,6 +9,10 @@ export interface PlayerClassInfo {
 	label: string;
 	race: string;
 	blurb: string;
+	/** A few sentences of the hero's story (the creation screens) */
+	lore: string;
+	/** One line on how the class plays, matching its two passives */
+	playstyle: string;
 	/** Accent for the picker card and its glow */
 	accent: string;
 	full: PixelIconName;
@@ -22,6 +26,8 @@ export const PLAYER_CLASSES: Record<PlayerClassId, PlayerClassInfo> = {
 		label: 'Warrior',
 		race: 'Human',
 		blurb: 'Steel, shield and stubborn courage.',
+		lore: 'Born in the border keeps, the warrior learned early that a wall is only as strong as whoever stands behind it. They fight in plain steel, haggle over every stone and have never walked away from a debt or a monster.',
+		playstyle: 'Tough in a fight, thrifty with land.',
 		accent: '#e0a040',
 		full: 'hero_warrior',
 	},
@@ -30,6 +36,8 @@ export const PLAYER_CLASSES: Record<PlayerClassId, PlayerClassInfo> = {
 		label: 'Paladin',
 		race: 'Angel',
 		blurb: 'Winged defender wrapped in holy light.',
+		lore: 'The Paladins are the last order of winged guardians, sworn to keep one light burning while the realm sleeps. They mend what they can, outlast what they cannot, and are never in a hurry to be paid.',
+		playstyle: 'Steady healing, rewarding to leave running.',
 		accent: '#ffe27a',
 		full: 'hero_paladin',
 	},
@@ -38,6 +46,8 @@ export const PLAYER_CLASSES: Record<PlayerClassId, PlayerClassInfo> = {
 		label: 'Ranger',
 		race: 'Elf',
 		blurb: 'Silent scout of the deep forest.',
+		lore: 'Rangers read a realm from its broken twigs and bent grass. Light of step and quick of eye, they find the shortcut, the hidden hoard and the shot that lands before the monster knows it is hunted.',
+		playstyle: 'Sharp strikes, faster treasure.',
 		accent: '#6fcf6a',
 		full: 'hero_ranger',
 	},
@@ -46,6 +56,8 @@ export const PLAYER_CLASSES: Record<PlayerClassId, PlayerClassInfo> = {
 		label: 'Mage',
 		race: 'Dark Elf',
 		blurb: 'Bends arcane power to a cold will.',
+		lore: 'Exiled to the cold halls beneath the roots, the dark elves bent arcane power to a patient will. Every spell is a calculation, and every lesson, learned in the field or the library, comes back as knowledge.',
+		playstyle: 'Deep mana, stronger spells, quicker learning.',
 		accent: '#b27aff',
 		full: 'hero_mage',
 	},

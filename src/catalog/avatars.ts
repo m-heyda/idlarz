@@ -26,31 +26,55 @@ export interface AvatarInfo {
 	how?: string;
 	/** The picture: file name (no extension) of a framed bust in `public/pixel/new_assets/heroes/` */
 	portrait: string;
+	/** One or two lines about this face (the creation screens and the Avatar window) */
+	bio: string;
 }
 
-const starter = (id: string, name: string, portrait: string): AvatarInfo => ({ id, name, kind: 'starter', portrait });
-const unlock = (id: string, name: string, unlockedBy: string, how: string, portrait: string): AvatarInfo => ({
+const starter = (id: string, name: string, portrait: string, bio: string): AvatarInfo => ({ id, name, kind: 'starter', portrait, bio });
+const unlock = (id: string, name: string, unlockedBy: string, how: string, portrait: string, bio: string): AvatarInfo => ({
 	id,
 	name,
 	kind: 'unlock',
 	unlockedBy,
 	how,
 	portrait,
+	bio,
 });
 
 export const AVATARS: readonly AvatarInfo[] = [
-	starter('knight', 'Knight', 'avatar_red_haired_knight'),
-	starter('druid', 'Druid', 'avatar_green_horned_elf'),
-	starter('scout', 'Scout', 'avatar_red_plume_lady'),
-	starter('scholar', 'Scholar', 'avatar_winged_helm_veteran'),
-	starter('miner', 'Miner', 'avatar_dwarf_knight_orange_eyes'),
-	starter('farmer', 'Farmer', 'avatar_chain_knight_woman'),
-	starter('bard', 'Bard', 'avatar_purple_elf_lady'),
-	starter('alchemist', 'Alchemist', 'avatar_blue_plume_knight'),
-	unlock('architect', 'Architect', 'castle_10', 'Raise the castle to level 10', 'avatar_gold_lion_knight'),
-	unlock('reborn', 'Reborn', 'first_rebirth', 'Rebirth for the first time', 'avatar_horned_scarred_woman'),
-	unlock('boss_slayer', 'Boss slayer', 'boss_auroch', 'Defeat The Great Auroch', 'avatar_horned_brute_dark'),
-	unlock('early_tester', 'Early tester', 'early_tester', 'Played before the new chapter', 'avatar_horned_chainmail'),
+	starter('knight', 'Knight', 'avatar_red_haired_knight', 'Red-haired and stubborn, sworn to the first banner they ever saw.'),
+	starter('druid', 'Druid', 'avatar_green_horned_elf', 'Speaks softly to the roots, and the roots answer.'),
+	starter('scout', 'Scout', 'avatar_red_plume_lady', 'Red plume, light step. First to the ridge, last to be seen.'),
+	starter('scholar', 'Scholar', 'avatar_winged_helm_veteran', 'Winged helm, long memory. Has read every ward before breaking one.'),
+	starter('miner', 'Miner', 'avatar_dwarf_knight_orange_eyes', 'Dwarf-trained and stone-hardened; has never met a wall they could not count.'),
+	starter('farmer', 'Farmer', 'avatar_chain_knight_woman', 'Ploughs by day, patrols by dusk: the quiet backbone of the realm.'),
+	starter('bard', 'Bard', 'avatar_purple_elf_lady', 'Carries a song for every victory and a few for the defeats.'),
+	starter('alchemist', 'Alchemist', 'avatar_blue_plume_knight', 'Blue-plumed and bright-eyed; trusts a steady hand and a tested flask.'),
+	unlock(
+		'architect',
+		'Architect',
+		'castle_10',
+		'Raise the castle to level 10',
+		'avatar_gold_lion_knight',
+		'Master of stone and ledger; the castle stands because they said so.',
+	),
+	unlock(
+		'reborn',
+		'Reborn',
+		'first_rebirth',
+		'Rebirth for the first time',
+		'avatar_horned_scarred_woman',
+		'Burned the realm down once and began again, wiser.',
+	),
+	unlock(
+		'boss_slayer',
+		'Boss slayer',
+		'boss_auroch',
+		'Defeat The Great Auroch',
+		'avatar_horned_brute_dark',
+		'Brought down the Great Auroch and kept the horn.',
+	),
+	unlock('early_tester', 'Early tester', 'early_tester', 'Played before the new chapter', 'avatar_horned_chainmail', 'Was here before the doors were open.'),
 ];
 
 /**

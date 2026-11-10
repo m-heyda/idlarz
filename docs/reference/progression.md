@@ -488,7 +488,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:102`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:126`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 
@@ -505,7 +505,7 @@ The server's rule for an avatar (IDL-71), the one place that decides: the id mus
 
 ### `CLASS_AVATARS` <small>const</small>
 
-Source: [`src/catalog/avatars.ts:64`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:88`](../../src/catalog/avatars.ts)
 
 The two starter avatars each class owns. The creation screens (sign-up, "Finish your hero", "A new chapter") show a hero the two of the class it picked, and the server accepts
 only those at sign-up (`checkCreationAvatar`); every starter belongs to exactly one class. Afterwards the Avatar window lets the player wear any starter or earned avatar with any class.

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CLASS_AVATARS, CLASS_DEFAULT_AVATAR, creatorAvatar } from '../../src/catalog/avatars';
-import { CLASS_PASSIVES } from '../../src/config/playerClasses';
+import { AVATARS, CLASS_AVATARS, CLASS_DEFAULT_AVATAR, creatorAvatar } from '../../src/catalog/avatars';
+import { CLASS_PASSIVES, PLAYER_CLASSES } from '../../src/config/playerClasses';
 import { describeClassPassives } from '../../src/lib/classPassives';
 import { PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
 
@@ -27,4 +27,12 @@ test('every class has at least one combat and one economy bonus to list', () => 
 		assert.ok(lines.economy.length > 0, `${id} economy`);
 		assert.ok(CLASS_PASSIVES[id]);
 	}
+});
+
+test('every class has a story and a playstyle line, and every avatar a bio, for the creation screens', () => {
+	for (const id of PLAYER_CLASS_ORDER) {
+		assert.ok(PLAYER_CLASSES[id].lore.length >= 120, `${id} lore`);
+		assert.ok(PLAYER_CLASSES[id].playstyle.length > 10, `${id} playstyle`);
+	}
+	for (const avatar of AVATARS) assert.ok(avatar.bio.length > 10, `${avatar.id} bio`);
 });
