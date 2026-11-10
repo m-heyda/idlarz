@@ -2,7 +2,7 @@ import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { supabaseSaveRepo } from '@/lib/cloudSave/supabaseRepo';
 import { fail, json, readBody, unavailable } from '@/lib/authRoute';
 import { requirePlayer } from '@/lib/playerRoute';
-import { supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
+import { supabaseAchievementRepo, supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
 import { lootConfigured, lootSecret } from '@/lib/offline/secret';
 import type { Online } from '@/lib/offline/online';
 import type { ServiceDeps } from '@/lib/offline/service';
@@ -28,7 +28,12 @@ export const onlineRoute = async <Body>(
 		const body = raw && typeof raw === 'object' ? parse(raw) : null;
 		if (!body) return fail('Bad request.', 400);
 		const admin = createSupabaseAdmin();
-		const out = await run({ ledgers: supabaseLedgerRepo(admin), saves: supabaseSaveRepo(admin), secret: lootSecret() }, player.userId, body, Date.now());
+		const out = await run(
+			{ ledgers: supabaseLedgerRepo(admin), saves: supabaseSaveRepo(admin), secret: lootSecret(), achievements: supabaseAchievementRepo(admin) },
+			player.userId,
+			body,
+			Date.now(),
+		);
 		if (out.kind === 'no_save') return json({ error: 'No cloud save yet.', noSave: true }, 404);
 		if (out.kind === 'claim_first') return json({ error: 'Claim your time away first.', needClaim: true }, 409);
 		return json(out.value);

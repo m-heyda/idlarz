@@ -3,6 +3,7 @@ import { readBuffs } from '@/lib/buffs';
 import type { CombatState } from './fightTypes';
 import type { CraftState, Inventory } from './types';
 import { craftFromJson, isEmptyCraft, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
+import type { AchievementRepo } from './achievements';
 import { isEmptyStats, readStats } from './stats';
 import { upgradeStoredBank, type TicketBank } from './tickets';
 
@@ -94,5 +95,18 @@ export const supabaseLedgerRepo = (db: SupabaseClient): LedgerRepo => ({
 		const { data, error } = await db.from('player_ledger').update(toRow(ledger)).eq('user_id', userId).eq('ver', expectedVer).select('ver');
 		if (error) throw new Error(error.message);
 		return (data?.length ?? 0) === 1;
+	},
+});
+
+/** The `player_achievements` mirror: one `insert ... on conflict do nothing` for the ids a request paid. Service role only. */
+export const supabaseAchievementRepo = (db: SupabaseClient): AchievementRepo => ({
+	async record(userId, ids, atMs) {
+		if (ids.length === 0) return;
+		const earnedAt = new Date(atMs).toISOString();
+		const { error } = await db.from('player_achievements').upsert(
+			ids.map((id) => ({ user_id: userId, achievement_id: id, earned_at: earnedAt })),
+			{ onConflict: 'user_id,achievement_id', ignoreDuplicates: true },
+		);
+		if (error) throw new Error(error.message);
 	},
 });

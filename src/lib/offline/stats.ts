@@ -24,6 +24,8 @@ export interface LifetimeStats {
 	tilesAt: number;
 	/** The guided tutorial: steps done (their bundles paid), lessons seen, skipped. Additive: a row without it reads as nothing done. */
 	tutorial: TutorialProgress;
+	/** Achievement ids already paid (their gems are in the ledger). The server's record of "paid once"; `player_achievements` mirrors it. Additive: a row without it reads as none earned. */
+	achievements: string[];
 }
 
 /** Counters are written to the ledger at most this often by the save path (kills and chests are written with their own request, which writes the ledger anyway). */
@@ -40,6 +42,7 @@ export const emptyStats = (): LifetimeStats => ({
 	playAt: 0,
 	tilesAt: 0,
 	tutorial: emptyProgress(),
+	achievements: [],
 });
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
@@ -48,6 +51,9 @@ const counts = (value: unknown): Record<string, number> => {
 	if (value && typeof value === 'object') for (const [key, amount] of Object.entries(value)) if (num(amount) > 0) out[key] = num(amount);
 	return out;
 };
+
+const ids = (value: unknown): string[] =>
+	Array.isArray(value) ? [...new Set(value.filter((id): id is string => typeof id === 'string' && id.length > 0 && id.length <= 40))] : [];
 
 /** Reads the stored column back: a missing column, null or anything malformed reads as zeros. */
 export const readStats = (raw: unknown): LifetimeStats => {
@@ -64,6 +70,7 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		playAt: num(r.playAt),
 		tilesAt: Math.floor(num(r.tilesAt)),
 		tutorial: readProgress(r.tutorial),
+		achievements: ids(r.achievements),
 	};
 };
 
@@ -76,7 +83,8 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	s.tiles === 0 &&
 	Object.keys(s.kills).length === 0 &&
 	Object.keys(s.income).length === 0 &&
-	isEmptyProgress(s.tutorial);
+	isEmptyProgress(s.tutorial) &&
+	s.achievements.length === 0;
 
 /** A kill of monster `type`: counted once, when the server pays it. */
 export const recordKill = (stats: LifetimeStats, kill: { type: string; lucky: boolean; boss: boolean }): LifetimeStats => ({

@@ -15,6 +15,7 @@ import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
 import { addTotals, resetLedger, seedLedger, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
+import { settleAchievements, type AchievementRepo, type AchievementUnlock } from '@/lib/offline/achievements';
 import { restThrough } from '@/lib/offline/fight';
 import { coreWithInventory, fitInventory, inventoryFromCore } from '@/lib/offline/inventory';
 import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
@@ -34,6 +35,8 @@ export interface ServiceDeps {
 	saves: SaveRepo;
 	/** The server-only secret that seals rolls (LOOT_SECRET) */
 	secret: string;
+	/** Where earned achievements are mirrored (`player_achievements`). Absent in tests that do not look at it; payment never depends on it (the ledger records what was paid). */
+	achievements?: AchievementRepo;
 }
 
 export type { ClaimResult, PublicTickets };
@@ -163,6 +166,20 @@ export const bankContext = (stored: StoredSave): BankContext => ({
 	castleLevel: stored.summary.castleLevel,
 });
 
+/** Mirrors newly paid achievements into `player_achievements` after the ledger write landed. Best effort: the ledger is the record of payment, so a failed mirror never blocks or repeats a payout. */
+export const mirrorAchievements = async (deps: ServiceDeps, userId: string, unlocked: AchievementUnlock[], nowMs: number): Promise<void> => {
+	if (!deps.achievements || unlocked.length === 0) return;
+	try {
+		await deps.achievements.record(
+			userId,
+			unlocked.map((u) => u.id),
+			nowMs,
+		);
+	} catch {
+		// the gems are already paid and recorded in the ledger; the table row is only the mirror
+	}
+};
+
 /**
  * Loads the player's ledger, creating it from the last save the first time (seeded from what is on the map, see `seedLedger`), and
  * runs `step` on it. The step returns the new ledger and what to answer; the write is a compare-and-swap on `ver`, so two requests
@@ -173,7 +190,7 @@ export const withLedger = async <T>(
 	userId: string,
 	nowMs: number,
 	step: (ledger: Ledger, stored: StoredSave) => StepOutcome<T> | Promise<StepOutcome<T>>,
-): Promise<{ kind: 'no_save' } | { kind: 'ok'; result: T; ledger: Ledger }> => {
+): Promise<{ kind: 'no_save' } | { kind: 'ok'; result: T; ledger: Ledger; unlocked: AchievementUnlock[] }> => {
 	for (let attempt = 0; attempt < CAS_TRIES; attempt++) {
 		const stored = await deps.saves.load(userId);
 		if (!stored) return { kind: 'no_save' };
@@ -181,12 +198,18 @@ export const withLedger = async <T>(
 		const seeded = existing ?? seedLedger(stored, nowMs);
 		// the bag, the gear and the pity are the ledger's (seeded from the save the first time); the engine sees the save with them in place
 		const base: Ledger = { ...seeded, inv: fitInventory(seeded.inv ?? inventoryFromCore(stored.core), stored.core) };
-		const out = await step(base, { ...stored, core: coreWithInventory(stored.core, base.inv) as StoredSave['core'] });
+		const stepped = await step(base, { ...stored, core: coreWithInventory(stored.core, base.inv) as StoredSave['core'] });
+		// achievements are checked lazily here, on every request the server handles anyway: what became due is paid in the same write
+		const settled = settleAchievements(stepped.ledger, stored.summary);
+		const out = { ...stepped, ledger: settled.ledger };
 		// a read-only poll that found nothing new does not write: the spawn timers and the anchor are recomputed from the clock next time
 		if (out.skipWrite && existing && onlyTimeMoved(existing, out.ledger))
-			return { kind: 'ok', result: out.result, ledger: { ...out.ledger, ver: existing.ver } };
+			return { kind: 'ok', result: out.result, ledger: { ...out.ledger, ver: existing.ver }, unlocked: [] };
 		const next: Ledger = { ...out.ledger, ver: (existing?.ver ?? 0) + 1 };
-		if (await deps.ledgers.commit(userId, existing?.ver ?? 0, next)) return { kind: 'ok', result: out.result, ledger: next };
+		if (await deps.ledgers.commit(userId, existing?.ver ?? 0, next)) {
+			await mirrorAchievements(deps, userId, settled.unlocked, nowMs);
+			return { kind: 'ok', result: out.result, ledger: next, unlocked: settled.unlocked };
+		}
 	}
 	throw new Error('the ledger is busy');
 };
