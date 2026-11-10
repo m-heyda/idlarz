@@ -8,7 +8,7 @@ Commands, CI, the pacing guard, season resets and the E2E test account.
 
 - Commands: [Commands and documentation generation](#commands-and-documentation-generation)
 - CI: [The pacing guard and CI sharding](#the-pacing-guard-and-ci-sharding)
-- Operator guides: [Season restart (reset-players)](#season-restart-reset-players), [Checking live saves before a release](#checking-live-saves-before-a-release), [The end-to-end test account](#test-account-email)
+- Operator guides: [Season restart (reset-players)](#season-restart-reset-players), [Checking live saves before a release](#checking-live-saves-before-a-release), [Giving a flagged account its trust back (restore-trust)](#giving-a-flagged-account-its-trust-back-restore-trust), [The end-to-end test account](#test-account-email), [Turning enforcement and the server-run rebirth on together](#turning-enforcement-and-the-server-run-rebirth-on-together)
 
 ## Commands
 
@@ -45,6 +45,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run stat-audit` | `tsx scripts/stat-audit.ts` |
 | `npm run reset-players` | `tsx scripts/reset-players.ts` |
 | `npm run check-live-saves` | `tsx scripts/check-live-saves.ts` |
+| `npm run restore-trust` | `tsx scripts/restore-trust.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
 | `npm run perk-caps` | `tsx scripts/perk-caps.ts` |
 | `npm run monster-ladder` | `tsx scripts/monster-ladder.ts` |
@@ -127,7 +128,24 @@ Source: [`scripts/check-live-saves.ts:1`](../../scripts/check-live-saves.ts)
 
 Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that
 tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT`
-would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.
+would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. A last section is the new chapter dry run (IDL-254 item 2): accounts the flip would reset (and how many hold a save), name collisions with the forced renames they mean, and whether `player_ledger.stats` / `legacy` exist and how many rows are still null. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.
+
+<a id="giving-a-flagged-account-its-trust-back-restore-trust"></a>
+
+### Giving a flagged account its trust back (restore-trust)
+
+Source: [`scripts/restore-trust.ts:1`](../../scripts/restore-trust.ts)
+
+The way back for a false-positive flag (IDL-209): `npm run restore-trust -- --user <uuid>` is a DRY RUN that shows what the account's save carries;
+add `--yes` to really give the account its trust back ([`restoreTrust`](saves-and-server.md#restoretrust): flags cleared, ranking eligibility back, the income paid from the
+stored game's own rates again). The save it replaces is pinned in `save_history` first, and one JSON audit line is printed (`event: 'trust_restored'`);
+keep it with the ticket. Running it twice is safe (the second run says `already_trusted`).
+
+Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or the git-ignored .env.local); check which project they point at first (same rule as
+reset-players). One account per run, on purpose. Judge the account BEFORE you restore it: if its claimed land is still worth more than the game could
+have paid, the next save flags it again.
+
+See also: [`restoreTrust`](saves-and-server.md#restoretrust)
 
 <a id="test-account-email"></a>
 
@@ -151,3 +169,22 @@ option to point at another user.
 
 The smoke test covers: signing in and the account check; the game opens on a new game; income arrives; a click on the map pays gold; a tile can be bought (through `window.__game`, which the dev server exposes); the game menu opens Settings; Save game and a
 reload bring the same map back. Not covered yet (IDL-124 keeps these open): the monster growth badge, the battle queue markers and the Next strip, opening the Rebirth dialog, the offline report.
+
+<a id="turning-enforcement-and-the-server-run-rebirth-on-together"></a>
+
+### Turning enforcement and the server-run rebirth on together
+
+Source: [`src/lib/cloudSave/verify.ts:109`](../../src/lib/cloudSave/verify.ts)
+
+**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).**
+Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:
+
+1. The way back exists in production: `restoreTrust` / `npm run restore-trust` (IDL-209) is merged and you have run its dry run once against a real account. Enforcement is never on without it.
+2. The flip has happened and has settled: `npm run check-live-saves` (read-only, same Supabase environment) shows the rows are readable by today's rules and its new chapter section looks as expected.
+3. Read the `flagged` and `would be refused if enforcement were on` lines of that run. Honest accounts must produce zero refusals (`playtime_fast`, `gold_jump`, `gems_increase` on the allowlist). If one does, tune `VERIFY` or take that flag off `ENFORCEMENT.reject`; keep `tests/audit` green. Restore any honest flagged account with `restore-trust`.
+4. Rebirth: no client that does not ask the server to rebirth (`askServerRebirth`) can still be open (a deploy plus a grace period), and the real flow was walked in a browser against real Supabase (Rebirth dialog "Asking the server...", refused toast, retry with the same key). Then `requireServerRebirth: true`; a rebirth without a `/api/rebirth` record keeps the old rebirth count.
+5. One PR flips both switches (`ENFORCEMENT.enabled = true`, `EMBER_MODEL.requireServerRebirth = true`); `tests/server/serverRebirth.test.ts` and `tests/server/serverTrust.test.ts` pin the behaviour of both states.
+6. Watch the `save_rejected` log lines (route `/api/save`) for the first days. A wave of refusals for honest players means: `ENFORCEMENT.enabled = false` (or remove one flag from `reject`), deploy, restore the affected accounts. Nothing was stored for a refused save, so nothing needs repairing.
+7. Rollback of the pair: `enabled: false` and `requireServerRebirth: false`; no data migration is involved in either.
+
+See also: [`ENFORCEMENT`](saves-and-server.md#enforcement), [`restoreTrust`](saves-and-server.md#restoretrust)

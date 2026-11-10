@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { INTRO, INTRO_ID, TUTORIAL_PATH } from '@/catalog/tutorial';
 import { lessonBeat, newlyDone, nextBeat, type Beat } from '@/lib/tutorial/engine';
 import { factsFromGame, withSeen } from '@/lib/tutorial/facts';
-import { guideLive } from '@/lib/tutorial/live';
+import { guideVisible } from '@/lib/tutorial/live';
 import { buildNumbers } from '@/lib/tutorial/numbers';
 import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -37,7 +37,7 @@ const useViewport = () => {
  * @order 5
  */
 const TutorialGuide: React.FC<{ ready: boolean }> = ({ ready }) => {
-	const live = guideLive();
+	const live = guideVisible();
 	const enabled = useSettingsStore((s) => s.guideEnabled);
 	const introPage = useTutorialStore((s) => s.introPage);
 	const [beat, setBeat] = useState<Beat | null>(null);

@@ -6,6 +6,7 @@
 import { acceptSave, storedToText, type SaveRepo, type StoredSave } from '../src/lib/cloudSave/pipeline';
 import { ENFORCEMENT, FLAG_POLICY, rejectedFlags, verifyTransition, type SaveFlag, type Snapshot } from '../src/lib/cloudSave/verify';
 import type { Ledger, LedgerRepo } from '../src/lib/offline/ledger';
+import { GAME_EPOCH, needsResetFor } from '../src/config/epoch';
 
 export interface SaveVerdict {
 	/** `invalid`: sanitizeSave / decodeSave refuses the stored save under today's rules. `unreadable`: the row could not be turned back into a save. */
@@ -213,3 +214,81 @@ export const formatReport = (report: LiveReport): string => {
 	];
 	return lines.join('\n');
 };
+
+/** One `profiles` row as the new chapter dry run reads it (`hasSave`: the account owns a `player_saves` row). */
+export interface ChapterProfile {
+	characterName: string;
+	epoch: number | null;
+	hasSave: boolean;
+}
+
+/** One `player_ledger` row for the column check. A key that is `undefined` means the column did not come back (the migration is not applied). */
+export interface LedgerColumnsRow {
+	stats?: unknown;
+	legacy?: unknown;
+}
+
+export interface ChapterReport {
+	epoch: number;
+	profiles: number;
+	/** No epoch yet: read as the baseline (the old game) */
+	profilesWithoutEpoch: number;
+	/** Accounts the flip would send through the "A new chapter" screen, and how many of them hold a save that would be archived */
+	affected: number;
+	affectedWithSave: number;
+	/** Names that collide ignoring case: groups, and the accounts that would need a forced rename (all but the oldest of each group; the oldest keeps the name) */
+	nameCollisionGroups: number;
+	accountsToRename: number;
+	/** `player_ledger.stats` / `.legacy` (migration new_chapter_columns): is the column there, and how many rows hold null (null `stats` = not counted yet; null `legacy` = none, normal) */
+	ledgerRows: number;
+	statsColumn: boolean;
+	legacyColumn: boolean;
+	ledgerRowsWithoutStats: number;
+	ledgerRowsWithoutLegacy: number;
+}
+
+/**
+ * The new chapter's dry run (IDL-76, IDL-254 item 2) on rows: counts only, no names. Pure: the script feeds it rows, the tests feed it fixtures.
+ * `columns` says which of the two ledger columns the query could read.
+ */
+export const buildChapterReport = (
+	profiles: readonly ChapterProfile[],
+	ledgerRows: readonly LedgerColumnsRow[],
+	columns: { stats: boolean; legacy: boolean },
+	epoch: number = GAME_EPOCH,
+): ChapterReport => {
+	const names = new Map<string, number>();
+	for (const row of profiles) names.set(row.characterName.toLowerCase(), (names.get(row.characterName.toLowerCase()) ?? 0) + 1);
+	const colliding = [...names.values()].filter((count) => count > 1);
+	const affected = profiles.filter((row) => needsResetFor(row.epoch));
+	return {
+		epoch,
+		profiles: profiles.length,
+		profilesWithoutEpoch: profiles.filter((row) => row.epoch === null).length,
+		affected: affected.length,
+		affectedWithSave: affected.filter((row) => row.hasSave).length,
+		nameCollisionGroups: colliding.length,
+		accountsToRename: colliding.reduce((sum, count) => sum + count - 1, 0),
+		ledgerRows: ledgerRows.length,
+		statsColumn: columns.stats,
+		legacyColumn: columns.legacy,
+		ledgerRowsWithoutStats: ledgerRows.filter((row) => row.stats == null).length,
+		ledgerRowsWithoutLegacy: ledgerRows.filter((row) => row.legacy == null).length,
+	};
+};
+
+export const formatChapterReport = (report: ChapterReport): string =>
+	[
+		'',
+		`New chapter (GAME_EPOCH in the code: ${report.epoch})`,
+		`  profiles: ${report.profiles} (${report.profilesWithoutEpoch} with no epoch yet, read as the baseline)`,
+		`  accounts the flip would send through the new chapter screen: ${report.affected} (${report.affectedWithSave} of them hold a save that would be archived)`,
+		`  names that collide ignoring case: ${report.nameCollisionGroups} (${report.accountsToRename} accounts would need a forced rename; the oldest keeps the name)${report.nameCollisionGroups > 0 ? '  <- the unique-name migration stops until they are resolved' : ''}`,
+		`  ledger rows: ${report.ledgerRows}`,
+		report.statsColumn
+			? `    player_ledger.stats: column present, ${report.ledgerRowsWithoutStats} rows still null (not counted yet)`
+			: '    player_ledger.stats: COLUMN MISSING (apply migration new_chapter_columns before the code that reads it)',
+		report.legacyColumn
+			? `    player_ledger.legacy: column present, ${report.ledgerRowsWithoutLegacy} rows null (none; normal)`
+			: '    player_ledger.legacy: COLUMN MISSING (apply migration new_chapter_columns before the code that reads it)',
+	].join('\n');

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useUiStore } from '@/stores/uiStore';
 import { useTutorialStore } from '@/stores/tutorialStore';
-import { guideLive } from '@/lib/tutorial/live';
+import { guideVisible } from '@/lib/tutorial/live';
 import { buildNumbers } from '@/lib/tutorial/numbers';
 import { journalEntries } from '@/lib/tutorial/engine';
 import { GUIDE_NAME, TUTORIAL_PATH } from '@/catalog/tutorial';
@@ -36,7 +36,7 @@ const TutorialDialog: React.FC = () => {
 	const close = useUiStore((state) => state.closeTutorial);
 	const [tab, setTab] = useState<'reference' | 'journal'>('reference');
 	if (!open) return null;
-	const journal = guideLive();
+	const journal = guideVisible();
 	return (
 		<PixelModal title='Guide' size='lg' onClose={close}>
 			{journal && (

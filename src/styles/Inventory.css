@@ -536,3 +536,53 @@
 	font-size: 0.7rem;
 	color: #8ac0ff;
 }
+
+/* the hero card of the Character and Statistics windows: avatar (click to change), name and class, then the level bar */
+.hero-card {
+	width: 288px;
+	margin: 0 auto;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	background: #14100a;
+	box-shadow:
+		0 0 0 2px #080504,
+		0 0 0 4px #5a3f1c;
+}
+
+.hero-card-top {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.hero-card-avatar {
+	flex: none;
+	padding: 0;
+	border: 0;
+	background: none;
+	cursor: pointer;
+	line-height: 0;
+	image-rendering: pixelated;
+}
+
+.hero-card-avatar:hover,
+.hero-card-avatar:focus-visible {
+	outline: 2px solid #f0d27a;
+	outline-offset: 2px;
+}
+
+.hero-card-id {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.hero-card-name {
+	font-size: 1.125rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

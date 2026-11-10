@@ -9,7 +9,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - Threat model: [The server's rule and the threat model](#the-server-s-rule-and-the-threat-model)
 - The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog)
 - Uploading: [`SYNC`](#sync), [`judgeRebase`](#judgerebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
-- Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
+- Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
@@ -315,6 +315,32 @@ The kept castle timer counts down by the real seconds since the save it comes fr
 frozen castle remaining = max(0, last trusted remaining - elapsedSec between the saves)
 ```
 
+<a id="restoretrust"></a>
+
+### `restoreTrust` <small>function</small>
+
+Source: [`src/lib/cloudSave/restoreTrust.ts:39`](../../src/lib/cloudSave/restoreTrust.ts)
+
+The way back for a false positive (IDL-209). A save that fires `castle_jump` or `networth_exceeds` is paid from the last trusted economy
+([`trustedEconomy`](saves-and-server.md#trustedeconomy)) and the account loses its ranking for good (`everFlagged`). Nothing in the save path ever lifts that, so an honest
+account hit by a clock jump or a bug in a build would stay frozen. This is the owner's tool for it: it takes the account's stored game as
+the new baseline.
+
+What it does, in one atomic write (compare-and-swap on the revision, so a save arriving at the same moment makes it answer `conflict` and change nothing):
+ - the stored save's summary is worked out again from the stored game itself, so the rates, castle and castle timer the server pays from are
+   the CLAIMED ones again (the stored game was never altered by the freeze, only the numbers derived from it);
+ - `flags` is cleared and `everFlagged` is false, so the account is ranking-eligible again if its first save was a young game;
+ - the XP base and the gem balance are kept as they were, the save time stays (away pay is not touched), the revision goes up by one.
+
+Before it writes, the save it replaces is pinned in the history (`PINNED_KEEP`), so what the account looked like when it was flagged is still
+there; the caller logs the returned `restored` outcome as the audit line (`scripts/restore-trust.ts` prints it as JSON).
+
+Idempotent: an account with no flags on its save and no `everFlagged` answers `already_trusted` and nothing is written, so running it twice is safe.
+
+It judges nothing. Only restore an account that was looked at and found honest: if the claimed land is still worth more than the game could have paid,
+the very next save raises `networth_exceeds` again and the account is frozen again, now at the restored rates. It changes nothing for any other save:
+`acceptSave` never calls it, and with `ENFORCEMENT.enabled` off (as shipped) the save path behaves exactly as before.
+
 <a id="xp-model"></a>
 
 ### `XP_MODEL` <small>const</small>
@@ -353,7 +379,7 @@ browser still does, so the server bounds what two consecutive saves can explain,
    best rebirth the game can pay.
 
 In short: Embers only rise with the rebirth count; one rebirth fits between two saves and it must be believable from the previous castle and land; a first save is bounded by 4 hours of play per rebirth and a 1,000-tile best case.
-`requireServerRebirth` is off.
+`requireServerRebirth` is off; it is turned on together with `ENFORCEMENT.enabled`, after the new chapter flip (checklist: "Turning enforcement and the server-run rebirth on together", Ops/Operator guides).
 
 <a id="min-save-interval-ms"></a>
 
@@ -367,7 +393,7 @@ Saves from one player are accepted at most this often (an honest client sends ev
 
 ### `verifyTransition` <small>function</small>
 
-Source: [`src/lib/cloudSave/verify.ts:208`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:225`](../../src/lib/cloudSave/verify.ts)
 
 Runs every plausibility check between two consecutive saves and returns the flags that fired; see [`FLAG_POLICY`](saves-and-server.md#flag-policy) for what each one means and does.
 
@@ -388,7 +414,7 @@ variables were not exposed, real players must stay in the checks, not slip out o
 
 ### `POISON_FLAGS` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:132`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:149`](../../src/lib/cloudSave/verify.ts)
 
 Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
 
@@ -405,7 +431,7 @@ resets level and tiles, so a higher rebirth count never counts). The replaced sa
 
 ### `ENFORCEMENT` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:117`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:134`](../../src/lib/cloudSave/verify.ts)
 
 The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
 accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`
