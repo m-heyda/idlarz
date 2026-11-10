@@ -248,3 +248,32 @@ create table if not exists public.app_settings (
 alter table public.app_settings enable row level security;
 revoke all on table public.app_settings from anon, authenticated, public;
 grant select, insert, update, delete on public.app_settings to service_role;
+
+-- ---- new_chapter_columns (migration new_chapter_columns, IDL-68): epoch, avatar, unique name, achievements, lifetime counters --------
+do $$
+declare
+  v_dupes integer;
+begin
+  select count(*) into v_dupes from (
+    select lower(character_name) from public.profiles group by lower(character_name) having count(*) > 1
+  ) d;
+  if v_dupes > 0 then
+    raise exception 'new_chapter_columns: % character name(s) collide ignoring case; resolve them first', v_dupes;
+  end if;
+end $$;
+alter table public.profiles add column if not exists epoch integer;       -- null = old game (epoch 0)
+alter table public.profiles add column if not exists avatar_id text;
+create unique index if not exists profiles_character_name_ci on public.profiles (lower(character_name));
+create table if not exists public.player_achievements (
+  user_id         uuid        not null references auth.users (id) on delete cascade,
+  achievement_id  text        not null,
+  earned_at       timestamptz not null default now(),
+  primary key (user_id, achievement_id)
+);
+alter table public.player_achievements enable row level security;
+revoke all on table public.player_achievements from anon, authenticated, public;
+grant select on public.player_achievements to authenticated;
+create policy "player_achievements_select_own" on public.player_achievements for select to authenticated using (user_id = (select auth.uid()));
+grant select, insert, update, delete on public.player_achievements to service_role;
+alter table public.player_ledger add column if not exists stats jsonb;    -- lifetime counters (null = not counted yet)
+alter table public.player_ledger add column if not exists legacy jsonb;   -- Idol levels that survive a rebirth (null = none)
