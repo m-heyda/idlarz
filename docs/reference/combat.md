@@ -460,7 +460,7 @@ With a fight open the server runs it to its end on a copy ([`projectFight`](comb
 
 ### `UNCLAIMED_SEC` <small>const</small>
 
-Source: [`src/lib/offline/grant.ts:46`](../../src/lib/offline/grant.ts)
+Source: [`src/lib/offline/grant.ts:51`](../../src/lib/offline/grant.ts)
 
 The longest gap the server treats as the same session: past it an online call is refused with `claim_first`, and the hero rests (heals fully) through the gap. The client uses the same number, so the picture never jumps back.
 

@@ -5,6 +5,10 @@ export type SaveEventReason =
 	| 'buyTile'
 	| 'upgradeCastle'
 	| 'castleUpgraded'
+	| 'buildBuilding'
+	| 'upgradeBuilding'
+	| 'moveBuilding'
+	| 'buildingUpgraded'
 	| 'rebirth'
 	| 'buyEmberUpgrade'
 	| 'purchaseAnimal'
@@ -37,6 +41,9 @@ export const emitSaveEvent = (reason: SaveEventReason): void => {
 const SAVE_EVENT_ACTIONS = [
 	'buyTile',
 	'upgradeCastle',
+	'buildBuilding',
+	'upgradeBuilding',
+	'moveBuilding',
 	'rebirth',
 	'buyEmberUpgrade',
 	'purchaseAnimal',

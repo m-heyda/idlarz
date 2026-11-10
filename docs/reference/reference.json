@@ -102,6 +102,17 @@
   "see": []
  },
  {
+  "id": "buildings",
+  "name": "BUILDINGS",
+  "symbol": "BUILDINGS",
+  "kind": "const",
+  "category": "Economy/Buildings",
+  "file": "src/catalog/buildings.ts",
+  "line": 29,
+  "summary": "The Producer of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents` tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.",
+  "see": []
+ },
+ {
   "id": "gear",
   "name": "gear",
   "symbol": "gear",
@@ -417,6 +428,32 @@
   "file": "src/config/biomes.ts",
   "line": 53,
   "summary": "Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.",
+  "see": []
+ },
+ {
+  "id": "buildings-flag",
+  "name": "BUILDINGS_FLAG",
+  "symbol": "BUILDINGS_FLAG",
+  "kind": "const",
+  "category": "Economy/Buildings",
+  "file": "src/config/buildings.ts",
+  "line": 17,
+  "summary": "The per-biome building system (R7, IDL-91, IDL-92), behind {@link BUILDINGS_FLAG}, which is **ON** (owner decision: live on merge). Switching it off is the rollback: the game, the save format, the server checks and the sim are then byte-identical to a build that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.",
+  "see": [
+   "producerBonus",
+   "buildingUpgradeDuration",
+   "buildingBuildCost"
+  ]
+ },
+ {
+  "id": "building-rules",
+  "name": "BUILDING_RULES",
+  "symbol": "BUILDING_RULES",
+  "kind": "const",
+  "category": "Economy/Buildings",
+  "file": "src/config/buildings.ts",
+  "line": 32,
+  "summary": "The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).",
   "see": []
  },
  {
@@ -961,6 +998,42 @@
   "see": []
  },
  {
+  "id": "produceroutput",
+  "name": "producerOutput",
+  "symbol": "producerOutput",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/lib/buildingOutput.ts",
+  "line": 20,
+  "summary": "What a Producer of level `level` makes per second, before the global modifiers (castle, Embers, ...): its `produces` resources at the biome's tile rate.",
+  "see": [
+   "BUILDING_RULES",
+   "producerBonus"
+  ]
+ },
+ {
+  "id": "buildingupgradeduration",
+  "name": "buildingUpgradeDuration",
+  "symbol": "buildingUpgradeDuration",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/lib/buildings.ts",
+  "line": 26,
+  "summary": "Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.",
+  "see": []
+ },
+ {
+  "id": "buildinglevelcost",
+  "name": "buildingLevelCost",
+  "symbol": "buildingLevelCost",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/lib/buildings.ts",
+  "line": 37,
+  "summary": "The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.",
+  "see": []
+ },
+ {
   "id": "castlerangeradius",
   "name": "castleRangeRadius",
   "symbol": "castleRangeRadius",
@@ -1168,7 +1241,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 87,
+  "line": 90,
   "summary": "The flags and what the server does with each. Meaning of each flag:",
   "see": []
  },
@@ -1178,7 +1251,7 @@
   "kind": "topic",
   "category": "Ops/Operator guides",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 105,
+  "line": 109,
   "summary": "**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).** Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:",
   "see": [
    "ENFORCEMENT",
@@ -1192,7 +1265,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 130,
+  "line": 134,
   "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
   "see": []
  },
@@ -1203,7 +1276,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 145,
+  "line": 149,
   "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
   "see": []
  },
@@ -1214,7 +1287,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 193,
+  "line": 225,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },
@@ -1967,7 +2040,7 @@
   "kind": "const",
   "category": "Combat/Results and rest",
   "file": "src/lib/offline/grant.ts",
-  "line": 46,
+  "line": 51,
   "summary": "The longest gap the server treats as the same session: past it an online call is refused with `claim_first`, and the hero rests (heals fully) through the gap. The client uses the same number, so the picture never jumps back.",
   "see": []
  },
@@ -1978,8 +2051,8 @@
   "kind": "function",
   "category": "Saves & Server/Away time",
   "file": "src/lib/offline/grant.ts",
-  "line": 70,
-  "summary": "The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the castle upgrade finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.",
+  "line": 75,
+  "summary": "The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the castle upgrade (or a building's, they share one builder) finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.",
   "see": []
  },
  {
@@ -2201,7 +2274,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 58,
+  "line": 62,
   "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
   "see": []
  },
@@ -2212,7 +2285,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 191,
+  "line": 201,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -2223,7 +2296,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/saveFormat.ts",
-  "line": 34,
+  "line": 35,
   "summary": "The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters. The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load. Not saved: monsters and the open fight (the server's).",
   "see": [
    "PERSISTED_KEYS",
@@ -2303,7 +2376,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 352,
+  "line": 362,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"
@@ -2509,7 +2582,7 @@
   "kind": "function",
   "category": "Economy/Income",
   "file": "src/utils/game/income.ts",
-  "line": 77,
+  "line": 80,
   "summary": "The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.",
   "see": []
  },
@@ -2520,7 +2593,7 @@
   "kind": "function",
   "category": "Economy/Income",
   "file": "src/utils/game/income.ts",
-  "line": 123,
+  "line": 127,
   "summary": "Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).",
   "see": [
    "calculateTileOutput",
@@ -2786,7 +2859,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 799,
+  "line": 857,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

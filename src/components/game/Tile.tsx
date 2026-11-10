@@ -17,6 +17,7 @@ import { useGameStore } from '@/stores/gameStore';
 import TileMonster from './TileMonster';
 import TileTooltip from './TileTooltip';
 import { openTileMenu } from './TileMenu';
+import { buildingDef } from '@/catalog/buildings';
 
 const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = false }) => {
 	const { game, onTile, drag } = useMapSource();
@@ -42,6 +43,14 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 
 	// Check if this tile has a chest
 	const hasChest = game((state) => isOwned && !!getTile(state.tiles, x, y)?.hasChest);
+
+	// The building on this tile, "id:level" ('' with none, and always '' while the building system is off): only this string is read, so a tile re-renders for its own building
+	const buildingKey = game((state) => {
+		const t = isOwned ? getTile(state.tiles, x, y) : undefined;
+		return t?.building ? `${t.building}:${t.buildingLevel ?? 1}` : '';
+	});
+	const [buildingId, buildingLevel] = buildingKey ? buildingKey.split(':') : [];
+	const building = buildingDef(buildingId);
 
 	// The map only mounts a tile that is not explored when it touches explored land: it can be bought
 	const isAdjacent = !isOwned;
@@ -193,6 +202,17 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 							})}
 						</span>
 					)}
+
+					{building && (
+						// eslint-disable-next-line @next/next/no-img-element
+						<img
+							src={building.art}
+							alt={`${building.label}, level ${buildingLevel}`}
+							className='absolute pointer-events-none'
+							style={{ width: TILE_SIZE * 1.1, bottom: 2, imageRendering: 'pixelated' }}
+						/>
+					)}
+					{building && <span className='tile-badge'>{buildingLevel}</span>}
 
 					{isOwned && monsterKey && (
 						<TileMonster

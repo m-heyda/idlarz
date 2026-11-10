@@ -1,5 +1,5 @@
 import { STORED_KEYS, zeroResources } from '@/catalog/resourceKeys';
-import type { CastleUpgradeState, Resources } from '@/types/game';
+import type { BuildingUpgradeState, CastleUpgradeState, Resources } from '@/types/game';
 
 // What an absence pays. Pure: the server computes it from the last accepted save and its own clock; the client only applies the result.
 
@@ -12,6 +12,9 @@ export interface OfflineInput {
 	/** The same once the running castle upgrade is done; null with no upgrade running */
 	ratesAfterCastle: Resources | null;
 	castleUpgrade: CastleUpgradeState | null;
+	/** The building level being built (building system, absent or null with none) and the rates once it is done. The castle and the buildings share one builder, so at most one of the two upgrades runs. */
+	buildingUpgrade?: BuildingUpgradeState | null;
+	ratesAfterBuilding?: Resources | null;
 	/** % bonus on xp income */
 	xpGainPct: number;
 	/** The server clock since the last save or claim, in seconds */
@@ -35,6 +38,8 @@ export interface OfflineGrant {
 	resources: Resources;
 	/** The castle upgrade that was running, and whether it finished while away */
 	castle: { toLevel: number; finished: boolean } | null;
+	/** The building upgrade that was running, and whether it finished while away (only present while one was running) */
+	building?: { x: number; y: number; toLevel: number; finished: boolean };
 }
 
 /**
@@ -49,7 +54,7 @@ export const zeroGrant = (): Resources => zeroResources();
 
 /**
  * The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the
- * castle upgrade finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.
+ * castle upgrade (or a building's, they share one builder) finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.
  *
  * Away time (`/api/offline`).
  *
@@ -72,14 +77,18 @@ export const computeOfflineGrant = (input: OfflineInput): OfflineGrant | null =>
 	if (gap < input.minGapSec) return null;
 	const elapsed = Math.min(gap, input.capSec);
 	const eff = Math.min(1, Math.max(0, input.efficiency));
-	const remaining = input.castleUpgrade ? Math.max(0, input.castleUpgrade.remainingSec) : null;
+	// one builder: the castle's upgrade or a building's runs, never both (a forged pair counts the castle's only)
+	const building = !input.castleUpgrade && input.buildingUpgrade ? input.buildingUpgrade : null;
+	const pending = input.castleUpgrade ?? building;
+	const ratesAfter = input.castleUpgrade ? input.ratesAfterCastle : building ? (input.ratesAfterBuilding ?? null) : null;
+	const remaining = pending ? Math.max(0, pending.remainingSec) : null;
 	const finished = remaining !== null && remaining <= elapsed;
-	const switchAt = finished && input.ratesAfterCastle ? (remaining as number) : elapsed;
+	const switchAt = finished && ratesAfter ? (remaining as number) : elapsed;
 
 	const resources = zeroGrant();
 	for (const key of RESOURCES) {
 		const before = input.rates[key] ?? 0;
-		const after = input.ratesAfterCastle ? (input.ratesAfterCastle[key] ?? 0) : before;
+		const after = ratesAfter ? (ratesAfter[key] ?? 0) : before;
 		let amount = (before * switchAt + after * (elapsed - switchAt)) * eff;
 		if (key === 'xp') amount *= 1 + input.xpGainPct / 100;
 		resources[key] = Number.isFinite(amount) ? Math.max(0, Math.floor(amount)) : 0;
@@ -92,5 +101,6 @@ export const computeOfflineGrant = (input: OfflineInput): OfflineGrant | null =>
 		capped: gap > input.capSec,
 		resources,
 		castle: input.castleUpgrade ? { toLevel: input.castleUpgrade.toLevel, finished } : null,
+		...(building ? { building: { x: building.x, y: building.y, toLevel: building.toLevel, finished } } : {}),
 	};
 };
