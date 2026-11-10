@@ -28,7 +28,9 @@ test('a product is a small share of the meat value once sold (so the farm stays 
 	for (const animal of ANIMALS) {
 		const meat = animal.baseProduction * 1; // sells for 1 gold per meat
 		const product = animal.product.perSec * price[animal.product.resource];
-		assert.ok(product / meat >= 0.2 && product / meat <= 0.4, `${animal.id}: ${(product / meat).toFixed(2)}`);
+		// hide is the one product big territories are paid in (TILE_RESOURCE_COST) and now only the pigs make it, so it may be worth up to half the meat
+		const top = animal.product.resource === 'hide' ? 0.5 : 0.4;
+		assert.ok(product / meat >= 0.2 && product / meat <= top, `${animal.id}: ${(product / meat).toFixed(2)}`);
 	}
 });
 

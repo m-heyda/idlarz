@@ -40,7 +40,7 @@ export const ANIMALS: Animal[] = [
 		baseCost: 60000,
 		costScaling: 1.36,
 		baseProduction: 1,
-		product: { resource: 'hide', perSec: 0.15 },
+		product: { resource: 'hide', perSec: 0.25 },
 	},
 	{
 		id: 'cow',

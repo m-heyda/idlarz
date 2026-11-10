@@ -485,7 +485,7 @@ The farm: animals are bought with food. The N-th animal of a kind costs `floor(b
 | --- | --- | --- | --- | --- |
 | Chicken | 1,000 | 1.3 | 0.2 | eggs 0.03 |
 | Sheep | 10 K | 1.33 | 0.5 | wool 0.075 |
-| Pig | 60 K | 1.36 | 1 | hide 0.15 |
+| Pig | 60 K | 1.36 | 1 | hide 0.25 |
 | Cow | 400 K | 1.4 | 2 | milk 0.225 |
 
 <a id="animaloutput"></a>

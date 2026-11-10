@@ -254,7 +254,7 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 | --- | --- | --- | --- | --- | --- | --- |
 | Chicken | eggs | 0.03 | 2 | 0.060 | 0.20 | 30% |
 | Sheep | wool | 0.075 | 2 | 0.150 | 0.50 | 30% |
-| Pig | hide | 0.15 | 2 | 0.300 | 1.00 | 30% |
+| Pig | hide | 0.25 | 2 | 0.500 | 1.00 | 50% |
 | Cow | milk | 0.225 | 3 | 0.675 | 2.00 | 34% |
 
 | Upgrade | effect per level | max level | cost of level 1 | cost of the last level |
