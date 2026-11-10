@@ -722,6 +722,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
 - [`inventory_ledger.sql`](../../supabase/migrations/inventory_ledger.sql)
+- [`new_chapter_columns.sql`](../../supabase/migrations/new_chapter_columns.sql)
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
 - [`rebirth_history.sql`](../../supabase/migrations/rebirth_history.sql)
