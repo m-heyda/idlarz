@@ -36,32 +36,32 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `bonus_bee` | <img src="../../public/pixel/icons/bonus_bee.png" width="96" alt="bonus_bee"> | 56x26 | used |  | `pixel/icons/bonus_bee.png` |
-| `bonus_butterfly` | <img src="../../public/pixel/icons/bonus_butterfly.png" width="96" alt="bonus_butterfly"> | 56x28 | used |  | `pixel/icons/bonus_butterfly.png` |
+| `bonus_bee` | <img src="../../public/pixel/icons/bonus_bee.png" width="96" alt="bonus_bee"> | 56x26 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_bee.png` |
+| `bonus_butterfly` | <img src="../../public/pixel/icons/bonus_butterfly.png" width="96" alt="bonus_butterfly"> | 56x28 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_butterfly.png` |
 | `bonus_chest` | <img src="../../public/pixel/icons/bonus_chest.png" width="64" alt="bonus_chest"> | 32x32 | unused |  | `pixel/icons/bonus_chest.png` |
-| `bonus_crab` | <img src="../../public/pixel/icons/bonus_crab.png" width="96" alt="bonus_crab"> | 60x20 | used |  | `pixel/icons/bonus_crab.png` |
-| `bonus_fish` | <img src="../../public/pixel/icons/bonus_fish.png" width="96" alt="bonus_fish"> | 64x22 | used |  | `pixel/icons/bonus_fish.png` |
-| `bonus_frog` | <img src="../../public/pixel/icons/bonus_frog.png" width="96" alt="bonus_frog"> | 52x22 | used |  | `pixel/icons/bonus_frog.png` |
-| `bonus_goat` | <img src="../../public/pixel/icons/bonus_goat.png" width="96" alt="bonus_goat"> | 72x32 | used |  | `pixel/icons/bonus_goat.png` |
-| `bonus_ladybug` | <img src="../../public/pixel/icons/bonus_ladybug.png" width="96" alt="bonus_ladybug"> | 48x22 | used |  | `pixel/icons/bonus_ladybug.png` |
-| `bonus_rabbit` | <img src="../../public/pixel/icons/bonus_rabbit.png" width="96" alt="bonus_rabbit"> | 68x34 | used |  | `pixel/icons/bonus_rabbit.png` |
-| `bonus_wolf` | <img src="../../public/pixel/icons/bonus_wolf.png" width="96" alt="bonus_wolf"> | 76x30 | used |  | `pixel/icons/bonus_wolf.png` |
+| `bonus_crab` | <img src="../../public/pixel/icons/bonus_crab.png" width="96" alt="bonus_crab"> | 60x20 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_crab.png` |
+| `bonus_fish` | <img src="../../public/pixel/icons/bonus_fish.png" width="96" alt="bonus_fish"> | 64x22 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_fish.png` |
+| `bonus_frog` | <img src="../../public/pixel/icons/bonus_frog.png" width="96" alt="bonus_frog"> | 52x22 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_frog.png` |
+| `bonus_goat` | <img src="../../public/pixel/icons/bonus_goat.png" width="96" alt="bonus_goat"> | 72x32 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_goat.png` |
+| `bonus_ladybug` | <img src="../../public/pixel/icons/bonus_ladybug.png" width="96" alt="bonus_ladybug"> | 48x22 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_ladybug.png` |
+| `bonus_rabbit` | <img src="../../public/pixel/icons/bonus_rabbit.png" width="96" alt="bonus_rabbit"> | 68x34 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_rabbit.png` |
+| `bonus_wolf` | <img src="../../public/pixel/icons/bonus_wolf.png" width="96" alt="bonus_wolf"> | 76x30 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_wolf.png` |
 
 ## bust
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `bust_mage` | <img src="../../public/pixel/icons/bust_mage.png" width="80" alt="bust_mage"> | 40x40 | used |  | `pixel/icons/bust_mage.png` |
-| `bust_paladin` | <img src="../../public/pixel/icons/bust_paladin.png" width="80" alt="bust_paladin"> | 40x40 | used |  | `pixel/icons/bust_paladin.png` |
-| `bust_ranger` | <img src="../../public/pixel/icons/bust_ranger.png" width="80" alt="bust_ranger"> | 40x40 | used |  | `pixel/icons/bust_ranger.png` |
-| `bust_warrior` | <img src="../../public/pixel/icons/bust_warrior.png" width="80" alt="bust_warrior"> | 40x40 | used |  | `pixel/icons/bust_warrior.png` |
+| `bust_mage` | <img src="../../public/pixel/icons/bust_mage.png" width="80" alt="bust_mage"> | 40x40 | used | src/config/playerClasses.ts | `pixel/icons/bust_mage.png` |
+| `bust_paladin` | <img src="../../public/pixel/icons/bust_paladin.png" width="80" alt="bust_paladin"> | 40x40 | used | src/config/playerClasses.ts | `pixel/icons/bust_paladin.png` |
+| `bust_ranger` | <img src="../../public/pixel/icons/bust_ranger.png" width="80" alt="bust_ranger"> | 40x40 | used | src/config/playerClasses.ts | `pixel/icons/bust_ranger.png` |
+| `bust_warrior` | <img src="../../public/pixel/icons/bust_warrior.png" width="80" alt="bust_warrior"> | 40x40 | used | src/config/playerClasses.ts | `pixel/icons/bust_warrior.png` |
 
 ## chest
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `chest_map` | <img src="../../public/pixel/icons/chest_map.png" width="96" alt="chest_map"> | 48x40 | unused |  | `pixel/icons/chest_map.png` |
-| `chest_map_anim` | <img src="../../public/pixel/icons/chest_map_anim.png" width="96" alt="chest_map_anim"> | 192x40 | used |  | `pixel/icons/chest_map_anim.png` |
+| `chest_map_anim` | <img src="../../public/pixel/icons/chest_map_anim.png" width="96" alt="chest_map_anim"> | 192x40 | used | src/components/game/Tile.tsx | `pixel/icons/chest_map_anim.png` |
 
 ## effects
 
@@ -125,17 +125,17 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `hero_mage` | <img src="../../public/pixel/icons/hero_mage.png" width="96" alt="hero_mage"> | 56x80 | used |  | `pixel/icons/hero_mage.png` |
-| `hero_paladin` | <img src="../../public/pixel/icons/hero_paladin.png" width="96" alt="hero_paladin"> | 56x80 | used |  | `pixel/icons/hero_paladin.png` |
-| `hero_ranger` | <img src="../../public/pixel/icons/hero_ranger.png" width="96" alt="hero_ranger"> | 56x80 | used |  | `pixel/icons/hero_ranger.png` |
-| `hero_warrior` | <img src="../../public/pixel/icons/hero_warrior.png" width="96" alt="hero_warrior"> | 56x80 | used |  | `pixel/icons/hero_warrior.png` |
+| `hero_mage` | <img src="../../public/pixel/icons/hero_mage.png" width="96" alt="hero_mage"> | 56x80 | used | src/config/playerClasses.ts | `pixel/icons/hero_mage.png` |
+| `hero_paladin` | <img src="../../public/pixel/icons/hero_paladin.png" width="96" alt="hero_paladin"> | 56x80 | used | src/config/playerClasses.ts | `pixel/icons/hero_paladin.png` |
+| `hero_ranger` | <img src="../../public/pixel/icons/hero_ranger.png" width="96" alt="hero_ranger"> | 56x80 | used | src/config/playerClasses.ts | `pixel/icons/hero_ranger.png` |
+| `hero_warrior` | <img src="../../public/pixel/icons/hero_warrior.png" width="96" alt="hero_warrior"> | 56x80 | used | src/config/playerClasses.ts | `pixel/icons/hero_warrior.png` |
 
 ## level
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `level_orb` | <img src="../../public/pixel/icons/level_orb.png" width="48" alt="level_orb"> | 24x24 | unused |  | `pixel/icons/level_orb.png` |
-| `level_orb_shine` | <img src="../../public/pixel/icons/level_orb_shine.png" width="96" alt="level_orb_shine"> | 144x24 | unused |  | `pixel/icons/level_orb_shine.png` |
+| `level_orb_shine` | <img src="../../public/pixel/icons/level_orb_shine.png" width="96" alt="level_orb_shine"> | 144x24 | used | src/app/globals.css | `pixel/icons/level_orb_shine.png` |
 
 ## menu
 
@@ -143,29 +143,29 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | --- | --- | --- | --- | --- | --- |
 | `menu_achievements` | <img src="../../public/pixel/icons/menu_achievements.png" width="96" alt="menu_achievements"> | 64x64 | unused |  | `pixel/icons/menu_achievements.png` |
 | `menu_bag_scroll` | <img src="../../public/pixel/icons/menu_bag_scroll.png" width="96" alt="menu_bag_scroll"> | 64x64 | unused |  | `pixel/icons/menu_bag_scroll.png` |
-| `menu_character` | <img src="../../public/pixel/icons/menu_character.png" width="80" alt="menu_character"> | 40x40 | used |  | `pixel/icons/menu_character.png` |
-| `menu_crafting` | <img src="../../public/pixel/icons/menu_crafting.png" width="96" alt="menu_crafting"> | 64x64 | used |  | `pixel/icons/menu_crafting.png` |
-| `menu_equipment` | <img src="../../public/pixel/icons/menu_equipment.png" width="96" alt="menu_equipment"> | 64x64 | used |  | `pixel/icons/menu_equipment.png` |
-| `menu_farm` | <img src="../../public/pixel/icons/menu_farm.png" width="96" alt="menu_farm"> | 64x64 | used |  | `pixel/icons/menu_farm.png` |
+| `menu_character` | <img src="../../public/pixel/icons/menu_character.png" width="80" alt="menu_character"> | 40x40 | used | src/components/game/AvatarDialog.tsx, src/components/game/ClassPickerDialog.tsx | `pixel/icons/menu_character.png` |
+| `menu_crafting` | <img src="../../public/pixel/icons/menu_crafting.png" width="96" alt="menu_crafting"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/CraftingOverlay.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_crafting.png` |
+| `menu_equipment` | <img src="../../public/pixel/icons/menu_equipment.png" width="96" alt="menu_equipment"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_equipment.png` |
+| `menu_farm` | <img src="../../public/pixel/icons/menu_farm.png" width="96" alt="menu_farm"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_farm.png` |
 | `menu_gems_pouch` | <img src="../../public/pixel/icons/menu_gems_pouch.png" width="96" alt="menu_gems_pouch"> | 64x64 | unused |  | `pixel/icons/menu_gems_pouch.png` |
 | `menu_glossary` | <img src="../../public/pixel/icons/menu_glossary.png" width="96" alt="menu_glossary"> | 64x64 | unused |  | `pixel/icons/menu_glossary.png` |
-| `menu_legacy` | <img src="../../public/pixel/icons/menu_legacy.png" width="96" alt="menu_legacy"> | 64x64 | used |  | `pixel/icons/menu_legacy.png` |
+| `menu_legacy` | <img src="../../public/pixel/icons/menu_legacy.png" width="96" alt="menu_legacy"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/RebirthDialog.tsx | `pixel/icons/menu_legacy.png` |
 | `menu_main` | <img src="../../public/pixel/icons/menu_main.png" width="80" alt="menu_main"> | 40x40 | unused |  | `pixel/icons/menu_main.png` |
-| `menu_merchant` | <img src="../../public/pixel/icons/menu_merchant.png" width="96" alt="menu_merchant"> | 64x64 | used |  | `pixel/icons/menu_merchant.png` |
-| `menu_settings` | <img src="../../public/pixel/icons/menu_settings.png" width="80" alt="menu_settings"> | 40x40 | used |  | `pixel/icons/menu_settings.png` |
-| `menu_stats` | <img src="../../public/pixel/icons/menu_stats.png" width="80" alt="menu_stats"> | 40x40 | used |  | `pixel/icons/menu_stats.png` |
+| `menu_merchant` | <img src="../../public/pixel/icons/menu_merchant.png" width="96" alt="menu_merchant"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_merchant.png` |
+| `menu_settings` | <img src="../../public/pixel/icons/menu_settings.png" width="80" alt="menu_settings"> | 40x40 | used | src/components/game/GameDebug.tsx, src/components/game/HeaderMenu.tsx, src/components/game/overlays/SettingsDialog.tsx | `pixel/icons/menu_settings.png` |
+| `menu_stats` | <img src="../../public/pixel/icons/menu_stats.png" width="80" alt="menu_stats"> | 40x40 | used | src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_stats.png` |
 
 ## skull
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `skull` | <img src="../../public/pixel/icons/skull.png" width="80" alt="skull"> | 40x40 | used |  | `pixel/icons/skull.png` |
+| `skull` | <img src="../../public/pixel/icons/skull.png" width="80" alt="skull"> | 40x40 | used | src/components/game/overlays/CombatWidget.tsx | `pixel/icons/skull.png` |
 
 ## unknown
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `unknown` | <img src="../../public/pixel/icons/unknown.png" width="48" alt="unknown"> | 11x14 | used |  | `pixel/icons/unknown.png` |
+| `unknown` | <img src="../../public/pixel/icons/unknown.png" width="48" alt="unknown"> | 11x14 | used | src/components/game/Tile.tsx, src/lib/cloudClient.ts, src/lib/offline/tutorial.ts | `pixel/icons/unknown.png` |
 
 ## xp
 

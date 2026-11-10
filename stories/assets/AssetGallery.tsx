@@ -62,9 +62,11 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 	);
 	if (sort !== 'default') shown.sort((a, b) => keyOf(a).localeCompare(keyOf(b), undefined, { numeric: true }));
 	const srcOf = (e: ManifestEntry) => (variant !== 'default' && e.variants?.[variant]) || e.src;
-	const copy = (name: string) => {
-		navigator.clipboard?.writeText(name).catch(() => {});
-		setCopied(name);
+	/** repo path of the picture shown (variant aware), as an agent finds it in the checkout */
+	const pathOf = (e: ManifestEntry) => `public${srcOf(e)}`;
+	const copy = (text: string, label = text) => {
+		navigator.clipboard?.writeText(text).catch(() => {});
+		setCopied(label);
 	};
 	const field = { background: '#241e1a', color: '#f1e6c8', border: '1px solid #4a3f36', padding: '4px 8px', borderRadius: 4 } as const;
 	return (
@@ -121,6 +123,14 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 				<label style={{ fontSize: 13 }}>
 					<input type='checkbox' checked={onlyTrash} onChange={(e) => setOnlyTrash(e.target.checked)} /> marked trash only
 				</label>
+				<button
+					type='button'
+					onClick={() => copy(shown.map(pathOf).join('\n'), `${shown.length} paths`)}
+					style={field}
+					title='Copy the repo path of every card shown (respects the filters)'
+				>
+					copy shown paths
+				</button>
 				<button type='button' onClick={trash.copyList} style={field} title='Copy every trash mark from every gallery'>
 					copy trash list ({trash.list.length})
 				</button>
@@ -140,10 +150,7 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 						>
 							{trash.marks[e.src] ? 'trash' : '🗑'}
 						</button>
-						<button
-							type='button'
-							onClick={() => copy(e.name)}
-							title={`${e.src}\n${e.source}`}
+						<div
 							style={{
 								textAlign: 'left',
 								width: '100%',
@@ -153,7 +160,6 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 								borderRadius: 6,
 								padding: 8,
 								color: 'inherit',
-								cursor: 'pointer',
 							}}
 						>
 							<div
@@ -186,7 +192,23 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 								{e.size.join('x')} · <span style={{ color: STATUS_COLOR[e.status] }}>{e.status}</span>
 							</div>
 							{e.usedBy.length > 0 && <div style={{ fontSize: 11, opacity: 0.7, wordBreak: 'break-all' }}>{e.usedBy.join(', ')}</div>}
-						</button>
+							<div style={{ fontSize: 10, marginTop: 4, color: '#c9b98f', wordBreak: 'break-all', fontFamily: 'ui-monospace, monospace', userSelect: 'all' }}>
+								{pathOf(e)}
+							</div>
+							<div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
+								<button
+									type='button'
+									onClick={() => copy(pathOf(e), `path of ${e.name}`)}
+									style={{ ...field, padding: '1px 6px', fontSize: 11 }}
+									title={pathOf(e)}
+								>
+									copy path
+								</button>
+								<button type='button' onClick={() => copy(e.name)} style={{ ...field, padding: '1px 6px', fontSize: 11 }} title='Copy the asset name'>
+									copy name
+								</button>
+							</div>
+						</div>
 					</div>
 				))}
 			</div>
