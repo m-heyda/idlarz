@@ -376,7 +376,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`reward.ts`](../../src/lib/offline/reward.ts) — ~ What the drops became:
 - [`seal.ts`](../../src/lib/offline/seal.ts) — ~ A random source for one reward:
 - [`season.ts`](../../src/lib/offline/season.ts) — ~ When the last season reset happened (epoch ms), or null when there never was one.
-- [`secret.ts`](../../src/lib/offline/secret.ts) — The server-only secret that seals rolls (the LOOT_SECRET variable).
+- [`secret.ts`](../../src/lib/offline/secret.ts) — ~ SHA-256 of the `LOOT_SECRET` that used to be committed in `.env.example`.
 - [`service.ts`](../../src/lib/offline/service.ts) — ~ The server-only secret that seals rolls (LOOT_SECRET)
 - [`spawnWeights.ts`](../../src/lib/offline/spawnWeights.ts) — ~ Win chance range that is worth a fight:
 - [`stats.ts`](../../src/lib/offline/stats.ts) — SERVER ONLY. The lifetime counters of a player (`player_ledger.stats`): kills per monster type, chests opened, tiles bought and the income earned while playing.
@@ -682,6 +682,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
+- [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.
