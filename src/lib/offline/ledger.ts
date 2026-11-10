@@ -5,6 +5,7 @@ import type { CombatState } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
 import { emptyCraft } from '@/lib/crafting';
 import type { CraftQueueEntry, CraftState, Inventory } from '@/lib/offline/types';
+import { emptyStats, type LifetimeStats } from '@/lib/offline/stats';
 import { emptyBank, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
 import type { Resources } from '@/types/game';
 
@@ -63,7 +64,7 @@ export const craftFromJson = (raw: unknown): CraftState => {
 /**
  * The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor,
  * the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result,
- * `combat` (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), `inv` (bag, gear, pity, auto-sell, Pack Rat size) and `resetAt`.
+ * `combat` (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), `inv` (bag, gear, pity, auto-sell, Pack Rat size), `stats` (lifetime counters: kills per monster type, chests, tiles bought, income earned; see `stats.ts`) and `resetAt`.
  *
  * - **Idempotency**: a repeated request with the same key replays the stored answer; two browsers cannot both claim (compare-and-swap).
  * - **Tickets**: a chest or monster exists only as a ticket the server minted from its own clock. Opening a chest names a tile; no ticket on that tile, no reward. Timers and caps: {@link advanceBank} and {@link ticketCap}.
@@ -106,6 +107,8 @@ export interface Ledger {
 	craft: CraftState;
 	/** The potion buffs running (migration player_ledger_buffs): family, stat, percent and the second each ends; an empty list is stored as null */
 	buffs: ActiveBuff[];
+	/** Lifetime counters (migration new_chapter_columns, IDL-69): kills per type, chests, tiles bought, income earned; null in the column until something was counted */
+	stats: LifetimeStats;
 }
 
 export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
@@ -126,6 +129,7 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	inv: null,
 	craft: emptyCraft(),
 	buffs: [],
+	stats: emptyStats(),
 });
 
 /**

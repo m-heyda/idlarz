@@ -359,3 +359,22 @@ test('a player whose game has not been through the last season reset is reset on
 	assert.equal(m.ledgers.get('old')!.resetAt, T0 + 3 * HOUR);
 	assert.equal((await ensureSeasonReset(m.deps, marker, 'old', T0 + 4 * HOUR)).reset, false, 'only once');
 });
+
+test('lifetime counters (IDL-69): the first save sets the baselines, a later one counts the income earned while playing, at most every ten minutes', async () => {
+	const m = memory();
+	const first = game();
+	assert.equal((await save(m, 'u1', first, 0, T0)).kind, 'ok');
+	const baseline = m.ledgers.get('u1')!.stats;
+	assert.deepEqual([baseline.at, baseline.playAt], [T0, 1000]);
+	assert.deepEqual(baseline.income, {}, 'nothing is counted from a first save');
+	// five minutes later: not due yet, the ledger is not written for the counters
+	const soon = await save(m, 'u1', { ...first, playSeconds: 1300 }, 1, T0 + 5 * 60_000);
+	assert.equal(soon.kind, 'ok');
+	assert.equal(m.ledgers.get('u1')!.stats.at, T0, 'under ten minutes since the last count: left alone');
+	// twenty minutes after the first save: 900 more play seconds are counted at the rates of the previous save
+	const later = await save(m, 'u1', { ...first, playSeconds: 1900 }, 2, T0 + 20 * 60_000);
+	assert.equal(later.kind, 'ok');
+	const counted = m.ledgers.get('u1')!.stats;
+	assert.equal(counted.at, T0 + 20 * 60_000);
+	assert.ok((counted.income.gold ?? 0) > 0, 'income while playing was counted');
+});

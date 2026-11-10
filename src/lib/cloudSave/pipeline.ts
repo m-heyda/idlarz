@@ -43,6 +43,7 @@
  */
 import { createHash } from 'node:crypto';
 import { STARTING_GEMS } from '@/config/economy';
+import { countSave, emptyStats, statsDue } from '@/lib/offline/stats';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
@@ -369,8 +370,16 @@ export const acceptSave = async (
 
 	if (ledgers && ledgerUsable) {
 		try {
+			// lifetime counters (IDL-69): tiles bought and income earned, counted from this accepted save; a first save or a new run only sets the baselines
+			const counted = countSave(ledger?.stats ?? emptyStats(), {
+				nowMs,
+				playSeconds: summary.playSeconds,
+				tilesOwned: summary.tilesOwned,
+				rates: previous ? (previous.summary.rates as unknown as Record<string, number>) : null,
+				newRun: newRun || !current,
+			});
 			if (!ledger) {
-				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1 });
+				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1, stats: counted });
 			} else if (!current) {
 				// the first save of an account whose game was reset (a New Game, or a season reset): the timers start now, not at the reset,
 				// so the time since the reset is neither "played" spawn time nor an absence; the bag and gear come from this save
@@ -386,6 +395,7 @@ export const acceptSave = async (
 					lastResult: null,
 					combat: null,
 					inv: inventoryFromCore(split.core),
+					stats: counted,
 				});
 			} else if (newRun) {
 				/**
@@ -408,6 +418,7 @@ export const acceptSave = async (
 					lastResult: null,
 					combat: null,
 					inv,
+					stats: counted,
 				};
 				await ledgers.commit(userId, ledger.ver, next);
 			} else if ((grants && Object.values(grants).some((amount) => amount > 0)) || !ledger.inv) {
@@ -417,7 +428,11 @@ export const acceptSave = async (
 					ver: ledger.ver + 1,
 					grantedSeen: ledger.granted,
 					inv: ledger.inv ?? inventoryFromCore(split.core),
+					stats: counted,
 				});
+			} else if (statsDue(ledger.stats, nowMs)) {
+				// nothing else to write: the counters are brought up to date at most every STATS_EVERY_MS
+				await ledgers.commit(userId, ledger.ver, { ...ledger, ver: ledger.ver + 1, stats: counted });
 			}
 		} catch {
 			// the save is stored; the next one brings the ledger up to date

@@ -91,6 +91,7 @@ test('a chest opens against a ticket, pays what the server rolled, and the same 
 	assert.deepEqual(replay, first, 'a lost answer is replayed, never rolled again');
 	assert.equal(m.ledgers.get('u1')!.ordChest, 1);
 	assert.equal(m.ledgers.get('u1')!.bank.chests.length, 1, 'one ticket was spent');
+	assert.equal(m.ledgers.get('u1')!.stats.chests, 1, 'counted once: the replayed key does not count again');
 });
 
 test('every ticket answer says how many chests the run has opened, so the browser can tell an old answer from a new one', async () => {
@@ -188,6 +189,11 @@ test('with auto-battle on the server fights the monsters one at a time and pays 
 	const ledger = m.ledgers.get('u1')!;
 	assert.ok(won >= 1, 'at least one monster fell');
 	assert.equal(ledger.ordKill, won, 'each win rolled one sealed reward');
+	assert.equal(
+		Object.values(ledger.stats.kills).reduce((a, b) => a + b, 0),
+		won,
+		'each win counted once, under the type of the monster that fell',
+	);
 	assert.ok(ledger.granted.gold > 0 && ledger.granted.xp > 0);
 });
 
