@@ -36,4 +36,4 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | [UI](ui.md) | 94 | 65 | 21 |
 | [Portraits](portraits.md) | 32 | 18 | 8 |
 | [Biomes](biomes.md) | 9 | 5 | 4 |
-| [Unsorted cuts](unsorted.md) | 6 | 0 | 6 |
+| [Unsorted cuts](unsorted.md) | 13 | 0 | 13 |
