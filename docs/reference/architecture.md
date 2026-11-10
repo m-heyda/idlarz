@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [Sound library](#sound-library), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [Sound library](#sound-library), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
 - Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
 ## The loop
@@ -145,11 +145,22 @@ Deterministic: the same seed gives the same picture. Pure: no canvas, no store.
 Source: [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts)
 
 The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
-accessories, monsters, buildings, resources, map-details, ui, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
+accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
 Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/`
 get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
 `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
 (`npm run storybook`) and `tests/docs/assets.test.ts` keeps current. Never edit `docs/assets/` by hand.
+
+<a id="npc-portraits"></a>
+
+### `NPC_PORTRAITS` <small>const</small>
+
+Source: [`src/config/npcPortraits.ts:12`](../../src/config/npcPortraits.ts)
+
+The NPC portraits: 12 small bust pictures (48x48, transparent, Sprite Fusion) in `public/pixel/portraits/`, named `npc_<who>`. They are NOT the 40x40 bust frame of
+the avatars in `art_style_reference/ui-and-portraits/README.md`: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`).
+The merchant window shows one face per tab (`MERCHANT_PORTRAIT`); every other portrait stays in the asset library (category Portraits) as a ready face for
+a future quest giver, innkeeper, blacksmith or dialogue.
 
 <a id="sound-library"></a>
 

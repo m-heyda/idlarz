@@ -20231,6 +20231,171 @@
 		]
 	},
 	{
+		"usedBy": [
+			"merchant:upgrades"
+		],
+		"name": "portrait_blacksmith",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_blacksmith.png",
+		"status": "used",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_brawler",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_brawler.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_farmer_woman",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_farmer_woman.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_grandma",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_grandma.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_herbalist",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_herbalist.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_hermit_sage",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_hermit_sage.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_innkeeper_woman",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_innkeeper_woman.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [
+			"merchant:gambling"
+		],
+		"name": "portrait_jester",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_jester.png",
+		"status": "used",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [
+			"merchant:resources",
+			"merchant:goods"
+		],
+		"name": "portrait_merchant",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_merchant.png",
+		"status": "used",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [
+			"merchant:quests"
+		],
+		"name": "portrait_quest_giver",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_quest_giver.png",
+		"status": "used",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_scout",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_scout.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "portrait_tavern_keeper",
+		"category": "portraits",
+		"subcategory": "NPC busts 48px",
+		"src": "/pixel/portraits/npc_tavern_keeper.png",
+		"status": "reuse",
+		"source": "public/pixel/portraits",
+		"size": [
+			48,
+			48
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "reuse_legendary_sf_b4884690_b36",
 		"category": "unsorted",

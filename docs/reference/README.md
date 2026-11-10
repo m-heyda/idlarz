@@ -52,7 +52,7 @@ when the code changes, change the block in the same edit. `tests/docs/reference.
 - [Loot](loot.md) (23): The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - [Progression](progression.md) (34): Levels, attributes, skills, rebirth, Embers, limits and gems.
 - [Saves & Server](saves-and-server.md) (30): The save, cloud-save checks, the ledger, sealed rolls, away time and the threat model.
-- [Architecture](architecture.md) (12): Stack, state, the tick loop, the map, rendering and the art pipeline.
+- [Architecture](architecture.md) (13): Stack, state, the tick loop, the map, rendering and the art pipeline.
 - [Pacing](pacing.md) (5): The pace the economy is tuned for, and the bot simulation that checks it.
 - [Ops](ops.md) (5): Commands, CI, the pacing guard, season resets and the E2E test account.
 - [Known issues](known-issues.md): open code-side findings
