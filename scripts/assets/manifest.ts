@@ -16,6 +16,7 @@ import { MERCHANT_PORTRAIT } from '../../src/config/npcPortraits';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
 import { AVATARS } from '../../src/catalog/avatars';
+import { GUIDE_SPRITE, GUIDE_TALK_SHEET } from '../../src/catalog/tutorial';
 import { BIOME_ART } from '../../src/config/biomeArt';
 import { ITEMS } from '../../src/catalog/items';
 import { RESOURCE_ART, resourceArtUrl } from '../../src/catalog/resourceArt';
@@ -451,6 +452,16 @@ export const buildManifest = (): AssetEntry[] => {
 				status: 'reuse',
 				source: 'new_assets/achievements',
 			});
+	// The tutorial guide, Brother Alder: his one sprite (a cut from the reuse pool) and the two-frame talking sheet drawn from it by scripts/guide-sprite.ts
+	add({
+		name: 'guide_brother_alder_talk',
+		category: 'portraits',
+		subcategory: 'tutorial guide',
+		src: GUIDE_TALK_SHEET,
+		status: 'used',
+		usedBy: ['tutorial:guide'],
+		source: 'scripts/guide-sprite.ts',
+	});
 	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'biomes')))
 		if (f.endsWith('.png')) {
 			const name = basename(f, '.png');
@@ -468,6 +479,18 @@ export const buildManifest = (): AssetEntry[] => {
 		}
 	for (const f of walk(join(PUBLIC, 'pixel', 'reuse'))) {
 		const kind = relative(join(PUBLIC, 'pixel', 'reuse'), f).split(sep)[0];
+		if (url(f) === GUIDE_SPRITE) {
+			add({
+				name: 'guide_brother_alder',
+				category: 'portraits',
+				subcategory: 'tutorial guide',
+				src: url(f),
+				status: 'used',
+				usedBy: ['tutorial:guide'],
+				source: 'public/pixel/reuse',
+			});
+			continue;
+		}
 		add({
 			name: `reuse_${snake(kind)}_${snake(basename(f))
 				.replace(/^sprite_fusion_/, 'sf_')

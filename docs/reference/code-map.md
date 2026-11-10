@@ -269,7 +269,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/tutorial/**
 
 - [`FocusLayer.tsx`](../../src/components/game/tutorial/FocusLayer.tsx) — ~ Measures every element that carries `data-tutorial="<target>"` on every animation frame; the state changes only when something moved.
-- [`GuideBubble.tsx`](../../src/components/game/tutorial/GuideBubble.tsx) — ~ "2 / 3" under the text (the intro's pages)
+- [`GuideBubble.tsx`](../../src/components/game/tutorial/GuideBubble.tsx) — ~ The text of a bubble typed out letter by letter.
 - [`TutorialGuide.tsx`](../../src/components/game/tutorial/TutorialGuide.tsx) — ~ Brother Alder, the tutorial guide.
 
 **src/components/landing/**
@@ -482,9 +482,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`engine.ts`](../../src/lib/tutorial/engine.ts) — ~ Per account, stored in the ledger's `stats.tutorial`.
 - [`facts.ts`](../../src/lib/tutorial/facts.ts) — ~ What the guide counts itself (events the state does not keep):
 - [`geometry.ts`](../../src/lib/tutorial/geometry.ts) — The focus layer's maths, pure: a dim over the whole screen with transparent cut-outs around the target element(s). The layer is one full-screen
-- [`live.ts`](../../src/lib/tutorial/live.ts) — ~ Whether Brother Alder is on at all.
+- [`live.ts`](../../src/lib/tutorial/live.ts) — ~ The build's environment, read once (`process.env.X` is written out literally so Next inlines it into the browser bundle).
 - [`numbers.ts`](../../src/lib/tutorial/numbers.ts) — ~ "30 minutes", "2 hours", "1.5 days":
 - [`progress.ts`](../../src/lib/tutorial/progress.ts) — ~ Reads the stored `stats.tutorial` (or an answer from the server) back:
+- [`typewriter.ts`](../../src/lib/tutorial/typewriter.ts) — Characters per second the bubble types at (the owner's 25 to 35)
 
 **src/lib/**
 
@@ -588,6 +589,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`docs-reference.ts`](../../scripts/docs-reference.ts) — Builds docs/reference from the JSDoc in the code (the single source of truth for how the game works).
 - [`fight-sim.ts`](../../scripts/fight-sim.ts) — Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
+- [`guide-sprite.ts`](../../scripts/guide-sprite.ts) — Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 
 **scripts/lib/**
@@ -786,6 +788,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
+- [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)

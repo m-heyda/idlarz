@@ -34,8 +34,8 @@ One name per picture, grouped by what it is. Biomes, roads, terrain atlases and 
 | [Resources](resources.md) | 98 | 40 | 0 |
 | [Map details](map-details.md) | 443 | 0 | 443 |
 | [UI](ui.md) | 102 | 72 | 21 |
-| [Portraits](portraits.md) | 30 | 16 | 14 |
+| [Portraits](portraits.md) | 32 | 18 | 14 |
 | [Biomes](biomes.md) | 20 | 5 | 15 |
-| [Unsorted cuts](unsorted.md) | 7 | 0 | 7 |
+| [Unsorted cuts](unsorted.md) | 6 | 0 | 6 |
 
 [Sounds](sounds.md): UI and game sound effects (the game's own plus the CC0 Kenney packs in `public/sfx/`), with lengths.
