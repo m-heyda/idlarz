@@ -71,7 +71,7 @@ export const PlayerCard: React.FC = () => {
 				<span className='pixel-avatar-orb'>
 					<LevelOrb level={level.level} scale={0.95} className={levelUpActive ? 'animate-pulse-ring' : undefined} />
 				</span>
-				<NotifyDot show={attention.any} label='Something needs your attention' />
+				<NotifyDot show={attention.stats} label='Unspent stat points' />
 			</span>
 			<HeaderTip align='start' width={200}>
 				<div className='px-tip-title'>{playerName}</div>
@@ -83,14 +83,9 @@ export const PlayerCard: React.FC = () => {
 					{needed > 0 ? `XP ${formatNumber(into)} / ${formatNumber(needed)}` : 'Max level'}
 					<span className='px-tip-muted'> ({formatNumber(xp)} in total)</span>
 				</div>
-				{(attention.stats || attention.farm) && (
-					<div className='pt-1 mt-1 border-t px-rule space-y-1 text-xs text-[#f0d27a]'>
-						{attention.stats && (
-							<div>
-								{availablePoints} unspent stat point{availablePoints === 1 ? '' : 's'}
-							</div>
-						)}
-						{attention.farm && <div>A farm purchase is affordable</div>}
+				{attention.stats && (
+					<div className='pt-1 mt-1 border-t px-rule text-xs text-[#f0d27a]'>
+						{availablePoints} unspent stat point{availablePoints === 1 ? '' : 's'}
 					</div>
 				)}
 				<div className='px-tip-muted text-xs mt-1'>Click to open the character screen.</div>
@@ -104,7 +99,7 @@ const WINDOW_BUTTONS: { id: WinId; label: string; icon: PixelIconName }[] = [
 	{ id: 'merchant', label: 'Merchant', icon: 'menu_merchant' },
 	{ id: 'farm', label: 'Farm', icon: 'menu_farm' },
 	{ id: 'crafting', label: 'Crafting', icon: 'menu_crafting' },
-	{ id: 'achievements', label: 'Achievements', icon: 'diamond' },
+	{ id: 'achievements', label: 'Achievements', icon: 'menu_achievements' },
 ];
 
 /** One button per window (the character screen is the avatar): each opens (or, when it is the front one, closes) its window; several can be open together. */

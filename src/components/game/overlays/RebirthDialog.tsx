@@ -11,7 +11,8 @@ import { castleLevelOf } from '@/lib/castleWard';
 import { formatHeaderAmount, formatNumber, formatPercent } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { askServerRebirth } from '@/lib/serverRebirth';
-import { rebirthUnlockIntro, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
+import { rebirthRunSummary, rebirthUnlockIntro, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
+import { useBestiaryStore } from '@/stores/bestiaryStore';
 import PixelModal from '../PixelModal';
 import RebirthUnlockModal from './RebirthUnlockModal';
 import PixelIcon from '../PixelIcon';
@@ -50,7 +51,8 @@ const RebirthDialog: React.FC = () => {
 	const buyEmberUpgrade = useGameStore((state) => state.buyEmberUpgrade);
 	const [confirming, setConfirming] = useState(false);
 	const [asking, setAsking] = useState(false);
-	const [intro, setIntro] = useState<RebirthUnlockIntro | null>(null); // the biome the rebirth just unlocked, shown before the dialog closes
+	// what the rebirth just did (the Embers, the run's numbers and anything it unlocked), shown on the result screen before the dialog closes
+	const [result, setResult] = useState<{ run: RebirthRunSummary; intro: RebirthUnlockIntro | null } | null>(null);
 	const showToast = useUiStore((state) => state.showToast);
 
 	if (!open) return null;
@@ -67,7 +69,7 @@ const RebirthDialog: React.FC = () => {
 
 	const handleClose = () => {
 		setConfirming(false);
-		setIntro(null);
+		setResult(null);
 		close();
 	};
 
@@ -82,20 +84,29 @@ const RebirthDialog: React.FC = () => {
 				showToast('The server does not see your rebirth yet. Give the game a few seconds to save, then try again.');
 				return;
 			}
+			// what the run had reached, read before the rebirth wipes it
+			const before = useGameStore.getState();
+			const ran = {
+				ownedTiles: economyTiles(before.tiles, before.freeTiles),
+				castleLevel: castleLevelOf(before.tiles),
+				level: before.level.level,
+				playSeconds: before.playSeconds,
+				rates: before.resourceRates as unknown as Record<string, number>,
+				kills: Object.values(useBestiaryStore.getState().kills).reduce((sum, n) => sum + n, 0),
+				before: before.prestige,
+			};
 			if (rebirth(answer.status === 'ok' ? answer.gain : undefined)) {
 				audioManager.playSound('fanfare');
-				const unlocked = rebirthUnlockIntro(useGameStore.getState().prestige.rebirths);
-				if (unlocked) {
-					setConfirming(false);
-					setIntro(unlocked);
-				} else handleClose();
+				const after = useGameStore.getState().prestige;
+				setConfirming(false);
+				setResult({ run: rebirthRunSummary({ ...ran, after }), intro: rebirthUnlockIntro(after.rebirths) });
 			}
 		} finally {
 			setAsking(false);
 		}
 	};
 
-	if (intro) return <RebirthUnlockModal intro={intro} onClose={handleClose} />;
+	if (result) return <RebirthUnlockModal run={result.run} intro={result.intro} onClose={handleClose} />;
 
 	const Check: React.FC<{ ok: boolean; children: React.ReactNode }> = ({ ok, children }) => (
 		<div className={ok ? 'text-green-400' : 'text-red-400'}>

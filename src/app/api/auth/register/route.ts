@@ -1,5 +1,5 @@
 import { createSupabaseServer } from '@/lib/supabase/server';
-import { checkAvatar, checkCredentials, checkProfile } from '@/lib/authValidation';
+import { checkCreationAvatar, checkCredentials, checkProfile } from '@/lib/authValidation';
 import { GAME_EPOCH } from '@/config/epoch';
 import { adminConfigured, createSupabaseAdmin } from '@/lib/supabase/admin';
 import { fail, guardConfigured, isOutage, json, readBody, unavailable } from '@/lib/authRoute';
@@ -20,7 +20,7 @@ const nameTaken = async (name: string): Promise<boolean> => {
 /**
  * Creates the account, signs the player in (Confirm email must be off in Supabase, otherwise there is no session)
  * and writes their profile row: reserved name, class and avatar, so a new player skips the "new chapter" screen (IDL-77). The name is checked for a holder
- * BEFORE the account is created (409 `nameTaken`, nothing made), and the avatar has to be a starter (a new account has earned nothing yet; `checkAvatar`). If only the profile write fails the account still exists: the response carries
+ * BEFORE the account is created (409 `nameTaken`, nothing made), and the avatar has to be one of the two starters of the chosen class (a new account has earned nothing yet; `checkCreationAvatar`). If only the profile write fails the account still exists: the response carries
  * `profile: null` and the client asks for name and hero again through /api/auth/profile.
  */
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 	if (!credentials.ok) return fail(credentials.error, 400);
 	const profileInput = checkProfile(body);
 	if (!profileInput.ok) return fail(profileInput.error, 400);
-	const avatar = checkAvatar(profileInput.value.avatarId, []);
+	const avatar = checkCreationAvatar(profileInput.value.avatarId, profileInput.value.playerClass, []);
 	if (!avatar.ok) return fail(avatar.error, 400);
 	try {
 		if (adminConfigured() && (await nameTaken(profileInput.value.characterName)))

@@ -67,7 +67,7 @@ const GameWindows: React.FC = () => {
 				</PixelWindow>
 			)}
 			{open.includes('achievements') && (
-				<PixelWindow id='achievements' title='Achievements' icon={<PixelIcon name='diamond' alt='' />} width={560} height={620}>
+				<PixelWindow id='achievements' title='Achievements' icon={<PixelIcon name='menu_achievements' alt='' scale={0.5} />} width={560} height={620}>
 					<WindowErrorBoundary name='Achievements'>
 						<AchievementsOverlay />
 					</WindowErrorBoundary>

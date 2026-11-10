@@ -1179,7 +1179,7 @@ totals[f] = min(PERK_CAPS[f], totals[f])    for the five families, nothing else 
 
 ### `aggregateStats` <small>function</small>
 
-Source: [`src/lib/inventory.ts:242`](../../src/lib/inventory.ts)
+Source: [`src/lib/inventory.ts:243`](../../src/lib/inventory.ts)
 
 The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families
 (income, XP, kill reward, click, damage) are capped by [`capPerks`](economy.md#capperks). The server reads gear through this too, so both sides agree.

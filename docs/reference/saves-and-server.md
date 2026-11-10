@@ -540,7 +540,7 @@ paid[r] = floor(rate[r] x elapsed x efficiency)                    efficiency = 
 
 ### `ensureSeasonReset` <small>function</small>
 
-Source: [`src/lib/offline/season.ts:33`](../../src/lib/offline/season.ts)
+Source: [`src/lib/offline/season.ts:53`](../../src/lib/offline/season.ts)
 
 Resets the player's game when a season reset happened that their ledger does not know about. Returns the marker (for the browser, which
 drops a local save older than it) and whether a reset was done now. A failure to read the marker never blocks a login.

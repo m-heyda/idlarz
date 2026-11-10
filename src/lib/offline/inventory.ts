@@ -94,14 +94,14 @@ export const inventoryFromCore = (core: Core): Inventory => {
 };
 
 /** The inventory a rebirth leaves: the starter kit (see `rebirthKit`); only the auto-sell filter, a setting, carries over. A newer `ver`, so the browser takes it. */
-export const rebirthInventory = (before: Inventory, merchantUpgrades: unknown, prestige?: unknown): Inventory => {
+export const rebirthInventory = (before: Inventory, merchantUpgrades: unknown, prestige?: unknown, playerClass?: unknown): Inventory => {
 	const packrat = packratFor(before, merchantUpgrades);
 	const beltSlots = beltSlotsFor(before);
 	return {
 		ver: before.ver + 1,
 		packrat,
 		...(beltSlots > 0 ? { beltSlots } : {}),
-		...rebirthKit(packrat > 0 ? { packrat } : undefined, prestigeOf(prestige), beltSlots),
+		...rebirthKit(packrat > 0 ? { packrat } : undefined, prestigeOf(prestige), beltSlots, typeof playerClass === 'string' ? playerClass : undefined),
 		autoSellUpTo: before.autoSellUpTo,
 	};
 };

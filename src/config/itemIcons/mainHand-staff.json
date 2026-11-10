@@ -1,4 +1,5 @@
 [
+	{"icon": "item_wooden_staff", "item": "wooden_staff", "file": null, "slot": "mainHand", "weapon": "staff", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py (class starter weapon)"},
 	{"icon": "art_amethyst_spire", "item": "amethyst_spire", "file": "legendary/amethyst_spire", "slot": "mainHand", "weapon": "staff", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "item_oak_staff", "item": "oak_staff", "file": null, "slot": "mainHand", "weapon": "staff", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_obsidian_staff", "item": "obsidian_staff", "file": null, "slot": "mainHand", "weapon": "staff", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},

@@ -51,16 +51,16 @@ const BASE_ICON_SIZES = {
 	diamond: [40, 40],
 	// menu buttons + badges
 	menu_character: [40, 40],
-	menu_settings: [40, 40],
 	menu_main: [40, 40],
 	menu_stats: [40, 40],
-	// Sprite Fusion menu buttons, 64x64 on a stone slab (scripts/pixel/sprites_menu_art.py). The header scales them down until the menu is reworked; achievements, glossary, gems_pouch and bag_scroll are not wired yet
+	// Sprite Fusion menu buttons, 64x64 on a stone slab (scripts/pixel/sprites_menu_art.py). The header scales them down until the menu is reworked; achievements and settings are wired (header buttons, the Settings dialog); glossary, gems_pouch and bag_scroll are not wired yet
 	menu_equipment: [64, 64],
 	menu_merchant: [64, 64],
 	menu_farm: [64, 64],
 	menu_crafting: [64, 64],
 	menu_legacy: [64, 64],
 	menu_achievements: [64, 64],
+	menu_settings: [64, 64],
 	menu_glossary: [64, 64],
 	menu_gems_pouch: [64, 64],
 	menu_bag_scroll: [64, 64],

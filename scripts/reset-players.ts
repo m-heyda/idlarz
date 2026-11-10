@@ -35,6 +35,7 @@
  *   npm run reset-players -- --yes --purge-history   only delete save_history; default keeps it
  *   npm run reset-players -- --yes --no-backup       skip the JSON backup (not recommended)
  *   npm run reset-players -- --yes --reset-gems      the gems go back to the starting amount too (the test account uses this, see scripts/reset-test-account.ts)
+ *   npm run reset-players -- --yes --reset-stats     also clears the lifetime counters (`player_ledger.stats`: kills, discovered monsters, tutorial progress, earned achievements) and `player_achievements`; the test account uses this
  *
  * Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (read from the environment or from .env.local).
  *
@@ -54,7 +55,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import { newLedger, resetLedger } from '../src/lib/offline/ledger';
-import { writeLastReset } from '../src/lib/offline/season';
+import { writeLastReset, writePlayerReset } from '../src/lib/offline/season';
 import { STARTING_GEMS } from '../src/config/economy';
 
 const args = process.argv.slice(2);
@@ -68,6 +69,7 @@ const hard = flag('--hard');
 const purgeHistory = flag('--purge-history') || hard;
 const backup = !flag('--no-backup');
 const resetGems = flag('--reset-gems');
+const resetStats = flag('--reset-stats');
 
 for (const file of ['.env.local', '.env']) {
 	try {
@@ -175,10 +177,17 @@ const main = async () => {
 			last_result: null,
 			combat: null,
 			inv: null,
+			...(resetStats ? { stats: null } : {}),
 			updated_at: new Date(now).toISOString(),
 		};
 		const ledgerWrite = old ? await db.from('player_ledger').update(row).eq('user_id', id) : await db.from('player_ledger').insert({ user_id: id, ...row });
 		fail(`ledger ${id}`, ledgerWrite.error);
+
+		if (resetStats) {
+			// the achievements table mirrors `stats.achievements`: a player with fresh counters has earned nothing
+			const achievementsDelete = await db.from('player_achievements').delete().eq('user_id', id);
+			fail(`achievements ${id}`, achievementsDelete.error);
+		}
 
 		// 2. the save: deleting it cascades to player_worlds and player_stats; the next login starts a new game. --hard deletes those rows explicitly as well
 		const saveDelete = await db.from('player_saves').delete().eq('user_id', id);
@@ -198,6 +207,8 @@ const main = async () => {
 			const historyDelete = await db.from('save_history').delete().eq('user_id', id);
 			fail(`history ${id}`, historyDelete.error);
 		}
+		// a reset of named players (not the whole season) leaves no global marker: this one tells the player's browser to drop its copy of the old game
+		if (users.length) await writePlayerReset(db, id, now);
 		done++;
 	}
 
@@ -221,7 +232,11 @@ const main = async () => {
 	console.log(
 		`Reset ${done} player(s). Names and classes kept, gems ${resetGems ? `reset to ${STARTING_GEMS}` : 'kept'}.${purgeHistory ? ' save_history purged.' : ' save_history kept (rollback copies).'} Check passed: no saves left, ledgers anchored at the reset.`,
 	);
-	console.log('Reminder: a browser that still holds the old game locally must choose "New game" in the start hub.');
+	console.log(
+		users.length
+			? 'The browser of each reset player drops its copy of the old game at the next sign-in (a per-player marker was written).'
+			: 'A browser that still holds the old game locally drops it at the next sign-in (the season marker).',
+	);
 };
 
 main().catch((e) => {

@@ -26,7 +26,7 @@ const SettingsDialog: React.FC = () => {
 	if (!open) return null;
 
 	return (
-		<PixelModal title='Settings' size='sm' icon={<PixelIcon name='menu_settings' alt='' />} onClose={close}>
+		<PixelModal title='Settings' size='sm' icon={<PixelIcon name='menu_settings' alt='' scale={0.5} />} onClose={close}>
 			<Row label='Sound effects'>
 				<button className={`px-btn px-btn-sm ${soundEnabled ? '' : 'px-btn-gray'}`} onClick={() => setSoundEnabled(!soundEnabled)} aria-pressed={soundEnabled}>
 					{soundEnabled ? 'On' : 'Off'}

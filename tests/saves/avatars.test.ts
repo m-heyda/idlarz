@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AVATARS, CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS, resolveAvatar, unlockedAvatarIds } from '../../src/catalog/avatars';
+import { AVATARS, CLASS_AVATARS, CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS, resolveAvatar, unlockedAvatarIds } from '../../src/catalog/avatars';
 import { PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
-import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
+import { checkAvatar, checkCreationAvatar, checkProfile } from '../../src/lib/authValidation';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -64,4 +64,21 @@ test('every class has a default avatar that is a starter; a null avatar resolves
 test('a stored id is still validated by the server: forged or locked ids are refused whatever the class', () => {
 	assert.equal(checkAvatar('boss_slayer', []).ok, false);
 	assert.equal(checkAvatar('knight_of_doom', []).ok, false);
+});
+
+test('each class owns two starters: together they cover all 8 once, and the default is the first of the pair', () => {
+	const owned = PLAYER_CLASS_ORDER.flatMap((id) => [...CLASS_AVATARS[id]]);
+	assert.equal(owned.length, 8);
+	assert.deepEqual([...owned].sort(), [...STARTER_AVATAR_IDS].sort(), 'every starter belongs to exactly one class');
+	for (const id of PLAYER_CLASS_ORDER) assert.equal(CLASS_DEFAULT_AVATAR[id], CLASS_AVATARS[id][0]);
+});
+
+test("at sign-up an avatar must be one of the chosen class's two (an earned one passes with any class)", () => {
+	assert.deepEqual(checkCreationAvatar('knight', 'warrior', []), { ok: true, value: 'knight' });
+	assert.deepEqual(checkCreationAvatar('miner', 'warrior', []), { ok: true, value: 'miner' });
+	assert.equal(checkCreationAvatar('druid', 'warrior', []).ok, false, "a Mage's starter is refused for a Warrior");
+	assert.equal(checkCreationAvatar('boss_slayer', 'mage', []).ok, false, 'still locked');
+	assert.deepEqual(checkCreationAvatar('boss_slayer', 'mage', ['boss_auroch']), { ok: true, value: 'boss_slayer' });
+	assert.deepEqual(checkCreationAvatar(null, 'ranger', []), { ok: true, value: null });
+	assert.equal(checkCreationAvatar('nope', 'ranger', []).ok, false);
 });

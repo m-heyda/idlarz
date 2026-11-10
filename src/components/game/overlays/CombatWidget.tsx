@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { formatCompact } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { monsterNameOf } from '@/stores/bestiaryStore';
 import { useRewardPendingStore } from '@/stores/rewardPendingStore';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILL_IDS } from '@/catalog/skills';
@@ -46,7 +47,7 @@ const QueueChips: React.FC<{ queue: { n: number; type: MonsterType; level: numbe
 	return (
 		<span
 			className='combat-queue-chips'
-			title={`Next in line (${queue.length}/${max}): ${queue.map((q) => monsterDef(q.type).label).join(', ')}`}
+			title={`Next in line (${queue.length}/${max}): ${queue.map((q) => monsterNameOf(q.type, monsterDef(q.type).label)).join(', ')}`}
 			aria-label={`${queue.length} monsters queued`}
 		>
 			{shown.map((q, i) => (
@@ -210,8 +211,12 @@ const CombatWidget: React.FC = () => {
 				<button
 					className='combat-icon'
 					data-resting='true'
-					onClick={() => useUiStore.getState().showToast(`Resting before the next fight (${monsterDef(next.type).label}), about ${wait}. It starts by itself.`)}
-					title={`Resting before the next fight against the ${monsterDef(next.type).label} (about ${wait})`}
+					onClick={() =>
+						useUiStore
+							.getState()
+							.showToast(`Resting before the next fight (${monsterNameOf(next.type, monsterDef(next.type).label)}), about ${wait}. It starts by itself.`)
+					}
+					title={`Resting before the next fight against the ${monsterNameOf(next.type, monsterDef(next.type).label)} (about ${wait})`}
 					aria-label='Resting before the next queued fight'
 				>
 					<span className='combat-icon-art' aria-hidden>
@@ -312,7 +317,7 @@ const CombatWidget: React.FC = () => {
 			queue={combat.queue}
 			queueMax={combat.queueMax}
 			restSec={!fight && restLeft !== null && combat.queue.length > 0 ? restLeft : null}
-			restLabel={combat.queue[0] ? monsterDef(combat.queue[0].type).label : undefined}
+			restLabel={combat.queue[0] ? monsterNameOf(combat.queue[0].type, monsterDef(combat.queue[0].type).label) : undefined}
 			onUnqueue={unqueueMonster}
 			onSkill={requestSkill}
 			onPotion={requestPotion}

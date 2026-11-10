@@ -577,6 +577,8 @@ LADDER_ALIAS = {
     'bound_scraps': 'apprentice_tome',
     'iron_dagger': 'steel_dagger', 'iron_axe': 'battle_axe', 'iron_spear': 'steel_spear',
     'twig_bow': 'hunting_bow', 'yew_bow': 'recurve_bow', 'walking_stick': 'oak_staff', 'twig_wand': 'apprentice_wand',
+    # the class starter weapons (catalog STARTER_EQUIPMENT_BY_CLASS): a Ranger's bow and a Mage's staff, the picture of the first-grade ones
+    'wooden_bow': 'hunting_bow', 'wooden_staff': 'oak_staff',
 }
 LADDER_DRAWN = {
     'hide_primer': lambda: _tome('leather', 'bark', 'linen', 'moss', 'bark', glints=()),

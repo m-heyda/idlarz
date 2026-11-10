@@ -270,7 +270,8 @@ export const acceptSave = async (
 	const rebirthed = !!(current && !newGame && state.prestige.rebirths > current.summary.rebirths);
 	// ... unless the server already did it when it ran the rebirth (`/api/rebirth`): the wipe happens once, and what was picked up since stays
 	const serverWiped = ledger?.inv?.rebirth?.to === state.prestige.rebirths;
-	const inventory = ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades, state.prestige) : (ledger?.inv ?? null);
+	const inventory =
+		ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades, state.prestige, state.playerClass) : (ledger?.inv ?? null);
 	if (inventory && !newGame) state = stampInventory(state, inventory);
 	let summary = summarize(state);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;

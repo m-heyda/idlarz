@@ -149,7 +149,7 @@ const GameDebug: React.FC = () => {
 		return (
 			<div className='fixed bottom-4 left-16 z-40'>
 				<div className='pixel-slot' title='Admin tools (dev)' role='button' onClick={() => setPref('adminCollapsed', false)}>
-					<PixelIcon name='menu_settings' alt='Admin tools' scale={0.8} />
+					<PixelIcon name='menu_settings' alt='Admin tools' scale={0.5} />
 				</div>
 			</div>
 		);

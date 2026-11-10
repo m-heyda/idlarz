@@ -1,0 +1,342 @@
+/* Hero creation (sign-up, "Finish your hero", "A new chapter"): the name, four text tabs and a detail card: a large avatar portrait (3x native, never scaled down) beside the class's story and bonuses. */
+
+.hero-creator {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.hero-tabs {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 6px;
+	padding: 4px;
+	background: rgba(0, 0, 0, 0.45);
+	border: 1px solid #3a2c1c;
+}
+
+.hero-tab {
+	--accent: #e0a040;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1px;
+	padding: 9px 6px 11px;
+	font-family: inherit;
+	color: #f1e6c8;
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+	transition: background-color 0.15s;
+}
+
+.hero-tab::after {
+	content: '';
+	position: absolute;
+	left: 14%;
+	right: 14%;
+	bottom: 3px;
+	height: 3px;
+	background: var(--accent);
+	transform: scaleX(0);
+	transition: transform 0.18s steps(4);
+}
+
+.hero-tab:hover:not(:disabled) {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.hero-tab[data-selected='true'] {
+	background: color-mix(in srgb, var(--accent) 16%, rgba(14, 9, 5, 0.9));
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.hero-tab[data-selected='true']::after {
+	transform: scaleX(1);
+}
+
+.hero-tab-name {
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: var(--accent);
+	text-shadow: 1px 1px 0 #000;
+}
+
+.hero-tab-race {
+	font-size: 0.65rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #a89878;
+}
+
+.hero-detail {
+	--accent: #e0a040;
+	display: grid;
+	grid-template-columns: 228px minmax(0, 1fr);
+	gap: 22px;
+	padding: 18px;
+	background: radial-gradient(ellipse at 12% 10%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 55%),
+		linear-gradient(180deg, rgba(18, 12, 8, 0.92), rgba(8, 6, 5, 0.92));
+	border: 1px solid color-mix(in srgb, var(--accent) 40%, #3a2c1c);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.hero-face {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}
+
+.hero-portrait {
+	position: relative;
+	display: flex;
+	padding: 6px;
+	line-height: 0;
+	background: rgba(0, 0, 0, 0.5);
+	border: 2px solid var(--accent);
+	box-shadow:
+		0 0 0 2px #000,
+		0 0 26px color-mix(in srgb, var(--accent) 45%, transparent);
+	image-rendering: pixelated;
+	animation: hero-glow 3.2s ease-in-out infinite;
+}
+
+/* a soft halo that breathes behind the portrait */
+.hero-portrait::before {
+	content: '';
+	position: absolute;
+	inset: -22px;
+	z-index: -1;
+	background: radial-gradient(circle, color-mix(in srgb, var(--accent) 55%, transparent), transparent 68%);
+	opacity: 0.5;
+	filter: blur(6px);
+	animation: hero-halo 3.2s ease-in-out infinite;
+	pointer-events: none;
+}
+
+/* a light that sweeps across the frame now and then */
+.hero-portrait::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.16) 50%, transparent 62%);
+	background-size: 260% 100%;
+	background-position: 140% 0;
+	animation: hero-sheen 5.5s ease-in-out infinite;
+	pointer-events: none;
+}
+
+@keyframes hero-glow {
+	0%,
+	100% {
+		box-shadow:
+			0 0 0 2px #000,
+			0 0 18px color-mix(in srgb, var(--accent) 35%, transparent);
+	}
+	50% {
+		box-shadow:
+			0 0 0 2px #000,
+			0 0 38px color-mix(in srgb, var(--accent) 70%, transparent);
+	}
+}
+
+@keyframes hero-halo {
+	0%,
+	100% {
+		opacity: 0.35;
+		transform: scale(0.96);
+	}
+	50% {
+		opacity: 0.75;
+		transform: scale(1.04);
+	}
+}
+
+@keyframes hero-sheen {
+	0%,
+	55% {
+		background-position: 140% 0;
+	}
+	85%,
+	100% {
+		background-position: -40% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero-portrait,
+	.hero-portrait::before,
+	.hero-portrait::after {
+		animation: none;
+	}
+}
+
+.hero-face-name {
+	font-size: 1.05rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #fff1c8;
+	text-shadow: 1px 1px 0 #000;
+}
+
+.hero-face-bio {
+	min-height: 2.8em;
+	margin: -4px 0 0;
+	text-align: center;
+	font-size: 0.74rem;
+	font-style: italic;
+	line-height: 1.35;
+	color: #b8a880;
+}
+
+.hero-avatars {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.hero-avatar {
+	padding: 3px;
+	line-height: 0;
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.5);
+	border: 2px solid #4a3a28;
+	opacity: 0.72;
+	transition:
+		opacity 0.15s,
+		transform 0.12s steps(2);
+}
+
+.hero-avatar:hover:not(:disabled) {
+	opacity: 1;
+	transform: translateY(-2px);
+}
+
+.hero-avatar[data-selected='true'] {
+	opacity: 1;
+	border-color: var(--accent);
+	box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.hero-detail-body {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+}
+
+.hero-detail-title {
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, #3a2c1c);
+}
+
+.hero-detail-name {
+	font-size: 1.7rem;
+	font-weight: 700;
+	line-height: 1;
+	color: var(--accent);
+	text-shadow: 2px 2px 0 #000;
+}
+
+.hero-detail-race {
+	font-size: 0.72rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: #a89878;
+}
+
+.hero-detail-play {
+	margin: 0;
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	color: color-mix(in srgb, var(--accent) 80%, #fff);
+}
+
+.hero-detail-lore {
+	margin: 0;
+	font-size: 0.88rem;
+	line-height: 1.55;
+	color: #d8c8a0;
+}
+
+.hero-bonuses {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px 12px;
+	margin-top: auto;
+	padding-top: 10px;
+	border-top: 1px solid #2e2418;
+}
+
+.hero-bonus-label {
+	font-size: 0.62rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: #8e7e5e;
+}
+
+.hero-bonus-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.hero-bonus {
+	padding: 3px 10px;
+	font-size: 0.82rem;
+	font-weight: 700;
+	background: rgba(0, 0, 0, 0.55);
+	border: 1px solid #5a4630;
+}
+
+.hero-bonus[data-kind='combat'] {
+	color: #ffb09a;
+	border-color: #7a3a2c;
+	background: rgba(122, 58, 44, 0.18);
+}
+
+.hero-bonus[data-kind='economy'] {
+	color: #f0d27a;
+	border-color: #7a6226;
+	background: rgba(122, 98, 38, 0.18);
+}
+
+.hero-bonus[data-kind='empty'] {
+	color: #6a5a40;
+	border-style: dashed;
+	border-color: #4a3a28;
+	background: transparent;
+}
+
+/* before a class is chosen: the same card with a neutral accent and a black silhouette, so nothing moves when a class is picked */
+.hero-detail[data-empty='true'] {
+	--accent: #8a7a5a;
+}
+
+.hero-detail[data-empty='true'] .hero-detail-name {
+	color: #b8a880;
+}
+
+.hero-detail[data-empty='true'] .hero-detail-lore,
+.hero-detail[data-empty='true'] .hero-face-bio {
+	color: #8e7e5e;
+}
+
+.hero-detail[data-empty='true'] .hero-portrait {
+	animation-duration: 5s;
+}
+
+.hero-avatar:not(button) {
+	cursor: default;
+	opacity: 0.5;
+}

@@ -1,5 +1,5 @@
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config/playerClasses';
-import { avatarById, unlockedAvatarIds } from '@/catalog/avatars';
+import { avatarById, CLASS_AVATARS, unlockedAvatarIds } from '@/catalog/avatars';
 
 /** Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint. */
 export const CHARACTER_NAME_MAX = 9;
@@ -70,6 +70,21 @@ export const checkAvatar = (raw: unknown, earned: Iterable<string>): Checked<str
 	if (typeof raw !== 'string' || !avatarById(raw)) return { ok: false, error: 'Pick one of the avatars.' };
 	if (!unlockedAvatarIds(earned).includes(raw)) return { ok: false, error: 'That avatar is still locked.' };
 	return { ok: true, value: raw };
+};
+
+/**
+ * The avatar rule at sign-up and "Finish your hero": the plain `checkAvatar` rule, and a starter must be one of the two the chosen class owns ({@link CLASS_AVATARS}), so a Mage
+ * cannot sign up wearing the Knight. An earned unlockable passes with any class. `null` still means "none chosen".
+ *
+ * @category Progression/Avatars
+ * @order 5
+ */
+export const checkCreationAvatar = (raw: unknown, playerClass: PlayerClassId, earned: Iterable<string>): Checked<string | null> => {
+	const checked = checkAvatar(raw, earned);
+	if (!checked.ok || checked.value === null) return checked;
+	const avatar = avatarById(checked.value);
+	if (avatar?.kind === 'starter' && !CLASS_AVATARS[playerClass].includes(checked.value)) return { ok: false, error: 'That avatar belongs to another hero.' };
+	return checked;
 };
 
 export const checkProfile = (body: unknown): Checked<ProfileInput> => {

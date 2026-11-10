@@ -8,7 +8,7 @@ import PixelModal from './PixelModal';
 import PixelIcon from './PixelIcon';
 import AvatarArt from './AvatarArt';
 
-/** Four heroes to choose from; picking one applies at once (cosmetic for now, abilities come later). */
+/** Four heroes to choose from; picking one applies at once. Each class has its own passives (`CLASS_PASSIVES`), so the change is meant to be rare (it costs gems once that sink ships). */
 const ClassPickerDialog: React.FC = () => {
 	const open = useUiStore((state) => state.classDialogOpen);
 	const close = useUiStore((state) => state.closeClassDialog);
@@ -20,7 +20,7 @@ const ClassPickerDialog: React.FC = () => {
 
 	return (
 		<PixelModal title='Choose your hero' icon={<PixelIcon name='menu_character' alt='' />} size='md' onClose={close}>
-			<p className='text-[#a89878] text-sm mb-4 text-center'>Pick a look for {playerName}. Classes are cosmetic for now - their abilities come later.</p>
+			<p className='text-[#a89878] text-sm mb-4 text-center'>Pick the hero for {playerName}. Each hero has its own bonuses.</p>
 			<div className='class-grid'>
 				{PLAYER_CLASS_ORDER.map((id) => {
 					const info = PLAYER_CLASSES[id];

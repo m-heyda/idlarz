@@ -161,6 +161,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`AuthForm.tsx`](../../src/components/auth/AuthForm.tsx) — ~ Which form opens first.
 - [`AuthUnavailable.tsx`](../../src/components/auth/AuthUnavailable.tsx) — ~ An outage may pass on its own:
+- [`HeroCreator.tsx`](../../src/components/auth/HeroCreator.tsx) — ~ null:
 - [`NewChapterScreen.tsx`](../../src/components/auth/NewChapterScreen.tsx) — ~ The account's current hero:
 - [`SaveHub.tsx`](../../src/components/auth/SaveHub.tsx) — ~ local:
 - [`StartDialog.tsx`](../../src/components/auth/StartDialog.tsx) — ~ 'profile':
@@ -181,7 +182,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
 - [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ 'full' = the whole figure (56x80), 'bust' = head and shoulders (40x40)
-- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from; picking one applies at once (cosmetic for now, abilities come later).
+- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from; picking one applies at once.
 - [`CollapsibleSection.tsx`](../../src/components/game/CollapsibleSection.tsx) — ~ A titled block whose header toggles the body; the open/closed choice is remembered per `id` (localStorage).
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
@@ -203,7 +204,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
-- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ A monster's picture (public/pixel/enemies); `scale` 1 is the size it has on the map, bigger ones are for the fight window.
+- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`OrganizeButton.tsx`](../../src/components/game/OrganizeButton.tsx) — ~ Tidies the bag from the left:
@@ -258,7 +259,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ "Hours as a number":
 - [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ Rebirth and the Ember shop.
-- [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The small "what you unlocked" modal shown right after a rebirth:
+- [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
 - [`SaveMenuDialog.tsx`](../../src/components/game/overlays/SaveMenuDialog.tsx) — ~ Save & backup:
 - [`SettingsDialog.tsx`](../../src/components/game/overlays/SettingsDialog.tsx) — ~ Visible settings:
@@ -324,7 +325,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useCtrlSequence.ts`](../../src/hooks/useCtrlSequence.ts) — ~ Calls `onTrigger` when the Control key is pressed `count` times within `windowMs` (hidden menu shortcut).
 - [`useGlobalContextMenu.ts`](../../src/hooks/useGlobalContextMenu.ts) — ~ Takes over the right click for the whole page:
 - [`useHydration.ts`](../../src/hooks/useHydration.ts) — ~ True once the saved game has been loaded from the vault AND the splash has been shown for a moment.
-- [`useMenuAttention.ts`](../../src/hooks/useMenuAttention.ts) — ~ Which tabs of the main menu have something waiting:
+- [`useMenuAttention.ts`](../../src/hooks/useMenuAttention.ts) — ~ What in the header has something waiting:
 - [`useOfflineClaim.ts`](../../src/hooks/useOfflineClaim.ts) — ~ The game waits this long for the server before it starts anyway (a late answer is still applied when it arrives).
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
 - [`useSingleTab.ts`](../../src/hooks/useSingleTab.ts) — ~ Only one tab may run the game.
@@ -508,6 +509,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/stores/**
 
 - [`achievementStore.ts`](../../src/stores/achievementStore.ts) — ~ The achievements the server says the player has earned (an id list it sends with the spawn poll) and the toast when a request pays a new one.
+- [`bestiaryStore.ts`](../../src/stores/bestiaryStore.ts) — ~ The monsters the player has met (the server's `stats.seen`, sent with every online answer) and the kills per type (`stats.kills`).
 - [`craftStore.ts`](../../src/stores/craftStore.ts) — ~ One shared empty stock:
 
 **src/stores/game/**
@@ -711,6 +713,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleFinder.test.ts`](../../tests/economy/castleFinder.test.ts) — ~ A view whose screen centre is the world point (wx, wy) in tiles.
 - [`castleWard.test.ts`](../../tests/economy/castleWard.test.ts) — ~ Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3).
 - [`classPassives.test.ts`](../../tests/economy/classPassives.test.ts) — Class passives (IDL-70): one test per passive, the caps, and the proof that the class is the profile row's, not the upload's.
+- [`classStarterGear.test.ts`](../../tests/economy/classStarterGear.test.ts)
 - [`costOrder.test.ts`](../../tests/economy/costOrder.test.ts)
 - [`deepPockets.test.ts`](../../tests/economy/deepPockets.test.ts)
 - [`economy.test.ts`](../../tests/economy/economy.test.ts)
@@ -786,6 +789,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/server/**
 
 - [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
+- [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
@@ -793,6 +797,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.
 - [`offlineServer.test.ts`](../../tests/server/offlineServer.test.ts)
+- [`playerReset.test.ts`](../../tests/server/playerReset.test.ts) — ~ A tiny in-memory app_settings table behind the two calls season.ts makes
 - [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)
@@ -812,8 +817,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
+- [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
+- [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
 - [`tutorial.test.ts`](../../tests/ui/tutorial.test.ts)
 - [`uiActions.test.ts`](../../tests/ui/uiActions.test.ts)

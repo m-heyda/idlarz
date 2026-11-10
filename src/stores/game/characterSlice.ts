@@ -6,6 +6,8 @@ import { DEFAULT_PLAYER_NAME } from '@/config/character';
 import { calculateCombatStats, calculateLevel, reconcileCharacter } from '@/utils/game/character';
 import { calculateResourceRates } from '@/utils/game/income';
 import { gearIncomePct } from '@/lib/gearEconomy';
+import { maxHp, maxMana } from '@/lib/combat';
+import { starterEquipmentFor } from '@/config/itemCatalog';
 import type { CharacterStats } from '@/types/game';
 import { BASE_STATS, type GameGet, type GameSet } from './base';
 
@@ -67,7 +69,15 @@ export const createCharacterSlice = (set: GameSet, get: GameGet) => ({
 		const state = get();
 		const cleanName = name.trim().substring(0, 9);
 		if (state.playSeconds > 0 || state.playerName !== DEFAULT_PLAYER_NAME || !cleanName || !PLAYER_CLASSES[playerClass]) return false;
-		set({ playerName: cleanName, playerClass });
+		// a brand-new game starts with the gear that fits the class (a bow, a staff, or the sword and shield)
+		const equipment = starterEquipmentFor(playerClass);
+		set({
+			playerName: cleanName,
+			playerClass,
+			equipment,
+			playerHp: maxHp(state.characterStats, equipment),
+			playerMp: maxMana(state.characterStats, equipment, playerClass),
+		});
 		return true;
 	},
 });

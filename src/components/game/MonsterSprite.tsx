@@ -4,6 +4,7 @@ import { MONSTERS } from '@/config/combatConfig';
 import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import type { MonsterType } from '@/types/game';
+import { useIsDiscovered } from '@/stores/bestiaryStore';
 import MonsterArt from './MonsterArt';
 import '@/styles/Monsters.css';
 
@@ -27,14 +28,18 @@ const MonsterSprite: React.FC<{
 }> = ({ type, level, lucky = false, art, maxed = false, growth, intervalSec = 1800, queued = 0 }) => {
 	const wip = MONSTER_CATALOG.find((m) => m.id === (art ?? type));
 	const size = wip ? monsterArtSize(wip.id, wip.grade) : undefined;
+	const discovered = useIsDiscovered(type);
+	// the map lab's art preview is always known; a real monster of a type not fought yet hides what it is (name, boss glow, lucky tint) behind the "?"
+	const known = !!art || discovered;
 	const boss = wip ? wip.grade === 'boss' : MONSTERS[type].grade === 'boss';
+	const showBoss = boss && known;
 	return (
 		<span
 			className='tile-monster'
-			data-king={boss}
-			data-boss={boss}
-			data-lucky={lucky}
-			title={lucky ? 'A lucky monster: bigger rewards' : undefined}
+			data-king={showBoss}
+			data-boss={showBoss}
+			data-lucky={lucky && known}
+			title={lucky && known ? 'A lucky monster: bigger rewards' : undefined}
 			style={wip ? { width: size, height: size } : undefined}
 		>
 			{wip ? (
@@ -57,9 +62,9 @@ const MonsterSprite: React.FC<{
 					style={{ '--grow-left': `${growth.leftSec}s`, '--grow-from': growth.fraction, '--grow-total': `${intervalSec}s` } as React.CSSProperties}
 				/>
 			)}
-			<span className='tile-monster-tier' data-boss={boss} data-maxed={maxed} title={maxed ? 'Fully grown' : undefined}>
-				{boss ? '☠ ' : ''}
-				{lucky ? '★ ' : ''}
+			<span className='tile-monster-tier' data-boss={showBoss} data-maxed={maxed} title={maxed ? 'Fully grown' : undefined}>
+				{showBoss ? '☠ ' : ''}
+				{lucky && known ? '★ ' : ''}
 				{formatCompact(level)}
 			</span>
 		</span>

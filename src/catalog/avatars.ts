@@ -1,7 +1,8 @@
 import type { PlayerClassId } from '@/config/playerClasses';
 
 /**
- * Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual.
+ * Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each class **owns two starters** ({@link CLASS_AVATARS}):
+ * the creation screens offer a new hero the two of the class it picked, and the server refuses another class's starter at sign-up (`checkCreationAvatar`). Later, any starter can still be worn with any class (the Avatar window).
  * Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced
  * on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the
  * achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
@@ -25,45 +26,84 @@ export interface AvatarInfo {
 	how?: string;
 	/** The picture: file name (no extension) of a framed bust in `public/pixel/new_assets/heroes/` */
 	portrait: string;
+	/** One or two lines about this face (the creation screens and the Avatar window) */
+	bio: string;
 }
 
-const starter = (id: string, name: string, portrait: string): AvatarInfo => ({ id, name, kind: 'starter', portrait });
-const unlock = (id: string, name: string, unlockedBy: string, how: string, portrait: string): AvatarInfo => ({
+const starter = (id: string, name: string, portrait: string, bio: string): AvatarInfo => ({ id, name, kind: 'starter', portrait, bio });
+const unlock = (id: string, name: string, unlockedBy: string, how: string, portrait: string, bio: string): AvatarInfo => ({
 	id,
 	name,
 	kind: 'unlock',
 	unlockedBy,
 	how,
 	portrait,
+	bio,
 });
 
 export const AVATARS: readonly AvatarInfo[] = [
-	starter('knight', 'Knight', 'avatar_red_haired_knight'),
-	starter('druid', 'Druid', 'avatar_green_horned_elf'),
-	starter('scout', 'Scout', 'avatar_red_plume_lady'),
-	starter('scholar', 'Scholar', 'avatar_winged_helm_veteran'),
-	starter('miner', 'Miner', 'avatar_dwarf_knight_orange_eyes'),
-	starter('farmer', 'Farmer', 'avatar_chain_knight_woman'),
-	starter('bard', 'Bard', 'avatar_purple_elf_lady'),
-	starter('alchemist', 'Alchemist', 'avatar_blue_plume_knight'),
-	unlock('architect', 'Architect', 'castle_10', 'Raise the castle to level 10', 'avatar_gold_lion_knight'),
-	unlock('reborn', 'Reborn', 'first_rebirth', 'Rebirth for the first time', 'avatar_horned_scarred_woman'),
-	unlock('boss_slayer', 'Boss slayer', 'boss_auroch', 'Defeat The Great Auroch', 'avatar_horned_brute_dark'),
-	unlock('early_tester', 'Early tester', 'early_tester', 'Played before the new chapter', 'avatar_horned_chainmail'),
+	starter('knight', 'Knight', 'avatar_red_haired_knight', 'Red-haired and stubborn, sworn to the first banner they ever saw.'),
+	starter('druid', 'Druid', 'avatar_green_horned_elf', 'Speaks softly to the roots, and the roots answer.'),
+	starter('scout', 'Scout', 'avatar_red_plume_lady', 'Red plume, light step. First to the ridge, last to be seen.'),
+	starter('scholar', 'Scholar', 'avatar_winged_helm_veteran', 'Winged helm, long memory. Has read every ward before breaking one.'),
+	starter('miner', 'Miner', 'avatar_dwarf_knight_orange_eyes', 'Dwarf-trained and stone-hardened; has never met a wall they could not count.'),
+	starter('farmer', 'Farmer', 'avatar_chain_knight_woman', 'Ploughs by day, patrols by dusk: the quiet backbone of the realm.'),
+	starter('bard', 'Bard', 'avatar_purple_elf_lady', 'Carries a song for every victory and a few for the defeats.'),
+	starter('alchemist', 'Alchemist', 'avatar_blue_plume_knight', 'Blue-plumed and bright-eyed; trusts a steady hand and a tested flask.'),
+	unlock(
+		'architect',
+		'Architect',
+		'castle_10',
+		'Raise the castle to level 10',
+		'avatar_gold_lion_knight',
+		'Master of stone and ledger; the castle stands because they said so.',
+	),
+	unlock(
+		'reborn',
+		'Reborn',
+		'first_rebirth',
+		'Rebirth for the first time',
+		'avatar_horned_scarred_woman',
+		'Burned the realm down once and began again, wiser.',
+	),
+	unlock(
+		'boss_slayer',
+		'Boss slayer',
+		'boss_auroch',
+		'Defeat The Great Auroch',
+		'avatar_horned_brute_dark',
+		'Brought down the Great Auroch and kept the horn.',
+	),
+	unlock('early_tester', 'Early tester', 'early_tester', 'Played before the new chapter', 'avatar_horned_chainmail', 'Was here before the doors were open.'),
 ];
 
 /**
- * Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the "A new chapter" screen when the player picks that class
- * (until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.
+ * The two starter avatars each class owns. The creation screens (sign-up, "Finish your hero", "A new chapter") show a hero the two of the class it picked, and the server accepts
+ * only those at sign-up (`checkCreationAvatar`); every starter belongs to exactly one class. Afterwards the Avatar window lets the player wear any starter or earned avatar with any class.
+ * The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
  *
  * @category Progression/Avatars
  * @order 3
  */
+export const CLASS_AVATARS: Readonly<Record<PlayerClassId, readonly [string, string]>> = {
+	warrior: ['knight', 'miner'],
+	paladin: ['alchemist', 'scholar'],
+	ranger: ['scout', 'farmer'],
+	mage: ['druid', 'bard'],
+};
+
+/** The default avatar of a class (the first of its two): shown while `profiles.avatar_id` is null and preselected when a class is picked. */
 export const CLASS_DEFAULT_AVATAR: Readonly<Record<PlayerClassId, string>> = {
-	warrior: 'knight',
-	paladin: 'alchemist',
-	ranger: 'scout',
-	mage: 'druid',
+	warrior: CLASS_AVATARS.warrior[0],
+	paladin: CLASS_AVATARS.paladin[0],
+	ranger: CLASS_AVATARS.ranger[0],
+	mage: CLASS_AVATARS.mage[0],
+};
+
+/** The avatar the creation screens show for a class: the pick when it is one of the class's two (or an earned extra), otherwise the class's default; null while no class is chosen. */
+export const creatorAvatar = (playerClass: PlayerClassId | null, pick: string | null, earned: readonly string[] = []): string | null => {
+	if (!playerClass) return null;
+	return pick && (CLASS_AVATARS[playerClass].includes(pick) || earned.includes(pick)) ? pick : CLASS_DEFAULT_AVATAR[playerClass];
 };
 
 /** The avatar to show: the chosen one when it is in the catalog, otherwise the class default (never undefined). */

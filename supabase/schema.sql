@@ -275,7 +275,7 @@ revoke all on table public.player_achievements from anon, authenticated, public;
 grant select on public.player_achievements to authenticated;
 create policy "player_achievements_select_own" on public.player_achievements for select to authenticated using (user_id = (select auth.uid()));
 grant select, insert, update, delete on public.player_achievements to service_role;
-alter table public.player_ledger add column if not exists stats jsonb;    -- lifetime counters (null = not counted yet)
+alter table public.player_ledger add column if not exists stats jsonb;    -- lifetime counters (null = not counted yet); stats.seen (monster type -> first fight, epoch ms) and stats.kills (type -> count) are the bestiary data
 alter table public.player_ledger add column if not exists legacy jsonb;   -- Idol levels that survive a rebirth (null = none)
 
 -- ---- profiles_server_columns (migration profiles_server_columns, IDL-76): epoch and avatar_id are written by the server only --------------------

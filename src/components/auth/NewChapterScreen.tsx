@@ -1,15 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config/playerClasses';
+import type { PlayerClassId } from '@/config/playerClasses';
 import { GAME_TITLE } from '@/config/branding';
-import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { startChapter, fetchAvatars, type Profile } from '@/lib/authClient';
-import { CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS } from '@/catalog/avatars';
-import AvatarPicker from '@/components/game/AvatarPicker';
+import { STARTER_AVATAR_IDS } from '@/catalog/avatars';
 import PixelModal from '@/components/game/PixelModal';
-import PixelIcon from '@/components/game/PixelIcon';
-import '@/styles/Heroes.css';
+import HeroCreator from './HeroCreator';
+import { creatorAvatar } from '@/catalog/avatars';
 
 interface Props {
 	/** The account's current hero: the name and class start as they are, the player may change both (free, once, here) */
@@ -30,11 +28,13 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 	const [name, setName] = useState(profile.characterName);
 	const [playerClass, setPlayerClass] = useState<PlayerClassId>(profile.playerClass);
 	const [avatarPick, setAvatarPick] = useState<string | null>(profile.avatarId ?? null);
-	// until the player chooses one, the avatar is the default of the chosen class
-	const avatarId = avatarPick ?? CLASS_DEFAULT_AVATAR[playerClass];
 	const [unlocked, setUnlocked] = useState<readonly string[]>(STARTER_AVATAR_IDS);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	// the avatars an account has earned beyond the starters are extra choices next to the class's two
+	const earned = unlocked.filter((id) => !STARTER_AVATAR_IDS.includes(id));
+	// the kept avatar stays while it is one of the class's two or an earned one; otherwise the class's default
+	const avatarId = creatorAvatar(playerClass, avatarPick, earned) as string;
 	const ready = name.trim() !== '' && !busy;
 
 	useEffect(() => {
@@ -64,43 +64,19 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 						{GAME_TITLE} starts a new chapter. Your old game is archived and kept safe, and your realm begins again. Your account, your name and your gems stay
 						with you.
 					</p>
-					<input
-						type='text'
-						className='px-input'
-						placeholder={`Character name (${CHARACTER_NAME_MAX} chars max)`}
-						maxLength={CHARACTER_NAME_MAX}
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						aria-label='Character name'
+					<HeroCreator
+						name={name}
+						onName={setName}
+						playerClass={playerClass}
+						onClass={(id) => {
+							setPlayerClass(id);
+							setAvatarPick(null);
+						}}
+						avatarId={avatarId}
+						onAvatar={setAvatarPick}
+						earned={earned}
+						disabled={busy}
 					/>
-					<p className='text-[#a89878] text-sm text-center'>Choose your hero.</p>
-					<div className='class-grid' role='radiogroup' aria-label='Hero'>
-						{PLAYER_CLASS_ORDER.map((id) => {
-							const info = PLAYER_CLASSES[id];
-							const selected = id === playerClass;
-							return (
-								<button
-									key={id}
-									type='button'
-									role='radio'
-									aria-checked={selected}
-									className='class-card'
-									data-selected={selected}
-									style={{ '--accent': info.accent } as React.CSSProperties}
-									onClick={() => setPlayerClass(id)}
-								>
-									<span className='class-card-stage'>
-										<PixelIcon name={info.full} scale={2} alt={`${info.race} ${info.label}`} />
-									</span>
-									<span className='class-card-name'>{info.label}</span>
-									<span className='class-card-race'>{info.race}</span>
-									<span className='class-card-tag'>{selected ? 'Chosen' : 'Choose'}</span>
-								</button>
-							);
-						})}
-					</div>
-					<p className='text-[#a89878] text-sm text-center'>Choose your avatar.</p>
-					<AvatarPicker value={avatarId} unlocked={unlocked} onChange={setAvatarPick} />
 					{error && (
 						<p role='alert' className='text-sm text-center text-[#e07a6a]'>
 							{error}

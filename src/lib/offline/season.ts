@@ -6,6 +6,7 @@ import { startNewGame, type ServiceDeps } from '@/lib/offline/service';
 // (`reset_at`) says so. A game created after the marker is never touched.
 
 const KEY = 'last_reset';
+const PLAYER_KEY = 'player_reset:';
 
 /** When the last season reset happened (epoch ms), or null when there never was one. */
 export const readLastReset = async (db: SupabaseClient): Promise<number | null> => {
@@ -13,6 +14,25 @@ export const readLastReset = async (db: SupabaseClient): Promise<number | null> 
 	if (error) throw new Error(error.message);
 	const at = Date.parse((data?.value as { at?: string } | undefined)?.at ?? '');
 	return Number.isFinite(at) ? at : null;
+};
+
+/**
+ * When this one player was reset by hand (`reset-players --user`, the test account's `reset-test-account`), epoch ms, or null. Only those scripts write it, so a new
+ * game or a first upload never counts as a reset. The browser drops a local save older than the later of this and {@link readLastReset} and starts fresh, so a
+ * reset of one account does not leave the "this browser or the account?" choice in front of the old game.
+ */
+export const readPlayerReset = async (db: SupabaseClient, userId: string): Promise<number | null> => {
+	const { data, error } = await db.from('app_settings').select('value').eq('key', `${PLAYER_KEY}${userId}`).maybeSingle();
+	if (error) throw new Error(error.message);
+	const at = Date.parse((data?.value as { at?: string } | undefined)?.at ?? '');
+	return Number.isFinite(at) ? at : null;
+};
+
+/** Records the reset of one player (the reset scripts use it). */
+export const writePlayerReset = async (db: SupabaseClient, userId: string, atMs: number): Promise<void> => {
+	const at = new Date(atMs).toISOString();
+	const { error } = await db.from('app_settings').upsert({ key: `${PLAYER_KEY}${userId}`, value: { at }, updated_at: at });
+	if (error) throw new Error(error.message);
 };
 
 /** Records a season reset (the CLI and tests use it). */

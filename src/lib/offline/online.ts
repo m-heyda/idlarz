@@ -28,6 +28,7 @@ import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, Re
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 import { reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
+import { bestiaryOf } from '@/lib/offline/stats';
 import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
 
 // The server's side of play while the player is here: spawns, chests and fights. The server mints the tickets from its own clock, puts
@@ -68,6 +69,10 @@ const withAchievements = <T>(value: T, ledger: Ledger, fresh: AchievementUnlock[
 	return { ...value, ...gems, achievements: reportOf(ledger, fresh) };
 };
 
+/** The answer with the player's monster discoveries and kill counts attached (a few dozen small numbers; the browser shows silhouettes until a type is in `seen`). */
+const withBestiary = <T>(value: T, ledger: Ledger): T =>
+	typeof value === 'object' && value !== null ? { ...value, bestiary: bestiaryOf(ledger.stats) } : value;
+
 const onlineStep = async <T>(
 	deps: ServiceDeps,
 	userId: string,
@@ -97,7 +102,7 @@ const onlineStep = async <T>(
 		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
 		const settled = settleAchievements(out.ledger, stored.summary);
 		unlocked = settled.unlocked;
-		const value = withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements);
+		const value = withBestiary(withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements), settled.ledger);
 		// a poll (no key) keeps the record of the last keyed request: its answer may still have to be replayed for a retry
 		return {
 			ledger: { ...settled.ledger, anchorAt: nowMs, ...(key ? { lastKey: key, lastResult: value } : {}) },
@@ -300,7 +305,7 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 			return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, serverNowSec: ctx.nowSec } };
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = {
-			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige),
+			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige, ctx.stored.core.playerClass),
 			rebirth: { to: judged.to, gain: judged.gain },
 		};
 		return {

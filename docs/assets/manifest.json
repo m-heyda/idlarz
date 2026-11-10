@@ -1179,6 +1179,23 @@
 	},
 	{
 		"usedBy": [
+			"wooden_bow"
+		],
+		"name": "item_wooden_bow",
+		"category": "weapons",
+		"subcategory": "mainHand/bow",
+		"src": "/pixel/icons/item_wooden_bow.png",
+		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "bow",
+		"source": "itemIcons registry",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
 			"twig_bow"
 		],
 		"name": "item_twig_bow",
@@ -2824,6 +2841,23 @@
 		"subcategory": "mainHand/staff",
 		"src": "/pixel/icons/item_obsidian_staff.png",
 		"status": "used",
+		"slot": "mainHand",
+		"weaponType": "staff",
+		"source": "itemIcons registry",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"wooden_staff"
+		],
+		"name": "item_wooden_staff",
+		"category": "weapons",
+		"subcategory": "mainHand/staff",
+		"src": "/pixel/icons/item_wooden_staff.png",
+		"status": "planned",
 		"slot": "mainHand",
 		"weaponType": "staff",
 		"source": "itemIcons registry",
@@ -20607,12 +20641,15 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/overlays/GameWindows.tsx"
+		],
 		"name": "menu_achievements",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_achievements.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			64,
@@ -20781,8 +20818,8 @@
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			64,
+			64
 		]
 	},
 	{

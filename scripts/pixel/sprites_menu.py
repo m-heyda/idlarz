@@ -1,4 +1,4 @@
-"""Menu-button icons added for Settings (steel cog) and Legacy / Rebirth (golden sun round a purple orb)."""
+"""Built menu-button icons: the main menu journal, the stats bars and the glass vial (Settings and Achievements are supplied art, see sprites_menu_art.py)."""
 import math
 from render3d import Scene, Prim, rot, I3, place
 from materials import MATS
@@ -8,31 +8,6 @@ import fx
 def _facing(sc, prim):
     """Sprites that face the camera: the same -45 degree yaw the other menu icons use."""
     sc.add(place(prim, -45))
-
-
-# ----------------------------------------------------------------- settings: an upright steel cog with a gold hub
-def gear():
-    sc = Scene(MATS, scale=13.0, origin=(20, 29))
-    cz = 0.0
-    R_BODY, R_TOOTH, TEETH = 0.82, 1.0, 8
-
-    def A(kind, c, size, mat, R=I3, tex=None, seed=0):
-        _facing(sc, Prim(kind, c, size, mat, R, tex, seed))
-
-    A('cyl', (0, 0, cz), (R_BODY, 0.26), 'steel', rot(90, 0, 0), None, 1)                    # body
-    for k in range(TEETH):
-        a = 2 * math.pi * k / TEETH
-        A('box', (R_TOOTH * 0.93 * math.cos(a), 0, cz + R_TOOTH * 0.93 * math.sin(a)),
-          (0.2, 0.26, 0.2), 'steel', rot(0, -math.degrees(a), 0), None, 3 + k)              # teeth
-    A('cyl', (0, -0.1, cz), (0.62, 0.2), 'steel', rot(90, 0, 0), None, 20)                   # raised face
-    A('cyl', (0, -0.3, cz), (0.34, 0.06), 'dark', rot(90, 0, 0))                             # socket
-    A('cyl', (0, -0.36, cz), (0.22, 0.07), 'gold', rot(90, 0, 0))                            # gold hub
-    for k in range(4):                                                                         # rivets
-        a = math.pi / 4 + k * math.pi / 2
-        A('ell', (0.47 * math.cos(a), -0.3, cz + 0.47 * math.sin(a)), (0.07, 0.05, 0.07), 'gold')
-    img = sc.render()
-    fx.glint(img, 13, 11, 1)
-    return img
 
 
 # ----------------------------------------------------------------- main menu: a maroon journal with a gold sigil and an orb
@@ -88,4 +63,4 @@ def vial():
     return img
 
 
-SPRITES = {'menu_settings': gear, 'menu_main': journal, 'menu_stats': bars, 'comp_glass_vial': vial}
+SPRITES = {'menu_main': journal, 'menu_stats': bars, 'comp_glass_vial': vial}

@@ -2,6 +2,7 @@ import type { BiomeType, MonsterType } from '@/types/game';
 import { BIOMES } from '@/config/biomes';
 import { MONSTERS } from '@/config/combatConfig';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
+import { monsterNameOf } from '@/stores/bestiaryStore';
 import type { MapGameStore } from '@/components/game/mapSource';
 import { buildingsEnabled } from '@/lib/buildings';
 import { buildingMenuItems } from '@/lib/buildingMenu';
@@ -32,13 +33,14 @@ export function tileMenuItems({ x, y, biome, game, monster, queuePos, lineOpen, 
 	const own: ContextMenuItem[] = [];
 	if (monster) {
 		const { id, type } = monster;
+		const name = monsterNameOf(type, MONSTERS[type].label); // "Unknown monster" until the first fight with the type
 		own.push(
 			{
 				id: 'fight',
-				label: lineOpen ? (queuePos > 0 ? 'Remove from the queue' : `Add ${MONSTERS[type].label} to the queue`) : `Fight ${MONSTERS[type].label}`,
+				label: lineOpen ? (queuePos > 0 ? 'Remove from the queue' : `Add ${name} to the queue`) : `Fight ${name}`,
 				onSelect: () => void startFight(id),
 			},
-			{ id: 'dismiss', label: `Dismiss ${MONSTERS[type].label}...`, danger: true, onSelect: () => ui.askDismissMonster(id) },
+			{ id: 'dismiss', label: `Dismiss ${name}...`, danger: true, onSelect: () => ui.askDismissMonster(id) },
 		);
 	} else if (hasChest) {
 		own.push({ id: 'chest', label: 'Open chest', onSelect: () => void collectChest(x, y) });

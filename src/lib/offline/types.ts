@@ -207,6 +207,8 @@ export interface SyncResult {
 	inv?: Inventory;
 	/** Earned achievements (always on this poll) and any paid by this request */
 	achievements?: import('@/lib/offline/achievements').AchievementReport;
+	/** The discovered monster types and the kills per type (on every online answer, so a fight that discovers one shows it at once) */
+	bestiary?: import('@/lib/offline/stats').BestiaryReport;
 }
 
 /** What /api/fight answers: the combat picture, plus the tickets and gems (a won fight changes both). */
@@ -217,6 +219,8 @@ export interface FightReply {
 	gemsTotal: number;
 	/** False when an asked-for action was refused (cooldown, mana, no potion left, no such monster) */
 	accepted: boolean;
+	/** The discovered monster types and the kills per type, as on {@link SyncResult} */
+	bestiary?: import('@/lib/offline/stats').BestiaryReport;
 	/** A click on a monster while a fight was open: it joined the queue, left it, or the queue was full */
 	queued?: import('@/lib/offline/fightTypes').QueueResult;
 	inv?: Inventory;

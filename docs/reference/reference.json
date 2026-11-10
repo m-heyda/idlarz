@@ -64,19 +64,19 @@
   "kind": "interface",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 17,
-  "summary": "Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual. Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.",
+  "line": 18,
+  "summary": "Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each class **owns two starters** ({@link CLASS_AVATARS}): the creation screens offer a new hero the two of the class it picked, and the server refuses another class's starter at sign-up (`checkCreationAvatar`). Later, any starter can still be worn with any class (the Avatar window). Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.",
   "see": []
  },
  {
-  "id": "class-default-avatar",
-  "name": "CLASS_DEFAULT_AVATAR",
-  "symbol": "CLASS_DEFAULT_AVATAR",
+  "id": "class-avatars",
+  "name": "CLASS_AVATARS",
+  "symbol": "CLASS_AVATARS",
   "kind": "const",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 62,
-  "summary": "Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the \"A new chapter\" screen when the player picks that class (until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.",
+  "line": 88,
+  "summary": "The two starter avatars each class owns. The creation screens (sign-up, \"Finish your hero\", \"A new chapter\") show a hero the two of the class it picked, and the server accepts only those at sign-up (`checkCreationAvatar`); every starter belongs to exactly one class. Afterwards the Avatar window lets the player wear any starter or earned avatar with any class. The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).",
   "see": []
  },
  {
@@ -86,7 +86,7 @@
   "kind": "function",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 86,
+  "line": 126,
   "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
   "see": []
  },
@@ -110,6 +110,17 @@
   "file": "src/catalog/buildings.ts",
   "line": 29,
   "summary": "The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents` tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.",
+  "see": []
+ },
+ {
+  "id": "starter-equipment-by-class",
+  "name": "STARTER_EQUIPMENT_BY_CLASS",
+  "symbol": "STARTER_EQUIPMENT_BY_CLASS",
+  "kind": "const",
+  "category": "Progression/Class passives",
+  "file": "src/catalog/index.ts",
+  "line": 76,
+  "summary": "What each class starts with, so the first gear fits the hero: the Warrior and the Paladin wear the sword and shield, the Ranger a bow and the Mage a staff (no off-hand: a bow and a staff take both hands). Their damage per second matches the sword's, so no class starts stronger; a Ranger or a Mage gives up the shield's 2 armor. Used by a new game, \"A new chapter\" and a rebirth (`starterEquipmentFor`).",
   "see": []
  },
  {
@@ -943,6 +954,17 @@
   "see": []
  },
  {
+  "id": "checkcreationavatar",
+  "name": "checkCreationAvatar",
+  "symbol": "checkCreationAvatar",
+  "kind": "function",
+  "category": "Progression/Avatars",
+  "file": "src/lib/authValidation.ts",
+  "line": 82,
+  "summary": "The avatar rule at sign-up and \"Finish your hero\": the plain `checkAvatar` rule, and a starter must be one of the two the chosen class owns ({@link CLASS_AVATARS}), so a Mage cannot sign up wearing the Knight. An earned unlockable passes with any class. `null` still means \"none chosen\".",
+  "see": []
+ },
+ {
   "id": "max-active-buffs",
   "name": "MAX_ACTIVE_BUFFS",
   "symbol": "MAX_ACTIVE_BUFFS",
@@ -1571,7 +1593,7 @@
   "kind": "function",
   "category": "Economy/Perk caps",
   "file": "src/lib/inventory.ts",
-  "line": 242,
+  "line": 243,
   "summary": "The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families (income, XP, kill reward, click, damage) are capped by {@link capPerks}. The server reads gear through this too, so both sides agree.",
   "see": []
  },
@@ -2167,7 +2189,7 @@
   "kind": "function",
   "category": "Saves & Server/Away time",
   "file": "src/lib/offline/season.ts",
-  "line": 33,
+  "line": 53,
   "summary": "Resets the player's game when a season reset happened that their ledger does not know about. Returns the marker (for the browser, which drops a local save older than it) and whether a reset was done now. A failure to read the marker never blocks a login.",
   "see": []
  },
@@ -2724,8 +2746,19 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirthUnlocks.ts",
-  "line": 28,
+  "line": 40,
   "summary": "The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. `null` when that rebirth unlocks nothing (the sixth and later).",
+  "see": []
+ },
+ {
+  "id": "rebirthrunsummary",
+  "name": "rebirthRunSummary",
+  "symbol": "rebirthRunSummary",
+  "kind": "function",
+  "category": "Progression/Rebirth",
+  "file": "src/utils/game/rebirthUnlocks.ts",
+  "line": 102,
+  "summary": "The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. The Embers gained are read from the two prestige states (what the player really got, whether the server or the browser named the amount), never recomputed here.",
   "see": []
  },
  {

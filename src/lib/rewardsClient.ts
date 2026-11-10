@@ -2,6 +2,7 @@ import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
 import type { AchievementReport } from '@/lib/offline/achievements';
+import type { BestiaryReport } from '@/lib/offline/stats';
 import { epochFetch } from '@/lib/epochFetch';
 
 // The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
@@ -25,6 +26,12 @@ export const provideAchievementSink = (fn: (report: AchievementReport) => void):
 	achievementSink = fn;
 };
 
+// Where the monster discoveries an answer carries go (the bestiary store registers itself here).
+let bestiarySink: ((report: BestiaryReport) => void) | null = null;
+export const provideBestiarySink = (fn: (report: BestiaryReport) => void): void => {
+	bestiarySink = fn;
+};
+
 const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 	const invVer = path === '/api/inventory' ? null : invVerOf();
 	if (invVer !== null && typeof body === 'object' && body !== null) body = { ...body, invVer };
@@ -44,6 +51,8 @@ const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 		const value = (await response.json()) as T;
 		const report = (value as { achievements?: AchievementReport } | null)?.achievements;
 		if (report && Array.isArray(report.earned)) achievementSink?.(report);
+		const bestiary = (value as { bestiary?: BestiaryReport } | null)?.bestiary;
+		if (bestiary && Array.isArray(bestiary.seen)) bestiarySink?.(bestiary);
 		return { status: 'ok', value };
 	} catch {
 		return { status: 'unavailable' };

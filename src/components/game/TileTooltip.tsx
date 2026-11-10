@@ -6,6 +6,7 @@ import { MONSTERS } from '@/config/combatConfig';
 import { MONSTER_CATALOG } from '@/catalog/monsters';
 import { formatCompact } from '@/utils/formatters';
 import { growthSecondsLeft, isBoss, maxLevelOf, monsterStats } from '@/lib/monsters';
+import { useIsDiscovered } from '@/stores/bestiaryStore';
 import { useMapSource } from './mapSource';
 import { useMapTipLayer } from './MapTipLayer';
 import { TileStatus } from './TileStatus';
@@ -83,7 +84,11 @@ export interface TileTooltipProps {
  */
 const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x, y, level, hasChest, showChestTip, monster, queued, lineOpen }) => {
 	const tipLayer = useMapTipLayer();
+	const discovered = useIsDiscovered(monster?.type ?? '');
 	if (!tipLayer || !(isOwned || isAdjacent)) return null;
+	// a monster the player has not fought yet gets no tooltip at all (not even the biome card): it is a "?" until the first fight
+	const tipMonster = monster && (monster.art || discovered) ? monster : undefined;
+	if (isOwned && monster && !tipMonster) return null;
 	return createPortal(
 		<div className='absolute' style={{ left: x * TILE_SIZE, top: y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }}>
 			{isOwned && monster && <MonsterTip id={monster.id} type={monster.type} level={monster.level} art={monster.art} queued={queued} lineOpen={lineOpen} />}
