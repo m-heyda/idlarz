@@ -514,10 +514,10 @@ and its gold is paid in the browser.
 
 ### `computeOfflineGrant` <small>function</small>
 
-Source: [`src/lib/offline/grant.ts:70`](../../src/lib/offline/grant.ts)
+Source: [`src/lib/offline/grant.ts:75`](../../src/lib/offline/grant.ts)
 
 The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the
-castle upgrade finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.
+castle upgrade (or a building's, they share one builder) finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.
 
 Away time (`/api/offline`).
 

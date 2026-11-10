@@ -295,7 +295,7 @@ test('an old save with buildings loads with every building stripped (IDL-259), w
 	const spots = gridCells().filter(({ t }) => t.isOwned && t.biome !== 'castle');
 	const raw = snapshot();
 	// the old rules allowed a building on any biome but water, and on lakes the old validator refused: all of them load now
-	const sample = ['tavern', 'quarry', 'market', 'nonsense'];
+	const sample = ['tavern', 'mine', 'market', 'nonsense'];
 	spots.slice(0, sample.length).forEach(({ x, y, t }, i) => setLandAt(raw, x, y, { biome: t.biome, building: sample[i] }));
 	const result = sanitizeSave(raw);
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);

@@ -968,8 +968,8 @@ Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.
 
 Source: [`src/config/buildings.ts:17`](../../src/config/buildings.ts)
 
-The per-biome building system (R7, IDL-91, IDL-92), built dark: **everything here is behind [`BUILDINGS_FLAG`](economy.md#buildings-flag), which ships OFF**. With the flag off the game, the save format, the server checks and the sim are byte-identical to a build
-that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it). It is switched on by a one-line change after the "new chapter" release (the `GAME_EPOCH` flip).
+The per-biome building system (R7, IDL-91, IDL-92), behind [`BUILDINGS_FLAG`](economy.md#buildings-flag), which is **ON** (owner decision: live on merge). Switching it off is the rollback: the game, the save format, the server checks and the sim are then byte-identical to a build
+that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
 
 What is in this first slice (Producers only, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
 the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share **one builder** (one timer at a time);
@@ -992,18 +992,18 @@ The numbers of the building system (proposals from docs/plan/18, tuned with the 
 - `maxLevel`: the base level cap, 5. Level `L` can only be bought while the castle is at least level `L` (`min(5, castle level)`).
 - `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once.
 - `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
-- `cost`: level 1 costs `tilePrices` (6) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ([`calculateTileCost`](economy.md#calculatetilecost)).
+- `cost`: level 1 costs `tilePrices` (12) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ([`calculateTileCost`](economy.md#calculatetilecost)).
 - `relocateShare`: moving a building costs this share (50 %) of what its current level cost to reach, at today's prices; it is instant and keeps the level.
 
 **Building levels (the building system, flag off)** _(computed from the code)_
 
 | Level | Castle level needed | Output x (of level 1) | Timer to reach it | Cost at 100 tiles |
 | --- | --- | --- | --- | --- |
-| 1 | 1 | x1 | built at once | wood 195 K, stone 130 K, coal 130 K, food 64.9 K, hide 13 K, gold 649 K |
-| 2 | 2 | x1.5 | 10 min | wood 389 K, stone 260 K, coal 260 K, food 130 K, hide 26 K, gold 1.3 M |
-| 3 | 3 | x2 | 45 min | wood 779 K, stone 519 K, coal 519 K, food 260 K, hide 51.9 K, gold 2.6 M |
-| 4 | 4 | x2.5 | 3 h | wood 1.56 M, stone 1.04 M, coal 1.04 M, food 519 K, hide 104 K, gold 5.19 M |
-| 5 | 5 | x3 | 8 h | wood 3.12 M, stone 2.08 M, coal 2.08 M, food 1.04 M, hide 208 K, gold 10.4 M |
+| 1 | 1 | x1 | built at once | wood 389 K, stone 260 K, coal 260 K, food 130 K, hide 26 K, gold 1.3 M |
+| 2 | 2 | x1.5 | 10 min | wood 779 K, stone 519 K, coal 519 K, food 260 K, hide 51.9 K, gold 2.6 M |
+| 3 | 3 | x2 | 45 min | wood 1.56 M, stone 1.04 M, coal 1.04 M, food 519 K, hide 104 K, gold 5.19 M |
+| 4 | 4 | x2.5 | 3 h | wood 3.12 M, stone 2.08 M, coal 2.08 M, food 1.04 M, hide 208 K, gold 10.4 M |
+| 5 | 5 | x3 | 8 h | wood 6.23 M, stone 4.15 M, coal 4.15 M, food 2.08 M, hide 415 K, gold 20.8 M |
 
 <a id="buildings"></a>
 

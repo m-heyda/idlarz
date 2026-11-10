@@ -42,6 +42,8 @@ export interface SaveDerived {
 	buildingUpgrade?: BuildingUpgradeState | null;
 	/** Level of each building type on the map (absent while the building system is off): the server judges level changes against `buildingUpgrade` (`timer_jump` in verify.ts) */
 	buildings?: Record<string, number>;
+	/** The per-second rates once the running building upgrade is done (absent while the building system is off; null with none running) */
+	ratesAfterBuilding?: Resources | null;
 	/** The castle upgrade that was running, and the per-second rates once it is done (null with none running) */
 	castleUpgrade: CastleUpgradeState | null;
 	ratesAfterCastle: Resources | null;
@@ -77,6 +79,23 @@ export const DEFAULT_DERIVED: SaveDerived = {
 	chests: 0,
 	offlineCapSec: offlineCapSec(),
 	offlineEfficiency: offlineEfficiency(),
+};
+
+/** The per-second rates the kingdom will have once the running building upgrade is done (null with none running). */
+const ratesAfterBuildingUpgrade = (state: PersistedGame): Resources | null => {
+	const job = state.buildingUpgrade;
+	const tile = job ? getTile(state.tiles, job.x, job.y) : undefined;
+	if (!job || !tile?.building) return null;
+	const tiles = setTile(state.tiles, job.x, job.y, { ...tile, buildingLevel: job.toLevel });
+	return calculateResourceRates(
+		tiles,
+		state.characterStats,
+		state.farmLevels,
+		state.prestige,
+		state.farmUpgrades,
+		state.merchantUpgrades,
+		gearIncomePct(state.equipment),
+	).total;
 };
 
 /** The per-second rates the kingdom will have once the running castle upgrade is done. */
@@ -138,6 +157,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			...(BUILDINGS_FLAG.enabled
 				? {
 						buildingUpgrade: state.buildingUpgrade ? { ...state.buildingUpgrade } : null,
+						ratesAfterBuilding: ratesAfterBuildingUpgrade(state),
 						buildings: Object.fromEntries(builtBuildings(state.tiles).map((b) => [b.id, b.level])),
 					}
 				: {}),

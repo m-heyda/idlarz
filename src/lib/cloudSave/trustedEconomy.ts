@@ -57,6 +57,7 @@ export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, r
 				...(prev.derived.buildings
 					? {
 							buildings: { ...prev.derived.buildings },
+							ratesAfterBuilding: prev.derived.ratesAfterBuilding ? { ...prev.derived.ratesAfterBuilding } : null,
 							buildingUpgrade: prev.derived.buildingUpgrade
 								? { ...prev.derived.buildingUpgrade, remainingSec: Math.max(0, prev.derived.buildingUpgrade.remainingSec - Math.max(0, elapsedSec)) }
 								: null,

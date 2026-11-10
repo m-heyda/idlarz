@@ -239,14 +239,15 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			chests++;
 		}
 		if (t.building !== undefined) {
-			// only present while the building system is on (readLand): a known type, on its own biome, one of each type, never with a chest
+			// only present while the building system is on (readLand). A building that cannot be valid here is DROPPED, never a reason to refuse the save, so an old save (the removed
+			// building types, even ones that share a name with a new type) or one edited by hand always loads: unknown type, wrong biome, a second of its type, a chest on the tile, a bad level
 			const def = typeof t.building === 'string' ? buildingDef(t.building) : undefined;
-			if (!def || def.biome !== t.biome || tile.hasChest || buildingIds.has(def.id)) return fail('building');
 			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, BUILDING_RULES.maxLevel);
-			if (bl === null) return fail('building level');
-			buildingIds.add(def.id);
-			tile.building = def.id;
-			if (bl > 1) tile.buildingLevel = bl;
+			if (def && def.biome === t.biome && !tile.hasChest && !buildingIds.has(def.id) && bl !== null) {
+				buildingIds.add(def.id);
+				tile.building = def.id;
+				if (bl > 1) tile.buildingLevel = bl;
+			}
 		}
 		placed.push({ x, y, tile });
 	}
@@ -464,20 +465,24 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	// ---- Building system (only read while BUILDINGS_FLAG is on; absent means none) --------------------------
 	let buildingUpgrade: BuildingUpgradeState | null = null;
 	if (BUILDINGS_FLAG.enabled) {
+		// a level the castle does not allow (the gate `min(5, castle level)`) is dropped with its building, like any other building that cannot be valid
 		const cap = buildingLevelCap(castleLevel);
-		for (const { tile } of placed) if (tile.building && levelOfTile(tile) > cap) return fail('building level above the castle gate');
-		if (raw.buildingUpgrade !== null && raw.buildingUpgrade !== undefined) {
-			const b = raw.buildingUpgrade;
-			if (!isRecord(b) || castleUpgrade) return fail('building upgrade');
+		for (const { tile } of placed)
+			if (tile.building && levelOfTile(tile) > cap) {
+				delete tile.building;
+				delete tile.buildingLevel;
+			}
+		// the running upgrade must belong to a building one level below it, with a timer that fits; anything else is dropped (the server derives and judges the timer anyway)
+		const b = raw.buildingUpgrade;
+		if (isRecord(b) && !castleUpgrade) {
 			const bx = int(b.x, -16000, 16000);
 			const by = int(b.y, -16000, 16000);
 			const toLevel = int(b.toLevel, 2, BUILDING_RULES.maxLevel);
-			if (bx === null || by === null || toLevel === null) return fail('building upgrade');
-			const at = placed.find((p) => p.x === bx && p.y === by);
-			if (!at || levelOfTile(at.tile) !== toLevel - 1 || toLevel > cap) return fail('building upgrade tile');
-			const remaining = num(b.remainingSec, 0, buildingUpgradeDuration(toLevel - 1));
-			if (remaining === null) return fail('building upgrade time');
-			buildingUpgrade = { x: bx, y: by, toLevel, remainingSec: remaining };
+			const at = bx === null || by === null ? undefined : placed.find((p) => p.x === bx && p.y === by);
+			const remaining = toLevel === null ? null : num(b.remainingSec, 0, buildingUpgradeDuration(toLevel - 1));
+			if (bx !== null && by !== null && toLevel !== null && remaining !== null && at && levelOfTile(at.tile) === toLevel - 1 && toLevel <= cap) {
+				buildingUpgrade = { x: bx, y: by, toLevel, remainingSec: remaining };
+			}
 		}
 	}
 

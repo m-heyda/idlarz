@@ -702,6 +702,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`buildings.test.ts`](../../tests/economy/buildings.test.ts) — ~ Runs `fn` with the building system switched on, and puts the flag back.
 - [`buildingsFlagOff.test.ts`](../../tests/economy/buildingsFlagOff.test.ts) — ~ The guarantee of the dark release:
+- [`buildingsOffline.test.ts`](../../tests/economy/buildingsOffline.test.ts) — ~ A game with a lumberyard being upgraded to level 2, and its server-side summary.
 - [`castle.test.ts`](../../tests/economy/castle.test.ts) — ~ Pays for and waits out one castle upgrade with the real actions.
 - [`castleFinder.test.ts`](../../tests/economy/castleFinder.test.ts) — ~ A view whose screen centre is the world point (wx, wy) in tiles.
 - [`castleWard.test.ts`](../../tests/economy/castleWard.test.ts) — ~ Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3).

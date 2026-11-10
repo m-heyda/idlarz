@@ -236,6 +236,8 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 					rates: stored.summary.rates,
 					ratesAfterCastle: derived.ratesAfterCastle,
 					castleUpgrade: derived.castleUpgrade,
+					buildingUpgrade: derived.buildingUpgrade ?? null,
+					ratesAfterBuilding: derived.ratesAfterBuilding ?? null,
 					xpGainPct: stored.summary.xpGainPct,
 					gapSec,
 					capSec: derived.offlineCapSec,

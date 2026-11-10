@@ -6,8 +6,10 @@ import { calculateResourceBreakdown, calculateResourceRates } from '../../src/ut
 import { useUiStore } from '../../src/stores/uiStore';
 import { BUILDINGS_ENTRY_ID, tileMenuItems } from '../../src/lib/tileMenuItems';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
+import { BUILDINGS_FLAG } from '../../src/config/buildings';
 import { PREF_DEFAULTS, readPref, writePref } from '../../src/lib/uiPrefs';
 import { useGameStore } from '../../src/stores/gameStore';
+import { patchTile } from '../../src/utils/world';
 import type { BagSlot, Monster, Tile } from '../../src/types/game';
 
 const spot = () => {
@@ -149,7 +151,12 @@ test('the farm panels and the minimap are remembered: defaults first, then what 
 	}
 });
 
-test('the tile right-click menu keeps a disabled "Buildings: coming soon" placeholder (IDL-259), and none on the castle', () => {
+test('with the building system off the tile right-click menu keeps a disabled "Buildings: coming soon" placeholder (IDL-259), and none on the castle', (t) => {
+	const wasOn = BUILDINGS_FLAG.enabled;
+	BUILDINGS_FLAG.enabled = false;
+	t.after(() => {
+		BUILDINGS_FLAG.enabled = wasOn;
+	});
 	freshGame();
 	growTo(6);
 	const at = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
@@ -183,5 +190,28 @@ test('the tile right-click menu keeps a disabled "Buildings: coming soon" placeh
 		tileMenuItems(context(CASTLE_X, CASTLE_Y, 'castle')).some((item) => item.id === BUILDINGS_ENTRY_ID),
 		false,
 		'the castle takes no building',
+	);
+});
+
+test('with the building system on the placeholder gives way to the real build menu of the tile', () => {
+	freshGame();
+	growTo(6);
+	const at = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
+	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, at.x, at.y, { biome: 'forest', hasChest: false }) }));
+	const ctx = { x: at.x, y: at.y, biome: 'forest' as Tile['biome'], game: useGameStore as never, queuePos: 0, lineOpen: false, hasChest: false };
+	const items = tileMenuItems(ctx);
+	assert.equal(
+		items.some((i) => i.id === BUILDINGS_ENTRY_ID),
+		false,
+		'no placeholder',
+	);
+	const build = items.find((i) => i.id === 'building-build-lumberyard');
+	assert.ok(build, 'Build Lumberyard is offered on a forest tile');
+	assert.match(build.label, /^Build Lumberyard/);
+	assert.ok(items.some((i) => i.id === 'highlight'));
+	assert.equal(
+		tileMenuItems({ ...ctx, x: CASTLE_X, y: CASTLE_Y, biome: 'castle' }).some((i) => i.id.startsWith('building')),
+		false,
+		'nothing on the castle',
 	);
 });

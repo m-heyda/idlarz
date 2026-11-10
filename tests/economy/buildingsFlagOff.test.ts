@@ -1,4 +1,4 @@
-import test from 'node:test';
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, patchTileAt, tileAt, store } from '../helpers';
 import { BUILDINGS_FLAG } from '../../src/config/buildings';
@@ -16,8 +16,14 @@ import { builtBuildings } from '../../src/lib/buildings';
  * The flag-on behaviour is tested in buildings.test.ts; here every surface that could leak is checked with the flag off.
  */
 
-test('the flag ships off', () => {
-	assert.equal(BUILDINGS_FLAG.enabled, false);
+// The flag is on in the game; these tests are the rollback guarantee, so they run with it forced off
+let was = true;
+before(() => {
+	was = BUILDINGS_FLAG.enabled;
+	BUILDINGS_FLAG.enabled = false;
+});
+after(() => {
+	BUILDINGS_FLAG.enabled = was;
 });
 
 test('flag off: the save body has exactly the keys it had before the building system', () => {

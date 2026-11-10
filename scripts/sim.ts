@@ -54,7 +54,7 @@
  *   npx tsx scripts/sim.ts --no-write hardcore-rebirth6 --maxdays=500   do not touch docs/generated (for tuning runs)
  *
  *   npx tsx scripts/sim.ts --except=hardcore-rebirth6-x10   all profiles but the named ones (comma separated)
- *   npx tsx scripts/sim.ts --buildings hardcore   play with the building system switched on (BUILDINGS_FLAG, docs/plan/18): the bots follow BUILD_ORDER; writes nothing. Without the flag nothing about the sim changes.
+ *   npx tsx scripts/sim.ts --no-buildings hardcore   play with the building system switched off (BUILDINGS_FLAG, docs/plan/18): the game of before the building system, for comparisons; writes nothing. By default the system is on and the bots follow BUILD_ORDER.
  *   npx tsx scripts/sim.ts --dump=shard.json hardcore   run the selected profiles and save their raw results, write nothing else
  *   npx tsx scripts/sim.ts --merge=dir   run nothing: merge the --dump files in dir (every profile exactly once) and write the docs as a full run does
  *
@@ -78,13 +78,10 @@ import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/lo
 
 const main = async () => {
 	const args = process.argv.slice(2);
-	// --buildings: the building system is switched on for this run and the bots build (BUILD_ORDER); such a run writes nothing
-	const buildingsOn = args.includes('--buildings');
-	let bld: typeof import('../src/lib/buildings') | null = null;
-	if (buildingsOn) {
-		(await import('../src/config/buildings')).BUILDINGS_FLAG.enabled = true;
-		bld = await import('../src/lib/buildings');
-	}
+	// --no-buildings: the building system is switched off for this run (the pre-building game, for comparisons); such a run writes nothing. Otherwise it is on (BUILDINGS_FLAG) and the bots build (BUILD_ORDER).
+	const buildingsOff = args.includes('--no-buildings');
+	if (buildingsOff) (await import('../src/config/buildings')).BUILDINGS_FLAG.enabled = false;
+	const bld: typeof import('../src/lib/buildings') | null = buildingsOff ? null : await import('../src/lib/buildings');
 	const legacy = args.includes('--legacy');
 	const names = args.filter((a) => !a.startsWith('--'));
 	// --set Path.to.value=1.5   (tuning experiments without touching the config files)
@@ -205,7 +202,7 @@ const main = async () => {
 		(_key, value) => (typeof value === 'number' ? Number(value.toPrecision(6)) : value),
 		1,
 	);
-	if (!legacy && simClass === 'none' && !buildingsOn && !args.includes('--no-write')) {
+	if (!legacy && simClass === 'none' && !buildingsOff && !args.includes('--no-write')) {
 		const dir = resolve(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../docs/generated');
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(resolve(dir, 'sim-milestones.md'), md);
@@ -443,7 +440,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		}
 		mark(`castle${castle.level ?? 1}`, t);
 
-		// Buildings (--buildings only): level the lowest Producer or build the next of BUILD_ORDER, never while the castle is about to take the builder
+		// Buildings (unless --no-buildings): level the lowest Producer or build the next of BUILD_ORDER, never while the castle is about to take the builder
 		if (bld) {
 			s = api();
 			const castleNow = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);

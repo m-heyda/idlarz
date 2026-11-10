@@ -20,6 +20,7 @@ type Applied = Pick<
 >;
 
 export type OfflineStateIn = Applied &
+	Partial<Pick<GameState, 'buildingUpgrade'>> &
 	Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige' | 'merchantUpgrades'> &
 	Partial<Pick<GameState, 'merchantStock' | 'merchantRefresh' | 'playSeconds' | 'playerClass'>>;
 
@@ -28,6 +29,8 @@ export interface OfflineSummary {
 	levelsGained: number;
 	/** The castle level reached while away, when the upgrade finished */
 	castleReached: number | null;
+	/** The building level reached while away (building system), only present when an upgrade finished */
+	buildingReached?: number;
 }
 
 /** Everything the welcome-back window shows. */
@@ -86,6 +89,38 @@ export const applyOfflineGrant = (
 		}
 	}
 
+	// a building upgrade counts the same way (the builder is shared, so it never runs next to the castle's): the new level counts from the moment its timer ended
+	let buildingUpgrade = state.buildingUpgrade ?? null;
+	let buildingReached: number | undefined;
+	if (
+		buildingUpgrade &&
+		grant.building &&
+		buildingUpgrade.x === grant.building.x &&
+		buildingUpgrade.y === grant.building.y &&
+		buildingUpgrade.toLevel === grant.building.toLevel
+	) {
+		const remaining = buildingUpgrade.remainingSec - grant.elapsedSec;
+		if (remaining > 0) {
+			buildingUpgrade = { ...buildingUpgrade, remainingSec: remaining };
+		} else {
+			const tile = getTile(tiles, buildingUpgrade.x, buildingUpgrade.y);
+			if (tile?.building) {
+				tiles = setTile(tiles, buildingUpgrade.x, buildingUpgrade.y, { ...tile, buildingLevel: buildingUpgrade.toLevel });
+				resourceRates = calculateResourceRates(
+					tiles,
+					state.characterStats,
+					state.farmLevels,
+					state.prestige,
+					state.farmUpgrades,
+					state.merchantUpgrades,
+					gearIncomePct(state.equipment),
+				);
+				buildingReached = buildingUpgrade.toLevel;
+			}
+			buildingUpgrade = null;
+		}
+	}
+
 	// monsters age, and so grow, by the whole absence (the server then says which of them are still there)
 	const monsters = state.monsters.length > 0 ? advanceMonsters(state.monsters, grant.elapsedSec, limits) : state.monsters;
 
@@ -108,6 +143,7 @@ export const applyOfflineGrant = (
 			resourceRates,
 			tiles,
 			castleUpgrade,
+			...(state.buildingUpgrade !== undefined ? { buildingUpgrade } : {}),
 			monsters,
 			level: { level, progress },
 			// the level-up window is for levels reached while playing: the welcome-back window reports these
@@ -116,6 +152,6 @@ export const applyOfflineGrant = (
 			...(merchant ?? {}),
 			...(healed ? { playerHp: maxHp(characterStats, state.equipment), playerMp: maxMana(characterStats, state.equipment, state.playerClass) } : {}),
 		},
-		summary: { levelsGained, castleReached },
+		summary: { levelsGained, castleReached, ...(buildingReached !== undefined ? { buildingReached } : {}) },
 	};
 };

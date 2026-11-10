@@ -27,14 +27,17 @@ import { checkNetWorth, minimumSpend } from '../../src/lib/cloudSave/netWorth';
 import { patchTile } from '../../src/utils/world';
 
 /** Runs `fn` with the building system switched on, and puts the flag back. */
-const withBuildings = <T>(fn: () => T): T => {
-	BUILDINGS_FLAG.enabled = true;
+const withFlag = <T>(enabled: boolean, fn: () => T): T => {
+	const was = BUILDINGS_FLAG.enabled;
+	BUILDINGS_FLAG.enabled = enabled;
 	try {
 		return fn();
 	} finally {
-		BUILDINGS_FLAG.enabled = false;
+		BUILDINGS_FLAG.enabled = was;
 	}
 };
+const withBuildings = <T>(fn: () => T): T => withFlag(true, fn);
+const withoutBuildings = <T>(fn: () => T): T => withFlag(false, fn);
 
 const RICH = { gold: 1e15, wood: 1e15, stone: 1e15, coal: 1e15, food: 1e15, hide: 1e15 };
 
@@ -55,8 +58,8 @@ const gameWith = (biome: string, n = 1, castleLevel = 1) => {
 	return spots;
 };
 
-test('the flag ships off', () => {
-	assert.equal(BUILDINGS_FLAG.enabled, false);
+test('the flag ships on (owner decision: live on merge)', () => {
+	assert.equal(BUILDINGS_FLAG.enabled, true);
 });
 
 test('the catalog: one Producer for each of the seven home biomes, with real art and only resources its biome makes', () => {
@@ -100,7 +103,7 @@ test('levels are gated by min(5, castle level); timers are 10 min, 45 min, 3 h, 
 	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 540);
 });
 
-test('prices: x2 per level on the price of 6 tiles; moving costs half of everything the building cost', () => {
+test('prices: x2 per level on the price of 12 tiles; moving costs half of everything the building cost', () => {
 	const one = buildingLevelCost(1, 100);
 	const two = buildingLevelCost(2, 100);
 	assert.ok(one.gold! > 0);
@@ -112,11 +115,13 @@ test('prices: x2 per level on the price of 6 tiles; moving costs half of everyth
 });
 
 test('with the flag off every action refuses and nothing changes', () => {
-	const [spot] = gameWith('forest');
-	const before = api().tiles;
-	assert.equal(api().buildBuilding(spot.x, spot.y, 'lumberyard'), false);
-	assert.equal(api().tiles, before);
-	assert.equal(api().buildingUpgrade, null);
+	withoutBuildings(() => {
+		const [spot] = gameWith('forest');
+		const before = api().tiles;
+		assert.equal(api().buildBuilding(spot.x, spot.y, 'lumberyard'), false);
+		assert.equal(api().tiles, before);
+		assert.equal(api().buildingUpgrade, null);
+	});
 });
 
 test('build: right biome only, one of each type, no chest or monster, and the price is paid', () => {
@@ -160,7 +165,7 @@ test('a Producer adds its output to the income (once the flag is on) and the fla
 		assert.ok(api().resourceRates.total.wood > off * 2, 'the store recomputes the rates');
 		assert.equal(api().resourceRates.total.wood, rates());
 	});
-	assert.equal(rates(), off, 'flag off: the building on the tile makes nothing');
+	withoutBuildings(() => assert.equal(rates(), off, 'flag off: the building on the tile makes nothing'));
 });
 
 test('upgrading: gated by the castle level, paid now, one timer shared with the castle, the level lands when the timer ends', () => {
@@ -218,7 +223,7 @@ test('moving: to another tile of the biome for half the price, level kept', () =
 	});
 });
 
-test('the save round trip keeps buildings and the running upgrade; invalid ones are refused', () => {
+test('the save round trip keeps buildings and the running upgrade; invalid ones are dropped', () => {
 	withBuildings(() => {
 		const [a, b] = gameWith('forest', 2, 3);
 		api().buildBuilding(a.x, a.y, 'lumberyard');
@@ -232,13 +237,21 @@ test('the save round trip keeps buildings and the running upgrade; invalid ones 
 		assert.equal(back.state.buildingUpgrade?.toLevel, 2);
 		assert.equal(Math.round(back.state.buildingUpgrade!.remainingSec), 540);
 
-		// a building on the wrong biome, a second one of a type, a level the castle does not allow
+		// a building that cannot be valid is dropped, never a reason to refuse the save: wrong biome, a second of its type, a level the castle does not allow
+		const loads = (tiles: typeof wrongBiome) => {
+			const r = decodeSave(encodeSave({ ...pickPersisted(api()), tiles }));
+			assert.ok(r.ok, r.ok ? '' : r.reason);
+			return r.ok ? r.state : null;
+		};
 		const wrongBiome = patchTile(api().tiles, b.x, b.y, { building: 'granary' });
-		assert.equal(decodeSave(encodeSave({ ...pickPersisted(api()), tiles: wrongBiome })).ok, false);
+		assert.equal(tileAt(loads(wrongBiome)!.tiles, b.x, b.y).building, undefined);
 		const twice = patchTile(api().tiles, b.x, b.y, { building: 'lumberyard' });
-		assert.equal(decodeSave(encodeSave({ ...pickPersisted(api()), tiles: twice })).ok, false);
+		const twiceState = loads(twice)!;
+		assert.equal(builtBuildings(twiceState.tiles).length, 1, 'only one of a type survives');
 		const tooHigh = patchTile(api().tiles, a.x, a.y, { buildingLevel: 5 });
-		assert.equal(decodeSave(encodeSave({ ...pickPersisted(api()), tiles: tooHigh })).ok, false);
+		const high = loads(tooHigh)!;
+		assert.equal(tileAt(high.tiles, a.x, a.y).building, undefined, 'castle level 3 does not allow level 5');
+		assert.equal(high.buildingUpgrade, null, 'and the upgrade that belonged to it goes too');
 	});
 });
 
@@ -253,12 +266,13 @@ test('a save written with the flag on still loads with it off, minus its buildin
 		rates = api().resourceRates.total.wood;
 		assert.ok(rates > 0);
 	});
-	assert.equal(BUILDINGS_FLAG.enabled, false);
-	const back = decodeSave(text);
-	assert.ok(back.ok, back.ok ? '' : back.reason);
-	if (!back.ok) return;
-	assert.equal(builtBuildings(back.state.tiles).length, 0);
-	assert.equal('buildingUpgrade' in back.state, false);
+	withoutBuildings(() => {
+		const back = decodeSave(text);
+		assert.ok(back.ok, back.ok ? '' : back.reason);
+		if (!back.ok) return;
+		assert.equal(builtBuildings(back.state.tiles).length, 0);
+		assert.equal('buildingUpgrade' in back.state, false);
+	});
 });
 
 test('the server derives the buildings and judges their timer (timer_jump)', () => {
@@ -293,12 +307,25 @@ test('the server derives the buildings and judges their timer (timer_jump)', () 
 });
 
 test('flag off: the server never raises timer_jump and the summary carries no building keys', () => {
+	withoutBuildings(() => {
+		freshGame();
+		const first = summarize(pickPersisted(api()));
+		assert.equal('buildings' in first.derived, false);
+		assert.equal('buildingUpgrade' in first.derived, false);
+		const forged = { ...first, derived: { ...first.derived, buildings: { lumberyard: 5 } } };
+		assert.equal(verifyTransition({ summary: first, serverSavedAt: 0 }, forged, 1000).includes('timer_jump'), false);
+	});
+});
+
+test('saves from before the building system load with the flag on, and old ones with it off', () => {
 	freshGame();
-	const first = summarize(pickPersisted(api()));
-	assert.equal('buildings' in first.derived, false);
-	assert.equal('buildingUpgrade' in first.derived, false);
-	const forged = { ...first, derived: { ...first.derived, buildings: { lumberyard: 5 } } };
-	assert.equal(verifyTransition({ summary: first, serverSavedAt: 0 }, forged, 1000).includes('timer_jump'), false);
+	growTo(8);
+	const state = pickPersisted(api());
+	const text = withoutBuildings(() => encodeSave(state));
+	assert.ok(decodeSave(text).ok, 'a flag-off save loads with the flag on');
+	const on = decodeSave(withBuildings(() => encodeSave(state)));
+	assert.ok(on.ok);
+	if (on.ok) assert.equal(on.state.buildingUpgrade, null);
 });
 
 test('net worth: buildings add a gold floor, only while the system is on', () => {
