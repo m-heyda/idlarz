@@ -2220,7 +2220,7 @@ and to 0.1 for a hopeless one (chance &lt;= 5%); equal weights give the plain un
 for new spawns only. Bosses follow the same rules (IDL-222): among the boss types that have a free tile the pick is weighted and the level capped (<a href="#placetickets"><code>placeTickets</code></a>). Measured: <code>docs/generated/spawn-mix.md</code>.</p>
 </article><article><p><a id="placetickets"></a></p>
 <h3><code>placeTickets</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/placement.ts"><code>src/lib/offline/placement.ts:71</code></a></p>
+<p>Source: <a href="../../src/lib/offline/placement.ts"><code>src/lib/offline/placement.ts:74</code></a></p>
 <p>Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
 grows. <code>rollFor(&#39;spawnpos&#39;, n)</code> picks the tile of monster ticket <code>n</code> and <code>rollFor(&#39;chestpos&#39;, n)</code> the one of chest <code>n</code> (the server seals

@@ -201,7 +201,7 @@ for new spawns only. Bosses follow the same rules (IDL-222): among the boss type
 
 ### `placeTickets` <small>function</small>
 
-Source: [`src/lib/offline/placement.ts:71`](../../src/lib/offline/placement.ts)
+Source: [`src/lib/offline/placement.ts:74`](../../src/lib/offline/placement.ts)
 
 Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
