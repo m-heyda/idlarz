@@ -13,7 +13,8 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
-- Browser state: [`BASELINE_EPOCH`](#baseline-epoch)
+- Epoch: [`BASELINE_EPOCH`](#baseline-epoch), [`startNewChapter`](#startnewchapter)
+- Browser state: [The browser's half of the data epoch](#the-browser-s-half-of-the-data-epoch)
 
 ## Threat model
 
@@ -209,7 +210,7 @@ The menu's "Save game" button uploads at most once per 10 minutes.
 
 ### `resolveConflict` <small>function</small>
 
-Source: [`src/lib/cloudClient.ts:215`](../../src/lib/cloudClient.ts)
+Source: [`src/lib/cloudClient.ts:216`](../../src/lib/cloudClient.ts)
 
 After a 409, decide whether it needs the player. Looks at the account's save once and answers:
   - it is one of this browser's own lost uploads (`isOwnSave`), or this browser's game is the same game and at least as far along
@@ -238,7 +239,7 @@ still happens is resolved by `resolveConflict`. The lock dies with the page, so 
 
 ### `acceptSave` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:201`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:206`](../../src/lib/cloudSave/pipeline.ts)
 
 Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet).
   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`
@@ -458,6 +459,7 @@ and its gold is paid in the browser.
 
 | Route | Methods | File |
 | --- | --- | --- |
+| `/api/auth/epoch` | POST | `src/app/api/auth/epoch/route.ts` |
 | `/api/auth/login` | POST | `src/app/api/auth/login/route.ts` |
 | `/api/auth/logout` | POST | `src/app/api/auth/logout/route.ts` |
 | `/api/auth/me` | GET | `src/app/api/auth/me/route.ts` |
@@ -515,13 +517,45 @@ drops a local save older than it) and whether a reset was done now. A failure to
 
 Season resets: `npm run reset-players` writes `app_settings.last_reset`; a player whose ledger `resetAt` is older is reset once at their next login. Operating guide: the Ops page (season reset CLI).
 
-## Browser state
+## Epoch
 
 <a id="baseline-epoch"></a>
 
 ### `BASELINE_EPOCH` <small>const</small>
 
-Source: [`src/lib/epochGuard.ts:26`](../../src/lib/epochGuard.ts)
+Source: [`src/config/epoch.ts:13`](../../src/config/epoch.ts)
+
+The data epoch: which "chapter" of the game an account's data belongs to. Raising `GAME_EPOCH` is the new chapter release (IDL-253, a PR that changes this one number and nothing else): from then on every account
+whose profile is on an older epoch has to confirm the "A new chapter" screen (`POST /api/auth/epoch`), which archives their game into a pinned history row and starts it over (account, name and gems are kept), and every browser
+and tab still on the old epoch is refused by the server until it reloads. While `GAME_EPOCH` equals `BASELINE_EPOCH` the whole mechanism is dark: nobody needs a reset and nothing is refused.
+
+- `profiles.epoch` is the epoch of the account's game; null (every account made before the epoch existed) counts as `BASELINE_EPOCH`.
+- `/api/auth/me` sends `epoch` (this constant) and `needsReset`; the browser remembers the epoch it last saw (`lib/epochGuard`) and sends it in the `x-game-epoch` header of every game request.
+- A request whose header is lower than `GAME_EPOCH` (a tab that was open at the flip; no header counts as `BASELINE_EPOCH`) answers 412 `stale_epoch` and the browser reloads into the guard.
+
+<a id="startnewchapter"></a>
+
+### `startNewChapter` <small>function</small>
+
+Source: [`src/lib/offline/chapter.ts:42`](../../src/lib/offline/chapter.ts)
+
+Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.
+
+- An account already on the server's epoch gets `{ ok, already: true }` and nothing is touched, so a repeated request, a second tab or a lost response is harmless.
+- Otherwise: the name and class are saved first (a name another account holds ends it here with nothing reset), then the game is replaced exactly like a New Game
+  (the old save is first archived into a **pinned** `save_history` row flagged `epoch_archive` that is never trimmed, and only if that worked `startNewGame` runs: the save, its map, the leaderboard row and the rebirth log are
+  deleted and the ledger starts a new run with its counters and stats zeroed; account, reserved name and gems stay), an account that predates epochs gets the early-tester
+  grant, and the profile moves to the new epoch **last**: a failure in between leaves the account on the old epoch, and the retry is the same request again.
+- A stale tab cannot overwrite the fresh start: its requests carry the old epoch and are refused (`isStaleEpoch`), and a save for a row that no longer exists is a conflict
+  (`acceptSave`), never a silent re-creation.
+
+## Browser state
+
+<a id="the-browser-s-half-of-the-data-epoch"></a>
+
+### The browser's half of the data epoch
+
+Source: [`src/lib/epochGuard.ts:10`](../../src/lib/epochGuard.ts)
 
 The browser's half of the data epoch. A server reset (the New chapter release flips the server's `GAME_EPOCH`, IDL-76) leaves this browser holding state
 that belongs to the old game: the cloud link (a revision the account no longer has: 409 loops, or `no_save` 404s), upload attempts, the combat log cursor, a
@@ -530,8 +564,8 @@ pending offline claim, the manual save cooldown, the conflict counters, the tab'
 The browser remembers the epoch it last saw (`localStorage` `idlarz.epoch`). When `/api/auth/me` reports a higher one (`epochVerdict` says `wipe`),
 the local save is put aside (`archiveForNewGame`) and reset, every key above is cleared (`wipeStaleBrowser`), the new epoch is recorded last (a
 failed wipe is simply tried again on the next load) and the page reloads into the normal start check, which finds an account with no save and starts a new
-game with a fresh link. No epoch in the reply (the server does not send one yet) means the guard does nothing. A browser with no stored epoch counts as
+game with a fresh link. The server sends `epoch` and `needsReset` (`config/epoch.ts`); a reply with no epoch (an older server) means the guard does nothing. A browser with no stored epoch counts as
 `BASELINE_EPOCH`, the value the server has today, so every browser that predates the guard is wiped on the flip and a brand new one is not.
 
-What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server (a save from an old
-epoch has to be refused there), not by this guard. See `docs/plan/reset-proof-browsers.md`.
+What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server: every game request carries the epoch
+the browser last saw (`lib/epochFetch`) and a lower one is refused with 412 `staleEpoch`, after which the page reloads into this guard. See `docs/plan/reset-proof-browsers.md`.

@@ -25,6 +25,7 @@ import { supabaseSaveRepo } from '../src/lib/cloudSave/supabaseRepo';
 import { summarize, type SaveSummary } from '../src/lib/cloudSave/summary';
 import type { Ledger } from '../src/lib/offline/ledger';
 import { supabaseLedgerRepo } from '../src/lib/offline/supabaseLedger';
+import { GAME_EPOCH, needsResetFor } from '../src/config/epoch';
 import { decodeSave, sealWire } from '../src/lib/saveFormat';
 import { addLedger, addSave, addTransition, formatReport, judgeSave, judgeTransition, newReport } from './liveSavesReport';
 
@@ -109,6 +110,28 @@ const run = async () => {
 		addLedger(report, saveSet.has(id), ledger?.inv != null);
 	}
 	console.log(formatReport(report));
+	await reportEpoch();
+};
+
+/**
+ * The new chapter's dry run (IDL-76, IDL-254): how many accounts the flip would send through the "A new chapter" screen, how many profiles hold no epoch yet, and whether any two names collide ignoring case (the unique index
+ * makes that impossible once the migration ran; a count above 0 means the index is missing). Counts only, no names.
+ */
+const reportEpoch = async () => {
+	const { data, error } = await db.from('profiles').select('character_name, epoch');
+	if (error) die('read profiles');
+	const rows = (data ?? []) as { character_name: string; epoch: number | null }[];
+	const names = new Map<string, number>();
+	for (const row of rows) names.set(row.character_name.toLowerCase(), (names.get(row.character_name.toLowerCase()) ?? 0) + 1);
+	const lines = [
+		'',
+		`New chapter (GAME_EPOCH in the code: ${GAME_EPOCH})`,
+		`  profiles: ${rows.length}`,
+		`  profiles with no epoch yet (read as the baseline): ${rows.filter((row) => row.epoch === null).length}`,
+		`  profiles the flip would send through the new chapter screen: ${rows.filter((row) => needsResetFor(row.epoch)).length}`,
+		`  names that collide ignoring case: ${[...names.values()].filter((count) => count > 1).length}`,
+	];
+	console.log(lines.join('\n'));
 };
 
 run().catch(() => die('the check'));

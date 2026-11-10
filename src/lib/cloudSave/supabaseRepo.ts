@@ -104,6 +104,9 @@ const fromRow = (row: Row): StoredSave => ({
 	lastArchiveAt: Date.parse(row.last_archive_at),
 });
 
+/** The `save_history.flags` value that marks the new chapter's archive of an account's old game: never trimmed. */
+export const CHAPTER_ARCHIVE_FLAG = 'epoch_archive';
+
 /** The full body of a save (map included), as kept in the history. */
 const fullBody = (save: StoredSave) => ({ ...save.core, land: save.world?.land, extra: save.world?.extra });
 
@@ -115,6 +118,7 @@ export const supabaseSaveRepo = (db: SupabaseClient): SaveRepo => {
 			.select('id')
 			.eq('user_id', userId)
 			.eq('pinned', pinned)
+			.not('flags', 'cs', `{${CHAPTER_ARCHIVE_FLAG}}`) // the new chapter's archive is never trimmed
 			.order('rev', { ascending: false })
 			.range(keep, keep + 50);
 		const ids = (data ?? []).map((row: { id: number }) => row.id);
@@ -181,6 +185,17 @@ export const supabaseSaveRepo = (db: SupabaseClient): SaveRepo => {
 				if (error) return;
 			}
 			await trim(userId, true, keep);
+		},
+
+		async pinChapter(userId, save) {
+			const flags = [...new Set<string>([...save.flags, CHAPTER_ARCHIVE_FLAG])];
+			const updated = await db.from('save_history').update({ pinned: true, flags }).eq('user_id', userId).eq('rev', save.rev).select('id');
+			if (updated.error) throw new Error(updated.error.message);
+			if (updated.data?.length) return;
+			const inserted = await db
+				.from('save_history')
+				.insert({ user_id: userId, rev: save.rev, schema: save.schema, state: fullBody(save), flags, server_saved_at: iso(save.serverSavedAt), pinned: true });
+			if (inserted.error) throw new Error(inserted.error.message);
 		},
 
 		async remove(userId) {

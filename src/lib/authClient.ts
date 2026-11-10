@@ -55,6 +55,26 @@ export const login = (email: string, password: string) => post('/api/auth/login'
 export const register = (email: string, password: string, characterName: string, playerClass: PlayerClassId) =>
 	post('/api/auth/register', { email, password, characterName, playerClass });
 export const saveProfile = (characterName: string, playerClass: PlayerClassId) => post('/api/auth/profile', { characterName, playerClass });
+/** The "A new chapter" confirm (`POST /api/auth/epoch`, IDL-76): archives the old game and starts over with this name and hero. `nameTaken`: another account holds the name, nothing was reset. */
+export type ChapterResult = { status: 'ok' } | { status: 'error'; message: string; nameTaken?: boolean } | { status: 'unavailable' };
+export const startChapter = async (characterName: string, playerClass: PlayerClassId): Promise<ChapterResult> => {
+	try {
+		const response = await fetch('/api/auth/epoch', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ characterName, playerClass }),
+			credentials: 'same-origin',
+			cache: 'no-store',
+			signal: AbortSignal.timeout(30_000),
+		});
+		const body = (await response.json().catch(() => ({}))) as { error?: string; nameTaken?: boolean };
+		if (response.ok) return { status: 'ok' };
+		if (response.status === 503 && !body.error) return { status: 'unavailable' };
+		return { status: 'error', message: body.error ?? 'Something went wrong.', ...(body.nameTaken ? { nameTaken: true } : {}) };
+	} catch {
+		return { status: 'unavailable' };
+	}
+};
 export const logout = async (): Promise<void> => {
 	await post('/api/auth/logout');
 };

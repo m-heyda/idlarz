@@ -11,6 +11,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`GameApp.tsx`](../../src/app/GameApp.tsx) — ~ The account's name and hero, given to a brand-new game only (never to one that has been played).
 
+**src/app/api/auth/epoch/**
+
+- [`route.ts`](../../src/app/api/auth/epoch/route.ts) — ~ The "A new chapter" confirm:
+
 **src/app/api/auth/login/**
 
 - [`route.ts`](../../src/app/api/auth/login/route.ts)
@@ -21,7 +25,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/api/auth/me/**
 
-- [`route.ts`](../../src/app/api/auth/me/route.ts) — ~ Who is signed in (from the cookie only) and their own profile row.
+- [`route.ts`](../../src/app/api/auth/me/route.ts) — ~ Who is signed in (from the cookie only), their own profile row and the data epoch state (`epoch`, `needsReset`, see `config/epoch.ts`).
 
 **src/app/api/auth/profile/**
 
@@ -133,6 +137,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/auth/**
 
 - [`AuthUnavailable.tsx`](../../src/components/auth/AuthUnavailable.tsx) — ~ An outage may pass on its own:
+- [`NewChapterScreen.tsx`](../../src/components/auth/NewChapterScreen.tsx) — ~ The account's current hero:
 - [`SaveHub.tsx`](../../src/components/auth/SaveHub.tsx) — ~ local:
 - [`StartDialog.tsx`](../../src/components/auth/StartDialog.tsx) — ~ 'profile':
 
@@ -248,6 +253,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`crafting.ts`](../../src/config/crafting.ts) — Crafting: the crafting level curve and the per-request limits. First draft (docs/plan/crafting-v0.md): level 10 in the first days of
 - [`distanceBands.ts`](../../src/config/distanceBands.ts) — Named bands of castle distance (Chebyshev tiles), so biome, monster and chest rules all share one vocabulary and a tweak is a
 - [`economy.ts`](../../src/config/economy.ts) — Tile prices and XP, the resource caps, clicks and the starting gems: the numbers the economy runs on.
+- [`epoch.ts`](../../src/config/epoch.ts) — ~ The data epoch the server is on.
 - [`farm.ts`](../../src/config/farm.ts) — The farm: animals, pen and farm upgrades.
 - [`itemCatalog.ts`](../../src/config/itemCatalog.ts) — The item catalog lives in src/catalog (items, sets, rarities, stats, resources, loot config). This file only derives the
 
@@ -320,6 +326,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
+- [`epochFetch.ts`](../../src/lib/epochFetch.ts) — ~ `fetch` for the game's own /api routes:
 - [`epochGuard.ts`](../../src/lib/epochGuard.ts) — ~ The browser's half of the data epoch.
 - [`fightSim.ts`](../../src/lib/fightSim.ts) — ~ A character with attribute points spent on top of the starting 5 each (a level 30 character has about 25 to spend).
 - [`floatText.ts`](../../src/lib/floatText.ts) — Tiny event bus for the "+N resource" popups that appear at the cursor.
@@ -355,6 +362,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/lib/offline/**
 
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
+- [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 - [`craft.ts`](../../src/lib/offline/craft.ts) — ~ What rolling a gear craft needs besides the ledger:
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
@@ -391,7 +399,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
 - [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
-- [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The signed-in player's id from the session cookie (never from the request body), or the response to send instead.
+- [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:
@@ -400,6 +408,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`saveEvents.ts`](../../src/lib/saveEvents.ts) — Tiny event bus for moments worth saving right away (a purchase, a castle upgrade, a rebirth, a level up).
 - [`saveFormat.ts`](../../src/lib/saveFormat.ts) — ~ The save format:
 - [`saveStorage.ts`](../../src/lib/saveStorage.ts) — ~ Where the game is kept:
+- [`seenEpoch.ts`](../../src/lib/seenEpoch.ts) — ~ The epoch this browser last saw, or null when it never recorded one (a browser from before the guard, or a new one).
 - [`serverRebirth.ts`](../../src/lib/serverRebirth.ts) — ~ The browser's side of the server-run rebirth (IDL-102, `POST /api/rebirth`).
 - [`serverSession.ts`](../../src/lib/serverSession.ts) — A one-function bridge so the game store can say "the server wants an absence claimed first" without importing the code that claims
 - [`skills.ts`](../../src/lib/skills.ts) — ~ HP a Heal restores:
@@ -730,6 +739,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`new_chapter_columns_rollback.sql`](../../supabase/migrations/new_chapter_columns_rollback.sql)
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
+- [`profiles_server_columns.sql`](../../supabase/migrations/profiles_server_columns.sql)
 - [`rebirth_history.sql`](../../supabase/migrations/rebirth_history.sql)
 - [`season_reset.sql`](../../supabase/migrations/season_reset.sql)
 

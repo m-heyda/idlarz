@@ -1,5 +1,6 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import { epochFetch } from '@/lib/epochFetch';
 
 // The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
 
@@ -20,7 +21,7 @@ const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 	const invVer = path === '/api/inventory' ? null : invVerOf();
 	if (invVer !== null && typeof body === 'object' && body !== null) body = { ...body, invVer };
 	try {
-		const response = await fetch(path, {
+		const response = await epochFetch(path, {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: { 'Content-Type': 'application/json' },

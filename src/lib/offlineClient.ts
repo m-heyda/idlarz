@@ -1,5 +1,6 @@
 import type { ClaimResult } from '@/lib/offline/types';
 import { scoped } from '@/lib/storageScope';
+import { epochFetch } from '@/lib/epochFetch';
 
 /** The browser side of /api/offline. */
 export type ClaimResponse =
@@ -9,7 +10,7 @@ export type ClaimResponse =
 
 export const requestClaim = async (claimId: string): Promise<ClaimResponse> => {
 	try {
-		const response = await fetch('/api/offline', {
+		const response = await epochFetch('/api/offline', {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: { 'Content-Type': 'application/json' },

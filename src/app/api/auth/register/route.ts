@@ -1,5 +1,7 @@
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { checkCredentials, checkProfile } from '@/lib/authValidation';
+import { GAME_EPOCH } from '@/config/epoch';
+import { adminConfigured, createSupabaseAdmin } from '@/lib/supabase/admin';
 import { fail, guardConfigured, isOutage, json, readBody, unavailable } from '@/lib/authRoute';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +32,8 @@ export async function POST(request: Request) {
 
 		const { characterName, playerClass } = profileInput.value;
 		const { error: profileError } = await supabase.from('profiles').insert({ id: data.user.id, character_name: characterName, player_class: playerClass });
+		// a new account starts on the current data epoch (the epoch column is the server's to write, not the player's)
+		if (!profileError && adminConfigured()) await createSupabaseAdmin().from('profiles').update({ epoch: GAME_EPOCH }).eq('id', data.user.id);
 		const user = { id: data.user.id, email: data.user.email ?? null };
 		return json({ user, profile: profileError ? null : { characterName, playerClass } }, 201);
 	} catch {

@@ -277,3 +277,8 @@ create policy "player_achievements_select_own" on public.player_achievements for
 grant select, insert, update, delete on public.player_achievements to service_role;
 alter table public.player_ledger add column if not exists stats jsonb;    -- lifetime counters (null = not counted yet)
 alter table public.player_ledger add column if not exists legacy jsonb;   -- Idol levels that survive a rebirth (null = none)
+
+-- ---- profiles_server_columns (migration profiles_server_columns, IDL-76): epoch and avatar_id are written by the server only --------------------
+revoke insert, update on table public.profiles from authenticated;
+grant insert (id, character_name, player_class) on public.profiles to authenticated;
+grant update (character_name, player_class) on public.profiles to authenticated;
