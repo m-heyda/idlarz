@@ -103,6 +103,23 @@ export interface Enforcement {
 }
 
 /**
+ * **Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).**
+ * Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:
+ *
+ * 1. The way back exists in production: `restoreTrust` / `npm run restore-trust` (IDL-209) is merged and you have run its dry run once against a real account. Enforcement is never on without it.
+ * 2. The flip has happened and has settled: `npm run check-live-saves` (read-only, same Supabase environment) shows the rows are readable by today's rules and its new chapter section looks as expected.
+ * 3. Read the `flagged` and `would be refused if enforcement were on` lines of that run. Honest accounts must produce zero refusals (`playtime_fast`, `gold_jump`, `gems_increase` on the allowlist). If one does, tune `VERIFY` or take that flag off `ENFORCEMENT.reject`; keep `tests/audit` green. Restore any honest flagged account with `restore-trust`.
+ * 4. Rebirth: no client that does not ask the server to rebirth (`askServerRebirth`) can still be open (a deploy plus a grace period), and the real flow was walked in a browser against real Supabase (Rebirth dialog "Asking the server...", refused toast, retry with the same key). Then `requireServerRebirth: true`; a rebirth without a `/api/rebirth` record keeps the old rebirth count.
+ * 5. One PR flips both switches (`ENFORCEMENT.enabled = true`, `EMBER_MODEL.requireServerRebirth = true`); `tests/server/serverRebirth.test.ts` and `tests/server/serverTrust.test.ts` pin the behaviour of both states.
+ * 6. Watch the `save_rejected` log lines (route `/api/save`) for the first days. A wave of refusals for honest players means: `ENFORCEMENT.enabled = false` (or remove one flag from `reject`), deploy, restore the affected accounts. Nothing was stored for a refused save, so nothing needs repairing.
+ * 7. Rollback of the pair: `enabled: false` and `requireServerRebirth: false`; no data migration is involved in either.
+ *
+ * @title Turning enforcement and the server-run rebirth on together
+ * @category Ops/Operator guides
+ * @order 4
+ * @see ENFORCEMENT, restoreTrust
+ */
+/**
  * The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
  * accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`
  * in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.
