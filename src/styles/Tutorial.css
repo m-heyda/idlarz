@@ -99,31 +99,6 @@
 	font-size: 11px;
 }
 
-/* a phone: a smaller Alder with the bubble above him */
-@media (max-width: 640px) {
-	.guide {
-		flex-direction: column-reverse;
-		align-items: flex-start;
-		gap: 2px;
-		bottom: 4px;
-		left: 4px;
-	}
-	.guide-sprite {
-		width: 67px;
-		height: 67px;
-	}
-	.guide-bubble {
-		margin-bottom: 0;
-		font-size: 13px;
-	}
-	.guide-bubble::before {
-		left: 22px;
-		bottom: -12px;
-		border: 6px solid transparent;
-		border-top: 6px solid #8a6a3a;
-	}
-}
-
 .guide-journal-lock {
 	color: #7a6a52;
 }
