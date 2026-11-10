@@ -17,11 +17,23 @@ export const BIOME_RULES = {
 	/** Purchases needed before a biome can turn up or be picked. Not listed = available from the start. */
 	unlockAfterPurchases: { swamp: 6, tundra: 10 } as Record<string, number>,
 
+	/**
+	 * Rebirths a biome needs before it can turn up (the count of completed rebirths, `prestige.rebirths`). Not listed = no rebirth needed. The map resets on every
+	 * rebirth, so a run only ever holds the biomes of its own rebirth count or fewer.
+	 */
+	unlockAfterRebirths: { jungle: 1, fields: 2, orchard: 3, blight: 4, battlefield: 5 } as Record<string, number>,
+
 	/** Biomes that may never touch (checked against all 8 neighbours). */
 	conflicts: [
 		['tundra', 'swamp'],
 		['tundra', 'coast'],
 		['hills', 'coast'],
+		// docs/plan/12-rebirth-biomes.md section 9 (decided): the rebirth biomes keep away from the neighbours they clash with
+		['blight', 'lake'],
+		['blight', 'coast'],
+		['blight', 'orchard'],
+		['battlefield', 'swamp'],
+		['jungle', 'tundra'],
 	] as [string, string][],
 
 	/** Biomes that only exist beside water (a lake or coast among the 8 neighbours). */
@@ -32,7 +44,20 @@ export const BIOME_RULES = {
 
 	/** Random purchases: chance (%) to copy a neighbouring biome instead of rolling from the weights. */
 	cluster: {
-		basePct: { forest: 60, hills: 55, lake: 50, swamp: 55, tundra: 65, plains: 45, coast: 40 } as Record<string, number>,
+		basePct: {
+			forest: 60,
+			hills: 55,
+			lake: 50,
+			swamp: 55,
+			tundra: 65,
+			plains: 45,
+			coast: 40,
+			jungle: 55,
+			fields: 55,
+			orchard: 55,
+			blight: 60,
+			battlefield: 55,
+		} as Record<string, number>,
 		perExtraNeighbourPct: 10, // +10 for every same-biome 4-neighbour beyond the first
 		capPct: 90,
 		neverCopy: [] as string[],

@@ -21,6 +21,29 @@ export const BIOME_SPAWN = {
 };
 
 /**
+ * Output of the five rebirth biomes (unlocked one per rebirth, `BIOME_RULES.unlockAfterRebirths`): a **flat multiple of a basic tile's output**, existing resources only. `base` is the
+ * output of the basic tile it is measured against (per second, before `BIOME_YIELD.scale`); `multiplier` rises with the rebirth that unlocks it, from x1.5 (jungle) to x2
+ * (battlefield). No new resource types: T2 materials, monsters and buildings for these biomes come after the release. Pinned by tests/economy/rebirthBiomes.test.ts.
+ *
+ * @category Economy/Biomes
+ * @order 3
+ * @table rebirth-biome-output
+ */
+export const REBIRTH_BIOME_OUTPUT: Record<string, { rebirth: number; multiplier: number; base: Record<string, number>; measuredAgainst: string }> = {
+	jungle: { rebirth: 1, multiplier: 1.5, base: { gold: 0.1, wood: 0.3 }, measuredAgainst: 'forest' },
+	fields: { rebirth: 2, multiplier: 1.6, base: { gold: 0.1, food: 0.3 }, measuredAgainst: 'plains' },
+	orchard: { rebirth: 3, multiplier: 1.75, base: { gold: 0.1, food: 0.2, wood: 0.1 }, measuredAgainst: 'a plains and forest mix' },
+	blight: { rebirth: 4, multiplier: 1.9, base: { gold: 0.1, coal: 0.35 }, measuredAgainst: 'tundra' },
+	battlefield: { rebirth: 5, multiplier: 2, base: { stone: 0.3, wood: 0.2 }, measuredAgainst: 'hills (stone) and swamp (wood)' },
+};
+
+/** The per-second output of a rebirth biome tile: its `base` times its `multiplier`, rounded to four places. */
+function rebirthBiomeOutput(biome: string): Record<string, number> {
+	const { base, multiplier } = REBIRTH_BIOME_OUTPUT[biome];
+	return Object.fromEntries(Object.entries(base).map(([resource, rate]) => [resource, Math.round(rate * multiplier * 1e4) / 1e4]));
+}
+
+/**
  * Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.
  *
  * @category Economy/Biomes
@@ -140,17 +163,17 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		resourceIcons: [RESOURCE_ICONS.gold, RESOURCE_ICONS.food],
 		description: 'Sandy shores provide gold and food, and border the water',
 	},
-	// The five rebirth biomes (docs/plan/12-rebirth-biomes.md). DEV ONLY: `config/biomeStage.ts` keeps them out of purchases, saves and the guide. The output is a
-	// placeholder (none) until the numbers of docs/plan/12-rebirth-biomes.md section 2 and 4 are set with the sim.
+	// The five rebirth biomes (docs/plan/12-rebirth-biomes.md), one per rebirth (BIOME_RULES.unlockAfterRebirths). MVP output: existing resources only, a flat
+	// multiple of a basic tile's output (REBIRTH_BIOME_OUTPUT); the T2 materials, monsters and buildings of these biomes come after the new chapter ships.
 	jungle: {
 		name: 'jungle',
 		label: 'Jungle',
 		baseColor: BIOME_COLORS.jungle,
 		unique: false,
 		upgradeable: false,
-		resourceGeneration: {},
-		resourceIcons: [],
-		description: 'Dev only: a river-cut rainforest (hide and Hardwood later)',
+		resourceGeneration: rebirthBiomeOutput('jungle'),
+		resourceIcons: [RESOURCE_ICONS.wood],
+		description: 'A river-cut rainforest: wood and gold, half as much again as a forest',
 	},
 	fields: {
 		name: 'fields',
@@ -158,9 +181,9 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		baseColor: BIOME_COLORS.fields,
 		unique: false,
 		upgradeable: false,
-		resourceGeneration: {},
-		resourceIcons: [],
-		description: 'Dev only: a patchwork of farm plots (eggs and Cloth later)',
+		resourceGeneration: rebirthBiomeOutput('fields'),
+		resourceIcons: [RESOURCE_ICONS.food],
+		description: 'A patchwork of farm plots: food and gold, well above plains',
 	},
 	orchard: {
 		name: 'orchard',
@@ -168,9 +191,9 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		baseColor: BIOME_COLORS.orchard,
 		unique: false,
 		upgradeable: false,
-		resourceGeneration: {},
-		resourceIcons: [],
-		description: 'Dev only: blossom trees and beehives (milk and Honey later)',
+		resourceGeneration: rebirthBiomeOutput('orchard'),
+		resourceIcons: [RESOURCE_ICONS.food, RESOURCE_ICONS.wood],
+		description: 'Blossom trees and beehives: food, wood and gold',
 	},
 	blight: {
 		name: 'blight',
@@ -178,9 +201,9 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		baseColor: BIOME_COLORS.blight,
 		unique: false,
 		upgradeable: false,
-		resourceGeneration: {},
-		resourceIcons: [],
-		description: 'Dev only: a violet spore wasteland (coal and Ichor later)',
+		resourceGeneration: rebirthBiomeOutput('blight'),
+		resourceIcons: [RESOURCE_ICONS.coal],
+		description: 'A violet spore wasteland: nearly twice the coal of a tundra',
 	},
 	battlefield: {
 		name: 'battlefield',
@@ -188,9 +211,9 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		baseColor: BIOME_COLORS.battlefield,
 		unique: false,
 		upgradeable: false,
-		resourceGeneration: {},
-		resourceIcons: [],
-		description: 'Dev only: churned mud, graves and bones (stone, wood and War Medals later)',
+		resourceGeneration: rebirthBiomeOutput('battlefield'),
+		resourceIcons: [RESOURCE_ICONS.stone, RESOURCE_ICONS.wood],
+		description: 'Churned mud, graves and bones: double the stone and wood of a basic tile',
 	},
 } as const;
 
