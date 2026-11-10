@@ -47,7 +47,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		const characterStats = { ...fresh.characterStats, availablePoints: totalStatPoints(settled.level) };
 		Object.assign(characterStats, calculateCombatStats(characterStats));
 		// gear is wiped: the starter kit on, the starter bag, no pity (the server does the same to its inventory when the rebirth reaches it)
-		const kit = rebirthKit(merchantUpgrades);
+		const kit = rebirthKit(merchantUpgrades, prestige); // Deep Pockets is an Ember upgrade: it survives too
 		set({
 			...fresh,
 			// the character is progression too: lifetime XP, the level it gives and the attributes (with the points still to spend) carry
@@ -75,7 +75,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			merchantRefreshes: state.merchantRefreshes, // the refresh price and the free window are not reset by a rebirth
 			merchantRefresh: state.merchantRefresh,
 			playerHp: maxHp(characterStats, kit.equipment),
-			playerMp: maxMana(characterStats, kit.equipment),
+			playerMp: maxMana(characterStats, kit.equipment, state.playerClass),
 			playerName: state.playerName,
 			playerClass: state.playerClass,
 			playSeconds: state.playSeconds,
@@ -93,12 +93,15 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		if (level >= def.maxLevel) return false;
 		const cost = emberUpgradeCost(id, level);
 		if (state.prestige.legacyPoints < cost) return false;
+		// Deep Pockets: the new slots are in the bag at once (the server pads its bag the same way from the save's level)
+		const grow = id === 'deeppockets' ? Array.from({ length: def.effectPerLevel }, () => null) : [];
 		set({
 			prestige: {
 				...state.prestige,
 				legacyPoints: state.prestige.legacyPoints - cost,
 				upgrades: { ...state.prestige.upgrades, [id]: level + 1 },
 			},
+			...(grow.length ? { bag: [...state.bag, ...grow] } : {}),
 		});
 		return true;
 	},

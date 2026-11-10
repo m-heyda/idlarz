@@ -1,6 +1,7 @@
 import { ITEM_CATALOG } from '@/catalog';
 import { COMBAT, STAT_RULES } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
+import { classPassives } from '@/lib/classPassives';
 import { atkSpeedPercent, critDamagePercent, magicDamagePercent, physicalDamagePercent, statArmor, statManaRegen, type Attributes } from '@/lib/statBonuses';
 import type { CharacterStats, Equipment } from '@/types/game';
 
@@ -173,10 +174,12 @@ export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBo
  * @category Combat/Player numbers
  * @order 8
  */
-export const armorOf = (equipment: Equipment, stats?: Attributes): number => aggregateStats(equipment).armor + (stats ? statArmor(stats) : 0);
+export const armorOf = (equipment: Equipment, stats?: Attributes, playerClass?: unknown): number =>
+	aggregateStats(equipment).armor + (stats ? statArmor(stats) : 0) + classPassives(playerClass).armor;
 
-/** Mana: the attributes' pool plus the gear's. */
-export const maxMana = (characterStats: CharacterStats, equipment: Equipment): number => Math.round(characterStats.mp + aggregateStats(equipment).maxMana);
+/** Mana: the attributes' pool plus the gear's and the class's. */
+export const maxMana = (characterStats: CharacterStats, equipment: Equipment, playerClass?: unknown): number =>
+	Math.round(characterStats.mp + aggregateStats(equipment).maxMana + classPassives(playerClass).maxMana);
 
 /** Mana per second, in and out of fights. */
 export const manaRegenPerSec = (stats: Attributes, equipment: Equipment): number => statManaRegen(stats) + aggregateStats(equipment).manaRegen;

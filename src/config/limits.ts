@@ -3,7 +3,7 @@
 // are registered for that key, so a new effect is one entry in `LIMIT_BONUSES` and no call site changes.
 
 /**
- * Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours;
+ * Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat and the Deep Pockets Ember upgrade raise the bag size; Night Watch and set bonuses the away hours;
  * Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.
  *
  * @category Progression/Limits
@@ -24,8 +24,8 @@ export const LIMITS = {
 	merchantRotateSec: 1800,
 	/** Gold of the first paid shelf refresh (each one after it costs this much more, see MERCHANT_GOODS.refresh) */
 	merchantRefreshBase: 10_000,
-	/** Bag slots (the Pack Rat bonus adds to it) */
-	bagSize: 36,
+	/** Bag slots (the Pack Rat merchant bonus and the Deep Pockets Ember upgrade add to it; the belt bag slots will too). 60 since IDL-162, it was 36 */
+	bagSize: 60,
 	/** Hours of away time the server pays out when the player comes back (the Night Watch Ember upgrade adds to it) */
 	offlineCapHours: 8,
 	/** Share of the normal income (and chest/monster arrivals) an away hour pays (the Steward Ember upgrade adds to it) */
@@ -52,6 +52,8 @@ export const HARD_LIMITS = {
 	monsterGrowthLevels: 40,
 	merchantOffers: 12,
 	battleQueue: 16,
+	/** The most bag slots a save may hold: base 60 + Pack Rat 48 + Deep Pockets 12 = 120 today, the rest is room for the belt bag slots (IDL-154) */
+	bagSize: 200,
 	offlineCapHours: 72,
 	offlineEfficiency: 1,
 	craftBatchCap: 1_000_000_000,

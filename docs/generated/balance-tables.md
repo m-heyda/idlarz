@@ -281,11 +281,11 @@ Per-second output of one tile before adjacency and modifiers (already multiplied
 | Tundra | gold 0.13, coal 0.455 |
 | Lake | gold 0.065, food 0.325 |
 | Coast | gold 0.13, food 0.26 |
-| Jungle | — |
-| Fields | — |
-| Blossom Orchard | — |
-| Blight | — |
-| Battlefield | — |
+| Jungle | gold 0.195, wood 0.585 |
+| Fields | gold 0.208, food 0.624 |
+| Blossom Orchard | gold 0.227, food 0.455, wood 0.227 |
+| Blight | gold 0.247, coal 0.865 |
+| Battlefield | stone 0.78, wood 0.52 |
 
 
 ## 6. Stats
@@ -359,7 +359,7 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | Haggler | +3% gold from everything you sell | 10 | 100.00K | 32.27M |
 | Bulk Discount | -1% tile cost | 8 | 250.00K | 45.03M |
 | Lucky Charm | +2 Luck for chests and kills | 10 | 150.00K | 48.40M |
-| Pack Rat | +4 bag slots | 4 | 500.00K | 13.50M |
+| Pack Rat | +8 bag slots | 6 | 500.00K | 121.50M |
 | Foreman | +1% income from every resource, gold included | 10 | 400.00K | 129.08M |
 | Skinner | +5% meat and hide from your animals | 8 | 300.00K | 26.82M |
 | Quick Hands | +2% attack speed | 8 | 250.00K | 22.35M |
@@ -398,3 +398,4 @@ Shop (cost in points of the next level, by current level):
 | Provisions | 1500 gold + 400 wood + 400 stone | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
 | Night Watch | 100% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
 | Steward | 5% | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Deep Pockets | +4 bag slots | 3 | 30 | 54 | 98 | 175 | 567 | 5951 |

@@ -9,7 +9,6 @@ import { GEMS_CAP, STARTING_GEMS, CLICK_LADDER, INITIAL_RESOURCES, RESOURCE_CAP,
 import { DEFAULT_PLAYER_NAME, INITIAL_CHARACTER_STATS } from '@/config/character';
 import { MERCHANT_GOODS, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
 import { EMBER_UPGRADES, type EmberUpgradeId } from '@/config/rebirth';
-import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES } from '@/catalog';
 import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { instanceProblem } from '@/lib/itemInstance';
@@ -326,14 +325,15 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (v > 0) merchantUpgrades[id] = v;
 		}
 	}
-	const bagSize = limitOf('bagSize', { merchantUpgrades });
+	// The bag is sized below, once the Embers (Deep Pockets) are read: a saved bag may be smaller than that (padded) but never beyond the ceiling
+	const maxBagSize = limitOf('bagSize', { hardCap: true });
 
 	// ---- gear, bag, HP, monsters (all optional: a save from before combat gets the starter kit) ------------------
 	let equipment: Equipment;
 	let bag: BagSlot[];
 	if (raw.equipment === undefined && raw.bag === undefined) {
 		equipment = { ...STARTER_EQUIPMENT };
-		bag = [...starterBag(), ...Array.from({ length: bagSize - COMBAT.bagSize }, () => null)];
+		bag = starterBag();
 	} else {
 		if (raw.equipment === undefined || raw.bag === undefined) return fail('equipment and bag belong together');
 		if (!isRecord(raw.equipment)) return fail('equipment');
@@ -347,7 +347,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if (!fits) return fail('equipped item in the wrong slot');
 			equipment[slot as EquipmentSlot] = item;
 		}
-		if (!Array.isArray(raw.bag) || raw.bag.length !== bagSize) return fail('bag size');
+		if (!Array.isArray(raw.bag) || raw.bag.length < 1 || raw.bag.length > maxBagSize) return fail('bag size');
 		bag = [];
 		for (const entry of raw.bag) {
 			if (entry === null) {
@@ -397,7 +397,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		playerHp = v;
 	}
 	// Mana (optional: a save from before it was added starts full)
-	const maxPlayerMp = maxMana(characterStats, equipment);
+	const maxPlayerMp = maxMana(characterStats, equipment, raw.playerClass);
 	let playerMp = maxPlayerMp;
 	if (raw.playerMp !== undefined) {
 		const v = num(raw.playerMp, 0, maxPlayerMp);
@@ -462,6 +462,10 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (legacyEarned < rebirths) return fail('too few embers for the rebirths');
 		prestige = { rebirths, legacyPoints, legacyEarned, upgrades };
 	}
+
+	// An older, smaller bag is padded up to what the save is entitled to (base, Pack Rat, Deep Pockets): a bag only ever grows, it is never cut
+	const bagSize = limitOf('bagSize', { merchantUpgrades, prestige });
+	if (bag.length < bagSize) bag = [...bag, ...Array.from({ length: bagSize - bag.length }, () => null)];
 
 	// Gems (optional so saves from before they existed stay valid: those players get the starting gems too)
 	const gems = raw.gems === undefined ? STARTING_GEMS : int(raw.gems, 0, GEMS_CAP);

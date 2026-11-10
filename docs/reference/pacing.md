@@ -8,7 +8,7 @@ The pace the economy is tuned for, and the bot simulation that checks it.
 
 - Targets: [Pacing targets](#pacing-targets)
 - Magnitude targets: [`MAGNITUDE_BANDS`](#magnitude-bands)
-- The sim: [The bot simulation](#the-bot-simulation), [The parallel sim runner](#the-parallel-sim-runner)
+- The sim: [The bot simulation](#the-bot-simulation), [The parallel sim runner](#the-parallel-sim-runner), [The class picker acceptance](#the-class-picker-acceptance)
 
 ## Targets
 
@@ -51,7 +51,7 @@ See also: [`MAGNITUDE_BANDS`](pacing.md#magnitude-bands), [`CASTLE_UPGRADE`](eco
 
 ### `MAGNITUDE_BANDS` <small>const</small>
 
-Source: [`scripts/sim.ts:776`](../../scripts/sim.ts)
+Source: [`scripts/sim.ts:785`](../../scripts/sim.ts)
 
 The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.
 
@@ -84,7 +84,7 @@ The sim (`scripts/sim.ts`): a bot drives the **real store** with a seeded RNG an
 a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
 (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
 
-Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names),
+Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names), `--class=mage` (every profile plays that hero class; the default `none` is the neutral baseline, and a class run writes nothing: `npm run sim:classes` measures all four against it, IDL-78),
 `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
 
 **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
@@ -105,3 +105,18 @@ the merge. The wall time drops from the sum of all profiles to about the slowest
   npm run sim:parallel -- --jobs=4          limit the processes (each needs about 1 GB)
 
 Needs no profile names (it always runs all of them, the merge insists on that); for one profile use `npm run sim -- <name>`.
+
+<a id="the-class-picker-acceptance"></a>
+
+### The class picker acceptance
+
+Source: [`scripts/sim-classes.ts:1`](../../scripts/sim-classes.ts)
+
+`npm run sim:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline
+the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule
+(`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.
+
+  npm run sim:classes                       idle and casual, every class
+  npm run sim:classes -- human --maxdays=60 other profiles and the other flags of sim.ts go through
+
+The sim bots play the real store, so they carry the XP, tile-discount and fight passives; offline efficiency and chest speed act on the server's grants and tickets, which the sim does not model.

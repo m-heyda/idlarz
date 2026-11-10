@@ -9,6 +9,7 @@
 		"lint": "eslint . --max-warnings=0",
 		"sim": "tsx scripts/sim.ts",
 		"sim:parallel": "tsx scripts/sim-parallel.ts",
+		"sim:classes": "tsx scripts/sim-classes.ts",
 		"perf": "tsx scripts/perf-world.ts",
 		"test": "tsx --test \"tests/**/*.test.ts\"",
 		"report": "tsx scripts/balance-report.ts",

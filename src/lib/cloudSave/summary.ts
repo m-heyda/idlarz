@@ -109,9 +109,10 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		equipment: state.equipment,
 		prestige: state.prestige,
 		merchantUpgrades: state.merchantUpgrades,
+		playerClass: state.playerClass,
 	});
 	const gear = gearEconomy(state.equipment);
-	const limits = { prestige: state.prestige, merchantUpgrades: state.merchantUpgrades, gear };
+	const limits = { prestige: state.prestige, merchantUpgrades: state.merchantUpgrades, gear, playerClass: state.playerClass };
 	return {
 		rates,
 		gold: state.resources.gold,
@@ -124,7 +125,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		rebirths: state.prestige.rebirths,
 		legacyPoints: state.prestige.legacyPoints,
 		legacyEarned: state.prestige.legacyEarned,
-		xpGainPct: xpGainPct(state.characterStats, state.equipment),
+		xpGainPct: xpGainPct(state.characterStats, state.equipment, state.playerClass),
 		playSeconds: state.playSeconds,
 		derived: {
 			lakesOwned: biomeCount(state.tiles, 'lake'),

@@ -11,13 +11,13 @@ const points = (luck: number): number => (Number.isFinite(luck) ? Math.max(0, lu
  * @category Economy/Chests and Luck
  * @order 3
  * @formula
- * interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck))
+ * interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck)) / (1 + class chest speed% / 100)
  */
-export const chestIntervalSec = (luck: number): number =>
-	CHEST.intervalSec * Math.max(LUCK.chestIntervalFloor, 1 / (1 + points(luck) * LUCK.chestSpeedPerPoint));
+export const chestIntervalSec = (luck: number, classChestSpeedPct = 0): number =>
+	(CHEST.intervalSec * Math.max(LUCK.chestIntervalFloor, 1 / (1 + points(luck) * LUCK.chestSpeedPerPoint))) / (1 + Math.max(0, classChestSpeedPct) / 100);
 
-/** % more chests than at Luck 0 (what the Character window shows). */
-export const chestRateBonusPct = (luck: number): number => (CHEST.intervalSec / chestIntervalSec(luck) - 1) * 100;
+/** % more chests than at Luck 0 (what the Character window shows), the Ranger's chest speed included. */
+export const chestRateBonusPct = (luck: number, classChestSpeedPct = 0): number => (CHEST.intervalSec / chestIntervalSec(luck, classChestSpeedPct) - 1) * 100;
 
 /**
  * What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear).

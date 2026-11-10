@@ -20,7 +20,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = economyTiles(state.tiles, state.freeTiles);
-		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades));
+		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass));
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
 
@@ -36,7 +36,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			gearIncomePct(state.equipment),
 		);
 
-		const xpGain = calculateXpGain(owned + 1) * (1 + xpGainPct(state.characterStats, state.equipment) / 100);
+		const xpGain = calculateXpGain(owned + 1) * (1 + xpGainPct(state.characterStats, state.equipment, state.playerClass) / 100);
 		const resources = subtractBundle(state.resources, bundle);
 		resources.xp = Math.min(resources.xp + xpGain, XP_CAP);
 
@@ -57,7 +57,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 
 			const owned = economyTiles(state.tiles, state.freeTiles);
 			const purchased = owned - 1;
-			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades));
+			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass));
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
 			return completePurchase(x, y, rollBiome(state.tiles, x, y, purchased, Math.random, state.prestige.rebirths));

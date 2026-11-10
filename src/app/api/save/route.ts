@@ -81,6 +81,8 @@ export async function POST(request: Request) {
 			Date.now(),
 			isNonProduction(),
 			supabaseLedgerRepo(createSupabaseAdmin()),
+			undefined,
+			profile?.playerClass,
 		);
 		switch (outcome.kind) {
 			case 'ok':

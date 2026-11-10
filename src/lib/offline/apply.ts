@@ -21,7 +21,7 @@ type Applied = Pick<
 
 export type OfflineStateIn = Applied &
 	Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige' | 'merchantUpgrades'> &
-	Partial<Pick<GameState, 'merchantStock' | 'merchantRefresh' | 'playSeconds'>>;
+	Partial<Pick<GameState, 'merchantStock' | 'merchantRefresh' | 'playSeconds' | 'playerClass'>>;
 
 /** What the welcome-back window shows besides the income. */
 export interface OfflineSummary {
@@ -114,7 +114,7 @@ export const applyOfflineGrant = (
 			previousLevel: level,
 			characterStats,
 			...(merchant ?? {}),
-			...(healed ? { playerHp: maxHp(characterStats, state.equipment), playerMp: maxMana(characterStats, state.equipment) } : {}),
+			...(healed ? { playerHp: maxHp(characterStats, state.equipment), playerMp: maxMana(characterStats, state.equipment, state.playerClass) } : {}),
 		},
 		summary: { levelsGained, castleReached },
 	};

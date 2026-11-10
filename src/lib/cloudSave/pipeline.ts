@@ -41,6 +41,7 @@
  * @order 1
  * @see acceptSave, FLAG_POLICY, ENFORCEMENT
  */
+import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { createHash } from 'node:crypto';
 import { STARTING_GEMS } from '@/config/economy';
 import { countSave, emptyStats, statsDue } from '@/lib/offline/stats';
@@ -216,10 +217,13 @@ export const acceptSave = async (
 	ledgers: LedgerRepo | null = null,
 	/** Which flags refuse a save. Shadow mode (nothing refused) unless `ENFORCEMENT.enabled` is switched on; a parameter so tests can run both. */
 	enforcement: Enforcement = ENFORCEMENT,
+	/** The hero class of the account's profile row (the route reads it): it is stamped over the upload, because class passives pay on the server (IDL-70). Absent = the upload's own, as before. */
+	playerClass?: PlayerClassId,
 ): Promise<SaveOutcome> => {
 	const decoded = decodeSave(text);
 	if (!decoded.ok) return { kind: 'invalid', reason: decoded.reason };
 	let state = decoded.state;
+	if (playerClass && PLAYER_CLASSES[playerClass]) state = { ...state, playerClass };
 
 	const current = await repo.load(userId);
 	if (current && current.rev !== baseRev) return { kind: 'conflict', rev: current.rev, serverSavedAt: current.serverSavedAt };
@@ -266,7 +270,7 @@ export const acceptSave = async (
 	const rebirthed = !!(current && !newGame && state.prestige.rebirths > current.summary.rebirths);
 	// ... unless the server already did it when it ran the rebirth (`/api/rebirth`): the wipe happens once, and what was picked up since stays
 	const serverWiped = ledger?.inv?.rebirth?.to === state.prestige.rebirths;
-	const inventory = ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades) : (ledger?.inv ?? null);
+	const inventory = ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades, state.prestige) : (ledger?.inv ?? null);
 	if (inventory && !newGame) state = stampInventory(state, inventory);
 	let summary = summarize(state);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
