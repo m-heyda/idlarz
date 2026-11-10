@@ -58,7 +58,7 @@ SPRITES = {
     # no picture in the sheet: bread, the emerald ability shard, farm products
     'food': sprites_resources.carrot, 'res_shard': sprites_resources.shard, 'diamond': sprites_resources.diamond,
     'eggs': sprites_resources.eggs, 'milk': sprites_resources.milk, 'hide': sprites_resources.hide,
-    'menu_character': sprites_props.helm, 'menu_merchant': sprites_props.pouch, 'menu_farm': sprites_props.barn,
+    'menu_character': sprites_props.helm,
     'level_orb': sprites_props.level_orb,
     'equip_head': sprites_equipment.head, 'equip_neck': sprites_equipment.neck,
     'equip_chest': sprites_equipment.chest, 'equip_mainHand': sprites_equipment.mainhand,
@@ -76,7 +76,7 @@ SPRITES = {
     **sprites_fortress.SPRITES,
     **sprites_buildings.SPRITES,
     **sprites_menu.SPRITES,
-    **sprites_menu_art.SPRITES,  # Sprite Fusion menu buttons: replace the built menu_merchant, menu_farm, menu_crafting, menu_legacy
+    **sprites_menu_art.SPRITES,  # Sprite Fusion menu buttons: menu_equipment, merchant, farm, crafting, legacy (rebirth) and the unwired extras
     **sprites_water.SPRITES,
     **sprites_monsters.SPRITES,
     **sprites_gear.SPRITES,
