@@ -5,6 +5,7 @@ import { levelAtAge, monsterDef, monsterStats } from '@/lib/monsters';
 import { pushEvent, type FightCtx } from '@/lib/offline/fightContext';
 import type { CombatState, PlayerProfile } from '@/lib/offline/fightTypes';
 import { bagCountOf } from '@/lib/offline/inventory';
+import { recordEncounter } from '@/lib/offline/stats';
 import type { MonsterTicket } from '@/lib/offline/tickets';
 import type { Inventory } from '@/lib/offline/types';
 import { estimateWin, type PotionStock } from '@/lib/offline/winChance';
@@ -48,6 +49,8 @@ export const resumeHpOf = (profile: PlayerProfile): number => (profile.maxHp * C
 /** Opens the fight against a monster: the start of both an automatic and a chosen fight. The player's profile is frozen into it. */
 export const startFight = (ctx: FightCtx, t: number, target: { ticket: MonsterTicket; type: MonsterType }): boolean => {
 	const c = ctx.c;
+	// the first fight with a type discovers it (stats.seen): the "?" on the map and in the combat window turns into the monster
+	ctx.ledger = { ...ctx.ledger, stats: recordEncounter(ctx.ledger.stats, target.type, ctx.env.nowSec * 1000) };
 	const level = levelAtAge(target.ticket.spawnLevel ?? 1, t - target.ticket.at, {}, target.ticket.growCap);
 	const stats = monsterStats(target.type, level);
 	const profile: PlayerProfile = ctx.profileNow;

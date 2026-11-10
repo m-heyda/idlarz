@@ -1,4 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import { monsterNameOf } from '@/stores/bestiaryStore';
 import { formatCompact, formatNumber } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
@@ -415,7 +416,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 									data-boss={monsterDef(q.type).grade === 'boss'}
 									data-lucky={!!q.lucky}
 									data-win={bucket ? winBucketOf(q.winPct!) : undefined}
-									title={`${i + 1}. ${q.lucky ? 'Lucky ' : ''}${monsterDef(q.type).label}, level ${q.level}${bucket ? `, ${bucket.word}: ${q.winPct}% win chance` : ''}`}
+									title={`${i + 1}. ${q.lucky ? 'Lucky ' : ''}${monsterNameOf(q.type, monsterDef(q.type).label)}, level ${q.level}${bucket ? `, ${bucket.word}: ${q.winPct}% win chance` : ''}`}
 								>
 									<span className='fight-queue-art'>
 										<MonsterArt type={q.type} scale={0.8} />
@@ -430,7 +431,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 										<button
 											className='fight-queue-x'
 											onClick={() => p.onUnqueue!(q.n)}
-											aria-label={`Take ${monsterDef(q.type).label} out of the queue`}
+											aria-label={`Take ${monsterNameOf(q.type, monsterDef(q.type).label)} out of the queue`}
 											title='Take it out of the queue'
 										>
 											x

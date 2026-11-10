@@ -7,6 +7,7 @@ import { gearOf, slotQty } from '@/lib/inventory';
 import { resolveItem } from '@/lib/itemInstance';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { monsterNameOf } from '@/stores/bestiaryStore';
 import PixelIcon from './PixelIcon';
 import PixelModal from './PixelModal';
 import { itemIconName } from './itemUi';
@@ -24,7 +25,8 @@ const DismissBody: React.FC<{ id: number }> = ({ id }) => {
 		if (!monster) close(null);
 	}, [monster, close]);
 	if (!monster) return null;
-	const label = `${MONSTERS[monster.type].label} (level ${formatCompact(monster.level)})`;
+	const name = monsterNameOf(monster.type, MONSTERS[monster.type].label);
+	const label = `${name} (level ${formatCompact(monster.level)})`;
 
 	return (
 		<PixelModal title='Dismiss monster?' size='sm' onClose={done}>
@@ -44,7 +46,7 @@ const DismissBody: React.FC<{ id: number }> = ({ id }) => {
 						onClick={() => {
 							if (dismissMonster(id)) {
 								audioManager.playSound('click');
-								showToast(`${MONSTERS[monster.type].label} dismissed`);
+								showToast(`${name} dismissed`);
 							}
 							done();
 						}}

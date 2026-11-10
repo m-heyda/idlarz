@@ -9,6 +9,8 @@ import { readProgress } from '@/lib/tutorial/progress';
 export interface LifetimeStats {
 	/** Kills per monster type id (bosses and golden monsters included) */
 	kills: Record<string, number>;
+	/** Monster type id -> epoch ms of the first fight with it (the discovery: a type not in here shows as a "?" silhouette). Additive: a row without it reads as nothing discovered. */
+	seen: Record<string, number>;
 	/** Golden (lucky) monster kills, and boss kills, on top of the per-type counts */
 	golden: number;
 	bosses: number;
@@ -33,6 +35,7 @@ export const STATS_EVERY_MS = 10 * 60_000;
 
 export const emptyStats = (): LifetimeStats => ({
 	kills: {},
+	seen: {},
 	golden: 0,
 	bosses: 0,
 	chests: 0,
@@ -48,7 +51,8 @@ export const emptyStats = (): LifetimeStats => ({
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
 const counts = (value: unknown): Record<string, number> => {
 	const out: Record<string, number> = {};
-	if (value && typeof value === 'object') for (const [key, amount] of Object.entries(value)) if (num(amount) > 0) out[key] = num(amount);
+	if (value && typeof value === 'object' && !Array.isArray(value))
+		for (const [key, amount] of Object.entries(value)) if (num(amount) > 0) out[key] = num(amount);
 	return out;
 };
 
@@ -61,6 +65,7 @@ export const readStats = (raw: unknown): LifetimeStats => {
 	const r = raw as Record<string, unknown>;
 	return {
 		kills: counts(r.kills),
+		seen: counts(r.seen),
 		golden: Math.floor(num(r.golden)),
 		bosses: Math.floor(num(r.bosses)),
 		chests: Math.floor(num(r.chests)),
@@ -82,6 +87,7 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	s.chests === 0 &&
 	s.tiles === 0 &&
 	Object.keys(s.kills).length === 0 &&
+	Object.keys(s.seen).length === 0 &&
 	Object.keys(s.income).length === 0 &&
 	isEmptyProgress(s.tutorial) &&
 	s.achievements.length === 0;
@@ -93,6 +99,23 @@ export const recordKill = (stats: LifetimeStats, kill: { type: string; lucky: bo
 	golden: stats.golden + (kill.lucky ? 1 : 0),
 	bosses: stats.bosses + (kill.boss ? 1 : 0),
 });
+
+/**
+ * The first fight with a monster type discovers it (the "?" silhouette becomes the monster, on the map and in the combat window). Later fights keep the first time, so the same
+ * stats object comes back untouched.
+ *
+ * Bestiary groundwork: `seen` and `kills` are the whole record a later bestiary needs (discovery as its gate, kill tiers of 100 / 200 / 300 per type for bonuses, read from `kills`).
+ */
+export const recordEncounter = (stats: LifetimeStats, type: string, nowMs: number): LifetimeStats =>
+	stats.seen[type] ? stats : { ...stats, seen: { ...stats.seen, [type]: Math.max(1, Math.floor(nowMs)) } };
+
+/** What the browser is told about the player's monsters: the discovered type ids and the kills per type. */
+export interface BestiaryReport {
+	seen: string[];
+	kills: Record<string, number>;
+}
+
+export const bestiaryOf = (stats: LifetimeStats): BestiaryReport => ({ seen: Object.keys(stats.seen), kills: stats.kills });
 
 /** A chest opened: counted once, when the server pays it. */
 export const recordChest = (stats: LifetimeStats): LifetimeStats => ({ ...stats, chests: stats.chests + 1 });
