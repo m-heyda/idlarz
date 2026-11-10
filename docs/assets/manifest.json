@@ -21441,6 +21441,97 @@
 	},
 	{
 		"usedBy": [],
+		"name": "reuse_header_coin_bag",
+		"category": "unsorted",
+		"subcategory": "header",
+		"src": "/pixel/reuse/header/coin_bag.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_header_crossed_swords",
+		"category": "unsorted",
+		"subcategory": "header",
+		"src": "/pixel/reuse/header/crossed_swords.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_header_key",
+		"category": "unsorted",
+		"subcategory": "header",
+		"src": "/pixel/reuse/header/key.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_header_red_potion",
+		"category": "unsorted",
+		"subcategory": "header",
+		"src": "/pixel/reuse/header/red_potion.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_header_rune_book",
+		"category": "unsorted",
+		"subcategory": "header",
+		"src": "/pixel/reuse/header/rune_book.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_header_sword",
+		"category": "unsorted",
+		"subcategory": "header",
+		"src": "/pixel/reuse/header/sword.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_header_teal_shield",
+		"category": "unsorted",
+		"subcategory": "header",
+		"src": "/pixel/reuse/header/teal_shield.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "reuse_legendary_sf_b4884690_b36",
 		"category": "unsorted",
 		"subcategory": "legendary",
