@@ -160,9 +160,15 @@ const BASE_ICON_SIZES = {
 	building_stonecraft: [48, 60],
 	building_barracks: [48, 60],
 	// farm animals
-	animal_chicken: [40, 40],
-	animal_pig: [40, 40],
-	animal_cow: [40, 40],
+	// Sprite Fusion art, 96x96 (drawn at half size on the farm); sheep, duck and rooster are not used yet
+	animal_chicken_1: [96, 96],
+	animal_chicken_2: [96, 96],
+	animal_cow_1: [96, 96],
+	animal_cow_2: [96, 96],
+	animal_pig: [96, 96],
+	animal_sheep: [96, 96],
+	animal_duck: [96, 96],
+	animal_rooster: [96, 96],
 	animal_deer: [40, 40],
 	// farm pasture: the whole fenced meadow (back) and the near fences that go in front of the animals (front)
 	farm_back: [348, 300],
@@ -237,12 +243,32 @@ export const EQUIPMENT_PIXEL_ICONS: Record<string, PixelIconName> = {
 	belt: 'equip_charm',
 };
 
-// Farm animal id -> sprite
-export const ANIMAL_PIXEL_ICONS: Record<string, PixelIconName> = {
-	chicken: 'animal_chicken',
-	pig: 'animal_pig',
-	cow: 'animal_cow',
-	deer: 'animal_deer',
+/**
+ * Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.
+ *
+ * @category Architecture/Art
+ */
+export const ANIMAL_PIXEL_ICONS: Record<string, readonly PixelIconName[]> = {
+	chicken: ['animal_chicken_1', 'animal_chicken_2'],
+	pig: ['animal_pig'],
+	cow: ['animal_cow_1', 'animal_cow_2'],
+	deer: ['animal_deer'],
+};
+
+/**
+ * The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`),
+ * so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial).
+ * Pure: no random numbers.
+ *
+ * @category Architecture/Art
+ * @formula look = ANIMAL_PIXEL_ICONS[kind][hash(seed) mod number of looks], hash(s) = fold h = h*31 + charCode, from h = 7
+ */
+export const animalIcon = (kind: string, seed?: string): PixelIconName => {
+	const looks = ANIMAL_PIXEL_ICONS[kind];
+	if (!seed || looks.length === 1) return looks[0];
+	let h = 7;
+	for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+	return looks[h % looks.length];
 };
 
 // Biome -> map icon (the 'empty' biome has none; the castle uses castle_<level>)

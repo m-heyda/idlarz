@@ -24,6 +24,7 @@ import fog  # noqa: E402
 import ground_art  # noqa: E402
 import ui_art  # noqa: E402
 import sprites_animals  # noqa: E402
+import sprites_animal_art  # noqa: E402
 import sprites_buildings  # noqa: E402
 import sprites_castle  # noqa: E402
 import sprites_characters  # noqa: E402
@@ -66,6 +67,7 @@ SPRITES = {
     'equip_cape': sprites_equipment.cape, 'equip_charm': sprites_equipment.charm,
     **sprites_characters.SPRITES,
     **sprites_animals.SPRITES,
+    **sprites_animal_art.SPRITES,
     **sprites_farm.SPRITES,
     **sprites_meadow.SPRITES,
     **sprites_map.SPRITES,

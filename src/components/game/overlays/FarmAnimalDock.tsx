@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { ANIMALS, FARM_UPGRADES } from '@/config/farm';
-import { ANIMAL_PIXEL_ICONS } from '@/config/pixelIcons';
+import { PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
 import { formatNumber } from '@/utils/formatters';
 import { animalBatchCost, animalOutput, calculateAnimalCost, farmCap, farmUpgradeLevel } from '@/utils/game/farm';
 import type { Animal } from '@/types/game';
@@ -73,7 +73,7 @@ const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, on
 			onMouseLeave={() => onHover(false)}
 		>
 			<div className='farm-animal-head'>
-				<PixelIcon name={ANIMAL_PIXEL_ICONS[animal.id]} scale={0.75} alt='' />
+				<PixelIcon name={animalIcon(animal.id)} scale={30 / PIXEL_ICON_SIZES[animalIcon(animal.id)][0]} alt='' />
 				<span className='farm-animal-name'>{animal.name}</span>
 				<span className='farm-animal-count' title='Animals owned / pen limit'>
 					{owned}/{cap}
