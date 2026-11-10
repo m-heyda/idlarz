@@ -839,7 +839,7 @@
   "kind": "function",
   "category": "Economy/Chests and Luck",
   "file": "src/lib/chests.ts",
-  "line": 29,
+  "line": 28,
   "summary": "The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = \"x,y\" keys), outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a penalty when another chest is within `nearbyRadius`. So chests lean toward the edge of your land and spread out.",
   "see": []
  },
@@ -850,7 +850,7 @@
   "kind": "function",
   "category": "Economy/Chests and Luck",
   "file": "src/lib/chests.ts",
-  "line": 91,
+  "line": 90,
   "summary": "Relative chances with Luck shifted from plain gold toward the lucky chest and the item.",
   "see": []
  },
@@ -861,7 +861,7 @@
   "kind": "function",
   "category": "Economy/Chests and Luck",
   "file": "src/lib/chests.ts",
-  "line": 108,
+  "line": 107,
   "summary": "Rolls the contents of a chest. Gold is \"minutes of income\", like before; a full bag turns an item into gold.",
   "see": []
  },

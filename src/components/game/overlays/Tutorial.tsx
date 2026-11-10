@@ -112,8 +112,8 @@ const Tutorial: React.FC = () => {
 			<section>
 				<h3 className='px-h'>Right-click</h3>
 				<p className='text-[#d8c8a0] mb-2'>
-					<b>Right-click</b> an explored tile for its menu: <b>Highlight this area</b> tints the connected area of that biome around the tile for a moment. Buildings are
-					coming back in a new form and will be built from the same menu (the entry is there, greyed out, until then).
+					<b>Right-click</b> an explored tile for its menu: <b>Highlight this area</b> tints the connected area of that biome around the tile for a moment.
+					Buildings are coming back in a new form and will be built from the same menu (the entry is there, greyed out, until then).
 				</p>
 			</section>
 

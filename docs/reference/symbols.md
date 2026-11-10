@@ -55,7 +55,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Checking live saves before a release | Ops / Operator guides | [`scripts/check-live-saves.ts:1`](../../scripts/check-live-saves.ts) | Before a reset or a release that tightens the save rules: |
 | `CHEST` | Economy / Chests and Luck | [`src/config/spawns.ts:34`](../../src/config/spawns.ts) | Chests. |
 | `chestIntervalSec` | Economy / Chests and Luck | [`src/lib/luck.ts:16`](../../src/lib/luck.ts) | Seconds between two chests: |
-| `chestSpots` | Economy / Chests and Luck | [`src/lib/chests.ts:29`](../../src/lib/chests.ts) | The tiles a chest could go on, with their weights. |
+| `chestSpots` | Economy / Chests and Luck | [`src/lib/chests.ts:28`](../../src/lib/chests.ts) | The tiles a chest could go on, with their weights. |
 | `CLICK_LADDER` | Economy / Clicks | [`src/config/economy.ts:170`](../../src/config/economy.ts) | Clicking: |
 | `CLICK_LIMIT` | Economy / Clicks | [`src/config/economy.ts:203`](../../src/config/economy.ts) | The click rate limit: |
 | `clickGold` | Economy / Clicks | [`src/config/economy.ts:186`](../../src/config/economy.ts) | Gold of one click at a ladder level: |
@@ -169,10 +169,10 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `resolveSourceLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:99`](../../src/lib/loot/generate.ts) | The level of a chest or shelf: |
 | `RESOURCE_CAP` | Economy / Basics | [`src/config/economy.ts:43`](../../src/config/economy.ts) | The most any stockpile (XP included) can hold; |
 | `restThrough` | Combat / Results and rest | [`src/lib/offline/fight.ts:164`](../../src/lib/offline/fight.ts) | After an absence the player is back on their feet: |
-| `rewardWeights` | Economy / Chests and Luck | [`src/lib/chests.ts:91`](../../src/lib/chests.ts) | Relative chances with Luck shifted from plain gold toward the lucky chest and the item. |
+| `rewardWeights` | Economy / Chests and Luck | [`src/lib/chests.ts:90`](../../src/lib/chests.ts) | Relative chances with Luck shifted from plain gold toward the lucky chest and the item. |
 | `rngFor` | Combat / A fight | [`src/lib/offline/fightContext.ts:81`](../../src/lib/offline/fightContext.ts) | The next random stream of a fight: |
 | `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:126`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
-| `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:108`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
+| `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
 | `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:114`](../../src/lib/craftGear.ts) | One crafted piece: |
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |

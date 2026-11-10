@@ -17,7 +17,6 @@ const SIDES4: [number, number][] = [
 	[-1, 0],
 ];
 
-
 /**
  * The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys),
  * outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a

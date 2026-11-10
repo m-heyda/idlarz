@@ -168,9 +168,20 @@ test('the tile right-click menu keeps a disabled "Buildings: coming soon" placeh
 	assert.ok(entry, 'the entry is there');
 	assert.equal(entry.label, 'Buildings: coming soon');
 	assert.equal(entry.disabled, true);
-	assert.equal(items.some((item) => /build here/i.test(item.label)), false, 'the old "Build here..." entry is gone');
-	assert.ok(items.some((item) => item.id === 'highlight'), 'the other entries are unchanged');
+	assert.equal(
+		items.some((item) => /build here/i.test(item.label)),
+		false,
+		'the old "Build here..." entry is gone',
+	);
+	assert.ok(
+		items.some((item) => item.id === 'highlight'),
+		'the other entries are unchanged',
+	);
 	// it stays out of the way of a chest or a monster on the tile, as before for the other entries
 	assert.ok(tileMenuItems(context(at.x, at.y, at.t.biome, { hasChest: true })).some((item) => item.id === BUILDINGS_ENTRY_ID));
-	assert.equal(tileMenuItems(context(CASTLE_X, CASTLE_Y, 'castle')).some((item) => item.id === BUILDINGS_ENTRY_ID), false, 'the castle takes no building');
+	assert.equal(
+		tileMenuItems(context(CASTLE_X, CASTLE_Y, 'castle')).some((item) => item.id === BUILDINGS_ENTRY_ID),
+		false,
+		'the castle takes no building',
+	);
 });

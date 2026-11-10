@@ -1048,13 +1048,13 @@ so an auto-clicker is no better than a very dedicated human). Script-dispatched 
 </code></pre>
 </article><article><p><a id="chestspots"></a></p>
 <h3><code>chestSpots</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:29</code></a></p>
+<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:28</code></a></p>
 <p>The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (<code>taken</code> = &quot;x,y&quot; keys),
 outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
 penalty when another chest is within <code>nearbyRadius</code>. So chests lean toward the edge of your land and spread out.</p>
 </article><article><p><a id="rewardweights"></a></p>
 <h3><code>rewardWeights</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:91</code></a></p>
+<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:90</code></a></p>
 <p>Relative chances with Luck shifted from plain gold toward the lucky chest and the item.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">shift       = min(0.6 x gold weight, gold weight x Luck x 1%)
@@ -1062,7 +1062,7 @@ gold weight -= shift;  boost += 0.8 x shift;  item += 0.2 x shift
 </code></pre>
 </article><article><p><a id="rollchestloot"></a></p>
 <h3><code>rollChestLoot</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:108</code></a></p>
+<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:107</code></a></p>
 <p>Rolls the contents of a chest. Gold is &quot;minutes of income&quot;, like before; a full bag turns an item into gold.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">gold chest  = floor(gold/s x U(10..60 min) x 60 x (1 + 0.005 x Luck) x (1 + Gold Find%))      boost chest: x1.5

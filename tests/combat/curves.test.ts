@@ -113,4 +113,3 @@ test('stats and percentages use the same short notation: plain below 10,000 (5,0
 	assert.equal(formatPercent(5000), '5.00K%');
 	assert.equal(formatPercent(450), '450%');
 });
-

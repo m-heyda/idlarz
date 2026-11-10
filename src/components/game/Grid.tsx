@@ -257,17 +257,7 @@ const Grid: React.FC = () => {
 			for (let x = minX; x < maxX; x++) {
 				const tile = getTile(tiles, x, y);
 				if (!tile && !hasOwnedNeighbour(tiles, x, y)) continue;
-				visible.push(
-					<Tile
-						key={`${x},${y}`}
-						biome={tile ? tile.biome : 'empty'}
-						isOwned={!!tile}
-						x={x}
-						y={y}
-						level={tile?.level}
-						canAfford={canAffordNext}
-					/>,
-				);
+				visible.push(<Tile key={`${x},${y}`} biome={tile ? tile.biome : 'empty'} isOwned={!!tile} x={x} y={y} level={tile?.level} canAfford={canAffordNext} />);
 			}
 		}
 		return visible;

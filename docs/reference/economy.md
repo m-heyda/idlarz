@@ -801,7 +801,7 @@ interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck))
 
 ### `chestSpots` <small>function</small>
 
-Source: [`src/lib/chests.ts:29`](../../src/lib/chests.ts)
+Source: [`src/lib/chests.ts:28`](../../src/lib/chests.ts)
 
 The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (`taken` = "x,y" keys),
 outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
@@ -811,7 +811,7 @@ penalty when another chest is within `nearbyRadius`. So chests lean toward the e
 
 ### `rewardWeights` <small>function</small>
 
-Source: [`src/lib/chests.ts:91`](../../src/lib/chests.ts)
+Source: [`src/lib/chests.ts:90`](../../src/lib/chests.ts)
 
 Relative chances with Luck shifted from plain gold toward the lucky chest and the item.
 
@@ -826,7 +826,7 @@ gold weight -= shift;  boost += 0.8 x shift;  item += 0.2 x shift
 
 ### `rollChestLoot` <small>function</small>
 
-Source: [`src/lib/chests.ts:108`](../../src/lib/chests.ts)
+Source: [`src/lib/chests.ts:107`](../../src/lib/chests.ts)
 
 Rolls the contents of a chest. Gold is "minutes of income", like before; a full bag turns an item into gold.
 
