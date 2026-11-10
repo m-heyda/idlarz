@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo } from '../helpers';
-import { CASTLE_FORTRESS } from '../../src/config/castle';
+import { CASTLE_WARD } from '../../src/config/castle';
 import { SPAWN_LIMIT } from '../../src/config/spawns';
 import { castleLevelOf } from '../../src/lib/castleWard';
 import { freeTiles, spawnCap } from '../../src/lib/spawnLimits';
@@ -11,11 +11,12 @@ import { summarize } from '../../src/lib/cloudSave/summary';
 import { syntheticWorld } from '../../src/utils/worldGen';
 import { biomeCount, EMPTY_WORLD } from '../../src/utils/world';
 
-test('free tiles leave out the castle, lakes and (from the fortress level) the ward', () => {
+test('free tiles leave out the castle, lakes and (from the ward level) the ward', () => {
 	const world = syntheticWorld(400, 3);
 	const { owned, byBiome } = world.stats;
 	assert.equal(freeTiles(world, 1), owned - (byBiome.castle ?? 0) - (byBiome.lake ?? 0));
-	assert.equal(freeTiles(world, CASTLE_FORTRESS.fromLevel), freeTiles(world, 1) - 8);
+	assert.equal(freeTiles(world, CASTLE_WARD.fromLevel), freeTiles(world, 1) - 8);
+	assert.equal(freeTiles(world, 10), freeTiles(world, 1) - 80, 'the ward grows with the range: 9x9 less the castle at level 10');
 	assert.equal(freeTiles(EMPTY_WORLD, 1), 0);
 });
 
@@ -36,7 +37,7 @@ test('IDL-221: the server cap (from the save counts) equals the client cap for t
 	for (const [size, seed, castleLevel] of [
 		[400, 3, 1],
 		[1000, 5, 1],
-		[1000, 5, CASTLE_FORTRESS.fromLevel],
+		[1000, 5, CASTLE_WARD.fromLevel],
 		[120, 9, 1],
 	] as const) {
 		const world = syntheticWorld(size, seed);

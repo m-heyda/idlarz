@@ -1,22 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, store, tileAt } from '../helpers';
-import { CASTLE_FORTRESS, CASTLE_RANGE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
-import {
-	castleAreaBonus,
-	castleLevelOf,
-	castleRangeRadius,
-	fortressWallTier,
-	inCastleRange,
-	isInWard,
-	MAX_CASTLE_RANGE_RADIUS,
-} from '../../src/lib/castleWard';
+import { CASTLE_WARD, CASTLE_RANGE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
+import { castleAreaBonus, castleLevelOf, castleRangeRadius, inCastleRange, isInWard, MAX_CASTLE_RANGE_RADIUS } from '../../src/lib/castleWard';
 import { calculateResourceBreakdown, calculateTileOutput } from '../../src/utils/game/income';
 import { groundOf } from '../../src/utils/terrain';
 import { pickSpawnTile } from '../../src/lib/monsters';
 import { EMPTY_WORLD, patchTile, setTile } from '../../src/utils/world';
 
-const L7 = CASTLE_FORTRESS.fromLevel;
+const L7 = CASTLE_WARD.fromLevel;
 const R = CASTLE_RANGE.radius;
 
 const setCastle = (level: number) =>
@@ -43,22 +35,24 @@ const ownRing = () =>
 		return { tiles };
 	});
 
-test('the fortress starts at castle level 7', () => {
+test('the ward starts at castle level 7', () => {
 	assert.equal(L7, 7);
 });
 
-test('isInWard: the 3x3 around the castle from level 7, nothing before and nothing outside', () => {
+test('isInWard: the whole range area from level 7 (3x3 growing to 9x9), nothing before and nothing outside', () => {
 	for (const { x, y } of ring()) {
 		assert.equal(isInWard(x, y, L7 - 1), false, `${x},${y} at level ${L7 - 1}`);
 		assert.equal(isInWard(x, y, L7), true, `${x},${y} at level ${L7}`);
 		assert.equal(isInWard(x, y, 10), true);
 	}
-	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y, 10), false);
-	assert.equal(isInWard(CASTLE_X, CASTLE_Y - R - 1, 10), false);
-	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y + R + 1, 10), false);
+	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y, L7), false);
+	assert.equal(isInWard(CASTLE_X, CASTLE_Y - R - 1, L7), false);
+	assert.equal(isInWard(CASTLE_X + R + 1, CASTLE_Y + R + 1, L7), false);
+	assert.equal(isInWard(CASTLE_X + 4, CASTLE_Y - 4, 10), true);
+	assert.equal(isInWard(CASTLE_X + 5, CASTLE_Y, 10), false);
 });
 
-test('the range area: 3x3 up to level 7, then one more tile on every side per level up to 9x9; the ward stays 3x3', () => {
+test('the range area: 3x3 up to level 7, then one more tile on every side per level up to 9x9; the ward covers the same area', () => {
 	assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(castleRangeRadius), [1, 1, 1, 1, 1, 1, 1, 2, 3, 4]);
 	assert.equal(MAX_CASTLE_RANGE_RADIUS, 4);
 	for (const [level, r] of [
@@ -71,9 +65,9 @@ test('the range area: 3x3 up to level 7, then one more tile on every side per le
 		assert.equal(inCastleRange(CASTLE_X + r + 1, CASTLE_Y, level), false, `level ${level}: one past`);
 		assert.equal(inCastleRange(CASTLE_X, CASTLE_Y - r - 1, level), false);
 	}
-	// the safe ward and the walled fortress do not grow with it
-	assert.equal(isInWard(CASTLE_X + 2, CASTLE_Y, 10), false);
-	assert.equal(isInWard(CASTLE_X + R, CASTLE_Y + R, 10), true);
+	// the safe ward grows with it
+	assert.equal(isInWard(CASTLE_X + 2, CASTLE_Y, 10), true);
+	assert.equal(isInWard(CASTLE_X + 2, CASTLE_Y, L7), false);
 });
 
 test('pickSpawnTile never picks a lake or a chest tile, however often it is asked', () => {
@@ -133,24 +127,18 @@ test('a monster never stands in the ward (the 3x3 around the castle from level 7
 	}
 });
 
-test('fortressWallTier: stone walls for levels 7-8, gilded for 9-10', () => {
-	assert.deepEqual([7, 8, 9, 10].map(fortressWallTier), ['a', 'a', 'b', 'b']);
-});
-
-test('the castle tile is drawn on cobbled yard ground from level 7 and on its flagstones before', () => {
+test('the castle tile keeps its flagstone ground at every level (no walled courtyard any more)', () => {
 	freshGame();
 	const castle = () => tileAt(api().tiles, CASTLE_X, CASTLE_Y);
-	setCastle(L7 - 1);
-	assert.equal(groundOf(castle()), 'castle');
-	setCastle(L7);
-	assert.equal(groundOf(castle()), 'yard');
-	setCastle(10);
-	assert.equal(groundOf(castle()), 'yard');
+	for (const level of [1, L7 - 1, L7, 10]) {
+		setCastle(level);
+		assert.equal(groundOf(castle()), 'castle');
+	}
 });
 
 const sumOf = (parts: Partial<Record<string, number>>) => Object.values(parts).reduce<number>((a, b) => a + (b ?? 0), 0);
 
-test('castleAreaBonus: +50% below level 7 (no walls), then +1x (100%) per tile of range up to +4x at level 10', () => {
+test('castleAreaBonus: +50% below level 7, then +1x (100%) per tile of range up to +4x at level 10', () => {
 	assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(castleAreaBonus), [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 2, 3, 4]);
 });
 

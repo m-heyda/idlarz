@@ -1,5 +1,4 @@
 import type { Tile } from '@/types/game';
-import { CASTLE_FORTRESS } from '@/config/castle';
 import atlasJson from '@/config/terrainAtlas.json';
 import { getTile, inRange, tileKey, type World } from './world';
 
@@ -106,7 +105,6 @@ const rankOf = (g: string) => RANK.indexOf(g as Ground);
 /** The ground an owned tile is drawn with; null when it is not owned. A building does not change it: the tile keeps its biome's ground and gets a pad in that biome's style. */
 export function groundOf(tile: Tile | undefined): Ground | null {
 	if (!tile || !tile.isOwned) return null;
-	if (tile.biome === 'castle' && (tile.level ?? 1) >= CASTLE_FORTRESS.fromLevel) return 'yard'; // the fortress stands on cobbles
 	return rankOf(tile.biome) > 0 ? (tile.biome as Ground) : null;
 }
 

@@ -79,7 +79,11 @@ export const CATEGORIES: readonly { id: AssetCategory; title: string; blurb: str
 	{ id: 'armor', title: 'Armor', blurb: 'Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.' },
 	{ id: 'accessories', title: 'Accessories', blurb: 'Neck, ring and charm icons.' },
 	{ id: 'monsters', title: 'Monsters', blurb: 'The monster roster art, per biome, plus planned monsters that have no picture yet.' },
-	{ id: 'buildings', title: 'Buildings', blurb: 'The 16 map buildings and the castle in the game, and the village packs waiting in the reuse pool.' },
+	{
+		id: 'buildings',
+		title: 'Buildings',
+		blurb: 'The 16 map buildings, the 10 castle levels and the 7 castle skins (not wired yet), and the village packs waiting in the reuse pool.',
+	},
 	{ id: 'resources', title: 'Resources', blurb: 'Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.' },
 	{
 		id: 'map-details',
@@ -306,16 +310,15 @@ export const buildManifest = (): AssetEntry[] => {
 	for (const f of walk(join(PUBLIC, 'pixel', 'icons'))) {
 		const id = basename(f, '.png');
 		if (itemIconNames.has(id) || /^(biome|meadow|water)_/.test(id)) continue;
-		const category: AssetCategory =
-			id.startsWith('building_') || id.startsWith('castle_')
-				? 'buildings'
-				: /^(res_|animal_|farm_)/.test(id) || /^(gold|wood|stone|coal|food|meat|eggs|milk|hide|legacy|diamond|comp_)/.test(id)
-					? 'resources'
-					: id.startsWith('monster_')
-						? 'monsters'
-						: 'ui';
+		const category: AssetCategory = id.startsWith('building_')
+			? 'buildings'
+			: /^(res_|animal_|farm_)/.test(id) || /^(gold|wood|stone|coal|food|meat|eggs|milk|hide|legacy|diamond|comp_)/.test(id)
+				? 'resources'
+				: id.startsWith('monster_')
+					? 'monsters'
+					: 'ui';
 		const users = usage.get(id) ?? [];
-		const wired = users.length > 0 || id.startsWith('castle_') || mentioned(id);
+		const wired = users.length > 0 || mentioned(id);
 		add({
 			name: id,
 			category,
@@ -324,6 +327,22 @@ export const buildManifest = (): AssetEntry[] => {
 			status: reserved.has(id as never) ? 'planned' : wired ? 'used' : 'unused',
 			usedBy: users,
 			source: 'public/pixel/icons',
+		});
+	}
+
+	// 4b. The castle: one sprite per upgrade level (in the game) and the premium skins (planned for the gem shop)
+	for (const f of walk(join(PUBLIC, 'pixel', 'castles'))) {
+		const id = basename(f, '.png');
+		const skin = id.startsWith('castle_skin_');
+		const loading = id === 'castle_loading';
+		add({
+			name: id,
+			category: 'buildings',
+			subcategory: skin ? 'castle skin' : 'castle',
+			src: url(f),
+			status: skin ? 'planned' : 'used',
+			usedBy: skin ? [] : loading ? ['loading screen'] : ['castle level ' + id.replace('castle_', '')],
+			source: 'public/pixel/castles',
 		});
 	}
 

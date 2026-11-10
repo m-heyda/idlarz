@@ -7,7 +7,7 @@ const TICKS = Array.from({ length: 12 }, (_, i) => i * 30);
 /**
  * Hydration splash: a rune circle drawn as smooth SVG and pushed through an SVG "block" filter
  * so it renders as chunky pixels (it keeps rotating, so the pixels re-form every frame), with the
- * castle growing through its six levels in the middle, fog drifting behind and a stone bar below.
+ * castle growing through its ten levels in the middle, fog drifting behind and a stone bar below.
  */
 const LoadingView: React.FC = () => {
 	return (

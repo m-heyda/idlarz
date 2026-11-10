@@ -1,12 +1,13 @@
-import { CASTLE_FORTRESS, CASTLE_RANGE } from '@/config/castle';
+import { CASTLE_WARD } from '@/config/castle';
+import { castleRangeRadius } from '@/lib/castleWard';
 import { SPAWN_LIMIT } from '@/config/spawns';
 import type { World } from '@/utils/world';
 
 // How many monsters and chests the map can hold: a share of the land they could stand on, so a small map never fills up
 // with them. O(1) (world counters only), because the tick asks every second while the spawn timers are paused at the limit.
 
-/** Tiles the ward keeps clear (the walled range around the castle, without the castle itself); 0 below the fortress level. */
-export const wardTiles = (castleLevel: number): number => (castleLevel >= CASTLE_FORTRESS.fromLevel ? (2 * CASTLE_RANGE.radius + 1) ** 2 - 1 : 0);
+/** Tiles the ward keeps clear (the range area around the castle, without the castle itself: 8 at level 7 up to 80 at level 10); 0 below the ward level. */
+export const wardTiles = (castleLevel: number): number => (castleLevel >= CASTLE_WARD.fromLevel ? (2 * castleRangeRadius(castleLevel) + 1) ** 2 - 1 : 0);
 
 /**
  * Owned land a monster or chest can stand on: not the castle, not a lake, outside the ward. An estimate, never below 0.

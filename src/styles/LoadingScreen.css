@@ -53,7 +53,7 @@
 	}
 }
 
-/* the castle grows through its six levels: 48px cells shown at 4x, one per step */
+/* the castle grows through its ten levels: 64px cells (public/pixel/castles/castle_loading.png, built from castle_1..10) shown at 3x, one per step */
 .loading-castle {
 	position: absolute;
 	left: 50%;
@@ -61,15 +61,15 @@
 	width: 192px;
 	height: 192px;
 	margin: -106px 0 0 -96px;
-	background: url('/pixel/icons/castle_loading.png') 0 0 / 1152px 192px no-repeat;
+	background: url('/pixel/castles/castle_loading.png') 0 0 / 1920px 192px no-repeat;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.4)) drop-shadow(0 0 14px rgba(255, 210, 100, 0.55));
-	animation: castle-grow 4.8s steps(6) infinite;
+	animation: castle-grow 6s steps(10) infinite;
 }
 
 @keyframes castle-grow {
 	to {
-		background-position-x: -1152px;
+		background-position-x: -1920px;
 	}
 }
 

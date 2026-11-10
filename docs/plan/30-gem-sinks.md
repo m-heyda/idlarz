@@ -99,7 +99,7 @@ Re-roll **one** affix of a bagged or worn piece. The server rolls it with a seal
 
 ## 7. Prestige tail
 
-A sink that never runs out and gives no power: **patron titles** by lifetime gems spent (spentTotal), a **Monument** map object (cosmetic, no income) that grows with the same milestones, premium castle skins, map themes and name colours. Embers buy the basic cosmetics (IDL-184), gems the premium ones. Nothing here changes income, combat or any limit. It also gives the rankings board something to show beyond income.
+A sink that never runs out and gives no power: **patron titles** by lifetime gems spent (spentTotal), a **Monument** map object (cosmetic, no income) that grows with the same milestones, premium castle skins (the 7 sprites `castle_skin_1..7.png` are already in `public/pixel/castles/`, listed as planned in Storybook; no shop or save field yet), map themes and name colours. Embers buy the basic cosmetics (IDL-184), gems the premium ones. Nothing here changes income, combat or any limit. It also gives the rankings board something to show beyond income.
 
 ## 8. Release placement
 

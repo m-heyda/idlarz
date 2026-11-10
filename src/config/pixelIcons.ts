@@ -16,6 +16,7 @@ import { ITEM_ART_SIZE, ITEM_ICON_SIZE, ITEM_ICONS } from './itemIcons';
 
 const PIXEL_ICON_DIR = '/pixel/icons';
 const ITEM_ART_DIR = '/pixel/items';
+const CASTLE_ART_DIR = '/pixel/castles';
 
 export { ITEM_ART_SIZE };
 
@@ -125,27 +126,25 @@ const BASE_ICON_SIZES = {
 	monster_rat: [80, 40],
 	monster_ratking: [112, 56],
 	skull: [40, 40], // lies over a dead monster in the minimized combat box
-	// castle by upgrade level, seen from above; every level fills its 48px tile (6 is the animated max)
-	castle_1: [48, 48],
-	castle_2: [48, 48],
-	castle_3: [48, 48],
-	castle_4: [48, 48],
-	castle_5: [48, 48],
-	castle_6: [48, 48],
-	// castle fortress (level 7+): keep (64px, spills 8px over its neighbours; the anim sheet is 4 frames), corner towers,
-	// walls (stone a / gilded b) and the south gate
-	castle_keep: [64, 64],
-	castle_keep_anim: [256, 64],
-	castle_tower_7: [40, 56],
-	castle_tower_8: [40, 56],
-	castle_tower_9: [40, 56],
-	castle_tower_10: [40, 56],
-	castle_wall_h_a: [48, 12],
-	castle_wall_h_b: [48, 12],
-	castle_wall_v_a: [12, 48],
-	castle_wall_v_b: [12, 48],
-	castle_gate_a: [52, 30],
-	castle_gate_b: [52, 30],
+	// castles: castle_1..castle_10 (one per upgrade level) and castle_skin_1..7 (premium skins, not wired yet) live in public/pixel/castles.
+	// 64px, drawn centred on the 48px castle tile so they spill 8px over the neighbours.
+	castle_1: [64, 64],
+	castle_2: [64, 64],
+	castle_3: [64, 64],
+	castle_4: [64, 64],
+	castle_5: [64, 64],
+	castle_6: [64, 64],
+	castle_7: [64, 64],
+	castle_8: [64, 64],
+	castle_9: [64, 64],
+	castle_10: [64, 64],
+	castle_skin_1: [64, 64],
+	castle_skin_2: [64, 64],
+	castle_skin_3: [64, 64],
+	castle_skin_4: [64, 64],
+	castle_skin_5: [64, 64],
+	castle_skin_6: [64, 64],
+	castle_skin_7: [64, 64],
 	// map: one icon per biome
 	biome_forest: [32, 32],
 	biome_plains: [32, 32],
@@ -206,7 +205,10 @@ export type PixelIconName = keyof typeof BASE_ICON_SIZES | ItemIconName;
 /** Is this icon one of the supplied 64 px item art files (the registry, config/itemIcons/)? */
 export const isItemArt = (name: string): name is ItemArtName => ITEM_ART_FILES.has(name);
 
-export const pixelIconSrc = (name: PixelIconName) => (isItemArt(name) ? `${ITEM_ART_DIR}/${ITEM_ART_FILES.get(name)}.png` : `${PIXEL_ICON_DIR}/${name}.png`);
+export const pixelIconSrc = (name: PixelIconName) => {
+	if (isItemArt(name)) return `${ITEM_ART_DIR}/${ITEM_ART_FILES.get(name)}.png`;
+	return `${name.startsWith('castle_') ? CASTLE_ART_DIR : PIXEL_ICON_DIR}/${name}.png`;
+};
 
 // Resource key -> sprite. Resources without an entry fall back to their emoji.
 export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
@@ -302,7 +304,7 @@ export const BIOME_PIXEL_ICONS: Record<string, PixelIconName | undefined> = {
 	coast: 'biome_coast',
 };
 
-export const castleIconName = (level: number): PixelIconName => `castle_${Math.max(1, Math.min(6, Math.floor(level)))}` as PixelIconName;
+export const castleIconName = (level: number): PixelIconName => `castle_${Math.max(1, Math.min(10, Math.floor(level)))}` as PixelIconName;
 
 // Building type -> sprite
 export const BUILDING_PIXEL_ICONS: Record<string, PixelIconName> = {

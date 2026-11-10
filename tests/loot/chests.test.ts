@@ -77,7 +77,7 @@ test('chest spot: a lake is fine (drawn as a glowing ripple), a tile that holds 
 	for (let i = 0; i < 40; i++) assert.deepEqual(pickChestSpot(w, new Set(), 1, rng(i)), { x: CASTLE_X + 1, y: CASTLE_Y + 1 });
 });
 
-test('chest spot: nothing eligible gives null, and the fortress ward is off limits', () => {
+test('chest spot: nothing eligible gives null, and the ward is off limits', () => {
 	assert.equal(pickChestSpot(worldFromRows(blank()), new Set(), 1), null);
 	const g = worldFromRows(territory(1)); // castle + its 8 neighbours = exactly the ward
 	assert.equal(pickChestSpot(g, new Set(), 7), null);

@@ -1453,10 +1453,6 @@ body {
 	background-image: url('/pixel/bg/ground_castle.png');
 }
 
-.tile-ground-yard {
-	background-image: url('/pixel/bg/ground_yard.png');
-}
-
 /* owned tiles light up on hover with an overlay (a filter would wash out the tile's own sprites) */
 .tile-owned {
 	&::after {
@@ -1672,7 +1668,7 @@ body {
 	}
 }
 
-/* --- Castle: top-down, fills its tile; grows towers with each upgrade, the max level glows + animates --- */
+/* --- Castle: one 64px sprite per upgrade level (public/pixel/castles), centred on its 48px tile and spilling 8px over the neighbours --- */
 .castle-sprite {
 	position: absolute;
 	left: 50%;
@@ -1689,94 +1685,6 @@ body {
 		top: auto;
 		transform: none;
 		pointer-events: auto;
-	}
-}
-
-/* the fortress keep: 64px frames in a 4-frame sheet (banners wave, the crystal pulses); spills 8px over the neighbours */
-.castle-keep {
-	width: 64px;
-	height: 64px;
-	translate: 0 -6px;
-	background: url('/pixel/icons/castle_keep_anim.png') 0 0 / 256px 64px no-repeat;
-	animation: castle-keep-anim 1.2s steps(4) infinite;
-}
-
-@keyframes castle-keep-anim {
-	to {
-		background-position-x: -256px;
-	}
-}
-
-.castle-max {
-	--tier: 0;
-	--grow: calc(1 + var(--tier) * 0.06); /* 1.00 at the first glowing level, 1.24 at level 10 */
-	width: 48px;
-	height: 48px;
-	scale: var(--grow);
-	background: url('/pixel/icons/castle_6_anim.png') 0 0 / 192px 48px no-repeat;
-	animation:
-		castle-anim 0.9s steps(4) infinite,
-		castle-glow 2.6s ease-in-out infinite alternate;
-}
-
-@keyframes castle-anim {
-	to {
-		background-position-x: -192px;
-	}
-}
-
-@keyframes castle-glow {
-	from {
-		filter: drop-shadow(0 0 calc(3px + var(--tier) * 1px) rgba(255, 200, 80, 0.4)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35));
-	}
-	to {
-		filter: drop-shadow(0 0 calc(12px + var(--tier) * 3px) rgba(255, 224, 120, 0.95)) drop-shadow(0 3px 0 rgba(0, 0, 0, 0.35));
-	}
-}
-
-/* golden aura on the tile itself + sparkles that drift up around the castle */
-.castle-max-tile {
-	animation: castle-aura 2.6s ease-in-out infinite alternate;
-}
-
-@keyframes castle-aura {
-	from {
-		box-shadow:
-			0 0 10px 2px rgba(255, 200, 70, 0.25),
-			inset 0 0 8px rgba(255, 220, 120, 0.2);
-	}
-	to {
-		box-shadow:
-			0 0 30px 10px rgba(255, 210, 80, 0.5),
-			inset 0 0 14px rgba(255, 230, 140, 0.4);
-	}
-}
-
-.castle-spark {
-	position: absolute;
-	left: var(--x);
-	top: 70%;
-	width: 4px;
-	height: 4px;
-	background: #fff6c0;
-	box-shadow: 0 0 6px 1px #ffd860;
-	opacity: 0;
-	pointer-events: none;
-	animation: spark-rise 2.8s linear infinite;
-	animation-delay: var(--d);
-}
-
-@keyframes spark-rise {
-	0% {
-		transform: translateY(0);
-		opacity: 0;
-	}
-	15% {
-		opacity: 1;
-	}
-	100% {
-		transform: translateY(-56px);
-		opacity: 0;
 	}
 }
 
@@ -1814,21 +1722,6 @@ body {
 	border: 1px solid #8a6a2a;
 	cursor: pointer;
 	white-space: nowrap;
-}
-
-/* the keep reaches to the top of its tile: the level plaque moves to the bottom corner */
-.tile-fortress .tile-badge {
-	top: auto;
-	bottom: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.castle-max,
-	.castle-keep,
-	.castle-max-tile,
-	.castle-spark {
-		animation: none;
-	}
 }
 
 /* --- Notify dot: universal, understated "needs attention" marker, pinned to the top-right of a positioned parent --- */

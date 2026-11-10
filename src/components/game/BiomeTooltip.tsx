@@ -65,7 +65,7 @@ export const BiomeTooltip = memo(({ biome, level, x, y }: { biome: BiomeType; le
 			{biome === 'castle' && (
 				<div className='text-purple-300 text-xs'>
 					{`Castle area: ${percent(areaBonus)} production on every tile within ${castleRangeRadius(castleLevel)} tile${castleRangeRadius(castleLevel) > 1 ? 's' : ''}`}
-					{castleLevel < CASTLE_AREA_BONUS.fromLevel && ` (walls at level ${CASTLE_AREA_BONUS.fromLevel} double it)`}
+					{castleLevel < CASTLE_AREA_BONUS.fromLevel && ` (level ${CASTLE_AREA_BONUS.fromLevel} doubles it)`}
 				</div>
 			)}
 			{biome === 'castle' && castleUpgrade && (

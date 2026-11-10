@@ -22,7 +22,6 @@
  * @order 1
  */
 import React, { useRef, useEffect, useState, useCallback, useMemo, JSX } from 'react';
-import { CASTLE_FORTRESS, CASTLE_RANGE } from '@/config/castle';
 import { TILE_SIZE } from '@/config/biomes';
 import { castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import { visibleTileRange } from '@/lib/mapView';
@@ -37,7 +36,6 @@ import AmbientLife from './AmbientLife';
 import { MapTipLayerContext } from './MapTipLayer';
 import type { Viewport } from '@/lib/ambientLife';
 import CastleRange from './CastleRange';
-import CastleFortress from './CastleFortress';
 import TerrainLayer from './TerrainLayer';
 import WaterLayer from './WaterLayer';
 import HighlightLayer from './HighlightLayer';
@@ -302,9 +300,7 @@ const Grid: React.FC = () => {
 				<WaterLayer minX={seen.minX} maxX={seen.maxX} minY={seen.minY} maxY={seen.maxY} />
 				<MapTipLayerContext.Provider value={tipLayer}>{visibleTiles}</MapTipLayerContext.Provider>
 				<AmbientLife getViewport={getViewport} />
-				{/* below the fortress level the violet 3x3 alone; at the fortress level the walls replace it; once the range outgrows the walled 3x3 both show */}
-				{castleLevel < CASTLE_FORTRESS.fromLevel || rangeRadius > CASTLE_RANGE.radius ? <CastleRange radius={rangeRadius} /> : null}
-				{castleLevel >= CASTLE_FORTRESS.fromLevel && <CastleFortress level={castleLevel} />}
+				<CastleRange radius={rangeRadius} />
 				<div ref={setTipLayer} className='map-tip-layer' />
 			</div>
 			<HighlightLayer />
