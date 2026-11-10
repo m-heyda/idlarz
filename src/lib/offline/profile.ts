@@ -6,6 +6,7 @@ import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { aggregateStats } from '@/lib/inventory';
 import { attacksPerSecond, critOdds, damagePerHit, dodgeChance, lifeLeechPercent, manaRegenPerSec, maxHp, maxMana, armorOf } from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
+import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/potionBelt';
 import { withClassBonus } from '@/lib/classPassives';
 import { critDamagePercent } from '@/lib/statBonuses';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
@@ -54,7 +55,7 @@ const merchantOf = (core: Core): Record<string, number> => {
 };
 
 /**
- * Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).
+ * Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt's potion cooldown, power and slots), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).
  *
  * @category Combat/A fight
  * @order 5
@@ -66,6 +67,7 @@ export const playerProfile = (core: Core): PlayerProfile => {
 	const playerClass = core.playerClass;
 	const bonus = withClassBonus(merchantCombat(merchantOf(core)), playerClass);
 	const odds = critOdds(stats, equipment, bonus);
+	const gear = aggregateStats(equipment);
 	return {
 		level: characterLevelOf(core),
 		maxHp: maxHp(stats, equipment),
@@ -78,9 +80,12 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		armor: armorOf(equipment, stats, playerClass),
 		dodge: dodgeChance(equipment),
 		leechPct: lifeLeechPercent(equipment, bonus),
-		hpRegen: aggregateStats(equipment).regen + bonus.regen,
+		hpRegen: gear.regen + bonus.regen,
 		mpRegen: manaRegenPerSec(stats, equipment),
 		heal: healAmount(stats, equipment, undefined, playerClass),
+		potionCooldownSec: potionCooldownSec(gear),
+		potionPower: potionPower(gear),
+		potionSlots: potionSlotCount(gear),
 	};
 };
 

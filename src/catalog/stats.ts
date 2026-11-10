@@ -22,6 +22,11 @@ export interface StatDef {
 	 * the multipliers and economy effects of the big set bonuses (income, XP, kill rewards, away income, click gold, % damage, % max HP).
 	 */
 	setOnly?: boolean;
+	/**
+	 * Only gear of this slot carries this stat (IDL-138: the belt is the potion belt). No affix rolls it and it has no row in STAT_BASE_BY_TIER; the
+	 * item definitions of that slot author it directly. `levelShare` 0 keeps it at the value the grade gives.
+	 */
+	slotOnly?: string;
 }
 
 export const STAT_DEFS = {
@@ -38,6 +43,12 @@ export const STAT_DEFS = {
 	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
 	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
+
+	// ---- belt-only stats: the potion belt (IDL-138 / IDL-153). Nothing but a belt carries them; see lib/potionBelt.ts ----------
+	potionCooldownPct: { label: 'Potion Cooldown', unit: '%', slotOnly: 'belt', levelShare: 0 }, // % shorter shared potion cooldown (never below COMBAT.potionCooldownMinSec)
+	potionPowerPct: { label: 'Potion Power', unit: '%', slotOnly: 'belt', levelShare: 0 }, // % more healing from a drunk potion
+	potionSlots: { label: 'Potion Slots', integer: true, slotOnly: 'belt', levelShare: 0 }, // more potion stacks on the hotkey bar
+	bagSlots: { label: 'Bag Slots', integer: true, slotOnly: 'belt', levelShare: 0 }, // more bag slots (through limitOf('bagSize'), under HARD_LIMITS.bagSize)
 
 	// ---- set-only stats: percentages and economy effects that only a set bonus gives ---------------------------------------
 	damagePct: { label: 'Damage', unit: '%', setOnly: true }, // % more damage per hit, on top of the flat damage and the attributes
@@ -70,6 +81,10 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	critChance: 'combat',
 	superCrit: 'combat',
 	lifeLeech: 'combat',
+	potionCooldownPct: 'defense',
+	potionPowerPct: 'defense',
+	potionSlots: 'defense',
+	bagSlots: 'economy',
 	damagePct: 'combat',
 	armor: 'defense',
 	maxHp: 'defense',
@@ -90,9 +105,10 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 };
 
 type SetOnlyKey = { [K in StatKey]: (typeof STAT_DEFS)[K] extends { setOnly: true } ? K : never }[StatKey];
-/** The stats an item can carry (everything but the set-only ones) */
-export type ItemStatKey = Exclude<StatKey, SetOnlyKey>;
-export const ITEM_STAT_KEYS = STAT_KEYS.filter((key) => !(STAT_DEFS[key] as StatDef).setOnly) as ItemStatKey[];
+type SlotOnlyKey = { [K in StatKey]: (typeof STAT_DEFS)[K] extends { slotOnly: string } ? K : never }[StatKey];
+/** The stats that roll as base stats and affixes (everything but the set-only and the slot-only ones; those are authored on the items that carry them) */
+export type ItemStatKey = Exclude<StatKey, SetOnlyKey | SlotOnlyKey>;
+export const ITEM_STAT_KEYS = STAT_KEYS.filter((key) => !(STAT_DEFS[key] as StatDef).setOnly && !(STAT_DEFS[key] as StatDef).slotOnly) as ItemStatKey[];
 
 /**
  * The flat value one stat starts at for gear of each tier (index 0 = tier 1 wood/cloth ... 4 = tier 5 legendary), at the
