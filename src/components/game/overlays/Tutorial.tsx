@@ -4,6 +4,7 @@ import { ANIMALS } from '@/config/farm';
 import { LEVELING, CHARACTER_STAT_CONFIG } from '@/config/character';
 import { BASE_TILE_COST, BIOME_YIELD, CLICK_LADDER, CLICK_LIMIT, SCALING_CONFIG, TILE_PRICE, TILE_RESOURCE_COST } from '@/config/economy';
 import { BIOMES } from '@/config/biomes';
+import { BIOME_RULES } from '@/config/biomeRules';
 import { CASTLE_FORTRESS, CASTLE_RANGE, CASTLE_UPGRADE } from '@/config/castle';
 import { CHEST, SPAWN_LIMIT } from '@/config/spawns';
 import { EMBER_UPGRADES, REBIRTH } from '@/config/rebirth';
@@ -101,6 +102,9 @@ const Tutorial: React.FC = () => {
 									</Res>
 								))}
 							</p>
+							{BIOME_RULES.unlockAfterRebirths[b.name] && (
+								<p className='text-[#a89878] text-xs mt-1'>Unlocks with rebirth {BIOME_RULES.unlockAfterRebirths[b.name]}.</p>
+							)}
 							{b.name === 'plains' && (
 								<p className='text-[#a89878] text-xs mt-1'>Each Plains tile also adds +{pct(stat.plainsMeatModifier)} to meat production.</p>
 							)}

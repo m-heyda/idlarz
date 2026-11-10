@@ -281,11 +281,11 @@ Per-second output of one tile before adjacency and modifiers (already multiplied
 | Tundra | gold 0.13, coal 0.455 |
 | Lake | gold 0.065, food 0.325 |
 | Coast | gold 0.13, food 0.26 |
-| Jungle | — |
-| Fields | — |
-| Blossom Orchard | — |
-| Blight | — |
-| Battlefield | — |
+| Jungle | gold 0.195, wood 0.585 |
+| Fields | gold 0.208, food 0.624 |
+| Blossom Orchard | gold 0.227, food 0.455, wood 0.227 |
+| Blight | gold 0.247, coal 0.865 |
+| Battlefield | stone 0.78, wood 0.52 |
 
 
 ## 6. Stats

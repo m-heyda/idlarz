@@ -11,7 +11,9 @@ import { castleLevelOf } from '@/lib/castleWard';
 import { formatHeaderAmount, formatNumber, formatPercent } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { askServerRebirth } from '@/lib/serverRebirth';
+import { rebirthUnlockIntro, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import PixelModal from '../PixelModal';
+import RebirthUnlockModal from './RebirthUnlockModal';
 import PixelIcon from '../PixelIcon';
 import EmberIcon from '../EmberIcon';
 
@@ -48,6 +50,7 @@ const RebirthDialog: React.FC = () => {
 	const buyEmberUpgrade = useGameStore((state) => state.buyEmberUpgrade);
 	const [confirming, setConfirming] = useState(false);
 	const [asking, setAsking] = useState(false);
+	const [intro, setIntro] = useState<RebirthUnlockIntro | null>(null); // the biome the rebirth just unlocked, shown before the dialog closes
 	const showToast = useUiStore((state) => state.showToast);
 
 	if (!open) return null;
@@ -59,10 +62,12 @@ const RebirthDialog: React.FC = () => {
 	const levelOk = castleLevel >= REBIRTH.minCastleLevel;
 	const tilesOk = ownedTiles >= tilesNeeded;
 	const idleOk = !castleUpgrade;
+	const nextUnlock = rebirthUnlockIntro(prestige.rebirths + 1);
 	const canRebirth = levelOk && tilesOk && idleOk && gain >= 1;
 
 	const handleClose = () => {
 		setConfirming(false);
+		setIntro(null);
 		close();
 	};
 
@@ -79,12 +84,18 @@ const RebirthDialog: React.FC = () => {
 			}
 			if (rebirth(answer.status === 'ok' ? answer.gain : undefined)) {
 				audioManager.playSound('fanfare');
-				handleClose();
+				const unlocked = rebirthUnlockIntro(useGameStore.getState().prestige.rebirths);
+				if (unlocked) {
+					setConfirming(false);
+					setIntro(unlocked);
+				} else handleClose();
 			}
 		} finally {
 			setAsking(false);
 		}
 	};
+
+	if (intro) return <RebirthUnlockModal intro={intro} onClose={handleClose} />;
 
 	const Check: React.FC<{ ok: boolean; children: React.ReactNode }> = ({ ok, children }) => (
 		<div className={ok ? 'text-green-400' : 'text-red-400'}>
@@ -119,6 +130,11 @@ const RebirthDialog: React.FC = () => {
 						{pct(emberIncomeBonus(prestige.legacyEarned + gain) - emberIncomeBonus(prestige.legacyEarned))} income for ever). The map, resources, castle and
 						farm start again. Your name, hero, level, XP, attributes, Embers and shop upgrades stay.
 					</p>
+					{nextUnlock && (
+						<p className='text-[#f0d27a] mb-2'>
+							This rebirth unlocks a new land: <b>{nextUnlock.label}</b> (x{nextUnlock.multiplier} output).
+						</p>
+					)}
 					<div className='flex justify-between'>
 						<button className='px-btn' onClick={() => setConfirming(false)}>
 							Not yet

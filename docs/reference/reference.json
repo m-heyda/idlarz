@@ -314,13 +314,24 @@
   "see": []
  },
  {
+  "id": "rebirth-biome-output",
+  "name": "REBIRTH_BIOME_OUTPUT",
+  "symbol": "REBIRTH_BIOME_OUTPUT",
+  "kind": "const",
+  "category": "Economy/Biomes",
+  "file": "src/config/biomes.ts",
+  "line": 32,
+  "summary": "Output of the five rebirth biomes (unlocked one per rebirth, `BIOME_RULES.unlockAfterRebirths`): a **flat multiple of a basic tile's output**, existing resources only. `base` is the output of the basic tile it is measured against (per second, before `BIOME_YIELD.scale`); `multiplier` rises with the rebirth that unlocks it, from x1.5 (jungle) to x2 (battlefield). No new resource types: T2 materials, monsters and buildings for these biomes come after the release. Pinned by tests/economy/rebirthBiomes.test.ts.",
+  "see": []
+ },
+ {
   "id": "biomes",
   "name": "BIOMES",
   "symbol": "BIOMES",
   "kind": "const",
   "category": "Economy/Biomes",
   "file": "src/config/biomes.ts",
-  "line": 30,
+  "line": 53,
   "summary": "Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (1.3) for what a tile really makes; the castle is not scaled.",
   "see": []
  },
@@ -2049,7 +2060,7 @@
   "kind": "function",
   "category": "Economy/Biomes",
   "file": "src/utils/biomeRules.ts",
-  "line": 126,
+  "line": 129,
   "summary": "The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore (BIOME_SPAWN). Always returns an allowed biome (plains is never blocked).",
   "see": []
  },
@@ -2060,7 +2071,7 @@
   "kind": "function",
   "category": "Economy/Biomes",
   "file": "src/utils/biomeRules.ts",
-  "line": 186,
+  "line": 189,
   "summary": "The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains` plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.",
   "see": []
  },
@@ -2350,6 +2361,17 @@
   "file": "src/utils/game/rebirth.ts",
   "line": 128,
   "summary": "Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store's `rebirth` all read this one function, so what the tooltip promises is what the action checks.",
+  "see": []
+ },
+ {
+  "id": "rebirthunlockintro",
+  "name": "rebirthUnlockIntro",
+  "symbol": "rebirthUnlockIntro",
+  "kind": "function",
+  "category": "Progression/Rebirth",
+  "file": "src/utils/game/rebirthUnlocks.ts",
+  "line": 28,
+  "summary": "The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. `null` when that rebirth unlocks nothing (the sixth and later).",
   "see": []
  },
  {
