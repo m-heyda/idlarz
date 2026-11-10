@@ -38,7 +38,7 @@ The game sits behind email/password login and **cannot be played without a worki
 | --- | --- | --- |
 | `SUPABASE_URL`, `SUPABASE_ANON_KEY` (publishable key) | login and every route | the game shows the "accounts unavailable" screen with a retry button |
 | `SUPABASE_SERVICE_ROLE_KEY` (secret key) | the ledger and cloud saves (`/api/save`, `/api/offline`, `/api/spawn`, `/api/chest`, `/api/fight`) | those routes answer 503: nothing spawns, no fight starts, nothing reaches the account |
-| `LOOT_SECRET` (16+ characters) | sealing spawns, chests and fights | `/api/offline`, `/api/spawn`, `/api/chest` and `/api/fight` answer 503 `not_configured`; the game loads, but nothing spawns and the offline claim times out after 6 s |
+| `LOOT_SECRET` (16+ characters, its own value for every deployment; generate one, never reuse a committed one) | sealing spawns, chests and fights | `/api/offline`, `/api/spawn`, `/api/chest` and `/api/fight` answer 503 `not_configured`; the game loads, but nothing spawns and the offline claim times out after 6 s |
 
 See [docs/reference/saves-and-server.md](docs/reference/saves-and-server.md).
 
