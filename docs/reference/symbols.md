@@ -229,8 +229,10 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The class picker acceptance | Pacing / The sim | [`scripts/sim-classes.ts:1`](../../scripts/sim-classes.ts) | `npm run sim:classes`: |
 | The end-to-end test account | Ops / Operator guides | [`e2e/account.ts:23`](../../e2e/account.ts) | The one account every end-to-end test signs in with (docs/reference/ops.md). |
 | The game at a glance | Overview / The game | [`src/app/GameApp.tsx:17`](../../src/app/GameApp.tsx) | Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. |
+| The generated-docs inputs hash | Ops / CI | [`scripts/gen-inputs.ts:1`](../../scripts/gen-inputs.ts) | The inputs hash of the generated docs: |
 | The guided tutorial | Progression / Guided tutorial | [`src/catalog/tutorial.ts:133`](../../src/catalog/tutorial.ts) | The guided tutorial (IDL-74): |
 | The landing world | Architecture / Art | [`src/lib/landingWorld.ts:4`](../../src/lib/landingWorld.ts) | The world behind the landing page: |
+| The local verify script and the pre-push hook | Ops / CI | [`scripts/verify.ts:1`](../../scripts/verify.ts) | `npm run verify`: |
 | The map (World) | Architecture / State | [`src/utils/world.ts:32`](../../src/utils/world.ts) | The map has no edge. |
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
 | The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
