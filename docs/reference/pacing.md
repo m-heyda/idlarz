@@ -8,7 +8,7 @@ The pace the economy is tuned for, and the bot simulation that checks it.
 
 - Targets: [Pacing targets](#pacing-targets)
 - Magnitude targets: [`MAGNITUDE_BANDS`](#magnitude-bands)
-- The sim: [The bot simulation](#the-bot-simulation)
+- The sim: [The bot simulation](#the-bot-simulation), [The parallel sim runner](#the-parallel-sim-runner)
 
 ## Targets
 
@@ -51,7 +51,7 @@ See also: [`MAGNITUDE_BANDS`](pacing.md#magnitude-bands), [`CASTLE_UPGRADE`](eco
 
 ### `MAGNITUDE_BANDS` <small>const</small>
 
-Source: [`scripts/sim.ts:792`](../../scripts/sim.ts)
+Source: [`scripts/sim.ts:797`](../../scripts/sim.ts)
 
 The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.
 
@@ -84,8 +84,24 @@ The sim (`scripts/sim.ts`): a bot drives the **real store** with a seeded RNG an
 a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
 (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
 
-Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones),
+Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names),
 `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
 
 **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
 baseline with the base branch in CI.
+
+<a id="the-parallel-sim-runner"></a>
+
+### The parallel sim runner
+
+Source: [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts)
+
+`npm run sim:parallel`: the full sim on all your cores. `scripts/sim.ts` plays one profile after another on one core; CI already runs the profiles as shards (`--dump`) and puts them together
+(`--merge`), whose result is byte-identical to one full run. This script does the same on one machine: one child process per profile (at most `--jobs=N`, default the number of cores minus one), then
+the merge. The wall time drops from the sum of all profiles to about the slowest one (`hardcore-rebirth6-x10`).
+
+  npm run sim:parallel                      every profile, writes docs/generated like `npm run sim`
+  npm run sim:parallel -- --seeds=3         the flags of sim.ts (`--seeds`, `--maxdays`, `--set`, `--legacy`, `--no-write`) go to every shard and to the merge
+  npm run sim:parallel -- --jobs=4          limit the processes (each needs about 1 GB)
+
+Needs no profile names (it always runs all of them, the merge insists on that); for one profile use `npm run sim -- <name>`.

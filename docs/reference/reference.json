@@ -2453,6 +2453,16 @@
   ]
  },
  {
+  "id": "the-parallel-sim-runner",
+  "name": "The parallel sim runner",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/sim-parallel.ts",
+  "line": 1,
+  "summary": "`npm run sim:parallel`: the full sim on all your cores. `scripts/sim.ts` plays one profile after another on one core; CI already runs the profiles as shards (`--dump`) and puts them together (`--merge`), whose result is byte-identical to one full run. This script does the same on one machine: one child process per profile (at most `--jobs=N`, default the number of cores minus one), then the merge. The wall time drops from the sum of all profiles to about the slowest one (`hardcore-rebirth6-x10`).",
+  "see": []
+ },
+ {
   "id": "the-bot-simulation",
   "name": "The bot simulation",
   "kind": "topic",
@@ -2482,7 +2492,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 792,
+  "line": 797,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

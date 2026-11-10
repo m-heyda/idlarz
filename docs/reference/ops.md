@@ -35,6 +35,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run start` | `next start` |
 | `npm run lint` | `eslint . --max-warnings=0` |
 | `npm run sim` | `tsx scripts/sim.ts` |
+| `npm run sim:parallel` | `tsx scripts/sim-parallel.ts` |
 | `npm run perf` | `tsx scripts/perf-world.ts` |
 | `npm run test` | `tsx --test "tests/**/*.test.ts"` |
 | `npm run report` | `tsx scripts/balance-report.ts` |
@@ -57,7 +58,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run docs:gen:rest:quick` | `npm run report && npm run stat-audit && npm run catalog-report && npm run kill-sim -- --md && npm run craft-sim -- --md` |
 | `npm run docs:gen:rest:fights` | `npm run fight-sim -- --md && npm run monster-ladder -- --md` |
 | `npm run docs:gen:rest:loot` | `npm run loot-sim -- --md` |
-| `npm run docs:gen:sim` | `npm run sim` |
+| `npm run docs:gen:sim` | `npm run sim:parallel` |
 | `npm run docs:check` | `npm run docs:gen && git add -N docs/generated && git diff --exit-code docs/generated` |
 | `npm run format` | `prettier --write .` |
 | `npm run format:check` | `prettier --check .` |

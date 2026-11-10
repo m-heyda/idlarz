@@ -131,7 +131,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `LOOT_SOURCES` | Loot / Config | [`src/catalog/lootConfig.ts:278`](../../src/catalog/lootConfig.ts) | Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). |
 | `losesProgress` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:76`](../../src/lib/cloudSave/pipeline.ts) | True when a new save holds less than the one it replaces: |
 | `LUCK` | Economy / Chests and Luck | [`src/config/spawns.ts:74`](../../src/config/spawns.ts) | Luck = Charisma + Lucky Charm + gear Luck. |
-| `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/sim.ts:792`](../../scripts/sim.ts) | The bands of the magnitude targets (IDL-128): |
+| `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/sim.ts:797`](../../scripts/sim.ts) | The bands of the magnitude targets (IDL-128): |
 | `MANUAL_CLOUD_COOLDOWN_MS` | Saves & Server / Uploading | [`src/lib/manualCloudSave.ts:15`](../../src/lib/manualCloudSave.ts) | "Save game" in the menu: |
 | Map lab | Architecture / Art | [`src/app/map-lab/page.tsx:2`](../../src/app/map-lab/page.tsx) | Map lab (`/map-lab`): |
 | `MAX_ACTIVE_BUFFS` | Combat / Consumables | [`src/lib/buffs.ts:18`](../../src/lib/buffs.ts) | How many different buffs can run at once. |
@@ -205,6 +205,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The landing world | Architecture / Art | [`src/lib/landingWorld.ts:4`](../../src/lib/landingWorld.ts) | The world behind the landing page: |
 | The map (World) | Architecture / State | [`src/utils/world.ts:32`](../../src/utils/world.ts) | The map has no edge. |
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
+| The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
 | The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:111`](../../src/app/GameApp.tsx) | The tick loop. |
 | `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:113`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |

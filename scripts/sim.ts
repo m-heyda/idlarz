@@ -3,7 +3,7 @@
  * a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
  * (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
  *
- * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones),
+ * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names),
  * `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
  *
  * **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
@@ -113,6 +113,11 @@ const main = async () => {
 		'human-rebirth6': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 6, rebirths: 5 },
 		'human-rebirth8': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 8, rebirths: 4 },
 	};
+	// --list: the profile names, one per line (scripts/sim-parallel.ts asks for them so its list cannot drift from this one)
+	if (args.includes('--list')) {
+		console.log(Object.keys(PROFILES).join('\n'));
+		return;
+	}
 	const except = new Set((args.find((a) => a.startsWith('--except='))?.slice(9) ?? '').split(',').filter(Boolean));
 	for (const name of except) if (!PROFILES[name]) throw new Error(`--except names an unknown profile ${name}`);
 	const mergeDir = args.find((a) => a.startsWith('--merge='))?.slice(8);
