@@ -17,6 +17,7 @@ import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
+import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
 
 // The server's side of play while the player is here: spawns, chests and fights. The server mints the tickets from its own clock, puts
 // the monsters on the map, rolls the contents from a secret and runs every fight (see fight.ts). Each call is one compare-and-swap on the
@@ -333,6 +334,30 @@ export const fightStep = (
 			// a click (or the × of the panel) that joined or left the queue is accepted too
 			const accepted = request.action !== 'use' || queued === 'queued' || queued === 'removed' || (ledger.combat?.log.some(done) ?? false);
 			return reply(ledger, view, accepted, queued);
+		},
+		invVer,
+	);
+
+/**
+ * The guided tutorial's progress (`stats.tutorial`) and its starter bundles, see {@link applyTutorial}. `sync` (no key) only reads the progress; the other actions are
+ * recorded under their idempotency key, and a step that is already done pays nothing again.
+ */
+export const tutorialStep = (
+	deps: ServiceDeps,
+	userId: string,
+	key: string | null,
+	request: TutorialRequest,
+	nowMs: number,
+	invVer?: number,
+): Promise<Online<TutorialReply>> =>
+	onlineStep(
+		deps,
+		userId,
+		request.action === 'sync' ? null : key,
+		nowMs,
+		(ctx): { ledger: Ledger; value: TutorialReply } => {
+			const out = applyTutorial(ctx.ledger, ctx.stored, request, ctx.nowSec);
+			return { ledger: out.ledger, value: out.reply };
 		},
 		invVer,
 	);

@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 110,
+  "line": 111,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -272,6 +272,21 @@
   "see": []
  },
  {
+  "id": "tutorial-path",
+  "name": "The guided tutorial",
+  "symbol": "TUTORIAL_PATH",
+  "kind": "const",
+  "category": "Progression/Guided tutorial",
+  "file": "src/catalog/tutorial.ts",
+  "line": 131,
+  "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It ships dark: nothing is shown until `GAME_EPOCH` is raised (the new chapter release), or on a build with `NEXT_PUBLIC_GUIDE=on` ({@link guideLive}).",
+  "see": [
+   "applyTutorial",
+   "buildNumbers",
+   "guideLive"
+  ]
+ },
+ {
   "id": "weapon-attack-speed",
   "name": "WEAPON_ATTACK_SPEED",
   "symbol": "WEAPON_ATTACK_SPEED",
@@ -300,6 +315,17 @@
   "file": "src/components/game/overlays/SaveMenuDialog.tsx",
   "line": 1,
   "summary": "The Save & Backup dialog (Settings, *Save & backup*, or Control x5).",
+  "see": []
+ },
+ {
+  "id": "tutorialguide",
+  "name": "TutorialGuide",
+  "symbol": "TutorialGuide",
+  "kind": "function",
+  "category": "Progression/Guided tutorial",
+  "file": "src/components/game/tutorial/TutorialGuide.tsx",
+  "line": 39,
+  "summary": "Brother Alder, the tutorial guide. Mounted once in the game (GameApp). It counts the few events the state does not keep (map clicks, chests opened, fights won), evaluates the triggers twice a second (`lib/tutorial/engine.ts`), records finished steps and fired lessons on the account (the server may pay a starter bundle), and draws the bubble and the focus layer for the beat that is on show. Nothing is drawn while the guide is dark (`guideLive`), switched off in Settings, or before the account's progress has arrived; a target that is not on screen shows the bubble alone and never blocks the game.",
   "see": []
  },
  {
@@ -1896,6 +1922,19 @@
   "see": []
  },
  {
+  "id": "applytutorial",
+  "name": "applyTutorial",
+  "symbol": "applyTutorial",
+  "kind": "function",
+  "category": "Progression/Guided tutorial",
+  "file": "src/lib/offline/tutorial.ts",
+  "line": 45,
+  "summary": "Applies one tutorial request to the ledger. `done` records a step once and pays its bundle (gold and wood as `granted` totals, items through `receiveInto`); repeating it, with the same key or another, changes nothing and pays nothing. `lesson` records a fired lesson, `skip` ends the starter path (later bundles are forfeited), `sync` only reads. Progress lives in the ledger's `stats` and resets with it at a new chapter.",
+  "see": [
+   "readProgress"
+  ]
+ },
+ {
   "id": "estimatewin",
   "name": "estimateWin",
   "symbol": "estimateWin",
@@ -1994,6 +2033,39 @@
   "file": "src/lib/syncPolicy.ts",
   "line": 17,
   "summary": "When the game is copied to the account's cloud save. Pure: the clock, the timers and the upload itself are injected, so the cadence is tested without a browser.",
+  "see": []
+ },
+ {
+  "id": "guidelive",
+  "name": "guideLive",
+  "symbol": "guideLive",
+  "kind": "function",
+  "category": "Progression/Guided tutorial",
+  "file": "src/lib/tutorial/live.ts",
+  "line": 10,
+  "summary": "Whether Brother Alder is on at all. The tutorial ships dark with the new chapter: until `GAME_EPOCH` is raised (the release flip, IDL-253) nobody sees it, so accounts that are playing the old chapter get no bubbles. To try it on a build before the flip, set `NEXT_PUBLIC_GUIDE=on`.",
+  "see": []
+ },
+ {
+  "id": "buildnumbers",
+  "name": "buildNumbers",
+  "symbol": "buildNumbers",
+  "kind": "function",
+  "category": "Progression/Guided tutorial",
+  "file": "src/lib/tutorial/numbers.ts",
+  "line": 31,
+  "summary": "The numbers the tutorial texts quote, read from the live config at the moment they are shown (a changed price changes the text, nothing is typed in): the first tile's price, the first animal and its food price, the first castle upgrade's price and time, the chest interval, the offline cap and efficiency, and the rebirth requirements.",
+  "see": []
+ },
+ {
+  "id": "readprogress",
+  "name": "readProgress",
+  "symbol": "readProgress",
+  "kind": "function",
+  "category": "Progression/Guided tutorial",
+  "file": "src/lib/tutorial/progress.ts",
+  "line": 18,
+  "summary": "Reads the stored `stats.tutorial` (or an answer from the server) back: a missing field, null or anything malformed reads as nothing done, ids that are not in the catalog any more (a step removed in a later release) are dropped, nothing is trusted to be the right shape.",
   "see": []
  },
  {
@@ -2443,7 +2515,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 776,
+  "line": 790,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

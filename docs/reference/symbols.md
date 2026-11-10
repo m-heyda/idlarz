@@ -13,6 +13,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:240`](../../src/lib/inventory.ts) | The one place gear is summed: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
+| `applyTutorial` | Progression / Guided tutorial | [`src/lib/offline/tutorial.ts:45`](../../src/lib/offline/tutorial.ts) | Applies one tutorial request to the ledger. |
 | `applyUse` | Combat / Consumables | [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts) | Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now). |
 | `armorOf` | Combat / Player numbers | [`src/lib/combat.ts:176`](../../src/lib/combat.ts) | Armor against monster hits: |
 | `armorReduction` | Combat / Player numbers | [`src/lib/combat.ts:207`](../../src/lib/combat.ts) | The share (0-0.75) of a hit that `armor` takes away: |
@@ -31,6 +32,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `BOSS_MIN_DISTANCE` | Monsters / Spawning | [`src/config/combatConfig.ts:316`](../../src/config/combatConfig.ts) | The boss band (IDL-222, owner decision 2026-11-09): |
 | `BUFF_FAMILIES` | Combat / Consumables | [`src/catalog/buffs.ts:25`](../../src/catalog/buffs.ts) | The buff families. |
 | `buffTotals` | Combat / Consumables | [`src/lib/buffs.ts:84`](../../src/lib/buffs.ts) | The summed bonus per stat of the running buffs: |
+| `buildNumbers` | Progression / Guided tutorial | [`src/lib/tutorial/numbers.ts:31`](../../src/lib/tutorial/numbers.ts) | The numbers the tutorial texts quote, read from the live config at the moment they are shown (a changed price changes the text, nothing is typed in): |
 | `buyCost` | Economy / Merchant | [`src/utils/game/merchant.ts:61`](../../src/utils/game/merchant.ts) | Gold for buying `units` of a resource from the merchant: |
 | `calculateAnimalCost` | Economy / Farm | [`src/utils/game/farm.ts:14`](../../src/utils/game/farm.ts) | Food cost of the next animal of a kind when `level` of them are owned: |
 | `calculateCombatStats` | Progression / Attributes | [`src/utils/game/character.ts:267`](../../src/utils/game/character.ts) | The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says. |
@@ -107,6 +109,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `gradeLegacyItems` | Loot / Items | [`src/catalog/items/ladder.ts:316`](../../src/catalog/items/ladder.ts) | Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece: |
 | `gradeLevels` | Loot / Items | [`src/catalog/items/grades.ts:79`](../../src/catalog/items/grades.ts) | The item level window an item of this grade is generated in. |
 | `gradeRarities` | Loot / Items | [`src/catalog/items/grades.ts:94`](../../src/catalog/items/grades.ts) | The rarities an item of this grade may roll as: |
+| `guideLive` | Progression / Guided tutorial | [`src/lib/tutorial/live.ts:10`](../../src/lib/tutorial/live.ts) | Whether Brother Alder is on at all. |
 | `healAmount` | Combat / Potions and skills | [`src/lib/skills.ts:19`](../../src/lib/skills.ts) | HP a Heal restores: |
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
@@ -127,7 +130,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `LOOT_SOURCES` | Loot / Config | [`src/catalog/lootConfig.ts:278`](../../src/catalog/lootConfig.ts) | Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). |
 | `losesProgress` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:76`](../../src/lib/cloudSave/pipeline.ts) | True when a new save holds less than the one it replaces: |
 | `LUCK` | Economy / Chests and Luck | [`src/config/spawns.ts:74`](../../src/config/spawns.ts) | Luck = Charisma + Lucky Charm + gear Luck. |
-| `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/sim.ts:776`](../../scripts/sim.ts) | The bands of the magnitude targets (IDL-128): |
+| `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/sim.ts:790`](../../scripts/sim.ts) | The bands of the magnitude targets (IDL-128): |
 | `MANUAL_CLOUD_COOLDOWN_MS` | Saves & Server / Uploading | [`src/lib/manualCloudSave.ts:15`](../../src/lib/manualCloudSave.ts) | "Save game" in the menu: |
 | Map lab | Architecture / Art | [`src/app/map-lab/page.tsx:2`](../../src/app/map-lab/page.tsx) | Map lab (`/map-lab`): |
 | `MAX_ACTIVE_BUFFS` | Combat / Consumables | [`src/lib/buffs.ts:18`](../../src/lib/buffs.ts) | How many different buffs can run at once. |
@@ -158,6 +161,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `RARITIES` | Loot / Items | [`src/catalog/rarity.ts:34`](../../src/catalog/rarity.ts) | Rarities: |
 | `rarityLuckMultiplier` | Economy / Chests and Luck | [`src/lib/luck.ts:30`](../../src/lib/luck.ts) | What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear). |
 | `readBuffs` | Combat / Consumables | [`src/lib/buffs.ts:30`](../../src/lib/buffs.ts) | Cleans a stored buff list: |
+| `readProgress` | Progression / Guided tutorial | [`src/lib/tutorial/progress.ts:18`](../../src/lib/tutorial/progress.ts) | Reads the stored `stats.tutorial` (or an answer from the server) back: |
 | `REBIRTH` | Progression / Rebirth | [`src/config/rebirth.ts:22`](../../src/config/rebirth.ts) | Rebirth: |
 | `rebirthStatus` | Progression / Rebirth | [`src/utils/game/rebirth.ts:122`](../../src/utils/game/rebirth.ts) | Can the player rebirth, and if not what is missing. |
 | `receiveDrops` | Loot / Pipeline | [`src/lib/loot/receive.ts:24`](../../src/lib/loot/receive.ts) | Hands drops to the player: |
@@ -198,18 +202,20 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The browser's half of the data epoch | Saves & Server / Browser state | [`src/lib/epochGuard.ts:10`](../../src/lib/epochGuard.ts) | The browser's half of the data epoch. |
 | The end-to-end test account | Ops / Operator guides | [`e2e/account.ts:23`](../../e2e/account.ts) | The one account every end-to-end test signs in with (docs/reference/ops.md). |
 | The game at a glance | Overview / The game | [`src/app/GameApp.tsx:17`](../../src/app/GameApp.tsx) | Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. |
+| The guided tutorial | Progression / Guided tutorial | [`src/catalog/tutorial.ts:131`](../../src/catalog/tutorial.ts) | The guided tutorial (IDL-74): |
 | The landing world | Architecture / Art | [`src/lib/landingWorld.ts:4`](../../src/lib/landingWorld.ts) | The world behind the landing page: |
 | The map (World) | Architecture / State | [`src/utils/world.ts:32`](../../src/utils/world.ts) | The map has no edge. |
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
 | The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
-| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:110`](../../src/app/GameApp.tsx) | The tick loop. |
+| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:111`](../../src/app/GameApp.tsx) | The tick loop. |
 | `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:112`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
 | `totalStatPoints` | Progression / Levels | [`src/utils/game/character.ts:151`](../../src/utils/game/character.ts) | The attribute points a character that has reached `level` has earned in all (a level gives 1; |
 | `TRADE_GOODS` | Economy / Crafting | [`src/catalog/recipes.ts:36`](../../src/catalog/recipes.ts) | The trade goods crafting makes (IDL-227): |
 | `trustedEconomy` | Saves & Server / Accepting a save | [`src/lib/cloudSave/trustedEconomy.ts:44`](../../src/lib/cloudSave/trustedEconomy.ts) | `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). |
+| `TutorialGuide` | Progression / Guided tutorial | [`src/components/game/tutorial/TutorialGuide.tsx:39`](../../src/components/game/tutorial/TutorialGuide.tsx) | Brother Alder, the tutorial guide. |
 | `typeWeights` | Monsters / Spawning | [`src/lib/offline/spawnWeights.ts:49`](../../src/lib/offline/spawnWeights.ts) | Weight of each type for this player and castle level, in the order given. |
 | `UNCLAIMED_SEC` | Combat / Results and rest | [`src/lib/offline/grant.ts:46`](../../src/lib/offline/grant.ts) | The longest gap the server treats as the same session: |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |

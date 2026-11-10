@@ -162,7 +162,7 @@ const CastleUpgradeDialog: FC = () => {
 						<button onClick={onClose} className='px-btn px-btn-red'>
 							Cancel
 						</button>
-						<button onClick={handleUpgrade} disabled={!canAfford} className='px-btn'>
+						<button onClick={handleUpgrade} disabled={!canAfford} className='px-btn' data-tutorial='castle-upgrade'>
 							Upgrade Castle
 						</button>
 					</div>

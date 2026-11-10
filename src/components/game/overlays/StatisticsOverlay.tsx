@@ -174,6 +174,7 @@ const StatisticsOverlay: React.FC = () => {
 									</div>
 									<button
 										onClick={() => handleAddStatPoint(stat)}
+										data-tutorial={stat === 'strength' ? 'stat-add' : undefined}
 										disabled={points <= 0}
 										className={`ml-2 w-6 h-6 !p-0 flex items-center justify-center px-btn px-btn-sm ${points > 0 ? '' : 'opacity-40'}`}
 										aria-label={`Add point to ${stat}`}

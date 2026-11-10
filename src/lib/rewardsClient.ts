@@ -1,5 +1,6 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
 import { epochFetch } from '@/lib/epochFetch';
 
 // The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
@@ -76,3 +77,7 @@ export const requestAuto = (switches: { autoBattle?: boolean; autoUse?: boolean 
 /** Takes a monster off the map with no reward. */
 export const requestDismiss = (key: string, n: number, since: number | undefined): Promise<Reply<FightReply>> =>
 	post<FightReply>('/api/fight', { action: 'dismiss', key, n, since });
+
+/** The guided tutorial: `sync` reads the account's progress; `done`, `lesson` and `skip` record it (one key per request) and a finished step may pay its starter bundle. */
+export const requestTutorial = (key: string, request: TutorialRequest): Promise<Reply<TutorialReply>> =>
+	post<TutorialReply>('/api/tutorial', { key, ...request });

@@ -83,6 +83,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/spawn/route.ts) — ~ The chests and monsters the server says have appeared, when to ask again, and the player's combat as of now.
 
+**src/app/api/tutorial/**
+
+- [`route.ts`](../../src/app/api/tutorial/route.ts) — ~ The guided tutorial:
+
 **src/app/**
 
 - [`layout.tsx`](../../src/app/layout.tsx)
@@ -143,6 +147,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`sets.ts`](../../src/catalog/sets.ts) — ~ Armour sets.
 - [`skills.ts`](../../src/catalog/skills.ts) — Skills: the things a character can cast with mana. Data only; the rules (damage-free, so nothing here touches the click combat)
 - [`stats.ts`](../../src/catalog/stats.ts) — ~ Every stat an item or a set bonus can carry.
+- [`tutorial.ts`](../../src/catalog/tutorial.ts) — The guided tutorial as data: Brother Alder's intro, the starter path and the milestone lessons. Order is data: a step is inserted between two others by
 - [`weapons.ts`](../../src/catalog/weapons.ts) — ~ Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; an item can override it with `attackSpeed`).
 
 **src/components/auth/**
@@ -247,8 +252,14 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`StatisticsOverlay.tsx`](../../src/components/game/overlays/StatisticsOverlay.tsx) — ~ One label / value line; `muted` for the small print inside a breakdown.
 - [`TabLockOverlay.tsx`](../../src/components/game/overlays/TabLockOverlay.tsx) — ~ Shown in a tab that does not own the game (another tab is running it).
 - [`Tutorial.tsx`](../../src/components/game/overlays/Tutorial.tsx) — ~ The in-game guide.
-- [`TutorialDialog.tsx`](../../src/components/game/overlays/TutorialDialog.tsx) — ~ The full guide, reopened on demand from Settings.
+- [`TutorialDialog.tsx`](../../src/components/game/overlays/TutorialDialog.tsx) — ~ Brother Alder's journal:
 - [`farmGeometry.ts`](../../src/components/game/overlays/farmGeometry.ts) — Geometry of the farm pasture drawn by scripts/pixel/sprites_farm.py (keep the constants and prop lists in sync with that file).
+
+**src/components/game/tutorial/**
+
+- [`FocusLayer.tsx`](../../src/components/game/tutorial/FocusLayer.tsx) — ~ Measures every element that carries `data-tutorial="<target>"` on every animation frame; the state changes only when something moved.
+- [`GuideBubble.tsx`](../../src/components/game/tutorial/GuideBubble.tsx) — ~ "2 / 3" under the text (the intro's pages)
+- [`TutorialGuide.tsx`](../../src/components/game/tutorial/TutorialGuide.tsx) — ~ Brother Alder, the tutorial guide.
 
 **src/components/landing/**
 
@@ -407,6 +418,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`stats.ts`](../../src/lib/offline/stats.ts) — SERVER ONLY. The lifetime counters of a player (`player_ledger.stats`): kills per monster type, chests opened, tiles bought and the income earned while playing.
 - [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger in Supabase (service role:
 - [`tickets.ts`](../../src/lib/offline/tickets.ts) — ~ Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny).
+- [`tutorial.ts`](../../src/lib/offline/tutorial.ts) — ~ `unknown`:
 - [`types.ts`](../../src/lib/offline/types.ts) — ~ What the server keeps of a player's things:
 - [`winChance.ts`](../../src/lib/offline/winChance.ts) — ~ How sharply the chance rises with the time-to-survive over time-to-kill ratio (1 = a coin flip; the fight is a race of many swings, so it is steep).
 
@@ -446,6 +458,18 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`terrainRenderer.ts`](../../src/lib/terrainRenderer.ts) — ~ Draws the map terrain one chunk at a time (CHUNK_TILES x CHUNK_TILES tiles per canvas; 1 canvas px = 1 art px = 1 world px, scaled by the world div's CSS transform, so pan and zoom never redraw).
 - [`tileMenuItems.ts`](../../src/lib/tileMenuItems.ts) — ~ Id of the disabled Buildings entry, the hook for the new building system (R7, IDL-91; see {@link tileMenuItems}).
 - [`tipPlacement.ts`](../../src/lib/tipPlacement.ts) — Where a hover card goes: flush against the edge of the item box it belongs to, not under the cursor. Pure, so the
+
+**src/lib/tutorial/**
+
+- [`engine.ts`](../../src/lib/tutorial/engine.ts) — ~ Per account, stored in the ledger's `stats.tutorial`.
+- [`facts.ts`](../../src/lib/tutorial/facts.ts) — ~ What the guide counts itself (events the state does not keep):
+- [`geometry.ts`](../../src/lib/tutorial/geometry.ts) — The focus layer's maths, pure: a dim over the whole screen with transparent cut-outs around the target element(s). The layer is one full-screen
+- [`live.ts`](../../src/lib/tutorial/live.ts) — ~ Whether Brother Alder is on at all.
+- [`numbers.ts`](../../src/lib/tutorial/numbers.ts) — ~ "30 minutes", "2 hours", "1.5 days":
+- [`progress.ts`](../../src/lib/tutorial/progress.ts) — ~ Reads the stored `stats.tutorial` (or an answer from the server) back:
+
+**src/lib/**
+
 - [`uiPrefs.ts`](../../src/lib/uiPrefs.ts) — Remembered view options (not game state): plain booleans in localStorage, every access guarded
 - [`utils.ts`](../../src/lib/utils.ts)
 
@@ -479,6 +503,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`labStore.ts`](../../src/stores/labStore.ts) — ~ The map lab's world:
 - [`rewardPendingStore.ts`](../../src/stores/rewardPendingStore.ts) — ~ How many rewards are on their way from the server (a chest being opened, a won fight whose result is not shown yet).
 - [`settingsStore.ts`](../../src/stores/settingsStore.ts)
+- [`tutorialStore.ts`](../../src/stores/tutorialStore.ts) — ~ How long to wait before asking again when the server could not confirm a step yet (its last saved copy lags the browser's) or could not be reached.
 - [`uiStore.ts`](../../src/stores/uiStore.ts) — ~ Red entry for something destructive
 - [`viewStore.ts`](../../src/stores/viewStore.ts) — ~ Where the map is on the screen (pan and zoom).
 - [`windowStore.ts`](../../src/stores/windowStore.ts) — ~ The game's windows:
@@ -723,6 +748,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`serverRebirth.test.ts`](../../tests/server/serverRebirth.test.ts) — IDL-102: the server runs the rebirth. POST /api/rebirth judges the last stored save, computes the Embers, wipes the server's bag and gear once,
 - [`serverTrust.test.ts`](../../tests/server/serverTrust.test.ts) — Server trust: enforcement (IDL-112), the trusted economy (IDL-167) and paid merchant levels (IDL-168).
 - [`ticketBankUpgrade.test.ts`](../../tests/server/ticketBankUpgrade.test.ts)
+- [`tutorial.test.ts`](../../tests/server/tutorial.test.ts) — ~ A save of a player who has bought `tiles` tiles (the count the proof reads), then the first request seeds the ledger.
 
 **tests/**
 
@@ -734,6 +760,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
+- [`tutorial.test.ts`](../../tests/ui/tutorial.test.ts)
 - [`uiActions.test.ts`](../../tests/ui/uiActions.test.ts)
 
 **tests/world/**

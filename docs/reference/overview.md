@@ -35,7 +35,7 @@ Measured pacing from the bot simulation is in `docs/generated/sim-milestones.md`
 [code-map.md](code-map.md) lists every file with its first comment.
 
 **Not in the game yet**: hills, coast and lake monsters; jungle, fields, orchard, blight and battlefield biomes (dev-only entries); the Producer/Extractor/Idol building rework; quests; gambling; achievements, glossary and mastery;
-real class bonuses; paragon levels; rankings and the preview map; landing page and `/play` route; the guided tutorial rework; gem sinks. Details: `docs/plan/ROADMAP.md`. Crafting (queue, recipes) exists but is still a first draft: `docs/plan/crafting-v0.md`.
+real class bonuses; paragon levels; rankings and the preview map; landing page and `/play` route; the guided tutorial (built, dark until the new chapter flips); gem sinks. Details: `docs/plan/ROADMAP.md`. Crafting (queue, recipes) exists but is still a first draft: `docs/plan/crafting-v0.md`.
 
 **Stack (versions from package.json)** _(computed from the code)_
 

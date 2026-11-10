@@ -133,6 +133,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 		<>
 			<div
 				id={`tile-${x}-${y}`}
+				data-tutorial={!isOwned && isAdjacent ? 'tile-buy' : isOwned && biome === 'castle' ? 'castle' : hasChest ? 'chest' : monsterKey ? 'monster' : undefined}
 				className={cn('absolute transition-all duration-200 ease-in-out select-none', {
 					'opacity-100': isOwned,
 					// the ground itself is drawn by TerrainLayer; a tile is a transparent hit area with its overlays

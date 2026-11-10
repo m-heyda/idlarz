@@ -53,6 +53,7 @@ export const PlayerCard: React.FC = () => {
 		<div
 			className='pixel-profile hdr-has-tip'
 			data-active={statsOpen}
+			data-tutorial='tab-character'
 			role='button'
 			tabIndex={0}
 			aria-label={`${playerName}, level ${level.level}. Opens the character screen`}
@@ -118,6 +119,7 @@ export const WindowButtons: React.FC = () => {
 					className='pixel-slot pixel-slot-sm relative'
 					data-active={order.includes(id)}
 					title={label}
+					data-tutorial={`tab-${id}`}
 					role='button'
 					tabIndex={0}
 					aria-label={label}
@@ -182,6 +184,7 @@ export const HeaderButtons: React.FC = () => {
 			<div className='hdr-has-tip flex'>
 				<div
 					className={cn('pixel-slot pixel-slot-sm', !status.canRebirth && 'is-disabled')}
+					data-tutorial='rebirth-button'
 					data-active={rebirthOpen}
 					role='button'
 					tabIndex={0}

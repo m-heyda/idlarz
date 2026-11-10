@@ -26,6 +26,7 @@ import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
 import { MONSTERS } from '../../src/config/combatConfig';
 import { SKILLS } from '../../src/catalog/skills';
+import { TUTORIAL_LESSONS, TUTORIAL_PATH, type TutorialReward } from '../../src/catalog/tutorial';
 import { RARITIES } from '../../src/catalog/rarity';
 import { RESOURCE_TIERS, resourcesInTier } from '../../src/catalog/resources';
 import { LOOT_PROFILES, LOOT_SOURCES } from '../../src/catalog/lootConfig';
@@ -331,6 +332,25 @@ TABLES['api-routes'] = () => {
 	walk(base);
 	return { title: 'API routes (scanned from src/app/api)', md: mdTable(['Route', 'Methods', 'File'], rows) };
 };
+
+TABLES['tutorial-path'] = () => {
+	const rewardText = (r?: TutorialReward) =>
+		r ? [r.gold ? `${r.gold} gold` : '', r.wood ? `${r.wood} wood` : '', ...(r.items ?? []).map((i) => `${i.qty} x ${i.id}`)].filter(Boolean).join(', ') : '-';
+	return {
+		title: 'The starter path and its bundles',
+		md: mdTable(
+			['#', 'Step', 'Focus', 'Bundle (once per account)'],
+			TUTORIAL_PATH.map((s, i) => [i + 1, `\`${s.id}\``, s.focus, rewardText(s.reward)]),
+		),
+	};
+};
+TABLES['tutorial-lessons'] = () => ({
+	title: 'Milestone lessons',
+	md: mdTable(
+		['Lesson', 'Journal heading', 'Spotlight'],
+		TUTORIAL_LESSONS.map((l) => [`\`${l.id}\``, l.title, typeof l.target === 'string' ? `\`${l.target}\`` : 'none']),
+	),
+});
 
 TABLES['stack-versions'] = () => {
 	const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { dependencies: Record<string, string>; devDependencies: Record<string, string> };

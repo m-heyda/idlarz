@@ -267,6 +267,7 @@ const Grid: React.FC = () => {
 		<div
 			ref={gridRef}
 			data-click-area
+			data-tutorial='map'
 			className='fixed inset-0 overflow-hidden bg-gray-950'
 			onMouseDown={handleMouseDown}
 			onMouseMove={handleMouseMove}

@@ -65,6 +65,7 @@ const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, on
 	return (
 		<div
 			className='farm-animal-card'
+			data-tutorial={animal.id === ANIMALS[0].id ? 'farm-animal' : undefined}
 			data-ok={!full && food >= costOne}
 			role='group'
 			aria-label={animal.name}

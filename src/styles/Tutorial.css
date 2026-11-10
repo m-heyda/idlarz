@@ -1,0 +1,166 @@
+/* Brother Alder, his bubble and the focus layer (src/components/game/tutorial). The layer is one full-screen element clipped to "everything but the
+   holes" (clip-path, see lib/tutorial/geometry.ts): in strict mode it catches every click outside the holes, in soft mode it never takes a click. */
+
+.guide-focus {
+	position: fixed;
+	inset: 0;
+	z-index: 650;
+	background: rgba(8, 5, 3, 0.62);
+	backdrop-filter: blur(1.5px);
+	animation: guide-fade 220ms ease-out both;
+}
+.guide-focus[data-mode='strict'] {
+	pointer-events: auto;
+	cursor: not-allowed;
+}
+.guide-focus[data-mode='soft'] {
+	pointer-events: none;
+	background: rgba(8, 5, 3, 0.45);
+	backdrop-filter: none;
+}
+.guide-focus[data-intro='true'] {
+	background: rgba(8, 5, 3, 0.7);
+	backdrop-filter: blur(2px);
+}
+
+.guide-ring {
+	position: fixed;
+	z-index: 651;
+	pointer-events: none;
+	border: 2px solid var(--px-gold, #f0d27a);
+	box-shadow:
+		0 0 0 2px rgba(10, 6, 5, 0.9),
+		0 0 12px 2px rgba(240, 210, 122, 0.7);
+	animation: guide-pulse 1.3s ease-in-out infinite;
+}
+
+.guide {
+	position: fixed;
+	left: 8px;
+	bottom: 8px;
+	z-index: 660;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
+	gap: 8px;
+	max-width: min(560px, calc(100vw - 16px));
+	pointer-events: none;
+	animation: guide-walk-in 600ms steps(8) both;
+}
+.guide > * {
+	pointer-events: auto;
+}
+.guide-sprite {
+	flex: none;
+	width: 134px;
+	height: 134px;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	image-rendering: pixelated;
+	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45));
+}
+.guide-bubble {
+	position: relative;
+	min-width: 0;
+	margin-bottom: 18px;
+	padding: 10px 12px;
+	background: #2a1d12;
+	border: 3px solid #8a6a3a;
+	box-shadow: 0 0 0 2px #0a0605;
+	color: #f1e6c8;
+	font-size: 14px;
+	line-height: 1.35;
+}
+/* the bubble's tail points back at Brother Alder */
+.guide-bubble::before {
+	content: '';
+	position: absolute;
+	left: -12px;
+	bottom: 14px;
+	border: 6px solid transparent;
+	border-right: 6px solid #8a6a3a;
+}
+.guide-name {
+	margin-bottom: 2px;
+	color: var(--px-gold, #f0d27a);
+	font-size: 12px;
+	letter-spacing: 0.04em;
+}
+.guide-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-top: 8px;
+}
+.guide-dots {
+	color: #a89878;
+	font-size: 11px;
+}
+
+/* a phone: a smaller Alder with the bubble above him */
+@media (max-width: 640px) {
+	.guide {
+		flex-direction: column-reverse;
+		align-items: flex-start;
+		gap: 2px;
+		bottom: 4px;
+		left: 4px;
+	}
+	.guide-sprite {
+		width: 67px;
+		height: 67px;
+	}
+	.guide-bubble {
+		margin-bottom: 0;
+		font-size: 13px;
+	}
+	.guide-bubble::before {
+		left: 22px;
+		bottom: -12px;
+		border: 6px solid transparent;
+		border-top: 6px solid #8a6a3a;
+	}
+}
+
+.guide-journal-lock {
+	color: #7a6a52;
+}
+
+@keyframes guide-fade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+@keyframes guide-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.55;
+		transform: scale(1.03);
+	}
+}
+@keyframes guide-walk-in {
+	from {
+		transform: translateX(-160px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.guide,
+	.guide-focus,
+	.guide-ring {
+		animation: none;
+	}
+}
