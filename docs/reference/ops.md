@@ -206,7 +206,7 @@ the app's own `/api/auth/login` route; `E2E_MANUAL_LOGIN=1` forces the by-hand p
    opens your installed Chrome (`E2E_CHANNEL=chromium` uses Playwright's own browser) and runs `e2e/smoke.spec.ts`. It is a local run, not part of CI, because CI has no login and no test project.
 
 `reset-test-account` finds the account by e-mail and runs the season reset for that one user with `--hard --reset-gems --purge-history --no-backup`: it clears the save (map, buildings, castle, level, XP, rebirths, Embers, worlds and stats), the whole ledger
-(bag, gear, fight, spawn timers, tickets, rebirths), the rebirth history and the rollback copies, and puts the gems back to the starting amount. It keeps the login and the profile (character name and class). The e-mail is hard-coded here; the script has no
+(bag, gear, fight, spawn timers, tickets, rebirths), the rebirth history and the rollback copies, and puts the gems back to the starting amount. It keeps the login and the profile (character name and class); `-- --yes --new-character` deletes the profile and the earned achievements too, so the next login goes through character creation like a new player. The e-mail is hard-coded here; the script has no
 option to point at another user.
 
 The smoke test covers: signing in and the account check; the game opens on a new game; income arrives; a click on the map pays gold; a tile can be bought (through `window.__game`, which the dev server exposes); the game menu opens Settings; Save game and a
