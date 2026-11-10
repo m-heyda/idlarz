@@ -13,6 +13,7 @@ import {
 	maxMana,
 } from '@/lib/combat';
 import { critDamagePercent } from '@/lib/statBonuses';
+import { classPassives, withClassBonus } from '@/lib/classPassives';
 import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
 import { chestRateBonusPct, gemChance, goldenMonsterChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
@@ -26,6 +27,8 @@ export interface StatContext {
 	equipment: Equipment;
 	prestige?: PrestigeState;
 	merchantUpgrades?: MerchantUpgrades;
+	/** The hero class: its passives are part of every number below */
+	playerClass?: unknown;
 }
 
 /**
@@ -33,18 +36,19 @@ export interface StatContext {
  * with the same functions the fights and the economy use. The Character window shows exactly this, so a new source (a new gear stat,
  * an Ember effect) is added where it is applied and appears here, instead of being patched into each screen.
  */
-export const effectiveStats = ({ characterStats, equipment, prestige, merchantUpgrades }: StatContext) => {
+export const effectiveStats = ({ characterStats, equipment, prestige, merchantUpgrades, playerClass }: StatContext) => {
 	const gear = aggregateStats(equipment);
-	const bonus = merchantCombat(merchantUpgrades);
+	const bonus = withClassBonus(merchantCombat(merchantUpgrades), playerClass);
+	const passives = classPassives(playerClass);
 	const odds = critOdds(characterStats, equipment, bonus);
 	const critExtra = 1 + critDamagePercent(characterStats) / 100;
-	const armor = armorOf(equipment, characterStats);
+	const armor = armorOf(equipment, characterStats, playerClass);
 	const luck = characterStats.luck + merchantLuck(merchantUpgrades) + gear.luck;
 	const economy = gearEconomy(equipment);
-	const limits = { prestige, merchantUpgrades, gear: economy };
+	const limits = { prestige, merchantUpgrades, gear: economy, playerClass };
 	return {
 		maxHp: maxHp(characterStats, equipment),
-		maxMana: maxMana(characterStats, equipment),
+		maxMana: maxMana(characterStats, equipment, playerClass),
 		hpRegen: COMBAT.regenPerSec + gear.regen + bonus.regen,
 		manaRegen: manaRegenPerSec(characterStats, equipment),
 		damage: damagePerHit(equipment, characterStats, bonus),
@@ -63,7 +67,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		superCritMultiplier: COMBAT.crit.superMult * critExtra,
 		luck,
 		/** % more chests than without Luck */
-		chestRateBonus: chestRateBonusPct(luck),
+		chestRateBonus: chestRateBonusPct(luck, passives.chestSpeedPct),
 		/** % better odds for rare-and-better gear from Luck */
 		rarityLuckBonus: (rarityLuckMultiplier(luck) - 1) * 100,
 		/** % chance that a chest also holds 5-50 gems */
@@ -74,10 +78,10 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		offlineCapHours: offlineCapHours(limits),
 		offlineEfficiency: offlineEfficiency(limits) * 100,
 		goldFind: gear.goldFind,
-		spellPower: gear.spellPower,
-		xpGain: xpGainPct(characterStats, equipment),
+		spellPower: gear.spellPower + passives.spellPowerPct,
+		xpGain: xpGainPct(characterStats, equipment, playerClass),
 		/** % off TILES (not buildings): Charisma, the rebirth Thrift and the merchant's Bulk Discount, capped. Building cost takes the Ember Thrift only (calculateBuildingCost) */
-		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades),
+		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass),
 		/** % more gold per click from rebirth (Click Mastery) and % faster castle builds (Master Builders) */
 		clickMastery: emberEffect(prestige, 'mastery') * 100,
 		buildTimeReduction: emberEffect(prestige, 'builders') * 100,

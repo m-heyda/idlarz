@@ -6,6 +6,7 @@ import { MAX_CATCHUP_SEC, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { calculateLevel, totalStatPoints } from '@/utils/game/character';
 import { calculateResourceRates } from '@/utils/game/income';
 import { merchantCombat } from '@/utils/game/merchant';
+import { withClassBonus } from '@/lib/classPassives';
 import { manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
 import { bestWornGrade, generateMerchantStock, rotationRng, stockDue } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
@@ -32,7 +33,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			if (resource === 'xp') return;
 			newResources[resource] = Math.min(newResources[resource] + rate * secondsElapsed, RESOURCE_CAP);
 		});
-		const xpGain = state.resourceRates.total.xp * (1 + xpGainPct(state.characterStats, state.equipment) / 100);
+		const xpGain = state.resourceRates.total.xp * (1 + xpGainPct(state.characterStats, state.equipment, state.playerClass) / 100);
 		newResources.xp = Math.min(newResources.xp + xpGain * secondsElapsed, XP_CAP);
 
 		let newTiles = state.tiles;
@@ -82,11 +83,16 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 				? shown.hp
 				: inFight
 					? state.playerHp
-					: regen(state.playerHp, playerMaxHp, secondsElapsed, aggregateStats(state.equipment).regen + merchantCombat(state.merchantUpgrades).regen),
+					: regen(
+							state.playerHp,
+							playerMaxHp,
+							secondsElapsed,
+							aggregateStats(state.equipment).regen + withClassBonus(merchantCombat(state.merchantUpgrades), state.playerClass).regen,
+						),
 		);
 		// mana follows the plan too (it has the spell costs and the regen the server counted), else it just fills
 		const newPlayerMp = Math.min(
-			maxMana(state.characterStats, state.equipment),
+			maxMana(state.characterStats, state.equipment, state.playerClass),
 			shown?.mp != null ? shown.mp : state.playerMp + manaRegenPerSec(state.characterStats, state.equipment) * secondsElapsed,
 		);
 		const cd = state.combat.cd;

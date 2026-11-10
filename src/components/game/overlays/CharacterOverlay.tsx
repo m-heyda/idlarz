@@ -8,6 +8,8 @@ import { MERCHANT_GOODS } from '@/config/merchant';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { armorOf, armorReduction, maxHp } from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
+import { describeClassPassives } from '@/lib/classPassives';
+import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { formatCompact, formatPct } from '@/utils/formatters';
@@ -28,6 +30,7 @@ const CharacterOverlay: React.FC = () => {
 	const equipItem = useGameStore((state) => state.equipItem);
 	const prestige = useGameStore((state) => state.prestige);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
+	const playerClass = useGameStore((state) => state.playerClass);
 	const requestSkill = useGameStore((state) => state.requestSkill);
 	const skillCd = useGameStore((state) => state.combat.cd);
 	const level = useGameStore((state) => state.level.level);
@@ -62,10 +65,11 @@ const CharacterOverlay: React.FC = () => {
 		/>
 	);
 
-	const armor = armorOf(equipment, characterStats);
+	const armor = armorOf(equipment, characterStats, playerClass);
 	const mitigation = armorReduction(armor) * 100;
 	const gear = aggregateStats(equipment);
-	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades });
+	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass });
+	const passives = describeClassPassives(playerClass);
 	const worn = Object.values(equipment).filter(Boolean).length;
 	const itemLevel = Math.round(averageItemLevel(equipment) * 10) / 10;
 
@@ -75,7 +79,7 @@ const CharacterOverlay: React.FC = () => {
 		const cd = Math.ceil(skillCd[id] ?? 0);
 		const detail = locked
 			? `Unlocks at level ${skill.unlockLevel}`
-			: `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown${id === 'heal' ? `, heals about ${formatCompact(healAmount(characterStats, equipment, skill))} HP` : ''}`;
+			: `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown${id === 'heal' ? `, heals about ${formatCompact(healAmount(characterStats, equipment, skill, playerClass))} HP` : ''}`;
 		return (
 			<button
 				key={id}
@@ -149,11 +153,15 @@ const CharacterOverlay: React.FC = () => {
 					</div>
 					<div
 						className='inv-readout'
-						title={`HP per second: ${COMBAT.regenPerSec} base, ${formatCompact(gear.regen)} from gear and ${formatCompact(fx.hpRegen - COMBAT.regenPerSec - gear.regen)} from the merchant. The ${COMBAT.regenPerSec}/s base works out of fights only; in a fight you get ${formatCompact(fx.hpRegen - COMBAT.regenPerSec)}/s;${formatCompact(gear.luck)} Luck from gear`}
+						title={`HP per second: ${COMBAT.regenPerSec} base, ${formatCompact(gear.regen)} from gear and ${formatCompact(fx.hpRegen - COMBAT.regenPerSec - gear.regen)} from the merchant and your class. The ${COMBAT.regenPerSec}/s base works out of fights only; in a fight you get ${formatCompact(fx.hpRegen - COMBAT.regenPerSec)}/s;${formatCompact(gear.luck)} Luck from gear`}
 					>
 						<span className='inv-readout-label'>Regen</span>
 						<span className='inv-readout-value'>{formatCompact(fx.hpRegen)}/s</span>
 					</div>
+				</div>
+
+				<div className='text-xs text-center mt-3 text-[#c8b898]' title='Your class passives are worked out on the server from your profile'>
+					<b>{PLAYER_CLASSES[playerClass]?.label ?? 'Hero'}</b>: {[...passives.combat, ...passives.economy].join(', ')}
 				</div>
 
 				<div className='flex justify-center gap-3 mt-4'>

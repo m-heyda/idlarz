@@ -3,7 +3,7 @@
  * a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
  * (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
  *
- * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names),
+ * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names), `--class=mage` (every profile plays that hero class; the default `none` is the neutral baseline, and a class run writes nothing: `npm run sim:classes` measures all four against it, IDL-78),
  * `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
  *
  * **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
@@ -64,6 +64,7 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
 import { mulberry32 } from '../src/lib/rng';
+import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../src/config/playerClasses';
 import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/loadGame';
 
 // zustand's persist middleware needs *a* storage; the sim replaces it with a no-op one below
@@ -80,6 +81,10 @@ const main = async () => {
 	// --set Path.to.value=1.5   (tuning experiments without touching the config files)
 	const overrides = args.filter((a) => a.startsWith('--set=')).map((a) => a.slice(6));
 	const maxDays = args.find((a) => a.startsWith('--maxdays='));
+	// --class=warrior|paladin|ranger|mage|none: the hero class every profile plays (IDL-78). The default `none` is the neutral baseline (no passives), so the committed profiles stay comparable.
+	const classArg = args.find((a) => a.startsWith('--class='))?.slice(8) ?? 'none';
+	if (classArg !== 'none' && !(classArg in PLAYER_CLASSES)) throw new Error(`--class must be none or one of ${PLAYER_CLASS_ORDER.join(', ')}`);
+	simClass = classArg;
 	if (maxDays) MAX_DAYS = Number(maxDays.slice(10));
 
 	const cfg = await loadConfig();
@@ -191,7 +196,7 @@ const main = async () => {
 		(_key, value) => (typeof value === 'number' ? Number(value.toPrecision(6)) : value),
 		1,
 	);
-	if (!legacy && !args.includes('--no-write')) {
+	if (!legacy && simClass === 'none' && !args.includes('--no-write')) {
 		const dir = resolve(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../docs/generated');
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(resolve(dir, 'sim-milestones.md'), md);
@@ -270,6 +275,8 @@ const HUMAN_WINDOWS: [number, number][] = [
 	[18, 23],
 ];
 let MAX_DAYS = 300;
+/** The hero class the profiles play (`--class=`); `none` is the neutral baseline the committed numbers are measured with. */
+let simClass = 'none';
 const FINE_STEP_DAYS = 45; // 20 s steps for the first weeks, coarser afterwards (keeps long runs fast)
 const FIRST_FINISH_CASTLE = 6; // the first finish line (castle 6 + best click + the rebirth territory) is unchanged by castle levels 7-10
 
@@ -280,6 +287,8 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 	const api = () => store.getState();
 	api().resetGame();
+	// the class picker: a class the store does not know has no passives (classPassives), which is the neutral baseline
+	store.setState({ playerClass: simClass as never });
 
 	const milestones: Milestones = {};
 	const mag: Record<string, number | string> = (magnitudes[name] = {});
@@ -446,7 +455,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 			if (!frontier) break;
 			const owned = utils.economyTiles(s.tiles, s.freeTiles);
-			const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades));
+			const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades, s.playerClass));
 			const bundle = utils.tileCostAsResources(cost);
 			if (!utils.canAffordBundle(s.resources, bundle)) {
 				if (!topUp(bundle)) break;
@@ -480,7 +489,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		const need: Record<string, number> = { ...((castle.upgradeCost ?? {}) as Record<string, number>) };
 		const owned = utils.economyTiles(s.tiles, s.freeTiles);
 		for (let k = 0; k < 3; k++) {
-			const c = utils.calculateTileCost(owned + k, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades));
+			const c = utils.calculateTileCost(owned + k, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades, s.playerClass));
 			Object.entries(c.resources).forEach(([r, v]) => {
 				need[r] = Math.max(need[r] ?? 0, (v ?? 0) * 1.1);
 			});
@@ -513,7 +522,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		if (!key) return;
 		const byName = (tileWaits[name] ??= {});
 		if (byName[key]) return;
-		const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades));
+		const cost = utils.calculateTileCost(owned, utils.effectiveTileDiscount(s.characterStats, s.prestige, s.merchantUpgrades, s.playerClass));
 		const need = utils.tileCostAsResources(cost) as Record<string, number>;
 		const rate = s.resourceRates.total as unknown as Record<string, number>;
 		// what is still missing after the purchase just made, over the income: the biggest number is what holds the next tile back
@@ -575,7 +584,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}));
 		}
 		const rates = api().resourceRates.total;
-		const xpRate = rates.xp * (1 + gearEco.xpGainPct(api().characterStats, api().equipment) / 100);
+		const xpRate = rates.xp * (1 + gearEco.xpGainPct(api().characterStats, api().equipment, api().playerClass) / 100);
 		waiting.sort((a, b) => a.spawnLevel - b.spawnLevel);
 		const left: typeof waiting = [];
 		for (const m of waiting) {
@@ -872,6 +881,10 @@ function renderMarkdown(results: Record<string, Milestones>, legacy: boolean, sp
 	lines.push(
 		'> Generated by `npm run sim` (scripts/sim.ts): the real game store driven by a bot with a seeded RNG. ' +
 			'Time to first reach each milestone, in game time. "finished" = castle 6 + max click power + the rebirth territory (REBIRTH.minTiles); the run continues to the last castle level.',
+	);
+	lines.push('');
+	lines.push(
+		'> Class picker (IDL-78, RELEASE-PLAN B7): these profiles play with no class, the neutral baseline. `npm run sim:classes` plays `idle` and `casual` with each class and fails when a guarded milestone moves more than ±15 % (or 5 game days) from this baseline; the sim models the XP, tile-discount and fight passives, not offline efficiency or chest speed (both are server-side only).',
 	);
 	lines.push('');
 	lines.push(`| milestone | ${names.join(' | ')} |`);

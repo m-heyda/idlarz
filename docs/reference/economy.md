@@ -215,17 +215,17 @@ See also: [`tilePrice`](economy.md#tileprice), [`effectiveTileDiscount`](economy
 
 ### `effectiveTileDiscount` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:63`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:64`](../../src/utils/game/rebirth.ts)
 
 Percent off tile cost: Charisma plus Thrift, capped.
 
-The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant), capped at 45% (`REBIRTH.discountCapPercent`).
+The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points), capped at 45% (`REBIRTH.discountCapPercent`).
 Buildings take Thrift only.
 
 **Formula**
 
 ```text
-discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level)
+discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
 ```
 
 <a id="calculatexpgain"></a>
@@ -794,7 +794,7 @@ Seconds between two chests: Luck shortens it, never below `LUCK.chestIntervalFlo
 **Formula**
 
 ```text
-interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck))
+interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck)) / (1 + class chest speed% / 100)
 ```
 
 <a id="chestspots"></a>

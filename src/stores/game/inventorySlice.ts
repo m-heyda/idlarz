@@ -43,7 +43,7 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 				// a set bonus can change the income: the rates follow the gear
 				resourceRates: ratesWithGear(state, result.equipment),
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
-				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
+				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment, state.playerClass)),
 			});
 			return true;
 		},
@@ -60,7 +60,7 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 				// a set bonus can change the income: the rates follow the gear
 				resourceRates: ratesWithGear(state, result.equipment),
 				playerHp: Math.min(state.playerHp, maxHp(state.characterStats, result.equipment)),
-				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment)),
+				playerMp: Math.min(state.playerMp, maxMana(state.characterStats, result.equipment, state.playerClass)),
 			});
 			return true;
 		},

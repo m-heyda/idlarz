@@ -397,7 +397,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		playerHp = v;
 	}
 	// Mana (optional: a save from before it was added starts full)
-	const maxPlayerMp = maxMana(characterStats, equipment);
+	const maxPlayerMp = maxMana(characterStats, equipment, raw.playerClass);
 	let playerMp = maxPlayerMp;
 	if (raw.playerMp !== undefined) {
 		const v = num(raw.playerMp, 0, maxPlayerMp);

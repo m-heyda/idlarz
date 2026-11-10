@@ -2,6 +2,7 @@ import { SKILLS, type SkillDef, type SkillId } from '@/catalog/skills';
 import { aggregateStats } from '@/lib/inventory';
 import { magicDamagePercent, type Attributes } from '@/lib/statBonuses';
 import { maxHp } from '@/lib/combat';
+import { classPassives } from '@/lib/classPassives';
 import type { CharacterStats, Equipment } from '@/types/game';
 
 // Pure skill rules: what a cast does. The server's fight engine (lib/offline/fight.ts) decides whether and when it may be cast.
@@ -14,11 +15,12 @@ export const isSkillId = (value: unknown): value is SkillId => typeof value === 
  * @category Combat/Potions and skills
  * @order 2
  * @formula
- * heal = 25% of max HP x (1 + magic damage% / 100) x (1 + Spell Power / 100)
+ * heal = 25% of max HP x (1 + magic damage% / 100) x (1 + (gear Spell Power + class Spell Power) / 100)
  */
-export const healAmount = (characterStats: CharacterStats, equipment: Equipment, skill: SkillDef = SKILLS.heal): number => {
+export const healAmount = (characterStats: CharacterStats, equipment: Equipment, skill: SkillDef = SKILLS.heal, playerClass?: unknown): number => {
 	const base = maxHp(characterStats, equipment) * (skill.healFraction ?? 0);
 	const attributes: Attributes = characterStats;
-	const bonus = (1 + magicDamagePercent(attributes) / 100) * (1 + aggregateStats(equipment).spellPower / 100);
+	const spellPower = aggregateStats(equipment).spellPower + classPassives(playerClass).spellPowerPct;
+	const bonus = (1 + magicDamagePercent(attributes) / 100) * (1 + spellPower / 100);
 	return Math.max(1, Math.round(base * bonus));
 };

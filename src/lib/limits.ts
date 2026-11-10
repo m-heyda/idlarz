@@ -1,4 +1,5 @@
 import { HARD_LIMITS, LIMITS, type LimitKey } from '@/config/limits';
+import { classPassives } from '@/lib/classPassives';
 import { emberEffect } from '@/utils/game/rebirth';
 import { merchantEffect, type MerchantUpgrades } from '@/utils/game/merchant';
 import type { PrestigeState } from '@/types/game';
@@ -9,6 +10,8 @@ export interface LimitContext {
 	prestige?: PrestigeState;
 	/** What the worn gear's set bonuses add to the away-time limits (lib/gearEconomy.ts) */
 	gear?: { offlineEff: number; offlineCapHours: number };
+	/** The hero class: the Paladin adds offline efficiency (lib/classPassives.ts) */
+	playerClass?: unknown;
 	/** Validation only: use the hard ceilings (`HARD_LIMITS`) where there are any instead of the current value */
 	hardCap?: boolean;
 }
@@ -20,7 +23,7 @@ export interface LimitContext {
 export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } = {
 	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat'),
 	offlineCapHours: (ctx) => emberEffect(ctx.prestige, 'nightwatch') + (ctx.gear?.offlineCapHours ?? 0),
-	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward') + (ctx.gear?.offlineEff ?? 0) / 100,
+	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward') + ((ctx.gear?.offlineEff ?? 0) + classPassives(ctx.playerClass).offlineEffPct) / 100,
 };
 
 /**

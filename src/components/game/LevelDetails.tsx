@@ -47,9 +47,9 @@ const VitalBar: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({ k
 
 /** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). */
 export const LevelBar: React.FC = () => {
-	const { resources, level, resourceRates, characterStats, equipment, playerHp, playerMp } = useGameStore();
+	const { resources, level, resourceRates, characterStats, equipment, playerHp, playerMp, playerClass } = useGameStore();
 	const hpMax = maxHp(characterStats, equipment);
-	const mpMax = maxMana(characterStats, equipment);
+	const mpMax = maxMana(characterStats, equipment, playerClass);
 	return (
 		<div className='eq-level-wrap'>
 			<div className='eq-level'>
@@ -83,7 +83,7 @@ export const LevelBar: React.FC = () => {
 const LevelDetails: React.FC = () => {
 	const { resources, level, resourceRates, characterStats, playerClass, playerHp, playerMp, equipment, playerName } = useGameStore();
 	const hpMax = maxHp(characterStats, equipment);
-	const mpMax = maxMana(characterStats, equipment);
+	const mpMax = maxMana(characterStats, equipment, playerClass);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
 	return (
