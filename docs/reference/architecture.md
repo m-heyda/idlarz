@@ -9,7 +9,8 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [Asset library](#asset-library), [Sound library](#sound-library)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [Sound library](#sound-library)
+- Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
 ## The loop
 
@@ -127,6 +128,16 @@ The panel offers biome painting, extending land, erasing, chests and monsters (b
 - `lib/mapEdit.ts` (pure): `applyStroke(world, cells, tool)` plus the tools (`paintTool`, `extendTool`, `eraseTool`, `chestTool`, `extendRing`). A new tool is one more `(world, cell) => Tile | undefined | 'skip'` function.
 - The lab's random chests use a plain picker on purpose: the game's weighted chest placement stays server-side (`tests/server/serverBoundary.test.ts`).
 
+<a id="the-landing-world"></a>
+
+### The landing world
+
+Source: [`src/lib/landingWorld.ts:4`](../../src/lib/landingWorld.ts)
+
+The world behind the landing page: a vast, seeded land of the basic biomes (plains, forest, swamp, tundra, coast) with a sea around it, a river and ponds, and the word IDLE spelled
+out in hills on a snow plain that is part of the mainland (patches of the biomes, not slabs). `/map-lab/landing-bake` draws it with the real terrain renderer and saves `public/landing/map.png`, which the landing page shows (so the landing never runs the generator).
+Deterministic: the same seed gives the same picture. Pure: no canvas, no store.
+
 <a id="asset-library"></a>
 
 ### Asset library
@@ -150,3 +161,16 @@ The sound library: every audio file under `public/` (the game's own mp3s and the
 duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
 Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
 The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.
+
+## Routes
+
+<a id="the-play-route-and-its-redirects"></a>
+
+### The /play route and its redirects
+
+Source: [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts)
+
+The front door's routes (IDL-61). The game lives at `/play`; `/` is the public landing. A guest who asks for `/play` is sent to the landing with the login window open
+(`/?login=1&next=/play`) and, once signed in, goes back to where they were headed. `next` comes from the address bar, so it is only ever followed when it is a
+path on this site (`safeNextPath`): anything else (another host, `//host`, a backslash trick, a control character) falls back to `/play`. This is a convenience
+for the player, not a security boundary: every API route answers 401 on its own.

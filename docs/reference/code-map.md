@@ -25,7 +25,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/api/auth/me/**
 
-- [`route.ts`](../../src/app/api/auth/me/route.ts) — ~ Who is signed in (from the cookie only), their own profile row and the data epoch state (`epoch`, `needsReset`, see `config/epoch.ts`).
+- [`route.ts`](../../src/app/api/auth/me/route.ts) — ~ The player's own level and rebirth count from their `player_stats` row; null when there is no row yet (a new account) or the read failed.
 
 **src/app/api/auth/profile/**
 
@@ -91,12 +91,23 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`CombatPreview.tsx`](../../src/app/map-lab/CombatPreview.tsx) — ~ Same list as the lab's spawn dropdown:
 - [`LabPanel.tsx`](../../src/app/map-lab/LabPanel.tsx)
+
+**src/app/map-lab/landing-bake/**
+
+- [`page.tsx`](../../src/app/map-lab/landing-bake/page.tsx) — ~ /map-lab/landing-bake:
+
+**src/app/map-lab/**
+
 - [`layout.tsx`](../../src/app/map-lab/layout.tsx)
 - [`page.tsx`](../../src/app/map-lab/page.tsx) — ~ /map-lab:
 
 **src/app/**
 
-- [`page.tsx`](../../src/app/page.tsx) — ~ The gate in front of the game:
+- [`page.tsx`](../../src/app/page.tsx) — ~ The public landing page (`/`):
+
+**src/app/play/**
+
+- [`page.tsx`](../../src/app/play/page.tsx) — ~ The gate in front of the game (route `/play`; a guest is sent to the landing page to log in):
 
 **src/catalog/**
 
@@ -136,6 +147,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/auth/**
 
+- [`AuthForm.tsx`](../../src/components/auth/AuthForm.tsx) — ~ Which form opens first.
 - [`AuthUnavailable.tsx`](../../src/components/auth/AuthUnavailable.tsx) — ~ An outage may pass on its own:
 - [`NewChapterScreen.tsx`](../../src/components/auth/NewChapterScreen.tsx) — ~ The account's current hero:
 - [`SaveHub.tsx`](../../src/components/auth/SaveHub.tsx) — ~ local:
@@ -239,6 +251,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`TutorialDialog.tsx`](../../src/components/game/overlays/TutorialDialog.tsx) — ~ The full guide, reopened on demand from Settings.
 - [`farmGeometry.ts`](../../src/components/game/overlays/farmGeometry.ts) — Geometry of the farm pasture drawn by scripts/pixel/sprites_farm.py (keep the constants and prop lists in sync with that file).
 
+**src/components/landing/**
+
+- [`LandingPage.tsx`](../../src/components/landing/LandingPage.tsx) — ~ The size the landing is designed for (content width, and the height from the top of the map to the bottom of the feature cards).
+
 **src/config/**
 
 - [`biomePalette.ts`](../../src/config/biomePalette.ts) — One colour per biome, the single place for them:
@@ -248,6 +264,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
 - [`buildings.ts`](../../src/config/buildings.ts) — Buildings and what they cost.
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
+- [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`). Newest first; add an entry here with every update worth telling players about.
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
 - [`combatConfig.ts`](../../src/config/combatConfig.ts) — ~ Combat tunables.
 - [`crafting.ts`](../../src/config/crafting.ts) — Crafting: the crafting level curve and the per-request limits. First draft (docs/plan/crafting-v0.md): level 10 in the first days of
@@ -263,6 +280,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/config/**
 
+- [`landing.ts`](../../src/config/landing.ts) — The words and art on the landing page (`/`): the five feature cards and the monsters that sit on the edges of the boxes. Pure config; the page (components/landing) only lays them out.
 - [`limits.ts`](../../src/config/limits.ts) — Bounds and caps that later upgrades and the rebirth system are meant to raise (more bag room, longer monster growth, a bigger
 - [`merchant.ts`](../../src/config/merchant.ts) — The merchant: resource prices, upgrades, shop goods.
 - [`monsterArtSize.ts`](../../src/config/monsterArtSize.ts) — How big a roster monster's picture is drawn on the map, in px (a tile is TILE_SIZE = 48 wide).
@@ -336,6 +354,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
 - [`itemInstance.ts`](../../src/lib/itemInstance.ts) — ~ The base stats at this level and quality (no affixes)
+- [`landingWorld.ts`](../../src/lib/landingWorld.ts) — ~ The world behind the landing page:
 - [`limits.ts`](../../src/lib/limits.ts) — ~ What can raise a limit:
 
 **src/lib/loot/**
@@ -399,6 +418,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
 - [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
+- [`playRoute.ts`](../../src/lib/playRoute.ts) — The route of the game itself (the gate in front of it, then the game).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
@@ -429,6 +449,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`tipPlacement.ts`](../../src/lib/tipPlacement.ts) — Where a hover card goes: flush against the edge of the item box it belongs to, not under the cursor. Pure, so the
 - [`uiPrefs.ts`](../../src/lib/uiPrefs.ts) — Remembered view options (not game state): plain booleans in localStorage, every access guarded
 - [`utils.ts`](../../src/lib/utils.ts)
+
+**src/**
+
+- [`middleware.ts`](../../src/middleware.ts) — ~ Guards `/play` (IDL-61):
 
 **src/stores/**
 
@@ -711,6 +735,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
+- [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
 - [`uiActions.test.ts`](../../tests/ui/uiActions.test.ts)
 
