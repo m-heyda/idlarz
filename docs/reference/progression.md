@@ -13,7 +13,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
-- Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [Avatars](#avatarinfo)
+- Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_DEFAULT_AVATAR`](#class-default-avatar), [Avatars](#avatarinfo)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
 - Guided tutorial: [`guideLive`](#guidelive), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
@@ -471,7 +471,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:66`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:86`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 
@@ -484,11 +484,20 @@ Source: [`src/lib/authValidation.ts:68`](../../src/lib/authValidation.ts)
 The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned`
 (the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means "none chosen" and passes. The client's own idea of what is unlocked is never trusted.
 
+<a id="class-default-avatar"></a>
+
+### `CLASS_DEFAULT_AVATAR` <small>const</small>
+
+Source: [`src/catalog/avatars.ts:62`](../../src/catalog/avatars.ts)
+
+Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the "A new chapter" screen when the player picks that class
+(until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.
+
 <a id="avatarinfo"></a>
 
 ### Avatars
 
-Source: [`src/catalog/avatars.ts:15`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:17`](../../src/catalog/avatars.ts)
 
 Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual.
 Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced

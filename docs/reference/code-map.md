@@ -120,7 +120,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/catalog/**
 
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
-- [`avatars.ts`](../../src/catalog/avatars.ts) — ~ `starter`:
+- [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71):
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 
@@ -166,7 +166,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/**
 
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
-- [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id; null/unknown shows the class bust (`playerClass`)
+- [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id; null/unknown shows the default avatar of `playerClass`
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The chosen avatar id (null = none yet)
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).

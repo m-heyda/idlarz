@@ -177,3 +177,9 @@
 	font-size: 0.65rem;
 	line-height: 1.15;
 }
+
+.class-card-avatar {
+	display: inline-flex;
+	margin: 2px 0;
+	line-height: 0;
+}

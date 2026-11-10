@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AVATARS, STARTER_AVATAR_IDS, unlockedAvatarIds } from '../../src/catalog/avatars';
+import { AVATARS, CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS, resolveAvatar, unlockedAvatarIds } from '../../src/catalog/avatars';
+import { PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
 import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -46,4 +47,21 @@ test('checkProfile carries the raw avatar id and rejects a non-string one', () =
 	assert.deepEqual(checkProfile({ ...base, avatarId: 'bard' }), { ok: true, value: { ...base, avatarId: 'bard' } });
 	assert.equal(checkProfile({ ...base, avatarId: 5 }).ok, false);
 	assert.equal(checkProfile({ ...base, avatarId: 'x'.repeat(100) }).ok, false);
+});
+
+test('every class has a default avatar that is a starter; a null avatar resolves to it', () => {
+	for (const id of PLAYER_CLASS_ORDER) {
+		const def = CLASS_DEFAULT_AVATAR[id];
+		assert.ok(STARTER_AVATAR_IDS.includes(def), `${id} -> ${def}`);
+		assert.equal(resolveAvatar(null, id).id, def);
+		assert.equal(resolveAvatar('not_an_avatar', id).id, def);
+		assert.equal(resolveAvatar('bard', id).id, 'bard', 'a chosen avatar wins over the class default');
+		assert.deepEqual(checkAvatar(def, []), { ok: true, value: def });
+	}
+	assert.deepEqual(CLASS_DEFAULT_AVATAR, { warrior: 'knight', paladin: 'alchemist', ranger: 'scout', mage: 'druid' });
+});
+
+test('a stored id is still validated by the server: forged or locked ids are refused whatever the class', () => {
+	assert.equal(checkAvatar('boss_slayer', []).ok, false);
+	assert.equal(checkAvatar('knight_of_doom', []).ok, false);
 });

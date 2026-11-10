@@ -5,7 +5,7 @@ import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config
 import { GAME_TITLE } from '@/config/branding';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { startChapter, fetchAvatars, type Profile } from '@/lib/authClient';
-import { STARTER_AVATAR_IDS } from '@/catalog/avatars';
+import { CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS } from '@/catalog/avatars';
 import AvatarPicker from '@/components/game/AvatarPicker';
 import PixelModal from '@/components/game/PixelModal';
 import PixelIcon from '@/components/game/PixelIcon';
@@ -29,7 +29,9 @@ const NOOP = () => {};
 const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 	const [name, setName] = useState(profile.characterName);
 	const [playerClass, setPlayerClass] = useState<PlayerClassId>(profile.playerClass);
-	const [avatarId, setAvatarId] = useState<string | null>(profile.avatarId ?? null);
+	const [avatarPick, setAvatarPick] = useState<string | null>(profile.avatarId ?? null);
+	// until the player chooses one, the avatar is the default of the chosen class
+	const avatarId = avatarPick ?? CLASS_DEFAULT_AVATAR[playerClass];
 	const [unlocked, setUnlocked] = useState<readonly string[]>(STARTER_AVATAR_IDS);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -98,7 +100,7 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 						})}
 					</div>
 					<p className='text-[#a89878] text-sm text-center'>Choose your avatar.</p>
-					<AvatarPicker value={avatarId} unlocked={unlocked} onChange={setAvatarId} />
+					<AvatarPicker value={avatarId} unlocked={unlocked} onChange={setAvatarPick} />
 					{error && (
 						<p role='alert' className='text-sm text-center text-[#e07a6a]'>
 							{error}

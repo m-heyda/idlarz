@@ -1,3 +1,5 @@
+import type { PlayerClassId } from '@/config/playerClasses';
+
 /**
  * Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual.
  * Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced
@@ -49,6 +51,24 @@ export const AVATARS: readonly AvatarInfo[] = [
 	unlock('boss_slayer', 'Boss slayer', 'boss_auroch', 'Defeat The Great Auroch', 'avatar_horned_brute_dark'),
 	unlock('early_tester', 'Early tester', 'early_tester', 'Played before the new chapter', 'avatar_horned_chainmail'),
 ];
+
+/**
+ * Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the "A new chapter" screen when the player picks that class
+ * (until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.
+ *
+ * @category Progression/Avatars
+ * @order 3
+ */
+export const CLASS_DEFAULT_AVATAR: Readonly<Record<PlayerClassId, string>> = {
+	warrior: 'knight',
+	paladin: 'alchemist',
+	ranger: 'scout',
+	mage: 'druid',
+};
+
+/** The avatar to show: the chosen one when it is in the catalog, otherwise the class default (never undefined). */
+export const resolveAvatar = (id: string | null | undefined, playerClass: PlayerClassId): AvatarInfo =>
+	avatarById(id) ?? (avatarById(CLASS_DEFAULT_AVATAR[playerClass]) as AvatarInfo);
 
 /** The served picture of an avatar */
 export const avatarArtUrl = (avatar: AvatarInfo): string => `/pixel/new_assets/heroes/${avatar.portrait}.png`;

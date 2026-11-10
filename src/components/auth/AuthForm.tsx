@@ -6,7 +6,7 @@ import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { login, register, saveProfile, type AuthResult, type Profile } from '@/lib/authClient';
 import PixelIcon from '@/components/game/PixelIcon';
 import AvatarPicker from '@/components/game/AvatarPicker';
-import { STARTER_AVATAR_IDS } from '@/catalog/avatars';
+import { CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS } from '@/catalog/avatars';
 import '@/styles/Heroes.css';
 
 export type AuthMode = 'login' | 'register' | 'profile';
@@ -34,7 +34,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 	const [password, setPassword] = useState('');
 	const [name, setName] = useState('');
 	const [playerClass, setPlayerClass] = useState<PlayerClassId | null>(null);
-	const [avatarId, setAvatarId] = useState<string | null>(null);
+	const [avatarPick, setAvatarPick] = useState<string | null>(null);
+	// until the player chooses one, the avatar follows the class (its default)
+	const avatarId = avatarPick ?? (playerClass ? CLASS_DEFAULT_AVATAR[playerClass] : null);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -128,7 +130,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 					{mode === 'register' && (
 						<>
 							<p className='text-[#a89878] text-sm text-center'>Choose your avatar. More are won in the game.</p>
-							<AvatarPicker value={avatarId} unlocked={STARTER_AVATAR_IDS} onChange={setAvatarId} />
+							<AvatarPicker value={avatarId} unlocked={STARTER_AVATAR_IDS} onChange={setAvatarPick} />
 						</>
 					)}
 				</>

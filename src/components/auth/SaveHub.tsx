@@ -7,7 +7,7 @@ import { newGameCloud } from '@/lib/cloudClient';
 import type { CloudInfo } from '@/lib/startPlan';
 import { countOwnedTiles } from '@/utils/game/tiles';
 import PixelModal from '@/components/game/PixelModal';
-import PixelIcon from '@/components/game/PixelIcon';
+import AvatarArt from '@/components/game/AvatarArt';
 
 export type HubChoice = 'local' | 'cloud' | 'fresh';
 
@@ -91,7 +91,7 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 			<SaveCard
 				title='This browser'
 				name={localOk.state.playerName}
-				bust={<PixelIcon name={info.bust} scale={3} alt={info.label} />}
+				bust={<AvatarArt id={null} playerClass={localOk.state.playerClass} scale={2} />}
 				level={localOk.state.level.level}
 				tiles={countOwnedTiles(localOk.state.tiles)}
 				playSeconds={localOk.state.playSeconds}
