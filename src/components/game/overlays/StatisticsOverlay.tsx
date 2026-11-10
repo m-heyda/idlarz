@@ -16,6 +16,8 @@ import { useUiStore, type CharacterTab } from '@/stores/uiStore';
 import { craftLevelOf } from '@/lib/crafting';
 import { useCraftStore } from '@/stores/craftStore';
 import RebirthsPanel from './RebirthsPanel';
+import { describeClassPassives } from '@/lib/classPassives';
+import { PLAYER_CLASSES } from '@/config/playerClasses';
 
 const CHARACTER_TAB_LABELS: { id: CharacterTab; label: string }[] = [
 	{ id: 'combat', label: 'Combat & bonuses' },
@@ -93,7 +95,9 @@ const StatisticsOverlay: React.FC = () => {
 	const farmLevels = useGameStore((state) => state.farmLevels);
 	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
-	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades });
+	const playerClass = useGameStore((state) => state.playerClass);
+	const classLines = describeClassPassives(playerClass);
+	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass });
 
 	const characterTab = useUiStore((state) => state.characterTab);
 	const setCharacterTab = useUiStore((state) => state.setCharacterTab);
@@ -239,6 +243,11 @@ const StatisticsOverlay: React.FC = () => {
 								<Line label='Gem find in chests' value={pct(fx.gemChance, 1)} valueClass='text-cyan-300' />
 								<Line label='Golden monster chance' value={pct(fx.goldenMonsterChance, 1)} valueClass='text-yellow-300' />
 								<Line label='Gold find' value={pct(fx.goldFind, 1)} valueClass='text-yellow-400' />
+								<Line
+									label={`Class (${PLAYER_CLASSES[playerClass]?.label ?? 'Hero'})`}
+									value={[...classLines.combat, ...classLines.economy].join(', ')}
+									valueClass='text-amber-300'
+								/>
 								<Line label='Mana regen' value={`${formatCompact(fx.manaRegen, 2)}/s`} valueClass='text-blue-400' />
 								<Line label='Spell power' value={pct(fx.spellPower, 1)} valueClass='text-purple-300' />
 								<Line label='XP gain' value={pct(fx.xpGain, 2)} valueClass='text-green-400' />
@@ -295,6 +304,12 @@ const StatisticsOverlay: React.FC = () => {
 								Each tile adds 25% for every neighbour of the same biome, and tile and building output is scaled up by the yield scale. The castle bonus, the
 								plains bonus (meat), your attributes and your rebirths then raise the total.
 							</p>
+							{classLines.economy.length > 0 && (
+								<p className='text-xs text-[#a89878]'>
+									Your class ({PLAYER_CLASSES[playerClass]?.label}) adds: {classLines.economy.join(', ')}. It counts inside the same caps as gear and
+									attributes.
+								</p>
+							)}
 							{(Object.keys(breakdown) as (keyof Resources)[]).map((resource) => {
 								const entry = breakdown[resource];
 								return (

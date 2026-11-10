@@ -13,6 +13,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
+- Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
 - Guided tutorial: [`guideLive`](#guidelive), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
 ## Levels
@@ -192,7 +193,7 @@ See also: [`rebirthStatus`](progression.md#rebirthstatus), [`emberGain`](progres
 
 ### `emberGain` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:91`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:97`](../../src/utils/game/rebirth.ts)
 
 Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.
 
@@ -220,7 +221,7 @@ gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
 
 ### `emberIncomeBonus` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:48`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:49`](../../src/utils/game/rebirth.ts)
 
 The income bonus (0.5 = +50 %) that `earned` Embers ever earned give: linear when `incomeExponent` is 1, flatter when it is below 1.
 
@@ -247,7 +248,7 @@ income bonus = 0.1 x (Embers ever earned)^0.6          multiplier = 1 + bonus
 
 ### `rebirthStatus` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:122`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:128`](../../src/utils/game/rebirth.ts)
 
 Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store's `rebirth`
 all read this one function, so what the tooltip promises is what the action checks.
@@ -266,7 +267,7 @@ can rebirth = castle level >= 6  and  economyTiles >= 400 + 50 x rebirths  and  
 
 Source: [`src/config/rebirth.ts:58`](../../src/config/rebirth.ts)
 
-The Ember shop: level N+1 costs `ceil(baseCost x 1.4^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers.
+The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers.
 The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
 
 **The Ember shop** _(computed from the code)_
@@ -279,12 +280,13 @@ The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies 
 | provisions | Provisions | 2 | start every run with +1 bundle(s) of gold 1,500, wood 400, stone 400 |
 | nightwatch | Night Watch | 2 | +1 hour of paid away time |
 | steward | Steward | 3 | +5% income while away |
+| deeppockets | Deep Pockets | 30 | +4 bag slots |
 
 <a id="emberupgradecost"></a>
 
 ### `emberUpgradeCost` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:25`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:26`](../../src/utils/game/rebirth.ts)
 
 Cost in Embers of buying the next level of an upgrade, given its current level.
 
@@ -302,7 +304,7 @@ cost of level N+1 = ceil(baseCost x 1.4^N) Embers
 
 Source: [`src/config/limits.ts:14`](../../src/config/limits.ts)
 
-Limits that upgrades raise. These are base values; code reads them through [`limitOf`](progression.md#limitof), which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours;
+Limits that upgrades raise. These are base values; code reads them through [`limitOf`](progression.md#limitof), which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat and the Deep Pockets Ember upgrade raise the bag size; Night Watch and set bonuses the away hours;
 Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.
 
 **Limits (base values and hard caps)** _(computed from the code)_
@@ -315,7 +317,7 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `merchantOffers` | 6 | 12 | nothing yet |
 | `merchantRotateSec` | 1,800 | n/a | nothing yet |
 | `merchantRefreshBase` | 10 K | n/a | nothing yet |
-| `bagSize` | 36 | n/a | Pack Rat +4 per level |
+| `bagSize` | 60 | 200 | Pack Rat +8 per level, Deep Pockets +4 per level |
 | `offlineCapHours` | 8 | 72 | Night Watch +1 h per level, set bonus hours |
 | `offlineEfficiency` | 0.5 | 1 | Steward +0.05 per level, set bonus points |
 | `offlineMinGapSec` | 300 | n/a | nothing yet |
@@ -330,7 +332,7 @@ See also: [`limitOf`](progression.md#limitof)
 
 ### `limitOf` <small>function</small>
 
-Source: [`src/lib/limits.ts:34`](../../src/lib/limits.ts)
+Source: [`src/lib/limits.ts:37`](../../src/lib/limits.ts)
 
 The current value of a limit: its base plus the registered bonuses.
 
@@ -453,6 +455,51 @@ See also: [`gearOdds`](progression.md#gearodds), [`CRAFT_GEAR`](progression.md#c
 Source: [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts)
 
 What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.
+
+## Class passives
+
+<a id="classpassives"></a>
+
+### `classPassives` <small>function</small>
+
+Source: [`src/lib/classPassives.ts:24`](../../src/lib/classPassives.ts)
+
+The passives of a hero class (`CLASS_PASSIVES`, `src/config/playerClasses.ts`): one combat and one economy bonus each (the Mage's combat one is mana and Spell Power together).
+
+| Where it lands | How |
+| --- | --- |
+| Armor, max mana, Spell Power (healing) | added to the character's own number before it is used ([`armorOf`](combat.md#armorof), `maxMana`, [`healAmount`](combat.md#healamount)) |
+| Crit chance, HP regeneration | added to the merchant's `CombatBonus` (`withClassBonus`), so they count in fights, in the idle regeneration and in the win chance |
+| Tile discount | added to Charisma, Thrift and Bulk Discount, inside the tile-discount cap ([`effectiveTileDiscount`](economy.md#effectivetilediscount)) |
+| Offline efficiency | added to the Steward and the set bonuses, under the hard limit (`offlineEfficiency`) |
+| XP gain | added to the gear's XP bucket, under the XP perk-family cap ([`classXpBucket`](progression.md#classxpbucket)) |
+| Chest speed | the chest interval is divided by `1 + chestSpeed / 100` ([`chestIntervalSec`](economy.md#chestintervalsec)) |
+
+No class passive has a multiplier bucket of its own. The class is read from the profile row (the save route stamps it over the upload, see
+`acceptSave`), never from a number the browser sends, and the server runs the fight profile and the economy summary on it.
+
+**Class passives** _(computed from the code)_
+
+| Class | Combat | Economy |
+| --- | --- | --- |
+| Warrior | +2 armor | -3% tile cost |
+| Paladin | +0.25 HP/s regeneration | +5% offline efficiency |
+| Ranger | +2% crit chance | +5% chest speed |
+| Mage | +8 max mana, +5% spell power | +5% XP gain |
+
+<a id="classxpbucket"></a>
+
+### `classXpBucket` <small>function</small>
+
+Source: [`src/lib/classPassives.ts:46`](../../src/lib/classPassives.ts)
+
+The gear's XP bucket with the class's XP added, held under the XP perk-family cap: the class counts like gear, it never lifts the bucket above `PERK_CAPS.xpPct`.
+
+**Formula**
+
+```text
+xp bucket = min(PERK_CAPS.xpPct, gear XP% + class XP%)          then + the attributes' XP gain
+```
 
 ## Guided tutorial
 

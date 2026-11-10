@@ -15,7 +15,7 @@ import OrganizeButton from './OrganizeButton';
 import BuffRow from './BuffRow';
 import { slotProps } from './itemUi';
 
-/** The 6x6 bag. Double-click equips gear or drinks a potion; right-click opens its menu (use, sell, discard); drag to rearrange or to unequip. */
+/** The bag (6 columns, scrolls from 60 slots up). Double-click equips gear or drinks a potion; right-click opens its menu (use, sell, discard); drag to rearrange or to unequip. */
 const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) => {
 	const [tab, setTab] = React.useState<'bag' | 'crafting'>('bag');
 	const bag = useGameStore((state) => state.bag);

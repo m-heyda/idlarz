@@ -76,7 +76,10 @@ const Grid: React.FC = () => {
 		canAffordBundle(
 			state.resources,
 			tileCostAsResources(
-				calculateTileCost(economyTiles(state.tiles, state.freeTiles), effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades)),
+				calculateTileCost(
+					economyTiles(state.tiles, state.freeTiles),
+					effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass),
+				),
 			),
 		),
 	);

@@ -675,7 +675,7 @@
   "category": "Progression/Limits",
   "file": "src/config/limits.ts",
   "line": 14,
-  "summary": "Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours; Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.",
+  "summary": "Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat and the Deep Pockets Ember upgrade raise the bag size; Night Watch and set bonuses the away hours; Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.",
   "see": [
    "limitOf"
   ]
@@ -756,7 +756,7 @@
   "category": "Progression/Ember shop",
   "file": "src/config/rebirth.ts",
   "line": 58,
-  "summary": "The Ember shop: level N+1 costs `ceil(baseCost x 1.4^N)` Embers ({@link emberUpgradeCost}); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.",
+  "summary": "The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.",
   "see": []
  },
  {
@@ -892,6 +892,28 @@
   "see": []
  },
  {
+  "id": "classpassives",
+  "name": "classPassives",
+  "symbol": "classPassives",
+  "kind": "function",
+  "category": "Progression/Class passives",
+  "file": "src/lib/classPassives.ts",
+  "line": 24,
+  "summary": "The passives of a hero class (`CLASS_PASSIVES`, `src/config/playerClasses.ts`): one combat and one economy bonus each (the Mage's combat one is mana and Spell Power together).",
+  "see": []
+ },
+ {
+  "id": "classxpbucket",
+  "name": "classXpBucket",
+  "symbol": "classXpBucket",
+  "kind": "function",
+  "category": "Progression/Class passives",
+  "file": "src/lib/classPassives.ts",
+  "line": 46,
+  "summary": "The gear's XP bucket with the class's XP added, held under the XP perk-family cap: the class counts like gear, it never lifts the bucket above `PERK_CAPS.xpPct`.",
+  "see": []
+ },
+ {
   "id": "createclicklimiter",
   "name": "createClickLimiter",
   "symbol": "createClickLimiter",
@@ -967,7 +989,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 76,
+  "line": 77,
   "summary": "True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).",
   "see": []
  },
@@ -978,7 +1000,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 84,
+  "line": 85,
   "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
   "see": []
  },
@@ -989,7 +1011,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 206,
+  "line": 207,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1066,7 +1088,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 34,
+  "line": 35,
   "summary": "The player's numbers (all pure functions in `src/lib/combat.ts`, used by the server engine and the UI):",
   "see": [
    "armorReduction",
@@ -1081,7 +1103,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/combat.ts",
-  "line": 45,
+  "line": 46,
   "summary": "Auto-battle (the server picking the next monster) is a reward for the first rebirth; a click on a monster starts a fight from the start.",
   "see": []
  },
@@ -1092,7 +1114,7 @@
   "kind": "function",
   "category": "Combat/Win chance",
   "file": "src/lib/combat.ts",
-  "line": 61,
+  "line": 62,
   "summary": "The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red). The strip also shows the word and the exact percent on hover, so colour is never the only cue.",
   "see": []
  },
@@ -1103,7 +1125,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 109,
+  "line": 110,
   "summary": "Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.",
   "see": []
  },
@@ -1114,7 +1136,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 120,
+  "line": 121,
   "summary": "Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.",
   "see": []
  },
@@ -1125,7 +1147,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 139,
+  "line": 140,
   "summary": "Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.",
   "see": []
  },
@@ -1136,7 +1158,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 157,
+  "line": 158,
   "summary": "One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.",
   "see": []
  },
@@ -1147,7 +1169,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 176,
+  "line": 177,
   "summary": "Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.",
   "see": []
  },
@@ -1158,7 +1180,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 190,
+  "line": 193,
   "summary": "The Life Leech in %, the gear's and the merchant's together, never above the cap.",
   "see": []
  },
@@ -1169,7 +1191,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 207,
+  "line": 210,
   "summary": "The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much, so no amount of armor makes anything unkillable (the asymptote is 75 %).",
   "see": []
  },
@@ -1180,7 +1202,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 220,
+  "line": 223,
   "summary": "Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.",
   "see": []
  },
@@ -1191,7 +1213,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 228,
+  "line": 231,
   "summary": "HP regeneration outside fights: the base rate plus the gear's regen stat.",
   "see": []
  },
@@ -1202,7 +1224,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 239,
+  "line": 242,
   "summary": "Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.",
   "see": []
  },
@@ -1303,7 +1325,7 @@
   "kind": "function",
   "category": "Economy/Perk caps",
   "file": "src/lib/inventory.ts",
-  "line": 240,
+  "line": 241,
   "summary": "The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families (income, XP, kill reward, click, damage) are capped by {@link capPerks}. The server reads gear through this too, so both sides agree.",
   "see": []
  },
@@ -1335,7 +1357,7 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/limits.ts",
-  "line": 34,
+  "line": 37,
   "summary": "The current value of a limit: its base plus the registered bonuses.",
   "see": []
  },
@@ -1831,7 +1853,7 @@
   "category": "Combat/A fight",
   "file": "src/lib/offline/profile.ts",
   "line": 62,
-  "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear.",
+  "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).",
   "see": []
  },
  {
@@ -1841,7 +1863,7 @@
   "kind": "function",
   "category": "Combat/Consumables",
   "file": "src/lib/offline/profile.ts",
-  "line": 96,
+  "line": 98,
   "summary": "A profile with the running potion buffs on top ({@link buffTotals}): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object), so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.",
   "see": []
  },
@@ -1906,7 +1928,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 112,
+  "line": 114,
   "summary": "How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together), (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.",
   "see": []
  },
@@ -1917,7 +1939,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 152,
+  "line": 154,
   "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.",
   "see": []
  },
@@ -1973,7 +1995,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 59,
+  "line": 58,
   "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
   "see": []
  },
@@ -1984,7 +2006,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 192,
+  "line": 191,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -2020,7 +2042,7 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/skills.ts",
-  "line": 19,
+  "line": 20,
   "summary": "HP a Heal restores: its share of max HP, times the Intelligence bonus (the same one magic weapons get) and the gear's Spell Power.",
   "see": []
  },
@@ -2343,7 +2365,7 @@
   "kind": "function",
   "category": "Progression/Ember shop",
   "file": "src/utils/game/rebirth.ts",
-  "line": 25,
+  "line": 26,
   "summary": "Cost in Embers of buying the next level of an upgrade, given its current level.",
   "see": []
  },
@@ -2354,7 +2376,7 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirth.ts",
-  "line": 48,
+  "line": 49,
   "summary": "The income bonus (0.5 = +50 %) that `earned` Embers ever earned give: linear when `incomeExponent` is 1, flatter when it is below 1.",
   "see": []
  },
@@ -2365,7 +2387,7 @@
   "kind": "function",
   "category": "Economy/Tiles",
   "file": "src/utils/game/rebirth.ts",
-  "line": 63,
+  "line": 64,
   "summary": "Percent off tile cost: Charisma plus Thrift, capped.",
   "see": []
  },
@@ -2376,7 +2398,7 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirth.ts",
-  "line": 91,
+  "line": 97,
   "summary": "Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.",
   "see": []
  },
@@ -2387,7 +2409,7 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirth.ts",
-  "line": 122,
+  "line": 128,
   "summary": "Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store's `rebirth` all read this one function, so what the tooltip promises is what the action checks.",
   "see": []
  },
@@ -2476,6 +2498,16 @@
   ]
  },
  {
+  "id": "the-class-picker-acceptance",
+  "name": "The class picker acceptance",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/sim-classes.ts",
+  "line": 1,
+  "summary": "`npm run sim:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule (`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.",
+  "see": []
+ },
+ {
   "id": "the-parallel-sim-runner",
   "name": "The parallel sim runner",
   "kind": "topic",
@@ -2515,7 +2547,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 790,
+  "line": 799,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

@@ -20,6 +20,8 @@ import {
 	XP_CAP,
 } from '../../src/config/economy';
 import { BIOMES } from '../../src/config/biomes';
+import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
+import { describeClassPassives } from '../../src/lib/classPassives';
 import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADE_GROUPS, MERCHANT_UPGRADES } from '../../src/config/merchant';
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
@@ -233,6 +235,7 @@ const EMBER_EFFECT: Record<string, (n: number) => string> = {
 	provisions: (n) => `start every run with +${n} bundle(s) of ${res(EMBER_UPGRADES.provisions.bundle as Record<string, number>)}`,
 	nightwatch: (n) => `+${n} hour of paid away time`,
 	steward: (n) => `+${pct(n)} income while away`,
+	deeppockets: (n) => `+${n} bag slots`,
 };
 TABLES['ember-shop'] = () => ({
 	title: 'The Ember shop',
@@ -243,7 +246,7 @@ TABLES['ember-shop'] = () => ({
 });
 
 const RAISED_BY: Record<string, string> = {
-	bagSize: 'Pack Rat +4 per level',
+	bagSize: 'Pack Rat +8 per level, Deep Pockets +4 per level',
 	offlineCapHours: 'Night Watch +1 h per level, set bonus hours',
 	offlineEfficiency: 'Steward +0.05 per level, set bonus points',
 };
@@ -409,6 +412,17 @@ TABLES['perk-caps'] = () => ({
 	md: mdTable(
 		['Family', 'Cap (% of the gear bucket)', 'Multiplier at the cap'],
 		PERK_FAMILIES.map((f) => [STAT_DEFS[f].label, PERK_CAPS[f], `x${(1 + PERK_CAPS[f] / 100).toFixed(2)}`]),
+	),
+});
+
+TABLES['class-passives'] = () => ({
+	title: 'Class passives',
+	md: mdTable(
+		['Class', 'Combat', 'Economy'],
+		PLAYER_CLASS_ORDER.map((id) => {
+			const lines = describeClassPassives(id);
+			return [PLAYER_CLASSES[id].label, lines.combat.join(', '), lines.economy.join(', ')];
+		}),
 	),
 });
 

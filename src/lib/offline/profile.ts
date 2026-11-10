@@ -6,6 +6,7 @@ import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { aggregateStats } from '@/lib/inventory';
 import { attacksPerSecond, critOdds, damagePerHit, dodgeChance, lifeLeechPercent, manaRegenPerSec, maxHp, maxMana, armorOf } from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
+import { withClassBonus } from '@/lib/classPassives';
 import { critDamagePercent } from '@/lib/statBonuses';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { CharacterStats, Equipment } from '@/types/game';
@@ -53,8 +54,7 @@ const merchantOf = (core: Core): Record<string, number> => {
 };
 
 /**
- * Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear.
- *
+ * Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).
  *
  * @category Combat/A fight
  * @order 5
@@ -62,23 +62,25 @@ const merchantOf = (core: Core): Record<string, number> => {
 export const playerProfile = (core: Core): PlayerProfile => {
 	const stats = statsOf(core);
 	const equipment = equipmentOf(core);
-	const bonus = merchantCombat(merchantOf(core));
+	// the class comes from the stored save, where the save route stamps it from the profile row (never from the upload)
+	const playerClass = core.playerClass;
+	const bonus = withClassBonus(merchantCombat(merchantOf(core)), playerClass);
 	const odds = critOdds(stats, equipment, bonus);
 	return {
 		level: characterLevelOf(core),
 		maxHp: maxHp(stats, equipment),
-		maxMp: maxMana(stats, equipment),
+		maxMp: maxMana(stats, equipment, playerClass),
 		hit: damagePerHit(equipment, stats, bonus),
 		crit: odds.crit,
 		superCrit: odds.superCrit,
 		critExtra: 1 + critDamagePercent(stats) / 100,
 		attacksPerSec: attacksPerSecond(equipment, stats, bonus),
-		armor: armorOf(equipment, stats),
+		armor: armorOf(equipment, stats, playerClass),
 		dodge: dodgeChance(equipment),
 		leechPct: lifeLeechPercent(equipment, bonus),
 		hpRegen: aggregateStats(equipment).regen + bonus.regen,
 		mpRegen: manaRegenPerSec(stats, equipment),
-		heal: healAmount(stats, equipment),
+		heal: healAmount(stats, equipment, undefined, playerClass),
 	};
 };
 

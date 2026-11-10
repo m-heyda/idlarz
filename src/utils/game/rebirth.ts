@@ -2,6 +2,7 @@
 import { CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '@/config/rebirth';
 import { INITIAL_RESOURCES } from '@/config/economy';
+import { classPassives } from '@/lib/classPassives';
 import type { CharacterStats, GameState, PrestigeState, Resources } from '@/types/game';
 import { getTile } from '@/utils/world';
 import { merchantEffect, type MerchantUpgrades } from '@/utils/game/merchant';
@@ -52,19 +53,24 @@ export const emberIncomeMultiplier = (prestige: PrestigeState | undefined): numb
 /**
  * Percent off tile cost: Charisma plus Thrift, capped.
  *
- * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant), capped at 45% (`REBIRTH.discountCapPercent`).
+ * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points), capped at 45% (`REBIRTH.discountCapPercent`).
  * Buildings take Thrift only.
  *
  * @category Economy/Tiles
  * @order 4
  * @formula
- * discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level)
+ * discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
  */
 export const effectiveTileDiscount = (
 	stats: Pick<CharacterStats, 'tileCostDiscount'>,
 	prestige: PrestigeState | undefined,
 	merchant?: MerchantUpgrades,
-): number => Math.min(stats.tileCostDiscount + emberEffect(prestige, 'thrift') * 100 + merchantEffect(merchant, 'bulk'), REBIRTH.discountCapPercent);
+	playerClass?: unknown,
+): number =>
+	Math.min(
+		stats.tileCostDiscount + emberEffect(prestige, 'thrift') * 100 + merchantEffect(merchant, 'bulk') + classPassives(playerClass).tileDiscountPct,
+		REBIRTH.discountCapPercent,
+	);
 
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {

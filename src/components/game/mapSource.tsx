@@ -22,7 +22,8 @@ export type MapGameState = Pick<
 	| 'buyTile'
 	| 'collectChest'
 	| 'startFight'
->;
+> &
+	Partial<Pick<GameState, 'playerClass'>>;
 
 export type MapGameStore = UseBoundStore<StoreApi<MapGameState>>;
 

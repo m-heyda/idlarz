@@ -130,7 +130,7 @@ test('tile cost: extra resources are required from the configured tile count and
 	const first = TILE_RESOURCE_COST[0];
 	growTo(first.from);
 	assert.equal(owned(), first.from);
-	const cost = calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, api().prestige));
+	const cost = calculateTileCost(owned(), effectiveTileDiscount(api().characterStats, api().prestige, api().merchantUpgrades, api().playerClass));
 	assert.ok((cost.resources[first.resource] ?? 0) > 0);
 	// enough gold, but none of the required resource
 	setResources({ gold: 1e12, wood: 0, stone: 0, coal: 0, food: 0 });

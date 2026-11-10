@@ -38,7 +38,7 @@ export const createInventorySync = (set: GameSet, get: GameGet) => {
 			// a set bonus can change the income: the rates follow the gear
 			resourceRates: ratesWithGear(state, inv.equipment),
 			playerHp: Math.min(state.playerHp, maxHp(state.characterStats, inv.equipment)),
-			playerMp: Math.min(state.playerMp, maxMana(state.characterStats, inv.equipment)),
+			playerMp: Math.min(state.playerMp, maxMana(state.characterStats, inv.equipment, state.playerClass)),
 		});
 	};
 

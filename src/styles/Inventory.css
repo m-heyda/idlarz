@@ -99,6 +99,10 @@
 	grid-template-columns: repeat(6, 48px);
 	gap: 6px;
 	justify-content: center;
+	/* 60+ cells (IDL-162): about 7 rows show, the rest scrolls inside the window (drag and Organize work the same) */
+	max-height: 336px;
+	overflow-y: auto;
+	padding: 2px 4px 2px 0;
 }
 
 /* The merchant's shelf: small slots standing on wooden planks, a Buy button hanging under each (the price shows on hover). The wood is CSS only
