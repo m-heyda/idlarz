@@ -203,7 +203,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
-- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ A monster's picture (public/pixel/enemies); `scale` 1 is the size it has on the map, bigger ones are for the fight window.
+- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`OrganizeButton.tsx`](../../src/components/game/OrganizeButton.tsx) — ~ Tidies the bag from the left:
@@ -508,6 +508,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/stores/**
 
 - [`achievementStore.ts`](../../src/stores/achievementStore.ts) — ~ The achievements the server says the player has earned (an id list it sends with the spawn poll) and the toast when a request pays a new one.
+- [`bestiaryStore.ts`](../../src/stores/bestiaryStore.ts) — ~ The monsters the player has met (the server's `stats.seen`, sent with every online answer) and the kills per type (`stats.kills`).
 - [`craftStore.ts`](../../src/stores/craftStore.ts) — ~ One shared empty stock:
 
 **src/stores/game/**
@@ -786,6 +787,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/server/**
 
 - [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
+- [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)

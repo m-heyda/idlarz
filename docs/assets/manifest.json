@@ -20612,7 +20612,7 @@
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_achievements.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			64,
@@ -20781,8 +20781,8 @@
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			64,
+			64
 		]
 	},
 	{
