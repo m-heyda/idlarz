@@ -103,7 +103,7 @@ test('levels are gated by min(5, castle level); timers are 10 min, 45 min, 3 h, 
 	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 540);
 });
 
-test('prices: x2 per level on the price of 12 tiles; moving costs half of everything the building cost', () => {
+test('prices: x2 per level on the price of 14 tiles; moving costs half of everything the building cost', () => {
 	const one = buildingLevelCost(1, 100);
 	const two = buildingLevelCost(2, 100);
 	assert.ok(one.gold! > 0);

@@ -22,7 +22,7 @@ export const BUILDINGS_FLAG = { enabled: true };
  * - `maxLevel`: the base level cap, 5. Level `L` can only be bought while the castle is at least level `L` (`min(5, castle level)`).
  * - `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once.
  * - `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
- * - `cost`: level 1 costs `tilePrices` (12) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ({@link calculateTileCost}).
+ * - `cost`: level 1 costs `tilePrices` (14) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ({@link calculateTileCost}).
  * - `relocateShare`: moving a building costs this share (50 %) of what its current level cost to reach, at today's prices; it is instant and keeps the level.
  *
  * @category Economy/Buildings
@@ -33,6 +33,6 @@ export const BUILDING_RULES = {
 	maxLevel: 5,
 	durationsSec: [600, 2700, 10800, 28800],
 	producer: { tileEquivalents: 15, levelStep: 0.5, perOwnedTile: 0.02, bonusCap: 1 },
-	cost: { tilePrices: 12, priceTileCap: 300, levelGrowth: 2 },
+	cost: { tilePrices: 14, priceTileCap: 300, levelGrowth: 2 },
 	relocateShare: 0.5,
 };

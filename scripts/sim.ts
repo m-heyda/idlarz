@@ -270,6 +270,8 @@ interface Ctx {
  * What the bots build with `--buildings`, in this order (docs/plan/18: Producers only for now). The first affordable one whose biome the map has is built; once all stand, the bot levels the lowest one the castle allows.
  * The order follows what the early game lacks: wood and stone for the castle and tiles, then food, then coal.
  */
+/** Tiles' worth of gold a bot keeps in hand when it builds (see decide) */
+const BUILD_TILE_RESERVE = Number(process.env.SIM_BUILD_RESERVE ?? 20);
 const BUILD_ORDER = ['lumberyard', 'quarry', 'granary', 'coalpit', 'fishery', 'harbor', 'peatworks'];
 
 const HARDCORE_WINDOWS: [number, number][] = [
@@ -452,7 +454,10 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 				const built = bld.builtBuildings(s.tiles);
 				const owned = utils.economyTiles(s.tiles, s.freeTiles);
 				const castleLvl = castleNow.level ?? 1;
-				const pay = (cost: Partial<Record<string, number>>) => utils.canAffordBundle(s.resources, cost) || topUp(cost);
+				// a sensible player keeps buying land first: a building is paid only when the gold left over still buys the next BUILD_TILE_RESERVE tiles
+				const reserve = BUILD_TILE_RESERVE * utils.calculateTileCost(owned, 0).gold;
+				const pay = (cost: Partial<Record<string, number>>) =>
+					s.resources.gold >= (cost.gold ?? 0) + reserve && (utils.canAffordBundle(s.resources, cost) || topUp(cost));
 				const lowest = built.filter((b) => b.level < bld.buildingLevelCap(castleLvl)).sort((a, b) => a.level - b.level)[0];
 				const next = BUILD_ORDER.find((id) => !built.some((b) => b.id === id));
 				if (next) {
@@ -534,7 +539,8 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 			// A sensible player does not let tiles eat the resources the next castle level needs
 			const castleTile = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
-			if (!s.castleUpgrade && (castleTile.level ?? 1) < cfg.CASTLE_UPGRADE.maxLevel && castleTile.upgradeCost) {
+			// (a castle the profile never upgrades further, rebirthAtCastle, reserves nothing)
+			if (!s.castleUpgrade && (castleTile.level ?? 1) < castleCeiling && castleTile.upgradeCost) {
 				const after = utils.subtractBundle(s.resources, bundle);
 				const blocked = Object.entries(castleTile.upgradeCost).some(
 					([r, v]) => r !== 'gold' && s.resources[r as keyof typeof s.resources] >= (v ?? 0) && after[r as keyof typeof after] < (v ?? 0),
