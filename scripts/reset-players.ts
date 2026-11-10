@@ -35,6 +35,7 @@
  *   npm run reset-players -- --yes --purge-history   only delete save_history; default keeps it
  *   npm run reset-players -- --yes --no-backup       skip the JSON backup (not recommended)
  *   npm run reset-players -- --yes --reset-gems      the gems go back to the starting amount too (the test account uses this, see scripts/reset-test-account.ts)
+ *   npm run reset-players -- --yes --reset-stats     also clears the lifetime counters (`player_ledger.stats`: kills, discovered monsters, tutorial progress, earned achievements) and `player_achievements`; the test account uses this
  *
  * Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (read from the environment or from .env.local).
  *
@@ -68,6 +69,7 @@ const hard = flag('--hard');
 const purgeHistory = flag('--purge-history') || hard;
 const backup = !flag('--no-backup');
 const resetGems = flag('--reset-gems');
+const resetStats = flag('--reset-stats');
 
 for (const file of ['.env.local', '.env']) {
 	try {
@@ -175,10 +177,17 @@ const main = async () => {
 			last_result: null,
 			combat: null,
 			inv: null,
+			...(resetStats ? { stats: null } : {}),
 			updated_at: new Date(now).toISOString(),
 		};
 		const ledgerWrite = old ? await db.from('player_ledger').update(row).eq('user_id', id) : await db.from('player_ledger').insert({ user_id: id, ...row });
 		fail(`ledger ${id}`, ledgerWrite.error);
+
+		if (resetStats) {
+			// the achievements table mirrors `stats.achievements`: a player with fresh counters has earned nothing
+			const achievementsDelete = await db.from('player_achievements').delete().eq('user_id', id);
+			fail(`achievements ${id}`, achievementsDelete.error);
+		}
 
 		// 2. the save: deleting it cascades to player_worlds and player_stats; the next login starts a new game. --hard deletes those rows explicitly as well
 		const saveDelete = await db.from('player_saves').delete().eq('user_id', id);
