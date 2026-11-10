@@ -50,6 +50,13 @@ export const nextBeat = (facts: TutorialFacts, progress: TutorialProgress, intro
 	return lesson ? { kind: 'lesson', id: lesson.id, lesson, focus: lesson.focus, target: targetOf(lesson.target, facts) } : null;
 };
 
+/** Two views of the same account's progress put together: what either has recorded counts (a server answer must not erase a move the browser has made since it was asked). */
+export const mergeProgress = (a: TutorialProgress, b: TutorialProgress): TutorialProgress => ({
+	done: [...a.done, ...b.done.filter((id) => !a.done.includes(id))],
+	lessons: [...a.lessons, ...b.lessons.filter((id) => !a.lessons.includes(id))],
+	skipped: a.skipped || b.skipped,
+});
+
 /** Progress after the player finished `id` (intro, a step): idempotent. */
 export const withDone = (p: TutorialProgress, id: string): TutorialProgress => (p.done.includes(id) ? p : { ...p, done: [...p.done, id] });
 

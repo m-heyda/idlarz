@@ -54,7 +54,9 @@
 	flex: none;
 	width: 134px;
 	height: 134px;
-	background-size: 100% 100%;
+	/* a sheet of two frames: closed mouth | open mouth */
+	background-size: 200% 100%;
+	background-position: 0 0;
 	background-repeat: no-repeat;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45));
@@ -80,6 +82,21 @@
 	border: 6px solid transparent;
 	border-right: 6px solid #8a6a3a;
 }
+.guide-sprite[data-frame='1'] {
+	background-position: 100% 0;
+}
+/* the whole text is laid out invisibly so the bubble has its final size from the first letter; the typed part sits on top of it */
+.guide-text {
+	position: relative;
+	cursor: default;
+}
+.guide-text-full {
+	visibility: hidden;
+}
+.guide-text-typed {
+	position: absolute;
+	inset: 0;
+}
 .guide-name {
 	margin-bottom: 2px;
 	color: var(--px-gold, #f0d27a);
@@ -97,31 +114,6 @@
 .guide-dots {
 	color: #a89878;
 	font-size: 11px;
-}
-
-/* a phone: a smaller Alder with the bubble above him */
-@media (max-width: 640px) {
-	.guide {
-		flex-direction: column-reverse;
-		align-items: flex-start;
-		gap: 2px;
-		bottom: 4px;
-		left: 4px;
-	}
-	.guide-sprite {
-		width: 67px;
-		height: 67px;
-	}
-	.guide-bubble {
-		margin-bottom: 0;
-		font-size: 13px;
-	}
-	.guide-bubble::before {
-		left: 22px;
-		bottom: -12px;
-		border: 6px solid transparent;
-		border-top: 6px solid #8a6a3a;
-	}
 }
 
 .guide-journal-lock {

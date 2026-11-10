@@ -101,7 +101,6 @@ const StatisticsOverlay: React.FC = () => {
 
 	const characterTab = useUiStore((state) => state.characterTab);
 	const setCharacterTab = useUiStore((state) => state.setCharacterTab);
-	const openAvatarDialog = useUiStore((state) => state.openAvatarDialog);
 
 	const points = characterStats.availablePoints;
 	const breakdown = useMemo(
@@ -132,10 +131,6 @@ const StatisticsOverlay: React.FC = () => {
 						</div>
 					)}
 				</div>
-
-				<button type='button' className='px-btn px-btn-sm self-center' onClick={openAvatarDialog}>
-					Avatar
-				</button>
 
 				<div className='flex flex-col gap-2' role='tablist' aria-label='Character details'>
 					{CHARACTER_TAB_LABELS.map(({ id, label }) => (
