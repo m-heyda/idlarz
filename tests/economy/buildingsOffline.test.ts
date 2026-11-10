@@ -170,3 +170,75 @@ test('a forged remainingSec is rejected by timer_jump: a level claimed after an 
 		assert.equal(verifyTransition({ summary, serverSavedAt: T0 }, rewritten, T0 + 5000).includes('timer_jump'), true);
 	});
 });
+
+/** A game with a Sap Tapper (and nothing else) on a forest tile, and its server-side summary. */
+const withExtractor = () => {
+	freshGame();
+	growTo(12);
+	let spot: { x: number; y: number } | null = null;
+	for (let y = CASTLE_Y - 6; y <= CASTLE_Y + 6 && !spot; y++)
+		for (let x = CASTLE_X - 6; x <= CASTLE_X + 6 && !spot; x++)
+			if (tileAt(api().tiles, x, y).isOwned && tileAt(api().tiles, x, y).biome !== 'castle') spot = { x, y };
+	patchTileAt(spot!.x, spot!.y, { biome: 'forest', hasChest: false });
+	store.setState((s) => ({ tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: 3 }), monsters: [] }));
+	setResources({ gold: 1e15, wood: 1e15, stone: 1e15, coal: 1e15, food: 1e15, hide: 1e15 });
+	assert.ok(api().buildBuilding(spot!.x, spot!.y, 'saptapper'));
+	return { spot: spot!, summary: summarize(pickPersisted(api())) };
+};
+
+test('Extractor income is part of the offline grant like tile income: the T3 stock grows by rate x time x efficiency', () => {
+	withBuildings(() => {
+		const { summary } = withExtractor();
+		assert.ok(summary.rates.sap > 0, 'the server derives the extract rate from the saved map');
+		const grant = computeOfflineGrant(input({ rates: summary.rates, xpGainPct: summary.xpGainPct, gapSec: 3600 }))!;
+		assert.equal(grant.resources.sap, Math.floor(summary.rates.sap * 3600 * 0.5));
+		const applied = applyOfflineGrant(api(), grant);
+		assert.equal(applied.patch.resources!.sap, api().resources.sap + grant.resources.sap);
+	});
+});
+
+test('an Extractor upgrade finishes while away: the old rate until the timer ends, the level-2 rate after, and the shared builder rule holds', () => {
+	withBuildings(() => {
+		const { spot, summary: before } = withExtractor();
+		assert.ok(api().upgradeBuilding(spot.x, spot.y));
+		const summary = summarize(pickPersisted(api()));
+		assert.ok(summary.derived.ratesAfterBuilding!.sap > before.rates.sap, 'level 2 makes more sap');
+		const grant = computeOfflineGrant({
+			rates: summary.rates,
+			ratesAfterCastle: null,
+			castleUpgrade: null,
+			buildingUpgrade: summary.derived.buildingUpgrade,
+			ratesAfterBuilding: summary.derived.ratesAfterBuilding,
+			xpGainPct: 0,
+			gapSec: 3600,
+			capSec: 8 * 3600,
+			efficiency: 0.5,
+			minGapSec: 300,
+		})!;
+		const timer = summary.derived.buildingUpgrade!.remainingSec;
+		const expected = Math.floor((summary.rates.sap * timer + summary.derived.ratesAfterBuilding!.sap * (3600 - timer)) * 0.5);
+		assert.equal(grant.resources.sap, expected);
+		const applied = applyOfflineGrant(api(), grant);
+		assert.equal(tileAt(applied.patch.tiles!, spot.x, spot.y).buildingLevel, 2);
+		assert.ok(applied.patch.resourceRates!.total.sap > api().resourceRates.total.sap);
+	});
+});
+
+test('the ledger totals and the saved resources know the T3 keys; the merchant has no price for them', async () => {
+	const { zeroTotals } = await import('../../src/lib/offline/ledger');
+	const { MERCHANT_RESOURCE_PRICES } = await import('../../src/config/merchant');
+	for (const key of ['herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt']) {
+		assert.equal(zeroTotals()[key as 'sap'], 0, `${key} is in the ledger totals`);
+		assert.equal(key in MERCHANT_RESOURCE_PRICES, false, `${key} is not sold`);
+	}
+});
+
+test('the header lists a T3 material only once it is held or made; the other tiers always', async () => {
+	const { resourceDiscovered } = await import('../../src/lib/resourceDiscovery');
+	assert.equal(resourceDiscovered('sap', 0, 0), false);
+	assert.equal(resourceDiscovered('sap', 0, undefined), false);
+	assert.equal(resourceDiscovered('sap', 5, 0), true);
+	assert.equal(resourceDiscovered('sap', 0, 0.3), true);
+	assert.equal(resourceDiscovered('wood', 0, 0), true);
+	assert.equal(resourceDiscovered('gold', 0, 0), true);
+});

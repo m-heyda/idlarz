@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { zeroResources } from '../../src/catalog/resourceKeys';
 import assert from 'node:assert/strict';
 import { CHEST } from '../../src/config/spawns';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
@@ -30,6 +31,7 @@ const territory = (r: number): Tile[][] => {
 	return g;
 };
 const rates = (over: Partial<Resources> = {}): Resources => ({
+	...zeroResources(),
 	gold: 2,
 	wood: 1,
 	stone: 1,

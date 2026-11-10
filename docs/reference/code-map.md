@@ -456,6 +456,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`potionBelt.ts`](../../src/lib/potionBelt.ts) — ~ The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
+- [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
 - [`sanitizeSave.ts`](../../src/lib/sanitizeSave.ts) — ~ The part of the game state that is saved.
@@ -549,7 +550,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/utils/game/**
 
 - [`castle.ts`](../../src/utils/game/castle.ts) — The castle's income bonus and upgrade time (part of the former utils/gameUtils.ts, split in IDL-15).
-- [`character.ts`](../../src/utils/game/character.ts) — Attributes, the level curve, XP and the combat stats derived from the attributes (part of the former utils/gameUtils.ts, split in IDL-15).
+- [`character.ts`](../../src/utils/game/character.ts) — ~ "+2.5% Stone & Coal production per point / +0.2% XP production per point / +0.2% XP gained per point"
 - [`costs.ts`](../../src/utils/game/costs.ts) — What buying a tile costs, and paying for it (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`farm.ts`](../../src/utils/game/farm.ts) — The farm: animal costs and output, pen and upgrades (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`income.ts`](../../src/utils/game/income.ts) — Income per second: what one tile produces, and the full breakdown and rates (part of the former utils/gameUtils.ts, split in IDL-15).
@@ -834,6 +835,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **supabase/migrations/**
 
 - [`autosave_history_by_time.sql`](../../supabase/migrations/autosave_history_by_time.sql)
+- [`buildings_extractors_v1.sql`](../../supabase/migrations/buildings_extractors_v1.sql)
+- [`buildings_extractors_v1_rollback.sql`](../../supabase/migrations/buildings_extractors_v1_rollback.sql)
 - [`buildings_v1.sql`](../../supabase/migrations/buildings_v1.sql)
 - [`buildings_v1_rollback.sql`](../../supabase/migrations/buildings_v1_rollback.sql)
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)

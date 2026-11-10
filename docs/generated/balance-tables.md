@@ -331,6 +331,13 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | milk | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | hide | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | xp | 0.25 | 0.5 | 1.000 | 22.2% | 1.222 |
+| herbs | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| sap | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| ironOre | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| spores | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| frostshard | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| pearls | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| salt | 0 | 0 | 0.000 | 20.0% | 0.000 |
 
 ## 8. Click power and merchant
 
