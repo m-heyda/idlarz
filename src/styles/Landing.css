@@ -328,3 +328,58 @@
 		font-size: 1.6rem;
 	}
 }
+
+/* the account window keeps one height while it looks for a session and when the login form or the hero card arrives */
+.ld-account .px-modal-body {
+	min-height: 330px;
+}
+
+.ld-skel {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding-top: 6px;
+}
+
+.ld-skel-bar {
+	display: block;
+	border: 2px solid #3a2810;
+	background: linear-gradient(100deg, rgba(40, 28, 14, 0.9) 30%, rgba(90, 64, 30, 0.9) 50%, rgba(40, 28, 14, 0.9) 70%) 0 0 / 220% 100%;
+	animation: ld-shimmer 1.4s linear infinite;
+}
+
+.ld-skel-tabs {
+	height: 32px;
+}
+
+.ld-skel-input {
+	height: 40px;
+}
+
+.ld-skel-button {
+	align-self: center;
+	width: 120px;
+	height: 38px;
+	margin-top: 6px;
+}
+
+@keyframes ld-shimmer {
+	from {
+		background-position: 120% 0;
+	}
+	to {
+		background-position: -120% 0;
+	}
+}
+
+.ld-links {
+	display: flex;
+	gap: 16px;
+	justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ld-skel-bar {
+		animation: none;
+	}
+}
