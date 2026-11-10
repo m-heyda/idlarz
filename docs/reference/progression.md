@@ -8,7 +8,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 
 - Levels: [`LEVELING`](#leveling), [`xpToNextLevel`](#xptonextlevel), [`totalStatPoints`](#totalstatpoints), [`cumulativeXp`](#cumulativexp), [`calculateLevel`](#calculatelevel), [`reconcileCharacter`](#reconcilecharacter)
 - Attributes: [`CHARACTER_STAT_CONFIG`](#character-stat-config), [`calculateStatResourceModifiers`](#calculatestatresourcemodifiers), [`calculateCombatStats`](#calculatecombatstats)
-- Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`rebirthUnlockIntro`](#rebirthunlockintro)
+- Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`rebirthUnlockIntro`](#rebirthunlockintro), [`rebirthRunSummary`](#rebirthrunsummary)
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
@@ -265,9 +265,18 @@ can rebirth = castle level >= 6  and  economyTiles >= 400 + 50 x rebirths  and  
 
 ### `rebirthUnlockIntro` <small>function</small>
 
-Source: [`src/utils/game/rebirthUnlocks.ts:28`](../../src/utils/game/rebirthUnlocks.ts)
+Source: [`src/utils/game/rebirthUnlocks.ts:40`](../../src/utils/game/rebirthUnlocks.ts)
 
 The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. `null` when that rebirth unlocks nothing (the sixth and later).
+
+<a id="rebirthrunsummary"></a>
+
+### `rebirthRunSummary` <small>function</small>
+
+Source: [`src/utils/game/rebirthUnlocks.ts:102`](../../src/utils/game/rebirthUnlocks.ts)
+
+The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. The Embers gained are read from the two prestige states
+(what the player really got, whether the server or the browser named the amount), never recomputed here.
 
 ## Ember shop
 

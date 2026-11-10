@@ -259,7 +259,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ "Hours as a number":
 - [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ Rebirth and the Ember shop.
-- [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The small "what you unlocked" modal shown right after a rebirth:
+- [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
 - [`SaveMenuDialog.tsx`](../../src/components/game/overlays/SaveMenuDialog.tsx) — ~ Save & backup:
 - [`SettingsDialog.tsx`](../../src/components/game/overlays/SettingsDialog.tsx) — ~ Visible settings:
@@ -819,6 +819,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
+- [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
 - [`tutorial.test.ts`](../../tests/ui/tutorial.test.ts)
 - [`uiActions.test.ts`](../../tests/ui/uiActions.test.ts)

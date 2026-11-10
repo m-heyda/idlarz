@@ -10,7 +10,8 @@ import { creatorAvatar } from '@/catalog/avatars';
 import type { PlayerClassId } from '@/config/playerClasses';
 import { ACHIEVEMENTS } from '@/catalog/achievements';
 import { AVATARS, STARTER_AVATAR_IDS } from '@/catalog/avatars';
-import { rebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
+import { rebirthRunSummary, rebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
+import type { PrestigeState } from '@/types/game';
 import type { Profile } from '@/lib/authClient';
 
 // The new-chapter screens at desktop widths (1240-1920 px). Pure props, no login needed.
@@ -51,11 +52,31 @@ export const AchievementsNoneEarned: Story = {
 	),
 };
 
+const prestigeOf = (rebirths: number, gained: number, earnedBefore: number): { before: PrestigeState; after: PrestigeState } => ({
+	before: { rebirths: rebirths - 1, legacyPoints: 0, legacyEarned: earnedBefore, upgrades: {} },
+	after: { rebirths, legacyPoints: gained, legacyEarned: earnedBefore + gained, upgrades: {} },
+});
+
+/** A finished run of the first rebirth: made-up but plausible numbers. */
+const runOf = (rebirths: number) =>
+	rebirthRunSummary({
+		ownedTiles: 436,
+		castleLevel: 8,
+		level: 34,
+		playSeconds: 61_200,
+		rates: { gold: 61.4, wood: 22.8, stone: 19.1, food: 11.2, coal: 4.2, hide: 0 },
+		kills: 1287,
+		...prestigeOf(rebirths, 38, rebirths > 1 ? 120 : 0),
+	});
+
+/** The rebirth result: Embers, income bonus, the new land with its monsters, and the collapsed "run stats". */
 export const RebirthUnlock: Story = {
-	render: () => {
-		const intro = rebirthUnlockIntro(1);
-		return intro ? <RebirthUnlockModal intro={intro} onClose={() => undefined} /> : <p>No biome unlocks at rebirth 1.</p>;
-	},
+	render: () => <RebirthUnlockModal run={runOf(1)} intro={rebirthUnlockIntro(1)} onClose={() => undefined} />,
+};
+
+/** A rebirth that unlocks nothing new (the sixth and later): only the Embers and the stats. */
+export const RebirthNoUnlock: Story = {
+	render: () => <RebirthUnlockModal run={runOf(7)} intro={rebirthUnlockIntro(7)} onClose={() => undefined} />,
 };
 
 const profile = { characterName: 'Hero', playerClass: 'warrior', avatarId: null } as unknown as Profile;

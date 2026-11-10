@@ -2735,8 +2735,19 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirthUnlocks.ts",
-  "line": 28,
+  "line": 40,
   "summary": "The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. `null` when that rebirth unlocks nothing (the sixth and later).",
+  "see": []
+ },
+ {
+  "id": "rebirthrunsummary",
+  "name": "rebirthRunSummary",
+  "symbol": "rebirthRunSummary",
+  "kind": "function",
+  "category": "Progression/Rebirth",
+  "file": "src/utils/game/rebirthUnlocks.ts",
+  "line": 102,
+  "summary": "The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. The Embers gained are read from the two prestige states (what the player really got, whether the server or the browser named the amount), never recomputed here.",
   "see": []
  },
  {
