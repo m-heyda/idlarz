@@ -7,11 +7,11 @@ const VILLAGE = '/pixel/assets_to_assess_and_use/more_buildings/';
 export interface BuildingDef {
 	id: string;
 	label: string;
-	/** What it is: only `producer` exists so far (Extractors and Idols follow, IDL-94 and the Idol slice). */
-	kind: 'producer';
+	/** What it is: `producer` (the biome's own materials) or `extractor` (its T3 material); Idols follow (IDL-96). */
+	kind: 'producer' | 'extractor';
 	/** The one biome whose tiles it can stand on, and whose size it feeds on */
 	biome: string;
-	/** The resources it makes: the same keys the biome's tiles make, so it multiplies what the land already gives */
+	/** The resources it makes: for a Producer the keys the biome's tiles make (so it multiplies what the land already gives), for an Extractor its one T3 material */
 	produces: (keyof Resources)[];
 	/** The picture on the map and in the menu */
 	art: string;
@@ -19,7 +19,7 @@ export interface BuildingDef {
 }
 
 /**
- * The Producer of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
+ * The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
  * tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.
  *
  * @category Economy/Buildings
@@ -89,6 +89,69 @@ export const BUILDINGS: readonly BuildingDef[] = [
 		produces: ['gold', 'food'],
 		art: `${VILLAGE}Merchant%20House.png`,
 		blurb: 'Ships, cargo and a customs house.',
+	},
+	{
+		id: 'herbgarden',
+		label: 'Herb Garden',
+		kind: 'extractor',
+		biome: 'plains',
+		produces: ['herbs'],
+		art: `${VILLAGE}Herbalist%20House.png`,
+		blurb: 'Beds of medicinal herbs for the brewers.',
+	},
+	{
+		id: 'saptapper',
+		label: 'Sap Tapper',
+		kind: 'extractor',
+		biome: 'forest',
+		produces: ['sap'],
+		art: `${VILLAGE}Carpenters%20House.png`,
+		blurb: 'Taps the old trees for sap.',
+	},
+	{
+		id: 'deepmine',
+		label: 'Deep Mine',
+		kind: 'extractor',
+		biome: 'hills',
+		produces: ['ironOre'],
+		art: `${VILLAGE}Workshop%20House.png`,
+		blurb: 'Shafts down to the iron seams.',
+	},
+	{
+		id: 'sporecellar',
+		label: 'Spore Cellar',
+		kind: 'extractor',
+		biome: 'swamp',
+		produces: ['spores'],
+		art: `${VILLAGE}Wizard%20Hut.png`,
+		blurb: 'Cultivates spores in the damp dark.',
+	},
+	{
+		id: 'icecutter',
+		label: 'Ice Cutter',
+		kind: 'extractor',
+		biome: 'tundra',
+		produces: ['frostshard'],
+		art: `${VILLAGE}Hunters%20Cabin.png`,
+		blurb: 'Saws shards out of the ice.',
+	},
+	{
+		id: 'pearldiver',
+		label: 'Pearl Diver',
+		kind: 'extractor',
+		biome: 'lake',
+		produces: ['pearls'],
+		art: `${VILLAGE}Jewelers%20House.png`,
+		blurb: 'Divers bring up pearls from the lakebed.',
+	},
+	{
+		id: 'saltworks',
+		label: 'Salt Works',
+		kind: 'extractor',
+		biome: 'coast',
+		produces: ['salt'],
+		art: `${VILLAGE}Mill%20House.png`,
+		blurb: 'Evaporation pans along the shore.',
 	},
 ];
 

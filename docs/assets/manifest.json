@@ -11321,7 +11321,39 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"resource:frostshard"
+		],
+		"name": "res_frostshard",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_frostshard.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:herbs"
+		],
+		"name": "res_herbs",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_herbs.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:ironOre"
+		],
 		"name": "res_iron",
 		"category": "resources",
 		"subcategory": "res",
@@ -11390,6 +11422,51 @@
 		]
 	},
 	{
+		"usedBy": [
+			"resource:pearls"
+		],
+		"name": "res_pearls",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_pearls.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:salt"
+		],
+		"name": "res_salt",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_salt.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:sap"
+		],
+		"name": "res_sap",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_sap.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "res_sapphire",
 		"category": "resources",
@@ -11424,6 +11501,21 @@
 		"subcategory": "res",
 		"src": "/pixel/icons/res_shard.png",
 		"status": "planned",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:spores"
+		],
+		"name": "res_spores",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_spores.png",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -12082,6 +12174,111 @@
 	},
 	{
 		"usedBy": [
+			"frostshard"
+		],
+		"name": "resource_frostshard",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/frostshard.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"herbs"
+		],
+		"name": "resource_herbs",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/herbs.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"ironOre"
+		],
+		"name": "resource_iron_ore",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/iron-ore.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"pearls"
+		],
+		"name": "resource_pearls",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/pearls.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"salt"
+		],
+		"name": "resource_salt",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/salt.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"sap"
+		],
+		"name": "resource_sap",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/sap.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"spores"
+		],
+		"name": "resource_spores",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/spores.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
 			"scrapSteel"
 		],
 		"name": "resource_scrap_steel",
@@ -12112,117 +12309,12 @@
 	},
 	{
 		"usedBy": [
-			"salt"
-		],
-		"name": "resource_salt",
-		"category": "resources",
-		"subcategory": "t3 coast",
-		"src": "/pixel/resources/salt.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
 			"dye"
 		],
 		"name": "resource_dye",
 		"category": "resources",
 		"subcategory": "t3 fields",
 		"src": "/pixel/resources/dye.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"sap"
-		],
-		"name": "resource_sap",
-		"category": "resources",
-		"subcategory": "t3 forest",
-		"src": "/pixel/resources/sap.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"ironOre"
-		],
-		"name": "resource_iron_ore",
-		"category": "resources",
-		"subcategory": "t3 hills",
-		"src": "/pixel/resources/iron-ore.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"pearls"
-		],
-		"name": "resource_pearls",
-		"category": "resources",
-		"subcategory": "t3 lake",
-		"src": "/pixel/resources/pearls.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"herbs"
-		],
-		"name": "resource_herbs",
-		"category": "resources",
-		"subcategory": "t3 plains",
-		"src": "/pixel/resources/herbs.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"spores"
-		],
-		"name": "resource_spores",
-		"category": "resources",
-		"subcategory": "t3 swamp",
-		"src": "/pixel/resources/spores.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"frostshard"
-		],
-		"name": "resource_frostshard",
-		"category": "resources",
-		"subcategory": "t3 tundra",
-		"src": "/pixel/resources/frostshard.png",
 		"status": "planned",
 		"source": "resource roster",
 		"size": [

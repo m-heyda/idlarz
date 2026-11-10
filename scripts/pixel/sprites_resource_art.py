@@ -17,6 +17,8 @@ USED = {
     'legacy': 'embers',          # the rebirth currency kept its old sprite name
     'diamond': 'gems',           # the premium currency
     'res_fish': 'fish', 'res_iron': 'iron-ore',
+    # the T3 extracts
+    'res_herbs': 'herbs', 'res_sap': 'sap', 'res_spores': 'spores', 'res_frostshard': 'frostshard', 'res_pearls': 'pearls', 'res_salt': 'salt',
 }
 
 

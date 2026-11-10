@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { RESOURCES, RESOURCE_TIERS, resourcesInTier, type ResourceKey, type ResourceTier } from '@/catalog';
 import { RESOURCE_ICONS } from '@/config/resources';
 import { RESOURCE_PIXEL_ICONS, SHINE_SHEETS } from '@/config/pixelIcons';
@@ -167,7 +168,12 @@ const ResourceDisplay: React.FC = () => {
 						bonus: produced ? resourceRates.modifiers[key as keyof typeof resourceRates.modifiers] : undefined,
 					};
 				});
-				return <ResourceGroup key={tier.id} tier={tier} rows={rows} showNumbers={!compact} align={t === 0 ? 'start' : 'center'} onOpenEmbers={toggleRebirth} />;
+				// extracts (T3) and beyond are listed once the player has met them; a tier with none met is not drawn
+				const shown = rows.filter((row) => resourceDiscovered(row.key, row.amount, row.rate));
+				if (shown.length === 0) return null;
+				return (
+					<ResourceGroup key={tier.id} tier={tier} rows={shown} showNumbers={!compact} align={t === 0 ? 'start' : 'center'} onOpenEmbers={toggleRebirth} />
+				);
 			})}
 		</>
 	);

@@ -6,6 +6,7 @@ import { api, freshGame, growTo, patchTileAt, setResources, tileAt, store } from
 import { BUILDING_RULES, BUILDINGS_FLAG } from '../../src/config/buildings';
 import { BUILDINGS, buildingDef, buildingsOfBiome } from '../../src/catalog/buildings';
 import { BIOMES } from '../../src/config/biomes';
+import { RESOURCES } from '../../src/catalog/resources';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { MAX_CATCHUP_SEC } from '../../src/config/economy';
 import {
@@ -16,6 +17,8 @@ import {
 	builtBuildings,
 	producerBonus,
 	producerOutput,
+	extractorOutput,
+	buildingOutput,
 	relocationCost,
 } from '../../src/lib/buildings';
 import { calculateResourceRates } from '../../src/utils/game/income';
@@ -62,19 +65,38 @@ test('the flag ships on (owner decision: live on merge)', () => {
 	assert.equal(BUILDINGS_FLAG.enabled, true);
 });
 
-test('the catalog: one Producer for each of the seven home biomes, with real art and only resources its biome makes', () => {
-	assert.equal(BUILDINGS.length, 7);
-	assert.deepEqual([...BUILDINGS.map((b) => b.biome)].sort(), ['coast', 'forest', 'hills', 'lake', 'plains', 'swamp', 'tundra']);
+test('the catalog: a Producer and an Extractor for each of the seven home biomes, with real art', () => {
+	const homes = ['coast', 'forest', 'hills', 'lake', 'plains', 'swamp', 'tundra'];
+	assert.equal(BUILDINGS.length, 14);
 	assert.equal(new Set(BUILDINGS.map((b) => b.id)).size, BUILDINGS.length);
+	for (const kind of ['producer', 'extractor'] as const)
+		assert.deepEqual(
+			BUILDINGS.filter((b) => b.kind === kind)
+				.map((b) => b.biome)
+				.sort(),
+			homes,
+		);
 	for (const b of BUILDINGS) {
 		assert.ok(BIOMES[b.biome], b.id);
-		for (const key of b.produces)
-			assert.ok((BIOMES[b.biome].resourceGeneration as Record<string, number>)[key] > 0, `${b.id} makes ${key}, which its biome does not`);
+		if (b.kind === 'producer')
+			for (const key of b.produces)
+				assert.ok((BIOMES[b.biome].resourceGeneration as Record<string, number>)[key] > 0, `${b.id} makes ${key}, which its biome does not`);
+		else {
+			assert.equal(b.produces.length, 1, `${b.id} makes exactly one extract`);
+			assert.equal((RESOURCES[b.produces[0]] as { tier?: string }).tier, 't3', `${b.id} makes a T3 material`);
+		}
 		const file = decodeURIComponent(b.art).replace(/^\//, '');
 		assert.ok(existsSync(join(process.cwd(), 'public', file)), `${b.id}: ${file}`);
 		assert.equal(buildingDef(b.id), b);
 	}
-	assert.equal(buildingsOfBiome('forest').length, 1);
+	// the seven extracts are the seven T3 materials of the home biomes, each made by one Extractor
+	assert.deepEqual(
+		BUILDINGS.filter((b) => b.kind === 'extractor')
+			.map((b) => b.produces[0])
+			.sort(),
+		['frostshard', 'herbs', 'ironOre', 'pearls', 'salt', 'sap', 'spores'],
+	);
+	assert.equal(buildingsOfBiome('forest').length, 2);
 	assert.equal(buildingsOfBiome('castle').length, 0);
 });
 
@@ -339,5 +361,56 @@ test('net worth: buildings add a gold floor, only while the system is on', () =>
 		assert.ok(withBuilding > without);
 		const check = checkNetWorth(pickPersisted(api()), summarize(pickPersisted(api())));
 		assert.ok(check.required > 0);
+	});
+});
+
+test('an Extractor makes 0.3 of its T3 material per second at level 1, +40 % per level, and grows with its biome like the Producer', () => {
+	const def = buildingDef('saptapper')!;
+	assert.deepEqual(extractorOutput(def, 1, 0), { sap: 0.3 });
+	assert.ok(Math.abs(extractorOutput(def, 3, 0).sap! - 0.3 * 1.8) < 1e-12);
+	assert.ok(Math.abs(extractorOutput(def, 1, 25).sap! - 0.3 * 1.5) < 1e-12);
+	assert.deepEqual(buildingOutput(def, 2, 0), extractorOutput(def, 2, 0));
+	assert.deepEqual(buildingOutput(buildingDef('lumberyard')!, 2, 0), producerOutput(buildingDef('lumberyard')!, 2, 0));
+});
+
+test('build an Extractor: beside the Producer of its biome, one of each type, T3 income appears in the rates and nowhere else', () => {
+	withBuildings(() => {
+		const [a, b] = gameWith('forest', 2, 3);
+		assert.equal(api().resourceRates.total.sap, 0);
+		assert.equal(api().buildBuilding(a.x, a.y, 'saptapper'), true);
+		assert.equal(api().buildBuilding(b.x, b.y, 'lumberyard'), true, 'the Producer of the same biome stands beside it');
+		const sap = api().resourceRates.total.sap;
+		assert.ok(sap > 0.3, 'the castle modifier and the biome size count');
+		assert.equal(api().resourceRates.total.wood > 0, true);
+		assert.equal(api().buildBuilding(b.x, b.y, 'saptapper'), false, 'one of each type');
+		// the level step follows the same timer, gate and shared builder as the Producer
+		assert.equal(api().upgradeBuilding(a.x, a.y), true);
+		assert.equal(api().upgradeBuilding(b.x, b.y), false, 'one builder');
+		for (let t = 0; t < 700; t += 10) api().tick(10_000);
+		assert.ok(api().resourceRates.total.sap > sap, 'level 2 makes more');
+		// the stock grows with the tick and the merchant has no price for it
+		const before = api().resources.sap;
+		api().tick(10_000);
+		assert.ok(api().resources.sap > before);
+	});
+});
+
+test('the Extractors save, load and are judged like the Producers (the T3 stock is an optional resource key)', () => {
+	withBuildings(() => {
+		const [a] = gameWith('hills', 1, 3);
+		api().buildBuilding(a.x, a.y, 'deepmine');
+		const back = decodeSave(encodeSave(pickPersisted(api())));
+		assert.ok(back.ok, back.ok ? '' : back.reason);
+		if (!back.ok) return;
+		assert.equal(tileAt(back.state.tiles, a.x, a.y).building, 'deepmine');
+		assert.equal(summarize(back.state).derived.buildings?.deepmine, 1);
+		assert.ok(summarize(back.state).rates.ironOre > 0, 'the server derives the T3 income from the saved map');
+		// an old save without the T3 keys loads with them at 0
+		const raw = { ...pickPersisted(api()) } as Record<string, unknown>;
+		const resources = { ...(raw.resources as Record<string, number>) };
+		for (const key of ['herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt']) delete resources[key];
+		const old = decodeSave(encodeSave({ ...pickPersisted(api()), resources } as never));
+		assert.ok(old.ok);
+		if (old.ok) assert.equal(old.state.resources.sap, 0);
 	});
 });

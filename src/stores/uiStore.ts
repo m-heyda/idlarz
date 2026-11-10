@@ -21,6 +21,10 @@ export interface ContextMenuItem {
 	checked?: boolean;
 	/** A thin rule above this entry */
 	separator?: boolean;
+	/** Shown as a hover tooltip (a disabled entry shows its `hint` there when it has none) */
+	tooltip?: string;
+	/** A submenu: choosing the entry replaces the menu with these entries (and a Back entry) instead of running `onSelect` */
+	children?: ContextMenuItem[];
 }
 
 interface ContextMenuState {

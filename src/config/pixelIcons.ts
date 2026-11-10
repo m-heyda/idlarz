@@ -86,6 +86,12 @@ const BASE_ICON_SIZES = {
 	res_mystery_shine: [240, 40],
 	// reserved late-game art (no game resource yet, see RESERVED_RESOURCES below)
 	res_iron: [40, 40],
+	res_herbs: [40, 40],
+	res_sap: [40, 40],
+	res_spores: [40, 40],
+	res_frostshard: [40, 40],
+	res_pearls: [40, 40],
+	res_salt: [40, 40],
 	res_fish: [40, 40],
 	res_mana: [40, 40],
 	res_crystal: [40, 40],
@@ -216,6 +222,14 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 	embers: 'legacy', // the rebirth currency (not a Resources key); the sprite kept its old file name
 	gems: 'diamond', // the premium currency (its own balance, not a Resources key)
 	xp: 'xp',
+	// the T3 extracts (iron ore keeps the icon that was reserved for it)
+	herbs: 'res_herbs',
+	sap: 'res_sap',
+	ironOre: 'res_iron',
+	spores: 'res_spores',
+	frostshard: 'res_frostshard',
+	pearls: 'res_pearls',
+	salt: 'res_salt',
 };
 
 // Sprites that twinkle: name -> its 6-frame strip (see the .px-shine class)

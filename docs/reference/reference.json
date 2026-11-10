@@ -109,7 +109,7 @@
   "category": "Economy/Buildings",
   "file": "src/catalog/buildings.ts",
   "line": 29,
-  "summary": "The Producer of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents` tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.",
+  "summary": "The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents` tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.",
   "see": []
  },
  {
@@ -452,7 +452,7 @@
   "kind": "const",
   "category": "Economy/Buildings",
   "file": "src/config/buildings.ts",
-  "line": 32,
+  "line": 33,
   "summary": "The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).",
   "see": []
  },
@@ -869,7 +869,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 257,
+  "line": 271,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -880,7 +880,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 272,
+  "line": 286,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },
@@ -1006,6 +1006,20 @@
   "file": "src/lib/buildingOutput.ts",
   "line": 20,
   "summary": "What a Producer of level `level` makes per second, before the global modifiers (castle, Embers, ...): its `produces` resources at the biome's tile rate.",
+  "see": [
+   "BUILDING_RULES",
+   "producerBonus"
+  ]
+ },
+ {
+  "id": "extractoroutput",
+  "name": "extractorOutput",
+  "symbol": "extractorOutput",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/lib/buildingOutput.ts",
+  "line": 42,
+  "summary": "What an Extractor of level `level` makes per second, before the global modifiers: its T3 material at `extractor.baseRate`, grown by level and by the size of its biome.",
   "see": [
    "BUILDING_RULES",
    "producerBonus"
@@ -2433,7 +2447,7 @@
   "kind": "function",
   "category": "Economy/Tiles",
   "file": "src/utils/game/character.ts",
-  "line": 84,
+  "line": 85,
   "summary": "Calculate XP gain scaling based on owned tiles The more tiles owned, the more XP gained",
   "see": []
  },
@@ -2444,7 +2458,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 151,
+  "line": 152,
   "summary": "The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING).",
   "see": [
    "reconcileCharacter"
@@ -2457,7 +2471,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 166,
+  "line": 167,
   "summary": "Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every point the level has earned is left to spend again. A character that is within its points is returned as it is.",
   "see": []
  },
@@ -2468,7 +2482,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 186,
+  "line": 187,
   "summary": "XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config); everything that shows or checks a level threshold uses this.",
   "see": []
  },
@@ -2479,7 +2493,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 198,
+  "line": 199,
   "summary": "The total XP at which `level` is reached (level 1 is 0).",
   "see": []
  },
@@ -2490,7 +2504,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 210,
+  "line": 211,
   "summary": "Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.",
   "see": []
  },
@@ -2501,7 +2515,7 @@
   "kind": "function",
   "category": "Progression/Attributes",
   "file": "src/utils/game/character.ts",
-  "line": 234,
+  "line": 235,
   "summary": "What the five attributes add to the income modifier of each resource (all points count, not only those above 5).",
   "see": []
  },
@@ -2512,7 +2526,7 @@
   "kind": "function",
   "category": "Progression/Attributes",
   "file": "src/utils/game/character.ts",
-  "line": 267,
+  "line": 257,
   "summary": "The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.",
   "see": []
  },
@@ -2859,7 +2873,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 863,
+  "line": 867,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },
