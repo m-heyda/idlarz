@@ -65,10 +65,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
 - **Equipment slots**: `equip_head/neck/chest/mainHand/offHand/legs/feet/ring` - kettle hat, amulet, cuirass, sword,
   round shield, greaves, boots, ring. Empty = dim grayscale silhouette, filled = glowing slot frame.
 - **Animals**: `animal_chicken/pig/cow/sheep`.
-- **Monsters** (`sprites_monsters.py`): `monster_rat` (2-frame idle sheet, 2 x 40x40) and `monster_ratking` (2 x 56x56, crowned, red cape,
-  fur collar). Same 3/4 view as the farm animals, head to the lower-left; grey-brown fur ramp (`rat_fur`), pink ears/paws/tail (`rat_pink`),
-  cream buck teeth, one glowing red eye. Shown through `MonsterArt` (CSS sheet animation, 520 ms per frame) on the map tile (red glow, tier badge)
-  and in the fight modal (3-5x).
+- **Monsters** are supplied pictures under `public/pixel/enemies/<biome>/` (the old procedural rat sheets were removed); a monster without one shows `enemies/placeholder/silhouette.png` (the purple ogre as a black silhouette) through `MonsterArt`.
 - **Slots and items**: four more empty-slot silhouettes (`equip_shoulder/hands/cape/charm`: pauldrons, gauntlet, cloak with clasp, bead on a cord).
   Item icons are `item_*` 40px sprites: `item_potion_hp` (red flask, cork) and the wooden starter kit (`item_wooden_sword/shield`), the slot
   icons re-skinned through `_skin()` in `sprites_monsters.py`. The rat materials stay for the rat monsters.

@@ -7271,36 +7271,6 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/catalog/lootConfig.ts"
-		],
-		"name": "monster_rat",
-		"category": "monsters",
-		"subcategory": "monster",
-		"src": "/pixel/icons/monster_rat.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			80,
-			40
-		]
-	},
-	{
-		"usedBy": [
-			"src/catalog/lootConfig.ts"
-		],
-		"name": "monster_ratking",
-		"category": "monsters",
-		"subcategory": "monster",
-		"src": "/pixel/icons/monster_ratking.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			112,
-			56
-		]
-	},
-	{
 		"usedBy": [],
 		"name": "monster_pack_eye_horror",
 		"category": "monsters",
@@ -7448,47 +7418,19 @@
 			"graniteRam",
 			"caveGoblinMiner",
 			"boulderBeetle",
-			"bossHillGiant"
-		],
-		"name": "monster_placeholder_hills",
-		"category": "monsters",
-		"subcategory": "placeholder (stand-in until the real sprite)",
-		"src": "/pixel/enemies/placeholder/hills.png",
-		"status": "used",
-		"source": "monster roster",
-		"size": [
-			69,
-			69
-		]
-	},
-	{
-		"usedBy": [
+			"bossHillGiant",
+			"pikeLurker",
 			"bossHardwoodColossus"
 		],
-		"name": "monster_placeholder_jungle",
+		"name": "monster_placeholder_silhouette",
 		"category": "monsters",
 		"subcategory": "placeholder (stand-in until the real sprite)",
-		"src": "/pixel/enemies/placeholder/jungle.png",
+		"src": "/pixel/enemies/placeholder/silhouette.png",
 		"status": "used",
 		"source": "monster roster",
 		"size": [
-			69,
-			69
-		]
-	},
-	{
-		"usedBy": [
-			"pikeLurker"
-		],
-		"name": "monster_placeholder_lake",
-		"category": "monsters",
-		"subcategory": "placeholder (stand-in until the real sprite)",
-		"src": "/pixel/enemies/placeholder/lake.png",
-		"status": "used",
-		"source": "monster roster",
-		"size": [
-			69,
-			69
+			64,
+			64
 		]
 	},
 	{
@@ -7925,6 +7867,42 @@
 		"size": [
 			64,
 			64
+		]
+	},
+	{
+		"usedBy": [
+			"Idols, IDL-96"
+		],
+		"name": "idol_blue_gray_ruins",
+		"category": "buildings",
+		"subcategory": "idols (planned)",
+		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
+		"status": "planned",
+		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins3.png",
+			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins3.png",
+			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins3.png"
+		},
+		"size": [
+			48,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"Idols, IDL-96"
+		],
+		"name": "idol_dark_totem",
+		"category": "buildings",
+		"subcategory": "idols (planned)",
+		"src": "/pixel/assets_to_assess_and_use/misc/Objects_separately/128/Dark_totem_dark_shadow2.png",
+		"status": "planned",
+		"source": "assets_to_assess_and_use/misc",
+		"size": [
+			128,
+			128
 		]
 	},
 	{
@@ -13432,19 +13410,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "prop_dark_totem_dark_shadow2_s128",
-		"category": "map-details",
-		"subcategory": "dark and bone props",
-		"src": "/pixel/assets_to_assess_and_use/misc/Objects_separately/128/Dark_totem_dark_shadow2.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/misc",
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "prop_dark_totem_dark_shadow3_s128",
 		"category": "map-details",
 		"subcategory": "dark and bone props",
@@ -18018,25 +17983,6 @@
 		"size": [
 			80,
 			80
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ruin_blue_gray_ruins3",
-		"category": "map-details",
-		"subcategory": "ruins",
-		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins3.png"
-		},
-		"size": [
-			48,
-			64
 		]
 	},
 	{

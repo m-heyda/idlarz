@@ -124,8 +124,6 @@ const BASE_ICON_SIZES = {
 	equip_feet: [40, 40],
 	equip_ring: [40, 40],
 	// monsters: 2-frame idle sheets (frame width x 2)
-	monster_rat: [80, 40],
-	monster_ratking: [112, 56],
 	skull: [40, 40], // lies over a dead monster in the minimized combat box
 	// castles: castle_1..castle_10 (one per upgrade level) and castle_skin_1..7 (premium skins, not wired yet) live in public/pixel/castles.
 	// 64px, drawn centred on the 48px castle tile so they spill 8px over the neighbours.

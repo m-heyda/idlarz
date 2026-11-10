@@ -41,12 +41,8 @@ export const monsterArtUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes'>)
 export const monsterSpriteUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes' | 'art' | 'placeholder'>): string =>
 	entry.art ? monsterArtUrl(entry) : (entry.placeholder ?? monsterArtUrl(entry));
 
-/** The stand-in pictures, one per family (`public/pixel/enemies/placeholder/`): a plain tinted silhouette until the real sprite is made */
-const PLACEHOLDER = {
-	hills: '/pixel/enemies/placeholder/hills.png',
-	lake: '/pixel/enemies/placeholder/lake.png',
-	jungle: '/pixel/enemies/placeholder/jungle.png',
-} as const;
+/** The one stand-in picture (`public/pixel/enemies/placeholder/silhouette.png`, the purple ogre as a black silhouette) shown until a monster's real sprite is made */
+const PLACEHOLDER = '/pixel/enemies/placeholder/silhouette.png';
 
 const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): MonsterCatalogEntry => ({
 	id,
@@ -78,10 +74,10 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 	normal('rotcapStag', 'Rotcap Stag', 'forest', true),
 	boss('bossElderStag', 'The Elder Stag', 'forest', true),
 
-	normal('graniteRam', 'Granite Ram', 'hills', false, PLACEHOLDER.hills),
-	normal('caveGoblinMiner', 'Cave Goblin Miner', 'hills', false, PLACEHOLDER.hills),
-	normal('boulderBeetle', 'Boulder Beetle', 'hills', false, PLACEHOLDER.hills),
-	boss('bossHillGiant', 'The Hill Giant', 'hills', false, PLACEHOLDER.hills),
+	normal('graniteRam', 'Granite Ram', 'hills', false, PLACEHOLDER),
+	normal('caveGoblinMiner', 'Cave Goblin Miner', 'hills', false, PLACEHOLDER),
+	normal('boulderBeetle', 'Boulder Beetle', 'hills', false, PLACEHOLDER),
+	boss('bossHillGiant', 'The Hill Giant', 'hills', false, PLACEHOLDER),
 
 	normal('garbageOgre', 'Garbage Ogre', 'swamp', true),
 	normal('dumpback', 'Dumpback', 'swamp', true),
@@ -101,14 +97,14 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 
 	normal('mossSnapper', 'Moss Snapper', 'lake', true),
 	normal('reedNymph', 'Reed Nymph', 'lake', true),
-	normal('pikeLurker', 'Pike Lurker', 'lake', false, PLACEHOLDER.lake),
+	normal('pikeLurker', 'Pike Lurker', 'lake', false, PLACEHOLDER),
 	boss('bossLakeHydra', 'The Lake Hydra', 'lake', true),
 
 	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the jungle roster is live (rebirth 1), the other four wait. The jungle monsters take the names of the supplied sprites (owner decision 2026-11-10)
 	normal('skullVine', 'Skull Vine', 'jungle', true),
 	normal('eyeHorror', 'Eye Horror', 'jungle', true),
 	normal('zombieTriceratops', 'Zombie Triceratops', 'jungle', true),
-	boss('bossHardwoodColossus', 'The Hardwood Colossus', 'jungle', false, PLACEHOLDER.jungle),
+	boss('bossHardwoodColossus', 'The Hardwood Colossus', 'jungle', false, PLACEHOLDER),
 
 	normal('murderCrow', 'Murder Crow', 'fields', false),
 	normal('livingScarecrow', 'Living Scarecrow', 'fields', false),

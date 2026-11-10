@@ -159,6 +159,12 @@ const mentionedIn = (name: string): string[] => {
 	return srcFiles.filter((f) => quoted.test(f.text) || prefixes.some((p) => f.text.includes(p))).map((f) => f.file);
 };
 
+/** Pool pictures picked as art for the Idols (the third building of each biome, docs/plan/18, IDL-96): moved into Buildings as `planned`, under a stable name */
+const IDOL_ART: Record<string, string> = {
+	'/pixel/assets_to_assess_and_use/misc/Objects_separately/128/Dark_totem_dark_shadow2.png': 'idol_dark_totem',
+	'/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png': 'idol_blue_gray_ruins',
+};
+
 export const buildManifest = (): AssetEntry[] => {
 	const entries: AssetEntry[] = [];
 	const add = (e: Omit<AssetEntry, 'size' | 'usedBy'> & { usedBy?: string[]; size?: [number, number] }) => {
@@ -576,5 +582,9 @@ export const buildManifest = (): AssetEntry[] => {
 		if (n > 1) e.name = `${e.name}_${n}`;
 	}
 	const rank = new Map(CATEGORIES.map((c, i) => [c.id, i]));
+	for (const e of entries) {
+		const idol = IDOL_ART[e.src];
+		if (idol) Object.assign(e, { name: idol, category: 'buildings', subcategory: 'idols (planned)', status: 'planned', usedBy: ['Idols, IDL-96'] });
+	}
 	return entries.sort((a, b) => rank.get(a.category)! - rank.get(b.category)! || a.subcategory.localeCompare(b.subcategory) || a.name.localeCompare(b.name));
 };
