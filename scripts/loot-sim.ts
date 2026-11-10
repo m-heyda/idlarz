@@ -4,14 +4,27 @@
 //   npm run loot-sim -- --kills 20000 --seed 7
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { BIOME_LOOT, ITEM_CATALOG, LOOT_PROFILES, RARITIES, RARITY_ORDER, monsterSourceId } from '../src/catalog';
+import {
+	BIOME_LOOT,
+	BOSS_LOOT,
+	ITEM_CATALOG,
+	LOOT_PROFILES,
+	RARITIES,
+	RARITY_ORDER,
+	bossSourceId,
+	buildBossLoot,
+	monsterSourceId,
+	type BossLootDef,
+} from '../src/catalog';
+import { COMBAT } from '../src/config/combatConfig';
 import { gradeOfItem } from '../src/catalog/items/grades';
 import { baseStatsAt } from '../src/lib/itemInstance';
 import { generateLoot } from '../src/lib/loot/generate';
-import { LOOT_DATA } from '../src/lib/loot/data';
+import { LOOT_DATA, type LootData } from '../src/lib/loot/data';
 import { validateLootData } from '../src/lib/loot/validate';
 import { mulberry32 } from '../src/lib/rng';
 import { LUCK } from '../src/config/spawns';
+import { BOSS_SET_CHANCE, BOSS_SET_PITY, BOSS_UNIQUE_CHANCE, BOSS_UNIQUE_PITY } from '../src/catalog/lootConfig';
 import { chestIntervalSec, gemChance, goldenMonsterChance, rollGemFind } from '../src/lib/luck';
 
 const arg = (name: string, fallback: number) => {
@@ -35,9 +48,10 @@ const SCENARIOS: Scenario[] = [
 	{ label: 'Monster level 9', sourceId: 'monster', level: 9 },
 	{ label: 'Monster level 15', sourceId: 'monster', level: 15 },
 	{ label: 'Monster level 20', sourceId: 'monster', level: 20 },
-	{ label: 'Boss level 15', sourceId: 'boss', level: 15 },
-	{ label: 'Boss level 25', sourceId: 'boss', level: 25 },
-	{ label: 'Boss level 35', sourceId: 'boss', level: 35 },
+	{ label: 'Boss (plains) level 15', sourceId: bossSourceId('plains'), level: 15 },
+	{ label: 'Boss (forest) level 25', sourceId: bossSourceId('forest'), level: 25 },
+	{ label: 'Boss (swamp) level 35', sourceId: bossSourceId('swamp'), level: 35 },
+	{ label: 'Boss (tundra) level 45', sourceId: bossSourceId('tundra'), level: 45 },
 	{ label: 'Chest, castle 1', sourceId: 'chest', castleLevel: 1 },
 	{ label: 'Chest, castle 5', sourceId: 'chest', castleLevel: 5 },
 	{ label: 'Chest, castle 10', sourceId: 'chest', castleLevel: 10 },
@@ -96,6 +110,89 @@ for (const s of SCENARIOS) {
 	out(
 		`| ${s.label} | ${sourceLevel} | ${(gear / KILLS).toFixed(3)} | ${RARITY_ORDER.map((r) => pct(byRarity.get(r) ?? 0, gear)).join(' | ')} | ${percentile(levels, 0.5)} / ${percentile(levels, 0.9)} / ${levels[levels.length - 1] ?? 0} | ${pct(high, KILLS)} | ${(named / KILLS).toFixed(4)} | ${warnings} |`,
 	);
+}
+
+out();
+out('## Bosses');
+out();
+out(
+	`Each biome's boss drops from a source of its own (\`boss_<biome>\`, IDL-44): a guaranteed general roll, its potions, its unique (a named legendary weapon: ${(BOSS_UNIQUE_CHANCE * 100).toFixed(0)} % per kill, +${(BOSS_UNIQUE_PITY.perMiss * 100).toFixed(0)} % per miss up to +${(BOSS_UNIQUE_PITY.maxBonus * 100).toFixed(0)} %, a drop resets the counter) and, once one is wired, a piece of the set it owns. The kills below are bosses killed in a row, counted until the drop (${KILLS.toLocaleString('en')} runs per row, pity included); hours assume one boss kill per boss timer (\`COMBAT.spawn.bossIntervalSec\`, ${COMBAT.spawn.bossIntervalSec / 3600} h; only one boss stands at a time, so this is the best case of a player who kills every boss).`,
+);
+out();
+out('| Boss | Level | Owns | Gear / kill | Kills to the drop: mean | p10 | p50 | p90 | Hours at 1 boss / timer (mean) |');
+out('|---|---:|---|---:|---:|---:|---:|---:|---:|');
+/** Kills in a row until a drop that satisfies `done`, with the pity counters carried between kills */
+const killsUntil = (
+	sourceId: string,
+	level: number,
+	runs: number,
+	data: LootData,
+	seed: number,
+	step: (drops: ReturnType<typeof generateLoot>['drops'], owned: Set<string>) => boolean,
+): number[] => {
+	const rng = mulberry32(seed);
+	const results: number[] = [];
+	for (let i = 0; i < runs; i++) {
+		let pity: Record<string, number> = {};
+		const owned = new Set<string>();
+		let kills = 0;
+		for (;;) {
+			kills++;
+			const r = generateLoot({ sourceId, level, owned: [...owned], pity }, rng, data);
+			pity = r.pity;
+			if (step(r.drops, owned) || kills >= 10_000) break;
+		}
+		results.push(kills);
+	}
+	return results.sort((a, b) => a - b);
+};
+const summary = (kills: number[]) => {
+	const mean = kills.reduce((a, b) => a + b, 0) / (kills.length || 1);
+	return { mean, p10: percentile(kills, 0.1), p50: percentile(kills, 0.5), p90: percentile(kills, 0.9) };
+};
+const RUNS = Math.min(KILLS, 20_000);
+const hours = (kills: number) => ((kills * COMBAT.spawn.bossIntervalSec) / 3600).toFixed(0);
+for (const [biome, def] of Object.entries(BOSS_LOOT)) {
+	const sourceId = bossSourceId(biome);
+	const level = LOOT_DATA.sources[sourceId].levels!.max - 10;
+	const rng = mulberry32(SEED);
+	let gear = 0;
+	for (let i = 0; i < KILLS; i++)
+		gear += generateLoot({ sourceId, level }, rng).drops.filter((d) => d.kind === 'gear' && ITEM_CATALOG[d.item.base].generation !== 'named').length;
+	for (const unique of def.uniques) {
+		const k = summary(killsUntil(sourceId, level, RUNS, LOOT_DATA, SEED, (drops) => drops.some((d) => d.kind === 'gear' && d.item.base === unique)));
+		out(
+			`| ${sourceId} | ${level} | ${ITEM_CATALOG[unique].name} | ${(gear / KILLS).toFixed(2)} | ${k.mean.toFixed(1)} | ${k.p10} | ${k.p50} | ${k.p90} | ${hours(k.mean)} |`,
+		);
+	}
+	if (!def.uniques.length) out(`| ${sourceId} | ${level} | nothing yet | ${(gear / KILLS).toFixed(2)} | - | - | - | - | - |`);
+}
+out();
+out('### A full set from one boss (projection)');
+out();
+out(
+	`No set of the four biomes has live pieces yet (\`BOSS_LOOT[biome].setId\` is null for all of them, the Obsidian set is out of item level reach and S1-S3 are disabled), so this is a projection on a copy of the data: the tundra boss owns Blightbound with its pieces made reachable. The set table triggers ${(BOSS_SET_CHANCE * 100).toFixed(0)} % per kill, +${(BOSS_SET_PITY.perMiss * 100).toFixed(0)} % per miss up to +${(BOSS_SET_PITY.maxBonus * 100).toFixed(0)} %, and gives one piece, missing pieces first (the player's bag and gear count as owned). Kills are bosses killed until the whole set is owned.`,
+);
+out();
+out('| Pieces | Kills for the whole set: mean | p10 | p50 | p90 | Hours at 1 boss / timer (mean) | Hours (p90) |');
+out('|---:|---:|---:|---:|---:|---:|---:|');
+{
+	const data = JSON.parse(JSON.stringify(LOOT_DATA)) as LootData;
+	const loot: Record<string, BossLootDef> = Object.fromEntries(
+		Object.entries(BOSS_LOOT).map(([b, d]) => [b, { ...d, setId: b === 'tundra' ? 'blightbound' : null }]),
+	);
+	const built = buildBossLoot(loot);
+	Object.assign(data.pools, built.pools);
+	Object.assign(data.profiles, built.profiles);
+	Object.assign(data.sources, built.sources);
+	const pieces = Object.values(data.items).filter((d) => d.set === 'blightbound');
+	for (const d of pieces) Object.assign(d, { enabled: true, minItemLevel: 1, maxItemLevel: 100, dropLevels: undefined });
+	const kills = killsUntil('boss_tundra', 40, RUNS, data, SEED, (drops, owned) => {
+		for (const d of drops) if (d.kind === 'gear' && data.items[d.item.base].set) owned.add(d.item.base);
+		return owned.size >= pieces.length;
+	});
+	const k = summary(kills);
+	out(`| ${pieces.length} | ${k.mean.toFixed(1)} | ${k.p10} | ${k.p50} | ${k.p90} | ${hours(k.mean)} | ${hours(k.p90)} |`);
 }
 
 out();

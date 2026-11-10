@@ -230,25 +230,25 @@ test('a bonus table adds to the general loot and never removes it', () => {
 });
 
 test('pity raises the chance after misses and resets on a drop', () => {
-	// Boss legendary (pity key `boss:king_legendary`, a legacy name): base 5%, +1% per miss up to +10%
+	// A boss's unique (the tundra boss, pity key `boss_tundra:unique`): base 5%, +1% per miss up to +10%
 	const miss = () => 0.999;
 	let pity: Record<string, number> = {};
-	for (let i = 0; i < 4; i++) pity = generateLoot({ sourceId: 'boss', level: 15, pity }, miss).pity;
-	assert.equal(pity['boss:king_legendary'], 4);
+	for (let i = 0; i < 4; i++) pity = generateLoot({ sourceId: 'boss_tundra', level: 30, pity }, miss).pity;
+	assert.equal(pity['boss_tundra:unique'], 4);
 	// 4 misses = 5% + 4% = 9%: a roll of 0.08 now succeeds, which it would not at the base 5%
 	const rng = mulberry32(12);
 	let hitsBase = 0;
 	let hitsPity = 0;
 	const isLegendary = (drops: LootDrop[]) => gear(drops).some((g) => LOOT_DATA.items[g.base].pools?.includes('legendary_weapons'));
 	for (let i = 0; i < 20000; i++) {
-		if (isLegendary(generateLoot({ sourceId: 'boss', level: 15 }, rng).drops)) hitsBase++;
-		if (isLegendary(generateLoot({ sourceId: 'boss', level: 15, pity: { 'boss:king_legendary': 50 } }, rng).drops)) hitsPity++;
+		if (isLegendary(generateLoot({ sourceId: 'boss_tundra', level: 30 }, rng).drops)) hitsBase++;
+		if (isLegendary(generateLoot({ sourceId: 'boss_tundra', level: 30, pity: { 'boss_tundra:unique': 50 } }, rng).drops)) hitsPity++;
 	}
 	assert.ok(Math.abs(hitsBase / 20000 - 0.05) < 0.01, `base ${hitsBase / 20000}`);
 	assert.ok(Math.abs(hitsPity / 20000 - 0.15) < 0.015, `capped pity ${hitsPity / 20000}`); // 5% + the 10% cap
 	// a drop resets the counter
 	const win = () => 0;
-	assert.equal(generateLoot({ sourceId: 'boss', level: 15, pity: { 'boss:king_legendary': 7 } }, win).pity['boss:king_legendary'], 0);
+	assert.equal(generateLoot({ sourceId: 'boss_tundra', level: 30, pity: { 'boss_tundra:unique': 7 } }, win).pity['boss_tundra:unique'], 0);
 });
 
 test('the explain trace says why an item dropped', () => {

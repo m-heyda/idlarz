@@ -52,7 +52,7 @@ test('roll counts, guarantees and chances are checked', () => {
 	d.profiles.boss.rolls.chancePerRoll = 1.5;
 	assert.ok(has(d, /chancePerRoll/));
 	d = copy();
-	d.profiles.boss.bonusTables[1].chance = 2;
+	d.profiles.boss_tundra.bonusTables[0].chance = 2;
 	assert.ok(has(d, /chance must be 0-1/));
 });
 

@@ -54,7 +54,7 @@ test('a rat drops gear about 12% of the time at level 1, and the chance is indep
 });
 
 test('a boss always drops the potions that list it, and a low roll adds a legendary weapon', () => {
-	const king = { type: 'bossGreatAuroch', level: 15 } as const;
+	const king = { type: 'bossWinterWyrm', level: 30 } as const; // the tundra boss owns Titan Maul (BOSS_LOOT)
 	const r = rollKillLoot(king, ctx, () => 0.999);
 	assert.deepEqual(
 		r.items.find((d) => baseOf(d) === 'potion_minor'),
@@ -69,13 +69,14 @@ test('a boss always drops the potions that list it, and a low roll adds a legend
 	assert.equal(lucky.filter(isLegendaryWeapon).length, 1, 'a low roll also wins a legendary weapon');
 });
 
-test('a boss gives a legendary weapon about 5% of the time', () => {
+test('a boss with a unique gives it about 5% of the time (the Great Auroch has none yet)', () => {
 	const rng = mulberry32(32);
 	const n = 40000;
 	let legendary = 0;
 	for (let i = 0; i < n; i++) {
-		const items = rollKillLoot({ type: 'bossGreatAuroch', level: 15 }, ctx, rng).items;
+		const items = rollKillLoot({ type: 'bossWinterWyrm', level: 30 }, ctx, rng).items;
 		if (items.some(isLegendaryWeapon)) legendary++;
+		assert.equal(rollKillLoot({ type: 'bossGreatAuroch', level: 15 }, ctx, rng).items.some(isLegendaryWeapon), false);
 	}
 	assert.ok(Math.abs(legendary / n - 0.05) < 0.007, `legendary ${legendary / n}`);
 });
@@ -163,8 +164,8 @@ test('the monster level sets the item level of kill drops; the pity counters com
 		);
 	assert.ok(top(20) > top(5) + 10);
 	assert.equal(top(5), 6, 'level 5 plus the one level of variance');
-	const king = rollKillLoot({ type: 'bossGreatAuroch', level: 15 }, { ...ctx, pity: { 'boss:king_legendary': 4 } }, () => 0.999);
-	assert.equal(king.pity['boss:king_legendary'], 5);
+	const king = rollKillLoot({ type: 'bossWinterWyrm', level: 30 }, { ...ctx, pity: { 'boss_tundra:unique': 4 } }, () => 0.999);
+	assert.equal(king.pity['boss_tundra:unique'], 5);
 });
 
 test('emitCombat is a no-op outside the browser', () => {
