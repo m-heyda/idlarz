@@ -281,4 +281,4 @@ alter table public.player_ledger add column if not exists legacy jsonb;   -- Ido
 -- ---- profiles_server_columns (migration profiles_server_columns, IDL-76): epoch and avatar_id are written by the server only --------------------
 revoke insert, update on table public.profiles from authenticated;
 grant insert (id, character_name, player_class) on public.profiles to authenticated;
-grant update (character_name, player_class) on public.profiles to authenticated;
+grant update (id, character_name, player_class) on public.profiles to authenticated;
