@@ -15,15 +15,22 @@ test('every animal yields meat plus a farm product', () => {
 		assert.ok(out.meat > 0, `${animal.id} meat`);
 		assert.ok(out[animal.product.resource] > 0, `${animal.id} ${animal.product.resource}`);
 	}
-	assert.deepEqual(ANIMALS.map((a) => a.product.resource).sort(), ['eggs', 'hide', 'hide', 'milk']);
+	assert.deepEqual(ANIMALS.map((a) => a.product.resource).sort(), ['eggs', 'hide', 'milk', 'wool']);
 });
 
 test('a product is a small share of the meat value once sold (so the farm stays balanced)', () => {
-	const price = { eggs: RESOURCES.eggs.merchant.price, milk: RESOURCES.milk.merchant.price, hide: RESOURCES.hide.merchant.price };
+	const price = {
+		eggs: RESOURCES.eggs.merchant.price,
+		milk: RESOURCES.milk.merchant.price,
+		hide: RESOURCES.hide.merchant.price,
+		wool: RESOURCES.wool.merchant.price,
+	};
 	for (const animal of ANIMALS) {
 		const meat = animal.baseProduction * 1; // sells for 1 gold per meat
 		const product = animal.product.perSec * price[animal.product.resource];
-		assert.ok(product / meat >= 0.2 && product / meat <= 0.4, `${animal.id}: ${(product / meat).toFixed(2)}`);
+		// hide is the one product big territories are paid in (TILE_RESOURCE_COST) and now only the pigs make it, so it may be worth up to half the meat
+		const top = animal.product.resource === 'hide' ? 0.5 : 0.4;
+		assert.ok(product / meat >= 0.2 && product / meat <= top, `${animal.id}: ${(product / meat).toFixed(2)}`);
 	}
 });
 
@@ -70,7 +77,7 @@ test('farm products accumulate in the resource rates and respect the global modi
 
 test('farm upgrades: each level costs more, raises the right output and is paid in resources', () => {
 	freshGame();
-	setResources({ food: 1e12, wood: 1e12, stone: 1e12, coal: 1e12, eggs: 1e9, milk: 1e9, hide: 1e9 });
+	setResources({ food: 1e12, wood: 1e12, stone: 1e12, coal: 1e12, eggs: 1e9, milk: 1e9, hide: 1e9, wool: 1e9 });
 	api().purchaseAnimal('chicken', 5);
 	const meat0 = api().resourceRates.base.meat;
 	const eggs0 = api().resourceRates.base.eggs;
@@ -122,6 +129,7 @@ test('second-tier products come at a brisk pace: a full pen of chickens pays the
 		['coop', 'eggs', 'chicken'],
 		['dairy', 'milk', 'cow'],
 		['tannery', 'hide', 'pig'],
+		['shearing', 'wool', 'sheep'],
 	] as const) {
 		const base = calculateFarmOutput({ [animal]: 4 })[resource];
 		const maxed = calculateFarmOutput({ [animal]: 4 }, { [id]: 10 })[resource];
@@ -129,19 +137,45 @@ test('second-tier products come at a brisk pace: a full pen of chickens pays the
 	}
 });
 
-test('Pasture lifts eggs, milk and hide together (and nothing else), on top of the single-product upgrades', () => {
-	const herd = { chicken: 4, deer: 4, pig: 4, cow: 4 };
+test('Pasture lifts eggs, milk, hide and wool together (and nothing else), on top of the single-product upgrades', () => {
+	const herd = { chicken: 4, sheep: 4, pig: 4, cow: 4 };
 	const base = calculateFarmOutput(herd);
 	const grazed = calculateFarmOutput(herd, { pasture: 5 });
 	const factor = 1 + 5 * FARM_UPGRADES.pasture.effectPerLevel;
-	for (const key of ['eggs', 'milk', 'hide'] as const) assert.ok(Math.abs(grazed[key] / base[key] - factor) < 1e-9, key);
+	for (const key of ['eggs', 'milk', 'hide', 'wool'] as const) assert.ok(Math.abs(grazed[key] / base[key] - factor) < 1e-9, key);
 	assert.equal(grazed.meat, base.meat);
 	const stacked = calculateFarmOutput(herd, { pasture: 5, tannery: 10 });
 	assert.ok(Math.abs(stacked.hide / base.hide - factor * (1 + 10 * FARM_UPGRADES.tannery.effectPerLevel)) < 1e-9);
 });
 
-test('hide is a real farm product: a full pen of deer and pigs pays a 300-tile territory a tile every few minutes', () => {
-	const hidePerSec = calculateFarmOutput({ deer: FARM.baseCap, pig: FARM.baseCap }).hide;
+test('hide is a real farm product: a full pen of pigs pays a 300-tile territory a tile every few minutes', () => {
+	const hidePerSec = calculateFarmOutput({ pig: FARM.baseCap }).hide;
 	const tileHide = calculateTileCost(300, 0).resources.hide ?? 0;
 	assert.ok(tileHide / hidePerSec <= 3 * 3600, `${(tileHide / hidePerSec / 60).toFixed(0)} min of an unupgraded full pen per tile at 300 tiles`);
+});
+
+test('sheep make wool, and only the sheep do', () => {
+	const sheep = ANIMALS.find((a) => a.id === 'sheep')!;
+	assert.equal(sheep.product.resource, 'wool');
+	assert.equal(
+		ANIMALS.some((a) => a.id === 'deer'),
+		false,
+		'the deer is gone',
+	);
+	const out = calculateFarmOutput({ sheep: 4, pig: 4, cow: 4, chicken: 4 });
+	assert.ok(Math.abs(out.wool - 4 * sheep.product.perSec) < 1e-12);
+});
+
+test('the Shearing Shed buys with wool and raises wool only', () => {
+	freshGame();
+	setResources({ food: 1e12, wool: 1e9 });
+	api().purchaseAnimal('sheep', 3);
+	const wool0 = api().resourceRates.base.wool;
+	const hide0 = api().resourceRates.base.hide;
+	assert.ok(wool0 > 0);
+	const woolBefore = api().resources.wool;
+	assert.equal(api().buyFarmUpgrade('shearing'), true);
+	assert.equal(woolBefore - api().resources.wool, farmUpgradeCost('shearing', 0).wool);
+	assert.ok(Math.abs(api().resourceRates.base.wool - wool0 * (1 + FARM_UPGRADES.shearing.effectPerLevel)) < 1e-12);
+	assert.equal(api().resourceRates.base.hide, hide0);
 });

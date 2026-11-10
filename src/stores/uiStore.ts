@@ -129,6 +129,10 @@ interface UiState {
 	askDismissMonster: (id: number | null) => void;
 	discardIndex: number | null;
 	askDiscard: (index: number | null) => void;
+	/** The "Build here" window: the free tile it was opened for (null = closed) */
+	buildModal: { x: number; y: number } | null;
+	openBuildModal: (x: number, y: number) => void;
+	closeBuildModal: () => void;
 	/** The connected area of one biome that is tinted for a few seconds ("Highlight" in the tile menu): its tiles as map keys */
 	highlight: { biome: string; cells: ReadonlySet<number> } | null;
 	/** Tints the area of the same biome around tile (x, y): every tile of that biome that touches it, side by side. */
@@ -198,6 +202,9 @@ export const useUiStore = create<UiState>((set, get) => ({
 	askDismissMonster: (id) => set({ dismissMonsterId: id, contextMenu: null }),
 	discardIndex: null,
 	askDiscard: (index) => set({ discardIndex: index, contextMenu: null }),
+	buildModal: null,
+	openBuildModal: (x, y) => set({ buildModal: { x, y }, contextMenu: null }),
+	closeBuildModal: () => set({ buildModal: null }),
 	highlight: null,
 	flashCluster: (world, x, y) => {
 		if (flashTimer) clearTimeout(flashTimer);

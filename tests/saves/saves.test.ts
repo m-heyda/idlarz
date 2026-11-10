@@ -341,3 +341,17 @@ test('an old save with buildings in the text format loads, and the server summar
 	const check = checkNetWorth(result.state, summary);
 	assert.ok(Number.isFinite(check.required) && Number.isFinite(check.allowed));
 });
+
+test('a save with deer loads them as sheep (the deer became the sheep) and keeps the sheep when it has both', () => {
+	const old = snapshot();
+	old.farmLevels = { chicken: 2, deer: 5 };
+	const result = sanitizeSave(old);
+	assert.equal(result.ok, true);
+	if (result.ok) assert.deepEqual(result.state.farmLevels, { chicken: 2, sheep: 5 });
+
+	const both = snapshot();
+	both.farmLevels = { deer: 5, sheep: 3 };
+	const merged = sanitizeSave(both);
+	assert.equal(merged.ok, true);
+	if (merged.ok) assert.deepEqual(merged.state.farmLevels, { sheep: 3 });
+});

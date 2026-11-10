@@ -32,7 +32,7 @@
  * - **Castle timers are the floor of the first run.** Levels 2-6 take 30 min, 2 h, 6 h, 12 h and 24 h (1 d 20 h 30 min in all), levels 7-10 another 1.5, 2, 2.5 and 3.5 days (11 d 8 h 30 min to castle 10); Master Builders shortens them.
  *   The cost of 5 to 6 is what a player who plays a few times a day must be able to pay while the 4 to 5 timer runs, so a player who hoards instead of selling must not be locked out of it (the sim's `human` never sells surplus on purpose).
  * - **Tile price in materials** ({@link TILE_RESOURCE_COST}). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (table at the end of `sim-milestones.md`).
- *   Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (deer and pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.
+ *   Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.
  * - **Tile XP is small on purpose** (`BASE_XP_PER_TILE` 45) and the level curve is slow and lifetime, so levels come from passive XP, kills and rebirth-paced play, not from buying tiles.
  * - **Combat is in the sim**: the `human*` profiles fight a normal monster every 900 s and the plains boss every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from `docs/generated/fight-sim.md`), paying the real kill income.
  *
@@ -401,12 +401,19 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 	};
 
 	// The tutorial's starter bundles (IDL-74): the server pays each once per account, the bot receives them at the same events. The potions at the last step do not matter to the economy.
-	const gifts = { tile: false, castle: false };
-	const gift = (which: 'tile' | 'castle') => {
+	const gifts = { tile: false, castle: false, farm: false };
+	const gift = (which: 'tile' | 'castle' | 'farm') => {
 		if (gifts[which]) return;
 		gifts[which] = true;
-		const bundle: { gold?: number; wood?: number } = STARTER_REWARDS[which];
-		store.setState((st) => ({ resources: { ...st.resources, gold: st.resources.gold + (bundle.gold ?? 0), wood: st.resources.wood + (bundle.wood ?? 0) } }));
+		const bundle: { gold?: number; wood?: number; food?: number } = STARTER_REWARDS[which];
+		store.setState((st) => ({
+			resources: {
+				...st.resources,
+				gold: st.resources.gold + (bundle.gold ?? 0),
+				wood: st.resources.wood + (bundle.wood ?? 0),
+				food: st.resources.food + (bundle.food ?? 0),
+			},
+		}));
 	};
 
 	const decide = (active: boolean) => {
@@ -554,6 +561,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const ok = api().buyTile(frontier[0], frontier[1]);
 			if (!ok) break;
 			gift('tile');
+			gift('farm'); // the farm bundle arrives when the guide meets the farm, right after the first tile
 			frontierDirty = true;
 			s = api();
 			const ownedNow = utils.economyTiles(s.tiles, s.freeTiles);
@@ -581,9 +589,9 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const excess = s.resources[r] - keep;
 			if (excess > 50) api().sellResources(r, Math.floor(excess));
 		});
-		// Farm products: keep what the next hen house / dairy / tannery level needs, sell the rest
-		const productUpgrade = { eggs: 'coop', milk: 'dairy', hide: 'tannery' } as const;
-		(['eggs', 'milk', 'hide'] as const).forEach((r) => {
+		// Farm products: keep what the next hen house / dairy / tannery / shearing shed level needs, sell the rest
+		const productUpgrade = { eggs: 'coop', milk: 'dairy', hide: 'tannery', wool: 'shearing' } as const;
+		(['eggs', 'milk', 'hide', 'wool'] as const).forEach((r) => {
 			const id = productUpgrade[r];
 			const next = utils.farmUpgradeCost(id, utils.farmUpgradeLevel(s.farmUpgrades, id))[r] ?? 0;
 			const excess = api().resources[r] - Math.max(next * 1.6, (need[r] ?? 0) * 1.1) * hoard; // the next tiles may cost hide too

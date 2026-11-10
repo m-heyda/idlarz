@@ -13,7 +13,7 @@ CELL = 40
 # icon name in the game -> file in public/pixel/resources/
 USED = {
     'gold': 'gold', 'wood': 'wood', 'stone': 'stone', 'coal': 'coal', 'food': 'food', 'meat': 'meat',
-    'eggs': 'eggs', 'milk': 'milk', 'hide': 'hide', 'xp': 'xp',
+    'eggs': 'eggs', 'milk': 'milk', 'hide': 'hide', 'wool': 'wool', 'xp': 'xp',
     'legacy': 'embers',          # the rebirth currency kept its old sprite name
     'diamond': 'gems',           # the premium currency
     'res_fish': 'fish', 'res_iron': 'iron-ore',

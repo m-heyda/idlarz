@@ -17,7 +17,7 @@ export interface TutorialReply {
 	reason?: 'unknown' | 'not_yet';
 	progress: TutorialProgress;
 	/** What the bundle paid this time (empty when nothing was paid) */
-	paid?: { gold?: number; wood?: number; items?: { id: string; qty: number }[] };
+	paid?: { gold?: number; wood?: number; food?: number; items?: { id: string; qty: number }[] };
 	serverNowSec: number;
 	inv?: Inventory;
 }
@@ -72,6 +72,7 @@ export const applyTutorial = (ledger: Ledger, stored: StoredSave, request: Tutor
 	const resources: Partial<GrantTotals> = {};
 	if (reward.gold) resources.gold = reward.gold;
 	if (reward.wood) resources.wood = reward.wood;
+	if (reward.food) resources.food = reward.food;
 	let inv = ledger.inv;
 	let convertedGold = 0;
 	if (reward.items?.length && inv) {
@@ -88,6 +89,7 @@ export const applyTutorial = (ledger: Ledger, stored: StoredSave, request: Tutor
 	const paid = {
 		...(resources.gold ? { gold: resources.gold } : {}),
 		...(resources.wood ? { wood: resources.wood } : {}),
+		...(resources.food ? { food: resources.food } : {}),
 		...(reward.items ? { items: [...reward.items] } : {}),
 	};
 	return {

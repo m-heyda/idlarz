@@ -311,7 +311,7 @@ export interface Animal {
 	product: { resource: FarmProduct; perSec: number }; // a farm product trickling out of every animal
 }
 
-type FarmProduct = 'eggs' | 'milk' | 'hide';
+type FarmProduct = 'eggs' | 'milk' | 'hide' | 'wool';
 
 // One physical click, as seen by the click limiter. `eventId` is shared by every handler of the same DOM event.
 export interface ClickInput {

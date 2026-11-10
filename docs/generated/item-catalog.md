@@ -261,7 +261,7 @@ Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_s
 | `meat` | Meat | 1 | Every animal on the farm (boosted by Feed Trough and the plains bonus). |
 | `eggs` | Eggs | 2 | Chickens on the farm. Cannot be bought. |
 | `milk` | Milk | 3 | Cows on the farm. Cannot be bought. |
-| `hide` | Hide | 2 | Deer and pigs on the farm, and the monsters you beat. Cannot be bought. |
+| `hide` | Hide | 2 | Pigs on the farm, and the monsters you beat. Cannot be bought. |
 | `xp` | XP |  | The castle, buying tiles and your stats. |
 | `gems` | Gems |  | Your starting purse; more ways to earn them are coming. |
 | `embers` | Embers |  | Rebirthing from castle level 6: the higher your castle and land, the more you get. |
@@ -272,3 +272,4 @@ Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_s
 | `frostshard` | Frostshard |  | The Ice Cutter on a tundra tile. Cannot be bought or sold. |
 | `pearls` | Pearls |  | The Pearl Diver on a lake tile. Cannot be bought or sold. |
 | `salt` | Salt |  | The Salt Works on a coast tile. Cannot be bought or sold. |
+| `wool` | Wool | 2 | Sheep on the farm. Cannot be bought. |

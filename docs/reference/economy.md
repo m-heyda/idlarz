@@ -46,7 +46,7 @@ What the game does is read from the code; every number below is computed from th
 | Income with nothing built | gold 0.1, xp 0.25 per second | `BASE_GENERATION_RATES` |
 | Castle position | (25, 25) | `CASTLE_X`, `CASTLE_Y` |
 | Map size | unbounded; coordinates within +-16 K, at most 250 K owned tiles | `COORD_LIMIT`, `MAX_OWNED_TILES` |
-| Resource tiers | Currency: gold, gems, embers; Base materials: wood, stone, coal, food, meat; Farm products: eggs, milk, hide; Biome goods: none yet; Extracts: herbs, sap, ironOre, spores, frostshard, pearls, salt; Relics: none yet | `RESOURCE_TIERS` |
+| Resource tiers | Currency: gold, gems, embers; Base materials: wood, stone, coal, food, meat; Farm products: eggs, milk, hide, wool; Biome goods: none yet; Extracts: herbs, sap, ironOre, spores, frostshard, pearls, salt; Relics: none yet | `RESOURCE_TIERS` |
 
 See also: [`MAX_CATCHUP_SEC`](economy.md#max-catchup-sec), [`RESOURCE_CAP`](economy.md#resource-cap), [`BASE_GENERATION_RATES`](economy.md#base-generation-rates), [`INITIAL_RESOURCES`](economy.md#initial-resources)
 
@@ -484,8 +484,8 @@ The farm: animals are bought with food. The N-th animal of a kind costs `floor(b
 | Animal | First cost (food) | Cost x per animal | Meat / s each | Product / s each |
 | --- | --- | --- | --- | --- |
 | Chicken | 1,000 | 1.3 | 0.2 | eggs 0.03 |
-| Deer | 10 K | 1.33 | 0.5 | hide 0.075 |
-| Pig | 60 K | 1.36 | 1 | hide 0.15 |
+| Sheep | 10 K | 1.33 | 0.5 | wool 0.075 |
+| Pig | 60 K | 1.36 | 1 | hide 0.25 |
 | Cow | 400 K | 1.4 | 2 | milk 0.225 |
 
 <a id="animaloutput"></a>
@@ -502,7 +502,7 @@ Output of N animals of one kind. Meat uses Feed Trough, the products use their o
 
 ```text
 meat    = baseProduction x N x (1 + 0.02 x pen level) x (1 + 0.05 x feed trough level)
-product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery effect) x (1 + 0.08 x pasture level)
+product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery | shearing effect) x (1 + 0.08 x pasture level)
 ```
 
 <a id="farm-upgrades"></a>
@@ -522,7 +522,8 @@ the others have 10 levels and growth 1.6.
 | Hen House | +15% eggs | 10 | wood 1,500, eggs 40 | 1.6 |
 | Dairy | +15% milk | 10 | stone 1,500, milk 30 | 1.6 |
 | Tannery | +25% hide | 10 | coal 1,200, hide 20 | 1.6 |
-| Pasture | +8% eggs, milk and hide | 10 | food 5,000, wood 2,500 | 1.6 |
+| Shearing Shed | +25% wool | 10 | food 1,500, wool 30 | 1.6 |
+| Pasture | +8% eggs, milk, hide and wool | 10 | food 5,000, wood 2,500 | 1.6 |
 | Pen Expansion | +2% farm output, +4 animals per kind | 8 | food 8,000, wood 3,000, stone 3,000 | 1.9 |
 
 <a id="calculateanimalcost"></a>
@@ -584,6 +585,7 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 | eggs | 2 | not sold |
 | milk | 3 | not sold |
 | hide | 2 | not sold |
+| wool | 2 | not sold |
 
 <a id="merchant-goods"></a>
 

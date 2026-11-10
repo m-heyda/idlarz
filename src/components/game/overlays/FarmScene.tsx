@@ -4,6 +4,7 @@ import { PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
 import { mulberry32 } from '@/lib/rng';
 import { Animal } from '@/types/game';
 import PixelIcon from '../PixelIcon';
+import FarmProps from './FarmProps';
 import {
 	ANCHOR,
 	ANIMAL_MOTION,
@@ -69,6 +70,7 @@ interface FarmSceneProps {
 const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrate, insets, onPointerDown }) => {
 	const stageRef = useRef<HTMLDivElement>(null);
 	const [zoom, setZoom] = useState(3);
+	const [stage, setStage] = useState({ w: 0, h: 0 });
 	const zoomRef = useRef(zoom);
 	zoomRef.current = zoom;
 	const nodes = useRef(new Map<string, HTMLDivElement>());
@@ -102,9 +104,10 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 		const el = stageRef.current;
 		if (!el) return;
 		const fit = () => {
-			const z = penZoom(el.clientWidth);
+			const z = penZoom(el.clientWidth, el.clientHeight);
 			zoomRef.current = z;
 			setZoom(z);
+			setStage({ w: el.clientWidth, h: el.clientHeight });
 			const view = walkView(el.clientWidth, el.clientHeight, z, insets);
 			viewRef.current = view;
 			agents.current.forEach((a) => {
@@ -229,10 +232,10 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 	}, []);
 
 	return (
-		<div ref={stageRef} className='farm-stage' onPointerDown={onPointerDown}>
+		<div ref={stageRef} className='farm-stage' style={{ '--z': zoom } as React.CSSProperties} onPointerDown={onPointerDown}>
 			<div className='farm-cloud' />
 			<div className='farm-pen' style={{ width: PEN.w * zoom, height: PEN.h * zoom, '--z': zoom } as React.CSSProperties}>
-				<PixelIcon name='farm_back' scale={zoom} alt='Farm pen' className='farm-layer' />
+				<FarmProps zoom={zoom} stageW={stage.w} stageH={stage.h} />
 
 				{instances.map((inst) => {
 					const a = inst.animal;
@@ -266,8 +269,6 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 						</div>
 					);
 				})}
-
-				<PixelIcon name='farm_front' scale={zoom} alt='' className='farm-layer farm-front' />
 			</div>
 		</div>
 	);

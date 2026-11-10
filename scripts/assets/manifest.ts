@@ -312,7 +312,7 @@ export const buildManifest = (): AssetEntry[] => {
 		if (itemIconNames.has(id) || /^(biome|meadow|water)_/.test(id)) continue;
 		const category: AssetCategory = id.startsWith('building_')
 			? 'buildings'
-			: /^(res_|animal_|farm_)/.test(id) || /^(gold|wood|stone|coal|food|meat|eggs|milk|hide|legacy|diamond|comp_)/.test(id)
+			: /^(res_|animal_|farm_)/.test(id) || /^(gold|wood|stone|coal|food|meat|eggs|milk|hide|wool|legacy|diamond|comp_)/.test(id)
 				? 'resources'
 				: id.startsWith('monster_')
 					? 'monsters'
@@ -345,6 +345,29 @@ export const buildManifest = (): AssetEntry[] => {
 			source: 'public/pixel/castles',
 		});
 	}
+
+	// 4c. The farm's loose parts (fence, buildings, water, trees ... from scripts/pixel/farm_parts.py) and the repeating meadow tile they stand on
+	for (const f of walk(join(PUBLIC, 'pixel', 'farm')).filter((file) => file.endsWith('.png'))) {
+		const id = basename(f, '.png');
+		add({
+			name: `farm_${id}`,
+			category: 'map-details',
+			subcategory: 'farm part',
+			src: url(f),
+			status: 'used',
+			usedBy: ['farm window'],
+			source: 'public/pixel/farm',
+		});
+	}
+	add({
+		name: 'farm_meadow',
+		category: 'map-details',
+		subcategory: 'farm part',
+		src: url(join(PUBLIC, 'pixel', 'bg', 'farm_meadow.png')),
+		status: 'used',
+		usedBy: ['farm window background (repeats)'],
+		source: 'public/pixel/bg',
+	});
 
 	// 5. UI parts and effects
 	for (const f of walk(join(PUBLIC, 'pixel', 'ui')))

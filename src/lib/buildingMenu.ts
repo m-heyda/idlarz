@@ -1,4 +1,4 @@
-import { buildingDef, buildingsOfBiome } from '@/catalog/buildings';
+import { buildingDef, buildingsOfBiome, type BuildingDef } from '@/catalog/buildings';
 import {
 	buildProblem,
 	builtBuildings,
@@ -11,7 +11,7 @@ import {
 	type BuildingContext,
 } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
-import type { ContextMenuItem } from '@/stores/uiStore';
+import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import type { MapGameStore } from '@/components/game/mapSource';
 import type { Resources } from '@/types/game';
 import { canAffordBundle } from '@/utils/game/costs';
@@ -71,45 +71,56 @@ export function buildingMenuItems(game: MapGameStore, x: number, y: number): Con
 		];
 	}
 
-	// "Build here..." opens a short list of the buildings of this biome: the ones already standing are greyed out ("Built"), the rest show what is missing or what they cost
-	const children: ContextMenuItem[] = [];
-	const moves: ContextMenuItem[] = [];
+	// "Build here..." opens the Build window (components/game/overlays/BuildModal.tsx), which lists the same rows (`buildOptions`)
+	const { builds } = buildOptions(game, x, y);
+	if (builds.length === 0) return [];
+	return [{ id: 'building-here', label: 'Build here...', onSelect: () => useUiStore.getState().openBuildModal(x, y) }];
+}
+
+/** One building of the tile's biome as the Build window shows it. `problem` is why it cannot be built now (null: it can). */
+export interface BuildOption {
+	def: BuildingDef;
+	cost: Partial<Resources>;
+	problem: string | null;
+}
+
+/** An already standing building that could be moved to the tile instead of building it again (half price, level kept). */
+export interface MoveOption {
+	def: BuildingDef;
+	level: number;
+	cost: Partial<Resources>;
+	problem: string | null;
+	from: { x: number; y: number };
+}
+
+/**
+ * What the Build window offers on the free tile (x, y): a `BuildOption` for every building of the biome that does not stand yet (`problem` = the rules' refusal, or "Not enough resources"), and a `MoveOption` for
+ * each one that stands elsewhere. Pure reads of the store; the rules and prices are `lib/buildings.ts`'s.
+ */
+export function buildOptions(game: MapGameStore, x: number, y: number): { builds: BuildOption[]; moves: MoveOption[] } {
+	const s = game.getState();
+	const tile = getTile(s.tiles, x, y);
+	const out = { builds: [] as BuildOption[], moves: [] as MoveOption[] };
+	if (!tile) return out;
+	const ctx: BuildingContext = {
+		tiles: s.tiles,
+		monsters: s.monsters,
+		castleLevel: castleLevelOf(s.tiles),
+		castleUpgrade: s.castleUpgrade,
+		buildingUpgrade: s.buildingUpgrade ?? null,
+		ownedTiles: economyTiles(s.tiles, s.freeTiles),
+	};
+	const standing = builtBuildings(s.tiles);
 	for (const def of buildingsOfBiome(tile.biome)) {
-		const kind = def.kind === 'extractor' ? 'Extractor' : 'Producer';
-		const elsewhere = builtBuildings(s.tiles).find((b) => b.id === def.id);
+		const elsewhere = standing.find((b) => b.id === def.id);
 		if (elsewhere) {
-			children.push({
-				id: `building-build-${def.id}`,
-				label: `${def.label} (${kind})`,
-				disabled: true,
-				hint: 'Built',
-				tooltip: `The ${def.label} already stands on another tile`,
-				onSelect: () => {},
-			});
 			const cost = relocationCost(elsewhere.level, ctx.ownedTiles);
 			const problem = moveProblem(ctx, elsewhere.x, elsewhere.y, x, y) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
-			moves.push({
-				id: `building-move-${def.id}`,
-				label: `Move ${def.label} here`,
-				separator: moves.length === 0,
-				disabled: !!problem,
-				hint: problem ?? 'half price',
-				tooltip: `Move it here for ${costText(cost)}, level kept`,
-				onSelect: () => void game.getState().moveBuilding?.(elsewhere.x, elsewhere.y, x, y),
-			});
+			out.moves.push({ def, level: elsewhere.level, cost, problem, from: { x: elsewhere.x, y: elsewhere.y } });
 		} else {
 			const cost = buildingLevelCost(1, ctx.ownedTiles);
-			const problem = buildProblem(ctx, x, y, def.id) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
-			children.push({
-				id: `building-build-${def.id}`,
-				label: `${def.label} (${kind})`,
-				disabled: !!problem,
-				hint: problem ?? undefined,
-				tooltip: `${def.blurb} Costs ${costText(cost)}.`,
-				onSelect: () => void game.getState().buildBuilding?.(x, y, def.id),
-			});
+			out.builds.push({ def, cost, problem: buildProblem(ctx, x, y, def.id) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources') });
 		}
 	}
-	if (children.length === 0) return [];
-	return [{ id: 'building-here', label: 'Build here...', onSelect: () => {}, children: [...children, ...moves] }];
+	return out;
 }

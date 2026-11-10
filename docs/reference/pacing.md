@@ -36,7 +36,7 @@ Open balance questions are in `docs/plan/ROADMAP.md`.
 - **Castle timers are the floor of the first run.** Levels 2-6 take 30 min, 2 h, 6 h, 12 h and 24 h (1 d 20 h 30 min in all), levels 7-10 another 1.5, 2, 2.5 and 3.5 days (11 d 8 h 30 min to castle 10); Master Builders shortens them.
   The cost of 5 to 6 is what a player who plays a few times a day must be able to pay while the 4 to 5 timer runs, so a player who hoards instead of selling must not be locked out of it (the sim's `human` never sells surplus on purpose).
 - **Tile price in materials** ([`TILE_RESOURCE_COST`](economy.md#tile-resource-cost)). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (table at the end of `sim-milestones.md`).
-  Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (deer and pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.
+  Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.
 - **Tile XP is small on purpose** (`BASE_XP_PER_TILE` 45) and the level curve is slow and lifetime, so levels come from passive XP, kills and rebirth-paced play, not from buying tiles.
 - **Combat is in the sim**: the `human*` profiles fight a normal monster every 900 s and the plains boss every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from `docs/generated/fight-sim.md`), paying the real kill income.
 
@@ -51,7 +51,7 @@ See also: [`MAGNITUDE_BANDS`](pacing.md#magnitude-bands), [`CASTLE_UPGRADE`](eco
 
 ### `MAGNITUDE_BANDS` <small>const</small>
 
-Source: [`scripts/sim.ts:867`](../../scripts/sim.ts)
+Source: [`scripts/sim.ts:875`](../../scripts/sim.ts)
 
 The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.
 

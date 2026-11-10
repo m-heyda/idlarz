@@ -152,7 +152,7 @@ and a changed system clock can neither skip nor reverse time. Away time is not c
 </tr>
 <tr>
 <td>Resource tiers</td>
-<td>Currency: gold, gems, embers; Base materials: wood, stone, coal, food, meat; Farm products: eggs, milk, hide; Biome goods: none yet; Extracts: herbs, sap, ironOre, spores, frostshard, pearls, salt; Relics: none yet</td>
+<td>Currency: gold, gems, embers; Base materials: wood, stone, coal, food, meat; Farm products: eggs, milk, hide, wool; Biome goods: none yet; Extracts: herbs, sap, ironOre, spores, frostshard, pearls, salt; Relics: none yet</td>
 <td><code>RESOURCE_TIERS</code></td>
 </tr>
 </tbody></table>
@@ -677,18 +677,18 @@ level up to <code>doublingUntil</code>, then a fixed step per level (so levels 7
 <td>eggs 0.03</td>
 </tr>
 <tr>
-<td>Deer</td>
+<td>Sheep</td>
 <td>10 K</td>
 <td>1.33</td>
 <td>0.5</td>
-<td>hide 0.075</td>
+<td>wool 0.075</td>
 </tr>
 <tr>
 <td>Pig</td>
 <td>60 K</td>
 <td>1.36</td>
 <td>1</td>
-<td>hide 0.15</td>
+<td>hide 0.25</td>
 </tr>
 <tr>
 <td>Cow</td>
@@ -705,7 +705,7 @@ level up to <code>doublingUntil</code>, then a fixed step per level (so levels 7
 <p>Output of N animals of one kind. Meat uses Feed Trough, the products use their own upgrade and Pasture.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">meat    = baseProduction x N x (1 + 0.02 x pen level) x (1 + 0.05 x feed trough level)
-product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery effect) x (1 + 0.08 x pasture level)
+product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery | shearing effect) x (1 + 0.08 x pasture level)
 </code></pre>
 </article><article><p><a id="farm-upgrades"></a></p>
 <h3><code>FARM_UPGRADES</code> <small>const</small></h3>
@@ -752,8 +752,15 @@ the others have 10 levels and growth 1.6.</p>
 <td>1.6</td>
 </tr>
 <tr>
+<td>Shearing Shed</td>
+<td>+25% wool</td>
+<td>10</td>
+<td>food 1,500, wool 30</td>
+<td>1.6</td>
+</tr>
+<tr>
 <td>Pasture</td>
-<td>+8% eggs, milk and hide</td>
+<td>+8% eggs, milk, hide and wool</td>
 <td>10</td>
 <td>food 5,000, wood 2,500</td>
 <td>1.6</td>
@@ -835,6 +842,11 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 </tr>
 <tr>
 <td>hide</td>
+<td>2</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>wool</td>
 <td>2</td>
 <td>not sold</td>
 </tr>
@@ -3983,10 +3995,10 @@ and draws the bubble and the focus layer for the beat that is on show. Nothing i
 account&#39;s progress has arrived; a target that is not on screen shows the bubble alone and never blocks the game.</p>
 </article><article><p><a id="tutorial-path"></a></p>
 <h3>The guided tutorial</h3>
-<p>Source: <a href="../../src/catalog/tutorial.ts"><code>src/catalog/tutorial.ts:133</code></a></p>
+<p>Source: <a href="../../src/catalog/tutorial.ts"><code>src/catalog/tutorial.ts:137</code></a></p>
 <p>The guided tutorial (IDL-74): <strong>Brother Alder</strong>, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after <code>GAME_EPOCH</code> is raised (the new chapter release); <code>NEXT_PUBLIC_GUIDE=on</code> forces it on anywhere (<a href="#guidevisiblefor"><code>guideVisibleFor</code></a>).</p>
 <ul>
-<li><strong>Intro</strong>: on the first start of a chapter the screen dims and Alder speaks three short bubbles. <strong>Starter path</strong>: eight steps in the order of <a href="#tutorial-path"><code>TUTORIAL_PATH</code></a>. The first step that is <em>ready</em> and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. <strong>Milestone lessons</strong> (<code>TUTORIAL_LESSONS</code>) fire the first time something is reached, in any order, after the path; each is kept in the Guide&#39;s journal tab (locked ones read &#39;???&#39;).</li>
+<li><strong>Intro</strong>: on the first start of a chapter the screen dims and Alder speaks three short bubbles. <strong>Starter path</strong>: nine steps in the order of <a href="#tutorial-path"><code>TUTORIAL_PATH</code></a>. The first step that is <em>ready</em> and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. <strong>Milestone lessons</strong> (<code>TUTORIAL_LESSONS</code>) fire the first time something is reached, in any order, after the path; each is kept in the Guide&#39;s journal tab (locked ones read &#39;???&#39;).</li>
 <li><strong>Focus</strong>: <code>strict</code> dims and blurs the whole game with a cut-out around the <code>data-tutorial</code> target and blocks every click outside it (the intro and the first two steps); <code>soft</code> only dims. A target that is not on screen shows the bubble alone and never blocks the game. <strong>Skip</strong> is on every bubble and ends the starter path (lessons still come); the guide can be switched off in Settings.</li>
 <li><strong>Texts</strong> are one or two sentences with numbers read from the config (<a href="#buildnumbers"><code>buildNumbers</code></a>). <strong>Order is data</strong>: a step is inserted between two others by putting it there (the new building system adds its &#39;build&#39; step that way).</li>
 <li><strong>Progress is per account on the server</strong> (<code>stats.tutorial</code> in the ledger: done ids, fired lessons, skipped; no migration) and resets with the ledger at a new chapter. <strong>Starter bundles</strong> are paid once per account by the server when a step is recorded, only if the last accepted save shows the step happened, and counted as <code>granted</code> (<a href="#applytutorial"><code>applyTutorial</code></a>). The sim bot receives them at the same events.</li>
@@ -4016,36 +4028,42 @@ account&#39;s progress has arrived; a target that is not on screen shows the bub
 </tr>
 <tr>
 <td>3</td>
+<td><code>farm-intro</code></td>
+<td>soft</td>
+<td>1000 food</td>
+</tr>
+<tr>
+<td>4</td>
 <td><code>buy-animal</code></td>
 <td>soft</td>
 <td>-</td>
 </tr>
 <tr>
-<td>4</td>
+<td>5</td>
 <td><code>castle-upgrade</code></td>
 <td>soft</td>
 <td>300 gold</td>
 </tr>
 <tr>
-<td>5</td>
+<td>6</td>
 <td><code>open-chest</code></td>
 <td>soft</td>
 <td>-</td>
 </tr>
 <tr>
-<td>6</td>
+<td>7</td>
 <td><code>first-fight</code></td>
 <td>soft</td>
 <td>-</td>
 </tr>
 <tr>
-<td>7</td>
+<td>8</td>
 <td><code>merchant</code></td>
 <td>soft</td>
 <td>-</td>
 </tr>
 <tr>
-<td>8</td>
+<td>9</td>
 <td><code>stat-point</code></td>
 <td>soft</td>
 <td>3 x potion_minor</td>
@@ -4099,6 +4117,16 @@ account&#39;s progress has arrived; a target that is not on screen shows the bub
 <td><code>res-milk</code></td>
 <td>Milk</td>
 <td><code>res-milk</code></td>
+</tr>
+<tr>
+<td><code>res-wool</code></td>
+<td>Wool</td>
+<td><code>res-wool</code></td>
+</tr>
+<tr>
+<td><code>farm-upgrades</code></td>
+<td>Farm upgrades</td>
+<td><code>tab-farm</code></td>
 </tr>
 <tr>
 <td><code>income-offline</code></td>
@@ -4778,7 +4806,7 @@ game with a fresh link. The server sends <code>epoch</code> and <code>needsReset
 the browser last saw (<code>lib/epochFetch</code>) and a lower one is refused with 412 <code>staleEpoch</code>, after which the page reloads into this guard. See <code>docs/plan/reset-proof-browsers.md</code>.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-architecture">Architecture</h2><p class="blurb">Stack, state, the tick loop, the map, rendering and the art pipeline.</p><h2>The loop</h2><article><p><a id="gameapp"></a></p>
 <h3>The tick loop and persistence</h3>
-<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:112</code></a></p>
+<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:113</code></a></p>
 <p>The tick loop. <code>GameApp</code> runs <code>setInterval(..., 100 ms)</code> <strong>only</strong> in the owning tab (one tab owns the game through a Web Lock, <code>useSingleTab</code>) and only after the save is loaded and the offline claim is done.
 Each interval computes <code>deltaTime = performance.now() - last</code> (monotonic) and calls <code>store.tick(deltaTime)</code>; <code>tick</code> clamps the delta to <code>0 ... MAX_CATCHUP_SEC</code> (300 s), so a throttled background tab catches up in 5-minute steps
 but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player&#39;s absence is claimed from the server before the loop starts (<a href="#computeofflinegrant"><code>computeOfflineGrant</code></a>).</p>
@@ -4894,11 +4922,11 @@ unlocked&quot; window shows them (<code>RebirthUnlockModal</code>); the other vi
 The file name is <code>biome_&lt;name&gt;.png</code>; change the value here to use another one.</p>
 </article><article><p><a id="animal-pixel-icons"></a></p>
 <h3><code>ANIMAL_PIXEL_ICONS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:273</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:271</code></a></p>
 <p>Farm animal id -&gt; its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is <a href="#animalicon"><code>animalIcon</code></a>.</p>
 </article><article><p><a id="animalicon"></a></p>
 <h3><code>animalIcon</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:288</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:286</code></a></p>
 <p>The sprite one animal wears: a stable pick among its kind&#39;s looks from a hash of <code>seed</code> (the farm uses the animal&#39;s key, e.g. <code>chicken-3</code>),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind&#39;s first look (shop cards, tutorial).
 Pure: no random numbers.</p>
@@ -4958,7 +4986,7 @@ Open balance questions are in <code>docs/plan/ROADMAP.md</code>.</p>
 <li><strong>Castle timers are the floor of the first run.</strong> Levels 2-6 take 30 min, 2 h, 6 h, 12 h and 24 h (1 d 20 h 30 min in all), levels 7-10 another 1.5, 2, 2.5 and 3.5 days (11 d 8 h 30 min to castle 10); Master Builders shortens them.
 The cost of 5 to 6 is what a player who plays a few times a day must be able to pay while the 4 to 5 timer runs, so a player who hoards instead of selling must not be locked out of it (the sim&#39;s <code>human</code> never sells surplus on purpose).</li>
 <li><strong>Tile price in materials</strong> (<a href="#tile-resource-cost"><code>TILE_RESOURCE_COST</code></a>). The sim prints, per tile count, the minutes the income needs to cover what is missing of each part of the next tile (table at the end of <code>sim-milestones.md</code>).
-Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (deer and pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.</li>
+Gold must stay the biggest number; if hide or stone becomes the limiter, adjust the farm (pigs make hide, Tannery +25 %, Pasture +8 %) rather than the share.</li>
 <li><strong>Tile XP is small on purpose</strong> (<code>BASE_XP_PER_TILE</code> 45) and the level curve is slow and lifetime, so levels come from passive XP, kills and rebirth-paced play, not from buying tiles.</li>
 <li><strong>Combat is in the sim</strong>: the <code>human*</code> profiles fight a normal monster every 900 s and the plains boss every 3 h with a gear schedule (starter kit, knight gear from day 1.5, obsidian from day 5; an assumption taken from <code>docs/generated/fight-sim.md</code>), paying the real kill income.</li>
 </ul>
@@ -4967,7 +4995,7 @@ Gold must stay the biggest number; if hide or stone becomes the limiter, adjust 
 <p>See also: <a href="#magnitude-bands"><code>MAGNITUDE_BANDS</code></a>, <a href="#castle-upgrade"><code>CASTLE_UPGRADE</code></a></p>
 </article><h2>Magnitude targets</h2><article><p><a id="magnitude-bands"></a></p>
 <h3><code>MAGNITUDE_BANDS</code> <small>const</small></h3>
-<p>Source: <a href="../../scripts/sim.ts"><code>scripts/sim.ts:867</code></a></p>
+<p>Source: <a href="../../scripts/sim.ts"><code>scripts/sim.ts:875</code></a></p>
 <p>The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.</p>
 <p>Magnitude targets (decided 2026-11-07, IDL-128): measured with the real store (<code>casual</code>, trace to day 16; <code>human-rebirth8</code>, <code>hardcore-rebirth6-x10</code>) and set as the design ceiling every cap decision is checked against.
 &quot;Income multiplier&quot; is total income at castle 10 relative to run 1 at castle 10, all sources together (Embers, gear, Idols, Monument, Paragon). The bands are the constants below: they are the only copy, the sim prints them next to the measured value

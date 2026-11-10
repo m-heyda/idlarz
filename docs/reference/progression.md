@@ -677,11 +677,11 @@ account's progress has arrived; a target that is not on screen shows the bubble 
 
 ### The guided tutorial
 
-Source: [`src/catalog/tutorial.ts:133`](../../src/catalog/tutorial.ts)
+Source: [`src/catalog/tutorial.ts:137`](../../src/catalog/tutorial.ts)
 
 The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ([`guideVisibleFor`](progression.md#guidevisiblefor)).
 
-- **Intro**: on the first start of a chapter the screen dims and Alder speaks three short bubbles. **Starter path**: eight steps in the order of [`TUTORIAL_PATH`](progression.md#tutorial-path). The first step that is *ready* and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. **Milestone lessons** (`TUTORIAL_LESSONS`) fire the first time something is reached, in any order, after the path; each is kept in the Guide's journal tab (locked ones read '???').
+- **Intro**: on the first start of a chapter the screen dims and Alder speaks three short bubbles. **Starter path**: nine steps in the order of [`TUTORIAL_PATH`](progression.md#tutorial-path). The first step that is *ready* and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. **Milestone lessons** (`TUTORIAL_LESSONS`) fire the first time something is reached, in any order, after the path; each is kept in the Guide's journal tab (locked ones read '???').
 - **Focus**: `strict` dims and blurs the whole game with a cut-out around the `data-tutorial` target and blocks every click outside it (the intro and the first two steps); `soft` only dims. A target that is not on screen shows the bubble alone and never blocks the game. **Skip** is on every bubble and ends the starter path (lessons still come); the guide can be switched off in Settings.
 - **Texts** are one or two sentences with numbers read from the config ([`buildNumbers`](progression.md#buildnumbers)). **Order is data**: a step is inserted between two others by putting it there (the new building system adds its 'build' step that way).
 - **Progress is per account on the server** (`stats.tutorial` in the ledger: done ids, fired lessons, skipped; no migration) and resets with the ledger at a new chapter. **Starter bundles** are paid once per account by the server when a step is recorded, only if the last accepted save shows the step happened, and counted as `granted` ([`applyTutorial`](progression.md#applytutorial)). The sim bot receives them at the same events.
@@ -693,12 +693,13 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 | --- | --- | --- | --- |
 | 1 | `click-gold` | strict | - |
 | 2 | `buy-tile` | strict | 100 gold, 20 wood |
-| 3 | `buy-animal` | soft | - |
-| 4 | `castle-upgrade` | soft | 300 gold |
-| 5 | `open-chest` | soft | - |
-| 6 | `first-fight` | soft | - |
-| 7 | `merchant` | soft | - |
-| 8 | `stat-point` | soft | 3 x potion_minor |
+| 3 | `farm-intro` | soft | 1000 food |
+| 4 | `buy-animal` | soft | - |
+| 5 | `castle-upgrade` | soft | 300 gold |
+| 6 | `open-chest` | soft | - |
+| 7 | `first-fight` | soft | - |
+| 8 | `merchant` | soft | - |
+| 9 | `stat-point` | soft | 3 x potion_minor |
 
 **Milestone lessons** _(computed from the code)_
 
@@ -712,6 +713,8 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 | `res-meat` | Meat | `res-meat` |
 | `res-eggs` | Eggs | `res-eggs` |
 | `res-milk` | Milk | `res-milk` |
+| `res-wool` | Wool | `res-wool` |
+| `farm-upgrades` | Farm upgrades | `tab-farm` |
 | `income-offline` | Income, timers and time away | `top-resources` |
 | `gear-bag-potions` | Gear, bag and potions | `tab-equipment` |
 | `rebirth-embers` | Rebirth and Embers | `rebirth-button` |

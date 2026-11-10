@@ -38,7 +38,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   white hair, glowing eyes, pointed purple hood, crystal staff, floating orb). Each also has a 40x40 bust for the header.
   The merchant uses the same kit: round green coat, bushy white beard, wide hat with feather, ledger, held coin.
 - **Animals**: 3/4 view, head to the lower-left, simple hard-shaded forms with one clear marking each
-  (hen: red comb + tail fan; pig: snout + curl tail; cow: black patches + pink muzzle; deer: antlers + dapples).
+  (hen: red comb + tail fan; pig: snout + curl tail; cow: black patches + pink muzzle).
 
 ## UI direction (from the attached references - follow this for all new HUD pieces)
 - Chunky **beveled frames**: 2-3px light-tan top/left bevel, dark bottom/right, 1px near-black outline, no rounded
@@ -64,7 +64,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
 - **Badges/portraits**: level orb (`level_orb`, animated), heroes `hero_<class>` + `bust_<class>`, `merchant`.
 - **Equipment slots**: `equip_head/neck/chest/mainHand/offHand/legs/feet/ring` - kettle hat, amulet, cuirass, sword,
   round shield, greaves, boots, ring. Empty = dim grayscale silhouette, filled = glowing slot frame.
-- **Animals**: `animal_chicken/pig/cow/deer`.
+- **Animals**: `animal_chicken/pig/cow/sheep`.
 - **Monsters** (`sprites_monsters.py`): `monster_rat` (2-frame idle sheet, 2 x 40x40) and `monster_ratking` (2 x 56x56, crowned, red cape,
   fur collar). Same 3/4 view as the farm animals, head to the lower-left; grey-brown fur ramp (`rat_fur`), pink ears/paws/tail (`rat_pink`),
   cream buck teeth, one glowing red eye. Shown through `MonsterArt` (CSS sheet animation, 520 ms per frame) on the map tile (red glow, tier badge)
@@ -140,8 +140,8 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   gold diamond with a warm glow. **Castle compass** (`CastleCompass.tsx`): a round dark badge with a gold arrow and the distance, gold
   frame and soft pulse, plus a `px-btn-gold` "Back to castle" button. **Minimap dots**: red (`#ff4d4d`) for monsters, yellow
   (`#ffd23a`) with a pulsing halo for chests, dark 1px outline, bigger when several merge.
-- **Farm** (`FarmScene.tsx`): an isometric pen ray-cast like the animals (`farm_back` everything, `farm_front` the near fences,
-  cut from the same render so animals walk between them). Ground to screen: `sx = OX + (x-y)*0.7071*S`, `sy = OY - (x+y)*0.3536*S`
+- **Farm** (`FarmScene.tsx`): an isometric pen ray-cast like the animals, rendered as loose parts (`public/pixel/farm/*.png` from `scripts/pixel/farm_parts.py`: fence segments, gate, barn, troughs, trees ...)
+  laid out by `farmLayout.ts` on a repeating meadow tile, so animals walk between them by depth (foot y). Ground to screen: `sx = OX + (x-y)*0.7071*S`, `sy = OY - (x+y)*0.3536*S`
   (constants in `farmGeometry.ts`). The scene fills the whole window (`PixelModal flush`): the pen is drawn at the biggest whole-pixel zoom that fits (`penZoom`, 1-4x),
   the meadow props and grass fill the rest. Animals wander, flip by screen direction, one sprite per animal owned up to 6; hovering one (or clicking to pin it) freezes its kind and hangs
   a **buy card** (owned/limit, yield, Buy / x10 / Max) above it; unowned = pale silhouette with price tag. A stats readout sits top-left, the upgrade shelf along the bottom (collapsible).

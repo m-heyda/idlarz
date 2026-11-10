@@ -1,36 +1,26 @@
 /* Farm mini-game: one seamless scene. The meadow fills the whole window; a stats readout (top-left), the animal shop (right)
-   and the upgrade drawer (bottom, beside the shop) are cells of one grid laid over it. The drawer slides up over the meadow. */
+   and the upgrade drawer (bottom, the full window width) are cells of one grid laid over it. The shop ends where the drawer starts. */
 
 .farm-root {
 	position: absolute;
 	inset: 0;
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;
-	grid-template-rows: minmax(0, 1fr);
-	overflow: hidden; /* the closed upgrade drawer waits just below the window edge */
+	grid-template-rows: minmax(0, 1fr) auto;
+	overflow: hidden;
 }
 
-/* --- the meadow around the pen: plains grass, vignette, a drifting cloud shadow --- */
+/* --- the meadow around the pen: the pen art's own grass (farm_meadow.png, a seamless tile at the pen's pixel zoom --z), so the pen sits in endless grass at any window size, plus a drifting cloud shadow --- */
 .farm-stage {
-	grid-area: 1 / 1 / 2 / 3;
+	grid-area: 1 / 1 / 3 / 3;
 	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
-	background: #3a6030 url('/pixel/bg/ground_plains.png') 0 0 / 192px 192px repeat;
-	background-blend-mode: multiply;
+	background: #c0f090 url('/pixel/bg/farm_meadow.png') center / calc(96px * var(--z, 3)) calc(96px * var(--z, 3)) repeat;
 	image-rendering: pixelated;
 	cursor: default;
-}
-
-/* a soft shade towards the edges only, so the meadow reads as filling the whole window */
-.farm-stage::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	background: radial-gradient(ellipse at center, rgba(10, 24, 8, 0) 62%, rgba(6, 12, 6, 0.5) 100%);
 }
 
 .farm-cloud {
@@ -58,15 +48,12 @@
 	flex-shrink: 0;
 }
 
-.farm-layer {
+.farm-prop {
 	position: absolute;
-	left: 0;
-	top: 0;
+	max-width: none;
 	pointer-events: none;
-}
-
-.farm-front {
-	z-index: 400;
+	user-select: none;
+	image-rendering: pixelated;
 }
 
 /* --- animals: positioned by the scene loop (translate), flipped by data-dir --- */
@@ -434,10 +421,9 @@
 	color: #e0c050;
 }
 
-/* --- upgrade drawer (bottom): slides up over the scene on a blurred backdrop; its column ends where the animal shop starts --- */
+/* --- upgrade drawer (bottom): the full window width on a blurred backdrop, under the animal shop; closed it is just its tab (26px + the 10px margin = UPGRADE_TAB_H in farmGeometry.ts) --- */
 .farm-dock {
-	grid-area: 1 / 1;
-	align-self: end;
+	grid-area: 2 / 1 / 3 / 3;
 	position: relative;
 	margin: 0 12px 10px;
 	z-index: 710;
@@ -446,12 +432,6 @@
 	align-items: center;
 	gap: 4px;
 	pointer-events: none;
-	transition: transform 0.28s cubic-bezier(0.22, 0.8, 0.3, 1);
-}
-
-/* closed: everything but the tab (26px + the 10px margin = UPGRADE_TAB_H in farmGeometry.ts) slides below the window edge */
-.farm-dock[data-open='false'] {
-	transform: translateY(calc(100% - 26px));
 }
 
 .farm-dock > * {
@@ -460,8 +440,7 @@
 
 .farm-drawer {
 	width: 100%;
-	min-height: min(170px, 34vh); /* roomy: a second row of upgrades fits without the drawer growing */
-	max-height: min(300px, 48vh);
+	max-height: min(300px, 48vh); /* a narrow window wraps the cards onto more rows, then scrolls */
 	overflow-x: hidden;
 	overflow-y: auto;
 	scrollbar-width: thin;
@@ -472,16 +451,23 @@
 	border: 4px solid transparent;
 	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
 	image-rendering: pixelated;
-	/* cards wrap onto further rows by themselves as upgrades are added */
+	/* auto-fit: the cards share the whole width (no empty tracks), and wrap onto further rows when the window is narrow */
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
 	align-content: start;
 	gap: 8px;
+	animation: farm-drawer-in 0.22s ease-out;
 }
 
 .farm-dock[data-open='false'] .farm-drawer {
-	visibility: hidden;
-	transition: visibility 0s 0.28s;
+	display: none;
+}
+
+@keyframes farm-drawer-in {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
 }
 
 .farm-dock-toggle {
@@ -537,4 +523,9 @@
 .farm-up-effect {
 	min-height: 2.4em;
 	line-height: 1.2;
+}
+
+/* the buy button sits at the bottom of every card, so the cards of one row line up whatever their text length */
+.farm-up > :last-child {
+	margin-top: auto;
 }

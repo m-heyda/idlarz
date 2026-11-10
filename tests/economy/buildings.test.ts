@@ -179,7 +179,14 @@ test('build: refused when it cannot be paid', () => {
 });
 
 test('a Producer adds its output to the income (once the flag is on) and the flag-off income ignores it', () => {
-	const [a] = gameWith('forest', 3);
+	const spots = gameWith('forest', 3);
+	const [a] = spots;
+	// the world is random: any other forest among the ten tiles would make the base income so big that a Producer cannot double it. Make every other tile plains.
+	for (let y = CASTLE_Y - 6; y <= CASTLE_Y + 6; y++)
+		for (let x = CASTLE_X - 6; x <= CASTLE_X + 6; x++) {
+			const t = tileAt(api().tiles, x, y);
+			if (t.isOwned && t.biome !== 'castle' && !spots.some((p) => p.x === x && p.y === y)) patchTileAt(x, y, { biome: 'plains' });
+		}
 	const rates = () => calculateResourceRates(api().tiles, api().characterStats, api().farmLevels, api().prestige).total.wood;
 	const off = rates();
 	withBuildings(() => {
