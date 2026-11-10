@@ -587,6 +587,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`docs-reference.ts`](../../scripts/docs-reference.ts) — Builds docs/reference from the JSDoc in the code (the single source of truth for how the game works).
 - [`fight-sim.ts`](../../scripts/fight-sim.ts) — Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
+- [`gen-inputs.ts`](../../scripts/gen-inputs.ts) — ~ The scripts named by `tsx scripts/<file>.ts` in the `docs:gen:*` entries of package.json, following `npm run <name>` one level (so the groups and a new generator are found without a list here).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 
 **scripts/lib/**
@@ -609,6 +610,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
 - [`spawnMix.ts`](../../scripts/spawnMix.ts) — What a hero of a given level meets on a castle level 1 map that owns all four biomes: the share of new spawns by the hero's chance to beat them,
 - [`stat-audit.ts`](../../scripts/stat-audit.ts) — Writes docs/generated/stat-audit.md:
+- [`verify.ts`](../../scripts/verify.ts) — ~ The marker file that says "this exact tree passed":
 
 ## e2e/
 
@@ -742,6 +744,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`serverSpawns.test.ts`](../../tests/monsters/serverSpawns.test.ts)
 - [`spawnLimits.test.ts`](../../tests/monsters/spawnLimits.test.ts)
 - [`spawnPlacement.test.ts`](../../tests/monsters/spawnPlacement.test.ts)
+
+**tests/ops/**
+
+- [`genInputs.test.ts`](../../tests/ops/genInputs.test.ts)
 
 **tests/saves/**
 

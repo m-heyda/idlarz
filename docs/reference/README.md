@@ -54,7 +54,7 @@ when the code changes, change the block in the same edit. `tests/docs/reference.
 - [Saves & Server](saves-and-server.md) (30): The save, cloud-save checks, the ledger, sealed rolls, away time and the threat model.
 - [Architecture](architecture.md) (13): Stack, state, the tick loop, the map, rendering and the art pipeline.
 - [Pacing](pacing.md) (5): The pace the economy is tuned for, and the bot simulation that checks it.
-- [Ops](ops.md) (5): Commands, CI, the pacing guard, season resets and the E2E test account.
+- [Ops](ops.md) (7): Commands, CI, the pacing guard, season resets and the E2E test account.
 - [Known issues](known-issues.md): open code-side findings
 - [Symbol index](symbols.md): function → file and line
 - [Code map](code-map.md): every source file
