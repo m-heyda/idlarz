@@ -6,7 +6,7 @@ import type { BiomeType } from '@/types/game';
  *
  * This is a roster, not a balance sheet. It carries no stats, rewards or loot. A monster spawns when it has an entry in `MONSTERS`
  * (config/combatConfig.ts) under the same id (`enabled` follows that), which is where stats, spawn window and loot go. The rats are gone:
- * the seven home biomes (plains, forest, hills, coast, swamp, lake, tundra) have their three monsters and a boss; the rest is art waiting for its turn (docs/plan/20-monster-families-and-rewards.md). On-map size of the art: `config/monsterArtSize.ts` (tuned in /map-lab, used by `MonsterSprite` for real game monsters too).
+ * the seven home biomes (plains, forest, hills, coast, swamp, lake, tundra) and the jungle have their three monsters and a boss; the rest is art waiting for its turn (docs/plan/20-monster-families-and-rewards.md). On-map size of the art: `config/monsterArtSize.ts` (tuned in /map-lab, used by `MonsterSprite` for real game monsters too).
  */
 
 /** Biomes planned in docs/plan/12-rebirth-biomes.md that are not in `BIOMES` yet (unlocked by rebirth). */
@@ -42,7 +42,11 @@ export const monsterSpriteUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes
 	entry.art ? monsterArtUrl(entry) : (entry.placeholder ?? monsterArtUrl(entry));
 
 /** The stand-in pictures, one per family (`public/pixel/enemies/placeholder/`): a plain tinted silhouette until the real sprite is made */
-const PLACEHOLDER = { hills: '/pixel/enemies/placeholder/hills.png', lake: '/pixel/enemies/placeholder/lake.png' } as const;
+const PLACEHOLDER = {
+	hills: '/pixel/enemies/placeholder/hills.png',
+	lake: '/pixel/enemies/placeholder/lake.png',
+	jungle: '/pixel/enemies/placeholder/jungle.png',
+} as const;
 
 const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): MonsterCatalogEntry => ({
 	id,
@@ -100,11 +104,11 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 	normal('pikeLurker', 'Pike Lurker', 'lake', false, PLACEHOLDER.lake),
 	boss('bossLakeHydra', 'The Lake Hydra', 'lake', true),
 
-	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the biomes themselves are not built yet
-	normal('shadowJaguar', 'Shadow Jaguar', 'jungle', false),
-	normal('orchidSpider', 'Orchid Spider', 'jungle', false),
-	normal('poisonToad', 'Poison Toad', 'jungle', false),
-	boss('bossHardwoodColossus', 'The Hardwood Colossus', 'jungle', false),
+	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the jungle roster is live (rebirth 1), the other four wait. The jungle monsters take the names of the supplied sprites (owner decision 2026-11-10)
+	normal('skullVine', 'Skull Vine', 'jungle', true),
+	normal('eyeHorror', 'Eye Horror', 'jungle', true),
+	normal('zombieTriceratops', 'Zombie Triceratops', 'jungle', true),
+	boss('bossHardwoodColossus', 'The Hardwood Colossus', 'jungle', false, PLACEHOLDER.jungle),
 
 	normal('murderCrow', 'Murder Crow', 'fields', false),
 	normal('livingScarecrow', 'Living Scarecrow', 'fields', false),
