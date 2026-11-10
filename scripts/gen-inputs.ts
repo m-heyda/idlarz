@@ -3,12 +3,13 @@
  *
  * `npm run docs:gen` (the sim, the balance tables, the fight and loot reports ...) is deterministic and slow. Instead of repeating it on every pull request, `docs:gen` ends by writing
  * `docs/generated/inputs.sha256`: a SHA-256 over **every file the generators import** (found with esbuild from the entry scripts named in the `docs:gen:*` scripts of `package.json`, so a new
- * generator or a new import is picked up by itself) and over `package-lock.json`. Line endings are normalised, so Windows and Linux agree. If any of those files changes, the hash changes and
- * the committed docs are stale until `npm run docs:gen` has run again; the CI job `generated` recomputes the hash (seconds) and fails on a mismatch. The full regeneration still runs in CI on
- * every push to `main`, every night and on a PR labelled `verify-generated`, so a hash written without really regenerating is found within a day.
+ * generator or a new import is picked up by itself) and over `package-lock.json`. Line endings are normalised, so Windows and Linux agree. If any of those files changes, the hash changes:
+ * the committed docs may be stale. The CI job `hash` recomputes it (seconds): **fresh** means `docs/generated` was written for exactly these sources, so CI skips the sims; **stale** (a PR that did not run
+ * `npm run docs:gen`, or `main` moved under it) means CI runs the full regeneration, as it always did, and fails if the committed files differ. So the hash is only a shortcut, never a reason to fail. The full
+ * regeneration also runs on every push to `main`, every night and on a PR labelled `verify-generated`, so a hash written without really regenerating is found within a day.
  *
  *   npx tsx scripts/gen-inputs.ts            print the current hash and whether the committed one matches (exit 0)
- *   npx tsx scripts/gen-inputs.ts --check    exit 1 when the committed hash is stale (what CI runs)
+ *   npx tsx scripts/gen-inputs.ts --check    exit 1 when the committed hash is stale (the CI job `hash` runs it and picks fast or full by the result)
  *   npx tsx scripts/gen-inputs.ts --write    write docs/generated/inputs.sha256 (the last step of `npm run docs:gen`)
  *   npx tsx scripts/gen-inputs.ts --list     print the files that count
  *
@@ -103,7 +104,7 @@ const main = async () => {
 	);
 	if (args.includes('--check') && !fresh) {
 		console.error(
-			`::error::docs/generated is stale: a file the generators read has changed since the last \`npm run docs:gen\`. Run \`npm run docs:gen\` (or \`npm run verify\`) and commit the result.`,
+			'gen-inputs: a file the generators read has changed since the last `npm run docs:gen`: the committed docs/generated may be stale (run `npm run verify`).',
 		);
 		process.exit(1);
 	}

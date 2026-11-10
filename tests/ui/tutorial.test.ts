@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { INTRO_ID, TUTORIAL_LESSONS, TUTORIAL_PATH, type TutorialFacts } from '../../src/catalog/tutorial';
-import { emptyProgress, journalEntries, lessonBeat, newlyDone, nextBeat, withDone, withLesson, withSkip } from '../../src/lib/tutorial/engine';
+import { TYPE_CPS, glyphs, mouthOpen, visibleLength } from '../../src/lib/tutorial/typewriter';
+import { guideLiveFor, guideVisibleFor } from '../../src/lib/tutorial/live';
+import { emptyProgress, journalEntries, mergeProgress, lessonBeat, newlyDone, nextBeat, withDone, withLesson, withSkip } from '../../src/lib/tutorial/engine';
 import { clipPathFor, holesFor, padRect, pointInHoles, sameRects, selectorFor, CUTOUT_PAD, MAX_HOLES } from '../../src/lib/tutorial/geometry';
 import { buildNumbers, spoken } from '../../src/lib/tutorial/numbers';
 import { emptyCounters, factsFromGame, pointsSpentOf, withSeen } from '../../src/lib/tutorial/facts';
@@ -228,4 +230,77 @@ test('resources count as seen once above zero and stay seen', () => {
 	const more = withSeen(seen, { resources: { ...s.resources, coal: 5 }, resourceRates: s.resourceRates });
 	assert.equal(more.coal, true);
 	assert.equal(withSeen(more, s).coal, true, 'sticky');
+});
+
+// ---- a brand-new game
+
+test('a brand-new game gets the intro first, then the first strict step on the map', () => {
+	api().resetGame();
+	const facts = factsFromGame(api(), emptyCounters(), []);
+	const first = nextBeat(facts, emptyProgress());
+	assert.equal(first?.kind, 'intro');
+	assert.equal(first?.focus, 'strict');
+	const afterIntro = nextBeat(facts, withDone(emptyProgress(), INTRO_ID));
+	assert.equal(afterIntro?.id, 'click-gold');
+	assert.equal(afterIntro?.target, 'map');
+	assert.equal(afterIntro?.focus, 'strict');
+	assert.deepEqual(newlyDone(facts, emptyProgress()), [], 'nothing counts as done on a fresh game');
+});
+
+test('the intro does not wait for a cloud save: a brand-new account answers no_save and the guide still starts', async () => {
+	const { useTutorialStore } = await import('../../src/stores/tutorialStore');
+	const real = globalThis.fetch;
+	globalThis.fetch = (async () => new Response('{}', { status: 404 })) as typeof fetch;
+	try {
+		useTutorialStore.getState().reset();
+		await useTutorialStore.getState().load();
+		assert.equal(useTutorialStore.getState().loaded, true);
+		assert.deepEqual(useTutorialStore.getState().progress, emptyProgress());
+	} finally {
+		globalThis.fetch = real;
+		useTutorialStore.getState().reset();
+	}
+});
+
+test('a server answer never erases what the browser has recorded since it asked', () => {
+	const merged = mergeProgress({ done: ['intro', 'click-gold'], lessons: ['res-wood'], skipped: false }, { done: ['intro'], lessons: [], skipped: true });
+	assert.deepEqual(merged, { done: ['intro', 'click-gold'], lessons: ['res-wood'], skipped: true });
+});
+
+// ---- where the guide is shown
+
+test('the guide is shown on localhost and previews, and on production only after the flip', () => {
+	const prod = { epoch: 1, nodeEnv: 'production', vercelEnv: 'production' };
+	assert.equal(guideVisibleFor(prod), false, 'the production site before the flip');
+	assert.equal(guideVisibleFor({ epoch: 1, nodeEnv: 'production', vercelEnv: '' }), false, 'a self-hosted production build');
+	assert.equal(guideVisibleFor({ epoch: 1, nodeEnv: 'development' }), true, 'next dev');
+	assert.equal(guideVisibleFor({ epoch: 1, nodeEnv: 'production', vercelEnv: 'preview' }), true, 'a Vercel preview');
+	assert.equal(guideVisibleFor({ ...prod, epoch: 2 }), true, 'after the flip');
+	assert.equal(guideVisibleFor({ ...prod, flag: 'on' }), true, 'forced on');
+	// the new-chapter economy (bundles, achievements) never follows the environment
+	assert.equal(guideLiveFor({ epoch: 1, nodeEnv: 'development', vercelEnv: 'preview' }), false);
+	assert.equal(guideLiveFor({ ...prod, flag: 'on' }), true);
+});
+
+// ---- the typewriter
+
+test('the text types at about 30 characters a second and never past its end', () => {
+	assert.ok(TYPE_CPS >= 25 && TYPE_CPS <= 35);
+	assert.equal(visibleLength(100, 0), 0);
+	assert.equal(visibleLength(100, 1000), TYPE_CPS);
+	assert.equal(visibleLength(100, 500), Math.floor(TYPE_CPS / 2));
+	assert.equal(visibleLength(10, 60_000), 10);
+	assert.equal(visibleLength(10, -5), 0);
+	assert.deepEqual(glyphs('a\u00e9\u{1F600}'), ['a', '\u00e9', '\u{1F600}']);
+});
+
+test('the mouth opens and closes while typing, rests on spaces and stops shut when the text is complete', () => {
+	const text = 'Hello there. Welcome';
+	assert.equal(mouthOpen(text, 0), false);
+	const opens = Array.from({ length: text.length }, (_, i) => mouthOpen(text, i + 1));
+	assert.ok(opens.some(Boolean) && opens.some((v) => !v), 'it alternates');
+	assert.equal(mouthOpen(text, 6), false, 'the space');
+	assert.equal(mouthOpen(text, 12), false, 'the full stop');
+	assert.equal(mouthOpen(text, glyphs(text).length), false, 'complete');
+	assert.equal(mouthOpen(text, glyphs(text).length + 5), false);
 });

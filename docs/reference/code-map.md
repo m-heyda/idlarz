@@ -269,7 +269,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/tutorial/**
 
 - [`FocusLayer.tsx`](../../src/components/game/tutorial/FocusLayer.tsx) — ~ Measures every element that carries `data-tutorial="<target>"` on every animation frame; the state changes only when something moved.
-- [`GuideBubble.tsx`](../../src/components/game/tutorial/GuideBubble.tsx) — ~ "2 / 3" under the text (the intro's pages)
+- [`GuideBubble.tsx`](../../src/components/game/tutorial/GuideBubble.tsx) — ~ The text of a bubble typed out letter by letter.
 - [`TutorialGuide.tsx`](../../src/components/game/tutorial/TutorialGuide.tsx) — ~ Brother Alder, the tutorial guide.
 
 **src/components/landing/**
@@ -278,6 +278,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/config/**
 
+- [`biomeArt.ts`](../../src/config/biomeArt.ts) — ~ The picture of each rebirth biome:
 - [`biomePalette.ts`](../../src/config/biomePalette.ts) — One colour per biome, the single place for them:
 - [`biomeRules.ts`](../../src/config/biomeRules.ts) — How the map grows:
 - [`biomeStage.ts`](../../src/config/biomeStage.ts) — Which biomes are part of the game today and which exist only for development (the map lab).
@@ -351,6 +352,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`netWorth.ts`](../../src/lib/cloudSave/netWorth.ts) — ~ The spending check:
 - [`pipeline.ts`](../../src/lib/cloudSave/pipeline.ts) — ~ Accepted saves are copied into the history when this long passed since the last copy (not every N revisions:
 - [`rebirthHistory.ts`](../../src/lib/cloudSave/rebirthHistory.ts) — ~ One rebirth, as the Rebirths tab lists it.
+- [`restoreTrust.ts`](../../src/lib/cloudSave/restoreTrust.ts) — ~ What `restoreTrust` did.
 - [`serverRebirth.ts`](../../src/lib/cloudSave/serverRebirth.ts) — ~ The server's own reading of "may this account rebirth, and what does it pay" (IDL-102), from the last STORED save (never from numbers the browser sends with the request):
 - [`summary.ts`](../../src/lib/cloudSave/summary.ts) — ~ What the server derives from a save by itself (never from numbers the client sends):
 - [`supabaseRepo.ts`](../../src/lib/cloudSave/supabaseRepo.ts) — ~ Null until the row's first save under the offline ledger; `DEFAULT_DERIVED` fills it
@@ -481,9 +483,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`engine.ts`](../../src/lib/tutorial/engine.ts) — ~ Per account, stored in the ledger's `stats.tutorial`.
 - [`facts.ts`](../../src/lib/tutorial/facts.ts) — ~ What the guide counts itself (events the state does not keep):
 - [`geometry.ts`](../../src/lib/tutorial/geometry.ts) — The focus layer's maths, pure: a dim over the whole screen with transparent cut-outs around the target element(s). The layer is one full-screen
-- [`live.ts`](../../src/lib/tutorial/live.ts) — ~ Whether Brother Alder is on at all.
+- [`live.ts`](../../src/lib/tutorial/live.ts) — ~ The build's environment, read once (`process.env.X` is written out literally so Next inlines it into the browser bundle).
 - [`numbers.ts`](../../src/lib/tutorial/numbers.ts) — ~ "30 minutes", "2 hours", "1.5 days":
 - [`progress.ts`](../../src/lib/tutorial/progress.ts) — ~ Reads the stored `stats.tutorial` (or an answer from the server) back:
+- [`typewriter.ts`](../../src/lib/tutorial/typewriter.ts) — Characters per second the bubble types at (the owner's 25 to 35)
 
 **src/lib/**
 
@@ -588,6 +591,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`docs-reference.ts`](../../scripts/docs-reference.ts) — Builds docs/reference from the JSDoc in the code (the single source of truth for how the game works).
 - [`fight-sim.ts`](../../scripts/fight-sim.ts) — Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
 - [`gen-inputs.ts`](../../scripts/gen-inputs.ts) — ~ The scripts named by `tsx scripts/<file>.ts` in the `docs:gen:*` entries of package.json, following `npm run <name>` one level (so the groups and a new generator are found without a list here).
+- [`guide-sprite.ts`](../../scripts/guide-sprite.ts) — Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 
 **scripts/lib/**
@@ -605,6 +609,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`perk-caps.ts`](../../scripts/perk-caps.ts) — Perk family cap sim (IDL-149): how the gear bucket of each family behaves against the set bonuses and a top legendary, for several cap candidates.
 - [`reset-players.ts`](../../scripts/reset-players.ts) — Season restart:
 - [`reset-test-account.ts`](../../scripts/reset-test-account.ts) — Clears the game data of the ONE account the end-to-end tests use (docs/reference/ops.md), so a test run starts from a new game.
+- [`restore-trust.ts`](../../scripts/restore-trust.ts)
 - [`sim-classes.ts`](../../scripts/sim-classes.ts) — ~ Runs one sim (`--dump`:
 - [`sim-parallel.ts`](../../scripts/sim-parallel.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
@@ -776,6 +781,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.
 - [`offlineServer.test.ts`](../../tests/server/offlineServer.test.ts)
+- [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)
 - [`serverRebirth.test.ts`](../../tests/server/serverRebirth.test.ts) — IDL-102: the server runs the rebirth. POST /api/rebirth judges the last stored save, computes the Embers, wipes the server's bag and gear once,
@@ -789,7 +795,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
+- [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)

@@ -94,6 +94,8 @@ export interface IntroPage {
 export const GUIDE_NAME = 'Brother Alder';
 export const GUIDE_SPRITE = '/pixel/reuse/misc/sprite-fusion-374f7430-0e77-437e-8e6a-a0f4c6ac3332.png';
 export const GUIDE_SPRITE_PX = 67;
+/** Two frames side by side (closed mouth | open mouth), drawn from `GUIDE_SPRITE` by `scripts/guide-sprite.ts`; the bubble alternates them while the text is typed. */
+export const GUIDE_TALK_SHEET = '/pixel/guide/alder_talk.png';
 
 /** Shown dimmed, on the first start of a chapter. Recorded in the progress as `INTRO_ID`. */
 export const INTRO_ID = 'intro';
@@ -113,7 +115,7 @@ export const STARTER_REWARDS = {
 const isOpen = (facts: TutorialFacts, id: string) => facts.open.includes(id);
 
 /**
- * The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It ships dark: nothing is shown until `GAME_EPOCH` is raised (the new chapter release), or on a build with `NEXT_PUBLIC_GUIDE=on` ({@link guideLive}).
+ * The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ({@link guideVisibleFor}).
  *
  * - **Intro**: on the first start of a chapter the screen dims and Alder speaks three short bubbles. **Starter path**: eight steps in the order of {@link TUTORIAL_PATH}. The first step that is *ready* and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. **Milestone lessons** (`TUTORIAL_LESSONS`) fire the first time something is reached, in any order, after the path; each is kept in the Guide's journal tab (locked ones read '???').
  * - **Focus**: `strict` dims and blurs the whole game with a cut-out around the `data-tutorial` target and blocks every click outside it (the intro and the first two steps); `soft` only dims. A target that is not on screen shows the bubble alone and never blocks the game. **Skip** is on every bubble and ends the starter path (lessons still come); the guide can be switched off in Settings.
@@ -126,7 +128,7 @@ const isOpen = (facts: TutorialFacts, id: string) => facts.open.includes(id);
  * @order 0
  * @table tutorial-path
  * @table tutorial-lessons
- * @see applyTutorial, buildNumbers, guideLive
+ * @see applyTutorial, buildNumbers, guideVisibleFor
  */
 export const TUTORIAL_PATH: readonly PathStep[] = [
 	{

@@ -18,14 +18,18 @@ concurrency:
 permissions:
   contents: read
 
-# What runs where (the slow work is done on your machine by `npm run verify`, see scripts/verify.ts, and CI checks that it was done):
+# What runs where. The slow work (the sims and reports behind docs/generated) is done on your machine by `npm run verify` (scripts/verify.ts, also the pre-push hook), which writes
+# docs/generated/inputs.sha256: a hash of every file the generators read (scripts/gen-inputs.ts). CI uses it as a shortcut:
 #
-#   every PR     lint (format, types, eslint), unit (tests) and build run side by side; `check` (the required check) waits for the three.
-#                `generated` (required) recomputes the inputs hash of the generators (scripts/gen-inputs.ts: seconds) and fails when a file they read changed since the committed
-#                docs/generated was written, then runs the pacing guard on the committed sim baseline against the one on the base branch.
-#   main, nightly, a PR labelled `verify-generated`, a manual run
-#                the full regeneration: `generate` shards the sims and reports (the slowest shard sets the time), `generated-full` merges them and fails when the committed
-#                docs/generated differs from what was just generated. This is the net under the hash: it finds a hash written without really regenerating.
+#   lint, unit, build    run side by side on every PR and push; `check` (the required check) is green when all three are.
+#   hash                 recomputes the inputs hash (seconds). Fresh = docs/generated was written for exactly these sources.
+#   generate             the full regeneration, sharded (the slowest shard sets the time). It runs when the hash is NOT fresh (a PR that did not run docs:gen, or main moved under it:
+#                        then it is the proof as before), on every push to main, every night, on a manual run and on a PR labelled `verify-generated`.
+#   generated            (required) waits for the shards, puts them together, fails when the committed docs/generated differs from what was just generated, then runs the pacing
+#                        guard on the baseline against the base branch's. With a fresh hash and no shards it only runs the guard (about a minute in all).
+#
+# So a PR that only touches the UI or assets, or one whose author ran `npm run verify`, finishes in about the time of `check`. The full regeneration on main and nightly
+# is the net under the hash: it finds a hash that was written without really regenerating.
 
 jobs:
   lint:
@@ -90,11 +94,11 @@ jobs:
           echo "lint: ${{ needs.lint.result }}, unit: ${{ needs.unit.result }}, build: ${{ needs.build.result }}"
           [ "${{ needs.lint.result }}" = success ] && [ "${{ needs.unit.result }}" = success ] && [ "${{ needs.build.result }}" = success ]
 
-  # The fast `generated` check (the required one): is docs/generated the output of THESE sources? (hash, no sims) and the pacing guard on the committed baseline.
-  # A PR that changes what the generators read must have run `npm run docs:gen` (or `npm run verify`, which does it in parallel and writes the hash) and committed the result.
-  generated:
-    if: ${{ github.event_name != 'schedule' && github.event_name != 'push' }}
+  # Is docs/generated the output of THESE sources? (a hash, no sims)
+  hash:
     runs-on: ubuntu-latest
+    outputs:
+      fresh: ${{ steps.hash.outputs.fresh }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -104,34 +108,22 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: docs/generated was written for these sources
-        run: npx tsx scripts/gen-inputs.ts --check
-      - name: Pacing guard against the base branch
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_REF: ${{ github.base_ref }}
-          PACING_CHANGE: ${{ contains(github.event.pull_request.labels.*.name, 'pacing-change') }}
+      - name: Inputs hash of the generators
+        id: hash
         run: |
-          git fetch --depth=1 origin "$BASE_REF"
-          if ! git cat-file -e "origin/$BASE_REF:docs/generated/sim-baseline.json" 2>/dev/null; then
-            echo "::notice::$BASE_REF has no docs/generated/sim-baseline.json yet (this PR introduces it): nothing to compare against"
-            exit 0
-          fi
-          git show "origin/$BASE_REF:docs/generated/sim-baseline.json" > "$RUNNER_TEMP/base-baseline.json"
-          # the label excuses violations only (--allow-violations); an unreadable file or a crash still fails the job.
-          # Labels are read when the run starts: after adding `pacing-change`, push or reopen the PR (Re-run keeps the old labels).
-          if [ "$PACING_CHANGE" = true ]; then
-            npx tsx scripts/pacing-guard.ts --base="$RUNNER_TEMP/base-baseline.json" --allow-violations
+          if npx tsx scripts/gen-inputs.ts --check; then
+            echo "fresh=true" >> "$GITHUB_OUTPUT"
           else
-            npx tsx scripts/pacing-guard.ts --base="$RUNNER_TEMP/base-baseline.json"
+            echo "fresh=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::The inputs hash is stale (a file the generators read changed since the last npm run docs:gen, or main moved): running the full regeneration. Run npm run verify to avoid this next time."
           fi
 
   # The full regeneration (IDL-9, IDL-17). `npm run docs:gen` reruns every report, including the full sim, and the committed docs/generated must be exactly what it writes.
-  # Two jobs: `generate` is a matrix that runs in parallel (the slow sim profile hardcore-rebirth6-x10 alone, about 5 minutes; every other sim profile; the other generators
-  # in three groups) and uploads what each wrote; `generated-full` puts the shards together with `scripts/sim.ts --merge` (which fails if a profile is missing or twice) and
-  # compares. The wall time is about the slowest shard plus the install, not the sum.
+  # A matrix that runs in parallel (the slow sim profile hardcore-rebirth6-x10 alone, about 5 minutes; every other sim profile; the other generators in three groups); each shard uploads
+  # what it wrote and `generated` puts them together with `scripts/sim.ts --merge` (which fails if a profile is missing or twice). The wall time is about the slowest shard plus the install.
   generate:
-    if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'verify-generated') }}
+    needs: hash
+    if: ${{ needs.hash.outputs.fresh != 'true' || github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'verify-generated') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -173,16 +165,16 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
-  generated-full:
-    needs: generate
-    # a failed or cancelled shard fails it in the first step
-    if: ${{ !cancelled() && needs.generate.result != 'skipped' }}
+  generated:
+    needs: [hash, generate]
+    # runs on every event (and is green with a fresh hash and no shards); a failed or cancelled shard fails it in the first step
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
-      - name: A shard must not have failed
+      - name: A shard (or the hash job) must not have failed
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: |
-          echo '::error::a generate shard failed, see above'
+          echo '::error::a generate shard or the hash job failed, see above'
           exit 1
       - uses: actions/checkout@v4
         with:
@@ -193,10 +185,12 @@ jobs:
           cache: npm
       - run: npm ci
       - uses: actions/download-artifact@v4
+        if: needs.generate.result == 'success'
         with:
           pattern: shard-*
           path: shards
       - name: Put the shards together
+        if: needs.generate.result == 'success'
         run: |
           # the sim shards: one flat folder of dumps, merged into sim-milestones.md and sim-baseline.json
           mkdir sim-dumps
@@ -205,11 +199,13 @@ jobs:
           for t in shards/shard-docs-*/docs.tar; do tar -xf "$t"; done
           npx tsx scripts/sim.ts --merge=sim-dumps > /dev/null
       - name: Generated docs are up to date
+        if: needs.generate.result == 'success'
         run: |
           git add -N docs/generated
           git diff --exit-code docs/generated || { echo '::error::docs/generated is stale: run npm run docs:gen (or npm run verify) and commit the result'; exit 1; }
-      - name: The committed inputs hash matches the sources
-        run: npx tsx scripts/gen-inputs.ts --check
+          if [ "${{ needs.hash.outputs.fresh }}" != true ]; then
+            echo "::notice::The regenerated docs equal the committed ones, only the inputs hash is stale: run npm run docs:gen:hash and commit docs/generated/inputs.sha256 to get the fast path next time."
+          fi
       - name: Pacing guard against the base branch
         if: github.event_name == 'pull_request'
         env:
@@ -217,7 +213,13 @@ jobs:
           PACING_CHANGE: ${{ contains(github.event.pull_request.labels.*.name, 'pacing-change') }}
         run: |
           git fetch --depth=1 origin "$BASE_REF"
+          if ! git cat-file -e "origin/$BASE_REF:docs/generated/sim-baseline.json" 2>/dev/null; then
+            echo "::notice::$BASE_REF has no docs/generated/sim-baseline.json yet (this PR introduces it): nothing to compare against"
+            exit 0
+          fi
           git show "origin/$BASE_REF:docs/generated/sim-baseline.json" > "$RUNNER_TEMP/base-baseline.json"
+          # the label excuses violations only (--allow-violations); an unreadable file or a crash still fails the job.
+          # Labels are read when the run starts: after adding `pacing-change`, push or reopen the PR (Re-run keeps the old labels).
           if [ "$PACING_CHANGE" = true ]; then
             npx tsx scripts/pacing-guard.ts --base="$RUNNER_TEMP/base-baseline.json" --allow-violations
           else

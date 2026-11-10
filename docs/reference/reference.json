@@ -336,12 +336,12 @@
   "kind": "const",
   "category": "Progression/Guided tutorial",
   "file": "src/catalog/tutorial.ts",
-  "line": 131,
-  "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It ships dark: nothing is shown until `GAME_EPOCH` is raised (the new chapter release), or on a build with `NEXT_PUBLIC_GUIDE=on` ({@link guideLive}).",
+  "line": 133,
+  "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ({@link guideVisibleFor}).",
   "see": [
    "applyTutorial",
    "buildNumbers",
-   "guideLive"
+   "guideVisibleFor"
   ]
  },
  {
@@ -384,6 +384,17 @@
   "file": "src/components/game/tutorial/TutorialGuide.tsx",
   "line": 39,
   "summary": "Brother Alder, the tutorial guide. Mounted once in the game (GameApp). It counts the few events the state does not keep (map clicks, chests opened, fights won), evaluates the triggers twice a second (`lib/tutorial/engine.ts`), records finished steps and fired lessons on the account (the server may pay a starter bundle), and draws the bubble and the focus layer for the beat that is on show. Nothing is drawn while the guide is dark (`guideLive`), switched off in Settings, or before the account's progress has arrived; a target that is not on screen shows the bubble alone and never blocks the game.",
+  "see": []
+ },
+ {
+  "id": "biome-art",
+  "name": "BIOME_ART",
+  "symbol": "BIOME_ART",
+  "kind": "const",
+  "category": "Architecture/Art",
+  "file": "src/config/biomeArt.ts",
+  "line": 11,
+  "summary": "The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in `public/pixel/new_assets/biomes/`. Today only the \"New land unlocked\" window shows them (`RebirthUnlockModal`); the other vignettes of the folder (alternatives, the older biomes and three extras) wait in the asset library, category Biomes. The file name is `biome_<name>.png`; change the value here to use another one.",
   "see": []
  },
  {
@@ -1129,6 +1140,17 @@
   "see": []
  },
  {
+  "id": "restoretrust",
+  "name": "restoreTrust",
+  "symbol": "restoreTrust",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/restoreTrust.ts",
+  "line": 39,
+  "summary": "The way back for a false positive (IDL-209). A save that fires `castle_jump` or `networth_exceeds` is paid from the last trusted economy ({@link trustedEconomy}) and the account loses its ranking for good (`everFlagged`). Nothing in the save path ever lifts that, so an honest account hit by a clock jump or a bug in a build would stay frozen. This is the owner's tool for it: it takes the account's stored game as the new baseline.",
+  "see": []
+ },
+ {
   "id": "trustedeconomy",
   "name": "trustedEconomy",
   "symbol": "trustedEconomy",
@@ -1151,13 +1173,26 @@
   "see": []
  },
  {
+  "id": "turning-enforcement-and-the-server-run-rebirth-on-together",
+  "name": "Turning enforcement and the server-run rebirth on together",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "src/lib/cloudSave/verify.ts",
+  "line": 105,
+  "summary": "**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).** Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:",
+  "see": [
+   "ENFORCEMENT",
+   "restoreTrust"
+  ]
+ },
+ {
   "id": "enforcement",
   "name": "ENFORCEMENT",
   "symbol": "ENFORCEMENT",
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 113,
+  "line": 130,
   "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
   "see": []
  },
@@ -1168,7 +1203,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 128,
+  "line": 145,
   "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
   "see": []
  },
@@ -1179,7 +1214,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 176,
+  "line": 193,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },
@@ -2229,14 +2264,14 @@
   "see": []
  },
  {
-  "id": "guidelive",
-  "name": "guideLive",
-  "symbol": "guideLive",
+  "id": "guidevisiblefor",
+  "name": "guideVisibleFor",
+  "symbol": "guideVisibleFor",
   "kind": "function",
   "category": "Progression/Guided tutorial",
   "file": "src/lib/tutorial/live.ts",
-  "line": 10,
-  "summary": "Whether Brother Alder is on at all. The tutorial ships dark with the new chapter: until `GAME_EPOCH` is raised (the release flip, IDL-253) nobody sees it, so accounts that are playing the old chapter get no bubbles. To try it on a build before the flip, set `NEXT_PUBLIC_GUIDE=on`.",
+  "line": 35,
+  "summary": "Whether Brother Alder is **shown** (the bubbles, the focus layer, the journal tab). That is `guideLiveFor`, and also every build that is not the production site: localhost (`next dev`, `NODE_ENV` is not 'production') and Vercel previews (`NEXT_PUBLIC_VERCEL_ENV` is 'preview' or 'development'), so the tutorial can be tried without touching `GAME_EPOCH`. The production deployment shows it only after the flip. `NEXT_PUBLIC_GUIDE=on` forces it on anywhere (set it in `.env.local` or the host's environment); `NEXT_PUBLIC_GUIDE=off` is not special.",
   "see": []
  },
  {
@@ -2644,7 +2679,7 @@
   "category": "Ops/Operator guides",
   "file": "scripts/check-live-saves.ts",
   "line": 1,
-  "summary": "Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT` would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.",
+  "summary": "Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT` would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. A last section is the new chapter dry run (IDL-254 item 2): accounts the flip would reset (and how many hold a save), name collisions with the forced renames they mean, and whether `player_ledger.stats` / `legacy` exist and how many rows are still null. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.",
   "see": []
  },
  {
@@ -2687,6 +2722,18 @@
   "summary": "Season restart: `npm run reset-players` gives every player a fresh game while keeping who they are. It talks to Supabase with the service role, so it is run by hand from a trusted machine, never from the app. The usage and flags are in the header of the script. Needs `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (environment or `.env.local`); they decide which project is wiped: check them first, and try one account with `--user` before running it for everyone.",
   "see": [
    "ensureSeasonReset"
+  ]
+ },
+ {
+  "id": "giving-a-flagged-account-its-trust-back-restore-trust",
+  "name": "Giving a flagged account its trust back (restore-trust)",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "scripts/restore-trust.ts",
+  "line": 1,
+  "summary": "The way back for a false-positive flag (IDL-209): `npm run restore-trust -- --user <uuid>` is a DRY RUN that shows what the account's save carries; add `--yes` to really give the account its trust back ({@link restoreTrust}: flags cleared, ranking eligibility back, the income paid from the stored game's own rates again). The save it replaces is pinned in `save_history` first, and one JSON audit line is printed (`event: 'trust_restored'`); keep it with the ticket. Running it twice is safe (the second run says `already_trusted`).",
+  "see": [
+   "restoreTrust"
   ]
  },
  {

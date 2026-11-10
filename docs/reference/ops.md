@@ -8,7 +8,7 @@ Commands, CI, the pacing guard, season resets and the E2E test account.
 
 - Commands: [Commands and documentation generation](#commands-and-documentation-generation)
 - CI: [The pacing guard and CI sharding](#the-pacing-guard-and-ci-sharding), [The generated-docs inputs hash](#the-generated-docs-inputs-hash), [The local verify script and the pre-push hook](#the-local-verify-script-and-the-pre-push-hook)
-- Operator guides: [Season restart (reset-players)](#season-restart-reset-players), [Checking live saves before a release](#checking-live-saves-before-a-release), [The end-to-end test account](#test-account-email)
+- Operator guides: [Season restart (reset-players)](#season-restart-reset-players), [Checking live saves before a release](#checking-live-saves-before-a-release), [Giving a flagged account its trust back (restore-trust)](#giving-a-flagged-account-its-trust-back-restore-trust), [The end-to-end test account](#test-account-email), [Turning enforcement and the server-run rebirth on together](#turning-enforcement-and-the-server-run-rebirth-on-together)
 
 ## Commands
 
@@ -45,6 +45,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run stat-audit` | `tsx scripts/stat-audit.ts` |
 | `npm run reset-players` | `tsx scripts/reset-players.ts` |
 | `npm run check-live-saves` | `tsx scripts/check-live-saves.ts` |
+| `npm run restore-trust` | `tsx scripts/restore-trust.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
 | `npm run perk-caps` | `tsx scripts/perk-caps.ts` |
 | `npm run monster-ladder` | `tsx scripts/monster-ladder.ts` |
@@ -87,7 +88,7 @@ The pacing guard, and how CI generates the docs.
 Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label is read when a run starts,
 so after adding it **push a commit or close and reopen the PR** ("Re-run jobs" keeps the labels of the old run).
 
-**Where the work runs.** The slow part (the sims and reports behind `docs/generated`) is done on your machine: `npm run verify` (also run by the `pre-push` hook) regenerates it in parallel on all cores when a file the generators read has changed, and writes `docs/generated/inputs.sha256` (`scripts/gen-inputs.ts`). On a pull request the job `generated` only recomputes that hash (seconds) and runs this guard on the committed baseline against the base branch's. The full regeneration, sharded as before (`sim-x10` alone, `sim-rest`, and `docs:gen:rest:quick|fights|loot`, merged by `generated-full`; a profile in two shards or in none fails the merge), runs on every push to `main`, every night and on a PR labelled `verify-generated`, so a hash written without really regenerating is found within a day.
+**Where the work runs.** The slow part (the sims and reports behind `docs/generated`) is done on your machine: `npm run verify` (also run by the `pre-push` hook) regenerates it in parallel on all cores when a file the generators read has changed, and writes `docs/generated/inputs.sha256` (`scripts/gen-inputs.ts`). In CI the job `hash` recomputes that hash (seconds). With a fresh hash the sims are skipped and the job `generated` only runs this guard on the committed baseline against the base branch's. With a stale hash (a PR that did not regenerate, or `main` moved) and always on a push to `main`, every night and on a PR labelled `verify-generated`, the full regeneration runs, sharded (`sim-x10` alone, `sim-rest`, and `docs:gen:rest:quick|fights|loot`; `generated` merges them, a profile in two shards or in none fails the merge, and the committed files must equal the result).
 
 <a id="the-generated-docs-inputs-hash"></a>
 
@@ -99,12 +100,13 @@ The inputs hash of the generated docs: what lets CI trust `docs/generated` witho
 
 `npm run docs:gen` (the sim, the balance tables, the fight and loot reports ...) is deterministic and slow. Instead of repeating it on every pull request, `docs:gen` ends by writing
 `docs/generated/inputs.sha256`: a SHA-256 over **every file the generators import** (found with esbuild from the entry scripts named in the `docs:gen:*` scripts of `package.json`, so a new
-generator or a new import is picked up by itself) and over `package-lock.json`. Line endings are normalised, so Windows and Linux agree. If any of those files changes, the hash changes and
-the committed docs are stale until `npm run docs:gen` has run again; the CI job `generated` recomputes the hash (seconds) and fails on a mismatch. The full regeneration still runs in CI on
-every push to `main`, every night and on a PR labelled `verify-generated`, so a hash written without really regenerating is found within a day.
+generator or a new import is picked up by itself) and over `package-lock.json`. Line endings are normalised, so Windows and Linux agree. If any of those files changes, the hash changes:
+the committed docs may be stale. The CI job `hash` recomputes it (seconds): **fresh** means `docs/generated` was written for exactly these sources, so CI skips the sims; **stale** (a PR that did not run
+`npm run docs:gen`, or `main` moved under it) means CI runs the full regeneration, as it always did, and fails if the committed files differ. So the hash is only a shortcut, never a reason to fail. The full
+regeneration also runs on every push to `main`, every night and on a PR labelled `verify-generated`, so a hash written without really regenerating is found within a day.
 
   npx tsx scripts/gen-inputs.ts            print the current hash and whether the committed one matches (exit 0)
-  npx tsx scripts/gen-inputs.ts --check    exit 1 when the committed hash is stale (what CI runs)
+  npx tsx scripts/gen-inputs.ts --check    exit 1 when the committed hash is stale (the CI job `hash` runs it and picks fast or full by the result)
   npx tsx scripts/gen-inputs.ts --write    write docs/generated/inputs.sha256 (the last step of `npm run docs:gen`)
   npx tsx scripts/gen-inputs.ts --list     print the files that count
 
@@ -116,7 +118,7 @@ Source: [`scripts/verify.ts:1`](../../scripts/verify.ts)
 
 `npm run verify`: everything CI checks, run here on all your cores before you push.
 
-CI used to repeat the slow work (the sims behind `docs/generated`) on every pull request; now it only checks that this was done (the inputs hash, see `scripts/gen-inputs.ts`). This script does
+CI used to repeat the slow work (the sims behind `docs/generated`) on every pull request; now it skips it when the inputs hash says it was done (see `scripts/gen-inputs.ts`). This script does
 it: formatting, types, lint, the unit tests and the reference docs check run **at the same time**, and when a file the generators read has changed (the hash is stale) it regenerates
 `docs/generated` in parallel too (`sim:parallel` on all cores next to the three report groups) and writes the new hash. The `pre-push` hook (`.githooks/pre-push`) runs it, so a push is
 refused while something would fail in CI. When it regenerated files it stops with "commit them" (a hook cannot commit for you); commit and push again.
@@ -168,7 +170,24 @@ Source: [`scripts/check-live-saves.ts:1`](../../scripts/check-live-saves.ts)
 
 Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that
 tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT`
-would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.
+would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. A last section is the new chapter dry run (IDL-254 item 2): accounts the flip would reset (and how many hold a save), name collisions with the forced renames they mean, and whether `player_ledger.stats` / `legacy` exist and how many rows are still null. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.
+
+<a id="giving-a-flagged-account-its-trust-back-restore-trust"></a>
+
+### Giving a flagged account its trust back (restore-trust)
+
+Source: [`scripts/restore-trust.ts:1`](../../scripts/restore-trust.ts)
+
+The way back for a false-positive flag (IDL-209): `npm run restore-trust -- --user <uuid>` is a DRY RUN that shows what the account's save carries;
+add `--yes` to really give the account its trust back ([`restoreTrust`](saves-and-server.md#restoretrust): flags cleared, ranking eligibility back, the income paid from the
+stored game's own rates again). The save it replaces is pinned in `save_history` first, and one JSON audit line is printed (`event: 'trust_restored'`);
+keep it with the ticket. Running it twice is safe (the second run says `already_trusted`).
+
+Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or the git-ignored .env.local); check which project they point at first (same rule as
+reset-players). One account per run, on purpose. Judge the account BEFORE you restore it: if its claimed land is still worth more than the game could
+have paid, the next save flags it again.
+
+See also: [`restoreTrust`](saves-and-server.md#restoretrust)
 
 <a id="test-account-email"></a>
 
@@ -192,3 +211,22 @@ option to point at another user.
 
 The smoke test covers: signing in and the account check; the game opens on a new game; income arrives; a click on the map pays gold; a tile can be bought (through `window.__game`, which the dev server exposes); the game menu opens Settings; Save game and a
 reload bring the same map back. Not covered yet (IDL-124 keeps these open): the monster growth badge, the battle queue markers and the Next strip, opening the Rebirth dialog, the offline report.
+
+<a id="turning-enforcement-and-the-server-run-rebirth-on-together"></a>
+
+### Turning enforcement and the server-run rebirth on together
+
+Source: [`src/lib/cloudSave/verify.ts:105`](../../src/lib/cloudSave/verify.ts)
+
+**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).**
+Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:
+
+1. The way back exists in production: `restoreTrust` / `npm run restore-trust` (IDL-209) is merged and you have run its dry run once against a real account. Enforcement is never on without it.
+2. The flip has happened and has settled: `npm run check-live-saves` (read-only, same Supabase environment) shows the rows are readable by today's rules and its new chapter section looks as expected.
+3. Read the `flagged` and `would be refused if enforcement were on` lines of that run. Honest accounts must produce zero refusals (`playtime_fast`, `gold_jump`, `gems_increase` on the allowlist). If one does, tune `VERIFY` or take that flag off `ENFORCEMENT.reject`; keep `tests/audit` green. Restore any honest flagged account with `restore-trust`.
+4. Rebirth: no client that does not ask the server to rebirth (`askServerRebirth`) can still be open (a deploy plus a grace period), and the real flow was walked in a browser against real Supabase (Rebirth dialog "Asking the server...", refused toast, retry with the same key). Then `requireServerRebirth: true`; a rebirth without a `/api/rebirth` record keeps the old rebirth count.
+5. One PR flips both switches (`ENFORCEMENT.enabled = true`, `EMBER_MODEL.requireServerRebirth = true`); `tests/server/serverRebirth.test.ts` and `tests/server/serverTrust.test.ts` pin the behaviour of both states.
+6. Watch the `save_rejected` log lines (route `/api/save`) for the first days. A wave of refusals for honest players means: `ENFORCEMENT.enabled = false` (or remove one flag from `reject`), deploy, restore the affected accounts. Nothing was stored for a refused save, so nothing needs repairing.
+7. Rollback of the pair: `enabled: false` and `requireServerRebirth: false`; no data migration is involved in either.
+
+See also: [`ENFORCEMENT`](saves-and-server.md#enforcement), [`restoreTrust`](saves-and-server.md#restoretrust)

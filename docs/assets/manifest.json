@@ -19216,10 +19216,114 @@
 	},
 	{
 		"usedBy": [],
+		"name": "badge_castle_10_gold",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_castle_10_gold.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_castle_10_gold_alt",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_castle_10_gold_alt.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "badge_chest_bronze",
 		"category": "ui",
 		"subcategory": "achievement badges (not wired)",
 		"src": "/pixel/new_assets/achievements/badge_chest_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_early_tester_special",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_early_tester_special.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_early_tester_special_alt",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_early_tester_special_alt.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_first_rebirth_fire",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_first_rebirth_fire.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_first_rebirth_fire_alt",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_first_rebirth_fire_alt.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_golden_monster_gold",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_golden_monster_gold.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_great_auroch_boss",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_great_auroch_boss.png",
 		"status": "reuse",
 		"source": "new_assets/achievements",
 		"size": [
@@ -20888,6 +20992,306 @@
 		]
 	},
 	{
+		"usedBy": [
+			"tutorial:guide"
+		],
+		"name": "guide_brother_alder",
+		"category": "portraits",
+		"subcategory": "tutorial guide",
+		"src": "/pixel/reuse/misc/sprite-fusion-374f7430-0e77-437e-8e6a-a0f4c6ac3332.png",
+		"status": "used",
+		"source": "public/pixel/reuse",
+		"size": [
+			67,
+			67
+		]
+	},
+	{
+		"usedBy": [
+			"tutorial:guide"
+		],
+		"name": "guide_brother_alder_talk",
+		"category": "portraits",
+		"subcategory": "tutorial guide",
+		"src": "/pixel/guide/alder_talk.png",
+		"status": "used",
+		"source": "scripts/guide-sprite.ts",
+		"size": [
+			134,
+			67
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_battlefield_2",
+		"category": "biomes",
+		"subcategory": "battlefield (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_battlefield_2.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_battlefield_3",
+		"category": "biomes",
+		"subcategory": "battlefield (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_battlefield_3.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [
+			"RebirthUnlockModal"
+		],
+		"name": "biome_battlefield_1",
+		"category": "biomes",
+		"subcategory": "battlefield (in the game)",
+		"src": "/pixel/new_assets/biomes/biome_battlefield_1.png",
+		"status": "used",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_blight_2",
+		"category": "biomes",
+		"subcategory": "blight (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_blight_2.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_blight_3",
+		"category": "biomes",
+		"subcategory": "blight (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_blight_3.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_blight_4",
+		"category": "biomes",
+		"subcategory": "blight (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_blight_4.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [
+			"RebirthUnlockModal"
+		],
+		"name": "biome_blight_1",
+		"category": "biomes",
+		"subcategory": "blight (in the game)",
+		"src": "/pixel/new_assets/biomes/biome_blight_1.png",
+		"status": "used",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_castle_1",
+		"category": "biomes",
+		"subcategory": "castle (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_castle_1.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_extra_desert",
+		"category": "biomes",
+		"subcategory": "extras (no such biome in the game)",
+		"src": "/pixel/new_assets/biomes/biome_extra_desert.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_extra_mushroom_cave",
+		"category": "biomes",
+		"subcategory": "extras (no such biome in the game)",
+		"src": "/pixel/new_assets/biomes/biome_extra_mushroom_cave.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_extra_volcano",
+		"category": "biomes",
+		"subcategory": "extras (no such biome in the game)",
+		"src": "/pixel/new_assets/biomes/biome_extra_volcano.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_fields_2",
+		"category": "biomes",
+		"subcategory": "fields (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_fields_2.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_fields_3",
+		"category": "biomes",
+		"subcategory": "fields (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_fields_3.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [
+			"RebirthUnlockModal"
+		],
+		"name": "biome_fields_1",
+		"category": "biomes",
+		"subcategory": "fields (in the game)",
+		"src": "/pixel/new_assets/biomes/biome_fields_1.png",
+		"status": "used",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_jungle_2",
+		"category": "biomes",
+		"subcategory": "jungle (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_jungle_2.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [
+			"RebirthUnlockModal"
+		],
+		"name": "biome_jungle_1",
+		"category": "biomes",
+		"subcategory": "jungle (in the game)",
+		"src": "/pixel/new_assets/biomes/biome_jungle_1.png",
+		"status": "used",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_orchard_2",
+		"category": "biomes",
+		"subcategory": "orchard (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_orchard_2.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [
+			"RebirthUnlockModal"
+		],
+		"name": "biome_orchard_1",
+		"category": "biomes",
+		"subcategory": "orchard (in the game)",
+		"src": "/pixel/new_assets/biomes/biome_orchard_1.png",
+		"status": "used",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_tundra_1",
+		"category": "biomes",
+		"subcategory": "tundra (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_tundra_1.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "biome_tundra_2",
+		"category": "biomes",
+		"subcategory": "tundra (alternatives)",
+		"src": "/pixel/new_assets/biomes/biome_tundra_2.png",
+		"status": "reuse",
+		"source": "new_assets/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "reuse_legendary_sf_b4884690_b36",
 		"category": "unsorted",
@@ -20924,19 +21328,6 @@
 		"size": [
 			64,
 			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_misc_sf_374f7430_0e7",
-		"category": "unsorted",
-		"subcategory": "misc",
-		"src": "/pixel/reuse/misc/sprite-fusion-374f7430-0e77-437e-8e6a-a0f4c6ac3332.png",
-		"status": "reuse",
-		"source": "public/pixel/reuse",
-		"size": [
-			67,
-			67
 		]
 	},
 	{
