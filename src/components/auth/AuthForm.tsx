@@ -1,13 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config/playerClasses';
-import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
+import type { PlayerClassId } from '@/config/playerClasses';
 import { login, register, saveProfile, type AuthResult, type Profile } from '@/lib/authClient';
-import PixelIcon from '@/components/game/PixelIcon';
-import AvatarPicker from '@/components/game/AvatarPicker';
-import { CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS } from '@/catalog/avatars';
-import '@/styles/Heroes.css';
+import HeroCreator from './HeroCreator';
+import { creatorAvatar } from '@/catalog/avatars';
 
 export type AuthMode = 'login' | 'register' | 'profile';
 
@@ -23,7 +20,7 @@ export interface AuthFormProps {
 /** The window title that goes with each form. */
 export const authTitle = (mode: AuthMode): string => (mode === 'login' ? 'Welcome back' : mode === 'register' ? 'Create your hero' : 'Finish your hero');
 
-/** Log in, register (character name, one of the four heroes and a starter avatar; the server reserves the name and checks the avatar) or finish a profile. No frame of its own: the start page and the landing window both wrap it. */
+/** Log in, register (character name, one of the four heroes and one of its two avatars; the server reserves the name and checks the avatar) or finish a profile (the same hero block). No frame of its own: the start page and the landing window both wrap it. */
 const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavailable, onModeChange }) => {
 	const [mode, setModeState] = useState<AuthMode>(initialMode);
 	const setMode = (next: AuthMode) => {
@@ -35,8 +32,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 	const [name, setName] = useState('');
 	const [playerClass, setPlayerClass] = useState<PlayerClassId | null>(null);
 	const [avatarPick, setAvatarPick] = useState<string | null>(null);
-	// until the player chooses one, the avatar follows the class (its default)
-	const avatarId = avatarPick ?? (playerClass ? CLASS_DEFAULT_AVATAR[playerClass] : null);
+	// until the player chooses one of the class's two avatars, the avatar is the class's default
+	const avatarId = creatorAvatar(playerClass, avatarPick);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +42,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 	const ready =
 		(!needsAccount || (email.trim() !== '' && password !== '')) &&
 		(!needsHero || (name.trim() !== '' && playerClass !== null)) &&
-		(mode !== 'register' || avatarId !== null);
+		(!needsHero || avatarId !== null);
 
 	const settle = (result: AuthResult) => {
 		if (result.status === 'ok') return onSignedIn(result.profile);
@@ -61,7 +58,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 		try {
 			if (mode === 'login') settle(await login(email, password));
 			else if (mode === 'register') settle(await register(email, password, name, playerClass as PlayerClassId, avatarId));
-			else settle(await saveProfile(name, playerClass as PlayerClassId));
+			else settle(await saveProfile(name, playerClass as PlayerClassId, avatarId));
 		} finally {
 			setBusy(false);
 		}
@@ -92,48 +89,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 			)}
 
 			{needsHero && (
-				<>
-					<input
-						type='text'
-						className='px-input'
-						placeholder={`Character name (${CHARACTER_NAME_MAX} chars max)`}
-						maxLength={CHARACTER_NAME_MAX}
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-					/>
-					<p className='text-[#a89878] text-sm text-center'>Choose your hero (cosmetic for now).</p>
-					<div className='class-grid' role='radiogroup' aria-label='Hero'>
-						{PLAYER_CLASS_ORDER.map((id) => {
-							const info = PLAYER_CLASSES[id];
-							const selected = id === playerClass;
-							return (
-								<button
-									key={id}
-									type='button'
-									role='radio'
-									aria-checked={selected}
-									className='class-card'
-									data-selected={selected}
-									style={{ '--accent': info.accent } as React.CSSProperties}
-									onClick={() => setPlayerClass(id)}
-								>
-									<span className='class-card-stage'>
-										<PixelIcon name={info.full} scale={2} alt={`${info.race} ${info.label}`} />
-									</span>
-									<span className='class-card-name'>{info.label}</span>
-									<span className='class-card-race'>{info.race}</span>
-									<span className='class-card-tag'>{selected ? 'Chosen' : 'Choose'}</span>
-								</button>
-							);
-						})}
-					</div>
-					{mode === 'register' && (
-						<>
-							<p className='text-[#a89878] text-sm text-center'>Choose your avatar. More are won in the game.</p>
-							<AvatarPicker value={avatarId} unlocked={STARTER_AVATAR_IDS} onChange={setAvatarPick} />
-						</>
-					)}
-				</>
+				<HeroCreator
+					name={name}
+					onName={setName}
+					playerClass={playerClass}
+					onClass={(id) => {
+						setPlayerClass(id);
+						setAvatarPick(null);
+					}}
+					avatarId={avatarId}
+					onAvatar={setAvatarPick}
+					disabled={busy}
+				/>
 			)}
 
 			{error && (

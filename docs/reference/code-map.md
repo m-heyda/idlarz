@@ -161,6 +161,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`AuthForm.tsx`](../../src/components/auth/AuthForm.tsx) — ~ Which form opens first.
 - [`AuthUnavailable.tsx`](../../src/components/auth/AuthUnavailable.tsx) — ~ An outage may pass on its own:
+- [`HeroCreator.tsx`](../../src/components/auth/HeroCreator.tsx) — ~ null:
 - [`NewChapterScreen.tsx`](../../src/components/auth/NewChapterScreen.tsx) — ~ The account's current hero:
 - [`SaveHub.tsx`](../../src/components/auth/SaveHub.tsx) — ~ local:
 - [`StartDialog.tsx`](../../src/components/auth/StartDialog.tsx) — ~ 'profile':
@@ -181,7 +182,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
 - [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ 'full' = the whole figure (56x80), 'bust' = head and shoulders (40x40)
-- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from; picking one applies at once (cosmetic for now, abilities come later).
+- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from; picking one applies at once.
 - [`CollapsibleSection.tsx`](../../src/components/game/CollapsibleSection.tsx) — ~ A titled block whose header toggles the body; the open/closed choice is remembered per `id` (localStorage).
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
@@ -815,6 +816,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
+- [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)

@@ -65,7 +65,8 @@ export const fetchMe = () => request('/api/auth/me');
 export const login = (email: string, password: string) => post('/api/auth/login', { email, password });
 export const register = (email: string, password: string, characterName: string, playerClass: PlayerClassId, avatarId: string | null = null) =>
 	post('/api/auth/register', { email, password, characterName, playerClass, avatarId });
-export const saveProfile = (characterName: string, playerClass: PlayerClassId) => post('/api/auth/profile', { characterName, playerClass });
+export const saveProfile = (characterName: string, playerClass: PlayerClassId, avatarId: string | null = null) =>
+	post('/api/auth/profile', { characterName, playerClass, avatarId });
 /** The "A new chapter" confirm (`POST /api/auth/epoch`, IDL-76): archives the old game and starts over with this name and hero. `nameTaken`: another account holds the name, nothing was reset. */
 export type ChapterResult = { status: 'ok' } | { status: 'error'; message: string; nameTaken?: boolean } | { status: 'unavailable' };
 export const startChapter = async (characterName: string, playerClass: PlayerClassId, avatarId: string | null = null): Promise<ChapterResult> => {

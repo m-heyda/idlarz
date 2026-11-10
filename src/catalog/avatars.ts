@@ -1,7 +1,8 @@
 import type { PlayerClassId } from '@/config/playerClasses';
 
 /**
- * Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual.
+ * Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each class **owns two starters** ({@link CLASS_AVATARS}):
+ * the creation screens offer a new hero the two of the class it picked, and the server refuses another class's starter at sign-up (`checkCreationAvatar`). Later, any starter can still be worn with any class (the Avatar window).
  * Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced
  * on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the
  * achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
@@ -53,17 +54,32 @@ export const AVATARS: readonly AvatarInfo[] = [
 ];
 
 /**
- * Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the "A new chapter" screen when the player picks that class
- * (until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.
+ * The two starter avatars each class owns. The creation screens (sign-up, "Finish your hero", "A new chapter") show a hero the two of the class it picked, and the server accepts
+ * only those at sign-up (`checkCreationAvatar`); every starter belongs to exactly one class. Afterwards the Avatar window lets the player wear any starter or earned avatar with any class.
+ * The first of the two is the class's **default avatar** ({@link CLASS_DEFAULT_AVATAR}).
  *
  * @category Progression/Avatars
  * @order 3
  */
+export const CLASS_AVATARS: Readonly<Record<PlayerClassId, readonly [string, string]>> = {
+	warrior: ['knight', 'miner'],
+	paladin: ['alchemist', 'scholar'],
+	ranger: ['scout', 'farmer'],
+	mage: ['druid', 'bard'],
+};
+
+/** The default avatar of a class (the first of its two): shown while `profiles.avatar_id` is null and preselected when a class is picked. */
 export const CLASS_DEFAULT_AVATAR: Readonly<Record<PlayerClassId, string>> = {
-	warrior: 'knight',
-	paladin: 'alchemist',
-	ranger: 'scout',
-	mage: 'druid',
+	warrior: CLASS_AVATARS.warrior[0],
+	paladin: CLASS_AVATARS.paladin[0],
+	ranger: CLASS_AVATARS.ranger[0],
+	mage: CLASS_AVATARS.mage[0],
+};
+
+/** The avatar the creation screens show for a class: the pick when it is one of the class's two (or an earned extra), otherwise the class's default; null while no class is chosen. */
+export const creatorAvatar = (playerClass: PlayerClassId | null, pick: string | null, earned: readonly string[] = []): string | null => {
+	if (!playerClass) return null;
+	return pick && (CLASS_AVATARS[playerClass].includes(pick) || earned.includes(pick)) ? pick : CLASS_DEFAULT_AVATAR[playerClass];
 };
 
 /** The avatar to show: the chosen one when it is in the catalog, otherwise the class default (never undefined). */
