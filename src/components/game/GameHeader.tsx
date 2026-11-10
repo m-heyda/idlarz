@@ -33,7 +33,7 @@ const GameHeader: React.FC = () => {
 							<WindowButtons />
 						</div>
 					</div>
-					<div className='flex flex-wrap items-center justify-center gap-x-2 gap-y-1 min-w-0'>
+					<div className='flex flex-wrap items-center justify-center gap-x-2 gap-y-1 min-w-0' data-tutorial='top-resources'>
 						<ResourceDisplay />
 					</div>
 					<div className='justify-self-end'>

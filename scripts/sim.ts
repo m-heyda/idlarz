@@ -64,6 +64,7 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
 import { mulberry32 } from '../src/lib/rng';
+import { STARTER_REWARDS } from '../src/catalog/tutorial';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../src/config/playerClasses';
 import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/loadGame';
 
@@ -382,6 +383,15 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		return true;
 	};
 
+	// The tutorial's starter bundles (IDL-74): the server pays each once per account, the bot receives them at the same events. The potions at the last step do not matter to the economy.
+	const gifts = { tile: false, castle: false };
+	const gift = (which: 'tile' | 'castle') => {
+		if (gifts[which]) return;
+		gifts[which] = true;
+		const bundle: { gold?: number; wood?: number } = STARTER_REWARDS[which];
+		store.setState((st) => ({ resources: { ...st.resources, gold: st.resources.gold + (bundle.gold ?? 0), wood: st.resources.wood + (bundle.wood ?? 0) } }));
+	};
+
 	const decide = (active: boolean) => {
 		let s = api();
 
@@ -410,7 +420,10 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		const castleCeiling = profile.rebirthAtCastle ?? cfg.CASTLE_UPGRADE.maxLevel; // a player who rebirths at castle N does not start N+1
 		if (!s.castleUpgrade && (castle.level ?? 1) < castleCeiling && castle.upgradeCost) {
 			topUp(castle.upgradeCost as Partial<Record<string, number>>);
-			if (api().upgradeCastle()) s = api();
+			if (api().upgradeCastle()) {
+				gift('castle');
+				s = api();
+			}
 		}
 		mark(`castle${castle.level ?? 1}`, t);
 		if ([6, 8, 10].includes(castle.level ?? 1)) recordMagnitude(`r${run}.c${castle.level}`);
@@ -472,6 +485,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			}
 			const ok = api().buyTile(frontier[0], frontier[1]);
 			if (!ok) break;
+			gift('tile');
 			frontierDirty = true;
 			s = api();
 			const ownedNow = utils.economyTiles(s.tiles, s.freeTiles);

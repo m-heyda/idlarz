@@ -477,6 +477,7 @@ and its gold is paid in the browser.
 | `/api/rebirths` | GET | `src/app/api/rebirths/route.ts` |
 | `/api/save` | GET, DELETE, POST | `src/app/api/save/route.ts` |
 | `/api/spawn` | POST | `src/app/api/spawn/route.ts` |
+| `/api/tutorial` | POST | `src/app/api/tutorial/route.ts` |
 
 ## Away time
 

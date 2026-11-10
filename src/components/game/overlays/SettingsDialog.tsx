@@ -21,7 +21,7 @@ const SettingsDialog: React.FC = () => {
 	const close = useUiStore((state) => state.closeSettings);
 	const toggleSaveMenu = useUiStore((state) => state.toggleSaveMenu);
 	const openTutorial = useUiStore((state) => state.openTutorial);
-	const { soundEnabled, volume, ambientLife, setSoundEnabled, setVolume, setAmbientLife } = useSettingsStore();
+	const { soundEnabled, volume, ambientLife, guideEnabled, setSoundEnabled, setVolume, setAmbientLife, setGuideEnabled } = useSettingsStore();
 
 	if (!open) return null;
 
@@ -50,6 +50,12 @@ const SettingsDialog: React.FC = () => {
 			<Row label='Life on the map' hint='Critters wander over your land and ripples play on the water'>
 				<button className={`px-btn px-btn-sm ${ambientLife ? '' : 'px-btn-gray'}`} onClick={() => setAmbientLife(!ambientLife)} aria-pressed={ambientLife}>
 					{ambientLife ? 'On' : 'Off'}
+				</button>
+			</Row>
+
+			<Row label='Brother Alder' hint='The guide who explains the game as you play'>
+				<button className={`px-btn px-btn-sm ${guideEnabled ? '' : 'px-btn-gray'}`} onClick={() => setGuideEnabled(!guideEnabled)} aria-pressed={guideEnabled}>
+					{guideEnabled ? 'On' : 'Off'}
 				</button>
 			</Row>
 

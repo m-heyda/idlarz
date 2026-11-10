@@ -34,7 +34,7 @@
  * [code-map.md](code-map.md) lists every file with its first comment.
  *
  * **Not in the game yet**: hills, coast and lake monsters; jungle, fields, orchard, blight and battlefield biomes (dev-only entries); the Producer/Extractor/Idol building rework; quests; gambling; achievements, glossary and mastery;
- * paragon levels; rankings and the preview map; landing page and `/play` route; the guided tutorial rework; gem sinks. Details: `docs/plan/ROADMAP.md`. Crafting (queue, recipes) exists but is still a first draft: `docs/plan/crafting-v0.md`.
+ * paragon levels; rankings and the preview map; landing page and `/play` route; the guided tutorial (built, dark until the new chapter flips); gem sinks. Details: `docs/plan/ROADMAP.md`. Crafting (queue, recipes) exists but is still a first draft: `docs/plan/crafting-v0.md`.
  *
  * @title The game at a glance
  * @category Overview/The game
@@ -75,6 +75,7 @@ import { useCloudSync } from '@/hooks/useCloudSync';
 import { useOfflineClaim } from '@/hooks/useOfflineClaim';
 import { useSpawnSync } from '@/hooks/useSpawnSync';
 import OfflineDialog from '@/components/game/overlays/OfflineDialog';
+import TutorialGuide from '@/components/game/tutorial/TutorialGuide';
 
 interface GameAppProps {
 	/** The account's name and hero, given to a brand-new game only (never to one that has been played). */
@@ -174,6 +175,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<RebirthDialog />
 			<OfflineDialog />
 			<TutorialDialog />
+			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<ConfirmDialogs />
 			<BottomRightStack />
 			<CastleCompass />

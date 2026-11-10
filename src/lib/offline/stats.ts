@@ -2,6 +2,9 @@
 // They feed achievements (IDL-73), the glossary and mastery (R6) and rankings; nothing shows them yet. Every number is counted by the server from its own events or from accepted
 // saves (never from a figure the client claims), and the record stays small: one map of kill counts and a few numbers.
 
+import { emptyProgress, isEmptyProgress, type TutorialProgress } from '@/lib/tutorial/engine';
+import { readProgress } from '@/lib/tutorial/progress';
+
 /** Lifetime counters. Stored as one jsonb value; a player who has counted nothing yet has `null` in the column and reads as {@link emptyStats}. */
 export interface LifetimeStats {
 	/** Kills per monster type id (bosses and golden monsters included) */
@@ -19,12 +22,25 @@ export interface LifetimeStats {
 	at: number;
 	playAt: number;
 	tilesAt: number;
+	/** The guided tutorial: steps done (their bundles paid), lessons seen, skipped. Additive: a row without it reads as nothing done. */
+	tutorial: TutorialProgress;
 }
 
 /** Counters are written to the ledger at most this often by the save path (kills and chests are written with their own request, which writes the ledger anyway). */
 export const STATS_EVERY_MS = 10 * 60_000;
 
-export const emptyStats = (): LifetimeStats => ({ kills: {}, golden: 0, bosses: 0, chests: 0, tiles: 0, income: {}, at: 0, playAt: 0, tilesAt: 0 });
+export const emptyStats = (): LifetimeStats => ({
+	kills: {},
+	golden: 0,
+	bosses: 0,
+	chests: 0,
+	tiles: 0,
+	income: {},
+	at: 0,
+	playAt: 0,
+	tilesAt: 0,
+	tutorial: emptyProgress(),
+});
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
 const counts = (value: unknown): Record<string, number> => {
@@ -47,12 +63,20 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		at: num(r.at),
 		playAt: num(r.playAt),
 		tilesAt: Math.floor(num(r.tilesAt)),
+		tutorial: readProgress(r.tutorial),
 	};
 };
 
 /** True when nothing was ever counted (stored as null, so most rows keep the column empty). */
 export const isEmptyStats = (s: LifetimeStats): boolean =>
-	s.at === 0 && s.golden === 0 && s.bosses === 0 && s.chests === 0 && s.tiles === 0 && Object.keys(s.kills).length === 0 && Object.keys(s.income).length === 0;
+	s.at === 0 &&
+	s.golden === 0 &&
+	s.bosses === 0 &&
+	s.chests === 0 &&
+	s.tiles === 0 &&
+	Object.keys(s.kills).length === 0 &&
+	Object.keys(s.income).length === 0 &&
+	isEmptyProgress(s.tutorial);
 
 /** A kill of monster `type`: counted once, when the server pays it. */
 export const recordKill = (stats: LifetimeStats, kill: { type: string; lucky: boolean; boss: boolean }): LifetimeStats => ({

@@ -93,6 +93,7 @@ const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, o
 					<span
 						key={row.key}
 						className={cn('hdr-chip', isEmbers && 'is-link')}
+						data-tutorial={`res-${row.key}`}
 						title={RESOURCES[row.key].label}
 						onClick={
 							isEmbers

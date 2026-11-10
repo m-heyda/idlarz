@@ -14,6 +14,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
+- Guided tutorial: [`guideLive`](#guidelive), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
 ## Levels
 
@@ -507,3 +508,102 @@ The gear's XP bucket with the class's XP added, held under the XP perk-family ca
 ```text
 xp bucket = min(PERK_CAPS.xpPct, gear XP% + class XP%)          then + the attributes' XP gain
 ```
+
+## Guided tutorial
+
+<a id="guidelive"></a>
+
+### `guideLive` <small>function</small>
+
+Source: [`src/lib/tutorial/live.ts:10`](../../src/lib/tutorial/live.ts)
+
+Whether Brother Alder is on at all. The tutorial ships dark with the new chapter: until `GAME_EPOCH` is raised (the release flip, IDL-253) nobody sees it, so accounts that are
+playing the old chapter get no bubbles. To try it on a build before the flip, set `NEXT_PUBLIC_GUIDE=on`.
+
+<a id="buildnumbers"></a>
+
+### `buildNumbers` <small>function</small>
+
+Source: [`src/lib/tutorial/numbers.ts:31`](../../src/lib/tutorial/numbers.ts)
+
+The numbers the tutorial texts quote, read from the live config at the moment they are shown (a changed price changes the text, nothing is typed in):
+the first tile's price, the first animal and its food price, the first castle upgrade's price and time, the chest interval, the offline cap and
+efficiency, and the rebirth requirements.
+
+<a id="readprogress"></a>
+
+### `readProgress` <small>function</small>
+
+Source: [`src/lib/tutorial/progress.ts:18`](../../src/lib/tutorial/progress.ts)
+
+Reads the stored `stats.tutorial` (or an answer from the server) back: a missing field, null or anything malformed reads as nothing done, ids that are
+not in the catalog any more (a step removed in a later release) are dropped, nothing is trusted to be the right shape.
+
+<a id="applytutorial"></a>
+
+### `applyTutorial` <small>function</small>
+
+Source: [`src/lib/offline/tutorial.ts:45`](../../src/lib/offline/tutorial.ts)
+
+Applies one tutorial request to the ledger. `done` records a step once and pays its bundle (gold and wood as `granted` totals, items through
+`receiveInto`); repeating it, with the same key or another, changes nothing and pays nothing. `lesson` records a fired lesson, `skip` ends the starter path
+(later bundles are forfeited), `sync` only reads. Progress lives in the ledger's `stats` and resets with it at a new chapter.
+
+See also: [`readProgress`](progression.md#readprogress)
+
+<a id="tutorialguide"></a>
+
+### `TutorialGuide` <small>function</small>
+
+Source: [`src/components/game/tutorial/TutorialGuide.tsx:39`](../../src/components/game/tutorial/TutorialGuide.tsx)
+
+Brother Alder, the tutorial guide. Mounted once in the game (GameApp). It counts the few events the state does not keep (map clicks, chests opened, fights won),
+evaluates the triggers twice a second (`lib/tutorial/engine.ts`), records finished steps and fired lessons on the account (the server may pay a starter bundle),
+and draws the bubble and the focus layer for the beat that is on show. Nothing is drawn while the guide is dark (`guideLive`), switched off in Settings, or before the
+account's progress has arrived; a target that is not on screen shows the bubble alone and never blocks the game.
+
+<a id="tutorial-path"></a>
+
+### The guided tutorial
+
+Source: [`src/catalog/tutorial.ts:131`](../../src/catalog/tutorial.ts)
+
+The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It ships dark: nothing is shown until `GAME_EPOCH` is raised (the new chapter release), or on a build with `NEXT_PUBLIC_GUIDE=on` ([`guideLive`](progression.md#guidelive)).
+
+- **Intro**: on the first start of a chapter the screen dims and Alder speaks three short bubbles. **Starter path**: eight steps in the order of [`TUTORIAL_PATH`](progression.md#tutorial-path). The first step that is *ready* and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. **Milestone lessons** (`TUTORIAL_LESSONS`) fire the first time something is reached, in any order, after the path; each is kept in the Guide's journal tab (locked ones read '???').
+- **Focus**: `strict` dims and blurs the whole game with a cut-out around the `data-tutorial` target and blocks every click outside it (the intro and the first two steps); `soft` only dims. A target that is not on screen shows the bubble alone and never blocks the game. **Skip** is on every bubble and ends the starter path (lessons still come); the guide can be switched off in Settings.
+- **Texts** are one or two sentences with numbers read from the config ([`buildNumbers`](progression.md#buildnumbers)). **Order is data**: a step is inserted between two others by putting it there (the new building system adds its 'build' step that way).
+- **Progress is per account on the server** (`stats.tutorial` in the ledger: done ids, fired lessons, skipped; no migration) and resets with the ledger at a new chapter. **Starter bundles** are paid once per account by the server when a step is recorded, only if the last accepted save shows the step happened, and counted as `granted` ([`applyTutorial`](progression.md#applytutorial)). The sim bot receives them at the same events.
+- The long reference page (`Tutorial.tsx`) stays as the Guide's reference tab until every section has a journal entry.
+
+**The starter path and its bundles** _(computed from the code)_
+
+| # | Step | Focus | Bundle (once per account) |
+| --- | --- | --- | --- |
+| 1 | `click-gold` | strict | - |
+| 2 | `buy-tile` | strict | 100 gold, 20 wood |
+| 3 | `buy-animal` | soft | - |
+| 4 | `castle-upgrade` | soft | 300 gold |
+| 5 | `open-chest` | soft | - |
+| 6 | `first-fight` | soft | - |
+| 7 | `merchant` | soft | - |
+| 8 | `stat-point` | soft | 3 x potion_minor |
+
+**Milestone lessons** _(computed from the code)_
+
+| Lesson | Journal heading | Spotlight |
+| --- | --- | --- |
+| `res-wood` | Wood | `res-wood` |
+| `res-stone` | Stone | `res-stone` |
+| `res-coal` | Coal | `res-coal` |
+| `res-food` | Food | `res-food` |
+| `res-hide` | Hide | `res-hide` |
+| `res-meat` | Meat | `res-meat` |
+| `res-eggs` | Eggs | `res-eggs` |
+| `res-milk` | Milk | `res-milk` |
+| `income-offline` | Income, timers and time away | `top-resources` |
+| `gear-bag-potions` | Gear, bag and potions | `tab-equipment` |
+| `rebirth-embers` | Rebirth and Embers | `rebirth-button` |
+| `auto-battle` | Auto-battle | none |
+
+See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideLive`](progression.md#guidelive)
