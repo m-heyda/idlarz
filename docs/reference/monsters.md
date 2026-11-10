@@ -141,12 +141,12 @@ danger bonus = floor(Chebyshev distance from the castle / 8) levels
 
 ### `advanceBank` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:143`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:153`](../../src/lib/offline/tickets.ts)
 
 Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
 (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
-With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket
-`n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.
+With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket
+`n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.
 
 `realDtSec` is the real time the `dtSec` stand for: an absence is credited at a share of its length (the efficiency), but the
 tickets are stamped across the whole real stretch so that they have the ages they would have had.
@@ -155,7 +155,7 @@ Where and when monsters appear (server only).
 
 - **Timers** (`COMBAT.spawn`): the first normal monster 120 s after the run starts, then one per 900 s; one boss at a time, 10,800 s after the last one left (or after the start). The timers pause when the map has no room or no free tile for it.
 - **Room**: monsters and chests together hold at most 30% of the free tiles, at least 2, at most 40 tickets ([`ticketCap`](monsters.md#ticketcap), `SPAWN_LIMIT`, `TICKET_CAP`).
-- **Golden (lucky) monsters**: chance `min(10%, 2% + 0.05% x Luck)` per new normal monster; a kill pays x3 gold, XP and hide and adds one guaranteed gear roll (`LUCK.luckyRat`). Bosses are never golden.
+- **Golden (lucky) monsters**: chance `min(10%, 2% + 0.05% x Luck)` per new normal monster; a kill pays x3 gold, XP and hide and adds one guaranteed gear roll (`LUCK.goldenMonster`). Bosses are never golden.
 
 <a id="canspawnon"></a>
 
@@ -185,7 +185,7 @@ for new spawns only. Bosses follow the same rules (IDL-222): among the boss type
 
 ### `placeTickets` <small>function</small>
 
-Source: [`src/lib/offline/placement.ts:73`](../../src/lib/offline/placement.ts)
+Source: [`src/lib/offline/placement.ts:72`](../../src/lib/offline/placement.ts)
 
 Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
@@ -199,7 +199,7 @@ that still have a free tile the pick is weighted by win chance and the boss's sp
 
 ### `ticketCap` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:103`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:113`](../../src/lib/offline/tickets.ts)
 
 How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
 (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.

@@ -24,7 +24,7 @@ const view: CombatView = {
 	behind: false,
 	nextPollSec: 8,
 };
-const tickets = (chests: PublicChest[], opened?: number): PublicTickets => ({ chests, rats: [], king: null, ...(opened === undefined ? {} : { opened }) });
+const tickets = (chests: PublicChest[], opened?: number): PublicTickets => ({ chests, monsters: [], boss: null, ...(opened === undefined ? {} : { opened }) });
 const sync = (chests: PublicChest[], opened?: number): SyncResult => ({
 	tickets: tickets(chests, opened),
 	serverNowSec: 1_800_000_000,

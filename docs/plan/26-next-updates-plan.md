@@ -18,7 +18,7 @@ Rule for every step: **no gameplay change, the sim and the generated docs stay i
 
 | # | Step | Size | Notes |
 |---|---|---|---|
-| A5 | **Rename the rat leftovers.** `bank.rats`, `TicketKind 'rat'`, `LUCK.luckyRat`, `ratsMinted`, `luckyRatChance`, `monster_rat` icons: say `monsters` / `normal` / golden monster (the golden variant itself stays, see the section below). The ledger bank is stored JSON: no reader for the old names is needed (the ledger is reset), so rename, bump `SAVE_SCHEMA` if the save changes, and run `npm run reset-players` with that release. | M | Ships with the epoch reset (IDL-76), not earlier: the ledger names change and the reset is what makes that safe. Replaces the "additive ledger columns first" rule of [14](14-server-audit-and-data-plan.md) for this step. |
+| A5 | **Rename the rat leftovers.** `bank.rats`, `TicketKind 'rat'`, `LUCK.goldenMonster`, `ratsMinted`, `goldenMonsterChance`, `monster_rat` icons: say `monsters` / `normal` / golden monster (the golden variant itself stays, see the section below). The ledger bank is stored JSON: no reader for the old names is needed (the ledger is reset), so rename, bump `SAVE_SCHEMA` if the save changes, and run `npm run reset-players` with that release. | M | Ships with the epoch reset (IDL-76), not earlier: the ledger names change and the reset is what makes that safe. Replaces the "additive ledger columns first" rule of [14](14-server-audit-and-data-plan.md) for this step. |
 
 ## Phase B · Prepare the item assets (M-L, art and data, no balance change)
 
@@ -54,9 +54,9 @@ Only after A-C: server-run rebirth (`/api/rebirth`, closes the short window in w
 
 ## Golden monsters stay (keep and extend)
 
-The rats had a **golden ("lucky") variant** and we keep that for every monster: the server decides it when the monster appears (`luckyRatChance` in `lib/luck.ts`, `LUCK.luckyRat`: 2 % plus Luck, at most 10 %), the map draws it gold-tinted (`.tile-monster[data-lucky]` in `Monsters.css`) and a kill pays x3 gold and XP plus one extra gear roll (`rollKillLoot`). It still works for the new roster. What is missing, to do with the monster phases:
+The rats had a **golden ("lucky") variant** and we keep that for every monster: the server decides it when the monster appears (`goldenMonsterChance` in `lib/luck.ts`, `LUCK.goldenMonster`: 2 % plus Luck, at most 10 %), the map draws it gold-tinted (`.tile-monster[data-lucky]` in `Monsters.css`) and a kill pays x3 gold and XP plus one extra gear roll (`rollKillLoot`). It still works for the new roster. What is missing, to do with the monster phases:
 
-- **Rename** `luckyRat` / `luckyRatChance` to golden/lucky *monster* (part of A5); the ledger ticket field `lucky` stays.
+- **Rename** `goldenMonster` / `goldenMonsterChance` to golden/lucky *monster* (part of A5); the ledger ticket field `lucky` stays.
 - **Show it everywhere**: the gold tint also in the fight window (`CombatPanel`), the "Next" strip of the queue and the glossary; a small sparkle on the tile so it is seen from far away; the badge star already exists.
 - **Per-monster golden art** later: a hand-picked gold palette per monster instead of one sepia filter (the art sheets are single images, so this is a palette swap in the pipeline).
 - **Tune per biome**: the chance and the multiplier follow the monster ladder (a golden tundra monster is worth more than a golden plains one; the x3 reward is capped by the reward caps of [20](20-monster-families-and-rewards.md)); decide whether bosses may be golden (today they never are).

@@ -43,7 +43,7 @@ const view = (over: Partial<CombatView> = {}): CombatView => ({
 });
 const reply = (combat: CombatView, over: Partial<FightReply> = {}): FightReply => ({
 	combat,
-	tickets: { chests: [], rats: [], king: null },
+	tickets: { chests: [], monsters: [], boss: null },
 	serverNowSec: clock,
 	gemsTotal: 1000,
 	accepted: true,
@@ -564,7 +564,11 @@ test('a click during a fight asks to join the battle queue (the same request), a
 	openFight({ n: 7 });
 	const calls: { body: Record<string, unknown> }[] = [];
 	// the answers list the monsters that are standing (the map follows the server's tickets)
-	const tickets = { chests: [], rats: [7, 8].map((n) => ({ n, at: clock, lucky: false, x: CASTLE_X + n - 5, y: CASTLE_Y, spawnLevel: n - 6 })), king: null };
+	const tickets = {
+		chests: [],
+		monsters: [7, 8].map((n) => ({ n, at: clock, lucky: false, x: CASTLE_X + n - 5, y: CASTLE_Y, spawnLevel: n - 6 })),
+		boss: null,
+	};
 	const answers = [
 		reply(view({ fight: api().combat.fight, queue: [{ n: 8, type: 'thistleBoar', level: 2 }], queueMax: 3 }), { queued: 'queued', tickets }),
 		reply(view({ fight: api().combat.fight, queue: [], queueMax: 3 }), { queued: 'removed', tickets }),

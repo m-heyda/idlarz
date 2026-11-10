@@ -11,6 +11,7 @@ import { bagCountOf } from '../../src/lib/offline/inventory';
 import { combatView, restThrough, runCombat } from '../../src/lib/offline/fight';
 import { COSMETIC_EVENTS, type CombatCommand, type FightEvent } from '../../src/lib/offline/fightTypes';
 import type { Ledger } from '../../src/lib/offline/ledger';
+import { bossOf, normalsOf } from '@/lib/offline/tickets';
 
 // IDL-16 (A4): the fight engine was split into profile, targets, steps and view. This file pins what it does: three scripted fights (fixed seed,
 // so a fixed sealed random stream) are run request by request, and the HP and mana after every request, the fight's state, the kills, the
@@ -96,8 +97,8 @@ const play = (setup: SimSetup, steps: Step[], potionIds: string[]) => {
 			mp: n6(ledger.combat!.mp),
 			kills: ledger.ordKill,
 			granted: ledger.granted,
-			ratsLeft: ledger.bank.rats.map((t) => t.n),
-			king: ledger.bank.king?.n ?? null,
+			ratsLeft: normalsOf(ledger.bank).map((t) => t.n),
+			king: bossOf(ledger.bank)?.n ?? null,
 			retryAt: Object.fromEntries(Object.entries(ledger.combat!.retryAt).map(([k, v]) => [k, n6(v - s.start)])),
 			potions: Object.fromEntries(potionIds.map((id) => [id, bagCountOf(ledger.inv!, id)])),
 			ord: ledger.combat!.ord,

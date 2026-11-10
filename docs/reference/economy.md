@@ -15,7 +15,7 @@ Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.
 - Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
 - Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`bestWornGrade`](#bestworngrade)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
-- Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`luckyRatChance`](#luckyratchance)
+- Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
@@ -867,7 +867,7 @@ Luck = Charisma + Lucky Charm + gear Luck. Other effects (`LUCK`):
 
 - rare-and-better rarity weights x `min(1.6, 1 + 0.004 x Luck)` ([`rarityLuckMultiplier`](economy.md#rarityluckmultiplier));
 - monster gear roll chance x `(1 + 0.002 x Luck)` ([`dropChanceMultiplier`](economy.md#dropchancemultiplier));
-- golden ("lucky") monster chance `min(10%, 2% + 0.05% x Luck)` ([`luckyRatChance`](economy.md#luckyratchance));
+- golden ("lucky") monster chance `min(10%, 2% + 0.05% x Luck)` ([`goldenMonsterChance`](economy.md#goldenmonsterchance));
 - gem find on a chest ([`gemChance`](economy.md#gemchance)).
 
 <a id="chestintervalsec"></a>
@@ -965,9 +965,9 @@ Multiplier on a monster's gear drop chance.
 multiplier = 1 + 0.002 x Luck
 ```
 
-<a id="luckyratchance"></a>
+<a id="goldenmonsterchance"></a>
 
-### `luckyRatChance` <small>function</small>
+### `goldenMonsterChance` <small>function</small>
 
 Source: [`src/lib/luck.ts:67`](../../src/lib/luck.ts)
 

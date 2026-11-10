@@ -127,7 +127,7 @@ export const runCombat = (
 	if (!behind && !c.fight) engage(ctx, t);
 
 	// a retry time only matters for a monster that is still there
-	const standing = new Set([...ctx.ledger.bank.rats.map((ticket) => ticket.n), ...(ctx.ledger.bank.king ? [ctx.ledger.bank.king.n] : [])].map(String));
+	const standing = new Set(ctx.ledger.bank.monsters.map((ticket) => String(ticket.n)));
 	c.retryAt = Object.fromEntries(Object.entries(c.retryAt).filter(([n]) => standing.has(n)));
 
 	// a queued monster must still be there

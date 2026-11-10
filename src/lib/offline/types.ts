@@ -66,8 +66,10 @@ export interface PublicTickets {
 	 * was made before one of its own chest opens (it still counts that chest) from one made after it. Left out by older servers.
 	 */
 	opened?: number;
-	rats: (PublicMonster & { lucky: boolean })[];
-	king: PublicMonster | null;
+	/** The normal monsters standing on the map (golden ones carry `lucky`) */
+	monsters: (PublicMonster & { lucky: boolean })[];
+	/** The boss standing on the map, if any */
+	boss: PublicMonster | null;
 }
 
 export interface ClaimResult {

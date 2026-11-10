@@ -321,7 +321,7 @@ Pieces that predate the ladder keep their ids, art and set bonuses, and a save o
 
 ### `kit` <small>function</small>
 
-Source: [`src/lib/fightSim.ts:57`](../../src/lib/fightSim.ts)
+Source: [`src/lib/fightSim.ts:58`](../../src/lib/fightSim.ts)
 
 A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.
 

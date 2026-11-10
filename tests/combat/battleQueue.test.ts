@@ -119,7 +119,7 @@ test('a queued monster that is gone is skipped, and the next one in line is foug
 	r = at(s, r.ledger, 0.2, fight(2));
 	r = at(s, r.ledger, 0.3, fight(3));
 	// monster 2 leaves the map behind the queue's back (a bank change): the line closes up
-	const bank = { ...r.ledger.bank, rats: r.ledger.bank.rats.filter((ticket) => ticket.n !== 2) };
+	const bank = { ...r.ledger.bank, monsters: r.ledger.bank.monsters.filter((ticket) => ticket.n !== 2) };
 	r = at(s, { ...r.ledger, bank }, 60);
 	assert.deepEqual(wins(r.ledger), [1, 3]);
 });

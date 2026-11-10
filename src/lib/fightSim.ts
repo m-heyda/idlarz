@@ -8,6 +8,7 @@ import { isBoss } from '@/lib/monsters';
 import { runCombat, type CombatEnv } from '@/lib/offline/fight';
 import { freshCombat, type FightEvent } from '@/lib/offline/fightTypes';
 import { newLedger } from '@/lib/offline/ledger';
+import type { MonsterKind, MonsterTicket } from '@/lib/offline/tickets';
 import { savedVitals } from '@/lib/offline/profile';
 import { plainItem as plain } from '@/lib/itemInstance';
 import { calculateCombatStats } from '@/utils/game/character';
@@ -124,13 +125,22 @@ export const simSetup = ({ equipment = {}, character = freshCharacter(), potions
 	const stored = { core, summary: { derived: { luck: 0, goldFind: 0 }, rates: { gold: 1, xp: 1 }, xpGainPct: 0 } } as unknown as StoredSave;
 	const base = newLedger(START * 1000, COMBAT.auto.minRebirths);
 	let n = 0;
-	const ticket = (m: SimSetup['monsters'][number]) => ({ n: ++n, at: START, lucky: m.lucky ?? false, x: 2 + n, y: 3, spawnLevel: m.level, type: m.type });
-	const rats = monsters.filter((m) => !isBoss(m.type)).map(ticket);
-	const kingDef = monsters.find((m) => isBoss(m.type));
+	const ticket = (m: SimSetup['monsters'][number], kind: MonsterKind): MonsterTicket => ({
+		n: ++n,
+		at: START,
+		kind,
+		lucky: m.lucky ?? false,
+		x: 2 + n,
+		y: 3,
+		spawnLevel: m.level,
+		type: m.type,
+	});
+	const normals = monsters.filter((m) => !isBoss(m.type)).map((m) => ticket(m, 'normal'));
+	const bossDef = monsters.find((m) => isBoss(m.type));
 	// the sim lets the engine pick the monsters one after the other, so auto-battle is on (a new player starts with it off)
 	const vitals = savedVitals(core);
 	const combat = { ...freshCombat(START, vitals.hp, vitals.mp), autoBattle: true };
-	const ledger = { ...base, runId: 1, combat, bank: { ...base.bank, accAt: START, rats, king: kingDef ? ticket(kingDef) : null } };
+	const ledger = { ...base, runId: 1, combat, bank: { ...base.bank, accAt: START, monsters: [...normals, ...(bossDef ? [ticket(bossDef, 'boss')] : [])] } };
 	const env = (nowSec: number): CombatEnv => ({ secret: SECRET, userId: seed, stored, nowSec });
 	return { ledger, env, start: START, stored };
 };

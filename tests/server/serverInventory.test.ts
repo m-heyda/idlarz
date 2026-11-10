@@ -298,7 +298,7 @@ test('changes that swap or sell gear are refused while a fight is open, purchase
 	await stay(p, 30);
 	const ticketMs = T0 + 31 * MIN;
 	const view = ok(await syncTickets(p.m.deps, p.id, ticketMs));
-	const rat = view.tickets.rats[0];
+	const rat = view.tickets.monsters[0];
 	assert.ok(rat, 'a rat has appeared');
 	const opened = ok(await fightStep(p.m.deps, p.id, key(), { action: 'use', command: { kind: 'fight', n: rat.n } }, ticketMs + 1000));
 	assert.ok(opened.combat.fight, 'the fight is open');

@@ -14,7 +14,7 @@ import { tileAt } from '../helpers';
 import type { Monster } from '../../src/types/game';
 
 const NOW = 1_800_000_000;
-const tickets = (over: Partial<PublicTickets> = {}): PublicTickets => ({ chests: [], rats: [], king: null, ...over });
+const tickets = (over: Partial<PublicTickets> = {}): PublicTickets => ({ chests: [], monsters: [], boss: null, ...over });
 const state = () => {
 	const s = api();
 	return { tiles: s.tiles, monsters: s.monsters, activeChests: s.activeChests };
@@ -42,7 +42,7 @@ test('placed tickets become monsters exactly where the server put them, aged as 
 	const out = reconcileTickets(
 		state(),
 		tickets({
-			rats: [
+			monsters: [
 				placed(1, NOW - 3600, { x: CASTLE_X + 2, y: CASTLE_Y, spawnLevel: 2 }),
 				placed(2, NOW - 100, { lucky: true, x: CASTLE_X, y: CASTLE_Y + 3, spawnLevel: 1 }),
 			],
@@ -68,7 +68,7 @@ test('placed tickets become monsters exactly where the server put them, aged as 
 test('the boss ticket becomes the boss', () => {
 	freshGame();
 	growTo(30);
-	const out = reconcileTickets(state(), tickets({ king: { n: 5, at: NOW - 10, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 15 } }), NOW);
+	const out = reconcileTickets(state(), tickets({ boss: { n: 5, at: NOW - 10, x: CASTLE_X + 3, y: CASTLE_Y, spawnLevel: 15 } }), NOW);
 	assert.equal(out.monsters[0].type, 'bossGreatAuroch');
 	assert.equal(out.monsters[0].ticket, 5);
 	assert.equal(out.monsters[0].level, 15);
@@ -81,7 +81,7 @@ test('a monster the server does not list is removed, one it lists stays; nothing
 		{ id: 4, type: 'thistleBoar', level: 1, spawnLevel: 1, x: CASTLE_X + 2, y: CASTLE_Y, ageSec: 0, ticket: 4 },
 		{ id: 5, type: 'thistleBoar', level: 1, spawnLevel: 1, x: CASTLE_X - 2, y: CASTLE_Y, ageSec: 0, ticket: 5 },
 	];
-	const out = reconcileTickets({ ...state(), monsters: standing }, tickets({ rats: [placed(4, NOW, { x: CASTLE_X + 2 })] }), NOW);
+	const out = reconcileTickets({ ...state(), monsters: standing }, tickets({ monsters: [placed(4, NOW, { x: CASTLE_X + 2 })] }), NOW);
 	assert.deepEqual(
 		out.monsters.map((m) => m.id),
 		[4],
@@ -147,7 +147,7 @@ test('applyOfflineClaim pays the grant, places the tickets, takes the server gem
 		minGapSec: 300,
 	})!;
 	const report = api().applyOfflineClaim(
-		claimResult({ grant, reason: 'paid', gems: 1037, tickets: tickets({ chests: chestList(2), rats: [placed(1, NOW - 3 * 3600, { spawnLevel: 2 })] }) }),
+		claimResult({ grant, reason: 'paid', gems: 1037, tickets: tickets({ chests: chestList(2), monsters: [placed(1, NOW - 3 * 3600, { spawnLevel: 2 })] }) }),
 	);
 	const after = api();
 	assert.equal(after.resources.gold, before.resources.gold + 7 * 4 * 3600 * 0.5);

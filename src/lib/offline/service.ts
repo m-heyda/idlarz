@@ -20,7 +20,7 @@ import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPar
 import { playerProfile } from '@/lib/offline/profile';
 import { powerKey } from '@/lib/offline/spawnWeights';
 import { sealedRng } from '@/lib/offline/seal';
-import { advanceBank, type BankContext, type TicketBank } from '@/lib/offline/tickets';
+import { advanceBank, bossOf, normalsOf, type BankContext, type TicketBank } from '@/lib/offline/tickets';
 import { offlineMinGapSec } from '@/lib/offline/limits';
 import type { Rng } from '@/lib/rng';
 import type { World } from '@/utils/world';
@@ -43,28 +43,28 @@ export { UNCLAIMED_SEC };
 export const publicTickets = (bank: TicketBank, opened?: number): PublicTickets => ({
 	chests: bank.chests.filter(isChestPlaced).map(({ n, x, y }) => ({ n, x: x!, y: y! })),
 	...(opened === undefined ? {} : { opened }),
-	rats: bank.rats.filter(isPlaced).map(({ n, at, lucky, x, y, spawnLevel, type, growCap }) => ({
-		n,
-		at,
-		lucky,
-		x: x!,
-		y: y!,
-		spawnLevel: spawnLevel!,
-		...(type ? { type } : {}),
-		...(growCap !== undefined ? { growCap } : {}),
-	})),
-	king:
-		bank.king && isPlaced(bank.king)
-			? {
-					n: bank.king.n,
-					at: bank.king.at,
-					x: bank.king.x!,
-					y: bank.king.y!,
-					spawnLevel: bank.king.spawnLevel!,
-					...(bank.king.type ? { type: bank.king.type } : {}),
-				}
-			: null,
+	monsters: normalsOf(bank)
+		.filter(isPlaced)
+		.map(({ n, at, lucky, x, y, spawnLevel, type, growCap }) => ({
+			n,
+			at,
+			lucky,
+			x: x!,
+			y: y!,
+			spawnLevel: spawnLevel!,
+			...(type ? { type } : {}),
+			...(growCap !== undefined ? { growCap } : {}),
+		})),
+	boss: publicBoss(bank),
 });
+
+/** The boss standing on the map, as the browser may see it (null: none, or it has no tile yet). */
+function publicBoss(bank: TicketBank): PublicTickets['boss'] {
+	const boss = bossOf(bank);
+	return boss && isPlaced(boss)
+		? { n: boss.n, at: boss.at, x: boss.x!, y: boss.y!, spawnLevel: boss.spawnLevel!, ...(boss.type ? { type: boss.type } : {}) }
+		: null;
+}
 
 /** Reads the player's map at most once per request, and only when it is asked for. */
 export const mapLoader = (deps: ServiceDeps, userId: string) => {
@@ -148,7 +148,7 @@ const onlyTimeMoved = (stored: Ledger, next: Ledger): boolean => {
 			...l,
 			ver: 0,
 			anchorAt: 0,
-			bank: { ...l.bank, accAt: 0, chestAcc: 0, ratAcc: 0, kingAcc: 0 },
+			bank: { ...l.bank, accAt: 0, chestAcc: 0, monsterAcc: 0, bossAcc: 0 },
 			combat: l.combat && !l.combat.fight ? { ...l.combat, at: 0 } : l.combat,
 		});
 	return frozen(stored) === frozen(next);

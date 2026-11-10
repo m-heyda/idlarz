@@ -14,7 +14,7 @@ import {
 } from '@/lib/combat';
 import { critDamagePercent } from '@/lib/statBonuses';
 import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
-import { chestRateBonusPct, gemChance, luckyRatChance, rarityLuckMultiplier } from '@/lib/luck';
+import { chestRateBonusPct, gemChance, goldenMonsterChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
 import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { merchantCombat, merchantLuck, type MerchantUpgrades } from '@/utils/game/merchant';
@@ -69,7 +69,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		/** % chance that a chest also holds 5-50 gems */
 		gemChance: gemChance(luck) * 100,
 		/** % chance that a newly arrived rat is a lucky one */
-		luckyRatChance: luckyRatChance(luck) * 100,
+		goldenMonsterChance: goldenMonsterChance(luck) * 100,
 		/** Hours of away time the kingdom works for you (base + Night Watch) and the % of the normal income it pays (base + Steward) */
 		offlineCapHours: offlineCapHours(limits),
 		offlineEfficiency: offlineEfficiency(limits) * 100,

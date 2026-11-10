@@ -3,7 +3,7 @@ import { readBuffs } from '@/lib/buffs';
 import type { CombatState } from './fightTypes';
 import type { CraftState, Inventory } from './types';
 import { craftFromJson, isEmptyCraft, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
-import { emptyBank, type TicketBank } from './tickets';
+import { upgradeStoredBank, type TicketBank } from './tickets';
 
 interface Row {
 	ver: number;
@@ -55,7 +55,7 @@ const fromRow = (row: Row): Ledger => ({
 	rebirths: row.rebirths,
 	anchorAt: Date.parse(row.anchor_at),
 	resetAt: row.reset_at ? Date.parse(row.reset_at) : null,
-	bank: { ...emptyBank(0), ...row.bank } as TicketBank,
+	bank: upgradeStoredBank(row.bank),
 	ordChest: row.ord_chest,
 	ordKill: row.ord_kill,
 	granted: { ...zeroTotals(), ...row.granted },

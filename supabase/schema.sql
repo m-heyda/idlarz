@@ -107,7 +107,7 @@ create table public.player_ledger (
   run_id        integer     not null default 1,       -- bumped by a rebirth or a new game: sealed rolls never repeat across runs
   rebirths      integer     not null default 0,
   anchor_at     timestamptz not null,                 -- away time is counted from the later of this and the last accepted save
-  bank          jsonb       not null,                 -- spawn timers and the chest / rat / king tickets (a few dozen numbers)
+  bank          jsonb       not null,                 -- spawn timers and the chest and monster tickets (a few dozen numbers; a boss is a monster ticket of kind 'boss')
   ord_chest     integer     not null default 0,       -- chest and kill rewards rolled this run (the next one is sealed on this number)
   ord_kill      integer     not null default 0,
   granted       jsonb       not null,                 -- lifetime totals the server handed out: what a save may contain on top of its income

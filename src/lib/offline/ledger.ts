@@ -166,13 +166,13 @@ export const seedLedger = (source: LedgerSeedSource, nowMs: number): Ledger => {
 	const savedSec = source.serverSavedAt / 1000;
 	const monsters = (Array.isArray(source.core.monsters) ? source.core.monsters : []) as { id?: number; type?: string; ageSec?: number }[];
 	const sorted = [...monsters].sort((a, b) => num(a.id) - num(b.id));
-	const rats: MonsterTicket[] = [];
-	let king: MonsterTicket | null = null;
+	const waiting: MonsterTicket[] = [];
 	let n = 1;
 	for (const monster of sorted) {
-		const ticket = { n: n++, at: savedSec - Math.max(0, num(monster.ageSec)), lucky: false };
-		if (monster.type === 'ratKing' || (monster.type && monster.type.startsWith('boss'))) king = king ?? ticket;
-		else rats.push(ticket);
+		const isBoss = monster.type === 'ratKing' || (monster.type && monster.type.startsWith('boss'));
+		const ticket: MonsterTicket = { n: n++, at: savedSec - Math.max(0, num(monster.ageSec)), kind: isBoss ? 'boss' : 'normal', lucky: false };
+		if (isBoss && waiting.some((t) => t.kind === 'boss')) continue; // one boss at a time
+		waiting.push(ticket);
 	}
 	// the chests standing on the saved map become numbered tickets; the server finds them a tile at the first look at the map
 	const chestCount = Math.max(0, Math.floor(num(source.summary.derived.chests)));
@@ -180,13 +180,12 @@ export const seedLedger = (source: LedgerSeedSource, nowMs: number): Ledger => {
 	ledger.bank = {
 		...emptyBank(nowMs / 1000),
 		chests,
-		rats,
-		king,
+		monsters: waiting,
 		nextN: n + chestCount,
-		ratsMinted: Math.max(rats.length, num(source.core.nextMonsterId, 1) > 1 ? 1 : 0),
+		monstersMinted: Math.max(waiting.filter((t) => t.kind === 'normal').length, num(source.core.nextMonsterId, 1) > 1 ? 1 : 0),
 		chestAcc: Math.max(0, num(source.core.chestSpawnTimer)),
-		ratAcc: Math.max(0, num(source.core.monsterSpawnTimer)),
-		kingAcc: Math.max(0, num(source.core.bossSpawnTimer)),
+		monsterAcc: Math.max(0, num(source.core.monsterSpawnTimer)),
+		bossAcc: Math.max(0, num(source.core.bossSpawnTimer)),
 	};
 	ledger.anchorAt = source.serverSavedAt;
 	ledger.inv = inventoryFromCore(source.core);

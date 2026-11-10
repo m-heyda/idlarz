@@ -1,6 +1,6 @@
 import { COMBAT, FALLBACK_BOSS, FALLBACK_MONSTER, MONSTERS } from '@/config/combatConfig';
 import { SPAWN_LIMIT } from '@/config/spawns';
-import { chestIntervalSec, luckyRatChance } from '@/lib/luck';
+import { chestIntervalSec, goldenMonsterChance } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import type { MonsterType } from '@/types/game';
 import { freeLand } from '@/lib/spawnLimits';
@@ -15,8 +15,11 @@ import { freeLand } from '@/lib/spawnLimits';
 /** Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny). */
 export const TICKET_CAP = 40;
 
-/** What `kind` of ticket: a chest, a normal monster (`rat`) or a boss (`king`: one at a time). The `rat` / `king` names are legacy ticket and save keys from when the game had a rat and a Rat King; they now mean "normal monster" and "boss". */
-export type TicketKind = 'chest' | 'rat' | 'king';
+/** What `kind` of ticket: a chest, a normal monster or a boss (one at a time). Also the name that seals the ticket's random rolls. */
+export type TicketKind = 'chest' | 'monster' | 'boss';
+
+/** Which list of the monster a ticket stands for: a normal monster or the boss (fixed when the ticket is minted; the exact monster is chosen with its tile). */
+export type MonsterKind = 'normal' | 'boss';
 
 /** A waiting chest. Like a monster it has a number and (once the server found a tile for it, see placement.ts) a tile: the browser draws it there and opens it by naming that tile. */
 export interface ChestTicket {
@@ -32,7 +35,9 @@ export interface MonsterTicket {
 	n: number;
 	/** When it appeared (epoch seconds, server clock): its age sets the level it has grown to */
 	at: number;
-	/** A lucky rat (gold tint, bigger reward); decided here, never by the client */
+	/** A normal monster or the boss */
+	kind: MonsterKind;
+	/** A golden monster (gold tint, bigger reward); decided here, never by the client */
 	lucky: boolean;
 	/** Where it stands and the level it appeared at: set by the server when it finds a tile (see placement.ts); a ticket without them is not on the map yet */
 	x?: number;
@@ -40,30 +45,30 @@ export interface MonsterTicket {
 	spawnLevel?: number;
 	/** Growth levels it may gain, when the player was weak enough at placement for the server to cap it (left out: the full growth limit) */
 	growCap?: number;
-	/** Which monster it is, chosen with the tile (placement.ts). Left out in rows from the days of rats: see `monsterTypeOf` */
+	/** Which monster it is, chosen with the tile (placement.ts). Left out until it has a tile: see `monsterTypeOf` */
 	type?: MonsterType;
 }
 
 /** The monster a ticket stands for: its own `type` when it has a valid one, else the plains monster or boss of its kind. */
-export const monsterTypeOf = (ticket: Pick<MonsterTicket, 'type'>, kind: 'rat' | 'king'): MonsterType =>
-	ticket.type && ticket.type in MONSTERS ? ticket.type : kind === 'king' ? FALLBACK_BOSS : FALLBACK_MONSTER;
+export const monsterTypeOf = (ticket: Pick<MonsterTicket, 'type' | 'kind'>): MonsterType =>
+	ticket.type && ticket.type in MONSTERS ? ticket.type : ticket.kind === 'boss' ? FALLBACK_BOSS : FALLBACK_MONSTER;
 
 export interface TicketBank {
 	/** Seconds the timers have run towards the next chest / monster / boss (they stop while the map is full) */
 	chestAcc: number;
-	ratAcc: number;
-	kingAcc: number;
+	monsterAcc: number;
+	bossAcc: number;
 	/** The server clock (epoch seconds) the timers were last brought up to */
 	accAt: number;
 	/** Waiting chests */
 	chests: ChestTicket[];
-	rats: MonsterTicket[];
-	king: MonsterTicket | null;
-	/** The number of the next monster ticket, and how many rats this run has had (the first one comes sooner) */
+	/** Waiting monsters of every kind (normal ones and at most one boss), placed or not */
+	monsters: MonsterTicket[];
+	/** The number of the next ticket, and how many normal monsters this run has had (the first one comes sooner) */
 	nextN: number;
-	ratsMinted: number;
+	monstersMinted: number;
 	/** How many tiles a normal monster / the boss may stand on right now (from the last look at the map: `sitesKey` says which land that was). Monsters stop coming when they are all taken; unknown (never looked) means none come yet. `chest` counts the tiles a chest may stand on (absent in rows from before chests were placed here). */
-	sites?: { rat: number; king: number; chest?: number };
+	sites?: { monster: number; boss: number; chest?: number };
 	sitesKey?: string;
 }
 
@@ -79,17 +84,22 @@ export interface BankContext {
 
 export const emptyBank = (nowSec: number): TicketBank => ({
 	chestAcc: 0,
-	ratAcc: 0,
-	kingAcc: 0,
+	monsterAcc: 0,
+	bossAcc: 0,
 	accAt: nowSec,
 	chests: [],
-	rats: [],
-	king: null,
+	monsters: [],
 	nextN: 1,
-	ratsMinted: 0,
+	monstersMinted: 0,
 });
 
-const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.rats.length + (bank.king ? 1 : 0);
+/** The boss waiting in the bank, if any (there is at most one). */
+export const bossOf = (bank: Pick<TicketBank, 'monsters'>): MonsterTicket | null => bank.monsters.find((ticket) => ticket.kind === 'boss') ?? null;
+
+/** The waiting normal monsters. */
+export const normalsOf = (bank: Pick<TicketBank, 'monsters'>): MonsterTicket[] => bank.monsters.filter((ticket) => ticket.kind === 'normal');
+
+const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.monsters.length;
 
 /**
  * How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
@@ -107,26 +117,26 @@ export const ticketCap = (ctx: BankContext): number => {
 
 const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, ticketCap(ctx) - ticketCount(bank));
 
-const ratThreshold = (bank: TicketBank): number => (bank.ratsMinted === 0 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec);
+const monsterThreshold = (bank: TicketBank): number => (bank.monstersMinted === 0 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec);
 
 /** Monsters waiting (normal monsters and the boss), placed or not. */
-const monsterCount = (bank: TicketBank): number => bank.rats.length + (bank.king ? 1 : 0);
+const monsterCount = (bank: TicketBank): number => bank.monsters.length;
 
 /** Whether another normal monster / the boss can come: the map has a tile for it that no waiting monster has taken. */
-const ratSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.rat;
-const kingSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.king;
+const monsterSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.monster;
+const bossSiteFree = (bank: TicketBank): boolean => !!bank.sites && monsterCount(bank) < bank.sites.boss;
 
 export interface Minted {
 	chests: ChestTicket[];
-	rats: MonsterTicket[];
-	king: MonsterTicket | null;
+	monsters: MonsterTicket[];
+	boss: MonsterTicket | null;
 }
 
 /**
  * Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
  * (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
- * With no room the chest and rat timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket
- * `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a rat is lucky.
+ * With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket
+ * `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.
  *
  * `realDtSec` is the real time the `dtSec` stand for: an absence is credited at a share of its length (the efficiency), but the
  * tickets are stamped across the whole real stretch so that they have the ages they would have had.
@@ -135,7 +145,7 @@ export interface Minted {
  *
  * - **Timers** (`COMBAT.spawn`): the first normal monster 120 s after the run starts, then one per 900 s; one boss at a time, 10,800 s after the last one left (or after the start). The timers pause when the map has no room or no free tile for it.
  * - **Room**: monsters and chests together hold at most 30% of the free tiles, at least 2, at most 40 tickets ({@link ticketCap}, `SPAWN_LIMIT`, `TICKET_CAP`).
- * - **Golden (lucky) monsters**: chance `min(10%, 2% + 0.05% x Luck)` per new normal monster; a kill pays x3 gold, XP and hide and adds one guaranteed gear roll (`LUCK.luckyRat`). Bosses are never golden.
+ * - **Golden (lucky) monsters**: chance `min(10%, 2% + 0.05% x Luck)` per new normal monster; a kill pays x3 gold, XP and hide and adds one guaranteed gear roll (`LUCK.goldenMonster`). Bosses are never golden.
  *
  * @category Monsters/Spawning
  * @order 1
@@ -147,8 +157,8 @@ export const advanceBank = (
 	rollFor: (kind: TicketKind, n: number) => Rng,
 	options: { realDtSec?: number } = {},
 ): { bank: TicketBank; minted: Minted } => {
-	const next: TicketBank = { ...bank, chests: [...bank.chests], rats: [...bank.rats] };
-	const minted: Minted = { chests: [], rats: [], king: null };
+	const next: TicketBank = { ...bank, chests: [...bank.chests], monsters: [...bank.monsters] };
+	const minted: Minted = { chests: [], monsters: [], boss: null };
 	const dt = Number.isFinite(dtSec) ? Math.max(0, dtSec) : 0;
 	const scale = dt > 0 ? (options.realDtSec ?? dt) / dt : 1;
 	const start = bank.accAt;
@@ -157,21 +167,21 @@ export const advanceBank = (
 
 	// every pass either mints a ticket (room shrinks) or uses up the time, so this ends
 	for (let guard = 0; guard < 1000 && used < dt; guard++) {
-		const ratsAllowed = ratSiteFree(next);
-		const kingAllowed = !next.king && kingSiteFree(next);
+		const monstersAllowed = monsterSiteFree(next);
+		const bossAllowed = !bossOf(next) && bossSiteFree(next);
 		if (ticketRoom(next, ctx) <= 0) {
 			next.chestAcc = 0;
-			next.ratAcc = 0;
+			next.monsterAcc = 0;
 			break;
 		}
 		const chestLeft = Math.max(0, chestEvery - next.chestAcc);
-		const ratLeft = ratsAllowed ? Math.max(0, ratThreshold(next) - next.ratAcc) : Infinity;
-		const kingLeft = kingAllowed ? Math.max(0, COMBAT.spawn.bossIntervalSec - next.kingAcc) : Infinity;
-		const step = Math.min(chestLeft, ratLeft, kingLeft, dt - used);
+		const monsterLeft = monstersAllowed ? Math.max(0, monsterThreshold(next) - next.monsterAcc) : Infinity;
+		const bossLeft = bossAllowed ? Math.max(0, COMBAT.spawn.bossIntervalSec - next.bossAcc) : Infinity;
+		const step = Math.min(chestLeft, monsterLeft, bossLeft, dt - used);
 		next.chestAcc += step;
-		if (ratsAllowed) next.ratAcc += step;
-		else next.ratAcc = 0; // no free tile: the rat timer waits at 0, like with no room
-		if (kingAllowed) next.kingAcc += step;
+		if (monstersAllowed) next.monsterAcc += step;
+		else next.monsterAcc = 0; // no free tile: the monster timer waits at 0, like with no room
+		if (bossAllowed) next.bossAcc += step;
 		used += step;
 		const at = start + used * scale;
 
@@ -181,20 +191,20 @@ export const advanceBank = (
 			next.chests.push(chest);
 			minted.chests.push(chest);
 		}
-		if (ratsAllowed && next.ratAcc >= ratThreshold(next) - 1e-9 && ticketRoom(next, ctx) > 0) {
+		if (monstersAllowed && next.monsterAcc >= monsterThreshold(next) - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const n = next.nextN++;
-			const lucky = rollFor('rat', n)() < luckyRatChance(ctx.luck);
-			const ticket = { n, at, lucky };
-			next.ratAcc = 0;
-			next.ratsMinted++;
-			next.rats.push(ticket);
-			minted.rats.push(ticket);
+			const lucky = rollFor('monster', n)() < goldenMonsterChance(ctx.luck);
+			const ticket: MonsterTicket = { n, at, kind: 'normal', lucky };
+			next.monsterAcc = 0;
+			next.monstersMinted++;
+			next.monsters.push(ticket);
+			minted.monsters.push(ticket);
 		}
-		if (kingAllowed && !next.king && kingSiteFree(next) && next.kingAcc >= COMBAT.spawn.bossIntervalSec - 1e-9 && ticketRoom(next, ctx) > 0) {
-			const ticket = { n: next.nextN++, at, lucky: false };
-			next.kingAcc = 0;
-			next.king = ticket;
-			minted.king = ticket;
+		if (bossAllowed && !bossOf(next) && bossSiteFree(next) && next.bossAcc >= COMBAT.spawn.bossIntervalSec - 1e-9 && ticketRoom(next, ctx) > 0) {
+			const ticket: MonsterTicket = { n: next.nextN++, at, kind: 'boss', lucky: false };
+			next.bossAcc = 0;
+			next.monsters.push(ticket);
+			minted.boss = ticket;
 		}
 	}
 	next.accAt = start + dt * scale;
@@ -209,18 +219,46 @@ export const takeChestAt = (bank: TicketBank, x: number, y: number): { bank: Tic
 };
 
 /** Takes the monster ticket numbered `n` (a kill or a dismissal). Null when there is none. */
-export const takeMonster = (bank: TicketBank, n: number): { bank: TicketBank; ticket: MonsterTicket; kind: 'rat' | 'king' } | null => {
-	if (bank.king?.n === n) return { bank: { ...bank, king: null, kingAcc: 0 }, ticket: bank.king, kind: 'king' };
-	const ticket = bank.rats.find((rat) => rat.n === n);
+export const takeMonster = (bank: TicketBank, n: number): { bank: TicketBank; ticket: MonsterTicket; kind: MonsterKind } | null => {
+	const ticket = bank.monsters.find((monster) => monster.n === n);
 	if (!ticket) return null;
-	return { bank: { ...bank, rats: bank.rats.filter((rat) => rat.n !== n) }, ticket, kind: 'rat' };
+	const rest = bank.monsters.filter((monster) => monster.n !== n);
+	return { bank: { ...bank, monsters: rest, ...(ticket.kind === 'boss' ? { bossAcc: 0 } : {}) }, ticket, kind: ticket.kind };
 };
 
 /** Seconds until the next ticket of any kind is due, or null when the map is full (nothing is coming until something is opened or killed). */
 export const secondsToNext = (bank: TicketBank, ctx: BankContext): number | null => {
 	if (ticketRoom(bank, ctx) <= 0) return null;
 	const left = [Math.max(0, chestIntervalSec(ctx.luck) - bank.chestAcc)];
-	if (ratSiteFree(bank)) left.push(Math.max(0, ratThreshold(bank) - bank.ratAcc));
-	if (!bank.king && kingSiteFree(bank)) left.push(Math.max(0, COMBAT.spawn.bossIntervalSec - bank.kingAcc));
+	if (monsterSiteFree(bank)) left.push(Math.max(0, monsterThreshold(bank) - bank.monsterAcc));
+	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, COMBAT.spawn.bossIntervalSec - bank.bossAcc));
 	return Math.min(...left);
+};
+
+/**
+ * Reads a bank as stored in `player_ledger.bank`. Rows written before the new chapter kept normal monsters in a `rats` list and the boss in a
+ * `king` slot (with `ratAcc`, `kingAcc`, `ratsMinted` and `sites.rat` / `sites.king`); they are turned into the single `monsters` list here, so this
+ * can be deployed before the reset and no in-flight monster is lost. TEMPORARY: delete this reader after the new chapter reset (IDL-253) has run and no old row is left.
+ */
+export const upgradeStoredBank = (raw: unknown, nowSec = 0): TicketBank => {
+	const row = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+	const base = emptyBank(nowSec);
+	if (!('rats' in row) && !('king' in row) && !('ratAcc' in row) && !('ratsMinted' in row)) return { ...base, ...(row as Partial<TicketBank>) };
+	const { rats, king, ratAcc, kingAcc, ratsMinted, sites, ...rest } = row as Record<string, unknown> & {
+		sites?: { rat?: number; king?: number; chest?: number };
+	};
+	const old = Array.isArray(rats) ? (rats as MonsterTicket[]) : [];
+	const monsters: MonsterTicket[] = [
+		...old.map((ticket) => ({ ...ticket, kind: 'normal' as const })),
+		...(king && typeof king === 'object' ? [{ ...(king as MonsterTicket), kind: 'boss' as const }] : []),
+	];
+	return {
+		...base,
+		...(rest as Partial<TicketBank>),
+		monsters,
+		monsterAcc: typeof ratAcc === 'number' ? ratAcc : 0,
+		bossAcc: typeof kingAcc === 'number' ? kingAcc : 0,
+		monstersMinted: typeof ratsMinted === 'number' ? ratsMinted : monsters.length > 0 ? 1 : 0,
+		...(sites ? { sites: { monster: sites.rat ?? 0, boss: sites.king ?? 0, ...(sites.chest !== undefined ? { chest: sites.chest } : {}) } } : {}),
+	};
 };

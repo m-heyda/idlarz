@@ -204,7 +204,7 @@ See also: [`fightStep`](combat.md#fightstep), [`estimateWin`](combat.md#estimate
 
 ### `pickTarget` <small>function</small>
 
-Source: [`src/lib/offline/fightTargets.ts:41`](../../src/lib/offline/fightTargets.ts)
+Source: [`src/lib/offline/fightTargets.ts:39`](../../src/lib/offline/fightTargets.ts)
 
 The next monster to engage: placed normal monsters first (the weakest, or the oldest: COMBAT.auto.engageOrder), then the boss. One that
 beat the player is left alone until its retry time has passed, so an unbeatable monster never blocks the easy ones.
@@ -223,7 +223,7 @@ See also: [`engage`](combat.md#engage), [`queueTicket`](combat.md#queueticket)
 
 ### `queueTicket` <small>function</small>
 
-Source: [`src/lib/offline/fightTargets.ts:87`](../../src/lib/offline/fightTargets.ts)
+Source: [`src/lib/offline/fightTargets.ts:85`](../../src/lib/offline/fightTargets.ts)
 
 A click while a fight is open: the monster joins the queue, or leaves it when it was already there.
 
@@ -272,7 +272,7 @@ Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to
 
 ### `engage` <small>function</small>
 
-Source: [`src/lib/offline/fightTargets.ts:112`](../../src/lib/offline/fightTargets.ts)
+Source: [`src/lib/offline/fightTargets.ts:110`](../../src/lib/offline/fightTargets.ts)
 
 The next fight: the queue's head (the player chose it, so no retry time and no win estimate stop it, but the hero must be back on his feet), then auto-battle's pick.
 
