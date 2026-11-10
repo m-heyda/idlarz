@@ -43,7 +43,10 @@ test('credentials: email is trimmed and lowercased, short or odd input is refuse
 });
 
 test('profile: name 1-9 characters after trimming, class one of the four heroes', () => {
-	assert.deepEqual(checkProfile({ characterName: ' Zoë ', playerClass: 'mage' }), { ok: true, value: { characterName: 'Zoë', playerClass: 'mage' } });
+	assert.deepEqual(checkProfile({ characterName: ' Zoë ', playerClass: 'mage' }), {
+		ok: true,
+		value: { characterName: 'Zoë', playerClass: 'mage', avatarId: null },
+	});
 	assert.equal(checkProfile({ characterName: 'x'.repeat(CHARACTER_NAME_MAX + 1), playerClass: 'mage' }).ok, false);
 	assert.equal(checkProfile({ characterName: '   ', playerClass: 'mage' }).ok, false);
 	for (const playerClass of ['dragon', '', 7, null, '__proto__', 'constructor', 'toString']) {

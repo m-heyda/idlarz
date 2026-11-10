@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 111,
+  "line": 112,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -56,6 +56,39 @@
    "settleAchievements",
    "achievementsDue"
   ]
+ },
+ {
+  "id": "avatarinfo",
+  "name": "Avatars",
+  "symbol": "AvatarInfo",
+  "kind": "interface",
+  "category": "Progression/Avatars",
+  "file": "src/catalog/avatars.ts",
+  "line": 17,
+  "summary": "Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual. Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.",
+  "see": []
+ },
+ {
+  "id": "class-default-avatar",
+  "name": "CLASS_DEFAULT_AVATAR",
+  "symbol": "CLASS_DEFAULT_AVATAR",
+  "kind": "const",
+  "category": "Progression/Avatars",
+  "file": "src/catalog/avatars.ts",
+  "line": 62,
+  "summary": "Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the \"A new chapter\" screen when the player picks that class (until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.",
+  "see": []
+ },
+ {
+  "id": "unlockedavatarids",
+  "name": "unlockedAvatarIds",
+  "symbol": "unlockedAvatarIds",
+  "kind": "function",
+  "category": "Progression/Avatars",
+  "file": "src/catalog/avatars.ts",
+  "line": 86,
+  "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
+  "see": []
  },
  {
   "id": "buff-families",
@@ -848,6 +881,17 @@
   "file": "src/config/spawns.ts",
   "line": 74,
   "summary": "Luck = Charisma + Lucky Charm + gear Luck. Other effects (`LUCK`):",
+  "see": []
+ },
+ {
+  "id": "checkavatar",
+  "name": "checkAvatar",
+  "symbol": "checkAvatar",
+  "kind": "function",
+  "category": "Progression/Avatars",
+  "file": "src/lib/authValidation.ts",
+  "line": 68,
+  "summary": "The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned` (the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means \"none chosen\" and passes. The client's own idea of what is unlocked is never trusted.",
   "see": []
  },
  {

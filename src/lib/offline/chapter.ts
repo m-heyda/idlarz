@@ -13,8 +13,8 @@ export interface ChapterProfile {
 /** The storage the reset needs besides the save and ledger repos (Supabase in the app, a map in tests). */
 export interface ChapterRepo {
 	loadProfile(userId: string): Promise<ChapterProfile | null>;
-	/** Sets name and class. `name_taken` when another account already holds that name (case-insensitive: the unique index). */
-	setIdentity(userId: string, name: string, playerClass: PlayerClassId): Promise<'ok' | 'name_taken'>;
+	/** Sets name and class (and the avatar, when the player chose one: an id already checked by `checkAvatar`). `name_taken` when another account already holds that name (case-insensitive: the unique index). */
+	setIdentity(userId: string, name: string, playerClass: PlayerClassId, avatarId?: string | null): Promise<'ok' | 'name_taken'>;
 	/** Puts the profile on `epoch`, only when it is on an older one (so a retry or a race never moves it back). */
 	setEpoch(userId: string, epoch: number): Promise<void>;
 	/** Records an achievement once (a second call for the same id changes nothing). */
@@ -29,7 +29,7 @@ export type ChapterOutcome = { kind: 'ok'; already: boolean } | { kind: 'name_ta
  * Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.
  *
  * - An account already on the server's epoch gets `{ ok, already: true }` and nothing is touched, so a repeated request, a second tab or a lost response is harmless.
- * - Otherwise: the name and class are saved first (a name another account holds ends it here with nothing reset), then the game is replaced exactly like a New Game
+ * - Otherwise: the name, class and avatar (already checked against the account's achievements by the route) are saved first (a name another account holds ends it here with nothing reset), then the game is replaced exactly like a New Game
  *   (the old save is first archived into a **pinned** `save_history` row flagged `epoch_archive` that is never trimmed, and only if that worked `startNewGame` runs: the save, its map, the leaderboard row and the rebirth log are
  *   deleted and the ledger starts a new run with its counters and stats zeroed; account, reserved name and gems stay), an account that predates epochs gets the early-tester
  *   grant, and the profile moves to the new epoch **last**: a failure in between leaves the account on the old epoch, and the retry is the same request again.
@@ -43,14 +43,14 @@ export const startNewChapter = async (
 	deps: Pick<ServiceDeps, 'ledgers' | 'saves'>,
 	repo: ChapterRepo,
 	userId: string,
-	input: { characterName: string; playerClass: PlayerClassId },
+	input: { characterName: string; playerClass: PlayerClassId; avatarId?: string | null },
 	nowMs: number,
 	serverEpoch: number = GAME_EPOCH,
 ): Promise<ChapterOutcome> => {
 	const profile = await repo.loadProfile(userId);
 	if (!profile) return { kind: 'no_profile' };
 	if (!needsResetFor(profile.epoch, serverEpoch)) return { kind: 'ok', already: true };
-	if ((await repo.setIdentity(userId, input.characterName, input.playerClass)) === 'name_taken') return { kind: 'name_taken' };
+	if ((await repo.setIdentity(userId, input.characterName, input.playerClass, input.avatarId)) === 'name_taken') return { kind: 'name_taken' };
 	// the old game is archived for good BEFORE anything is deleted: if the copy cannot be stored (or the save cannot be read) the reset stops here, nothing deleted
 	try {
 		const old = await deps.saves.load(userId, { world: true });
@@ -74,8 +74,11 @@ export const supabaseChapterRepo = (db: SupabaseClient): ChapterRepo => ({
 		if (error) throw new Error(error.message);
 		return data ? { epoch: typeof data.epoch === 'number' ? data.epoch : null } : null;
 	},
-	async setIdentity(userId, name, playerClass) {
-		const { error } = await db.from('profiles').update({ character_name: name, player_class: playerClass }).eq('id', userId);
+	async setIdentity(userId, name, playerClass, avatarId) {
+		const { error } = await db
+			.from('profiles')
+			.update({ character_name: name, player_class: playerClass, ...(avatarId ? { avatar_id: avatarId } : {}) })
+			.eq('id', userId);
 		if (error?.code === '23505') return 'name_taken';
 		if (error) throw new Error(error.message);
 		return 'ok';

@@ -20400,12 +20400,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"alchemist"
+		],
 		"name": "avatar_blue_plume_knight",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits",
 		"src": "/pixel/new_assets/heroes/avatar_blue_plume_knight.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -20413,12 +20415,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"farmer"
+		],
 		"name": "avatar_chain_knight_woman",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits",
 		"src": "/pixel/new_assets/heroes/avatar_chain_knight_woman.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -20426,12 +20430,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"miner"
+		],
 		"name": "avatar_dwarf_knight_orange_eyes",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits",
 		"src": "/pixel/new_assets/heroes/avatar_dwarf_knight_orange_eyes.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -20439,12 +20445,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"architect"
+		],
 		"name": "avatar_gold_lion_knight",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits",
 		"src": "/pixel/new_assets/heroes/avatar_gold_lion_knight.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -20452,50 +20460,131 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"druid"
+		],
 		"name": "avatar_green_horned_elf",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits",
 		"src": "/pixel/new_assets/heroes/avatar_green_horned_elf.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
 			64
+		]
+	},
+	{
+		"usedBy": [
+			"boss_slayer"
+		],
+		"name": "avatar_horned_brute_dark",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_horned_brute_dark.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"early_tester"
+		],
+		"name": "avatar_horned_chainmail",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_horned_chainmail.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"reborn"
+		],
+		"name": "avatar_horned_scarred_woman",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_horned_scarred_woman.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"bard"
+		],
+		"name": "avatar_purple_elf_lady",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_purple_elf_lady.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"knight"
+		],
+		"name": "avatar_red_haired_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_red_haired_knight.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"scout"
+		],
+		"name": "avatar_red_plume_lady",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_red_plume_lady.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"scholar"
+		],
+		"name": "avatar_winged_helm_veteran",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_winged_helm_veteran.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			65,
+			65
 		]
 	},
 	{
 		"usedBy": [],
 		"name": "avatar_horned_black_helm",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_black_helm.png",
-		"status": "reuse",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "avatar_horned_brute_dark",
-		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
-		"src": "/pixel/new_assets/heroes/avatar_horned_brute_dark.png",
-		"status": "reuse",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "avatar_horned_chainmail",
-		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
-		"src": "/pixel/new_assets/heroes/avatar_horned_chainmail.png",
 		"status": "reuse",
 		"source": "new_assets/heroes",
 		"size": [
@@ -20507,7 +20596,7 @@
 		"usedBy": [],
 		"name": "avatar_horned_fur_beard",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_fur_beard.png",
 		"status": "reuse",
 		"source": "new_assets/heroes",
@@ -20520,7 +20609,7 @@
 		"usedBy": [],
 		"name": "avatar_horned_fur_collar",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_fur_collar.png",
 		"status": "reuse",
 		"source": "new_assets/heroes",
@@ -20533,7 +20622,7 @@
 		"usedBy": [],
 		"name": "avatar_horned_graybeard",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_graybeard.png",
 		"status": "reuse",
 		"source": "new_assets/heroes",
@@ -20546,7 +20635,7 @@
 		"usedBy": [],
 		"name": "avatar_horned_green_veteran",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_green_veteran.png",
 		"status": "reuse",
 		"source": "new_assets/heroes",
@@ -20559,78 +20648,13 @@
 		"usedBy": [],
 		"name": "avatar_horned_ram_helm",
 		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
+		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_ram_helm.png",
 		"status": "reuse",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
 			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "avatar_horned_scarred_woman",
-		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
-		"src": "/pixel/new_assets/heroes/avatar_horned_scarred_woman.png",
-		"status": "reuse",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "avatar_purple_elf_lady",
-		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
-		"src": "/pixel/new_assets/heroes/avatar_purple_elf_lady.png",
-		"status": "reuse",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "avatar_red_haired_knight",
-		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
-		"src": "/pixel/new_assets/heroes/avatar_red_haired_knight.png",
-		"status": "reuse",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "avatar_red_plume_lady",
-		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
-		"src": "/pixel/new_assets/heroes/avatar_red_plume_lady.png",
-		"status": "reuse",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "avatar_winged_helm_veteran",
-		"category": "portraits",
-		"subcategory": "avatar portraits (not wired)",
-		"src": "/pixel/new_assets/heroes/avatar_winged_helm_veteran.png",
-		"status": "reuse",
-		"source": "new_assets/heroes",
-		"size": [
-			65,
-			65
 		]
 	},
 	{

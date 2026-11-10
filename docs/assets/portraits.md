@@ -6,28 +6,33 @@ NPC faces (48px busts): merchant, quest giver, gambler, blacksmith, innkeepers a
 
 30 assets. Refer to an asset by its **name**.
 
-## avatar portraits (not wired)
+## avatar portraits
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `avatar_blue_plume_knight` | <img src="../../public/pixel/new_assets/heroes/avatar_blue_plume_knight.png" width="96" alt="avatar_blue_plume_knight"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_blue_plume_knight.png` |
-| `avatar_chain_knight_woman` | <img src="../../public/pixel/new_assets/heroes/avatar_chain_knight_woman.png" width="96" alt="avatar_chain_knight_woman"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_chain_knight_woman.png` |
-| `avatar_dwarf_knight_orange_eyes` | <img src="../../public/pixel/new_assets/heroes/avatar_dwarf_knight_orange_eyes.png" width="96" alt="avatar_dwarf_knight_orange_eyes"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_dwarf_knight_orange_eyes.png` |
-| `avatar_gold_lion_knight` | <img src="../../public/pixel/new_assets/heroes/avatar_gold_lion_knight.png" width="96" alt="avatar_gold_lion_knight"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_gold_lion_knight.png` |
-| `avatar_green_horned_elf` | <img src="../../public/pixel/new_assets/heroes/avatar_green_horned_elf.png" width="96" alt="avatar_green_horned_elf"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_green_horned_elf.png` |
+| `avatar_blue_plume_knight` | <img src="../../public/pixel/new_assets/heroes/avatar_blue_plume_knight.png" width="96" alt="avatar_blue_plume_knight"> | 64x64 | used | alchemist | `pixel/new_assets/heroes/avatar_blue_plume_knight.png` |
+| `avatar_chain_knight_woman` | <img src="../../public/pixel/new_assets/heroes/avatar_chain_knight_woman.png" width="96" alt="avatar_chain_knight_woman"> | 64x64 | used | farmer | `pixel/new_assets/heroes/avatar_chain_knight_woman.png` |
+| `avatar_dwarf_knight_orange_eyes` | <img src="../../public/pixel/new_assets/heroes/avatar_dwarf_knight_orange_eyes.png" width="96" alt="avatar_dwarf_knight_orange_eyes"> | 64x64 | used | miner | `pixel/new_assets/heroes/avatar_dwarf_knight_orange_eyes.png` |
+| `avatar_gold_lion_knight` | <img src="../../public/pixel/new_assets/heroes/avatar_gold_lion_knight.png" width="96" alt="avatar_gold_lion_knight"> | 64x64 | used | architect | `pixel/new_assets/heroes/avatar_gold_lion_knight.png` |
+| `avatar_green_horned_elf` | <img src="../../public/pixel/new_assets/heroes/avatar_green_horned_elf.png" width="96" alt="avatar_green_horned_elf"> | 64x64 | used | druid | `pixel/new_assets/heroes/avatar_green_horned_elf.png` |
+| `avatar_horned_brute_dark` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_brute_dark.png" width="96" alt="avatar_horned_brute_dark"> | 64x64 | used | boss_slayer | `pixel/new_assets/heroes/avatar_horned_brute_dark.png` |
+| `avatar_horned_chainmail` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_chainmail.png" width="96" alt="avatar_horned_chainmail"> | 64x64 | used | early_tester | `pixel/new_assets/heroes/avatar_horned_chainmail.png` |
+| `avatar_horned_scarred_woman` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_scarred_woman.png" width="96" alt="avatar_horned_scarred_woman"> | 64x64 | used | reborn | `pixel/new_assets/heroes/avatar_horned_scarred_woman.png` |
+| `avatar_purple_elf_lady` | <img src="../../public/pixel/new_assets/heroes/avatar_purple_elf_lady.png" width="96" alt="avatar_purple_elf_lady"> | 64x64 | used | bard | `pixel/new_assets/heroes/avatar_purple_elf_lady.png` |
+| `avatar_red_haired_knight` | <img src="../../public/pixel/new_assets/heroes/avatar_red_haired_knight.png" width="96" alt="avatar_red_haired_knight"> | 64x64 | used | knight | `pixel/new_assets/heroes/avatar_red_haired_knight.png` |
+| `avatar_red_plume_lady` | <img src="../../public/pixel/new_assets/heroes/avatar_red_plume_lady.png" width="96" alt="avatar_red_plume_lady"> | 64x64 | used | scout | `pixel/new_assets/heroes/avatar_red_plume_lady.png` |
+| `avatar_winged_helm_veteran` | <img src="../../public/pixel/new_assets/heroes/avatar_winged_helm_veteran.png" width="96" alt="avatar_winged_helm_veteran"> | 65x65 | used | scholar | `pixel/new_assets/heroes/avatar_winged_helm_veteran.png` |
+
+## avatar portraits (spare, for later unlocks)
+
+| Name | Picture | Size | Status | Used by | Source file |
+| --- | --- | --- | --- | --- | --- |
 | `avatar_horned_black_helm` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_black_helm.png" width="96" alt="avatar_horned_black_helm"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_black_helm.png` |
-| `avatar_horned_brute_dark` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_brute_dark.png" width="96" alt="avatar_horned_brute_dark"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_brute_dark.png` |
-| `avatar_horned_chainmail` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_chainmail.png" width="96" alt="avatar_horned_chainmail"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_chainmail.png` |
 | `avatar_horned_fur_beard` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_fur_beard.png" width="96" alt="avatar_horned_fur_beard"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_fur_beard.png` |
 | `avatar_horned_fur_collar` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_fur_collar.png" width="96" alt="avatar_horned_fur_collar"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_fur_collar.png` |
 | `avatar_horned_graybeard` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_graybeard.png" width="96" alt="avatar_horned_graybeard"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_graybeard.png` |
 | `avatar_horned_green_veteran` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_green_veteran.png" width="96" alt="avatar_horned_green_veteran"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_green_veteran.png` |
 | `avatar_horned_ram_helm` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_ram_helm.png" width="96" alt="avatar_horned_ram_helm"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_ram_helm.png` |
-| `avatar_horned_scarred_woman` | <img src="../../public/pixel/new_assets/heroes/avatar_horned_scarred_woman.png" width="96" alt="avatar_horned_scarred_woman"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_horned_scarred_woman.png` |
-| `avatar_purple_elf_lady` | <img src="../../public/pixel/new_assets/heroes/avatar_purple_elf_lady.png" width="96" alt="avatar_purple_elf_lady"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_purple_elf_lady.png` |
-| `avatar_red_haired_knight` | <img src="../../public/pixel/new_assets/heroes/avatar_red_haired_knight.png" width="96" alt="avatar_red_haired_knight"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_red_haired_knight.png` |
-| `avatar_red_plume_lady` | <img src="../../public/pixel/new_assets/heroes/avatar_red_plume_lady.png" width="96" alt="avatar_red_plume_lady"> | 64x64 | reuse |  | `pixel/new_assets/heroes/avatar_red_plume_lady.png` |
-| `avatar_winged_helm_veteran` | <img src="../../public/pixel/new_assets/heroes/avatar_winged_helm_veteran.png" width="96" alt="avatar_winged_helm_veteran"> | 65x65 | reuse |  | `pixel/new_assets/heroes/avatar_winged_helm_veteran.png` |
 
 ## NPC busts 48px
 

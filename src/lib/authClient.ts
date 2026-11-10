@@ -5,6 +5,8 @@ import { scoped } from '@/lib/storageScope';
 export interface Profile {
 	characterName: string;
 	playerClass: PlayerClassId;
+	/** The chosen avatar (a catalog id, `catalog/avatars.ts`); null = none chosen yet (the class bust is shown). Absent from an older server's answer. */
+	avatarId?: string | null;
 }
 
 /** The numbers on the landing's Continue card (from `player_stats`, absent for an account that has not played yet). */
@@ -61,17 +63,17 @@ const post = (path: string, body?: unknown) =>
 
 export const fetchMe = () => request('/api/auth/me');
 export const login = (email: string, password: string) => post('/api/auth/login', { email, password });
-export const register = (email: string, password: string, characterName: string, playerClass: PlayerClassId) =>
-	post('/api/auth/register', { email, password, characterName, playerClass });
+export const register = (email: string, password: string, characterName: string, playerClass: PlayerClassId, avatarId: string | null = null) =>
+	post('/api/auth/register', { email, password, characterName, playerClass, avatarId });
 export const saveProfile = (characterName: string, playerClass: PlayerClassId) => post('/api/auth/profile', { characterName, playerClass });
 /** The "A new chapter" confirm (`POST /api/auth/epoch`, IDL-76): archives the old game and starts over with this name and hero. `nameTaken`: another account holds the name, nothing was reset. */
 export type ChapterResult = { status: 'ok' } | { status: 'error'; message: string; nameTaken?: boolean } | { status: 'unavailable' };
-export const startChapter = async (characterName: string, playerClass: PlayerClassId): Promise<ChapterResult> => {
+export const startChapter = async (characterName: string, playerClass: PlayerClassId, avatarId: string | null = null): Promise<ChapterResult> => {
 	try {
 		const response = await fetch('/api/auth/epoch', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ characterName, playerClass }),
+			body: JSON.stringify({ characterName, playerClass, avatarId }),
 			credentials: 'same-origin',
 			cache: 'no-store',
 			signal: AbortSignal.timeout(30_000),
@@ -82,6 +84,41 @@ export const startChapter = async (characterName: string, playerClass: PlayerCla
 		return { status: 'error', message: body.error ?? 'Something went wrong.', ...(body.nameTaken ? { nameTaken: true } : {}) };
 	} catch {
 		return { status: 'unavailable' };
+	}
+};
+
+/** The avatar picker's data (`GET /api/auth/avatar`): the chosen avatar and every id the account may pick. `null` when the server cannot be reached. */
+export interface AvatarState {
+	avatarId: string | null;
+	unlocked: string[];
+}
+export const fetchAvatars = async (): Promise<AvatarState | null> => {
+	try {
+		const response = await fetch('/api/auth/avatar', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+		if (!response.ok) return null;
+		const body = (await response.json().catch(() => null)) as { avatarId?: unknown; unlocked?: unknown } | null;
+		if (!body || !Array.isArray(body.unlocked)) return null;
+		return { avatarId: typeof body.avatarId === 'string' ? body.avatarId : null, unlocked: body.unlocked.filter((id): id is string => typeof id === 'string') };
+	} catch {
+		return null;
+	}
+};
+/** Picks an avatar (`POST /api/auth/avatar`); the server refuses an unknown or locked id with its reason. */
+export const chooseAvatar = async (avatarId: string): Promise<{ ok: true } | { ok: false; message: string }> => {
+	try {
+		const response = await fetch('/api/auth/avatar', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ avatarId }),
+			credentials: 'same-origin',
+			cache: 'no-store',
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+		});
+		if (response.ok) return { ok: true };
+		const body = (await response.json().catch(() => ({}))) as { error?: string };
+		return { ok: false, message: body.error ?? 'Something went wrong.' };
+	} catch {
+		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
 	}
 };
 export const logout = async (): Promise<void> => {

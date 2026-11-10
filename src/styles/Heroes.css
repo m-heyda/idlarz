@@ -127,3 +127,59 @@
 	background: var(--accent);
 	border-color: #080504;
 }
+
+/* Avatar picker (character window, new chapter screen, sign-up): small bust cards, locked ones as silhouettes. */
+.avatar-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 8px;
+}
+
+.avatar-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 8px 4px;
+	font-family: inherit;
+	text-align: center;
+	color: #f1e6c8;
+	cursor: pointer;
+	background: rgba(10, 7, 6, 0.75);
+	border: 4px solid transparent;
+	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+	image-rendering: pixelated;
+}
+
+.avatar-card:hover:not([data-locked='true']):not(:disabled) {
+	filter: brightness(1.12);
+	background: rgba(40, 26, 14, 0.8);
+}
+
+.avatar-card[data-selected='true'] {
+	background: rgba(60, 38, 14, 0.85);
+	box-shadow: 0 0 0 2px #e0a040;
+}
+
+.avatar-card[data-locked='true'] {
+	cursor: not-allowed;
+	color: #7c6e56;
+}
+
+.avatar-card-name {
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.avatar-card-how {
+	font-size: 0.65rem;
+	line-height: 1.15;
+}
+
+.class-card-avatar {
+	display: inline-flex;
+	margin: 2px 0;
+	line-height: 0;
+}

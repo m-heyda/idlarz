@@ -5,6 +5,8 @@ import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { login, register, saveProfile, type AuthResult, type Profile } from '@/lib/authClient';
 import PixelIcon from '@/components/game/PixelIcon';
+import AvatarPicker from '@/components/game/AvatarPicker';
+import { CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS } from '@/catalog/avatars';
 import '@/styles/Heroes.css';
 
 export type AuthMode = 'login' | 'register' | 'profile';
@@ -21,7 +23,7 @@ export interface AuthFormProps {
 /** The window title that goes with each form. */
 export const authTitle = (mode: AuthMode): string => (mode === 'login' ? 'Welcome back' : mode === 'register' ? 'Create your hero' : 'Finish your hero');
 
-/** Log in, register (character name and one of the four heroes) or finish a profile. No frame of its own: the start page and the landing window both wrap it. */
+/** Log in, register (character name, one of the four heroes and a starter avatar; the server reserves the name and checks the avatar) or finish a profile. No frame of its own: the start page and the landing window both wrap it. */
 const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavailable, onModeChange }) => {
 	const [mode, setModeState] = useState<AuthMode>(initialMode);
 	const setMode = (next: AuthMode) => {
@@ -32,12 +34,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 	const [password, setPassword] = useState('');
 	const [name, setName] = useState('');
 	const [playerClass, setPlayerClass] = useState<PlayerClassId | null>(null);
+	const [avatarPick, setAvatarPick] = useState<string | null>(null);
+	// until the player chooses one, the avatar follows the class (its default)
+	const avatarId = avatarPick ?? (playerClass ? CLASS_DEFAULT_AVATAR[playerClass] : null);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	const needsHero = mode !== 'login';
 	const needsAccount = mode !== 'profile';
-	const ready = (!needsAccount || (email.trim() !== '' && password !== '')) && (!needsHero || (name.trim() !== '' && playerClass !== null));
+	const ready =
+		(!needsAccount || (email.trim() !== '' && password !== '')) &&
+		(!needsHero || (name.trim() !== '' && playerClass !== null)) &&
+		(mode !== 'register' || avatarId !== null);
 
 	const settle = (result: AuthResult) => {
 		if (result.status === 'ok') return onSignedIn(result.profile);
@@ -52,7 +60,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 		setError(null);
 		try {
 			if (mode === 'login') settle(await login(email, password));
-			else if (mode === 'register') settle(await register(email, password, name, playerClass as PlayerClassId));
+			else if (mode === 'register') settle(await register(email, password, name, playerClass as PlayerClassId, avatarId));
 			else settle(await saveProfile(name, playerClass as PlayerClassId));
 		} finally {
 			setBusy(false);
@@ -119,6 +127,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 							);
 						})}
 					</div>
+					{mode === 'register' && (
+						<>
+							<p className='text-[#a89878] text-sm text-center'>Choose your avatar. More are won in the game.</p>
+							<AvatarPicker value={avatarId} unlocked={STARTER_AVATAR_IDS} onChange={setAvatarPick} />
+						</>
+					)}
 				</>
 			)}
 
