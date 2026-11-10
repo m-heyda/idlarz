@@ -27,11 +27,9 @@ import sprites_animals  # noqa: E402
 import sprites_animal_art  # noqa: E402
 import sprites_menu_art  # noqa: E402
 import sprites_buildings  # noqa: E402
-import sprites_castle  # noqa: E402
 import sprites_characters  # noqa: E402
 import sprites_equipment  # noqa: E402
 import sprites_farm  # noqa: E402
-import sprites_fortress  # noqa: E402
 import sprites_gear  # noqa: E402
 import sprites_map  # noqa: E402
 import sprites_menu  # noqa: E402
@@ -72,8 +70,6 @@ SPRITES = {
     **sprites_farm.SPRITES,
     **sprites_meadow.SPRITES,
     **sprites_map.SPRITES,
-    **sprites_castle.SPRITES,
-    **sprites_fortress.SPRITES,
     **sprites_buildings.SPRITES,
     **sprites_menu.SPRITES,
     **sprites_menu_art.SPRITES,  # Sprite Fusion menu buttons: menu_equipment, merchant, farm, crafting, legacy (rebirth) and the unwired extras
@@ -202,14 +198,6 @@ def reference_sheets(sprites, ui, bg):
     m, images, _ = terrain_build.manifest()
     terrain_preview.render_world(terrain_preview.make_layout(), m, images).save(os.path.join(REFERENCE, 'map-terrain.png'))
     terrain_preview.sprite_sheet(images).save(os.path.join(REFERENCE, 'map-sprites.png'))
-    # castle levels 1-6 side by side (top-down, 48px each) at 2x
-    lv = [sprites[f'castle_{i}'] for i in range(1, 7)]
-    sheet = Image.new('RGBA', (sum(im.size[0] * 2 + 16 for im in lv) + 16, 48 * 2 + 32), (60, 36, 100, 255))
-    x = 16
-    for im in lv:
-        sheet.alpha_composite(upscale(im, 2), (x, 16))
-        x += im.size[0] * 2 + 16
-    sheet.save(os.path.join(REFERENCE, 'castle-levels.png'))
     # UI parts at 3x on a dark ground
     parts = ['frame_modal', 'frame_panel', 'frame_tip', 'bar_frame', 'bar_fill', 'slot_frame', 'slot_frame_active',
              'header_divider', 'torch']
@@ -237,16 +225,6 @@ def main():
     for name, make in sprites_sheet.SHEETS.items():
         if not only or name in only:
             make().save(os.path.join(PUB, 'icons', f'{name}.png'))
-    if not only or 'castle_6_anim' in only:
-        sprites_castle.sheet_max().save(os.path.join(PUB, 'icons', 'castle_6_anim.png'))
-    if not only or 'castle_keep_anim' in only:
-        sprites_fortress.keep_sheet().save(os.path.join(PUB, 'icons', 'castle_keep_anim.png'))
-    if not only or 'castle_loading' in only:
-        # loading screen: the castle growing through its six levels (48px cells)
-        cells = Image.new('RGBA', (48 * 6, 48), (0, 0, 0, 0))
-        for i in range(6):
-            cells.alpha_composite(sprites_castle.build(i + 1, 0), (i * 48, 0))
-        cells.save(os.path.join(PUB, 'icons', 'castle_loading.png'))
     if not only or 'level_orb_shine' in only:
         sprites_props.level_orb_sheet().save(os.path.join(PUB, 'icons', 'level_orb_shine.png'))
 

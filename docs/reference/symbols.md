@@ -12,8 +12,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:301`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:242`](../../src/lib/inventory.ts) | The one place gear is summed: |
-| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:271`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
-| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:286`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
+| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:273`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
+| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:288`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyTutorial` | Progression / Guided tutorial | [`src/lib/offline/tutorial.ts:45`](../../src/lib/offline/tutorial.ts) | Applies one tutorial request to the ledger. |
@@ -57,13 +57,13 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `calculateXpGain` | Economy / Tiles | [`src/utils/game/character.ts:85`](../../src/utils/game/character.ts) | Calculate XP gain scaling based on owned tiles The more tiles owned, the more XP gained |
 | `canSpawnOn` | Monsters / Spawning | [`src/lib/monsters.ts:150`](../../src/lib/monsters.ts) | Whether a monster of this type may stand on this tile: |
 | `capPerks` | Economy / Perk caps | [`src/catalog/perkCaps.ts:57`](../../src/catalog/perkCaps.ts) | The one function that caps the perk families of a summed gear block. |
-| `CASTLE_AREA_BONUS` | Economy / Castle | [`src/config/castle.ts:36`](../../src/config/castle.ts) | Area bonus: |
-| `CASTLE_FORTRESS` | Economy / Castle | [`src/config/castle.ts:46`](../../src/config/castle.ts) | The ward: |
-| `CASTLE_RANGE` | Economy / Castle | [`src/config/castle.ts:24`](../../src/config/castle.ts) | The castle range (violet area): |
-| `CASTLE_UPGRADE` | Economy / Castle | [`src/config/castle.ts:62`](../../src/config/castle.ts) | The castle: |
-| `castleAreaBonus` | Economy / Castle | [`src/lib/castleWard.ts:41`](../../src/lib/castleWard.ts) | The extra output (as a fraction: |
+| `CASTLE_AREA_BONUS` | Economy / Castle | [`src/config/castle.ts:35`](../../src/config/castle.ts) | Area bonus: |
+| `CASTLE_RANGE` | Economy / Castle | [`src/config/castle.ts:23`](../../src/config/castle.ts) | The castle range (violet area): |
+| `CASTLE_UPGRADE` | Economy / Castle | [`src/config/castle.ts:60`](../../src/config/castle.ts) | The castle: |
+| `CASTLE_WARD` | Economy / Castle | [`src/config/castle.ts:44`](../../src/config/castle.ts) | The ward: |
+| `castleAreaBonus` | Economy / Castle | [`src/lib/castleWard.ts:47`](../../src/lib/castleWard.ts) | The extra output (as a fraction: |
 | `castleModifier` | Economy / Castle | [`src/utils/game/castle.ts:16`](../../src/utils/game/castle.ts) | Bonus (as a fraction) the castle adds to the modifier of every resource: |
-| `castleRangeRadius` | Economy / Castle | [`src/lib/castleWard.ts:22`](../../src/lib/castleWard.ts) | How far (tiles, every side) the violet range area reaches: |
+| `castleRangeRadius` | Economy / Castle | [`src/lib/castleWard.ts:28`](../../src/lib/castleWard.ts) | How far (tiles, every side) the violet range area reaches: |
 | `castleUpgradeDuration` | Economy / Castle | [`src/utils/game/castle.ts:34`](../../src/utils/game/castle.ts) | Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`. |
 | `CHARACTER_STAT_CONFIG` | Progression / Attributes | [`src/config/character.ts:92`](../../src/config/character.ts) | Attributes. |
 | `checkAvatar` | Progression / Avatars | [`src/lib/authValidation.ts:68`](../../src/lib/authValidation.ts) | The server's rule for an avatar (IDL-71), the one place that decides: |
@@ -131,6 +131,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `healAmount` | Combat / Potions and skills | [`src/lib/skills.ts:20`](../../src/lib/skills.ts) | HP a Heal restores: |
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
+| `isInWard` | Economy / Castle | [`src/lib/castleWard.ts:15`](../../src/lib/castleWard.ts) | Is this tile inside the ward: |
 | `isNonProduction` | Saves & Server / Accepting a save | [`src/lib/cloudSave/environment.ts:12`](../../src/lib/cloudSave/environment.ts) | Is this server a production server? Decided from the server's own environment only; |
 | `judgeRebase` | Saves & Server / Uploading | [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts) | Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. |
 | `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:51`](../../src/lib/loot/kill.ts) | Rewards for a kill. |

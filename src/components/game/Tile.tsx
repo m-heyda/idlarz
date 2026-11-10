@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
 import { TileProps, type MonsterType } from '@/types/game';
-import { CASTLE_X, CASTLE_Y, CASTLE_FORTRESS, CASTLE_UPGRADE } from '@/config/castle';
+import { CASTLE_X, CASTLE_Y, CASTLE_UPGRADE } from '@/config/castle';
 import { TILE_SIZE } from '@/config/biomes';
 import { useMapSource } from './mapSource';
 import { castleLevelOf, inCastleRange, MAX_CASTLE_RANGE_RADIUS } from '@/lib/castleWard';
@@ -56,9 +56,6 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 	const isAdjacent = !isOwned;
 
 	const castleLevel = game((state) => (biome === 'castle' ? castleLevelOf(state.tiles) : 1));
-	const isGlowingCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.glowFromLevel;
-	// from the fortress level the castle stands on cobbles inside walls: no purple border, no golden tile aura
-	const isFortress = biome === 'castle' && castleLevel >= CASTLE_FORTRESS.fromLevel;
 
 	// Owned tiles around the castle get gold sparkles: they are inside the castle's range (it grows from castle level 8). A tile
 	// farther than the biggest range never reads the castle level.
@@ -151,14 +148,12 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					'hover:z-10 cursor-pointer border border-transparent': !isOwned && isAdjacent,
 					'hover:border-green-700': !isOwned && isAdjacent && canAfford,
 					'hover:border-red-700 cursor-not-allowed': !isOwned && isAdjacent && !canAfford,
-					'border-2 border-amber-300': castleLevel >= CASTLE_UPGRADE.maxLevel && biome === 'castle' && !isFortress,
+					'border-2 border-amber-300': castleLevel >= CASTLE_UPGRADE.maxLevel && biome === 'castle',
 					'group hover:z-20': true,
 					'opacity-75 border-2 border-red-500': isShaking,
 					'cursor-pointer': isOwned && (biome === 'castle' || hasChest || !!monsterKey),
 					'tile-has-monster': isOwned && !!monsterKey,
 					'castle-tile': isOwned && biome === 'castle',
-					'castle-max-tile': isOwned && isGlowingCastle && !isFortress,
-					'tile-fortress': isOwned && isFortress,
 				})}
 				style={{
 					width: TILE_SIZE,

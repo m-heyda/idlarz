@@ -187,7 +187,7 @@ The file name is `biome_<name>.png`; change the value here to use another one.
 
 ### `ANIMAL_PIXEL_ICONS` <small>const</small>
 
-Source: [`src/config/pixelIcons.ts:271`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:273`](../../src/config/pixelIcons.ts)
 
 Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is [`animalIcon`](architecture.md#animalicon).
 
@@ -195,7 +195,7 @@ Farm animal id -> its sprites. Chickens and cows come in two looks, the others i
 
 ### `animalIcon` <small>function</small>
 
-Source: [`src/config/pixelIcons.ts:286`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:288`](../../src/config/pixelIcons.ts)
 
 The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial).

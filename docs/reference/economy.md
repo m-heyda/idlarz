@@ -10,7 +10,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Income: [`calculateResourceBreakdown`](#calculateresourcebreakdown), [`calculateTileOutput`](#calculatetileoutput), [`BIOME_YIELD`](#biome-yield), [`BASE_GENERATION_RATES`](#base-generation-rates)
 - Tiles: [`tilePrice`](#tileprice), [`TILE_RESOURCE_COST`](#tile-resource-cost), [`calculateTileCost`](#calculatetilecost), [`effectiveTileDiscount`](#effectivetilediscount), [`calculateXpGain`](#calculatexpgain), [`economyTiles`](#economytiles)
 - Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`REBIRTH_BIOME_OUTPUT`](#rebirth-biome-output), [`generateStartRing`](#generatestartring)
-- Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_FORTRESS`](#castle-fortress), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
+- Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_WARD`](#castle-ward), [`isInWard`](#isinward), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
 - Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
 - Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`bestWornGrade`](#bestworngrade)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
@@ -349,14 +349,14 @@ plains and never more than `maxOfOther` of any other biome. Retries with the sam
 
 ### `CASTLE_UPGRADE` <small>const</small>
 
-Source: [`src/config/castle.ts:62`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:60`](../../src/config/castle.ts)
 
 The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.
 
 - **Modifier** added to every resource: see [`castleModifier`](economy.md#castlemodifier). **Flat XP**: +0.5 xp/s per level above 1 (`xpBonus`).
 - **Timers** (`durationsSec`), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d. Master Builders (Ember shop) cuts them 5% per level ([`castleUpgradeDuration`](economy.md#castleupgradeduration)).
 - **Costs** per step (`upgradeCosts`): coal appears from 2 to 3, food and meat from 3 to 4. The full per-step table is in `docs/generated/balance-tables.md`.
-- **Range** (violet area), **area bonus** and **ward**: [`CASTLE_RANGE`](economy.md#castle-range), [`CASTLE_AREA_BONUS`](economy.md#castle-area-bonus), [`CASTLE_FORTRESS`](economy.md#castle-fortress).
+- **Range** (violet area), **area bonus** and **ward**: [`CASTLE_RANGE`](economy.md#castle-range), [`CASTLE_AREA_BONUS`](economy.md#castle-area-bonus), [`CASTLE_WARD`](economy.md#castle-ward).
 
 **Castle levels** _(computed from the code)_
 
@@ -409,7 +409,7 @@ seconds = floor(durationsSec[fromLevel - 1] x (1 - 0.05 x Master Builders level)
 
 ### `CASTLE_RANGE` <small>const</small>
 
-Source: [`src/config/castle.ts:24`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:23`](../../src/config/castle.ts)
 
 The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it grows one tile per level: 5x5 at 8, 7x7 at 9, 9x9 at 10 ([`castleRangeRadius`](economy.md#castlerangeradius)).
 
@@ -417,24 +417,32 @@ The castle range (violet area): radius 1 (3x3) up to level 7; from level 8 it gr
 
 ### `CASTLE_AREA_BONUS` <small>const</small>
 
-Source: [`src/config/castle.ts:36`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:35`](../../src/config/castle.ts)
 
 Area bonus: tiles in range (and their buildings) make extra output, +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10)
 ([`castleAreaBonus`](economy.md#castleareabonus)). It is part of the base income, so the modifiers apply on top.
 
-<a id="castle-fortress"></a>
+<a id="castle-ward"></a>
 
-### `CASTLE_FORTRESS` <small>const</small>
+### `CASTLE_WARD` <small>const</small>
 
-Source: [`src/config/castle.ts:46`](../../src/config/castle.ts)
+Source: [`src/config/castle.ts:44`](../../src/config/castle.ts)
 
-The ward: from castle level 7 the 3x3 around the castle is a walled fortress, no monsters or chests spawn there and monsters standing in it are driven out (`isInWard`, `wardTiles`).
+The ward: from castle level 7 the whole range area around the castle (3x3 growing to 9x9 at level 10) is safe, no monsters or chests spawn there and monsters standing in it are driven out (`isInWard`, `wardTiles`).
+
+<a id="isinward"></a>
+
+### `isInWard` <small>function</small>
+
+Source: [`src/lib/castleWard.ts:15`](../../src/lib/castleWard.ts)
+
+Is this tile inside the ward: from castle level 7 the whole range area (3x3 at level 7, up to 9x9 at level 10) is free of monsters and chests, and monsters standing in it are driven out.
 
 <a id="castlerangeradius"></a>
 
 ### `castleRangeRadius` <small>function</small>
 
-Source: [`src/lib/castleWard.ts:22`](../../src/lib/castleWard.ts)
+Source: [`src/lib/castleWard.ts:28`](../../src/lib/castleWard.ts)
 
 How far (tiles, every side) the violet range area reaches: 1 (3x3) up to level 7, then one more tile per level (5x5 at 8, 9x9 at 10).
 
@@ -450,9 +458,9 @@ radius = 1 + max(0, level - 8 + 1) x 1          level 1-7: 1 (3x3), 8: 2 (5x5), 
 
 ### `castleAreaBonus` <small>function</small>
 
-Source: [`src/lib/castleWard.ts:41`](../../src/lib/castleWard.ts)
+Source: [`src/lib/castleWard.ts:47`](../../src/lib/castleWard.ts)
 
-The extra output (as a fraction: 1 = +100%) every tile inside the castle range gets: +50% below level 7 (no walls), then one step per tile of range.
+The extra output (as a fraction: 1 = +100%) every tile inside the castle range gets: +50% below level 7, then one step per tile of range.
 
 **Formula**
 

@@ -33,7 +33,7 @@ const NAMES: Record<string, { biome: BiomeType; building?: string; level?: numbe
 	B: { biome: 'coast' },
 	L: { biome: 'lake' },
 	C: { biome: 'castle' },
-	W: { biome: 'castle', level: 7 },
+	W: { biome: 'yard' as BiomeType }, // the yard ground is no longer used by the game (it was the walled castle's courtyard); the terrain pipeline and its parity fixture still draw it
 	J: { biome: 'jungle' },
 	D: { biome: 'fields' },
 	O: { biome: 'orchard' },
@@ -75,8 +75,8 @@ test('tile depth, dual-cell layers and sprite placement match the Python logic o
 	);
 });
 
-test("yard rule: the fortress is cobbled; unowned and empty are no ground; a building keeps its tile's ground", () => {
-	assert.equal(groundOf({ biome: 'castle', isOwned: true, level: 7 }), 'yard');
+test("castle ground: flagstones at every level; unowned and empty are no ground; a building keeps its tile's ground", () => {
+	assert.equal(groundOf({ biome: 'castle', isOwned: true, level: 7 }), 'castle');
 	assert.equal(groundOf({ biome: 'castle', isOwned: true, level: 6 }), 'castle');
 	assert.equal(groundOf({ biome: 'forest', isOwned: true, building: 'farm' }), 'forest');
 	assert.equal(groundOf({ biome: 'grounds' as never, isOwned: true }), null, 'the removed Grounds biome is no ground');

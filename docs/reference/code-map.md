@@ -176,7 +176,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
-- [`CastleFortress.tsx`](../../src/components/game/CastleFortress.tsx) — ~ The castle's fortress (castle level 7+):
 - [`CastleRange.tsx`](../../src/components/game/CastleRange.tsx) — ~ Violet patch drawn over the tiles the castle's range bonus covers (the bonus itself comes later):
 - [`CastleSprite.tsx`](../../src/components/game/CastleSprite.tsx) — ~ `tile`:
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
@@ -341,7 +340,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buildings.ts`](../../src/lib/buildings.ts) — ~ Whether the building system is switched on (`BUILDINGS_FLAG`, off by default).
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
-- [`castleWard.ts`](../../src/lib/castleWard.ts) — ~ How far (tiles, every side) the violet range area reaches:
+- [`castleWard.ts`](../../src/lib/castleWard.ts) — ~ Is this tile inside the ward:
 - [`changelogFiles.ts`](../../src/lib/changelogFiles.ts) — ~ The folder of release notes (`content/changelog/<version>.md`).
 - [`chests.ts`](../../src/lib/chests.ts) — ~ The tiles a chest could go on, with their weights.
 - [`classPassives.ts`](../../src/lib/classPassives.ts) — ~ The passives of a hero class (`CLASS_PASSIVES`, `src/config/playerClasses.ts`):
@@ -467,7 +466,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`serverRebirth.ts`](../../src/lib/serverRebirth.ts) — ~ The browser's side of the server-run rebirth (IDL-102, `POST /api/rebirth`).
 - [`serverSession.ts`](../../src/lib/serverSession.ts) — A one-function bridge so the game store can say "the server wants an absence claimed first" without importing the code that claims
 - [`skills.ts`](../../src/lib/skills.ts) — ~ HP a Heal restores:
-- [`spawnLimits.ts`](../../src/lib/spawnLimits.ts) — ~ Tiles the ward keeps clear (the walled range around the castle, without the castle itself); 0 below the fortress level.
+- [`spawnLimits.ts`](../../src/lib/spawnLimits.ts) — ~ Tiles the ward keeps clear (the range area around the castle, without the castle itself:
 - [`startPlan.ts`](../../src/lib/startPlan.ts) — ~ Headline numbers of the account's cloud save (what GET /api/save sends next to the text).
 - [`statBonuses.ts`](../../src/lib/statBonuses.ts) — ~ % more damage with physical weapons (swords, daggers, maces, mauls, axes, spears, bows, crossbows, bare hands).
 - [`storageScope.ts`](../../src/lib/storageScope.ts) — Local development keeps its own browser storage: on localhost (any port, 127.0.0.1, [::1], *.localhost) every key this game writes
@@ -807,6 +806,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/ui/**
 
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
+- [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)

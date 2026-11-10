@@ -21,7 +21,7 @@ export const BIOME_COLORS: Readonly<Record<string, string>> = {
 	battlefield: '#725f4a',
 };
 
-/** The unexplored ring next to explored land, and the cobbled yard of a fortress castle (terrain grounds that are no biome). */
+/** The unexplored ring next to explored land, (a terrain ground that is no biome). */
 export const MIST_COLOR = '#112248';
 export const YARD_COLOR = '#928068';
 

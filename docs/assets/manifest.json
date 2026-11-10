@@ -7908,130 +7908,178 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"castle level 1"
+		],
 		"name": "castle_1",
 		"category": "buildings",
 		"subcategory": "castle",
-		"src": "/pixel/icons/castle_1.png",
+		"src": "/pixel/castles/castle_1.png",
 		"status": "used",
-		"source": "public/pixel/icons",
+		"source": "public/pixel/castles",
 		"size": [
-			48,
-			48
+			64,
+			64
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"castle level 10"
+		],
+		"name": "castle_10",
+		"category": "buildings",
+		"subcategory": "castle",
+		"src": "/pixel/castles/castle_10.png",
+		"status": "used",
+		"source": "public/pixel/castles",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"castle level 2"
+		],
 		"name": "castle_2",
 		"category": "buildings",
 		"subcategory": "castle",
-		"src": "/pixel/icons/castle_2.png",
+		"src": "/pixel/castles/castle_2.png",
 		"status": "used",
-		"source": "public/pixel/icons",
+		"source": "public/pixel/castles",
 		"size": [
-			48,
-			48
+			64,
+			64
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"castle level 3"
+		],
 		"name": "castle_3",
 		"category": "buildings",
 		"subcategory": "castle",
-		"src": "/pixel/icons/castle_3.png",
+		"src": "/pixel/castles/castle_3.png",
 		"status": "used",
-		"source": "public/pixel/icons",
+		"source": "public/pixel/castles",
 		"size": [
-			48,
-			48
+			64,
+			64
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"castle level 4"
+		],
 		"name": "castle_4",
 		"category": "buildings",
 		"subcategory": "castle",
-		"src": "/pixel/icons/castle_4.png",
+		"src": "/pixel/castles/castle_4.png",
 		"status": "used",
-		"source": "public/pixel/icons",
+		"source": "public/pixel/castles",
 		"size": [
-			48,
-			48
+			64,
+			64
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"castle level 5"
+		],
 		"name": "castle_5",
 		"category": "buildings",
 		"subcategory": "castle",
-		"src": "/pixel/icons/castle_5.png",
+		"src": "/pixel/castles/castle_5.png",
 		"status": "used",
-		"source": "public/pixel/icons",
+		"source": "public/pixel/castles",
 		"size": [
-			48,
-			48
+			64,
+			64
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"castle level 6"
+		],
 		"name": "castle_6",
 		"category": "buildings",
 		"subcategory": "castle",
-		"src": "/pixel/icons/castle_6.png",
+		"src": "/pixel/castles/castle_6.png",
 		"status": "used",
-		"source": "public/pixel/icons",
+		"source": "public/pixel/castles",
 		"size": [
-			48,
-			48
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"castle level 7"
+		],
+		"name": "castle_7",
+		"category": "buildings",
+		"subcategory": "castle",
+		"src": "/pixel/castles/castle_7.png",
+		"status": "used",
+		"source": "public/pixel/castles",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"castle level 8"
+		],
+		"name": "castle_8",
+		"category": "buildings",
+		"subcategory": "castle",
+		"src": "/pixel/castles/castle_8.png",
+		"status": "used",
+		"source": "public/pixel/castles",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"castle level 9"
+		],
+		"name": "castle_9",
+		"category": "buildings",
+		"subcategory": "castle",
+		"src": "/pixel/castles/castle_9.png",
+		"status": "used",
+		"source": "public/pixel/castles",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"loading screen"
+		],
+		"name": "castle_loading",
+		"category": "buildings",
+		"subcategory": "castle",
+		"src": "/pixel/castles/castle_loading.png",
+		"status": "used",
+		"source": "public/pixel/castles",
+		"size": [
+			640,
+			64
 		]
 	},
 	{
 		"usedBy": [],
-		"name": "castle_6_anim",
+		"name": "castle_skin_1",
 		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_6_anim.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			192,
-			48
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_gate_a",
-		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_gate_a.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			52,
-			30
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_gate_b",
-		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_gate_b.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			52,
-			30
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_keep",
-		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_keep.png",
-		"status": "used",
-		"source": "public/pixel/icons",
+		"subcategory": "castle skin",
+		"src": "/pixel/castles/castle_skin_1.png",
+		"status": "planned",
+		"source": "public/pixel/castles",
 		"size": [
 			64,
 			64
@@ -8039,132 +8087,80 @@
 	},
 	{
 		"usedBy": [],
-		"name": "castle_keep_anim",
+		"name": "castle_skin_2",
 		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_keep_anim.png",
-		"status": "used",
-		"source": "public/pixel/icons",
+		"subcategory": "castle skin",
+		"src": "/pixel/castles/castle_skin_2.png",
+		"status": "planned",
+		"source": "public/pixel/castles",
 		"size": [
-			256,
+			64,
 			64
 		]
 	},
 	{
 		"usedBy": [],
-		"name": "castle_loading",
+		"name": "castle_skin_3",
 		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_loading.png",
-		"status": "used",
-		"source": "public/pixel/icons",
+		"subcategory": "castle skin",
+		"src": "/pixel/castles/castle_skin_3.png",
+		"status": "planned",
+		"source": "public/pixel/castles",
 		"size": [
-			288,
-			48
+			64,
+			64
 		]
 	},
 	{
 		"usedBy": [],
-		"name": "castle_tower_10",
+		"name": "castle_skin_4",
 		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_tower_10.png",
-		"status": "used",
-		"source": "public/pixel/icons",
+		"subcategory": "castle skin",
+		"src": "/pixel/castles/castle_skin_4.png",
+		"status": "planned",
+		"source": "public/pixel/castles",
 		"size": [
-			40,
-			56
+			64,
+			64
 		]
 	},
 	{
 		"usedBy": [],
-		"name": "castle_tower_7",
+		"name": "castle_skin_5",
 		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_tower_7.png",
-		"status": "used",
-		"source": "public/pixel/icons",
+		"subcategory": "castle skin",
+		"src": "/pixel/castles/castle_skin_5.png",
+		"status": "planned",
+		"source": "public/pixel/castles",
 		"size": [
-			40,
-			56
+			64,
+			64
 		]
 	},
 	{
 		"usedBy": [],
-		"name": "castle_tower_8",
+		"name": "castle_skin_6",
 		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_tower_8.png",
-		"status": "used",
-		"source": "public/pixel/icons",
+		"subcategory": "castle skin",
+		"src": "/pixel/castles/castle_skin_6.png",
+		"status": "planned",
+		"source": "public/pixel/castles",
 		"size": [
-			40,
-			56
+			64,
+			64
 		]
 	},
 	{
 		"usedBy": [],
-		"name": "castle_tower_9",
+		"name": "castle_skin_7",
 		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_tower_9.png",
-		"status": "used",
-		"source": "public/pixel/icons",
+		"subcategory": "castle skin",
+		"src": "/pixel/castles/castle_skin_7.png",
+		"status": "planned",
+		"source": "public/pixel/castles",
 		"size": [
-			40,
-			56
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_wall_h_a",
-		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_wall_h_a.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			12
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_wall_h_b",
-		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_wall_h_b.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			12
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_wall_v_a",
-		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_wall_v_a.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			12,
-			48
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_wall_v_b",
-		"category": "buildings",
-		"subcategory": "castle",
-		"src": "/pixel/icons/castle_wall_v_b.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			12,
-			48
+			64,
+			64
 		]
 	},
 	{

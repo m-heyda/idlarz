@@ -5,7 +5,7 @@ import { LEVELING, CHARACTER_STAT_CONFIG } from '@/config/character';
 import { BASE_TILE_COST, BIOME_YIELD, CLICK_LADDER, CLICK_LIMIT, SCALING_CONFIG, TILE_PRICE, TILE_RESOURCE_COST } from '@/config/economy';
 import { BIOMES } from '@/config/biomes';
 import { BIOME_RULES } from '@/config/biomeRules';
-import { CASTLE_FORTRESS, CASTLE_RANGE, CASTLE_UPGRADE } from '@/config/castle';
+import { CASTLE_AREA_BONUS, CASTLE_WARD, CASTLE_RANGE, CASTLE_UPGRADE } from '@/config/castle';
 import { CHEST, SPAWN_LIMIT } from '@/config/spawns';
 import { EMBER_UPGRADES, REBIRTH } from '@/config/rebirth';
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_GOODS, MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
@@ -158,10 +158,10 @@ const Tutorial: React.FC = () => {
 					{CASTLE_UPGRADE.doublingUntil}, then +{pct(CASTLE_UPGRADE.lateLevelStep)} more per level up to +{pct(castleMax)} at level {CASTLE_UPGRADE.maxLevel}.
 					Upgrades cost resources and take real time ({formatTime(CASTLE_UPGRADE.durationsSec[0])} for the first, {formatTime(totalCastleTime)} in total); the
 					castle keeps its current bonus while it is being built. From level 2 it also produces +{CASTLE_UPGRADE.xpBonus} XP/s per level above 1. The violet
-					area around it is the castle&apos;s range: everything inside produces +50% (+100% or more once the walls stand). It is 3x3 at first, growing by a tile
-					on every side with each level from {CASTLE_RANGE.growFromLevel} (9x9 at level {CASTLE_UPGRADE.maxLevel}); from level {CASTLE_FORTRESS.fromLevel} walls
-					surround the inner 3x3 and no monsters or chests appear there. If you lose the castle while exploring, an arrow at the edge of the screen points to it
-					and <b>Back to castle</b> brings you home. Once the castle is at its maximum level, clicking it opens the Rebirth window, where you can rebirth.
+					area around it is the castle&apos;s range: everything inside produces +50% (+100% or more from level {CASTLE_AREA_BONUS.fromLevel}). It is 3x3 at
+					first, growing by a tile on every side with each level from {CASTLE_RANGE.growFromLevel} (9x9 at level {CASTLE_UPGRADE.maxLevel}); from level{' '}
+					{CASTLE_WARD.fromLevel} no monsters or chests appear inside it. If you lose the castle while exploring, an arrow at the edge of the screen points to
+					it and <b>Back to castle</b> brings you home. Once the castle is at its maximum level, clicking it opens the Rebirth window, where you can rebirth.
 				</p>
 			</section>
 

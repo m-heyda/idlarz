@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import manifest from '../../docs/assets/manifest.json';
+import { useTrashMarks } from './trashMarks';
 
 export interface ManifestEntry {
 	name: string;
@@ -37,6 +38,8 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 	const [sort, setSort] = useState('default');
 	const [variant, setVariant] = useState('default');
 	const [copied, setCopied] = useState('');
+	const [onlyTrash, setOnlyTrash] = useState(false);
+	const trash = useTrashMarks();
 	const statuses = [...new Set(rows.map((e) => e.status))];
 	const subs = [...new Set(rows.map((e) => e.subcategory))];
 	const hasVariants = rows.some((e) => e.variants);
@@ -54,6 +57,7 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 			(status === 'all' || e.status === status) &&
 			(sub === 'all' || e.subcategory === sub) &&
 			(slot === 'all' || e.slot === slot) &&
+			(!onlyTrash || trash.marks[e.src]) &&
 			(!query || e.name.includes(query.toLowerCase()) || e.usedBy.some((u) => u.includes(query))),
 	);
 	if (sort !== 'default') shown.sort((a, b) => keyOf(a).localeCompare(keyOf(b), undefined, { numeric: true }));
@@ -114,6 +118,12 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 						))}
 					</select>
 				)}
+				<label style={{ fontSize: 13 }}>
+					<input type='checkbox' checked={onlyTrash} onChange={(e) => setOnlyTrash(e.target.checked)} /> marked trash only
+				</label>
+				<button type='button' onClick={trash.copyList} style={field} title='Copy every trash mark from every gallery'>
+					copy trash list ({trash.list.length})
+				</button>
 				<span style={{ opacity: 0.7 }}>
 					{shown.length} / {rows.length}
 					{copied && ` · copied ${copied}`}
@@ -121,44 +131,63 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 			</div>
 			<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
 				{shown.map((e) => (
-					<button
-						key={e.name}
-						type='button'
-						onClick={() => copy(e.name)}
-						title={`${e.src}\n${e.source}`}
-						style={{ textAlign: 'left', background: '#1d1814', border: '1px solid #3a3029', borderRadius: 6, padding: 8, color: 'inherit', cursor: 'pointer' }}
-					>
-						<div
+					<div key={e.name} style={{ position: 'relative' }}>
+						<button
+							type='button'
+							onClick={() => trash.toggle(e.src)}
+							title={trash.marks[e.src] ? 'marked as trash: click to unmark' : 'mark as trash'}
+							style={{ position: 'absolute', top: 4, right: 4, zIndex: 1, ...field, padding: '0 6px', background: trash.marks[e.src] ? '#8a2f2f' : '#241e1a' }}
+						>
+							{trash.marks[e.src] ? 'trash' : '🗑'}
+						</button>
+						<button
+							type='button'
+							onClick={() => copy(e.name)}
+							title={`${e.src}\n${e.source}`}
 							style={{
-								height: 112,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								background: 'repeating-conic-gradient(#2a231e 0% 25%, #211b17 0% 50%) 0 / 16px 16px',
-								borderRadius: 4,
-								overflow: 'hidden',
+								textAlign: 'left',
+								width: '100%',
+								background: '#1d1814',
+								border: `1px solid ${trash.marks[e.src] ? '#c04a4a' : '#3a3029'}`,
+								opacity: trash.marks[e.src] ? 0.55 : 1,
+								borderRadius: 6,
+								padding: 8,
+								color: 'inherit',
+								cursor: 'pointer',
 							}}
 						>
-							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img
-								src={srcOf(e)}
-								alt={e.name}
+							<div
 								style={{
-									imageRendering: 'pixelated',
-									width: e.size[0] * scale,
-									height: e.size[1] * scale,
-									maxWidth: '100%',
-									maxHeight: '100%',
-									objectFit: 'contain',
+									height: 112,
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									background: 'repeating-conic-gradient(#2a231e 0% 25%, #211b17 0% 50%) 0 / 16px 16px',
+									borderRadius: 4,
+									overflow: 'hidden',
 								}}
-							/>
-						</div>
-						<div style={{ fontSize: 12, marginTop: 6, wordBreak: 'break-all', fontWeight: 600 }}>{e.name}</div>
-						<div style={{ fontSize: 11, opacity: 0.7 }}>
-							{e.size.join('x')} · <span style={{ color: STATUS_COLOR[e.status] }}>{e.status}</span>
-						</div>
-						{e.usedBy.length > 0 && <div style={{ fontSize: 11, opacity: 0.7, wordBreak: 'break-all' }}>{e.usedBy.join(', ')}</div>}
-					</button>
+							>
+								{/* eslint-disable-next-line @next/next/no-img-element */}
+								<img
+									src={srcOf(e)}
+									alt={e.name}
+									style={{
+										imageRendering: 'pixelated',
+										width: e.size[0] * scale,
+										height: e.size[1] * scale,
+										maxWidth: '100%',
+										maxHeight: '100%',
+										objectFit: 'contain',
+									}}
+								/>
+							</div>
+							<div style={{ fontSize: 12, marginTop: 6, wordBreak: 'break-all', fontWeight: 600 }}>{e.name}</div>
+							<div style={{ fontSize: 11, opacity: 0.7 }}>
+								{e.size.join('x')} · <span style={{ color: STATUS_COLOR[e.status] }}>{e.status}</span>
+							</div>
+							{e.usedBy.length > 0 && <div style={{ fontSize: 11, opacity: 0.7, wordBreak: 'break-all' }}>{e.usedBy.join(', ')}</div>}
+						</button>
+					</div>
 				))}
 			</div>
 		</div>
