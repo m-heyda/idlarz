@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, growTo, store } from '../helpers';
 import { pickPersisted } from '../../src/lib/sanitizeSave';
-import { canResumeTab, cloudSaveGone, planStart, type CloudInfo } from '../../src/lib/startPlan';
+import { canResumeTab, cloudSaveGone, planStart, savedGameSummary, skipsHub, type CloudInfo } from '../../src/lib/startPlan';
 import type { SavePeek } from '../../src/lib/saveStorage';
 
 const localSave = (playSeconds: number): SavePeek => {
@@ -55,4 +55,26 @@ test('a refused upload that reports revision 0 means the account has no save (re
 
 test('the very same game on both sides is not a choice even if the link was lost', () => {
 	assert.deepEqual(planStart(localSave(700), cloudAt(4, 700), null, 'u'), { kind: 'hub', mode: 'local' });
+});
+
+test('the hub is skipped only when there is nothing to decide', () => {
+	const local = localSave(500);
+	assert.equal(skipsHub(planStart(NONE, null, null, 'u'), NONE), true, 'a new player');
+	assert.equal(skipsHub(planStart(local, null, null, 'u'), local), true, 'one game here, none in the account');
+	assert.equal(skipsHub(planStart(local, cloudAt(3, 500), { userId: 'u', rev: 3 }, 'u'), local), true, 'the same game on both sides');
+	assert.equal(skipsHub(planStart(local, cloudAt(3, 9000), null, 'u'), local), false, 'two different games: the player chooses');
+	assert.equal(skipsHub(planStart(NONE, cloudAt(3, 500), null, 'u'), NONE), false, 'only the account has a save: restoring it is a choice');
+	assert.equal(skipsHub(planStart({ kind: 'unreadable' }, null, null, 'u'), { kind: 'unreadable' }), false, 'an unreadable save needs a word');
+	const backup: SavePeek = { ...(local as Extract<SavePeek, { kind: 'ok' }>), fromBackup: true };
+	assert.equal(skipsHub(planStart(backup, null, null, 'u'), backup), false, 'a backup is announced');
+});
+
+test('the landing summary is the more played game', () => {
+	const local = localSave(500);
+	assert.equal(savedGameSummary(NONE, null), null);
+	assert.equal(savedGameSummary(local, null)?.playSeconds, 500);
+	assert.equal(savedGameSummary(NONE, cloudAt(1, 900))?.playSeconds, 900);
+	assert.equal(savedGameSummary(local, cloudAt(1, 900))?.playSeconds, 900);
+	assert.equal(savedGameSummary(local, cloudAt(1, 100))?.playSeconds, 500);
+	assert.equal(savedGameSummary(local, 'unavailable')?.playSeconds, 500);
 });

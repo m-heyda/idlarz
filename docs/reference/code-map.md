@@ -103,7 +103,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/**
 
-- [`page.tsx`](../../src/app/page.tsx) — ~ The public landing page (`/`):
+- [`page.tsx`](../../src/app/page.tsx) — ~ Sets the page scale before the first paint (the same formula as `fitZoom`), so the layout does not jump when the page wakes up.
 
 **src/app/play/**
 
@@ -252,7 +252,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/landing/**
 
-- [`LandingPage.tsx`](../../src/components/landing/LandingPage.tsx) — ~ The size the landing is designed for (content width, and the height from the top of the map to the bottom of the feature cards).
+- [`LandingPage.tsx`](../../src/components/landing/LandingPage.tsx) — ~ A monster from the game sitting on the edge of a box.
 
 **src/config/**
 
