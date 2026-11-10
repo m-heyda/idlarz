@@ -17,6 +17,7 @@ export async function POST(request: Request) {
 		if (error || !data.user) return fail('Not signed in.', 401);
 		const { characterName, playerClass } = input.value;
 		const { error: writeError } = await supabase.from('profiles').upsert({ id: data.user.id, character_name: characterName, player_class: playerClass });
+		if (writeError?.code === '23505') return json({ error: 'That name is taken. Pick another.', nameTaken: true }, 409);
 		if (writeError) return unavailable();
 		return json({ user: { id: data.user.id, email: data.user.email ?? null }, profile: { characterName, playerClass } });
 	} catch {

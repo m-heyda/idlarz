@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config/playerClasses';
 import { GAME_TITLE } from '@/config/branding';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
-import { startChapter, type Profile } from '@/lib/authClient';
+import { startChapter, fetchAvatars, type Profile } from '@/lib/authClient';
+import { CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS } from '@/catalog/avatars';
+import AvatarPicker from '@/components/game/AvatarPicker';
 import PixelModal from '@/components/game/PixelModal';
 import PixelIcon from '@/components/game/PixelIcon';
 import '@/styles/Heroes.css';
@@ -22,21 +24,33 @@ const NOOP = () => {};
 /**
  * The "A new chapter" screen (IDL-76): shown before the save hub to an account whose game is on an older data epoch (`needsReset` from /api/auth/me). It says what
  * happens (the old game is archived and the game starts over; account, name and gems stay), lets the player pick a hero and fix the name, and confirms with
- * `POST /api/auth/epoch`. The avatar picker and the tutorial join this screen with IDL-71 and IDL-74. Nobody sees it while `GAME_EPOCH` is the baseline (config/epoch.ts).
+ * `POST /api/auth/epoch`. It also carries the avatar picker (IDL-71): what the account has unlocked comes from `GET /api/auth/avatar`, the server checks the pick again. The tutorial joins with IDL-74. Nobody sees it while `GAME_EPOCH` is the baseline (config/epoch.ts).
  */
 const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 	const [name, setName] = useState(profile.characterName);
 	const [playerClass, setPlayerClass] = useState<PlayerClassId>(profile.playerClass);
+	const [avatarPick, setAvatarPick] = useState<string | null>(profile.avatarId ?? null);
+	// until the player chooses one, the avatar is the default of the chosen class
+	const avatarId = avatarPick ?? CLASS_DEFAULT_AVATAR[playerClass];
+	const [unlocked, setUnlocked] = useState<readonly string[]>(STARTER_AVATAR_IDS);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const ready = name.trim() !== '' && !busy;
+
+	useEffect(() => {
+		let alive = true;
+		void fetchAvatars().then((state) => alive && state && setUnlocked(state.unlocked));
+		return () => {
+			alive = false;
+		};
+	}, []);
 
 	const confirm = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!ready) return;
 		setBusy(true);
 		setError(null);
-		const result = await startChapter(name.trim(), playerClass);
+		const result = await startChapter(name.trim(), playerClass, avatarId);
 		setBusy(false);
 		if (result.status === 'ok') return onDone();
 		setError(result.status === 'unavailable' ? 'The server could not be reached. Nothing was changed; try again in a moment.' : result.message);
@@ -85,6 +99,8 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 							);
 						})}
 					</div>
+					<p className='text-[#a89878] text-sm text-center'>Choose your avatar.</p>
+					<AvatarPicker value={avatarId} unlocked={unlocked} onChange={setAvatarPick} />
 					{error && (
 						<p role='alert' className='text-sm text-center text-[#e07a6a]'>
 							{error}

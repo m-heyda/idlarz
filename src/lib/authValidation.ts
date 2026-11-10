@@ -1,4 +1,5 @@
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config/playerClasses';
+import { avatarById, unlockedAvatarIds } from '@/catalog/avatars';
 
 /** Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint. */
 export const CHARACTER_NAME_MAX = 9;
@@ -14,6 +15,8 @@ export interface Credentials {
 export interface ProfileInput {
 	characterName: string;
 	playerClass: PlayerClassId;
+	/** The raw avatar id from the body, `null` when none was sent. NOT yet checked: it needs the account's earned achievements, see `checkAvatar`. */
+	avatarId: string | null;
 }
 
 type Checked<T> = { ok: true; value: T } | { ok: false; error: string };
@@ -55,11 +58,27 @@ export const checkCredentials = (body: unknown): Checked<Credentials> => {
 	return { ok: true, value: { email: email.value, password: password.value } };
 };
 
+/**
+ * The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned`
+ * (the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means "none chosen" and passes. The client's own idea of what is unlocked is never trusted.
+ *
+ * @category Progression/Avatars
+ * @order 2
+ */
+export const checkAvatar = (raw: unknown, earned: Iterable<string>): Checked<string | null> => {
+	if (raw === undefined || raw === null) return { ok: true, value: null };
+	if (typeof raw !== 'string' || !avatarById(raw)) return { ok: false, error: 'Pick one of the avatars.' };
+	if (!unlockedAvatarIds(earned).includes(raw)) return { ok: false, error: 'That avatar is still locked.' };
+	return { ok: true, value: raw };
+};
+
 export const checkProfile = (body: unknown): Checked<ProfileInput> => {
 	const input = asRecord(body);
 	const characterName = checkCharacterName(input.characterName);
 	if (!characterName.ok) return characterName;
 	const playerClass = checkPlayerClass(input.playerClass);
 	if (!playerClass.ok) return playerClass;
-	return { ok: true, value: { characterName: characterName.value, playerClass: playerClass.value } };
+	const avatar = input.avatarId;
+	if (avatar !== undefined && avatar !== null && (typeof avatar !== 'string' || avatar.length > 40)) return { ok: false, error: 'Pick one of the avatars.' };
+	return { ok: true, value: { characterName: characterName.value, playerClass: playerClass.value, avatarId: avatar ?? null } };
 };

@@ -11,6 +11,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`GameApp.tsx`](../../src/app/GameApp.tsx) — ~ The account's name and hero, given to a brand-new game only (never to one that has been played).
 
+**src/app/api/auth/avatar/**
+
+- [`route.ts`](../../src/app/api/auth/avatar/route.ts) — ~ The picker's data:
+
 **src/app/api/auth/epoch/**
 
 - [`route.ts`](../../src/app/api/auth/epoch/route.ts) — ~ The "A new chapter" confirm:
@@ -33,7 +37,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/api/auth/register/**
 
-- [`route.ts`](../../src/app/api/auth/register/route.ts) — ~ Creates the account, signs the player in (Confirm email must be off in Supabase, otherwise there is no session) and writes their profile row.
+- [`route.ts`](../../src/app/api/auth/register/route.ts) — ~ Whether another account already holds this name (case-insensitive, like the unique index `profiles_character_name_ci`).
 
 **src/app/api/chest/**
 
@@ -115,7 +119,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/catalog/**
 
+- [`achievements.ts`](../../src/catalog/achievements.ts) — The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
+- [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71):
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 
@@ -161,6 +167,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/**
 
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
+- [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id; null/unknown shows the default avatar of `playerClass`
+- [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
+- [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The chosen avatar id (null = none yet)
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
@@ -218,6 +227,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/overlays/**
 
+- [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
 - [`CharacterOverlay.tsx`](../../src/components/game/overlays/CharacterOverlay.tsx)
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
@@ -321,6 +331,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authClient.ts`](../../src/lib/authClient.ts) — ~ The browser side of /api/auth/*:
 - [`authRoute.ts`](../../src/lib/authRoute.ts) — ~ The auth service cannot be reached or is not set up:
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
+- [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
@@ -393,6 +404,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/lib/offline/**
 
+- [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read.
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
@@ -484,6 +496,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/stores/**
 
+- [`achievementStore.ts`](../../src/stores/achievementStore.ts) — ~ The achievements the server says the player has earned (an id list it sends with the spawn poll) and the toast when a request pays a new one.
 - [`craftStore.ts`](../../src/stores/craftStore.ts) — ~ One shared empty stock:
 
 **src/stores/game/**
@@ -734,6 +747,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`auth.test.ts`](../../tests/saves/auth.test.ts)
 - [`authClient.test.ts`](../../tests/saves/authClient.test.ts)
+- [`avatars.test.ts`](../../tests/saves/avatars.test.ts)
 - [`cloudAdopt.test.ts`](../../tests/saves/cloudAdopt.test.ts)
 - [`cloudConflict.test.ts`](../../tests/saves/cloudConflict.test.ts)
 - [`cloudSave.test.ts`](../../tests/saves/cloudSave.test.ts) — ~ The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null:
@@ -748,6 +762,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/server/**
 
+- [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)

@@ -92,6 +92,12 @@ export const HIGHLIGHT_MS = 3000;
 // Transient UI flags (never persisted): dialogs that are opened from several places.
 interface UiState {
 	classDialogOpen: boolean;
+	/** The account's chosen avatar (`catalog/avatars.ts`, from the profile; null = none yet): the header and the character window show it. Not part of the save. */
+	avatarId: string | null;
+	setAvatarId: (id: string | null) => void;
+	avatarDialogOpen: boolean;
+	openAvatarDialog: () => void;
+	closeAvatarDialog: () => void;
 	openClassDialog: () => void;
 	closeClassDialog: () => void;
 	settingsOpen: boolean;
@@ -159,6 +165,11 @@ interface UiState {
 
 export const useUiStore = create<UiState>((set, get) => ({
 	classDialogOpen: false,
+	avatarId: null,
+	setAvatarId: (id) => set({ avatarId: id }),
+	avatarDialogOpen: false,
+	openAvatarDialog: () => set({ avatarDialogOpen: true }),
+	closeAvatarDialog: () => set({ avatarDialogOpen: false }),
 	openClassDialog: () => set({ classDialogOpen: true }),
 	closeClassDialog: () => set({ classDialogOpen: false }),
 	settingsOpen: false,

@@ -13,7 +13,9 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
+- Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_DEFAULT_AVATAR`](#class-default-avatar), [Avatars](#avatarinfo)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
+- Achievements: [`settleAchievements`](#settleachievements), [Achievements](#achievements)
 - Guided tutorial: [`guideLive`](#guidelive), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
 ## Levels
@@ -480,6 +482,49 @@ Source: [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts)
 
 What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.
 
+## Avatars
+
+<a id="unlockedavatarids"></a>
+
+### `unlockedAvatarIds` <small>function</small>
+
+Source: [`src/catalog/avatars.ts:86`](../../src/catalog/avatars.ts)
+
+The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
+
+<a id="checkavatar"></a>
+
+### `checkAvatar` <small>function</small>
+
+Source: [`src/lib/authValidation.ts:68`](../../src/lib/authValidation.ts)
+
+The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned`
+(the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means "none chosen" and passes. The client's own idea of what is unlocked is never trusted.
+
+<a id="class-default-avatar"></a>
+
+### `CLASS_DEFAULT_AVATAR` <small>const</small>
+
+Source: [`src/catalog/avatars.ts:62`](../../src/catalog/avatars.ts)
+
+Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the "A new chapter" screen when the player picks that class
+(until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.
+
+<a id="avatarinfo"></a>
+
+### Avatars
+
+Source: [`src/catalog/avatars.ts:17`](../../src/catalog/avatars.ts)
+
+Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual.
+Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced
+on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the
+achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
+
+**Art.** The owner's framed busts (64x64, `public/pixel/new_assets/heroes/<portrait>.png`, listed in `public/pixel/new_assets/README.md`) are the portraits; `avatarArtUrl` is the only place that
+builds the path, so a new picture is a change to the `portrait` field. The six horned busts not used here stay in the pool for later unlocks. A locked avatar is shown as a black
+cut-out of its own picture (generated in `AvatarArt`, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.
+
 ## Class passives
 
 <a id="classpassives"></a>
@@ -524,6 +569,55 @@ The gear's XP bucket with the class's XP added, held under the XP perk-family ca
 ```text
 xp bucket = min(PERK_CAPS.xpPct, gear XP% + class XP%)          then + the attributes' XP gain
 ```
+
+## Achievements
+
+<a id="settleachievements"></a>
+
+### `settleAchievements` <small>function</small>
+
+Source: [`src/lib/offline/achievements.ts:111`](../../src/lib/offline/achievements.ts)
+
+Lazy evaluation, once per online request: the achievements that became due are paid and recorded in the same ledger write (a compare-and-swap, so two requests
+at once cannot both pay; a replayed request finds the id recorded and pays nothing). The caller mirrors the ids into `player_achievements` with
+`insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
+
+- **Gems**: `rewards.gems` is added to `ledger.gems` (capped by `GEMS_CAP`) and to `granted.gems`, like a chest's gem find. Gems are not an economy input, so the pacing sim does not move.
+- **Avatar and title** are only recorded with the achievement; the avatar picker (IDL-71) offers the avatars of the earned ones.
+- **Early tester** is never checked here: the new chapter reset grants it.
+- **Dark until the new chapter**: while the guide is dark (`guideLive`: `GAME_EPOCH` still the baseline and no `NEXT_PUBLIC_GUIDE=on`) nothing is paid, so the live game gets no surprise gems and the first achievement
+  (the tutorial's end) cannot be reached anyway. The one-line epoch flip switches it on together with the guide.
+
+See also: `achievementsDue`, `payAchievements`
+
+<a id="achievements"></a>
+
+### Achievements
+
+Source: [`src/catalog/achievements.ts:55`](../../src/catalog/achievements.ts)
+
+The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds
+([`settleAchievements`](progression.md#settleachievements)); the early tester is granted by the new chapter reset instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
+The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
+
+**The launch achievements (12, 600 gems in total)** _(computed from the code)_
+
+| # | Id | Title | Condition | Gems | Avatar / title |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `tutorial` | Learned the ropes | last step of the starter path done | 25 | - |
+| 2 | `first_tile` | Landowner | tiles >= 1 | 25 | - |
+| 3 | `first_building` | Builder | buildings >= 1 | 25 | - |
+| 4 | `first_fight` | First blood | kills >= 1 | 25 | - |
+| 5 | `first_chest` | Treasure hunter | chests >= 1 | 25 | - |
+| 6 | `castle_2` | Growing keep | castle level 2 | 25 | - |
+| 7 | `castle_6` | Stout walls | castle level 6 | 75 | - |
+| 8 | `castle_10` | Architect | castle level 10 | 100 | architect |
+| 9 | `first_rebirth` | Reborn | rebirths >= 1 | 75 | reborn |
+| 10 | `boss_auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss_slayer |
+| 11 | `golden_kill` | Golden touch | golden >= 1 | 50 | - |
+| 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early_tester / early-tester |
+
+See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
 ## Guided tutorial
 

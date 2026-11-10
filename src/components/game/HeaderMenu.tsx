@@ -11,6 +11,7 @@ import { openMenuAt } from '@/lib/globalMenu';
 import { castleTimerLabel } from '@/lib/castleTimer';
 import { useViewStore } from '@/stores/viewStore';
 import { cn } from '@/lib/utils';
+import { guideLive } from '@/lib/tutorial/live';
 import PixelIcon from './PixelIcon';
 import type { PixelIconName } from '@/config/pixelIcons';
 import LevelOrb from './LevelOrb';
@@ -103,6 +104,7 @@ const WINDOW_BUTTONS: { id: WinId; label: string; icon: PixelIconName }[] = [
 	{ id: 'merchant', label: 'Merchant', icon: 'menu_merchant' },
 	{ id: 'farm', label: 'Farm', icon: 'menu_farm' },
 	{ id: 'crafting', label: 'Crafting', icon: 'menu_crafting' },
+	{ id: 'achievements', label: 'Achievements', icon: 'diamond' },
 ];
 
 /** One button per window (the character screen is the avatar): each opens (or, when it is the front one, closes) its window; several can be open together. */
@@ -113,7 +115,7 @@ export const WindowButtons: React.FC = () => {
 	const dots: Partial<Record<WinId, boolean>> = { farm: attention.farm };
 	return (
 		<div className='flex items-center gap-1'>
-			{WINDOW_BUTTONS.map(({ id, label, icon }) => (
+			{WINDOW_BUTTONS.filter(({ id }) => id !== 'achievements' || guideLive()).map(({ id, label, icon }) => (
 				<div
 					key={id}
 					className='pixel-slot pixel-slot-sm relative'

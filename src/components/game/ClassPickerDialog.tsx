@@ -6,6 +6,7 @@ import audioManager from '@/utils/audioManager';
 import '@/styles/Heroes.css';
 import PixelModal from './PixelModal';
 import PixelIcon from './PixelIcon';
+import AvatarArt from './AvatarArt';
 
 /** Four heroes to choose from; picking one applies at once (cosmetic for now, abilities come later). */
 const ClassPickerDialog: React.FC = () => {
@@ -41,6 +42,9 @@ const ClassPickerDialog: React.FC = () => {
 						>
 							<span className='class-card-stage'>
 								<PixelIcon name={info.full} scale={2} alt={`${info.race} ${info.label}`} />
+							</span>
+							<span className='class-card-avatar' title='Default avatar'>
+								<AvatarArt id={null} playerClass={id} scale={0.6} />
 							</span>
 							<span className='class-card-name'>{info.label}</span>
 							<span className='class-card-race'>{info.race}</span>

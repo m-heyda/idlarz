@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 111,
+  "line": 112,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -41,6 +41,53 @@
   "file": "src/app/map-lab/page.tsx",
   "line": 2,
   "summary": "Map lab (`/map-lab`): a public, client-only page to look at and tweak the art. It renders the real map components (`Grid`, `Tile`, terrain, minimap) over a simulated world: no login, no `/api/*` call, nothing saved. The panel offers biome painting, extending land, erasing, chests and monsters (by hand or random spawns), brush size, castle level, presets (start ring, rolled 60 / 400, every biome), undo (Ctrl+Z) and JSON export / import (a lab file, not a game save).",
+  "see": []
+ },
+ {
+  "id": "achievements",
+  "name": "Achievements",
+  "symbol": "ACHIEVEMENTS",
+  "kind": "const",
+  "category": "Progression/Achievements",
+  "file": "src/catalog/achievements.ts",
+  "line": 55,
+  "summary": "The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds ({@link settleAchievements}); the early tester is granted by the new chapter reset instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
+  "see": [
+   "settleAchievements",
+   "achievementsDue"
+  ]
+ },
+ {
+  "id": "avatarinfo",
+  "name": "Avatars",
+  "symbol": "AvatarInfo",
+  "kind": "interface",
+  "category": "Progression/Avatars",
+  "file": "src/catalog/avatars.ts",
+  "line": 17,
+  "summary": "Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual. Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.",
+  "see": []
+ },
+ {
+  "id": "class-default-avatar",
+  "name": "CLASS_DEFAULT_AVATAR",
+  "symbol": "CLASS_DEFAULT_AVATAR",
+  "kind": "const",
+  "category": "Progression/Avatars",
+  "file": "src/catalog/avatars.ts",
+  "line": 62,
+  "summary": "Each class has a **default avatar** (a starter): shown while `profiles.avatar_id` is null, preselected in the sign-up and the \"A new chapter\" screen when the player picks that class (until they choose another), and shown on the class cards. Avatars stay separate from classes: any starter can be picked with any class, and the server checks the stored id like any other.",
+  "see": []
+ },
+ {
+  "id": "unlockedavatarids",
+  "name": "unlockedAvatarIds",
+  "symbol": "unlockedAvatarIds",
+  "kind": "function",
+  "category": "Progression/Avatars",
+  "file": "src/catalog/avatars.ts",
+  "line": 86,
+  "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
   "see": []
  },
  {
@@ -834,6 +881,17 @@
   "file": "src/config/spawns.ts",
   "line": 74,
   "summary": "Luck = Charisma + Lucky Charm + gear Luck. Other effects (`LUCK`):",
+  "see": []
+ },
+ {
+  "id": "checkavatar",
+  "name": "checkAvatar",
+  "symbol": "checkAvatar",
+  "kind": "function",
+  "category": "Progression/Avatars",
+  "file": "src/lib/authValidation.ts",
+  "line": 68,
+  "summary": "The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned` (the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means \"none chosen\" and passes. The client's own idea of what is unlocked is never trusted.",
   "see": []
  },
  {
@@ -1699,6 +1757,20 @@
   "line": 150,
   "summary": "Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance (Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are `MonsterDef.spawn`.",
   "see": []
+ },
+ {
+  "id": "settleachievements",
+  "name": "settleAchievements",
+  "symbol": "settleAchievements",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/offline/achievements.ts",
+  "line": 111,
+  "summary": "Lazy evaluation, once per online request: the achievements that became due are paid and recorded in the same ledger write (a compare-and-swap, so two requests at once cannot both pay; a replayed request finds the id recorded and pays nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
+  "see": [
+   "achievementsDue",
+   "payAchievements"
+  ]
  },
  {
   "id": "startnewchapter",
