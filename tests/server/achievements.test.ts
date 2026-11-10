@@ -42,16 +42,16 @@ test('the catalog is the decided launch set: 12 achievements, 600 gems, 4 avatar
 
 test('eligibility comes from the lifetime counters and the save', () => {
 	assert.deepEqual(ids(facts()), [], 'a fresh player has earned nothing');
-	assert.deepEqual(ids(facts({}, { tiles: 1 })), ['first-tile']);
-	assert.deepEqual(ids(facts({}, { chests: 3 })), ['first-chest']);
-	assert.deepEqual(ids(facts({}, { kills: { thistleBoar: 1 } })), ['first-fight']);
-	assert.deepEqual(ids(facts({}, { golden: 1 })), ['golden-kill']);
-	assert.deepEqual(ids(facts({}, { kills: { bossGreatAuroch: 1 }, bosses: 1 })), ['first-fight', 'great-auroch']);
-	assert.deepEqual(ids(facts({ castleLevel: 2 })), ['castle-2']);
-	assert.deepEqual(ids(facts({ castleLevel: 6 })), ['castle-2', 'castle-6']);
-	assert.deepEqual(ids(facts({ castleLevel: 10 })), ['castle-2', 'castle-6', 'castle-10']);
-	assert.deepEqual(ids(facts({ rebirths: 1 })), ['first-rebirth']);
-	assert.deepEqual(ids(facts({ buildings: 1 })), ['first-building']);
+	assert.deepEqual(ids(facts({}, { tiles: 1 })), ['first_tile']);
+	assert.deepEqual(ids(facts({}, { chests: 3 })), ['first_chest']);
+	assert.deepEqual(ids(facts({}, { kills: { thistleBoar: 1 } })), ['first_fight']);
+	assert.deepEqual(ids(facts({}, { golden: 1 })), ['golden_kill']);
+	assert.deepEqual(ids(facts({}, { kills: { bossGreatAuroch: 1 }, bosses: 1 })), ['first_fight', 'boss_auroch']);
+	assert.deepEqual(ids(facts({ castleLevel: 2 })), ['castle_2']);
+	assert.deepEqual(ids(facts({ castleLevel: 6 })), ['castle_2', 'castle_6']);
+	assert.deepEqual(ids(facts({ castleLevel: 10 })), ['castle_2', 'castle_6', 'castle_10']);
+	assert.deepEqual(ids(facts({ rebirths: 1 })), ['first_rebirth']);
+	assert.deepEqual(ids(facts({ buildings: 1 })), ['first_building']);
 });
 
 test('the first achievement is the end of the tutorial path: skipping or the other steps do not earn it', () => {
@@ -75,19 +75,19 @@ test('the early tester is never checked by the lazy evaluator', () => {
 
 test('paying is idempotent: a paid id pays nothing again, an unknown id pays nothing, the cap holds', () => {
 	const ledger = newLedger(T0);
-	const first = payAchievements(ledger, ['first-tile', 'castle-10', 'not-an-achievement']);
+	const first = payAchievements(ledger, ['first_tile', 'castle_10', 'not-an-achievement']);
 	assert.deepEqual(first.unlocked, [
-		{ id: 'first-tile', gems: 25 },
-		{ id: 'castle-10', gems: 100 },
+		{ id: 'first_tile', gems: 25 },
+		{ id: 'castle_10', gems: 100 },
 	]);
 	assert.equal(first.ledger.gems, STARTING_GEMS + 125);
 	assert.equal(first.ledger.granted.gems, 125);
-	assert.deepEqual(first.ledger.stats.achievements, ['first-tile', 'castle-10']);
-	const again = payAchievements(first.ledger, ['first-tile', 'castle-10', 'first-tile']);
+	assert.deepEqual(first.ledger.stats.achievements, ['first_tile', 'castle_10']);
+	const again = payAchievements(first.ledger, ['first_tile', 'castle_10', 'first_tile']);
 	assert.deepEqual(again.unlocked, []);
 	assert.equal(again.ledger, first.ledger, 'nothing to pay returns the same ledger');
 	const rich: Ledger = { ...ledger, gems: GEMS_CAP - 10 };
-	const capped = payAchievements(rich, ['castle-10']);
+	const capped = payAchievements(rich, ['castle_10']);
 	assert.equal(capped.ledger.gems, GEMS_CAP);
 	assert.equal(capped.ledger.granted.gems, 10, 'only what was really added is recorded');
 });
@@ -98,7 +98,7 @@ test('settle pays what became due once, and an earned achievement stays earned w
 	const first = settleAchievements(ledger, summary);
 	assert.deepEqual(
 		first.unlocked.map((u) => u.id),
-		['first-chest', 'castle-2', 'castle-6'],
+		['first_chest', 'castle_2', 'castle_6'],
 	);
 	assert.equal(first.ledger.gems, STARTING_GEMS + 25 + 25 + 75);
 	const lower = settleAchievements(first.ledger, { castleLevel: 1, rebirths: 0 } as never);
@@ -108,7 +108,7 @@ test('settle pays what became due once, and an earned achievement stays earned w
 
 test('the stored list reads back safely', () => {
 	assert.deepEqual(readStats(null).achievements, []);
-	assert.deepEqual(readStats({ achievements: ['first-tile', 'first-tile', 7, '', 'x'.repeat(41)] }).achievements, ['first-tile']);
+	assert.deepEqual(readStats({ achievements: ['first_tile', 'first_tile', 7, '', 'x'.repeat(41)] }).achievements, ['first_tile']);
 });
 
 // ---- through the server ----------------------------------------------------------------------------------------------------------------------------
@@ -177,19 +177,19 @@ test('a request that finds an achievement due pays it once, tells the browser, a
 
 	const paid = ok(await syncTickets(m.deps, 'u1', T0 + 2000));
 	assert.deepEqual(paid.achievements?.fresh, [
-		{ id: 'first-chest', gems: 25 },
-		{ id: 'golden-kill', gems: 50 },
+		{ id: 'first_chest', gems: 25 },
+		{ id: 'golden_kill', gems: 50 },
 	]);
 	assert.equal(paid.achievements?.gemsTotal, before.gems + 75);
 	assert.equal(paid.gemsTotal, before.gems + 75);
 	const after = m.ledgers.get('u1')!;
 	assert.equal(after.gems, before.gems + 75);
 	assert.equal(after.granted.gems, before.granted.gems + 75);
-	assert.deepEqual(m.mirrored, [{ userId: 'u1', ids: ['first-chest', 'golden-kill'] }]);
+	assert.deepEqual(m.mirrored, [{ userId: 'u1', ids: ['first_chest', 'golden_kill'] }]);
 
 	const again = ok(await syncTickets(m.deps, 'u1', T0 + 3000));
 	assert.deepEqual(again.achievements?.fresh, []);
-	assert.deepEqual(again.achievements?.earned, ['first-chest', 'golden-kill']);
+	assert.deepEqual(again.achievements?.earned, ['first_chest', 'golden_kill']);
 	assert.equal(m.ledgers.get('u1')!.gems, before.gems + 75, 'a later request pays nothing more');
 	assert.equal(m.mirrored.length, 1);
 });
@@ -201,7 +201,7 @@ test('requests at the same moment pay once (the ledger write is a compare-and-sw
 	const before = m.ledgers.get('u1')!.gems;
 	await Promise.all([syncTickets(m.deps, 'u1', T0 + 2000), syncTickets(m.deps, 'u1', T0 + 2000), syncTickets(m.deps, 'u1', T0 + 2001)]);
 	assert.equal(m.ledgers.get('u1')!.gems, before + 25);
-	assert.deepEqual(m.ledgers.get('u1')!.stats.achievements, ['first-chest']);
+	assert.deepEqual(m.ledgers.get('u1')!.stats.achievements, ['first_chest']);
 });
 
 test('a failed mirror never blocks or repeats a payout', async () => {
@@ -229,7 +229,7 @@ test('a forged claim earns nothing: no request names an achievement, and the las
 	assert.equal(stolen.ok, false);
 	assert.equal(stolen.reason, 'not_yet');
 	// an id that is an achievement id is not a tutorial step either
-	const unknown = ok(await tutorialStep(m.deps, 'u1', 'forge-key-0002', { action: 'done', id: 'castle-10' }, T0 + 3000));
+	const unknown = ok(await tutorialStep(m.deps, 'u1', 'forge-key-0002', { action: 'done', id: 'castle_10' }, T0 + 3000));
 	assert.equal(unknown.reason, 'unknown');
 	assert.deepEqual(m.ledgers.get('u1')!.stats.achievements, []);
 	assert.equal(m.ledgers.get('u1')!.gems, before);

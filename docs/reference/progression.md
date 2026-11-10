@@ -545,16 +545,16 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
 | 1 | `tutorial` | Learned the ropes | last step of the starter path done | 25 | - |
-| 2 | `first-tile` | Landowner | tiles >= 1 | 25 | - |
-| 3 | `first-building` | Builder | buildings >= 1 | 25 | - |
-| 4 | `first-fight` | First blood | kills >= 1 | 25 | - |
-| 5 | `first-chest` | Treasure hunter | chests >= 1 | 25 | - |
-| 6 | `castle-2` | Growing keep | castle level 2 | 25 | - |
-| 7 | `castle-6` | Stout walls | castle level 6 | 75 | - |
-| 8 | `castle-10` | Architect | castle level 10 | 100 | architect |
-| 9 | `first-rebirth` | Reborn | rebirths >= 1 | 75 | reborn |
-| 10 | `great-auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss-slayer |
-| 11 | `golden-kill` | Golden touch | golden >= 1 | 50 | - |
+| 2 | `first_tile` | Landowner | tiles >= 1 | 25 | - |
+| 3 | `first_building` | Builder | buildings >= 1 | 25 | - |
+| 4 | `first_fight` | First blood | kills >= 1 | 25 | - |
+| 5 | `first_chest` | Treasure hunter | chests >= 1 | 25 | - |
+| 6 | `castle_2` | Growing keep | castle level 2 | 25 | - |
+| 7 | `castle_6` | Stout walls | castle level 6 | 75 | - |
+| 8 | `castle_10` | Architect | castle level 10 | 100 | architect |
+| 9 | `first_rebirth` | Reborn | rebirths >= 1 | 75 | reborn |
+| 10 | `boss_auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss-slayer |
+| 11 | `golden_kill` | Golden touch | golden >= 1 | 50 | - |
 | 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early-tester / early-tester |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
