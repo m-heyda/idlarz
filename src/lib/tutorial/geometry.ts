@@ -16,8 +16,8 @@ export interface Viewport {
 
 /** Room around the target, in px */
 export const CUTOUT_PAD = 6;
-/** More matching elements than this are ignored (a field of buyable tiles): the nearest ones are enough */
-export const MAX_HOLES = 24;
+/** Several elements can match a target (every monster, every buyable tile): only the one nearest the middle of the screen is lit, so the map is not ringed all over */
+export const MAX_HOLES = 1;
 
 /** The rectangle grown by `pad` on every side. */
 export const padRect = (r: Rect, pad = CUTOUT_PAD): Rect => ({ left: r.left - pad, top: r.top - pad, width: r.width + 2 * pad, height: r.height + 2 * pad });
@@ -38,9 +38,9 @@ export const holesFor = (rects: readonly Rect[], view: Viewport, pad = CUTOUT_PA
 		if (!(r.width > 0 && r.height > 0)) continue;
 		const clipped = clipToViewport(padRect(r, pad), view);
 		if (clipped) holes.push(clipped);
-		if (holes.length >= MAX_HOLES) break;
 	}
-	return holes;
+	const away = (h: Rect) => Math.hypot(h.left + h.width / 2 - view.width / 2, h.top + h.height / 2 - view.height / 2);
+	return holes.sort((a, b) => away(a) - away(b)).slice(0, MAX_HOLES);
 };
 
 const px = (n: number) => `${Math.round(n * 10) / 10}`;

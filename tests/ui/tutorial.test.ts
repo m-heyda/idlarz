@@ -161,16 +161,25 @@ test('holes are padded, clipped to the screen and empty ones dropped', () => {
 		],
 		view,
 	);
-	assert.equal(holes.length, 2);
+	assert.equal(holes.length, MAX_HOLES);
 	assert.deepEqual(holes[0], { left: 94, top: 94, width: 62, height: 52 });
-	assert.equal(holes[1].left + holes[1].width, 1000, 'clipped at the right edge');
-	assert.equal(holes[1].top + holes[1].height, 600);
+	const edge = holesFor([{ left: 990, top: 590, width: 100, height: 100 }], view)[0];
+	assert.equal(edge.left + edge.width, 1000, 'clipped at the right edge');
+	assert.equal(edge.top + edge.height, 600);
 	assert.deepEqual(holesFor([], view), [], 'a target that is not on screen yields no hole (the bubble stays alone)');
 });
 
-test('at most MAX_HOLES holes', () => {
+test('only the element nearest the middle of the screen is lit', () => {
 	const many = Array.from({ length: 80 }, (_, i) => ({ left: (i * 12) % 900, top: 20, width: 10, height: 10 }));
 	assert.equal(holesFor(many, view).length, MAX_HOLES);
+	const [near] = holesFor(
+		[
+			{ left: 20, top: 20, width: 10, height: 10 },
+			{ left: 490, top: 290, width: 10, height: 10 },
+		],
+		view,
+	);
+	assert.equal(near.left, 484, 'the one at the centre wins');
 });
 
 test('the clip path is the screen minus the holes (even-odd), and strict lets clicks through the holes only', () => {
