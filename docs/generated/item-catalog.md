@@ -202,6 +202,9 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **monster_lake level 10** (profile `normal_monster_lake`, item level 10): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
 - **monster_lake level 29** (profile `normal_monster_lake`, item level 29): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
+- **monster_jungle level 14** (profile `normal_monster_jungle`, item level 14): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
+- **monster_jungle level 32** (profile `normal_monster_jungle`, item level 32): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `rat_potion` from pool `potions_rat`, chance 0.25
 - **boss level 15** (profile `boss`, item level 15): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss level 45** (profile `boss`, item level 45): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
@@ -229,6 +232,9 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **boss_lake level 27** (profile `boss_lake`, item level 27): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_lake level 47** (profile `boss_lake`, item level 47): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
+- **boss_jungle level 32** (profile `boss_jungle`, item level 32): 32 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_jungle level 52** (profile `boss_jungle`, item level 52): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+  - bonus `king_potions` from pool `potions_king`
 - **chest** (profile `basic_chest`, item level 4): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
   - bonus `chest_legendary` from pool `legendary_weapons`, chance 0.019, replace
   - bonus `chest_potion` from pool `potions_chest`, fallback
@@ -236,7 +242,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **craft level 1** (profile `craft`, item level 1): 33 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 - **craft level 41** (profile `craft`, item level 41): 32 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 
-Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `equipment_coast`, `equipment_hills`, `equipment_lake`, `equipment_craft`, `legendary_weapons`, `boss_general`, `boss_general_plains`, `boss_general_forest`, `boss_general_swamp`, `boss_general_tundra`, `boss_general_coast`, `boss_general_hills`, `boss_general_lake`, `boss_unique_forest`, `boss_unique_swamp`, `boss_unique_tundra`, `potions_rat`, `potions_king`, `potions_chest`
+Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `equipment_coast`, `equipment_hills`, `equipment_lake`, `equipment_jungle`, `equipment_craft`, `legendary_weapons`, `boss_general`, `boss_general_plains`, `boss_general_forest`, `boss_general_swamp`, `boss_general_tundra`, `boss_general_coast`, `boss_general_hills`, `boss_general_lake`, `boss_general_jungle`, `boss_unique_forest`, `boss_unique_swamp`, `boss_unique_tundra`, `potions_rat`, `potions_king`, `potions_chest`
 
 ## Merchant stock
 

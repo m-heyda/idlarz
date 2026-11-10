@@ -174,8 +174,9 @@ test('art: every new biome has colours, a ground texture, shapes, props, decor, 
 	}
 });
 
-test('monsters: nothing spawns on a new-biome tile, whatever the distance, castle level or rebirths', () => {
-	for (const type of Object.keys(MONSTERS) as MonsterType[])
+test('monsters: only the jungle roster spawns on a new-biome tile (jungle tiles, from rebirth 1); nowhere else, whatever the distance, castle level or rebirths', () => {
+	const jungle = (type: MonsterType) => (MONSTERS[type].spawn.biomes as readonly string[]).includes('jungle');
+	for (const type of (Object.keys(MONSTERS) as MonsterType[]).filter((t) => !jungle(t)))
 		for (const biome of NEW_BIOMES)
 			for (const distance of [2, 5, 9, 20, 40])
 				assert.equal(canSpawnOn(type, CASTLE_X + distance, CASTLE_Y, { biome }, 1, 9), false, `${type} on ${biome} at ${distance}`);

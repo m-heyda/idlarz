@@ -402,7 +402,12 @@ export const BOSS_MIN_DISTANCE = 8;
 export const BOSS_MAX_DISTANCE = 999;
 
 /** A boss always has a clock and taunts (the type says so, so a caller need not check) */
-const boss = (biome: keyof typeof BIOME_TIER, label: string, taunts: readonly string[], minRebirths?: number): MonsterDef & { timeLimitSec: number; taunts: readonly string[] } => {
+const boss = (
+	biome: keyof typeof BIOME_TIER,
+	label: string,
+	taunts: readonly string[],
+	minRebirths?: number,
+): MonsterDef & { timeLimitSec: number; taunts: readonly string[] } => {
 	const b = BIOME_TIER[biome].boss;
 	return {
 		grade: 'boss',

@@ -90,3 +90,15 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 93% |
 | The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 85% |
 | The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 80% |
+| Skull Vine | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 95% |
+| Skull Vine | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Skull Vine | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 50% |
+| Eye Horror | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Zombie Triceratops | 14 (castle 1) | 0% | 0% | 0% | 0% | 60% | 100% |
+| Zombie Triceratops | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Zombie Triceratops | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
