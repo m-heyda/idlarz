@@ -769,6 +769,17 @@
   "see": []
  },
  {
+  "id": "npc-portraits",
+  "name": "NPC_PORTRAITS",
+  "symbol": "NPC_PORTRAITS",
+  "kind": "const",
+  "category": "Architecture/Art",
+  "file": "src/config/npcPortraits.ts",
+  "line": 12,
+  "summary": "The NPC portraits: 12 small bust pictures (48x48, transparent, Sprite Fusion) in `public/pixel/portraits/`, named `npc_<who>`. They are NOT the 40x40 bust frame of the avatars in `art_style_reference/ui-and-portraits/README.md`: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`). The merchant window shows one face per tab (`MERCHANT_PORTRAIT`); every other portrait stays in the asset library (category Portraits) as a ready face for a future quest giver, innkeeper, blacksmith or dialogue.",
+  "see": []
+ },
+ {
   "id": "pixel-art-pipeline",
   "name": "Pixel art pipeline",
   "kind": "topic",
@@ -2508,7 +2519,7 @@
   "category": "Architecture/Art",
   "file": "scripts/assets/manifest.ts",
   "line": 1,
-  "summary": "The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor, accessories, monsters, buildings, resources, map-details, ui, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose. Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/` get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them. `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook (`npm run storybook`) and `tests/docs/assets.test.ts` keeps current. Never edit `docs/assets/` by hand.",
+  "summary": "The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor, accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose. Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/` get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them. `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook (`npm run storybook`) and `tests/docs/assets.test.ts` keeps current. Never edit `docs/assets/` by hand.",
   "see": []
  },
  {

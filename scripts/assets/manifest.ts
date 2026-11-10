@@ -1,6 +1,6 @@
 /**
  * The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
- * accessories, monsters, buildings, resources, map-details, ui, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
+ * accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
  * Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/`
  * get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
  * `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
@@ -12,6 +12,7 @@
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, relative, resolve, sep } from 'node:path';
+import { MERCHANT_PORTRAIT } from '../../src/config/npcPortraits';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
 import { ITEMS } from '../../src/catalog/items';
@@ -28,7 +29,18 @@ import {
 export const ROOT = resolve(__dirname, '..', '..');
 const PUBLIC = join(ROOT, 'public');
 
-export type AssetCategory = 'potions' | 'weapons' | 'armor' | 'accessories' | 'monsters' | 'buildings' | 'resources' | 'map-details' | 'ui' | 'unsorted';
+export type AssetCategory =
+	| 'potions'
+	| 'weapons'
+	| 'armor'
+	| 'accessories'
+	| 'monsters'
+	| 'buildings'
+	| 'resources'
+	| 'map-details'
+	| 'ui'
+	| 'portraits'
+	| 'unsorted';
 /**
  * used = live in the game now (enabled item, monster or resource; icon referenced by code); planned = its item/monster/resource exists but is disabled; retired = item no longer drops, old saves keep it; unused = registered art that nothing references (an icon no item uses, an icon no code mentions);
  * placeholder = a stand-in silhouette; spare = generated art nobody asked for (`_name.png`); reuse = raw pack art, not wired.
@@ -69,7 +81,13 @@ export const CATEGORIES: readonly { id: AssetCategory; title: string; blurb: str
 		title: 'Map details',
 		blurb: 'Trees, bushes, rocks, minerals, ruins, props and creatures to dress the map. None is wired yet; use a variant that matches the ground.',
 	},
-	{ id: 'ui', title: 'UI and portraits', blurb: 'Menu icons, equipment slot icons, portraits, banners, bars, frames, effects.' },
+	{ id: 'ui', title: 'UI', blurb: 'Menu icons, equipment slot icons, banners, bars, frames, effects.' },
+	{
+		id: 'portraits',
+		title: 'Portraits',
+		blurb:
+			'NPC faces (48px busts): merchant, quest giver, gambler, blacksmith, innkeepers and more. A few stand behind the merchant counter, the rest are ready for quests and dialogue.',
+	},
 	{ id: 'unsorted', title: 'Unsorted cuts', blurb: 'Loose cuts in public/pixel/reuse, not classified yet.' },
 ];
 
@@ -296,6 +314,23 @@ export const buildManifest = (): AssetEntry[] => {
 			source: 'public/fx',
 		});
 
+	// 5b. NPC portraits (public/pixel/portraits, picked per merchant tab by src/config/npcPortraits.ts)
+	const portraitUsers = new Map<string, string[]>();
+	for (const [tab, name] of Object.entries(MERCHANT_PORTRAIT)) portraitUsers.set(name, [...(portraitUsers.get(name) ?? []), `merchant:${tab}`]);
+	for (const f of walk(join(PUBLIC, 'pixel', 'portraits'))) {
+		const id = basename(f, '.png');
+		const users = portraitUsers.get(id) ?? [];
+		add({
+			name: `portrait_${id.replace(/^npc_/, '')}`,
+			category: 'portraits',
+			subcategory: 'NPC busts 48px',
+			src: url(f),
+			status: users.length ? 'used' : 'reuse',
+			usedBy: users,
+			source: 'public/pixel/portraits',
+		});
+	}
+
 	// 6. Reuse pools
 	const POOL = join(PUBLIC, 'pixel', 'assets_to_assess_and_use');
 	// `plain` = what a file with no variant marker is: most packs keep the no-shadow art in `Assets/`, but rocks and fantasy trees ship the shadowed art plain and mark the other `no_shadow`
@@ -386,6 +421,26 @@ export const buildManifest = (): AssetEntry[] => {
 			status: 'reuse',
 			source: 'assets_to_assess_and_use/monsters',
 		});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'heroes')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'portraits',
+				subcategory: 'avatar portraits (not wired)',
+				src: url(f),
+				status: 'reuse',
+				source: 'new_assets/heroes',
+			});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'achievements')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'ui',
+				subcategory: 'achievement badges (not wired)',
+				src: url(f),
+				status: 'reuse',
+				source: 'new_assets/achievements',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'reuse'))) {
 		const kind = relative(join(PUBLIC, 'pixel', 'reuse'), f).split(sep)[0];
 		add({
