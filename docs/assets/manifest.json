@@ -7673,246 +7673,6 @@
 	},
 	{
 		"usedBy": [
-			"building:alchemylab"
-		],
-		"name": "building_alchemylab",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_alchemylab.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:barracks"
-		],
-		"name": "building_barracks",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_barracks.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:blacksmith"
-		],
-		"name": "building_blacksmith",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_blacksmith.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:farm"
-		],
-		"name": "building_farm",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_farm.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:fishinghut"
-		],
-		"name": "building_fishinghut",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_fishinghut.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:hunterslodge"
-		],
-		"name": "building_hunterslodge",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_hunterslodge.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:lumbercamp"
-		],
-		"name": "building_lumbercamp",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_lumbercamp.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:lumbermill"
-		],
-		"name": "building_lumbermill",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_lumbermill.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:market"
-		],
-		"name": "building_market",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_market.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:mine"
-		],
-		"name": "building_mine",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_mine.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:quarry"
-		],
-		"name": "building_quarry",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_quarry.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:stonecraft"
-		],
-		"name": "building_stonecraft",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_stonecraft.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:tavern"
-		],
-		"name": "building_tavern",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_tavern.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:tower"
-		],
-		"name": "building_tower",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_tower.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:well"
-		],
-		"name": "building_well",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_well.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:workshop"
-		],
-		"name": "building_workshop",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_workshop.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
 			"castle level 1"
 		],
 		"name": "castle_1",
@@ -10196,12 +9956,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:coalpit"
+		],
 		"name": "building_village_blacksmith_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Blacksmith House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10248,12 +10010,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:saptapper"
+		],
 		"name": "building_village_carpenters_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Carpenters House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10326,12 +10090,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:fishery"
+		],
 		"name": "building_village_fishermans_hut",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Fishermans Hut.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10404,12 +10170,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:herbgarden"
+		],
 		"name": "building_village_herbalist_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Herbalist House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10417,12 +10185,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:icecutter"
+		],
 		"name": "building_village_hunters_cabin",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Hunters Cabin.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10430,12 +10200,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:pearldiver"
+		],
 		"name": "building_village_jewelers_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Jewelers House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10456,12 +10228,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:lumberyard"
+		],
 		"name": "building_village_lumberjack_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Lumberjack House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10508,12 +10282,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:harbor"
+		],
 		"name": "building_village_merchant_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Merchant House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10521,12 +10297,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:saltworks"
+		],
 		"name": "building_village_mill_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Mill House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10534,12 +10312,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:quarry"
+		],
 		"name": "building_village_mine_entrance_building",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Mine Entrance Building.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10690,12 +10470,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:peatworks"
+		],
 		"name": "building_village_small_wooden_cottage",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Small Wooden Cottage.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10729,12 +10511,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:granary"
+		],
 		"name": "building_village_storage_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Storage House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10846,12 +10630,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:sporecellar"
+		],
 		"name": "building_village_wizard_hut",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Wizard Hut.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10859,12 +10645,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:deepmine"
+		],
 		"name": "building_village_workshop_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Workshop House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,

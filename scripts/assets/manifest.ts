@@ -17,18 +17,12 @@ import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { MONSTERS } from '../../src/config/combatConfig';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
 import { AVATARS } from '../../src/catalog/avatars';
+import { BUILDINGS } from '../../src/catalog/buildings';
 import { GUIDE_SPRITE, GUIDE_TALK_SHEET } from '../../src/catalog/tutorial';
 import { BIOME_ART } from '../../src/config/biomeArt';
 import { ITEMS } from '../../src/catalog/items';
 import { RESOURCE_ART, resourceArtUrl } from '../../src/catalog/resourceArt';
-import {
-	ANIMAL_PIXEL_ICONS,
-	BUILDING_PIXEL_ICONS,
-	EQUIPMENT_PIXEL_ICONS,
-	RESERVED_RESOURCES,
-	RESOURCE_PIXEL_ICONS,
-	SHINE_SHEETS,
-} from '../../src/config/pixelIcons';
+import { ANIMAL_PIXEL_ICONS, EQUIPMENT_PIXEL_ICONS, RESERVED_RESOURCES, RESOURCE_PIXEL_ICONS, SHINE_SHEETS } from '../../src/config/pixelIcons';
 
 export const ROOT = resolve(__dirname, '..', '..');
 const PUBLIC = join(ROOT, 'public');
@@ -299,7 +293,6 @@ export const buildManifest = (): AssetEntry[] => {
 	};
 	const usage = new Map<string, string[]>();
 	for (const [prefix, map] of [
-		['building:', BUILDING_PIXEL_ICONS],
 		['slot:', EQUIPMENT_PIXEL_ICONS],
 		['resource:', RESOURCE_PIXEL_ICONS],
 		['animal:', ANIMAL_PIXEL_ICONS],
@@ -477,14 +470,18 @@ export const buildManifest = (): AssetEntry[] => {
 			status: 'reuse',
 			source: 'assets_to_assess_and_use/buildings',
 		});
+	// the village pictures the building catalog (src/catalog/buildings.ts) uses are in the game; the rest wait in the pool
+	const buildingOfArt = new Map(BUILDINGS.map((b) => [decodeURIComponent(b.art), b.id]));
 	for (const f of walk(join(POOL, 'more_buildings'))) {
 		if (/^(titel|text)\./i.test(basename(f))) continue;
+		const building = buildingOfArt.get(url(f));
 		add({
 			name: `building_village_${snake(basename(f))}`,
 			category: 'buildings',
 			subcategory: 'village pack 80px (named)',
 			src: url(f),
-			status: 'reuse',
+			status: building ? 'used' : 'reuse',
+			usedBy: building ? [`building:${building}`] : [],
 			source: 'assets_to_assess_and_use/more_buildings',
 		});
 	}

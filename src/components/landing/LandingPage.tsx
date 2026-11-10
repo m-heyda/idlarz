@@ -158,7 +158,12 @@ const FeatureCard: React.FC<{ feature: LandingFeature }> = ({ feature }) => (
 		<Critter id={feature.critter} size={48} className='ld-critter-top' />
 		<div className='ld-card-head'>
 			<span className='ld-card-icon'>
-				<PixelIcon name={feature.icon} />
+				{feature.art ? (
+					// eslint-disable-next-line @next/next/no-img-element
+					<img className='ld-card-art' src={feature.art} alt='' />
+				) : (
+					<PixelIcon name={feature.icon!} />
+				)}
 			</span>
 			<h3 className='ld-card-title'>{feature.title}</h3>
 		</div>

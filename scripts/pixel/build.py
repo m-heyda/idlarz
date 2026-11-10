@@ -25,7 +25,6 @@ import ground_art  # noqa: E402
 import ui_art  # noqa: E402
 import sprites_animal_art  # noqa: E402
 import sprites_menu_art  # noqa: E402
-import sprites_buildings  # noqa: E402
 import sprites_characters  # noqa: E402
 import sprites_equipment  # noqa: E402
 import sprites_gear  # noqa: E402
@@ -66,7 +65,6 @@ SPRITES = {
     **sprites_animal_art.SPRITES,
     **sprites_meadow.SPRITES,
     **sprites_map.SPRITES,
-    **sprites_buildings.SPRITES,
     **sprites_menu.SPRITES,
     **sprites_menu_art.SPRITES,  # Sprite Fusion menu buttons: menu_equipment, merchant, farm, crafting, legacy (rebirth) and the unwired extras
     **sprites_water.SPRITES,

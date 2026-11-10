@@ -155,22 +155,6 @@ const BASE_ICON_SIZES = {
 	biome_lake: [32, 32],
 	biome_coast: [32, 32],
 	// buildings, 3/4 view on a transparent 48x60 canvas anchored at the tile bottom (the foundation is terrain art)
-	building_farm: [48, 60],
-	building_mine: [48, 60],
-	building_lumbermill: [48, 60],
-	building_market: [48, 60],
-	building_blacksmith: [48, 60],
-	building_workshop: [48, 60],
-	building_lumbercamp: [48, 60],
-	building_quarry: [48, 60],
-	building_fishinghut: [48, 60],
-	building_hunterslodge: [48, 60],
-	building_tavern: [48, 60],
-	building_tower: [48, 60],
-	building_well: [48, 60],
-	building_alchemylab: [48, 60],
-	building_stonecraft: [48, 60],
-	building_barracks: [48, 60],
 	// farm animals
 	// Sprite Fusion art, 96x96 (drawn at half size on the farm); sheep, duck and rooster are not used yet
 	animal_chicken_1: [96, 96],
@@ -303,46 +287,6 @@ export const BIOME_PIXEL_ICONS: Record<string, PixelIconName | undefined> = {
 };
 
 export const castleIconName = (level: number): PixelIconName => `castle_${Math.max(1, Math.min(10, Math.floor(level)))}` as PixelIconName;
-
-// Building type -> sprite
-export const BUILDING_PIXEL_ICONS: Record<string, PixelIconName> = {
-	farm: 'building_farm',
-	mine: 'building_mine',
-	lumbermill: 'building_lumbermill',
-	market: 'building_market',
-	blacksmith: 'building_blacksmith',
-	workshop: 'building_workshop',
-	lumbercamp: 'building_lumbercamp',
-	quarry: 'building_quarry',
-	fishinghut: 'building_fishinghut',
-	hunterslodge: 'building_hunterslodge',
-	tavern: 'building_tavern',
-	tower: 'building_tower',
-	well: 'building_well',
-	alchemylab: 'building_alchemylab',
-	stonecraft: 'building_stonecraft',
-	barracks: 'building_barracks',
-};
-
-// Soft working-glow colour per building (a converted tile's workstation glows in this tone)
-export const BUILDING_GLOW: Record<string, string> = {
-	farm: '#9be15d',
-	mine: '#ffb347',
-	lumbermill: '#e0a860',
-	market: '#ffd84a',
-	blacksmith: '#ff8a3c',
-	workshop: '#b27aff',
-	lumbercamp: '#c8e070',
-	quarry: '#c4cce0',
-	fishinghut: '#58c4f8',
-	hunterslodge: '#e08a5a',
-	tavern: '#ffc060',
-	tower: '#7aa8ff',
-	well: '#8adcff',
-	alchemylab: '#d070ff',
-	stonecraft: '#b8c4d8',
-	barracks: '#ff7a7a',
-};
 
 /**
  * Art-only resources for a later end-game / rebirth system. They are NOT in `Resources` or
