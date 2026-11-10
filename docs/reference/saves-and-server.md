@@ -459,6 +459,7 @@ and its gold is paid in the browser.
 
 | Route | Methods | File |
 | --- | --- | --- |
+| `/api/auth/avatar` | GET, POST | `src/app/api/auth/avatar/route.ts` |
 | `/api/auth/epoch` | POST | `src/app/api/auth/epoch/route.ts` |
 | `/api/auth/login` | POST | `src/app/api/auth/login/route.ts` |
 | `/api/auth/logout` | POST | `src/app/api/auth/logout/route.ts` |
@@ -543,7 +544,7 @@ Source: [`src/lib/offline/chapter.ts:42`](../../src/lib/offline/chapter.ts)
 Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.
 
 - An account already on the server's epoch gets `{ ok, already: true }` and nothing is touched, so a repeated request, a second tab or a lost response is harmless.
-- Otherwise: the name and class are saved first (a name another account holds ends it here with nothing reset), then the game is replaced exactly like a New Game
+- Otherwise: the name, class and avatar (already checked against the account's achievements by the route) are saved first (a name another account holds ends it here with nothing reset), then the game is replaced exactly like a New Game
   (the old save is first archived into a **pinned** `save_history` row flagged `epoch_archive` that is never trimmed, and only if that worked `startNewGame` runs: the save, its map, the leaderboard row and the rebirth log are
   deleted and the ledger starts a new run with its counters and stats zeroed; account, reserved name and gems stay), an account that predates epochs gets the early-tester
   grant, and the profile moves to the new epoch **last**: a failure in between leaves the account on the old epoch, and the retry is the same request again.

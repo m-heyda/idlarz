@@ -13,6 +13,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
+- Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [Avatars](#avatarinfo)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
 - Guided tutorial: [`guideLive`](#guidelive), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
@@ -463,6 +464,40 @@ See also: [`gearOdds`](progression.md#gearodds), [`CRAFT_GEAR`](progression.md#c
 Source: [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts)
 
 What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.
+
+## Avatars
+
+<a id="unlockedavatarids"></a>
+
+### `unlockedAvatarIds` <small>function</small>
+
+Source: [`src/catalog/avatars.ts:71`](../../src/catalog/avatars.ts)
+
+The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
+
+<a id="checkavatar"></a>
+
+### `checkAvatar` <small>function</small>
+
+Source: [`src/lib/authValidation.ts:68`](../../src/lib/authValidation.ts)
+
+The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned`
+(the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means "none chosen" and passes. The client's own idea of what is unlocked is never trusted.
+
+<a id="avatarinfo"></a>
+
+### Avatars
+
+Source: [`src/catalog/avatars.ts:17`](../../src/catalog/avatars.ts)
+
+Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are **separate from classes** and purely visual.
+Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced
+on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the
+achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
+
+**Art is a placeholder.** Every avatar points at a class bust (`portrait`, 40x40) and gets its own hue (`hue`) so the picker is usable; a locked avatar shows the same bust as
+a black silhouette (`AVATAR_SILHOUETTE`). When the owner's portraits arrive (IDL-72: `public/pixel/portraits/avatars/<id>.png`, 40x40 bust, the sheet in
+`art_style_reference/ui-and-portraits/README.md`) the swap is this table only: point `portrait` at the registered icon and drop `hue`. Nothing else changes.
 
 ## Class passives
 

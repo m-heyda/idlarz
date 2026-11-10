@@ -55,6 +55,7 @@ import GameHeader from '@/components/game/GameHeader';
 import ChestNotification from '@/components/game/overlays/ChestNotification';
 import FloatingText from '@/components/game/FloatingText';
 import ClassPickerDialog from '@/components/game/ClassPickerDialog';
+import AvatarDialog from '@/components/game/AvatarDialog';
 import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
 import SettingsDialog from '@/components/game/overlays/SettingsDialog';
 import RebirthDialog from '@/components/game/overlays/RebirthDialog';
@@ -135,6 +136,8 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 	// ... and from then on the server says when a chest or a monster appears (and what is in it), and runs the fights
 	useSpawnSync(userId, isHydrated && tabStatus === 'owner' && claim === 'done');
 	const applyProfileToFreshGame = useGameStore((state) => state.applyProfileToFreshGame);
+	const setAvatarId = useUiStore((state) => state.setAvatarId);
+	useEffect(() => setAvatarId(profile.avatarId ?? null), [profile.avatarId, setAvatarId]);
 	useEffect(() => {
 		// Before the first tick: a brand-new game becomes the account's character (a played game is never touched)
 		if (!isHydrated || tabStatus !== 'owner') return;
@@ -167,6 +170,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<FloatingText />
 			<GameWindows />
 			<ClassPickerDialog />
+			<AvatarDialog />
 			<LevelUpNotification />
 			<LoadingScreen />
 			<GameDebug />

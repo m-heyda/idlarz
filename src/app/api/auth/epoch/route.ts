@@ -4,12 +4,13 @@ import { checkProfile } from '@/lib/authValidation';
 import { fail, json, readBody, unavailable } from '@/lib/authRoute';
 import { requirePlayer } from '@/lib/playerRoute';
 import { supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
+import { checkAvatarFor } from '@/lib/avatarServer';
 import { startNewChapter, supabaseChapterRepo } from '@/lib/offline/chapter';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * The "A new chapter" confirm: `{ characterName, playerClass }`. Archives the account's game into a pinned history row and starts it over (see `startNewChapter`); idempotent, so a repeated
+ * The "A new chapter" confirm: `{ characterName, playerClass, avatarId? }` (the avatar must be a starter or one this account has unlocked, else 400 and nothing is reset). Archives the account's game into a pinned history row and starts it over (see `startNewChapter`); idempotent, so a repeated
  * request (a second tab, a lost answer) answers `already: true` and changes nothing. 409 `nameTaken`: another account holds that name, nothing was reset. 503 `archive_failed`: the old game could not be archived, nothing was deleted.
  */
 export async function POST(request: Request) {
@@ -19,11 +20,14 @@ export async function POST(request: Request) {
 		const input = checkProfile(await readBody(request));
 		if (!input.ok) return fail(input.error, 400);
 		const admin = createSupabaseAdmin();
+		// a forged or locked avatar id ends the request before anything is touched
+		const avatar = await checkAvatarFor(admin, player.userId, input.value.avatarId);
+		if (!avatar.ok) return fail(avatar.error, 400);
 		const out = await startNewChapter(
 			{ ledgers: supabaseLedgerRepo(admin), saves: supabaseSaveRepo(admin) },
 			supabaseChapterRepo(admin),
 			player.userId,
-			input.value,
+			{ ...input.value, avatarId: avatar.value },
 			Date.now(),
 		);
 		switch (out.kind) {
