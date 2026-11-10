@@ -9,6 +9,7 @@ import { MerchantResources } from './MerchantResources';
 import { CLICK_LADDER } from '@/config/economy';
 import { cn } from '@/lib/utils';
 import ResourceIcon from '../../ResourceIcon';
+import { MERCHANT_PORTRAIT, npcPortraitUrl } from '@/config/npcPortraits';
 
 // Extracted component for tab content placeholders
 interface PlaceholderTabContentProps {
@@ -150,6 +151,8 @@ const MerchantOverlay: React.FC = () => {
 		<div className='grid grid-cols-5 gap-5'>
 			{/* Merchant Avatar and Navigation */}
 			<div className='col-span-1 flex flex-col gap-4'>
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img src={npcPortraitUrl(MERCHANT_PORTRAIT[activeTab])} alt='' width={96} height={96} className='mx-auto' style={{ imageRendering: 'pixelated' }} />
 				{/* Merchant Navigation Tabs */}
 				<MerchantTabButtons activeTab={activeTab} onTabChange={setActiveTab} />
 			</div>
