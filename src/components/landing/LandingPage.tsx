@@ -42,7 +42,7 @@ const Crown: React.FC = () => (
 	</svg>
 );
 
-/** The title: IDLE is written on the land itself (hills in the baked map); here the REALM stamp, the crown and the tagline sit under it, inside the drifting map so they move together. */
+/** The title: IDLE is written on the land itself (hills in the baked map); here the REALM stamp, the crown and the tagline sit under it, on top of the drifting map but standing still (only the map moves). */
 const TitleBlock: React.FC = () => {
 	const rest = GAME_TITLE.split(' ').slice(1).join(' ').toUpperCase();
 	return (
@@ -193,9 +193,8 @@ const LandingPage: React.FC = () => {
 	return (
 		<main className='ld-root' style={{ '--ld-zoom': zoom } as React.CSSProperties}>
 			<div className='ld-mapwrap'>
-				<div className='ld-map' style={{ backgroundImage: `url(${LANDING_MAP.src})`, width: LANDING_MAP.width * LANDING_MAP.scale, height: LANDING_MAP.height * LANDING_MAP.scale, marginLeft: (-LANDING_MAP.width * LANDING_MAP.scale) / 2 }}>
-					<TitleBlock />
-				</div>
+				<div className='ld-map' style={{ backgroundImage: `url(${LANDING_MAP.src})`, width: LANDING_MAP.width * LANDING_MAP.scale, height: LANDING_MAP.height * LANDING_MAP.scale, marginLeft: (-LANDING_MAP.width * LANDING_MAP.scale) / 2 }} />
+				<TitleBlock />
 			</div>
 
 			<div className='ld-content'>

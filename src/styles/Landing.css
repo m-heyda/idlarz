@@ -45,12 +45,12 @@
 	}
 }
 
-/* map px: the letters end at about y = 465; the stamp starts under them */
+/* in the scaled page (not in the drifting map): the letters end at about y = 395 when the map rests, and the crown and stamp overlap their lower edge */
 .ld-title {
 	position: absolute;
-	left: 0;
-	right: 0;
-	top: 318px;
+	left: -650px;
+	width: 1300px;
+	top: 243px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
