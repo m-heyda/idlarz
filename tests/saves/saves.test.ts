@@ -190,7 +190,7 @@ test('an old save without the combat fields loads with the starter kit', () => {
 	if (!result.ok) return;
 	assert.deepEqual(result.state.equipment, STARTER_EQUIPMENT);
 	assert.deepEqual(result.state.bag[0], { id: 'potion_minor', qty: 2 });
-	assert.equal(result.state.bag.length, 36);
+	assert.equal(result.state.bag.length, 60);
 	assert.equal(result.state.playerHp, 101);
 	assert.equal(result.state.playerMp, 40, 'a save from before mana starts with a full pool');
 });
@@ -251,8 +251,8 @@ test('forged inventories and HP are rejected', () => {
 	bad((r) => (r.lootPity = { 'boss:king_legendary': 1e9 }), 'absurd pity');
 	bad((r) => (r.autoSellUpTo = 'mythic'), 'auto-sell up to an unknown rarity');
 	bad((r) => (r.autoSellUpTo = 'constructor'), 'auto-sell up to a prototype name');
-	bad((r) => (r.bag = r.bag.slice(1)), 'bag of 35');
-	bad((r) => (r.bag = [...r.bag, null]), 'bag of 37');
+	bad((r) => (r.bag = []), 'an empty bag');
+	bad((r) => (r.bag = [...r.bag, ...Array.from({ length: 200 }, () => null)]), 'a bag beyond the ceiling');
 	bad((r) => (r.bag[4].qty = 101), 'potion stack of 101');
 	bad((r) => (r.bag[4].qty = 0), 'empty stack');
 	bad((r) => (r.bag[4].qty = 2.5), 'fractional stack');

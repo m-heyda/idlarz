@@ -15,7 +15,7 @@ import { SELL_BONUSES, sellMultiplier, sellPayout } from '../../src/utils/game/m
 
 test('limits: a bonus registered for a key reaches every reader (bag size, the merchant shelf)', () => {
 	assert.equal(limitOf('bagSize'), LIMITS.bagSize);
-	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 2 } }), LIMITS.bagSize + 8, 'Pack Rat goes through the same hook');
+	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 2 } }), LIMITS.bagSize + 16, 'Pack Rat goes through the same hook');
 	const original = LIMIT_BONUSES.merchantOffers;
 	LIMIT_BONUSES.merchantOffers = () => 2; // a future Ember effect
 	try {

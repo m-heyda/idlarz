@@ -249,8 +249,8 @@ test('rebirth gates: castle 6, 400 + 50 per past rebirth in tiles, no upgrade ru
 
 test('Ember shop: level N+1 costs ceil(base x 1.4^N), every upgrade stops at level 10, the ladders add up', () => {
 	const ids = Object.keys(EMBER_UPGRADES) as EmberUpgradeId[];
-	assert.deepEqual(ids.sort(), ['builders', 'mastery', 'nightwatch', 'provisions', 'steward', 'thrift']);
-	for (const id of ids) {
+	assert.deepEqual(ids.sort(), ['builders', 'deeppockets', 'mastery', 'nightwatch', 'provisions', 'steward', 'thrift']);
+	for (const id of ids.filter((i) => i !== 'deeppockets')) {
 		const def = EMBER_UPGRADES[id];
 		assert.equal(def.maxLevel, 10);
 		let total = 0;
@@ -260,6 +260,12 @@ test('Ember shop: level N+1 costs ceil(base x 1.4^N), every upgrade stops at lev
 		}
 		assert.equal(emberSpent({ [id]: 10 }), total, `${id}: ladder total`);
 	}
+	// Deep Pockets (IDL-162): 3 levels at 30 / 54 / 98 Embers, +4 bag slots each
+	assert.equal(EMBER_UPGRADES.deeppockets.maxLevel, 3);
+	assert.deepEqual(
+		[0, 1, 2].map((l) => emberUpgradeCost('deeppockets', l)),
+		[30, 54, 98],
+	);
 	assert.deepEqual(
 		[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => emberUpgradeCost('thrift', l)),
 		[2, 3, 4, 6, 8, 11, 16, 22, 30, 42],

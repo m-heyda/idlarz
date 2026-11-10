@@ -187,13 +187,13 @@ test('a bag grows with the Pack Rat level of the save and never shrinks', async 
 			...state,
 			playSeconds: state.playSeconds + 120,
 			merchantUpgrades: { ...state.merchantUpgrades, packrat: 2 },
-			bag: [...state.bag, null, null, null, null, null, null, null, null],
+			bag: [...state.bag, ...Array.from({ length: 16 }, () => null)],
 		},
 		1,
 		T0 + 2 * MIN,
 	);
 	ok(await syncTickets(p.m.deps, p.id, T0 + 3 * MIN));
-	assert.equal(p.inv().bag.length, size + 8);
+	assert.equal(p.inv().bag.length, size + 16);
 	const stamped = stampInventory(state, { ...p.inv(), bag: p.inv().bag.slice(0, size) });
 	assert.ok(stamped.bag.length >= size, 'padded to what the save is entitled to, never cut');
 });

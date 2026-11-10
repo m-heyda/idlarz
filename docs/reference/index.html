@@ -814,8 +814,8 @@ The count is never reset, not even by a rebirth.</li>
 <tr>
 <td>packrat (Pack Rat)</td>
 <td>Economy</td>
-<td>+4 bag slots</td>
-<td>4</td>
+<td>+8 bag slots</td>
+<td>6</td>
 <td>500 K</td>
 <td>3</td>
 </tr>
@@ -1327,7 +1327,7 @@ legendaries are a little overpowered on purpose). With the best set (S3, 13 piec
 </code></pre>
 </article><article><p><a id="aggregatestats"></a></p>
 <h3><code>aggregateStats</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/inventory.ts"><code>src/lib/inventory.ts:240</code></a></p>
+<p>Source: <a href="../../src/lib/inventory.ts"><code>src/lib/inventory.ts:241</code></a></p>
 <p>The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families
 (income, XP, kill reward, click, damage) are capped by <a href="#capperks"><code>capPerks</code></a>. The server reads gear through this too, so both sides agree.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-combat">Combat</h2><p class="blurb">The player's numbers, the server's fight engine, auto-battle, skills and win chance.</p><h2>Overview</h2><article><p><a id="combat"></a></p>
@@ -2709,7 +2709,7 @@ all read this one function, so what the tooltip promises is what the action chec
 </article><h2>Ember shop</h2><article><p><a id="ember-upgrades"></a></p>
 <h3><code>EMBER_UPGRADES</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/rebirth.ts"><code>src/config/rebirth.ts:58</code></a></p>
-<p>The Ember shop: level N+1 costs <code>ceil(baseCost x 1.4^N)</code> Embers (<a href="#emberupgradecost"><code>emberUpgradeCost</code></a>); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers.
+<p>The Ember shop: level N+1 costs <code>ceil(baseCost x costGrowth^N)</code> Embers (<a href="#emberupgradecost"><code>emberUpgradeCost</code></a>); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through <code>limitOf(&#39;bagSize&#39;)</code>). Shop levels are permanent: nothing refunds Embers.
 The save is valid only if <code>unspent + spent = earned</code> and <code>rebirths = 0</code> implies <code>earned = 0</code> (checked in <code>src/lib/sanitizeSave.ts</code>). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.</p>
 <p><strong>The Ember shop</strong> <em>(computed from the code)</em></p>
 <table>
@@ -2757,6 +2757,12 @@ The save is valid only if <code>unspent + spent = earned</code> and <code>rebirt
 <td>3</td>
 <td>+5% income while away</td>
 </tr>
+<tr>
+<td>deeppockets</td>
+<td>Deep Pockets</td>
+<td>30</td>
+<td>+4 bag slots</td>
+</tr>
 </tbody></table>
 </article><article><p><a id="emberupgradecost"></a></p>
 <h3><code>emberUpgradeCost</code> <small>function</small></h3>
@@ -2768,7 +2774,7 @@ The save is valid only if <code>unspent + spent = earned</code> and <code>rebirt
 </article><h2>Limits</h2><article><p><a id="limits"></a></p>
 <h3><code>LIMITS</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/limits.ts"><code>src/config/limits.ts:14</code></a></p>
-<p>Limits that upgrades raise. These are base values; code reads them through <a href="#limitof"><code>limitOf</code></a>, which adds the bonuses registered in <code>LIMIT_BONUSES</code> (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours;
+<p>Limits that upgrades raise. These are base values; code reads them through <a href="#limitof"><code>limitOf</code></a>, which adds the bonuses registered in <code>LIMIT_BONUSES</code> (today: Pack Rat and the Deep Pockets Ember upgrade raise the bag size; Night Watch and set bonuses the away hours;
 Steward and set bonuses the away efficiency). <code>HARD_LIMITS</code> is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.</p>
 <p><strong>Limits (base values and hard caps)</strong> <em>(computed from the code)</em></p>
 <table>
@@ -2818,9 +2824,9 @@ Steward and set bonuses the away efficiency). <code>HARD_LIMITS</code> is the mo
 </tr>
 <tr>
 <td><code>bagSize</code></td>
-<td>36</td>
-<td>n/a</td>
-<td>Pack Rat +4 per level</td>
+<td>60</td>
+<td>200</td>
+<td>Pack Rat +8 per level, Deep Pockets +4 per level</td>
 </tr>
 <tr>
 <td><code>offlineCapHours</code></td>
@@ -3181,7 +3187,7 @@ and on hide/close; the backup rotates every 10 minutes. A read goes through <cod
 One tab owns the game at a time (<code>src/hooks/useSingleTab.ts</code>, a Web Lock).</p>
 </article><article><p><a id="sanitizesave"></a></p>
 <h3><code>sanitizeSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:192</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:191</code></a></p>
 <p>Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
 pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
@@ -3190,7 +3196,7 @@ cost) are recomputed instead of trusted. Returns the cleaned persisted slice.</p
 a click level outside the ladder, a prestige block that does not add up, less XP than the owned tiles produced; gear must be valid item instances (<code>instanceProblem</code> in <code>src/lib/itemInstance.ts</code>). Gear stats are derived, never read from the save.</p>
 </article><article><p><a id="persisted-keys"></a></p>
 <h3><code>PERSISTED_KEYS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:59</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:58</code></a></p>
 <p>The part of the game state that is saved. Rates, window flags and the like are recomputed on load.</p>
 <p><strong>How to extend the save safely.</strong></p>
 <ul>

@@ -156,7 +156,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/**
 
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
-- [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The 6x6 bag.
+- [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
@@ -392,7 +392,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fightTypes.ts`](../../src/lib/offline/fightTypes.ts) — ~ What the player brings to a fight, worked out from the last accepted save when the fight starts and then frozen for that fight.
 - [`fightView.ts`](../../src/lib/offline/fightView.ts) — ~ The picture the browser is given:
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
-- [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The bag size a save entitles its owner to (the base plus the Pack Rat bonus the save holds).
+- [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
 - [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ Everything the server ever granted (income while away, chest and kill rewards):
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
@@ -650,6 +650,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleWard.test.ts`](../../tests/economy/castleWard.test.ts) — ~ Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3).
 - [`classPassives.test.ts`](../../tests/economy/classPassives.test.ts) — Class passives (IDL-70): one test per passive, the caps, and the proof that the class is the profile row's, not the upload's.
 - [`costOrder.test.ts`](../../tests/economy/costOrder.test.ts)
+- [`deepPockets.test.ts`](../../tests/economy/deepPockets.test.ts)
 - [`economy.test.ts`](../../tests/economy/economy.test.ts)
 - [`farm.test.ts`](../../tests/economy/farm.test.ts)
 - [`farmGeometry.test.ts`](../../tests/economy/farmGeometry.test.ts)

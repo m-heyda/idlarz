@@ -578,7 +578,7 @@ Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost 
 | haggler (Haggler) | Economy | +3% gold from everything you sell | 10 | 100 K | 1.9 |
 | bulk (Bulk Discount) | Economy | -1% tile cost | 8 | 250 K | 2.1 |
 | charm (Lucky Charm) | Economy | +2 Luck for chests and kills | 10 | 150 K | 1.9 |
-| packrat (Pack Rat) | Economy | +4 bag slots | 4 | 500 K | 3 |
+| packrat (Pack Rat) | Economy | +8 bag slots | 6 | 500 K | 3 |
 | foreman (Foreman) | Economy | +1% income from every resource, gold included | 10 | 400 K | 1.9 |
 | skinner (Skinner) | Economy | +5% meat and hide from your animals | 8 | 300 K | 1.9 |
 | swift (Quick Hands) | Combat | +2% attack speed | 8 | 250 K | 1.9 |
@@ -1007,7 +1007,7 @@ totals[f] = min(PERK_CAPS[f], totals[f])    for the five families, nothing else 
 
 ### `aggregateStats` <small>function</small>
 
-Source: [`src/lib/inventory.ts:240`](../../src/lib/inventory.ts)
+Source: [`src/lib/inventory.ts:241`](../../src/lib/inventory.ts)
 
 The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families
 (income, XP, kill reward, click, damage) are capped by [`capPerks`](economy.md#capperks). The server reads gear through this too, so both sides agree.

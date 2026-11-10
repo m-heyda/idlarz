@@ -48,7 +48,7 @@ export const REBIRTH = {
 // The Ember shop: permanent upgrades bought with unspent Embers. The N+1-th level costs
 // ceil(baseCost x costGrowth^N) points.
 /**
- * The Ember shop: level N+1 costs `ceil(baseCost x 1.4^N)` Embers ({@link emberUpgradeCost}); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers.
+ * The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers.
  * The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
  *
  * @category Progression/Ember shop
@@ -98,6 +98,13 @@ export const EMBER_UPGRADES = {
 		baseCost: 3,
 		costGrowth: 1.4,
 		effectPerLevel: 0.05, // +5% of the normal income while you are away, per level (base: LIMITS.offlineEfficiency)
+	},
+	deeppockets: {
+		label: 'Deep Pockets',
+		maxLevel: 3,
+		baseCost: 30,
+		costGrowth: 1.8, // 30 / 54 / 98 Embers
+		effectPerLevel: 4, // +4 bag slots per level (base: LIMITS.bagSize), kept through every rebirth
 	},
 } as const;
 

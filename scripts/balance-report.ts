@@ -330,7 +330,9 @@ line();
 				? Object.entries(EMBER_UPGRADES.provisions.bundle)
 						.map(([r, v]) => `${fmt(v as number)} ${r}`)
 						.join(' + ')
-				: `${EMBER_UPGRADES[id].effectPerLevel * 100}%`,
+				: id === 'deeppockets'
+					? `+${EMBER_UPGRADES.deeppockets.effectPerLevel} bag slots`
+					: `${EMBER_UPGRADES[id].effectPerLevel * 100}%`,
 			EMBER_UPGRADES[id].maxLevel,
 			...[0, 1, 2, 3, 5, 9].map((l) => emberUpgradeCost(id, l)),
 		]),
