@@ -261,9 +261,9 @@ export const buildManifest = (): AssetEntry[] => {
 	}
 
 	// 4. icons/ (built sprites). item_* are covered by the registry above; map terrain (biome_, meadow_, water_) is left out.
-	const keysUsing = (map: Record<string, string | undefined>, prefix: string) => {
+	const keysUsing = (map: Record<string, string | readonly string[] | undefined>, prefix: string) => {
 		const out = new Map<string, string[]>();
-		for (const [k, v] of Object.entries(map)) if (v) out.set(v, [...(out.get(v) ?? []), `${prefix}${k}`]);
+		for (const [k, v] of Object.entries(map)) for (const icon of [v ?? []].flat()) out.set(icon, [...(out.get(icon) ?? []), `${prefix}${k}`]);
 		return out;
 	};
 	const usage = new Map<string, string[]>();
@@ -274,7 +274,7 @@ export const buildManifest = (): AssetEntry[] => {
 		['animal:', ANIMAL_PIXEL_ICONS],
 		['shine:', Object.fromEntries(Object.entries(SHINE_SHEETS).map(([k, v]) => [k, v]))],
 	] as const) {
-		for (const [icon, users] of keysUsing(map as Record<string, string>, prefix)) usage.set(icon, [...(usage.get(icon) ?? []), ...users]);
+		for (const [icon, users] of keysUsing(map as Record<string, string | readonly string[]>, prefix)) usage.set(icon, [...(usage.get(icon) ?? []), ...users]);
 	}
 	const reserved = new Set(Object.values(RESERVED_RESOURCES));
 	const itemIconNames = new Set(ITEM_ICONS.map((e) => e.icon));

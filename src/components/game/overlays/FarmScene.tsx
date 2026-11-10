@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ANIMALS, FARM } from '@/config/farm';
-import { ANIMAL_PIXEL_ICONS } from '@/config/pixelIcons';
+import { PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
 import { mulberry32 } from '@/lib/rng';
 import { Animal } from '@/types/game';
 import PixelIcon from '../PixelIcon';
@@ -11,6 +11,7 @@ import {
 	penZoom,
 	project,
 	randomSpot,
+	spriteFit,
 	PERSONAL_SPACE,
 	roomySpot,
 	walkView,
@@ -235,6 +236,8 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 
 				{instances.map((inst) => {
 					const a = inst.animal;
+					const icon = animalIcon(a.id, inst.key);
+					const fit = spriteFit(PIXEL_ICON_SIZES[icon][0]);
 					return (
 						<div
 							key={inst.key}
@@ -247,8 +250,8 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 							data-celebrate={celebrate === a.id}
 						>
 							<span className='farm-shadow' />
-							<span className='farm-sprite'>
-								<PixelIcon name={ANIMAL_PIXEL_ICONS[a.id]} scale={zoom} alt={a.name} />
+							<span className='farm-sprite' style={{ paddingLeft: fit.dx * zoom, paddingTop: fit.dy * zoom }}>
+								<PixelIcon name={icon} scale={zoom * fit.scale} alt={a.name} />
 							</span>
 							{celebrate === a.id && inst.first && (
 								<span className='farm-burst'>
