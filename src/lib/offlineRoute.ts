@@ -21,7 +21,7 @@ export const onlineRoute = async <Body>(
 	run: (deps: ServiceDeps, userId: string, body: Body, nowMs: number) => Promise<Online<unknown>>,
 ): Promise<Response> => {
 	try {
-		const player = await requirePlayer();
+		const player = await requirePlayer(request);
 		if (!player.userId) return player.response ?? fail('Not signed in.', 401);
 		if (!lootConfigured()) return unavailable('not_configured');
 		const raw = (await readBody(request)) as Record<string, unknown> | null;

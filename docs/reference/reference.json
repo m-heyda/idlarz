@@ -634,6 +634,17 @@
   "see": []
  },
  {
+  "id": "baseline-epoch",
+  "name": "BASELINE_EPOCH",
+  "symbol": "BASELINE_EPOCH",
+  "kind": "const",
+  "category": "Saves & Server/Epoch",
+  "file": "src/config/epoch.ts",
+  "line": 13,
+  "summary": "The data epoch: which \"chapter\" of the game an account's data belongs to. Raising `GAME_EPOCH` is the new chapter release (IDL-253, a PR that changes this one number and nothing else): from then on every account whose profile is on an older epoch has to confirm the \"A new chapter\" screen (`POST /api/auth/epoch`), which archives their game into a pinned history row and starts it over (account, name and gems are kept), and every browser and tab still on the old epoch is refused by the server until it reloads. While `GAME_EPOCH` equals `BASELINE_EPOCH` the whole mechanism is dark: nobody needs a reset and nothing is refused.",
+  "see": []
+ },
+ {
   "id": "animals",
   "name": "ANIMALS",
   "symbol": "ANIMALS",
@@ -897,7 +908,7 @@
   "kind": "function",
   "category": "Saves & Server/Uploading",
   "file": "src/lib/cloudClient.ts",
-  "line": 215,
+  "line": 216,
   "summary": "After a 409, decide whether it needs the player. Looks at the account's save once and answers: - it is one of this browser's own lost uploads (`isOwnSave`), or this browser's game is the same game and at least as far along (`judgeRebase`): the link is moved to its revision and the caller uploads again (`rebased`); - it holds more than this browser's game but nobody has saved it for `QUIET_MS` (the other session is gone): this browser's game replaces it (`rebased` via `overwrite`, owner decision; the server pins the replaced save in the history and the caller tells the player); - it holds more and is still being saved, or its revision is not above the link's (a New Game elsewhere restarts the revisions): `diverged`, nothing is uploaded, the caller looks again later (the player can choose in the hub meanwhile); - the account has no save (`gone`), or could not be read (`unknown`). Nothing is uploaded here, so the server's revision check stays the only thing that decides what is stored.",
   "see": []
  },
@@ -977,7 +988,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 201,
+  "line": 206,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1264,13 +1275,12 @@
   "see": []
  },
  {
-  "id": "baseline-epoch",
-  "name": "BASELINE_EPOCH",
-  "symbol": "BASELINE_EPOCH",
-  "kind": "const",
+  "id": "the-browser-s-half-of-the-data-epoch",
+  "name": "The browser's half of the data epoch",
+  "kind": "topic",
   "category": "Saves & Server/Browser state",
   "file": "src/lib/epochGuard.ts",
-  "line": 26,
+  "line": 10,
   "summary": "The browser's half of the data epoch. A server reset (the New chapter release flips the server's `GAME_EPOCH`, IDL-76) leaves this browser holding state that belongs to the old game: the cloud link (a revision the account no longer has: 409 loops, or `no_save` 404s), upload attempts, the combat log cursor, a pending offline claim, the manual save cooldown, the conflict counters, the tab's \"entered\" flag and the local save itself.",
   "see": []
  },
@@ -1600,6 +1610,17 @@
   "file": "src/lib/monsters.ts",
   "line": 150,
   "summary": "Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance (Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are `MonsterDef.spawn`.",
+  "see": []
+ },
+ {
+  "id": "startnewchapter",
+  "name": "startNewChapter",
+  "symbol": "startNewChapter",
+  "kind": "function",
+  "category": "Saves & Server/Epoch",
+  "file": "src/lib/offline/chapter.ts",
+  "line": 42,
+  "summary": "Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.",
   "see": []
  },
  {

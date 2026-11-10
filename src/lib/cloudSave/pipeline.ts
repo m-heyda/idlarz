@@ -133,6 +133,11 @@ export interface SaveRepo {
 	archive(userId: string, save: StoredSave, keep: number): Promise<void>;
 	/** Keeps a copy of a full save that ordinary trimming never drops (only the newest `keep` pinned ones stay). */
 	pin(userId: string, save: StoredSave, keep: number): Promise<void>;
+	/**
+	 * Keeps a copy of a full save for good (the new chapter's archive, IDL-76): flagged `epoch_archive`, so neither the pinned nor the ordinary trimming ever drops it. Unlike `pin` it
+	 * THROWS when the copy could not be stored, because the caller deletes the save right after. Optional: a store without it cannot run the new chapter reset.
+	 */
+	pinChapter?(userId: string, save: StoredSave): Promise<void>;
 	/** Keeps the record of a rebirth (the Rebirths tab); recording the same rebirth twice changes nothing. Optional: a store without history just has none. */
 	recordRebirth?(userId: string, record: RebirthRecord): Promise<void>;
 	/** Deletes the player's save (the map and the leaderboard row go with it) and the record of their rebirths: a New Game. */

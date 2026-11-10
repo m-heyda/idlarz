@@ -6,6 +6,7 @@ import LoadingView from '@/components/game/overlays/LoadingView';
 import StartDialog from '@/components/auth/StartDialog';
 import SaveHub, { type HubChoice } from '@/components/auth/SaveHub';
 import AuthUnavailable from '@/components/auth/AuthUnavailable';
+import NewChapterScreen from '@/components/auth/NewChapterScreen';
 import { fetchMe, logout, readEntered, writeEntered, type Profile, type UnavailableReason } from '@/lib/authClient';
 import { fetchCloud, readLink, writeAttempts, writeLink } from '@/lib/cloudClient';
 import { canResumeTab, planStart, type CloudInfo } from '@/lib/startPlan';
@@ -26,6 +27,7 @@ type Phase =
 	| { name: 'checking' }
 	| { name: 'guest' }
 	| { name: 'profile' } // signed in but the profile row is missing
+	| { name: 'chapter'; player: Player } // the account's game is on an older data epoch: the new chapter screen comes first (IDL-76)
 	| { name: 'unavailable'; reason: UnavailableReason }
 	| HubPhase
 	| { name: 'game'; player: Player };
@@ -89,6 +91,7 @@ export default function Home() {
 			if (!(await guardEpoch(result))) return;
 			if (!result.profile) return setPhase({ name: 'profile' });
 			const player = { userId: result.userId, profile: result.profile };
+			if (result.needsReset) return setPhase({ name: 'chapter', player });
 			if (readEntered() === 'account' && canResumeTab(readLink(), player.userId)) return enterGame(player); // same tab, refreshed while playing
 			await admit(player);
 		},
@@ -104,6 +107,7 @@ export default function Home() {
 		const me = await fetchMe();
 		if (me.status !== 'ok') return setPhase({ name: 'unavailable', reason: me.status === 'unavailable' ? me.reason : 'outage' });
 		if (!(await guardEpoch(me))) return;
+		if (me.needsReset) return setPhase({ name: 'chapter', player: { userId: me.userId, profile } });
 		await admit({ userId: me.userId, profile });
 	};
 
@@ -129,6 +133,22 @@ export default function Home() {
 			return <StartDialog startMode='guest' onSignedIn={signedIn} onUnavailable={() => setPhase({ name: 'unavailable', reason: 'outage' })} />;
 		case 'profile':
 			return <StartDialog startMode='profile' onSignedIn={signedIn} onUnavailable={() => setPhase({ name: 'unavailable', reason: 'outage' })} />;
+		case 'chapter':
+			return (
+				<NewChapterScreen
+					profile={phase.player.profile}
+					onDone={() => {
+						// the old game is archived on the server and the epoch guard put this browser's copy aside: reload into a new game
+						writeLink(null);
+						writeEntered(null);
+						window.location.reload();
+					}}
+					onLogout={() => {
+						writeEntered(null);
+						void logout().then(() => setPhase({ name: 'guest' }));
+					}}
+				/>
+			);
 		case 'unavailable':
 			return <AuthUnavailable reason={phase.reason} onRetry={() => check(true)} />;
 		case 'hub':

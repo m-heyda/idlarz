@@ -4,6 +4,7 @@ import { shouldKeepalive } from '@/lib/syncPolicy';
 import { scoped } from '@/lib/storageScope';
 import { decodeSave } from '@/lib/saveFormat';
 import { judgeRebase, type Progress } from '@/lib/cloudRecovery';
+import { epochFetch } from '@/lib/epochFetch';
 
 /** The browser side of /api/save. Saves stay local first; the cloud copy follows. */
 /** `lastReset` is when the last season reset happened (epoch ms): a browser save older than it belongs to a game that was reset */
@@ -14,7 +15,7 @@ export type FetchCloud =
 
 export const fetchCloud = async (): Promise<FetchCloud> => {
 	try {
-		const response = await fetch('/api/save', { credentials: 'same-origin', cache: 'no-store' });
+		const response = await epochFetch('/api/save', { credentials: 'same-origin', cache: 'no-store' });
 		if (!response.ok) return { status: 'unavailable' };
 		const body = (await response.json()) as { empty?: boolean; lastReset?: number | null } & Partial<CloudInfo>;
 		const lastReset = typeof body.lastReset === 'number' ? body.lastReset : null;
@@ -29,7 +30,7 @@ export const fetchCloud = async (): Promise<FetchCloud> => {
 /** New Game: replaces the account's cloud game (its old save is kept in the history). True when the server did it. */
 export const newGameCloud = async (): Promise<boolean> => {
 	try {
-		const response = await fetch('/api/save', { method: 'DELETE', credentials: 'same-origin' });
+		const response = await epochFetch('/api/save', { method: 'DELETE', credentials: 'same-origin' });
 		return response.ok;
 	} catch {
 		return false;
@@ -58,7 +59,7 @@ export type PushResult =
 export const pushCloud = async (text: string, baseRev: number, keepalive = false): Promise<PushResult> => {
 	try {
 		const body = JSON.stringify({ text, baseRev });
-		const response = await fetch('/api/save', {
+		const response = await epochFetch('/api/save', {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: { 'Content-Type': 'application/json' },

@@ -1,4 +1,5 @@
-import { scoped } from '@/lib/storageScope';
+import { BASELINE_EPOCH } from '@/config/epoch';
+import { readSeenEpoch, writeSeenEpoch } from '@/lib/seenEpoch';
 import { clearConflictStats, writeAttempts, writeLink } from '@/lib/cloudClient';
 import { clearCursor } from '@/lib/combatCursor';
 import { clearManualCloudStamp } from '@/lib/manualCloudSave';
@@ -14,36 +15,19 @@ import { archiveForNewGame, resetSave } from '@/lib/saveStorage';
  * The browser remembers the epoch it last saw (`localStorage` `idlarz.epoch`). When `/api/auth/me` reports a higher one (`epochVerdict` says `wipe`),
  * the local save is put aside (`archiveForNewGame`) and reset, every key above is cleared (`wipeStaleBrowser`), the new epoch is recorded last (a
  * failed wipe is simply tried again on the next load) and the page reloads into the normal start check, which finds an account with no save and starts a new
- * game with a fresh link. No epoch in the reply (the server does not send one yet) means the guard does nothing. A browser with no stored epoch counts as
+ * game with a fresh link. The server sends `epoch` and `needsReset` (`config/epoch.ts`); a reply with no epoch (an older server) means the guard does nothing. A browser with no stored epoch counts as
  * `BASELINE_EPOCH`, the value the server has today, so every browser that predates the guard is wiped on the flip and a brand new one is not.
  *
- * What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server (a save from an old
- * epoch has to be refused there), not by this guard. See `docs/plan/reset-proof-browsers.md`.
+ * What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server: every game request carries the epoch
+ * the browser last saw (`lib/epochFetch`) and a lower one is refused with 412 `staleEpoch`, after which the page reloads into this guard. See `docs/plan/reset-proof-browsers.md`.
  *
+ * @title The browser's half of the data epoch
  * @category Saves & Server/Browser state
  * @order 1
  */
-export const BASELINE_EPOCH = 1;
+export { BASELINE_EPOCH };
 
-const EPOCH_KEY = scoped('idlarz.epoch');
-
-/** The epoch this browser last saw, or null when it never recorded one (a browser from before the guard, or a new one). */
-export const readSeenEpoch = (): number | null => {
-	try {
-		const n = Number(window.localStorage.getItem(EPOCH_KEY));
-		return Number.isInteger(n) && n >= 1 ? n : null;
-	} catch {
-		return null;
-	}
-};
-
-export const writeSeenEpoch = (epoch: number): void => {
-	try {
-		window.localStorage.setItem(EPOCH_KEY, String(epoch));
-	} catch {
-		/* without storage the next load compares against the baseline again and wipes again: harmless, the browser is already fresh */
-	}
-};
+export { readSeenEpoch, writeSeenEpoch };
 
 /**
  * What to do about the server's epoch: `none` (the server sent no epoch, or it is not newer), `record` (first visit at the baseline: just remember it) or

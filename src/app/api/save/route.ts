@@ -2,6 +2,7 @@ import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { supabaseSaveRepo } from '@/lib/cloudSave/supabaseRepo';
 import { acceptSave, storedToText } from '@/lib/cloudSave/pipeline';
 import { isNonProduction } from '@/lib/cloudSave/environment';
+import { needsResetFor } from '@/config/epoch';
 import { fail, json, loadProfile, readBody, unavailable } from '@/lib/authRoute';
 import { requirePlayer } from '@/lib/playerRoute';
 import { supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
@@ -14,9 +15,9 @@ export const dynamic = 'force-dynamic';
 const SAVE_BODY_MAX = 600_000;
 
 /** The account's cloud save (text the client imports, plus headline numbers for the start hub), or `{ empty: true }`. */
-export async function GET() {
+export async function GET(request: Request) {
 	try {
-		const player = await requirePlayer();
+		const player = await requirePlayer(request);
 		if (!player.userId) return player.response;
 		const admin = createSupabaseAdmin();
 		// a season reset this player has not been through yet happens now, before anything of the old game is handed out
@@ -44,9 +45,9 @@ export async function GET() {
 }
 
 /** New Game: the account's cloud game is replaced (the old save is kept pinned in the history), so nothing of it is paid or kept. Gems stay. */
-export async function DELETE() {
+export async function DELETE(request: Request) {
 	try {
-		const player = await requirePlayer();
+		const player = await requirePlayer(request);
 		if (!player.userId) return player.response;
 		const admin = createSupabaseAdmin();
 		await startNewGame({ ledgers: supabaseLedgerRepo(admin), saves: supabaseSaveRepo(admin) }, player.userId, Date.now());
@@ -62,13 +63,15 @@ export async function DELETE() {
  */
 export async function POST(request: Request) {
 	try {
-		const player = await requirePlayer();
+		const player = await requirePlayer(request);
 		if (!player.userId) return player.response;
 		const body = (await readBody(request, SAVE_BODY_MAX)) as { text?: unknown; baseRev?: unknown } | null;
 		if (!body || typeof body.text !== 'string' || !Number.isInteger(body.baseRev) || (body.baseRev as number) < 0) return fail('Bad save request.', 400);
 
 		// The leaderboard name comes from the player's profile row (the owner-only name set at registration), never from the save
-		const { profile } = await loadProfile(player.supabase, player.userId);
+		const { profile, epoch } = await loadProfile(player.supabase, player.userId);
+		// an account that has not been through the new chapter screen yet may not upload: its game is the old chapter's (dark while the epoch is the baseline)
+		if (needsResetFor(epoch)) return json({ error: 'Start the new chapter first.', needsReset: true }, 412);
 		const outcome = await acceptSave(
 			supabaseSaveRepo(createSupabaseAdmin()),
 			player.userId,

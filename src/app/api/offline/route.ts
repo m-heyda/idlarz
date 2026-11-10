@@ -18,7 +18,7 @@ const CLAIM_ID = /^[A-Za-z0-9_-]{8,64}$/;
  */
 export async function POST(request: Request) {
 	try {
-		const player = await requirePlayer();
+		const player = await requirePlayer(request);
 		if (!player.userId) return player.response;
 		if (!lootConfigured()) return unavailable('not_configured');
 		const body = (await readBody(request)) as { claimId?: unknown } | null;

@@ -16,11 +16,16 @@ import { limitOf } from '../../src/lib/limits';
 import { starterBag } from '../../src/lib/inventory';
 import { claimOffline, startNewGame, type ClaimResult, type ServiceDeps } from '../../src/lib/offline/service';
 import { normalsOf } from '@/lib/offline/tickets';
+import { startNewChapter, EARLY_TESTER, type ChapterRepo } from '../../src/lib/offline/chapter';
+import { epochFromHeader, isStaleEpoch, needsResetFor } from '../../src/config/epoch';
+import type { PlayerClassId } from '../../src/config/playerClasses';
 
 const memory = () => {
 	const rows = new Map<string, StoredSave>();
 	const worlds = new Map<string, WorldPart>();
 	const stats = new Map<string, StatsRow>();
+	const archives: StoredSave[] = [];
+	const control = { failArchive: false };
 	const saves: SaveRepo = {
 		load: async (id, options) => {
 			const row = rows.get(id);
@@ -37,6 +42,10 @@ const memory = () => {
 		},
 		archive: async () => undefined,
 		pin: async () => undefined,
+		pinChapter: async (_id, save) => {
+			if (control.failArchive) throw new Error('archive failed');
+			archives.push(structuredClone(save));
+		},
 		remove: async (id) => {
 			rows.delete(id);
 			worlds.delete(id);
@@ -45,7 +54,7 @@ const memory = () => {
 	};
 	const { ledgers, ledgerRepo } = memoryLedgers();
 	const deps: ServiceDeps = { saves, ledgers: ledgerRepo, secret: 'test-secret-test-secret' };
-	return { saves, ledgerRepo, rows, ledgers, deps };
+	return { saves, ledgerRepo, rows, ledgers, deps, archives, control };
 };
 
 const game = (patch: Partial<PersistedGame> = {}): PersistedGame => {
@@ -377,4 +386,121 @@ test('lifetime counters (IDL-69): the first save sets the baselines, a later one
 	const counted = m.ledgers.get('u1')!.stats;
 	assert.equal(counted.at, T0 + 20 * 60_000);
 	assert.ok((counted.income.gold ?? 0) > 0, 'income while playing was counted');
+});
+
+// ---- IDL-76: the new chapter reset -------------------------------------------------------------------------------------------------------------
+
+const chapterRepo = (opts: { epoch?: number | null; taken?: boolean } = {}) => {
+	const state = { epoch: opts.epoch === undefined ? null : opts.epoch, name: 'Zoë', playerClass: 'warrior' as PlayerClassId, granted: [] as string[] };
+	const repo: ChapterRepo = {
+		loadProfile: async () => ({ epoch: state.epoch }),
+		setIdentity: async (_id, name, playerClass) => {
+			if (opts.taken) return 'name_taken';
+			state.name = name;
+			state.playerClass = playerClass;
+			return 'ok';
+		},
+		setEpoch: async (_id, epoch) => {
+			if (state.epoch === null || state.epoch < epoch) state.epoch = epoch;
+		},
+		grantAchievement: async (_id, achievementId) => {
+			if (!state.granted.includes(achievementId)) state.granted.push(achievementId);
+		},
+	};
+	return { repo, state };
+};
+const INPUT = { characterName: 'Nova', playerClass: 'mage' as PlayerClassId };
+
+test('epoch helpers: a profile with no epoch is on the baseline, and only an older browser is stale', () => {
+	assert.equal(needsResetFor(null, 1), false, 'dark: the server is on the baseline');
+	assert.equal(needsResetFor(null, 2), true);
+	assert.equal(needsResetFor(1, 2), true);
+	assert.equal(needsResetFor(2, 2), false);
+	assert.equal(isStaleEpoch(null, 1), false);
+	assert.equal(isStaleEpoch(null, 2), true, 'a client that sends no epoch counts as the baseline');
+	assert.equal(isStaleEpoch(1, 2), true);
+	assert.equal(isStaleEpoch(2, 2), false);
+	assert.deepEqual(
+		[epochFromHeader(null), epochFromHeader('2'), epochFromHeader('0'), epochFromHeader('x'), epochFromHeader('1.5')],
+		[null, 2, null, null, null],
+	);
+});
+
+test('while the server is on the baseline epoch the reset does nothing at all', async () => {
+	const m = memory();
+	assert.equal((await save(m, 'u1', game(), 0, T0)).kind, 'ok');
+	const { repo, state } = chapterRepo();
+	const out = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + HOUR, 1);
+	assert.deepEqual(out, { kind: 'ok', already: true });
+	assert.ok(m.rows.has('u1'), 'the save is untouched');
+	assert.equal(m.archives.length, 0);
+	assert.deepEqual([state.name, state.playerClass, state.epoch], ['Zoë', 'warrior', null]);
+});
+
+test('the flip: the old game is archived for good, then replaced; gems, account and the early-tester mark are kept; a repeat changes nothing', async () => {
+	const m = memory();
+	assert.equal((await save(m, 'u1', game(), 0, T0)).kind, 'ok');
+	const before = m.ledgers.get('u1')!;
+	m.ledgers.set('u1', { ...before, gems: 77, stats: { ...before.stats, chests: 5 } });
+	const { repo, state } = chapterRepo({ epoch: null });
+	const out = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + HOUR, 2);
+	assert.deepEqual(out, { kind: 'ok', already: false });
+	assert.equal(m.archives.length, 1, 'the old save went into the archive first');
+	assert.ok(m.archives[0].world, 'the archive holds the map too');
+	assert.equal(m.rows.has('u1'), false, 'the save is gone');
+	const after = m.ledgers.get('u1')!;
+	assert.equal(after.gems, 77, 'gems are kept');
+	assert.equal(after.stats.chests, 0, 'the counters start again');
+	assert.equal(after.runId, before.runId + 1, 'a new run: sealed rolls never repeat');
+	assert.deepEqual([state.name, state.playerClass, state.epoch], ['Nova', 'mage', 2]);
+	assert.deepEqual(state.granted, [EARLY_TESTER]);
+	// the same request again (a second tab, a lost answer): nothing is touched
+	const again = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + 2 * HOUR, 2);
+	assert.deepEqual(again, { kind: 'ok', already: true });
+	assert.equal(m.archives.length, 1, 'no second archive');
+	assert.equal(m.ledgers.get('u1')!.runId, after.runId, 'the ledger is not reset twice');
+});
+
+test('a name another account holds stops the reset before anything is deleted', async () => {
+	const m = memory();
+	assert.equal((await save(m, 'u1', game(), 0, T0)).kind, 'ok');
+	const { repo, state } = chapterRepo({ epoch: null, taken: true });
+	assert.deepEqual(await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + HOUR, 2), { kind: 'name_taken' });
+	assert.ok(m.rows.has('u1'));
+	assert.equal(m.archives.length, 0);
+	assert.equal(state.epoch, null);
+});
+
+test('if the old game cannot be archived nothing is deleted and the account stays on the old epoch', async () => {
+	const m = memory();
+	assert.equal((await save(m, 'u1', game(), 0, T0)).kind, 'ok');
+	m.control.failArchive = true;
+	const { repo, state } = chapterRepo({ epoch: null });
+	assert.deepEqual(await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + HOUR, 2), { kind: 'archive_failed' });
+	assert.ok(m.rows.has('u1'), 'the save is still there');
+	assert.equal(state.epoch, null);
+	assert.deepEqual(state.granted, []);
+	// the retry after the store recovers is the same request and goes through
+	m.control.failArchive = false;
+	assert.deepEqual(await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + 2 * HOUR, 2), { kind: 'ok', already: false });
+});
+
+test('an account with no save yet just moves to the new epoch (nothing to archive)', async () => {
+	const m = memory();
+	const { repo, state } = chapterRepo({ epoch: 1 });
+	assert.deepEqual(await startNewChapter(m.deps, repo, 'u9', INPUT, T0, 2), { kind: 'ok', already: false });
+	assert.equal(m.archives.length, 0);
+	assert.equal(state.epoch, 2);
+	assert.deepEqual(state.granted, [], 'only an account that predates epochs is an early tester');
+});
+
+test('a stale tab cannot bring the old game back: its upload for the deleted row is a conflict, never a new row', async () => {
+	const m = memory();
+	const old = game();
+	assert.equal((await save(m, 'u1', old, 0, T0)).kind, 'ok');
+	const { repo } = chapterRepo({ epoch: null });
+	assert.equal((await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + HOUR, 2)).kind, 'ok');
+	const stale = await save(m, 'u1', { ...old, playSeconds: old.playSeconds + 600 }, 1, T0 + 2 * HOUR);
+	assert.equal(stale.kind, 'conflict');
+	assert.equal(m.rows.has('u1'), false, 'the old game did not come back');
 });

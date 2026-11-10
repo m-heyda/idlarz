@@ -32,9 +32,13 @@ export const readBody = async (request: Request, maxChars = BODY_MAX): Promise<u
 export const isOutage = (error: { status?: number } | null | undefined): boolean => Boolean(error && (!error.status || error.status >= 500));
 
 /** The signed-in player's own profile row (`id = userId`, never an id from the client). */
-export const loadProfile = async (supabase: SupabaseClient, userId: string): Promise<{ profile: Profile | null; failed: boolean }> => {
-	const { data, error } = await supabase.from('profiles').select('character_name, player_class').eq('id', userId).maybeSingle();
-	if (error) return { profile: null, failed: true };
-	if (!data) return { profile: null, failed: false };
-	return { profile: { characterName: data.character_name, playerClass: data.player_class }, failed: false };
+export const loadProfile = async (supabase: SupabaseClient, userId: string): Promise<{ profile: Profile | null; epoch: number | null; failed: boolean }> => {
+	const { data, error } = await supabase.from('profiles').select('character_name, player_class, epoch').eq('id', userId).maybeSingle();
+	if (error) return { profile: null, epoch: null, failed: true };
+	if (!data) return { profile: null, epoch: null, failed: false };
+	return {
+		profile: { characterName: data.character_name, playerClass: data.player_class },
+		epoch: typeof data.epoch === 'number' ? data.epoch : null,
+		failed: false,
+	};
 };
