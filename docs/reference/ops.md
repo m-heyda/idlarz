@@ -7,7 +7,7 @@ Commands, CI, the pacing guard, season resets and the E2E test account.
 **Contents**
 
 - Commands: [Commands and documentation generation](#commands-and-documentation-generation)
-- CI: [The pacing guard and CI sharding](#the-pacing-guard-and-ci-sharding)
+- CI: [The pacing guard and CI sharding](#the-pacing-guard-and-ci-sharding), [The generated-docs inputs hash](#the-generated-docs-inputs-hash), [The local verify script and the pre-push hook](#the-local-verify-script-and-the-pre-push-hook)
 - Operator guides: [Season restart (reset-players)](#season-restart-reset-players), [Checking live saves before a release](#checking-live-saves-before-a-release), [Giving a flagged account its trust back (restore-trust)](#giving-a-flagged-account-its-trust-back-restore-trust), [The end-to-end test account](#test-account-email), [Turning enforcement and the server-run rebirth on together](#turning-enforcement-and-the-server-run-rebirth-on-together)
 
 ## Commands
@@ -55,16 +55,19 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run craft-sim` | `tsx scripts/craft-sim.ts` |
 | `npm run docs:code` | `tsx scripts/docs-reference.ts` |
 | `npm run docs:code:check` | `tsx scripts/docs-reference.ts --check` |
-| `npm run docs:gen` | `npm run docs:gen:rest && npm run docs:gen:sim` |
+| `npm run docs:gen` | `npm run docs:gen:rest && npm run docs:gen:sim && npm run docs:gen:hash` |
 | `npm run docs:gen:rest` | `npm run docs:gen:rest:quick && npm run docs:gen:rest:fights && npm run docs:gen:rest:loot` |
 | `npm run docs:gen:rest:quick` | `npm run report && npm run stat-audit && npm run catalog-report && npm run kill-sim -- --md && npm run craft-sim -- --md` |
 | `npm run docs:gen:rest:fights` | `npm run fight-sim -- --md && npm run monster-ladder -- --md` |
 | `npm run docs:gen:rest:loot` | `npm run loot-sim -- --md` |
 | `npm run docs:gen:sim` | `npm run sim:parallel` |
+| `npm run docs:gen:hash` | `tsx scripts/gen-inputs.ts --write` |
+| `npm run docs:gen:fast` | `tsx scripts/verify.ts --gen-only` |
+| `npm run verify` | `tsx scripts/verify.ts` |
 | `npm run docs:check` | `npm run docs:gen && git add -N docs/generated && git diff --exit-code docs/generated` |
 | `npm run format` | `prettier --write .` |
 | `npm run format:check` | `prettier --check .` |
-| `npm run prepare` | `git config core.hooksPath .githooks && chmod +x .githooks/pre-commit || exit 0` |
+| `npm run prepare` | `git config core.hooksPath .githooks && chmod +x .githooks/pre-commit .githooks/pre-push || exit 0` |
 | `npm run assets:catalog` | `tsx scripts/assets-catalog.ts` |
 | `npm run assets:catalog:check` | `tsx scripts/assets-catalog.ts --check` |
 | `npm run storybook` | `storybook dev -p 6006` |
@@ -82,12 +85,51 @@ The pacing guard, and how CI generates the docs.
 
 `npm run sim` writes `docs/generated/sim-baseline.json`; CI (job `generated`) runs this script, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than +-15 % **or by more than 5 game days**
 (`PACING_MAX_DRIFT_DAYS` in `scripts/pacingCompare.ts`; without it a milestone at day 220 could drift for a month inside 15 %). The job log starts with a table per profile (guarded milestones, how many moved, the largest move in percent and days).
-Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label only takes effect on a new run,
-so **re-run the job after adding it**.
+Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label is read when a run starts,
+so after adding it **push a commit or close and reopen the PR** ("Re-run jobs" keeps the labels of the old run).
 
-**CI sharding.** The job `generated` is three stages: `scope` (does the PR touch what the docs come from), `generate` (a matrix that runs in parallel: the profile `hardcore-rebirth6-x10` alone, about 5 minutes; every other sim profile via `--except`;
-the three groups `docs:gen:rest:quick|fights|loot` of the other generators; a new generator goes into one of those scripts), and `generated` (the required check), which downloads the shards, runs `sim --merge` and then the two gates (stale docs, pacing guard).
-Wall time is about the slowest shard, not the sum. A new sim profile joins the `sim-rest` shard by itself; a profile in two shards or in none fails the merge.
+**Where the work runs.** The slow part (the sims and reports behind `docs/generated`) is done on your machine: `npm run verify` (also run by the `pre-push` hook) regenerates it in parallel on all cores when a file the generators read has changed, and writes `docs/generated/inputs.sha256` (`scripts/gen-inputs.ts`). In CI the job `hash` recomputes that hash (seconds). With a fresh hash the sims are skipped and the job `generated` only runs this guard on the committed baseline against the base branch's. With a stale hash (a PR that did not regenerate, or `main` moved) and always on a push to `main`, every night and on a PR labelled `verify-generated`, the full regeneration runs, sharded (`sim-x10` alone, `sim-rest`, and `docs:gen:rest:quick|fights|loot`; `generated` merges them, a profile in two shards or in none fails the merge, and the committed files must equal the result).
+
+<a id="the-generated-docs-inputs-hash"></a>
+
+### The generated-docs inputs hash
+
+Source: [`scripts/gen-inputs.ts:1`](../../scripts/gen-inputs.ts)
+
+The inputs hash of the generated docs: what lets CI trust `docs/generated` without running every sim again.
+
+`npm run docs:gen` (the sim, the balance tables, the fight and loot reports ...) is deterministic and slow. Instead of repeating it on every pull request, `docs:gen` ends by writing
+`docs/generated/inputs.sha256`: a SHA-256 over **every file the generators import** (found with esbuild from the entry scripts named in the `docs:gen:*` scripts of `package.json`, so a new
+generator or a new import is picked up by itself) and over `package-lock.json`. Line endings are normalised, so Windows and Linux agree. If any of those files changes, the hash changes:
+the committed docs may be stale. The CI job `hash` recomputes it (seconds): **fresh** means `docs/generated` was written for exactly these sources, so CI skips the sims; **stale** (a PR that did not run
+`npm run docs:gen`, or `main` moved under it) means CI runs the full regeneration, as it always did, and fails if the committed files differ. So the hash is only a shortcut, never a reason to fail. The full
+regeneration also runs on every push to `main`, every night and on a PR labelled `verify-generated`, so a hash written without really regenerating is found within a day.
+
+  npx tsx scripts/gen-inputs.ts            print the current hash and whether the committed one matches (exit 0)
+  npx tsx scripts/gen-inputs.ts --check    exit 1 when the committed hash is stale (the CI job `hash` runs it and picks fast or full by the result)
+  npx tsx scripts/gen-inputs.ts --write    write docs/generated/inputs.sha256 (the last step of `npm run docs:gen`)
+  npx tsx scripts/gen-inputs.ts --list     print the files that count
+
+<a id="the-local-verify-script-and-the-pre-push-hook"></a>
+
+### The local verify script and the pre-push hook
+
+Source: [`scripts/verify.ts:1`](../../scripts/verify.ts)
+
+`npm run verify`: everything CI checks, run here on all your cores before you push.
+
+CI used to repeat the slow work (the sims behind `docs/generated`) on every pull request; now it skips it when the inputs hash says it was done (see `scripts/gen-inputs.ts`). This script does
+it: formatting, types, lint, the unit tests and the reference docs check run **at the same time**, and when a file the generators read has changed (the hash is stale) it regenerates
+`docs/generated` in parallel too (`sim:parallel` on all cores next to the three report groups) and writes the new hash. The `pre-push` hook (`.githooks/pre-push`) runs it, so a push is
+refused while something would fail in CI. When it regenerated files it stops with "commit them" (a hook cannot commit for you); commit and push again.
+
+  npm run verify                everything above; a tree that already passed (same HEAD tree, clean) is skipped
+  npm run verify -- --force     ignore the "already verified" marker
+  npm run verify -- --no-gen    skip the regeneration of docs/generated even when it is stale (CI will say so)
+  npm run verify -- --gen-only  only the regeneration (what `npm run docs:gen:fast` runs)
+  npm run verify -- --build     also `next build` (slow, CI runs it)
+
+Skip the hook once with `SKIP_VERIFY=1 git push` or `git push --no-verify`. CI still fails what you skipped.
 
 ## Operator guides
 
@@ -174,7 +216,7 @@ reload bring the same map back. Not covered yet (IDL-124 keeps these open): the 
 
 ### Turning enforcement and the server-run rebirth on together
 
-Source: [`src/lib/cloudSave/verify.ts:105`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:109`](../../src/lib/cloudSave/verify.ts)
 
 **Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).**
 Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:

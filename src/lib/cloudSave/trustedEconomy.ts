@@ -53,6 +53,16 @@ export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, r
 					? { ...prev.derived.castleUpgrade, remainingSec: Math.max(0, prev.derived.castleUpgrade.remainingSec - Math.max(0, elapsedSec)) }
 					: null,
 				ratesAfterCastle: prev.derived.ratesAfterCastle ? { ...prev.derived.ratesAfterCastle } : null,
+				// the building timer and the levels it paid for are kept the same way (absent while the building system is off)
+				...(prev.derived.buildings
+					? {
+							buildings: { ...prev.derived.buildings },
+							ratesAfterBuilding: prev.derived.ratesAfterBuilding ? { ...prev.derived.ratesAfterBuilding } : null,
+							buildingUpgrade: prev.derived.buildingUpgrade
+								? { ...prev.derived.buildingUpgrade, remainingSec: Math.max(0, prev.derived.buildingUpgrade.remainingSec - Math.max(0, elapsedSec)) }
+								: null,
+						}
+					: {}),
 			},
 		};
 	}

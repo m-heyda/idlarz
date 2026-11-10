@@ -45,7 +45,7 @@ Deviation from the confirmed order of [ROADMAP](ROADMAP.md) (**approved as D1**)
 | **P3** | Monster engine | more monster kinds in the home land with real stats and rewards; rats stay near the castle | L | 🧱 generic sprite |
 | **P4** | Glossary and mastery | black unknown monsters, glossary, mastery bonuses | M | none |
 | **P5** | Biome engine (invisible) | nothing (dev tools only) | M | none |
-| **P6** | Buildings | 3 buildings per home biome, levels, Idols, Extractors, T3 materials, roads | L x3 | 🧱 then 🎨 |
+| **P6** | Buildings | 3 buildings per home biome, levels, Idols, Extractors, T3 materials | L x3 | 🧱 then 🎨 |
 | **P7** | Respec | rebirth refunds points, +20 per rebirth | S-M | none |
 | **P8** | Jungle (rebirth 1) | the first new biome, Hardwood, its buildings and monsters | L | 🎨 |
 | **P9** | Rankings | leaderboard, preview map, paragon display | M | small |
@@ -146,15 +146,14 @@ Goal: replace the 16 generic buildings with three per biome on the **seven exist
 | 6.4 | Seven Extractors and their T3 materials (Herbs, Sap, Iron Ore, Spores, Frostshard, Pearls, Salt); header group hidden until discovered; 🧱 placeholder icons from the reserved set (`res_iron` for Iron Ore, `res_crystal` for Frostshard, `res_sapphire` or `res_fish` for Pearls, `res_mana` for Spores ...) | M |
 | 6.5 | Position bonus `positionBonus(distance, castleLevel)` (castle area bonus on every building in range, frontier bonus beyond), folded into `buildingEconomy(world)` so offline grants, `verify.ts` and `netWorth.ts` agree | M |
 
-**P6c Idols, soft caps, roads**
+**P6c Idols, soft caps**
 | Step | What | Size |
 |---|---|---|
 | 6.6 | `player_ledger.legacy` (migration first); seven Idols (+2 % per level, position bonus capped at x2), levels persist across rebirth, free re-placement at the remembered level, castle gate applies to upgrading only | L |
 | 6.7 | Ember shop cap items: Idol Mastery, Master Craftsmen, Extra Builder, as `LIMITS` / `LIMIT_BONUSES` with `HARD_LIMITS` | M |
-| 6.8 | **Roads**: per-tile overlay, +100 % for a connected Producer or Extractor (additive), cost about 3 % of the tile price times a biome multiplier, built instantly, `road` flag in tile `extra`, breadth-first connection check on the server | L |
-| 6.9 | 🎨 Real building sprites (21 for the home biomes) and the first road sets replace placeholders | L (art) |
+| 6.9 | 🎨 Real building sprites (21 for the home biomes) replace placeholders | L (art) |
 
-Clarify ❓: **D2 and D3 must be answered before 6.6** (the click Idol and the farm Idol depend on them). Open numbers from [18](18-biome-buildings-and-material-tiers.md): Extractor rates, timers above level 5, Luck points per Idol level, road multipliers and refund, whether the castle may cut the builder queue, whether the frontier bonus counts the +12 offset. The combined build-time reduction cap (proposal 60 %). Sim acceptance: all-Idols-maxed line against the Ember income bonus, the run-2 ratio stays 60-70 %, payback of a road in hours not days.
+Clarify ❓: **D2 and D3 must be answered before 6.6** (the click Idol and the farm Idol depend on them). Open numbers from [18](18-biome-buildings-and-material-tiers.md): Extractor rates, timers above level 5, Luck points per Idol level, whether the castle may cut the builder queue, whether the frontier bonus counts the +12 offset. The combined build-time reduction cap (proposal 60 %). Sim acceptance: all-Idols-maxed line against the Ember income bonus, the run-2 ratio stays 60-70 %.
 
 ### P7 · Rebirth respec (no wipe yet)
 
@@ -175,7 +174,7 @@ The pattern for every biome release: **rules are already there (P5), so a biome 
 |---|---|
 | 8.1 🎨 | Biome art: ground, deep tier, rim against every neighbour, props, decor, building pads, ambient critters, minimap and highlight colour; pixel pipeline plus its TypeScript port and parity test |
 | 8.2 | **Hardwood** (T2, 0.1/s per tile), header slot on discovery, offline yes and chests no; basic outputs gold and hide |
-| 8.3 | Jungle Logging Camp, Serpent Pit (Venom), Totem of the Wild, jungle road set 🎨 (placeholders first) |
+| 8.3 | Jungle Logging Camp, Serpent Pit (Venom), Totem of the Wild 🎨 (placeholders first) |
 | 8.4 | Jungle monsters (3-4 plus boss) with real stats, 🧱 generic sprite until the art lands, then swapped |
 | 8.5 | Guide entries and Rebirth dialog line ("Rebirth 1 unlocks the Jungle") |
 
@@ -223,7 +222,7 @@ Same release pattern, with a deliberately **richer look**: they are the last two
 
 | Step | What |
 |---|---|
-| 13.1 🎨 | Landing v2 (section 5): full re-bake with all twelve biomes, new buildings and roads in view |
+| 13.1 🎨 | Landing v2 (section 5): full re-bake with all twelve biomes, new buildings in view |
 | 13.2 | Mobile layout pass (responsive modals, tap targets, test on a real phone) |
 | 13.3 | Playwright smoke test in CI; framework upgrades one at a time (Next 16, TypeScript 7, ESLint 10) |
 | 13.4 | Public checklist: email confirmation on, `verify.ts` enforcing (done in 9.4), rotated secrets, rate limits, free-plan load check |
@@ -253,7 +252,7 @@ Item upgrading (replaced by crafting's enchant), the Quests and Gambling merchan
 |---|---|---|---|
 | **v1 simple** | P1, with the reset in P2 adding the pickers | a title banner "IDLE REALM" (big IDLE in hills tiles, REALM smaller), one **static** background still of the seven current biomes, a login / create-account window (collapses to a bottom sheet on phones), five feature cards, a **Continue** card for signed-in visitors with the character card and the offline bar; signed-in visitors reach the game via `/play` | one baked still (existing renderer), lettering pattern, 5 small feature icons |
 | **v1.1 animated** (optional, any time after P2) | between phases when engineering is free | the baked tall strip scrolling bottom to top with ambient critters, `prefers-reduced-motion` gives the static frame | `npm run landing:bake` output, seven biomes only |
-| **v2 MVP** | P13 | re-baked strip with **all twelve biomes**, the two special biomes as the finale, building and road clusters in view, a new Open Graph image; the progress it shows is the point: visitors who saw v1 see a bigger world | baked strip from the final art; built from the map renderer (no sample art needed) |
+| **v2 MVP** | P13 | re-baked strip with **all twelve biomes**, the two special biomes as the finale, building clusters in view, a new Open Graph image; the progress it shows is the point: visitors who saw v1 see a bigger world | baked strip from the final art; built from the map renderer (no sample art needed) |
 
 Switching is cheap by design: the background is one baked file and the title lives in `GAME_TITLE`, so v2 is a new file plus a copy edit, with no change to the route or the login flow. Open (❓ D10): final wording of the feature cards, whether the landing shows a public players-online number (not in v1).
 
@@ -270,7 +269,6 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 | T3 icons (12 extracts) | 12 | reserved icon set (`res_iron` ...) | `resources/` |
 | T4 relic icons | few | generic crate icon | `resources/` |
 | Buildings: 3 per biome, 36 total (21 home biomes, 15 new), 2 looks each (levels 1-2 and 3-5, glow on level 5) | 36 x 2 | the 16 old sprites | `buildings/` |
-| Road sets (one per ground family, 16 autotile variants plus end caps and bridge) | about 10 sets | none (P6c) | `roads/` |
 | New biomes: Jungle, Fields, Orchard, Blight, Battlefield (ground, rim, props, decor, pads, critters, minimap colour) | 5 | flat-colour dev palettes | `biomes/` |
 | Monsters: home families (3), 3-4 per new biome plus a boss (about 20 more) | about 25 | `monster_generic` tinted | `monsters/` |
 | Landing: lettering pattern, 5 icons, baked strips v1 and v2 | | the still of v1 | none (built from the map renderer; the `landing/` reference folder was removed) |
@@ -279,7 +277,7 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 
 **The two special biomes (Blight, Battlefield) brief.** Same tile geometry and outline discipline as every other biome, but richer: an extra animated layer (pulsing slime pools, drifting embers and ash, flapping banners), a deeper interior tier with its own prop set, 2 building pad variants instead of 1, a fuller rim set against every neighbour, a distinct minimap and highlight colour, and building sprites with a **glow on level 3+**, so reaching them feels like arriving somewhere. Keep the palette tied to the established 28-colour discipline so they do not look pasted in. Upload the references you like most for these two and I will build the brief around them.
 
-**Reference material is in `art_style_reference/` (added 2026-10-29).** Each folder has a README with a file index, what we want and what agents must do with it: `biomes/`, `buildings/`, `equip/` (includes the grading plan), `monsters/` (includes the roster plan), `resources/`, `roads/`, `ui-and-portraits/`, and `farm/` (**ignore for now**, future farm update). Licences are unconfirmed and some sheets are watermarked: see the table in its root README; direct cuts need the owner's confirmation first.
+**Reference material is in `art_style_reference/` (added 2026-10-29).** Each folder has a README with a file index, what we want and what agents must do with it: `biomes/`, `buildings/`, `equip/` (includes the grading plan), `monsters/` (includes the roster plan), `resources/`, `ui-and-portraits/`, and `farm/` (**ignore for now**, future farm update). Licences are unconfirmed and some sheets are watermarked: see the table in its root README; direct cuts need the owner's confirmation first.
 
 **Equipment track (floating, after P2).** E1 build the 12-per-slot catalog as data with new icon ids (not yet in any drop table); E2 put the nine normal grades into loot profiles and craft tiers, tuned with `loot-sim` and `fight-sim`; E3 add the three special sets (Sunhoney, Ashen Warlord, Blightbound) through bosses, relics and enchanted crafts (P11-P12); E4 delete the old `item_*` icons and gear scripts. The deletion waits for the P2 reset (every bag is empty afterwards); the retired Rattatui pieces are the only items that may still need an icon until then. New weapon types and a belt slot are design decisions, not art, and are not part of E1.
 

@@ -1,5 +1,6 @@
 import { isRecord } from '@/lib/isRecord';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/utils/world';
 
 /**
@@ -73,6 +74,8 @@ interface LandCell {
 	biome: string;
 	level?: unknown;
 	chest?: boolean;
+	building?: string;
+	buildingLevel?: number;
 }
 
 /** Packs cells that are already ordered by row, then column. */
@@ -96,10 +99,15 @@ const packCells = (cells: Iterable<LandCell>): PackedLand => {
 			runNext = cell.x + 1;
 			letters = code;
 		}
-		if (cell.level !== undefined || cell.chest) {
+		if (cell.level !== undefined || cell.chest || cell.building) {
 			const props: SaveBody = {};
 			if (cell.level !== undefined) props.level = cell.level;
 			if (cell.chest) props.chest = true;
+			// the building system (flag on only): `building` is the catalog id and `bl` its level, written only above level 1
+			if (cell.building) {
+				props.building = cell.building;
+				if (cell.buildingLevel !== undefined && cell.buildingLevel > 1) props.bl = cell.buildingLevel;
+			}
 			extra.push([cell.x, cell.y, props]);
 		}
 	}
@@ -116,7 +124,14 @@ export const packLand = (world: World): PackedLand => {
 		packed = packCells(
 			(function* () {
 				for (const { x, y, tile } of ownedRowMajor(world)) {
-					yield { x, y, biome: tile.biome, level: tile.level, chest: tile.hasChest };
+					yield {
+						x,
+						y,
+						biome: tile.biome,
+						level: tile.level,
+						chest: tile.hasChest,
+						...(BUILDINGS_FLAG.enabled && tile.building ? { building: tile.building, buildingLevel: tile.buildingLevel } : {}),
+					};
 				}
 			})(),
 		);
@@ -163,14 +178,16 @@ export const packBody = (state: PersistedGame): SaveBody => {
 	for (const key of BASE_STAT_KEYS) characterStats[key] = stats[key];
 	body.characterStats = characterStats;
 
+	if (BUILDINGS_FLAG.enabled) body.buildingUpgrade = state.buildingUpgrade ?? null;
+
 	const { land, extra } = packLand(state.tiles);
 	body.land = land;
 	body.extra = extra;
 	return body;
 };
 
-// `building` is only read: saves written before the old buildings were removed (IDL-259) carry it, and sanitizeSave drops it
-const EXTRA_KEYS = new Set(['level', 'building', 'chest']);
+// `building` and `bl` are always read, but kept only while the building system is on (BUILDINGS_FLAG): saves written before the old buildings were removed (IDL-259), and saves written with the flag on, load with the flag off minus their buildings
+const EXTRA_KEYS = new Set(['level', 'building', 'bl', 'chest']);
 
 /**
  * The body as `sanitizeSave` reads it: the runs are expanded to one `{ x, y, biome, level?, chest? }` entry per

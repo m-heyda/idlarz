@@ -40,7 +40,7 @@ export const renderCategory = (id: string, m: AssetEntry[]): string => {
 export const renderIndex = (m: AssetEntry[]): string => {
 	const out: string[] = ['# Asset library', '', HEADER, ''];
 	out.push(
-		'One name per picture, grouped by what it is. Biomes, roads, terrain atlases and ground textures are not listed. Browse it visually with `npm run storybook` (stories under `stories/assets/`).',
+		'One name per picture, grouped by what it is. Biomes, terrain atlases and ground textures are not listed. Browse it visually with `npm run storybook` (stories under `stories/assets/`).',
 		'',
 		'## How to use it with an agent',
 		'',

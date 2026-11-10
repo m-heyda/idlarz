@@ -16,7 +16,7 @@ import { castleLevelOf } from '@/lib/castleWard';
 import { advanceMonsters } from '@/lib/monsters';
 import { planPictureAt } from '@/lib/planPicture';
 import type { Resources } from '@/types/game';
-import { setTile } from '@/utils/world';
+import { getTile, setTile } from '@/utils/world';
 import { findCastle, limitCtx, type GameGet, type GameSet } from './base';
 
 export const createClockSlice = (set: GameSet, get: GameGet) => ({
@@ -64,6 +64,33 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 				newCastleUpgrade = null;
 			} else {
 				newCastleUpgrade = { ...newCastleUpgrade, remainingSec: remaining };
+			}
+		}
+
+		// Building upgrade timer (the per-biome building system, null unless BUILDINGS_FLAG is on): same rule as the castle's, and the same builder
+		let newBuildingUpgrade = state.buildingUpgrade;
+		let buildingFinished = false;
+		if (newBuildingUpgrade) {
+			const remaining = newBuildingUpgrade.remainingSec - secondsElapsed;
+			if (remaining <= 0) {
+				const { x, y, toLevel } = newBuildingUpgrade;
+				const tile = getTile(newTiles, x, y);
+				if (tile?.building) {
+					newTiles = setTile(newTiles, x, y, { ...tile, buildingLevel: toLevel });
+					newRates = calculateResourceRates(
+						newTiles,
+						state.characterStats,
+						state.farmLevels,
+						state.prestige,
+						state.farmUpgrades,
+						state.merchantUpgrades,
+						gearIncomePct(state.equipment),
+					);
+				}
+				newBuildingUpgrade = null;
+				buildingFinished = true;
+			} else {
+				newBuildingUpgrade = { ...newBuildingUpgrade, remainingSec: remaining };
 			}
 		}
 
@@ -134,6 +161,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			characterStats: newCharacterStats,
 			tiles: newTiles,
 			castleUpgrade: newCastleUpgrade,
+			buildingUpgrade: newBuildingUpgrade,
 			monsters: newMonsters,
 			combat: newCombat,
 			playerHp: newPlayerHp,
@@ -151,6 +179,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			playSeconds: newPlaySeconds,
 		});
 		if (castleFinished) emitSaveEvent('castleUpgraded');
+		if (buildingFinished) emitSaveEvent('buildingUpgraded');
 		if (level > state.level.level) emitSaveEvent('levelUp');
 	},
 });

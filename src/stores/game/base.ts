@@ -109,6 +109,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
 		clickLevel: 0,
 		castleUpgrade: null,
+		buildingUpgrade: null,
 		playSeconds: 0,
 		activeChests: 0,
 		gems: STARTING_GEMS, // a new game's gift; once the account has a ledger the server's balance replaces it on every answer

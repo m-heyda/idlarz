@@ -21,6 +21,9 @@ import {
 } from '../../src/config/economy';
 import { BIOMES, REBIRTH_BIOME_OUTPUT } from '../../src/config/biomes';
 import { BIOME_RULES } from '../../src/config/biomeRules';
+import { BUILDING_RULES } from '../../src/config/buildings';
+import { BUILDINGS } from '../../src/catalog/buildings';
+import { buildingLevelCost, buildingUpgradeDuration, producerOutput } from '../../src/lib/buildings';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
 import { describeClassPassives } from '../../src/lib/classPassives';
 import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
@@ -133,6 +136,30 @@ TABLES['castle-levels'] = () => ({
 			const cost = CASTLE_UPGRADE.upgradeCosts[i];
 			return [L, `+${pct(castleModifier(L))}`, `${2 * r + 1}x${2 * r + 1}`, `+${pct(castleAreaBonus(L))}`, L < CASTLE_UPGRADE.maxLevel ? sec(CASTLE_UPGRADE.durationsSec[i]) : '-', cost ? res(cost) : '-'];
 		}),
+	),
+});
+
+TABLES['building-rules'] = () => ({
+	title: 'Building levels (the building system, flag off)',
+	md: mdTable(
+		['Level', 'Castle level needed', 'Output x (of level 1)', 'Timer to reach it', 'Cost at 100 tiles'],
+		Array.from({ length: BUILDING_RULES.maxLevel }, (_, i) => {
+			const L = i + 1;
+			return [L, L, `x${1 + BUILDING_RULES.producer.levelStep * i}`, L === 1 ? 'built at once' : sec(buildingUpgradeDuration(L - 1)), res(buildingLevelCost(L, 100) as Record<string, number>)];
+		}),
+	),
+});
+
+TABLES['building-catalog'] = () => ({
+	title: 'The Producers (one per home biome, level 1, with 0 and 25 owned tiles of the biome)',
+	md: mdTable(
+		['Building', 'Biome', 'Makes per second at 0 biome tiles', 'at 25 biome tiles'],
+		BUILDINGS.map((b) => [
+			b.label,
+			BIOMES[b.biome].label,
+			res(producerOutput(b, 1, 0) as Record<string, number>),
+			res(producerOutput(b, 1, 25) as Record<string, number>),
+		]),
 	),
 });
 

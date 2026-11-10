@@ -2,11 +2,11 @@ import { COORD_LIMIT, inRange } from '@/utils/world';
 
 /**
  * Press, hold and drag over the map to draw on it: the pure half. No React, no stores, no game rules, so the map lab uses
- * it now and the real game can use it later (roads, extending land). The React half is `Grid`, which hands the pointer's
+ * it now and the real game can use it later (extending land). The React half is `Grid`, which hands the pointer's
  * tiles to a `DragHandler` and keeps the map from panning while a stroke is on.
  *
  * What a caller writes is one function: `createStroke(apply)`. `apply` gets the cells to draw each time the pointer reaches
- * new ones, so a road tool is "createStroke((cells) => build road on cells)".
+ * new ones, so a new tool is "createStroke((cells) => do something to cells)".
  */
 
 export interface Cell {

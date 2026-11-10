@@ -309,7 +309,7 @@ export const acceptSave = async (
 	 * could have paid, are stored as claimed (the flag stays) but never paid: the merchant levels go back to the last trusted save's, and the rates
 	 * and the castle the server pays from are that save's too
 	 */
-	const trusted = flags.includes('castle_jump') || worth.exceeds;
+	const trusted = flags.includes('castle_jump') || flags.includes('timer_jump') || worth.exceeds;
 	if (trusted) {
 		const baseline = sameRunAs(previous?.summary ?? null, summary) ? current : null;
 		if (worth.exceeds && baseline)

@@ -16,6 +16,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
+- Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`buildingLevelCost`](#buildinglevelcost)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
@@ -81,7 +82,7 @@ What a new game starts with: 125 gold (and [`STARTING_GEMS`](progression.md#star
 
 ### `calculateResourceBreakdown` <small>function</small>
 
-Source: [`src/utils/game/income.ts:123`](../../src/utils/game/income.ts)
+Source: [`src/utils/game/income.ts:127`](../../src/utils/game/income.ts)
 
 Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).
 
@@ -105,6 +106,7 @@ base[r]  = BASE_GENERATION_RATES[r]
          + 0.5 x (castle level - 1)                      (xp only)
 modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
 total[r] = base[r] x (1 + modifier[r])
+         + sum over Producers (buildings flag on) of {@link producerOutput}   (counted with the biome tiles)
 ```
 
 See also: [`calculateTileOutput`](economy.md#calculatetileoutput), [`castleModifier`](economy.md#castlemodifier), [`castleAreaBonus`](economy.md#castleareabonus), [`calculateFarmOutput`](economy.md#calculatefarmoutput)
@@ -113,7 +115,7 @@ See also: [`calculateTileOutput`](economy.md#calculatetileoutput), [`castleModif
 
 ### `calculateTileOutput` <small>function</small>
 
-Source: [`src/utils/game/income.ts:77`](../../src/utils/game/income.ts)
+Source: [`src/utils/game/income.ts:80`](../../src/utils/game/income.ts)
 
 The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.
 
@@ -957,6 +959,116 @@ Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.
 | charm | 2,425 / 60 | 21.5 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
 | cape | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
 | belt | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+
+## Buildings
+
+<a id="buildings-flag"></a>
+
+### `BUILDINGS_FLAG` <small>const</small>
+
+Source: [`src/config/buildings.ts:17`](../../src/config/buildings.ts)
+
+The per-biome building system (R7, IDL-91, IDL-92), behind [`BUILDINGS_FLAG`](economy.md#buildings-flag), which is **ON** (owner decision: live on merge). Switching it off is the rollback: the game, the save format, the server checks and the sim are then byte-identical to a build
+that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
+
+What is in this first slice (Producers only, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
+the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share **one builder** (one timer at a time);
+a building can be **moved** for half its cost. Extractors (IDL-94), Idols, the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
+
+**Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrade is the optional top-level `buildingUpgrade` (`{ x, y, toLevel, remainingSec }`, like `castleUpgrade`). They are
+written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No `SAVE_SCHEMA` bump. The server derives income from the saved map
+with the same [`calculateResourceBreakdown`](economy.md#calculateresourcebreakdown) (so the client only displays), judges the timer from two summaries (`timer_jump` in `verify.ts`) and prices levels in the net-worth floor.
+
+See also: `producerBonus`, [`buildingUpgradeDuration`](economy.md#buildingupgradeduration), `buildingBuildCost`
+
+<a id="building-rules"></a>
+
+### `BUILDING_RULES` <small>const</small>
+
+Source: [`src/config/buildings.ts:32`](../../src/config/buildings.ts)
+
+The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).
+
+- `maxLevel`: the base level cap, 5. Level `L` can only be bought while the castle is at least level `L` (`min(5, castle level)`).
+- `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once.
+- `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
+- `cost`: level 1 costs `tilePrices` (12) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ([`calculateTileCost`](economy.md#calculatetilecost)).
+- `relocateShare`: moving a building costs this share (50 %) of what its current level cost to reach, at today's prices; it is instant and keeps the level.
+
+**Building levels (the building system, flag off)** _(computed from the code)_
+
+| Level | Castle level needed | Output x (of level 1) | Timer to reach it | Cost at 100 tiles |
+| --- | --- | --- | --- | --- |
+| 1 | 1 | x1 | built at once | wood 389 K, stone 260 K, coal 260 K, food 130 K, hide 26 K, gold 1.3 M |
+| 2 | 2 | x1.5 | 10 min | wood 779 K, stone 519 K, coal 519 K, food 260 K, hide 51.9 K, gold 2.6 M |
+| 3 | 3 | x2 | 45 min | wood 1.56 M, stone 1.04 M, coal 1.04 M, food 519 K, hide 104 K, gold 5.19 M |
+| 4 | 4 | x2.5 | 3 h | wood 3.12 M, stone 2.08 M, coal 2.08 M, food 1.04 M, hide 208 K, gold 10.4 M |
+| 5 | 5 | x3 | 8 h | wood 6.23 M, stone 4.15 M, coal 4.15 M, food 2.08 M, hide 415 K, gold 20.8 M |
+
+<a id="buildings"></a>
+
+### `BUILDINGS` <small>const</small>
+
+Source: [`src/catalog/buildings.ts:29`](../../src/catalog/buildings.ts)
+
+The Producer of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
+tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.
+
+**The Producers (one per home biome, level 1, with 0 and 25 owned tiles of the biome)** _(computed from the code)_
+
+| Building | Biome | Makes per second at 0 biome tiles | at 25 biome tiles |
+| --- | --- | --- | --- |
+| Granary | Plains | food 5.85, gold 1.95 | food 8.78, gold 2.93 |
+| Lumberyard | Forest | wood 5.85, gold 1.95 | wood 8.78, gold 2.93 |
+| Quarry | Hills | stone 5.85, coal 3.9, gold 0.975 | stone 8.78, coal 5.85, gold 1.46 |
+| Peat Works | Swamp | wood 3.9, food 1.95 | wood 5.85, food 2.93 |
+| Coal Pit | Tundra | coal 6.83, gold 1.95 | coal 10.2, gold 2.93 |
+| Fishery | Lake | food 4.88, gold 0.975 | food 7.31, gold 1.46 |
+| Harbor | Coast | gold 1.95, food 3.9 | gold 2.93, food 5.85 |
+
+<a id="produceroutput"></a>
+
+### `producerOutput` <small>function</small>
+
+Source: [`src/lib/buildingOutput.ts:20`](../../src/lib/buildingOutput.ts)
+
+What a Producer of level `level` makes per second, before the global modifiers (castle, Embers, ...): its `produces` resources at the biome's tile rate.
+
+**Formula**
+
+```text
+output[r] = tileEquivalents x biome tile rate[r] x BIOME_YIELD.scale x (1 + levelStep x (level - 1)) x (1 + min(bonusCap, perOwnedTile x owned tiles of the biome))
+```
+
+See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`
+
+<a id="buildingupgradeduration"></a>
+
+### `buildingUpgradeDuration` <small>function</small>
+
+Source: [`src/lib/buildings.ts:26`](../../src/lib/buildings.ts)
+
+Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.
+
+**Formula**
+
+```text
+seconds = floor(durationsSec[fromLevel - 1] x (1 - 0.05 x Master Builders level))
+```
+
+<a id="buildinglevelcost"></a>
+
+### `buildingLevelCost` <small>function</small>
+
+Source: [`src/lib/buildings.ts:37`](../../src/lib/buildings.ts)
+
+The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.
+
+**Formula**
+
+```text
+cost(level) = floor(tilePrice(min(owned tiles, priceTileCap)) x tilePrices x levelGrowth^(level - 1))   per resource
+```
 
 ## Perk caps
 

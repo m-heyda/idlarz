@@ -64,7 +64,7 @@ Tiles an old save knew by row and column keep their logical coordinates: the cas
 
 ### `GameState` <small>interface</small>
 
-Source: [`src/types/game.ts:352`](../../src/types/game.ts)
+Source: [`src/types/game.ts:362`](../../src/types/game.ts)
 
 State. The persisted keys are `PERSISTED_KEYS` ([`PERSISTED_KEYS`](saves-and-server.md#persisted-keys)), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.
 
@@ -145,7 +145,7 @@ Deterministic: the same seed gives the same picture. Pure: no canvas, no store.
 Source: [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts)
 
 The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
-accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
+accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, terrain atlases and ground textures are left out on purpose.
 Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/`
 get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
 `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
