@@ -241,6 +241,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ "Hours as a number":
 - [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ Rebirth and the Ember shop.
+- [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The small "what you unlocked" modal shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
 - [`SaveMenuDialog.tsx`](../../src/components/game/overlays/SaveMenuDialog.tsx) — ~ Save & backup:
 - [`SettingsDialog.tsx`](../../src/components/game/overlays/SettingsDialog.tsx) — ~ Visible settings:
@@ -504,6 +505,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`income.ts`](../../src/utils/game/income.ts) — Income per second: what one tile produces, and the full breakdown and rates (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`merchant.ts`](../../src/utils/game/merchant.ts) — The merchant's upgrades, what selling pays and what buying costs (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`rebirth.ts`](../../src/utils/game/rebirth.ts) — Rebirth and the Ember shop: effects, costs, gain and the rebirth requirements (part of the former utils/gameUtils.ts, split in IDL-15).
+- [`rebirthUnlocks.ts`](../../src/utils/game/rebirthUnlocks.ts) — What a rebirth unlocks: the biome whose `BIOME_RULES.unlockAfterRebirths` equals the new rebirth count (IDL-258).
 - [`tiles.ts`](../../src/utils/game/tiles.ts) — Map-level counts and the new-game map (part of the former utils/gameUtils.ts, split in IDL-15).
 
 **src/utils/**
@@ -662,6 +664,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`netWorth.test.ts`](../../tests/economy/netWorth.test.ts) — ~ An honest game:
 - [`pacingGuard.test.ts`](../../tests/economy/pacingGuard.test.ts)
 - [`rebirth.test.ts`](../../tests/economy/rebirth.test.ts) — ~ A run that has reached the rebirth line.
+- [`rebirthBiomes.test.ts`](../../tests/economy/rebirthBiomes.test.ts)
 - [`startPlan.test.ts`](../../tests/economy/startPlan.test.ts)
 - [`unbounded.test.ts`](../../tests/economy/unbounded.test.ts)
 

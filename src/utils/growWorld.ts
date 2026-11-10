@@ -36,9 +36,9 @@ function frontierTiles(world: World): [number, number][] {
 
 /**
  * A new game plus `purchases` rolled purchases, the way the store does it (rollBiome on a tile beside the land), without
- * the economy. Deterministic for a given seed; used by the map lab, the lone-tile report and the tests.
+ * the economy, in a run that follows `rebirths` rebirths (0 = a first run, so no rebirth biome turns up). Deterministic for a given seed; used by the map lab, the lone-tile report and the tests.
  */
-export function growWorld(purchases: number, seed: number, policy: BuyPolicy = 'nearest'): World {
+export function growWorld(purchases: number, seed: number, policy: BuyPolicy = 'nearest', rebirths = 0): World {
 	const random = seededRandom(seed);
 	let world = createInitialWorld(random);
 	for (let n = 0; n < purchases; n++) {
@@ -57,7 +57,7 @@ export function growWorld(purchases: number, seed: number, policy: BuyPolicy = '
 			}
 		}
 		const [x, y] = pick;
-		world = setTile(world, x, y, { biome: rollBiome(world, x, y, n, random), isOwned: true });
+		world = setTile(world, x, y, { biome: rollBiome(world, x, y, n, random, rebirths), isOwned: true });
 	}
 	return world;
 }

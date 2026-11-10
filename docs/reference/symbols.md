@@ -27,7 +27,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
 | `BIOME_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:124`](../../src/catalog/lootConfig.ts) | The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: |
 | `BIOME_YIELD` | Economy / Income | [`src/config/economy.ts:141`](../../src/config/economy.ts) | Biome and building output is multiplied by `scale` (1.3). |
-| `BIOMES` | Economy / Biomes | [`src/config/biomes.ts:30`](../../src/config/biomes.ts) | Every biome with its config output per second. |
+| `BIOMES` | Economy / Biomes | [`src/config/biomes.ts:53`](../../src/config/biomes.ts) | Every biome with its config output per second. |
 | `BOSS_MIN_DISTANCE` | Monsters / Spawning | [`src/config/combatConfig.ts:316`](../../src/config/combatConfig.ts) | The boss band (IDL-222, owner decision 2026-11-09): |
 | `BUFF_FAMILIES` | Combat / Consumables | [`src/catalog/buffs.ts:25`](../../src/catalog/buffs.ts) | The buff families. |
 | `buffTotals` | Combat / Consumables | [`src/lib/buffs.ts:84`](../../src/lib/buffs.ts) | The summed bonus per stat of the running buffs: |
@@ -104,7 +104,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `gemChance` | Economy / Chests and Luck | [`src/lib/luck.ts:50`](../../src/lib/luck.ts) | Chance (0-1) that a chest also holds gems. |
 | `generateLoot` | Loot / Pipeline | [`src/lib/loot/generate.ts:317`](../../src/lib/loot/generate.ts) | Everything one source gives. |
 | `generateMerchantStock` | Economy / Merchant | [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts) | A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. |
-| `generateStartRing` | Economy / Biomes | [`src/utils/biomeRules.ts:186`](../../src/utils/biomeRules.ts) | The castle's four starting neighbours for a new game: |
+| `generateStartRing` | Economy / Biomes | [`src/utils/biomeRules.ts:189`](../../src/utils/biomeRules.ts) | The castle's four starting neighbours for a new game: |
 | `goldenMonsterChance` | Economy / Chests and Luck | [`src/lib/luck.ts:67`](../../src/lib/luck.ts) | Chance (0-1) that a newly arrived rat is a lucky one. |
 | `gradeLegacyItems` | Loot / Items | [`src/catalog/items/ladder.ts:316`](../../src/catalog/items/ladder.ts) | Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece: |
 | `gradeLevels` | Loot / Items | [`src/catalog/items/grades.ts:79`](../../src/catalog/items/grades.ts) | The item level window an item of this grade is generated in. |
@@ -161,7 +161,9 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rarityLuckMultiplier` | Economy / Chests and Luck | [`src/lib/luck.ts:30`](../../src/lib/luck.ts) | What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear). |
 | `readBuffs` | Combat / Consumables | [`src/lib/buffs.ts:30`](../../src/lib/buffs.ts) | Cleans a stored buff list: |
 | `REBIRTH` | Progression / Rebirth | [`src/config/rebirth.ts:22`](../../src/config/rebirth.ts) | Rebirth: |
+| `REBIRTH_BIOME_OUTPUT` | Economy / Biomes | [`src/config/biomes.ts:32`](../../src/config/biomes.ts) | Output of the five rebirth biomes (unlocked one per rebirth, `BIOME_RULES.unlockAfterRebirths`): |
 | `rebirthStatus` | Progression / Rebirth | [`src/utils/game/rebirth.ts:128`](../../src/utils/game/rebirth.ts) | Can the player rebirth, and if not what is missing. |
+| `rebirthUnlockIntro` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:28`](../../src/utils/game/rebirthUnlocks.ts) | The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. |
 | `receiveDrops` | Loot / Pipeline | [`src/lib/loot/receive.ts:24`](../../src/lib/loot/receive.ts) | Hands drops to the player: |
 | `reconcileCharacter` | Progression / Levels | [`src/utils/game/character.ts:166`](../../src/utils/game/character.ts) | Puts a character's attributes in line with an XP total: |
 | `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` have been bought: |
@@ -173,7 +175,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `restThrough` | Combat / Results and rest | [`src/lib/offline/fight.ts:164`](../../src/lib/offline/fight.ts) | After an absence the player is back on their feet: |
 | `rewardWeights` | Economy / Chests and Luck | [`src/lib/chests.ts:90`](../../src/lib/chests.ts) | Relative chances with Luck shifted from plain gold toward the lucky chest and the item. |
 | `rngFor` | Combat / A fight | [`src/lib/offline/fightContext.ts:81`](../../src/lib/offline/fightContext.ts) | The next random stream of a fight: |
-| `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:126`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
+| `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:129`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
 | `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
 | `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:114`](../../src/lib/craftGear.ts) | One crafted piece: |
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
