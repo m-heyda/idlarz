@@ -197,6 +197,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `startNewChapter` | Saves & Server / Epoch | [`src/lib/offline/chapter.ts:42`](../../src/lib/offline/chapter.ts) | Starts the new chapter for one account, once: |
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:157`](../../src/lib/combat.ts) | One swing: |
 | `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
+| The /play route and its redirects | Architecture / Routes | [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts) | The front door's routes (IDL-61). |
 | The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |
 | The browser's half of the data epoch | Saves & Server / Browser state | [`src/lib/epochGuard.ts:10`](../../src/lib/epochGuard.ts) | The browser's half of the data epoch. |
 | The end-to-end test account | Ops / Operator guides | [`e2e/account.ts:23`](../../e2e/account.ts) | The one account every end-to-end test signs in with (docs/reference/ops.md). |

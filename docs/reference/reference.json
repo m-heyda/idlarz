@@ -1922,6 +1922,16 @@
   "see": []
  },
  {
+  "id": "the-play-route-and-its-redirects",
+  "name": "The /play route and its redirects",
+  "kind": "topic",
+  "category": "Architecture/Routes",
+  "file": "src/lib/playRoute.ts",
+  "line": 1,
+  "summary": "The front door's routes (IDL-61). The game lives at `/play`; `/` is the public landing. A guest who asks for `/play` is sent to the landing with the login window open (`/?login=1&next=/play`) and, once signed in, goes back to where they were headed. `next` comes from the address bar, so it is only ever followed when it is a path on this site (`safeNextPath`): anything else (another host, `//host`, a backslash trick, a control character) falls back to `/play`. This is a convenience for the player, not a security boundary: every API route answers 401 on its own.",
+  "see": []
+ },
+ {
   "id": "withpushlock",
   "name": "withPushLock",
   "symbol": "withPushLock",
