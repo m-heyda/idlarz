@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatCompact } from '@/utils/formatters';
 import { MONSTERS } from '@/config/combatConfig';
-import { MONSTER_CATALOG, monsterArtUrl } from '@/catalog/monsters';
+import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import type { MonsterType } from '@/types/game';
 import MonsterArt from './MonsterArt';
@@ -39,7 +39,7 @@ const MonsterSprite: React.FC<{
 		>
 			{wip ? (
 				// eslint-disable-next-line @next/next/no-img-element
-				<img src={monsterArtUrl(wip)} alt={wip.label} className='tile-monster-img tile-monster-still' draggable={false} />
+				<img src={monsterSpriteUrl(wip)} alt={wip.label} className='tile-monster-img tile-monster-still' draggable={false} />
 			) : (
 				<MonsterArt type={type} label={MONSTERS[type].label} className='tile-monster-img' />
 			)}

@@ -15,9 +15,12 @@ import { createWorld, getTile, type Placed, type World } from '@/utils/world';
 // save and the spawn rules of the monster (config/combatConfig `MonsterDef.spawn`: biomes, distance from the castle). The browser only
 // draws a monster where the ticket says. The map is a large row that is only read when it matters (see `needsLook`).
 
-/** What the rules depend on: a different key means the land (or the castle) changed since the last look. */
+/**
+ * What the rules depend on: a different key means the land, the castle or the roster changed since the last look. The roster counts (`MONSTERS` size), so a bank counted before a new roster went live
+ * (hills, coast, lake, the jungle) is looked at again at once instead of waiting for the next purchase, and no monster is missed on tiles that only just became eligible.
+ */
 export const siteKey = (summary: { tilesOwned: number; castleLevel: number; rebirths: number }): string =>
-	`${summary.tilesOwned}:${summary.castleLevel}:${summary.rebirths}`;
+	`${summary.tilesOwned}:${summary.castleLevel}:${summary.rebirths}:r${Object.keys(MONSTERS).length}`;
 
 type LandEntry = { x: number; y: number; biome: Tile['biome']; level?: number; chest?: boolean };
 

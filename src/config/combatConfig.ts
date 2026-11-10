@@ -109,10 +109,10 @@ export interface MonsterSpawnRule {
 }
 
 /**
- * The biomes that have a monster roster today (art in public/pixel/enemies, see catalog/monsters.ts). Hills has no art yet, water has no
- * shoreline spawns: nothing stands there until they do.
+ * The biomes that have a monster roster today (catalog/monsters.ts): the seven home biomes. A monster stands on tiles of its own biome, water included (a coast or lake tile holds
+ * a monster like any other owned tile; IDL-58), so there is no shoreline rule. The rebirth biomes have no roster yet.
  */
-type MonsterBiome = 'plains' | 'forest' | 'swamp' | 'tundra';
+type MonsterBiome = 'plains' | 'forest' | 'hills' | 'coast' | 'swamp' | 'lake' | 'tundra';
 
 export interface RewardPart {
 	rewardSec: number;
@@ -273,6 +273,67 @@ const BIOME_TIER = {
 			stunResist: 45,
 		},
 	},
+	// IDL-58 / IDL-201: the water and hills biomes slot in between the first four. Starting values, checked with `npm run monster-ladder` and `kill-sim` (docs/plan/20 section 8).
+	// coast: easy, between plains and forest
+	coast: {
+		hp: 130,
+		attack: 5,
+		armor: 0,
+		rewardSec: 100,
+		cap: { gold: 450, xp: 64 },
+		window: { base: 2, perCastleLevel: 1, spread: 2, cap: 12 },
+		boss: {
+			hp: 1400,
+			attack: 13,
+			armor: 20,
+			refLevel: 17,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 78,
+			window: { base: 17, perCastleLevel: 0.8, spread: 3, cap: 27 },
+			crit: 8,
+			stunResist: 22,
+		},
+	},
+	// hills: mid, between forest and swamp
+	hills: {
+		hp: 190,
+		attack: 6.5,
+		armor: 1.5,
+		rewardSec: 120,
+		cap: { gold: 800, xp: 114 },
+		window: { base: 6, perCastleLevel: 1, spread: 2, cap: 16 },
+		boss: {
+			hp: 2300,
+			attack: 18,
+			armor: 28,
+			refLevel: 22,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 82,
+			window: { base: 22, perCastleLevel: 0.8, spread: 3, cap: 32 },
+			crit: 9,
+			stunResist: 27,
+		},
+	},
+	// lake: mid-hard, between swamp and tundra
+	lake: {
+		hp: 260,
+		attack: 7.5,
+		armor: 2.5,
+		rewardSec: 160,
+		cap: { gold: 1800, xp: 257 },
+		window: { base: 10, perCastleLevel: 1, spread: 2, cap: 19 },
+		boss: {
+			hp: 4500,
+			attack: 27,
+			armor: 45,
+			refLevel: 27,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 88,
+			window: { base: 27, perCastleLevel: 0.8, spread: 3, cap: 37 },
+			crit: 11,
+			stunResist: 37,
+		},
+	},
 } as const satisfies Record<MonsterBiome, Tier>;
 
 /** How a normal monster fights, relative to its biome's tier */
@@ -352,12 +413,12 @@ export const FALLBACK_MONSTER = 'thistleBoar' as const;
 export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
 
 /**
- * The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`).
+ * The roster: 28 monsters in seven biomes, three normal ones and a boss each: plains, forest, swamp and tundra, and since IDL-201 hills, coast and lake. A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes have no roster yet.
  * Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
  *
  * - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
- * - Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses: crit 8 / 9 / 10 / 13 %, Stun resistance 20 / 25 / 30 / 45 %, time limit 75 / 80 / 85 / 90 s, one hit every 3 s (`BIOME_TIER`).
- * - Tier numbers per biome (`BIOME_TIER`): plains HP 100 attack 4; forest 160 / 6; swamp 220 / 7; tundra 300 / 8.
+ * - Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 s, one hit every 3 s (`BIOME_TIER`).
+ * - Tier numbers per biome (`BIOME_TIER`), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8.
  * - The ladder against gear: `docs/generated/monster-ladder.md`.
  *
  * @category Monsters/Roster
@@ -385,4 +446,19 @@ export const MONSTERS = {
 	icetuskCalf: normal('tundra', 'Icetusk Calf', 'tough'),
 	rimeWraith: normal('tundra', 'Rime Wraith', 'elite'),
 	bossWinterWyrm: boss('tundra', 'The Winter Wyrm', ['The Wyrm exhales a cold breath.', 'Winter outlasts everyone.']),
+	// hills (IDL-201; placeholder art until the real sprites exist)
+	graniteRam: normal('hills', 'Granite Ram', 'fierce'),
+	caveGoblinMiner: normal('hills', 'Cave Goblin Miner', 'even'),
+	boulderBeetle: normal('hills', 'Boulder Beetle', 'tough'),
+	bossHillGiant: boss('hills', 'The Hill Giant', ['The Giant lifts a boulder.', 'The hills are his, and so is the road.']),
+	// coast
+	wreckCrab: normal('coast', 'Wreck Crab', 'tough'),
+	netGull: normal('coast', 'Net Gull', 'fierce'),
+	drownedSailor: normal('coast', 'Drowned Sailor', 'even'),
+	bossReefLeviathan: boss('coast', 'The Reef Leviathan', ['The Leviathan rises out of the surf.', 'The tide takes everything in the end.']),
+	// lake
+	mossSnapper: normal('lake', 'Moss Snapper', 'tough'),
+	reedNymph: normal('lake', 'Reed Nymph', 'even'),
+	pikeLurker: normal('lake', 'Pike Lurker', 'fierce'),
+	bossLakeHydra: boss('lake', 'The Lake Hydra', ['Heads hiss from the reeds.', 'Cut one down and two more watch you.']),
 } as const satisfies Record<string, MonsterDef>;

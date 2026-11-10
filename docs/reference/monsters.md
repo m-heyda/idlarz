@@ -17,14 +17,14 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:367`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:428`](../../src/config/combatConfig.ts)
 
-The roster: 16 monsters in four biomes, three normal ones and a boss each. Plains, forest, swamp and tundra only; hills, coast and lake have none (a monster may only stand on a biome in its `spawn.biomes`).
+The roster: 28 monsters in seven biomes, three normal ones and a boss each: plains, forest, swamp and tundra, and since IDL-201 hills, coast and lake. A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes have no roster yet.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
 
 - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
-- Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses: crit 8 / 9 / 10 / 13 %, Stun resistance 20 / 25 / 30 / 45 %, time limit 75 / 80 / 85 / 90 s, one hit every 3 s (`BIOME_TIER`).
-- Tier numbers per biome (`BIOME_TIER`): plains HP 100 attack 4; forest 160 / 6; swamp 220 / 7; tundra 300 / 8.
+- Normal monsters never crit (`critChance` 0, `critMult` 1.5, no Stun resistance). Bosses, plains / coast / forest / hills / swamp / lake / tundra: crit 8 / 8 / 9 / 9 / 10 / 11 / 13 %, Stun resistance 20 / 22 / 25 / 27 / 30 / 37 / 45 %, time limit 75 / 78 / 80 / 82 / 85 / 88 / 90 s, one hit every 3 s (`BIOME_TIER`).
+- Tier numbers per biome (`BIOME_TIER`), HP / attack: plains 100 / 4; coast 130 / 5; forest 160 / 6; hills 190 / 6.5; swamp 220 / 7; lake 260 / 7.5; tundra 300 / 8.
 - The ladder against gear: `docs/generated/monster-ladder.md`.
 
 **The roster (level 1 stats; bosses at their reference level)** _(computed from the code)_
@@ -47,6 +47,18 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | tundra | Icetusk Calf | 1 | 390 | 6 | 3 | 0.4 | 12-14 -> 16-18 |
 | tundra | Rime Wraith | 1 | 600 | 12 | 11 | 0.45 | 12-14 -> 16-18 |
 | tundra | The Winter Wyrm (boss) | 30 | 7,000 | 36 | 58 | 0.33 | 30-33 -> 37-40 |
+| hills | Granite Ram | 1 | 152 | 8 | 1.5 | 0.6 | 6-8 -> 14-16 |
+| hills | Cave Goblin Miner | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
+| hills | Boulder Beetle | 1 | 247 | 5 | 1.5 | 0.4 | 6-8 -> 14-16 |
+| hills | The Hill Giant (boss) | 22 | 2,300 | 18 | 28 | 0.33 | 22-25 -> 29-32 |
+| coast | Wreck Crab | 1 | 169 | 4 | 0 | 0.4 | 2-4 -> 10-12 |
+| coast | Net Gull | 1 | 104 | 6 | 0 | 0.6 | 2-4 -> 10-12 |
+| coast | Drowned Sailor | 1 | 130 | 5 | 0 | 0.5 | 2-4 -> 10-12 |
+| coast | The Reef Leviathan (boss) | 17 | 1,400 | 13 | 20 | 0.33 | 17-20 -> 24-27 |
+| lake | Moss Snapper | 1 | 338 | 6 | 2.5 | 0.4 | 10-12 -> 17-19 |
+| lake | Reed Nymph | 1 | 260 | 8 | 2.5 | 0.5 | 10-12 -> 17-19 |
+| lake | Pike Lurker | 1 | 208 | 9 | 2.5 | 0.6 | 10-12 -> 17-19 |
+| lake | The Lake Hydra (boss) | 27 | 4,500 | 27 | 45 | 0.33 | 27-30 -> 34-37 |
 
 ## Level scaling
 
@@ -62,7 +74,7 @@ Level scaling: a monster has an integer level. Stats follow `monsterStats`.
 
 - **Normal** (`scaling: 'exp'`): `HP = round(hp x sqrt(1.5)^(level-1))`, `attack = round(attack x sqrt(1.25)^(level-1))`, `armor = armor + 0.5 x (level-1)`. A level 9 plains monster has 506 HP.
 - **Boss** (`scaling: 'gear'`): HP and attack `x levelScale(level) / levelScale(refLevel)` (`1 + 0.07 x (level - 1)`, `src/catalog/stats.ts`); armor `+0.5` per level away from `refLevel`. The plains boss has 1,000 HP and 11 attack at level 15.
-- Reference levels: plains 15, forest 20, swamp 25, tundra 30.
+- Reference levels: plains 15, coast 17, forest 20, hills 22, swamp 25, lake 27, tundra 30.
 
 **Formula**
 
@@ -82,7 +94,7 @@ Source: [`src/lib/monsters.ts:39`](../../src/lib/monsters.ts)
 
 The levels a new monster of this type can appear at in a world of this castle level (both ends included).
 
-Spawn window. Plains normal: base 1, +1 per castle level, spread 2, cap 10; forest 4/+1/2/14; swamp 8/+1/2/18; tundra 12/+0.5/2/20. Bosses: base 15 / 20 / 25 / 30, +0.8 per castle level, spread 3, cap 25 / 30 / 35 / 40.
+Spawn window. Plains normal: base 1, +1 per castle level, spread 2, cap 10; coast 2/+1/2/12; forest 4/+1/2/14; hills 6/+1/2/16; swamp 8/+1/2/18; lake 10/+1/2/19; tundra 12/+0.5/2/20. Bosses: base 15 / 17 / 20 / 22 / 25 / 27 / 30 (plains, coast, forest, hills, swamp, lake, tundra), +0.8 per castle level, spread 3, cap base + 10.
 
 **Formula**
 
@@ -185,7 +197,7 @@ for new spawns only. Bosses follow the same rules (IDL-222): among the boss type
 
 ### `placeTickets` <small>function</small>
 
-Source: [`src/lib/offline/placement.ts:71`](../../src/lib/offline/placement.ts)
+Source: [`src/lib/offline/placement.ts:74`](../../src/lib/offline/placement.ts)
 
 Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
@@ -218,7 +230,7 @@ Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`b
 
 ### `BOSS_MIN_DISTANCE` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:320`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:381`](../../src/config/combatConfig.ts)
 
 The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
 
@@ -269,3 +281,6 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 | forest | 110 | 600 | 85 | 1.08 |
 | swamp | 135 | 1,200 | 171 | 1.08 |
 | tundra | 190 | 2,400 | 342 | 1.08 |
+| hills | 120 | 800 | 114 | 1.08 |
+| coast | 100 | 450 | 64 | 1.08 |
+| lake | 160 | 1,800 | 257 | 1.08 |

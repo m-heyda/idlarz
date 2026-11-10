@@ -2,17 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BOSS_MAX_DISTANCE, BOSS_MIN_DISTANCE, COMBAT, MONSTERS } from '../../src/config/combatConfig';
 import { BIOMES } from '../../src/config/biomes';
+import { MONSTER_CATALOG } from '../../src/catalog/monsters';
 
 // Every monster is one entry of config/combatConfig: adding a monster (or a biome) later must not need code, so the shape is checked here.
 
 const WATER = ['lake', 'coast'];
 
-test('every monster says where it may spawn: known land only, never water or the castle, and a sane distance from the castle', () => {
+test('every monster says where it may spawn: a known biome, never the castle, and a sane distance from it; water only for the monsters that live there (IDL-58)', () => {
 	for (const [id, def] of Object.entries(MONSTERS)) {
 		assert.ok(def.spawn.biomes.length > 0, `${id} needs somewhere to stand`);
 		for (const biome of def.spawn.biomes) {
 			assert.ok(biome in BIOMES, `${id}: ${biome} is a biome`);
-			assert.ok(!WATER.includes(biome), `${id}: no water`);
+			if (WATER.includes(biome))
+				assert.equal(MONSTER_CATALOG.find((m) => m.id === id)?.biomes[0], biome, `${id}: only a monster of the water biome stands on it`);
 			assert.notEqual(biome, 'castle');
 			assert.notEqual(biome, 'empty');
 		}
@@ -33,16 +35,22 @@ test('normal monsters spawn 2 to 9 tiles from the castle and bosses 8 or more (I
 });
 
 test('each biome is a step up: its monsters and its boss start at higher levels, hit harder and have more HP than the biome before', () => {
+	// one normal monster and the boss of each biome, easiest biome first (the home ladder: plains, coast, forest, hills, swamp, lake, tundra)
 	const ladder = [
 		['thistleBoar', 'bossGreatAuroch'],
+		['wreckCrab', 'bossReefLeviathan'],
 		['mossbackWolf', 'bossElderStag'],
+		['graniteRam', 'bossHillGiant'],
 		['garbageOgre', 'bossMireMatriarch'],
+		['mossSnapper', 'bossLakeHydra'],
 		['frostHare', 'bossWinterWyrm'],
 	] as const;
 	for (let i = 1; i < ladder.length; i++) {
 		const [before, after] = [MONSTERS[ladder[i - 1][0]], MONSTERS[ladder[i][0]]];
+		assert.ok(after.reward.gold.cap > before.reward.gold.cap && after.reward.gold.rewardSec > before.reward.gold.rewardSec, 'pays more');
 		assert.ok(after.spawnWindow.base > before.spawnWindow.base && after.spawnWindow.cap > before.spawnWindow.cap, 'higher levels');
 		assert.ok(after.hp > before.hp * 0.6 && after.armor >= before.armor, 'tougher at the start');
+		assert.ok(MONSTERS[ladder[i][1]].timeLimitSec! > MONSTERS[ladder[i - 1][1]].timeLimitSec!, 'a longer clock for the harder boss');
 		const [kingBefore, kingAfter] = [MONSTERS[ladder[i - 1][1]], MONSTERS[ladder[i][1]]];
 		assert.ok(
 			kingAfter.hp > kingBefore.hp && kingAfter.armor > kingBefore.armor && kingAfter.spawnWindow.base > kingBefore.spawnWindow.base,

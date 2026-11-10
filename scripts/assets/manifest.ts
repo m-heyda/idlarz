@@ -14,6 +14,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, relative, resolve, sep } from 'node:path';
 import { MERCHANT_PORTRAIT } from '../../src/config/npcPortraits';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
+import { MONSTERS } from '../../src/config/combatConfig';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
 import { AVATARS } from '../../src/catalog/avatars';
 import { GUIDE_SPRITE, GUIDE_TALK_SHEET } from '../../src/catalog/tutorial';
@@ -237,6 +238,21 @@ export const buildManifest = (): AssetEntry[] => {
 			src,
 			status: m.enabled ? 'used' : 'planned',
 			usedBy: [m.id],
+			source: 'monster roster',
+		});
+	}
+	// the stand-in pictures of monsters whose art is not made yet (one file serves a whole family)
+	const standIns = new Map<string, string[]>();
+	for (const m of MONSTER_CATALOG) if (m.placeholder && !m.art) standIns.set(m.placeholder, [...(standIns.get(m.placeholder) ?? []), m.id]);
+	for (const [src, ids] of standIns) {
+		if (!existsSync(abs(src))) continue;
+		add({
+			name: `monster_placeholder_${snake(basename(src))}`,
+			category: 'monsters',
+			subcategory: 'placeholder (stand-in until the real sprite)',
+			src,
+			status: ids.some((id) => id in MONSTERS) ? 'used' : 'planned',
+			usedBy: ids,
 			source: 'monster roster',
 		});
 	}

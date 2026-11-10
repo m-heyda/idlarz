@@ -3,7 +3,7 @@ import { formatCompact, formatNumber } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
-import { MONSTER_CATALOG, monsterArtUrl } from '@/catalog/monsters';
+import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import { SLASH_FRAME, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import { winBucketOf, type WinBucket } from '@/lib/combat';
@@ -297,7 +297,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 	const art = wip ? (
 		// eslint-disable-next-line @next/next/no-img-element
 		<img
-			src={monsterArtUrl(wip)}
+			src={monsterSpriteUrl(wip)}
 			alt={wip.label}
 			draggable={false}
 			style={{

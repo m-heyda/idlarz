@@ -28,7 +28,7 @@ export const isBoss = (type: MonsterType): boolean => MONSTERS[type].grade === '
 /**
  * The levels a new monster of this type can appear at in a world of this castle level (both ends included).
  *
- * Spawn window. Plains normal: base 1, +1 per castle level, spread 2, cap 10; forest 4/+1/2/14; swamp 8/+1/2/18; tundra 12/+0.5/2/20. Bosses: base 15 / 20 / 25 / 30, +0.8 per castle level, spread 3, cap 25 / 30 / 35 / 40.
+ * Spawn window. Plains normal: base 1, +1 per castle level, spread 2, cap 10; coast 2/+1/2/12; forest 4/+1/2/14; hills 6/+1/2/16; swamp 8/+1/2/18; lake 10/+1/2/19; tundra 12/+0.5/2/20. Bosses: base 15 / 17 / 20 / 22 / 25 / 27 / 30 (plains, coast, forest, hills, swamp, lake, tundra), +0.8 per castle level, spread 3, cap base + 10.
  *
  * @category Monsters/Level scaling
  * @order 2
@@ -103,7 +103,7 @@ const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
  *
  * - **Normal** (`scaling: 'exp'`): `HP = round(hp x sqrt(1.5)^(level-1))`, `attack = round(attack x sqrt(1.25)^(level-1))`, `armor = armor + 0.5 x (level-1)`. A level 9 plains monster has 506 HP.
  * - **Boss** (`scaling: 'gear'`): HP and attack `x levelScale(level) / levelScale(refLevel)` (`1 + 0.07 x (level - 1)`, `src/catalog/stats.ts`); armor `+0.5` per level away from `refLevel`. The plains boss has 1,000 HP and 11 attack at level 15.
- * - Reference levels: plains 15, forest 20, swamp 25, tundra 30.
+ * - Reference levels: plains 15, coast 17, forest 20, hills 22, swamp 25, lake 27, tundra 30.
  *
  * @category Monsters/Level scaling
  * @order 1

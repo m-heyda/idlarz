@@ -6,7 +6,7 @@ import type { BiomeType } from '@/types/game';
  *
  * This is a roster, not a balance sheet. It carries no stats, rewards or loot. A monster spawns when it has an entry in `MONSTERS`
  * (config/combatConfig.ts) under the same id (`enabled` follows that), which is where stats, spawn window and loot go. The rats are gone:
- * plains, forest, swamp and tundra have their three monsters and a boss; the rest is art waiting for its turn (docs/plan/20-monster-families-and-rewards.md). On-map size of the art: `config/monsterArtSize.ts` (tuned in /map-lab, used by `MonsterSprite` for real game monsters too).
+ * the seven home biomes (plains, forest, hills, coast, swamp, lake, tundra) have their three monsters and a boss; the rest is art waiting for its turn (docs/plan/20-monster-families-and-rewards.md). On-map size of the art: `config/monsterArtSize.ts` (tuned in /map-lab, used by `MonsterSprite` for real game monsters too).
  */
 
 /** Biomes planned in docs/plan/12-rebirth-biomes.md that are not in `BIOMES` yet (unlocked by rebirth). */
@@ -24,6 +24,11 @@ export interface MonsterCatalogEntry {
 	enabled: boolean;
 	/** true when the generated picture exists at `monsterArtUrl(entry)` (the first biome in `biomes` is its folder) */
 	art: boolean;
+	/**
+	 * The stand-in picture (a path under `public/`) shown while `art` is false. Getting the real art in is a file swap: put the picture at `monsterArtUrl(entry)`, set `art` to true and drop this field
+	 * (`monsterSpriteUrl` then follows by itself). Nothing else reads it.
+	 */
+	placeholder?: string;
 }
 
 /** `public/pixel/enemies/<biome>/<kebab-id>.png`; bosses are `boss-<name>`. */
@@ -32,21 +37,30 @@ export const monsterArtUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes'>)
 	return `/pixel/enemies/${entry.biomes[0]}/${kebab}.png`;
 };
 
-const normal = (id: string, label: string, biome: CatalogBiome, art: boolean): MonsterCatalogEntry => ({
+/** The picture the game draws: the real art when it exists, else the stand-in (or the real path, which then shows nothing, for a monster that has neither). */
+export const monsterSpriteUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes' | 'art' | 'placeholder'>): string =>
+	entry.art ? monsterArtUrl(entry) : (entry.placeholder ?? monsterArtUrl(entry));
+
+/** The stand-in pictures, one per family (`public/pixel/enemies/placeholder/`): a plain tinted silhouette until the real sprite is made */
+const PLACEHOLDER = { hills: '/pixel/enemies/placeholder/hills.png', lake: '/pixel/enemies/placeholder/lake.png' } as const;
+
+const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): MonsterCatalogEntry => ({
 	id,
 	label,
 	grade: 'normal',
 	biomes: [biome],
 	enabled: id in MONSTERS,
 	art,
+	...(placeholder ? { placeholder } : {}),
 });
-const boss = (id: string, label: string, biome: CatalogBiome, art: boolean): MonsterCatalogEntry => ({
+const boss = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): MonsterCatalogEntry => ({
 	id,
 	label,
 	grade: 'boss',
 	biomes: [biome],
 	enabled: id in MONSTERS,
 	art,
+	...(placeholder ? { placeholder } : {}),
 });
 
 export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
@@ -60,10 +74,10 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 	normal('rotcapStag', 'Rotcap Stag', 'forest', true),
 	boss('bossElderStag', 'The Elder Stag', 'forest', true),
 
-	normal('graniteRam', 'Granite Ram', 'hills', false),
-	normal('caveGoblinMiner', 'Cave Goblin Miner', 'hills', false),
-	normal('boulderBeetle', 'Boulder Beetle', 'hills', false),
-	boss('bossHillGiant', 'The Hill Giant', 'hills', false),
+	normal('graniteRam', 'Granite Ram', 'hills', false, PLACEHOLDER.hills),
+	normal('caveGoblinMiner', 'Cave Goblin Miner', 'hills', false, PLACEHOLDER.hills),
+	normal('boulderBeetle', 'Boulder Beetle', 'hills', false, PLACEHOLDER.hills),
+	boss('bossHillGiant', 'The Hill Giant', 'hills', false, PLACEHOLDER.hills),
 
 	normal('garbageOgre', 'Garbage Ogre', 'swamp', true),
 	normal('dumpback', 'Dumpback', 'swamp', true),
@@ -75,7 +89,7 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 	normal('rimeWraith', 'Rime Wraith', 'tundra', true),
 	boss('bossWinterWyrm', 'The Winter Wyrm', 'tundra', true),
 
-	// Water biomes: no monster rule allows them today (`LAND_BIOMES`), so these wait for shoreline spawns
+	// Water biomes (IDL-58): monsters stand on coast and lake tiles themselves
 	normal('wreckCrab', 'Wreck Crab', 'coast', true),
 	normal('netGull', 'Net Gull', 'coast', true),
 	normal('drownedSailor', 'Drowned Sailor', 'coast', true),
@@ -83,7 +97,7 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 
 	normal('mossSnapper', 'Moss Snapper', 'lake', true),
 	normal('reedNymph', 'Reed Nymph', 'lake', true),
-	normal('pikeLurker', 'Pike Lurker', 'lake', false),
+	normal('pikeLurker', 'Pike Lurker', 'lake', false, PLACEHOLDER.lake),
 	boss('bossLakeHydra', 'The Lake Hydra', 'lake', true),
 
 	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the biomes themselves are not built yet
@@ -116,3 +130,12 @@ export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = [
 /** Roster entries that live in a biome. Spawning code passes `enabledOnly` so unfinished monsters never appear. */
 export const monstersInBiome = (biome: CatalogBiome, enabledOnly = true): MonsterCatalogEntry[] =>
 	MONSTER_CATALOG.filter((m) => m.biomes.includes(biome) && (!enabledOnly || m.enabled));
+
+/**
+ * The monsters the map lab can show (its spawn dropdown and combat preview): roster monsters with finished art that are not enabled yet, and once every monster with art is enabled, all of them.
+ * The lab reads `[0]` of this list, so it must never be empty (an empty list crashed the `/map-lab` prerender once every monster with art was enabled).
+ */
+export const labMonsters = (): MonsterCatalogEntry[] => {
+	const notEnabled = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
+	return notEnabled.length > 0 ? notEnabled : MONSTER_CATALOG.filter((m) => m.art);
+};

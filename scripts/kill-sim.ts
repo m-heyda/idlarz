@@ -99,7 +99,7 @@ const types = Object.keys(MONSTERS) as MonsterType[];
 const normals = types.filter((t) => MONSTERS[t].grade === 'normal');
 const bosses = types.filter((t) => MONSTERS[t].grade === 'boss');
 const biomeOf = (t: MonsterType) => MONSTERS[t].spawn.biomes[0];
-const BIOMES = ['plains', 'forest', 'swamp', 'tundra'] as const;
+const BIOMES = ['plains', 'coast', 'forest', 'hills', 'swamp', 'lake', 'tundra'] as const;
 
 const TARGET = 0.15;
 const TEN_MIN = 600;
@@ -156,7 +156,7 @@ const rowsFor = (stage: Stage): { rows: Row[]; total: number; bossShare: number;
 		r.share = ((r.weight / weightSum) * r.win * r.gold) / interval;
 		r.xpShare = ((r.weight / weightSum) * r.win * r.xp) / xpInterval;
 	}
-	// one boss at a time, one per boss interval, any of the four biomes' (the average of them)
+	// one boss at a time, one per boss interval, any of the seven biomes' (the average of them)
 	const bossRows = rows.filter((r) => MONSTERS[r.type].grade === 'boss');
 	const bossShare = bossRows.reduce((s, r) => s + (r.win * r.gold) / (stage.goldPerSec * COMBAT.spawn.bossIntervalSec), 0) / bossRows.length;
 	for (const r of bossRows) {

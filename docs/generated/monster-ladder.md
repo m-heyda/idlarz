@@ -54,3 +54,39 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Winter Wyrm | 30 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
 | The Winter Wyrm | 38 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 48 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Granite Ram | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Granite Ram | 15 (castle 8) | 0% | 0% | 0% | 0% | 90% | 100% |
+| Granite Ram | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Cave Goblin Miner | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Cave Goblin Miner | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Cave Goblin Miner | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Boulder Beetle | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Boulder Beetle | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Boulder Beetle | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hill Giant | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Hill Giant | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Hill Giant | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Wreck Crab | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Wreck Crab | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 100% |
+| Net Gull | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Net Gull | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Net Gull | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Drowned Sailor | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Drowned Sailor | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Drowned Sailor | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 20% |
+| The Reef Leviathan | 17 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
+| The Reef Leviathan | 25 (castle 8) | 0% | 0% | 73% | 98% | 100% | 100% |
+| The Reef Leviathan | 35 (grown) | 0% | 0% | 25% | 80% | 100% | 100% |
+| Moss Snapper | 10 (castle 1) | 0% | 85% | 100% | 100% | 100% | 100% |
+| Moss Snapper | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Moss Snapper | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Reed Nymph | 10 (castle 1) | 0% | 0% | 98% | 100% | 100% | 100% |
+| Reed Nymph | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Reed Nymph | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Pike Lurker | 10 (castle 1) | 0% | 0% | 5% | 100% | 100% | 100% |
+| Pike Lurker | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Pike Lurker | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 93% |
+| The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 85% |
+| The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 80% |

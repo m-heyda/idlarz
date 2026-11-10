@@ -31,9 +31,12 @@ test('every normal monster drops from the source of its own biome, bosses from t
 	}
 });
 
-test('a biome pool stops at its grade ceiling: plains G4, forest G4, swamp G5, tundra G7', () => {
+test('a biome pool stops at its grade ceiling: plains, coast, forest and hills G4, swamp and lake G5, tundra G7', () => {
 	const d = allGradesLive();
-	const ceilings = { plains: 'G4', forest: 'G4', swamp: 'G5', tundra: 'G7' } satisfies Record<keyof typeof BIOME_LOOT, Grade>;
+	const ceilings = { plains: 'G4', coast: 'G4', forest: 'G4', hills: 'G4', swamp: 'G5', lake: 'G5', tundra: 'G7' } satisfies Record<
+		keyof typeof BIOME_LOOT,
+		Grade
+	>;
 	for (const [biome, ceiling] of Object.entries(ceilings)) {
 		let top = -1;
 		for (let level = 1; level <= 100; level++) top = Math.max(top, topGrade(d, `equipment_${biome}`, level));

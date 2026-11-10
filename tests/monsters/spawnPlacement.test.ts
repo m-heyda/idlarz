@@ -94,6 +94,11 @@ test('the map the server reads is the one the save wrote: castle, land and chest
 	assert.equal(read.stats.owned, api().tiles.stats.owned);
 	assert.equal(read.stats.chests, 1);
 	assert.notEqual(siteKey(summary), siteKey({ ...summary, tilesOwned: summary.tilesOwned + 1 }));
+	assert.match(
+		siteKey(summary),
+		new RegExp(`:r${Object.keys(MONSTERS).length}$`),
+		'the roster size is part of the key, so a new roster forces a fresh look of every existing bank',
+	);
 });
 
 // ---------------------------------------------------------------------------------------------------- chests
