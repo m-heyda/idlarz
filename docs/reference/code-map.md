@@ -401,7 +401,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
 - [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off), for the win estimate.
 - [`fightProject.ts`](../../src/lib/offline/fightProject.ts) — ~ The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands something first), as the picture the browser animates:
-- [`fightSteps.ts`](../../src/lib/offline/fightSteps.ts) — ~ Auto-use's rules for one tick:
+- [`fightSteps.ts`](../../src/lib/offline/fightSteps.ts) — ~ The profile a potion is judged on:
 - [`fightTargets.ts`](../../src/lib/offline/fightTargets.ts) — ~ A placed monster by ticket number, with what it is (null:
 - [`fightTypes.ts`](../../src/lib/offline/fightTypes.ts) — ~ What the player brings to a fight, worked out from the last accepted save when the fight starts and then frozen for that fight.
 - [`fightView.ts`](../../src/lib/offline/fightView.ts) — ~ The picture the browser is given:
@@ -434,6 +434,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
 - [`playRoute.ts`](../../src/lib/playRoute.ts) — The route of the game itself (the gate in front of it, then the game).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
+- [`potionBelt.ts`](../../src/lib/potionBelt.ts) — ~ The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:
@@ -651,6 +652,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fightPlan.test.ts`](../../tests/combat/fightPlan.test.ts)
 - [`goldenFight.test.ts`](../../tests/combat/goldenFight.test.ts) — ~ Numbers are written to 6 decimals so a platform's last-bit noise cannot fail the comparison.
 - [`leveling.test.ts`](../../tests/combat/leveling.test.ts)
+- [`potionBelt.test.ts`](../../tests/combat/potionBelt.test.ts) — ~ Drinks one potion at 40 HP in a fight and returns the HP it healed and the cooldown it started.
 - [`skills.test.ts`](../../tests/combat/skills.test.ts)
 - [`spawnWeights.test.ts`](../../tests/combat/spawnWeights.test.ts) — ~ A hero nothing on the map can hurt:
 - [`stats.test.ts`](../../tests/combat/stats.test.ts)

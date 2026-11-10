@@ -118,11 +118,12 @@ export type DrinkResult =
  *
  * @category Combat/Consumables
  * @formula
- * hp' = min(maxHp, hp + healHp)      mp' = min(maxMp, mp + healMp)
+ * hp' = min(maxHp, hp + healHp x power)      mp' = min(maxMp, mp + healMp x power)      regen' = hpPerSec x power
+ * power = the belt's Potion Power multiplier (1 without a belt, {@link potionPower})
  * buffs: each buff effect through addBuff; a refusal by any of them refuses the potion
  * @order 7
  */
-export function drink(effects: readonly ConsumableEffect[], state: DrinkState, nowSec: number): DrinkResult {
+export function drink(effects: readonly ConsumableEffect[], state: DrinkState, nowSec: number, power = 1): DrinkResult {
 	if (effects.length === 0) return { ok: false, message: 'Nothing happens' };
 	let hp = state.hp;
 	let mp = state.mp;
@@ -135,14 +136,14 @@ export function drink(effects: readonly ConsumableEffect[], state: DrinkState, n
 		if (effect.kind === 'healHp') {
 			healsHp = true;
 			if (hp < state.maxHp) useful = true;
-			hp = Math.min(state.maxHp, hp + effect.amount);
+			hp = Math.min(state.maxHp, hp + effect.amount * power);
 		} else if (effect.kind === 'healMp') {
 			healsMp = true;
 			if (mp < state.maxMp) useful = true;
-			mp = Math.min(state.maxMp, mp + effect.amount);
+			mp = Math.min(state.maxMp, mp + effect.amount * power);
 		} else if (effect.kind === 'regen') {
 			if (hp < state.maxHp) useful = true;
-			regen = { hpPerSec: effect.hpPerSec, durationSec: effect.durationSec };
+			regen = { hpPerSec: effect.hpPerSec * power, durationSec: effect.durationSec };
 		} else {
 			const added = addBuff(buffs, effect, nowSec);
 			if (!added.ok) return added;

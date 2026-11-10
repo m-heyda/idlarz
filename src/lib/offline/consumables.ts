@@ -33,14 +33,14 @@ export const applyUse = (input: Ledger, env: CombatEnv, index: number): UseResul
 	if (c.fight && c.cd.potion > 0) return { ok: false, message: 'Potions are still on cooldown' };
 	const now = env.nowSec;
 	const profile = profileWithBuffs(env.stored.core, input.buffs, now);
-	const drunk = drink(effects, { hp: c.hp, maxHp: profile.maxHp, mp: c.mp, maxMp: profile.maxMp, buffs: input.buffs }, now);
+	const drunk = drink(effects, { hp: c.hp, maxHp: profile.maxHp, mp: c.mp, maxMp: profile.maxMp, buffs: input.buffs }, now, profile.potionPower ?? 1);
 	if (!drunk.ok) return drunk;
 	// a new maxHp buff (Fortitude) does not raise the HP at once: only heals do; the fight in progress keeps the profile it started with
 	const combat = {
 		...c,
 		hp: drunk.hp,
 		mp: drunk.mp,
-		cd: c.fight ? { ...c.cd, potion: COMBAT.potionCooldownSec } : c.cd,
+		cd: c.fight ? { ...c.cd, potion: profile.potionCooldownSec ?? COMBAT.potionCooldownSec } : c.cd,
 		...(drunk.regen ? { regen: { hpPerSec: drunk.regen.hpPerSec, untilSec: now + drunk.regen.durationSec } } : {}),
 	};
 	const ledger: Ledger = {

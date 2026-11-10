@@ -24,7 +24,7 @@ export const LIMITS = {
 	merchantRotateSec: 1800,
 	/** Gold of the first paid shelf refresh (each one after it costs this much more, see MERCHANT_GOODS.refresh) */
 	merchantRefreshBase: 10_000,
-	/** Bag slots (the Pack Rat merchant bonus and the Deep Pockets Ember upgrade add to it; the belt bag slots will too). 60 since IDL-162, it was 36 */
+	/** Bag slots (the Pack Rat merchant bonus and the Deep Pockets Ember upgrade add to it; the worn belt's bag slots too). 60 since IDL-162, it was 36 */
 	bagSize: 60,
 	/** Hours of away time the server pays out when the player comes back (the Night Watch Ember upgrade adds to it) */
 	offlineCapHours: 8,
@@ -52,7 +52,7 @@ export const HARD_LIMITS = {
 	monsterGrowthLevels: 40,
 	merchantOffers: 12,
 	battleQueue: 16,
-	/** The most bag slots a save may hold: base 60 + Pack Rat 48 + Deep Pockets 12 = 120 today, the rest is room for the belt bag slots (IDL-154) */
+	/** The most bag slots a save may hold: base 60 + Pack Rat 48 + Deep Pockets 12 + belt up to 3 = 123 today, the rest is room to grow; `limitOf('bagSize')` never goes past it */
 	bagSize: 200,
 	offlineCapHours: 72,
 	offlineEfficiency: 1,
