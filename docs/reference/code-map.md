@@ -713,6 +713,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleFinder.test.ts`](../../tests/economy/castleFinder.test.ts) — ~ A view whose screen centre is the world point (wx, wy) in tiles.
 - [`castleWard.test.ts`](../../tests/economy/castleWard.test.ts) — ~ Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3).
 - [`classPassives.test.ts`](../../tests/economy/classPassives.test.ts) — Class passives (IDL-70): one test per passive, the caps, and the proof that the class is the profile row's, not the upload's.
+- [`classStarterGear.test.ts`](../../tests/economy/classStarterGear.test.ts)
 - [`costOrder.test.ts`](../../tests/economy/costOrder.test.ts)
 - [`deepPockets.test.ts`](../../tests/economy/deepPockets.test.ts)
 - [`economy.test.ts`](../../tests/economy/economy.test.ts)

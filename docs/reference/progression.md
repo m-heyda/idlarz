@@ -14,7 +14,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`checkCreationAvatar`](#checkcreationavatar)
-- Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket)
+- Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 
@@ -589,6 +589,16 @@ The gear's XP bucket with the class's XP added, held under the XP perk-family ca
 ```text
 xp bucket = min(PERK_CAPS.xpPct, gear XP% + class XP%)          then + the attributes' XP gain
 ```
+
+<a id="starter-equipment-by-class"></a>
+
+### `STARTER_EQUIPMENT_BY_CLASS` <small>const</small>
+
+Source: [`src/catalog/index.ts:76`](../../src/catalog/index.ts)
+
+What each class starts with, so the first gear fits the hero: the Warrior and the Paladin wear the sword and shield, the Ranger a bow and the Mage a staff (no off-hand: a
+bow and a staff take both hands). Their damage per second matches the sword's, so no class starts stronger; a Ranger or a Mage gives up the shield's 2 armor. Used by a new game,
+"A new chapter" and a rebirth (`starterEquipmentFor`).
 
 ## Achievements
 

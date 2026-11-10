@@ -47,7 +47,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		const characterStats = { ...fresh.characterStats, availablePoints: totalStatPoints(settled.level) };
 		Object.assign(characterStats, calculateCombatStats(characterStats));
 		// gear is wiped: the starter kit on, the starter bag, no pity (the server does the same to its inventory when the rebirth reaches it)
-		const kit = rebirthKit(merchantUpgrades, prestige); // Deep Pockets is an Ember upgrade: it survives too
+		const kit = rebirthKit(merchantUpgrades, prestige, 0, state.playerClass); // Deep Pockets is an Ember upgrade: it survives too
 		set({
 			...fresh,
 			// the character is progression too: lifetime XP, the level it gives and the attributes (with the points still to spend) carry

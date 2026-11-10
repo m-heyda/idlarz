@@ -1,4 +1,5 @@
 [
+	{"icon": "item_wooden_bow", "item": "wooden_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py (class starter weapon)"},
 	{"icon": "art_cinderflight_bow", "item": "cinderflight_bow", "file": "legendary/cinderflight_bow", "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "item_hunting_bow", "item": "hunting_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
 	{"icon": "item_recurve_bow", "item": "recurve_bow", "file": null, "slot": "mainHand", "weapon": "bow", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},

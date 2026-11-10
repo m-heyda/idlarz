@@ -113,6 +113,17 @@
   "see": []
  },
  {
+  "id": "starter-equipment-by-class",
+  "name": "STARTER_EQUIPMENT_BY_CLASS",
+  "symbol": "STARTER_EQUIPMENT_BY_CLASS",
+  "kind": "const",
+  "category": "Progression/Class passives",
+  "file": "src/catalog/index.ts",
+  "line": 76,
+  "summary": "What each class starts with, so the first gear fits the hero: the Warrior and the Paladin wear the sword and shield, the Ranger a bow and the Mage a staff (no off-hand: a bow and a staff take both hands). Their damage per second matches the sword's, so no class starts stronger; a Ranger or a Mage gives up the shield's 2 armor. Used by a new game, \"A new chapter\" and a rebirth (`starterEquipmentFor`).",
+  "see": []
+ },
+ {
   "id": "gear",
   "name": "gear",
   "symbol": "gear",
@@ -1582,7 +1593,7 @@
   "kind": "function",
   "category": "Economy/Perk caps",
   "file": "src/lib/inventory.ts",
-  "line": 242,
+  "line": 243,
   "summary": "The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families (income, XP, kill reward, click, damage) are capped by {@link capPerks}. The server reads gear through this too, so both sides agree.",
   "see": []
  },

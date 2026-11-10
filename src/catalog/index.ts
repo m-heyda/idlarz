@@ -64,6 +64,21 @@ export const setBonusStats = (counts: Record<string, number>): StatTotals => {
 
 /** What a new character wears: the base items worn at their authored level (see `STARTER_EQUIPMENT` in config/itemCatalog for the instances). */
 export const STARTER_EQUIPMENT_IDS: Partial<Record<EquipmentSlot, string>> = { mainHand: 'wooden_sword', offHand: 'wooden_shield' };
+
+/**
+ * What each class starts with, so the first gear fits the hero: the Warrior and the Paladin wear the sword and shield, the Ranger a bow and the Mage a staff (no off-hand: a
+ * bow and a staff take both hands). Their damage per second matches the sword's, so no class starts stronger; a Ranger or a Mage gives up the shield's 2 armor. Used by a new game,
+ * "A new chapter" and a rebirth (`starterEquipmentFor`).
+ *
+ * @category Progression/Class passives
+ * @order 3
+ */
+export const STARTER_EQUIPMENT_BY_CLASS: Record<'warrior' | 'paladin' | 'ranger' | 'mage', Partial<Record<EquipmentSlot, string>>> = {
+	warrior: STARTER_EQUIPMENT_IDS,
+	paladin: STARTER_EQUIPMENT_IDS,
+	ranger: { mainHand: 'wooden_bow' },
+	mage: { mainHand: 'wooden_staff' },
+};
 export const STARTER_BAG_ITEMS = [{ id: 'potion_minor', qty: 2 }];
 
 export const EQUIPMENT_LAYOUT: {

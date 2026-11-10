@@ -305,7 +305,7 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 			return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, serverNowSec: ctx.nowSec } };
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = {
-			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige),
+			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige, ctx.stored.core.playerClass),
 			rebirth: { to: judged.to, gain: judged.gain },
 		};
 		return {
