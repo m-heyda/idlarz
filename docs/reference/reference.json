@@ -2693,6 +2693,16 @@
   "see": []
  },
  {
+  "id": "the-generated-docs-inputs-hash",
+  "name": "The generated-docs inputs hash",
+  "kind": "topic",
+  "category": "Ops/CI",
+  "file": "scripts/gen-inputs.ts",
+  "line": 1,
+  "summary": "The inputs hash of the generated docs: what lets CI trust `docs/generated` without running every sim again.",
+  "see": []
+ },
+ {
   "id": "the-pacing-guard-and-ci-sharding",
   "name": "The pacing guard and CI sharding",
   "kind": "topic",
@@ -2778,6 +2788,16 @@
   "file": "scripts/sim.ts",
   "line": 799,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
+  "see": []
+ },
+ {
+  "id": "the-local-verify-script-and-the-pre-push-hook",
+  "name": "The local verify script and the pre-push hook",
+  "kind": "topic",
+  "category": "Ops/CI",
+  "file": "scripts/verify.ts",
+  "line": 1,
+  "summary": "`npm run verify`: everything CI checks, run here on all your cores before you push.",
   "see": []
  },
  {

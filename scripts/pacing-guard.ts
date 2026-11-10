@@ -3,12 +3,10 @@
  *
  * `npm run sim` writes `docs/generated/sim-baseline.json`; CI (job `generated`) runs this script, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than +-15 % **or by more than 5 game days**
  * (`PACING_MAX_DRIFT_DAYS` in `scripts/pacingCompare.ts`; without it a milestone at day 220 could drift for a month inside 15 %). The job log starts with a table per profile (guarded milestones, how many moved, the largest move in percent and days).
- * Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label only takes effect on a new run,
- * so **re-run the job after adding it**.
+ * Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label is read when a run starts,
+ * so after adding it **push a commit or close and reopen the PR** ("Re-run jobs" keeps the labels of the old run).
  *
- * **CI sharding.** The job `generated` is three stages: `scope` (does the PR touch what the docs come from), `generate` (a matrix that runs in parallel: the profile `hardcore-rebirth6-x10` alone, about 5 minutes; every other sim profile via `--except`;
- * the three groups `docs:gen:rest:quick|fights|loot` of the other generators; a new generator goes into one of those scripts), and `generated` (the required check), which downloads the shards, runs `sim --merge` and then the two gates (stale docs, pacing guard).
- * Wall time is about the slowest shard, not the sum. A new sim profile joins the `sim-rest` shard by itself; a profile in two shards or in none fails the merge.
+ * **Where the work runs.** The slow part (the sims and reports behind `docs/generated`) is done on your machine: `npm run verify` (also run by the `pre-push` hook) regenerates it in parallel on all cores when a file the generators read has changed, and writes `docs/generated/inputs.sha256` (`scripts/gen-inputs.ts`). In CI the job `hash` recomputes that hash (seconds). With a fresh hash the sims are skipped and the job `generated` only runs this guard on the committed baseline against the base branch's. With a stale hash (a PR that did not regenerate, or `main` moved) and always on a push to `main`, every night and on a PR labelled `verify-generated`, the full regeneration runs, sharded (`sim-x10` alone, `sim-rest`, and `docs:gen:rest:quick|fights|loot`; `generated` merges them, a profile in two shards or in none fails the merge, and the committed files must equal the result).
  *
  * @title The pacing guard and CI sharding
  * @category Ops/CI
@@ -62,7 +60,7 @@ if (violations.length === 0) {
 		console.error('Allowed by the `pacing-change` label; the numbers are in docs/generated/sim-milestones.md.');
 	} else {
 		console.error(
-			'If this change is intended, add the `pacing-change` label to the PR (and re-run the job); the numbers are in docs/generated/sim-milestones.md.',
+			'If this change is intended, add the `pacing-change` label to the PR (then push a commit or reopen the PR: re-running keeps the old labels); the numbers are in docs/generated/sim-milestones.md.',
 		);
 		process.exit(1);
 	}
