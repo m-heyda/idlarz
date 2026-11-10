@@ -1,10 +1,9 @@
 """Prop sprites: menu-button icons (helm, coin pouch, barn) and the purple level/XP orb."""
 import math
-from PIL import Image, ImageDraw
-from render3d import Scene, Prim, rot, vnoise, between, place, I3, hexc
+from PIL import Image
+from render3d import Scene, Prim, rot, vnoise, place, I3, hexc
 from common import add_outline
 from materials import MATS
-from sprites_resources import coin_tex, GOLD_HI
 import fx
 
 
@@ -126,41 +125,6 @@ def helm():
     return img
 
 
-def pouch_tex(pl, nl, pr):
-    n = vnoise(pl[0] * 3, pl[1] * 3, pl[2] * 3, pr.seed)
-    d = (n - 0.5) * 0.22
-    if nl[1] < -0.2:
-        if abs(pl[0]) < 0.045:
-            return None, d - 0.3                                     # centre seam
-        if abs(abs(pl[0]) - 0.14) < 0.03 and int(pl[2] * 9) % 2:
-            return 'tunic', 0.0                                      # stitching
-    return None, d
-
-
-def pouch():
-    sc = Scene(MATS, scale=11.5, origin=(20, 34))
-    sc.add(Prim('ell', (0.1, 0.1, 0.85), (0.95, 0.95, 0.85), 'pleather', I3, pouch_tex, 1))
-    sc.add(Prim('ell', (0.1, 0.1, 1.5), (0.52, 0.52, 0.4), 'pleather', I3, pouch_tex, 2))
-    for k in range(6):                                                # gathered ruffle
-        a = math.radians(k * 60 + 15)
-        sc.add(Prim('ell', (0.1 + 0.46 * math.cos(a), 0.1 + 0.46 * math.sin(a), 1.98),
-                    (0.3, 0.3, 0.26), 'pleather', rot(20 * math.sin(a), -20 * math.cos(a), 0), pouch_tex, 3 + k))
-    sc.add(Prim('cyl', (0.1, 0.1, 1.55), (0.62, 0.09), 'cloth', I3, None, 4))         # cord
-    sc.add(Prim('ell', (-0.42, -0.42, 1.55), (0.15, 0.15, 0.15), 'cloth', I3, None, 5))  # knot
-    sc.add(Prim('ell', (-0.62, -0.52, 1.28), (0.1, 0.1, 0.3), 'cloth', rot(0, 18, 0), None, 6))   # tassels
-    sc.add(Prim('ell', (-0.4, -0.7, 1.25), (0.1, 0.1, 0.3), 'cloth', rot(0, -12, 0), None, 7))
-    sc.add(Prim('ell', (-0.64, -0.54, 0.98), (0.08, 0.08, 0.08), 'gold'))
-    sc.add(Prim('ell', (-0.4, -0.72, 0.95), (0.08, 0.08, 0.08), 'gold'))
-    sc.add(Prim('cyl', (0.15, 0.05, 2.15), (0.4, 0.09), 'gold', rot(25, 0, 20), coin_tex))   # coin peeking out
-    sc.add(Prim('cyl', (-0.95, -0.72, 0.52), (0.5, 0.1), 'gold', rot(90, 0, -45), coin_tex))
-    sc.add(Prim('cyl', (0.55, -1.0, 0.1), (0.5, 0.1), 'gold', rot(0, 0, 25), coin_tex))
-    sc.add(Prim('cyl', (0.8, -0.6, 0.3), (0.5, 0.1), 'gold', rot(0, 0, 70), coin_tex))
-    img = sc.render()
-    for (x, y), r in zip(fx.find_highlights(img, GOLD_HI, n=2, min_dist=12), (2, 1)):
-        fx.glint(img, x - 1, y - 1, r)
-    return img
-
-
 def shingle_tex(pl, nl, pr):
     row = int(math.floor(pl[1] * 5.5))
     off = 0.0 if row % 2 else 0.18
@@ -178,33 +142,3 @@ def hay_tex(pl, nl, pr):
     n = vnoise(pl[0] * 5, pl[1] * 5, pl[2] * 5, pr.seed)
     d = -0.2 if int(math.floor(pl[0] * 6)) % 2 else 0.05
     return None, d + (n - 0.5) * 0.3
-
-
-def barn():
-    sc = Scene(MATS, scale=9.6, origin=(19, 33))
-    sc.add(Prim('box', (0, 0, 0.06), (1.35, 0.98, 0.08), 'slate', I3, None, 30))          # stone footing
-    sc.add(Prim('box', (0, 0, 0.8), (1.25, 0.9, 0.72), 'barn', I3, plank_tex, 1))
-    sc.add(Prim('box', (0, -0.52, 1.9), (1.45, 0.7, 0.07), 'shingle', rot(38, 0, 0), shingle_tex, 2))
-    sc.add(Prim('box', (0, 0.52, 1.9), (1.45, 0.7, 0.07), 'shingle', rot(-38, 0, 0), shingle_tex, 3))
-    sc.add(Prim('box', (0, 0, 2.36), (1.45, 0.08, 0.07), 'cream'))                         # ridge cap
-    for z, hw in ((1.64, 0.78), (1.86, 0.56), (2.07, 0.34)):                                 # stepped gable
-        sc.add(Prim('box', (-1.22, 0, z), (0.05, hw, 0.12), 'barn', I3, plank_tex, 4))
-    sc.add(Prim('box', (0.35, -0.9, 0.62), (0.64, 0.05, 0.6), 'cream'))                      # door + frame
-    sc.add(Prim('box', (0.35, -0.93, 0.62), (0.52, 0.05, 0.52), 'door', I3, plank_tex, 5))
-    sc.add(between('box', (0.0, -0.97, 0.15), (0.7, -0.97, 1.05), (0.04, 0.03), 'cream', None, (0, -1, 0)))
-    sc.add(between('box', (0.7, -0.97, 0.15), (0.0, -0.97, 1.05), (0.04, 0.03), 'cream', None, (0, -1, 0)))
-    sc.add(Prim('box', (-0.72, -0.9, 1.15), (0.22, 0.04, 0.2), 'cream'))                     # hay-loft window
-    sc.add(Prim('box', (-0.72, -0.93, 1.15), (0.16, 0.04, 0.14), 'dark'))
-    sc.add(Prim('ell', (-0.72, -0.95, 1.05), (0.17, 0.05, 0.08), 'wheat', I3, hay_tex, 6))   # straw in the window
-    sc.add(Prim('box', (-1.25, -0.9, 0.8), (0.05, 0.05, 0.72), 'cream'))                      # corner trim
-    sc.add(Prim('box', (1.25, -0.9, 0.8), (0.05, 0.05, 0.72), 'cream'))
-    # weathervane
-    sc.add(Prim('cyl', (0.3, 0, 2.75), (0.035, 0.38), 'steel', I3, None, 7))
-    sc.add(Prim('ell', (0.3, 0, 3.12), (0.2, 0.05, 0.07), 'gold'))
-    sc.add(Prim('ell', (0.3, 0, 2.95), (0.12, 0.04, 0.12), 'gold'))
-    # hay bale beside the barn
-    sc.add(Prim('box', (1.55, -0.95, 0.3), (0.38, 0.3, 0.3), 'wheat', rot(0, 0, 12), hay_tex, 8))
-    sc.add(Prim('box', (1.55, -0.95, 0.3), (0.4, 0.04, 0.32), 'rope', rot(0, 0, 12), None, 9))
-    img = sc.render()
-    fx.glint(img, 27, 6, 2)
-    return img
