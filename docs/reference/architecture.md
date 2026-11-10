@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [Sound library](#sound-library), [`BIOME_ART`](#biome-art), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [`BIOME_ART`](#biome-art), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
 - Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
 ## The loop
@@ -162,17 +162,6 @@ the avatars in `art_style_reference/ui-and-portraits/README.md`: keep them at th
 The merchant window shows one face per tab (`MERCHANT_PORTRAIT`); every other portrait stays in the asset library (category Portraits) as a ready face for
 a future quest giver, innkeeper, blacksmith or dialogue.
 
-<a id="sound-library"></a>
-
-### Sound library
-
-Source: [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts)
-
-The sound library: every audio file under `public/` (the game's own mp3s and the CC0 Kenney packs in `public/sfx/`) under one stable name, with its
-duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
-Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
-The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.
-
 <a id="biome-art"></a>
 
 ### `BIOME_ART` <small>const</small>
@@ -187,7 +176,7 @@ The file name is `biome_<name>.png`; change the value here to use another one.
 
 ### `ANIMAL_PIXEL_ICONS` <small>const</small>
 
-Source: [`src/config/pixelIcons.ts:271`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:249`](../../src/config/pixelIcons.ts)
 
 Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is [`animalIcon`](architecture.md#animalicon).
 
@@ -195,7 +184,7 @@ Farm animal id -> its sprites. Chickens and cows come in two looks, the others i
 
 ### `animalIcon` <small>function</small>
 
-Source: [`src/config/pixelIcons.ts:286`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:264`](../../src/config/pixelIcons.ts)
 
 The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial).

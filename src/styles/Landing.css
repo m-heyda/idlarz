@@ -348,6 +348,12 @@
 	padding-right: 36px; /* room for the monster on the edge */
 }
 
+.ld-card-art {
+	width: 48px;
+	height: 48px;
+	image-rendering: pixelated;
+}
+
 .ld-card-icon {
 	display: flex;
 	flex: none;

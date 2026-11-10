@@ -7271,36 +7271,6 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/catalog/lootConfig.ts"
-		],
-		"name": "monster_rat",
-		"category": "monsters",
-		"subcategory": "monster",
-		"src": "/pixel/icons/monster_rat.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			80,
-			40
-		]
-	},
-	{
-		"usedBy": [
-			"src/catalog/lootConfig.ts"
-		],
-		"name": "monster_ratking",
-		"category": "monsters",
-		"subcategory": "monster",
-		"src": "/pixel/icons/monster_ratking.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			112,
-			56
-		]
-	},
-	{
 		"usedBy": [],
 		"name": "monster_pack_eye_horror",
 		"category": "monsters",
@@ -7448,47 +7418,19 @@
 			"graniteRam",
 			"caveGoblinMiner",
 			"boulderBeetle",
-			"bossHillGiant"
-		],
-		"name": "monster_placeholder_hills",
-		"category": "monsters",
-		"subcategory": "placeholder (stand-in until the real sprite)",
-		"src": "/pixel/enemies/placeholder/hills.png",
-		"status": "used",
-		"source": "monster roster",
-		"size": [
-			69,
-			69
-		]
-	},
-	{
-		"usedBy": [
+			"bossHillGiant",
+			"pikeLurker",
 			"bossHardwoodColossus"
 		],
-		"name": "monster_placeholder_jungle",
+		"name": "monster_placeholder_silhouette",
 		"category": "monsters",
 		"subcategory": "placeholder (stand-in until the real sprite)",
-		"src": "/pixel/enemies/placeholder/jungle.png",
+		"src": "/pixel/enemies/placeholder/silhouette.png",
 		"status": "used",
 		"source": "monster roster",
 		"size": [
-			69,
-			69
-		]
-	},
-	{
-		"usedBy": [
-			"pikeLurker"
-		],
-		"name": "monster_placeholder_lake",
-		"category": "monsters",
-		"subcategory": "placeholder (stand-in until the real sprite)",
-		"src": "/pixel/enemies/placeholder/lake.png",
-		"status": "used",
-		"source": "monster roster",
-		"size": [
-			69,
-			69
+			64,
+			64
 		]
 	},
 	{
@@ -7669,246 +7611,6 @@
 		"size": [
 			64,
 			64
-		]
-	},
-	{
-		"usedBy": [
-			"building:alchemylab"
-		],
-		"name": "building_alchemylab",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_alchemylab.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:barracks"
-		],
-		"name": "building_barracks",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_barracks.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:blacksmith"
-		],
-		"name": "building_blacksmith",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_blacksmith.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:farm"
-		],
-		"name": "building_farm",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_farm.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:fishinghut"
-		],
-		"name": "building_fishinghut",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_fishinghut.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:hunterslodge"
-		],
-		"name": "building_hunterslodge",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_hunterslodge.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:lumbercamp"
-		],
-		"name": "building_lumbercamp",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_lumbercamp.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:lumbermill"
-		],
-		"name": "building_lumbermill",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_lumbermill.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:market"
-		],
-		"name": "building_market",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_market.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:mine"
-		],
-		"name": "building_mine",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_mine.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:quarry"
-		],
-		"name": "building_quarry",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_quarry.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:stonecraft"
-		],
-		"name": "building_stonecraft",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_stonecraft.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:tavern"
-		],
-		"name": "building_tavern",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_tavern.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:tower"
-		],
-		"name": "building_tower",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_tower.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:well"
-		],
-		"name": "building_well",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_well.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
-		]
-	},
-	{
-		"usedBy": [
-			"building:workshop"
-		],
-		"name": "building_workshop",
-		"category": "buildings",
-		"subcategory": "building",
-		"src": "/pixel/icons/building_workshop.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			48,
-			60
 		]
 	},
 	{
@@ -8165,6 +7867,42 @@
 		"size": [
 			64,
 			64
+		]
+	},
+	{
+		"usedBy": [
+			"Idols, IDL-96"
+		],
+		"name": "idol_blue_gray_ruins",
+		"category": "buildings",
+		"subcategory": "idols (planned)",
+		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
+		"status": "planned",
+		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
+		"variants": {
+			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
+			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins3.png",
+			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins3.png",
+			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins3.png"
+		},
+		"size": [
+			48,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"Idols, IDL-96"
+		],
+		"name": "idol_dark_totem",
+		"category": "buildings",
+		"subcategory": "idols (planned)",
+		"src": "/pixel/assets_to_assess_and_use/misc/Objects_separately/128/Dark_totem_dark_shadow2.png",
+		"status": "planned",
+		"source": "assets_to_assess_and_use/misc",
+		"size": [
+			128,
+			128
 		]
 	},
 	{
@@ -10196,12 +9934,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:coalpit"
+		],
 		"name": "building_village_blacksmith_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Blacksmith House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10248,12 +9988,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:saptapper"
+		],
 		"name": "building_village_carpenters_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Carpenters House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10326,12 +10068,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:fishery"
+		],
 		"name": "building_village_fishermans_hut",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Fishermans Hut.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10404,12 +10148,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:herbgarden"
+		],
 		"name": "building_village_herbalist_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Herbalist House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10417,12 +10163,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:icecutter"
+		],
 		"name": "building_village_hunters_cabin",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Hunters Cabin.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10430,12 +10178,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:pearldiver"
+		],
 		"name": "building_village_jewelers_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Jewelers House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10456,12 +10206,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:lumberyard"
+		],
 		"name": "building_village_lumberjack_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Lumberjack House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10508,12 +10260,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:harbor"
+		],
 		"name": "building_village_merchant_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Merchant House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10521,12 +10275,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:saltworks"
+		],
 		"name": "building_village_mill_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Mill House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10534,12 +10290,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:quarry"
+		],
 		"name": "building_village_mine_entrance_building",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Mine Entrance Building.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10690,12 +10448,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:peatworks"
+		],
 		"name": "building_village_small_wooden_cottage",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Small Wooden Cottage.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10729,12 +10489,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:granary"
+		],
 		"name": "building_village_storage_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Storage House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10846,12 +10608,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:sporecellar"
+		],
 		"name": "building_village_wizard_hut",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Wizard Hut.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10859,12 +10623,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:deepmine"
+		],
 		"name": "building_village_workshop_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Workshop House.png",
-		"status": "reuse",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10960,12 +10726,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"golden-egg chicken upgrade (late gem purchase), IDL-260"
+		],
 		"name": "animal_rooster",
 		"category": "resources",
 		"subcategory": "animal",
 		"src": "/pixel/icons/animal_rooster.png",
-		"status": "unused",
+		"status": "planned",
 		"source": "public/pixel/icons",
 		"size": [
 			96,
@@ -13640,19 +13408,6 @@
 		"size": [
 			256,
 			256
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "prop_dark_totem_dark_shadow2_s128",
-		"category": "map-details",
-		"subcategory": "dark and bone props",
-		"src": "/pixel/assets_to_assess_and_use/misc/Objects_separately/128/Dark_totem_dark_shadow2.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/misc",
-		"size": [
-			128,
-			128
 		]
 	},
 	{
@@ -18234,25 +17989,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "ruin_blue_gray_ruins3",
-		"category": "map-details",
-		"subcategory": "ruins",
-		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
-		"status": "reuse",
-		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins3.png"
-		},
-		"size": [
-			48,
-			64
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "ruin_blue_gray_ruins4",
 		"category": "map-details",
 		"subcategory": "ruins",
@@ -20222,66 +19958,6 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/config/playerClasses.ts"
-		],
-		"name": "bust_mage",
-		"category": "ui",
-		"subcategory": "bust",
-		"src": "/pixel/icons/bust_mage.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			40,
-			40
-		]
-	},
-	{
-		"usedBy": [
-			"src/config/playerClasses.ts"
-		],
-		"name": "bust_paladin",
-		"category": "ui",
-		"subcategory": "bust",
-		"src": "/pixel/icons/bust_paladin.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			40,
-			40
-		]
-	},
-	{
-		"usedBy": [
-			"src/config/playerClasses.ts"
-		],
-		"name": "bust_ranger",
-		"category": "ui",
-		"subcategory": "bust",
-		"src": "/pixel/icons/bust_ranger.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			40,
-			40
-		]
-	},
-	{
-		"usedBy": [
-			"src/config/playerClasses.ts"
-		],
-		"name": "bust_warrior",
-		"category": "ui",
-		"subcategory": "bust",
-		"src": "/pixel/icons/bust_warrior.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			40,
-			40
-		]
-	},
-	{
 		"usedBy": [],
 		"name": "chest_map",
 		"category": "ui",
@@ -20649,45 +20325,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "ui_flask_bubbles",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/flask_bubbles.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			40,
-			24
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_flask_glass",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/flask_glass.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			40,
-			56
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_flask_mask",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/flask_mask.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			40,
-			56
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "ui_frame_modal",
 		"category": "ui",
 		"subcategory": "frames and bars",
@@ -20775,19 +20412,6 @@
 		"size": [
 			80,
 			10
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_hero_scene",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/hero_scene.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			144,
-			112
 		]
 	},
 	{
@@ -21404,12 +21028,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"unlockable avatar (gems, achievements), IDL-266"
+		],
 		"name": "avatar_horned_black_helm",
 		"category": "portraits",
 		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_black_helm.png",
-		"status": "reuse",
+		"status": "planned",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -21417,12 +21043,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"unlockable avatar (gems, achievements), IDL-266"
+		],
 		"name": "avatar_horned_fur_beard",
 		"category": "portraits",
 		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_fur_beard.png",
-		"status": "reuse",
+		"status": "planned",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -21430,12 +21058,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"unlockable avatar (gems, achievements), IDL-266"
+		],
 		"name": "avatar_horned_fur_collar",
 		"category": "portraits",
 		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_fur_collar.png",
-		"status": "reuse",
+		"status": "planned",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -21443,12 +21073,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"unlockable avatar (gems, achievements), IDL-266"
+		],
 		"name": "avatar_horned_graybeard",
 		"category": "portraits",
 		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_graybeard.png",
-		"status": "reuse",
+		"status": "planned",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -21456,12 +21088,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"unlockable avatar (gems, achievements), IDL-266"
+		],
 		"name": "avatar_horned_green_veteran",
 		"category": "portraits",
 		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_green_veteran.png",
-		"status": "reuse",
+		"status": "planned",
 		"source": "new_assets/heroes",
 		"size": [
 			64,
@@ -21469,12 +21103,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"unlockable avatar (gems, achievements), IDL-266"
+		],
 		"name": "avatar_horned_ram_helm",
 		"category": "portraits",
 		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_ram_helm.png",
-		"status": "reuse",
+		"status": "planned",
 		"source": "new_assets/heroes",
 		"size": [
 			64,

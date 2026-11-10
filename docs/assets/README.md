@@ -29,13 +29,11 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | [Weapons](weapons.md) | 197 | 72 | 0 |
 | [Armor](armor.md) | 127 | 52 | 0 |
 | [Accessories](accessories.md) | 53 | 31 | 0 |
-| [Monsters](monsters.md) | 42 | 31 | 11 |
-| [Buildings](buildings.md) | 242 | 27 | 208 |
+| [Monsters](monsters.md) | 38 | 27 | 11 |
+| [Buildings](buildings.md) | 228 | 25 | 194 |
 | [Resources](resources.md) | 102 | 53 | 0 |
-| [Map details](map-details.md) | 471 | 28 | 443 |
-| [UI](ui.md) | 102 | 73 | 21 |
-| [Portraits](portraits.md) | 32 | 18 | 14 |
+| [Map details](map-details.md) | 469 | 28 | 441 |
+| [UI](ui.md) | 94 | 65 | 21 |
+| [Portraits](portraits.md) | 32 | 18 | 8 |
 | [Biomes](biomes.md) | 9 | 5 | 4 |
 | [Unsorted cuts](unsorted.md) | 6 | 0 | 6 |
-
-[Sounds](sounds.md): UI and game sound effects (the game's own plus the CC0 Kenney packs in `public/sfx/`), with lengths.

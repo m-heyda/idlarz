@@ -10,17 +10,16 @@ graphics for anything that isn't a map glyph. Match the references in this folde
 | `ui-ref-gauges.png` | **UI direction**: ornate dark-framed vertical gauges (HP / MP) with an icon head. |
 | `ui-ref-buttons.png` | **UI direction**: vertical strip of square stone-maroon icon buttons with a red notification pip. |
 | `icons.png` | Current approved sprite set (resources, menu, portraits, equipment, animals, map). |
-| `hero-hud.png` | Current approved Character HUD (alcove scene, flasks, stone XP bar, level gem). |
 | `ui-parts.png` | Frames, stone bar, slot frames, divider, torch - the 9-slice/chrome parts. |
 | `map-terrain.png`, `map-sprites.png` | **Map direction**: the dual-grid terrain sample island (organic edges, depth tiers, trees, docks, fog sea) and its sprite sheet at 3x. |
 | `town.png` | The 16 town buildings (48x60, transparent, no ground) at 3x on meadow green. |
 | `fog.png`, `castle-levels.png`, `gold-shine.png` | Fog tile, castle levels and the coin twinkle strip. |
 | `gear.png` | The gear tiers: wooden/leather, cloth, steel and obsidian sets (10 icons each), the weapons and the potions, labelled, at 4x. |
 
-Reference images in this folder: `icons.png` (icon set), `characters.png` (heroes, merchant, busts), `farm.png` (pen back + front layers), `hero-hud.png`, `castle-levels.png`, `map-terrain.png`, `map-sprites.png`, `town.png`, `fog.png`, `ui-parts.png`, `gold-shine.png`.
+Reference images in this folder: `icons.png` (icon set), `characters.png` (heroes, merchant), `farm.png` (pen back + front layers), `castle-levels.png`, `map-terrain.png`, `map-sprites.png`, `town.png`, `fog.png`, `ui-parts.png`, `gold-shine.png`.
 
 ## Sprite look
-- **Canvas**: 40x40 (hero/merchant figures 56x80, busts 40x40, level orb 24x24, farm pen 256x184). Artwork fills ~34-36px. Sprites float on transparency -
+- **Canvas**: 40x40 (hero/merchant figures 56x80, level orb 24x24, farm pen 256x184). Artwork fills ~34-36px. Sprites float on transparency -
   **no ground shadows**. Displayed at integer scale only (`image-rendering: pixelated`).
 - **Outline**: 1px, *coloured*, never pure black - the darkest hue-shifted tone of the object's own material.
   Overlapping pieces get an inner contour.
@@ -35,7 +34,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   The four hero classes (cosmetic for now, picked with the Change class button of the Equipment tab): **Warrior/Human** (steel breastplate,
   red cape, round shield, sword), **Paladin/Angel** (fanned white wings, halo of gold beads, gold + white plate, mace,
   kite shield), **Ranger/Elf** (green hood, pointed ears, red hair, longbow, quiver), **Mage/Dark Elf** (lavender skin,
-  white hair, glowing eyes, pointed purple hood, crystal staff, floating orb). Each also has a 40x40 bust for the header.
+  white hair, glowing eyes, pointed purple hood, crystal staff, floating orb).
   The merchant uses the same kit: round green coat, bushy white beard, wide hat with feather, ledger, held coin.
 - **Animals**: 3/4 view, head to the lower-left, simple hard-shaded forms with one clear marking each
   (hen: red comb + tail fan; pig: snout + curl tail; cow: black patches + pink muzzle).
@@ -61,21 +60,15 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
   **Twinkle strips** (`<name>_shine.png`, 6 frames, `sprites_sheet.py`): gold, gems, both blue crystals, mana and the crate; played by the generic stepped `.px-shine` / `PixelSheet`
   (`PixelIcon shine`), reduced-motion safe.
 - **Menu**: character = plumed great helm (T-visor), merchant = stitched coin pouch, farm = shingled barn.
-- **Badges/portraits**: level orb (`level_orb`, animated), heroes `hero_<class>` + `bust_<class>`, `merchant`.
+- **Badges/portraits**: level orb (`level_orb`, animated), heroes `hero_<class>`, `merchant`.
 - **Equipment slots**: `equip_head/neck/chest/mainHand/offHand/legs/feet/ring` - kettle hat, amulet, cuirass, sword,
   round shield, greaves, boots, ring. Empty = dim grayscale silhouette, filled = glowing slot frame.
 - **Animals**: `animal_chicken/pig/cow/sheep`.
-- **Monsters** (`sprites_monsters.py`): `monster_rat` (2-frame idle sheet, 2 x 40x40) and `monster_ratking` (2 x 56x56, crowned, red cape,
-  fur collar). Same 3/4 view as the farm animals, head to the lower-left; grey-brown fur ramp (`rat_fur`), pink ears/paws/tail (`rat_pink`),
-  cream buck teeth, one glowing red eye. Shown through `MonsterArt` (CSS sheet animation, 520 ms per frame) on the map tile (red glow, tier badge)
-  and in the fight modal (3-5x).
+- **Monsters** are supplied pictures under `public/pixel/enemies/<biome>/` (the old procedural rat sheets were removed); a monster without one shows `enemies/placeholder/silhouette.png` (the purple ogre as a black silhouette) through `MonsterArt`.
 - **Slots and items**: four more empty-slot silhouettes (`equip_shoulder/hands/cape/charm`: pauldrons, gauntlet, cloak with clasp, bead on a cord).
   Item icons are `item_*` 40px sprites: `item_potion_hp` (red flask, cork) and the wooden starter kit (`item_wooden_sword/shield`), the slot
   icons re-skinned through `_skin()` in `sprites_monsters.py`. The rat materials stay for the rat monsters.
   New materials: `rat_fur`, `rat_fur_dk`, `rat_pink`, `rat_tan`, `cheese`, `glass`.
-- **Character HUD** (`LevelDetails.tsx`): 144x112 stone alcove scene shown at 2x - the hero (class sprite, idle bob) standing on the floor under a name plate (double-click = rename),
-  two flickering torches (3-frame strip), HP/MP flasks flanking him, stony XP bar along the floor with a flowing emerald
-  fill and 10% ticks, level on the purple orb. Flask scale is an integer (`--s`).
 - **Map terrain** (48px tiles, art 1:1; `terrain_*.py`, drawn by `TerrainLayer` on one canvas - see `reference/map-terrain.png`
   and `map-sprites.png`): saturated top-down 16-bit pixel art with soft organic edges, matched to the Gemini island
   reference the user supplied. **Dual grid**: terrain cells sit on the corner shared by four tiles and pick one of 16
@@ -197,7 +190,7 @@ shadows, contours, rim light, coloured outlines), so every asset shares one ligh
 | `terrain_build.py` | Writes `public/pixel/terrain/` (textures, shape atlases, props atlas), `src/config/terrainAtlas.json` and the parity fixture. |
 | `terrain_preview.py` | Mock maps composed with the same logic (`previews/`, and `reference/map-terrain.png` with `--refs`). |
 | `art_preview.py` | `python art_preview.py gold chest_map building_farm --k 6` renders the named sprites at Nx into `previews/` without touching `public/`. |
-| `ui_art.py` | 2D UI art: frames, header chrome, flask parts, stone XP bar, hero scene, torch, castle-range parts, gold sparkle strip, level-up ribbon. |
+| `ui_art.py` | 2D UI art: frames, header chrome, stone XP bar, torch, castle-range parts, gold sparkle strip, level-up ribbon. |
 | `build.py` | Builds everything into `public/pixel/{icons,ui,bg,terrain}` (rewrites in place, then removes stale files). `python build.py terrain` rebuilds just the map terrain. `--refs` also refreshes this folder. |
 
 Commands: `python scripts/pixel/art_preview.py <names>` (quick look), `python scripts/pixel/build.py` (all), `python scripts/pixel/build.py hero_mage gold` (just those),

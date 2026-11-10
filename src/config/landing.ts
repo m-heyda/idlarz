@@ -1,5 +1,6 @@
 // The words and art on the landing page (`/`): the five feature cards and the monsters that sit on the edges of the boxes. Pure config; the page (components/landing) only lays them out.
 // Wording is the owner's to tune (decision D10); the two-line length is what the card layout is built for.
+import { buildingDef } from '../catalog/buildings';
 import type { PixelIconName } from './pixelIcons';
 
 export interface LandingFeature {
@@ -7,10 +8,15 @@ export interface LandingFeature {
 	title: string;
 	/** Two short lines. */
 	text: string;
-	icon: PixelIconName;
+	/** The card's picture: a pixel icon, or `art`, the URL of a building picture (the building catalog's, so a swap of that file shows here too). One of the two is set. */
+	icon?: PixelIconName;
+	art?: string;
 	/** A monster from `public/pixel/enemies` that perches on the card's top edge. */
 	critter: string;
 }
+
+/** The picture of a building in the catalog (`catalog/buildings.ts`) */
+const buildingArt = (id: string): string => buildingDef(id)!.art;
 
 /** The five feature cards, in reading order. */
 export const LANDING_FEATURES: readonly LandingFeature[] = [
@@ -18,7 +24,7 @@ export const LANDING_FEATURES: readonly LandingFeature[] = [
 		id: 'land',
 		title: 'Grow your land',
 		text: 'Buy tiles, raise farms and mines, and watch a quiet meadow become a kingdom.',
-		icon: 'building_farm',
+		art: buildingArt('granary'),
 		critter: 'plains/thistle-boar',
 	},
 	{
@@ -39,14 +45,14 @@ export const LANDING_FEATURES: readonly LandingFeature[] = [
 		id: 'craft',
 		title: 'Craft legendary gear',
 		text: 'Gather, smith and enchant until your armour has a story of its own.',
-		icon: 'building_blacksmith',
+		art: buildingArt('coalpit'),
 		critter: 'forest/bramble-imp',
 	},
 	{
 		id: 'rank',
 		title: 'Climb the rankings',
 		text: 'Your realm keeps growing while you are away. See how it stacks up.',
-		icon: 'building_tower',
+		art: buildingArt('sporecellar'),
 		critter: 'tundra/frost-hare',
 	},
 ];

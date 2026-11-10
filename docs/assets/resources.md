@@ -16,7 +16,7 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 | `animal_cow_2` | <img src="../../public/pixel/icons/animal_cow_2.png" width="96" alt="animal_cow_2"> | 96x96 | used | animal:cow | `pixel/icons/animal_cow_2.png` |
 | `animal_duck` | <img src="../../public/pixel/icons/animal_duck.png" width="96" alt="animal_duck"> | 96x96 | unused |  | `pixel/icons/animal_duck.png` |
 | `animal_pig` | <img src="../../public/pixel/icons/animal_pig.png" width="96" alt="animal_pig"> | 96x96 | used | animal:pig | `pixel/icons/animal_pig.png` |
-| `animal_rooster` | <img src="../../public/pixel/icons/animal_rooster.png" width="96" alt="animal_rooster"> | 96x96 | unused |  | `pixel/icons/animal_rooster.png` |
+| `animal_rooster` | <img src="../../public/pixel/icons/animal_rooster.png" width="96" alt="animal_rooster"> | 96x96 | planned | golden-egg chicken upgrade (late gem purchase), IDL-260 | `pixel/icons/animal_rooster.png` |
 | `animal_sheep` | <img src="../../public/pixel/icons/animal_sheep.png" width="96" alt="animal_sheep"> | 96x96 | used | animal:sheep | `pixel/icons/animal_sheep.png` |
 
 ## coal
