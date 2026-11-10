@@ -265,7 +265,7 @@ can rebirth = castle level >= 6  and  economyTiles >= 400 + 50 x rebirths  and  
 
 Source: [`src/config/rebirth.ts:58`](../../src/config/rebirth.ts)
 
-The Ember shop: level N+1 costs `ceil(baseCost x 1.4^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers.
+The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers.
 The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
 
 **The Ember shop** _(computed from the code)_
@@ -278,6 +278,7 @@ The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies 
 | provisions | Provisions | 2 | start every run with +1 bundle(s) of gold 1,500, wood 400, stone 400 |
 | nightwatch | Night Watch | 2 | +1 hour of paid away time |
 | steward | Steward | 3 | +5% income while away |
+| deeppockets | Deep Pockets | 30 | +4 bag slots |
 
 <a id="emberupgradecost"></a>
 
@@ -301,7 +302,7 @@ cost of level N+1 = ceil(baseCost x 1.4^N) Embers
 
 Source: [`src/config/limits.ts:14`](../../src/config/limits.ts)
 
-Limits that upgrades raise. These are base values; code reads them through [`limitOf`](progression.md#limitof), which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours;
+Limits that upgrades raise. These are base values; code reads them through [`limitOf`](progression.md#limitof), which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat and the Deep Pockets Ember upgrade raise the bag size; Night Watch and set bonuses the away hours;
 Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.
 
 **Limits (base values and hard caps)** _(computed from the code)_
@@ -314,7 +315,7 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `merchantOffers` | 6 | 12 | nothing yet |
 | `merchantRotateSec` | 1,800 | n/a | nothing yet |
 | `merchantRefreshBase` | 10 K | n/a | nothing yet |
-| `bagSize` | 36 | n/a | Pack Rat +4 per level |
+| `bagSize` | 60 | 200 | Pack Rat +8 per level, Deep Pockets +4 per level |
 | `offlineCapHours` | 8 | 72 | Night Watch +1 h per level, set bonus hours |
 | `offlineEfficiency` | 0.5 | 1 | Steward +0.05 per level, set bonus points |
 | `offlineMinGapSec` | 300 | n/a | nothing yet |

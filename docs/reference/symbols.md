@@ -10,7 +10,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `addBuff` | Combat / Consumables | [`src/lib/buffs.ts:63`](../../src/lib/buffs.ts) | Adds one buff effect to the running buffs. |
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:161`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:152`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
-| `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:240`](../../src/lib/inventory.ts) | The one place gear is summed: |
+| `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:241`](../../src/lib/inventory.ts) | The one place gear is summed: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyUse` | Combat / Consumables | [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts) | Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now). |
@@ -145,7 +145,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Pacing targets | Pacing / Targets | [`scripts/sim.ts:16`](../../scripts/sim.ts) | What pace the economy is tuned for, why, and how to check it. |
 | `payKill` | Combat / A fight | [`src/lib/offline/reward.ts:36`](../../src/lib/offline/reward.ts) | Pays the kill of ticket `n`: |
 | `PERK_CAPS` | Economy / Perk caps | [`src/catalog/perkCaps.ts:15`](../../src/catalog/perkCaps.ts) | The cap on the gear bucket of each perk family, in percent. |
-| `PERSISTED_KEYS` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:59`](../../src/lib/sanitizeSave.ts) | The part of the game state that is saved. |
+| `PERSISTED_KEYS` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:58`](../../src/lib/sanitizeSave.ts) | The part of the game state that is saved. |
 | `pickTarget` | Combat / A fight | [`src/lib/offline/fightTargets.ts:39`](../../src/lib/offline/fightTargets.ts) | The next monster to engage: |
 | `pityMultiplier` | Progression / Crafting | [`src/lib/craftGear.ts:78`](../../src/lib/craftGear.ts) | The pity multiplier on the grade's best rarity after `misses` crafts that missed it. |
 | Pixel art pipeline | Architecture / Art | [`src/config/pixelIcons.ts:1`](../../src/config/pixelIcons.ts) | All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: |
@@ -178,7 +178,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |
 | `rollSpawnLevel` | Monsters / Level scaling | [`src/lib/monsters.ts:56`](../../src/lib/monsters.ts) | The level a new monster starts at. |
 | `runCombat` | Combat / A fight | [`src/lib/offline/fight.ts:61`](../../src/lib/offline/fight.ts) | Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battl... |
-| `sanitizeSave` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:192`](../../src/lib/sanitizeSave.ts) | Validates and normalises a loaded/imported save. |
+| `sanitizeSave` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:191`](../../src/lib/sanitizeSave.ts) | Validates and normalises a loaded/imported save. |
 | Save and Backup dialog | Saves & Server / The save | [`src/components/game/overlays/SaveMenuDialog.tsx:1`](../../src/components/game/overlays/SaveMenuDialog.tsx) | The Save & Backup dialog (Settings, *Save & backup*, or Control x5). |
 | `SAVE_SCHEMA` | Saves & Server / The save | [`src/lib/saveFormat.ts:34`](../../src/lib/saveFormat.ts) | The save in the browser. |
 | `sealedRng` | Saves & Server / The ledger | [`src/lib/offline/seal.ts:18`](../../src/lib/offline/seal.ts) | A random source for one reward: |

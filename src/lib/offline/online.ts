@@ -259,7 +259,10 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 		if (judged.ok && inv.rebirth?.to === judged.to)
 			return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, serverNowSec: ctx.nowSec } };
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
-		const wiped: Inventory = { ...rebirthInventory(inv, ctx.stored.core.merchantUpgrades), rebirth: { to: judged.to, gain: judged.gain } };
+		const wiped: Inventory = {
+			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige),
+			rebirth: { to: judged.to, gain: judged.gain },
+		};
 		return {
 			ledger: { ...ctx.ledger, inv: wiped, buffs: clearBuffsOnRebirth() },
 			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec },

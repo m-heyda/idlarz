@@ -35,11 +35,11 @@ const deepFreeze = <T>(o: T): T => {
 const fullOfGear = (): BagSlot[] => emptyBag().map(() => ({ item: p('wooden_sword') }));
 const stats = (id: string) => resolveItem(p(id))!.stats;
 
-test('emptyBag has 36 empty slots and starterBag holds the 2 starter potions', () => {
-	assert.equal(emptyBag().length, 36);
+test('emptyBag has 60 empty slots and starterBag holds the 2 starter potions', () => {
+	assert.equal(emptyBag().length, 60);
 	assert.ok(emptyBag().every((s) => s === null));
 	const bag = starterBag();
-	assert.equal(bag.length, 36);
+	assert.equal(bag.length, 60);
 	assert.deepEqual(bag[0], { id: 'potion_minor', qty: 2 });
 });
 
@@ -55,10 +55,10 @@ test('addToBag stacks potions to 100 then spills into a new slot', () => {
 	assert.deepEqual(more.bag[1], { id: 'potion_minor', qty: 8 });
 });
 
-test('addGear / addDrop report overflow when all 36 slots are full', () => {
+test('addGear / addDrop report overflow when all 60 slots are full', () => {
 	const r = addGear(fullOfGear(), p('obsidian_helm'));
 	assert.equal(r.added, false);
-	assert.equal(r.bag.filter(Boolean).length, 36);
+	assert.equal(r.bag.filter(Boolean).length, 60);
 	assert.equal(addDrop(fullOfGear(), { kind: 'gear', item: p('obsidian_helm') }).overflow, 1);
 	assert.equal(addDrop(fullOfGear(), { kind: 'consumable', id: 'potion_minor', qty: 4 }).overflow, 4);
 	const unknown = addToBag(emptyBag(), 'nope', 2);

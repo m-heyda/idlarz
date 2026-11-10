@@ -649,7 +649,7 @@
   "category": "Progression/Limits",
   "file": "src/config/limits.ts",
   "line": 14,
-  "summary": "Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat raises the bag size; Night Watch and set bonuses the away hours; Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.",
+  "summary": "Limits that upgrades raise. These are base values; code reads them through {@link limitOf}, which adds the bonuses registered in `LIMIT_BONUSES` (today: Pack Rat and the Deep Pockets Ember upgrade raise the bag size; Night Watch and set bonuses the away hours; Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save may hold, so raising a limit later never invalidates a save and a forged save cannot go beyond it.",
   "see": [
    "limitOf"
   ]
@@ -730,7 +730,7 @@
   "category": "Progression/Ember shop",
   "file": "src/config/rebirth.ts",
   "line": 58,
-  "summary": "The Ember shop: level N+1 costs `ceil(baseCost x 1.4^N)` Embers ({@link emberUpgradeCost}); every upgrade has 10 levels. Shop levels are permanent: nothing refunds Embers. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.",
+  "summary": "The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.",
   "see": []
  },
  {
@@ -1277,7 +1277,7 @@
   "kind": "function",
   "category": "Economy/Perk caps",
   "file": "src/lib/inventory.ts",
-  "line": 240,
+  "line": 241,
   "summary": "The one place gear is summed: stats of everything equipped (base at its level and quality, plus affixes) plus the set bonuses reached, then the perk families (income, XP, kill reward, click, damage) are capped by {@link capPerks}. The server reads gear through this too, so both sides agree.",
   "see": []
  },
@@ -1934,7 +1934,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 59,
+  "line": 58,
   "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
   "see": []
  },
@@ -1945,7 +1945,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 192,
+  "line": 191,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },

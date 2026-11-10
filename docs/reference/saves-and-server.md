@@ -91,7 +91,7 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:192`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:191`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -105,7 +105,7 @@ a click level outside the ladder, a prestige block that does not add up, less XP
 
 ### `PERSISTED_KEYS` <small>const</small>
 
-Source: [`src/lib/sanitizeSave.ts:59`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:58`](../../src/lib/sanitizeSave.ts)
 
 The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
 

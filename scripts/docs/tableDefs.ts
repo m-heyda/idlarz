@@ -232,6 +232,7 @@ const EMBER_EFFECT: Record<string, (n: number) => string> = {
 	provisions: (n) => `start every run with +${n} bundle(s) of ${res(EMBER_UPGRADES.provisions.bundle as Record<string, number>)}`,
 	nightwatch: (n) => `+${n} hour of paid away time`,
 	steward: (n) => `+${pct(n)} income while away`,
+	deeppockets: (n) => `+${n} bag slots`,
 };
 TABLES['ember-shop'] = () => ({
 	title: 'The Ember shop',
@@ -242,7 +243,7 @@ TABLES['ember-shop'] = () => ({
 });
 
 const RAISED_BY: Record<string, string> = {
-	bagSize: 'Pack Rat +4 per level',
+	bagSize: 'Pack Rat +8 per level, Deep Pockets +4 per level',
 	offlineCapHours: 'Night Watch +1 h per level, set bonus hours',
 	offlineEfficiency: 'Steward +0.05 per level, set bonus points',
 };
