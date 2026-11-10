@@ -389,7 +389,7 @@ TABLES['api-routes'] = () => {
 
 TABLES['tutorial-path'] = () => {
 	const rewardText = (r?: TutorialReward) =>
-		r ? [r.gold ? `${r.gold} gold` : '', r.wood ? `${r.wood} wood` : '', ...(r.items ?? []).map((i) => `${i.qty} x ${i.id}`)].filter(Boolean).join(', ') : '-';
+		r ? [r.gold ? `${r.gold} gold` : '', r.wood ? `${r.wood} wood` : '', r.food ? `${r.food} food` : '', ...(r.items ?? []).map((i) => `${i.qty} x ${i.id}`)].filter(Boolean).join(', ') : '-';
 	return {
 		title: 'The starter path and its bundles',
 		md: mdTable(

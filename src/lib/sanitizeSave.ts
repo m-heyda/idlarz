@@ -430,7 +430,9 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	// ---- farm, click power, castle timer, misc -------------------------------------------------------
 	if (!isRecord(raw.farmLevels)) return fail('farm');
 	const farmLevels: Record<string, number> = {};
-	for (const [id, lvl] of Object.entries(raw.farmLevels)) {
+	for (const [key, lvl] of Object.entries(raw.farmLevels)) {
+		const id = key === 'deer' ? 'sheep' : key; // the deer became the sheep (same price and meat); a save that has both keeps the sheep
+		if (key === 'deer' && 'sheep' in raw.farmLevels) continue;
 		if (!ANIMALS.some((a) => a.id === id)) return fail('unknown animal');
 		const v = int(lvl, 0, MAX_ANIMALS);
 		if (v === null) return fail('animal count');

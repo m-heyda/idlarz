@@ -1,6 +1,6 @@
-// Geometry of the farm pasture drawn by scripts/pixel/sprites_farm.py (keep the constants and prop lists in sync with that file).
-// The pasture is an isometric meadow the size of a big window, shown at a fixed whole-pixel zoom and centred in the Farm window
-// (cropped, never scaled); animals walk on its ground plane and are projected with the same camera.
+// Geometry of the farm pasture: an isometric fenced pen on an endless repeating meadow, shown at a whole-pixel zoom and centred in the Farm window.
+// The parts (fence, barn, troughs ...) are loose PNGs from scripts/pixel/farm_parts.py laid out by farmLayout.ts from the lists below; animals walk on the
+// ground plane and are projected with the same camera. `PEN` is the frame whose centre is the window's centre.
 
 export const PEN = {
 	w: 348,
@@ -10,8 +10,8 @@ export const PEN = {
 	oy: 165,
 };
 
-/** Native -> CSS pixels: a whole number, 3 in a normal window, smaller only when the window is narrow (phones) */
-export const penZoom = (stageW: number) => (stageW >= 760 ? 3 : stageW >= 500 ? 2 : 1);
+/** Native -> CSS pixels: a whole number, 3 in a normal window, 4 in a big one (1500 x 1000 and up), smaller only when the window is narrow. The meadow tile around the pen follows the same zoom. */
+export const penZoom = (stageW: number, stageH = 0) => (stageW >= 1500 && stageH >= 1000 ? 4 : stageW >= 760 ? 3 : stageW >= 500 ? 2 : 1);
 
 /** Ground position (x, y world units, z = 0) -> pixel position inside the pen image (native pixels). */
 export const project = (gx: number, gy: number) => ({
@@ -19,8 +19,8 @@ export const project = (gx: number, gy: number) => ({
 	y: PEN.oy - (gx + gy) * 0.3536 * PEN.scale,
 });
 
-// The props of the pasture (same lists as sprites_farm.py): x, y (and the long side of a trough)
-const TROUGHS: [number, number, 'x' | 'y'][] = [
+// The props of the pasture: x, y (and the long side of a trough)
+export const TROUGHS: [number, number, 'x' | 'y'][] = [
 	[-3.3, 1.4, 'x'],
 	[8, -1.5, 'y'],
 	[-6, -7, 'x'],
@@ -29,13 +29,13 @@ const TROUGHS: [number, number, 'x' | 'y'][] = [
 	[-7, -1, 'y'],
 	[1, -10, 'x'],
 ];
-const TANKS: [number, number][] = [
+export const TANKS: [number, number][] = [
 	[-9, 9],
 	[11.5, 2.5],
 	[6, 13],
 	[-1, -4],
 ];
-const HAY: [number, number][] = [
+export const HAY: [number, number][] = [
 	[-6, 7],
 	[10, 2],
 	[2, -6],
@@ -44,25 +44,32 @@ const HAY: [number, number][] = [
 	[14.5, 13],
 	[-3, -11],
 ];
-const BARRELS: [number, number][] = [
+export const BARRELS: [number, number][] = [
 	[11.6, 5.6],
 	[12.4, 6.5],
 	[11.5, 7],
 	[-3.4, 9.2],
 	[-4.1, 9.9],
 ];
-const CRATES: [number, number][] = [
+export const CRATES: [number, number][] = [
 	[1.8, 12.4],
 	[2.7, 12.9],
 	[12, 14.2],
 	[-4.8, 12.4],
 ];
-const BARN = { x: 8.5, y: 8.5 };
-const COOP = { x: -1, y: 11 };
-const POND = { x: -12, y: -4 };
+/** Bare earth where the animals gather (trodden dirt in the meadow) */
+export const SPOTS: [number, number][] = [
+	[-0.5, 6],
+	[6, 6],
+	[-8, 2],
+];
+
+export const BARN = { x: 8.5, y: 8.5 };
+export const COOP = { x: -1, y: 11 };
+export const POND = { x: -12, y: -4 };
 
 /** Where animals may walk: inside the fence (at +-18), clear of its posts */
-const BOUNDS = { x: 16.5, y: 16.5 };
+export const BOUNDS = { x: 16.5, y: 16.5 };
 
 const box = (x: number, y: number, hx: number, hy: number): [number, number, number, number] => [x - hx, x + hx, y - hy, y + hy];
 
@@ -165,14 +172,13 @@ export const ANIMAL_MOTION: Record<string, { speed: number }> = {
 	chicken: { speed: 1.3 },
 	pig: { speed: 0.9 },
 	cow: { speed: 0.7 },
-	deer: { speed: 1.6 },
+	sheep: { speed: 0.8 },
 };
 
 /**
- * Where an animal's feet are in its 48 x 48 box (native px). The Sprite Fusion art is 96 x 96 and is drawn at half size, an exact 2:1 step;
- * the 40 x 40 deer fills the same box 1:1 and sits 4 px right and 9 px down so its feet land on the same spot.
+ * Where an animal's feet are in its 48 x 48 box (native px). The Sprite Fusion art is 96 x 96 and is drawn at half size, an exact 2:1 step.
  */
 export const ANCHOR = { x: 24, y: 42 };
 
 /** How an animal icon sits in the 48 x 48 box: its scale (96 px art: half) and its offset (native px) */
-export const spriteFit = (iconWidth: number) => (iconWidth >= 96 ? { scale: 0.5, dx: 0, dy: 0 } : { scale: 1, dx: 4, dy: 9 });
+export const spriteFit = (iconWidth: number) => ({ scale: 48 / iconWidth, dx: 0, dy: 0 });

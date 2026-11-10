@@ -171,7 +171,7 @@ Every purchase adds one animal (production = `baseProduction × count`). Cost (f
 | 19 | 112.45K | 483.96K | 3.80 | 2.6d |
 | 20 | 146.19K | 630.16K | 4.00 | 3.4d |
 
-### Deer (first 10.00K food, ×1.33 each, +0.5 meat/s each)
+### Sheep (first 10.00K food, ×1.33 each, +0.5 meat/s each)
 
 | Count | cost of this one (food) | cumulative food | meat/s total | payback |
 | --- | --- | --- | --- | --- |
@@ -253,7 +253,7 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 | Animal | product | per second each | sells for | gold/s each (sold) | meat gold/s each | share of meat |
 | --- | --- | --- | --- | --- | --- | --- |
 | Chicken | eggs | 0.03 | 2 | 0.060 | 0.20 | 30% |
-| Deer | hide | 0.075 | 2 | 0.150 | 0.50 | 30% |
+| Sheep | wool | 0.075 | 2 | 0.150 | 0.50 | 30% |
 | Pig | hide | 0.15 | 2 | 0.300 | 1.00 | 30% |
 | Cow | milk | 0.225 | 3 | 0.675 | 2.00 | 34% |
 
@@ -263,7 +263,8 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 | Hen House | +15% eggs | 10 | 1500 wood + 40.00 eggs | 103.08K wood + 2749 eggs |
 | Dairy | +15% milk | 10 | 1500 stone + 30.00 milk | 103.08K stone + 2062 milk |
 | Tannery | +25% hide | 10 | 1200 coal + 20.00 hide | 82.46K coal + 1375 hide |
-| Pasture | +8% eggs, milk and hide | 10 | 5000 food + 2500 wood | 343.60K food + 171.80K wood |
+| Shearing Shed | +25% wool | 10 | 1500 food + 30.00 wool | 103.08K food + 2062 wool |
+| Pasture | +8% eggs, milk, hide and wool | 10 | 5000 food + 2500 wood | 343.60K food + 171.80K wood |
 | Pen Expansion | +2% farm output, +4 animals per kind | 8 | 8000 food + 3000 wood + 3000 stone | 715.10K food + 268.16K wood + 268.16K stone |
 
 ## 5. Biomes
@@ -338,6 +339,7 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | frostshard | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | pearls | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | salt | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| wool | 0 | 0 | 0.000 | 20.0% | 0.000 |
 
 ## 8. Click power and merchant
 
@@ -358,6 +360,7 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | eggs | 2 | not for sale |
 | milk | 3 | not for sale |
 | hide | 2 | not for sale |
+| wool | 2 | not for sale |
 
 ### Merchant bonuses and gear shop
 

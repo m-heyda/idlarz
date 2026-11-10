@@ -41,9 +41,9 @@ export const farmUpgradeCost = (id: FarmUpgradeId, level: number): Partial<Resou
 };
 
 /** Everything the farm yields per second before the global modifiers: meat plus the products. */
-export type FarmOutput = Record<'meat' | 'eggs' | 'milk' | 'hide', number>;
+export type FarmOutput = Record<'meat' | 'eggs' | 'milk' | 'hide' | 'wool', number>;
 
-const emptyOutput = (): FarmOutput => ({ meat: 0, eggs: 0, milk: 0, hide: 0 });
+const emptyOutput = (): FarmOutput => ({ meat: 0, eggs: 0, milk: 0, hide: 0, wool: 0 });
 
 /**
  * Output of `count` animals of one kind (every purchase adds one more animal).
@@ -54,7 +54,7 @@ const emptyOutput = (): FarmOutput => ({ meat: 0, eggs: 0, milk: 0, hide: 0 });
  * @order 2
  * @formula
  * meat    = baseProduction x N x (1 + 0.02 x pen level) x (1 + 0.05 x feed trough level)
- * product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery effect) x (1 + 0.08 x pasture level)
+ * product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery | shearing effect) x (1 + 0.08 x pasture level)
  */
 export const animalOutput = (animal: Animal, count: number, upgrades?: FarmUpgrades): FarmOutput => {
 	const out = emptyOutput();
@@ -62,7 +62,7 @@ export const animalOutput = (animal: Animal, count: number, upgrades?: FarmUpgra
 	const pen = 1 + farmUpgradeLevel(upgrades, 'pen') * FARM_PEN.outputPerLevel;
 	const up = (id: FarmUpgradeId) => 1 + farmUpgradeLevel(upgrades, id) * FARM_UPGRADES[id].effectPerLevel;
 	out.meat = animal.baseProduction * count * pen * up('feed');
-	const productUpgrade: Record<Animal['product']['resource'], FarmUpgradeId> = { eggs: 'coop', milk: 'dairy', hide: 'tannery' };
+	const productUpgrade: Record<Animal['product']['resource'], FarmUpgradeId> = { eggs: 'coop', milk: 'dairy', hide: 'tannery', wool: 'shearing' };
 	out[animal.product.resource] = animal.product.perSec * count * pen * up(productUpgrade[animal.product.resource]) * up('pasture');
 	return out;
 };
@@ -107,7 +107,7 @@ export const affordableAnimals = (animal: Animal, owned: number, food: number, c
 
 /** True when the farm has something to buy right now: one more animal (below the pen cap) or the next level of an upgrade. */
 export const farmHasPurchase = (
-	resources: Pick<Resources, 'food' | 'wood' | 'stone' | 'coal' | 'meat' | 'eggs' | 'milk' | 'hide' | 'gold'>,
+	resources: Pick<Resources, 'food' | 'wood' | 'stone' | 'coal' | 'meat' | 'eggs' | 'milk' | 'hide' | 'wool' | 'gold'>,
 	farmLevels: Record<string, number>,
 	farmUpgrades: FarmUpgrades | undefined,
 ): boolean => {

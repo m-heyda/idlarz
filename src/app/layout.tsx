@@ -19,8 +19,9 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	// suppressHydrationWarning: the landing page's inline script (FIT_SCRIPT in page.tsx) sets --ld-zoom on <html> before React hydrates, so its style attribute differs from the server's
 	return (
-		<html lang='en'>
+		<html lang='en' suppressHydrationWarning>
 			<body>
 				{children}
 				<Analytics />

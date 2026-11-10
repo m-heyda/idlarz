@@ -2,7 +2,7 @@
 
 Each picture is copied 1:1 into public/pixel/icons/ as `animal_<file>` (no resampling). The farm draws them at half size (an exact 2:1 step,
 see src/components/game/overlays/farmGeometry.ts). chicken_1/2 and cow_1/2 are variants of one animal (the farm picks one per animal, see
-`animalIcon` in src/config/pixelIcons.ts); sheep, duck and rooster are not used by the farm yet. The deer is still drawn by sprites_animals.py."""
+`animalIcon` in src/config/pixelIcons.ts); duck and rooster are not used by the farm yet."""
 import os
 from PIL import Image
 

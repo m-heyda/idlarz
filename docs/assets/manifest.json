@@ -10928,21 +10928,6 @@
 		]
 	},
 	{
-		"usedBy": [
-			"animal:deer"
-		],
-		"name": "animal_deer",
-		"category": "resources",
-		"subcategory": "animal",
-		"src": "/pixel/icons/animal_deer.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			40,
-			40
-		]
-	},
-	{
 		"usedBy": [],
 		"name": "animal_duck",
 		"category": "resources",
@@ -10984,12 +10969,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"animal:sheep"
+		],
 		"name": "animal_sheep",
 		"category": "resources",
 		"subcategory": "animal",
 		"src": "/pixel/icons/animal_sheep.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			96,
@@ -11127,32 +11114,6 @@
 		"size": [
 			40,
 			40
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "farm_back",
-		"category": "resources",
-		"subcategory": "farm",
-		"src": "/pixel/icons/farm_back.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			348,
-			300
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "farm_front",
-		"category": "resources",
-		"subcategory": "farm",
-		"src": "/pixel/icons/farm_front.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			348,
-			300
 		]
 	},
 	{
@@ -11961,19 +11922,6 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "resource_spare_wool",
-		"category": "resources",
-		"subcategory": "spare",
-		"src": "/pixel/resources/_wool.png",
-		"status": "spare",
-		"source": "public/pixel/resources",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
 		"usedBy": [
 			"resource:stone"
 		],
@@ -12116,6 +12064,21 @@
 		"category": "resources",
 		"subcategory": "t1",
 		"src": "/pixel/resources/milk.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"wool"
+		],
+		"name": "resource_wool",
+		"category": "resources",
+		"subcategory": "t1",
+		"src": "/pixel/resources/wool.png",
 		"status": "used",
 		"source": "resource roster",
 		"size": [
@@ -12326,6 +12289,21 @@
 		"category": "resources",
 		"subcategory": "wood",
 		"src": "/pixel/icons/wood.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:wool"
+		],
+		"name": "wool",
+		"category": "resources",
+		"subcategory": "wool",
+		"src": "/pixel/icons/wool.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -15232,6 +15210,426 @@
 		"size": [
 			688,
 			384
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_barn",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/barn.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			75,
+			68
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_barrel",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/barrel.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			14,
+			15
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_bucket",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/bucket.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			10,
+			10
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_bush_0",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/bush_0.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			19,
+			15
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_bush_1",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/bush_1.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			24,
+			19
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_bush_2",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/bush_2.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			29,
+			23
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_coop",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/coop.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			40,
+			38
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_crate",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/crate.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			20,
+			17
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_dirt_0",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/dirt_0.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			28,
+			14
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_dirt_1",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/dirt_1.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			42,
+			20
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_dirt_2",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/dirt_2.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			60,
+			30
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_fence_post",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/fence_post.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			13,
+			17
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_fence_x",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/fence_x.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			25,
+			22
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_fence_y",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/fence_y.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			28,
+			22
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_flower_0",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/flower_0.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			4,
+			4
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_flower_1",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/flower_1.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			4,
+			4
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_flower_2",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/flower_2.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			4,
+			4
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_gate",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/gate.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			44,
+			33
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_hay",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/hay.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			34,
+			26
+		]
+	},
+	{
+		"usedBy": [
+			"farm window background (repeats)"
+		],
+		"name": "farm_meadow",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/bg/farm_meadow.png",
+		"status": "used",
+		"source": "public/pixel/bg",
+		"size": [
+			96,
+			96
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_pine",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/pine.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			35,
+			42
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_pond",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/pond.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			67,
+			36
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_stone_0",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/stone_0.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			8,
+			7
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_stone_1",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/stone_1.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			10,
+			8
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_stone_2",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/stone_2.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			13,
+			11
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_tank",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/tank.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			28,
+			22
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_trough_x",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/trough_x.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			29,
+			21
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_trough_y",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/trough_y.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			28,
+			21
 		]
 	},
 	{

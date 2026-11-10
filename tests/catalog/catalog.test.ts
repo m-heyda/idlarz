@@ -128,7 +128,7 @@ test('every header resource sits in a tier: the header groups come from the cata
 	assert.equal(new Set(tiered).size, tiered.length, 'no resource in two tiers');
 	assert.deepEqual(resourcesInTier('currency'), ['gold', 'gems', 'embers']);
 	assert.deepEqual(resourcesInTier('t0'), ['wood', 'stone', 'coal', 'food', 'meat']);
-	assert.deepEqual(resourcesInTier('t1'), ['eggs', 'milk', 'hide']);
+	assert.deepEqual(resourcesInTier('t1'), ['eggs', 'milk', 'hide', 'wool']);
 });
 
 test('the stored resource keys come from the catalog, in the order saves have always had', async () => {
@@ -140,11 +140,30 @@ test('the stored resource keys come from the catalog, in the order saves have al
 	// a snapshot: adding a resource changes this list on purpose, never by accident
 	assert.deepEqual(
 		[...STORED_KEYS],
-		['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'xp', 'herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt'],
+		[
+			'gold',
+			'wood',
+			'stone',
+			'coal',
+			'food',
+			'meat',
+			'eggs',
+			'milk',
+			'hide',
+			'xp',
+			'herbs',
+			'sap',
+			'ironOre',
+			'spores',
+			'frostshard',
+			'pearls',
+			'salt',
+			'wool',
+		],
 	);
-	assert.deepEqual([...OPTIONAL_KEYS], ['eggs', 'milk', 'hide', 'herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt']);
-	assert.deepEqual([...FARM_KEYS], ['meat', 'eggs', 'milk', 'hide']);
-	assert.deepEqual([...FARM_PRODUCT_KEYS], ['eggs', 'milk', 'hide']);
+	assert.deepEqual([...OPTIONAL_KEYS], ['eggs', 'milk', 'hide', 'herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt', 'wool']);
+	assert.deepEqual([...FARM_KEYS], ['meat', 'eggs', 'milk', 'hide', 'wool']);
+	assert.deepEqual([...FARM_PRODUCT_KEYS], ['eggs', 'milk', 'hide', 'wool']);
 	for (const table of [INITIAL_RESOURCES, BASE_GENERATION_RATES, CASTLE_BASE_RATES, zeroResources()]) assert.deepEqual(Object.keys(table), [...STORED_KEYS]);
 	assert.deepEqual(Object.keys(zeroTotals()), [...STORED_KEYS, 'gems']);
 	assert.equal(INITIAL_RESOURCES.gold, 125);

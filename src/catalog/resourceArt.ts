@@ -52,6 +52,7 @@ export const RESOURCE_ART: readonly ResourceArtEntry[] = [
 	live('eggs', 'Eggs', 't1'),
 	live('milk', 'Milk', 't1'),
 	live('hide', 'Hide', 't1'),
+	live('wool', 'Wool', 't1'),
 	// A reserved icon (RESERVED_RESOURCES in config/pixelIcons.ts), not a header resource
 	live('fish', 'Fish', 't0'),
 

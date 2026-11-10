@@ -44,6 +44,7 @@ const BASE_ICON_SIZES = {
 	eggs: [40, 40],
 	milk: [40, 40],
 	hide: [40, 40],
+	wool: [40, 40],
 	// the rebirth currency (Embers; the sprite kept its old name, `legacy`)
 	legacy: [40, 40],
 	// the premium currency
@@ -180,10 +181,6 @@ const BASE_ICON_SIZES = {
 	animal_sheep: [96, 96],
 	animal_duck: [96, 96],
 	animal_rooster: [96, 96],
-	animal_deer: [40, 40],
-	// farm pasture: the whole fenced meadow (back) and the near fences that go in front of the animals (front)
-	farm_back: [348, 300],
-	farm_front: [348, 300],
 	// meadow around the pen
 	meadow_tree: [56, 72],
 	meadow_pine: [48, 76],
@@ -221,6 +218,7 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 	eggs: 'eggs',
 	milk: 'milk',
 	hide: 'hide',
+	wool: 'wool',
 	embers: 'legacy', // the rebirth currency (not a Resources key); the sprite kept its old file name
 	gems: 'diamond', // the premium currency (its own balance, not a Resources key)
 	xp: 'xp',
@@ -274,7 +272,7 @@ export const ANIMAL_PIXEL_ICONS: Record<string, readonly PixelIconName[]> = {
 	chicken: ['animal_chicken_1', 'animal_chicken_2'],
 	pig: ['animal_pig'],
 	cow: ['animal_cow_1', 'animal_cow_2'],
-	deer: ['animal_deer'],
+	sheep: ['animal_sheep'],
 };
 
 /**

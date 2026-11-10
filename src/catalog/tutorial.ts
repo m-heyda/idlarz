@@ -58,6 +58,8 @@ export interface TutorialNumbers {
 export interface TutorialReward {
 	gold?: number;
 	wood?: number;
+	/** Food: the price of the first chicken */
+	food?: number;
 	/** Bag items by catalog id */
 	items?: { id: string; qty: number }[];
 }
@@ -108,6 +110,8 @@ export const INTRO: readonly IntroPage[] = [
 /** The starter bundles, granted once per account by the server (IDL-67). */
 export const STARTER_REWARDS = {
 	tile: { gold: 100, wood: 20 },
+	/** The price of the first chicken (`ANIMALS[0].baseCost`, pinned by tests/ui/tutorial.test.ts): Alder gives the player's first animal */
+	farm: { food: 1000 },
 	castle: { gold: 300 },
 	potions: { items: [{ id: 'potion_minor', qty: 3 }] },
 } as const satisfies Record<string, TutorialReward>;
@@ -117,7 +121,7 @@ const isOpen = (facts: TutorialFacts, id: string) => facts.open.includes(id);
 /**
  * The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ({@link guideVisibleFor}).
  *
- * - **Intro**: on the first start of a chapter the screen dims and Alder speaks three short bubbles. **Starter path**: eight steps in the order of {@link TUTORIAL_PATH}. The first step that is *ready* and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. **Milestone lessons** (`TUTORIAL_LESSONS`) fire the first time something is reached, in any order, after the path; each is kept in the Guide's journal tab (locked ones read '???').
+ * - **Intro**: on the first start of a chapter the screen dims and Alder speaks three short bubbles. **Starter path**: nine steps in the order of {@link TUTORIAL_PATH}. The first step that is *ready* and not done is on show (the castle upgrade waits until it can be paid, the next ready step is shown meanwhile); a step the player did on their own is recorded without being shown. **Milestone lessons** (`TUTORIAL_LESSONS`) fire the first time something is reached, in any order, after the path; each is kept in the Guide's journal tab (locked ones read '???').
  * - **Focus**: `strict` dims and blurs the whole game with a cut-out around the `data-tutorial` target and blocks every click outside it (the intro and the first two steps); `soft` only dims. A target that is not on screen shows the bubble alone and never blocks the game. **Skip** is on every bubble and ends the starter path (lessons still come); the guide can be switched off in Settings.
  * - **Texts** are one or two sentences with numbers read from the config ({@link buildNumbers}). **Order is data**: a step is inserted between two others by putting it there (the new building system adds its 'build' step that way).
  * - **Progress is per account on the server** (`stats.tutorial` in the ledger: done ids, fired lessons, skipped; no migration) and resets with the ledger at a new chapter. **Starter bundles** are paid once per account by the server when a step is recorded, only if the last accepted save shows the step happened, and counted as `granted` ({@link applyTutorial}). The sim bot receives them at the same events.
@@ -151,11 +155,21 @@ export const TUTORIAL_PATH: readonly PathStep[] = [
 		reward: STARTER_REWARDS.tile,
 	},
 	{
+		id: 'farm-intro',
+		title: 'Meet the farm',
+		focus: 'soft',
+		target: 'tab-farm',
+		text: () => 'Your farm turns food into meat and goods: eggs, milk, hide and wool. Open the Farm window; your first animal is on me.',
+		ready: () => true,
+		done: (f) => isOpen(f, 'farm') || f.animals >= 1,
+		reward: STARTER_REWARDS.farm,
+	},
+	{
 		id: 'buy-animal',
 		title: 'Buy an animal',
 		focus: 'soft',
 		target: (f) => (isOpen(f, 'farm') ? 'farm-animal' : 'tab-farm'),
-		text: (n) => `Open the Farm and buy a ${n.animalName} for ${n.animalFood} food. Animals make meat, eggs and more.`,
+		text: (n) => `Buy a ${n.animalName} for ${n.animalFood} food, a gift from me. It makes meat now and eggs soon; sheep grow wool, pigs hide, cows milk.`,
 		ready: (f) => f.animalAffordable || f.animals > 0,
 		done: (f) => f.animals >= 1,
 	},
@@ -213,10 +227,11 @@ const RESOURCE_LESSONS: readonly { key: string; title: string; text: string }[] 
 	{ key: 'stone', title: 'Stone', text: 'Stone comes from mountains and hills. Like wood, it goes into tiles and the castle.' },
 	{ key: 'coal', title: 'Coal', text: 'Coal is dug from mines. The later castle levels need plenty of it.' },
 	{ key: 'food', title: 'Food', text: 'Food feeds your farm: animals are bought with it. Fields and orchards grow it.' },
-	{ key: 'hide', title: 'Hide', text: 'Hide drops from monsters and animals. It is a crafting material and part of the price of bigger tiles.' },
+	{ key: 'hide', title: 'Hide', text: 'Hide drops from monsters and pigs. It is a crafting material and part of the price of bigger tiles.' },
 	{ key: 'meat', title: 'Meat', text: 'Meat comes from farm animals. The later castle levels need it.' },
 	{ key: 'eggs', title: 'Eggs', text: 'Chickens lay eggs. Sell them to the merchant for gold.' },
 	{ key: 'milk', title: 'Milk', text: 'Cows give milk. Sell it to the merchant for gold.' },
+	{ key: 'wool', title: 'Wool', text: 'Sheep grow wool. Sell it to the merchant for gold, or keep it: it becomes cloth armour later.' },
 ];
 
 /** Milestone lessons: each fires the first time its condition holds, in any order, with a soft spotlight. */
@@ -231,6 +246,15 @@ export const TUTORIAL_LESSONS: readonly Lesson[] = [
 			fires: (f) => !!f.seen[key],
 		}),
 	),
+	{
+		id: 'farm-upgrades',
+		title: 'Farm upgrades',
+		focus: 'soft',
+		target: 'tab-farm',
+		text: () =>
+			'Each product has its own upgrade along the bottom of the Farm: Hen House for eggs, Dairy for milk, Tannery for hide, Shearing Shed for wool. Pasture boosts all four.',
+		fires: (f) => f.animals >= 3,
+	},
 	{
 		id: 'income-offline',
 		title: 'Income, timers and time away',

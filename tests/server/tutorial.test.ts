@@ -127,3 +127,14 @@ test('progress reads back safely from the stored column', () => {
 	assert.equal(isEmptyStats(stats), false);
 	assert.equal(isEmptyStats({ ...emptyStats(), tutorial: { done: ['intro'], lessons: [], skipped: false } }), false);
 });
+
+test('meeting the farm pays the food for the first chicken once, with no proof needed', async () => {
+	const m = await player(0);
+	const first = ok(await tutorialStep(m.deps, 'u1', 'tutorial-key-farm-1', { action: 'done', id: 'farm-intro' }, T0 + 1000));
+	assert.equal(first.ok, true);
+	assert.deepEqual(first.paid, { food: STARTER_REWARDS.farm.food });
+	assert.equal(m.ledgers.get('u1')!.granted.food, STARTER_REWARDS.farm.food);
+	const again = ok(await tutorialStep(m.deps, 'u1', 'tutorial-key-farm-2', { action: 'done', id: 'farm-intro' }, T0 + 2000));
+	assert.equal(again.paid, undefined);
+	assert.equal(m.ledgers.get('u1')!.granted.food, STARTER_REWARDS.farm.food);
+});

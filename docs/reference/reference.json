@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 112,
+  "line": 113,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -347,7 +347,7 @@
   "kind": "const",
   "category": "Progression/Guided tutorial",
   "file": "src/catalog/tutorial.ts",
-  "line": 133,
+  "line": 137,
   "summary": "The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the screen with a speech bubble. It is shown on localhost and on Vercel previews, and on the production site only after `GAME_EPOCH` is raised (the new chapter release); `NEXT_PUBLIC_GUIDE=on` forces it on anywhere ({@link guideVisibleFor}).",
   "see": [
    "applyTutorial",
@@ -869,7 +869,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 273,
+  "line": 271,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -880,7 +880,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 288,
+  "line": 286,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },
@@ -2884,7 +2884,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 867,
+  "line": 875,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

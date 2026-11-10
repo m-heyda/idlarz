@@ -228,6 +228,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/**
 
 - [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
+- [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in one line:
 - [`CharacterOverlay.tsx`](../../src/components/game/overlays/CharacterOverlay.tsx)
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
@@ -236,6 +237,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`FarmAnimalDock.tsx`](../../src/components/game/overlays/FarmAnimalDock.tsx) — ~ Width the scene keeps clear on the right while the panel is open (panel width plus its margin)
 - [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
 - [`FarmOverlay.tsx`](../../src/components/game/overlays/FarmOverlay.tsx) — ~ The Farm window:
+- [`FarmProps.tsx`](../../src/components/game/overlays/FarmProps.tsx) — ~ CSS px outside the window that still get drawn, so a part is never seen popping in at the edge
 - [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Animals drawn for a count:
 - [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ How long the drawer takes to slide shut (a little over the transition in Farm.css)
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
@@ -264,7 +266,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`TabLockOverlay.tsx`](../../src/components/game/overlays/TabLockOverlay.tsx) — ~ Shown in a tab that does not own the game (another tab is running it).
 - [`Tutorial.tsx`](../../src/components/game/overlays/Tutorial.tsx) — ~ The in-game guide.
 - [`TutorialDialog.tsx`](../../src/components/game/overlays/TutorialDialog.tsx) — ~ Brother Alder's journal:
-- [`farmGeometry.ts`](../../src/components/game/overlays/farmGeometry.ts) — Geometry of the farm pasture drawn by scripts/pixel/sprites_farm.py (keep the constants and prop lists in sync with that file).
+- [`farmGeometry.ts`](../../src/components/game/overlays/farmGeometry.ts) — Geometry of the farm pasture: an isometric fenced pen on an endless repeating meadow, shown at a whole-pixel zoom and centred in the Farm window.
+- [`farmLayout.ts`](../../src/components/game/overlays/farmLayout.ts) — Lays out the farm's loose parts (public/pixel/farm/*.png, made by scripts/pixel/farm_parts.py) as a list of props on the ground plane: the fence round the pen
 
 **src/components/game/tutorial/**
 
@@ -393,7 +396,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`data.ts`](../../src/lib/loot/data.ts) — ~ Everything the loot pipeline reads, as one injectable bundle.
 - [`generate.ts`](../../src/lib/loot/generate.ts) — ~ The monster's level (sets the item level of what it drops and the per-level chances); omitted for a chest or the shelf
 - [`index.ts`](../../src/lib/loot/index.ts) — The loot pipeline's public face. Content lives in src/catalog (lootConfig, affixes, items); this folder is the logic.
-- [`kill.ts`](../../src/lib/loot/kill.ts) — ~ Hide per second of the farm; a kill pays a share of it (0 without deer and pigs)
+- [`kill.ts`](../../src/lib/loot/kill.ts) — ~ Hide per second of the farm; a kill pays a share of it (0 without pigs)
 - [`pools.ts`](../../src/lib/loot/pools.ts) — ~ Whether an item belongs to a pool:
 - [`receive.ts`](../../src/lib/loot/receive.ts) — ~ What actually went into the bag
 - [`validate.ts`](../../src/lib/loot/validate.ts) — ~ The configuration is broken:

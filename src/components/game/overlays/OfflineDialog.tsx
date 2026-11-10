@@ -6,7 +6,7 @@ import ResourceIcon from '../ResourceIcon';
 import GemIcon from '../GemIcon';
 import type { Resources } from '@/types/game';
 
-const ORDER: (keyof Resources)[] = ['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'xp'];
+const ORDER: (keyof Resources)[] = ['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool', 'xp'];
 
 /** "Hours as a number": 7.7 h, 30 min, so the cap and the time away read the same way. */
 const hours = (seconds: number) => (seconds >= 3600 ? `${formatCompact(seconds / 3600, 1)} h` : formatTime(seconds));

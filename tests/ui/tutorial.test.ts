@@ -47,7 +47,10 @@ test('the starter path runs in order, strict first and soft later', () => {
 	progress = withDone(progress, 'click-gold');
 	assert.equal(nextBeat(base({ clicks: 3 }), progress)?.id, 'buy-tile');
 	progress = withDone(progress, 'buy-tile');
-	// the farm step waits until the first animal can be paid; the next ready step is shown meanwhile
+	assert.equal(nextBeat(base({ tilesBought: 1 }), progress)?.id, 'farm-intro', 'the farm is introduced before the first animal');
+	assert.equal(nextBeat(base({ tilesBought: 1 }), progress)?.target, 'tab-farm');
+	progress = withDone(progress, 'farm-intro');
+	// the animal step waits until the first animal can be paid; the next ready step is shown meanwhile
 	const waiting = nextBeat(base({ tilesBought: 1, chestOnMap: true }), progress);
 	assert.equal(waiting?.id, 'open-chest');
 	assert.equal(waiting?.focus, 'soft');
@@ -55,14 +58,14 @@ test('the starter path runs in order, strict first and soft later', () => {
 });
 
 test('a step the player already did on their own is recorded, never shown', () => {
-	const facts = base({ clicks: 5, tilesBought: 2, merchantOpened: true });
+	const facts = base({ clicks: 5, tilesBought: 2, merchantOpened: true, animals: 1 });
 	const done = newlyDone(facts, afterIntro()).map((s) => s.id);
-	assert.deepEqual(done, ['click-gold', 'buy-tile', 'merchant']);
+	assert.deepEqual(done, ['click-gold', 'buy-tile', 'farm-intro', 'buy-animal', 'merchant']);
 	assert.equal(nextBeat(facts, [...done].reduce(withDone, afterIntro()))?.kind, undefined, 'nothing left that is ready');
 });
 
 test('targets follow the window state: the tab first, then the thing inside the window', () => {
-	const progress = ['click-gold', 'buy-tile'].reduce(withDone, afterIntro());
+	const progress = ['click-gold', 'buy-tile', 'farm-intro'].reduce(withDone, afterIntro());
 	const food = base({ tilesBought: 1, animalAffordable: true });
 	assert.equal(nextBeat(food, progress)?.target, 'tab-farm');
 	assert.equal(nextBeat({ ...food, open: ['farm'] }, progress)?.target, 'farm-animal');
@@ -102,18 +105,18 @@ test('milestone lessons: income, gear, rebirth and auto-battle', () => {
 
 test('every resource lesson exists for the eight new resources', () => {
 	const ids = TUTORIAL_LESSONS.map((l) => l.id);
-	for (const key of ['wood', 'stone', 'coal', 'food', 'hide', 'meat', 'eggs', 'milk']) assert.ok(ids.includes(`res-${key}`), key);
+	for (const key of ['wood', 'stone', 'coal', 'food', 'hide', 'meat', 'eggs', 'milk', 'wool']) assert.ok(ids.includes(`res-${key}`), key);
 	assert.equal(new Set([INTRO_ID, ...TUTORIAL_PATH.map((s) => s.id), ...ids]).size, 1 + TUTORIAL_PATH.length + ids.length, 'ids are unique');
 });
 
-test("the path is the owner's eight steps, in order, with the three bundles", () => {
+test("the path is the owner's nine steps, in order, with the four bundles", () => {
 	assert.deepEqual(
 		TUTORIAL_PATH.map((s) => s.id),
-		['click-gold', 'buy-tile', 'buy-animal', 'castle-upgrade', 'open-chest', 'first-fight', 'merchant', 'stat-point'],
+		['click-gold', 'buy-tile', 'farm-intro', 'buy-animal', 'castle-upgrade', 'open-chest', 'first-fight', 'merchant', 'stat-point'],
 	);
 	assert.deepEqual(
 		TUTORIAL_PATH.filter((s) => s.reward).map((s) => s.id),
-		['buy-tile', 'castle-upgrade', 'stat-point'],
+		['buy-tile', 'farm-intro', 'castle-upgrade', 'stat-point'],
 	);
 });
 
@@ -126,7 +129,7 @@ test('texts quote the live config and stay short', () => {
 		assert.ok(!/undefined|NaN|\[object/.test(text), text);
 		assert.ok(!/!{2}|haha|lol/i.test(text), 'no jokes');
 	}
-	assert.ok(TUTORIAL_PATH[3].text(n).includes(n.castleGold));
+	assert.ok(TUTORIAL_PATH[4].text(n).includes(n.castleGold));
 	assert.equal(spoken(1800), '30 minutes');
 	assert.equal(spoken(7200), '2 hours');
 	assert.equal(spoken(3600), '1 hour');
@@ -303,4 +306,10 @@ test('the mouth opens and closes while typing, rests on spaces and stops shut wh
 	assert.equal(mouthOpen(text, 12), false, 'the full stop');
 	assert.equal(mouthOpen(text, glyphs(text).length), false, 'complete');
 	assert.equal(mouthOpen(text, glyphs(text).length + 5), false);
+});
+
+test('the farm bundle is exactly the price of the first chicken', async () => {
+	const { ANIMALS } = await import('../../src/config/farm');
+	const { STARTER_REWARDS } = await import('../../src/catalog/tutorial');
+	assert.equal(STARTER_REWARDS.farm.food, ANIMALS[0].baseCost);
 });

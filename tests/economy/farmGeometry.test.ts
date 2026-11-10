@@ -46,3 +46,39 @@ test('roomySpot picks the spot farthest from the others', () => {
 	assert.ok(room(spot) > typical / 20, 'roomier than an average random spot');
 	assert.ok(PERSONAL_SPACE > 0);
 });
+
+test('the pen zoom is a whole number that grows with the window, 4 only when both sides are big', async () => {
+	const { penZoom } = await import('../../src/components/game/overlays/farmGeometry');
+	assert.equal(penZoom(1120, 760), 3);
+	assert.equal(penZoom(1800, 900), 3, 'wide but short: the pen would be cropped to a strip');
+	assert.equal(penZoom(1800, 1000), 4);
+	assert.equal(penZoom(600, 800), 2);
+	assert.equal(penZoom(400, 800), 1);
+});
+
+test('the farm parts: every prop uses a rendered part, the fence is closed but for the gate, and a bigger window only adds apron props', async () => {
+	const { penProps, apronProps, apronReach, propPlace } = await import('../../src/components/game/overlays/farmLayout');
+	const { existsSync } = await import('node:fs');
+	const pen = penProps();
+	const apron = apronProps(40);
+	for (const prop of [...pen, ...apron]) {
+		assert.ok(existsSync(`public/pixel/farm/${prop.part}.png`), `${prop.key}: ${prop.part}.png`);
+		const place = propPlace(prop);
+		assert.ok(place.w > 0 && place.h > 0, prop.key);
+	}
+	assert.equal(new Set(pen.map((p) => p.key)).size, pen.length, 'unique keys in the pen');
+	assert.ok(pen.some((p) => p.part === 'gate'));
+	// no fence part stands inside the gate opening of the near-right fence
+	assert.equal(pen.filter((p) => p.key.startsWith('fence-x-18-') && p.part !== 'fence_post' && p.x > -4.2 && p.x < -2).length, 0, 'the gate is open');
+	const bigger = new Set(apronProps(80).map((p) => p.key));
+	assert.ok(
+		apron.every((p) => bigger.has(p.key)),
+		'a larger reach keeps every prop of a smaller one',
+	);
+	assert.ok(bigger.size > apron.length);
+	assert.ok(
+		apron.every((p) => Math.max(Math.abs(p.x), Math.abs(p.y)) > 18),
+		'nothing in the apron stands inside the fence',
+	);
+	assert.ok(apronReach(3840, 2160, 4) > apronReach(1120, 760, 3), 'a bigger window reaches further');
+});

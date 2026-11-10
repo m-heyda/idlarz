@@ -25,7 +25,7 @@ export interface ResourceDef {
 	stored?: true;
 	/** Added after the first saves: a save without it is still valid and reads 0 (every new resource starts this way) */
 	optionalInSave?: true;
-	/** Comes from the farm (meat, eggs, milk, hide) */
+	/** Comes from the farm (meat, eggs, milk, hide, wool) */
 	farm?: true;
 	/** Header group; left out for things the header never lists (xp) */
 	tier?: ResourceTier;
@@ -146,9 +146,9 @@ export const RESOURCES = {
 		tier: 't1',
 		emoji: '🟫',
 		label: 'Hide',
-		description: 'A farm product from deer and pigs.',
+		description: 'A farm product from pigs.',
 		usedFor: 'Tannery upgrades and the price of big territories; sell the rest to the merchant.',
-		source: 'Deer and pigs on the farm, and the monsters you beat. Cannot be bought.',
+		source: 'Pigs on the farm, and the monsters you beat. Cannot be bought.',
 		color: '#c89868',
 		merchant: { price: 2, description: 'Tanned leather from the farm.', pitch: 'Craftsmen always need good leather.' },
 	},
@@ -258,6 +258,19 @@ export const RESOURCES = {
 		usedFor: 'Crafting (leather armor) and, later, building upgrades.',
 		source: 'The Salt Works on a coast tile. Cannot be bought or sold.',
 		color: '#f4f0e4',
+	},
+	wool: {
+		stored: true,
+		optionalInSave: true,
+		farm: true,
+		tier: 't1',
+		emoji: '🧶',
+		label: 'Wool',
+		description: 'A farm product sheared from sheep: the cloth material of the future cloth armour.',
+		usedFor: 'Shearing Shed upgrades; sell the rest to the merchant.',
+		source: 'Sheep on the farm. Cannot be bought.',
+		color: '#e8dcc0',
+		merchant: { price: 2, description: 'Soft, clean fleece from the pasture.', pitch: 'Weavers pay well for good wool.' },
 	},
 } as const satisfies Record<string, ResourceDef>;
 

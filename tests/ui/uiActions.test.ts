@@ -5,6 +5,7 @@ import { emptyBag } from '../../src/lib/inventory';
 import { calculateResourceBreakdown, calculateResourceRates } from '../../src/utils/game/income';
 import { useUiStore } from '../../src/stores/uiStore';
 import { BUILDINGS_ENTRY_ID, tileMenuItems } from '../../src/lib/tileMenuItems';
+import { buildOptions } from '../../src/lib/buildingMenu';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { BUILDINGS_FLAG } from '../../src/config/buildings';
 import { PREF_DEFAULTS, readPref, writePref } from '../../src/lib/uiPrefs';
@@ -208,27 +209,35 @@ test('with the building system on the placeholder gives way to the real build me
 	const here = items.find((i) => i.id === 'building-here');
 	assert.ok(here, 'a single "Build here..." entry');
 	assert.equal(here.label, 'Build here...');
-	const kids = here.children!;
+	assert.equal(here.children, undefined, 'it opens the Build window, not a submenu');
+	const { builds } = buildOptions(useGameStore as never, at.x, at.y);
 	assert.deepEqual(
-		kids.map((k) => k.id),
-		['building-build-lumberyard', 'building-build-saptapper'],
+		builds.map((o) => o.def.id),
+		['lumberyard', 'saptapper'],
 		'the Producer and the Extractor of a forest',
 	);
-	assert.match(kids[0].label, /^Lumberyard \(Producer\)/);
-	assert.match(kids[1].label, /^Sap Tapper \(Extractor\)/);
-	// what already stands is greyed out, and can be moved here instead
+	assert.deepEqual(
+		builds.map((o) => o.def.kind),
+		['producer', 'extractor'],
+	);
+	here.onSelect();
+	assert.deepEqual(useUiStore.getState().buildModal, { x: at.x, y: at.y }, 'selecting it opens the window for this tile');
+	useUiStore.getState().closeBuildModal();
+	// what already stands is no longer offered as a build, and can be moved here instead
 	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, at.x, at.y, { building: 'lumberyard', buildingLevel: 1 }) }));
 	const other = gridCells().find(({ t, x, y }) => t.isOwned && t.biome !== 'castle' && !(x === at.x && y === at.y))!;
 	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, other.x, other.y, { biome: 'forest', hasChest: false }) }));
-	const second = tileMenuItems({ ...ctx, x: other.x, y: other.y }).find((i) => i.id === 'building-here')!.children!;
-	const built = second.find((k) => k.id === 'building-build-lumberyard')!;
-	assert.equal(built.disabled, true);
-	assert.equal(built.hint, 'Built');
-	assert.ok(
-		second.some((k) => k.id === 'building-move-lumberyard'),
-		'a Move entry for it',
+	const second = buildOptions(useGameStore as never, other.x, other.y);
+	assert.deepEqual(
+		second.builds.map((o) => o.def.id),
+		['saptapper'],
+		'the Extractor is not built yet',
 	);
-	assert.equal(second.find((k) => k.id === 'building-build-saptapper')!.hint === 'Built', false, 'the Extractor is not built yet');
+	assert.deepEqual(
+		second.moves.map((o) => o.def.id),
+		['lumberyard'],
+		'a Move option for the one that stands',
+	);
 	assert.ok(items.some((i) => i.id === 'highlight'));
 	assert.equal(
 		tileMenuItems({ ...ctx, x: CASTLE_X, y: CASTLE_Y, biome: 'castle' }).some((i) => i.id.startsWith('building')),

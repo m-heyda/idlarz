@@ -37,7 +37,7 @@ interface TutorialStoreState {
 
 const pending = new Set<string>();
 
-/** Puts what a bundle paid into the game: gold and wood now (the server has counted them as granted), items arrive with the inventory in the answer. */
+/** Puts what a bundle paid into the game: gold, wood and food now (the server has counted them as granted), items arrive with the inventory in the answer. */
 const receivePaid = (reply: TutorialReply) => {
 	if (reply.inv) useGameStore.getState().applyServerInventory(reply.inv);
 	const paid = reply.paid;
@@ -46,10 +46,12 @@ const receivePaid = (reply: TutorialReply) => {
 	const resources = { ...state.resources };
 	if (paid.gold) resources.gold = Math.min(resources.gold + paid.gold, RESOURCE_CAP);
 	if (paid.wood) resources.wood = Math.min(resources.wood + paid.wood, RESOURCE_CAP);
+	if (paid.food) resources.food = Math.min(resources.food + paid.food, RESOURCE_CAP);
 	useGameStore.setState({ resources });
 	const parts = [
 		paid.gold ? `${paid.gold} gold` : '',
 		paid.wood ? `${paid.wood} wood` : '',
+		paid.food ? `${paid.food} food` : '',
 		...(paid.items ?? []).map((i) => `${i.qty} ${i.id === 'potion_minor' ? 'minor potions' : i.id}`),
 	].filter(Boolean);
 	useUiStore.getState().showToast(`${GUIDE_NAME} gives you ${parts.join(', ')}.`);

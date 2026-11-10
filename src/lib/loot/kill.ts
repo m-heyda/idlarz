@@ -8,7 +8,7 @@ import { generateLoot } from './generate';
 export interface KillContext {
 	goldPerSec: number;
 	xpPerSec: number;
-	/** Hide per second of the farm; a kill pays a share of it (0 without deer and pigs) */
+	/** Hide per second of the farm; a kill pays a share of it (0 without pigs) */
 	hidePerSec?: number;
 	luck: number;
 	/** Gold Find of the gear, in %: extra kill gold */

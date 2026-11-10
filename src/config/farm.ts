@@ -25,13 +25,13 @@ export const ANIMALS: Animal[] = [
 		product: { resource: 'eggs', perSec: 0.03 },
 	},
 	{
-		id: 'deer',
-		name: 'Deer',
-		description: 'A wild animal that produces more meat than a chicken.',
+		id: 'sheep',
+		name: 'Sheep',
+		description: 'A woolly grazer that produces more meat than a chicken.',
 		baseCost: 10000,
 		costScaling: 1.33,
 		baseProduction: 0.5,
-		product: { resource: 'hide', perSec: 0.075 },
+		product: { resource: 'wool', perSec: 0.075 },
 	},
 	{
 		id: 'pig',
@@ -54,12 +54,12 @@ export const ANIMALS: Animal[] = [
 ];
 
 /**
- * The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, worth about a third of the meat
+ * The farm: every animal yields meat plus a small trickle of a product (eggs, milk, hide, wool, worth about a third of the meat
  * once sold). Products were 50 % slower (and their upgrade bonuses 33 % smaller) until the second-tier resources felt too
  * slow to earn; the merchant prices were lowered by the same factor, so a product still sells for the same share of its
  * animal's meat and gold income is unchanged: the products themselves, and what they unlock, come faster.
  * Upgrades raise the output and the per-kind animal cap. Cost of level N+1 = base x growth^N, per resource.
- * Prices: the first animal of each kind is a milestone (chicken ~30 min, deer / pig / cow over the first days) and the costs
+ * Prices: the first animal of each kind is a milestone (chicken ~30 min, sheep / pig / cow over the first days) and the costs
  * then climb gently enough that a full pen (12 of a kind, 44 with every Pen Expansion) is a goal for weeks, not a wall.
  */
 export const FARM = {
@@ -111,11 +111,19 @@ export const FARM_UPGRADES = {
 		cost: { coal: 1200, hide: 20 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
+	shearing: {
+		label: 'Shearing Shed',
+		description: (n: number) => `+${Math.round(n * 25)}% wool`,
+		maxLevel: 10,
+		effectPerLevel: 0.25, // wool: the cloth material of the future cloth armour
+		cost: { food: 1500, wool: 30 } as Partial<Record<keyof Resources, number>>,
+		costGrowth: 1.6,
+	},
 	pasture: {
 		label: 'Pasture',
-		description: (n: number) => `+${Math.round(n * 8)}% eggs, milk and hide`,
+		description: (n: number) => `+${Math.round(n * 8)}% eggs, milk, hide and wool`,
 		maxLevel: 10,
-		effectPerLevel: 0.08, // eggs, milk and hide together, on top of Hen House / Dairy / Tannery
+		effectPerLevel: 0.08, // eggs, milk, hide and wool together, on top of Hen House / Dairy / Tannery / Shearing Shed
 		cost: { food: 5000, wood: 2500 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.6,
 	},
