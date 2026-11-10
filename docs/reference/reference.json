@@ -988,7 +988,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/trustedEconomy.ts",
-  "line": 37,
+  "line": 44,
   "summary": "`ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). With a baseline the rates and the castle are the previous save's; without one (the account's first save, or the first of a new run) there is nothing trusted to fall back on, so the claimed rates are cut by the same ratio: the economy is worth what the play time can explain.",
   "see": []
  },
@@ -1261,6 +1261,17 @@
   "file": "src/lib/distance.ts",
   "line": 13,
   "summary": "The band a castle distance falls in. Anything below the first band (the castle tile itself) or NaN is the first band.",
+  "see": []
+ },
+ {
+  "id": "baseline-epoch",
+  "name": "BASELINE_EPOCH",
+  "symbol": "BASELINE_EPOCH",
+  "kind": "const",
+  "category": "Saves & Server/Browser state",
+  "file": "src/lib/epochGuard.ts",
+  "line": 26,
+  "summary": "The browser's half of the data epoch. A server reset (the New chapter release flips the server's `GAME_EPOCH`, IDL-76) leaves this browser holding state that belongs to the old game: the cloud link (a revision the account no longer has: 409 loops, or `no_save` 404s), upload attempts, the combat log cursor, a pending offline claim, the manual save cooldown, the conflict counters, the tab's \"entered\" flag and the local save itself.",
   "see": []
  },
  {
@@ -2336,6 +2347,26 @@
   "file": "src/utils/world.ts",
   "line": 32,
   "summary": "The map has no edge. `GameState.tiles` is a `World`: an immutable, sparse set of the **explored** tiles on an integer grid with negative coordinates, stored as `ReadonlyMap<number, Tile>` under a small-integer key (`tileKey(x, y)`, `|x|, |y| <= COORD_LIMIT = 16,000`, at most `MAX_OWNED_TILES = 250,000` tiles). Unexplored land is simply absent (`getTile` gives `undefined`, `tileAt` an empty tile). Updates are copy-on-write (`setTile`, `patchTile`, batched `setTiles`), so `state.tiles` changes exactly when the map does; the owned / building / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).",
+  "see": []
+ },
+ {
+  "id": "asset-library",
+  "name": "Asset library",
+  "kind": "topic",
+  "category": "Architecture/Art",
+  "file": "scripts/assets/manifest.ts",
+  "line": 1,
+  "summary": "The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor, accessories, monsters, buildings, resources, map-details, ui, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose. Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/` get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them. `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook (`npm run storybook`) and `tests/docs/assets.test.ts` keeps current. Never edit `docs/assets/` by hand.",
+  "see": []
+ },
+ {
+  "id": "sound-library",
+  "name": "Sound library",
+  "kind": "topic",
+  "category": "Architecture/Art",
+  "file": "scripts/assets/sounds.ts",
+  "line": 1,
+  "summary": "The sound library: every audio file under `public/` (the game's own mp3s and the CC0 Kenney packs in `public/sfx/`) under one stable name, with its duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them. Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`. The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.",
   "see": []
  },
  {

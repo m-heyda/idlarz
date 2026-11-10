@@ -16,11 +16,13 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `applyUse` | Combat / Consumables | [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts) | Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now). |
 | `armorOf` | Combat / Player numbers | [`src/lib/combat.ts:176`](../../src/lib/combat.ts) | Armor against monster hits: |
 | `armorReduction` | Combat / Player numbers | [`src/lib/combat.ts:207`](../../src/lib/combat.ts) | The share (0-0.75) of a hit that `armor` takes away: |
+| Asset library | Architecture / Art | [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts) | The asset library: |
 | `attacksPerSecond` | Combat / Player numbers | [`src/lib/combat.ts:120`](../../src/lib/combat.ts) | Attacks per second: |
 | `autoBattleUnlocked` | Combat / A fight | [`src/lib/combat.ts:45`](../../src/lib/combat.ts) | Auto-battle (the server picking the next monster) is a reward for the first rebirth; |
 | `autoUse` | Combat / Potions and skills | [`src/lib/offline/fightSteps.ts:67`](../../src/lib/offline/fightSteps.ts) | Auto-use's rules for one tick: |
 | `bandOf` | Monsters / Spawning | [`src/lib/distance.ts:13`](../../src/lib/distance.ts) | The band a castle distance falls in. |
 | `BASE_GENERATION_RATES` | Economy / Income | [`src/config/economy.ts:158`](../../src/config/economy.ts) | Income of the realm itself, per second, before any tile: |
+| `BASELINE_EPOCH` | Saves & Server / Browser state | [`src/lib/epochGuard.ts:26`](../../src/lib/epochGuard.ts) | The browser's half of the data epoch. |
 | Basics: tick, caps, start | Economy / Basics | [`src/config/economy.ts:22`](../../src/config/economy.ts) | Game constants the economy runs on: |
 | `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
 | `BIOME_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:124`](../../src/catalog/lootConfig.ts) | The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: |
@@ -189,6 +191,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
 | `SKILLS` | Combat / Potions and skills | [`src/catalog/skills.ts:34`](../../src/catalog/skills.ts) | Potions and skills. |
+| Sound library | Architecture / Art | [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts) | The sound library: |
 | `spawnLevelRange` | Monsters / Level scaling | [`src/lib/monsters.ts:39`](../../src/lib/monsters.ts) | The levels a new monster of this type can appear at in a world of this castle level (both ends included). |
 | `STARTING_GEMS` | Progression / Gems | [`src/config/economy.ts:219`](../../src/config/economy.ts) | Gems every player starts with (also granted to saves from before Gems existed). |
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:157`](../../src/lib/combat.ts) | One swing: |
@@ -205,7 +208,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
 | `totalStatPoints` | Progression / Levels | [`src/utils/game/character.ts:151`](../../src/utils/game/character.ts) | The attribute points a character that has reached `level` has earned in all (a level gives 1; |
 | `TRADE_GOODS` | Economy / Crafting | [`src/catalog/recipes.ts:36`](../../src/catalog/recipes.ts) | The trade goods crafting makes (IDL-227): |
-| `trustedEconomy` | Saves & Server / Accepting a save | [`src/lib/cloudSave/trustedEconomy.ts:37`](../../src/lib/cloudSave/trustedEconomy.ts) | `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). |
+| `trustedEconomy` | Saves & Server / Accepting a save | [`src/lib/cloudSave/trustedEconomy.ts:44`](../../src/lib/cloudSave/trustedEconomy.ts) | `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). |
 | `typeWeights` | Monsters / Spawning | [`src/lib/offline/spawnWeights.ts:49`](../../src/lib/offline/spawnWeights.ts) | Weight of each type for this player and castle level, in the order given. |
 | `UNCLAIMED_SEC` | Combat / Results and rest | [`src/lib/offline/grant.ts:46`](../../src/lib/offline/grant.ts) | The longest gap the server treats as the same session: |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |

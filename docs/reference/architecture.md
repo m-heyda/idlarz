@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [Asset library](#asset-library), [Sound library](#sound-library)
 
 ## The loop
 
@@ -126,3 +126,27 @@ The panel offers biome painting, extending land, erasing, chests and monsters (b
 - `lib/dragPaint.ts` (pure): hold-and-drag drawing. `createStroke(apply)` turns pointer moves into the new cells of one stroke (line interpolation, brush, no repeats, capped).
 - `lib/mapEdit.ts` (pure): `applyStroke(world, cells, tool)` plus the tools (`paintTool`, `extendTool`, `eraseTool`, `chestTool`, `extendRing`). A new tool is one more `(world, cell) => Tile | undefined | 'skip'` function.
 - The lab's random chests use a plain picker on purpose: the game's weighted chest placement stays server-side (`tests/server/serverBoundary.test.ts`).
+
+<a id="asset-library"></a>
+
+### Asset library
+
+Source: [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts)
+
+The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
+accessories, monsters, buildings, resources, map-details, ui, unsorted). Biomes, roads, terrain atlases and ground textures are left out on purpose.
+Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/`
+get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
+`npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
+(`npm run storybook`) and `tests/docs/assets.test.ts` keeps current. Never edit `docs/assets/` by hand.
+
+<a id="sound-library"></a>
+
+### Sound library
+
+Source: [`scripts/assets/sounds.ts:1`](../../scripts/assets/sounds.ts)
+
+The sound library: every audio file under `public/` (the game's own mp3s and the CC0 Kenney packs in `public/sfx/`) under one stable name, with its
+duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
+Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
+The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.
