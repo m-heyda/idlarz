@@ -10782,30 +10782,60 @@
 		"usedBy": [
 			"animal:chicken"
 		],
-		"name": "animal_chicken",
+		"name": "animal_chicken_1",
 		"category": "resources",
 		"subcategory": "animal",
-		"src": "/pixel/icons/animal_chicken.png",
+		"src": "/pixel/icons/animal_chicken_1.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			96,
+			96
+		]
+	},
+	{
+		"usedBy": [
+			"animal:chicken"
+		],
+		"name": "animal_chicken_2",
+		"category": "resources",
+		"subcategory": "animal",
+		"src": "/pixel/icons/animal_chicken_2.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			96,
+			96
 		]
 	},
 	{
 		"usedBy": [
 			"animal:cow"
 		],
-		"name": "animal_cow",
+		"name": "animal_cow_1",
 		"category": "resources",
 		"subcategory": "animal",
-		"src": "/pixel/icons/animal_cow.png",
+		"src": "/pixel/icons/animal_cow_1.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			96,
+			96
+		]
+	},
+	{
+		"usedBy": [
+			"animal:cow"
+		],
+		"name": "animal_cow_2",
+		"category": "resources",
+		"subcategory": "animal",
+		"src": "/pixel/icons/animal_cow_2.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			96,
+			96
 		]
 	},
 	{
@@ -10824,6 +10854,19 @@
 		]
 	},
 	{
+		"usedBy": [],
+		"name": "animal_duck",
+		"category": "resources",
+		"subcategory": "animal",
+		"src": "/pixel/icons/animal_duck.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			96,
+			96
+		]
+	},
+	{
 		"usedBy": [
 			"animal:pig"
 		],
@@ -10834,8 +10877,34 @@
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
-			40,
-			40
+			96,
+			96
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "animal_rooster",
+		"category": "resources",
+		"subcategory": "animal",
+		"src": "/pixel/icons/animal_rooster.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			96,
+			96
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "animal_sheep",
+		"category": "resources",
+		"subcategory": "animal",
+		"src": "/pixel/icons/animal_sheep.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			96,
+			96
 		]
 	},
 	{

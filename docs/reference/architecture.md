@@ -9,7 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
-- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [Sound library](#sound-library)
+- Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [Sound library](#sound-library), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
 - Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
 ## The loop
@@ -172,6 +172,30 @@ The sound library: every audio file under `public/` (the game's own mp3s and the
 duration and what it is used for. `npm run assets:catalog` renders it to `docs/assets/sounds.json` and `sounds.md`; Storybook's Sounds page plays them.
 Names are `<pack>_<file>` (`uiaudio_click1`, `interface_confirmation_001`, `game_click`); rename one in `scripts/assets/names.json` by its `src`.
 The game plays only the four `game_*` files (src/utils/audioManager.ts). Three Kenney Interface Sounds were picked for later (kept in `public/sfx/`, the rest of the pack was deleted); what each is for is in `scripts/assets/sound-notes.json`, and they stay `reuse` until wired.
+
+<a id="animal-pixel-icons"></a>
+
+### `ANIMAL_PIXEL_ICONS` <small>const</small>
+
+Source: [`src/config/pixelIcons.ts:251`](../../src/config/pixelIcons.ts)
+
+Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is [`animalIcon`](architecture.md#animalicon).
+
+<a id="animalicon"></a>
+
+### `animalIcon` <small>function</small>
+
+Source: [`src/config/pixelIcons.ts:266`](../../src/config/pixelIcons.ts)
+
+The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`),
+so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial).
+Pure: no random numbers.
+
+**Formula**
+
+```text
+look = ANIMAL_PIXEL_ICONS[kind][hash(seed) mod number of looks], hash(s) = fold h = h*31 + charCode, from h = 7
+```
 
 ## Routes
 

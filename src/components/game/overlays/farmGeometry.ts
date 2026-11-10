@@ -104,7 +104,7 @@ export interface Insets {
 const HUD = { open: { w: 285, h: 235 }, closed: { w: 285, h: 48 } };
 // the upgrade drawer's tab along the bottom edge (CSS px, with its margin); the open drawer overlays the scene and reserves nothing
 const UPGRADE_TAB_H = 36;
-const SPRITE = { halfW: 20, above: 33, below: 6 }; // an animal's extent round its feet, native px
+const SPRITE = { halfW: 24, above: 42, below: 6 }; // an animal's extent round its feet, native px
 
 /** The walkable window for a stage of this size at this zoom, with the panels subtracted. */
 export const walkView = (stageW: number, stageH: number, zoom: number, insets: Insets): WalkView => {
@@ -168,4 +168,11 @@ export const ANIMAL_MOTION: Record<string, { speed: number }> = {
 	deer: { speed: 1.6 },
 };
 
-export const ANCHOR = { x: 20, y: 33 };
+/**
+ * Where an animal's feet are in its 48 x 48 box (native px). The Sprite Fusion art is 96 x 96 and is drawn at half size, an exact 2:1 step;
+ * the 40 x 40 deer fills the same box 1:1 and sits 4 px right and 9 px down so its feet land on the same spot.
+ */
+export const ANCHOR = { x: 24, y: 42 };
+
+/** How an animal icon sits in the 48 x 48 box: its scale (96 px art: half) and its offset (native px) */
+export const spriteFit = (iconWidth: number) => (iconWidth >= 96 ? { scale: 0.5, dx: 0, dy: 0 } : { scale: 1, dx: 4, dy: 9 });
