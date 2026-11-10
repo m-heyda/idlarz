@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, setResources, owned, store, tileAt, gridCells, rawSnapshot, landAt, setLandAt } from '../helpers';
 import { pickPersisted, sanitizeSave } from '../../src/lib/sanitizeSave';
-import { decodeSave, encodeSave } from '../../src/lib/saveFormat';
+import { decodeSave, encodeSave, packBody, unpackBody } from '../../src/lib/saveFormat';
+import { summarize } from '../../src/lib/cloudSave/summary';
+import { checkNetWorth, minimumSpend } from '../../src/lib/cloudSave/netWorth';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { RESOURCE_CAP } from '../../src/config/economy';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
@@ -77,7 +79,7 @@ test('tampered saves are rejected', () => {
 	rejects((r) => (landAt(r, CASTLE_X, CASTLE_Y).level = 0), 'castle level 0');
 	rejects((r) => setLandAt(r, 0, 0, { biome: 'forest' }), 'territory not connected to the castle');
 	rejects((r) => setLandAt(r, 1, 0, { biome: 'castle', level: 1 }), 'second castle');
-	rejects((r) => setLandAt(r, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', building: 'market', level: 2 }), 'building on a forest');
+	rejects((r) => setLandAt(r, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', level: 2 }), 'a level on a tile that is not the castle');
 	rejects((r) => (landAt(r, CASTLE_X + 1, CASTLE_Y).chest = 'yes'), 'bad chest flag');
 	rejects((r) => (r.farmLevels = { dragon: 3 }), 'unknown animal');
 	rejects((r) => (r.farmLevels = { chicken: -4 }), 'negative animals');
@@ -147,7 +149,7 @@ test('export -> decode accepts a real save and rejects edited / foreign ones', (
 // ---- combat / inventory state ------------------------------------------------------------------------------------
 const NEW_KEYS = ['equipment', 'bag', 'playerHp', 'playerMp', 'monsters', 'monsterSpawnTimer', 'nextMonsterId', 'lootPity', 'autoSellUpTo'];
 
-/** The n-th owned tile that is not the castle or a lake (the land is rolled, and a monster or a building cannot be on water). */
+/** The n-th owned tile that is not the castle or a lake (the land is rolled, and a monster cannot be on water). */
 const spot = (n = 0) => {
 	const found = gridCells()
 		.filter(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')
@@ -275,40 +277,67 @@ test('forged inventories and HP are rejected', () => {
 	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'constructor' }), 'prototype name as a rarity');
 });
 
-test('a played game that started with the free ring passes validation (tiles, buildings, chests)', () => {
+test('a played game that started with the free ring passes validation (tiles, chests)', () => {
 	api().resetGame(); // keep the starting tiles
 	growTo(30);
 	store.setState((s) => {
 		const spot = gridCells(s.tiles).find(({ t }) => t.isOwned && t.biome !== 'castle')!;
-		return { tiles: setTile(s.tiles, spot.x, spot.y, { biome: 'forest', isOwned: true, building: 'tavern' }) };
+		return { tiles: setTile(s.tiles, spot.x, spot.y, { biome: 'forest', isOwned: true }) };
 	});
 	api().tick(60_000);
 	const result = sanitizeSave(snapshot());
 	assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
-test('buildings on any land biome save and load; water, nonsense and stray levels are rejected; the removed Grounds biome is refused', () => {
+test('an old save with buildings loads with every building stripped (IDL-259), whatever the tile', () => {
 	api().resetGame();
 	growTo(12);
+	const spots = gridCells().filter(({ t }) => t.isOwned && t.biome !== 'castle');
+	const raw = snapshot();
+	// the old rules allowed a building on any biome but water, and on lakes the old validator refused: all of them load now
+	const sample = ['tavern', 'quarry', 'market', 'nonsense'];
+	spots.slice(0, sample.length).forEach(({ x, y, t }, i) => setLandAt(raw, x, y, { biome: t.biome, building: sample[i] }));
+	const result = sanitizeSave(raw);
+	assert.equal(result.ok, true, result.ok ? '' : result.reason);
+	if (!result.ok) return;
+	assert.equal(ownedCount(result.state.tiles), owned(), 'no tile is lost');
+	for (const { x, y, t } of spots) {
+		const tile = tileAt(result.state.tiles, x, y);
+		assert.equal(tile.building, undefined, `${x},${y} has no building`);
+		assert.equal(tile.biome, t.biome, 'the tile keeps its biome');
+	}
+	// a building on the castle was always refused by the old validator; it is simply dropped now
+	const onCastle = snapshot();
+	landAt(onCastle, CASTLE_X, CASTLE_Y).building = 'tavern';
+	assert.equal(sanitizeSave(onCastle).ok, true);
+	// the rest of the map rules are unchanged: the removed Grounds biome and a stray level are still refused
+	const grounds = snapshot();
+	setLandAt(grounds, spots[0].x, spots[0].y, { biome: 'grounds', building: 'tavern' });
+	assert.equal(sanitizeSave(grounds).ok, false, 'Grounds is no biome any more');
+	const level = snapshot();
+	setLandAt(level, spots[0].x, spots[0].y, { biome: spots[0].t.biome, building: 'tavern', level: 2 });
+	assert.equal(sanitizeSave(level).ok, false, 'a level on a tile that is not the castle');
+});
+
+test('an old save with buildings in the text format loads, and the server summary and net worth check still work', () => {
+	api().resetGame();
+	growTo(12);
+	const state = pickPersisted(api());
+	const body = packBody(state);
 	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle')!;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const place = (tile: Record<string, unknown>) => (raw: any) => {
-		setLandAt(raw, spot.x, spot.y, tile);
-	};
-	const load = (tile: Record<string, unknown>) => {
-		const raw = snapshot();
-		place(tile)(raw);
-		return sanitizeSave(raw);
-	};
-	assert.equal(load({ biome: 'forest', building: 'tavern' }).ok, true, 'a forest building');
-	assert.equal(load({ biome: 'hills', building: 'quarry' }).ok, true);
-	assert.equal(load({ biome: 'grounds', building: 'tavern' }).ok, false, 'Grounds is no biome any more');
-	assert.equal(load({ biome: 'grounds' }).ok, false, 'an old empty lot');
-	assert.equal(load({ biome: 'lake', building: 'tavern' }).ok, false, 'a building on water');
-	assert.equal(load({ biome: 'forest', building: 'nonsense' }).ok, false);
-	assert.equal(load({ biome: 'forest', building: 'tavern', level: 2 }).ok, false, 'a building never has a level');
-	assert.equal(load({ biome: 'forest', level: 2 }).ok, false, 'a level without a building');
-	rejects((raw) => {
-		landAt(raw, CASTLE_X, CASTLE_Y).building = 'tavern';
-	}, 'a building on the castle');
+	// the way an old client wrote it: the tile in `extra` carries a `building`
+	(body.extra as unknown[]).push([spot.x, spot.y, { building: 'tavern' }]);
+	const unpacked = unpackBody(body);
+	assert.ok('raw' in unpacked, 'error' in unpacked ? unpacked.error : '');
+	if (!('raw' in unpacked)) return;
+	const result = sanitizeSave(unpacked.raw);
+	assert.equal(result.ok, true, result.ok ? '' : result.reason);
+	if (!result.ok) return;
+	assert.equal(tileAt(result.state.tiles, spot.x, spot.y).building, undefined);
+	const summary = summarize(result.state);
+	assert.equal('buildingsOwned' in summary, false, 'the summary no longer counts buildings');
+	assert.ok(Number.isFinite(minimumSpend(result.state)) && minimumSpend(result.state) > 0);
+	// growTo hands out land for free, so the verdict itself is not the point: the check must run on a loaded old save
+	const check = checkNetWorth(result.state, summary);
+	assert.ok(Number.isFinite(check.required) && Number.isFinite(check.allowed));
 });

@@ -4,7 +4,6 @@ import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
 import { calculateResourceRates } from '@/utils/game/income';
-import { countBuildings } from '@/utils/game/costs';
 import { countOwnedTiles, economyTiles } from '@/utils/game/tiles';
 import { biomeCount, getTile, setTile } from '@/utils/world';
 import type { PersistedGame } from '@/lib/sanitizeSave';
@@ -25,7 +24,6 @@ export interface SaveSummary {
 	level: number;
 	clickLevel: number;
 	tilesOwned: number;
-	buildingsOwned: number;
 	castleLevel: number;
 	rebirths: number;
 	legacyPoints: number;
@@ -122,7 +120,6 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		level: state.level.level,
 		clickLevel: state.clickLevel,
 		tilesOwned: countOwnedTiles(state.tiles),
-		buildingsOwned: countBuildings(state.tiles),
 		castleLevel: castleLevelOf(state.tiles),
 		rebirths: state.prestige.rebirths,
 		legacyPoints: state.prestige.legacyPoints,

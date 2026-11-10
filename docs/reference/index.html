@@ -14,14 +14,14 @@ article{background:var(--card);border:1px solid var(--line);border-radius:8px;pa
 small{color:var(--muted);font-weight:400;font-size:12px}table{border-collapse:collapse;display:block;overflow:auto;margin:8px 0}th,td{border:1px solid var(--line);padding:3px 8px;text-align:left;vertical-align:top}th{background:var(--code)}
 .hidden{display:none}.blurb{color:var(--muted)}
 @media (max-width:800px){.layout{display:block}nav{position:static;width:auto;height:auto;max-height:260px}main{padding:8px 16px 60px}}
-</style></head><body><div class="layout"><nav><input id="q" type="search" placeholder="Search the reference" aria-label="Search"><a href="symbols.md">Symbol index</a><a href="known-issues.md">Known issues</a><a href="code-map.md">Code map</a><h3><a href="#cat-overview">Overview</a></h3><div class="sub">The game</div><a data-id="the-game-at-a-glance" href="#the-game-at-a-glance">The game at a glance</a><a data-id="conventions" href="#conventions">Conventions</a><h3><a href="#cat-economy">Economy</a></h3><div class="sub">Basics</div><a data-id="tick-rate" href="#tick-rate">Basics: tick, caps, start</a><a data-id="max-catchup-sec" href="#max-catchup-sec">MAX_CATCHUP_SEC</a><a data-id="resource-cap" href="#resource-cap">RESOURCE_CAP</a><a data-id="initial-resources" href="#initial-resources">INITIAL_RESOURCES</a><div class="sub">Income</div><a data-id="calculateresourcebreakdown" href="#calculateresourcebreakdown">calculateResourceBreakdown</a><a data-id="calculatetileoutput" href="#calculatetileoutput">calculateTileOutput</a><a data-id="biome-yield" href="#biome-yield">BIOME_YIELD</a><a data-id="base-generation-rates" href="#base-generation-rates">BASE_GENERATION_RATES</a><div class="sub">Tiles</div><a data-id="tileprice" href="#tileprice">tilePrice</a><a data-id="tile-resource-cost" href="#tile-resource-cost">TILE_RESOURCE_COST</a><a data-id="calculatetilecost" href="#calculatetilecost">calculateTileCost</a><a data-id="effectivetilediscount" href="#effectivetilediscount">effectiveTileDiscount</a><a data-id="calculatexpgain" href="#calculatexpgain">calculateXpGain</a><a data-id="economytiles" href="#economytiles">economyTiles</a><div class="sub">Biomes</div><a data-id="rollbiome" href="#rollbiome">rollBiome</a><a data-id="biomes" href="#biomes">BIOMES</a><a data-id="generatestartring" href="#generatestartring">generateStartRing</a><div class="sub">Buildings</div><a data-id="buildings" href="#buildings">BUILDINGS</a><a data-id="buildingcostfactor" href="#buildingcostfactor">buildingCostFactor</a><a data-id="calculatebuildingcost" href="#calculatebuildingcost">calculateBuildingCost</a><a data-id="building-cost" href="#building-cost">BUILDING_COST</a><div class="sub">Castle</div><a data-id="castle-upgrade" href="#castle-upgrade">CASTLE_UPGRADE</a><a data-id="castlemodifier" href="#castlemodifier">castleModifier</a><a data-id="castleupgradeduration" href="#castleupgradeduration">castleUpgradeDuration</a><a data-id="castle-range" href="#castle-range">CASTLE_RANGE</a><a data-id="castle-area-bonus" href="#castle-area-bonus">CASTLE_AREA_BONUS</a><a data-id="castle-fortress" href="#castle-fortress">CASTLE_FORTRESS</a><a data-id="castlerangeradius" href="#castlerangeradius">castleRangeRadius</a><a data-id="castleareabonus" href="#castleareabonus">castleAreaBonus</a><div class="sub">Farm</div><a data-id="animals" href="#animals">ANIMALS</a><a data-id="animaloutput" href="#animaloutput">animalOutput</a><a data-id="farm-upgrades" href="#farm-upgrades">FARM_UPGRADES</a><a data-id="calculateanimalcost" href="#calculateanimalcost">calculateAnimalCost</a><a data-id="farmupgradecost" href="#farmupgradecost">farmUpgradeCost</a><a data-id="calculatefarmoutput" href="#calculatefarmoutput">calculateFarmOutput</a><div class="sub">Merchant</div><a data-id="merchant-resource-prices" href="#merchant-resource-prices">MERCHANT_RESOURCE_PRICES</a><a data-id="merchant-goods" href="#merchant-goods">MERCHANT_GOODS</a><a data-id="merchant-upgrades" href="#merchant-upgrades">MERCHANT_UPGRADES</a><a data-id="sellpayout" href="#sellpayout">sellPayout</a><a data-id="buycost" href="#buycost">buyCost</a><a data-id="merchant-buy-multiplier" href="#merchant-buy-multiplier">MERCHANT_BUY_MULTIPLIER</a><a data-id="merchantupgradecost" href="#merchantupgradecost">merchantUpgradeCost</a><a data-id="generatemerchantstock" href="#generatemerchantstock">generateMerchantStock</a><a data-id="shoppriceof" href="#shoppriceof">shopPriceOf</a><a data-id="refreshcost" href="#refreshcost">refreshCost</a><a data-id="bestworngrade" href="#bestworngrade">bestWornGrade</a><div class="sub">Clicks</div><a data-id="click-ladder" href="#click-ladder">CLICK_LADDER</a><a data-id="click-limit" href="#click-limit">CLICK_LIMIT</a><a data-id="clickgold" href="#clickgold">clickGold</a><a data-id="createclicklimiter" href="#createclicklimiter">createClickLimiter</a><div class="sub">Chests and Luck</div><a data-id="chest" href="#chest">CHEST</a><a data-id="luck" href="#luck">LUCK</a><a data-id="chestintervalsec" href="#chestintervalsec">chestIntervalSec</a><a data-id="chestspots" href="#chestspots">chestSpots</a><a data-id="rewardweights" href="#rewardweights">rewardWeights</a><a data-id="rollchestloot" href="#rollchestloot">rollChestLoot</a><a data-id="gemchance" href="#gemchance">gemChance</a><a data-id="rarityluckmultiplier" href="#rarityluckmultiplier">rarityLuckMultiplier</a><a data-id="dropchancemultiplier" href="#dropchancemultiplier">dropChanceMultiplier</a><a data-id="goldenmonsterchance" href="#goldenmonsterchance">goldenMonsterChance</a><div class="sub">Crafting</div><a data-id="trade-goods" href="#trade-goods">TRADE_GOODS</a><a data-id="gear-recipes" href="#gear-recipes">GEAR_RECIPES</a><div class="sub">Perk caps</div><a data-id="perk-caps" href="#perk-caps">PERK_CAPS</a><a data-id="legendary-perk-tiers" href="#legendary-perk-tiers">LEGENDARY_PERK_TIERS</a><a data-id="weapon-legendary-damage-top" href="#weapon-legendary-damage-top">WEAPON_LEGENDARY_DAMAGE_TOP</a><a data-id="capperks" href="#capperks">capPerks</a><a data-id="aggregatestats" href="#aggregatestats">aggregateStats</a><h3><a href="#cat-combat">Combat</a></h3><div class="sub">Overview</div><a data-id="combat" href="#combat">Combat overview and tunables</a><div class="sub">Player numbers</div><a data-id="maxhp" href="#maxhp">maxHp</a><a data-id="armorreduction" href="#armorreduction">armorReduction</a><a data-id="weapon-attack-speed" href="#weapon-attack-speed">WEAPON_ATTACK_SPEED</a><a data-id="damageperhit" href="#damageperhit">damagePerHit</a><a data-id="attackspersecond" href="#attackspersecond">attacksPerSecond</a><a data-id="critodds" href="#critodds">critOdds</a><a data-id="swing" href="#swing">swing</a><a data-id="armorof" href="#armorof">armorOf</a><a data-id="dodgechance" href="#dodgechance">dodgeChance</a><a data-id="lifeleechpercent" href="#lifeleechpercent">lifeLeechPercent</a><a data-id="regen" href="#regen">regen</a><a data-id="mitigate" href="#mitigate">mitigate</a><div class="sub">A fight</div><a data-id="runcombat" href="#runcombat">runCombat</a><a data-id="picktarget" href="#picktarget">pickTarget</a><a data-id="queueticket" href="#queueticket">queueTicket</a><a data-id="autobattleunlocked" href="#autobattleunlocked">autoBattleUnlocked</a><a data-id="playerprofile" href="#playerprofile">playerProfile</a><a data-id="fightstep" href="#fightstep">fightStep</a><a data-id="endfight" href="#endfight">endFight</a><a data-id="engage" href="#engage">engage</a><a data-id="dismissticket" href="#dismissticket">dismissTicket</a><a data-id="projectfight" href="#projectfight">projectFight</a><a data-id="paykill" href="#paykill">payKill</a><a data-id="rngfor" href="#rngfor">rngFor</a><div class="sub">Win chance</div><a data-id="winbucketof" href="#winbucketof">winBucketOf</a><a data-id="estimatewin" href="#estimatewin">estimateWin</a><div class="sub">Potions and skills</div><a data-id="healamount" href="#healamount">healAmount</a><a data-id="autouse" href="#autouse">autoUse</a><a data-id="skills" href="#skills">SKILLS</a><div class="sub">Results and rest</div><a data-id="restthrough" href="#restthrough">restThrough</a><a data-id="unclaimed-sec" href="#unclaimed-sec">UNCLAIMED_SEC</a><div class="sub">Consumables</div><a data-id="buff-families" href="#buff-families">BUFF_FAMILIES</a><a data-id="max-active-buffs" href="#max-active-buffs">MAX_ACTIVE_BUFFS</a><a data-id="readbuffs" href="#readbuffs">readBuffs</a><a data-id="addbuff" href="#addbuff">addBuff</a><a data-id="bufftotals" href="#bufftotals">buffTotals</a><a data-id="drink" href="#drink">drink</a><a data-id="withbuffs" href="#withbuffs">withBuffs</a><a data-id="applyuse" href="#applyuse">applyUse</a><h3><a href="#cat-monsters">Monsters</a></h3><div class="sub">Roster</div><a data-id="monsters" href="#monsters">MONSTERS</a><div class="sub">Level scaling</div><a data-id="monsterstats" href="#monsterstats">monsterStats</a><a data-id="spawnlevelrange" href="#spawnlevelrange">spawnLevelRange</a><a data-id="rollspawnlevel" href="#rollspawnlevel">rollSpawnLevel</a><a data-id="levelatage" href="#levelatage">levelAtAge</a><a data-id="dangerbonus" href="#dangerbonus">dangerBonus</a><div class="sub">Spawning</div><a data-id="advancebank" href="#advancebank">advanceBank</a><a data-id="canspawnon" href="#canspawnon">canSpawnOn</a><a data-id="typeweights" href="#typeweights">typeWeights</a><a data-id="placetickets" href="#placetickets">placeTickets</a><a data-id="ticketcap" href="#ticketcap">ticketCap</a><a data-id="distance-bands" href="#distance-bands">DISTANCE_BANDS</a><a data-id="boss-min-distance" href="#boss-min-distance">BOSS_MIN_DISTANCE</a><a data-id="bandof" href="#bandof">bandOf</a><div class="sub">Rewards</div><a data-id="killincome" href="#killincome">killIncome</a><h3><a href="#cat-loot">Loot</a></h3><div class="sub">Pipeline</div><a data-id="generateloot" href="#generateloot">generateLoot</a><a data-id="validatelootdata" href="#validatelootdata">validateLootData</a><a data-id="resolvesourcelevel" href="#resolvesourcelevel">resolveSourceLevel</a><a data-id="rollitemlevel" href="#rollitemlevel">rollItemLevel</a><a data-id="receivedrops" href="#receivedrops">receiveDrops</a><a data-id="isautosold" href="#isautosold">isAutoSold</a><a data-id="eligiblecandidates" href="#eligiblecandidates">eligibleCandidates</a><a data-id="rollleaning" href="#rollleaning">rollLeaning</a><div class="sub">Config</div><a data-id="loot-sources" href="#loot-sources">LOOT_SOURCES</a><a data-id="loot-profiles" href="#loot-profiles">LOOT_PROFILES</a><a data-id="biome-loot" href="#biome-loot">BIOME_LOOT</a><div class="sub">Items</div><a data-id="rarities" href="#rarities">RARITIES</a><a data-id="levelscale" href="#levelscale">levelScale</a><a data-id="valuecurve" href="#valuecurve">valueCurve</a><a data-id="sellvalueof" href="#sellvalueof">sellValueOf</a><a data-id="live-grades" href="#live-grades">LIVE_GRADES</a><a data-id="gradelevels" href="#gradelevels">gradeLevels</a><a data-id="graderarities" href="#graderarities">gradeRarities</a><a data-id="gradelegacyitems" href="#gradelegacyitems">gradeLegacyItems</a><a data-id="kit" href="#kit">kit</a><div class="sub">Adding content</div><a data-id="loot-pools" href="#loot-pools">Adding loot content (data only)</a><a data-id="gear" href="#gear">gear</a><h3><a href="#cat-progression">Progression</a></h3><div class="sub">Levels</div><a data-id="leveling" href="#leveling">LEVELING</a><a data-id="xptonextlevel" href="#xptonextlevel">xpToNextLevel</a><a data-id="totalstatpoints" href="#totalstatpoints">totalStatPoints</a><a data-id="cumulativexp" href="#cumulativexp">cumulativeXp</a><a data-id="calculatelevel" href="#calculatelevel">calculateLevel</a><a data-id="reconcilecharacter" href="#reconcilecharacter">reconcileCharacter</a><div class="sub">Attributes</div><a data-id="character-stat-config" href="#character-stat-config">CHARACTER_STAT_CONFIG</a><a data-id="calculatestatresourcemodifiers" href="#calculatestatresourcemodifiers">calculateStatResourceModifiers</a><a data-id="calculatecombatstats" href="#calculatecombatstats">calculateCombatStats</a><div class="sub">Rebirth</div><a data-id="rebirth" href="#rebirth">REBIRTH</a><a data-id="embergain" href="#embergain">emberGain</a><a data-id="emberincomebonus" href="#emberincomebonus">emberIncomeBonus</a><a data-id="rebirthstatus" href="#rebirthstatus">rebirthStatus</a><div class="sub">Ember shop</div><a data-id="ember-upgrades" href="#ember-upgrades">EMBER_UPGRADES</a><a data-id="emberupgradecost" href="#emberupgradecost">emberUpgradeCost</a><div class="sub">Limits</div><a data-id="limits" href="#limits">LIMITS</a><a data-id="limitof" href="#limitof">limitOf</a><div class="sub">Gems</div><a data-id="starting-gems" href="#starting-gems">STARTING_GEMS</a><div class="sub">Crafting</div><a data-id="crafting" href="#crafting">CRAFTING</a><a data-id="craft-gear" href="#craft-gear">CRAFT_GEAR</a><a data-id="gearitemlevels" href="#gearitemlevels">gearItemLevels</a><a data-id="qualitybiasof" href="#qualitybiasof">qualityBiasOf</a><a data-id="pitymultiplier" href="#pitymultiplier">pityMultiplier</a><a data-id="rollgear" href="#rollgear">rollGear</a><a data-id="gearodds" href="#gearodds">gearOdds</a><h3><a href="#cat-saves-and-server">Saves & Server</a></h3><div class="sub">Threat model</div><a data-id="the-server-s-rule-and-the-threat-model" href="#the-server-s-rule-and-the-threat-model">The server's rule and the threat model</a><div class="sub">The save</div><a data-id="save-schema" href="#save-schema">SAVE_SCHEMA</a><a data-id="createsavestorage" href="#createsavestorage">createSaveStorage</a><a data-id="sanitizesave" href="#sanitizesave">sanitizeSave</a><a data-id="persisted-keys" href="#persisted-keys">PERSISTED_KEYS</a><a data-id="save-and-backup-dialog" href="#save-and-backup-dialog">Save and Backup dialog</a><div class="sub">Uploading</div><a data-id="sync" href="#sync">SYNC</a><a data-id="judgerebase" href="#judgerebase">judgeRebase</a><a data-id="manual-cloud-cooldown-ms" href="#manual-cloud-cooldown-ms">MANUAL_CLOUD_COOLDOWN_MS</a><a data-id="resolveconflict" href="#resolveconflict">resolveConflict</a><a data-id="withpushlock" href="#withpushlock">withPushLock</a><div class="sub">Accepting a save</div><a data-id="acceptsave" href="#acceptsave">acceptSave</a><a data-id="flag-policy" href="#flag-policy">FLAG_POLICY</a><a data-id="trustedeconomy" href="#trustedeconomy">trustedEconomy</a><a data-id="xp-model" href="#xp-model">XP_MODEL</a><a data-id="ember-model" href="#ember-model">EMBER_MODEL</a><a data-id="min-save-interval-ms" href="#min-save-interval-ms">MIN_SAVE_INTERVAL_MS</a><a data-id="verifytransition" href="#verifytransition">verifyTransition</a><a data-id="isnonproduction" href="#isnonproduction">isNonProduction</a><a data-id="poison-flags" href="#poison-flags">POISON_FLAGS</a><a data-id="losesprogress" href="#losesprogress">losesProgress</a><a data-id="enforcement" href="#enforcement">ENFORCEMENT</a><div class="sub">The ledger</div><a data-id="ledger" href="#ledger">Ledger</a><a data-id="sealedrng" href="#sealedrng">sealedRng</a><div class="sub">Endpoints</div><a data-id="endpoints-the-api-routes" href="#endpoints-the-api-routes">Endpoints (the API routes)</a><div class="sub">Away time</div><a data-id="computeofflinegrant" href="#computeofflinegrant">computeOfflineGrant</a><a data-id="ensureseasonreset" href="#ensureseasonreset">ensureSeasonReset</a><div class="sub">Epoch</div><a data-id="baseline-epoch" href="#baseline-epoch">BASELINE_EPOCH</a><a data-id="startnewchapter" href="#startnewchapter">startNewChapter</a><div class="sub">Browser state</div><a data-id="the-browser-s-half-of-the-data-epoch" href="#the-browser-s-half-of-the-data-epoch">The browser's half of the data epoch</a><h3><a href="#cat-architecture">Architecture</a></h3><div class="sub">The loop</div><a data-id="gameapp" href="#gameapp">The tick loop and persistence</a><div class="sub">State</div><a data-id="coord-limit" href="#coord-limit">The map (World)</a><a data-id="gamestate" href="#gamestate">GameState</a><div class="sub">Rendering</div><a data-id="rendering-the-map" href="#rendering-the-map">Rendering the map</a><div class="sub">Art</div><a data-id="pixel-art-pipeline" href="#pixel-art-pipeline">Pixel art pipeline</a><a data-id="map-lab" href="#map-lab">Map lab</a><a data-id="the-landing-world" href="#the-landing-world">The landing world</a><a data-id="asset-library" href="#asset-library">Asset library</a><a data-id="sound-library" href="#sound-library">Sound library</a><div class="sub">Routes</div><a data-id="the-play-route-and-its-redirects" href="#the-play-route-and-its-redirects">The /play route and its redirects</a><h3><a href="#cat-pacing">Pacing</a></h3><div class="sub">Targets</div><a data-id="pacing-targets" href="#pacing-targets">Pacing targets</a><div class="sub">Magnitude targets</div><a data-id="magnitude-bands" href="#magnitude-bands">MAGNITUDE_BANDS</a><div class="sub">The sim</div><a data-id="the-bot-simulation" href="#the-bot-simulation">The bot simulation</a><a data-id="the-parallel-sim-runner" href="#the-parallel-sim-runner">The parallel sim runner</a><h3><a href="#cat-ops">Ops</a></h3><div class="sub">Commands</div><a data-id="commands-and-documentation-generation" href="#commands-and-documentation-generation">Commands and documentation generation</a><div class="sub">CI</div><a data-id="the-pacing-guard-and-ci-sharding" href="#the-pacing-guard-and-ci-sharding">The pacing guard and CI sharding</a><div class="sub">Operator guides</div><a data-id="season-restart-reset-players" href="#season-restart-reset-players">Season restart (reset-players)</a><a data-id="checking-live-saves-before-a-release" href="#checking-live-saves-before-a-release">Checking live saves before a release</a><a data-id="test-account-email" href="#test-account-email">The end-to-end test account</a></nav><main><h1>Idle Realm reference</h1><p class="blurb">Generated from the JSDoc in the code (<code>npm run docs:code</code>). The code is the source of truth; this page is rebuilt on every commit.</p><section class="cat"><h2 class="cat" id="cat-overview">Overview</h2><p class="blurb">What the game is and how the loop fits together.</p><h2>The game</h2><article><p><a id="the-game-at-a-glance"></a></p>
+</style></head><body><div class="layout"><nav><input id="q" type="search" placeholder="Search the reference" aria-label="Search"><a href="symbols.md">Symbol index</a><a href="known-issues.md">Known issues</a><a href="code-map.md">Code map</a><h3><a href="#cat-overview">Overview</a></h3><div class="sub">The game</div><a data-id="the-game-at-a-glance" href="#the-game-at-a-glance">The game at a glance</a><a data-id="conventions" href="#conventions">Conventions</a><h3><a href="#cat-economy">Economy</a></h3><div class="sub">Basics</div><a data-id="tick-rate" href="#tick-rate">Basics: tick, caps, start</a><a data-id="max-catchup-sec" href="#max-catchup-sec">MAX_CATCHUP_SEC</a><a data-id="resource-cap" href="#resource-cap">RESOURCE_CAP</a><a data-id="initial-resources" href="#initial-resources">INITIAL_RESOURCES</a><div class="sub">Income</div><a data-id="calculateresourcebreakdown" href="#calculateresourcebreakdown">calculateResourceBreakdown</a><a data-id="calculatetileoutput" href="#calculatetileoutput">calculateTileOutput</a><a data-id="biome-yield" href="#biome-yield">BIOME_YIELD</a><a data-id="base-generation-rates" href="#base-generation-rates">BASE_GENERATION_RATES</a><div class="sub">Tiles</div><a data-id="tileprice" href="#tileprice">tilePrice</a><a data-id="tile-resource-cost" href="#tile-resource-cost">TILE_RESOURCE_COST</a><a data-id="calculatetilecost" href="#calculatetilecost">calculateTileCost</a><a data-id="effectivetilediscount" href="#effectivetilediscount">effectiveTileDiscount</a><a data-id="calculatexpgain" href="#calculatexpgain">calculateXpGain</a><a data-id="economytiles" href="#economytiles">economyTiles</a><div class="sub">Biomes</div><a data-id="rollbiome" href="#rollbiome">rollBiome</a><a data-id="biomes" href="#biomes">BIOMES</a><a data-id="generatestartring" href="#generatestartring">generateStartRing</a><div class="sub">Castle</div><a data-id="castle-upgrade" href="#castle-upgrade">CASTLE_UPGRADE</a><a data-id="castlemodifier" href="#castlemodifier">castleModifier</a><a data-id="castleupgradeduration" href="#castleupgradeduration">castleUpgradeDuration</a><a data-id="castle-range" href="#castle-range">CASTLE_RANGE</a><a data-id="castle-area-bonus" href="#castle-area-bonus">CASTLE_AREA_BONUS</a><a data-id="castle-fortress" href="#castle-fortress">CASTLE_FORTRESS</a><a data-id="castlerangeradius" href="#castlerangeradius">castleRangeRadius</a><a data-id="castleareabonus" href="#castleareabonus">castleAreaBonus</a><div class="sub">Farm</div><a data-id="animals" href="#animals">ANIMALS</a><a data-id="animaloutput" href="#animaloutput">animalOutput</a><a data-id="farm-upgrades" href="#farm-upgrades">FARM_UPGRADES</a><a data-id="calculateanimalcost" href="#calculateanimalcost">calculateAnimalCost</a><a data-id="farmupgradecost" href="#farmupgradecost">farmUpgradeCost</a><a data-id="calculatefarmoutput" href="#calculatefarmoutput">calculateFarmOutput</a><div class="sub">Merchant</div><a data-id="merchant-resource-prices" href="#merchant-resource-prices">MERCHANT_RESOURCE_PRICES</a><a data-id="merchant-goods" href="#merchant-goods">MERCHANT_GOODS</a><a data-id="merchant-upgrades" href="#merchant-upgrades">MERCHANT_UPGRADES</a><a data-id="sellpayout" href="#sellpayout">sellPayout</a><a data-id="buycost" href="#buycost">buyCost</a><a data-id="merchant-buy-multiplier" href="#merchant-buy-multiplier">MERCHANT_BUY_MULTIPLIER</a><a data-id="merchantupgradecost" href="#merchantupgradecost">merchantUpgradeCost</a><a data-id="generatemerchantstock" href="#generatemerchantstock">generateMerchantStock</a><a data-id="shoppriceof" href="#shoppriceof">shopPriceOf</a><a data-id="refreshcost" href="#refreshcost">refreshCost</a><a data-id="bestworngrade" href="#bestworngrade">bestWornGrade</a><div class="sub">Clicks</div><a data-id="click-ladder" href="#click-ladder">CLICK_LADDER</a><a data-id="click-limit" href="#click-limit">CLICK_LIMIT</a><a data-id="clickgold" href="#clickgold">clickGold</a><a data-id="createclicklimiter" href="#createclicklimiter">createClickLimiter</a><div class="sub">Chests and Luck</div><a data-id="chest" href="#chest">CHEST</a><a data-id="luck" href="#luck">LUCK</a><a data-id="chestintervalsec" href="#chestintervalsec">chestIntervalSec</a><a data-id="chestspots" href="#chestspots">chestSpots</a><a data-id="rewardweights" href="#rewardweights">rewardWeights</a><a data-id="rollchestloot" href="#rollchestloot">rollChestLoot</a><a data-id="gemchance" href="#gemchance">gemChance</a><a data-id="rarityluckmultiplier" href="#rarityluckmultiplier">rarityLuckMultiplier</a><a data-id="dropchancemultiplier" href="#dropchancemultiplier">dropChanceMultiplier</a><a data-id="goldenmonsterchance" href="#goldenmonsterchance">goldenMonsterChance</a><div class="sub">Crafting</div><a data-id="trade-goods" href="#trade-goods">TRADE_GOODS</a><a data-id="gear-recipes" href="#gear-recipes">GEAR_RECIPES</a><div class="sub">Perk caps</div><a data-id="perk-caps" href="#perk-caps">PERK_CAPS</a><a data-id="legendary-perk-tiers" href="#legendary-perk-tiers">LEGENDARY_PERK_TIERS</a><a data-id="weapon-legendary-damage-top" href="#weapon-legendary-damage-top">WEAPON_LEGENDARY_DAMAGE_TOP</a><a data-id="capperks" href="#capperks">capPerks</a><a data-id="aggregatestats" href="#aggregatestats">aggregateStats</a><h3><a href="#cat-combat">Combat</a></h3><div class="sub">Overview</div><a data-id="combat" href="#combat">Combat overview and tunables</a><div class="sub">Player numbers</div><a data-id="maxhp" href="#maxhp">maxHp</a><a data-id="armorreduction" href="#armorreduction">armorReduction</a><a data-id="weapon-attack-speed" href="#weapon-attack-speed">WEAPON_ATTACK_SPEED</a><a data-id="damageperhit" href="#damageperhit">damagePerHit</a><a data-id="attackspersecond" href="#attackspersecond">attacksPerSecond</a><a data-id="critodds" href="#critodds">critOdds</a><a data-id="swing" href="#swing">swing</a><a data-id="armorof" href="#armorof">armorOf</a><a data-id="dodgechance" href="#dodgechance">dodgeChance</a><a data-id="lifeleechpercent" href="#lifeleechpercent">lifeLeechPercent</a><a data-id="regen" href="#regen">regen</a><a data-id="mitigate" href="#mitigate">mitigate</a><div class="sub">A fight</div><a data-id="runcombat" href="#runcombat">runCombat</a><a data-id="picktarget" href="#picktarget">pickTarget</a><a data-id="queueticket" href="#queueticket">queueTicket</a><a data-id="autobattleunlocked" href="#autobattleunlocked">autoBattleUnlocked</a><a data-id="playerprofile" href="#playerprofile">playerProfile</a><a data-id="fightstep" href="#fightstep">fightStep</a><a data-id="endfight" href="#endfight">endFight</a><a data-id="engage" href="#engage">engage</a><a data-id="dismissticket" href="#dismissticket">dismissTicket</a><a data-id="projectfight" href="#projectfight">projectFight</a><a data-id="paykill" href="#paykill">payKill</a><a data-id="rngfor" href="#rngfor">rngFor</a><div class="sub">Win chance</div><a data-id="winbucketof" href="#winbucketof">winBucketOf</a><a data-id="estimatewin" href="#estimatewin">estimateWin</a><div class="sub">Potions and skills</div><a data-id="healamount" href="#healamount">healAmount</a><a data-id="autouse" href="#autouse">autoUse</a><a data-id="skills" href="#skills">SKILLS</a><div class="sub">Results and rest</div><a data-id="restthrough" href="#restthrough">restThrough</a><a data-id="unclaimed-sec" href="#unclaimed-sec">UNCLAIMED_SEC</a><div class="sub">Consumables</div><a data-id="buff-families" href="#buff-families">BUFF_FAMILIES</a><a data-id="max-active-buffs" href="#max-active-buffs">MAX_ACTIVE_BUFFS</a><a data-id="readbuffs" href="#readbuffs">readBuffs</a><a data-id="addbuff" href="#addbuff">addBuff</a><a data-id="bufftotals" href="#bufftotals">buffTotals</a><a data-id="drink" href="#drink">drink</a><a data-id="withbuffs" href="#withbuffs">withBuffs</a><a data-id="applyuse" href="#applyuse">applyUse</a><h3><a href="#cat-monsters">Monsters</a></h3><div class="sub">Roster</div><a data-id="monsters" href="#monsters">MONSTERS</a><div class="sub">Level scaling</div><a data-id="monsterstats" href="#monsterstats">monsterStats</a><a data-id="spawnlevelrange" href="#spawnlevelrange">spawnLevelRange</a><a data-id="rollspawnlevel" href="#rollspawnlevel">rollSpawnLevel</a><a data-id="levelatage" href="#levelatage">levelAtAge</a><a data-id="dangerbonus" href="#dangerbonus">dangerBonus</a><div class="sub">Spawning</div><a data-id="advancebank" href="#advancebank">advanceBank</a><a data-id="canspawnon" href="#canspawnon">canSpawnOn</a><a data-id="typeweights" href="#typeweights">typeWeights</a><a data-id="placetickets" href="#placetickets">placeTickets</a><a data-id="ticketcap" href="#ticketcap">ticketCap</a><a data-id="distance-bands" href="#distance-bands">DISTANCE_BANDS</a><a data-id="boss-min-distance" href="#boss-min-distance">BOSS_MIN_DISTANCE</a><a data-id="bandof" href="#bandof">bandOf</a><div class="sub">Rewards</div><a data-id="killincome" href="#killincome">killIncome</a><h3><a href="#cat-loot">Loot</a></h3><div class="sub">Pipeline</div><a data-id="generateloot" href="#generateloot">generateLoot</a><a data-id="validatelootdata" href="#validatelootdata">validateLootData</a><a data-id="resolvesourcelevel" href="#resolvesourcelevel">resolveSourceLevel</a><a data-id="rollitemlevel" href="#rollitemlevel">rollItemLevel</a><a data-id="receivedrops" href="#receivedrops">receiveDrops</a><a data-id="isautosold" href="#isautosold">isAutoSold</a><a data-id="eligiblecandidates" href="#eligiblecandidates">eligibleCandidates</a><a data-id="rollleaning" href="#rollleaning">rollLeaning</a><div class="sub">Config</div><a data-id="loot-sources" href="#loot-sources">LOOT_SOURCES</a><a data-id="loot-profiles" href="#loot-profiles">LOOT_PROFILES</a><a data-id="biome-loot" href="#biome-loot">BIOME_LOOT</a><div class="sub">Items</div><a data-id="rarities" href="#rarities">RARITIES</a><a data-id="levelscale" href="#levelscale">levelScale</a><a data-id="valuecurve" href="#valuecurve">valueCurve</a><a data-id="sellvalueof" href="#sellvalueof">sellValueOf</a><a data-id="live-grades" href="#live-grades">LIVE_GRADES</a><a data-id="gradelevels" href="#gradelevels">gradeLevels</a><a data-id="graderarities" href="#graderarities">gradeRarities</a><a data-id="gradelegacyitems" href="#gradelegacyitems">gradeLegacyItems</a><a data-id="kit" href="#kit">kit</a><div class="sub">Adding content</div><a data-id="loot-pools" href="#loot-pools">Adding loot content (data only)</a><a data-id="gear" href="#gear">gear</a><h3><a href="#cat-progression">Progression</a></h3><div class="sub">Levels</div><a data-id="leveling" href="#leveling">LEVELING</a><a data-id="xptonextlevel" href="#xptonextlevel">xpToNextLevel</a><a data-id="totalstatpoints" href="#totalstatpoints">totalStatPoints</a><a data-id="cumulativexp" href="#cumulativexp">cumulativeXp</a><a data-id="calculatelevel" href="#calculatelevel">calculateLevel</a><a data-id="reconcilecharacter" href="#reconcilecharacter">reconcileCharacter</a><div class="sub">Attributes</div><a data-id="character-stat-config" href="#character-stat-config">CHARACTER_STAT_CONFIG</a><a data-id="calculatestatresourcemodifiers" href="#calculatestatresourcemodifiers">calculateStatResourceModifiers</a><a data-id="calculatecombatstats" href="#calculatecombatstats">calculateCombatStats</a><div class="sub">Rebirth</div><a data-id="rebirth" href="#rebirth">REBIRTH</a><a data-id="embergain" href="#embergain">emberGain</a><a data-id="emberincomebonus" href="#emberincomebonus">emberIncomeBonus</a><a data-id="rebirthstatus" href="#rebirthstatus">rebirthStatus</a><div class="sub">Ember shop</div><a data-id="ember-upgrades" href="#ember-upgrades">EMBER_UPGRADES</a><a data-id="emberupgradecost" href="#emberupgradecost">emberUpgradeCost</a><div class="sub">Limits</div><a data-id="limits" href="#limits">LIMITS</a><a data-id="limitof" href="#limitof">limitOf</a><div class="sub">Gems</div><a data-id="starting-gems" href="#starting-gems">STARTING_GEMS</a><div class="sub">Crafting</div><a data-id="crafting" href="#crafting">CRAFTING</a><a data-id="craft-gear" href="#craft-gear">CRAFT_GEAR</a><a data-id="gearitemlevels" href="#gearitemlevels">gearItemLevels</a><a data-id="qualitybiasof" href="#qualitybiasof">qualityBiasOf</a><a data-id="pitymultiplier" href="#pitymultiplier">pityMultiplier</a><a data-id="rollgear" href="#rollgear">rollGear</a><a data-id="gearodds" href="#gearodds">gearOdds</a><h3><a href="#cat-saves-and-server">Saves & Server</a></h3><div class="sub">Threat model</div><a data-id="the-server-s-rule-and-the-threat-model" href="#the-server-s-rule-and-the-threat-model">The server's rule and the threat model</a><div class="sub">The save</div><a data-id="save-schema" href="#save-schema">SAVE_SCHEMA</a><a data-id="createsavestorage" href="#createsavestorage">createSaveStorage</a><a data-id="sanitizesave" href="#sanitizesave">sanitizeSave</a><a data-id="persisted-keys" href="#persisted-keys">PERSISTED_KEYS</a><a data-id="save-and-backup-dialog" href="#save-and-backup-dialog">Save and Backup dialog</a><div class="sub">Uploading</div><a data-id="sync" href="#sync">SYNC</a><a data-id="judgerebase" href="#judgerebase">judgeRebase</a><a data-id="manual-cloud-cooldown-ms" href="#manual-cloud-cooldown-ms">MANUAL_CLOUD_COOLDOWN_MS</a><a data-id="resolveconflict" href="#resolveconflict">resolveConflict</a><a data-id="withpushlock" href="#withpushlock">withPushLock</a><div class="sub">Accepting a save</div><a data-id="acceptsave" href="#acceptsave">acceptSave</a><a data-id="flag-policy" href="#flag-policy">FLAG_POLICY</a><a data-id="trustedeconomy" href="#trustedeconomy">trustedEconomy</a><a data-id="xp-model" href="#xp-model">XP_MODEL</a><a data-id="ember-model" href="#ember-model">EMBER_MODEL</a><a data-id="min-save-interval-ms" href="#min-save-interval-ms">MIN_SAVE_INTERVAL_MS</a><a data-id="verifytransition" href="#verifytransition">verifyTransition</a><a data-id="isnonproduction" href="#isnonproduction">isNonProduction</a><a data-id="poison-flags" href="#poison-flags">POISON_FLAGS</a><a data-id="losesprogress" href="#losesprogress">losesProgress</a><a data-id="enforcement" href="#enforcement">ENFORCEMENT</a><div class="sub">The ledger</div><a data-id="ledger" href="#ledger">Ledger</a><a data-id="sealedrng" href="#sealedrng">sealedRng</a><div class="sub">Endpoints</div><a data-id="endpoints-the-api-routes" href="#endpoints-the-api-routes">Endpoints (the API routes)</a><div class="sub">Away time</div><a data-id="computeofflinegrant" href="#computeofflinegrant">computeOfflineGrant</a><a data-id="ensureseasonreset" href="#ensureseasonreset">ensureSeasonReset</a><div class="sub">Epoch</div><a data-id="baseline-epoch" href="#baseline-epoch">BASELINE_EPOCH</a><a data-id="startnewchapter" href="#startnewchapter">startNewChapter</a><div class="sub">Browser state</div><a data-id="the-browser-s-half-of-the-data-epoch" href="#the-browser-s-half-of-the-data-epoch">The browser's half of the data epoch</a><h3><a href="#cat-architecture">Architecture</a></h3><div class="sub">The loop</div><a data-id="gameapp" href="#gameapp">The tick loop and persistence</a><div class="sub">State</div><a data-id="coord-limit" href="#coord-limit">The map (World)</a><a data-id="gamestate" href="#gamestate">GameState</a><div class="sub">Rendering</div><a data-id="rendering-the-map" href="#rendering-the-map">Rendering the map</a><div class="sub">Art</div><a data-id="pixel-art-pipeline" href="#pixel-art-pipeline">Pixel art pipeline</a><a data-id="map-lab" href="#map-lab">Map lab</a><a data-id="the-landing-world" href="#the-landing-world">The landing world</a><a data-id="asset-library" href="#asset-library">Asset library</a><a data-id="sound-library" href="#sound-library">Sound library</a><div class="sub">Routes</div><a data-id="the-play-route-and-its-redirects" href="#the-play-route-and-its-redirects">The /play route and its redirects</a><h3><a href="#cat-pacing">Pacing</a></h3><div class="sub">Targets</div><a data-id="pacing-targets" href="#pacing-targets">Pacing targets</a><div class="sub">Magnitude targets</div><a data-id="magnitude-bands" href="#magnitude-bands">MAGNITUDE_BANDS</a><div class="sub">The sim</div><a data-id="the-bot-simulation" href="#the-bot-simulation">The bot simulation</a><a data-id="the-parallel-sim-runner" href="#the-parallel-sim-runner">The parallel sim runner</a><h3><a href="#cat-ops">Ops</a></h3><div class="sub">Commands</div><a data-id="commands-and-documentation-generation" href="#commands-and-documentation-generation">Commands and documentation generation</a><div class="sub">CI</div><a data-id="the-pacing-guard-and-ci-sharding" href="#the-pacing-guard-and-ci-sharding">The pacing guard and CI sharding</a><div class="sub">Operator guides</div><a data-id="season-restart-reset-players" href="#season-restart-reset-players">Season restart (reset-players)</a><a data-id="checking-live-saves-before-a-release" href="#checking-live-saves-before-a-release">Checking live saves before a release</a><a data-id="test-account-email" href="#test-account-email">The end-to-end test account</a></nav><main><h1>Idle Realm reference</h1><p class="blurb">Generated from the JSDoc in the code (<code>npm run docs:code</code>). The code is the source of truth; this page is rebuilt on every commit.</p><section class="cat"><h2 class="cat" id="cat-overview">Overview</h2><p class="blurb">What the game is and how the loop fits together.</p><h2>The game</h2><article><p><a id="the-game-at-a-glance"></a></p>
 <h3>The game at a glance</h3>
 <p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:17</code></a></p>
 <p>Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. Everything here describes <strong>only what the code does now</strong>, with the symbol each number comes from.</p>
 <p><strong>The loop of the game</strong></p>
 <ol>
 <li>You start with a castle and the four tiles beside it on an unbounded map, 125 gold and 1,000 gems. Gold, other resources and XP trickle in (<a href="#base-generation-rates"><code>BASE_GENERATION_RATES</code></a>).</li>
-<li>Gold (plus wood, stone, coal, food and hide from tile 15 up) buys adjacent tiles (<a href="#tileprice"><code>tilePrice</code></a>); each becomes a randomly rolled biome (<a href="#rollbiome"><code>rollBiome</code></a>) and adds income. Buildings stand on tiles and add output. Same-biome neighbours add 25% each.</li>
+<li>Gold (plus wood, stone, coal, food and hide from tile 15 up) buys adjacent tiles (<a href="#tileprice"><code>tilePrice</code></a>); each becomes a randomly rolled biome (<a href="#rollbiome"><code>rollBiome</code></a>) and adds income. Same-biome neighbours add 25% each.</li>
 <li>The <strong>castle</strong> is a timed upgrade (level 1-10) that adds a big modifier to every resource, a range bonus on nearby tiles, and a ward from level 7 that keeps monsters out (<a href="#castle-upgrade"><code>CASTLE_UPGRADE</code></a>).</li>
 <li>The <strong>farm</strong> turns food into animals that make meat and small amounts of eggs, milk and hide (<a href="#animals"><code>ANIMALS</code></a>). The <strong>merchant</strong> buys resources, sells gear and potions, and sells permanent upgrades for gold (<a href="#merchant-upgrades"><code>MERCHANT_UPGRADES</code></a>).</li>
 <li><strong>Clicks</strong> on the map and <strong>chests</strong> add active gold (<a href="#clickgold"><code>clickGold</code></a>, <a href="#chest"><code>CHEST</code></a>). Every level gives attribute points (Strength, Dexterity, Intelligence, Vitality, Charisma) that add income, combat strength, Luck and a tile discount (<a href="#character-stat-config"><code>CHARACTER_STAT_CONFIG</code></a>).</li>
@@ -100,7 +100,7 @@ anything that decides a reward or a fight lives on the server side (<code>src/li
 <li>Config is data, maths is pure functions. Tutorial, stat tooltips and cost lists are generated from config constants so they cannot drift from the rules.</li>
 <li>Reports measured from the game (<code>docs/generated/*</code>, written by <code>npm run docs:gen</code>) are never edited by hand; prefer a link to them over copying numbers into prose, and prefer <code>@table</code> over numbers typed into JSDoc.</li>
 </ul>
-</article></section><section class="cat"><h2 class="cat" id="cat-economy">Economy</h2><p class="blurb">Income, tiles, buildings, castle, farm, merchant, clicks, chests and Luck.</p><h2>Basics</h2><article><p><a id="tick-rate"></a></p>
+</article></section><section class="cat"><h2 class="cat" id="cat-economy">Economy</h2><p class="blurb">Income, tiles, castle, farm, merchant, clicks, chests and Luck.</p><h2>Basics</h2><article><p><a id="tick-rate"></a></p>
 <h3>Basics: tick, caps, start</h3>
 <p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:22</code></a></p>
 <p>Game constants the economy runs on: the tick, the caps, the start.</p>
@@ -172,7 +172,7 @@ and a changed system clock can neither skip nor reverse time. Away time is not c
 <p>What a new game starts with: 125 gold (and <a href="#starting-gems"><code>STARTING_GEMS</code></a> gems).</p>
 </article><h2>Income</h2><article><p><a id="calculateresourcebreakdown"></a></p>
 <h3><code>calculateResourceBreakdown</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:133</code></a></p>
+<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:123</code></a></p>
 <p>Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).</p>
 <p>The one function that builds the income. Every number the UI shows as &quot;per second&quot; (header, tooltips, the tick) comes from here.</p>
 <p>Everything inside the first bracket is added, the three multipliers after it are multiplied. The meat and hide of the farm are multiplied by the merchant&#39;s
@@ -186,7 +186,7 @@ Skinner before they enter <code>base</code>. The castle tile itself gets no yiel
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">base[r]  = BASE_GENERATION_RATES[r]
          + farm output (meat, eggs, milk, hide; the farm has no other source of those four)
-         + sum over owned tiles of (biome output[r] + building output[r]) x BIOME_YIELD.scale x (1 + 0.25 x same-biome 4-neighbours)
+         + sum over owned tiles of biome output[r] x BIOME_YIELD.scale x (1 + 0.25 x same-biome 4-neighbours)
          + sum over tiles inside the castle range of the same tile output x castleAreaBonus(castle level)
          + 0.5 x (castle level - 1)                      (xp only)
 modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
@@ -195,7 +195,7 @@ total[r] = base[r] x (1 + modifier[r])
 <p>See also: <a href="#calculatetileoutput"><code>calculateTileOutput</code></a>, <a href="#castlemodifier"><code>castleModifier</code></a>, <a href="#castleareabonus"><code>castleAreaBonus</code></a>, <a href="#calculatefarmoutput"><code>calculateFarmOutput</code></a></p>
 </article><article><p><a id="calculatetileoutput"></a></p>
 <h3><code>calculateTileOutput</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:80</code></a></p>
+<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:77</code></a></p>
 <p>The one place a single tile&#39;s output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.</p>
 <p>Neighbour bonus: +25% per same-biome 4-neighbour (<code>SCALING_CONFIG.adjacencyBonus</code>). A tile inside the castle range also gets the castle area bonus (<a href="#castleareabonus"><code>castleAreaBonus</code></a>).</p>
 </article><article><p><a id="biome-yield"></a></p>
@@ -324,7 +324,7 @@ ceiling  = RESOURCE_CAP / 100
 </tbody></table>
 </article><article><p><a id="calculatetilecost"></a></p>
 <h3><code>calculateTileCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/costs.ts"><code>src/utils/game/costs.ts:18</code></a></p>
+<p>Source: <a href="../../src/utils/game/costs.ts"><code>src/utils/game/costs.ts:14</code></a></p>
 <p>Everything buying the next tile costs, given how many tiles are owned and the Charisma discount (percent).</p>
 <p><code>discountPercent</code> removes that percent from the gold and from every extra part (<a href="#effectivetilediscount"><code>effectiveTileDiscount</code></a> computes it).</p>
 <p>See also: <a href="#tileprice"><code>tilePrice</code></a>, <a href="#effectivetilediscount"><code>effectiveTileDiscount</code></a>, <a href="#tile-resource-cost"><code>TILE_RESOURCE_COST</code></a></p>
@@ -426,165 +426,6 @@ capped at 90%; a lone tile joins a neighbour with <code>buddyPct</code> 100.</li
 <p>Source: <a href="../../src/utils/biomeRules.ts"><code>src/utils/biomeRules.ts:186</code></a></p>
 <p>The castle&#39;s four starting neighbours for a new game: the basic biomes (plains most), always at least <code>minPlains</code>
 plains and never more than <code>maxOfOther</code> of any other biome. Retries with the same random source until it fits.</p>
-</article><h2>Buildings</h2><article><p><a id="buildings"></a></p>
-<h3><code>BUILDINGS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/buildings.ts"><code>src/config/buildings.ts:40</code></a></p>
-<p>Buildings: one per tile, on any owned tile that is not the castle, a lake or empty (<code>BUILDING_COST.blockedBiomes</code>), not inside a landmark area, not under a monster or chest.
-A building&#39;s output is added to the tile&#39;s own output (same 1.3 scale and neighbour bonus). 16 types, config output per second:</p>
-<p><strong>Buildings and their config output per second</strong> <em>(computed from the code)</em></p>
-<table>
-<thead>
-<tr>
-<th>Building</th>
-<th>Output / s</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Farm</td>
-<td>food 0.2</td>
-</tr>
-<tr>
-<td>Mine</td>
-<td>stone 0.2, coal 0.2</td>
-</tr>
-<tr>
-<td>Lumber Mill</td>
-<td>wood 0.2</td>
-</tr>
-<tr>
-<td>Market</td>
-<td>gold 0.2</td>
-</tr>
-<tr>
-<td>Blacksmith</td>
-<td>stone 0.07, coal 0.07, gold 0.07, food 0.07, wood 0.07</td>
-</tr>
-<tr>
-<td>Workshop</td>
-<td>xp 0.2</td>
-</tr>
-<tr>
-<td>Lumber Camp</td>
-<td>wood 0.18</td>
-</tr>
-<tr>
-<td>Quarry</td>
-<td>stone 0.25</td>
-</tr>
-<tr>
-<td>Fishing Hut</td>
-<td>food 0.16, gold 0.05</td>
-</tr>
-<tr>
-<td>Hunter&#39;s Lodge</td>
-<td>meat 0.15</td>
-</tr>
-<tr>
-<td>Tavern</td>
-<td>food 0.12, xp 0.08</td>
-</tr>
-<tr>
-<td>Tower</td>
-<td>stone 0.08, xp 0.12</td>
-</tr>
-<tr>
-<td>Well</td>
-<td>food 0.15</td>
-</tr>
-<tr>
-<td>Alchemy Lab</td>
-<td>xp 0.12, gold 0.08</td>
-</tr>
-<tr>
-<td>Stone Craft</td>
-<td>stone 0.15, gold 0.08</td>
-</tr>
-<tr>
-<td>Barracks</td>
-<td>gold 0.1, xp 0.1</td>
-</tr>
-</tbody></table>
-<p>See also: <a href="#building-cost"><code>BUILDING_COST</code></a>, <a href="#buildingcostfactor"><code>buildingCostFactor</code></a></p>
-</article><article><p><a id="buildingcostfactor"></a></p>
-<h3><code>buildingCostFactor</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/costs.ts"><code>src/utils/game/costs.ts:63</code></a></p>
-<p>Price factor of the next building when <code>built</code> buildings stand: the cheap starter steps, then three stages of growth.</p>
-<p>Price of the next building: base 500 gold / 250 wood / 150 stone (<a href="#building-cost"><code>BUILDING_COST</code></a>) times this factor, which depends on how many buildings stand, times <code>1 - Thrift</code>.
-Only Thrift discounts buildings (not Charisma or Bulk Discount). Each resource is capped at <code>RESOURCE_CAP / 100</code>.</p>
-<p><strong>Formula</strong></p>
-<pre><code class="language-text">factor(built) = starter[built]                      for the first four: 0.4, 0.6, 0.8, 1.0
-              = 1.15^min(k,12) x 1.09^clamp(k-12, 0, 16) x 1.025^max(k-28, 0)     with k = built - 3
-cost[r]       = floor(min(base[r] x factor x (1 - Thrift), RESOURCE_CAP / 100))
-</code></pre>
-<p><strong>Price of the Nth building (before Thrift)</strong> <em>(computed from the code)</em></p>
-<table>
-<thead>
-<tr>
-<th>Building number</th>
-<th>gold</th>
-<th>wood</th>
-<th>stone</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>200</td>
-<td>100</td>
-<td>60</td>
-</tr>
-<tr>
-<td>2</td>
-<td>300</td>
-<td>150</td>
-<td>90</td>
-</tr>
-<tr>
-<td>3</td>
-<td>400</td>
-<td>200</td>
-<td>120</td>
-</tr>
-<tr>
-<td>4</td>
-<td>500</td>
-<td>250</td>
-<td>150</td>
-</tr>
-<tr>
-<td>5</td>
-<td>575</td>
-<td>287</td>
-<td>172</td>
-</tr>
-<tr>
-<td>10</td>
-<td>1,156</td>
-<td>578</td>
-<td>346</td>
-</tr>
-<tr>
-<td>20</td>
-<td>3,776</td>
-<td>1,888</td>
-<td>1,132</td>
-</tr>
-<tr>
-<td>40</td>
-<td>12.9 K</td>
-<td>6,470</td>
-<td>3,882</td>
-</tr>
-</tbody></table>
-<p>See also: <a href="#calculatebuildingcost"><code>calculateBuildingCost</code></a></p>
-</article><article><p><a id="calculatebuildingcost"></a></p>
-<h3><code>calculateBuildingCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/costs.ts"><code>src/utils/game/costs.ts:82</code></a></p>
-<p>Cost of the next building: base cost x the factor for the number of buildings already built.</p>
-<p>Cost of the next building: base cost x <a href="#buildingcostfactor"><code>buildingCostFactor</code></a> x <code>(1 - Thrift)</code>, each resource floored and capped at <code>RESOURCE_CAP / 100</code>.</p>
-</article><article><p><a id="building-cost"></a></p>
-<h3><code>BUILDING_COST</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/buildings.ts"><code>src/config/buildings.ts:111</code></a></p>
-<p>The building price constants: base cost 500 gold / 250 wood / 150 stone, the four cheap starter steps, the three growth stages (1.15 for 12 buildings, 1.09 for 16, 1.025 after) and the biomes a building cannot stand on.</p>
 </article><h2>Castle</h2><article><p><a id="castle-upgrade"></a></p>
 <h3><code>CASTLE_UPGRADE</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:62</code></a></p>
@@ -1207,13 +1048,13 @@ so an auto-clicker is no better than a very dedicated human). Script-dispatched 
 </code></pre>
 </article><article><p><a id="chestspots"></a></p>
 <h3><code>chestSpots</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:31</code></a></p>
+<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:28</code></a></p>
 <p>The tiles a chest could go on, with their weights. Eligible: owned, not the castle, no chest, no monster (<code>taken</code> = &quot;x,y&quot; keys),
-no building, outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
+outside the castle ward. Weight = 1 + frontier bonus (touches unowned land) + distance from the castle, times a
 penalty when another chest is within <code>nearbyRadius</code>. So chests lean toward the edge of your land and spread out.</p>
 </article><article><p><a id="rewardweights"></a></p>
 <h3><code>rewardWeights</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:93</code></a></p>
+<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:90</code></a></p>
 <p>Relative chances with Luck shifted from plain gold toward the lucky chest and the item.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">shift       = min(0.6 x gold weight, gold weight x Luck x 1%)
@@ -1221,7 +1062,7 @@ gold weight -= shift;  boost += 0.8 x shift;  item += 0.2 x shift
 </code></pre>
 </article><article><p><a id="rollchestloot"></a></p>
 <h3><code>rollChestLoot</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:110</code></a></p>
+<p>Source: <a href="../../src/lib/chests.ts"><code>src/lib/chests.ts:107</code></a></p>
 <p>Rolls the contents of a chest. Gold is &quot;minutes of income&quot;, like before; a full bag turns an item into gold.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">gold chest  = floor(gold/s x U(10..60 min) x 60 x (1 + 0.005 x Luck) x (1 + Gold Find%))      boost chest: x1.5
@@ -2094,7 +1935,7 @@ A monster whose spawn was capped for a weak player has a smaller <code>growCap</
 </code></pre>
 </article><h2>Spawning</h2><article><p><a id="advancebank"></a></p>
 <h3><code>advanceBank</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:153</code></a></p>
+<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:152</code></a></p>
 <p>Runs the timers for <code>dtSec</code> seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
 (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
 With no room the chest and monster timers sit at 0, like the client&#39;s own timers. <code>rollFor(kind, n)</code> gives the random source of ticket
@@ -2111,8 +1952,8 @@ tickets are stamped across the whole real stretch so that they have the ages the
 <h3><code>canSpawnOn</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/monsters.ts"><code>src/lib/monsters.ts:150</code></a></p>
 <p>Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance
-(Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are <code>MonsterDef.spawn</code>.</p>
-<p>The tile: an owned tile whose biome is in the monster&#39;s list (<code>MonsterDef.spawn</code>), Chebyshev distance from the castle 2 to 9 (<code>minCastleDistance</code>, <code>maxCastleDistance</code>), no building, no chest, no other monster,
+(Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are <code>MonsterDef.spawn</code>.</p>
+<p>The tile: an owned tile whose biome is in the monster&#39;s list (<code>MonsterDef.spawn</code>), Chebyshev distance from the castle 2 to 9 (<code>minCastleDistance</code>, <code>maxCastleDistance</code>), no chest, no other monster,
 outside the castle ward from castle level 7. <code>minRebirths</code> exists in the rule but no monster uses it.</p>
 </article><article><p><a id="typeweights"></a></p>
 <h3><code>typeWeights</code> <small>function</small></h3>
@@ -2123,7 +1964,7 @@ and to 0.1 for a hopeless one (chance &lt;= 5%); equal weights give the plain un
 for new spawns only. Bosses follow the same rules (IDL-222): among the boss types that have a free tile the pick is weighted and the level capped (<a href="#placetickets"><code>placeTickets</code></a>). Measured: <code>docs/generated/spawn-mix.md</code>.</p>
 </article><article><p><a id="placetickets"></a></p>
 <h3><code>placeTickets</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/placement.ts"><code>src/lib/offline/placement.ts:72</code></a></p>
+<p>Source: <a href="../../src/lib/offline/placement.ts"><code>src/lib/offline/placement.ts:71</code></a></p>
 <p>Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
 grows. <code>rollFor(&#39;spawnpos&#39;, n)</code> picks the tile of monster ticket <code>n</code> and <code>rollFor(&#39;chestpos&#39;, n)</code> the one of chest <code>n</code> (the server seals
@@ -2133,7 +1974,7 @@ near what the player can beat; without it every type is equally likely and nothi
 that still have a free tile the pick is weighted by win chance and the boss&#39;s spawn level and growth are capped. A boss only has a free tile 8 or more tiles from the castle (<code>BOSS_MIN_DISTANCE</code>).</p>
 </article><article><p><a id="ticketcap"></a></p>
 <h3><code>ticketCap</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:113</code></a></p>
+<p>Source: <a href="../../src/lib/offline/tickets.ts"><code>src/lib/offline/tickets.ts:112</code></a></p>
 <p>How many more tickets may wait: the same share of the free land as the client&#39;s own spawn limit (monsters and chests together),
 (<code>freeLand</code>, the client&#39;s own formula) estimated from the save&#39;s counts because the server never opens the map, and never more than <code>TICKET_CAP</code> per kind.</p>
 <p>The room for new tickets: monsters and chests together hold at most 30% of the free land, at least 2, at most 40 tickets in all.</p>
@@ -3252,9 +3093,9 @@ it comes from the ticket&#39;s spawn level and age (<a href="#levelatage"><code>
 <p>See also: <a href="#acceptsave"><code>acceptSave</code></a>, <a href="#flag-policy"><code>FLAG_POLICY</code></a>, <a href="#enforcement"><code>ENFORCEMENT</code></a></p>
 </article><h2>The save</h2><article><p><a id="save-schema"></a></p>
 <h3><code>SAVE_SCHEMA</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/saveFormat.ts"><code>src/lib/saveFormat.ts:35</code></a></p>
+<p>Source: <a href="../../src/lib/saveFormat.ts"><code>src/lib/saveFormat.ts:34</code></a></p>
 <p>The save in the browser. <strong>Text format</strong>: <code>IDLZ2.</code> + base64(UTF-8 JSON) + <code>.</code> + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters.
-The map is compact (only owned tiles, as runs per row, plus <code>extra</code> for tiles with a level, building or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
+The map is compact (only owned tiles, as runs per row, plus <code>extra</code> for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
 Not saved: monsters and the open fight (the server&#39;s).</p>
 <p>See also: <a href="#persisted-keys"><code>PERSISTED_KEYS</code></a>, <a href="#sanitizesave"><code>sanitizeSave</code></a></p>
 </article><article><p><a id="createsavestorage"></a></p>
@@ -3265,7 +3106,7 @@ and on hide/close; the backup rotates every 10 minutes. A read goes through <cod
 One tab owns the game at a time (<code>src/hooks/useSingleTab.ts</code>, a Web Lock).</p>
 </article><article><p><a id="sanitizesave"></a></p>
 <h3><code>sanitizeSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:193</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:192</code></a></p>
 <p>Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
 pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
@@ -3274,7 +3115,7 @@ cost) are recomputed instead of trusted. Returns the cleaned persisted slice.</p
 a click level outside the ladder, a prestige block that does not add up, less XP than the owned tiles produced; gear must be valid item instances (<code>instanceProblem</code> in <code>src/lib/itemInstance.ts</code>). Gear stats are derived, never read from the save.</p>
 </article><article><p><a id="persisted-keys"></a></p>
 <h3><code>PERSISTED_KEYS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:60</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:59</code></a></p>
 <p>The part of the game state that is saved. Rates, window flags and the like are recomputed on load.</p>
 <p><strong>How to extend the save safely.</strong></p>
 <ul>
@@ -3764,7 +3605,7 @@ game with a fresh link. The server sends <code>epoch</code> and <code>needsReset
 the browser last saw (<code>lib/epochFetch</code>) and a lower one is refused with 412 <code>staleEpoch</code>, after which the page reloads into this guard. See <code>docs/plan/reset-proof-browsers.md</code>.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-architecture">Architecture</h2><p class="blurb">Stack, state, the tick loop, the map, rendering and the art pipeline.</p><h2>The loop</h2><article><p><a id="gameapp"></a></p>
 <h3>The tick loop and persistence</h3>
-<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:111</code></a></p>
+<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:110</code></a></p>
 <p>The tick loop. <code>GameApp</code> runs <code>setInterval(..., 100 ms)</code> <strong>only</strong> in the owning tab (one tab owns the game through a Web Lock, <code>useSingleTab</code>) and only after the save is loaded and the offline claim is done.
 Each interval computes <code>deltaTime = performance.now() - last</code> (monotonic) and calls <code>store.tick(deltaTime)</code>; <code>tick</code> clamps the delta to <code>0 ... MAX_CATCHUP_SEC</code> (300 s), so a throttled background tab catches up in 5-minute steps
 but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player&#39;s absence is claimed from the server before the loop starts (<a href="#computeofflinegrant"><code>computeOfflineGrant</code></a>).</p>
@@ -3784,7 +3625,7 @@ a player without a save gets a random start in <code>merge</code>. The browser c
 <p>Source: <a href="../../src/utils/world.ts"><code>src/utils/world.ts:32</code></a></p>
 <p>The map has no edge. <code>GameState.tiles</code> is a <code>World</code>: an immutable, sparse set of the <strong>explored</strong> tiles on an integer grid with negative coordinates, stored as <code>ReadonlyMap&lt;number, Tile&gt;</code> under a small-integer key (<code>tileKey(x, y)</code>,
 <code>|x|, |y| &lt;= COORD_LIMIT = 16,000</code>, at most <code>MAX_OWNED_TILES = 250,000</code> tiles). Unexplored land is simply absent (<code>getTile</code> gives <code>undefined</code>, <code>tileAt</code> an empty tile). Updates are copy-on-write (<code>setTile</code>, <code>patchTile</code>, batched <code>setTiles</code>),
-so <code>state.tiles</code> changes exactly when the map does; the owned / building / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).</p>
+so <code>state.tiles</code> changes exactly when the map does; the owned / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).</p>
 <p>Tiles an old save knew by row and column keep their logical coordinates: the castle stays at (25, 25), so old saves and the procedural art (which hashes absolute coordinates, parity-tested against Python) are unchanged.</p>
 <ul>
 <li>Reads go through <code>getTile</code> / <code>tileAt</code> / <code>isOwnedAt</code> / <code>hasOwnedNeighbour</code> / <code>forEachOwned</code> / <code>ownedRowMajor</code> (a cached row-then-column order, so seeded pickers and saves do not depend on the order tiles were added).
@@ -3795,7 +3636,7 @@ so <code>state.tiles</code> changes exactly when the map does; the owned / build
 </ul>
 </article><article><p><a id="gamestate"></a></p>
 <h3><code>GameState</code> <small>interface</small></h3>
-<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:348</code></a></p>
+<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:352</code></a></p>
 <p>State. The persisted keys are <code>PERSISTED_KEYS</code> (<a href="#persisted-keys"><code>PERSISTED_KEYS</code></a>), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.</p>
 <p>Not saved: <code>monsters</code> and the open fight (<code>combat</code>) are the server&#39;s picture and arrive with each <code>/api/spawn</code> answer. Rebuilt on load: <code>resourceRates</code>, derived combat stats, castle upgrade cost, every window/dialog flag, <code>isHydrated</code>.
 The stores: <code>gameStore.ts</code> (every action: buyTile, tick, upgradeCastle, clickForGold, startFight, rebirth, buyEmberUpgrade, merchant actions ...), <code>uiStore.ts</code> (transient UI flags), <code>viewStore.ts</code> (where the map is on the screen),
@@ -3808,17 +3649,17 @@ The stores: <code>gameStore.ts</code> (every action: buyTile, tick, upgradeCastl
 <ul>
 <li><code>Grid</code> mounts only the tiles that matter on screen: explored tiles and the unexplored ones touching them (what can be bought), inside the visible range plus two tiles. The list is rebuilt when that integer range or the map changes, not on every pixel of panning.
 The pan / zoom position lives in <code>viewStore</code>; fling inertia keeps its velocity in a ref with friction (no per-frame React state). The world div is a zero-size origin placed with <code>translate() scale()</code>; everything inside is positioned in world pixels, negative ones included.</li>
-<li><strong>Wheel zoom</strong> is stepped (0.75 / 1 / 1.5 / 2, one step per 50 px of wheel delta) so the pixel art stays crisp and zooms around the cursor. The zoom is exposed to CSS as <code>--map-zoom</code>; tile tooltips scale with it, castle/building dialogs do not.</li>
+<li><strong>Wheel zoom</strong> is stepped (0.75 / 1 / 1.5 / 2, one step per 50 px of wheel delta) so the pixel art stays crisp and zooms around the cursor. The zoom is exposed to CSS as <code>--map-zoom</code>; tile tooltips scale with it, castle dialogs do not.</li>
 <li><strong>Terrain</strong>: the ground is drawn in <strong>chunks</strong> of 16 x 16 tiles (768 px, <code>CHUNK_TILES</code>), one <code>&lt;canvas&gt;</code> each (<code>TerrainLayer</code> / <code>TerrainChunk</code>), only for the chunks on screen plus a ring around them, by <code>terrainRenderer.ts</code> from the atlas in <code>public/pixel/terrain/</code><ul>
-<li><code>src/config/terrainAtlas.json</code>. A chunk&#39;s picture depends only on the ground inside the chunk plus <code>CHUNK_HALO</code> (5) tiles, so its <code>chunkSignature</code> (one character per tile of that window, building tiles upper case) decides when it is redrawn: a purchase redraws
-the chunks next to it, never pan, zoom or a chest toggle. Draws are queued and run within a 6 ms frame budget (at least one chunk per frame); flat colours show first and until the atlas loads. Tiles are transparent hit areas that carry the castle, buildings,
+<li><code>src/config/terrainAtlas.json</code>. A chunk&#39;s picture depends only on the ground inside the chunk plus <code>CHUNK_HALO</code> (5) tiles, so its <code>chunkSignature</code> (one character per tile of that window) decides when it is redrawn: a purchase redraws
+the chunks next to it, never pan, zoom or a chest toggle. Draws are queued and run within a 6 ms frame budget (at least one chunk per frame); flat colours show first and until the atlas loads. Tiles are transparent hit areas that carry the castle,
 chest, &#39;?&#39; marker and hover overlays. Buyable unexplored tiles are drawn as the dark &#39;mist&#39; sea. <code>tests/world/terrainChunks.test.ts</code> checks the halo is enough, that equal signatures mean equal pictures, and that nothing is cut at a border.</li>
 </ul>
 </li>
 <li><strong>Highlight</strong>: the tile menu&#39;s &quot;Highlight this ... area&quot; tints the connected same-biome area (<code>connectedCluster</code>, an iterative flood fill) with the biome&#39;s colour from <code>biomePalette.ts</code> for 3 s, drawn by <code>HighlightLayer</code> as one screen-space canvas.</li>
-<li><strong>Minimap</strong>: <code>Minimap</code> paints one square per explored tile in its biome colour into one <code>ImageData</code> (<code>src/lib/minimap.ts</code>, repainted at most every 200 ms), a gold marker on the castle, purple ones on workshops, and outlines the visible part.
+<li><strong>Minimap</strong>: <code>Minimap</code> paints one square per explored tile in its biome colour into one <code>ImageData</code> (<code>src/lib/minimap.ts</code>, repainted at most every 200 ms), a gold marker on the castle, and outlines the visible part.
 Click or drag centres the view there; it is outside the map&#39;s click area, so it never pays gold.</li>
-<li><strong>Buildings</strong> keep their tile&#39;s own ground and get a pad of that biome (<code>allPads()</code> in <code>terrain.ts</code>, art in <code>terrain_pads.py</code>); the same rule is ported to <code>terrain_logic.py</code> and covered by the parity fixture.</li>
+<li><strong>Building pads</strong> (<code>allPads()</code> in <code>terrain.ts</code>, art in <code>terrain_pads.py</code>) are drawn under a tile that carries <code>Tile.building</code>. Nothing sets it since IDL-259; the per-biome building system (R7, IDL-91) will.</li>
 <li>Tile tooltips are portalled into <code>MapTipLayer</code>, a layer above the critters, because every tile is its own stacking context. <code>NotifyDot</code> is the one &quot;needs attention&quot; marker (unspent stat points, an affordable farm animal or upgrade).</li>
 <li>A <code>Tile</code> reads only primitives from the store and takes <code>canAfford</code> from <code>Grid</code>, which works the price of the next tile out once for all of them; unchanged tiles are skipped by <code>React.memo</code>, so panning mounts only the tiles that enter the view.</li>
 <li><code>AmbientLife</code> spawns a critter every few seconds on an owned tile in view; they are purely decorative (no clicks, no rewards) and off when disabled in Settings, when the tab is hidden, and with <code>prefers-reduced-motion</code>.</li>
@@ -3927,7 +3768,7 @@ Gold must stay the biggest number; if hide or stone becomes the limiter, adjust 
 <p>See also: <a href="#magnitude-bands"><code>MAGNITUDE_BANDS</code></a>, <a href="#castle-upgrade"><code>CASTLE_UPGRADE</code></a></p>
 </article><h2>Magnitude targets</h2><article><p><a id="magnitude-bands"></a></p>
 <h3><code>MAGNITUDE_BANDS</code> <small>const</small></h3>
-<p>Source: <a href="../../scripts/sim.ts"><code>scripts/sim.ts:797</code></a></p>
+<p>Source: <a href="../../scripts/sim.ts"><code>scripts/sim.ts:776</code></a></p>
 <p>The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.</p>
 <p>Magnitude targets (decided 2026-11-07, IDL-128): measured with the real store (<code>casual</code>, trace to day 16; <code>human-rebirth8</code>, <code>hardcore-rebirth6-x10</code>) and set as the design ceiling every cap decision is checked against.
 &quot;Income multiplier&quot; is total income at castle 10 relative to run 1 at castle 10, all sources together (Embers, gear, Idols, Monument, Paragon). The bands are the constants below: they are the only copy, the sim prints them next to the measured value

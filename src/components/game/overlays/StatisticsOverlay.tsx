@@ -48,7 +48,6 @@ const BreakdownBody: React.FC<{ entry: ResourceBreakdownEntry }> = ({ entry }) =
 		['Realm start', entry.start],
 		['Farm animals', entry.farm],
 		['Biome tiles', entry.biome],
-		['Buildings', entry.building],
 		['Castle area', entry.castleArea],
 		['Castle levels', entry.castleXp],
 	];

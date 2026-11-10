@@ -2,7 +2,6 @@
 import { FARM_KEYS, zeroResources } from '@/catalog/resourceKeys';
 import { BASE_GENERATION_RATES, BIOME_YIELD, SCALING_CONFIG } from '@/config/economy';
 import { BIOMES } from '@/config/biomes';
-import { BUILDINGS, type BuildingType } from '@/config/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { CHARACTER_STAT_CONFIG } from '@/config/character';
 import type { BiomeType, CharacterStats, GameState, PrestigeState, ResourceRates, Resources } from '@/types/game';
@@ -29,13 +28,11 @@ export interface ResourceBreakdownEntry {
 	farm: number;
 	/** Biome tiles, with the adjacency bonus and the yield scale applied */
 	biome: number;
-	/** Buildings, with the adjacency bonus and the yield scale applied */
-	building: number;
-	/** What the castle area bonus adds on the tiles (and their buildings) inside the castle range */
+	/** What the castle area bonus adds on the tiles inside the castle range */
 	castleArea: number;
 	/** Flat XP from castle levels above 1 */
 	castleXp: number;
-	/** start + farm + biome + building + castleArea + castleXp */
+	/** start + farm + biome + castleArea + castleXp */
 	base: number;
 	/** Percentage bonuses (0.2 = +20%), added together before the ember multiplier */
 	castleMod: number;
@@ -58,7 +55,7 @@ const RESOURCE_KEYS = Object.keys(BASE_GENERATION_RATES) as (keyof Resources)[];
 
 /** What one tile produces per second (before the global modifiers), split into the part that is its own and the bonuses on it. */
 interface TileOutput {
-	/** The biome's and the building's own output (with the yield scale) */
+	/** The biome's own output (with the yield scale) */
 	base: Partial<Resources>;
 	/** Extra from adjacent tiles of the same biome */
 	neighbour: Partial<Resources>;
@@ -95,13 +92,6 @@ export const calculateTileOutput = (tiles: World, x: number, y: number, castleLe
 		out.area[key] = (out.area[key] || 0) + withNeighbours * areaBonus;
 	};
 	for (const [resource, rate] of Object.entries(BIOMES[tile.biome].resourceGeneration)) add(resource, rate as number, yieldScale);
-	// A building adds its own output on top of the tile's biome output, with the same neighbour bonus
-	const building = tile.building ? BUILDINGS[tile.building as BuildingType] : undefined;
-	if (building?.resourceGeneration) {
-		for (const [resource, rate] of Object.entries(building.resourceGeneration)) {
-			if (typeof rate === 'number') add(resource, rate, BIOME_YIELD.scale);
-		}
-	}
 	return out;
 };
 
@@ -123,7 +113,7 @@ export const calculateTileOutput = (tiles: World, x: number, y: number, castleLe
  * @formula
  * base[r]  = BASE_GENERATION_RATES[r]
  *          + farm output (meat, eggs, milk, hide; the farm has no other source of those four)
- *          + sum over owned tiles of (biome output[r] + building output[r]) x BIOME_YIELD.scale x (1 + 0.25 x same-biome 4-neighbours)
+ *          + sum over owned tiles of biome output[r] x BIOME_YIELD.scale x (1 + 0.25 x same-biome 4-neighbours)
  *          + sum over tiles inside the castle range of the same tile output x castleAreaBonus(castle level)
  *          + 0.5 x (castle level - 1)                      (xp only)
  * modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
@@ -144,7 +134,6 @@ export const calculateResourceBreakdown = (
 	const start: Resources = { ...BASE_GENERATION_RATES };
 	const farmPart = zeroResources();
 	const biomePart = zeroResources();
-	const buildingPart = zeroResources();
 
 	// Meat and the other farm products come from the animals alone (the Skinner's bonus is on the meat and the hide)
 	const farm = calculateFarmOutput(farmLevels, farmUpgrades);
@@ -158,20 +147,17 @@ export const calculateResourceBreakdown = (
 	}
 
 	/**
-	 * Calculate base rates from tiles. Tiles are counted by (biome, same-biome neighbours, building) first and each group is
+	 * Calculate base rates from tiles. Tiles are counted by (biome, same-biome neighbours) first and each group is
 	 * priced once, so a map of tens of thousands of tiles costs one cheap pass instead of an allocation per tile.
 	 */
 	const biomeNames = Object.keys(BIOMES);
 	const biomeSlot = new Map(biomeNames.map((name, i) => [name, i]));
-	const buildingNames = ['', ...Object.keys(BUILDINGS)];
-	const buildingSlot = new Map(buildingNames.map((name, i) => [name, i]));
-	const groups = new Float64Array(biomeNames.length * 5 * buildingNames.length);
+	const groups = new Float64Array(biomeNames.length * 5);
 	forEachOwned(tiles, (tile, x, y) => {
 		const b = biomeSlot.get(tile.biome);
 		if (b === undefined) return;
 		const adjacent = countAdjacentSameBiomes(tiles, x, y, tile.biome);
-		const bld = tile.building ? (buildingSlot.get(tile.building) ?? 0) : 0;
-		groups[(b * 5 + adjacent) * buildingNames.length + bld]++;
+		groups[b * 5 + adjacent]++;
 	});
 	for (let b = 0; b < biomeNames.length; b++) {
 		const biome = BIOMES[biomeNames[b]];
@@ -179,27 +165,14 @@ export const calculateResourceBreakdown = (
 		const yieldScale = biomeNames[b] === 'castle' ? 1 : BIOME_YIELD.scale;
 		for (let adjacent = 0; adjacent < 5; adjacent++) {
 			const adjacencyMultiplier = 1 + SCALING_CONFIG.adjacencyBonus * adjacent;
-			for (let bld = 0; bld < buildingNames.length; bld++) {
-				const count = groups[(b * 5 + adjacent) * buildingNames.length + bld];
-				if (count === 0) continue;
-				for (const [resource, rate] of Object.entries(biome.resourceGeneration)) {
-					if (rate) {
-						// Add to base rate with adjacency bonus
-						const gain = count * rate * adjacencyMultiplier * yieldScale;
-						base[resource as keyof Resources] += gain;
-						biomePart[resource as keyof Resources] += gain;
-					}
-				}
-				// A building adds its own output on top of the tile's biome output
-				const building = bld > 0 ? BUILDINGS[buildingNames[bld] as BuildingType] : undefined;
-				if (building && building.resourceGeneration) {
-					for (const [resource, rate] of Object.entries(building.resourceGeneration)) {
-						if (rate && typeof rate === 'number') {
-							const gain = count * rate * adjacencyMultiplier * BIOME_YIELD.scale;
-							base[resource as keyof Resources] += gain;
-							buildingPart[resource as keyof Resources] += gain;
-						}
-					}
+			const count = groups[b * 5 + adjacent];
+			if (count === 0) continue;
+			for (const [resource, rate] of Object.entries(biome.resourceGeneration)) {
+				if (rate) {
+					// Add to base rate with adjacency bonus
+					const gain = count * rate * adjacencyMultiplier * yieldScale;
+					base[resource as keyof Resources] += gain;
+					biomePart[resource as keyof Resources] += gain;
 				}
 			}
 		}
@@ -257,7 +230,6 @@ export const calculateResourceBreakdown = (
 			start: start[key],
 			farm: farmPart[key],
 			biome: biomePart[key],
-			building: buildingPart[key],
 			castleArea: areaPart[key],
 			castleXp: key === 'xp' ? castleXp : 0,
 			base: base[key],

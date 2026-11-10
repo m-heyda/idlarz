@@ -5,7 +5,7 @@ import type { Tile } from '@/types/game';
  *
  * Only owned tiles are stored; everything else is "not explored" (`tileAt` answers an empty tile, `getTile` undefined).
  * Updates are copy-on-write (`setTile` returns a new World) so a store `tiles` reference changes exactly when the map does,
- * and the counters (owned, buildings, per-biome) and bounds are kept up to date incrementally: no per-tick scans.
+ * and the counters (owned, per-biome) and bounds are kept up to date incrementally: no per-tick scans.
  *
  * Coordinates are logical: the castle stays at (25, 25) as it always was, so old saves and the procedural art (which hashes
  * absolute coordinates) are unchanged. |x| and |y| are limited to COORD_LIMIT so a tile has a small-integer key (a Map with
@@ -15,7 +15,7 @@ import type { Tile } from '@/types/game';
 /**
  * The map has no edge. `GameState.tiles` is a `World`: an immutable, sparse set of the **explored** tiles on an integer grid with negative coordinates, stored as `ReadonlyMap<number, Tile>` under a small-integer key (`tileKey(x, y)`,
  * `|x|, |y| <= COORD_LIMIT = 16,000`, at most `MAX_OWNED_TILES = 250,000` tiles). Unexplored land is simply absent (`getTile` gives `undefined`, `tileAt` an empty tile). Updates are copy-on-write (`setTile`, `patchTile`, batched `setTiles`),
- * so `state.tiles` changes exactly when the map does; the owned / building / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).
+ * so `state.tiles` changes exactly when the map does; the owned / chest / per-biome counters and the bounding box are kept up to date incrementally (O(1) reads, no per-tick scans).
  *
  * Tiles an old save knew by row and column keep their logical coordinates: the castle stays at (25, 25), so old saves and the procedural art (which hashes absolute coordinates, parity-tested against Python) are unchanged.
  *
@@ -55,7 +55,6 @@ export interface Bounds {
 
 interface WorldStats {
 	owned: number;
-	buildings: number;
 	chests: number;
 	byBiome: Readonly<Record<string, number>>;
 }
@@ -73,7 +72,7 @@ export interface Placed {
 	tile: Tile;
 }
 
-const EMPTY_STATS: WorldStats = { owned: 0, buildings: 0, chests: 0, byBiome: {} };
+const EMPTY_STATS: WorldStats = { owned: 0, chests: 0, byBiome: {} };
 export const EMPTY_WORLD: World = { map: new Map(), stats: EMPTY_STATS, bounds: null };
 
 // ---- statistics ----------------------------------------------------------------------------------------------------
@@ -81,14 +80,12 @@ export const EMPTY_WORLD: World = { map: new Map(), stats: EMPTY_STATS, bounds: 
 /** Running totals while a batch of changes is applied (one byBiome copy per batch, not per tile). */
 interface Tally {
 	owned: number;
-	buildings: number;
 	chests: number;
 	byBiome: Record<string, number>;
 }
 
 const startTally = (stats: WorldStats): Tally => ({
 	owned: stats.owned,
-	buildings: stats.buildings,
 	chests: stats.chests,
 	byBiome: { ...stats.byBiome },
 });
@@ -97,13 +94,11 @@ const startTally = (stats: WorldStats): Tally => ({
 const account = (t: Tally, old: Tile | undefined, next: Tile | undefined): void => {
 	if (old) {
 		t.owned--;
-		if (old.building) t.buildings--;
 		if (old.hasChest) t.chests--;
 		if (--t.byBiome[old.biome] <= 0) delete t.byBiome[old.biome];
 	}
 	if (next) {
 		t.owned++;
-		if (next.building) t.buildings++;
 		if (next.hasChest) t.chests++;
 		t.byBiome[next.biome] = (t.byBiome[next.biome] ?? 0) + 1;
 	}
@@ -141,7 +136,6 @@ export const tileAt = (world: World, x: number, y: number): Tile => getTile(worl
 export const isOwnedAt = (world: World, x: number, y: number): boolean => getTile(world, x, y) !== undefined;
 
 export const ownedCount = (world: World): number => world.stats.owned;
-export const buildingCount = (world: World): number => world.stats.buildings;
 export const biomeCount = (world: World, biome: string): number => world.stats.byBiome[biome] ?? 0;
 export const ownedBounds = (world: World): Bounds | null => world.bounds;
 

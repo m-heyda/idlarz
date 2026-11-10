@@ -1,10 +1,9 @@
 // economySlice.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
-import { BUILDINGS } from '@/config/buildings';
 import { CASTLE_UPGRADE } from '@/config/castle';
 import { CLICK_LADDER, clickGold, RESOURCE_CAP, XP_CAP } from '@/config/economy';
-import { calculateBuildingCost, canBuildAt, calculateTileCost, canAffordBundle, subtractBundle, tileCostAsResources } from '@/utils/game/costs';
+import { calculateTileCost, canAffordBundle, subtractBundle, tileCostAsResources } from '@/utils/game/costs';
 import { calculateResourceRates } from '@/utils/game/income';
 import { calculateXpGain } from '@/utils/game/character';
 import { castleUpgradeDuration } from '@/utils/game/castle';
@@ -12,9 +11,8 @@ import { economyTiles } from '@/utils/game/tiles';
 import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { rollBiome } from '@/utils/biomeRules';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
-import { monsterAt } from '@/lib/monsters';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
-import { MAX_OWNED_TILES, getTile, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
+import { MAX_OWNED_TILES, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
 import { clickLimiter, findCastle, type GameGet, type GameSet } from './base';
 
 export const createEconomySlice = (set: GameSet, get: GameGet) => {
@@ -81,36 +79,6 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 					toLevel: castle.tile.level + 1,
 					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige),
 				},
-			});
-			return true;
-		},
-
-		// Builds on an explored tile of any biome (not the castle or a lake, not inside a landmark's 6x6 area; one building per tile, nothing on a tile with a chest or a monster).
-		// The tile keeps its biome and its output; the building adds its own. Each building costs more than the last (calculateBuildingCost).
-		buildOnTile: (x: number, y: number, buildingType: string) => {
-			const state = get();
-			const tile = getTile(state.tiles, x, y);
-			if (!tile || !canBuildAt(state.tiles, x, y) || tile.hasChest || monsterAt(state.monsters, x, y)) return false;
-			if (!(buildingType in BUILDINGS)) return false;
-
-			const cost = calculateBuildingCost(state.tiles, state.prestige);
-			if (!canAffordBundle(state.resources, cost)) return false;
-
-			const updatedTiles = setTile(state.tiles, x, y, { ...tile, building: buildingType });
-			const newRates = calculateResourceRates(
-				updatedTiles,
-				state.characterStats,
-				state.farmLevels,
-				state.prestige,
-				state.farmUpgrades,
-				state.merchantUpgrades,
-				gearIncomePct(state.equipment),
-			);
-
-			set({
-				tiles: updatedTiles,
-				resources: subtractBundle(state.resources, cost),
-				resourceRates: newRates,
 			});
 			return true;
 		},

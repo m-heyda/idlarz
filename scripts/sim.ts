@@ -62,7 +62,7 @@
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { getTile, isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
+import { isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/world';
 import { mulberry32 } from '../src/lib/rng';
 import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/loadGame';
 
@@ -318,15 +318,8 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 	let t = 0; // game seconds
 	let eventId = 0;
-	let ownedTiles: [number, number][] = [];
-	const refreshOwned = () => {
-		ownedTiles = [];
-		for (const { x, y } of ownedRowMajor(api().tiles)) ownedTiles.push([x, y]);
-	};
 	let frontier: [number, number] | null = null;
 	let frontierDirty = true;
-	let buildingCursor = 0;
-	const BUILD_ORDER = ['market', 'farm', 'lumbermill', 'mine', 'blacksmith', 'workshop'];
 
 	const isActive = (sec: number) => {
 		const hour = ((sec + (profile.startHour ?? 0) * 3600) % 86400) / 3600;
@@ -443,18 +436,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const cost = utils.farmUpgradeCost(id, level);
 			const roomy = Object.entries(cost).every(([r, v]) => s.resources[r as keyof typeof s.resources] >= (v ?? 0) * 1.5 + (castleNeed[r] ?? 0));
 			if (roomy && api().buyFarmUpgrade(id)) s = api();
-		}
-
-		// Buildings: on the first explored tile that can take one, while the gold is comfortably there (the price rises with every one)
-		{
-			const bc = utils.calculateBuildingCost(s.tiles, s.prestige);
-			if (utils.canAffordBundle(s.resources, bc) && s.resources.gold > (bc.gold ?? 0) * 3) {
-				const spot = ownedTiles.find(([x, y]) => utils.canBuildOn(getTile(s.tiles, x, y)));
-				if (spot && api().buildOnTile(spot[0], spot[1], BUILD_ORDER[buildingCursor % BUILD_ORDER.length])) {
-					buildingCursor++;
-					s = api();
-				}
-			}
 		}
 
 		// Tile purchases: as many as affordable
@@ -658,7 +639,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			// Attempts above what the limiter could ever pay are skipped (they would all be denied anyway)
 			const n = Math.min(Math.floor(profile.cps * step), Math.ceil(cfg.CLICK_LIMIT.refillPerSec * 1.2 * step));
 			const gap = (step * 1000) / Math.max(n, 1);
-			if (ownedTiles.length === 0 || frontierDirty) refreshOwned();
 			for (let i = 0; i < n; i++) {
 				const input = { eventId: ++eventId, now: t * 1000 + i * gap, trusted: true };
 				api().clickForGold(input);
@@ -711,7 +691,6 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 					runStart = t;
 					castleIdleSince = t;
 					frontierDirty = true;
-					buildingCursor = 0;
 					if (profile.combat) resetCombat();
 				}
 			}
@@ -996,7 +975,6 @@ function applyLegacy(cfg: GameConfig) {
 	c.MERCHANT_RESOURCE_PRICES.meat = 15;
 	c.CASTLE_UPGRADE.durationsSec.fill(0);
 	c.TILE_RESOURCE_COST.length = 0;
-	c.BUILDING_COST.base = {};
 	c.CHEST.minMinutes = 5;
 	c.CHEST.maxMinutes = 50;
 	c.SCALING_CONFIG.costFormula = (n: number) => {

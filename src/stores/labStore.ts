@@ -232,7 +232,7 @@ const strokeTool = (tool: LabTool, biome: string): StrokeTool | null => {
 
 /** A random free land tile for a lab chest. The lab's own plain pick: the game's weighted chest placement stays on the server. */
 const freeSpot = (world: World, taken: ReadonlySet<string>, random: () => number): Cell | null => {
-	const free = ownedEntries(world).filter(({ x, y, tile }) => tile.biome !== 'castle' && !tile.hasChest && !tile.building && !taken.has(`${x},${y}`));
+	const free = ownedEntries(world).filter(({ x, y, tile }) => tile.biome !== 'castle' && !tile.hasChest && !taken.has(`${x},${y}`));
 	if (!free.length) return null;
 	const { x, y } = free[Math.floor(random() * free.length)];
 	return { x, y };
@@ -369,9 +369,9 @@ export const useLabStore = create<LabState>((set, get) => {
 			const random = seededRandom(seed + nextId * 104729);
 			const taken = takenSpots(tiles, monsters);
 			const castleLevel = castleLevelOf(tiles);
-			// the monster's own biome (its art folder), clear of the castle ward, buildings, chests and other monsters
+			// the monster's own biome (its art folder), clear of the castle ward, chests and other monsters
 			const eligible = ownedEntries(tiles).filter(
-				({ x, y, tile }) => tile.biome === entry.biomes[0] && !tile.building && !tile.hasChest && !taken.has(`${x},${y}`) && !isInWard(x, y, castleLevel),
+				({ x, y, tile }) => tile.biome === entry.biomes[0] && !tile.hasChest && !taken.has(`${x},${y}`) && !isInWard(x, y, castleLevel),
 			);
 			for (let i = 0; i < count && eligible.length; i++) {
 				const { x, y } = eligible.splice(Math.floor(random() * eligible.length), 1)[0];

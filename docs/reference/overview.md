@@ -21,7 +21,7 @@ Idle Realm (code name idlarz) is an idle/incremental map game for signed-in play
 **The loop of the game**
 
 1. You start with a castle and the four tiles beside it on an unbounded map, 125 gold and 1,000 gems. Gold, other resources and XP trickle in ([`BASE_GENERATION_RATES`](economy.md#base-generation-rates)).
-2. Gold (plus wood, stone, coal, food and hide from tile 15 up) buys adjacent tiles ([`tilePrice`](economy.md#tileprice)); each becomes a randomly rolled biome ([`rollBiome`](economy.md#rollbiome)) and adds income. Buildings stand on tiles and add output. Same-biome neighbours add 25% each.
+2. Gold (plus wood, stone, coal, food and hide from tile 15 up) buys adjacent tiles ([`tilePrice`](economy.md#tileprice)); each becomes a randomly rolled biome ([`rollBiome`](economy.md#rollbiome)) and adds income. Same-biome neighbours add 25% each.
 3. The **castle** is a timed upgrade (level 1-10) that adds a big modifier to every resource, a range bonus on nearby tiles, and a ward from level 7 that keeps monsters out ([`CASTLE_UPGRADE`](economy.md#castle-upgrade)).
 4. The **farm** turns food into animals that make meat and small amounts of eggs, milk and hide ([`ANIMALS`](economy.md#animals)). The **merchant** buys resources, sells gear and potions, and sells permanent upgrades for gold ([`MERCHANT_UPGRADES`](economy.md#merchant-upgrades)).
 5. **Clicks** on the map and **chests** add active gold ([`clickGold`](economy.md#clickgold), [`CHEST`](economy.md#chest)). Every level gives attribute points (Strength, Dexterity, Intelligence, Vitality, Charisma) that add income, combat strength, Luck and a tile discount ([`CHARACTER_STAT_CONFIG`](progression.md#character-stat-config)).

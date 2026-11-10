@@ -141,7 +141,7 @@ danger bonus = floor(Chebyshev distance from the castle / 8) levels
 
 ### `advanceBank` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:153`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:152`](../../src/lib/offline/tickets.ts)
 
 Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
 (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
@@ -164,9 +164,9 @@ Where and when monsters appear (server only).
 Source: [`src/lib/monsters.ts:150`](../../src/lib/monsters.ts)
 
 Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance
-(Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are `MonsterDef.spawn`.
+(Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are `MonsterDef.spawn`.
 
-The tile: an owned tile whose biome is in the monster's list (`MonsterDef.spawn`), Chebyshev distance from the castle 2 to 9 (`minCastleDistance`, `maxCastleDistance`), no building, no chest, no other monster,
+The tile: an owned tile whose biome is in the monster's list (`MonsterDef.spawn`), Chebyshev distance from the castle 2 to 9 (`minCastleDistance`, `maxCastleDistance`), no chest, no other monster,
 outside the castle ward from castle level 7. `minRebirths` exists in the rule but no monster uses it.
 
 <a id="typeweights"></a>
@@ -185,7 +185,7 @@ for new spawns only. Bosses follow the same rules (IDL-222): among the boss type
 
 ### `placeTickets` <small>function</small>
 
-Source: [`src/lib/offline/placement.ts:72`](../../src/lib/offline/placement.ts)
+Source: [`src/lib/offline/placement.ts:71`](../../src/lib/offline/placement.ts)
 
 Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
@@ -199,7 +199,7 @@ that still have a free tile the pick is weighted by win chance and the boss's sp
 
 ### `ticketCap` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:113`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:112`](../../src/lib/offline/tickets.ts)
 
 How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
 (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.

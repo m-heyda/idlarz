@@ -5,7 +5,7 @@ import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { CLICK_LADDER, clickGold, MAX_CATCHUP_SEC, TILE_RESOURCE_COST } from '../../src/config/economy';
 import { MERCHANT_BUYABLE, MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES } from '../../src/config/merchant';
 import { buyCost } from '../../src/utils/game/merchant';
-import { calculateTileCost, calculateBuildingCost } from '../../src/utils/game/costs';
+import { calculateTileCost } from '../../src/utils/game/costs';
 import { effectiveTileDiscount } from '../../src/utils/game/rebirth';
 import { totalStatPoints, xpToNextLevel } from '../../src/utils/game/character';
 import type { Resources } from '../../src/types/game';
@@ -122,7 +122,7 @@ test('buyTile: only adjacent, unowned, affordable tiles; pick-a-biome flow is gu
 	assert.ok(api().resources.gold < gold, 'the purchase is charged at once');
 	assert.equal(owned(), 4);
 	assert.ok(tileAt(api().tiles, spot[0], spot[1]).isOwned);
-	assert.notEqual(tileAt(api().tiles, spot[0], spot[1]).biome, 'grounds', 'the removed Grounds biome never turns up: buildings go on any tile');
+	assert.notEqual(tileAt(api().tiles, spot[0], spot[1]).biome, 'grounds', 'the removed Grounds biome never turns up: every tile is a land biome or a lake');
 });
 
 test('tile cost: extra resources are required from the configured tile count and are paid', () => {
@@ -219,26 +219,6 @@ test('chests: collecting needs a real chest and takes it off the map at once (wh
 	} finally {
 		globalThis.fetch = realFetch;
 	}
-});
-
-test('buildings: cost resources, grow more expensive, and only go on free land tiles', () => {
-	freshGame({ gold: 1e12, wood: 1e12, stone: 1e12 });
-	growTo(4);
-	// the bought tiles roll their biome, and all of them can be water: pin one owned land tile to build on
-	patchTileAt(CASTLE_X + 1, CASTLE_Y, { biome: 'plains', isOwned: true });
-	const spot = gridCells().find(({ t }) => t.isOwned && t.biome !== 'castle' && t.biome !== 'lake')!;
-	const first = calculateBuildingCost(api().tiles);
-	assert.equal(api().buildOnTile(spot.x, spot.y, 'nonsense'), false);
-	assert.equal(api().buildOnTile(CASTLE_X, CASTLE_Y, 'market'), false); // the castle
-	setResources({ gold: 0, wood: 0, stone: 0 });
-	assert.equal(api().buildOnTile(spot.x, spot.y, 'market'), false);
-	setResources({ gold: 1e12, wood: 1e12, stone: 1e12 });
-	assert.equal(api().buildOnTile(spot.x, spot.y, 'market'), true);
-	assert.equal(tileAt(api().tiles, spot.x, spot.y).building, 'market');
-	assert.equal(tileAt(api().tiles, spot.x, spot.y).biome, spot.t.biome, 'the tile keeps its biome');
-	assert.equal(api().buildOnTile(spot.x, spot.y, 'farm'), false); // already built
-	const second = calculateBuildingCost(api().tiles);
-	assert.ok((second.gold ?? 0) > (first.gold ?? 0));
 });
 
 test('stat points: only the five base stats can be raised and only with points', () => {

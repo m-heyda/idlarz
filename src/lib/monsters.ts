@@ -139,9 +139,9 @@ export const monsterAt = (monsters: Monster[], x: number, y: number): Monster | 
 
 /**
  * Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance
- * (Chebyshev), and nothing else is there (castle ward, building, chest, another monster). The rules are `MonsterDef.spawn`.
+ * (Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are `MonsterDef.spawn`.
  *
- * The tile: an owned tile whose biome is in the monster's list (`MonsterDef.spawn`), Chebyshev distance from the castle 2 to 9 (`minCastleDistance`, `maxCastleDistance`), no building, no chest, no other monster,
+ * The tile: an owned tile whose biome is in the monster's list (`MonsterDef.spawn`), Chebyshev distance from the castle 2 to 9 (`minCastleDistance`, `maxCastleDistance`), no chest, no other monster,
  * outside the castle ward from castle level 7. `minRebirths` exists in the rule but no monster uses it.
  *
  * @category Monsters/Spawning
@@ -151,7 +151,7 @@ export const canSpawnOn = (
 	type: MonsterType,
 	x: number,
 	y: number,
-	tile: { biome: string; building?: string; hasChest?: boolean },
+	tile: { biome: string; hasChest?: boolean },
 	castleLevel: number,
 	rebirths = 0,
 ): boolean => {
@@ -159,7 +159,7 @@ export const canSpawnOn = (
 	if (rebirths < (rule.minRebirths ?? 0)) return false;
 	if (!(rule.biomes as readonly string[]).includes(tile.biome)) return false;
 	const distance = castleDistance({ x, y });
-	return distance >= rule.minCastleDistance && distance <= rule.maxCastleDistance && !tile.building && !tile.hasChest && !isInWard(x, y, castleLevel);
+	return distance >= rule.minCastleDistance && distance <= rule.maxCastleDistance && !tile.hasChest && !isInWard(x, y, castleLevel);
 };
 
 /** Every owned tile a monster of this type may appear on, not counting the `taken` ones ("x,y" keys of monsters already standing). */

@@ -22,7 +22,6 @@ const snapshot = (b: Before = {}): Snapshot => {
 		level: 1,
 		clickLevel: 0,
 		tilesOwned: b.purchased ?? 12,
-		buildingsOwned: 0,
 		castleLevel: b.castleLevel ?? 1,
 		rebirths: b.rebirths ?? 0,
 		legacyPoints: b.legacyEarned ?? 0,

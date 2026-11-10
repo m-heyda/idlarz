@@ -68,7 +68,6 @@ test('a monster may stand on land of its allowlist 2 to 9 tiles from the castle:
 	assert.equal(land(0, -10), false);
 	for (const water of ['lake', 'coast', 'castle', 'empty']) assert.equal(land(4, 0, water), false, water);
 	for (const ground of rule.biomes) assert.equal(land(4, 0, ground), true, ground);
-	assert.equal(canSpawnOn('thistleBoar', CASTLE_X + 4, CASTLE_Y, { biome: 'plains', building: 'farm' }, 1), false, 'not on a building');
 	assert.equal(canSpawnOn('thistleBoar', CASTLE_X + 4, CASTLE_Y, { biome: 'plains', hasChest: true }, 1), false, 'not on a chest');
 	assert.equal(canSpawnOn('thistleBoar', CASTLE_X + 4, CASTLE_Y, { biome: 'plains' }, 1, 0), true);
 	assert.equal(typeof BIOMES.lake, 'object');

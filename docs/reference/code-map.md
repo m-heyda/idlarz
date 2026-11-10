@@ -160,7 +160,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
-- [`BuildDialog.tsx`](../../src/components/game/BuildDialog.tsx) — ~ The build dialog of one explored tile, opened from its right-click menu ("Build here").
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
 - [`CastleFortress.tsx`](../../src/components/game/CastleFortress.tsx) — ~ The castle's fortress (castle level 7+):
 - [`CastleRange.tsx`](../../src/components/game/CastleRange.tsx) — ~ Violet patch drawn over the tiles the castle's range bonus covers (the bonus itself comes later):
@@ -202,7 +201,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
 - [`Tile.tsx`](../../src/components/game/Tile.tsx)
-- [`TileMenu.ts`](../../src/components/game/TileMenu.ts) — ~ The monster on the tile; undefined:
+- [`TileMenu.ts`](../../src/components/game/TileMenu.ts) — ~ Right click on an explored tile:
 - [`TileMonster.tsx`](../../src/components/game/TileMonster.tsx) — ~ The monster on the map with its growth shown:
 - [`TileStatus.tsx`](../../src/components/game/TileStatus.tsx)
 - [`TileTooltip.tsx`](../../src/components/game/TileTooltip.tsx) — ~ Hover card of a monster:
@@ -262,7 +261,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`biomeStage.ts`](../../src/config/biomeStage.ts) — Which biomes are part of the game today and which exist only for development (the map lab).
 - [`biomes.ts`](../../src/config/biomes.ts) — The map: tile size, biome list and spawn weights, and the ambient critters.
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
-- [`buildings.ts`](../../src/config/buildings.ts) — Buildings and what they cost.
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
 - [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`). Newest first; add an entry here with every update worth telling players about.
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
@@ -314,7 +312,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
 - [`castleWard.ts`](../../src/lib/castleWard.ts) — ~ How far (tiles, every side) the violet range area reaches:
-- [`chests.ts`](../../src/lib/chests.ts) — ~ A tile with a building:
+- [`chests.ts`](../../src/lib/chests.ts) — ~ The tiles a chest could go on, with their weights.
 - [`clickLimiter.ts`](../../src/lib/clickLimiter.ts) — ~ Click limiter made of two token buckets (a paid click needs a token from both).
 - [`clipboard.ts`](../../src/lib/clipboard.ts) — Copies text to the clipboard.
 - [`cloudClient.ts`](../../src/lib/cloudClient.ts) — ~ The browser side of /api/save.
@@ -446,6 +444,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`syncPolicy.ts`](../../src/lib/syncPolicy.ts) — ~ Browsers refuse a keepalive request body above 64 KiB (the fetch throws):
 - [`terrainRenderer.ts`](../../src/lib/terrainRenderer.ts) — ~ Draws the map terrain one chunk at a time (CHUNK_TILES x CHUNK_TILES tiles per canvas; 1 canvas px = 1 art px = 1 world px, scaled by the world div's CSS transform, so pan and zoom never redraw).
+- [`tileMenuItems.ts`](../../src/lib/tileMenuItems.ts) — ~ Id of the disabled Buildings entry, the hook for the new building system (R7, IDL-91; see {@link tileMenuItems}).
 - [`tipPlacement.ts`](../../src/lib/tipPlacement.ts) — Where a hover card goes: flush against the edge of the item box it belongs to, not under the cursor. Pure, so the
 - [`uiPrefs.ts`](../../src/lib/uiPrefs.ts) — Remembered view options (not game state): plain booleans in localStorage, every access guarded
 - [`utils.ts`](../../src/lib/utils.ts)
@@ -499,7 +498,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`castle.ts`](../../src/utils/game/castle.ts) — The castle's income bonus and upgrade time (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`character.ts`](../../src/utils/game/character.ts) — Attributes, the level curve, XP and the combat stats derived from the attributes (part of the former utils/gameUtils.ts, split in IDL-15).
-- [`costs.ts`](../../src/utils/game/costs.ts) — What buying a tile or a building costs, and paying for it (part of the former utils/gameUtils.ts, split in IDL-15).
+- [`costs.ts`](../../src/utils/game/costs.ts) — What buying a tile costs, and paying for it (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`farm.ts`](../../src/utils/game/farm.ts) — The farm: animal costs and output, pen and upgrades (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`income.ts`](../../src/utils/game/income.ts) — Income per second: what one tile produces, and the full breakdown and rates (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`merchant.ts`](../../src/utils/game/merchant.ts) — The merchant's upgrades, what selling pays and what buying costs (part of the former utils/gameUtils.ts, split in IDL-15).
@@ -644,8 +643,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/economy/**
 
-- [`buildOnTile.test.ts`](../../tests/economy/buildOnTile.test.ts) — ~ The first explored non-castle tile, turned into `biome`.
-- [`buildings.test.ts`](../../tests/economy/buildings.test.ts)
 - [`castle.test.ts`](../../tests/economy/castle.test.ts) — ~ Pays for and waits out one castle upgrade with the real actions.
 - [`castleFinder.test.ts`](../../tests/economy/castleFinder.test.ts) — ~ A view whose screen centre is the world point (wx, wy) in tiles.
 - [`castleWard.test.ts`](../../tests/economy/castleWard.test.ts) — ~ Make all 8 tiles around the castle owned (growTo buys the nearest tiles, which is not always the full 3x3).
@@ -706,7 +703,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
-- [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with buildings, a chest, gear and a monster, as a plain persisted slice.
+- [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with a chest, gear and a monster, as a plain persisted slice.
 - [`saveWorld.test.ts`](../../tests/saves/saveWorld.test.ts) — ~ The game with a synthetic map of `count` tiles that is valid for sanitizeSave (XP pays for it, stat points follow the level).
 - [`saves.test.ts`](../../tests/saves/saves.test.ts) — ~ A plain JSON copy of a (valid) persisted game, as it would come out of a save file.
 - [`storageScope.test.ts`](../../tests/saves/storageScope.test.ts)

@@ -157,7 +157,6 @@ const onlyTimeMoved = (stored: Ledger, next: Ledger): boolean => {
 export const bankContext = (stored: StoredSave): BankContext => ({
 	luck: stored.summary.derived.luck,
 	tilesOwned: stored.summary.tilesOwned,
-	buildingsOwned: stored.summary.buildingsOwned,
 	lakesOwned: stored.summary.derived.lakesOwned ?? 0,
 	castleLevel: stored.summary.castleLevel,
 });

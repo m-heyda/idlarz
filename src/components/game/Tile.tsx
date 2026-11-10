@@ -2,8 +2,6 @@ import React, { memo, useState } from 'react';
 import { TileProps, type MonsterType } from '@/types/game';
 import { CASTLE_X, CASTLE_Y, CASTLE_FORTRESS, CASTLE_UPGRADE } from '@/config/castle';
 import { TILE_SIZE } from '@/config/biomes';
-import { BUILDINGS, BuildingType } from '@/config/buildings';
-import '@/styles/Buildings.css';
 import { useMapSource } from './mapSource';
 import { castleLevelOf, inCastleRange, MAX_CASTLE_RANGE_RADIUS } from '@/lib/castleWard';
 import { getTile } from '@/utils/world';
@@ -12,7 +10,6 @@ import audioManager from '@/utils/audioManager';
 import PixelIcon, { PixelSheet } from './PixelIcon';
 import CastleSprite from './CastleSprite';
 import CastleTimerBadge from './CastleTimerBadge';
-import { BUILDING_PIXEL_ICONS, BUILDING_GLOW } from '@/config/pixelIcons';
 import { maxLevelOf, monsterAt } from '@/lib/monsters';
 import { useWindowStore } from '@/stores/windowStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -21,7 +18,7 @@ import TileMonster from './TileMonster';
 import TileTooltip from './TileTooltip';
 import { openTileMenu } from './TileMenu';
 
-const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, building, canAfford = false }) => {
+const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = false }) => {
 	const { game, onTile, drag } = useMapSource();
 	// Only primitives are read from the store: a tile re-renders for its own chest, monster or castle level, not for every change of the map
 	const buyTile = game((state) => state.buyTile);
@@ -49,7 +46,6 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, building, canA
 	// The map only mounts a tile that is not explored when it touches explored land: it can be bought
 	const isAdjacent = !isOwned;
 
-	const hasBuilding = !!building;
 	const castleLevel = game((state) => (biome === 'castle' ? castleLevelOf(state.tiles) : 1));
 	const isGlowingCastle = biome === 'castle' && castleLevel >= CASTLE_UPGRADE.glowFromLevel;
 	// from the fortress level the castle stands on cobbles inside walls: no purple border, no golden tile aura
@@ -130,7 +126,6 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, building, canA
 			queuePos,
 			lineOpen,
 			hasChest,
-			hasBuilding,
 		});
 	};
 
@@ -223,12 +218,6 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, building, canA
 							<span className='tile-chest'>
 								<PixelSheet name='chest_map_anim' frames={4} durationMs={1600} alt='Treasure chest' />
 							</span>
-						</span>
-					)}
-
-					{hasBuilding && (
-						<span className='tile-building' style={{ '--glow': BUILDING_GLOW[building as string] ?? '#ffd860' } as React.CSSProperties}>
-							<PixelIcon name={BUILDING_PIXEL_ICONS[building as string]} alt={BUILDINGS[building as BuildingType]?.label ?? 'Building'} className='tile-icon' />
 						</span>
 					)}
 				</div>

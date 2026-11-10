@@ -20,7 +20,6 @@ import {
 	XP_CAP,
 } from '../../src/config/economy';
 import { BIOMES } from '../../src/config/biomes';
-import { BUILDING_COST, BUILDINGS } from '../../src/config/buildings';
 import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADE_GROUPS, MERCHANT_UPGRADES } from '../../src/config/merchant';
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
@@ -37,7 +36,6 @@ import { gearItemLevels, gearOdds, pityRarityOf } from '../../src/lib/craftGear'
 import { recipeCostGold } from '../../src/lib/crafting';
 import { castleAreaBonus, castleRangeRadius } from '../../src/lib/castleWard';
 import { castleModifier } from '../../src/utils/game/castle';
-import { buildingCostFactor } from '../../src/utils/game/costs';
 import { cumulativeXp, totalStatPoints } from '../../src/utils/game/character';
 import { emberGain, emberIncomeBonus } from '../../src/utils/game/rebirth';
 import { monsterStats, spawnLevelRange } from '../../src/lib/monsters';
@@ -109,19 +107,6 @@ TABLES['biome-output'] = () => ({
 			...SELECTABLE_BIOMES.map((b) => [BIOMES[b].label, res(BIOMES[b].resourceGeneration as Record<string, number>) || '-']),
 			['(scale)', `x${BIOME_YIELD.scale}`],
 		],
-	),
-});
-
-TABLES['buildings-output'] = () => ({
-	title: 'Buildings and their config output per second',
-	md: mdTable(['Building', 'Output / s'], Object.values(BUILDINGS).map((b) => [b.label, res(b.resourceGeneration as Record<string, number>)])),
-});
-
-TABLES['building-cost-examples'] = () => ({
-	title: 'Price of the Nth building (before Thrift)',
-	md: mdTable(
-		['Building number', ...Object.keys(BUILDING_COST.base)],
-		[1, 2, 3, 4, 5, 10, 20, 40].map((n) => [n, ...Object.values(BUILDING_COST.base).map((base) => fmt(Math.floor(Math.min((base || 0) * buildingCostFactor(n - 1), RESOURCE_CAP / 100))))]),
 	),
 });
 
