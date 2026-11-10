@@ -13,7 +13,7 @@ import { COMBAT, MONSTERS, STAT_RULES } from '@/config/combatConfig';
 import { SKILLS } from '@/catalog/skills';
 import { LIMITS } from '@/config/limits';
 import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
-import { BIOME_PIXEL_ICONS } from '@/config/pixelIcons';
+import { BIOME_PIXEL_ICONS, PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
 import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
 import { castleModifier } from '@/utils/game/castle';
 import PixelIcon from '../PixelIcon';
@@ -285,7 +285,7 @@ const Tutorial: React.FC = () => {
 						<div key={a.id} className='px-card'>
 							<h4 className='text-yellow-300 font-medium mb-1 flex items-center gap-1'>
 								{a.name}
-								<PixelIcon name={`animal_${a.id}` as never} alt='' scale={0.5} className='inline-block align-middle' />
+								<PixelIcon name={animalIcon(a.id)} alt='' scale={20 / PIXEL_ICON_SIZES[animalIcon(a.id)][0]} className='inline-block align-middle' />
 							</h4>
 							<p className='text-[#d8c8a0] text-xs'>First: {short(a.baseCost)} food</p>
 							<p className='text-[#d8c8a0] text-xs'>+{rate(a.baseProduction)} meat/s each</p>

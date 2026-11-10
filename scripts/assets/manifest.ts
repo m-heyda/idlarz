@@ -260,9 +260,9 @@ export const buildManifest = (): AssetEntry[] => {
 	}
 
 	// 4. icons/ (built sprites). item_* are covered by the registry above; map terrain (biome_, meadow_, water_) is left out.
-	const keysUsing = (map: Record<string, string | undefined>, prefix: string) => {
+	const keysUsing = (map: Record<string, string | readonly string[] | undefined>, prefix: string) => {
 		const out = new Map<string, string[]>();
-		for (const [k, v] of Object.entries(map)) if (v) out.set(v, [...(out.get(v) ?? []), `${prefix}${k}`]);
+		for (const [k, v] of Object.entries(map)) for (const icon of [v ?? []].flat()) out.set(icon, [...(out.get(icon) ?? []), `${prefix}${k}`]);
 		return out;
 	};
 	const usage = new Map<string, string[]>();
@@ -273,7 +273,7 @@ export const buildManifest = (): AssetEntry[] => {
 		['animal:', ANIMAL_PIXEL_ICONS],
 		['shine:', Object.fromEntries(Object.entries(SHINE_SHEETS).map(([k, v]) => [k, v]))],
 	] as const) {
-		for (const [icon, users] of keysUsing(map as Record<string, string>, prefix)) usage.set(icon, [...(usage.get(icon) ?? []), ...users]);
+		for (const [icon, users] of keysUsing(map as Record<string, string | readonly string[]>, prefix)) usage.set(icon, [...(usage.get(icon) ?? []), ...users]);
 	}
 	const reserved = new Set(Object.values(RESERVED_RESOURCES));
 	const itemIconNames = new Set(ITEM_ICONS.map((e) => e.icon));
@@ -421,6 +421,26 @@ export const buildManifest = (): AssetEntry[] => {
 			status: 'reuse',
 			source: 'assets_to_assess_and_use/monsters',
 		});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'heroes')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'portraits',
+				subcategory: 'avatar portraits (not wired)',
+				src: url(f),
+				status: 'reuse',
+				source: 'new_assets/heroes',
+			});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'achievements')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'ui',
+				subcategory: 'achievement badges (not wired)',
+				src: url(f),
+				status: 'reuse',
+				source: 'new_assets/achievements',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'reuse'))) {
 		const kind = relative(join(PUBLIC, 'pixel', 'reuse'), f).split(sep)[0];
 		add({
