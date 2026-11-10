@@ -49,7 +49,7 @@ export const merchantGoldSpent = (upgrades: Record<string, number> | undefined):
 
 /** Gold the owned land and castle cost at least (gold part of each price only). */
 export const minimumSpend = (state: PersistedGame): number => {
-	const discount = effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades);
+	const discount = effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass);
 	const purchases = Math.min(economyTiles(state.tiles, state.freeTiles) - 1, MAX_OWNED_TILES);
 	let spent = 0;
 	for (let k = 1; k <= purchases; k++) spent += calculateTileCost(k, discount).gold;

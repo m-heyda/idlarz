@@ -75,6 +75,8 @@ export interface TicketBank {
 /** What decides how many tickets there can be and how fast they come: the last accepted save's land and the player's Luck. */
 export interface BankContext {
 	luck: number;
+	/** The class's chest speed in % (the Ranger's passive; absent = none) */
+	chestSpeedPct?: number;
 	tilesOwned: number;
 	/** Owned lake tiles (from the save summary's `derived.lakesOwned`; 0 when absent): they cannot hold a monster or chest */
 	lakesOwned: number;
@@ -161,7 +163,7 @@ export const advanceBank = (
 	const dt = Number.isFinite(dtSec) ? Math.max(0, dtSec) : 0;
 	const scale = dt > 0 ? (options.realDtSec ?? dt) / dt : 1;
 	const start = bank.accAt;
-	const chestEvery = chestIntervalSec(ctx.luck);
+	const chestEvery = chestIntervalSec(ctx.luck, ctx.chestSpeedPct);
 	let used = 0;
 
 	// every pass either mints a ticket (room shrinks) or uses up the time, so this ends
@@ -228,7 +230,7 @@ export const takeMonster = (bank: TicketBank, n: number): { bank: TicketBank; ti
 /** Seconds until the next ticket of any kind is due, or null when the map is full (nothing is coming until something is opened or killed). */
 export const secondsToNext = (bank: TicketBank, ctx: BankContext): number | null => {
 	if (ticketRoom(bank, ctx) <= 0) return null;
-	const left = [Math.max(0, chestIntervalSec(ctx.luck) - bank.chestAcc)];
+	const left = [Math.max(0, chestIntervalSec(ctx.luck, ctx.chestSpeedPct) - bank.chestAcc)];
 	if (monsterSiteFree(bank)) left.push(Math.max(0, monsterThreshold(bank) - bank.monsterAcc));
 	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, COMBAT.spawn.bossIntervalSec - bank.bossAcc));
 	return Math.min(...left);

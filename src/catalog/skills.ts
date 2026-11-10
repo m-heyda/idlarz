@@ -26,7 +26,7 @@ export interface SkillDef {
  *   **Stun** (level 10, 15 mana, 30 s) freezes the monster's attack timer for 10 s, fights only; the monster's `stunResist` % can make it fail (mana and cooldown are still spent).
  * - **Auto-use** (switch, default on; a fixed preset in `COMBAT.auto`, {@link autoUse}): a potion below 40% HP (best fit for the missing HP), Heal below 50%, Stun whenever it is ready.
  *
- * Nothing else is learned or levelled. Four classes (warrior, paladin, ranger, mage) are cosmetic: a portrait and a name (`PLAYER_CLASSES`), no class gives a bonus.
+ * Nothing else is learned or levelled. Four classes (warrior, paladin, ranger, mage) give a portrait, a name (`PLAYER_CLASSES`) and two passives each (`CLASS_PASSIVES`, lib/classPassives.ts).
  *
  * @category Combat/Potions and skills
  * @table skills

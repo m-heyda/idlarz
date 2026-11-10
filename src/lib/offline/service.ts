@@ -9,6 +9,7 @@
  * @order 1
  * @table api-routes
  */
+import { classPassives } from '@/lib/classPassives';
 import { PINNED_KEEP, type SaveRepo, type StoredSave } from '@/lib/cloudSave/pipeline';
 import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';
@@ -156,6 +157,7 @@ const onlyTimeMoved = (stored: Ledger, next: Ledger): boolean => {
 
 export const bankContext = (stored: StoredSave): BankContext => ({
 	luck: stored.summary.derived.luck,
+	chestSpeedPct: classPassives(stored.core.playerClass).chestSpeedPct,
 	tilesOwned: stored.summary.tilesOwned,
 	lakesOwned: stored.summary.derived.lakesOwned ?? 0,
 	castleLevel: stored.summary.castleLevel,

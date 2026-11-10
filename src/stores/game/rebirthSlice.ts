@@ -75,7 +75,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			merchantRefreshes: state.merchantRefreshes, // the refresh price and the free window are not reset by a rebirth
 			merchantRefresh: state.merchantRefresh,
 			playerHp: maxHp(characterStats, kit.equipment),
-			playerMp: maxMana(characterStats, kit.equipment),
+			playerMp: maxMana(characterStats, kit.equipment, state.playerClass),
 			playerName: state.playerName,
 			playerClass: state.playerClass,
 			playSeconds: state.playSeconds,

@@ -141,7 +141,7 @@ danger bonus = floor(Chebyshev distance from the castle / 8) levels
 
 ### `advanceBank` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:152`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts)
 
 Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
 (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
@@ -199,7 +199,7 @@ that still have a free tile the pick is weighted by win chance and the boss's sp
 
 ### `ticketCap` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:112`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:114`](../../src/lib/offline/tickets.ts)
 
 How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
 (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.
