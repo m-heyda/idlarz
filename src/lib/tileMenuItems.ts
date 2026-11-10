@@ -3,8 +3,10 @@ import { BIOMES } from '@/config/biomes';
 import { MONSTERS } from '@/config/combatConfig';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import type { MapGameStore } from '@/components/game/mapSource';
+import { buildingsEnabled } from '@/lib/buildings';
+import { buildingMenuItems } from '@/lib/buildingMenu';
 
-/** Id of the disabled Buildings entry, the hook for the new building system (R7, IDL-91; see {@link tileMenuItems}). */
+/** Id of the disabled Buildings entry shown while the building system is off (R7, IDL-91; the flag is `BUILDINGS_FLAG`, see {@link tileMenuItems}). */
 export const BUILDINGS_ENTRY_ID = 'buildings';
 
 export interface TileMenuContext {
@@ -47,7 +49,9 @@ export function tileMenuItems({ x, y, biome, game, monster, queuePos, lineOpen, 
 		 * does not change shape when the new system lands. To wire it in: make it enabled, give it an `onSelect` that opens the new build UI
 		 * for tile (x, y), and gate it on the new rules (biome, free tile, no monster or chest) the way the old "Build here..." entry did.
 		 */
-		own.push({ id: BUILDINGS_ENTRY_ID, label: 'Buildings: coming soon', disabled: true, onSelect: () => {} });
+		// With the building system on (BUILDINGS_FLAG) the placeholder gives way to the real entries of this tile
+		if (buildingsEnabled()) own.push(...buildingMenuItems(game, x, y));
+		else own.push({ id: BUILDINGS_ENTRY_ID, label: 'Buildings: coming soon', disabled: true, onSelect: () => {} });
 		own.push({
 			id: 'highlight',
 			label: `Highlight this ${BIOMES[biome]?.label ?? biome} area`,

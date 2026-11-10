@@ -63,10 +63,12 @@ export interface Tile {
 	level?: number;
 	upgradeCost?: Partial<Resources>;
 	/**
-	 * Reserved for the per-biome building system (R7, IDL-91). Nothing sets it today: the old 16 buildings are gone (IDL-259) and
-	 * `sanitizeSave` strips the field from every loaded save. Only the map renderer (`utils/terrain.ts` pads) still reads it.
+	 * The catalog id of the building on the tile (`catalog/buildings.ts`, the per-biome system of R7, IDL-91). Set only while `BUILDINGS_FLAG` is on:
+	 * with it off `sanitizeSave` strips the field from every loaded save. The map renderer (`utils/terrain.ts` pads) draws a pad under it.
 	 */
 	building?: string;
+	/** The level of the building on the tile (1-5). Absent means level 1; only meaningful with `building` (see config/buildings.ts) */
+	buildingLevel?: number;
 	hasChest?: boolean;
 }
 
@@ -324,6 +326,14 @@ export interface CastleUpgradeState {
 	remainingSec: number;
 }
 
+/** A building level being built on tile (x, y): like the castle's timer it is counted by the tick loop, and the castle and the buildings share one builder (config/buildings.ts) */
+export interface BuildingUpgradeState {
+	x: number;
+	y: number;
+	toLevel: number;
+	remainingSec: number;
+}
+
 // What buying the next tile costs
 export interface TileCost {
 	gold: number;
@@ -381,6 +391,8 @@ export interface GameState {
 	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
 	castleUpgrade: CastleUpgradeState | null;
+	/** The building level being built (null with none, and always null while `BUILDINGS_FLAG` is off) */
+	buildingUpgrade: BuildingUpgradeState | null;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
 	activeChests: number;
 	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Embers of `prestige`. */
@@ -403,6 +415,10 @@ export interface GameState {
 	rebirth: (serverGain?: number) => boolean;
 	buyEmberUpgrade: (id: EmberUpgradeId) => boolean;
 	upgradeCastle: () => boolean;
+	/** The building system (flag-gated, config/buildings.ts): build, start the next level of, or move the building of the given tile */
+	buildBuilding: (x: number, y: number, id: string) => boolean;
+	upgradeBuilding: (x: number, y: number) => boolean;
+	moveBuilding: (fromX: number, fromY: number, toX: number, toY: number) => boolean;
 	purchaseAnimal: (animalId: string, count?: number | 'max') => number; // animals bought
 	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;
 	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;

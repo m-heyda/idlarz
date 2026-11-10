@@ -67,6 +67,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 		upgradeCastle: () => {
 			const state = get();
 			if (state.castleUpgrade) return false;
+			if (state.buildingUpgrade) return false; // one builder: the castle waits for the building that is being upgraded
 
 			const castle = findCastle(state.tiles);
 			if (!castle || !castle.tile.upgradeCost || !castle.tile.level) return false;
