@@ -1,6 +1,6 @@
 # art_style_reference
 
-**Reference material for new art. Nothing in this folder is imported by the game.** It is the visual brief for resources, buildings, roads, biomes, monsters, equipment, portraits and UI. Which assets are needed and when: [docs/plan/RELEASE-PLAN.md](../docs/plan/RELEASE-PLAN.md) section 6.
+**Reference material for new art. Nothing in this folder is imported by the game.** It is the visual brief for resources, buildings, biomes, monsters, equipment, portraits and UI. Which assets are needed and when: [docs/plan/RELEASE-PLAN.md](../docs/plan/RELEASE-PLAN.md) section 6.
 
 Every sub-folder has its own `README.md`: an index of the files in it (what each sheet contains), what we want from it, and **what agents must do with it later**. Read the folder README before touching a file. The approved current style lives in `scripts/pixel/reference/` (`STYLE.md` and its images); where a reference here disagrees with `STYLE.md`, **`STYLE.md` and the current map win**.
 
@@ -11,7 +11,6 @@ Every sub-folder has its own `README.md`: an index of the files in it (what each
 | [`equip/`](equip/README.md) | about 600 equipment icons: weapons, armor, jewelry, potions; plus the **item grading plan** (12 grades per slot, 3 special sets) | reference and direct cuts (licensed, see Licence) |
 | [`monsters/`](monsters/README.md) | monster samples and the **roster plan** (3-4 per biome plus a boss, 12 biomes) | reference; rat stays the baseline |
 | [`resources/`](resources/README.md) | materials, ores, goods, drops, potions, relics, fish, fungi | replaces all current resource icons |
-| [`roads/`](roads/README.md) | road materials, how roads blend into ground, bridges | environment reference |
 | [`ui-and-portraits/`](ui-and-portraits/README.md) | avatar portraits, skill icons, battle backgrounds, NPC | reference |
 | [`farm/`](farm/README.md) | top-down farm and crops | **IGNORE FOR NOW**, future farm update |
 
