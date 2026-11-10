@@ -30,13 +30,6 @@ export const StepBubble: StoryObj<typeof meta> = {
 	args: { text: TUTORIAL_PATH[1].text(numbers), progress: 'Step 2 of 8', actionLabel: undefined, onAction: undefined },
 };
 
-/** A phone: the bubble sits above a smaller Alder. */
-export const Phone: StoryObj<typeof meta> = {
-	args: { text: TUTORIAL_PATH[3].text(numbers), progress: 'Step 4 of 8', actionLabel: undefined, onAction: undefined },
-	parameters: { viewport: { defaultViewport: 'mobile1' } },
-	globals: { viewport: { value: 'mobile1' } },
-};
-
 const Stage: React.FC<{ mode: FocusMode; intro?: boolean }> = ({ mode, intro = false }) => {
 	const rects = useTargetRects(intro ? undefined : 'story-target');
 	const [clicks, setClicks] = React.useState(0);
