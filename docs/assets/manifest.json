@@ -19147,6 +19147,175 @@
 	},
 	{
 		"usedBy": [],
+		"name": "badge_chest_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_chest_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_hammer_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_hammer_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_map_flag_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_map_flag_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_potion_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_potion_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_scroll_check_silver",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_scroll_check_silver.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_shield_silver",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_shield_silver.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_skull_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_skull_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_star_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_star_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_star_silver",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_star_silver.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_sword_shield_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_sword_shield_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_sword_silver",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_sword_silver.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_tower_silver",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_tower_silver.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_winged_boot_bronze",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_winged_boot_bronze.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "bonus_bee",
 		"category": "ui",
 		"subcategory": "bonus",
@@ -20159,6 +20328,240 @@
 		"size": [
 			40,
 			40
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_blue_plume_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_blue_plume_knight.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_chain_knight_woman",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_chain_knight_woman.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_dwarf_knight_orange_eyes",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_dwarf_knight_orange_eyes.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_gold_lion_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_gold_lion_knight.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_green_horned_elf",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_green_horned_elf.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_black_helm",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_black_helm.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_brute_dark",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_brute_dark.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_chainmail",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_chainmail.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_fur_beard",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_fur_beard.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_fur_collar",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_fur_collar.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_graybeard",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_graybeard.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_green_veteran",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_green_veteran.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_ram_helm",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_ram_helm.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_horned_scarred_woman",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_horned_scarred_woman.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_purple_elf_lady",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_purple_elf_lady.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_red_haired_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_red_haired_knight.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_red_plume_lady",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_red_plume_lady.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "avatar_winged_helm_veteran",
+		"category": "portraits",
+		"subcategory": "avatar portraits (not wired)",
+		"src": "/pixel/new_assets/heroes/avatar_winged_helm_veteran.png",
+		"status": "reuse",
+		"source": "new_assets/heroes",
+		"size": [
+			65,
+			65
 		]
 	},
 	{
