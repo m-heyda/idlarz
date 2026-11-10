@@ -398,4 +398,4 @@ Shop (cost in points of the next level, by current level):
 | Provisions | 1500 gold + 400 wood + 400 stone | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
 | Night Watch | 100% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
 | Steward | 5% | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
-| Deep Pockets | 400% | 3 | 30 | 54 | 98 | 175 | 567 | 5951 |
+| Deep Pockets | +4 bag slots | 3 | 30 | 54 | 98 | 175 | 567 | 5951 |
