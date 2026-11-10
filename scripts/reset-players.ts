@@ -54,7 +54,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import { newLedger, resetLedger } from '../src/lib/offline/ledger';
-import { writeLastReset } from '../src/lib/offline/season';
+import { writeLastReset, writePlayerReset } from '../src/lib/offline/season';
 import { STARTING_GEMS } from '../src/config/economy';
 
 const args = process.argv.slice(2);
@@ -198,6 +198,8 @@ const main = async () => {
 			const historyDelete = await db.from('save_history').delete().eq('user_id', id);
 			fail(`history ${id}`, historyDelete.error);
 		}
+		// a reset of named players (not the whole season) leaves no global marker: this one tells the player's browser to drop its copy of the old game
+		if (users.length) await writePlayerReset(db, id, now);
 		done++;
 	}
 
@@ -221,7 +223,11 @@ const main = async () => {
 	console.log(
 		`Reset ${done} player(s). Names and classes kept, gems ${resetGems ? `reset to ${STARTING_GEMS}` : 'kept'}.${purgeHistory ? ' save_history purged.' : ' save_history kept (rollback copies).'} Check passed: no saves left, ledgers anchored at the reset.`,
 	);
-	console.log('Reminder: a browser that still holds the old game locally must choose "New game" in the start hub.');
+	console.log(
+		users.length
+			? 'Each reset player's browser drops its copy of the old game at the next sign-in (a per-player marker was written).'
+			: 'A browser that still holds the old game locally drops it at the next sign-in (the season marker).',
+	);
 };
 
 main().catch((e) => {

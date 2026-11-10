@@ -2167,7 +2167,7 @@
   "kind": "function",
   "category": "Saves & Server/Away time",
   "file": "src/lib/offline/season.ts",
-  "line": 33,
+  "line": 53,
   "summary": "Resets the player's game when a season reset happened that their ledger does not know about. Returns the marker (for the browser, which drops a local save older than it) and whether a reset was done now. A failure to read the marker never blocks a login.",
   "see": []
  },

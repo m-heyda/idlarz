@@ -795,6 +795,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.
 - [`offlineServer.test.ts`](../../tests/server/offlineServer.test.ts)
+- [`playerReset.test.ts`](../../tests/server/playerReset.test.ts) — ~ A tiny in-memory app_settings table behind the two calls season.ts makes
 - [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)

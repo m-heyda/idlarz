@@ -7,7 +7,7 @@ import { fail, json, loadProfile, readBody, unavailable } from '@/lib/authRoute'
 import { requirePlayer } from '@/lib/playerRoute';
 import { supabaseLedgerRepo } from '@/lib/offline/supabaseLedger';
 import { startNewGame } from '@/lib/offline/service';
-import { ensureSeasonReset, readLastReset } from '@/lib/offline/season';
+import { ensureSeasonReset, readLastReset, readPlayerReset } from '@/lib/offline/season';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +26,9 @@ export async function GET(request: Request) {
 			lastReset = (
 				await ensureSeasonReset({ ledgers: supabaseLedgerRepo(admin), saves: supabaseSaveRepo(admin) }, await readLastReset(admin), player.userId, Date.now())
 			).lastReset;
+			// a reset of this one account (reset-players --user) counts like a season reset for the browser's copy of the game
+			const own = await readPlayerReset(admin, player.userId);
+			if (own !== null) lastReset = Math.max(lastReset ?? 0, own);
 		} catch {
 			// the marker could not be read: the login goes on, the next one looks again
 		}

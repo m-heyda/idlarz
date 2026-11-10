@@ -12,7 +12,7 @@
  *            tickets, rebirths), the rebirth history, the save_history rollback copies, and the gems (back to the starting amount).
  *   kept:    the login itself and the profile (character name and class), so the next test run only has to sign in (unless --new-character: then the profile goes too).
  * Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or .env.local); check which project they point at first, the same rule as reset-players.
- * A browser that still holds the old game locally must choose "New game" in the start hub (the server cannot clear a browser).
+ * The reset also writes a per-player marker (`app_settings` key `player_reset:<id>`): the next sign-in drops this browser's copy of the old game (it is archived, not deleted) and starts fresh, so there is no "this browser or the account?" choice.
  */
 import { resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
