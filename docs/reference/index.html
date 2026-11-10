@@ -4348,11 +4348,11 @@ unlocked&quot; window shows them (<code>RebirthUnlockModal</code>); the other vi
 The file name is <code>biome_&lt;name&gt;.png</code>; change the value here to use another one.</p>
 </article><article><p><a id="animal-pixel-icons"></a></p>
 <h3><code>ANIMAL_PIXEL_ICONS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:251</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:257</code></a></p>
 <p>Farm animal id -&gt; its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is <a href="#animalicon"><code>animalIcon</code></a>.</p>
 </article><article><p><a id="animalicon"></a></p>
 <h3><code>animalIcon</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:266</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:272</code></a></p>
 <p>The sprite one animal wears: a stable pick among its kind&#39;s looks from a hash of <code>seed</code> (the farm uses the animal&#39;s key, e.g. <code>chicken-3</code>),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind&#39;s first look (shop cards, tutorial).
 Pure: no random numbers.</p>
