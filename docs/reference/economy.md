@@ -992,18 +992,18 @@ The numbers of the building system (proposals from docs/plan/18, tuned with the 
 - `maxLevel`: the base level cap, 5. Level `L` can only be bought while the castle is at least level `L` (`min(5, castle level)`).
 - `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once.
 - `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
-- `cost`: level 1 costs `tilePrices` (12) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ([`calculateTileCost`](economy.md#calculatetilecost)).
+- `cost`: level 1 costs `tilePrices` (14) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ([`calculateTileCost`](economy.md#calculatetilecost)).
 - `relocateShare`: moving a building costs this share (50 %) of what its current level cost to reach, at today's prices; it is instant and keeps the level.
 
 **Building levels (the building system, flag off)** _(computed from the code)_
 
 | Level | Castle level needed | Output x (of level 1) | Timer to reach it | Cost at 100 tiles |
 | --- | --- | --- | --- | --- |
-| 1 | 1 | x1 | built at once | wood 389 K, stone 260 K, coal 260 K, food 130 K, hide 26 K, gold 1.3 M |
-| 2 | 2 | x1.5 | 10 min | wood 779 K, stone 519 K, coal 519 K, food 260 K, hide 51.9 K, gold 2.6 M |
-| 3 | 3 | x2 | 45 min | wood 1.56 M, stone 1.04 M, coal 1.04 M, food 519 K, hide 104 K, gold 5.19 M |
-| 4 | 4 | x2.5 | 3 h | wood 3.12 M, stone 2.08 M, coal 2.08 M, food 1.04 M, hide 208 K, gold 10.4 M |
-| 5 | 5 | x3 | 8 h | wood 6.23 M, stone 4.15 M, coal 4.15 M, food 2.08 M, hide 415 K, gold 20.8 M |
+| 1 | 1 | x1 | built at once | wood 454 K, stone 303 K, coal 303 K, food 151 K, hide 30.3 K, gold 1.51 M |
+| 2 | 2 | x1.5 | 10 min | wood 909 K, stone 606 K, coal 606 K, food 303 K, hide 60.6 K, gold 3.03 M |
+| 3 | 3 | x2 | 45 min | wood 1.82 M, stone 1.21 M, coal 1.21 M, food 606 K, hide 121 K, gold 6.06 M |
+| 4 | 4 | x2.5 | 3 h | wood 3.63 M, stone 2.42 M, coal 2.42 M, food 1.21 M, hide 242 K, gold 12.1 M |
+| 5 | 5 | x3 | 8 h | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M |
 
 <a id="buildings"></a>
 
