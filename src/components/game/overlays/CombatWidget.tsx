@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatCompact } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -8,6 +8,8 @@ import { SKILL_IDS } from '@/catalog/skills';
 import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
 import { autoBattleUnlocked } from '@/lib/combat';
+import { aggregateStats } from '@/lib/inventory';
+import { potionCooldownSec, potionSlotCount } from '@/lib/potionBelt';
 import { monsterDef, monsterStats } from '@/lib/monsters';
 import { slashFor, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import { COMBAT_EVENT, hitNumberText, type CombatFx } from '@/lib/combatFx';
@@ -62,6 +64,7 @@ const CombatWidget: React.FC = () => {
 	const playerHp = useGameStore((state) => state.playerHp);
 	const playerMp = useGameStore((state) => state.playerMp);
 	const bag = useGameStore((state) => state.bag);
+	const equipment = useGameStore((state) => state.equipment);
 	const level = useGameStore((state) => state.level.level);
 	const autoLocked = useGameStore((state) => !autoBattleUnlocked(state.prestige.rebirths));
 	const requestPotion = useGameStore((state) => state.requestPotion);
@@ -174,25 +177,28 @@ const CombatWidget: React.FC = () => {
 		return () => clearTimeout(closeTimer.current);
 	}, [showResult, noticeId, noticeKind, armClose]);
 
-	// Up to three potion stacks from the bag, with hotkeys 1-3
+	// The potion stacks of the bag that get hotkeys 1..N (N = 3 plus the belt's Potion Slots, lib/potionBelt.ts)
+	const belt = useMemo(() => aggregateStats(equipment), [equipment]);
+	const potionSlots = potionSlotCount(belt);
+	const potionCooldown = potionCooldownSec(belt);
 	const potions = bag
 		.map((slot, index) => ({ slot, index }))
 		.filter(({ slot }) => slot && 'id' in slot && quickHealOf(ITEM_CATALOG[slot.id]) > 0)
-		.slice(0, 3);
+		.slice(0, potionSlots);
 
-	// Hotkeys: 1-3 drink the potions, 4 and 5 cast the skills (the server decides whether it goes through)
+	// Hotkeys: 1..N drink the potions, the next keys cast the skills (the server decides whether it goes through)
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
 			if (typingInField(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
 			const n = Number(e.key);
 			if (!Number.isInteger(n) || n < 1) return;
 			const potion = potions[n - 1]?.slot;
-			if (n <= 3 && potion && 'id' in potion) requestPotion(potion.id);
-			else if (n >= 4 && n < 4 + SKILL_IDS.length) requestSkill(SKILL_IDS[n - 4]);
+			if (n <= potionSlots && potion && 'id' in potion) requestPotion(potion.id);
+			else if (n > potionSlots && n <= potionSlots + SKILL_IDS.length) requestSkill(SKILL_IDS[n - potionSlots - 1]);
 		};
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
-	}, [potions, requestPotion, requestSkill]);
+	}, [potions, potionSlots, requestPotion, requestSkill]);
 
 	// The hero rests before the queue's next monster (it starts by itself): the queue and the rest stay on screen, as a small icon in either mode
 	if (combat.maxHp > 0 && !fight && !pending && !notice && combat.resting && combat.queue.length > 0) {
@@ -293,6 +299,8 @@ const CombatWidget: React.FC = () => {
 			player={{ hp: playerHp, maxHp: combat.maxHp, mp: playerMp, maxMp: combat.maxMp, level }}
 			cd={combat.cd}
 			potions={potions}
+			potionSlots={potionSlots}
+			potionCooldownSec={potionCooldown}
 			autoBattle={combat.autoBattle}
 			autoLocked={autoLocked}
 			autoUse={combat.autoUse}
