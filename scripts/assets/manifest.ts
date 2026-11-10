@@ -421,6 +421,26 @@ export const buildManifest = (): AssetEntry[] => {
 			status: 'reuse',
 			source: 'assets_to_assess_and_use/monsters',
 		});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'heroes')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'portraits',
+				subcategory: 'avatar portraits (not wired)',
+				src: url(f),
+				status: 'reuse',
+				source: 'new_assets/heroes',
+			});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'achievements')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'ui',
+				subcategory: 'achievement badges (not wired)',
+				src: url(f),
+				status: 'reuse',
+				source: 'new_assets/achievements',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'reuse'))) {
 		const kind = relative(join(PUBLIC, 'pixel', 'reuse'), f).split(sep)[0];
 		add({
