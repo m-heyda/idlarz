@@ -12,8 +12,9 @@ import type { MonsterType } from '@/types/game';
 import { useLabStore } from '@/stores/labStore';
 import type { FightView } from '@/lib/offline/fightTypes';
 
-/** Same list as the lab's spawn dropdown: roster monsters with finished art that are not enabled yet */
-export const WIP_MONSTERS = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
+/** Same list as the lab's spawn dropdown: roster monsters with finished art that are not enabled yet (once every monster with art is enabled, all of them, so the lab always has one to show) */
+const NOT_ENABLED = MONSTER_CATALOG.filter((m) => m.art && !m.enabled);
+export const WIP_MONSTERS = NOT_ENABLED.length > 0 ? NOT_ENABLED : MONSTER_CATALOG.filter((m) => m.art);
 
 const noop = () => {};
 
