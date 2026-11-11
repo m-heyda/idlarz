@@ -21129,6 +21129,71 @@
 		]
 	},
 	{
+		"usedBy": [],
+		"name": "avatar_wireframe_hero",
+		"category": "ui",
+		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"src": "/pixel/new_assets/wireframe/avatar_wireframe_hero.png",
+		"status": "planned",
+		"source": "new_assets/wireframe",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "badge_star_wireframe",
+		"category": "ui",
+		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"src": "/pixel/new_assets/wireframe/badge_star_wireframe.png",
+		"status": "planned",
+		"source": "new_assets/wireframe",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "pet_fox",
+		"category": "ui",
+		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"src": "/pixel/new_assets/wireframe/pet_fox.png",
+		"status": "planned",
+		"source": "new_assets/wireframe",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "pet_owl",
+		"category": "ui",
+		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"src": "/pixel/new_assets/wireframe/pet_owl.png",
+		"status": "planned",
+		"source": "new_assets/wireframe",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "pet_rabbit",
+		"category": "ui",
+		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"src": "/pixel/new_assets/wireframe/pet_rabbit.png",
+		"status": "planned",
+		"source": "new_assets/wireframe",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [
 			"resource:xp"
 		],
