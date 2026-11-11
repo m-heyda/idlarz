@@ -203,7 +203,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
-- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}).
+- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`OrganizeButton.tsx`](../../src/components/game/OrganizeButton.tsx) — ~ Tidies the bag from the left:
@@ -337,6 +337,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authRoute.ts`](../../src/lib/authRoute.ts) — ~ The auth service cannot be reached or is not set up:
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
 - [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
+- [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ "1.2K gold, 300 wood":
 - [`buildingOutput.ts`](../../src/lib/buildingOutput.ts) — ~ The Producer's bonus from the size of its biome, as a fraction (0.5 = +50 %):
@@ -415,6 +416,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read.
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
+- [`bootSnapshot.ts`](../../src/lib/offline/bootSnapshot.ts) — ~ The game's first load (`GET /api/auth/me?game=1`):
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 - [`craft.ts`](../../src/lib/offline/craft.ts) — ~ What rolling a gear craft needs besides the ledger:
@@ -459,7 +461,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
-- [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:
+- [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ Hands the monster discoveries of an answer to the bestiary store.
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
 - [`sanitizeSave.ts`](../../src/lib/sanitizeSave.ts) — ~ The part of the game state that is saved.
 - [`saveEvents.ts`](../../src/lib/saveEvents.ts) — Tiny event bus for moments worth saving right away (a purchase, a castle upgrade, a rebirth, a level up).
@@ -789,7 +791,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
 - [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
+- [`bootSnapshot.test.ts`](../../tests/server/bootSnapshot.test.ts) — ~ A stand-in for the Supabase client:
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
+- [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
@@ -818,6 +822,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
+- [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
 - [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)

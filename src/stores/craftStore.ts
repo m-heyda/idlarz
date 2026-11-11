@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { ITEM_CATALOG } from '@/catalog';
 import { RECIPE_BY_ID } from '@/catalog/recipes';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, emptyCraft } from '@/lib/crafting';
-import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState } from '@/lib/offline/types';
+import type { BootSnapshot, CraftQueueEntry, CraftRefusal, CraftReply, CraftState } from '@/lib/offline/types';
+import { onAccountCleared } from '@/lib/bootSnapshot';
 import { newClaimId } from '@/lib/offlineClient';
 import { requestCraft, requestCraftCancel, requestCraftClaim, requestCraftWithdraw } from '@/lib/rewardsClient';
 import { useGameStore } from '@/stores/gameStore';
@@ -41,7 +42,13 @@ interface CraftStore {
 	busy: boolean;
 	/** Server clock minus this browser's clock in ms (from the last answer): the queue's progress is drawn on the server's time */
 	clockOffsetMs: number;
-	/** Asks the server for the crafting state (the overlay does it when it opens) */
+	/** The account the held state belongs to (null: none yet); a snapshot of another account replaces it whole */
+	ownerId: string | null;
+	/** Takes the crafting state the first load brought (`/api/auth/me?game=1`), so the Crafting tab has it on its first render. Synchronous: no empty state in between. */
+	hydrate: (userId: string, snapshot: Pick<BootSnapshot, 'craft' | 'serverNowSec'> | null) => void;
+	/** Forgets everything (sign-out, another account) */
+	reset: () => void;
+	/** Asks the server for the crafting state again (the overlay does it when it opens: a refresh, the first picture comes from `hydrate`) */
 	refresh: () => Promise<void>;
 	/** Pays the resources, asks the server to craft, settles. Returns the toast text. */
 	craftItem: (recipeId: string, count: number) => Promise<string>;
@@ -59,6 +66,15 @@ export const useCraftStore = create<CraftStore>((set, get) => ({
 	craft: null,
 	busy: false,
 	clockOffsetMs: 0,
+	ownerId: null,
+
+	hydrate: (userId, snapshot) => {
+		// another account's state is never kept; the same account's state that is already held (a refresh got there first) is newer than the snapshot
+		if (get().ownerId === userId && get().craft) return;
+		set({ ownerId: userId, craft: snapshot ? snapshot.craft : null, busy: false, clockOffsetMs: snapshot ? snapshot.serverNowSec * 1000 - Date.now() : 0 });
+	},
+
+	reset: () => set({ craft: null, busy: false, clockOffsetMs: 0, ownerId: null }),
 
 	refresh: async () => {
 		const reply = await requestCraft(newClaimId(), 'glass_vial', 0);
@@ -149,6 +165,9 @@ export const useCraftStore = create<CraftStore>((set, get) => ({
 		return answer.crafted > 0 ? `Batch ended: collected ${answer.crafted}, the rest refunded` : 'Batch cancelled: refunded';
 	},
 }));
+
+/** Sign-out empties the store (`clearBootSnapshot`) */
+onAccountCleared(() => useCraftStore.getState().reset());
 
 /** Sends a claim or cancel (one retry with the same key after an outage), stores the answer and the bag. A string is the failure toast. */
 const send = async (request: (key: string, slot: never) => ReturnType<typeof requestCraftClaim>, slot: number | 'all'): Promise<CraftReply | string> => {

@@ -8,6 +8,7 @@ import SaveHub, { type HubChoice } from '@/components/auth/SaveHub';
 import AuthUnavailable from '@/components/auth/AuthUnavailable';
 import NewChapterScreen from '@/components/auth/NewChapterScreen';
 import { fetchMe, logout, readEntered, writeEntered, type Profile, type UnavailableReason } from '@/lib/authClient';
+import { clearBootSnapshot, stageBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchCloud, readLink, writeAttempts, writeLink } from '@/lib/cloudClient';
 import { canResumeTab, planStart, skipsHub, type CloudInfo } from '@/lib/startPlan';
 import { epochVerdict, readSeenEpoch, wipeStaleBrowser, writeSeenEpoch } from '@/lib/epochGuard';
@@ -97,13 +98,14 @@ export default function PlayPage() {
 	const check = useCallback(
 		async (quiet = false) => {
 			if (!quiet) setPhase({ name: 'checking' });
-			const result = await fetchMe();
+			const result = await fetchMe({ game: true }); // one request: who, epoch and the bag + crafting snapshot the game opens with
 			if (result.status === 'guest') return leaveToLanding(true); // the middleware sends guests away already; this covers a session that ended while the tab was open
 			if (result.status !== 'ok') return setPhase({ name: 'unavailable', reason: result.status === 'unavailable' ? result.reason : 'outage' });
 			if (!(await guardEpoch(result))) return;
 			if (!result.profile) return setPhase({ name: 'profile' });
 			const player = { userId: result.userId, profile: result.profile };
 			if (result.needsReset) return setPhase({ name: 'chapter', player });
+			stageBootSnapshot(player.userId, result.game);
 			if (readEntered() === 'account' && canResumeTab(readLink(), player.userId)) return enterGame(player); // same tab, refreshed while playing
 			await admit(player);
 		},
@@ -116,10 +118,11 @@ export default function PlayPage() {
 
 	const signedIn = async (profile: Profile | null) => {
 		if (!profile) return setPhase({ name: 'profile' });
-		const me = await fetchMe();
+		const me = await fetchMe({ game: true });
 		if (me.status !== 'ok') return setPhase({ name: 'unavailable', reason: me.status === 'unavailable' ? me.reason : 'outage' });
 		if (!(await guardEpoch(me))) return;
 		if (me.needsReset) return setPhase({ name: 'chapter', player: { userId: me.userId, profile } });
+		stageBootSnapshot(me.userId, me.game);
 		await admit({ userId: me.userId, profile });
 	};
 
@@ -155,7 +158,10 @@ export default function PlayPage() {
 					}}
 					onLogout={() => {
 						writeEntered(null);
-						void logout().then(() => leaveToLanding(false));
+						void logout().then(() => {
+							clearBootSnapshot();
+							leaveToLanding(false);
+						});
 					}}
 				/>
 			);
@@ -178,7 +184,10 @@ export default function PlayPage() {
 					}}
 					onLogout={() => {
 						writeEntered(null);
-						void logout().then(() => leaveToLanding(false));
+						void logout().then(() => {
+							clearBootSnapshot();
+							leaveToLanding(false);
+						});
 					}}
 				/>
 			);

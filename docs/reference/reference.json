@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 112,
+  "line": 115,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -1915,6 +1915,17 @@
    "achievementsDue",
    "payAchievements"
   ]
+ },
+ {
+  "id": "loadbootsnapshot",
+  "name": "loadBootSnapshot",
+  "symbol": "loadBootSnapshot",
+  "kind": "function",
+  "category": "Saves & Server/The ledger",
+  "file": "src/lib/offline/bootSnapshot.ts",
+  "line": 13,
+  "summary": "The game's first load (`GET /api/auth/me?game=1`): the signed-in player's own bag, gear and crafting state, read from their `player_ledger` row (`inv`, `craft`: two columns, one select, nothing but what the Bag window draws) so the Bag and its Crafting tab have their data on the first render instead of asking `/api/craft` when they open. Read-only: it never writes and the browser's copy is only a picture, the next online answer replaces it. A failed read or a row without an inventory is `null` / `inv: null`, never an error for the sign-in.",
+  "see": []
  },
  {
   "id": "startnewchapter",

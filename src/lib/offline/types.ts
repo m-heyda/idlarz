@@ -82,6 +82,8 @@ export interface ClaimResult {
 	/** The server clock (epoch seconds) the tickets' ages are measured against */
 	serverNowSec: number;
 	gems: number;
+	/** The discovered monster types and the kills per type, as on {@link SyncResult}: the claim places the first monsters, so it must say which of them the player has met (IDL-267) */
+	bestiary?: import('@/lib/offline/stats').BestiaryReport;
 }
 
 /**
@@ -180,6 +182,17 @@ export interface CraftReply {
 	refund?: { key: MerchantResourceKey; qty: number }[];
 	inv: Inventory;
 	craft: CraftState;
+	serverNowSec: number;
+}
+
+/**
+ * What `GET /api/auth/me?game=1` adds for a player who is about to enter the game: the bag, the worn gear and the crafting state as the ledger holds them, in the same shape the
+ * online answers use (`Inventory`, `CraftState`), so the first render of the Bag and of its Crafting tab already has them. `inv` is null while the account has no ledger yet (a brand-new account).
+ */
+export interface BootSnapshot {
+	inv: Inventory | null;
+	craft: CraftState;
+	/** The server's clock in seconds, for the crafting queue's progress */
 	serverNowSec: number;
 }
 
