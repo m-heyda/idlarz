@@ -13,7 +13,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/api/auth/avatar/**
 
-- [`route.ts`](../../src/app/api/auth/avatar/route.ts) — ~ The picker's data:
+- [`route.ts`](../../src/app/api/auth/avatar/route.ts) — ~ The profile's class and stored avatar; `null` when the account has no profile yet.
 
 **src/app/api/auth/epoch/**
 
@@ -121,7 +121,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`achievements.ts`](../../src/catalog/achievements.ts) — The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
-- [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71):
+- [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)

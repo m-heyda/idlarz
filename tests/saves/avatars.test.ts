@@ -1,8 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AVATARS, CLASS_AVATARS, CLASS_DEFAULT_AVATAR, STARTER_AVATAR_IDS, resolveAvatar, unlockedAvatarIds } from '../../src/catalog/avatars';
-import { PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
-import { checkAvatar, checkCreationAvatar, checkProfile } from '../../src/lib/authValidation';
+import {
+	AVATARS,
+	CLASS_AVATARS,
+	CLASS_DEFAULT_AVATAR,
+	STARTER_AVATAR_IDS,
+	classAvatarIds,
+	fitAvatar,
+	resolveAvatar,
+	unlockedAvatarIds,
+} from '../../src/catalog/avatars';
+import { PLAYER_CLASS_ORDER, type PlayerClassId } from '../../src/config/playerClasses';
+import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -19,27 +28,29 @@ test('the catalog has 8 starters and the 4 launch unlockables, each with its por
 	}
 });
 
+const AVATAR_CLASS = Object.fromEntries(AVATARS.filter((a) => a.classId).map((a) => [a.id, a.classId as PlayerClassId]));
+
 test('a starter avatar is accepted with nothing earned', () => {
-	for (const id of STARTER_AVATAR_IDS) assert.deepEqual(checkAvatar(id, []), { ok: true, value: id });
+	for (const id of STARTER_AVATAR_IDS) assert.deepEqual(checkAvatar(id, AVATAR_CLASS[id], []), { ok: true, value: id });
 });
 
 test('a locked avatar is refused until its achievement is earned', () => {
-	assert.equal(checkAvatar('architect', []).ok, false);
-	assert.equal(checkAvatar('architect', ['first_rebirth', 'early_tester']).ok, false, "another avatar's achievement does not open it");
-	assert.deepEqual(checkAvatar('architect', ['castle_10']), { ok: true, value: 'architect' });
-	assert.deepEqual(checkAvatar('early_tester', ['early_tester']), { ok: true, value: 'early_tester' });
+	assert.equal(checkAvatar('architect', 'mage', []).ok, false);
+	assert.equal(checkAvatar('architect', 'mage', ['first_rebirth', 'early_tester']).ok, false, "another avatar's achievement does not open it");
+	assert.deepEqual(checkAvatar('architect', 'mage', ['castle_10']), { ok: true, value: 'architect' });
+	assert.deepEqual(checkAvatar('early_tester', 'ranger', ['early_tester']), { ok: true, value: 'early_tester' });
 });
 
 test('a forged id is refused: unknown, wrong type, prototype keys', () => {
 	for (const bad of ['', 'god_mode', 'KNIGHT', 'knight ', '__proto__', 'constructor', 7, true, {}, ['knight']]) {
-		assert.equal(checkAvatar(bad, ['castle_10', 'first_rebirth', 'boss_auroch', 'early_tester']).ok, false, JSON.stringify(bad));
+		assert.equal(checkAvatar(bad, 'warrior', ['castle_10', 'first_rebirth', 'boss_auroch', 'early_tester']).ok, false, JSON.stringify(bad));
 	}
 });
 
 test('an achievement id the catalog does not know unlocks nothing; none chosen passes', () => {
 	assert.deepEqual(unlockedAvatarIds(['made_up']), [...STARTER_AVATAR_IDS]);
-	assert.deepEqual(checkAvatar(null, []), { ok: true, value: null });
-	assert.deepEqual(checkAvatar(undefined, []), { ok: true, value: null });
+	assert.deepEqual(checkAvatar(null, 'mage', []), { ok: true, value: null });
+	assert.deepEqual(checkAvatar(undefined, 'mage', []), { ok: true, value: null });
 });
 
 test('checkProfile carries the raw avatar id and rejects a non-string one', () => {
@@ -55,15 +66,15 @@ test('every class has a default avatar that is a starter; a null avatar resolves
 		assert.ok(STARTER_AVATAR_IDS.includes(def), `${id} -> ${def}`);
 		assert.equal(resolveAvatar(null, id).id, def);
 		assert.equal(resolveAvatar('not_an_avatar', id).id, def);
-		assert.equal(resolveAvatar('bard', id).id, 'bard', 'a chosen avatar wins over the class default');
-		assert.deepEqual(checkAvatar(def, []), { ok: true, value: def });
+		assert.equal(resolveAvatar(CLASS_AVATARS[id][1], id).id, CLASS_AVATARS[id][1], 'a chosen avatar of the class wins over the class default');
+		assert.deepEqual(checkAvatar(def, id, []), { ok: true, value: def });
 	}
 	assert.deepEqual(CLASS_DEFAULT_AVATAR, { warrior: 'knight', paladin: 'alchemist', ranger: 'scout', mage: 'druid' });
 });
 
 test('a stored id is still validated by the server: forged or locked ids are refused whatever the class', () => {
-	assert.equal(checkAvatar('boss_slayer', []).ok, false);
-	assert.equal(checkAvatar('knight_of_doom', []).ok, false);
+	assert.equal(checkAvatar('boss_slayer', 'mage', []).ok, false);
+	assert.equal(checkAvatar('knight_of_doom', 'mage', []).ok, false);
 });
 
 test('each class owns two starters: together they cover all 8 once, and the default is the first of the pair', () => {
@@ -73,12 +84,43 @@ test('each class owns two starters: together they cover all 8 once, and the defa
 	for (const id of PLAYER_CLASS_ORDER) assert.equal(CLASS_DEFAULT_AVATAR[id], CLASS_AVATARS[id][0]);
 });
 
-test("at sign-up an avatar must be one of the chosen class's two (an earned one passes with any class)", () => {
-	assert.deepEqual(checkCreationAvatar('knight', 'warrior', []), { ok: true, value: 'knight' });
-	assert.deepEqual(checkCreationAvatar('miner', 'warrior', []), { ok: true, value: 'miner' });
-	assert.equal(checkCreationAvatar('druid', 'warrior', []).ok, false, "a Mage's starter is refused for a Warrior");
-	assert.equal(checkCreationAvatar('boss_slayer', 'mage', []).ok, false, 'still locked');
-	assert.deepEqual(checkCreationAvatar('boss_slayer', 'mage', ['boss_auroch']), { ok: true, value: 'boss_slayer' });
-	assert.deepEqual(checkCreationAvatar(null, 'ranger', []), { ok: true, value: null });
-	assert.equal(checkCreationAvatar('nope', 'ranger', []).ok, false);
+test('every starter has exactly one class, rewards have none, and each class default is among its own starters', () => {
+	for (const avatar of AVATARS) assert.equal(avatar.classId !== undefined, avatar.kind === 'starter', avatar.id);
+	for (const id of PLAYER_CLASS_ORDER) {
+		const own = AVATARS.filter((a) => a.classId === id).map((a) => a.id);
+		assert.deepEqual([...own].sort(), [...CLASS_AVATARS[id]].sort(), `${id}: classId matches CLASS_AVATARS`);
+		assert.ok(own.includes(CLASS_DEFAULT_AVATAR[id]), id);
+	}
+	assert.deepEqual(CLASS_AVATARS, { warrior: ['knight', 'miner'], paladin: ['alchemist', 'farmer'], ranger: ['scout', 'bard'], mage: ['druid', 'scholar'] });
+});
+
+test("another class's starter is refused (register, profile, avatar route and new chapter all use checkAvatar); the class's own pass", () => {
+	for (const cls of PLAYER_CLASS_ORDER) {
+		for (const avatar of AVATARS.filter((a) => a.kind === 'starter')) {
+			const res = checkAvatar(avatar.id, cls, []);
+			assert.equal(res.ok, avatar.classId === cls, `${cls} <- ${avatar.id}`);
+		}
+	}
+	assert.equal(checkAvatar('druid', 'warrior', []).ok, false);
+});
+
+test('earned reward avatars are selectable by every class, unearned ones by none', () => {
+	const all = ['castle_10', 'first_rebirth', 'boss_auroch', 'early_tester'];
+	for (const cls of PLAYER_CLASS_ORDER) {
+		for (const id of ['architect', 'reborn', 'boss_slayer', 'early_tester']) {
+			assert.equal(checkAvatar(id, cls, all).ok, true, `${cls} <- ${id}`);
+			assert.equal(checkAvatar(id, cls, []).ok, false, `${cls} <- ${id} unearned`);
+		}
+		assert.deepEqual(classAvatarIds(cls, []).sort(), [...CLASS_AVATARS[cls]].sort());
+		assert.equal(classAvatarIds(cls, all).length, 6);
+	}
+});
+
+test("a stored avatar that no longer fits the class falls back to the new class's default", () => {
+	assert.equal(fitAvatar('knight', 'warrior').id, 'knight');
+	assert.equal(fitAvatar('knight', 'mage').id, 'druid', 'class changed');
+	assert.equal(fitAvatar(null, 'ranger').id, 'scout');
+	assert.equal(fitAvatar('architect', 'mage', ['castle_10']).id, 'architect', 'an earned reward stays');
+	assert.equal(fitAvatar('architect', 'mage', []).id, 'druid', 'a reward that is not earned does not');
+	assert.equal(resolveAvatar('knight', 'paladin').id, 'alchemist');
 });
