@@ -179,6 +179,8 @@ const main = async () => {
 			last_result: null,
 			combat: null,
 			inv: null,
+			// the Idol levels that survive a rebirth (`legacy.idols`) belong to the game that ended: a restart clears them too
+			legacy: null,
 			// every restart wipes the tutorial progress (the whole counter column with --reset-stats); kills, glossary and achievements stay otherwise
 			stats: resetStats ? null : statsWithoutTutorial(old?.stats),
 			updated_at: new Date(now).toISOString(),

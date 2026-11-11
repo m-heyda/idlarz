@@ -447,6 +447,7 @@ test('the flip: the old game is archived for good, then replaced completely: gem
 	m.ledgers.set('u1', {
 		...before,
 		gems: 77,
+		legacy: { idols: { battlefield: 3 } },
 		stats: { ...before.stats, chests: 5, tutorial: { done: ['build'], lessons: ['a'], skipped: false }, achievements: ['castle_10'], seen: { thistleBoar: 1 } },
 	});
 	const { repo, state } = chapterRepo({ epoch: null });
@@ -459,6 +460,7 @@ test('the flip: the old game is archived for good, then replaced completely: gem
 	const after = m.ledgers.get('u1')!;
 	assert.equal(after.gems, STARTING_GEMS, 'gems are the starting gift, whatever the account held');
 	assert.equal(after.stats.chests, 0, 'the counters start again');
+	assert.deepEqual(after.legacy, { idols: {} }, 'the Idol levels are wiped too');
 	assert.deepEqual(after.stats.tutorial, { done: [], lessons: [], skipped: false }, 'the tutorial starts again');
 	assert.deepEqual([after.stats.achievements, after.stats.seen], [[], {}], 'achievements and the glossary are wiped');
 	assert.equal(after.runId, before.runId + 1, 'a new run: sealed rolls never repeat');
