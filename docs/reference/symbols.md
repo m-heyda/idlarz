@@ -87,7 +87,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `craftXpOf` | Progression / Crafting | [`src/lib/crafting.ts:90`](../../src/lib/crafting.ts) | The crafting XP one payout gives: |
 | `createAvatarPicker` | Progression / Avatars | [`src/lib/avatarPick.ts:23`](../../src/lib/avatarPick.ts) | Optimistic avatar change (the picker used to wait 2-3 s for the server before the new face showed). |
 | `createClickLimiter` | Economy / Clicks | [`src/lib/clickLimiter.ts:35`](../../src/lib/clickLimiter.ts) | Creates the click rate limiter: |
-| `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:75`](../../src/lib/saveStorage.ts) | Where the save lives: |
+| `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:83`](../../src/lib/saveStorage.ts) | Where the save lives: |
 | `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:140`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
 | `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:110`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
@@ -264,7 +264,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `TutorialGuide` | Progression / Guided tutorial | [`src/components/game/tutorial/TutorialGuide.tsx:39`](../../src/components/game/tutorial/TutorialGuide.tsx) | Brother Alder, the tutorial guide. |
 | `typeWeights` | Monsters / Spawning | [`src/lib/offline/spawnWeights.ts:49`](../../src/lib/offline/spawnWeights.ts) | Weight of each type for this player and castle level, in the order given. |
 | `UNCLAIMED_SEC` | Combat / Results and rest | [`src/lib/offline/grant.ts:51`](../../src/lib/offline/grant.ts) | The longest gap the server treats as the same session: |
-| `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:143`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
+| `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:146`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
 | `upgradeBody` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:52`](../../src/lib/saveUpgrade.ts) | Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |
 | `valueCurve` | Loot / Items | [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |

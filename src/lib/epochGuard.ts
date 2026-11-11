@@ -18,6 +18,9 @@ import { archiveForNewGame, resetSave } from '@/lib/saveStorage';
  * game with a fresh link. The server sends `epoch` and `needsReset` (`config/epoch.ts`); a reply with no epoch (an older server) means the guard does nothing. A browser with no stored epoch counts as
  * `BASELINE_EPOCH`, the value the server has today, so every browser that predates the guard is wiped on the flip and a brand new one is not.
  *
+ * The local game's keys also carry the epoch (`storageScope.epochScoped`, `saveStorage`): from epoch 2 on the browser reads `idlarz.save.e2`, so the previous epoch's game is never read again even if this guard
+ * never ran; `archiveForNewGame` still finds it under the old names and keeps it, `resetSave` then removes them.
+ *
  * What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server: every game request carries the epoch
  * the browser last saw (`lib/epochFetch`) and a lower one is refused with 412 `staleEpoch`, after which the page reloads into this guard. See `docs/plan/reset-proof-browsers.md`.
  *

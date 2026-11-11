@@ -170,7 +170,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/**
 
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
-- [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id; null/unknown shows the default avatar of `playerClass`
+- [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The chosen avatar id (null = none yet)
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
@@ -800,6 +800,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`cloudConflict.test.ts`](../../tests/saves/cloudConflict.test.ts)
 - [`cloudSave.test.ts`](../../tests/saves/cloudSave.test.ts) — ~ The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null:
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
+- [`localSaveAccount.test.ts`](../../tests/saves/localSaveAccount.test.ts)
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
 - [`saveFixtures.test.ts`](../../tests/saves/saveFixtures.test.ts) — The guard for every future PR: every frozen fixture in tests/fixtures/saves/ (one per released shape, made from the code of that release by
@@ -808,6 +809,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`saveUpgrade.test.ts`](../../tests/saves/saveUpgrade.test.ts)
 - [`saveWorld.test.ts`](../../tests/saves/saveWorld.test.ts) — ~ The game with a synthetic map of `count` tiles that is valid for sanitizeSave (XP pays for it, stat points follow the level).
 - [`saves.test.ts`](../../tests/saves/saves.test.ts) — ~ A plain JSON copy of a (valid) persisted game, as it would come out of a save file.
+- [`startHubSuppression.test.ts`](../../tests/saves/startHubSuppression.test.ts) — ~ Whether the hub would be shown the way /play decides it:
 - [`storageScope.test.ts`](../../tests/saves/storageScope.test.ts)
 - [`syncPolicy.test.ts`](../../tests/saves/syncPolicy.test.ts) — ~ A fake clock:
 
@@ -839,6 +841,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`avatarArt.test.ts`](../../tests/ui/avatarArt.test.ts)
 - [`avatarPick.test.ts`](../../tests/ui/avatarPick.test.ts) — ~ A fake client store and server:
 - [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)

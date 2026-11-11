@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import PixelIcon from '@/components/game/PixelIcon';
 import AvatarArt from '@/components/game/AvatarArt';
+import { resolveAvatar } from '@/catalog/avatars';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
 import { LANDING_FEATURES, LANDING_MAP, fitZoom, type LandingFeature } from '@/config/landing';
@@ -14,7 +15,7 @@ import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { fetchCloud, readLink } from '@/lib/cloudClient';
 import { epochVerdict, readSeenEpoch } from '@/lib/epochGuard';
 import { peekSave } from '@/lib/saveStorage';
-import { planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
+import { localForAccount, planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
 import { clearBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchMe, logout, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
@@ -197,7 +198,7 @@ const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null
 	return (
 		<div className='ld-continue'>
 			<div className='ld-continue-figure'>
-				<AvatarArt id={profile.avatarId} playerClass={profile.playerClass} scale={2} />
+				<AvatarArt id={resolveAvatar(profile.avatarId, profile.playerClass).id} playerClass={profile.playerClass} scale={2} />
 			</div>
 			<p className='ld-continue-name'>{profile.characterName}</p>
 			<p className='ld-continue-class'>
@@ -242,7 +243,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 			let asks = false;
 			const stale = me.needsReset === true || epochVerdict(readSeenEpoch(), me.epoch) === 'wipe'; // an older chapter's game: /play puts it aside, the card shows nothing of it
 			if (me.profile && !stale) {
-				const local = peekSave();
+				const local = localForAccount(peekSave(), readLink(), me.userId);
 				const fetched = await fetchCloud();
 				const cloud = fetched.status === 'ok' ? fetched.cloud : fetched.status === 'empty' ? null : 'unavailable';
 				game = savedGameSummary(local, cloud);

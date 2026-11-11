@@ -86,7 +86,7 @@
   "kind": "function",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 143,
+  "line": 146,
   "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
   "see": []
  },
@@ -2459,8 +2459,8 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/saveStorage.ts",
-  "line": 75,
-  "summary": "Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`). Written 2 s after a change (`FLUSH_DELAY_MS`) and on hide/close; the backup rotates every 10 minutes. A read goes through `sanitizeSave`; if `current` is refused the game starts from `backup`, keeps the bad text as `damaged`, then falls back to a new game. One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).",
+  "line": 83,
+  "summary": "Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`). The first three carry the data epoch: unchanged while `GAME_EPOCH` is `BASELINE_EPOCH` (1), `.e2`, `.e3`... after a flip (`epochScoped`), so the previous epoch's local game is never read again; `archiveForNewGame` still finds it under the old names and keeps it in `.previous-game` (a stable name), and `reset` removes the old names only after that. Written 2 s after a change (`FLUSH_DELAY_MS`) and on hide/close; the backup rotates every 10 minutes. A read goes through `sanitizeSave`; if `current` is refused the game starts from `backup`, keeps the bad text as `damaged`, then falls back to a new game. One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).",
   "see": []
  },
  {

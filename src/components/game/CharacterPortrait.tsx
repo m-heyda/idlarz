@@ -4,6 +4,7 @@ import { DEFAULT_PLAYER_CLASS, PLAYER_CLASSES } from '@/config/playerClasses';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/uiStore';
 import PixelIcon from './PixelIcon';
+import { resolveAvatar } from '@/catalog/avatars';
 import AvatarArt from './AvatarArt';
 
 interface CharacterPortraitProps {
@@ -21,7 +22,7 @@ const CharacterPortrait: React.FC<CharacterPortraitProps> = ({ variant = 'full',
 
 	// the head-and-shoulders portrait is the player's avatar (IDL-71), or their class's default avatar until one is chosen; the full figure is always the class hero
 	if (variant === 'bust') {
-		return <AvatarArt id={avatarId} playerClass={playerClass} scale={scale} className={cn('character-portrait', className)} />;
+		return <AvatarArt id={resolveAvatar(avatarId, playerClass).id} playerClass={playerClass} scale={scale} className={cn('character-portrait', className)} />;
 	}
 
 	return (

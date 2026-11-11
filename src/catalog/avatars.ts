@@ -127,6 +127,9 @@ export const fitAvatar = (id: string | null | undefined, playerClass: PlayerClas
 /** The avatar to show: the chosen one when it fits the class, otherwise the class default (never undefined). Display side: an unearned reward cannot be told apart here, the server never stores one. */
 export const resolveAvatar = (id: string | null | undefined, playerClass: PlayerClassId): AvatarInfo => fitAvatar(id, playerClass);
 
+/** The avatar a picture should show: exactly the given id when it is in the catalog (any class's starter, a reward), otherwise the class default. No class lock here: what a player may wear is `resolveAvatar` / `checkAvatar`; art for another class's starter (creator, dimmed picker cards) must stay its own. */
+export const artAvatar = (id: string | null | undefined, playerClass: PlayerClassId): AvatarInfo => avatarById(id) ?? resolveAvatar(null, playerClass);
+
 /** The served picture of an avatar */
 export const avatarArtUrl = (avatar: AvatarInfo): string => `/pixel/new_assets/heroes/${avatar.portrait}.png`;
 
