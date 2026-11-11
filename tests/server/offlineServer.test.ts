@@ -16,7 +16,7 @@ import { limitOf } from '../../src/lib/limits';
 import { starterBag } from '../../src/lib/inventory';
 import { claimOffline, startNewGame, type ClaimResult, type ServiceDeps } from '../../src/lib/offline/service';
 import { normalsOf } from '@/lib/offline/tickets';
-import { startNewChapter, EARLY_TESTER, type ChapterRepo } from '../../src/lib/offline/chapter';
+import { startNewChapter, EARLY_TESTER, earnedAfterReset, type ChapterRepo } from '../../src/lib/offline/chapter';
 import { epochFromHeader, isStaleEpoch, needsResetFor } from '../../src/config/epoch';
 import type { PlayerClassId } from '../../src/config/playerClasses';
 
@@ -403,6 +403,9 @@ const chapterRepo = (opts: { epoch?: number | null; taken?: boolean } = {}) => {
 		setEpoch: async (_id, epoch) => {
 			if (state.epoch === null || state.epoch < epoch) state.epoch = epoch;
 		},
+		clearAchievements: async () => {
+			state.granted = [];
+		},
 		grantAchievement: async (_id, achievementId) => {
 			if (!state.granted.includes(achievementId)) state.granted.push(achievementId);
 		},
@@ -437,23 +440,32 @@ test('while the server is on the baseline epoch the reset does nothing at all', 
 	assert.deepEqual([state.name, state.playerClass, state.epoch], ['Zoë', 'warrior', null]);
 });
 
-test('the flip: the old game is archived for good, then replaced; gems, account and the early-tester mark are kept; a repeat changes nothing', async () => {
+test('the flip: the old game is archived for good, then replaced completely: gems go to the starting gift, every old achievement is deleted, the early-tester mark is granted; a repeat changes nothing', async () => {
 	const m = memory();
 	assert.equal((await save(m, 'u1', game(), 0, T0)).kind, 'ok');
 	const before = m.ledgers.get('u1')!;
-	m.ledgers.set('u1', { ...before, gems: 77, stats: { ...before.stats, chests: 5 } });
+	m.ledgers.set('u1', {
+		...before,
+		gems: 77,
+		stats: { ...before.stats, chests: 5, tutorial: { done: ['build'], lessons: ['a'], skipped: false }, achievements: ['castle_10'], seen: { thistleBoar: 1 } },
+	});
 	const { repo, state } = chapterRepo({ epoch: null });
+	state.granted.push('boss_slayer', 'castle_10');
 	const out = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + HOUR, 2);
 	assert.deepEqual(out, { kind: 'ok', already: false });
 	assert.equal(m.archives.length, 1, 'the old save went into the archive first');
 	assert.ok(m.archives[0].world, 'the archive holds the map too');
 	assert.equal(m.rows.has('u1'), false, 'the save is gone');
 	const after = m.ledgers.get('u1')!;
-	assert.equal(after.gems, 77, 'gems are kept');
+	assert.equal(after.gems, STARTING_GEMS, 'gems are the starting gift, whatever the account held');
 	assert.equal(after.stats.chests, 0, 'the counters start again');
+	assert.deepEqual(after.stats.tutorial, { done: [], lessons: [], skipped: false }, 'the tutorial starts again');
+	assert.deepEqual([after.stats.achievements, after.stats.seen], [[], {}], 'achievements and the glossary are wiped');
 	assert.equal(after.runId, before.runId + 1, 'a new run: sealed rolls never repeat');
 	assert.deepEqual([state.name, state.playerClass, state.epoch], ['Nova', 'mage', 2]);
-	assert.deepEqual(state.granted, [EARLY_TESTER]);
+	assert.deepEqual(state.granted, [EARLY_TESTER], 'the old unlocks are gone, only the early-tester mark is left');
+	assert.deepEqual(earnedAfterReset(null), [EARLY_TESTER]);
+	assert.deepEqual(earnedAfterReset(1), [], 'an account that already had a chapter keeps no tester mark');
 	// the same request again (a second tab, a lost answer): nothing is touched
 	const again = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + 2 * HOUR, 2);
 	assert.deepEqual(again, { kind: 'ok', already: true });
