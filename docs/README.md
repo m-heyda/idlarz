@@ -11,7 +11,7 @@ How the game works (formulas, rules, numbers, the server's guarantees, the opera
 | --- | --- |
 | [reference/](reference/README.md) | **Generated, never edited by hand.** One page per category (economy, combat, monsters, loot, progression, saves and server, architecture, pacing, ops), a [symbol index](reference/symbols.md) (function to file and line), a [code map](reference/code-map.md), [known issues](reference/known-issues.md), `index.html` (searchable) and `reference.json` (for tools). |
 | [generated/](generated/) | Measured by `npm run docs:gen`, never edited by hand: balance tables, the bot simulation, item catalog, loot/fight/kill simulations, monster ladder, stat audit. |
-| [plan/](plan/ROADMAP.md) | The plans for what is **not built**: [ROADMAP](plan/ROADMAP.md), [RELEASE-PLAN](plan/RELEASE-PLAN.md), drafts, research and the art prompt sheets. These are the only hand-written documents; a built draft leaves `plan/` and is described in the JSDoc. |
+| [plan/](plan/ROADMAP.md) | The plans for what is **not built**: [ROADMAP](plan/ROADMAP.md), the [UI refresh layout/UX reference](plan/ui-refresh.md), [RELEASE-PLAN](plan/RELEASE-PLAN.md), drafts, research and the art prompt sheets. These are the only hand-written documents; a built draft leaves `plan/` and is described in the JSDoc. |
 
 ## Changing a rule? Change its JSDoc in the same edit
 
