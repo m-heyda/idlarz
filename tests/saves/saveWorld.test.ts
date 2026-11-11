@@ -151,9 +151,9 @@ test('a hand-edited land list is refused', () => {
 		'extra for a tile that is not there',
 	);
 	assert.equal(
-		tampered((b) => b.extra.push([25, 25, { gold: 99 }])),
-		false,
-		'unknown extra key',
+		tampered((b) => b.extra.push([b.land[0][1], b.land[0][0], { gold: 99 }])),
+		true,
+		'an extra key this version does not know is ignored (a property a later release added)',
 	);
 	assert.equal(
 		tampered((b) => (b.land = 'nonsense' as never)),

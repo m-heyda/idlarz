@@ -31,7 +31,7 @@ test('a belt equips into the belt slot, shows in the stats and unequips back int
 	assert.deepEqual(off.bag[0] && 'item' in off.bag[0] ? off.bag[0].item : null, belt);
 });
 
-test('a save with and without a belt round-trips, and a belt in the wrong slot is refused', () => {
+test('a save with and without a belt round-trips, and a belt in the wrong slot is dropped', () => {
 	freshGame();
 	growTo(8);
 	const plain = rawSnapshot();
@@ -43,10 +43,12 @@ test('a save with and without a belt round-trips, and a belt in the wrong slot i
 	if (result.ok) assert.deepEqual(result.state.equipment.belt, withBelt.equipment.belt);
 	const wrong = rawSnapshot();
 	wrong.equipment = { ...STARTER_EQUIPMENT, head: rare('obsidian_belt') };
-	assert.equal(sanitizeSave(wrong).ok, false, 'a belt in the head slot');
+	const wrongRead = sanitizeSave(wrong);
+	assert.ok(wrongRead.ok && wrongRead.state.equipment.head === undefined, 'a belt in the head slot is dropped, the save loads');
 	const wrongBack = rawSnapshot();
 	wrongBack.equipment = { ...STARTER_EQUIPMENT, belt: plainItem('obsidian_helm') };
-	assert.equal(sanitizeSave(wrongBack).ok, false, 'a helm in the belt slot');
+	const wrongBackRead = sanitizeSave(wrongBack);
+	assert.ok(wrongBackRead.ok && wrongBackRead.state.equipment.belt === undefined, 'a helm in the belt slot is dropped, the save loads');
 });
 
 test('the server accepts unequipping the belt slot and refuses an unknown one', () => {

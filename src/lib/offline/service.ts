@@ -22,6 +22,7 @@ import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPar
 import { playerProfile } from '@/lib/offline/profile';
 import { powerKey } from '@/lib/offline/spawnWeights';
 import { sealedRng } from '@/lib/offline/seal';
+import { bestiaryOf } from '@/lib/offline/stats';
 import { advanceBank, bossOf, normalsOf, type BankContext, type TicketBank } from '@/lib/offline/tickets';
 import { offlineMinGapSec } from '@/lib/offline/limits';
 import type { Rng } from '@/lib/rng';
@@ -108,7 +109,12 @@ export const lookAtMap = async (
  * pinned in the history first (recoverable), then the save, its map, the leaderboard row and the rebirth log are deleted and the ledger
  * starts over (timers at now, nothing granted, no bag, no fight) with the gems kept. With no save left, the next claim pays nothing.
  */
-export const startNewGame = async (deps: Pick<ServiceDeps, 'ledgers' | 'saves'>, userId: string, nowMs: number): Promise<void> => {
+export const startNewGame = async (
+	deps: Pick<ServiceDeps, 'ledgers' | 'saves'>,
+	userId: string,
+	nowMs: number,
+	options: { gems?: number } = {},
+): Promise<void> => {
 	const { saves, ledgers } = deps;
 	try {
 		const old = await saves.load(userId, { world: true });
@@ -120,7 +126,7 @@ export const startNewGame = async (deps: Pick<ServiceDeps, 'ledgers' | 'saves'>,
 	for (let attempt = 0; attempt < CAS_TRIES; attempt++) {
 		const existing = await ledgers.load(userId);
 		if (!existing) return; // the first save of the new game creates it
-		const next: Ledger = { ...resetLedger(existing, nowMs), ver: existing.ver + 1 };
+		const next: Ledger = { ...resetLedger(existing, nowMs, options.gems), ver: existing.ver + 1 };
 		if (await ledgers.commit(userId, existing.ver, next)) return;
 	}
 	throw new Error('the ledger is busy');
@@ -160,7 +166,7 @@ const onlyTimeMoved = (stored: Ledger, next: Ledger): boolean => {
 
 export const bankContext = (stored: StoredSave): BankContext => ({
 	luck: stored.summary.derived.luck,
-	chestSpeedPct: classPassives(stored.core.playerClass).chestSpeedPct,
+	chestSpeedPct: classPassives(stored.core.playerClass).chestSpeedPct + (stored.summary.derived.idol?.chestSpeedPct ?? 0),
 	tilesOwned: stored.summary.tilesOwned,
 	lakesOwned: stored.summary.derived.lakesOwned ?? 0,
 	castleLevel: stored.summary.castleLevel,
@@ -223,7 +229,9 @@ export const withLedger = async <T>(
 export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: string, nowMs: number): Promise<ClaimOutcome> => {
 	const loadMap = mapLoader(deps, userId);
 	const done = await withLedger(deps, userId, nowMs, async (ledger, stored): Promise<{ ledger: Ledger; result: ClaimResult }> => {
-		if (ledger.lastKey === claimId && ledger.lastResult) return { ledger, result: ledger.lastResult as ClaimResult };
+		// a replay (a lost answer) is the same payment, but the discoveries are told as they stand now
+		if (ledger.lastKey === claimId && ledger.lastResult)
+			return { ledger, result: { ...(ledger.lastResult as ClaimResult), bestiary: bestiaryOf(ledger.stats) } };
 
 		const derived = stored.summary.derived;
 		const nowSec = nowMs / 1000;
@@ -265,6 +273,7 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 			tickets: publicTickets(bank, ledger.ordChest),
 			serverNowSec: nowSec,
 			gems: ledger.gems,
+			bestiary: bestiaryOf(ledger.stats),
 		};
 		// a real absence is a rest: no fight is left open, HP and mana are back. (A page reload is not one: the open fight carries on.)
 		const rested = gapSec > UNCLAIMED_SEC ? restThrough({ ...ledger, bank }, { secret: deps.secret, userId, stored, nowSec }, gapSec) : { ...ledger, bank };

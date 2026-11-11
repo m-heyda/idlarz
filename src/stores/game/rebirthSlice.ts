@@ -69,6 +69,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			bag: kit.bag,
 			lootPity: kit.lootPity,
 			gems: state.gems, // the premium currency survives a rebirth
+			idolLevels: state.idolLevels, // the Idols' levels are the account's: only the buildings go with the map, they are placed again for free
 			autoSellUpTo: state.autoSellUpTo, // a setting, not gear
 			merchantUpgrades,
 			merchantStock: state.merchantStock, // the shelf and its rotation clock carry over: a rebirth is no free reshuffle

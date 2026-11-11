@@ -19,6 +19,8 @@
 		"reset-players": "tsx scripts/reset-players.ts",
 		"check-live-saves": "tsx scripts/check-live-saves.ts",
 		"restore-trust": "tsx scripts/restore-trust.ts",
+		"migrate-saves": "tsx scripts/migrate-saves.ts",
+		"gen-save-fixtures": "tsx scripts/gen-save-fixtures.ts",
 		"fight-sim": "tsx scripts/fight-sim.ts",
 		"perk-caps": "tsx scripts/perk-caps.ts",
 		"monster-ladder": "tsx scripts/monster-ladder.ts",

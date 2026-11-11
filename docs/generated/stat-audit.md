@@ -158,8 +158,8 @@ Each row is a second save sent through the real `acceptSave` against an honest f
 | a brand new account whose first save holds 1,000,000 Embers | CLAMPED | ember_jump | x1 |
 | rebirth count 0 -> 40 in one save, 900,000 Embers | CLAMPED | ember_jump | x1 |
 | Thrift level 10 without spending the Embers | REJECTED | The save contains impossible data (embers do not add up). | - |
-| +100 attribute points | REJECTED | The save contains impossible data (too many stat points). | - |
-| click ladder maxed | REJECTED | The save contains impossible data (click level). | - |
+| +100 attribute points | SILENT | none | x1 |
+| click ladder maxed | SILENT | none | x1 |
 | 1e12 XP | CLAMPED | xp_jump | x1 |
 | 1e12 gold | CLAMPED | gold_jump, networth_exceeds | x1 |
 | +1,500 gold in 300 s (inside the 1,000 floor + income allowance) | SILENT | none | x1 |

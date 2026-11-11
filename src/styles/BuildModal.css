@@ -63,16 +63,45 @@
 	color: #a89878;
 	margin: 2px 0 4px;
 }
+.build-top {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+.build-action {
+	flex: none;
+	white-space: nowrap;
+}
+.build-cost {
+	flex-wrap: nowrap !important;
+	white-space: nowrap;
+}
 .build-output {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
 	color: #ecdcb4;
+}
+.build-output-icons {
+	display: inline-flex;
+	gap: 2px;
+	padding-top: 1px;
+}
+.build-effect p {
+	margin: 0 0 2px;
+}
+.build-effect-main {
+	color: #f0d27a;
+}
+.build-effect-note {
+	color: #a89878;
+	font-size: 0.72rem;
 }
 .build-foot {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: flex-start;
 	gap: 8px;
 	margin-top: 6px;
 }
@@ -80,4 +109,30 @@
 	margin-top: 4px;
 	color: #d98a6a;
 	font-size: 0.7rem;
+}
+.build-kind-idol {
+	color: #d8b04a;
+}
+.build-idol {
+	margin: 2px 0 4px;
+	font-size: 0.72rem;
+	color: #ecdcb4;
+}
+.build-idol-effect {
+	margin: 0;
+	color: #f0d27a;
+}
+.build-idol-levels {
+	margin: 2px 0;
+}
+.build-idol-notes {
+	margin: 2px 0 0;
+	padding-left: 14px;
+	color: #a89878;
+}
+.build-soon {
+	color: #d98a6a;
+}
+.build-free {
+	color: #9be15d;
 }

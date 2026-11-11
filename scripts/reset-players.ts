@@ -57,6 +57,7 @@ import { createClient } from '@supabase/supabase-js';
 import { newLedger, resetLedger } from '../src/lib/offline/ledger';
 import { writeLastReset, writePlayerReset } from '../src/lib/offline/season';
 import { STARTING_GEMS } from '../src/config/economy';
+import { statsWithoutTutorial } from '../src/lib/offline/statsReset';
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.includes(name);
@@ -112,6 +113,7 @@ const fetchAll = async <T>(table: string, columns: string): Promise<T[]> => {
 };
 
 interface LedgerInfo {
+	stats?: unknown;
 	user_id: string;
 	gems: number;
 	run_id: number;
@@ -121,7 +123,7 @@ interface LedgerInfo {
 
 const main = async () => {
 	const saves = await fetchAll<{ user_id: string; gems: number; level: number; rebirths: number }>('player_saves', 'user_id, gems, level, rebirths');
-	const ledgers = await fetchAll<LedgerInfo>('player_ledger', 'user_id, gems, run_id, ver, anchor_at');
+	const ledgers = await fetchAll<LedgerInfo>('player_ledger', 'user_id, gems, run_id, ver, anchor_at, stats');
 	const profiles = await fetchAll<{ id: string; character_name: string }>('profiles', 'id, character_name');
 
 	const names = new Map(profiles.map((p) => [p.id, p.character_name]));
@@ -177,7 +179,10 @@ const main = async () => {
 			last_result: null,
 			combat: null,
 			inv: null,
-			...(resetStats ? { stats: null } : {}),
+			// the Idol levels that survive a rebirth (`legacy.idols`) belong to the game that ended: a restart clears them too
+			legacy: null,
+			// every restart wipes the tutorial progress (the whole counter column with --reset-stats); kills, glossary and achievements stay otherwise
+			stats: resetStats ? null : statsWithoutTutorial(old?.stats),
 			updated_at: new Date(now).toISOString(),
 		};
 		const ledgerWrite = old ? await db.from('player_ledger').update(row).eq('user_id', id) : await db.from('player_ledger').insert({ user_id: id, ...row });

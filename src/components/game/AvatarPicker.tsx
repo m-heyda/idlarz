@@ -13,19 +13,21 @@ interface AvatarPickerProps {
 	unlocked: readonly string[];
 	onChange: (id: string) => void;
 	disabled?: boolean;
+	/** The unlocked set is still being fetched: every card shows its own face, dimmed and disabled, with no lock line yet (so nothing flashes as open and then locks) */
+	loading?: boolean;
 }
 
 /**
  * The avatar grid (IDL-71, class lock IDL-269): the 8 starters first, then the rewards. The hero's own two starters and the earned rewards are enabled. Another class's starter stays visible but disabled (dimmed, a small
  * lock, "Needs the <Class> class"); a reward that is not earned keeps its silhouette, "???" and how to earn it. The server decides again on every save, so this only keeps honest players from trying (`checkAvatar`).
  */
-const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocked, onChange, disabled = false }) => (
+const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocked, onChange, disabled = false, loading = false }) => (
 	<div className='avatar-grid' role='radiogroup' aria-label='Avatar'>
 		{AVATARS.map((avatar) => {
-			const open = unlocked.includes(avatar.id);
+			const open = !loading && unlocked.includes(avatar.id);
 			const selected = open && avatar.id === value;
 			// another class's starter: a real face, just not yours; a reward not earned yet: a silhouette with its how-to
-			const otherClass = !open && !avatarFitsClass(avatar, playerClass);
+			const otherClass = !loading && !open && !avatarFitsClass(avatar, playerClass);
 			const needs = avatar.classId ? `Needs the ${PLAYER_CLASSES[avatar.classId].label} class` : '';
 			return (
 				<button
@@ -34,16 +36,18 @@ const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocke
 					role='radio'
 					aria-checked={selected}
 					aria-disabled={!open}
-					disabled={disabled}
+					disabled={disabled || loading}
 					className='avatar-card'
 					data-selected={selected}
 					data-locked={!open}
+					data-loading={loading}
 					data-class-locked={otherClass}
 					title={open ? avatar.name : otherClass ? needs : `Locked: ${avatar.how ?? 'earn it in the game'}`}
 					onClick={() => open && onChange(avatar.id)}
 				>
-					<AvatarArt id={avatar.id} locked={!open && !otherClass} scale={1.5} />
-					<span className='avatar-card-name'>{open || otherClass ? avatar.name : '???'}</span>
+					{/* the card's own class: without it the picture of another class's starter would resolve to the viewer's class default */}
+					<AvatarArt id={avatar.id} playerClass={avatar.classId ?? playerClass} locked={!loading && !open && !otherClass} scale={1.5} />
+					<span className='avatar-card-name'>{loading || open || otherClass ? avatar.name : '???'}</span>
 					{otherClass && (
 						<span className='avatar-card-how'>
 							<svg className='avatar-card-lock' viewBox='0 0 8 8' width='10' height='10' aria-hidden='true' shapeRendering='crispEdges'>
@@ -52,7 +56,7 @@ const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocke
 							{needs}
 						</span>
 					)}
-					{!open && !otherClass && <span className='avatar-card-how'>{avatar.how}</span>}
+					{!loading && !open && !otherClass && <span className='avatar-card-how'>{avatar.how}</span>}
 				</button>
 			);
 		})}

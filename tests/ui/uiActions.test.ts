@@ -116,7 +116,7 @@ test('ui store: dialogs close the menu, confirmations track their target, prefs 
 	assert.equal(useUiStore.getState().discardIndex, 2);
 	ui.askDiscard(null);
 	// the test storage stub always answers null: every pref is its default, and writing does not throw
-	assert.equal(readPref('showAdmin'), PREF_DEFAULTS.showAdmin);
+	assert.equal(readPref('showMinimap'), PREF_DEFAULTS.showMinimap);
 	assert.doesNotThrow(() => writePref('showMinimap', false));
 });
 
@@ -213,12 +213,12 @@ test('with the building system on the placeholder gives way to the real build me
 	const { builds } = buildOptions(useGameStore as never, at.x, at.y);
 	assert.deepEqual(
 		builds.map((o) => o.def.id),
-		['lumberyard', 'saptapper'],
-		'the Producer and the Extractor of a forest',
+		['lumberyard', 'saptapper', 'idol_forest'],
+		'the Producer, the Extractor and the Idol of a forest',
 	);
 	assert.deepEqual(
 		builds.map((o) => o.def.kind),
-		['producer', 'extractor'],
+		['producer', 'extractor', 'idol'],
 	);
 	here.onSelect();
 	assert.deepEqual(useUiStore.getState().buildModal, { x: at.x, y: at.y }, 'selecting it opens the window for this tile');
@@ -230,8 +230,8 @@ test('with the building system on the placeholder gives way to the real build me
 	const second = buildOptions(useGameStore as never, other.x, other.y);
 	assert.deepEqual(
 		second.builds.map((o) => o.def.id),
-		['saptapper'],
-		'the Extractor is not built yet',
+		['saptapper', 'idol_forest'],
+		'the Extractor and the Idol are not built yet',
 	);
 	assert.deepEqual(
 		second.moves.map((o) => o.def.id),

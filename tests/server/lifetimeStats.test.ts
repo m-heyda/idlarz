@@ -57,3 +57,14 @@ test('the save path writes the counters at most every ten minutes', () => {
 	assert.equal(statsDue(counted, 1_000_000 + STATS_EVERY_MS - 1), false);
 	assert.equal(statsDue(counted, 1_000_000 + STATS_EVERY_MS), true);
 });
+
+test('a season restart wipes the tutorial progress and keeps the other counters; nothing left stores as null', async () => {
+	const { statsWithoutTutorial } = await import('../../src/lib/offline/statsReset');
+	const raw = { kills: { thistleBoar: 4 }, chests: 2, achievements: ['tutorial'], tutorial: { done: ['build'], lessons: ['a'], skipped: true } };
+	const wiped = statsWithoutTutorial(raw);
+	assert.deepEqual(wiped?.tutorial, { done: [], lessons: [], skipped: false });
+	assert.equal(wiped?.kills.thistleBoar, 4);
+	assert.deepEqual(wiped?.achievements, ['tutorial']);
+	assert.equal(statsWithoutTutorial({ tutorial: { done: ['build'], lessons: [], skipped: false } }), null, 'only tutorial progress: nothing left to store');
+	assert.equal(statsWithoutTutorial(null), null);
+});

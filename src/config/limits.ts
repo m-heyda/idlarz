@@ -40,6 +40,8 @@ export const LIMITS = {
 	craftOfflineHours: 8,
 	/** Speed multiplier on the seconds one craft takes (2 = twice as fast) */
 	craftSpeed: 1,
+	/** The level an Idol can be taken to (docs/plan/18 section 6): the Ember shop's Idol Mastery will raise it, up to the hard limit */
+	idolMaxLevel: 5,
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
@@ -60,4 +62,5 @@ export const HARD_LIMITS = {
 	craftQueueSlots: 5,
 	craftOfflineHours: 72,
 	craftSpeed: 4,
+	idolMaxLevel: 10,
 } as const;

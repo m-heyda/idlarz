@@ -2,12 +2,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { readBuffs } from '@/lib/buffs';
 import type { CombatState } from './fightTypes';
 import type { CraftState, Inventory } from './types';
-import { craftFromJson, isEmptyCraft, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
+import { craftFromJson, isEmptyCraft, isEmptyLegacy, legacyFromJson, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
 import type { AchievementRepo } from './achievements';
+import { readCombat, readInventory } from './ledgerRead';
+import { upgradeLedgerRow } from './ledgerUpgrade';
 import { isEmptyStats, readStats } from './stats';
 import { upgradeStoredBank, type TicketBank } from './tickets';
 
-interface Row {
+export interface LedgerRow {
 	ver: number;
 	run_id: number;
 	rebirths: number;
@@ -26,12 +28,14 @@ interface Row {
 	craft: CraftState | null;
 	buffs: unknown;
 	stats: unknown;
+	legacy: unknown;
 }
 
 const COLUMNS =
-	'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs, stats';
+	'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs, stats, legacy';
 
-const toRow = (ledger: Ledger) => ({
+/** The ledger as the `player_ledger` row it is stored as (also what the migration script writes). */
+export const ledgerToRow = (ledger: Ledger) => ({
 	ver: ledger.ver,
 	run_id: ledger.runId,
 	rebirths: ledger.rebirths,
@@ -50,10 +54,12 @@ const toRow = (ledger: Ledger) => ({
 	craft: isEmptyCraft(ledger.craft) ? null : ledger.craft,
 	buffs: ledger.buffs.length === 0 ? null : ledger.buffs,
 	stats: isEmptyStats(ledger.stats) ? null : ledger.stats,
+	legacy: isEmptyLegacy(ledger.legacy) ? null : ledger.legacy,
 	updated_at: new Date().toISOString(),
 });
 
-const fromRow = (row: Row): Ledger => ({
+/** A stored row read tolerantly: every column goes through a reader that drops what this version does not know (`ledgerRead.ts`, `craftFromJson`, `readBuffs`, `readStats`, `upgradeStoredBank`). */
+export const ledgerFromRow = (row: LedgerRow): Ledger => ({
 	ver: row.ver,
 	runId: row.run_id,
 	rebirths: row.rebirths,
@@ -67,11 +73,12 @@ const fromRow = (row: Row): Ledger => ({
 	gems: row.gems,
 	lastKey: row.last_key,
 	lastResult: row.last_result,
-	combat: row.combat ? { ...row.combat, queue: row.combat.queue ?? [] } : null,
-	inv: row.inv ?? null,
+	combat: readCombat(row.combat),
+	inv: readInventory(row.inv),
 	craft: craftFromJson(row.craft),
 	buffs: readBuffs(row.buffs, 0),
 	stats: readStats(row.stats),
+	legacy: legacyFromJson(row.legacy),
 });
 
 /**
@@ -82,17 +89,17 @@ export const supabaseLedgerRepo = (db: SupabaseClient): LedgerRepo => ({
 	async load(userId) {
 		const { data, error } = await db.from('player_ledger').select(COLUMNS).eq('user_id', userId).maybeSingle();
 		if (error) throw new Error(error.message);
-		return data ? fromRow(data as unknown as Row) : null;
+		return data ? ledgerFromRow(upgradeLedgerRow(data as unknown as LedgerRow)) : null;
 	},
 
 	async commit(userId, expectedVer, ledger) {
 		if (expectedVer === 0) {
-			const { error } = await db.from('player_ledger').insert({ user_id: userId, ...toRow(ledger) });
+			const { error } = await db.from('player_ledger').insert({ user_id: userId, ...ledgerToRow(ledger) });
 			if (!error) return true;
 			if (error.code === '23505') return false; // somebody created it first
 			throw new Error(error.message);
 		}
-		const { data, error } = await db.from('player_ledger').update(toRow(ledger)).eq('user_id', userId).eq('ver', expectedVer).select('ver');
+		const { data, error } = await db.from('player_ledger').update(ledgerToRow(ledger)).eq('user_id', userId).eq('ver', expectedVer).select('ver');
 		if (error) throw new Error(error.message);
 		return (data?.length ?? 0) === 1;
 	},

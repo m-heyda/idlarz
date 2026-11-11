@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { CRAFTING } from '../../src/config/crafting';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
-import { craftLimit, craftTimeSec, emptyCraft, finishedOf, nextDoneAt } from '../../src/lib/crafting';
+import { craftLimit, craftTimeSec, craftXpOf, emptyCraft, finishedOf, nextDoneAt } from '../../src/lib/crafting';
 import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw } from '../../src/lib/offline/craft';
 import { bagCountOf } from '../../src/lib/offline/inventory';
 import { addDrop } from '../../src/lib/inventory';
@@ -61,7 +61,7 @@ test('a claim pays the finished part, the XP and shortens the entry; the rest ke
 	assert.equal(r.crafted, 3);
 	assert.equal(r.craft.stock.potion_minor, 3, 'potions go to the crafting stash, not the bag');
 	assert.equal(bagCountOf(r.inv, 'potion_minor'), 0);
-	assert.equal(r.craft.xp, 3 * RECIPE_BY_ID.potion_minor.xp);
+	assert.equal(r.craft.xp, craftXpOf(RECIPE_BY_ID.potion_minor, 3));
 	assert.equal(r.craft.ord, 3);
 	assert.deepEqual(r.craft.queue, [{ ...e, count: 7, startedAt: e.startedAt + 42_000 }]);
 	// the clock did not lose the 3 s already spent on the next craft
@@ -78,7 +78,7 @@ test('a stash with room for only some delivers those and the rest waits in the b
 	assert.equal(r.ok, true);
 	assert.equal(r.crafted, 3, 'only the 3 that fit');
 	assert.equal(r.craft.stock.potion_minor, cap);
-	assert.equal(r.craft.xp, 3 * RECIPE_BY_ID.potion_minor.xp);
+	assert.equal(r.craft.xp, craftXpOf(RECIPE_BY_ID.potion_minor, 3));
 	assert.deepEqual(r.craft.queue, [{ ...e, count: 2, startedAt: e.startedAt + 3 * 14_000 }]);
 	assert.equal(applyClaim(inv(), r.craft, 0, e.startedAt + 6 * 14_000).reason, 'stock_full');
 });
@@ -157,7 +157,7 @@ test('cancel delivers the finished part, ends the rest and names the refund (com
 	assert.deepEqual(r.craft.queue, []);
 	assert.equal(r.craft.stock.glass_vial, 8);
 	assert.deepEqual(r.refund, [{ key: 'food', qty: 8 * 40 }]);
-	assert.equal(r.craft.xp, 2 * RECIPE_BY_ID.potion_minor.xp);
+	assert.equal(r.craft.xp, craftXpOf(RECIPE_BY_ID.potion_minor, 2));
 	assert.ok(r.craft.spent < 1000);
 	// a batch that is all finished refunds nothing
 	const done = applyCancel(inv(), withQueue(e), 0, e.startedAt + 1e9);

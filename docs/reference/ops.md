@@ -46,6 +46,8 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run reset-players` | `tsx scripts/reset-players.ts` |
 | `npm run check-live-saves` | `tsx scripts/check-live-saves.ts` |
 | `npm run restore-trust` | `tsx scripts/restore-trust.ts` |
+| `npm run migrate-saves` | `tsx scripts/migrate-saves.ts` |
+| `npm run gen-save-fixtures` | `tsx scripts/gen-save-fixtures.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
 | `npm run perk-caps` | `tsx scripts/perk-caps.ts` |
 | `npm run monster-ladder` | `tsx scripts/monster-ladder.ts` |
@@ -209,14 +211,14 @@ the app's own `/api/auth/login` route; `E2E_MANUAL_LOGIN=1` forces the by-hand p
 (bag, gear, fight, spawn timers, tickets, rebirths), the rebirth history and the rollback copies, and puts the gems back to the starting amount (and clears the lifetime counters: kills, discovered monsters, tutorial progress, achievements). It keeps the login and the profile (character name and class); `-- --yes --new-character` deletes the profile and the earned achievements too, so the next login goes through character creation like a new player. The e-mail is hard-coded here; the script has no
 option to point at another user.
 
-The smoke test covers: signing in and the account check; the game opens on a new game; income arrives; a click on the map pays gold; a tile can be bought (through `window.__game`, which the dev server exposes); the game menu opens Settings; Save game and a
+The smoke test covers: signing in and the account check; the game opens on a new game; income arrives; a click on the map pays gold; a tile can be bought (by clicking a tile next to the land); the game menu opens Settings; Save game and a
 reload bring the same map back. Not covered yet (IDL-124 keeps these open): the monster growth badge, the battle queue markers and the Next strip, opening the Rebirth dialog, the offline report.
 
 <a id="turning-enforcement-and-the-server-run-rebirth-on-together"></a>
 
 ### Turning enforcement and the server-run rebirth on together
 
-Source: [`src/lib/cloudSave/verify.ts:109`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:110`](../../src/lib/cloudSave/verify.ts)
 
 **Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).**
 Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:

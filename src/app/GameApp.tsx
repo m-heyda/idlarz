@@ -42,14 +42,16 @@
  * @table stack-versions
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { useCraftStore } from '@/stores/craftStore';
+import { takeBootSnapshot } from '@/lib/bootSnapshot';
+import type { BootSnapshot } from '@/lib/offline/types';
 import Grid from '@/components/game/Grid';
 import GameWindows from '@/components/game/overlays/GameWindows';
 import { useWindowStore } from '@/stores/windowStore';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
-import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/economy';
 import GameHeader from '@/components/game/GameHeader';
 import ChestNotification from '@/components/game/overlays/ChestNotification';
@@ -123,6 +125,19 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 	useEffect(() => loadWindowPositions(), [loadWindowPositions]);
 	// no browser menu anywhere: the right click belongs to the game (tiles and bag slots add their own entries)
 	useGlobalContextMenu();
+	// The first load's bag, gear and crafting state (`/api/auth/me?game=1`, handed over by /play): the crafting store takes it before the first paint, the bag once the save is read (it would overwrite it), so the Bag and its
+	// Crafting tab never open empty. A later online answer replaces them; the windows' own refresh stays as a fallback.
+	const boot = useRef<BootSnapshot | null>(null);
+	useLayoutEffect(() => {
+		boot.current = takeBootSnapshot(userId);
+		useCraftStore.getState().hydrate(userId, boot.current);
+	}, [userId]);
+	const applyServerInventory = useGameStore((state) => state.applyServerInventory);
+	useEffect(() => {
+		if (!isHydrated || !boot.current) return;
+		applyServerInventory(boot.current.inv ?? undefined);
+		boot.current = null;
+	}, [isHydrated, applyServerInventory]);
 	// Hidden shortcut: Control x5 within 2.5 s opens the save tools (export / import / reset)
 	useCtrlSequence(5, 2500, toggleSaveMenu);
 	// Chest rewards queue in the ui store (one notice per chest, each with its own timer)
@@ -174,7 +189,6 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<AvatarDialog />
 			<LevelUpNotification />
 			<LoadingScreen />
-			<GameDebug />
 			<SaveMenuDialog />
 			<SettingsDialog />
 			<RebirthDialog />

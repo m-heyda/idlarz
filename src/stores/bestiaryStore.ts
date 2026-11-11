@@ -22,13 +22,15 @@ export const useBestiaryStore = create<BestiaryState>((set) => ({
 	apply: (report) => set({ loaded: true, seen: new Set(report.seen), kills: report.kills }),
 }));
 
-/** Hook: whether the monster type is known (before the server's first answer every type counts as known, so the map never flashes silhouettes). */
-export const useIsDiscovered = (type: string): boolean => useBestiaryStore((state) => !state.loaded || state.seen.has(type));
+/** The rule: a type is known once the server listed it (before the server's first answer every type counts as known, so the map never flashes silhouettes; the login claim and every online answer carry the list). */
+export const isKnownType = (state: Pick<BestiaryState, 'loaded' | 'seen'>, type: string): boolean => !state.loaded || state.seen.has(type);
+
+/** Hook: whether the monster type is known, see {@link isKnownType}. */
+export const useIsDiscovered = (type: string): boolean => useBestiaryStore((state) => isKnownType(state, type));
 
 /** The name to show for a monster type in text (menus, toasts, tooltips): its label once met, "Unknown monster" before. Reads the store at call time, so a menu or toast built after a fight is already right. */
 export const monsterNameOf = (type: string, label: string): string => {
-	const { loaded, seen } = useBestiaryStore.getState();
-	return !loaded || seen.has(type) ? label : 'Unknown monster';
+	return isKnownType(useBestiaryStore.getState(), type) ? label : 'Unknown monster';
 };
 
 provideBestiarySink((report) => useBestiaryStore.getState().apply(report));

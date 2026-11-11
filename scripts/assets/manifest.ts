@@ -521,6 +521,16 @@ export const buildManifest = (): AssetEntry[] => {
 				status: 'reuse',
 				source: 'new_assets/achievements',
 			});
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'wireframe')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'ui',
+				subcategory: 'wireframe early-tester set (not wired: tester avatar, badge, pets)',
+				src: url(f),
+				status: 'planned',
+				source: 'new_assets/wireframe',
+			});
 	// The tutorial guide, Brother Alder: his one sprite (a cut from the reuse pool) and the two-frame talking sheet drawn from it by scripts/guide-sprite.ts
 	add({
 		name: 'guide_brother_alder_talk',

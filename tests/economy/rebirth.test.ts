@@ -224,11 +224,27 @@ test('saves: prestige survives validation, forged Embers is rejected', () => {
 		mutate(raw);
 		assert.equal(sanitizeSave(raw).ok, false, `${label} should be rejected`);
 	};
-	rejects((r) => (r.prestige.legacyPoints += 1), 'free points');
-	rejects((r) => (r.prestige.legacyEarned += 5), 'inflated earned points');
-	rejects((r) => (r.prestige.upgrades.mastery = 4), 'shop level nobody paid for');
-	rejects((r) => (r.prestige.upgrades.thrift = 99), 'level above the maximum');
-	rejects((r) => (r.prestige.upgrades.hax = 1), 'unknown upgrade');
+	// the unspent balance is recomputed as earned minus spent, so a claimed balance cannot add anything; only a shop dearer than everything earned is refused
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const repaired = (mutate: (raw: any) => void, label: string) => {
+		const raw = snapshot();
+		const earned = raw.prestige.legacyEarned;
+		mutate(raw);
+		const result = sanitizeSave(raw);
+		assert.equal(result.ok, true, `${label} should be repaired, not refused`);
+		if (result.ok) assert.equal(result.state.prestige.legacyPoints + emberSpent(result.state.prestige.upgrades), result.state.prestige.legacyEarned, label);
+		return { result, earned };
+	};
+	repaired((r) => (r.prestige.legacyPoints += 1), 'free points');
+	// a claimed `legacyEarned` was never what sanitizeSave bounded (raising both numbers kept the sum): the server's Ember model clamps it (`settleEmbers`, flag `ember_jump`, tests/server/serverRebirth.test.ts)
+	repaired((r) => (r.prestige.legacyEarned += 5), 'inflated earned points');
+	repaired(
+		(r) => (r.prestige.upgrades.mastery = 4),
+		'shop level paid from the unspent balance (what a purchase does); one dearer than all Embers earned is refused below',
+	);
+	rejects((r) => (r.prestige.upgrades.mastery = 99999), 'shop level dearer than everything ever earned');
+	rejects((r) => (r.prestige.upgrades.thrift = 99), 'level above the maximum: cut to it, then the shop costs more than everything earned');
+	repaired((r) => (r.prestige.upgrades.hax = 1), 'unknown upgrade');
 	rejects((r) => (r.prestige.rebirths = 0), 'points without a rebirth');
 	rejects((r) => (r.prestige.rebirths = 999), 'more rebirths than points');
 	rejects((r) => (r.prestige.legacyPoints = -1), 'negative points');

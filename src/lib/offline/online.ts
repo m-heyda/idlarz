@@ -86,7 +86,9 @@ const onlineStep = async <T>(
 	let unlocked: AchievementUnlock[] = [];
 	const done = await withLedger(deps, userId, nowMs, async (ledger, stored): Promise<StepOutcome<{ claimFirst: true } | { claimFirst: false; value: T }>> => {
 		unlocked = [];
-		if (key && ledger.lastKey === key && ledger.lastResult) return { ledger, result: { claimFirst: false, value: ledger.lastResult as T } };
+		// a replay (a lost answer) is the same answer, but the discoveries are told as they stand now
+		if (key && ledger.lastKey === key && ledger.lastResult)
+			return { ledger, result: { claimFirst: false, value: withBestiary(ledger.lastResult as T, ledger) } };
 		const anchorMs = Math.max(ledger.anchorAt, stored.serverSavedAt);
 		if ((nowMs - anchorMs) / 1000 > UNCLAIMED_SEC) return { ledger, result: { claimFirst: true } };
 
@@ -263,10 +265,16 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 		if ('recipeId' in request && request.count === 0)
 			return { ledger, value: { ok: true, crafted: 0, inv: ledger.inv!, craft: ledger.craft, serverNowSec: ctx.nowSec } };
 		// what a gear craft is rolled with: the sealing secret and the Luck and Intelligence of the last accepted save
-		const env: CraftEnv = { secret: deps.secret, userId, luck: ctx.stored.summary.derived.luck, intelligence: ctx.stored.summary.derived.intelligence ?? 0 };
+		const env: CraftEnv = {
+			secret: deps.secret,
+			userId,
+			luck: ctx.stored.summary.derived.luck,
+			intelligence: ctx.stored.summary.derived.intelligence ?? 0,
+			xpPct: ctx.stored.summary.derived.idol?.craftXpPct ?? 0,
+		};
 		const result =
 			'recipeId' in request
-				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs)
+				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs, env.xpPct)
 				: request.action === 'claim'
 					? request.slot === 'all'
 						? applyClaimAll(ledger.inv!, ledger.craft, nowMs, env)

@@ -124,6 +124,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
+- [`idols.ts`](../../src/catalog/idols.ts) — Where the Idol statues live:
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 
 **src/catalog/items/**
@@ -190,7 +191,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
-- [`GameDebug.tsx`](../../src/components/game/GameDebug.tsx) — ~ Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table).
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
 - [`GemIcon.tsx`](../../src/components/game/GemIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`Grid.tsx`](../../src/components/game/Grid.tsx) — ~ Wheel zoom.
@@ -204,7 +204,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
-- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}).
+- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`OrganizeButton.tsx`](../../src/components/game/OrganizeButton.tsx) — ~ Tidies the bag from the left:
@@ -229,12 +229,12 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/**
 
 - [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
-- [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in one line:
+- [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in plain words:
 - [`CharacterOverlay.tsx`](../../src/components/game/overlays/CharacterOverlay.tsx)
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
 - [`CombatWidget.tsx`](../../src/components/game/overlays/CombatWidget.tsx) — ~ "1 min 12 s" or "45 s"
-- [`CraftingOverlay.tsx`](../../src/components/game/overlays/CraftingOverlay.tsx) — ~ Components have no catalog item, so their sprite is named here.
+- [`CraftingOverlay.tsx`](../../src/components/game/overlays/CraftingOverlay.tsx) — ~ Crafting XP is small now (`CRAFTING.xpScale`):
 - [`FarmAnimalDock.tsx`](../../src/components/game/overlays/FarmAnimalDock.tsx) — ~ Width the scene keeps clear on the right while the panel is open (panel width plus its margin)
 - [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
 - [`FarmOverlay.tsx`](../../src/components/game/overlays/FarmOverlay.tsx) — ~ The Farm window:
@@ -330,6 +330,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
 - [`useSingleTab.ts`](../../src/hooks/useSingleTab.ts) — ~ Only one tab may run the game.
 - [`useSpawnSync.ts`](../../src/hooks/useSpawnSync.ts) — ~ The one poll of the game.
+- [`useTipDismiss.ts`](../../src/hooks/useTipDismiss.ts) — ~ Keeps a hover tooltip from outliving its reason:
 
 **src/lib/**
 
@@ -338,9 +339,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authRoute.ts`](../../src/lib/authRoute.ts) — ~ The auth service cannot be reached or is not set up:
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
 - [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
+- [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ "1.2K gold, 300 wood":
 - [`buildingOutput.ts`](../../src/lib/buildingOutput.ts) — ~ The Producer's bonus from the size of its biome, as a fraction (0.5 = +50 %):
+- [`buildingText.ts`](../../src/lib/buildingText.ts) — ~ The plain-language lines of a Producer or Extractor card in the Build window; every number comes from `BUILDING_RULES` and the output formulas (`lib/buildingOutput.ts`).
 - [`buildings.ts`](../../src/lib/buildings.ts) — ~ Whether the building system is switched on (`BUILDINGS_FLAG`, off by default).
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
@@ -357,6 +360,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`emberModel.ts`](../../src/lib/cloudSave/emberModel.ts) — ~ The server's model of how many Embers (and rebirths) an account can hold.
 - [`environment.ts`](../../src/lib/cloudSave/environment.ts)
+- [`idolTrust.ts`](../../src/lib/cloudSave/idolTrust.ts) — ~ The server's say over the Idol levels (the account's `idolLevels`).
 - [`netWorth.ts`](../../src/lib/cloudSave/netWorth.ts) — ~ The spending check:
 - [`pipeline.ts`](../../src/lib/cloudSave/pipeline.ts) — ~ Accepted saves are copied into the history when this long passed since the last copy (not every N revisions:
 - [`rebirthHistory.ts`](../../src/lib/cloudSave/rebirthHistory.ts) — ~ One rebirth, as the Rebirths tab lists it.
@@ -384,6 +388,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`floatText.ts`](../../src/lib/floatText.ts) — Tiny event bus for the "+N resource" popups that appear at the cursor.
 - [`gearEconomy.ts`](../../src/lib/gearEconomy.ts) — ~ The economy effects of the worn gear (the set bonuses of catalog/sets.ts).
 - [`globalMenu.ts`](../../src/lib/globalMenu.ts) — ~ Saves to this browser and, with an account signed in, to the cloud copy too (once every 10 minutes:
+- [`idolEconomy.ts`](../../src/lib/idolEconomy.ts) — ~ What the standing Idols add to the economy:
 - [`inventory.ts`](../../src/lib/inventory.ts) — ~ What a character carries after a rebirth:
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
@@ -416,6 +421,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read.
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
+- [`bootSnapshot.ts`](../../src/lib/offline/bootSnapshot.ts) — ~ The game's first load (`GET /api/auth/me?game=1`):
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 - [`craft.ts`](../../src/lib/offline/craft.ts) — ~ What rolling a gear craft needs besides the ledger:
@@ -429,7 +435,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fightView.ts`](../../src/lib/offline/fightView.ts) — ~ The picture the browser is given:
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
-- [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ Everything the server ever granted (income while away, chest and kill rewards):
+- [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ What the account keeps across rebirths (the ledger's `legacy` column, null until something was kept):
+- [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
+- [`ledgerUpgrade.ts`](../../src/lib/offline/ledgerUpgrade.ts) — ~ The upgrade path of a `player_ledger` row.
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
 - [`placement.ts`](../../src/lib/offline/placement.ts) — ~ What the rules depend on:
@@ -442,7 +450,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`service.ts`](../../src/lib/offline/service.ts) — ~ The server-only secret that seals rolls (LOOT_SECRET)
 - [`spawnWeights.ts`](../../src/lib/offline/spawnWeights.ts) — ~ Win chance range that is worth a fight:
 - [`stats.ts`](../../src/lib/offline/stats.ts) — SERVER ONLY. The lifetime counters of a player (`player_ledger.stats`): kills per monster type, chests opened, tiles bought and the income earned while playing.
-- [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger in Supabase (service role:
+- [`statsReset.ts`](../../src/lib/offline/statsReset.ts) — ~ The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, chests, achievements):
+- [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger as the `player_ledger` row it is stored as (also what the migration script writes).
 - [`tickets.ts`](../../src/lib/offline/tickets.ts) — ~ Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny).
 - [`tutorial.ts`](../../src/lib/offline/tutorial.ts) — ~ `unknown`:
 - [`types.ts`](../../src/lib/offline/types.ts) — ~ What the server keeps of a player's things:
@@ -460,12 +469,13 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
-- [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:
+- [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ Hands the monster discoveries of an answer to the bestiary store.
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
 - [`sanitizeSave.ts`](../../src/lib/sanitizeSave.ts) — ~ The part of the game state that is saved.
 - [`saveEvents.ts`](../../src/lib/saveEvents.ts) — Tiny event bus for moments worth saving right away (a purchase, a castle upgrade, a rebirth, a level up).
 - [`saveFormat.ts`](../../src/lib/saveFormat.ts) — ~ The save format:
 - [`saveStorage.ts`](../../src/lib/saveStorage.ts) — ~ Where the game is kept:
+- [`saveUpgrade.ts`](../../src/lib/saveUpgrade.ts) — ~ The upgrade steps, keyed by the schema they upgrade FROM:
 - [`seenEpoch.ts`](../../src/lib/seenEpoch.ts) — ~ The epoch this browser last saw, or null when it never recorded one (a browser from before the guard, or a new one).
 - [`serverRebirth.ts`](../../src/lib/serverRebirth.ts) — ~ The browser's side of the server-run rebirth (IDL-102, `POST /api/rebirth`).
 - [`serverSession.ts`](../../src/lib/serverSession.ts) — A one-function bridge so the game store can say "the server wants an absence claimed first" without importing the code that claims
@@ -569,7 +579,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`terrain.ts`](../../src/utils/terrain.ts) — ~ Dual-grid terrain.
 - [`water.ts`](../../src/utils/water.ts) — ~ Where the map's water ripples go:
 - [`world.ts`](../../src/utils/world.ts) — ~ The map:
-- [`worldGen.ts`](../../src/utils/worldGen.ts) — ~ A synthetic world for tests, benchmarks and the admin "+N tiles" button:
+- [`worldGen.ts`](../../src/utils/worldGen.ts) — ~ A synthetic world for tests, benchmarks and perf scripts:
 
 ## scripts/
 
@@ -601,17 +611,21 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`docs-reference.ts`](../../scripts/docs-reference.ts) — Builds docs/reference from the JSDoc in the code (the single source of truth for how the game works).
 - [`fight-sim.ts`](../../scripts/fight-sim.ts) — Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
 - [`gen-inputs.ts`](../../scripts/gen-inputs.ts) — ~ The scripts named by `tsx scripts/<file>.ts` in the `docs:gen:*` entries of package.json, following `npm run <name>` one level (so the groups and a new generator are found without a list here).
+- [`gen-save-fixtures.ts`](../../scripts/gen-save-fixtures.ts) — Writes the frozen save fixtures of `tests/fixtures/saves/` from the CURRENT code.
 - [`guide-sprite.ts`](../../scripts/guide-sprite.ts) — Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 
 **scripts/lib/**
 
 - [`loadGame.ts`](../../scripts/lib/loadGame.ts) — The game's config and maths as one merged object each, for the scripts that read and override them by name (scripts/sim.ts).
+- [`savedIds.ts`](../../scripts/lib/savedIds.ts) — ~ Everything a stored save or ledger can name by id or position, as the running code has it.
 
 **scripts/**
 
 - [`liveSavesReport.ts`](../../scripts/liveSavesReport.ts) — The pure part of `scripts/check-live-saves.ts` (IDL-12):
 - [`loot-sim.ts`](../../scripts/loot-sim.ts) — Loot simulator: seeded Monte Carlo over the real pipeline (src/lib/loot), per source and level. Use it to tune drop rates.
+- [`migrate-saves.ts`](../../scripts/migrate-saves.ts) — The tool for a release that cannot be additive:
+- [`migrateSaves.ts`](../../scripts/migrateSaves.ts) — The pure part of `scripts/migrate-saves.ts`:
 - [`monster-ladder.ts`](../../scripts/monster-ladder.ts) — Monster ladder: win rate of each gear tier against every monster at the levels it spawns at (docs/plan/ROADMAP.md, enemy rework).
 - [`pacing-guard.ts`](../../scripts/pacing-guard.ts) — The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % or more than 5 game days against a base. Prints a summary table first.
 - [`pacingCompare.ts`](../../scripts/pacingCompare.ts) — The pure part of the pacing guard (scripts/pacing-guard.ts, tests/economy/pacingGuard.test.ts): compares two sim baselines
@@ -720,6 +734,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`farm.test.ts`](../../tests/economy/farm.test.ts)
 - [`farmGeometry.test.ts`](../../tests/economy/farmGeometry.test.ts)
 - [`gearEconomy.test.ts`](../../tests/economy/gearEconomy.test.ts) — ~ Puts gear on the character the way a loaded save does, with the rates that go with it.
+- [`idols.test.ts`](../../tests/economy/idols.test.ts) — ~ A fresh game with `n` tiles made `biome` (the first non-castle tiles), castle at `castleLevel`; returns their positions.
 - [`limitsAndSelling.test.ts`](../../tests/economy/limitsAndSelling.test.ts)
 - [`merchantGoods.test.ts`](../../tests/economy/merchantGoods.test.ts)
 - [`merchantShop.test.ts`](../../tests/economy/merchantShop.test.ts) — ~ What a plain item sells for at its first level (the shop's stock); consumables have their own price.
@@ -768,9 +783,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/ops/**
 
 - [`genInputs.test.ts`](../../tests/ops/genInputs.test.ts)
+- [`migrateSaves.test.ts`](../../tests/ops/migrateSaves.test.ts) — The pure part of `npm run migrate-saves` (scripts/migrateSaves.ts), run on the frozen fixtures. No network: the script feeds the same functions with database rows.
 
 **tests/saves/**
 
+- [`appendOnly.test.ts`](../../tests/saves/appendOnly.test.ts) — Append-only guards: what a save or a ledger can name by id (an item, a monster, a biome letter, a resource key, a building, an avatar, an achievement, a recipe ...) may be ADDED to but never removed, renamed
 - [`auth.test.ts`](../../tests/saves/auth.test.ts)
 - [`authClient.test.ts`](../../tests/saves/authClient.test.ts)
 - [`avatars.test.ts`](../../tests/saves/avatars.test.ts)
@@ -780,7 +797,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
+- [`saveFixtures.test.ts`](../../tests/saves/saveFixtures.test.ts) — The guard for every future PR: every frozen fixture in tests/fixtures/saves/ (one per released shape, made from the code of that release by
 - [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with a chest, gear and a monster, as a plain persisted slice.
+- [`saveTolerance.test.ts`](../../tests/saves/saveTolerance.test.ts) — A save or a ledger row written by an older (or newer) release must degrade, not die: what this version does not know is dropped, what is over a changed limit is cut, what is missing gets a default.
+- [`saveUpgrade.test.ts`](../../tests/saves/saveUpgrade.test.ts)
 - [`saveWorld.test.ts`](../../tests/saves/saveWorld.test.ts) — ~ The game with a synthetic map of `count` tiles that is valid for sanitizeSave (XP pays for it, stat points follow the level).
 - [`saves.test.ts`](../../tests/saves/saves.test.ts) — ~ A plain JSON copy of a (valid) persisted game, as it would come out of a save file.
 - [`storageScope.test.ts`](../../tests/saves/storageScope.test.ts)
@@ -790,7 +810,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
 - [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
+- [`bootSnapshot.test.ts`](../../tests/server/bootSnapshot.test.ts) — ~ A stand-in for the Supabase client:
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
+- [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
@@ -812,13 +834,17 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
+- [`buildingText.test.ts`](../../tests/ui/buildingText.test.ts)
 - [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
+- [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
+- [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
@@ -850,6 +876,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buildings_v1_rollback.sql`](../../supabase/migrations/buildings_v1_rollback.sql)
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
+- [`idols_v1.sql`](../../supabase/migrations/idols_v1.sql)
+- [`idols_v1_rollback.sql`](../../supabase/migrations/idols_v1_rollback.sql)
 - [`inventory_ledger.sql`](../../supabase/migrations/inventory_ledger.sql)
 - [`new_chapter_columns.sql`](../../supabase/migrations/new_chapter_columns.sql)
 - [`new_chapter_columns_rollback.sql`](../../supabase/migrations/new_chapter_columns_rollback.sql)
