@@ -124,6 +124,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71):
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
+- [`idols.ts`](../../src/catalog/idols.ts) — Where the Idol statues live:
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 
 **src/catalog/items/**
@@ -357,6 +358,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`emberModel.ts`](../../src/lib/cloudSave/emberModel.ts) — ~ The server's model of how many Embers (and rebirths) an account can hold.
 - [`environment.ts`](../../src/lib/cloudSave/environment.ts)
+- [`idolTrust.ts`](../../src/lib/cloudSave/idolTrust.ts) — ~ The server's say over the Idol levels (the account's `idolLevels`).
 - [`netWorth.ts`](../../src/lib/cloudSave/netWorth.ts) — ~ The spending check:
 - [`pipeline.ts`](../../src/lib/cloudSave/pipeline.ts) — ~ Accepted saves are copied into the history when this long passed since the last copy (not every N revisions:
 - [`rebirthHistory.ts`](../../src/lib/cloudSave/rebirthHistory.ts) — ~ One rebirth, as the Rebirths tab lists it.
@@ -384,6 +386,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`floatText.ts`](../../src/lib/floatText.ts) — Tiny event bus for the "+N resource" popups that appear at the cursor.
 - [`gearEconomy.ts`](../../src/lib/gearEconomy.ts) — ~ The economy effects of the worn gear (the set bonuses of catalog/sets.ts).
 - [`globalMenu.ts`](../../src/lib/globalMenu.ts) — ~ Saves to this browser and, with an account signed in, to the cloud copy too (once every 10 minutes:
+- [`idolEconomy.ts`](../../src/lib/idolEconomy.ts) — ~ What the standing Idols add to the economy:
 - [`inventory.ts`](../../src/lib/inventory.ts) — ~ What a character carries after a rebirth:
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
@@ -429,7 +432,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fightView.ts`](../../src/lib/offline/fightView.ts) — ~ The picture the browser is given:
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
-- [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ Everything the server ever granted (income while away, chest and kill rewards):
+- [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ What the account keeps across rebirths (the ledger's `legacy` column, null until something was kept):
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
 - [`placement.ts`](../../src/lib/offline/placement.ts) — ~ What the rules depend on:
@@ -720,6 +723,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`farm.test.ts`](../../tests/economy/farm.test.ts)
 - [`farmGeometry.test.ts`](../../tests/economy/farmGeometry.test.ts)
 - [`gearEconomy.test.ts`](../../tests/economy/gearEconomy.test.ts) — ~ Puts gear on the character the way a loaded save does, with the rates that go with it.
+- [`idols.test.ts`](../../tests/economy/idols.test.ts) — ~ A fresh game with `n` tiles made `biome` (the first non-castle tiles), castle at `castleLevel`; returns their positions.
 - [`limitsAndSelling.test.ts`](../../tests/economy/limitsAndSelling.test.ts)
 - [`merchantGoods.test.ts`](../../tests/economy/merchantGoods.test.ts)
 - [`merchantShop.test.ts`](../../tests/economy/merchantShop.test.ts) — ~ What a plain item sells for at its first level (the shop's stock); consumables have their own price.
@@ -850,6 +854,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buildings_v1_rollback.sql`](../../supabase/migrations/buildings_v1_rollback.sql)
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
+- [`idols_v1.sql`](../../supabase/migrations/idols_v1.sql)
+- [`idols_v1_rollback.sql`](../../supabase/migrations/idols_v1_rollback.sql)
 - [`inventory_ledger.sql`](../../supabase/migrations/inventory_ledger.sql)
 - [`new_chapter_columns.sql`](../../supabase/migrations/new_chapter_columns.sql)
 - [`new_chapter_columns_rollback.sql`](../../supabase/migrations/new_chapter_columns_rollback.sql)

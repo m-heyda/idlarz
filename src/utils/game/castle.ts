@@ -1,7 +1,7 @@
 // The castle's income bonus and upgrade time (part of the former utils/gameUtils.ts, split in IDL-15).
 import { CASTLE_UPGRADE } from '@/config/castle';
 import type { PrestigeState } from '@/types/game';
-import { emberEffect } from '@/utils/game/rebirth';
+import { buildTimeReduction } from '@/lib/buildings';
 
 /**
  * Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each
@@ -29,7 +29,7 @@ export const castleModifier = (level: number): number => {
  * @category Economy/Castle
  * @order 3
  * @formula
- * seconds = floor(durationsSec[fromLevel - 1] x (1 - 0.05 x Master Builders level))
+ * seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))
  */
-export const castleUpgradeDuration = (fromLevel: number, prestige?: PrestigeState): number =>
-	Math.floor((CASTLE_UPGRADE.durationsSec[fromLevel - 1] ?? 0) * (1 - emberEffect(prestige, 'builders')));
+export const castleUpgradeDuration = (fromLevel: number, prestige?: PrestigeState, idolBuildTimePct = 0): number =>
+	Math.floor((CASTLE_UPGRADE.durationsSec[fromLevel - 1] ?? 0) * (1 - buildTimeReduction(prestige, idolBuildTimePct)));

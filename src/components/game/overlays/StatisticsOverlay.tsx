@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { effectiveStats } from '@/lib/effectiveStats';
 import type { CharacterStats, Resources } from '@/types/game';
 import LevelDetails from '../LevelDetails';
@@ -96,8 +97,10 @@ const StatisticsOverlay: React.FC = () => {
 	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const playerClass = useGameStore((state) => state.playerClass);
+	const idolLevels = useGameStore((state) => state.idolLevels);
+	const idol = idolEconomy(tiles, idolLevels);
 	const classLines = describeClassPassives(playerClass);
-	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass });
+	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol });
 
 	const characterTab = useUiStore((state) => state.characterTab);
 	const setCharacterTab = useUiStore((state) => state.setCharacterTab);

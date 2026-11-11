@@ -68,16 +68,19 @@ export const playerProfile = (core: Core): PlayerProfile => {
 	const bonus = withClassBonus(merchantCombat(merchantOf(core)), playerClass);
 	const odds = critOdds(stats, equipment, bonus);
 	const gear = aggregateStats(equipment);
+	// the Idols' combat bonuses (Maw Idol: damage, War Memorial: max HP and armor), stamped into the stored save by the save pipeline from the standing Idols (`idolFx`)
+	const fx = isRecord(core.idolFx) ? core.idolFx : {};
+	const pct = (key: string) => 1 + (typeof fx[key] === 'number' && Number.isFinite(fx[key]) ? Math.max(0, fx[key] as number) : 0) / 100;
 	return {
 		level: characterLevelOf(core),
-		maxHp: maxHp(stats, equipment),
+		maxHp: Math.round(maxHp(stats, equipment) * pct('hpArmorPct')),
 		maxMp: maxMana(stats, equipment, playerClass),
-		hit: damagePerHit(equipment, stats, bonus),
+		hit: damagePerHit(equipment, stats, bonus) * pct('damagePct'),
 		crit: odds.crit,
 		superCrit: odds.superCrit,
 		critExtra: 1 + critDamagePercent(stats) / 100,
 		attacksPerSec: attacksPerSecond(equipment, stats, bonus),
-		armor: armorOf(equipment, stats, playerClass),
+		armor: armorOf(equipment, stats, playerClass) * pct('hpArmorPct'),
 		dodge: dodgeChance(equipment),
 		leechPct: lifeLeechPercent(equipment, bonus),
 		hpRegen: gear.regen + bonus.regen,

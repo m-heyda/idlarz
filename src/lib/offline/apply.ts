@@ -4,6 +4,7 @@ import { maxHp, maxMana } from '@/lib/combat';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import type { LimitContext } from '@/lib/limits';
 import { afterAbsence } from '@/lib/merchant';
+import { completeUpgrade } from '@/lib/buildings';
 import { advanceMonsters } from '@/lib/monsters';
 import { UNCLAIMED_SEC, type OfflineGrant } from '@/lib/offline/grant';
 import { calculateLevel, totalStatPoints } from '@/utils/game/character';
@@ -20,7 +21,7 @@ type Applied = Pick<
 >;
 
 export type OfflineStateIn = Applied &
-	Partial<Pick<GameState, 'buildingUpgrade'>> &
+	Partial<Pick<GameState, 'buildingUpgrade' | 'idolLevels'>> &
 	Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige' | 'merchantUpgrades'> &
 	Partial<Pick<GameState, 'merchantStock' | 'merchantRefresh' | 'playSeconds' | 'playerClass'>>;
 
@@ -92,6 +93,7 @@ export const applyOfflineGrant = (
 	// a building upgrade counts the same way (the builder is shared, so it never runs next to the castle's): the new level counts from the moment its timer ended
 	let buildingUpgrade = state.buildingUpgrade ?? null;
 	let buildingReached: number | undefined;
+	let idolLevels = state.idolLevels;
 	if (
 		buildingUpgrade &&
 		grant.building &&
@@ -103,9 +105,10 @@ export const applyOfflineGrant = (
 		if (remaining > 0) {
 			buildingUpgrade = { ...buildingUpgrade, remainingSec: remaining };
 		} else {
-			const tile = getTile(tiles, buildingUpgrade.x, buildingUpgrade.y);
-			if (tile?.building) {
-				tiles = setTile(tiles, buildingUpgrade.x, buildingUpgrade.y, { ...tile, buildingLevel: buildingUpgrade.toLevel });
+			const done = completeUpgrade(tiles, state.idolLevels ?? {}, buildingUpgrade);
+			if (done.reached) {
+				tiles = done.tiles;
+				idolLevels = done.idolLevels;
 				resourceRates = calculateResourceRates(
 					tiles,
 					state.characterStats,
@@ -144,6 +147,7 @@ export const applyOfflineGrant = (
 			tiles,
 			castleUpgrade,
 			...(state.buildingUpgrade !== undefined ? { buildingUpgrade } : {}),
+			...(idolLevels !== undefined ? { idolLevels } : {}),
 			monsters,
 			level: { level, progress },
 			// the level-up window is for levels reached while playing: the welcome-back window reports these

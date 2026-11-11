@@ -7,10 +7,13 @@ import {
 	levelOfTile,
 	moveProblem,
 	relocationCost,
+	rememberedIdolLevel,
 	upgradeProblem,
 	type BuildingContext,
 } from '@/lib/buildings';
+import { limitOf } from '@/lib/limits';
 import { castleLevelOf } from '@/lib/castleWard';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import type { MapGameStore } from '@/components/game/mapSource';
 import type { Resources } from '@/types/game';
@@ -57,13 +60,14 @@ export function buildingMenuItems(game: MapGameStore, x: number, y: number): Con
 				},
 			];
 		}
-		if (level >= 5) return [{ id: 'building-max', label: `${here.label}: highest level`, disabled: true, onSelect: () => {} }];
-		const cost = buildingLevelCost(level + 1, ctx.ownedTiles);
+		if (level >= (here.kind === 'idol' ? limitOf('idolMaxLevel') : 5))
+			return [{ id: 'building-max', label: `${here.label}: highest level`, disabled: true, onSelect: () => {} }];
+		const cost = buildingLevelCost(level + 1, ctx.ownedTiles, here);
 		const problem = upgradeProblem(ctx, x, y) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
 		return [
 			{
 				id: 'building-upgrade',
-				label: `Upgrade ${here.label} to level ${level + 1} (${costText(cost)}, ${formatTime(buildingUpgradeDuration(level, s.prestige))})`,
+				label: `Upgrade ${here.label} to level ${level + 1} (${costText(cost)}, ${formatTime(buildingUpgradeDuration(level, s.prestige, idolEconomy(s.tiles, s.idolLevels ?? {}).buildTimePct))})`,
 				disabled: !!problem,
 				hint: problem ?? undefined,
 				onSelect: () => void game.getState().upgradeBuilding?.(x, y),
@@ -82,6 +86,8 @@ export interface BuildOption {
 	def: BuildingDef;
 	cost: Partial<Resources>;
 	problem: string | null;
+	/** An Idol the account has learned: placed for free at this level (0 = the first one, which is paid) */
+	remembered?: number;
 }
 
 /** An already standing building that could be moved to the tile instead of building it again (half price, level kept). */
@@ -118,8 +124,15 @@ export function buildOptions(game: MapGameStore, x: number, y: number): { builds
 			const problem = moveProblem(ctx, elsewhere.x, elsewhere.y, x, y) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
 			out.moves.push({ def, level: elsewhere.level, cost, problem, from: { x: elsewhere.x, y: elsewhere.y } });
 		} else {
-			const cost = buildingLevelCost(1, ctx.ownedTiles);
-			out.builds.push({ def, cost, problem: buildProblem(ctx, x, y, def.id) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources') });
+			// an Idol learned in an earlier run is placed again for free at its remembered level
+			const remembered = def.kind === 'idol' ? rememberedIdolLevel(s.idolLevels ?? {}, def.biome) : 0;
+			const cost = remembered > 0 ? {} : buildingLevelCost(1, ctx.ownedTiles, def);
+			out.builds.push({
+				def,
+				cost,
+				remembered,
+				problem: buildProblem(ctx, x, y, def.id) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources'),
+			});
 		}
 	}
 	return out;
