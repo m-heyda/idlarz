@@ -6,6 +6,8 @@ Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 
 
 > **Status note (2026-11-07):** the work is now tracked in Linear (team IDL; projects R0-R12 map to the phases below). Decisions made after this file was written are in docs 06, 10, 13, 15, 17, 18, 20, 21 and 28 (index: "Where each decision lives" in the [ROADMAP](ROADMAP.md)) and win over older lines here, for example: the Rattatui set is removed rather than retired (IDL-55), spawn bands and danger offsets are decided (IDL-53), and the launch has 12 achievements (IDL-73).
 
+> **Status note (2026-11-11):** P1 (front door) and P2 (New chapter) **shipped** on 2026-11-11 (`GAME_EPOCH` 2, release 0.3.0), together with most of P3-P6 (monster engine, discovery, home-biome buildings and Idols, live biomes at rebirth 1-5, potion belt, farm and castle rework). Read P1-P6 below as history; what is still open is tracked in Linear and sketched in the draft [26-next-updates-plan.md](26-next-updates-plan.md). Mobile and phone layouts are **dropped** (desktop only).
+
 ## 0. Reading guide
 
 | Section | What it holds |
@@ -223,7 +225,7 @@ Same release pattern, with a deliberately **richer look**: they are the last two
 | Step | What |
 |---|---|
 | 13.1 🎨 | Landing v2 (section 5): full re-bake with all twelve biomes, new buildings in view |
-| 13.2 | Mobile layout pass (responsive modals, tap targets, test on a real phone) |
+| 13.2 | ~~Mobile layout pass~~ dropped 2026-11-11: the game is desktop only (screens 1240 px and wider), IDL-123 canceled |
 | 13.3 | Playwright smoke test in CI; framework upgrades one at a time (Next 16, TypeScript 7, ESLint 10) |
 | 13.4 | Public checklist: email confirmation on, `verify.ts` enforcing (done in 9.4), rotated secrets, rate limits, free-plan load check |
 | 13.5 | Drop `BIOME_DISTANCE_OFFSET` to the calibrated value if the sim says so |
@@ -250,7 +252,7 @@ Item upgrading (replaced by crafting's enchant), the Quests and Gambling merchan
 
 | Version | When | What it is | Assets |
 |---|---|---|---|
-| **v1 simple** | P1, with the reset in P2 adding the pickers | a title banner "IDLE REALM" (big IDLE in hills tiles, REALM smaller), one **static** background still of the seven current biomes, a login / create-account window (collapses to a bottom sheet on phones), five feature cards, a **Continue** card for signed-in visitors with the character card and the offline bar; signed-in visitors reach the game via `/play` | one baked still (existing renderer), lettering pattern, 5 small feature icons |
+| **v1 simple** | P1, with the reset in P2 adding the pickers | a title banner "IDLE REALM" (big IDLE in hills tiles, REALM smaller), one **static** background still of the seven current biomes, a login / create-account window, five feature cards, a **Continue** card for signed-in visitors with the character card and the offline bar; signed-in visitors reach the game via `/play` | one baked still (existing renderer), lettering pattern, 5 small feature icons |
 | **v1.1 animated** (optional, any time after P2) | between phases when engineering is free | the baked tall strip scrolling bottom to top with ambient critters, `prefers-reduced-motion` gives the static frame | `npm run landing:bake` output, seven biomes only |
 | **v2 MVP** | P13 | re-baked strip with **all twelve biomes**, the two special biomes as the finale, building clusters in view, a new Open Graph image; the progress it shows is the point: visitors who saw v1 see a bigger world | baked strip from the final art; built from the map renderer (no sample art needed) |
 
