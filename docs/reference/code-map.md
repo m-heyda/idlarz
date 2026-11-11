@@ -809,6 +809,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`saveUpgrade.test.ts`](../../tests/saves/saveUpgrade.test.ts)
 - [`saveWorld.test.ts`](../../tests/saves/saveWorld.test.ts) — ~ The game with a synthetic map of `count` tiles that is valid for sanitizeSave (XP pays for it, stat points follow the level).
 - [`saves.test.ts`](../../tests/saves/saves.test.ts) — ~ A plain JSON copy of a (valid) persisted game, as it would come out of a save file.
+- [`startHubSuppression.test.ts`](../../tests/saves/startHubSuppression.test.ts) — ~ Whether the hub would be shown the way /play decides it:
 - [`storageScope.test.ts`](../../tests/saves/storageScope.test.ts)
 - [`syncPolicy.test.ts`](../../tests/saves/syncPolicy.test.ts) — ~ A fake clock:
 
