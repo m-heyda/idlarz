@@ -33,3 +33,11 @@ test('the rule: a type is known once the server said so, nothing is hidden befor
 	assert.equal(isKnownType({ loaded: true, seen: new Set([type]) }, type), true);
 	assert.equal(isKnownType({ loaded: true, seen: new Set(['graniteRam']) }, type), false);
 });
+
+test('a real monster on the map or in the fight window is never the lab preview: only an `art` override skips the silhouette', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { labPreviewOf } = require('../../src/components/game/MonsterArt') as typeof import('../../src/components/game/MonsterArt');
+	assert.equal(labPreviewOf(undefined), undefined, 'the map and the combat panel pass no art for a real monster');
+	assert.equal(labPreviewOf(type)?.id, type, 'the lab names a roster monster explicitly');
+	assert.equal(labPreviewOf('nope'), undefined);
+});

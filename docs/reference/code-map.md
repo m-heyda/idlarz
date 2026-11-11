@@ -204,7 +204,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
-- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}).
+- [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`OrganizeButton.tsx`](../../src/components/game/OrganizeButton.tsx) — ~ Tidies the bag from the left:

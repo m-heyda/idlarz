@@ -6,6 +6,13 @@ import { useIsDiscovered } from '@/stores/bestiaryStore';
 import type { MonsterType } from '@/types/game';
 import '@/styles/Monsters.css';
 
+/**
+ * The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt}
+ * (so the "?" silhouette applies). Every real monster type is in the catalog too, so looking the type itself up would send every monster around the silhouette (the bug where the
+ * map showed real art while the queue showed shadows).
+ */
+export const labPreviewOf = (art: string | undefined) => (art ? MONSTER_CATALOG.find((m) => m.id === art) : undefined);
+
 /** What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}). */
 export const UNKNOWN_MONSTER = 'Unknown monster';
 
