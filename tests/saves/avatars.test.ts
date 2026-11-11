@@ -15,11 +15,11 @@ import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-test('the catalog has 8 starters and the 4 launch unlockables, each with its portrait file', () => {
+test('the catalog has 8 starters and the 5 unlockables, each with its portrait file', () => {
 	assert.equal(STARTER_AVATAR_IDS.length, 8);
 	assert.deepEqual(
 		AVATARS.filter((a) => a.kind === 'unlock').map((a) => a.id),
-		['architect', 'reborn', 'boss_slayer', 'early_tester'],
+		['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester'],
 	);
 	assert.equal(new Set(AVATARS.map((a) => a.id)).size, AVATARS.length);
 	for (const avatar of AVATARS) {
@@ -39,6 +39,7 @@ test('a locked avatar is refused until its achievement is earned', () => {
 	assert.equal(checkAvatar('architect', 'mage', ['first_rebirth', 'early_tester']).ok, false, "another avatar's achievement does not open it");
 	assert.deepEqual(checkAvatar('architect', 'mage', ['castle_10']), { ok: true, value: 'architect' });
 	assert.deepEqual(checkAvatar('early_tester', 'ranger', ['early_tester']), { ok: true, value: 'early_tester' });
+	assert.deepEqual(checkAvatar('beta_tester', 'ranger', ['early_tester']), { ok: true, value: 'beta_tester' }, 'the same achievement opens both tester faces');
 });
 
 test('a forged id is refused: unknown, wrong type, prototype keys', () => {
@@ -107,12 +108,12 @@ test("another class's starter is refused (register, profile, avatar route and ne
 test('earned reward avatars are selectable by every class, unearned ones by none', () => {
 	const all = ['castle_10', 'first_rebirth', 'boss_auroch', 'early_tester'];
 	for (const cls of PLAYER_CLASS_ORDER) {
-		for (const id of ['architect', 'reborn', 'boss_slayer', 'early_tester']) {
+		for (const id of ['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester']) {
 			assert.equal(checkAvatar(id, cls, all).ok, true, `${cls} <- ${id}`);
 			assert.equal(checkAvatar(id, cls, []).ok, false, `${cls} <- ${id} unearned`);
 		}
 		assert.deepEqual(classAvatarIds(cls, []).sort(), [...CLASS_AVATARS[cls]].sort());
-		assert.equal(classAvatarIds(cls, all).length, 6);
+		assert.equal(classAvatarIds(cls, all).length, 7);
 	}
 });
 

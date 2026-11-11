@@ -29,8 +29,8 @@ Starters are candidates for the 8 starter avatars (IDL-71): human, elf and dwarf
 | 17 | `avatar_horned_green_veteran.png` | veteran with curved horns, green frame | unlockable pool |
 | 4324 | `avatar_horned_black_helm.png` | stern warrior in a black horned helm, purple frame | unlockable pool |
 | 654654 | `avatar_horned_fur_collar.png` | warrior with a fur collar, red frame | unlockable pool |
-| 34543543 | `avatar_horned_chainmail.png` | grizzled warrior in chainmail and horns, purple frame | unlockable pool (was the Early tester placeholder) |
-| new | `avatar_early_tester.png` | wireframe hologram bust on a teal frame | unlockable: Early tester |
+| 34543543 | `avatar_horned_chainmail.png` | grizzled warrior in chainmail and horns, purple frame | unlockable: Early tester |
+| new | `avatar_beta_tester.png` | wireframe hologram bust on a teal frame | unlockable: Beta tester (same achievement as Early tester) |
 
 ## achievements/ (21 medals)
 
@@ -64,4 +64,4 @@ Check the 65x65 file (`avatar_winged_helm_veteran.png`) and crop it to 64x64 if 
 
 ## wireframe/ (5 sprites, green hologram mesh, 64x64)
 
-Made with Sprite Fusion on 2026-11-11 for the early-tester rewards after the New Chapter. **Early tester set (IDL-282):** `avatar_wireframe_hero.png` is composited onto a teal frame as `heroes/avatar_early_tester.png` (the Early tester avatar) and `badge_star_wireframe.png` is copied to `achievements/badge_early_tester_wireframe.png` (the Early tester badge, shown beside the name in the Character window and on the landing Continue card). **Pets not wired yet** (pet system): `pet_fox.png`, `pet_owl.png` and `pet_rabbit.png` the first pets. The wireframe castle variants are still to be drawn.
+Made with Sprite Fusion on 2026-11-11 for the early-tester rewards after the New Chapter. **Early tester set (IDL-282):** `avatar_wireframe_hero.png` is composited onto a teal frame as `heroes/avatar_beta_tester.png` (the Beta tester avatar; the Early tester keeps its chainmail bust) and `badge_star_wireframe.png` is copied to `achievements/badge_early_tester_wireframe.png` (the Early tester badge, shown beside the name in the Character window and on the landing Continue card). **Pets not wired yet** (pet system): `pet_fox.png`, `pet_owl.png` and `pet_rabbit.png` the first pets. The wireframe castle variants are still to be drawn.

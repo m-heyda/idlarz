@@ -21370,6 +21370,21 @@
 	},
 	{
 		"usedBy": [
+			"beta_tester"
+		],
+		"name": "avatar_beta_tester",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_beta_tester.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"alchemist"
 		],
 		"name": "avatar_blue_plume_knight",
@@ -21415,21 +21430,6 @@
 	},
 	{
 		"usedBy": [
-			"early_tester"
-		],
-		"name": "avatar_early_tester",
-		"category": "portraits",
-		"subcategory": "avatar portraits",
-		"src": "/pixel/new_assets/heroes/avatar_early_tester.png",
-		"status": "used",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [
 			"architect"
 		],
 		"name": "avatar_gold_lion_knight",
@@ -21466,6 +21466,21 @@
 		"category": "portraits",
 		"subcategory": "avatar portraits",
 		"src": "/pixel/new_assets/heroes/avatar_horned_brute_dark.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"early_tester"
+		],
+		"name": "avatar_horned_chainmail",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_horned_chainmail.png",
 		"status": "used",
 		"source": "new_assets/heroes",
 		"size": [
@@ -21556,21 +21571,6 @@
 		"category": "portraits",
 		"subcategory": "avatar portraits (spare, for later unlocks)",
 		"src": "/pixel/new_assets/heroes/avatar_horned_black_helm.png",
-		"status": "planned",
-		"source": "new_assets/heroes",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [
-			"unlockable avatar (gems, achievements), IDL-266"
-		],
-		"name": "avatar_horned_chainmail",
-		"category": "portraits",
-		"subcategory": "avatar portraits (spare, for later unlocks)",
-		"src": "/pixel/new_assets/heroes/avatar_horned_chainmail.png",
 		"status": "planned",
 		"source": "new_assets/heroes",
 		"size": [

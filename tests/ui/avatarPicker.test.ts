@@ -46,3 +46,11 @@ test('once loaded, other classes keep the dimmed look with the lock line and une
 	assert.match(html, /\?\?\?/);
 	assert.doesNotMatch(html, /data-loading="true"/);
 });
+
+test('the grid is four rows of four: the faces, then "Soon" cards for the free slots', () => {
+	const { AVATAR_GRID_SLOTS } = require('../../src/components/game/AvatarPicker') as typeof import('../../src/components/game/AvatarPicker'); // eslint-disable-line @typescript-eslint/no-require-imports
+	const html = draw('mage');
+	assert.equal((html.match(/data-testid="avatar-soon"/g) ?? []).length, AVATAR_GRID_SLOTS - AVATARS.length);
+	assert.equal(AVATAR_GRID_SLOTS % 4, 0);
+	assert.ok(AVATARS.length <= AVATAR_GRID_SLOTS);
+});

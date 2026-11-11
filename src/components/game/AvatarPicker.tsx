@@ -4,6 +4,9 @@ import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import AvatarArt from './AvatarArt';
 import '@/styles/Heroes.css';
 
+/** The grid is four rows of four: faces still to come show as empty "Coming soon" cards until the catalog fills them (one row more than the faces there are today leaves room for the next updates). */
+export const AVATAR_GRID_SLOTS = 16;
+
 interface AvatarPickerProps {
 	/** The chosen avatar id (null = none yet) */
 	value: string | null;
@@ -18,7 +21,7 @@ interface AvatarPickerProps {
 }
 
 /**
- * The avatar grid (IDL-71, class lock IDL-269): the 8 starters first, then the rewards. The hero's own two starters and the earned rewards are enabled. Another class's starter stays visible but disabled (dimmed, a small
+ * The avatar grid (IDL-71, class lock IDL-269): the 8 starters first, then the rewards, then empty "Soon" cards up to 16 slots. The hero's own two starters and the earned rewards are enabled. Another class's starter stays visible but disabled (dimmed, a small
  * lock, "Needs the <Class> class"); a reward that is not earned keeps its silhouette, "???" and how to earn it. The server decides again on every save, so this only keeps honest players from trying (`checkAvatar`).
  */
 const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocked, onChange, disabled = false, loading = false }) => (
@@ -60,6 +63,13 @@ const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocke
 				</button>
 			);
 		})}
+		{Array.from({ length: Math.max(0, AVATAR_GRID_SLOTS - AVATARS.length) }, (_, i) => (
+			<div key={`soon-${i}`} className='avatar-card avatar-card-soon' aria-hidden='true' data-testid='avatar-soon'>
+				<span className='avatar-card-soon-art'>?</span>
+				<span className='avatar-card-name'>Soon</span>
+				<span className='avatar-card-soon-note'>New faces in later updates</span>
+			</div>
+		))}
 	</div>
 );
 
