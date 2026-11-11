@@ -79,6 +79,16 @@ export const nextDoneAt = (entry: CraftQueueEntry, nowMs: number, ctx: LimitCont
 	return at - entry.startedAt > craftLimit('craftOfflineHours', ctx) * 3_600_000 ? null : at;
 };
 
+/**
+ * The crafting XP one payout gives: the recipe's `xp` times how many were made times `CRAFTING.xpScale` (the end-game slow-down, `config/crafting.ts`), rounded to six decimals so repeated small
+ * additions never drift. The server uses this for every craft, claim and queue payout, the UI to show it.
+ *
+ * @category Progression/Crafting
+ * @order 4
+ * @formula craftXpOf = recipe.xp x count x CRAFTING.xpScale
+ */
+export const craftXpOf = (recipe: { xp: number }, count: number): number => Math.round(recipe.xp * count * CRAFTING.xpScale * 1e6) / 1e6;
+
 /** Crafting XP to go from `level` to the next one (Infinity at the maximum). */
 export const craftXpToNext = (level: number): number => {
 	if (!(level >= 1)) return STEPS[0];

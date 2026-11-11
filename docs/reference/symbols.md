@@ -82,8 +82,9 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Commands and documentation generation | Ops / Commands | [`scripts/docs-reference.ts:1`](../../scripts/docs-reference.ts) | Commands. |
 | `computeOfflineGrant` | Saves & Server / Away time | [`src/lib/offline/grant.ts:75`](../../src/lib/offline/grant.ts) | The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). |
 | Conventions | Overview / The game | [`src/app/GameApp.tsx:2`](../../src/app/GameApp.tsx) | Conventions that hold for the whole code base. |
-| `CRAFT_GEAR` | Progression / Crafting | [`src/config/crafting.ts:46`](../../src/config/crafting.ts) | Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): |
+| `CRAFT_GEAR` | Progression / Crafting | [`src/config/crafting.ts:52`](../../src/config/crafting.ts) | Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): |
 | `CRAFTING` | Progression / Crafting | [`src/config/crafting.ts:14`](../../src/config/crafting.ts) | Crafting: |
+| `craftXpOf` | Progression / Crafting | [`src/lib/crafting.ts:90`](../../src/lib/crafting.ts) | The crafting XP one payout gives: |
 | `createClickLimiter` | Economy / Clicks | [`src/lib/clickLimiter.ts:35`](../../src/lib/clickLimiter.ts) | Creates the click rate limiter: |
 | `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:75`](../../src/lib/saveStorage.ts) | Where the save lives: |
 | `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:140`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
@@ -244,7 +245,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
 | The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
-| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:116`](../../src/app/GameApp.tsx) | The tick loop. |
+| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:115`](../../src/app/GameApp.tsx) | The tick loop. |
 | `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:114`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |

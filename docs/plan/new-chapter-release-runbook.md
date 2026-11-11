@@ -1,6 +1,6 @@
 # New Chapter release runbook (0.3.0): fresh start for everyone
 
-Owner decision 2026-11-11: the New Chapter is the **last free reset**. Every account keeps **its login, its reserved name and its gems**; everything else is cleared and each player picks name, class and avatar again on the "A new chapter" screen. This page is the order of operations for release day. The code is the source of truth for mechanics (`src/config/epoch.ts`, `src/lib/offline/chapter.ts`, `docs/reference/saves-and-server.md`); this page only sequences them. Tasks: IDL-253 (the flip), IDL-254 (checklist and rehearsal), IDL-279 (save compatibility).
+Owner decision 2026-11-11: the New Chapter is the **last free reset**. Every account keeps **its login and its reserved name**; everything else is cleared (kill counts, glossary, achievements, tutorial, everything), each player ends with exactly **1000 gems** and the **Early tester avatar**, and picks name, class and avatar again on the "A new chapter" screen. The full reset is IDL-283 (PR 212): it must be merged before the flip. This page is the order of operations for release day. The code is the source of truth for mechanics (`src/config/epoch.ts`, `src/lib/offline/chapter.ts`, `docs/reference/saves-and-server.md`); this page only sequences them. Tasks: IDL-253 (the flip), IDL-254 (checklist and rehearsal), IDL-279 (save compatibility).
 
 ## What the reset does, per thing
 
@@ -8,8 +8,9 @@ Owner decision 2026-11-11: the New Chapter is the **last free reset**. Every acc
 | --- | --- |
 | Auth account, email, password | kept |
 | Reserved character name | kept (the player can change it on the chapter screen; a name another account holds is refused) |
-| Gems (`player_ledger.gems`) | **kept** (decided 2026-11-11) |
-| Class, avatar | chosen again on the chapter screen (avatar checked against earned achievements, which are cleared, so only starters) |
+| Gems (`player_ledger.gems`) | set to exactly 1000 (`STARTING_GEMS`), whatever the account held (decided 2026-11-11) |
+| Class, avatar | chosen again on the chapter screen: only the starters and the Early tester avatar are offered (`earnedAfterReset`); no old unlock |
+| Achievements (`player_achievements` rows and `stats.achievements`), kill counts, glossary, tutorial progress | all deleted / zeroed |
 | Save, map, leaderboard row, rebirth log | deleted |
 | Ledger: tickets, granted totals, combat, bag and gear, craft, buffs, rebirths, counters, stats, achievements | reset to new-game values; `run_id` and `ver` bumped so sealed rolls never repeat |
 | The old game | archived first in a pinned `save_history` row flagged `epoch_archive`, never trimmed. If the copy fails the reset stops with nothing deleted |
@@ -18,7 +19,7 @@ Owner decision 2026-11-11: the New Chapter is the **last free reset**. Every acc
 
 ## PRs that go out together (label `release-0.3`)
 
-1. **Save compatibility** (IDL-279, PR 210): merge **first**. It is additive and changes nothing for the reset itself; its fixtures and guards should capture the shapes that ship.
+1. **Save compatibility** (IDL-279, PR 210) and **the full reset** (IDL-283, PR 212): merge these **first**. It is additive and changes nothing for the reset itself; its fixtures and guards should capture the shapes that ship.
 2. **Release notes**: `content/changelog/0.3.0.md` (format in `content/changelog/README.md`; players' words, what changed in the game). Written on request, when the PR list is final.
 3. **The flip**: one PR that changes `GAME_EPOCH` 1 to 2 in `src/config/epoch.ts` and nothing else. Merge **last**: merging it is the release.
 

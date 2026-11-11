@@ -4,12 +4,15 @@ import { ITEMS, ITEM_CATALOG, RARITIES } from '@/catalog';
 import { GRADE_INFO, gradeOfItem } from '@/catalog/items/grades';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearOdds } from '@/lib/craftGear';
-import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
+import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
 import type { Box } from '@/lib/tipPlacement';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatInt, formatTime, parseAmount } from '@/utils/formatters';
+
+/** Crafting XP is small now (`CRAFTING.xpScale`): show up to two decimals below 10, whole numbers above. */
+const formatXp = (xp: number): string => (xp >= 10 ? formatInt(xp) : String(Math.round(xp * 100) / 100));
 import type { PixelIconName } from '@/config/pixelIcons';
 import ResourceIcon from '../ResourceIcon';
 import PixelIcon from '../PixelIcon';
@@ -127,7 +130,7 @@ const RecipeTile: React.FC<{ recipe: Recipe; have: Have; selected: boolean; onSe
 						) : (
 							<>
 								<CostChips recipe={recipe} count={1} have={have} />
-								<div className='cr-xp'>+{formatInt(recipe.xp)} XP</div>
+								<div className='cr-xp'>+{formatXp(craftXpOf(recipe, 1))} XP</div>
 							</>
 						)}
 					</div>
@@ -248,7 +251,7 @@ const RecipeDetail: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 						/>
 						<span className='cr-qty-n'>/ {formatInt(max)}</span>
 					</div>
-					<div className='cr-xp'>+{formatInt(recipe.xp * count)} XP</div>
+					<div className='cr-xp'>+{formatXp(craftXpOf(recipe, count))} XP</div>
 					{perCraft > 0 && (
 						<div className='px-tip-muted'>
 							{formatTime(perCraft)} each{count > 1 ? `, ${formatTime(perCraft * count)} for ${formatInt(count)}` : ''}

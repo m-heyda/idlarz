@@ -190,7 +190,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
-- [`GameDebug.tsx`](../../src/components/game/GameDebug.tsx) — ~ Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table).
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
 - [`GemIcon.tsx`](../../src/components/game/GemIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`Grid.tsx`](../../src/components/game/Grid.tsx) — ~ Wheel zoom.
@@ -234,7 +233,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
 - [`CombatWidget.tsx`](../../src/components/game/overlays/CombatWidget.tsx) — ~ "1 min 12 s" or "45 s"
-- [`CraftingOverlay.tsx`](../../src/components/game/overlays/CraftingOverlay.tsx) — ~ Components have no catalog item, so their sprite is named here.
+- [`CraftingOverlay.tsx`](../../src/components/game/overlays/CraftingOverlay.tsx) — ~ Crafting XP is small now (`CRAFTING.xpScale`):
 - [`FarmAnimalDock.tsx`](../../src/components/game/overlays/FarmAnimalDock.tsx) — ~ Width the scene keeps clear on the right while the panel is open (panel width plus its margin)
 - [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
 - [`FarmOverlay.tsx`](../../src/components/game/overlays/FarmOverlay.tsx) — ~ The Farm window:
@@ -574,7 +573,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`terrain.ts`](../../src/utils/terrain.ts) — ~ Dual-grid terrain.
 - [`water.ts`](../../src/utils/water.ts) — ~ Where the map's water ripples go:
 - [`world.ts`](../../src/utils/world.ts) — ~ The map:
-- [`worldGen.ts`](../../src/utils/worldGen.ts) — ~ A synthetic world for tests, benchmarks and the admin "+N tiles" button:
+- [`worldGen.ts`](../../src/utils/worldGen.ts) — ~ A synthetic world for tests, benchmarks and perf scripts:
 
 ## scripts/
 
@@ -836,6 +835,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
+- [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
