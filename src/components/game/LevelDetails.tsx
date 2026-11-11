@@ -7,8 +7,9 @@ import { useUiStore } from '@/stores/uiStore';
 import { LevelUpTimer } from './LevelUpTimer';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import CharacterPortrait from './CharacterPortrait';
-import EarlyTesterBadge, { EARLY_TESTER_ID } from './EarlyTesterBadge';
-import { useAchievementStore } from '@/stores/achievementStore';
+import AchievementBadge from './AchievementBadge';
+import { useBadgeChoice } from './BadgeDialog';
+import { shownBadge, shownTitle } from '@/catalog/badges';
 import LevelOrb from './LevelOrb';
 import { maxHp, maxMana } from '@/lib/combat';
 
@@ -70,7 +71,10 @@ const LevelDetails: React.FC = () => {
 	const playerClass = useGameStore((state) => state.playerClass);
 	const playerName = useGameStore((state) => state.playerName);
 	const openAvatarDialog = useUiStore((state) => state.openAvatarDialog);
-	const earlyTester = useAchievementStore((state) => state.earned.includes(EARLY_TESTER_ID));
+	const choice = useUiStore((state) => state.badge);
+	useBadgeChoice();
+	const badge = shownBadge(choice.badgeId, choice.earned);
+	const title = shownTitle(choice.titleId, choice.earned);
 	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
 	return (
@@ -82,8 +86,9 @@ const LevelDetails: React.FC = () => {
 				<div className='hero-card-id'>
 					<span className='px-name hero-card-name'>
 						{playerName}
-						{earlyTester && <EarlyTesterBadge size={22} />}
+						{badge && <AchievementBadge achievement={badge} size={22} />}
 					</span>
+					{title && <span className='hero-class'>{title}</span>}
 					<span className='hero-class'>
 						{info.race} {info.label}
 					</span>

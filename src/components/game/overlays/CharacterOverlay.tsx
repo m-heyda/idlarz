@@ -40,6 +40,7 @@ const CharacterOverlay: React.FC = () => {
 	const level = useGameStore((state) => state.level.level);
 	const unequipItem = useGameStore((state) => state.unequipItem);
 	const openClassDialog = useUiStore((state) => state.openClassDialog);
+	const openBadgeDialog = useUiStore((state) => state.openBadgeDialog);
 	const setNotice = useUiStore((state) => state.showToast);
 
 	const blocked = () => (useGameStore.getState().combat.fight ? 'Finish the fight first' : null);
@@ -171,6 +172,9 @@ const CharacterOverlay: React.FC = () => {
 				<div className='flex justify-center gap-3 mt-4'>
 					<button className='px-btn px-btn-sm' onClick={openClassDialog}>
 						Class
+					</button>
+					<button className='px-btn px-btn-sm' onClick={openBadgeDialog} title='Choose the badge and title shown next to your name'>
+						Badge
 					</button>
 					<button className='px-btn px-btn-sm' onClick={() => openWindow('character')}>
 						Character

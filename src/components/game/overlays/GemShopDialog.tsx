@@ -10,6 +10,14 @@ import GemIcon from '../GemIcon';
 
 const DAY = 86_400;
 
+/** The gem sinks that are planned but not built (the "Coming soon" tab): gems only come in from the daily bonus and achievements, so these are what they will be spent on. */
+const GEMS_COMING_SOON: readonly string[] = [
+	'Longer offline time',
+	'Bigger bag and farm limits',
+	'Cosmetics: avatars, badges and titles',
+	'Gear and time boosts',
+];
+
 /** Days and hours left of a cooldown, in words. */
 const waitText = (sec: number): string => {
 	const days = Math.floor(sec / DAY);
@@ -33,6 +41,7 @@ const GemShopDialog: React.FC = () => {
 	const playerName = useGameStore((state) => state.playerName);
 	const [name, setName] = useState('');
 	const [confirm, setConfirm] = useState<string | null>(null);
+	const [tab, setTab] = useState<'identity' | 'soon'>('identity');
 
 	useEffect(() => {
 		if (open) void useGemStore.getState().refresh();
@@ -87,12 +96,26 @@ const GemShopDialog: React.FC = () => {
 			</div>
 
 			<div role='tablist' className='flex gap-2 mb-3'>
-				<button role='tab' aria-selected='true' className='px-tab' data-active='true'>
+				<button role='tab' aria-selected={tab === 'identity'} className='px-tab' data-active={tab === 'identity'} onClick={() => setTab('identity')}>
 					Identity
+				</button>
+				<button role='tab' aria-selected={tab === 'soon'} className='px-tab' data-active={tab === 'soon'} onClick={() => setTab('soon')}>
+					Coming soon
 				</button>
 			</div>
 
-			<div className='flex flex-col gap-2' data-testid='gem-identity'>
+			{tab === 'soon' && (
+				<div className='px-card text-center flex flex-col gap-2' data-testid='gem-soon'>
+					<div className='text-sm text-[#f1e6c8]'>More ways to spend gems are on the way.</div>
+					<ul className='text-xs text-[#a89878] flex flex-col gap-1'>
+						{GEMS_COMING_SOON.map((line) => (
+							<li key={line}>{line}</li>
+						))}
+					</ul>
+				</div>
+			)}
+
+			<div className={tab === 'identity' ? 'flex flex-col gap-2' : 'hidden'} data-testid='gem-identity'>
 				{identity.map((item) => {
 					const { price, blocked } = stateOf(item);
 					const needsConfirm = price > GEM_CONFIRM_ABOVE;

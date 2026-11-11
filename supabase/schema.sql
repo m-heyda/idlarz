@@ -282,3 +282,7 @@ alter table public.player_ledger add column if not exists legacy jsonb;   -- Ido
 revoke insert, update on table public.profiles from authenticated;
 grant insert (id, character_name, player_class) on public.profiles to authenticated;
 grant update (id, character_name, player_class) on public.profiles to authenticated;
+
+-- ---- profile_badge_title (migration profile_badge_title): the badge and title a player shows; server-written only (not in the authenticated grants above) ----
+alter table public.profiles add column if not exists badge_id text;   -- null = default, 'none' = hidden, else an earned achievement id
+alter table public.profiles add column if not exists title_id text;   -- null = no title, else an earned achievement's title id

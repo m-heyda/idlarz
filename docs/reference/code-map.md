@@ -15,6 +15,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/auth/avatar/route.ts) — ~ The profile's class and stored avatar; `null` when the account has no profile yet.
 
+**src/app/api/auth/badge/**
+
+- [`route.ts`](../../src/app/api/auth/badge/route.ts) — ~ The badge and title the profile shows (`null` badge = the default, `"none"` = hidden) and the achievements it has earned, which decide what it may pick.
+
 **src/app/api/auth/epoch/**
 
 - [`route.ts`](../../src/app/api/auth/epoch/route.ts) — ~ The "A new chapter" confirm:
@@ -146,6 +150,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`achievements.ts`](../../src/catalog/achievements.ts) — The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
+- [`badges.ts`](../../src/catalog/badges.ts) — ~ The stored `profiles.badge_id` that hides the badge completely (null = the default).
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
 - [`idols.ts`](../../src/catalog/idols.ts) — Where the Idol statues live:
@@ -193,11 +198,13 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/**
 
+- [`AchievementBadge.tsx`](../../src/components/game/AchievementBadge.tsx) — ~ One achievement's badge picture, shown next to a name (the Character window) and in the badge picker.
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
 - [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
 - [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ The away-time bar (IDL-64):
+- [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
@@ -208,7 +215,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
 - [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ 'full' = the whole figure (56x80), 'bust' = head and shoulders (40x40)
-- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from.
+- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from, shown as their portraits.
 - [`CollapsibleSection.tsx`](../../src/components/game/CollapsibleSection.tsx) — ~ A titled block whose header toggles the body; the open/closed choice is remembered per `id` (localStorage).
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
@@ -268,7 +275,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Animals drawn for a count:
 - [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ How long the drawer takes to slide shut (a little over the transition in Farm.css)
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
-- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ Days and hours left of a cooldown, in words.
+- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The gem sinks that are planned but not built (the "Coming soon" tab):
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
 - [`LoadingScreen.tsx`](../../src/components/game/overlays/LoadingScreen.tsx) — ~ The splash while the saved game loads (needs the game store; the start gate uses LoadingView, which does not).
 - [`LoadingView.tsx`](../../src/components/game/overlays/LoadingView.tsx) — ~ Hydration splash:
@@ -370,6 +377,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
 - [`avatarPick.ts`](../../src/lib/avatarPick.ts) — What the server said to an avatar change:
 - [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
+- [`badgeServer.ts`](../../src/lib/badgeServer.ts) — ~ The stored choice of this account; a missing row is "nothing chosen".
 - [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ "1.2K gold, 300 wood":
@@ -836,6 +844,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`auth.test.ts`](../../tests/saves/auth.test.ts)
 - [`authClient.test.ts`](../../tests/saves/authClient.test.ts)
 - [`avatars.test.ts`](../../tests/saves/avatars.test.ts)
+- [`badges.test.ts`](../../tests/saves/badges.test.ts)
 - [`cloudAdopt.test.ts`](../../tests/saves/cloudAdopt.test.ts)
 - [`cloudConflict.test.ts`](../../tests/saves/cloudConflict.test.ts)
 - [`cloudSave.test.ts`](../../tests/saves/cloudSave.test.ts) — ~ The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null:
@@ -940,6 +949,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`new_chapter_columns_rollback.sql`](../../supabase/migrations/new_chapter_columns_rollback.sql)
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
+- [`profile_badge_title.sql`](../../supabase/migrations/profile_badge_title.sql)
+- [`profile_badge_title_rollback.sql`](../../supabase/migrations/profile_badge_title_rollback.sql)
 - [`profiles_server_columns.sql`](../../supabase/migrations/profiles_server_columns.sql)
 - [`rebirth_history.sql`](../../supabase/migrations/rebirth_history.sql)
 - [`season_reset.sql`](../../supabase/migrations/season_reset.sql)

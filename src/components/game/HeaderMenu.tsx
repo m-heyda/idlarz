@@ -16,6 +16,7 @@ import PixelIcon from './PixelIcon';
 import type { PixelIconName } from '@/config/pixelIcons';
 import LevelOrb from './LevelOrb';
 import NotifyDot from './NotifyDot';
+import GemIcon from './GemIcon';
 import CharacterPortrait from './CharacterPortrait';
 import HeaderTip, { TipLine } from './HeaderTip';
 
@@ -107,6 +108,8 @@ export const WindowButtons: React.FC = () => {
 	const order = useWindowStore((state) => state.order);
 	const toggleWindow = useWindowStore((state) => state.toggleWindow);
 	const attention = useMenuAttention();
+	const gemShopOpen = useUiStore((state) => state.gemShopOpen);
+	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
 	const dots: Partial<Record<WinId, boolean>> = { farm: attention.farm };
 	return (
 		<div className='flex items-center gap-1'>
@@ -133,6 +136,24 @@ export const WindowButtons: React.FC = () => {
 					<NotifyDot show={!!dots[id]} label='An animal or upgrade is affordable' />
 				</div>
 			))}
+			<div
+				className='pixel-slot pixel-slot-sm relative'
+				data-active={gemShopOpen}
+				title='Gem shop'
+				role='button'
+				tabIndex={0}
+				aria-label='Gem shop'
+				aria-pressed={gemShopOpen}
+				onClick={toggleGemShop}
+				onKeyDown={(event) => {
+					if (event.key === 'Enter' || event.key === ' ') {
+						event.preventDefault();
+						toggleGemShop();
+					}
+				}}
+			>
+				<GemIcon scale={0.7} />
+			</div>
 		</div>
 	);
 };
