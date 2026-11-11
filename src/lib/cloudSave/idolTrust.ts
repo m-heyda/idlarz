@@ -1,6 +1,8 @@
-import { IDOLS } from '@/catalog/idols';
+import { IDOLS, idolDef } from '@/catalog/idols';
 import { standingIdols } from '@/lib/idolEconomy';
+import { forEachOwned, setTiles, type World } from '@/utils/world';
 import type { PersistedGame } from '@/lib/sanitizeSave';
+import type { Tile } from '@/types/game';
 
 /**
  * The server's say over the Idol levels (the account's `idolLevels`). The ledger's `legacy.idols` is the trusted record; a save may claim a level above it only by one step per save and only
@@ -36,4 +38,25 @@ export const sameIdols = (a: Record<string, number>, b: Record<string, number>):
 	const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
 	for (const k of keys) if ((a[k] ?? 0) !== (b[k] ?? 0)) return false;
 	return true;
+};
+
+/**
+ * Cuts every standing Idol's tile level to the settled record, so that everything derived from the map alone (the farm bonus in the income rates, the stored world) is the server's number and not the claim: a tile above the record goes down to it
+ * (an Idol the record knows nothing about, a forged build, is taken off the map). Only a level or a building nobody verified is taken away; an honest first build is accepted by {@link settleIdols} first.
+ */
+export const clampIdolTiles = (tiles: World, settled: Record<string, number>): World => {
+	const changes: { x: number; y: number; tile: Tile }[] = [];
+	forEachOwned(tiles, (tile, x, y) => {
+		const idol = idolDef(tile.building);
+		if (!idol) return;
+		const allowed = settled[idol.biome] ?? 0;
+		if ((tile.buildingLevel ?? 1) <= allowed) return;
+		// an Idol the record knows is cut to its level; one it knows nothing about (a forged build) is taken off the map
+		const { buildingLevel: _level, ...noLevel } = tile;
+		const { building: _building, ...bare } = noLevel;
+		void _level;
+		void _building;
+		changes.push({ x, y, tile: allowed > 1 ? { ...tile, buildingLevel: allowed } : allowed === 1 ? noLevel : bare });
+	});
+	return changes.length === 0 ? tiles : setTiles(tiles, changes);
 };

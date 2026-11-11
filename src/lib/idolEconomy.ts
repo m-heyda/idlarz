@@ -26,6 +26,12 @@ export interface IdolEconomy {
 	hpArmorPct: number;
 	/** % shorter castle and building timers (Dwarf Statue), before the cap shared with Master Builders */
 	buildTimePct: number;
+	/** % more of every farm product: meat, eggs, milk, hide (Harvest Scarecrow) */
+	farmOutputPct: number;
+	/** % more gold per map click (Scarecrow King) */
+	clickGoldPct: number;
+	/** % more gold from everything sold to the merchant (Lighthouse) */
+	merchantSellPct: number;
 }
 
 export const NO_IDOL_ECONOMY: IdolEconomy = {
@@ -38,6 +44,9 @@ export const NO_IDOL_ECONOMY: IdolEconomy = {
 	damagePct: 0,
 	hpArmorPct: 0,
 	buildTimePct: 0,
+	farmOutputPct: 0,
+	clickGoldPct: 0,
+	merchantSellPct: 0,
 };
 
 /** The Idols standing on a map: biome -> the level on its tile (1 when the field is absent). Cached per World, so the per-tick callers do not scan the map. */
@@ -104,7 +113,15 @@ export const idolEconomy = (tiles: World, idolLevels?: Record<string, number>): 
 			case 'battlefield':
 				out.hpArmorPct += pct;
 				break;
-			// plains (farm output), coast (merchant sell price) and fields (click gold) are catalog-only for now
+			case 'plains':
+				out.farmOutputPct += pct;
+				break;
+			case 'fields':
+				out.clickGoldPct += pct;
+				break;
+			case 'coast':
+				out.merchantSellPct += pct;
+				break;
 		}
 	}
 	return out;

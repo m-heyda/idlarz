@@ -77,7 +77,7 @@ const tick = (sec: number) => {
 
 // ---- catalog -----------------------------------------------------------------------------------------------------------------------------------
 
-test('the catalog: twelve Idols, one per biome, with art, a unique id and an effect; the three client-only ones are marked', () => {
+test('the catalog: twelve Idols, one per biome, with art, a unique id and an effect; every effect is applied', () => {
 	assert.equal(IDOLS.length, 12);
 	assert.equal(new Set(IDOLS.map((i) => i.id)).size, 12);
 	assert.equal(new Set(IDOLS.map((i) => i.biome)).size, 12);
@@ -89,12 +89,11 @@ test('the catalog: twelve Idols, one per biome, with art, a unique id and an eff
 		assert.equal(buildingDef(i.id)?.kind, 'idol', 'the building catalog carries it');
 	}
 	assert.deepEqual(
-		IDOLS.filter((i) => !i.applied)
-			.map((i) => i.biome)
-			.sort(),
-		['coast', 'fields', 'plains'],
-		'farm output, click gold and merchant sell price are coming soon',
+		IDOLS.filter((i) => !i.applied).map((i) => i.biome),
+		[],
+		'every Idol effect is applied end to end',
 	);
+	assert.equal(new Set(IDOLS.map((i) => i.effect)).size, 12, 'twelve different effects');
 });
 
 test('idolMaxLevel is a limit: 5 base, 10 hard, read through limitOf', () => {
@@ -121,7 +120,7 @@ test('effects: +2 % per level (Luck 4 points), only what the game applies, never
 	assert.deepEqual({ ...idolEconomy(api().tiles), luck: 0 }, NO_IDOL_ECONOMY);
 });
 
-test('every applied Idol feeds exactly its own number; the coming-soon ones feed nothing', () => {
+test('every applied Idol feeds exactly its own number; each has its number', () => {
 	const expectKey: Record<string, keyof typeof NO_IDOL_ECONOMY | null> = {
 		forest: 'xpPct',
 		hills: 'buildTimePct',
@@ -132,9 +131,9 @@ test('every applied Idol feeds exactly its own number; the coming-soon ones feed
 		orchard: 'craftXpPct',
 		blight: 'damagePct',
 		battlefield: 'hpArmorPct',
-		plains: null,
-		coast: null,
-		fields: null,
+		plains: 'farmOutputPct',
+		coast: 'merchantSellPct',
+		fields: 'clickGoldPct',
 	};
 	for (const idol of IDOLS) {
 		const [s] = gameWith(idol.biome);
@@ -145,7 +144,7 @@ test('every applied Idol feeds exactly its own number; the coming-soon ones feed
 			.filter(([, v]) => v !== 0)
 			.map(([k]) => k);
 		assert.deepEqual(nonZero, key ? [key] : [], idol.id);
-		assert.equal(idol.applied, key !== null);
+		assert.equal(idol.applied, true);
 	}
 });
 

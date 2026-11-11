@@ -218,7 +218,7 @@ reload bring the same map back. Not covered yet (IDL-124 keeps these open): the 
 
 ### Turning enforcement and the server-run rebirth on together
 
-Source: [`src/lib/cloudSave/verify.ts:110`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:113`](../../src/lib/cloudSave/verify.ts)
 
 **Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).**
 Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:

@@ -2,6 +2,8 @@
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
 import type { PrestigeState } from '@/types/game';
 import type { CombatBonus } from '@/lib/combat';
+import { idolEconomy } from '@/lib/idolEconomy';
+import type { World } from '@/utils/world';
 
 // Merchant upgrades
 export type MerchantUpgrades = Partial<Record<string, number>>;
@@ -27,6 +29,11 @@ export const merchantUpgradeCost = (id: MerchantUpgradeId, level: number): numbe
 export interface SellContext {
 	merchantUpgrades?: MerchantUpgrades;
 	prestige?: PrestigeState;
+	/** The Lighthouse's % (the coast Idol), when the caller has worked it out already (the server reads it from the stored save: `idolFx`) */
+	idolSellPct?: number;
+	/** Or the map and the remembered Idol levels (a whole game state fits): the bonus is read from the standing Idols */
+	tiles?: World;
+	idolLevels?: Record<string, number>;
 }
 
 /**
@@ -34,7 +41,11 @@ export interface SellContext {
  * bag gear, junk, auto-sold drops, the previews and the net-worth check) goes through `sellMultiplier`, so a new bonus (an Ember
  * effect, a merchant level, an event) is one entry here and applies to all of them alike.
  */
-export const SELL_BONUSES: ((ctx: SellContext) => number)[] = [(ctx) => merchantEffect(ctx.merchantUpgrades, 'haggler')];
+export const SELL_BONUSES: ((ctx: SellContext) => number)[] = [
+	(ctx) => merchantEffect(ctx.merchantUpgrades, 'haggler'),
+	// the Lighthouse: +2 % per level of the coast Idol on every sale
+	(ctx) => (ctx.idolSellPct ?? (ctx.tiles ? idolEconomy(ctx.tiles, ctx.idolLevels).merchantSellPct : 0)) / 100,
+];
 
 /** Multiplier on every gold payout from selling to the merchant. */
 export const sellMultiplier = (ctx: SellContext | undefined): number => 1 + SELL_BONUSES.reduce((sum, bonus) => sum + (ctx ? bonus(ctx) : 0), 0);
@@ -45,7 +56,7 @@ export const sellMultiplier = (ctx: SellContext | undefined): number => 1 + SELL
  * @category Economy/Merchant
  * @order 4
  * @formula
- * payout = floor(units x unit price x (1 + 0.03 x Haggler level))
+ * payout = floor(units x unit price x (1 + 0.03 x Haggler level + Lighthouse %))
  * @see sellMultiplier (src/utils/game/merchant.ts)
  */
 export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefined): number => Math.floor(unit * qty * sellMultiplier(ctx));
