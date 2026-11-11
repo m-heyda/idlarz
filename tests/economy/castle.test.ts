@@ -80,7 +80,9 @@ test('a castle upgrade in a save must be exactly the next level', () => {
 	saved.castleUpgrade.toLevel = 4;
 	assert.equal(sanitizeSave(saved).ok, false);
 	saved.castleUpgrade = { toLevel: 2, remainingSec: castleUpgradeDuration(1) + 1 };
-	assert.equal(sanitizeSave(saved).ok, false);
+	const cut = sanitizeSave(saved);
+	assert.equal(cut.ok, true, 'a timer longer than the duration (a shortened rule) is cut to it, not refused');
+	if (cut.ok) assert.equal(cut.state.castleUpgrade?.remainingSec, castleUpgradeDuration(1));
 	assert.equal(castleLevel(), 1);
 	assert.equal(CASTLE_X, 25);
 });

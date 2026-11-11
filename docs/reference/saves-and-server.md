@@ -7,10 +7,10 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 **Contents**
 
 - Threat model: [The server's rule and the threat model](#the-server-s-rule-and-the-threat-model)
-- The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog)
+- The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog), [`BodyUpgrade`](#bodyupgrade), [`upgradeBody`](#upgradebody)
 - Uploading: [`SYNC`](#sync), [`judgeRebase`](#judgerebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
 - Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`settleIdols`](#settleidols), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
-- The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`statsWithoutTutorial`](#statswithouttutorial), [`loadBootSnapshot`](#loadbootsnapshot)
+- The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`finite`](#finite), [`LedgerRowUpgrade`](#ledgerrowupgrade), [`statsWithoutTutorial`](#statswithouttutorial), [`loadBootSnapshot`](#loadbootsnapshot)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
 - Epoch: [`BASELINE_EPOCH`](#baseline-epoch), [`startNewChapter`](#startnewchapter)
@@ -71,7 +71,7 @@ See also: [`acceptSave`](saves-and-server.md#acceptsave), [`FLAG_POLICY`](saves-
 
 Source: [`src/lib/saveFormat.ts:35`](../../src/lib/saveFormat.ts)
 
-The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters.
+The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. A newer schema is refused, an older one is upgraded by `SAVE_UPGRADES` (empty today: every older save is refused). Max text 3,000,000 characters.
 The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
 Not saved: monsters and the open fight (the server's).
 
@@ -91,29 +91,31 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:210`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:216`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
 pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
 cost) are recomputed instead of trusted. Returns the cleaned persisted slice.
 
-Validation of any loaded or imported save. It rejects what the game cannot produce: bad land, a second castle, unconnected tiles, unknown ids, values below 0 or above 1e21, wrong attribute sums, impossible castle upgrades,
-a click level outside the ladder, a prestige block that does not add up, less XP than the owned tiles produced; gear must be valid item instances (`instanceProblem` in `src/lib/itemInstance.ts`). Gear stats are derived, never read from the save.
+Validation of any loaded or imported save, **tolerant of change, strict about damage**. It refuses what no version of the game could have produced: a map that is not a map (bad land, a second castle, unconnected tiles, an unknown biome letter),
+values below 0 or above 1e21, non-numbers, a missing gold or XP, a castle upgrade to the wrong level, a prestige shop that costs more than every Ember ever earned, a bag that is not a list or is beyond the ceiling.
+What a later release can change it degrades instead of refusing: an id it does not know (an upgrade, an animal, a loot table, a stray key) is dropped; a level or count above a lowered maximum is cut to it; a resource the save lacks is 0; HP and mana above the maximum are cut;
+stat points are credited when the level pays more and a free respec when it pays fewer; XP below what the tiles paid for is lifted; the Ember balance is recomputed as earned minus spent; a piece of gear or a stack that is no longer valid leaves an empty slot (`instanceProblem` in `src/lib/itemInstance.ts`). Gear stats are derived, never read from the save.
 
 <a id="persisted-keys"></a>
 
 ### `PERSISTED_KEYS` <small>const</small>
 
-Source: [`src/lib/sanitizeSave.ts:65`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:64`](../../src/lib/sanitizeSave.ts)
 
 The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
 
 **How to extend the save safely.**
 
 - **New persisted field**: add it to `PERSISTED_KEYS`, make `sanitizeSave` accept it as *optional with a default* (old saves simply lack it) and validate it. No version bump. Add the field to a test that round-trips it (`tests/saves/saveStorage.test.ts`).
-- **Renamed, moved or reinterpreted field, or removed content** (an item, a building, a biome): bump `SAVE_SCHEMA` in `src/lib/saveFormat.ts`. Older saves are then refused. If they must survive, write the conversion for that bump
-  (a `MIGRATIONS`-style step in `decodeSave`) and a frozen fixture save of the old version in `tests/fixtures/saves/`; the project does not carry any today. A save from a *newer* schema than the running game is refused with a clear message.
+- **Renamed, moved or reinterpreted field**: bump `SAVE_SCHEMA` in `src/lib/saveFormat.ts` and add the pure upgrade step for the old version to `SAVE_UPGRADES` (`src/lib/saveUpgrade.ts`, worked example there), with a frozen fixture of the old shape in `tests/fixtures/saves/`.
+  Never remove content (an item, a building, a biome, a monster): retire it with a flag and keep the id, `tests/saves/appendOnly.test.ts` fails otherwise. A save from a *newer* schema than the running game is refused with a clear message.
 - **New action that moves resources**: validate inputs (type, range, finiteness, ownership), check affordability against the full cost bundle, and add a test in `tests/economy/economy.test.ts`.
 - **Anything that decides a reward or a fight** belongs on the server side (`src/lib/offline/`), seeded by the sealed random source, not in the store.
 - **Balance changes**: run `npm run docs:gen` and `npm test` (the click limiter, arbitrage and fight-balance tests guard the main exploits).
@@ -138,6 +140,52 @@ The Save & Backup dialog (Settings, *Save & backup*, or Control x5).
 - **Import**: paste the text or open a file. The text is checked as it arrives and shows level / castle / tiles / play time / save date; only on confirmation does it replace the save (the old one becomes the backup) and reload.
   Damaged, cut-off, foreign, impossible and *newer-version* saves are refused with a reason.
 - **Reset**: confirmation, then wipes the save, the backup and the damaged copy, and reloads.
+
+<a id="bodyupgrade"></a>
+
+### `BodyUpgrade` <small>type</small>
+
+Source: [`src/lib/saveUpgrade.ts:35`](../../src/lib/saveUpgrade.ts)
+
+**The one way to change what a save means: bump the schema and write an upgrade step.** Everything else is additive and needs no version (a new optional field with a default, a new id in a catalog, a new
+resource, a new building, a changed number: see `docs/plan/save-compatibility.md`). A step is only for what additive changes cannot do: a field that is renamed, moved, split or reinterpreted, or an id that must
+be turned into another one.
+
+**How it runs.** `decodeSave` reads the `v` of the save text. A save of an OLDER schema goes through `upgradeBody`: every step from its `v` up to `SAVE_SCHEMA`, one after the other, each a pure
+function `(body) => body` that turns a version N body into a version N + 1 body (the body is the packed form of `wire.s`: `land`, `extra` and the core keys). The result is then read by `sanitizeSave` like any save,
+so a step only has to make the OLD shape readable as the NEW one; validation, clamping and derived values stay where they are. A save with no path up (a gap in the chain, or a schema older than the first step)
+is refused with the "older season" message, as before. A save of a NEWER schema is refused ("update the game"): the old code cannot read what it does not know.
+The upgraded game is written back in the new schema by the next save, so a player is upgraded once. The same chain runs over every stored row in `npm run migrate-saves` (a release that wants every row moved at once).
+
+**Rules for a step.** Pure (no clock, no randomness, no network, never mutates its input; `upgradeBody` hands it a copy anyway), total (any body in, a body out: a field it cannot make sense of is dropped or defaulted,
+never thrown on), and idempotent on a body that is already new. A step is never edited after it shipped and never deleted: players on that version still exist. It comes with a fixture of the old version in
+`tests/fixtures/saves/` and a test that loads it (`tests/saves/saveFixtures.test.ts`).
+
+**Worked example.** A release renames the stored `playerName` to `heroName` and moves `gems` out of the core into the ledger. Bump `SAVE_SCHEMA` from 7 to 8 in `saveFormat.ts` and register the step that upgrades FROM 7:
+
+```ts
+export const SAVE_UPGRADES: Record<number, BodyUpgrade> = {
+  7: (body) => {
+    if (!('playerName' in body)) return body;              // already new (or never had one): leave it alone, so running the step twice changes nothing
+    const { playerName, gems, ...rest } = body;
+    return { ...rest, heroName: playerName };   // gems are the ledger's now: the old value is simply not carried
+  },
+};
+```
+
+`sanitizeSave` then reads `heroName`. A v7 save in a browser or in `player_saves.core` is upgraded when it is read; nothing else changes. If the release also changes a database column, the SQL migration goes first (nullable
+additive, with a rollback file) and the code that reads the new column second; see the recipe in `docs/plan/save-compatibility.md`.
+
+See also: [`SAVE_SCHEMA`](saves-and-server.md#save-schema), `decodeSave`, [`upgradeBody`](saves-and-server.md#upgradebody)
+
+<a id="upgradebody"></a>
+
+### `upgradeBody` <small>function</small>
+
+Source: [`src/lib/saveUpgrade.ts:52`](../../src/lib/saveUpgrade.ts)
+
+Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... `to - 1` of `chain`. Pure: the input is never changed. `from === to` returns a copy untouched.
+`chain` is a parameter so a test (or a release script) can run a step before it is registered.
 
 ## Uploading
 
@@ -487,6 +535,43 @@ player's runs (a rebirth or a new game starts again at ordinal 1 without repeati
 
 Sealed rolls: every reward is seeded by `HMAC-SHA256(LOOT_SECRET, userId | runId | kind | ordinal)` with a fresh digest per draw. The ordinal is consumed on the server, so a reload cannot reroll.
 A rebirth or New Game starts a new run id. `LOOT_SECRET` is server-only; without it `/api/offline`, `/api/spawn`, `/api/chest` and `/api/fight` answer 503.
+
+<a id="finite"></a>
+
+### `finite` <small>function</small>
+
+Source: [`src/lib/offline/ledgerRead.ts:19`](../../src/lib/offline/ledgerRead.ts)
+
+Tolerant readers for the two ledger columns that hold catalog ids (`inv`: bag, gear, pity; `combat`: the open fight). The rule for every stored column: **read what you
+understand, drop what you do not, never throw**. A catalog entry that a later release removed or changed (an item id, a monster type, a rarity, an affix, a level window) costs the
+player that one piece, not the row: the rest of the bag, the gear and the combat state stay. (Retire content with a flag instead of deleting it and nothing is dropped at all:
+see `docs/plan/save-compatibility.md`.)
+
+<a id="ledgerrowupgrade"></a>
+
+### `LedgerRowUpgrade` <small>type</small>
+
+Source: [`src/lib/offline/ledgerUpgrade.ts:26`](../../src/lib/offline/ledgerUpgrade.ts)
+
+The upgrade path of a `player_ledger` row. A ledger row has no schema number: its columns are read tolerantly (`ledgerFromRow`: every column through a reader that drops what it does not know, a missing column
+reads as empty), so ADDING a column or a key never needs a step (the migration adds the column nullable, the reader defaults it: SQL first, code second).
+A step exists for the rare change a reader cannot absorb: a key that is renamed, a value that changes meaning, a list that changes shape. Because there is no version to branch on, **every step recognises the OLD
+shape by itself and leaves a new row alone** (idempotent, like `upgradeStoredBank` in `tickets.ts`), is pure, and is never edited or deleted after it shipped.
+
+It runs on read (`ledgerFromRow` could call it) and, for a release that wants every row moved at once, over every row in `npm run migrate-saves`. Worked example: a release renames `combat.autoUse` to `combat.autoPotion`:
+
+```ts
+export const LEDGER_ROW_UPGRADES: readonly LedgerRowUpgrade[] = [
+  (row) => {
+    const combat = row.combat as Record<string, unknown> | null;
+    if (!combat || !('autoUse' in combat)) return row;          // already new (or no combat yet): leave it alone
+    const { autoUse, ...rest } = combat;
+    return { ...row, combat: { ...rest, autoPotion: autoUse } } as LedgerRow;
+  },
+];
+```
+
+See also: `ledgerFromRow`, [`upgradeBody`](saves-and-server.md#upgradebody)
 
 <a id="statswithouttutorial"></a>
 

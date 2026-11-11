@@ -19,10 +19,11 @@ const get = (id: string) => {
 	return rows[id];
 };
 
-test('structural forgery is refused outright: unpaid Ember shop levels, extra attribute points, a click level beyond the ladder', () => {
-	for (const id of ['ember-shop-unpaid', 'stat-points', 'click-level']) assert.equal(get(id).verdict, 'rejected', id);
+test('structural forgery: an unpaid Ember shop is refused; extra attribute points and a click level beyond the ladder are repaired to what the rules allow (a save is never refused for a changed rule)', () => {
+	assert.equal(get('ember-shop-unpaid').verdict, 'rejected');
 	assert.match(get('ember-shop-unpaid').reason!, /embers do not add up/);
-	assert.match(get('stat-points').reason!, /too many stat points/);
+	// the claim buys nothing: the points go back to unspent (a free respec), the click level is cut to the top of the ladder (the net-worth check prices it like any claimed level)
+	for (const id of ['stat-points', 'click-level']) assert.notEqual(get(id).verdict, 'rejected', id);
 });
 
 test("XP is the server's to bound: a save with more XP than the game could have paid is clamped and flagged", () => {

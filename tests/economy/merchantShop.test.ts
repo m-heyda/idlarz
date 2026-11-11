@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, closeFight, freshGame, growTo, openFight, setResources, store, rawSnapshot } from '../helpers';
 import { COMBAT } from '../../src/config/combatConfig';
-import { FARM_PRODUCT_KEYS } from '../../src/config/farm';
+import { FARM_PRODUCT_KEYS, FARM_UPGRADES } from '../../src/config/farm';
 import {
 	MERCHANT_BUYABLE,
 	MERCHANT_BUY_MULTIPLIER,
@@ -241,10 +241,13 @@ test('saves: merchant upgrades round-trip, the bag size follows Pack Rat, and ba
 	assert.equal(sanitizeSave(forged).ok, false, 'a forged bag above HARD_LIMITS.bagSize is refused');
 	const unknown = JSON.parse(JSON.stringify(raw));
 	unknown.merchantUpgrades.cheat = 1;
-	assert.equal(sanitizeSave(unknown).ok, false);
+	const unknownRead = sanitizeSave(unknown);
+	assert.equal(unknownRead.ok, true, 'a save with an unknown upgrade loads');
+	assert.equal(unknownRead.ok && 'cheat' in unknownRead.state.merchantUpgrades, false, 'the unknown upgrade is dropped');
 	const high = JSON.parse(JSON.stringify(raw));
 	high.merchantUpgrades.haggler = 99;
-	assert.equal(sanitizeSave(high).ok, false);
+	const highRead = sanitizeSave(high);
+	assert.equal(highRead.ok && highRead.state.merchantUpgrades.haggler, MERCHANT_UPGRADES.haggler.maxLevel, 'a level above the maximum is cut to it');
 	const missing = JSON.parse(JSON.stringify(raw));
 	delete missing.merchantUpgrades;
 	missing.bag = missing.bag.slice(0, COMBAT.bagSize);
@@ -264,10 +267,10 @@ test('saves: an older save without farm products or farm upgrades loads with zer
 		assert.deepEqual(result.state.farmUpgrades, {});
 	}
 	const bad = rawSnapshot();
-	bad.farmUpgrades = { feed: 99 };
-	assert.equal(sanitizeSave(bad).ok, false);
-	bad.farmUpgrades = { sorcery: 1 };
-	assert.equal(sanitizeSave(bad).ok, false);
+	bad.farmUpgrades = { feed: 99, sorcery: 1 };
+	const cut = sanitizeSave(bad);
+	assert.equal(cut.ok, true, 'a level above the maximum is cut and an unknown upgrade dropped');
+	if (cut.ok) assert.deepEqual(cut.state.farmUpgrades, { feed: FARM_UPGRADES.feed.maxLevel });
 });
 
 test('farm products sell but are never offered for sale; resource packs stay on the old five', () => {

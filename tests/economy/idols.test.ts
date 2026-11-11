@@ -599,7 +599,8 @@ test('a save whose HP is the War Memorial maximum is valid, and one above it is 
 	const hp = (n: number) => decodeSave(encodeSave({ ...structuredClone(base), playerHp: n } as never));
 	const limit = Math.round(effectiveStatsMaxHp() * 1.1);
 	assert.equal(hp(limit).ok, true, 'the pool the Idol makes');
-	assert.equal(hp(limit * 2).ok, false, 'far above it');
+	const far = hp(limit * 2);
+	assert.ok(far.ok && far.state.playerHp <= limit, 'far above it: cut to the pool, not refused');
 });
 
 const effectiveStatsMaxHp = (): number => {

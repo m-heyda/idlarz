@@ -1,5 +1,4 @@
 import { isRecord } from '@/lib/isRecord';
-import { OPTIONAL_KEYS } from '@/catalog/resourceKeys';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS, type PlayerClassId } from '@/config/playerClasses';
 import { isLiveBiome } from '@/config/biomeStage';
 import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
@@ -49,8 +48,8 @@ import type {
  * **How to extend the save safely.**
  *
  * - **New persisted field**: add it to `PERSISTED_KEYS`, make `sanitizeSave` accept it as *optional with a default* (old saves simply lack it) and validate it. No version bump. Add the field to a test that round-trips it (`tests/saves/saveStorage.test.ts`).
- * - **Renamed, moved or reinterpreted field, or removed content** (an item, a building, a biome): bump `SAVE_SCHEMA` in `src/lib/saveFormat.ts`. Older saves are then refused. If they must survive, write the conversion for that bump
- *   (a `MIGRATIONS`-style step in `decodeSave`) and a frozen fixture save of the old version in `tests/fixtures/saves/`; the project does not carry any today. A save from a *newer* schema than the running game is refused with a clear message.
+ * - **Renamed, moved or reinterpreted field**: bump `SAVE_SCHEMA` in `src/lib/saveFormat.ts` and add the pure upgrade step for the old version to `SAVE_UPGRADES` (`src/lib/saveUpgrade.ts`, worked example there), with a frozen fixture of the old shape in `tests/fixtures/saves/`.
+ *   Never remove content (an item, a building, a biome, a monster): retire it with a flag and keep the id, `tests/saves/appendOnly.test.ts` fails otherwise. A save from a *newer* schema than the running game is refused with a clear message.
  * - **New action that moves resources**: validate inputs (type, range, finiteness, ownership), check affordability against the full cost bundle, and add a test in `tests/economy/economy.test.ts`.
  * - **Anything that decides a reward or a fight** belongs on the server side (`src/lib/offline/`), seeded by the sealed random source, not in the store.
  * - **Balance changes**: run `npm run docs:gen` and `npm test` (the click limiter, arbitrage and fight-balance tests guard the main exploits).
@@ -146,19 +145,24 @@ const int = (v: unknown, min: number, max: number): number | null => {
 
 export const BASE_STAT_KEYS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 const RESOURCE_KEYS = Object.keys(INITIAL_RESOURCES) as (keyof Resources)[];
-const OPTIONAL_RESOURCES = new Set<keyof Resources>(OPTIONAL_KEYS);
+/** The only stored resources a save must hold: every other one (added after launch, or added later still) is read as 0 when a save lacks it. */
+const REQUIRED_RESOURCES = new Set<keyof Resources>(['gold', 'xp']);
 export const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
+
+/** Whether `item` may be worn in `slot`: a slot this version has, and a piece made for it (a ring goes in either ring slot). Shared by the save reader and the ledger reader. */
+export const fitsSlot = (slot: string, item: ItemInstance): boolean => {
+	if (!GEAR_SLOTS.has(slot)) return false;
+	const def = ITEM_CATALOG[item.base];
+	return !!def && (def.slot === slot || (def.slot === 'ring' && (slot === 'ring1' || slot === 'ring2')));
+};
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);
 const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes', 'crafted']);
 const AFFIX_KEYS = new Set(['id', 'roll']);
 /** Longest pity counter a save may hold: far past any cap, so only a forged value exceeds it */
 const MAX_PITY = 100000;
-/** Level-ups are awarded by the tick, so a save written a moment after a purchase can be a few points behind. */
-const POINT_TOLERANCE = 5;
 
-const LAND_KEYS = new Set(['x', 'y', 'biome', 'level', 'building', 'bl', 'chest']);
 /** A biome a real save may hold: in the catalog and live (the dev-only biomes of config/biomeStage.ts exist only in the map lab). */
 const hasBiome = (name: unknown): name is string => typeof name === 'string' && Object.prototype.hasOwnProperty.call(BIOMES, name) && isLiveBiome(name);
 
@@ -178,7 +182,7 @@ const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
 	if (raw.land.length > MAX_OWNED_TILES) return 'too many tiles';
 	for (const entry of raw.land) {
 		if (!isRecord(entry)) return 'land entry shape';
-		for (const key of Object.keys(entry)) if (!LAND_KEYS.has(key)) return 'land entry key';
+		// keys this version does not know are ignored (a field a later release added): only the known ones are read
 		// `building` and `bl` are accepted and dropped unless the building system is on (BUILDINGS_FLAG): saves from before the old building system was removed (IDL-259), or written with the flag on, still load, minus their buildings
 		const { x, y, biome, level, chest, building, bl } = entry;
 		if (typeof x !== 'number' || typeof y !== 'number' || !inRange(x, y)) return 'land entry position';
@@ -201,8 +205,10 @@ const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
  * pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
  * cost) are recomputed instead of trusted. Returns the cleaned persisted slice.
  *
- * Validation of any loaded or imported save. It rejects what the game cannot produce: bad land, a second castle, unconnected tiles, unknown ids, values below 0 or above 1e21, wrong attribute sums, impossible castle upgrades,
- * a click level outside the ladder, a prestige block that does not add up, less XP than the owned tiles produced; gear must be valid item instances (`instanceProblem` in `src/lib/itemInstance.ts`). Gear stats are derived, never read from the save.
+ * Validation of any loaded or imported save, **tolerant of change, strict about damage**. It refuses what no version of the game could have produced: a map that is not a map (bad land, a second castle, unconnected tiles, an unknown biome letter),
+ * values below 0 or above 1e21, non-numbers, a missing gold or XP, a castle upgrade to the wrong level, a prestige shop that costs more than every Ember ever earned, a bag that is not a list or is beyond the ceiling.
+ * What a later release can change it degrades instead of refusing: an id it does not know (an upgrade, an animal, a loot table, a stray key) is dropped; a level or count above a lowered maximum is cut to it; a resource the save lacks is 0; HP and mana above the maximum are cut;
+ * stat points are credited when the level pays more and a free respec when it pays fewer; XP below what the tiles paid for is lifted; the Ember balance is recomputed as earned minus spent; a piece of gear or a stack that is no longer valid leaves an empty slot (`instanceProblem` in `src/lib/itemInstance.ts`). Gear stats are derived, never read from the save.
  *
  * @category Saves & Server/The save
  * @order 3
@@ -306,14 +312,16 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (!isRecord(raw.resources)) return fail('resources');
 	const resources = { ...INITIAL_RESOURCES };
 	for (const key of RESOURCE_KEYS) {
-		// resources added after launch (farm products) are missing from older saves and start at 0
-		const v = raw.resources[key] === undefined && OPTIONAL_RESOURCES.has(key) ? 0 : num(raw.resources[key]);
+		// a resource added after the save was written (farm products, extractors, anything later) is missing from it and starts at 0: only gold and XP must be there
+		const v = raw.resources[key] === undefined && !REQUIRED_RESOURCES.has(key) ? 0 : num(raw.resources[key]);
 		if (v === null) return fail(`resource ${key}`);
 		resources[key] = v;
 	}
 	let minXp = 0;
 	for (let k = 2; k <= purchasedOwned; k++) minXp += calculateXpGain(k);
-	if (resources.xp < Math.min(minXp, XP_CAP) * 0.999) return fail('xp does not cover owned tiles');
+	// XP below what the owned tiles paid for (a save that dropped XP, or an XP formula raised later) is lifted to that floor, never a reason to refuse the save
+	const xpFloor = Math.min(minXp, XP_CAP);
+	if (resources.xp < xpFloor * 0.999) resources.xp = xpFloor;
 	const level = calculateLevel(resources.xp);
 
 	// ---- character ---------------------------------------------------------------------------
@@ -332,17 +340,19 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		base[key] = v;
 		allocated += v;
 	}
-	const available = int(raw.characterStats.availablePoints, 0, 100000);
+	let available = int(raw.characterStats.availablePoints, 0, 100000);
 	if (available === null) return fail('available points');
 	const expectedTotal = BASE_STAT_KEYS.length * INITIAL_CHARACTER_STATS.strength + totalStatPoints(level.level);
 	const total = allocated + available;
-	if (total > expectedTotal) return fail('too many stat points');
-	if (total < expectedTotal - POINT_TOLERANCE) return fail('too few stat points');
-	const characterStats: CharacterStats = {
-		...INITIAL_CHARACTER_STATS,
-		...base,
-		availablePoints: available + (expectedTotal - total),
-	};
+	if (total > expectedTotal) {
+		// more points than the level pays for (a hand edit, or fewer points per level after a rebalance): a free respec, every point unspent, never a refused save
+		for (const key of BASE_STAT_KEYS) base[key] = INITIAL_CHARACTER_STATS[key];
+		available = totalStatPoints(level.level);
+	} else {
+		// fewer than the level pays for (points per level were raised, or the save is a moment behind a level-up): the difference is credited
+		available += expectedTotal - total;
+	}
+	const characterStats: CharacterStats = { ...INITIAL_CHARACTER_STATS, ...base, availablePoints: available };
 	Object.assign(characterStats, calculateCombatStats(characterStats));
 
 	// ---- merchant bonuses (optional: an older save has none). Parsed first because Pack Rat sets the bag size ----------
@@ -350,10 +360,11 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (raw.merchantUpgrades !== undefined) {
 		if (!isRecord(raw.merchantUpgrades)) return fail('merchant upgrades');
 		for (const [id, lvl] of Object.entries(raw.merchantUpgrades)) {
-			if (!(id in MERCHANT_UPGRADES)) return fail('unknown merchant upgrade');
-			const v = int(lvl, 0, MERCHANT_UPGRADES[id as MerchantUpgradeId].maxLevel);
+			if (!Object.prototype.hasOwnProperty.call(MERCHANT_UPGRADES, id)) continue; // an upgrade this version does not know (retired, or from a later release): dropped
+			const v = int(lvl, 0, 1e6);
 			if (v === null) return fail('merchant upgrade level');
-			if (v > 0) merchantUpgrades[id] = v;
+			const level = Math.min(v, MERCHANT_UPGRADES[id as MerchantUpgradeId].maxLevel); // a level above a lowered maximum is cut to it
+			if (level > 0) merchantUpgrades[id] = level;
 		}
 	}
 	// The bag is sized below, once the Embers (Deep Pockets) are read: a saved bag may be smaller than that (padded) but never beyond the ceiling
@@ -370,12 +381,9 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (!isRecord(raw.equipment)) return fail('equipment');
 		equipment = {};
 		for (const [slot, value] of Object.entries(raw.equipment)) {
-			if (!GEAR_SLOTS.has(slot)) return fail('equipment slot');
+			// a slot this version does not have, or a piece that is no longer valid here (an id it does not know, a level or affix the rules changed): that piece is dropped, never a reason to refuse the save
 			const item = readInstance(value);
-			if (typeof item === 'string') return fail(`equipped item (${item})`);
-			const def = ITEM_CATALOG[item.base];
-			const fits = def.slot === slot || (def.slot === 'ring' && (slot === 'ring1' || slot === 'ring2'));
-			if (!fits) return fail('equipped item in the wrong slot');
+			if (typeof item === 'string' || !fitsSlot(slot, item)) continue;
 			equipment[slot as EquipmentSlot] = item;
 		}
 		if (!Array.isArray(raw.bag) || raw.bag.length < 1 || raw.bag.length > maxBagSize) return fail('bag size');
@@ -389,16 +397,17 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			if ('item' in entry) {
 				for (const key of Object.keys(entry)) if (!GEAR_ENTRY_KEYS.has(key)) return fail('bag entry key');
 				const item = readInstance(entry.item);
-				if (typeof item === 'string') return fail(`bag item (${item})`);
-				bag.push({ item });
+				bag.push(typeof item === 'string' ? null : { item }); // a piece that is no longer valid leaves an empty slot, the rest of the bag stays
 				continue;
 			}
 			for (const key of Object.keys(entry)) if (!STACK_KEYS.has(key)) return fail('bag entry key');
 			const def = typeof entry.id === 'string' ? ITEM_CATALOG[entry.id] : undefined;
-			if (!def || def.kind !== 'consumable') return fail('bag item');
-			const qty = int(entry.qty, 1, def.stackMax ?? 1);
-			if (qty === null) return fail('bag quantity');
-			bag.push({ id: def.id, qty });
+			const qty = int(entry.qty, 1, 1e9);
+			if (!def || def.kind !== 'consumable' || qty === null) {
+				bag.push(null); // an id this version does not know (or a broken count): an empty slot
+				continue;
+			}
+			bag.push({ id: def.id, qty: Math.min(qty, def.stackMax ?? 1) }); // a stack above a lowered stack size is cut to it
 		}
 	}
 
@@ -408,7 +417,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (!isRecord(raw.lootPity)) return fail('loot pity');
 		const known = new Set(Object.values(LOOT_PROFILES).flatMap((p) => p.bonusTables.filter((t) => t.pity).map((t) => `${p.id}:${t.id}`)));
 		for (const [key, count] of Object.entries(raw.lootPity)) {
-			if (!known.has(key)) return fail('unknown loot table');
+			if (!known.has(key)) continue; // a loot table this version does not know: dropped
 			const v = int(count, 0, MAX_PITY);
 			if (v === null) return fail('loot pity count');
 			if (v > 0) lootPity[key] = v;
@@ -424,17 +433,17 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	const maxPlayerHp = Math.round(maxHp(characterStats, equipment) * (1 + (BUILDINGS_FLAG.enabled ? idolEconomy(tiles).hpArmorPct : 0) / 100));
 	let playerHp = maxPlayerHp;
 	if (raw.playerHp !== undefined) {
-		const v = num(raw.playerHp, 0, maxPlayerHp);
+		const v = num(raw.playerHp, 0);
 		if (v === null) return fail('player hp');
-		playerHp = v;
+		playerHp = Math.min(v, maxPlayerHp); // above the maximum (a lowered maximum, or gear no longer worn): cut to it
 	}
 	// Mana (optional: a save from before it was added starts full)
 	const maxPlayerMp = maxMana(characterStats, equipment, raw.playerClass);
 	let playerMp = maxPlayerMp;
 	if (raw.playerMp !== undefined) {
-		const v = num(raw.playerMp, 0, maxPlayerMp);
+		const v = num(raw.playerMp, 0);
 		if (v === null) return fail('player mana');
-		playerMp = v;
+		playerMp = Math.min(v, maxPlayerMp);
 	}
 
 	// ---- farm, click power, castle timer, misc -------------------------------------------------------
@@ -443,10 +452,10 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	for (const [key, lvl] of Object.entries(raw.farmLevels)) {
 		const id = key === 'deer' ? 'sheep' : key; // the deer became the sheep (same price and meat); a save that has both keeps the sheep
 		if (key === 'deer' && 'sheep' in raw.farmLevels) continue;
-		if (!ANIMALS.some((a) => a.id === id)) return fail('unknown animal');
-		const v = int(lvl, 0, MAX_ANIMALS);
+		if (!ANIMALS.some((a) => a.id === id)) continue; // an animal this version does not know: dropped
+		const v = int(lvl, 0, 1e9);
 		if (v === null) return fail('animal count');
-		if (v > 0) farmLevels[id] = v;
+		if (v > 0) farmLevels[id] = Math.min(v, MAX_ANIMALS);
 	}
 
 	// farm upgrades arrived later than the farm: an older save simply has none
@@ -454,24 +463,26 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (raw.farmUpgrades !== undefined) {
 		if (!isRecord(raw.farmUpgrades)) return fail('farm upgrades');
 		for (const [id, lvl] of Object.entries(raw.farmUpgrades)) {
-			if (!(id in FARM_UPGRADES)) return fail('unknown farm upgrade');
-			const v = int(lvl, 0, FARM_UPGRADES[id as FarmUpgradeId].maxLevel);
+			if (!Object.prototype.hasOwnProperty.call(FARM_UPGRADES, id)) continue;
+			const v = int(lvl, 0, 1e6);
 			if (v === null) return fail('farm upgrade level');
-			if (v > 0) farmUpgrades[id] = v;
+			const level = Math.min(v, FARM_UPGRADES[id as FarmUpgradeId].maxLevel);
+			if (level > 0) farmUpgrades[id] = level;
 		}
 	}
 
-	const clickLevel = int(raw.clickLevel, 0, CLICK_LADDER.length - 1);
-	if (clickLevel === null) return fail('click level');
+	const clickRaw = int(raw.clickLevel, 0, 1e6);
+	if (clickRaw === null) return fail('click level');
+	const clickLevel = Math.min(clickRaw, CLICK_LADDER.length - 1);
 
 	let castleUpgrade: CastleUpgradeState | null = null;
 	if (raw.castleUpgrade !== null && raw.castleUpgrade !== undefined) {
 		if (!isRecord(raw.castleUpgrade)) return fail('castle upgrade');
 		const toLevel = int(raw.castleUpgrade.toLevel, 2, CASTLE_UPGRADE.maxLevel);
 		if (toLevel === null || toLevel !== castleLevel + 1) return fail('castle upgrade level');
-		const remaining = num(raw.castleUpgrade.remainingSec, 0, castleUpgradeDuration(castleLevel));
+		const remaining = num(raw.castleUpgrade.remainingSec, 0, 1e9);
 		if (remaining === null) return fail('castle upgrade time');
-		castleUpgrade = { toLevel, remainingSec: remaining };
+		castleUpgrade = { toLevel, remainingSec: Math.min(remaining, castleUpgradeDuration(castleLevel)) }; // a timer longer than a shortened duration is cut to it
 	}
 
 	// ---- Building system (only read while BUILDINGS_FLAG is on; absent means none) --------------------------
@@ -524,19 +535,23 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (raw.prestige !== undefined) {
 		if (!isRecord(raw.prestige)) return fail('prestige');
 		const rebirths = int(raw.prestige.rebirths, 0, 10000);
-		const legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
+		let legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
 		const legacyEarned = int(raw.prestige.legacyEarned, 0, 1_000_000);
 		if (rebirths === null || legacyPoints === null || legacyEarned === null) return fail('prestige numbers');
 		const upgrades: PrestigeState['upgrades'] = {};
 		if (!isRecord(raw.prestige.upgrades)) return fail('prestige upgrades');
 		for (const [id, lvl] of Object.entries(raw.prestige.upgrades)) {
-			if (!(id in EMBER_UPGRADES)) return fail('unknown ember upgrade');
-			const level = int(lvl, 0, EMBER_UPGRADES[id as EmberUpgradeId].maxLevel);
-			if (level === null) return fail('ember upgrade level');
+			if (!Object.prototype.hasOwnProperty.call(EMBER_UPGRADES, id)) continue; // an upgrade this version does not know: dropped, its Embers come back below
+			const v = int(lvl, 0, 1e6);
+			if (v === null) return fail('ember upgrade level');
+			const level = Math.min(v, EMBER_UPGRADES[id as EmberUpgradeId].maxLevel);
 			if (level > 0) upgrades[id as EmberUpgradeId] = level;
 		}
-		// Points are conserved: everything earned is either still unspent or paid for shop levels
-		if (legacyPoints + emberSpent(upgrades) !== legacyEarned) return fail('embers do not add up');
+		// Points are conserved: everything earned is either still unspent or paid for shop levels. The unspent balance absorbs a difference that is not a forgery (an upgrade that was dropped
+		// or cut, a price that changed): it is recomputed as earned minus spent. Only a shop that costs MORE than all the Embers ever earned is refused.
+		const spent = emberSpent(upgrades);
+		if (spent > legacyEarned) return fail('embers do not add up');
+		legacyPoints = legacyEarned - spent;
 		if ((rebirths === 0) !== (legacyEarned === 0)) return fail('rebirths and embers disagree');
 		if (legacyEarned < rebirths) return fail('too few embers for the rebirths');
 		prestige = { rebirths, legacyPoints, legacyEarned, upgrades };
@@ -558,14 +573,12 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (raw.merchantStock !== undefined && raw.merchantStock !== null) {
 		const rawStock = raw.merchantStock;
 		if (!isRecord(rawStock)) return fail('merchant stock');
-		for (const key of Object.keys(rawStock)) if (key !== 'at' && key !== 'offers') return fail('merchant stock key');
 		const at = num(rawStock.at, 0, 1e12);
 		if (at === null || !Array.isArray(rawStock.offers) || rawStock.offers.length > MERCHANT_GOODS.maxOffers) return fail('merchant stock');
 		const offers: ItemInstance[] = [];
 		for (const entry of rawStock.offers) {
 			const item = readInstance(entry);
-			if (typeof item === 'string') return fail(`merchant offer (${item})`);
-			offers.push(item);
+			if (typeof item !== 'string') offers.push(item); // an offer that is no longer valid is left off the shelf
 		}
 		merchantStock = { at: Math.min(at, playSeconds), offers };
 	}
