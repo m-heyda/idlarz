@@ -4703,6 +4703,45 @@
 		]
 	},
 	{
+		"usedBy": [],
+		"name": "spare_chest_bluesteel_plate",
+		"category": "armor",
+		"subcategory": "chest",
+		"src": "/pixel/items/chest/_bluesteel_plate.png",
+		"status": "spare",
+		"source": "public/pixel/items",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "spare_chest_rusted_plate",
+		"category": "armor",
+		"subcategory": "chest",
+		"src": "/pixel/items/chest/_rusted_plate.png",
+		"status": "spare",
+		"source": "public/pixel/items",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "spare_chest_winged_lion_plate",
+		"category": "armor",
+		"subcategory": "chest",
+		"src": "/pixel/items/chest/_winged_lion_plate.png",
+		"status": "spare",
+		"source": "public/pixel/items",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [
 			"rag_tunic"
 		],
@@ -4755,11 +4794,11 @@
 	},
 	{
 		"usedBy": [],
-		"name": "art_ph_chest_g4",
+		"name": "art_steel_cuirass",
 		"category": "armor",
 		"subcategory": "chest G4",
-		"src": "/pixel/items/chest/ph_g4.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/steel_cuirass.png",
+		"status": "unused",
 		"slot": "chest",
 		"grade": "G4",
 		"source": "itemIcons registry",
@@ -4769,12 +4808,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_chest_g5",
+		"usedBy": [
+			"knights_breastplate"
+		],
+		"name": "art_knights_breastplate",
 		"category": "armor",
 		"subcategory": "chest G5",
-		"src": "/pixel/items/chest/ph_g5.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/knights_breastplate.png",
+		"status": "used",
 		"slot": "chest",
 		"grade": "G5",
 		"source": "itemIcons registry",
@@ -4785,11 +4826,11 @@
 	},
 	{
 		"usedBy": [],
-		"name": "art_ph_chest_g6",
+		"name": "art_obsidian_plate",
 		"category": "armor",
 		"subcategory": "chest G6",
-		"src": "/pixel/items/chest/ph_g6.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/obsidian_plate.png",
+		"status": "unused",
 		"slot": "chest",
 		"grade": "G6",
 		"source": "itemIcons registry",
@@ -4799,12 +4840,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_chest_g7",
+		"usedBy": [
+			"runed_hauberk"
+		],
+		"name": "art_runed_hauberk",
 		"category": "armor",
 		"subcategory": "chest G7",
-		"src": "/pixel/items/chest/ph_g7.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/runed_hauberk.png",
+		"status": "planned",
 		"slot": "chest",
 		"grade": "G7",
 		"source": "itemIcons registry",
@@ -4814,12 +4857,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_chest_g8",
+		"usedBy": [
+			"ancient_cuirass"
+		],
+		"name": "art_ancient_cuirass",
 		"category": "armor",
 		"subcategory": "chest G8",
-		"src": "/pixel/items/chest/ph_g8.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/ancient_cuirass.png",
+		"status": "planned",
 		"slot": "chest",
 		"grade": "G8",
 		"source": "itemIcons registry",
@@ -4829,12 +4874,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_chest_g9",
+		"usedBy": [
+			"dragonheart_plate"
+		],
+		"name": "art_dragonheart_plate",
 		"category": "armor",
 		"subcategory": "chest G9",
-		"src": "/pixel/items/chest/ph_g9.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/dragonheart_plate.png",
+		"status": "planned",
 		"slot": "chest",
 		"grade": "G9",
 		"source": "itemIcons registry",
@@ -4844,12 +4891,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_chest_s1",
+		"usedBy": [
+			"sunhoney_vestments"
+		],
+		"name": "art_sunhoney_vestments",
 		"category": "armor",
 		"subcategory": "chest S1",
-		"src": "/pixel/items/chest/ph_s1.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/sunhoney_vestments.png",
+		"status": "planned",
 		"slot": "chest",
 		"grade": "S1",
 		"source": "itemIcons registry",
@@ -4859,12 +4908,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_chest_s2",
+		"usedBy": [
+			"ashen_plate"
+		],
+		"name": "art_ashen_plate",
 		"category": "armor",
 		"subcategory": "chest S2",
-		"src": "/pixel/items/chest/ph_s2.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/ashen_plate.png",
+		"status": "planned",
 		"slot": "chest",
 		"grade": "S2",
 		"source": "itemIcons registry",
@@ -4874,12 +4925,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_chest_s3",
+		"usedBy": [
+			"blightbound_robe"
+		],
+		"name": "art_blightbound_robe",
 		"category": "armor",
 		"subcategory": "chest S3",
-		"src": "/pixel/items/chest/ph_s3.png",
-		"status": "placeholder",
+		"src": "/pixel/items/chest/blightbound_robe.png",
+		"status": "planned",
 		"slot": "chest",
 		"grade": "S3",
 		"source": "itemIcons registry",
@@ -5221,6 +5274,19 @@
 		]
 	},
 	{
+		"usedBy": [],
+		"name": "spare_hands_worn_leather_gloves",
+		"category": "armor",
+		"subcategory": "hands",
+		"src": "/pixel/items/hands/_worn_leather_gloves.png",
+		"status": "spare",
+		"source": "public/pixel/items",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [
 			"rag_wraps"
 		],
@@ -5273,11 +5339,11 @@
 	},
 	{
 		"usedBy": [],
-		"name": "art_ph_hands_g4",
+		"name": "art_steel_gauntlets",
 		"category": "armor",
 		"subcategory": "hands G4",
-		"src": "/pixel/items/hands/ph_g4.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/steel_gauntlets.png",
+		"status": "unused",
 		"slot": "hands",
 		"grade": "G4",
 		"source": "itemIcons registry",
@@ -5287,12 +5353,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_hands_g5",
+		"usedBy": [
+			"knights_gauntlets"
+		],
+		"name": "art_knights_gauntlets",
 		"category": "armor",
 		"subcategory": "hands G5",
-		"src": "/pixel/items/hands/ph_g5.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/knights_gauntlets.png",
+		"status": "used",
 		"slot": "hands",
 		"grade": "G5",
 		"source": "itemIcons registry",
@@ -5303,11 +5371,11 @@
 	},
 	{
 		"usedBy": [],
-		"name": "art_ph_hands_g6",
+		"name": "art_obsidian_grips",
 		"category": "armor",
 		"subcategory": "hands G6",
-		"src": "/pixel/items/hands/ph_g6.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/obsidian_grips.png",
+		"status": "unused",
 		"slot": "hands",
 		"grade": "G6",
 		"source": "itemIcons registry",
@@ -5317,12 +5385,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_hands_g7",
+		"usedBy": [
+			"runed_gloves"
+		],
+		"name": "art_runed_gloves",
 		"category": "armor",
 		"subcategory": "hands G7",
-		"src": "/pixel/items/hands/ph_g7.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/runed_gloves.png",
+		"status": "planned",
 		"slot": "hands",
 		"grade": "G7",
 		"source": "itemIcons registry",
@@ -5332,12 +5402,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_hands_g8",
+		"usedBy": [
+			"ancient_handguards"
+		],
+		"name": "art_ancient_handguards",
 		"category": "armor",
 		"subcategory": "hands G8",
-		"src": "/pixel/items/hands/ph_g8.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/ancient_handguards.png",
+		"status": "planned",
 		"slot": "hands",
 		"grade": "G8",
 		"source": "itemIcons registry",
@@ -5347,12 +5419,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_hands_g9",
+		"usedBy": [
+			"titans_fists"
+		],
+		"name": "art_titans_fists",
 		"category": "armor",
 		"subcategory": "hands G9",
-		"src": "/pixel/items/hands/ph_g9.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/titans_fists.png",
+		"status": "planned",
 		"slot": "hands",
 		"grade": "G9",
 		"source": "itemIcons registry",
@@ -5362,12 +5436,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_hands_s1",
+		"usedBy": [
+			"sunhoney_gloves"
+		],
+		"name": "art_sunhoney_gloves",
 		"category": "armor",
 		"subcategory": "hands S1",
-		"src": "/pixel/items/hands/ph_s1.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/sunhoney_gloves.png",
+		"status": "planned",
 		"slot": "hands",
 		"grade": "S1",
 		"source": "itemIcons registry",
@@ -5377,12 +5453,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_hands_s2",
+		"usedBy": [
+			"warlords_gauntlets"
+		],
+		"name": "art_warlords_gauntlets",
 		"category": "armor",
 		"subcategory": "hands S2",
-		"src": "/pixel/items/hands/ph_s2.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/warlords_gauntlets.png",
+		"status": "planned",
 		"slot": "hands",
 		"grade": "S2",
 		"source": "itemIcons registry",
@@ -5392,12 +5470,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_hands_s3",
+		"usedBy": [
+			"shroud_claws"
+		],
+		"name": "art_shroud_claws",
 		"category": "armor",
 		"subcategory": "hands S3",
-		"src": "/pixel/items/hands/ph_s3.png",
-		"status": "placeholder",
+		"src": "/pixel/items/hands/shroud_claws.png",
+		"status": "planned",
 		"slot": "hands",
 		"grade": "S3",
 		"source": "itemIcons registry",
@@ -5471,6 +5551,45 @@
 		]
 	},
 	{
+		"usedBy": [],
+		"name": "spare_head_crusader_helm",
+		"category": "armor",
+		"subcategory": "head",
+		"src": "/pixel/items/head/_crusader_helm.png",
+		"status": "spare",
+		"source": "public/pixel/items",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "spare_head_rusted_helm",
+		"category": "armor",
+		"subcategory": "head",
+		"src": "/pixel/items/head/_rusted_helm.png",
+		"status": "spare",
+		"source": "public/pixel/items",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "spare_head_spartan_helm",
+		"category": "armor",
+		"subcategory": "head",
+		"src": "/pixel/items/head/_spartan_helm.png",
+		"status": "spare",
+		"source": "public/pixel/items",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [
 			"rag_hood"
 		],
@@ -5523,11 +5642,11 @@
 	},
 	{
 		"usedBy": [],
-		"name": "art_ph_head_g4",
+		"name": "art_steel_helm",
 		"category": "armor",
 		"subcategory": "head G4",
-		"src": "/pixel/items/head/ph_g4.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/steel_helm.png",
+		"status": "unused",
 		"slot": "head",
 		"grade": "G4",
 		"source": "itemIcons registry",
@@ -5537,12 +5656,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_head_g5",
+		"usedBy": [
+			"knights_greathelm"
+		],
+		"name": "art_knights_greathelm",
 		"category": "armor",
 		"subcategory": "head G5",
-		"src": "/pixel/items/head/ph_g5.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/knights_greathelm.png",
+		"status": "used",
 		"slot": "head",
 		"grade": "G5",
 		"source": "itemIcons registry",
@@ -5553,11 +5674,11 @@
 	},
 	{
 		"usedBy": [],
-		"name": "art_ph_head_g6",
+		"name": "art_obsidian_visage",
 		"category": "armor",
 		"subcategory": "head G6",
-		"src": "/pixel/items/head/ph_g6.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/obsidian_visage.png",
+		"status": "unused",
 		"slot": "head",
 		"grade": "G6",
 		"source": "itemIcons registry",
@@ -5567,12 +5688,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_head_g7",
+		"usedBy": [
+			"runed_circlet"
+		],
+		"name": "art_runed_circlet",
 		"category": "armor",
 		"subcategory": "head G7",
-		"src": "/pixel/items/head/ph_g7.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/runed_circlet.png",
+		"status": "planned",
 		"slot": "head",
 		"grade": "G7",
 		"source": "itemIcons registry",
@@ -5582,12 +5705,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_head_g8",
+		"usedBy": [
+			"ancient_warhelm"
+		],
+		"name": "art_ancient_warhelm",
 		"category": "armor",
 		"subcategory": "head G8",
-		"src": "/pixel/items/head/ph_g8.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/ancient_warhelm.png",
+		"status": "planned",
 		"slot": "head",
 		"grade": "G8",
 		"source": "itemIcons registry",
@@ -5597,12 +5722,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_head_g9",
+		"usedBy": [
+			"crown_of_embers"
+		],
+		"name": "art_crown_of_embers",
 		"category": "armor",
 		"subcategory": "head G9",
-		"src": "/pixel/items/head/ph_g9.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/crown_of_embers.png",
+		"status": "planned",
 		"slot": "head",
 		"grade": "G9",
 		"source": "itemIcons registry",
@@ -5612,12 +5739,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_head_s1",
+		"usedBy": [
+			"sunhoney_crown"
+		],
+		"name": "art_sunhoney_crown",
 		"category": "armor",
 		"subcategory": "head S1",
-		"src": "/pixel/items/head/ph_s1.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/sunhoney_crown.png",
+		"status": "planned",
 		"slot": "head",
 		"grade": "S1",
 		"source": "itemIcons registry",
@@ -5627,12 +5756,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_head_s2",
+		"usedBy": [
+			"ashen_warlords_visor"
+		],
+		"name": "art_ashen_warlords_visor",
 		"category": "armor",
 		"subcategory": "head S2",
-		"src": "/pixel/items/head/ph_s2.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/ashen_warlords_visor.png",
+		"status": "planned",
 		"slot": "head",
 		"grade": "S2",
 		"source": "itemIcons registry",
@@ -5642,12 +5773,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "art_ph_head_s3",
+		"usedBy": [
+			"blightbound_cowl"
+		],
+		"name": "art_blightbound_cowl",
 		"category": "armor",
 		"subcategory": "head S3",
-		"src": "/pixel/items/head/ph_s3.png",
-		"status": "placeholder",
+		"src": "/pixel/items/head/blightbound_cowl.png",
+		"status": "planned",
 		"slot": "head",
 		"grade": "S3",
 		"source": "itemIcons registry",
