@@ -9,7 +9,7 @@ import PixelModal from '@/components/game/PixelModal';
 import { creatorAvatar } from '@/catalog/avatars';
 import type { PlayerClassId } from '@/config/playerClasses';
 import { ACHIEVEMENTS } from '@/catalog/achievements';
-import { AVATARS, STARTER_AVATAR_IDS } from '@/catalog/avatars';
+import { classAvatarIds } from '@/catalog/avatars';
 import { rebirthRunSummary, rebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import type { PrestigeState } from '@/types/game';
 import type { Profile } from '@/lib/authClient';
@@ -19,19 +19,25 @@ const meta = { title: 'Screens/New chapter', parameters: { layout: 'fullscreen' 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Only the starters are open; every other card is a silhouette with how to earn it. */
+/** A warrior with nothing earned: its two starters are open, the other classes' starters are dimmed with "Needs the <Class> class", the rewards are silhouettes with how to earn them. */
 export const AvatarsStarters: Story = {
 	render: () => (
 		<div style={{ width: 720, padding: 24 }}>
-			<AvatarPicker value={STARTER_AVATAR_IDS[0]} unlocked={STARTER_AVATAR_IDS} onChange={() => undefined} />
+			<AvatarPicker value='knight' playerClass='warrior' unlocked={classAvatarIds('warrior', [])} onChange={() => undefined} />
 		</div>
 	),
 };
 
+/** A mage with every reward earned: the rewards are open to every class, the other classes' starters stay disabled. */
 export const AvatarsAllUnlocked: Story = {
 	render: () => (
 		<div style={{ width: 720, padding: 24 }}>
-			<AvatarPicker value={AVATARS[0].id} unlocked={AVATARS.map((a) => a.id)} onChange={() => undefined} />
+			<AvatarPicker
+				value='boss_slayer'
+				playerClass='mage'
+				unlocked={classAvatarIds('mage', ['castle_10', 'first_rebirth', 'boss_auroch', 'early_tester'])}
+				onChange={() => undefined}
+			/>
 		</div>
 	),
 };

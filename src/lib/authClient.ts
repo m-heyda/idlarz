@@ -1,4 +1,5 @@
-import type { PlayerClassId } from '@/config/playerClasses';
+import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
+import type { BootSnapshot } from '@/lib/offline/types';
 import { scoped } from '@/lib/storageScope';
 
 /** The browser side of /api/auth/*: the page only ever talks to our own routes, never to Supabase. */
@@ -20,7 +21,7 @@ export type UnavailableReason = 'not_configured' | 'outage';
 
 export type AuthResult =
 	// `epoch` / `needsReset`: what /api/auth/me says about the server's data epoch (IDL-76). Absent while the server does not send them (the guard is then a no-op).
-	| { status: 'ok'; userId: string; profile: Profile | null; epoch?: number; needsReset?: boolean; stats?: ProfileStats }
+	| { status: 'ok'; userId: string; profile: Profile | null; epoch?: number; needsReset?: boolean; stats?: ProfileStats; game?: BootSnapshot }
 	| { status: 'guest' } // no session (a clean 401)
 	| { status: 'unavailable'; reason: UnavailableReason } // outage, missing env, network: never treated as "logged out"
 	| { status: 'error'; message: string }; // the player's input was refused
@@ -40,13 +41,18 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			epoch?: unknown;
 			needsReset?: unknown;
 			stats?: { level?: unknown; rebirths?: unknown } | null;
+			game?: { inv?: unknown; craft?: unknown; serverNowSec?: unknown } | null;
 		};
 		if (response.ok) {
 			const epoch = typeof body.epoch === 'number' && Number.isInteger(body.epoch) && body.epoch >= 1 ? { epoch: body.epoch } : {};
 			const needsReset = body.needsReset === true ? { needsReset: true } : {};
 			const { level, rebirths } = body.stats ?? {};
 			const stats = typeof level === 'number' && typeof rebirths === 'number' ? { stats: { level, rebirths } } : {};
-			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats };
+			const game =
+				body.game && typeof body.game.serverNowSec === 'number' && typeof body.game.craft === 'object' && body.game.craft !== null
+					? { game: body.game as BootSnapshot }
+					: {};
+			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats, ...game };
 		}
 		if (response.status === 503 || response.status >= 500 || body.unavailable) {
 			return { status: 'unavailable', reason: body.reason === 'not_configured' ? 'not_configured' : 'outage' };
@@ -61,7 +67,8 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 const post = (path: string, body?: unknown) =>
 	request(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body ?? {}) });
 
-export const fetchMe = () => request('/api/auth/me');
+/** `game: true`: the game's own first load, which also gets the bag and crafting snapshot (`BootSnapshot`) in the same request. */
+export const fetchMe = (opts: { game?: boolean } = {}) => request(opts.game ? '/api/auth/me?game=1' : '/api/auth/me');
 export const login = (email: string, password: string) => post('/api/auth/login', { email, password });
 export const register = (email: string, password: string, characterName: string, playerClass: PlayerClassId, avatarId: string | null = null) =>
 	post('/api/auth/register', { email, password, characterName, playerClass, avatarId });
@@ -90,6 +97,8 @@ export const startChapter = async (characterName: string, playerClass: PlayerCla
 
 /** The avatar picker's data (`GET /api/auth/avatar`): the chosen avatar and every id the account may pick. `null` when the server cannot be reached. */
 export interface AvatarState {
+	/** The profile's class: decides which starters are enabled */
+	playerClass: PlayerClassId;
 	avatarId: string | null;
 	unlocked: string[];
 }
@@ -97,9 +106,13 @@ export const fetchAvatars = async (): Promise<AvatarState | null> => {
 	try {
 		const response = await fetch('/api/auth/avatar', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 		if (!response.ok) return null;
-		const body = (await response.json().catch(() => null)) as { avatarId?: unknown; unlocked?: unknown } | null;
-		if (!body || !Array.isArray(body.unlocked)) return null;
-		return { avatarId: typeof body.avatarId === 'string' ? body.avatarId : null, unlocked: body.unlocked.filter((id): id is string => typeof id === 'string') };
+		const body = (await response.json().catch(() => null)) as { playerClass?: unknown; avatarId?: unknown; unlocked?: unknown } | null;
+		if (!body || !Array.isArray(body.unlocked) || typeof body.playerClass !== 'string' || !PLAYER_CLASSES[body.playerClass as PlayerClassId]) return null;
+		return {
+			playerClass: body.playerClass as PlayerClassId,
+			avatarId: typeof body.avatarId === 'string' ? body.avatarId : null,
+			unlocked: body.unlocked.filter((id): id is string => typeof id === 'string'),
+		};
 	} catch {
 		return null;
 	}

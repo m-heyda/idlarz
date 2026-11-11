@@ -172,6 +172,21 @@
 	color: #7c6e56;
 }
 
+.avatar-card[data-class-locked='true'] {
+	opacity: 0.55;
+}
+
+.avatar-card[data-class-locked='true'] canvas,
+.avatar-card[data-class-locked='true'] img {
+	filter: grayscale(0.7) brightness(0.8);
+}
+
+.avatar-card-lock {
+	display: inline-block;
+	margin-right: 2px;
+	vertical-align: -1px;
+}
+
 .avatar-card-name {
 	font-size: 0.8rem;
 	font-weight: 700;

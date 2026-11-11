@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 113,
+  "line": 116,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -65,7 +65,7 @@
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
   "line": 18,
-  "summary": "Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each class **owns two starters** ({@link CLASS_AVATARS}): the creation screens offer a new hero the two of the class it picked, and the server refuses another class's starter at sign-up (`checkCreationAvatar`). Later, any starter can still be worn with any class (the Avatar window). Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.",
+  "summary": "Avatars (IDL-71, class lock IDL-269): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each of the eight **starters** belongs to ONE class (`classId`; two per class, {@link CLASS_AVATARS}) and only that class can wear it: the pickers (Avatar window, sign-up, \"A new chapter\") enable the class's own starters plus the earned rewards and show the other classes' starters disabled (\"Needs the <Class> class\"). The **unlockables** are classless rewards of server-side achievements (the id of the achievement is `unlockedBy`): any class wears them once earned. Rules, all enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, a starter has to belong to the profile's class, and an unlockable one has to be among the achievements the account has earned. A stored avatar that no longer fits (a later class change) falls back to the class's default (`fitAvatar`). The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.",
   "see": []
  },
  {
@@ -75,8 +75,8 @@
   "kind": "const",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 88,
-  "summary": "The two starter avatars each class owns. The creation screens (sign-up, \"Finish your hero\", \"A new chapter\") show a hero the two of the class it picked, and the server accepts only those at sign-up (`checkCreationAvatar`); every starter belongs to exactly one class. Afterwards the Avatar window lets the player wear any starter or earned avatar with any class. The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).",
+  "line": 96,
+  "summary": "The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class. Only that class can wear them (`checkAvatar`). The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).",
   "see": []
  },
  {
@@ -86,7 +86,7 @@
   "kind": "function",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 126,
+  "line": 143,
   "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
   "see": []
  },
@@ -971,19 +971,8 @@
   "kind": "function",
   "category": "Progression/Avatars",
   "file": "src/lib/authValidation.ts",
-  "line": 68,
-  "summary": "The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned` (the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means \"none chosen\" and passes. The client's own idea of what is unlocked is never trusted.",
-  "see": []
- },
- {
-  "id": "checkcreationavatar",
-  "name": "checkCreationAvatar",
-  "symbol": "checkCreationAvatar",
-  "kind": "function",
-  "category": "Progression/Avatars",
-  "file": "src/lib/authValidation.ts",
-  "line": 82,
-  "summary": "The avatar rule at sign-up and \"Finish your hero\": the plain `checkAvatar` rule, and a starter must be one of the two the chosen class owns ({@link CLASS_AVATARS}), so a Mage cannot sign up wearing the Knight. An earned unlockable passes with any class. `null` still means \"none chosen\".",
+  "line": 69,
+  "summary": "The server's rule for an avatar (IDL-71, class lock IDL-269), the one place that decides: the id must be a string in the avatar catalog, a starter must belong to `playerClass` (a Mage cannot wear the Knight), and an unlockable one needs its achievement among `earned` (the account's `player_achievements`); an earned reward is classless and passes with every class. A forged, unknown, locked or other-class id is refused; `null`/`undefined` means \"none chosen\" and passes. Used by register, `POST /api/auth/profile`, `POST /api/auth/avatar` and the new-chapter reset. The client's own idea of what is unlocked is never trusted.",
   "see": []
  },
  {
@@ -1970,6 +1959,17 @@
    "achievementsDue",
    "payAchievements"
   ]
+ },
+ {
+  "id": "loadbootsnapshot",
+  "name": "loadBootSnapshot",
+  "symbol": "loadBootSnapshot",
+  "kind": "function",
+  "category": "Saves & Server/The ledger",
+  "file": "src/lib/offline/bootSnapshot.ts",
+  "line": 13,
+  "summary": "The game's first load (`GET /api/auth/me?game=1`): the signed-in player's own bag, gear and crafting state, read from their `player_ledger` row (`inv`, `craft`: two columns, one select, nothing but what the Bag window draws) so the Bag and its Crafting tab have their data on the first render instead of asking `/api/craft` when they open. Read-only: it never writes and the browser's copy is only a picture, the next online answer replaces it. A failed read or a row without an inventory is `null` / `inv: null`, never an error for the sign-in.",
+  "see": []
  },
  {
   "id": "startnewchapter",

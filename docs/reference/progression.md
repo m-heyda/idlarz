@@ -13,7 +13,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
-- Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`checkCreationAvatar`](#checkcreationavatar)
+- Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
@@ -498,7 +498,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:126`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:143`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 
@@ -506,20 +506,20 @@ The avatar ids an account may use: every starter plus each unlockable whose achi
 
 ### `checkAvatar` <small>function</small>
 
-Source: [`src/lib/authValidation.ts:68`](../../src/lib/authValidation.ts)
+Source: [`src/lib/authValidation.ts:69`](../../src/lib/authValidation.ts)
 
-The server's rule for an avatar (IDL-71), the one place that decides: the id must be a string in the avatar catalog, and an unlockable one needs its achievement among `earned`
-(the account's `player_achievements`). A forged, unknown or locked id is refused; `null`/`undefined` means "none chosen" and passes. The client's own idea of what is unlocked is never trusted.
+The server's rule for an avatar (IDL-71, class lock IDL-269), the one place that decides: the id must be a string in the avatar catalog, a starter must belong to `playerClass` (a Mage cannot wear the Knight), and an unlockable
+one needs its achievement among `earned` (the account's `player_achievements`); an earned reward is classless and passes with every class. A forged, unknown, locked or other-class id is refused; `null`/`undefined` means "none chosen" and passes.
+Used by register, `POST /api/auth/profile`, `POST /api/auth/avatar` and the new-chapter reset. The client's own idea of what is unlocked is never trusted.
 
 <a id="class-avatars"></a>
 
 ### `CLASS_AVATARS` <small>const</small>
 
-Source: [`src/catalog/avatars.ts:88`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:96`](../../src/catalog/avatars.ts)
 
-The two starter avatars each class owns. The creation screens (sign-up, "Finish your hero", "A new chapter") show a hero the two of the class it picked, and the server accepts
-only those at sign-up (`checkCreationAvatar`); every starter belongs to exactly one class. Afterwards the Avatar window lets the player wear any starter or earned avatar with any class.
-The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
+The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class.
+Only that class can wear them (`checkAvatar`). The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
 
 <a id="avatarinfo"></a>
 
@@ -527,24 +527,15 @@ The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
 
 Source: [`src/catalog/avatars.ts:18`](../../src/catalog/avatars.ts)
 
-Avatars (IDL-71): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each class **owns two starters** ([`CLASS_AVATARS`](progression.md#class-avatars)):
-the creation screens offer a new hero the two of the class it picked, and the server refuses another class's starter at sign-up (`checkCreationAvatar`). Later, any starter can still be worn with any class (the Avatar window).
-Eight **starters** are open to everyone; the **unlockables** are rewards of server-side achievements (the id of the achievement is `unlockedBy`). Two rules, both enforced
-on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, and an unlockable one has to be among the
-achievements the account has earned. The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
+Avatars (IDL-71, class lock IDL-269): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each of the eight **starters**
+belongs to ONE class (`classId`; two per class, [`CLASS_AVATARS`](progression.md#class-avatars)) and only that class can wear it: the pickers (Avatar window, sign-up, "A new chapter") enable the class's own starters plus the earned
+rewards and show the other classes' starters disabled ("Needs the <Class> class"). The **unlockables** are classless rewards of server-side achievements (the id of the achievement is `unlockedBy`): any class wears them once earned.
+Rules, all enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, a starter has to belong to the profile's class, and an unlockable one has to be among the
+achievements the account has earned. A stored avatar that no longer fits (a later class change) falls back to the class's default (`fitAvatar`). The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
 
 **Art.** The owner's framed busts (64x64, `public/pixel/new_assets/heroes/<portrait>.png`, listed in `public/pixel/new_assets/README.md`) are the portraits; `avatarArtUrl` is the only place that
 builds the path, so a new picture is a change to the `portrait` field. The six horned busts not used here stay in the pool for later unlocks. A locked avatar is shown as a black
 cut-out of its own picture (generated in `AvatarArt`, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.
-
-<a id="checkcreationavatar"></a>
-
-### `checkCreationAvatar` <small>function</small>
-
-Source: [`src/lib/authValidation.ts:82`](../../src/lib/authValidation.ts)
-
-The avatar rule at sign-up and "Finish your hero": the plain `checkAvatar` rule, and a starter must be one of the two the chosen class owns ([`CLASS_AVATARS`](progression.md#class-avatars)), so a Mage
-cannot sign up wearing the Knight. An earned unlockable passes with any class. `null` still means "none chosen".
 
 ## Class passives
 

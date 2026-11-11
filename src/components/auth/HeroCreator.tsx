@@ -29,7 +29,7 @@ const SILHOUETTE_AVATAR = 'knight';
  * The hero creation block shared by sign-up, "Finish your hero" and "A new chapter": the name, four class tabs and, for the chosen class, a detail card. The card leads with the
  * chosen avatar as a large portrait (drawn at 3x its native 64 px, so it stays sharp, with a slowly pulsing glow in the class colour), with its bio, and the two avatars the class owns
  * (plus earned extras) to switch between; beside it are the class's story, how it plays and its bonuses on one line (the real `CLASS_PASSIVES`, written out by `describeClassPassives`).
- * Before a class is chosen the same card shows a black silhouette, so nothing moves when one is picked. The server decides again on every save (`checkCreationAvatar`).
+ * Before a class is chosen the same card shows a black silhouette, so nothing moves when one is picked. The server decides again on every save (`checkAvatar`).
  */
 const HeroCreator: React.FC<HeroCreatorProps> = ({ name, onName, playerClass, onClass, avatarId, onAvatar, earned = [], disabled = false }) => {
 	const info = playerClass ? PLAYER_CLASSES[playerClass] : null;

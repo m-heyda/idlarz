@@ -15,6 +15,7 @@ import { fetchCloud, readLink } from '@/lib/cloudClient';
 import { epochVerdict, readSeenEpoch } from '@/lib/epochGuard';
 import { peekSave } from '@/lib/saveStorage';
 import { planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
+import { clearBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchMe, logout, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@/styles/Landing.css';
@@ -282,6 +283,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 
 	const leave = async () => {
 		await logout();
+		clearBootSnapshot();
 		setVisitor({ name: 'guest' });
 	};
 

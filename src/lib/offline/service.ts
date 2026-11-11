@@ -22,6 +22,7 @@ import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPar
 import { playerProfile } from '@/lib/offline/profile';
 import { powerKey } from '@/lib/offline/spawnWeights';
 import { sealedRng } from '@/lib/offline/seal';
+import { bestiaryOf } from '@/lib/offline/stats';
 import { advanceBank, bossOf, normalsOf, type BankContext, type TicketBank } from '@/lib/offline/tickets';
 import { offlineMinGapSec } from '@/lib/offline/limits';
 import type { Rng } from '@/lib/rng';
@@ -223,7 +224,9 @@ export const withLedger = async <T>(
 export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: string, nowMs: number): Promise<ClaimOutcome> => {
 	const loadMap = mapLoader(deps, userId);
 	const done = await withLedger(deps, userId, nowMs, async (ledger, stored): Promise<{ ledger: Ledger; result: ClaimResult }> => {
-		if (ledger.lastKey === claimId && ledger.lastResult) return { ledger, result: ledger.lastResult as ClaimResult };
+		// a replay (a lost answer) is the same payment, but the discoveries are told as they stand now
+		if (ledger.lastKey === claimId && ledger.lastResult)
+			return { ledger, result: { ...(ledger.lastResult as ClaimResult), bestiary: bestiaryOf(ledger.stats) } };
 
 		const derived = stored.summary.derived;
 		const nowSec = nowMs / 1000;
@@ -265,6 +268,7 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 			tickets: publicTickets(bank, ledger.ordChest),
 			serverNowSec: nowSec,
 			gems: ledger.gems,
+			bestiary: bestiaryOf(ledger.stats),
 		};
 		// a real absence is a rest: no fight is left open, HP and mana are back. (A page reload is not one: the open fight carries on.)
 		const rested = gapSec > UNCLAIMED_SEC ? restThrough({ ...ledger, bank }, { secret: deps.secret, userId, stored, nowSec }, gapSec) : { ...ledger, bank };

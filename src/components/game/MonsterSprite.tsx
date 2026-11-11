@@ -1,11 +1,11 @@
 import React from 'react';
 import { formatCompact } from '@/utils/formatters';
 import { MONSTERS } from '@/config/combatConfig';
-import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
+import { monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import type { MonsterType } from '@/types/game';
 import { useIsDiscovered } from '@/stores/bestiaryStore';
-import MonsterArt from './MonsterArt';
+import MonsterArt, { labPreviewOf } from './MonsterArt';
 import '@/styles/Monsters.css';
 
 /**
@@ -26,7 +26,7 @@ const MonsterSprite: React.FC<{
 	/** Its place in the battle queue (1 = next), 0 or left out when it is not queued */
 	queued?: number;
 }> = ({ type, level, lucky = false, art, maxed = false, growth, intervalSec = 1800, queued = 0 }) => {
-	const wip = MONSTER_CATALOG.find((m) => m.id === (art ?? type));
+	const wip = labPreviewOf(art);
 	const size = wip ? monsterArtSize(wip.id, wip.grade) : undefined;
 	const discovered = useIsDiscovered(type);
 	// the map lab's art preview is always known; a real monster of a type not fought yet hides what it is (name, boss glow, lucky tint) behind the "?"

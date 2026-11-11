@@ -86,7 +86,9 @@ const onlineStep = async <T>(
 	let unlocked: AchievementUnlock[] = [];
 	const done = await withLedger(deps, userId, nowMs, async (ledger, stored): Promise<StepOutcome<{ claimFirst: true } | { claimFirst: false; value: T }>> => {
 		unlocked = [];
-		if (key && ledger.lastKey === key && ledger.lastResult) return { ledger, result: { claimFirst: false, value: ledger.lastResult as T } };
+		// a replay (a lost answer) is the same answer, but the discoveries are told as they stand now
+		if (key && ledger.lastKey === key && ledger.lastResult)
+			return { ledger, result: { claimFirst: false, value: withBestiary(ledger.lastResult as T, ledger) } };
 		const anchorMs = Math.max(ledger.anchorAt, stored.serverSavedAt);
 		if ((nowMs - anchorMs) / 1000 > UNCLAIMED_SEC) return { ledger, result: { claimFirst: true } };
 

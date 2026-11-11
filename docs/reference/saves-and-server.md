@@ -10,7 +10,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog)
 - Uploading: [`SYNC`](#sync), [`judgeRebase`](#judgerebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
 - Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`settleIdols`](#settleidols), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
-- The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng)
+- The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`loadBootSnapshot`](#loadbootsnapshot)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
 - Epoch: [`BASELINE_EPOCH`](#baseline-epoch), [`startNewChapter`](#startnewchapter)
@@ -487,6 +487,16 @@ player's runs (a rebirth or a new game starts again at ordinal 1 without repeati
 
 Sealed rolls: every reward is seeded by `HMAC-SHA256(LOOT_SECRET, userId | runId | kind | ordinal)` with a fresh digest per draw. The ordinal is consumed on the server, so a reload cannot reroll.
 A rebirth or New Game starts a new run id. `LOOT_SECRET` is server-only; without it `/api/offline`, `/api/spawn`, `/api/chest` and `/api/fight` answer 503.
+
+<a id="loadbootsnapshot"></a>
+
+### `loadBootSnapshot` <small>function</small>
+
+Source: [`src/lib/offline/bootSnapshot.ts:13`](../../src/lib/offline/bootSnapshot.ts)
+
+The game's first load (`GET /api/auth/me?game=1`): the signed-in player's own bag, gear and crafting state, read from their `player_ledger` row (`inv`, `craft`: two columns, one select, nothing but
+what the Bag window draws) so the Bag and its Crafting tab have their data on the first render instead of asking `/api/craft` when they open. Read-only: it never writes and the
+browser's copy is only a picture, the next online answer replaces it. A failed read or a row without an inventory is `null` / `inv: null`, never an error for the sign-in.
 
 ## Endpoints
 

@@ -24,7 +24,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `attacksPerSecond` | Combat / Player numbers | [`src/lib/combat.ts:121`](../../src/lib/combat.ts) | Attacks per second: |
 | `autoBattleUnlocked` | Combat / A fight | [`src/lib/combat.ts:46`](../../src/lib/combat.ts) | Auto-battle (the server picking the next monster) is a reward for the first rebirth; |
 | `autoUse` | Combat / Potions and skills | [`src/lib/offline/fightSteps.ts:73`](../../src/lib/offline/fightSteps.ts) | Auto-use's rules for one tick: |
-| Avatars | Progression / Avatars | [`src/catalog/avatars.ts:18`](../../src/catalog/avatars.ts) | Avatars (IDL-71): |
+| Avatars | Progression / Avatars | [`src/catalog/avatars.ts:18`](../../src/catalog/avatars.ts) | Avatars (IDL-71, class lock IDL-269): |
 | `bandOf` | Monsters / Spawning | [`src/lib/distance.ts:13`](../../src/lib/distance.ts) | The band a castle distance falls in. |
 | `BASE_GENERATION_RATES` | Economy / Income | [`src/config/economy.ts:158`](../../src/config/economy.ts) | Income of the realm itself, per second, before any tile: |
 | `BASELINE_EPOCH` | Saves & Server / Epoch | [`src/config/epoch.ts:13`](../../src/config/epoch.ts) | The data epoch: |
@@ -66,13 +66,12 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `castleRangeRadius` | Economy / Castle | [`src/lib/castleWard.ts:28`](../../src/lib/castleWard.ts) | How far (tiles, every side) the violet range area reaches: |
 | `castleUpgradeDuration` | Economy / Castle | [`src/utils/game/castle.ts:34`](../../src/utils/game/castle.ts) | Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`. |
 | `CHARACTER_STAT_CONFIG` | Progression / Attributes | [`src/config/character.ts:92`](../../src/config/character.ts) | Attributes. |
-| `checkAvatar` | Progression / Avatars | [`src/lib/authValidation.ts:68`](../../src/lib/authValidation.ts) | The server's rule for an avatar (IDL-71), the one place that decides: |
-| `checkCreationAvatar` | Progression / Avatars | [`src/lib/authValidation.ts:82`](../../src/lib/authValidation.ts) | The avatar rule at sign-up and "Finish your hero": |
+| `checkAvatar` | Progression / Avatars | [`src/lib/authValidation.ts:69`](../../src/lib/authValidation.ts) | The server's rule for an avatar (IDL-71, class lock IDL-269), the one place that decides: |
 | Checking live saves before a release | Ops / Operator guides | [`scripts/check-live-saves.ts:1`](../../scripts/check-live-saves.ts) | Before a reset or a release that tightens the save rules: |
 | `CHEST` | Economy / Chests and Luck | [`src/config/spawns.ts:34`](../../src/config/spawns.ts) | Chests. |
 | `chestIntervalSec` | Economy / Chests and Luck | [`src/lib/luck.ts:16`](../../src/lib/luck.ts) | Seconds between two chests: |
 | `chestSpots` | Economy / Chests and Luck | [`src/lib/chests.ts:28`](../../src/lib/chests.ts) | The tiles a chest could go on, with their weights. |
-| `CLASS_AVATARS` | Progression / Avatars | [`src/catalog/avatars.ts:88`](../../src/catalog/avatars.ts) | The two starter avatars each class owns. |
+| `CLASS_AVATARS` | Progression / Avatars | [`src/catalog/avatars.ts:96`](../../src/catalog/avatars.ts) | The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: |
 | `classPassives` | Progression / Class passives | [`src/lib/classPassives.ts:24`](../../src/lib/classPassives.ts) | The passives of a hero class (`CLASS_PASSIVES`, `src/config/playerClasses.ts`): |
 | `classXpBucket` | Progression / Class passives | [`src/lib/classPassives.ts:46`](../../src/lib/classPassives.ts) | The gear's XP bucket with the class's XP added, held under the XP perk-family cap: |
 | `CLICK_LADDER` | Economy / Clicks | [`src/config/economy.ts:170`](../../src/config/economy.ts) | Clicking: |
@@ -149,6 +148,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `limitOf` | Progression / Limits | [`src/lib/limits.ts:40`](../../src/lib/limits.ts) | The current value of a limit: |
 | `LIMITS` | Progression / Limits | [`src/config/limits.ts:14`](../../src/config/limits.ts) | Limits that upgrades raise. |
 | `LIVE_GRADES` | Loot / Items | [`src/catalog/items/grades.ts:51`](../../src/catalog/items/grades.ts) | The grade ladder's live grades (IDL-220, IDL-224, IDL-243, IDL-238): |
+| `loadBootSnapshot` | Saves & Server / The ledger | [`src/lib/offline/bootSnapshot.ts:13`](../../src/lib/offline/bootSnapshot.ts) | The game's first load (`GET /api/auth/me?game=1`): |
 | `LOOT_PROFILES` | Loot / Config | [`src/catalog/lootConfig.ts:340`](../../src/catalog/lootConfig.ts) | Profiles: |
 | `LOOT_SOURCES` | Loot / Config | [`src/catalog/lootConfig.ts:401`](../../src/catalog/lootConfig.ts) | Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). |
 | `losesProgress` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:79`](../../src/lib/cloudSave/pipeline.ts) | True when a new save holds less than the one it replaces: |
@@ -245,7 +245,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
 | The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
-| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:113`](../../src/app/GameApp.tsx) | The tick loop. |
+| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:116`](../../src/app/GameApp.tsx) | The tick loop. |
 | `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:114`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
@@ -256,7 +256,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `TutorialGuide` | Progression / Guided tutorial | [`src/components/game/tutorial/TutorialGuide.tsx:39`](../../src/components/game/tutorial/TutorialGuide.tsx) | Brother Alder, the tutorial guide. |
 | `typeWeights` | Monsters / Spawning | [`src/lib/offline/spawnWeights.ts:49`](../../src/lib/offline/spawnWeights.ts) | Weight of each type for this player and castle level, in the order given. |
 | `UNCLAIMED_SEC` | Combat / Results and rest | [`src/lib/offline/grant.ts:51`](../../src/lib/offline/grant.ts) | The longest gap the server treats as the same session: |
-| `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:126`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
+| `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:143`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |
 | `valueCurve` | Loot / Items | [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |
 | `verifyTransition` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:228`](../../src/lib/cloudSave/verify.ts) | Runs every plausibility check between two consecutive saves and returns the flags that fired; |
