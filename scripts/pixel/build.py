@@ -61,6 +61,7 @@ SPRITES = {
     'equip_feet': sprites_equipment.feet, 'equip_ring': sprites_equipment.ring,
     'equip_shoulder': sprites_equipment.shoulder, 'equip_hands': sprites_equipment.hands,
     'equip_cape': sprites_equipment.cape, 'equip_charm': sprites_equipment.charm,
+    'equip_belt': sprites_equipment.belt,
     **sprites_characters.SPRITES,
     **sprites_animal_art.SPRITES,
     **sprites_meadow.SPRITES,
