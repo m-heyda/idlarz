@@ -293,10 +293,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 8px;
-	background: rgba(10, 7, 6, 0.75);
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
+	/* no frame of its own: the portrait image already carries its gold border */
 }
 
 .ld-continue-name {
@@ -395,41 +392,49 @@
 	min-height: 330px;
 }
 
+/* the loading state: a ring of eight gold pixels whose brightness chases round in steps (pixel-art spinner), with a line of text under it */
 .ld-skel {
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
-	padding-top: 6px;
+	align-items: center;
+	justify-content: center;
+	gap: 18px;
+	min-height: 280px;
 }
 
-.ld-skel-bar {
+.ld-spinner {
 	display: block;
-	border: 2px solid #3a2810;
-	background: linear-gradient(100deg, rgba(40, 28, 14, 0.9) 30%, rgba(90, 64, 30, 0.9) 50%, rgba(40, 28, 14, 0.9) 70%) 0 0 / 220% 100%;
-	animation: ld-shimmer 1.4s linear infinite;
+	width: 64px;
+	height: 64px;
+	image-rendering: pixelated;
 }
 
-.ld-skel-tabs {
-	height: 32px;
+.ld-spinner rect {
+	fill: #f0d27a;
+	opacity: 0.18;
+	animation: ld-spin 0.96s steps(1) infinite;
+	animation-delay: calc(var(--i) * 0.12s);
 }
 
-.ld-skel-input {
-	height: 40px;
+.ld-skel-text {
+	font-size: 0.9rem;
+	color: #d8ccaa;
+	letter-spacing: 0.04em;
 }
 
-.ld-skel-button {
-	align-self: center;
-	width: 120px;
-	height: 38px;
-	margin-top: 6px;
-}
-
-@keyframes ld-shimmer {
-	from {
-		background-position: 120% 0;
+@keyframes ld-spin {
+	0% {
+		opacity: 1;
 	}
-	to {
-		background-position: -120% 0;
+	12.5% {
+		opacity: 0.7;
+	}
+	25% {
+		opacity: 0.45;
+	}
+	37.5%,
+	100% {
+		opacity: 0.18;
 	}
 }
 
@@ -440,7 +445,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ld-skel-bar {
+	.ld-spinner rect {
 		animation: none;
+		opacity: 0.6;
 	}
 }
