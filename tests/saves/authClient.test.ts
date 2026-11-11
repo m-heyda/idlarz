@@ -1,6 +1,7 @@
 import test, { afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { fetchMe } from '../../src/lib/authClient';
+import { chooseAvatar, fetchMe } from '../../src/lib/authClient';
+import { EPOCH_HEADER } from '../../src/config/epoch';
 import { guardConfigured, unavailable } from '../../src/lib/authRoute';
 
 const realFetch = globalThis.fetch;
@@ -58,4 +59,15 @@ test('a network failure or a hung request is an outage; a clean 401 is a guest; 
 	assert.deepEqual(await fetchMe(), { status: 'guest' });
 	answer(200, { user: { id: 'u1', email: 'a@b.c' }, profile: { characterName: 'Zoe', playerClass: 'warrior' } });
 	assert.deepEqual(await fetchMe(), { status: 'ok', userId: 'u1', profile: { characterName: 'Zoe', playerClass: 'warrior' } });
+});
+
+test('picking an avatar sends the data epoch header: the route refuses a request without it once the epoch has moved', async () => {
+	let sent: Headers | undefined;
+	globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+		sent = new Headers(init?.headers);
+		return new Response(JSON.stringify({ avatarId: 'scout' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+	}) as typeof fetch;
+	assert.deepEqual(await chooseAvatar('scout'), { ok: true, avatarId: 'scout' });
+	assert.ok(sent?.get(EPOCH_HEADER), 'x-game-epoch is set');
+	assert.equal(sent?.get('Content-Type'), 'application/json');
 });
