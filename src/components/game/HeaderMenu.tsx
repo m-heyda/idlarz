@@ -14,9 +14,8 @@ import { cn } from '@/lib/utils';
 import { guideLive } from '@/lib/tutorial/live';
 import PixelIcon from './PixelIcon';
 import type { PixelIconName } from '@/config/pixelIcons';
-import LevelOrb from './LevelOrb';
+import LevelBadge from './LevelBadge';
 import NotifyDot from './NotifyDot';
-import GemIcon from './GemIcon';
 import CharacterPortrait from './CharacterPortrait';
 import HeaderTip, { TipLine } from './HeaderTip';
 
@@ -70,7 +69,7 @@ export const PlayerCard: React.FC = () => {
 			<span className='pixel-avatar'>
 				<CharacterPortrait variant='bust' scale={0.85} />
 				<span className='pixel-avatar-orb'>
-					<LevelOrb level={level.level} scale={0.95} className={levelUpActive ? 'animate-pulse-ring' : undefined} />
+					<LevelBadge level={level.level} size={20} className={levelUpActive ? 'animate-pulse-ring' : undefined} />
 				</span>
 				<NotifyDot show={attention.stats} label='Unspent stat points' />
 			</span>
@@ -152,7 +151,7 @@ export const WindowButtons: React.FC = () => {
 					}
 				}}
 			>
-				<GemIcon scale={0.7} />
+				<PixelIcon name='menu_gems_pouch' alt='' scale={0.6} />
 			</div>
 		</div>
 	);

@@ -19,6 +19,24 @@ export interface BuildingDef {
 	blurb: string;
 }
 
+/** A few lines of story for the building window, by building id (an Idol uses its blurb): purely flavour, no numbers. */
+export const BUILDING_LORE: Readonly<Record<string, string>> = {
+	granary: 'Every autumn the plains folk fill its bins to the rafters. A full granary has never once been a sad sight in this kingdom.',
+	lumberyard: 'The axes ring from dawn. The lumberjacks swear the forest grows back out of spite, and they plan to keep cutting it just the same.',
+	quarry: 'Cut into the hillside by dwarven hands long before your banner flew here. The stone is grey, the coal is black, the wages are gold.',
+	peatworks: 'Bog fuel burns slow and smells of old rain. The workers wear tall boots and never speak of what the swamp sometimes gives back.',
+	coalpit: 'In the frozen north the smiths need coal more than bread. The pit stays warm, and so does everyone who works near it.',
+	fishery: 'A crooked pier, a few patched nets and a very proud fisherman. The lake has never run out of fish, only of patience.',
+	harbor: 'Ships from far shores unload spice, rumours and customs forms in equal measure. Your coffers like the forms best.',
+	herbgarden: 'Rows of sage, thyme and things the herbalist will not name. The brewers pay well and ask no questions.',
+	saptapper: 'Tiny taps in the oldest trunks, buckets below. The trees seem to sigh when the carpenter walks by, but they give the sap.',
+	deepmine: 'The shaft goes down further than any rope. The miners sing on the way in, and are very quiet on the way out.',
+	sporecellar: 'The wizard says the spores are harmless. The wizard has also been a different colour every week since the cellar opened.',
+	icecutter: 'A hunter, a saw and a lot of cold. Frost shards chime softly in the crates, as if they were still thinking about snow.',
+	pearldiver: 'They hold their breath longer than seems wise and come up grinning. Somewhere below, the lake keeps its best pearls for itself.',
+	saltworks: 'Shallow pans, a lazy sun and a mill that grinds the crust to white. Nothing makes a kingdom last like salt.',
+};
+
 /**
  * The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
  * tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.

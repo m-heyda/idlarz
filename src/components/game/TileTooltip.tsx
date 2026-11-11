@@ -1,13 +1,16 @@
 import { buildingDef } from '@/catalog/buildings';
+import { BIOMES } from '@/config/biomes';
+import { buildingOutput, ownedOfBiome, producerBonus } from '@/lib/buildings';
+import ResourceIcon from './ResourceIcon';
 import { idolDef } from '@/catalog/idols';
 import { idolValueText } from '@/lib/idolEconomy';
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { type BiomeType, type MonsterType } from '@/types/game';
+import { type BiomeType, type MonsterType, type Resources } from '@/types/game';
 import { TILE_SIZE } from '@/config/biomes';
 import { MONSTERS } from '@/config/combatConfig';
 import { MONSTER_CATALOG } from '@/catalog/monsters';
-import { formatCompact } from '@/utils/formatters';
+import { formatCompact, formatNumber } from '@/utils/formatters';
 import { growthSecondsLeft, isBoss, maxLevelOf, monsterStats } from '@/lib/monsters';
 import { useBestiaryStore, useIsDiscovered } from '@/stores/bestiaryStore';
 import { useMapSource } from './mapSource';
@@ -68,16 +71,39 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 	);
 };
 
-/** The building on the tile: its name and level; an Idol also says what it gives now and that its level survives a rebirth. */
+/**
+ * The building on the tile: its name and level, what it makes per hour now (with the biome bonus its output grows by), and that a click opens its window. An Idol says what it gives now and that its level survives a rebirth.
+ * The output is before the castle and Ember bonuses, like the building window.
+ */
 const BuildingTip: React.FC<{ id: string; level: number }> = ({ id, level }) => {
 	const def = buildingDef(id);
 	const idol = idolDef(id);
+	const { game } = useMapSource();
+	const tiles = game((state) => state.tiles);
 	if (!def) return null;
+	const owned = ownedOfBiome(tiles, def.biome);
+	const output = idol ? null : buildingOutput(def, level, owned);
+	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
+	const rows = output ? Object.entries(output).filter(([, amount]) => (amount ?? 0) > 0) : [];
 	return (
 		<div className='mt-1 border-t border-[#5a4a2a] pt-1 text-xs'>
 			<div className='text-[#f0d27a]'>
 				{def.label} (level {level})
 			</div>
+			{rows.length > 0 && (
+				<div className='flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5'>
+					{rows.map(([key, amount]) => (
+						<span key={key} className='inline-flex items-center gap-1 tabular-nums'>
+							<ResourceIcon resource={key as keyof Resources} />+{formatNumber((amount ?? 0) * 3600)}/h
+						</span>
+					))}
+				</div>
+			)}
+			{output && (
+				<div className='text-[#c8b898]'>
+					{biomeLabel} bonus: +{Math.round(producerBonus(owned) * 100)} % ({owned} tile{owned === 1 ? '' : 's'})
+				</div>
+			)}
 			{idol && (
 				<>
 					<div>
@@ -87,6 +113,7 @@ const BuildingTip: React.FC<{ id: string; level: number }> = ({ id, level }) => 
 					<div className='text-[#a89878]'>Its level is kept when you rebirth; rebuild it free on any {idol.biome} tile.</div>
 				</>
 			)}
+			<div className='text-[#f0d27a] mt-0.5'>Click to open and upgrade</div>
 		</div>
 	);
 };

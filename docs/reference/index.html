@@ -1375,7 +1375,7 @@ with the same <a href="#calculateresourcebreakdown"><code>calculateResourceBreak
 </tbody></table>
 </article><article><p><a id="buildings"></a></p>
 <h3><code>BUILDINGS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/buildings.ts"><code>src/catalog/buildings.ts:30</code></a></p>
+<p>Source: <a href="../../src/catalog/buildings.ts"><code>src/catalog/buildings.ts:48</code></a></p>
 <p>The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in <code>produces</code> at <code>BUILDING_RULES.producer.tileEquivalents</code>
 tiles&#39; worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one <code>art</code> field per building.</p>
 <p><strong>The Producers and Extractors (one of each per home biome, level 1, with 0 and 25 owned tiles of the biome)</strong> <em>(computed from the code)</em></p>
@@ -5360,7 +5360,7 @@ never ran; <code>archiveForNewGame</code> still finds it under the old names and
 the browser last saw (<code>lib/epochFetch</code>) and a lower one is refused with 412 <code>staleEpoch</code>, after which the page reloads into this guard. See <code>docs/plan/reset-proof-browsers.md</code>.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-architecture">Architecture</h2><p class="blurb">Stack, state, the tick loop, the map, rendering and the art pipeline.</p><h2>The loop</h2><article><p><a id="gameapp"></a></p>
 <h3>The tick loop and persistence</h3>
-<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:117</code></a></p>
+<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:118</code></a></p>
 <p>The tick loop. <code>GameApp</code> runs <code>setInterval(..., 100 ms)</code> <strong>only</strong> in the owning tab (one tab owns the game through a Web Lock, <code>useSingleTab</code>) and only after the save is loaded and the offline claim is done.
 Each interval computes <code>deltaTime = performance.now() - last</code> (monotonic) and calls <code>store.tick(deltaTime)</code>; <code>tick</code> clamps the delta to <code>0 ... MAX_CATCHUP_SEC</code> (300 s), so a throttled background tab catches up in 5-minute steps
 but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player&#39;s absence is claimed from the server before the loop starts (<a href="#computeofflinegrant"><code>computeOfflineGrant</code></a>).</p>

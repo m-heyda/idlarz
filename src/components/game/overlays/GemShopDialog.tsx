@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
+import { DAILY_BONUS_GEMS, GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
 import { useGemStore } from '@/stores/gemStore';
@@ -94,16 +94,48 @@ const GemShopDialog: React.FC = () => {
 					</div>
 				</div>
 
-				<div className='flex items-center justify-between gap-3 px-3 py-2 border border-[#4a3a26] bg-[#2a2012]' data-testid='gem-daily'>
-					<div className='min-w-0'>
-						<div className='font-semibold text-[#ecdcb4]'>Daily bonus</div>
-						<div className='text-xs text-[#a89878]'>
-							{daily ? (daily.available ? `Day ${daily.step} of 7: +${daily.gems} gems` : 'Claimed today. Come back tomorrow (UTC).') : 'Checking...'}
+				<div className='flex flex-col gap-2 px-3 py-3 border border-[#4a3a26] bg-[#2a2012]' data-testid='gem-daily'>
+					<div className='flex items-center justify-between gap-3'>
+						<div className='min-w-0'>
+							<div className='font-semibold text-[#ecdcb4]'>Welcome back! Daily bonus</div>
+							<div className='text-xs text-[#a89878]'>
+								{daily
+									? daily.available
+										? `Day ${daily.step} of ${DAILY_BONUS_GEMS.length}: +${daily.gems} gems. Come back every day: day ${DAILY_BONUS_GEMS.length} pays the most.`
+										: `Claimed today. Come back tomorrow (UTC); day ${DAILY_BONUS_GEMS.length} pays the most. A missed day starts the week again.`
+									: 'Checking...'}
+							</div>
 						</div>
 					</div>
-					<button className='px-btn px-btn-gold shrink-0' disabled={busy || !daily?.available} onClick={() => void useGemStore.getState().claimDaily()}>
-						Claim
-					</button>
+					<ol className='grid grid-cols-7 gap-1.5'>
+						{DAILY_BONUS_GEMS.map((gemsPaid, i) => {
+							const day = i + 1;
+							const done = !!daily && day < (daily.available ? daily.step : daily.step + 1);
+							const today = !!daily?.available && day === daily.step;
+							const last = day === DAILY_BONUS_GEMS.length;
+							return (
+								<li
+									key={day}
+									data-state={done ? 'done' : today ? 'today' : 'later'}
+									className={`flex flex-col items-center gap-1 px-1 py-2 border text-center ${
+										today ? 'border-[#f0d27a] bg-[#3a2c14]' : last ? 'border-[#9a7aff] bg-[#1f1830]' : 'border-[#4a3a26] bg-[#1a140c]'
+									} ${done ? 'opacity-50' : ''}`}
+								>
+									<span className='text-[10px] uppercase tracking-wide text-[#a89878]'>{last ? 'Day 7 bonus' : `Day ${day}`}</span>
+									<span className={`flex items-center gap-1 tabular-nums text-sm ${last ? 'text-[#c8b0ff]' : 'text-[#f1e6c8]'}`}>
+										+{gemsPaid} <GemIcon />
+									</span>
+									{today ? (
+										<button className='px-btn px-btn-gold px-btn-sm' disabled={busy} onClick={() => void useGemStore.getState().claimDaily()}>
+											Claim
+										</button>
+									) : (
+										<span className='text-[10px] text-[#7a6a52]'>{done ? 'Claimed' : 'Locked'}</span>
+									)}
+								</li>
+							);
+						})}
+					</ol>
 				</div>
 
 				<div role='tablist' className='flex gap-2'>

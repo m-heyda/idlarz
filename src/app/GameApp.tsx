@@ -73,6 +73,7 @@ import { useGlobalContextMenu } from '@/hooks/useGlobalContextMenu';
 import ContextMenu from '@/components/game/ContextMenu';
 import ConfirmDialogs from '@/components/game/ConfirmDialogs';
 import BuildModal from '@/components/game/overlays/BuildModal';
+import BuildingModal from '@/components/game/overlays/BuildingModal';
 import BottomRightStack from '@/components/game/BottomRightStack';
 import CastleCompass from '@/components/game/CastleCompass';
 import Toast from '@/components/game/Toast';
@@ -201,6 +202,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<ConfirmDialogs />
 			<BuildModal />
+			<BuildingModal />
 			<BottomRightStack />
 			<CastleCompass />
 			<ContextMenu />

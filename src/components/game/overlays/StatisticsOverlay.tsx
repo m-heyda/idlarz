@@ -125,15 +125,6 @@ const StatisticsOverlay: React.FC = () => {
 			<div className='flex flex-col gap-4 shrink-0 mx-auto'>
 				<div className='relative'>
 					<LevelDetails />
-					{/* Absolutely placed on the portrait, so spending points never moves anything */}
-					{points > 0 && (
-						<div
-							className='absolute top-2 right-2 z-10 px-2 py-0.5 text-xs font-semibold text-[#2a1e10] bg-[#f0d27a] border border-[#8a6a2a] pointer-events-none'
-							title='Unspent attribute points'
-						>
-							{formatCompact(points)} {points === 1 ? 'point' : 'points'}
-						</div>
-					)}
 				</div>
 
 				<button
@@ -165,8 +156,18 @@ const StatisticsOverlay: React.FC = () => {
 			{/* Right column: attributes and overview on top, then the chosen view */}
 			<div className='flex-1 min-w-[320px] flex flex-col gap-5'>
 				<div className='grid grid-cols-2 gap-x-8 gap-y-4 text-sm max-[640px]:grid-cols-1'>
-					<div>
-						<h3 className='px-h'>Attributes</h3>
+					<div className='char-panel char-panel-attr'>
+						<div className='flex items-start justify-between gap-2'>
+							<h3 className='px-h flex-1'>Attributes</h3>
+							{/* always in the layout (hidden at 0), so spending the last point moves nothing */}
+							<span
+								className={`char-points ${points > 0 ? '' : 'invisible'}`}
+								title='Unspent attribute points: spend them with the + buttons'
+								data-testid='attr-points'
+							>
+								{formatCompact(points)} {points === 1 ? 'point' : 'points'} to spend
+							</span>
+						</div>
 						<div className='space-y-1.5'>
 							{BASE_STATS.map((stat) => (
 								<div key={stat} className='flex items-center text-xs'>
@@ -194,7 +195,7 @@ const StatisticsOverlay: React.FC = () => {
 										onClick={() => handleAddStatPoint(stat)}
 										data-tutorial={stat === 'strength' ? 'stat-add' : undefined}
 										disabled={points <= 0}
-										className={`ml-2 w-6 h-6 !p-0 flex items-center justify-center px-btn px-btn-sm ${points > 0 ? '' : 'opacity-40'}`}
+										className={`ml-2 w-6 h-6 !p-0 flex items-center justify-center px-btn px-btn-sm ${points > 0 ? 'px-btn-gold' : 'opacity-40'}`}
 										aria-label={`Add point to ${stat}`}
 									>
 										+
@@ -204,7 +205,7 @@ const StatisticsOverlay: React.FC = () => {
 						</div>
 					</div>
 
-					<div>
+					<div className='char-panel char-panel-info'>
 						<h3 className='px-h'>Overview</h3>
 						<div className='space-y-1.5 text-xs'>
 							<Line label='Level' value={formatCompact(level.level)} valueClass='text-yellow-400' />

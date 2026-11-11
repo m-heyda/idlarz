@@ -53,7 +53,7 @@ const BASE_ICON_SIZES = {
 	menu_character: [40, 40],
 	menu_main: [40, 40],
 	menu_stats: [40, 40],
-	// Sprite Fusion menu buttons, 64x64 on a stone slab (scripts/pixel/sprites_menu_art.py). The header scales them down until the menu is reworked; achievements and settings are wired (header buttons, the Settings dialog); glossary, gems_pouch and bag_scroll are not wired yet
+	// Sprite Fusion menu buttons, 64x64 on a stone slab (scripts/pixel/sprites_menu_art.py). The header scales them down until the menu is reworked; achievements, settings and gems_pouch (the Gem shop button) are wired; glossary and bag_scroll are not wired yet
 	menu_equipment: [64, 64],
 	menu_merchant: [64, 64],
 	menu_farm: [64, 64],
@@ -268,6 +268,12 @@ export const animalIcon = (kind: string, seed?: string): PixelIconName => {
 	for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
 	return looks[h % looks.length];
 };
+
+/** The farm sprites whose art looks to the right (head on the right); every other animal sprite looks left. The farm mirrors an animal so it always walks the way it looks. */
+const FACES_RIGHT: ReadonlySet<PixelIconName> = new Set<PixelIconName>(['animal_cow_1', 'animal_pig', 'animal_sheep', 'animal_duck', 'animal_rooster']);
+
+/** Whether this animal sprite looks to the right without a flip (see {@link FACES_RIGHT}). */
+export const facesRight = (icon: PixelIconName): boolean => FACES_RIGHT.has(icon);
 
 // Biome -> map icon (the 'empty' biome has none; the castle uses castle_<level>)
 export const BIOME_PIXEL_ICONS: Record<string, PixelIconName | undefined> = {

@@ -31,9 +31,9 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | [Accessories](accessories.md) | 53 | 31 | 0 |
 | [Monsters](monsters.md) | 38 | 27 | 11 |
 | [Buildings](buildings.md) | 248 | 25 | 202 |
-| [Resources](resources.md) | 102 | 53 | 0 |
+| [Resources](resources.md) | 102 | 54 | 0 |
 | [Map details](map-details.md) | 469 | 28 | 441 |
-| [UI](ui.md) | 101 | 67 | 22 |
+| [UI](ui.md) | 101 | 68 | 22 |
 | [Portraits](portraits.md) | 33 | 19 | 8 |
 | [Biomes](biomes.md) | 9 | 5 | 4 |
 | [Unsorted cuts](unsorted.md) | 13 | 0 | 13 |

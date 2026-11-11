@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ANIMALS, FARM } from '@/config/farm';
-import { PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
+import { PIXEL_ICON_SIZES, animalIcon, facesRight } from '@/config/pixelIcons';
 import { mulberry32 } from '@/lib/rng';
 import { Animal } from '@/types/game';
 import PixelIcon from '../PixelIcon';
@@ -29,7 +29,10 @@ interface Agent {
 	tx: number;
 	ty: number;
 	wait: number;
+	/** Moving to the right on screen (the way it last walked) */
 	flip: boolean;
+	/** The side the art looks to without any flip */
+	faces: 'l' | 'r';
 	moving: boolean;
 }
 
@@ -94,7 +97,8 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 		const z = zoomRef.current;
 		el.style.transform = `translate(${(p.x - ANCHOR.x) * z}px, ${(p.y - ANCHOR.y) * z}px)`;
 		el.style.zIndex = String(Math.round(p.y));
-		el.dataset.dir = a.flip ? 'r' : 'l';
+		// mirror the art only when it looks the other way from the walk (cows, pigs and sheep look right, the chickens left)
+		el.dataset.dir = (a.flip ? 'r' : 'l') === a.faces ? 'l' : 'r';
 		el.dataset.moving = a.moving ? '1' : '0';
 	};
 
@@ -150,6 +154,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 					ty: spot.y,
 					wait: 0.5 + rnd() * 2.5,
 					flip: rnd() > 0.5,
+					faces: facesRight(animalIcon(inst.animal.id, inst.key)) ? 'r' : 'l',
 					moving: false,
 				};
 				agents.current.set(inst.key, a);
