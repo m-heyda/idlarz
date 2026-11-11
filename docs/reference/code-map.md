@@ -460,7 +460,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
-- [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ `since`:
+- [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ Hands the monster discoveries of an answer to the bestiary store.
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
 - [`sanitizeSave.ts`](../../src/lib/sanitizeSave.ts) — ~ The part of the game state that is saved.
 - [`saveEvents.ts`](../../src/lib/saveEvents.ts) — Tiny event bus for moments worth saving right away (a purchase, a castle upgrade, a rebirth, a level up).
@@ -791,6 +791,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
 - [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
+- [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
@@ -819,6 +820,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
+- [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)

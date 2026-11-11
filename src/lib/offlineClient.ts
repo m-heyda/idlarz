@@ -1,6 +1,7 @@
 import type { ClaimResult } from '@/lib/offline/types';
 import { scoped } from '@/lib/storageScope';
 import { epochFetch } from '@/lib/epochFetch';
+import { deliverBestiary } from '@/lib/rewardsClient';
 
 /** The browser side of /api/offline. */
 export type ClaimResponse =
@@ -20,6 +21,8 @@ export const requestClaim = async (claimId: string): Promise<ClaimResponse> => {
 		if (!response.ok) return { status: 'unavailable' };
 		const body = (await response.json()) as Partial<ClaimResult>;
 		if (!body || typeof body.serverNowSec !== 'number' || !body.tickets || typeof body.gems !== 'number') return { status: 'unavailable' };
+		// before the caller places the claim's monsters: an unmet type must already be a "?" when it first appears (IDL-267)
+		deliverBestiary(body.bestiary);
 		return { status: 'ok', result: body as ClaimResult };
 	} catch {
 		return { status: 'unavailable' };

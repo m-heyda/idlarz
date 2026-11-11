@@ -82,6 +82,8 @@ export interface ClaimResult {
 	/** The server clock (epoch seconds) the tickets' ages are measured against */
 	serverNowSec: number;
 	gems: number;
+	/** The discovered monster types and the kills per type, as on {@link SyncResult}: the claim places the first monsters, so it must say which of them the player has met (IDL-267) */
+	bestiary?: import('@/lib/offline/stats').BestiaryReport;
 }
 
 /**

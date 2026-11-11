@@ -11,10 +11,15 @@ export const UNKNOWN_MONSTER = 'Unknown monster';
 
 /**
  * A monster's picture (public/pixel/enemies); `scale` 1 is the size it has on the map, bigger ones are for the fight window.
- * A type the player has not fought yet (the bestiary store: server's `stats.seen`) is drawn as a black silhouette with a "?" on it and no name.
+ * {@link MonsterPicture} draws it for a given `known` (the store-free part); the default export reads the store. A type the player has not fought yet (the bestiary store: server's `stats.seen`) is drawn as a black silhouette with a "?" on it and no name.
  */
-const MonsterArt: React.FC<{ type: MonsterType; scale?: number; label?: string; className?: string }> = ({ type, scale = 1, label, className }) => {
-	const known = useIsDiscovered(type);
+export const MonsterPicture: React.FC<{ type: MonsterType; known: boolean; scale?: number; label?: string; className?: string }> = ({
+	type,
+	known,
+	scale = 1,
+	label,
+	className,
+}) => {
 	const entry = MONSTER_CATALOG.find((m) => m.id === type);
 	if (!entry) return null;
 	const size = monsterArtSize(entry.id, entry.grade) * scale;
@@ -40,5 +45,9 @@ const MonsterArt: React.FC<{ type: MonsterType; scale?: number; label?: string; 
 		</span>
 	);
 };
+
+const MonsterArt: React.FC<{ type: MonsterType; scale?: number; label?: string; className?: string }> = (props) => (
+	<MonsterPicture {...props} known={useIsDiscovered(props.type)} />
+);
 
 export default MonsterArt;
