@@ -1,4 +1,4 @@
-import type { PlayerClassId } from '@/config/playerClasses';
+import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { scoped } from '@/lib/storageScope';
 
 /** The browser side of /api/auth/*: the page only ever talks to our own routes, never to Supabase. */
@@ -90,6 +90,8 @@ export const startChapter = async (characterName: string, playerClass: PlayerCla
 
 /** The avatar picker's data (`GET /api/auth/avatar`): the chosen avatar and every id the account may pick. `null` when the server cannot be reached. */
 export interface AvatarState {
+	/** The profile's class: decides which starters are enabled */
+	playerClass: PlayerClassId;
 	avatarId: string | null;
 	unlocked: string[];
 }
@@ -97,9 +99,13 @@ export const fetchAvatars = async (): Promise<AvatarState | null> => {
 	try {
 		const response = await fetch('/api/auth/avatar', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 		if (!response.ok) return null;
-		const body = (await response.json().catch(() => null)) as { avatarId?: unknown; unlocked?: unknown } | null;
-		if (!body || !Array.isArray(body.unlocked)) return null;
-		return { avatarId: typeof body.avatarId === 'string' ? body.avatarId : null, unlocked: body.unlocked.filter((id): id is string => typeof id === 'string') };
+		const body = (await response.json().catch(() => null)) as { playerClass?: unknown; avatarId?: unknown; unlocked?: unknown } | null;
+		if (!body || !Array.isArray(body.unlocked) || typeof body.playerClass !== 'string' || !PLAYER_CLASSES[body.playerClass as PlayerClassId]) return null;
+		return {
+			playerClass: body.playerClass as PlayerClassId,
+			avatarId: typeof body.avatarId === 'string' ? body.avatarId : null,
+			unlocked: body.unlocked.filter((id): id is string => typeof id === 'string'),
+		};
 	} catch {
 		return null;
 	}

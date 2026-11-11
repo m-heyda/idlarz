@@ -1,5 +1,5 @@
 import { createSupabaseServer } from '@/lib/supabase/server';
-import { checkCreationAvatar, checkProfile } from '@/lib/authValidation';
+import { checkAvatar, checkProfile } from '@/lib/authValidation';
 import { adminConfigured, createSupabaseAdmin } from '@/lib/supabase/admin';
 import { writeAvatar } from '@/lib/avatarServer';
 import { fail, guardConfigured, isOutage, json, readBody, unavailable } from '@/lib/authRoute';
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 	const input = checkProfile(await readBody(request));
 	if (!input.ok) return fail(input.error, 400);
 	// the hero's avatar: one of the two starters of the class (a profile being finished has earned nothing yet)
-	const avatar = checkCreationAvatar(input.value.avatarId, input.value.playerClass, []);
+	const avatar = checkAvatar(input.value.avatarId, input.value.playerClass, []);
 	if (!avatar.ok) return fail(avatar.error, 400);
 	try {
 		const supabase = await createSupabaseServer();
