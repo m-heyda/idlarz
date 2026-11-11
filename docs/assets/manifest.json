@@ -20505,6 +20505,21 @@
 	},
 	{
 		"usedBy": [
+			"slot:belt"
+		],
+		"name": "equip_belt",
+		"category": "ui",
+		"subcategory": "equip",
+		"src": "/pixel/icons/equip_belt.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
 			"slot:cape"
 		],
 		"name": "equip_cape",
@@ -20520,8 +20535,7 @@
 	},
 	{
 		"usedBy": [
-			"slot:charm",
-			"slot:belt"
+			"slot:charm"
 		],
 		"name": "equip_charm",
 		"category": "ui",

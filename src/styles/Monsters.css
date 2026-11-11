@@ -24,9 +24,8 @@
 }
 
 .monster-placeholder {
-	/* the stand-in picture is a black cut-out: invert lifts it to a mid grey (not black, so it never reads as an undiscovered monster); no "?" */
-	filter: invert(0.55) drop-shadow(0 0 2px rgba(0, 0, 0, 0.6)) !important;
-	opacity: 0.9;
+	/* the stand-in picture is a small teal slime in its own colours: only a soft shadow, no "?", so it never reads as an undiscovered monster */
+	filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.45)) !important;
 }
 
 .monster-unknown-mark {

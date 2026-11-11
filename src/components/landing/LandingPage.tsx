@@ -86,13 +86,27 @@ const WindowHead: React.FC<{ title: string }> = ({ title }) => (
 	</div>
 );
 
-/** What the account window shows while it looks for a session: the shape of the login form, so nothing jumps when the real content arrives. */
+/** The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.ld-spinner` in Landing.css). */
+const SPINNER_PIXELS: readonly (readonly [number, number])[] = [
+	[28, 4],
+	[44, 12],
+	[52, 28],
+	[44, 44],
+	[28, 52],
+	[12, 44],
+	[4, 28],
+	[12, 12],
+];
+
+/** What the account window shows while it looks for a session: a pixel spinner (the window keeps its height, so nothing jumps when the real content arrives). */
 const Skeleton: React.FC = () => (
 	<div className='ld-skel' role='status' aria-label='Looking for your hero'>
-		<span className='ld-skel-bar ld-skel-tabs' />
-		<span className='ld-skel-bar ld-skel-input' />
-		<span className='ld-skel-bar ld-skel-input' />
-		<span className='ld-skel-bar ld-skel-button' />
+		<svg className='ld-spinner' viewBox='0 0 64 64' aria-hidden='true' shapeRendering='crispEdges'>
+			{SPINNER_PIXELS.map(([x, y], i) => (
+				<rect key={i} x={x} y={y} width={8} height={8} style={{ '--i': i } as React.CSSProperties} />
+			))}
+		</svg>
+		<span className='ld-skel-text'>Looking for your hero…</span>
 	</div>
 );
 

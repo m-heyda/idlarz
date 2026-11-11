@@ -251,3 +251,4 @@ def charm():
     img = sc.render()
     fx.glint(img, 17, 17, 2)
     return img
+

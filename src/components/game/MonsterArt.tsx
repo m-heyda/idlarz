@@ -13,7 +13,7 @@ import '@/styles/Monsters.css';
  */
 export const labPreviewOf = (art: string | undefined) => (art ? MONSTER_CATALOG.find((m) => m.id === art) : undefined);
 
-/** What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}). A met monster whose real sprite is not made yet draws the stand-in as a grey silhouette without the "?" (`monster-placeholder`), so the two read differently. */
+/** What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}). A met monster whose real sprite is not made yet draws the stand-in (a teal slime) without the "?" (`monster-placeholder`), so the two read differently. */
 export const UNKNOWN_MONSTER = 'Unknown monster';
 
 /**

@@ -112,6 +112,7 @@ const BASE_ICON_SIZES = {
 	equip_hands: [40, 40],
 	equip_cape: [40, 40],
 	equip_charm: [40, 40],
+	equip_belt: [40, 40],
 	equip_neck: [40, 40],
 	equip_chest: [40, 40],
 	equip_mainHand: [40, 40],
@@ -237,8 +238,7 @@ export const EQUIPMENT_PIXEL_ICONS: Record<string, PixelIconName> = {
 	feet: 'equip_feet',
 	ring1: 'equip_ring',
 	ring2: 'equip_ring',
-	// No belt sprite yet: the charm's stands in until pass 2 draws `equip_belt` (docs/plan/ROADMAP.md, item art in three passes)
-	belt: 'equip_charm',
+	belt: 'equip_belt',
 };
 
 /**

@@ -64,7 +64,7 @@ Reference images in this folder: `icons.png` (icon set), `characters.png` (heroe
 - **Equipment slots**: `equip_head/neck/chest/mainHand/offHand/legs/feet/ring` - kettle hat, amulet, cuirass, sword,
   round shield, greaves, boots, ring. Empty = dim grayscale silhouette, filled = glowing slot frame.
 - **Animals**: `animal_chicken/pig/cow/sheep`.
-- **Monsters** are supplied pictures under `public/pixel/enemies/<biome>/` (the old procedural rat sheets were removed); a monster without one shows `enemies/placeholder/silhouette.png` (the purple ogre as a black silhouette) through `MonsterArt`.
+- **Monsters** are supplied pictures under `public/pixel/enemies/<biome>/` (the old procedural rat sheets were removed); a monster without one shows `enemies/placeholder/silhouette.png` (a small teal slime) through `MonsterArt`.
 - **Slots and items**: four more empty-slot silhouettes (`equip_shoulder/hands/cape/charm`: pauldrons, gauntlet, cloak with clasp, bead on a cord).
   Item icons are `item_*` 40px sprites: `item_potion_hp` (red flask, cork) and the wooden starter kit (`item_wooden_sword/shield`), the slot
   icons re-skinned through `_skin()` in `sprites_monsters.py`. The rat materials stay for the rat monsters.
@@ -217,3 +217,5 @@ slot icons of `sprites_equipment.py` through material remaps (`_skin`, optional 
 - Glints only on metal and glass (steel, obsidian, gems); none on wood, leather, cloth or fur.
 - Rarity is shown by the item frame glow in the UI (`catalog/rarity.ts`), never baked into the sprite.
 - New materials: `obsidian`, `obsidian_edge`, `ember`, `linen`. The potion pair: `item_potion_hp` (small red flask) and `item_potion_greater` (bigger flask, gold band, star stud).
+
+**Empty equipment-slot icons (`equip_*.png`, 40x40)**: no longer generated. Each is the matching item picture (steel helm, cuirass, pair of gauntlets, legs, boots, arming sword, round shield, gold signet, cord pendant, leather belt; pauldrons cropped from the cuirass; the cape and charm placeholders), scaled to about 32 px and desaturated; the game dims them with `.px-equip-empty`. To change one, edit the PNG or redo it from another item picture.

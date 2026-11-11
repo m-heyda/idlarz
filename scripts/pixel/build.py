@@ -1,4 +1,9 @@
-"""Builds every pixel asset the game uses.   python scripts/pixel/build.py [name ...]
+"""LEGACY (do not run). New art is made in Sprite Fusion and then recoloured or touched up in existing images; see "Assets" in CLAUDE.md.
+This procedural pipeline only stays for the few things Sprite Fusion cannot make yet (new kinds of thing, a special effect) and for the
+starter item_* icons that still come from sprites_gear.py. Running it rewrites hand-made files in public/pixel/icons and deletes
+every file it does not know about, so main() refuses unless you pass --legacy.
+
+Builds the old pixel assets.   python scripts/pixel/build.py --legacy [name ...]
 
   public/pixel/icons/  sprites (resources, menu, equipment, portraits, animals, gold shine strip); the item_* ones are listed in
                        src/config/itemIcons/*.json (the item icon registry, checked by item_registry.py before the build)
@@ -55,12 +60,6 @@ SPRITES = {
     'eggs': sprites_resources.eggs, 'milk': sprites_resources.milk, 'hide': sprites_resources.hide,
     'menu_character': sprites_props.helm,
     'level_orb': sprites_props.level_orb,
-    'equip_head': sprites_equipment.head, 'equip_neck': sprites_equipment.neck,
-    'equip_chest': sprites_equipment.chest, 'equip_mainHand': sprites_equipment.mainhand,
-    'equip_offHand': sprites_equipment.offhand, 'equip_legs': sprites_equipment.legs,
-    'equip_feet': sprites_equipment.feet, 'equip_ring': sprites_equipment.ring,
-    'equip_shoulder': sprites_equipment.shoulder, 'equip_hands': sprites_equipment.hands,
-    'equip_cape': sprites_equipment.cape, 'equip_charm': sprites_equipment.charm,
     **sprites_characters.SPRITES,
     **sprites_animal_art.SPRITES,
     **sprites_meadow.SPRITES,
@@ -163,6 +162,8 @@ def reference_sheets(sprites, ui, bg):
 
 
 def main():
+    if '--legacy' not in sys.argv:
+        sys.exit('scripts/pixel/build.py is legacy: it overwrites hand-made art and deletes files it does not know. Read "Assets" in CLAUDE.md; pass --legacy only for a deliberate special case.')
     refs = '--refs' in sys.argv
     only = set(a for a in sys.argv[1:] if not a.startswith('--'))
     started = time.time()
