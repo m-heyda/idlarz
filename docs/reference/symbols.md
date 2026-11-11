@@ -47,7 +47,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `buffTotals` | Combat / Consumables | [`src/lib/buffs.ts:84`](../../src/lib/buffs.ts) | The summed bonus per stat of the running buffs: |
 | `BUILDING_RULES` | Economy / Buildings | [`src/config/buildings.ts:33`](../../src/config/buildings.ts) | The numbers of the building system (proposals from docs/plan/18, tuned with the sim; |
 | `buildingLevelCost` | Economy / Buildings | [`src/lib/buildings.ts:58`](../../src/lib/buildings.ts) | The price of reaching `level` (1 = building it): |
-| `BUILDINGS` | Economy / Buildings | [`src/catalog/buildings.ts:30`](../../src/catalog/buildings.ts) | The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; |
+| `BUILDINGS` | Economy / Buildings | [`src/catalog/buildings.ts:48`](../../src/catalog/buildings.ts) | The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; |
 | `BUILDINGS_FLAG` | Economy / Buildings | [`src/config/buildings.ts:17`](../../src/config/buildings.ts) | The per-biome building system (R7, IDL-91, IDL-92), behind BUILDINGS_FLAG, which is **ON** (owner decision: |
 | `buildingUpgradeDuration` | Economy / Buildings | [`src/lib/buildings.ts:39`](../../src/lib/buildings.ts) | Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); |
 | `buildNumbers` | Progression / Guided tutorial | [`src/lib/tutorial/numbers.ts:31`](../../src/lib/tutorial/numbers.ts) | The numbers the tutorial texts quote, read from the live config at the moment they are shown (a changed price changes the text, nothing is typed in): |
@@ -96,7 +96,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:83`](../../src/lib/saveStorage.ts) | Where the save lives: |
 | `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:140`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
 | `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
-| `DAILY_BONUS_GEMS` | Economy / Gems | [`src/config/gemShop.ts:66`](../../src/config/gemShop.ts) | The daily first-login bonus: |
+| `DAILY_BONUS_GEMS` | Economy / Gems | [`src/config/gemShop.ts:71`](../../src/config/gemShop.ts) | The daily first-login bonus: |
 | `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:19`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:110`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
 | `dangerBonus` | Monsters / Level scaling | [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts) | Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: |
@@ -130,7 +130,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `GEAR_RECIPES` | Economy / Crafting | [`src/catalog/recipes.ts:337`](../../src/catalog/recipes.ts) | The gear recipes (IDL-241): |
 | `gearItemLevels` | Progression / Crafting | [`src/lib/craftGear.ts:37`](../../src/lib/craftGear.ts) | The item level a recipe of this grade makes, by crafting level: |
 | `gearOdds` | Progression / Crafting | [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts) | What the Crafting window's odds panel shows for a recipe: |
-| `GEM_SHOP` | Economy / Gems | [`src/config/gemShop.ts:36`](../../src/config/gemShop.ts) | The gem shop's price book: |
+| `GEM_SHOP` | Economy / Gems | [`src/config/gemShop.ts:41`](../../src/config/gemShop.ts) | The gem shop's price book: |
 | `gemChance` | Economy / Chests and Luck | [`src/lib/luck.ts:50`](../../src/lib/luck.ts) | Chance (0-1) that a chest also holds gems. |
 | `generateLoot` | Loot / Pipeline | [`src/lib/loot/generate.ts:320`](../../src/lib/loot/generate.ts) | Everything one source gives. |
 | `generateMerchantStock` | Economy / Merchant | [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts) | A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. |
@@ -262,7 +262,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
 | The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
-| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:117`](../../src/app/GameApp.tsx) | The tick loop. |
+| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:118`](../../src/app/GameApp.tsx) | The tick loop. |
 | `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:114`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |

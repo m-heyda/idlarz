@@ -1022,7 +1022,7 @@ The numbers of the building system (proposals from docs/plan/18, tuned with the 
 
 ### `BUILDINGS` <small>const</small>
 
-Source: [`src/catalog/buildings.ts:30`](../../src/catalog/buildings.ts)
+Source: [`src/catalog/buildings.ts:48`](../../src/catalog/buildings.ts)
 
 The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
 tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.
@@ -1191,7 +1191,7 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:36`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:41`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
@@ -1213,7 +1213,7 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:66`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:71`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 

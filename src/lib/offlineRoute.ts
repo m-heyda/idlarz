@@ -1,4 +1,5 @@
 import { createSupabaseAdmin } from '@/lib/supabase/admin';
+import { KEY } from '@/lib/idempotencyKey';
 import { supabaseSaveRepo } from '@/lib/cloudSave/supabaseRepo';
 import { fail, json, readBody, unavailable } from '@/lib/authRoute';
 import { requirePlayer } from '@/lib/playerRoute';
@@ -7,8 +8,7 @@ import { lootConfigured, lootSecret } from '@/lib/offline/secret';
 import type { Online } from '@/lib/offline/online';
 import type { ServiceDeps } from '@/lib/offline/service';
 
-/** An idempotency key: the client makes one per request and repeats it if the answer got lost. */
-export const KEY = /^[A-Za-z0-9_-]{8,64}$/;
+export { KEY };
 
 /**
  * The shared shell of the signed-in game routes (/api/spawn, /api/chest, /api/kill): the player comes from the cookie, the body is small

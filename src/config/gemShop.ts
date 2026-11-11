@@ -1,13 +1,18 @@
 // The gem shop's price book (IDL-189, IDL-190, IDL-194). A leaf module: pure data and two tiny helpers, imported by the server (`lib/offline/gemShop.ts`) and the shop window alike.
 
-/** The tabs of the Gem shop window. Only tabs that hold at least one item are shown. */
-export type GemShopTab = 'identity';
+/** The tabs of the Gem shop window: services (identity), leveled upgrades and one-time purchases. A tab with no item shows a "coming soon" note. */
+export type GemShopTab = 'identity' | 'upgrades' | 'once';
+
+/** How an item is sold: a `service` can be bought again and again, a `leveled` upgrade has levels (each costs more), a `once` purchase is bought one time and kept. Today every item is a service. */
+export type GemItemKind = 'service' | 'leveled' | 'once';
 
 export type GemItemId = 'class_change' | 'name_change' | 'attr_respec';
 
 export interface GemItem {
 	id: GemItemId;
 	tab: GemShopTab;
+	/** Defaults to `service` */
+	kind?: GemItemKind;
 	name: string;
 	/** One line: what the player gets. */
 	blurb: string;

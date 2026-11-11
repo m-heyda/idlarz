@@ -303,6 +303,27 @@
 	white-space: nowrap;
 }
 
+/* the name and badge are one button: it opens the badge and title picker */
+.hero-card-name-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	max-width: 100%;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-family: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.hero-card-name-btn:hover,
+.hero-card-name-btn:focus-visible {
+	filter: brightness(1.25);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
 /* hover wrapper of a button with a hover card: a disabled button would swallow the hover */
 .tip-btn-wrap {
 	display: block;
@@ -545,7 +566,8 @@
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	background: #14100a;
+	/* a dimmed violet wash from the top left fading into the dark stone */
+	background: linear-gradient(155deg, rgba(120, 80, 200, 0.24) 0%, rgba(60, 40, 110, 0.1) 40%, rgba(20, 16, 10, 0) 75%), #14100a;
 	box-shadow:
 		0 0 0 2px #080504,
 		0 0 0 4px #5a3f1c;
@@ -585,4 +607,76 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+/* the Attributes and Overview blocks of the Character window: a soft tinted card each, so the first screen reads as two clear groups */
+.char-panel {
+	padding: 10px 12px 12px;
+	border: 1px solid #3a2a16;
+	box-shadow: inset 0 1px 0 rgba(217, 168, 80, 0.12);
+}
+
+.char-panel-attr {
+	background: linear-gradient(180deg, rgba(70, 120, 200, 0.16) 0%, rgba(30, 40, 70, 0.08) 45%, rgba(20, 16, 10, 0) 100%);
+}
+
+.char-panel-info {
+	background: linear-gradient(180deg, rgba(200, 150, 60, 0.14) 0%, rgba(90, 60, 20, 0.07) 45%, rgba(20, 16, 10, 0) 100%);
+}
+
+/* "9 points to spend", beside the Attributes heading */
+.char-points {
+	flex: none;
+	margin-top: 2px;
+	padding: 1px 8px;
+	font-size: 0.7rem;
+	font-weight: 700;
+	white-space: nowrap;
+	color: #2a1e10;
+	background: #f0d27a;
+	border: 1px solid #8a6a2a;
+	box-shadow: 0 0 8px rgba(240, 210, 122, 0.35);
+}
+
+/* the hero card: the level is a violet square beside the XP bar, as tall as the bar; HP and MP use the whole card width */
+.level-badge-bar {
+	flex: none;
+	align-self: stretch;
+	height: auto;
+	min-width: 38px; /* roomy: the number never touches the border, and two digits fit */
+	padding: 0 10px;
+	font-size: 1.05rem;
+	margin-right: 4px;
+}
+
+.eq-level-wrap-flat {
+	--eq-orb: 0px;
+	--eq-orb-gap: 0px;
+	margin-top: 4px;
+}
+
+.eq-level-wrap-flat .eq-vitals {
+	margin-left: 2px;
+}
+
+/* a panel title with the points pill: one separator under the whole row (the title's own line stopped at the pill) */
+.char-panel-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 8px;
+	padding-bottom: 4px;
+	border-bottom: 2px solid #3a2810;
+}
+
+.char-panel-head .px-h {
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.char-panel-head .char-points {
+	margin-top: 0;
 }

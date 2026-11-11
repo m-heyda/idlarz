@@ -139,6 +139,10 @@ interface UiState {
 	askDismissMonster: (id: number | null) => void;
 	discardIndex: number | null;
 	askDiscard: (index: number | null) => void;
+	/** The building window (art, lore, output, level, the next level's price and its Upgrade button): the tile of the building it was opened for (null = closed) */
+	buildingModal: { x: number; y: number } | null;
+	openBuildingModal: (x: number, y: number) => void;
+	closeBuildingModal: () => void;
 	/** The "Build here" window: the free tile it was opened for (null = closed) */
 	buildModal: { x: number; y: number } | null;
 	openBuildModal: (x: number, y: number) => void;
@@ -218,6 +222,9 @@ export const useUiStore = create<UiState>((set, get) => ({
 	askDismissMonster: (id) => set({ dismissMonsterId: id, contextMenu: null }),
 	discardIndex: null,
 	askDiscard: (index) => set({ discardIndex: index, contextMenu: null }),
+	buildingModal: null,
+	openBuildingModal: (x, y) => set({ buildingModal: { x, y }, contextMenu: null }),
+	closeBuildingModal: () => set({ buildingModal: null }),
 	buildModal: null,
 	openBuildModal: (x, y) => set({ buildModal: { x, y }, contextMenu: null }),
 	closeBuildModal: () => set({ buildModal: null }),

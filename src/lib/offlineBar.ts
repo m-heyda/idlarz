@@ -52,3 +52,12 @@ export const offlineBar = (input: OfflineBarInput): OfflineBar => {
 
 /** "Capped: 4 h 10 m earned nothing" (null when not capped). */
 export const cappedLine = (bar: OfflineBar): string | null => (bar.capped ? `Capped: ${barDuration(bar.lostSec)} earned nothing` : null);
+
+/** How long the counting-down animation of the welcome-back window runs. */
+export const AWAY_COUNT_MS = 1800;
+
+/** Share of the animation still to run (1 = just started, 0 = done), eased out so the bar slows as it empties. `elapsedMs` is the time since it began. */
+export const countdownLeft = (elapsedMs: number, durationMs: number = AWAY_COUNT_MS): number => {
+	const t = Math.min(1, Math.max(0, elapsedMs / durationMs));
+	return Math.pow(1 - t, 2);
+};

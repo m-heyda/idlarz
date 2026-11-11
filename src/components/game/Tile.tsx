@@ -161,7 +161,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					'border-2 border-amber-300': castleLevel >= CASTLE_UPGRADE.maxLevel && biome === 'castle',
 					'group hover:z-20': true,
 					'opacity-75 border-2 border-red-500': isShaking,
-					'cursor-pointer': isOwned && (biome === 'castle' || hasChest || !!monsterKey),
+					'cursor-pointer': isOwned && (biome === 'castle' || hasChest || !!monsterKey || !!building),
 					'tile-has-monster': isOwned && !!monsterKey,
 					'castle-tile': isOwned && biome === 'castle',
 				})}

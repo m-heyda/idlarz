@@ -11,6 +11,7 @@ import AchievementBadge from './AchievementBadge';
 import { useBadgeChoice } from './BadgeDialog';
 import { shownBadge, shownTitle } from '@/catalog/badges';
 import LevelOrb from './LevelOrb';
+import LevelBadge from './LevelBadge';
 import { maxHp, maxMana } from '@/lib/combat';
 
 type FlaskKind = 'hp' | 'mp';
@@ -32,17 +33,20 @@ const VitalBar: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({ k
 	</div>
 );
 
-/** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). */
-export const LevelBar: React.FC = () => {
+/** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). With `orb={false}` the orb is left out (the hero card shows the level as a square badge beside the XP bar instead) and the XP, HP and MP bars use the full width. */
+export const LevelBar: React.FC<{ orb?: boolean }> = ({ orb = true }) => {
 	const { resources, level, resourceRates, characterStats, equipment, playerHp, playerMp, playerClass } = useGameStore();
 	const hpMax = maxHp(characterStats, equipment);
 	const mpMax = maxMana(characterStats, equipment, playerClass);
 	return (
-		<div className='eq-level-wrap'>
+		<div className={`eq-level-wrap${orb ? '' : ' eq-level-wrap-flat'}`}>
 			<div className='eq-level'>
-				<div className='eq-level-orb' title={`Level ${level.level}`}>
-					<LevelOrb scale={2} level={level.level} />
-				</div>
+				{!orb && <LevelBadge level={level.level} className='level-badge-bar' />}
+				{orb && (
+					<div className='eq-level-orb' title={`Level ${level.level}`}>
+						<LevelOrb scale={2} level={level.level} />
+					</div>
+				)}
 				<div className='group relative flex-1'>
 					<div className='hero-xp eq-xp' style={{ '--pct': level.progress * 100 } as React.CSSProperties}>
 						<div className='hero-xp-fill' />
@@ -64,13 +68,14 @@ export const LevelBar: React.FC = () => {
 };
 
 /**
- * The hero card of the Character and Statistics windows: the avatar (a click opens the avatar dialog, there is no extra button), the name and class, then the level, the XP bar and the
+ * The hero card of the Character and Statistics windows: the avatar (a click opens the avatar dialog, there is no extra button), the name and badge (a click opens the badge and title picker, which also hides the badge; later customisation such as a name glow goes there too) and the class, then the level, the XP bar and the
  * HP and MP bars (`LevelBar`). It replaced the torch-lit alcove scene with its potion flasks (a first simplification, the card is reworked later).
  */
 const LevelDetails: React.FC = () => {
 	const playerClass = useGameStore((state) => state.playerClass);
 	const playerName = useGameStore((state) => state.playerName);
 	const openAvatarDialog = useUiStore((state) => state.openAvatarDialog);
+	const openBadgeDialog = useUiStore((state) => state.openBadgeDialog);
 	const choice = useUiStore((state) => state.badge);
 	useBadgeChoice();
 	const badge = shownBadge(choice.badgeId, choice.earned);
@@ -84,17 +89,23 @@ const LevelDetails: React.FC = () => {
 					<CharacterPortrait variant='bust' scale={2} />
 				</button>
 				<div className='hero-card-id'>
-					<span className='px-name hero-card-name'>
+					<button
+						type='button'
+						className='px-name hero-card-name hero-card-name-btn'
+						onClick={openBadgeDialog}
+						title='Change badge and title'
+						aria-label='Change badge and title'
+					>
 						{playerName}
 						{badge && <AchievementBadge achievement={badge} size={22} />}
-					</span>
+					</button>
 					{title && <span className='hero-class'>{title}</span>}
 					<span className='hero-class'>
 						{info.race} {info.label}
 					</span>
 				</div>
 			</div>
-			<LevelBar />
+			<LevelBar orb={false} />
 		</div>
 	);
 };

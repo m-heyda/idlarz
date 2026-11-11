@@ -11130,7 +11130,7 @@
 		"category": "resources",
 		"subcategory": "animal",
 		"src": "/pixel/icons/animal_duck.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			96,
@@ -21155,12 +21155,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/HeaderMenu.tsx"
+		],
 		"name": "menu_gems_pouch",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_gems_pouch.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			64,

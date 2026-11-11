@@ -49,6 +49,16 @@ export const isForeignLocal = (local: SavePeek, link: CloudLink | null, userId: 
 export const localForAccount = (local: SavePeek, link: CloudLink | null, userId: string): SavePeek =>
 	isForeignLocal(local, link, userId) ? { kind: 'none' } : local;
 
+/** How many seconds of play time still count as "the same game" (a save that lags the other by a minute or two is not a different game). */
+export const SAME_GAME_SLACK_SEC = 120;
+
+/**
+ * True when the browser's save and the account's save are, for the player, the same game: same level, same tiles owned and play time within {@link SAME_GAME_SLACK_SEC}.
+ * Nothing is worth choosing between then, so the start hub does not ask (the browser's save is continued and its next upload replaces the account's; the old one stays in the history).
+ */
+export const isNearlySame = (local: { level: number; tiles: number; playSeconds: number }, cloud: CloudInfo['summary']): boolean =>
+	local.level === cloud.level && local.tiles === cloud.tilesOwned && Math.abs(local.playSeconds - cloud.playSeconds) <= SAME_GAME_SLACK_SEC;
+
 export const planStart = (peeked: SavePeek, cloud: CloudInfo | null | 'unavailable', link: CloudLink | null, userId: string): StartPlan => {
 	const local = localForAccount(peeked, link, userId);
 	if (cloud === 'unavailable' || cloud === null) {
@@ -57,7 +67,7 @@ export const planStart = (peeked: SavePeek, cloud: CloudInfo | null | 'unavailab
 	if (local.kind !== 'ok') return { kind: 'hub', mode: 'cloud' };
 	const linked = link !== null && link.userId === userId && link.rev === cloud.rev;
 	// the same game on both sides (e.g. the link was lost): nothing to choose
-	const same = local.state.playSeconds === cloud.summary.playSeconds;
+	const same = isNearlySame({ level: local.state.level.level, tiles: countOwnedTiles(local.state.tiles), playSeconds: local.state.playSeconds }, cloud.summary);
 	return { kind: 'hub', mode: linked || same ? 'local' : 'choose' };
 };
 

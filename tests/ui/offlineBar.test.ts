@@ -44,3 +44,12 @@ test('garbage input stays harmless', () => {
 	assert.equal(bar.capped, false);
 	assert.equal(bar.efficiencyPct, 100);
 });
+
+test('the welcome-back count-down starts full, ends empty and never leaves 0..1', async () => {
+	const { countdownLeft, AWAY_COUNT_MS } = await import('../../src/lib/offlineBar');
+	assert.equal(countdownLeft(0), 1);
+	assert.equal(countdownLeft(AWAY_COUNT_MS), 0);
+	assert.equal(countdownLeft(AWAY_COUNT_MS * 5), 0);
+	assert.equal(countdownLeft(-50), 1);
+	assert.ok(countdownLeft(AWAY_COUNT_MS / 2) < 0.5, 'eased out');
+});

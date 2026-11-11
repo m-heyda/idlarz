@@ -60,7 +60,7 @@ test('(c) after the chapter reset nothing is left to ask about, and the old game
 test("the hub still shows for the same account's genuinely different local and cloud games", () => {
 	const { kv } = fakeKv({ 'idlarz.save': played(700) });
 	const mine: CloudLink = { userId: 'u', rev: 4 };
-	assert.equal(hubShown(kv, 1, cloud(5, 600), mine, 'u'), true, 'played elsewhere since');
-	assert.equal(planStart(createSaveStorage({ kv, epoch: 1 }).peek(), cloud(5, 600), mine, 'u').kind, 'hub');
+	assert.equal(hubShown(kv, 1, cloud(5, 5000), mine, 'u'), true, 'played elsewhere since');
+	assert.equal(planStart(createSaveStorage({ kv, epoch: 1 }).peek(), cloud(5, 5000), mine, 'u').kind, 'hub');
 	assert.equal(hubShown(kv, 1, cloud(4, 600), mine, 'u'), false, 'linked and in step: no question');
 });

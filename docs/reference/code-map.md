@@ -203,7 +203,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
-- [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ The away-time bar (IDL-64):
+- [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ 1 until it has run, then counts down to 0; stays at 0 for a player who asked for reduced motion.
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
 - [`BetaTesterBadge.tsx`](../../src/components/game/BetaTesterBadge.tsx) — ~ Who wears the tester medal:
@@ -232,6 +232,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`HighlightLayer.tsx`](../../src/components/game/HighlightLayer.tsx) — ~ The "Highlight" tint:
 - [`ItemSlot.tsx`](../../src/components/game/ItemSlot.tsx) — ~ A piece of gear (an instance) ...
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
+- [`LevelBadge.tsx`](../../src/components/game/LevelBadge.tsx) — ~ Side of the square in px (the number scales with it)
 - [`LevelDetails.tsx`](../../src/components/game/LevelDetails.tsx) — ~ The text of an XP bar:
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
@@ -263,6 +264,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
 - [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in plain words:
+- [`BuildingModal.tsx`](../../src/components/game/overlays/BuildingModal.tsx) — ~ "+1.2K" per hour for each resource of an output (per second in, per hour out).
 - [`CharacterOverlay.tsx`](../../src/components/game/overlays/CharacterOverlay.tsx)
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
@@ -272,10 +274,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
 - [`FarmOverlay.tsx`](../../src/components/game/overlays/FarmOverlay.tsx) — ~ The Farm window:
 - [`FarmProps.tsx`](../../src/components/game/overlays/FarmProps.tsx) — ~ CSS px outside the window that still get drawn, so a part is never seen popping in at the edge
-- [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Animals drawn for a count:
+- [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Moving to the right on screen (the way it last walked)
 - [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ How long the drawer takes to slide shut (a little over the transition in Farm.css)
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
-- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The gem sinks that are planned but not built (the "Coming soon" tab):
+- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The tabs, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on).
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
 - [`LoadingScreen.tsx`](../../src/components/game/overlays/LoadingScreen.tsx) — ~ The splash while the saved game loads (needs the game store; the start gate uses LoadingView, which does not).
 - [`LoadingView.tsx`](../../src/components/game/overlays/LoadingView.tsx) — ~ Hydration splash:
@@ -381,7 +383,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`badgeServer.ts`](../../src/lib/badgeServer.ts) — ~ The stored choice of this account; a missing row is "nothing chosen".
 - [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
-- [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ "1.2K gold, 300 wood":
+- [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ The entries of the tile menu for the building system (only called while `BUILDINGS_FLAG` is on, see `tileMenuItems`):
 - [`buildingOutput.ts`](../../src/lib/buildingOutput.ts) — ~ The Producer's bonus from the size of its biome, as a fraction (0.5 = +50 %):
 - [`buildingText.ts`](../../src/lib/buildingText.ts) — ~ The plain-language lines of a Producer or Extractor card in the Build window; every number comes from `BUILDING_RULES` and the output formulas (`lib/buildingOutput.ts`).
 - [`buildings.ts`](../../src/lib/buildings.ts) — ~ Whether the building system is switched on (`BUILDINGS_FLAG`, off by default).
@@ -428,6 +430,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`floatText.ts`](../../src/lib/floatText.ts) — Tiny event bus for the "+N resource" popups that appear at the cursor.
 - [`gearEconomy.ts`](../../src/lib/gearEconomy.ts) — ~ The economy effects of the worn gear (the set bonuses of catalog/sets.ts).
 - [`globalMenu.ts`](../../src/lib/globalMenu.ts) — ~ Saves to this browser and, with an account signed in, to the cloud copy too (once every 10 minutes:
+- [`idempotencyKey.ts`](../../src/lib/idempotencyKey.ts) — An idempotency key:
 - [`idolEconomy.ts`](../../src/lib/idolEconomy.ts) — ~ What the standing Idols add to the economy:
 - [`inventory.ts`](../../src/lib/inventory.ts) — ~ What a character carries after a rebirth:
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
@@ -478,6 +481,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gemTypes.ts`](../../src/lib/offline/gemTypes.ts) — ~ An identity change the server has charged for and still has to write on the profile row (`ledger.gemShop.pending`):
 - [`gems.ts`](../../src/lib/offline/gems.ts) — ~ The server day (UTC), 1-based so that 0 can mean "never".
 - [`gemsFlow.ts`](../../src/lib/offline/gemsFlow.ts) — ~ One request to the gem shop, start to finish.
+- [`gemsParse.ts`](../../src/lib/offline/gemsParse.ts) — ~ The body of `POST /api/gems` as a typed request, or null when it is not one (the route answers 400).
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
 - [`identity.ts`](../../src/lib/offline/identity.ts) — ~ Epoch seconds of the last paid name change; null = never changed
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
@@ -508,7 +512,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineBar.ts`](../../src/lib/offlineBar.ts) — The away-time bar (IDL-64):
 - [`offlineClient.ts`](../../src/lib/offlineClient.ts) — ~ The browser side of /api/offline.
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
-- [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
+- [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ The shared shell of the signed-in game routes (/api/spawn, /api/chest, /api/kill):
 - [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
 - [`playRoute.ts`](../../src/lib/playRoute.ts) — The route of the game itself (the gate in front of it, then the game).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
@@ -796,7 +800,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pacingGuard.test.ts`](../../tests/economy/pacingGuard.test.ts)
 - [`rebirth.test.ts`](../../tests/economy/rebirth.test.ts) — ~ A run that has reached the rebirth line.
 - [`rebirthBiomes.test.ts`](../../tests/economy/rebirthBiomes.test.ts)
-- [`startPlan.test.ts`](../../tests/economy/startPlan.test.ts)
+- [`startPlan.test.ts`](../../tests/economy/startPlan.test.ts) — ~ The account's save of the game that `localSave` just built (same level and tiles), at `playSeconds`.
 - [`unbounded.test.ts`](../../tests/economy/unbounded.test.ts)
 
 **tests/**

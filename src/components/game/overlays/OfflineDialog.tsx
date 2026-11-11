@@ -3,7 +3,6 @@ import { useUiStore } from '@/stores/uiStore';
 import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
 import PixelModal from '../PixelModal';
 import ResourceIcon from '../ResourceIcon';
-import GemIcon from '../GemIcon';
 import AwayBar from '../AwayBar';
 import { useGameStore } from '@/stores/gameStore';
 import { offlineBar } from '@/lib/offlineBar';
@@ -30,15 +29,15 @@ const OfflineDialog: React.FC = () => {
 	const earned = ORDER.filter((key) => grant.resources[key] > 0);
 
 	return (
-		<PixelModal title='Welcome back!' size='sm' onClose={close}>
-			<div className='px-card text-sm space-y-3'>
+		<PixelModal title='Welcome back!' size='md' onClose={close}>
+			<div className='flex flex-col gap-5 px-3 pb-2 pt-1 text-base'>
 				<div className='text-center'>
 					<div className='text-[#a89878]'>While you were away</div>
-					<div className='text-2xl text-[#f0d27a] tabular-nums'>{hours(grant.gapSec)}</div>
+					<div className='text-3xl text-[#f0d27a] tabular-nums mt-1'>{hours(grant.gapSec)}</div>
 				</div>
 
-				<AwayBar gapSec={grant.gapSec} capSec={grant.capSec} efficiency={grant.efficiency} />
-				<div className='text-center text-xs text-[#7a6a52]'>
+				<AwayBar gapSec={grant.gapSec} capSec={grant.capSec} efficiency={grant.efficiency} countDown />
+				<div className='text-center text-sm text-[#7a6a52] -mt-2'>
 					Your kingdom earns {offlineBar(grant).efficiencyPct}% of its income while you are away
 					{showsAwayHint(rebirths) && <div className='text-[#a89878]'>Night Watch and Steward (Ember shop) raise the cap and the pay</div>}
 				</div>
@@ -59,7 +58,7 @@ const OfflineDialog: React.FC = () => {
 					</div>
 				)}
 
-				<ul className='space-y-1 text-[#ecdcb4]'>
+				<ul className='flex flex-col gap-1.5 text-center text-[#ecdcb4]'>
 					{report.levelsGained > 0 && (
 						<li>
 							You reached <span className='text-[#f0d27a]'>level +{report.levelsGained}</span> (stat points to spend)
@@ -84,10 +83,7 @@ const OfflineDialog: React.FC = () => {
 					{report.monstersPlaced === 0 && <li className='text-[#a89878]'>The monsters on your land grew stronger while you were away</li>}
 				</ul>
 
-				<div className='flex items-center justify-between'>
-					<span className='inline-flex items-center gap-1 text-[#a89878]'>
-						<GemIcon /> {formatNumber(report.gems)} gems
-					</span>
+				<div className='flex justify-center'>
 					<button className='px-btn px-btn-gold' onClick={close}>
 						Continue
 					</button>

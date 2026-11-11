@@ -136,7 +136,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `menu_crafting` | <img src="../../public/pixel/icons/menu_crafting.png" width="96" alt="menu_crafting"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/CraftingOverlay.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_crafting.png` |
 | `menu_equipment` | <img src="../../public/pixel/icons/menu_equipment.png" width="96" alt="menu_equipment"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_equipment.png` |
 | `menu_farm` | <img src="../../public/pixel/icons/menu_farm.png" width="96" alt="menu_farm"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_farm.png` |
-| `menu_gems_pouch` | <img src="../../public/pixel/icons/menu_gems_pouch.png" width="96" alt="menu_gems_pouch"> | 64x64 | unused |  | `pixel/icons/menu_gems_pouch.png` |
+| `menu_gems_pouch` | <img src="../../public/pixel/icons/menu_gems_pouch.png" width="96" alt="menu_gems_pouch"> | 64x64 | used | src/components/game/HeaderMenu.tsx | `pixel/icons/menu_gems_pouch.png` |
 | `menu_glossary` | <img src="../../public/pixel/icons/menu_glossary.png" width="96" alt="menu_glossary"> | 64x64 | unused |  | `pixel/icons/menu_glossary.png` |
 | `menu_legacy` | <img src="../../public/pixel/icons/menu_legacy.png" width="96" alt="menu_legacy"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/RebirthDialog.tsx | `pixel/icons/menu_legacy.png` |
 | `menu_main` | <img src="../../public/pixel/icons/menu_main.png" width="80" alt="menu_main"> | 40x40 | unused |  | `pixel/icons/menu_main.png` |

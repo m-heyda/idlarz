@@ -1,79 +1,24 @@
 import { buildingDef, buildingsOfBiome, type BuildingDef } from '@/catalog/buildings';
-import {
-	buildProblem,
-	builtBuildings,
-	buildingLevelCost,
-	buildingUpgradeDuration,
-	levelOfTile,
-	moveProblem,
-	relocationCost,
-	rememberedIdolLevel,
-	upgradeProblem,
-	type BuildingContext,
-} from '@/lib/buildings';
-import { limitOf } from '@/lib/limits';
+import { buildProblem, builtBuildings, buildingLevelCost, moveProblem, relocationCost, rememberedIdolLevel, type BuildingContext } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
-import { idolEconomy } from '@/lib/idolEconomy';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import type { MapGameStore } from '@/components/game/mapSource';
 import type { Resources } from '@/types/game';
 import { canAffordBundle } from '@/utils/game/costs';
 import { economyTiles } from '@/utils/game/tiles';
-import { formatNumber, formatTime } from '@/utils/formatters';
 import { getTile } from '@/utils/world';
 
-/** "1.2K gold, 300 wood": a price for a menu label. */
-const costText = (cost: Partial<Resources>): string =>
-	Object.entries(cost)
-		.filter(([, amount]) => amount)
-		.map(([key, amount]) => `${formatNumber(amount)} ${key}`)
-		.join(', ');
-
 /**
- * The entries of the tile menu for the building system (only called while `BUILDINGS_FLAG` is on, see `tileMenuItems`): on a free tile of a biome with a Producer, "Build X" (or "Move X here" when it
- * stands elsewhere); on a tile with a building, the next level with its price and timer. A refused action stays in the menu greyed out with the reason as its hint. All numbers are the rules' (`lib/buildings.ts`), nothing is decided here.
+ * The entries of the tile menu for the building system (only called while `BUILDINGS_FLAG` is on, see `tileMenuItems`): on a free tile of a biome with a Producer, "Build here..." (the Build window, which also offers "Move X here" when it
+ * stands elsewhere). A tile with a building has none: its left click opens the building window with the upgrade. All numbers are the rules' (`lib/buildings.ts`), nothing is decided here.
  */
 export function buildingMenuItems(game: MapGameStore, x: number, y: number): ContextMenuItem[] {
 	const s = game.getState();
-	const ctx: BuildingContext = {
-		tiles: s.tiles,
-		monsters: s.monsters,
-		castleLevel: castleLevelOf(s.tiles),
-		castleUpgrade: s.castleUpgrade,
-		buildingUpgrade: s.buildingUpgrade ?? null,
-		ownedTiles: economyTiles(s.tiles, s.freeTiles),
-	};
 	const tile = getTile(s.tiles, x, y);
 	if (!tile) return [];
 
-	const here = buildingDef(tile.building);
-	if (here) {
-		const level = levelOfTile(tile);
-		const running = s.buildingUpgrade && s.buildingUpgrade.x === x && s.buildingUpgrade.y === y ? s.buildingUpgrade : null;
-		if (running) {
-			return [
-				{
-					id: 'building-upgrading',
-					label: `${here.label} ${level}: level ${running.toLevel} in ${formatTime(Math.max(1, Math.ceil(running.remainingSec)))}`,
-					disabled: true,
-					onSelect: () => {},
-				},
-			];
-		}
-		if (level >= (here.kind === 'idol' ? limitOf('idolMaxLevel') : 5))
-			return [{ id: 'building-max', label: `${here.label}: highest level`, disabled: true, onSelect: () => {} }];
-		const cost = buildingLevelCost(level + 1, ctx.ownedTiles, here);
-		const problem = upgradeProblem(ctx, x, y) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
-		return [
-			{
-				id: 'building-upgrade',
-				label: `Upgrade ${here.label} to level ${level + 1} (${costText(cost)}, ${formatTime(buildingUpgradeDuration(level, s.prestige, idolEconomy(s.tiles, s.idolLevels ?? {}).buildTimePct))})`,
-				disabled: !!problem,
-				hint: problem ?? undefined,
-				onSelect: () => void game.getState().upgradeBuilding?.(x, y),
-			},
-		];
-	}
+	// a tile with a building has no entry here: a left click opens the building window (components/game/overlays/BuildingModal.tsx), which holds the upgrade
+	if (buildingDef(tile.building)) return [];
 
 	// "Build here..." opens the Build window (components/game/overlays/BuildModal.tsx), which lists the same rows (`buildOptions`)
 	const { builds } = buildOptions(game, x, y);

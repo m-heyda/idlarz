@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, growTo, store } from '../helpers';
 import { pickPersisted } from '../../src/lib/sanitizeSave';
-import { canResumeTab, cloudSaveGone, planStart, savedGameSummary, skipsHub, type CloudInfo } from '../../src/lib/startPlan';
+import { canResumeTab, cloudSaveGone, SAME_GAME_SLACK_SEC, planStart, savedGameSummary, skipsHub, type CloudInfo } from '../../src/lib/startPlan';
+import { countOwnedTiles } from '../../src/utils/game/tiles';
 import type { SavePeek } from '../../src/lib/saveStorage';
 
 const localSave = (playSeconds: number): SavePeek => {
@@ -11,12 +12,11 @@ const localSave = (playSeconds: number): SavePeek => {
 	store.setState({ playSeconds } as never);
 	return { kind: 'ok', state: structuredClone(pickPersisted(api())), savedAt: 1, fromBackup: false };
 };
-const cloudAt = (rev: number, playSeconds: number): CloudInfo => ({
-	rev,
-	serverSavedAt: 1,
-	text: 'IDLZ2.x',
-	summary: { level: 1, tilesOwned: 10, playSeconds, gold: 1 },
-});
+/** The account's save of the game that `localSave` just built (same level and tiles), at `playSeconds`. */
+const cloudAt = (rev: number, playSeconds: number): CloudInfo => {
+	const state = pickPersisted(api());
+	return { rev, serverSavedAt: 1, text: 'IDLZ2.x', summary: { level: state.level.level, tilesOwned: countOwnedTiles(state.tiles), playSeconds, gold: 1 } };
+};
 const NONE: SavePeek = { kind: 'none' };
 
 test('nothing anywhere: straight into a new game; nothing in the account: the hub for the local save', () => {
@@ -37,13 +37,13 @@ test('a new browser (or an unreadable save) gets the account save, never a silen
 test('this browser continues the account save: no choice; anything else asks', () => {
 	const local = localSave(700);
 	assert.deepEqual(planStart(local, cloudAt(4, 600), { userId: 'u', rev: 4 }, 'u'), { kind: 'hub', mode: 'local' });
-	assert.deepEqual(planStart(local, cloudAt(5, 600), { userId: 'u', rev: 4 }, 'u'), { kind: 'hub', mode: 'choose' }, 'played elsewhere since');
+	assert.deepEqual(planStart(local, cloudAt(5, 1500), { userId: 'u', rev: 4 }, 'u'), { kind: 'hub', mode: 'choose' }, 'played elsewhere since');
 	assert.deepEqual(
 		planStart(local, cloudAt(4, 600), { userId: 'other', rev: 4 }, 'u'),
 		{ kind: 'hub', mode: 'cloud' },
 		'linked to another account: that game is not offered (/play puts it aside)',
 	);
-	assert.deepEqual(planStart(local, cloudAt(4, 600), null, 'u'), { kind: 'hub', mode: 'choose' }, 'never linked');
+	assert.deepEqual(planStart(local, cloudAt(4, 1500), null, 'u'), { kind: 'hub', mode: 'choose' }, 'never linked');
 });
 
 test("a tab already playing skips the start check only while it holds this account's link", () => {
@@ -81,4 +81,13 @@ test('the landing summary is the more played game', () => {
 	assert.equal(savedGameSummary(local, cloudAt(1, 900))?.playSeconds, 900);
 	assert.equal(savedGameSummary(local, cloudAt(1, 100))?.playSeconds, 500);
 	assert.equal(savedGameSummary(local, 'unavailable')?.playSeconds, 500);
+});
+
+test('two saves a minute apart are the same game: no choice; a real difference still asks', () => {
+	const local = localSave(700);
+	assert.deepEqual(planStart(local, cloudAt(4, 640), null, 'u'), { kind: 'hub', mode: 'local' }, 'a minute behind');
+	assert.deepEqual(planStart(local, cloudAt(4, 700 + SAME_GAME_SLACK_SEC), null, 'u'), { kind: 'hub', mode: 'local' }, 'at the edge');
+	assert.deepEqual(planStart(local, cloudAt(4, 700 + SAME_GAME_SLACK_SEC + 1), null, 'u'), { kind: 'hub', mode: 'choose' }, 'past the edge');
+	const behind = { ...cloudAt(4, 700), summary: { ...cloudAt(4, 700).summary, level: 3 } };
+	assert.deepEqual(planStart(local, behind, null, 'u'), { kind: 'hub', mode: 'choose' }, 'a different level is a different game');
 });

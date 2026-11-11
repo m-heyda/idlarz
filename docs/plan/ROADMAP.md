@@ -21,6 +21,7 @@ The one place to look when planning the next step. It lists only what is **still
 | Launch achievements, tutorial steps and bundles | [21](21-classes-avatars-achievements-offline-report.md) | IDL-73, 74, 194 |
 | Crafting unlocks, salvage, War Medal legendary craft | [17](17-crafting.md) | IDL-152, 151, 120 |
 | Ember price book, cosmetics, Monument, autobuyers | [18](18-biome-buildings-and-material-tiers.md) section 6 | IDL-97, 184, 185, 195 |
+| Hero customisation: click name or badge, nickname glow, name colour, frames (gem One-time tab) | [30](30-gem-sinks.md) section 5 | IDL-296 |
 | Map size, milestones (the tile price tail is built, IDL-79/181) | [18](18-biome-buildings-and-material-tiers.md) | IDL-131, 198 |
 | Rankings (four boards, daily snapshot), preview map, +20 attribute points | [15](15-leaderboard-and-world-preview.md), [13](13-rebirth-reset-and-paragon.md) | IDL-113, 115, 100 |
 | Paragon | [13](13-rebirth-reset-and-paragon.md) section 5 | IDL-104, 186, 187 |

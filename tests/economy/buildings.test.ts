@@ -422,3 +422,17 @@ test('the Extractors save, load and are judged like the Producers (the T3 stock 
 		if (old.ok) assert.equal(old.state.resources.sap, 0);
 	});
 });
+
+test('every Producer and Extractor has lore for its window, and a right-click menu on a building offers nothing (a left click opens the window)', async () => {
+	const { BUILDINGS, BUILDING_LORE } = await import('../../src/catalog/buildings');
+	for (const def of BUILDINGS.filter((b) => b.kind !== 'idol')) assert.ok((BUILDING_LORE[def.id] ?? '').length > 20, `${def.id} has lore`);
+});
+
+test('farm sprites: cows (first look), pigs and sheep look right, chickens look left', async () => {
+	const { facesRight } = await import('../../src/config/pixelIcons');
+	assert.equal(facesRight('animal_pig'), true);
+	assert.equal(facesRight('animal_cow_1'), true);
+	assert.equal(facesRight('animal_sheep'), true);
+	assert.equal(facesRight('animal_chicken_1'), false);
+	assert.equal(facesRight('animal_cow_2'), false);
+});
