@@ -4,14 +4,14 @@ import { formatCompact, formatNumber } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
-import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
+import { monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import { SLASH_FRAME, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import { winBucketOf, type WinBucket } from '@/lib/combat';
 import { isBoss, monsterDef, monsterStats } from '@/lib/monsters';
 import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
 import type { BagSlot, CombatNotice, MonsterType } from '@/types/game';
-import MonsterArt from '../MonsterArt';
+import MonsterArt, { labPreviewOf } from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
 import ResourceIcon from '../ResourceIcon';
 import { slotProps } from '../itemUi';
@@ -215,7 +215,7 @@ export interface CombatPanelProps {
 const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 	const { monster, flip, fight, over, player, cd } = p;
 	const def = monsterDef(monster.type);
-	const wip = MONSTER_CATALOG.find((m) => m.id === (monster.art ?? monster.type));
+	const wip = labPreviewOf(monster.art);
 	const label = wip?.label ?? def.label;
 	const boss = wip ? wip.grade === 'boss' : def.grade === 'boss';
 	const traits = monsterStats(monster.type, monster.level);

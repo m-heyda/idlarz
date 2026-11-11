@@ -6,7 +6,7 @@ import { MONSTERS } from '@/config/combatConfig';
 import { MONSTER_CATALOG } from '@/catalog/monsters';
 import { formatCompact } from '@/utils/formatters';
 import { growthSecondsLeft, isBoss, maxLevelOf, monsterStats } from '@/lib/monsters';
-import { useIsDiscovered } from '@/stores/bestiaryStore';
+import { useBestiaryStore, useIsDiscovered } from '@/stores/bestiaryStore';
 import { useMapSource } from './mapSource';
 import { useMapTipLayer } from './MapTipLayer';
 import { TileStatus } from './TileStatus';
@@ -21,6 +21,8 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 	lineOpen,
 }) => {
 	const state = useMapSource().game.getState();
+	// the server's count of this type's kills (the bestiary store; a tip only shows for a type the player has met, so 0 reads as "none yet")
+	const kills = useBestiaryStore((s) => s.kills[type] ?? 0);
 	const wip = art ? MONSTER_CATALOG.find((m) => m.id === art) : undefined;
 	if (wip) {
 		return (
@@ -43,6 +45,7 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 				{MONSTERS[type].label} - Lv {formatCompact(level)} - {formatCompact(stats.maxHp)} HP
 			</div>
 			{isBoss(type) && <div className='text-[#ff8a6a] font-bold'>BOSS</div>}
+			<div className='px-tip-muted'>Defeated: {formatCompact(kills)}</div>
 			{monster && (
 				<div className='px-tip-muted'>
 					Level {formatCompact(level)} of{' '}

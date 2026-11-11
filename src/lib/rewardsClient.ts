@@ -32,6 +32,11 @@ export const provideBestiarySink = (fn: (report: BestiaryReport) => void): void 
 	bestiarySink = fn;
 };
 
+/** Hands the monster discoveries of an answer to the bestiary store. Every answer that can put monsters on the map calls it first (the login claim included), so the browser knows what is met before it draws them. */
+export const deliverBestiary = (bestiary: BestiaryReport | undefined): void => {
+	if (bestiary && Array.isArray(bestiary.seen)) bestiarySink?.(bestiary);
+};
+
 const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 	const invVer = path === '/api/inventory' ? null : invVerOf();
 	if (invVer !== null && typeof body === 'object' && body !== null) body = { ...body, invVer };
@@ -51,8 +56,7 @@ const post = async <T>(path: string, body: unknown): Promise<Reply<T>> => {
 		const value = (await response.json()) as T;
 		const report = (value as { achievements?: AchievementReport } | null)?.achievements;
 		if (report && Array.isArray(report.earned)) achievementSink?.(report);
-		const bestiary = (value as { bestiary?: BestiaryReport } | null)?.bestiary;
-		if (bestiary && Array.isArray(bestiary.seen)) bestiarySink?.(bestiary);
+		deliverBestiary((value as { bestiary?: BestiaryReport } | null)?.bestiary);
 		return { status: 'ok', value };
 	} catch {
 		return { status: 'unavailable' };
