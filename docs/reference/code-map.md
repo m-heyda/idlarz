@@ -448,6 +448,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`service.ts`](../../src/lib/offline/service.ts) — ~ The server-only secret that seals rolls (LOOT_SECRET)
 - [`spawnWeights.ts`](../../src/lib/offline/spawnWeights.ts) — ~ Win chance range that is worth a fight:
 - [`stats.ts`](../../src/lib/offline/stats.ts) — SERVER ONLY. The lifetime counters of a player (`player_ledger.stats`): kills per monster type, chests opened, tiles bought and the income earned while playing.
+- [`statsReset.ts`](../../src/lib/offline/statsReset.ts) — ~ The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, chests, achievements):
 - [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger as the `player_ledger` row it is stored as (also what the migration script writes).
 - [`tickets.ts`](../../src/lib/offline/tickets.ts) — ~ Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny).
 - [`tutorial.ts`](../../src/lib/offline/tutorial.ts) — ~ `unknown`:

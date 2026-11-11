@@ -10,7 +10,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog), [`BodyUpgrade`](#bodyupgrade), [`upgradeBody`](#upgradebody)
 - Uploading: [`SYNC`](#sync), [`judgeRebase`](#judgerebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
 - Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`settleIdols`](#settleidols), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
-- The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`finite`](#finite), [`LedgerRowUpgrade`](#ledgerrowupgrade), [`loadBootSnapshot`](#loadbootsnapshot)
+- The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`finite`](#finite), [`LedgerRowUpgrade`](#ledgerrowupgrade), [`statsWithoutTutorial`](#statswithouttutorial), [`loadBootSnapshot`](#loadbootsnapshot)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
 - Epoch: [`BASELINE_EPOCH`](#baseline-epoch), [`startNewChapter`](#startnewchapter)
@@ -572,6 +572,15 @@ export const LEDGER_ROW_UPGRADES: readonly LedgerRowUpgrade[] = [
 
 See also: `ledgerFromRow`, [`upgradeBody`](saves-and-server.md#upgradebody)
 
+<a id="statswithouttutorial"></a>
+
+### `statsWithoutTutorial` <small>function</small>
+
+Source: [`src/lib/offline/statsReset.ts:11`](../../src/lib/offline/statsReset.ts)
+
+The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, chests, achievements): what a season restart (`reset-players` without `--reset-stats`)
+writes, so every player starts the new game with the guided tutorial again and its bundles can pay again. null when nothing is left to store (the column stays empty). `--reset-stats` and a New Game / new chapter clear the whole column instead.
+
 <a id="loadbootsnapshot"></a>
 
 ### `loadBootSnapshot` <small>function</small>
@@ -679,15 +688,15 @@ and tab still on the old epoch is refused by the server until it reloads. While 
 
 ### `startNewChapter` <small>function</small>
 
-Source: [`src/lib/offline/chapter.ts:42`](../../src/lib/offline/chapter.ts)
+Source: [`src/lib/offline/chapter.ts:51`](../../src/lib/offline/chapter.ts)
 
 Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.
 
 - An account already on the server's epoch gets `{ ok, already: true }` and nothing is touched, so a repeated request, a second tab or a lost response is harmless.
 - Otherwise: the name, class and avatar (already checked against the account's achievements by the route) are saved first (a name another account holds ends it here with nothing reset), then the game is replaced exactly like a New Game
   (the old save is first archived into a **pinned** `save_history` row flagged `epoch_archive` that is never trimmed, and only if that worked `startNewGame` runs: the save, its map, the leaderboard row and the rebirth log are
-  deleted and the ledger starts a new run with its counters and stats zeroed; account, reserved name and gems stay), an account that predates epochs gets the early-tester
-  grant, and the profile moves to the new epoch **last**: a failure in between leaves the account on the old epoch, and the retry is the same request again.
+  deleted and the ledger starts a new run with its counters and stats zeroed (kills, glossary, tutorial, achievements); account and reserved name stay, the gems are set to the starting gift (`STARTING_GEMS`, flat), every earned achievement and its unlocks are deleted), an account that predates epochs then gets the early-tester
+  grant (the tester avatar), and the profile moves to the new epoch **last**: a failure in between leaves the account on the old epoch, and the retry is the same request again.
 - A stale tab cannot overwrite the fresh start: its requests carry the old epoch and are refused (`isStaleEpoch`), and a save for a row that no longer exists is a conflict
   (`acceptSave`), never a silent re-creation.
 

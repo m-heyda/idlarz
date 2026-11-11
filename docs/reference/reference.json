@@ -1989,7 +1989,7 @@
   "kind": "function",
   "category": "Saves & Server/Epoch",
   "file": "src/lib/offline/chapter.ts",
-  "line": 42,
+  "line": 51,
   "summary": "Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.",
   "see": []
  },
@@ -2292,6 +2292,17 @@
   "file": "src/lib/offline/spawnWeights.ts",
   "line": 49,
   "summary": "Weight of each type for this player and castle level, in the order given.",
+  "see": []
+ },
+ {
+  "id": "statswithouttutorial",
+  "name": "statsWithoutTutorial",
+  "symbol": "statsWithoutTutorial",
+  "kind": "function",
+  "category": "Saves & Server/The ledger",
+  "file": "src/lib/offline/statsReset.ts",
+  "line": 11,
+  "summary": "The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, chests, achievements): what a season restart (`reset-players` without `--reset-stats`) writes, so every player starts the new game with the guided tutorial again and its bundles can pay again. null when nothing is left to store (the column stays empty). `--reset-stats` and a New Game / new chapter clear the whole column instead.",
   "see": []
  },
  {
