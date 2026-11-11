@@ -133,9 +133,13 @@ body {
 		background: rgba(60, 38, 16, 0.45);
 	}
 
+	/* open: no box around the whole button (it doubled the portrait's own frame); the portrait itself glows gold */
 	&[data-active='true'] {
-		border-color: #c08a30;
-		background: rgba(90, 56, 20, 0.55);
+		background: rgba(90, 56, 20, 0.3);
+	}
+
+	&[data-active='true'] .pixel-avatar {
+		filter: drop-shadow(0 0 3px rgba(240, 210, 122, 0.9));
 	}
 }
 
@@ -145,8 +149,8 @@ body {
 	justify-content: center;
 	position: relative;
 	flex-shrink: 0;
-	width: 44px;
-	height: 44px;
+	/* as big as the portrait, so the level badge sits on the portrait's own corner */
+	line-height: 0;
 	/* no frame of its own: the portrait art already has one (a second border made a double edge) */
 	image-rendering: pixelated;
 }
@@ -154,8 +158,9 @@ body {
 /* the level badge pinned to the portrait's corner like a badge */
 .pixel-avatar-orb {
 	position: absolute;
-	left: -6px;
-	bottom: -6px;
+	right: -5px;
+	bottom: -5px;
+	z-index: 5; /* above the portrait's frame */
 }
 
 /* the attention dot sits on the top edge of the portrait */
