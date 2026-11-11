@@ -107,7 +107,7 @@ export const WindowButtons: React.FC = () => {
 	const order = useWindowStore((state) => state.order);
 	const toggleWindow = useWindowStore((state) => state.toggleWindow);
 	const attention = useMenuAttention();
-	const dots: Partial<Record<WinId, boolean>> = { farm: attention.farm };
+	const dots: Partial<Record<WinId, boolean>> = { farm: attention.farm, achievements: attention.achievements };
 	return (
 		<div className='flex items-center gap-1'>
 			{WINDOW_BUTTONS.filter(({ id }) => id !== 'achievements' || guideLive()).map(({ id, label, icon }) => (
@@ -130,7 +130,7 @@ export const WindowButtons: React.FC = () => {
 					}}
 				>
 					<PixelIcon name={icon} alt='' scale={0.6} />
-					<NotifyDot show={!!dots[id]} label='An animal or upgrade is affordable' />
+					<NotifyDot show={!!dots[id]} label={id === 'achievements' ? 'An achievement is ready to claim' : 'An animal or upgrade is affordable'} />
 				</div>
 			))}
 		</div>

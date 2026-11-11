@@ -25,12 +25,14 @@ export interface ChapterRepo {
 }
 
 export const EARLY_TESTER = 'early_tester';
+/** Granted with the Early tester (catalog `withAchievement`) */
+export const BETA_TESTER = 'beta_tester';
 
 /**
  * The achievements an account will hold once its new chapter has started: none, except `early_tester` for an account that predates epochs (profile epoch null). The avatar picker and its server check use this
  * instead of the stored rows for an account that still has to reset, so the tester avatar can be picked on the chapter screen and no old unlock can.
  */
-export const earnedAfterReset = (epoch: number | null): string[] => (epoch === null ? [EARLY_TESTER] : []);
+export const earnedAfterReset = (epoch: number | null): string[] => (epoch === null ? [EARLY_TESTER, BETA_TESTER] : []);
 
 export type ChapterOutcome = { kind: 'ok'; already: boolean } | { kind: 'name_taken' } | { kind: 'no_profile' } | { kind: 'archive_failed' };
 
@@ -72,7 +74,10 @@ export const startNewChapter = async (
 	}
 	await startNewGame(deps, userId, nowMs, { gems: STARTING_GEMS });
 	await repo.clearAchievements(userId);
-	if (profile.epoch === null) await repo.grantAchievement(userId, EARLY_TESTER);
+	if (profile.epoch === null) {
+		await repo.grantAchievement(userId, EARLY_TESTER);
+		await repo.grantAchievement(userId, BETA_TESTER);
+	}
 	await repo.setEpoch(userId, serverEpoch);
 	return { kind: 'ok', already: false };
 };

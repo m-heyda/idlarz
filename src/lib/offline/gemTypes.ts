@@ -1,3 +1,4 @@
+import type { AchievementReport } from '@/lib/offline/achievements';
 import type { Attrs } from '@/lib/offline/attrs';
 
 // What goes over the wire for /api/gems and /api/character. Kept apart from the server logic so the browser can import it (no node:crypto, no database).
@@ -18,7 +19,7 @@ export interface GemShop {
 	pending: PendingIdentity | null;
 }
 
-export type GemsRequest = { action: 'status' } | { action: 'daily' } | { action: 'spend'; itemId: string; value?: string };
+export type GemsRequest = { action: 'status' } | { action: 'daily' } | { action: 'claim'; id: string } | { action: 'spend'; itemId: string; value?: string };
 
 export interface DailyInfo {
 	/** Whether today's bonus can be claimed now */
@@ -40,6 +41,7 @@ export type GemsRefusal =
 	| 'nothing_to_respec'
 	| 'pending'
 	| 'already_claimed'
+	| 'not_earned'
 	| 'no_profile';
 
 /** What /api/gems answers. The balance is always the server's; `attrs` rides along after a respec. */
@@ -62,6 +64,8 @@ export interface GemsReply {
 	/** Gems the request charged (0 for a free respec) or the daily bonus paid */
 	paid?: number;
 	attrs?: Attrs;
+	/** The achievements as they stand after a claim (every online answer may carry it: the achievement store takes it) */
+	achievements?: AchievementReport;
 	serverNowSec: number;
 }
 

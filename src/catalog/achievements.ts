@@ -37,13 +37,15 @@ export interface AchievementDef {
 	rewards: AchievementRewards;
 	/** File name (no extension) in `public/pixel/new_assets/achievements/`; swapping the art later is changing this string */
 	badge: string;
+	/** Granted together with another (manual) achievement: the Beta tester comes with the Early tester */
+	withAchievement?: string;
 	/** The badge is a stand-in until art for this achievement exists */
 	badgePlaceholder?: boolean;
 }
 
 /**
- * The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds
- * ({@link settleAchievements}); the early tester is granted by the new chapter reset instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
+ * The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
+ * ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
  * The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
  *
  * @title Achievements
@@ -146,8 +148,17 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Early tester',
 		description: 'Played before the new chapter.',
 		when: { kind: 'manual' },
-		badge: 'badge_early_tester_wireframe',
+		badge: 'badge_early_tester_special',
 		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester' },
+	},
+	{
+		id: 'beta_tester', // granted with the Early tester (`withAchievement`): by the reset, and for the accounts that already had it
+		title: 'Beta tester',
+		description: 'Played in the closed beta.',
+		when: { kind: 'manual' },
+		withAchievement: 'early_tester',
+		badge: 'badge_early_tester_wireframe',
+		rewards: { gems: 200, avatarId: 'beta_tester', titleId: 'beta-tester' },
 	},
 ];
 

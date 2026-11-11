@@ -199,6 +199,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
 - [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ The away-time bar (IDL-64):
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
+- [`BetaTesterBadge.tsx`](../../src/components/game/BetaTesterBadge.tsx) — ~ Who wears the tester medal:
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
@@ -214,7 +215,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
 - [`CostList.tsx`](../../src/components/game/CostList.tsx) — ~ A bundle of resource costs; each entry is green when affordable and red when not.
 - [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
-- [`EarlyTesterBadge.tsx`](../../src/components/game/EarlyTesterBadge.tsx) — ~ The Early tester medal shown next to a name (the Character window and the landing's Continue card); the caller decides who has earned it.
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
@@ -362,6 +362,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/lib/**
 
+- [`achievementView.ts`](../../src/lib/achievementView.ts) — What the Achievements window needs to know about one row, built from the fields of the server's achievement report.
 - [`ambientLife.ts`](../../src/lib/ambientLife.ts) — ~ Visible part of the map in tile coordinates (inclusive).
 - [`authCallback.ts`](../../src/lib/authCallback.ts) — ~ The page that sets a new password after the emailed link.
 - [`authClient.ts`](../../src/lib/authClient.ts) — ~ The browser side of /api/auth/*:
@@ -557,7 +558,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/stores/**
 
-- [`achievementStore.ts`](../../src/stores/achievementStore.ts) — ~ The achievements the server says the player has earned (an id list it sends with the spawn poll) and the toast when a request pays a new one.
+- [`achievementStore.ts`](../../src/stores/achievementStore.ts) — ~ The achievements the server says the player has earned and claimed, with the times (all from the answers; the browser never decides).
 - [`bestiaryStore.ts`](../../src/stores/bestiaryStore.ts) — ~ The monsters the player has met (the server's `stats.seen`, sent with every online answer) and the kills per type (`stats.kills`).
 - [`craftStore.ts`](../../src/stores/craftStore.ts) — ~ One shared empty stock:
 
@@ -884,6 +885,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`achievementView.test.ts`](../../tests/ui/achievementView.test.ts)
 - [`avatarArt.test.ts`](../../tests/ui/avatarArt.test.ts)
 - [`avatarPick.test.ts`](../../tests/ui/avatarPick.test.ts) — ~ A fake client store and server:
 - [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)

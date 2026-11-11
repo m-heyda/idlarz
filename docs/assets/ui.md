@@ -154,7 +154,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `unknown` | <img src="../../public/pixel/icons/unknown.png" width="48" alt="unknown"> | 11x14 | used | src/components/game/Tile.tsx, src/lib/cloudClient.ts, src/lib/offline/tutorial.ts | `pixel/icons/unknown.png` |
+| `unknown` | <img src="../../public/pixel/icons/unknown.png" width="48" alt="unknown"> | 11x14 | used | src/components/game/Tile.tsx, src/lib/cloudClient.ts, src/lib/offline/achievements.ts | `pixel/icons/unknown.png` |
 
 ## wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)
 
