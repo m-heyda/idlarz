@@ -16,7 +16,7 @@ import { limitOf } from '../../src/lib/limits';
 import { starterBag } from '../../src/lib/inventory';
 import { claimOffline, startNewGame, type ClaimResult, type ServiceDeps } from '../../src/lib/offline/service';
 import { normalsOf } from '@/lib/offline/tickets';
-import { startNewChapter, EARLY_TESTER, earnedAfterReset, type ChapterRepo } from '../../src/lib/offline/chapter';
+import { startNewChapter, BETA_TESTER, EARLY_TESTER, earnedAfterReset, type ChapterRepo } from '../../src/lib/offline/chapter';
 import { epochFromHeader, isStaleEpoch, needsResetFor } from '../../src/config/epoch';
 import type { PlayerClassId } from '../../src/config/playerClasses';
 
@@ -465,8 +465,8 @@ test('the flip: the old game is archived for good, then replaced completely: gem
 	assert.deepEqual([after.stats.achievements, after.stats.seen], [[], {}], 'achievements and the glossary are wiped');
 	assert.equal(after.runId, before.runId + 1, 'a new run: sealed rolls never repeat');
 	assert.deepEqual([state.name, state.playerClass, state.epoch], ['Nova', 'mage', 2]);
-	assert.deepEqual(state.granted, [EARLY_TESTER], 'the old unlocks are gone, only the early-tester mark is left');
-	assert.deepEqual(earnedAfterReset(null), [EARLY_TESTER]);
+	assert.deepEqual(state.granted, [EARLY_TESTER, BETA_TESTER], 'the old unlocks are gone, only the tester marks are left');
+	assert.deepEqual(earnedAfterReset(null), [EARLY_TESTER, BETA_TESTER]);
 	assert.deepEqual(earnedAfterReset(1), [], 'an account that already had a chapter keeps no tester mark');
 	// the same request again (a second tab, a lost answer): nothing is touched
 	const again = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + 2 * HOUR, 2);

@@ -704,7 +704,7 @@ and tab still on the old epoch is refused by the server until it reloads. While 
 
 ### `startNewChapter` <small>function</small>
 
-Source: [`src/lib/offline/chapter.ts:51`](../../src/lib/offline/chapter.ts)
+Source: [`src/lib/offline/chapter.ts:53`](../../src/lib/offline/chapter.ts)
 
 Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.
 

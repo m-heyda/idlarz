@@ -54,7 +54,15 @@ export const AvatarsAllUnlocked: Story = {
 export const AchievementsHalfEarned: Story = {
 	render: () => (
 		<div style={{ width: 720, padding: 24, color: '#f1e6c8' }}>
-			<AchievementList earned={ACHIEVEMENTS.filter((_, i) => i % 2 === 0).map((a) => a.id)} />
+			<AchievementList
+				report={{
+					earned: ACHIEVEMENTS.filter((_, i) => i % 2 === 0).map((a) => a.id),
+					claimed: ACHIEVEMENTS.filter((_, i) => i % 4 === 0).map((a) => a.id),
+					earnedAt: Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, Date.UTC(2026, 10, 12)])),
+					claimedAt: Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, Date.UTC(2026, 10, 13)])),
+				}}
+				onClaim={() => undefined}
+			/>
 		</div>
 	),
 };
@@ -62,7 +70,7 @@ export const AchievementsHalfEarned: Story = {
 export const AchievementsNoneEarned: Story = {
 	render: () => (
 		<div style={{ width: 720, padding: 24, color: '#f1e6c8' }}>
-			<AchievementList earned={[]} />
+			<AchievementList report={{ earned: [] }} />
 		</div>
 	),
 };

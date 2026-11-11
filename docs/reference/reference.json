@@ -50,8 +50,8 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 55,
-  "summary": "The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds ({@link settleAchievements}); the early tester is granted by the new chapter reset instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
+  "line": 57,
+  "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
    "achievementsDue"
@@ -1991,17 +1991,28 @@
   "see": []
  },
  {
+  "id": "claimachievement",
+  "name": "claimAchievement",
+  "symbol": "claimAchievement",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/offline/achievements.ts",
+  "line": 106,
+  "summary": "The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time. Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.",
+  "see": []
+ },
+ {
   "id": "settleachievements",
   "name": "settleAchievements",
   "symbol": "settleAchievements",
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 111,
-  "summary": "Lazy evaluation, once per online request: the achievements that became due are paid and recorded in the same ledger write (a compare-and-swap, so two requests at once cannot both pay; a replayed request finds the id recorded and pays nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
+  "line": 156,
+  "summary": "Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
   "see": [
    "achievementsDue",
-   "payAchievements"
+   "earnAchievements"
   ]
  },
  {
@@ -2057,7 +2068,7 @@
   "kind": "function",
   "category": "Saves & Server/Epoch",
   "file": "src/lib/offline/chapter.ts",
-  "line": 51,
+  "line": 53,
   "summary": "Starts the new chapter for one account, once: the answer to `POST /api/auth/epoch`.",
   "see": []
  },

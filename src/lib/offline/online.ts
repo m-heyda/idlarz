@@ -32,7 +32,7 @@ import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
-import { reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
+import { claimAchievement, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
 import { bestiaryOf } from '@/lib/offline/stats';
 import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
 
@@ -107,7 +107,7 @@ const onlineStep = async <T>(
 		const env: CombatEnv = { secret: deps.secret, userId, stored, nowSec };
 		const out = await body({ ledger: { ...ledger, bank }, stored, bank, nowSec, env, place });
 		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
-		const settled = settleAchievements(out.ledger, stored.summary);
+		const settled = settleAchievements(out.ledger, stored.summary, nowMs);
 		unlocked = settled.unlocked;
 		const value = withBestiary(withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements), settled.ledger);
 		// a poll (no key) keeps the record of the last keyed request: its answer may still have to be replayed for a retry
@@ -366,6 +366,19 @@ export const gemsStep = (
 			const claim = claimDaily(ledger, ctx.nowSec);
 			if (!claim) return refused('already_claimed', "Today's bonus is already claimed.");
 			return { ledger: claim.ledger, value: { ...gemsView(claim.ledger, ctx.nowSec, identity), paid: claim.gems } };
+		}
+		if (request.action === 'claim') {
+			// the Claim button of the Achievements window: pays the rewards of one earned achievement, once
+			const claimed = claimAchievement(ledger, request.id, nowMs);
+			if (!claimed.ok)
+				return refused(
+					claimed.reason === 'already_claimed' ? 'already_claimed' : 'not_earned',
+					claimed.reason === 'already_claimed' ? 'That reward is already claimed.' : 'That achievement is not earned yet.',
+				);
+			return {
+				ledger: claimed.ledger,
+				value: { ...gemsView(claimed.ledger, ctx.nowSec, identity), paid: claimed.gems, achievements: reportOf(claimed.ledger, []) },
+			};
 		}
 		if (!identity) return refused('no_profile', 'There is no hero to change yet.');
 		if (blocked) return refused(blocked.reason, blocked.message);

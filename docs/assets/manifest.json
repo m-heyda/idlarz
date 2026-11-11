@@ -21275,7 +21275,7 @@
 		"usedBy": [
 			"src/components/game/Tile.tsx",
 			"src/lib/cloudClient.ts",
-			"src/lib/offline/tutorial.ts"
+			"src/lib/offline/achievements.ts"
 		],
 		"name": "unknown",
 		"category": "ui",

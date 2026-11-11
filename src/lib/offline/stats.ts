@@ -28,6 +28,16 @@ export interface LifetimeStats {
 	tutorial: TutorialProgress;
 	/** Achievement ids already paid (their gems are in the ledger). The server's record of "paid once"; `player_achievements` mirrors it. Additive: a row without it reads as none earned. */
 	achievements: string[];
+	/**
+	 * Achievement ids whose rewards the player has claimed (the gems are in the ledger from the claim on). `null` = a row from before claiming existed: everything earned then was paid at once, so the first settle after the deploy
+	 * turns it into a copy of `achievements` (nothing is paid twice). Additive: a row without it reads as null.
+	 */
+	claimed: string[] | null;
+	/** When each achievement was earned and claimed (epoch ms), for the Achievements window; absent for the ones earned before this was kept */
+	earnedAt: Record<string, number>;
+	claimedAt: Record<string, number>;
+	/** The manual achievements (the testers) held in `player_achievements` have been merged into `achievements` once */
+	manualSynced: boolean;
 }
 
 /** Counters are written to the ledger at most this often by the save path (kills and chests are written with their own request, which writes the ledger anyway). */
@@ -46,6 +56,10 @@ export const emptyStats = (): LifetimeStats => ({
 	tilesAt: 0,
 	tutorial: emptyProgress(),
 	achievements: [],
+	claimed: null,
+	earnedAt: {},
+	claimedAt: {},
+	manualSynced: false,
 });
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
@@ -76,6 +90,22 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		tilesAt: Math.floor(num(r.tilesAt)),
 		tutorial: readProgress(r.tutorial),
 		achievements: ids(r.achievements),
+		claimed: Array.isArray(r.claimed) ? ids(r.claimed) : null,
+		earnedAt: counts(r.earnedAt),
+		claimedAt: counts(r.claimedAt),
+		manualSynced: r.manualSynced === true,
+	};
+};
+
+/** The stored form: the claim fields are left out while they hold nothing (a row from before claiming existed stays byte-for-byte what it was; `claimed: null` means "not initialised", which is the same as absent). */
+export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
+	const { claimed, earnedAt, claimedAt, manualSynced, ...rest } = s;
+	return {
+		...rest,
+		...(claimed !== null ? { claimed } : {}),
+		...(Object.keys(earnedAt).length > 0 ? { earnedAt } : {}),
+		...(Object.keys(claimedAt).length > 0 ? { claimedAt } : {}),
+		...(manualSynced ? { manualSynced } : {}),
 	};
 };
 
@@ -90,7 +120,10 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	Object.keys(s.seen).length === 0 &&
 	Object.keys(s.income).length === 0 &&
 	isEmptyProgress(s.tutorial) &&
-	s.achievements.length === 0;
+	s.achievements.length === 0 &&
+	!s.manualSynced &&
+	(s.claimed === null || s.claimed.length === 0) &&
+	Object.keys(s.earnedAt).length === 0;
 
 /** A kill of monster `type`: counted once, when the server pays it. */
 export const recordKill = (stats: LifetimeStats, kill: { type: string; lucky: boolean; boss: boolean }): LifetimeStats => ({
