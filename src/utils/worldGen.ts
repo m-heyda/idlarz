@@ -3,7 +3,7 @@ import { CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { EMPTY_WORLD, isOwnedAt, ownedEntries, setTiles, tileKey, type Placed, type World } from './world';
 
 /**
- * A synthetic world for tests, benchmarks and the admin "+N tiles" button: `count` explored tiles around the castle (which
+ * A synthetic world for tests, benchmarks and perf scripts: `count` explored tiles around the castle (which
  * stays at (CASTLE_X, CASTLE_Y)), grown one connected tile at a time with a slight pull to one side, so the blob is
  * irregular and reaches negative coordinates once it is big enough. Biomes form patches (a new tile usually continues the
  * biome of the tile it grew from). The same (count, seed) always gives the same world.

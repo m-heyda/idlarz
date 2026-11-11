@@ -73,9 +73,6 @@ const Tutorial: React.FC = () => {
 					<li>
 						<b>Export game save</b> copies your whole game as one line of text to the clipboard; <b>Import / backup</b> pastes one back (or saves it as a file).
 					</li>
-					<li>
-						Development builds also have <b>Show admin mode</b>, the cheat panel, which can be folded into an icon.
-					</li>
 				</ul>
 			</section>
 
