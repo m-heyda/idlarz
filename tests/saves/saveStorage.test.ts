@@ -8,6 +8,7 @@ import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { plainItem } from '../../src/lib/itemInstance';
 import { emptyBag } from '../../src/lib/inventory';
 import { ownedCount, patchTile, setTile } from '../../src/utils/world';
+import { epochScoped } from '../../src/lib/storageScope';
 
 /** A played game with a chest, gear and a monster, as a plain persisted slice. */
 const playedGame = (): PersistedGame => {
@@ -40,9 +41,10 @@ const fakeKv = (initial: Record<string, string> = {}) => {
 	return { kv, data, refuse: (name: string | null) => (failWith = name) };
 };
 
-const KEY = 'idlarz.save';
-const BACKUP = 'idlarz.save.backup';
-const DAMAGED = 'idlarz.save.damaged';
+// the local game's keys carry the data epoch (none at epoch 1, `.e<epoch>` after the flip), so the tests ask for them instead of spelling them
+const KEY = epochScoped('idlarz.save');
+const BACKUP = epochScoped('idlarz.save.backup');
+const DAMAGED = epochScoped('idlarz.save.damaged');
 
 const wrap = (state: PersistedGame) => ({ state, version: 1 });
 
