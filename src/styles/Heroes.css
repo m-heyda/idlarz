@@ -6,12 +6,6 @@
 	gap: 12px;
 }
 
-@media (max-width: 760px) {
-	.class-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
-
 .class-card {
 	--accent: #e0a040;
 	position: relative;

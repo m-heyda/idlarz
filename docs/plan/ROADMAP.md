@@ -2,7 +2,9 @@
 
 The one place to look when planning the next step. It lists only what is **still open**; finished work is in git history. Legend: 🚧 unfinished feature · 🔧 small fix · ⚠️ needs a decision. Sizes: S ≈ half a day, M ≈ 1-2 days, L ≈ a week.
 
-**Tasks live in Linear (team IDL, projects R0-R12 and the Economy track); each decided item carries a "Decided 2026-11-07" block.** This file is the narrative index and the specs are the numbered docs. Where an old doc line disagrees with a Linear decision block, the decision block and the doc section it names win. **The plan for what comes next, in order, is [26-next-updates-plan.md](26-next-updates-plan.md)** (core cleanup, item assets, loot pools and variety, the rest of the monsters, then the rebirth world below). The big plan behind it is to move more of the economy to the server (see "Server authority") and to optimise afterwards.
+**Tasks live in Linear (team IDL, projects R0-R12 and the Economy track); each decided item carries a "Decided 2026-11-07" block.** This file is the narrative index and the specs are the numbered docs. Where an old doc line disagrees with a Linear decision block, the decision block and the doc section it names win. **A rough, non-binding draft of what comes next is [26-next-updates-plan.md](26-next-updates-plan.md); Linear is the truth, not that file.** The big plan behind it is to move more of the economy to the server (see "Server authority") and to optimise afterwards.
+
+> **Status 2026-11-11:** the **New chapter shipped** (release 0.3.0, `GAME_EPOCH` 2: classes with passives, class-locked avatars, achievements, guided tutorial, full reset, landing and `/play`, buildings with Idols, live biomes at rebirth 1-5, farm and castle rework, potion belt, bigger bags, discovery). Sections below that call it "the next update" or "not built" are partly history; check Linear for the live state. **The game is desktop only (screens 1240 px and wider): there is no mobile or phone layout and none is planned** (IDL-123 canceled).
 
 ## Where each decision lives (2026-11-07 planning pass)
 
@@ -36,9 +38,9 @@ Order of work: pass 1 (IDL-26..31 wiring) -> pass 2 -> the loot work of phase C 
 
 **The test benchmark moves with the items.** Fight and loot tests use "a strong kit" as a fixture; since the Rattatui set was deleted (2026-11-08) that is the Obsidian set plus a legendary maul. Once the grade ladder (G1-G9), the new legendary pool and sets S1-S3 exist, Obsidian is no longer the top of the game, so the fixtures must be **one named kit per grade** from a single helper (not `fullSet('obsidian', ...)` scattered through the tests), and `fight-sim`, `monster-ladder` and `fightBalance` pin their numbers to those grades. Ticketed in Linear; until then do not add new tests that name Obsidian as "the best".
 
-## The next update: the rebirth world (design drafts, nothing built)
+## The rebirth world (design docs; the New chapter part is built, the rest is open)
 
-One theme, ten docs. Each doc lists what exists in the code, the design, the server and save impact, and its open questions. Numbers and names in them are proposals until the questions are answered.
+One theme, ten docs. Built already: classes, avatars, achievements, tutorial, reset and landing ([21](21-classes-avatars-achievements-offline-report.md), [16](16-landing-and-play-route.md)), home-biome buildings and Idols ([18](18-biome-buildings-and-material-tiers.md), partly), live biomes at rebirth 1-5 (rule only, [12](12-rebirth-biomes.md)), monster discovery ([22](22-glossary-and-mastery.md), first part). Still open: the new biomes' data and art, rankings, Paragon, crafting v1, the gem shop. Each doc lists what exists in the code, the design, the server and save impact, and its open questions. Numbers and names in them are proposals until the questions are answered.
 
 | Doc | Feature | Size | Needs first |
 |---|---|---|---|
@@ -53,7 +55,7 @@ One theme, ten docs. Each doc lists what exists in the code, the design, the ser
 | [22](22-glossary-and-mastery.md) | **Glossary and mastery**: unknown black monsters, kill-count reveals, permanent mastery bonuses for kills and mined resources | M | the lifetime counters (`player_ledger.stats`), the New chapter release |
 | [17](17-crafting.md) | **Crafting** (Luck = rarity, Intelligence = affix quality, persistent crafting level, about 10 weeks to level 100, instant crafts, slot-themed extract recipes), enchanted craft (reroll/add one affix) locked behind Ichor | L | T2 materials; server-priced merchant to enforce it |
 
-Release order (confirmed 2026-10-29; the castle timers, the resource registry and the polling fix are built, and [26](26-next-updates-plan.md) puts core cleanup and item assets in front of it): **the "New chapter" release ([21](21-classes-avatars-achievements-offline-report.md): classes, avatars, reserved names, the one-time reset, initial tutorial, with [16](16-landing-and-play-route.md) landing and the sign-up pickers) -> 12 P0-P1 (rules + first biome art) with 18 buildings P1-P3 (the reset has already wiped old maps, so no legacy-building refund) -> 13 the +20 pool -> 15 rankings -> 12 P2-P4 (T2 materials, flags, Guide entries) -> 17 crafting -> 20 and 12 P5-P6 (distance bands, monster families, reward caps)**. Ship the reset exactly once: put everything that would otherwise need another wipe (class and avatar columns, unique names, the epoch) into that release. Biomes, rankings and the landing are otherwise independent; Items 1-5 of the *Server authority* list below are the dependencies that turn these features from "flagged" into "enforced".
+Release order as confirmed 2026-10-29 (**history: the first step, the New chapter, shipped on 2026-11-11; the order after it is now a draft in [26](26-next-updates-plan.md)**): **the "New chapter" release ([21](21-classes-avatars-achievements-offline-report.md): classes, avatars, reserved names, the one-time reset, initial tutorial, with [16](16-landing-and-play-route.md) landing and the sign-up pickers) -> 12 P0-P1 (rules + first biome art) with 18 buildings P1-P3 (the reset has already wiped old maps, so no legacy-building refund) -> 13 the +20 pool -> 15 rankings -> 12 P2-P4 (T2 materials, flags, Guide entries) -> 17 crafting -> 20 and 12 P5-P6 (distance bands, monster families, reward caps)**. Ship the reset exactly once: put everything that would otherwise need another wipe (class and avatar columns, unique names, the epoch) into that release. Biomes, rankings and the landing are otherwise independent; Items 1-5 of the *Server authority* list below are the dependencies that turn these features from "flagged" into "enforced".
 
 **Principles agreed for the whole update**
 
@@ -83,7 +85,7 @@ Triaged on 2026-10-29; the fixed ones are removed.
 
 - **R7** (`dangerBonus` is 0 or 1 because monsters stand at most 9 tiles out) is decided: per-band danger offsets and spawn tables replace it ([20](20-monster-families-and-rewards.md) section 8, IDL-53); delete this line when IDL-53 ships.
 - **B6** (chests and clicks are small) is decided (BL1 + BL3 below, IDL-80/197). **B7** (sim bots are simple) is an acceptance line of each release step that changes player choices (class picker, `BUILD_ORDER`, respec, craft-sim; IDL-78).
-- **Open bugs are in Linear:** IDL-169 (building cost ignores Charisma and Bulk Discount; `calculateBuildingCost` uses Thrift only), IDL-170, IDL-172.
+- **Open bugs are in Linear** (filter label Bug, plus the audit cleanups IDL-172). IDL-169 and IDL-170 are fixed.
 
 ## Server authority (the migration backlog, ranked)
 
@@ -117,10 +119,10 @@ Notes from reading the code (not measured against the live project):
 **Content**
 
 1. **Item upgrading** is replaced by crafting: the enchanted craft (reroll or add one affix, behind Ichor, IDL-120) and the War Medal legendary craft ([17](17-crafting.md)); rebirth salvage is IDL-151.
-2. 🚧 **Building rework** (L): Producer, Extractor and Idol per biome with timed levels ([18](18-biome-buildings-and-material-tiers.md); Linear project R7); demolish and swap with a refund are part of it.
+2. 🚧 **Building rework** (L): **mostly shipped with the New chapter** (Producer, Extractor and Idol per home biome, levels 1-5, builder queue, Idols with levels that persist; [18](18-biome-buildings-and-material-tiers.md); Linear project R7). Open: building art (IDL-99, IDL-245), position bonus (IDL-95), build-time stat (IDL-145), Idol scaling (IDL-287), Monument (IDL-185).
 3. 🚧 **Quests** (L): the merchant's *Quests* tab is a placeholder. Early guidance, item rewards, tracking in the store. Brainstorm: IDL-203 (self-completing kill/gather quests plus rotating dailies).
 4. 🚧 **Gambling** (M): the *Gambling* tab is a placeholder. Uses `luck`; every payout must be computed on the server side, limited by cooldown. Gold only, never gems (IDL-205).
-5. 🚧 **Mobile layout** (L, IDL-123): the pixel UI is desktop-first; touch pan exists, the rest is untested. Responsive modals, bigger tap targets, test on a real phone.
+5. **Mobile layout: dropped** (2026-11-11, owner). Desktop only, screens 1240 px and wider; IDL-123 canceled, the phone-only CSS and plan lines were removed.
 6. **Monsters and combat depth**: rosters for hills, coast and lake (decided, IDL-201); the glossary and bestiary with kill counts ([22](22-glossary-and-mastery.md)); **monster discovery is built** (a type is a "?" silhouette until the first fight; `stats.seen` and per-type `stats.kills` in `player_ledger.stats`, no extra table), so what is left is the bestiary window, the kill-tier bonuses at 100 / 200 / 300 kills per monster (read from `stats.kills`, gated by `stats.seen`) and its glossary and achievements entries; more skills and a skill tree (IDL-202); monster abilities, a daily bounty monster and elites (IDL-204); monster chests are decided (IDL-163).
 7. **Ambient life** (cheap, optional): weather (rain tint), day/night tint by real clock, castle flag animation. Each switchable in Settings and covered by `prefers-reduced-motion`.
 8. **Zoom 0.5** step for an overview (the minimap covers it today; the wheel zoom is four fixed steps).
@@ -133,9 +135,9 @@ Notes from reading the code (not measured against the live project):
 
 ## Gem sinks and the Gem shop (design draft, nothing built; spec [30](30-gem-sinks.md))
 
-Gems are the premium currency (start purse 1,000, a gem roll on every chest, a server-held balance that survives rebirth) and **nothing spends them yet**. The decided base is IDL-188 (fair-play line: convenience, time within limits, identity, cosmetics, temporary boosts; never bulk resources or permanent stat power; gems may be sold later). Added 2026-11-08 (owner): a **Gem shop window** and **Cap Breaks**, gems as the late-game currency that permanently raises the cap of upgrade ladders. Rejected the same day: keeping a % of a resource through a rebirth, skipping a stage of the tile requirement, instantly finishing a castle timer.
+Gems are the premium currency (start purse 1,000 after the reset, a gem roll on every chest, a server-held balance that survives rebirth) and **nothing spends them yet** (2026-11-11). The decided base is IDL-188 (fair-play line: convenience, time within limits, identity, cosmetics, temporary boosts; never bulk resources or permanent stat power; gems may be sold later). Added 2026-11-08 (owner): a **Gem shop window** and **Cap Breaks**, gems as the late-game currency that permanently raises the cap of upgrade ladders. Rejected the same day: keeping a % of a resource through a rebirth, skipping a stage of the tile requirement, instantly finishing a castle timer.
 
-1. 🚧 **G1 Engine, shop window, identity, sources** (L, with R5): spend engine IDL-189, Gem shop window IDL-230 (header gem chip, five tabs), class/name/respec IDL-190, achievement and daily-login gems IDL-194, price check with the gem sim IDL-229.
+1. 🚧 **G1 Engine, shop window, identity, sources** (L; **cut from the New chapter on 2026-11-09, only the start purse of 1,000 gems and the achievement gems shipped; this is the first open item of the gem track**): spend engine IDL-189, Gem shop window IDL-230 (header gem chip, five tabs), class/name/respec IDL-190, achievement and daily-login gems IDL-194, price check with the gem sim IDL-229.
 2. 🚧 **G2 Convenience and time** (M): bag and battle-queue slots IDL-191, longer away time and filter slots IDL-234, Hourglass and Chest Beacon IDL-192, timed boosts IDL-193 (the last two need the server-owned economy, IDL-134).
 3. 🚧 **G3 Cap Breaks** (M-L, after R8): +1 max level, at most 3 per ladder, economy ladders only (merchant IDL-231, farm and Ember shop IDL-232). **Decided 2026-11-08 (IDL-228):** accepted as an explicit exception to the IDL-188 fair-play line, economy only; prices wait for the gem sim (IDL-229).
 4. 🚧 **G4 Affix re-roll** (M, after crafting v0, IDL-236) and **G5 patron titles and Monument** (S-M, with rankings, IDL-237).

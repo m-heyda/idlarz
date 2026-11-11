@@ -372,21 +372,6 @@
 	color: #d8ccaa;
 }
 
-/* narrow screens: stacked, no polish promised */
-@media (max-width: 1100px) {
-	.ld-columns {
-		grid-template-columns: minmax(0, 1fr);
-	}
-
-	.ld-features {
-		grid-template-columns: minmax(0, 1fr);
-	}
-
-	.ld-stamp {
-		font-size: 1.6rem;
-	}
-}
-
 /* the account window keeps one height while it looks for a session and when the login form or the hero card arrives */
 .ld-account .px-modal-body {
 	min-height: 330px;
