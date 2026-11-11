@@ -1,6 +1,10 @@
 import { zeroResources } from '@/catalog/resourceKeys';
+import { DAILY_BONUS_GEMS } from '@/config/gemShop';
 import { STARTING_GEMS } from '@/config/economy';
 import type { ActiveBuff } from '@/lib/buffs';
+import { isRecord } from '@/lib/isRecord';
+import { attrsFromCore, type Attrs } from '@/lib/offline/attrs';
+import type { GemShop } from '@/lib/offline/gemTypes';
 import type { CombatState } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
 import { emptyCraft } from '@/lib/crafting';
@@ -33,6 +37,46 @@ export const legacyFromJson = (raw: unknown): Legacy => {
 	if (typeof idols === 'object' && idols !== null && !Array.isArray(idols))
 		for (const [biome, level] of Object.entries(idols))
 			if (typeof level === 'number' && Number.isInteger(level) && level >= 1 && level <= 100) out.idols[biome] = level;
+	return out;
+};
+
+export const emptyGemShop = (): GemShop => ({ bought: {}, lastAt: {}, daily: { day: 0, streak: 0 }, spentSinceSave: 0, pending: null });
+
+export const isEmptyGemShop = (shop: GemShop): boolean =>
+	Object.keys(shop.bought).length === 0 && Object.keys(shop.lastAt).length === 0 && shop.daily.day === 0 && shop.spentSinceSave === 0 && shop.pending === null;
+
+const countsOf = (raw: unknown): Record<string, number> => {
+	const out: Record<string, number> = {};
+	if (isRecord(raw))
+		for (const [key, value] of Object.entries(raw))
+			if (typeof value === 'number' && Number.isFinite(value) && value > 0 && key.length <= 40) out[key] = Math.floor(value);
+	return out;
+};
+
+/** Reads the stored column back: a missing column, null or anything malformed reads as nothing bought and no daily claimed (a pending identity change that does not fit its shape is dropped). */
+export const readGemShop = (raw: unknown): GemShop => {
+	const out = emptyGemShop();
+	if (!isRecord(raw)) return out;
+	out.bought = countsOf(raw.bought);
+	out.lastAt = countsOf(raw.lastAt);
+	if (isRecord(raw.daily)) {
+		const day = raw.daily.day;
+		const streak = raw.daily.streak;
+		if (typeof day === 'number' && Number.isInteger(day) && day > 0)
+			out.daily = { day, streak: typeof streak === 'number' && streak >= 1 && streak <= DAILY_BONUS_GEMS.length ? Math.floor(streak) : 1 };
+	}
+	const spent = raw.spentSinceSave;
+	if (typeof spent === 'number' && Number.isFinite(spent) && spent > 0) out.spentSinceSave = Math.floor(spent);
+	const p = raw.pending;
+	if (
+		isRecord(p) &&
+		(p.kind === 'class' || p.kind === 'name') &&
+		typeof p.value === 'string' &&
+		p.value.length <= 40 &&
+		typeof p.price === 'number' &&
+		p.price >= 0
+	)
+		out.pending = { kind: p.kind, value: p.value, price: Math.floor(p.price) };
 	return out;
 };
 
@@ -134,6 +178,10 @@ export interface Ledger {
 	stats: LifetimeStats;
 	/** What the account keeps across rebirths: the Idol levels (migration new_chapter_columns added the column; null until an Idol was learned) */
 	legacy: Legacy;
+	/** The attribute points the player put into each attribute: the server's record (migration gems_attrs_ledger). Null in the column until the first request after the deploy seeds it from the stored save. */
+	attrs: Attrs | null;
+	/** What the gem shop has sold and the daily bonus (migration gems_attrs_ledger); an empty record is stored as null. See `GemShop`. */
+	gemShop: GemShop;
 }
 
 export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
@@ -156,6 +204,8 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	buffs: [],
 	stats: emptyStats(),
 	legacy: emptyLegacy(),
+	attrs: null,
+	gemShop: emptyGemShop(),
 });
 
 /**
@@ -219,6 +269,7 @@ export const seedLedger = (source: LedgerSeedSource, nowMs: number): Ledger => {
 	};
 	ledger.anchorAt = source.serverSavedAt;
 	ledger.inv = inventoryFromCore(source.core);
+	ledger.attrs = attrsFromCore(source.core);
 	ledger.gems = Math.max(0, Math.min(Math.floor(num(source.summary.gems, STARTING_GEMS)), STARTING_GEMS));
 	return ledger;
 };

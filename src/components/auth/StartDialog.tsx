@@ -20,7 +20,7 @@ const StartDialog: React.FC<Props> = ({ startMode, onSignedIn, onUnavailable }) 
 	const [mode, setMode] = useState<AuthMode>(initialMode);
 	return (
 		<div className='fixed inset-0 bg-[#14100c]'>
-			<PixelModal title={authTitle(mode)} size={mode === 'login' ? 'sm' : 'md'} hideClose closeOnBackdrop={false} onClose={NOOP}>
+			<PixelModal title={authTitle(mode)} size={mode === 'login' || mode === 'forgot' ? 'sm' : 'md'} hideClose closeOnBackdrop={false} onClose={NOOP}>
 				<AuthForm initialMode={initialMode} onSignedIn={onSignedIn} onUnavailable={onUnavailable} onModeChange={setMode} />
 			</PixelModal>
 		</div>

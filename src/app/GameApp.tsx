@@ -61,6 +61,7 @@ import AvatarDialog from '@/components/game/AvatarDialog';
 import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
 import SettingsDialog from '@/components/game/overlays/SettingsDialog';
 import RebirthDialog from '@/components/game/overlays/RebirthDialog';
+import GemShopDialog from '@/components/game/overlays/GemShopDialog';
 import TutorialDialog from '@/components/game/overlays/TutorialDialog';
 import { useSettingsStore } from '@/stores/settingsStore';
 import TabLockOverlay from '@/components/game/overlays/TabLockOverlay';
@@ -192,6 +193,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<SaveMenuDialog />
 			<SettingsDialog />
 			<RebirthDialog />
+			<GemShopDialog />
 			<OfflineDialog />
 			<TutorialDialog />
 			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />

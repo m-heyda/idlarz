@@ -12,11 +12,13 @@ import type { PrestigeState } from '@/types/game';
 import { clickLimiter, createInitialData, type GameGet, type GameSet } from './base';
 import type { ChestSync } from './chestSync';
 import type { InventorySync } from './inventorySync';
+import type { CharacterSync } from './characterSync';
 
-export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySync, chests: ChestSync) => ({
+export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySync, chests: ChestSync, character: CharacterSync) => ({
 	resetGame: () => {
 		clickLimiter.reset();
 		inv.reset();
+		character.resetCharacterSync();
 		chests.resetOpens();
 		set({ ...createInitialData(), isHydrated: true });
 	},
@@ -38,6 +40,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		};
 		clickLimiter.reset();
 		chests.resetOpens();
+		character.resetCharacterSync(); // every point goes back (the server clears its allocation with the rebirth)
 		const fresh = createInitialData(prestige);
 		// settle the level first: XP bought a moment ago may not have been counted by a tick yet (its points are credited here)
 		const settled = calculateLevel(state.resources.xp);

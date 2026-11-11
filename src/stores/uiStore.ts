@@ -109,6 +109,10 @@ interface UiState {
 	closeSettings: () => void;
 	rebirthOpen: boolean;
 	toggleRebirth: () => void;
+	/** The Gem shop window (the header gem chip opens it) */
+	gemShopOpen: boolean;
+	toggleGemShop: () => void;
+	closeGemShop: () => void;
 	closeRebirth: () => void;
 	tutorialOpen: boolean;
 	openTutorial: () => void;
@@ -181,6 +185,9 @@ export const useUiStore = create<UiState>((set, get) => ({
 	settingsOpen: false,
 	toggleSettings: () => set((state) => ({ settingsOpen: !state.settingsOpen })),
 	closeSettings: () => set({ settingsOpen: false }),
+	gemShopOpen: false,
+	toggleGemShop: () => set((state) => ({ gemShopOpen: !state.gemShopOpen })),
+	closeGemShop: () => set({ gemShopOpen: false }),
 	rebirthOpen: false,
 	toggleRebirth: () => set((state) => ({ rebirthOpen: !state.rebirthOpen })),
 	closeRebirth: () => set({ rebirthOpen: false }),

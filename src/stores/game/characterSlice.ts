@@ -10,8 +10,15 @@ import { maxHp, maxMana } from '@/lib/combat';
 import { starterEquipmentFor } from '@/config/itemCatalog';
 import type { CharacterStats } from '@/types/game';
 import { BASE_STATS, type GameGet, type GameSet } from './base';
+import type { CharacterSync } from './characterSync';
+import type { AttrKey } from '@/lib/offline/attrs';
 
-export const createCharacterSlice = (set: GameSet, get: GameGet) => ({
+export const createCharacterSlice = (set: GameSet, get: GameGet, character: CharacterSync) => ({
+	/** Takes the server's attribute allocation (the points belong to the server's ledger). */
+	applyServerAttrs: character.applyAttrs,
+	/** Reads the server's allocation and takes it (game start). */
+	syncServerAttrs: character.syncAttrs,
+
 	addStatPoint: (stat: keyof CharacterStats) => {
 		const state = get();
 		if (!(BASE_STATS as readonly string[]).includes(stat)) return false;
@@ -36,6 +43,8 @@ export const createCharacterSlice = (set: GameSet, get: GameGet) => ({
 			characterStats: newStats,
 			resourceRates: newRates,
 		});
+		// the preview is on screen; the server is asked for the point (a burst of clicks is one request)
+		character.queuePoint(stat as AttrKey);
 		return true;
 	},
 

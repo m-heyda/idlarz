@@ -1,5 +1,6 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest } from '@/lib/offline/gemTypes';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
 import type { AchievementReport } from '@/lib/offline/achievements';
 import type { BestiaryReport } from '@/lib/offline/stats';
@@ -100,6 +101,14 @@ export const requestAuto = (switches: { autoBattle?: boolean; autoUse?: boolean 
 /** Takes a monster off the map with no reward. */
 export const requestDismiss = (key: string, n: number, since: number | undefined): Promise<Reply<FightReply>> =>
 	post<FightReply>('/api/fight', { action: 'dismiss', key, n, since });
+
+/** The gem shop: `status` reads the balance, the daily bonus and the cooldowns; `daily` and `spend` need a key (one per click: the server replays the answer if it is sent twice). */
+export const requestGems = (key: string | null, request: GemsRequest): Promise<Reply<GemsReply>> =>
+	post<GemsReply>('/api/gems', key === null ? request : { key, ...request });
+
+/** The attribute points: `allocate` puts points into attributes (the server holds the allocation), `sync` only reads it. */
+export const requestCharacter = (key: string | null, request: CharacterRequest): Promise<Reply<CharacterReply>> =>
+	post<CharacterReply>('/api/character', key === null ? request : { key, ...request });
 
 /** The guided tutorial: `sync` reads the account's progress; `done`, `lesson` and `skip` record it (one key per request) and a finished step may pay its starter bundle. */
 export const requestTutorial = (key: string, request: TutorialRequest): Promise<Reply<TutorialReply>> =>

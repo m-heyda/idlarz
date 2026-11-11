@@ -102,6 +102,7 @@ const StatisticsOverlay: React.FC = () => {
 	const classLines = describeClassPassives(playerClass);
 	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol });
 
+	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
 	const characterTab = useUiStore((state) => state.characterTab);
 	const setCharacterTab = useUiStore((state) => state.setCharacterTab);
 
@@ -134,6 +135,16 @@ const StatisticsOverlay: React.FC = () => {
 						</div>
 					)}
 				</div>
+
+				<button
+					type='button'
+					className='px-btn px-btn-sm'
+					onClick={toggleGemShop}
+					title='Give every attribute point back (the first respec is free, a rebirth does it for free)'
+					data-testid='attr-respec'
+				>
+					Respec attributes
+				</button>
 
 				<div className='flex flex-col gap-2' role='tablist' aria-label='Character details'>
 					{CHARACTER_TAB_LABELS.map(({ id, label }) => (

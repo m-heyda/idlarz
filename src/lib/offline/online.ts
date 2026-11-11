@@ -1,4 +1,9 @@
 import { GEMS_CAP } from '@/config/economy';
+import { gemItemById } from '@/config/gemShop';
+import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
+import { applySpend, claimDaily, clearPending, dailyInfo, refundPending } from '@/lib/offline/gems';
+import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, PendingIdentity } from '@/lib/offline/gemTypes';
+import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
 import { rollGemFind } from '@/lib/luck';
@@ -317,9 +322,128 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 			rebirth: { to: judged.to, gain: judged.gain },
 		};
 		return {
-			ledger: { ...ctx.ledger, inv: wiped, buffs: clearBuffsOnRebirth() },
+			// a rebirth gives every attribute point back (the free respec of a rebirth): the allocation starts again, the account's one free paid respec stays as it was
+			ledger: { ...ctx.ledger, inv: wiped, buffs: clearBuffsOnRebirth(), attrs: clearedAttrs(ctx.ledger.attrs) },
 			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec },
 		};
+	});
+
+/** The gem shop's answer for the ledger as it stands (the balance is always the server's). */
+const gemsView = (ledger: Ledger, nowSec: number, identity: IdentityInfo | null): GemsReply => ({
+	ok: true,
+	gems: ledger.gems,
+	daily: dailyInfo(ledger.gemShop, nowSec),
+	freeRespec: !(ledger.attrs?.freeUsed ?? false),
+	lastAt: ledger.gemShop.lastAt,
+	nameChangedAt: identity?.nameChangedAtSec ?? null,
+	serverNowSec: nowSec,
+});
+
+/**
+ * The gem shop (IDL-189, IDL-190, IDL-194): `status` only reads, `daily` claims today's bonus, `spend` buys one item of the price book (`GEM_SHOP`). All decided on the ledger under the compare-and-swap, so two browsers or a double click cannot both buy; a repeated key
+ * replays the stored answer. An identity change (class, name) is charged here and left as `gemShop.pending`; {@link resolvePendingIdentity} writes it on the profile and clears it. `identity` is the profile as the caller read it (null: none).
+ * A name change is checked by the caller first (rules, a name another account holds, the 30-day cooldown on the profile), so a refused change never costs anything.
+ */
+export const gemsStep = (
+	deps: ServiceDeps,
+	userId: string,
+	key: string | null,
+	request: GemsRequest,
+	nowMs: number,
+	identity: IdentityInfo | null,
+	/** A reason the caller already found for refusing the purchase (a bad or taken name): answered as a refusal, nothing is charged */
+	blocked: { reason: NonNullable<GemsReply['reason']>; message: string } | null = null,
+): Promise<Online<GemsReply>> =>
+	onlineStep(deps, userId, request.action === 'status' ? null : key, nowMs, (ctx): { ledger: Ledger; value: GemsReply } => {
+		const ran = runCombat(ctx.ledger, ctx.env);
+		const ledger = ran.ledger;
+		const refused = (reason: GemsReply['reason'], message: string): { ledger: Ledger; value: GemsReply } => ({
+			ledger,
+			value: { ...gemsView(ledger, ctx.nowSec, identity), ok: false, reason, message },
+		});
+		if (request.action === 'status') return { ledger, value: gemsView(ledger, ctx.nowSec, identity) };
+		if (request.action === 'daily') {
+			const claim = claimDaily(ledger, ctx.nowSec);
+			if (!claim) return refused('already_claimed', "Today's bonus is already claimed.");
+			return { ledger: claim.ledger, value: { ...gemsView(claim.ledger, ctx.nowSec, identity), paid: claim.gems } };
+		}
+		if (!identity) return refused('no_profile', 'There is no hero to change yet.');
+		if (blocked) return refused(blocked.reason, blocked.message);
+		if (request.itemId === 'name_change') {
+			const item = gemItemById('name_change');
+			const last = identity.nameChangedAtSec;
+			if (item && last !== null && ctx.nowSec - last < item.cooldownSec) return refused('cooldown', 'You can change your name once every 30 days.');
+		}
+		const spent = applySpend(ledger, request.itemId, request.value, {
+			nowSec: ctx.nowSec,
+			inFight: !!ledger.combat?.fight,
+			currentClass: identity.playerClass,
+			attrs: ledger.attrs ?? newAttrs(),
+		});
+		if (!spent.ok) return refused(spent.reason, spent.message);
+		return {
+			ledger: spent.ledger,
+			value: { ...gemsView(spent.ledger, ctx.nowSec, identity), paid: spent.paid, ...(request.itemId === 'attr_respec' ? { attrs: spent.ledger.attrs! } : {}) },
+		};
+	});
+
+/**
+ * Finishes an identity change a purchase left pending: writes it on the profile, then clears the record, or (the name was taken a moment ago) gives the gems back. Safe to run any number of times and to run after a crash:
+ * the write is idempotent and the record is only cleared once it is done. Returns what happened, so the caller can tell the player.
+ */
+export const resolvePendingIdentity = async (
+	deps: ServiceDeps,
+	identity: IdentityRepo,
+	userId: string,
+	nowMs: number,
+): Promise<{ kind: 'none' } | { kind: 'applied'; pending: PendingIdentity; gems: number } | { kind: 'refunded'; pending: PendingIdentity; gems: number }> => {
+	const done = await withLedger(
+		deps,
+		userId,
+		nowMs,
+		async (ledger): Promise<StepOutcome<{ kind: 'none' } | { kind: 'applied' | 'refunded'; pending: PendingIdentity; gems: number }>> => {
+			const pending = ledger.gemShop.pending;
+			if (!pending) return { ledger, result: { kind: 'none' } };
+			const outcome = await identity.apply(userId, pending, nowMs / 1000);
+			if (outcome === 'ok') {
+				const cleared = clearPending(ledger);
+				return { ledger: cleared, result: { kind: 'applied', pending, gems: cleared.gems } };
+			}
+			const refunded = refundPending(ledger);
+			return { ledger: refunded, result: { kind: 'refunded', pending, gems: refunded.gems } };
+		},
+	);
+	return done.kind === 'ok' ? done.result : { kind: 'none' };
+};
+
+/**
+ * Attribute points (IDL-189 follow-up): `allocate` puts points into attributes up to what the level has earned (the level is worked out from the stored XP plus the XP the server paid since that save), `sync` only reads. The answer always
+ * carries the allocation as it stands, so a browser whose preview was refused puts it right. Free points are never stored: they are the budget minus what is spent.
+ */
+export const characterStep = (
+	deps: ServiceDeps,
+	userId: string,
+	key: string | null,
+	request: CharacterRequest,
+	nowMs: number,
+): Promise<Online<CharacterReply>> =>
+	onlineStep(deps, userId, request.action === 'sync' ? null : key, nowMs, (ctx): { ledger: Ledger; value: CharacterReply } => {
+		const ledger = ctx.ledger;
+		const attrs = ledger.attrs ?? newAttrs();
+		const xp = (ctx.stored.core.resources as { xp?: unknown } | undefined)?.xp;
+		const unseenXp = Math.max(0, (ledger.granted.xp ?? 0) - (ledger.grantedSeen.xp ?? 0));
+		const budget = attributeBudget(levelOfXp((typeof xp === 'number' ? xp : 0) + unseenXp), ledger.rebirths);
+		const view = (a: Attrs, ok: boolean, reason?: CharacterReply['reason']): CharacterReply => ({
+			ok,
+			...(reason ? { reason } : {}),
+			attrs: a,
+			available: Math.max(0, budget - spentOf(a.alloc)),
+			serverNowSec: ctx.nowSec,
+		});
+		if (request.action === 'sync') return { ledger: { ...ledger, attrs }, value: view(attrs, true) };
+		const result = allocatePoints(attrs, request.add, budget);
+		if (!result.ok) return { ledger: { ...ledger, attrs }, value: view(attrs, false, result.reason) };
+		return { ledger: { ...ledger, attrs: result.attrs }, value: view(result.attrs, true) };
 	});
 
 export type FightRequest =

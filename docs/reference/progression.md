@@ -6,7 +6,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 
 **Contents**
 
-- Levels: [`LEVELING`](#leveling), [`xpToNextLevel`](#xptonextlevel), [`totalStatPoints`](#totalstatpoints), [`cumulativeXp`](#cumulativexp), [`calculateLevel`](#calculatelevel), [`reconcileCharacter`](#reconcilecharacter)
+- Levels: [`LEVELING`](#leveling), [`xpToNextLevel`](#xptonextlevel), [`totalStatPoints`](#totalstatpoints), [`attributeBudget`](#attributebudget), [`cumulativeXp`](#cumulativexp), [`allocatePoints`](#allocatepoints), [`calculateLevel`](#calculatelevel), [`reconcileCharacter`](#reconcilecharacter)
 - Attributes: [`CHARACTER_STAT_CONFIG`](#character-stat-config), [`calculateStatResourceModifiers`](#calculatestatresourcemodifiers), [`calculateCombatStats`](#calculatecombatstats)
 - Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`rebirthUnlockIntro`](#rebirthunlockintro), [`rebirthRunSummary`](#rebirthrunsummary)
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
@@ -97,6 +97,22 @@ totalStatPoints(level) = (level - 1) + (min(level, 30) - 1) x 2
 
 See also: [`reconcileCharacter`](progression.md#reconcilecharacter)
 
+<a id="attributebudget"></a>
+
+### `attributeBudget` <small>function</small>
+
+Source: [`src/lib/offline/attrs.ts:40`](../../src/lib/offline/attrs.ts)
+
+How many attribute points a character holds in all: what its level has earned (`totalStatPoints`), plus a term per rebirth that is 0 today (the +20 pool of IDL-100 goes here, in the one place the budget is worked out).
+
+**Formula**
+
+```text
+attributeBudget(level, rebirths) = totalStatPoints(level) + 0 x rebirths
+```
+
+See also: [`totalStatPoints`](progression.md#totalstatpoints)
+
 <a id="cumulativexp"></a>
 
 ### `cumulativeXp` <small>function</small>
@@ -104,6 +120,14 @@ See also: [`reconcileCharacter`](progression.md#reconcilecharacter)
 Source: [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts)
 
 The total XP at which `level` is reached (level 1 is 0).
+
+<a id="allocatepoints"></a>
+
+### `allocatePoints` <small>function</small>
+
+Source: [`src/lib/offline/attrs.ts:107`](../../src/lib/offline/attrs.ts)
+
+Puts points into attributes: `add` is how many per attribute. Refused (nothing changes) when it is empty or malformed, or when it would spend more than the level's budget holds.
 
 <a id="calculatelevel"></a>
 

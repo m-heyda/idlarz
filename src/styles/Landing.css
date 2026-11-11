@@ -302,6 +302,11 @@
 	color: var(--px-gold);
 }
 
+.ld-away {
+	max-width: 300px;
+	margin-top: 4px;
+}
+
 .ld-continue-class,
 .ld-continue-stats {
 	font-size: 0.95rem;

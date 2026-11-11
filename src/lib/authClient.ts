@@ -18,12 +18,29 @@ export interface ProfileStats {
 	rebirths: number;
 }
 
+/** The away bar on the landing's Continue card (IDL-64): seconds since the player was last seen, the cap that counts and the share of income paid. Absent when under the minimum gap or unknown. */
+export interface AwayInfo {
+	gapSec: number;
+	capSec: number;
+	efficiency: number;
+}
+
 /** Why accounts cannot be used: the server has no Supabase setup (retrying cannot help), or it is an outage / network problem (it may pass). */
 export type UnavailableReason = 'not_configured' | 'outage';
 
 export type AuthResult =
 	// `epoch` / `needsReset`: what /api/auth/me says about the server's data epoch (IDL-76). Absent while the server does not send them (the guard is then a no-op).
-	| { status: 'ok'; userId: string; profile: Profile | null; epoch?: number; needsReset?: boolean; stats?: ProfileStats; game?: BootSnapshot }
+	| {
+			status: 'ok';
+			userId: string;
+			profile: Profile | null;
+			epoch?: number;
+			needsReset?: boolean;
+			stats?: ProfileStats;
+			game?: BootSnapshot;
+			away?: AwayInfo;
+			earlyTester?: boolean;
+	  }
 	| { status: 'guest' } // no session (a clean 401)
 	| { status: 'unavailable'; reason: UnavailableReason } // outage, missing env, network: never treated as "logged out"
 	| { status: 'error'; message: string }; // the player's input was refused
@@ -44,6 +61,8 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			needsReset?: unknown;
 			stats?: { level?: unknown; rebirths?: unknown } | null;
 			game?: { inv?: unknown; craft?: unknown; serverNowSec?: unknown } | null;
+			away?: { gapSec?: unknown; capSec?: unknown; efficiency?: unknown } | null;
+			earlyTester?: unknown;
 		};
 		if (response.ok) {
 			const epoch = typeof body.epoch === 'number' && Number.isInteger(body.epoch) && body.epoch >= 1 ? { epoch: body.epoch } : {};
@@ -54,7 +73,18 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 				body.game && typeof body.game.serverNowSec === 'number' && typeof body.game.craft === 'object' && body.game.craft !== null
 					? { game: body.game as BootSnapshot }
 					: {};
-			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats, ...game };
+			const { gapSec, capSec, efficiency } = body.away ?? {};
+			const away =
+				typeof gapSec === 'number' &&
+				typeof capSec === 'number' &&
+				typeof efficiency === 'number' &&
+				gapSec >= 0 &&
+				capSec > 0 &&
+				Number.isFinite(gapSec + capSec + efficiency)
+					? { away: { gapSec, capSec, efficiency } }
+					: {};
+			const earlyTester = body.earlyTester === true ? { earlyTester: true } : {};
+			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats, ...game, ...away, ...earlyTester };
 		}
 		if (response.status === 503 || response.status >= 500 || body.unavailable) {
 			return { status: 'unavailable', reason: body.reason === 'not_configured' ? 'not_configured' : 'outage' };
@@ -140,6 +170,10 @@ export const chooseAvatar = async (avatarId: string): Promise<AvatarSendResult> 
 		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
 	}
 };
+/** "Forgot password?" (`POST /api/auth/reset`): the answer is the same whether or not the account exists, so `ok` only means "asked". */
+export const requestPasswordReset = (email: string) => post('/api/auth/reset', { email });
+/** The reset page's new password (`POST /api/auth/password`, needs the session the emailed link opened). A 401 comes back as an `error`: the link is expired. */
+export const setNewPassword = (password: string) => post('/api/auth/password', { password });
 export const logout = async (): Promise<void> => {
 	await post('/api/auth/logout');
 };

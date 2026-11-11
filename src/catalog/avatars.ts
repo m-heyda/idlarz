@@ -83,7 +83,7 @@ export const AVATARS: readonly AvatarInfo[] = [
 		'avatar_horned_brute_dark',
 		'Brought down the Great Auroch and kept the horn.',
 	),
-	unlock('early_tester', 'Early tester', 'early_tester', 'Played before the new chapter', 'avatar_horned_chainmail', 'Was here before the doors were open.'),
+	unlock('early_tester', 'Early tester', 'early_tester', 'Played before the new chapter', 'avatar_early_tester', 'Was here before the doors were open.'),
 ];
 
 /**

@@ -181,6 +181,9 @@ const main = async () => {
 			inv: null,
 			// the Idol levels that survive a rebirth (`legacy.idols`) belong to the game that ended: a restart clears them too
 			legacy: null,
+			// the attribute allocation and the gem shop record belong to the game that ended too (the first request seeds attrs again)
+			attrs: null,
+			gem_shop: null,
 			// every restart wipes the tutorial progress (the whole counter column with --reset-stats); kills, glossary and achievements stay otherwise
 			stats: resetStats ? null : statsWithoutTutorial(old?.stats),
 			updated_at: new Date(now).toISOString(),

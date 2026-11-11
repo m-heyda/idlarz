@@ -16,6 +16,7 @@ import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
 import { addTotals, resetLedger, seedLedger, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
 import { settleAchievements, type AchievementRepo, type AchievementUnlock } from '@/lib/offline/achievements';
+import { attrsFromCore, coreWithAttrs, levelOfXp } from '@/lib/offline/attrs';
 import { restThrough } from '@/lib/offline/fight';
 import { coreWithInventory, fitInventory, inventoryFromCore } from '@/lib/offline/inventory';
 import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
@@ -203,8 +204,21 @@ export const withLedger = async <T>(
 		const existing = await deps.ledgers.load(userId);
 		const seeded = existing ?? seedLedger(stored, nowMs);
 		// the bag, the gear and the pity are the ledger's (seeded from the save the first time); the engine sees the save with them in place
-		const base: Ledger = { ...seeded, inv: fitInventory(seeded.inv ?? inventoryFromCore(stored.core), stored.core) };
-		const stepped = await step(base, { ...stored, core: coreWithInventory(stored.core, base.inv) as StoredSave['core'] });
+		// the attribute allocation is the ledger's too (seeded from the save the first time, so every account keeps what it has); the engine sees the save with it in place
+		const base: Ledger = {
+			...seeded,
+			inv: fitInventory(seeded.inv ?? inventoryFromCore(stored.core), stored.core),
+			attrs: seeded.attrs ?? attrsFromCore(stored.core),
+		};
+		const unseenXp = Math.max(0, (base.granted.xp ?? 0) - (base.grantedSeen.xp ?? 0));
+		const savedXp = (stored.core.resources as { xp?: unknown } | undefined)?.xp;
+		const withAttrs = coreWithAttrs(
+			coreWithInventory(stored.core, base.inv) as StoredSave['core'],
+			base.attrs,
+			levelOfXp((typeof savedXp === 'number' ? savedXp : 0) + unseenXp),
+			base.rebirths,
+		);
+		const stepped = await step(base, { ...stored, core: withAttrs });
 		// achievements are checked lazily here, on every request the server handles anyway: what became due is paid in the same write
 		const settled = settleAchievements(stepped.ledger, stored.summary);
 		const out = { ...stepped, ledger: settled.ledger };

@@ -12,7 +12,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`settleIdols`](#settleidols), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`finite`](#finite), [`LedgerRowUpgrade`](#ledgerrowupgrade), [`statsWithoutTutorial`](#statswithouttutorial), [`loadBootSnapshot`](#loadbootsnapshot)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
-- Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
+- Away time: [`computeOfflineGrant`](#computeofflinegrant), [`awayBlockOf`](#awayblockof), [`ensureSeasonReset`](#ensureseasonreset)
 - Epoch: [`BASELINE_EPOCH`](#baseline-epoch), [`startNewChapter`](#startnewchapter)
 - Browser state: [The browser's half of the data epoch](#the-browser-s-half-of-the-data-epoch)
 
@@ -288,7 +288,7 @@ still happens is resolved by `resolveConflict`. The lock dies with the page, so 
 
 ### `acceptSave` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:209`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:210`](../../src/lib/cloudSave/pipeline.ts)
 
 Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet).
   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`
@@ -434,7 +434,7 @@ In short: Embers only rise with the rebirth count; one rebirth fits between two 
 
 ### `MIN_SAVE_INTERVAL_MS` <small>const</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:87`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:88`](../../src/lib/cloudSave/pipeline.ts)
 
 Saves from one player are accepted at most this often (an honest client sends every ~90 s).
 
@@ -489,7 +489,7 @@ Flags that make an account ineligible for rankings for good. Going back in time 
 
 ### `losesProgress` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:79`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:80`](../../src/lib/cloudSave/pipeline.ts)
 
 True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).
@@ -510,7 +510,7 @@ in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken 
 
 ### `Ledger` <small>interface</small>
 
-Source: [`src/lib/offline/ledger.ts:102`](../../src/lib/offline/ledger.ts)
+Source: [`src/lib/offline/ledger.ts:146`](../../src/lib/offline/ledger.ts)
 
 The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor,
 the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result,
@@ -615,14 +615,18 @@ and its gold is paid in the browser.
 | `/api/auth/login` | POST | `src/app/api/auth/login/route.ts` |
 | `/api/auth/logout` | POST | `src/app/api/auth/logout/route.ts` |
 | `/api/auth/me` | GET | `src/app/api/auth/me/route.ts` |
+| `/api/auth/password` | POST | `src/app/api/auth/password/route.ts` |
 | `/api/auth/profile` | POST | `src/app/api/auth/profile/route.ts` |
 | `/api/auth/register` | POST | `src/app/api/auth/register/route.ts` |
+| `/api/auth/reset` | POST | `src/app/api/auth/reset/route.ts` |
+| `/api/character` | POST | `src/app/api/character/route.ts` |
 | `/api/chest` | POST | `src/app/api/chest/route.ts` |
 | `/api/craft/cancel` | POST | `src/app/api/craft/cancel/route.ts` |
 | `/api/craft/claim` | POST | `src/app/api/craft/claim/route.ts` |
 | `/api/craft` | POST | `src/app/api/craft/route.ts` |
 | `/api/craft/stash` | POST | `src/app/api/craft/stash/route.ts` |
 | `/api/fight` | POST | `src/app/api/fight/route.ts` |
+| `/api/gems` | POST | `src/app/api/gems/route.ts` |
 | `/api/inventory` | POST | `src/app/api/inventory/route.ts` |
 | `/api/offline` | POST | `src/app/api/offline/route.ts` |
 | `/api/rebirth` | POST | `src/app/api/rebirth/route.ts` |
@@ -658,6 +662,16 @@ Away time (`/api/offline`).
 elapsed = min(gap, 8 h + Night Watch hours + set hours)           (hard cap 72 h)
 paid[r] = floor(rate[r] x elapsed x efficiency)                    efficiency = min(1, 0.5 + 0.05 x Steward level + set points)
 ```
+
+<a id="awayblockof"></a>
+
+### `awayBlockOf` <small>function</small>
+
+Source: [`src/lib/offline/away.ts:21`](../../src/lib/offline/away.ts)
+
+The read-only `away` block of `GET /api/auth/me`: gap = now minus the later of the ledger anchor and the last accepted save (as `claimOffline` measures it), with the cap and efficiency the last
+save stored (`derived.offlineCapSec` / `offlineEfficiency`, the base limits when an older row lacks them). `null` with no save, an unreadable time, or a gap under `offlineMinGapSec` (nothing to show).
+It never claims anything and never touches the ledger.
 
 <a id="ensureseasonreset"></a>
 
