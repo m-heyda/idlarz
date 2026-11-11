@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import type { PlayerClassId } from '@/config/playerClasses';
 import { GAME_TITLE } from '@/config/branding';
-import { startChapter, fetchAvatars, type Profile } from '@/lib/authClient';
-import { STARTER_AVATAR_IDS } from '@/catalog/avatars';
+import { startChapter, type Profile } from '@/lib/authClient';
 import PixelModal from '@/components/game/PixelModal';
 import HeroCreator from './HeroCreator';
 import { creatorAvatar } from '@/catalog/avatars';
@@ -28,22 +27,11 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 	const [name, setName] = useState(profile.characterName);
 	const [playerClass, setPlayerClass] = useState<PlayerClassId>(profile.playerClass);
 	const [avatarPick, setAvatarPick] = useState<string | null>(profile.avatarId ?? null);
-	const [unlocked, setUnlocked] = useState<readonly string[]>(STARTER_AVATAR_IDS);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	// the avatars an account has earned beyond the starters are extra choices next to the class's two
-	const earned = unlocked.filter((id) => !STARTER_AVATAR_IDS.includes(id));
-	// the kept avatar stays while it is one of the class's two or an earned one; otherwise the class's default
-	const avatarId = creatorAvatar(playerClass, avatarPick, earned) as string;
+	// only the class's two starters are offered here: earned avatars (Early tester, ...) are not shown, the player switches to them later in the Avatars window
+	const avatarId = creatorAvatar(playerClass, avatarPick) as string;
 	const ready = name.trim() !== '' && !busy;
-
-	useEffect(() => {
-		let alive = true;
-		void fetchAvatars().then((state) => alive && state && setUnlocked(state.unlocked));
-		return () => {
-			alive = false;
-		};
-	}, []);
 
 	const confirm = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -74,7 +62,6 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 						}}
 						avatarId={avatarId}
 						onAvatar={setAvatarPick}
-						earned={earned}
 						disabled={busy}
 					/>
 					{error && (
