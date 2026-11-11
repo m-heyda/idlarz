@@ -619,6 +619,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **scripts/lib/**
 
 - [`loadGame.ts`](../../scripts/lib/loadGame.ts) — The game's config and maths as one merged object each, for the scripts that read and override them by name (scripts/sim.ts).
+- [`rehearsalSeed.ts`](../../scripts/lib/rehearsalSeed.ts) — ~ The numbers of the seeded state:
 - [`savedIds.ts`](../../scripts/lib/savedIds.ts) — ~ Everything a stored save or ledger can name by id or position, as the running code has it.
 
 **scripts/**
@@ -635,6 +636,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`reset-players.ts`](../../scripts/reset-players.ts) — Season restart:
 - [`reset-test-account.ts`](../../scripts/reset-test-account.ts) — Clears the game data of the ONE account the end-to-end tests use (docs/reference/ops.md), so a test run starts from a new game.
 - [`restore-trust.ts`](../../scripts/restore-trust.ts)
+- [`seed-rehearsal-account.ts`](../../scripts/seed-rehearsal-account.ts) — ~ Stops the run with a reason made of words only (a database error text could name a row or an address).
 - [`sim-classes.ts`](../../scripts/sim-classes.ts) — ~ Runs one sim (`--dump`:
 - [`sim-parallel.ts`](../../scripts/sim-parallel.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
@@ -786,6 +788,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`genInputs.test.ts`](../../tests/ops/genInputs.test.ts)
 - [`migrateSaves.test.ts`](../../tests/ops/migrateSaves.test.ts) — The pure part of `npm run migrate-saves` (scripts/migrateSaves.ts), run on the frozen fixtures. No network: the script feeds the same functions with database rows.
+- [`rehearsalSeed.test.ts`](../../tests/ops/rehearsalSeed.test.ts)
 
 **tests/saves/**
 

@@ -2952,6 +2952,19 @@
   "see": []
  },
  {
+  "id": "rehearsal-seeding-the-pure-part",
+  "name": "Rehearsal seeding (the pure part)",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "scripts/lib/rehearsalSeed.ts",
+  "line": 1,
+  "summary": "The pure part of `npm run seed-rehearsal` (`scripts/seed-rehearsal-account.ts`): builds the game, the ledger and the achievements that put ONE throwaway account into a rebirthed mid-game state, writes them through the server's own save path, and decides whether an account may be seeded at all. No database client lives here: the storage is passed in (`SeedRepos`), so the unit test runs the whole thing against in-memory repos.",
+  "see": [
+   "acceptSave",
+   "startNewChapter"
+  ]
+ },
+ {
   "id": "the-pacing-guard-and-ci-sharding",
   "name": "The pacing guard and CI sharding",
   "kind": "topic",
@@ -2983,6 +2996,19 @@
   "summary": "The way back for a false-positive flag (IDL-209): `npm run restore-trust -- --user <uuid>` is a DRY RUN that shows what the account's save carries; add `--yes` to really give the account its trust back ({@link restoreTrust}: flags cleared, ranking eligibility back, the income paid from the stored game's own rates again). The save it replaces is pinned in `save_history` first, and one JSON audit line is printed (`event: 'trust_restored'`); keep it with the ticket. Running it twice is safe (the second run says `already_trusted`).",
   "see": [
    "restoreTrust"
+  ]
+ },
+ {
+  "id": "rehearsal-seeding-seed-rehearsal",
+  "name": "Rehearsal seeding (seed-rehearsal)",
+  "kind": "topic",
+  "category": "Ops/Operator guides",
+  "file": "scripts/seed-rehearsal-account.ts",
+  "line": 1,
+  "summary": "Puts ONE throwaway account into a rebirthed mid-game state, fast, for the new chapter reset rehearsal (`docs/plan/new-chapter-release-runbook.md`, \"Rehearsal seeding\"). The dev console is gone and a real rebirth takes hours, so this writes the state through the server's own save path instead (`scripts/lib/rehearsalSeed.ts` says what the account ends up holding). It reads and writes exactly one account and nothing else.",
+  "see": [
+   "applySeed",
+   "judgeAccount"
   ]
  },
  {
