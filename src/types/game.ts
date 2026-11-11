@@ -393,6 +393,8 @@ export interface GameState {
 	castleUpgrade: CastleUpgradeState | null;
 	/** The building level being built (null with none, and always null while `BUILDINGS_FLAG` is off) */
 	buildingUpgrade: BuildingUpgradeState | null;
+	/** The level of each Idol the account has reached, by biome (kept across rebirths; the server's ledger holds the trusted copy, `legacy.idols`). A standing Idol works at the lower of this and its tile's level; placing a learned Idol again is free at this level. */
+	idolLevels: Record<string, number>;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
 	activeChests: number;
 	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Embers of `prestige`. */

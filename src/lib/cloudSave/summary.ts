@@ -4,6 +4,7 @@ import { builtBuildings } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
 import { calculateResourceRates } from '@/utils/game/income';
 import { countOwnedTiles, economyTiles } from '@/utils/game/tiles';
@@ -54,6 +55,8 @@ export interface SaveDerived {
 	lakesOwned?: number;
 	/** The character's Intelligence attribute: it leans the quality of crafted gear (src/lib/craftGear.ts). Absent on rows from before (read as 0). */
 	intelligence?: number;
+	/** What the standing Idols add that the server applies beyond the numbers above (absent with none): chest speed, crafting XP, damage and max HP and armor, in % */
+	idol?: { chestSpeedPct: number; craftXpPct: number; damagePct: number; hpArmorPct: number };
 	/** The set bonuses' Kill Rewards %: extra gold and XP from a kill */
 	killRewardPct: number;
 	/** Chests standing on the map: the ledger is seeded from them the first time it is created (monsters are the ledger's own) */
@@ -129,7 +132,9 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		state.merchantUpgrades,
 		gearIncomePct(state.equipment),
 	).total;
+	const idol = idolEconomy(state.tiles, state.idolLevels);
 	const fx = effectiveStats({
+		idol,
 		characterStats: state.characterStats,
 		equipment: state.equipment,
 		prestige: state.prestige,
@@ -137,7 +142,13 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		playerClass: state.playerClass,
 	});
 	const gear = gearEconomy(state.equipment);
-	const limits = { prestige: state.prestige, merchantUpgrades: state.merchantUpgrades, gear, playerClass: state.playerClass };
+	// the standing Idols (a pure function of the map and the account's trusted Idol levels) add to the same numbers the gear does
+	const limits = {
+		prestige: state.prestige,
+		merchantUpgrades: state.merchantUpgrades,
+		gear: { ...gear, offlineEff: gear.offlineEff + idol.offlineEffPts },
+		playerClass: state.playerClass,
+	};
 	return {
 		rates,
 		gold: state.resources.gold,
@@ -150,7 +161,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		rebirths: state.prestige.rebirths,
 		legacyPoints: state.prestige.legacyPoints,
 		legacyEarned: state.prestige.legacyEarned,
-		xpGainPct: xpGainPct(state.characterStats, state.equipment, state.playerClass),
+		xpGainPct: xpGainPct(state.characterStats, state.equipment, state.playerClass) + idol.xpPct,
 		playSeconds: state.playSeconds,
 		derived: {
 			lakesOwned: biomeCount(state.tiles, 'lake'),
@@ -166,7 +177,10 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			luck: fx.luck,
 			goldFind: fx.goldFind,
 			intelligence: state.characterStats.intelligence,
-			killRewardPct: gear.killRewardPct,
+			killRewardPct: gear.killRewardPct + idol.killRewardPct,
+			...(idol.chestSpeedPct || idol.craftXpPct || idol.damagePct || idol.hpArmorPct
+				? { idol: { chestSpeedPct: idol.chestSpeedPct, craftXpPct: idol.craftXpPct, damagePct: idol.damagePct, hpArmorPct: idol.hpArmorPct } }
+				: {}),
 			chests: state.tiles.stats.chests,
 			offlineCapSec: offlineCapSec(limits),
 			offlineEfficiency: offlineEfficiency(limits),

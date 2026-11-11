@@ -1,4 +1,5 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
+import { idolDef } from '@/catalog/idols';
 import { MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import type { GrantTotals } from '@/lib/offline/ledger';
 import type { Resources } from '@/types/game';
@@ -185,7 +186,7 @@ const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number
  * The building timer, judged like the castle's: a building is born at level 1, every later level needs an upgrade that was running in the previous save for this very level
  * and whose remaining time the real seconds between the saves cover, and a running timer cannot have lost more seconds than passed. Always false while the building system is off.
  */
-const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number): boolean => {
+const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, trustedIdols: Record<string, number> = {}): boolean => {
 	if (!BUILDINGS_FLAG.enabled) return false;
 	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
 	const was = before.derived.buildingUpgrade ?? null;
@@ -195,7 +196,9 @@ const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number)
 	for (const [id, level] of Object.entries(next.derived.buildings ?? {})) {
 		const old = prev[id];
 		if (old === undefined) {
-			if (level > 1) return true;
+			// a building is born at level 1; an Idol the account has learned is placed again for free at the level it remembers (the ledger's record)
+			const idol = idolDef(id);
+			if (level > 1 && !(idol && level <= (trustedIdols[idol.biome] ?? 0))) return true;
 			continue;
 		}
 		if (level < old) return true;
@@ -222,7 +225,13 @@ const goldWorthRate = (summary: SaveSummary): number => {
  * @category Saves & Server/Accepting a save
  * @order 7
  */
-export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs: number, grants?: GrantTotals): SaveFlag[] => {
+export const verifyTransition = (
+	prev: Snapshot | null,
+	next: SaveSummary,
+	nowMs: number,
+	grants?: GrantTotals,
+	trustedIdols?: Record<string, number>,
+): SaveFlag[] => {
 	const flags = new Set<SaveFlag>();
 
 	if (!prev) {
@@ -246,7 +255,7 @@ export const verifyTransition = (prev: Snapshot | null, next: SaveSummary, nowMs
 	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
 
 	if (sameRun && castleJumped(before, next, elapsedSec)) flags.add('castle_jump');
-	if (sameRun && timerJumped(before, next, elapsedSec)) flags.add('timer_jump');
+	if (sameRun && timerJumped(before, next, elapsedSec, trustedIdols)) flags.add('timer_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);

@@ -9,10 +9,12 @@ import {
 	levelOfTile,
 	moveProblem,
 	relocationCost,
+	rememberedIdolLevel,
 	upgradeProblem,
 	type BuildingContext,
 } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
 import { calculateResourceRates } from '@/utils/game/income';
@@ -44,13 +46,22 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			if (!Number.isInteger(x) || !Number.isInteger(y)) return false;
 			const ctx = context();
 			if (buildProblem(ctx, x, y, id)) return false;
-			const cost = buildingLevelCost(1, ctx.ownedTiles);
 			const s = get();
+			const def = buildingDef(id);
+			// an Idol the account has learned is placed again for free, at the level it remembers (docs/plan/18 section 6); the first one costs level 1
+			const remembered = def?.kind === 'idol' ? rememberedIdolLevel(s.idolLevels, def.biome) : 0;
+			const cost = remembered > 0 ? {} : buildingLevelCost(1, ctx.ownedTiles, def);
 			if (!canAffordBundle(s.resources, cost)) return false;
 			const tile = getTile(s.tiles, x, y);
 			if (!tile) return false;
-			const tiles = setTiles(s.tiles, [{ x, y, tile: { ...tile, building: id, buildingLevel: 1 } }]);
-			set({ tiles, resources: subtractBundle(s.resources, cost), resourceRates: ratesOf(tiles) });
+			const level = Math.max(1, remembered);
+			const tiles = setTiles(s.tiles, [{ x, y, tile: { ...tile, building: id, buildingLevel: level } }]);
+			set({
+				tiles,
+				resources: subtractBundle(s.resources, cost),
+				resourceRates: ratesOf(tiles),
+				...(def?.kind === 'idol' && remembered === 0 ? { idolLevels: { ...s.idolLevels, [def.biome]: 1 } } : {}),
+			});
 			return true;
 		},
 
@@ -60,12 +71,18 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			const ctx = context();
 			if (upgradeProblem(ctx, x, y)) return false;
 			const s = get();
-			const level = levelOfTile(getTile(s.tiles, x, y));
-			const cost = buildingLevelCost(level + 1, ctx.ownedTiles);
+			const tile = getTile(s.tiles, x, y);
+			const level = levelOfTile(tile);
+			const cost = buildingLevelCost(level + 1, ctx.ownedTiles, buildingDef(tile?.building));
 			if (!canAffordBundle(s.resources, cost)) return false;
 			set({
 				resources: subtractBundle(s.resources, cost),
-				buildingUpgrade: { x, y, toLevel: level + 1, remainingSec: buildingUpgradeDuration(level, s.prestige) },
+				buildingUpgrade: {
+					x,
+					y,
+					toLevel: level + 1,
+					remainingSec: buildingUpgradeDuration(level, s.prestige, idolEconomy(s.tiles, s.idolLevels).buildTimePct),
+				},
 			});
 			return true;
 		},

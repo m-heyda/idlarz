@@ -21,7 +21,9 @@ import {
 } from '../../src/config/economy';
 import { BIOMES, REBIRTH_BIOME_OUTPUT } from '../../src/config/biomes';
 import { BIOME_RULES } from '../../src/config/biomeRules';
-import { BUILDING_RULES } from '../../src/config/buildings';
+import { BUILDING_RULES, IDOL_RULES } from '../../src/config/buildings';
+import { IDOLS } from '../../src/catalog/idols';
+import { idolValueText } from '../../src/lib/idolEconomy';
 import { BUILDINGS } from '../../src/catalog/buildings';
 import { buildingLevelCost, buildingUpgradeDuration, buildingOutput } from '../../src/lib/buildings';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
@@ -162,6 +164,40 @@ TABLES['building-catalog'] = () => ({
 		]),
 	),
 });
+
+TABLES['idol-catalog'] = () => ({
+	title: 'The twelve Idols (one per biome)',
+	md: mdTable(
+		['Idol', 'Biome', 'Effect per level', 'Level 5', 'Applied by the game'],
+		IDOLS.map((i) => [
+			i.label,
+			BIOMES[i.biome]?.label ?? i.biome,
+			idolValueText(i, 1),
+			idolValueText(i, 5),
+			i.applied ? 'yes' : 'coming soon',
+		]),
+	),
+});
+
+TABLES['idol-effects'] = () => {
+	// "all Idols maxed" next to the Ember contribution (docs/plan/18 section 9): the same level on every Idol, against the income the Embers a first rebirth pays add
+	const levels = [1, 2, 3, 4, 5];
+	return {
+		title: 'All Idols at one level, next to the Embers',
+		md:
+			mdTable(
+				['Level of every Idol', 'XP gain', 'Kill rewards', 'Away income', 'Luck', 'Chest speed', 'Crafting XP', 'Damage', 'Max HP and armor', 'Build time'],
+				levels.map((l) => {
+					const pctText = `+${l * IDOL_RULES.perLevel} %`;
+					return [l, pctText, pctText, `+${l * IDOL_RULES.perLevel} points`, `+${l * IDOL_RULES.luckPerLevel}`, pctText, pctText, pctText, pctText, `-${l * IDOL_RULES.perLevel} %`];
+				}),
+			) +
+			`
+
+For scale, the income bonus of the Embers ever earned (\`emberIncomeBonus\`, every resource but XP): ${[10, 25, 50, 100].map((e) => `${e} Embers +${+(emberIncomeBonus(e) * 100).toPrecision(3)} %`).join(', ')}. No Idol touches the income: the largest Idol bonus is +${5 * IDOL_RULES.perLevel} % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than ${IDOL_RULES.buildTimeCap} %.
+`,
+	};
+};
 
 TABLES['farm-animals'] = () => ({
 	title: `Animals (the pen holds ${FARM.baseCap} per kind)`,

@@ -344,6 +344,7 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `craftQueueSlots` | 3 | 5 | nothing yet |
 | `craftOfflineHours` | 8 | 72 | nothing yet |
 | `craftSpeed` | 1 | 4 | nothing yet |
+| `idolMaxLevel` | 5 | 10 | nothing yet |
 
 See also: [`limitOf`](progression.md#limitof)
 
@@ -467,7 +468,7 @@ additions never drift. The server uses this for every craft, claim and queue pay
 **Formula**
 
 ```text
-craftXpOf = recipe.xp x count x CRAFTING.xpScale
+craftXpOf = recipe.xp x count x CRAFTING.xpScale x (1 + crafting XP bonus %)   (the bonus is the Blossom Shrine Idol's)
 ```
 
 <a id="pitymultiplier"></a>
@@ -751,6 +752,7 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 | `res-milk` | Milk | `res-milk` |
 | `res-wool` | Wool | `res-wool` |
 | `farm-upgrades` | Farm upgrades | `tab-farm` |
+| `idols` | Idols | none |
 | `income-offline` | Income, timers and time away | `top-resources` |
 | `gear-bag-potions` | Gear, bag and potions | `tab-equipment` |
 | `rebirth-embers` | Rebirth and Embers | `rebirth-button` |

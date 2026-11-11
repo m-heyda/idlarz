@@ -274,6 +274,21 @@ interface Ctx {
 const BUILD_TILE_RESERVE = Number(process.env.SIM_BUILD_RESERVE ?? 20);
 const BUILD_ORDER = ['lumberyard', 'quarry', 'granary', 'coalpit', 'fishery', 'harbor', 'peatworks'];
 /** The Extractors (T3 materials, nothing in the game spends them yet): built last, never levelled by the bot, so they only cost what a player who wants them would pay */
+/** The Idols (one per biome, level 1 only: their next levels need T3 materials the bots do not collect): built before the Extractors, once nothing is left to level */
+const IDOL_ORDER = [
+	'idol_forest',
+	'idol_swamp',
+	'idol_tundra',
+	'idol_lake',
+	'idol_hills',
+	'idol_plains',
+	'idol_coast',
+	'idol_jungle',
+	'idol_fields',
+	'idol_orchard',
+	'idol_blight',
+	'idol_battlefield',
+];
 const EXTRACTOR_ORDER = ['saptapper', 'herbgarden', 'deepmine', 'icecutter', 'pearldiver', 'saltworks', 'sporecellar'];
 
 const HARDCORE_WINDOWS: [number, number][] = [
@@ -467,10 +482,12 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 				const reserve = BUILD_TILE_RESERVE * utils.calculateTileCost(owned, 0).gold;
 				const pay = (cost: Partial<Record<string, number>>) =>
 					s.resources.gold >= (cost.gold ?? 0) + reserve && (utils.canAffordBundle(s.resources, cost) || topUp(cost));
-				const lowest = built.filter((b) => !EXTRACTOR_ORDER.includes(b.id) && b.level < bld.buildingLevelCap(castleLvl)).sort((a, b) => a.level - b.level)[0];
+				const lowest = built
+					.filter((b) => !EXTRACTOR_ORDER.includes(b.id) && !IDOL_ORDER.includes(b.id) && b.level < bld.buildingLevelCap(castleLvl))
+					.sort((a, b) => a.level - b.level)[0];
 				// Producers first, then their levels as far as the castle allows; the Extractors only once nothing is left to level (they feed crafting, which has no sink yet)
 				const missing = (ids: string[]) => ids.find((id) => !built.some((b) => b.id === id));
-				const next = missing(BUILD_ORDER) ?? (lowest ? undefined : missing(EXTRACTOR_ORDER));
+				const next = missing(BUILD_ORDER) ?? (lowest ? undefined : (missing(IDOL_ORDER) ?? missing(EXTRACTOR_ORDER)));
 				if (next) {
 					const spot = ownedRowMajor(s.tiles).find(
 						({ x, y, tile }) =>

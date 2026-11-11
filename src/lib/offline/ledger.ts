@@ -13,6 +13,29 @@ import type { Resources } from '@/types/game';
 // server knows - when the player was last here, which chests and monsters have really appeared, how many gems they hold and how much
 // the server ever handed out. One row per player, written only by the server (service role), read by nobody else.
 
+/**
+ * What the account keeps across rebirths (the ledger's `legacy` column, null until something was kept): `idols` is the level of each Idol by biome, the server's trusted record (a save can claim more, it is clamped to this plus one verified step, see `settleIdols`).
+ * A New Game or a season reset starts it again (`resetLedger`); a rebirth keeps it.
+ */
+export interface Legacy {
+	idols: Record<string, number>;
+}
+
+export const emptyLegacy = (): Legacy => ({ idols: {} });
+
+export const isEmptyLegacy = (l: Legacy): boolean => Object.keys(l.idols).length === 0;
+
+/** Reads the stored column back: a missing column, null or anything malformed reads as nothing kept. */
+export const legacyFromJson = (raw: unknown): Legacy => {
+	const out = emptyLegacy();
+	if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out;
+	const idols = (raw as Record<string, unknown>).idols;
+	if (typeof idols === 'object' && idols !== null && !Array.isArray(idols))
+		for (const [biome, level] of Object.entries(idols))
+			if (typeof level === 'number' && Number.isInteger(level) && level >= 1 && level <= 100) out.idols[biome] = level;
+	return out;
+};
+
 /** Everything the server ever granted (income while away, chest and kill rewards): the save checks allow gains up to this much more. */
 export type GrantTotals = Resources & { gems: number };
 
@@ -109,6 +132,8 @@ export interface Ledger {
 	buffs: ActiveBuff[];
 	/** Lifetime counters (migration new_chapter_columns, IDL-69): kills per type, chests, tiles bought, income earned; null in the column until something was counted */
 	stats: LifetimeStats;
+	/** What the account keeps across rebirths: the Idol levels (migration new_chapter_columns added the column; null until an Idol was learned) */
+	legacy: Legacy;
 }
 
 export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
@@ -130,6 +155,7 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	craft: emptyCraft(),
 	buffs: [],
 	stats: emptyStats(),
+	legacy: emptyLegacy(),
 });
 
 /**

@@ -1,3 +1,6 @@
+import { buildingDef } from '@/catalog/buildings';
+import { idolDef } from '@/catalog/idols';
+import { idolValueText } from '@/lib/idolEconomy';
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { type BiomeType, type MonsterType } from '@/types/game';
@@ -65,6 +68,29 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 	);
 };
 
+/** The building on the tile: its name and level; an Idol also says what it gives now and that its level survives a rebirth. */
+const BuildingTip: React.FC<{ id: string; level: number }> = ({ id, level }) => {
+	const def = buildingDef(id);
+	const idol = idolDef(id);
+	if (!def) return null;
+	return (
+		<div className='mt-1 border-t border-[#5a4a2a] pt-1 text-xs'>
+			<div className='text-[#f0d27a]'>
+				{def.label} (level {level})
+			</div>
+			{idol && (
+				<>
+					<div>
+						{idolValueText(idol, level)}
+						{!idol.applied && ' (coming soon: not applied yet)'}
+					</div>
+					<div className='text-[#a89878]'>Its level is kept when you rebirth; rebuild it free on any {idol.biome} tile.</div>
+				</>
+			)}
+		</div>
+	);
+};
+
 export interface TileTooltipProps {
 	biome: BiomeType;
 	isOwned: boolean;
@@ -79,13 +105,15 @@ export interface TileTooltipProps {
 	monster?: { id: number; type: MonsterType; level: number; art?: string };
 	queued: number;
 	lineOpen: boolean;
+	/** The building standing on the tile (catalog id) and its level */
+	building?: { id: string; level: number };
 }
 
 /**
  * The tile's tooltips, mounted only while the pointer is on the tile. They live in the map's tooltip layer (above the ambient
  * critters), anchored to the tile, so nothing here costs a tile that is not hovered.
  */
-const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x, y, level, hasChest, showChestTip, monster, queued, lineOpen }) => {
+const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x, y, level, hasChest, showChestTip, monster, queued, lineOpen, building }) => {
 	const tipLayer = useMapTipLayer();
 	const discovered = useIsDiscovered(monster?.type ?? '');
 	if (!tipLayer || !(isOwned || isAdjacent)) return null;
@@ -105,6 +133,7 @@ const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x
 				<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>
 					<div className='px-tooltip break-words'>
 						<TileStatus biome={biome} isOwned={isOwned} isAdjacent={isAdjacent} level={level} x={x} y={y} />
+						{isOwned && building && <BuildingTip id={building.id} level={building.level} />}
 					</div>
 				</div>
 			)}

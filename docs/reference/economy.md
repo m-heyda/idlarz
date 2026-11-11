@@ -16,7 +16,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
-- Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`buildingLevelCost`](#buildinglevelcost)
+- Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`idolEconomy`](#idoleconomy)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
@@ -402,7 +402,7 @@ Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`.
 **Formula**
 
 ```text
-seconds = floor(durationsSec[fromLevel - 1] x (1 - 0.05 x Master Builders level))
+seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))
 ```
 
 <a id="castle-range"></a>
@@ -1020,7 +1020,7 @@ The numbers of the building system (proposals from docs/plan/18, tuned with the 
 
 ### `BUILDINGS` <small>const</small>
 
-Source: [`src/catalog/buildings.ts:29`](../../src/catalog/buildings.ts)
+Source: [`src/catalog/buildings.ts:30`](../../src/catalog/buildings.ts)
 
 The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents`
 tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.
@@ -1043,6 +1043,18 @@ tiles' worth, so the land under it decides what it is good at. The sprite is fir
 | Ice Cutter | Tundra | frostshard 0.3 | frostshard 0.45 |
 | Pearl Diver | Lake | pearls 0.3 | pearls 0.45 |
 | Salt Works | Coast | salt 0.3 | salt 0.45 |
+| Harvest Scarecrow | Plains |  |  |
+| Elder Tree Statue | Forest |  |  |
+| Dwarf Statue | Hills |  |  |
+| Bog Witch Totem | Swamp |  |  |
+| Frost Obelisk | Tundra |  |  |
+| Water Spirit Fountain | Lake |  |  |
+| Lighthouse | Coast |  |  |
+| Totem of the Wild | Jungle |  |  |
+| Scarecrow King | Fields |  |  |
+| Blossom Shrine | Blossom Orchard |  |  |
+| Maw Idol | Blight |  |  |
+| War Memorial | Battlefield |  |  |
 
 <a id="produceroutput"></a>
 
@@ -1080,21 +1092,48 @@ See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`
 
 ### `buildingUpgradeDuration` <small>function</small>
 
-Source: [`src/lib/buildings.ts:26`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:39`](../../src/lib/buildings.ts)
 
 Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.
 
 **Formula**
 
 ```text
-seconds = floor(durationsSec[fromLevel - 1] x (1 - 0.05 x Master Builders level))
+seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))
 ```
+
+<a id="idols"></a>
+
+### `IDOLS` <small>const</small>
+
+Source: [`src/catalog/idols.ts:42`](../../src/catalog/idols.ts)
+
+The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice.
+An Idol's level is kept across rebirths (the building is not): see [`IDOL_RULES`](economy.md#idol-rules). The server applies XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage and max HP and armor;
+the build-time effect shortens the castle and building timers in the browser; farm output, click gold and the merchant's sell price are catalog-only for now.
+
+**The twelve Idols (one per biome)** _(computed from the code)_
+
+| Idol | Biome | Effect per level | Level 5 | Applied by the game |
+| --- | --- | --- | --- | --- |
+| Harvest Scarecrow | Plains | +2 % farm animal output | +10 % farm animal output | coming soon |
+| Elder Tree Statue | Forest | +2 % XP gain | +10 % XP gain | yes |
+| Dwarf Statue | Hills | +2 % faster castle and building timers | +10 % faster castle and building timers | yes |
+| Bog Witch Totem | Swamp | +4 Luck | +20 Luck | yes |
+| Frost Obelisk | Tundra | +2 % income while away | +10 % income while away | yes |
+| Water Spirit Fountain | Lake | +2 % chest speed | +10 % chest speed | yes |
+| Lighthouse | Coast | +2 % merchant sell price | +10 % merchant sell price | coming soon |
+| Totem of the Wild | Jungle | +2 % kill rewards | +10 % kill rewards | yes |
+| Scarecrow King | Fields | +2 % gold per click | +10 % gold per click | coming soon |
+| Blossom Shrine | Blossom Orchard | +2 % crafting XP | +10 % crafting XP | yes |
+| Maw Idol | Blight | +2 % damage | +10 % damage | yes |
+| War Memorial | Battlefield | +2 % max HP and armor | +10 % max HP and armor | yes |
 
 <a id="buildinglevelcost"></a>
 
 ### `buildingLevelCost` <small>function</small>
 
-Source: [`src/lib/buildings.ts:37`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:58`](../../src/lib/buildings.ts)
 
 The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.
 
@@ -1102,6 +1141,47 @@ The price of reaching `level` (1 = building it): `tilePrices` times the price of
 
 ```text
 cost(level) = floor(tilePrice(min(owned tiles, priceTileCap)) x tilePrices x levelGrowth^(level - 1))   per resource
+```
+
+<a id="idol-rules"></a>
+
+### `IDOL_RULES` <small>const</small>
+
+Source: [`src/config/buildings.ts:55`](../../src/config/buildings.ts)
+
+The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
+
+- `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
+- `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
+- **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
+  An upgrade is bought during a run: resources, a timer on the shared builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one).
+  The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery.
+
+**All Idols at one level, next to the Embers** _(computed from the code)_
+
+| Level of every Idol | XP gain | Kill rewards | Away income | Luck | Chest speed | Crafting XP | Damage | Max HP and armor | Build time |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | +2 % | +2 % | +2 points | +4 | +2 % | +2 % | +2 % | +2 % | -2 % |
+| 2 | +4 % | +4 % | +4 points | +8 | +4 % | +4 % | +4 % | +4 % | -4 % |
+| 3 | +6 % | +6 % | +6 points | +12 | +6 % | +6 % | +6 % | +6 % | -6 % |
+| 4 | +8 % | +8 % | +8 points | +16 | +8 % | +8 % | +8 % | +8 % | -8 % |
+| 5 | +10 % | +10 % | +10 points | +20 | +10 % | +10 % | +10 % | +10 % | -10 % |
+
+For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every resource but XP): 10 Embers +39.8 %, 25 Embers +69 %, 50 Embers +105 %, 100 Embers +158 %. No Idol touches the income: the largest Idol bonus is +10 % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than 60 %.
+
+<a id="idoleconomy"></a>
+
+### `idolEconomy` <small>function</small>
+
+Source: [`src/lib/idolEconomy.ts:71`](../../src/lib/idolEconomy.ts)
+
+The economy effects of the standing Idols. Each level adds `perLevel` (2 %) of its effect, the Bog Witch Totem `luckPerLevel` (4) Luck points. Only the effects the game applies are counted (`IdolDef.applied`).
+
+**Formula**
+
+```text
+effect = IDOL_RULES.perLevel x level  (percent)          Luck: luckPerLevel x level points
+level = min(level on the tile, level the account remembers for the biome)
 ```
 
 ## Perk caps
