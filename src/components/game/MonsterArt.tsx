@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
+import { MONSTER_CATALOG, monsterSpriteUrl, usesPlaceholderArt } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import { useIsDiscovered } from '@/stores/bestiaryStore';
 import type { MonsterType } from '@/types/game';
@@ -13,7 +13,7 @@ import '@/styles/Monsters.css';
  */
 export const labPreviewOf = (art: string | undefined) => (art ? MONSTER_CATALOG.find((m) => m.id === art) : undefined);
 
-/** What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}). */
+/** What the name of a monster the player has not met yet reads as (the picture is a black "?" silhouette, see {@link MonsterArt}). A met monster whose real sprite is not made yet draws the stand-in as a grey silhouette without the "?" (`monster-placeholder`), so the two read differently. */
 export const UNKNOWN_MONSTER = 'Unknown monster';
 
 /**
@@ -37,7 +37,7 @@ export const MonsterPicture: React.FC<{ type: MonsterType; known: boolean; scale
 			alt={known ? (label ?? entry.label) : UNKNOWN_MONSTER}
 			width={size}
 			height={size}
-			className={cn('monster-art', className, !known && 'monster-unknown')}
+			className={cn('monster-art', className, !known && 'monster-unknown', known && usesPlaceholderArt(entry) && 'monster-placeholder')}
 			style={{ imageRendering: 'pixelated' }}
 			draggable={false}
 		/>

@@ -14,6 +14,7 @@ import { maxLevelOf, monsterAt } from '@/lib/monsters';
 import { useWindowStore } from '@/stores/windowStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
+import { useTipDismiss } from '@/hooks/useTipDismiss';
 import TileMonster from './TileMonster';
 import TileTooltip from './TileTooltip';
 import { openTileMenu } from './TileMenu';
@@ -40,6 +41,15 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 	const [isShaking, setIsShaking] = useState(false);
 	const [showChestTooltip, setShowChestTooltip] = useState(false);
 	const [hovered, setHovered] = useState(false);
+	// no stuck tooltip: a scroll, click, Escape, blur or a pointer that is no longer over this tile (a window opened over it, the monster replaced) hides it
+	useTipDismiss(
+		hovered,
+		() => {
+			setHovered(false);
+			setShowChestTooltip(false);
+		},
+		(target) => !!target.closest(`#tile-${x}-${y}`),
+	);
 
 	// Check if this tile has a chest
 	const hasChest = game((state) => isOwned && !!getTile(state.tiles, x, y)?.hasChest);
