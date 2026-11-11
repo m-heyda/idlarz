@@ -109,7 +109,12 @@ export const lookAtMap = async (
  * pinned in the history first (recoverable), then the save, its map, the leaderboard row and the rebirth log are deleted and the ledger
  * starts over (timers at now, nothing granted, no bag, no fight) with the gems kept. With no save left, the next claim pays nothing.
  */
-export const startNewGame = async (deps: Pick<ServiceDeps, 'ledgers' | 'saves'>, userId: string, nowMs: number): Promise<void> => {
+export const startNewGame = async (
+	deps: Pick<ServiceDeps, 'ledgers' | 'saves'>,
+	userId: string,
+	nowMs: number,
+	options: { gems?: number } = {},
+): Promise<void> => {
 	const { saves, ledgers } = deps;
 	try {
 		const old = await saves.load(userId, { world: true });
@@ -121,7 +126,7 @@ export const startNewGame = async (deps: Pick<ServiceDeps, 'ledgers' | 'saves'>,
 	for (let attempt = 0; attempt < CAS_TRIES; attempt++) {
 		const existing = await ledgers.load(userId);
 		if (!existing) return; // the first save of the new game creates it
-		const next: Ledger = { ...resetLedger(existing, nowMs), ver: existing.ver + 1 };
+		const next: Ledger = { ...resetLedger(existing, nowMs, options.gems), ver: existing.ver + 1 };
 		if (await ledgers.commit(userId, existing.ver, next)) return;
 	}
 	throw new Error('the ledger is busy');

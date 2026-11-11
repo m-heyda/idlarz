@@ -160,14 +160,14 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 
 /**
  * The ledger of a player who starts over (a New Game, or a season reset): everything back to a new game's values (anchor and spawn timers
- * at `nowMs`, nothing granted, no bag, no fight) except the gems, and the next run id so sealed rolls never repeat. `ver` is the old one:
+ * at `nowMs`, nothing granted, no bag, no fight) except the gems (kept, unless `gems` says otherwise: the new chapter sets them to the starting gift), and the next run id so sealed rolls never repeat. `ver` is the old one:
  * the caller's compare-and-swap writes it one higher.
  */
-export const resetLedger = (old: Ledger | null, nowMs: number): Ledger => ({
+export const resetLedger = (old: Ledger | null, nowMs: number, gems?: number): Ledger => ({
 	...newLedger(nowMs, 0),
 	ver: old?.ver ?? 0,
 	runId: (old?.runId ?? 0) + 1,
-	gems: old?.gems ?? STARTING_GEMS,
+	gems: gems ?? old?.gems ?? STARTING_GEMS,
 });
 
 /** Storage of the ledger: Supabase in the app, a Map in tests. */
