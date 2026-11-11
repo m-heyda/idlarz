@@ -10,6 +10,7 @@ import { castleUpgradeDuration } from '@/utils/game/castle';
 import { economyTiles } from '@/utils/game/tiles';
 import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { rollBiome } from '@/utils/biomeRules';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
 import { MAX_OWNED_TILES, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
@@ -36,7 +37,9 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			gearIncomePct(state.equipment),
 		);
 
-		const xpGain = calculateXpGain(owned + 1) * (1 + xpGainPct(state.characterStats, state.equipment, state.playerClass) / 100);
+		const xpGain =
+			calculateXpGain(owned + 1) *
+			(1 + (xpGainPct(state.characterStats, state.equipment, state.playerClass) + idolEconomy(state.tiles, state.idolLevels).xpPct) / 100);
 		const resources = subtractBundle(state.resources, bundle);
 		resources.xp = Math.min(resources.xp + xpGain, XP_CAP);
 
@@ -78,7 +81,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 				resources: subtractBundle(state.resources, castle.tile.upgradeCost),
 				castleUpgrade: {
 					toLevel: castle.tile.level + 1,
-					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige),
+					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, idolEconomy(state.tiles, state.idolLevels).buildTimePct),
 				},
 			});
 			return true;

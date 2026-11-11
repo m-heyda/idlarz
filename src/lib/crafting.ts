@@ -85,9 +85,10 @@ export const nextDoneAt = (entry: CraftQueueEntry, nowMs: number, ctx: LimitCont
  *
  * @category Progression/Crafting
  * @order 4
- * @formula craftXpOf = recipe.xp x count x CRAFTING.xpScale
+ * @formula craftXpOf = recipe.xp x count x CRAFTING.xpScale x (1 + crafting XP bonus %)   (the bonus is the Blossom Shrine Idol's)
  */
-export const craftXpOf = (recipe: { xp: number }, count: number): number => Math.round(recipe.xp * count * CRAFTING.xpScale * 1e6) / 1e6;
+export const craftXpOf = (recipe: { xp: number }, count: number, bonusPct = 0): number =>
+	Math.round(recipe.xp * count * CRAFTING.xpScale * (1 + bonusPct / 100) * 1e6) / 1e6;
 
 /** Crafting XP to go from `level` to the next one (Infinity at the maximum). */
 export const craftXpToNext = (level: number): number => {

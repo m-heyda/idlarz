@@ -552,7 +552,7 @@ buffs: each buff effect through addBuff; a refusal by any of them refuses the po
 
 ### `withBuffs` <small>function</small>
 
-Source: [`src/lib/offline/profile.ts:103`](../../src/lib/offline/profile.ts)
+Source: [`src/lib/offline/profile.ts:106`](../../src/lib/offline/profile.ts)
 
 A profile with the running potion buffs on top ([`buffTotals`](combat.md#bufftotals)): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object),
 so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.

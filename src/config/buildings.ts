@@ -38,3 +38,18 @@ export const BUILDING_RULES = {
 	cost: { tilePrices: 14, priceTileCap: 300, levelGrowth: 2 },
 	relocateShare: 0.5,
 };
+
+/**
+ * The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
+ *
+ * - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
+ * - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
+ * - **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
+ *   An upgrade is bought during a run: resources, a timer on the shared builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one).
+ *   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery.
+ *
+ * @category Economy/Buildings
+ * @order 7
+ * @table idol-effects
+ */
+export const IDOL_RULES = { perLevel: 2, luckPerLevel: 4, buildTimeCap: 60, t3PerLevel: 200 };

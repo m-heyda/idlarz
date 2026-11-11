@@ -65,7 +65,7 @@ Anything else (a renamed, moved or reinterpreted field, an id that must become a
 | `buffs` | `readBuffs` | `[]` | unknown family dropped | tolerant already |
 | `stats` | `readStats` | zeros | unknown monster ids kept as counters, achievement ids kept | tolerant already |
 | `granted`, `granted_seen` | `{ ...zeroTotals(), ...row }` | new resources read 0 | removed resource keys stay (harmless) | tolerant already |
-| `legacy` | not read by the code (room for Idol levels) | null | n/a | reserved, nothing depends on it |
+| `legacy` | `legacyFromJson` (Idol levels that survive a rebirth) | `{ idols: {} }` | malformed reads as nothing kept; unknown idol ids are kept as numbers | tolerant. `migrate-saves` selects it, so a repaired row never wipes it |
 | `last_result` | opaque (replayed to the client once) | null | n/a | idempotency answer |
 
 ### Other tables

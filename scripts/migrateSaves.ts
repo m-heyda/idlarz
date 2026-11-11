@@ -67,7 +67,8 @@ const comparable = (row: Record<string, unknown>): Record<string, unknown> => {
 	const { updated_at: _updatedAt, user_id: _userId, ...rest } = row;
 	void _updatedAt;
 	void _userId;
-	const out: Record<string, unknown> = { ...rest };
+	// a column that is null or absent is the same thing (the reader defaults it): a row written before a column existed is not a different row
+	const out: Record<string, unknown> = Object.fromEntries(Object.entries(rest).filter(([, value]) => value !== null && value !== undefined));
 	for (const column of DATE_COLUMNS) if (typeof out[column] === 'string') out[column] = new Date(out[column] as string).toISOString();
 	return out;
 };

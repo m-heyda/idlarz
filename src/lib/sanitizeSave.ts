@@ -5,7 +5,10 @@ import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { BIOMES } from '@/config/biomes';
 import { BUILDING_RULES, BUILDINGS_FLAG } from '@/config/buildings';
 import { buildingDef } from '@/catalog/buildings';
-import { buildingLevelCap, buildingUpgradeDuration, levelOfTile } from '@/lib/buildings';
+import { IDOLS } from '@/catalog/idols';
+import { idolEconomy } from '@/lib/idolEconomy';
+import { HARD_LIMITS } from '@/config/limits';
+import { buildingLevelCap, buildingUpgradeDuration, levelOfTile, upgradeCapOf } from '@/lib/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { GEMS_CAP, STARTING_GEMS, CLICK_LADDER, INITIAL_RESOURCES, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { DEFAULT_PLAYER_NAME, INITIAL_CHARACTER_STATS } from '@/config/character';
@@ -88,14 +91,20 @@ export const PERSISTED_KEYS = [
 ] as const;
 
 /** The saved slice of the game. `buildingUpgrade` is outside {@link PERSISTED_KEYS} on purpose: it exists only while BUILDINGS_FLAG is on, so a flag-off save is byte-identical to one from before the building system. */
-export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]> & { buildingUpgrade?: GameState['buildingUpgrade'] };
+export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]> & {
+	buildingUpgrade?: GameState['buildingUpgrade'];
+	idolLevels?: GameState['idolLevels'];
+};
 
 export const pickPersisted = (state: GameState): PersistedGame => {
 	const out: Record<string, unknown> = {};
 	PERSISTED_KEYS.forEach((key) => {
 		out[key] = state[key];
 	});
-	if (BUILDINGS_FLAG.enabled) out.buildingUpgrade = state.buildingUpgrade;
+	if (BUILDINGS_FLAG.enabled) {
+		out.buildingUpgrade = state.buildingUpgrade;
+		out.idolLevels = state.idolLevels;
+	}
 	return out as unknown as PersistedGame;
 };
 
@@ -241,7 +250,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			// only present while the building system is on (readLand). A building that cannot be valid here is DROPPED, never a reason to refuse the save, so an old save (the removed
 			// building types, even ones that share a name with a new type) or one edited by hand always loads: unknown type, wrong biome, a second of its type, a chest on the tile, a bad level
 			const def = typeof t.building === 'string' ? buildingDef(t.building) : undefined;
-			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, BUILDING_RULES.maxLevel);
+			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, def?.kind === 'idol' ? HARD_LIMITS.idolMaxLevel : BUILDING_RULES.maxLevel);
 			if (def && def.biome === t.biome && !tile.hasChest && !buildingIds.has(def.id) && bl !== null) {
 				buildingIds.add(def.id);
 				tile.building = def.id;
@@ -417,7 +426,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		autoSellUpTo = raw.autoSellUpTo;
 	}
 
-	const maxPlayerHp = maxHp(characterStats, equipment);
+	// the most HP the save may hold includes the largest War Memorial the map shows (the tile's level, whatever the record says: the server's ledger bounds the real bonus)
+	const maxPlayerHp = Math.round(maxHp(characterStats, equipment) * (1 + (BUILDINGS_FLAG.enabled ? idolEconomy(tiles).hpArmorPct : 0) / 100));
 	let playerHp = maxPlayerHp;
 	if (raw.playerHp !== undefined) {
 		const v = num(raw.playerHp, 0);
@@ -474,11 +484,13 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 
 	// ---- Building system (only read while BUILDINGS_FLAG is on; absent means none) --------------------------
 	let buildingUpgrade: BuildingUpgradeState | null = null;
+	const idolLevels: Record<string, number> = {};
 	if (BUILDINGS_FLAG.enabled) {
 		// a level the castle does not allow (the gate `min(5, castle level)`) is dropped with its building, like any other building that cannot be valid
 		const cap = buildingLevelCap(castleLevel);
+		// an Idol is exempt: its level is the account's and it is placed again at that level whatever the castle level is (the server's ledger bounds it)
 		for (const { tile } of placed)
-			if (tile.building && levelOfTile(tile) > cap) {
+			if (tile.building && buildingDef(tile.building)?.kind !== 'idol' && levelOfTile(tile) > cap) {
 				delete tile.building;
 				delete tile.buildingLevel;
 			}
@@ -487,12 +499,31 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		if (isRecord(b) && !castleUpgrade) {
 			const bx = int(b.x, -16000, 16000);
 			const by = int(b.y, -16000, 16000);
-			const toLevel = int(b.toLevel, 2, BUILDING_RULES.maxLevel);
+			const toLevel = int(b.toLevel, 2, HARD_LIMITS.idolMaxLevel);
 			const at = bx === null || by === null ? undefined : placed.find((p) => p.x === bx && p.y === by);
 			const remaining = toLevel === null ? null : num(b.remainingSec, 0, buildingUpgradeDuration(toLevel - 1));
-			if (bx !== null && by !== null && toLevel !== null && remaining !== null && at && levelOfTile(at.tile) === toLevel - 1 && toLevel <= cap) {
+			if (
+				bx !== null &&
+				by !== null &&
+				toLevel !== null &&
+				remaining !== null &&
+				at &&
+				levelOfTile(at.tile) === toLevel - 1 &&
+				toLevel <= upgradeCapOf(buildingDef(at.tile.building), castleLevel)
+			) {
 				buildingUpgrade = { x: bx, y: by, toLevel, remainingSec: remaining };
 			}
+		}
+		// the levels the account remembers for its Idols: known biomes, whole levels up to the hard limit; a standing Idol is never above what is remembered (a tile that says more raises the record, the server's ledger bounds it)
+		if (isRecord(raw.idolLevels)) {
+			for (const idol of IDOLS) {
+				const v = int(raw.idolLevels[idol.biome], 1, HARD_LIMITS.idolMaxLevel);
+				if (v !== null) idolLevels[idol.biome] = v;
+			}
+		}
+		for (const { tile } of placed) {
+			const def = buildingDef(tile.building);
+			if (def?.kind === 'idol') idolLevels[def.biome] = Math.max(idolLevels[def.biome] ?? 0, levelOfTile(tile));
 		}
 	}
 
@@ -596,7 +627,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			merchantStock,
 			merchantRefreshes,
 			merchantRefresh,
-			...(BUILDINGS_FLAG.enabled ? { buildingUpgrade } : {}),
+			...(BUILDINGS_FLAG.enabled ? { buildingUpgrade, idolLevels } : {}),
 		},
 	};
 };

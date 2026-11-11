@@ -108,8 +108,19 @@
   "kind": "const",
   "category": "Economy/Buildings",
   "file": "src/catalog/buildings.ts",
-  "line": 29,
+  "line": 30,
   "summary": "The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents` tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.",
+  "see": []
+ },
+ {
+  "id": "idols",
+  "name": "IDOLS",
+  "symbol": "IDOLS",
+  "kind": "const",
+  "category": "Economy/Buildings",
+  "file": "src/catalog/idols.ts",
+  "line": 42,
+  "summary": "The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice. An Idol's level is kept across rebirths (the building is not): see {@link IDOL_RULES}. The server applies XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage and max HP and armor; the build-time effect shortens the castle and building timers in the browser; farm output, click gold and the merchant's sell price are catalog-only for now.",
   "see": []
  },
  {
@@ -465,6 +476,17 @@
   "file": "src/config/buildings.ts",
   "line": 33,
   "summary": "The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).",
+  "see": []
+ },
+ {
+  "id": "idol-rules",
+  "name": "IDOL_RULES",
+  "symbol": "IDOL_RULES",
+  "kind": "const",
+  "category": "Economy/Buildings",
+  "file": "src/config/buildings.ts",
+  "line": 55,
+  "summary": "The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.",
   "see": []
  },
  {
@@ -1043,7 +1065,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 26,
+  "line": 39,
   "summary": "Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.",
   "see": []
  },
@@ -1054,7 +1076,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 37,
+  "line": 58,
   "summary": "The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.",
   "see": []
  },
@@ -1202,6 +1224,17 @@
   "see": []
  },
  {
+  "id": "settleidols",
+  "name": "settleIdols",
+  "symbol": "settleIdols",
+  "kind": "function",
+  "category": "Saves & Server/Accepting a save",
+  "file": "src/lib/cloudSave/idolTrust.ts",
+  "line": 17,
+  "summary": "The server's say over the Idol levels (the account's `idolLevels`). The ledger's `legacy.idols` is the trusted record; a save may claim a level above it only by one step per save and only when that step is real: the Idol stands on the map at that level now and the save raised no `timer_jump` (a level above the remembered one needs a running upgrade, or the first build, behind it, which `verify.ts` judges). Everything else is cut back to the trusted level, so an edited save cannot grant a level and a rebirth cannot lose one. A level the save holds below the record is raised to it (the server wins).",
+  "see": []
+ },
+ {
   "id": "the-server-s-rule-and-the-threat-model",
   "name": "The server's rule and the threat model",
   "kind": "topic",
@@ -1222,7 +1255,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 77,
+  "line": 79,
   "summary": "True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).",
   "see": []
  },
@@ -1233,7 +1266,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 85,
+  "line": 87,
   "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
   "see": []
  },
@@ -1244,7 +1277,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 207,
+  "line": 209,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1277,7 +1310,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 90,
+  "line": 91,
   "summary": "The flags and what the server does with each. Meaning of each flag:",
   "see": []
  },
@@ -1287,7 +1320,7 @@
   "kind": "topic",
   "category": "Ops/Operator guides",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 109,
+  "line": 110,
   "summary": "**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).** Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:",
   "see": [
    "ENFORCEMENT",
@@ -1301,7 +1334,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 134,
+  "line": 135,
   "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
   "see": []
  },
@@ -1312,7 +1345,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 149,
+  "line": 150,
   "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
   "see": []
  },
@@ -1323,7 +1356,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 225,
+  "line": 228,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },
@@ -1584,6 +1617,17 @@
   "file": "src/lib/fightSim.ts",
   "line": 58,
   "summary": "A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.",
+  "see": []
+ },
+ {
+  "id": "idoleconomy",
+  "name": "idolEconomy",
+  "symbol": "idolEconomy",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/lib/idolEconomy.ts",
+  "line": 71,
+  "summary": "The economy effects of the standing Idols. Each level adds `perLevel` (2 %) of its effect, the Bog Witch Totem `luckPerLevel` (4) Luck points. Only the effects the game applies are counted (`IdolDef.applied`).",
   "see": []
  },
  {
@@ -2131,7 +2175,7 @@
   "kind": "interface",
   "category": "Saves & Server/The ledger",
   "file": "src/lib/offline/ledger.ts",
-  "line": 79,
+  "line": 102,
   "summary": "The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor, the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result, `combat` (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), `inv` (bag, gear, pity, auto-sell, Pack Rat size), `stats` (lifetime counters: kills per monster type, chests, tiles bought, income earned; see `stats.ts`) and `resetAt`.",
   "see": [
    "sealedRng",
@@ -2192,7 +2236,7 @@
   "kind": "function",
   "category": "Combat/Consumables",
   "file": "src/lib/offline/profile.ts",
-  "line": 103,
+  "line": 106,
   "summary": "A profile with the running potion buffs on top ({@link buffTotals}): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object), so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.",
   "see": []
  },
@@ -2357,7 +2401,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 61,
+  "line": 64,
   "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
   "see": []
  },
@@ -2368,7 +2412,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 200,
+  "line": 209,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -2969,7 +3013,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 875,
+  "line": 892,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

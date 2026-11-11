@@ -178,7 +178,11 @@ export const packBody = (state: PersistedGame): SaveBody => {
 	for (const key of BASE_STAT_KEYS) characterStats[key] = stats[key];
 	body.characterStats = characterStats;
 
-	if (BUILDINGS_FLAG.enabled) body.buildingUpgrade = state.buildingUpgrade ?? null;
+	if (BUILDINGS_FLAG.enabled) {
+		body.buildingUpgrade = state.buildingUpgrade ?? null;
+		// the Idols' levels (kept across rebirths); written only once one was learned
+		if (state.idolLevels && Object.keys(state.idolLevels).length > 0) body.idolLevels = state.idolLevels;
+	}
 
 	const { land, extra } = packLand(state.tiles);
 	body.land = land;

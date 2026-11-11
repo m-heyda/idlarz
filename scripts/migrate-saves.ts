@@ -97,7 +97,7 @@ interface WorldRow {
 type LedgerDbRow = LedgerRow & { user_id: string };
 
 const LEDGER_COLUMNS =
-	'user_id, ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs, stats';
+	'user_id, ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs, stats, legacy';
 
 const run = async () => {
 	console.log(

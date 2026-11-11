@@ -161,7 +161,7 @@ const onlyTimeMoved = (stored: Ledger, next: Ledger): boolean => {
 
 export const bankContext = (stored: StoredSave): BankContext => ({
 	luck: stored.summary.derived.luck,
-	chestSpeedPct: classPassives(stored.core.playerClass).chestSpeedPct,
+	chestSpeedPct: classPassives(stored.core.playerClass).chestSpeedPct + (stored.summary.derived.idol?.chestSpeedPct ?? 0),
 	tilesOwned: stored.summary.tilesOwned,
 	lakesOwned: stored.summary.derived.lakesOwned ?? 0,
 	castleLevel: stored.summary.castleLevel,

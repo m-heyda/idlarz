@@ -67,7 +67,7 @@ test('the flag ships on (owner decision: live on merge)', () => {
 
 test('the catalog: a Producer and an Extractor for each of the seven home biomes, with real art', () => {
 	const homes = ['coast', 'forest', 'hills', 'lake', 'plains', 'swamp', 'tundra'];
-	assert.equal(BUILDINGS.length, 14);
+	assert.equal(BUILDINGS.length, 14 + 12, 'seven Producers, seven Extractors and the twelve Idols');
 	assert.equal(new Set(BUILDINGS.map((b) => b.id)).size, BUILDINGS.length);
 	for (const kind of ['producer', 'extractor'] as const)
 		assert.deepEqual(
@@ -78,7 +78,8 @@ test('the catalog: a Producer and an Extractor for each of the seven home biomes
 		);
 	for (const b of BUILDINGS) {
 		assert.ok(BIOMES[b.biome], b.id);
-		if (b.kind === 'producer')
+		if (b.kind === 'idol') assert.equal(b.produces.length, 0, `${b.id} makes nothing`);
+		else if (b.kind === 'producer')
 			for (const key of b.produces)
 				assert.ok((BIOMES[b.biome].resourceGeneration as Record<string, number>)[key] > 0, `${b.id} makes ${key}, which its biome does not`);
 		else {
@@ -96,7 +97,7 @@ test('the catalog: a Producer and an Extractor for each of the seven home biomes
 			.sort(),
 		['frostshard', 'herbs', 'ironOre', 'pearls', 'salt', 'sap', 'spores'],
 	);
-	assert.equal(buildingsOfBiome('forest').length, 2);
+	assert.equal(buildingsOfBiome('forest').length, 3, 'Producer, Extractor and Idol');
 	assert.equal(buildingsOfBiome('castle').length, 0);
 });
 

@@ -9,7 +9,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - Threat model: [The server's rule and the threat model](#the-server-s-rule-and-the-threat-model)
 - The save: [`SAVE_SCHEMA`](#save-schema), [`createSaveStorage`](#createsavestorage), [`sanitizeSave`](#sanitizesave), [`PERSISTED_KEYS`](#persisted-keys), [Save and Backup dialog](#save-and-backup-dialog), [`BodyUpgrade`](#bodyupgrade), [`upgradeBody`](#upgradebody)
 - Uploading: [`SYNC`](#sync), [`judgeRebase`](#judgerebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
-- Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
+- Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`settleIdols`](#settleidols), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`finite`](#finite), [`LedgerRowUpgrade`](#ledgerrowupgrade), [`loadBootSnapshot`](#loadbootsnapshot)
 - Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`ensureSeasonReset`](#ensureseasonreset)
@@ -91,7 +91,7 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:200`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:209`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -107,7 +107,7 @@ stat points are credited when the level pays more and a free respec when it pays
 
 ### `PERSISTED_KEYS` <small>const</small>
 
-Source: [`src/lib/sanitizeSave.ts:61`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:64`](../../src/lib/sanitizeSave.ts)
 
 The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
 
@@ -286,7 +286,7 @@ still happens is resolved by `resolveConflict`. The lock dies with the page, so 
 
 ### `acceptSave` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:207`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:209`](../../src/lib/cloudSave/pipeline.ts)
 
 Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet).
   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`
@@ -311,7 +311,7 @@ Ranking eligibility (`trusted`): the first save was a young game (<= 900 s of pl
 
 ### `FLAG_POLICY` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:90`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:91`](../../src/lib/cloudSave/verify.ts)
 
 The flags and what the server does with each. Meaning of each flag:
 
@@ -432,7 +432,7 @@ In short: Embers only rise with the rebirth count; one rebirth fits between two 
 
 ### `MIN_SAVE_INTERVAL_MS` <small>const</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:85`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:87`](../../src/lib/cloudSave/pipeline.ts)
 
 Saves from one player are accepted at most this often (an honest client sends every ~90 s).
 
@@ -440,7 +440,7 @@ Saves from one player are accepted at most this often (an honest client sends ev
 
 ### `verifyTransition` <small>function</small>
 
-Source: [`src/lib/cloudSave/verify.ts:225`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:228`](../../src/lib/cloudSave/verify.ts)
 
 Runs every plausibility check between two consecutive saves and returns the flags that fired; see [`FLAG_POLICY`](saves-and-server.md#flag-policy) for what each one means and does.
 
@@ -457,11 +457,29 @@ Non-production = `next dev` on a developer's machine (NODE_ENV is "development")
 deployment (VERCEL_ENV). Everything else counts as production, including a missing VERCEL_ENV: if the platform
 variables were not exposed, real players must stay in the checks, not slip out of them.
 
+<a id="settleidols"></a>
+
+### `settleIdols` <small>function</small>
+
+Source: [`src/lib/cloudSave/idolTrust.ts:17`](../../src/lib/cloudSave/idolTrust.ts)
+
+The server's say over the Idol levels (the account's `idolLevels`). The ledger's `legacy.idols` is the trusted record; a save may claim a level above it only by one step per save and only
+when that step is real: the Idol stands on the map at that level now and the save raised no `timer_jump` (a level above the remembered one needs a running upgrade, or the first build, behind it, which `verify.ts` judges).
+Everything else is cut back to the trusted level, so an edited save cannot grant a level and a rebirth cannot lose one. A level the save holds below the record is raised to it (the server wins).
+
+**Formula**
+
+```text
+accepted[biome] = trusted                              when claimed <= trusted
+                = claimed                              when claimed = trusted + 1, the Idol stands at that level and no timer_jump was raised
+                = trusted                              otherwise
+```
+
 <a id="poison-flags"></a>
 
 ### `POISON_FLAGS` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:149`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:150`](../../src/lib/cloudSave/verify.ts)
 
 Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
 
@@ -469,7 +487,7 @@ Flags that make an account ineligible for rankings for good. Going back in time 
 
 ### `losesProgress` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:77`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:79`](../../src/lib/cloudSave/pipeline.ts)
 
 True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).
@@ -478,7 +496,7 @@ resets level and tiles, so a higher rebirth count never counts). The replaced sa
 
 ### `ENFORCEMENT` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:134`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:135`](../../src/lib/cloudSave/verify.ts)
 
 The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
 accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`
@@ -490,7 +508,7 @@ in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken 
 
 ### `Ledger` <small>interface</small>
 
-Source: [`src/lib/offline/ledger.ts:79`](../../src/lib/offline/ledger.ts)
+Source: [`src/lib/offline/ledger.ts:102`](../../src/lib/offline/ledger.ts)
 
 The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor,
 the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result,

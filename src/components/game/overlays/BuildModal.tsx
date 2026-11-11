@@ -1,5 +1,11 @@
 import React, { useEffect } from 'react';
-import { BUILDING_RULES } from '@/config/buildings';
+import { BUILDING_RULES, IDOL_RULES } from '@/config/buildings';
+import { idolDef } from '@/catalog/idols';
+import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
+import type { PrestigeState } from '@/types/game';
+import { limitOf } from '@/lib/limits';
+import { buildingUpgradeDuration } from '@/lib/buildings';
+import { formatTime } from '@/utils/formatters';
 import { buildOptions, type BuildOption, type MoveOption } from '@/lib/buildingMenu';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -11,14 +17,15 @@ import ResourceIcon from '../ResourceIcon';
 import '@/styles/BuildModal.css';
 
 /** What a building makes, in one line: the Producer's tile-equivalents of its resources, the Extractor's rate of its material. */
-const OutputLine: React.FC<{ option: Pick<BuildOption, 'def'> }> = ({ option: { def } }) => (
-	<span className='build-output'>
-		{def.produces.map((resource) => (
-			<ResourceIcon key={resource} resource={resource} />
-		))}
-		<span>{def.kind === 'extractor' ? `${BUILDING_RULES.extractor.baseRate}/s` : `like ${BUILDING_RULES.producer.tileEquivalents} tiles`}</span>
-	</span>
-);
+const OutputLine: React.FC<{ option: Pick<BuildOption, 'def'> }> = ({ option: { def } }) =>
+	def.kind === 'idol' ? null : (
+		<span className='build-output'>
+			{def.produces.map((resource) => (
+				<ResourceIcon key={resource} resource={resource} />
+			))}
+			<span>{def.kind === 'extractor' ? `${BUILDING_RULES.extractor.baseRate}/s` : `like ${BUILDING_RULES.producer.tileEquivalents} tiles`}</span>
+		</span>
+	);
 
 const Art: React.FC<{ def: BuildOption['def'] }> = ({ def }) => (
 	<span className='build-art'>
@@ -30,10 +37,46 @@ const Art: React.FC<{ def: BuildOption['def'] }> = ({ def }) => (
 const Head: React.FC<{ def: BuildOption['def']; extra?: string }> = ({ def, extra }) => (
 	<div className='build-head'>
 		<span className='build-name'>{def.label}</span>
-		<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : 'Producer'}</span>
+		<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
 		{extra && <span className='build-extra'>{extra}</span>}
 	</div>
 );
+
+/**
+ * What an Idol is and does, in plain lines: the effect per level with the value now and at the cap, what the rebirth keeps, how it is upgraded. `coming soon` marks the effects the game does not apply yet
+ * (farm output, click gold, merchant sell price). The numbers are `IDOL_RULES` and `limitOf('idolMaxLevel')`.
+ */
+export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?: number; prestige?: PrestigeState }> = ({
+	id,
+	remembered,
+	buildTimePct = 0,
+	prestige,
+}) => {
+	const idol = idolDef(id);
+	if (!idol) return null;
+	const max = limitOf('idolMaxLevel');
+	const shown = Math.max(1, remembered);
+	return (
+		<div className='build-idol'>
+			<p className='build-idol-effect'>
+				{idol.effect === 'luck' ? `+${IDOL_RULES.luckPerLevel} Luck per level` : `+${IDOL_RULES.perLevel} % ${idol.effectText} per level`}
+				{!idol.applied && <span className='build-soon'> (coming soon: not applied yet)</span>}
+			</p>
+			<p className='build-idol-levels'>
+				Level {shown}/{max} = {idolValueText(idol, shown)}
+				{shown < max ? `; level ${max} = ${idolValueText(idol, max)}` : ''}
+			</p>
+			<ul className='build-idol-notes'>
+				<li>Kept when you rebirth: its level stays, rebuild it free on any {idol.biome} tile.</li>
+				<li>
+					Upgrade up to level {max} as your castle grows; each level takes the shared builder (
+					{[1, 2, 3, 4].map((l) => formatTime(buildingUpgradeDuration(l, prestige, buildTimePct))).join(', ')}).
+				</li>
+				<li>The Ember shop&apos;s Idol Mastery raises the cap (coming soon).</li>
+			</ul>
+		</div>
+	);
+};
 
 /** "Build here": the buildings of the tile's biome with art, output and price, and the ones standing elsewhere that can be moved here. */
 const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
@@ -43,6 +86,9 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	// re-evaluate whenever resources or the map change, so prices go green/red live
 	const tiles = useGameStore((state) => state.tiles);
 	useGameStore((state) => state.resources);
+	const idolLevels = useGameStore((state) => state.idolLevels);
+	const prestige = useGameStore((state) => state.prestige);
+	const buildTimePct = idolEconomy(tiles, idolLevels).buildTimePct;
 	const tile = getTile(tiles, x, y);
 	const free = !!tile && !tile.building;
 	const { builds, moves } = buildOptions(useGameStore, x, y);
@@ -76,8 +122,9 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 							<Head def={o.def} />
 							<p className='build-blurb'>{o.def.blurb}</p>
 							<OutputLine option={o} />
+							{o.def.kind === 'idol' && <IdolInfo id={o.def.id} remembered={o.remembered ?? 0} buildTimePct={buildTimePct} prestige={prestige} />}
 							<div className='build-foot'>
-								<CostList cost={o.cost} />
+								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostList cost={o.cost} />}
 								<button className='px-btn' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
 									Build
 								</button>
