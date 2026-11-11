@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import PixelIcon from '@/components/game/PixelIcon';
 import AvatarArt from '@/components/game/AvatarArt';
+import { resolveAvatar } from '@/catalog/avatars';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
 import { LANDING_FEATURES, LANDING_MAP, fitZoom, type LandingFeature } from '@/config/landing';
@@ -197,7 +198,7 @@ const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null
 	return (
 		<div className='ld-continue'>
 			<div className='ld-continue-figure'>
-				<AvatarArt id={profile.avatarId} playerClass={profile.playerClass} scale={2} />
+				<AvatarArt id={resolveAvatar(profile.avatarId, profile.playerClass).id} playerClass={profile.playerClass} scale={2} />
 			</div>
 			<p className='ld-continue-name'>{profile.characterName}</p>
 			<p className='ld-continue-class'>

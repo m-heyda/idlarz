@@ -513,7 +513,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:143`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:146`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 

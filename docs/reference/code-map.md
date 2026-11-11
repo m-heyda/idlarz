@@ -170,7 +170,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/**
 
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
-- [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id; null/unknown shows the default avatar of `playerClass`
+- [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The chosen avatar id (null = none yet)
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
@@ -839,6 +839,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`avatarArt.test.ts`](../../tests/ui/avatarArt.test.ts)
 - [`avatarPick.test.ts`](../../tests/ui/avatarPick.test.ts) — ~ A fake client store and server:
 - [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)

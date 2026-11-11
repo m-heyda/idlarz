@@ -264,7 +264,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `TutorialGuide` | Progression / Guided tutorial | [`src/components/game/tutorial/TutorialGuide.tsx:39`](../../src/components/game/tutorial/TutorialGuide.tsx) | Brother Alder, the tutorial guide. |
 | `typeWeights` | Monsters / Spawning | [`src/lib/offline/spawnWeights.ts:49`](../../src/lib/offline/spawnWeights.ts) | Weight of each type for this player and castle level, in the order given. |
 | `UNCLAIMED_SEC` | Combat / Results and rest | [`src/lib/offline/grant.ts:51`](../../src/lib/offline/grant.ts) | The longest gap the server treats as the same session: |
-| `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:143`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
+| `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:146`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
 | `upgradeBody` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:52`](../../src/lib/saveUpgrade.ts) | Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |
 | `valueCurve` | Loot / Items | [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |

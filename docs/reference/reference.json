@@ -86,7 +86,7 @@
   "kind": "function",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 143,
+  "line": 146,
   "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
   "see": []
  },
