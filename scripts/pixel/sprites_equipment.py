@@ -252,20 +252,3 @@ def charm():
     fx.glint(img, 17, 17, 2)
     return img
 
-
-# ----------------------------------------------------------------- belt
-def belt():
-    """A leather belt seen from the front, laid flat: a studded strap with a gold buckle and the loose end hanging from it."""
-    sc = _scene(11.0, (20, 20))
-    for sx in (-1, 1):                                                                            # the strap, two halves
-        sc.add(between('cyl', _P(sc, 0.3 * sx, 0.1), _P(sc, 1.45 * sx, 0.1), (0.3,), 'leather', None, (0, 0, 1)))
-    for k in range(3):                                                                            # studs
-        for sx in (-1, 1):
-            sc.add(Prim('ell', add(_P(sc, (0.75 + 0.27 * k) * sx, 0.1), mul(sc.f, -0.3)), (0.07, 0.07, 0.07), 'gold', I3, None, 20 + k))
-    sc.add(Prim('box', _P(sc, 0, 0.1), (0.52, 0.56, 0.12), 'gold', I3, None, 1))                  # buckle frame
-    sc.add(Prim('box', add(_P(sc, 0, 0.1), mul(sc.f, -0.1)), (0.3, 0.34, 0.1), 'dark', I3, None, 2))  # its opening
-    sc.add(Prim('box', add(_P(sc, 0, 0.1), mul(sc.f, -0.17)), (0.05, 0.34, 0.06), 'gold', I3, None, 3))  # tongue
-    sc.add(between('cyl', _P(sc, 0.55, -0.15), _P(sc, 0.6, -0.95), (0.24,), 'pleather', None, (0, 0, 1)))  # loose end
-    img = sc.render()
-    fx.glint(img, 20, 15, 1)
-    return img

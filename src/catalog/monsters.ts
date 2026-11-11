@@ -44,7 +44,7 @@ export const monsterSpriteUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes
 /** Whether the game draws this monster's stand-in silhouette (no real art yet) instead of its own sprite. */
 export const usesPlaceholderArt = (entry: Pick<MonsterCatalogEntry, 'art' | 'placeholder'>): boolean => !entry.art && !!entry.placeholder;
 
-/** The one stand-in picture (`public/pixel/enemies/placeholder/silhouette.png`, a small teal slime, drawn by `scripts/pixel/placeholder_monster.py`) shown until a monster's real sprite is made */
+/** The one stand-in picture (`public/pixel/enemies/placeholder/silhouette.png`, a small teal slime) shown until a monster's real sprite is made */
 const PLACEHOLDER = '/pixel/enemies/placeholder/silhouette.png';
 
 const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): MonsterCatalogEntry => ({
