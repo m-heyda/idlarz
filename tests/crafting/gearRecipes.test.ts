@@ -6,7 +6,7 @@ import { GRADE_INFO, gradeLevels, gradeOfItem } from '../../src/catalog/items/gr
 import { RARITIES } from '../../src/catalog/rarity';
 import { CRAFT_GEAR } from '../../src/config/crafting';
 import { gearItemLevels, gearOdds, gearRequest, pityMultiplier, pityRarityOf, qualityBiasOf, rarityCeilingAt, rollGear } from '../../src/lib/craftGear';
-import { craftCumulativeXp, craftLimit, emptyCraft, recipeCostGold } from '../../src/lib/crafting';
+import { craftCumulativeXp, craftLimit, craftXpOf, emptyCraft, recipeCostGold } from '../../src/lib/crafting';
 import { generateLoot, rollLeaning } from '../../src/lib/loot/generate';
 import { sellValueOf, instanceProblem } from '../../src/lib/itemInstance';
 import { mulberry32 } from '../../src/lib/rng';
@@ -260,7 +260,7 @@ test('claiming a gear batch rolls sealed pieces into the bag, marked crafted, wi
 	const items = bagItems(out.inv);
 	assert.equal(items.length, 4);
 	assert.ok(items.every((i) => i.crafted === true && i.rarity === 'common' && instanceProblem(i) === null));
-	assert.equal(out.craft.xp, q.craft.xp + 4 * q.r.xp);
+	assert.equal(out.craft.xp, q.craft.xp + craftXpOf(q.r, 4));
 	assert.equal(out.craft.ord, 4);
 	assert.deepEqual(out.craft.queue, []);
 	// the ordinal seals the piece: the same claim from the same state gives the same items (a replayed request), and the next batch continues the sequence
@@ -321,7 +321,7 @@ test("cancel delivers what is finished, refunds the rest's components and the XP
 	assert.equal(bagItems(out.inv).length, 1);
 	assert.equal(out.craft.queue.length, 0);
 	assert.equal(out.refund?.length, q.r.inputs.filter((i) => 'resource' in i).length);
-	assert.equal(out.craft.xp, q.craft.xp + q.r.xp);
+	assert.equal(out.craft.xp, q.craft.xp + craftXpOf(q.r, 1));
 });
 
 test("a level-up in the middle of a batch does not shift the batch's rolls: the level is read once per delivery", () => {

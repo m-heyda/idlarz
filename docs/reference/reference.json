@@ -598,7 +598,7 @@
   "kind": "const",
   "category": "Progression/Crafting",
   "file": "src/config/crafting.ts",
-  "line": 46,
+  "line": 52,
   "summary": "Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.",
   "see": []
  },
@@ -1541,6 +1541,17 @@
   "file": "src/lib/craftGear.ts",
   "line": 140,
   "summary": "What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.",
+  "see": []
+ },
+ {
+  "id": "craftxpof",
+  "name": "craftXpOf",
+  "symbol": "craftXpOf",
+  "kind": "function",
+  "category": "Progression/Crafting",
+  "file": "src/lib/crafting.ts",
+  "line": 90,
+  "summary": "The crafting XP one payout gives: the recipe's `xp` times how many were made times `CRAFTING.xpScale` (the end-game slow-down, `config/crafting.ts`), rounded to six decimals so repeated small additions never drift. The server uses this for every craft, claim and queue payout, the UI to show it.",
   "see": []
  },
  {
