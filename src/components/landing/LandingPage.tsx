@@ -8,7 +8,7 @@ import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import PixelIcon from '@/components/game/PixelIcon';
 import AvatarArt from '@/components/game/AvatarArt';
 import AwayBar from '@/components/game/AwayBar';
-import EarlyTesterBadge from '@/components/game/EarlyTesterBadge';
+import BetaTesterBadge from '@/components/game/BetaTesterBadge';
 import { resolveAvatar } from '@/catalog/avatars';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
@@ -228,7 +228,7 @@ const MemberCard: React.FC<{
 			</div>
 			<p className='ld-continue-name'>
 				{profile.characterName}
-				{earlyTester && <EarlyTesterBadge size={26} />}
+				{earlyTester && <BetaTesterBadge size={26} />}
 			</p>
 			<p className='ld-continue-class'>
 				{info.race} {info.label}

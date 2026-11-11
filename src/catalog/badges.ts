@@ -3,8 +3,8 @@ import { ACHIEVEMENTS, achievementById, type AchievementDef } from '@/catalog/ac
 /** The stored `profiles.badge_id` that hides the badge completely (null = the default). */
 export const BADGE_NONE = 'none';
 
-/** The badge shown when the player never chose: the Early tester medal, for the accounts that hold it. */
-export const DEFAULT_BADGE_ID = 'early_tester';
+/** The badges shown when the player never chose, best first: the tester medals (Beta, then Early), for the accounts that hold one. */
+export const DEFAULT_BADGE_IDS: readonly string[] = ['beta_tester', 'early_tester'];
 
 /** One title a player can wear: the achievement that grants it and the words shown. */
 export interface TitleOption {
@@ -28,8 +28,8 @@ export const titleOptions = (earned: readonly string[]): TitleOption[] =>
 /** The badge to draw for a stored choice, or null when none is shown (hidden, nothing earned, or a choice that is no longer earned). */
 export const shownBadge = (choice: string | null | undefined, earned: readonly string[]): AchievementDef | null => {
 	if (choice === BADGE_NONE) return null;
-	const id = choice ?? DEFAULT_BADGE_ID;
-	return earned.includes(id) ? (achievementById(id) ?? null) : null;
+	const id = choice ?? DEFAULT_BADGE_IDS.find((candidate) => earned.includes(candidate));
+	return id && earned.includes(id) ? (achievementById(id) ?? null) : null;
 };
 
 /** The title text for a stored title id, or null when it is not set or not earned. */

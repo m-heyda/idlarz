@@ -18,7 +18,7 @@ import { readAttrs } from './attrs';
 import type { AchievementRepo } from './achievements';
 import { readCombat, readInventory } from './ledgerRead';
 import { upgradeLedgerRow } from './ledgerUpgrade';
-import { isEmptyStats, readStats } from './stats';
+import { isEmptyStats, readStats, statsToJson } from './stats';
 import { upgradeStoredBank, type TicketBank } from './tickets';
 
 export interface LedgerRow {
@@ -67,7 +67,7 @@ export const ledgerToRow = (ledger: Ledger) => ({
 	inv: ledger.inv,
 	craft: isEmptyCraft(ledger.craft) ? null : ledger.craft,
 	buffs: ledger.buffs.length === 0 ? null : ledger.buffs,
-	stats: isEmptyStats(ledger.stats) ? null : ledger.stats,
+	stats: isEmptyStats(ledger.stats) ? null : statsToJson(ledger.stats),
 	legacy: isEmptyLegacy(ledger.legacy) ? null : ledger.legacy,
 	attrs: ledger.attrs,
 	gem_shop: isEmptyGemShop(ledger.gemShop) ? null : ledger.gemShop,
@@ -125,6 +125,12 @@ export const supabaseLedgerRepo = (db: SupabaseClient): LedgerRepo => ({
 
 /** The `player_achievements` mirror: one `insert ... on conflict do nothing` for the ids a request paid. Service role only. */
 export const supabaseAchievementRepo = (db: SupabaseClient): AchievementRepo => ({
+	async list(userId) {
+		const { data, error } = await db.from('player_achievements').select('achievement_id').eq('user_id', userId);
+		if (error) throw new Error(error.message);
+		return (data ?? []).map((row) => String(row.achievement_id));
+	},
+
 	async record(userId, ids, atMs) {
 		if (ids.length === 0) return;
 		const earnedAt = new Date(atMs).toISOString();

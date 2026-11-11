@@ -15,7 +15,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`craftXpOf`](#craftxpof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
-- Achievements: [`settleAchievements`](#settleachievements), [Achievements](#achievements)
+- Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 - Badges: [`badgeOptions`](#badgeoptions)
 
@@ -574,7 +574,7 @@ Rules, all enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the
 achievements the account has earned. A stored avatar that no longer fits (a later class change) falls back to the class's default (`fitAvatar`). The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
 
 **Art.** The owner's framed busts (64x64, `public/pixel/new_assets/heroes/<portrait>.png`, listed in `public/pixel/new_assets/README.md`) are the portraits; `avatarArtUrl` is the only place that
-builds the path, so a new picture is a change to the `portrait` field. The horned busts not used here stay in the pool for later unlocks. The **Beta tester** is a second reward of the same `early_tester` achievement (a wireframe bust), so every account that played before the new chapter gets both faces. A locked avatar is shown as a black
+builds the path, so a new picture is a change to the `portrait` field. The horned busts not used here stay in the pool for later unlocks. The **Beta tester** is the reward of the Beta tester achievement (a wireframe bust), which every Early tester gets too. A locked avatar is shown as a black
 cut-out of its own picture (generated in `AvatarArt`, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.
 
 <a id="createavatarpicker"></a>
@@ -651,31 +651,38 @@ bow and a staff take both hands). Their damage per second matches the sword's, s
 
 ### `settleAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:111`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:156`](../../src/lib/offline/achievements.ts)
 
-Lazy evaluation, once per online request: the achievements that became due are paid and recorded in the same ledger write (a compare-and-swap, so two requests
-at once cannot both pay; a replayed request finds the id recorded and pays nothing). The caller mirrors the ids into `player_achievements` with
-`insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
+Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing).
+The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
 
-- **Gems**: `rewards.gems` is added to `ledger.gems` (capped by `GEMS_CAP`) and to `granted.gems`, like a chest's gem find. Gems are not an economy input, so the pacing sim does not move.
+- **Claiming**: earning pays nothing by itself; the player claims each achievement in the Achievements window ([`claimAchievement`](progression.md#claimachievement)). Gems are not an economy input, so the pacing sim does not move.
 - **Avatar and title** are only recorded with the achievement; the avatar picker (IDL-71) offers the avatars of the earned ones.
-- **Early tester** is never checked here: the new chapter reset grants it.
-- **Dark until the new chapter**: while the guide is dark (`guideLive`: `GAME_EPOCH` still the baseline and no `NEXT_PUBLIC_GUIDE=on`) nothing is paid, so the live game gets no surprise gems and the first achievement
-  (the tutorial's end) cannot be reached anyway. The one-line epoch flip switches it on together with the guide.
+- **The testers** are never checked here: the new chapter reset grants them (`mergeManual` brings them into the ledger).
+- **Dark until the new chapter**: while the guide is dark (`guideLive`: `GAME_EPOCH` still the baseline and no `NEXT_PUBLIC_GUIDE=on`) nothing is earned, so the live game gets no surprises. The one-line epoch flip switches it on together with the guide.
 
-See also: `achievementsDue`, `payAchievements`
+See also: `achievementsDue`, `earnAchievements`
+
+<a id="claimachievement"></a>
+
+### `claimAchievement` <small>function</small>
+
+Source: [`src/lib/offline/achievements.ts:106`](../../src/lib/offline/achievements.ts)
+
+The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time.
+Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.
 
 <a id="achievements"></a>
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:55`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:57`](../../src/catalog/achievements.ts)
 
-The 12 launch achievements: 600 gems in total and 4 avatars (docs/plan/21 section 3). Gems are paid once per account by the server when the condition first holds
-([`settleAchievements`](progression.md#settleachievements)); the early tester is granted by the new chapter reset instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
+The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
+([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (12, 600 gems in total)** _(computed from the code)_
+**The launch achievements (13, 800 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -691,6 +698,7 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 10 | `boss_auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss_slayer |
 | 11 | `golden_kill` | Golden touch | golden >= 1 | 50 | - |
 | 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early_tester / early-tester |
+| 13 | `beta_tester` | Beta tester | granted by the new chapter reset | 200 | beta_tester / beta-tester |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 

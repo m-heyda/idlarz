@@ -4,7 +4,8 @@ import { BADGE_NONE, badgeOptions, checkBadgeChoice, shownBadge, shownTitle, tit
 
 const earned = ['early_tester', 'first_rebirth'];
 
-test('the default badge is the Early tester medal, and only for accounts that hold it', () => {
+test('the default badge is the tester medal (Beta before Early), and only for accounts that hold one', () => {
+	assert.equal(shownBadge(null, ['early_tester', 'beta_tester'])?.id, 'beta_tester');
 	assert.equal(shownBadge(null, earned)?.id, 'early_tester');
 	assert.equal(shownBadge(null, ['first_rebirth']), null);
 });

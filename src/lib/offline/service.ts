@@ -15,7 +15,7 @@ import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
 import { addTotals, resetLedger, seedLedger, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
-import { settleAchievements, type AchievementRepo, type AchievementUnlock } from '@/lib/offline/achievements';
+import { mergeManual, settleAchievements, type AchievementRepo, type AchievementUnlock } from '@/lib/offline/achievements';
 import { attrsFromCore, coreWithAttrs, levelOfXp } from '@/lib/offline/attrs';
 import { restThrough } from '@/lib/offline/fight';
 import { coreWithInventory, fitInventory, inventoryFromCore } from '@/lib/offline/inventory';
@@ -220,14 +220,20 @@ export const withLedger = async <T>(
 		);
 		const stepped = await step(base, { ...stored, core: withAttrs });
 		// achievements are checked lazily here, on every request the server handles anyway: what became due is paid in the same write
-		const settled = settleAchievements(stepped.ledger, stored.summary);
+		// the testers are granted outside the lazy evaluator (`player_achievements`): merged into the ledger once, so they show in the Achievements window and can be claimed
+		let manual: { ledger: Ledger; added: string[]; mirror: string[] } = { ledger: stepped.ledger, added: [], mirror: [] };
+		if (!stepped.ledger.stats.manualSynced && deps.achievements?.list) {
+			const held = await deps.achievements.list(userId);
+			manual = mergeManual(stepped.ledger, held, nowMs);
+		}
+		const settled = settleAchievements(manual.ledger, stored.summary, nowMs);
 		const out = { ...stepped, ledger: settled.ledger };
 		// a read-only poll that found nothing new does not write: the spawn timers and the anchor are recomputed from the clock next time
 		if (out.skipWrite && existing && onlyTimeMoved(existing, out.ledger))
 			return { kind: 'ok', result: out.result, ledger: { ...out.ledger, ver: existing.ver }, unlocked: [] };
 		const next: Ledger = { ...out.ledger, ver: (existing?.ver ?? 0) + 1 };
 		if (await deps.ledgers.commit(userId, existing?.ver ?? 0, next)) {
-			await mirrorAchievements(deps, userId, settled.unlocked, nowMs);
+			await mirrorAchievements(deps, userId, [...manual.mirror.map((id) => ({ id, gems: 0 })), ...settled.unlocked], nowMs);
 			return { kind: 'ok', result: out.result, ledger: next, unlocked: settled.unlocked };
 		}
 	}
