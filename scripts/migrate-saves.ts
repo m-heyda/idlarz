@@ -30,7 +30,14 @@ const args = process.argv.slice(2);
 const flag = (name: string) => args.includes(name);
 const users: string[] = [];
 args.forEach((a, i) => {
-	if (a === '--user' && args[i + 1]) users.push(args[i + 1]);
+	if (a !== '--user') return;
+	const value = args[i + 1];
+	// a --user without an account must stop the run: an empty list would mean EVERY account
+	if (!value || value.startsWith('--')) {
+		console.error('--user needs an account id (uuid): refusing to run.');
+		process.exit(1);
+	}
+	users.push(value);
 });
 const execute = flag('--yes');
 const backup = !flag('--no-backup');
@@ -179,8 +186,19 @@ const run = async () => {
 			.eq('user_id', row.user_id)
 			.eq('rev', row.rev)
 			.select('rev');
+		const landed = !saved.error && !!saved.data?.length;
+		if (!landed && nextWorld.hash !== world.hash) {
+			// the map was already rewritten but the save was not (a newer save, or an error): put the old map back so the save and its map never disagree.
+			// (Two tables cannot be one transaction from here; a step that changes the map should ship as a SQL function that does both under the rev check, see docs/plan/save-compatibility.md)
+			const undo = await db
+				.from('player_worlds')
+				.update({ hash: world.hash, land: world.land, extra: world.extra })
+				.eq('user_id', row.user_id)
+				.eq('hash', nextWorld.hash);
+			fail('put the old map back (restore it from the backup file)', undo.error);
+		}
 		fail('write a save', saved.error);
-		if (saved.data?.length) wrote++;
+		if (landed) wrote++;
 		else skipped++;
 	}
 	for (const { row, result } of ledgerWork) {

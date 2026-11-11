@@ -91,7 +91,7 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:209`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:216`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -145,7 +145,7 @@ The Save & Backup dialog (Settings, *Save & backup*, or Control x5).
 
 ### `BodyUpgrade` <small>type</small>
 
-Source: [`src/lib/saveUpgrade.ts:34`](../../src/lib/saveUpgrade.ts)
+Source: [`src/lib/saveUpgrade.ts:35`](../../src/lib/saveUpgrade.ts)
 
 **The one way to change what a save means: bump the schema and write an upgrade step.** Everything else is additive and needs no version (a new optional field with a default, a new id in a catalog, a new
 resource, a new building, a changed number: see `docs/plan/save-compatibility.md`). A step is only for what additive changes cannot do: a field that is renamed, moved, split or reinterpreted, or an id that must
@@ -166,6 +166,7 @@ never thrown on), and idempotent on a body that is already new. A step is never 
 ```ts
 export const SAVE_UPGRADES: Record<number, BodyUpgrade> = {
   7: (body) => {
+    if (!('playerName' in body)) return body;              // already new (or never had one): leave it alone, so running the step twice changes nothing
     const { playerName, gems, ...rest } = body;
     return { ...rest, heroName: playerName };   // gems are the ledger's now: the old value is simply not carried
   },
@@ -181,7 +182,7 @@ See also: [`SAVE_SCHEMA`](saves-and-server.md#save-schema), `decodeSave`, [`upgr
 
 ### `upgradeBody` <small>function</small>
 
-Source: [`src/lib/saveUpgrade.ts:51`](../../src/lib/saveUpgrade.ts)
+Source: [`src/lib/saveUpgrade.ts:52`](../../src/lib/saveUpgrade.ts)
 
 Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... `to - 1` of `chain`. Pure: the input is never changed. `from === to` returns a copy untouched.
 `chain` is a parameter so a test (or a release script) can run a step before it is registered.

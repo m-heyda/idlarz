@@ -27,10 +27,10 @@ Keep the two later PRs as drafts until step 4 below is green. Vercel failing on 
 
 ## Before release day (nothing here changes players)
 
-1. `npm run verify` green on `main` after the save-compat merge; `npm run docs:gen:fast` hash fresh.
+1. `npm run verify` green on `main` after the save-compat merge; `npm run docs:gen:fast` hash fresh. Run `npm run gen-save-fixtures -- --ids` and commit `tests/fixtures/saves/released-ids.json`: the list of shipped ids is closed at release time (it only ever grows), so the append-only guard protects every id that ships.
 2. SQL: every migration the release needs is already applied (`supabase/migrations/*`, applied by the owner, SQL before code): at least `new_chapter_columns` (`player_ledger.stats`, `legacy`, `player_achievements`, `profiles.epoch`, `avatar_id`). Check `check-live-saves` section "new chapter dry run" says the columns exist.
 3. `npm run check-live-saves` (read-only, same Supabase environment as production): accounts the flip would reset, how many hold a save, **name collisions and the forced renames they mean**, rows unreadable by today's rules. Fix or reset anything it reports before the flip.
-4. Rehearsal on the test account (`lepryko@gmail.com`, the owner signs in by hand): `npm run reset-test-account`, then walk the chapter screen against a preview or staging with `GAME_EPOCH` raised there: pick name, class, avatar; confirm the game starts empty, gems unchanged, archive row exists in `save_history` (flag `epoch_archive`). Try a stale second tab: it must be refused (412 `stale_epoch`) and reload into the screen.
+4. Rehearsal on the test account (`lepryko@gmail.com`, the owner signs in by hand): `npm run reset-test-account`, then walk the chapter screen against a preview or staging with `GAME_EPOCH` raised there: pick name, class, avatar; first set the account's gems to a balance that is NOT 1000 (say 250), then confirm after the reset that the game starts empty, the gems are **exactly 1000**, the old achievements are gone and only the Early tester avatar is offered beyond the starters, the archive row exists in `save_history` (flag `epoch_archive`). Try a stale second tab: it must be refused (412 `stale_epoch`) and reload into the screen.
 5. `restore-trust` dry run once against a real account (IDL-209) so the way back exists. Enforcement stays **off** at the flip (`ENFORCEMENT.enabled = false`, `EMBER_MODEL.requireServerRebirth = false`); it is turned on later, see the guide on `ENFORCEMENT` in `verify.ts`.
 6. Secrets: new `LOOT_SECRET` per deployment, a placeholder in `.env.example` (RELEASE-PLAN 2.7). The reset invalidates every sealed roll anyway, so rotate it now, in the same deploy window.
 7. Announce the downtime-free change if you want (the old tabs reload by themselves), and pick an hour with few players online.
@@ -44,7 +44,7 @@ Keep the two later PRs as drafts until step 4 below is green. Vercel failing on 
 
 ## After the flip
 
-1. Watch for a day: `/api/auth/epoch` errors (`archive_failed`, `name_taken` spikes), `stale_epoch` 412 counts settling to zero, first saves of new accounts accepted (not `invalid`).
+1. Watch for a day, from what the server really emits: `POST /api/auth/epoch` answering **503 with `archiveFailed: true`** (the server also logs the event `chapter_archive_failed`, search for it), **409 with `nameTaken: true`** (not logged: count the 409s on that route in the Vercel logs), `stale_epoch` **412** counts settling to zero, first saves of new accounts accepted (not `invalid`).
 2. `npm run check-live-saves` again: accounts still on epoch 1 are the players who have not come back yet; rows that were reset read as new-game saves.
 3. Once nobody can still hold the old shape (the first reset has run for everyone who matters), delete `upgradeStoredBank` in `src/lib/offline/tickets.ts` (IDL-281). Not before.
 4. From now on every PR follows the save-compatibility rule in `CLAUDE.md` and `docs/plan/save-compatibility.md`.

@@ -149,6 +149,13 @@ const RESOURCE_KEYS = Object.keys(INITIAL_RESOURCES) as (keyof Resources)[];
 const REQUIRED_RESOURCES = new Set<keyof Resources>(['gold', 'xp']);
 export const MAX_ANIMALS = 5000;
 const GEAR_SLOTS = new Set<string>([...EQUIPMENT_LAYOUT.left, ...EQUIPMENT_LAYOUT.right, ...EQUIPMENT_LAYOUT.bottom]);
+
+/** Whether `item` may be worn in `slot`: a slot this version has, and a piece made for it (a ring goes in either ring slot). Shared by the save reader and the ledger reader. */
+export const fitsSlot = (slot: string, item: ItemInstance): boolean => {
+	if (!GEAR_SLOTS.has(slot)) return false;
+	const def = ITEM_CATALOG[item.base];
+	return !!def && (def.slot === slot || (def.slot === 'ring' && (slot === 'ring1' || slot === 'ring2')));
+};
 const STACK_KEYS = new Set(['id', 'qty']);
 const GEAR_ENTRY_KEYS = new Set(['item']);
 const INSTANCE_KEYS = new Set(['base', 'level', 'rarity', 'quality', 'affixes', 'crafted']);
@@ -375,12 +382,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		equipment = {};
 		for (const [slot, value] of Object.entries(raw.equipment)) {
 			// a slot this version does not have, or a piece that is no longer valid here (an id it does not know, a level or affix the rules changed): that piece is dropped, never a reason to refuse the save
-			if (!GEAR_SLOTS.has(slot)) continue;
 			const item = readInstance(value);
-			if (typeof item === 'string') continue;
-			const def = ITEM_CATALOG[item.base];
-			const fits = def.slot === slot || (def.slot === 'ring' && (slot === 'ring1' || slot === 'ring2'));
-			if (!fits) continue;
+			if (typeof item === 'string' || !fitsSlot(slot, item)) continue;
 			equipment[slot as EquipmentSlot] = item;
 		}
 		if (!Array.isArray(raw.bag) || raw.bag.length < 1 || raw.bag.length > maxBagSize) return fail('bag size');

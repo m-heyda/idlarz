@@ -196,3 +196,62 @@ test('a ledger row with damaged columns still loads: every column falls back to 
 	assert.deepEqual(ledger.buffs, []);
 	assert.deepEqual(ledger.bank.chests, []);
 });
+
+test('ledger inventory: every single discarded field advances the version, an untouched row does not', () => {
+	const base = () => ({ ver: 4, bag: [null], equipment: { head: plainItem('leather_cap') }, lootPity: {}, autoSellUpTo: null as string | null });
+	assert.equal(readInventory(base())?.ver, 4, 'nothing repaired: same version');
+	assert.equal(readInventory({ ...base(), autoSellUpTo: 'mythic_of_the_future' })?.ver, 5, 'only the auto-sell rarity');
+	assert.equal(readInventory({ ...base(), lootPity: { 'boss:x': 'many' } })?.ver, 5, 'only a pity counter that is not a number');
+	assert.equal(readInventory({ ...base(), lootPity: { 'boss:x': -3 } })?.ver, 5, 'only a negative pity counter');
+	assert.equal(readInventory({ ...base(), equipment: { belt: plainItem('obsidian_helm') } })?.ver, 5, 'only a helm in the belt slot');
+	assert.equal(
+		readInventory({ ...base(), equipment: { head: plainItem('leather_cap'), tail: plainItem('leather_cap') } })?.ver,
+		5,
+		'only a valid piece under a slot this version lacks',
+	);
+	const worn = readInventory({ ...base(), equipment: { head: plainItem('leather_cap'), belt: plainItem('obsidian_helm'), tail: plainItem('leather_cap') } });
+	assert.deepEqual(Object.keys(worn?.equipment ?? {}), ['head']);
+});
+
+test('ledger combat: an open fight that lacks its profile, a timer or a number is closed; a complete one (optional profile fields or not) is kept', () => {
+	const fight = {
+		n: 1,
+		type: 'thistleBoar',
+		level: 1,
+		lucky: false,
+		monsterHp: 8,
+		monsterMaxHp: 10,
+		playerTimer: 0.2,
+		monsterTimer: 0.4,
+		stunLeft: 0,
+		elapsed: 3,
+		timeLeftSec: null,
+		ord: 9,
+		seq: 4,
+		profile: {
+			level: 3,
+			maxHp: 120,
+			maxMp: 40,
+			hit: 8,
+			crit: 0.05,
+			superCrit: 0.1,
+			critExtra: 1,
+			attacksPerSec: 1,
+			armor: 2,
+			dodge: 0.02,
+			leechPct: 0,
+			hpRegen: 0.1,
+			mpRegen: 0.2,
+			heal: 20,
+		},
+		x: 3,
+		y: 4,
+	};
+	const combat = (f: unknown) => readCombat({ ...freshCombat(1000, 50, 20), fight: f });
+	assert.deepEqual(combat(fight)?.fight, fight, 'complete: kept as it is');
+	assert.deepEqual(combat({ ...fight, profile: { ...fight.profile, potionPower: 1.5 } })?.fight?.profile.potionPower, 1.5, 'optional fields stay');
+	assert.equal(combat({ ...fight, profile: undefined })?.fight, null, 'no profile');
+	assert.equal(combat({ ...fight, profile: { ...fight.profile, maxHp: 'x' } })?.fight, null, 'a profile number that is not a number');
+	assert.equal(combat({ ...fight, monsterTimer: undefined })?.fight, null, 'a missing timer');
+	assert.equal(combat({ ...fight, timeLeftSec: 'soon' })?.fight, null, 'a clock that is not a number');
+});

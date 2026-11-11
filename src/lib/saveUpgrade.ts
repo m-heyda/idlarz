@@ -18,6 +18,7 @@
  * ```ts
  * export const SAVE_UPGRADES: Record<number, BodyUpgrade> = {
  *   7: (body) => {
+ *     if (!('playerName' in body)) return body;              // already new (or never had one): leave it alone, so running the step twice changes nothing
  *     const { playerName, gems, ...rest } = body;
  *     return { ...rest, heroName: playerName };   // gems are the ledger's now: the old value is simply not carried
  *   },

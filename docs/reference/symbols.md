@@ -35,7 +35,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `BIOME_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:125`](../../src/catalog/lootConfig.ts) | The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: |
 | `BIOME_YIELD` | Economy / Income | [`src/config/economy.ts:141`](../../src/config/economy.ts) | Biome and building output is multiplied by `scale` (1.3). |
 | `BIOMES` | Economy / Biomes | [`src/config/biomes.ts:53`](../../src/config/biomes.ts) | Every biome with its config output per second. |
-| `BodyUpgrade` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:34`](../../src/lib/saveUpgrade.ts) | **The one way to change what a save means: |
+| `BodyUpgrade` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:35`](../../src/lib/saveUpgrade.ts) | **The one way to change what a save means: |
 | `BOSS_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:210`](../../src/catalog/lootConfig.ts) | Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): |
 | `BOSS_MIN_DISTANCE` | Monsters / Spawning | [`src/config/combatConfig.ts:401`](../../src/config/combatConfig.ts) | The boss band (IDL-222, owner decision 2026-11-09): |
 | `BUFF_FAMILIES` | Combat / Consumables | [`src/catalog/buffs.ts:25`](../../src/catalog/buffs.ts) | The buff families. |
@@ -218,7 +218,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |
 | `rollSpawnLevel` | Monsters / Level scaling | [`src/lib/monsters.ts:56`](../../src/lib/monsters.ts) | The level a new monster starts at. |
 | `runCombat` | Combat / A fight | [`src/lib/offline/fight.ts:61`](../../src/lib/offline/fight.ts) | Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battl... |
-| `sanitizeSave` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:209`](../../src/lib/sanitizeSave.ts) | Validates and normalises a loaded/imported save. |
+| `sanitizeSave` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:216`](../../src/lib/sanitizeSave.ts) | Validates and normalises a loaded/imported save. |
 | Save and Backup dialog | Saves & Server / The save | [`src/components/game/overlays/SaveMenuDialog.tsx:1`](../../src/components/game/overlays/SaveMenuDialog.tsx) | The Save & Backup dialog (Settings, *Save & backup*, or Control x5). |
 | `SAVE_SCHEMA` | Saves & Server / The save | [`src/lib/saveFormat.ts:35`](../../src/lib/saveFormat.ts) | The save in the browser. |
 | `sealedRng` | Saves & Server / The ledger | [`src/lib/offline/seal.ts:18`](../../src/lib/offline/seal.ts) | A random source for one reward: |
@@ -262,7 +262,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `typeWeights` | Monsters / Spawning | [`src/lib/offline/spawnWeights.ts:49`](../../src/lib/offline/spawnWeights.ts) | Weight of each type for this player and castle level, in the order given. |
 | `UNCLAIMED_SEC` | Combat / Results and rest | [`src/lib/offline/grant.ts:51`](../../src/lib/offline/grant.ts) | The longest gap the server treats as the same session: |
 | `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:143`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
-| `upgradeBody` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:51`](../../src/lib/saveUpgrade.ts) | Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... |
+| `upgradeBody` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:52`](../../src/lib/saveUpgrade.ts) | Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |
 | `valueCurve` | Loot / Items | [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |
 | `verifyTransition` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:228`](../../src/lib/cloudSave/verify.ts) | Runs every plausibility check between two consecutive saves and returns the flags that fired; |

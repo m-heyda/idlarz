@@ -5,6 +5,7 @@ import type { CraftState, Inventory } from './types';
 import { craftFromJson, isEmptyCraft, isEmptyLegacy, legacyFromJson, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
 import type { AchievementRepo } from './achievements';
 import { readCombat, readInventory } from './ledgerRead';
+import { upgradeLedgerRow } from './ledgerUpgrade';
 import { isEmptyStats, readStats } from './stats';
 import { upgradeStoredBank, type TicketBank } from './tickets';
 
@@ -88,7 +89,7 @@ export const supabaseLedgerRepo = (db: SupabaseClient): LedgerRepo => ({
 	async load(userId) {
 		const { data, error } = await db.from('player_ledger').select(COLUMNS).eq('user_id', userId).maybeSingle();
 		if (error) throw new Error(error.message);
-		return data ? ledgerFromRow(data as unknown as LedgerRow) : null;
+		return data ? ledgerFromRow(upgradeLedgerRow(data as unknown as LedgerRow)) : null;
 	},
 
 	async commit(userId, expectedVer, ledger) {

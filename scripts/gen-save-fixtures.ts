@@ -27,6 +27,12 @@ import { currentIds, mergeReleased, type SavedIds } from './lib/savedIds';
 /** The clock of every fixture (ms): fixed, so a regenerated file differs only where the code does. */
 export const FIXTURE_NOW = 1_800_000_000_000;
 
+/**
+ * The shape number of the ledger row fixtures (`ledger-v<n>-*.json`). Raise it when the ledger gains or changes a column, in the same release: the new files are written next to the old ones, which stay as they are
+ * (1: the first released columns, 2: with `legacy`). Save fixtures are named from `SAVE_SCHEMA` by themselves.
+ */
+const LEDGER_SHAPE = 2;
+
 const dir = resolve(process.cwd(), 'tests/fixtures/saves');
 const force = process.argv.includes('--force');
 const writeIds = process.argv.includes('--ids');
@@ -81,10 +87,14 @@ const rebirthed = () => {
 };
 
 mkdirSync(dir, { recursive: true });
-saveFixture('save-v7-new-game', 'A new game: the castle and its four free tiles, nothing bought.', newGame());
+saveFixture(`save-v${SAVE_SCHEMA}-new-game`, 'A new game: the castle and its four free tiles, nothing bought.', newGame());
 const mid = midGame();
-saveFixture('save-v7-mid-game', 'A played game: 40 tiles, a farm, merchant levels, a click level, gear and potions, a castle upgrade running.', mid.text);
-saveFixture('save-v7-rebirthed', 'A game after two rebirths (castle 6, 400 tiles), with unspent Embers.', rebirthed());
+saveFixture(
+	`save-v${SAVE_SCHEMA}-mid-game`,
+	'A played game: 40 tiles, a farm, merchant levels, a click level, gear and potions, a castle upgrade running.',
+	mid.text,
+);
+saveFixture(`save-v${SAVE_SCHEMA}-rebirthed`, 'A game after two rebirths (castle 6, 400 tiles), with unspent Embers.', rebirthed());
 
 /** ---- ledger rows: the columns of `player_ledger` as the code writes them today ---- */
 const nowSec = FIXTURE_NOW / 1000;
@@ -94,7 +104,10 @@ const ledgerRow = (ledger: ReturnType<typeof newLedger>) => {
 	return JSON.parse(JSON.stringify(row));
 };
 const fresh = newLedger(FIXTURE_NOW);
-write('ledger-v1-new.json', { note: 'The row of an account that has just started: empty bank, no inventory yet.', row: ledgerRow({ ...fresh, ver: 1 }) });
+write(`ledger-v${LEDGER_SHAPE}-new.json`, {
+	note: 'The row of an account that has just started: empty bank, no inventory yet.',
+	row: ledgerRow({ ...fresh, ver: 1 }),
+});
 
 const played = newLedger(FIXTURE_NOW, 0);
 played.ver = 7;
@@ -153,6 +166,7 @@ played.combat = {
 		y: 4,
 	},
 };
+played.legacy = { idols: { battlefield: 3 } };
 played.craft = {
 	xp: 40,
 	ord: 3,
@@ -174,8 +188,8 @@ played.stats = {
 	seen: { thistleBoar: FIXTURE_NOW - 1000 },
 	income: { gold: 500 },
 };
-write('ledger-v1-played.json', {
-	note: 'The row of an account mid-game: tickets, bag and gear, an open fight, crafting, a buff, counters, an achievement.',
+write(`ledger-v${LEDGER_SHAPE}-played.json`, {
+	note: 'The row of an account mid-game: tickets, bag and gear, an open fight, crafting, a buff, counters, an achievement, an Idol level (legacy).',
 	row: ledgerRow(played),
 });
 

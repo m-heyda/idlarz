@@ -252,11 +252,11 @@ test('saves: a level above the maximum is cut, an unknown upgrade dropped, a neg
 		odd.merchantUpgrades[id] = level;
 		const read = sanitizeSave(odd);
 		assert.equal(read.ok, true, `${id} ${level}`);
-		if (read.ok)
-			assert.ok(
-				!(id in read.state.merchantUpgrades) || read.state.merchantUpgrades[id as 'foreman'] === MERCHANT_UPGRADES[id as 'foreman'].maxLevel,
-				`${id} is dropped or cut`,
-			);
+		if (read.ok) {
+			if (id in MERCHANT_UPGRADES)
+				assert.equal(read.state.merchantUpgrades[id as 'foreman'], MERCHANT_UPGRADES[id as 'foreman'].maxLevel, `${id} is cut to its maximum, not dropped`);
+			else assert.equal(id in read.state.merchantUpgrades, false, `${id} is unknown and dropped`);
+		}
 	}
 	const negative = JSON.parse(JSON.stringify(raw));
 	negative.merchantUpgrades.tithe = -1;

@@ -1,0 +1,308 @@
+{
+	"note": "The row of an account mid-game: tickets, bag and gear, an open fight, crafting, a buff, counters, an achievement, an Idol level (legacy).",
+	"row": {
+		"ver": 7,
+		"run_id": 2,
+		"rebirths": 0,
+		"anchor_at": "2027-01-15T08:00:00.000Z",
+		"reset_at": "2027-01-15T08:00:00.000Z",
+		"bank": {
+			"chestAcc": 12,
+			"monsterAcc": 0,
+			"bossAcc": 0,
+			"accAt": 1800000000,
+			"chests": [
+				{
+					"n": 1,
+					"at": 1799999400
+				}
+			],
+			"monsters": [
+				{
+					"n": 2,
+					"at": 1799999700,
+					"kind": "normal",
+					"lucky": false,
+					"type": "thistleBoar",
+					"x": 3,
+					"y": 4,
+					"spawnLevel": 1
+				}
+			],
+			"nextN": 3,
+			"monstersMinted": 1
+		},
+		"ord_chest": 4,
+		"ord_kill": 9,
+		"granted": {
+			"gold": 1234,
+			"wood": 50,
+			"stone": 0,
+			"coal": 0,
+			"food": 0,
+			"meat": 0,
+			"eggs": 0,
+			"milk": 0,
+			"hide": 0,
+			"xp": 0,
+			"herbs": 0,
+			"sap": 0,
+			"ironOre": 0,
+			"spores": 0,
+			"frostshard": 0,
+			"pearls": 0,
+			"salt": 0,
+			"wool": 0,
+			"gems": 10
+		},
+		"granted_seen": {
+			"gold": 1000,
+			"wood": 0,
+			"stone": 0,
+			"coal": 0,
+			"food": 0,
+			"meat": 0,
+			"eggs": 0,
+			"milk": 0,
+			"hide": 0,
+			"xp": 0,
+			"herbs": 0,
+			"sap": 0,
+			"ironOre": 0,
+			"spores": 0,
+			"frostshard": 0,
+			"pearls": 0,
+			"salt": 0,
+			"wool": 0,
+			"gems": 0
+		},
+		"gems": 1010,
+		"last_key": null,
+		"last_result": null,
+		"combat": {
+			"at": 1800000000,
+			"hp": 90,
+			"mp": 30,
+			"cd": {
+				"heal": 0,
+				"stun": 0,
+				"potion": 0
+			},
+			"fight": {
+				"n": 2,
+				"type": "thistleBoar",
+				"level": 1,
+				"lucky": false,
+				"monsterHp": 8,
+				"monsterMaxHp": 10,
+				"playerTimer": 0.2,
+				"monsterTimer": 0.4,
+				"stunLeft": 0,
+				"elapsed": 3,
+				"timeLeftSec": null,
+				"ord": 9,
+				"seq": 4,
+				"profile": {
+					"level": 3,
+					"maxHp": 120,
+					"maxMp": 40,
+					"hit": 8,
+					"crit": 0.05,
+					"superCrit": 0.1,
+					"critExtra": 1,
+					"attacksPerSec": 1,
+					"armor": 2,
+					"dodge": 0.02,
+					"leechPct": 0,
+					"hpRegen": 0.1,
+					"mpRegen": 0.2,
+					"heal": 20
+				},
+				"x": 3,
+				"y": 4
+			},
+			"autoBattle": false,
+			"autoUse": true,
+			"ord": 9,
+			"retryAt": {
+				"5": 1800000030
+			},
+			"queue": [2],
+			"eventNo": 3,
+			"log": []
+		},
+		"inv": {
+			"ver": 1,
+			"packrat": 2,
+			"bag": [
+				{
+					"id": "potion_minor",
+					"qty": 12
+				},
+				null,
+				null,
+				{
+					"item": {
+						"base": "obsidian_cuirass",
+						"level": 8,
+						"rarity": "common",
+						"quality": 50,
+						"affixes": []
+					}
+				},
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null
+			],
+			"equipment": {
+				"mainHand": {
+					"base": "wooden_sword",
+					"level": 1,
+					"rarity": "common",
+					"quality": 50,
+					"affixes": []
+				},
+				"offHand": {
+					"base": "wooden_shield",
+					"level": 1,
+					"rarity": "common",
+					"quality": 50,
+					"affixes": []
+				},
+				"head": {
+					"base": "obsidian_helm",
+					"level": 8,
+					"rarity": "common",
+					"quality": 50,
+					"affixes": []
+				}
+			},
+			"lootPity": {},
+			"autoSellUpTo": null
+		},
+		"craft": {
+			"xp": 40,
+			"ord": 3,
+			"stock": {
+				"glass_vial": 5
+			},
+			"pity": {},
+			"spent": 10,
+			"last": 1800000000,
+			"queue": [
+				{
+					"recipeId": "glass_vial",
+					"count": 2,
+					"startedAt": 1799999970,
+					"timeSec": 60
+				}
+			]
+		},
+		"buffs": [
+			{
+				"family": "might",
+				"stat": "damagePct",
+				"amount": 10,
+				"untilSec": 1800000600
+			}
+		],
+		"stats": {
+			"kills": {
+				"thistleBoar": 1
+			},
+			"seen": {
+				"thistleBoar": 1799999999000
+			},
+			"golden": 0,
+			"bosses": 0,
+			"chests": 2,
+			"tiles": 35,
+			"income": {
+				"gold": 500
+			},
+			"at": 1800000000000,
+			"playAt": 60,
+			"tilesAt": 40,
+			"tutorial": {
+				"done": [],
+				"lessons": [],
+				"skipped": false
+			},
+			"achievements": ["tutorial"]
+		},
+		"legacy": {
+			"idols": {
+				"battlefield": 3
+			}
+		}
+	}
+}

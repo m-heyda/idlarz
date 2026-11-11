@@ -4573,7 +4573,7 @@ and on hide/close; the backup rotates every 10 minutes. A read goes through <cod
 One tab owns the game at a time (<code>src/hooks/useSingleTab.ts</code>, a Web Lock).</p>
 </article><article><p><a id="sanitizesave"></a></p>
 <h3><code>sanitizeSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:209</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:216</code></a></p>
 <p>Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
 pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
@@ -4612,7 +4612,7 @@ Damaged, cut-off, foreign, impossible and <em>newer-version</em> saves are refus
 </ul>
 </article><article><p><a id="bodyupgrade"></a></p>
 <h3><code>BodyUpgrade</code> <small>type</small></h3>
-<p>Source: <a href="../../src/lib/saveUpgrade.ts"><code>src/lib/saveUpgrade.ts:34</code></a></p>
+<p>Source: <a href="../../src/lib/saveUpgrade.ts"><code>src/lib/saveUpgrade.ts:35</code></a></p>
 <p><strong>The one way to change what a save means: bump the schema and write an upgrade step.</strong> Everything else is additive and needs no version (a new optional field with a default, a new id in a catalog, a new
 resource, a new building, a changed number: see <code>docs/plan/save-compatibility.md</code>). A step is only for what additive changes cannot do: a field that is renamed, moved, split or reinterpreted, or an id that must
 be turned into another one.</p>
@@ -4627,6 +4627,7 @@ never thrown on), and idempotent on a body that is already new. A step is never 
 <p><strong>Worked example.</strong> A release renames the stored <code>playerName</code> to <code>heroName</code> and moves <code>gems</code> out of the core into the ledger. Bump <code>SAVE_SCHEMA</code> from 7 to 8 in <code>saveFormat.ts</code> and register the step that upgrades FROM 7:</p>
 <pre><code class="language-ts">export const SAVE_UPGRADES: Record&lt;number, BodyUpgrade&gt; = {
   7: (body) =&gt; {
+    if (!(&#39;playerName&#39; in body)) return body;              // already new (or never had one): leave it alone, so running the step twice changes nothing
     const { playerName, gems, ...rest } = body;
     return { ...rest, heroName: playerName };   // gems are the ledger&#39;s now: the old value is simply not carried
   },
@@ -4637,7 +4638,7 @@ additive, with a rollback file) and the code that reads the new column second; s
 <p>See also: <a href="#save-schema"><code>SAVE_SCHEMA</code></a>, <code>decodeSave</code>, <a href="#upgradebody"><code>upgradeBody</code></a></p>
 </article><article><p><a id="upgradebody"></a></p>
 <h3><code>upgradeBody</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/saveUpgrade.ts"><code>src/lib/saveUpgrade.ts:51</code></a></p>
+<p>Source: <a href="../../src/lib/saveUpgrade.ts"><code>src/lib/saveUpgrade.ts:52</code></a></p>
 <p>Brings a save body of schema <code>from</code> up to schema <code>to</code> by running the steps <code>from</code>, <code>from + 1</code>, ... <code>to - 1</code> of <code>chain</code>. Pure: the input is never changed. <code>from === to</code> returns a copy untouched.
 <code>chain</code> is a parameter so a test (or a release script) can run a step before it is registered.</p>
 </article><h2>Uploading</h2><article><p><a id="sync"></a></p>

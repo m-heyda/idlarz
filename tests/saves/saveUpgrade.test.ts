@@ -8,6 +8,7 @@ import type { LedgerRow } from '../../src/lib/offline/supabaseLedger';
 // the worked example of the JSDoc in saveUpgrade.ts: v7 -> v8 renames playerName to heroName and moves the gems out, then v8 -> v9 adds a default
 const chain: Record<number, BodyUpgrade> = {
 	7: (body) => {
+		if (!('playerName' in body)) return body;
 		const { playerName, gems: _gems, ...rest } = body;
 		void _gems;
 		return { ...rest, heroName: playerName };
@@ -46,6 +47,14 @@ test('a gap in the chain, a newer save and nonsense versions are refused, never 
 	assert.deepEqual(upgradeBody({}, 9, 8, chain), { ok: false, reason: 'newer schema' });
 	assert.deepEqual(upgradeBody({}, 0, 8, chain), { ok: false, reason: 'unknown schema' });
 	assert.deepEqual(upgradeBody({}, 1.5, 8, chain), { ok: false, reason: 'unknown schema' });
+});
+
+test('the schema-7 step of the worked example run twice gives the same body (an already-new body is returned unchanged)', () => {
+	const once = upgradeBody({ playerName: 'Ada', gems: 5 }, 7, 8, chain);
+	assert.ok(once.ok);
+	assert.deepEqual(once.ok && once.body, { heroName: 'Ada' });
+	const twice = once.ok ? chain[7](once.body) : {};
+	assert.deepEqual(twice, { heroName: 'Ada' }, 'heroName is not overwritten with undefined');
 });
 
 test('running a step twice changes nothing more (idempotent on a body that is already new)', () => {

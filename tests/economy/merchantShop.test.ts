@@ -242,7 +242,8 @@ test('saves: merchant upgrades round-trip, the bag size follows Pack Rat, and ba
 	const unknown = JSON.parse(JSON.stringify(raw));
 	unknown.merchantUpgrades.cheat = 1;
 	const unknownRead = sanitizeSave(unknown);
-	assert.equal(unknownRead.ok && 'cheat' in unknownRead.state.merchantUpgrades, false, 'an unknown upgrade is dropped, the save loads');
+	assert.equal(unknownRead.ok, true, 'a save with an unknown upgrade loads');
+	assert.equal(unknownRead.ok && 'cheat' in unknownRead.state.merchantUpgrades, false, 'the unknown upgrade is dropped');
 	const high = JSON.parse(JSON.stringify(raw));
 	high.merchantUpgrades.haggler = 99;
 	const highRead = sanitizeSave(high);

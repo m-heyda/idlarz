@@ -530,7 +530,19 @@
 		"sporecellar",
 		"icecutter",
 		"pearldiver",
-		"saltworks"
+		"saltworks",
+		"idol_plains",
+		"idol_forest",
+		"idol_hills",
+		"idol_swamp",
+		"idol_tundra",
+		"idol_lake",
+		"idol_coast",
+		"idol_jungle",
+		"idol_fields",
+		"idol_orchard",
+		"idol_blight",
+		"idol_battlefield"
 	],
 	"avatarIds": ["knight", "druid", "scout", "scholar", "miner", "farmer", "bard", "alchemist", "architect", "reborn", "boss_slayer", "early_tester"],
 	"achievementIds": [
@@ -566,6 +578,7 @@
 		"hard.craftQueueSlots": 5,
 		"hard.craftOfflineHours": 72,
 		"hard.craftSpeed": 4,
+		"hard.idolMaxLevel": 10,
 		"castle.maxLevel": 10,
 		"clickLadder.length": 4,
 		"merchant.haggler": 10,
