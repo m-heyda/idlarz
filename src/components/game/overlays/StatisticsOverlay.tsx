@@ -157,7 +157,7 @@ const StatisticsOverlay: React.FC = () => {
 			<div className='flex-1 min-w-[320px] flex flex-col gap-5'>
 				<div className='grid grid-cols-2 gap-x-8 gap-y-4 text-sm max-[640px]:grid-cols-1'>
 					<div className='char-panel char-panel-attr'>
-						<div className='flex items-start justify-between gap-2'>
+						<div className='char-panel-head'>
 							<h3 className='px-h flex-1'>Attributes</h3>
 							{/* always in the layout (hidden at 0), so spending the last point moves nothing */}
 							<span

@@ -658,3 +658,25 @@
 .eq-level-wrap-flat .eq-vitals {
 	margin-left: 2px;
 }
+
+/* a panel title with the points pill: one separator under the whole row (the title's own line stopped at the pill) */
+.char-panel-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 8px;
+	padding-bottom: 4px;
+	border-bottom: 2px solid #3a2810;
+}
+
+.char-panel-head .px-h {
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.char-panel-head .char-points {
+	margin-top: 0;
+}
