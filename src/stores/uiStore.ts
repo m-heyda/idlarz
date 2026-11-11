@@ -99,6 +99,12 @@ interface UiState {
 	/** The account's chosen avatar (`catalog/avatars.ts`, from the profile; null = none yet): the header and the character window show it. Not part of the save. */
 	avatarId: string | null;
 	setAvatarId: (id: string | null) => void;
+	/** The badge and title the account shows (`profiles.badge_id`: null = default, 'none' = hidden; `title_id`) and the achievements it holds. Loaded from the server once; not part of the save. */
+	badge: { badgeId: string | null; titleId: string | null; earned: readonly string[]; loaded: boolean };
+	setBadge: (badge: { badgeId: string | null; titleId: string | null; earned: readonly string[] }) => void;
+	badgeDialogOpen: boolean;
+	openBadgeDialog: () => void;
+	closeBadgeDialog: () => void;
 	avatarDialogOpen: boolean;
 	openAvatarDialog: () => void;
 	closeAvatarDialog: () => void;
@@ -177,6 +183,11 @@ export const useUiStore = create<UiState>((set, get) => ({
 	classDialogOpen: false,
 	avatarId: null,
 	setAvatarId: (id) => set({ avatarId: id }),
+	badge: { badgeId: null, titleId: null, earned: [], loaded: false },
+	setBadge: (badge) => set({ badge: { ...badge, loaded: true } }),
+	badgeDialogOpen: false,
+	openBadgeDialog: () => set({ badgeDialogOpen: true }),
+	closeBadgeDialog: () => set({ badgeDialogOpen: false }),
 	avatarDialogOpen: false,
 	openAvatarDialog: () => set({ avatarDialogOpen: true }),
 	closeAvatarDialog: () => set({ avatarDialogOpen: false }),

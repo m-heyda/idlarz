@@ -611,6 +611,7 @@ and its gold is paid in the browser.
 | Route | Methods | File |
 | --- | --- | --- |
 | `/api/auth/avatar` | GET, POST | `src/app/api/auth/avatar/route.ts` |
+| `/api/auth/badge` | GET, POST | `src/app/api/auth/badge/route.ts` |
 | `/api/auth/epoch` | POST | `src/app/api/auth/epoch/route.ts` |
 | `/api/auth/login` | POST | `src/app/api/auth/login/route.ts` |
 | `/api/auth/logout` | POST | `src/app/api/auth/logout/route.ts` |

@@ -54,16 +54,15 @@ export const loadAway = async (supabase: SupabaseClient, userId: string, nowMs: 
 	}
 };
 
-/** Whether the player holds the Early tester achievement (`player_achievements`, their own row through RLS); a failed read is "no". */
+/** Whether the landing shows the Early tester badge: the player holds the achievement (`player_achievements`, their own row through RLS) and has not hidden it or picked a badge that is not a tester medal (`profiles.badge_id`); a failed read is "no". */
 export const loadEarlyTester = async (supabase: SupabaseClient, userId: string): Promise<boolean> => {
 	try {
-		const { data, error } = await supabase
-			.from('player_achievements')
-			.select('achievement_id')
-			.eq('user_id', userId)
-			.eq('achievement_id', 'early_tester')
-			.maybeSingle();
-		return !error && !!data;
+		const [earned, choice] = await Promise.all([
+			supabase.from('player_achievements').select('achievement_id').eq('user_id', userId).eq('achievement_id', 'early_tester').maybeSingle(),
+			supabase.from('profiles').select('badge_id').eq('id', userId).maybeSingle(),
+		]);
+		const badgeId = typeof choice.data?.badge_id === 'string' ? choice.data.badge_id : null;
+		return !earned.error && !!earned.data && (badgeId === null || badgeId === 'early_tester' || badgeId === 'beta_tester');
 	} catch {
 		return false;
 	}

@@ -170,6 +170,45 @@ export const chooseAvatar = async (avatarId: string): Promise<AvatarSendResult> 
 		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
 	}
 };
+/** The badge and title of the profile (`GET /api/auth/badge`) and the achievements that decide what can be picked. */
+export interface BadgeState {
+	badgeId: string | null;
+	titleId: string | null;
+	earned: string[];
+}
+/** `null` when the server cannot be reached. */
+export const fetchBadges = async (): Promise<BadgeState | null> => {
+	try {
+		const response = await fetch('/api/auth/badge', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+		if (!response.ok) return null;
+		const body = (await response.json().catch(() => null)) as { badgeId?: unknown; titleId?: unknown; earned?: unknown } | null;
+		if (!body || !Array.isArray(body.earned)) return null;
+		return {
+			badgeId: typeof body.badgeId === 'string' ? body.badgeId : null,
+			titleId: typeof body.titleId === 'string' ? body.titleId : null,
+			earned: body.earned.filter((id): id is string => typeof id === 'string'),
+		};
+	} catch {
+		return null;
+	}
+};
+/** Saves the badge (`null` = default, `"none"` = hidden) and title (`null` = none) (`POST /api/auth/badge`); the server refuses one that is not earned. Goes through `epochFetch` like the avatar. */
+export const chooseBadge = async (badgeId: string | null, titleId: string | null): Promise<{ ok: true } | { ok: false; message: string }> => {
+	try {
+		const response = await epochFetch('/api/auth/badge', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ badgeId, titleId }),
+			credentials: 'same-origin',
+			cache: 'no-store',
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+		});
+		const body = (await response.json().catch(() => ({}))) as { error?: string };
+		return response.ok ? { ok: true } : { ok: false, message: body.error ?? 'Something went wrong.' };
+	} catch {
+		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
+	}
+};
 /** "Forgot password?" (`POST /api/auth/reset`): the answer is the same whether or not the account exists, so `ok` only means "asked". */
 export const requestPasswordReset = (email: string) => post('/api/auth/reset', { email });
 /** The reset page's new password (`POST /api/auth/password`, needs the session the emailed link opened). A 401 comes back as an `error`: the link is expired. */

@@ -58,6 +58,7 @@ import ChestNotification from '@/components/game/overlays/ChestNotification';
 import FloatingText from '@/components/game/FloatingText';
 import ClassPickerDialog from '@/components/game/ClassPickerDialog';
 import AvatarDialog from '@/components/game/AvatarDialog';
+import BadgeDialog from '@/components/game/BadgeDialog';
 import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
 import SettingsDialog from '@/components/game/overlays/SettingsDialog';
 import RebirthDialog from '@/components/game/overlays/RebirthDialog';
@@ -188,6 +189,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<GameWindows />
 			<ClassPickerDialog />
 			<AvatarDialog />
+			<BadgeDialog />
 			<LevelUpNotification />
 			<LoadingScreen />
 			<SaveMenuDialog />

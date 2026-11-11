@@ -17,6 +17,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
+- Badges: [`badgeOptions`](#badgeoptions)
 
 ## Levels
 
@@ -804,3 +805,14 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 | `auto-battle` | Auto-battle | none |
 
 See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideVisibleFor`](progression.md#guidevisiblefor)
+
+## Badges
+
+<a id="badgeoptions"></a>
+
+### `badgeOptions` <small>function</small>
+
+Source: [`src/catalog/badges.ts:23`](../../src/catalog/badges.ts)
+
+Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
+The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.
