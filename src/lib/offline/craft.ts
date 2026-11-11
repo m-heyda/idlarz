@@ -3,7 +3,7 @@ import { CRAFTING } from '@/config/crafting';
 import { addDrop } from '@/lib/inventory';
 import { rollGear } from '@/lib/craftGear';
 import { sealedRng } from '@/lib/offline/seal';
-import { craftLevelOf, craftLimit, craftNeeds, craftTimeSec, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
+import { craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
 import type { GearTarget } from '@/catalog/recipes';
 import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState, Inventory } from '@/lib/offline/types';
 
@@ -28,9 +28,6 @@ export interface CraftEnv {
 	/** % more crafting XP from the Blossom Shrine (the Idol of the orchard), from the last accepted save */
 	xpPct?: number;
 }
-
-/** The XP `n` crafts of a recipe pay: `recipe.xp x n`, grown by the crafting XP bonus. Kept fractional (to 6 places) so that claiming crafts one by one pays the same as claiming them together; the ledger stores fractional XP. */
-const craftXpOf = (recipeXp: number, n: number, xpPct = 0): number => Math.round(recipeXp * n * (1 + xpPct / 100) * 1e6) / 1e6;
 
 export interface CraftResult {
 	ok: boolean;
@@ -96,7 +93,7 @@ export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, 
 		ok: true,
 		crafted: count,
 		inv,
-		craft: { ...craft, xp: craft.xp + craftXpOf(recipe.xp, count, xpPct), ord: craft.ord + count, stock: dropEmpty(stock), spent, last: nowMs },
+		craft: { ...craft, xp: craft.xp + craftXpOf(recipe, count, xpPct), ord: craft.ord + count, stock: dropEmpty(stock), spent, last: nowMs },
 	};
 };
 
@@ -141,7 +138,7 @@ const deliverGear = (inv: Inventory, craft: CraftState, index: number, nowMs: nu
 	return {
 		n,
 		inv: n > 0 ? { ...inv, bag, ver: inv.ver + 1 } : inv,
-		craft: { ...craft, xp: craft.xp + craftXpOf(recipe.xp, n, env.xpPct), ord: craft.ord + n, pity: pities, queue },
+		craft: { ...craft, xp: craft.xp + craftXpOf(recipe, n, env.xpPct), ord: craft.ord + n, pity: pities, queue },
 	};
 };
 
@@ -158,7 +155,7 @@ const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number
 	const queue = craft.queue.slice();
 	if (left > 0) queue[index] = { ...entry, count: left, startedAt: Math.round(entry.startedAt + n * entry.timeSec * 1000) };
 	else queue.splice(index, 1);
-	return { n, inv, craft: { ...craft, xp: craft.xp + craftXpOf(recipe.xp, n, env?.xpPct), ord: craft.ord + n, stock, queue } };
+	return { n, inv, craft: { ...craft, xp: craft.xp + craftXpOf(recipe, n, env?.xpPct), ord: craft.ord + n, stock, queue } };
 };
 
 /** Delivers what is finished in batch `slot`. Whatever does not fit stays in the batch and is delivered by a later claim. */

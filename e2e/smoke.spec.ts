@@ -1,21 +1,9 @@
 // Smoke test of the real game in a real browser (IDL-124). It runs against the Supabase project in .env.local with the ONE test account
 // (docs/reference/ops.md): clear it with `npm run reset-test-account -- --yes`, run `npm run e2e`, and SIGN IN BY HAND in the window that opens.
 // The test never types a password; it waits for the session and refuses to go on when the account is not the test account.
-// The dev server exposes the store as `window.__game` (GameDebug), which the steps below use to read state and to do what has no stable button.
+// The steps read the game from the page itself (resource bar, tile classes): the game exposes no store handle to the browser.
 import { expect, test, type Page } from '@playwright/test';
 import { TEST_ACCOUNT_EMAIL } from './account';
-
-interface GameWindow {
-	__game?: {
-		getState: () => {
-			isHydrated: boolean;
-			playerName: string;
-			resources: { gold: number };
-			tiles: { stats: { owned: number } };
-			buyTile: (x: number, y: number) => boolean;
-		};
-	};
-}
 
 test.describe.configure({ mode: 'serial' });
 
@@ -31,22 +19,23 @@ test.afterAll(async () => {
 
 const SIGN_IN_WAIT_MS = 10 * 60_000;
 
-/** Lets a person through the start hub of a saved game or a new one, and waits until the game store has loaded. */
+/** Lets a person through the start hub of a saved game or a new one, and waits until the map is on screen. */
 const waitForGame = async () => {
 	await expect
 		.poll(
 			async () => {
 				const startNew = page.getByRole('button', { name: /start a new game/i });
 				if (await startNew.isVisible().catch(() => false)) await startNew.click();
-				return page.evaluate(() => !!(window as unknown as GameWindow).__game?.getState().isHydrated);
+				return page.locator('.tile-owned').count();
 			},
 			{ timeout: 60_000, message: 'the game did not load (is the Supabase project in .env.local running?)' },
 		)
-		.toBe(true);
+		.toBeGreaterThan(0);
 };
 
-const owned = () => page.evaluate(() => (window as unknown as GameWindow).__game!.getState().tiles.stats.owned);
-const gold = () => page.evaluate(() => (window as unknown as GameWindow).__game!.getState().resources.gold);
+const owned = () => page.locator('.tile-owned').count();
+/** The text of the resource bar: it changes whenever gold (or any resource) changes. */
+const resourceBar = () => page.locator('[data-tutorial="top-resources"]').innerText();
 
 test('sign in as the test account', async () => {
 	/**
@@ -69,43 +58,38 @@ test('sign in as the test account', async () => {
 
 test('the game opens on a new game', async () => {
 	await waitForGame();
-	const state = await page.evaluate(() => {
-		const s = (window as unknown as GameWindow).__game!.getState();
-		return { name: s.playerName, gold: s.resources.gold, owned: s.tiles.stats.owned };
-	});
-	expect(state.name.length).toBeGreaterThan(0);
-	expect(Number.isFinite(state.gold)).toBe(true);
-	expect(state.owned).toBeGreaterThan(0);
+	expect(await owned()).toBeGreaterThan(0);
+	expect((await resourceBar()).trim().length).toBeGreaterThan(0);
 	await expect(page.getByLabel('Rebirth (not available yet)')).toBeVisible();
 });
 
 test('the game keeps running: income arrives', async () => {
-	const before = await gold();
-	await expect.poll(gold, { timeout: 20_000, message: 'gold did not rise' }).toBeGreaterThan(before);
+	const before = await resourceBar();
+	await expect.poll(resourceBar, { timeout: 20_000, message: 'the resource bar did not change' }).not.toBe(before);
 });
 
 test('a click on the map pays gold', async () => {
 	const area = page.locator('[data-click-area]').first();
 	await expect(area).toBeVisible();
 	const box = (await area.boundingBox())!;
-	const before = await gold();
+	const before = await resourceBar();
 	for (let i = 0; i < 4; i++) {
 		await page.mouse.click(box.x + box.width / 2 + i * 3, box.y + box.height / 2 + i * 3);
 		await page.waitForTimeout(350);
 	}
-	expect(await gold()).toBeGreaterThan(before);
+	expect(await resourceBar()).not.toBe(before);
 });
 
 test('buy a tile', async () => {
 	const before = await owned();
-	// try the squares around the castle (25,25) until one is a legal, affordable purchase
-	const bought = await page.evaluate(() => {
-		const game = (window as unknown as GameWindow).__game!;
-		for (let r = 1; r <= 4; r++) for (let y = 25 - r; y <= 25 + r; y++) for (let x = 25 - r; x <= 25 + r; x++) if (game.getState().buyTile(x, y)) return true;
-		return false;
-	});
-	expect(bought, 'no tile could be bought: is the account a new game with its starting gold?').toBe(true);
-	expect(await owned()).toBe(before + 1);
+	// click the squares next to the owned land until one is an affordable purchase
+	const candidates = page.locator('.tile-unknown');
+	const n = Math.min(await candidates.count(), 12);
+	for (let i = 0; i < n && (await owned()) === before; i++) {
+		await candidates.nth(i).click();
+		await page.waitForTimeout(300);
+	}
+	expect(await owned(), 'no tile could be bought: is the account a new game with its starting gold?').toBe(before + 1);
 });
 
 test('the game menu opens Settings', async () => {

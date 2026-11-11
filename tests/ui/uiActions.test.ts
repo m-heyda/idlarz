@@ -116,7 +116,7 @@ test('ui store: dialogs close the menu, confirmations track their target, prefs 
 	assert.equal(useUiStore.getState().discardIndex, 2);
 	ui.askDiscard(null);
 	// the test storage stub always answers null: every pref is its default, and writing does not throw
-	assert.equal(readPref('showAdmin'), PREF_DEFAULTS.showAdmin);
+	assert.equal(readPref('showMinimap'), PREF_DEFAULTS.showMinimap);
 	assert.doesNotThrow(() => writePref('showMinimap', false));
 });
 

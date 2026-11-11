@@ -73,15 +73,6 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 			onSelect: () => ui.setPref('compactHeader', !ui.compactHeader),
 		},
 	];
-	// the admin panel exists only in development builds
-	if (process.env.NODE_ENV === 'development') {
-		items.push({
-			id: 'admin',
-			label: 'Show admin mode',
-			checked: ui.showAdmin,
-			onSelect: () => ui.setPref('showAdmin', !ui.showAdmin),
-		});
-	}
 	return items;
 };
 

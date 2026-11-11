@@ -12,7 +12,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
-- Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
+- Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`craftXpOf`](#craftxpof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [Achievements](#achievements)
@@ -407,7 +407,7 @@ is the one before times a constant ratio (`src/lib/crafting.ts`). Recipes are da
 
 ### `CRAFT_GEAR` <small>const</small>
 
-Source: [`src/config/crafting.ts:46`](../../src/config/crafting.ts)
+Source: [`src/config/crafting.ts:52`](../../src/config/crafting.ts)
 
 Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through
 the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.
@@ -454,6 +454,21 @@ Intelligence's lean on the quality and the affix magnitudes of a craft, for `rol
 
 ```text
 bias = min(1, 0.01 x (Intelligence - 5)), 0 at 5 or less
+```
+
+<a id="craftxpof"></a>
+
+### `craftXpOf` <small>function</small>
+
+Source: [`src/lib/crafting.ts:90`](../../src/lib/crafting.ts)
+
+The crafting XP one payout gives: the recipe's `xp` times how many were made times `CRAFTING.xpScale` (the end-game slow-down, `config/crafting.ts`), rounded to six decimals so repeated small
+additions never drift. The server uses this for every craft, claim and queue payout, the UI to show it.
+
+**Formula**
+
+```text
+craftXpOf = recipe.xp x count x CRAFTING.xpScale x (1 + crafting XP bonus %)   (the bonus is the Blossom Shrine Idol's)
 ```
 
 <a id="pitymultiplier"></a>

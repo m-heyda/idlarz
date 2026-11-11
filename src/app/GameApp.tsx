@@ -52,7 +52,6 @@ import GameWindows from '@/components/game/overlays/GameWindows';
 import { useWindowStore } from '@/stores/windowStore';
 import LevelUpNotification from '@/components/game/overlays/LevelUpNotification';
 import LoadingScreen from '@/components/game/overlays/LoadingScreen';
-import GameDebug from '@/components/game/GameDebug';
 import { TICK_RATE } from '@/config/economy';
 import GameHeader from '@/components/game/GameHeader';
 import ChestNotification from '@/components/game/overlays/ChestNotification';
@@ -190,7 +189,6 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<AvatarDialog />
 			<LevelUpNotification />
 			<LoadingScreen />
-			<GameDebug />
 			<SaveMenuDialog />
 			<SettingsDialog />
 			<RebirthDialog />

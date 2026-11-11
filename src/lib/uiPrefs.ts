@@ -3,20 +3,10 @@
 
 import { scoped } from '@/lib/storageScope';
 
-export type UiPrefKey =
-	| 'showAdmin'
-	| 'adminCollapsed'
-	| 'showMinimap'
-	| 'combatMinimized'
-	| 'compactHeader'
-	| 'farmAnimalsOpen'
-	| 'farmHudOpen'
-	| 'farmUpgradesOpen';
+export type UiPrefKey = 'showMinimap' | 'combatMinimized' | 'compactHeader' | 'farmAnimalsOpen' | 'farmHudOpen' | 'farmUpgradesOpen';
 
-/** What a first visit (and the server render) sees: the dev admin panel starts open, the minimap on */
+/** What a first visit (and the server render) sees: the minimap on */
 export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
-	showAdmin: true,
-	adminCollapsed: false,
 	showMinimap: true,
 	combatMinimized: false, // the combat panel starts open
 	compactHeader: false, // the header shows each resource with its amount; compact leaves only the icons (the amounts are in the dropdown of each group)

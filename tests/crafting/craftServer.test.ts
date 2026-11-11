@@ -13,7 +13,7 @@ import { emptyCraft } from '../../src/lib/crafting';
 import { addDrop, stackOf } from '../../src/lib/inventory';
 import { plainItem } from '../../src/lib/itemInstance';
 import { CRAFTING } from '../../src/config/crafting';
-import { craftCumulativeXp, craftLimit } from '../../src/lib/crafting';
+import { craftCumulativeXp, craftLimit, craftXpOf } from '../../src/lib/crafting';
 import { RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { bagCountOf } from '../../src/lib/offline/inventory';
 import type { CraftReply, CraftState } from '../../src/lib/offline/types';
@@ -98,7 +98,7 @@ test('a queued vial batch gives nothing until it is claimed; the claim puts vial
 	assert.ok(Math.abs(p.ledger().craft.spent - 3 * 14.5) < 1e-9);
 	await claim(p, 50 * SEC);
 	assert.deepEqual(p.ledger().craft.stock, { glass_vial: 3 });
-	assert.equal(p.ledger().craft.xp, 6);
+	assert.equal(p.ledger().craft.xp, craftXpOf(RECIPE_BY_ID.glass_vial, 3));
 	assert.equal(p.ledger().craft.ord, 3);
 	assert.deepEqual(p.ledger().inv!.bag, bagBefore);
 	assert.deepEqual(p.ledger().craft.queue, []);
@@ -118,7 +118,7 @@ test('a potion takes a vial when it is queued and lands in the crafting stash wh
 	assert.equal(r.crafted, 2);
 	assert.equal(p.ledger().craft.stock.potion_minor, 2);
 	assert.equal(bagCountOf(p.ledger().inv!, 'potion_minor'), before, 'the bag is not touched');
-	assert.equal(p.ledger().craft.xp, 4 + 12);
+	assert.equal(p.ledger().craft.xp, craftXpOf(RECIPE_BY_ID.glass_vial, 2) + craftXpOf(RECIPE_BY_ID.potion_minor, 2));
 });
 
 test('the greater potion is locked until its crafting level', async () => {
@@ -284,11 +284,19 @@ test('a trade good is level-gated, takes its components when queued, and lands i
 	assert.equal(claimed.crafted, 2);
 	assert.equal(claimed.craft.stock.leather_satchel, 2);
 	assert.equal(bagCountOf(claimed.inv, 'leather_satchel'), 0);
-	assert.equal(claimed.craft.xp, rich.xp + 2 * satchel.xp);
+	assert.equal(claimed.craft.xp, rich.xp + craftXpOf(satchel, 2));
 
 	let bag = inv.bag;
 	for (let i = 0; i < 36; i++) bag = addDrop(bag, { kind: 'gear', item: plainItem('iron_sword') }).bag as typeof bag;
 	const full = { ...inv, bag };
 	const stuck = applyClaim(full, queued.craft, 0, T0 + 2 * satchel.timeSec! * SEC + SEC);
 	assert.equal(stuck.ok, true, 'a full bag does not stop a claim');
+});
+
+test('crafting XP is scaled by CRAFTING.xpScale: a Minor Healing Potion gives about a tenth of an XP', () => {
+	assert.ok(CRAFTING.xpScale > 0 && CRAFTING.xpScale <= 0.05, 'the end-game slow-down is a small multiplier');
+	const one = craftXpOf(RECIPE_BY_ID.potion_minor, 1);
+	assert.ok(one > 0.05 && one < 0.2, `one minor potion gives ${one} XP`);
+	assert.equal(craftXpOf(RECIPE_BY_ID.potion_minor, 10), Math.round(one * 10 * 1e6) / 1e6, 'a batch is the one-craft value times the count, without drift');
+	assert.equal(craftXpOf(RECIPE_BY_ID.potion_minor, 0), 0);
 });

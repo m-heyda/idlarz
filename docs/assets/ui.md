@@ -139,7 +139,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `menu_legacy` | <img src="../../public/pixel/icons/menu_legacy.png" width="96" alt="menu_legacy"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/RebirthDialog.tsx | `pixel/icons/menu_legacy.png` |
 | `menu_main` | <img src="../../public/pixel/icons/menu_main.png" width="80" alt="menu_main"> | 40x40 | unused |  | `pixel/icons/menu_main.png` |
 | `menu_merchant` | <img src="../../public/pixel/icons/menu_merchant.png" width="96" alt="menu_merchant"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_merchant.png` |
-| `menu_settings` | <img src="../../public/pixel/icons/menu_settings.png" width="96" alt="menu_settings"> | 64x64 | used | src/components/game/GameDebug.tsx, src/components/game/HeaderMenu.tsx, src/components/game/overlays/SettingsDialog.tsx | `pixel/icons/menu_settings.png` |
+| `menu_settings` | <img src="../../public/pixel/icons/menu_settings.png" width="96" alt="menu_settings"> | 64x64 | used | src/components/game/HeaderMenu.tsx, src/components/game/overlays/SettingsDialog.tsx | `pixel/icons/menu_settings.png` |
 | `menu_stats` | <img src="../../public/pixel/icons/menu_stats.png" width="80" alt="menu_stats"> | 40x40 | used | src/components/game/overlays/GameWindows.tsx | `pixel/icons/menu_stats.png` |
 
 ## skull
