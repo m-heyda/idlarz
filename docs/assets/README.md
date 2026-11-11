@@ -27,7 +27,7 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | --- | --- | --- | --- |
 | [Potions](potions.md) | 63 | 5 | 48 |
 | [Weapons](weapons.md) | 199 | 72 | 0 |
-| [Armor](armor.md) | 127 | 52 | 0 |
+| [Armor](armor.md) | 134 | 55 | 0 |
 | [Accessories](accessories.md) | 53 | 31 | 0 |
 | [Monsters](monsters.md) | 38 | 27 | 11 |
 | [Buildings](buildings.md) | 248 | 25 | 202 |
