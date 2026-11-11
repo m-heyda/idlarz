@@ -23,6 +23,12 @@
 	filter: brightness(0) drop-shadow(0 0 2px rgba(255, 255, 255, 0.35)) !important;
 }
 
+.monster-placeholder {
+	/* the stand-in picture is a black cut-out: invert lifts it to a mid grey (not black, so it never reads as an undiscovered monster); no "?" */
+	filter: invert(0.55) drop-shadow(0 0 2px rgba(0, 0, 0, 0.6)) !important;
+	opacity: 0.9;
+}
+
 .monster-unknown-mark {
 	position: absolute;
 	inset: 0;

@@ -41,6 +41,9 @@ export const monsterArtUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes'>)
 export const monsterSpriteUrl = (entry: Pick<MonsterCatalogEntry, 'id' | 'biomes' | 'art' | 'placeholder'>): string =>
 	entry.art ? monsterArtUrl(entry) : (entry.placeholder ?? monsterArtUrl(entry));
 
+/** Whether the game draws this monster's stand-in silhouette (no real art yet) instead of its own sprite. */
+export const usesPlaceholderArt = (entry: Pick<MonsterCatalogEntry, 'art' | 'placeholder'>): boolean => !entry.art && !!entry.placeholder;
+
 /** The one stand-in picture (`public/pixel/enemies/placeholder/silhouette.png`, the purple ogre as a black silhouette) shown until a monster's real sprite is made */
 const PLACEHOLDER = '/pixel/enemies/placeholder/silhouette.png';
 

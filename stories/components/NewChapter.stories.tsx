@@ -28,6 +28,15 @@ export const AvatarsStarters: Story = {
 	),
 };
 
+/** The window just opened and the unlocked set is still loading: every card shows its own face, dimmed and disabled, with no lock lines yet. */
+export const AvatarsLoading: Story = {
+	render: () => (
+		<div style={{ width: 720, padding: 24 }}>
+			<AvatarPicker value={null} playerClass='warrior' unlocked={[]} loading onChange={() => undefined} />
+		</div>
+	),
+};
+
 /** A mage with every reward earned: the rewards are open to every class, the other classes' starters stay disabled. */
 export const AvatarsAllUnlocked: Story = {
 	render: () => (

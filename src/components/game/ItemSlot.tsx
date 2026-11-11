@@ -5,6 +5,7 @@ import { EQUIPMENT_PIXEL_ICONS } from '@/config/pixelIcons';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { resolveItem } from '@/lib/itemInstance';
 import type { EquipmentSlot, ItemInstance } from '@/types/game';
+import { useTipDismiss } from '@/hooks/useTipDismiss';
 import PixelIcon from './PixelIcon';
 import ItemTooltipStack from './ItemTooltip';
 import { placeTip, type Box } from '@/lib/tipPlacement';
@@ -38,7 +39,7 @@ interface ItemSlotProps {
 }
 
 /** How long a hover card lingers after the pointer leaves its slot (ms), so it can be reached and its text copied */
-export const TIP_CLOSE_MS = 300;
+export const TIP_CLOSE_MS = 100;
 
 /**
  * A hover card attached to the edge of its item box (not the cursor, so it stays put while the mouse moves over the box).
@@ -65,6 +66,7 @@ export const FloatingTip: React.FC<{
 	return (
 		<div
 			ref={ref}
+			data-floating-tip
 			className={`fixed z-[100] ${onPointerEnter ? 'pointer-events-auto select-text' : 'pointer-events-none'}`}
 			style={{ left: anchor.right + 8, top: anchor.top, visibility: 'hidden' }}
 			onPointerEnter={onPointerEnter}
@@ -113,16 +115,22 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 	const rarity = rarityId ? RARITIES[rarityId as keyof typeof RARITIES] : undefined;
 	const hasTip = !!def || !!label;
 
+	// no stuck tooltip: a scroll, click, Escape, blur or a pointer outside the slot and its card closes it at once, and so does a slot that lost its item
+	const rootRef = useRef<HTMLDivElement | null>(null);
+	useTipDismiss(
+		!!tip,
+		() => setTip(null),
+		(target) => !!rootRef.current?.contains(target) || !!target.closest('[data-floating-tip]'),
+		false,
+	);
 	useEffect(() => {
-		if (!tip) return;
-		const close = () => setTip(null);
-		window.addEventListener('scroll', close, true);
-		return () => window.removeEventListener('scroll', close, true);
-	}, [tip]);
+		if (!hasTip) setTip(null);
+	}, [hasTip]);
 
 	return (
 		<>
 			<div
+				ref={rootRef}
 				className='inv-slot'
 				role='button'
 				aria-label={resolved?.name ?? def?.name ?? label ?? 'Empty slot'}

@@ -16,6 +16,7 @@ const AvatarDialog: React.FC = () => {
 	const setAvatarId = useUiStore((state) => state.setAvatarId);
 	const [playerClass, setPlayerClass] = useState<PlayerClassId>(DEFAULT_PLAYER_CLASS);
 	const [unlocked, setUnlocked] = useState<readonly string[]>(CLASS_AVATARS[DEFAULT_PLAYER_CLASS]);
+	const [loaded, setLoaded] = useState(false);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -23,8 +24,10 @@ const AvatarDialog: React.FC = () => {
 		if (!open) return;
 		let alive = true;
 		setError(null);
+		setLoaded(false);
 		void fetchAvatars().then((state) => {
 			if (!alive || !state) return;
+			setLoaded(true);
 			setPlayerClass(state.playerClass);
 			setUnlocked(state.unlocked);
 			setAvatarId(state.avatarId);
@@ -54,7 +57,7 @@ const AvatarDialog: React.FC = () => {
 				Your face in the header and the rankings. Your hero wears its own two faces; faces of other classes stay disabled, and the locked rewards are earned in
 				the game.
 			</p>
-			<AvatarPicker value={avatarId} playerClass={playerClass} unlocked={unlocked} onChange={pick} disabled={busy} />
+			<AvatarPicker value={avatarId} playerClass={playerClass} unlocked={unlocked} onChange={pick} disabled={busy} loading={!loaded} />
 			{error && (
 				<p role='alert' className='text-sm text-center text-[#e07a6a] mt-3'>
 					{error}
