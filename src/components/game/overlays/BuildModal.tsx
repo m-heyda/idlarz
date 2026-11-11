@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { BUILDING_RULES, IDOL_RULES } from '@/config/buildings';
 import { idolDef } from '@/catalog/idols';
-import { idolValueText } from '@/lib/idolEconomy';
+import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
+import type { PrestigeState } from '@/types/game';
 import { limitOf } from '@/lib/limits';
 import { buildingUpgradeDuration } from '@/lib/buildings';
 import { formatTime } from '@/utils/formatters';
@@ -45,7 +46,12 @@ const Head: React.FC<{ def: BuildOption['def']; extra?: string }> = ({ def, extr
  * What an Idol is and does, in plain lines: the effect per level with the value now and at the cap, what the rebirth keeps, how it is upgraded. `coming soon` marks the effects the game does not apply yet
  * (farm output, click gold, merchant sell price). The numbers are `IDOL_RULES` and `limitOf('idolMaxLevel')`.
  */
-export const IdolInfo: React.FC<{ id: string; remembered: number }> = ({ id, remembered }) => {
+export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?: number; prestige?: PrestigeState }> = ({
+	id,
+	remembered,
+	buildTimePct = 0,
+	prestige,
+}) => {
 	const idol = idolDef(id);
 	if (!idol) return null;
 	const max = limitOf('idolMaxLevel');
@@ -64,7 +70,7 @@ export const IdolInfo: React.FC<{ id: string; remembered: number }> = ({ id, rem
 				<li>Kept when you rebirth: its level stays, rebuild it free on any {idol.biome} tile.</li>
 				<li>
 					Upgrade up to level {max} as your castle grows; each level takes the shared builder (
-					{[1, 2, 3, 4].map((l) => formatTime(buildingUpgradeDuration(l))).join(', ')}).
+					{[1, 2, 3, 4].map((l) => formatTime(buildingUpgradeDuration(l, prestige, buildTimePct))).join(', ')}).
 				</li>
 				<li>The Ember shop&apos;s Idol Mastery raises the cap (coming soon).</li>
 			</ul>
@@ -80,6 +86,9 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	// re-evaluate whenever resources or the map change, so prices go green/red live
 	const tiles = useGameStore((state) => state.tiles);
 	useGameStore((state) => state.resources);
+	const idolLevels = useGameStore((state) => state.idolLevels);
+	const prestige = useGameStore((state) => state.prestige);
+	const buildTimePct = idolEconomy(tiles, idolLevels).buildTimePct;
 	const tile = getTile(tiles, x, y);
 	const free = !!tile && !tile.building;
 	const { builds, moves } = buildOptions(useGameStore, x, y);
@@ -113,7 +122,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 							<Head def={o.def} />
 							<p className='build-blurb'>{o.def.blurb}</p>
 							<OutputLine option={o} />
-							{o.def.kind === 'idol' && <IdolInfo id={o.def.id} remembered={o.remembered ?? 0} />}
+							{o.def.kind === 'idol' && <IdolInfo id={o.def.id} remembered={o.remembered ?? 0} buildTimePct={buildTimePct} prestige={prestige} />}
 							<div className='build-foot'>
 								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostList cost={o.cost} />}
 								<button className='px-btn' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>

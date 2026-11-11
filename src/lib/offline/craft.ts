@@ -29,8 +29,8 @@ export interface CraftEnv {
 	xpPct?: number;
 }
 
-/** The XP `n` crafts of a recipe pay: `recipe.xp x n`, grown by the crafting XP bonus (rounded down, so it never pays more than the exact value). */
-const craftXpOf = (recipeXp: number, n: number, xpPct = 0): number => Math.floor(recipeXp * n * (1 + xpPct / 100));
+/** The XP `n` crafts of a recipe pay: `recipe.xp x n`, grown by the crafting XP bonus. Kept fractional (to 6 places) so that claiming crafts one by one pays the same as claiming them together; the ledger stores fractional XP. */
+const craftXpOf = (recipeXp: number, n: number, xpPct = 0): number => Math.round(recipeXp * n * (1 + xpPct / 100) * 1e6) / 1e6;
 
 export interface CraftResult {
 	ok: boolean;

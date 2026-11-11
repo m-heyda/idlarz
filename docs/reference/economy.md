@@ -1166,6 +1166,7 @@ The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
 | 3 | +6 % | +6 % | +6 points | +12 | +6 % | +6 % | +6 % | +6 % | -6 % |
 | 4 | +8 % | +8 % | +8 points | +16 | +8 % | +8 % | +8 % | +8 % | -8 % |
 | 5 | +10 % | +10 % | +10 points | +20 | +10 % | +10 % | +10 % | +10 % | -10 % |
+
 For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every resource but XP): 10 Embers +39.8 %, 25 Embers +69 %, 50 Embers +105 %, 100 Embers +158 %. No Idol touches the income: the largest Idol bonus is +10 % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than 60 %.
 
 <a id="idoleconomy"></a>

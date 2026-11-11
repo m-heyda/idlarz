@@ -7,6 +7,7 @@ import { BIOMES } from '@/config/biomes';
 import { BUILDING_RULES, BUILDINGS_FLAG } from '@/config/buildings';
 import { buildingDef } from '@/catalog/buildings';
 import { IDOLS } from '@/catalog/idols';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { HARD_LIMITS } from '@/config/limits';
 import { buildingLevelCap, buildingUpgradeDuration, levelOfTile, upgradeCapOf } from '@/lib/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
@@ -419,7 +420,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		autoSellUpTo = raw.autoSellUpTo;
 	}
 
-	const maxPlayerHp = maxHp(characterStats, equipment);
+	// the most HP the save may hold includes the largest War Memorial the map shows (the tile's level, whatever the record says: the server's ledger bounds the real bonus)
+	const maxPlayerHp = Math.round(maxHp(characterStats, equipment) * (1 + (BUILDINGS_FLAG.enabled ? idolEconomy(tiles).hpArmorPct : 0) / 100));
 	let playerHp = maxPlayerHp;
 	if (raw.playerHp !== undefined) {
 		const v = num(raw.playerHp, 0, maxPlayerHp);

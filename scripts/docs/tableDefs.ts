@@ -193,6 +193,7 @@ TABLES['idol-effects'] = () => {
 				}),
 			) +
 			`
+
 For scale, the income bonus of the Embers ever earned (\`emberIncomeBonus\`, every resource but XP): ${[10, 25, 50, 100].map((e) => `${e} Embers +${+(emberIncomeBonus(e) * 100).toPrecision(3)} %`).join(', ')}. No Idol touches the income: the largest Idol bonus is +${5 * IDOL_RULES.perLevel} % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than ${IDOL_RULES.buildTimeCap} %.
 `,
 	};

@@ -55,7 +55,7 @@ export const standingIdols = (tiles: World): Record<string, number> => {
 	return out;
 };
 
-/** The level an Idol works at: the level of its tile, never above the level the account remembers for the biome (`idolLevels`, the server-trusted record; absent = no limit, as before the record existed). */
+/** The level an Idol works at: the level of its tile, never above the level the account remembers for the biome (`idolLevels`, the server-trusted record: a biome it does not list works at level 0; `undefined` = no limit, as before the record existed). */
 export const effectiveIdolLevel = (tileLevel: number, remembered: number | undefined): number =>
 	Math.max(0, remembered === undefined ? tileLevel : Math.min(tileLevel, remembered));
 
@@ -72,7 +72,8 @@ export const idolEconomy = (tiles: World, idolLevels?: Record<string, number>): 
 	const standing = standingIdols(tiles);
 	const out = { ...NO_IDOL_ECONOMY };
 	for (const [biome, tileLevel] of Object.entries(standing)) {
-		const level = effectiveIdolLevel(tileLevel, idolLevels?.[biome]);
+		// with a record, an Idol it does not list works at level 0 (never learned or not accepted by the server); with none (an old save, a test) the tile's level counts
+		const level = effectiveIdolLevel(tileLevel, idolLevels ? (idolLevels[biome] ?? 0) : undefined);
 		if (level <= 0) continue;
 		const pct = level * IDOL_RULES.perLevel;
 		switch (biome) {

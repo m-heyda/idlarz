@@ -533,3 +533,76 @@ test('the Build window offers the Idol of the biome with its remembered level, a
 	assert.match(lesson.text({} as never), /free/i);
 	assert.equal(typeof useUiStore.getState().openBuildModal, 'function');
 });
+
+// ---- review fixes: values must not drift, claims must not pay ----------------------------------------------------------------------------------
+
+test('a record that does not list an Idol means level 0: a forged tile level pays nothing once a record exists', () => {
+	const [a] = gameWith('forest');
+	patchTileAt(a.x, a.y, { building: 'idol_forest', buildingLevel: 10 });
+	assert.equal(idolEconomy(api().tiles, {}).xpPct, 0, 'a record without it');
+	assert.equal(idolEconomy(api().tiles, { forest: 3 }).xpPct, 6);
+	assert.equal(idolEconomy(api().tiles).xpPct, 20, 'no record at all (an old save): the tile level');
+});
+
+test('the server never pays a claimed Idol level: an unrecorded level-10 Idol adds no XP, kill reward or combat bonus', async () => {
+	const m = memoryStore();
+	const { ledgerRepo } = memoryLedgers();
+	const T = 1_800_000_000_000;
+	const [a] = gameWith('forest', 1, 1, 6);
+	patchTileAt(a.x, a.y, { building: 'idol_forest', buildingLevel: 10 });
+	store.setState({ idolLevels: { forest: 10 }, playSeconds: 100_000 } as never);
+	const out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 0, T, false, ledgerRepo);
+	assert.equal(out.kind, 'ok');
+	const stored = m.rows.get('u1')!;
+	assert.equal(stored.summary.xpGainPct, summarize(plain()).xpGainPct, 'no XP bonus from a claim');
+	assert.equal((stored.core as { idolLevels?: unknown }).idolLevels, undefined, 'the stored copy holds the settled record: none');
+	assert.equal((stored.core as { idolFx?: unknown }).idolFx, undefined);
+});
+
+test('without a usable ledger the claimed levels are kept in the stored save but pay nothing', async () => {
+	const m = memoryStore();
+	const broken = { load: async () => Promise.reject(new Error('down')), commit: async () => false };
+	const T = 1_800_000_000_000;
+	const [a] = gameWith('forest', 1, 2, 6);
+	assert.ok(api().buildBuilding(a.x, a.y, 'idol_forest'));
+	store.setState({ playSeconds: 100_000 } as never);
+	const out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 0, T, false, broken as never);
+	assert.equal(out.kind, 'ok');
+	const stored = m.rows.get('u1')!;
+	assert.equal(stored.summary.xpGainPct, summarize(plain()).xpGainPct, 'no bonus without a ledger to verify against');
+	assert.deepEqual((stored.core as { idolLevels?: unknown }).idolLevels, { forest: 1 }, 'nothing is lost from the stored save');
+});
+
+test('crafting XP is the same whether the crafts are claimed one by one or together (fractional XP is kept)', async () => {
+	const { applyClaim, applyClaimAll } = await import('../../src/lib/offline/craft');
+	const { RECIPES } = await import('../../src/catalog/recipes');
+	const { emptyCraft } = await import('../../src/lib/crafting');
+	const recipe = RECIPES.find((r) => r.timeSec && r.kind !== 'gear' && r.xp > 0);
+	if (!recipe) return;
+	const env = { secret: 'x'.repeat(24), userId: 'u', luck: 0, intelligence: 0, xpPct: 10 };
+	const finished = 1_000_000_000_000;
+	const entry = (count: number) => ({ ...emptyCraft(), queue: [{ recipeId: recipe.id, count, startedAt: 0, timeSec: recipe.timeSec! }] });
+	const inv = { bag: [], ver: 1 } as never;
+	const together = applyClaimAll(inv, entry(100), finished, env);
+	const single = applyClaim(inv, entry(1), 0, finished, env);
+	assert.ok(together.ok && single.ok);
+	if (together.ok && single.ok) assert.ok(Math.abs(single.craft.xp * 100 - together.craft.xp) < 1e-3, `${single.craft.xp} x 100 vs ${together.craft.xp}`);
+});
+
+test('a save whose HP is the War Memorial maximum is valid, and one above it is not', () => {
+	const [a] = gameWith('battlefield', 1, 5);
+	patchTileAt(a.x, a.y, { building: 'idol_battlefield', buildingLevel: 5 });
+	store.setState({ idolLevels: { battlefield: 5 } });
+	const base = pickPersisted(api());
+	const max = summarize(structuredClone(base));
+	void max;
+	const hp = (n: number) => decodeSave(encodeSave({ ...structuredClone(base), playerHp: n } as never));
+	const limit = Math.round(effectiveStatsMaxHp() * 1.1);
+	assert.equal(hp(limit).ok, true, 'the pool the Idol makes');
+	assert.equal(hp(limit * 2).ok, false, 'far above it');
+});
+
+const effectiveStatsMaxHp = (): number => {
+	const s = api();
+	return Math.round(playerProfile({ characterStats: s.characterStats, equipment: s.equipment, resources: s.resources } as never).maxHp);
+};

@@ -1763,19 +1763,8 @@ The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember s
 <td>+10 %</td>
 <td>-10 %</td>
 </tr>
-<tr>
-<td>For scale, the income bonus of the Embers ever earned (<code>emberIncomeBonus</code>, every resource but XP): 10 Embers +39.8 %, 25 Embers +69 %, 50 Embers +105 %, 100 Embers +158 %. No Idol touches the income: the largest Idol bonus is +10 % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than 60 %.</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
 </tbody></table>
+<p>For scale, the income bonus of the Embers ever earned (<code>emberIncomeBonus</code>, every resource but XP): 10 Embers +39.8 %, 25 Embers +69 %, 50 Embers +105 %, 100 Embers +158 %. No Idol touches the income: the largest Idol bonus is +10 % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than 60 %.</p>
 </article><article><p><a id="idoleconomy"></a></p>
 <h3><code>idolEconomy</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/idolEconomy.ts"><code>src/lib/idolEconomy.ts:71</code></a></p>
@@ -4576,7 +4565,7 @@ and on hide/close; the backup rotates every 10 minutes. A read goes through <cod
 One tab owns the game at a time (<code>src/hooks/useSingleTab.ts</code>, a Web Lock).</p>
 </article><article><p><a id="sanitizesave"></a></p>
 <h3><code>sanitizeSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:209</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:210</code></a></p>
 <p>Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
 pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
@@ -4585,7 +4574,7 @@ cost) are recomputed instead of trusted. Returns the cleaned persisted slice.</p
 a click level outside the ladder, a prestige block that does not add up, less XP than the owned tiles produced; gear must be valid item instances (<code>instanceProblem</code> in <code>src/lib/itemInstance.ts</code>). Gear stats are derived, never read from the save.</p>
 </article><article><p><a id="persisted-keys"></a></p>
 <h3><code>PERSISTED_KEYS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:64</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:65</code></a></p>
 <p>The part of the game state that is saved. Rates, window flags and the like are recomputed on load.</p>
 <p><strong>How to extend the save safely.</strong></p>
 <ul>

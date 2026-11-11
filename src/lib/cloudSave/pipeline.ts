@@ -275,8 +275,24 @@ export const acceptSave = async (
 	const inventory =
 		ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades, state.prestige, state.playerClass) : (ledger?.inv ?? null);
 	if (inventory && !newGame) state = stampInventory(state, inventory);
-	let summary = summarize(state);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
+	/**
+	 * The Idols (IDL-96): the account's Idol levels are the ledger's (`legacy.idols`). The save's claim is cut back to the trusted record plus one verified step ({@link settleIdols}) BEFORE anything is
+	 * derived, so the XP allowance, the rates and every bonus the Idols pay are worked out from the settled levels, never from the claim. A New Game starts the record again. Without a usable ledger nothing can be
+	 * verified: the claimed levels are kept in the stored save (nothing is lost) but pay no bonus.
+	 */
+	const trustedIdols = newGame ? {} : (ledger?.legacy.idols ?? {});
+	const claimedIdolLevels = state.idolLevels;
+	let settledIdols: Record<string, number> = state.idolLevels ?? {};
+	if (BUILDINGS_FLAG.enabled && ledgerUsable) {
+		// the timer check only needs the buildings on the map, which the settling does not change
+		const jumped = verifyTransition(previous, summarize(state), nowMs, grants, trustedIdols).includes('timer_jump');
+		settledIdols = settleIdols(trustedIdols, state, jumped);
+		state = { ...state, idolLevels: settledIdols };
+	} else if (BUILDINGS_FLAG.enabled) {
+		state = { ...state, idolLevels: {} };
+	}
+	let summary = summarize(state);
 	/**
 	 * XP is the server's to bound: a save that holds more than the tiles bought, the time played and what the server paid can explain is
 	 * clamped to what they explain (and its attribute points to the level that XP gives), and the stored copy, the level on the ranking
@@ -307,19 +323,6 @@ export const acceptSave = async (
 	const refused = rejectedFlags(flags, enforcement);
 	if (refused.length) return { kind: 'rejected', flags: refused };
 
-	/**
-	 * The Idols (IDL-96): the account's Idol levels are the ledger's (`legacy.idols`); the save's claim is cut back to the trusted record plus one verified step ({@link settleIdols}), and everything the
-	 * server derives from here on (the bonuses the Idols pay) is worked out from the settled levels. A New Game starts the record again.
-	 */
-	const trustedIdols = newGame ? {} : (ledger?.legacy.idols ?? {});
-	const settledIdols = BUILDINGS_FLAG.enabled && ledgerUsable ? settleIdols(trustedIdols, state, flags.includes('timer_jump')) : (state.idolLevels ?? {});
-	const idolsChanged = !sameIdols(settledIdols, state.idolLevels ?? {});
-	if (BUILDINGS_FLAG.enabled && ledgerUsable && (idolsChanged || Object.keys(settledIdols).length > 0)) {
-		state = { ...state, idolLevels: settledIdols };
-		const settled = summarize(state);
-		settled.derived.xpBase = summary.derived.xpBase;
-		summary = settled;
-	}
 	const legacyIdols = BUILDINGS_FLAG.enabled && ledgerUsable ? settledIdols : (ledger?.legacy.idols ?? {});
 	const legacyChanged = !!ledger && !sameIdols(legacyIdols, ledger.legacy.idols);
 
@@ -353,7 +356,7 @@ export const acceptSave = async (
 	// The gem balance is the server's: a save can never raise it (a new ledger starts at the save's gems, but never above the starting gift)
 	const gems = ledgerUsable ? (ledger ? ledger.gems : Math.max(0, Math.min(summary.gems, STARTING_GEMS))) : summary.gems;
 	summary.gems = gems;
-	const split = splitBody(packBody(state), summary.tilesOwned);
+	const split = splitBody(packBody(BUILDINGS_FLAG.enabled && !ledgerUsable ? { ...state, idolLevels: claimedIdolLevels } : state), summary.tilesOwned);
 	const core = {
 		...(ledgerUsable ? { ...split.core, gems } : split.core),
 		// the Idols' combat bonuses ride in the stored save for the fight profile (profile.ts reads `idolFx`); absent with none

@@ -104,7 +104,8 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 
 		// HP and mana: the server's numbers arrive with every answer; in between they keep filling the way the server will count them
 		// (in a fight the server's picture is the only one, so HP is left alone and only the cooldowns and the stun run down)
-		const playerMaxHp = maxHp(state.characterStats, state.equipment);
+		// the War Memorial raises the pool the hero refills to (the server's profile has the same number)
+		const playerMaxHp = Math.round(maxHp(state.characterStats, state.equipment) * (1 + idolEconomy(state.tiles, state.idolLevels).hpArmorPct / 100));
 		const inFight = state.combat.fight !== null;
 		// a fight the server ran to its end: the HP of both sides follow its plan (the next answer, at the end, is the truth)
 		const plan = inFight ? state.combat.plan : null;
