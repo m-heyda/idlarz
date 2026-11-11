@@ -229,7 +229,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/**
 
 - [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
-- [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in one line:
+- [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in plain words:
 - [`CharacterOverlay.tsx`](../../src/components/game/overlays/CharacterOverlay.tsx)
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
@@ -330,6 +330,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
 - [`useSingleTab.ts`](../../src/hooks/useSingleTab.ts) — ~ Only one tab may run the game.
 - [`useSpawnSync.ts`](../../src/hooks/useSpawnSync.ts) — ~ The one poll of the game.
+- [`useTipDismiss.ts`](../../src/hooks/useTipDismiss.ts) — ~ Keeps a hover tooltip from outliving its reason:
 
 **src/lib/**
 
@@ -342,6 +343,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ "1.2K gold, 300 wood":
 - [`buildingOutput.ts`](../../src/lib/buildingOutput.ts) — ~ The Producer's bonus from the size of its biome, as a fraction (0.5 = +50 %):
+- [`buildingText.ts`](../../src/lib/buildingText.ts) — ~ The plain-language lines of a Producer or Extractor card in the Build window; every number comes from `BUILDING_RULES` and the output formulas (`lib/buildingOutput.ts`).
 - [`buildings.ts`](../../src/lib/buildings.ts) — ~ Whether the building system is switched on (`BUILDINGS_FLAG`, off by default).
 - [`castleFinder.ts`](../../src/lib/castleFinder.ts) — ~ Finding the castle again on a map without edges:
 - [`castleTimer.ts`](../../src/lib/castleTimer.ts) — ~ The short text of the castle upgrade timer ("2h 5m", "4m 10s"), or null when no upgrade is running.
@@ -833,7 +835,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
+- [`buildingText.test.ts`](../../tests/ui/buildingText.test.ts)
 - [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
