@@ -145,12 +145,10 @@ interface UiState {
 	chestNotices: ChestNotice[];
 	pushChestNotice: (loot: ChestNoticeLoot) => void;
 	dismissChestNotice: (id: number) => void;
-	/** Remembered view options (localStorage, see lib/uiPrefs): the minimap and the dev admin panel */
+	/** Remembered view options (localStorage, see lib/uiPrefs): the minimap, the compact header and the folded panels */
 	showMinimap: boolean;
 	/** The combat panel is shrunk to its icon (a win or defeat is still announced) */
 	combatMinimized: boolean;
-	showAdmin: boolean;
-	adminCollapsed: boolean;
 	/** Small amounts next to the header's resource icons (off: icons only) */
 	compactHeader: boolean;
 	/** The Farm window's panels: animal shop, stats readout, upgrade drawer */
@@ -282,9 +280,7 @@ export const useUiStore = create<UiState>((set, get) => ({
 			merchantTab: readMerchantTab(),
 			merchantPreset: readMerchantPreset(),
 			merchantCustom: (readStringPref('merchantCustom') ?? '').slice(0, MERCHANT_CUSTOM_MAX),
-			showAdmin: readPref('showAdmin'),
 			showMinimap: readPref('showMinimap'),
-			adminCollapsed: readPref('adminCollapsed'),
 			combatMinimized: readPref('combatMinimized'),
 			compactHeader: readPref('compactHeader'),
 			farmAnimalsOpen: readPref('farmAnimalsOpen'),

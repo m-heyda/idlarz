@@ -190,7 +190,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
-- [`GameDebug.tsx`](../../src/components/game/GameDebug.tsx) — ~ Rolls the loot of a source through the real pipeline at the current castle level, puts it in the bag and logs why it dropped (console.table).
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
 - [`GemIcon.tsx`](../../src/components/game/GemIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`Grid.tsx`](../../src/components/game/Grid.tsx) — ~ Wheel zoom.
@@ -569,7 +568,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`terrain.ts`](../../src/utils/terrain.ts) — ~ Dual-grid terrain.
 - [`water.ts`](../../src/utils/water.ts) — ~ Where the map's water ripples go:
 - [`world.ts`](../../src/utils/world.ts) — ~ The map:
-- [`worldGen.ts`](../../src/utils/worldGen.ts) — ~ A synthetic world for tests, benchmarks and the admin "+N tiles" button:
+- [`worldGen.ts`](../../src/utils/worldGen.ts) — ~ A synthetic world for tests, benchmarks and perf scripts:
 
 ## scripts/
 
@@ -819,6 +818,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
+- [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
