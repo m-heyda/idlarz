@@ -2,6 +2,7 @@ import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import type { BootSnapshot } from '@/lib/offline/types';
 import { scoped } from '@/lib/storageScope';
 import type { AvatarSendResult } from '@/lib/avatarPick';
+import { epochFetch } from '@/lib/epochFetch';
 
 /** The browser side of /api/auth/*: the page only ever talks to our own routes, never to Supabase. */
 export interface Profile {
@@ -118,10 +119,13 @@ export const fetchAvatars = async (): Promise<AvatarState | null> => {
 		return null;
 	}
 };
-/** Picks an avatar (`POST /api/auth/avatar`); the server refuses an unknown or locked id with its reason, and answers with the id it stored. */
+/**
+ * Picks an avatar (`POST /api/auth/avatar`); the server refuses an unknown or locked id with its reason, and answers with the id it stored.
+ * It goes through `epochFetch`: the route checks the data epoch (`requirePlayer(request)`), and a request without the `x-game-epoch` header counts as the baseline epoch, so after the new chapter flip a plain `fetch` was refused with 412 `staleEpoch` for everyone.
+ */
 export const chooseAvatar = async (avatarId: string): Promise<AvatarSendResult> => {
 	try {
-		const response = await fetch('/api/auth/avatar', {
+		const response = await epochFetch('/api/auth/avatar', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ avatarId }),
