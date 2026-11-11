@@ -180,6 +180,31 @@
 	opacity: 0.55;
 }
 
+.avatar-card-soon {
+	cursor: default;
+	color: #5c5040;
+	opacity: 0.45;
+	outline: none;
+}
+
+.avatar-card-soon-art {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 60px;
+	height: 60px;
+	font-size: 1.6rem;
+	color: #3c3226;
+	background: rgba(0, 0, 0, 0.35);
+	border: 2px dashed #3c3226;
+}
+
+.avatar-card-soon-note {
+	overflow-wrap: anywhere;
+	font-size: 0.65rem;
+	line-height: 1.15;
+}
+
 .avatar-card-lock {
 	display: inline-block;
 	margin-right: 2px;

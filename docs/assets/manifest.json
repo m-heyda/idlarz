@@ -20030,6 +20030,19 @@
 	},
 	{
 		"usedBy": [],
+		"name": "badge_early_tester_wireframe",
+		"category": "ui",
+		"subcategory": "achievement badges (not wired)",
+		"src": "/pixel/new_assets/achievements/badge_early_tester_wireframe.png",
+		"status": "reuse",
+		"source": "new_assets/achievements",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "badge_first_rebirth_fire",
 		"category": "ui",
 		"subcategory": "achievement badges (not wired)",
@@ -21279,7 +21292,7 @@
 		"usedBy": [],
 		"name": "avatar_wireframe_hero",
 		"category": "ui",
-		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"subcategory": "wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)",
 		"src": "/pixel/new_assets/wireframe/avatar_wireframe_hero.png",
 		"status": "planned",
 		"source": "new_assets/wireframe",
@@ -21292,7 +21305,7 @@
 		"usedBy": [],
 		"name": "badge_star_wireframe",
 		"category": "ui",
-		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"subcategory": "wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)",
 		"src": "/pixel/new_assets/wireframe/badge_star_wireframe.png",
 		"status": "planned",
 		"source": "new_assets/wireframe",
@@ -21305,7 +21318,7 @@
 		"usedBy": [],
 		"name": "pet_fox",
 		"category": "ui",
-		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"subcategory": "wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)",
 		"src": "/pixel/new_assets/wireframe/pet_fox.png",
 		"status": "planned",
 		"source": "new_assets/wireframe",
@@ -21318,7 +21331,7 @@
 		"usedBy": [],
 		"name": "pet_owl",
 		"category": "ui",
-		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"subcategory": "wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)",
 		"src": "/pixel/new_assets/wireframe/pet_owl.png",
 		"status": "planned",
 		"source": "new_assets/wireframe",
@@ -21331,7 +21344,7 @@
 		"usedBy": [],
 		"name": "pet_rabbit",
 		"category": "ui",
-		"subcategory": "wireframe early-tester set (not wired: tester avatar, badge, pets)",
+		"subcategory": "wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)",
 		"src": "/pixel/new_assets/wireframe/pet_rabbit.png",
 		"status": "planned",
 		"source": "new_assets/wireframe",
@@ -21353,6 +21366,21 @@
 		"size": [
 			40,
 			40
+		]
+	},
+	{
+		"usedBy": [
+			"beta_tester"
+		],
+		"name": "avatar_beta_tester",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/new_assets/heroes/avatar_beta_tester.png",
+		"status": "used",
+		"source": "new_assets/heroes",
+		"size": [
+			64,
+			64
 		]
 	},
 	{

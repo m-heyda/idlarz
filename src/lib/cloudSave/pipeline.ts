@@ -48,6 +48,7 @@ import { countSave, emptyStats, statsDue } from '@/lib/offline/stats';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
+import { ATTR_KEYS, attrsFromCore, clearedAttrs, fitAttrs, levelOfXp, stateWithAttrs, type Attrs } from '@/lib/offline/attrs';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
 import { clampIdolTiles, settleIdols, sameIdols } from './idolTrust';
 import { BUILDINGS_FLAG } from '@/config/buildings';
@@ -275,6 +276,13 @@ export const acceptSave = async (
 	const inventory =
 		ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades, state.prestige, state.playerClass) : (ledger?.inv ?? null);
 	if (inventory && !newGame) state = stampInventory(state, inventory);
+	/**
+	 * The attribute points are the ledger's too: the upload's allocation is replaced by the ledger's before anything is derived (so rates, XP gain and Luck are worked out from the points the server holds). A rebirth or a New Game gives every point back (the
+	 * allocation starts again). An account without a record yet is seeded from this save below (`attrsOut`), which keeps what it has.
+	 */
+	let attrsOut: Attrs | null = ledgerUsable ? (ledger?.attrs ?? null) : null;
+	if (ledgerUsable && attrsOut && (newGame || rebirthed)) attrsOut = clearedAttrs(attrsOut);
+	if (ledgerUsable && attrsOut) state = stateWithAttrs(state, attrsOut, levelOfXp(state.resources.xp), state.prestige.rebirths);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
 	/**
 	 * The Idols (IDL-96): the account's Idol levels are the ledger's (`legacy.idols`). The save's claim is cut back to the trusted record plus one verified step ({@link settleIdols}) BEFORE anything is
@@ -311,9 +319,20 @@ export const acceptSave = async (
 		};
 		summary = summarize(state);
 	}
+	if (ledgerUsable) {
+		// the points the level has earned are the budget: an allocation above it (the XP was clamped lower) goes back to unspent; no record yet = seeded from this (already sanitized) save
+		const level = levelOfXp(state.resources.xp);
+		const rebirths = state.prestige.rebirths;
+		const before = state.characterStats;
+		attrsOut = attrsOut ? fitAttrs(attrsOut, level, rebirths) : attrsFromCore({ characterStats: before });
+		state = stateWithAttrs(state, attrsOut, level, rebirths);
+		if (state.characterStats.availablePoints !== before.availablePoints || ATTR_KEYS.some((key) => before[key] !== state.characterStats[key]))
+			summary = summarize(state);
+	}
 	summary.derived.xpBase = xpVerdict.base;
 	const flags = verifyTransition(previous, sent ?? claimed, nowMs, grants, ledger?.legacy.idols); // judged as the player sent it (the XP check flags a clamp)
-	if (ledger && gemsClaimed > ledger.gems) flags.push('gems_increase');
+	// a save may still hold the balance from before a gem purchase (it was on its way when the shop sold something): `spentSinceSave` is what the ledger allows above its own balance
+	if (ledger && gemsClaimed > ledger.gems + ledger.gemShop.spentSinceSave) flags.push('gems_increase');
 	if (emberVerdict.clamped) flags.push('ember_jump');
 	const worth = checkNetWorth(state, summary, ledger?.granted);
 	if (worth.exceeds) flags.push('networth_exceeds');
@@ -423,6 +442,9 @@ export const acceptSave = async (
 				rates: previous ? (previous.summary.rates as unknown as Record<string, number>) : null,
 				newRun: newRun || !current,
 			});
+			// the attribute record, and the gem shop's allowance for a save that was on its way when something was bought (this save has been accepted: it is used up)
+			const settledShop = { ...ledger?.gemShop, spentSinceSave: 0 } as Ledger['gemShop'];
+			const attrsChanged = !!ledger && JSON.stringify(ledger.attrs) !== JSON.stringify(attrsOut);
 			if (!ledger) {
 				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1, stats: counted, legacy: { idols: legacyIdols } });
 			} else if (!current) {
@@ -442,6 +464,8 @@ export const acceptSave = async (
 					inv: inventoryFromCore(split.core),
 					stats: counted,
 					legacy: { idols: legacyIdols },
+					attrs: attrsOut,
+					gemShop: settledShop,
 				});
 			} else if (newRun) {
 				/**
@@ -466,9 +490,17 @@ export const acceptSave = async (
 					inv,
 					stats: counted,
 					legacy: { idols: legacyIdols },
+					attrs: attrsOut,
+					gemShop: settledShop,
 				};
 				await ledgers.commit(userId, ledger.ver, next);
-			} else if ((grants && Object.values(grants).some((amount) => amount > 0)) || !ledger.inv || legacyChanged) {
+			} else if (
+				(grants && Object.values(grants).some((amount) => amount > 0)) ||
+				!ledger.inv ||
+				legacyChanged ||
+				attrsChanged ||
+				ledger.gemShop.spentSinceSave > 0
+			) {
 				// the save knows what was granted so far; a ledger from before the inventory moved here takes this save's
 				await ledgers.commit(userId, ledger.ver, {
 					...ledger,
@@ -477,6 +509,8 @@ export const acceptSave = async (
 					inv: ledger.inv ?? inventoryFromCore(split.core),
 					stats: counted,
 					legacy: { idols: legacyIdols },
+					attrs: attrsOut,
+					gemShop: settledShop,
 				});
 			} else if (statsDue(ledger.stats, nowMs)) {
 				// nothing else to write: the counters are brought up to date at most every STATS_EVERY_MS

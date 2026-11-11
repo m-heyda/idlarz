@@ -6,7 +6,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 
 **Contents**
 
-- Levels: [`LEVELING`](#leveling), [`xpToNextLevel`](#xptonextlevel), [`totalStatPoints`](#totalstatpoints), [`cumulativeXp`](#cumulativexp), [`calculateLevel`](#calculatelevel), [`reconcileCharacter`](#reconcilecharacter)
+- Levels: [`LEVELING`](#leveling), [`xpToNextLevel`](#xptonextlevel), [`totalStatPoints`](#totalstatpoints), [`attributeBudget`](#attributebudget), [`cumulativeXp`](#cumulativexp), [`allocatePoints`](#allocatepoints), [`calculateLevel`](#calculatelevel), [`reconcileCharacter`](#reconcilecharacter)
 - Attributes: [`CHARACTER_STAT_CONFIG`](#character-stat-config), [`calculateStatResourceModifiers`](#calculatestatresourcemodifiers), [`calculateCombatStats`](#calculatecombatstats)
 - Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`rebirthUnlockIntro`](#rebirthunlockintro), [`rebirthRunSummary`](#rebirthrunsummary)
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
@@ -97,6 +97,22 @@ totalStatPoints(level) = (level - 1) + (min(level, 30) - 1) x 2
 
 See also: [`reconcileCharacter`](progression.md#reconcilecharacter)
 
+<a id="attributebudget"></a>
+
+### `attributeBudget` <small>function</small>
+
+Source: [`src/lib/offline/attrs.ts:40`](../../src/lib/offline/attrs.ts)
+
+How many attribute points a character holds in all: what its level has earned (`totalStatPoints`), plus a term per rebirth that is 0 today (the +20 pool of IDL-100 goes here, in the one place the budget is worked out).
+
+**Formula**
+
+```text
+attributeBudget(level, rebirths) = totalStatPoints(level) + 0 x rebirths
+```
+
+See also: [`totalStatPoints`](progression.md#totalstatpoints)
+
 <a id="cumulativexp"></a>
 
 ### `cumulativeXp` <small>function</small>
@@ -104,6 +120,14 @@ See also: [`reconcileCharacter`](progression.md#reconcilecharacter)
 Source: [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts)
 
 The total XP at which `level` is reached (level 1 is 0).
+
+<a id="allocatepoints"></a>
+
+### `allocatePoints` <small>function</small>
+
+Source: [`src/lib/offline/attrs.ts:107`](../../src/lib/offline/attrs.ts)
+
+Puts points into attributes: `add` is how many per attribute. Refused (nothing changes) when it is empty or malformed, or when it would spend more than the level's budget holds.
 
 <a id="calculatelevel"></a>
 
@@ -513,7 +537,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:146`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:154`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 
@@ -531,7 +555,7 @@ Used by register, `POST /api/auth/profile`, `POST /api/auth/avatar` and the new-
 
 ### `CLASS_AVATARS` <small>const</small>
 
-Source: [`src/catalog/avatars.ts:96`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:104`](../../src/catalog/avatars.ts)
 
 The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class.
 Only that class can wear them (`checkAvatar`). The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
@@ -549,7 +573,7 @@ Rules, all enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the
 achievements the account has earned. A stored avatar that no longer fits (a later class change) falls back to the class's default (`fitAvatar`). The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
 
 **Art.** The owner's framed busts (64x64, `public/pixel/new_assets/heroes/<portrait>.png`, listed in `public/pixel/new_assets/README.md`) are the portraits; `avatarArtUrl` is the only place that
-builds the path, so a new picture is a change to the `portrait` field. The six horned busts not used here stay in the pool for later unlocks. A locked avatar is shown as a black
+builds the path, so a new picture is a change to the `portrait` field. The horned busts not used here stay in the pool for later unlocks. The **Beta tester** is a second reward of the same `early_tester` achievement (a wireframe bust), so every account that played before the new chapter gets both faces. A locked avatar is shown as a black
 cut-out of its own picture (generated in `AvatarArt`, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.
 
 <a id="createavatarpicker"></a>

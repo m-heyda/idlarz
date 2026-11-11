@@ -31,13 +31,25 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/auth/me/route.ts) — ~ The player's own level and rebirth count from their `player_stats` row; null when there is no row yet (a new account) or the read failed.
 
+**src/app/api/auth/password/**
+
+- [`route.ts`](../../src/app/api/auth/password/route.ts) — ~ `POST /api/auth/password { password }`:
+
 **src/app/api/auth/profile/**
 
-- [`route.ts`](../../src/app/api/auth/profile/route.ts) — ~ Creates or replaces the signed-in player's own profile row (the id is always the cookie's user, never from the body).
+- [`route.ts`](../../src/app/api/auth/profile/route.ts) — ~ Creates the signed-in player's own profile row (the id is always the cookie's user, never from the body).
 
 **src/app/api/auth/register/**
 
 - [`route.ts`](../../src/app/api/auth/register/route.ts) — ~ Whether another account already holds this name (case-insensitive, like the unique index `profiles_character_name_ci`).
+
+**src/app/api/auth/reset/**
+
+- [`route.ts`](../../src/app/api/auth/reset/route.ts) — ~ `POST /api/auth/reset { email }`:
+
+**src/app/api/character/**
+
+- [`route.ts`](../../src/app/api/character/route.ts) — ~ The player's attribute points:
 
 **src/app/api/chest/**
 
@@ -62,6 +74,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/app/api/fight/**
 
 - [`route.ts`](../../src/app/api/fight/route.ts) — ~ `{ key, action, ...
+
+**src/app/api/gems/**
+
+- [`route.ts`](../../src/app/api/gems/route.ts) — ~ The gem shop:
 
 **src/app/api/inventory/**
 
@@ -91,6 +107,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/tutorial/route.ts) — ~ The guided tutorial:
 
+**src/app/auth/callback/**
+
+- [`route.ts`](../../src/app/auth/callback/route.ts) — ~ `GET /auth/callback?code=...&next=/reset`:
+
 **src/app/**
 
 - [`layout.tsx`](../../src/app/layout.tsx)
@@ -116,6 +136,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/app/play/**
 
 - [`page.tsx`](../../src/app/play/page.tsx) — ~ The gate in front of the game (route `/play`; a guest is sent to the landing page to log in):
+
+**src/app/reset/**
+
+- [`page.tsx`](../../src/app/reset/page.tsx) — ~ `/reset` (IDL-65):
 
 **src/catalog/**
 
@@ -172,7 +196,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
 - [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
-- [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The chosen avatar id (null = none yet)
+- [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
+- [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ The away-time bar (IDL-64):
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
@@ -183,12 +208,13 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
 - [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ 'full' = the whole figure (56x80), 'bust' = head and shoulders (40x40)
-- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from; picking one applies at once.
+- [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from.
 - [`CollapsibleSection.tsx`](../../src/components/game/CollapsibleSection.tsx) — ~ A titled block whose header toggles the body; the open/closed choice is remembered per `id` (localStorage).
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
 - [`CostList.tsx`](../../src/components/game/CostList.tsx) — ~ A bundle of resource costs; each entry is green when affordable and red when not.
 - [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
+- [`EarlyTesterBadge.tsx`](../../src/components/game/EarlyTesterBadge.tsx) — ~ The Early tester medal shown next to a name (the Character window and the landing's Continue card); the caller decides who has earned it.
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
@@ -242,6 +268,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Animals drawn for a count:
 - [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ How long the drawer takes to slide shut (a little over the transition in Farm.css)
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
+- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ Days and hours left of a cooldown, in words.
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
 - [`LoadingScreen.tsx`](../../src/components/game/overlays/LoadingScreen.tsx) — ~ The splash while the saved game loads (needs the game store; the start gate uses LoadingView, which does not).
 - [`LoadingView.tsx`](../../src/components/game/overlays/LoadingView.tsx) — ~ Hydration splash:
@@ -257,7 +284,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/overlays/**
 
-- [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ "Hours as a number":
+- [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ Whether the away-time hint (Night Watch, Steward) is worth showing:
 - [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ Rebirth and the Ember shop.
 - [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
@@ -298,6 +325,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`economy.ts`](../../src/config/economy.ts) — Tile prices and XP, the resource caps, clicks and the starting gems: the numbers the economy runs on.
 - [`epoch.ts`](../../src/config/epoch.ts) — ~ The data epoch the server is on.
 - [`farm.ts`](../../src/config/farm.ts) — The farm: animals, pen and farm upgrades.
+- [`gemShop.ts`](../../src/config/gemShop.ts) — The gem shop's price book (IDL-189, IDL-190, IDL-194). A leaf module: pure data and two tiny helpers, imported by the server (`lib/offline/gemShop.ts`) and the shop window alike.
 - [`itemCatalog.ts`](../../src/config/itemCatalog.ts) — The item catalog lives in src/catalog (items, sets, rarities, stats, resources, loot config). This file only derives the
 
 **src/config/itemIcons/**
@@ -335,7 +363,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/lib/**
 
 - [`ambientLife.ts`](../../src/lib/ambientLife.ts) — ~ Visible part of the map in tile coordinates (inclusive).
+- [`authCallback.ts`](../../src/lib/authCallback.ts) — ~ The page that sets a new password after the emailed link.
 - [`authClient.ts`](../../src/lib/authClient.ts) — ~ The browser side of /api/auth/*:
+- [`authReset.ts`](../../src/lib/authReset.ts) — ~ The one answer to a reset request, whether or not the account exists (no account enumeration).
 - [`authRoute.ts`](../../src/lib/authRoute.ts) — ~ The auth service cannot be reached or is not set up:
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
 - [`avatarPick.ts`](../../src/lib/avatarPick.ts) — What the server said to an avatar change:
@@ -422,6 +452,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read.
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
+- [`attrs.ts`](../../src/lib/offline/attrs.ts) — ~ The most points one request may add to one attribute (a sanity bound on the body; the budget is the real limit).
+- [`away.ts`](../../src/lib/offline/away.ts) — ~ The landing card's away bar:
 - [`bootSnapshot.ts`](../../src/lib/offline/bootSnapshot.ts) — ~ The game's first load (`GET /api/auth/me?game=1`):
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
@@ -434,7 +466,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fightTargets.ts`](../../src/lib/offline/fightTargets.ts) — ~ A placed monster by ticket number, with what it is (null:
 - [`fightTypes.ts`](../../src/lib/offline/fightTypes.ts) — ~ What the player brings to a fight, worked out from the last accepted save when the fight starts and then frozen for that fight.
 - [`fightView.ts`](../../src/lib/offline/fightView.ts) — ~ The picture the browser is given:
+- [`gemTypes.ts`](../../src/lib/offline/gemTypes.ts) — ~ An identity change the server has charged for and still has to write on the profile row (`ledger.gemShop.pending`):
+- [`gems.ts`](../../src/lib/offline/gems.ts) — ~ The server day (UTC), 1-based so that 0 can mean "never".
+- [`gemsFlow.ts`](../../src/lib/offline/gemsFlow.ts) — ~ One request to the gem shop, start to finish.
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
+- [`identity.ts`](../../src/lib/offline/identity.ts) — ~ Epoch seconds of the last paid name change; null = never changed
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
 - [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ What the account keeps across rebirths (the ledger's `legacy` column, null until something was kept):
 - [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
@@ -460,6 +496,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/lib/**
 
+- [`offlineBar.ts`](../../src/lib/offlineBar.ts) — The away-time bar (IDL-64):
 - [`offlineClient.ts`](../../src/lib/offlineClient.ts) — ~ The browser side of /api/offline.
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
@@ -468,6 +505,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
 - [`potionBelt.ts`](../../src/lib/potionBelt.ts) — ~ The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
+- [`rateLimit.ts`](../../src/lib/rateLimit.ts) — A small in-memory sliding-window limiter for routes that must not be hammered (password reset requests).
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ Hands the monster discoveries of an answer to the bestiary store.
@@ -528,6 +566,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`base.ts`](../../src/stores/game/base.ts) — base.ts
 - [`buildingSlice.ts`](../../src/stores/game/buildingSlice.ts) — buildingSlice.ts
 - [`characterSlice.ts`](../../src/stores/game/characterSlice.ts) — characterSlice.ts
+- [`characterSync.ts`](../../src/stores/game/characterSync.ts) — characterSync.ts
 - [`chestSync.ts`](../../src/stores/game/chestSync.ts) — chestSync.ts
 - [`clockSlice.ts`](../../src/stores/game/clockSlice.ts) — clockSlice.ts
 - [`combatSlice.ts`](../../src/stores/game/combatSlice.ts) — combatSlice.ts
@@ -543,6 +582,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/stores/**
 
 - [`gameStore.ts`](../../src/stores/gameStore.ts) — ~ The whole store:
+- [`gemStore.ts`](../../src/stores/gemStore.ts) — ~ The last answer of the server (null until it has been asked)
 - [`labStore.ts`](../../src/stores/labStore.ts) — ~ The map lab's world:
 - [`rewardPendingStore.ts`](../../src/stores/rewardPendingStore.ts) — ~ How many rewards are on their way from the server (a chest being opened, a won fight whose result is not shown yet).
 - [`settingsStore.ts`](../../src/stores/settingsStore.ts)
@@ -802,6 +842,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
 - [`localSaveAccount.test.ts`](../../tests/saves/localSaveAccount.test.ts)
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
+- [`passwordReset.test.ts`](../../tests/saves/passwordReset.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
 - [`saveFixtures.test.ts`](../../tests/saves/saveFixtures.test.ts) — The guard for every future PR: every frozen fixture in tests/fixtures/saves/ (one per released shape, made from the code of that release by
 - [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with a chest, gear and a monster, as a plain persisted slice.
@@ -816,10 +857,12 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/server/**
 
 - [`achievements.test.ts`](../../tests/server/achievements.test.ts) — ~ Gives the ledger counters the server would have counted itself (the test runs no fights).
+- [`away.test.ts`](../../tests/server/away.test.ts)
 - [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
 - [`bootSnapshot.test.ts`](../../tests/server/bootSnapshot.test.ts) — ~ A stand-in for the Supabase client:
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
+- [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
@@ -854,6 +897,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
 - [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
+- [`offlineBar.test.ts`](../../tests/ui/offlineBar.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
@@ -885,6 +929,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buildings_v1_rollback.sql`](../../supabase/migrations/buildings_v1_rollback.sql)
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
+- [`gems_attrs_ledger.sql`](../../supabase/migrations/gems_attrs_ledger.sql)
+- [`gems_attrs_ledger_rollback.sql`](../../supabase/migrations/gems_attrs_ledger_rollback.sql)
+- [`identity_server_only.sql`](../../supabase/migrations/identity_server_only.sql)
+- [`identity_server_only_rollback.sql`](../../supabase/migrations/identity_server_only_rollback.sql)
 - [`idols_v1.sql`](../../supabase/migrations/idols_v1.sql)
 - [`idols_v1_rollback.sql`](../../supabase/migrations/idols_v1_rollback.sql)
 - [`inventory_ledger.sql`](../../supabase/migrations/inventory_ledger.sql)

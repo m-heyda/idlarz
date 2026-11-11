@@ -20,6 +20,7 @@ import {
 	XP_CAP,
 } from '../../src/config/economy';
 import { BIOMES, REBIRTH_BIOME_OUTPUT } from '../../src/config/biomes';
+import { DAILY_BONUS_GEMS, DAY_SEC, GEM_SHOP } from '../../src/config/gemShop';
 import { BIOME_RULES } from '../../src/config/biomeRules';
 import { BUILDING_RULES, IDOL_RULES } from '../../src/config/buildings';
 import { IDOLS } from '../../src/catalog/idols';
@@ -279,6 +280,19 @@ TABLES['level-curve-examples'] = () => ({
 TABLES['stat-points-examples'] = () => ({
 	title: 'Attribute points earned by level',
 	md: mdTable(['Level', 'Total points'], [2, 10, 30, 80, 100].map((l) => [l, totalStatPoints(l)])),
+});
+
+TABLES['gem-price-book'] = () => ({
+	title: 'Gem shop price book',
+	md: mdTable(
+		['Item', 'Tab', 'Price (gems)', 'Cooldown', 'What it does'],
+		GEM_SHOP.map((item) => [item.name, item.tab, item.price, item.cooldownSec > 0 ? `${item.cooldownSec / DAY_SEC} days` : 'none', item.blurb]),
+	),
+});
+
+TABLES['gem-daily-ladder'] = () => ({
+	title: 'Daily first-login bonus by day of the streak',
+	md: mdTable(['Day', 'Gems'], DAILY_BONUS_GEMS.map((gems, i) => [i + 1, gems])),
 });
 
 TABLES['ember-gain-examples'] = () => ({

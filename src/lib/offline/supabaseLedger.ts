@@ -2,7 +2,19 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { readBuffs } from '@/lib/buffs';
 import type { CombatState } from './fightTypes';
 import type { CraftState, Inventory } from './types';
-import { craftFromJson, isEmptyCraft, isEmptyLegacy, legacyFromJson, zeroTotals, type GrantTotals, type Ledger, type LedgerRepo } from './ledger';
+import {
+	craftFromJson,
+	isEmptyCraft,
+	isEmptyGemShop,
+	isEmptyLegacy,
+	legacyFromJson,
+	readGemShop,
+	zeroTotals,
+	type GrantTotals,
+	type Ledger,
+	type LedgerRepo,
+} from './ledger';
+import { readAttrs } from './attrs';
 import type { AchievementRepo } from './achievements';
 import { readCombat, readInventory } from './ledgerRead';
 import { upgradeLedgerRow } from './ledgerUpgrade';
@@ -29,10 +41,12 @@ export interface LedgerRow {
 	buffs: unknown;
 	stats: unknown;
 	legacy: unknown;
+	attrs: unknown;
+	gem_shop: unknown;
 }
 
 const COLUMNS =
-	'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs, stats, legacy';
+	'ver, run_id, rebirths, anchor_at, reset_at, bank, ord_chest, ord_kill, granted, granted_seen, gems, last_key, last_result, combat, inv, craft, buffs, stats, legacy, attrs, gem_shop';
 
 /** The ledger as the `player_ledger` row it is stored as (also what the migration script writes). */
 export const ledgerToRow = (ledger: Ledger) => ({
@@ -55,6 +69,8 @@ export const ledgerToRow = (ledger: Ledger) => ({
 	buffs: ledger.buffs.length === 0 ? null : ledger.buffs,
 	stats: isEmptyStats(ledger.stats) ? null : ledger.stats,
 	legacy: isEmptyLegacy(ledger.legacy) ? null : ledger.legacy,
+	attrs: ledger.attrs,
+	gem_shop: isEmptyGemShop(ledger.gemShop) ? null : ledger.gemShop,
 	updated_at: new Date().toISOString(),
 });
 
@@ -79,6 +95,8 @@ export const ledgerFromRow = (row: LedgerRow): Ledger => ({
 	buffs: readBuffs(row.buffs, 0),
 	stats: readStats(row.stats),
 	legacy: legacyFromJson(row.legacy),
+	attrs: readAttrs(row.attrs),
+	gemShop: readGemShop(row.gem_shop),
 });
 
 /**

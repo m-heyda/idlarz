@@ -4,9 +4,15 @@ import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
 import PixelModal from '../PixelModal';
 import ResourceIcon from '../ResourceIcon';
 import GemIcon from '../GemIcon';
+import AwayBar from '../AwayBar';
+import { useGameStore } from '@/stores/gameStore';
+import { offlineBar } from '@/lib/offlineBar';
 import type { Resources } from '@/types/game';
 
 const ORDER: (keyof Resources)[] = ['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool', 'xp'];
+
+/** Whether the away-time hint (Night Watch, Steward) is worth showing: only to a player who has been reborn and so owns the Ember shop. */
+export const showsAwayHint = (rebirths: number): boolean => rebirths > 0;
 
 /** "Hours as a number": 7.7 h, 30 min, so the cap and the time away read the same way. */
 const hours = (seconds: number) => (seconds >= 3600 ? `${formatCompact(seconds / 3600, 1)} h` : formatTime(seconds));
@@ -18,6 +24,7 @@ const hours = (seconds: number) => (seconds >= 3600 ? `${formatCompact(seconds /
 const OfflineDialog: React.FC = () => {
 	const report = useUiStore((state) => state.offlineReport);
 	const close = useUiStore((state) => state.closeOfflineReport);
+	const rebirths = useGameStore((state) => state.prestige.rebirths);
 	if (!report) return null;
 	const { grant } = report;
 	const earned = ORDER.filter((key) => grant.resources[key] > 0);
@@ -28,10 +35,12 @@ const OfflineDialog: React.FC = () => {
 				<div className='text-center'>
 					<div className='text-[#a89878]'>While you were away</div>
 					<div className='text-2xl text-[#f0d27a] tabular-nums'>{hours(grant.gapSec)}</div>
-					<div className='text-xs text-[#7a6a52]'>
-						your kingdom works for up to {hours(grant.capSec)} at {Math.round(grant.efficiency * 100)}% of its income
-						{grant.capped && <span className='text-[#d9a05a]'> - you were away longer than that</span>}
-					</div>
+				</div>
+
+				<AwayBar gapSec={grant.gapSec} capSec={grant.capSec} efficiency={grant.efficiency} />
+				<div className='text-center text-xs text-[#7a6a52]'>
+					Your kingdom earns {offlineBar(grant).efficiencyPct}% of its income while you are away
+					{showsAwayHint(rebirths) && <div className='text-[#a89878]'>Night Watch and Steward (Ember shop) raise the cap and the pay</div>}
 				</div>
 
 				{earned.length > 0 && (

@@ -30,6 +30,7 @@ Starters are candidates for the 8 starter avatars (IDL-71): human, elf and dwarf
 | 4324 | `avatar_horned_black_helm.png` | stern warrior in a black horned helm, purple frame | unlockable pool |
 | 654654 | `avatar_horned_fur_collar.png` | warrior with a fur collar, red frame | unlockable pool |
 | 34543543 | `avatar_horned_chainmail.png` | grizzled warrior in chainmail and horns, purple frame | unlockable: Early tester |
+| new | `avatar_beta_tester.png` | wireframe hologram bust on a teal frame | unlockable: Beta tester (same achievement as Early tester) |
 
 ## achievements/ (21 medals)
 
@@ -54,7 +55,7 @@ One family: a round medal with a ribbon. **Bronze** = first-time actions, **silv
 | new | `badge_first_rebirth_fire.png` | fiery medal with a flame | first rebirth (Reborn) |
 | new | `badge_great_auroch_boss.png` | dark iron medal with an auroch skull and red gems | defeat The Great Auroch |
 | new | `badge_golden_monster_gold.png` | gold medal with a golden monster silhouette | kill a golden monster |
-| new | `badge_early_tester_special.png` | purple and gold medal with a wrench and star | early tester |
+| new | `badge_early_tester_special.png` | purple and gold medal with a wrench and star | spare (the Early tester badge is `badge_early_tester_wireframe.png`) |
 | new | `badge_castle_10_gold_alt.png`, `badge_first_rebirth_fire_alt.png`, `badge_early_tester_special_alt.png` | second variants of the three above | spare |
 
 ## Before it ships
@@ -63,4 +64,4 @@ Check the 65x65 file (`avatar_winged_helm_veteran.png`) and crop it to 64x64 if 
 
 ## wireframe/ (5 sprites, green hologram mesh, 64x64)
 
-Made with Sprite Fusion on 2026-11-11 for the early-tester rewards after the New Chapter. **Not wired yet** (Linear: early tester avatar and badge, pet system). `avatar_wireframe_hero.png` is the tester avatar candidate, `badge_star_wireframe.png` a badge, `pet_fox.png`, `pet_owl.png` and `pet_rabbit.png` the first pets. The wireframe castle variants are still to be drawn.
+Made with Sprite Fusion on 2026-11-11 for the early-tester rewards after the New Chapter. **Early tester set (IDL-282):** `avatar_wireframe_hero.png` is composited onto a teal frame as `heroes/avatar_beta_tester.png` (the Beta tester avatar; the Early tester keeps its chainmail bust) and `badge_star_wireframe.png` is copied to `achievements/badge_early_tester_wireframe.png` (the Early tester badge, shown beside the name in the Character window and on the landing Continue card). **Pets not wired yet** (pet system): `pet_fox.png`, `pet_owl.png` and `pet_rabbit.png` the first pets. The wireframe castle variants are still to be drawn.

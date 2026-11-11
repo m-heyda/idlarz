@@ -1282,6 +1282,58 @@ body {
 	gap: 4px;
 }
 
+/* the Early tester medal beside a name */
+.early-tester-badge {
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 6px;
+}
+
+/* the away-time bar (welcome-back window, landing Continue card): the stone frame of the XP bar, static, in flow */
+.away-bar {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	width: 100%;
+}
+
+.away-bar-label {
+	color: #d8ccaa;
+	font-size: 0.9rem;
+	text-align: center;
+}
+
+.away-bar-track {
+	position: relative;
+	height: 28px;
+	border: 8px solid transparent;
+	border-image: url('/pixel/ui/bar_frame.png') 4 / 8px round;
+	background: #0a0706;
+	background-clip: padding-box;
+	image-rendering: pixelated;
+}
+
+.away-bar-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: calc(var(--pct, 0) * 1%);
+	background: url('/pixel/ui/bar_fill.png') 0 0 / 16px 12px repeat-x;
+	image-rendering: pixelated;
+	box-shadow:
+		2px 0 0 rgba(212, 255, 150, 0.9),
+		0 0 8px rgba(130, 255, 90, 0.55);
+}
+
+.away-bar.is-capped .away-bar-fill {
+	filter: sepia(1) saturate(2.2) hue-rotate(-18deg);
+}
+
+.away-bar-capped {
+	color: #d9a05a;
+	font-size: 0.85rem;
+	text-align: center;
+}
+
 /* --- Hero card: the stony XP bar (the alcove scene and the potion flasks are gone) --- */
 /* stony XP bar: 9-slice chiselled frame, emerald fill that flows, tick marks every 10% */
 .hero-xp {

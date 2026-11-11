@@ -43,6 +43,7 @@ interface GroupProps {
 	showNumbers: boolean;
 	align: 'center' | 'start';
 	onOpenEmbers: () => void;
+	onOpenGems: () => void;
 }
 
 /**
@@ -50,7 +51,7 @@ interface GroupProps {
  * opens a list of every resource in the tier with its amount and production; a click pins that list open (touch screens, or just to
  * read it for a while). A tier can grow to dozens of resources and the strip stays as wide as its icons.
  */
-const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, onOpenEmbers }) => {
+const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, onOpenEmbers, onOpenGems }) => {
 	const [pinned, setPinned] = useState(false);
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -90,17 +91,18 @@ const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, o
 		>
 			{rows.map((row) => {
 				const isEmbers = row.key === 'embers';
+				const isGems = row.key === 'gems';
 				return (
 					<span
 						key={row.key}
-						className={cn('hdr-chip', isEmbers && 'is-link')}
+						className={cn('hdr-chip', (isEmbers || isGems) && 'is-link')}
 						data-tutorial={`res-${row.key}`}
-						title={RESOURCES[row.key].label}
+						title={isGems ? 'Gems: open the Gem shop' : RESOURCES[row.key].label}
 						onClick={
-							isEmbers
+							isEmbers || isGems
 								? (event) => {
 										event.stopPropagation();
-										onOpenEmbers();
+										(isGems ? onOpenGems : onOpenEmbers)();
 									}
 								: undefined
 						}
@@ -149,6 +151,7 @@ const ResourceDisplay: React.FC = () => {
 	const embers = useGameStore((state) => state.prestige.legacyPoints); // saved under its old name, see PrestigeState
 	const compact = useUiStore((state) => state.compactHeader);
 	const toggleRebirth = useUiStore((state) => state.toggleRebirth);
+	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
 
 	const amountOf = (key: ResourceKey): number =>
 		key === 'gems' ? gems : key === 'embers' ? embers : ((resources as unknown as Record<string, number>)[key] ?? 0);
@@ -172,7 +175,15 @@ const ResourceDisplay: React.FC = () => {
 				const shown = rows.filter((row) => resourceDiscovered(row.key, row.amount, row.rate));
 				if (shown.length === 0) return null;
 				return (
-					<ResourceGroup key={tier.id} tier={tier} rows={shown} showNumbers={!compact} align={t === 0 ? 'start' : 'center'} onOpenEmbers={toggleRebirth} />
+					<ResourceGroup
+						key={tier.id}
+						tier={tier}
+						rows={shown}
+						showNumbers={!compact}
+						align={t === 0 ? 'start' : 'center'}
+						onOpenEmbers={toggleRebirth}
+						onOpenGems={toggleGemShop}
+					/>
 				);
 			})}
 		</>

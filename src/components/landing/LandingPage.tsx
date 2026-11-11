@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import PixelIcon from '@/components/game/PixelIcon';
 import AvatarArt from '@/components/game/AvatarArt';
+import AwayBar from '@/components/game/AwayBar';
+import EarlyTesterBadge from '@/components/game/EarlyTesterBadge';
 import { resolveAvatar } from '@/catalog/avatars';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
@@ -17,14 +19,22 @@ import { epochVerdict, readSeenEpoch } from '@/lib/epochGuard';
 import { peekSave } from '@/lib/saveStorage';
 import { localForAccount, planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
 import { clearBootSnapshot } from '@/lib/bootSnapshot';
-import { fetchMe, logout, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
+import { fetchMe, logout, type AwayInfo, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@/styles/Landing.css';
 
 type Visitor =
 	| { name: 'checking' }
 	| { name: 'guest' }
-	| { name: 'member'; profile: Profile | null; stats: ProfileStats | null; game: GameSummary | null; asks: boolean }
+	| {
+			name: 'member';
+			profile: Profile | null;
+			stats: ProfileStats | null;
+			game: GameSummary | null;
+			asks: boolean;
+			away: AwayInfo | null;
+			earlyTester: boolean;
+	  }
 	| { name: 'unavailable'; reason: UnavailableReason };
 
 /** A monster from the game sitting on the edge of a box. */
@@ -188,13 +198,15 @@ const FeatureCard: React.FC<{ feature: LandingFeature }> = ({ feature }) => (
 );
 
 /** The hero card for a signed-in visitor: portrait, name, class, level and rebirths, and the way into the game (Enter). Read-only. */
-const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null; game: GameSummary | null; asks: boolean; onLogout: () => void }> = ({
-	profile,
-	stats,
-	game,
-	asks,
-	onLogout,
-}) => {
+const MemberCard: React.FC<{
+	profile: Profile | null;
+	stats: ProfileStats | null;
+	game: GameSummary | null;
+	asks: boolean;
+	away: AwayInfo | null;
+	earlyTester: boolean;
+	onLogout: () => void;
+}> = ({ profile, stats, game, asks, away, earlyTester, onLogout }) => {
 	if (!profile) {
 		return (
 			<div className='ld-continue'>
@@ -214,7 +226,10 @@ const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null
 			<div className='ld-continue-figure'>
 				<AvatarArt id={resolveAvatar(profile.avatarId, profile.playerClass).id} playerClass={profile.playerClass} scale={2} />
 			</div>
-			<p className='ld-continue-name'>{profile.characterName}</p>
+			<p className='ld-continue-name'>
+				{profile.characterName}
+				{earlyTester && <EarlyTesterBadge size={26} />}
+			</p>
 			<p className='ld-continue-class'>
 				{info.race} {info.label}
 			</p>
@@ -222,6 +237,7 @@ const MemberCard: React.FC<{ profile: Profile | null; stats: ProfileStats | null
 				{game ? `Level ${game.level} · ${game.tiles} tiles` : stats ? `Level ${stats.level}` : 'A new game awaits'}
 				{stats ? ` · ${stats.rebirths} ${stats.rebirths === 1 ? 'rebirth' : 'rebirths'}` : ''}
 			</p>
+			{away && <AwayBar gapSec={away.gapSec} capSec={away.capSec} efficiency={away.efficiency} className='ld-away' />}
 			<Link className='px-btn ld-continue-go' href={PLAY_PATH} autoFocus>
 				Enter the realm
 			</Link>
@@ -263,7 +279,16 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 				game = savedGameSummary(local, cloud);
 				asks = !skipsHub(planStart(local, cloud, readLink(), me.userId), local);
 			}
-			setVisitor({ name: 'member', profile: me.profile, stats: stale ? null : (me.stats ?? null), game, asks });
+			// the away bar and the early tester badge follow the same stale-epoch rule as the stats: an older chapter's numbers are not shown
+			setVisitor({
+				name: 'member',
+				profile: me.profile,
+				stats: stale ? null : (me.stats ?? null),
+				game,
+				asks,
+				away: stale ? null : (me.away ?? null),
+				earlyTester: !stale && me.earlyTester === true,
+			});
 		} else if (me.status === 'guest') setVisitor({ name: 'guest' });
 		else setVisitor({ name: 'unavailable', reason: me.status === 'unavailable' ? me.reason : 'outage' });
 	}, []);
@@ -327,7 +352,15 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 							<>
 								<WindowHead title='Welcome back' />
 								<div className='px-modal-body'>
-									<MemberCard profile={visitor.profile} stats={visitor.stats} game={visitor.game} asks={visitor.asks} onLogout={() => void leave()} />
+									<MemberCard
+										profile={visitor.profile}
+										stats={visitor.stats}
+										game={visitor.game}
+										asks={visitor.asks}
+										away={visitor.away}
+										earlyTester={visitor.earlyTester}
+										onLogout={() => void leave()}
+									/>
 								</div>
 							</>
 						) : (

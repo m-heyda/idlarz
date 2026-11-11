@@ -9,6 +9,7 @@ import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type { GameState } from '@/types/game';
 import { createCharacterSlice } from './game/characterSlice';
+import { createCharacterSync } from './game/characterSync';
 import { createChestSync } from './game/chestSync';
 import { createBuildingSlice } from './game/buildingSlice';
 import { createClockSlice } from './game/clockSlice';
@@ -28,17 +29,18 @@ const createGameSlice = (set: GameSet, get: GameGet) => {
 	const inv = createInventorySync(set, get);
 	const chests = createChestSync(set, get, inv);
 	const combat = createCombatSync(set, get, inv, chests);
+	const character = createCharacterSync(set, get);
 
 	const slice = {
 		// A fixed placeholder world: it is rendered on the server and before the save is read, so it must not be
 		// random (that broke hydration). `merge` below replaces it with a random one for a player without a save.
 		...createInitialData(EMPTY_PRESTIGE, mulberry32(1)),
-		...createRebirthSlice(set, get, inv, chests),
+		...createRebirthSlice(set, get, inv, chests, character),
 		...createEconomySlice(set, get),
 		...createBuildingSlice(set, get),
 		...createClockSlice(set, get),
 		...createFarmSlice(set, get),
-		...createCharacterSlice(set, get),
+		...createCharacterSlice(set, get, character),
 		...createInventorySlice(set, get, inv),
 		...createMerchantSlice(set, get, inv),
 		...createCombatSlice(set, get, inv, chests, combat),

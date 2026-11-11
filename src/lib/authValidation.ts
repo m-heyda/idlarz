@@ -36,13 +36,13 @@ const checkPassword = (raw: unknown): Checked<string> => {
 	return { ok: true, value: raw };
 };
 
-const checkCharacterName = (raw: unknown): Checked<string> => {
+export const checkCharacterName = (raw: unknown): Checked<string> => {
 	const name = typeof raw === 'string' ? raw.trim() : '';
 	if (!name || name.length > CHARACTER_NAME_MAX) return { ok: false, error: `Character name needs 1 to ${CHARACTER_NAME_MAX} characters.` };
 	return { ok: true, value: name };
 };
 
-const checkPlayerClass = (raw: unknown): Checked<PlayerClassId> => {
+export const checkPlayerClass = (raw: unknown): Checked<PlayerClassId> => {
 	if (typeof raw !== 'string' || !(PLAYER_CLASS_ORDER as string[]).includes(raw) || !PLAYER_CLASSES[raw as PlayerClassId]) {
 		return { ok: false, error: 'Pick one of the four heroes.' };
 	}
@@ -85,3 +85,9 @@ export const checkProfile = (body: unknown): Checked<ProfileInput> => {
 	if (avatar !== undefined && avatar !== null && (typeof avatar !== 'string' || avatar.length > 40)) return { ok: false, error: 'Pick one of the avatars.' };
 	return { ok: true, value: { characterName: characterName.value, playerClass: playerClass.value, avatarId: avatar ?? null } };
 };
+
+/** An email on its own (password reset request): trimmed, lowercased, same rule as sign-up. */
+export const checkEmailOnly = (body: unknown): Checked<string> => checkEmail(asRecord(body).email);
+
+/** A new password on its own (the reset page): the same length rules as sign-up. */
+export const checkNewPassword = (body: unknown): Checked<string> => checkPassword(asRecord(body).password);

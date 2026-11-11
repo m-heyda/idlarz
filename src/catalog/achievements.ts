@@ -146,7 +146,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		title: 'Early tester',
 		description: 'Played before the new chapter.',
 		when: { kind: 'manual' },
-		badge: 'badge_early_tester_special',
+		badge: 'badge_early_tester_wireframe',
 		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester' },
 	},
 ];

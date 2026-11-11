@@ -526,7 +526,7 @@ export const buildManifest = (): AssetEntry[] => {
 			add({
 				name: snake(basename(f)),
 				category: 'ui',
-				subcategory: 'wireframe early-tester set (not wired: tester avatar, badge, pets)',
+				subcategory: 'wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)',
 				src: url(f),
 				status: 'planned',
 				source: 'new_assets/wireframe',
