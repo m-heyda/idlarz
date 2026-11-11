@@ -33,7 +33,7 @@ const VitalBar: React.FC<{ kind: FlaskKind; value: number; max: number }> = ({ k
 	</div>
 );
 
-/** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). With `orb={false}` the orb is left out (the hero card puts it on the avatar) and the XP, HP and MP bars use the full width. */
+/** The compact version: the level orb and the XP bar in one row, no hero scene (the Equipment tab). With `orb={false}` the orb is left out (the hero card shows the level as a square badge beside the XP bar instead) and the XP, HP and MP bars use the full width. */
 export const LevelBar: React.FC<{ orb?: boolean }> = ({ orb = true }) => {
 	const { resources, level, resourceRates, characterStats, equipment, playerHp, playerMp, playerClass } = useGameStore();
 	const hpMax = maxHp(characterStats, equipment);
@@ -41,6 +41,7 @@ export const LevelBar: React.FC<{ orb?: boolean }> = ({ orb = true }) => {
 	return (
 		<div className={`eq-level-wrap${orb ? '' : ' eq-level-wrap-flat'}`}>
 			<div className='eq-level'>
+				{!orb && <LevelBadge level={level.level} className='level-badge-bar' />}
 				{orb && (
 					<div className='eq-level-orb' title={`Level ${level.level}`}>
 						<LevelOrb scale={2} level={level.level} />
@@ -73,7 +74,6 @@ export const LevelBar: React.FC<{ orb?: boolean }> = ({ orb = true }) => {
 const LevelDetails: React.FC = () => {
 	const playerClass = useGameStore((state) => state.playerClass);
 	const playerName = useGameStore((state) => state.playerName);
-	const level = useGameStore((state) => state.level.level);
 	const openAvatarDialog = useUiStore((state) => state.openAvatarDialog);
 	const openBadgeDialog = useUiStore((state) => state.openBadgeDialog);
 	const choice = useUiStore((state) => state.badge);
@@ -85,15 +85,9 @@ const LevelDetails: React.FC = () => {
 	return (
 		<div className='hero-card'>
 			<div className='hero-card-top'>
-				<div className='hero-card-avatar-wrap'>
-					<button type='button' className='hero-card-avatar' onClick={openAvatarDialog} title='Change avatar' aria-label='Change avatar'>
-						<CharacterPortrait variant='bust' scale={2} />
-					</button>
-					{/* the level sits on the avatar's bottom left corner */}
-					<div className='hero-card-level' title={`Level ${level}`}>
-						<LevelBadge level={level} size={29} />
-					</div>
-				</div>
+				<button type='button' className='hero-card-avatar' onClick={openAvatarDialog} title='Change avatar' aria-label='Change avatar'>
+					<CharacterPortrait variant='bust' scale={2} />
+				</button>
 				<div className='hero-card-id'>
 					<button
 						type='button'

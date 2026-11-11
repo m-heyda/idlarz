@@ -155,14 +155,6 @@ body {
 	image-rendering: pixelated;
 }
 
-/* the level badge pinned to the portrait's corner like a badge */
-.pixel-avatar-orb {
-	position: absolute;
-	right: -5px;
-	bottom: -5px;
-	z-index: 5; /* above the portrait's frame */
-}
-
 /* the attention dot sits on the top edge of the portrait */
 .pixel-avatar .notify-dot {
 	top: -4px;

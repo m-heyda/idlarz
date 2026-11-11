@@ -307,7 +307,7 @@
 .hero-card-name-btn {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
+	gap: 3px;
 	max-width: 100%;
 	padding: 0;
 	border: 0;
@@ -638,24 +638,22 @@
 	box-shadow: 0 0 8px rgba(240, 210, 122, 0.35);
 }
 
-/* the hero card: the level orb sits on the avatar's bottom left corner, and the bars under it use the whole card width */
-.hero-card-avatar-wrap {
-	position: relative;
+/* the hero card: the level is a violet square beside the XP bar, as tall as the bar; HP and MP use the whole card width */
+.level-badge-bar {
 	flex: none;
-}
-
-.hero-card-level {
-	position: absolute;
-	left: -6px;
-	bottom: -6px;
-	display: flex;
-	pointer-events: none;
+	align-self: stretch;
+	aspect-ratio: 1;
+	min-width: 0;
+	height: auto;
+	padding: 0;
+	font-size: 1.05rem;
+	margin-right: 6px;
 }
 
 .eq-level-wrap-flat {
 	--eq-orb: 0px;
 	--eq-orb-gap: 0px;
-	margin-top: 8px;
+	margin-top: 4px;
 }
 
 .eq-level-wrap-flat .eq-vitals {
