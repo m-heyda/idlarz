@@ -6,9 +6,11 @@ import { SAVE_PREFIX, encodeSave } from '../../src/lib/saveFormat';
 import { createSaveStorage, type KeyValue } from '../../src/lib/saveStorage';
 import { checkCredentials, checkProfile, CHARACTER_NAME_MAX } from '../../src/lib/authValidation';
 import { DEFAULT_PLAYER_NAME } from '../../src/config/character';
+import { epochScoped } from '../../src/lib/storageScope';
 
-const KEY = 'idlarz.save';
-const BACKUP = 'idlarz.save.backup';
+// the local game's keys carry the data epoch (none at epoch 1, `.e<epoch>` after the flip)
+const KEY = epochScoped('idlarz.save');
+const BACKUP = epochScoped('idlarz.save.backup');
 const PREVIOUS = 'idlarz.save.previous-game';
 
 const fakeKv = (initial: Record<string, string> = {}) => {
