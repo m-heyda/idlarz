@@ -646,7 +646,7 @@
 	min-width: 38px; /* roomy: the number never touches the border, and two digits fit */
 	padding: 0 10px;
 	font-size: 1.05rem;
-	margin-right: 6px;
+	margin-right: 4px;
 }
 
 .eq-level-wrap-flat {
