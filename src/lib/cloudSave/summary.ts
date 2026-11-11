@@ -1,6 +1,6 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
-import { builtBuildings } from '@/lib/buildings';
+import { buildTimeReduction, builtBuildings } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
@@ -56,7 +56,9 @@ export interface SaveDerived {
 	/** The character's Intelligence attribute: it leans the quality of crafted gear (src/lib/craftGear.ts). Absent on rows from before (read as 0). */
 	intelligence?: number;
 	/** What the standing Idols add that the server applies beyond the numbers above (absent with none): chest speed, crafting XP, damage and max HP and armor, in % */
-	idol?: { chestSpeedPct: number; craftXpPct: number; damagePct: number; hpArmorPct: number };
+	idol?: { chestSpeedPct: number; craftXpPct: number; damagePct: number; hpArmorPct: number; merchantSellPct?: number };
+	/** The share of a castle or building timer the player's cuts take off (Master Builders plus the Dwarf Statue, at most 0.6): `verify.ts` refuses a new upgrade shorter than that allows. Absent with none. */
+	buildTimeReduction?: number;
 	/** The set bonuses' Kill Rewards %: extra gold and XP from a kill */
 	killRewardPct: number;
 	/** Chests standing on the map: the ledger is seeded from them the first time it is created (monsters are the ledger's own) */
@@ -178,8 +180,17 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			goldFind: fx.goldFind,
 			intelligence: state.characterStats.intelligence,
 			killRewardPct: gear.killRewardPct + idol.killRewardPct,
-			...(idol.chestSpeedPct || idol.craftXpPct || idol.damagePct || idol.hpArmorPct
-				? { idol: { chestSpeedPct: idol.chestSpeedPct, craftXpPct: idol.craftXpPct, damagePct: idol.damagePct, hpArmorPct: idol.hpArmorPct } }
+			...(buildTimeReduction(state.prestige, idol.buildTimePct) > 0 ? { buildTimeReduction: buildTimeReduction(state.prestige, idol.buildTimePct) } : {}),
+			...(idol.chestSpeedPct || idol.craftXpPct || idol.damagePct || idol.hpArmorPct || idol.merchantSellPct
+				? {
+						idol: {
+							chestSpeedPct: idol.chestSpeedPct,
+							craftXpPct: idol.craftXpPct,
+							damagePct: idol.damagePct,
+							hpArmorPct: idol.hpArmorPct,
+							...(idol.merchantSellPct ? { merchantSellPct: idol.merchantSellPct } : {}),
+						},
+					}
 				: {}),
 			chests: state.tiles.stats.chests,
 			offlineCapSec: offlineCapSec(limits),

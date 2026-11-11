@@ -91,7 +91,10 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 		clickForGold: (input: ClickInput) => {
 			if (!clickLimiter.take(input)) return 0;
 			const state = get();
-			const multiplier = (1 + emberEffect(state.prestige, 'mastery')) * (1 + gearEconomy(state.equipment).clickPct / 100);
+			const multiplier =
+				(1 + emberEffect(state.prestige, 'mastery')) *
+				(1 + gearEconomy(state.equipment).clickPct / 100) *
+				(1 + idolEconomy(state.tiles, state.idolLevels).clickGoldPct / 100);
 			const gold = clickGold(state.resourceRates.total.gold, state.clickLevel, multiplier);
 			if (!(gold > 0)) return 0;
 			set({

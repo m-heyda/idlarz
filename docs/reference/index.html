@@ -172,7 +172,7 @@ and a changed system clock can neither skip nor reverse time. Away time is not c
 <p>What a new game starts with: 125 gold (and <a href="#starting-gems"><code>STARTING_GEMS</code></a> gems).</p>
 </article><h2>Income</h2><article><p><a id="calculateresourcebreakdown"></a></p>
 <h3><code>calculateResourceBreakdown</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:127</code></a></p>
+<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:129</code></a></p>
 <p>Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).</p>
 <p>The one function that builds the income. Every number the UI shows as &quot;per second&quot; (header, tooltips, the tick) comes from here.</p>
 <p>Everything inside the first bracket is added, the three multipliers after it are multiplied. The meat and hide of the farm are multiplied by the merchant&#39;s
@@ -191,12 +191,13 @@ Skinner before they enter <code>base</code>. The castle tile itself gets no yiel
          + 0.5 x (castle level - 1)                      (xp only)
 modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
 total[r] = base[r] x (1 + modifier[r])
+         (the farm products are x (1 + Harvest Scarecrow %) before they enter the sum)
          + sum over Producers and Extractors (buildings flag on) of {@link buildingOutput}   (counted with the biome tiles)
 </code></pre>
 <p>See also: <a href="#calculatetileoutput"><code>calculateTileOutput</code></a>, <a href="#castlemodifier"><code>castleModifier</code></a>, <a href="#castleareabonus"><code>castleAreaBonus</code></a>, <a href="#calculatefarmoutput"><code>calculateFarmOutput</code></a></p>
 </article><article><p><a id="calculatetileoutput"></a></p>
 <h3><code>calculateTileOutput</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:80</code></a></p>
+<p>Source: <a href="../../src/utils/game/income.ts"><code>src/utils/game/income.ts:81</code></a></p>
 <p>The one place a single tile&#39;s output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.</p>
 <p>Neighbour bonus: +25% per same-biome 4-neighbour (<code>SCALING_CONFIG.adjacencyBonus</code>). A tile inside the castle range also gets the castle area bonus (<a href="#castleareabonus"><code>castleAreaBonus</code></a>).</p>
 </article><article><p><a id="biome-yield"></a></p>
@@ -993,15 +994,15 @@ The count is never reset, not even by a rebirth.</li>
 </tbody></table>
 </article><article><p><a id="sellpayout"></a></p>
 <h3><code>sellPayout</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:51</code></a></p>
+<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:62</code></a></p>
 <p>Gold for selling <code>qty</code> of something worth <code>unit</code> each.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">payout = floor(units x unit price x (1 + 0.03 x Haggler level))
+<pre><code class="language-text">payout = floor(units x unit price x (1 + 0.03 x Haggler level + Lighthouse %))
 </code></pre>
 <p>See also: <code>sellMultiplier (src/utils/game/merchant.ts)</code></p>
 </article><article><p><a id="buycost"></a></p>
 <h3><code>buyCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:61</code></a></p>
+<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:72</code></a></p>
 <p>Gold for buying <code>units</code> of a resource from the merchant: twice the selling price, rounded up in the merchant&#39;s favour (the store and the Resources tab use this).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">cost = ceil(units x sell price x 2)
@@ -1012,7 +1013,7 @@ The count is never reset, not even by a rebirth.</li>
 <p>The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).</p>
 </article><article><p><a id="merchantupgradecost"></a></p>
 <h3><code>merchantUpgradeCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:23</code></a></p>
+<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:25</code></a></p>
 <p>Gold price of the next level of a merchant upgrade.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">cost of level N+1 = ceil(baseCost x growth^N)
@@ -1569,10 +1570,9 @@ tiles&#39; worth, so the land under it decides what it is good at. The sprite is
 </code></pre>
 </article><article><p><a id="idols"></a></p>
 <h3><code>IDOLS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/idols.ts"><code>src/catalog/idols.ts:42</code></a></p>
+<p>Source: <a href="../../src/catalog/idols.ts"><code>src/catalog/idols.ts:41</code></a></p>
 <p>The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice.
-An Idol&#39;s level is kept across rebirths (the building is not): see <a href="#idol-rules"><code>IDOL_RULES</code></a>. The server applies XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage and max HP and armor;
-the build-time effect shortens the castle and building timers in the browser; farm output, click gold and the merchant&#39;s sell price are catalog-only for now.</p>
+An Idol&#39;s level is kept across rebirths (the building is not): see <a href="#idol-rules"><code>IDOL_RULES</code></a>. All twelve effects are applied end to end: the server derives XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage, max HP and armor, farm output (in the income rates), the merchant&#39;s sell price (inventory sales and drops) and judges the shortened build timers; click gold is paid by the browser like the gear&#39;s Click % (bounded by the server&#39;s gold plausibility check).</p>
 <p><strong>The twelve Idols (one per biome)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
@@ -1589,7 +1589,7 @@ the build-time effect shortens the castle and building timers in the browser; fa
 <td>Plains</td>
 <td>+2 % farm animal output</td>
 <td>+10 % farm animal output</td>
-<td>coming soon</td>
+<td>yes</td>
 </tr>
 <tr>
 <td>Elder Tree Statue</td>
@@ -1631,7 +1631,7 @@ the build-time effect shortens the castle and building timers in the browser; fa
 <td>Coast</td>
 <td>+2 % merchant sell price</td>
 <td>+10 % merchant sell price</td>
-<td>coming soon</td>
+<td>yes</td>
 </tr>
 <tr>
 <td>Totem of the Wild</td>
@@ -1645,7 +1645,7 @@ the build-time effect shortens the castle and building timers in the browser; fa
 <td>Fields</td>
 <td>+2 % gold per click</td>
 <td>+10 % gold per click</td>
-<td>coming soon</td>
+<td>yes</td>
 </tr>
 <tr>
 <td>Blossom Shrine</td>
@@ -1767,7 +1767,7 @@ The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember s
 <p>For scale, the income bonus of the Embers ever earned (<code>emberIncomeBonus</code>, every resource but XP): 10 Embers +39.8 %, 25 Embers +69 %, 50 Embers +105 %, 100 Embers +158 %. No Idol touches the income: the largest Idol bonus is +10 % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than 60 %.</p>
 </article><article><p><a id="idoleconomy"></a></p>
 <h3><code>idolEconomy</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/idolEconomy.ts"><code>src/lib/idolEconomy.ts:71</code></a></p>
+<p>Source: <a href="../../src/lib/idolEconomy.ts"><code>src/lib/idolEconomy.ts:80</code></a></p>
 <p>The economy effects of the standing Idols. Each level adds <code>perLevel</code> (2 %) of its effect, the Bog Witch Totem <code>luckPerLevel</code> (4) Luck points. Only the effects the game applies are counted (<code>IdolDef.applied</code>).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">effect = IDOL_RULES.perLevel x level  (percent)          Luck: luckPerLevel x level points
@@ -4757,7 +4757,7 @@ Test accounts: a save through a non-production server marks the account <code>te
 Ranking eligibility (<code>trusted</code>): the first save was a young game (&lt;= 900 s of play) and no poison flag was ever raised (<a href="#poison-flags"><code>POISON_FLAGS</code></a>).</p>
 </article><article><p><a id="flag-policy"></a></p>
 <h3><code>FLAG_POLICY</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:91</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:94</code></a></p>
 <p>The flags and what the server does with each. Meaning of each flag:</p>
 <ul>
 <li><code>baseline_rich</code>: the first save holds more gold than its rates and play time explain.</li>
@@ -4915,7 +4915,7 @@ best rebirth the game can pay.</li>
 <p>Saves from one player are accepted at most this often (an honest client sends every ~90 s).</p>
 </article><article><p><a id="verifytransition"></a></p>
 <h3><code>verifyTransition</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:228</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:245</code></a></p>
 <p>Runs every plausibility check between two consecutive saves and returns the flags that fired; see <a href="#flag-policy"><code>FLAG_POLICY</code></a> for what each one means and does.</p>
 </article><article><p><a id="isnonproduction"></a></p>
 <h3><code>isNonProduction</code> <small>function</small></h3>
@@ -4927,7 +4927,7 @@ deployment (VERCEL_ENV). Everything else counts as production, including a missi
 variables were not exposed, real players must stay in the checks, not slip out of them.</p>
 </article><article><p><a id="settleidols"></a></p>
 <h3><code>settleIdols</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/idolTrust.ts"><code>src/lib/cloudSave/idolTrust.ts:17</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/idolTrust.ts"><code>src/lib/cloudSave/idolTrust.ts:19</code></a></p>
 <p>The server&#39;s say over the Idol levels (the account&#39;s <code>idolLevels</code>). The ledger&#39;s <code>legacy.idols</code> is the trusted record; a save may claim a level above it only by one step per save and only
 when that step is real: the Idol stands on the map at that level now and the save raised no <code>timer_jump</code> (a level above the remembered one needs a running upgrade, or the first build, behind it, which <code>verify.ts</code> judges).
 Everything else is cut back to the trusted level, so an edited save cannot grant a level and a rebirth cannot lose one. A level the save holds below the record is raised to it (the server wins).</p>
@@ -4938,7 +4938,7 @@ Everything else is cut back to the trusted level, so an edited save cannot grant
 </code></pre>
 </article><article><p><a id="poison-flags"></a></p>
 <h3><code>POISON_FLAGS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:150</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:153</code></a></p>
 <p>Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.</p>
 </article><article><p><a id="losesprogress"></a></p>
 <h3><code>losesProgress</code> <small>function</small></h3>
@@ -4947,7 +4947,7 @@ Everything else is cut back to the trusted level, so an edited save cannot grant
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game&#39;s (<code>PINNED_KEEP</code>).</p>
 </article><article><p><a id="enforcement"></a></p>
 <h3><code>ENFORCEMENT</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:135</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:138</code></a></p>
 <p>The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
 accounts have been read (<code>check-live-saves</code>), no honest account is among them, and someone flips <code>enabled</code>. Only flags that are <code>reject</code>
 in <code>FLAG_POLICY</code> AND listed here refuse a save, so one noisy check can be taken out without touching the others.</p>
@@ -5761,7 +5761,7 @@ option to point at another user.</p>
 reload bring the same map back. Not covered yet (IDL-124 keeps these open): the monster growth badge, the battle queue markers and the Next strip, opening the Rebirth dialog, the offline report.</p>
 </article><article><p><a id="turning-enforcement-and-the-server-run-rebirth-on-together"></a></p>
 <h3>Turning enforcement and the server-run rebirth on together</h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:110</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:113</code></a></p>
 <p><strong>Turning enforcement on: <code>ENFORCEMENT.enabled</code> and <code>EMBER_MODEL.requireServerRebirth</code> together (IDL-208, IDL-211, IDL-209).</strong>
 Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:</p>
 <ol>

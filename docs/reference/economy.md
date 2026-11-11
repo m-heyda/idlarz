@@ -82,7 +82,7 @@ What a new game starts with: 125 gold (and [`STARTING_GEMS`](progression.md#star
 
 ### `calculateResourceBreakdown` <small>function</small>
 
-Source: [`src/utils/game/income.ts:127`](../../src/utils/game/income.ts)
+Source: [`src/utils/game/income.ts:129`](../../src/utils/game/income.ts)
 
 Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).
 
@@ -106,6 +106,7 @@ base[r]  = BASE_GENERATION_RATES[r]
          + 0.5 x (castle level - 1)                      (xp only)
 modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
 total[r] = base[r] x (1 + modifier[r])
+         (the farm products are x (1 + Harvest Scarecrow %) before they enter the sum)
          + sum over Producers and Extractors (buildings flag on) of {@link buildingOutput}   (counted with the biome tiles)
 ```
 
@@ -115,7 +116,7 @@ See also: [`calculateTileOutput`](economy.md#calculatetileoutput), [`castleModif
 
 ### `calculateTileOutput` <small>function</small>
 
-Source: [`src/utils/game/income.ts:80`](../../src/utils/game/income.ts)
+Source: [`src/utils/game/income.ts:81`](../../src/utils/game/income.ts)
 
 The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.
 
@@ -632,14 +633,14 @@ Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost 
 
 ### `sellPayout` <small>function</small>
 
-Source: [`src/utils/game/merchant.ts:51`](../../src/utils/game/merchant.ts)
+Source: [`src/utils/game/merchant.ts:62`](../../src/utils/game/merchant.ts)
 
 Gold for selling `qty` of something worth `unit` each.
 
 **Formula**
 
 ```text
-payout = floor(units x unit price x (1 + 0.03 x Haggler level))
+payout = floor(units x unit price x (1 + 0.03 x Haggler level + Lighthouse %))
 ```
 
 See also: `sellMultiplier (src/utils/game/merchant.ts)`
@@ -648,7 +649,7 @@ See also: `sellMultiplier (src/utils/game/merchant.ts)`
 
 ### `buyCost` <small>function</small>
 
-Source: [`src/utils/game/merchant.ts:61`](../../src/utils/game/merchant.ts)
+Source: [`src/utils/game/merchant.ts:72`](../../src/utils/game/merchant.ts)
 
 Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this).
 
@@ -670,7 +671,7 @@ The merchant sells wood, stone, coal, food and meat at this multiple of the pric
 
 ### `merchantUpgradeCost` <small>function</small>
 
-Source: [`src/utils/game/merchant.ts:23`](../../src/utils/game/merchant.ts)
+Source: [`src/utils/game/merchant.ts:25`](../../src/utils/game/merchant.ts)
 
 Gold price of the next level of a merchant upgrade.
 
@@ -1106,25 +1107,24 @@ seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builde
 
 ### `IDOLS` <small>const</small>
 
-Source: [`src/catalog/idols.ts:42`](../../src/catalog/idols.ts)
+Source: [`src/catalog/idols.ts:41`](../../src/catalog/idols.ts)
 
 The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice.
-An Idol's level is kept across rebirths (the building is not): see [`IDOL_RULES`](economy.md#idol-rules). The server applies XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage and max HP and armor;
-the build-time effect shortens the castle and building timers in the browser; farm output, click gold and the merchant's sell price are catalog-only for now.
+An Idol's level is kept across rebirths (the building is not): see [`IDOL_RULES`](economy.md#idol-rules). All twelve effects are applied end to end: the server derives XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage, max HP and armor, farm output (in the income rates), the merchant's sell price (inventory sales and drops) and judges the shortened build timers; click gold is paid by the browser like the gear's Click % (bounded by the server's gold plausibility check).
 
 **The twelve Idols (one per biome)** _(computed from the code)_
 
 | Idol | Biome | Effect per level | Level 5 | Applied by the game |
 | --- | --- | --- | --- | --- |
-| Harvest Scarecrow | Plains | +2 % farm animal output | +10 % farm animal output | coming soon |
+| Harvest Scarecrow | Plains | +2 % farm animal output | +10 % farm animal output | yes |
 | Elder Tree Statue | Forest | +2 % XP gain | +10 % XP gain | yes |
 | Dwarf Statue | Hills | +2 % faster castle and building timers | +10 % faster castle and building timers | yes |
 | Bog Witch Totem | Swamp | +4 Luck | +20 Luck | yes |
 | Frost Obelisk | Tundra | +2 % income while away | +10 % income while away | yes |
 | Water Spirit Fountain | Lake | +2 % chest speed | +10 % chest speed | yes |
-| Lighthouse | Coast | +2 % merchant sell price | +10 % merchant sell price | coming soon |
+| Lighthouse | Coast | +2 % merchant sell price | +10 % merchant sell price | yes |
 | Totem of the Wild | Jungle | +2 % kill rewards | +10 % kill rewards | yes |
-| Scarecrow King | Fields | +2 % gold per click | +10 % gold per click | coming soon |
+| Scarecrow King | Fields | +2 % gold per click | +10 % gold per click | yes |
 | Blossom Shrine | Blossom Orchard | +2 % crafting XP | +10 % crafting XP | yes |
 | Maw Idol | Blight | +2 % damage | +10 % damage | yes |
 | War Memorial | Battlefield | +2 % max HP and armor | +10 % max HP and armor | yes |
@@ -1173,7 +1173,7 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 
 ### `idolEconomy` <small>function</small>
 
-Source: [`src/lib/idolEconomy.ts:71`](../../src/lib/idolEconomy.ts)
+Source: [`src/lib/idolEconomy.ts:80`](../../src/lib/idolEconomy.ts)
 
 The economy effects of the standing Idols. Each level adds `perLevel` (2 %) of its effect, the Bog Witch Totem `luckPerLevel` (4) Luck points. Only the effects the game applies are counted (`IdolDef.applied`).
 

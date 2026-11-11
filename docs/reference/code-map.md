@@ -733,6 +733,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`farmGeometry.test.ts`](../../tests/economy/farmGeometry.test.ts)
 - [`gearEconomy.test.ts`](../../tests/economy/gearEconomy.test.ts) — ~ Puts gear on the character the way a loaded save does, with the rates that go with it.
 - [`idols.test.ts`](../../tests/economy/idols.test.ts) — ~ A fresh game with `n` tiles made `biome` (the first non-castle tiles), castle at `castleLevel`; returns their positions.
+- [`idolsServer.test.ts`](../../tests/economy/idolsServer.test.ts) — ~ Every Idol effect, checked the way the server applies it:
 - [`limitsAndSelling.test.ts`](../../tests/economy/limitsAndSelling.test.ts)
 - [`merchantGoods.test.ts`](../../tests/economy/merchantGoods.test.ts)
 - [`merchantShop.test.ts`](../../tests/economy/merchantShop.test.ts) — ~ What a plain item sells for at its first level (the shop's stock); consumables have their own price.

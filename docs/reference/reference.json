@@ -119,8 +119,8 @@
   "kind": "const",
   "category": "Economy/Buildings",
   "file": "src/catalog/idols.ts",
-  "line": 42,
-  "summary": "The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice. An Idol's level is kept across rebirths (the building is not): see {@link IDOL_RULES}. The server applies XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage and max HP and armor; the build-time effect shortens the castle and building timers in the browser; farm output, click gold and the merchant's sell price are catalog-only for now.",
+  "line": 41,
+  "summary": "The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice. An Idol's level is kept across rebirths (the building is not): see {@link IDOL_RULES}. All twelve effects are applied end to end: the server derives XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage, max HP and armor, farm output (in the income rates), the merchant's sell price (inventory sales and drops) and judges the shortened build timers; click gold is paid by the browser like the gear's Click % (bounded by the server's gold plausibility check).",
   "see": []
  },
  {
@@ -1230,7 +1230,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/idolTrust.ts",
-  "line": 17,
+  "line": 19,
   "summary": "The server's say over the Idol levels (the account's `idolLevels`). The ledger's `legacy.idols` is the trusted record; a save may claim a level above it only by one step per save and only when that step is real: the Idol stands on the map at that level now and the save raised no `timer_jump` (a level above the remembered one needs a running upgrade, or the first build, behind it, which `verify.ts` judges). Everything else is cut back to the trusted level, so an edited save cannot grant a level and a rebirth cannot lose one. A level the save holds below the record is raised to it (the server wins).",
   "see": []
  },
@@ -1310,7 +1310,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 91,
+  "line": 94,
   "summary": "The flags and what the server does with each. Meaning of each flag:",
   "see": []
  },
@@ -1320,7 +1320,7 @@
   "kind": "topic",
   "category": "Ops/Operator guides",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 110,
+  "line": 113,
   "summary": "**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).** Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:",
   "see": [
    "ENFORCEMENT",
@@ -1334,7 +1334,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 135,
+  "line": 138,
   "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
   "see": []
  },
@@ -1345,7 +1345,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 150,
+  "line": 153,
   "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
   "see": []
  },
@@ -1356,7 +1356,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 228,
+  "line": 245,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },
@@ -1626,7 +1626,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/idolEconomy.ts",
-  "line": 71,
+  "line": 80,
   "summary": "The economy effects of the standing Idols. Each level adds `perLevel` (2 %) of its effect, the Bog Witch Totem `luckPerLevel` (4) Luck points. Only the effects the game applies are counted (`IdolDef.applied`).",
   "see": []
  },
@@ -2746,7 +2746,7 @@
   "kind": "function",
   "category": "Economy/Income",
   "file": "src/utils/game/income.ts",
-  "line": 80,
+  "line": 81,
   "summary": "The one place a single tile's output is priced; the tooltip, the tile tap and the castle area pass of the income all use it.",
   "see": []
  },
@@ -2757,7 +2757,7 @@
   "kind": "function",
   "category": "Economy/Income",
   "file": "src/utils/game/income.ts",
-  "line": 127,
+  "line": 129,
   "summary": "Income per second of every resource, split into its sources and modifiers (the one place the income formula lives).",
   "see": [
    "calculateTileOutput",
@@ -2773,7 +2773,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/utils/game/merchant.ts",
-  "line": 23,
+  "line": 25,
   "summary": "Gold price of the next level of a merchant upgrade.",
   "see": []
  },
@@ -2784,7 +2784,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/utils/game/merchant.ts",
-  "line": 51,
+  "line": 62,
   "summary": "Gold for selling `qty` of something worth `unit` each.",
   "see": [
    "sellMultiplier (src/utils/game/merchant.ts)"
@@ -2797,7 +2797,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/utils/game/merchant.ts",
-  "line": 61,
+  "line": 72,
   "summary": "Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this).",
   "see": []
  },

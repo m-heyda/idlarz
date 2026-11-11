@@ -1,7 +1,7 @@
 /** Where the Idol statues live: the 64x64 pictures the owner supplied (public/pixel/new_assets/idols/README.md maps each biome to its primary picture). One `art` field per Idol: real art is a file swap. */
 const ART = '/pixel/new_assets/idols/';
 
-/** What an Idol changes. `applied: false` effects are in the catalog and the UI ("coming soon") but not applied by the game yet (the client-only ones: farm output, click gold, merchant sell price). */
+/** What an Idol changes. `applied: false` marks an effect that is in the catalog and the UI ("coming soon") but not applied by the game yet; none is today. */
 export type IdolEffectKey =
 	| 'farmOutput'
 	| 'xpGain'
@@ -32,8 +32,7 @@ export interface IdolDef {
 
 /**
  * The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice.
- * An Idol's level is kept across rebirths (the building is not): see {@link IDOL_RULES}. The server applies XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage and max HP and armor;
- * the build-time effect shortens the castle and building timers in the browser; farm output, click gold and the merchant's sell price are catalog-only for now.
+ * An Idol's level is kept across rebirths (the building is not): see {@link IDOL_RULES}. All twelve effects are applied end to end: the server derives XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage, max HP and armor, farm output (in the income rates), the merchant's sell price (inventory sales and drops) and judges the shortened build timers; click gold is paid by the browser like the gear's Click % (bounded by the server's gold plausibility check).
  *
  * @category Economy/Buildings
  * @order 6
@@ -46,7 +45,7 @@ export const IDOLS: readonly IdolDef[] = [
 		biome: 'plains',
 		effect: 'farmOutput',
 		effectText: 'farm animal output',
-		applied: false,
+		applied: true,
 		art: `${ART}idol_plains_wind_stones.png`,
 		blurb: 'Blesses the farm with a richer yield.',
 	},
@@ -106,7 +105,7 @@ export const IDOLS: readonly IdolDef[] = [
 		biome: 'coast',
 		effect: 'merchantSell',
 		effectText: 'merchant sell price',
-		applied: false,
+		applied: true,
 		art: `${ART}idol_coast_lighthouse.png`,
 		blurb: 'Guides richer ships to the merchant.',
 	},
@@ -126,7 +125,7 @@ export const IDOLS: readonly IdolDef[] = [
 		biome: 'fields',
 		effect: 'clickGold',
 		effectText: 'gold per click',
-		applied: false,
+		applied: true,
 		art: `${ART}idol_fields_sun_statue.png`,
 		blurb: 'Every tap on the map shines brighter.',
 	},

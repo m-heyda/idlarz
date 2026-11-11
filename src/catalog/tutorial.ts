@@ -260,7 +260,7 @@ export const TUTORIAL_LESSONS: readonly Lesson[] = [
 		title: 'Idols',
 		focus: 'soft',
 		text: () =>
-			"Each biome has an Idol, a statue with a permanent bonus of +2% per level (a few are coming soon). Build one from a tile's Build here window. Rebirth keeps its level: rebuild it free on any tile of that biome.",
+			"Each biome has an Idol, a statue with a permanent bonus of +2% per level. Build one from a tile's Build here window. Rebirth keeps its level: rebuild it free on any tile of that biome.",
 		fires: (f) => f.castleLevel >= 3,
 	},
 	{

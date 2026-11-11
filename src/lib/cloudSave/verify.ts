@@ -1,6 +1,9 @@
-import { BUILDINGS_FLAG } from '@/config/buildings';
+import { BUILDINGS_FLAG, IDOL_RULES } from '@/config/buildings';
+import { CASTLE_UPGRADE } from '@/config/castle';
+import { buildingUpgradeDuration } from '@/lib/buildings';
 import { idolDef } from '@/catalog/idols';
-import { MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
+import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES } from '@/config/merchant';
+import { HARD_LIMITS } from '@/config/limits';
 import type { GrantTotals } from '@/lib/offline/ledger';
 import type { Resources } from '@/types/game';
 import type { SaveSummary } from './summary';
@@ -27,8 +30,8 @@ export const VERIFY = {
 	goldFloor: 1_000,
 	/** The share of the previous balance a save may add on top (a rich account has bigger legitimate bursts, a poor one almost none). */
 	goldFloorShare: 0.02,
-	/** The best a maxed Haggler pays on a sale (+30 %): stock sold at the merchant is judged at this multiple of the base price. */
-	sellBonusMax: 1.3,
+	/** The best a maxed Haggler plus the Lighthouse at its hard ceiling pay on a sale (+30 % and +20 %): stock sold at the merchant is judged at this multiple of the base price. */
+	sellBonusMax: 1 + MERCHANT_UPGRADES.haggler.maxLevel * MERCHANT_UPGRADES.haggler.effectPerLevel + (HARD_LIMITS.idolMaxLevel * IDOL_RULES.perLevel) / 100,
 	/** Relative slack on the comparison itself: past 2^53 a double cannot tell neighbouring balances apart (IDL-112). */
 	relativeTolerance: 1e-9,
 	/** Without a previous save the whole balance has to be explained by the current income over the play time. */
@@ -165,6 +168,10 @@ export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
  * contain that much more than its income explains. When it is given the server also holds the gem balance, so the gem check
  * happens against that balance in the pipeline instead of here.
  */
+/** The most of a build timer the player's cuts may have taken off in this step: the larger of the two saves' `buildTimeReduction` (Master Builders plus the Dwarf Statue, never above 60 %). */
+const maxBuildTimeCut = (before: SaveSummary, next: SaveSummary): number =>
+	Math.min(IDOL_RULES.buildTimeCap / 100, Math.max(before.derived.buildTimeReduction ?? 0, next.derived.buildTimeReduction ?? 0));
+
 /**
  * The castle upgrade is a timer the server can check from two summaries: it runs at most as fast as real time. So a new castle level is
  * only believable when an upgrade was running and the real time between the saves covers what was left of its timer, and a running timer
@@ -174,6 +181,11 @@ const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number
 	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
 	const was = before.derived.castleUpgrade;
 	const now = next.derived.castleUpgrade;
+	// a NEW upgrade cannot be shorter than its timer allows with the most the player's build-time cuts (Master Builders, the Dwarf Statue, capped at 60 %) could take off: a forged short timer is a jump
+	if (now && !(was && was.toLevel === now.toLevel)) {
+		const min = Math.floor((CASTLE_UPGRADE.durationsSec[now.toLevel - 2] ?? 0) * (1 - maxBuildTimeCut(before, next)));
+		if (now.remainingSec + allowed < min) return true;
+	}
 	if (next.castleLevel > before.castleLevel) {
 		// every level needs its own upgrade: more than one level between two saves, or a level with no running upgrade behind it, is a jump
 		return next.castleLevel > before.castleLevel + 1 || !was || was.toLevel !== next.castleLevel || was.remainingSec > allowed;
@@ -208,6 +220,11 @@ const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number,
 		}
 	}
 	if (raised > 1) return true;
+	// a NEW building upgrade cannot be shorter than its timer allows with the most the build-time cuts could take off
+	if (now && !(was && was.toLevel === now.toLevel && was.x === now.x && was.y === now.y)) {
+		const min = Math.floor(buildingUpgradeDuration(now.toLevel - 1) * (1 - maxBuildTimeCut(before, next)));
+		if (now.remainingSec + allowed < min) return true;
+	}
 	return !raised && !!was && !!now && was.toLevel === now.toLevel && was.x === now.x && was.y === now.y && was.remainingSec - now.remainingSec > allowed;
 };
 

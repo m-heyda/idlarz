@@ -49,7 +49,7 @@ import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
-import { settleIdols, sameIdols } from './idolTrust';
+import { clampIdolTiles, settleIdols, sameIdols } from './idolTrust';
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { checkNetWorth } from './netWorth';
 import { summarize, type SaveSummary } from './summary';
@@ -284,11 +284,13 @@ export const acceptSave = async (
 	const trustedIdols = newGame ? {} : (ledger?.legacy.idols ?? {});
 	const claimedIdolLevels = state.idolLevels;
 	let settledIdols: Record<string, number> = state.idolLevels ?? {};
+	// the summary of the game exactly as it was sent: the transition flags judge this one (a forged Idol level must still be seen after the settling cut it)
+	const sent = BUILDINGS_FLAG.enabled ? summarize(state) : null;
 	if (BUILDINGS_FLAG.enabled && ledgerUsable) {
 		// the timer check only needs the buildings on the map, which the settling does not change
-		const jumped = verifyTransition(previous, summarize(state), nowMs, grants, trustedIdols).includes('timer_jump');
+		const jumped = verifyTransition(previous, sent!, nowMs, grants, trustedIdols).includes('timer_jump');
 		settledIdols = settleIdols(trustedIdols, state, jumped);
-		state = { ...state, idolLevels: settledIdols };
+		state = { ...state, idolLevels: settledIdols, tiles: clampIdolTiles(state.tiles, settledIdols) };
 	} else if (BUILDINGS_FLAG.enabled) {
 		state = { ...state, idolLevels: {} };
 	}
@@ -310,7 +312,7 @@ export const acceptSave = async (
 		summary = summarize(state);
 	}
 	summary.derived.xpBase = xpVerdict.base;
-	const flags = verifyTransition(previous, claimed, nowMs, grants, ledger?.legacy.idols); // judged as the player sent it (the XP check flags a clamp)
+	const flags = verifyTransition(previous, sent ?? claimed, nowMs, grants, ledger?.legacy.idols); // judged as the player sent it (the XP check flags a clamp)
 	if (ledger && gemsClaimed > ledger.gems) flags.push('gems_increase');
 	if (emberVerdict.clamped) flags.push('ember_jump');
 	const worth = checkNetWorth(state, summary, ledger?.granted);
@@ -360,8 +362,14 @@ export const acceptSave = async (
 	const core = {
 		...(ledgerUsable ? { ...split.core, gems } : split.core),
 		// the Idols' combat bonuses ride in the stored save for the fight profile (profile.ts reads `idolFx`); absent with none
-		...(summary.derived.idol && (summary.derived.idol.damagePct || summary.derived.idol.hpArmorPct)
-			? { idolFx: { damagePct: summary.derived.idol.damagePct, hpArmorPct: summary.derived.idol.hpArmorPct } }
+		...(summary.derived.idol && (summary.derived.idol.damagePct || summary.derived.idol.hpArmorPct || summary.derived.idol.merchantSellPct)
+			? {
+					idolFx: {
+						damagePct: summary.derived.idol.damagePct,
+						hpArmorPct: summary.derived.idol.hpArmorPct,
+						...(summary.derived.idol.merchantSellPct ? { merchantSellPct: summary.derived.idol.merchantSellPct } : {}),
+					},
+				}
 			: {}),
 	};
 	const world = split.world;

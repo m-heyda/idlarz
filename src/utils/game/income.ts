@@ -10,6 +10,7 @@ import { biomeCount, forEachOwned, getTile, type World } from '@/utils/world';
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { buildingDef } from '@/catalog/buildings';
 import { buildingOutput } from '@/lib/buildingOutput';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { castleModifier } from '@/utils/game/castle';
 import { calculateStatResourceModifiers } from '@/utils/game/character';
 import { calculateFarmOutput, type FarmUpgrades } from '@/utils/game/farm';
@@ -121,6 +122,7 @@ export const calculateTileOutput = (tiles: World, x: number, y: number, castleLe
  *          + 0.5 x (castle level - 1)                      (xp only)
  * modifier[r] = (1 + castleModifier + plainsMod[r] + statMod[r]) x emberMult x foreman x gearIncome - 1
  * total[r] = base[r] x (1 + modifier[r])
+ *          (the farm products are x (1 + Harvest Scarecrow %) before they enter the sum)
  *          + sum over Producers and Extractors (buildings flag on) of {@link buildingOutput}   (counted with the biome tiles)
  * @see calculateTileOutput, castleModifier, castleAreaBonus, calculateFarmOutput
  */
@@ -144,6 +146,9 @@ export const calculateResourceBreakdown = (
 	const skinner = 1 + merchantEffect(merchantUpgrades, 'skinner');
 	farm.meat *= skinner;
 	farm.hide *= skinner;
+	// the Harvest Scarecrow (the plains Idol) makes every farm product grow by its percentage; read from the map's standing Idols, which the server has already cut to the trusted level
+	const farmMult = 1 + idolEconomy(tiles).farmOutputPct / 100;
+	if (farmMult !== 1) for (const key of FARM_KEYS) farm[key] *= farmMult;
 	for (const key of FARM_KEYS) {
 		base[key] = farm[key];
 		start[key] = 0;

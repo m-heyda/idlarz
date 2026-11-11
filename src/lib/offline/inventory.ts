@@ -141,6 +141,11 @@ export const coreWithInventory = (core: Core, inv: Inventory | null): Core =>
 export const sellContextOf = (core: Core): SellContext => ({
 	merchantUpgrades: isRecord(core.merchantUpgrades) ? (core.merchantUpgrades as MerchantUpgrades) : undefined,
 	prestige: isRecord(core.prestige) ? (core.prestige as unknown as SellContext['prestige']) : undefined,
+	// the Lighthouse's %, stamped into the stored save by the save pipeline from the standing Idol (`idolFx`)
+	idolSellPct:
+		isRecord(core.idolFx) && typeof core.idolFx.merchantSellPct === 'number' && Number.isFinite(core.idolFx.merchantSellPct)
+			? Math.max(0, core.idolFx.merchantSellPct)
+			: undefined,
 });
 
 const bump = (inv: Inventory, change: Partial<Omit<Inventory, 'ver'>>): Inventory => ({ ...inv, ...change, ver: inv.ver + 1 });
