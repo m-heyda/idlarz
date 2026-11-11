@@ -2128,6 +2128,31 @@
   ]
  },
  {
+  "id": "finite",
+  "name": "finite",
+  "symbol": "finite",
+  "kind": "function",
+  "category": "Saves & Server/The ledger",
+  "file": "src/lib/offline/ledgerRead.ts",
+  "line": 19,
+  "summary": "Tolerant readers for the two ledger columns that hold catalog ids (`inv`: bag, gear, pity; `combat`: the open fight). The rule for every stored column: **read what you understand, drop what you do not, never throw**. A catalog entry that a later release removed or changed (an item id, a monster type, a rarity, an affix, a level window) costs the player that one piece, not the row: the rest of the bag, the gear and the combat state stay. (Retire content with a flag instead of deleting it and nothing is dropped at all: see `docs/plan/save-compatibility.md`.)",
+  "see": []
+ },
+ {
+  "id": "ledgerrowupgrade",
+  "name": "LedgerRowUpgrade",
+  "symbol": "LedgerRowUpgrade",
+  "kind": "type",
+  "category": "Saves & Server/The ledger",
+  "file": "src/lib/offline/ledgerUpgrade.ts",
+  "line": 26,
+  "summary": "The upgrade path of a `player_ledger` row. A ledger row has no schema number: its columns are read tolerantly (`ledgerFromRow`: every column through a reader that drops what it does not know, a missing column reads as empty), so ADDING a column or a key never needs a step (the migration adds the column nullable, the reader defaults it: SQL first, code second). A step exists for the rare change a reader cannot absorb: a key that is renamed, a value that changes meaning, a list that changes shape. Because there is no version to branch on, **every step recognises the OLD shape by itself and leaves a new row alone** (idempotent, like `upgradeStoredBank` in `tickets.ts`), is pure, and is never edited or deleted after it shipped.",
+  "see": [
+   "ledgerFromRow",
+   "upgradeBody"
+  ]
+ },
+ {
   "id": "placetickets",
   "name": "placeTickets",
   "symbol": "placeTickets",
@@ -2321,7 +2346,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 62,
+  "line": 61,
   "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
   "see": []
  },
@@ -2332,7 +2357,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 201,
+  "line": 200,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -2344,7 +2369,7 @@
   "category": "Saves & Server/The save",
   "file": "src/lib/saveFormat.ts",
   "line": 35,
-  "summary": "The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters. The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load. Not saved: monsters and the open fight (the server's).",
+  "summary": "The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. A newer schema is refused, an older one is upgraded by `SAVE_UPGRADES` (empty today: every older save is refused). Max text 3,000,000 characters. The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load. Not saved: monsters and the open fight (the server's).",
   "see": [
    "PERSISTED_KEYS",
    "sanitizeSave"
@@ -2359,6 +2384,32 @@
   "file": "src/lib/saveStorage.ts",
   "line": 75,
   "summary": "Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`). Written 2 s after a change (`FLUSH_DELAY_MS`) and on hide/close; the backup rotates every 10 minutes. A read goes through `sanitizeSave`; if `current` is refused the game starts from `backup`, keeps the bad text as `damaged`, then falls back to a new game. One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).",
+  "see": []
+ },
+ {
+  "id": "bodyupgrade",
+  "name": "BodyUpgrade",
+  "symbol": "BodyUpgrade",
+  "kind": "type",
+  "category": "Saves & Server/The save",
+  "file": "src/lib/saveUpgrade.ts",
+  "line": 34,
+  "summary": "**The one way to change what a save means: bump the schema and write an upgrade step.** Everything else is additive and needs no version (a new optional field with a default, a new id in a catalog, a new resource, a new building, a changed number: see `docs/plan/save-compatibility.md`). A step is only for what additive changes cannot do: a field that is renamed, moved, split or reinterpreted, or an id that must be turned into another one.",
+  "see": [
+   "SAVE_SCHEMA",
+   "decodeSave",
+   "upgradeBody"
+  ]
+ },
+ {
+  "id": "upgradebody",
+  "name": "upgradeBody",
+  "symbol": "upgradeBody",
+  "kind": "function",
+  "category": "Saves & Server/The save",
+  "file": "src/lib/saveUpgrade.ts",
+  "line": 51,
+  "summary": "Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... `to - 1` of `chain`. Pure: the input is never changed. `from === to` returns a copy untouched. `chain` is a parameter so a test (or a release script) can run a step before it is registered.",
   "see": []
  },
  {

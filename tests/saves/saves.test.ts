@@ -8,7 +8,7 @@ import { checkNetWorth, minimumSpend } from '../../src/lib/cloudSave/netWorth';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { RESOURCE_CAP } from '../../src/config/economy';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
-import { plainItem } from '../../src/lib/itemInstance';
+import { instanceProblem, plainItem } from '../../src/lib/itemInstance';
 import { emptyBag } from '../../src/lib/inventory';
 import { ownedCount, setTile } from '../../src/utils/world';
 import { totalStatPoints, xpToNextLevel } from '../../src/utils/game/character';
@@ -71,9 +71,6 @@ test('tampered saves are rejected', () => {
 	rejects((r) => (r.resources.gold = RESOURCE_CAP * 10), 'gold above the cap');
 	rejects((r) => (r.resources.wood = 'lots'), 'non-numeric wood');
 	rejects((r) => (r.resources.stone = null), 'null stone');
-	rejects((r) => delete r.resources.coal, 'missing resource');
-	rejects((r) => (r.characterStats.strength += 50), 'extra strength points');
-	rejects((r) => (r.characterStats.availablePoints += 50), 'extra available points');
 	rejects((r) => (r.characterStats.charisma = 2.5), 'fractional stat');
 	rejects((r) => (landAt(r, CASTLE_X, CASTLE_Y).level = CASTLE_UPGRADE.maxLevel + 1), 'castle above max level');
 	rejects((r) => (landAt(r, CASTLE_X, CASTLE_Y).level = 0), 'castle level 0');
@@ -81,13 +78,10 @@ test('tampered saves are rejected', () => {
 	rejects((r) => setLandAt(r, 1, 0, { biome: 'castle', level: 1 }), 'second castle');
 	rejects((r) => setLandAt(r, CASTLE_X + 1, CASTLE_Y, { biome: 'forest', level: 2 }), 'a level on a tile that is not the castle');
 	rejects((r) => (landAt(r, CASTLE_X + 1, CASTLE_Y).chest = 'yes'), 'bad chest flag');
-	rejects((r) => (r.farmLevels = { dragon: 3 }), 'unknown animal');
 	rejects((r) => (r.farmLevels = { chicken: -4 }), 'negative animals');
-	rejects((r) => (r.clickLevel = 9), 'click level above the ladder');
 	rejects((r) => (r.castleUpgrade = { toLevel: 6, remainingSec: 1 }), 'castle upgrade to a level that is not next');
 	rejects((r) => (r.castleUpgrade = { toLevel: 2, remainingSec: -5 }), 'negative upgrade timer');
 	rejects((r) => (r.playSeconds = -1), 'negative play time');
-	rejects((r) => (r.resources.xp = 0), 'tiles owned without the XP that paid for them');
 	rejects((r) => (r.land = null), 'no map');
 	assert.equal(sanitizeSave(null).ok, false);
 	assert.equal(sanitizeSave('hello').ok, false);
@@ -113,15 +107,17 @@ test('derived values cannot be forged: rates, level, combat stats and castle cos
 	assert.ok((tileAt(result.state.tiles, CASTLE_X, CASTLE_Y).upgradeCost?.gold ?? 0) > 1);
 });
 
-test('a save one level-up behind (written between a purchase and the next tick) is repaired, a far-behind one is rejected', () => {
+test('a save behind on its level-up points (written between a purchase and the next tick, or before a rule raised them) is credited the difference', () => {
 	freshGame();
 	setResources({ xp: xpToNextLevel(1) + 100 }); // level 2, but the tick has not awarded the points yet
 	const repaired = sanitizeSave(snapshot());
 	assert.equal(repaired.ok, true);
 	if (repaired.ok) assert.equal(repaired.state.characterStats.availablePoints, totalStatPoints(2));
 
-	setResources({ xp: 100_000 }); // many levels without any points: not a one-tick gap
-	assert.equal(sanitizeSave(snapshot()).ok, false);
+	setResources({ xp: 100_000 }); // many levels without any points: the level pays them, so they are credited (a raised points-per-level rule must not refuse a save)
+	const far = sanitizeSave(snapshot());
+	assert.equal(far.ok, true);
+	if (far.ok) assert.ok(far.state.characterStats.availablePoints >= totalStatPoints(far.state.level.level) - 5, 'the level pays its points');
 	api().tick(100);
 	assert.equal(sanitizeSave(snapshot()).ok, true);
 });
@@ -205,26 +201,38 @@ test('a played game with gear and damaged HP round-trips unchanged', () => {
 	assert.equal(result.state.playerHp, 50);
 });
 
-test('forged inventories and HP are rejected', () => {
+test('forged inventories and HP never get through: a broken piece is dropped, structural damage refuses the save', () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const bad = (mutate: (raw: any) => void, label: string) => {
 		assert.equal(sanitizeSave(combatSave(mutate)).ok, false, `${label} should be rejected`);
 	};
-	bad((r) => (r.equipment.head = 'mythic_crown'), 'a bare item id (the old format) is not an item');
-	bad((r) => (r.equipment.head = plainItem('wooden_sword')), 'sword in the head slot');
-	bad((r) => (r.equipment.mainHand = plainItem('obsidian_ring')), 'ring item in the weapon slot');
-	bad((r) => (r.equipment.ring1 = plainItem('obsidian_helm')), 'cap in a ring slot');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'potion_minor' }), 'potion equipped');
-	bad((r) => (r.equipment.bogus = plainItem('wooden_sword')), 'unknown equipment slot');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'nope' }), 'unknown base item');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'mythic' }), 'unknown rarity');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 500 }), 'item level above the cap');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 0 }), 'item level 0');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 1.5 }), 'fractional item level');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 90 }), 'item level past the base window');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), quality: 101 }), 'quality out of range');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), stats: { damage: 9999 } }), 'a stat field smuggled into an instance');
-	bad(
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const cleaned = (mutate: (raw: any) => void, label: string) => {
+		const result = sanitizeSave(combatSave(mutate));
+		assert.equal(result.ok, true, `${label} should be cleaned, not refuse the save`);
+		if (!result.ok) return;
+		const pieces = [...Object.values(result.state.equipment), ...result.state.bag.flatMap((slot) => (slot && 'item' in slot ? [slot.item] : []))];
+		for (const piece of pieces) assert.equal(instanceProblem(piece), null, `${label}: nothing invalid survives`);
+		assert.ok(
+			result.state.bag.every((slot) => !slot || !('id' in slot) || slot.qty >= 1),
+			label,
+		);
+	};
+	cleaned((r) => (r.equipment.head = 'mythic_crown'), 'a bare item id (the old format) is not an item');
+	cleaned((r) => (r.equipment.head = plainItem('wooden_sword')), 'sword in the head slot');
+	cleaned((r) => (r.equipment.mainHand = plainItem('obsidian_ring')), 'ring item in the weapon slot');
+	cleaned((r) => (r.equipment.ring1 = plainItem('obsidian_helm')), 'cap in a ring slot');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'potion_minor' }), 'potion equipped');
+	cleaned((r) => (r.equipment.bogus = plainItem('wooden_sword')), 'unknown equipment slot');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'nope' }), 'unknown base item');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'mythic' }), 'unknown rarity');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 500 }), 'item level above the cap');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 0 }), 'item level 0');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 1.5 }), 'fractional item level');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), level: 90 }), 'item level past the base window');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), quality: 101 }), 'quality out of range');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), stats: { damage: 9999 } }), 'a stat field smuggled into an instance');
+	cleaned(
 		(r) =>
 			(r.equipment.head = {
 				...plainItem('leather_cap'),
@@ -235,46 +243,52 @@ test('forged inventories and HP are rejected', () => {
 			}),
 		'two affixes on a common item',
 	);
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'nope', roll: 5 }] }), 'unknown affix');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'damage_prefix', roll: 5 }] }), 'a weapon affix on a cap');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'maxHp_prefix', roll: 500 }] }), 'affix roll out of range');
-	bad(
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'nope', roll: 5 }] }), 'unknown affix');
+	cleaned(
+		(r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'damage_prefix', roll: 5 }] }),
+		'a weapon affix on a cap',
+	);
+	cleaned(
+		(r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'maxHp_prefix', roll: 500 }] }),
+		'affix roll out of range',
+	);
+	cleaned(
 		(r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'uncommon', affixes: [{ id: 'maxHp_prefix', roll: 5, value: 9999 }] }),
 		'a value smuggled into an affix',
 	);
-	bad((r) => (r.equipment.mainHand = { ...plainItem('emberbrand'), rarity: 'common' }), 'a named item with another rarity');
-	bad((r) => (r.bag[3].item.rarity = 'mythic'), 'a bag item with an unknown rarity');
+	cleaned((r) => (r.equipment.mainHand = { ...plainItem('emberbrand'), rarity: 'common' }), 'a named item with another rarity');
+	cleaned((r) => (r.bag[3].item.rarity = 'mythic'), 'a bag item with an unknown rarity');
 	bad((r) => (r.bag[3] = { item: plainItem('obsidian_cuirass'), extra: 1 }), 'a stray key on a gear entry');
-	bad((r) => (r.bag[3] = { id: 'obsidian_cuirass', qty: 1 }), 'gear stored as a stack (the old format)');
-	bad((r) => (r.lootPity = { 'boss:nope': 1 }), 'pity for an unknown table');
-	bad((r) => (r.lootPity = { 'boss:king_legendary': -1 }), 'negative pity');
-	bad((r) => (r.lootPity = { 'boss:king_legendary': 1e9 }), 'absurd pity');
+	cleaned((r) => (r.bag[3] = { id: 'obsidian_cuirass', qty: 1 }), 'gear stored as a stack (the old format)');
+	cleaned((r) => (r.lootPity = { 'boss:nope': 1 }), 'pity for an unknown table');
+	cleaned((r) => (r.lootPity = { 'boss:king_legendary': -1 }), 'negative pity');
+	cleaned((r) => (r.lootPity = { 'boss:king_legendary': 1e9 }), 'absurd pity');
 	bad((r) => (r.autoSellUpTo = 'mythic'), 'auto-sell up to an unknown rarity');
 	bad((r) => (r.autoSellUpTo = 'constructor'), 'auto-sell up to a prototype name');
 	bad((r) => (r.bag = []), 'an empty bag');
 	bad((r) => (r.bag = [...r.bag, ...Array.from({ length: 200 }, () => null)]), 'a bag beyond the ceiling');
-	bad((r) => (r.bag[4].qty = 101), 'potion stack of 101');
-	bad((r) => (r.bag[4].qty = 0), 'empty stack');
-	bad((r) => (r.bag[4].qty = 2.5), 'fractional stack');
+	cleaned((r) => (r.bag[4].qty = 101), 'potion stack of 101');
+	cleaned((r) => (r.bag[4].qty = 0), 'empty stack');
+	cleaned((r) => (r.bag[4].qty = 2.5), 'fractional stack');
 	bad((r) => (r.bag[3].qty = 2), 'gear with qty 2');
-	bad((r) => (r.bag[4].id = 'nope'), 'unknown bag item');
+	cleaned((r) => (r.bag[4].id = 'nope'), 'unknown bag item');
 	bad((r) => (r.bag[0] = 'sword'), 'bag entry that is not an object');
 	bad((r) => delete r.bag, 'equipment without a bag');
 	bad((r) => delete r.equipment, 'bag without equipment');
-	bad((r) => (r.playerHp = 1e6), 'playerHp above max');
+	cleaned((r) => (r.playerHp = 1e6), 'playerHp above max');
 	bad((r) => (r.playerHp = NaN), 'playerHp NaN');
 	bad((r) => (r.playerHp = -1), 'negative playerHp');
-	bad((r) => (r.playerMp = 1e6), 'playerMp above the mana pool');
+	cleaned((r) => (r.playerMp = 1e6), 'playerMp above the mana pool');
 	bad((r) => (r.playerMp = NaN), 'playerMp NaN');
 	bad((r) => (r.playerMp = -1), 'negative playerMp');
 	bad((r) => (r.playerMp = '40'), 'playerMp as text');
-	bad((r) => (r.bag[0] = { id: 'constructor', qty: 1 }), 'object prototype name as a bag item');
-	bad((r) => (r.bag[0] = { id: '__proto__', qty: 1 }), '__proto__ as a bag item');
-	bad((r) => (r.bag[0] = { id: 'toString', qty: 1 }), 'toString as a bag item');
-	bad((r) => (r.equipment.head = 'constructor'), 'object prototype name as equipped item');
-	bad((r) => (r.equipment.neck = 'hasOwnProperty'), 'hasOwnProperty as equipped item');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'constructor' }), 'prototype name as an item base');
-	bad((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'constructor' }), 'prototype name as a rarity');
+	cleaned((r) => (r.bag[0] = { id: 'constructor', qty: 1 }), 'object prototype name as a bag item');
+	cleaned((r) => (r.bag[0] = { id: '__proto__', qty: 1 }), '__proto__ as a bag item');
+	cleaned((r) => (r.bag[0] = { id: 'toString', qty: 1 }), 'toString as a bag item');
+	cleaned((r) => (r.equipment.head = 'constructor'), 'object prototype name as equipped item');
+	cleaned((r) => (r.equipment.neck = 'hasOwnProperty'), 'hasOwnProperty as equipped item');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), base: 'constructor' }), 'prototype name as an item base');
+	cleaned((r) => (r.equipment.head = { ...plainItem('leather_cap'), rarity: 'constructor' }), 'prototype name as a rarity');
 });
 
 test('a played game that started with the free ring passes validation (tiles, chests)', () => {

@@ -432,6 +432,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
 - [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ Everything the server ever granted (income while away, chest and kill rewards):
+- [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
+- [`ledgerUpgrade.ts`](../../src/lib/offline/ledgerUpgrade.ts) — ~ The upgrade path of a `player_ledger` row.
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
 - [`placement.ts`](../../src/lib/offline/placement.ts) — ~ What the rules depend on:
@@ -444,7 +446,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`service.ts`](../../src/lib/offline/service.ts) — ~ The server-only secret that seals rolls (LOOT_SECRET)
 - [`spawnWeights.ts`](../../src/lib/offline/spawnWeights.ts) — ~ Win chance range that is worth a fight:
 - [`stats.ts`](../../src/lib/offline/stats.ts) — SERVER ONLY. The lifetime counters of a player (`player_ledger.stats`): kills per monster type, chests opened, tiles bought and the income earned while playing.
-- [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger in Supabase (service role:
+- [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger as the `player_ledger` row it is stored as (also what the migration script writes).
 - [`tickets.ts`](../../src/lib/offline/tickets.ts) — ~ Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny).
 - [`tutorial.ts`](../../src/lib/offline/tutorial.ts) — ~ `unknown`:
 - [`types.ts`](../../src/lib/offline/types.ts) — ~ What the server keeps of a player's things:
@@ -468,6 +470,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`saveEvents.ts`](../../src/lib/saveEvents.ts) — Tiny event bus for moments worth saving right away (a purchase, a castle upgrade, a rebirth, a level up).
 - [`saveFormat.ts`](../../src/lib/saveFormat.ts) — ~ The save format:
 - [`saveStorage.ts`](../../src/lib/saveStorage.ts) — ~ Where the game is kept:
+- [`saveUpgrade.ts`](../../src/lib/saveUpgrade.ts) — ~ The upgrade steps, keyed by the schema they upgrade FROM:
 - [`seenEpoch.ts`](../../src/lib/seenEpoch.ts) — ~ The epoch this browser last saw, or null when it never recorded one (a browser from before the guard, or a new one).
 - [`serverRebirth.ts`](../../src/lib/serverRebirth.ts) — ~ The browser's side of the server-run rebirth (IDL-102, `POST /api/rebirth`).
 - [`serverSession.ts`](../../src/lib/serverSession.ts) — A one-function bridge so the game store can say "the server wants an absence claimed first" without importing the code that claims
@@ -603,17 +606,21 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`docs-reference.ts`](../../scripts/docs-reference.ts) — Builds docs/reference from the JSDoc in the code (the single source of truth for how the game works).
 - [`fight-sim.ts`](../../scripts/fight-sim.ts) — Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
 - [`gen-inputs.ts`](../../scripts/gen-inputs.ts) — ~ The scripts named by `tsx scripts/<file>.ts` in the `docs:gen:*` entries of package.json, following `npm run <name>` one level (so the groups and a new generator are found without a list here).
+- [`gen-save-fixtures.ts`](../../scripts/gen-save-fixtures.ts) — Writes the frozen save fixtures of `tests/fixtures/saves/` from the CURRENT code.
 - [`guide-sprite.ts`](../../scripts/guide-sprite.ts) — Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 
 **scripts/lib/**
 
 - [`loadGame.ts`](../../scripts/lib/loadGame.ts) — The game's config and maths as one merged object each, for the scripts that read and override them by name (scripts/sim.ts).
+- [`savedIds.ts`](../../scripts/lib/savedIds.ts) — ~ Everything a stored save or ledger can name by id or position, as the running code has it.
 
 **scripts/**
 
 - [`liveSavesReport.ts`](../../scripts/liveSavesReport.ts) — The pure part of `scripts/check-live-saves.ts` (IDL-12):
 - [`loot-sim.ts`](../../scripts/loot-sim.ts) — Loot simulator: seeded Monte Carlo over the real pipeline (src/lib/loot), per source and level. Use it to tune drop rates.
+- [`migrate-saves.ts`](../../scripts/migrate-saves.ts) — The tool for a release that cannot be additive:
+- [`migrateSaves.ts`](../../scripts/migrateSaves.ts) — The pure part of `scripts/migrate-saves.ts`:
 - [`monster-ladder.ts`](../../scripts/monster-ladder.ts) — Monster ladder: win rate of each gear tier against every monster at the levels it spawns at (docs/plan/ROADMAP.md, enemy rework).
 - [`pacing-guard.ts`](../../scripts/pacing-guard.ts) — The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % or more than 5 game days against a base. Prints a summary table first.
 - [`pacingCompare.ts`](../../scripts/pacingCompare.ts) — The pure part of the pacing guard (scripts/pacing-guard.ts, tests/economy/pacingGuard.test.ts): compares two sim baselines
@@ -770,9 +777,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/ops/**
 
 - [`genInputs.test.ts`](../../tests/ops/genInputs.test.ts)
+- [`migrateSaves.test.ts`](../../tests/ops/migrateSaves.test.ts) — The pure part of `npm run migrate-saves` (scripts/migrateSaves.ts), run on the frozen fixtures. No network: the script feeds the same functions with database rows.
 
 **tests/saves/**
 
+- [`appendOnly.test.ts`](../../tests/saves/appendOnly.test.ts) — Append-only guards: what a save or a ledger can name by id (an item, a monster, a biome letter, a resource key, a building, an avatar, an achievement, a recipe ...) may be ADDED to but never removed, renamed
 - [`auth.test.ts`](../../tests/saves/auth.test.ts)
 - [`authClient.test.ts`](../../tests/saves/authClient.test.ts)
 - [`avatars.test.ts`](../../tests/saves/avatars.test.ts)
@@ -782,7 +791,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
+- [`saveFixtures.test.ts`](../../tests/saves/saveFixtures.test.ts) — The guard for every future PR: every frozen fixture in tests/fixtures/saves/ (one per released shape, made from the code of that release by
 - [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with a chest, gear and a monster, as a plain persisted slice.
+- [`saveTolerance.test.ts`](../../tests/saves/saveTolerance.test.ts) — A save or a ledger row written by an older (or newer) release must degrade, not die: what this version does not know is dropped, what is over a changed limit is cut, what is missing gets a default.
+- [`saveUpgrade.test.ts`](../../tests/saves/saveUpgrade.test.ts)
 - [`saveWorld.test.ts`](../../tests/saves/saveWorld.test.ts) — ~ The game with a synthetic map of `count` tiles that is valid for sanitizeSave (XP pays for it, stat points follow the level).
 - [`saves.test.ts`](../../tests/saves/saves.test.ts) — ~ A plain JSON copy of a (valid) persisted game, as it would come out of a save file.
 - [`storageScope.test.ts`](../../tests/saves/storageScope.test.ts)

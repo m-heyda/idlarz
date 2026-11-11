@@ -232,59 +232,55 @@ test('a save from before the goods existed loads and gets a shelf on the next ti
 	if (result.ok) assert.equal(result.state.merchantStock, null);
 });
 
-test('a forged shelf is rejected: an unknown item, a legendary-level stat, too many offers, a price, an extra key', () => {
+test('a forged shelf never gets through: an invalid offer is dropped, damage to the stock itself is refused', () => {
 	freshGame();
 	api().tick(1000);
 	const good = rawSnapshot();
-	const mutate = (fn: (raw: ReturnType<typeof rawSnapshot>) => void) => {
+	const shelf = (fn: (raw: ReturnType<typeof rawSnapshot>) => void) => {
 		const raw = JSON.parse(JSON.stringify(good));
 		fn(raw);
-		return sanitizeSave(raw).ok;
+		const result = sanitizeSave(raw);
+		return result.ok ? result.state.merchantStock : 'refused';
 	};
+	const offers = good.merchantStock.offers.length;
+	assert.ok(offers > 1);
 	assert.equal(sanitizeSave(good).ok, true);
-	assert.equal(
-		mutate((r) => (r.merchantStock.offers[0].base = 'constructor')),
-		false,
-		'unknown base',
+	// an offer that is no longer valid (an unknown item, an impossible level or quality, a smuggled price) is left off the shelf, the others stay
+	for (const [label, fn] of [
+		['unknown base', (r: typeof good) => (r.merchantStock.offers[0].base = 'constructor')],
+		['impossible level', (r: typeof good) => (r.merchantStock.offers[0].level = 9999)],
+		['impossible quality', (r: typeof good) => (r.merchantStock.offers[0].quality = 1e6)],
+		['a stored price', (r: typeof good) => (r.merchantStock.offers[0].price = 1)],
+	] as const) {
+		const stockAfter = shelf(fn);
+		assert.notEqual(stockAfter, 'refused', label);
+		assert.equal(typeof stockAfter === 'object' && stockAfter?.offers.length, offers - 1, label);
+	}
+	// a key this version does not know is ignored
+	assert.notEqual(
+		shelf((r) => ((r.merchantStock as Record<string, unknown>).cheat = true)),
+		'refused',
+		'extra key',
 	);
+	// too many offers, a stock that is not an object, a negative time, offers that are not a list: damage, refused
 	assert.equal(
-		mutate((r) => (r.merchantStock.offers[0].level = 9999)),
-		false,
-		'impossible level',
-	);
-	assert.equal(
-		mutate((r) => (r.merchantStock.offers[0].quality = 1e6)),
-		false,
-		'impossible quality',
-	);
-	assert.equal(
-		mutate((r) => (r.merchantStock.offers[0].price = 1)),
-		false,
-		'a stored price',
-	);
-	assert.equal(
-		mutate((r) => (r.merchantStock.offers = Array.from({ length: MERCHANT_GOODS.maxOffers + 1 }, () => r.merchantStock.offers[0]))),
-		false,
+		shelf((r) => (r.merchantStock.offers = Array.from({ length: MERCHANT_GOODS.maxOffers + 1 }, () => r.merchantStock.offers[0]))),
+		'refused',
 		'too many offers',
 	);
 	assert.equal(
-		mutate((r) => (r.merchantStock.cheat = true)),
-		false,
-		'extra key',
-	);
-	assert.equal(
-		mutate((r) => (r.merchantStock = 'free gear')),
-		false,
+		shelf((r) => ((r as Record<string, unknown>).merchantStock = 'free gear')),
+		'refused',
 		'not an object',
 	);
 	assert.equal(
-		mutate((r) => (r.merchantStock.at = -5)),
-		false,
+		shelf((r) => (r.merchantStock.at = -5)),
+		'refused',
 		'negative time',
 	);
 	assert.equal(
-		mutate((r) => (r.merchantStock.offers = 'x')),
-		false,
+		shelf((r) => ((r.merchantStock as Record<string, unknown>).offers = 'x')),
+		'refused',
 		'offers not a list',
 	);
 });

@@ -1,6 +1,7 @@
 import { isRecord } from '@/lib/isRecord';
 import { BASE_STAT_KEYS, PERSISTED_KEYS, sanitizeSave, type PersistedGame } from '@/lib/sanitizeSave';
 import { BUILDINGS_FLAG } from '@/config/buildings';
+import { upgradeBody } from '@/lib/saveUpgrade';
 import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/utils/world';
 
 /**
@@ -17,14 +18,13 @@ import { MAX_OWNED_TILES, inRange, ownedRowMajor, tileKey, type World } from '@/
  *     tiles x0, x0 + 1, ... of row y) and `extra` lists the tiles that carry more than a biome, `[x, y, { level?, chest? }]`. A 50,000-tile map is about 60 KB of text. Coordinates may be negative.
  *   - level, activeChests, previousLevel, tile upgrade costs and combat stats are left out (rebuilt on load).
  *
- * A save written by any other schema than this game's is refused with a clear message, never half-loaded. When the format changes
- * (a renamed, moved or reinterpreted field, removed content), bump SAVE_SCHEMA; write a migration only if old saves must survive
- * (today they do not: player progress is reset between seasons, see docs/reference/ops.md). A new OPTIONAL field needs no bump:
- * add it to PERSISTED_KEYS and let `sanitizeSave` accept it with a default.
+ * A save of a newer schema than this game's is refused ("update the game"). An older one is upgraded by the chain in `src/lib/saveUpgrade.ts` (a pure step per version, run on read) and refused only when no path up exists.
+ * When the format changes in a way an additive change cannot express (a renamed, moved or reinterpreted field), bump SAVE_SCHEMA and add the step; every other change (a new optional field, a new id, a new resource, a changed
+ * number) needs no bump: add the field to PERSISTED_KEYS and let `sanitizeSave` accept it with a default. See `docs/plan/save-compatibility.md`.
  */
 
 /**
- * The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. Any other schema is refused (no migrations kept). Max text 3,000,000 characters.
+ * The save in the browser. **Text format**: `IDLZ2.` + base64(UTF-8 JSON) + `.` + 8-digit FNV check. Not encrypted; the check only catches cut-off text. A newer schema is refused, an older one is upgraded by `SAVE_UPGRADES` (empty today: every older save is refused). Max text 3,000,000 characters.
  * The map is compact (only owned tiles, as runs per row, plus `extra` for tiles with a level or chest); derived values (level, combat stats, tile upgrade costs, active chest count) are rebuilt on load.
  * Not saved: monsters and the open fight (the server's).
  *
@@ -223,10 +223,8 @@ export const unpackBody = (body: SaveBody): { raw: SaveBody } | { error: string 
 		if (!Number.isInteger(x) || !Number.isInteger(y) || !inRange(x, y)) return { error: 'an extra entry is off the map' };
 		const entry = byKey.get(tileKey(x, y));
 		if (!entry) return { error: 'an extra entry is for a tile that is not there' };
-		for (const [key, value] of Object.entries(props)) {
-			if (!EXTRA_KEYS.has(key)) return { error: 'an extra entry has an unknown key' };
-			entry[key] = value;
-		}
+		// a key this version does not know (a property a later release put on a tile) is ignored, never a reason to refuse the save
+		for (const [key, value] of Object.entries(props)) if (EXTRA_KEYS.has(key)) entry[key] = value;
 	}
 	const { land: _land, extra: _extra, ...rest } = body;
 	void _land;
@@ -273,9 +271,15 @@ export const decodeSave = (text: string): DecodeResult => {
 	}
 	const schema = wire.v as number;
 	if (schema > SAVE_SCHEMA) return bad('This save was made by a newer version of the game. Update the game first.');
-	if (schema < SAVE_SCHEMA) return bad('This save is from an older season of the game and can no longer be loaded. Start a new game.');
+	let body: SaveBody = wire.s;
+	if (schema < SAVE_SCHEMA) {
+		// an older schema is upgraded step by step (src/lib/saveUpgrade.ts); with no path up it is the old "older season" refusal
+		const upgraded = upgradeBody(wire.s, schema, SAVE_SCHEMA);
+		if (!upgraded.ok) return bad('This save is from an older season of the game and can no longer be loaded. Start a new game.');
+		body = upgraded.body;
+	}
 
-	const unpacked = unpackBody(wire.s);
+	const unpacked = unpackBody(body);
 	if ('error' in unpacked) return bad(`The save contains impossible data (${unpacked.error}).`);
 
 	const result = sanitizeSave(unpacked.raw);

@@ -235,7 +235,7 @@ test('every new upgrade can be bought up to its maximum, costs gold, and starts 
 	assert.deepEqual(api().merchantUpgrades, { packrat: MERCHANT_UPGRADES.packrat.maxLevel });
 });
 
-test('saves: a level above the maximum or an unknown upgrade is rejected, a normal level is accepted', () => {
+test('saves: a level above the maximum is cut, an unknown upgrade dropped, a negative level refused, a normal level accepted', () => {
 	freshGame({ gold: 1e12 });
 	api().buyMerchantUpgrade('foreman');
 	api().buyMerchantUpgrade('fang');
@@ -246,13 +246,21 @@ test('saves: a level above the maximum or an unknown upgrade is rejected, a norm
 	for (const [id, level] of [
 		['foreman', MERCHANT_UPGRADES.foreman.maxLevel + 1],
 		['fang', 99],
-		['tithe', -1],
 		['bogus', 1],
 	] as const) {
-		const bad = JSON.parse(JSON.stringify(raw));
-		bad.merchantUpgrades[id] = level;
-		assert.equal(sanitizeSave(bad).ok, false, `${id} ${level}`);
+		const odd = JSON.parse(JSON.stringify(raw));
+		odd.merchantUpgrades[id] = level;
+		const read = sanitizeSave(odd);
+		assert.equal(read.ok, true, `${id} ${level}`);
+		if (read.ok)
+			assert.ok(
+				!(id in read.state.merchantUpgrades) || read.state.merchantUpgrades[id as 'foreman'] === MERCHANT_UPGRADES[id as 'foreman'].maxLevel,
+				`${id} is dropped or cut`,
+			);
 	}
+	const negative = JSON.parse(JSON.stringify(raw));
+	negative.merchantUpgrades.tithe = -1;
+	assert.equal(sanitizeSave(negative).ok, false, 'a negative level is damage');
 });
 
 // ---------------------------------------------------------------------------------------------------- the shelf

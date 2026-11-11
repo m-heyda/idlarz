@@ -105,6 +105,8 @@ const fromRow = (row: Row): StoredSave => ({
 
 /** The `save_history.flags` value that marks the new chapter's archive of an account's old game: never trimmed. */
 export const CHAPTER_ARCHIVE_FLAG = 'epoch_archive';
+/** The `save_history.flags` value of the copy `npm run migrate-saves` keeps of a row before it rewrites it: pinned and never trimmed, like the chapter archive. */
+export const MIGRATION_BACKUP_FLAG = 'migration_backup';
 
 /** The full body of a save (map included), as kept in the history. */
 const fullBody = (save: StoredSave) => ({ ...save.core, land: save.world?.land, extra: save.world?.extra });
@@ -118,6 +120,7 @@ export const supabaseSaveRepo = (db: SupabaseClient): SaveRepo => {
 			.eq('user_id', userId)
 			.eq('pinned', pinned)
 			.not('flags', 'cs', `{${CHAPTER_ARCHIVE_FLAG}}`) // the new chapter's archive is never trimmed
+			.not('flags', 'cs', `{${MIGRATION_BACKUP_FLAG}}`) // nor is the copy a save migration took before rewriting a row
 			.order('rev', { ascending: false })
 			.range(keep, keep + 50);
 		const ids = (data ?? []).map((row: { id: number }) => row.id);
