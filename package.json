@@ -20,6 +20,7 @@
 		"check-live-saves": "tsx scripts/check-live-saves.ts",
 		"restore-trust": "tsx scripts/restore-trust.ts",
 		"migrate-saves": "tsx scripts/migrate-saves.ts",
+		"seed-rehearsal": "tsx scripts/seed-rehearsal-account.ts",
 		"gen-save-fixtures": "tsx scripts/gen-save-fixtures.ts",
 		"fight-sim": "tsx scripts/fight-sim.ts",
 		"perk-caps": "tsx scripts/perk-caps.ts",

@@ -8,7 +8,7 @@ Commands, CI, the pacing guard, season resets and the E2E test account.
 
 - Commands: [Commands and documentation generation](#commands-and-documentation-generation)
 - CI: [The pacing guard and CI sharding](#the-pacing-guard-and-ci-sharding), [The generated-docs inputs hash](#the-generated-docs-inputs-hash), [The local verify script and the pre-push hook](#the-local-verify-script-and-the-pre-push-hook)
-- Operator guides: [Season restart (reset-players)](#season-restart-reset-players), [Checking live saves before a release](#checking-live-saves-before-a-release), [Giving a flagged account its trust back (restore-trust)](#giving-a-flagged-account-its-trust-back-restore-trust), [The end-to-end test account](#test-account-email), [Turning enforcement and the server-run rebirth on together](#turning-enforcement-and-the-server-run-rebirth-on-together)
+- Operator guides: [Season restart (reset-players)](#season-restart-reset-players), [Checking live saves before a release](#checking-live-saves-before-a-release), [Giving a flagged account its trust back (restore-trust)](#giving-a-flagged-account-its-trust-back-restore-trust), [The end-to-end test account](#test-account-email), [Turning enforcement and the server-run rebirth on together](#turning-enforcement-and-the-server-run-rebirth-on-together), [Rehearsal seeding (seed-rehearsal)](#rehearsal-seeding-seed-rehearsal), [Rehearsal seeding (the pure part)](#rehearsal-seeding-the-pure-part)
 
 ## Commands
 
@@ -47,6 +47,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run check-live-saves` | `tsx scripts/check-live-saves.ts` |
 | `npm run restore-trust` | `tsx scripts/restore-trust.ts` |
 | `npm run migrate-saves` | `tsx scripts/migrate-saves.ts` |
+| `npm run seed-rehearsal` | `tsx scripts/seed-rehearsal-account.ts` |
 | `npm run gen-save-fixtures` | `tsx scripts/gen-save-fixtures.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
 | `npm run perk-caps` | `tsx scripts/perk-caps.ts` |
@@ -232,3 +233,54 @@ Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turn
 7. Rollback of the pair: `enabled: false` and `requireServerRebirth: false`; no data migration is involved in either.
 
 See also: [`ENFORCEMENT`](saves-and-server.md#enforcement), [`restoreTrust`](saves-and-server.md#restoretrust)
+
+<a id="rehearsal-seeding-seed-rehearsal"></a>
+
+### Rehearsal seeding (seed-rehearsal)
+
+Source: [`scripts/seed-rehearsal-account.ts:1`](../../scripts/seed-rehearsal-account.ts)
+
+Puts ONE throwaway account into a rebirthed mid-game state, fast, for the new chapter reset rehearsal (`docs/plan/new-chapter-release-runbook.md`, "Rehearsal seeding"). The dev console is gone and a real rebirth takes hours, so this writes the
+state through the server's own save path instead (`scripts/lib/rehearsalSeed.ts` says what the account ends up holding). It reads and writes exactly one account and nothing else.
+
+  npm run seed-rehearsal -- --user <uuid> --expect-email <address>                 DRY RUN (the default): checks the account, prints what it would do as counts, writes nothing
+  npm run seed-rehearsal -- --user <uuid> --expect-email <address> --yes           backs the account up to `backups/seed-rehearsal-<time>.json`, then seeds it
+  npm run seed-rehearsal -- ... --yes --force-fresh                                 first wipes the account's game data (backup first, then the `reset-players` path with --hard), then seeds it
+  npm run seed-rehearsal -- --restore <file> --user <uuid> --expect-email <address> [--yes]   puts the rows of a backup back (the account's current rows are backed up first)
+
+**Safety.** `--user` and `--expect-email` are both required. The run refuses unless the account's auth e-mail equals `--expect-email` (never printed) and its profile epoch is null (the pre-flip state the rehearsal needs; neither can be forced).
+An account that already holds game data (a save, a leaderboard row, ledger progress, history, rebirth records, achievements), or looks like a real player (more than one rebirth, more than 400 tiles or 120 levels), is refused unless `--force-fresh` wipes it first.
+Output is counts and words only: no e-mail, name, id or number out of a game, and no database error text. The profile is never written (the epoch stays null). The browser of the account is told to drop its local copy of an older game (`player_reset` marker),
+so it loads the seeded one.
+
+Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or the git-ignored `.env.local`): they decide which project is touched, so check them first. This is operator tooling: it is run by hand, never by the app or CI.
+
+See also: `applySeed`, `judgeAccount`
+
+<a id="rehearsal-seeding-the-pure-part"></a>
+
+### Rehearsal seeding (the pure part)
+
+Source: [`scripts/lib/rehearsalSeed.ts:1`](../../scripts/lib/rehearsalSeed.ts)
+
+The pure part of `npm run seed-rehearsal` (`scripts/seed-rehearsal-account.ts`): builds the game, the ledger and the achievements that put ONE throwaway account into a rebirthed mid-game state, writes them through the
+server's own save path, and decides whether an account may be seeded at all. No database client lives here: the storage is passed in (`SeedRepos`), so the unit test runs the whole thing against in-memory repos.
+
+**What the seeded account looks like**
+
+| Part | Where it lives | Value |
+| --- | --- | --- |
+| Rebirthed once | save (`prestige`), ledger (`rebirths`, `runId`), `rebirth_history` | the store's own `rebirth()` ran on a 400-tile castle-6 game, so Embers, the kit and the point conservation are the real ones |
+| Mid-game map | save + world | `REHEARSAL_SEED.tiles` owned tiles after the rebirth, an Idol standing on a forest and a plains tile |
+| Idols | ledger `legacy.idols` and the save's `idolLevels` | forest 3, plains 2 (the server's record and the claim agree, so nothing is cut back) |
+| Gems | ledger `gems` (the server's balance) | 250, not the 1000 gift |
+| Tutorial | ledger `stats.tutorial` | started, unfinished: the first two path steps and the intro done |
+| Monsters | ledger `stats.kills`, `stats.seen` | three discovered types, a few kills each |
+| Achievements | ledger `stats.achievements` and `player_achievements` | two (no gems are paid: the rows are written, not earned) |
+| Profile epoch | `profiles.epoch` | **untouched** (null before the release flips `GAME_EPOCH`) |
+
+**Why it is accepted as a normal save.** The ledger row is written first (run 2, rebirths 1, the Idol record, the counters, the gems), then the save goes through [`acceptSave`](saves-and-server.md#acceptsave) exactly as `POST /api/save` does it (revision 1 from base 0,
+world hash, summary, leaderboard row, history copy), so the stored rows are the ones the server itself would have written, and the rebirth is logged with the server's own `rebirthRecordOf`. The game is long enough (`playSeconds`) that
+the first-save Ember and XP bounds hold, so no flag is raised.
+
+See also: [`acceptSave`](saves-and-server.md#acceptsave), [`startNewChapter`](saves-and-server.md#startnewchapter)
