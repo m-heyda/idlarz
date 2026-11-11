@@ -41,3 +41,20 @@ test('a real monster on the map or in the fight window is never the lab preview:
 	assert.equal(labPreviewOf(type)?.id, type, 'the lab names a roster monster explicitly');
 	assert.equal(labPreviewOf('nope'), undefined);
 });
+
+test('a placeholder monster is a grey stand-in (monster-placeholder), different from the black "?" silhouette of an unmet one', () => {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { MONSTER_CATALOG, usesPlaceholderArt } = require('../../src/catalog/monsters') as typeof import('../../src/catalog/monsters');
+	const stand = MONSTER_CATALOG.find((m) => m.id === 'caveGoblinMiner' && usesPlaceholderArt(m));
+	assert.ok(stand, 'caveGoblinMiner still has no real art');
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const { MonsterPicture } = require('../../src/components/game/MonsterArt') as typeof import('../../src/components/game/MonsterArt');
+	const known = renderToStaticMarkup(React.createElement(MonsterPicture, { type: 'caveGoblinMiner' as MonsterType, known: true }));
+	assert.match(known, /monster-placeholder/);
+	assert.doesNotMatch(known, /monster-unknown/);
+	const hidden = renderToStaticMarkup(React.createElement(MonsterPicture, { type: 'caveGoblinMiner' as MonsterType, known: false }));
+	assert.match(hidden, /monster-unknown/);
+	assert.doesNotMatch(hidden, /monster-placeholder/);
+	const real = renderToStaticMarkup(React.createElement(MonsterPicture, { type, known: true }));
+	assert.doesNotMatch(real, /monster-placeholder/);
+});

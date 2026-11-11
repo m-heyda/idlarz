@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { BUILDING_RULES, IDOL_RULES } from '@/config/buildings';
+import { IDOL_RULES } from '@/config/buildings';
 import { idolDef } from '@/catalog/idols';
 import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
 import type { PrestigeState } from '@/types/game';
 import { limitOf } from '@/lib/limits';
-import { buildingUpgradeDuration } from '@/lib/buildings';
+import { buildingUpgradeDuration, ownedOfBiome } from '@/lib/buildings';
+import { buildingEffectText } from '@/lib/buildingText';
 import { formatTime } from '@/utils/formatters';
 import { buildOptions, type BuildOption, type MoveOption } from '@/lib/buildingMenu';
 import { useGameStore } from '@/stores/gameStore';
@@ -16,16 +17,26 @@ import PixelModal from '../PixelModal';
 import ResourceIcon from '../ResourceIcon';
 import '@/styles/BuildModal.css';
 
-/** What a building makes, in one line: the Producer's tile-equivalents of its resources, the Extractor's rate of its material. */
-const OutputLine: React.FC<{ option: Pick<BuildOption, 'def'> }> = ({ option: { def } }) =>
-	def.kind === 'idol' ? null : (
-		<span className='build-output'>
-			{def.produces.map((resource) => (
-				<ResourceIcon key={resource} resource={resource} />
-			))}
-			<span>{def.kind === 'extractor' ? `${BUILDING_RULES.extractor.baseRate}/s` : `like ${BUILDING_RULES.producer.tileEquivalents} tiles`}</span>
-		</span>
+/** What a building makes, in plain words: the amount per hour now, what a level adds, what the tile count means and that levels exist. */
+const EffectLines: React.FC<{ def: BuildOption['def']; ownedOfBiome: number }> = ({ def, ownedOfBiome }) => {
+	const text = buildingEffectText(def, ownedOfBiome);
+	if (!text) return null;
+	return (
+		<div className='build-output'>
+			<span className='build-output-icons'>
+				{def.produces.map((resource) => (
+					<ResourceIcon key={resource} resource={resource} />
+				))}
+			</span>
+			<div className='build-effect'>
+				<p className='build-effect-main'>{text.produces}</p>
+				<p>{text.perLevel}</p>
+				<p className='build-effect-note'>{text.scale}</p>
+				<p className='build-effect-note'>{text.levels}</p>
+			</div>
+		</div>
 	);
+};
 
 const Art: React.FC<{ def: BuildOption['def'] }> = ({ def }) => (
 	<span className='build-art'>
@@ -78,6 +89,9 @@ export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?:
 	);
 };
 
+/** The shortage is already visible (red costs, a disabled button), so it is not printed under every card; any other refusal still is. */
+const NOT_ENOUGH = 'Not enough resources';
+
 /** "Build here": the buildings of the tile's biome with art, output and price, and the ones standing elsewhere that can be moved here. */
 const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const close = useUiStore((state) => state.closeBuildModal);
@@ -113,23 +127,25 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	};
 
 	return (
-		<PixelModal title='Build here' size='sm' onClose={close}>
+		<PixelModal title='Build here' size='md' onClose={close}>
 			<div className='build-list'>
 				{builds.map((o) => (
 					<div key={o.def.id} className={`px-card build-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
 						<div className='build-info'>
-							<Head def={o.def} />
-							<p className='build-blurb'>{o.def.blurb}</p>
-							<OutputLine option={o} />
-							{o.def.kind === 'idol' && <IdolInfo id={o.def.id} remembered={o.remembered ?? 0} buildTimePct={buildTimePct} prestige={prestige} />}
-							<div className='build-foot'>
-								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostList cost={o.cost} />}
-								<button className='px-btn' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
+							<div className='build-top'>
+								<Head def={o.def} />
+								<button className='px-btn build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
 									Build
 								</button>
 							</div>
-							{o.problem && <p className='build-problem'>{o.problem}</p>}
+							<p className='build-blurb'>{o.def.blurb}</p>
+							<EffectLines def={o.def} ownedOfBiome={ownedOfBiome(tiles, o.def.biome)} />
+							{o.def.kind === 'idol' && <IdolInfo id={o.def.id} remembered={o.remembered ?? 0} buildTimePct={buildTimePct} prestige={prestige} />}
+							<div className='build-foot'>
+								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostList cost={o.cost} className='build-cost' />}
+							</div>
+							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
 						</div>
 					</div>
 				))}
@@ -137,15 +153,17 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					<div key={`move-${o.def.id}`} className={`px-card build-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
 						<div className='build-info'>
-							<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
-							<p className='build-blurb'>Move it here: level kept, half price.</p>
-							<div className='build-foot'>
-								<CostList cost={o.cost} />
-								<button className='px-btn' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
+							<div className='build-top'>
+								<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
+								<button className='px-btn build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
 									Move here
 								</button>
 							</div>
-							{o.problem && <p className='build-problem'>{o.problem}</p>}
+							<p className='build-blurb'>Move it here: level kept, half price.</p>
+							<div className='build-foot'>
+								<CostList cost={o.cost} className='build-cost' />
+							</div>
+							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
 						</div>
 					</div>
 				))}
