@@ -976,6 +976,17 @@
   "see": []
  },
  {
+  "id": "createavatarpicker",
+  "name": "createAvatarPicker",
+  "symbol": "createAvatarPicker",
+  "kind": "function",
+  "category": "Progression/Avatars",
+  "file": "src/lib/avatarPick.ts",
+  "line": 23,
+  "summary": "Optimistic avatar change (the picker used to wait 2-3 s for the server before the new face showed). `pick(id)` shows `id` everywhere at once, then asks the server; the server stays the judge. - The avatar shown right now counts as the request in flight, so picking it again sends nothing. - Only the latest pick may write the final state: a late answer of an earlier pick is `stale` (it only moves the last confirmed avatar forward when it succeeded). - A refused or failed latest pick goes back to the last avatar the server confirmed (not to an earlier optimistic one), and returns the reason to show. - When the server stores another avatar than the one asked for, the server's value is shown. Nothing is stored by the client; saves and ledgers are untouched.",
+  "see": []
+ },
+ {
   "id": "max-active-buffs",
   "name": "MAX_ACTIVE_BUFFS",
   "symbol": "MAX_ACTIVE_BUFFS",

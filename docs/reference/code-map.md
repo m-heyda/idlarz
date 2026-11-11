@@ -338,6 +338,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authClient.ts`](../../src/lib/authClient.ts) — ~ The browser side of /api/auth/*:
 - [`authRoute.ts`](../../src/lib/authRoute.ts) — ~ The auth service cannot be reached or is not set up:
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
+- [`avatarPick.ts`](../../src/lib/avatarPick.ts) — What the server said to an avatar change:
 - [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
 - [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
@@ -834,6 +835,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/ui/**
 
+- [`avatarPick.test.ts`](../../tests/ui/avatarPick.test.ts) — ~ A fake client store and server:
 - [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
 - [`buildingText.test.ts`](../../tests/ui/buildingText.test.ts)
