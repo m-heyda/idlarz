@@ -37,26 +37,26 @@ Keep the two later PRs as drafts until step 4 below is green. Vercel failing on 
 
 ### Rehearsal seeding (a rebirthed mid-game account in seconds)
 
-Rehearsal step 4 above needs an account that has something to lose: a map, an Idol, a rebirth, a started tutorial, discovered monsters, gems that are not 1000, achievements. A rebirth takes hours of play and the dev console is gone, so `npm run seed-rehearsal` writes that state for ONE throwaway account through the server's own save path (revision, world hash, ledger and leaderboard row come out as if the server had written them; the profile epoch stays null). Use a throwaway fake-e-mail account that has signed in once (so it has a profile), never a real player. Nothing is stored that the game does not already store, so it is save-compatible; the script only ever reads and writes the one `--user`.
+Rehearsal step 4 above needs an account that has something to lose: a map, an Idol, a rebirth, a started tutorial, discovered monsters, gems that are not 1000, achievements. A rebirth takes hours of play and the dev console is gone, so `npm run seed-rehearsal` writes that state for ONE throwaway account through the server's own save path (revision, world hash, ledger and leaderboard row come out as if the server had written them; the profile epoch stays null). Use the throwaway account `test@example.com` (the owner signs it up by hand on a local dev server against the live project; no password is kept anywhere in the repo) once it has signed in (so it has a profile), never a real player. Nothing is stored that the game does not already store, so it is save-compatible; the script only ever reads and writes the one `--user`.
 
 ```bash
 # 1. dry run: checks the account (e-mail, epoch null, empty) and prints what it would write, as counts only
-npm run seed-rehearsal -- --user <uuid> --expect-email <the fake address>
+npm run seed-rehearsal -- --user <uuid> --expect-email test@example.com
 ```
 
 ```bash
 # 2. apply: backs the rows up to backups/seed-rehearsal-<time>.json first, then seeds
-npm run seed-rehearsal -- --user <uuid> --expect-email <the fake address> --yes
+npm run seed-rehearsal -- --user <uuid> --expect-email test@example.com --yes
 ```
 
 ```bash
 # the account already played a little (a save, achievements...)? Wipe it first through the reset-players path (backup first):
-npm run seed-rehearsal -- --user <uuid> --expect-email <the fake address> --yes --force-fresh
+npm run seed-rehearsal -- --user <uuid> --expect-email test@example.com --yes --force-fresh
 ```
 
 ```bash
 # undo: puts the rows of that backup back (the current rows are backed up first)
-npm run seed-rehearsal -- --restore backups/seed-rehearsal-<time>.json --user <uuid> --expect-email <the fake address> --yes
+npm run seed-rehearsal -- --restore backups/seed-rehearsal-<time>.json --user <uuid> --expect-email test@example.com --yes
 ```
 
 It refuses (and `--force-fresh` cannot override) a wrong e-mail, a missing profile, or a profile whose epoch is not null. Seeded state: one rebirth, 90 tiles, Idols forest 3 and plains 2 standing on the map (`legacy.idols` set), 250 gems, tutorial started and unfinished, three discovered monster types with kills, two achievements (`first_tile`, `first_fight`), a rebirth record. After it, sign in as that account (the browser drops any older local copy and loads the seeded game), then run rehearsal step 4: raise `GAME_EPOCH` on the preview, confirm the chapter screen, and check that the gems are exactly 1000 and the Idol record, tutorial, kills and achievements are gone. The numbers are `REHEARSAL_SEED` in `scripts/lib/rehearsalSeed.ts`.
