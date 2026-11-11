@@ -13,7 +13,7 @@
 export const BASELINE_EPOCH = 1;
 
 /** The data epoch the server is on. Raising it is the release: see the doc block above. */
-export const GAME_EPOCH = 1;
+export const GAME_EPOCH = 2;
 
 /** The request header that carries the epoch the browser last saw. */
 export const EPOCH_HEADER = 'x-game-epoch';
