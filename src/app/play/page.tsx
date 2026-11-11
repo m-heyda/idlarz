@@ -10,7 +10,7 @@ import NewChapterScreen from '@/components/auth/NewChapterScreen';
 import { fetchMe, logout, readEntered, writeEntered, type Profile, type UnavailableReason } from '@/lib/authClient';
 import { clearBootSnapshot, stageBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchCloud, readLink, writeAttempts, writeLink } from '@/lib/cloudClient';
-import { canResumeTab, planStart, skipsHub, type CloudInfo } from '@/lib/startPlan';
+import { canResumeTab, isForeignLocal, planStart, skipsHub, type CloudInfo } from '@/lib/startPlan';
 import { epochVerdict, readSeenEpoch, wipeStaleBrowser, writeSeenEpoch } from '@/lib/epochGuard';
 import { LANDING_PATH, loginRedirectPath } from '@/lib/playRoute';
 import { archiveForNewGame, installSave, peekSave, resetSave, type SavePeek } from '@/lib/saveStorage';
@@ -55,6 +55,13 @@ export default function PlayPage() {
 				await resetSave();
 				writeLink(null);
 				window.location.reload(); // resetSave froze this page's save writer: a reload starts the new game writing normally
+				return;
+			}
+			// another account's game in this browser (the link names someone else) is put aside, never adopted: this account starts from its own cloud save or a fresh game
+			if (isForeignLocal(local, readLink(), player.userId)) {
+				if (!archiveForNewGame()) return setPhase({ name: 'unavailable', reason: 'outage' });
+				await resetSave(); // also drops the other account's link
+				window.location.reload();
 				return;
 			}
 			const plan = planStart(local, cloud, readLink(), player.userId);

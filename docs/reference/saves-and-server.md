@@ -81,9 +81,10 @@ See also: [`PERSISTED_KEYS`](saves-and-server.md#persisted-keys), [`sanitizeSave
 
 ### `createSaveStorage` <small>function</small>
 
-Source: [`src/lib/saveStorage.ts:75`](../../src/lib/saveStorage.ts)
+Source: [`src/lib/saveStorage.ts:83`](../../src/lib/saveStorage.ts)
 
-Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`). Written 2 s after a change (`FLUSH_DELAY_MS`)
+Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`).
+The first three carry the data epoch: unchanged while `GAME_EPOCH` is `BASELINE_EPOCH` (1), `.e2`, `.e3`... after a flip (`epochScoped`), so the previous epoch's local game is never read again; `archiveForNewGame` still finds it under the old names and keeps it in `.previous-game` (a stable name), and `reset` removes the old names only after that. Written 2 s after a change (`FLUSH_DELAY_MS`)
 and on hide/close; the backup rotates every 10 minutes. A read goes through `sanitizeSave`; if `current` is refused the game starts from `backup`, keeps the bad text as `damaged`, then falls back to a new game.
 One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
@@ -718,6 +719,9 @@ the local save is put aside (`archiveForNewGame`) and reset, every key above is 
 failed wipe is simply tried again on the next load) and the page reloads into the normal start check, which finds an account with no save and starts a new
 game with a fresh link. The server sends `epoch` and `needsReset` (`config/epoch.ts`); a reply with no epoch (an older server) means the guard does nothing. A browser with no stored epoch counts as
 `BASELINE_EPOCH`, the value the server has today, so every browser that predates the guard is wiped on the flip and a brand new one is not.
+
+The local game's keys also carry the epoch (`storageScope.epochScoped`, `saveStorage`): from epoch 2 on the browser reads `idlarz.save.e2`, so the previous epoch's game is never read again even if this guard
+never ran; `archiveForNewGame` still finds it under the old names and keeps it, `resetSave` then removes them.
 
 What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server: every game request carries the epoch
 the browser last saw (`lib/epochFetch`) and a lower one is refused with 412 `staleEpoch`, after which the page reloads into this guard. See `docs/plan/reset-proof-browsers.md`.

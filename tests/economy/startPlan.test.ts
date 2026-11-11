@@ -38,7 +38,11 @@ test('this browser continues the account save: no choice; anything else asks', (
 	const local = localSave(700);
 	assert.deepEqual(planStart(local, cloudAt(4, 600), { userId: 'u', rev: 4 }, 'u'), { kind: 'hub', mode: 'local' });
 	assert.deepEqual(planStart(local, cloudAt(5, 600), { userId: 'u', rev: 4 }, 'u'), { kind: 'hub', mode: 'choose' }, 'played elsewhere since');
-	assert.deepEqual(planStart(local, cloudAt(4, 600), { userId: 'other', rev: 4 }, 'u'), { kind: 'hub', mode: 'choose' }, 'linked to another account');
+	assert.deepEqual(
+		planStart(local, cloudAt(4, 600), { userId: 'other', rev: 4 }, 'u'),
+		{ kind: 'hub', mode: 'cloud' },
+		'linked to another account: that game is not offered (/play puts it aside)',
+	);
 	assert.deepEqual(planStart(local, cloudAt(4, 600), null, 'u'), { kind: 'hub', mode: 'choose' }, 'never linked');
 });
 

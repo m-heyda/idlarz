@@ -37,7 +37,20 @@ export const canResumeTab = (link: CloudLink | null, userId: string): boolean =>
  */
 export const cloudSaveGone = (conflictRev: number): boolean => conflictRev === 0;
 
-export const planStart = (local: SavePeek, cloud: CloudInfo | null | 'unavailable', link: CloudLink | null, userId: string): StartPlan => {
+/**
+ * True when the local game in this browser belongs to ANOTHER account: something is stored and the cloud link (written whenever an account enters or continues a game here)
+ * names a different user. Such a game is never offered to or adopted by `userId`; `/play` puts it aside (`archiveForNewGame`) and clears it. A save with no link (a browser
+ * that predates the link, or a wiped one) cannot be told apart and still counts as this player's.
+ */
+export const isForeignLocal = (local: SavePeek, link: CloudLink | null, userId: string): boolean =>
+	local.kind !== 'none' && link !== null && link.userId !== userId;
+
+/** What this account sees of the browser's save: nothing when it is another account's game (`isForeignLocal`). */
+export const localForAccount = (local: SavePeek, link: CloudLink | null, userId: string): SavePeek =>
+	isForeignLocal(local, link, userId) ? { kind: 'none' } : local;
+
+export const planStart = (peeked: SavePeek, cloud: CloudInfo | null | 'unavailable', link: CloudLink | null, userId: string): StartPlan => {
+	const local = localForAccount(peeked, link, userId);
 	if (cloud === 'unavailable' || cloud === null) {
 		return local.kind === 'none' ? { kind: 'enter' } : { kind: 'hub', mode: 'local' };
 	}

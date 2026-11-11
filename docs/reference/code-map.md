@@ -800,6 +800,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`cloudConflict.test.ts`](../../tests/saves/cloudConflict.test.ts)
 - [`cloudSave.test.ts`](../../tests/saves/cloudSave.test.ts) — ~ The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null:
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
+- [`localSaveAccount.test.ts`](../../tests/saves/localSaveAccount.test.ts)
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
 - [`saveFixtures.test.ts`](../../tests/saves/saveFixtures.test.ts) — The guard for every future PR: every frozen fixture in tests/fixtures/saves/ (one per released shape, made from the code of that release by

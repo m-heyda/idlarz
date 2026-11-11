@@ -15,7 +15,7 @@ import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { fetchCloud, readLink } from '@/lib/cloudClient';
 import { epochVerdict, readSeenEpoch } from '@/lib/epochGuard';
 import { peekSave } from '@/lib/saveStorage';
-import { planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
+import { localForAccount, planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
 import { clearBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchMe, logout, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
@@ -243,7 +243,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 			let asks = false;
 			const stale = me.needsReset === true || epochVerdict(readSeenEpoch(), me.epoch) === 'wipe'; // an older chapter's game: /play puts it aside, the card shows nothing of it
 			if (me.profile && !stale) {
-				const local = peekSave();
+				const local = localForAccount(peekSave(), readLink(), me.userId);
 				const fetched = await fetchCloud();
 				const cloud = fetched.status === 'ok' ? fetched.cloud : fetched.status === 'empty' ? null : 'unavailable';
 				game = savedGameSummary(local, cloud);

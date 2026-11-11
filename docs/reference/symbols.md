@@ -87,7 +87,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `craftXpOf` | Progression / Crafting | [`src/lib/crafting.ts:90`](../../src/lib/crafting.ts) | The crafting XP one payout gives: |
 | `createAvatarPicker` | Progression / Avatars | [`src/lib/avatarPick.ts:23`](../../src/lib/avatarPick.ts) | Optimistic avatar change (the picker used to wait 2-3 s for the server before the new face showed). |
 | `createClickLimiter` | Economy / Clicks | [`src/lib/clickLimiter.ts:35`](../../src/lib/clickLimiter.ts) | Creates the click rate limiter: |
-| `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:75`](../../src/lib/saveStorage.ts) | Where the save lives: |
+| `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:83`](../../src/lib/saveStorage.ts) | Where the save lives: |
 | `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:140`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
 | `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:110`](../../src/lib/combat.ts) | Damage of one swing (before crits): |

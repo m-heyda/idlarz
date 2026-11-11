@@ -1,7 +1,8 @@
 import type { PersistStorage, StorageValue } from 'zustand/middleware';
 import { decodeSave, encodeSave, type DecodeResult } from '@/lib/saveFormat';
 import type { PersistedGame } from '@/lib/sanitizeSave';
-import { scoped } from '@/lib/storageScope';
+import { GAME_EPOCH } from '@/config/epoch';
+import { epochScoped, scoped } from '@/lib/storageScope';
 
 /**
  * Where the game is kept: the browser's localStorage, one text line (see saveFormat.ts).
@@ -21,9 +22,13 @@ import { scoped } from '@/lib/storageScope';
 export const PERSIST_VERSION = 1; // for the zustand persist option only; the real schema lives in saveFormat.ts
 export const PERSIST_NAME = scoped('idlarz-save');
 
-const KEY_CURRENT = scoped('idlarz.save');
-const KEY_BACKUP = scoped('idlarz.save.backup');
-const KEY_DAMAGED = scoped('idlarz.save.damaged');
+/** The three keys of the local game for an epoch (`epochScoped`): today's names at `BASELINE_EPOCH`, `.e<epoch>` after it. `legacy` are the names before the flip's epoch. */
+const gameKeys = (epoch: number) => ({
+	current: epochScoped('idlarz.save', epoch),
+	backup: epochScoped('idlarz.save.backup', epoch),
+	damaged: epochScoped('idlarz.save.damaged', epoch),
+	legacy: [scoped('idlarz.save'), scoped('idlarz.save.backup'), scoped('idlarz.save.damaged')],
+});
 /** Everything else the browser keeps about the game being played (not settings or window layout): the cloud link and unconfirmed uploads, the manual-save clock, a pending claim, the fight cursor. A new game starts without any of it. */
 const GAME_TRACE_KEYS = ['idlarz.cloud', 'idlarz.cloud.attempts', 'idlarz.cloud.manual', 'idlarz.offline.pending', 'idlarz.combat.cursor'].map(scoped);
 const KEY_PREVIOUS_GAME = scoped('idlarz.save.previous-game'); // the game a New Game replaced; reset never removes it
@@ -62,10 +67,13 @@ interface Options {
 	/** Asks the browser for persistent storage; resolves to whether it was granted. */
 	requestPersist?: () => Promise<boolean | null>;
 	queryPersisted?: () => Promise<boolean | null>;
+	/** The data epoch whose keys are used (default `GAME_EPOCH`); injectable for tests */
+	epoch?: number;
 }
 
 /**
- * Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`). Written 2 s after a change (`FLUSH_DELAY_MS`)
+ * Where the save lives: `localStorage` keys `idlarz.save`, `.backup`, `.damaged`, `.previous-game` (on localhost every key gets a `.dev` suffix, `src/lib/storageScope.ts`).
+ * The first three carry the data epoch: unchanged while `GAME_EPOCH` is `BASELINE_EPOCH` (1), `.e2`, `.e3`... after a flip (`epochScoped`), so the previous epoch's local game is never read again; `archiveForNewGame` still finds it under the old names and keeps it in `.previous-game` (a stable name), and `reset` removes the old names only after that. Written 2 s after a change (`FLUSH_DELAY_MS`)
  * and on hide/close; the backup rotates every 10 minutes. A read goes through `sanitizeSave`; if `current` is refused the game starts from `backup`, keeps the bad text as `damaged`, then falls back to a new game.
  * One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
  *
@@ -75,6 +83,11 @@ interface Options {
 export const createSaveStorage = (options: Options) => {
 	const { kv } = options;
 	const now = options.now ?? Date.now;
+	const keys = gameKeys(options.epoch ?? GAME_EPOCH);
+	const KEY_CURRENT = keys.current;
+	const KEY_BACKUP = keys.backup;
+	const KEY_DAMAGED = keys.damaged;
+	const legacyOnly = keys.current !== keys.legacy[0]; // an epoch after the baseline: the older epoch's keys hold a game this epoch never reads
 
 	let ready = false; // nothing is written before the first load finished (a fresh game must not overwrite a save)
 	let frozen = false; // set while importing/resetting so the running game cannot overwrite the new save
@@ -246,6 +259,7 @@ export const createSaveStorage = (options: Options) => {
 		drop(KEY_CURRENT);
 		drop(KEY_BACKUP);
 		drop(KEY_DAMAGED);
+		if (legacyOnly) keys.legacy.forEach(drop); // only ever after `archiveForNewGame` (epoch guard, New Game) kept a copy of the old epoch's game
 		GAME_TRACE_KEYS.forEach(drop);
 	};
 
@@ -270,7 +284,7 @@ export const createSaveStorage = (options: Options) => {
 	 * never replaces an earlier copy of a real one. False when a copy was needed but the browser would not store it.
 	 */
 	const archiveForNewGame = (): boolean => {
-		const text = load(KEY_CURRENT) ?? load(KEY_BACKUP);
+		const text = load(KEY_CURRENT) ?? load(KEY_BACKUP) ?? (legacyOnly ? (load(keys.legacy[0]) ?? load(keys.legacy[1])) : null);
 		if (!text) return true;
 		const result = decodeSave(text);
 		if (result.ok && result.state.playSeconds < BARELY_PLAYED_SEC && load(KEY_PREVIOUS_GAME)) return true;

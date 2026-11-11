@@ -4578,8 +4578,9 @@ Not saved: monsters and the open fight (the server&#39;s).</p>
 <p>See also: <a href="#persisted-keys"><code>PERSISTED_KEYS</code></a>, <a href="#sanitizesave"><code>sanitizeSave</code></a></p>
 </article><article><p><a id="createsavestorage"></a></p>
 <h3><code>createSaveStorage</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/saveStorage.ts"><code>src/lib/saveStorage.ts:75</code></a></p>
-<p>Where the save lives: <code>localStorage</code> keys <code>idlarz.save</code>, <code>.backup</code>, <code>.damaged</code>, <code>.previous-game</code> (on localhost every key gets a <code>.dev</code> suffix, <code>src/lib/storageScope.ts</code>). Written 2 s after a change (<code>FLUSH_DELAY_MS</code>)
+<p>Source: <a href="../../src/lib/saveStorage.ts"><code>src/lib/saveStorage.ts:83</code></a></p>
+<p>Where the save lives: <code>localStorage</code> keys <code>idlarz.save</code>, <code>.backup</code>, <code>.damaged</code>, <code>.previous-game</code> (on localhost every key gets a <code>.dev</code> suffix, <code>src/lib/storageScope.ts</code>).
+The first three carry the data epoch: unchanged while <code>GAME_EPOCH</code> is <code>BASELINE_EPOCH</code> (1), <code>.e2</code>, <code>.e3</code>... after a flip (<code>epochScoped</code>), so the previous epoch&#39;s local game is never read again; <code>archiveForNewGame</code> still finds it under the old names and keeps it in <code>.previous-game</code> (a stable name), and <code>reset</code> removes the old names only after that. Written 2 s after a change (<code>FLUSH_DELAY_MS</code>)
 and on hide/close; the backup rotates every 10 minutes. A read goes through <code>sanitizeSave</code>; if <code>current</code> is refused the game starts from <code>backup</code>, keeps the bad text as <code>damaged</code>, then falls back to a new game.
 One tab owns the game at a time (<code>src/hooks/useSingleTab.ts</code>, a Web Lock).</p>
 </article><article><p><a id="sanitizesave"></a></p>
@@ -5196,6 +5197,8 @@ the local save is put aside (<code>archiveForNewGame</code>) and reset, every ke
 failed wipe is simply tried again on the next load) and the page reloads into the normal start check, which finds an account with no save and starts a new
 game with a fresh link. The server sends <code>epoch</code> and <code>needsReset</code> (<code>config/epoch.ts</code>); a reply with no epoch (an older server) means the guard does nothing. A browser with no stored epoch counts as
 <code>BASELINE_EPOCH</code>, the value the server has today, so every browser that predates the guard is wiped on the flip and a brand new one is not.</p>
+<p>The local game&#39;s keys also carry the epoch (<code>storageScope.epochScoped</code>, <code>saveStorage</code>): from epoch 2 on the browser reads <code>idlarz.save.e2</code>, so the previous epoch&#39;s game is never read again even if this guard
+never ran; <code>archiveForNewGame</code> still finds it under the old names and keeps it, <code>resetSave</code> then removes them.</p>
 <p>What this cannot do: a tab that is already open when the epoch flips never asks <code>/api/auth/me</code> again. That tab is stopped by the server: every game request carries the epoch
 the browser last saw (<code>lib/epochFetch</code>) and a lower one is refused with 412 <code>staleEpoch</code>, after which the page reloads into this guard. See <code>docs/plan/reset-proof-browsers.md</code>.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-architecture">Architecture</h2><p class="blurb">Stack, state, the tick loop, the map, rendering and the art pipeline.</p><h2>The loop</h2><article><p><a id="gameapp"></a></p>
