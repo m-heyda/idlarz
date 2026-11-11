@@ -49,6 +49,8 @@ import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
+import { settleIdols, sameIdols } from './idolTrust';
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { checkNetWorth } from './netWorth';
 import { summarize, type SaveSummary } from './summary';
 import { settleXp } from './xpModel';
@@ -273,8 +275,24 @@ export const acceptSave = async (
 	const inventory =
 		ledger?.inv && rebirthed && !serverWiped ? rebirthInventory(ledger.inv, state.merchantUpgrades, state.prestige, state.playerClass) : (ledger?.inv ?? null);
 	if (inventory && !newGame) state = stampInventory(state, inventory);
-	let summary = summarize(state);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
+	/**
+	 * The Idols (IDL-96): the account's Idol levels are the ledger's (`legacy.idols`). The save's claim is cut back to the trusted record plus one verified step ({@link settleIdols}) BEFORE anything is
+	 * derived, so the XP allowance, the rates and every bonus the Idols pay are worked out from the settled levels, never from the claim. A New Game starts the record again. Without a usable ledger nothing can be
+	 * verified: the claimed levels are kept in the stored save (nothing is lost) but pay no bonus.
+	 */
+	const trustedIdols = newGame ? {} : (ledger?.legacy.idols ?? {});
+	const claimedIdolLevels = state.idolLevels;
+	let settledIdols: Record<string, number> = state.idolLevels ?? {};
+	if (BUILDINGS_FLAG.enabled && ledgerUsable) {
+		// the timer check only needs the buildings on the map, which the settling does not change
+		const jumped = verifyTransition(previous, summarize(state), nowMs, grants, trustedIdols).includes('timer_jump');
+		settledIdols = settleIdols(trustedIdols, state, jumped);
+		state = { ...state, idolLevels: settledIdols };
+	} else if (BUILDINGS_FLAG.enabled) {
+		state = { ...state, idolLevels: {} };
+	}
+	let summary = summarize(state);
 	/**
 	 * XP is the server's to bound: a save that holds more than the tiles bought, the time played and what the server paid can explain is
 	 * clamped to what they explain (and its attribute points to the level that XP gives), and the stored copy, the level on the ranking
@@ -292,7 +310,7 @@ export const acceptSave = async (
 		summary = summarize(state);
 	}
 	summary.derived.xpBase = xpVerdict.base;
-	const flags = verifyTransition(previous, claimed, nowMs, grants); // judged as the player sent it (the XP check flags a clamp)
+	const flags = verifyTransition(previous, claimed, nowMs, grants, ledger?.legacy.idols); // judged as the player sent it (the XP check flags a clamp)
 	if (ledger && gemsClaimed > ledger.gems) flags.push('gems_increase');
 	if (emberVerdict.clamped) flags.push('ember_jump');
 	const worth = checkNetWorth(state, summary, ledger?.granted);
@@ -304,6 +322,9 @@ export const acceptSave = async (
 	 */
 	const refused = rejectedFlags(flags, enforcement);
 	if (refused.length) return { kind: 'rejected', flags: refused };
+
+	const legacyIdols = BUILDINGS_FLAG.enabled && ledgerUsable ? settledIdols : (ledger?.legacy.idols ?? {});
+	const legacyChanged = !!ledger && !sameIdols(legacyIdols, ledger.legacy.idols);
 
 	/**
 	 * Trusted economy (IDL-167, IDL-168): a castle level its timer never paid for, or land, buildings and merchant levels worth more than the game
@@ -335,8 +356,14 @@ export const acceptSave = async (
 	// The gem balance is the server's: a save can never raise it (a new ledger starts at the save's gems, but never above the starting gift)
 	const gems = ledgerUsable ? (ledger ? ledger.gems : Math.max(0, Math.min(summary.gems, STARTING_GEMS))) : summary.gems;
 	summary.gems = gems;
-	const split = splitBody(packBody(state), summary.tilesOwned);
-	const core = ledgerUsable ? { ...split.core, gems } : split.core;
+	const split = splitBody(packBody(BUILDINGS_FLAG.enabled && !ledgerUsable ? { ...state, idolLevels: claimedIdolLevels } : state), summary.tilesOwned);
+	const core = {
+		...(ledgerUsable ? { ...split.core, gems } : split.core),
+		// the Idols' combat bonuses ride in the stored save for the fight profile (profile.ts reads `idolFx`); absent with none
+		...(summary.derived.idol && (summary.derived.idol.damagePct || summary.derived.idol.hpArmorPct)
+			? { idolFx: { damagePct: summary.derived.idol.damagePct, hpArmorPct: summary.derived.idol.hpArmorPct } }
+			: {}),
+	};
 	const world = split.world;
 	// A test account's findings are still recorded (they show the checks working) but never count against it, and it is never ranked
 	const testAccount = (current?.testAccount ?? false) || nonProduction;
@@ -389,7 +416,7 @@ export const acceptSave = async (
 				newRun: newRun || !current,
 			});
 			if (!ledger) {
-				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1, stats: counted });
+				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1, stats: counted, legacy: { idols: legacyIdols } });
 			} else if (!current) {
 				// the first save of an account whose game was reset (a New Game, or a season reset): the timers start now, not at the reset,
 				// so the time since the reset is neither "played" spawn time nor an absence; the bag and gear come from this save
@@ -406,6 +433,7 @@ export const acceptSave = async (
 					combat: null,
 					inv: inventoryFromCore(split.core),
 					stats: counted,
+					legacy: { idols: legacyIdols },
 				});
 			} else if (newRun) {
 				/**
@@ -429,9 +457,10 @@ export const acceptSave = async (
 					combat: null,
 					inv,
 					stats: counted,
+					legacy: { idols: legacyIdols },
 				};
 				await ledgers.commit(userId, ledger.ver, next);
-			} else if ((grants && Object.values(grants).some((amount) => amount > 0)) || !ledger.inv) {
+			} else if ((grants && Object.values(grants).some((amount) => amount > 0)) || !ledger.inv || legacyChanged) {
 				// the save knows what was granted so far; a ledger from before the inventory moved here takes this save's
 				await ledgers.commit(userId, ledger.ver, {
 					...ledger,
@@ -439,6 +468,7 @@ export const acceptSave = async (
 					grantedSeen: ledger.granted,
 					inv: ledger.inv ?? inventoryFromCore(split.core),
 					stats: counted,
+					legacy: { idols: legacyIdols },
 				});
 			} else if (statsDue(ledger.stats, nowMs)) {
 				// nothing else to write: the counters are brought up to date at most every STATS_EVERY_MS

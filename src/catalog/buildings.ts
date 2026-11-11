@@ -1,3 +1,4 @@
+import { IDOLS } from '@/catalog/idols';
 import type { Resources } from '@/types/game';
 
 /** Where the first-pass building art lives: the supplied "Tiny Top-Down Village" pack (80x80), named in the asset library as `building_village_<file>`. */
@@ -7,11 +8,11 @@ const VILLAGE = '/pixel/assets_to_assess_and_use/more_buildings/';
 export interface BuildingDef {
 	id: string;
 	label: string;
-	/** What it is: `producer` (the biome's own materials) or `extractor` (its T3 material); Idols follow (IDL-96). */
-	kind: 'producer' | 'extractor';
+	/** What it is: `producer` (the biome's own materials) `extractor` (its T3 material) or `idol` (a permanent bonus, `catalog/idols.ts`). */
+	kind: 'producer' | 'extractor' | 'idol';
 	/** The one biome whose tiles it can stand on, and whose size it feeds on */
 	biome: string;
-	/** The resources it makes: for a Producer the keys the biome's tiles make (so it multiplies what the land already gives), for an Extractor its one T3 material */
+	/** The resources it makes: for a Producer the keys the biome's tiles make (so it multiplies what the land already gives), for an Extractor its one T3 material, for an Idol nothing */
 	produces: (keyof Resources)[];
 	/** The picture on the map and in the menu */
 	art: string;
@@ -153,6 +154,8 @@ export const BUILDINGS: readonly BuildingDef[] = [
 		art: `${VILLAGE}Mill%20House.png`,
 		blurb: 'Evaporation pans along the shore.',
 	},
+	// the Idols (catalog/idols.ts): one per biome, they make nothing, their level is a bonus
+	...IDOLS.map((i): BuildingDef => ({ id: i.id, label: i.label, kind: 'idol', biome: i.biome, produces: [], art: i.art, blurb: i.blurb })),
 ];
 
 const BY_ID = new Map(BUILDINGS.map((b) => [b.id, b]));

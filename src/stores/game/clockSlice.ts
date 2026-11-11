@@ -13,10 +13,12 @@ import { emitSaveEvent } from '@/lib/saveEvents';
 import { gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { castleLevelOf } from '@/lib/castleWard';
+import { completeUpgrade } from '@/lib/buildings';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { advanceMonsters } from '@/lib/monsters';
 import { planPictureAt } from '@/lib/planPicture';
 import type { Resources } from '@/types/game';
-import { getTile, setTile } from '@/utils/world';
+import { setTile } from '@/utils/world';
 import { findCastle, limitCtx, type GameGet, type GameSet } from './base';
 
 export const createClockSlice = (set: GameSet, get: GameGet) => ({
@@ -33,7 +35,9 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			if (resource === 'xp') return;
 			newResources[resource] = Math.min(newResources[resource] + rate * secondsElapsed, RESOURCE_CAP);
 		});
-		const xpGain = state.resourceRates.total.xp * (1 + xpGainPct(state.characterStats, state.equipment, state.playerClass) / 100);
+		const xpGain =
+			state.resourceRates.total.xp *
+			(1 + (xpGainPct(state.characterStats, state.equipment, state.playerClass) + idolEconomy(state.tiles, state.idolLevels).xpPct) / 100);
 		newResources.xp = Math.min(newResources.xp + xpGain * secondsElapsed, XP_CAP);
 
 		let newTiles = state.tiles;
@@ -69,14 +73,15 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 
 		// Building upgrade timer (the per-biome building system, null unless BUILDINGS_FLAG is on): same rule as the castle's, and the same builder
 		let newBuildingUpgrade = state.buildingUpgrade;
+		let newIdolLevels = state.idolLevels;
 		let buildingFinished = false;
 		if (newBuildingUpgrade) {
 			const remaining = newBuildingUpgrade.remainingSec - secondsElapsed;
 			if (remaining <= 0) {
-				const { x, y, toLevel } = newBuildingUpgrade;
-				const tile = getTile(newTiles, x, y);
-				if (tile?.building) {
-					newTiles = setTile(newTiles, x, y, { ...tile, buildingLevel: toLevel });
+				const done = completeUpgrade(newTiles, state.idolLevels, newBuildingUpgrade);
+				if (done.reached) {
+					newTiles = done.tiles;
+					newIdolLevels = done.idolLevels;
 					newRates = calculateResourceRates(
 						newTiles,
 						state.characterStats,
@@ -99,7 +104,8 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 
 		// HP and mana: the server's numbers arrive with every answer; in between they keep filling the way the server will count them
 		// (in a fight the server's picture is the only one, so HP is left alone and only the cooldowns and the stun run down)
-		const playerMaxHp = maxHp(state.characterStats, state.equipment);
+		// the War Memorial raises the pool the hero refills to (the server's profile has the same number)
+		const playerMaxHp = Math.round(maxHp(state.characterStats, state.equipment) * (1 + idolEconomy(state.tiles, state.idolLevels).hpArmorPct / 100));
 		const inFight = state.combat.fight !== null;
 		// a fight the server ran to its end: the HP of both sides follow its plan (the next answer, at the end, is the truth)
 		const plan = inFight ? state.combat.plan : null;
@@ -162,6 +168,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			tiles: newTiles,
 			castleUpgrade: newCastleUpgrade,
 			buildingUpgrade: newBuildingUpgrade,
+			idolLevels: newIdolLevels,
 			monsters: newMonsters,
 			combat: newCombat,
 			playerHp: newPlayerHp,

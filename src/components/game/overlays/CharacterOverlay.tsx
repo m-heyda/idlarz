@@ -6,11 +6,12 @@ import { COMBAT } from '@/config/combatConfig';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL } from '@/catalog';
 import { MERCHANT_GOODS } from '@/config/merchant';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
-import { armorOf, armorReduction, maxHp } from '@/lib/combat';
+import { armorReduction } from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
 import { describeClassPassives } from '@/lib/classPassives';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
+import { idolEconomy } from '@/lib/idolEconomy';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { formatCompact, formatPct } from '@/utils/formatters';
 import { clearDrag, getDrag, setDrag } from '@/lib/inventoryDrag';
@@ -31,6 +32,9 @@ const CharacterOverlay: React.FC = () => {
 	const prestige = useGameStore((state) => state.prestige);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const playerClass = useGameStore((state) => state.playerClass);
+	const tiles = useGameStore((state) => state.tiles);
+	const idolLevels = useGameStore((state) => state.idolLevels);
+	const idol = idolEconomy(tiles, idolLevels);
 	const requestSkill = useGameStore((state) => state.requestSkill);
 	const skillCd = useGameStore((state) => state.combat.cd);
 	const level = useGameStore((state) => state.level.level);
@@ -65,10 +69,10 @@ const CharacterOverlay: React.FC = () => {
 		/>
 	);
 
-	const armor = armorOf(equipment, characterStats, playerClass);
-	const mitigation = armorReduction(armor) * 100;
 	const gear = aggregateStats(equipment);
-	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass });
+	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol });
+	const armor = fx.armor; // with the War Memorial, like every other number of the window
+	const mitigation = armorReduction(armor) * 100;
 	const passives = describeClassPassives(playerClass);
 	const worn = Object.values(equipment).filter(Boolean).length;
 	const itemLevel = Math.round(averageItemLevel(equipment) * 10) / 10;
@@ -142,7 +146,7 @@ const CharacterOverlay: React.FC = () => {
 					</div>
 					<div className='inv-readout'>
 						<span className='inv-readout-label'>Max HP</span>
-						<span className='inv-readout-value'>{formatCompact(maxHp(characterStats, equipment))}</span>
+						<span className='inv-readout-value'>{formatCompact(fx.maxHp)}</span>
 					</div>
 					<div
 						className='inv-readout'

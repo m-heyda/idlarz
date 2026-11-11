@@ -255,6 +255,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					}
 					queued={queuePos}
 					lineOpen={lineOpen}
+					building={building ? { id: building.id, level: Number(buildingLevel) } : undefined}
 				/>
 			)}
 		</>
