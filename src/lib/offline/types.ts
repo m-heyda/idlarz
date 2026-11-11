@@ -183,6 +183,17 @@ export interface CraftReply {
 	serverNowSec: number;
 }
 
+/**
+ * What `GET /api/auth/me?game=1` adds for a player who is about to enter the game: the bag, the worn gear and the crafting state as the ledger holds them, in the same shape the
+ * online answers use (`Inventory`, `CraftState`), so the first render of the Bag and of its Crafting tab already has them. `inv` is null while the account has no ledger yet (a brand-new account).
+ */
+export interface BootSnapshot {
+	inv: Inventory | null;
+	craft: CraftState;
+	/** The server's clock in seconds, for the crafting queue's progress */
+	serverNowSec: number;
+}
+
 /** What /api/rebirth answers: whether the server ran the rebirth, the Embers it pays, and the inventory the new run starts with (the starter kit). */
 export interface RebirthReply {
 	ok: boolean;
