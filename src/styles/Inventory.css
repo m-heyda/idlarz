@@ -303,6 +303,27 @@
 	white-space: nowrap;
 }
 
+/* the name and badge are one button: it opens the badge and title picker */
+.hero-card-name-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-family: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.hero-card-name-btn:hover,
+.hero-card-name-btn:focus-visible {
+	filter: brightness(1.25);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
 /* hover wrapper of a button with a hover card: a disabled button would swallow the hover */
 .tip-btn-wrap {
 	display: block;

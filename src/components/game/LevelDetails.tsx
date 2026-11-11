@@ -64,13 +64,14 @@ export const LevelBar: React.FC = () => {
 };
 
 /**
- * The hero card of the Character and Statistics windows: the avatar (a click opens the avatar dialog, there is no extra button), the name and class, then the level, the XP bar and the
+ * The hero card of the Character and Statistics windows: the avatar (a click opens the avatar dialog, there is no extra button), the name and badge (a click opens the badge and title picker, which also hides the badge; later customisation such as a name glow goes there too) and the class, then the level, the XP bar and the
  * HP and MP bars (`LevelBar`). It replaced the torch-lit alcove scene with its potion flasks (a first simplification, the card is reworked later).
  */
 const LevelDetails: React.FC = () => {
 	const playerClass = useGameStore((state) => state.playerClass);
 	const playerName = useGameStore((state) => state.playerName);
 	const openAvatarDialog = useUiStore((state) => state.openAvatarDialog);
+	const openBadgeDialog = useUiStore((state) => state.openBadgeDialog);
 	const choice = useUiStore((state) => state.badge);
 	useBadgeChoice();
 	const badge = shownBadge(choice.badgeId, choice.earned);
@@ -84,10 +85,16 @@ const LevelDetails: React.FC = () => {
 					<CharacterPortrait variant='bust' scale={2} />
 				</button>
 				<div className='hero-card-id'>
-					<span className='px-name hero-card-name'>
+					<button
+						type='button'
+						className='px-name hero-card-name hero-card-name-btn'
+						onClick={openBadgeDialog}
+						title='Change badge and title'
+						aria-label='Change badge and title'
+					>
 						{playerName}
 						{badge && <AchievementBadge achievement={badge} size={22} />}
-					</span>
+					</button>
 					{title && <span className='hero-class'>{title}</span>}
 					<span className='hero-class'>
 						{info.race} {info.label}

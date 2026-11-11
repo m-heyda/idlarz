@@ -93,6 +93,10 @@ A rebirth-payout bonus ("a small, capped extra of Embers") was floated in the sa
 - Balance, ownership and prices come from the server answer; the browser never computes them. Short balance shows how many gems are missing. The Buy button is disabled while the request is pending, and a replayed claim id returns the stored answer (a double click buys once).
 - Ledger shape (IDL-189): `ledger.gemShop { bought: { itemId: n }, lastAt: { itemId: sec }, spentTotal }`. A rebirth keeps gems and permanent unlocks and clears run-scoped effects (boosts).
 
+**Window shape today (post-merge tweaks):** the window uses the same rows and header as the other windows, with three tabs: **Identity** (class, name, respec), **Upgrades** (leveled upgrades: "Level x of y" and the next price) and **One-time** (bought once and kept: cosmetics, unlocks). Upgrades and One-time show a "coming soon" note until they hold an item. An item's `kind` (`service`, `leveled`, `once`) in `config/gemShop.ts` decides how its row reads.
+
+**Hero customisation (IDL-296, next):** clicking the hero's name or badge in the Character window opens the badge and title picker (badge on or off already works). It grows into a "Customise hero" window: nickname glow, name colour, frames; free ones come from achievements, premium ones are One-time gem purchases. Cosmetic only, stored on the profile, shown in the game, the rankings and the landing.
+
 ## 6. Gear sink: affix re-roll
 
 Re-roll **one** affix of a bagged or worn piece. The server rolls it with a sealed seed (`HMAC(LOOT_SECRET, user / run / 'reroll' / ordinal)`, [saves and server](../reference/saves-and-server.md)), idempotent by claim id. The result is final (no undo; a gem sink must not be a free retry). At most 3 re-rolls per item, never the fixed effect of a legendary, and the new value stays inside the perk family caps of [loot](../reference/loot.md) / IDL-149. It ships on the crafting hooks (IDL-117), so it follows crafting v0. **Gem sockets** remain parked; if they ever return, the socketed stone needs another name than "gem".

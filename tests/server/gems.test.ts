@@ -9,6 +9,7 @@ import { MIN_SAVE_INTERVAL_MS, acceptSave, type SaveRepo, type StoredSave, type 
 import type { ServiceDeps } from '../../src/lib/offline/service';
 import { characterStep, gemsStep, type Online } from '../../src/lib/offline/online';
 import { runGems } from '../../src/lib/offline/gemsFlow';
+import { parseGemsBody } from '../../src/lib/offline/gemsParse';
 import type { IdentityInfo, IdentityRepo } from '../../src/lib/offline/identity';
 import type { CharacterReply, GemsReply, GemsRequest, PendingIdentity } from '../../src/lib/offline/gemTypes';
 import { dailyInfo, serverDay } from '../../src/lib/offline/gems';
@@ -308,4 +309,14 @@ test('an upload meets the ledger: its allocation is replaced, a stale gem balanc
 	assert.equal(bad.kind, 'ok');
 	if (bad.kind === 'ok') assert.ok(bad.flags.includes('gems_increase'));
 	void store;
+});
+
+test('the route reads a claim: it needs the key and an id, and never lets a claim fall through as a bad body', () => {
+	const key = 'claim-key-000001';
+	assert.deepEqual(parseGemsBody({ action: 'claim', key, id: 'first_blood' }), { key, request: { action: 'claim', id: 'first_blood' } });
+	assert.equal(parseGemsBody({ action: 'claim', id: 'first_blood' }), null, 'no key');
+	assert.equal(parseGemsBody({ action: 'claim', key }), null, 'no id');
+	assert.equal(parseGemsBody({ action: 'claim', key, id: '' }), null, 'empty id');
+	assert.equal(parseGemsBody({ action: 'claim', key, id: 'x'.repeat(61) }), null, 'id too long');
+	assert.deepEqual(parseGemsBody({ action: 'status' }), { key: null, request: { action: 'status' } });
 });

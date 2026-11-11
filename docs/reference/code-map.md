@@ -203,7 +203,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
-- [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ The away-time bar (IDL-64):
+- [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ 1 until it has run, then counts down to 0; stays at 0 for a player who asked for reduced motion.
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
 - [`BetaTesterBadge.tsx`](../../src/components/game/BetaTesterBadge.tsx) — ~ Who wears the tester medal:
@@ -275,7 +275,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Animals drawn for a count:
 - [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ How long the drawer takes to slide shut (a little over the transition in Farm.css)
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
-- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The gem sinks that are planned but not built (the "Coming soon" tab):
+- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The tabs, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on).
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
 - [`LoadingScreen.tsx`](../../src/components/game/overlays/LoadingScreen.tsx) — ~ The splash while the saved game loads (needs the game store; the start gate uses LoadingView, which does not).
 - [`LoadingView.tsx`](../../src/components/game/overlays/LoadingView.tsx) — ~ Hydration splash:
@@ -428,6 +428,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`floatText.ts`](../../src/lib/floatText.ts) — Tiny event bus for the "+N resource" popups that appear at the cursor.
 - [`gearEconomy.ts`](../../src/lib/gearEconomy.ts) — ~ The economy effects of the worn gear (the set bonuses of catalog/sets.ts).
 - [`globalMenu.ts`](../../src/lib/globalMenu.ts) — ~ Saves to this browser and, with an account signed in, to the cloud copy too (once every 10 minutes:
+- [`idempotencyKey.ts`](../../src/lib/idempotencyKey.ts) — An idempotency key:
 - [`idolEconomy.ts`](../../src/lib/idolEconomy.ts) — ~ What the standing Idols add to the economy:
 - [`inventory.ts`](../../src/lib/inventory.ts) — ~ What a character carries after a rebirth:
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
@@ -478,6 +479,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gemTypes.ts`](../../src/lib/offline/gemTypes.ts) — ~ An identity change the server has charged for and still has to write on the profile row (`ledger.gemShop.pending`):
 - [`gems.ts`](../../src/lib/offline/gems.ts) — ~ The server day (UTC), 1-based so that 0 can mean "never".
 - [`gemsFlow.ts`](../../src/lib/offline/gemsFlow.ts) — ~ One request to the gem shop, start to finish.
+- [`gemsParse.ts`](../../src/lib/offline/gemsParse.ts) — ~ The body of `POST /api/gems` as a typed request, or null when it is not one (the route answers 400).
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
 - [`identity.ts`](../../src/lib/offline/identity.ts) — ~ Epoch seconds of the last paid name change; null = never changed
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
@@ -508,7 +510,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineBar.ts`](../../src/lib/offlineBar.ts) — The away-time bar (IDL-64):
 - [`offlineClient.ts`](../../src/lib/offlineClient.ts) — ~ The browser side of /api/offline.
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
-- [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ An idempotency key:
+- [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ The shared shell of the signed-in game routes (/api/spawn, /api/chest, /api/kill):
 - [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
 - [`playRoute.ts`](../../src/lib/playRoute.ts) — The route of the game itself (the gate in front of it, then the game).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
@@ -796,7 +798,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pacingGuard.test.ts`](../../tests/economy/pacingGuard.test.ts)
 - [`rebirth.test.ts`](../../tests/economy/rebirth.test.ts) — ~ A run that has reached the rebirth line.
 - [`rebirthBiomes.test.ts`](../../tests/economy/rebirthBiomes.test.ts)
-- [`startPlan.test.ts`](../../tests/economy/startPlan.test.ts)
+- [`startPlan.test.ts`](../../tests/economy/startPlan.test.ts) — ~ The account's save of the game that `localSave` just built (same level and tiles), at `playSeconds`.
 - [`unbounded.test.ts`](../../tests/economy/unbounded.test.ts)
 
 **tests/**
