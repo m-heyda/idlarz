@@ -20,16 +20,19 @@ Desktop only (1240 px and wider); the boards have no mobile layout.
 
 ## UI kit sheets (art reference for building the interfaces)
 
-Two sprite sheets kept next to the boards so the interfaces can be built from the same parts. They are reference sheets, not wired assets: cut what is needed in Sprite Fusion (CLAUDE.md), and register it in `public/pixel/` when it is used.
+Three sprite sheets kept next to the boards so the interfaces can be built from the same parts. They are reference sheets, not wired assets: cut what is needed in Sprite Fusion (CLAUDE.md), and register it in `public/pixel/` when it is used.
 
 | Sheet | Holds |
 | --- | --- |
 | [ui-kit-sheet-frames-bars.webp](design/ui-kit-sheet-frames-bars.webp) | window frames (stone panel, gold trim), title and plaque bars, buttons in gold/wood/stone/dark, slot frames, parchment and scroll, gold dividers and corner pieces, rivets and studs, shield and banner emblems |
 | [ui-kit-sheet-textures-ornaments.jpg](design/ui-kit-sheet-textures-ornaments.jpg) | tileable wood, dark stone brick and parchment textures, gold and bronze frame edges and corners, Celtic and flourish ornaments, studs, rounded wood slot tiles |
 
+| [ui-kit-sheet-portrait-frames-badges.webp](design/ui-kit-sheet-portrait-frames-badges.webp) | square and round portrait/avatar frames (stone, wood, gold, gem-set, rarity colours), item slot frames (plain, rarity-coloured, avatar, locked), plaques and bars, scroll, divider rules and chains, shields, banners, coins and medals, crown and skull emblems, gems |
 ![UI kit: frames and bars](design/ui-kit-sheet-frames-bars.webp)
 
 ![UI kit: textures and ornaments](design/ui-kit-sheet-textures-ornaments.jpg)
+
+![UI kit: portrait frames, slots and badges](design/ui-kit-sheet-portrait-frames-badges.webp)
 
 ## Tickets
 
