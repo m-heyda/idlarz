@@ -541,6 +541,18 @@ export const buildManifest = (): AssetEntry[] => {
 		usedBy: ['tutorial:guide'],
 		source: 'scripts/guide-sprite.ts',
 	});
+	// The blacksmith beside the Crafting tab of the Hero window (supplied art, background cut out and mirrored to face right)
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'crafting')))
+		if (f.endsWith('.png'))
+			add({
+				name: `crafting_${snake(basename(f))}`,
+				category: 'ui',
+				subcategory: 'crafting',
+				src: url(f),
+				status: 'used',
+				usedBy: ['hero:crafting-tab'],
+				source: 'new_assets/crafting',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'idols')))
 		if (f.endsWith('.png'))
 			add({

@@ -36,7 +36,7 @@ import { LevelUpTimer } from '../LevelUpTimer';
 import GameWindow from '../GameWindow';
 import { activateBagSlot, dropOnBagSlot, dropOnEquipment, openBagMenu, shiftSellBagSlot, takeOffSlot } from './bagActions';
 import { GameItemTip } from './GameItemTip';
-import HeroCrafting from './HeroCrafting';
+import HeroCrafting, { CraftingSidebar } from './HeroCrafting';
 import HeroStats from './HeroStats';
 
 /** A bag slot as the design system draws it: the picture, the rarity glow and the stack count of the item in it. */
@@ -461,8 +461,8 @@ const HeroWindow: React.FC = () => {
 				/>
 			}
 		>
-			<div className='ds-hero'>
-				<HeroLeft />
+			<div className='ds-hero' data-tab={tab}>
+				{tab === 'craft' ? <CraftingSidebar /> : <HeroLeft />}
 				<Panel className='ds-hero-right'>{tab === 'bag' ? <BagTab /> : tab === 'stats' ? <HeroStats /> : <HeroCrafting />}</Panel>
 			</div>
 		</GameWindow>

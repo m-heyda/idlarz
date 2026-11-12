@@ -3845,3 +3845,86 @@ button.ds-income-head:hover {
 	background: #0b0d14;
 	border: 1px solid #3a2c1c;
 }
+
+/* ===== Crafting tab: a narrower sidebar with the level, the queue and the blacksmith ===== */
+.ds-hero[data-tab='craft'] {
+	grid-template-columns: minmax(250px, 280px) 1fr;
+}
+
+.ds-hero > .ds-craft-side {
+	align-self: stretch;
+	overflow: hidden;
+}
+
+.ds-craft-level {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 8px 10px;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--ds-line-dk);
+}
+
+.ds-craft-level-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 8px;
+	white-space: nowrap;
+}
+
+.ds-craft-smith {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+}
+
+.ds-craft-smith img {
+	display: block;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	image-rendering: pixelated;
+}
+
+/* the queue in the narrow sidebar: two lines per batch */
+.ds-queue[data-stacked='true'] .ds-queue-head .ds-btn {
+	width: 100%;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-head {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 4px;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-row {
+	grid-template-columns: 18px 1fr 52px 70px;
+	grid-template-areas:
+		'icon name cancel collect'
+		'bar bar bar bar';
+	row-gap: 3px;
+	padding-bottom: 4px;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-icon {
+	grid-area: icon;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-name {
+	grid-area: name;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-bar {
+	grid-area: bar;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-row > .ds-btn:nth-of-type(1) {
+	grid-area: cancel;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-row > .ds-btn:nth-of-type(2) {
+	grid-area: collect;
+}

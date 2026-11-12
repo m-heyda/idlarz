@@ -20602,6 +20602,21 @@
 		]
 	},
 	{
+		"usedBy": [
+			"hero:crafting-tab"
+		],
+		"name": "crafting_blacksmith",
+		"category": "ui",
+		"subcategory": "crafting",
+		"src": "/pixel/new_assets/crafting/blacksmith.png",
+		"status": "used",
+		"source": "new_assets/crafting",
+		"size": [
+			142,
+			242
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "fx_dead",
 		"category": "ui",

@@ -265,6 +265,7 @@ const Queue: React.FC = () => {
 			onCollect={(id) => act(() => claim(Number(id)))}
 			onCancel={(id) => act(() => cancel(Number(id)))}
 			onCollectAll={() => act(() => claim('all'))}
+			stacked
 		/>
 	);
 };
@@ -285,7 +286,43 @@ const groupsOf = (recipes: Recipe[]): { label: string; recipes: Recipe[] }[] => 
 const KINDS = (Object.keys(KIND_LABELS) as RecipeKind[]).filter((kind) => RECIPES.some((r) => r.kind === kind));
 
 /**
- * The Crafting tab of the Hero window: the crafting level bar, the queue (Collect all lights up when something finished), the recipe list in folding groups (a locked recipe is dimmed, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
+ * The left column of the Crafting tab: the crafting level and its XP bar on top, the queue under it (Collect all lights up when something finished), and the blacksmith filling the rest. It stands in for the hero card on this tab, so the recipes
+ * and the ticket get the room.
+ */
+export const CraftingSidebar: React.FC = () => {
+	const craft = useCraftStore((state) => state.craft);
+	const refresh = useCraftStore((state) => state.refresh);
+	useEffect(() => void refresh(), [refresh]);
+	const { level, progress } = craftLevelOf(craft?.xp ?? 0);
+	const next = craftXpToNext(level);
+	return (
+		<Panel className='ds-hero-left ds-craft-side'>
+			<div className='ds-craft-level'>
+				<div className='ds-craft-level-line'>
+					<span className='ds-gold-text'>Crafting level {level}</span>
+					<span className='ds-dim' style={{ fontSize: 12 }}>
+						{Number.isFinite(next) ? `${formatInt(Math.floor(next * progress))} / ${formatInt(next)} XP` : 'MAX'}
+					</span>
+				</div>
+				<XpBar
+					level={level}
+					value={Number.isFinite(next) ? Math.floor(next * progress) : 1}
+					max={Number.isFinite(next) ? next : 1}
+					label={`${Math.floor(progress * 100)}%`}
+					compact
+				/>
+			</div>
+			<Queue />
+			<div className='ds-craft-smith'>
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img src='/pixel/new_assets/crafting/blacksmith.png' alt='' draggable={false} />
+			</div>
+		</Panel>
+	);
+};
+
+/**
+ * The Crafting tab of the Hero window (the right side; the level and the queue are in `CraftingSidebar`): the crafting level bar, the queue (Collect all lights up when something finished), the recipe list in folding groups (a locked recipe is dimmed, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
  * Everything the old Crafting window did: amount by slider or typed text, cost colours, XP and time, gear odds, queue slots, Collect, Cancel.
  */
 const HeroCrafting: React.FC = () => {
@@ -296,8 +333,7 @@ const HeroCrafting: React.FC = () => {
 	const [closed, setClosed] = useState<ReadonlySet<RecipeKind>>(new Set());
 	useEffect(() => void refresh(), [refresh]);
 
-	const { level, progress } = craftLevelOf(craft?.xp ?? 0);
-	const next = craftXpToNext(level);
+	const { level } = craftLevelOf(craft?.xp ?? 0);
 	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
 	const selected = RECIPES.find((r) => r.id === selectedId) ?? RECIPES.find((r) => r.unlock <= level) ?? RECIPES[0];
 	const toggleKind = (kind: RecipeKind) =>
@@ -310,20 +346,6 @@ const HeroCrafting: React.FC = () => {
 
 	return (
 		<div className='ds-craft'>
-			<div className='ds-craft-top'>
-				<span className='ds-gold-text'>Crafting level {level}</span>
-				<XpBar
-					level={level}
-					value={Number.isFinite(next) ? Math.floor(next * progress) : 1}
-					max={Number.isFinite(next) ? next : 1}
-					label={`${Math.floor(progress * 100)}%`}
-					compact
-				/>
-				<span className='ds-dim' style={{ fontSize: 12 }}>
-					{Number.isFinite(next) ? `${formatInt(Math.floor(next * progress))} / ${formatInt(next)} XP` : 'MAX'}
-				</span>
-			</div>
-			<Queue />
 			<div className='ds-craft-body'>
 				<Inset className='ds-craft-list'>
 					{KINDS.map((kind) => {

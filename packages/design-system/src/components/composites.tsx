@@ -426,19 +426,21 @@ export const CraftQueue: React.FC<{
 	onCancel?: (id: string | number) => void;
 	onCollectAll?: () => void;
 	labels?: { queue?: string; idle?: string; collectAll?: string; cancel?: string; collect?: string };
-}> = ({ entries, slots, onCollect, onCancel, onCollectAll, labels }) => {
+	/** A narrow sidebar: each batch takes two lines (icon, name and buttons, then the progress bar) and Collect all spans the width */
+	stacked?: boolean;
+}> = ({ entries, slots, onCollect, onCancel, onCollectAll, labels, stacked }) => {
 	const L = { queue: 'Queue', idle: 'idle', collectAll: 'Collect all', cancel: 'Cancel', collect: 'Collect', ...labels };
 	const ready = entries.reduce((n, e) => n + (e.done >= 1 ? 1 : 0), 0);
 	if (entries.length === 0)
 		return (
-			<div className='ds-queue' data-ready='false'>
+			<div className='ds-queue' data-ready='false' data-stacked={stacked ? 'true' : undefined}>
 				<span className='ds-dim' style={{ fontSize: 12 }}>
 					{L.queue} 0 / {slots} · {L.idle}
 				</span>
 			</div>
 		);
 	return (
-		<div className='ds-queue' data-ready={ready > 0}>
+		<div className='ds-queue' data-ready={ready > 0} data-stacked={stacked ? 'true' : undefined}>
 			<div className='ds-queue-head'>
 				<span className='ds-dim' style={{ fontSize: 12 }}>
 					{L.queue} {entries.length} / {slots}
