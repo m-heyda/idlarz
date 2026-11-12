@@ -44,15 +44,15 @@
 	pointer-events: none;
 }
 
-/* two columns the full height of the screen, the picture (and its logo) between them */
+/* two columns in the middle of the screen, under the logo of the picture, down to the bottom */
 .ld-layout {
 	position: relative;
 	z-index: 1;
 	display: flex;
-	justify-content: space-between;
-	gap: 24px;
+	justify-content: center;
+	gap: 36px;
 	height: 100%;
-	padding: 28px 32px 56px;
+	padding: clamp(190px, 24vh, 300px) 32px 58px; /* the logo of the picture stays free above the frames */
 }
 
 .ld-col {
@@ -62,12 +62,12 @@
 }
 
 .ld-col-log {
-	width: min(470px, 34vw);
+	width: min(620px, 42vw);
 	min-width: 340px;
 }
 
 .ld-col-account {
-	width: min(370px, 27vw);
+	width: min(430px, 29vw);
 	min-width: 320px;
 }
 

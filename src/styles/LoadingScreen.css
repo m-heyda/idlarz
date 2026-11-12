@@ -36,7 +36,7 @@
 /* rings turn inside the filter, so the pixels re-form every frame */
 .rune-ring {
 	transform-box: view-box;
-	transform-origin: 50% 50%;
+	transform-origin: 200px 200px; /* the centre of the rings (they are drawn at 400 units and scaled by 0.8 inside a 320 grid) */
 }
 
 .rune-a {

@@ -62,7 +62,7 @@ const LoadingView: React.FC = () => {
 			<div className='fog-layer fog-b' />
 
 			<div className='loading-stage'>
-				<svg className='loading-runes' viewBox='0 0 400 400' width='320' height='320' aria-hidden>
+				<svg className='loading-runes' viewBox='0 0 320 320' width='320' height='320' aria-hidden>
 					<defs>
 						{/* one-sample-per-6px tile + dilate = a 6px pixel grid over whatever it filters */}
 						<filter id='px-block' x='0' y='0' width='320' height='320' filterUnits='userSpaceOnUse'>
@@ -79,18 +79,20 @@ const LoadingView: React.FC = () => {
 						</radialGradient>
 					</defs>
 					<g filter='url(#px-block)'>
-						<circle cx='200' cy='200' r='196' fill='url(#loading-glow)' />
-						<g className='rune-ring rune-a'>
-							<circle cx='200' cy='200' r='176' fill='none' stroke='#f0d27a' strokeWidth='7' strokeDasharray='3 11 40 11' />
-							<circle cx='200' cy='200' r='154' fill='none' stroke='#a070f0' strokeWidth='6' strokeDasharray='70 16 8 16' />
-							{TICKS.map((deg) => (
-								<rect key={deg} x='196' y='6' width='8' height='14' fill='#ffe27a' transform={`rotate(${deg} 200 200)`} />
-							))}
-						</g>
-						<g className='rune-ring rune-b'>
-							<circle cx='200' cy='200' r='124' fill='none' stroke='#f0d27a' strokeWidth='5' strokeDasharray='12 9' />
-							<polygon points='200,86 299,257 101,257' fill='none' stroke='#b890ff' strokeWidth='5' />
-							<polygon points='200,314 101,143 299,143' fill='none' stroke='#b890ff' strokeWidth='5' />
+						<g transform='scale(0.8)'>
+							<circle cx='200' cy='200' r='196' fill='url(#loading-glow)' />
+							<g className='rune-ring rune-a'>
+								<circle cx='200' cy='200' r='176' fill='none' stroke='#f0d27a' strokeWidth='7' strokeDasharray='3 11 40 11' />
+								<circle cx='200' cy='200' r='154' fill='none' stroke='#a070f0' strokeWidth='6' strokeDasharray='70 16 8 16' />
+								{TICKS.map((deg) => (
+									<rect key={deg} x='196' y='6' width='8' height='14' fill='#ffe27a' transform={`rotate(${deg} 200 200)`} />
+								))}
+							</g>
+							<g className='rune-ring rune-b'>
+								<circle cx='200' cy='200' r='124' fill='none' stroke='#f0d27a' strokeWidth='5' strokeDasharray='12 9' />
+								<polygon points='200,86 299,257 101,257' fill='none' stroke='#b890ff' strokeWidth='5' />
+								<polygon points='200,314 101,143 299,143' fill='none' stroke='#b890ff' strokeWidth='5' />
+							</g>
 						</g>
 					</g>
 				</svg>
