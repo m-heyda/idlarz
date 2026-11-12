@@ -214,7 +214,8 @@ export const TUTORIAL_PATH: readonly PathStep[] = [
 		id: 'stat-point',
 		title: 'Spend a stat point',
 		focus: 'soft',
-		target: (f) => (isOpen(f, 'character') ? 'stat-add' : isOpen(f, 'equipment') ? 'hero-stats-tab' : 'tab-equipment'),
+		// the Stats tab of the Hero window carries the 'stat-add' anchor until it is open; then the first + button does
+		target: (f) => (isOpen(f, 'equipment') ? 'stat-add' : 'tab-equipment'),
 		text: () => 'Every level gives attribute points. Open your Hero window, then its Stats tab, and spend one.',
 		ready: (f) => f.unspentPoints > 0 || f.pointsSpent > 0,
 		done: (f) => f.pointsSpent >= 1,

@@ -24,12 +24,12 @@ test('several windows can be open at once, the last opened is in front', () => {
 test('clicking a window brings it to the front, and opening an open one does the same', () => {
 	closeAll();
 	win().openWindow('equipment');
-	win().openWindow('character');
+	win().openWindow('crafting');
 	win().openWindow('merchant');
 	win().focusWindow('equipment');
-	assert.deepEqual(win().order, ['character', 'merchant', 'equipment']);
-	win().openWindow('character');
-	assert.deepEqual(win().order, ['merchant', 'equipment', 'character']);
+	assert.deepEqual(win().order, ['crafting', 'merchant', 'equipment']);
+	win().openWindow('crafting');
+	assert.deepEqual(win().order, ['merchant', 'equipment', 'crafting']);
 	win().focusWindow('farm'); // a closed window is not opened by a click
 	assert.equal(win().order.includes('farm'), false);
 	closeAll();

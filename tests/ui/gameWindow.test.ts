@@ -58,3 +58,29 @@ test('the Hero window draws the new bag with the hero card, gear, skills, footer
 	assert.match(out, /ds-baggrid/);
 	assert.match(out, /ds-hero-left/);
 });
+
+test('the Stats tab keeps every figure of the old Character window: attributes, overview, combat, bonuses, income and the rebirth history', async () => {
+	const { default: HeroStats } = await import('../../src/components/game/hero/HeroStats');
+	reset();
+	const out = renderToStaticMarkup(h(HeroStats));
+	for (const word of [
+		'Strength',
+		'Dexterity',
+		'Intelligence',
+		'Vitality',
+		'Charisma',
+		'Overview',
+		'Combat',
+		'Bonuses',
+		'Resource income',
+		'Where the income comes from',
+		'Rebirths',
+	]) {
+		assert.ok(out.includes(word), `the tab shows "${word}"`);
+	}
+	for (const line of ['Crit chance', 'Super crit damage', 'Life leech', 'Luck', 'Gold find', 'Offline progress', 'Per second', 'Crafting level']) {
+		assert.ok(out.includes(line), `the tab lists "${line}"`);
+	}
+	assert.match(out, /Respec/, 'at 0 points the corner holds the red Respec button');
+	assert.match(out, /data-tutorial="stat-add"/, 'the guide can point at the first + button');
+});

@@ -37,6 +37,7 @@ import { LevelUpTimer } from '../LevelUpTimer';
 import GameWindow from '../GameWindow';
 import { activateBagSlot, dropOnBagSlot, dropOnEquipment, openBagMenu, shiftSellBagSlot, takeOffSlot } from './bagActions';
 import { GameItemTip } from './GameItemTip';
+import HeroStats from './HeroStats';
 
 /** A bag slot as the design system draws it: the picture, the rarity glow and the stack count of the item in it. */
 const slotLook = (slot: BagSlot | ItemInstance | null | undefined, instance?: ItemInstance | null) => {
@@ -468,7 +469,7 @@ const HeroWindow: React.FC = () => {
 					onChange={(id) => setTab(id as HeroTab)}
 					items={[
 						{ id: 'bag', label: 'Bag' },
-						{ id: 'stats', label: 'Stats', badge: points > 0 ? points : undefined, anchor: 'hero-stats-tab' },
+						{ id: 'stats', label: 'Stats', badge: points > 0 ? points : undefined, anchor: tab === 'stats' ? undefined : 'stat-add' },
 						{ id: 'craft', label: 'Crafting' },
 					]}
 				/>
@@ -480,11 +481,7 @@ const HeroWindow: React.FC = () => {
 					{tab === 'bag' ? (
 						<BagTab />
 					) : tab === 'stats' ? (
-						<ComingTab
-							text='Attributes, combat numbers, income and rebirths still live in the Character window while they are rebuilt here.'
-							action='Open the Character window'
-							onOpen={() => openWindow('character')}
-						/>
+						<HeroStats />
 					) : (
 						<ComingTab
 							text='Recipes and the crafting queue still live in the Crafting window while they are rebuilt here.'

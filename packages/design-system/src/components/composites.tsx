@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Frame } from './primitives';
+import { Button, Frame, HoverTip } from './primitives';
 import { compact, parseAmountText } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -561,5 +561,129 @@ export const ComingSoon: React.FC<{ title: string; text: string; icon?: string; 
 		<div className='ds-soon-title'>{title}</div>
 		<span className='ds-soon-tag'>{tag}</span>
 		<p>{text}</p>
+	</div>
+);
+
+/** The ink colours of values on the paper ledger (dark enough to read on parchment). */
+export const PAPER_INK = { green: '#17561f', gold: '#6a3f00', blue: '#1a3f92', purple: '#4d2490', red: '#8a2018', plain: '#2b1d0e', muted: '#8a7a5a' } as const;
+
+export interface PaperRowData {
+	label: React.ReactNode;
+	value: React.ReactNode;
+	/** Ink colour of the value (see `PAPER_INK`) */
+	color?: string;
+	/** A hover card with the details behind the number */
+	tip?: React.ReactNode;
+	/** The small print inside a breakdown: indented and lighter */
+	muted?: boolean;
+}
+/** Ruled "label ........ value" lines of the paper ledger; a row with `tip` shows its card on hover. */
+export const PaperRows: React.FC<{ rows: PaperRowData[] }> = ({ rows }) => (
+	<>
+		{rows.map((r, i) => {
+			const row = (
+				<div className='ds-paper-row' data-muted={r.muted ? 'true' : undefined}>
+					<span>{r.label}</span>
+					<b style={r.color ? { color: r.color } : undefined}>{r.value}</b>
+				</div>
+			);
+			return r.tip ? (
+				<HoverTip key={i} fill interactive closeDelayMs={100} tip={r.tip}>
+					{row}
+				</HoverTip>
+			) : (
+				<React.Fragment key={i}>{row}</React.Fragment>
+			);
+		})}
+	</>
+);
+
+/**
+ * A titled block of the paper ledger whose header folds it open and shut. Controlled: the caller keeps (and may remember) `open`. `compact` is the small row style for a block inside a block; `summary` stays visible when it is folded.
+ */
+export const PaperSection: React.FC<{
+	title: React.ReactNode;
+	open: boolean;
+	onToggle: () => void;
+	summary?: React.ReactNode;
+	compact?: boolean;
+	children: React.ReactNode;
+}> = ({ title, open, onToggle, summary, compact, children }) => (
+	<section className={cx('ds-psec', compact && 'ds-psec-compact')} data-open={open}>
+		<button type='button' className='ds-psec-head' aria-expanded={open} onClick={onToggle}>
+			<span className='ds-psec-title'>{title}</span>
+			{summary !== undefined ? <span className='ds-psec-summary'>{summary}</span> : null}
+			<i className='ds-psec-caret' aria-hidden />
+		</button>
+		{open ? <div className='ds-psec-body'>{children}</div> : null}
+	</section>
+);
+
+export interface AttributeCard {
+	id: string;
+	label: string;
+	value: React.ReactNode;
+	color?: string;
+	/** The details behind the attribute, shown on hover over its number */
+	tip?: React.ReactNode;
+	/** A tutorial anchor for the + button */
+	anchor?: string;
+}
+/**
+ * The attribute strip that stays in place above the scrolling ledger: a card per attribute (number with a hover card, a + button that spends a point), and in the corner the points to spend; at 0 points the corner turns into a red
+ * Respec button (`onRespec`).
+ */
+export const AttributeStrip: React.FC<{
+	attrs: AttributeCard[];
+	points: number;
+	onAdd: (id: string) => void;
+	onRespec?: () => void;
+	respecTitle?: string;
+	heading?: string;
+}> = ({ attrs, points, onAdd, onRespec, respecTitle, heading = 'Attributes' }) => (
+	<div className='ds-attrstrip'>
+		<div className='ds-paper-head'>
+			<div className='ds-capi' style={{ flex: 1 }}>
+				{heading}
+			</div>
+			{points > 0 ? (
+				<span className='ds-pill' title='Unspent attribute points: spend them with the + buttons'>
+					{points} {points === 1 ? 'point' : 'points'} to spend
+				</span>
+			) : (
+				<Button tone='danger' size='sm' title={respecTitle} onClick={onRespec}>
+					Respec
+				</Button>
+			)}
+		</div>
+		<div className='ds-attrs'>
+			{attrs.map((a) => {
+				const text = (
+					<span className='ds-attr-text'>
+						<small>{a.label}</small>
+						<b style={a.color ? { color: a.color } : undefined}>{a.value}</b>
+					</span>
+				);
+				return (
+					<div className='ds-attr' key={a.id}>
+						{a.tip ? (
+							<HoverTip fill interactive closeDelayMs={100} tip={a.tip}>
+								{text}
+							</HoverTip>
+						) : (
+							text
+						)}
+						<button
+							type='button'
+							className='ds-plus'
+							aria-label={`Add point to ${a.label}`}
+							data-tutorial={a.anchor}
+							disabled={points < 1}
+							onClick={() => onAdd(a.id)}
+						/>
+					</div>
+				);
+			})}
+		</div>
 	</div>
 );

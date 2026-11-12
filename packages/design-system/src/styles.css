@@ -3610,3 +3610,160 @@
 	width: 62%;
 	height: 62%;
 }
+
+/* ===== Stats tab of the Hero window: the attribute strip stays, the ledger scrolls, sections fold ===== */
+.ds-stats {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.ds-attrstrip {
+	flex: none;
+	padding-bottom: 6px;
+	border-bottom: 2px solid #a9894f;
+}
+
+.ds-attrstrip .ds-attrs {
+	margin: 8px 0 4px;
+}
+
+.ds-stats-scroll {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 8px 4px 4px 0;
+}
+
+.ds-attr .ds-hovertip {
+	flex: 1;
+	min-width: 0;
+}
+
+.ds-psec {
+	margin-bottom: 12px;
+}
+
+.ds-psec-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 0 0 3px;
+	font: inherit;
+	font-size: 13px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #6a3f00;
+	text-align: left;
+	background: none;
+	border: 0;
+	border-bottom: 2px solid #a9894f;
+	cursor: pointer;
+}
+
+.ds-psec-title {
+	flex: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ds-psec-summary {
+	font-size: 13px;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.ds-psec-caret {
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 6px solid currentColor;
+	transition: transform 0.12s;
+}
+
+.ds-psec[data-open='false'] .ds-psec-caret {
+	transform: rotate(-90deg);
+}
+
+.ds-psec-body {
+	padding-top: 4px;
+}
+
+.ds-psec-compact {
+	margin: 2px 0 0;
+}
+
+.ds-psec-compact .ds-psec-head {
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	text-transform: none;
+	border-bottom: 1px solid #c8ad74;
+	padding: 2px 0;
+}
+
+.ds-paper-row[data-muted='true'] {
+	padding-left: 18px;
+	color: #8a7a5a;
+	height: 20px;
+}
+
+.ds-paper-cols-flow {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0 26px;
+	align-items: start;
+}
+
+.ds-income-table {
+	display: grid;
+	grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+	gap: 2px 12px;
+	font-size: 13px;
+	max-width: 640px;
+}
+
+.ds-income-table > span {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.ds-income-table > .ds-income-name {
+	text-align: left;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: #5a4326;
+}
+
+.ds-income-table img {
+	width: 16px;
+	height: 16px;
+	image-rendering: pixelated;
+}
+
+.ds-income-table > .ds-income-head {
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #8a7a5a;
+	border-bottom: 1px solid #c8ad74;
+	padding-bottom: 2px;
+}
+
+.ds-paper-note {
+	margin: 4px 0 8px;
+	font-size: 12px;
+	color: #6a4b24;
+}
+
+@container ds-win (max-width: 900px) {
+	.ds-paper-cols-flow {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
