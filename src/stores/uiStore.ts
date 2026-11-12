@@ -84,11 +84,16 @@ interface ChestNotice {
 	id: number;
 	loot: ChestNoticeLoot;
 }
+/** How a notice looks: `info` (gold frame, the default) or `error` (red frame). */
+export type ToastTone = 'info' | 'error';
+
 interface ToastMessage {
 	id: number;
 	text: string;
 	/** The same message repeated in a row (a rapid sale) is one line with a counter */
 	count: number;
+	/** `error` draws the notice with a red frame (a refused purchase, "not enough gems") */
+	tone: ToastTone;
 }
 
 function schedule(id: number, ms: number, remove: () => void) {
@@ -163,7 +168,8 @@ interface UiState {
 	flashCluster: (world: World, x: number, y: number) => void;
 	/** Short messages, stacked under the header (a new one never replaces one still showing) */
 	toasts: ToastMessage[];
-	showToast: (text: string) => void;
+	/** A short notice at the top of the screen (`tone` `error` draws a red frame). Call it through `notify` in `lib/notices.ts`, which says when to use it. */
+	showToast: (text: string, tone?: ToastTone) => void;
 	dismissToast: (id: number) => void;
 	/** Chest rewards, stacked: opening chests quickly queues one notice per chest */
 	chestNotices: ChestNotice[];
@@ -256,16 +262,16 @@ export const useUiStore = create<UiState>((set, get) => ({
 		flashTimer = setTimeout(() => set({ highlight: null }), HIGHLIGHT_MS);
 	},
 	toasts: [],
-	showToast: (text) => {
+	showToast: (text, tone = 'info') => {
 		const last = get().toasts[get().toasts.length - 1];
-		if (last && last.text === text) {
+		if (last && last.text === text && last.tone === tone) {
 			// the same message again: one line with a counter, its time restarted
 			set((state) => ({ toasts: state.toasts.map((t) => (t.id === last.id ? { ...t, count: t.count + 1 } : t)) }));
 			schedule(last.id, TOAST_MS, () => get().dismissToast(last.id));
 			return;
 		}
 		const id = ++toastId;
-		const next = [...get().toasts, { id, text, count: 1 }];
+		const next = [...get().toasts, { id, text, count: 1, tone }];
 		const dropped = next.splice(0, Math.max(0, next.length - MAX_NOTICES));
 		dropped.forEach((t) => noticeTimers.delete(t.id));
 		set({ toasts: next });

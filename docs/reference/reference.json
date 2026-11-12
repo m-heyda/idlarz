@@ -2099,6 +2099,17 @@
   "see": []
  },
  {
+  "id": "notify",
+  "name": "Short notices (notify)",
+  "symbol": "notify",
+  "kind": "function",
+  "category": "Architecture/Notifications",
+  "file": "src/lib/notices.ts",
+  "line": 14,
+  "summary": "THE way to tell the player something short: a small notice at the top of the screen under the header for a couple of seconds (\"Game saved\", and in red a refusal such as \"You need 490 more gems\"). Several stack, and the same text twice in a row is one line with a counter. Call it from a component, a store or plain code alike (it reads the ui store, no hook needed).",
+  "see": []
+ },
+ {
   "id": "claimachievement",
   "name": "claimAchievement",
   "symbol": "claimAchievement",

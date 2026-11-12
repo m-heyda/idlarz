@@ -22,7 +22,6 @@ const ClassPickerDialog: React.FC = () => {
 	const playerClass = useGameStore((state) => state.playerClass);
 	const gems = useGameStore((state) => state.gems);
 	const busy = useGemStore((state) => state.busy);
-	const message = useGemStore((state) => state.message);
 	const [pick, setPick] = useState<PlayerClassId | null>(null);
 
 	useEffect(() => {
@@ -75,11 +74,6 @@ const ClassPickerDialog: React.FC = () => {
 						);
 					})}
 				</div>
-				{message && (
-					<p style={{ marginTop: 10, textAlign: 'center', color: '#ff9a7a' }} role='status'>
-						{message}
-					</p>
-				)}
 			</GameModal>
 			{picked && pick && (
 				<GameModal title={`Become a ${picked.label}?`} size='sm' onClose={() => setPick(null)}>
@@ -98,11 +92,6 @@ const ClassPickerDialog: React.FC = () => {
 							.
 						</p>
 						{missing > 0 && <p className='text-xs text-[#d98a6a]'>You need {missing} more gems.</p>}
-						{message && (
-							<p className='text-xs text-[#d98a6a]' role='status'>
-								{message}
-							</p>
-						)}
 						<div className='flex gap-3'>
 							<Button disabled={busy} onClick={() => setPick(null)}>
 								Cancel

@@ -6,6 +6,7 @@ import { BADGE_NONE, badgeOptions, shownBadge, shownTitle, titleOptions } from '
 import { NICK_COLORS, NICK_GOLD, NICK_RAINBOW, NICK_RAINBOW_ITEM, inkOn, nickColorValue } from '@/config/nickColors';
 import { gemItemById } from '@/config/gemShop';
 import { useGemStore } from '@/stores/gemStore';
+import { notify } from '@/lib/notices';
 import GemIcon from './GemIcon';
 import audioManager from '@/utils/audioManager';
 import GameModal from './GameModal';
@@ -35,14 +36,12 @@ const BadgeDialog: React.FC = () => {
 	const badge = useUiStore((state) => state.badge);
 	const setBadge = useUiStore((state) => state.setBadge);
 	const playerName = useGameStore((state) => state.playerName);
-	const [error, setError] = useState<string | null>(null);
 	/** A colour tried on the preview while the picker is locked (hover or click): never saved */
 	const [tried, setTried] = useState<string | null | undefined>(undefined);
 	const [hovered, setHovered] = useState<string | null | undefined>(undefined);
 
 	useEffect(() => {
 		if (!open) return;
-		setError(null);
 		setTried(undefined);
 		setHovered(undefined);
 		void fetchBadges().then((state) => state && useUiStore.getState().setBadge(state));
@@ -53,7 +52,6 @@ const BadgeDialog: React.FC = () => {
 	const save = async (next: { badgeId?: string | null; titleId?: string | null }) => {
 		const before = badge;
 		audioManager.playSound('click');
-		setError(null);
 		setBadge({
 			...before,
 			badgeId: next.badgeId === undefined ? before.badgeId : next.badgeId,
@@ -63,7 +61,7 @@ const BadgeDialog: React.FC = () => {
 		const result = await chooseBadge(next.badgeId, next.titleId);
 		if (!result.ok) {
 			setBadge(before);
-			setError(result.message);
+			notify(result.message, 'error');
 		}
 	};
 
@@ -84,10 +82,9 @@ const BadgeDialog: React.FC = () => {
 
 	/** Buys the Rainbow name from here (the server charges and refuses a short balance), then reads the unlocks again */
 	const buyRainbow = async () => {
-		setError(null);
 		const reply = await useGemStore.getState().buy(NICK_RAINBOW_ITEM);
 		if (!reply?.ok) {
-			setError(reply?.message ?? 'The purchase did not go through.');
+			if (!reply) notify('The purchase did not go through.', 'error');
 			return;
 		}
 		const state = await fetchBadges();
@@ -98,12 +95,11 @@ const BadgeDialog: React.FC = () => {
 	const saveColor = async (nameColor: string | null) => {
 		const before = badge;
 		audioManager.playSound('click');
-		setError(null);
 		setBadge({ ...before, nameColor });
 		const result = await chooseNameColor(nameColor);
 		if (!result.ok) {
 			setBadge(before);
-			setError(result.message);
+			notify(result.message, 'error');
 		}
 	};
 
@@ -196,10 +192,10 @@ const BadgeDialog: React.FC = () => {
 						)}
 					</div>
 					{!badge.rainbowUnlocked && (
-						<div className='ds-lock-banner' data-testid='rainbow-locked'>
+						<div className='ds-lock-banner' data-testid='rainbow-locked' style={{ marginTop: 12 }}>
 							<span>🌈 Rainbow: an animated nickname that shifts through every colour.</span>
 							<Button tone='gold' onClick={() => void buyRainbow()}>
-								Unlock {rainbowPrice} <GemIcon />
+								{rainbowPrice} <GemIcon />
 							</Button>
 						</div>
 					)}
@@ -246,12 +242,6 @@ const BadgeDialog: React.FC = () => {
 					)}
 				</section>
 			</div>
-
-			{error && (
-				<p role='alert' style={{ textAlign: 'center', color: '#ff7a6a', margin: '10px 0 0' }}>
-					{error}
-				</p>
-			)}
 		</GameModal>
 	);
 };

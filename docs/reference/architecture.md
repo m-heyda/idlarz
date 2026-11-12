@@ -9,6 +9,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - The loop: [The tick loop and persistence](#gameapp)
 - State: [The map (World)](#coord-limit), [`GameState`](#gamestate)
 - Rendering: [Rendering the map](#rendering-the-map)
+- Notifications: [Short notices (notify)](#notify)
 - Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [`BIOME_ART`](#biome-art), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
 - Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
@@ -99,6 +100,21 @@ Rendering notes.
 - A `Tile` reads only primitives from the store and takes `canAfford` from `Grid`, which works the price of the next tile out once for all of them; unchanged tiles are skipped by `React.memo`, so panning mounts only the tiles that enter the view.
 - `AmbientLife` spawns a critter every few seconds on an owned tile in view; they are purely decorative (no clicks, no rewards) and off when disabled in Settings, when the tab is hidden, and with `prefers-reduced-motion`.
 - Tutorial, stat tooltips and cost lists are generated from config constants, so they cannot drift from the rules. Font: Mozilla Headline (self-hosted, `--font-pixel`).
+
+## Notifications
+
+<a id="notify"></a>
+
+### Short notices (notify)
+
+Source: [`src/lib/notices.ts:14`](../../src/lib/notices.ts)
+
+THE way to tell the player something short: a small notice at the top of the screen under the header for a couple of seconds ("Game saved", and in red a refusal such as "You need 490 more gems").
+Several stack, and the same text twice in a row is one line with a counter. Call it from a component, a store or plain code alike (it reads the ui store, no hook needed).
+
+- `notify(text)` for news, `notify(text, 'error')` for a refusal or a failure.
+- Do **not** add another inline red or grey one-line message to a window for something this short; call `notify` instead, and when you find a window that already does, move it here in the same change.
+- The gem store already sends every refused purchase through it.
 
 ## Art
 

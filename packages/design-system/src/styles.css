@@ -4394,6 +4394,16 @@ button.ds-income-head:hover {
 		0 6px 14px rgba(0, 0, 0, 0.55);
 }
 
+/* a refusal: the same plate with a red frame */
+.ds-toast[data-tone='error'] {
+	border-color: #c7503f;
+	color: #ffb3a6;
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 14px rgba(229, 96, 79, 0.35),
+		0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
 .ds-toast-line {
 	display: inline-flex;
 	align-items: center;

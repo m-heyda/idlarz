@@ -264,7 +264,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`TileMonster.tsx`](../../src/components/game/TileMonster.tsx) — ~ The monster on the map with its growth shown:
 - [`TileStatus.tsx`](../../src/components/game/TileStatus.tsx) — ~ More card content under the tile's own lines (the building on the tile)
 - [`TileTooltip.tsx`](../../src/components/game/TileTooltip.tsx) — ~ Hover card of a monster, the design system's MonsterTooltip with the game's numbers:
-- [`Toast.tsx`](../../src/components/game/Toast.tsx) — ~ Short messages ("Game saved") under the header; `showToast` in the ui store puts one up for a couple of seconds, and several stack.
+- [`Toast.tsx`](../../src/components/game/Toast.tsx) — ~ Short messages ("Game saved", and in red a refusal such as "You need 490 more gems") at the top of the screen under the header; `showToast(text, tone?)` in the ui store puts one up for a couple of seconds, and several stack.
 - [`WaterLayer.tsx`](../../src/components/game/WaterLayer.tsx) — ~ Visible tile range (inclusive-exclusive), so only the ripples on screen are in the DOM
 - [`WindowErrorBoundary.tsx`](../../src/components/game/WindowErrorBoundary.tsx) — ~ Keeps one window's crash from blanking the whole game:
 
@@ -501,6 +501,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`merchant.ts`](../../src/lib/merchant.ts) — ~ What a piece of gear costs at the merchant:
 - [`minimap.ts`](../../src/lib/minimap.ts) — ~ The minimap:
 - [`monsters.ts`](../../src/lib/monsters.ts) — ~ Reduces the damage of every hit the player lands (same curve as the player's armor)
+- [`notices.ts`](../../src/lib/notices.ts) — ~ THE way to tell the player something short:
 
 **src/lib/offline/**
 
@@ -979,6 +980,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
 - [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
+- [`notices.test.ts`](../../tests/ui/notices.test.ts)
 - [`offlineBar.test.ts`](../../tests/ui/offlineBar.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)

@@ -48,7 +48,6 @@ const GemShopDialog: React.FC = () => {
 	const openClassDialog = useUiStore((state) => state.openClassDialog);
 	const info = useGemStore((state) => state.info);
 	const busy = useGemStore((state) => state.busy);
-	const message = useGemStore((state) => state.message);
 	const gems = useGameStore((state) => state.gems);
 	const admin = useUiStore((state) => state.badge.admin);
 	useBadgeChoice();
@@ -183,12 +182,6 @@ const GemShopDialog: React.FC = () => {
 							);
 						})}
 					</ul>
-				)}
-
-				{message && (
-					<p className='text-sm text-center text-[#d98a6a]' role='status'>
-						{message}
-					</p>
 				)}
 			</div>
 		</GameModal>

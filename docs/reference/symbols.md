@@ -258,6 +258,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:177`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
 | `settleIdols` | Saves & Server / Accepting a save | [`src/lib/cloudSave/idolTrust.ts:19`](../../src/lib/cloudSave/idolTrust.ts) | The server's say over the Idol levels (the account's `idolLevels`). |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
+| Short notices (notify) | Architecture / Notifications | [`src/lib/notices.ts:14`](../../src/lib/notices.ts) | THE way to tell the player something short: |
 | `SKILLS` | Combat / Potions and skills | [`src/catalog/skills.ts:34`](../../src/catalog/skills.ts) | Potions and skills. |
 | `spawnLevelRange` | Monsters / Level scaling | [`src/lib/monsters.ts:39`](../../src/lib/monsters.ts) | The levels a new monster of this type can appear at in a world of this castle level (both ends included). |
 | `STARTER_EQUIPMENT_BY_CLASS` | Progression / Class passives | [`src/catalog/index.ts:76`](../../src/catalog/index.ts) | What each class starts with, so the first gear fits the hero: |
