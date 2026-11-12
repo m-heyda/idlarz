@@ -43,12 +43,6 @@ export const NICK_COLORS_ITEM = 'name_colors';
 /** The gem shop item that unlocks the rainbow nickname. */
 export const NICK_RAINBOW_ITEM = 'name_rainbow';
 
-/**
- * Every colour is open on a development build (`next dev`, tests): the account's own purchases and `is_admin` are not needed to try the rainbow and the gold nickname. A production build never has it.
- * The server applies it when it answers (`lib/badgeServer.ts`), so the same rule holds for the picker and for what a request may store.
- */
-export const DEV_UNLOCK_COLOURS: boolean = process.env.NODE_ENV !== 'production';
-
 export const nickColorById = (id: unknown): NickColor | null => NICK_COLORS.find((color) => color.id === id) ?? null;
 
 /** The value `NickName` takes for a stored id: the CSS colour, `gold` / `rainbow` for the two animated ones, or undefined for the default colour. */

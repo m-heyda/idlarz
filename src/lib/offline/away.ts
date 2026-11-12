@@ -1,7 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { offlineCapSec, offlineEfficiency, offlineMinGapSec } from '@/lib/offline/limits';
 import { shownIdentity, type ShownIdentity } from '@/catalog/badges';
-import { DEV_UNLOCK_COLOURS } from '@/config/nickColors';
 
 /** The landing card's away bar: how long the player has been gone, the cap that counts and the share of income paid. Numbers only, the same ones the claim will use. */
 export interface AwayBlock {
@@ -75,7 +74,7 @@ export const loadShownIdentity = async (supabase: SupabaseClient, userId: string
 				nameColor: typeof choice.data?.name_color === 'string' ? choice.data.name_color : null,
 			},
 			held,
-			choice.data?.is_admin === true || DEV_UNLOCK_COLOURS,
+			choice.data?.is_admin === true,
 		);
 		return shown.badge || shown.title || shown.nameColor ? shown : null;
 	} catch {

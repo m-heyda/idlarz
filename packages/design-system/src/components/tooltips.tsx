@@ -507,7 +507,7 @@ export const ChestTooltip: React.FC<{ icon: string; rows?: TipRow[]; subtitle?: 
 
 /** A compact one-line label for an icon-sized control ("Customize", "Change avatar"): small text on a dark plate with a gold rim, no title row. Wrap the control in a `HoverTip` and pass this as the `tip`. */
 export const MiniTip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-	<div className='ds-root ds-tip ds-tip-mini' role='tooltip'>
+	<div className='ds-root ds-tip ds-tip-label' role='tooltip'>
 		{children}
 	</div>
 );

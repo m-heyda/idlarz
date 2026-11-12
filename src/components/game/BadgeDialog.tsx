@@ -25,7 +25,7 @@ export const useBadgeChoice = (): void => {
 };
 
 /**
- * The name, badge and title window (click the name, the title or the badge in the Character window). Two columns: on the left the nickname colour (fourteen colours, locked until "Name colours" is bought in the Gem shop; the animated Rainbow is bought right here; the admin account, and every development build, has all of them plus the gold nickname with glowing stars),
+ * The name, badge and title window (click the name, the title or the badge in the Character window). Two columns: on the left the nickname colour (fourteen colours, locked until "Name colours" is bought in the Gem shop; the animated Rainbow is bought right here; the admin account has all of them plus the gold nickname with glowing stars),
  * on the right the title and the badge (earned ones only; the badge can be hidden). A pick shows at once and is saved on the profile (`POST /api/auth/badge`), which is what the landing page and the rankings read; a refusal puts the previous choice back and shows why.
  */
 const BadgeDialog: React.FC = () => {
@@ -121,7 +121,7 @@ const BadgeDialog: React.FC = () => {
 	const previewColor = hovered !== undefined ? hovered : tried !== undefined && lockedColor(tried) ? tried : badge.nameColor;
 
 	return (
-		<GameModal title='Name, badge and title' width={1080} onClose={close}>
+		<GameModal title='Name, badge and title' width={972} onClose={close}>
 			<div className='ds-nick-preview' data-testid='nick-preview'>
 				<NickName color={nickColorValue(previewColor)}>{playerName}</NickName>
 				{title && <span className='ds-nick-preview-title'>({title})</span>}
@@ -139,13 +139,23 @@ const BadgeDialog: React.FC = () => {
 					<SectionLabel>Name colour</SectionLabel>
 					{locked && (
 						<div className='ds-lock-banner' data-testid='color-locked'>
-							<span>🔒 Name colours are locked. Click a colour to try it on, unlock all fourteen for good in the Gem shop.</span>
+							<span>🔒 Colours are locked. Click one to try it on; unlock all in the Gem shop.</span>
 							<Button tone='gold' onClick={goToShop}>
 								Open Gem shop
 							</Button>
 						</div>
 					)}
 					<div className='ds-swatch-grid' data-testid='color-grid' onMouseLeave={() => setHovered(undefined)}>
+						<button
+							type='button'
+							className='ds-swatch ds-swatch-default'
+							data-selected={previewColor === null}
+							onMouseEnter={() => setHovered(null)}
+							onClick={() => void pickColor(null)}
+							title='Default: the normal text colour'
+						>
+							Default
+						</button>
 						{NICK_COLORS.map((color) => (
 							<button
 								key={color.id}
@@ -161,16 +171,6 @@ const BadgeDialog: React.FC = () => {
 								{color.name}
 							</button>
 						))}
-						<button
-							type='button'
-							className='ds-swatch ds-swatch-default'
-							data-selected={previewColor === null}
-							onMouseEnter={() => setHovered(null)}
-							onClick={() => void pickColor(null)}
-							title='No colour: the normal text colour'
-						>
-							No colour
-						</button>
 						<button
 							type='button'
 							className='ds-swatch ds-swatch-rainbow'
@@ -197,7 +197,7 @@ const BadgeDialog: React.FC = () => {
 					</div>
 					{!badge.rainbowUnlocked && (
 						<div className='ds-lock-banner' data-testid='rainbow-locked'>
-							<span>🌈 Rainbow name: an animated nickname that shifts through every colour.</span>
+							<span>🌈 Rainbow: an animated nickname that shifts through every colour.</span>
 							<Button tone='gold' onClick={() => void buyRainbow()}>
 								Unlock {rainbowPrice} <GemIcon />
 							</Button>
@@ -207,12 +207,18 @@ const BadgeDialog: React.FC = () => {
 
 				<section>
 					<SectionLabel>Title</SectionLabel>
-					<div className='ds-pick-grid' data-testid='title-grid'>
-						<button type='button' className='ds-pick' data-selected={badge.titleId === null} onClick={() => void save({ titleId: null })}>
+					<div className='ds-pick-grid' data-testid='title-grid' data-compact='true'>
+						<button type='button' className='ds-pick ds-pick-compact' data-selected={badge.titleId === null} onClick={() => void save({ titleId: null })}>
 							<span>No title</span>
 						</button>
 						{titles.map((t) => (
-							<button key={t.id} type='button' className='ds-pick' data-selected={badge.titleId === t.id} onClick={() => void save({ titleId: t.id })}>
+							<button
+								key={t.id}
+								type='button'
+								className='ds-pick ds-pick-compact'
+								data-selected={badge.titleId === t.id}
+								onClick={() => void save({ titleId: t.id })}
+							>
 								<span>{t.name}</span>
 							</button>
 						))}

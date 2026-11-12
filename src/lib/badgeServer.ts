@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { DEV_UNLOCK_COLOURS, NICK_COLORS_ITEM, NICK_RAINBOW_ITEM } from '@/config/nickColors';
+import { NICK_COLORS_ITEM, NICK_RAINBOW_ITEM } from '@/config/nickColors';
 import type { NameColorAccess } from '@/catalog/badges';
 import { readGemShop } from '@/lib/offline/ledger';
 
@@ -38,13 +38,12 @@ export const writeNameColor = async (db: SupabaseClient, userId: string, nameCol
 };
 
 /**
- * Which nickname colours this account may use: the Name colours and Rainbow purchases (the purchase counts in `player_ledger.gem_shop`; a missing ledger row is "none"), and everything for an admin account (`profiles.is_admin`) or on a development build
- * (`DEV_UNLOCK_COLOURS`). A failed read throws.
+ * Which nickname colours this account may use: the Name colours and Rainbow purchases (the purchase counts in `player_ledger.gem_shop`; a missing ledger row is "none"), and everything for an admin account (`profiles.is_admin`). A failed read throws.
  */
 export const loadNameColorAccess = async (db: SupabaseClient, userId: string, isAdmin: boolean): Promise<NameColorAccess> => {
 	const { data, error } = await db.from('player_ledger').select('gem_shop').eq('user_id', userId).maybeSingle();
 	if (error) throw new Error(error.message);
 	const bought = readGemShop(data?.gem_shop).bought;
-	const admin = isAdmin || DEV_UNLOCK_COLOURS;
+	const admin = isAdmin;
 	return { admin, unlocked: admin || (bought[NICK_COLORS_ITEM] ?? 0) > 0, rainbow: admin || (bought[NICK_RAINBOW_ITEM] ?? 0) > 0 };
 };

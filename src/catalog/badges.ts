@@ -51,7 +51,7 @@ export interface ShownIdentity {
 }
 
 /**
- * What decides which nickname colours an account may use: the admin flag (`profiles.is_admin`, or a development build, see `DEV_UNLOCK_COLOURS`), whether the Name colours item was bought (`unlocked`: the fourteen plain colours)
+ * What decides which nickname colours an account may use: the admin flag (`profiles.is_admin`), whether the Name colours item was bought (`unlocked`: the fourteen plain colours)
  * and whether the Rainbow item was bought (`rainbow`), both from `ledger.gemShop.bought`. An admin has all of them.
  */
 export interface NameColorAccess {

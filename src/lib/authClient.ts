@@ -178,7 +178,7 @@ export const chooseAvatar = async (avatarId: string): Promise<AvatarSendResult> 
 		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
 	}
 };
-/** The badge, title and nickname colour of the profile (`GET /api/auth/badge`), the achievements that decide what can be picked, and whether the colour picker is open (`colorsUnlocked` / `rainbowUnlocked`: bought in the Gem shop, or admin or a development build; `admin`: the owner's account, which also has the gold nickname). */
+/** The badge, title and nickname colour of the profile (`GET /api/auth/badge`), the achievements that decide what can be picked, and whether the colour picker is open (`colorsUnlocked` / `rainbowUnlocked`: bought in the Gem shop, or admin; `admin`: the owner's account, which also has the gold nickname). */
 export interface BadgeState {
 	badgeId: string | null;
 	titleId: string | null;

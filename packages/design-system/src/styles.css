@@ -631,10 +631,10 @@
 	padding: 7px 10px;
 }
 
-/* the compact one-line tip for small controls */
-.ds-tip-mini {
-	width: auto;
-	max-width: 200px;
+/* the compact one-line tip for small controls (`.ds-tip-mini` is the small icon in a tooltip row, a different thing) */
+.ds-tip-label {
+	width: max-content;
+	max-width: none;
 	padding: 3px 8px;
 	font-size: 12px;
 	line-height: 1.2;
@@ -4223,14 +4223,14 @@ button.ds-income-head:hover {
 
 .ds-badge-cols {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 372px minmax(0, 1fr);
 	gap: 24px;
 	align-items: start;
 }
 
 .ds-swatch-grid {
 	display: grid;
-	grid-template-columns: repeat(7, 1fr);
+	grid-template-columns: repeat(6, 1fr);
 	gap: 6px;
 	margin-top: 6px;
 }
@@ -4250,27 +4250,18 @@ button.ds-income-head:hover {
 	color: var(--ink, #fff);
 	cursor: pointer;
 	background: var(--swatch, #222);
-	border: 1px solid rgba(0, 0, 0, 0.7);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.3),
-		inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+	border: 0;
 }
 
-.ds-swatch:hover {
-	filter: brightness(1.12);
+/* hover: a grey frame; chosen: an orange one (no tick) */
+.ds-swatch:hover:not([data-selected='true']) {
+	outline: 2px solid #8a8d96;
+	outline-offset: 1px;
 }
 
 .ds-swatch[data-selected='true'] {
 	outline: 2px solid var(--ds-gold, #e0a93a);
 	outline-offset: 1px;
-}
-
-.ds-swatch[data-selected='true']::after {
-	content: '✓';
-	position: absolute;
-	top: 1px;
-	right: 4px;
-	font-size: 10px;
 }
 
 /* not unlocked yet: it still previews, but looks quiet */
@@ -4355,7 +4346,18 @@ button.ds-income-head:hover {
 }
 
 .ds-pick:hover {
-	filter: brightness(1.2);
+	border-color: #8a8d96;
+}
+
+/* a title card: one short line, tighter than a badge card */
+.ds-pick-compact {
+	min-height: 34px;
+	padding: 5px 10px;
+}
+
+.ds-pick-grid[data-compact='true'] {
+	grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+	gap: 6px;
 }
 
 .ds-pick[data-selected='true'] {

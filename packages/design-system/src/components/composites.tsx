@@ -74,7 +74,7 @@ export const AvatarFrame: React.FC<{ src: string; size?: number; onClick?: () =>
 	onClick,
 	title = 'Change avatar',
 }) => (
-	<HoverTip tip={<MiniTip>{title}</MiniTip>} placement='below' align='start'>
+	<HoverTip tip={<MiniTip>{title}</MiniTip>} placement='above' align='start'>
 		<button type='button' className='ds-avatar' style={{ width: size, height: size }} aria-label={title} onClick={onClick}>
 			<img src={src} alt='' />
 			<span className='ds-avatar-edit' aria-hidden='true'>
@@ -128,7 +128,7 @@ export const HeroIdentity: React.FC<{
 		<AvatarFrame src={avatar} size={61} onClick={onAvatar} title={avatarTitle} />
 		<div className='ds-identity-text'>
 			<div className='ds-identity-name'>
-				<HoverTip tip={<MiniTip>{badgeTitle}</MiniTip>} placement='below' align='start'>
+				<HoverTip tip={<MiniTip>{badgeTitle}</MiniTip>} placement='above' align='start'>
 					<button type='button' className='ds-identity-nick' aria-label={`${name}: ${badgeTitle}`} onClick={onBadge}>
 						<NickName color={nameColor}>{name}</NickName>
 					</button>
