@@ -21284,15 +21284,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/components/game/AvatarDialog.tsx",
-			"src/components/game/ClassPickerDialog.tsx"
-		],
+		"usedBy": [],
 		"name": "menu_character",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_character.png",
-		"status": "used",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			40,

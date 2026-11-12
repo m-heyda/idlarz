@@ -4159,8 +4159,8 @@ button.ds-income-head:hover {
 	color: var(--ds-text-dim, #9aa4bd);
 }
 
-.ds-toast-row {
-	display: flex;
+.ds-toast.ds-toast-row {
+	flex-direction: row;
 	align-items: center;
 	gap: 10px;
 	text-align: left;

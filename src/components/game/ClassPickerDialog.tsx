@@ -9,7 +9,6 @@ import audioManager from '@/utils/audioManager';
 import '@/styles/Heroes.css';
 import GameModal from './GameModal';
 import { Button } from '../../../packages/design-system/src/components/primitives';
-import PixelIcon from './PixelIcon';
 import AvatarArt from './AvatarArt';
 import GemIcon from './GemIcon';
 
@@ -47,7 +46,7 @@ const ClassPickerDialog: React.FC = () => {
 
 	return (
 		<>
-			<GameModal title='Choose your hero' icon={<PixelIcon name='menu_character' alt='' />} size='md' onClose={close}>
+			<GameModal title='Choose your hero' size='md' onClose={close}>
 				<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px' }}>
 					Each hero has its own bonuses. Changing hero costs {price} <GemIcon />.
 				</p>

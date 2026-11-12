@@ -5,8 +5,7 @@ import { CLASS_AVATARS } from '@/catalog/avatars';
 import { DEFAULT_PLAYER_CLASS, type PlayerClassId } from '@/config/playerClasses';
 import { createAvatarPicker } from '@/lib/avatarPick';
 import audioManager from '@/utils/audioManager';
-import PixelModal from './PixelModal';
-import PixelIcon from './PixelIcon';
+import GameModal from './GameModal';
 import AvatarPicker from './AvatarPicker';
 
 /** The avatar picker of the character window: fetches the hero's class and what the account has unlocked each time it opens, and a pick shows at once and is saved on the server in the background (the server refuses a locked or other-class id; then the previous face comes back with the reason). */
@@ -50,18 +49,18 @@ const AvatarDialog: React.FC = () => {
 	};
 
 	return (
-		<PixelModal title='Choose your avatar' icon={<PixelIcon name='menu_character' alt='' />} size='md' onClose={close}>
-			<p className='text-[#a89878] text-sm mb-4 text-center'>
+		<GameModal title='Choose your avatar' size='md' onClose={close}>
+			<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px' }}>
 				Your face in the header and the rankings. Your hero wears its own two faces; faces of other classes stay disabled, and the locked rewards are earned in
 				the game.
 			</p>
 			<AvatarPicker value={avatarId} playerClass={playerClass} unlocked={unlocked} onChange={pick} loading={!loaded} />
 			{error && (
-				<p role='alert' className='text-sm text-center text-[#e07a6a] mt-3'>
+				<p role='alert' style={{ textAlign: 'center', color: '#ff7a6a', marginTop: 10 }}>
 					{error}
 				</p>
 			)}
-		</PixelModal>
+		</GameModal>
 	);
 };
 
