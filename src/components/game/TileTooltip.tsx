@@ -1,12 +1,11 @@
 import { buildingDef } from '@/catalog/buildings';
 import { BIOMES } from '@/config/biomes';
 import { BUILDING_RULES } from '@/config/buildings';
-import { buildingLevelCost, buildingOutput, buildingUpgradeDuration, ownedOfBiome, producerBonus } from '@/lib/buildings';
-import { RESOURCES, sortedCostEntries } from '@/catalog';
+import { buildingOutput, buildingUpgradeDuration, ownedOfBiome, producerBonus } from '@/lib/buildings';
+import { RESOURCES } from '@/catalog';
 import { BuildingTooltip, ChestTooltip, MonsterTooltip, TipLine, Tooltip } from '../../../packages/design-system/src/components/tooltips';
 import { BiomeTooltip } from './BiomeTooltip';
 import { limitOf } from '@/lib/limits';
-import { economyTiles } from '@/utils/game/tiles';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { idolDef } from '@/catalog/idols';
 import { idolValueText } from '@/lib/idolEconomy';
@@ -92,7 +91,6 @@ const BuildingTile: React.FC<{ id: string; level: number; tile: React.ReactNode 
 	const idol = idolDef(id);
 	const { game } = useMapSource();
 	const tiles = game((state) => state.tiles);
-	const resources = game((state) => state.resources);
 	const prestige = game((state) => state.prestige);
 	const idolLevels = game((state) => state.idolLevels);
 	if (!def) return null;
@@ -105,8 +103,6 @@ const BuildingTile: React.FC<{ id: string; level: number; tile: React.ReactNode 
 	const rows = output ? hourly(output).map(([key, amount]) => ({ label: RESOURCES[key].label, value: `+${formatNumber(amount * 3600)}/h` })) : [];
 	let next: { label: string; value: string; tone?: 'green' | 'red' | 'amber' }[] | undefined;
 	if (!atTop) {
-		const ownedTiles = economyTiles(tiles, game.getState().freeTiles);
-		const cost = buildingLevelCost(level + 1, ownedTiles, def);
 		const after = idol ? null : buildingOutput(def, level + 1, owned);
 		next = [
 			...(after
@@ -117,11 +113,6 @@ const BuildingTile: React.FC<{ id: string; level: number; tile: React.ReactNode 
 					}))
 				: []),
 			...(idol ? [{ label: 'Gives', value: idolValueText(idol, level + 1) }] : []),
-			...sortedCostEntries<keyof Resources>(cost).map(([key, amount]) => ({
-				label: `Cost · ${RESOURCES[key].label}`,
-				value: formatNumber(amount),
-				tone: (resources[key] ?? 0) >= amount ? ('green' as const) : ('red' as const),
-			})),
 			{
 				label: 'Takes',
 				value: formatTime(buildingUpgradeDuration(level, prestige, idolEconomy(tiles, idolLevels ?? {}).buildTimePct)),
@@ -191,7 +182,8 @@ const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x
 				<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
 					<ChestTooltip
 						icon='/pixel/reuse/valuables/treasure_chest.png'
-						cta={biome === 'lake' ? 'Something glints in the water. Click to open' : 'Click to open the treasure chest'}
+						subtitle={biome === 'lake' ? 'Something glints in the water' : 'Opens with a click'}
+						cta={biome === 'lake' ? 'Click to open' : undefined}
 					/>
 				</div>
 			)}

@@ -345,23 +345,36 @@ export const MonsterTooltip: React.FC<{
 	cta?: string;
 	wip?: boolean;
 }> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, defeated, growth, bossLine, cta, wip }) => (
-	<Tooltip rarity={boss ? 'legendary' : 'epic'} icon={icon} title={name} subtitle={subtitle} footer={footer}>
+	<Tooltip
+		rarity={boss ? 'legendary' : 'epic'}
+		icon={icon}
+		title={name}
+		subtitle={subtitle}
+		footer={
+			footer ??
+			(cta || defeated !== undefined
+				? [<span style={{ color: '#f0d27a' }}>{cta ?? ''}</span>, defeated !== undefined ? `Defeated: ${defeated}` : '']
+				: undefined)
+		}
+	>
 		{boss ? <div className='ds-tip-boss'>BOSS</div> : null}
 		<TipRows rows={[{ label: 'HP', value: hp }]} />
 		<div className='ds-bar' style={{ height: 10 }}>
 			<div className='ds-bar-fill' style={{ width: '100%' }} />
 		</div>
 		<TipRows rows={rows} />
-		{defeated !== undefined ? <TipLine tone='muted'>Defeated: {defeated}</TipLine> : null}
-		{growth ? <TipLine tone='amber'>{growth}</TipLine> : null}
-		{bossLine ? <TipLine tone='red'>{bossLine}</TipLine> : null}
+		{growth || bossLine ? (
+			<div className='ds-tip-sep'>
+				{growth ? <TipLine tone='amber'>{growth}</TipLine> : null}
+				{bossLine ? <TipLine tone='red'>{bossLine}</TipLine> : null}
+			</div>
+		) : null}
 		{drops && drops.length > 0 ? (
 			<>
 				<TipSection>{dropsTitle}</TipSection>
 				<TipRows rows={drops} />
 			</>
 		) : null}
-		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
 		{wip ? <TipLine tone='muted'>Work in progress: art preview only</TipLine> : null}
 	</Tooltip>
 );
@@ -397,10 +410,10 @@ export const BuildingTooltip: React.FC<{
 			</>
 		) : null}
 		{tileExtra ? (
-			<>
+			<div className='ds-tip-sep'>
 				<TipSection>Tile</TipSection>
 				{tileExtra}
-			</>
+			</div>
 		) : null}
 		{rebirthNote ? <TipLine tone='muted'>{rebirthNote}</TipLine> : null}
 		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
@@ -474,10 +487,10 @@ export const TileTooltip: React.FC<{
 );
 
 /** A chest standing on the map: what it may hold and how to open it. */
-export const ChestTooltip: React.FC<{ icon: string; rows?: TipRow[]; cta?: string }> = ({ icon, rows, cta = 'Click to open' }) => (
-	<Tooltip rarity='uncommon' icon={icon} title='Treasure chest' subtitle='Opens with a click'>
+export const ChestTooltip: React.FC<{ icon: string; rows?: TipRow[]; subtitle?: string; cta?: string }> = ({ icon, rows, subtitle = 'Click to open', cta }) => (
+	<Tooltip rarity='uncommon' icon={icon} title='Treasure chest' subtitle={subtitle}>
 		{rows ? <TipRows rows={rows} /> : null}
-		<TipLine tone='gold'>{cta}</TipLine>
+		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
 	</Tooltip>
 );
 
