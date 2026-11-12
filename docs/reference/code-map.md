@@ -222,6 +222,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
 - [`CostList.tsx`](../../src/components/game/CostList.tsx) — ~ A bundle of resource costs; each entry is green when affordable and red when not.
 - [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
+- [`DailyBoard.tsx`](../../src/components/game/DailyBoard.tsx) — ~ The line under the board's title:
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
@@ -270,6 +271,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
 - [`CombatWidget.tsx`](../../src/components/game/overlays/CombatWidget.tsx) — ~ "1 min 12 s" or "45 s"
 - [`CraftingOverlay.tsx`](../../src/components/game/overlays/CraftingOverlay.tsx) — ~ Crafting XP is small now (`CRAFTING.xpScale`):
+- [`DailyBonusDialog.tsx`](../../src/components/game/overlays/DailyBonusDialog.tsx) — ~ The daily bonus window:
 - [`FarmAnimalDock.tsx`](../../src/components/game/overlays/FarmAnimalDock.tsx) — ~ Width the scene keeps clear on the right while the panel is open (panel width plus its margin)
 - [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
 - [`FarmOverlay.tsx`](../../src/components/game/overlays/FarmOverlay.tsx) — ~ The Farm window:
@@ -421,6 +423,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`combatFx.ts`](../../src/lib/combatFx.ts) — ~ The floating number of a hit the player lands:
 - [`craftGear.ts`](../../src/lib/craftGear.ts) — Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
+- [`dailyPrompt.ts`](../../src/lib/dailyPrompt.ts) — Where the daily bonus window remembers "Don't show again today" (per browser).
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
