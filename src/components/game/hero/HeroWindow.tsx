@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import GameModal from '../GameModal';
 import {
 	AddSlot,
 	Button,
@@ -322,38 +323,60 @@ const MoreSpace: React.FC = () => {
 	const maxed = level >= def.maxLevel;
 	const cost = merchantUpgradeCost('packrat', level);
 	const affordable = gold >= cost;
+	const [asking, setAsking] = useState(false);
+	const purchase = () => {
+		setAsking(false);
+		if (buy('packrat')) showToast(`Purchased ${def.label} level ${level + 1} for ${compact(cost)} Gold`);
+		else showToast('Not enough gold for more bag space');
+	};
 	return (
-		<AddSlot
-			onClick={() => {
-				if (maxed) return;
-				if (buy('packrat')) showToast(`Purchased ${def.label} level ${level + 1} for ${compact(cost)} Gold`);
-				else showToast('Not enough gold for more bag space');
-			}}
-			tip={
-				<Tooltip className='ds-tip-compact' title='More bag space' icon={BAG_ICON} subtitle={`Pack Rat · level ${level} of ${def.maxLevel}`}>
-					<div style={{ padding: '6px 0 2px' }}>
-						<DiamondLevel level={level} max={def.maxLevel} small />
+		<>
+			{asking && (
+				<GameModal title='Buy more bag space?' size='sm' onClose={() => setAsking(false)}>
+					<p style={{ margin: '0 0 6px' }}>
+						Pack Rat level {level + 1} adds <b>{def.effectPerLevel}</b> bag slots.
+					</p>
+					<p style={{ margin: '0 0 14px', color: affordable ? undefined : '#ff7a6a' }}>
+						It costs {compact(cost)} gold{affordable ? '' : ` (you have ${compact(gold)})`}.
+					</p>
+					<div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+						<Button onClick={() => setAsking(false)}>Cancel</Button>
+						<Button tone='gold' disabled={!affordable} onClick={purchase}>
+							Buy
+						</Button>
 					</div>
-					{maxed ? (
-						<TipRows rows={[{ label: 'Pack Rat', value: 'Fully upgraded' }]} />
-					) : (
-						<TipRows
-							rows={[
-								{ label: 'Next level', value: `+${def.effectPerLevel} slots`, tone: 'green' },
-								{ label: 'Cost', value: `${compact(cost)} gold`, tone: affordable ? 'gold' : 'red' },
-							]}
-						/>
-					)}
-					{maxed ? null : (
-						<div className='ds-tip-keys'>
-							<span>
-								<span className='ds-kbd'>Click</span>buy
-							</span>
+				</GameModal>
+			)}
+			<AddSlot
+				onClick={() => {
+					if (!maxed) setAsking(true);
+				}}
+				tip={
+					<Tooltip className='ds-tip-compact' title='More bag space' icon={BAG_ICON} subtitle={`Pack Rat · level ${level} of ${def.maxLevel}`}>
+						<div style={{ padding: '6px 0 2px' }}>
+							<DiamondLevel level={level} max={def.maxLevel} small />
 						</div>
-					)}
-				</Tooltip>
-			}
-		/>
+						{maxed ? (
+							<TipRows rows={[{ label: 'Pack Rat', value: 'Fully upgraded' }]} />
+						) : (
+							<TipRows
+								rows={[
+									{ label: 'Next level', value: `+${def.effectPerLevel} slots`, tone: 'green' },
+									{ label: 'Cost', value: `${compact(cost)} gold`, tone: affordable ? 'gold' : 'red' },
+								]}
+							/>
+						)}
+						{maxed ? null : (
+							<div className='ds-tip-keys'>
+								<span>
+									<span className='ds-kbd'>Click</span>buy
+								</span>
+							</div>
+						)}
+					</Tooltip>
+				}
+			/>
+		</>
 	);
 };
 

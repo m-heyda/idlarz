@@ -3,7 +3,7 @@ import { BIOMES } from '@/config/biomes';
 import { BUILDING_RULES } from '@/config/buildings';
 import { buildingLevelCost, buildingOutput, buildingUpgradeDuration, ownedOfBiome, producerBonus } from '@/lib/buildings';
 import { RESOURCES, sortedCostEntries } from '@/catalog';
-import { BuildingTooltip, ChestTooltip, MonsterTooltip } from '../../../packages/design-system/src/components/tooltips';
+import { BuildingTooltip, ChestTooltip, MonsterTooltip, TipLine, Tooltip } from '../../../packages/design-system/src/components/tooltips';
 import { BiomeTooltip } from './BiomeTooltip';
 import { limitOf } from '@/lib/limits';
 import { economyTiles } from '@/utils/game/tiles';
@@ -174,10 +174,19 @@ const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x
 	if (!tipLayer || !(isOwned || isAdjacent)) return null;
 	// a monster the player has not fought yet gets no tooltip at all (not even the biome card): it is a "?" until the first fight
 	const tipMonster = monster && (monster.art || discovered) ? monster : undefined;
-	if (isOwned && monster && !tipMonster) return null;
 	return createPortal(
 		<div className='absolute' style={{ left: x * TILE_SIZE, top: y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }}>
-			{isOwned && monster && <MonsterTip id={monster.id} type={monster.type} level={monster.level} art={monster.art} queued={queued} lineOpen={lineOpen} />}
+			{isOwned && monster && !tipMonster && (
+				<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
+					<Tooltip title='Unknown creature' subtitle='Not discovered yet' className='ds-tip-compact'>
+						<TipLine>Something is lurking here. Fight it once to find out what it is.</TipLine>
+						<TipLine tone='gold'>Click to fight</TipLine>
+					</Tooltip>
+				</div>
+			)}
+			{isOwned && tipMonster && monster && (
+				<MonsterTip id={monster.id} type={monster.type} level={monster.level} art={monster.art} queued={queued} lineOpen={lineOpen} />
+			)}
 			{isOwned && hasChest && showChestTip && (
 				<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
 					<ChestTooltip

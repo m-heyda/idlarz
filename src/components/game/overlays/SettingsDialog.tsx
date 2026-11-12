@@ -9,7 +9,7 @@ import PixelIcon from '../PixelIcon';
 
 const Row: React.FC<{ label: string; hint?: string; children: React.ReactNode }> = ({ label, hint, children }) => (
 	<div className='ds-listrow ds-listrow-line'>
-		<div>
+		<div style={{ minWidth: 0, flex: 1 }}>
 			<div>{label}</div>
 			{hint && (
 				<div className='ds-dim' style={{ fontSize: 12 }}>

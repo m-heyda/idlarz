@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button, HoverTip, Inset, Panel, ProgressBar, Slot } from '../../../../packages/design-system/src/components/primitives';
 import { CollapsibleGroup, CraftQueue, PAPER_INK, Slider, type CraftQueueEntry } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip, TipCostList, TipLine } from '../../../../packages/design-system/src/components/tooltips';
-import { RARITIES } from '@/catalog';
+import { RARITIES, RESOURCES } from '@/catalog';
 import { GRADE_INFO } from '@/catalog/items/grades';
 import { COMPONENTS, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
 import { gearOdds } from '@/lib/craftGear';
@@ -25,12 +25,15 @@ interface Have {
 	stock: Record<string, number>;
 }
 
+/** What a recipe's kind is called in a tooltip (one thing, capitalised). */
+const KIND_NAME: Record<RecipeKind, string> = { component: 'Component', potion: 'Potion', good: 'Trade good', gear: 'Gear' };
+
 /** The cost card of a recipe tile: what one craft takes (green when you have it, red when not) and the XP, or the level it unlocks at. */
 const RecipeTip: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) => {
 	const locked = have.craftLevel < recipe.unlock;
 	const needs = craftNeeds(recipe, 1);
 	return (
-		<Tooltip icon={recipeIconUrl(recipe)} title={outputName(recipe)} subtitle={recipe.kind}>
+		<Tooltip icon={recipeIconUrl(recipe)} title={outputName(recipe)} subtitle={KIND_NAME[recipe.kind]}>
 			{locked ? (
 				<TipLine tone='red'>Unlocks at crafting level {recipe.unlock}</TipLine>
 			) : (
@@ -38,7 +41,7 @@ const RecipeTip: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) =
 					<TipCostList
 						costs={[
 							...needs.resources.map((n) => ({
-								label: n.key,
+								label: RESOURCES[n.key as keyof typeof RESOURCES].label,
 								icon: resourceIconUrl(n.key),
 								have: have.resources[n.key] ?? 0,
 								cost: n.qty,
@@ -125,7 +128,7 @@ const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 						{recipe.output.qty > 1 ? ` x${recipe.output.qty}` : ''}
 					</div>
 					<div className='ds-paper-sub'>
-						{recipe.kind}
+						{KIND_NAME[recipe.kind]}
 						{isGear ? ' · goes to your bag' : ` · you hold ${formatInt(held)}`}
 					</div>
 				</div>
