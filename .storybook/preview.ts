@@ -3,6 +3,7 @@ import '@fontsource-variable/mozilla-headline';
 import '@fontsource/titan-one/latin-400.css';
 import '../src/app/globals.css';
 import '../packages/design-system/src/styles.css';
+import '../packages/design-system/src/tooltip-data.css';
 
 const preview: Preview = {
 	parameters: {
