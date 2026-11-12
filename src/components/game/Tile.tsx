@@ -100,6 +100,13 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 
 		// Prioritize owned tiles for special interactions
 		if (isOwned) {
+			// A building: its window (art, lore, output, level, the next level's price and time, Upgrade)
+			if (building) {
+				audioManager.playSound('click');
+				useUiStore.getState().openBuildingModal(x, y);
+				return;
+			}
+
 			// Castle tile: the upgrade dialog; a castle that cannot be upgraded any further opens the rebirth (Embers) window
 			if (biome === 'castle') {
 				audioManager.playSound('click');

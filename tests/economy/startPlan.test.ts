@@ -91,3 +91,16 @@ test('two saves a minute apart are the same game: no choice; a real difference s
 	const behind = { ...cloudAt(4, 700), summary: { ...cloudAt(4, 700).summary, level: 3 } };
 	assert.deepEqual(planStart(local, behind, null, 'u'), { kind: 'hub', mode: 'choose' }, 'a different level is a different game');
 });
+
+test('the daily bonus window waits for the welcome-back window, honours "not today" and needs a claimable bonus', async () => {
+	const { shouldOpenDaily, utcDay } = await import('../../src/lib/dailyPrompt');
+	const base = { ready: true, offlineReportOpen: false, asked: false, hiddenToday: false, claimable: true };
+	assert.equal(shouldOpenDaily(base), true);
+	assert.equal(shouldOpenDaily({ ...base, offlineReportOpen: true }), false, 'the welcome-back window comes first');
+	assert.equal(shouldOpenDaily({ ...base, ready: false }), false, 'the start of the game is not done');
+	assert.equal(shouldOpenDaily({ ...base, asked: true }), false, 'once per start');
+	assert.equal(shouldOpenDaily({ ...base, hiddenToday: true }), false, 'ticked: do not show again today');
+	assert.equal(shouldOpenDaily({ ...base, claimable: false }), false, 'already claimed');
+	assert.equal(utcDay(Date.UTC(2026, 10, 12, 0, 30)), '2026-11-12');
+	assert.equal(utcDay(Date.UTC(2026, 10, 11, 23, 59)), '2026-11-11');
+});

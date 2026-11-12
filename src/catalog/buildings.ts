@@ -19,7 +19,7 @@ export interface BuildingDef {
 	blurb: string;
 }
 
-/** A few lines of story for the building window, by building id (an Idol uses its blurb): purely flavour, no numbers. */
+/** A few lines of story for the building window, by building id (every building has some, Idols included): purely flavour, no numbers. */
 export const BUILDING_LORE: Readonly<Record<string, string>> = {
 	granary: 'Every autumn the plains folk fill its bins to the rafters. A full granary has never once been a sad sight in this kingdom.',
 	lumberyard: 'The axes ring from dawn. The lumberjacks swear the forest grows back out of spite, and they plan to keep cutting it just the same.',
@@ -34,6 +34,18 @@ export const BUILDING_LORE: Readonly<Record<string, string>> = {
 	sporecellar: 'The wizard says the spores are harmless. The wizard has also been a different colour every week since the cellar opened.',
 	icecutter: 'A hunter, a saw and a lot of cold. Frost shards chime softly in the crates, as if they were still thinking about snow.',
 	pearldiver: 'They hold their breath longer than seems wise and come up grinning. Somewhere below, the lake keeps its best pearls for itself.',
+	idol_plains: 'The scarecrow has stood here longer than the farm. Crows bow to it, and the hens lay a little more when it is watching.',
+	idol_forest: 'Roots as thick as a house wrap its base. Forest folk say it never forgets a name, a path or a lesson, and neither will you.',
+	idol_hills: 'Carved by the same dwarves who dug the quarry, it still keeps their rhythm. Work done in its shadow somehow goes faster.',
+	idol_swamp: 'Bones, feathers and a grin of black moss. The witch who made it is long gone, but the luck she left behind is not.',
+	idol_tundra: 'A spire of blue ice that hums in the dark. While you sleep it keeps the fires lit and the workers moving.',
+	idol_lake: 'The fountain whispers in a voice like rain on glass. Sailors leave a coin; the water sends back something better.',
+	idol_coast: 'Its lamp has not gone out in a hundred years. Every ship that sees it steers for your merchant, and pays well for the welcome.',
+	idol_jungle: 'Painted faces, red clay and a hundred feathers. The wild bends its head to it, and the hunt always ends in your favour.',
+	idol_fields: 'A king of straw and old rope, crowned with a rusty bucket. When you work the land beside him, every click shines a little brighter.',
+	idol_orchard: 'Petals drift around it in every season. Hands that work in its scent learn their craft twice as fast.',
+	idol_blight: 'A mouth of black stone that never closes. It feeds on your victories and gives back strength from every blade that falls.',
+	idol_battlefield: 'Names cut into grey stone, too many to read. The fallen do not rest here: they stand behind you and lend their strength.',
 	saltworks: 'Shallow pans, a lazy sun and a mill that grinds the crust to white. Nothing makes a kingdom last like salt.',
 };
 

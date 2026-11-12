@@ -10,15 +10,16 @@ import { getTile } from '@/utils/world';
 
 /**
  * The entries of the tile menu for the building system (only called while `BUILDINGS_FLAG` is on, see `tileMenuItems`): on a free tile of a biome with a Producer, "Build here..." (the Build window, which also offers "Move X here" when it
- * stands elsewhere). A tile with a building has none: its left click opens the building window with the upgrade. All numbers are the rules' (`lib/buildings.ts`), nothing is decided here.
+ * stands elsewhere). A tile with a building has one entry, "Open <building>", which opens the building window like a left click (the upgrade is there). All numbers are the rules' (`lib/buildings.ts`), nothing is decided here.
  */
 export function buildingMenuItems(game: MapGameStore, x: number, y: number): ContextMenuItem[] {
 	const s = game.getState();
 	const tile = getTile(s.tiles, x, y);
 	if (!tile) return [];
 
-	// a tile with a building has no entry here: a left click opens the building window (components/game/overlays/BuildingModal.tsx), which holds the upgrade
-	if (buildingDef(tile.building)) return [];
+	// a tile with a building: one entry that opens its window (the same as a left click), where the upgrade is
+	const here = buildingDef(tile.building);
+	if (here) return [{ id: 'building-open', label: `Open ${here.label}`, onSelect: () => useUiStore.getState().openBuildingModal(x, y) }];
 
 	// "Build here..." opens the Build window (components/game/overlays/BuildModal.tsx), which lists the same rows (`buildOptions`)
 	const { builds } = buildOptions(game, x, y);

@@ -47,7 +47,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `buffTotals` | Combat / Consumables | [`src/lib/buffs.ts:84`](../../src/lib/buffs.ts) | The summed bonus per stat of the running buffs: |
 | `BUILDING_RULES` | Economy / Buildings | [`src/config/buildings.ts:33`](../../src/config/buildings.ts) | The numbers of the building system (proposals from docs/plan/18, tuned with the sim; |
 | `buildingLevelCost` | Economy / Buildings | [`src/lib/buildings.ts:58`](../../src/lib/buildings.ts) | The price of reaching `level` (1 = building it): |
-| `BUILDINGS` | Economy / Buildings | [`src/catalog/buildings.ts:48`](../../src/catalog/buildings.ts) | The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; |
+| `BUILDINGS` | Economy / Buildings | [`src/catalog/buildings.ts:60`](../../src/catalog/buildings.ts) | The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; |
 | `BUILDINGS_FLAG` | Economy / Buildings | [`src/config/buildings.ts:17`](../../src/config/buildings.ts) | The per-biome building system (R7, IDL-91, IDL-92), behind BUILDINGS_FLAG, which is **ON** (owner decision: |
 | `buildingUpgradeDuration` | Economy / Buildings | [`src/lib/buildings.ts:39`](../../src/lib/buildings.ts) | Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); |
 | `buildNumbers` | Progression / Guided tutorial | [`src/lib/tutorial/numbers.ts:31`](../../src/lib/tutorial/numbers.ts) | The numbers the tutorial texts quote, read from the live config at the moment they are shown (a changed price changes the text, nothing is typed in): |
@@ -263,7 +263,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
 | The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
-| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:118`](../../src/app/GameApp.tsx) | The tick loop. |
+| The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:119`](../../src/app/GameApp.tsx) | The tick loop. |
 | `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:114`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
