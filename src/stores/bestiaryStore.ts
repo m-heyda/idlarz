@@ -12,6 +12,10 @@ interface BestiaryState {
 	loaded: boolean;
 	seen: ReadonlySet<string>;
 	kills: Readonly<Record<string, number>>;
+	/** Mastery tiers claimed per type, times beaten and the fastest win in ms (the server's; empty from an older server) */
+	claimed: Readonly<Record<string, number>>;
+	deaths: Readonly<Record<string, number>>;
+	bestMs: Readonly<Record<string, number>>;
 	apply: (report: BestiaryReport) => void;
 }
 
@@ -19,7 +23,18 @@ export const useBestiaryStore = create<BestiaryState>((set) => ({
 	loaded: false,
 	seen: new Set<string>(),
 	kills: {},
-	apply: (report) => set({ loaded: true, seen: new Set(report.seen), kills: report.kills }),
+	claimed: {},
+	deaths: {},
+	bestMs: {},
+	apply: (report) =>
+		set({
+			loaded: true,
+			seen: new Set(report.seen),
+			kills: report.kills,
+			claimed: report.claimed ?? {},
+			deaths: report.deaths ?? {},
+			bestMs: report.bestMs ?? {},
+		}),
 }));
 
 /** The rule: a type is known once the server listed it (before the server's first answer every type counts as known, so the map never flashes silhouettes; the login claim and every online answer carry the list). */

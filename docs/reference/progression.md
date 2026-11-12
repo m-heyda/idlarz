@@ -16,6 +16,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [Achievements](#achievements)
+- Mastery: [`claimMastery`](#claimmastery), [`claimAllMastery`](#claimallmastery), [Bestiary mastery](#mastery-tiers)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 - Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
 - Badges: [`badgeOptions`](#badgeoptions)
@@ -677,7 +678,7 @@ Refused (nothing changes) for an id that is not in the catalog, was not earned, 
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:71`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:73`](../../src/catalog/achievements.ts)
 
 The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
@@ -730,6 +731,36 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 41 | `scholar_30` | Scholar III | entries >= 30 | 150 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
+
+## Mastery
+
+<a id="claimmastery"></a>
+
+### `claimMastery` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:37`](../../src/lib/offline/mastery.ts)
+
+Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached. Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one
+that skips a tier; a repeated or forged claim therefore pays nothing.
+
+<a id="claimallmastery"></a>
+
+### `claimAllMastery` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:54`](../../src/lib/offline/mastery.ts)
+
+Claim all: every tier every monster type has reached and not claimed, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.
+
+<a id="mastery-tiers"></a>
+
+### Bestiary mastery
+
+Source: [`src/catalog/mastery.ts:27`](../../src/catalog/mastery.ts)
+
+The mastery ladder shared by every monster type: 10 kills reveal the stats, 100 the drop table (with a small bonus), 500 is Mastery I (the decided +10% XP and +5% loot chance, as text for now), 2,500 is Mastery II
+with a title or pet. The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.
+
+See also: `masteryState`, [`claimMastery`](progression.md#claimmastery)
 
 ## Guided tutorial
 
@@ -850,7 +881,7 @@ Claim all: pays every earned tier that is not claimed yet in one go (one request
 
 ### Deeds
 
-Source: [`src/catalog/achievements.ts:415`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:417`](../../src/catalog/achievements.ts)
 
 The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).

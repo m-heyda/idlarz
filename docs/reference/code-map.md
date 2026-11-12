@@ -87,6 +87,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/inventory/route.ts) — ~ One of the player's own changes to what they carry:
 
+**src/app/api/mastery/**
+
+- [`route.ts`](../../src/app/api/mastery/route.ts) — ~ Bestiary mastery:
+
 **src/app/api/offline/**
 
 - [`route.ts`](../../src/app/api/offline/route.ts) — ~ An idempotency key:
@@ -147,7 +151,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/catalog/**
 
-- [`achievements.ts`](../../src/catalog/achievements.ts) — The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
+- [`achievements.ts`](../../src/catalog/achievements.ts) — ~ What has to hold.
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
 - [`badges.ts`](../../src/catalog/badges.ts) — ~ The stored `profiles.badge_id` that hides the badge completely (null = the default).
@@ -174,6 +178,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`loot.ts`](../../src/catalog/loot.ts) — ~ Items the merchant sells, cheapest first (a disabled item is never sold, whatever its `shop` price).
 - [`lootConfig.ts`](../../src/catalog/lootConfig.ts) — ~ A set of items a profile can draw from.
+- [`mastery.ts`](../../src/catalog/mastery.ts) — Bestiary mastery as data (IDL-309, decided 2026-11-12: the hybrid ladder). A monster type has the same ladder of kill tiers; reaching a tier lets the player claim it. Appending a tier later (the
 - [`monsters.ts`](../../src/catalog/monsters.ts) — ~ The monster roster:
 - [`perkCaps.ts`](../../src/catalog/perkCaps.ts) — ~ The stat families whose gear bucket is capped (IDL-149 / IDL-252).
 - [`rarity.ts`](../../src/catalog/rarity.ts) — ~ Everything the game knows about a rarity, in one place:
@@ -460,6 +465,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`manualCloudSave.ts`](../../src/lib/manualCloudSave.ts) — ~ "Save game" in the menu:
 - [`mapEdit.ts`](../../src/lib/mapEdit.ts) — ~ Drawing on a World with a drag:
 - [`mapView.ts`](../../src/lib/mapView.ts) — ~ The view of the map:
+- [`mastery.ts`](../../src/lib/mastery.ts) — ~ Tiers a kill count has reached (0 to the number of tiers).
 - [`merchant.ts`](../../src/lib/merchant.ts) — ~ What a piece of gear costs at the merchant:
 - [`minimap.ts`](../../src/lib/minimap.ts) — ~ The minimap:
 - [`monsters.ts`](../../src/lib/monsters.ts) — ~ Reduces the damage of every hit the player lands (same curve as the player's armor)
@@ -493,6 +499,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
 - [`ledgerUpgrade.ts`](../../src/lib/offline/ledgerUpgrade.ts) — ~ The upgrade path of a `player_ledger` row.
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
+- [`mastery.ts`](../../src/lib/offline/mastery.ts) — ~ The gems the tiers `from` (exclusive) to `to` (inclusive, 1-based) pay.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
 - [`placement.ts`](../../src/lib/offline/placement.ts) — ~ What the rules depend on:
 - [`profile.ts`](../../src/lib/offline/profile.ts) — ~ The character's stats with every derived number worked out again (a save only holds the attributes).
@@ -886,6 +893,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
+- [`mastery.test.ts`](../../tests/server/mastery.test.ts)
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.

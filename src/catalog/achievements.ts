@@ -1,3 +1,5 @@
+import { MASTERY_ENTRY_KILLS } from '@/catalog/mastery';
+
 // The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
 // `lib/offline/achievements.ts` checks against numbers the server already holds; nothing here imports the config or the server.
 
@@ -379,7 +381,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		id: 'scholar_5',
 		title: 'Scholar I',
 		description: 'Fill 5 bestiary entries.',
-		when: { kind: 'entries', kills: 10, min: 5 },
+		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 5 },
 		badge: 'badge_scroll_check_silver',
 		rewards: { gems: 20, points: 5 },
 	},
@@ -387,7 +389,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		id: 'scholar_15',
 		title: 'Scholar II',
 		description: 'Fill 15 bestiary entries.',
-		when: { kind: 'entries', kills: 10, min: 15 },
+		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 15 },
 		badge: 'badge_scroll_check_silver',
 		rewards: { gems: 60, points: 25, bonus: '+5% XP' },
 	},
@@ -395,7 +397,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		id: 'scholar_30',
 		title: 'Scholar III',
 		description: 'Fill 30 bestiary entries.',
-		when: { kind: 'entries', kills: 10, min: 30 },
+		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 30 },
 		badge: 'badge_scroll_check_silver',
 		rewards: { gems: 150, points: 80 },
 	},

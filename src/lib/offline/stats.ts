@@ -52,6 +52,8 @@ export interface LifetimeStats {
 	/** Per monster type id: times the monster beat the player, and the fastest win in ms (the Bestiary). Additive: absent reads as none. */
 	deaths: Record<string, number>;
 	bestMs: Record<string, number>;
+	/** Bestiary mastery: per monster type id, how many mastery tiers the player has claimed (tiers are claimed in order, so a count is the whole record). Additive: absent reads as none. */
+	masteryClaimed: Record<string, number>;
 }
 
 /** Counters are written to the ledger at most this often by the save path (kills and chests are written with their own request, which writes the ledger anyway). */
@@ -82,6 +84,7 @@ export const emptyStats = (): LifetimeStats => ({
 	respecs: 0,
 	deaths: {},
 	bestMs: {},
+	masteryClaimed: {},
 });
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
@@ -124,12 +127,28 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		respecs: Math.floor(num(r.respecs)),
 		deaths: counts(r.deaths),
 		bestMs: counts(r.bestMs),
+		masteryClaimed: counts(r.masteryClaimed),
 	};
 };
 
 /** The stored form: the claim fields are left out while they hold nothing (a row from before claiming existed stays byte-for-byte what it was; `claimed: null` means "not initialised", which is the same as absent). */
 export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
-	const { claimed, earnedAt, claimedAt, manualSynced, goldPeak, unitsSold, goldFromSales, crafted, flawless, respecs, deaths, bestMs, ...rest } = s;
+	const {
+		claimed,
+		earnedAt,
+		claimedAt,
+		manualSynced,
+		goldPeak,
+		unitsSold,
+		goldFromSales,
+		crafted,
+		flawless,
+		respecs,
+		deaths,
+		bestMs,
+		masteryClaimed,
+		...rest
+	} = s;
 	return {
 		...rest,
 		...(claimed !== null ? { claimed } : {}),
@@ -145,6 +164,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(respecs > 0 ? { respecs } : {}),
 		...(Object.keys(deaths).length > 0 ? { deaths } : {}),
 		...(Object.keys(bestMs).length > 0 ? { bestMs } : {}),
+		...(Object.keys(masteryClaimed).length > 0 ? { masteryClaimed } : {}),
 	};
 };
 
@@ -170,7 +190,8 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	s.flawless === 0 &&
 	s.respecs === 0 &&
 	Object.keys(s.deaths).length === 0 &&
-	Object.keys(s.bestMs).length === 0;
+	Object.keys(s.bestMs).length === 0 &&
+	Object.keys(s.masteryClaimed).length === 0;
 
 /**
  * A kill of monster `type`: counted once, when the server pays it. `ms` (how long the fight lasted) keeps the fastest win per type for the Bestiary, and `flawless` (the hero took no hit) counts
@@ -218,9 +239,19 @@ export const recordEncounter = (stats: LifetimeStats, type: string, nowMs: numbe
 export interface BestiaryReport {
 	seen: string[];
 	kills: Record<string, number>;
+	/** Mastery tiers claimed per type, the times a monster beat the player and the fastest win in ms (absent from an older server: read as none) */
+	claimed?: Record<string, number>;
+	deaths?: Record<string, number>;
+	bestMs?: Record<string, number>;
 }
 
-export const bestiaryOf = (stats: LifetimeStats): BestiaryReport => ({ seen: Object.keys(stats.seen), kills: stats.kills });
+export const bestiaryOf = (stats: LifetimeStats): BestiaryReport => ({
+	seen: Object.keys(stats.seen),
+	kills: stats.kills,
+	claimed: stats.masteryClaimed,
+	deaths: stats.deaths,
+	bestMs: stats.bestMs,
+});
 
 /** A chest opened: counted once, when the server pays it. */
 export const recordChest = (stats: LifetimeStats): LifetimeStats => ({ ...stats, chests: stats.chests + 1 });

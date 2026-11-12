@@ -2,7 +2,8 @@ import { GEMS_CAP } from '@/config/economy';
 import { gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending } from '@/lib/offline/gems';
-import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, PendingIdentity } from '@/lib/offline/gemTypes';
+import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
+import { claimAllMastery, claimMastery } from '@/lib/offline/mastery';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
@@ -471,6 +472,34 @@ export const characterStep = (
 		const result = allocatePoints(attrs, request.add, budget);
 		if (!result.ok) return { ledger: { ...ledger, attrs }, value: view(attrs, false, result.reason) };
 		return { ledger: { ...ledger, attrs: result.attrs }, value: view(result.attrs, true) };
+	});
+
+/**
+ * Bestiary mastery (IDL-309): claim one tier of one monster type, or every tier waiting. Decided on the ledger's own kill counts under the compare-and-swap with an idempotency key, so a double click or a forged body pays nothing twice.
+ * The answer carries the bestiary as it stands (every online answer does).
+ */
+export const masteryStep = (deps: ServiceDeps, userId: string, key: string, request: MasteryRequest, nowMs: number): Promise<Online<MasteryReply>> =>
+	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: MasteryReply } => {
+		const ledger = ctx.ledger;
+		const view = (ok: boolean, l: Ledger, over: Partial<MasteryReply> = {}): MasteryReply => ({
+			ok,
+			tiers: 0,
+			paid: 0,
+			gems: l.gems,
+			serverNowSec: ctx.nowSec,
+			...over,
+		});
+		const done = request.action === 'claimAll' ? claimAllMastery(ledger) : claimMastery(ledger, request.type, request.tier);
+		if (!done.ok) {
+			const message =
+				done.reason === 'already_claimed'
+					? 'That tier is already claimed.'
+					: done.reason === 'out_of_order'
+						? 'Claim the earlier tier first.'
+						: 'That tier is not reached yet.';
+			return { ledger, value: view(false, ledger, { reason: done.reason, message }) };
+		}
+		return { ledger: done.ledger, value: view(true, done.ledger, { tiers: done.tiers, paid: done.gems }) };
 	});
 
 export type FightRequest =

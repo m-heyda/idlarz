@@ -1,6 +1,6 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
-import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest } from '@/lib/offline/gemTypes';
+import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest } from '@/lib/offline/gemTypes';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
 import type { AchievementReport } from '@/lib/offline/achievements';
 import type { BestiaryReport } from '@/lib/offline/stats';
@@ -105,6 +105,9 @@ export const requestDismiss = (key: string, n: number, since: number | undefined
 /** The gem shop: `status` reads the balance, the daily bonus and the cooldowns; `daily` and `spend` need a key (one per click: the server replays the answer if it is sent twice). */
 export const requestGems = (key: string | null, request: GemsRequest): Promise<Reply<GemsReply>> =>
 	post<GemsReply>('/api/gems', key === null ? request : { key, ...request });
+
+/** Bestiary mastery: claim one tier of a monster type, or every tier that is waiting (one key per click). */
+export const requestMastery = (key: string, request: MasteryRequest): Promise<Reply<MasteryReply>> => post<MasteryReply>('/api/mastery', { key, ...request });
 
 /** The attribute points: `allocate` puts points into attributes (the server holds the allocation), `sync` only reads it. */
 export const requestCharacter = (key: string | null, request: CharacterRequest): Promise<Reply<CharacterReply>> =>

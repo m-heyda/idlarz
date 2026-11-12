@@ -50,7 +50,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 71,
+  "line": 73,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
@@ -64,7 +64,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 415,
+  "line": 417,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -276,6 +276,20 @@
   "line": 401,
   "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
   "see": []
+ },
+ {
+  "id": "mastery-tiers",
+  "name": "Bestiary mastery",
+  "symbol": "MASTERY_TIERS",
+  "kind": "const",
+  "category": "Progression/Mastery",
+  "file": "src/catalog/mastery.ts",
+  "line": 27,
+  "summary": "The mastery ladder shared by every monster type: 10 kills reveal the stats, 100 the drop table (with a small bonus), 500 is Mastery I (the decided +10% XP and +5% loot chance, as text for now), 2,500 is Mastery II with a title or pet. The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.",
+  "see": [
+   "masteryState",
+   "claimMastery"
+  ]
  },
  {
   "id": "perk-caps",
@@ -2343,6 +2357,28 @@
    "ledgerFromRow",
    "upgradeBody"
   ]
+ },
+ {
+  "id": "claimmastery",
+  "name": "claimMastery",
+  "symbol": "claimMastery",
+  "kind": "function",
+  "category": "Progression/Mastery",
+  "file": "src/lib/offline/mastery.ts",
+  "line": 37,
+  "summary": "Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached. Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one that skips a tier; a repeated or forged claim therefore pays nothing.",
+  "see": []
+ },
+ {
+  "id": "claimallmastery",
+  "name": "claimAllMastery",
+  "symbol": "claimAllMastery",
+  "kind": "function",
+  "category": "Progression/Mastery",
+  "file": "src/lib/offline/mastery.ts",
+  "line": 54,
+  "summary": "Claim all: every tier every monster type has reached and not claimed, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.",
+  "see": []
  },
  {
   "id": "placetickets",

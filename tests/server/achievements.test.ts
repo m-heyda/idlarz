@@ -6,7 +6,7 @@ import { pickPersisted, type PersistedGame } from '../../src/lib/sanitizeSave';
 import { encodeSave } from '../../src/lib/saveFormat';
 import { acceptSave, type SaveRepo, type StoredSave, type WorldPart } from '../../src/lib/cloudSave/pipeline';
 import type { ServiceDeps } from '../../src/lib/offline/service';
-import { gemsStep, syncTickets, tutorialStep, type Online } from '../../src/lib/offline/online';
+import { gemsStep, masteryStep, syncTickets, tutorialStep, type Online } from '../../src/lib/offline/online';
 import { ACHIEVEMENTS } from '../../src/catalog/achievements';
 import { TUTORIAL_PATH } from '../../src/catalog/tutorial';
 import { GEMS_CAP, STARTING_GEMS } from '../../src/config/economy';
@@ -401,4 +401,26 @@ test('a Claim all request over the wire pays once and replays on the same key', 
 	const again = ok(await gemsStep(m.deps, 'u1', 'claimall-key-002', { action: 'claimAll' }, T0 + 4000, null));
 	assert.equal(again.ok, false);
 	assert.equal(m.ledgers.get('u1')!.gems, before + 75);
+});
+
+// IDL-309: a mastery claim over the wire
+
+test('a mastery claim request judges the tier from the server kills, pays once and replays on the same key', async () => {
+	const m = await player();
+	ok(await syncTickets(m.deps, 'u1', T0 + 1000));
+	count(m, { kills: { thistleBoar: 120 } });
+	const unreached = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0001', { action: 'claim', type: 'thistleBoar', tier: 3 }, T0 + 2000));
+	assert.equal(unreached.ok, false);
+	assert.equal(unreached.reason, 'not_reached');
+	const first = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0002', { action: 'claim', type: 'thistleBoar', tier: 1 }, T0 + 3000));
+	assert.equal(first.ok, true);
+	assert.equal(first.tiers, 1);
+	assert.equal(m.ledgers.get('u1')!.stats.masteryClaimed.thistleBoar, 1);
+	const replay = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0002', { action: 'claim', type: 'thistleBoar', tier: 1 }, T0 + 3001));
+	assert.deepEqual(replay, first);
+	const twice = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0003', { action: 'claim', type: 'thistleBoar', tier: 1 }, T0 + 4000));
+	assert.equal(twice.reason, 'already_claimed');
+	const all = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0004', { action: 'claimAll' }, T0 + 5000));
+	assert.equal(all.ok && all.tiers, 1, 'tier 2 (100 kills) was still waiting');
+	assert.equal(m.ledgers.get('u1')!.stats.masteryClaimed.thistleBoar, 2);
 });

@@ -629,6 +629,7 @@ and its gold is paid in the browser.
 | `/api/fight` | POST | `src/app/api/fight/route.ts` |
 | `/api/gems` | POST | `src/app/api/gems/route.ts` |
 | `/api/inventory` | POST | `src/app/api/inventory/route.ts` |
+| `/api/mastery` | POST | `src/app/api/mastery/route.ts` |
 | `/api/offline` | POST | `src/app/api/offline/route.ts` |
 | `/api/rebirth` | POST | `src/app/api/rebirth/route.ts` |
 | `/api/rebirths` | GET | `src/app/api/rebirths/route.ts` |
