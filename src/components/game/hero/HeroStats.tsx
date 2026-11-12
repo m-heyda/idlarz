@@ -282,6 +282,7 @@ const HeroStats: React.FC = () => {
 								return (
 									<React.Fragment key={key}>
 										<span className='ds-income-name'>
+											{/* eslint-disable-next-line @next/next/no-img-element */}
 											{icon ? <img src={icon} alt='' /> : null}
 											{labelOf(key)}
 										</span>
@@ -315,6 +316,7 @@ const HeroStats: React.FC = () => {
 								defaultOpen={false}
 								title={
 									<>
+										{/* eslint-disable-next-line @next/next/no-img-element */}
 										{icon ? <img src={icon} alt='' style={{ width: 16, height: 16 }} /> : null}
 										{labelOf(key)}
 									</>

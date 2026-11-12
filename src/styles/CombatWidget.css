@@ -308,7 +308,7 @@
 
 /* ===== The combat window in the design system's look: dark slate, gold rim, flat bars and slots. The fight effects (slashes, numbers, sprite hit) are unchanged. ===== */
 .combat-widget {
-	padding: 10px 12px 12px;
+	padding: 16px 18px 18px;
 	background: linear-gradient(#10131c, #0a0c12);
 	border: 2px solid var(--ds-gold-dk, #8a5f16);
 	box-shadow:
@@ -469,4 +469,23 @@
 	.fight-body[data-shake='true'] .fight-bar[data-kind='player'] {
 		animation: none;
 	}
+}
+
+/* more air inside the combat window */
+.combat-widget .fight-body {
+	gap: 10px;
+}
+
+.combat-head {
+	padding-bottom: 12px;
+	margin-bottom: 12px;
+}
+
+.combat-widget .fight-skill {
+	padding: 10px 8px 10px 24px;
+}
+
+.combat-switches {
+	padding-top: 10px;
+	margin-top: 2px;
 }

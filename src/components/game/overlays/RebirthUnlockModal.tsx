@@ -3,9 +3,10 @@ import { biomeArtUrl } from '@/config/biomeArt';
 import { biomeColor } from '@/config/biomePalette';
 import { formatHeaderAmount, formatInt, formatNumber, formatTime, tidy } from '@/utils/formatters';
 import type { RebirthRunSummary, RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
 import ResourceIcon from '../ResourceIcon';
 import EmberIcon from '../EmberIcon';
+import { Button, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
 
 const pct = (fraction: number) => `${tidy((fraction * 100).toFixed(fraction >= 1 ? 0 : 1))}%`;
 
@@ -26,8 +27,8 @@ const RebirthUnlockModal: React.FC<{ run: RebirthRunSummary; intro: RebirthUnloc
 	const art = intro ? biomeArtUrl(intro.biome) : undefined;
 	const monsterCount = intro ? intro.monsters.normal + intro.monsters.boss : 0;
 	return (
-		<PixelModal title='Rebirth complete' size='sm' onClose={onClose}>
-			<div className='px-card mb-3 text-sm text-center'>
+		<GameModal title='Rebirth complete' size='sm' onClose={onClose}>
+			<div className='ds-listrow mb-3 text-sm text-center' style={{ marginBottom: 10 }}>
 				<div className='text-xs uppercase tracking-widest text-[#a89878] mb-1'>Rebirth {run.rebirths}</div>
 				<div className='flex items-center justify-center gap-2 text-2xl font-bold text-green-300' data-testid='rebirth-embers'>
 					<EmberIcon />+{formatHeaderAmount(run.embersGained)} Embers
@@ -40,8 +41,8 @@ const RebirthUnlockModal: React.FC<{ run: RebirthRunSummary; intro: RebirthUnloc
 			</div>
 
 			{intro && (
-				<div className='px-card mb-3 text-sm text-center'>
-					<div className='px-h'>Unlocked</div>
+				<div className='ds-listrow mb-3 text-sm text-center' style={{ marginBottom: 10 }}>
+					<SectionLabel>Unlocked</SectionLabel>
 					{art && (
 						// eslint-disable-next-line @next/next/no-img-element
 						<img src={art} alt={intro.label} width={136} height={136} className='pixelated mx-auto mb-2' style={{ imageRendering: 'pixelated' }} />
@@ -77,7 +78,7 @@ const RebirthUnlockModal: React.FC<{ run: RebirthRunSummary; intro: RebirthUnloc
 				</div>
 			)}
 
-			<div className='px-card mb-3 text-sm'>
+			<div className='ds-listrow mb-3 text-sm' style={{ marginBottom: 10 }}>
 				<button
 					type='button'
 					className='w-full flex items-center justify-between text-left text-[#f0d27a]'
@@ -111,11 +112,11 @@ const RebirthUnlockModal: React.FC<{ run: RebirthRunSummary; intro: RebirthUnloc
 			</div>
 
 			<div className='flex justify-center'>
-				<button className='px-btn px-btn-gold' onClick={onClose}>
+				<Button tone='gold' onClick={onClose}>
 					Continue
-				</button>
+				</Button>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

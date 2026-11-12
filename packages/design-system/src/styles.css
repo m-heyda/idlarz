@@ -4250,3 +4250,29 @@ button.ds-income-head:hover {
 .ds-slider-bare .ds-slider-out {
 	display: none;
 }
+
+/* an undiscovered monster: a dark shape with a gold question mark over it */
+.ds-mon-art,
+.ds-deed-icon-lg {
+	position: relative;
+}
+
+.ds-mon[data-unk='true'] .ds-mon-art img,
+.ds-unk-sil {
+	filter: brightness(0) drop-shadow(0 0 1px #5a5f78);
+	opacity: 0.9;
+}
+
+.ds-mon-q {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	font-size: 26px;
+	font-weight: 400;
+	color: var(--ds-gold-lt, #f4d57e);
+	text-shadow:
+		0 0 4px #000,
+		0 2px 0 #000;
+	pointer-events: none;
+}

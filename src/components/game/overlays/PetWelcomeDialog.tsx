@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { petById } from '@/catalog/pets';
 import { usePetStore } from '@/stores/petStore';
 import { useUiStore } from '@/stores/uiStore';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button } from '../../../../packages/design-system/src/components/primitives';
 
 /**
  * The welcome letter of a special pet: asked from the server once the start of the game is done (`ready`), shown once after the welcome-back window, then never again.
@@ -27,13 +28,13 @@ const PetWelcomeDialog: React.FC<{ ready: boolean }> = ({ ready }) => {
 	const close = () => void usePetStore.getState().closeLetter(letter.petId);
 
 	return (
-		<PixelModal title={text.title} size='md' onClose={close} closeOnBackdrop={false}>
+		<GameModal title={text.title} size='md' onClose={close} closeOnBackdrop={false}>
 			<div className='flex flex-col gap-4 px-1 pb-1' data-testid='pet-welcome'>
 				<div className='flex justify-end gap-1' role='group' aria-label='Language'>
 					{(['pl', 'en'] as const).map((code) => (
-						<button key={code} className={`px-btn ${lang === code ? 'active' : ''}`} aria-pressed={lang === code} onClick={() => setLang(code)}>
+						<Button key={code} size='sm' tone={lang === code ? 'gold' : 'stone'} aria-pressed={lang === code} onClick={() => setLang(code)}>
 							{code.toUpperCase()}
-						</button>
+						</Button>
 					))}
 				</div>
 				{pet && (
@@ -48,12 +49,10 @@ const PetWelcomeDialog: React.FC<{ ready: boolean }> = ({ ready }) => {
 					))}
 				</div>
 				<div className='flex justify-center'>
-					<button className='px-btn' onClick={close}>
-						{text.button}
-					</button>
+					<Button onClick={close}>{text.button}</Button>
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

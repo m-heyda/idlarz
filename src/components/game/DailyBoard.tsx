@@ -2,6 +2,7 @@ import React from 'react';
 import { DAILY_BONUS_GEMS } from '@/config/gemShop';
 import type { DailyInfo } from '@/lib/offline/gemTypes';
 import GemIcon from './GemIcon';
+import { Button } from '../../../packages/design-system/src/components/primitives';
 
 /** The line under the board's title: what today pays, or when to come back. */
 const dailyLine = (daily: DailyInfo | undefined): string => {
@@ -41,9 +42,9 @@ const DailyBoard: React.FC<{ daily: DailyInfo | undefined; busy: boolean; onClai
 							+{gemsPaid} <GemIcon />
 						</span>
 						{today ? (
-							<button className='px-btn px-btn-gold px-btn-sm' disabled={busy} onClick={onClaim}>
+							<Button tone='gold' size='sm' disabled={busy} onClick={onClaim}>
 								Claim
-							</button>
+							</Button>
 						) : (
 							<span className='text-[10px] text-[#7a6a52]'>{done ? 'Claimed' : 'Locked'}</span>
 						)}

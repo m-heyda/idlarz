@@ -46,6 +46,7 @@ export const BiomeTooltip = memo(({ biome, level, x, y }: { biome: BiomeType; le
 					{lines.map(({ resource, own, bonus }) => (
 						<div key={resource} className='ds-tip-row'>
 							<span>
+								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img className='ds-tip-mini' src={resourceIconUrl(resource)} alt='' />
 								{RESOURCES[resource].label}
 							</span>

@@ -1,12 +1,13 @@
 import React from 'react';
 import { useUiStore } from '@/stores/uiStore';
 import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
 import ResourceIcon from '../ResourceIcon';
 import AwayBar from '../AwayBar';
 import { useGameStore } from '@/stores/gameStore';
 import { offlineBar } from '@/lib/offlineBar';
 import type { Resources } from '@/types/game';
+import { Button } from '../../../../packages/design-system/src/components/primitives';
 
 const ORDER: (keyof Resources)[] = ['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool', 'xp'];
 
@@ -29,7 +30,7 @@ const OfflineDialog: React.FC = () => {
 	const earned = ORDER.filter((key) => grant.resources[key] > 0);
 
 	return (
-		<PixelModal title='Welcome back!' size='md' onClose={close}>
+		<GameModal title='Welcome back!' size='md' onClose={close}>
 			<div className='flex flex-col gap-5 px-3 pb-2 pt-1 text-base'>
 				<div className='text-center'>
 					<div className='text-[#a89878]'>While you were away</div>
@@ -84,12 +85,12 @@ const OfflineDialog: React.FC = () => {
 				</ul>
 
 				<div className='flex justify-center'>
-					<button className='px-btn px-btn-gold' onClick={close}>
+					<Button tone='gold' onClick={close}>
 						Continue
-					</button>
+					</Button>
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

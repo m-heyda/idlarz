@@ -358,7 +358,12 @@ export const MonsterTooltip: React.FC<{
 		footer={
 			footer ??
 			(cta || defeated !== undefined
-				? [<span style={{ color: '#f0d27a' }}>{cta ?? ''}</span>, defeated !== undefined ? `Defeated: ${defeated}` : '']
+				? [
+						<span key='cta' style={{ color: '#f0d27a' }}>
+							{cta ?? ''}
+						</span>,
+						defeated !== undefined ? `Defeated: ${defeated}` : '',
+					]
 				: undefined)
 		}
 	>

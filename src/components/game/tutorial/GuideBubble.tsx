@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '@/styles/Tutorial.css';
 import { GUIDE_NAME, GUIDE_TALK_SHEET } from '@/catalog/tutorial';
 import { TYPE_CPS, TYPE_TICK_MS, glyphs, mouthOpen, visibleLength } from '@/lib/tutorial/typewriter';
+import { Button } from '../../../../packages/design-system/src/components/primitives';
 
 /**
  * The text of a bubble typed out letter by letter. A click on the bubble or any key shows the rest at once; with `prefers-reduced-motion` (or `instant`) the whole text is there from the start.
@@ -81,13 +82,13 @@ const GuideBubble: React.FC<GuideBubbleProps> = ({ text, progress, actionLabel, 
 				<div className='guide-actions'>
 					<span className='guide-dots'>{progress}</span>
 					<span className='flex gap-2'>
-						<button type='button' className='px-btn px-btn-sm px-btn-gray' onClick={onSkip}>
+						<Button tone='dark' size='sm' onClick={onSkip}>
 							{skipLabel}
-						</button>
+						</Button>
 						{actionLabel && onAction && (
-							<button type='button' className='px-btn px-btn-sm' onClick={onAction} autoFocus>
+							<Button size='sm' onClick={onAction} autoFocus>
 								{actionLabel}
-							</button>
+							</Button>
 						)}
 					</span>
 				</div>
