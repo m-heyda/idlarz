@@ -300,13 +300,13 @@ export const MiniMapStory: Story = {
 	),
 };
 
-/** The amount of a trade: presets (1K, 1M, Max), a typed field with k / m / b suffixes (typed wins over a preset), a slider and an invalid state. */
+/** The amount of a trade: presets (1K, 1M, 1B, Max), a typed field with k / m / b suffixes (typed wins over a preset), a slider and an invalid state. */
 export const AmountInputStory: Story = {
 	name: 'AmountInput',
 	render: function Render() {
 		const [text, setText] = React.useState('');
 		const [preset, setPreset] = React.useState<string | number | null>(1000);
-		const max = 2_450_000;
+		const max = 2_450_000_000;
 		const typed = text.trim() === '' ? null : parseAmountText(text);
 		const value = clampAmount(typed ?? (preset === 'max' ? max : Number(preset ?? 0)), max);
 		return (
@@ -319,6 +319,7 @@ export const AmountInputStory: Story = {
 					presets={[
 						{ id: 1000, label: '1K' },
 						{ id: 1_000_000, label: '1M' },
+						{ id: 1_000_000_000, label: '1B' },
 						{ id: 'max', label: 'Max' },
 					]}
 					activePreset={preset}

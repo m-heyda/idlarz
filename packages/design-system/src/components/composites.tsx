@@ -276,7 +276,7 @@ export interface AmountPreset {
 }
 
 /**
- * The amount of a trade or craft: preset buttons (1K, 1M, Max), a typed field ("250", "1.5k", "2m") and a slider. **A typed amount wins over a preset** (no preset is shown active while text is typed), and text the
+ * The amount of a trade or craft: preset buttons (1K, 1M, 1B, Max), a typed field ("250", "1.5k", "2m") and a slider. **A typed amount wins over a preset** (no preset is shown active while text is typed), and text the
  * parser does not understand marks the field invalid. Props only: the caller holds `text`, the active preset and the resolved `value`, and persists them (the game keeps them across visits).
  *
  * - `value`: the amount the trade will move now (already resolved from the typed text or the preset and held to `max`); it drives the slider and the readout.

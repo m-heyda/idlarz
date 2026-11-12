@@ -128,7 +128,7 @@
 	margin-right: 4px;
 }
 
-/* ===== AmountInput (IDL-318): presets (1K, 1M, Max), the typed field and a slider ===== */
+/* ===== AmountInput (IDL-318): presets (1K, 1M, 1B, Max), the typed field and a slider ===== */
 .ds-amount {
 	display: flex;
 	flex-direction: column;
