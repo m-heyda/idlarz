@@ -44,6 +44,7 @@ export const MerchantResources: React.FC = () => {
 	// kept in the ui store (and remembered): they survive switching tabs or closing the window
 	const preset = useUiStore((state) => state.merchantPreset);
 	const setPreset = useUiStore((state) => state.setMerchantPreset);
+	const selected = useUiStore((state) => state.merchantSelect);
 	const custom = useUiStore((state) => state.merchantCustom);
 	const setCustom = useUiStore((state) => state.setMerchantCustom);
 	// a typed amount wins while it reads as a number; a chip click clears it
@@ -127,7 +128,13 @@ export const MerchantResources: React.FC = () => {
 					const canBuy = isBuyable(resource);
 					const buyUnits = unitsToBuy(resource);
 					return (
-						<div className='mr-row' key={resource} title={`${info.label}: ${info.priceDescription}`}>
+						<div
+							className='mr-row'
+							key={resource}
+							data-selected={selected === resource}
+							ref={selected === resource ? (el) => el?.scrollIntoView({ block: 'nearest' }) : undefined}
+							title={`${info.label}: ${info.priceDescription}`}
+						>
 							<ResourceIcon resource={resource} scale={1} />
 							<span className='mr-name'>{info.label}</span>
 							<span className='mr-num'>{formatNumber(Math.floor(resources[resource]))}</span>

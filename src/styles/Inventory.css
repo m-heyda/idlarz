@@ -680,3 +680,9 @@
 .char-panel-head .char-points {
 	margin-top: 0;
 }
+
+/* the row a click on a header resource selected (IDL-315) */
+.mr-row[data-selected='true'] {
+	outline: 1px solid #f0d27a;
+	background: rgba(60, 44, 20, 0.7);
+}

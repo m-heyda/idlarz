@@ -245,3 +245,19 @@ test('with the building system on the placeholder gives way to the real build me
 		'nothing on the castle',
 	);
 });
+
+// IDL-315: a click on a header resource opens the Merchant on it
+test('openMerchantOn opens the Merchant on the Resources tab with that row selected; gold opens Upgrades', async () => {
+	const { useWindowStore } = await import('../../src/stores/windowStore');
+	useWindowStore.setState({ order: [] });
+	useUiStore.getState().openMerchantOn('eggs');
+	assert.equal(useWindowStore.getState().order.at(-1), 'merchant');
+	assert.equal(useUiStore.getState().merchantTab, 'resources');
+	assert.equal(useUiStore.getState().merchantSelect, 'eggs');
+	useUiStore.getState().openMerchantOn('gold');
+	assert.equal(useUiStore.getState().merchantTab, 'upgrades');
+	assert.equal(useUiStore.getState().merchantSelect, null);
+	useUiStore.getState().openMerchantOn('wood');
+	useUiStore.getState().clearMerchantSelect();
+	assert.equal(useUiStore.getState().merchantSelect, null);
+});
