@@ -186,10 +186,8 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 
 	return (
 		<main className='h-screen w-screen overflow-hidden relative'>
-			{/* z-50 puts the header above the window backdrop (z-45): resources stay visible and the Menu button toggles */}
-			<div className='fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm'>
-				<GameHeader />
-			</div>
+			{/* the top bar is z-50, above the window backdrop (z-45): resources stay visible and the menu button toggles. No wrapper with a blur: it would become the containing block of the dock's fixed position */}
+			<GameHeader />
 			<Grid />
 			<FloatingText />
 			<GameWindows />

@@ -89,7 +89,7 @@ const MinimapBody: React.FC = () => {
 
 	return (
 		<div
-			className='minimap'
+			className='minimap ds-root ds-minimap'
 			style={{ width: BOX.w, height: BOX.h }}
 			title={`Map overview: click or drag to move the view${summary.length ? ` (${summary.join(', ')})` : ''}`}
 			aria-label={`Map overview${summary.length ? `, ${summary.join(', ')}` : ''}`}
@@ -106,22 +106,21 @@ const MinimapBody: React.FC = () => {
 			<canvas ref={canvasRef} width={layout.width} height={layout.height} className='minimap-canvas' />
 			<canvas ref={glowRef} width={layout.width} height={layout.height} className='minimap-canvas minimap-glow' aria-hidden />
 			<div ref={viewRef} className='minimap-view' />
-			{(monsters.length > 0 || chestCount > 0) && (
-				<div className='minimap-legend' aria-hidden>
+			<div className='ds-minimap-stats' aria-hidden>
+				<span style={{ display: 'flex', gap: 8 }}>
 					{monsters.length > 0 && (
-						<span>
-							<i style={{ background: MONSTER_COLOR }} />
-							{monsters.length}
+						<span className='ds-bad' title='Enemies on the map'>
+							<i className='minimap-dot' style={{ background: MONSTER_COLOR }} /> {monsters.length}
 						</span>
 					)}
 					{chestCount > 0 && (
-						<span>
-							<i style={{ background: CHEST_COLOR, boxShadow: `0 0 4px ${CHEST_COLOR}` }} />
-							{chestCount}
+						<span className='ds-gold-text' title='Chests on the map'>
+							<i className='minimap-dot' style={{ background: CHEST_COLOR, boxShadow: `0 0 4px ${CHEST_COLOR}` }} /> {chestCount}
 						</span>
 					)}
-				</div>
-			)}
+				</span>
+				<span className='ds-dim'>{tiles.stats.owned} tiles</span>
+			</div>
 		</div>
 	);
 };
