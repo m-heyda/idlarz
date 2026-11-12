@@ -51,6 +51,10 @@ test('callbackNext keeps a path on this site and refuses everything else', () =>
 
 test('the site origin prefers the configured address over the request host', () => {
 	assert.equal(siteOrigin({ SITE_URL: 'https://idlarz.example/path' }, 'https://evil.example/api/auth/reset'), 'https://idlarz.example');
+	const both = { SITE_URL: 'https://idler.site, https://idler-rose.vercel.app' };
+	assert.equal(siteOrigin(both, 'https://idler-rose.vercel.app/api/auth/reset'), 'https://idler-rose.vercel.app');
+	assert.equal(siteOrigin(both, 'https://idler.site/api/auth/reset'), 'https://idler.site');
+	assert.equal(siteOrigin(both, 'https://evil.example/api/auth/reset'), 'https://idler.site');
 	assert.equal(siteOrigin({ VERCEL_URL: 'idlarz-abc.vercel.app' }, 'https://evil.example/x'), 'https://idlarz-abc.vercel.app');
 	assert.equal(siteOrigin({ SITE_URL: 'javascript:alert(1)' }, 'http://localhost:3000/x'), 'http://localhost:3000');
 	assert.equal(resetRedirectTo('https://idlarz.example'), 'https://idlarz.example/auth/callback?next=%2Freset');

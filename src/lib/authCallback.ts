@@ -16,16 +16,28 @@ export const callbackNext = (raw: string | null | undefined): string => safeNext
 /**
  * The site's own origin for the link in the reset email. A configured `SITE_URL` wins (never trust a Host header when we know our address), then the Vercel
  * deployment host, and only then the request's own origin (local development). Supabase additionally only honours a redirect on its allow-list.
+ *
+ * `SITE_URL` may list several origins separated by commas (for example the new and the old domain). The request's own origin is used only when it is one of
+ * them, so the emailed link returns to the domain the player is on; any other request falls back to the first listed origin (a Host header never adds one).
  */
 export const siteOrigin = (env: { SITE_URL?: string; VERCEL_URL?: string }, requestUrl: string): string => {
-	const configured = env.SITE_URL?.trim();
-	if (configured) {
+	const configured: string[] = [];
+	for (const part of (env.SITE_URL ?? '').split(',')) {
 		try {
-			const url = new URL(configured);
-			if (url.protocol === 'https:' || url.protocol === 'http:') return url.origin;
+			const url = new URL(part.trim());
+			if (url.protocol === 'https:' || url.protocol === 'http:') configured.push(url.origin);
 		} catch {
-			/* fall through to the next source */
+			/* skip an entry that is not a URL */
 		}
+	}
+	if (configured.length > 0) {
+		let requested = '';
+		try {
+			requested = new URL(requestUrl).origin;
+		} catch {
+			/* no usable request origin: use the first listed */
+		}
+		return configured.includes(requested) ? requested : configured[0];
 	}
 	const vercel = env.VERCEL_URL?.trim();
 	if (vercel && /^[a-z0-9.-]+$/i.test(vercel)) return `https://${vercel}`;
