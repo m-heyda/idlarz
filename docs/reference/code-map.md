@@ -312,7 +312,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The tabs, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on).
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
 - [`LoadingScreen.tsx`](../../src/components/game/overlays/LoadingScreen.tsx) — ~ The splash while the saved game loads (needs the game store; the start gate uses LoadingView, which does not).
-- [`LoadingView.tsx`](../../src/components/game/overlays/LoadingView.tsx) — ~ Hydration splash:
+- [`LoadingView.tsx`](../../src/components/game/overlays/LoadingView.tsx) — ~ The monsters that take turns on the loading card (art under public/pixel/enemies)
 
 **src/components/game/overlays/Merchant/**
 
