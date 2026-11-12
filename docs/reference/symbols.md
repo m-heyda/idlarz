@@ -53,6 +53,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `buildingUpgradeDuration` | Economy / Buildings | [`src/lib/buildings.ts:39`](../../src/lib/buildings.ts) | Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); |
 | `buildNumbers` | Progression / Guided tutorial | [`src/lib/tutorial/numbers.ts:31`](../../src/lib/tutorial/numbers.ts) | The numbers the tutorial texts quote, read from the live config at the moment they are shown (a changed price changes the text, nothing is typed in): |
 | `buyCost` | Economy / Merchant | [`src/utils/game/merchant.ts:72`](../../src/utils/game/merchant.ts) | Gold for buying `units` of a resource from the merchant: |
+| `buyResource` | Economy / Merchant | [`src/lib/offline/trade.ts:69`](../../src/lib/offline/trade.ts) | Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. |
 | `calculateAnimalCost` | Economy / Farm | [`src/utils/game/farm.ts:14`](../../src/utils/game/farm.ts) | Food cost of the next animal of a kind when `level` of them are owned: |
 | `calculateCombatStats` | Progression / Attributes | [`src/utils/game/character.ts:257`](../../src/utils/game/character.ts) | The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says. |
 | `calculateFarmOutput` | Economy / Farm | [`src/utils/game/farm.ts:79`](../../src/utils/game/farm.ts) | The whole farm's output per second: |
@@ -153,7 +154,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
 | `isInWard` | Economy / Castle | [`src/lib/castleWard.ts:15`](../../src/lib/castleWard.ts) | Is this tile inside the ward: |
-| `isJunk` | Loot / Junk | [`src/lib/loot/junk.ts:18`](../../src/lib/loot/junk.ts) | Whether a piece of gear in the bag counts as junk for the "Sell junk" button. |
+| `isJunk` | Loot / Junk | [`src/lib/loot/junk.ts:19`](../../src/lib/loot/junk.ts) | Whether a piece of gear in the bag counts as junk for the "Sell junk" button. |
 | `isNonProduction` | Saves & Server / Accepting a save | [`src/lib/cloudSave/environment.ts:12`](../../src/lib/cloudSave/environment.ts) | Is this server a production server? Decided from the server's own environment only; |
 | `judgeRebase` | Saves & Server / Uploading | [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts) | Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. |
 | `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:51`](../../src/lib/loot/kill.ts) | Rewards for a kill. |
@@ -241,8 +242,9 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `SAVE_SCHEMA` | Saves & Server / The save | [`src/lib/saveFormat.ts:35`](../../src/lib/saveFormat.ts) | The save in the browser. |
 | `sealedRng` | Saves & Server / The ledger | [`src/lib/offline/seal.ts:18`](../../src/lib/offline/seal.ts) | A random source for one reward: |
 | Season restart (reset-players) | Ops / Operator guides | [`scripts/reset-players.ts:1`](../../scripts/reset-players.ts) | Season restart: |
-| `sellJunkRule` | Loot / Junk | [`src/lib/offline/inventory.ts:235`](../../src/lib/offline/inventory.ts) | The "Sell junk" button: |
+| `sellJunkRule` | Loot / Junk | [`src/lib/offline/inventory.ts:240`](../../src/lib/offline/inventory.ts) | The "Sell junk" button: |
 | `sellPayout` | Economy / Merchant | [`src/utils/game/merchant.ts:62`](../../src/utils/game/merchant.ts) | Gold for selling `qty` of something worth `unit` each. |
+| `sellResource` | Economy / Merchant | [`src/lib/offline/trade.ts:44`](../../src/lib/offline/trade.ts) | Sells `qty` units of `resource` to the merchant: |
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
 | `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:153`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
 | `settleIdols` | Saves & Server / Accepting a save | [`src/lib/cloudSave/idolTrust.ts:19`](../../src/lib/cloudSave/idolTrust.ts) | The server's say over the Idol levels (the account's `idolLevels`). |

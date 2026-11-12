@@ -420,7 +420,7 @@ The builder every piece of gear is authored with. Gear is authored at the first 
 
 ### `isJunk` <small>function</small>
 
-Source: [`src/lib/loot/junk.ts:18`](../../src/lib/loot/junk.ts)
+Source: [`src/lib/loot/junk.ts:19`](../../src/lib/loot/junk.ts)
 
 Whether a piece of gear in the bag counts as junk for the "Sell junk" button. **This is the one place that defines junk.** It is false for everything until the rule is decided (IDL-312), so the button sells nothing yet; the server
 (`sellJunk` with `rule: 'junk'`) and the browser both ask it, so they always agree. Never junk, whatever the rule says: worn gear (it is not in the bag), potions and other stacks (they are not gear), and, once they exist, set pieces and items the
@@ -432,7 +432,7 @@ See also: `countJunk`
 
 ### `sellJunkRule` <small>function</small>
 
-Source: [`src/lib/offline/inventory.ts:235`](../../src/lib/offline/inventory.ts)
+Source: [`src/lib/offline/inventory.ts:240`](../../src/lib/offline/inventory.ts)
 
 The "Sell junk" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
 every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.

@@ -190,7 +190,12 @@ export type { InventoryOp };
 
 /** Operations that change what the player carries while a fight is open are refused (the fight swings with the gear it started with). */
 export const needsNoFight = (op: InventoryOp): boolean =>
-	op.action !== 'buyShop' && op.action !== 'buyOffer' && op.action !== 'autoSell' && op.action !== 'use';
+	op.action !== 'buyShop' &&
+	op.action !== 'buyOffer' &&
+	op.action !== 'autoSell' &&
+	op.action !== 'use' &&
+	op.action !== 'sellResource' &&
+	op.action !== 'buyResource';
 
 export interface OpResult {
 	ok: boolean;
@@ -328,6 +333,10 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 		case 'use':
 			// drinking touches the hero's HP, mana and buffs too: it is applied by applyUse (consumables.ts), never here
 			return refused(inv);
+		case 'sellResource':
+		case 'buyResource':
+			// a resource trade needs the save and the ledger's grants, not the bag: it is made by `tradeResource` (trade.ts)
+			return refused(inv);
 		case 'buyOffer': {
 			if (!isRecord(op.item) || instanceProblem(op.item as ItemInstance)) return refused(inv);
 			const added = addDrop(inv.bag, { kind: 'gear', item: op.item as ItemInstance });
@@ -363,6 +372,14 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 			return typeof raw.id === 'string' && int(raw.qty) ? { action: 'buyShop', id: raw.id, qty: raw.qty } : null;
 		case 'use':
 			return int(raw.index) ? { action: 'use', index: raw.index } : null;
+		case 'sellResource':
+			return typeof raw.resource === 'string' && raw.resource.length <= 40 && typeof raw.qty === 'number' && Number.isFinite(raw.qty)
+				? { action: 'sellResource', resource: raw.resource, qty: raw.qty }
+				: null;
+		case 'buyResource':
+			return typeof raw.resource === 'string' && raw.resource.length <= 40 && int(raw.qty)
+				? { action: 'buyResource', resource: raw.resource, qty: raw.qty }
+				: null;
 		case 'buyOffer':
 			return isRecord(raw.item) ? { action: 'buyOffer', item: raw.item as unknown as ItemInstance } : null;
 		default:

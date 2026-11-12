@@ -31,6 +31,17 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			const price = MERCHANT_RESOURCE_PRICES[resource as keyof typeof MERCHANT_RESOURCE_PRICES];
 			const goldGained = sellPayout(price, amount, state);
 
+			// the server prices and judges the trade (IDL-319); the browser previews it and the answer settles it: the server's gold replaces the preview's, and a refusal gives the units back
+			sendInventoryOp({ action: 'sellResource', resource, qty: amount }, (reply) => {
+				const paid = reply?.ok ? reply.gold : 0;
+				set((now) => ({
+					resources: {
+						...now.resources,
+						[resource]: reply?.ok ? now.resources[resource] : Math.min(now.resources[resource] + amount, RESOURCE_CAP),
+						gold: Math.min(Math.max(0, now.resources.gold + paid - goldGained), RESOURCE_CAP),
+					},
+				}));
+			});
 			set({
 				resources: {
 					...state.resources,
@@ -165,6 +176,17 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			const price = buyCost(resource as keyof typeof MERCHANT_RESOURCE_PRICES, units);
 			if (state.resources.gold < price) return false;
 
+			// the server judges the price and grants the units (IDL-319); a refusal takes the units back and returns the gold
+			sendInventoryOp({ action: 'buyResource', resource, qty: units }, (reply) => {
+				if (reply?.ok) return;
+				set((now) => ({
+					resources: {
+						...now.resources,
+						gold: Math.min(now.resources.gold + price, RESOURCE_CAP),
+						[resource]: Math.max(0, now.resources[resource] - units),
+					},
+				}));
+			});
 			set({
 				resources: {
 					...state.resources,

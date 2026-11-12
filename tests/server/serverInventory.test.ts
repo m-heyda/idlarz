@@ -486,3 +486,68 @@ test('sellJunk with the junk rule sells nothing today, and exactly the flagged g
 	assert.deepEqual(parseOp({ action: 'sellJunk', maxRarity: 'common' }), { action: 'sellJunk', maxRarity: 'common' });
 	assert.equal(parseOp({ action: 'sellJunk' }), null);
 });
+
+// IDL-319: the merchant's resource trades are priced and judged by the server
+
+const stocked = (): PersistedGame => {
+	const base = game();
+	return { ...base, resources: { ...base.resources, wood: 1000, stone: 50, gold: 500 } } as PersistedGame;
+};
+
+test('a resource sale is paid by the server price, recorded as granted, counted for Market Day and remembered until the next save', async () => {
+	const p = await player(stocked());
+	const before = p.m.ledgers.get(p.id)!;
+	const sold = await op(p, { action: 'sellResource', resource: 'wood', qty: 400 });
+	assert.equal(sold.ok, true);
+	assert.ok(sold.gold > 0);
+	const after = p.m.ledgers.get(p.id)!;
+	assert.equal(after.granted.gold, before.granted.gold + sold.gold, 'the gold is recorded as granted so the save that holds it passes');
+	assert.deepEqual([after.stats.unitsSold, after.stats.goldFromSales], [400, sold.gold]);
+	assert.deepEqual(after.stats.tradeSince.sold, { wood: 400 });
+	// what is left of the stock can still be sold, what was never there cannot
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 500 })).ok, true);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 5000 })).ok, false, 'more than the stock can explain');
+});
+
+test('a sale the save cannot explain, a resource the merchant does not buy, and bad numbers are refused with nothing changed', async () => {
+	const p = await player(stocked());
+	const ledger = p.m.ledgers.get(p.id)!;
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 1e9 })).ok, false);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'gold', qty: 10 })).ok, false, 'gold is not sold');
+	assert.equal((await op(p, { action: 'sellResource', resource: 'xp', qty: 10 })).ok, false);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 0 })).ok, false);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: -5 })).ok, false);
+	assert.equal(parseOp({ action: 'sellResource', resource: 'wood', qty: Number.NaN }), null);
+	assert.equal(parseOp({ action: 'sellResource', resource: 'wood' }), null);
+	assert.deepEqual(p.m.ledgers.get(p.id)!.granted, ledger.granted);
+	assert.equal(p.m.ledgers.get(p.id)!.stats.unitsSold, 0);
+});
+
+test('an accepted save absorbs the trades since the one before it, so the same stock is not counted twice', async () => {
+	const p = await player(stocked());
+	await op(p, { action: 'sellResource', resource: 'wood', qty: 900 });
+	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince.sold, { wood: 900 });
+	// the browser's next save holds 100 wood and the gold of the sale
+	const next = stocked();
+	const state = { ...next, resources: { ...next.resources, wood: 100, gold: 500 + 900 } } as PersistedGame;
+	const rev = p.m.rows.get(p.id)!.rev;
+	const saved = await save(p.m, p.id, state, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince, { sold: {}, boughtGold: 0 }, 'the save absorbed them');
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 90 }, T0 + 3 * MIN)).ok, true);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 2000 }, T0 + 3 * MIN)).ok, false);
+});
+
+test('a purchase is granted by the server when the gold can be explained, and refused when it cannot', async () => {
+	const p = await player(stocked());
+	const before = p.m.ledgers.get(p.id)!;
+	const bought = await op(p, { action: 'buyResource', resource: 'wood', qty: 20 });
+	assert.equal(bought.ok, true);
+	assert.equal(bought.gold, 0, 'the cost is paid in the browser');
+	const after = p.m.ledgers.get(p.id)!;
+	assert.equal(after.granted.wood, before.granted.wood + 20);
+	assert.ok(after.stats.tradeSince.boughtGold > 0);
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 5_000_000 })).ok, false, 'a price far beyond the purse');
+	assert.equal((await op(p, { action: 'buyResource', resource: 'gold', qty: 5 })).ok, false, 'not for sale');
+	assert.equal(parseOp({ action: 'buyResource', resource: 'wood', qty: 1.5 }), null, 'whole units only');
+});

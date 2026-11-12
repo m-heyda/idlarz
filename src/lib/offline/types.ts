@@ -37,6 +37,9 @@ export type InventoryOp =
 	| { action: 'autoSell'; rarity: string | null }
 	| { action: 'buyShop'; id: string; qty: number }
 	| { action: 'buyOffer'; item: ItemInstance }
+	/** The merchant's resource trades (IDL-319): priced on the server, judged against what the last save and the rates can explain (`lib/offline/trade.ts`) */
+	| { action: 'sellResource'; resource: string; qty: number }
+	| { action: 'buyResource'; resource: string; qty: number }
 	/** Drinks one potion from the bag slot `index` (instant effects fill HP and mana, a buff is recorded with an end time) */
 	| { action: 'use'; index: number };
 

@@ -1812,7 +1812,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junk.ts",
-  "line": 18,
+  "line": 19,
   "summary": "Whether a piece of gear in the bag counts as junk for the \"Sell junk\" button. **This is the one place that defines junk.** It is false for everything until the rule is decided (IDL-312), so the button sells nothing yet; the server (`sellJunk` with `rule: 'junk'`) and the browser both ask it, so they always agree. Never junk, whatever the rule says: worn gear (it is not in the bag), potions and other stacks (they are not gear), and, once they exist, set pieces and items the player locked.",
   "see": [
    "countJunk"
@@ -2339,7 +2339,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/offline/inventory.ts",
-  "line": 235,
+  "line": 240,
   "summary": "The \"Sell junk\" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.",
   "see": []
  },
@@ -2522,6 +2522,28 @@
   "file": "src/lib/offline/tickets.ts",
   "line": 154,
   "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.",
+  "see": []
+ },
+ {
+  "id": "sellresource",
+  "name": "sellResource",
+  "symbol": "sellResource",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/offline/trade.ts",
+  "line": 44,
+  "summary": "Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime `unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.",
+  "see": []
+ },
+ {
+  "id": "buyresource",
+  "name": "buyResource",
+  "symbol": "buyResource",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/offline/trade.ts",
+  "line": 69,
+  "summary": "Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.",
   "see": []
  },
  {

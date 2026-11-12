@@ -454,7 +454,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`data.ts`](../../src/lib/loot/data.ts) — ~ Everything the loot pipeline reads, as one injectable bundle.
 - [`generate.ts`](../../src/lib/loot/generate.ts) — ~ The monster's level (sets the item level of what it drops and the per-level chances); omitted for a chest or the shelf
 - [`index.ts`](../../src/lib/loot/index.ts) — The loot pipeline's public face. Content lives in src/catalog (lootConfig, affixes, items); this folder is the logic.
-- [`junk.ts`](../../src/lib/loot/junk.ts) — ~ What the junk rule may look at besides the piece itself.
+- [`junk.ts`](../../src/lib/loot/junk.ts) — eslint-disable @typescript-eslint/no-unused-vars -- the junk rule has no body until it is decided (IDL-312)
 - [`kill.ts`](../../src/lib/loot/kill.ts) — ~ Hide per second of the farm; a kill pays a share of it (0 without pigs)
 - [`pools.ts`](../../src/lib/loot/pools.ts) — ~ Whether an item belongs to a pool:
 - [`receive.ts`](../../src/lib/loot/receive.ts) — ~ What actually went into the bag
@@ -515,6 +515,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`statsReset.ts`](../../src/lib/offline/statsReset.ts) — ~ The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, chests, achievements):
 - [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger as the `player_ledger` row it is stored as (also what the migration script writes).
 - [`tickets.ts`](../../src/lib/offline/tickets.ts) — ~ Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny).
+- [`trade.ts`](../../src/lib/offline/trade.ts) — ~ The longest stretch of income counted on top of the last accepted save:
 - [`tutorial.ts`](../../src/lib/offline/tutorial.ts) — ~ `unknown`:
 - [`types.ts`](../../src/lib/offline/types.ts) — ~ What the server keeps of a player's things:
 - [`winChance.ts`](../../src/lib/offline/winChance.ts) — ~ How sharply the chance rises with the time-to-survive over time-to-kill ratio (1 = a coin flip; the fight is a race of many swings, so it is steep).

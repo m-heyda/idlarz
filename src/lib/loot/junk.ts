@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars -- the junk rule has no body until it is decided (IDL-312) */
 import type { BagSlot, ItemInstance } from '@/types/game';
 
 /** What the junk rule may look at besides the piece itself. Empty today; it grows with the rule (average worn level, the player's own marks, locked items). */

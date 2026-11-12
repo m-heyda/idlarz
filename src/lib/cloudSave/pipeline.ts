@@ -44,7 +44,7 @@
 import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { createHash } from 'node:crypto';
 import { STARTING_GEMS } from '@/config/economy';
-import { countSave, emptyStats, statsDue } from '@/lib/offline/stats';
+import { countSave, emptyStats, isEmptyTrade, statsDue } from '@/lib/offline/stats';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
@@ -500,7 +500,8 @@ export const acceptSave = async (
 				!ledger.inv ||
 				legacyChanged ||
 				attrsChanged ||
-				ledger.gemShop.spentSinceSave > 0
+				ledger.gemShop.spentSinceSave > 0 ||
+				!isEmptyTrade(ledger.stats.tradeSince)
 			) {
 				// the save knows what was granted so far; a ledger from before the inventory moved here takes this save's
 				await ledgers.commit(userId, ledger.ver, {

@@ -17,6 +17,7 @@ import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
 import { recordChest, recordCraft } from '@/lib/offline/stats';
+import { buyResource, sellResource } from '@/lib/offline/trade';
 import {
 	UNCLAIMED_SEC,
 	bankContext,
@@ -243,6 +244,12 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 			const used = applyUse(ledger, ctx.env, op.index);
 			if (!used.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, message: used.message } };
 			return { ledger: used.ledger, value: { ok: true, gold: 0, count: 0, inv: used.ledger.inv!, serverNowSec: ctx.nowSec, buffs: used.buffs } };
+		}
+		if (op.action === 'sellResource' || op.action === 'buyResource') {
+			// the merchant's resource trades (IDL-319): priced here, judged against what the last save and the rates can explain; allowed in a fight like the shop purchases
+			const traded = (op.action === 'sellResource' ? sellResource : buyResource)(ledger, ctx.stored, ctx.nowSec, op.resource, op.qty);
+			if (!traded.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
+			return { ledger: traded.ledger, value: { ok: true, gold: traded.gold, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
 		}
 		const blocked = needsNoFight(op) && !!ledger.combat?.fight;
 		const result = blocked ? null : applyOp(ledger.inv!, op, sellContextOf(ctx.stored.core));

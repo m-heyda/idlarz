@@ -54,7 +54,22 @@ export interface LifetimeStats {
 	bestMs: Record<string, number>;
 	/** Bestiary mastery: per monster type id, how many mastery tiers the player has claimed (tiers are claimed in order, so a count is the whole record). Additive: absent reads as none. */
 	masteryClaimed: Record<string, number>;
+	/**
+	 * Merchant trades the server has made since the last accepted save (IDL-319): units sold per resource and the gold spent on buying. The server judges the next trade against the last save plus these, so a stock cannot be sold twice;
+	 * an accepted save has absorbed them and {@link countSave} empties them. Additive: absent reads as none.
+	 */
+	tradeSince: TradeSince;
 }
+
+/** What the server traded with the merchant since the last accepted save. */
+export interface TradeSince {
+	sold: Record<string, number>;
+	boughtGold: number;
+}
+
+export const emptyTrade = (): TradeSince => ({ sold: {}, boughtGold: 0 });
+
+export const isEmptyTrade = (t: TradeSince): boolean => t.boughtGold === 0 && Object.keys(t.sold).length === 0;
 
 /** Counters are written to the ledger at most this often by the save path (kills and chests are written with their own request, which writes the ledger anyway). */
 export const STATS_EVERY_MS = 10 * 60_000;
@@ -85,6 +100,7 @@ export const emptyStats = (): LifetimeStats => ({
 	deaths: {},
 	bestMs: {},
 	masteryClaimed: {},
+	tradeSince: emptyTrade(),
 });
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
@@ -93,6 +109,12 @@ const counts = (value: unknown): Record<string, number> => {
 	if (value && typeof value === 'object' && !Array.isArray(value))
 		for (const [key, amount] of Object.entries(value)) if (num(amount) > 0) out[key] = num(amount);
 	return out;
+};
+
+const tradeOf = (value: unknown): TradeSince => {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return emptyTrade();
+	const t = value as Record<string, unknown>;
+	return { sold: counts(t.sold), boughtGold: num(t.boughtGold) };
 };
 
 const ids = (value: unknown): string[] =>
@@ -128,6 +150,7 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		deaths: counts(r.deaths),
 		bestMs: counts(r.bestMs),
 		masteryClaimed: counts(r.masteryClaimed),
+		tradeSince: tradeOf(r.tradeSince),
 	};
 };
 
@@ -147,6 +170,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		deaths,
 		bestMs,
 		masteryClaimed,
+		tradeSince,
 		...rest
 	} = s;
 	return {
@@ -165,6 +189,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(Object.keys(deaths).length > 0 ? { deaths } : {}),
 		...(Object.keys(bestMs).length > 0 ? { bestMs } : {}),
 		...(Object.keys(masteryClaimed).length > 0 ? { masteryClaimed } : {}),
+		...(!isEmptyTrade(tradeSince) ? { tradeSince } : {}),
 	};
 };
 
@@ -191,7 +216,8 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	s.respecs === 0 &&
 	Object.keys(s.deaths).length === 0 &&
 	Object.keys(s.bestMs).length === 0 &&
-	Object.keys(s.masteryClaimed).length === 0;
+	Object.keys(s.masteryClaimed).length === 0 &&
+	isEmptyTrade(s.tradeSince);
 
 /**
  * A kill of monster `type`: counted once, when the server pays it. `ms` (how long the fight lasted) keeps the fastest win per type for the Bestiary, and `flawless` (the hero took no hit) counts
@@ -279,7 +305,15 @@ export const statsDue = (stats: LifetimeStats, nowMs: number): boolean => stats.
  * as both away pay and income). The first count of a player, and the first after a rebirth or New Game, only set the baselines.
  */
 export const countSave = (stats: LifetimeStats, save: SaveCount): LifetimeStats => {
-	const base = { ...stats, at: save.nowMs, playAt: save.playSeconds, tilesAt: save.tilesOwned, goldPeak: Math.max(stats.goldPeak, num(save.gold)) };
+	// the accepted save has absorbed the trades made since the one before it
+	const base = {
+		...stats,
+		at: save.nowMs,
+		playAt: save.playSeconds,
+		tilesAt: save.tilesOwned,
+		goldPeak: Math.max(stats.goldPeak, num(save.gold)),
+		tradeSince: isEmptyTrade(stats.tradeSince) ? stats.tradeSince : emptyTrade(),
+	};
 	if (save.newRun || stats.at === 0) return base;
 	const onlineSec = Math.max(0, Math.min(save.playSeconds - stats.playAt, (save.nowMs - stats.at) / 1000));
 	const income = { ...stats.income };
