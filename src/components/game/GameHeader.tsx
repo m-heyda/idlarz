@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import ResourceDisplay from './ResourceDisplay';
-import { PlayerCard, WindowButtons, HeaderButtons } from './HeaderMenu';
 import { useClickIncome } from '@/hooks/useClickIncome';
+import HudDock from './hud/HudDock';
+import HudTopBar from './hud/HudTopBar';
 
 /**
- * One compact row: the hero's avatar, the currencies and materials as small chips in one boxed group per resource tier
- * (wrapping to a second row on narrow screens), then the Rebirth and Settings buttons. The real height is published as
- * --header-h so windows and toasts sit below it.
+ * The game's HUD, drawn with the design system (IDL-325): the wooden top bar (hero portrait, resource trays, Gem shop, Deeds, game menu) and the stone dock of windows along the bottom.
+ * `useClickIncome` registers the map click listener; the real height of the bar is published as --header-h so windows and toasts sit below it.
  */
 const GameHeader: React.FC = () => {
 	useClickIncome();
@@ -23,25 +22,12 @@ const GameHeader: React.FC = () => {
 	}, []);
 
 	return (
-		<div ref={ref} className='pixel-header fixed top-0 left-0 right-0 z-50'>
-			<div className='max-w-[98%] mx-auto px-2 py-0.5'>
-				{/* three columns, the outer two equal: the resources sit in the true middle of the screen on any width */}
-				<div className='grid grid-cols-[minmax(max-content,1fr)_minmax(0,auto)_minmax(max-content,1fr)] items-center gap-2'>
-					<div className='pixel-divider-right justify-self-start pr-3'>
-						<div className='flex items-center gap-3'>
-							<PlayerCard />
-							<WindowButtons />
-						</div>
-					</div>
-					<div className='flex flex-wrap items-center justify-center gap-x-2 gap-y-1 min-w-0' data-tutorial='top-resources'>
-						<ResourceDisplay />
-					</div>
-					<div className='justify-self-end'>
-						<HeaderButtons />
-					</div>
-				</div>
+		<>
+			<div ref={ref} className='ds-root fixed top-0 left-0 right-0 z-50'>
+				<HudTopBar />
 			</div>
-		</div>
+			<HudDock />
+		</>
 	);
 };
 

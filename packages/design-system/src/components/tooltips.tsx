@@ -449,16 +449,17 @@ export const HintTooltip: React.FC<{ title: string; text?: string; tone?: 'norma
 	</div>
 );
 
-/** A top-bar resource: the chip plus its hover tooltip (stock, income, sources). Props only; the caller supplies the live numbers. */
-export const ResourceStat: React.FC<{ icon: string; name: string; value: string; rows: TipRow[]; sources?: TipRow[]; footer?: Footer }> = ({
-	icon,
-	name,
-	value,
-	rows,
-	sources,
-	footer,
-}) => (
+/** A top-bar resource: the chip plus its hover tooltip (stock, income, sources). Props only; the caller supplies the live numbers. `chip` makes the chip a button and carries its extra attributes. */
+export const ResourceStat: React.FC<{
+	icon: string;
+	name: string;
+	value: string;
+	rows: TipRow[];
+	sources?: TipRow[];
+	footer?: Footer;
+	chip?: { onClick?: () => void; title?: string } & Record<`data-${string}`, string | undefined>;
+}> = ({ icon, name, value, rows, sources, footer, chip }) => (
 	<HoverTip tip={<ResourceTooltip icon={icon} name={name} rows={rows} sources={sources} footer={footer} />}>
-		<ResourceChip icon={icon} value={value} />
+		<ResourceChip icon={icon} value={value} {...chip} />
 	</HoverTip>
 );

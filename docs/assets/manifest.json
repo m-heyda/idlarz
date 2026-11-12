@@ -21239,6 +21239,7 @@
 	{
 		"usedBy": [
 			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/hud/HudDock.tsx",
 			"src/components/game/overlays/GameWindows.tsx"
 		],
 		"name": "menu_achievements",
@@ -21253,12 +21254,15 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/hud/HudDock.tsx",
+			"src/components/game/hud/HudTopBar.tsx"
+		],
 		"name": "menu_bag_scroll",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_bag_scroll.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			64,
@@ -21284,8 +21288,8 @@
 	{
 		"usedBy": [
 			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/CraftingOverlay.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
+			"src/components/game/hud/HudDock.tsx",
+			"src/components/game/overlays/CraftingOverlay.tsx"
 		],
 		"name": "menu_crafting",
 		"category": "ui",
@@ -21301,6 +21305,7 @@
 	{
 		"usedBy": [
 			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/hud/HudDock.tsx",
 			"src/components/game/overlays/GameWindows.tsx"
 		],
 		"name": "menu_equipment",
@@ -21317,6 +21322,7 @@
 	{
 		"usedBy": [
 			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/hud/HudDock.tsx",
 			"src/components/game/overlays/GameWindows.tsx"
 		],
 		"name": "menu_farm",
@@ -21361,6 +21367,7 @@
 	{
 		"usedBy": [
 			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/hud/HudDock.tsx",
 			"src/components/game/overlays/RebirthDialog.tsx"
 		],
 		"name": "menu_legacy",
@@ -21390,6 +21397,7 @@
 	{
 		"usedBy": [
 			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/hud/HudDock.tsx",
 			"src/components/game/overlays/GameWindows.tsx"
 		],
 		"name": "menu_merchant",

@@ -48,7 +48,7 @@
 		"prepare": "git config core.hooksPath .githooks && chmod +x .githooks/pre-commit .githooks/pre-push || exit 0",
 		"assets:catalog": "tsx scripts/assets-catalog.ts",
 		"assets:catalog:check": "tsx scripts/assets-catalog.ts --check",
-		"storybook": "storybook dev -p 6006",
+		"storybook": "storybook dev -p 6007",
 		"build-storybook": "storybook build"
 	},
 	"dependencies": {

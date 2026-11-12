@@ -96,9 +96,28 @@ export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: 
 	</div>
 );
 
-/** A resource in the top bar: icon, amount, optional income per second. */
-export const ResourceChip: React.FC<{ icon: string; value: string; rate?: string; title?: string }> = ({ icon, value, rate, title }) => (
-	<span className='ds-chip' title={title}>
+/** A resource in the top bar: icon, amount, optional income per second. With `onClick` it is a button (a resource that opens something); extra attributes (a tutorial anchor) go to the chip itself. */
+export const ResourceChip: React.FC<
+	{ icon: string; value: string; rate?: string; title?: string; onClick?: () => void } & Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClick' | 'title'>
+> = ({ icon, value, rate, title, onClick, ...rest }) => (
+	<span
+		className={cx('ds-chip', onClick && 'ds-chip-link')}
+		title={title}
+		role={onClick ? 'button' : undefined}
+		tabIndex={onClick ? 0 : undefined}
+		onClick={onClick}
+		onKeyDown={
+			onClick
+				? (e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+							onClick();
+						}
+					}
+				: undefined
+		}
+		{...rest}
+	>
 		<img src={icon} alt='' />
 		<span>{value}</span>
 		{rate ? <span className='ds-chip-rate'>{rate}</span> : null}
@@ -176,15 +195,14 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 	);
 };
 
-/** A stone menu icon with a caption (the middle bar of the HUD). */
-export const IconButton: React.FC<{ icon: string; label: string; badge?: number; small?: boolean; onClick?: () => void }> = ({
-	icon,
-	label,
-	badge,
-	small,
-	onClick,
-}) => (
-	<button type='button' className={cx('ds-iconbtn', small && 'ds-iconbtn-sm')} onClick={onClick}>
+/**
+ * A stone menu icon with a caption (the dock). `active` marks an open window, `disabled` dims it (not available yet); the badge is the count of things waiting. Any other button attribute
+ * (a tutorial anchor, aria-label) goes to the button.
+ */
+export const IconButton: React.FC<
+	{ icon: string; label: string; badge?: number; small?: boolean; active?: boolean } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>
+> = ({ icon, label, badge, small, active, className, ...rest }) => (
+	<button type='button' className={cx('ds-iconbtn', small && 'ds-iconbtn-sm', className)} data-active={active ? 'true' : undefined} {...rest}>
 		<img src={icon} alt='' />
 		{badge ? <Badge count={badge} floating /> : null}
 		<span>{label}</span>
@@ -372,9 +390,11 @@ export const AddSlot: React.FC<{ tip: React.ReactNode; onClick?: () => void }> =
 );
 
 export type GlyphTone = 'gold' | 'wood' | 'stone';
-/** A small square button with one engraved character (Deeds, Settings). Tones: `gold` (the default plate), `wood`, `stone`. */
-export const GlyphButton: React.FC<{ glyph: string; label: string; tone?: GlyphTone; onClick?: () => void }> = ({ glyph, label, tone = 'gold', onClick }) => (
-	<button type='button' className='ds-glyphbtn' data-tone={tone} aria-label={label} title={label} onClick={onClick}>
+/** A small square button with one engraved character (Deeds, Settings). Tones: `gold` (the default plate), `wood`, `stone`. `active` marks an open window; extra button attributes pass through. */
+export const GlyphButton: React.FC<
+	{ glyph: string; label: string; tone?: GlyphTone; active?: boolean } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>
+> = ({ glyph, label, tone = 'gold', active, ...rest }) => (
+	<button type='button' className='ds-glyphbtn' data-tone={tone} data-active={active ? 'true' : undefined} aria-label={label} title={label} {...rest}>
 		<span>{glyph}</span>
 	</button>
 );

@@ -3469,3 +3469,36 @@
 	background: var(--ds-gold);
 	box-shadow: 0 0 0 1px #05060a;
 }
+
+/* ===== HUD wiring (IDL-325): clickable chips, open window marks, a dimmed dock icon, steady chip widths ===== */
+.ds-chip-link {
+	cursor: pointer;
+}
+
+.ds-chip-link:hover {
+	filter: brightness(1.25);
+}
+
+.ds-chip > span:first-of-type:not(.ds-chip-rate) {
+	min-width: 3.4em;
+	font-variant-numeric: tabular-nums;
+}
+
+.ds-iconbtn[data-active='true'] img {
+	filter: drop-shadow(0 0 6px rgba(244, 213, 126, 0.9));
+	transform: translateY(-2px);
+}
+
+.ds-iconbtn[data-active='true'] > span:last-child {
+	color: #f0d27a;
+}
+
+.ds-iconbtn[aria-disabled='true'] {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.ds-glyphbtn[data-active='true'] {
+	filter: brightness(1.2);
+	box-shadow: inset 0 0 0 2px #fff3c4;
+}
