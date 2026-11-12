@@ -44,7 +44,8 @@
 import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { createHash } from 'node:crypto';
 import { STARTING_GEMS } from '@/config/economy';
-import { countSave, emptyStats, isEmptyTrade, statsDue } from '@/lib/offline/stats';
+import { countSave, emptyStats, statsDue } from '@/lib/offline/stats';
+import { settleTrades } from '@/lib/offline/trade';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
@@ -441,8 +442,11 @@ export const acceptSave = async (
 				tilesOwned: summary.tilesOwned,
 				rates: previous ? (previous.summary.rates as unknown as Record<string, number>) : null,
 				newRun: newRun || !current,
-				gold: summary.gold,
+				// only a clean save's gold counts towards Hoarder: a flagged save (shadow mode) may claim gold nothing paid for
+				gold: flags.length === 0 ? summary.gold : undefined,
 			});
+			// trades the server made since the last save stay on the record until this save's stock accounts for them (an older browser's picture does not)
+			counted.tradeSince = ledger ? settleTrades(ledger, current, split.core, nowMs / 1000, newRun || !current) : counted.tradeSince;
 			// the attribute record, and the gem shop's allowance for a save that was on its way when something was bought (this save has been accepted: it is used up)
 			const settledShop = { ...ledger?.gemShop, spentSinceSave: 0 } as Ledger['gemShop'];
 			const attrsChanged = !!ledger && JSON.stringify(ledger.attrs) !== JSON.stringify(attrsOut);
@@ -501,7 +505,8 @@ export const acceptSave = async (
 				legacyChanged ||
 				attrsChanged ||
 				ledger.gemShop.spentSinceSave > 0 ||
-				!isEmptyTrade(ledger.stats.tradeSince)
+				JSON.stringify(counted.tradeSince) !== JSON.stringify(ledger.stats.tradeSince) ||
+				counted.goldPeak > ledger.stats.goldPeak
 			) {
 				// the save knows what was granted so far; a ledger from before the inventory moved here takes this save's
 				await ledgers.commit(userId, ledger.ver, {

@@ -1327,7 +1327,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 80,
+  "line": 81,
   "summary": "True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).",
   "see": []
  },
@@ -1338,7 +1338,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 88,
+  "line": 89,
   "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
   "see": []
  },
@@ -1349,7 +1349,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 210,
+  "line": 211,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -2554,7 +2554,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/offline/trade.ts",
-  "line": 44,
+  "line": 63,
   "summary": "Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime `unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.",
   "see": []
  },
@@ -2565,7 +2565,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/offline/trade.ts",
-  "line": 69,
+  "line": 88,
   "summary": "Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.",
   "see": []
  },

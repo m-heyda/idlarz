@@ -33,14 +33,17 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 
 			// the server prices and judges the trade (IDL-319); the browser previews it and the answer settles it: the server's gold replaces the preview's, and a refusal gives the units back
 			sendInventoryOp({ action: 'sellResource', resource, qty: amount }, (reply) => {
-				const paid = reply?.ok ? reply.gold : 0;
-				set((now) => ({
-					resources: {
-						...now.resources,
-						[resource]: reply?.ok ? now.resources[resource] : Math.min(now.resources[resource] + amount, RESOURCE_CAP),
-						gold: Math.min(Math.max(0, now.resources.gold + paid - goldGained), RESOURCE_CAP),
-					},
-				}));
+				if (reply?.ok) {
+					// the server's gold replaces the preview's
+					set((now) => ({ resources: { ...now.resources, gold: Math.min(Math.max(0, now.resources.gold + reply.gold - goldGained), RESOURCE_CAP) } }));
+					return;
+				}
+				// refused: the gold is taken back, and only as many units come back as gold could be taken (gold already spent on something else is not given twice)
+				set((now) => {
+					const taken = Math.min(goldGained, now.resources.gold);
+					const back = goldGained > 0 ? (amount * taken) / goldGained : amount;
+					return { resources: { ...now.resources, gold: now.resources.gold - taken, [resource]: Math.min(now.resources[resource] + back, RESOURCE_CAP) } };
+				});
 			});
 			set({
 				resources: {
@@ -179,13 +182,17 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			// the server judges the price and grants the units (IDL-319); a refusal takes the units back and returns the gold
 			sendInventoryOp({ action: 'buyResource', resource, qty: units }, (reply) => {
 				if (reply?.ok) return;
-				set((now) => ({
-					resources: {
-						...now.resources,
-						gold: Math.min(now.resources.gold + price, RESOURCE_CAP),
-						[resource]: Math.max(0, now.resources[resource] - units),
-					},
-				}));
+				// refused: the units are taken back and the gold returned, but only for units still there (units already spent, on an upgrade say, stay paid for)
+				set((now) => {
+					const removed = Math.min(units, Math.floor(now.resources[resource]));
+					return {
+						resources: {
+							...now.resources,
+							gold: Math.min(now.resources.gold + Math.floor((price * removed) / units), RESOURCE_CAP),
+							[resource]: now.resources[resource] - removed,
+						},
+					};
+				});
 			});
 			set({
 				resources: {

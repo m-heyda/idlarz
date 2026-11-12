@@ -568,3 +568,69 @@ test('a purchase is granted by the server when the gold can be explained, and re
 	assert.equal((await op(p, { action: 'buyResource', resource: 'gold', qty: 5 })).ok, false, 'not for sale');
 	assert.equal(parseOp({ action: 'buyResource', resource: 'wood', qty: 1.5 }), null, 'whole units only');
 });
+
+// Review fixes for IDL-319 and IDL-307
+
+test('trades since the save come off after the slack, so repeated small sales cannot each get a fresh allowance', async () => {
+	const p = await player(stocked());
+	const wood = (p.m.rows.get(p.id)!.summary.rates as unknown as Record<string, number>).wood;
+	let sold = 0;
+	let refused = 0;
+	for (let i = 0; i < 200 && refused < 2; i++) {
+		const out = await op(p, { action: 'sellResource', resource: 'wood', qty: 25 }, T0 + 1000);
+		if (out.ok) sold += 25;
+		else refused++;
+	}
+	assert.ok(sold <= (1000 + wood * 1) * 1.1 + 25 + 1e-6, `${sold} units sold of a stock of 1000`);
+	assert.ok(refused >= 2, 'it ends');
+});
+
+const hoard = (): PersistedGame => {
+	const base = game();
+	return { ...base, resources: { ...base.resources, wood: 100_000, gold: 100_000 } } as PersistedGame;
+};
+
+test('a save that still holds the pre-sale stock does not clear the sale: the same stock cannot be sold again', async () => {
+	const p = await player(hoard());
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000 }, T0 + 1000)).ok, true);
+	// another browser uploads its older picture: 100,000 wood and the old gold
+	const rev = p.m.rows.get(p.id)!.rev;
+	const saved = await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince.sold, { wood: 99_000 }, 'the record stays');
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000 }, T0 + 3 * MIN)).ok, false);
+});
+
+test('a purchase stays on the record until the gold it cost is gone from the saved purse', async () => {
+	const p = await player(hoard());
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 1000)).ok, true);
+	const boughtGold = p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold;
+	assert.ok(boughtGold > 50_000);
+	// a modified browser uploads the wood but not the debit
+	const rev = p.m.rows.get(p.id)!.rev;
+	const base = hoard();
+	const saved = await save(p.m, p.id, { ...base, resources: { ...base.resources, wood: 140_000 } } as PersistedGame, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	assert.equal(p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold, boughtGold, 'not absorbed: the gold is still there');
+});
+
+test('a new gold peak is written at once, not at the next ten-minute count', async () => {
+	const p = await player(stocked());
+	const before = p.m.ledgers.get(p.id)!.stats.goldPeak;
+	const rev = p.m.rows.get(p.id)!.rev;
+	const richer = stocked();
+	const saved = await save(p.m, p.id, { ...richer, resources: { ...richer.resources, gold: 700 } } as PersistedGame, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	assert.equal(p.m.ledgers.get(p.id)!.stats.goldPeak, 700);
+	assert.ok(before < 700);
+});
+
+test('gold from a flagged save is not counted towards the peak', async () => {
+	const p = await player(stocked());
+	const rev = p.m.rows.get(p.id)!.rev;
+	const forged = stocked();
+	const saved = await save(p.m, p.id, { ...forged, resources: { ...forged.resources, gold: 90_000_000_000 } } as PersistedGame, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok');
+	if (saved.kind === 'ok') assert.ok(saved.flags.length > 0, 'the save is flagged');
+	assert.ok(p.m.ledgers.get(p.id)!.stats.goldPeak < 90_000_000_000);
+});

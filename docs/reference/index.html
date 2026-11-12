@@ -1040,7 +1040,7 @@ The count is never reset, not even by a rebirth.</li>
 </code></pre>
 </article><article><p><a id="sellresource"></a></p>
 <h3><code>sellResource</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:44</code></a></p>
+<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:63</code></a></p>
 <p>Sells <code>qty</code> units of <code>resource</code> to the merchant: the gold is <code>sellPayout</code> with the save&#39;s Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime
 <code>unitsSold</code> / <code>goldFromSales</code> counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.</p>
 </article><article><p><a id="bestworngrade"></a></p>
@@ -1050,7 +1050,7 @@ The count is never reset, not even by a rebirth.</li>
 the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).</p>
 </article><article><p><a id="buyresource"></a></p>
 <h3><code>buyResource</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:69</code></a></p>
+<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:88</code></a></p>
 <p>Buys <code>qty</code> whole units of a resource the merchant sells (<code>MERCHANT_BUYABLE</code>) for <code>buyCost</code>, rounded up in the merchant&#39;s favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the
 spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.</p>
 </article><h2>Clicks</h2><article><p><a id="click-ladder"></a></p>
@@ -5159,7 +5159,7 @@ revision it left, instead of sending the one it read before. Without Web Locks t
 still happens is resolved by <code>resolveConflict</code>. The lock dies with the page, so a closing tab never holds it up.</p>
 </article><h2>Accepting a save</h2><article><p><a id="acceptsave"></a></p>
 <h3><code>acceptSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:210</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:211</code></a></p>
 <p>Accepts a save from a client that says it was based on revision <code>baseRev</code> (0 = this account has no save yet).</p>
 <ul>
 <li>the text must decode (checksum, schema, <code>sanitizeSave</code>), otherwise <code>invalid</code></li>
@@ -5335,7 +5335,7 @@ best rebirth the game can pay.</li>
 <code>requireServerRebirth</code> is off; it is turned on together with <code>ENFORCEMENT.enabled</code>, after the new chapter flip (checklist: &quot;Turning enforcement and the server-run rebirth on together&quot;, Ops/Operator guides).</p>
 </article><article><p><a id="min-save-interval-ms"></a></p>
 <h3><code>MIN_SAVE_INTERVAL_MS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:88</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:89</code></a></p>
 <p>Saves from one player are accepted at most this often (an honest client sends every ~90 s).</p>
 </article><article><p><a id="verifytransition"></a></p>
 <h3><code>verifyTransition</code> <small>function</small></h3>
@@ -5366,7 +5366,7 @@ Everything else is cut back to the trusted level, so an edited save cannot grant
 <p>Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.</p>
 </article><article><p><a id="losesprogress"></a></p>
 <h3><code>losesProgress</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:80</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:81</code></a></p>
 <p>True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game&#39;s (<code>PINNED_KEEP</code>).</p>
 </article><article><p><a id="enforcement"></a></p>

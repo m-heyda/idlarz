@@ -266,3 +266,42 @@ test("the owner's save (185 tiles, 17 % discount, the income of the Character wi
 	for (const r of ['wood', 'stone', 'coal', 'food', 'hide'] as const)
 		assert.ok(wait(r) <= 0.6 * wait('gold'), `${r}: ${(wait(r) / 60).toFixed(1)} min against ${(wait('gold') / 60).toFixed(1)} min of gold`);
 });
+
+// Review fix (IDL-319): a refused trade never hands out the same value twice
+
+test('a refused sale takes back the gold and returns only as many units as gold could be taken', async () => {
+	freshGame({ gold: 0, wood: 1000 });
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = (async () => new Response('{}', { status: 503 })) as typeof fetch;
+	try {
+		assert.equal(api().sellResources('wood', 1000), true);
+		const gained = api().resources.gold;
+		assert.ok(gained > 0);
+		// the player spends half of that gold before the server answers
+		store.setState({ resources: { ...api().resources, gold: Math.floor(gained / 2) } } as never);
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		assert.equal(api().resources.gold, 0, 'what could be taken was taken');
+		assert.ok(api().resources.wood > 400 && api().resources.wood < 600, `about half the wood is back, got ${api().resources.wood}`);
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});
+
+test('a refused purchase returns the gold only for the units that are still there', async () => {
+	freshGame({ gold: 1e6, eggs: 0 });
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = (async () => new Response('{}', { status: 503 })) as typeof fetch;
+	try {
+		assert.equal(api().buyResource('eggs', 40), true);
+		const paid = 1e6 - api().resources.gold;
+		assert.ok(paid > 0);
+		// 30 of the 40 eggs are spent on something before the answer
+		store.setState({ resources: { ...api().resources, eggs: 10 } } as never);
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		assert.equal(api().resources.eggs, 0);
+		const refunded = api().resources.gold - (1e6 - paid);
+		assert.ok(refunded > 0 && refunded < paid, `a quarter of the price is back, got ${refunded} of ${paid}`);
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});

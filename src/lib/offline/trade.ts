@@ -3,7 +3,7 @@ import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { isRecord } from '@/lib/isRecord';
 import { sellContextOf } from '@/lib/offline/inventory';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
-import { recordSale } from '@/lib/offline/stats';
+import { emptyTrade, isEmptyTrade, recordSale, type TradeSince } from '@/lib/offline/stats';
 import { buyCost, sellPayout } from '@/utils/game/merchant';
 
 // SERVER ONLY. The merchant's resource trades (IDL-319): the price, the Haggler and Idol bonuses and the buy multiplier are worked out here, from the last accepted save, never from a figure the browser sends. The browser still previews the trade
@@ -30,8 +30,27 @@ const stockBound = (ledger: Ledger, stored: StoredSave, nowSec: number, resource
 	const elapsed = Math.min(TRADE_MAX_AGE_SEC, Math.max(0, nowSec - stored.serverSavedAt / 1000));
 	const granted = (ledger.granted as GrantTotals & Record<string, number>)[resource] ?? 0;
 	const grantedSeen = (ledger.grantedSeen as GrantTotals & Record<string, number>)[resource] ?? 0;
-	const estimate = num(resources[resource]) + num(rates[resource]) * elapsed + Math.max(0, granted - grantedSeen) - soldSince - boughtGold;
-	return Math.max(0, estimate) * SLACK + SLACK_UNITS;
+	const estimate = num(resources[resource]) + num(rates[resource]) * elapsed + Math.max(0, granted - grantedSeen);
+	// the slack goes on the estimate first and the trades since the save come off after it, so the slack is not a fresh allowance for every request
+	return Math.max(0, estimate * SLACK + SLACK_UNITS - soldSince - boughtGold);
+};
+
+/**
+ * What the trade record is after a save is accepted. The save is the browser's picture of its stock: a trade is dropped from the record only when that picture accounts for it, that is, the new stock is within what the previous
+ * save plus income could explain **after** the trade came off. A save that still holds the pre-sale stock (another browser's older picture) or the gold a purchase should have cost leaves the record alone, so the same stock or gold
+ * cannot be traded twice. A new run (rebirth, New Game) or a first save starts the record again.
+ */
+export const settleTrades = (ledger: Ledger, previous: StoredSave | null, newCore: { resources?: unknown }, nowSec: number, newRun: boolean): TradeSince => {
+	const trade = ledger.stats.tradeSince;
+	if (newRun || !previous || isEmptyTrade(trade)) return emptyTrade();
+	const resources = isRecord(newCore.resources) ? newCore.resources : {};
+	const sold: Record<string, number> = {};
+	for (const [resource, units] of Object.entries(trade.sold)) {
+		const bound = stockBound(ledger, previous, nowSec, resource, units);
+		if (num(resources[resource]) > bound) sold[resource] = units;
+	}
+	const goldBound = stockBound(ledger, previous, nowSec, 'gold', 0, trade.boughtGold);
+	return { sold, boughtGold: num(resources.gold) > goldBound ? trade.boughtGold : 0 };
 };
 
 /**

@@ -56,7 +56,7 @@ export interface LifetimeStats {
 	masteryClaimed: Record<string, number>;
 	/**
 	 * Merchant trades the server has made since the last accepted save (IDL-319): units sold per resource and the gold spent on buying. The server judges the next trade against the last save plus these, so a stock cannot be sold twice;
-	 * an accepted save has absorbed them and {@link countSave} empties them. Additive: absent reads as none.
+	 * an accepted save that accounts for them drops them (`settleTrades`, trade.ts). Additive: absent reads as none.
 	 */
 	tradeSince: TradeSince;
 }
@@ -305,14 +305,12 @@ export const statsDue = (stats: LifetimeStats, nowMs: number): boolean => stats.
  * as both away pay and income). The first count of a player, and the first after a rebirth or New Game, only set the baselines.
  */
 export const countSave = (stats: LifetimeStats, save: SaveCount): LifetimeStats => {
-	// the accepted save has absorbed the trades made since the one before it
 	const base = {
 		...stats,
 		at: save.nowMs,
 		playAt: save.playSeconds,
 		tilesAt: save.tilesOwned,
 		goldPeak: Math.max(stats.goldPeak, num(save.gold)),
-		tradeSince: isEmptyTrade(stats.tradeSince) ? stats.tradeSince : emptyTrade(),
 	};
 	if (save.newRun || stats.at === 0) return base;
 	const onlineSec = Math.max(0, Math.min(save.playSeconds - stats.playAt, (save.nowMs - stats.at) / 1000));
