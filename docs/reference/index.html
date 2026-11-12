@@ -5682,7 +5682,7 @@ so <code>state.tiles</code> changes exactly when the map does; the owned / chest
 </ul>
 </article><article><p><a id="gamestate"></a></p>
 <h3><code>GameState</code> <small>interface</small></h3>
-<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:364</code></a></p>
+<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:366</code></a></p>
 <p>State. The persisted keys are <code>PERSISTED_KEYS</code> (<a href="#persisted-keys"><code>PERSISTED_KEYS</code></a>), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.</p>
 <p>Not saved: <code>monsters</code> and the open fight (<code>combat</code>) are the server&#39;s picture and arrive with each <code>/api/spawn</code> answer. Rebuilt on load: <code>resourceRates</code>, derived combat stats, castle upgrade cost, every window/dialog flag, <code>isHydrated</code>.
 The stores: <code>gameStore.ts</code> (every action: buyTile, tick, upgradeCastle, clickForGold, startFight, rebirth, buyEmberUpgrade, merchant actions ...), <code>uiStore.ts</code> (transient UI flags), <code>viewStore.ts</code> (where the map is on the screen),

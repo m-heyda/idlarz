@@ -131,7 +131,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `fightStep` | Combat / A fight | [`src/lib/offline/fightSteps.ts:126`](../../src/lib/offline/fightSteps.ts) | One tick of the open fight. |
 | `finite` | Saves & Server / The ledger | [`src/lib/offline/ledgerRead.ts:19`](../../src/lib/offline/ledgerRead.ts) | Tolerant readers for the two ledger columns that hold catalog ids (`inv`: |
 | `FLAG_POLICY` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:94`](../../src/lib/cloudSave/verify.ts) | The flags and what the server does with each. |
-| `GameState` | Architecture / State | [`src/types/game.ts:364`](../../src/types/game.ts) | State. |
+| `GameState` | Architecture / State | [`src/types/game.ts:366`](../../src/types/game.ts) | State. |
 | `gear` | Loot / Adding content | [`src/catalog/items/define.ts:101`](../../src/catalog/items/define.ts) | The builder every piece of gear is authored with. |
 | `GEAR_RECIPES` | Economy / Crafting | [`src/catalog/recipes.ts:337`](../../src/catalog/recipes.ts) | The gear recipes (IDL-241): |
 | `gearItemLevels` | Progression / Crafting | [`src/lib/craftGear.ts:37`](../../src/lib/craftGear.ts) | The item level a recipe of this grade makes, by crafting level: |

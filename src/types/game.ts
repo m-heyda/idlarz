@@ -112,6 +112,8 @@ export interface ItemDef {
 	/** A plain loot family (wood, cloth, steel): matches affixes and pools like a set does, but gives no set bonus */
 	family?: string;
 	description?: string;
+	/** The longer story of a legendary (IDL-317), under the flavour line of its tooltip and in full in the Glossary; catalog only */
+	lore?: string;
 	/** What drinking it does (instant heals, a regen, timed buffs); see catalog/buffs.ts. Absent: it does nothing (trade goods). */
 	effects?: ConsumableEffect[];
 	stackMax?: number;

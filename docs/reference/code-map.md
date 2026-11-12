@@ -166,10 +166,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`consumables.ts`](../../src/catalog/items/consumables.ts)
 - [`define.ts`](../../src/catalog/items/define.ts) — ~ The item level window of a material tier.
 - [`grades.ts`](../../src/catalog/items/grades.ts) — ~ Name of the grade in the planning doc
-- [`index.ts`](../../src/catalog/items/index.ts) — ~ Every item in the game, in display order.
+- [`index.ts`](../../src/catalog/items/index.ts) — ~ Fills `lore` from `lore.ts` (the legendaries' stories) so the item definitions stay as they are.
 - [`junk.ts`](../../src/catalog/items/junk.ts)
 - [`ladder.ts`](../../src/catalog/items/ladder.ts) — ~ The set a special grade's pieces belong to (SetDef ids in catalog/sets.ts)
 - [`legendary.ts`](../../src/catalog/items/legendary.ts)
+- [`lore.ts`](../../src/catalog/items/lore.ts) — The longer story of the legendary weapons (IDL-317): one short paragraph each, shown in the item tooltip under the flavour line and in full in the Glossary. Draft text, for the owner to approve. Keyed by item id so the item
 - [`obsidian.ts`](../../src/catalog/items/obsidian.ts)
 - [`reuse.ts`](../../src/catalog/items/reuse.ts) — ~ Grade of a reserve item = the grade its art is registered with (config/itemIcons), so one table says it
 - [`starter.ts`](../../src/catalog/items/starter.ts)
@@ -840,6 +841,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`loot.test.ts`](../../tests/loot/loot.test.ts)
 - [`lootGenerate.test.ts`](../../tests/loot/lootGenerate.test.ts)
 - [`lootValidate.test.ts`](../../tests/loot/lootValidate.test.ts)
+- [`lore.test.ts`](../../tests/loot/lore.test.ts)
 - [`organizeBag.test.ts`](../../tests/loot/organizeBag.test.ts)
 - [`reserveItems.test.ts`](../../tests/loot/reserveItems.test.ts) — ~ A reserve item is live when it is a base item of grade G1-G3; named ones (legendary folder) and G4+ stay disabled
 

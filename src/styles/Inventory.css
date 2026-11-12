@@ -686,3 +686,13 @@
 	outline: 1px solid #f0d27a;
 	background: rgba(60, 44, 20, 0.7);
 }
+
+/* a legendary's story under its flavour line: two lines in the card, the full text in the title and the Glossary (IDL-317) */
+.px-tip-lore {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	margin-top: 4px;
+	color: #c9b27a;
+}

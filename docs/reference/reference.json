@@ -2782,7 +2782,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 364,
+  "line": 366,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

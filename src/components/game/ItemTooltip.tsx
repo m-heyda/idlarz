@@ -247,6 +247,11 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 			)}
 
 			{def.description && <div className='px-tip-flavor'>{def.description}</div>}
+			{def.lore && (
+				<div className='px-tip-flavor px-tip-lore' title={def.lore}>
+					{def.lore}
+				</div>
+			)}
 			<div className='px-tip-sell' title={buyPrice === undefined && sellPrice !== baseSell ? `Base value ${formatNumber(baseSell)}` : undefined}>
 				{buyPrice !== undefined ? 'Costs' : 'Sells for'} {formatNumber(buyPrice ?? sellPrice)} <ResourceIcon resource='gold' />
 			</div>
