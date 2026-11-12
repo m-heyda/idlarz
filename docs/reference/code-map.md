@@ -267,7 +267,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`TileMenu.ts`](../../src/components/game/TileMenu.ts) — ~ Right click on an explored tile:
 - [`TileMonster.tsx`](../../src/components/game/TileMonster.tsx) — ~ The monster on the map with its growth shown:
 - [`TileStatus.tsx`](../../src/components/game/TileStatus.tsx) — ~ More card content under the tile's own lines (the building on the tile)
-- [`TileTooltip.tsx`](../../src/components/game/TileTooltip.tsx) — ~ Hover card of a monster:
+- [`TileTooltip.tsx`](../../src/components/game/TileTooltip.tsx) — ~ Hover card of a monster, the design system's MonsterTooltip with the game's numbers:
 - [`Toast.tsx`](../../src/components/game/Toast.tsx) — ~ Short messages ("Game saved") under the header; `showToast` in the ui store puts one up for a couple of seconds, and several stack.
 - [`WaterLayer.tsx`](../../src/components/game/WaterLayer.tsx) — ~ Visible tile range (inclusive-exclusive), so only the ripples on screen are in the DOM
 - [`WindowErrorBoundary.tsx`](../../src/components/game/WindowErrorBoundary.tsx) — ~ Keeps one window's crash from blanking the whole game:

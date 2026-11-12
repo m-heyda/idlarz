@@ -334,7 +334,9 @@ export const MonsterTooltip: React.FC<{
 	subtitle: string;
 	hp: string;
 	rows: TipRow[];
-	drops: TipRow[];
+	drops?: TipRow[];
+	/** The heading over `drops` (default "Drops") */
+	dropsTitle?: string;
 	footer?: Footer;
 	boss?: boolean;
 	defeated?: number;
@@ -342,7 +344,7 @@ export const MonsterTooltip: React.FC<{
 	bossLine?: string;
 	cta?: string;
 	wip?: boolean;
-}> = ({ icon, name, subtitle, hp, rows, drops, footer, boss, defeated, growth, bossLine, cta, wip }) => (
+}> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, defeated, growth, bossLine, cta, wip }) => (
 	<Tooltip rarity={boss ? 'legendary' : 'epic'} icon={icon} title={name} subtitle={subtitle} footer={footer}>
 		{boss ? <div className='ds-tip-boss'>BOSS</div> : null}
 		<TipRows rows={[{ label: 'HP', value: hp }]} />
@@ -353,8 +355,12 @@ export const MonsterTooltip: React.FC<{
 		{defeated !== undefined ? <TipLine tone='muted'>Defeated: {defeated}</TipLine> : null}
 		{growth ? <TipLine tone='amber'>{growth}</TipLine> : null}
 		{bossLine ? <TipLine tone='red'>{bossLine}</TipLine> : null}
-		<TipSection>Drops</TipSection>
-		<TipRows rows={drops} />
+		{drops && drops.length > 0 ? (
+			<>
+				<TipSection>{dropsTitle}</TipSection>
+				<TipRows rows={drops} />
+			</>
+		) : null}
 		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
 		{wip ? <TipLine tone='muted'>Work in progress: art preview only</TipLine> : null}
 	</Tooltip>
@@ -366,9 +372,12 @@ export const BuildingTooltip: React.FC<{
 	name: string;
 	subtitle: string;
 	rows: TipRow[];
-	nextLevel: number;
-	next: TipRow[];
+	/** The level the upgrade section is about; leave out (with `next`) at the top level */
+	nextLevel?: number;
+	next?: TipRow[];
 	footer?: Footer;
+	/** More lines about the tile the building stands on (its own output and bonuses), under a "Tile" heading */
+	tileExtra?: React.ReactNode;
 	/** "Forest bonus: +12% (owned tiles)" */
 	biomeBonus?: string;
 	/** The Idol text, with "(coming soon: not applied yet)" when it is not live */
@@ -376,13 +385,23 @@ export const BuildingTooltip: React.FC<{
 	/** "Its level is kept when you rebirth; rebuild it free" */
 	rebirthNote?: string;
 	cta?: string;
-}> = ({ icon, name, subtitle, rows, nextLevel, next, footer, biomeBonus, idolText, rebirthNote, cta }) => (
+}> = ({ icon, name, subtitle, rows, nextLevel, next, footer, tileExtra, biomeBonus, idolText, rebirthNote, cta }) => (
 	<Tooltip rarity='rare' icon={icon} title={name} subtitle={subtitle} footer={footer}>
 		<TipRows rows={rows} />
 		{biomeBonus ? <TipLine tone='green'>{biomeBonus}</TipLine> : null}
 		{idolText ? <TipLine tone='purple'>{idolText}</TipLine> : null}
-		<TipSection>Upgrade to level {nextLevel}</TipSection>
-		<TipRows rows={next} />
+		{nextLevel !== undefined && next ? (
+			<>
+				<TipSection>Upgrade to level {nextLevel}</TipSection>
+				<TipRows rows={next} />
+			</>
+		) : null}
+		{tileExtra ? (
+			<>
+				<TipSection>Tile</TipSection>
+				{tileExtra}
+			</>
+		) : null}
 		{rebirthNote ? <TipLine tone='muted'>{rebirthNote}</TipLine> : null}
 		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
 	</Tooltip>

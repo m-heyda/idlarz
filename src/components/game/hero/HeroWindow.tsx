@@ -308,16 +308,8 @@ const BagCell: React.FC<{ slot: BagSlot; index: number; wornLevel: number }> = (
 	);
 };
 
-/** A plain pixel sack on a transparent ground (inline, so it needs no file): the picture of "more bag space". */
-const BAG_ICON =
-	'data:image/svg+xml;utf8,' +
-	encodeURIComponent(
-		"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'>" +
-			"<rect x='6' y='1' width='4' height='2' fill='#c9a26a'/><rect x='5' y='3' width='6' height='2' fill='#8a5a2a'/>" +
-			"<rect x='4' y='5' width='8' height='1' fill='#5a3a18'/><rect x='3' y='6' width='10' height='7' fill='#b07a3c'/>" +
-			"<rect x='2' y='8' width='12' height='4' fill='#b07a3c'/><rect x='3' y='13' width='10' height='1' fill='#6b4420'/>" +
-			"<rect x='4' y='7' width='2' height='5' fill='#d39a55'/><rect x='11' y='8' width='2' height='5' fill='#8a5a2a'/></svg>",
-	);
+/** The picture of "more bag space": a leather pouch from the spare icons. */
+const BAG_ICON = '/pixel/reuse/valuables/coin_pouch.png';
 
 /** The end of the bag: a click buys the next Pack Rat level (more bag slots) with gold, and the tooltip shows the level as gems, what the next one gives and what it costs. */
 const MoreSpace: React.FC = () => {
