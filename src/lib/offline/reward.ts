@@ -40,6 +40,7 @@ export const payKill = (
 	stored: StoredSave,
 	n: number,
 	nowSec: number,
+	fight?: { elapsedSec: number; flawless: boolean },
 ): { ledger: Ledger; payout: KillPayout } | null => {
 	const taken = takeMonster(ledger.bank, n);
 	if (!taken) return null;
@@ -72,7 +73,13 @@ export const payKill = (
 			...ledger,
 			bank: taken.bank,
 			ordKill,
-			stats: recordKill(ledger.stats, { type, lucky: ticket.lucky, boss: ticket.kind === 'boss' }),
+			stats: recordKill(ledger.stats, {
+				type,
+				lucky: ticket.lucky,
+				boss: ticket.kind === 'boss',
+				ms: fight ? fight.elapsedSec * 1000 : undefined,
+				flawless: fight?.flawless,
+			}),
 			inv: received.inv,
 			granted: addTotals(ledger.granted, { gold: loot.gold + received.received.convertedGold + received.received.autoSold.gold, xp: loot.xp, hide: loot.hide }),
 		},

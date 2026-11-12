@@ -252,7 +252,7 @@ Freezes everything a fight needs about the player into a `PlayerProfile` (max HP
 
 ### `fightStep` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:124`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:126`](../../src/lib/offline/fightSteps.ts)
 
 One tick of the open fight. Returns when the fight ended.
 
@@ -262,7 +262,7 @@ One tick of the open fight, in the order of the numbered list on [`runCombat`](c
 
 ### `endFight` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:94`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:95`](../../src/lib/offline/fightSteps.ts)
 
 Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.
 
@@ -373,7 +373,7 @@ heal = 25% of max HP x (1 + magic damage% / 100) x (1 + (gear Spell Power + clas
 
 ### `autoUse` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:73`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:74`](../../src/lib/offline/fightSteps.ts)
 
 Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.
 

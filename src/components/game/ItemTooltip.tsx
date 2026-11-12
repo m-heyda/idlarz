@@ -1,4 +1,6 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { sellPayout } from '@/utils/game/merchant';
 import { useGameStore } from '@/stores/gameStore';
 import {
 	EQUIPMENT_SLOT_LABEL,
@@ -61,6 +63,8 @@ interface BodyProps {
 	buyPrice?: number;
 	/** Shows a Drink button under the effects (a potion in the bag) */
 	onDrink?: () => void;
+	/** Shows the key hints line for where the card is drawn: the Bag (double-click equips or drinks, shift + click sells the stack) or the Merchant's bag grid (click sells one, shift + click the stack) */
+	hints?: 'bag' | 'merchant';
 }
 
 /**
@@ -69,8 +73,14 @@ interface BodyProps {
  * `comparison` every number carries its change against the worn piece, stats the worn piece has and this one lacks are
  * listed as lost, and the set block shows the state after the swap.
  */
-const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink }) => {
+const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink, hints }) => {
 	const equipment = useGameStore((state) => state.equipment);
+	// what the merchant really pays: the Haggler and Idol bonuses are in the number, the base value is in its title
+	// the same inputs a sale uses (`sellItem` passes the whole state), so the Lighthouse is in the number too
+	const sellCtx = useGameStore(
+		useShallow((state) => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige, tiles: state.tiles, idolLevels: state.idolLevels })),
+	);
+	const fighting = useGameStore((state) => !!state.combat.fight);
 	const resolved = item ? resolveItem(item) : null;
 	const def = resolved?.def ?? (itemId ? ITEM_CATALOG[itemId] : undefined);
 	if (!def) return null;
@@ -78,7 +88,8 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 	const rarity = RARITIES[(resolved?.instance.rarity ?? def.rarity) as keyof typeof RARITIES];
 	const color = rarity?.color ?? RARITY_COLOR.common;
 	const title = resolved?.name ?? def.name;
-	const sellPrice = item ? sellValueOf(item) : def.sellValue;
+	const baseSell = item ? sellValueOf(item) : def.sellValue;
+	const sellPrice = sellPayout(baseSell, 1, sellCtx);
 
 	const slotLabel = def.slot ? slotName(def.slot) : 'Consumable';
 	// With a comparison the set block previews the swap, so the hovered piece already counts as worn
@@ -239,9 +250,26 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 			)}
 
 			{def.description && <div className='px-tip-flavor'>{def.description}</div>}
-			<div className='px-tip-sell'>
+			{def.lore && (
+				<div className='px-tip-flavor px-tip-lore' title={def.lore}>
+					{def.lore}
+				</div>
+			)}
+			<div className='px-tip-sell' title={buyPrice === undefined && sellPrice !== baseSell ? `Base value ${formatNumber(baseSell)}` : undefined}>
 				{buyPrice !== undefined ? 'Costs' : 'Sells for'} {formatNumber(buyPrice ?? sellPrice)} <ResourceIcon resource='gold' />
 			</div>
+			{hints && buyPrice === undefined && !wornLabel && (
+				<div className='px-tip-muted text-xs'>
+					{(hints === 'bag'
+						? [item ? 'Dbl-click equip' : hasEffects(def) ? 'Dbl-click drink' : '', fighting ? '' : 'Shift + click sell']
+						: fighting
+							? []
+							: ['Click sell one', 'Shift + click sell all']
+					)
+						.filter(Boolean)
+						.join(' · ')}
+				</div>
+			)}
 		</div>
 	);
 };
@@ -250,19 +278,20 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
  * The hover card of an item. With `compare` (the bag) and a piece worn in the same slot it becomes two cards side by side:
  * the worn piece (marked Equipped) and the hovered one with every number set against it.
  */
-const ItemTooltipStack: React.FC<{ item?: ItemInstance; itemId?: string; compare?: boolean; buyPrice?: number; onDrink?: () => void }> = ({
-	item,
-	itemId,
-	compare,
-	buyPrice,
-	onDrink,
-}) => {
+const ItemTooltipStack: React.FC<{
+	item?: ItemInstance;
+	itemId?: string;
+	compare?: boolean;
+	buyPrice?: number;
+	onDrink?: () => void;
+	hints?: 'bag' | 'merchant';
+}> = ({ item, itemId, compare, buyPrice, onDrink, hints }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const comparison = compare && item ? compareDetailed(item, equipment) : null;
 	return (
 		<div className='flex items-start gap-2'>
 			<div className='px-tooltip'>
-				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} onDrink={onDrink} />
+				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} onDrink={onDrink} hints={hints} />
 			</div>
 			{comparison?.equipped && (
 				<div className='px-tooltip px-tooltip-worn'>

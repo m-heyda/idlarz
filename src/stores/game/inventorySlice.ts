@@ -6,7 +6,7 @@ import { sellPayout } from '@/utils/game/merchant';
 import { maxHp, maxMana } from '@/lib/combat';
 import { equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, unequip } from '@/lib/inventory';
 import { sellValueOf } from '@/lib/itemInstance';
-import { isAutoSold } from '@/lib/loot';
+import { isAutoSold, junkFor, junkSale, withJunkMark } from '@/lib/loot';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
 import type { EquipmentSlot } from '@/types/game';
@@ -118,23 +118,38 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 			return true;
 		},
 
+		// The right-click menu's Mark as junk: the preview is at once, the server's answer settles it
+		markJunk: (bagIndex: number, junk: boolean) => {
+			const state = get();
+			if (state.combat.fight) return false;
+			const item = Number.isInteger(bagIndex) ? gearOf(state.bag[bagIndex]) : null;
+			if (!item) return false;
+			sendInventoryOp({ action: 'markJunk', index: bagIndex, junk });
+			set({ bag: state.bag.map((slot, i) => (i === bagIndex ? { item: withJunkMark(item, junk) } : slot)) });
+			return true;
+		},
+
 		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)
-		sellJunk: (maxRarity: string) => {
+		sellJunk: (maxRarity?: string) => {
 			const state = get();
 			if (state.combat.fight) return { gold: 0, count: 0 };
-			if (!Object.prototype.hasOwnProperty.call(RARITIES, maxRarity)) return { gold: 0, count: 0 };
+			if (maxRarity !== undefined && !Object.prototype.hasOwnProperty.call(RARITIES, maxRarity)) return { gold: 0, count: 0 };
 			let bag = state.bag;
 			let gold = 0;
 			let count = 0;
-			bag.forEach((slot, index) => {
-				const item = gearOf(slot);
-				if (!item || !isAutoSold(item, maxRarity)) return;
-				gold += sellPayout(sellValueOf(item), 1, state);
-				count += 1;
-				bag = removeFromBag(bag, index, 1);
-			});
+			if (maxRarity === undefined) {
+				// no rarity: the junk rule decides (the junk materials, and the gear the rule names)
+				({ bag, gold, count } = junkSale(bag, state, junkFor(state.equipment)));
+			} else
+				bag.forEach((slot, index) => {
+					const item = gearOf(slot);
+					if (!item || !isAutoSold(item, maxRarity)) return;
+					gold += sellPayout(sellValueOf(item), 1, state);
+					count += 1;
+					bag = removeFromBag(bag, index, 1);
+				});
 			if (count === 0) return { gold: 0, count: 0 };
-			sendInventoryOp({ action: 'sellJunk', maxRarity }, settleSale(gold));
+			sendInventoryOp(maxRarity === undefined ? { action: 'sellJunk', rule: 'junk' } : { action: 'sellJunk', maxRarity }, settleSale(gold));
 			set({ bag, resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) } });
 			return { gold, count };
 		},

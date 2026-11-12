@@ -1,7 +1,7 @@
 import type { MerchantResourceKey } from '@/catalog/resources';
 import type { ActiveBuff } from '@/lib/buffs';
 import type { OfflineGrant } from '@/lib/offline/grant';
-import type { BagSlot, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
+import type { BagSlot, Drop, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
 
 // What goes over the wire between /api/offline and the browser. Kept apart from service.ts (which pulls in node:crypto) so the client can import it.
 
@@ -31,10 +31,17 @@ export type InventoryOp =
 	| { action: 'organize' }
 	| { action: 'discard'; index: number; qty?: number }
 	| { action: 'sell'; index: number; qty?: number }
+	/** Sells every bag piece up to a rarity (Quick sell in the Merchant), or every piece the junk rule names (`rule: 'junk'`, the Bag's Sell junk button) */
 	| { action: 'sellJunk'; maxRarity: string }
+	| { action: 'sellJunk'; rule: 'junk' }
+	/** Marks a bag piece as junk (the player's flag), or takes the mark off */
+	| { action: 'markJunk'; index: number; junk: boolean }
 	| { action: 'autoSell'; rarity: string | null }
 	| { action: 'buyShop'; id: string; qty: number }
 	| { action: 'buyOffer'; item: ItemInstance }
+	/** The merchant's resource trades (IDL-319): priced on the server, judged against what the last save and the rates can explain (`lib/offline/trade.ts`) */
+	| { action: 'sellResource'; resource: string; qty: number }
+	| { action: 'buyResource'; resource: string; qty: number }
 	/** Drinks one potion from the bag slot `index` (instant effects fill HP and mana, a buff is recorded with an end time) */
 	| { action: 'use'; index: number };
 
@@ -100,6 +107,8 @@ export type ChestReward =
 			tickets: PublicTickets;
 			serverNowSec: number;
 			received?: { convertedGold: number; autoSold: { count: number; gold: number } };
+			/** The junk materials the chest held on top of its reward (already in the bag; the gold of what did not fit is in `received`) */
+			junk?: Drop[];
 			inv?: Inventory;
 	  }
 	| { ok: false; reason: 'no_ticket'; tickets: PublicTickets; serverNowSec: number; gemsTotal: number; inv?: Inventory };

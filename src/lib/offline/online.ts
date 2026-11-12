@@ -2,10 +2,14 @@ import { GEMS_CAP } from '@/config/economy';
 import { gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending } from '@/lib/offline/gems';
-import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, PendingIdentity } from '@/lib/offline/gemTypes';
+import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
+import { claimAllMastery, claimMastery } from '@/lib/offline/mastery';
+import { recordCuriosity } from '@/lib/offline/curiosity';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
+import { LOOT_SOURCES } from '@/catalog/lootConfig';
+import { resolveSourceLevel, rollJunkDrops } from '@/lib/loot';
 import { rollGemFind } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import { clearBuffsOnRebirth } from '@/lib/buffs';
@@ -15,7 +19,8 @@ import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
-import { recordChest } from '@/lib/offline/stats';
+import { recordChest, recordCraft } from '@/lib/offline/stats';
+import { buyResource, sellResource } from '@/lib/offline/trade';
 import {
 	UNCLAIMED_SEC,
 	bankContext,
@@ -32,7 +37,7 @@ import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
-import { claimAchievement, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
+import { claimAchievement, claimAllAchievements, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
 import { bestiaryOf } from '@/lib/offline/stats';
 import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
 
@@ -67,11 +72,11 @@ const withInventory = <T>(value: T, inv: Inventory | null, invVer: number | unde
  * The answer with the achievements attached when this request paid one (the toast) or when the caller wants the full list (the spawn poll the browser starts from).
  * Every online reply can carry it, so a payout is never missed whichever request found it.
  */
-const withAchievements = <T>(value: T, ledger: Ledger, fresh: AchievementUnlock[], list: boolean): T => {
+const withAchievements = <T>(value: T, ledger: Ledger, fresh: AchievementUnlock[], list: boolean, summary: StoredSave['summary']): T => {
 	if (!(fresh.length > 0 || list) || typeof value !== 'object' || value === null) return value;
 	// the answer was made before the payout: a gem balance in it is brought up to date, so nothing in the browser sets the older number over the new one
 	const gems = fresh.length > 0 && 'gemsTotal' in value ? { gemsTotal: ledger.gems } : {};
-	return { ...value, ...gems, achievements: reportOf(ledger, fresh) };
+	return { ...value, ...gems, achievements: reportOf(ledger, fresh, summary) };
 };
 
 /** The answer with the player's monster discoveries and kill counts attached (a few dozen small numbers; the browser shows silhouettes until a type is in `seen`). */
@@ -109,7 +114,7 @@ const onlineStep = async <T>(
 		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
 		const settled = settleAchievements(out.ledger, stored.summary, nowMs);
 		unlocked = settled.unlocked;
-		const value = withBestiary(withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements), settled.ledger);
+		const value = withBestiary(withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements, stored.summary), settled.ledger);
 		// a poll (no key) keeps the record of the last keyed request: its answer may still have to be replayed for a retry
 		return {
 			ledger: { ...settled.ledger, anchorAt: nowMs, ...(key ? { lastKey: key, lastResult: value } : {}) },
@@ -189,6 +194,17 @@ export const redeemChest = (
 			// an XP chest pays like every other XP the player earns: with the XP bonus (kills and the passive XP already do)
 			const loot = rolled.kind === 'xp' ? { ...rolled, xp: Math.floor(rolled.xp * (1 + stored.summary.xpGainPct / 100)) } : rolled;
 			const gems = rollGemFind(luck, rng);
+			// every chest also holds some junk materials (IDL-312), rolled last so the reward above is the one it always was; the level is the chest's own
+			const junkDrops = rollJunkDrops(
+				{
+					level: resolveSourceLevel(LOOT_SOURCES.chest.level!, stored.summary.castleLevel),
+					gold: stored.summary.rates.gold * 600,
+					luck,
+					boss: false,
+					lucky: false,
+				},
+				rng,
+			);
 
 			const granted: Partial<GrantTotals> = { gems };
 			if (loot.kind === 'gold' || loot.kind === 'boost') granted.gold = loot.gold;
@@ -202,6 +218,12 @@ export const redeemChest = (
 				inv = result.inv;
 				received = { convertedGold: result.received.convertedGold, autoSold: result.received.autoSold };
 				granted.gold = (granted.gold ?? 0) + received.convertedGold + received.autoSold.gold;
+			}
+			const junkIn = receiveInto(inv, junkDrops, sellContextOf(stored.core));
+			inv = junkIn.inv;
+			if (junkIn.received.convertedGold > 0) {
+				received = { convertedGold: (received?.convertedGold ?? 0) + junkIn.received.convertedGold, autoSold: received?.autoSold ?? { count: 0, gold: 0 } };
+				granted.gold = (granted.gold ?? 0) + junkIn.received.convertedGold;
 			}
 			const next: Ledger = {
 				...ledger,
@@ -222,6 +244,7 @@ export const redeemChest = (
 					tickets: publicTickets(taken.bank, ordChest),
 					serverNowSec: nowSec,
 					...(received ? { received } : {}),
+					junk: junkIn.received.stored,
 				},
 			};
 		},
@@ -242,6 +265,12 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 			const used = applyUse(ledger, ctx.env, op.index);
 			if (!used.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, message: used.message } };
 			return { ledger: used.ledger, value: { ok: true, gold: 0, count: 0, inv: used.ledger.inv!, serverNowSec: ctx.nowSec, buffs: used.buffs } };
+		}
+		if (op.action === 'sellResource' || op.action === 'buyResource') {
+			// the merchant's resource trades (IDL-319): priced here, judged against what the last save and the rates can explain; allowed in a fight like the shop purchases
+			const traded = (op.action === 'sellResource' ? sellResource : buyResource)(ledger, ctx.stored, ctx.nowSec, op.resource, op.qty);
+			if (!traded.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
+			return { ledger: traded.ledger, value: { ok: true, gold: traded.gold, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
 		}
 		const blocked = needsNoFight(op) && !!ledger.combat?.fight;
 		const result = blocked ? null : applyOp(ledger.inv!, op, sellContextOf(ctx.stored.core));
@@ -298,7 +327,7 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 			craft: result.craft,
 			serverNowSec: ctx.nowSec,
 		};
-		return { ledger: result.ok ? { ...ledger, inv: result.inv, craft: result.craft } : ledger, value };
+		return { ledger: result.ok ? { ...ledger, inv: result.inv, craft: result.craft, stats: recordCraft(ledger.stats, result.crafted ?? 0) } : ledger, value };
 	});
 
 /**
@@ -377,7 +406,26 @@ export const gemsStep = (
 				);
 			return {
 				ledger: claimed.ledger,
-				value: { ...gemsView(claimed.ledger, ctx.nowSec, identity), paid: claimed.gems, achievements: reportOf(claimed.ledger, []) },
+				value: { ...gemsView(claimed.ledger, ctx.nowSec, identity), paid: claimed.gems, achievements: reportOf(claimed.ledger, [], ctx.stored.summary) },
+			};
+		}
+		if (request.action === 'visit') {
+			// a one-off event for a secret deed: recorded once, from the allowlist; the deed itself is earned by the settle that follows
+			const visited = recordCuriosity(ledger, request.id);
+			return { ledger: visited, value: gemsView(visited, ctx.nowSec, identity) };
+		}
+		if (request.action === 'claimAll') {
+			// Claim all of the Hall of Deeds: every earned tier that is waiting, paid in this one request
+			const claimedAll = claimAllAchievements(ledger, nowMs);
+			if (!claimedAll.ok) return refused('not_earned', 'There is nothing to claim.');
+			return {
+				ledger: claimedAll.ledger,
+				value: {
+					...gemsView(claimedAll.ledger, ctx.nowSec, identity),
+					paid: claimedAll.gems,
+					claimedIds: claimedAll.claimed,
+					achievements: reportOf(claimedAll.ledger, [], ctx.stored.summary),
+				},
 			};
 		}
 		if (!identity) return refused('no_profile', 'There is no hero to change yet.');
@@ -457,6 +505,34 @@ export const characterStep = (
 		const result = allocatePoints(attrs, request.add, budget);
 		if (!result.ok) return { ledger: { ...ledger, attrs }, value: view(attrs, false, result.reason) };
 		return { ledger: { ...ledger, attrs: result.attrs }, value: view(result.attrs, true) };
+	});
+
+/**
+ * Bestiary mastery (IDL-309): claim one tier of one monster type, or every tier waiting. Decided on the ledger's own kill counts under the compare-and-swap with an idempotency key, so a double click or a forged body pays nothing twice.
+ * The answer carries the bestiary as it stands (every online answer does).
+ */
+export const masteryStep = (deps: ServiceDeps, userId: string, key: string, request: MasteryRequest, nowMs: number): Promise<Online<MasteryReply>> =>
+	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: MasteryReply } => {
+		const ledger = ctx.ledger;
+		const view = (ok: boolean, l: Ledger, over: Partial<MasteryReply> = {}): MasteryReply => ({
+			ok,
+			tiers: 0,
+			paid: 0,
+			gems: l.gems,
+			serverNowSec: ctx.nowSec,
+			...over,
+		});
+		const done = request.action === 'claimAll' ? claimAllMastery(ledger) : claimMastery(ledger, request.type, request.tier);
+		if (!done.ok) {
+			const message =
+				done.reason === 'already_claimed'
+					? 'That tier is already claimed.'
+					: done.reason === 'out_of_order'
+						? 'Claim the earlier tier first.'
+						: 'That tier is not reached yet.';
+			return { ledger, value: view(false, ledger, { reason: done.reason, message }) };
+		}
+		return { ledger: done.ledger, value: view(true, done.ledger, { tiers: done.tiers, paid: done.gems }) };
 	});
 
 export type FightRequest =

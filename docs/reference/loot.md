@@ -10,6 +10,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - Config: [`LOOT_SOURCES`](#loot-sources), [`LOOT_PROFILES`](#loot-profiles), [`BIOME_LOOT`](#biome-loot), [`BOSS_LOOT`](#boss-loot)
 - Items: [`RARITIES`](#rarities), [`levelScale`](#levelscale), [`valueCurve`](#valuecurve), [`sellValueOf`](#sellvalueof), [`LIVE_GRADES`](#live-grades), [`gradeLevels`](#gradelevels), [`gradeRarities`](#graderarities), [`gradeLegacyItems`](#gradelegacyitems), [`kit`](#kit)
 - Adding content: [Adding loot content (data only)](#loot-pools), [`gear`](#gear)
+- Junk: [`isJunk`](#isjunk), [`junkSale`](#junksale), [`sellJunkRule`](#selljunkrule), [`rollJunkDrops`](#rolljunkdrops)
 
 ## Pipeline
 
@@ -412,3 +413,51 @@ See also: [`gear`](loot.md#gear), [`RARITIES`](loot.md#rarities), [`LOOT_SOURCES
 Source: [`src/catalog/items/define.ts:101`](../../src/catalog/items/define.ts)
 
 The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier's window (`LEVEL_WINDOW_BY_TIER`: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).
+
+## Junk
+
+<a id="isjunk"></a>
+
+### `isJunk` <small>function</small>
+
+Source: [`src/lib/loot/junk.ts:30`](../../src/lib/loot/junk.ts)
+
+Whether a piece of **gear** in the bag counts as junk for the "Sell junk" button: the player marked it (`item.junk`, the right-click menu), or its item level is `JUNK_LEVEL_MARGIN` below the average of what is worn. The level rule never
+touches set pieces, epic or legendary pieces or crafted gear (the mark overrides all of that: it is the player's own call). Worn gear is never in the bag.
+
+See also: `isJunkStack`, [`junkSale`](loot.md#junksale)
+
+<a id="junksale"></a>
+
+### `junkSale` <small>function</small>
+
+Source: [`src/lib/loot/junk.ts:70`](../../src/lib/loot/junk.ts)
+
+What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run,
+so their previews agree. `junk` is a parameter so a test can flip the gear rule.
+
+<a id="selljunkrule"></a>
+
+### `sellJunkRule` <small>function</small>
+
+Source: [`src/lib/offline/inventory.ts:240`](../../src/lib/offline/inventory.ts)
+
+The "Sell junk" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
+every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.
+
+<a id="rolljunkdrops"></a>
+
+### `rollJunkDrops` <small>function</small>
+
+Source: [`src/lib/loot/junkDrops.ts:60`](../../src/lib/loot/junkDrops.ts)
+
+The junk a kill drops, as consumable drops (a stack holds 1,000). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance
+(Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.
+
+**Formula**
+
+```text
+cheap qty   = max(1, round(gold x 0.15 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
+rare chance = base x (1 + 0.005 x Luck)
+boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
+```

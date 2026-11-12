@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { PREF_DEFAULTS, readPref, readStringPref, writePref, writeStringPref, type UiPrefKey } from '@/lib/uiPrefs';
-import type { MerchantTab } from '@/types/game';
+import type { Drop, MerchantTab } from '@/types/game';
 import type { OfflineReport } from '@/lib/offline/apply';
+import { useWindowStore } from '@/stores/windowStore';
 import { connectedCluster } from '@/utils/cluster';
 import { getTile, type World } from '@/utils/world';
 import type { ChestLoot } from '@/lib/chests';
@@ -66,7 +67,7 @@ const CHEST_NOTICE_MS = 3000;
 /** Most notices of one kind on screen at once; opening more drops the oldest */
 const MAX_NOTICES = 5;
 
-type ChestNoticeLoot = ChestLoot & { gems?: number };
+type ChestNoticeLoot = ChestLoot & { gems?: number; junk?: Drop[] };
 interface ChestNotice {
 	id: number;
 	loot: ChestNoticeLoot;
@@ -179,6 +180,11 @@ interface UiState {
 	setMerchantPreset: (preset: MerchantAmount) => void;
 	merchantCustom: string;
 	setMerchantCustom: (text: string) => void;
+	/** The resource row the Merchant's Resources tab has selected (set by a click on a header resource; null: none) */
+	merchantSelect: string | null;
+	/** Opens the Merchant on `resource`: the window comes to the front on the Resources tab with that row selected (gold opens the Upgrades tab, where gold is spent) */
+	openMerchantOn: (resource: string) => void;
+	clearMerchantSelect: () => void;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
 }
@@ -287,6 +293,14 @@ export const useUiStore = create<UiState>((set, get) => ({
 		writeStringPref('merchantPreset', String(preset));
 		set({ merchantPreset: preset });
 	},
+	merchantSelect: null,
+	openMerchantOn: (resource) => {
+		const tab: MerchantTab = resource === 'gold' ? 'upgrades' : 'resources';
+		writeStringPref('merchantTab', tab);
+		set({ merchantTab: tab, merchantSelect: tab === 'resources' ? resource : null });
+		useWindowStore.getState().openWindow('merchant');
+	},
+	clearMerchantSelect: () => set({ merchantSelect: null }),
 	merchantCustom: '',
 	setMerchantCustom: (text) => {
 		const clean = text.slice(0, MERCHANT_CUSTOM_MAX);

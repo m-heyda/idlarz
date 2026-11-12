@@ -680,3 +680,33 @@
 .char-panel-head .char-points {
 	margin-top: 0;
 }
+
+/* the row a click on a header resource selected (IDL-315) */
+.mr-row[data-selected='true'] {
+	outline: 1px solid #f0d27a;
+	background: rgba(60, 44, 20, 0.7);
+}
+
+/* a legendary's story under its flavour line: two lines in the card, the full text in the title and the Glossary (IDL-317) */
+.px-tip-lore {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	margin-top: 4px;
+	color: #c9b27a;
+}
+
+/* a bag piece that Sell junk would sell (IDL-312): a small brown tag in the corner */
+.inv-slot[data-junk='true']::after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 8px;
+	height: 8px;
+	background: #8a5a2a;
+	border: 1px solid #f0d27a;
+	transform: rotate(45deg);
+	pointer-events: none;
+}

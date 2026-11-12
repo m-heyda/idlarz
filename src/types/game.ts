@@ -112,9 +112,13 @@ export interface ItemDef {
 	/** A plain loot family (wood, cloth, steel): matches affixes and pools like a set does, but gives no set bonus */
 	family?: string;
 	description?: string;
+	/** The longer story of a legendary (IDL-317), under the flavour line of its tooltip and in full in the Glossary; catalog only */
+	lore?: string;
 	/** What drinking it does (instant heals, a regen, timed buffs); see catalog/buffs.ts. Absent: it does nothing (trade goods). */
 	effects?: ConsumableEffect[];
 	stackMax?: number;
+	/** A junk material (IDL-312): no use but the merchant; the Bag's Sell junk button sells every stack of them */
+	junk?: true;
 	sellValue: number;
 	icon?: PixelIconName;
 	/** Merchant price in gold; absent = not sold */
@@ -170,6 +174,8 @@ export interface ItemInstance {
 	affixes: AffixRoll[];
 	/** Made by the player in the Crafting window (IDL-241): only the server sets it; the tooltip says so. Absent on drops, the shelf and gifts. */
 	crafted?: true;
+	/** The player marked this piece as junk (IDL-312): the Sell junk button sells it. Optional and additive; only the server sets it (the `markJunk` inventory op). */
+	junk?: true;
 }
 
 /** Equipped gear by slot: instances (rolled rarity, level, quality, affixes) */
@@ -405,7 +411,7 @@ export interface GameState {
 	autoSellUpTo: string | null;
 	/** The version of the inventory (bag, gear, pity, auto-sell) this browser holds, as the server numbers it; null until the server has said (transient, never saved) */
 	invVer: number | null;
-	lastChestLoot: (ChestLoot & { gems?: number }) | null; // transient: the last chest's contents, shown by the toast (never saved)
+	lastChestLoot: (ChestLoot & { gems?: number; junk?: Drop[] }) | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods
 	setAutoSell: (rarity: string | null) => void;
@@ -426,7 +432,10 @@ export interface GameState {
 	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
 	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
-	sellJunk: (maxRarity: string) => { gold: number; count: number };
+	/** Sells the gear up to a rarity (Quick sell); with no argument it sells what the junk rule names (the Bag's Sell junk button: nothing until the rule exists) */
+	/** Marks a bag piece as junk, or takes the mark off (the right-click menu); refused in a fight */
+	markJunk: (bagIndex: number, junk: boolean) => boolean;
+	sellJunk: (maxRarity?: string) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
 	buyOffer: (index: number) => boolean;
 	refreshMerchantStock: () => boolean;

@@ -44,6 +44,12 @@ export const MerchantResources: React.FC = () => {
 	// kept in the ui store (and remembered): they survive switching tabs or closing the window
 	const preset = useUiStore((state) => state.merchantPreset);
 	const setPreset = useUiStore((state) => state.setMerchantPreset);
+	const selected = useUiStore((state) => state.merchantSelect);
+	const tableRef = React.useRef<HTMLDivElement>(null);
+	// bring the selected row into view when the selection changes, not on every render (the player may have scrolled away since)
+	React.useEffect(() => {
+		if (selected) tableRef.current?.querySelector('[data-selected="true"]')?.scrollIntoView({ block: 'nearest' });
+	}, [selected]);
 	const custom = useUiStore((state) => state.merchantCustom);
 	const setCustom = useUiStore((state) => state.setMerchantCustom);
 	// a typed amount wins while it reads as a number; a chip click clears it
@@ -109,7 +115,7 @@ export const MerchantResources: React.FC = () => {
 				</span>
 			</div>
 
-			<div className='mr-table'>
+			<div className='mr-table' ref={tableRef}>
 				<div className='mr-row mr-head'>
 					<span />
 					<span>Resource</span>
@@ -127,7 +133,7 @@ export const MerchantResources: React.FC = () => {
 					const canBuy = isBuyable(resource);
 					const buyUnits = unitsToBuy(resource);
 					return (
-						<div className='mr-row' key={resource} title={`${info.label}: ${info.priceDescription}`}>
+						<div className='mr-row' key={resource} data-selected={selected === resource} title={`${info.label}: ${info.priceDescription}`}>
 							<ResourceIcon resource={resource} scale={1} />
 							<span className='mr-name'>{info.label}</span>
 							<span className='mr-num'>{formatNumber(Math.floor(resources[resource]))}</span>

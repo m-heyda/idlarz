@@ -92,7 +92,7 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:216`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:218`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -288,7 +288,7 @@ still happens is resolved by `resolveConflict`. The lock dies with the page, so 
 
 ### `acceptSave` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:210`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:211`](../../src/lib/cloudSave/pipeline.ts)
 
 Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet).
   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`
@@ -434,7 +434,7 @@ In short: Embers only rise with the rebirth count; one rebirth fits between two 
 
 ### `MIN_SAVE_INTERVAL_MS` <small>const</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:88`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:89`](../../src/lib/cloudSave/pipeline.ts)
 
 Saves from one player are accepted at most this often (an honest client sends every ~90 s).
 
@@ -489,7 +489,7 @@ Flags that make an account ineligible for rankings for good. Going back in time 
 
 ### `losesProgress` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:80`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:81`](../../src/lib/cloudSave/pipeline.ts)
 
 True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).
@@ -629,6 +629,7 @@ and its gold is paid in the browser.
 | `/api/fight` | POST | `src/app/api/fight/route.ts` |
 | `/api/gems` | POST | `src/app/api/gems/route.ts` |
 | `/api/inventory` | POST | `src/app/api/inventory/route.ts` |
+| `/api/mastery` | POST | `src/app/api/mastery/route.ts` |
 | `/api/offline` | POST | `src/app/api/offline/route.ts` |
 | `/api/rebirth` | POST | `src/app/api/rebirth/route.ts` |
 | `/api/rebirths` | GET | `src/app/api/rebirths/route.ts` |

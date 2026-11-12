@@ -1,7 +1,14 @@
 // merchantSlice.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
-import { MERCHANT_BUYABLE, MERCHANT_RESOURCE_PRICES, MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
+import {
+	MERCHANT_BUYABLE,
+	MERCHANT_MAX_TRADE_QTY,
+	MERCHANT_RESOURCE_PRICES,
+	MERCHANT_SHOP_ITEMS,
+	MERCHANT_UPGRADES,
+	type MerchantUpgradeId,
+} from '@/config/merchant';
 import { RESOURCE_CAP } from '@/config/economy';
 import { calculateResourceRates } from '@/utils/game/income';
 import { buyCost, merchantLevel, merchantUpgradeCost, sellPayout } from '@/utils/game/merchant';
@@ -21,9 +28,11 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 
 	return {
 		// Sell resources to the merchant for gold. Gold and XP cannot be sold.
-		sellResources: (resource: keyof Resources, amount: number) => {
+		sellResources: (resource: keyof Resources, requested: number) => {
 			if (!(resource in MERCHANT_RESOURCE_PRICES)) return false;
-			if (!isPositiveNumber(amount)) return false;
+			if (!isPositiveNumber(requested)) return false;
+			// a Max over the server's limit sells the limit (the rest can be sold with the next click)
+			const amount = Math.min(requested, MERCHANT_MAX_TRADE_QTY);
 
 			const state = get();
 			if (state.resources[resource] < amount) return false;
@@ -31,6 +40,20 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			const price = MERCHANT_RESOURCE_PRICES[resource as keyof typeof MERCHANT_RESOURCE_PRICES];
 			const goldGained = sellPayout(price, amount, state);
 
+			// the server prices and judges the trade (IDL-319); the browser previews it and the answer settles it: the server's gold replaces the preview's, and a refusal gives the units back
+			sendInventoryOp({ action: 'sellResource', resource, qty: amount }, (reply) => {
+				if (reply?.ok) {
+					// the server's gold replaces the preview's
+					set((now) => ({ resources: { ...now.resources, gold: Math.min(Math.max(0, now.resources.gold + reply.gold - goldGained), RESOURCE_CAP) } }));
+					return;
+				}
+				// refused: the gold is taken back, and only as many units come back as gold could be taken (gold already spent on something else is not given twice)
+				set((now) => {
+					const taken = Math.min(goldGained, now.resources.gold);
+					const back = goldGained > 0 ? (amount * taken) / goldGained : amount;
+					return { resources: { ...now.resources, gold: now.resources.gold - taken, [resource]: Math.min(now.resources[resource] + back, RESOURCE_CAP) } };
+				});
+			});
 			set({
 				resources: {
 					...state.resources,
@@ -158,13 +181,28 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 		buyResource: (resource: keyof Resources, amount: number) => {
 			if (!(resource in MERCHANT_RESOURCE_PRICES) || !(MERCHANT_BUYABLE as readonly string[]).includes(resource)) return false;
 			if (!isPositiveNumber(amount)) return false;
-			const units = Math.floor(amount);
-			if (units < 1) return false;
-
 			const state = get();
+			// only what the stock can still hold is bought (and charged): the preview credits all of it, so a refusal takes back exactly that
+			const units = Math.min(Math.floor(amount), MERCHANT_MAX_TRADE_QTY, Math.floor(RESOURCE_CAP - state.resources[resource]));
+			if (units < 1) return false;
 			const price = buyCost(resource as keyof typeof MERCHANT_RESOURCE_PRICES, units);
 			if (state.resources.gold < price) return false;
 
+			// the server judges the price and grants the units (IDL-319); a refusal takes the units back and returns the gold
+			sendInventoryOp({ action: 'buyResource', resource, qty: units }, (reply) => {
+				if (reply?.ok) return;
+				// refused: the units are taken back and the gold returned, but only for units still there (units already spent, on an upgrade say, stay paid for)
+				set((now) => {
+					const removed = Math.min(units, Math.floor(now.resources[resource]));
+					return {
+						resources: {
+							...now.resources,
+							gold: Math.min(now.resources.gold + Math.floor((price * removed) / units), RESOURCE_CAP),
+							[resource]: now.resources[resource] - removed,
+						},
+					};
+				});
+			});
 			set({
 				resources: {
 					...state.resources,

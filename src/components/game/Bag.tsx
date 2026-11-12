@@ -24,6 +24,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 	const moveBagItem = useGameStore((state) => state.moveBagItem);
 	const unequipItem = useGameStore((state) => state.unequipItem);
 	const sellItem = useGameStore((state) => state.sellItem);
+	const markJunk = useGameStore((state) => state.markJunk);
 
 	const activate = (index: number) => {
 		const slot = bag[index];
@@ -32,6 +33,22 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 		else if (!equipItem(index)) {
 			onNotice(useGameStore.getState().combat.fight ? 'Finish the fight first' : 'Cannot equip that');
 		}
+	};
+
+	// Shift + click sells the whole stack (or the piece) at once, at the merchant's price with Haggler; refused in a fight (the toast says so)
+	const shiftSell = (index: number) => {
+		const slot = bag[index];
+		const gear = slot ? gearOf(slot) : null;
+		const resolved = gear ? resolveItem(gear) : null;
+		const def = resolved?.def ?? (slot && 'id' in slot ? ITEM_CATALOG[slot.id] : undefined);
+		if (!slot || !def) return;
+		const qty = slotQty(slot);
+		const gold = sellItem(index, qty);
+		useUiStore
+			.getState()
+			.showToast(
+				gold > 0 ? `Sold ${qty > 1 ? `${formatNumber(qty)} x ` : ''}${resolved?.name ?? def.name} for ${formatNumber(gold)} Gold` : 'Finish the fight first',
+			);
 	};
 
 	// Right click: use it, sell it at the merchant's price, or throw it away (the global entries follow below)
@@ -73,6 +90,16 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 						},
 					]
 				: []),
+			...(gear
+				? [
+						{
+							id: 'junk',
+							label: gear.junk ? 'Unmark junk' : 'Mark as junk',
+							disabled: fighting,
+							onSelect: () => markJunk(index, !gear.junk),
+						},
+					]
+				: []),
 			{ id: 'discard', label: 'Discard...', danger: true, disabled: fighting, hint: fighting ? 'in a fight' : undefined, onSelect: () => ui.askDiscard(index) },
 		];
 		openMenuAt(e.clientX, e.clientY, resolved?.name ?? def.name, items);
@@ -110,8 +137,10 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 							{...slotProps(slot)}
 							draggable
 							compare
+							hints='bag'
 							onDragStart={() => setDrag({ kind: 'bag', index: i })}
 							onDrop={() => drop(i)}
+							onClick={(e) => e.shiftKey && shiftSell(i)}
 							onDoubleClick={() => activate(i)}
 							onDrink={slotProps(slot).itemId && hasEffects(ITEM_CATALOG[slotProps(slot).itemId!]) ? () => activate(i) : undefined}
 							onContextMenu={(e) => menu(i, e)}
