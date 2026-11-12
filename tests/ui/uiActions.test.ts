@@ -245,3 +245,54 @@ test('with the building system on the placeholder gives way to the real build me
 		'nothing on the castle',
 	);
 });
+
+// IDL-315: a click on a header resource opens the Merchant on it
+test('openMerchantOn opens the Merchant on the Resources tab with that row selected; gold opens Upgrades', async () => {
+	const { useWindowStore } = await import('../../src/stores/windowStore');
+	useWindowStore.setState({ order: [] });
+	useUiStore.getState().openMerchantOn('eggs');
+	assert.equal(useWindowStore.getState().order.at(-1), 'merchant');
+	assert.equal(useUiStore.getState().merchantTab, 'resources');
+	assert.equal(useUiStore.getState().merchantSelect, 'eggs');
+	useUiStore.getState().openMerchantOn('gold');
+	assert.equal(useUiStore.getState().merchantTab, 'upgrades');
+	assert.equal(useUiStore.getState().merchantSelect, null);
+	useUiStore.getState().openMerchantOn('wood');
+	useUiStore.getState().clearMerchantSelect();
+	assert.equal(useUiStore.getState().merchantSelect, null);
+});
+
+// IDL-332: the achievement reward card
+test('an earned achievement puts a reward card in the notice stack, at most three at once, and the fanfare plays once per burst', async () => {
+	const { useAchievementStore } = await import('../../src/stores/achievementStore');
+	useUiStore.setState({ achievementNotices: [], toasts: [] });
+	useAchievementStore.getState().apply({
+		fresh: [
+			{ id: 'first_tile', gems: 25 },
+			{ id: 'slayer_100', gems: 25 },
+			{ id: 'first_chest', gems: 25 },
+			{ id: 'first_fight', gems: 25 },
+		],
+		earned: [],
+		claimed: [],
+		earnedAt: {},
+		claimedAt: {},
+		gemsTotal: 100,
+		points: 0,
+		claimable: 4,
+		bonusText: '',
+	});
+	const shown = useUiStore.getState().achievementNotices;
+	assert.equal(shown.length, 3, 'the oldest is dropped');
+	assert.deepEqual(
+		shown.map((n) => n.achievementId),
+		['slayer_100', 'first_chest', 'first_fight'],
+	);
+	assert.equal(useUiStore.getState().toasts.length, 0, 'no plain text toast');
+	const { playAchievementFanfare } = await import('../../src/utils/fanfare');
+	assert.equal(playAchievementFanfare(1_000_000), true);
+	assert.equal(playAchievementFanfare(1_000_500), false, 'inside the gap');
+	assert.equal(playAchievementFanfare(1_002_000), true);
+	useUiStore.getState().dismissAchievementNotice(shown[0].id);
+	assert.equal(useUiStore.getState().achievementNotices.length, 2);
+});

@@ -87,6 +87,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/inventory/route.ts) — ~ One of the player's own changes to what they carry:
 
+**src/app/api/mastery/**
+
+- [`route.ts`](../../src/app/api/mastery/route.ts) — ~ Bestiary mastery:
+
 **src/app/api/offline/**
 
 - [`route.ts`](../../src/app/api/offline/route.ts) — ~ An idempotency key:
@@ -151,7 +155,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/catalog/**
 
-- [`achievements.ts`](../../src/catalog/achievements.ts) — The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
+- [`achievements.ts`](../../src/catalog/achievements.ts) — ~ What has to hold.
+- [`achievementsBatch2.ts`](../../src/catalog/achievementsBatch2.ts) — ~ Adds a deed whose tiers are `[goal, when, title suffix, gems, points, bonus?]`.
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
 - [`badges.ts`](../../src/catalog/badges.ts) — ~ The stored `profiles.badge_id` that hides the badge completely (null = the default).
@@ -166,9 +171,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`consumables.ts`](../../src/catalog/items/consumables.ts)
 - [`define.ts`](../../src/catalog/items/define.ts) — ~ The item level window of a material tier.
 - [`grades.ts`](../../src/catalog/items/grades.ts) — ~ Name of the grade in the planning doc
-- [`index.ts`](../../src/catalog/items/index.ts) — ~ Every item in the game, in display order.
+- [`index.ts`](../../src/catalog/items/index.ts) — ~ Fills `lore` from `lore.ts` (the legendaries' stories) so the item definitions stay as they are.
+- [`junk.ts`](../../src/catalog/items/junk.ts)
 - [`ladder.ts`](../../src/catalog/items/ladder.ts) — ~ The set a special grade's pieces belong to (SetDef ids in catalog/sets.ts)
 - [`legendary.ts`](../../src/catalog/items/legendary.ts)
+- [`lore.ts`](../../src/catalog/items/lore.ts) — The longer story of the legendary weapons (IDL-317): one short paragraph each, shown in the item tooltip under the flavour line and in full in the Glossary. Draft text, for the owner to approve. Keyed by item id so the item
 - [`obsidian.ts`](../../src/catalog/items/obsidian.ts)
 - [`reuse.ts`](../../src/catalog/items/reuse.ts) — ~ Grade of a reserve item = the grade its art is registered with (config/itemIcons), so one table says it
 - [`starter.ts`](../../src/catalog/items/starter.ts)
@@ -178,6 +185,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`loot.ts`](../../src/catalog/loot.ts) — ~ Items the merchant sells, cheapest first (a disabled item is never sold, whatever its `shop` price).
 - [`lootConfig.ts`](../../src/catalog/lootConfig.ts) — ~ A set of items a profile can draw from.
+- [`mastery.ts`](../../src/catalog/mastery.ts) — Bestiary mastery as data (IDL-309, decided 2026-11-12: the hybrid ladder). A monster type has the same ladder of kill tiers; reaching a tier lets the player claim it. Appending a tier later (the
 - [`monsters.ts`](../../src/catalog/monsters.ts) — ~ The monster roster:
 - [`perkCaps.ts`](../../src/catalog/perkCaps.ts) — ~ The stat families whose gear bucket is capped (IDL-149 / IDL-252).
 - [`pets.ts`](../../src/catalog/pets.ts) — ~ Path of the pixel icon under `public/` (reuse pool, `public/pixel/reuse/pets/`)
@@ -268,6 +276,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/overlays/**
 
+- [`AchievementNotification.tsx`](../../src/components/game/overlays/AchievementNotification.tsx) — ~ The reward moment for an earned achievement (IDL-332):
 - [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
 - [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in plain words:
 - [`BuildingModal.tsx`](../../src/components/game/overlays/BuildingModal.tsx) — ~ "+1.2K" per hour for each resource of an output (per second in, per hour out).
@@ -292,7 +301,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/Merchant/**
 
 - [`MerchantItemsSection.tsx`](../../src/components/game/overlays/Merchant/MerchantItemsSection.tsx) — ~ Sell bag items for gold:
-- [`MerchantOverlay.tsx`](../../src/components/game/overlays/Merchant/MerchantOverlay.tsx)
+- [`MerchantOverlay.tsx`](../../src/components/game/overlays/Merchant/MerchantOverlay.tsx) — ~ Opening the Gambling tab while it is still empty is a secret deed (IDL-305):
 - [`MerchantResources.tsx`](../../src/components/game/overlays/Merchant/MerchantResources.tsx) — ~ How much one Sell or Buy click moves:
 - [`MerchantShop.tsx`](../../src/components/game/overlays/Merchant/MerchantShop.tsx) — ~ How many places stand on one plank of the shelf.
 - [`MerchantTabButtons.tsx`](../../src/components/game/overlays/Merchant/MerchantTabButtons.tsx)
@@ -374,6 +383,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useCtrlSequence.ts`](../../src/hooks/useCtrlSequence.ts) — ~ Calls `onTrigger` when the Control key is pressed `count` times within `windowMs` (hidden menu shortcut).
 - [`useGlobalContextMenu.ts`](../../src/hooks/useGlobalContextMenu.ts) — ~ Takes over the right click for the whole page:
 - [`useHydration.ts`](../../src/hooks/useHydration.ts) — ~ True once the saved game has been loaded from the vault AND the splash has been shown for a moment.
+- [`useIncomeBreakdown.ts`](../../src/hooks/useIncomeBreakdown.ts) — ~ The income of every resource split by source (`calculateResourceBreakdown`), recomputed only when one of its inputs changes (the map, the stats, the farm, the Embers, the merchant upgrades, the gear), never on a tick.
 - [`useMenuAttention.ts`](../../src/hooks/useMenuAttention.ts) — ~ What in the header has something waiting:
 - [`useOfflineClaim.ts`](../../src/hooks/useOfflineClaim.ts) — ~ The game waits this long for the server before it starts anyway (a late answer is still applied when it arrives).
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
@@ -434,6 +444,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`craftGear.ts`](../../src/lib/craftGear.ts) — Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 - [`dailyPrompt.ts`](../../src/lib/dailyPrompt.ts) — Where the daily bonus window remembers "Don't show again today" (per browser).
+- [`deeds.ts`](../../src/lib/deeds.ts) — ~ Equipment slots a full kit must fill.
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
@@ -458,6 +469,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`data.ts`](../../src/lib/loot/data.ts) — ~ Everything the loot pipeline reads, as one injectable bundle.
 - [`generate.ts`](../../src/lib/loot/generate.ts) — ~ The monster's level (sets the item level of what it drops and the per-level chances); omitted for a chest or the shelf
 - [`index.ts`](../../src/lib/loot/index.ts) — The loot pipeline's public face. Content lives in src/catalog (lootConfig, affixes, items); this folder is the logic.
+- [`junk.ts`](../../src/lib/loot/junk.ts) — ~ What the gear junk rule may look at besides the piece itself.
+- [`junkDrops.ts`](../../src/lib/loot/junkDrops.ts) — ~ Share of the kill's gold that the cheap junk is worth (placeholder, balance pass):
 - [`kill.ts`](../../src/lib/loot/kill.ts) — ~ Hide per second of the farm; a kill pays a share of it (0 without pigs)
 - [`pools.ts`](../../src/lib/loot/pools.ts) — ~ Whether an item belongs to a pool:
 - [`receive.ts`](../../src/lib/loot/receive.ts) — ~ What actually went into the bag
@@ -469,13 +482,14 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`manualCloudSave.ts`](../../src/lib/manualCloudSave.ts) — ~ "Save game" in the menu:
 - [`mapEdit.ts`](../../src/lib/mapEdit.ts) — ~ Drawing on a World with a drag:
 - [`mapView.ts`](../../src/lib/mapView.ts) — ~ The view of the map:
+- [`mastery.ts`](../../src/lib/mastery.ts) — ~ Tiers a kill count has reached (0 to the number of tiers).
 - [`merchant.ts`](../../src/lib/merchant.ts) — ~ What a piece of gear costs at the merchant:
 - [`minimap.ts`](../../src/lib/minimap.ts) — ~ The minimap:
 - [`monsters.ts`](../../src/lib/monsters.ts) — ~ Reduces the damage of every hit the player lands (same curve as the player's armor)
 
 **src/lib/offline/**
 
-- [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read.
+- [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read (see `lib/deeds.ts`).
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
 - [`attrs.ts`](../../src/lib/offline/attrs.ts) — ~ The most points one request may add to one attribute (a sanity bound on the body; the budget is the real limit).
 - [`away.ts`](../../src/lib/offline/away.ts) — ~ The landing card's away bar:
@@ -483,6 +497,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 - [`craft.ts`](../../src/lib/offline/craft.ts) — ~ What rolling a gear craft needs besides the ledger:
+- [`curiosity.ts`](../../src/lib/offline/curiosity.ts) — ~ The events a deed may be waiting for.
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
 - [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off), for the win estimate.
@@ -502,6 +517,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
 - [`ledgerUpgrade.ts`](../../src/lib/offline/ledgerUpgrade.ts) — ~ The upgrade path of a `player_ledger` row.
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
+- [`mastery.ts`](../../src/lib/offline/mastery.ts) — ~ The gems the tiers `from` (exclusive) to `to` (inclusive, 1-based) pay.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
 - [`petLetters.ts`](../../src/lib/offline/petLetters.ts) — SERVER ONLY. The welcome letters that come with a special pet. They are kept out of `src/catalog/pets.ts` (which is in the browser bundle for everyone) so the text reaches only the account it is for: `applyPets` puts a letter in the answer for the account that was granted the pet, nobody else.
 - [`pets.ts`](../../src/lib/offline/pets.ts) — ~ The pets this account owns (ids of the catalog)
@@ -518,6 +534,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`statsReset.ts`](../../src/lib/offline/statsReset.ts) — ~ The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, chests, achievements):
 - [`supabaseLedger.ts`](../../src/lib/offline/supabaseLedger.ts) — ~ The ledger as the `player_ledger` row it is stored as (also what the migration script writes).
 - [`tickets.ts`](../../src/lib/offline/tickets.ts) — ~ Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny).
+- [`trade.ts`](../../src/lib/offline/trade.ts) — ~ The longest stretch of income counted on top of the last accepted save:
 - [`tutorial.ts`](../../src/lib/offline/tutorial.ts) — ~ `unknown`:
 - [`types.ts`](../../src/lib/offline/types.ts) — ~ What the server keeps of a player's things:
 - [`winChance.ts`](../../src/lib/offline/winChance.ts) — ~ How sharply the chance rises with the time-to-survive over time-to-kill ratio (1 = a coin flip; the fight is a race of many swings, so it is steep).
@@ -579,6 +596,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`uiPrefs.ts`](../../src/lib/uiPrefs.ts) — Remembered view options (not game state): plain booleans in localStorage, every access guarded
 - [`utils.ts`](../../src/lib/utils.ts)
+- [`worldFacts.ts`](../../src/lib/worldFacts.ts) — ~ The land and farm facts of one accepted save.
 
 **src/**
 
@@ -630,6 +648,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`audioManager.ts`](../../src/utils/audioManager.ts) — Audio manager for handling game sound effects
 - [`biomeRules.ts`](../../src/utils/biomeRules.ts) — ~ Whether a biome may turn up on one tile, and why not.
 - [`cluster.ts`](../../src/utils/cluster.ts) — ~ The connected area of one biome around (x, y):
+- [`fanfare.ts`](../../src/utils/fanfare.ts) — ~ The fanfare plays once per burst:
 - [`formatters.ts`](../../src/utils/formatters.ts) — Suffixes for large numbers: thousand steps from K (the first at 10,000), then M, B, T, Qa, Qi, Sx; beyond that scientific
 
 **src/utils/game/**
@@ -810,6 +829,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gearEconomy.test.ts`](../../tests/economy/gearEconomy.test.ts) — ~ Puts gear on the character the way a loaded save does, with the rates that go with it.
 - [`idols.test.ts`](../../tests/economy/idols.test.ts) — ~ A fresh game with `n` tiles made `biome` (the first non-castle tiles), castle at `castleLevel`; returns their positions.
 - [`idolsServer.test.ts`](../../tests/economy/idolsServer.test.ts) — ~ Every Idol effect, checked the way the server applies it:
+- [`incomeSources.test.ts`](../../tests/economy/incomeSources.test.ts)
 - [`limitsAndSelling.test.ts`](../../tests/economy/limitsAndSelling.test.ts)
 - [`merchantGoods.test.ts`](../../tests/economy/merchantGoods.test.ts)
 - [`merchantShop.test.ts`](../../tests/economy/merchantShop.test.ts) — ~ What a plain item sells for at its first level (the shop's stock); consumables have their own price.
@@ -840,6 +860,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`loot.test.ts`](../../tests/loot/loot.test.ts)
 - [`lootGenerate.test.ts`](../../tests/loot/lootGenerate.test.ts)
 - [`lootValidate.test.ts`](../../tests/loot/lootValidate.test.ts)
+- [`lore.test.ts`](../../tests/loot/lore.test.ts)
 - [`organizeBag.test.ts`](../../tests/loot/organizeBag.test.ts)
 - [`reserveItems.test.ts`](../../tests/loot/reserveItems.test.ts) — ~ A reserve item is live when it is a base item of grade G1-G3; named ones (legendary folder) and G4+ stay disabled
 
@@ -894,10 +915,14 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
 - [`bootSnapshot.test.ts`](../../tests/server/bootSnapshot.test.ts) — ~ A stand-in for the Supabase client:
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
+- [`deeds.test.ts`](../../tests/server/deeds.test.ts)
+- [`deedsBatch2.test.ts`](../../tests/server/deedsBatch2.test.ts)
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
+- [`junk.test.ts`](../../tests/server/junk.test.ts)
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
+- [`mastery.test.ts`](../../tests/server/mastery.test.ts)
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.
@@ -927,6 +952,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`designSystem.test.ts`](../../tests/ui/designSystem.test.ts)
+- [`designSystemRender.test.ts`](../../tests/ui/designSystemRender.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)

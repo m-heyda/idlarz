@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { RESOURCES, RESOURCE_TIERS, resourcesInTier, type ResourceKey, type ResourceTier } from '@/catalog';
 import { RESOURCE_ICONS } from '@/config/resources';
@@ -44,6 +45,8 @@ interface GroupProps {
 	align: 'center' | 'start';
 	onOpenEmbers: () => void;
 	onOpenGems: () => void;
+	/** A click on a resource chip opens the Merchant on it (IDL-315) */
+	onOpenMerchant: (resource: string) => void;
 }
 
 /**
@@ -51,7 +54,7 @@ interface GroupProps {
  * opens a list of every resource in the tier with its amount and production; a click pins that list open (touch screens, or just to
  * read it for a while). A tier can grow to dozens of resources and the strip stays as wide as its icons.
  */
-const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, onOpenEmbers, onOpenGems }) => {
+const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, onOpenEmbers, onOpenGems, onOpenMerchant }) => {
 	const [pinned, setPinned] = useState(false);
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -92,17 +95,34 @@ const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, o
 			{rows.map((row) => {
 				const isEmbers = row.key === 'embers';
 				const isGems = row.key === 'gems';
+				// a chip opens the Merchant only for what it has a row for (gold opens the Upgrades tab); an extract the merchant does not buy keeps the plain pin behaviour
+				const opensMerchant = !isEmbers && !isGems && (row.key === 'gold' || row.key in MERCHANT_RESOURCE_PRICES);
+				const actionable = isEmbers || isGems || opensMerchant;
+				const act = () => (isGems ? onOpenGems() : isEmbers ? onOpenEmbers() : onOpenMerchant(row.key));
 				return (
 					<span
 						key={row.key}
-						className={cn('hdr-chip', (isEmbers || isGems) && 'is-link')}
+						className={cn('hdr-chip', actionable && 'is-link')}
 						data-tutorial={`res-${row.key}`}
-						title={isGems ? 'Gems: open the Gem shop' : RESOURCES[row.key].label}
+						title={isGems ? 'Gems: open the Gem shop' : opensMerchant ? `${RESOURCES[row.key].label}: open the Merchant` : RESOURCES[row.key].label}
+						role={actionable ? 'button' : undefined}
+						tabIndex={actionable ? 0 : undefined}
 						onClick={
-							isEmbers || isGems
+							actionable
 								? (event) => {
+										// the pin toggle stays on the group (its padding and the Enter / Space key on the group); a chip does what it says
 										event.stopPropagation();
-										(isGems ? onOpenGems : onOpenEmbers)();
+										act();
+									}
+								: undefined
+						}
+						onKeyDown={
+							actionable
+								? (event) => {
+										if (event.key !== 'Enter' && event.key !== ' ') return;
+										event.preventDefault();
+										event.stopPropagation();
+										act();
 									}
 								: undefined
 						}
@@ -135,6 +155,9 @@ const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, o
 					})}
 				</div>
 				{hasEmbers && <div className='pt-1 mt-1 border-t px-rule text-xs text-[#9be26a]'>Click the green gem to open the Ember shop.</div>}
+				{!hasEmbers && rows.some((row) => row.key !== 'gems') && (
+					<div className='pt-1 mt-1 border-t px-rule text-xs px-tip-muted'>Click a resource to open the Merchant.</div>
+				)}
 			</HeaderTip>
 		</div>
 	);
@@ -152,6 +175,7 @@ const ResourceDisplay: React.FC = () => {
 	const compact = useUiStore((state) => state.compactHeader);
 	const toggleRebirth = useUiStore((state) => state.toggleRebirth);
 	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
+	const openMerchantOn = useUiStore((state) => state.openMerchantOn);
 
 	const amountOf = (key: ResourceKey): number =>
 		key === 'gems' ? gems : key === 'embers' ? embers : ((resources as unknown as Record<string, number>)[key] ?? 0);
@@ -183,6 +207,7 @@ const ResourceDisplay: React.FC = () => {
 						align={t === 0 ? 'start' : 'center'}
 						onOpenEmbers={toggleRebirth}
 						onOpenGems={toggleGemShop}
+						onOpenMerchant={openMerchantOn}
 					/>
 				);
 			})}

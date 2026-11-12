@@ -7,7 +7,8 @@ import { encodeSave } from '../../src/lib/saveFormat';
 import { acceptSave, type SaveRepo, type StatsRow, type StoredSave, type WorldPart } from '../../src/lib/cloudSave/pipeline';
 import type { ServiceDeps } from '../../src/lib/offline/service';
 import { fightStep, inventoryStep, redeemChest, syncTickets, type Online } from '../../src/lib/offline/online';
-import { applyOp, bagCountOf, inventoryFromCore, parseOp, stampInventory } from '../../src/lib/offline/inventory';
+import { applyOp, bagCountOf, inventoryFromCore, parseOp, sellJunkRule, stampInventory } from '../../src/lib/offline/inventory';
+import { countJunk, isJunk } from '../../src/lib/loot/junk';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { plainItem, sellValueOf } from '../../src/lib/itemInstance';
 import { sellPayout } from '../../src/utils/game/merchant';
@@ -368,6 +369,23 @@ test("a chest's item goes into the ledger's bag (or the auto-sell filter), and t
 	assert.ok(items >= 0);
 });
 
+test('every chest also holds junk materials: they are in the answer and in the ledger bag', async () => {
+	const p = await player();
+	await stay(p, 30);
+	const listed = ok(await syncTickets(p.m.deps, p.id, T0 + 31 * MIN)).tickets.chests;
+	assert.ok(listed.length > 0);
+	const result = ok(await redeemChest(p.m.deps, p.id, key(), listed[0], T0 + 31 * MIN));
+	assert.ok(result.ok);
+	if (!result.ok) return;
+	assert.ok(result.junk && result.junk.length >= 1, 'junk rides along');
+	for (const drop of result.junk!) {
+		assert.equal(drop.kind, 'consumable');
+		assert.ok(drop.kind === 'consumable' && ITEM_CATALOG[drop.id].junk);
+	}
+	const held = p.inv().bag.reduce((n, slot) => n + (slot && 'id' in slot && ITEM_CATALOG[slot.id].junk ? slot.qty : 0), 0);
+	assert.ok(held >= 1, 'and in the bag');
+});
+
 // ---------------------------------------------------------------------------------------------------- the use operation (IDL-155)
 
 ITEM_CATALOG.t_might = {
@@ -454,4 +472,206 @@ test('use: an instant potion (mana) fills the pool through the same op, in the s
 	assert.ok(p.m.ledgers.get(p.id)!.combat!.mp > 0, 'mana restored');
 	assert.equal(potionsLeft(p, 'potion_mana'), 0);
 	assert.deepEqual(p.m.ledgers.get(p.id)!.buffs, [], 'no buff for an instant potion');
+});
+
+// IDL-311: the junk rule is one function that says no to everything today, so the button sells nothing until the rule exists
+
+test('sellJunk with the junk rule sells nothing today, and exactly the flagged gear once the rule says so (Haggler paid)', async () => {
+	const p = await player();
+	const rare = { ...plainItem('steel_mace'), rarity: 'rare' as const };
+	const slots = bag({ item: plainItem('steel_helm') }, { item: rare }, { id: 'potion_minor', qty: 1 }, { item: plainItem('steel_cuirass') });
+	p.m.ledgers.set(p.id, { ...p.m.ledgers.get(p.id)!, inv: { ...p.inv(), bag: slots } });
+	assert.equal(isJunk(plainItem('steel_helm')), false, 'nothing is junk yet');
+	const none = await op(p, { action: 'sellJunk', rule: 'junk' });
+	assert.equal(none.ok, false);
+	assert.equal(none.count, 0);
+	assert.deepEqual(p.inv().bag, slots, 'the bag is untouched');
+	assert.equal(countJunk(slots), 0);
+
+	// flipping the rule in a fixture: only the flagged pieces go, potions and unflagged gear stay, and the payout is the normal sale payout
+	const inv = { ...p.inv(), bag: slots };
+	const ctx = { merchantUpgrades: {}, prestige: { rebirths: 0, legacyPoints: 0, legacyEarned: 0 } } as unknown as Parameters<typeof sellJunkRule>[1];
+	const flagged = (item: { rarity: string }) => item.rarity === 'rare';
+	assert.equal(countJunk(slots, flagged), 1);
+	const sold = sellJunkRule(inv, ctx, flagged);
+	assert.equal(sold.ok, true);
+	assert.equal(sold.count, 1);
+	assert.equal(sold.gold, sellPayout(sellValueOf(rare), 1, ctx));
+	assert.deepEqual(sold.inv.bag[2], { id: 'potion_minor', qty: 1 });
+	assert.equal(sold.inv.bag.filter((slot) => slot && 'item' in slot).length, 2);
+	assert.deepEqual(parseOp({ action: 'sellJunk', rule: 'junk' }), { action: 'sellJunk', rule: 'junk' });
+	assert.deepEqual(parseOp({ action: 'sellJunk', maxRarity: 'common' }), { action: 'sellJunk', maxRarity: 'common' });
+	assert.equal(parseOp({ action: 'sellJunk' }), null);
+});
+
+// IDL-319: the merchant's resource trades are priced and judged by the server
+
+const stocked = (): PersistedGame => {
+	const base = game();
+	return { ...base, resources: { ...base.resources, wood: 1000, stone: 50, gold: 500 } } as PersistedGame;
+};
+
+test('a resource sale is paid by the server price, recorded as granted, counted for Market Day and remembered until the next save', async () => {
+	const p = await player(stocked());
+	const before = p.m.ledgers.get(p.id)!;
+	const sold = await op(p, { action: 'sellResource', resource: 'wood', qty: 400 });
+	assert.equal(sold.ok, true);
+	assert.ok(sold.gold > 0);
+	const after = p.m.ledgers.get(p.id)!;
+	assert.equal(after.granted.gold, before.granted.gold + sold.gold, 'the gold is recorded as granted so the save that holds it passes');
+	assert.deepEqual([after.stats.unitsSold, after.stats.goldFromSales], [400, sold.gold]);
+	assert.deepEqual(after.stats.tradeSince.sold, { wood: 400 });
+	// what is left of the stock can still be sold, what was never there cannot
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 500 })).ok, true);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 1e6 })).ok, false, 'more than the stock can explain');
+});
+
+test('a sale the save cannot explain, a resource the merchant does not buy, and bad numbers are refused with nothing changed', async () => {
+	const p = await player(stocked());
+	const ledger = p.m.ledgers.get(p.id)!;
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 1e9 })).ok, false);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'gold', qty: 10 })).ok, false, 'gold is not sold');
+	assert.equal((await op(p, { action: 'sellResource', resource: 'xp', qty: 10 })).ok, false);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 0 })).ok, false);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: -5 })).ok, false);
+	assert.equal(parseOp({ action: 'sellResource', resource: 'wood', qty: Number.NaN }), null);
+	assert.equal(parseOp({ action: 'sellResource', resource: 'wood' }), null);
+	assert.deepEqual(p.m.ledgers.get(p.id)!.granted, ledger.granted);
+	assert.equal(p.m.ledgers.get(p.id)!.stats.unitsSold, 0);
+});
+
+test('an accepted save absorbs the trades since the one before it, so the same stock is not counted twice', async () => {
+	const p = await player(stocked());
+	await op(p, { action: 'sellResource', resource: 'wood', qty: 900 });
+	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince.sold, { wood: 900 });
+	// the browser's next save holds 100 wood and the gold of the sale
+	const next = stocked();
+	const state = { ...next, resources: { ...next.resources, wood: 100, gold: 500 + 900 } } as PersistedGame;
+	const rev = p.m.rows.get(p.id)!.rev;
+	const saved = await save(p.m, p.id, state, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince, { sold: {}, boughtGold: 0 }, 'the save absorbed them');
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 90 }, T0 + 3 * MIN)).ok, true);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 1e6 }, T0 + 3 * MIN)).ok, false);
+});
+
+test('a purchase is granted by the server when the gold can be explained, and refused when it cannot', async () => {
+	const p = await player(stocked());
+	const before = p.m.ledgers.get(p.id)!;
+	const bought = await op(p, { action: 'buyResource', resource: 'wood', qty: 20 });
+	assert.equal(bought.ok, true);
+	assert.equal(bought.gold, 0, 'the cost is paid in the browser');
+	const after = p.m.ledgers.get(p.id)!;
+	assert.equal(after.granted.wood, before.granted.wood + 20);
+	assert.ok(after.stats.tradeSince.boughtGold > 0);
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 5_000_000 })).ok, false, 'a price far beyond the purse');
+	assert.equal((await op(p, { action: 'buyResource', resource: 'gold', qty: 5 })).ok, false, 'not for sale');
+	assert.equal(parseOp({ action: 'buyResource', resource: 'wood', qty: 1.5 }), null, 'whole units only');
+});
+
+// Review fixes for IDL-319 and IDL-307
+
+test('trades since the save come off after the slack, so repeated small sales cannot each get a fresh allowance', async () => {
+	const p = await player(stocked());
+	const wood = (p.m.rows.get(p.id)!.summary.rates as unknown as Record<string, number>).wood;
+	let sold = 0;
+	let refused = 0;
+	for (let i = 0; i < 200 && refused < 2; i++) {
+		const out = await op(p, { action: 'sellResource', resource: 'wood', qty: 25 }, T0 + 1000);
+		if (out.ok) sold += 25;
+		else refused++;
+	}
+	assert.ok(sold <= (1000 + wood * 1) * 1.1 + 25 + 1e-6, `${sold} units sold of a stock of 1000`);
+	assert.ok(refused >= 2, 'it ends');
+});
+
+const hoard = (): PersistedGame => {
+	const base = game();
+	return { ...base, resources: { ...base.resources, wood: 100_000, gold: 100_000 } } as PersistedGame;
+};
+
+test('a save that still holds the pre-sale stock does not clear the sale: the same stock cannot be sold again', async () => {
+	const p = await player(hoard());
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000 }, T0 + 1000)).ok, true);
+	// another browser uploads its older picture: 100,000 wood and the old gold
+	const rev = p.m.rows.get(p.id)!.rev;
+	const saved = await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	const kept = p.m.ledgers.get(p.id)!.stats.tradeSince.sold.wood;
+	assert.ok(kept > 90_000 && kept <= 99_000, `most of the sale stays on the record, got ${kept}`);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000 }, T0 + 3 * MIN)).ok, false);
+});
+
+test('a purchase stays on the record until the gold it cost is gone from the saved purse', async () => {
+	const p = await player(hoard());
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 1000)).ok, true);
+	const boughtGold = p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold;
+	assert.ok(boughtGold > 50_000);
+	// a modified browser uploads the wood but not the debit
+	const rev = p.m.rows.get(p.id)!.rev;
+	const base = hoard();
+	const saved = await save(p.m, p.id, { ...base, resources: { ...base.resources, wood: 140_000 } } as PersistedGame, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	const kept = p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold;
+	assert.ok(kept > boughtGold * 0.8 && kept <= boughtGold, `most of the debit stays on the record, got ${kept} of ${boughtGold}`);
+});
+
+test('a new gold peak is written at once, not at the next ten-minute count', async () => {
+	const p = await player(stocked());
+	const before = p.m.ledgers.get(p.id)!.stats.goldPeak;
+	const rev = p.m.rows.get(p.id)!.rev;
+	const richer = stocked();
+	const saved = await save(p.m, p.id, { ...richer, resources: { ...richer.resources, gold: 700 } } as PersistedGame, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
+	assert.equal(p.m.ledgers.get(p.id)!.stats.goldPeak, 700);
+	assert.ok(before < 700);
+});
+
+test('gold from a flagged save is not counted towards the peak', async () => {
+	const p = await player(stocked());
+	const rev = p.m.rows.get(p.id)!.rev;
+	const forged = stocked();
+	const saved = await save(p.m, p.id, { ...forged, resources: { ...forged.resources, gold: 90_000_000_000 } } as PersistedGame, rev, T0 + 2 * MIN);
+	assert.equal(saved.kind, 'ok');
+	if (saved.kind === 'ok') assert.ok(saved.flags.length > 0, 'the save is flagged');
+	assert.ok(p.m.ledgers.get(p.id)!.stats.goldPeak < 90_000_000_000);
+});
+
+test('a retained deduction is released by the next correct save, it does not stay for ever (review)', async () => {
+	const p = await player(hoard());
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 50_000 }, T0 + 1000)).ok, true);
+	// another browser's picture first (it still holds the old stock) ...
+	let rev = p.m.rows.get(p.id)!.rev;
+	assert.equal((await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN)).kind, 'ok');
+	assert.ok(p.m.ledgers.get(p.id)!.stats.tradeSince.sold.wood > 0);
+	// ... then the corrected one, with the stock the sale left
+	rev = p.m.rows.get(p.id)!.rev;
+	const base = hoard();
+	assert.equal(
+		(await save(p.m, p.id, { ...base, resources: { ...base.resources, wood: 50_000, gold: 100_000 } } as PersistedGame, rev, T0 + 4 * MIN)).kind,
+		'ok',
+	);
+	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince.sold, {}, 'released');
+	assert.equal(
+		(await op(p, { action: 'sellResource', resource: 'wood', qty: 40_000 }, T0 + 5 * MIN)).ok,
+		true,
+		'and the player can sell what they really hold',
+	);
+});
+
+test('a flagged save keeps the land and farm facts of the save before it, so a cheat cannot unlock a deed', async () => {
+	const p = await player(stocked());
+	const before = p.m.rows.get(p.id)!.summary.derived.deedWorld;
+	const rev = p.m.rows.get(p.id)!.rev;
+	const forged = stocked();
+	const saved = await save(
+		p.m,
+		p.id,
+		{ ...forged, farmLevels: { chicken: 5000 }, resources: { ...forged.resources, gold: 90_000_000_000 } } as PersistedGame,
+		rev,
+		T0 + 2 * MIN,
+	);
+	assert.equal(saved.kind, 'ok');
+	if (saved.kind === 'ok') assert.ok(saved.flags.length > 0);
+	assert.deepEqual(p.m.rows.get(p.id)!.summary.derived.deedWorld, before);
 });

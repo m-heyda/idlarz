@@ -163,3 +163,61 @@
 		animation: none;
 	}
 }
+
+/* the reward card of an earned achievement (IDL-332): gold frame, a slow glow on the badge, fades out over its 7 seconds */
+.achv-toast {
+	animation: achv-toast 7s ease-in-out both;
+	min-width: 280px;
+	box-shadow: 0 0 18px rgba(240, 210, 122, 0.45);
+}
+
+.achv-congrats {
+	font-size: 11px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #f0d27a;
+	text-shadow: 0 0 6px rgba(240, 210, 122, 0.6);
+}
+
+.achv-badge {
+	filter: drop-shadow(0 0 6px rgba(240, 210, 122, 0.7));
+	animation: achv-badge 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes achv-toast {
+	0% {
+		opacity: 0;
+		margin-top: -10px;
+		transform: scale(0.92);
+	}
+	4% {
+		opacity: 1;
+		margin-top: 0;
+		transform: scale(1.04);
+	}
+	7%,
+	92% {
+		opacity: 1;
+		margin-top: 0;
+		transform: scale(1);
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes achv-badge {
+	from {
+		filter: drop-shadow(0 0 3px rgba(240, 210, 122, 0.4));
+	}
+	to {
+		filter: drop-shadow(0 0 9px rgba(240, 210, 122, 0.9));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.achv-toast,
+	.achv-badge {
+		animation: none;
+	}
+}

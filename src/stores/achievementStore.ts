@@ -16,10 +16,17 @@ interface AchievementState {
 	claimed: readonly string[];
 	earnedAt: Readonly<Record<string, number>>;
 	claimedAt: Readonly<Record<string, number>>;
-	/** The id being claimed right now (the buttons are disabled meanwhile) */
+	/** Deed points of the claimed tiers, the tiers waiting for Claim, the placeholder text of the deeds bonus and the number towards each deed (all from the server) */
+	points: number;
+	claimable: number;
+	bonusText: string;
+	progress: Readonly<Record<string, number>>;
+	/** The id being claimed right now ('all' for Claim all; the buttons are disabled meanwhile) */
 	busy: string | null;
 	apply: (report: AchievementReport) => void;
 	claim: (id: string) => Promise<boolean>;
+	/** Claim all: one request for every earned tier that is waiting */
+	claimAll: () => Promise<boolean>;
 }
 
 /** The report as an older server may send it: the claimed list and the times can be missing. */
@@ -27,6 +34,10 @@ type LooseReport = Pick<AchievementReport, 'fresh' | 'earned' | 'gemsTotal'> & {
 	claimed?: string[];
 	earnedAt?: Record<string, number>;
 	claimedAt?: Record<string, number>;
+	points?: number;
+	claimable?: number;
+	bonusText?: string;
+	progress?: Record<string, number>;
 };
 
 export const useAchievementStore = create<AchievementState>((set, get) => ({
@@ -34,14 +45,30 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
 	claimed: [],
 	earnedAt: {},
 	claimedAt: {},
+	points: 0,
+	claimable: 0,
+	bonusText: '',
+	progress: {},
 	busy: null,
 	apply: (report) => {
 		const r = report as LooseReport;
-		set({ earned: r.earned, claimed: r.claimed ?? r.earned, earnedAt: r.earnedAt ?? {}, claimedAt: r.claimedAt ?? {} });
+		const claimed = r.claimed ?? r.earned;
+		set((state) => ({
+			earned: r.earned,
+			claimed,
+			earnedAt: r.earnedAt ?? {},
+			claimedAt: r.claimedAt ?? {},
+			points: r.points ?? state.points,
+			claimable: r.claimable ?? r.earned.filter((id) => !claimed.includes(id)).length,
+			bonusText: r.bonusText ?? state.bonusText,
+			// a report without the numbers (an older server, or one made before the save is known) keeps what was shown
+			progress: r.progress ?? state.progress,
+		}));
 		if (typeof r.gemsTotal === 'number') useGameStore.setState({ gems: r.gemsTotal });
 		for (const unlock of r.fresh) {
-			const title = achievementById(unlock.id)?.title ?? unlock.id;
-			useUiStore.getState().showToast(`Achievement earned: ${title}. Claim it in the Achievements window.`);
+			// the reward card (badge, Congratulations!, fanfare); an id the catalog does not know falls back to the plain message
+			if (achievementById(unlock.id)) useUiStore.getState().pushAchievementNotice(unlock.id);
+			else useUiStore.getState().showToast(`Achievement earned: ${unlock.id}.`);
 		}
 	},
 	claim: async (id) => {
@@ -52,6 +79,35 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
 			const key = newClaimId();
 			let reply = await requestGems(key, { action: 'claim', id });
 			if (reply.status === 'unavailable') reply = await requestGems(key, { action: 'claim', id });
+			if (reply.status === 'need_claim') {
+				signalNeedClaim();
+				toast('Collect your time away first, then claim.');
+				return false;
+			}
+			if (reply.status !== 'ok') {
+				toast('Could not reach the server. Nothing was claimed.');
+				return false;
+			}
+			const value = reply.value;
+			if (typeof value.gems === 'number') useGameStore.setState({ gems: value.gems });
+			if (!value.ok) {
+				toast(value.message ?? 'The server did not do that.');
+				return false;
+			}
+			toast(value.paid ? `+${value.paid} gems` : 'Claimed');
+			return true;
+		} finally {
+			set({ busy: null });
+		}
+	},
+	claimAll: async () => {
+		if (get().busy !== null) return false;
+		const toast = useUiStore.getState().showToast;
+		set({ busy: 'all' });
+		try {
+			const key = newClaimId();
+			let reply = await requestGems(key, { action: 'claimAll' });
+			if (reply.status === 'unavailable') reply = await requestGems(key, { action: 'claimAll' });
 			if (reply.status === 'need_claim') {
 				signalNeedClaim();
 				toast('Collect your time away first, then claim.');

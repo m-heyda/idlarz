@@ -273,19 +273,23 @@ test('saves: an older save without farm products or farm upgrades loads with zer
 	if (cut.ok) assert.deepEqual(cut.state.farmUpgrades, { feed: FARM_UPGRADES.feed.maxLevel });
 });
 
-test('farm products sell but are never offered for sale; resource packs stay on the old five', () => {
-	assert.deepEqual([...MERCHANT_BUYABLE], ['wood', 'stone', 'coal', 'food', 'meat']);
+test('farm products sell and, since IDL-312, can be bought back like the basics', () => {
+	assert.deepEqual([...MERCHANT_BUYABLE], ['wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool']);
 	for (const key of FARM_PRODUCT_KEYS) {
 		assert.ok(key in MERCHANT_RESOURCE_PRICES, `${key} sells`);
 		assert.ok(MERCHANT_RESOURCE_PRICES[key] > MERCHANT_RESOURCE_PRICES.meat, `${key} sells for more than meat`);
+		assert.ok((MERCHANT_BUYABLE as readonly string[]).includes(key), `${key} is for sale`);
 	}
 	freshGame({ gold: 0, eggs: 10 });
 	assert.equal(api().sellResources('eggs', 10), true);
 	assert.equal(api().resources.gold, 10 * MERCHANT_RESOURCE_PRICES.eggs);
-	setResources({ gold: 1e9 });
-	assert.equal(api().buyResource('eggs', 5), false);
-	assert.equal(api().buyResource('milk', 5), false);
-	assert.equal(api().buyResource('hide', 5), false);
+	setResources({ gold: 1e9, eggs: 0, milk: 0, hide: 0, wool: 0 });
+	for (const key of ['eggs', 'milk', 'hide', 'wool'] as const) {
+		assert.equal(api().buyResource(key, 5), true, key);
+		assert.equal(api().resources[key], 5, key);
+	}
+	assert.equal(api().buyResource('gold' as never, 5), false);
+	assert.equal(api().buyResource('xp' as never, 5), false);
 });
 
 test('merchant prices follow early scarcity: the slower a basic resource is produced early, the more it sells for', () => {

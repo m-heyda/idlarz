@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { PREF_DEFAULTS, readPref, readStringPref, writePref, writeStringPref, type UiPrefKey } from '@/lib/uiPrefs';
-import type { MerchantTab } from '@/types/game';
+import type { Drop, MerchantTab } from '@/types/game';
 import type { OfflineReport } from '@/lib/offline/apply';
+import { useWindowStore } from '@/stores/windowStore';
 import { connectedCluster } from '@/utils/cluster';
 import { getTile, type World } from '@/utils/world';
 import type { ChestLoot } from '@/lib/chests';
@@ -37,6 +38,9 @@ interface ContextMenuState {
 
 let toastId = 0;
 let chestNoticeId = 0;
+let achievementNoticeId = 0;
+/** How long the reward card of an earned achievement stays up (ms) */
+const ACHIEVEMENT_NOTICE_MS = 7000;
 const noticeTimers = new Map<number, ReturnType<typeof setTimeout>>();
 let flashTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -66,7 +70,7 @@ const CHEST_NOTICE_MS = 3000;
 /** Most notices of one kind on screen at once; opening more drops the oldest */
 const MAX_NOTICES = 5;
 
-type ChestNoticeLoot = ChestLoot & { gems?: number };
+type ChestNoticeLoot = ChestLoot & { gems?: number; junk?: Drop[] };
 interface ChestNotice {
 	id: number;
 	loot: ChestNoticeLoot;
@@ -158,6 +162,10 @@ interface UiState {
 	/** Chest rewards, stacked: opening chests quickly queues one notice per chest */
 	chestNotices: ChestNotice[];
 	pushChestNotice: (loot: ChestNoticeLoot) => void;
+	/** The reward card of an earned achievement (badge, Congratulations, fanfare): one per achievement, at most a few on screen */
+	achievementNotices: { id: number; achievementId: string }[];
+	pushAchievementNotice: (achievementId: string) => void;
+	dismissAchievementNotice: (id: number) => void;
 	dismissChestNotice: (id: number) => void;
 	/** Remembered view options (localStorage, see lib/uiPrefs): the minimap, the compact header and the folded panels */
 	showMinimap: boolean;
@@ -179,6 +187,11 @@ interface UiState {
 	setMerchantPreset: (preset: MerchantAmount) => void;
 	merchantCustom: string;
 	setMerchantCustom: (text: string) => void;
+	/** The resource row the Merchant's Resources tab has selected (set by a click on a header resource; null: none) */
+	merchantSelect: string | null;
+	/** Opens the Merchant on `resource`: the window comes to the front on the Resources tab with that row selected (gold opens the Upgrades tab, where gold is spent) */
+	openMerchantOn: (resource: string) => void;
+	clearMerchantSelect: () => void;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
 }
@@ -258,6 +271,21 @@ export const useUiStore = create<UiState>((set, get) => ({
 	},
 	dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 	chestNotices: [],
+	achievementNotices: [],
+	pushAchievementNotice: (achievementId) => {
+		const id = ++achievementNoticeId;
+		const next = [...get().achievementNotices, { id, achievementId }];
+		const dropped = next.splice(0, Math.max(0, next.length - 3));
+		dropped.forEach((n) => {
+			const timer = noticeTimers.get(-1_000_000 - n.id);
+			if (timer) clearTimeout(timer);
+			noticeTimers.delete(-1_000_000 - n.id);
+		});
+		set({ achievementNotices: next });
+		// keys below -1,000,000 keep these timers apart from the chest and toast timers in the same map
+		schedule(-1_000_000 - id, ACHIEVEMENT_NOTICE_MS, () => get().dismissAchievementNotice(id));
+	},
+	dismissAchievementNotice: (id) => set((state) => ({ achievementNotices: state.achievementNotices.filter((n) => n.id !== id) })),
 	pushChestNotice: (loot) => {
 		const id = ++chestNoticeId;
 		const next = [...get().chestNotices, { id, loot }];
@@ -287,6 +315,14 @@ export const useUiStore = create<UiState>((set, get) => ({
 		writeStringPref('merchantPreset', String(preset));
 		set({ merchantPreset: preset });
 	},
+	merchantSelect: null,
+	openMerchantOn: (resource) => {
+		const tab: MerchantTab = resource === 'gold' ? 'upgrades' : 'resources';
+		writeStringPref('merchantTab', tab);
+		set({ merchantTab: tab, merchantSelect: tab === 'resources' ? resource : null });
+		useWindowStore.getState().openWindow('merchant');
+	},
+	clearMerchantSelect: () => set({ merchantSelect: null }),
 	merchantCustom: '',
 	setMerchantCustom: (text) => {
 		const clean = text.slice(0, MERCHANT_CUSTOM_MAX);

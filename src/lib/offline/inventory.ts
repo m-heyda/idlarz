@@ -19,6 +19,7 @@ import { instanceProblem, plainItem, sellValueOf } from '@/lib/itemInstance';
 import { HARD_LIMITS } from '@/config/limits';
 import { limitOf } from '@/lib/limits';
 import { isAutoSold } from '@/lib/loot/autoSell';
+import { junkFor, junkSale, withJunkMark } from '@/lib/loot/junk';
 import { receiveDrops, type Received } from '@/lib/loot/receive';
 import type { Inventory, InventoryOp } from '@/lib/offline/types';
 import type { PersistedGame } from '@/lib/sanitizeSave';
@@ -189,7 +190,12 @@ export type { InventoryOp };
 
 /** Operations that change what the player carries while a fight is open are refused (the fight swings with the gear it started with). */
 export const needsNoFight = (op: InventoryOp): boolean =>
-	op.action !== 'buyShop' && op.action !== 'buyOffer' && op.action !== 'autoSell' && op.action !== 'use';
+	op.action !== 'buyShop' &&
+	op.action !== 'buyOffer' &&
+	op.action !== 'autoSell' &&
+	op.action !== 'use' &&
+	op.action !== 'sellResource' &&
+	op.action !== 'buyResource';
 
 export interface OpResult {
 	ok: boolean;
@@ -222,6 +228,18 @@ const done = (inv: Inventory, gold = 0, count = 0): OpResult => ({ ok: true, inv
 const wholeQty = (qty: number | undefined, available: number): number | null => {
 	const amount = qty === undefined ? 1 : Math.floor(qty);
 	return Number.isFinite(amount) && amount >= 1 && amount <= available ? amount : null;
+};
+
+/**
+ * The "Sell junk" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
+ * every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.
+ *
+ * @category Loot/Junk
+ * @order 2
+ */
+export const sellJunkRule = (inv: Inventory, sellCtx: SellContext, junk: (item: ItemInstance) => boolean = junkFor(inv.equipment)): OpResult => {
+	const sold = junkSale(inv.bag, sellCtx, junk);
+	return sold.count === 0 ? refused(inv) : done(bump(inv, { bag: sold.bag }), sold.gold, sold.count);
 };
 
 /**
@@ -267,7 +285,14 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 			if (!unit || !amount) return refused(inv);
 			return done(bump(inv, { bag: removeFromBag(inv.bag, op.index, amount) }), sellPayout(unit, amount, sellCtx), amount);
 		}
+		case 'markJunk': {
+			const item = Number.isInteger(op.index) ? gearOf(inv.bag[op.index]) : null;
+			if (!item || typeof op.junk !== 'boolean') return refused(inv);
+			const marked = withJunkMark(item, op.junk);
+			return done(bump(inv, { bag: inv.bag.map((slot, i) => (i === op.index ? { item: marked } : slot)) }));
+		}
 		case 'sellJunk': {
+			if ('rule' in op) return op.rule === 'junk' ? sellJunkRule(inv, sellCtx) : refused(inv);
 			if (typeof op.maxRarity !== 'string' || !Object.prototype.hasOwnProperty.call(RARITIES, op.maxRarity)) return refused(inv);
 			let bag = inv.bag;
 			let gold = 0;
@@ -305,6 +330,10 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 		case 'use':
 			// drinking touches the hero's HP, mana and buffs too: it is applied by applyUse (consumables.ts), never here
 			return refused(inv);
+		case 'sellResource':
+		case 'buyResource':
+			// a resource trade needs the save and the ledger's grants, not the bag: it is made by `tradeResource` (trade.ts)
+			return refused(inv);
 		case 'buyOffer': {
 			if (!isRecord(op.item) || instanceProblem(op.item as ItemInstance)) return refused(inv);
 			const added = addDrop(inv.bag, { kind: 'gear', item: op.item as ItemInstance });
@@ -331,7 +360,10 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 			return int(raw.index) && (raw.qty === undefined || int(raw.qty))
 				? { action: raw.action, index: raw.index, ...(raw.qty === undefined ? {} : { qty: raw.qty as number }) }
 				: null;
+		case 'markJunk':
+			return int(raw.index) && typeof raw.junk === 'boolean' ? { action: 'markJunk', index: raw.index, junk: raw.junk } : null;
 		case 'sellJunk':
+			if (raw.rule === 'junk') return { action: 'sellJunk', rule: 'junk' };
 			return typeof raw.maxRarity === 'string' ? { action: 'sellJunk', maxRarity: raw.maxRarity } : null;
 		case 'autoSell':
 			return raw.rarity === null || typeof raw.rarity === 'string' ? { action: 'autoSell', rarity: raw.rarity as string | null } : null;
@@ -339,6 +371,14 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 			return typeof raw.id === 'string' && int(raw.qty) ? { action: 'buyShop', id: raw.id, qty: raw.qty } : null;
 		case 'use':
 			return int(raw.index) ? { action: 'use', index: raw.index } : null;
+		case 'sellResource':
+			return typeof raw.resource === 'string' && raw.resource.length <= 40 && typeof raw.qty === 'number' && Number.isFinite(raw.qty)
+				? { action: 'sellResource', resource: raw.resource, qty: raw.qty }
+				: null;
+		case 'buyResource':
+			return typeof raw.resource === 'string' && raw.resource.length <= 40 && int(raw.qty)
+				? { action: 'buyResource', resource: raw.resource, qty: raw.qty }
+				: null;
 		case 'buyOffer':
 			return isRecord(raw.item) ? { action: 'buyOffer', item: raw.item as unknown as ItemInstance } : null;
 		default:

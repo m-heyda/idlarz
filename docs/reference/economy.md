@@ -12,7 +12,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`REBIRTH_BIOME_OUTPUT`](#rebirth-biome-output), [`generateStartRing`](#generatestartring)
 - Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_WARD`](#castle-ward), [`isInWard`](#isinward), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
 - Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
-- Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`bestWornGrade`](#bestworngrade)
+- Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`sellResource`](#sellresource), [`bestWornGrade`](#bestworngrade), [`buyResource`](#buyresource)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
@@ -664,7 +664,7 @@ cost = ceil(units x sell price x 2)
 
 ### `MERCHANT_BUY_MULTIPLIER` <small>const</small>
 
-Source: [`src/config/merchant.ts:221`](../../src/config/merchant.ts)
+Source: [`src/config/merchant.ts:224`](../../src/config/merchant.ts)
 
 The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).
 
@@ -721,6 +721,15 @@ The gold the next paid refresh costs, when `refreshesBought` have been bought: i
 paid refresh price = min(1e9, 10,000 x 2^(paid refreshes so far))
 ```
 
+<a id="sellresource"></a>
+
+### `sellResource` <small>function</small>
+
+Source: [`src/lib/offline/trade.ts:69`](../../src/lib/offline/trade.ts)
+
+Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime
+`unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.
+
 <a id="bestworngrade"></a>
 
 ### `bestWornGrade` <small>function</small>
@@ -729,6 +738,15 @@ Source: [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts)
 
 The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). The shelf never sells above it:
 the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).
+
+<a id="buyresource"></a>
+
+### `buyResource` <small>function</small>
+
+Source: [`src/lib/offline/trade.ts:94`](../../src/lib/offline/trade.ts)
+
+Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the
+spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.
 
 ## Clicks
 
@@ -1233,7 +1251,7 @@ The daily first-login bonus: gems per day of the streak. A claim is once per **U
 
 ### `dailyInfo` <small>function</small>
 
-Source: [`src/lib/offline/gems.ts:19`](../../src/lib/offline/gems.ts)
+Source: [`src/lib/offline/gems.ts:20`](../../src/lib/offline/gems.ts)
 
 The daily first-login bonus as it stands: claimable when today (UTC) has not been claimed; the step it pays is the next one of the ladder when the last claim was yesterday, and day 1 otherwise (a missed day starts again, and so does day 8).
 
@@ -1241,7 +1259,7 @@ The daily first-login bonus as it stands: claimable when today (UTC) has not bee
 
 ### `applySpend` <small>function</small>
 
-Source: [`src/lib/offline/gems.ts:71`](../../src/lib/offline/gems.ts)
+Source: [`src/lib/offline/gems.ts:72`](../../src/lib/offline/gems.ts)
 
 One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed
 when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.

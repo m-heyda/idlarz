@@ -84,7 +84,7 @@ export const MerchantItemsSection: React.FC = () => {
 			</label>
 			<div className='inv-bag'>
 				{bag.map((slot, i) => (
-					<ItemSlot key={i} {...slotProps(slot)} compare onClick={(e) => sell(i, e.shiftKey)} />
+					<ItemSlot key={i} {...slotProps(slot)} compare hints='merchant' onClick={(e) => sell(i, e.shiftKey)} />
 				))}
 			</div>
 		</div>

@@ -76,6 +76,9 @@ import { EMBER_UPGRADES, type EmberUpgradeId } from '../src/config/rebirth';
 import { MERCHANT_UPGRADES, type MerchantUpgradeId } from '../src/config/merchant';
 import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/loadGame';
 
+// The bot plays the real store, whose merchant trades now ask the server too (IDL-319). There is no server here: a request that never answers keeps the preview as it is and, unlike a real connection, does not keep the process alive after the run.
+globalThis.fetch = (() => new Promise<Response>(() => undefined)) as typeof fetch;
+
 // zustand's persist middleware needs *a* storage; the sim replaces it with a no-op one below
 (globalThis as unknown as { localStorage: unknown }).localStorage = {
 	getItem: () => null,

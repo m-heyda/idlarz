@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 120,
+  "line": 121,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -50,11 +50,25 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 57,
+  "line": 96,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
    "achievementsDue"
+  ]
+ },
+ {
+  "id": "deeds",
+  "name": "Deeds",
+  "symbol": "DEEDS",
+  "kind": "const",
+  "category": "Progression/Deeds",
+  "file": "src/catalog/achievements.ts",
+  "line": 441,
+  "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
+  "see": [
+   "deedState",
+   "deedPoints"
   ]
  },
  {
@@ -262,6 +276,20 @@
   "line": 401,
   "summary": "Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).",
   "see": []
+ },
+ {
+  "id": "mastery-tiers",
+  "name": "Bestiary mastery",
+  "symbol": "MASTERY_TIERS",
+  "kind": "const",
+  "category": "Progression/Mastery",
+  "file": "src/catalog/mastery.ts",
+  "line": 27,
+  "summary": "The mastery ladder shared by every monster type: 10 kills reveal the stats, 100 the drop table (with a small bonus), 500 is Mastery I (the decided +10% XP and +5% loot chance, as text for now), 2,500 is Mastery II with a title or pet. The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.",
+  "see": [
+   "masteryState",
+   "claimMastery"
+  ]
  },
  {
   "id": "perk-caps",
@@ -914,7 +942,7 @@
   "kind": "const",
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
-  "line": 221,
+  "line": 224,
   "summary": "The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).",
   "see": []
  },
@@ -1310,7 +1338,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 80,
+  "line": 81,
   "summary": "True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).",
   "see": []
  },
@@ -1321,7 +1349,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 88,
+  "line": 89,
   "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
   "see": []
  },
@@ -1332,7 +1360,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 210,
+  "line": 211,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1789,13 +1817,49 @@
   ]
  },
  {
+  "id": "isjunk",
+  "name": "isJunk",
+  "symbol": "isJunk",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/loot/junk.ts",
+  "line": 30,
+  "summary": "Whether a piece of **gear** in the bag counts as junk for the \"Sell junk\" button: the player marked it (`item.junk`, the right-click menu), or its item level is `JUNK_LEVEL_MARGIN` below the average of what is worn. The level rule never touches set pieces, epic or legendary pieces or crafted gear (the mark overrides all of that: it is the player's own call). Worn gear is never in the bag.",
+  "see": [
+   "isJunkStack",
+   "junkSale"
+  ]
+ },
+ {
+  "id": "junksale",
+  "name": "junkSale",
+  "symbol": "junkSale",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/loot/junk.ts",
+  "line": 70,
+  "summary": "What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run, so their previews agree. `junk` is a parameter so a test can flip the gear rule.",
+  "see": []
+ },
+ {
+  "id": "rolljunkdrops",
+  "name": "rollJunkDrops",
+  "symbol": "rollJunkDrops",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/loot/junkDrops.ts",
+  "line": 60,
+  "summary": "The junk a kill drops, as consumable drops (a stack holds 1,000). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.",
+  "see": []
+ },
+ {
   "id": "killincome",
   "name": "killIncome",
   "symbol": "killIncome",
   "kind": "function",
   "category": "Monsters/Rewards",
   "file": "src/lib/loot/kill.ts",
-  "line": 51,
+  "line": 52,
   "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
   "see": []
  },
@@ -2019,8 +2083,19 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 106,
+  "line": 96,
   "summary": "The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time. Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.",
+  "see": []
+ },
+ {
+  "id": "claimallachievements",
+  "name": "claimAllAchievements",
+  "symbol": "claimAllAchievements",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/lib/offline/achievements.ts",
+  "line": 124,
+  "summary": "Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP` (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.",
   "see": []
  },
  {
@@ -2030,7 +2105,7 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 156,
+  "line": 177,
   "summary": "Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
   "see": [
    "achievementsDue",
@@ -2106,6 +2181,17 @@
   "see": []
  },
  {
+  "id": "recordcuriosity",
+  "name": "recordCuriosity",
+  "symbol": "recordCuriosity",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/offline/curiosity.ts",
+  "line": 14,
+  "summary": "Records a curiosity once. An id that is not on the list, or one already recorded, changes nothing (the same ledger comes back).",
+  "see": []
+ },
+ {
   "id": "runcombat",
   "name": "runCombat",
   "symbol": "runCombat",
@@ -2171,7 +2257,7 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 73,
+  "line": 74,
   "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.",
   "see": []
  },
@@ -2182,7 +2268,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 94,
+  "line": 95,
   "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
   "see": []
  },
@@ -2193,7 +2279,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 124,
+  "line": 126,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -2243,7 +2329,7 @@
   "kind": "function",
   "category": "Economy/Gems",
   "file": "src/lib/offline/gems.ts",
-  "line": 19,
+  "line": 20,
   "summary": "The daily first-login bonus as it stands: claimable when today (UTC) has not been claimed; the step it pays is the next one of the ladder when the last claim was yesterday, and day 1 otherwise (a missed day starts again, and so does day 8).",
   "see": []
  },
@@ -2254,7 +2340,7 @@
   "kind": "function",
   "category": "Economy/Gems",
   "file": "src/lib/offline/gems.ts",
-  "line": 71,
+  "line": 72,
   "summary": "One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.",
   "see": []
  },
@@ -2287,8 +2373,19 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/offline/inventory.ts",
-  "line": 63,
+  "line": 64,
   "summary": "The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up, so taking a belt off, or a rebirth, never shrinks the bag below the items in it.",
+  "see": []
+ },
+ {
+  "id": "selljunkrule",
+  "name": "sellJunkRule",
+  "symbol": "sellJunkRule",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/offline/inventory.ts",
+  "line": 240,
+  "summary": "The \"Sell junk\" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.",
   "see": []
  },
  {
@@ -2329,6 +2426,28 @@
    "ledgerFromRow",
    "upgradeBody"
   ]
+ },
+ {
+  "id": "claimmastery",
+  "name": "claimMastery",
+  "symbol": "claimMastery",
+  "kind": "function",
+  "category": "Progression/Mastery",
+  "file": "src/lib/offline/mastery.ts",
+  "line": 37,
+  "summary": "Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached. Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one that skips a tier; a repeated or forged claim therefore pays nothing.",
+  "see": []
+ },
+ {
+  "id": "claimallmastery",
+  "name": "claimAllMastery",
+  "symbol": "claimAllMastery",
+  "kind": "function",
+  "category": "Progression/Mastery",
+  "file": "src/lib/offline/mastery.ts",
+  "line": 54,
+  "summary": "Claim all: every tier every monster type has reached and not claimed, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.",
+  "see": []
  },
  {
   "id": "applypets",
@@ -2462,6 +2581,28 @@
   "see": []
  },
  {
+  "id": "sellresource",
+  "name": "sellResource",
+  "symbol": "sellResource",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/offline/trade.ts",
+  "line": 69,
+  "summary": "Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime `unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.",
+  "see": []
+ },
+ {
+  "id": "buyresource",
+  "name": "buyResource",
+  "symbol": "buyResource",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/offline/trade.ts",
+  "line": 94,
+  "summary": "Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.",
+  "see": []
+ },
+ {
   "id": "applytutorial",
   "name": "applyTutorial",
   "symbol": "applyTutorial",
@@ -2579,7 +2720,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 216,
+  "line": 218,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -2690,13 +2831,24 @@
   "see": []
  },
  {
+  "id": "worldfacts",
+  "name": "worldFacts",
+  "symbol": "worldFacts",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/worldFacts.ts",
+  "line": 34,
+  "summary": "The facts of a map and a farm. The largest group per biome is a flood fill over the owned tiles (each tile is visited once), so a map of tens of thousands of tiles costs one pass.",
+  "see": []
+ },
+ {
   "id": "gamestate",
   "name": "GameState",
   "symbol": "GameState",
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 362,
+  "line": 368,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"
@@ -3216,7 +3368,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 983,
+  "line": 986,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

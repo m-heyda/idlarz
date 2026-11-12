@@ -110,7 +110,7 @@ test('IDL-267: the login claim carries the bestiary like every online answer, no
 	assert.equal(out.kind, 'ok');
 	const result = (out as { kind: 'ok'; result: ClaimResult }).result;
 	assert.ok(result.tickets.monsters.length > 0, 'monsters were placed by the claim itself');
-	assert.deepEqual(result.bestiary, { seen: [], kills: {} }, 'and the browser is told that none of them has been met');
+	assert.deepEqual(result.bestiary, { seen: [], kills: {}, claimed: {}, deaths: {}, bestMs: {} }, 'and the browser is told that none of them has been met');
 });
 
 test('IDL-267: a replayed claim (a lost answer) still says what is known', async () => {
@@ -149,14 +149,14 @@ test('step 1: on a fresh account every reply carries an empty bestiary and the p
 	const m = await freshPlayer();
 	assert.deepEqual([stats(m).seen, stats(m).kills], [{}, {}], 'nothing met, nothing killed');
 	const { at, view, monster } = await untilMonster(m);
-	assert.deepEqual(view.bestiary, { seen: [], kills: {} });
+	assert.deepEqual(view.bestiary, { seen: [], kills: {}, claimed: {}, deaths: {}, bestMs: {} });
 	for (const field of Object.keys(monster))
 		assert.ok(['n', 'at', 'lucky', 'x', 'y', 'spawnLevel', 'type', 'growCap'].includes(field), `unexpected ticket field ${field}`);
 	const text = JSON.stringify(view.tickets);
 	for (const word of ['label', 'name', 'hp', 'maxHp', 'monsterHp'])
 		assert.doesNotMatch(text, new RegExp(`"${word}"`), `${word} must not be in a public ticket`);
 	const sync = ok(await fightStep(m.deps, 'u1', null, { action: 'sync' }, at + MIN));
-	assert.deepEqual(sync.bestiary, { seen: [], kills: {} }, '/api/fight answers carry it too');
+	assert.deepEqual(sync.bestiary, { seen: [], kills: {}, claimed: {}, deaths: {}, bestMs: {} }, '/api/fight answers carry it too');
 });
 
 test('step 2: a click on a monster discovers exactly its type, once, with the first-fight time; everything else stays unmet', async () => {
@@ -186,7 +186,7 @@ test('step 2/5: dismissing or merely seeing a monster does not discover it', asy
 	const { at, monster } = await untilMonster(m);
 	const out = ok(await fightStep(m.deps, 'u1', key(), { action: 'dismiss', n: monster.n }, at + 1000));
 	assert.equal(out.accepted, true);
-	assert.deepEqual(out.bestiary, { seen: [], kills: {} });
+	assert.deepEqual(out.bestiary, { seen: [], kills: {}, claimed: {}, deaths: {}, bestMs: {} });
 	assert.deepEqual(stats(m).seen, {});
 });
 

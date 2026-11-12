@@ -49,6 +49,8 @@ export interface FightRecord {
 	monsterTimer: number;
 	/** Seconds the monster stays stunned: its timer does not run */
 	stunLeft: number;
+	/** Damage the hero has taken in this fight (absent: none yet); a win with none counts towards Untouched (`LifetimeStats.flawless`) */
+	hurt?: number;
 	/** Seconds the fight has lasted, and what is left of a boss's clock (null: no clock) */
 	elapsed: number;
 	timeLeftSec: number | null;

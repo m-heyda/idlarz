@@ -55,6 +55,7 @@ import LoadingScreen from '@/components/game/overlays/LoadingScreen';
 import { TICK_RATE } from '@/config/economy';
 import GameHeader from '@/components/game/GameHeader';
 import ChestNotification from '@/components/game/overlays/ChestNotification';
+import AchievementNotification from '@/components/game/overlays/AchievementNotification';
 import FloatingText from '@/components/game/FloatingText';
 import ClassPickerDialog from '@/components/game/ClassPickerDialog';
 import AvatarDialog from '@/components/game/AvatarDialog';
@@ -148,6 +149,8 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 	// Chest rewards queue in the ui store (one notice per chest, each with its own timer)
 	const chestNotices = useUiStore((state) => state.chestNotices);
 	const dismissChestNotice = useUiStore((state) => state.dismissChestNotice);
+	const achievementNotices = useUiStore((state) => state.achievementNotices);
+	const dismissAchievementNotice = useUiStore((state) => state.dismissAchievementNotice);
 	// Monotonic clock: changing the system clock must not change game speed
 	const lastTickTime = useRef(performance.now());
 
@@ -216,6 +219,9 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<div className='notice-stack'>
 				{chestNotices.map((notice) => (
 					<ChestNotification key={notice.id} loot={notice.loot} onClose={() => dismissChestNotice(notice.id)} />
+				))}
+				{achievementNotices.map((notice) => (
+					<AchievementNotification key={notice.id} achievementId={notice.achievementId} onClose={() => dismissAchievementNotice(notice.id)} />
 				))}
 				<Toast />
 			</div>

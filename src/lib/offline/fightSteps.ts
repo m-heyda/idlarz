@@ -9,6 +9,7 @@ import type { CombatCommand, PlayerProfile, QueueResult } from '@/lib/offline/fi
 import { engageTicket, queueTicket, restFor, unqueueTicket } from '@/lib/offline/fightTargets';
 import { takeOne } from '@/lib/offline/inventory';
 import { payKill } from '@/lib/offline/reward';
+import { recordDeath } from '@/lib/offline/stats';
 
 // SERVER ONLY. What happens inside a fight, one tick at a time: the swings of both sides, the skills, the potions, the end of a fight, the
 // resting between fights and the player's commands. Each takes the request's `FightCtx` and changes its combat record (and its ledger: a kill
@@ -97,6 +98,7 @@ export const endFight = (ctx: FightCtx, t: number, kind: 'defeated' | 'timeout' 
 	pushEvent(ctx, t, kind, { n: f.n, type: f.type, level: f.level });
 	if (kind !== 'retreat') {
 		if (kind === 'defeated') {
+			ctx.ledger = { ...ctx.ledger, stats: recordDeath(ctx.ledger.stats, f.type) };
 			c.hp = Math.round(f.profile.maxHp * COMBAT.knockoutHpFraction);
 			c.defeatStreak = (c.defeatStreak ?? 0) + 1;
 			if (c.defeatStreak >= COMBAT.auto.pauseAfterDefeats) {
@@ -150,7 +152,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		pushEvent(ctx, t, kind, { amount: damage });
 	}
 	if (f.monsterHp <= 0) {
-		const paid = payKill(env.secret, env.userId, ctx.ledger, env.stored, f.n, t);
+		const paid = payKill(env.secret, env.userId, ctx.ledger, env.stored, f.n, t, { elapsedSec: f.elapsed, flawless: !(f.hurt && f.hurt > 0) });
 		if (!paid) return endFight(ctx, t, 'retreat');
 		ctx.ledger = paid.ledger;
 		pushEvent(ctx, t, 'won', {
@@ -187,6 +189,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		const crit = monster.critChance > 0 && rng() >= 1 - monster.critChance / 100;
 		const amount = mitigate(crit ? Math.round(monster.attack * monster.critMult) : monster.attack, p.armor);
 		c.hp = Math.max(0, c.hp - amount);
+		f.hurt = (f.hurt ?? 0) + amount;
 		pushEvent(ctx, t, 'hurt', { amount, crit });
 	}
 	if (c.hp <= 0) endFight(ctx, t, 'defeated');

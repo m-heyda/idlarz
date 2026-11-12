@@ -15,16 +15,18 @@ const ctx = { goldPerSec: 100, xpPerSec: 2, luck: 0 };
 const T1 = { type: 'thistleBoar', level: 1 } as const;
 
 const baseOf = (d: Drop) => (d.kind === 'gear' ? d.item.base : d.id);
+const noJunk = (items: Drop[]) => items.filter((d) => d.kind === 'gear' || !ITEM_CATALOG[d.id].junk);
 const gearOnly = (items: Drop[]) => items.filter((d) => d.kind === 'gear');
 const isLegendaryWeapon = (d: Drop) => ITEM_CATALOG[baseOf(d)].pools?.includes('legendary_weapons') ?? false;
 
 test('rng 0 drops a piece of plain gear and a potion from a rat, rng 0.999 drops nothing', () => {
 	const lucky = rollKillLoot(T1, ctx, () => 0);
+	lucky.items = noJunk(lucky.items); // junk materials always drop and are tested in junk.test.ts
 	assert.equal(lucky.items.length, 2);
 	assert.equal(lucky.items[0].kind, 'gear');
 	assert.ok((BASIC_GEAR as readonly string[]).includes(baseOf(lucky.items[0])));
 	assert.deepEqual(lucky.items[1], { kind: 'consumable', id: 'potion_minor', qty: 1 });
-	assert.deepEqual(rollKillLoot(T1, ctx, () => 0.999).items, []);
+	assert.deepEqual(noJunk(rollKillLoot(T1, ctx, () => 0.999).items), []);
 });
 
 test('rats never drop the legendary weapons, whatever the rng', () => {

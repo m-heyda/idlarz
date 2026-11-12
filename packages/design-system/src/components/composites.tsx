@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button, Frame } from './primitives';
+import { compact, parseAmountText } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -268,6 +269,102 @@ export const Slider: React.FC<{
 		<span className='ds-slider-out'>{readout ?? `${value} / ${max}`}</span>
 	</div>
 );
+
+export interface AmountPreset {
+	id: string | number;
+	label: string;
+}
+
+/**
+ * The amount of a trade or craft: preset buttons (1K, 1M, 1B, Max), a typed field ("250", "1.5k", "2m") and a slider. **A typed amount wins over a preset** (no preset is shown active while text is typed), and text the
+ * parser does not understand marks the field invalid. Props only: the caller holds `text`, the active preset and the resolved `value`, and persists them (the game keeps them across visits).
+ *
+ * - `value`: the amount the trade will move now (already resolved from the typed text or the preset and held to `max`); it drives the slider and the readout.
+ * - `max`: the most that can be moved (the stock, or what the gold can buy).
+ * - `parse` / `format`: how text becomes a number and back for the readout (defaults: `parseAmountText` and `compact`).
+ */
+export const AmountInput: React.FC<{
+	value: number;
+	max: number;
+	text: string;
+	onTextChange: (text: string) => void;
+	presets?: AmountPreset[];
+	activePreset?: string | number | null;
+	onPreset?: (id: string | number) => void;
+	/** Moving the slider sets an exact amount (the caller usually writes it into the typed field) */
+	onSlider?: (amount: number) => void;
+	parse?: (text: string) => number | null;
+	format?: (n: number) => string;
+	placeholder?: string;
+	hint?: string;
+	maxLength?: number;
+	disabled?: boolean;
+	label?: string;
+}> = ({
+	value,
+	max,
+	text,
+	onTextChange,
+	presets = [],
+	activePreset = null,
+	onPreset,
+	onSlider,
+	parse = parseAmountText,
+	format = compact,
+	placeholder = 'Custom',
+	hint = 'Type your own amount: 250, 1.5k, 2m, 3b',
+	maxLength = 12,
+	disabled,
+	label = 'Amount',
+}) => {
+	const typed = text.trim() === '' ? null : parse(text);
+	const invalid = text.trim() !== '' && typed === null;
+	return (
+		<div className='ds-amount' data-invalid={invalid}>
+			<div className='ds-amount-row' role='group' aria-label={label}>
+				<span className='ds-amount-label'>{label}</span>
+				{presets.map((p) => (
+					<button
+						key={String(p.id)}
+						type='button'
+						className='ds-btn ds-btn-sm ds-amount-chip'
+						data-active={typed === null && activePreset === p.id}
+						aria-pressed={typed === null && activePreset === p.id}
+						disabled={disabled}
+						onClick={() => onPreset?.(p.id)}
+					>
+						{p.label}
+					</button>
+				))}
+				<input
+					className='ds-amount-field'
+					type='text'
+					autoComplete='off'
+					spellCheck={false}
+					placeholder={placeholder}
+					title={hint}
+					aria-label={hint}
+					aria-invalid={invalid}
+					data-active={typed !== null}
+					value={text}
+					maxLength={maxLength}
+					disabled={disabled}
+					onChange={(e) => onTextChange(e.target.value)}
+				/>
+			</div>
+			{onSlider ? (
+				<Slider
+					value={Math.min(value, max)}
+					max={Math.max(1, max)}
+					onChange={onSlider}
+					disabled={disabled || max < 1}
+					readout={`${format(value)} / ${format(max)}`}
+				/>
+			) : null}
+			{invalid ? <div className='ds-amount-error'>{hint}</div> : null}
+		</div>
+	);
+};
 
 /** A header row that opens and closes its content (recipe groups, settings sections): chevron, title, count. Presentational; the caller owns `open`. */
 export const CollapsibleGroup: React.FC<{ title: string; count?: number; open: boolean; onToggle: () => void; children: React.ReactNode }> = ({

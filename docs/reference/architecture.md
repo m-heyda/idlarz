@@ -18,7 +18,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 
 ### The tick loop and persistence
 
-Source: [`src/app/GameApp.tsx:120`](../../src/app/GameApp.tsx)
+Source: [`src/app/GameApp.tsx:121`](../../src/app/GameApp.tsx)
 
 The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done.
 Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps
@@ -64,7 +64,7 @@ Tiles an old save knew by row and column keep their logical coordinates: the cas
 
 ### `GameState` <small>interface</small>
 
-Source: [`src/types/game.ts:362`](../../src/types/game.ts)
+Source: [`src/types/game.ts:368`](../../src/types/game.ts)
 
 State. The persisted keys are `PERSISTED_KEYS` ([`PERSISTED_KEYS`](saves-and-server.md#persisted-keys)), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.
 

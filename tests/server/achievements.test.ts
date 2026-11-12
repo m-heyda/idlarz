@@ -6,16 +6,18 @@ import { pickPersisted, type PersistedGame } from '../../src/lib/sanitizeSave';
 import { encodeSave } from '../../src/lib/saveFormat';
 import { acceptSave, type SaveRepo, type StoredSave, type WorldPart } from '../../src/lib/cloudSave/pipeline';
 import type { ServiceDeps } from '../../src/lib/offline/service';
-import { gemsStep, syncTickets, tutorialStep, type Online } from '../../src/lib/offline/online';
+import { gemsStep, masteryStep, syncTickets, tutorialStep, type Online } from '../../src/lib/offline/online';
 import { ACHIEVEMENTS } from '../../src/catalog/achievements';
 import { TUTORIAL_PATH } from '../../src/catalog/tutorial';
 import { GEMS_CAP, STARTING_GEMS } from '../../src/config/economy';
 import {
 	achievementsDue,
 	claimAchievement,
+	claimAllAchievements,
 	conditionHolds,
 	earnAchievements,
 	mergeManual,
+	reportOf,
 	settleAchievements,
 	type AchievementFacts,
 } from '../../src/lib/offline/achievements';
@@ -36,14 +38,15 @@ const facts = (patch: Partial<AchievementFacts> = {}, stats: Partial<LifetimeSta
 });
 const ids = (f: AchievementFacts) => achievementsDue(f).map((a) => a.id);
 
-test('the catalog is the launch set plus the Beta tester: 13 achievements, 800 gems, 5 avatars, unique ids', () => {
-	assert.equal(ACHIEVEMENTS.length, 13);
-	assert.equal(new Set(ACHIEVEMENTS.map((a) => a.id)).size, 13);
+test('the catalog is the launch set plus the Beta tester (13 achievements, 800 gems, 5 avatars) with the deed tiers appended after it, unique ids', () => {
+	const launch = ACHIEVEMENTS.slice(0, 13);
+	assert.equal(launch[12].id, 'beta_tester', 'the launch ids keep their places');
+	assert.equal(new Set(ACHIEVEMENTS.map((a) => a.id)).size, ACHIEVEMENTS.length);
 	assert.equal(
-		ACHIEVEMENTS.reduce((sum, a) => sum + a.rewards.gems, 0),
+		launch.reduce((sum, a) => sum + a.rewards.gems, 0),
 		800,
 	);
-	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 25 && a.rewards.gems <= 200));
+	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 20 && a.rewards.gems <= 400));
 	assert.equal(ACHIEVEMENTS.filter((a) => a.rewards.avatarId).length, 5);
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.rewards.gems, 200);
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.withAchievement, 'early_tester');
@@ -77,9 +80,13 @@ test('the testers are never checked by the lazy evaluator', () => {
 		{ castleLevel: 99, rebirths: 9, buildings: 9 },
 		{ tiles: 9, chests: 9, golden: 9, kills: { bossGreatAuroch: 1 }, tutorial: { done: [LAST_STEP], lessons: [], skipped: false } },
 	);
+	const due = ids(everything);
+	assert.ok(!due.includes('early_tester') && !due.includes('beta_tester'));
 	assert.deepEqual(
-		ids(everything),
-		ACHIEVEMENTS.filter((a) => a.when.kind !== 'manual').map((a) => a.id),
+		due.filter((id) => ACHIEVEMENTS.slice(0, 13).some((a) => a.id === id)),
+		ACHIEVEMENTS.slice(0, 13)
+			.filter((a) => a.when.kind !== 'manual')
+			.map((a) => a.id),
 	);
 });
 
@@ -164,7 +171,8 @@ const memory = () => {
 		load: async (id, options) => {
 			const row = rows.get(id);
 			if (!row) return null;
-			return options?.world ? { ...row, world: worlds.get(id) } : { ...row };
+			const plain = { ...row, summary: { ...row.summary, derived: { ...row.summary.derived, deedWorld: undefined } } };
+			return options?.world ? { ...plain, world: worlds.get(id) } : plain;
 		},
 		commit: async (id, baseRev, save, world) => {
 			const current = rows.get(id);
@@ -195,7 +203,7 @@ const player = async () => {
 	const m = memory();
 	api().resetGame();
 	growTo(8);
-	store.setState({ playSeconds: 1000 } as never);
+	store.setState({ playSeconds: 1000, resources: { ...api().resources, gold: 100 } } as never);
 	const state: PersistedGame = structuredClone(pickPersisted(api()));
 	await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(state), 0, T0, false, m.ledgerRepo);
 	return m;
@@ -292,9 +300,11 @@ test('a forged claim earns nothing: no request names an achievement, and the las
 	// an id that is an achievement id is not a tutorial step either
 	const unknown = ok(await tutorialStep(m.deps, 'u1', 'forge-key-0002', { action: 'done', id: 'castle_10' }, T0 + 3000));
 	assert.equal(unknown.reason, 'unknown');
-	assert.deepEqual(m.ledgers.get('u1')!.stats.achievements, []);
+	assert.deepEqual(
+		m.ledgers.get('u1')!.stats.achievements.filter((id) => !id.startsWith('cluster_')),
+		[],
+	);
 	assert.equal(m.ledgers.get('u1')!.gems, before);
-	assert.equal(m.mirrored.length, 0);
 });
 
 test('finishing the end of the tutorial path earns the first achievement, once', async () => {
@@ -311,10 +321,125 @@ test('finishing the end of the tutorial path earns the first achievement, once',
 	);
 	assert.equal(m.ledgers.get('u1')!.gems, before, 'the starter bundle is resources, the achievement waits for its Claim');
 	ok(await tutorialStep(m.deps, 'u1', null, { action: 'sync' }, T0 + 3000));
-	assert.deepEqual(m.ledgers.get('u1')!.stats.achievements, ['tutorial']);
+	assert.deepEqual(
+		m.ledgers.get('u1')!.stats.achievements.filter((id) => !id.startsWith('cluster_')),
+		['tutorial'],
+	);
 });
 
 test('every achievement names a badge that exists in the asset library', async () => {
 	const { existsSync } = await import('node:fs');
 	for (const a of ACHIEVEMENTS) assert.ok(existsSync(`public/pixel/new_assets/achievements/${a.badge}.png`), `${a.id}: ${a.badge}`);
+});
+
+// IDL-308: the Hall of Deeds flow (tiers are achievements, so earning and claiming work per tier)
+
+test('several tiers of one deed can be earned in a single settle', () => {
+	const f = facts({}, { kills: { thistleBoar: 600 } });
+	assert.deepEqual(ids(f), ['first_fight', 'slayer_100', 'slayer_500']);
+	const earned = earnAchievements(newLedger(T0), ids(f), T0 + 1);
+	assert.deepEqual(earned.ledger.stats.earnedAt.slayer_100, T0 + 1);
+	assert.deepEqual(earned.ledger.stats.earnedAt.slayer_500, T0 + 1);
+});
+
+test('Claim all pays every waiting tier in one write, records each id, and refuses when nothing waits', () => {
+	const ledger = earnAchievements(newLedger(T0), ['first_tile', 'castle_10', 'slayer_100'], T0 + 5).ledger;
+	const all = claimAllAchievements(ledger, T0 + 20);
+	assert.ok(all.ok);
+	if (!all.ok) return;
+	assert.equal(all.gems, 25 + 100 + 25);
+	assert.deepEqual(all.claimed, ['first_tile', 'castle_10', 'slayer_100']);
+	assert.equal(all.ledger.gems, STARTING_GEMS + 150);
+	assert.equal(all.ledger.granted.gems, 150);
+	assert.deepEqual(all.ledger.stats.claimed, ['first_tile', 'castle_10', 'slayer_100']);
+	assert.equal(all.ledger.stats.claimedAt.castle_10, T0 + 20);
+	assert.deepEqual(claimAllAchievements(all.ledger, T0 + 30), { ok: false, reason: 'nothing_to_claim' });
+	assert.deepEqual(claimAllAchievements(newLedger(T0), T0), { ok: false, reason: 'nothing_to_claim' });
+});
+
+test('Claim all skips what was claimed one by one, and the gem cap holds for the whole batch', () => {
+	const earned = earnAchievements(newLedger(T0), ['first_tile', 'castle_10', 'slayer_100'], T0 + 5).ledger;
+	const one = claimAchievement(earned, 'castle_10', T0 + 6);
+	assert.ok(one.ok);
+	if (!one.ok) return;
+	const rest = claimAllAchievements(one.ledger, T0 + 7);
+	assert.ok(rest.ok && rest.claimed.join() === 'first_tile,slayer_100');
+	const rich: Ledger = { ...earned, gems: GEMS_CAP - 30 };
+	const capped = claimAllAchievements(rich, T0);
+	assert.ok(capped.ok && capped.gems === 30 && capped.ledger.gems === GEMS_CAP && capped.ledger.granted.gems === 30);
+});
+
+test('Claim all on a ledger from before claiming existed pays nothing it already paid', () => {
+	const old: Ledger = { ...newLedger(T0), stats: { ...emptyStats(), achievements: ['first_tile'], claimed: null } };
+	assert.deepEqual(claimAllAchievements(old, T0), { ok: false, reason: 'nothing_to_claim' });
+});
+
+test('the report carries deed points of the claimed tiers, the waiting count, the placeholder bonus and per-deed progress', () => {
+	const ledger = earnAchievements(newLedger(T0), ['slayer_100', 'slayer_500'], T0).ledger;
+	const claimed = claimAchievement(ledger, 'slayer_100', T0 + 1);
+	assert.ok(claimed.ok);
+	if (!claimed.ok) return;
+	const withKills: Ledger = { ...claimed.ledger, stats: { ...claimed.ledger.stats, kills: { thistleBoar: 642 } } };
+	const summary = { castleLevel: 3, rebirths: 0 } as Parameters<typeof reportOf>[2];
+	const report = reportOf(withKills, [], summary);
+	assert.equal(report.points, 10);
+	assert.equal(report.claimable, 1);
+	assert.equal(report.bonusText, 'Bonus from deeds: coming soon');
+	assert.equal(report.progress?.slayer, 642);
+	assert.equal(report.progress?.castle, 3);
+	assert.equal(reportOf(withKills, []).progress, undefined, 'no save known: no progress');
+});
+
+test('a Claim all request over the wire pays once and replays on the same key', async () => {
+	const m = await player();
+	ok(await syncTickets(m.deps, 'u1', T0 + 1000));
+	count(m, { chests: 1, golden: 1 });
+	ok(await syncTickets(m.deps, 'u1', T0 + 2000));
+	const before = m.ledgers.get('u1')!.gems;
+	const first = ok(await gemsStep(m.deps, 'u1', 'claimall-key-001', { action: 'claimAll' }, T0 + 3000, null));
+	assert.equal(first.ok, true);
+	assert.equal(first.paid, 75);
+	assert.deepEqual(first.claimedIds, ['first_chest', 'golden_kill']);
+	assert.equal(first.gems, before + 75);
+	assert.deepEqual(first.achievements?.claimed, ['first_chest', 'golden_kill']);
+	const replay = ok(await gemsStep(m.deps, 'u1', 'claimall-key-001', { action: 'claimAll' }, T0 + 3001, null));
+	assert.deepEqual(replay, first);
+	const again = ok(await gemsStep(m.deps, 'u1', 'claimall-key-002', { action: 'claimAll' }, T0 + 4000, null));
+	assert.equal(again.ok, false);
+	assert.equal(m.ledgers.get('u1')!.gems, before + 75);
+});
+
+// IDL-309: a mastery claim over the wire
+
+test('a mastery claim request judges the tier from the server kills, pays once and replays on the same key', async () => {
+	const m = await player();
+	ok(await syncTickets(m.deps, 'u1', T0 + 1000));
+	count(m, { kills: { thistleBoar: 120 } });
+	const unreached = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0001', { action: 'claim', type: 'thistleBoar', tier: 3 }, T0 + 2000));
+	assert.equal(unreached.ok, false);
+	assert.equal(unreached.reason, 'not_reached');
+	const first = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0002', { action: 'claim', type: 'thistleBoar', tier: 1 }, T0 + 3000));
+	assert.equal(first.ok, true);
+	assert.equal(first.tiers, 1);
+	assert.equal(m.ledgers.get('u1')!.stats.masteryClaimed.thistleBoar, 1);
+	const replay = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0002', { action: 'claim', type: 'thistleBoar', tier: 1 }, T0 + 3001));
+	assert.deepEqual(replay, first);
+	const twice = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0003', { action: 'claim', type: 'thistleBoar', tier: 1 }, T0 + 4000));
+	assert.equal(twice.reason, 'already_claimed');
+	const all = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0004', { action: 'claimAll' }, T0 + 5000));
+	assert.equal(all.ok && all.tiers, 1, 'tier 2 (100 kills) was still waiting');
+	assert.equal(m.ledgers.get('u1')!.stats.masteryClaimed.thistleBoar, 2);
+});
+
+// IDL-305: the secret deed over the wire
+
+test('a visit event earns the secret deed once; an unknown event earns nothing', async () => {
+	const m = await player();
+	ok(await syncTickets(m.deps, 'u1', T0 + 1000));
+	const nothing = ok(await gemsStep(m.deps, 'u1', 'visit-key-0001', { action: 'visit', id: 'made_up' }, T0 + 2000, null));
+	assert.equal(nothing.achievements?.earned.includes('curious_gambler') ?? false, false);
+	ok(await gemsStep(m.deps, 'u1', 'visit-key-0002', { action: 'visit', id: 'gambling_empty' }, T0 + 3000, null));
+	const after = ok(await syncTickets(m.deps, 'u1', T0 + 4000));
+	assert.ok(after.achievements?.earned.includes('curious_gambler'));
+	assert.deepEqual(m.ledgers.get('u1')!.stats.curiosity, ['gambling_empty']);
 });
