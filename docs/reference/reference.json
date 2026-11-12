@@ -34,6 +34,17 @@
   ]
  },
  {
+  "id": "get",
+  "name": "GET /api/rankings",
+  "symbol": "GET",
+  "kind": "function",
+  "category": "Saves & Server/Endpoints",
+  "file": "src/app/api/rankings/route.ts",
+  "line": 18,
+  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
+  "see": []
+ },
+ {
   "id": "map-lab",
   "name": "Map lab",
   "kind": "topic",
@@ -2744,6 +2755,28 @@
   "file": "src/lib/pushLock.ts",
   "line": 19,
   "summary": "One upload at a time per browser. Everything that reads the link, uploads and writes the new link back runs inside this lock, so a second tab (a tab that took the game over from the first, or a browser without the game-owner lock) waits for the upload in flight and then reads the revision it left, instead of sending the one it read before. Without Web Locks the work simply runs (graceful fallback), and a conflict that still happens is resolved by `resolveConflict`. The lock dies with the page, so a closing tab never holds it up.",
+  "see": []
+ },
+ {
+  "id": "ranking-boards",
+  "name": "The boards",
+  "symbol": "RANKING_BOARDS",
+  "kind": "const",
+  "category": "Progression/Rankings",
+  "file": "src/lib/rankings.ts",
+  "line": 35,
+  "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).",
+  "see": []
+ },
+ {
+  "id": "movement",
+  "name": "Movement arrows",
+  "symbol": "movement",
+  "kind": "function",
+  "category": "Progression/Rankings",
+  "file": "src/lib/rankings.ts",
+  "line": 81,
+  "summary": "The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.",
   "see": []
  },
  {

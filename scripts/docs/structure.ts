@@ -37,7 +37,7 @@ export const CATEGORIES: CategoryDef[] = [
 		name: 'Progression',
 		slug: 'progression',
 		blurb: 'Levels, attributes, skills, rebirth, Embers, limits and gems.',
-		sections: ['Levels', 'Attributes', 'Rebirth', 'Ember shop', 'Limits', 'Gems', 'Crafting'],
+		sections: ['Levels', 'Attributes', 'Rebirth', 'Ember shop', 'Limits', 'Gems', 'Crafting', 'Rankings'],
 	},
 	{
 		name: 'Saves & Server',

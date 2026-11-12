@@ -2,12 +2,14 @@ import { QueryClient } from '@tanstack/react-query';
 
 /**
  * The browser's one cache for server reads that several windows share (TanStack Query). A key is fetched once and then served from the cache until it is marked stale; a window that opens again shows the cached answer at once instead of loading again.
- * Only reads that are cheap to keep and rarely change are here (today the avatar unlock list); the game's own state (saves, ledger, gems) stays in its stores and is never cached by this.
+ * Only reads that are cheap to keep and rarely change are here (the avatar unlock list, the rankings); the game's own state (saves, ledger, gems) stays in its stores and is never cached by this.
  * Mutations are not wired here: a change that makes a cached read wrong calls {@link invalidate}, and the next window that needs it fetches it again.
  */
 export const QUERY_KEYS = {
 	/** `GET /api/auth/avatar`: the hero's class and the avatars the account may pick */
 	avatars: ['avatars'] as const,
+	/** `GET /api/rankings?board=…`: one board of the Rankings (changes at most once a day on the server) */
+	rankings: (board: string) => ['rankings', board] as const,
 } as const;
 
 /** How long a cached answer counts as fresh. The things that can change it (an achievement earned, a class change) call {@link invalidate}, so this is only the safety net. */

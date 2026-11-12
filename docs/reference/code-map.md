@@ -99,6 +99,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/pets/route.ts) — ~ The cosmetic pets:
 
+**src/app/api/rankings/**
+
+- [`route.ts`](../../src/app/api/rankings/route.ts) — ~ The Rankings:
+
 **src/app/api/rebirth/**
 
 - [`route.ts`](../../src/app/api/rebirth/route.ts) — ~ The server runs the player's rebirth:
@@ -256,7 +260,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`PixelIcon.tsx`](../../src/components/game/PixelIcon.tsx) — ~ A one-row sprite sheet from the icon set (its size is the whole sheet)
 - [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
-- [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The Rankings:
+- [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The number of a row:
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
@@ -569,6 +573,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`potionBelt.ts`](../../src/lib/potionBelt.ts) — ~ The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`queryClient.ts`](../../src/lib/queryClient.ts) — ~ The browser's one cache for server reads that several windows share (TanStack Query).
+- [`rankings.ts`](../../src/lib/rankings.ts) — ~ What the number on a row means (the window's column heading)
+- [`rankingsQuery.ts`](../../src/lib/rankingsQuery.ts) — ~ One board of the Rankings (`GET /api/rankings?board=…`); null on any failure or a body of the wrong shape, so the window shows its error state rather than a half-drawn list.
+- [`rankingsServer.ts`](../../src/lib/rankingsServer.ts) — ~ What a board orders by:
 - [`rateLimit.ts`](../../src/lib/rateLimit.ts) — A small in-memory sliding-window limiter for routes that must not be hammered (password reset requests).
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
@@ -916,6 +923,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`localSaveAccount.test.ts`](../../tests/saves/localSaveAccount.test.ts)
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`passwordReset.test.ts`](../../tests/saves/passwordReset.test.ts)
+- [`rankings.test.ts`](../../tests/saves/rankings.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
 - [`saveFixtures.test.ts`](../../tests/saves/saveFixtures.test.ts) — The guard for every future PR: every frozen fixture in tests/fixtures/saves/ (one per released shape, made from the code of that release by
 - [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with a chest, gear and a monster, as a plain persisted slice.
@@ -984,6 +992,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`notices.test.ts`](../../tests/ui/notices.test.ts)
 - [`offlineBar.test.ts`](../../tests/ui/offlineBar.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
+- [`rankings.test.ts`](../../tests/ui/rankings.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
 - [`tutorial.test.ts`](../../tests/ui/tutorial.test.ts)
@@ -1025,6 +1034,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`new_chapter_columns_rollback.sql`](../../supabase/migrations/new_chapter_columns_rollback.sql)
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
+- [`player_rankings.sql`](../../supabase/migrations/player_rankings.sql)
+- [`player_rankings_rollback.sql`](../../supabase/migrations/player_rankings_rollback.sql)
 - [`profile_badge_title.sql`](../../supabase/migrations/profile_badge_title.sql)
 - [`profile_badge_title_rollback.sql`](../../supabase/migrations/profile_badge_title_rollback.sql)
 - [`profile_name_color.sql`](../../supabase/migrations/profile_name_color.sql)

@@ -11,7 +11,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - Uploading: [`SYNC`](#sync), [`judgeRebase`](#judgerebase), [`MANUAL_CLOUD_COOLDOWN_MS`](#manual-cloud-cooldown-ms), [`resolveConflict`](#resolveconflict), [`withPushLock`](#withpushlock)
 - Accepting a save: [`acceptSave`](#acceptsave), [`FLAG_POLICY`](#flag-policy), [`trustedEconomy`](#trustedeconomy), [`restoreTrust`](#restoretrust), [`XP_MODEL`](#xp-model), [`EMBER_MODEL`](#ember-model), [`MIN_SAVE_INTERVAL_MS`](#min-save-interval-ms), [`verifyTransition`](#verifytransition), [`isNonProduction`](#isnonproduction), [`settleIdols`](#settleidols), [`POISON_FLAGS`](#poison-flags), [`losesProgress`](#losesprogress), [`ENFORCEMENT`](#enforcement)
 - The ledger: [`Ledger`](#ledger), [`sealedRng`](#sealedrng), [`finite`](#finite), [`LedgerRowUpgrade`](#ledgerrowupgrade), [`statsWithoutTutorial`](#statswithouttutorial), [`loadBootSnapshot`](#loadbootsnapshot)
-- Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes)
+- Endpoints: [Endpoints (the API routes)](#endpoints-the-api-routes), [GET /api/rankings](#get)
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`awayBlockOf`](#awayblockof), [`ensureSeasonReset`](#ensureseasonreset)
 - Epoch: [`BASELINE_EPOCH`](#baseline-epoch), [`startNewChapter`](#startnewchapter)
 - Browser state: [The browser's half of the data epoch](#the-browser-s-half-of-the-data-epoch)
@@ -632,11 +632,22 @@ and its gold is paid in the browser.
 | `/api/mastery` | POST | `src/app/api/mastery/route.ts` |
 | `/api/offline` | POST | `src/app/api/offline/route.ts` |
 | `/api/pets` | POST | `src/app/api/pets/route.ts` |
+| `/api/rankings` | GET | `src/app/api/rankings/route.ts` |
 | `/api/rebirth` | POST | `src/app/api/rebirth/route.ts` |
 | `/api/rebirths` | GET | `src/app/api/rebirths/route.ts` |
 | `/api/save` | GET, DELETE, POST | `src/app/api/save/route.ts` |
 | `/api/spawn` | POST | `src/app/api/spawn/route.ts` |
 | `/api/tutorial` | POST | `src/app/api/tutorial/route.ts` |
+
+<a id="get"></a>
+
+### GET /api/rankings
+
+Source: [`src/app/api/rankings/route.ts:18`](../../src/app/api/rankings/route.ts)
+
+The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
+asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single
+SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.
 
 ## Away time
 

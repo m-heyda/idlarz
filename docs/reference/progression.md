@@ -13,6 +13,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`craftXpOf`](#craftxpof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
+- Rankings: [The boards](#ranking-boards), [Movement arrows](#movement)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Pets: [`PetDef`](#petdef), [`nextWanderStep`](#nextwanderstep), [`pickPetPhrase`](#pickpetphrase), [`applyPets`](#applypets)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
@@ -534,6 +535,31 @@ See also: [`gearOdds`](progression.md#gearodds), [`CRAFT_GEAR`](progression.md#c
 Source: [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts)
 
 What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.
+
+## Rankings
+
+<a id="ranking-boards"></a>
+
+### The boards
+
+Source: [`src/lib/rankings.ts:35`](../../src/lib/rankings.ts)
+
+The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
+
+Every board lists the first 50 places of the trusted players, plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
+Ties are broken in this order:
+- Level: level, then lifetime XP, then who reached the level cap first.
+- Rebirths: rebirths, then Embers ever earned.
+- Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.
+- Tiles: the most tiles the player ever owned in one run (`player_stats.best_tiles`), so a rebirth does not lower it.
+
+<a id="movement"></a>
+
+### Movement arrows
+
+Source: [`src/lib/rankings.ts:81`](../../src/lib/rankings.ts)
+
+The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
 
 ## Avatars
 

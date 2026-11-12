@@ -4826,3 +4826,143 @@ button.ds-income-head:hover {
 .ld-form-tabs .ds-tabs {
 	justify-content: center;
 }
+
+/* ===== Rankings: a zebra list (rank, avatar, name with title, badge, value, move since the daily rebuild) ===== */
+.ds-rank-list {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ds-rank-row {
+	display: grid;
+	grid-template-columns: 40px 44px minmax(0, 1fr) 32px 96px 58px;
+	align-items: center;
+	gap: 10px;
+	min-height: 56px;
+	border-width: 0 0 1px;
+}
+
+/* the zebra stripes: every second place on a lighter inset */
+.ds-rank-list > .ds-rank-row:nth-child(even) {
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.ds-rank-row[data-me='true'] {
+	box-shadow: inset 3px 0 0 var(--ds-gold, #e0a93a);
+	background: rgba(224, 169, 58, 0.14);
+}
+
+.ds-rank-pos {
+	font-weight: 700;
+	text-align: center;
+	color: var(--ds-dim, #9aa0b4);
+}
+
+.ds-rank-row[data-top='1'] .ds-rank-pos {
+	color: #ffd45a;
+}
+
+.ds-rank-row[data-top='2'] .ds-rank-pos {
+	color: #d6dbe6;
+}
+
+.ds-rank-row[data-top='3'] .ds-rank-pos {
+	color: #d89a62;
+}
+
+.ds-rank-avatar {
+	justify-self: center;
+}
+
+.ds-rank-who {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.ds-rank-name {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 15px;
+	white-space: nowrap;
+}
+
+.ds-rank-title {
+	font-size: 11px;
+	color: var(--ds-dim, #9aa0b4);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ds-rank-nobadge {
+	width: 28px;
+	height: 28px;
+}
+
+.ds-rank-value {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	font-weight: 700;
+	text-align: right;
+}
+
+.ds-rank-paragon {
+	font-size: 11px;
+	color: #c58bff;
+}
+
+.ds-rank-move {
+	font-size: 12px;
+	text-align: right;
+	color: var(--ds-dim, #9aa0b4);
+}
+
+.ds-rank-move[data-dir='up'] {
+	color: var(--ds-good);
+}
+
+.ds-rank-move[data-dir='down'] {
+	color: var(--ds-bad);
+}
+
+.ds-rank-move[data-dir='new'] {
+	color: var(--ds-gold, #e0a93a);
+}
+
+/* the player's own place when it is further down: set apart from the list */
+.ds-rank-mine {
+	margin-top: 8px;
+	border-top: 2px solid var(--ds-line-dk, #2a2118);
+}
+
+.ds-rank-foot,
+.ds-rank-empty {
+	margin: 12px 0 0;
+	font-size: 12px;
+	text-align: center;
+}
+
+.ds-rank-sk-pos {
+	width: 20px;
+	height: 14px;
+	justify-self: center;
+}
+
+.ds-rank-sk-art {
+	width: 40px;
+	height: 40px;
+}
+
+.ds-rank-sk-name {
+	grid-column: 3 / -1;
+	width: 40%;
+	height: 14px;
+}
