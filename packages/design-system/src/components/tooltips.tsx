@@ -123,10 +123,17 @@ export interface TooltipProps {
 	children?: React.ReactNode;
 	footer?: Footer;
 	className?: string;
+	/** A solid band across the top of the card ("Equipped" in green, "Comparing" in grey) */
+	banner?: { text: string; tone: 'equipped' | 'comparing' };
 }
 /** The base tooltip: dark slate body, rim in the rarity colour, and a glow for uncommon and up. Icon + title header, free content, optional two-part footer. */
-export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, title, subtitle, children, footer, className }) => (
+export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, title, subtitle, children, footer, className, banner }) => (
 	<div className={cx('ds-root', 'ds-tip', className)} data-rarity={rarity} role='tooltip'>
+		{banner ? (
+			<div className='ds-tip-banner' data-tone={banner.tone}>
+				{banner.text}
+			</div>
+		) : null}
 		<div className='ds-tip-head'>
 			{icon ? <img src={icon} alt='' /> : null}
 			<div>
@@ -177,6 +184,8 @@ export interface ItemTooltipProps {
 	lore?: string;
 	/** Marks the card of the piece currently worn ("Equipped") */
 	equippedLabel?: boolean;
+	/** A solid band over the card: green "Equipped" for the worn piece, grey "Comparing" for the hovered one */
+	banner?: { text: string; tone: 'equipped' | 'comparing' };
 	/** The difference block: what changes against the worn piece, one row per change (tone green for a gain, red for a loss), under the heading `compareWith` (default "Difference") */
 	compareWith?: string;
 	compare?: TipRow[];
@@ -210,6 +219,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 	flavor,
 	lore,
 	equippedLabel,
+	banner,
 	compareWith,
 	compare,
 	onDrink,
@@ -217,7 +227,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 	extra,
 	footer,
 }) => (
-	<Tooltip rarity={rarity} icon={icon} title={name} subtitle={type} footer={footer}>
+	<Tooltip rarity={rarity} icon={icon} title={name} subtitle={type} footer={footer} banner={banner}>
 		{equippedLabel ? <div className='ds-tip-equipped'>Equipped</div> : null}
 		{levelLine ? <TipLine tone='muted'>{levelLine}</TipLine> : null}
 		{primary ? (

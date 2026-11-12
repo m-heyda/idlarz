@@ -60,13 +60,15 @@ interface TipProps {
 	buyPrice?: number;
 	onDrink?: () => void;
 	hints?: 'bag' | 'merchant';
+	/** The band over the card: Equipped (the worn piece) or Comparing (the hovered one next to it) */
+	banner?: 'equipped' | 'comparing';
 }
 
 /**
  * One item card drawn by the design system's `ItemTooltip` from the game's own data: the same lines the game's card always had (kind line, item level and quality, the headline stat with its change, attack speed and DPS, stats by
  * colour group with their changes, affixes, lost properties, set changes and the set block, effects, Drink button, flavour and lore, price, key hints), only drawn in the new style.
  */
-const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink, hints }) => {
+const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink, hints, banner }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	// what the merchant really pays: the same inputs a sale uses (Haggler, Idols, the Lighthouse)
 	const sellCtx = useGameStore(
@@ -177,7 +179,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					? `Item Level ${formatCompact(resolved.instance.level)} · Quality ${Math.round(qualityMultiplier(resolved.instance.quality) * 100)}%${resolved.instance.crafted ? ' · Crafted' : ''}`
 					: undefined
 			}
-			equippedLabel={wornLabel}
+			banner={banner ? { text: banner === 'equipped' ? 'Equipped' : 'Comparing', tone: banner } : undefined}
 			primary={
 				primaryKey ? { label: statLabel(primaryKey), value: formatCompact(stats[primaryKey] ?? 0, 2), diff: withDiff ? primaryDelta : undefined } : undefined
 			}
@@ -268,13 +270,8 @@ export const GameItemTip: React.FC<Omit<TipProps, 'comparison' | 'wornLabel'> & 
 	const comparison = compare && rest.item ? compareDetailed(rest.item, equipment) : null;
 	return (
 		<div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-			<GameItemCard {...rest} comparison={comparison} />
-			{comparison?.equipped ? (
-				<div>
-					<div className='ds-tip-comparing'>Comparing</div>
-					<GameItemCard item={comparison.equipped} wornLabel />
-				</div>
-			) : null}
+			<GameItemCard {...rest} comparison={comparison} banner={comparison?.equipped ? 'comparing' : undefined} />
+			{comparison?.equipped ? <GameItemCard item={comparison.equipped} wornLabel banner='equipped' /> : null}
 		</div>
 	);
 };
