@@ -70,3 +70,27 @@ export const clampWindowSize = (start: Size, delta: Point, min: Size, room: Size
 	w: clamp(start.w + delta.x, min.w, room.w - margin),
 	h: clamp(start.h + delta.y, min.h, room.h - margin),
 });
+
+const AMOUNT_SUFFIXES = ['', 'k', 'm', 'b', 't', 'qa', 'qi', 'sx'];
+
+/**
+ * A typed amount ("250", "1,500", "1.5k", "2m", "3B"): a whole number of at least 1, or null for anything else (empty, negative, an unknown suffix, a fraction of a unit). The same rules as the game's `parseAmount`, kept here so the
+ * `AmountInput` works without the game; the game can pass its own parser instead.
+ */
+export const parseAmountText = (text: string): number | null => {
+	const match = /^(\d+(?:\.\d+)?)\s*([a-z]*)$/i.exec(text.replace(/[,_\s]+/g, '').toLowerCase());
+	if (!match) return null;
+	const tier = AMOUNT_SUFFIXES.indexOf(match[2]);
+	if (tier < 0) return null;
+	const value = Math.floor(Number(match[1]) * Math.pow(1000, tier) + 1e-6);
+	return Number.isFinite(value) && value >= 1 ? value : null;
+};
+
+/** A typed or chosen amount held between 0 and `max` (a typed amount over the stock sells the stock). */
+export const clampAmount = (value: number, max: number): number =>
+	Number.isFinite(value) ? Math.max(0, Math.min(Math.floor(value), Math.max(0, Math.floor(max)))) : 0;
+
+/**
+ * The adapter from the game's rarity id (a string that may be anything a save or a future catalog holds) to a design-system `Rarity`: a known id passes, anything else reads as `common`. Wiring code calls it instead of casting.
+ */
+export const toRarity = (id: string | undefined | null): Rarity => ((RARITIES as readonly string[]).includes(id ?? '') ? (id as Rarity) : 'common');

@@ -1,4 +1,5 @@
 /* Idle Realm design system. Everything lives under .ds-root and uses the ds- prefix so it never touches the game's .px-* styles. */
+
 .ds-root {
 	--ds-font: var(--font-pixel, system-ui, sans-serif);
 	--ds-slate: #1a1e29;
@@ -27,11 +28,13 @@
 	color: var(--ds-text);
 	-webkit-font-smoothing: antialiased;
 }
+
 .ds-root *,
 .ds-root *::before,
 .ds-root *::after {
 	box-sizing: border-box;
 }
+
 .ds-chip img,
 .ds-slot img,
 .ds-iconbtn img,
@@ -41,13 +44,16 @@
 .ds-hero-sil {
 	image-rendering: pixelated;
 }
+
 .ds-topbar,
 .ds-slate,
 .ds-wood,
 .ds-parch {
 	image-rendering: pixelated;
 }
+
 /* Textures sit on a ::before layer so they stay crisp (pixelated) while the 9-slice frame art on the same element scales smoothly */
+
 .ds-frame,
 .ds-panel,
 .ds-window-bar,
@@ -55,9 +61,7 @@
 	position: relative;
 	isolation: isolate;
 }
-.ds-window-title {
-	isolation: isolate;
-}
+
 .ds-frame::before,
 .ds-panel::before,
 .ds-window-bar::before,
@@ -72,32 +76,40 @@
 	image-rendering: pixelated;
 	pointer-events: none;
 }
+
 .ds-caps {
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
 }
+
 .ds-gold-text {
 	color: var(--ds-gold);
 }
+
 .ds-dim {
 	color: var(--ds-text-dim);
 }
+
 .ds-good {
 	color: var(--ds-good);
 }
+
 .ds-bad {
 	color: var(--ds-bad);
 }
 
 /* ---------- textures ---------- */
+
 .ds-slate {
 	background: url('./assets/tex-slate.png') var(--ds-slate);
 	background-size: 64px 64px;
 }
+
 .ds-wood {
 	background: url('./assets/tex-wood-dark.png') var(--ds-wood-dk);
 	background-size: 96px 96px;
 }
+
 .ds-parch {
 	background: url('./assets/tex-parchment.png') var(--ds-parch);
 	background-size: 128px 128px;
@@ -105,128 +117,24 @@
 }
 
 /* ---------- frames (9-slice) ---------- */
-.ds-frame {
-	position: relative;
-	border: 30px solid transparent;
-	border-image: url('./assets/frame-stone.png') 15 / 30px round;
-	background: var(--ds-slate);
-	--tex: url('./assets/tex-slate.png');
-	--tex-size: 64px 64px;
-	filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55));
-}
+
 .ds-frame-b {
 	border-image-source: url('./assets/frame-stone-b.png');
 	border-image-slice: 15;
 }
-.ds-frame > .ds-frame-body {
-	margin: -14px;
-}
-.ds-panel {
-	position: relative;
-	border: 16px solid transparent;
-	border-image: url('./assets/frame-panel.png') 11 / 16px round;
-	background: var(--ds-slate-2);
-	--tex: url('./assets/tex-slate.png');
-	--tex-size: 64px 64px;
-}
+
 .ds-panel-b {
 	border-image-source: url('./assets/frame-panel-b.png');
 }
-.ds-panel.ds-parch {
-	background: var(--ds-parch);
-	--tex: url('./assets/tex-parchment.png');
-	--tex-size: 128px 128px;
-}
-.ds-inset {
-	background: rgba(6, 8, 14, 0.55);
-	box-shadow:
-		inset 0 0 0 2px #0b0d14,
-		inset 0 0 0 3px rgba(224, 169, 58, 0.25);
-	padding: 10px;
-}
 
 /* ---------- window shell ---------- */
-.ds-window {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	height: 100%;
-}
-.ds-window-title {
-	position: absolute;
-	top: -2px;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 3;
-	min-width: 240px;
-	height: 48px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0 30px;
-	border: 10px solid transparent;
-	border-image: url('./assets/plaque-wood-ornate.png') 8 12 8 12 / 10px 16px stretch;
-	background: #5a3a1d;
-	--tex: url('./assets/tex-wood.png');
-	--tex-size: 96px 48px;
-	font-size: 20px;
-	letter-spacing: 0.22em;
-	text-transform: uppercase;
-	color: var(--ds-gold-lt);
-	text-shadow:
-		0 2px 0 #1d1007,
-		0 0 8px rgba(244, 213, 126, 0.35);
-}
-.ds-window-head {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 6px 4px 8px;
-	margin-top: 22px;
-}
-.ds-window-bar {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	min-height: 44px;
-	padding: 4px 8px;
-	border: 8px solid transparent;
-	border-image: url('./assets/plaque-wood.png') 6 10 6 10 / 8px 12px stretch;
-	background: #4a2f17;
-	--tex: url('./assets/tex-wood.png');
-	--tex-size: 96px 48px;
-}
-.ds-window-body {
-	flex: 1;
-	min-height: 0;
-	padding: 4px 8px 8px;
-}
-.ds-close {
-	position: absolute;
-	top: 18px;
-	right: 4px;
-	z-index: 4;
-	width: 34px;
-	height: 34px;
-	display: grid;
-	place-items: center;
-	font: inherit;
-	font-size: 18px;
-	color: #fff;
-	background: linear-gradient(#e0513f, #a3281c);
-	border: 2px solid #2a0a06;
-	box-shadow:
-		inset 0 0 0 2px #f08a7a,
-		0 3px 0 #2a0a06;
-	cursor: pointer;
-}
+
 .ds-close:hover {
 	filter: brightness(1.15);
 }
 
 /* ---------- buttons and tabs ---------- */
+
 .ds-btn {
 	font: inherit;
 	font-size: 13px;
@@ -246,85 +154,43 @@
 	gap: 6px;
 	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
 }
+
 .ds-btn:hover:not(:disabled) {
 	filter: brightness(1.15);
 }
+
 .ds-btn:active:not(:disabled) {
 	transform: translateY(1px);
 }
+
 .ds-btn:disabled {
 	opacity: 0.55;
 	cursor: default;
 }
+
 .ds-btn-gold {
 	border-image-source: url('./assets/btn-gold.png');
 	background: #d9a031;
 	color: #2a1a05;
 	text-shadow: 0 1px 0 rgba(255, 235, 170, 0.6);
 }
+
 .ds-btn-wood {
 	border-image-source: url('./assets/btn-wood.png');
 	background: #6a4424;
 }
+
 .ds-btn-dark {
 	border-image-source: url('./assets/btn-dark.png');
 	background: #15171e;
 }
-.ds-tabs {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-}
-.ds-tab {
-	position: relative;
-	font: inherit;
-	font-size: 13px;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: #d8c9a8;
-	height: 36px;
-	padding: 0 16px;
-	border: 8px solid transparent;
-	border-image: url('./assets/tab-idle.png') 7 / 8px stretch;
-	background: #3d2614;
-	background-clip: padding-box;
-	cursor: pointer;
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.7);
-}
+
 .ds-tab:hover {
 	filter: brightness(1.2);
 }
-.ds-tab[data-active='true'] {
-	border-image-source: url('./assets/tab-active.png');
-	background: #e0a93a;
-	color: #2a1a05;
-	text-shadow: 0 1px 0 rgba(255, 235, 170, 0.6);
-}
-.ds-badge {
-	min-width: 18px;
-	height: 18px;
-	padding: 0 4px;
-	display: inline-grid;
-	place-items: center;
-	font-size: 11px;
-	color: #fff;
-	background: #d6402f;
-	border-radius: 999px;
-	box-shadow:
-		0 0 0 2px #fff,
-		0 0 0 3px #5a1209;
-	text-shadow: none;
-}
-.ds-badge-float {
-	position: absolute;
-	top: -8px;
-	right: -8px;
-}
 
 /* ---------- chips, bars, stats ---------- */
+
 .ds-chip {
 	display: inline-flex;
 	align-items: center;
@@ -337,14 +203,17 @@
 	font-size: 14px;
 	letter-spacing: 0.04em;
 }
+
 .ds-chip img {
 	width: 22px;
 	height: 22px;
 }
+
 .ds-chip-rate {
 	font-size: 11px;
 	color: var(--ds-good);
 }
+
 .ds-bar {
 	position: relative;
 	height: 20px;
@@ -352,20 +221,25 @@
 	border: 2px solid var(--ds-gold-dk);
 	box-shadow: inset 0 0 0 1px #000;
 }
+
 .ds-bar-fill {
 	position: absolute;
 	inset: 0 auto 0 0;
 	background: linear-gradient(#e45b4a, #a3281c);
 }
+
 .ds-bar-fill[data-tone='mana'] {
 	background: linear-gradient(#4f8cf5, #2754b8);
 }
+
 .ds-bar-fill[data-tone='xp'] {
 	background: linear-gradient(#5ec36e, #2f8a40);
 }
+
 .ds-bar-fill[data-tone='gold'] {
 	background: linear-gradient(#f4d57e, #c1861b);
 }
+
 .ds-bar-label {
 	position: relative;
 	display: block;
@@ -375,22 +249,26 @@
 	letter-spacing: 0.06em;
 	text-shadow: 0 1px 0 #000;
 }
+
 .ds-stat {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 2px;
 }
+
 .ds-stat-label {
 	font-size: 11px;
 	color: var(--ds-text-dim);
 }
+
 .ds-stat-value {
 	font-size: 17px;
 	color: #fff;
 }
 
 /* ---------- slots ---------- */
+
 .ds-slot {
 	position: relative;
 	width: 60px;
@@ -406,10 +284,12 @@
 	cursor: pointer;
 	--ds-rarity: transparent;
 }
+
 .ds-slot img {
 	width: 36px;
 	height: 36px;
 }
+
 .ds-slot[data-rarity] {
 	box-shadow:
 		inset 0 0 0 2px #05060a,
@@ -417,13 +297,16 @@
 		0 0 5px color-mix(in srgb, var(--ds-rarity) 45%, transparent);
 	background: color-mix(in srgb, var(--ds-rarity) 9%, #0d1019);
 }
+
 .ds-slot[data-empty='true'] img {
 	opacity: 0.3;
 	filter: grayscale(1);
 }
+
 .ds-slot[data-locked='true'] {
 	opacity: 0.55;
 }
+
 .ds-slot-count {
 	position: absolute;
 	right: 2px;
@@ -436,14 +319,17 @@
 		-1px 0 0 #000,
 		0 -1px 0 #000;
 }
+
 .ds-slot-lg {
 	width: 68px;
 	height: 68px;
 }
+
 .ds-slot-lg img {
 	width: 44px;
 	height: 44px;
 }
+
 .ds-iconbtn {
 	position: relative;
 	width: 76px;
@@ -462,32 +348,38 @@
 	cursor: pointer;
 	text-shadow: 0 2px 0 #000;
 }
+
 .ds-iconbtn img {
 	width: 56px;
 	height: 56px;
 	transition: transform 0.12s;
 }
+
 .ds-iconbtn-sm {
 	width: 44px;
 	padding: 0;
 	font-size: 9px;
 }
+
 .ds-iconbtn-sm img {
 	width: 36px;
 	height: 36px;
 }
+
 .ds-iconbtn:hover img {
 	transform: translateY(-2px);
 	filter: drop-shadow(0 0 6px rgba(244, 213, 126, 0.7));
 }
 
 /* ---------- ornaments ---------- */
+
 .ds-divider {
 	position: relative;
 	height: 9px;
 	margin: 6px 0;
 	background: linear-gradient(90deg, transparent, var(--ds-gold-dk) 12%, var(--ds-gold) 50%, var(--ds-gold-dk) 88%, transparent) center / 100% 1px no-repeat;
 }
+
 .ds-divider::after {
 	content: '';
 	position: absolute;
@@ -499,24 +391,20 @@
 	background: var(--ds-gold);
 	box-shadow: 0 0 0 2px var(--ds-slate);
 }
+
 .ds-divider-flourish {
 	height: 26px;
 	background-image: url('./assets/divider-flourish.png');
 }
-.ds-section-label {
-	font-size: 12px;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	color: var(--ds-gold);
-	margin: 0;
-}
 
 /* ---------- diamond level gems ---------- */
+
 .ds-gems {
 	display: inline-flex;
 	gap: 3px;
 	align-items: center;
 }
+
 .ds-gem {
 	width: 12px;
 	height: 14px;
@@ -524,67 +412,66 @@
 	background: #151821;
 	box-shadow: inset 0 0 0 1px #000;
 }
+
 .ds-gem[data-state='on'] {
 	background: linear-gradient(135deg, #fff2b0 0 22%, #f1c13c 22% 62%, #b27a12 62%);
 	filter: drop-shadow(0 0 3px rgba(244, 193, 60, 0.9));
 }
+
 .ds-gem[data-state='max'] {
 	background: linear-gradient(135deg, #f1d1ff 0 22%, #b05cf5 22% 62%, #6a22b3 62%);
 	filter: drop-shadow(0 0 4px rgba(176, 92, 245, 0.95));
 }
+
 .ds-gem[data-state='off'] {
 	background: #1b1f2b;
 }
 
 /* ---------- upgrade tile ---------- */
-.ds-upgrade {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	padding: 12px 14px;
-	min-height: 126px;
-	background: linear-gradient(rgba(10, 12, 18, 0.78), rgba(10, 12, 18, 0.9));
-	box-shadow:
-		inset 0 0 0 2px #090b11,
-		inset 0 0 0 3px rgba(224, 169, 58, 0.3);
-}
+
 .ds-upgrade[data-state='ready'] {
 	box-shadow:
 		inset 0 0 0 2px #090b11,
 		inset 0 0 0 3px var(--ds-gold),
 		0 0 6px rgba(224, 169, 58, 0.25);
 }
+
 .ds-upgrade[data-state='maxed'] {
 	box-shadow:
 		inset 0 0 0 2px #090b11,
 		inset 0 0 0 3px var(--ds-r-epic),
 		0 0 6px rgba(176, 92, 245, 0.3);
 }
+
 .ds-upgrade-head {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 }
+
 .ds-upgrade-icon {
 	width: 36px;
 	height: 36px;
 	flex: none;
 }
+
 .ds-upgrade-name {
 	flex: 1;
 	font-size: 16px;
 	color: #fff;
 }
+
 .ds-upgrade-line {
 	font-size: 13px;
 	line-height: 1.3;
 	color: #c9cdd8;
 }
+
 .ds-upgrade-line b {
 	font-weight: 400;
 	margin-right: 6px;
 }
+
 .ds-upgrade-foot {
 	margin-top: auto;
 	display: flex;
@@ -592,6 +479,7 @@
 	justify-content: space-between;
 	gap: 8px;
 }
+
 .ds-cost {
 	display: inline-flex;
 	align-items: center;
@@ -599,12 +487,14 @@
 	font-size: 14px;
 	color: var(--ds-gold-lt);
 }
+
 .ds-cost img {
 	width: 18px;
 	height: 18px;
 }
 
 /* ---------- tooltips ---------- */
+
 .ds-tip {
 	--ds-rim: #9a7424;
 	--ds-glow: transparent;
@@ -620,26 +510,32 @@
 		0 8px 18px rgba(0, 0, 0, 0.6),
 		inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
+
 .ds-tip[data-rarity='common'] {
 	--ds-rim: var(--ds-r-common);
 	--ds-glow: transparent;
 }
+
 .ds-tip[data-rarity='uncommon'] {
 	--ds-rim: var(--ds-r-uncommon);
 	--ds-glow: rgba(85, 194, 100, 0.25);
 }
+
 .ds-tip[data-rarity='rare'] {
 	--ds-rim: var(--ds-r-rare);
 	--ds-glow: rgba(95, 134, 255, 0.4);
 }
+
 .ds-tip[data-rarity='epic'] {
 	--ds-rim: var(--ds-r-epic);
 	--ds-glow: rgba(176, 92, 245, 0.42);
 }
+
 .ds-tip[data-rarity='legendary'] {
 	--ds-rim: var(--ds-r-legendary);
 	--ds-glow: rgba(244, 169, 60, 0.45);
 }
+
 .ds-tip-head {
 	display: flex;
 	gap: 10px;
@@ -647,6 +543,7 @@
 	padding-bottom: 8px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .ds-tip-head img {
 	width: 40px;
 	height: 40px;
@@ -654,34 +551,41 @@
 	border: 1px solid var(--ds-rim);
 	padding: 2px;
 }
+
 .ds-tip-title {
 	font-size: 16px;
 	line-height: 1.1;
 	color: var(--ds-rim);
 }
+
 .ds-tip-sub {
 	font-size: 11px;
 	color: var(--ds-text-dim);
 	margin-top: 3px;
 }
+
 .ds-tip-rows {
 	padding: 8px 0 2px;
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 }
+
 .ds-tip-row {
 	display: flex;
 	justify-content: space-between;
 	gap: 12px;
 	font-size: 12.5px;
 }
+
 .ds-tip-row span:first-child {
 	color: #b9bdc9;
 }
+
 .ds-tip-row span:last-child {
 	color: #fff;
 }
+
 .ds-tip-section {
 	margin: 8px 0 4px;
 	font-size: 11px;
@@ -689,17 +593,20 @@
 	text-transform: uppercase;
 	color: var(--ds-gold);
 }
+
 .ds-tip-note {
 	font-size: 12px;
 	color: #b9bdc9;
 	line-height: 1.35;
 	padding-top: 6px;
 }
+
 .ds-tip-compare {
 	margin-top: 6px;
 	padding: 2px 8px 6px;
 	background: rgba(255, 255, 255, 0.04);
 }
+
 .ds-tip-foot {
 	display: flex;
 	justify-content: space-between;
@@ -709,6 +616,7 @@
 	font-size: 11px;
 	color: var(--ds-text-dim);
 }
+
 .ds-kbd {
 	padding: 1px 5px;
 	margin-right: 4px;
@@ -717,6 +625,7 @@
 	background: #2b3350;
 	border: 1px solid #4a5688;
 }
+
 .ds-tip-hint {
 	width: auto;
 	max-width: 260px;
@@ -724,93 +633,50 @@
 }
 
 /* ---------- map hud pieces ---------- */
-.ds-topbar {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	height: 56px;
-	padding: 0 14px;
-	background: url('./assets/tex-wood.png') #4a2f17;
-	background-size: 96px 48px;
-	border-bottom: 4px solid #1d1007;
-	box-shadow:
-		inset 0 -2px 0 var(--ds-gold-dk),
-		0 6px 14px rgba(0, 0, 0, 0.5);
-}
-.ds-dock {
-	display: flex;
-	gap: 6px;
-	padding: 8px 12px 6px;
-	border: 14px solid transparent;
-	border-image: url('./assets/frame-panel.png') 11 / 14px round;
-	background: #4a2f17;
-	--tex: url('./assets/tex-wood.png');
-	--tex-size: 96px 48px;
-}
 
 .ds-slots-sm .ds-slot {
 	width: 52px;
 	height: 52px;
 }
+
 .ds-slots-sm .ds-slot img {
 	width: 32px;
 	height: 32px;
 }
 
 /* ===== New Chapter look: warm-black flat panels, hairline borders, the game's simple stone+gold frame, flanked titles, flat segmented tabs ===== */
+
 .ds-root {
 	--ds-line: #3a2c1c;
 	--ds-line-dk: #2a2118;
 	--ds-accent: #e0a040;
 	--ds-fill: rgba(0, 0, 0, 0.45);
 }
-.ds-frame {
-	border: 24px solid transparent;
-	border-image: url('./assets/frame-modal.png') 12 / 24px round;
-	background: radial-gradient(ellipse at 50% 0%, #17110c, #0a0807 70%);
-	--tex: none;
-}
-.ds-frame > .ds-frame-body {
-	margin: -8px;
-}
+
 .ds-panel {
+	position: relative;
+	--tex-size: 64px 64px;
 	border: 1px solid var(--ds-line);
 	border-image: none;
 	padding: 12px;
 	background: var(--ds-fill);
 	--tex: none;
 }
+
 .ds-panel.ds-parch {
 	background: var(--ds-parch);
 	border-color: #7a5a2a;
 	--tex: url('./assets/tex-parchment.png');
 	--tex-size: 128px 128px;
 }
+
 .ds-inset {
+	padding: 10px;
 	background: rgba(0, 0, 0, 0.4);
 	box-shadow: none;
 	border: 1px solid var(--ds-line-dk);
 }
-.ds-window-head {
-	margin-top: 44px;
-}
-.ds-window-title {
-	top: 24px;
-	left: 0;
-	right: 0;
-	transform: none;
-	min-width: 0;
-	height: auto;
-	padding: 0 56px;
-	gap: 16px;
-	border: 0;
-	border-image: none;
-	background: none;
-	--tex: none;
-	font-size: 22px;
-	letter-spacing: 0.16em;
-	text-shadow: 0 2px 0 #000;
-}
+
 .ds-window-title::before,
 .ds-window-title::after {
 	content: '';
@@ -818,50 +684,46 @@
 	height: 1px;
 	background: linear-gradient(90deg, transparent, var(--ds-gold-dk) 40%, var(--ds-gold));
 }
+
 .ds-window-title::before {
 	position: static;
 	inset: auto;
 	z-index: auto;
 }
+
 .ds-window-title::after {
 	transform: scaleX(-1);
 }
-.ds-close {
-	top: 26px;
-	right: 26px;
-	width: 30px;
-	height: 30px;
-	font-size: 15px;
-}
+
 .ds-window-bar {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 44px;
+	--tex-size: 96px 48px;
 	border: 1px solid var(--ds-line);
 	border-image: none;
 	padding: 4px;
 	background: var(--ds-fill);
 	--tex: none;
 }
+
 .ds-tabs {
+	display: flex;
+	align-items: center;
 	gap: 6px;
 	padding: 4px;
 	background: var(--ds-fill);
 	border: 1px solid var(--ds-line);
 }
+
 .ds-window-bar .ds-tabs {
 	padding: 0;
 	background: none;
 	border: 0;
 }
-.ds-tab {
-	--accent: var(--ds-accent);
-	height: 38px;
-	padding: 0 18px;
-	border: 0;
-	border-image: none;
-	background: transparent;
-	color: #f1e6c8;
-	text-shadow: none;
-	transition: background-color 0.15s;
-}
+
 .ds-tab::after {
 	content: '';
 	position: absolute;
@@ -873,20 +735,16 @@
 	transform: scaleX(0);
 	transition: transform 0.18s steps(4);
 }
+
 .ds-tab:hover {
 	filter: none;
 	background: rgba(255, 255, 255, 0.05);
 }
-.ds-tab[data-active='true'] {
-	border-image: none;
-	background: color-mix(in srgb, var(--accent) 16%, rgba(14, 9, 5, 0.9));
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 70%, transparent);
-	color: var(--accent);
-	text-shadow: none;
-}
+
 .ds-tab[data-active='true']::after {
 	transform: scaleX(1);
 }
+
 .ds-btn {
 	min-height: 34px;
 	padding: 0 16px;
@@ -895,25 +753,35 @@
 	background: linear-gradient(#323746, #232733);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
+
 .ds-btn-gold {
 	border-color: #5a3b0c;
 	background: linear-gradient(#efc25a, #c58d28);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
+
 .ds-btn-wood {
 	border-color: #1d1007;
 	background: linear-gradient(#7a4f29, #573619);
 }
+
 .ds-btn-dark {
 	border-color: var(--ds-line-dk);
 	background: #12141b;
 	box-shadow: none;
 }
+
 .ds-section-label {
+	font-size: 12px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--ds-gold);
+	margin: 0;
 	display: flex;
 	align-items: center;
 	gap: 8px;
 }
+
 .ds-section-label::after {
 	content: '';
 	flex: 1;
@@ -922,90 +790,27 @@
 }
 
 /* ===== Frames rendered smaller: less chunky, the art is downscaled smoothly instead of blown up ===== */
-.ds-frame {
-	border-width: 18px;
-	border-image: url('./assets/frame-modal.png') 12 / 18px round;
-}
+
 .ds-frame.ds-frame-b {
 	border-width: 16px;
 	border-image: url('./assets/frame-stone-b.png') 15 / 16px round;
 }
-.ds-frame > .ds-frame-body {
-	margin: -4px;
-}
+
 .ds-frame.ds-frame-b > .ds-frame-body {
 	margin: -2px;
 }
-.ds-window-head {
-	margin-top: 38px;
-}
-.ds-window-title {
-	top: 18px;
-}
-.ds-close {
-	top: 20px;
-	right: 20px;
-}
-.ds-dock {
-	border-width: 10px;
-	border-image: url('./assets/frame-panel.png') 11 / 10px round;
-}
+
 .ds-panel.ds-panel-b {
 	border: 10px solid transparent;
 	border-image: url('./assets/frame-panel-b.png') 11 / 10px round;
 }
 
 /* ===== HUD: compact grouped chips, wood buttons, orange glowing badges ===== */
-.ds-topbar {
-	height: 46px;
-	gap: 8px;
-}
-.ds-chipgroup {
-	display: inline-flex;
-	gap: 2px;
-	padding: 2px;
-	background: rgba(8, 4, 2, 0.55);
-	border: 1px solid #1d1007;
-	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.22);
-}
-.ds-chipgroup .ds-chip {
-	height: 28px;
-	padding: 0 8px 0 5px;
-	gap: 5px;
-	font-size: 13px;
-	background: none;
-	border: 0;
-	box-shadow: none;
-}
+
 .ds-chipgroup .ds-chip + .ds-chip {
 	border-left: 1px solid rgba(224, 169, 58, 0.18);
 }
-.ds-chipgroup .ds-chip img {
-	width: 20px;
-	height: 20px;
-}
-.ds-glyphbtn {
-	position: relative;
-	isolation: isolate;
-	width: 34px;
-	height: 34px;
-	display: grid;
-	place-items: center;
-	padding: 0;
-	font: inherit;
-	font-size: 19px;
-	line-height: 1;
-	color: #2a1608;
-	background: #4a2f17;
-	border: 1px solid #1d1007;
-	box-shadow:
-		inset 0 1px 0 rgba(255, 210, 150, 0.25),
-		inset 0 -2px 0 rgba(0, 0, 0, 0.35);
-	cursor: pointer;
-	text-shadow:
-		0 1px 0 rgba(255, 200, 130, 0.4),
-		0 -1px 0 rgba(0, 0, 0, 0.55);
-}
+
 .ds-glyphbtn::before {
 	content: '';
 	position: absolute;
@@ -1015,82 +820,71 @@
 	image-rendering: pixelated;
 	filter: brightness(0.8);
 }
+
 .ds-glyphbtn:hover {
 	filter: brightness(1.2);
 }
-.ds-badge {
-	min-width: 20px;
-	height: 20px;
-	padding: 0 5px;
-	font-size: 12px;
-	line-height: 1;
-	color: #2a0f00;
-	background: radial-gradient(circle at 35% 30%, #ffd27a, #ff9a2e 55%, #e0650f);
-	box-shadow:
-		0 0 0 2px #3a1b06,
-		0 0 8px 2px rgba(255, 150, 40, 0.75);
-	text-shadow: 0 1px 0 rgba(255, 235, 190, 0.55);
-}
+
 .ds-badge-float {
+	position: absolute;
 	top: 0;
 	right: calc(50% - 40px);
 }
-.ds-dock {
-	padding: 0 8px;
-	border-width: 10px;
-	gap: 4px;
-}
-.ds-dock .ds-iconbtn {
-	width: 84px;
-	padding: 2px 4px 0;
-}
-.ds-dock .ds-iconbtn img {
-	width: 66px;
-	height: 66px;
-}
 
 /* ===== HUD round 2: black cut-out resource trays, small brown glyph buttons, stone dock ===== */
+
+/* ===== HUD round 3: smaller trays with air around them, gold glyph buttons, tighter stone dock ===== */
+
+.ds-topbar {
+	display: flex;
+	align-items: center;
+	padding: 0 14px;
+	background: url('./assets/tex-wood.png') #4a2f17;
+	background-size: 96px 48px;
+	border-bottom: 4px solid #1d1007;
+	box-shadow:
+		inset 0 -2px 0 var(--ds-gold-dk),
+		0 6px 14px rgba(0, 0, 0, 0.5);
+	gap: 8px;
+	height: 48px;
+}
+
 .ds-chipgroup {
+	display: inline-flex;
+	gap: 2px;
 	background: #07060a;
 	border: 2px solid #1d1007;
 	box-shadow:
 		inset 0 0 0 1px rgba(224, 169, 58, 0.18),
 		inset 0 2px 6px rgba(0, 0, 0, 0.8);
-}
-.ds-glyphbtn {
-	width: 28px;
-	height: 28px;
-	font-size: 14px;
-	color: #b57a3e;
-	text-shadow:
-		0 -1px 0 rgba(0, 0, 0, 0.7),
-		0 1px 0 rgba(255, 210, 150, 0.18);
-}
-.ds-dock {
-	background: #4a443c;
-	--tex: url('./assets/tex-stone.png');
-	--tex-size: 48px 48px;
-}
-
-/* ===== HUD round 3: smaller trays with air around them, gold glyph buttons, tighter stone dock ===== */
-.ds-topbar {
-	height: 48px;
-}
-.ds-chipgroup {
 	padding: 1px;
 	border-width: 1px;
 }
+
 .ds-chipgroup .ds-chip {
+	background: none;
+	border: 0;
+	box-shadow: none;
 	height: 22px;
 	padding: 0 6px 0 4px;
 	gap: 4px;
 	font-size: 12px;
 }
+
 .ds-chipgroup .ds-chip img {
 	width: 16px;
 	height: 16px;
 }
+
 .ds-glyphbtn {
+	position: relative;
+	isolation: isolate;
+	display: grid;
+	place-items: center;
+	padding: 0;
+	font: inherit;
+	line-height: 1;
+	cursor: pointer;
 	width: 28px;
 	height: 28px;
 	font-size: 14px;
@@ -1100,34 +894,45 @@
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 	text-shadow: 0 1px 0 rgba(255, 235, 170, 0.6);
 }
+
 .ds-glyphbtn::before {
 	display: none;
 }
+
 .ds-glyphbtn:hover {
 	filter: brightness(1.12);
 }
-.ds-dock {
-	gap: 2px;
-	--tex-size: 64px 64px;
-}
+
 .ds-dock .ds-iconbtn {
+	padding: 2px 4px 0;
 	width: 72px;
 }
+
 .ds-dock .ds-iconbtn img {
 	width: 60px;
 	height: 60px;
 }
+
 .ds-dock .ds-badge-float {
 	right: calc(50% - 37px);
 }
 
 /* Dock frame rendered smaller so the gold edge stays sharp */
+
 .ds-dock {
+	display: flex;
+	border: 14px solid transparent;
+	padding: 0 8px;
+	background: #4a443c;
+	--tex: url('./assets/tex-stone.png');
+	gap: 2px;
+	--tex-size: 64px 64px;
 	border-width: 6px;
 	border-image: url('./assets/frame-panel.png') 11 / 6px round;
 }
 
 /* ===== reusable pieces: glyph button tones, top bar right slot, hover tips, minimap overlay ===== */
+
 .ds-glyphbtn[data-tone='wood'] {
 	color: #b57a3e;
 	background: #4a2f17;
@@ -1139,6 +944,7 @@
 		0 -1px 0 rgba(0, 0, 0, 0.7),
 		0 1px 0 rgba(255, 210, 150, 0.18);
 }
+
 .ds-glyphbtn[data-tone='stone'] {
 	color: #e9e4d6;
 	background: linear-gradient(#4a4e5c, #2f3340);
@@ -1146,42 +952,43 @@
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
 }
+
 .ds-topbar-right {
 	margin-left: auto;
 	display: flex;
 	gap: 6px;
 }
+
 .ds-hovertip {
 	position: relative;
 	display: inline-flex;
 }
-.ds-hovertip-pop {
-	position: absolute;
-	z-index: 60;
-	left: 0;
-	display: none;
-	pointer-events: none;
-}
+
 .ds-hovertip[data-align='center'] .ds-hovertip-pop {
 	left: 50%;
 	transform: translateX(-50%);
 }
+
 .ds-hovertip[data-placement='below'] .ds-hovertip-pop {
 	top: calc(100% + 8px);
 }
+
 .ds-hovertip[data-placement='above'] .ds-hovertip-pop {
 	bottom: calc(100% + 8px);
 }
+
 .ds-hovertip:hover .ds-hovertip-pop,
 .ds-hovertip:focus-within .ds-hovertip-pop {
 	display: block;
 }
+
 .ds-minimap {
 	position: relative;
 	overflow: hidden;
 	border: 1px solid #0b0d14;
 	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.3);
 }
+
 .ds-minimap-stats {
 	position: absolute;
 	left: 0;
@@ -1195,33 +1002,41 @@
 }
 
 /* Compact tooltip (header resources): narrower, smaller type, tighter rows */
+
 .ds-tip-compact {
 	width: 210px;
 	padding: 7px 9px;
 	font-size: 12px;
 }
+
 .ds-tip-compact .ds-tip-head {
 	gap: 8px;
 	padding-bottom: 6px;
 }
+
 .ds-tip-compact .ds-tip-title {
 	font-size: 14px;
 }
+
 .ds-tip-compact .ds-tip-sub {
 	font-size: 10px;
 	margin-top: 2px;
 }
+
 .ds-tip-compact .ds-tip-rows {
 	padding: 5px 0 1px;
 	gap: 2px;
 }
+
 .ds-tip-compact .ds-tip-row {
 	font-size: 11.5px;
 }
+
 .ds-tip-compact .ds-tip-section {
 	margin: 5px 0 2px;
 	font-size: 10px;
 }
+
 .ds-tip-compact .ds-tip-foot {
 	margin-top: 5px;
 	padding-top: 4px;
@@ -1229,43 +1044,32 @@
 }
 
 /* ===== Hero window round: smaller frame, fluid layout, container queries, tabs, XP bar, paper ledger, identity, pickers ===== */
-.ds-frame {
-	border-width: 12px;
-	border-image: url('./assets/frame-modal.png') 12 / 12px round;
-}
-.ds-frame > .ds-frame-body {
-	margin: 0;
-}
-.ds-window-head {
-	margin-top: 34px;
-}
-.ds-window-title {
-	top: 12px;
-	font-size: 20px;
-	user-select: none;
-	touch-action: none;
-}
+
 .ds-window-title[data-draggable='true'] {
 	cursor: grab;
 }
+
 .ds-window-title[data-draggable='true']:active {
 	cursor: grabbing;
 }
-.ds-close {
-	top: 14px;
-	right: 14px;
-}
+
 .ds-winroot {
 	position: relative;
 	container: ds-win / size;
 }
+
 .ds-window,
 .ds-window-body {
 	min-height: 0;
 }
+
 .ds-window-body {
+	flex: 1;
+	min-height: 0;
+	padding: 4px 8px 8px;
 	overflow: auto;
 }
+
 .ds-resize {
 	position: absolute;
 	right: 2px;
@@ -1279,23 +1083,28 @@
 }
 
 /* slot size is one variable so windows can scale their slots */
+
 .ds-slot {
 	width: var(--ds-slot-size, 56px);
 	height: var(--ds-slot-size, 56px);
 }
+
 .ds-slot img {
 	width: calc(var(--ds-slot-size, 56px) * 0.62);
 	height: calc(var(--ds-slot-size, 56px) * 0.62);
 }
+
 .ds-slot.ds-slot-lg {
 	--ds-slot-size: 68px;
 }
+
 .ds-slot[data-active='true'] {
 	box-shadow:
 		inset 0 0 0 2px #05060a,
 		inset 0 0 0 3px var(--ds-gold),
 		0 0 6px rgba(224, 169, 58, 0.5);
 }
+
 .ds-slot-add {
 	background: transparent;
 	color: var(--ds-gold);
@@ -1306,6 +1115,7 @@
 		inset 0 0 0 3px rgba(224, 169, 58, 0.45);
 	background-image: repeating-linear-gradient(45deg, rgba(224, 169, 58, 0.08) 0 4px, transparent 4px 8px);
 }
+
 .ds-slot-add:hover {
 	color: var(--ds-gold-lt);
 	box-shadow:
@@ -1321,18 +1131,42 @@
 }
 
 /* tabs: fancier */
+
 .ds-tab {
+	position: relative;
+	font: inherit;
+	font-size: 13px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	background-clip: padding-box;
+	cursor: pointer;
+	display: inline-flex;
+	gap: 8px;
+	--accent: var(--ds-accent);
+	height: 38px;
+	padding: 0 18px;
+	border: 0;
+	border-image: none;
+	color: #f1e6c8;
+	text-shadow: none;
+	transition: background-color 0.15s;
 	background: linear-gradient(rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.25));
 	box-shadow: inset 0 0 0 1px var(--ds-line);
 	align-items: center;
 	line-height: 1;
 }
+
 .ds-tab[data-active='true'] {
+	border-image-source: url('./assets/tab-active.png');
+	border-image: none;
+	color: var(--accent);
+	text-shadow: none;
 	background: linear-gradient(color-mix(in srgb, var(--accent) 30%, #1a1208), color-mix(in srgb, var(--accent) 8%, #0a0705));
 	box-shadow:
 		inset 0 0 0 1px var(--accent),
 		0 0 10px color-mix(in srgb, var(--accent) 30%, transparent);
 }
+
 .ds-tab[data-active='true']::before {
 	content: '';
 	position: absolute;
@@ -1344,28 +1178,14 @@
 	background: var(--accent);
 	box-shadow: 0 0 0 2px #0a0705;
 }
-.ds-tab .ds-badge {
-	height: 16px;
-	min-width: 16px;
-	padding: 0 4px;
-	font-size: 10px;
-	box-shadow:
-		0 0 0 1px #3a1b06,
-		0 0 6px 1px rgba(255, 150, 40, 0.7);
-	align-self: center;
-	margin-top: -1px;
-}
+
 .ds-bar-hint {
 	font-size: 12px;
 	padding-right: 8px;
 }
 
 /* XP bar like the game: level box + segmented green bar */
-.ds-xp {
-	display: flex;
-	align-items: stretch;
-	gap: 0;
-}
+
 .ds-xp-level {
 	flex: none;
 	min-width: 36px;
@@ -1379,6 +1199,7 @@
 	box-shadow: inset 0 0 0 1px #b88af5;
 	text-shadow: 0 2px 0 #2a1060;
 }
+
 .ds-xp-track {
 	position: relative;
 	flex: 1;
@@ -1390,12 +1211,7 @@
 		inset 0 3px 0 rgba(0, 0, 0, 0.5);
 	overflow: hidden;
 }
-.ds-xp-fill {
-	position: absolute;
-	inset: 0 auto 0 0;
-	background: repeating-linear-gradient(90deg, transparent 0 9px, rgba(0, 0, 0, 0.35) 9px 11px), linear-gradient(#7be08a 0 20%, #3ea84e 20% 70%, #24703a 70%);
-	box-shadow: 4px 0 8px rgba(110, 230, 130, 0.45);
-}
+
 .ds-xp-fill::after {
 	content: '';
 	position: absolute;
@@ -1404,6 +1220,7 @@
 	background-size: 200% 100%;
 	animation: ds-xp-shine 3.2s linear infinite;
 }
+
 @keyframes ds-xp-shine {
 	from {
 		background-position: 200% 0;
@@ -1412,32 +1229,19 @@
 		background-position: -100% 0;
 	}
 }
-.ds-xp-label {
-	position: absolute;
-	inset: 0;
-	display: grid;
-	place-items: center;
-	font-size: 12px;
-	letter-spacing: 0.04em;
-	text-shadow:
-		0 1px 0 #000,
-		1px 0 0 #000,
-		-1px 0 0 #000,
-		0 -1px 0 #000;
-}
-.ds-xp-compact .ds-xp-track {
-	height: 20px;
-}
+
 .ds-xp-compact {
 	flex: 1;
 }
 
 /* identity */
+
 .ds-identity {
 	display: flex;
 	gap: 12px;
 	align-items: center;
 }
+
 .ds-avatar {
 	position: relative;
 	flex: none;
@@ -1449,6 +1253,7 @@
 		0 0 0 2px var(--ds-gold-dk),
 		0 0 0 3px #05060a;
 }
+
 .ds-avatar img {
 	width: 100%;
 	height: 100%;
@@ -1456,6 +1261,7 @@
 	image-rendering: pixelated;
 	object-fit: cover;
 }
+
 .ds-avatar-edit {
 	position: absolute;
 	right: -4px;
@@ -1471,25 +1277,22 @@
 	opacity: 0;
 	transition: opacity 0.12s;
 }
+
 .ds-avatar:hover .ds-avatar-edit {
 	opacity: 1;
 }
+
 .ds-avatar:hover {
 	filter: brightness(1.12);
 }
+
 .ds-identity-text {
 	display: flex;
 	flex-direction: column;
 	gap: 3px;
 	min-width: 0;
 }
-.ds-identity-name {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	font-size: 20px;
-	line-height: 1;
-}
+
 .ds-identity-badge {
 	display: grid;
 	place-items: center;
@@ -1500,26 +1303,19 @@
 	background: none;
 	cursor: pointer;
 }
+
 .ds-identity-badge img {
 	width: 24px;
 	height: 24px;
 	image-rendering: pixelated;
 }
-.ds-identity-title {
-	padding: 0;
-	border: 0;
-	background: none;
-	font: inherit;
-	font-size: 12px;
-	text-align: left;
-	color: var(--ds-gold-lt);
-	cursor: pointer;
-}
+
 .ds-identity-title:hover {
 	text-decoration: underline;
 }
 
 /* modal */
+
 .ds-backdrop {
 	position: fixed;
 	inset: 0;
@@ -1528,26 +1324,18 @@
 	place-items: center;
 	background: rgba(2, 3, 8, 0.72);
 }
+
 .ds-modal {
 	max-width: calc(100vw - 32px);
 	max-height: calc(100vh - 32px);
 	position: relative;
 }
+
 .ds-modal .ds-frame {
 	max-height: calc(100vh - 32px);
 	overflow: auto;
 }
-.ds-modal-title {
-	display: flex;
-	align-items: center;
-	gap: 14px;
-	margin-bottom: 14px;
-	font-size: 20px;
-	letter-spacing: 0.16em;
-	text-transform: uppercase;
-	color: var(--ds-gold-lt);
-	text-shadow: 0 2px 0 #000;
-}
+
 .ds-modal-title::before,
 .ds-modal-title::after {
 	content: '';
@@ -1555,22 +1343,21 @@
 	height: 1px;
 	background: linear-gradient(90deg, transparent, var(--ds-gold));
 }
+
 .ds-modal-title::after {
 	transform: scaleX(-1);
 }
-.ds-modal-close {
-	top: 10px;
-	right: 10px;
-	position: absolute;
-}
+
 .ds-modal-body {
 	padding: 4px 8px 8px;
 }
+
 .ds-avatar-grid {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	gap: 8px;
 }
+
 .ds-acard {
 	display: flex;
 	flex-direction: column;
@@ -1584,18 +1371,22 @@
 	cursor: pointer;
 	min-height: 120px;
 }
+
 .ds-acard-flat {
 	min-height: 0;
 	padding: 10px 6px;
 }
+
 .ds-acard[data-state='open']:hover {
 	background: rgba(255, 255, 255, 0.05);
 }
+
 .ds-acard[data-selected='true'] {
 	border-color: var(--ds-accent);
 	background: color-mix(in srgb, var(--ds-accent) 14%, rgba(14, 9, 5, 0.9));
 	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ds-accent) 60%, transparent);
 }
+
 .ds-acard-art {
 	display: grid;
 	place-items: center;
@@ -1603,34 +1394,42 @@
 	font-size: 28px;
 	color: var(--ds-text-dim);
 }
+
 .ds-acard-art img {
 	width: 64px;
 	height: 64px;
 	image-rendering: pixelated;
 }
+
 .ds-acard-name {
 	font-size: 13px;
 }
+
 .ds-acard-note {
 	font-size: 10px;
 	line-height: 1.25;
 	text-align: center;
 	color: var(--ds-text-dim);
 }
+
 .ds-acard[data-state='class'] {
 	cursor: default;
 }
+
 .ds-acard[data-state='class'] .ds-acard-art img {
 	opacity: 0.4;
 	filter: grayscale(0.6);
 }
+
 .ds-acard[data-state='locked'] {
 	cursor: default;
 }
+
 .ds-acard[data-state='locked'] .ds-acard-art img {
 	filter: brightness(0);
 	opacity: 0.8;
 }
+
 .ds-acard[data-state='soon'] {
 	cursor: default;
 	border-style: dashed;
@@ -1638,13 +1437,7 @@
 }
 
 /* hero layout */
-.ds-hero {
-	display: grid;
-	grid-template-columns: minmax(270px, 390px) 1fr;
-	gap: 10px;
-	height: 100%;
-	min-height: 0;
-}
+
 .ds-hero > .ds-panel {
 	min-height: 0;
 	min-width: 0;
@@ -1653,15 +1446,7 @@
 	gap: 8px;
 	overflow: hidden;
 }
-.ds-doll {
-	--ds-slot-size: 46px;
-	flex: 1;
-	min-height: 0;
-	display: grid;
-	grid-template-columns: auto 1fr auto;
-	grid-template-rows: minmax(0, 1fr) auto;
-	gap: 6px;
-}
+
 .ds-doll-col {
 	grid-row: 1;
 	display: flex;
@@ -1670,6 +1455,7 @@
 	gap: 4px;
 	min-height: 0;
 }
+
 .ds-doll-center {
 	grid-column: 2;
 	grid-row: 1;
@@ -1678,18 +1464,7 @@
 	gap: 6px;
 	min-height: 0;
 }
-.ds-doll-figure {
-	flex: 1;
-	min-height: 90px;
-	display: grid;
-	background: radial-gradient(ellipse at 50% 35%, #1d1a24, #0a0809 75%);
-	border: 1px solid var(--ds-line);
-}
-.ds-doll-figure svg {
-	width: 100%;
-	height: 100%;
-	display: block;
-}
+
 .ds-doll-hands {
 	grid-column: 2;
 	grid-row: 2;
@@ -1697,27 +1472,19 @@
 	flex-direction: column;
 	align-items: center;
 }
+
 .ds-doll-hands .ds-section-label {
 	width: 100%;
 	justify-content: center;
 }
+
 .ds-doll-hands .ds-section-label::before {
 	content: '';
 	flex: 1;
 	height: 1px;
 	background: linear-gradient(270deg, var(--ds-gold-dk), transparent);
 }
-.ds-baggrid {
-	--ds-slot-size: 56px;
-	flex: 1;
-	min-height: 0;
-	display: grid;
-	grid-template-columns: repeat(auto-fill, var(--ds-slot-size));
-	justify-content: space-evenly;
-	align-content: start;
-	gap: 6px;
-	overflow: auto;
-}
+
 .ds-bag-foot {
 	display: flex;
 	align-items: center;
@@ -1725,21 +1492,25 @@
 	flex-wrap: wrap;
 	font-size: 12px;
 }
+
 .ds-bag-actions {
 	display: flex;
 	gap: 8px;
 }
+
 .ds-bag-hint {
 	margin-left: auto;
 }
 
 /* paper ledger (stats, crafting ticket) */
+
 .ds-ledger {
 	flex: 1;
 	min-height: 0;
 	overflow: auto;
 	color: #2b1d0e;
 }
+
 .ds-capi {
 	font-size: 13px;
 	letter-spacing: 0.14em;
@@ -1749,11 +1520,13 @@
 	padding-bottom: 3px;
 	margin-bottom: 2px;
 }
+
 .ds-paper-head {
 	display: flex;
 	align-items: flex-end;
 	gap: 12px;
 }
+
 .ds-pill {
 	padding: 4px 10px;
 	font-size: 12px;
@@ -1762,12 +1535,14 @@
 	border: 1px solid #2a1060;
 	white-space: nowrap;
 }
+
 .ds-attrs {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 	gap: 8px;
 	margin: 8px 0 14px;
 }
+
 .ds-attr {
 	display: flex;
 	align-items: center;
@@ -1776,6 +1551,7 @@
 	background: rgba(90, 60, 20, 0.1);
 	border: 1px solid #a9894f;
 }
+
 .ds-attr-text {
 	flex: 1;
 	display: flex;
@@ -1783,42 +1559,35 @@
 	line-height: 1.1;
 	min-width: 0;
 }
+
 .ds-attr-text small {
 	font-size: 11px;
 	color: #5a4326;
 }
+
 .ds-attr-text b {
 	font-size: 20px;
 	font-weight: 400;
 }
-.ds-plus {
-	flex: none;
-	width: 28px;
-	height: 28px;
-	padding: 0;
-	font: inherit;
-	font-size: 18px;
-	color: #fff;
-	background: linear-gradient(#3fa653, #1f6c33);
-	border: 1px solid #0d3a1a;
-	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
+
 .ds-plus:disabled {
 	opacity: 0.35;
 	cursor: default;
 }
+
 .ds-paper-cols {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 0 26px;
 	align-items: start;
 }
+
 .ds-paper-cols > div {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
+
 .ds-paper-row {
 	display: flex;
 	justify-content: space-between;
@@ -1829,40 +1598,43 @@
 	font-size: 13px;
 	color: #5a4326;
 }
+
 .ds-paper-row b {
 	font-weight: 400;
 	white-space: nowrap;
 }
+
 .ds-paper-title {
 	font-size: 24px;
 	line-height: 1.1;
 	color: #2b1d0e;
 }
+
 .ds-paper-sub {
 	font-size: 13px;
 	color: #5a4326;
 }
+
 .ds-paper-text {
 	margin: 0;
 	font-size: 14px;
 	line-height: 1.45;
 }
+
 .ds-paper-cost {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
 	font-size: 16px;
 }
+
 .ds-paper-cost img {
 	width: 24px;
 	height: 24px;
 }
-.ds-range {
-	flex: 1;
-	accent-color: #c58d28;
-}
 
 /* crafting */
+
 .ds-craft {
 	flex: 1;
 	min-height: 0;
@@ -1870,6 +1642,7 @@
 	flex-direction: column;
 	gap: 8px;
 }
+
 .ds-craft-top {
 	display: flex;
 	align-items: center;
@@ -1879,20 +1652,14 @@
 	border: 1px solid var(--ds-line-dk);
 	white-space: nowrap;
 }
+
 .ds-craft-body {
 	flex: 1;
 	min-height: 0;
 	display: flex;
 	gap: 10px;
 }
-.ds-craft-list {
-	width: 270px;
-	flex: none;
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	overflow: auto;
-}
+
 .ds-craft-ticket {
 	display: flex;
 	flex-direction: column;
@@ -1900,6 +1667,7 @@
 }
 
 /* ===== container queries: slots scale with the window; columns stack when narrow ===== */
+
 @container ds-win (max-width: 900px), ds-win (max-height: 620px) {
 	.ds-baggrid {
 		--ds-slot-size: 44px;
@@ -1911,6 +1679,7 @@
 		grid-template-columns: 1fr;
 	}
 }
+
 @container ds-win (max-width: 720px), ds-win (max-height: 520px) {
 	.ds-baggrid {
 		--ds-slot-size: 32px;
@@ -1937,17 +1706,33 @@
 }
 
 /* the window frame fills its box so the body can size against it */
+
 .ds-frame {
+	position: relative;
+	--tex-size: 64px 64px;
+	filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55));
+	border: 24px solid transparent;
+	background: radial-gradient(ellipse at 50% 0%, #17110c, #0a0807 70%);
+	--tex: none;
+	border-width: 12px;
+	border-image: url('./assets/frame-modal.png') 12 / 12px round;
 	display: flex;
 	flex-direction: column;
 }
+
 .ds-frame > .ds-frame-body {
+	margin: 0;
 	flex: 1;
 	min-height: 0;
 	display: flex;
 	flex-direction: column;
 }
+
 .ds-window {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 	flex: 1;
 	height: auto;
 	min-height: 0;
@@ -1961,12 +1746,14 @@
 }
 
 /* Slots are always square, never squeezed by a short column */
+
 .ds-slot {
 	flex: none;
 	aspect-ratio: 1;
 }
 
 /* Short or narrow window: drop the silhouette and lay the equipment slots out in its place, two rows of squares, with the bars and hands below */
+
 @container ds-win (max-height: 780px), ds-win (max-width: 720px) {
 	.ds-doll {
 		display: flex;
@@ -1996,17 +1783,54 @@
 }
 
 /* compact window header, small close button, silhouette keeps its proportions */
+
 .ds-window-title {
+	isolation: isolate;
+	position: absolute;
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	--tex-size: 96px 48px;
+	text-transform: uppercase;
+	color: var(--ds-gold-lt);
+	left: 0;
+	right: 0;
+	transform: none;
+	min-width: 0;
+	height: auto;
+	border: 0;
+	border-image: none;
+	background: none;
+	--tex: none;
+	text-shadow: 0 2px 0 #000;
+	user-select: none;
+	touch-action: none;
 	top: 9px;
 	font-size: 14px;
 	letter-spacing: 0.14em;
 	padding: 0 48px;
 	gap: 12px;
 }
+
 .ds-window-head {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 4px 8px;
 	margin-top: 26px;
 }
+
 .ds-close {
+	position: absolute;
+	z-index: 4;
+	display: grid;
+	place-items: center;
+	font: inherit;
+	color: #fff;
+	background: linear-gradient(#e0513f, #a3281c);
+	border: 2px solid #2a0a06;
+	cursor: pointer;
 	top: 9px;
 	right: 10px;
 	width: 22px;
@@ -2016,78 +1840,119 @@
 		inset 0 0 0 1px #f08a7a,
 		0 2px 0 #2a0a06;
 }
+
 .ds-modal-close {
+	position: absolute;
 	top: 8px;
 	right: 8px;
 }
+
 .ds-modal-title {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-bottom: 14px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--ds-gold-lt);
+	text-shadow: 0 2px 0 #000;
 	font-size: 16px;
-}
-.ds-doll-figure svg {
-	width: auto;
-	height: 100%;
-	max-height: 360px;
-	max-width: 100%;
-	justify-self: center;
-	align-self: center;
 }
 
 /* tight bag grid, tooltips in a portal, title beside the name */
+
 .ds-baggrid {
+	--ds-slot-size: 56px;
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, var(--ds-slot-size));
+	align-content: start;
+	overflow: auto;
 	justify-content: start;
 	gap: 3px;
 }
+
 .ds-hovertip-pop {
+	left: 0;
 	position: fixed;
 	z-index: 10000;
 	display: block;
 	pointer-events: none;
 	transform: none;
 }
+
 .ds-identity-name {
+	display: flex;
+	font-size: 20px;
+	line-height: 1;
 	gap: 6px;
 	align-items: baseline;
 }
+
 .ds-identity-name .ds-identity-badge {
 	align-self: center;
 }
+
 .ds-identity-title {
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	text-align: left;
+	color: var(--ds-gold-lt);
+	cursor: pointer;
 	font-size: 12px;
 }
 
 /* closer equipment columns around a narrower figure; level box and XP bar aligned; readable XP texture; coloured stats */
+
 .ds-doll {
+	--ds-slot-size: 46px;
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-rows: minmax(0, 1fr) auto;
+	gap: 6px;
 	grid-template-columns: auto minmax(0, 210px) auto;
 	justify-content: center;
 	column-gap: 4px;
 }
+
 .ds-doll-figure {
+	flex: 1;
+	min-height: 90px;
+	display: grid;
+	border: 1px solid var(--ds-line);
 	background: radial-gradient(ellipse at 50% 40%, #221e2b, #0b090d 78%);
 }
+
 .ds-doll-figure svg {
+	display: block;
+	width: auto;
+	height: 100%;
+	max-width: 100%;
+	justify-self: center;
+	align-self: center;
 	max-height: 400px;
 }
-.ds-xp {
-	height: 28px;
-	align-items: stretch;
-}
-.ds-xp-level,
-.ds-xp-track {
-	height: 28px;
-	box-sizing: border-box;
-}
-.ds-xp-compact,
-.ds-xp-compact .ds-xp-track {
-	height: 22px;
-}
+
 .ds-xp-fill {
+	position: absolute;
+	inset: 0 auto 0 0;
 	background: repeating-linear-gradient(90deg, transparent 0 11px, rgba(0, 0, 0, 0.14) 11px 12px), linear-gradient(#58c46a, #2f8f45);
 	box-shadow: none;
 }
+
 .ds-xp-fill::after {
 	opacity: 0.5;
 }
+
 .ds-xp-label {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
 	font-size: 12px;
 	letter-spacing: 0.03em;
 	color: #fff;
@@ -2097,29 +1962,36 @@
 		1px 0 1px #000,
 		-1px 0 1px #000;
 }
+
 .ds-stat-value[data-tone='damage'] {
 	color: #ff9a4d;
 }
+
 .ds-stat-value[data-tone='armor'] {
 	color: #8cc8ff;
 }
+
 .ds-stat-value[data-tone='crit'] {
 	color: #ff7a7a;
 }
 
 /* ===== scrollbars like the game's: dark track, bronze bevelled thumb ===== */
+
 .ds-root * {
 	scrollbar-width: thin;
 	scrollbar-color: #8a5f26 #0a0605;
 }
+
 .ds-root *::-webkit-scrollbar {
 	width: 12px;
 	height: 12px;
 }
+
 .ds-root *::-webkit-scrollbar-track {
 	background: #0a0605;
 	border: 2px solid #2b1d0e;
 }
+
 .ds-root *::-webkit-scrollbar-thumb {
 	background: #8a5f26;
 	border: 2px solid #0a0605;
@@ -2127,16 +1999,28 @@
 		inset 2px 2px 0 #d9a850,
 		inset -2px -2px 0 #4a3014;
 }
+
 .ds-root *::-webkit-scrollbar-corner {
 	background: #0a0605;
 }
 
 /* + button: a drawn cross, crisp and bold */
+
 .ds-plus {
+	flex: none;
+	padding: 0;
+	font: inherit;
+	font-size: 18px;
+	color: #fff;
+	background: linear-gradient(#3fa653, #1f6c33);
+	border: 1px solid #0d3a1a;
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 	position: relative;
 	width: 30px;
 	height: 30px;
 }
+
 .ds-plus::before,
 .ds-plus::after {
 	content: '';
@@ -2147,27 +2031,33 @@
 	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 	transform: translate(-50%, -50%);
 }
+
 .ds-plus::before {
 	width: 12px;
 	height: 4px;
 }
+
 .ds-plus::after {
 	width: 4px;
 	height: 12px;
 }
 
 /* slider component */
+
 .ds-slider {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 }
+
 .ds-slider-out {
 	min-width: 72px;
 	text-align: right;
 	font-size: 14px;
 }
+
 .ds-range {
+	accent-color: #c58d28;
 	--p: 0%;
 	appearance: none;
 	-webkit-appearance: none;
@@ -2176,24 +2066,29 @@
 	background: transparent;
 	cursor: pointer;
 }
+
 .ds-range:disabled {
 	opacity: 0.45;
 	cursor: not-allowed;
 }
+
 .ds-range::-webkit-slider-runnable-track {
 	height: 10px;
 	border: 2px solid #3a2810;
 	background: linear-gradient(90deg, #d9a238 var(--p), transparent var(--p)), repeating-linear-gradient(90deg, #1a120c 0 6px, #120c08 6px 8px);
 }
+
 .ds-range::-moz-range-track {
 	height: 6px;
 	border: 2px solid #3a2810;
 	background: #1a120c;
 }
+
 .ds-range::-moz-range-progress {
 	height: 6px;
 	background: #d9a238;
 }
+
 .ds-range::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	width: 14px;
@@ -2205,6 +2100,7 @@
 		inset 2px 2px 0 #f0d27a,
 		inset -2px -2px 0 #6a4414;
 }
+
 .ds-range::-moz-range-thumb {
 	width: 10px;
 	height: 16px;
@@ -2212,14 +2108,17 @@
 	background: #c08a30;
 	border: 2px solid #0a0605;
 }
+
 .ds-slider-paper .ds-range::-webkit-slider-runnable-track {
 	border-color: #6a4a1c;
 }
+
 .ds-slider-paper .ds-slider-out {
 	color: #2b1d0e;
 }
 
 /* collapsible groups, small recipe icons */
+
 .ds-acc-head {
 	width: 100%;
 	display: flex;
@@ -2236,32 +2135,45 @@
 	border-bottom: 1px solid var(--ds-line);
 	cursor: pointer;
 }
+
 .ds-acc-head:hover {
 	background: rgba(255, 255, 255, 0.04);
 }
+
 .ds-acc-chev {
 	width: 10px;
 	color: var(--ds-text-dim);
 }
+
 .ds-acc-title {
 	flex: 1;
 	text-align: left;
 }
+
 .ds-acc-count {
 	color: var(--ds-text-dim);
 }
+
 .ds-acc-body {
 	padding: 8px 2px 10px;
 }
+
 .ds-craft-list {
+	width: 270px;
+	flex: none;
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
 	gap: 4px;
 	--ds-slot-size: 40px;
 }
+
 .ds-craft-grid {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 4px;
 }
+
 .ds-craft-sub {
 	margin-bottom: 6px;
 	font-size: 11px;
@@ -2269,51 +2181,26 @@
 }
 
 /* crafting queue */
-.ds-queue {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	padding: 8px 10px;
-	background: rgba(0, 0, 0, 0.4);
-	border: 1px solid var(--ds-line-dk);
-}
+
 .ds-queue[data-ready='true'] {
 	border-color: var(--ds-gold-dk);
 	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.25);
 }
-.ds-queue-head {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-}
-.ds-queue-row {
-	display: grid;
-	grid-template-columns: 28px minmax(80px, 150px) 1fr auto auto;
-	align-items: center;
-	gap: 8px;
-}
-.ds-queue-icon {
-	width: 26px;
-	height: 26px;
-	image-rendering: pixelated;
-}
-.ds-queue-name {
-	font-size: 13px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
+
 .ds-queue-bar {
 	min-width: 0;
 }
+
 .ds-queue .ds-btn {
 	min-height: 28px;
 	padding: 0 10px;
 	font-size: 11px;
 }
+
 .ds-collect-glow {
 	animation: ds-collect 1.6s ease-in-out infinite;
 }
+
 @keyframes ds-collect {
 	50% {
 		box-shadow:
@@ -2323,34 +2210,23 @@
 }
 
 /* equipment groups (no silhouette): Armor | Jewelry over Hands | Skills, square slots */
+
 .ds-eq-bars {
 	display: grid;
 	gap: 4px;
 }
-.ds-equip {
-	--ds-slot-size: 46px;
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 8px 12px;
-	justify-items: center;
-}
-.ds-eqgroup {
-	display: flex;
-	flex-direction: column;
-	gap: 5px;
-}
-.ds-eqgroup .ds-section-label {
-	justify-content: center;
-}
+
 .ds-eqgroup .ds-section-label::before {
 	content: '';
 	flex: 1;
 	height: 1px;
 	background: linear-gradient(270deg, var(--ds-gold-dk), transparent);
 }
+
 .ds-eqgrid {
 	display: grid;
 }
+
 .ds-slot-text {
 	display: flex;
 	flex-direction: column;
@@ -2358,75 +2234,51 @@
 	line-height: 1.1;
 	font-size: 12px;
 }
+
 .ds-slot-text small {
 	font-size: 9px;
 	color: #6fa0ff;
 }
 
 /* context menu */
-.ds-menu {
-	position: fixed;
-	z-index: 10001;
-	min-width: 190px;
-	padding: 4px;
-	font-size: 13px;
-	background: linear-gradient(#10131c, #0a0c12);
-	border: 1px solid var(--ds-gold-dk);
-	box-shadow:
-		0 0 0 1px #05060a,
-		0 8px 18px rgba(0, 0, 0, 0.6);
-}
-.ds-menu-title {
-	padding: 4px 8px 6px;
-	margin-bottom: 2px;
-	font-size: 12px;
-	color: var(--ds-gold-lt);
-	border-bottom: 1px solid var(--ds-line);
-}
-.ds-menu-item {
-	width: 100%;
-	display: flex;
-	align-items: center;
-	gap: 14px;
-	padding: 6px 8px;
-	font: inherit;
-	color: var(--ds-text);
-	text-align: left;
-	background: none;
-	border: 0;
-	cursor: pointer;
-}
+
 .ds-menu-item:hover:not(:disabled) {
 	background: rgba(224, 169, 58, 0.16);
 }
+
 .ds-menu-item:disabled {
 	color: var(--ds-text-dim);
 	cursor: default;
 }
+
 .ds-menu-item[data-danger='true'] {
 	color: #ff8d7c;
 }
-.ds-menu-hint {
-	margin-left: auto;
-	font-size: 11px;
-	color: var(--ds-text-dim);
-}
-.ds-menu-sep {
-	height: 1px;
-	margin: 3px 4px;
-	background: var(--ds-line);
-}
+
 .ds-menu-check {
 	width: 10px;
 	height: 10px;
 	border: 1px solid var(--ds-gold-dk);
 }
+
 .ds-menu-check[data-on='true'] {
 	background: var(--ds-gold);
 }
 
 /* badges: bold, number centred in the circle (global) */
+
 .ds-badge {
+	place-items: center;
+	border-radius: 999px;
+	min-width: 20px;
+	height: 20px;
+	font-size: 12px;
+	color: #2a0f00;
+	background: radial-gradient(circle at 35% 30%, #ffd27a, #ff9a2e 55%, #e0650f);
+	box-shadow:
+		0 0 0 2px #3a1b06,
+		0 0 8px 2px rgba(255, 150, 40, 0.75);
+	text-shadow: 0 1px 0 rgba(255, 235, 190, 0.55);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -2435,44 +2287,34 @@
 	padding: 1px 5px 0;
 	font-variant-numeric: tabular-nums;
 }
+
 .ds-tab .ds-badge {
+	height: 16px;
+	min-width: 16px;
+	font-size: 10px;
+	box-shadow:
+		0 0 0 1px #3a1b06,
+		0 0 6px 1px rgba(255, 150, 40, 0.7);
+	align-self: center;
 	padding: 1px 4px 0;
 	margin-top: 0;
 }
 
 /* compact crafting queue */
-.ds-queue {
-	gap: 4px;
-	padding: 5px 8px;
-}
-.ds-queue-row {
-	grid-template-columns: 22px minmax(70px, 120px) 1fr auto auto;
-	gap: 6px;
-}
-.ds-queue-icon {
-	width: 20px;
-	height: 20px;
-}
-.ds-queue-name {
-	font-size: 12px;
-}
-.ds-queue .ds-xp-track {
-	height: 18px;
-}
-.ds-queue .ds-xp-label {
-	font-size: 11px;
-}
+
 .ds-queue .ds-btn {
 	min-height: 22px;
 	padding: 0 8px;
 	font-size: 10px;
 	border-width: 1px;
 }
+
 @container ds-win (max-width: 900px), ds-win (max-height: 620px) {
 	.ds-equip {
 		--ds-slot-size: 40px;
 	}
 }
+
 @container ds-win (max-width: 720px), ds-win (max-height: 520px) {
 	.ds-equip {
 		--ds-slot-size: 32px;
@@ -2480,10 +2322,12 @@
 }
 
 /* crafting bag (bag sub-tabs + stash list) and a smaller recipe icon */
+
 .ds-subtabs {
 	display: flex;
 	gap: 6px;
 }
+
 .ds-subtabs button {
 	padding: 5px 14px;
 	font: inherit;
@@ -2495,21 +2339,25 @@
 	border: 1px solid var(--ds-line);
 	cursor: pointer;
 }
+
 .ds-subtabs button[data-active='true'] {
 	color: var(--ds-gold-lt);
 	border-color: var(--ds-gold-dk);
 	background: color-mix(in srgb, var(--ds-accent) 14%, rgba(14, 9, 5, 0.9));
 }
+
 .ds-stash-wrap {
 	flex: 1;
 	min-height: 0;
 	overflow: auto;
 }
+
 .ds-stash {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
+
 .ds-stash-row {
 	display: flex;
 	align-items: center;
@@ -2517,115 +2365,165 @@
 	padding: 4px 6px;
 	border-bottom: 1px solid var(--ds-line-dk);
 }
+
 .ds-stash-row img {
 	width: 28px;
 	height: 28px;
 	image-rendering: pixelated;
 }
+
 .ds-stash-name {
 	flex: 1;
 	font-size: 14px;
 }
+
 .ds-stash-qty {
 	min-width: 56px;
 	text-align: right;
 	font-size: 14px;
 	color: var(--ds-gold-lt);
 }
+
 .ds-stash-note {
 	min-width: 84px;
 	text-align: right;
 	font-size: 11px;
 }
+
 .ds-stash .ds-btn {
 	min-height: 24px;
 	padding: 0 10px;
 	font-size: 11px;
 	border-width: 1px;
 }
+
 .ds-craft-ticket .ds-slot.ds-slot-lg {
 	--ds-slot-size: 58px;
 }
 
 /* compact context menu */
+
 .ds-menu {
+	position: fixed;
+	z-index: 10001;
+	background: linear-gradient(#10131c, #0a0c12);
+	border: 1px solid var(--ds-gold-dk);
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 8px 18px rgba(0, 0, 0, 0.6);
 	min-width: 150px;
 	padding: 3px;
 	font-size: 12px;
 }
+
 .ds-menu-title {
+	color: var(--ds-gold-lt);
+	border-bottom: 1px solid var(--ds-line);
 	padding: 2px 6px 4px;
 	margin-bottom: 1px;
 	font-size: 11px;
 }
+
 .ds-menu-item {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	font: inherit;
+	color: var(--ds-text);
+	text-align: left;
+	background: none;
+	border: 0;
+	cursor: pointer;
 	gap: 10px;
 	padding: 3px 6px;
 }
+
 .ds-menu-hint {
+	margin-left: auto;
+	color: var(--ds-text-dim);
 	font-size: 10px;
 }
+
 .ds-menu-sep {
+	height: 1px;
+	background: var(--ds-line);
 	margin: 2px 3px;
 }
 
 /* level box exactly as tall as the XP bar */
+
 .ds-xp {
+	display: flex;
+	gap: 0;
+	align-items: stretch;
 	height: 28px;
 }
+
 .ds-xp-level,
 .ds-xp-track {
 	height: auto;
 	align-self: stretch;
 	box-sizing: border-box;
 }
+
 .ds-xp-compact,
 .ds-xp-compact .ds-xp-track {
 	height: 22px;
 }
+
 .ds-xp-compact .ds-xp-track {
-	height: auto;
-}
-.ds-queue .ds-xp,
-.ds-queue .ds-xp-track {
-	height: 18px;
-}
-.ds-queue .ds-xp-track {
 	height: auto;
 }
 
 /* narrower left column, equipment in tidy full-width rows (Armor, Jewelry) then Hands | Skills, left aligned */
+
 .ds-hero {
+	display: grid;
+	gap: 10px;
+	height: 100%;
+	min-height: 0;
 	grid-template-columns: minmax(250px, 312px) 1fr;
 }
+
 .ds-hero > .ds-hero-left {
 	align-self: start;
 }
+
 .ds-equip {
+	display: grid;
 	--ds-slot-size: 44px;
 	grid-template-columns: auto 1fr;
 	justify-items: start;
 	gap: 8px 18px;
 }
+
 .ds-equip > .ds-eqgroup:nth-child(1),
 .ds-equip > .ds-eqgroup:nth-child(2) {
 	grid-column: 1 / -1;
 }
+
 .ds-eqgroup {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
 	align-items: flex-start;
 }
+
 .ds-eqgroup .ds-section-label {
 	width: 100%;
 	justify-content: flex-start;
 }
+
 .ds-eqgroup .ds-section-label::before {
 	display: none;
 }
+
 @container ds-win (max-width: 900px), ds-win (max-height: 620px) {
 	.ds-equip {
 		--ds-slot-size: 40px;
 	}
 }
+
 @container ds-win (max-width: 720px), ds-win (max-height: 520px) {
 	.ds-equip {
 		--ds-slot-size: 32px;
@@ -2633,35 +2531,57 @@
 }
 
 /* crafting queue: one tight grid, fixed button widths so every row lines up */
+
 .ds-queue {
+	display: flex;
+	flex-direction: column;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--ds-line-dk);
 	gap: 3px;
 	padding: 4px 8px 5px;
 }
+
 .ds-queue-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	min-height: 22px;
 }
+
 .ds-queue-row {
+	display: grid;
+	align-items: center;
 	grid-template-columns: 18px 104px 1fr 52px 78px;
 	gap: 6px;
 	min-height: 22px;
 }
+
 .ds-queue-icon {
+	image-rendering: pixelated;
 	width: 18px;
 	height: 18px;
 }
+
 .ds-queue-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	font-size: 11px;
 }
+
 .ds-queue .ds-xp,
 .ds-queue .ds-xp-track {
 	height: 16px;
 }
+
 .ds-queue .ds-xp-track {
 	height: auto;
 }
+
 .ds-queue .ds-xp-label {
 	font-size: 10px;
 }
+
 .ds-queue .ds-btn {
 	min-height: 20px;
 	height: 20px;
@@ -2669,11 +2589,13 @@
 	font-size: 10px;
 	width: 100%;
 }
+
 .ds-queue-head .ds-btn {
 	width: 134px;
 }
 
 /* ===== merchant ===== */
+
 .ds-merch-res {
 	display: grid;
 	grid-template-columns: 1fr 360px;
@@ -2681,18 +2603,22 @@
 	height: 100%;
 	min-height: 0;
 }
+
 .ds-merch-res > .ds-panel {
 	min-height: 0;
 	overflow: auto;
 }
+
 .ds-ticket {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 }
+
 .ds-stock .ds-capi {
 	margin-bottom: 6px;
 }
+
 .ds-stock-head,
 .ds-stock-row {
 	display: grid;
@@ -2701,10 +2627,12 @@
 	gap: 8px;
 	text-align: right;
 }
+
 .ds-stock-head > :first-child,
 .ds-stock-row > :first-child {
 	text-align: left;
 }
+
 .ds-stock-head {
 	padding: 4px 10px;
 	font-size: 11px;
@@ -2713,6 +2641,7 @@
 	color: #6a4b24;
 	border-bottom: 1px solid #a9894f;
 }
+
 .ds-stock-row {
 	width: 100%;
 	padding: 6px 10px;
@@ -2725,34 +2654,41 @@
 	border-bottom: 1px solid rgba(74, 53, 22, 0.25);
 	cursor: pointer;
 }
+
 .ds-stock-row:hover {
 	background: rgba(120, 80, 30, 0.1);
 }
+
 .ds-stock-row[data-active='true'] {
 	background: rgba(176, 120, 40, 0.24);
 	box-shadow: inset 3px 0 0 #8a5a14;
 }
+
 .ds-stock-name {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	font-size: 16px;
 }
+
 .ds-stock-name img {
 	width: 36px;
 	height: 36px;
 	image-rendering: pixelated;
 }
+
 .ds-paper-foot {
 	margin-top: 10px;
 	font-size: 12px;
 	color: #6a4b24;
 }
+
 .ds-ledger .ds-capi {
 	color: #6a3f00;
 }
 
 /* goods */
+
 .ds-goods {
 	display: flex;
 	flex-direction: column;
@@ -2760,6 +2696,7 @@
 	height: 100%;
 	min-height: 0;
 }
+
 .ds-shelf-head {
 	display: flex;
 	align-items: center;
@@ -2767,17 +2704,21 @@
 	flex-wrap: wrap;
 	margin-bottom: 10px;
 }
+
 .ds-shelf-head .ds-section-label {
 	flex: none;
 }
+
 .ds-shelf-head .ds-section-label::after {
 	display: none;
 }
+
 .ds-shelf-grid {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 14px;
 }
+
 .ds-shelf-item {
 	width: 86px;
 	display: flex;
@@ -2785,6 +2726,7 @@
 	align-items: center;
 	gap: 6px;
 }
+
 .ds-shelf-price {
 	display: inline-flex;
 	align-items: center;
@@ -2792,10 +2734,12 @@
 	font-size: 13px;
 	color: var(--ds-gold-lt);
 }
+
 .ds-shelf-price img {
 	width: 16px;
 	height: 16px;
 }
+
 .ds-shelf-item .ds-btn {
 	width: 100%;
 	min-height: 26px;
@@ -2803,6 +2747,7 @@
 	font-size: 11px;
 	border-width: 1px;
 }
+
 .ds-goods-low {
 	flex: 1;
 	min-height: 0;
@@ -2810,12 +2755,14 @@
 	grid-template-columns: 1fr 300px;
 	gap: 10px;
 }
+
 .ds-sellbag {
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
 	overflow: auto;
 }
+
 .ds-sellbag-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, var(--ds-slot-size));
@@ -2823,11 +2770,13 @@
 	gap: 6px;
 	margin-bottom: 8px;
 }
+
 .ds-filters {
 	margin-left: auto;
 	display: flex;
 	gap: 6px;
 }
+
 .ds-filters button {
 	padding: 3px 10px;
 	font: inherit;
@@ -2837,26 +2786,31 @@
 	border: 1px solid var(--ds-line);
 	cursor: pointer;
 }
+
 .ds-filters button[data-active='true'] {
 	color: var(--ds-gold-lt);
 	border-color: var(--ds-gold-dk);
 }
+
 .ds-quick {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 }
+
 .ds-paper-rule {
 	height: 2px;
 	background: #a9894f;
 	margin: 2px 0;
 }
+
 .ds-paper-label {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 	font-size: 13px;
 }
+
 .ds-select {
 	font: inherit;
 	font-size: 13px;
@@ -2867,34 +2821,50 @@
 }
 
 /* upgrades */
+
 .ds-ups {
 	display: flex;
 	flex-direction: column;
 	gap: 14px;
 	padding: 4px;
 }
+
 .ds-ups-head {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	margin-bottom: 8px;
 }
+
 .ds-ups-head .ds-section-label {
 	flex: none;
 }
+
 .ds-ups-head .ds-section-label::after {
 	display: none;
 }
+
 .ds-ups-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 	gap: 8px;
 }
+
 .ds-upgrade {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 12px 14px;
+	background: linear-gradient(rgba(10, 12, 18, 0.78), rgba(10, 12, 18, 0.9));
+	box-shadow:
+		inset 0 0 0 2px #090b11,
+		inset 0 0 0 3px rgba(224, 169, 58, 0.3);
 	min-height: 0;
 }
 
 /* coming soon */
+
 .ds-soon {
 	height: 100%;
 	min-height: 300px;
@@ -2907,18 +2877,21 @@
 	background: rgba(0, 0, 0, 0.35);
 	border: 1px dashed var(--ds-line);
 }
+
 .ds-soon img {
 	width: 96px;
 	height: 96px;
 	opacity: 0.55;
 	image-rendering: pixelated;
 }
+
 .ds-soon-title {
 	font-size: 22px;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--ds-gold-lt);
 }
+
 .ds-soon-tag {
 	padding: 3px 12px;
 	font-size: 11px;
@@ -2927,12 +2900,14 @@
 	color: #2a1a05;
 	background: linear-gradient(#efc25a, #c58d28);
 }
+
 .ds-soon p {
 	max-width: 380px;
 	margin: 0;
 	font-size: 13px;
 	color: var(--ds-text-dim);
 }
+
 @container ds-win (max-width: 900px) {
 	.ds-merch-res,
 	.ds-goods-low {
@@ -2941,25 +2916,31 @@
 }
 
 /* ===== tooltips: grade-coloured radial wash from the top-left, animated shiny border for legendary ===== */
+
 @property --ds-ang {
 	syntax: '<angle>';
 	inherits: false;
 	initial-value: 0deg;
 }
+
 .ds-tip {
 	background: radial-gradient(circle at 0 0, color-mix(in srgb, var(--ds-rim) 30%, transparent), transparent 62%), linear-gradient(#10131c, #0a0c12);
 	position: relative;
 	isolation: isolate;
 }
+
 .ds-tip[data-rarity='common'] {
 	background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.09), transparent 60%), linear-gradient(#10131c, #0a0c12);
 }
+
 .ds-tip[data-rarity='legendary'] {
 	border-color: transparent;
 	overflow: hidden;
 	background: radial-gradient(circle at 0 0, rgba(244, 169, 60, 0.36), transparent 66%), linear-gradient(#14110d, #0a0907);
 }
+
 /* the shiny ring: a conic gradient that turns, shown only on the 2 px border via a mask */
+
 .ds-tip[data-rarity='legendary']::before {
 	content: '';
 	position: absolute;
@@ -2989,7 +2970,9 @@
 		linear-gradient(#000 0 0);
 	animation: ds-ring 3.2s linear infinite;
 }
+
 /* a soft light band sweeping across the card */
+
 .ds-tip[data-rarity='legendary']::after {
 	content: '';
 	position: absolute;
@@ -3000,6 +2983,7 @@
 	background-size: 260% 100%;
 	animation: ds-sweep 4.2s ease-in-out infinite;
 }
+
 .ds-tip[data-rarity='legendary'] .ds-tip-title {
 	background: linear-gradient(90deg, #f4a93c, #fff0b0 45%, #f4a93c 70%);
 	background-size: 220% 100%;
@@ -3008,17 +2992,21 @@
 	color: transparent;
 	animation: ds-gleam 3.2s linear infinite;
 }
+
 .ds-tip[data-rarity='legendary'] .ds-tip-head img {
 	box-shadow: 0 0 8px rgba(244, 169, 60, 0.65);
 }
+
 .ds-tip[data-rarity='epic'] .ds-tip-head img {
 	box-shadow: 0 0 6px rgba(176, 92, 245, 0.5);
 }
+
 @keyframes ds-ring {
 	to {
 		--ds-ang: 360deg;
 	}
 }
+
 @keyframes ds-sweep {
 	0% {
 		background-position: 130% 0;
@@ -3028,11 +3016,13 @@
 		background-position: -60% 0;
 	}
 }
+
 @keyframes ds-gleam {
 	to {
 		background-position: -220% 0;
 	}
 }
+
 @media (prefers-reduced-motion: reduce) {
 	.ds-tip[data-rarity='legendary']::before,
 	.ds-tip[data-rarity='legendary']::after,
@@ -3042,6 +3032,7 @@
 }
 
 /* ===== Hall of Deeds and Bestiary ===== */
+
 .ds-sumbar {
 	flex: 1;
 	display: flex;
@@ -3049,11 +3040,13 @@
 	gap: 18px;
 	min-width: 0;
 }
+
 .ds-sum-crown img {
 	width: 36px;
 	height: 36px;
 	image-rendering: pixelated;
 }
+
 .ds-sum-progress {
 	flex: 1;
 	min-width: 140px;
@@ -3063,6 +3056,7 @@
 	gap: 3px;
 	font-size: 12px;
 }
+
 .ds-sum-cell {
 	display: flex;
 	flex-direction: column;
@@ -3071,10 +3065,12 @@
 	padding-left: 14px;
 	border-left: 1px solid var(--ds-line);
 }
+
 .ds-sum-cell b {
 	font-weight: 400;
 	font-size: 16px;
 }
+
 .ds-sum-claim {
 	margin-left: auto;
 	display: flex;
@@ -3082,10 +3078,12 @@
 	gap: 8px;
 	font-size: 12px;
 }
+
 .ds-sumbar .ds-filters {
 	margin-left: auto;
 	align-items: center;
 }
+
 .ds-gloss {
 	display: grid;
 	grid-template-columns: 190px 1fr minmax(260px, 330px);
@@ -3093,18 +3091,22 @@
 	height: 100%;
 	min-height: 0;
 }
+
 .ds-gloss-2 {
 	grid-template-columns: 1fr minmax(280px, 360px);
 }
+
 .ds-gloss > * {
 	min-height: 0;
 	overflow: auto;
 }
+
 .ds-cats {
 	display: flex;
 	flex-direction: column;
 	padding: 4px;
 }
+
 .ds-cats button {
 	display: flex;
 	justify-content: space-between;
@@ -3117,14 +3119,17 @@
 	border-left: 3px solid transparent;
 	cursor: pointer;
 }
+
 .ds-cats button:hover {
 	background: rgba(255, 255, 255, 0.04);
 }
+
 .ds-cats button[data-active='true'] {
 	border-left-color: var(--ds-gold);
 	background: color-mix(in srgb, var(--ds-gold) 12%, rgba(14, 9, 5, 0.9));
 	color: var(--ds-gold-lt);
 }
+
 .ds-cats-note {
 	margin: auto 0 0;
 	padding: 10px;
@@ -3132,11 +3137,13 @@
 	line-height: 1.4;
 	color: var(--ds-text-dim);
 }
+
 .ds-gloss-list {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 }
+
 .ds-deed {
 	display: grid;
 	grid-template-columns: 56px 1fr auto;
@@ -3147,16 +3154,20 @@
 	border: 1px solid var(--ds-line-dk);
 	cursor: pointer;
 }
+
 .ds-deed:hover {
 	background: rgba(255, 255, 255, 0.04);
 }
+
 .ds-deed[data-active='true'] {
 	border-color: var(--ds-gold-dk);
 	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.3);
 }
+
 .ds-deed[data-lock='true'] {
 	opacity: 0.55;
 }
+
 .ds-deed-icon {
 	display: grid;
 	place-items: center;
@@ -3167,36 +3178,43 @@
 		inset 0 0 0 2px #05060a,
 		inset 0 0 0 3px rgba(224, 169, 58, 0.45);
 }
+
 .ds-deed-icon img {
 	width: 38px;
 	height: 38px;
 	image-rendering: pixelated;
 }
+
 .ds-deed-icon-lg {
 	width: 64px;
 	height: 64px;
 	flex: none;
 }
+
 .ds-deed-icon-lg img {
 	width: 48px;
 	height: 48px;
 }
+
 .ds-deed-main {
 	display: flex;
 	flex-direction: column;
 	gap: 3px;
 	min-width: 0;
 }
+
 .ds-deed-name {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	font-size: 15px;
 }
+
 .ds-deed-desc {
 	font-size: 12px;
 	color: var(--ds-text-dim);
 }
+
 .ds-deed-side {
 	display: flex;
 	flex-direction: column;
@@ -3204,37 +3222,44 @@
 	gap: 5px;
 	min-width: 86px;
 }
+
 .ds-deed-side b {
 	font-weight: 400;
 	font-size: 13px;
 	color: var(--ds-gold-lt);
 }
+
 .ds-deed-side .ds-btn {
 	min-height: 24px;
 	padding: 0 12px;
 	font-size: 11px;
 	border-width: 1px;
 }
+
 .ds-detail {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
+
 .ds-detail-head {
 	display: flex;
 	gap: 12px;
 	align-items: center;
 }
+
 .ds-detail-foot {
 	margin-top: auto;
 	display: flex;
 	justify-content: space-between;
 }
+
 .ds-tags {
 	display: flex;
 	gap: 4px;
 	margin-top: 4px;
 }
+
 .ds-tags span {
 	padding: 1px 6px;
 	font-size: 10px;
@@ -3242,11 +3267,13 @@
 	text-transform: uppercase;
 	color: #fff;
 }
+
 .ds-recs {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 6px;
 }
+
 .ds-recs > div {
 	display: flex;
 	flex-direction: column;
@@ -3254,15 +3281,18 @@
 	border: 1px solid #a9894f;
 	background: rgba(90, 60, 20, 0.08);
 }
+
 .ds-recs small {
 	font-size: 10px;
 	color: #6a4b24;
 }
+
 .ds-recs b {
 	font-size: 16px;
 	font-weight: 400;
 	color: #2b1d0e;
 }
+
 .ds-mastery {
 	display: grid;
 	grid-template-columns: 74px 1fr auto;
@@ -3272,37 +3302,45 @@
 	font-size: 12px;
 	color: #8a7a5a;
 }
+
 .ds-mastery b {
 	font-weight: 400;
 }
+
 .ds-mastery em {
 	font-style: normal;
 	min-width: 62px;
 	text-align: right;
 }
+
 .ds-mastery[data-status='unlocked'] {
 	color: #17561f;
 }
+
 .ds-mastery[data-status='next'] {
 	color: #2b1d0e;
 	background: rgba(176, 120, 40, 0.16);
 }
+
 .ds-mastery[data-status='claim'] {
 	color: #2b1d0e;
 	background: rgba(224, 169, 58, 0.22);
 }
+
 .ds-mastery .ds-btn {
 	min-height: 22px;
 	padding: 0 10px;
 	font-size: 10px;
 	border-width: 1px;
 }
+
 .ds-mons {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
 	gap: 8px;
 	align-content: start;
 }
+
 .ds-mon {
 	position: relative;
 	display: flex;
@@ -3316,16 +3354,20 @@
 	border: 1px solid var(--ds-line-dk);
 	cursor: pointer;
 }
+
 .ds-mon:hover {
 	background: rgba(255, 255, 255, 0.04);
 }
+
 .ds-mon[data-active='true'] {
 	border-color: var(--ds-gold);
 	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.35);
 }
+
 .ds-mon[data-unk='true'] {
 	opacity: 0.6;
 }
+
 .ds-mon-lv {
 	position: absolute;
 	top: 0;
@@ -3335,6 +3377,7 @@
 	background: #5a22a8;
 	color: #fff;
 }
+
 .ds-mon-ready {
 	position: absolute;
 	top: 4px;
@@ -3345,6 +3388,7 @@
 	background: radial-gradient(circle at 35% 30%, #ffd27a, #ff9a2e 55%, #e0650f);
 	box-shadow: 0 0 6px 1px rgba(255, 150, 40, 0.8);
 }
+
 .ds-mon-art {
 	display: grid;
 	place-items: center;
@@ -3353,23 +3397,28 @@
 	background: radial-gradient(circle, #1a1c28, #0a0b10);
 	box-shadow: inset 0 0 0 1px var(--ds-line);
 }
+
 .ds-mon-art img {
 	width: 64px;
 	height: 64px;
 	object-fit: contain;
 	image-rendering: pixelated;
 }
+
 .ds-mon[data-unk='true'] .ds-mon-art img {
 	filter: brightness(0);
 	opacity: 0.5;
 }
+
 .ds-mon-name {
 	font-size: 13px;
 	text-align: center;
 }
+
 .ds-mon-k {
 	font-size: 11px;
 }
+
 @container ds-win (max-width: 900px) {
 	.ds-gloss {
 		grid-template-columns: 150px 1fr;
@@ -3388,23 +3437,28 @@
 }
 
 /* generic hooks added for the game: compact button size, controlled window, interactive tips */
+
 .ds-btn-sm {
 	min-height: 24px;
 	padding: 0 10px;
 	font-size: 11px;
 }
+
 .ds-winroot[data-active='false'] {
 	filter: brightness(0.82);
 }
+
 .ds-winroot[data-flush='true'] .ds-window-body,
 .ds-window-body[data-flush='true'] {
 	padding: 0;
 	overflow: hidden;
 }
+
 .ds-hovertip-pop[data-interactive='true'] {
 	pointer-events: auto;
 	user-select: text;
 }
+
 .ds-slot[data-equipped='true']::after {
 	content: '';
 	position: absolute;

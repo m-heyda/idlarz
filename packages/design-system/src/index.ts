@@ -1,4 +1,5 @@
 import './styles.css';
+import './tooltip-data.css';
 
 export * from './logic';
 export * from './components/primitives';

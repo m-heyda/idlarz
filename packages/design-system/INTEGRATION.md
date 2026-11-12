@@ -32,6 +32,9 @@ The components in `src/components/` are **dumb**: they import nothing from the g
 | `Bag` | `Slot` grid + `AddSlot` (shortcut to the Pack Rat upgrade) | the whole bag logic |
 | `CraftingOverlay` accordion, `QueuePanel`, `CraftStash` | `CollapsibleGroup`, `CraftQueue` (Collect all on top), `CraftStash`, `Slider`, `SelectBox` | the craft store, timers (`finishedOf`, `formatTime`) |
 | merchant `UpgradeCard` | `UpgradeTile` (+ `DiamondLevel`); `state` can force maxed / ready / short | `merchantUpgradeCost`, the buy call |
+| merchant amount (presets, typed `250 / 1.5k / 2m`, slider; also the crafting amount) | `AmountInput` (`text`, `activePreset`, `value`, `max`; pass the game's `parseAmount` as `parse`; `clampAmount`) | `merchantPreset`, `merchantCustom` and their persistence in `uiStore` |
+| tile, unexplored tile, chest, monster (growth, boss), building tooltips with the game's data lines | `TileTooltip`, `ChestTooltip`, `MonsterTooltip`, `BuildingTooltip` with `TipLine` tones, `TipCostList`, `TipDiff` | building the rows from the game data (`tileInfo`, `monsterDef` ...) |
+| item tooltip with compare stack, set block, lost properties, lore, hints | `ItemTooltip` (`primary`, `speed`, `groups`, `affixes`, `lost`, `setChanges`, `set`, `lore`, `hints`) inside a `TooltipStack` | `resolveItem`, `compareDetailed`, the sell price with Haggler |
 | avatar and badge dialogs | `AvatarGrid`, `BadgeTitlePicker`, `AvatarFrame`, `HeroIdentity` inside a `Modal` | `fetchAvatars`, `chooseAvatar`, `chooseBadge`, the unlock rules |
 | achievements | Hall of Deeds and Bestiary are **demo views only**: build them from `Panel`, `ProgressBar`, `DiamondLevel`, `Button`, `Tabs`-style filters | all data |
 
@@ -51,9 +54,11 @@ The components in `src/components/` are **dumb**: they import nothing from the g
 ## Known gaps and risks (not blockers for a first screen)
 
 - **`styles.css` is ~3.4k lines** because it grew by appended override blocks (later rules win). It renders correctly but should be consolidated into per-component sections before heavy reuse; do it as its own pass with before/after screenshots of every story.
+- **Adapters**: `toRarity(id)` maps a game rarity id to `Rarity` (unknown reads as common); `parseAmountText` and `compact` mirror the game's `parseAmount` and `formatCompact` (the `AmountInput` takes `parse` and `format` props, so the game can inject its own).
 - **Number and rarity helpers are duplicated**: `compact` and the rarity colours mirror the game's `formatCompact` and `RARITIES`. When wiring, pass preformatted strings and map the game's rarity ids onto `Rarity` (`common` .. `legendary`).
 - **Window store specifics stay out**: Esc ordering, header-height clamp and the narrow-screen mode are the game's; the shell only needs `fixed` and the clamp helpers.
 - **Item tooltip stack**: the game shows an item card and, next to it, the worn gear. Compose two `ItemTooltip`s in one `HoverTip` (or use `ItemTooltip`'s built-in `compare` block).
 - **Assets**: the frames, textures and plaques are in `src/assets` (cut from the kit sheet by `scripts/build-assets.py`; the slate and wood textures are generated). Hero art, badges and enemies come from `public/pixel` through props.
 - **Not covered by a component yet**: tile/map tooltips with a cursor-following mode, the farm scene, toasts, the settings dialog, the landing page. Views for Hall of Deeds and Bestiary are layouts only.
-- **Tests**: pure helpers are unit-tested (`tests/ui/designSystem.test.ts`). There is no component test harness in the repo yet (the project has no React Testing Library); add one before wiring if you want render tests.
+- **Tests**: pure helpers are in `tests/ui/designSystem.test.ts`; `tests/ui/designSystemRender.test.ts` renders components to static markup with `react-dom/server` (no extra library) and pins what a prop turns into (`Slot` pass-through, `Tabs` disabled, `WindowShell` controlled geometry, `AmountInput`, tooltip tones). Interaction (hover timing, drag) is still checked in Storybook by hand.
+- **`styles.css` consolidation is still open** (IDL-327): the file grew by override blocks; new additions of this pass live in `tooltip-data.css` so they do not add to it.
