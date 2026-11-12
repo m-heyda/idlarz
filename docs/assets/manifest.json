@@ -23097,6 +23097,32 @@
 	},
 	{
 		"usedBy": [],
+		"name": "reuse_pets_cat_black_white",
+		"category": "unsorted",
+		"subcategory": "pets",
+		"src": "/pixel/reuse/pets/cat_black_white.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_pets_pet_silhouette",
+		"category": "unsorted",
+		"subcategory": "pets",
+		"src": "/pixel/reuse/pets/pet_silhouette.png",
+		"status": "reuse",
+		"source": "public/pixel/reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "reuse_potions_blue_elixir",
 		"category": "unsorted",
 		"subcategory": "potions",
