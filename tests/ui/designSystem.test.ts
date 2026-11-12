@@ -52,3 +52,31 @@ test('clampWindowSize: never below the minimum, never past the screen edge', () 
 	assert.deepEqual(clampWindowSize({ w: 800, h: 600 }, { x: -900, y: -900 }, min, { w: 1000, h: 700 }), min);
 	assert.deepEqual(clampWindowSize({ w: 800, h: 600 }, { x: 900, y: 900 }, min, { w: 1000, h: 700 }), { w: 992, h: 692 });
 });
+
+// IDL-318: the AmountInput's pure rules
+
+import { clampAmount, parseAmountText } from '../../packages/design-system/src/logic';
+import { parseAmount } from '../../src/utils/formatters';
+
+test('parseAmountText reads the typed amounts of the trade ticket exactly like the game does', () => {
+	for (const text of ['250', '1,500', '1.5k', '2m', '3B', ' 4 k ', '12.5M', '1t', '0', '', '-5', '1x', 'abc', '0.4', '1.5.2'])
+		assert.equal(parseAmountText(text), parseAmount(text), `"${text}"`);
+	assert.equal(parseAmountText('1.5k'), 1500);
+	assert.equal(parseAmountText('2m'), 2_000_000);
+	assert.equal(parseAmountText('0'), null);
+});
+
+test('clampAmount holds an amount between 0 and the stock', () => {
+	assert.equal(clampAmount(5_000, 1_200), 1_200);
+	assert.equal(clampAmount(-3, 10), 0);
+	assert.equal(clampAmount(Number.NaN, 10), 0);
+	assert.equal(clampAmount(7.9, 10), 7);
+});
+
+test('toRarity maps a game rarity id onto the design-system one and reads anything unknown as common', async () => {
+	const { toRarity } = await import('../../packages/design-system/src/logic');
+	assert.equal(toRarity('epic'), 'epic');
+	assert.equal(toRarity('mythic'), 'common');
+	assert.equal(toRarity(undefined), 'common');
+	assert.equal(toRarity(''), 'common');
+});

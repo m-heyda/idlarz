@@ -1,6 +1,9 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
+	AmountInput,
+	clampAmount,
+	parseAmountText,
 	ChipGroup,
 	Dock,
 	GlyphButton,
@@ -295,4 +298,38 @@ export const MiniMapStory: Story = {
 			<div style={{ height: '100%', background: 'linear-gradient(#e8f1f8 0 40%, #4f9a4c 40%)' }} />
 		</MiniMap>
 	),
+};
+
+/** The amount of a trade: presets (1K, 1M, Max), a typed field with k / m / b suffixes (typed wins over a preset), a slider and an invalid state. */
+export const AmountInputStory: Story = {
+	name: 'AmountInput',
+	render: function Render() {
+		const [text, setText] = React.useState('');
+		const [preset, setPreset] = React.useState<string | number | null>(1000);
+		const max = 2_450_000;
+		const typed = text.trim() === '' ? null : parseAmountText(text);
+		const value = clampAmount(typed ?? (preset === 'max' ? max : Number(preset ?? 0)), max);
+		return (
+			<div style={{ width: 460 }}>
+				<AmountInput
+					value={value}
+					max={max}
+					text={text}
+					onTextChange={setText}
+					presets={[
+						{ id: 1000, label: '1K' },
+						{ id: 1_000_000, label: '1M' },
+						{ id: 'max', label: 'Max' },
+					]}
+					activePreset={preset}
+					onPreset={(id) => {
+						setPreset(id);
+						setText('');
+					}}
+					onSlider={(n) => setText(String(n))}
+				/>
+				<p style={{ color: '#9aa4bd', fontSize: 12, marginTop: 12 }}>Amount: {value.toLocaleString('en-US')}</p>
+			</div>
+		);
+	},
 };

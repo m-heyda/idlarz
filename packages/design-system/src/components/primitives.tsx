@@ -85,7 +85,9 @@ export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: 
 				aria-selected={t.id === active}
 				data-active={t.id === active}
 				className='ds-tab'
-				onClick={() => onChange?.(t.id)}
+				disabled={t.disabled}
+				title={t.title}
+				onClick={() => !t.disabled && onChange?.(t.id)}
 			>
 				{t.label}
 				{t.badge ? <Badge count={t.badge} /> : null}

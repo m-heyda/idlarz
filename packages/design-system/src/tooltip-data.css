@@ -127,3 +127,46 @@
 .ds-tip-row > span:first-child .ds-tip-mini {
 	margin-right: 4px;
 }
+
+/* ===== AmountInput (IDL-318): presets (1K, 1M, Max), the typed field and a slider ===== */
+.ds-amount {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.ds-amount-row {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.ds-amount-label {
+	font-size: 12px;
+	color: #9aa4bd;
+	margin-right: 2px;
+}
+.ds-amount-chip[data-active='true'] {
+	outline: 2px solid #f0d27a;
+	filter: brightness(1.15);
+}
+.ds-amount-field {
+	width: 84px;
+	height: 28px;
+	padding: 0 8px;
+	background: #0b1022;
+	color: #f1e6c8;
+	border: 2px solid #3a4468;
+	font: inherit;
+	font-size: 13px;
+}
+.ds-amount-field[data-active='true'] {
+	border-color: #f0d27a;
+}
+.ds-amount[data-invalid='true'] .ds-amount-field {
+	border-color: #ff7a6a;
+	color: #ff9d90;
+}
+.ds-amount-error {
+	font-size: 11px;
+	color: #ff9d90;
+}

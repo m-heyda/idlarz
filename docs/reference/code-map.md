@@ -937,6 +937,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`designSystem.test.ts`](../../tests/ui/designSystem.test.ts)
+- [`designSystemRender.test.ts`](../../tests/ui/designSystemRender.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
