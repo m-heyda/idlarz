@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { gemStates, type Rarity } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -44,7 +44,7 @@ export const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children
 export const Divider: React.FC<{ flourish?: boolean }> = ({ flourish }) => <div className={cx('ds-divider', flourish && 'ds-divider-flourish')} />;
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	tone?: 'stone' | 'gold' | 'wood' | 'dark';
+	tone?: 'stone' | 'gold' | 'wood' | 'dark' | 'danger';
 }
 /** Plate button. `gold` is the primary action, `stone` the default, `dark` for the disabled "need more" state. */
 export const Button: React.FC<ButtonProps> = ({ tone = 'stone', className, ...rest }) => (
@@ -127,11 +127,13 @@ export interface SlotProps {
 	empty?: boolean;
 	locked?: boolean;
 	large?: boolean;
+	/** Marks the slot as the selected one (recipe picker) */
+	active?: boolean;
 	title?: string;
 	onClick?: () => void;
 }
 /** An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. */
-export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, large, title, onClick }) => {
+export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, large, active, title, onClick }) => {
 	const glow = rarity && rarity !== 'common';
 	return (
 		<button
@@ -141,6 +143,7 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 			style={glow ? ({ '--ds-rarity': `var(--ds-r-${rarity})` } as React.CSSProperties) : undefined}
 			data-empty={empty}
 			data-locked={locked}
+			data-active={active}
 			title={title}
 			onClick={onClick}
 		>
@@ -174,37 +177,99 @@ export const DiamondLevel: React.FC<{ level: number; max: number }> = ({ level, 
 	</span>
 );
 
-/** The window: frame, hanging wooden title plaque, close button, a tab/head bar and a body. Only presentational: the caller owns open/close and tab state. */
-export const WindowShell: React.FC<{
+export interface WindowShellProps {
 	title: string;
+	/** Starting size in px; the user can resize from the bottom-right corner when `resizable` */
 	width?: number;
 	height?: number;
+	minWidth?: number;
+	minHeight?: number;
+	draggable?: boolean;
+	resizable?: boolean;
 	bar?: React.ReactNode;
 	barRight?: React.ReactNode;
 	onClose?: () => void;
 	children: React.ReactNode;
-}> = ({ title, width = 1100, height = 640, bar, barRight, onClose, children }) => (
-	<div className='ds-root' style={{ width, height, position: 'relative' }}>
-		<div className='ds-window-title'>{title}</div>
-		<CloseButton onClick={onClose} />
-		<Frame style={{ width: '100%', height: '100%' }}>
-			<div className='ds-window'>
-				{bar ? (
-					<div className='ds-window-head'>
-						<div className='ds-window-bar'>
-							{bar}
-							<span style={{ marginLeft: 'auto' }}>{barRight}</span>
-						</div>
-					</div>
-				) : null}
-				<div className='ds-window-body'>{children}</div>
+}
+/**
+ * The window: frame, flanked title (drag handle), close button, a tab/head bar and a scrolling body, resizable from its corner. It is a size container (`container-name: ds-win`),
+ * so anything inside can adapt with `@container ds-win (max-width: ...)`: the Hero window scales its slots and stacks its columns that way. Only presentational: the caller owns open/close
+ * and tab state; size and position are kept here because they are pure UI.
+ */
+export const WindowShell: React.FC<WindowShellProps> = ({
+	title,
+	width = 1100,
+	height = 640,
+	minWidth = 380,
+	minHeight = 300,
+	draggable = true,
+	resizable = true,
+	bar,
+	barRight,
+	onClose,
+	children,
+}) => {
+	const [size, setSize] = useState({ w: width, h: height });
+	const [pos, setPos] = useState({ x: 0, y: 0 });
+	const drag = useRef<{ sx: number; sy: number; x: number; y: number } | null>(null);
+	const rs = useRef<{ sx: number; sy: number; w: number; h: number } | null>(null);
+	return (
+		<div className='ds-root ds-winroot' style={{ width: size.w, height: size.h, transform: `translate(${pos.x}px, ${pos.y}px)` }}>
+			<div
+				className='ds-window-title'
+				data-draggable={draggable}
+				onPointerDown={(e) => {
+					if (!draggable) return;
+					e.currentTarget.setPointerCapture(e.pointerId);
+					drag.current = { sx: e.clientX, sy: e.clientY, x: pos.x, y: pos.y };
+				}}
+				onPointerMove={(e) => drag.current && setPos({ x: drag.current.x + e.clientX - drag.current.sx, y: drag.current.y + e.clientY - drag.current.sy })}
+				onPointerUp={() => (drag.current = null)}
+			>
+				{title}
 			</div>
-		</Frame>
-	</div>
-);
+			<CloseButton onClick={onClose} />
+			<Frame style={{ width: '100%', height: '100%' }}>
+				<div className='ds-window'>
+					{bar ? (
+						<div className='ds-window-head'>
+							<div className='ds-window-bar'>
+								{bar}
+								<span style={{ marginLeft: 'auto' }}>{barRight}</span>
+							</div>
+						</div>
+					) : null}
+					<div className='ds-window-body'>{children}</div>
+				</div>
+			</Frame>
+			{resizable ? (
+				<div
+					className='ds-resize'
+					role='separator'
+					aria-label='Resize window'
+					onPointerDown={(e) => {
+						e.currentTarget.setPointerCapture(e.pointerId);
+						rs.current = { sx: e.clientX, sy: e.clientY, w: size.w, h: size.h };
+					}}
+					onPointerMove={(e) =>
+						rs.current &&
+						setSize({ w: Math.max(minWidth, rs.current.w + e.clientX - rs.current.sx), h: Math.max(minHeight, rs.current.h + e.clientY - rs.current.sy) })
+					}
+					onPointerUp={() => (rs.current = null)}
+				/>
+			) : null}
+		</div>
+	);
+};
 
-/** A group of resource chips sharing one dark tray, so tiers (money, base materials, farm goods) read as sets. */
-export const ChipGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => <span className='ds-chipgroup'>{children}</span>;
+/** The free-slot shortcut at the end of the bag: a dashed "+" slot that shows `tip` (what more space costs) and runs `onClick` (open the merchant upgrade). */
+export const AddSlot: React.FC<{ tip: React.ReactNode; onClick?: () => void }> = ({ tip, onClick }) => (
+	<HoverTip tip={tip} placement='above' align='center'>
+		<button type='button' className='ds-slot ds-slot-add' aria-label='Buy more bag slots' onClick={onClick}>
+			+
+		</button>
+	</HoverTip>
+);
 
 export type GlyphTone = 'gold' | 'wood' | 'stone';
 /** A small square button with one engraved character (Deeds, Settings). Tones: `gold` (the default plate), `wood`, `stone`. */
@@ -261,3 +326,6 @@ export const MiniMap: React.FC<{ stats: { tone: 'bad' | 'gold' | 'dim'; text: st
 
 /** Alias of NotifyBadge. */
 export const Badge = NotifyBadge;
+
+/** A group of resource chips sharing one dark tray, so tiers (money, base materials, farm goods) read as sets. */
+export const ChipGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => <span className='ds-chipgroup'>{children}</span>;

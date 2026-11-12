@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {
 	Button,
+	AddSlot,
+	HeroIdentity,
+	Modal,
+	AvatarGrid,
+	BadgeTitlePicker,
+	XpBar,
+	TipRows,
+	type AvatarCard,
+	type BadgeOption,
+	type TitleChoice,
 	ChipGroup,
 	GlyphButton,
 	TopBar,
@@ -207,24 +217,16 @@ export const GameHudView: React.FC<{ width?: number; height?: number }> = ({ wid
 	);
 };
 
-/** Placeholder hero figure: a dark human silhouette on a soft vignette, until class art is chosen. */
+/** Placeholder hero figure: a dark human silhouette that fills the height beside the equipment slots, until class art is chosen. */
 const Silhouette: React.FC = () => (
-	<div
-		style={{
-			height: 210,
-			display: 'grid',
-			placeItems: 'end center',
-			overflow: 'hidden',
-			background: 'radial-gradient(ellipse at 50% 35%, #1d1a24, #0a0809 75%)',
-			border: '1px solid #3a2c1c',
-		}}
-	>
-		<svg viewBox='0 0 100 130' width='150' height='195' aria-label='Hero silhouette'>
+	<div className='ds-doll-figure'>
+		<svg viewBox='0 0 120 260' preserveAspectRatio='xMidYMid meet' aria-label='Hero silhouette'>
 			<path
-				d='M50 6c-9 0-15 7-15 17 0 7 3 12 7 15v5c-14 3-26 8-30 22l-4 30c0 4 3 6 6 6h10l3 25h46l3-25h10c3 0 6-2 6-6l-4-30c-4-14-16-19-30-22v-5c4-3 7-8 7-15 0-10-6-17-15-17z'
+				d='M60 8C50 8 46 16 46 25C46 33 50 40 54 43L54 49C40 51 31 54 28 64L22 112C21 118 25 121 29 120L36 118L38 98L40 130L40 142C40 160 42 190 44 214L42 246C42 250 46 252 52 252L58 252L58 222L60 196L62 222L62 252L68 252C74 252 78 250 78 246L76 214C78 190 80 160 80 142L80 130L82 98L84 118L91 120C95 121 99 118 98 112L92 64C89 54 80 51 66 49L66 43C70 40 74 33 74 25C74 16 70 8 60 8Z'
 				fill='#07060a'
-				stroke='#241f2c'
+				stroke='#2a2433'
 				strokeWidth='1.5'
+				strokeLinejoin='round'
 			/>
 		</svg>
 	</div>
@@ -243,111 +245,445 @@ const bagItems: { icon: string; rarity?: Rarity; count?: number }[] = [
 	{ icon: I('item_cloth_hat'), rarity: 'uncommon' },
 ];
 
-/**
- * The compact character screen: plaque with name and class, equipment ring around the portrait, vitals, hands and skills, XP bar, and a right panel with the Bag, Stats and Crafting tabs.
- */
-export const HeroWindowView: React.FC = () => {
-	const [tab, setTab] = useState('bag');
+const H = (n: string) => `/pixel/new_assets/heroes/${n}.png`;
+const A = (n: string) => `/pixel/new_assets/achievements/${n}.png`;
+/** Mock of the game's avatar catalog for an elf ranger: its own two starters open, the other classes' starters dimmed, rewards earned or silhouettes, then empty "soon" cards. */
+const AVATAR_CARDS: AvatarCard[] = [
+	{ id: 'knight', name: 'Knight', portrait: H('avatar_red_haired_knight'), state: 'class', note: 'Needs the Warrior class' },
+	{ id: 'druid', name: 'Druid', portrait: H('avatar_green_horned_elf'), state: 'class', note: 'Needs the Mage class' },
+	{ id: 'scout', name: 'Scout', portrait: H('avatar_red_plume_lady'), state: 'open' },
+	{ id: 'scholar', name: 'Scholar', portrait: H('avatar_winged_helm_veteran'), state: 'class', note: 'Needs the Mage class' },
+	{ id: 'miner', name: 'Miner', portrait: H('avatar_dwarf_knight_orange_eyes'), state: 'class', note: 'Needs the Warrior class' },
+	{ id: 'farmer', name: 'Farmer', portrait: H('avatar_chain_knight_woman'), state: 'class', note: 'Needs the Paladin class' },
+	{ id: 'bard', name: 'Bard', portrait: H('avatar_purple_elf_lady'), state: 'open' },
+	{ id: 'alchemist', name: 'Alchemist', portrait: H('avatar_blue_plume_knight'), state: 'class', note: 'Needs the Paladin class' },
+	{ id: 'architect', name: 'Architect', portrait: H('avatar_gold_lion_knight'), state: 'open' },
+	{ id: 'reborn', name: 'Reborn', portrait: H('avatar_horned_scarred_woman'), state: 'locked', note: 'Rebirth for the first time' },
+	{ id: 'boss_slayer', name: 'Boss slayer', portrait: H('avatar_horned_brute_dark'), state: 'locked', note: 'Defeat The Great Auroch' },
+	{ id: 'early_tester', name: 'Early tester', portrait: H('avatar_horned_chainmail'), state: 'open' },
+	{ id: 'beta_tester', name: 'Beta tester', portrait: H('avatar_beta_tester'), state: 'locked', note: 'Played in the closed beta' },
+	{ id: 's1', name: 'Soon', portrait: '', state: 'soon' },
+	{ id: 's2', name: 'Soon', portrait: '', state: 'soon' },
+	{ id: 's3', name: 'Soon', portrait: '', state: 'soon' },
+];
+const avatarOf = (id: string) => AVATAR_CARDS.find((a) => a.id === id)?.portrait ?? H('avatar_red_plume_lady');
+const BADGES: BadgeOption[] = [
+	{ id: 'early_tester', title: 'Early tester', img: A('badge_early_tester_special') },
+	{ id: 'castle_10', title: 'Architect', img: A('badge_castle_10_gold') },
+	{ id: 'first_rebirth', title: 'Reborn', img: A('badge_first_rebirth_fire') },
+	{ id: 'first_blood', title: 'First blood', img: A('badge_sword_shield_bronze') },
+];
+const TITLES: TitleChoice[] = [
+	{ id: 'architect', name: 'Architect' },
+	{ id: 'reborn', name: 'Reborn' },
+	{ id: 'first_blood', name: 'First blood' },
+];
+
+const GREEN = '#17561f';
+const GOLD = '#6a3f00';
+const BLUE = '#1a3f92';
+const PURPLE = '#4d2490';
+const RED = '#8a2018';
+const INK = '#2b1d0e';
+type PaperRow = { l: string; v: string; c: string };
+const OFFENSE: PaperRow[] = [
+	{ l: 'Damage', v: '106.6 per hit', c: GOLD },
+	{ l: 'Physical ATK', v: '+24.0%', c: GOLD },
+	{ l: 'Magic ATK', v: '+24.0%', c: PURPLE },
+	{ l: 'Spell power', v: '0.0%', c: PURPLE },
+	{ l: 'ATK speed', v: '0.64/s (+2.50%)', c: BLUE },
+	{ l: 'Crit chance', v: '36.6%', c: GOLD },
+	{ l: 'Crit damage', v: 'x2.79', c: GOLD },
+	{ l: 'Super crit chance', v: '8.0% of crits', c: PURPLE },
+	{ l: 'Super crit damage', v: 'x6.98', c: PURPLE },
+	{ l: 'Life leech', v: '0.5%', c: RED },
+];
+const DEFENSE: PaperRow[] = [
+	{ l: 'HP', v: '278 / 278', c: GREEN },
+	{ l: 'MP', v: '101 / 101', c: BLUE },
+	{ l: 'Armor', v: '85 (-59% damage)', c: INK },
+	{ l: 'Dodge', v: '2.1%', c: BLUE },
+	{ l: 'HP regen', v: '3/s', c: GREEN },
+	{ l: 'Mana regen', v: '1.25/s', c: BLUE },
+];
+const FORTUNE: PaperRow[] = [
+	{ l: 'Luck', v: '64', c: PURPLE },
+	{ l: 'Chest rate', v: '+25.6%', c: GREEN },
+	{ l: 'Rare drop odds', v: '+25.6%', c: PURPLE },
+	{ l: 'Gem find in chests', v: '6.8%', c: BLUE },
+	{ l: 'Golden monster chance', v: '5.2%', c: GOLD },
+	{ l: 'Gold find', v: '10.0%', c: GOLD },
+	{ l: 'XP gain', v: '25.50%', c: GREEN },
+];
+const REALM: PaperRow[] = [
+	{ l: 'Tiles owned', v: '350', c: BLUE },
+	{ l: 'Tile discount', v: '25.00%', c: BLUE },
+	{ l: 'Income (set bonus)', v: '+6%', c: BLUE },
+	{ l: 'Kill rewards (set bonus)', v: '+12% gold and XP', c: GREEN },
+	{ l: 'Offline progress', v: 'up to 8 h at 50%', c: PURPLE },
+	{ l: 'Crafting level', v: '1', c: INK },
+	{ l: 'Rebirths', v: '0 (+0%)', c: INK },
+];
+
+const PaperBlock: React.FC<{ title: string; rows: PaperRow[] }> = ({ title, rows }) => (
+	<div>
+		<div className='ds-capi'>{title}</div>
+		{rows.map((r) => (
+			<div className='ds-paper-row' key={r.l}>
+				<span>{r.l}</span>
+				<b style={{ color: r.c }}>{r.v}</b>
+			</div>
+		))}
+	</div>
+);
+
+const ATTRS = [
+	{ k: 'str', n: 'Strength', c: RED },
+	{ k: 'dex', n: 'Dexterity', c: GREEN },
+	{ k: 'int', n: 'Intelligence', c: BLUE },
+	{ k: 'vit', n: 'Vitality', c: GOLD },
+	{ k: 'cha', n: 'Charisma', c: PURPLE },
+];
+
+/** Stats tab: paper ledger. Attribute cards with spend buttons, then Offense / Defense / Fortune / Realm as ruled tables in two columns. */
+const StatsTab: React.FC<{ pts: number; attrs: Record<string, number>; onSpend: (k: string) => void }> = ({ pts, attrs, onSpend }) => (
+	<Panel parchment className='ds-ledger'>
+		<div className='ds-paper-head'>
+			<div className='ds-capi' style={{ flex: 1 }}>
+				Attributes
+			</div>
+			<span className='ds-pill'>{pts > 0 ? `${pts} ${pts === 1 ? 'point' : 'points'} to spend` : 'No points to spend'}</span>
+		</div>
+		<div className='ds-attrs'>
+			{ATTRS.map((a) => (
+				<div className='ds-attr' key={a.k}>
+					<span className='ds-attr-text'>
+						<small>{a.n}</small>
+						<b style={{ color: a.c }}>{attrs[a.k]}</b>
+					</span>
+					<button type='button' className='ds-plus' aria-label={`Add point to ${a.n}`} disabled={pts < 1} onClick={() => onSpend(a.k)}>
+						+
+					</button>
+				</div>
+			))}
+		</div>
+		<div className='ds-paper-cols'>
+			<div>
+				<PaperBlock title='Offense' rows={OFFENSE} />
+				<PaperBlock title='Defense' rows={DEFENSE} />
+			</div>
+			<div>
+				<PaperBlock title='Fortune' rows={FORTUNE} />
+				<PaperBlock title='Realm' rows={REALM} />
+			</div>
+		</div>
+	</Panel>
+);
+
+const RECIPES = [
+	{
+		group: 'Components',
+		items: [
+			{
+				id: 'vial',
+				name: 'Glass Vial',
+				kind: 'Component',
+				hold: '3,470',
+				text: 'A small flask of fire-blown glass. Every potion needs one.',
+				icon: I('comp_glass_vial'),
+				cost: [
+					['stone', 10],
+					['coal', 5],
+				] as [string, number][],
+			},
+		],
+	},
+	{
+		group: 'Potions',
+		items: [
+			{
+				id: 'hp',
+				name: 'Health Potion',
+				kind: 'Potion',
+				hold: '88',
+				text: 'Restores 120 HP over 3 seconds.',
+				icon: I('item_potion_hp'),
+				cost: [
+					['food', 12],
+					['coal', 4],
+				] as [string, number][],
+			},
+			{
+				id: 'hp2',
+				name: 'Greater Potion',
+				kind: 'Potion',
+				hold: '6',
+				text: 'Restores 340 HP over 3 seconds.',
+				icon: I('item_potion_greater'),
+				cost: [
+					['food', 40],
+					['coal', 20],
+				] as [string, number][],
+			},
+		],
+	},
+	{
+		group: 'Gear',
+		items: [
+			{
+				id: 'sw',
+				name: 'Wooden Sword',
+				kind: 'Gear · starter',
+				hold: '1',
+				text: 'Starter gear, from crafting level 1.',
+				icon: I('item_wooden_sword'),
+				cost: [
+					['wood', 30],
+					['stone', 8],
+				] as [string, number][],
+			},
+			{
+				id: 'rg',
+				name: 'Wooden Ring',
+				kind: 'Gear · starter',
+				hold: '0',
+				text: 'A plain ring carved from oak.',
+				icon: I('item_wooden_ring'),
+				cost: [
+					['wood', 20],
+					['stone', 5],
+				] as [string, number][],
+			},
+		],
+	},
+];
+
+/** Crafting tab: level bar on top, a dark picker (grouped slots) at the left, a paper ticket with cost, amount and Craft at the right. */
+const CraftTab: React.FC<{ sel: string; onSel: (id: string) => void; amt: number; onAmt: (n: number) => void }> = ({ sel, onSel, amt, onAmt }) => {
+	const item = RECIPES.flatMap((g) => g.items).find((i) => i.id === sel) ?? RECIPES[0].items[0];
 	return (
-		<DsRoot style={{ padding: '30px 20px 20px', background: '#0b1022', width: 'fit-content' }}>
+		<div className='ds-craft'>
+			<div className='ds-craft-top'>
+				<span className='ds-gold-text'>Crafting level 10</span>
+				<XpBar level={10} value={415} max={3901} label='10%' compact />
+				<span className='ds-dim' style={{ fontSize: 12 }}>
+					415 / 3,901 XP
+				</span>
+			</div>
+			<div className='ds-craft-body'>
+				<Inset className='ds-craft-list'>
+					{RECIPES.map((g) => (
+						<div key={g.group}>
+							<SectionLabel>
+								{g.group} · {g.items.length}
+							</SectionLabel>
+							<div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+								{g.items.map((i) => (
+									<Slot key={i.id} icon={i.icon} title={i.name} active={i.id === sel} onClick={() => onSel(i.id)} />
+								))}
+							</div>
+						</div>
+					))}
+				</Inset>
+				<Panel parchment className='ds-ledger ds-craft-ticket'>
+					<div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+						<Slot large icon={item.icon} />
+						<div>
+							<div className='ds-paper-title'>{item.name}</div>
+							<div className='ds-paper-sub'>
+								{item.kind} · you hold {item.hold}
+							</div>
+						</div>
+					</div>
+					<p className='ds-paper-text'>{item.text}</p>
+					<div>
+						<div className='ds-capi'>Cost</div>
+						<div style={{ display: 'flex', gap: 20, paddingTop: 6 }}>
+							{item.cost.map(([res, n]) => (
+								<span key={res} className='ds-paper-cost'>
+									<img src={R(res)} alt={res} />
+									{compact(n * amt)}
+								</span>
+							))}
+						</div>
+					</div>
+					<div>
+						<label className='ds-capi' htmlFor='ds-amt' style={{ display: 'block' }}>
+							Amount
+						</label>
+						<div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 6 }}>
+							<input id='ds-amt' className='ds-range' type='range' min={1} max={500} value={amt} onChange={(e) => onAmt(Number(e.target.value))} />
+							<span className='ds-paper-cost' style={{ minWidth: 70, textAlign: 'right' }}>
+								{amt} / 500
+							</span>
+						</div>
+					</div>
+					<div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
+						<span style={{ color: GREEN, fontWeight: 600 }}>+{2 * amt} XP</span>
+						<span style={{ color: '#5a4326' }}>10s each · {amt * 10}s total</span>
+					</div>
+					<Button tone='gold' style={{ marginTop: 'auto', minHeight: 40 }}>
+						Craft {amt}
+					</Button>
+				</Panel>
+			</div>
+		</div>
+	);
+};
+
+/**
+ * The compact character screen in a resizable, draggable window. Left: name plaque, equipment around a full-height silhouette, vitals, hands and skills centred under it, XP bar, stats.
+ * Right: Bag (slots + free-slot shortcut to buy more), Stats (paper ledger, spend points) or Crafting. Everything is fluid: shrink the window and the slots scale down, below a width the
+ * two columns stack.
+ */
+export const HeroWindowView: React.FC<{ initialTab?: 'bag' | 'stats' | 'craft' }> = ({ initialTab = 'bag' }) => {
+	const [tab, setTab] = useState<string>(initialTab);
+	const [pts, setPts] = useState(1);
+	const [attrs, setAttrs] = useState<Record<string, number>>({ str: 17, dex: 15, int: 15, vit: 15, cha: 50 });
+	const [sel, setSel] = useState('vial');
+	const [amt, setAmt] = useState(1);
+	const [avatarId, setAvatarId] = useState('scout');
+	const [badgeId, setBadgeId] = useState<string | null>('castle_10');
+	const [titleId, setTitleId] = useState<string | null>('architect');
+	const [dialog, setDialog] = useState<'avatar' | 'badge' | null>(null);
+	const hints: Record<string, string> = { bag: '', stats: 'Spend points to grow stronger', craft: 'Recipes unlock with crafting level' };
+	return (
+		<DsRoot style={{ padding: 24, background: '#0b1022', minHeight: '100vh', boxSizing: 'border-box' }}>
 			<WindowShell
 				title='Hero'
-				width={1180}
-				height={680}
+				width={1100}
+				height={700}
 				bar={
 					<Tabs
 						active={tab}
 						onChange={setTab}
 						items={[
 							{ id: 'bag', label: 'Bag' },
-							{ id: 'stats', label: 'Stats', badge: 1 },
+							{ id: 'stats', label: 'Stats', badge: pts || undefined },
 							{ id: 'craft', label: 'Crafting' },
 						]}
 					/>
 				}
-				barRight={
-					<span className='ds-dim' style={{ fontSize: 13 }}>
-						9 of 40 slots used
-					</span>
-				}
+				barRight={<span className='ds-dim ds-bar-hint'>{hints[tab]}</span>}
 			>
-				<div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 12, height: '100%' }}>
-					<Panel style={{ padding: 0 }}>
-						<div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 4 }}>
-							<span className='ds-badge' style={{ width: 34, height: 34, fontSize: 15, background: '#6a22b3' }}>
-								31
-							</span>
-							<div>
-								<div style={{ fontSize: 18 }}>Insane</div>
-								<div className='ds-dim ds-caps' style={{ fontSize: 11 }}>
-									Angel Paladin
-								</div>
-							</div>
-						</div>
+				<div className='ds-hero'>
+					<Panel className='ds-hero-left'>
+						<HeroIdentity
+							avatar={avatarOf(avatarId)}
+							name='Insane'
+							classLabel='Elf Ranger'
+							badge={BADGES.find((b) => b.id === badgeId)?.img}
+							title={TITLES.find((t) => t.id === titleId)?.name ?? null}
+							onAvatar={() => setDialog('avatar')}
+							onBadge={() => setDialog('badge')}
+						/>
 						<Divider />
-						<div style={{ display: 'grid', gridTemplateColumns: '44px 1fr 44px', gap: 6, alignItems: 'start' }} className='ds-slots-sm'>
-							<div style={{ display: 'grid', gap: 4 }}>
+						<div className='ds-doll'>
+							<div className='ds-doll-col'>
 								{EQUIP_LEFT.map((s) => (
 									<Slot key={s} icon={I(`equip_${s}`)} empty />
 								))}
 							</div>
-							<div>
+							<div className='ds-doll-center'>
 								<Silhouette />
-								<div style={{ display: 'grid', gap: 4, marginTop: 6 }}>
-									<ProgressBar value={278} max={278} label='HP 278 / 278' />
-									<ProgressBar value={101} max={101} tone='mana' label='MP 101 / 101' />
-								</div>
+								<ProgressBar value={278} max={278} label='HP 278 / 278' />
+								<ProgressBar value={101} max={101} tone='mana' label='MP 101 / 101' />
 							</div>
-							<div style={{ display: 'grid', gap: 4 }}>
+							<div className='ds-doll-col'>
 								{EQUIP_RIGHT.map((s, i) => (
 									<Slot key={i} icon={I(`equip_${s}`)} empty />
 								))}
 							</div>
+							<div className='ds-doll-hands'>
+								<SectionLabel>Hands and skills</SectionLabel>
+								<div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+									<Slot icon={I('equip_mainHand')} rarity='rare' />
+									<Slot icon={I('equip_offHand')} rarity='epic' />
+									<Slot title='Heal' />
+									<Slot title='Stun' />
+								</div>
+							</div>
 						</div>
-						<SectionLabel>Hands and skills</SectionLabel>
-						<div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-							<Slot icon={I('equip_mainHand')} rarity='rare' />
-							<Slot icon={I('equip_offHand')} rarity='epic' />
-							<Slot title='Heal' />
-							<Slot title='Stun' />
-						</div>
-						<div style={{ marginTop: 8 }}>
-							<ProgressBar value={66} max={100} tone='xp' label='Level 31 · 66%' />
-						</div>
-						<Inset style={{ display: 'flex', justifyContent: 'space-around', marginTop: 8 }}>
+						<XpBar level={31} value={66} max={100} label='Level 31 · 66% · 20.07M / 30.10M' />
+						<Inset style={{ display: 'flex', justifyContent: 'space-around' }}>
 							<Stat label='Damage' value='106.6' />
 							<Stat label='Armor' value='85' />
 							<Stat label='Crit' value='36.6%' />
 							<Stat label='Item lvl' value='19.8' />
 						</Inset>
 					</Panel>
-					<Panel style={{ display: 'flex', flexDirection: 'column' }}>
-						<Inset
-							style={{
-								flex: 1,
-								display: 'grid',
-								gridTemplateColumns: 'repeat(10, 60px)',
-								gridAutoRows: 60,
-								justifyContent: 'space-evenly',
-								gap: 6,
-								alignContent: 'start',
-							}}
-						>
-							{Array.from({ length: 40 }, (_, i) => {
-								const it = bagItems[i];
-								return <Slot key={i} icon={it?.icon} rarity={it?.rarity} count={it?.count} />;
-							})}
-						</Inset>
-						<div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-							<Button>Organise</Button>
-							<Button tone='gold'>Sell junk</Button>
-							<span className='ds-dim' style={{ marginLeft: 'auto', fontSize: 12 }}>
-								Double-click to equip or drink. Right-click for more. Drag to rearrange.
-							</span>
-						</div>
+					<Panel className='ds-hero-right'>
+						{tab === 'bag' ? (
+							<>
+								<Inset className='ds-baggrid'>
+									{Array.from({ length: 40 }, (_, i) => {
+										const it = bagItems[i];
+										return <Slot key={i} icon={it?.icon} rarity={it?.rarity} count={it?.count} />;
+									})}
+									<AddSlot
+										tip={
+											<Tooltip className='ds-tip-compact' title='More bag space' icon={I('menu_bag_scroll')} subtitle='Merchant upgrade: Pack Rat'>
+												<TipRows
+													rows={[
+														{ label: 'Next level', value: '+4 slots' },
+														{ label: 'Cost', value: <span className='ds-gold-text'>1.90M gold</span> },
+													]}
+												/>
+											</Tooltip>
+										}
+									/>
+								</Inset>
+								<div className='ds-bag-foot'>
+									<span className='ds-dim'>9 of 40 slots used</span>
+									<span className='ds-bag-actions'>
+										<Button>Organise</Button>
+										<Button tone='danger'>Sell junk</Button>
+									</span>
+									<span className='ds-dim ds-bag-hint'>Double-click to equip or drink. Right-click for more. Drag to rearrange.</span>
+								</div>
+							</>
+						) : tab === 'stats' ? (
+							<StatsTab
+								pts={pts}
+								attrs={attrs}
+								onSpend={(k) => {
+									if (pts > 0) {
+										setPts(pts - 1);
+										setAttrs({ ...attrs, [k]: attrs[k] + 1 });
+									}
+								}}
+							/>
+						) : (
+							<CraftTab sel={sel} onSel={setSel} amt={amt} onAmt={setAmt} />
+						)}
 					</Panel>
 				</div>
 			</WindowShell>
+			{dialog === 'avatar' ? (
+				<Modal title='Choose your avatar' width={620} onClose={() => setDialog(null)}>
+					<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px', fontSize: 13 }}>
+						Your face in the header and the rankings. Faces of other classes stay disabled, and the locked rewards are earned in the game.
+					</p>
+					<AvatarGrid cards={AVATAR_CARDS} value={avatarId} onPick={setAvatarId} />
+				</Modal>
+			) : null}
+			{dialog === 'badge' ? (
+				<Modal title='Badge and title' width={620} onClose={() => setDialog(null)}>
+					<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px', fontSize: 13 }}>
+						Shown next to your name in the game and in the rankings. You can hide the badge completely.
+					</p>
+					<BadgeTitlePicker
+						badges={BADGES}
+						titles={TITLES}
+						badgeId={badgeId}
+						titleId={titleId}
+						onChange={(n) => {
+							setBadgeId(n.badgeId);
+							setTitleId(n.titleId);
+						}}
+					/>
+				</Modal>
+			) : null}
 		</DsRoot>
 	);
 };

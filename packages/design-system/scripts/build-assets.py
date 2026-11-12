@@ -118,25 +118,34 @@ def wood(dim=1.0, seed=11):
 
 
 def planks(dim=1.0, seed=3):
-	"""Calmer wood: 64x32 tile, two wide planks, low-contrast grain, a seam with a light lip and one butt joint each. Reads as wood at small size without noise."""
+	"""Subtle detailed wood: a warm orange-brown base, two boards with a faint seam between them, and plenty of fine grain: long and short streaks in two dark strengths, a light highlight
+	line under many of them, a few flecks. Contrast stays low so it works as a background. Periodic, 96x48."""
+	W, H = 96, 48
 	r = np.random.default_rng(seed)
-	W, H, PH = 64, 32, 16
-	base = np.array([112, 74, 42])
+	base = np.array([150, 95, 48])
 	img = np.zeros((H, W, 3), int)
-	for p in range(H // PH):
-		tone = base * r.choice([0.94, 1.0, 1.06])
-		y0 = p * PH
-		img[y0 : y0 + PH] = tone
-		for _ in range(4):
-			y = y0 + int(r.integers(3, PH - 2))
-			x, ln = int(r.integers(0, W)), int(r.integers(14, 40))
-			k = r.choice([0.93, 1.07])
-			for i in range(ln):
-				img[y, (x + i) % W] = tone * k
-		jx = int(r.integers(8, W - 8))
-		img[y0 + 1 : y0 + PH, jx] = tone * 0.7
-		img[y0] = tone * 0.55
-		img[y0 + 1] = np.clip(tone * 1.12, 0, 255)
+	img[:] = base
+
+	def line(y, x, ln, k):
+		img[y % H, [(x + i) % W for i in range(ln)]] = np.clip(base * k, 0, 255)
+
+	for y in range(2, H - 1):
+		if y in (23, 24, 25):
+			continue
+		if r.random() < 0.62:
+			x, ln = int(r.integers(0, W)), int(r.integers(10, 62))
+			line(y, x, ln, r.choice([0.9, 0.86]))
+			if r.random() < 0.55:  # highlight just under the streak, slightly offset
+				line(y + 1, x + int(r.integers(0, 6)), max(6, ln - int(r.integers(2, 12))), 1.06)
+		if r.random() < 0.35:  # a second, shorter dash on the same row
+			line(y, int(r.integers(0, W)), int(r.integers(4, 14)), r.choice([0.92, 1.05]))
+	for _ in range(26):  # flecks
+		img[int(r.integers(1, H - 1)), int(r.integers(0, W))] = np.clip(base * r.choice([0.8, 1.1]), 0, 255)
+	for x in range(W):  # board seams: top edge, a faint one mid-way
+		img[0, x] = np.clip(base * 1.1, 0, 255)
+		img[H - 1, x] = base * 0.86
+		img[24, x] = base * 0.84
+		img[25, x] = np.clip(base * 1.08, 0, 255)
 	return Image.fromarray(np.clip(img * dim, 0, 255).astype(np.uint8)).convert('RGBA')
 
 
@@ -169,5 +178,5 @@ def stone(seed=4):
 
 
 save('tex-wood', planks(1.0))
-save('tex-wood-dark', planks(0.62, seed=5))
+save('tex-wood-dark', planks(0.55, seed=5))
 save('tex-stone', stone())
