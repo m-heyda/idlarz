@@ -58,9 +58,7 @@ export const UpgradeTile: React.FC<UpgradeTileProps> = ({
 					<b className='ds-gold-text'>Next</b>
 					{next}
 				</div>
-			) : (
-				<div className='ds-upgrade-line ds-dim'>Fully upgraded</div>
-			)}
+			) : null}
 			<div className='ds-upgrade-foot'>
 				{state === 'maxed' ? (
 					<span className='ds-cost' style={{ color: 'var(--ds-r-epic)' }}>

@@ -357,3 +357,29 @@ export const CraftStash: React.FC<{ entries: StashEntry[]; onTake?: (id: string,
 		</div>
 	);
 };
+
+/** A dark pixel-styled dropdown (native select underneath, so it is keyboard and screen reader friendly). `options` are [value, label] pairs. */
+export const SelectBox: React.FC<{ value: string; onChange: (v: string) => void; options: [string, string][]; id?: string }> = ({
+	value,
+	onChange,
+	options,
+	id,
+}) => (
+	<select id={id} className='ds-select' value={value} onChange={(e) => onChange(e.target.value)}>
+		{options.map(([v, l]) => (
+			<option key={v} value={v}>
+				{l}
+			</option>
+		))}
+	</select>
+);
+
+/** A placeholder page for a tab that is not built yet: icon, title, a line of text and a "Coming soon" tag. */
+export const ComingSoon: React.FC<{ title: string; text: string; icon?: string }> = ({ title, text, icon }) => (
+	<div className='ds-soon'>
+		{icon ? <img src={icon} alt='' /> : null}
+		<div className='ds-soon-title'>{title}</div>
+		<span className='ds-soon-tag'>Coming soon</span>
+		<p>{text}</p>
+	</div>
+);

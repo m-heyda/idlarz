@@ -7,6 +7,8 @@ import {
 	AvatarGrid,
 	BadgeTitlePicker,
 	XpBar,
+	SelectBox,
+	ComingSoon,
 	CraftStash,
 	type StashEntry,
 	ContextMenu,
@@ -966,39 +968,468 @@ export const HeroWindowView: React.FC<{ initialTab?: 'bag' | 'stats' | 'craft' }
 	);
 };
 
-const ledger = [
-	{ icon: R('wood'), name: 'Wood', have: '484K', rate: '+299/s', sell: '0.82', buy: '1.90' },
-	{ icon: R('stone'), name: 'Stone', have: '558K', rate: '+148/s', sell: '0.98', buy: '1.80' },
-	{ icon: R('coal'), name: 'Coal', have: '683K', rate: '+831/s', sell: '1.20', buy: '2.20' },
-	{ icon: R('food'), name: 'Food', have: '5.81M', rate: '+937/s', sell: '0.44', buy: '0.80' },
-	{ icon: R('meat'), name: 'Meat', have: '4.40M', rate: '+899/s', sell: '1.09', buy: '2.00' },
+interface LedgerRes {
+	id: string;
+	name: string;
+	icon: string;
+	have: number;
+	rate: number;
+	sell: number;
+	/** 0 = not sold by the merchant (farm goods are earned, never bought) */
+	buy: number;
+}
+const LEDGER: LedgerRes[] = [
+	{ id: 'wood', name: 'Wood', icon: R('wood'), have: 484480, rate: 295.5, sell: 0.82, buy: 1.9 },
+	{ id: 'stone', name: 'Stone', icon: R('stone'), have: 558340, rate: 148, sell: 0.98, buy: 1.8 },
+	{ id: 'coal', name: 'Coal', icon: R('coal'), have: 682750, rate: 831, sell: 1.2, buy: 2.2 },
+	{ id: 'food', name: 'Food', icon: R('food'), have: 5810000, rate: 937.8, sell: 0.44, buy: 0.8 },
+	{ id: 'meat', name: 'Meat', icon: R('meat'), have: 4400000, rate: 899.9, sell: 1.09, buy: 2 },
+	{ id: 'eggs', name: 'Eggs', icon: R('eggs'), have: 123790, rate: 0, sell: 2.18, buy: 0 },
+	{ id: 'milk', name: 'Milk', icon: R('milk'), have: 227750, rate: 0, sell: 3.27, buy: 0 },
+	{ id: 'hide', name: 'Hide', icon: R('hide'), have: 1100000, rate: 0, sell: 2.18, buy: 0 },
 ];
 
-const upgrades = [
-	{ name: 'Bulk Discount', level: 0, max: 8, now: undefined, next: '-1% tile cost', cost: 250000, text: '250K' },
-	{ name: 'Haggler', level: 3, max: 10, now: '+9% gold on everything you sell', next: '+12% gold on everything you sell', cost: 686000, text: '686K' },
-	{ name: 'Click Power', level: 2, max: 8, now: 'a click pays 200% of your gold/s', next: 'a click pays 400% of your gold/s', cost: 730000, text: '730K' },
-	{ name: 'Foreman', level: 3, max: 10, now: '+3% income from every resource', next: '+4% income from every resource', cost: 900000, text: '900K' },
-	{ name: 'Lucky Charm', level: 3, max: 10, now: '+6 Luck for chests and kills', next: '+8 Luck for chests and kills', cost: 1030000, text: '1.03M' },
-	{ name: 'Pack Rat', level: 1, max: 4, now: '+4 bag slots', next: '+8 bag slots', cost: 1900000, text: '1.90M' },
-	{ name: 'Skinner', level: 2, max: 10, now: '+10% meat and hide from animals', next: '+15% meat and hide from animals', cost: 90000, text: '90K' },
-	{ name: 'Tinker', level: 4, max: 4, now: '+20% craft speed', next: undefined, cost: 0, text: '' },
+interface MockUpgrade {
+	id: string;
+	label: string;
+	group: 'economy' | 'combat' | 'rebirth';
+	max: number;
+	/** gold for level 1; each next level costs 1.6x more */
+	base: number;
+	desc: (n: number) => string;
+}
+/** The merchant's permanent upgrades as the game defines them (config/merchant.ts), three groups. */
+const UPGRADES: MockUpgrade[] = [
+	{ id: 'haggler', label: 'Haggler', group: 'economy', max: 10, base: 30000, desc: (n) => `+${Math.round(n * 3)}% gold from everything you sell` },
+	{ id: 'bulk', label: 'Bulk Discount', group: 'economy', max: 8, base: 25000, desc: (n) => `-${n}% tile cost` },
+	{ id: 'luck', label: 'Lucky Charm', group: 'economy', max: 10, base: 40000, desc: (n) => `+${n * 2} Luck for chests and kills` },
+	{ id: 'packrat', label: 'Pack Rat', group: 'economy', max: 6, base: 60000, desc: (n) => `+${n * 8} bag slots` },
+	{ id: 'foreman', label: 'Foreman', group: 'economy', max: 10, base: 35000, desc: (n) => `+${n}% income from every resource, gold included` },
+	{ id: 'skinner', label: 'Skinner', group: 'economy', max: 8, base: 30000, desc: (n) => `+${n * 5}% meat and hide from your animals` },
+	{ id: 'hands', label: 'Quick Hands', group: 'combat', max: 8, base: 45000, desc: (n) => `+${n * 2}% attack speed` },
+	{ id: 'eye', label: 'Keen Eye', group: 'combat', max: 8, base: 45000, desc: (n) => `+${n}% crit chance` },
+	{ id: 'aim', label: 'Deadly Aim', group: 'combat', max: 8, base: 60000, desc: (n) => `+${n}% chance that a crit is a super crit` },
+	{ id: 'might', label: 'Might', group: 'combat', max: 8, base: 50000, desc: (n) => `+${n * 2}% damage with physical weapons` },
+	{ id: 'arcana', label: 'Arcana', group: 'combat', max: 8, base: 50000, desc: (n) => `+${n * 2}% damage with staves and wands` },
+	{ id: 'fang', label: 'Vampiric Fang', group: 'combat', max: 6, base: 80000, desc: (n) => `+${n * 0.5}% life leech: HP back from the damage you deal` },
+	{ id: 'wind', label: 'Second Wind', group: 'combat', max: 6, base: 70000, desc: (n) => `+${n * 0.25} HP regenerated per second` },
+	{ id: 'tithe', label: 'Ancestral Tithe', group: 'rebirth', max: 10, base: 200000, desc: (n) => `+${n * 5}% Embers from your next rebirth` },
 ];
+const GROUP_TITLES: Record<MockUpgrade['group'], string> = { economy: 'Economy', combat: 'Combat', rebirth: 'Rebirth' };
+const upgradeCost = (u: MockUpgrade, level: number) => Math.round(u.base * Math.pow(1.6, level));
+
+interface Offer {
+	id: string;
+	icon: string;
+	name: string;
+	type: string;
+	rarity?: Rarity;
+	price: number;
+	rows: { label: string; value: string }[];
+}
+const SHELF_START: Offer[] = [
+	{
+		id: 'o1',
+		icon: I('item_bronze_dirk'),
+		name: 'Bronze Dirk',
+		type: 'Common · One-handed · ilvl 14',
+		price: 9000,
+		rows: [
+			{ label: 'Damage', value: '22 - 31' },
+			{ label: 'Attack speed', value: '1.1/s' },
+		],
+	},
+	{
+		id: 'o2',
+		icon: I('item_cloth_mantle'),
+		name: 'Cloth Mantle',
+		type: 'Uncommon · Shoulder · ilvl 17',
+		rarity: 'uncommon',
+		price: 28000,
+		rows: [
+			{ label: 'Armor', value: '9' },
+			{ label: 'Intelligence', value: '+4' },
+		],
+	},
+	{
+		id: 'o3',
+		icon: I('item_bronze_hammer'),
+		name: 'Bronze Hammer',
+		type: 'Uncommon · Two-handed · ilvl 18',
+		rarity: 'uncommon',
+		price: 52000,
+		rows: [
+			{ label: 'Damage', value: '48 - 64' },
+			{ label: 'Strength', value: '+5' },
+		],
+	},
+	{ id: 'o4', icon: I('item_cloth_gloves'), name: 'Cloth Gloves', type: 'Common · Hands · ilvl 12', price: 6000, rows: [{ label: 'Armor', value: '4' }] },
+	{ id: 'o5', icon: I('item_cloth_ring'), name: 'Plain Ring', type: 'Common · Ring · ilvl 13', price: 5000, rows: [{ label: 'Luck', value: '+2' }] },
+	{
+		id: 'o6',
+		icon: I('item_bronze_crossbow'),
+		name: 'Bronze Crossbow',
+		type: 'Uncommon · Two-handed · ilvl 19',
+		rarity: 'uncommon',
+		price: 64000,
+		rows: [
+			{ label: 'Damage', value: '40 - 58' },
+			{ label: 'Dexterity', value: '+6' },
+		],
+	},
+	{ id: 'p1', icon: I('item_potion_hp'), name: 'Health Potion', type: 'Common · Potion', price: 60, rows: [{ label: 'Restores', value: '120 HP' }] },
+	{ id: 'p2', icon: I('item_potion_greater'), name: 'Greater Potion', type: 'Common · Potion', price: 320, rows: [{ label: 'Restores', value: '340 HP' }] },
+];
+interface BagSell {
+	id: string;
+	icon: string;
+	name: string;
+	kind: 'gear' | 'potion';
+	rarity?: Rarity;
+	count?: number;
+	value: number;
+}
+const SELL_BAG_START: BagSell[] = [
+	{ id: 'b1', icon: I('item_potion_hp'), name: 'Health Potion', kind: 'potion', count: 88, value: 12 },
+	{ id: 'b2', icon: I('item_wooden_sword'), name: 'Wooden Sword', kind: 'gear', rarity: 'uncommon', value: 40 },
+	{ id: 'b3', icon: I('item_cloth_robe'), name: 'Dusk Robe', kind: 'gear', rarity: 'epic', value: 9800 },
+	{ id: 'b4', icon: I('item_wooden_ring'), name: 'Wooden Ring', kind: 'gear', value: 8 },
+	{ id: 'b5', icon: I('item_cloth_hat'), name: 'Pointed Hat', kind: 'gear', rarity: 'uncommon', value: 90 },
+	{ id: 'b6', icon: I('item_bone_knife'), name: 'Bone Knife', kind: 'gear', value: 14 },
+];
+
+/** Resources tab: stock ledger (big rows) and the trade ticket with a slider. */
+const ResourcesTab: React.FC<{ gold: number; setGold: (g: number) => void }> = ({ gold, setGold }) => {
+	const [rows, setRows] = useState(LEDGER);
+	const [sel, setSel] = useState(0);
+	const [mode, setMode] = useState<'sell' | 'buy'>('sell');
+	const [amt, setAmt] = useState(1);
+	const r = rows[sel];
+	const price = mode === 'sell' ? r.sell : r.buy;
+	const canBuy = r.buy > 0;
+	const max = mode === 'sell' ? Math.max(1, Math.floor(r.have)) : canBuy ? Math.max(1, Math.floor(gold / r.buy)) : 1;
+	const n = Math.min(amt, max);
+	const base = n * price;
+	const bonus = mode === 'sell' ? base * 0.09 : 0;
+	const total = Math.round(base + bonus);
+	const afford = mode === 'sell' || (canBuy && total <= gold);
+	const act = () => {
+		setRows((rs) => rs.map((x, i) => (i === sel ? { ...x, have: mode === 'sell' ? x.have - n : x.have + n } : x)));
+		setGold(mode === 'sell' ? gold + total : gold - total);
+		setAmt(1);
+	};
+	return (
+		<div className='ds-merch-res'>
+			<Panel parchment className='ds-ledger ds-stock'>
+				<div className='ds-capi'>Stock ledger</div>
+				<div className='ds-stock-head'>
+					<span>Resource</span>
+					<span>You have</span>
+					<span>Income</span>
+					<span>Sell</span>
+					<span>Buy</span>
+				</div>
+				{rows.map((x, i) => (
+					<button
+						type='button'
+						key={x.id}
+						className='ds-stock-row'
+						data-active={sel === i}
+						onClick={() => {
+							setSel(i);
+							setAmt(1);
+							if (!x.buy) setMode('sell');
+						}}
+					>
+						<span className='ds-stock-name'>
+							<img src={x.icon} alt='' />
+							{x.name}
+						</span>
+						<span>{compact(x.have)}</span>
+						<span style={{ color: x.rate ? GREEN : '#8a7a5a' }}>{x.rate ? `+${Math.round(x.rate)}/s` : '—'}</span>
+						<span>{x.sell.toFixed(2)}</span>
+						<span style={{ color: x.buy ? BLUE : '#8a7a5a' }}>{x.buy ? x.buy.toFixed(2) : 'not sold'}</span>
+					</button>
+				))}
+				<div className='ds-paper-foot'>Prices per unit in gold. Haggler: +9% on sales. Buying costs 2x base. Farm goods are earned, never bought.</div>
+			</Panel>
+			<Panel className='ds-ticket'>
+				<div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+					<Slot large icon={r.icon} />
+					<div>
+						<div style={{ fontSize: 18 }}>{r.name}</div>
+						<div className='ds-dim' style={{ fontSize: 12 }}>
+							You have {compact(r.have)}
+							{r.rate ? ` · +${r.rate.toFixed(1)}/s income` : ''}
+						</div>
+					</div>
+				</div>
+				<div style={{ display: 'flex', gap: 6 }}>
+					<Button tone={mode === 'sell' ? 'gold' : 'dark'} style={{ flex: 1 }} onClick={() => setMode('sell')}>
+						Sell
+					</Button>
+					<Button tone={mode === 'buy' ? 'gold' : 'dark'} style={{ flex: 1 }} disabled={!canBuy} onClick={() => setMode('buy')}>
+						Buy
+					</Button>
+				</div>
+				<SectionLabel>Amount</SectionLabel>
+				<div style={{ display: 'flex', gap: 6 }}>
+					{[0.1, 0.25, 0.5, 1].map((p) => (
+						<Button key={p} tone={n === Math.max(1, Math.floor(max * p)) ? 'gold' : 'stone'} onClick={() => setAmt(Math.max(1, Math.floor(max * p)))}>
+							{p === 1 ? 'Max' : `${p * 100}%`}
+						</Button>
+					))}
+				</div>
+				<Slider min={1} max={max} value={n} onChange={setAmt} readout={fmtInt(n)} />
+				<Inset style={{ fontSize: 13 }}>
+					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+						<span className='ds-dim'>
+							{fmtInt(n)} × {price.toFixed(2)} gold
+						</span>
+						<span>{compact(base)}</span>
+					</div>
+					{mode === 'sell' ? (
+						<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+							<span className='ds-dim'>Haggler +9%</span>
+							<span className='ds-good'>+{compact(bonus)}</span>
+						</div>
+					) : null}
+					<Divider />
+					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+						<span className='ds-gold-text ds-caps'>{mode === 'sell' ? 'You receive' : 'You pay'}</span>
+						<span style={{ fontSize: 22, color: mode === 'sell' || afford ? 'var(--ds-good)' : 'var(--ds-bad)' }}>{compact(total)} gold</span>
+					</div>
+				</Inset>
+				<Button tone='gold' style={{ minHeight: 42 }} disabled={!afford} onClick={act}>
+					{mode === 'sell' ? 'Sell' : 'Buy'} {compact(n)} {r.name.toLowerCase()}
+				</Button>
+			</Panel>
+		</div>
+	);
+};
+
+/** Goods tab: the shelf (gear + potions with a price and Buy under each), then your bag to sell from with Quick sell and auto-sell on a paper ticket. */
+const GoodsTab: React.FC<{ gold: number; setGold: (g: number) => void }> = ({ gold, setGold }) => {
+	const [shelf, setShelf] = useState(SHELF_START);
+	const [bag, setBag] = useState(SELL_BAG_START);
+	const [filter, setFilter] = useState<'all' | 'gear' | 'potion'>('all');
+	const [auto, setAuto] = useState('off');
+	const [note, setNote] = useState('');
+	const shown = bag.filter((b) => filter === 'all' || b.kind === filter);
+	const worth = shown.reduce((a, b) => a + b.value * (b.count ?? 1), 0);
+	return (
+		<div className='ds-goods'>
+			<Inset className='ds-shelf'>
+				<div className='ds-shelf-head'>
+					<SectionLabel>Today’s goods</SectionLabel>
+					<span className='ds-dim' style={{ fontSize: 12 }}>
+						Gear up to item level 20 (you wear 15). Potions never run out.
+					</span>
+					<span className='ds-dim' style={{ marginLeft: 'auto', fontSize: 12 }}>
+						New stock in <b style={{ color: '#fff', fontWeight: 400 }}>21m 17s</b>
+					</span>
+					<Button
+						tone='gold'
+						onClick={() => {
+							setShelf(SHELF_START);
+							setNote('The shelf is restocked');
+						}}
+					>
+						Restock · 80K
+					</Button>
+				</div>
+				<div className='ds-shelf-grid'>
+					{shelf.map((o) => (
+						<div className='ds-shelf-item' key={o.id}>
+							<HoverTip
+								tip={
+									<ItemTooltip
+										rarity={o.rarity ?? 'common'}
+										icon={o.icon}
+										name={o.name}
+										type={o.type}
+										rows={o.rows}
+										footer={['Shelf', `Price ${compact(o.price)}`]}
+									/>
+								}
+							>
+								<Slot large icon={o.icon} rarity={o.rarity} />
+							</HoverTip>
+							<span className='ds-shelf-price'>
+								<img src={I('gold')} alt='' />
+								{compact(o.price)}
+							</span>
+							<Button
+								tone={gold >= o.price ? 'stone' : 'dark'}
+								disabled={gold < o.price}
+								onClick={() => {
+									setGold(gold - o.price);
+									setShelf((s) => s.filter((x) => x.id !== o.id));
+									setNote(`Bought ${o.name} for ${compact(o.price)} gold`);
+								}}
+							>
+								{gold >= o.price ? 'Buy' : 'Need more'}
+							</Button>
+						</div>
+					))}
+					{shelf.length === 0 ? (
+						<p className='ds-dim' style={{ fontSize: 13 }}>
+							Sold out. New goods arrive soon.
+						</p>
+					) : null}
+				</div>
+			</Inset>
+			<div className='ds-goods-low'>
+				<Inset className='ds-sellbag'>
+					<div className='ds-shelf-head'>
+						<SectionLabel>Your bag</SectionLabel>
+						<span className='ds-dim' style={{ fontSize: 12 }}>
+							Worn gear is never listed.
+						</span>
+						<span className='ds-filters'>
+							{(['all', 'gear', 'potion'] as const).map((f) => (
+								<button key={f} type='button' data-active={filter === f} onClick={() => setFilter(f)}>
+									{f === 'all' ? 'All' : f === 'gear' ? 'Gear' : 'Potions'}
+								</button>
+							))}
+						</span>
+					</div>
+					<div className='ds-sellbag-grid'>
+						{shown.map((b) => (
+							<Slot
+								key={b.id}
+								icon={b.icon}
+								rarity={b.rarity}
+								count={b.count}
+								title={`${b.name}: click to sell one for ${b.value} gold`}
+								onClick={() => {
+									setGold(gold + b.value);
+									setBag((x) => x.flatMap((y) => (y.id !== b.id ? [y] : (y.count ?? 1) <= 1 ? [] : [{ ...y, count: (y.count ?? 1) - 1 }])));
+									setNote(`Sold ${b.name} for ${b.value} gold`);
+								}}
+							/>
+						))}
+					</div>
+					<div className='ds-dim' style={{ fontSize: 12, marginTop: 'auto' }}>
+						{note || 'Click an item to sell one. Shift-click sells the stack.'}
+					</div>
+				</Inset>
+				<Panel parchment className='ds-ledger ds-quick'>
+					<div className='ds-capi'>Quick sell</div>
+					<div className='ds-paper-row' style={{ height: 'auto', padding: '6px 0' }}>
+						<span>{shown.length} shown</span>
+						<b style={{ color: GOLD }}>{compact(worth)} gold</b>
+					</div>
+					<Button
+						tone='gold'
+						disabled={shown.length === 0}
+						onClick={() => {
+							setGold(gold + worth);
+							setBag((x) => x.filter((y) => !shown.includes(y)));
+							setNote(`Sold ${shown.length} stacks for ${compact(worth)} gold`);
+						}}
+					>
+						Sell {filter === 'all' ? 'everything shown' : filter === 'gear' ? 'all gear' : 'all potions'}
+					</Button>
+					<div className='ds-paper-rule' />
+					<label className='ds-paper-label'>
+						Auto-sell new gear up to
+						<SelectBox
+							value={auto}
+							onChange={setAuto}
+							options={[
+								['off', 'Off (keep everything)'],
+								['common', 'Common'],
+								['uncommon', 'Uncommon'],
+							]}
+						/>
+					</label>
+					<div className='ds-paper-foot' style={{ marginTop: 'auto' }}>
+						Auto-sell never touches potions, set pieces or anything above the rarity you pick.
+					</div>
+				</Panel>
+			</div>
+		</div>
+	);
+};
+
+/** Upgrades tab: grouped (Economy, Combat, Rebirth), each group sorted by what you can afford first; buying raises the level and spends the gold. */
+const UpgradesTab: React.FC<{ gold: number; setGold: (g: number) => void }> = ({ gold, setGold }) => {
+	const [levels, setLevels] = useState<Record<string, number>>({
+		haggler: 3,
+		bulk: 0,
+		luck: 3,
+		packrat: 1,
+		foreman: 10,
+		skinner: 2,
+		hands: 2,
+		eye: 5,
+		aim: 0,
+		might: 1,
+		arcana: 0,
+		fang: 0,
+		wind: 6,
+		tithe: 0,
+	});
+	return (
+		<div className='ds-ups'>
+			{(Object.keys(GROUP_TITLES) as MockUpgrade['group'][]).map((g) => (
+				<div key={g}>
+					<div className='ds-ups-head'>
+						<SectionLabel>{GROUP_TITLES[g]}</SectionLabel>
+						<span className='ds-dim' style={{ fontSize: 12 }}>
+							Permanent. Sorted by what you can afford first.
+						</span>
+					</div>
+					<div className='ds-ups-grid'>
+						{UPGRADES.filter((u) => u.group === g)
+							.map((u) => ({ u, lvl: levels[u.id] ?? 0 }))
+							.sort(
+								(a, b) =>
+									Number(a.lvl >= a.u.max) - Number(b.lvl >= b.u.max) || Number(upgradeCost(a.u, a.lvl) > gold) - Number(upgradeCost(b.u, b.lvl) > gold),
+							)
+							.map(({ u, lvl }) => {
+								const cost = upgradeCost(u, lvl);
+								return (
+									<UpgradeTile
+										key={u.id}
+										name={u.label}
+										level={lvl}
+										maxLevel={u.max}
+										now={lvl > 0 ? u.desc(lvl) : undefined}
+										next={u.desc(lvl + 1)}
+										cost={cost}
+										costText={compact(cost)}
+										costIcon={I('gold')}
+										have={gold}
+										shortText={`Need ${compact(cost - gold)} more`}
+										onBuy={() => {
+											setGold(gold - cost);
+											setLevels({ ...levels, [u.id]: lvl + 1 });
+										}}
+									/>
+								);
+							})}
+					</div>
+				</div>
+			))}
+		</div>
+	);
+};
 
 /**
- * The merchant: tabs along the top with the gold purse on the right. Resources shows a parchment stock ledger plus a trade ticket; Upgrades is a grid of upgrade tiles whose level
- * is shown as diamond gems (yellow, purple when maxed), sorted by what you can afford first.
+ * The merchant: tabs along the top with the gold purse on the right. Resources: stock ledger + trade ticket with slider. Goods: the shelf and your bag with quick sell. Upgrades: grouped tiles with
+ * diamond level gems. Quests and Gambling are coming-soon pages. Everything is interactive on mock state (gold, stock, levels) so the flows can be tested.
  */
-export const MerchantView: React.FC<{ initialTab?: 'resources' | 'upgrades' }> = ({ initialTab = 'upgrades' }) => {
+export const MerchantView: React.FC<{ initialTab?: 'resources' | 'goods' | 'upgrades' }> = ({ initialTab = 'resources' }) => {
 	const [tab, setTab] = useState<string>(initialTab);
-	const [sel, setSel] = useState(0);
-	const gold = 102000;
+	const [gold, setGold] = useState(102000);
 	return (
-		<DsRoot style={{ padding: '30px 20px 20px', background: '#0b1022', width: 'fit-content' }}>
+		<DsRoot style={{ padding: 24, background: '#0b1022', minHeight: '100vh', boxSizing: 'border-box' }}>
 			<WindowShell
 				title='Merchant'
-				width={1180}
-				height={640}
+				width={1100}
+				height={700}
 				bar={
 					<Tabs
 						active={tab}
@@ -1007,124 +1438,27 @@ export const MerchantView: React.FC<{ initialTab?: 'resources' | 'upgrades' }> =
 							{ id: 'resources', label: 'Resources' },
 							{ id: 'goods', label: 'Goods' },
 							{ id: 'upgrades', label: 'Upgrades', badge: 1 },
-							{ id: 'quests', label: 'Quests', badge: 8 },
+							{ id: 'quests', label: 'Quests' },
 							{ id: 'gambling', label: 'Gambling' },
 						]}
 					/>
 				}
-				barRight={<ResourceChip icon={I('gold')} value='102K' />}
+				barRight={<ResourceChip icon={I('gold')} value={compact(gold)} />}
 			>
-				{tab === 'upgrades' ? (
-					<div style={{ padding: 6 }}>
-						<p style={{ margin: '0 0 8px', fontSize: 13 }}>
-							<span className='ds-gold-text ds-caps' style={{ marginRight: 8 }}>
-								Economy
-							</span>
-							<span className='ds-dim'>Permanent. Sorted by what you can afford first.</span>
-						</p>
-						<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-							{[...upgrades]
-								.sort((a, b) => Number(a.cost > gold) - Number(b.cost > gold))
-								.map((u) => (
-									<UpgradeTile
-										key={u.name}
-										name={u.name}
-										icon={I('gold')}
-										level={u.level}
-										maxLevel={u.max}
-										now={u.now}
-										next={u.next}
-										cost={u.cost}
-										costText={u.text}
-										costIcon={I('gold')}
-										have={gold}
-										shortText={`Need ${Math.max(0, Math.round((u.cost - gold) / 1000))}K more`}
-									/>
-								))}
-						</div>
-					</div>
+				{tab === 'resources' ? (
+					<ResourcesTab gold={gold} setGold={setGold} />
+				) : tab === 'goods' ? (
+					<GoodsTab gold={gold} setGold={setGold} />
+				) : tab === 'upgrades' ? (
+					<UpgradesTab gold={gold} setGold={setGold} />
+				) : tab === 'quests' ? (
+					<ComingSoon
+						title='Quests'
+						icon={I('menu_achievements')}
+						text='The merchant will post jobs here: bring goods, hunt a beast, earn gold and rare rewards.'
+					/>
 				) : (
-					<div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 12, minHeight: 500 }}>
-						<Panel parchment style={{ overflow: 'hidden' }}>
-							<SectionLabel>Stock ledger</SectionLabel>
-							<div style={{ display: 'grid', gridTemplateColumns: '28px 1fr 80px 90px 60px 60px', gap: 4, padding: '8px 4px', fontSize: 11, opacity: 0.7 }}>
-								<span />
-								<span>RESOURCE</span>
-								<span>YOU HAVE</span>
-								<span>INCOME</span>
-								<span>SELL</span>
-								<span>BUY</span>
-							</div>
-							{ledger.map((r, i) => (
-								<div
-									key={r.name}
-									onClick={() => setSel(i)}
-									style={{
-										display: 'grid',
-										gridTemplateColumns: '28px 1fr 80px 90px 60px 60px',
-										gap: 4,
-										alignItems: 'center',
-										padding: '6px 4px',
-										borderTop: '1px solid rgba(74,53,22,.25)',
-										background: sel === i ? 'rgba(120,80,160,.25)' : undefined,
-										cursor: 'pointer',
-										fontSize: 14,
-									}}
-								>
-									<img src={r.icon} alt='' width={22} height={22} />
-									<span>{r.name}</span>
-									<span>{r.have}</span>
-									<span style={{ color: '#2d7a3f' }}>{r.rate}</span>
-									<span>{r.sell}</span>
-									<span style={{ color: '#2b4ea8' }}>{r.buy}</span>
-								</div>
-							))}
-						</Panel>
-						<Panel>
-							<div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-								<Slot large icon={ledger[sel].icon} />
-								<div>
-									<div style={{ fontSize: 18 }}>{ledger[sel].name}</div>
-									<div className='ds-dim' style={{ fontSize: 12 }}>
-										You have {ledger[sel].have} · {ledger[sel].rate} income
-									</div>
-								</div>
-							</div>
-							<div style={{ display: 'flex', gap: 6, margin: '10px 0' }}>
-								<Button tone='gold' style={{ flex: 1 }}>
-									Sell
-								</Button>
-								<Button tone='dark' style={{ flex: 1 }}>
-									Buy
-								</Button>
-							</div>
-							<SectionLabel>Amount</SectionLabel>
-							<div style={{ display: 'flex', gap: 6, margin: '6px 0 10px' }}>
-								<Button>10%</Button>
-								<Button tone='gold'>25%</Button>
-								<Button>50%</Button>
-								<Button>Max</Button>
-							</div>
-							<Inset style={{ fontSize: 13 }}>
-								<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-									<span className='ds-dim'>121,120 × 0.82 gold</span>
-									<span>91.1K</span>
-								</div>
-								<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-									<span className='ds-dim'>Haggler +9%</span>
-									<span className='ds-good'>+8.2K</span>
-								</div>
-								<Divider />
-								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-									<span className='ds-gold-text ds-caps'>You receive</span>
-									<span style={{ fontSize: 22, color: 'var(--ds-good)' }}>99.3K gold</span>
-								</div>
-							</Inset>
-							<Button tone='gold' style={{ width: '100%', marginTop: 10, minHeight: 42 }}>
-								Sell 121K wood
-							</Button>
-						</Panel>
-					</div>
+					<ComingSoon title='Gambling' icon={I('menu_gems_pouch')} text='Dice, wheels and a risky wager or two. The back room is still being built.' />
 				)}
 			</WindowShell>
 		</DsRoot>
