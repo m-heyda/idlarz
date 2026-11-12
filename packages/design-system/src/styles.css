@@ -4385,3 +4385,8 @@ button.ds-income-head:hover {
 	font-size: 10px;
 	color: #7a7f90;
 }
+
+/* the login and register tabs of the landing page sit in the middle */
+.ld-form-tabs .ds-tabs {
+	justify-content: center;
+}

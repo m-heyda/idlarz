@@ -84,7 +84,7 @@ import { useSpawnSync } from '@/hooks/useSpawnSync';
 import OfflineDialog from '@/components/game/overlays/OfflineDialog';
 import DailyBonusDialog from '@/components/game/overlays/DailyBonusDialog';
 import TutorialGuide from '@/components/game/tutorial/TutorialGuide';
-import PetWelcomeDialog from '@/components/game/overlays/PetWelcomeDialog';
+import { usePetStore } from '@/stores/petStore';
 
 interface GameAppProps {
 	/** The account's name and hero, given to a brand-new game only (never to one that has been played). */
@@ -167,6 +167,14 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 		applyProfileToFreshGame(profile.characterName, profile.playerClass);
 	}, [profile, isHydrated, tabStatus, applyProfileToFreshGame]);
 
+	// the pets: asked once per start of the game (this is where the special pet is granted and which pets the castle shows)
+	const petsAsked = useRef(false);
+	useEffect(() => {
+		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done' || petsAsked.current) return;
+		petsAsked.current = true;
+		void usePetStore.getState().sync();
+	}, [isHydrated, tabStatus, claim]);
+
 	useEffect(() => {
 		// Only the owning tab runs the game, and only once the saved game has been loaded
 		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done') return;
@@ -203,7 +211,6 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			{/* after the welcome-back window: the daily bonus, once the start of the game is done */}
 			<DailyBonusDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
-			<PetWelcomeDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<ConfirmDialogs />
 			<BuildModal />
 			<BuildingModal />

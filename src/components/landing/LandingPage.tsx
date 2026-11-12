@@ -304,14 +304,16 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 									)}
 									{visitor.name === 'guest' && (
 										<>
-											<Tabs
-												active={mode === 'register' ? 'register' : 'login'}
-												onChange={(id) => pickMode(id as AuthMode)}
-												items={[
-													{ id: 'login', label: 'Log in' },
-													{ id: 'register', label: 'Create account' },
-												]}
-											/>
+											<div className='ld-form-tabs'>
+												<Tabs
+													active={mode === 'register' ? 'register' : 'login'}
+													onChange={(id) => pickMode(id as AuthMode)}
+													items={[
+														{ id: 'login', label: 'Log in' },
+														{ id: 'register', label: 'Create account' },
+													]}
+												/>
+											</div>
 											<div className='ld-form'>
 												<AuthForm
 													key={formKey}

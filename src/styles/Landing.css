@@ -69,7 +69,7 @@
 .ld-col-account {
 	width: min(430px, 29vw);
 	min-width: 320px;
-	align-items: center; /* the window is as tall as its content and sits in the middle of the column */
+	align-items: flex-start; /* the window is as tall as its content and sits at the top of the column (more will go under it) */
 }
 
 .ld-col-account .ld-frame {

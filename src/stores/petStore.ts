@@ -8,7 +8,7 @@ import { requestPets } from '@/lib/rewardsClient';
 interface PetStoreState {
 	/** The pets the account owns (ids of the catalog); empty until the server answered */
 	owned: string[];
-	/** The welcome letter waiting to be shown, or null */
+	/** The welcome letter the server still holds (no window shows it any more; `sync` marks it read), or null */
 	letter: PetsReply['letter'];
 	/** Asks the server (once per start of the game): this is also where the special pet is granted */
 	sync: () => Promise<void>;
@@ -22,7 +22,10 @@ export const usePetStore = create<PetStoreState>((set) => ({
 	letter: null,
 	sync: async () => {
 		const reply = await requestPets(newClaimId(), { action: 'sync' });
-		if (reply.status === 'ok') set({ owned: reply.value.owned, letter: reply.value.letter });
+		if (reply.status !== 'ok') return;
+		set({ owned: reply.value.owned, letter: null });
+		// the welcome letter has no window any more: it is marked as read at once so the server stops sending it
+		if (reply.value.letter) void usePetStore.getState().closeLetter(reply.value.letter.petId);
 	},
 	closeLetter: async (petId) => {
 		// closed in the browser at once; the server keeps the record (a failed request only shows the letter once more at the next start)
