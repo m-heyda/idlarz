@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 119,
+  "line": 120,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -305,6 +305,17 @@
   "file": "src/catalog/perkCaps.ts",
   "line": 57,
   "summary": "The one function that caps the perk families of a summed gear block. `aggregateStats` calls it, and the server reads gear only through `aggregateStats` (fight profile, income summary), so the browser and the server cannot disagree. A new object is returned; stats without a cap pass through unchanged.",
+  "see": []
+ },
+ {
+  "id": "petdef",
+  "name": "PetDef",
+  "symbol": "PetDef",
+  "kind": "interface",
+  "category": "Progression/Pets",
+  "file": "src/catalog/pets.ts",
+  "line": 10,
+  "summary": "A pet of the catalog (pure config). Pets are cosmetic: they give no stat, drop from nothing and are never sold; a pet exists in an account only when the server granted it (`applyPets`). Ids are append-only (a save or ledger may name one forever); retire a pet with a flag, never by removing or renaming its id.",
   "see": []
  },
  {
@@ -2287,7 +2298,7 @@
   "kind": "interface",
   "category": "Saves & Server/The ledger",
   "file": "src/lib/offline/ledger.ts",
-  "line": 146,
+  "line": 158,
   "summary": "The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor, the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result, `combat` (HP, mana, cooldowns, the open fight, queue, switches, retry times, event log), `inv` (bag, gear, pity, auto-sell, Pack Rat size), `stats` (lifetime counters: kills per monster type, chests, tiles bought, income earned; see `stats.ts`) and `resetAt`.",
   "see": [
    "sealedRng",
@@ -2318,6 +2329,17 @@
    "ledgerFromRow",
    "upgradeBody"
   ]
+ },
+ {
+  "id": "applypets",
+  "name": "applyPets",
+  "symbol": "applyPets",
+  "kind": "function",
+  "category": "Progression/Pets",
+  "file": "src/lib/offline/pets.ts",
+  "line": 28,
+  "summary": "Applies one pets request to the ledger. `sync` grants the special pet to the one account the server is configured for (`grantUserId`, the `YUKI_GRANT_USER_ID` variable; nobody is granted anything while it is empty or the user id differs) and answers what the account owns and which letter is still to be shown. `ack` records that the player closed a letter, so it never comes again. Idempotent: running either again changes nothing. A pet is not in any drop table, shop or chest. The id of an account that is not the configured one gets no pet, no letter and no trace in its ledger.",
+  "see": []
  },
  {
   "id": "placetickets",
@@ -2461,6 +2483,28 @@
   "file": "src/lib/offline/winChance.ts",
   "line": 60,
   "summary": "The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.",
+  "see": []
+ },
+ {
+  "id": "nextwanderstep",
+  "name": "nextWanderStep",
+  "symbol": "nextWanderStep",
+  "kind": "function",
+  "category": "Progression/Pets",
+  "file": "src/lib/pets.ts",
+  "line": 29,
+  "summary": "The pet's next step: one step sideways, up, down or diagonally, never leaving `PET_RANGE` (3) steps from the castle's middle (a step that would leave it is turned back inwards, so it keeps moving near the edge). Cosmetic only: nothing in the game reads it.",
+  "see": []
+ },
+ {
+  "id": "pickpetphrase",
+  "name": "pickPetPhrase",
+  "symbol": "pickPetPhrase",
+  "kind": "function",
+  "category": "Progression/Pets",
+  "file": "src/lib/pets.ts",
+  "line": 51,
+  "summary": "Which phrase the pet says next: a random one that is not the last one said (`lastIndex`, or -1 for none). -1 when it has nothing to say.",
   "see": []
  },
  {

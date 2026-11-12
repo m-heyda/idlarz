@@ -35,6 +35,7 @@ import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 import { claimAchievement, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
 import { bestiaryOf } from '@/lib/offline/stats';
 import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
+import { applyPets, type PetsReply, type PetsRequest } from '@/lib/offline/pets';
 
 // The server's side of play while the player is here: spawns, chests and fights. The server mints the tickets from its own clock, puts
 // the monsters on the map, rolls the contents from a secret and runs every fight (see fight.ts). Each call is one compare-and-swap on the
@@ -553,3 +554,20 @@ export const tutorialStep = (
 		},
 		invVer,
 	);
+
+/**
+ * The cosmetic pets, see {@link applyPets}: grants the special pet to the one configured account and answers what the account owns and which welcome letter is still to be shown; `ack` records that the letter was closed.
+ * Always keyed: the grant is a write, and a repeated request gets the stored answer.
+ */
+export const petsStep = (
+	deps: ServiceDeps,
+	userId: string,
+	key: string,
+	request: PetsRequest,
+	grantUserId: string,
+	nowMs: number,
+): Promise<Online<PetsReply>> =>
+	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: PetsReply } => {
+		const out = applyPets(ctx.ledger, userId, request, grantUserId);
+		return { ledger: out.ledger, value: out.reply };
+	});

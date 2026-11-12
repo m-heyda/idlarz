@@ -2,6 +2,7 @@ import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest } from '@/lib/offline/gemTypes';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
+import type { PetsReply, PetsRequest } from '@/lib/offline/pets';
 import type { AchievementReport } from '@/lib/offline/achievements';
 import type { BestiaryReport } from '@/lib/offline/stats';
 import { epochFetch } from '@/lib/epochFetch';
@@ -113,3 +114,6 @@ export const requestCharacter = (key: string | null, request: CharacterRequest):
 /** The guided tutorial: `sync` reads the account's progress; `done`, `lesson` and `skip` record it (one key per request) and a finished step may pay its starter bundle. */
 export const requestTutorial = (key: string, request: TutorialRequest): Promise<Reply<TutorialReply>> =>
 	post<TutorialReply>('/api/tutorial', { key, ...request });
+
+/** The cosmetic pets: `sync` asks what the account owns and whether a welcome letter is waiting; `ack` says the letter was closed (one key per request). */
+export const requestPets = (key: string, request: PetsRequest): Promise<Reply<PetsReply>> => post<PetsReply>('/api/pets', { key, ...request });

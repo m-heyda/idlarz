@@ -10,6 +10,8 @@ import audioManager from '@/utils/audioManager';
 import PixelIcon, { PixelSheet } from './PixelIcon';
 import CastleSprite from './CastleSprite';
 import CastleTimerBadge from './CastleTimerBadge';
+import PetSprite from './pets/PetSprite';
+import { usePetStore } from '@/stores/petStore';
 import { maxLevelOf, monsterAt } from '@/lib/monsters';
 import { useWindowStore } from '@/stores/windowStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -38,6 +40,8 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 	const monsterTicket = game((state) => (monsterId ? monsterAt(state.monsters, x, y)?.ticket : undefined));
 	const queuePos = useGameStore((state) => (monsterTicket === undefined ? 0 : state.combat.queue.findIndex((q) => q.n === monsterTicket) + 1));
 	const lineOpen = useGameStore((state) => !!state.combat.fight || state.combat.queue.length > 0);
+	// the cosmetic pet that walks around the castle (the first one the account owns; only the castle tile reads it)
+	const petId = usePetStore((state) => (biome === 'castle' ? state.owned[0] : undefined));
 	const [isShaking, setIsShaking] = useState(false);
 	const [showChestTooltip, setShowChestTooltip] = useState(false);
 	const [hovered, setHovered] = useState(false);
@@ -194,6 +198,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					{!isOwned && isAdjacent && <PixelIcon name='unknown' alt='Unexplored' className='unknown-mark' />}
 					{biome === 'castle' && <span className='tile-badge'>{castleLevel}</span>}
 					{isOwned && biome === 'castle' && <CastleTimerBadge />}
+					{isOwned && biome === 'castle' && petId && <PetSprite petId={petId} />}
 
 					{inRange && (
 						<span className='range-sparks' aria-hidden>

@@ -14,6 +14,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`craftXpOf`](#craftxpof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
+- Pets: [`PetDef`](#petdef), [`nextWanderStep`](#nextwanderstep), [`pickPetPhrase`](#pickpetphrase), [`applyPets`](#applypets)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
@@ -589,6 +590,46 @@ Optimistic avatar change (the picker used to wait 2-3 s for the server before th
 - A refused or failed latest pick goes back to the last avatar the server confirmed (not to an earlier optimistic one), and returns the reason to show.
 - When the server stores another avatar than the one asked for, the server's value is shown.
 Nothing is stored by the client; saves and ledgers are untouched.
+
+## Pets
+
+<a id="petdef"></a>
+
+### `PetDef` <small>interface</small>
+
+Source: [`src/catalog/pets.ts:10`](../../src/catalog/pets.ts)
+
+A pet of the catalog (pure config). Pets are cosmetic: they give no stat, drop from nothing and are never sold; a pet exists in an account only when the server granted it (`applyPets`).
+Ids are append-only (a save or ledger may name one forever); retire a pet with a flag, never by removing or renaming its id.
+
+The letter that comes with a special pet is **not** here: this file is in the browser bundle for everyone, so the letter lives in `src/lib/offline/petLetters.ts` (server only) and reaches only the account it is for.
+
+<a id="nextwanderstep"></a>
+
+### `nextWanderStep` <small>function</small>
+
+Source: [`src/lib/pets.ts:29`](../../src/lib/pets.ts)
+
+The pet's next step: one step sideways, up, down or diagonally, never leaving `PET_RANGE` (3) steps from the castle's middle (a step that would leave it is
+turned back inwards, so it keeps moving near the edge). Cosmetic only: nothing in the game reads it.
+
+<a id="pickpetphrase"></a>
+
+### `pickPetPhrase` <small>function</small>
+
+Source: [`src/lib/pets.ts:51`](../../src/lib/pets.ts)
+
+Which phrase the pet says next: a random one that is not the last one said (`lastIndex`, or -1 for none). -1 when it has nothing to say.
+
+<a id="applypets"></a>
+
+### `applyPets` <small>function</small>
+
+Source: [`src/lib/offline/pets.ts:28`](../../src/lib/offline/pets.ts)
+
+Applies one pets request to the ledger. `sync` grants the special pet to the one account the server is configured for (`grantUserId`, the `YUKI_GRANT_USER_ID` variable; nobody is granted anything while it is empty or the user id differs) and
+answers what the account owns and which letter is still to be shown. `ack` records that the player closed a letter, so it never comes again. Idempotent: running either again changes nothing. A pet is not in any drop table, shop or chest.
+The id of an account that is not the configured one gets no pet, no letter and no trace in its ledger.
 
 ## Class passives
 

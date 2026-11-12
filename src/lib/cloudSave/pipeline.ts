@@ -463,7 +463,7 @@ export const acceptSave = async (
 					combat: null,
 					inv: inventoryFromCore(split.core),
 					stats: counted,
-					legacy: { idols: legacyIdols },
+					legacy: { ...ledger.legacy, idols: legacyIdols },
 					attrs: attrsOut,
 					gemShop: settledShop,
 				});
@@ -489,7 +489,7 @@ export const acceptSave = async (
 					combat: null,
 					inv,
 					stats: counted,
-					legacy: { idols: legacyIdols },
+					legacy: { ...ledger.legacy, idols: legacyIdols },
 					attrs: attrsOut,
 					gemShop: settledShop,
 				};
@@ -508,7 +508,7 @@ export const acceptSave = async (
 					grantedSeen: ledger.granted,
 					inv: ledger.inv ?? inventoryFromCore(split.core),
 					stats: counted,
-					legacy: { idols: legacyIdols },
+					legacy: { ...ledger.legacy, idols: legacyIdols },
 					attrs: attrsOut,
 					gemShop: settledShop,
 				});

@@ -23,16 +23,28 @@ import type { Resources } from '@/types/game';
  */
 export interface Legacy {
 	idols: Record<string, number>;
+	/** The pets the server granted this account (ids of `src/catalog/pets.ts`, append only). Cosmetic. Kept through a New Game too, see `resetLedger`. Absent until a pet was granted. */
+	pets?: string[];
+	/** The pets whose welcome letter the player has closed: it is shown once, then never again. Absent until one was. */
+	letters?: string[];
 }
 
 export const emptyLegacy = (): Legacy => ({ idols: {} });
 
-export const isEmptyLegacy = (l: Legacy): boolean => Object.keys(l.idols).length === 0;
+export const isEmptyLegacy = (l: Legacy): boolean => Object.keys(l.idols).length === 0 && !l.pets?.length && !l.letters?.length;
+
+/** A stored list of pet ids: strings only, short, no repeats, a small cap (a tolerant reader: anything else reads as nothing). */
+const idListFromJson = (raw: unknown): string[] =>
+	Array.isArray(raw) ? [...new Set(raw.filter((id): id is string => typeof id === 'string' && id.length > 0 && id.length <= 40))].slice(0, 50) : [];
 
 /** Reads the stored column back: a missing column, null or anything malformed reads as nothing kept. */
 export const legacyFromJson = (raw: unknown): Legacy => {
 	const out = emptyLegacy();
 	if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out;
+	const pets = idListFromJson((raw as Record<string, unknown>).pets);
+	const letters = idListFromJson((raw as Record<string, unknown>).letters);
+	if (pets.length > 0) out.pets = pets;
+	if (letters.length > 0) out.letters = letters;
 	const idols = (raw as Record<string, unknown>).idols;
 	if (typeof idols === 'object' && idols !== null && !Array.isArray(idols))
 		for (const [biome, level] of Object.entries(idols))
@@ -218,6 +230,8 @@ export const resetLedger = (old: Ledger | null, nowMs: number, gems?: number): L
 	ver: old?.ver ?? 0,
 	runId: (old?.runId ?? 0) + 1,
 	gems: gems ?? old?.gems ?? STARTING_GEMS,
+	// a gifted pet (and its letter) belongs to the account, not to the run: a New Game does not take it away or send the letter again
+	legacy: { ...emptyLegacy(), ...(old?.legacy.pets ? { pets: old.legacy.pets } : {}), ...(old?.legacy.letters ? { letters: old.legacy.letters } : {}) },
 });
 
 /** Storage of the ledger: Supabase in the app, a Map in tests. */
