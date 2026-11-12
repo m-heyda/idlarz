@@ -134,10 +134,12 @@ const walk = (dir: string): string[] =>
 /** Source files of src/ (path relative to src, text) outside the icon-size table, to see which code mentions an icon name */
 const srcFiles = (() => {
 	const files = (dir: string): string[] =>
-		readdirSync(dir).flatMap((n) => {
-			const f = join(dir, n);
-			return statSync(f).isDirectory() ? files(f) : /\.(ts|tsx|css)$/.test(n) ? [f] : [];
-		});
+		readdirSync(dir)
+			.sort() // the same order on every platform (Linux lists a directory unsorted), so the "used by" lists do not differ between machines and CI
+			.flatMap((n) => {
+				const f = join(dir, n);
+				return statSync(f).isDirectory() ? files(f) : /\.(ts|tsx|css)$/.test(n) ? [f] : [];
+			});
 	return files(join(ROOT, 'src')).map((f) => {
 		const t = readFileSync(f, 'utf8');
 		return {

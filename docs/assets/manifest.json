@@ -21442,8 +21442,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/hud/HudDock.tsx",
-			"src/components/game/RankingsWindow.tsx"
+			"src/components/game/RankingsWindow.tsx",
+			"src/components/game/hud/HudDock.tsx"
 		],
 		"name": "menu_rankings",
 		"category": "ui",
