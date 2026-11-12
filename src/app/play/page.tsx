@@ -14,6 +14,7 @@ import { canResumeTab, isForeignLocal, planStart, skipsHub, type CloudInfo } fro
 import { epochVerdict, readSeenEpoch, wipeStaleBrowser, writeSeenEpoch } from '@/lib/epochGuard';
 import { LANDING_PATH, loginRedirectPath } from '@/lib/playRoute';
 import { archiveForNewGame, installSave, peekSave, resetSave, type SavePeek } from '@/lib/saveStorage';
+import QueryProvider from '@/components/QueryProvider';
 
 // The game (and its save hydration) is only loaded once the gate lets the player in: the game is played with an account only.
 const GameApp = dynamic(() => import('../GameApp'), { ssr: false, loading: () => <LoadingView /> });
@@ -199,6 +200,10 @@ export default function PlayPage() {
 				/>
 			);
 		case 'game':
-			return <GameApp profile={phase.player.profile} userId={phase.player.userId} />;
+			return (
+				<QueryProvider>
+					<GameApp profile={phase.player.profile} userId={phase.player.userId} />
+				</QueryProvider>
+			);
 	}
 }

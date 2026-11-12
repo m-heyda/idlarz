@@ -31,12 +31,12 @@ test("every card shows its own portrait, whatever the hero's class (no shared Kn
 	assert.equal(html.split(`${knight.portrait}.png`).length - 1, 1, 'the Knight portrait is drawn once, on the Knight card only');
 });
 
-test('while the unlocked set is loading, every card is disabled with its name and no lock line or "???"', () => {
+test('while the unlocked set is loading the grid is skeleton cards of the full size: no faces, no names, nothing that could look unlocked', () => {
 	const html = draw('mage', { loading: true });
-	assert.equal((html.match(/data-loading="true"/g) ?? []).length, AVATARS.length);
-	assert.equal((html.match(/disabled=""/g) ?? []).length, AVATARS.length);
-	assert.doesNotMatch(html, /Needs the|\?\?\?|avatar-card-how/);
-	for (const avatar of AVATARS) assert.ok(html.includes(avatar.name), `${avatar.name} shows its name`);
+	assert.match(html, /data-testid="avatar-skeleton"/);
+	assert.equal((html.match(/avatar-card-skeleton/g) ?? []).length, 16);
+	assert.doesNotMatch(html, /Needs the|\?\?\?|avatar-card-how|\.png|role="radio"/);
+	for (const avatar of AVATARS) assert.ok(!html.includes(avatar.name), `${avatar.name} is not shown yet`);
 });
 
 test('once loaded, other classes keep the dimmed look with the lock line and unearned rewards stay "???"', () => {

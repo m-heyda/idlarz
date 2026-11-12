@@ -1,4 +1,5 @@
 import { ACHIEVEMENTS, achievementById, type AchievementDef } from '@/catalog/achievements';
+import { NICK_GOLD, isNickColorId } from '@/config/nickColors';
 
 /** The stored `profiles.badge_id` that hides the badge completely (null = the default). */
 export const BADGE_NONE = 'none';
@@ -45,12 +46,42 @@ export interface ShownIdentity {
 	badge: string | null;
 	badgeName: string | null;
 	title: string | null;
+	/** The nickname colour id (`config/nickColors.ts`, or `gold`); null = the default colour */
+	nameColor: string | null;
 }
 
-/** The badge and title to show for a stored choice (`profiles.badge_id` / `title_id`) and the earned achievements: the one rule the Character window, the landing and later the rankings share. */
-export const shownIdentity = (choice: { badgeId: string | null; titleId: string | null }, earned: readonly string[]): ShownIdentity => {
+/** What decides which nickname colours an account may use: the admin flag (`profiles.is_admin`) and whether the Name colours item was bought (`ledger.gemShop.bought`). */
+export interface NameColorAccess {
+	admin: boolean;
+	unlocked: boolean;
+}
+
+/** The colour to draw for a stored `profiles.name_color`: null when unset, unknown, or gold on an account that is not an admin. A paid colour stays shown (it was checked when it was stored). */
+export const shownNameColor = (stored: string | null | undefined, admin: boolean): string | null =>
+	isNickColorId(stored) && (stored !== NICK_GOLD || admin) ? stored : null;
+
+/** Validates a colour a player asks for (null = back to the default): one of the twelve needs the unlock (or admin), gold needs admin. */
+export const checkNameColor = (input: unknown, access: NameColorAccess): { ok: true; nameColor: string | null } | { ok: false; error: string } => {
+	if (input === null) return { ok: true, nameColor: null };
+	if (!isNickColorId(input)) return { ok: false, error: 'Pick one of the colours.' };
+	if (input === NICK_GOLD) return access.admin ? { ok: true, nameColor: input } : { ok: false, error: 'That colour is not for sale.' };
+	if (!access.admin && !access.unlocked) return { ok: false, error: 'Unlock name colours in the Gem shop first.' };
+	return { ok: true, nameColor: input };
+};
+
+/** The badge, title and nickname colour to show for a stored choice (`profiles.badge_id` / `title_id` / `name_color`) and the earned achievements: the one rule the Character window, the landing and later the rankings share. */
+export const shownIdentity = (
+	choice: { badgeId: string | null; titleId: string | null; nameColor?: string | null },
+	earned: readonly string[],
+	admin = false,
+): ShownIdentity => {
 	const badge = shownBadge(choice.badgeId, earned);
-	return { badge: badge?.badge ?? null, badgeName: badge?.title ?? null, title: shownTitle(choice.titleId, earned) };
+	return {
+		badge: badge?.badge ?? null,
+		badgeName: badge?.title ?? null,
+		title: shownTitle(choice.titleId, earned),
+		nameColor: shownNameColor(choice.nameColor, admin),
+	};
 };
 
 /** Validates what a player asks for: a badge id is `BADGE_NONE`, null (default) or an earned achievement; a title id is null or an earned title. */

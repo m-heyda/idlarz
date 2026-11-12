@@ -56,14 +56,14 @@ export const loadAway = async (supabase: SupabaseClient, userId: string, nowMs: 
 };
 
 /**
- * The badge and title the landing shows by the name: the same stored choice as the Character window (`profiles.badge_id` / `title_id`, the one place rankings will read too), checked against the
+ * The badge, title and nickname colour the landing shows by the name: the same stored choice as the Character window (`profiles.badge_id` / `title_id` / `name_color`, the one place rankings will read too), checked against the
  * achievements the account holds (`player_achievements`, their own rows through RLS) with `shownIdentity`. A failed read is "nothing shown".
  */
 export const loadShownIdentity = async (supabase: SupabaseClient, userId: string): Promise<ShownIdentity | null> => {
 	try {
 		const [earned, choice] = await Promise.all([
 			supabase.from('player_achievements').select('achievement_id').eq('user_id', userId),
-			supabase.from('profiles').select('badge_id, title_id').eq('id', userId).maybeSingle(),
+			supabase.from('profiles').select('badge_id, title_id, name_color, is_admin').eq('id', userId).maybeSingle(),
 		]);
 		if (earned.error || choice.error) return null;
 		const held = (earned.data ?? []).map((row) => String(row.achievement_id));
@@ -71,10 +71,12 @@ export const loadShownIdentity = async (supabase: SupabaseClient, userId: string
 			{
 				badgeId: typeof choice.data?.badge_id === 'string' ? choice.data.badge_id : null,
 				titleId: typeof choice.data?.title_id === 'string' ? choice.data.title_id : null,
+				nameColor: typeof choice.data?.name_color === 'string' ? choice.data.name_color : null,
 			},
 			held,
+			choice.data?.is_admin === true,
 		);
-		return shown.badge || shown.title ? shown : null;
+		return shown.badge || shown.title || shown.nameColor ? shown : null;
 	} catch {
 		return null;
 	}

@@ -19,8 +19,8 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
 - Mastery: [`claimMastery`](#claimmastery), [`claimAllMastery`](#claimallmastery), [Bestiary mastery](#mastery-tiers)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
+- Badges: [`NICK_COLORS`](#nick-colors), [`badgeOptions`](#badgeoptions)
 - Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
-- Badges: [`badgeOptions`](#badgeoptions)
 
 ## Levels
 
@@ -1005,6 +1005,25 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 
 See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideVisibleFor`](progression.md#guidevisiblefor)
 
+## Badges
+
+<a id="nick-colors"></a>
+
+### `NICK_COLORS` <small>const</small>
+
+Source: [`src/config/nickColors.ts:16`](../../src/config/nickColors.ts)
+
+The twelve colours of the picker, in the order the swatches are drawn. Bought once for the whole account in the Gem shop ("Name colours", `NICK_COLORS_ITEM`); stored on `profiles.name_color`.
+
+<a id="badgeoptions"></a>
+
+### `badgeOptions` <small>function</small>
+
+Source: [`src/catalog/badges.ts:27`](../../src/catalog/badges.ts)
+
+Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
+The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.
+
 ## Deeds
 
 <a id="claimallachievements"></a>
@@ -1026,14 +1045,3 @@ The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the 
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).
 
 See also: `deedState`, `deedPoints`
-
-## Badges
-
-<a id="badgeoptions"></a>
-
-### `badgeOptions` <small>function</small>
-
-Source: [`src/catalog/badges.ts:26`](../../src/catalog/badges.ts)
-
-Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
-The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.

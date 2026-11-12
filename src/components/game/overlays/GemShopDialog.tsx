@@ -6,6 +6,7 @@ import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber } from '@/utils/formatters';
 import GameModal from '../GameModal';
+import { useBadgeChoice } from '../BadgeDialog';
 import { Button, Tabs } from '../../../../packages/design-system/src/components/primitives';
 import GemIcon from '../GemIcon';
 import DailyBoard from '../DailyBoard';
@@ -49,6 +50,8 @@ const GemShopDialog: React.FC = () => {
 	const busy = useGemStore((state) => state.busy);
 	const message = useGemStore((state) => state.message);
 	const gems = useGameStore((state) => state.gems);
+	const admin = useUiStore((state) => state.badge.admin);
+	useBadgeChoice();
 	const playerName = useGameStore((state) => state.playerName);
 	const [name, setName] = useState('');
 	const [confirm, setConfirm] = useState<string | null>(null);
@@ -65,7 +68,11 @@ const GemShopDialog: React.FC = () => {
 
 	/** The state of an item for the row: its price now, and why it cannot be bought (null = it can). */
 	const stateOf = (item: GemItem): { price: number; blocked: string | null } => {
-		const price = item.id === 'attr_respec' && info?.freeRespec ? 0 : item.price;
+		const price = item.id === 'attr_respec' && info?.freeRespec ? 0 : item.id === 'name_colors' && admin ? 0 : item.price;
+		if (item.id === 'name_colors') {
+			if (admin) return { price, blocked: 'Included for admin accounts' };
+			if ((info?.bought?.[item.id] ?? 0) > 0) return { price, blocked: 'Owned: open the name window from your Character' };
+		}
 		if (item.id === 'name_change' && info?.nameChangedAt) {
 			const left = info.nameChangedAt + item.cooldownSec - nowSec;
 			if (left > 0) return { price, blocked: `Again in ${waitText(left)}` };

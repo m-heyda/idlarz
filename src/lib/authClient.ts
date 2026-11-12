@@ -63,7 +63,7 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			stats?: { level?: unknown; rebirths?: unknown } | null;
 			game?: { inv?: unknown; craft?: unknown; serverNowSec?: unknown } | null;
 			away?: { gapSec?: unknown; capSec?: unknown; efficiency?: unknown } | null;
-			identity?: { badge?: unknown; badgeName?: unknown; title?: unknown } | null;
+			identity?: { badge?: unknown; badgeName?: unknown; title?: unknown; nameColor?: unknown } | null;
 		};
 		if (response.ok) {
 			const epoch = typeof body.epoch === 'number' && Number.isInteger(body.epoch) && body.epoch >= 1 ? { epoch: body.epoch } : {};
@@ -85,8 +85,13 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 					? { away: { gapSec, capSec, efficiency } }
 					: {};
 			const text = (value: unknown): string | null => (typeof value === 'string' && value !== '' ? value : null);
-			const shown = { badge: text(body.identity?.badge), badgeName: text(body.identity?.badgeName), title: text(body.identity?.title) };
-			const identity = shown.badge || shown.title ? { identity: shown } : {};
+			const shown = {
+				badge: text(body.identity?.badge),
+				badgeName: text(body.identity?.badgeName),
+				title: text(body.identity?.title),
+				nameColor: text(body.identity?.nameColor),
+			};
+			const identity = shown.badge || shown.title || shown.nameColor ? { identity: shown } : {};
 			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats, ...game, ...away, ...identity };
 		}
 		if (response.status === 503 || response.status >= 500 || body.unavailable) {
@@ -173,10 +178,13 @@ export const chooseAvatar = async (avatarId: string): Promise<AvatarSendResult> 
 		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
 	}
 };
-/** The badge and title of the profile (`GET /api/auth/badge`) and the achievements that decide what can be picked. */
+/** The badge, title and nickname colour of the profile (`GET /api/auth/badge`), the achievements that decide what can be picked, and whether the colour picker is open (`colorsUnlocked`: bought in the Gem shop, or admin; `admin`: the owner's account, which also has the gold nickname). */
 export interface BadgeState {
 	badgeId: string | null;
 	titleId: string | null;
+	nameColor: string | null;
+	colorsUnlocked: boolean;
+	admin: boolean;
 	earned: string[];
 }
 /** `null` when the server cannot be reached. */
@@ -184,11 +192,21 @@ export const fetchBadges = async (): Promise<BadgeState | null> => {
 	try {
 		const response = await fetch('/api/auth/badge', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 		if (!response.ok) return null;
-		const body = (await response.json().catch(() => null)) as { badgeId?: unknown; titleId?: unknown; earned?: unknown } | null;
+		const body = (await response.json().catch(() => null)) as {
+			badgeId?: unknown;
+			titleId?: unknown;
+			nameColor?: unknown;
+			colorsUnlocked?: unknown;
+			admin?: unknown;
+			earned?: unknown;
+		} | null;
 		if (!body || !Array.isArray(body.earned)) return null;
 		return {
 			badgeId: typeof body.badgeId === 'string' ? body.badgeId : null,
 			titleId: typeof body.titleId === 'string' ? body.titleId : null,
+			nameColor: typeof body.nameColor === 'string' ? body.nameColor : null,
+			colorsUnlocked: body.colorsUnlocked === true,
+			admin: body.admin === true,
 			earned: body.earned.filter((id): id is string => typeof id === 'string'),
 		};
 	} catch {
@@ -205,6 +223,23 @@ export const chooseBadge = async (
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ badgeId, titleId }),
+			credentials: 'same-origin',
+			cache: 'no-store',
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+		});
+		const body = (await response.json().catch(() => ({}))) as { error?: string };
+		return response.ok ? { ok: true } : { ok: false, message: body.error ?? 'Something went wrong.' };
+	} catch {
+		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
+	}
+};
+/** Saves the nickname colour (`null` = the default colour; `POST /api/auth/badge`); the server refuses one that is not unlocked and the gold nickname for anyone but the admin. */
+export const chooseNameColor = async (nameColor: string | null): Promise<{ ok: true } | { ok: false; message: string }> => {
+	try {
+		const response = await epochFetch('/api/auth/badge', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ nameColor }),
 			credentials: 'same-origin',
 			cache: 'no-store',
 			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),

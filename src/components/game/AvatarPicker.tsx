@@ -16,7 +16,7 @@ interface AvatarPickerProps {
 	unlocked: readonly string[];
 	onChange: (id: string) => void;
 	disabled?: boolean;
-	/** The unlocked set is still being fetched: every card shows its own face, dimmed and disabled, with no lock line yet (so nothing flashes as open and then locks) */
+	/** The unlocked set is still being fetched (the first time the window opens): the grid is drawn as skeleton cards of the real size, so nothing flashes as open and then locks and nothing jumps when the answer arrives */
 	loading?: boolean;
 }
 
@@ -24,7 +24,7 @@ interface AvatarPickerProps {
  * The avatar grid (IDL-71, class lock IDL-269): the 8 starters first, then the rewards, then empty "Soon" cards up to 16 slots. The hero's own two starters and the earned rewards are enabled. Another class's starter stays visible but disabled (dimmed, a small
  * lock, "Needs the <Class> class"); a reward that is not earned keeps its silhouette, "???" and how to earn it. The server decides again on every save, so this only keeps honest players from trying (`checkAvatar`).
  */
-const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocked, onChange, disabled = false, loading = false }) => (
+const AvatarGrid: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocked, onChange, disabled = false, loading = false }) => (
 	<div className='avatar-grid' role='radiogroup' aria-label='Avatar'>
 		{AVATARS.map((avatar) => {
 			const open = !loading && unlocked.includes(avatar.id);
@@ -72,5 +72,20 @@ const AvatarPicker: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocke
 		))}
 	</div>
 );
+
+/** The loading grid: the same card size as a loaded one (picture, name line, one "how" line). */
+const AvatarSkeleton: React.FC = () => (
+	<div className='avatar-grid' aria-busy='true' aria-label='Loading avatars' data-testid='avatar-skeleton'>
+		{Array.from({ length: AVATAR_GRID_SLOTS }, (_, i) => (
+			<div key={i} className='avatar-card avatar-card-skeleton' aria-hidden='true'>
+				<span className='sk sk-art' />
+				<span className='sk sk-name' />
+				<span className='sk sk-how' />
+			</div>
+		))}
+	</div>
+);
+
+const AvatarPicker: React.FC<AvatarPickerProps> = (props) => (props.loading ? <AvatarSkeleton /> : <AvatarGrid {...props} />);
 
 export default AvatarPicker;

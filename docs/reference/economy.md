@@ -1209,13 +1209,15 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:41`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:43`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
 - **Class change** (500): never during a fight; writes the profile's class (server only); the passives of the new class apply at once. An avatar that does not fit the new class is swapped for its starter.
 - **Name change** (200): once per 30 days, counted on the profile (it survives a game reset); a name another account holds, or one that breaks the name rules, is refused and costs nothing.
 - **Attribute respec** (300): gives back every attribute point outside a rebirth (a rebirth does it free). **The first respec of an account is free** (a mistake with the new server-held allocation is forgiven once).
+
+- **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
 
 Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
 
@@ -1226,12 +1228,13 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 | Change class | identity | 500 | none | Take another hero class and its passives. Not during a fight. |
 | Change name | identity | 200 | 30 days | Pick a new hero name. Once every 30 days. |
 | Respec attributes | identity | 300 | none | Get every attribute point back to spend again. The first one is free. |
+| Name colours | identity | 1000 | none | Unlock the colour picker: twelve colours for your nickname in the game, the landing page and the rankings. |
 
 <a id="daily-bonus-gems"></a>
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:71`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:82`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 
@@ -1259,7 +1262,7 @@ The daily first-login bonus as it stands: claimable when today (UTC) has not bee
 
 ### `applySpend` <small>function</small>
 
-Source: [`src/lib/offline/gems.ts:72`](../../src/lib/offline/gems.ts)
+Source: [`src/lib/offline/gems.ts:73`](../../src/lib/offline/gems.ts)
 
 One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed
 when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.
@@ -1267,6 +1270,7 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 - **Class change**: not during a fight, to another class of the four.
 - **Name change**: `value` is the new name, already checked against the name rules and the unique index by the caller (the cooldown is the profile's, checked by the caller too).
 - **Attribute respec**: not during a fight; refused when nothing is spent; the first one of an account is free.
+- **A one-time item** (`kind: 'once'`, Name colours): refused when already owned; the purchase count in `bought` is the record of ownership.
 
 ## Perk caps
 

@@ -8,6 +8,7 @@ import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import AvatarArt from '@/components/game/AvatarArt';
 import AwayBar from '@/components/game/AwayBar';
 import { resolveAvatar } from '@/catalog/avatars';
+import { nickColorValue } from '@/config/nickColors';
 import type { ShownIdentity } from '@/catalog/badges';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
@@ -22,6 +23,7 @@ import { fetchMe, logout, type AwayInfo, type Profile, type ProfileStats, type U
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@idlarz/design-system';
 import { Button, Frame, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
+import { NickName } from '../../../packages/design-system/src/components/composites';
 import '@/styles/Landing.css';
 
 type Visitor =
@@ -188,7 +190,7 @@ const MemberCard: React.FC<{
 				<AvatarArt id={resolveAvatar(profile.avatarId, profile.playerClass).id} playerClass={profile.playerClass} scale={2} />
 			</div>
 			<p className='ld-continue-name'>
-				{profile.characterName}
+				<NickName color={nickColorValue(identity?.nameColor)}>{profile.characterName}</NickName>
 				{identity?.title && <span className='ld-continue-title'> ({identity.title})</span>}
 				{identity?.badge && (
 					// eslint-disable-next-line @next/next/no-img-element

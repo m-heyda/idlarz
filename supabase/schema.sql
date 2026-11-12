@@ -286,3 +286,7 @@ grant update (id, character_name, player_class) on public.profiles to authentica
 -- ---- profile_badge_title (migration profile_badge_title): the badge and title a player shows; server-written only (not in the authenticated grants above) ----
 alter table public.profiles add column if not exists badge_id text;   -- null = default, 'none' = hidden, else an earned achievement id
 alter table public.profiles add column if not exists title_id text;   -- null = no title, else an earned achievement's title id
+
+-- ---- profile_name_color (migration profile_name_color): the nickname colour and the admin flag; server-written only (not in the authenticated grants above) ----
+alter table public.profiles add column if not exists name_color text;                      -- null = default, else a colour id of config/nickColors.ts, or 'gold' (admin only)
+alter table public.profiles add column if not exists is_admin boolean not null default false; -- the owner's account: free name colours and the gold nickname; set by hand, never by the game

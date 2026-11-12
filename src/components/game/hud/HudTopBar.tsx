@@ -6,12 +6,9 @@ import { MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import { pixelIconSrc, type PixelIconName, RESOURCE_PIXEL_ICONS } from '@/config/pixelIcons';
 import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { openMenuAt } from '@/lib/globalMenu';
-import { castleTimerLabel } from '@/lib/castleTimer';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { useViewStore } from '@/stores/viewStore';
 import { formatHeaderAmount, formatPercent, formatRateAuto } from '@/utils/formatters';
-import PixelIcon from '../PixelIcon';
 
 const exactOf = (n: number) => Math.floor(n).toLocaleString('en-US');
 
@@ -81,35 +78,8 @@ const ResourceTrays: React.FC = () => {
 	);
 };
 
-/** The castle upgrade timer, shown while an upgrade runs: a click finds the castle on the map. */
-const CastleTimer: React.FC = () => {
-	// a minute-resolution text above an hour, so the chip re-renders once a second only in the last hour
-	const label = useGameStore((state) => castleTimerLabel(state.castleUpgrade));
-	const centerOnCastle = useViewStore((state) => state.centerOnCastle);
-	if (!label) return null;
-	return (
-		<div
-			className='hdr-castle-timer'
-			role='button'
-			tabIndex={0}
-			title='Castle upgrade in progress: click to find the castle'
-			aria-label={`Castle upgrade: ${label} left. Show the castle`}
-			onClick={centerOnCastle}
-			onKeyDown={(event) => {
-				if (event.key === 'Enter' || event.key === ' ') {
-					event.preventDefault();
-					centerOnCastle();
-				}
-			}}
-		>
-			<PixelIcon name='castle_1' alt='' scale={0.45} />
-			<span>{label}</span>
-		</div>
-	);
-};
-
 /**
- * The top bar of the game screen drawn with the design system: the resource trays in the middle and on the right the castle timer and the game menu (settings, save, export). The hero's portrait, the Gem shop and the windows are in the dock.
+ * The top bar of the game screen drawn with the design system: the resource trays in the middle and on the right the game menu (settings, save, export). The hero's portrait, the Gem shop and the windows are in the dock.
  */
 const HudTopBar: React.FC = () => {
 	const settingsOpen = useUiStore((state) => state.settingsOpen);
@@ -118,7 +88,6 @@ const HudTopBar: React.FC = () => {
 		<TopBar
 			right={
 				<>
-					<CastleTimer />
 					<GlyphButton
 						glyph='⚙'
 						label='Game menu: settings, save, export'

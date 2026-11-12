@@ -75,6 +75,7 @@ import ConfirmDialogs from '@/components/game/ConfirmDialogs';
 import BuildModal from '@/components/game/overlays/BuildModal';
 import BuildingModal from '@/components/game/overlays/BuildingModal';
 import BottomRightStack from '@/components/game/BottomRightStack';
+import BuildTimers from '@/components/game/hud/BuildTimers';
 import CastleCompass from '@/components/game/CastleCompass';
 import Toast from '@/components/game/Toast';
 import type { Profile } from '@/lib/authClient';
@@ -215,6 +216,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<BuildModal />
 			<BuildingModal />
 			<BottomRightStack />
+			<BuildTimers />
 			<CastleCompass />
 			<ContextMenu />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}

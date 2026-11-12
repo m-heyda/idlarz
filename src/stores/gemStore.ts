@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { newClaimId } from '@/lib/offlineClient';
 import type { GemsReply, GemsRequest } from '@/lib/offline/gemTypes';
 import { requestGems } from '@/lib/rewardsClient';
+import { QUERY_KEYS, invalidate } from '@/lib/queryClient';
 import { signalNeedClaim } from '@/lib/serverSession';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -26,6 +27,7 @@ interface GemStoreState {
 const applyReply = (reply: GemsReply) => {
 	const game = useGameStore.getState();
 	useGameStore.setState({ gems: reply.gems });
+	if (reply.playerClass) invalidate(QUERY_KEYS.avatars); // another class has other starter faces
 	if (reply.playerClass) game.setPlayerClass(reply.playerClass as Parameters<typeof game.setPlayerClass>[0]);
 	if (reply.characterName) useGameStore.setState({ playerName: reply.characterName });
 	if (reply.attrs) game.applyServerAttrs(reply.attrs);

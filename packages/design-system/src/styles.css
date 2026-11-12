@@ -631,6 +631,17 @@
 	padding: 7px 10px;
 }
 
+/* the compact one-line tip for small controls */
+.ds-tip-mini {
+	width: auto;
+	max-width: 200px;
+	padding: 3px 8px;
+	font-size: 12px;
+	line-height: 1.2;
+	color: #f1e6c8;
+	white-space: nowrap;
+}
+
 /* ---------- map hud pieces ---------- */
 
 .ds-slots-sm .ds-slot {
@@ -1891,6 +1902,93 @@
 
 .ds-identity-name .ds-identity-badge {
 	align-self: center;
+}
+
+.ds-identity-nick {
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.ds-identity-nick:hover .ds-nick {
+	filter: brightness(1.15);
+}
+
+/* a nickname in its colour; the gold one (admin) shines and has stars that twinkle around it */
+.ds-nick {
+	position: relative;
+	display: inline-block;
+}
+
+.ds-nick-gold .ds-nick-text {
+	background: linear-gradient(100deg, #a8741a 0%, #ffd866 22%, #fff7d1 38%, #ffd866 55%, #a8741a 78%, #ffd866 100%);
+	background-size: 220% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+	filter: drop-shadow(0 0 5px rgba(255, 207, 90, 0.75));
+	animation: ds-nick-shine 3.2s linear infinite;
+}
+
+.ds-nick-star {
+	position: absolute;
+	width: 7px;
+	height: 7px;
+	pointer-events: none;
+	background: #fff7d1;
+	clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+	opacity: 0;
+	animation: ds-nick-twinkle 2.4s ease-in-out infinite;
+}
+
+.ds-nick-star:nth-of-type(1) {
+	top: -4px;
+	left: 8%;
+}
+
+.ds-nick-star:nth-of-type(2) {
+	top: 30%;
+	left: 52%;
+	animation-delay: 0.8s;
+}
+
+.ds-nick-star:nth-of-type(3) {
+	bottom: -3px;
+	right: 6%;
+	animation-delay: 1.6s;
+}
+
+@keyframes ds-nick-shine {
+	to {
+		background-position: -220% 0;
+	}
+}
+
+@keyframes ds-nick-twinkle {
+	0%,
+	100% {
+		opacity: 0;
+		transform: scale(0.3) rotate(0deg);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.15) rotate(35deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-nick-gold .ds-nick-text,
+	.ds-nick-star {
+		animation: none;
+	}
+	.ds-nick-star {
+		opacity: 0.9;
+	}
 }
 
 .ds-identity-title {
@@ -4070,6 +4168,109 @@ button.ds-income-head:hover {
 
 .ds-chipgroup .ds-chip > span:first-of-type:not(.ds-chip-rate) {
 	min-width: 0;
+}
+
+/* the name, badge and title window: a preview of the name on top, the colour picker on the left and title and badge on the right */
+.ds-nick-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin: 2px 0 6px;
+	font-size: 28px;
+	line-height: 1.2;
+}
+
+.ds-nick-preview-title {
+	font-size: 14px;
+	color: var(--ds-gold-lt);
+}
+
+.ds-badge-cols {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	align-items: start;
+}
+
+.ds-swatch-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.ds-swatch {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 8px 4px;
+	font-family: inherit;
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--ds-text, #e9e4d6);
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.35);
+	border: 1px solid var(--ds-line-dk, #2a2118);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.ds-swatch:hover {
+	filter: brightness(1.2);
+}
+
+.ds-swatch[data-selected='true'] {
+	border-color: var(--ds-gold, #e0a93a);
+	background: rgba(224, 169, 58, 0.14);
+}
+
+.ds-swatch[aria-disabled='true'] {
+	opacity: 0.6;
+}
+
+.ds-swatch[aria-disabled='true'][data-selected='true'] {
+	border-style: dashed;
+}
+
+.ds-swatch-chip {
+	width: 34px;
+	height: 22px;
+	border: 1px solid rgba(0, 0, 0, 0.6);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.ds-swatch-none {
+	display: grid;
+	place-items: center;
+	background: none;
+	border: 1px dashed #6c6a60;
+	color: #8a8676;
+	font-size: 12px;
+}
+
+.ds-swatch-chip-gold {
+	background: linear-gradient(100deg, #a8741a, #ffd866 40%, #fff7d1 55%, #ffd866 70%, #a8741a);
+	box-shadow: 0 0 8px rgba(255, 207, 90, 0.7);
+}
+
+.ds-lock-banner button {
+	flex: none;
+	white-space: nowrap;
+}
+
+.ds-lock-banner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 6px 0;
+	padding: 8px 10px;
+	font-size: 12px;
+	color: #d9c89c;
+	background: rgba(224, 169, 58, 0.08);
+	border: 1px dashed var(--ds-gold-dk, #7a5a1c);
 }
 
 /* picker cards (badge and title): dark tiles with a gold rim when chosen */
