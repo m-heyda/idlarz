@@ -2,86 +2,81 @@ import React from 'react';
 import { useUiStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import audioManager from '@/utils/audioManager';
-import PixelModal from '../PixelModal';
+import { Button } from '../../../../packages/design-system/src/components/primitives';
+import { Slider } from '../../../../packages/design-system/src/components/composites';
+import GameModal from '../GameModal';
 import PixelIcon from '../PixelIcon';
 
 const Row: React.FC<{ label: string; hint?: string; children: React.ReactNode }> = ({ label, hint, children }) => (
-	<div className='px-card flex items-center justify-between gap-4 mb-3'>
+	<div className='ds-listrow ds-listrow-line'>
 		<div>
-			<div className='text-[#ecdcb4]'>{label}</div>
-			{hint && <div className='text-xs text-[#a89878]'>{hint}</div>}
+			<div>{label}</div>
+			{hint && (
+				<div className='ds-dim' style={{ fontSize: 12 }}>
+					{hint}
+				</div>
+			)}
 		</div>
-		<div className='shrink-0'>{children}</div>
+		<div style={{ flexShrink: 0 }}>{children}</div>
 	</div>
 );
 
-/** Visible settings: sound, volume, ambient map life, plus shortcuts to the save tools and the guide. */
+const Toggle: React.FC<{ on: boolean; onChange: (on: boolean) => void }> = ({ on, onChange }) => (
+	<Button size='sm' tone={on ? 'gold' : 'dark'} aria-pressed={on} onClick={() => onChange(!on)} style={{ minWidth: 56 }}>
+		{on ? 'On' : 'Off'}
+	</Button>
+);
+
+/** Settings: sound, volume, ambient map life and Brother Alder, plus a shortcut to the save tools. Drawn with the design system. */
 const SettingsDialog: React.FC = () => {
 	const open = useUiStore((state) => state.settingsOpen);
 	const close = useUiStore((state) => state.closeSettings);
 	const toggleSaveMenu = useUiStore((state) => state.toggleSaveMenu);
-	const openTutorial = useUiStore((state) => state.openTutorial);
 	const { soundEnabled, volume, ambientLife, guideEnabled, setSoundEnabled, setVolume, setAmbientLife, setGuideEnabled } = useSettingsStore();
 
 	if (!open) return null;
 
 	return (
-		<PixelModal title='Settings' size='sm' icon={<PixelIcon name='menu_settings' alt='' scale={0.5} />} onClose={close}>
-			<Row label='Sound effects'>
-				<button className={`px-btn px-btn-sm ${soundEnabled ? '' : 'px-btn-gray'}`} onClick={() => setSoundEnabled(!soundEnabled)} aria-pressed={soundEnabled}>
-					{soundEnabled ? 'On' : 'Off'}
-				</button>
-			</Row>
+		<GameModal title='Settings' size='sm' icon={<PixelIcon name='menu_settings' alt='' scale={0.5} />} onClose={close}>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+				<Row label='Sound effects'>
+					<Toggle on={soundEnabled} onChange={setSoundEnabled} />
+				</Row>
 
-			<Row label='Volume' hint={`${Math.round(volume * 100)}%`}>
-				<input
-					type='range'
-					min={0}
-					max={100}
-					value={Math.round(volume * 100)}
-					disabled={!soundEnabled}
-					onChange={(e) => setVolume(Number(e.target.value) / 100)}
-					onMouseUp={() => audioManager.playSound('click')}
-					aria-label='Volume'
-					className='px-range w-32 disabled:opacity-50'
-				/>
-			</Row>
+				<Row label='Volume'>
+					<div style={{ width: 170 }} onMouseUp={() => audioManager.playSound('click')}>
+						<Slider
+							value={Math.round(volume * 100)}
+							max={100}
+							disabled={!soundEnabled}
+							onChange={(n) => setVolume(n / 100)}
+							readout={`${Math.round(volume * 100)}%`}
+						/>
+					</div>
+				</Row>
 
-			<Row label='Life on the map' hint='Critters wander over your land and ripples play on the water'>
-				<button className={`px-btn px-btn-sm ${ambientLife ? '' : 'px-btn-gray'}`} onClick={() => setAmbientLife(!ambientLife)} aria-pressed={ambientLife}>
-					{ambientLife ? 'On' : 'Off'}
-				</button>
-			</Row>
+				<Row label='Life on the map' hint='Critters wander over your land and ripples play on the water'>
+					<Toggle on={ambientLife} onChange={setAmbientLife} />
+				</Row>
 
-			<Row label='Brother Alder' hint='The guide who explains the game as you play'>
-				<button className={`px-btn px-btn-sm ${guideEnabled ? '' : 'px-btn-gray'}`} onClick={() => setGuideEnabled(!guideEnabled)} aria-pressed={guideEnabled}>
-					{guideEnabled ? 'On' : 'Off'}
-				</button>
-			</Row>
+				<Row label='Brother Alder' hint='The guide who explains the game as you play'>
+					<Toggle on={guideEnabled} onChange={setGuideEnabled} />
+				</Row>
 
-			<div className='flex flex-col gap-3 mt-4'>
-				<button
-					className='px-btn'
+				<Button
 					onClick={() => {
 						close();
 						toggleSaveMenu();
 					}}
 				>
 					Save & backup (export / import)
-				</button>
-				<button
-					className='px-btn'
-					onClick={() => {
-						close();
-						openTutorial();
-					}}
-				>
-					Show guide
-				</button>
-			</div>
+				</Button>
 
-			<p className='text-xs text-[#7a6a52] mt-4 text-center'>Progress saves automatically in this browser. Export a copy to keep it safe.</p>
-		</PixelModal>
+				<p className='ds-dim' style={{ fontSize: 12, textAlign: 'center', margin: '4px 0 0' }}>
+					Progress saves automatically in this browser. Export a copy to keep it safe.
+				</p>
+			</div>
+		</GameModal>
 	);
 };
 

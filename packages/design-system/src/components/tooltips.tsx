@@ -191,8 +191,8 @@ export interface ItemTooltipProps {
 	compare?: TipRow[];
 	/** Shows the Drink button of a potion */
 	onDrink?: () => void;
-	/** The key hints line ("Dbl-click equip - Shift + click sell") */
-	hints?: string;
+	/** The key hints line: a key cap and what it does (`{ key: 'Dbl-click', text: 'equip' }`), or plain text */
+	hints?: string | { key: string; text: string }[];
 	/** Anything more, drawn after the set changes (the gained and lost set bonuses, the net change) */
 	extra?: React.ReactNode;
 	footer?: Footer;
@@ -287,7 +287,18 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 				<TipRows rows={compare} />
 			</div>
 		) : null}
-		{hints ? <TipLine tone='muted'>{hints}</TipLine> : null}
+		{Array.isArray(hints) ? (
+			<div className='ds-tip-keys'>
+				{hints.map((h) => (
+					<span key={h.key + h.text}>
+						<span className='ds-kbd'>{h.key}</span>
+						{h.text}
+					</span>
+				))}
+			</div>
+		) : hints ? (
+			<TipLine tone='muted'>{hints}</TipLine>
+		) : null}
 	</Tooltip>
 );
 

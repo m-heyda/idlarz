@@ -13,7 +13,8 @@ import audioManager from '@/utils/audioManager';
 import { askServerRebirth } from '@/lib/serverRebirth';
 import { rebirthRunSummary, rebirthUnlockIntro, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import { useBestiaryStore } from '@/stores/bestiaryStore';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
 import RebirthUnlockModal from './RebirthUnlockModal';
 import PixelIcon from '../PixelIcon';
 import EmberIcon from '../EmberIcon';
@@ -115,8 +116,8 @@ const RebirthDialog: React.FC = () => {
 	);
 
 	return (
-		<PixelModal title='Rebirth' size='md' icon={<PixelIcon name='menu_legacy' alt='' />} onClose={handleClose}>
-			<div className='px-card mb-3 text-sm grid grid-cols-3 gap-2 text-center'>
+		<GameModal title='Rebirth' size='md' icon={<PixelIcon name='menu_legacy' alt='' />} onClose={handleClose}>
+			<div className='ds-listrow' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', textAlign: 'center', marginBottom: 10 }}>
 				<div>
 					<div className='text-[#a89878]'>Rebirths</div>
 					<div className='text-[#f0d27a] text-lg'>{formatHeaderAmount(prestige.rebirths)}</div>
@@ -134,8 +135,8 @@ const RebirthDialog: React.FC = () => {
 			</div>
 
 			{confirming ? (
-				<div className='px-card mb-3 text-sm'>
-					<div className='px-h'>Rebirth now?</div>
+				<div className='ds-listrow' style={{ marginBottom: 10 }}>
+					<SectionLabel>Rebirth now?</SectionLabel>
 					<p className='text-[#d8c8a0] mb-2'>
 						You gain <b className='text-green-300'>{formatHeaderAmount(gain)}</b> Embers (+
 						{pct(emberIncomeBonus(prestige.legacyEarned + gain) - emberIncomeBonus(prestige.legacyEarned))} income for ever). The map, resources, castle and
@@ -147,17 +148,15 @@ const RebirthDialog: React.FC = () => {
 						</p>
 					)}
 					<div className='flex justify-between'>
-						<button className='px-btn' onClick={() => setConfirming(false)}>
-							Not yet
-						</button>
-						<button className='px-btn px-btn-red' onClick={doRebirth} disabled={asking}>
+						<Button onClick={() => setConfirming(false)}>Not yet</Button>
+						<Button tone='danger' onClick={doRebirth} disabled={asking}>
 							{asking ? 'Asking the server...' : 'Rebirth'}
-						</button>
+						</Button>
 					</div>
 				</div>
 			) : (
-				<div className='px-card mb-3 text-sm'>
-					<div className='px-h'>Rebirth</div>
+				<div className='ds-listrow' style={{ marginBottom: 10 }}>
+					<SectionLabel>Rebirth</SectionLabel>
 					<p className='text-[#d8c8a0] mb-2'>
 						Start over with a permanent bonus. A rebirth gives about {formatHeaderAmount(gain)} Ember{gain === 1 ? '' : 's'} now; a higher castle level and more
 						tiles give more (castle level {CASTLE_UPGRADE.maxLevel} is the best you can do).
@@ -173,15 +172,15 @@ const RebirthDialog: React.FC = () => {
 					</div>
 					<div className='text-xs text-[#a89878] mb-2'>Castle bonus today +{pct(castleModifier(castleLevel))} - it starts again from level 1.</div>
 					<div className='flex justify-center'>
-						<button className='px-btn px-btn-gold' disabled={!canRebirth} onClick={() => setConfirming(true)}>
+						<Button tone='gold' disabled={!canRebirth} onClick={() => setConfirming(true)}>
 							Rebirth for {formatHeaderAmount(gain)} Embers
-						</button>
+						</Button>
 					</div>
 				</div>
 			)}
 
-			<div className='px-card text-sm'>
-				<div className='px-h'>Ember shop</div>
+			<div className='ds-listrow'>
+				<SectionLabel>Ember shop</SectionLabel>
 				<div className='flex flex-col gap-2'>
 					{(Object.keys(EMBER_UPGRADES) as EmberUpgradeId[]).map((id) => {
 						const def = EMBER_UPGRADES[id];
@@ -190,7 +189,7 @@ const RebirthDialog: React.FC = () => {
 						const cost = emberUpgradeCost(id, level);
 						const affordable = prestige.legacyPoints >= cost;
 						return (
-							<div key={id} className='flex items-center justify-between gap-3 border-b px-rule pb-2 last:border-b-0'>
+							<div key={id} className='ds-listrow ds-listrow-line'>
 								<div>
 									<div className='text-[#ecdcb4]'>
 										{def.label}{' '}
@@ -200,8 +199,10 @@ const RebirthDialog: React.FC = () => {
 									</div>
 									<div className='text-xs text-[#a89878]'>{shopText[id](level)}</div>
 								</div>
-								<button
-									className='px-btn px-btn-sm shrink-0'
+								<Button
+									size='sm'
+									tone={maxed || !affordable ? 'dark' : 'gold'}
+									style={{ flexShrink: 0 }}
 									disabled={maxed || !affordable}
 									onClick={() => {
 										if (buyEmberUpgrade(id)) audioManager.playSound('purchase');
@@ -214,13 +215,13 @@ const RebirthDialog: React.FC = () => {
 											<EmberIcon /> {formatHeaderAmount(cost)}
 										</>
 									)}
-								</button>
+								</Button>
 							</div>
 						);
 					})}
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

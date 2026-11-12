@@ -121,9 +121,6 @@ interface UiState {
 	toggleGemShop: () => void;
 	closeGemShop: () => void;
 	closeRebirth: () => void;
-	tutorialOpen: boolean;
-	openTutorial: () => void;
-	closeTutorial: () => void;
 	saveMenuOpen: boolean;
 	toggleSaveMenu: () => void;
 	closeSaveMenu: () => void;
@@ -185,6 +182,8 @@ interface UiState {
 	merchantSelect: string | null;
 	/** Opens the Merchant on `resource`: the window comes to the front on the Resources tab with that row selected (gold opens the Upgrades tab, where gold is spent) */
 	openMerchantOn: (resource: string) => void;
+	/** Like openMerchantOn, but a second press on the same chip, with the Merchant in front, closes the window */
+	toggleMerchantOn: (resource: string) => void;
 	clearMerchantSelect: () => void;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
@@ -213,9 +212,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 	rebirthOpen: false,
 	toggleRebirth: () => set((state) => ({ rebirthOpen: !state.rebirthOpen })),
 	closeRebirth: () => set({ rebirthOpen: false }),
-	tutorialOpen: false,
-	openTutorial: () => set({ tutorialOpen: true }),
-	closeTutorial: () => set({ tutorialOpen: false }),
 	saveMenuOpen: false,
 	toggleSaveMenu: () => set((state) => ({ saveMenuOpen: !state.saveMenuOpen })),
 	closeSaveMenu: () => set({ saveMenuOpen: false }),
@@ -310,6 +306,13 @@ export const useUiStore = create<UiState>((set, get) => ({
 		writeStringPref('merchantTab', tab);
 		set({ merchantTab: tab, merchantSelect: tab === 'resources' ? resource : null });
 		useWindowStore.getState().openWindow('merchant');
+	},
+	toggleMerchantOn: (resource) => {
+		const windows = useWindowStore.getState();
+		const tab: MerchantTab = resource === 'gold' ? 'upgrades' : 'resources';
+		const sameView = get().merchantTab === tab && (tab === 'upgrades' || get().merchantSelect === resource);
+		if (sameView && windows.order[windows.order.length - 1] === 'merchant') windows.closeWindow('merchant');
+		else get().openMerchantOn(resource);
 	},
 	clearMerchantSelect: () => set({ merchantSelect: null }),
 	merchantCustom: '',

@@ -17,18 +17,13 @@ const exportGame = async () => {
 };
 
 /**
- * The entries every menu ends with: saving and the view options. The header dropdown (`full`) also lists Settings and the
- * Guide, the right-click menu stays short.
+ * The entries every menu ends with: saving and the view options. The header dropdown (`full`) also lists Settings, the
+ * right-click menu stays short.
  */
 export const globalMenuItems = (full = false): ContextMenuItem[] => {
 	const ui = useUiStore.getState();
 	const items: ContextMenuItem[] = [
-		...(full
-			? [
-					{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings },
-					{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
-				]
-			: []),
+		...(full ? [{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings }] : []),
 		{
 			id: 'organize',
 			label: 'Organize bag',

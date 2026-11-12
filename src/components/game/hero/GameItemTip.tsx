@@ -159,15 +159,18 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			];
 
 	const effectRows: TipRow[] = (def.effects ?? []).map((effect) => ({ label: describeEffect(effect), value: '', tone: 'green' as const }));
-	const hintText = (
+	const hintText: { key: string; text: string }[] =
 		hints === 'bag'
-			? [item ? 'Dbl-click equip' : hasEffects(def) ? 'Dbl-click drink' : '', fighting ? '' : 'Shift + click sell']
+			? [
+					...(item ? [{ key: 'Dbl-click', text: 'equip' }] : hasEffects(def) ? [{ key: 'Dbl-click', text: 'drink' }] : []),
+					...(fighting ? [] : [{ key: 'Shift', text: '+click sell' }]),
+				]
 			: hints === 'merchant' && !fighting
-				? ['Click sell one', 'Shift + click sell all']
-				: []
-	)
-		.filter(Boolean)
-		.join(' · ');
+				? [
+						{ key: 'Click', text: 'sell one' },
+						{ key: 'Shift', text: '+click sell all' },
+					]
+				: [];
 
 	return (
 		<ItemTooltip

@@ -64,7 +64,6 @@ import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
 import SettingsDialog from '@/components/game/overlays/SettingsDialog';
 import RebirthDialog from '@/components/game/overlays/RebirthDialog';
 import GemShopDialog from '@/components/game/overlays/GemShopDialog';
-import TutorialDialog from '@/components/game/overlays/TutorialDialog';
 import { useSettingsStore } from '@/stores/settingsStore';
 import TabLockOverlay from '@/components/game/overlays/TabLockOverlay';
 import { useSingleTab } from '@/hooks/useSingleTab';
@@ -203,7 +202,6 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<OfflineDialog />
 			{/* after the welcome-back window: the daily bonus, once the start of the game is done */}
 			<DailyBonusDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
-			<TutorialDialog />
 			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<PetWelcomeDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<ConfirmDialogs />

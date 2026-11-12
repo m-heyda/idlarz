@@ -31,7 +31,7 @@ const ResourceTrays: React.FC = () => {
 	const compact = useUiStore((state) => state.compactHeader);
 	const toggleRebirth = useUiStore((state) => state.toggleRebirth);
 	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
-	const openMerchantOn = useUiStore((state) => state.openMerchantOn);
+	const toggleMerchantOn = useUiStore((state) => state.toggleMerchantOn);
 
 	const amountOf = (key: ResourceKey): number =>
 		key === 'gems' ? gems : key === 'embers' ? embers : ((resources as unknown as Record<string, number>)[key] ?? 0);
@@ -51,7 +51,7 @@ const ResourceTrays: React.FC = () => {
 					const isEmbers = key === 'embers';
 					const price = (MERCHANT_RESOURCE_PRICES as Record<string, number | undefined>)[key];
 					const opensMerchant = !isGems && !isEmbers && (key === 'gold' || price !== undefined);
-					const act = isGems ? toggleGemShop : isEmbers ? toggleRebirth : opensMerchant ? () => openMerchantOn(key) : undefined;
+					const act = isGems ? toggleGemShop : isEmbers ? toggleRebirth : opensMerchant ? () => toggleMerchantOn(key) : undefined;
 					const production = rate === undefined ? null : formatRateAuto(rate);
 					const rows = [
 						{ label: 'Stock', value: exactOf(amount) },
@@ -135,7 +135,7 @@ const HudTopBar: React.FC = () => {
 				</>
 			}
 		>
-			<span data-tutorial='top-resources' style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+			<span data-tutorial='top-resources' style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
 				<ResourceTrays />
 			</span>
 		</TopBar>

@@ -4041,3 +4041,33 @@ button.ds-income-head:hover {
 	min-width: 190px;
 	max-width: 300px;
 }
+
+/* the key hints of an item tooltip: key caps with what they do, pushed to the two ends */
+.ds-tip-keys {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	margin-top: 8px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 11px;
+	color: var(--ds-text-dim);
+}
+
+/* the top bar, tightened: narrower chips, less air between the trays */
+.ds-topbar {
+	gap: 6px;
+}
+
+.ds-chipgroup .ds-chip {
+	padding: 0 5px 0 3px;
+	gap: 3px;
+}
+
+.ds-chip > span:first-of-type:not(.ds-chip-rate) {
+	min-width: 2.6em;
+}
+
+.ds-chipgroup .ds-chip > span:first-of-type:not(.ds-chip-rate) {
+	min-width: 0;
+}
