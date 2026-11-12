@@ -3,6 +3,10 @@ import { GEMS_CAP } from '@/config/economy';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
 import { conditionHolds, conditionProgress, deedPoints, type DeedFacts } from '@/lib/deeds';
+import { RARITIES } from '@/catalog';
+import { wornLevelOf } from '@/lib/loot/junk';
+import { readWorldFacts } from '@/lib/worldFacts';
+import type { ItemInstance } from '@/types/game';
 import { guideLive } from '@/lib/tutorial/live';
 
 // SERVER ONLY. Achievements (IDL-73, gem rewards IDL-194): pure functions of numbers the server already holds. Nothing here reads a request; the browser cannot name an
@@ -11,12 +15,32 @@ import { guideLive } from '@/lib/tutorial/live';
 /** The numbers the conditions read (see `lib/deeds.ts`). */
 export type AchievementFacts = DeedFacts;
 
-export const factsOf = (ledger: Ledger, summary: StoredSave['summary']): AchievementFacts => ({
-	stats: ledger.stats,
-	castleLevel: summary.castleLevel,
-	rebirths: Math.max(ledger.rebirths, summary.rebirths),
-	buildings: 0,
-});
+/** How many equipment slots hold gear of each rarity or better, and the average item level, from the server's own record of what is worn. */
+const wornOf = (equipment: Record<string, ItemInstance | undefined> | undefined) => {
+	const kit = { uncommon: 0, epic: 0, legendary: 0 };
+	const worn = Object.values(equipment ?? {}).filter((item): item is ItemInstance => !!item);
+	for (const item of worn) {
+		const rank = RARITIES[item.rarity as keyof typeof RARITIES]?.order ?? 0;
+		if (rank >= RARITIES.uncommon.order) kit.uncommon++;
+		if (rank >= RARITIES.epic.order) kit.epic++;
+		if (rank >= RARITIES.legendary.order) kit.legendary++;
+	}
+	return { kit, wornLevel: wornLevelOf(equipment ?? {}) };
+};
+
+export const factsOf = (ledger: Ledger, summary: StoredSave['summary']): AchievementFacts => {
+	const world = readWorldFacts(summary.derived?.deedWorld);
+	return {
+		stats: ledger.stats,
+		castleLevel: summary.castleLevel,
+		rebirths: Math.max(ledger.rebirths, summary.rebirths),
+		buildings: world?.buildingsBuilt ?? 0,
+		world,
+		attrs: ledger.attrs?.alloc,
+		streak: ledger.gemShop.daily.streak,
+		...wornOf(ledger.inv?.equipment),
+	};
+};
 
 export { conditionHolds };
 

@@ -50,7 +50,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 73,
+  "line": 96,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
@@ -64,7 +64,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 417,
+  "line": 441,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -2072,7 +2072,7 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 72,
+  "line": 96,
   "summary": "The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time. Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.",
   "see": []
  },
@@ -2083,7 +2083,7 @@
   "kind": "function",
   "category": "Progression/Deeds",
   "file": "src/lib/offline/achievements.ts",
-  "line": 100,
+  "line": 124,
   "summary": "Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP` (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.",
   "see": []
  },
@@ -2094,7 +2094,7 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 153,
+  "line": 177,
   "summary": "Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
   "see": [
    "achievementsDue",
@@ -2167,6 +2167,17 @@
   "file": "src/lib/offline/consumables.ts",
   "line": 27,
   "summary": "Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).",
+  "see": []
+ },
+ {
+  "id": "recordcuriosity",
+  "name": "recordCuriosity",
+  "symbol": "recordCuriosity",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/offline/curiosity.ts",
+  "line": 14,
+  "summary": "Records a curiosity once. An id that is not on the list, or one already recorded, changes nothing (the same ledger comes back).",
   "see": []
  },
  {
@@ -2773,6 +2784,17 @@
   "file": "src/lib/tutorial/progress.ts",
   "line": 18,
   "summary": "Reads the stored `stats.tutorial` (or an answer from the server) back: a missing field, null or anything malformed reads as nothing done, ids that are not in the catalog any more (a step removed in a later release) are dropped, nothing is trusted to be the right shape.",
+  "see": []
+ },
+ {
+  "id": "worldfacts",
+  "name": "worldFacts",
+  "symbol": "worldFacts",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/worldFacts.ts",
+  "line": 34,
+  "summary": "The facts of a map and a farm. The largest group per biome is a flood fill over the owned tiles (each tile is visited once), so a map of tens of thousands of tiles costs one pass.",
   "see": []
  },
  {

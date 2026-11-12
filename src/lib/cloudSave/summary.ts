@@ -1,4 +1,5 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
+import { worldFacts, type WorldFacts } from '@/lib/worldFacts';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { buildTimeReduction, builtBuildings } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
@@ -72,6 +73,8 @@ export interface SaveDerived {
 	xpBase?: number;
 	/** What the stock of sellable resources is worth at the merchant, in gold: the next save may sell it without that being a burst of income (verify.ts). Absent on rows from before. */
 	stockWorth?: number;
+	/** The land and farm facts the deeds read (`worldFacts`: biomes owned, largest groups, animals, buildings). Absent on rows from before. */
+	deedWorld?: WorldFacts;
 }
 
 export const DEFAULT_DERIVED: SaveDerived = {
@@ -167,6 +170,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		playSeconds: state.playSeconds,
 		derived: {
 			lakesOwned: biomeCount(state.tiles, 'lake'),
+			deedWorld: worldFacts(state.tiles, state.farmLevels, BUILDINGS_FLAG.enabled),
 			...(BUILDINGS_FLAG.enabled
 				? {
 						buildingUpgrade: state.buildingUpgrade ? { ...state.buildingUpgrade } : null,

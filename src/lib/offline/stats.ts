@@ -59,6 +59,8 @@ export interface LifetimeStats {
 	 * an accepted save that accounts for them drops them (`settleTrades`, trade.ts). Additive: absent reads as none.
 	 */
 	tradeSince: TradeSince;
+	/** One-off events the server recorded for the secret deeds (`curiosity` ids from a short allowlist, `lib/offline/curiosity.ts`). Additive: absent reads as none. */
+	curiosity: string[];
 }
 
 /** What the server traded with the merchant since the last accepted save. */
@@ -101,6 +103,7 @@ export const emptyStats = (): LifetimeStats => ({
 	bestMs: {},
 	masteryClaimed: {},
 	tradeSince: emptyTrade(),
+	curiosity: [],
 });
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
@@ -151,6 +154,7 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		bestMs: counts(r.bestMs),
 		masteryClaimed: counts(r.masteryClaimed),
 		tradeSince: tradeOf(r.tradeSince),
+		curiosity: ids(r.curiosity),
 	};
 };
 
@@ -171,6 +175,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		bestMs,
 		masteryClaimed,
 		tradeSince,
+		curiosity,
 		...rest
 	} = s;
 	return {
@@ -190,6 +195,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(Object.keys(bestMs).length > 0 ? { bestMs } : {}),
 		...(Object.keys(masteryClaimed).length > 0 ? { masteryClaimed } : {}),
 		...(!isEmptyTrade(tradeSince) ? { tradeSince } : {}),
+		...(curiosity.length > 0 ? { curiosity } : {}),
 	};
 };
 
@@ -217,7 +223,8 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	Object.keys(s.deaths).length === 0 &&
 	Object.keys(s.bestMs).length === 0 &&
 	Object.keys(s.masteryClaimed).length === 0 &&
-	isEmptyTrade(s.tradeSince);
+	isEmptyTrade(s.tradeSince) &&
+	s.curiosity.length === 0;
 
 /**
  * A kill of monster `type`: counted once, when the server pays it. `ms` (how long the fight lasted) keeps the fastest win per type for the Bestiary, and `flawless` (the hero took no hit) counts

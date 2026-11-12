@@ -468,7 +468,7 @@ TABLES['achievement-list'] = () => {
 			case 'manual':
 				return 'granted by the new chapter reset';
 			default:
-				return `${c.kind} >= ${c.min}`;
+				return 'min' in c ? `${c.kind} >= ${c.min}` : `${c.kind} ${Object.entries(c).filter(([k]) => k !== 'kind').map(([, v]) => v).join(' ')}`;
 		}
 	};
 	const total = ACHIEVEMENTS.reduce((sum, a) => sum + a.rewards.gems, 0);

@@ -4,6 +4,7 @@ import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spe
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending } from '@/lib/offline/gems';
 import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
 import { claimAllMastery, claimMastery } from '@/lib/offline/mastery';
+import { recordCuriosity } from '@/lib/offline/curiosity';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
@@ -407,6 +408,11 @@ export const gemsStep = (
 				ledger: claimed.ledger,
 				value: { ...gemsView(claimed.ledger, ctx.nowSec, identity), paid: claimed.gems, achievements: reportOf(claimed.ledger, [], ctx.stored.summary) },
 			};
+		}
+		if (request.action === 'visit') {
+			// a one-off event for a secret deed: recorded once, from the allowlist; the deed itself is earned by the settle that follows
+			const visited = recordCuriosity(ledger, request.id);
+			return { ledger: visited, value: gemsView(visited, ctx.nowSec, identity) };
 		}
 		if (request.action === 'claimAll') {
 			// Claim all of the Hall of Deeds: every earned tier that is waiting, paid in this one request

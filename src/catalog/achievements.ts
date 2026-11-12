@@ -1,3 +1,4 @@
+import { BATCH2_ACHIEVEMENTS, BATCH2_DEEDS } from '@/catalog/achievementsBatch2';
 import { MASTERY_ENTRY_KILLS } from '@/catalog/mastery';
 
 // The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
@@ -31,6 +32,28 @@ export type AchievementCondition =
 	| { kind: 'flawless'; min: number }
 	/** Bestiary entries filled: monster types with at least `kills` kills each (the first mastery step, `catalog/mastery.ts`) */
 	| { kind: 'entries'; kills: number; min: number }
+	/** The first tile of a biome owned (batch 2) */
+	| { kind: 'biome'; biome: string }
+	/** The largest connected group of tiles of one biome */
+	| { kind: 'cluster'; biome: string; min: number }
+	/** Farm animals owned: all kinds together, or one kind */
+	| { kind: 'animals'; min: number; animal?: string }
+	/** Buildings standing on tiles of one biome (their building's biome), and buildings at the top level */
+	| { kind: 'buildingsIn'; biome: string; min: number }
+	| { kind: 'buildingsMaxed'; min: number }
+	/** Points allocated into one attribute */
+	| { kind: 'attribute'; stat: string; min: number }
+	/** The average item level of the worn gear */
+	| { kind: 'wornLevel'; min: number }
+	/** Every equipment slot holds gear of this rarity or better */
+	| { kind: 'kit'; rarity: 'uncommon' | 'epic' | 'legendary' }
+	/** Days in a row the daily bonus was claimed (the gem shop's streak) */
+	| { kind: 'streak'; min: number }
+	| { kind: 'respecs'; min: number }
+	/** Boss kills */
+	| { kind: 'bosses'; min: number }
+	/** A one-off event the server recorded (`LifetimeStats.curiosity`) */
+	| { kind: 'curiosity'; id: string }
 	/** Never checked by the lazy evaluator: granted by a one-off server step (the early tester by the new chapter reset) */
 	| { kind: 'manual' };
 
@@ -401,6 +424,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		badge: 'badge_scroll_check_silver',
 		rewards: { gems: 150, points: 80 },
 	},
+	...BATCH2_ACHIEVEMENTS,
 ];
 
 export const achievementById = (id: string): AchievementDef | undefined => ACHIEVEMENTS.find((a) => a.id === id);
@@ -613,6 +637,7 @@ export const DEEDS: readonly DeedDef[] = [
 		how: 'Granted to the players of the closed beta.',
 		tiers: ['beta_tester'],
 	},
+	...BATCH2_DEEDS,
 ];
 
 export const deedById = (id: string): DeedDef | undefined => DEEDS.find((d) => d.id === id);
@@ -621,7 +646,7 @@ export const deedById = (id: string): DeedDef | undefined => DEEDS.find((d) => d
 export const deedOfAchievement = (achievementId: string): DeedDef | undefined => DEEDS.find((d) => d.tiers.includes(achievementId));
 
 /** The groups of the Hall of Deeds window. */
-export type DeedCategory = 'combat' | 'realm' | 'economy' | 'craft' | 'bestiary' | 'rebirth' | 'special';
+export type DeedCategory = 'combat' | 'realm' | 'economy' | 'craft' | 'bestiary' | 'rebirth' | 'special' | 'gear' | 'hero' | 'farm' | 'explorer' | 'fun';
 
 /**
  * A deed groups the tiers of one goal for the Hall of Deeds (Slayer: 100 / 500 / 2.5K / 10K kills). **Each tier is an ordinary achievement** (`tiers` lists their ids in order), so earning, claiming, the ledger and

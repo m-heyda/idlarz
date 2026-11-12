@@ -24,6 +24,8 @@ export type GemsRequest =
 	| { action: 'daily' }
 	| { action: 'claim'; id: string }
 	| { action: 'claimAll' }
+	/** A one-off event for the secret deeds (`lib/offline/curiosity.ts`) */
+	| { action: 'visit'; id: string }
 	| { action: 'spend'; itemId: string; value?: string };
 
 export interface DailyInfo {

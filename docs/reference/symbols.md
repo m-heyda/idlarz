@@ -7,7 +7,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Name | Category | Source | What |
 | --- | --- | --- | --- |
 | `acceptSave` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:211`](../../src/lib/cloudSave/pipeline.ts) | Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). |
-| Achievements | Progression / Achievements | [`src/catalog/achievements.ts:73`](../../src/catalog/achievements.ts) | The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). |
+| Achievements | Progression / Achievements | [`src/catalog/achievements.ts:96`](../../src/catalog/achievements.ts) | The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). |
 | `addBuff` | Combat / Consumables | [`src/lib/buffs.ts:63`](../../src/lib/buffs.ts) | Adds one buff effect to the running buffs. |
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:301`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
@@ -79,8 +79,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `CHEST` | Economy / Chests and Luck | [`src/config/spawns.ts:34`](../../src/config/spawns.ts) | Chests. |
 | `chestIntervalSec` | Economy / Chests and Luck | [`src/lib/luck.ts:16`](../../src/lib/luck.ts) | Seconds between two chests: |
 | `chestSpots` | Economy / Chests and Luck | [`src/lib/chests.ts:28`](../../src/lib/chests.ts) | The tiles a chest could go on, with their weights. |
-| `claimAchievement` | Progression / Achievements | [`src/lib/offline/achievements.ts:72`](../../src/lib/offline/achievements.ts) | The Claim button: |
-| `claimAllAchievements` | Progression / Deeds | [`src/lib/offline/achievements.ts:100`](../../src/lib/offline/achievements.ts) | Claim all: |
+| `claimAchievement` | Progression / Achievements | [`src/lib/offline/achievements.ts:96`](../../src/lib/offline/achievements.ts) | The Claim button: |
+| `claimAllAchievements` | Progression / Deeds | [`src/lib/offline/achievements.ts:124`](../../src/lib/offline/achievements.ts) | Claim all: |
 | `claimAllMastery` | Progression / Mastery | [`src/lib/offline/mastery.ts:54`](../../src/lib/offline/mastery.ts) | Claim all: |
 | `claimMastery` | Progression / Mastery | [`src/lib/offline/mastery.ts:37`](../../src/lib/offline/mastery.ts) | Claims tier `tier` (1-based) of monster `type`. |
 | `CLASS_AVATARS` | Progression / Avatars | [`src/catalog/avatars.ts:104`](../../src/catalog/avatars.ts) | The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: |
@@ -105,7 +105,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:20`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:110`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
 | `dangerBonus` | Monsters / Level scaling | [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts) | Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: |
-| Deeds | Progression / Deeds | [`src/catalog/achievements.ts:417`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
+| Deeds | Progression / Deeds | [`src/catalog/achievements.ts:441`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
 | `dismissTicket` | Combat / A fight | [`src/lib/offline/fight.ts:145`](../../src/lib/offline/fight.ts) | Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). |
 | `DISTANCE_BANDS` | Monsters / Spawning | [`src/config/distanceBands.ts:25`](../../src/config/distanceBands.ts) | Distance bands: |
 | `dodgeChance` | Combat / Player numbers | [`src/lib/combat.ts:242`](../../src/lib/combat.ts) | Chance (0-1) that a monster's hit misses: |
@@ -219,6 +219,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rebirthUnlockIntro` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:40`](../../src/utils/game/rebirthUnlocks.ts) | The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. |
 | `receiveDrops` | Loot / Pipeline | [`src/lib/loot/receive.ts:24`](../../src/lib/loot/receive.ts) | Hands drops to the player: |
 | `reconcileCharacter` | Progression / Levels | [`src/utils/game/character.ts:167`](../../src/utils/game/character.ts) | Puts a character's attributes in line with an XP total: |
+| `recordCuriosity` | Progression / Achievements | [`src/lib/offline/curiosity.ts:14`](../../src/lib/offline/curiosity.ts) | Records a curiosity once. |
 | `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` have been bought: |
 | `regen` | Combat / Player numbers | [`src/lib/combat.ts:231`](../../src/lib/combat.ts) | HP regeneration outside fights: |
 | Rehearsal seeding (seed-rehearsal) | Ops / Operator guides | [`scripts/seed-rehearsal-account.ts:1`](../../scripts/seed-rehearsal-account.ts) | Puts ONE throwaway account into a rebirthed mid-game state, fast, for the new chapter reset rehearsal (`docs/plan/new-chapter-release-runbook.md`,... |
@@ -248,7 +249,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `sellPayout` | Economy / Merchant | [`src/utils/game/merchant.ts:62`](../../src/utils/game/merchant.ts) | Gold for selling `qty` of something worth `unit` each. |
 | `sellResource` | Economy / Merchant | [`src/lib/offline/trade.ts:63`](../../src/lib/offline/trade.ts) | Sells `qty` units of `resource` to the merchant: |
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
-| `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:153`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
+| `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:177`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
 | `settleIdols` | Saves & Server / Accepting a save | [`src/lib/cloudSave/idolTrust.ts:19`](../../src/lib/cloudSave/idolTrust.ts) | The server's say over the Idol levels (the account's `idolLevels`). |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
 | `SKILLS` | Combat / Potions and skills | [`src/catalog/skills.ts:34`](../../src/catalog/skills.ts) | Potions and skills. |
@@ -295,5 +296,6 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `winBucketOf` | Combat / Win chance | [`src/lib/combat.ts:62`](../../src/lib/combat.ts) | The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): |
 | `withBuffs` | Combat / Consumables | [`src/lib/offline/profile.ts:106`](../../src/lib/offline/profile.ts) | A profile with the running potion buffs on top (buffTotals): |
 | `withPushLock` | Saves & Server / Uploading | [`src/lib/pushLock.ts:19`](../../src/lib/pushLock.ts) | One upload at a time per browser. |
+| `worldFacts` | Progression / Achievements | [`src/lib/worldFacts.ts:34`](../../src/lib/worldFacts.ts) | The facts of a map and a farm. |
 | `XP_MODEL` | Saves & Server / Accepting a save | [`src/lib/cloudSave/xpModel.ts:21`](../../src/lib/cloudSave/xpModel.ts) | The server's model of how much XP a character can have. |
 | `xpToNextLevel` | Progression / Levels | [`src/utils/game/character.ts:187`](../../src/utils/game/character.ts) | XP to go from `level` to the next one (Infinity at the maximum level). |

@@ -152,6 +152,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/catalog/**
 
 - [`achievements.ts`](../../src/catalog/achievements.ts) — ~ What has to hold.
+- [`achievementsBatch2.ts`](../../src/catalog/achievementsBatch2.ts) — ~ Adds a deed whose tiers are `[goal, when, title suffix, gems, points, bonus?]`.
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
 - [`badges.ts`](../../src/catalog/badges.ts) — ~ The stored `profiles.badge_id` that hides the badge completely (null = the default).
@@ -294,7 +295,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/Merchant/**
 
 - [`MerchantItemsSection.tsx`](../../src/components/game/overlays/Merchant/MerchantItemsSection.tsx) — ~ Sell bag items for gold:
-- [`MerchantOverlay.tsx`](../../src/components/game/overlays/Merchant/MerchantOverlay.tsx)
+- [`MerchantOverlay.tsx`](../../src/components/game/overlays/Merchant/MerchantOverlay.tsx) — ~ Opening the Gambling tab while it is still empty is a secret deed (IDL-305):
 - [`MerchantResources.tsx`](../../src/components/game/overlays/Merchant/MerchantResources.tsx) — ~ How much one Sell or Buy click moves:
 - [`MerchantShop.tsx`](../../src/components/game/overlays/Merchant/MerchantShop.tsx) — ~ How many places stand on one plank of the shelf.
 - [`MerchantTabButtons.tsx`](../../src/components/game/overlays/Merchant/MerchantTabButtons.tsx)
@@ -432,7 +433,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`craftGear.ts`](../../src/lib/craftGear.ts) — Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 - [`dailyPrompt.ts`](../../src/lib/dailyPrompt.ts) — Where the daily bonus window remembers "Don't show again today" (per browser).
-- [`deeds.ts`](../../src/lib/deeds.ts) — ~ The numbers the conditions read.
+- [`deeds.ts`](../../src/lib/deeds.ts) — ~ Equipment slots a full kit must fill.
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
@@ -485,6 +486,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 - [`craft.ts`](../../src/lib/offline/craft.ts) — ~ What rolling a gear craft needs besides the ledger:
+- [`curiosity.ts`](../../src/lib/offline/curiosity.ts) — ~ The events a deed may be waiting for.
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
 - [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off), for the win estimate.
@@ -580,6 +582,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`uiPrefs.ts`](../../src/lib/uiPrefs.ts) — Remembered view options (not game state): plain booleans in localStorage, every access guarded
 - [`utils.ts`](../../src/lib/utils.ts)
+- [`worldFacts.ts`](../../src/lib/worldFacts.ts) — ~ The land and farm facts of one accepted save.
 
 **src/**
 
@@ -897,6 +900,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`bootSnapshot.test.ts`](../../tests/server/bootSnapshot.test.ts) — ~ A stand-in for the Supabase client:
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
 - [`deeds.test.ts`](../../tests/server/deeds.test.ts)
+- [`deedsBatch2.test.ts`](../../tests/server/deedsBatch2.test.ts)
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`junk.test.ts`](../../tests/server/junk.test.ts)

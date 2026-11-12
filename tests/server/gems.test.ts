@@ -316,6 +316,8 @@ test('the route reads a claim: it needs the key and an id, and never lets a clai
 	assert.deepEqual(parseGemsBody({ action: 'claim', key, id: 'first_blood' }), { key, request: { action: 'claim', id: 'first_blood' } });
 	assert.equal(parseGemsBody({ action: 'claim', id: 'first_blood' }), null, 'no key');
 	assert.deepEqual(parseGemsBody({ action: 'claimAll', key }), { key, request: { action: 'claimAll' } });
+	assert.deepEqual(parseGemsBody({ action: 'visit', key, id: 'gambling_empty' }), { key, request: { action: 'visit', id: 'gambling_empty' } });
+	assert.equal(parseGemsBody({ action: 'visit', key }), null);
 	assert.equal(parseGemsBody({ action: 'claimAll' }), null, 'no key');
 	assert.equal(parseGemsBody({ action: 'claim', key }), null, 'no id');
 	assert.equal(parseGemsBody({ action: 'claim', key, id: '' }), null, 'empty id');

@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { newClaimId } from '@/lib/offlineClient';
+import { requestGems } from '@/lib/rewardsClient';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber, formatPercent } from '@/utils/formatters';
@@ -10,6 +12,19 @@ import { CLICK_LADDER } from '@/config/economy';
 import { cn } from '@/lib/utils';
 import ResourceIcon from '../../ResourceIcon';
 import { MERCHANT_PORTRAIT, npcPortraitUrl } from '@/config/npcPortraits';
+
+/** Opening the Gambling tab while it is still empty is a secret deed (IDL-305): the server is told once per page load, and it decides whether that counts. */
+let gamblingSeen = false;
+const GamblingPlaceholder: React.FC = () => {
+	useEffect(() => {
+		if (gamblingSeen) return;
+		gamblingSeen = true;
+		void requestGems(newClaimId(), { action: 'visit', id: 'gambling_empty' }).then((reply) => {
+			if (reply.status !== 'ok') gamblingSeen = false;
+		});
+	}, []);
+	return <PlaceholderTabContent title='Gambling' emoji='🎲' description='Coming soon! Test your luck with various games of chance. Win big or lose it all!' />;
+};
 
 // Extracted component for tab content placeholders
 interface PlaceholderTabContentProps {
@@ -139,9 +154,7 @@ const MerchantOverlay: React.FC = () => {
 					/>
 				);
 			case 'gambling':
-				return (
-					<PlaceholderTabContent title='Gambling' emoji='🎲' description='Coming soon! Test your luck with various games of chance. Win big or lose it all!' />
-				);
+				return <GamblingPlaceholder />;
 			default:
 				return null;
 		}

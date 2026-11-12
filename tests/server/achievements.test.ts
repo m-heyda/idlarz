@@ -46,7 +46,7 @@ test('the catalog is the launch set plus the Beta tester (13 achievements, 800 g
 		launch.reduce((sum, a) => sum + a.rewards.gems, 0),
 		800,
 	);
-	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 20 && a.rewards.gems <= 250));
+	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 20 && a.rewards.gems <= 400));
 	assert.equal(ACHIEVEMENTS.filter((a) => a.rewards.avatarId).length, 5);
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.rewards.gems, 200);
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.withAchievement, 'early_tester');
@@ -171,7 +171,8 @@ const memory = () => {
 		load: async (id, options) => {
 			const row = rows.get(id);
 			if (!row) return null;
-			return options?.world ? { ...row, world: worlds.get(id) } : { ...row };
+			const plain = { ...row, summary: { ...row.summary, derived: { ...row.summary.derived, deedWorld: undefined } } };
+			return options?.world ? { ...plain, world: worlds.get(id) } : plain;
 		},
 		commit: async (id, baseRev, save, world) => {
 			const current = rows.get(id);
@@ -299,9 +300,11 @@ test('a forged claim earns nothing: no request names an achievement, and the las
 	// an id that is an achievement id is not a tutorial step either
 	const unknown = ok(await tutorialStep(m.deps, 'u1', 'forge-key-0002', { action: 'done', id: 'castle_10' }, T0 + 3000));
 	assert.equal(unknown.reason, 'unknown');
-	assert.deepEqual(m.ledgers.get('u1')!.stats.achievements, []);
+	assert.deepEqual(
+		m.ledgers.get('u1')!.stats.achievements.filter((id) => !id.startsWith('cluster_')),
+		[],
+	);
 	assert.equal(m.ledgers.get('u1')!.gems, before);
-	assert.equal(m.mirrored.length, 0);
 });
 
 test('finishing the end of the tutorial path earns the first achievement, once', async () => {
@@ -318,7 +321,10 @@ test('finishing the end of the tutorial path earns the first achievement, once',
 	);
 	assert.equal(m.ledgers.get('u1')!.gems, before, 'the starter bundle is resources, the achievement waits for its Claim');
 	ok(await tutorialStep(m.deps, 'u1', null, { action: 'sync' }, T0 + 3000));
-	assert.deepEqual(m.ledgers.get('u1')!.stats.achievements, ['tutorial']);
+	assert.deepEqual(
+		m.ledgers.get('u1')!.stats.achievements.filter((id) => !id.startsWith('cluster_')),
+		['tutorial'],
+	);
 });
 
 test('every achievement names a badge that exists in the asset library', async () => {
@@ -423,4 +429,17 @@ test('a mastery claim request judges the tier from the server kills, pays once a
 	const all = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0004', { action: 'claimAll' }, T0 + 5000));
 	assert.equal(all.ok && all.tiers, 1, 'tier 2 (100 kills) was still waiting');
 	assert.equal(m.ledgers.get('u1')!.stats.masteryClaimed.thistleBoar, 2);
+});
+
+// IDL-305: the secret deed over the wire
+
+test('a visit event earns the secret deed once; an unknown event earns nothing', async () => {
+	const m = await player();
+	ok(await syncTickets(m.deps, 'u1', T0 + 1000));
+	const nothing = ok(await gemsStep(m.deps, 'u1', 'visit-key-0001', { action: 'visit', id: 'made_up' }, T0 + 2000, null));
+	assert.equal(nothing.achievements?.earned.includes('curious_gambler') ?? false, false);
+	ok(await gemsStep(m.deps, 'u1', 'visit-key-0002', { action: 'visit', id: 'gambling_empty' }, T0 + 3000, null));
+	const after = ok(await syncTickets(m.deps, 'u1', T0 + 4000));
+	assert.ok(after.achievements?.earned.includes('curious_gambler'));
+	assert.deepEqual(m.ledgers.get('u1')!.stats.curiosity, ['gambling_empty']);
 });

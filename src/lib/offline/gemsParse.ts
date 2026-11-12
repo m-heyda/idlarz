@@ -14,6 +14,8 @@ export const parseGemsBody = (body: Record<string, unknown>): GemsBody | null =>
 	if (typeof body.key !== 'string' || !KEY.test(body.key)) return null;
 	if (body.action === 'daily') return { key: body.key, request: { action: 'daily' } };
 	if (body.action === 'claimAll') return { key: body.key, request: { action: 'claimAll' } };
+	if (body.action === 'visit' && typeof body.id === 'string' && body.id.length > 0 && body.id.length <= 40)
+		return { key: body.key, request: { action: 'visit', id: body.id } };
 	if (body.action === 'claim' && typeof body.id === 'string' && body.id.length > 0 && body.id.length <= 60)
 		return { key: body.key, request: { action: 'claim', id: body.id } };
 	if (body.action === 'spend' && typeof body.itemId === 'string' && body.itemId.length <= 40)

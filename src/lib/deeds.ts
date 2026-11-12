@@ -1,6 +1,10 @@
 import { ACHIEVEMENTS, achievementById, type AchievementCondition, type DeedDef } from '@/catalog/achievements';
 import { TUTORIAL_PATH } from '@/catalog/tutorial';
 import type { LifetimeStats } from '@/lib/offline/stats';
+import type { WorldFacts } from '@/lib/worldFacts';
+
+/** Equipment slots a full kit must fill. */
+export const KIT_SLOTS = 14;
 
 // Pure maths of the Hall of Deeds (IDL-306): how far a condition is, what tier a deed is on, how many points the claimed tiers are worth. No server and no store imports, so the
 // server (what is due, what the report says) and the browser (the window) run the same functions on the same numbers.
@@ -8,6 +12,15 @@ import type { LifetimeStats } from '@/lib/offline/stats';
 /** The numbers the conditions read. All of them come from the ledger or the last accepted save. */
 export interface DeedFacts {
 	stats: LifetimeStats;
+	/** The land and farm of the last accepted save (`worldFacts`); absent on a row from before */
+	world?: WorldFacts | null;
+	/** Points allocated per attribute, from the server's record */
+	attrs?: Record<string, number>;
+	/** The average item level of the worn gear, and how many slots hold gear of each rarity or better (out of `KIT_SLOTS`) */
+	wornLevel?: number;
+	kit?: { uncommon: number; epic: number; legendary: number };
+	/** The daily bonus streak (1 to 7) */
+	streak?: number;
 	castleLevel: number;
 	rebirths: number;
 	/** Buildings built, lifetime. The building system has no counter yet, so this is 0 until it reports one. */
@@ -51,6 +64,33 @@ export const conditionProgress = (when: AchievementCondition, f: DeedFacts): { c
 			return { cur: f.stats.flawless, goal: when.min };
 		case 'entries':
 			return { cur: entriesFilled(f.stats, when.kills), goal: when.min };
+		case 'biome':
+			return { cur: f.world?.biomes.includes(when.biome) ? 1 : 0, goal: 1 };
+		case 'cluster':
+			return { cur: f.world?.largestGroup[when.biome] ?? 0, goal: when.min };
+		case 'animals':
+			return {
+				cur: when.animal ? (f.world?.animals[when.animal] ?? 0) : Object.values(f.world?.animals ?? {}).reduce((sum, n) => sum + n, 0),
+				goal: when.min,
+			};
+		case 'buildingsIn':
+			return { cur: f.world?.buildingsByBiome[when.biome] ?? 0, goal: when.min };
+		case 'buildingsMaxed':
+			return { cur: f.world?.buildingsMaxed ?? 0, goal: when.min };
+		case 'attribute':
+			return { cur: f.attrs?.[when.stat] ?? 0, goal: when.min };
+		case 'wornLevel':
+			return { cur: f.wornLevel ?? 0, goal: when.min };
+		case 'kit':
+			return { cur: f.kit?.[when.rarity] ?? 0, goal: KIT_SLOTS };
+		case 'streak':
+			return { cur: f.streak ?? 0, goal: when.min };
+		case 'respecs':
+			return { cur: f.stats.respecs, goal: when.min };
+		case 'bosses':
+			return { cur: f.stats.bosses, goal: when.min };
+		case 'curiosity':
+			return { cur: f.stats.curiosity.includes(when.id) ? 1 : 0, goal: 1 };
 		case 'manual':
 			return { cur: 0, goal: 1 };
 	}
