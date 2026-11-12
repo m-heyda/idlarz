@@ -420,10 +420,10 @@ The builder every piece of gear is authored with. Gear is authored at the first 
 
 ### `isJunk` <small>function</small>
 
-Source: [`src/lib/loot/junk.ts:22`](../../src/lib/loot/junk.ts)
+Source: [`src/lib/loot/junk.ts:30`](../../src/lib/loot/junk.ts)
 
-Whether a piece of **gear** in the bag counts as junk for the "Sell junk" button. False for everything until the gear rule is decided (a player flag, a rarity rule, item level under the worn average); worn gear is never in the bag, and set
-pieces and locked items will be protected when they exist.
+Whether a piece of **gear** in the bag counts as junk for the "Sell junk" button: the player marked it (`item.junk`, the right-click menu), or its item level is `JUNK_LEVEL_MARGIN` below the average of what is worn. The level rule never
+touches set pieces, epic or legendary pieces or crafted gear (the mark overrides all of that: it is the player's own call). Worn gear is never in the bag.
 
 See also: `isJunkStack`, [`junkSale`](loot.md#junksale)
 
@@ -431,7 +431,7 @@ See also: `isJunkStack`, [`junkSale`](loot.md#junksale)
 
 ### `junkSale` <small>function</small>
 
-Source: [`src/lib/loot/junk.ts:45`](../../src/lib/loot/junk.ts)
+Source: [`src/lib/loot/junk.ts:70`](../../src/lib/loot/junk.ts)
 
 What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run,
 so their previews agree. `junk` is a parameter so a test can flip the gear rule.

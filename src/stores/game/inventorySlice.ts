@@ -6,7 +6,7 @@ import { sellPayout } from '@/utils/game/merchant';
 import { maxHp, maxMana } from '@/lib/combat';
 import { equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, unequip } from '@/lib/inventory';
 import { sellValueOf } from '@/lib/itemInstance';
-import { isAutoSold, junkSale } from '@/lib/loot';
+import { isAutoSold, junkFor, junkSale, withJunkMark } from '@/lib/loot';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
 import type { EquipmentSlot } from '@/types/game';
@@ -118,6 +118,17 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 			return true;
 		},
 
+		// The right-click menu's Mark as junk: the preview is at once, the server's answer settles it
+		markJunk: (bagIndex: number, junk: boolean) => {
+			const state = get();
+			if (state.combat.fight) return false;
+			const item = Number.isInteger(bagIndex) ? gearOf(state.bag[bagIndex]) : null;
+			if (!item) return false;
+			sendInventoryOp({ action: 'markJunk', index: bagIndex, junk });
+			set({ bag: state.bag.map((slot, i) => (i === bagIndex ? { item: withJunkMark(item, junk) } : slot)) });
+			return true;
+		},
+
 		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)
 		sellJunk: (maxRarity?: string) => {
 			const state = get();
@@ -128,7 +139,7 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 			let count = 0;
 			if (maxRarity === undefined) {
 				// no rarity: the junk rule decides (the junk materials, and the gear the rule names)
-				({ bag, gold, count } = junkSale(bag, state));
+				({ bag, gold, count } = junkSale(bag, state, junkFor(state.equipment)));
 			} else
 				bag.forEach((slot, index) => {
 					const item = gearOf(slot);

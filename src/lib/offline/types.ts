@@ -34,6 +34,8 @@ export type InventoryOp =
 	/** Sells every bag piece up to a rarity (Quick sell in the Merchant), or every piece the junk rule names (`rule: 'junk'`, the Bag's Sell junk button) */
 	| { action: 'sellJunk'; maxRarity: string }
 	| { action: 'sellJunk'; rule: 'junk' }
+	/** Marks a bag piece as junk (the player's flag), or takes the mark off */
+	| { action: 'markJunk'; index: number; junk: boolean }
 	| { action: 'autoSell'; rarity: string | null }
 	| { action: 'buyShop'; id: string; qty: number }
 	| { action: 'buyOffer'; item: ItemInstance }

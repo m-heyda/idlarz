@@ -3,6 +3,8 @@ import { formatCompact } from '@/utils/formatters';
 import { createPortal } from 'react-dom';
 import { EQUIPMENT_PIXEL_ICONS } from '@/config/pixelIcons';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
+import { isJunk, wornLevelOf } from '@/lib/loot/junk';
+import { useGameStore } from '@/stores/gameStore';
 import { resolveItem } from '@/lib/itemInstance';
 import type { EquipmentSlot, ItemInstance } from '@/types/game';
 import { useTipDismiss } from '@/hooks/useTipDismiss';
@@ -114,6 +116,9 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 	const rarityId = resolved?.instance.rarity ?? def?.rarity;
 	const rarity = rarityId ? RARITIES[rarityId as keyof typeof RARITIES] : undefined;
 	const hasTip = !!def || !!label;
+	// a bag piece the Sell junk button would sell (marked by the player, or well below what is worn): a small mark in the corner
+	const wornLevel = useGameStore((state) => wornLevelOf(state.equipment));
+	const junkMark = !!compare && !!item && isJunk(item, { wornLevel });
 
 	// no stuck tooltip: a scroll, click, Escape, blur or a pointer outside the slot and its card closes it at once, and so does a slot that lost its item
 	const rootRef = useRef<HTMLDivElement | null>(null);
@@ -137,6 +142,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				data-filled={!!def}
 				data-equipped={!!equipped}
 				data-locked={!!locked}
+				data-junk={junkMark}
 				data-rarity={rarityId}
 				data-pulse={rarity?.glow.pulse}
 				data-over={over}

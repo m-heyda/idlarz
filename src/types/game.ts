@@ -174,6 +174,8 @@ export interface ItemInstance {
 	affixes: AffixRoll[];
 	/** Made by the player in the Crafting window (IDL-241): only the server sets it; the tooltip says so. Absent on drops, the shelf and gifts. */
 	crafted?: true;
+	/** The player marked this piece as junk (IDL-312): the Sell junk button sells it. Optional and additive; only the server sets it (the `markJunk` inventory op). */
+	junk?: true;
 }
 
 /** Equipped gear by slot: instances (rolled rarity, level, quality, affixes) */
@@ -431,6 +433,8 @@ export interface GameState {
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
 	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
 	/** Sells the gear up to a rarity (Quick sell); with no argument it sells what the junk rule names (the Bag's Sell junk button: nothing until the rule exists) */
+	/** Marks a bag piece as junk, or takes the mark off (the right-click menu); refused in a fight */
+	markJunk: (bagIndex: number, junk: boolean) => boolean;
 	sellJunk: (maxRarity?: string) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
 	buyOffer: (index: number) => boolean;

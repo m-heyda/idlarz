@@ -696,3 +696,17 @@
 	margin-top: 4px;
 	color: #c9b27a;
 }
+
+/* a bag piece that Sell junk would sell (IDL-312): a small brown tag in the corner */
+.inv-slot[data-junk='true']::after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 8px;
+	height: 8px;
+	background: #8a5a2a;
+	border: 1px solid #f0d27a;
+	transform: rotate(45deg);
+	pointer-events: none;
+}

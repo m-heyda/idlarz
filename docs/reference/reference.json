@@ -1812,8 +1812,8 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junk.ts",
-  "line": 22,
-  "summary": "Whether a piece of **gear** in the bag counts as junk for the \"Sell junk\" button. False for everything until the gear rule is decided (a player flag, a rarity rule, item level under the worn average); worn gear is never in the bag, and set pieces and locked items will be protected when they exist.",
+  "line": 30,
+  "summary": "Whether a piece of **gear** in the bag counts as junk for the \"Sell junk\" button: the player marked it (`item.junk`, the right-click menu), or its item level is `JUNK_LEVEL_MARGIN` below the average of what is worn. The level rule never touches set pieces, epic or legendary pieces or crafted gear (the mark overrides all of that: it is the player's own call). Worn gear is never in the bag.",
   "see": [
    "isJunkStack",
    "junkSale"
@@ -1826,7 +1826,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junk.ts",
-  "line": 45,
+  "line": 70,
   "summary": "What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run, so their previews agree. `junk` is a parameter so a test can flip the gear rule.",
   "see": []
  },
@@ -2665,7 +2665,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 216,
+  "line": 218,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },
@@ -2782,7 +2782,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 366,
+  "line": 368,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

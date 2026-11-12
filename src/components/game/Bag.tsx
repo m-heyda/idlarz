@@ -24,6 +24,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 	const moveBagItem = useGameStore((state) => state.moveBagItem);
 	const unequipItem = useGameStore((state) => state.unequipItem);
 	const sellItem = useGameStore((state) => state.sellItem);
+	const markJunk = useGameStore((state) => state.markJunk);
 
 	const activate = (index: number) => {
 		const slot = bag[index];
@@ -86,6 +87,16 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 							hint: `${formatNumber(sellPayout(unit, qty, state))} gold`,
 							disabled: fighting,
 							onSelect: () => sellBatch(qty),
+						},
+					]
+				: []),
+			...(gear
+				? [
+						{
+							id: 'junk',
+							label: gear.junk ? 'Unmark junk' : 'Mark as junk',
+							disabled: fighting,
+							onSelect: () => markJunk(index, !gear.junk),
 						},
 					]
 				: []),

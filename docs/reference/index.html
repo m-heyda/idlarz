@@ -3521,13 +3521,13 @@ It joins the general pool automatically (tags <code>gear</code>, not <code>named
 <p>The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier&#39;s window (<code>LEVEL_WINDOW_BY_TIER</code>: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).</p>
 </article><h2>Junk</h2><article><p><a id="isjunk"></a></p>
 <h3><code>isJunk</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/loot/junk.ts"><code>src/lib/loot/junk.ts:22</code></a></p>
-<p>Whether a piece of <strong>gear</strong> in the bag counts as junk for the &quot;Sell junk&quot; button. False for everything until the gear rule is decided (a player flag, a rarity rule, item level under the worn average); worn gear is never in the bag, and set
-pieces and locked items will be protected when they exist.</p>
+<p>Source: <a href="../../src/lib/loot/junk.ts"><code>src/lib/loot/junk.ts:30</code></a></p>
+<p>Whether a piece of <strong>gear</strong> in the bag counts as junk for the &quot;Sell junk&quot; button: the player marked it (<code>item.junk</code>, the right-click menu), or its item level is <code>JUNK_LEVEL_MARGIN</code> below the average of what is worn. The level rule never
+touches set pieces, epic or legendary pieces or crafted gear (the mark overrides all of that: it is the player&#39;s own call). Worn gear is never in the bag.</p>
 <p>See also: <code>isJunkStack</code>, <a href="#junksale"><code>junkSale</code></a></p>
 </article><article><p><a id="junksale"></a></p>
 <h3><code>junkSale</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/loot/junk.ts"><code>src/lib/loot/junk.ts:45</code></a></p>
+<p>Source: <a href="../../src/lib/loot/junk.ts"><code>src/lib/loot/junk.ts:70</code></a></p>
 <p>What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant&#39;s Haggler and Idol bonuses. The one function the server and the browser both run,
 so their previews agree. <code>junk</code> is a parameter so a test can flip the gear rule.</p>
 </article><article><p><a id="selljunkrule"></a></p>
@@ -4997,7 +4997,7 @@ and on hide/close; the backup rotates every 10 minutes. A read goes through <cod
 One tab owns the game at a time (<code>src/hooks/useSingleTab.ts</code>, a Web Lock).</p>
 </article><article><p><a id="sanitizesave"></a></p>
 <h3><code>sanitizeSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:216</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:218</code></a></p>
 <p>Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
 pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
@@ -5682,7 +5682,7 @@ so <code>state.tiles</code> changes exactly when the map does; the owned / chest
 </ul>
 </article><article><p><a id="gamestate"></a></p>
 <h3><code>GameState</code> <small>interface</small></h3>
-<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:366</code></a></p>
+<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:368</code></a></p>
 <p>State. The persisted keys are <code>PERSISTED_KEYS</code> (<a href="#persisted-keys"><code>PERSISTED_KEYS</code></a>), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.</p>
 <p>Not saved: <code>monsters</code> and the open fight (<code>combat</code>) are the server&#39;s picture and arrive with each <code>/api/spawn</code> answer. Rebuilt on load: <code>resourceRates</code>, derived combat stats, castle upgrade cost, every window/dialog flag, <code>isHydrated</code>.
 The stores: <code>gameStore.ts</code> (every action: buyTile, tick, upgradeCastle, clickForGold, startFight, rebirth, buyEmberUpgrade, merchant actions ...), <code>uiStore.ts</code> (transient UI flags), <code>viewStore.ts</code> (where the map is on the screen),

@@ -4,7 +4,8 @@ import { ITEM_CATALOG } from '../../src/catalog';
 import { JUNK_ITEMS } from '../../src/catalog/items/junk';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
-import { countJunk, isJunkStack, junkSale } from '../../src/lib/loot/junk';
+import { countJunk, isJunk, isJunkStack, JUNK_LEVEL_MARGIN, junkFor, junkSale, wornLevelOf } from '../../src/lib/loot/junk';
+import { applyOp, parseOp, sellJunkRule } from '../../src/lib/offline/inventory';
 import { rollJunkDrops } from '../../src/lib/loot/junkDrops';
 import { mulberry32 } from '../../src/lib/rng';
 import { plainItem } from '../../src/lib/itemInstance';
@@ -86,4 +87,49 @@ test('Sell junk sells every junk stack at its price (Haggler applies) and leaves
 	const rich = junkSale(bag, { merchantUpgrades: { haggler: 5 } });
 	assert.ok(rich.gold > sold.gold, 'Haggler pays more');
 	assert.equal(junkSale(emptyBag(), {}).count, 0);
+});
+
+// IDL-312: the gear rule: a player flag, or an item level well below what is worn
+
+const piece = (level: number, over: Record<string, unknown> = {}) => ({ ...plainItem('steel_helm'), level, ...over });
+
+test('gear is junk when the player marked it, or when its level is far below the worn average; never otherwise', () => {
+	const worn = { head: piece(30), chest: piece(40) };
+	assert.equal(wornLevelOf(worn), 35);
+	assert.equal(wornLevelOf({}), 0);
+	const ctx = { wornLevel: 35 };
+	assert.equal(isJunk(piece(35 - JUNK_LEVEL_MARGIN - 1), ctx), true, 'well below what is worn');
+	assert.equal(isJunk(piece(35 - JUNK_LEVEL_MARGIN), ctx), false, 'inside the margin');
+	assert.equal(isJunk(piece(1)), false, 'no worn level, no level rule');
+	assert.equal(isJunk(piece(1, { junk: true })), true, 'the player flag always counts');
+	assert.equal(isJunk(piece(1, { crafted: true }), ctx), false, 'crafted gear is protected from the level rule');
+	assert.equal(isJunk(piece(1, { rarity: 'epic' }), ctx), false, 'so is epic and above');
+	assert.equal(isJunk(piece(1, { rarity: 'epic', junk: true }), ctx), true, 'but the player decides');
+	assert.equal(junkFor(worn)(piece(10)), true);
+});
+
+test('markJunk sets and clears the flag on a bag piece, refuses anything else, and Sell junk then sells it', () => {
+	const rare = piece(20);
+	let bag = emptyBag();
+	bag = addDrop(bag, { kind: 'gear', item: rare }).bag;
+	bag = addDrop(bag, { kind: 'consumable', id: 'potion_minor', qty: 2 }).bag;
+	const inv = { bag, equipment: {}, ver: 1, lootPity: {}, autoSellUpTo: null } as unknown as Parameters<typeof applyOp>[0];
+	const ctx = {} as Parameters<typeof applyOp>[2];
+	assert.deepEqual(parseOp({ action: 'markJunk', index: 0, junk: true }), { action: 'markJunk', index: 0, junk: true });
+	assert.equal(parseOp({ action: 'markJunk', index: 0 }), null);
+	assert.equal(applyOp(inv, { action: 'markJunk', index: 1, junk: true }, ctx).ok, false, 'a potion cannot be marked');
+	assert.equal(applyOp(inv, { action: 'markJunk', index: 9, junk: true }, ctx).ok, false);
+	assert.equal(sellJunkRule(inv, ctx).ok, false, 'nothing marked, nothing sold');
+	const marked = applyOp(inv, { action: 'markJunk', index: 0, junk: true }, ctx);
+	assert.ok(marked.ok);
+	assert.equal(countJunk(marked.inv.bag, junkFor({})), 1);
+	const sold = sellJunkRule(marked.inv, ctx);
+	assert.ok(sold.ok && sold.count === 1 && sold.gold > 0);
+	assert.deepEqual(
+		sold.inv.bag.filter((s) => s && 'id' in s),
+		[{ id: 'potion_minor', qty: 2 }],
+	);
+	const cleared = applyOp(marked.inv, { action: 'markJunk', index: 0, junk: false }, ctx);
+	assert.ok(cleared.ok);
+	assert.equal(sellJunkRule(cleared.inv, ctx).ok, false);
 });

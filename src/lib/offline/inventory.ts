@@ -19,7 +19,7 @@ import { instanceProblem, plainItem, sellValueOf } from '@/lib/itemInstance';
 import { HARD_LIMITS } from '@/config/limits';
 import { limitOf } from '@/lib/limits';
 import { isAutoSold } from '@/lib/loot/autoSell';
-import { isJunk, junkSale } from '@/lib/loot/junk';
+import { junkFor, junkSale, withJunkMark } from '@/lib/loot/junk';
 import { receiveDrops, type Received } from '@/lib/loot/receive';
 import type { Inventory, InventoryOp } from '@/lib/offline/types';
 import type { PersistedGame } from '@/lib/sanitizeSave';
@@ -237,7 +237,7 @@ const wholeQty = (qty: number | undefined, available: number): number | null => 
  * @category Loot/Junk
  * @order 2
  */
-export const sellJunkRule = (inv: Inventory, sellCtx: SellContext, junk: (item: ItemInstance) => boolean = isJunk): OpResult => {
+export const sellJunkRule = (inv: Inventory, sellCtx: SellContext, junk: (item: ItemInstance) => boolean = junkFor(inv.equipment)): OpResult => {
 	const sold = junkSale(inv.bag, sellCtx, junk);
 	return sold.count === 0 ? refused(inv) : done(bump(inv, { bag: sold.bag }), sold.gold, sold.count);
 };
@@ -284,6 +284,12 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 			const amount = wholeQty(op.qty, slotQty(slot));
 			if (!unit || !amount) return refused(inv);
 			return done(bump(inv, { bag: removeFromBag(inv.bag, op.index, amount) }), sellPayout(unit, amount, sellCtx), amount);
+		}
+		case 'markJunk': {
+			const item = Number.isInteger(op.index) ? gearOf(inv.bag[op.index]) : null;
+			if (!item || typeof op.junk !== 'boolean') return refused(inv);
+			const marked = withJunkMark(item, op.junk);
+			return done(bump(inv, { bag: inv.bag.map((slot, i) => (i === op.index ? { item: marked } : slot)) }));
 		}
 		case 'sellJunk': {
 			if ('rule' in op) return op.rule === 'junk' ? sellJunkRule(inv, sellCtx) : refused(inv);
@@ -354,6 +360,8 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 			return int(raw.index) && (raw.qty === undefined || int(raw.qty))
 				? { action: raw.action, index: raw.index, ...(raw.qty === undefined ? {} : { qty: raw.qty as number }) }
 				: null;
+		case 'markJunk':
+			return int(raw.index) && typeof raw.junk === 'boolean' ? { action: 'markJunk', index: raw.index, junk: raw.junk } : null;
 		case 'sellJunk':
 			if (raw.rule === 'junk') return { action: 'sellJunk', rule: 'junk' };
 			return typeof raw.maxRarity === 'string' ? { action: 'sellJunk', maxRarity: raw.maxRarity } : null;

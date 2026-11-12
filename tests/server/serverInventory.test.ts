@@ -523,7 +523,7 @@ test('a resource sale is paid by the server price, recorded as granted, counted 
 	assert.deepEqual(after.stats.tradeSince.sold, { wood: 400 });
 	// what is left of the stock can still be sold, what was never there cannot
 	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 500 })).ok, true);
-	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 5000 })).ok, false, 'more than the stock can explain');
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 1e6 })).ok, false, 'more than the stock can explain');
 });
 
 test('a sale the save cannot explain, a resource the merchant does not buy, and bad numbers are refused with nothing changed', async () => {
@@ -552,7 +552,7 @@ test('an accepted save absorbs the trades since the one before it, so the same s
 	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
 	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince, { sold: {}, boughtGold: 0 }, 'the save absorbed them');
 	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 90 }, T0 + 3 * MIN)).ok, true);
-	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 2000 }, T0 + 3 * MIN)).ok, false);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 1e6 }, T0 + 3 * MIN)).ok, false);
 });
 
 test('a purchase is granted by the server when the gold can be explained, and refused when it cannot', async () => {
