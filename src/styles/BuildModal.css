@@ -296,8 +296,8 @@
 	gap: 6px;
 }
 .bh-details {
-	display: block;
-	text-align: center;
+	display: inline-block;
+	margin-left: 4px;
 	font-size: 0.75rem;
 	color: #7a7f90;
 	cursor: help;

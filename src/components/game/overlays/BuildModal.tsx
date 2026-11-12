@@ -25,11 +25,16 @@ const Art: React.FC<{ def: BuildOption['def'] }> = ({ def }) => (
 	</span>
 );
 
-const Head: React.FC<{ def: BuildOption['def']; extra?: string }> = ({ def, extra }) => (
+const Head: React.FC<{ def: BuildOption['def']; extra?: string; details?: React.ReactNode }> = ({ def, extra, details }) => (
 	<div className='build-head'>
 		<span className='build-name'>{def.label}</span>
 		<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
 		{extra && <span className='build-extra'>{extra}</span>}
+		{details && (
+			<HoverTip tip={details} placement='above' align='center'>
+				<span className='bh-details'>Details</span>
+			</HoverTip>
+		)}
 	</div>
 );
 
@@ -156,7 +161,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					<div key={o.def.id} className={`ds-listrow bh-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
 						<div className='bh-info'>
-							<Head def={o.def} />
+							<Head def={o.def} details={details(o.def, o.remembered)} />
 							<p className='build-blurb'>{o.def.blurb}</p>
 							{keyLine(o.def)}
 							<div className='build-foot'>
@@ -168,9 +173,6 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
 								Build
 							</Button>
-							<HoverTip tip={details(o.def, o.remembered)} placement='above' align='center'>
-								<span className='bh-details'>Details</span>
-							</HoverTip>
 						</div>
 					</div>
 				))}

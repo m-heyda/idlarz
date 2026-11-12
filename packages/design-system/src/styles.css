@@ -4245,3 +4245,8 @@ button.ds-income-head:hover {
 	padding: 10px 8px;
 	background: linear-gradient(transparent, #0a0c12 40%);
 }
+
+/* a slider whose value is shown elsewhere */
+.ds-slider-bare .ds-slider-out {
+	display: none;
+}

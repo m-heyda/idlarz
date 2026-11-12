@@ -43,7 +43,7 @@ const SettingsDialog: React.FC = () => {
 				</Row>
 
 				<Row label={`Volume ${Math.round(volume * 100)}%`}>
-					<div style={{ width: 240 }} onMouseUp={() => audioManager.playSound('click')}>
+					<div className='ds-slider-bare' style={{ width: 240 }} onMouseUp={() => audioManager.playSound('click')}>
 						<Slider
 							value={Math.round(volume * 100)}
 							max={100}
