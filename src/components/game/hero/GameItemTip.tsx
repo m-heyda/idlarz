@@ -120,6 +120,41 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 	});
 	const affixes = (resolved?.affixes ?? []).map((affix) => ({ text: formatStat(affix.stat as StatKey, affix.value), name: affix.name }));
 
+	// what changes against the worn piece, one line each: green for a gain, red for a loss
+	const gain = (n: number) => (n > 0 ? ('green' as const) : ('red' as const));
+	const differences: TipRow[] = !withDiff
+		? []
+		: [
+				...(primaryKey && primaryDelta
+					? [{ label: statLabel(primaryKey), value: `${primaryDelta > 0 ? '+' : '-'}${formatCompact(Math.abs(primaryDelta), 2)}`, tone: gain(primaryDelta) }]
+					: []),
+				...(swing && swing.speed.delta
+					? [
+							{
+								label: 'Attacks per second',
+								value: `${swing.speed.delta > 0 ? '+' : '-'}${formatCompact(Math.abs(swing.speed.delta), 2)}`,
+								tone: gain(swing.speed.delta),
+							},
+						]
+					: []),
+				...(swing && swing.dps.delta
+					? [
+							{
+								label: 'Weapon damage per second',
+								value: `${swing.dps.delta > 0 ? '+' : '-'}${formatCompact(Math.abs(swing.dps.delta), 2)}`,
+								tone: gain(swing.dps.delta),
+							},
+						]
+					: []),
+				...rows
+					.filter((row) => row.status !== 'same')
+					.map((row) => {
+						const change = row.status === 'new' ? row.now : row.delta;
+						return { label: statLabel(row.key), value: formatStatChange(row.key, change), tone: gain(change) };
+					}),
+				...lost.map((row) => ({ label: statLabel(row.key), value: formatStatChange(row.key, -row.was), tone: 'red' as const })),
+			];
+
 	const effectRows: TipRow[] = (def.effects ?? []).map((effect) => ({ label: describeEffect(effect), value: '', tone: 'green' as const }));
 	const hintText = (
 		hints === 'bag'
@@ -211,6 +246,8 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 						}
 					: undefined
 			}
+			compare={differences.length > 0 ? differences : undefined}
+			compareWith='Difference'
 			flavor={def.description}
 			lore={def.lore}
 			onDrink={onDrink && hasEffects(def) ? onDrink : undefined}
@@ -232,7 +269,12 @@ export const GameItemTip: React.FC<Omit<TipProps, 'comparison' | 'wornLabel'> & 
 	return (
 		<div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
 			<GameItemCard {...rest} comparison={comparison} />
-			{comparison?.equipped ? <GameItemCard item={comparison.equipped} wornLabel /> : null}
+			{comparison?.equipped ? (
+				<div>
+					<div className='ds-tip-comparing'>Comparing</div>
+					<GameItemCard item={comparison.equipped} wornLabel />
+				</div>
+			) : null}
 		</div>
 	);
 };

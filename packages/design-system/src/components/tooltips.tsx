@@ -177,7 +177,7 @@ export interface ItemTooltipProps {
 	lore?: string;
 	/** Marks the card of the piece currently worn ("Equipped") */
 	equippedLabel?: boolean;
-	/** The old compare block (a list of differences) */
+	/** The difference block: what changes against the worn piece, one row per change (tone green for a gain, red for a loss), under the heading `compareWith` (default "Difference") */
 	compareWith?: string;
 	compare?: TipRow[];
 	/** Shows the Drink button of a potion */
@@ -273,7 +273,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 		) : null}
 		{compare ? (
 			<div className='ds-tip-compare'>
-				<TipSection>vs worn · {compareWith}</TipSection>
+				<div className='ds-tip-compare-head'>{compareWith ?? 'Difference'}</div>
 				<TipRows rows={compare} />
 			</div>
 		) : null}
