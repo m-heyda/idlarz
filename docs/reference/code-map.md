@@ -453,7 +453,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`summary.ts`](../../src/lib/cloudSave/summary.ts) — ~ What the server derives from a save by itself (never from numbers the client sends):
 - [`supabaseRepo.ts`](../../src/lib/cloudSave/supabaseRepo.ts) — ~ Null until the row's first save under the offline ledger; `DEFAULT_DERIVED` fills it
 - [`trustedEconomy.ts`](../../src/lib/cloudSave/trustedEconomy.ts) — ~ What the server pays a save from when the save's own economy cannot be believed (IDL-167).
-- [`verify.ts`](../../src/lib/cloudSave/verify.ts) — ~ Plausibility checks between two consecutive saves of one player, run on the SERVER with the SERVER's clock, from the summaries alone (no state is opened).
+- [`verify.ts`](../../src/lib/cloudSave/verify.ts) — ~ The Lighthouse level the sale check allows for (Idol levels have no design limit, so the check no longer follows the hard limit; raise it with the Idol level cap).
 - [`xpModel.ts`](../../src/lib/cloudSave/xpModel.ts) — ~ The server's model of how much XP a character can have.
 
 **src/lib/**

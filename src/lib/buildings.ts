@@ -53,9 +53,28 @@ export const buildTimeReduction = (prestige: PrestigeState | undefined, idolBuil
  * @category Economy/Buildings
  * @order 6
  * @formula
- * cost(level) = floor(tilePrice(min(owned tiles, priceTileCap)) x tilePrices x levelGrowth^(level - 1))   per resource
+ * cost(level) = floor(tilePrice(min(max(owned tiles, floor(level)), priceTileCap)) x tilePrices x levelGrowth^(level - 1))   per resource
+ * floor(level) = IDOL_RULES.floorTiles[level - 1], then +floorStepTiles per level (Idols only; other buildings have no floor)
  */
-export const buildingLevelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partial<Resources> => {
+export const buildingLevelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partial<Resources> =>
+	levelCost(level, def?.kind === 'idol' ? Math.max(ownedTiles, idolFloorTiles(level)) : ownedTiles, def);
+
+/** The tile count an Idol level is priced at least at (the price floor): the table, then `floorStepTiles` more per level, never above `priceTileCap`. */
+export const idolFloorTiles = (level: number): number => {
+	const { floorTiles, floorStepTiles } = IDOL_RULES;
+	const l = Math.max(1, Math.floor(level));
+	const raw = floorTiles[l - 1] ?? (floorTiles[floorTiles.length - 1] ?? 0) + floorStepTiles * (l - floorTiles.length);
+	return Math.min(BUILDING_RULES.cost.priceTileCap, raw);
+};
+
+/** The cheapest gold a building level could ever have cost (no floor): the net-worth check's floor, so an Idol placed free after a rebirth never reads as unpaid spending. */
+export const buildingMinGold = (level: number): number => {
+	let gold = 0;
+	for (let l = 1; l <= level; l++) gold += levelCost(l, 1).gold ?? 0;
+	return gold;
+};
+
+const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partial<Resources> => {
 	const { tilePrices, priceTileCap, levelGrowth } = BUILDING_RULES.cost;
 	const tile = tileCostAsResources(calculateTileCost(Math.min(Math.max(1, ownedTiles), priceTileCap)));
 	const mult = tilePrices * Math.pow(levelGrowth, Math.max(1, level) - 1);

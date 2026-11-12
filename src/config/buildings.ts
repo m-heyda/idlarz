@@ -46,10 +46,12 @@ export const BUILDING_RULES = {
  * - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
  * - **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
  *   An upgrade is bought during a run: resources, a timer on the shared builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one).
- *   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery.
+ *   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery; levels above it keep scaling without a limit (price, extract and timer all grow exponentially).
+ * - `floorTiles`: the **price floor**. Buying Idol level `L` is priced as if the player owned at least `floorTiles[L - 1]` tiles (20, 40, 60, 80, 100), so a rebirth (9 tiles) does not make levels cheap again. Above the table the floor grows `floorStepTiles` (40) per level; the price tile count never exceeds `priceTileCap`.
  *
  * @category Economy/Buildings
  * @order 7
  * @table idol-effects
+ * @table idol-price-floor
  */
-export const IDOL_RULES = { perLevel: 2, luckPerLevel: 4, buildTimeCap: 60, t3PerLevel: 200 };
+export const IDOL_RULES = { perLevel: 2, luckPerLevel: 4, buildTimeCap: 60, t3PerLevel: 200, floorTiles: [20, 40, 60, 80, 100], floorStepTiles: 40 };

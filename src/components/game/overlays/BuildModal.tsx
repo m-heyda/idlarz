@@ -39,8 +39,7 @@ const Head: React.FC<{ def: BuildOption['def']; extra?: string; details?: React.
 );
 
 /**
- * What an Idol is and does, in plain lines: the effect per level with the value now and at the cap, what the rebirth keeps, how it is upgraded. `coming soon` marks the effects the game does not apply yet
- * (farm output, click gold, merchant sell price). The numbers are `IDOL_RULES` and `limitOf('idolMaxLevel')`.
+ * What an Idol is and does, in plain lines: the effect per level with the value now and at the cap, what the rebirth keeps, how it is upgraded. `coming soon` marks an effect the game does not apply yet (none today). The numbers are `IDOL_RULES` and `limitOf('idolMaxLevel')`.
  */
 export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?: number; prestige?: PrestigeState }> = ({
 	id,

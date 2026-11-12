@@ -26,7 +26,7 @@ import { BUILDING_RULES, IDOL_RULES } from '../../src/config/buildings';
 import { IDOLS } from '../../src/catalog/idols';
 import { idolValueText } from '../../src/lib/idolEconomy';
 import { BUILDINGS } from '../../src/catalog/buildings';
-import { buildingLevelCost, buildingUpgradeDuration, buildingOutput } from '../../src/lib/buildings';
+import { buildingLevelCost, buildingUpgradeDuration, buildingOutput, idolFloorTiles } from '../../src/lib/buildings';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../../src/config/playerClasses';
 import { describeClassPassives } from '../../src/lib/classPassives';
 import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
@@ -199,6 +199,19 @@ For scale, the income bonus of the Embers ever earned (\`emberIncomeBonus\`, eve
 `,
 	};
 };
+
+TABLES['idol-price-floor'] = () => ({
+	title: 'Idol price floor: what each level costs on a small map (9 tiles) and its timer',
+	md: mdTable(
+		['Level', 'Floor (tiles)', 'Price at 9 tiles', 'Timer from the level below'],
+		[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((L) => [
+			L,
+			idolFloorTiles(L),
+			res(buildingLevelCost(L, 9, BUILDINGS.find((b) => b.kind === 'idol')) as Record<string, number>),
+			L === 1 ? 'built at once' : sec(buildingUpgradeDuration(L - 1)),
+		]),
+	),
+});
 
 TABLES['farm-animals'] = () => ({
 	title: `Animals (the pen holds ${FARM.baseCap} per kind)`,

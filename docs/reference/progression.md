@@ -373,7 +373,7 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `craftQueueSlots` | 3 | 5 | nothing yet |
 | `craftOfflineHours` | 8 | 72 | nothing yet |
 | `craftSpeed` | 1 | 4 | nothing yet |
-| `idolMaxLevel` | 5 | 10 | nothing yet |
+| `idolMaxLevel` | 5 | 100 | nothing yet |
 
 See also: [`limitOf`](progression.md#limitof)
 
