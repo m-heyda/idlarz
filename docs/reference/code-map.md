@@ -370,6 +370,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useCtrlSequence.ts`](../../src/hooks/useCtrlSequence.ts) — ~ Calls `onTrigger` when the Control key is pressed `count` times within `windowMs` (hidden menu shortcut).
 - [`useGlobalContextMenu.ts`](../../src/hooks/useGlobalContextMenu.ts) — ~ Takes over the right click for the whole page:
 - [`useHydration.ts`](../../src/hooks/useHydration.ts) — ~ True once the saved game has been loaded from the vault AND the splash has been shown for a moment.
+- [`useIncomeBreakdown.ts`](../../src/hooks/useIncomeBreakdown.ts) — ~ The income of every resource split by source (`calculateResourceBreakdown`), recomputed only when one of its inputs changes (the map, the stats, the farm, the Embers, the merchant upgrades, the gear), never on a tick.
 - [`useMenuAttention.ts`](../../src/hooks/useMenuAttention.ts) — ~ What in the header has something waiting:
 - [`useOfflineClaim.ts`](../../src/hooks/useOfflineClaim.ts) — ~ The game waits this long for the server before it starts anyway (a late answer is still applied when it arrives).
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
@@ -808,6 +809,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gearEconomy.test.ts`](../../tests/economy/gearEconomy.test.ts) — ~ Puts gear on the character the way a loaded save does, with the rates that go with it.
 - [`idols.test.ts`](../../tests/economy/idols.test.ts) — ~ A fresh game with `n` tiles made `biome` (the first non-castle tiles), castle at `castleLevel`; returns their positions.
 - [`idolsServer.test.ts`](../../tests/economy/idolsServer.test.ts) — ~ Every Idol effect, checked the way the server applies it:
+- [`incomeSources.test.ts`](../../tests/economy/incomeSources.test.ts)
 - [`limitsAndSelling.test.ts`](../../tests/economy/limitsAndSelling.test.ts)
 - [`merchantGoods.test.ts`](../../tests/economy/merchantGoods.test.ts)
 - [`merchantShop.test.ts`](../../tests/economy/merchantShop.test.ts) — ~ What a plain item sells for at its first level (the shop's stock); consumables have their own price.

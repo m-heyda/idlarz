@@ -287,3 +287,43 @@ export const calculateResourceRates = (
 	}
 	return { base, modifiers, total };
 };
+
+/** One line of "Where the income comes from": what it is and how much per second it adds to the total. */
+export interface IncomeSource {
+	id: 'start' | 'tiles' | 'farm' | 'castleArea' | 'castleXp';
+	label: string;
+	/** Per second, **after** the percentage bonuses, so the lines add up to the total shown in the header */
+	value: number;
+}
+
+/** One percentage bonus on the income, for the tooltip's bonus lines (the Foreman, the set bonus, Embers, the castle ...). */
+export interface IncomeBonus {
+	id: 'castle' | 'plains' | 'stats' | 'embers' | 'foreman' | 'gear';
+	label: string;
+	/** As a fraction (0.2 = +20%) */
+	pct: number;
+}
+
+/**
+ * The income of one resource split by source, for the header tooltips (IDL-314). Each source is its part of `base` times `(1 + modifier)`, so **the sources add up to `total`** (a test holds it). The bonuses are listed
+ * separately for the bonus lines; their combined effect is `modifier`. Sources and bonuses that are zero are left out.
+ */
+export const incomeSources = (entry: ResourceBreakdownEntry): { sources: IncomeSource[]; bonuses: IncomeBonus[] } => {
+	const scale = 1 + entry.modifier;
+	const all: IncomeSource[] = [
+		{ id: 'start', label: 'Realm', value: entry.start * scale },
+		{ id: 'tiles', label: 'Tiles', value: entry.biome * scale },
+		{ id: 'farm', label: 'Farm', value: entry.farm * scale },
+		{ id: 'castleArea', label: 'Castle range', value: entry.castleArea * scale },
+		{ id: 'castleXp', label: 'Castle levels', value: entry.castleXp * scale },
+	];
+	const allBonuses: IncomeBonus[] = [
+		{ id: 'castle', label: 'Castle', pct: entry.castleMod },
+		{ id: 'plains', label: 'Plains', pct: entry.plainsMod },
+		{ id: 'stats', label: 'Attributes', pct: entry.statMod },
+		{ id: 'embers', label: 'Embers', pct: entry.emberMult - 1 },
+		{ id: 'foreman', label: 'Foreman', pct: entry.merchantMult - 1 },
+		{ id: 'gear', label: 'Set bonus', pct: entry.gearMult - 1 },
+	];
+	return { sources: all.filter((s) => s.value > 1e-9), bonuses: allBonuses.filter((b) => Math.abs(b.pct) > 5e-4) };
+};
