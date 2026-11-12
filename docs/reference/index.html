@@ -4235,7 +4235,7 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 <h3>The boards</h3>
 <p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:40</code></a></p>
 <p>The tabs of the Rankings window, in order. A board with <code>soon</code> is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).</p>
-<p>Every board lists the first 50 places of the players on the current chapter (test accounts never), plus the asking player&#39;s own place below it. The places are rebuilt once per 24 hours (<code>refresh_rankings()</code>, run by the first request after that), and each row shows the change since the rebuild before.
+<p>Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player&#39;s own place below it. The places are rebuilt once per 24 hours (<code>refresh_rankings()</code>, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:</p>
 <ul>
 <li>Level: level, then lifetime XP, then who reached the level cap first.</li>

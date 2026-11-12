@@ -1040,6 +1040,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`player_rankings_kills.sql`](../../supabase/migrations/player_rankings_kills.sql)
 - [`player_rankings_kills_rollback.sql`](../../supabase/migrations/player_rankings_kills_rollback.sql)
 - [`player_rankings_rollback.sql`](../../supabase/migrations/player_rankings_rollback.sql)
+- [`player_rankings_season.sql`](../../supabase/migrations/player_rankings_season.sql)
 - [`profile_badge_title.sql`](../../supabase/migrations/profile_badge_title.sql)
 - [`profile_badge_title_rollback.sql`](../../supabase/migrations/profile_badge_title_rollback.sql)
 - [`profile_name_color.sql`](../../supabase/migrations/profile_name_color.sql)

@@ -25,11 +25,12 @@ export const fetchRankings = async (board: RankingBoardId): Promise<RankingBoard
 
 /**
  * A board of the Rankings, cached per board (`QUERY_KEYS.rankings`): the first open of a tab loads it (the window shows skeleton rows), every later open of that tab is served from the cache. The server rebuilds the places once a day, so
- * the 5-minute freshness of the query client is plenty. A board that is not built yet (`soon`) is never fetched. A failed read throws, so the query retries once and then reports `isError`.
+ * a minute of freshness is plenty (the cache must not outlive a rebuild by long). A board that is not built yet (`soon`) is never fetched. A failed read throws, so the query retries once and then reports `isError`.
  */
 export const useRankings = (board: RankingBoardId) =>
 	useQuery<RankingBoardAnswer>({
 		queryKey: QUERY_KEYS.rankings(board),
+		staleTime: 60_000,
 		enabled: !RANKING_BOARDS.find((entry) => entry.id === board)?.soon,
 		queryFn: async () => {
 			const answer = await fetchRankings(board);

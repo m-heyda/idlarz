@@ -59,12 +59,12 @@ const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board 
 				</span>
 			)}
 		</span>
-		<Move row={row} />
 		<span className='ds-rank-podium'>
 			{row.rank <= 3 && (
 				// eslint-disable-next-line @next/next/no-img-element
 				<img className='ds-rank-trophy' data-place={row.rank} src={pixelIconSrc('rank_trophy')} alt={`Place ${row.rank}`} width={44} height={44} />
 			)}
+			<Move row={row} />
 		</span>
 	</li>
 );

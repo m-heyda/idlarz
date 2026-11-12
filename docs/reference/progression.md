@@ -546,7 +546,7 @@ Source: [`src/lib/rankings.ts:40`](../../src/lib/rankings.ts)
 
 The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
 
-Every board lists the first 50 places of the players on the current chapter (test accounts never), plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
+Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:
 - Level: level, then lifetime XP, then who reached the level cap first.
 - Rebirths: rebirths, then Embers ever earned.
