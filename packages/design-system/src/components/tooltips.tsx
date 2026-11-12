@@ -118,6 +118,8 @@ export const TipSection: React.FC<{ children: React.ReactNode }> = ({ children }
 export interface TooltipProps {
 	rarity?: Rarity;
 	icon?: string;
+	/** A class on the header picture (a tint) */
+	iconClassName?: string;
 	title: string;
 	subtitle?: React.ReactNode;
 	children?: React.ReactNode;
@@ -127,7 +129,7 @@ export interface TooltipProps {
 	banner?: { text: string; tone: 'equipped' | 'comparing' };
 }
 /** The base tooltip: dark slate body, rim in the rarity colour, and a glow for uncommon and up. Icon + title header, free content, optional two-part footer. */
-export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, title, subtitle, children, footer, className, banner }) => (
+export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, iconClassName, title, subtitle, children, footer, className, banner }) => (
 	<div className={cx('ds-root', 'ds-tip', className)} data-rarity={rarity} role='tooltip'>
 		{banner ? (
 			<div className='ds-tip-banner' data-tone={banner.tone}>
@@ -135,7 +137,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, title
 			</div>
 		) : null}
 		<div className='ds-tip-head'>
-			{icon ? <img src={icon} alt='' /> : null}
+			{icon ? <img src={icon} alt='' className={iconClassName} /> : null}
 			<div>
 				<div className='ds-tip-title'>{title}</div>
 				{subtitle ? <div className='ds-tip-sub'>{subtitle}</div> : null}
@@ -339,16 +341,19 @@ export const MonsterTooltip: React.FC<{
 	dropsTitle?: string;
 	footer?: Footer;
 	boss?: boolean;
+	/** A golden (lucky) monster: gold card, gold-tinted picture and a star */
+	lucky?: boolean;
 	defeated?: number;
 	growth?: string;
 	bossLine?: string;
 	cta?: string;
 	wip?: boolean;
-}> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, defeated, growth, bossLine, cta, wip }) => (
+}> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, lucky, defeated, growth, bossLine, cta, wip }) => (
 	<Tooltip
-		rarity={boss ? 'legendary' : 'epic'}
+		rarity={lucky ? 'legendary' : boss ? 'epic' : 'common'}
 		icon={icon}
-		title={name}
+		iconClassName={lucky ? 'ds-tip-lucky' : undefined}
+		title={lucky ? `★ ${name}` : name}
 		subtitle={subtitle}
 		footer={
 			footer ??
@@ -358,6 +363,7 @@ export const MonsterTooltip: React.FC<{
 		}
 	>
 		{boss ? <div className='ds-tip-boss'>BOSS</div> : null}
+		{lucky ? <TipLine tone='gold'>★ Golden monster: bigger rewards</TipLine> : null}
 		<TipRows rows={[{ label: 'HP', value: hp }]} />
 		<div className='ds-bar' style={{ height: 10 }}>
 			<div className='ds-bar-fill' style={{ width: '100%' }} />

@@ -244,3 +244,10 @@
 	height: 100%;
 	background: linear-gradient(#5ee07a, #2a9a4a);
 }
+
+/* the Build and Move here buttons: bigger */
+.build-action {
+	min-width: 120px;
+	min-height: 40px;
+	font-size: 0.85rem;
+}

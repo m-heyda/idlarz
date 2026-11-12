@@ -1,12 +1,11 @@
 import { buildingDef } from '@/catalog/buildings';
 import { BIOMES } from '@/config/biomes';
 import { BUILDING_RULES } from '@/config/buildings';
-import { buildingOutput, buildingUpgradeDuration, ownedOfBiome, producerBonus } from '@/lib/buildings';
+import { buildingOutput, ownedOfBiome, producerBonus } from '@/lib/buildings';
 import { RESOURCES } from '@/catalog';
 import { BuildingTooltip, ChestTooltip, MonsterTooltip, TipLine, Tooltip } from '../../../packages/design-system/src/components/tooltips';
 import { BiomeTooltip } from './BiomeTooltip';
 import { limitOf } from '@/lib/limits';
-import { idolEconomy } from '@/lib/idolEconomy';
 import { idolDef } from '@/catalog/idols';
 import { idolValueText } from '@/lib/idolEconomy';
 import React from 'react';
@@ -15,7 +14,7 @@ import { type BiomeType, type MonsterType, type Resources } from '@/types/game';
 import { TILE_SIZE } from '@/config/biomes';
 import { MONSTERS } from '@/config/combatConfig';
 import { MONSTER_CATALOG, monsterSpriteUrl } from '@/catalog/monsters';
-import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
+import { formatCompact, formatNumber } from '@/utils/formatters';
 import { growthSecondsLeft, isBoss, maxLevelOf, monsterStats } from '@/lib/monsters';
 import { useBestiaryStore, useIsDiscovered } from '@/stores/bestiaryStore';
 import { useMapSource } from './mapSource';
@@ -76,6 +75,7 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 					{ label: 'Armor', value: formatCompact(stats.armor) },
 				]}
 				boss={boss}
+				lucky={!!monster?.lucky}
 				defeated={kills}
 				growth={growth}
 				bossLine={boss ? `Crits ${stats.critChance}%, resists Stun ${stats.stunResist}%. Beat it within ${MONSTERS[type].timeLimitSec} seconds` : undefined}
@@ -91,8 +91,6 @@ const BuildingTile: React.FC<{ id: string; level: number; tile: React.ReactNode 
 	const idol = idolDef(id);
 	const { game } = useMapSource();
 	const tiles = game((state) => state.tiles);
-	const prestige = game((state) => state.prestige);
-	const idolLevels = game((state) => state.idolLevels);
 	if (!def) return null;
 	const owned = ownedOfBiome(tiles, def.biome);
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
@@ -113,11 +111,6 @@ const BuildingTile: React.FC<{ id: string; level: number; tile: React.ReactNode 
 					}))
 				: []),
 			...(idol ? [{ label: 'Gives', value: idolValueText(idol, level + 1) }] : []),
-			{
-				label: 'Takes',
-				value: formatTime(buildingUpgradeDuration(level, prestige, idolEconomy(tiles, idolLevels ?? {}).buildTimePct)),
-				tone: 'amber' as const,
-			},
 		];
 	}
 	return (

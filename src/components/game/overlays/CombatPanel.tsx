@@ -317,7 +317,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 	);
 
 	return (
-		<section className='combat-widget px-card' aria-label='Combat' onMouseEnter={p.onMouseEnter} onMouseLeave={p.onMouseLeave}>
+		<section className='ds-root combat-widget' aria-label='Combat' onMouseEnter={p.onMouseEnter} onMouseLeave={p.onMouseLeave}>
 			<header className='combat-head'>
 				<b>{`${boss ? '☠ ' : ''}${label} - Lv ${monster.level}`}</b>
 				<span className='flex gap-1'>

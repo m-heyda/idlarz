@@ -136,7 +136,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						<div className='build-info'>
 							<div className='build-top'>
 								<Head def={o.def} />
-								<Button tone='gold' size='sm' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
+								<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
 									Build
 								</Button>
 							</div>
@@ -156,7 +156,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						<div className='build-info'>
 							<div className='build-top'>
 								<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
-								<Button tone='gold' size='sm' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
+								<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
 									Move here
 								</Button>
 							</div>
