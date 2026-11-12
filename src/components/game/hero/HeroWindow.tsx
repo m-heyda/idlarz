@@ -183,6 +183,7 @@ const HeroLeft: React.FC = () => {
 				badge={badge ? `/pixel/new_assets/achievements/${badge.badge}.png` : undefined}
 				title={title}
 				nameColor={nickColorValue(choice.nameColor)}
+				admin={choice.admin}
 				onAvatar={openAvatarDialog}
 				onBadge={openBadgeDialog}
 				onClass={openClassDialog}

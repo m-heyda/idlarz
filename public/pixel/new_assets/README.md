@@ -65,3 +65,7 @@ Check the 65x65 file (`avatar_winged_helm_veteran.png`) and crop it to 64x64 if 
 ## wireframe/ (5 sprites, green hologram mesh, 64x64)
 
 Made with Sprite Fusion on 2026-11-11 for the early-tester rewards after the New Chapter. **Early tester set (IDL-282):** `avatar_wireframe_hero.png` is composited onto a teal frame as `heroes/avatar_beta_tester.png` (the Beta tester avatar; the Early tester keeps its chainmail bust) and `badge_star_wireframe.png` is copied to `achievements/badge_early_tester_wireframe.png` (the Early tester badge, shown beside the name in the Character window and on the landing Continue card). **Pets not wired yet** (pet system): `pet_fox.png`, `pet_owl.png` and `pet_rabbit.png` the first pets. The wireframe castle variants are still to be drawn.
+
+## admin/ (the game admin's mark) and avatar_admin.png
+
+`admin/admin_mark.png` is the admin mark: an 8 frame sprite sheet (256x32, 32 px frames) of a small purple creature with a screen for a face, provided by the owner. The design system's `AdminMark` plays it in place by the name of the admin account (`profiles.is_admin`) in the game, on the landing page and (later) in the rankings. `heroes/avatar_admin.png` is the Admin avatar (id `admin`, only for the admin account): the Bard's purple frame with the first frame of the creature at 2x on a dark violet field.

@@ -8,7 +8,7 @@ import { isRecord } from '@/lib/isRecord';
 
 export const dynamic = 'force-dynamic';
 
-/** The badge, title and nickname colour the profile shows (`null` badge = the default, `"none"` = hidden), the achievements it has earned (they decide what it may pick), and what the colour picker allows: `colorsUnlocked` and `rainbowUnlocked` (bought in the Gem shop, or admin) and `admin` (gold). */
+/** The badge, title and nickname colour the profile shows (`null` badge = the default, `"none"` = hidden), the achievements it has earned (they decide what it may pick), and what the colour picker allows: `colorsUnlocked` and `effectsUnlocked` (the effect ids; bought in the Gem shop, or admin) and `admin` (gold). */
 export async function GET() {
 	try {
 		const player = await requirePlayer();
@@ -21,7 +21,7 @@ export async function GET() {
 			titleId: stored.titleId,
 			nameColor: shownNameColor(stored.nameColor, access.admin),
 			colorsUnlocked: access.unlocked,
-			rainbowUnlocked: access.rainbow,
+			effectsUnlocked: access.effects,
 			admin: access.admin,
 			earned,
 		});

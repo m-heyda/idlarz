@@ -13,7 +13,7 @@ export interface UiBadge {
 	titleId: string | null;
 	nameColor: string | null;
 	colorsUnlocked: boolean;
-	rainbowUnlocked: boolean;
+	effectsUnlocked: readonly string[];
 	admin: boolean;
 	earned: readonly string[];
 	loaded: boolean;
@@ -211,7 +211,7 @@ export const useUiStore = create<UiState>((set, get) => ({
 	classDialogOpen: false,
 	avatarId: null,
 	setAvatarId: (id) => set({ avatarId: id }),
-	badge: { badgeId: null, titleId: null, nameColor: null, colorsUnlocked: false, rainbowUnlocked: false, admin: false, earned: [], loaded: false },
+	badge: { badgeId: null, titleId: null, nameColor: null, colorsUnlocked: false, effectsUnlocked: [], admin: false, earned: [], loaded: false },
 	setBadge: (badge) => set({ badge: { ...badge, loaded: true } }),
 	badgeDialogOpen: false,
 	openBadgeDialog: () => set({ badgeDialogOpen: true }),

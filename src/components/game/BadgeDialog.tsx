@@ -3,7 +3,7 @@ import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
 import { chooseBadge, chooseNameColor, fetchBadges } from '@/lib/authClient';
 import { BADGE_NONE, badgeOptions, shownBadge, shownTitle, titleOptions } from '@/catalog/badges';
-import { NICK_COLORS, NICK_GOLD, NICK_RAINBOW, NICK_RAINBOW_ITEM, inkOn, nickColorValue } from '@/config/nickColors';
+import { NICK_COLORS, NICK_EFFECTS, NICK_GOLD, inkOn, nickColorValue, nickEffectById } from '@/config/nickColors';
 import { gemItemById } from '@/config/gemShop';
 import { useGemStore } from '@/stores/gemStore';
 import { notify } from '@/lib/notices';
@@ -26,7 +26,7 @@ export const useBadgeChoice = (): void => {
 };
 
 /**
- * The name, badge and title window (click the name, the title or the badge in the Character window). Two columns: on the left the nickname colour (fourteen colours, locked until "Name colours" is bought in the Gem shop; the animated Rainbow is bought right here; the admin account has all of them plus the gold nickname with glowing stars),
+ * The name, badge and title window (click the name, the title or the badge in the Character window). Two columns: on the left the nickname colour (fourteen colours, locked until "Name colours" is bought in the Gem shop; the animated effects (Rainbow, Aurora, Ember, Frost, Void) are bought one by one right here; the admin account has all of them plus the gold nickname with glowing stars),
  * on the right the title and the badge (earned ones only; the badge can be hidden). A pick shows at once and is saved on the profile (`POST /api/auth/badge`), which is what the landing page and the rankings read; a refusal puts the previous choice back and shows why.
  */
 const BadgeDialog: React.FC = () => {
@@ -67,7 +67,7 @@ const BadgeDialog: React.FC = () => {
 
 	/** Whether a colour is still locked for this account (it can only be tried on the preview) */
 	const lockedColor = (id: string | null): boolean =>
-		id === null || id === NICK_GOLD ? false : id === NICK_RAINBOW ? !badge.rainbowUnlocked : !badge.colorsUnlocked;
+		id === null || id === NICK_GOLD ? false : nickEffectById(id) ? !badge.effectsUnlocked.includes(id) : !badge.colorsUnlocked;
 
 	/** A locked colour only previews (the name above changes, nothing is stored or sent) */
 	const pickColor = async (nameColor: string | null) => {
@@ -80,9 +80,11 @@ const BadgeDialog: React.FC = () => {
 		await saveColor(nameColor);
 	};
 
-	/** Buys the Rainbow name from here (the server charges and refuses a short balance), then reads the unlocks again */
-	const buyRainbow = async () => {
-		const reply = await useGemStore.getState().buy(NICK_RAINBOW_ITEM);
+	/** Buys a name effect from here (the server charges and refuses a short balance, which shows as a red notice), then reads the unlocks again */
+	const buyEffect = async (effectId: string) => {
+		const item = nickEffectById(effectId)?.item;
+		if (!item) return;
+		const reply = await useGemStore.getState().buy(item);
 		if (!reply?.ok) {
 			if (!reply) notify('The purchase did not go through.', 'error');
 			return;
@@ -113,7 +115,10 @@ const BadgeDialog: React.FC = () => {
 	const shown = shownBadge(badge.badgeId, badge.earned);
 	const title = shownTitle(badge.titleId, badge.earned);
 	const locked = !badge.colorsUnlocked;
-	const rainbowPrice = gemItemById(NICK_RAINBOW_ITEM)?.price ?? 0;
+	/** The effect tried on the preview that is still locked: it gets the unlock bar under the tiles */
+	const triedEffect = tried ? nickEffectById(tried) : null;
+	const triedEffectLocked = triedEffect !== null && !badge.effectsUnlocked.includes(triedEffect.id);
+	const effectPrice = triedEffect ? (gemItemById(triedEffect.item)?.price ?? 0) : 0;
 	const previewColor = hovered !== undefined ? hovered : tried !== undefined && lockedColor(tried) ? tried : badge.nameColor;
 
 	return (
@@ -167,17 +172,6 @@ const BadgeDialog: React.FC = () => {
 								{color.name}
 							</button>
 						))}
-						<button
-							type='button'
-							className='ds-swatch ds-swatch-rainbow'
-							data-selected={previewColor === NICK_RAINBOW}
-							aria-disabled={!badge.rainbowUnlocked}
-							onMouseEnter={() => setHovered(NICK_RAINBOW)}
-							onClick={() => void pickColor(NICK_RAINBOW)}
-							title='Animated rainbow'
-						>
-							Rainbow
-						</button>
 						{badge.admin && (
 							<button
 								type='button'
@@ -191,13 +185,38 @@ const BadgeDialog: React.FC = () => {
 							</button>
 						)}
 					</div>
-					{!badge.rainbowUnlocked && (
-						<div className='ds-lock-banner' data-testid='rainbow-locked' style={{ marginTop: 12 }}>
-							<span>🌈 Rainbow: an animated nickname that shifts through every colour.</span>
-							<Button tone='gold' onClick={() => void buyRainbow()}>
-								{rainbowPrice} <GemIcon />
+					<div style={{ marginTop: 12 }}>
+						<SectionLabel>Effects</SectionLabel>
+					</div>
+					<div className='ds-swatch-grid' data-testid='effect-grid' onMouseLeave={() => setHovered(undefined)}>
+						{NICK_EFFECTS.map((effect) => (
+							<button
+								key={effect.id}
+								type='button'
+								className={`ds-swatch ds-swatch-fx ds-swatch-${effect.id}`}
+								data-selected={previewColor === effect.id}
+								aria-disabled={!badge.effectsUnlocked.includes(effect.id)}
+								onMouseEnter={() => setHovered(effect.id)}
+								onClick={() => void pickColor(effect.id)}
+								title={effect.blurb}
+							>
+								{effect.name}
+							</button>
+						))}
+					</div>
+					{triedEffect && triedEffectLocked ? (
+						<div className='ds-lock-banner' data-testid='effect-locked' style={{ marginTop: 10 }}>
+							<span>
+								<b>{triedEffect.name}</b>: {triedEffect.blurb}
+							</span>
+							<Button tone='gold' onClick={() => void buyEffect(triedEffect.id)}>
+								{effectPrice} <GemIcon />
 							</Button>
 						</div>
+					) : (
+						<p className='ds-dim' style={{ fontSize: 12, margin: '8px 0 0' }}>
+							Effects are animated names, 500 gems each. Click one to try it on.
+						</p>
 					)}
 				</section>
 

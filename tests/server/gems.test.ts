@@ -196,6 +196,25 @@ test('Rainbow name: a separate one-time purchase of 500 gems that leaves Name co
 	assert.equal(m.ledgers.get(ID)!.gems, 200);
 });
 
+test('every other name effect is also a separate 500 gem one-time purchase', async () => {
+	for (const id of ['name_aurora', 'name_ember', 'name_frost', 'name_void']) {
+		const { m } = await started();
+		const ledger = m.ledgers.get(ID)!;
+		m.ledgers.set(ID, { ...ledger, gems: 600 });
+		const bought = ok(await gems(m, { action: 'spend', itemId: id }, T0 + STEP));
+		assert.equal(bought.ok, true, id);
+		assert.equal(bought.paid, 500, id);
+		assert.equal(bought.gems, 100, id);
+		assert.equal(
+			Object.keys(bought.bought)
+				.filter((key) => key.startsWith('name_'))
+				.join(),
+			id,
+		);
+		assert.equal(ok(await gems(m, { action: 'spend', itemId: id }, T0 + STEP + 1000)).reason, 'already_owned', id);
+	}
+});
+
 test('a short balance refuses and charges nothing', async () => {
 	const { m } = await started();
 	const ledger = m.ledgers.get(ID)!;

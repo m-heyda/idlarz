@@ -1952,15 +1952,86 @@
 	animation: ds-nick-shine 3.2s linear infinite;
 }
 
-.ds-nick-rainbow .ds-nick-text {
-	background: linear-gradient(90deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
+/* the animated nickname effects of the Gem shop: gradient text that moves (--fx), plus a glow; none is gold and none has stars */
+.ds-nick-rainbow .ds-nick-text,
+.ds-nick-aurora .ds-nick-text,
+.ds-nick-frost .ds-nick-text,
+.ds-nick-ember .ds-nick-text {
 	background-size: 200% 100%;
 	-webkit-background-clip: text;
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
 	color: transparent;
+}
+
+.ds-nick-rainbow .ds-nick-text {
+	background-image: linear-gradient(90deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
 	filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.45)) drop-shadow(0 0 11px rgba(168, 120, 255, 0.6));
 	animation: ds-nick-flow 4s linear infinite;
+}
+
+.ds-nick-aurora .ds-nick-text {
+	background-image: linear-gradient(90deg, #2de2b0, #3aa0ff, #9b5cff, #3aa0ff, #2de2b0);
+	filter: drop-shadow(0 0 4px rgba(45, 226, 176, 0.7)) drop-shadow(0 0 12px rgba(100, 120, 255, 0.55));
+	animation: ds-nick-flow 7s linear infinite;
+}
+
+.ds-nick-ember .ds-nick-text {
+	background-image: linear-gradient(180deg, #fff1a8 0%, #ffb347 35%, #ff5a1f 70%, #b81d0a 100%);
+	background-size: 100% 100%;
+	filter: drop-shadow(0 0 4px rgba(255, 110, 30, 0.85)) drop-shadow(0 0 10px rgba(255, 70, 20, 0.55));
+	animation: ds-nick-flicker 1.1s ease-in-out infinite alternate;
+}
+
+.ds-nick-frost .ds-nick-text {
+	background-image: linear-gradient(100deg, #8fd3ff 0%, #d9f3ff 30%, #ffffff 42%, #d9f3ff 54%, #8fd3ff 70%, #5fb4ff 100%);
+	filter: drop-shadow(0 0 4px rgba(140, 215, 255, 0.85)) drop-shadow(0 0 10px rgba(90, 170, 255, 0.5));
+	animation: ds-nick-flow 3.4s linear infinite;
+}
+
+.ds-nick-void {
+	color: #eadcff;
+	animation: ds-nick-void 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes ds-nick-flicker {
+	from {
+		filter: drop-shadow(0 0 3px rgba(255, 110, 30, 0.7)) drop-shadow(0 0 8px rgba(255, 70, 20, 0.4)) brightness(0.95);
+	}
+	to {
+		filter: drop-shadow(0 0 6px rgba(255, 140, 40, 1)) drop-shadow(0 0 14px rgba(255, 80, 20, 0.7)) brightness(1.12);
+	}
+}
+
+@keyframes ds-nick-void {
+	from {
+		text-shadow:
+			0 0 4px #7a3cff,
+			0 0 10px #4a1fb0;
+	}
+	to {
+		text-shadow:
+			0 0 6px #a56bff,
+			0 0 16px #6a2fe0,
+			0 0 26px #3a1590;
+	}
+}
+
+/* the admin mark: an 8 frame sprite sheet played in place (--ds-mark-end is minus the sheet width) */
+.ds-admin-mark {
+	display: inline-block;
+	flex: none;
+	align-self: center;
+	margin: -4px 0;
+	image-rendering: pixelated;
+	background-repeat: no-repeat;
+	animation: ds-admin-mark 0.9s steps(8) infinite;
+}
+
+@keyframes ds-admin-mark {
+	to {
+		background-position-x: var(--ds-mark-end);
+	}
 }
 
 .ds-nick-star {
@@ -2016,8 +2087,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ds-nick-gold .ds-nick-text,
-	.ds-nick-rainbow .ds-nick-text,
+	.ds-nick-fx .ds-nick-text,
+	.ds-nick-void,
+	.ds-admin-mark,
 	.ds-nick-star {
 		animation: none;
 	}
@@ -4279,12 +4351,37 @@ button.ds-income-head:hover {
 	border: 1px dashed #7a7566;
 }
 
-.ds-swatch-rainbow {
+/* an effect tile: the effect's own look, moving; locked ones are quiet like the plain colours */
+.ds-swatch-fx {
 	color: #fff;
 	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-	background: linear-gradient(100deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
 	background-size: 200% 100%;
 	animation: ds-nick-flow 5s linear infinite;
+}
+
+.ds-swatch-rainbow {
+	background-image: linear-gradient(100deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
+}
+
+.ds-swatch-aurora {
+	background-image: linear-gradient(100deg, #1fbf93, #3a8fe8, #8a52e8, #3a8fe8, #1fbf93);
+}
+
+.ds-swatch-ember {
+	background-image: linear-gradient(100deg, #8a1c0a, #ff5a1f, #ffb347, #ff5a1f, #8a1c0a);
+}
+
+.ds-swatch-frost {
+	color: #10344f;
+	text-shadow: none;
+	background-image: linear-gradient(100deg, #8fd3ff, #e8f8ff, #ffffff, #e8f8ff, #8fd3ff);
+}
+
+.ds-swatch-void {
+	background-image: radial-gradient(circle at 50% 50%, #5a2aa8 0%, #2a1050 55%, #12061f 100%);
+	background-size: 100% 100%;
+	box-shadow: inset 0 0 12px rgba(150, 90, 255, 0.55);
+	animation: none;
 }
 
 .ds-swatch-gold {
@@ -4294,7 +4391,7 @@ button.ds-income-head:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ds-swatch-rainbow {
+	.ds-swatch-fx {
 		animation: none;
 	}
 }

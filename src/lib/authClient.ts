@@ -63,7 +63,7 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			stats?: { level?: unknown; rebirths?: unknown } | null;
 			game?: { inv?: unknown; craft?: unknown; serverNowSec?: unknown } | null;
 			away?: { gapSec?: unknown; capSec?: unknown; efficiency?: unknown } | null;
-			identity?: { badge?: unknown; badgeName?: unknown; title?: unknown; nameColor?: unknown } | null;
+			identity?: { badge?: unknown; badgeName?: unknown; title?: unknown; nameColor?: unknown; admin?: unknown } | null;
 		};
 		if (response.ok) {
 			const epoch = typeof body.epoch === 'number' && Number.isInteger(body.epoch) && body.epoch >= 1 ? { epoch: body.epoch } : {};
@@ -90,8 +90,9 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 				badgeName: text(body.identity?.badgeName),
 				title: text(body.identity?.title),
 				nameColor: text(body.identity?.nameColor),
+				admin: body.identity?.admin === true,
 			};
-			const identity = shown.badge || shown.title || shown.nameColor ? { identity: shown } : {};
+			const identity = shown.badge || shown.title || shown.nameColor || shown.admin ? { identity: shown } : {};
 			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats, ...game, ...away, ...identity };
 		}
 		if (response.status === 503 || response.status >= 500 || body.unavailable) {
@@ -178,13 +179,14 @@ export const chooseAvatar = async (avatarId: string): Promise<AvatarSendResult> 
 		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
 	}
 };
-/** The badge, title and nickname colour of the profile (`GET /api/auth/badge`), the achievements that decide what can be picked, and whether the colour picker is open (`colorsUnlocked` / `rainbowUnlocked`: bought in the Gem shop, or admin; `admin`: the owner's account, which also has the gold nickname). */
+/** The badge, title and nickname colour of the profile (`GET /api/auth/badge`), the achievements that decide what can be picked, and whether the colour picker is open (`colorsUnlocked` / `effectsUnlocked`: bought in the Gem shop, or admin; `admin`: the owner's account, which also has the gold nickname). */
 export interface BadgeState {
 	badgeId: string | null;
 	titleId: string | null;
 	nameColor: string | null;
 	colorsUnlocked: boolean;
-	rainbowUnlocked: boolean;
+	/** The ids of the animated name effects this account may wear */
+	effectsUnlocked: string[];
 	admin: boolean;
 	earned: string[];
 }
@@ -198,7 +200,7 @@ export const fetchBadges = async (): Promise<BadgeState | null> => {
 			titleId?: unknown;
 			nameColor?: unknown;
 			colorsUnlocked?: unknown;
-			rainbowUnlocked?: unknown;
+			effectsUnlocked?: unknown;
 			admin?: unknown;
 			earned?: unknown;
 		} | null;
@@ -208,7 +210,7 @@ export const fetchBadges = async (): Promise<BadgeState | null> => {
 			titleId: typeof body.titleId === 'string' ? body.titleId : null,
 			nameColor: typeof body.nameColor === 'string' ? body.nameColor : null,
 			colorsUnlocked: body.colorsUnlocked === true,
-			rainbowUnlocked: body.rainbowUnlocked === true,
+			effectsUnlocked: Array.isArray(body.effectsUnlocked) ? body.effectsUnlocked.filter((id): id is string => typeof id === 'string') : [],
 			admin: body.admin === true,
 			earned: body.earned.filter((id): id is string => typeof id === 'string'),
 		};

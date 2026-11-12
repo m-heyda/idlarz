@@ -19,7 +19,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
 - Mastery: [`claimMastery`](#claimmastery), [`claimAllMastery`](#claimallmastery), [Bestiary mastery](#mastery-tiers)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
-- Badges: [`NICK_COLORS`](#nick-colors), [`badgeOptions`](#badgeoptions)
+- Badges: [`NICK_COLORS`](#nick-colors), [`NICK_EFFECTS`](#nick-effects), [`badgeOptions`](#badgeoptions)
 - Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
 
 ## Levels
@@ -541,7 +541,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:154`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:163`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 
@@ -559,7 +559,7 @@ Used by register, `POST /api/auth/profile`, `POST /api/auth/avatar` and the new-
 
 ### `CLASS_AVATARS` <small>const</small>
 
-Source: [`src/catalog/avatars.ts:104`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:113`](../../src/catalog/avatars.ts)
 
 The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class.
 Only that class can wear them (`checkAvatar`). The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
@@ -1015,6 +1015,15 @@ Source: [`src/config/nickColors.ts:17`](../../src/config/nickColors.ts)
 
 The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). Bought once for the whole account in the Gem shop ("Name colours", `NICK_COLORS_ITEM`); stored on `profiles.name_color`.
 The animated **Rainbow** (`NICK_RAINBOW`) is a separate purchase (`NICK_RAINBOW_ITEM`) and the gold nickname with stars (`NICK_GOLD`) is for admin accounts only.
+
+<a id="nick-effects"></a>
+
+### `NICK_EFFECTS` <small>const</small>
+
+Source: [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts)
+
+The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost and Void. None looks like the gold admin nickname (no gold, no stars).
+Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.
 
 <a id="badgeoptions"></a>
 

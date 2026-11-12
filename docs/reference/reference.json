@@ -89,7 +89,7 @@
   "kind": "const",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 104,
+  "line": 113,
   "summary": "The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class. Only that class can wear them (`checkAvatar`). The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).",
   "see": []
  },
@@ -100,7 +100,7 @@
   "kind": "function",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 154,
+  "line": 163,
   "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
   "see": []
  },
@@ -874,7 +874,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 45,
+  "line": 54,
   "summary": "The gem shop's price book: what each service costs and how often it can be bought.",
   "see": []
  },
@@ -885,7 +885,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 93,
+  "line": 138,
   "summary": "The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.",
   "see": []
  },
@@ -955,6 +955,17 @@
   "file": "src/config/nickColors.ts",
   "line": 17,
   "summary": "The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). Bought once for the whole account in the Gem shop (\"Name colours\", `NICK_COLORS_ITEM`); stored on `profiles.name_color`. The animated **Rainbow** (`NICK_RAINBOW`) is a separate purchase (`NICK_RAINBOW_ITEM`) and the gold nickname with stars (`NICK_GOLD`) is for admin accounts only.",
+  "see": []
+ },
+ {
+  "id": "nick-effects",
+  "name": "NICK_EFFECTS",
+  "symbol": "NICK_EFFECTS",
+  "kind": "const",
+  "category": "Progression/Badges",
+  "file": "src/config/nickColors.ts",
+  "line": 59,
+  "summary": "The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost and Void. None looks like the gold admin nickname (no gold, no stars). Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.",
   "see": []
  },
  {

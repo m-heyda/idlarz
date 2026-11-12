@@ -1209,7 +1209,7 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:45`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:54`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
@@ -1219,7 +1219,7 @@ The gem shop's price book: what each service costs and how often it can be bough
 
 - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
 
-- **Rainbow name** (500, once): unlocks the animated rainbow nickname, a separate purchase on top of the plain colours; also bought from the name window.
+- **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost and Void, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
 
 Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
 
@@ -1231,13 +1231,17 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 | Change name | identity | 200 | 30 days | Pick a new hero name. Once every 30 days. |
 | Respec attributes | identity | 300 | none | Get every attribute point back to spend again. The first one is free. |
 | Name colours | identity | 1000 | none | Unlock the colour picker: fourteen colours for your nickname in the game, the landing page and the rankings. |
-| Rainbow name | identity | 500 | none | An animated rainbow nickname that shifts through every colour. Bought once, on top of Name colours. |
+| Rainbow name | once | 500 | none | An animated nickname that shifts slowly through every colour. |
+| Aurora name | once | 500 | none | An animated nickname like northern lights: green, blue and violet drifting. |
+| Ember name | once | 500 | none | An animated nickname like a glowing coal, flickering from yellow to red. |
+| Frost name | once | 500 | none | An animated icy nickname with a glint that sweeps across it. |
+| Void name | once | 500 | none | A pale violet nickname that breathes out a dark purple glow. |
 
 <a id="daily-bonus-gems"></a>
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:93`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:138`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 

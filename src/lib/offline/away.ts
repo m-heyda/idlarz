@@ -76,7 +76,7 @@ export const loadShownIdentity = async (supabase: SupabaseClient, userId: string
 			held,
 			choice.data?.is_admin === true,
 		);
-		return shown.badge || shown.title || shown.nameColor ? shown : null;
+		return shown.badge || shown.title || shown.nameColor || shown.admin ? shown : null;
 	} catch {
 		return null;
 	}

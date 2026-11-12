@@ -6,7 +6,16 @@ export type GemShopTab = 'identity' | 'upgrades' | 'once';
 /** How an item is sold: a `service` can be bought again and again, a `leveled` upgrade has levels (each costs more), a `once` purchase is bought one time and kept. Today every item is a service. */
 export type GemItemKind = 'service' | 'leveled' | 'once';
 
-export type GemItemId = 'class_change' | 'name_change' | 'attr_respec' | 'name_colors' | 'name_rainbow';
+export type GemItemId =
+	| 'class_change'
+	| 'name_change'
+	| 'attr_respec'
+	| 'name_colors'
+	| 'name_rainbow'
+	| 'name_aurora'
+	| 'name_ember'
+	| 'name_frost'
+	| 'name_void';
 
 export interface GemItem {
 	id: GemItemId;
@@ -34,7 +43,7 @@ export const DAY_SEC = 86_400;
  *
  * - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
  *
- * - **Rainbow name** (500, once): unlocks the animated rainbow nickname, a separate purchase on top of the plain colours; also bought from the name window.
+ * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost and Void, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
  *
  * Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
  *
@@ -71,10 +80,46 @@ export const GEM_SHOP: readonly GemItem[] = [
 	},
 	{
 		id: 'name_rainbow',
-		tab: 'identity',
+		tab: 'once',
 		kind: 'once',
 		name: 'Rainbow name',
-		blurb: 'An animated rainbow nickname that shifts through every colour. Bought once, on top of Name colours.',
+		blurb: 'An animated nickname that shifts slowly through every colour.',
+		price: 500,
+		cooldownSec: 0,
+	},
+	{
+		id: 'name_aurora',
+		tab: 'once',
+		kind: 'once',
+		name: 'Aurora name',
+		blurb: 'An animated nickname like northern lights: green, blue and violet drifting.',
+		price: 500,
+		cooldownSec: 0,
+	},
+	{
+		id: 'name_ember',
+		tab: 'once',
+		kind: 'once',
+		name: 'Ember name',
+		blurb: 'An animated nickname like a glowing coal, flickering from yellow to red.',
+		price: 500,
+		cooldownSec: 0,
+	},
+	{
+		id: 'name_frost',
+		tab: 'once',
+		kind: 'once',
+		name: 'Frost name',
+		blurb: 'An animated icy nickname with a glint that sweeps across it.',
+		price: 500,
+		cooldownSec: 0,
+	},
+	{
+		id: 'name_void',
+		tab: 'once',
+		kind: 'once',
+		name: 'Void name',
+		blurb: 'A pale violet nickname that breathes out a dark purple glow.',
 		price: 500,
 		cooldownSec: 0,
 	},

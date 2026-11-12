@@ -517,6 +517,18 @@ export const buildManifest = (): AssetEntry[] => {
 				status: 'reuse',
 				source: 'new_assets/achievements',
 			});
+	// the admin mark: an 8 frame sprite sheet (32 px frames) drawn by the name of the game admin (`AdminMark` in the design system)
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'admin')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'ui',
+				subcategory: 'admin mark (8 frame sprite sheet)',
+				src: url(f),
+				status: 'used',
+				usedBy: ['AdminMark'],
+				source: 'new_assets/admin',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'wireframe')))
 		if (f.endsWith('.png'))
 			add({

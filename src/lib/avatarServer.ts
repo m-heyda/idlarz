@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { classAvatarIds, fitAvatar } from '@/catalog/avatars';
+import { ADMIN_UNLOCK, classAvatarIds, fitAvatar } from '@/catalog/avatars';
 import { needsResetFor } from '@/config/epoch';
 import { earnedAfterReset } from '@/lib/offline/chapter';
 import type { PlayerClassId } from '@/config/playerClasses';
@@ -11,13 +11,15 @@ import { checkAvatar } from '@/lib/authValidation';
 /** The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked". */
 export const loadEarnedAchievements = async (db: SupabaseClient, userId: string): Promise<string[]> => {
 	// an account that still has to start the new chapter will hold only what the reset leaves it (`earnedAfterReset`): its old unlocks are about to be deleted, so they are not offered or accepted
-	const profile = await db.from('profiles').select('epoch').eq('id', userId).maybeSingle();
+	const profile = await db.from('profiles').select('epoch, is_admin').eq('id', userId).maybeSingle();
 	if (profile.error) throw new Error(profile.error.message);
+	// the game admin's account also holds the pseudo id that unlocks the Admin avatar (`ADMIN_UNLOCK`); nobody else can
+	const extra = profile.data?.is_admin === true ? [ADMIN_UNLOCK] : [];
 	if (profile.data && needsResetFor(typeof profile.data.epoch === 'number' ? profile.data.epoch : null))
-		return earnedAfterReset(typeof profile.data.epoch === 'number' ? profile.data.epoch : null);
+		return [...earnedAfterReset(typeof profile.data.epoch === 'number' ? profile.data.epoch : null), ...extra];
 	const { data, error } = await db.from('player_achievements').select('achievement_id').eq('user_id', userId);
 	if (error) throw new Error(error.message);
-	return (data ?? []).map((row) => String(row.achievement_id));
+	return [...(data ?? []).map((row) => String(row.achievement_id)), ...extra];
 };
 
 /** The avatar ids this account may pick with `playerClass`: the class's own starters plus the rewards it has earned. */
