@@ -409,7 +409,7 @@ export interface GameState {
 	autoSellUpTo: string | null;
 	/** The version of the inventory (bag, gear, pity, auto-sell) this browser holds, as the server numbers it; null until the server has said (transient, never saved) */
 	invVer: number | null;
-	lastChestLoot: (ChestLoot & { gems?: number }) | null; // transient: the last chest's contents, shown by the toast (never saved)
+	lastChestLoot: (ChestLoot & { gems?: number; junk?: Drop[] }) | null; // transient: the last chest's contents, shown by the toast (never saved)
 
 	// Methods
 	setAutoSell: (rarity: string | null) => void;

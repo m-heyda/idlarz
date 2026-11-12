@@ -12,6 +12,7 @@ import { useUiStore } from '@/stores/uiStore';
 import { useRewardPendingStore } from '@/stores/rewardPendingStore';
 import { getTile, setTile } from '@/utils/world';
 import { limitCtx, toast, type GameGet, type GameSet } from './base';
+import type { Drop } from '@/types/game';
 import type { InventorySync } from './inventorySync';
 
 export const createChestSync = (set: GameSet, get: GameGet, inv: InventorySync) => {
@@ -20,17 +21,15 @@ export const createChestSync = (set: GameSet, get: GameGet, inv: InventorySync) 
 	type ChestReceived = NonNullable<Extract<ChestReward, { ok: true }>['received']>;
 
 	/** Puts what a chest held into the game: resources, XP, an item (through the auto-sell filter and the full-bag rule), and the server's gem balance when it gave one. */
-	const receiveChest = (loot: ChestLoot, gemsTotal?: number, gemsFound = 0, received?: ChestReceived) => {
+	const receiveChest = (loot: ChestLoot, gemsTotal?: number, gemsFound = 0, received?: ChestReceived, junk?: Drop[]) => {
 		const state = get();
 		const resources = { ...state.resources };
 		if (loot.kind === 'gold' || loot.kind === 'boost') resources.gold += loot.gold;
 		else if (loot.kind === 'bundle') loot.items.forEach((i) => (resources[i.resource] += i.amount));
 		else if (loot.kind === 'xp') resources.xp = Math.min(resources.xp + loot.xp, XP_CAP);
-		else if (received) {
-			// the server has put the item in its bag (the picture comes with the answer); the gold of what it sold or could not fit is ours
-			resources.gold = Math.min(resources.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP);
-		}
-		const shown = gemsFound > 0 ? { ...loot, gems: gemsFound } : loot;
+		// the server has put the item and the junk in its bag (the picture comes with the answer); the gold of what it sold or could not fit is ours
+		if (received) resources.gold = Math.min(resources.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP);
+		const shown = { ...loot, ...(gemsFound > 0 ? { gems: gemsFound } : {}), ...(junk && junk.length > 0 ? { junk } : {}) };
 		set({ resources, ...(gemsTotal !== undefined ? { gems: gemsTotal } : {}), lastChestLoot: shown });
 		// one notice per chest, stacked under the header (opening several quickly shows them all)
 		useUiStore.getState().pushChestNotice(shown);
@@ -74,7 +73,7 @@ export const createChestSync = (set: GameSet, get: GameGet, inv: InventorySync) 
 			applyInventory(reply.value.inv);
 			if (reply.value.ok) {
 				lastOwnOpen = { opened: Math.max(lastOwnOpen.opened, reply.value.tickets.opened ?? 0), at: Date.now() };
-				receiveChest(reply.value.loot, reply.value.gemsTotal, reply.value.gems, reply.value.received);
+				receiveChest(reply.value.loot, reply.value.gemsTotal, reply.value.gems, reply.value.received, reply.value.junk);
 			} else toast('The chest crumbled: it was not a real one.');
 			return;
 		}

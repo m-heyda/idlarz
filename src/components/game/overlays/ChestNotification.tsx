@@ -2,6 +2,7 @@ import React from 'react';
 import { formatCompact, formatNumber } from '@/utils/formatters';
 import { ITEM_CATALOG } from '@/catalog';
 import type { ChestLoot } from '@/lib/chests';
+import type { Drop } from '@/types/game';
 import GemIcon from '../GemIcon';
 import { resolveItem } from '@/lib/itemInstance';
 import ResourceIcon from '../ResourceIcon';
@@ -10,7 +11,7 @@ import '@/styles/ContextMenu.css';
 import { RARITY_COLOR, itemIconName } from '../itemUi';
 
 interface ChestNotificationProps {
-	loot: (ChestLoot & { gems?: number }) | null;
+	loot: (ChestLoot & { gems?: number; junk?: Drop[] }) | null;
 	onClose: () => void;
 }
 
@@ -87,6 +88,14 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, onClose }) 
 			<div className='flex items-center gap-2'>{title}</div>
 			{detail}
 			{hint}
+			{loot.junk && loot.junk.length > 0 && (
+				<span className='text-xs text-[#d8c8a0]'>
+					{loot.junk
+						.map((d) => (d.kind === 'consumable' ? `${formatNumber(d.qty)} x ${ITEM_CATALOG[d.id]?.name ?? d.id}` : ''))
+						.filter(Boolean)
+						.join(', ')}
+				</span>
+			)}
 			{!!loot.gems && (
 				<span className='text-sm text-cyan-300 font-semibold inline-flex items-center gap-1'>
 					Gem find! +{loot.gems} <GemIcon />

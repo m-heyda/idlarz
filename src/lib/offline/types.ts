@@ -1,7 +1,7 @@
 import type { MerchantResourceKey } from '@/catalog/resources';
 import type { ActiveBuff } from '@/lib/buffs';
 import type { OfflineGrant } from '@/lib/offline/grant';
-import type { BagSlot, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
+import type { BagSlot, Drop, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
 
 // What goes over the wire between /api/offline and the browser. Kept apart from service.ts (which pulls in node:crypto) so the client can import it.
 
@@ -105,6 +105,8 @@ export type ChestReward =
 			tickets: PublicTickets;
 			serverNowSec: number;
 			received?: { convertedGold: number; autoSold: { count: number; gold: number } };
+			/** The junk materials the chest held on top of its reward (already in the bag; the gold of what did not fit is in `received`) */
+			junk?: Drop[];
 			inv?: Inventory;
 	  }
 	| { ok: false; reason: 'no_ticket'; tickets: PublicTickets; serverNowSec: number; gemsTotal: number; inv?: Inventory };

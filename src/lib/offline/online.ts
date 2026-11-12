@@ -7,6 +7,8 @@ import { claimAllMastery, claimMastery } from '@/lib/offline/mastery';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
+import { LOOT_SOURCES } from '@/catalog/lootConfig';
+import { resolveSourceLevel, rollJunkDrops } from '@/lib/loot';
 import { rollGemFind } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import { clearBuffsOnRebirth } from '@/lib/buffs';
@@ -191,6 +193,17 @@ export const redeemChest = (
 			// an XP chest pays like every other XP the player earns: with the XP bonus (kills and the passive XP already do)
 			const loot = rolled.kind === 'xp' ? { ...rolled, xp: Math.floor(rolled.xp * (1 + stored.summary.xpGainPct / 100)) } : rolled;
 			const gems = rollGemFind(luck, rng);
+			// every chest also holds some junk materials (IDL-312), rolled last so the reward above is the one it always was; the level is the chest's own
+			const junkDrops = rollJunkDrops(
+				{
+					level: resolveSourceLevel(LOOT_SOURCES.chest.level!, stored.summary.castleLevel),
+					gold: stored.summary.rates.gold * 600,
+					luck,
+					boss: false,
+					lucky: false,
+				},
+				rng,
+			);
 
 			const granted: Partial<GrantTotals> = { gems };
 			if (loot.kind === 'gold' || loot.kind === 'boost') granted.gold = loot.gold;
@@ -204,6 +217,12 @@ export const redeemChest = (
 				inv = result.inv;
 				received = { convertedGold: result.received.convertedGold, autoSold: result.received.autoSold };
 				granted.gold = (granted.gold ?? 0) + received.convertedGold + received.autoSold.gold;
+			}
+			const junkIn = receiveInto(inv, junkDrops, sellContextOf(stored.core));
+			inv = junkIn.inv;
+			if (junkIn.received.convertedGold > 0) {
+				received = { convertedGold: (received?.convertedGold ?? 0) + junkIn.received.convertedGold, autoSold: received?.autoSold ?? { count: 0, gold: 0 } };
+				granted.gold = (granted.gold ?? 0) + junkIn.received.convertedGold;
 			}
 			const next: Ledger = {
 				...ledger,
@@ -224,6 +243,7 @@ export const redeemChest = (
 					tickets: publicTickets(taken.bank, ordChest),
 					serverNowSec: nowSec,
 					...(received ? { received } : {}),
+					junk: junkIn.received.stored,
 				},
 			};
 		},

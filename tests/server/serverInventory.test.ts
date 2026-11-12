@@ -369,6 +369,23 @@ test("a chest's item goes into the ledger's bag (or the auto-sell filter), and t
 	assert.ok(items >= 0);
 });
 
+test('every chest also holds junk materials: they are in the answer and in the ledger bag', async () => {
+	const p = await player();
+	await stay(p, 30);
+	const listed = ok(await syncTickets(p.m.deps, p.id, T0 + 31 * MIN)).tickets.chests;
+	assert.ok(listed.length > 0);
+	const result = ok(await redeemChest(p.m.deps, p.id, key(), listed[0], T0 + 31 * MIN));
+	assert.ok(result.ok);
+	if (!result.ok) return;
+	assert.ok(result.junk && result.junk.length >= 1, 'junk rides along');
+	for (const drop of result.junk!) {
+		assert.equal(drop.kind, 'consumable');
+		assert.ok(drop.kind === 'consumable' && ITEM_CATALOG[drop.id].junk);
+	}
+	const held = p.inv().bag.reduce((n, slot) => n + (slot && 'id' in slot && ITEM_CATALOG[slot.id].junk ? slot.qty : 0), 0);
+	assert.ok(held >= 1, 'and in the bag');
+});
+
 // ---------------------------------------------------------------------------------------------------- the use operation (IDL-155)
 
 ITEM_CATALOG.t_might = {

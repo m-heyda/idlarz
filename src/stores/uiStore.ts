@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { PREF_DEFAULTS, readPref, readStringPref, writePref, writeStringPref, type UiPrefKey } from '@/lib/uiPrefs';
-import type { MerchantTab } from '@/types/game';
+import type { Drop, MerchantTab } from '@/types/game';
 import type { OfflineReport } from '@/lib/offline/apply';
 import { useWindowStore } from '@/stores/windowStore';
 import { connectedCluster } from '@/utils/cluster';
@@ -67,7 +67,7 @@ const CHEST_NOTICE_MS = 3000;
 /** Most notices of one kind on screen at once; opening more drops the oldest */
 const MAX_NOTICES = 5;
 
-type ChestNoticeLoot = ChestLoot & { gems?: number };
+type ChestNoticeLoot = ChestLoot & { gems?: number; junk?: Drop[] };
 interface ChestNotice {
 	id: number;
 	loot: ChestNoticeLoot;
