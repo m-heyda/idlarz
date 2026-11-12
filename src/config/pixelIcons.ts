@@ -64,6 +64,7 @@ const BASE_ICON_SIZES = {
 	menu_glossary: [64, 64],
 	menu_gems_pouch: [64, 64],
 	menu_bag_scroll: [64, 64],
+	menu_bestiary: [64, 64], // the stone slab with a stag silhouette (the Bestiary button)
 	comp_glass_vial: [40, 40],
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
 	water_ripple_swamp: [96, 5], // 8 frames of 12x5

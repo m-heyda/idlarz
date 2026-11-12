@@ -21284,6 +21284,22 @@
 		]
 	},
 	{
+		"usedBy": [
+			"src/components/game/BestiaryWindow.tsx",
+			"src/components/game/hud/HudDock.tsx"
+		],
+		"name": "menu_bestiary",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_bestiary.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "menu_character",
 		"category": "ui",
