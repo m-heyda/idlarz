@@ -35,3 +35,38 @@ export const compact = (n: number): string => {
 	if (abs >= 1e3) return `${(n / 1e3).toFixed(abs >= 1e5 ? 0 : 1)}K`;
 	return String(Math.round(n));
 };
+
+export interface Point {
+	x: number;
+	y: number;
+}
+export interface Size {
+	w: number;
+	h: number;
+}
+
+/** Keeps a value inside [min, max]; when the range is empty (max < min) the minimum wins, so a window bigger than the screen still sits at its top-left. */
+export const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), Math.max(min, max));
+
+/**
+ * Where a dragged window may sit: at least `keepVisible` px of it stays on screen sideways, its title never goes above `minY` (under a fixed header) or below the bottom edge.
+ * Pure, so the game's window store can run its own drag with this clamp, or a test can pin the rule down.
+ */
+export const clampWindowPosition = (
+	pos: Point,
+	size: Size,
+	viewport: Size,
+	opts: { keepVisible?: number; minY?: number; bottomMargin?: number } = {},
+): Point => {
+	const keep = opts.keepVisible ?? 80;
+	return {
+		x: clamp(pos.x, keep - size.w, viewport.w - keep),
+		y: clamp(pos.y, opts.minY ?? 0, viewport.h - (opts.bottomMargin ?? 40)),
+	};
+};
+
+/** The size a resize drag asks for, kept between the window's minimum and the room left to the screen edge (`margin` px). */
+export const clampWindowSize = (start: Size, delta: Point, min: Size, room: Size, margin = 8): Size => ({
+	w: clamp(start.w + delta.x, min.w, room.w - margin),
+	h: clamp(start.h + delta.y, min.h, room.h - margin),
+});

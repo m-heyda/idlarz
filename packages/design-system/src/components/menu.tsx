@@ -13,6 +13,12 @@ export interface MenuItem {
 	separator?: boolean;
 	/** Draws a check box (toggle entries); undefined = a plain entry */
 	checked?: boolean;
+	/** Hover text (why an entry is disabled, what it does) */
+	tooltip?: string;
+	/** A hint that changes while the menu is open (a countdown); redrawn once a second */
+	liveHint?: () => string;
+	/** A submenu: choosing the entry opens these in place, with a Back entry that returns */
+	children?: MenuItem[];
 	onSelect: () => void;
 }
 export interface MenuState {
@@ -26,8 +32,20 @@ export interface MenuState {
  * The right-click menu, shaped like the game's (title, entries with hints, a rule before the destructive one). The caller owns `menu` (null = closed): set it from a slot's `onContextMenu` with
  * the pointer position and the entries. It sits in a portal on top of everything, stays inside the screen and closes on Escape, an outside press, a scroll, a resize or losing focus.
  */
-export const ContextMenu: React.FC<{ menu: MenuState | null; onClose: () => void }> = ({ menu, onClose }) => {
+export const ContextMenu: React.FC<{ menu: MenuState | null; onClose: () => void }> = ({ menu: opened, onClose }) => {
 	const ref = useRef<HTMLDivElement>(null);
+	// a submenu replaces the entries in place; opening another menu starts from its own entries again
+	const [sub, setSub] = useState<MenuState | null>(null);
+	useEffect(() => setSub(null), [opened]);
+	const menu = sub ?? opened;
+	// entries with a live hint (a countdown) are redrawn once a second while the menu is open
+	const [, setTick] = useState(0);
+	const hasLive = !!menu?.items.some((it) => it.liveHint);
+	useEffect(() => {
+		if (!hasLive) return;
+		const t = setInterval(() => setTick((n) => n + 1), 1000);
+		return () => clearInterval(t);
+	}, [hasLive]);
 	const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
 	useLayoutEffect(() => {
 		const el = ref.current;
@@ -76,14 +94,25 @@ export const ContextMenu: React.FC<{ menu: MenuState | null; onClose: () => void
 						className='ds-menu-item'
 						data-danger={!!it.danger}
 						disabled={it.disabled}
+						title={it.tooltip ?? (it.disabled ? it.hint : undefined)}
 						onClick={() => {
+							if (it.children) {
+								const parent = menu;
+								setSub({
+									x: menu.x,
+									y: menu.y,
+									title: it.label.replace(/\.\.\.$/, ''),
+									items: [...it.children, { id: 'ds-back', label: 'Back', separator: true, onSelect: () => setSub(parent === opened ? null : parent) }],
+								});
+								return;
+							}
 							onClose();
 							it.onSelect();
 						}}
 					>
 						{it.checked !== undefined ? <span className='ds-menu-check' data-on={it.checked} aria-hidden /> : null}
 						<span>{it.label}</span>
-						{it.hint ? <span className='ds-menu-hint'>{it.hint}</span> : null}
+						{(it.liveHint?.() ?? it.hint) ? <span className='ds-menu-hint'>{it.liveHint?.() ?? it.hint}</span> : null}
 					</button>
 				</React.Fragment>
 			))}

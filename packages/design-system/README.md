@@ -7,3 +7,5 @@ Props-only pixel-art UI (wood, stone, gold trim) for Idle Realm. **Storybook onl
 - `src/views/`: full screens composed from them with mock data (HUD, Hero, Merchant, Building upgrades, Tooltips).
 - `src/assets/`: art cut from `docs/plan/design/ui-kit-sheet-frames-bars.webp` by `scripts/build-assets.py` (crop, resize, clear the busy cobble). The slate texture is generated, clean on purpose. Pieces worth redoing in Sprite Fusion later: frame corners, tab plates, the title plaque centre ornament.
 - Missing menu icons (Realm, Fight, Bestiary): the HUD reuses the nearest stone icons.
+
+See [INTEGRATION.md](INTEGRATION.md) for how each piece maps onto the game's current components and what is still open before wiring.

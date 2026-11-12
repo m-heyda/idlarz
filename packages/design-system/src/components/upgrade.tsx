@@ -19,6 +19,12 @@ export interface UpgradeTileProps {
 	/** "Need 148K more" text for the short state */
 	shortText?: string;
 	buyLabel?: string;
+	/** Force the state when the game decides it (a rule beyond gold: a locked prerequisite). Default: derived from level, cost and `have`. */
+	state?: 'maxed' | 'ready' | 'short';
+	maxLabel?: string;
+	nowLabel?: string;
+	nextLabel?: string;
+	emptyNow?: string;
 	onBuy?: () => void;
 }
 
@@ -40,8 +46,13 @@ export const UpgradeTile: React.FC<UpgradeTileProps> = ({
 	shortText,
 	buyLabel = 'Upgrade',
 	onBuy,
+	state: forced,
+	maxLabel = 'MAX',
+	nowLabel = 'Now',
+	nextLabel = 'Next',
+	emptyNow = 'nothing yet',
 }) => {
-	const state = upgradeState(level, maxLevel, cost, have);
+	const state = forced ?? upgradeState(level, maxLevel, cost, have);
 	return (
 		<div className='ds-upgrade' data-state={state}>
 			<div className='ds-upgrade-head'>
@@ -50,19 +61,19 @@ export const UpgradeTile: React.FC<UpgradeTileProps> = ({
 				<DiamondLevel level={level} max={maxLevel} />
 			</div>
 			<div className='ds-upgrade-line'>
-				<b className='ds-good'>Now</b>
-				{now ?? 'nothing yet'}
+				<b className='ds-good'>{nowLabel}</b>
+				{now ?? emptyNow}
 			</div>
 			{state !== 'maxed' && next ? (
 				<div className='ds-upgrade-line'>
-					<b className='ds-gold-text'>Next</b>
+					<b className='ds-gold-text'>{nextLabel}</b>
 					{next}
 				</div>
 			) : null}
 			<div className='ds-upgrade-foot'>
 				{state === 'maxed' ? (
 					<span className='ds-cost' style={{ color: 'var(--ds-r-epic)' }}>
-						MAX
+						{maxLabel}
 					</span>
 				) : (
 					<span className='ds-cost'>

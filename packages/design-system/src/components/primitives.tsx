@@ -1,6 +1,6 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { gemStates, type Rarity } from '../logic';
+import { gemStates, type Point, type Rarity, type Size } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -46,10 +46,12 @@ export const Divider: React.FC<{ flourish?: boolean }> = ({ flourish }) => <div 
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	tone?: 'stone' | 'gold' | 'wood' | 'dark' | 'danger';
+	/** `sm` is the compact button used in rows and queues */
+	size?: 'md' | 'sm';
 }
 /** Plate button. `gold` is the primary action, `stone` the default, `dark` for the disabled "need more" state. */
-export const Button: React.FC<ButtonProps> = ({ tone = 'stone', className, ...rest }) => (
-	<button type='button' className={cx('ds-btn', tone !== 'stone' && `ds-btn-${tone}`, className)} {...rest} />
+export const Button: React.FC<ButtonProps> = ({ tone = 'stone', size = 'md', className, ...rest }) => (
+	<button type='button' className={cx('ds-btn', tone !== 'stone' && `ds-btn-${tone}`, size === 'sm' && 'ds-btn-sm', className)} {...rest} />
 );
 
 /** The red X in a window corner. */
@@ -68,6 +70,9 @@ export interface TabItem {
 	id: string;
 	label: string;
 	badge?: number;
+	disabled?: boolean;
+	/** Hover text (why a tab is locked) */
+	title?: string;
 }
 /** A row of wooden tabs, the active one in gold. */
 export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: string) => void }> = ({ items, active, onChange }) => (
@@ -122,38 +127,40 @@ export const Stat: React.FC<{ label: string; value: React.ReactNode; tone?: 'dam
 	</div>
 );
 
-export interface SlotProps {
+export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'className'> {
 	icon?: string;
 	rarity?: Rarity;
 	count?: number;
 	/** Show a faded placeholder icon for an empty equipment slot */
 	empty?: boolean;
 	locked?: boolean;
+	/** The item is worn (drawn with a gold corner mark) */
+	equipped?: boolean;
 	large?: boolean;
 	/** Marks the slot as the selected one (recipe picker) */
 	active?: boolean;
-	title?: string;
 	/** Text inside an icon-less slot (a skill name) */
 	label?: string;
 	sub?: string;
-	onClick?: () => void;
-	onContextMenu?: (e: React.MouseEvent) => void;
+	className?: string;
 }
-/** An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. */
-export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, large, active, title, label, sub, onClick, onContextMenu }) => {
+/**
+ * An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. It is a plain button: every native attribute and handler (onClick, onDoubleClick,
+ * onContextMenu, draggable, onDragStart, onDrop, aria-*, data-*) passes through, so the game keeps its own click, drag and drop logic.
+ */
+export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, equipped, large, active, label, sub, className, style, ...rest }) => {
 	const glow = rarity && rarity !== 'common';
 	return (
 		<button
 			type='button'
-			className={cx('ds-slot', large && 'ds-slot-lg')}
+			{...rest}
+			className={cx('ds-slot', large && 'ds-slot-lg', className)}
 			data-rarity={glow ? rarity : undefined}
-			style={glow ? ({ '--ds-rarity': `var(--ds-r-${rarity})` } as React.CSSProperties) : undefined}
+			style={glow ? ({ '--ds-rarity': `var(--ds-r-${rarity})`, ...style } as React.CSSProperties) : style}
 			data-empty={empty}
 			data-locked={locked}
 			data-active={active}
-			title={title}
-			onClick={onClick}
-			onContextMenu={onContextMenu}
+			data-equipped={equipped}
 		>
 			{icon ? <img src={icon} alt='' /> : null}
 			{label ? (
@@ -192,57 +199,125 @@ export const DiamondLevel: React.FC<{ level: number; max: number }> = ({ level, 
 );
 
 export interface WindowShellProps {
-	title: string;
-	/** Starting size in px; the user can resize from the bottom-right corner when `resizable` */
+	title: React.ReactNode;
+	/** Icon drawn before the title */
+	icon?: React.ReactNode;
+	/** Starting size in px when the size is not controlled */
 	width?: number;
 	height?: number;
 	minWidth?: number;
 	minHeight?: number;
+	/**
+	 * Controlled position (px from the page's top-left, the window becomes `position: fixed`). Leave undefined and the window stays where it is in the layout and drags by itself.
+	 * With it, the shell only reports moves through `onPositionChange` and the game's window store decides (clamping, persisting, z-order).
+	 */
+	position?: Point;
+	onPositionChange?: (pos: Point) => void;
+	/** Controlled size; same idea as `position` */
+	size?: Size;
+	onSizeChange?: (size: Size) => void;
+	/** A drag or resize finished (the moment to persist the new geometry) */
+	onGeometryCommit?: () => void;
+	/** A press anywhere inside the window (bring it to the front) */
+	onFocus?: () => void;
+	zIndex?: number;
+	/** The front window of several; dims the others slightly when false */
+	active?: boolean;
+	/** Small screens: no dragging or resizing, the window just fills its slot */
+	fixed?: boolean;
 	draggable?: boolean;
 	resizable?: boolean;
+	/** No body padding or scrolling: the content fills the window */
+	flush?: boolean;
 	bar?: React.ReactNode;
 	barRight?: React.ReactNode;
+	closeLabel?: string;
+	className?: string;
 	onClose?: () => void;
 	children: React.ReactNode;
 }
 /**
  * The window: frame, flanked title (drag handle), close button, a tab/head bar and a scrolling body, resizable from its corner. It is a size container (`container-name: ds-win`),
- * so anything inside can adapt with `@container ds-win (max-width: ...)`: the Hero window scales its slots and stacks its columns that way. Only presentational: the caller owns open/close
- * and tab state; size and position are kept here because they are pure UI.
+ * so anything inside can adapt with `@container ds-win (max-width: ...)`: the Hero window scales its slots and stacks its columns that way.
+ *
+ * Presentational with two modes. Uncontrolled (stories, simple uses): it keeps its own size and drag offset. Controlled (the game): pass `position` / `size` and the `on...Change` callbacks and the
+ * shell keeps no geometry of its own; `clampWindowPosition` and `clampWindowSize` in `logic.ts` hold the screen-edge rules. Focus, z-index and open/close always belong to the caller.
  */
 export const WindowShell: React.FC<WindowShellProps> = ({
 	title,
+	icon,
 	width = 1100,
 	height = 640,
 	minWidth = 380,
 	minHeight = 300,
+	position,
+	onPositionChange,
+	size,
+	onSizeChange,
+	onGeometryCommit,
+	onFocus,
+	zIndex,
+	active = true,
+	fixed = false,
 	draggable = true,
 	resizable = true,
+	flush = false,
 	bar,
 	barRight,
+	closeLabel = 'Close',
+	className,
 	onClose,
 	children,
 }) => {
-	const [size, setSize] = useState({ w: width, h: height });
-	const [pos, setPos] = useState({ x: 0, y: 0 });
+	const [ownSize, setOwnSize] = useState<Size>({ w: width, h: height });
+	const [ownPos, setOwnPos] = useState<Point>({ x: 0, y: 0 });
 	const drag = useRef<{ sx: number; sy: number; x: number; y: number } | null>(null);
 	const rs = useRef<{ sx: number; sy: number; w: number; h: number } | null>(null);
+	const sz = size ?? ownSize;
+	const controlledPos = position !== undefined;
+	const pos = position ?? ownPos;
+	const canDrag = draggable && !fixed;
+	const canResize = resizable && !fixed;
+	const style: React.CSSProperties = {
+		width: fixed ? undefined : sz.w,
+		height: fixed ? undefined : sz.h,
+		...(controlledPos ? { position: 'fixed', left: pos.x, top: pos.y } : { transform: `translate(${pos.x}px, ${pos.y}px)` }),
+		...(zIndex !== undefined ? { zIndex } : {}),
+	};
+	const move = (p: Point) => (controlledPos ? onPositionChange?.(p) : (setOwnPos(p), onPositionChange?.(p)));
+	const resize = (n: Size) => (size ? onSizeChange?.(n) : (setOwnSize(n), onSizeChange?.(n)));
 	return (
-		<div className='ds-root ds-winroot' style={{ width: size.w, height: size.h, transform: `translate(${pos.x}px, ${pos.y}px)` }}>
+		<div
+			className={cx('ds-root ds-winroot', className)}
+			style={style}
+			data-active={active}
+			data-flush={flush}
+			onPointerDownCapture={onFocus}
+			role='dialog'
+			aria-label={typeof title === 'string' ? title : undefined}
+		>
 			<div
 				className='ds-window-title'
-				data-draggable={draggable}
+				data-draggable={canDrag}
 				onPointerDown={(e) => {
-					if (!draggable) return;
+					if (!canDrag || e.button !== 0 || (e.target as HTMLElement).closest('button')) return;
 					e.currentTarget.setPointerCapture(e.pointerId);
 					drag.current = { sx: e.clientX, sy: e.clientY, x: pos.x, y: pos.y };
 				}}
-				onPointerMove={(e) => drag.current && setPos({ x: drag.current.x + e.clientX - drag.current.sx, y: drag.current.y + e.clientY - drag.current.sy })}
-				onPointerUp={() => (drag.current = null)}
+				onPointerMove={(e) => drag.current && move({ x: drag.current.x + e.clientX - drag.current.sx, y: drag.current.y + e.clientY - drag.current.sy })}
+				onPointerUp={() => {
+					if (!drag.current) return;
+					drag.current = null;
+					onGeometryCommit?.();
+				}}
+				onPointerCancel={() => (drag.current = null)}
 			>
+				{icon}
 				{title}
 			</div>
-			<CloseButton onClick={onClose} />
+			<button type='button' className='ds-close' aria-label={closeLabel} onClick={onClose}>
+				✕
+			</button>
 			<Frame style={{ width: '100%', height: '100%' }}>
 				<div className='ds-window'>
 					{bar ? (
@@ -253,23 +328,32 @@ export const WindowShell: React.FC<WindowShellProps> = ({
 							</div>
 						</div>
 					) : null}
-					<div className='ds-window-body'>{children}</div>
+					<div className='ds-window-body' data-flush={flush}>
+						{children}
+					</div>
 				</div>
 			</Frame>
-			{resizable ? (
+			{canResize ? (
 				<div
 					className='ds-resize'
 					role='separator'
 					aria-label='Resize window'
 					onPointerDown={(e) => {
+						if (e.button !== 0) return;
+						e.stopPropagation();
 						e.currentTarget.setPointerCapture(e.pointerId);
-						rs.current = { sx: e.clientX, sy: e.clientY, w: size.w, h: size.h };
+						rs.current = { sx: e.clientX, sy: e.clientY, w: sz.w, h: sz.h };
 					}}
 					onPointerMove={(e) =>
 						rs.current &&
-						setSize({ w: Math.max(minWidth, rs.current.w + e.clientX - rs.current.sx), h: Math.max(minHeight, rs.current.h + e.clientY - rs.current.sy) })
+						resize({ w: Math.max(minWidth, rs.current.w + e.clientX - rs.current.sx), h: Math.max(minHeight, rs.current.h + e.clientY - rs.current.sy) })
 					}
-					onPointerUp={() => (rs.current = null)}
+					onPointerUp={() => {
+						if (!rs.current) return;
+						rs.current = null;
+						onGeometryCommit?.();
+					}}
+					onPointerCancel={() => (rs.current = null)}
 				/>
 			) : null}
 		</div>
@@ -304,43 +388,106 @@ export const TopBar: React.FC<{ right?: React.ReactNode; children: React.ReactNo
 /** The stone bar of menu icons along the bottom of the game screen, framed in gold. Children are IconButtons. */
 export const Dock: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className='ds-dock'>{children}</div>;
 
+export interface TipBox {
+	left: number;
+	top: number;
+	right: number;
+	bottom: number;
+}
+export interface HoverTipProps {
+	tip: React.ReactNode;
+	placement?: 'below' | 'above';
+	align?: 'start' | 'center';
+	/** Controlled visibility (the caller's own hover logic); leave undefined for built-in hover and focus */
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	/** No tip at all (a locked or empty slot) */
+	disabled?: boolean;
+	/** ms the tip lingers after the pointer leaves; with `interactive` it can then be entered and its text copied */
+	closeDelayMs?: number;
+	interactive?: boolean;
+	/** Replace the built-in placement: gets the anchor's box, the tip's size and the viewport, returns the tip's top-left (the game's `placeTip` fits here) */
+	place?: (anchor: TipBox, tip: Size, viewport: Size) => Point;
+	children: React.ReactNode;
+}
 /**
- * Shows `tip` under (or above) the wrapped element while it is hovered or focused. The tip is drawn in a portal on `document.body` with fixed positioning, so no scrolling list, clipped panel
- * or window can hide it, it always sits on top, and it is kept inside the screen. Purely presentational; the tip is any node, usually a Tooltip.
+ * Shows `tip` next to the wrapped element while it is hovered or focused. The tip is drawn in a portal on `document.body` with fixed positioning, so no scrolling list, clipped panel
+ * or window can hide it, it always sits on top, and it is kept inside the screen. Purely presentational: the tip is any node (usually a Tooltip); visibility can be driven from outside.
  */
-export const HoverTip: React.FC<{ tip: React.ReactNode; placement?: 'below' | 'above'; align?: 'start' | 'center'; children: React.ReactNode }> = ({
+export const HoverTip: React.FC<HoverTipProps> = ({
 	tip,
 	placement = 'below',
 	align = 'start',
+	open: openProp,
+	onOpenChange,
+	disabled,
+	closeDelayMs = 0,
+	interactive,
+	place,
 	children,
 }) => {
 	const host = useRef<HTMLSpanElement>(null);
 	const pop = useRef<HTMLDivElement>(null);
-	const [open, setOpen] = useState(false);
-	const [at, setAt] = useState<{ left: number; top: number } | null>(null);
+	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const [openOwn, setOpenOwn] = useState(false);
+	const [at, setAt] = useState<Point | null>(null);
+	const open = !disabled && (openProp ?? openOwn);
+	const setOpen = (v: boolean) => {
+		if (timer.current) clearTimeout(timer.current);
+		timer.current = null;
+		if (v || closeDelayMs <= 0) {
+			setOpenOwn(v);
+			onOpenChange?.(v);
+			if (!v) setAt(null);
+			return;
+		}
+		timer.current = setTimeout(() => {
+			setOpenOwn(false);
+			onOpenChange?.(false);
+			setAt(null);
+		}, closeDelayMs);
+	};
+	useEffect(() => () => void (timer.current && clearTimeout(timer.current)), []);
 	useLayoutEffect(() => {
 		if (!open || !host.current || !pop.current) return;
 		const r = host.current.getBoundingClientRect();
 		const w = pop.current.offsetWidth;
 		const h = pop.current.offsetHeight;
+		const viewport = { w: window.innerWidth, h: window.innerHeight };
+		if (place) {
+			setAt(place({ left: r.left, top: r.top, right: r.right, bottom: r.bottom }, { w, h }, viewport));
+			return;
+		}
 		let left = align === 'center' ? r.left + r.width / 2 - w / 2 : r.left;
 		let top = placement === 'above' ? r.top - h - 8 : r.bottom + 8;
 		if (top < 4) top = r.bottom + 8;
-		if (top + h > window.innerHeight - 4) top = Math.max(4, r.top - h - 8);
-		left = Math.max(4, Math.min(left, window.innerWidth - w - 4));
-		setAt({ left, top });
-	}, [open, placement, align]);
-	const show = () => setOpen(true);
-	const hide = () => {
-		setOpen(false);
-		setAt(null);
-	};
+		if (top + h > viewport.h - 4) top = Math.max(4, r.top - h - 8);
+		left = Math.max(4, Math.min(left, viewport.w - w - 4));
+		setAt({ x: left, y: top });
+	}, [open, placement, align, place]);
 	return (
-		<span ref={host} className='ds-hovertip' onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide} onPointerDown={hide} onContextMenu={hide}>
+		<span
+			ref={host}
+			className='ds-hovertip'
+			onMouseEnter={() => setOpen(true)}
+			onMouseLeave={() => setOpen(false)}
+			onFocus={() => setOpen(true)}
+			onBlur={() => setOpen(false)}
+			onPointerDown={() => setOpen(false)}
+			onContextMenu={() => setOpen(false)}
+		>
 			{children}
 			{open && typeof document !== 'undefined'
 				? createPortal(
-						<div ref={pop} className='ds-root ds-hovertip-pop' role='presentation' style={{ left: at?.left ?? -9999, top: at?.top ?? -9999 }}>
+						<div
+							ref={pop}
+							className='ds-root ds-hovertip-pop'
+							role='presentation'
+							data-interactive={!!interactive}
+							style={{ left: at?.x ?? -9999, top: at?.y ?? -9999 }}
+							onMouseEnter={interactive ? () => setOpen(true) : undefined}
+							onMouseLeave={interactive ? () => setOpen(false) : undefined}
+						>
 							{tip}
 						</div>,
 						document.body,

@@ -1,27 +1,69 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Frame } from './primitives';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
-/** A dialog on a dimmed backdrop: the stone frame, a centred flanked title and a close button. Presentational; the caller owns open/close. */
-export const Modal: React.FC<{ title: string; width?: number; onClose?: () => void; children: React.ReactNode }> = ({
+/**
+ * A dialog on a dimmed backdrop: the stone frame, a centred flanked title and a close button. Presentational; the caller owns open/close (and the Escape key: pass `onClose` to your own key
+ * handler, or set `closeOnEscape` to let the dialog listen itself). `size` follows the game's modal sizes (sm 440, md 640, lg 1080) unless `width` is given.
+ */
+export const Modal: React.FC<{
+	title: React.ReactNode;
+	icon?: React.ReactNode;
+	size?: 'sm' | 'md' | 'lg';
+	width?: number;
+	onClose?: () => void;
+	closeOnBackdrop?: boolean;
+	closeOnEscape?: boolean;
+	hideClose?: boolean;
+	closeLabel?: string;
+	className?: string;
+	children: React.ReactNode;
+}> = ({
 	title,
-	width = 640,
+	icon,
+	size = 'md',
+	width,
 	onClose,
+	closeOnBackdrop = true,
+	closeOnEscape = false,
+	hideClose = false,
+	closeLabel = 'Close',
+	className,
 	children,
-}) => (
-	<div className='ds-backdrop' onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}>
-		<div className='ds-root ds-modal' style={{ width }} role='dialog' aria-label={title}>
-			<Frame>
-				<div className='ds-modal-title'>{title}</div>
-				<button type='button' className='ds-close ds-modal-close' aria-label='Close' onClick={onClose}>
-					✕
-				</button>
-				<div className='ds-modal-body'>{children}</div>
-			</Frame>
+}) => {
+	useEffect(() => {
+		if (!closeOnEscape) return;
+		const key = (e: KeyboardEvent) => e.key === 'Escape' && onClose?.();
+		window.addEventListener('keydown', key);
+		return () => window.removeEventListener('keydown', key);
+	}, [closeOnEscape, onClose]);
+	const w = width ?? { sm: 440, md: 640, lg: 1080 }[size];
+	return (
+		<div className='ds-backdrop' onMouseDown={(e) => closeOnBackdrop && e.target === e.currentTarget && onClose?.()}>
+			<div
+				className={cx('ds-root ds-modal', className)}
+				style={{ width: w }}
+				role='dialog'
+				aria-modal='true'
+				aria-label={typeof title === 'string' ? title : undefined}
+			>
+				<Frame>
+					<div className='ds-modal-title'>
+						{icon}
+						{title}
+					</div>
+					{hideClose ? null : (
+						<button type='button' className='ds-close ds-modal-close' aria-label={closeLabel} onClick={onClose}>
+							✕
+						</button>
+					)}
+					<div className='ds-modal-body'>{children}</div>
+				</Frame>
+			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 /** A hero face in a gold frame; the whole thing is a button with a small pencil, so it reads as "click to change". */
 export const AvatarFrame: React.FC<{ src: string; size?: number; onClick?: () => void; title?: string }> = ({
@@ -47,16 +89,19 @@ export const HeroIdentity: React.FC<{
 	title?: string | null;
 	onAvatar?: () => void;
 	onBadge?: () => void;
-}> = ({ avatar, name, classLabel, badge, title, onAvatar, onBadge }) => (
+	noTitleLabel?: string;
+	avatarTitle?: string;
+	badgeTitle?: string;
+}> = ({ avatar, name, classLabel, badge, title, onAvatar, onBadge, noTitleLabel = 'No title', avatarTitle, badgeTitle = 'Change badge and title' }) => (
 	<div className='ds-identity'>
-		<AvatarFrame src={avatar} size={61} onClick={onAvatar} />
+		<AvatarFrame src={avatar} size={61} onClick={onAvatar} title={avatarTitle} />
 		<div className='ds-identity-text'>
 			<div className='ds-identity-name'>
 				<span>{name}</span>
-				<button type='button' className='ds-identity-title' title='Change badge and title' onClick={onBadge}>
-					({title ?? 'No title'})
+				<button type='button' className='ds-identity-title' title={badgeTitle} onClick={onBadge}>
+					({title ?? noTitleLabel})
 				</button>
-				<button type='button' className='ds-identity-badge' title='Change badge and title' onClick={onBadge}>
+				<button type='button' className='ds-identity-badge' title={badgeTitle} onClick={onBadge}>
 					{badge ? <img src={badge} alt='' /> : <span className='ds-dim'>＋</span>}
 				</button>
 			</div>
@@ -76,14 +121,20 @@ export interface AvatarCard {
 	note?: string;
 }
 /** The avatar grid of the picker: the hero's starters and earned rewards are pickable, other classes' starters are dimmed with a lock line, unearned rewards are silhouettes with how to earn them. */
-export const AvatarGrid: React.FC<{ cards: AvatarCard[]; value: string | null; onPick?: (id: string) => void }> = ({ cards, value, onPick }) => (
+export const AvatarGrid: React.FC<{
+	cards: AvatarCard[];
+	value: string | null;
+	onPick?: (id: string) => void;
+	/** Texts of the empty cards */
+	labels?: { soon?: string; soonNote?: string; locked?: string };
+}> = ({ cards, value, onPick, labels }) => (
 	<div className='ds-avatar-grid' role='radiogroup' aria-label='Avatar'>
 		{cards.map((c, i) =>
 			c.state === 'soon' ? (
 				<div key={`soon-${i}`} className='ds-acard' data-state='soon' aria-hidden='true'>
 					<span className='ds-acard-art'>?</span>
-					<span className='ds-acard-name'>Soon</span>
-					<span className='ds-acard-note'>New faces in later updates</span>
+					<span className='ds-acard-name'>{labels?.soon ?? 'Soon'}</span>
+					<span className='ds-acard-note'>{labels?.soonNote ?? 'New faces in later updates'}</span>
 				</div>
 			) : (
 				<button
@@ -100,7 +151,7 @@ export const AvatarGrid: React.FC<{ cards: AvatarCard[]; value: string | null; o
 					<span className='ds-acard-art'>
 						<img src={c.portrait} alt='' />
 					</span>
-					<span className='ds-acard-name'>{c.state === 'locked' ? '???' : c.name}</span>
+					<span className='ds-acard-name'>{c.state === 'locked' ? (labels?.locked ?? '???') : c.name}</span>
 					{c.note ? <span className='ds-acard-note'>{c.state === 'class' ? `🔒 ${c.note}` : c.note}</span> : null}
 				</button>
 			),
@@ -124,9 +175,10 @@ export const BadgeTitlePicker: React.FC<{
 	badgeId: string | null;
 	titleId: string | null;
 	onChange?: (next: { badgeId: string | null; titleId: string | null }) => void;
-}> = ({ badges, titles, badgeId, titleId, onChange }) => (
+	labels?: { badge?: string; title?: string; hideBadge?: string; noTitle?: string };
+}> = ({ badges, titles, badgeId, titleId, onChange, labels }) => (
 	<div>
-		<h4 className='ds-section-label'>Badge</h4>
+		<h4 className='ds-section-label'>{labels?.badge ?? 'Badge'}</h4>
 		<div className='ds-avatar-grid' style={{ marginTop: 8 }}>
 			{badges.map((b) => (
 				<button
@@ -147,11 +199,11 @@ export const BadgeTitlePicker: React.FC<{
 				<span className='ds-acard-art' style={{ height: 44 }}>
 					✕
 				</span>
-				<span className='ds-acard-name'>Hide badge</span>
+				<span className='ds-acard-name'>{labels?.hideBadge ?? 'Hide badge'}</span>
 			</button>
 		</div>
 		<h4 className='ds-section-label' style={{ marginTop: 16 }}>
-			Title
+			{labels?.title ?? 'Title'}
 		</h4>
 		<div className='ds-avatar-grid' style={{ marginTop: 8 }}>
 			<button
@@ -161,7 +213,7 @@ export const BadgeTitlePicker: React.FC<{
 				data-selected={titleId === null}
 				onClick={() => onChange?.({ badgeId, titleId: null })}
 			>
-				<span className='ds-acard-name'>No title</span>
+				<span className='ds-acard-name'>{labels?.noTitle ?? 'No title'}</span>
 			</button>
 			{titles.map((t) => (
 				<button
@@ -254,13 +306,15 @@ export const CraftQueue: React.FC<{
 	onCollect?: (id: string | number) => void;
 	onCancel?: (id: string | number) => void;
 	onCollectAll?: () => void;
-}> = ({ entries, slots, onCollect, onCancel, onCollectAll }) => {
+	labels?: { queue?: string; idle?: string; collectAll?: string; cancel?: string; collect?: string };
+}> = ({ entries, slots, onCollect, onCancel, onCollectAll, labels }) => {
+	const L = { queue: 'Queue', idle: 'idle', collectAll: 'Collect all', cancel: 'Cancel', collect: 'Collect', ...labels };
 	const ready = entries.reduce((n, e) => n + (e.done >= 1 ? 1 : 0), 0);
 	if (entries.length === 0)
 		return (
 			<div className='ds-queue' data-ready='false'>
 				<span className='ds-dim' style={{ fontSize: 12 }}>
-					Queue 0 / {slots} · idle
+					{L.queue} 0 / {slots} · {L.idle}
 				</span>
 			</div>
 		);
@@ -268,10 +322,10 @@ export const CraftQueue: React.FC<{
 		<div className='ds-queue' data-ready={ready > 0}>
 			<div className='ds-queue-head'>
 				<span className='ds-dim' style={{ fontSize: 12 }}>
-					Queue {entries.length} / {slots}
+					{L.queue} {entries.length} / {slots}
 				</span>
 				<Button tone={ready > 0 ? 'gold' : 'stone'} className={ready > 0 ? 'ds-collect-glow' : undefined} disabled={ready === 0} onClick={onCollectAll}>
-					{ready > 0 ? `Collect all (${ready})` : 'Collect all'}
+					{ready > 0 ? `${L.collectAll} (${ready})` : L.collectAll}
 				</Button>
 			</div>
 			{entries.map((e) => (
@@ -286,9 +340,10 @@ export const CraftQueue: React.FC<{
 							</span>
 						</div>
 					</div>
-					<Button onClick={() => onCancel?.(e.id)}>Cancel</Button>
+					<Button onClick={() => onCancel?.(e.id)}>{L.cancel}</Button>
 					<Button tone={e.done >= 1 ? 'gold' : 'stone'} disabled={e.done < 1} onClick={() => onCollect?.(e.id)}>
-						Collect{e.done > 0 ? ` ${e.done}` : ''}
+						{L.collect}
+						{e.done > 0 ? ` ${e.done}` : ''}
 					</Button>
 				</div>
 			))}
@@ -321,12 +376,16 @@ const STASH_TITLES: Record<StashEntry['kind'], string> = { component: 'Component
  * The bag's Crafting tab: what crafting made and the ingredients, kept outside the bag's slots (no slots, only a cap). Components and special items stay for recipes; potions and trade goods can
  * be taken into the bag with "1" or "Stack". Rows are grouped by kind. Props only: the caller moves the items.
  */
-export const CraftStash: React.FC<{ entries: StashEntry[]; onTake?: (id: string, n: number) => void }> = ({ entries, onTake }) => {
+export const CraftStash: React.FC<{
+	entries: StashEntry[];
+	onTake?: (id: string, n: number) => void;
+	labels?: { empty?: string; stack?: string; forRecipes?: string; keptSafe?: string; groups?: Partial<Record<StashEntry['kind'], string>> };
+}> = ({ entries, onTake, labels }) => {
 	const shown = entries.filter((e) => e.qty > 0);
 	if (shown.length === 0)
 		return (
 			<p className='ds-dim' style={{ fontSize: 13 }}>
-				Nothing crafted yet. Finished potions, goods and components collect here.
+				{labels?.empty ?? 'Nothing crafted yet. Finished potions, goods and components collect here.'}
 			</p>
 		);
 	const kinds = (Object.keys(STASH_TITLES) as StashEntry['kind'][]).filter((k) => shown.some((e) => e.kind === k));
@@ -334,7 +393,7 @@ export const CraftStash: React.FC<{ entries: StashEntry[]; onTake?: (id: string,
 		<div className='ds-stash'>
 			{kinds.map((k) => (
 				<div key={k}>
-					<div className='ds-section-label'>{STASH_TITLES[k]}</div>
+					<div className='ds-section-label'>{labels?.groups?.[k] ?? STASH_TITLES[k]}</div>
 					{shown
 						.filter((e) => e.kind === k)
 						.map((e) => (
@@ -345,10 +404,12 @@ export const CraftStash: React.FC<{ entries: StashEntry[]; onTake?: (id: string,
 								{e.kind === 'potion' || e.kind === 'good' ? (
 									<>
 										<Button onClick={() => onTake?.(e.id, 1)}>1</Button>
-										<Button onClick={() => onTake?.(e.id, Math.min(e.qty, e.stack ?? 20))}>Stack</Button>
+										<Button onClick={() => onTake?.(e.id, Math.min(e.qty, e.stack ?? 20))}>{labels?.stack ?? 'Stack'}</Button>
 									</>
 								) : (
-									<span className='ds-dim ds-stash-note'>{e.kind === 'component' ? 'for recipes' : 'kept safe'}</span>
+									<span className='ds-dim ds-stash-note'>
+										{e.kind === 'component' ? (labels?.forRecipes ?? 'for recipes') : (labels?.keptSafe ?? 'kept safe')}
+									</span>
 								)}
 							</div>
 						))}
@@ -375,11 +436,11 @@ export const SelectBox: React.FC<{ value: string; onChange: (v: string) => void;
 );
 
 /** A placeholder page for a tab that is not built yet: icon, title, a line of text and a "Coming soon" tag. */
-export const ComingSoon: React.FC<{ title: string; text: string; icon?: string }> = ({ title, text, icon }) => (
+export const ComingSoon: React.FC<{ title: string; text: string; icon?: string; tag?: string }> = ({ title, text, icon, tag = 'Coming soon' }) => (
 	<div className='ds-soon'>
 		{icon ? <img src={icon} alt='' /> : null}
 		<div className='ds-soon-title'>{title}</div>
-		<span className='ds-soon-tag'>Coming soon</span>
+		<span className='ds-soon-tag'>{tag}</span>
 		<p>{text}</p>
 	</div>
 );
