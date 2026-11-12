@@ -74,6 +74,7 @@
 
 .ld-col-account .ld-frame {
 	flex: 0 1 auto;
+	max-height: 100%; /* a tall form scrolls inside the window instead of running off the screen */
 }
 
 .ld-frame {
@@ -388,6 +389,98 @@
 }
 
 /* a narrow screen: the frames stack and the page scrolls */
+/* --- making a hero: the changelog folds to a strip and the account window grows --- */
+.ld-col {
+	transition:
+		width 0.5s ease,
+		min-width 0.5s ease;
+}
+
+.ld-col-log[data-collapsed='true'] {
+	width: 60px;
+	min-width: 60px;
+}
+
+.ld-root[data-wide='true'] .ld-col-account {
+	width: min(860px, 60vw);
+}
+
+.ld-log-inner {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	min-width: 280px;
+	transition: opacity 0.25s ease;
+}
+
+.ld-col-log[data-collapsed='true'] .ld-log-inner {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ld-log-headrow {
+	position: relative;
+}
+
+.ld-fold {
+	position: absolute;
+	top: -2px;
+	right: 4px;
+	width: 26px;
+	height: 26px;
+	color: var(--ds-gold-lt, #f4d57e);
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid #8a5f16;
+	cursor: pointer;
+}
+
+.ld-fold:hover {
+	filter: brightness(1.3);
+}
+
+.ld-log-tab {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	padding-top: 16px;
+	color: var(--ds-gold-lt, #f4d57e);
+	font-family: inherit;
+	background: transparent;
+	cursor: pointer;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease 0.2s;
+}
+
+.ld-log-tab b {
+	font-weight: 400;
+	font-size: 0.85rem;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	writing-mode: vertical-rl;
+}
+
+.ld-col-log[data-collapsed='true'] .ld-log-tab {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.ld-col-log[data-collapsed='true'] .ld-log-tab:hover {
+	filter: brightness(1.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ld-col,
+	.ld-log-inner,
+	.ld-log-tab {
+		transition: none;
+	}
+}
+
 @media (max-width: 900px) {
 	.ld-root {
 		height: auto;

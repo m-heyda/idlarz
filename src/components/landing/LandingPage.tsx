@@ -115,7 +115,12 @@ const ChangelogRow: React.FC<{ entry: ChangelogEntry; open: boolean; onToggle: (
 };
 
 /** The release notes on a parchment sheet: one collapsible row per version in a scroll area that fills the frame (the newest starts open). */
-const ChangelogWindow: React.FC<{ entries: readonly ChangelogEntry[] }> = ({ entries }) => {
+const ChangelogWindow: React.FC<{ entries: readonly ChangelogEntry[]; collapsed: boolean; canCollapse: boolean; onToggle: () => void }> = ({
+	entries,
+	collapsed,
+	canCollapse,
+	onToggle,
+}) => {
 	const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set(entries.slice(0, 1).map((e) => e.version)));
 	const toggle = (version: string) =>
 		setOpen((prev) => {
@@ -124,16 +129,30 @@ const ChangelogWindow: React.FC<{ entries: readonly ChangelogEntry[] }> = ({ ent
 			return next;
 		});
 	return (
-		<div className='ld-col ld-col-log'>
+		<div className='ld-col ld-col-log' data-collapsed={collapsed}>
 			<Critter id='forest/mossback-wolf' className='ld-critter-tl' />
 			<Critter id='coast/wreck-crab' size={48} className='ld-critter-bl' />
 			<Frame className='ld-frame'>
-				<WindowHead title='Changelog' />
-				<Panel parchment className='ld-paper'>
-					{entries.map((entry) => (
-						<ChangelogRow key={entry.version} entry={entry} open={open.has(entry.version)} onToggle={() => toggle(entry.version)} />
-					))}
-				</Panel>
+				<div className='ld-log-inner' aria-hidden={collapsed}>
+					<div className='ld-log-headrow'>
+						<WindowHead title='Changelog' />
+						{canCollapse && (
+							<button type='button' className='ld-fold' onClick={onToggle} aria-label='Collapse the changelog' title='Collapse'>
+								◂
+							</button>
+						)}
+					</div>
+					<Panel parchment className='ld-paper'>
+						{entries.map((entry) => (
+							<ChangelogRow key={entry.version} entry={entry} open={open.has(entry.version)} onToggle={() => toggle(entry.version)} />
+						))}
+					</Panel>
+				</div>
+				{/* folded away while the hero is being made: a thin strip that opens it again */}
+				<button type='button' className='ld-log-tab' onClick={onToggle} tabIndex={collapsed ? 0 : -1} aria-label='Show the changelog'>
+					<span>▸</span>
+					<b>Changelog</b>
+				</button>
 			</Frame>
 		</div>
 	);
@@ -249,6 +268,12 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 		return () => window.removeEventListener('keydown', onKey);
 	}, [visitor.name, router]);
 
+	// making a hero needs the room: the changelog folds to a strip on the left and the window grows (the strip opens it again)
+	const wide = visitor.name === 'guest' && mode === 'register';
+	const [logPeek, setLogPeek] = useState(false);
+	useEffect(() => setLogPeek(false), [wide]);
+	const collapsed = wide && !logPeek;
+
 	const pickMode = (picked: AuthMode) => {
 		setMode(picked);
 		setFormKey((k) => k + 1);
@@ -261,13 +286,13 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 	};
 
 	return (
-		<main className='ld-root ds-root'>
+		<main className='ld-root ds-root' data-wide={wide && collapsed}>
 			<div className='ld-bg' style={{ backgroundImage: `url(${LANDING_BG})` }} aria-hidden='true' />
 			<div className='ld-shade' aria-hidden='true' />
 			<h1 className='sr-only'>{GAME_TITLE}</h1>
 
 			<div className='ld-layout'>
-				<ChangelogWindow entries={changelog} />
+				<ChangelogWindow entries={changelog} collapsed={collapsed} canCollapse={wide} onToggle={() => setLogPeek((p) => !p)} />
 
 				<div className='ld-col ld-col-account'>
 					<Critter id='swamp/rot-heron' className='ld-critter-tr' />
