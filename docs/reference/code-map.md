@@ -274,6 +274,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`itemUi.ts`](../../src/components/game/itemUi.ts) — ~ Rarity colours come from the catalog (catalog/rarity.ts); kept here as a lookup the item UI imports.
 - [`mapSource.tsx`](../../src/components/game/mapSource.tsx) — ~ What the map components read from the game.
 
+**src/components/game/merchant/**
+
+- [`MerchantResourcesTab.tsx`](../../src/components/game/merchant/MerchantResourcesTab.tsx) — ~ How much one Sell or Buy moves:
+- [`MerchantWindow.tsx`](../../src/components/game/merchant/MerchantWindow.tsx) — ~ How many upgrades the player can buy right now (the click power step and every merchant upgrade not yet maxed):
+
 **src/components/game/overlays/**
 
 - [`AchievementNotification.tsx`](../../src/components/game/overlays/AchievementNotification.tsx) — ~ The reward moment for an earned achievement (IDL-332):
@@ -302,9 +307,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`MerchantItemsSection.tsx`](../../src/components/game/overlays/Merchant/MerchantItemsSection.tsx) — ~ Sell bag items for gold:
 - [`MerchantOverlay.tsx`](../../src/components/game/overlays/Merchant/MerchantOverlay.tsx) — ~ Opening the Gambling tab while it is still empty is a secret deed (IDL-305):
-- [`MerchantResources.tsx`](../../src/components/game/overlays/Merchant/MerchantResources.tsx) — ~ How much one Sell or Buy click moves:
 - [`MerchantShop.tsx`](../../src/components/game/overlays/Merchant/MerchantShop.tsx) — ~ How many places stand on one plank of the shelf.
-- [`MerchantTabButtons.tsx`](../../src/components/game/overlays/Merchant/MerchantTabButtons.tsx)
 - [`TipButton.tsx`](../../src/components/game/overlays/Merchant/TipButton.tsx) — ~ A small button with a hover card (the price, the gold a sale pays ...), in the look of the item hover cards.
 
 **src/components/game/overlays/**

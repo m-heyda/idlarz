@@ -95,3 +95,16 @@ test('the Crafting tab shows the level bar, the queue, the recipe groups and the
 	assert.match(out, /ds-craft-ticket/);
 	assert.match(out, /Amount to craft/, 'the typed amount field is there');
 });
+
+test('the Merchant Resources tab: ledger, trade ticket with the 1K / 1M / 1B / Max amount, typed field and slider', async () => {
+	// (the other tabs import style sheets, which the test runner cannot load: the window shell is checked in the browser)
+	const { default: MerchantResourcesTab } = await import('../../src/components/game/merchant/MerchantResourcesTab');
+	reset();
+	const out = renderToStaticMarkup(h(MerchantResourcesTab));
+	for (const word of ['Stock ledger', 'You have', 'Haggler', 'Sell', 'Buy']) {
+		assert.ok(out.includes(word), `the window shows "${word}"`);
+	}
+	for (const preset of ['1K', '1M', '1B', 'Max']) assert.ok(out.includes(`>${preset}<`), `the amount has the ${preset} button`);
+	assert.match(out, /placeholder="Custom"/, 'and a typed amount field');
+	assert.match(out, /ds-range/, 'and the slider');
+});

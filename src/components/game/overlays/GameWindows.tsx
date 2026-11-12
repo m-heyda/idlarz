@@ -7,7 +7,7 @@ import PixelWindow from '../PixelWindow';
 import PixelIcon from '../PixelIcon';
 import CastleUpgradeDialog from '../CastleUpgradeDialog';
 import HeroWindow from '../hero/HeroWindow';
-import MerchantOverlay from './Merchant/MerchantOverlay';
+import MerchantWindow from '../merchant/MerchantWindow';
 import FarmOverlay from './FarmOverlay';
 import AchievementsOverlay from './AchievementsOverlay';
 import WindowErrorBoundary from '../WindowErrorBoundary';
@@ -36,11 +36,9 @@ const GameWindows: React.FC = () => {
 				</WindowErrorBoundary>
 			)}
 			{open.includes('merchant') && (
-				<PixelWindow id='merchant' title='Merchant' icon={<PixelIcon name='menu_merchant' alt='' />} width={980} height={720}>
-					<WindowErrorBoundary name='Merchant'>
-						<MerchantOverlay />
-					</WindowErrorBoundary>
-				</PixelWindow>
+				<WindowErrorBoundary name='Merchant'>
+					<MerchantWindow />
+				</WindowErrorBoundary>
 			)}
 			{open.includes('farm') && (
 				<PixelWindow id='farm' title='Farm' icon={<PixelIcon name='menu_farm' alt='' />} width={1120} height={760} flush>

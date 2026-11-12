@@ -21401,8 +21401,7 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/hud/HudDock.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
+			"src/components/game/hud/HudDock.tsx"
 		],
 		"name": "menu_merchant",
 		"category": "ui",

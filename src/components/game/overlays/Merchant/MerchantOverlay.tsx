@@ -4,14 +4,11 @@ import { requestGems } from '@/lib/rewardsClient';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber, formatPercent } from '@/utils/formatters';
-import { MerchantTabButtons } from './MerchantTabButtons';
 import { MerchantItemsSection } from './MerchantItemsSection';
 import { MerchantGoods, MerchantUpgradeCards } from './MerchantShop';
-import { MerchantResources } from './MerchantResources';
 import { CLICK_LADDER } from '@/config/economy';
 import { cn } from '@/lib/utils';
 import ResourceIcon from '../../ResourceIcon';
-import { MERCHANT_PORTRAIT, npcPortraitUrl } from '@/config/npcPortraits';
 
 /** Opening the Gambling tab while it is still empty is a secret deed (IDL-305): the server is told once per page load, and it decides whether that counts. */
 let gamblingSeen = false;
@@ -45,14 +42,15 @@ const PlaceholderTabContent: React.FC<PlaceholderTabContentProps> = ({ title, em
 	);
 };
 
+/**
+ * The Goods, Upgrades, Quests and Gambling tabs of the Merchant window, still in their own look while they are rebuilt one by one inside the new window (the Resources tab is `MerchantResourcesTab`).
+ */
 const MerchantOverlay: React.FC = () => {
 	const resources = useGameStore((state) => state.resources);
 	const buyClickUpgrade = useGameStore((state) => state.buyClickUpgrade);
 	const clickLevel = useGameStore((state) => state.clickLevel);
 
-	// State for current merchant tab
 	const activeTab = useUiStore((state) => state.merchantTab);
-	const setActiveTab = useUiStore((state) => state.setMerchantTab);
 
 	// Every sale and purchase is announced by the shared toast (top of the screen), so the window never jumps
 	const showToast = useUiStore((state) => state.showToast);
@@ -84,13 +82,6 @@ const MerchantOverlay: React.FC = () => {
 	// Render tab content based on active tab
 	const renderTabContent = () => {
 		switch (activeTab) {
-			case 'resources':
-				return (
-					<>
-						<h2 className='px-h text-center'>Resources</h2>
-						<MerchantResources />
-					</>
-				);
 			case 'goods':
 				return (
 					<>
@@ -160,20 +151,7 @@ const MerchantOverlay: React.FC = () => {
 		}
 	};
 
-	return (
-		<div className='grid grid-cols-5 gap-5'>
-			{/* Merchant Avatar and Navigation */}
-			<div className='col-span-1 flex flex-col gap-4'>
-				{/* eslint-disable-next-line @next/next/no-img-element */}
-				<img src={npcPortraitUrl(MERCHANT_PORTRAIT[activeTab])} alt='' width={96} height={96} className='mx-auto' style={{ imageRendering: 'pixelated' }} />
-				{/* Merchant Navigation Tabs */}
-				<MerchantTabButtons activeTab={activeTab} onTabChange={setActiveTab} />
-			</div>
-
-			{/* Content Area - Changes based on selected tab */}
-			<div className='col-span-4 px-panel flex flex-col'>{renderTabContent()}</div>
-		</div>
-	);
+	return <div className='px-panel flex flex-col'>{renderTabContent()}</div>;
 };
 
 export default MerchantOverlay;
