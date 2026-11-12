@@ -42,7 +42,7 @@ const Move: React.FC<{ row: RankingRow }> = ({ row }) => {
 const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board }) => (
 	<li className='ds-listrow ds-listrow-line ds-rank-row' data-me={row.me} data-top={row.rank <= 3 ? row.rank : undefined}>
 		<span className='ds-rank-pos'>{row.rank}</span>
-		<AvatarArt id={row.avatarId} playerClass={row.playerClass} className='ds-rank-avatar' />
+		<AvatarArt id={row.avatarId} playerClass={row.playerClass} className='ds-rank-avatar' scale={1.4} />
 		<span className='ds-rank-who'>
 			<span className='ds-rank-name'>
 				<NickName color={nickColorValue(row.nameColor)}>{row.name}</NickName>
@@ -56,8 +56,8 @@ const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board 
 				src={`/pixel/new_assets/achievements/${row.badge}.png`}
 				alt={row.badgeName ?? ''}
 				title={row.badgeName ?? undefined}
-				width={28}
-				height={28}
+				width={40}
+				height={40}
 				className='pixelated'
 			/>
 		) : (

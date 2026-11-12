@@ -732,6 +732,21 @@
 	padding: 0;
 	background: none;
 	border: 0;
+	/* a window dragged narrower than its tabs scrolls them sideways instead of letting them overlap; the top padding keeps room for the diamond of the active tab */
+	min-width: 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding: 8px 0 2px;
+	margin: -8px 0 -2px;
+	scrollbar-width: thin;
+}
+
+.ds-window-bar .ds-tab {
+	flex: 0 0 auto;
+}
+
+.ds-window-bar > :first-child {
+	min-width: 0;
 }
 
 .ds-tab::after {
@@ -4838,10 +4853,10 @@ button.ds-income-head:hover {
 
 .ds-rank-row {
 	display: grid;
-	grid-template-columns: 40px 44px minmax(0, 1fr) 32px 96px 58px;
+	grid-template-columns: 40px 64px minmax(0, 1fr) 48px 96px 58px;
 	align-items: center;
-	gap: 10px;
-	min-height: 56px;
+	gap: 12px;
+	min-height: 76px;
 	border-width: 0 0 1px;
 }
 
@@ -4887,13 +4902,13 @@ button.ds-income-head:hover {
 .ds-rank-name {
 	display: flex;
 	align-items: center;
-	gap: 6px;
-	font-size: 15px;
+	gap: 8px;
+	font-size: 19px;
 	white-space: nowrap;
 }
 
 .ds-rank-title {
-	font-size: 11px;
+	font-size: 12px;
 	color: var(--ds-dim, #9aa0b4);
 	white-space: nowrap;
 	overflow: hidden;
@@ -4901,8 +4916,8 @@ button.ds-income-head:hover {
 }
 
 .ds-rank-nobadge {
-	width: 28px;
-	height: 28px;
+	width: 40px;
+	height: 40px;
 }
 
 .ds-rank-value {
@@ -4911,7 +4926,9 @@ button.ds-income-head:hover {
 	justify-content: flex-end;
 	gap: 6px;
 	font-weight: 700;
+	font-size: 16px;
 	text-align: right;
+	color: var(--ds-accent, #f0a53a);
 }
 
 .ds-rank-paragon {
@@ -4957,8 +4974,8 @@ button.ds-income-head:hover {
 }
 
 .ds-rank-sk-art {
-	width: 40px;
-	height: 40px;
+	width: 56px;
+	height: 56px;
 }
 
 .ds-rank-sk-name {
