@@ -3928,3 +3928,18 @@ button.ds-income-head:hover {
 .ds-queue[data-stacked='true'] .ds-queue-row > .ds-btn:nth-of-type(2) {
 	grid-area: collect;
 }
+
+/* Crafting tab: a gray track under the green crafting XP, a wider recipe list, air under Collect all */
+.ds-craft-level .ds-bar {
+	height: 22px;
+	background: #4a4e5a;
+}
+
+.ds-hero .ds-craft-list {
+	width: 360px;
+	--ds-slot-size: 48px;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-head {
+	margin-bottom: 8px;
+}

@@ -464,7 +464,7 @@ export const CraftQueue: React.FC<{
 					<Button onClick={() => onCancel?.(e.id)}>{L.cancel}</Button>
 					<Button tone={e.done >= 1 ? 'gold' : 'stone'} disabled={e.done < 1} onClick={() => onCollect?.(e.id)}>
 						{L.collect}
-						{e.done > 0 ? ` ${e.done}` : ''}
+						{e.done > 0 && !stacked ? ` ${e.done}` : ''}
 					</Button>
 				</div>
 			))}

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, HoverTip, Inset, Panel, Slot } from '../../../../packages/design-system/src/components/primitives';
-import { CollapsibleGroup, CraftQueue, PAPER_INK, Slider, XpBar, type CraftQueueEntry } from '../../../../packages/design-system/src/components/composites';
+import { Button, HoverTip, Inset, Panel, ProgressBar, Slot } from '../../../../packages/design-system/src/components/primitives';
+import { CollapsibleGroup, CraftQueue, PAPER_INK, Slider, type CraftQueueEntry } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip, TipCostList, TipLine } from '../../../../packages/design-system/src/components/tooltips';
 import { RARITIES } from '@/catalog';
 import { GRADE_INFO } from '@/catalog/items/grades';
@@ -304,12 +304,11 @@ export const CraftingSidebar: React.FC = () => {
 						{Number.isFinite(next) ? `${formatInt(Math.floor(next * progress))} / ${formatInt(next)} XP` : 'MAX'}
 					</span>
 				</div>
-				<XpBar
-					level={level}
+				<ProgressBar
+					tone='xp'
 					value={Number.isFinite(next) ? Math.floor(next * progress) : 1}
 					max={Number.isFinite(next) ? next : 1}
 					label={`${Math.floor(progress * 100)}%`}
-					compact
 				/>
 			</div>
 			<Queue />
