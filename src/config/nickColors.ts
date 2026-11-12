@@ -50,7 +50,7 @@ export interface NickEffect {
 }
 
 /**
- * The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost and Void. None looks like the gold admin nickname (no gold, no stars).
+ * The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost, Void and Galaxy. None looks like the gold admin nickname (no gold, no stars).
  * Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.
  *
  * @category Progression/Badges
@@ -62,6 +62,7 @@ export const NICK_EFFECTS: readonly NickEffect[] = [
 	{ id: 'ember', name: 'Ember', item: 'name_ember', blurb: 'A glowing coal that flickers from yellow to red.' },
 	{ id: 'frost', name: 'Frost', item: 'name_frost', blurb: 'Icy white and blue with a glint that sweeps across.' },
 	{ id: 'void', name: 'Void', item: 'name_void', blurb: 'A pale violet name breathing out a dark purple glow.' },
+	{ id: 'galaxy', name: 'Galaxy', item: 'name_galaxy', blurb: 'A starry purple and blue sky drifting inside the letters.' },
 ];
 
 export const nickEffectById = (id: unknown): NickEffect | null => NICK_EFFECTS.find((effect) => effect.id === id) ?? null;

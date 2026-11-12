@@ -1989,6 +1989,38 @@
 	animation: ds-nick-flow 3.4s linear infinite;
 }
 
+/* Galaxy: a starry purple and blue sky inside the letters (a clipped background of star dots over a nebula gradient) that drifts, with a soft violet glow; quieter than the gold admin name */
+.ds-nick-galaxy .ds-nick-text {
+	background-image: radial-gradient(1px 1px at 6px 8px, #fff, transparent 60%), radial-gradient(1.2px 1.2px at 21px 17px, #fff, transparent 60%),
+		radial-gradient(1px 1px at 13px 24px, #d9ccff, transparent 60%), radial-gradient(ellipse 60% 80% at 20% 30%, #ff5fd2aa, transparent 70%),
+		radial-gradient(ellipse 60% 80% at 80% 70%, #3a6bffcc, transparent 70%), linear-gradient(120deg, #4b24c2, #8a3dff 50%, #3a4fd8);
+	background-size:
+		28px 30px,
+		34px 28px,
+		26px 32px,
+		100% 100%,
+		100% 100%,
+		100% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+	filter: drop-shadow(0 0 3px rgba(140, 100, 255, 0.55));
+	animation: ds-nick-galaxy 14s linear infinite;
+}
+
+@keyframes ds-nick-galaxy {
+	to {
+		background-position:
+			-28px 30px,
+			-34px 28px,
+			26px -32px,
+			0 0,
+			0 0,
+			0 0;
+	}
+}
+
 .ds-nick-void {
 	color: #eadcff;
 	animation: ds-nick-void 2.6s ease-in-out infinite alternate;
@@ -4315,71 +4347,6 @@ button.ds-income-head:hover {
 	min-height: 64px;
 }
 
-/* nebula clouds that drift, and two star layers (one drifts, one twinkles); all pure CSS */
-.ds-galaxy {
-	position: absolute;
-	inset: -20%;
-	background: radial-gradient(ellipse 40% 55% at 22% 40%, rgba(176, 64, 255, 0.42), transparent 70%),
-		radial-gradient(ellipse 45% 50% at 72% 58%, rgba(60, 90, 255, 0.4), transparent 70%),
-		radial-gradient(ellipse 30% 40% at 52% 22%, rgba(255, 70, 200, 0.28), transparent 70%);
-	animation: ds-galaxy-drift 24s ease-in-out infinite alternate;
-}
-
-.ds-galaxy::before,
-.ds-galaxy::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	background-repeat: repeat;
-}
-
-.ds-galaxy::before {
-	background-image: radial-gradient(1px 1px at 12px 18px, #fff, transparent 60%), radial-gradient(1px 1px at 58px 52px, #cfd8ff, transparent 60%),
-		radial-gradient(1.4px 1.4px at 96px 14px, #fff, transparent 60%), radial-gradient(1px 1px at 140px 70px, #e8d4ff, transparent 60%),
-		radial-gradient(1px 1px at 33px 88px, #fff, transparent 60%), radial-gradient(1.2px 1.2px at 118px 104px, #bcd0ff, transparent 60%);
-	background-size: 160px 120px;
-	animation: ds-galaxy-stars 60s linear infinite;
-}
-
-.ds-galaxy::after {
-	background-image: radial-gradient(1.6px 1.6px at 40px 30px, #fff, transparent 60%), radial-gradient(1.6px 1.6px at 130px 90px, #fff, transparent 60%),
-		radial-gradient(1.4px 1.4px at 80px 70px, #ffe9ff, transparent 60%);
-	background-size: 190px 130px;
-	animation: ds-galaxy-twinkle 3.2s ease-in-out infinite alternate;
-}
-
-@keyframes ds-galaxy-drift {
-	from {
-		transform: translate(-3%, -2%) rotate(0deg) scale(1);
-	}
-	to {
-		transform: translate(3%, 2%) rotate(6deg) scale(1.08);
-	}
-}
-
-@keyframes ds-galaxy-stars {
-	to {
-		background-position: -160px 120px;
-	}
-}
-
-@keyframes ds-galaxy-twinkle {
-	from {
-		opacity: 0.25;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.ds-galaxy,
-	.ds-galaxy::before,
-	.ds-galaxy::after {
-		animation: none;
-	}
-}
-
 .ds-badge-cols {
 	display: grid;
 	grid-template-columns: 372px minmax(0, 1fr);
@@ -4468,6 +4435,16 @@ button.ds-income-head:hover {
 	color: #10344f;
 	text-shadow: none;
 	background-image: linear-gradient(100deg, #8fd3ff, #e8f8ff, #ffffff, #e8f8ff, #8fd3ff);
+}
+
+.ds-swatch-galaxy {
+	background-image: radial-gradient(1px 1px at 8px 9px, #fff, transparent 60%), radial-gradient(1px 1px at 22px 20px, #fff, transparent 60%),
+		linear-gradient(120deg, #4b24c2, #a43dff 50%, #e056c8);
+	background-size:
+		30px 28px,
+		30px 28px,
+		100% 100%;
+	animation: none;
 }
 
 .ds-swatch-void {

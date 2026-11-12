@@ -874,7 +874,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 54,
+  "line": 55,
   "summary": "The gem shop's price book: what each service costs and how often it can be bought.",
   "see": []
  },
@@ -885,7 +885,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 138,
+  "line": 148,
   "summary": "The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.",
   "see": []
  },
@@ -965,7 +965,7 @@
   "category": "Progression/Badges",
   "file": "src/config/nickColors.ts",
   "line": 59,
-  "summary": "The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost and Void. None looks like the gold admin nickname (no gold, no stars). Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.",
+  "summary": "The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost, Void and Galaxy. None looks like the gold admin nickname (no gold, no stars). Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.",
   "see": []
  },
  {

@@ -1785,7 +1785,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </code></pre>
 </article><h2>Gems</h2><article><p><a id="gem-shop"></a></p>
 <h3><code>GEM_SHOP</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:54</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:55</code></a></p>
 <p>The gem shop&#39;s price book: what each service costs and how often it can be bought.</p>
 <ul>
 <li><p><strong>Class change</strong> (500): never during a fight; writes the profile&#39;s class (server only); the passives of the new class apply at once. An avatar that does not fit the new class is swapped for its starter.</p>
@@ -1796,7 +1796,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </li>
 <li><p><strong>Name colours</strong> (1000, once): unlocks the nickname colour picker (twelve colours, <code>config/nickColors.ts</code>) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.</p>
 </li>
-<li><p><strong>Name effects</strong> (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost and Void, the animated nicknames (<code>NICK_EFFECTS</code>). Each is its own purchase, separate from the plain colours; they are also bought from the name window.</p>
+<li><p><strong>Name effects</strong> (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (<code>NICK_EFFECTS</code>). Each is its own purchase, separate from the plain colours; they are also bought from the name window.</p>
 </li>
 </ul>
 <p>Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.</p>
@@ -1874,10 +1874,17 @@ level = min(level on the tile, level the account remembers for the biome)
 <td>none</td>
 <td>A pale violet nickname that breathes out a dark purple glow.</td>
 </tr>
+<tr>
+<td>Galaxy name</td>
+<td>once</td>
+<td>500</td>
+<td>none</td>
+<td>An animated nickname with a starry purple and blue sky drifting inside the letters.</td>
+</tr>
 </tbody></table>
 </article><article><p><a id="daily-bonus-gems"></a></p>
 <h3><code>DAILY_BONUS_GEMS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:138</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:148</code></a></p>
 <p>The daily first-login bonus: gems per day of the streak. A claim is once per <strong>UTC day</strong> (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.</p>
 <p><strong>Daily first-login bonus by day of the streak</strong> <em>(computed from the code)</em></p>
 <table>
@@ -5608,7 +5615,7 @@ The animated <strong>Rainbow</strong> (<code>NICK_RAINBOW</code>) is a separate 
 </article><article><p><a id="nick-effects"></a></p>
 <h3><code>NICK_EFFECTS</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/nickColors.ts"><code>src/config/nickColors.ts:59</code></a></p>
-<p>The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost and Void. None looks like the gold admin nickname (no gold, no stars).
+<p>The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost, Void and Galaxy. None looks like the gold admin nickname (no gold, no stars).
 Stored on <code>profiles.name_color</code> like a plain colour; the look of each is the <code>.ds-nick-&lt;id&gt;</code> class of the design system.</p>
 </article><article><p><a id="badgeoptions"></a></p>
 <h3><code>badgeOptions</code> <small>function</small></h3>

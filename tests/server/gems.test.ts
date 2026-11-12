@@ -197,7 +197,7 @@ test('Rainbow name: a separate one-time purchase of 500 gems that leaves Name co
 });
 
 test('every other name effect is also a separate 500 gem one-time purchase', async () => {
-	for (const id of ['name_aurora', 'name_ember', 'name_frost', 'name_void']) {
+	for (const id of ['name_aurora', 'name_ember', 'name_frost', 'name_void', 'name_galaxy']) {
 		const { m } = await started();
 		const ledger = m.ledgers.get(ID)!;
 		m.ledgers.set(ID, { ...ledger, gems: 600 });

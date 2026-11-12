@@ -69,8 +69,13 @@ const BadgeDialog: React.FC = () => {
 	const lockedColor = (id: string | null): boolean =>
 		id === null || id === NICK_GOLD ? false : nickEffectById(id) ? !badge.effectsUnlocked.includes(id) : !badge.colorsUnlocked;
 
-	/** A locked colour only previews (the name above changes, nothing is stored or sent) */
+	/** A locked colour only previews (the name above changes, nothing is stored or sent); a locked effect is bought with the click (the hover is its preview) */
 	const pickColor = async (nameColor: string | null) => {
+		if (nameColor !== null && nickEffectById(nameColor) && lockedColor(nameColor)) {
+			audioManager.playSound('click');
+			await buyEffect(nameColor);
+			return;
+		}
 		if (lockedColor(nameColor)) {
 			audioManager.playSound('click');
 			setTried(nameColor);
@@ -115,17 +120,12 @@ const BadgeDialog: React.FC = () => {
 	const shown = shownBadge(badge.badgeId, badge.earned);
 	const title = shownTitle(badge.titleId, badge.earned);
 	const locked = !badge.colorsUnlocked;
-	/** The effect tried on the preview that is still locked: it gets the unlock bar under the tiles */
-	const triedEffect = tried ? nickEffectById(tried) : null;
-	const triedEffectLocked = triedEffect !== null && !badge.effectsUnlocked.includes(triedEffect.id);
 	const effectBasePrice = gemItemById(NICK_EFFECTS[0].item)?.price ?? 0;
-	const effectPrice = triedEffect ? (gemItemById(triedEffect.item)?.price ?? 0) : 0;
 	const previewColor = hovered !== undefined ? hovered : tried !== undefined && lockedColor(tried) ? tried : badge.nameColor;
 
 	return (
 		<GameModal title='Name, badge and title' width={972} onClose={close}>
 			<div className='ds-nick-stage' data-testid='nick-preview'>
-				<span className='ds-galaxy' aria-hidden='true' />
 				<div className='ds-nick-preview'>
 					<NickName color={nickColorValue(previewColor)}>{playerName}</NickName>
 					{title && <span className='ds-nick-preview-title'>({title})</span>}
@@ -205,20 +205,9 @@ const BadgeDialog: React.FC = () => {
 							</button>
 						))}
 					</div>
-					{triedEffect && triedEffectLocked ? (
-						<div className='ds-lock-banner' data-testid='effect-locked' style={{ marginTop: 10 }}>
-							<span>
-								<b>{triedEffect.name}</b>: {triedEffect.blurb}
-							</span>
-							<Button tone='gold' onClick={() => void buyEffect(triedEffect.id)}>
-								{effectPrice} <GemIcon />
-							</Button>
-						</div>
-					) : (
-						<p className='ds-dim' style={{ fontSize: 12, margin: '16px 0 0' }}>
-							Hover to see the effect, click to buy: {effectBasePrice} <GemIcon /> each.
-						</p>
-					)}
+					<p className='ds-dim' style={{ fontSize: 12, margin: '16px 0 0' }}>
+						Hover to preview, click to buy: {effectBasePrice} <GemIcon /> each.
+					</p>
 				</section>
 
 				<section>

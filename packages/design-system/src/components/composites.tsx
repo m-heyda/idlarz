@@ -107,7 +107,7 @@ export const NickName: React.FC<{ children: React.ReactNode; color?: string | nu
 	);
 
 /** The animated nickname looks the design system draws (`.ds-nick-<id>`): the gold admin one and the effects of the Gem shop. A colour that is a CSS value is drawn plain. */
-const NICK_EFFECT_IDS = ['gold', 'rainbow', 'aurora', 'ember', 'frost', 'void'];
+const NICK_EFFECT_IDS = ['gold', 'rainbow', 'aurora', 'ember', 'frost', 'void', 'galaxy'];
 
 /**
  * The game admin's mark: a small animated creature (an 8 frame sprite sheet, `src`, 32 px frames) that stands by the name of the admin account, for everyone to see in the game, on the landing page and in the rankings.

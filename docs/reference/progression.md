@@ -1022,7 +1022,7 @@ The animated **Rainbow** (`NICK_RAINBOW`) is a separate purchase (`NICK_RAINBOW_
 
 Source: [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts)
 
-The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost and Void. None looks like the gold admin nickname (no gold, no stars).
+The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost, Void and Galaxy. None looks like the gold admin nickname (no gold, no stars).
 Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.
 
 <a id="badgeoptions"></a>

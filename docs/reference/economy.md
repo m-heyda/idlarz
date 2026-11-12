@@ -1209,7 +1209,7 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:54`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:55`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
@@ -1219,7 +1219,7 @@ The gem shop's price book: what each service costs and how often it can be bough
 
 - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
 
-- **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost and Void, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
+- **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
 
 Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
 
@@ -1236,12 +1236,13 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 | Ember name | once | 500 | none | An animated nickname like a glowing coal, flickering from yellow to red. |
 | Frost name | once | 500 | none | An animated icy nickname with a glint that sweeps across it. |
 | Void name | once | 500 | none | A pale violet nickname that breathes out a dark purple glow. |
+| Galaxy name | once | 500 | none | An animated nickname with a starry purple and blue sky drifting inside the letters. |
 
 <a id="daily-bonus-gems"></a>
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:138`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:148`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 

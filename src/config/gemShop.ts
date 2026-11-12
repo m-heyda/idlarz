@@ -15,7 +15,8 @@ export type GemItemId =
 	| 'name_aurora'
 	| 'name_ember'
 	| 'name_frost'
-	| 'name_void';
+	| 'name_void'
+	| 'name_galaxy';
 
 export interface GemItem {
 	id: GemItemId;
@@ -43,7 +44,7 @@ export const DAY_SEC = 86_400;
  *
  * - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
  *
- * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost and Void, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
+ * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
  *
  * Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
  *
@@ -120,6 +121,15 @@ export const GEM_SHOP: readonly GemItem[] = [
 		kind: 'once',
 		name: 'Void name',
 		blurb: 'A pale violet nickname that breathes out a dark purple glow.',
+		price: 500,
+		cooldownSec: 0,
+	},
+	{
+		id: 'name_galaxy',
+		tab: 'once',
+		kind: 'once',
+		name: 'Galaxy name',
+		blurb: 'An animated nickname with a starry purple and blue sky drifting inside the letters.',
 		price: 500,
 		cooldownSec: 0,
 	},

@@ -120,7 +120,7 @@ test('a stored gold nickname is only shown for an admin; shownIdentity carries t
 test('every name effect is its own purchase: owning one opens only that one, an admin has all, none is gold', () => {
 	assert.deepEqual(
 		NICK_EFFECTS.map((e) => e.id),
-		['rainbow', 'aurora', 'ember', 'frost', 'void'],
+		['rainbow', 'aurora', 'ember', 'frost', 'void', 'galaxy'],
 	);
 	for (const effect of NICK_EFFECTS) {
 		assert.equal(effect.item, `name_${effect.id}`);
