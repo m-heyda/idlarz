@@ -1991,13 +1991,15 @@
 
 /* Galaxy: a starry purple and blue sky inside the letters (a clipped background of star dots over a nebula gradient) that drifts, with a soft violet glow; quieter than the gold admin name */
 .ds-nick-galaxy .ds-nick-text {
-	background-image: radial-gradient(1px 1px at 6px 8px, #fff, transparent 60%), radial-gradient(1.2px 1.2px at 21px 17px, #fff, transparent 60%),
-		radial-gradient(1px 1px at 13px 24px, #d9ccff, transparent 60%), radial-gradient(ellipse 60% 80% at 20% 30%, #ff5fd2aa, transparent 70%),
+	background-image: radial-gradient(circle at 5px 6px, #fff 0, #fff 1.1px, transparent 1.7px),
+		radial-gradient(circle at 17px 19px, #fff 0, #fff 1.3px, transparent 1.9px), radial-gradient(circle at 11px 13px, #fff 0, #fff 0.9px, transparent 1.5px),
+		radial-gradient(circle at 26px 4px, #e8dcff 0, #e8dcff 1px, transparent 1.6px), radial-gradient(ellipse 60% 80% at 20% 30%, #ff5fd2aa, transparent 70%),
 		radial-gradient(ellipse 60% 80% at 80% 70%, #3a6bffcc, transparent 70%), linear-gradient(120deg, #4b24c2, #8a3dff 50%, #3a4fd8);
 	background-size:
-		28px 30px,
-		34px 28px,
-		26px 32px,
+		22px 26px,
+		30px 24px,
+		18px 20px,
+		34px 30px,
 		100% 100%,
 		100% 100%,
 		100% 100%;
@@ -2006,15 +2008,16 @@
 	-webkit-text-fill-color: transparent;
 	color: transparent;
 	filter: drop-shadow(0 0 3px rgba(140, 100, 255, 0.55));
-	animation: ds-nick-galaxy 14s linear infinite;
+	animation: ds-nick-galaxy 12s linear infinite;
 }
 
 @keyframes ds-nick-galaxy {
 	to {
 		background-position:
-			-28px 30px,
-			-34px 28px,
-			26px -32px,
+			-22px 26px,
+			-30px 24px,
+			18px -20px,
+			-34px -30px,
 			0 0,
 			0 0,
 			0 0;
