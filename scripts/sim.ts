@@ -3,7 +3,12 @@
  * a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
  * (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
  *
- * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names), `--class=mage` (every profile plays that hero class; the default `none` is the neutral baseline, and a class run writes nothing: `npm run sim:classes` measures all four against it, IDL-78),
+ * **Local-only probes (IDL-276, never on CI).** A profile with `localOnly: true` is not in the default run, `--list`, the CI shards, the merge or `docs/generated`: `hardcore-rebirth6-x20` (twenty rebirths at castle 6), `hardcore-rebirth8-x10` and the
+ * super-hardcore optimisers `max-r6`, `max-r8`, `max-r10`, `max-r6-then-r8`, `max-r8-then-r10`, `max-ramp` (a hardcore player that also buys the merchant's gold upgrades, spends Embers in a strict order and rebirths at the castle level of a schedule; the last
+ * run is played on to castle 10). Run them with `npm run sim:local` (all of them, on all cores, `scripts/sim-local.ts`); the result goes to `local-sims/sim-local.md`, which is git-ignored and not read by any CI check. `--max-spend` gives any other
+ * profile the same spending (`npm run sim:local -- --max-spend human-rebirth6`).
+ *
+ * Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names), `--list-local` (the local-only ones), `--max-spend` (any profile also buys the merchant's gold upgrades and spends Embers in the optimiser's order; local, writes nothing), `--class=mage` (every profile plays that hero class; the default `none` is the neutral baseline, and a class run writes nothing: `npm run sim:classes` measures all four against it, IDL-78),
  * `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
  *
  * **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
@@ -67,6 +72,8 @@ import { isOwnedAt, ownedBounds, ownedRowMajor, tileAt } from '../src/utils/worl
 import { mulberry32 } from '../src/lib/rng';
 import { STARTER_REWARDS } from '../src/catalog/tutorial';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER } from '../src/config/playerClasses';
+import { EMBER_UPGRADES, type EmberUpgradeId } from '../src/config/rebirth';
+import { MERCHANT_UPGRADES, type MerchantUpgradeId } from '../src/config/merchant';
 import { loadConfig, loadUtils, type GameConfig, type GameUtils } from './lib/loadGame';
 
 // zustand's persist middleware needs *a* storage; the sim replaces it with a no-op one below
@@ -119,21 +126,55 @@ const main = async () => {
 		'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
 		// the long game: ten rebirths, to see the character level (carried over each rebirth) reach the soft cap and the maximum
 		'hardcore-rebirth6-x10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 10 },
+		// the long-game probes (IDL-276): twenty rebirths at castle 6 (what an optimiser does past rebirth 10), and ten at castle 8 (is a later rebirth worth more Embers per day than an early one, run after run)
+		'hardcore-rebirth6-x20': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 20, localOnly: true },
+		'hardcore-rebirth8-x10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 8, rebirths: 10, localOnly: true },
 		// the owner's pace (docs/reference/pacing.md): a person who checks in a few times a day, fights with auto-battle, never optimises
 		human: { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18 },
 		'human-rebirth6': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 6, rebirths: 5 },
 		'human-rebirth8': { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: true, startHour: 18, rebirthAtCastle: 8, rebirths: 4 },
+		// the super-hardcore optimisers (IDL-276, local only: `npx tsx scripts/sim.ts max-r6 max-r8 ...`): the same hardcore player, but it buys the merchant's gold upgrades, spends Embers in a strict order
+		// and rebirths at the castle level of a schedule, to see how many Embers a day the best plan can make and when rebirth 10 and a castle 10 on it come
+		'max-r6': { ...MAX_PLAYER, rebirthAtCastle: 6, rebirths: 10 },
+		'max-r8': { ...MAX_PLAYER, rebirthAtCastle: 8, rebirths: 10 },
+		'max-r10': { ...MAX_PLAYER, rebirthAtCastle: 10, rebirths: 10 },
+		'max-r6-then-r8': { ...MAX_PLAYER, rebirthAtCastle: 6, rebirthSchedule: [6, 8], rebirths: 10 },
+		'max-r8-then-r10': { ...MAX_PLAYER, rebirthAtCastle: 8, rebirthSchedule: [8, 10], rebirths: 10 },
+		'max-ramp': { ...MAX_PLAYER, rebirthAtCastle: 6, rebirthSchedule: [6, 6, 8, 8, 10], rebirths: 10 },
 	};
-	// --list: the profile names, one per line (scripts/sim-parallel.ts asks for them so its list cannot drift from this one)
+	// --list-local: the local-only profile names (scripts/sim-local.ts asks for them)
+	if (args.includes('--list-local')) {
+		console.log(
+			Object.keys(PROFILES)
+				.filter((n) => PROFILES[n].localOnly)
+				.join('\n'),
+		);
+		return;
+	}
+	// --list: the profile names, one per line (scripts/sim-parallel.ts asks for them so its list cannot drift from this one); the local probes are not in it
 	if (args.includes('--list')) {
-		console.log(Object.keys(PROFILES).join('\n'));
+		console.log(
+			Object.keys(PROFILES)
+				.filter((n) => !PROFILES[n].localOnly)
+				.join('\n'),
+		);
 		return;
 	}
 	const except = new Set((args.find((a) => a.startsWith('--except='))?.slice(9) ?? '').split(',').filter(Boolean));
 	for (const name of except) if (!PROFILES[name]) throw new Error(`--except names an unknown profile ${name}`);
 	const mergeDir = args.find((a) => a.startsWith('--merge='))?.slice(8);
 	const dumpFile = args.find((a) => a.startsWith('--dump='))?.slice(7);
-	const selected = mergeDir ? Object.keys(PROFILES) : names.length ? names : Object.keys(PROFILES).filter((n) => !except.has(n));
+	const shared = Object.keys(PROFILES).filter((n) => !PROFILES[n].localOnly); // what the default run, the CI shards and the docs cover
+	const selected = mergeDir ? shared : names.length ? names : shared.filter((n) => !except.has(n));
+	// --max-spend: every selected profile also buys the merchant's gold upgrades and spends its Embers in the optimiser's strict order (what the existing bots never do); a local run, nothing is written
+	const maxSpend = args.includes('--max-spend');
+	if (maxSpend)
+		for (const n of selected) {
+			const p = PROFILES[n];
+			if (p) Object.assign(p, { buyMerchant: true, emberOrder: MAX_PLAYER.emberOrder });
+		}
+	const localRun = maxSpend || selected.some((n) => PROFILES[n]?.localOnly);
+	if (localRun && (dumpFile || mergeDir)) throw new Error('a local-only profile cannot be dumped or merged: it is not part of the CI shards or the docs');
 
 	const seedsArg = args.find((a) => a.startsWith('--seeds='));
 	const seeds = seedsArg ? Math.max(1, Number(seedsArg.slice(8))) : 1;
@@ -191,8 +232,9 @@ const main = async () => {
 	}
 
 	const md = renderMarkdown(results, legacy, seeds > 1 ? spreads : undefined);
-	console.log(md);
-	for (const w of renderMagnitudes(selected).warnings) console.error(`WARNING outside the docs/reference/pacing.md band: ${w}`);
+	if (localRun) console.log(renderOptimiser(results, selected));
+	else console.log(md);
+	if (!localRun) for (const w of renderMagnitudes(selected).warnings) console.error(`WARNING outside the docs/reference/pacing.md band: ${w}`);
 	// The milestones of every selected profile as data (game days, rounded so a rerun on another machine writes the same bytes): scripts/pacing-guard.ts compares it against the base branch's copy
 	const json = JSON.stringify(
 		{
@@ -202,7 +244,7 @@ const main = async () => {
 		(_key, value) => (typeof value === 'number' ? Number(value.toPrecision(6)) : value),
 		1,
 	);
-	if (!legacy && simClass === 'none' && !buildingsOff && !args.includes('--no-write')) {
+	if (!legacy && simClass === 'none' && !buildingsOff && !localRun && !args.includes('--no-write')) {
 		const dir = resolve(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../docs/generated');
 		mkdirSync(dir, { recursive: true });
 		writeFileSync(resolve(dir, 'sim-milestones.md'), md);
@@ -218,6 +260,16 @@ interface Profile {
 	windows: [number, number][]; // hours of the day the player is actively playing
 	rebirthAtCastle?: number; // rebirth as soon as the castle reaches this level (and keep playing the next run)
 	rebirths?: number; // how many rebirths to simulate (default 1 when rebirthAtCastle is set)
+	/** Rebirth at the castle level of this list, one entry per rebirth (the last entry repeats) instead of one fixed `rebirthAtCastle` (which still has to be set, to the first entry) */
+	rebirthSchedule?: number[];
+	/** Spend gold on the merchant's economy upgrades as soon as the gold on hand is twice the price (an optimiser; the other bots never buy them) */
+	buyMerchant?: boolean;
+	/** The Ember shop as a strict priority list: each upgrade is bought up to its max level before the next one (default: builders first, then the rest in step) */
+	emberOrder?: EmberUpgradeId[];
+	/** After the last rebirth keep playing the final run until the castle reaches its top level (the `max-*` probes: how long rebirth N plus a full castle takes) */
+	endAtCastle10?: boolean;
+	/** A local probe (the super-hardcore optimisers): not in the default run, not in `--list`, the CI shards or the docs; run it by name; it never writes docs/generated */
+	localOnly?: boolean;
 	/** A person, not a script: decides only this often while playing, buys at most `tilesPerVisit` tiles per visit, keeps `hoard` x what it might need */
 	human?: { decisionSec: number; hoard: number; tilesPerVisit: number };
 	/** Fight a normal monster and the boss the way the server's auto-battle does (see GEAR_SCHEDULE) */
@@ -296,6 +348,15 @@ const HARDCORE_WINDOWS: [number, number][] = [
 	[12, 13],
 	[18, 23],
 ];
+/** The super-hardcore optimiser every `max-*` profile starts from: the hardcore schedule, merchant gold upgrades, Embers in a strict order (time first: Master Builders, then Thrift, Provisions, Click Mastery), and the last run played on to castle 10 */
+const MAX_PLAYER = {
+	cps: 4,
+	windows: HARDCORE_WINDOWS,
+	buyMerchant: true,
+	emberOrder: ['builders', 'thrift', 'provisions', 'mastery'] as EmberUpgradeId[],
+	endAtCastle10: true,
+	localOnly: true,
+} satisfies Profile;
 // SIM_DECISION / SIM_HOARD: calibration knobs (docs/reference/pacing.md: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus (calibrated to the owner: ~185 tiles after 3.3 days))
 const HUMAN = {
 	decisionSec: Number(process.env.SIM_DECISION ?? 3600),
@@ -346,6 +407,13 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 		mag[`${prefix}.tiles`] = utils.economyTiles(s.tiles, s.freeTiles);
 	};
 	let run = 1; // 1 = first run; after a rebirth keys get an `rN.` prefix and are relative to the rebirth
+	// the castle level run N rebirths at: the schedule entry of that rebirth (the last one repeats), else the fixed level
+	const castleTargetFor = (n: number): number | undefined =>
+		profile.endAtCastle10 && n > (profile.rebirths ?? 1)
+			? cfg.CASTLE_UPGRADE.maxLevel
+			: profile.rebirthSchedule
+				? profile.rebirthSchedule[Math.min(n - 1, profile.rebirthSchedule.length - 1)]
+				: profile.rebirthAtCastle;
 	let runStart = 0;
 	const mark = (key: string, t: number) => {
 		const k = run === 1 ? key : `r${run}.${key}`;
@@ -440,12 +508,28 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			s = api();
 		}
 
-		// Ember shop: spend Embers as they come, Master Builders first
-		for (let guard = 0; guard < 50; guard++) {
-			const order: ('builders' | 'thrift' | 'mastery' | 'provisions')[] = ['builders', 'thrift', 'mastery', 'provisions'];
-			const target = order.find((id) => (s.prestige.upgrades[id] ?? 0) <= (s.prestige.upgrades.builders ?? 0));
+		// Ember shop: spend Embers as they come, Master Builders first (or the profile's strict priority list)
+		for (let guard = 0; guard < 80; guard++) {
+			const order: EmberUpgradeId[] = profile.emberOrder ?? ['builders', 'thrift', 'mastery', 'provisions'];
+			const target = profile.emberOrder
+				? order.find((id) => (s.prestige.upgrades[id] ?? 0) < EMBER_UPGRADES[id].maxLevel)
+				: order.find((id) => (s.prestige.upgrades[id] ?? 0) <= (s.prestige.upgrades.builders ?? 0));
 			if (!target || !api().buyEmberUpgrade(target)) break;
 			s = api();
+		}
+
+		// Merchant economy upgrades with gold (the optimiser only): bought when the gold on hand is twice the price, so tiles and the castle keep their money
+		if (profile.buyMerchant) {
+			const order: MerchantUpgradeId[] = ['foreman', 'bulk', 'haggler', 'charm', 'skinner', 'packrat'];
+			for (let guard = 0; guard < 40; guard++) {
+				s = api();
+				const target = order.find((id) => {
+					const level = s.merchantUpgrades[id] ?? 0;
+					const def = MERCHANT_UPGRADES[id];
+					return level < def.maxLevel && s.resources.gold >= 2 * Math.ceil(def.baseCost * Math.pow(def.costGrowth, level));
+				});
+				if (!target || !api().buyMerchantUpgrade(target)) break;
+			}
 		}
 
 		// Stat points -> Charisma / Intelligence
@@ -456,7 +540,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 		// Castle
 		const castle = tileAt(s.tiles, cfg.CASTLE_X, cfg.CASTLE_Y);
-		const castleCeiling = profile.rebirthAtCastle ?? cfg.CASTLE_UPGRADE.maxLevel; // a player who rebirths at castle N does not start N+1
+		const castleCeiling = castleTargetFor(run) ?? cfg.CASTLE_UPGRADE.maxLevel; // a player who rebirths at castle N does not start N+1
 		if (!s.castleUpgrade && (castle.level ?? 1) < castleCeiling && castle.upgradeCost) {
 			topUp(castle.upgradeCost as Partial<Record<string, number>>);
 			if (api().upgradeCastle()) {
@@ -790,7 +874,13 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 			const castleNow = tileAt(api().tiles, cfg.CASTLE_X, cfg.CASTLE_Y).level ?? 1;
 			const totalRebirths = profile.rebirthAtCastle ? (profile.rebirths ?? 1) : 0;
 			const territory = utils.economyTiles(api().tiles, api().freeTiles) >= cfg.REBIRTH.minTiles;
-			if (profile.rebirthAtCastle && run <= totalRebirths && castleNow >= profile.rebirthAtCastle && territory && !api().castleUpgrade) {
+			if (
+				profile.rebirthAtCastle &&
+				run <= totalRebirths &&
+				castleNow >= (castleTargetFor(run) ?? profile.rebirthAtCastle) &&
+				territory &&
+				!api().castleUpgrade
+			) {
 				mark('rebirth', t);
 				const before = api().prestige.legacyEarned;
 				const levelBefore = api().level.level;
@@ -811,7 +901,8 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 				}
 			}
 			if (totalRebirths > 0) {
-				if (run > totalRebirths && milestones[`r${run}.finished`] != null) break;
+				const lastRunDone = profile.endAtCastle10 ? `r${run}.castle${cfg.CASTLE_UPGRADE.maxLevel}` : `r${run}.finished`;
+				if (run > totalRebirths && milestones[lastRunDone] != null) break;
 			} else if (castleNow >= cfg.CASTLE_UPGRADE.maxLevel) {
 				mark(`castle${cfg.CASTLE_UPGRADE.maxLevel}`, t);
 				break;
@@ -977,6 +1068,48 @@ function renderMagnitudes(names: string[]): { lines: string[]; warnings: string[
 	lines.push('| profile | checkpoint | measured | band | status |', '| --- | --- | --- | --- | --- |', ...rows, '');
 	if (warnings.length) lines.push(`${warnings.length} line${warnings.length > 1 ? 's' : ''} outside the band.`, '');
 	return { lines, warnings };
+}
+
+/**
+ * The table of a local optimiser run (`max-*` profiles): per rebirth the castle level, the Embers gained, the days since the last rebirth and the Embers a day, and at the end the day of the last rebirth and
+ * of castle 10 on the run after it. Printed instead of the milestone table; nothing is written to docs/generated.
+ */
+function renderOptimiser(results: Record<string, Milestones>, names: string[]): string {
+	const out: string[] = ['# Optimiser runs (local, nothing written)', ''];
+	const num = (p: string, key: string) => {
+		const v = results[p]?.[key];
+		return typeof v === 'number' ? v : null;
+	};
+	for (const p of names) {
+		out.push(
+			`## ${p}`,
+			'',
+			'| rebirth | at castle | Embers | day | days since last | Embers a day | lifetime Embers | level |',
+			'| --- | --- | --- | --- | --- | --- | --- | --- |',
+		);
+		let lifetime = 0;
+		let lastDay = 0;
+		let rebirths = 0;
+		for (let n = 1; num(p, `embers${n}`) != null; n++) {
+			rebirths = n;
+			const embers = num(p, `embers${n}`)!;
+			const day = num(p, `rebirthDay${n}`)!;
+			lifetime += embers;
+			out.push(
+				`| ${n} | ${magnitudes[p]?.[`r${n}.gainCastle`] ?? '?'} | ${Math.round(embers)} | ${day.toFixed(1)} | ${(day - lastDay).toFixed(1)} | ${(embers / (day - lastDay)).toFixed(1)} | ${Math.round(lifetime)} | ${num(p, `lvlAtRebirth${n}`) ?? '?'} |`,
+			);
+			lastDay = day;
+		}
+		const castle10 = num(p, rebirths === 0 ? 'castle10' : `r${rebirths + 1}.castle10`);
+		out.push(
+			'',
+			rebirths === 0
+				? `No rebirth; castle 10 ${castle10 == null ? 'not reached' : `on day ${castle10.toFixed(1)}`}.`
+				: `Last rebirth on day ${lastDay.toFixed(1)}; castle 10 on the run after it ${castle10 == null ? 'not reached' : `${castle10.toFixed(1)} days later, on day ${(lastDay + castle10).toFixed(1)}`}.`,
+			'',
+		);
+	}
+	return out.join('\n');
 }
 
 function renderMarkdown(results: Record<string, Milestones>, legacy: boolean, spreads?: Record<string, Record<string, [number, number]>>): string {
