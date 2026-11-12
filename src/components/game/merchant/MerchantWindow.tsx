@@ -12,6 +12,7 @@ import GameWindow from '../GameWindow';
 import MerchantOverlay from '../overlays/Merchant/MerchantOverlay';
 import MerchantGoodsTab from './MerchantGoodsTab';
 import MerchantResourcesTab from './MerchantResourcesTab';
+import MerchantUpgradesTab from './MerchantUpgradesTab';
 
 const TABS: { id: MerchantTab; label: string; title: string }[] = [
 	{ id: 'resources', label: 'Resources', title: 'Sell your resources for gold, or buy them back in packs' },
@@ -35,7 +36,7 @@ const useAffordableUpgrades = (): number =>
 	});
 
 /**
- * The Merchant window (design system `WindowShell`, window id `merchant`): tabs along the top and the gold purse. Resources is the new ledger and trade ticket, Goods the shelf and quick sell; Upgrades, Quests and Gambling keep their own
+ * The Merchant window (design system `WindowShell`, window id `merchant`): tabs along the top and the gold purse. Resources is the new ledger and trade ticket, Goods the shelf and quick sell, Upgrades the tiles with diamond levels; Quests and Gambling keep their own
  * look inside the new window until they are rebuilt, one tab at a time.
  */
 const MerchantWindow: React.FC = () => {
@@ -58,7 +59,15 @@ const MerchantWindow: React.FC = () => {
 			}
 			barRight={<ResourceChip icon={pixelIconSrc('gold')} value={compact(Math.floor(gold))} title='Your gold' />}
 		>
-			{tab === 'resources' ? <MerchantResourcesTab /> : tab === 'goods' ? <MerchantGoodsTab /> : <MerchantOverlay />}
+			{tab === 'resources' ? (
+				<MerchantResourcesTab />
+			) : tab === 'goods' ? (
+				<MerchantGoodsTab />
+			) : tab === 'upgrades' ? (
+				<MerchantUpgradesTab />
+			) : (
+				<MerchantOverlay />
+			)}
 		</GameWindow>
 	);
 };

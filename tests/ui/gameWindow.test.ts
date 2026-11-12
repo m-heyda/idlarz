@@ -130,3 +130,13 @@ test('the Merchant Goods tab: the shelf with its restock, your bag with the filt
 		assert.ok(out.includes(word), `the tab shows "${word}"`);
 	}
 });
+
+test('the Merchant Upgrades tab: the groups, the Click Power tile and diamond level gems', async () => {
+	const { default: MerchantUpgradesTab } = await import('../../src/components/game/merchant/MerchantUpgradesTab');
+	reset();
+	const out = renderToStaticMarkup(h(MerchantUpgradesTab));
+	for (const word of ['Economy', 'Combat', 'Rebirth', 'Click Power', 'Haggler', 'Pack Rat', 'Now', 'Next', 'Sorted by what you can afford first']) {
+		assert.ok(out.includes(word), `the tab shows "${word}"`);
+	}
+	assert.match(out, /ds-gem/, 'the level is drawn as gems');
+});

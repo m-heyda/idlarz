@@ -278,6 +278,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`MerchantGoodsTab.tsx`](../../src/components/game/merchant/MerchantGoodsTab.tsx) — ~ The look of an item in a slot:
 - [`MerchantResourcesTab.tsx`](../../src/components/game/merchant/MerchantResourcesTab.tsx) — ~ How much one Sell or Buy moves:
+- [`MerchantUpgradesTab.tsx`](../../src/components/game/merchant/MerchantUpgradesTab.tsx) — ~ The Upgrades tab:
 - [`MerchantWindow.tsx`](../../src/components/game/merchant/MerchantWindow.tsx) — ~ How many upgrades the player can buy right now (the click power step and every merchant upgrade not yet maxed):
 
 **src/components/game/overlays/**
@@ -307,7 +308,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/Merchant/**
 
 - [`MerchantOverlay.tsx`](../../src/components/game/overlays/Merchant/MerchantOverlay.tsx) — ~ Opening the Gambling tab while it is still empty is a secret deed (IDL-305):
-- [`MerchantShop.tsx`](../../src/components/game/overlays/Merchant/MerchantShop.tsx) — ~ One permanent bonus:
 - [`TipButton.tsx`](../../src/components/game/overlays/Merchant/TipButton.tsx) — ~ A small button with a hover card (the price, the gold a sale pays ...), in the look of the item hover cards.
 
 **src/components/game/overlays/**
