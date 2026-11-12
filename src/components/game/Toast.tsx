@@ -8,9 +8,11 @@ const Toast: React.FC = () => {
 	return (
 		<>
 			{toasts.map((toast) => (
-				<div key={toast.id} className='px-toast ui-toast text-[#ffe27a] text-sm' role='status'>
-					{toast.text}
-					{toast.count > 1 && <span className='ml-2 text-[#f0d27a] font-semibold'>x{toast.count}</span>}
+				<div key={toast.id} className='ds-root ds-toast ui-toast' role='status'>
+					<span className='ds-toast-line'>
+						{toast.text}
+						{toast.count > 1 && <span className='ds-toast-sub'>x{toast.count}</span>}
+					</span>
 				</div>
 			))}
 		</>

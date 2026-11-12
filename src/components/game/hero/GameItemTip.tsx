@@ -59,7 +59,6 @@ interface TipProps {
 	wornLabel?: boolean;
 	/** On the merchant's shelf: the card says what it costs */
 	buyPrice?: number;
-	onDrink?: () => void;
 	hints?: 'bag' | 'merchant';
 	/** The band over the card: Equipped (the worn piece) or Comparing (the hovered one next to it) */
 	banner?: 'equipped' | 'comparing';
@@ -69,7 +68,7 @@ interface TipProps {
  * One item card drawn by the design system's `ItemTooltip` from the game's own data: the same lines the game's card always had (kind line, item level and quality, the headline stat with its change, attack speed and DPS, stats by
  * colour group with their changes, affixes, lost properties, set changes and the set block, effects, Drink button, flavour and lore, price, key hints), only drawn in the new style.
  */
-const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink, hints, banner }) => {
+const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, hints, banner }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	// what the merchant really pays: the same inputs a sale uses (Haggler, Idols, the Lighthouse)
 	const sellCtx = useGameStore(
@@ -172,6 +171,8 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					]
 				: [];
 
+	const showHints = buyPrice === undefined && !wornLabel;
+
 	return (
 		<ItemTooltip
 			rarity={toRarity(String(resolved?.instance.rarity ?? def.rarity ?? 'common'))}
@@ -256,11 +257,18 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			compareWith='Difference'
 			flavor={def.description}
 			lore={def.lore}
-			onDrink={onDrink && hasEffects(def) ? onDrink : undefined}
-			hints={hintText && buyPrice === undefined && !wornLabel ? hintText : undefined}
+			hints={showHints && hintText.length > 1 ? hintText : undefined}
 			footer={[
 				`${buyPrice !== undefined ? 'Costs' : 'Sells for'} ${formatNumber(buyPrice ?? sellPrice)} gold${buyPrice === undefined && sellPrice !== baseSell ? ` (base ${formatNumber(baseSell)})` : ''}`,
-				'',
+				// a single action sits on the price row, at the right
+				showHints && hintText.length === 1 ? (
+					<>
+						<span className='ds-kbd'>{hintText[0].key}</span>
+						{hintText[0].text}
+					</>
+				) : (
+					''
+				),
 			]}
 		/>
 	);

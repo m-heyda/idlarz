@@ -272,13 +272,12 @@ const BagCell: React.FC<{ slot: BagSlot; index: number; wornLevel: number }> = (
 	const look = slotLook(slot);
 	const props = slotProps(slot);
 	if (!look) return <Slot onDragOver={(e) => e.preventDefault()} onDrop={(e) => (e.preventDefault(), dropOnBagSlot(index))} />;
-	const effects = !!props.itemId && !!ITEM_CATALOG[props.itemId]?.effects?.length;
 	const junk = !!props.item && isJunk(props.item, { wornLevel });
 	return (
 		<HoverTip
 			interactive
 			closeDelayMs={100}
-			tip={<GameItemTip item={props.item} itemId={props.itemId} compare hints='bag' onDrink={effects ? () => activateBagSlot(index) : undefined} />}
+			tip={<GameItemTip item={props.item} itemId={props.itemId} compare hints='bag' />}
 		>
 			<Slot
 				icon={look.icon}

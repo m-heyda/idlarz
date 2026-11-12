@@ -30,27 +30,27 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, onClose }) 
 		case 'boost':
 			title = (
 				<>
-					<span className='text-lg font-semibold whitespace-nowrap'>
+					<span className='ds-toast-title'>
 						{loot.kind === 'boost' ? 'Lucky chest! ' : 'Claimed '}
 						{fmt(loot.gold)} bonus gold
 					</span>
-					<ResourceIcon resource='gold' scale={1} />
+					<ResourceIcon resource='gold' scale={0.85} />
 				</>
 			);
 			detail = (
-				<span className='text-sm text-[#f0d27a] font-medium'>
+				<span className='ds-toast-sub'>
 					{formatCompact(loot.minutes)} minutes of gold income{loot.kind === 'boost' ? ` x${formatCompact(loot.multiplier)}` : ''}
 				</span>
 			);
-			hint = <span className='text-xs text-[#a89878] mt-1'>Based on your current {formatNumber(loot.goldRate)} gold/s rate</span>;
+			hint = <span className='ds-toast-hint'>Based on your current {formatNumber(loot.goldRate)} gold/s rate</span>;
 			break;
 		case 'bundle':
-			title = <span className='text-lg font-semibold whitespace-nowrap'>Chest of supplies</span>;
+			title = <span className='ds-toast-title'>Chest of supplies</span>;
 			detail = (
-				<span className='flex items-center gap-3 text-sm text-[#f0d27a] font-medium'>
+				<span className='ds-toast-sub ds-toast-line' style={{ gap: 10 }}>
 					{loot.items.map((i) => (
 						<span key={i.resource} className='inline-flex items-center gap-1'>
-							+{fmt(i.amount)} <ResourceIcon resource={i.resource} scale={1} />
+							+{fmt(i.amount)} <ResourceIcon resource={i.resource} scale={0.85} />
 						</span>
 					))}
 				</span>
@@ -59,11 +59,11 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, onClose }) 
 		case 'xp':
 			title = (
 				<>
-					<span className='text-lg font-semibold whitespace-nowrap'>Chest of wisdom: +{fmt(loot.xp)} XP</span>
-					<ResourceIcon resource='xp' scale={1} />
+					<span className='ds-toast-title'>Chest of wisdom: +{fmt(loot.xp)} XP</span>
+					<ResourceIcon resource='xp' scale={0.85} />
 				</>
 			);
-			detail = <span className='text-sm text-[#f0d27a] font-medium'>{formatCompact(loot.minutes)} minutes of XP income</span>;
+			detail = <span className='ds-toast-sub'>{formatCompact(loot.minutes)} minutes of XP income</span>;
 			break;
 		case 'item': {
 			const drop = loot.drop;
@@ -72,24 +72,24 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, onClose }) 
 			const color = RARITY_COLOR[(resolved?.instance.rarity ?? def?.rarity ?? 'common') as keyof typeof RARITY_COLOR];
 			title = (
 				<>
-					<span className='text-lg font-semibold whitespace-nowrap'>
+					<span className='ds-toast-title'>
 						You found <span style={def ? { color } : undefined}>{resolved?.name ?? def?.name ?? 'an item'}</span>!
 					</span>
-					{def && <PixelIcon name={itemIconName(def)} alt='' />}
+					{def && <PixelIcon name={itemIconName(def)} alt='' scale={0.85} />}
 				</>
 			);
-			hint = <span className='text-xs text-[#a89878] mt-1'>{resolved ? `Item level ${formatCompact(resolved.instance.level)} - ` : ''}Added to your bag</span>;
+			hint = <span className='ds-toast-hint'>{resolved ? `Item level ${formatCompact(resolved.instance.level)} - ` : ''}Added to your bag</span>;
 			break;
 		}
 	}
 
 	return (
-		<div className='relative px-toast text-[#ffe27a] py-2 px-4 flex flex-col items-center gap-1 chest-toast cursor-pointer' onClick={onClose}>
-			<div className='flex items-center gap-2'>{title}</div>
+		<div className='ds-root ds-toast chest-toast' style={{ cursor: 'pointer' }} onClick={onClose}>
+			<div className='ds-toast-line'>{title}</div>
 			{detail}
 			{hint}
 			{loot.junk && loot.junk.length > 0 && (
-				<span className='text-xs text-[#d8c8a0]'>
+				<span className='ds-toast-hint'>
 					{loot.junk
 						.map((d) => (d.kind === 'consumable' ? `${formatNumber(d.qty)} x ${ITEM_CATALOG[d.id]?.name ?? d.id}` : ''))
 						.filter(Boolean)
@@ -97,7 +97,7 @@ const ChestNotification: React.FC<ChestNotificationProps> = ({ loot, onClose }) 
 				</span>
 			)}
 			{!!loot.gems && (
-				<span className='text-sm text-cyan-300 font-semibold inline-flex items-center gap-1'>
+				<span className='ds-toast-line' style={{ color: '#7fd8ff' }}>
 					Gem find! +{loot.gems} <GemIcon />
 				</span>
 			)}

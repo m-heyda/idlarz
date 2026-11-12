@@ -23,21 +23,21 @@ const AchievementNotification: React.FC<Props> = ({ achievementId, onClose }) =>
 		Boolean,
 	);
 	return (
-		<div className='relative px-toast achv-toast text-[#ffe27a] py-2 px-4 flex items-center gap-3 cursor-pointer' role='status' onClick={onClose}>
+		<div className='ds-root ds-toast ds-toast-row achv-toast' role='status' style={{ cursor: 'pointer' }} onClick={onClose}>
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img
 				src={`/pixel/new_assets/achievements/${def.badge}.png`}
 				alt=''
-				width={56}
-				height={56}
-				className='shrink-0 achv-badge'
-				style={{ imageRendering: 'pixelated' }}
+				width={44}
+				height={44}
+				className='achv-badge'
+				style={{ imageRendering: 'pixelated', flexShrink: 0 }}
 			/>
-			<div className='flex flex-col'>
-				<span className='achv-congrats'>Congratulations!</span>
-				<span className='text-lg font-semibold whitespace-nowrap'>{def.title}</span>
-				<span className='text-xs text-[#d8c8a0]'>{def.description}</span>
-				<span className='text-xs text-[#a89878]'>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+				<span className='ds-toast-kicker'>Congratulations!</span>
+				<span className='ds-toast-title'>{def.title}</span>
+				<span>{def.description}</span>
+				<span className='ds-toast-hint'>
 					{deed && deed.tiers.length > 1 ? `${deed.title} · ` : ''}
 					{gives.length > 0 ? `Claim ${gives.join(' and ')} in the Hall of Deeds` : 'Claim it in the Hall of Deeds'}
 				</span>

@@ -111,7 +111,7 @@
   "kind": "function",
   "category": "Progression/Badges",
   "file": "src/catalog/badges.ts",
-  "line": 23,
+  "line": 26,
   "summary": "Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement. The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.",
   "see": []
  },

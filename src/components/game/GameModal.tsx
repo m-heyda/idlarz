@@ -13,6 +13,7 @@ const GameModal: React.FC<{
 	width?: number;
 	onClose: () => void;
 	closeOnBackdrop?: boolean;
+	hideClose?: boolean;
 	children: React.ReactNode;
 }> = ({ onClose, ...rest }) => {
 	useModalRegistry(onClose);

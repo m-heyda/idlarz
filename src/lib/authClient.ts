@@ -192,8 +192,11 @@ export const fetchBadges = async (): Promise<BadgeState | null> => {
 		return null;
 	}
 };
-/** Saves the badge (`null` = default, `"none"` = hidden) and title (`null` = none) (`POST /api/auth/badge`); the server refuses one that is not earned. Goes through `epochFetch` like the avatar. */
-export const chooseBadge = async (badgeId: string | null, titleId: string | null): Promise<{ ok: true } | { ok: false; message: string }> => {
+/** Saves the badge (`undefined` = leave as it is, `null` = default, `"none"` = hidden) and title (`null` = none) (`POST /api/auth/badge`); the server refuses one that is not earned. Goes through `epochFetch` like the avatar. */
+export const chooseBadge = async (
+	badgeId: string | null | undefined,
+	titleId: string | null | undefined,
+): Promise<{ ok: true } | { ok: false; message: string }> => {
 	try {
 		const response = await epochFetch('/api/auth/badge', {
 			method: 'POST',
