@@ -1812,11 +1812,34 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junk.ts",
-  "line": 19,
-  "summary": "Whether a piece of gear in the bag counts as junk for the \"Sell junk\" button. **This is the one place that defines junk.** It is false for everything until the rule is decided (IDL-312), so the button sells nothing yet; the server (`sellJunk` with `rule: 'junk'`) and the browser both ask it, so they always agree. Never junk, whatever the rule says: worn gear (it is not in the bag), potions and other stacks (they are not gear), and, once they exist, set pieces and items the player locked.",
+  "line": 22,
+  "summary": "Whether a piece of **gear** in the bag counts as junk for the \"Sell junk\" button. False for everything until the gear rule is decided (a player flag, a rarity rule, item level under the worn average); worn gear is never in the bag, and set pieces and locked items will be protected when they exist.",
   "see": [
-   "countJunk"
+   "isJunkStack",
+   "junkSale"
   ]
+ },
+ {
+  "id": "junksale",
+  "name": "junkSale",
+  "symbol": "junkSale",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/loot/junk.ts",
+  "line": 45,
+  "summary": "What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run, so their previews agree. `junk` is a parameter so a test can flip the gear rule.",
+  "see": []
+ },
+ {
+  "id": "rolljunkdrops",
+  "name": "rollJunkDrops",
+  "symbol": "rollJunkDrops",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/loot/junkDrops.ts",
+  "line": 60,
+  "summary": "The junk a kill drops, as consumable drops (a stack holds 1,000). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.",
+  "see": []
  },
  {
   "id": "killincome",
@@ -1825,7 +1848,7 @@
   "kind": "function",
   "category": "Monsters/Rewards",
   "file": "src/lib/loot/kill.ts",
-  "line": 51,
+  "line": 52,
   "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
   "see": []
  },
@@ -2759,7 +2782,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 362,
+  "line": 364,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

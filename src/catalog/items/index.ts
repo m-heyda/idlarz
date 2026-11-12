@@ -2,6 +2,7 @@ import type { ItemDef } from '@/types/game';
 import { CLOTH_ITEMS } from './cloth';
 import { CONSUMABLES } from './consumables';
 import { LADDER_ITEMS, gradeLegacyItems } from './ladder';
+import { JUNK_ITEMS } from './junk';
 import { LEGENDARY_ITEMS } from './legendary';
 import { OBSIDIAN_ITEMS } from './obsidian';
 import { RESERVE_ITEMS } from './reuse';
@@ -13,6 +14,7 @@ export const ITEMS: ItemDef[] = [
 	// the legacy families, put on the grade ladder or retired (IDL-243, ladder.ts `gradeLegacyItems`)
 	...gradeLegacyItems(WOODEN_ITEMS),
 	...CONSUMABLES,
+	...JUNK_ITEMS,
 	...gradeLegacyItems(CLOTH_ITEMS),
 	...gradeLegacyItems(STEEL_ITEMS),
 	...gradeLegacyItems(OBSIDIAN_ITEMS),

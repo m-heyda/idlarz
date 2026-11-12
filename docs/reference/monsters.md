@@ -258,7 +258,7 @@ The band a castle distance falls in. Anything below the first band (the castle t
 
 ### `killIncome` <small>function</small>
 
-Source: [`src/lib/loot/kill.ts:51`](../../src/lib/loot/kill.ts)
+Source: [`src/lib/loot/kill.ts:52`](../../src/lib/loot/kill.ts)
 
 Rewards for a kill. Gold and XP are "seconds of income" (like chests) so they scale with the economy. The items come from
 the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which

@@ -1,9 +1,10 @@
 import { COMBAT } from '@/config/combatConfig';
 import { CHEST, LUCK } from '@/config/spawns';
-import { monsterDef, rewardLevelMult } from '@/lib/monsters';
+import { isBoss, monsterDef, rewardLevelMult } from '@/lib/monsters';
 import type { Rng } from '@/lib/rng';
 import type { Drop, Monster } from '@/types/game';
 import { generateLoot } from './generate';
+import { rollJunkDrops } from './junkDrops';
 
 export interface KillContext {
 	goldPerSec: number;
@@ -81,5 +82,7 @@ export const rollKillLoot = (monster: Pick<Monster, 'type' | 'level'>, ctx: Kill
 		rng,
 	);
 	if (result.warnings.length) console.warn('[loot]', ...result.warnings);
-	return { gold, xp, hide, items: result.drops, pity: result.pity };
+	// junk materials come last, so the rest of the kill's rolls are untouched
+	const junk = rollJunkDrops({ level: monster.level, gold, luck: ctx.luck, boss: isBoss(monster.type), lucky: !!ctx.lucky }, rng);
+	return { gold, xp, hide, items: [...result.drops, ...junk], pity: result.pity };
 };

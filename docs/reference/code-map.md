@@ -167,6 +167,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`define.ts`](../../src/catalog/items/define.ts) — ~ The item level window of a material tier.
 - [`grades.ts`](../../src/catalog/items/grades.ts) — ~ Name of the grade in the planning doc
 - [`index.ts`](../../src/catalog/items/index.ts) — ~ Every item in the game, in display order.
+- [`junk.ts`](../../src/catalog/items/junk.ts)
 - [`ladder.ts`](../../src/catalog/items/ladder.ts) — ~ The set a special grade's pieces belong to (SetDef ids in catalog/sets.ts)
 - [`legendary.ts`](../../src/catalog/items/legendary.ts)
 - [`obsidian.ts`](../../src/catalog/items/obsidian.ts)
@@ -454,7 +455,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`data.ts`](../../src/lib/loot/data.ts) — ~ Everything the loot pipeline reads, as one injectable bundle.
 - [`generate.ts`](../../src/lib/loot/generate.ts) — ~ The monster's level (sets the item level of what it drops and the per-level chances); omitted for a chest or the shelf
 - [`index.ts`](../../src/lib/loot/index.ts) — The loot pipeline's public face. Content lives in src/catalog (lootConfig, affixes, items); this folder is the logic.
-- [`junk.ts`](../../src/lib/loot/junk.ts) — eslint-disable @typescript-eslint/no-unused-vars -- the junk rule has no body until it is decided (IDL-312)
+- [`junk.ts`](../../src/lib/loot/junk.ts) — eslint-disable @typescript-eslint/no-unused-vars -- the gear part of the junk rule has no body until it is decided
+- [`junkDrops.ts`](../../src/lib/loot/junkDrops.ts) — ~ Share of the kill's gold that the cheap junk is worth (placeholder, balance pass):
 - [`kill.ts`](../../src/lib/loot/kill.ts) — ~ Hide per second of the farm; a kill pays a share of it (0 without pigs)
 - [`pools.ts`](../../src/lib/loot/pools.ts) — ~ Whether an item belongs to a pool:
 - [`receive.ts`](../../src/lib/loot/receive.ts) — ~ What actually went into the bag
@@ -893,6 +895,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`deeds.test.ts`](../../tests/server/deeds.test.ts)
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
+- [`junk.test.ts`](../../tests/server/junk.test.ts)
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
 - [`mastery.test.ts`](../../tests/server/mastery.test.ts)

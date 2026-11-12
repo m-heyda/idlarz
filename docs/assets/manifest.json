@@ -75,6 +75,182 @@
 	},
 	{
 		"usedBy": [
+			"junk_amethyst"
+		],
+		"name": "art_junk_amethyst",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_amethyst.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_bones"
+		],
+		"name": "art_junk_bones",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_bones.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_brush"
+		],
+		"name": "art_junk_brush",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_brush.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_claw"
+		],
+		"name": "art_junk_claw",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_claw.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_feather"
+		],
+		"name": "art_junk_feather",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_feather.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_rose_dust"
+		],
+		"name": "art_junk_rose_dust",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_rose_dust.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_rubble"
+		],
+		"name": "art_junk_rubble",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_rubble.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_sand"
+		],
+		"name": "art_junk_sand",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_sand.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_scrap"
+		],
+		"name": "art_junk_scrap",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_scrap.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_tar"
+		],
+		"name": "art_junk_tar",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_tar.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_teal_crystals"
+		],
+		"name": "art_junk_teal_crystals",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/junk_teal_crystals.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"potion_mana"
 		],
 		"name": "art_mana_potion",

@@ -115,6 +115,8 @@ export interface ItemDef {
 	/** What drinking it does (instant heals, a regen, timed buffs); see catalog/buffs.ts. Absent: it does nothing (trade goods). */
 	effects?: ConsumableEffect[];
 	stackMax?: number;
+	/** A junk material (IDL-312): no use but the merchant; the Bag's Sell junk button sells every stack of them */
+	junk?: true;
 	sellValue: number;
 	icon?: PixelIconName;
 	/** Merchant price in gold; absent = not sold */

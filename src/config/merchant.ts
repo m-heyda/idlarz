@@ -207,8 +207,8 @@ export const MERCHANT_GOODS = {
 	centreAboveAverage: 3,
 } as const;
 
-// Only these can be bought back (as resource packs); farm products are earned on the farm, never bought
-export const MERCHANT_BUYABLE = ['wood', 'stone', 'coal', 'food', 'meat'] as const;
+// What can be bought back (as resource packs): the basics and the four farm products (eggs, milk, hide and wool, since IDL-312). A farm still earns them; the merchant sells them at the same multiple as the rest.
+export const MERCHANT_BUYABLE = ['wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool'] as const;
 
 // Buying resources from the merchant costs this many times the sell price
 /**

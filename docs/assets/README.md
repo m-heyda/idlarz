@@ -25,7 +25,7 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 
 | Category | Assets | In the game | Reuse pool |
 | --- | --- | --- | --- |
-| [Potions](potions.md) | 63 | 5 | 48 |
+| [Potions](potions.md) | 74 | 16 | 48 |
 | [Weapons](weapons.md) | 199 | 72 | 0 |
 | [Armor](armor.md) | 134 | 55 | 0 |
 | [Accessories](accessories.md) | 53 | 31 | 0 |

@@ -416,7 +416,18 @@
 		"preserved_rations",
 		"honey_cake",
 		"leather_satchel",
-		"carved_trinket"
+		"carved_trinket",
+		"junk_rubble",
+		"junk_brush",
+		"junk_bones",
+		"junk_feather",
+		"junk_scrap",
+		"junk_tar",
+		"junk_sand",
+		"junk_claw",
+		"junk_rose_dust",
+		"junk_teal_crystals",
+		"junk_amethyst"
 	],
 	"monsterIds": [
 		"thistleBoar",

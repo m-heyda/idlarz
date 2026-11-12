@@ -6,7 +6,7 @@ import { sellPayout } from '@/utils/game/merchant';
 import { maxHp, maxMana } from '@/lib/combat';
 import { equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, unequip } from '@/lib/inventory';
 import { sellValueOf } from '@/lib/itemInstance';
-import { isAutoSold, isJunk } from '@/lib/loot';
+import { isAutoSold, junkSale } from '@/lib/loot';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
 import type { EquipmentSlot } from '@/types/game';
@@ -126,14 +126,17 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 			let bag = state.bag;
 			let gold = 0;
 			let count = 0;
-			bag.forEach((slot, index) => {
-				const item = gearOf(slot);
-				// no rarity: the junk rule decides (isJunk: nothing yet)
-				if (!item || !(maxRarity === undefined ? isJunk(item) : isAutoSold(item, maxRarity))) return;
-				gold += sellPayout(sellValueOf(item), 1, state);
-				count += 1;
-				bag = removeFromBag(bag, index, 1);
-			});
+			if (maxRarity === undefined) {
+				// no rarity: the junk rule decides (the junk materials, and the gear the rule names)
+				({ bag, gold, count } = junkSale(bag, state));
+			} else
+				bag.forEach((slot, index) => {
+					const item = gearOf(slot);
+					if (!item || !isAutoSold(item, maxRarity)) return;
+					gold += sellPayout(sellValueOf(item), 1, state);
+					count += 1;
+					bag = removeFromBag(bag, index, 1);
+				});
 			if (count === 0) return { gold: 0, count: 0 };
 			sendInventoryOp(maxRarity === undefined ? { action: 'sellJunk', rule: 'junk' } : { action: 'sellJunk', maxRarity }, settleSale(gold));
 			set({ bag, resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) } });

@@ -19,7 +19,7 @@ import { instanceProblem, plainItem, sellValueOf } from '@/lib/itemInstance';
 import { HARD_LIMITS } from '@/config/limits';
 import { limitOf } from '@/lib/limits';
 import { isAutoSold } from '@/lib/loot/autoSell';
-import { isJunk } from '@/lib/loot/junk';
+import { isJunk, junkSale } from '@/lib/loot/junk';
 import { receiveDrops, type Received } from '@/lib/loot/receive';
 import type { Inventory, InventoryOp } from '@/lib/offline/types';
 import type { PersistedGame } from '@/lib/sanitizeSave';
@@ -238,17 +238,8 @@ const wholeQty = (qty: number | undefined, available: number): number | null => 
  * @order 2
  */
 export const sellJunkRule = (inv: Inventory, sellCtx: SellContext, junk: (item: ItemInstance) => boolean = isJunk): OpResult => {
-	let bag = inv.bag;
-	let gold = 0;
-	let count = 0;
-	bag.forEach((slot, index) => {
-		const item = gearOf(slot);
-		if (!item || !junk(item)) return;
-		gold += sellPayout(sellValueOf(item), 1, sellCtx);
-		count += 1;
-		bag = removeFromBag(bag, index, 1);
-	});
-	return count === 0 ? refused(inv) : done(bump(inv, { bag }), gold, count);
+	const sold = junkSale(inv.bag, sellCtx, junk);
+	return sold.count === 0 ? refused(inv) : done(bump(inv, { bag: sold.bag }), sold.gold, sold.count);
 };
 
 /**

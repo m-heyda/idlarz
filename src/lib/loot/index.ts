@@ -3,6 +3,7 @@ export * from './autoSell';
 export * from './data';
 export * from './generate';
 export * from './junk';
+export * from './junkDrops';
 export * from './kill';
 export * from './pools';
 export * from './validate';
