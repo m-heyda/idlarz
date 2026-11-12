@@ -500,7 +500,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`curiosity.ts`](../../src/lib/offline/curiosity.ts) — ~ The events a deed may be waiting for.
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
-- [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off), for the win estimate.
+- [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off or still locked before the first rebirth), for the win estimate.
 - [`fightProject.ts`](../../src/lib/offline/fightProject.ts) — ~ The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands something first), as the picture the browser animates:
 - [`fightSteps.ts`](../../src/lib/offline/fightSteps.ts) — ~ The profile a potion is judged on:
 - [`fightTargets.ts`](../../src/lib/offline/fightTargets.ts) — ~ A placed monster by ticket number, with what it is (null:

@@ -182,6 +182,8 @@ export interface CombatPanelProps {
 	autoBattle: boolean;
 	autoLocked: boolean;
 	autoUse: boolean;
+	/** Auto-use is a reward for the first rebirth: its switch is not shown before */
+	autoUseLocked: boolean;
 	/** The server's reason Auto-battle is idle, when it is */
 	autoNote?: string | null;
 	numbers: FloatNumber[];
@@ -287,9 +289,11 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						Waiting: no monster looks winnable
 					</span>
 				)}
-				<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
-					<input type='checkbox' checked={p.autoUse} onChange={(e) => p.onAutoUse(e.target.checked)} /> Auto-use
-				</label>
+				{!p.autoUseLocked && (
+					<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
+						<input type='checkbox' checked={p.autoUse} onChange={(e) => p.onAutoUse(e.target.checked)} /> Auto-use
+					</label>
+				)}
 			</div>
 		</>
 	);

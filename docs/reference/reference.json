@@ -637,7 +637,7 @@
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 401,
+  "line": 402,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -648,7 +648,7 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 453,
+  "line": 454,
   "summary": "The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
@@ -1481,13 +1481,24 @@
   "see": []
  },
  {
+  "id": "autouseunlocked",
+  "name": "autoUseUnlocked",
+  "symbol": "autoUseUnlocked",
+  "kind": "function",
+  "category": "Combat/A fight",
+  "file": "src/lib/combat.ts",
+  "line": 55,
+  "summary": "Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work.",
+  "see": []
+ },
+ {
   "id": "winbucketof",
   "name": "winBucketOf",
   "symbol": "winBucketOf",
   "kind": "function",
   "category": "Combat/Win chance",
   "file": "src/lib/combat.ts",
-  "line": 62,
+  "line": 71,
   "summary": "The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red). The strip also shows the word and the exact percent on hover, so colour is never the only cue.",
   "see": []
  },
@@ -1498,7 +1509,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 110,
+  "line": 119,
   "summary": "Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.",
   "see": []
  },
@@ -1509,7 +1520,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 121,
+  "line": 130,
   "summary": "Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.",
   "see": []
  },
@@ -1520,7 +1531,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 140,
+  "line": 149,
   "summary": "Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.",
   "see": []
  },
@@ -1531,7 +1542,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 158,
+  "line": 167,
   "summary": "One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.",
   "see": []
  },
@@ -1542,7 +1553,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 177,
+  "line": 186,
   "summary": "Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.",
   "see": []
  },
@@ -1553,7 +1564,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 193,
+  "line": 202,
   "summary": "The Life Leech in %, the gear's and the merchant's together, never above the cap.",
   "see": []
  },
@@ -1564,7 +1575,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 210,
+  "line": 219,
   "summary": "The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much, so no amount of armor makes anything unkillable (the asymptote is 75 %).",
   "see": []
  },
@@ -1575,7 +1586,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 223,
+  "line": 232,
   "summary": "Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.",
   "see": []
  },
@@ -1586,7 +1597,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 231,
+  "line": 240,
   "summary": "HP regeneration outside fights: the base rate plus the gear's regen stat.",
   "see": []
  },
@@ -1597,7 +1608,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 242,
+  "line": 251,
   "summary": "Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.",
   "see": []
  },

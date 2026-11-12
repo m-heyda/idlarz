@@ -29,7 +29,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		nextPollSec = plan ? Math.max(0.5, Math.min(600, plan.endsInSec + COMBAT.poll.afterEndSec)) : COMBAT.poll.fightSec;
 	} else {
 		// idle: ask again when something can change
-		const winnable = winnableBy(p, c.hp, potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c));
+		const winnable = winnableBy(p, c.hp, potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, ledger.rebirths));
 		waiting = pickTarget(ledger, c, c.at, winnable) !== null;
 		const resume = resumeHpOf(p);
 		const retry = nextRetry(ledger, c, c.at);
@@ -46,7 +46,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		else if (!waiting && Number.isFinite(retry)) nextPollSec = Math.min(nextSpawnSec ?? 600, Math.min(600, Math.ceil(retry - c.at) + 1));
 		else if (!waiting) nextPollSec = Math.min(600, Math.max(COMBAT.poll.minimizedSec, Math.ceil(nextSpawnSec ?? 600) + 1));
 	}
-	const potions = potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c);
+	const potions = potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, ledger.rebirths);
 	const runningBuffs = activeBuffs(ledger.buffs, c.at);
 	return {
 		hp: c.hp,

@@ -21,13 +21,14 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `applySpend` | Economy / Gems | [`src/lib/offline/gems.ts:72`](../../src/lib/offline/gems.ts) | One purchase from the gem shop, decided on the ledger: |
 | `applyTutorial` | Progression / Guided tutorial | [`src/lib/offline/tutorial.ts:45`](../../src/lib/offline/tutorial.ts) | Applies one tutorial request to the ledger. |
 | `applyUse` | Combat / Consumables | [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts) | Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now). |
-| `armorOf` | Combat / Player numbers | [`src/lib/combat.ts:177`](../../src/lib/combat.ts) | Armor against monster hits: |
-| `armorReduction` | Combat / Player numbers | [`src/lib/combat.ts:210`](../../src/lib/combat.ts) | The share (0-0.75) of a hit that `armor` takes away: |
+| `armorOf` | Combat / Player numbers | [`src/lib/combat.ts:186`](../../src/lib/combat.ts) | Armor against monster hits: |
+| `armorReduction` | Combat / Player numbers | [`src/lib/combat.ts:219`](../../src/lib/combat.ts) | The share (0-0.75) of a hit that `armor` takes away: |
 | Asset library | Architecture / Art | [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts) | The asset library: |
-| `attacksPerSecond` | Combat / Player numbers | [`src/lib/combat.ts:121`](../../src/lib/combat.ts) | Attacks per second: |
+| `attacksPerSecond` | Combat / Player numbers | [`src/lib/combat.ts:130`](../../src/lib/combat.ts) | Attacks per second: |
 | `attributeBudget` | Progression / Levels | [`src/lib/offline/attrs.ts:40`](../../src/lib/offline/attrs.ts) | How many attribute points a character holds in all: |
 | `autoBattleUnlocked` | Combat / A fight | [`src/lib/combat.ts:46`](../../src/lib/combat.ts) | Auto-battle (the server picking the next monster) is a reward for the first rebirth; |
 | `autoUse` | Combat / Potions and skills | [`src/lib/offline/fightSteps.ts:74`](../../src/lib/offline/fightSteps.ts) | Auto-use's rules for one tick: |
+| `autoUseUnlocked` | Combat / A fight | [`src/lib/combat.ts:55`](../../src/lib/combat.ts) | Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: |
 | Avatars | Progression / Avatars | [`src/catalog/avatars.ts:18`](../../src/catalog/avatars.ts) | Avatars (IDL-71, class lock IDL-269): |
 | `awayBlockOf` | Saves & Server / Away time | [`src/lib/offline/away.ts:21`](../../src/lib/offline/away.ts) | The read-only `away` block of `GET /api/auth/me`: |
 | `badgeOptions` | Progression / Badges | [`src/catalog/badges.ts:23`](../../src/catalog/badges.ts) | Badges and titles of a profile. |
@@ -44,7 +45,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `BIOMES` | Economy / Biomes | [`src/config/biomes.ts:53`](../../src/config/biomes.ts) | Every biome with its config output per second. |
 | `BodyUpgrade` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:35`](../../src/lib/saveUpgrade.ts) | **The one way to change what a save means: |
 | `BOSS_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:210`](../../src/catalog/lootConfig.ts) | Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): |
-| `BOSS_MIN_DISTANCE` | Monsters / Spawning | [`src/config/combatConfig.ts:401`](../../src/config/combatConfig.ts) | The boss band (IDL-222, owner decision 2026-11-09): |
+| `BOSS_MIN_DISTANCE` | Monsters / Spawning | [`src/config/combatConfig.ts:402`](../../src/config/combatConfig.ts) | The boss band (IDL-222, owner decision 2026-11-09): |
 | `BUFF_FAMILIES` | Combat / Consumables | [`src/catalog/buffs.ts:25`](../../src/catalog/buffs.ts) | The buff families. |
 | `buffTotals` | Combat / Consumables | [`src/lib/buffs.ts:84`](../../src/lib/buffs.ts) | The summed bonus per stat of the running buffs: |
 | `BUILDING_RULES` | Economy / Buildings | [`src/config/buildings.ts:33`](../../src/config/buildings.ts) | The numbers of the building system (proposals from docs/plan/18, tuned with the sim; |
@@ -100,16 +101,16 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `createAvatarPicker` | Progression / Avatars | [`src/lib/avatarPick.ts:23`](../../src/lib/avatarPick.ts) | Optimistic avatar change (the picker used to wait 2-3 s for the server before the new face showed). |
 | `createClickLimiter` | Economy / Clicks | [`src/lib/clickLimiter.ts:35`](../../src/lib/clickLimiter.ts) | Creates the click rate limiter: |
 | `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:83`](../../src/lib/saveStorage.ts) | Where the save lives: |
-| `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:140`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
+| `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:149`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
 | `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
 | `DAILY_BONUS_GEMS` | Economy / Gems | [`src/config/gemShop.ts:71`](../../src/config/gemShop.ts) | The daily first-login bonus: |
 | `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:20`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
-| `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:110`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
+| `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:119`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
 | `dangerBonus` | Monsters / Level scaling | [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts) | Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: |
 | Deeds | Progression / Deeds | [`src/catalog/achievements.ts:441`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
 | `dismissTicket` | Combat / A fight | [`src/lib/offline/fight.ts:145`](../../src/lib/offline/fight.ts) | Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). |
 | `DISTANCE_BANDS` | Monsters / Spawning | [`src/config/distanceBands.ts:25`](../../src/config/distanceBands.ts) | Distance bands: |
-| `dodgeChance` | Combat / Player numbers | [`src/lib/combat.ts:242`](../../src/lib/combat.ts) | Chance (0-1) that a monster's hit misses: |
+| `dodgeChance` | Combat / Player numbers | [`src/lib/combat.ts:251`](../../src/lib/combat.ts) | Chance (0-1) that a monster's hit misses: |
 | `drink` | Combat / Consumables | [`src/lib/buffs.ts:126`](../../src/lib/buffs.ts) | Drinks one potion: |
 | `dropChanceMultiplier` | Economy / Chests and Luck | [`src/lib/luck.ts:40`](../../src/lib/luck.ts) | Multiplier on a monster's gear drop chance. |
 | `economyTiles` | Economy / Tiles | [`src/utils/game/tiles.ts:28`](../../src/utils/game/tiles.ts) | Owned-tile count as the economy sees it: |
@@ -167,7 +168,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `levelAtAge` | Monsters / Level scaling | [`src/lib/monsters.ts:93`](../../src/lib/monsters.ts) | The level of a monster of this age: |
 | `LEVELING` | Progression / Levels | [`src/config/character.ts:55`](../../src/config/character.ts) | Character level 1-100 (`maxLevel`). |
 | `levelScale` | Loot / Items | [`src/catalog/stats.ts:211`](../../src/catalog/stats.ts) | Power multiplier of an item level (1 at level 1). |
-| `lifeLeechPercent` | Combat / Player numbers | [`src/lib/combat.ts:193`](../../src/lib/combat.ts) | The Life Leech in %, the gear's and the merchant's together, never above the cap. |
+| `lifeLeechPercent` | Combat / Player numbers | [`src/lib/combat.ts:202`](../../src/lib/combat.ts) | The Life Leech in %, the gear's and the merchant's together, never above the cap. |
 | `limitOf` | Progression / Limits | [`src/lib/limits.ts:40`](../../src/lib/limits.ts) | The current value of a limit: |
 | `LIMITS` | Progression / Limits | [`src/config/limits.ts:14`](../../src/config/limits.ts) | Limits that upgrades raise. |
 | `LIVE_GRADES` | Loot / Items | [`src/catalog/items/grades.ts:51`](../../src/catalog/items/grades.ts) | The grade ladder's live grades (IDL-220, IDL-224, IDL-243, IDL-238): |
@@ -188,8 +189,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `MERCHANT_UPGRADES` | Economy / Merchant | [`src/config/merchant.ts:43`](../../src/config/merchant.ts) | Merchant upgrades are bought with gold; |
 | `merchantUpgradeCost` | Economy / Merchant | [`src/utils/game/merchant.ts:25`](../../src/utils/game/merchant.ts) | Gold price of the next level of a merchant upgrade. |
 | `MIN_SAVE_INTERVAL_MS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:89`](../../src/lib/cloudSave/pipeline.ts) | Saves from one player are accepted at most this often (an honest client sends every ~90 s). |
-| `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:223`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
-| `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:453`](../../src/config/combatConfig.ts) | The roster: |
+| `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:232`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
+| `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:454`](../../src/config/combatConfig.ts) | The roster: |
 | `monsterStats` | Monsters / Level scaling | [`src/lib/monsters.ts:117`](../../src/lib/monsters.ts) | HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). |
 | `nextWanderStep` | Progression / Pets | [`src/lib/pets.ts:29`](../../src/lib/pets.ts) | The pet's next step: |
 | `NPC_PORTRAITS` | Architecture / Art | [`src/config/npcPortraits.ts:12`](../../src/config/npcPortraits.ts) | The NPC portraits: |
@@ -225,7 +226,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `reconcileCharacter` | Progression / Levels | [`src/utils/game/character.ts:167`](../../src/utils/game/character.ts) | Puts a character's attributes in line with an XP total: |
 | `recordCuriosity` | Progression / Achievements | [`src/lib/offline/curiosity.ts:14`](../../src/lib/offline/curiosity.ts) | Records a curiosity once. |
 | `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` have been bought: |
-| `regen` | Combat / Player numbers | [`src/lib/combat.ts:231`](../../src/lib/combat.ts) | HP regeneration outside fights: |
+| `regen` | Combat / Player numbers | [`src/lib/combat.ts:240`](../../src/lib/combat.ts) | HP regeneration outside fights: |
 | Rehearsal seeding (seed-rehearsal) | Ops / Operator guides | [`scripts/seed-rehearsal-account.ts:1`](../../scripts/seed-rehearsal-account.ts) | Puts ONE throwaway account into a rebirthed mid-game state, fast, for the new chapter reset rehearsal (`docs/plan/new-chapter-release-runbook.md`,... |
 | Rehearsal seeding (the pure part) | Ops / Operator guides | [`scripts/lib/rehearsalSeed.ts:1`](../../scripts/lib/rehearsalSeed.ts) | The pure part of `npm run seed-rehearsal` (`scripts/seed-rehearsal-account.ts`): |
 | Rendering the map | Architecture / Rendering | [`src/components/game/Grid.tsx:1`](../../src/components/game/Grid.tsx) | Rendering notes. |
@@ -262,7 +263,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `STARTING_GEMS` | Progression / Gems | [`src/config/economy.ts:219`](../../src/config/economy.ts) | Gems every player starts with (also granted to saves from before Gems existed). |
 | `startNewChapter` | Saves & Server / Epoch | [`src/lib/offline/chapter.ts:53`](../../src/lib/offline/chapter.ts) | Starts the new chapter for one account, once: |
 | `statsWithoutTutorial` | Saves & Server / The ledger | [`src/lib/offline/statsReset.ts:11`](../../src/lib/offline/statsReset.ts) | The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, ches... |
-| `swing` | Combat / Player numbers | [`src/lib/combat.ts:158`](../../src/lib/combat.ts) | One swing: |
+| `swing` | Combat / Player numbers | [`src/lib/combat.ts:167`](../../src/lib/combat.ts) | One swing: |
 | `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
 | The /play route and its redirects | Architecture / Routes | [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts) | The front door's routes (IDL-61). |
 | The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |
@@ -297,7 +298,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `verifyTransition` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:245`](../../src/lib/cloudSave/verify.ts) | Runs every plausibility check between two consecutive saves and returns the flags that fired; |
 | `WEAPON_ATTACK_SPEED` | Combat / Player numbers | [`src/catalog/weapons.ts:13`](../../src/catalog/weapons.ts) | Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; |
 | `WEAPON_LEGENDARY_DAMAGE_TOP` | Economy / Perk caps | [`src/catalog/perkCaps.ts:44`](../../src/catalog/perkCaps.ts) | The top damage tier of a WEAPON legendary: |
-| `winBucketOf` | Combat / Win chance | [`src/lib/combat.ts:62`](../../src/lib/combat.ts) | The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): |
+| `winBucketOf` | Combat / Win chance | [`src/lib/combat.ts:71`](../../src/lib/combat.ts) | The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): |
 | `withBuffs` | Combat / Consumables | [`src/lib/offline/profile.ts:106`](../../src/lib/offline/profile.ts) | A profile with the running potion buffs on top (buffTotals): |
 | `withPushLock` | Saves & Server / Uploading | [`src/lib/pushLock.ts:19`](../../src/lib/pushLock.ts) | One upload at a time per browser. |
 | `worldFacts` | Progression / Achievements | [`src/lib/worldFacts.ts:34`](../../src/lib/worldFacts.ts) | The facts of a map and a farm. |

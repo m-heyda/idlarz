@@ -270,6 +270,7 @@ const record = () => {
 
 test('hotkeys, switches and dismissals are requests to the server: a key per press, nothing about damage or HP', async () => {
 	syncedGame();
+	store.setState({ prestige: { ...api().prestige, rebirths: 1 } }); // auto-use is a reward for the first rebirth
 	store.setState({ monsters: [makeMonster({ id: 3, level: 1, x: CASTLE_X + 2, y: CASTLE_Y, ticket: 3 })] });
 	const calls = record();
 	try {
@@ -646,4 +647,18 @@ test('the time left of a boss fight runs down with the clock between answers, ne
 	api().tick(1000);
 	assert.equal(api().combat.fight!.timeLeftSec, null);
 	closeFight();
+});
+
+test('auto-use cannot be switched before the first rebirth: nothing is sent and the saved switch stays', async () => {
+	syncedGame();
+	store.setState({ prestige: { ...api().prestige, rebirths: 0 } });
+	const calls = record();
+	try {
+		api().setAutoUse(false);
+		await flush();
+		assert.equal(calls.length, 0);
+		assert.equal(api().combat.autoUse, true);
+	} finally {
+		globalThis.fetch = realFetch;
+	}
 });
