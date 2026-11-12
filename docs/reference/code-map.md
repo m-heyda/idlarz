@@ -218,7 +218,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
 - [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ 1 until it has run, then counts down to 0; stays at 0 for a player who asked for reduced motion.
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
-- [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
+- [`BestiaryWindow.tsx`](../../src/components/game/BestiaryWindow.tsx) — ~ The Bestiary:
 - [`BetaTesterBadge.tsx`](../../src/components/game/BetaTesterBadge.tsx) — ~ Who wears the tester medal:
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx) — ~ The body of a tile card (the caller wraps it in the design-system Tooltip):
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
@@ -230,24 +230,20 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
 - [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ 'full' = the whole figure (56x80), 'bust' = head and shoulders (40x40)
 - [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from, shown as their portraits.
-- [`CollapsibleSection.tsx`](../../src/components/game/CollapsibleSection.tsx) — ~ A titled block whose header toggles the body; the open/closed choice is remembered per `id` (localStorage).
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu, drawn by the design system's `ContextMenu`.
 - [`CostList.tsx`](../../src/components/game/CostList.tsx) — ~ A bundle of resource costs; each entry is green when affordable and red when not.
-- [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
 - [`DailyBoard.tsx`](../../src/components/game/DailyBoard.tsx) — ~ The line under the board's title:
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
-- [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ One compact row:
+- [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ The game's HUD, drawn with the design system (IDL-325):
+- [`GameModal.tsx`](../../src/components/game/GameModal.tsx) — ~ A game dialog drawn with the design system's `Modal` (stone frame, flanked title, close button).
+- [`GameWindow.tsx`](../../src/components/game/GameWindow.tsx) — ~ Below this screen width windows are laid out one at a time (no room to drag them side by side)
 - [`GemIcon.tsx`](../../src/components/game/GemIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`Grid.tsx`](../../src/components/game/Grid.tsx) — ~ Wheel zoom.
-- [`HeaderMenu.tsx`](../../src/components/game/HeaderMenu.tsx) — ~ The hero:
-- [`HeaderTip.tsx`](../../src/components/game/HeaderTip.tsx) — ~ Which edge of the control the card lines up with:
 - [`HighlightLayer.tsx`](../../src/components/game/HighlightLayer.tsx) — ~ The "Highlight" tint:
 - [`ItemSlot.tsx`](../../src/components/game/ItemSlot.tsx) — ~ A piece of gear (an instance) ...
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
-- [`LevelBadge.tsx`](../../src/components/game/LevelBadge.tsx) — ~ Side of the square in px (the number scales with it)
-- [`LevelDetails.tsx`](../../src/components/game/LevelDetails.tsx) — ~ The text of an XP bar:
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
@@ -255,11 +251,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
-- [`OrganizeButton.tsx`](../../src/components/game/OrganizeButton.tsx) — ~ Tidies the bag from the left:
 - [`PixelIcon.tsx`](../../src/components/game/PixelIcon.tsx) — ~ A one-row sprite sheet from the icon set (its size is the whole sheet)
 - [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
-- [`PixelWindow.tsx`](../../src/components/game/PixelWindow.tsx) — ~ Windows narrower than this screen are laid out one at a time, centered (no room for dragging them side by side)
-- [`ResourceDisplay.tsx`](../../src/components/game/ResourceDisplay.tsx) — ~ Room for the longest ordinary amount ("12.3K") at the small header size, so a chip keeps its width while its number ticks
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
@@ -271,6 +264,23 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`Toast.tsx`](../../src/components/game/Toast.tsx) — ~ Short messages ("Game saved") under the header; `showToast` in the ui store puts one up for a couple of seconds, and several stack.
 - [`WaterLayer.tsx`](../../src/components/game/WaterLayer.tsx) — ~ Visible tile range (inclusive-exclusive), so only the ripples on screen are in the DOM
 - [`WindowErrorBoundary.tsx`](../../src/components/game/WindowErrorBoundary.tsx) — ~ Keeps one window's crash from blanking the whole game:
+
+**src/components/game/hero/**
+
+- [`GameItemTip.tsx`](../../src/components/game/hero/GameItemTip.tsx) — ~ A stat value with its change against the worn piece in the design system's green / red brackets.
+- [`HeroCrafting.tsx`](../../src/components/game/hero/HeroCrafting.tsx) — ~ Crafting XP is small now (`CRAFTING.xpScale`):
+- [`HeroStats.tsx`](../../src/components/game/hero/HeroStats.tsx) — ~ The ink each attribute is written in on the paper
+- [`HeroWindow.tsx`](../../src/components/game/hero/HeroWindow.tsx) — ~ A bag slot as the design system draws it:
+- [`bagActions.ts`](../../src/components/game/hero/bagActions.ts) — ~ Double-click on a bag slot:
+- [`recipeUi.ts`](../../src/components/game/hero/recipeUi.ts) — ~ What a recipe is called:
+
+**src/components/game/hud/**
+
+- [`HudDock.tsx`](../../src/components/game/hud/HudDock.tsx) — ~ The windows in the dock, in order.
+- [`HudTopBar.tsx`](../../src/components/game/hud/HudTopBar.tsx) — ~ The picture of a resource for the design-system chip (a resource with no sprite falls back to the scroll icon).
+
+**src/components/game/**
+
 - [`itemUi.ts`](../../src/components/game/itemUi.ts) — ~ Rarity colours come from the catalog (catalog/rarity.ts); kept here as a lookup the item UI imports.
 - [`mapSource.tsx`](../../src/components/game/mapSource.tsx) — ~ What the map components read from the game.
 
@@ -286,13 +296,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`AchievementNotification.tsx`](../../src/components/game/overlays/AchievementNotification.tsx) — ~ The reward moment for an earned achievement (IDL-332):
 - [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
-- [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in plain words:
-- [`BuildingModal.tsx`](../../src/components/game/overlays/BuildingModal.tsx) — ~ "+1.2K" per hour for each resource of an output (per second in, per hour out).
-- [`CharacterOverlay.tsx`](../../src/components/game/overlays/CharacterOverlay.tsx)
+- [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What an Idol is and does, in plain lines:
+- [`BuildingModal.tsx`](../../src/components/game/overlays/BuildingModal.tsx) — ~ The building window:
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
 - [`CombatPanel.tsx`](../../src/components/game/overlays/CombatPanel.tsx) — ~ How long a bar takes to run to a new number:
 - [`CombatWidget.tsx`](../../src/components/game/overlays/CombatWidget.tsx) — ~ "1 min 12 s" or "45 s"
-- [`CraftingOverlay.tsx`](../../src/components/game/overlays/CraftingOverlay.tsx) — ~ Crafting XP is small now (`CRAFTING.xpScale`):
 - [`DailyBonusDialog.tsx`](../../src/components/game/overlays/DailyBonusDialog.tsx) — ~ The daily bonus window:
 - [`FarmAnimalDock.tsx`](../../src/components/game/overlays/FarmAnimalDock.tsx) — ~ Width the scene keeps clear on the right while the panel is open (panel width plus its margin)
 - [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
@@ -318,11 +326,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
 - [`SaveMenuDialog.tsx`](../../src/components/game/overlays/SaveMenuDialog.tsx) — ~ Save & backup:
-- [`SettingsDialog.tsx`](../../src/components/game/overlays/SettingsDialog.tsx) — ~ Visible settings:
-- [`StatisticsOverlay.tsx`](../../src/components/game/overlays/StatisticsOverlay.tsx) — ~ One label / value line; `muted` for the small print inside a breakdown.
+- [`SettingsDialog.tsx`](../../src/components/game/overlays/SettingsDialog.tsx) — ~ Settings:
 - [`TabLockOverlay.tsx`](../../src/components/game/overlays/TabLockOverlay.tsx) — ~ Shown in a tab that does not own the game (another tab is running it).
-- [`Tutorial.tsx`](../../src/components/game/overlays/Tutorial.tsx) — ~ The in-game guide.
-- [`TutorialDialog.tsx`](../../src/components/game/overlays/TutorialDialog.tsx) — ~ Brother Alder's journal:
 - [`farmGeometry.ts`](../../src/components/game/overlays/farmGeometry.ts) — Geometry of the farm pasture: an isometric fenced pen on an endless repeating meadow, shown at a whole-pixel zoom and centred in the Farm window.
 - [`farmLayout.ts`](../../src/components/game/overlays/farmLayout.ts) — Lays out the farm's loose parts (public/pixel/farm/*.png, made by scripts/pixel/farm_parts.py) as a list of props on the ground plane: the fence round the pen
 
@@ -371,7 +376,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`limits.ts`](../../src/config/limits.ts) — Bounds and caps that later upgrades and the rebirth system are meant to raise (more bag room, longer monster growth, a bigger
 - [`merchant.ts`](../../src/config/merchant.ts) — The merchant: resource prices, upgrades, shop goods.
 - [`monsterArtSize.ts`](../../src/config/monsterArtSize.ts) — How big a roster monster's picture is drawn on the map, in px (a tile is TILE_SIZE = 48 wide).
-- [`npcPortraits.ts`](../../src/config/npcPortraits.ts) — ~ The NPC portraits:
+- [`npcPortraits.ts`](../../src/config/npcPortraits.ts) — ~ Served URL of an NPC portrait
 - [`pixelIcons.ts`](../../src/config/pixelIcons.ts) — Pixel-art sprite set (generated by scripts/pixel/build.py, rules in scripts/pixel/reference/STYLE.md).
 - [`playerClasses.ts`](../../src/config/playerClasses.ts) — Hero classes the player can pick (double-click the character). Each gives two passives (CLASS_PASSIVES below) and has its own
 - [`rebirth.ts`](../../src/config/rebirth.ts) — Rebirth and the Ember shop.
@@ -389,6 +394,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useIncomeBreakdown.ts`](../../src/hooks/useIncomeBreakdown.ts) — ~ The income of every resource split by source (`calculateResourceBreakdown`), recomputed only when one of its inputs changes (the map, the stats, the farm, the Embers, the merchant upgrades, the gear), never on a tick.
 - [`useMenuAttention.ts`](../../src/hooks/useMenuAttention.ts) — ~ What in the header has something waiting:
 - [`useOfflineClaim.ts`](../../src/hooks/useOfflineClaim.ts) — ~ The game waits this long for the server before it starts anyway (a late answer is still applied when it arrives).
+- [`useRememberedOpen.ts`](../../src/hooks/useRememberedOpen.ts) — ~ Whether a folding block is open, remembered per `id` in this browser (the same keys the old Character window used, so a player's choices carry over).
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
 - [`useSingleTab.ts`](../../src/hooks/useSingleTab.ts) — ~ Only one tab may run the game.
 - [`useSpawnSync.ts`](../../src/hooks/useSpawnSync.ts) — ~ The one poll of the game.
@@ -958,6 +964,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`designSystem.test.ts`](../../tests/ui/designSystem.test.ts)
 - [`designSystemRender.test.ts`](../../tests/ui/designSystemRender.test.ts)
 - [`formatStack.test.ts`](../../tests/ui/formatStack.test.ts)
+- [`gameWindow.test.ts`](../../tests/ui/gameWindow.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
