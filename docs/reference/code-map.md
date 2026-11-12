@@ -220,7 +220,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
 - [`Bag.tsx`](../../src/components/game/Bag.tsx) — ~ The bag (6 columns, scrolls from 60 slots up).
 - [`BetaTesterBadge.tsx`](../../src/components/game/BetaTesterBadge.tsx) — ~ Who wears the tester medal:
-- [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx)
+- [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx) — ~ The body of a tile card (the caller wraps it in the design-system Tooltip):
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
@@ -266,7 +266,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`Tile.tsx`](../../src/components/game/Tile.tsx)
 - [`TileMenu.ts`](../../src/components/game/TileMenu.ts) — ~ Right click on an explored tile:
 - [`TileMonster.tsx`](../../src/components/game/TileMonster.tsx) — ~ The monster on the map with its growth shown:
-- [`TileStatus.tsx`](../../src/components/game/TileStatus.tsx)
+- [`TileStatus.tsx`](../../src/components/game/TileStatus.tsx) — ~ More card content under the tile's own lines (the building on the tile)
 - [`TileTooltip.tsx`](../../src/components/game/TileTooltip.tsx) — ~ Hover card of a monster:
 - [`Toast.tsx`](../../src/components/game/Toast.tsx) — ~ Short messages ("Game saved") under the header; `showToast` in the ui store puts one up for a couple of seconds, and several stack.
 - [`WaterLayer.tsx`](../../src/components/game/WaterLayer.tsx) — ~ Visible tile range (inclusive-exclusive), so only the ripples on screen are in the DOM

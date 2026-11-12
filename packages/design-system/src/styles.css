@@ -4034,3 +4034,10 @@ button.ds-income-head:hover {
 .ds-listrow[data-dim='true'] img {
 	opacity: 0.5;
 }
+
+/* tooltips on the map: sized by their content (the map places and scales them) */
+.ds-tip.map-ds-tip {
+	width: max-content;
+	min-width: 190px;
+	max-width: 300px;
+}

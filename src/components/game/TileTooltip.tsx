@@ -1,7 +1,9 @@
 import { buildingDef } from '@/catalog/buildings';
 import { BIOMES } from '@/config/biomes';
 import { buildingOutput, ownedOfBiome, producerBonus } from '@/lib/buildings';
-import ResourceIcon from './ResourceIcon';
+import { RESOURCES } from '@/catalog';
+import { Tooltip, TipLine, TipSection } from '../../../packages/design-system/src/components/tooltips';
+import { resourceIconUrl } from './hero/recipeUi';
 import { idolDef } from '@/catalog/idols';
 import { idolValueText } from '@/lib/idolEconomy';
 import React from 'react';
@@ -30,50 +32,52 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 	// the server's count of this type's kills (the bestiary store; a tip only shows for a type the player has met, so 0 reads as "none yet")
 	const kills = useBestiaryStore((s) => s.kills[type] ?? 0);
 	const wip = art ? MONSTER_CATALOG.find((m) => m.id === art) : undefined;
+	const place = 'map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max';
 	if (wip) {
 		return (
-			<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs'>
-				<div className='px-tip-title'>
-					{wip.grade === 'boss' ? '☠ ' : ''}
-					{wip.label} - Lv {formatCompact(level)}
-				</div>
-				<div className='px-tip-muted'>Work in progress: art preview only</div>
+			<div className={place}>
+				<Tooltip title={`${wip.grade === 'boss' ? '☠ ' : ''}${wip.label}`} subtitle={`Lv ${formatCompact(level)}`} className='map-ds-tip'>
+					<TipLine>Work in progress: art preview only</TipLine>
+				</Tooltip>
 			</div>
 		);
 	}
 	const monster = state.monsters.find((m) => m.id === id);
 	const nextLevel = monster ? growthSecondsLeft(monster, { merchantUpgrades: state.merchantUpgrades, prestige: state.prestige }) : null;
 	const stats = monsterStats(type, level);
+	const boss = isBoss(type);
 	return (
-		<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-tooltip text-xs'>
-			<div className='px-tip-title'>
-				{isBoss(type) ? '☠ ' : ''}
-				{MONSTERS[type].label} - Lv {formatCompact(level)} - {formatCompact(stats.maxHp)} HP
-			</div>
-			{isBoss(type) && <div className='text-[#ff8a6a] font-bold'>BOSS</div>}
-			<div className='px-tip-muted'>Defeated: {formatCompact(kills)}</div>
-			{monster && (
-				<div className='px-tip-muted'>
-					Level {formatCompact(level)} of{' '}
-					{formatCompact(maxLevelOf(monster.spawnLevel, { merchantUpgrades: state.merchantUpgrades, prestige: state.prestige }, monster.growCap))}
-					{nextLevel !== null ? `, grows in ${Math.max(1, Math.ceil(nextLevel / 60))} min` : ' - fully grown'}
-				</div>
-			)}
-			{isBoss(type) && (
-				<div className='px-tip-muted'>
-					Crits {stats.critChance}%, resists Stun {stats.stunResist}%. Beat it within {MONSTERS[type].timeLimitSec} seconds
-				</div>
-			)}
-			<div className='text-[#f0d27a]'>
-				{queued > 0 ? `In the queue (${queued}) - click to leave it` : lineOpen ? 'Click to add to the queue' : 'Click to fight'}
-			</div>
+		<div className={place}>
+			<Tooltip
+				title={`${boss ? '☠ ' : ''}${MONSTERS[type].label}`}
+				subtitle={`Lv ${formatCompact(level)} - ${formatCompact(stats.maxHp)} HP`}
+				rarity={boss ? 'epic' : 'common'}
+				banner={undefined}
+				className='map-ds-tip'
+			>
+				{boss && <TipLine tone='red'>BOSS</TipLine>}
+				<TipLine>Defeated: {formatCompact(kills)}</TipLine>
+				{monster && (
+					<TipLine>
+						Level {formatCompact(level)} of{' '}
+						{formatCompact(maxLevelOf(monster.spawnLevel, { merchantUpgrades: state.merchantUpgrades, prestige: state.prestige }, monster.growCap))}
+						{nextLevel !== null ? `, grows in ${Math.max(1, Math.ceil(nextLevel / 60))} min` : ' - fully grown'}
+					</TipLine>
+				)}
+				{boss && (
+					<TipLine>
+						Crits {stats.critChance}%, resists Stun {stats.stunResist}%. Beat it within {MONSTERS[type].timeLimitSec} seconds
+					</TipLine>
+				)}
+				<TipLine tone='gold'>{queued > 0 ? `In the queue (${queued}) - click to leave it` : lineOpen ? 'Click to add to the queue' : 'Click to fight'}</TipLine>
+			</Tooltip>
 		</div>
 	);
 };
 
 /**
  * The building on the tile: its name and level, what it makes per hour now (with the biome bonus its output grows by), and that a click opens its window. An Idol says what it gives now and that its level survives a rebirth.
- * The output is before the castle and Ember bonuses, like the building window.
+ * The output is before the castle and Ember bonuses, like the building window. Content only: the tile card wraps it.
  */
 const BuildingTip: React.FC<{ id: string; level: number }> = ({ id, level }) => {
 	const def = buildingDef(id);
@@ -86,35 +90,39 @@ const BuildingTip: React.FC<{ id: string; level: number }> = ({ id, level }) => 
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
 	const rows = output ? Object.entries(output).filter(([, amount]) => (amount ?? 0) > 0) : [];
 	return (
-		<div className='mt-1 border-t border-[#5a4a2a] pt-1 text-xs'>
-			<div className='text-[#f0d27a]'>
+		<>
+			<TipSection>
 				{def.label} (level {level})
-			</div>
+			</TipSection>
 			{rows.length > 0 && (
-				<div className='flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5'>
+				<div className='ds-tip-rows'>
 					{rows.map(([key, amount]) => (
-						<span key={key} className='inline-flex items-center gap-1 tabular-nums'>
-							<ResourceIcon resource={key as keyof Resources} />+{formatNumber((amount ?? 0) * 3600)}/h
-						</span>
+						<div key={key} className='ds-tip-row'>
+							<span>
+								<img className='ds-tip-mini' src={resourceIconUrl(key)} alt='' />
+								{RESOURCES[key as keyof Resources].label}
+							</span>
+							<span>+{formatNumber((amount ?? 0) * 3600)}/h</span>
+						</div>
 					))}
 				</div>
 			)}
 			{output && (
-				<div className='text-[#c8b898]'>
+				<TipLine>
 					{biomeLabel} bonus: +{Math.round(producerBonus(owned) * 100)} % ({owned} tile{owned === 1 ? '' : 's'})
-				</div>
+				</TipLine>
 			)}
 			{idol && (
 				<>
-					<div>
+					<TipLine tone='gold'>
 						{idolValueText(idol, level)}
 						{!idol.applied && ' (coming soon: not applied yet)'}
-					</div>
-					<div className='text-[#a89878]'>Its level is kept when you rebirth; rebuild it free on any {idol.biome} tile.</div>
+					</TipLine>
+					<TipLine>Its level is kept when you rebirth; rebuild it free on any {idol.biome} tile.</TipLine>
 				</>
 			)}
-			<div className='text-[#f0d27a] mt-0.5'>Click to open and upgrade</div>
-		</div>
+			<TipLine tone='gold'>Click to open and upgrade</TipLine>
+		</>
 	);
 };
 
@@ -158,10 +166,15 @@ const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x
 			{/* a monster has its own tooltip: the biome card would only cover it */}
 			{!(isOwned && monster) && (
 				<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max min-w-[190px] max-w-[290px]'>
-					<div className='px-tooltip break-words'>
-						<TileStatus biome={biome} isOwned={isOwned} isAdjacent={isAdjacent} level={level} x={x} y={y} />
-						{isOwned && building && <BuildingTip id={building.id} level={building.level} />}
-					</div>
+					<TileStatus
+						biome={biome}
+						isOwned={isOwned}
+						isAdjacent={isAdjacent}
+						level={level}
+						x={x}
+						y={y}
+						extra={isOwned && building ? <BuildingTip id={building.id} level={building.level} /> : undefined}
+					/>
 				</div>
 			)}
 		</div>,
