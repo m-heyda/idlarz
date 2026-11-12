@@ -7,11 +7,9 @@ import { pixelIconSrc, type PixelIconName, RESOURCE_PIXEL_ICONS } from '@/config
 import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { openMenuAt } from '@/lib/globalMenu';
 import { castleTimerLabel } from '@/lib/castleTimer';
-import { guideLive } from '@/lib/tutorial/live';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useViewStore } from '@/stores/viewStore';
-import { useWindowStore } from '@/stores/windowStore';
 import { formatHeaderAmount, formatPercent, formatRateAuto } from '@/utils/formatters';
 import PixelIcon from '../PixelIcon';
 
@@ -111,11 +109,9 @@ const CastleTimer: React.FC = () => {
 };
 
 /**
- * The top bar of the game screen drawn with the design system: the resource trays in the middle and on the right the castle timer, Deeds and the game menu (settings, save, export). The hero's portrait, the Gem shop and the windows are in the dock.
+ * The top bar of the game screen drawn with the design system: the resource trays in the middle and on the right the castle timer and the game menu (settings, save, export). The hero's portrait, the Gem shop and the windows are in the dock.
  */
 const HudTopBar: React.FC = () => {
-	const order = useWindowStore((state) => state.order);
-	const toggleWindow = useWindowStore((state) => state.toggleWindow);
 	const settingsOpen = useUiStore((state) => state.settingsOpen);
 
 	return (
@@ -123,15 +119,6 @@ const HudTopBar: React.FC = () => {
 			right={
 				<>
 					<CastleTimer />
-					{guideLive() && (
-						<GlyphButton
-							glyph='★'
-							label='Deeds'
-							active={order.includes('achievements')}
-							aria-pressed={order.includes('achievements')}
-							onClick={() => toggleWindow('achievements')}
-						/>
-					)}
 					<GlyphButton
 						glyph='⚙'
 						label='Game menu: settings, save, export'

@@ -16,10 +16,10 @@ const icon = (name: PixelIconName) => pixelIconSrc(name);
 
 /** The windows in the dock, in order. The stone tiles are the ones the game already had (IDL-326 reworks them); Farm and Crafting keep their buttons until the Hero window takes over crafting. */
 const WINDOWS: { id: WinId; label: string; icon: PixelIconName; tutorial: string }[] = [
-	{ id: 'equipment', label: 'Hero', icon: 'menu_equipment', tutorial: 'tab-equipment' },
+	{ id: 'equipment', label: 'Equip', icon: 'menu_equipment', tutorial: 'tab-equipment' },
 	{ id: 'merchant', label: 'Merchant', icon: 'menu_merchant', tutorial: 'tab-merchant' },
 	{ id: 'farm', label: 'Farm', icon: 'menu_farm', tutorial: 'tab-farm' },
-	{ id: 'crafting', label: 'Crafting', icon: 'menu_bag_scroll', tutorial: 'tab-crafting' },
+	{ id: 'crafting', label: 'Crafting', icon: 'menu_crafting', tutorial: 'tab-crafting' },
 ];
 
 /**
