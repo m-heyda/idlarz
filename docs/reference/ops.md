@@ -49,6 +49,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run restore-trust` | `tsx scripts/restore-trust.ts` |
 | `npm run migrate-saves` | `tsx scripts/migrate-saves.ts` |
 | `npm run seed-rehearsal` | `tsx scripts/seed-rehearsal-account.ts` |
+| `npm run seed-dev-world` | `tsx scripts/seed-dev-world.ts` |
 | `npm run gen-save-fixtures` | `tsx scripts/gen-save-fixtures.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
 | `npm run perk-caps` | `tsx scripts/perk-caps.ts` |

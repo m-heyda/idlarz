@@ -725,6 +725,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`reset-players.ts`](../../scripts/reset-players.ts) — Season restart:
 - [`reset-test-account.ts`](../../scripts/reset-test-account.ts) — Clears the game data of the ONE account the end-to-end tests use (docs/reference/ops.md), so a test run starts from a new game.
 - [`restore-trust.ts`](../../scripts/restore-trust.ts)
+- [`seed-dev-world.ts`](../../scripts/seed-dev-world.ts) — Gives ONE throwaway development account a fresh mid-game world (land, a castle upgrade, a few producer and extractor buildings, a little progress), so the windows can be tried by hand.
 - [`seed-rehearsal-account.ts`](../../scripts/seed-rehearsal-account.ts) — ~ Stops the run with a reason made of words only (a database error text could name a row or an address).
 - [`sim-classes.ts`](../../scripts/sim-classes.ts) — ~ Runs one sim (`--dump`:
 - [`sim-local.ts`](../../scripts/sim-local.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
