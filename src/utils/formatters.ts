@@ -5,7 +5,29 @@ const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx'];
  * Drops the zeros a fixed-decimals number carries at the end: "7.00" is "7", "1.50K" is "1.5K", "0.90" is "0.9", "1.00M" is "1M" (a number with no decimal point is left alone). Every number the game shows goes through this, so a value
  * never reads as 1.0K or 7.00.
  */
-export const tidy = (text: string): string => text.replace(/(\.\d*?)0+(?=\D|$)/, '$1').replace(/\.(?=\D|$)/, '');
+export const tidy = (text: string): string => {
+	const isDigit = (ch: string | undefined) => ch !== undefined && ch >= '0' && ch <= '9';
+	let out = text;
+	// the first number whose decimals end in zeros loses them (a linear scan: no regular expression, so a long run of zeros costs nothing extra)
+	for (let dot = out.indexOf('.'); dot >= 0; dot = out.indexOf('.', dot + 1)) {
+		let end = dot + 1;
+		while (isDigit(out[end])) end++;
+		let keep = end;
+		while (keep > dot + 1 && out[keep - 1] === '0') keep--;
+		if (keep < end) {
+			out = out.slice(0, keep) + out.slice(end);
+			break;
+		}
+	}
+	// then a point with no digits after it goes too: "7." is "7"
+	for (let dot = out.indexOf('.'); dot >= 0; dot = out.indexOf('.', dot + 1)) {
+		if (!isDigit(out[dot + 1])) {
+			out = out.slice(0, dot) + out.slice(dot + 1);
+			break;
+		}
+	}
+	return out;
+};
 
 /** "1.23M"-style text for |n| >= 1,000,000 up to the largest suffix, "1.23e24" past it; below 1e6 returns null. */
 const compact = (n: number): string | null => {
