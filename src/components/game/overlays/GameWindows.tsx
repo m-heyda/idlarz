@@ -13,7 +13,7 @@ import WindowErrorBoundary from '../WindowErrorBoundary';
 
 /**
  * Every game window, each open or not on its own: Equipment, Character, Merchant, Farm and the castle upgrade. They sit side by side,
- * can be dragged and resized from the bottom right corner, and the one you click comes to the front (see PixelWindow, its design-system twin GameWindow, and the window store). Windows move from PixelWindow to GameWindow one at a time as their new look is wired in (IDL-324). A closed window is not mounted, so
+ * can be dragged and resized from the bottom right corner, and the one you click comes to the front (see GameWindow and the window store; every window is a GameWindow now). A closed window is not mounted, so
  * the farm scene measures its real body and its critters only roam while the Farm is open.
  */
 const GameWindows: React.FC = () => {

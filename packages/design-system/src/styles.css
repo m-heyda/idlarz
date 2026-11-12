@@ -4188,3 +4188,29 @@ button.ds-income-head:hover {
 	text-align: center;
 	font-variant-numeric: tabular-nums;
 }
+
+/* a tooltip that is only a head (the chest) has no rule under it */
+.ds-tip-head:last-child {
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+/* the merchant trade ticket: more air between its blocks */
+.ds-ticket {
+	gap: 20px;
+}
+
+.ds-ticket .ds-amount {
+	gap: 14px;
+}
+
+.ds-ticket .ds-inset {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 14px 16px;
+}
+
+.ds-ticket > .ds-btn:last-child {
+	min-height: 44px;
+}

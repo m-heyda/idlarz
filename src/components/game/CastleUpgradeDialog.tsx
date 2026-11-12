@@ -7,7 +7,9 @@ import { formatCompact, formatNumber, formatPercent, formatTime } from '@/utils/
 import { castleModifier, castleUpgradeDuration } from '@/utils/game/castle';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import audioManager from '@/utils/audioManager';
-import PixelWindow from './PixelWindow';
+import GameWindow from './GameWindow';
+import { Button } from '../../../packages/design-system/src/components/primitives';
+import '@/styles/BuildModal.css';
 import { useWindowStore } from '@/stores/windowStore';
 import ResourceIcon from './ResourceIcon';
 import CastleSprite from './CastleSprite';
@@ -71,13 +73,16 @@ const CastleUpgradeDialog: FC = () => {
 	const rangeLabel = (radius: number) => `${radius * 2 + 1}x${radius * 2 + 1}`;
 
 	const CostGrid: React.FC<{ costs: Partial<Record<string, number>>; muted?: boolean }> = ({ costs, muted }) => (
-		<div className='grid grid-cols-3 gap-2'>
+		<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px 12px' }}>
 			{sortedCostEntries(costs).map(([resource, amount]) => (
 				<div
 					key={resource}
-					className={`flex items-center gap-1 text-sm ${
-						muted ? 'text-[#7a6a52]' : resources[resource as keyof typeof resources] >= amount ? 'text-green-400' : 'text-red-400'
-					}`}
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: 6,
+						color: muted ? '#7a7f90' : resources[resource as keyof typeof resources] >= amount ? '#5ee07a' : '#ff7a6a',
+					}}
 				>
 					<ResourceIcon resource={resource} />
 					{formatNumber(amount)}
@@ -86,98 +91,116 @@ const CastleUpgradeDialog: FC = () => {
 		</div>
 	);
 
+	// the rows of the bonus table: what the castle gives now and at the next level
+	const rows: { label: string; now: React.ReactNode; next: React.ReactNode; tone?: string }[] = [
+		{ label: 'All resources', now: `+${formatPercent(currentMultiplier * 100)}`, next: `+${formatPercent(nextMultiplier * 100)}`, tone: '#5ee07a' },
+		{ label: 'Castle XP / s', now: `+${formatCompact(currentXpBonus)}`, next: `+${formatCompact(nextXpBonus)}`, tone: '#ffb24a' },
+		...(nextRange > currentRange ? [{ label: 'Castle range', now: rangeLabel(currentRange), next: rangeLabel(nextRange), tone: '#c9a6ff' }] : []),
+		...(castleAreaBonus(castleLevel + 1) > castleAreaBonus(castleLevel)
+			? [
+					{
+						label: 'Area production',
+						now: `+${formatPercent(castleAreaBonus(castleLevel) * 100)}`,
+						next: `+${formatPercent(castleAreaBonus(castleLevel + 1) * 100)}`,
+						tone: '#c9a6ff',
+					},
+				]
+			: []),
+	];
+	const total = castleUpgrade ? castleUpgradeDuration(castleUpgrade.toLevel - 1, prestige) : 0;
+	const progress = castleUpgrade && total > 0 ? Math.min(1, Math.max(0, 1 - castleUpgrade.remainingSec / total)) : 0;
+
 	return (
-		<PixelWindow id='castle' title={`Castle ${castleLevel}/${CASTLE_UPGRADE.maxLevel}`} width={460}>
-			<div className='flex items-end justify-center gap-6 mb-4 min-h-[88px]'>
-				<div className='flex flex-col items-center gap-1'>
-					<CastleSprite level={castleLevel} variant='inline' />
-					<span className='text-xs text-[#a89878]'>Level {castleLevel}</span>
+		<GameWindow id='castle' title={`Castle ${castleLevel}/${CASTLE_UPGRADE.maxLevel}`} width={600} height={700}>
+			<div className='bw-main' style={{ gap: 14 }}>
+				<div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 28, minHeight: 96 }}>
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+						<CastleSprite level={castleLevel} variant='inline' />
+						<span className='ds-dim' style={{ fontSize: 12 }}>
+							Level {castleLevel}
+						</span>
+					</div>
+					{!isMaxLevel && (
+						<>
+							<span style={{ fontSize: 26, color: '#f4d57e', paddingBottom: 26 }}>→</span>
+							<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: 0.85 }}>
+								<CastleSprite level={castleLevel + 1} variant='inline' />
+								<span style={{ fontSize: 12, color: '#f4d57e' }}>Level {castleLevel + 1}</span>
+							</div>
+						</>
+					)}
 				</div>
-				{!isMaxLevel && (
-					<>
-						<span className='text-2xl text-[#f0d27a] pb-6'>→</span>
-						<div className='flex flex-col items-center gap-1 opacity-80'>
-							<CastleSprite level={castleLevel + 1} variant='inline' />
-							<span className='text-xs text-[#f0d27a]'>Level {castleLevel + 1}</span>
+
+				{castleUpgrade && (
+					<div className='ds-listrow bw-upgrade'>
+						<div className='bw-label'>Upgrading to level {castleUpgrade.toLevel}</div>
+						<div className='bw-bar'>
+							<div className='bw-bar-fill' style={{ width: `${Math.round(progress * 100)}%` }} />
 						</div>
-					</>
+						<div className='bw-note'>{formatTime(castleUpgrade.remainingSec)} left. The castle keeps its current bonus until the work is done.</div>
+					</div>
 				)}
-			</div>
-			<div className='text-sm text-[#a89878] mb-1'>
-				Current bonus: <span className='text-green-400'>+{formatPercent(currentMultiplier * 100)}</span> to all resources
-			</div>
-			<div className='text-sm text-[#a89878] mb-3'>
-				Castle XP: <span className='text-amber-400'>+{formatCompact(currentXpBonus)} XP/s</span> flat
-			</div>
 
-			{castleUpgrade && (
-				<div className='px-card mb-3 text-center'>
-					<div className='px-h'>Upgrading to level {castleUpgrade.toLevel}</div>
-					<div className='text-amber-300 text-lg'>{formatTime(castleUpgrade.remainingSec)}</div>
-					<div className='text-xs text-[#a89878]'>The castle keeps its current bonus until the work is done.</div>
-				</div>
-			)}
-
-			{!isMaxLevel && nextLevelCosts ? (
-				<>
-					<div className='text-sm text-[#a89878] mb-1'>
-						Next level: <span className='text-green-400'>+{formatPercent(nextMultiplier * 100)}</span> to all resources
+				<div className='ds-listrow'>
+					<div className='bw-table'>
+						<span className='bw-label'>Castle bonus</span>
+						<span className='bw-col'>Now</span>
+						<span className='bw-col'>{isMaxLevel ? '' : `Level ${castleLevel + 1}`}</span>
+						{rows.map((row) => (
+							<React.Fragment key={row.label}>
+								<span>{row.label}</span>
+								<span className='bw-num' style={{ color: row.tone }}>
+									{row.now}
+								</span>
+								<span className='bw-num' style={{ color: row.tone }}>
+									{isMaxLevel ? '' : row.next}
+								</span>
+							</React.Fragment>
+						))}
 					</div>
-					<div className='text-sm text-[#a89878] mb-3'>
-						Castle XP: <span className='text-amber-400'>+{formatCompact(nextXpBonus)} XP/s</span> flat
-						{nextRange > currentRange && (
-							<div>
-								Castle range: <span className='text-violet-300'>{rangeLabel(currentRange)}</span> {'→'}{' '}
-								<span className='text-violet-300'>{rangeLabel(nextRange)}</span>
-							</div>
-						)}
-						{castleAreaBonus(castleLevel + 1) > castleAreaBonus(castleLevel) && (
-							<div>
-								Castle area production: <span className='text-violet-300'>+{formatPercent(castleAreaBonus(castleLevel) * 100)}</span> {'→'}{' '}
-								<span className='text-violet-300'>+{formatPercent(castleAreaBonus(castleLevel + 1) * 100)}</span>
-							</div>
-						)}
-					</div>
-
-					{!isNextToMaxLevel && afterNextLevelCosts && (
-						<div className='text-[#7a6a52] text-xs mb-3'>
+					{!isMaxLevel && !isNextToMaxLevel && afterNextLevelCosts && (
+						<div className='bw-note'>
 							Level {castleLevel + 2}: +{formatPercent(afterNextMultiplier * 100)} to all resources, +{formatCompact(afterNextXpBonus)} XP/s
 						</div>
 					)}
+				</div>
 
-					<div className='px-card mb-3'>
-						<div className='px-h'>Upgrade Cost</div>
-						<CostGrid costs={nextLevelCosts} />
-						<div className='text-xs text-[#a89878] mt-2'>Build time: {formatTime(duration)}</div>
-					</div>
+				{!isMaxLevel && nextLevelCosts ? (
+					<>
+						<div className='ds-listrow bw-upgrade'>
+							<div className='bw-label'>Upgrade to level {castleLevel + 1}</div>
+							<CostGrid costs={nextLevelCosts} />
+							<div className='bw-foot'>
+								<span className='bw-time'>Takes {formatTime(duration)}</span>
+							</div>
+						</div>
 
-					{!isNextToMaxLevel && afterNextLevelCosts && (
-						<>
-							<div className='text-xs text-[#a89878] mb-1'>Next upgrade cost</div>
-							<CostGrid costs={afterNextLevelCosts} muted />
-						</>
-					)}
+						{!isNextToMaxLevel && afterNextLevelCosts && (
+							<div className='ds-listrow'>
+								<div className='bw-label' style={{ color: '#7a7f90' }}>
+									Next upgrade cost
+								</div>
+								<CostGrid costs={afterNextLevelCosts} muted />
+							</div>
+						)}
 
-					<div className='flex justify-between mt-5'>
-						<button onClick={onClose} className='px-btn px-btn-red'>
-							Cancel
-						</button>
-						<button onClick={handleUpgrade} disabled={!canAfford} className='px-btn' data-tutorial='castle-upgrade'>
-							Upgrade Castle
-						</button>
+						<div className='bw-foot' style={{ marginTop: 4 }}>
+							<Button onClick={onClose}>Cancel</Button>
+							<Button tone='gold' onClick={handleUpgrade} disabled={!canAfford} data-tutorial='castle-upgrade'>
+								Upgrade castle
+							</Button>
+						</div>
+					</>
+				) : (
+					<div className='ds-listrow' style={{ textAlign: 'center' }}>
+						<div className='bw-up'>Your castle has reached its maximum level!</div>
+						<div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
+							<Button onClick={onClose}>Close</Button>
+						</div>
 					</div>
-				</>
-			) : (
-				<>
-					<div className='text-amber-400 mb-4'>Your castle has reached its maximum level!</div>
-					<div className='flex justify-center'>
-						<button onClick={onClose} className='px-btn px-btn-blue'>
-							Close
-						</button>
-					</div>
-				</>
-			)}
-		</PixelWindow>
+				)}
+			</div>
+		</GameWindow>
 	);
 };
 
