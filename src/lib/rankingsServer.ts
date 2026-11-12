@@ -49,7 +49,11 @@ export const refreshIfDue = async (db: SupabaseClient, nowMs = Date.now()): Prom
 	const last = typeof meta.data?.refreshed_at === 'string' ? meta.data.refreshed_at : null;
 	if (last && nowMs - Date.parse(last) < RANKING_REFRESH_MS) return last;
 	const done = await db.rpc('refresh_rankings', refreshArgs());
-	if (done.error) throw new Error(done.error.message);
+	// a failed rebuild must not hide the places that exist: serve the last ones, and only fail when there never were any
+	if (done.error) {
+		if (last) return last;
+		throw new Error(done.error.message);
+	}
 	const again = await db.from('ranking_meta').select('refreshed_at').eq('id', true).maybeSingle();
 	return typeof again.data?.refreshed_at === 'string' ? again.data.refreshed_at : last;
 };

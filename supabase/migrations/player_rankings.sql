@@ -117,7 +117,8 @@ begin
    where not exists (select 1 from public.player_stats s where s.user_id = r.user_id and s.trusted);
 
   update public.player_rankings set
-    prev_rank_level = rank_level, prev_rank_rebirths = rank_rebirths, prev_rank_crafting = rank_crafting, prev_rank_tiles = rank_tiles;
+    prev_rank_level = rank_level, prev_rank_rebirths = rank_rebirths, prev_rank_crafting = rank_crafting, prev_rank_tiles = rank_tiles
+  where true;
 
   insert into public.player_rankings (user_id, level, xp, level_maxed_at, rebirths, legacy_earned, craft_xp, craft_maxed_at, best_tiles, updated_at)
   select s.user_id, s.level, coalesce(p.xp, 0), case when s.level >= p_level_cap then now() end,
