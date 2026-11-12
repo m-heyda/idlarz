@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { NICK_COLORS, inkOn, nickColorValue } from '../../src/config/nickColors';
 import {
 	BADGE_NONE,
 	badgeOptions,
@@ -73,18 +74,37 @@ test('shownIdentity is the one rule for badge and title by a name (character win
 	assert.equal(shownIdentity({ badgeId: null, titleId: 'early-tester' }, []).title, null);
 });
 
-test('name colours: twelve need the unlock (or admin), gold needs admin, null is always fine', () => {
-	const locked = { admin: false, unlocked: false };
-	const bought = { admin: false, unlocked: true };
-	const admin = { admin: true, unlocked: false };
+test('name colours: plain ones need the unlock, the rainbow its own, gold needs admin, null is always fine', () => {
+	const locked = { admin: false, unlocked: false, rainbow: false };
+	const bought = { admin: false, unlocked: true, rainbow: false };
+	const rainbow = { admin: false, unlocked: false, rainbow: true };
+	const admin = { admin: true, unlocked: false, rainbow: false };
 	assert.deepEqual(checkNameColor(null, locked), { ok: true, nameColor: null });
 	assert.equal(checkNameColor('crimson', locked).ok, false);
 	assert.deepEqual(checkNameColor('crimson', bought), { ok: true, nameColor: 'crimson' });
 	assert.deepEqual(checkNameColor('crimson', admin), { ok: true, nameColor: 'crimson' });
+	assert.deepEqual(checkNameColor('mint', bought), { ok: true, nameColor: 'mint' });
+	assert.equal(checkNameColor('rainbow', bought).ok, false, 'the plain unlock does not include the rainbow');
+	assert.deepEqual(checkNameColor('rainbow', rainbow), { ok: true, nameColor: 'rainbow' });
+	assert.equal(checkNameColor('crimson', rainbow).ok, false, 'the rainbow does not include the plain colours');
+	assert.deepEqual(checkNameColor('rainbow', admin), { ok: true, nameColor: 'rainbow' });
 	assert.equal(checkNameColor('gold', bought).ok, false);
+	assert.equal(checkNameColor('gold', rainbow).ok, false);
 	assert.deepEqual(checkNameColor('gold', admin), { ok: true, nameColor: 'gold' });
 	assert.equal(checkNameColor('hotpink', admin).ok, false);
 	assert.equal(checkNameColor(7, admin).ok, false);
+});
+
+test('the palette has fourteen distinct plain colours, and the rainbow and gold are not among them', () => {
+	assert.equal(NICK_COLORS.length, 14);
+	assert.equal(new Set(NICK_COLORS.map((c) => c.id)).size, 14);
+	assert.ok(!NICK_COLORS.some((c) => c.id === 'rainbow' || c.id === 'gold'));
+	assert.equal(nickColorValue('rainbow'), 'rainbow');
+	assert.equal(nickColorValue('gold'), 'gold');
+	assert.equal(nickColorValue('teal'), '#2dd4bf');
+	assert.equal(nickColorValue(null), undefined);
+	assert.equal(inkOn('#e8e46a'), '#1a1208');
+	assert.equal(inkOn('#4f8df5'), '#ffffff');
 });
 
 test('a stored gold nickname is only shown for an admin; shownIdentity carries the colour', () => {

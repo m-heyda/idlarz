@@ -874,7 +874,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 43,
+  "line": 45,
   "summary": "The gem shop's price book: what each service costs and how often it can be bought.",
   "see": []
  },
@@ -885,7 +885,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 82,
+  "line": 93,
   "summary": "The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.",
   "see": []
  },
@@ -953,8 +953,8 @@
   "kind": "const",
   "category": "Progression/Badges",
   "file": "src/config/nickColors.ts",
-  "line": 16,
-  "summary": "The twelve colours of the picker, in the order the swatches are drawn. Bought once for the whole account in the Gem shop (\"Name colours\", `NICK_COLORS_ITEM`); stored on `profiles.name_color`.",
+  "line": 17,
+  "summary": "The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). Bought once for the whole account in the Gem shop (\"Name colours\", `NICK_COLORS_ITEM`); stored on `profiles.name_color`. The animated **Rainbow** (`NICK_RAINBOW`) is a separate purchase (`NICK_RAINBOW_ITEM`) and the gold nickname with stars (`NICK_GOLD`) is for admin accounts only.",
   "see": []
  },
  {
@@ -2165,7 +2165,7 @@
   "kind": "function",
   "category": "Saves & Server/Away time",
   "file": "src/lib/offline/away.ts",
-  "line": 22,
+  "line": 23,
   "summary": "The read-only `away` block of `GET /api/auth/me`: gap = now minus the later of the ledger anchor and the last accepted save (as `claimOffline` measures it), with the cap and efficiency the last save stored (`derived.offlineCapSec` / `offlineEfficiency`, the base limits when an older row lacks them). `null` with no save, an unreadable time, or a gap under `offlineMinGapSec` (nothing to show). It never claims anything and never touches the ledger.",
   "see": []
  },

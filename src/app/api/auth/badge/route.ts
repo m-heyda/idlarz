@@ -2,29 +2,27 @@ import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { fail, json, readBody, unavailable } from '@/lib/authRoute';
 import { requirePlayer } from '@/lib/playerRoute';
 import { loadEarnedAchievements } from '@/lib/avatarServer';
-import { loadBadgeChoice, loadNameColorsBought, writeBadgeChoice, writeNameColor } from '@/lib/badgeServer';
+import { loadBadgeChoice, loadNameColorAccess, writeBadgeChoice, writeNameColor } from '@/lib/badgeServer';
 import { checkBadgeChoice, checkNameColor, shownNameColor, titleOptions } from '@/catalog/badges';
 import { isRecord } from '@/lib/isRecord';
 
 export const dynamic = 'force-dynamic';
 
-/** The badge, title and nickname colour the profile shows (`null` badge = the default, `"none"` = hidden), the achievements it has earned (they decide what it may pick), and what the colour picker allows: `colorsUnlocked` (bought in the Gem shop, or admin) and `admin`. */
+/** The badge, title and nickname colour the profile shows (`null` badge = the default, `"none"` = hidden), the achievements it has earned (they decide what it may pick), and what the colour picker allows: `colorsUnlocked` and `rainbowUnlocked` (bought in the Gem shop, or admin / a development build) and `admin` (gold). */
 export async function GET() {
 	try {
 		const player = await requirePlayer();
 		if (!player.userId) return player.response;
 		const admin = createSupabaseAdmin();
-		const [stored, earned, bought] = await Promise.all([
-			loadBadgeChoice(admin, player.userId),
-			loadEarnedAchievements(admin, player.userId),
-			loadNameColorsBought(admin, player.userId),
-		]);
+		const stored = await loadBadgeChoice(admin, player.userId);
+		const [earned, access] = await Promise.all([loadEarnedAchievements(admin, player.userId), loadNameColorAccess(admin, player.userId, stored.admin)]);
 		return json({
 			badgeId: stored.badgeId,
 			titleId: stored.titleId,
-			nameColor: shownNameColor(stored.nameColor, stored.admin),
-			colorsUnlocked: stored.admin || bought,
-			admin: stored.admin,
+			nameColor: shownNameColor(stored.nameColor, access.admin),
+			colorsUnlocked: access.unlocked,
+			rainbowUnlocked: access.rainbow,
+			admin: access.admin,
 			earned,
 		});
 	} catch {
@@ -45,8 +43,7 @@ export async function POST(request: Request) {
 		const admin = createSupabaseAdmin();
 		const stored = await loadBadgeChoice(admin, player.userId);
 		if ('nameColor' in body) {
-			const unlocked = stored.admin || (await loadNameColorsBought(admin, player.userId));
-			const color = checkNameColor(body.nameColor ?? null, { admin: stored.admin, unlocked });
+			const color = checkNameColor(body.nameColor ?? null, await loadNameColorAccess(admin, player.userId, stored.admin));
 			if (!color.ok) return fail(color.error, 400);
 			await writeNameColor(admin, player.userId, color.nameColor);
 			if (!('badgeId' in body) && !('titleId' in body)) return json({ ok: true, nameColor: color.nameColor });

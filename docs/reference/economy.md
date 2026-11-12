@@ -1209,7 +1209,7 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:43`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:45`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
@@ -1218,6 +1218,8 @@ The gem shop's price book: what each service costs and how often it can be bough
 - **Attribute respec** (300): gives back every attribute point outside a rebirth (a rebirth does it free). **The first respec of an account is free** (a mistake with the new server-held allocation is forgiven once).
 
 - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
+
+- **Rainbow name** (500, once): unlocks the animated rainbow nickname, a separate purchase on top of the plain colours; also bought from the name window.
 
 Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
 
@@ -1228,13 +1230,14 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 | Change class | identity | 500 | none | Take another hero class and its passives. Not during a fight. |
 | Change name | identity | 200 | 30 days | Pick a new hero name. Once every 30 days. |
 | Respec attributes | identity | 300 | none | Get every attribute point back to spend again. The first one is free. |
-| Name colours | identity | 1000 | none | Unlock the colour picker: twelve colours for your nickname in the game, the landing page and the rankings. |
+| Name colours | identity | 1000 | none | Unlock the colour picker: fourteen colours for your nickname in the game, the landing page and the rankings. |
+| Rainbow name | identity | 500 | none | An animated rainbow nickname that shifts through every colour. Bought once, on top of Name colours. |
 
 <a id="daily-bonus-gems"></a>
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:82`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:93`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 

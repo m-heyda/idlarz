@@ -178,12 +178,13 @@ export const chooseAvatar = async (avatarId: string): Promise<AvatarSendResult> 
 		return { ok: false, message: 'The server could not be reached. Try again in a moment.' };
 	}
 };
-/** The badge, title and nickname colour of the profile (`GET /api/auth/badge`), the achievements that decide what can be picked, and whether the colour picker is open (`colorsUnlocked`: bought in the Gem shop, or admin; `admin`: the owner's account, which also has the gold nickname). */
+/** The badge, title and nickname colour of the profile (`GET /api/auth/badge`), the achievements that decide what can be picked, and whether the colour picker is open (`colorsUnlocked` / `rainbowUnlocked`: bought in the Gem shop, or admin or a development build; `admin`: the owner's account, which also has the gold nickname). */
 export interface BadgeState {
 	badgeId: string | null;
 	titleId: string | null;
 	nameColor: string | null;
 	colorsUnlocked: boolean;
+	rainbowUnlocked: boolean;
 	admin: boolean;
 	earned: string[];
 }
@@ -197,6 +198,7 @@ export const fetchBadges = async (): Promise<BadgeState | null> => {
 			titleId?: unknown;
 			nameColor?: unknown;
 			colorsUnlocked?: unknown;
+			rainbowUnlocked?: unknown;
 			admin?: unknown;
 			earned?: unknown;
 		} | null;
@@ -206,6 +208,7 @@ export const fetchBadges = async (): Promise<BadgeState | null> => {
 			titleId: typeof body.titleId === 'string' ? body.titleId : null,
 			nameColor: typeof body.nameColor === 'string' ? body.nameColor : null,
 			colorsUnlocked: body.colorsUnlocked === true,
+			rainbowUnlocked: body.rainbowUnlocked === true,
 			admin: body.admin === true,
 			earned: body.earned.filter((id): id is string => typeof id === 'string'),
 		};

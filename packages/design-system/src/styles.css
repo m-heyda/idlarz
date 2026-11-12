@@ -1133,6 +1133,23 @@
 		inset 0 0 0 3px var(--ds-gold);
 }
 
+/* an item the player already has at its top: a purple plate that is not clickable, and its row looks a little quiet */
+.ds-btn-max {
+	pointer-events: none;
+	letter-spacing: 0.12em;
+}
+
+.ds-listrow[data-owned='true'] {
+	opacity: 0.72;
+}
+
+.ds-btn-purple {
+	border-color: #2b1450;
+	background: linear-gradient(#a56bf0, #6a34b8);
+	color: #fff;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
 .ds-btn-danger {
 	border-color: #3d0f0a;
 	background: linear-gradient(#e0513f, #a3281c);
@@ -1931,14 +1948,25 @@
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
 	color: transparent;
-	filter: drop-shadow(0 0 5px rgba(255, 207, 90, 0.75));
+	filter: drop-shadow(0 0 4px rgba(255, 207, 90, 0.95)) drop-shadow(0 0 11px rgba(255, 184, 60, 0.7));
 	animation: ds-nick-shine 3.2s linear infinite;
+}
+
+.ds-nick-rainbow .ds-nick-text {
+	background: linear-gradient(90deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+	filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.45)) drop-shadow(0 0 11px rgba(168, 120, 255, 0.6));
+	animation: ds-nick-flow 4s linear infinite;
 }
 
 .ds-nick-star {
 	position: absolute;
-	width: 7px;
-	height: 7px;
+	width: 9px;
+	height: 9px;
 	pointer-events: none;
 	background: #fff7d1;
 	clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
@@ -1963,6 +1991,12 @@
 	animation-delay: 1.6s;
 }
 
+@keyframes ds-nick-flow {
+	to {
+		background-position: -200% 0;
+	}
+}
+
 @keyframes ds-nick-shine {
 	to {
 		background-position: -220% 0;
@@ -1983,6 +2017,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.ds-nick-gold .ds-nick-text,
+	.ds-nick-rainbow .ds-nick-text,
 	.ds-nick-star {
 		animation: none;
 	}
@@ -4195,64 +4230,82 @@ button.ds-income-head:hover {
 
 .ds-swatch-grid {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 8px;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 6px;
 	margin-top: 6px;
 }
 
+/* a palette tile: filled with its colour, the name on it in the ink that reads best (--swatch, --ink) */
 .ds-swatch {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
-	padding: 8px 4px;
+	position: relative;
+	display: grid;
+	place-items: center;
+	height: 38px;
+	padding: 0 4px;
 	font-family: inherit;
 	font-size: 11px;
-	text-transform: uppercase;
+	font-weight: 700;
 	letter-spacing: 0.04em;
-	color: var(--ds-text, #e9e4d6);
+	text-transform: uppercase;
+	color: var(--ink, #fff);
 	cursor: pointer;
-	background: rgba(0, 0, 0, 0.35);
-	border: 1px solid var(--ds-line-dk, #2a2118);
-	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+	background: var(--swatch, #222);
+	border: 1px solid rgba(0, 0, 0, 0.7);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.3),
+		inset 0 -2px 0 rgba(0, 0, 0, 0.25);
 }
 
 .ds-swatch:hover {
-	filter: brightness(1.2);
+	filter: brightness(1.12);
 }
 
 .ds-swatch[data-selected='true'] {
-	border-color: var(--ds-gold, #e0a93a);
-	background: rgba(224, 169, 58, 0.14);
+	outline: 2px solid var(--ds-gold, #e0a93a);
+	outline-offset: 1px;
 }
 
+.ds-swatch[data-selected='true']::after {
+	content: '✓';
+	position: absolute;
+	top: 1px;
+	right: 4px;
+	font-size: 10px;
+}
+
+/* not unlocked yet: it still previews, but looks quiet */
 .ds-swatch[aria-disabled='true'] {
 	opacity: 0.6;
 }
 
 .ds-swatch[aria-disabled='true'][data-selected='true'] {
-	border-style: dashed;
+	outline-style: dashed;
 }
 
-.ds-swatch-chip {
-	width: 34px;
-	height: 22px;
-	border: 1px solid rgba(0, 0, 0, 0.6);
-	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+.ds-swatch-default {
+	color: #d7ceb8;
+	background: repeating-linear-gradient(135deg, #14161d 0 6px, #1c1f29 6px 12px);
+	border: 1px dashed #7a7566;
 }
 
-.ds-swatch-none {
-	display: grid;
-	place-items: center;
-	background: none;
-	border: 1px dashed #6c6a60;
-	color: #8a8676;
-	font-size: 12px;
+.ds-swatch-rainbow {
+	color: #fff;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+	background: linear-gradient(100deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
+	background-size: 200% 100%;
+	animation: ds-nick-flow 5s linear infinite;
 }
 
-.ds-swatch-chip-gold {
+.ds-swatch-gold {
+	color: #2a1a05;
 	background: linear-gradient(100deg, #a8741a, #ffd866 40%, #fff7d1 55%, #ffd866 70%, #a8741a);
-	box-shadow: 0 0 8px rgba(255, 207, 90, 0.7);
+	box-shadow: 0 0 10px rgba(255, 207, 90, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-swatch-rainbow {
+		animation: none;
+	}
 }
 
 .ds-lock-banner button {

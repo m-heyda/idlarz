@@ -3,7 +3,10 @@ import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
 import { chooseBadge, chooseNameColor, fetchBadges } from '@/lib/authClient';
 import { BADGE_NONE, badgeOptions, shownBadge, shownTitle, titleOptions } from '@/catalog/badges';
-import { NICK_COLORS, NICK_GOLD, nickColorValue } from '@/config/nickColors';
+import { NICK_COLORS, NICK_GOLD, NICK_RAINBOW, NICK_RAINBOW_ITEM, inkOn, nickColorValue } from '@/config/nickColors';
+import { gemItemById } from '@/config/gemShop';
+import { useGemStore } from '@/stores/gemStore';
+import GemIcon from './GemIcon';
 import audioManager from '@/utils/audioManager';
 import GameModal from './GameModal';
 import { Button, SectionLabel } from '../../../packages/design-system/src/components/primitives';
@@ -22,7 +25,7 @@ export const useBadgeChoice = (): void => {
 };
 
 /**
- * The name, badge and title window (click the name, the title or the badge in the Character window). Two columns: on the left the nickname colour (twelve colours, locked until "Name colours" is bought in the Gem shop; the admin account has them free, plus the gold nickname with glowing stars),
+ * The name, badge and title window (click the name, the title or the badge in the Character window). Two columns: on the left the nickname colour (fourteen colours, locked until "Name colours" is bought in the Gem shop; the animated Rainbow is bought right here; the admin account, and every development build, has all of them plus the gold nickname with glowing stars),
  * on the right the title and the badge (earned ones only; the badge can be hidden). A pick shows at once and is saved on the profile (`POST /api/auth/badge`), which is what the landing page and the rankings read; a refusal puts the previous choice back and shows why.
  */
 const BadgeDialog: React.FC = () => {
@@ -64,14 +67,32 @@ const BadgeDialog: React.FC = () => {
 		}
 	};
 
-	/** A locked picker only previews the colour (the name above changes, nothing is stored or sent) */
+	/** Whether a colour is still locked for this account (it can only be tried on the preview) */
+	const lockedColor = (id: string | null): boolean =>
+		id === null || id === NICK_GOLD ? false : id === NICK_RAINBOW ? !badge.rainbowUnlocked : !badge.colorsUnlocked;
+
+	/** A locked colour only previews (the name above changes, nothing is stored or sent) */
 	const pickColor = async (nameColor: string | null) => {
-		if (locked) {
+		if (lockedColor(nameColor)) {
 			audioManager.playSound('click');
 			setTried(nameColor);
 			return;
 		}
+		setTried(undefined);
 		await saveColor(nameColor);
+	};
+
+	/** Buys the Rainbow name from here (the server charges and refuses a short balance), then reads the unlocks again */
+	const buyRainbow = async () => {
+		setError(null);
+		const reply = await useGemStore.getState().buy(NICK_RAINBOW_ITEM);
+		if (!reply?.ok) {
+			setError(reply?.message ?? 'The purchase did not go through.');
+			return;
+		}
+		const state = await fetchBadges();
+		if (state) setBadge(state);
+		setTried(undefined);
 	};
 
 	const saveColor = async (nameColor: string | null) => {
@@ -96,7 +117,8 @@ const BadgeDialog: React.FC = () => {
 	const shown = shownBadge(badge.badgeId, badge.earned);
 	const title = shownTitle(badge.titleId, badge.earned);
 	const locked = !badge.colorsUnlocked;
-	const previewColor = hovered !== undefined ? hovered : locked && tried !== undefined ? tried : badge.nameColor;
+	const rainbowPrice = gemItemById(NICK_RAINBOW_ITEM)?.price ?? 0;
+	const previewColor = hovered !== undefined ? hovered : tried !== undefined && lockedColor(tried) ? tried : badge.nameColor;
 
 	return (
 		<GameModal title='Name, badge and title' width={1080} onClose={close}>
@@ -117,54 +139,70 @@ const BadgeDialog: React.FC = () => {
 					<SectionLabel>Name colour</SectionLabel>
 					{locked && (
 						<div className='ds-lock-banner' data-testid='color-locked'>
-							<span>🔒 Name colours are locked. Click a colour to preview it, unlock all twelve for good in the Gem shop.</span>
+							<span>🔒 Name colours are locked. Click a colour to try it on, unlock all fourteen for good in the Gem shop.</span>
 							<Button tone='gold' onClick={goToShop}>
 								Open Gem shop
 							</Button>
 						</div>
 					)}
-					<div className='ds-swatch-grid' data-locked={locked} data-testid='color-grid' onMouseLeave={() => setHovered(undefined)}>
-						<button
-							type='button'
-							className='ds-swatch'
-							data-selected={previewColor === null}
-							aria-disabled={locked}
-							onMouseEnter={() => setHovered(null)}
-							onClick={() => void pickColor(null)}
-							title='Default colour'
-						>
-							<span className='ds-swatch-chip ds-swatch-none'>✕</span>
-							<span>Default</span>
-						</button>
+					<div className='ds-swatch-grid' data-testid='color-grid' onMouseLeave={() => setHovered(undefined)}>
 						{NICK_COLORS.map((color) => (
 							<button
 								key={color.id}
 								type='button'
 								className='ds-swatch'
+								style={{ ['--swatch' as string]: color.hex, ['--ink' as string]: inkOn(color.hex) }}
 								data-selected={previewColor === color.id}
 								aria-disabled={locked}
 								onMouseEnter={() => setHovered(color.id)}
 								onClick={() => void pickColor(color.id)}
 								title={color.name}
 							>
-								<span className='ds-swatch-chip' style={{ background: color.hex }} />
-								<span>{color.name}</span>
+								{color.name}
 							</button>
 						))}
+						<button
+							type='button'
+							className='ds-swatch ds-swatch-default'
+							data-selected={previewColor === null}
+							onMouseEnter={() => setHovered(null)}
+							onClick={() => void pickColor(null)}
+							title='No colour: the normal text colour'
+						>
+							No colour
+						</button>
+						<button
+							type='button'
+							className='ds-swatch ds-swatch-rainbow'
+							data-selected={previewColor === NICK_RAINBOW}
+							aria-disabled={!badge.rainbowUnlocked}
+							onMouseEnter={() => setHovered(NICK_RAINBOW)}
+							onClick={() => void pickColor(NICK_RAINBOW)}
+							title='Animated rainbow'
+						>
+							Rainbow
+						</button>
 						{badge.admin && (
 							<button
 								type='button'
-								className='ds-swatch'
+								className='ds-swatch ds-swatch-gold'
 								data-selected={previewColor === NICK_GOLD}
 								onMouseEnter={() => setHovered(NICK_GOLD)}
 								onClick={() => void saveColor(NICK_GOLD)}
 								title='Gold with glowing stars (admin)'
 							>
-								<span className='ds-swatch-chip ds-swatch-chip-gold' />
-								<span>Gold</span>
+								Gold
 							</button>
 						)}
 					</div>
+					{!badge.rainbowUnlocked && (
+						<div className='ds-lock-banner' data-testid='rainbow-locked'>
+							<span>🌈 Rainbow name: an animated nickname that shifts through every colour.</span>
+							<Button tone='gold' onClick={() => void buyRainbow()}>
+								Unlock {rainbowPrice} <GemIcon />
+							</Button>
+						</div>
+					)}
 				</section>
 
 				<section>

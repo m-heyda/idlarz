@@ -1,5 +1,5 @@
 import { ACHIEVEMENTS, achievementById, type AchievementDef } from '@/catalog/achievements';
-import { NICK_GOLD, isNickColorId } from '@/config/nickColors';
+import { NICK_GOLD, NICK_RAINBOW, isNickColorId } from '@/config/nickColors';
 
 /** The stored `profiles.badge_id` that hides the badge completely (null = the default). */
 export const BADGE_NONE = 'none';
@@ -50,21 +50,26 @@ export interface ShownIdentity {
 	nameColor: string | null;
 }
 
-/** What decides which nickname colours an account may use: the admin flag (`profiles.is_admin`) and whether the Name colours item was bought (`ledger.gemShop.bought`). */
+/**
+ * What decides which nickname colours an account may use: the admin flag (`profiles.is_admin`, or a development build, see `DEV_UNLOCK_COLOURS`), whether the Name colours item was bought (`unlocked`: the fourteen plain colours)
+ * and whether the Rainbow item was bought (`rainbow`), both from `ledger.gemShop.bought`. An admin has all of them.
+ */
 export interface NameColorAccess {
 	admin: boolean;
 	unlocked: boolean;
+	rainbow: boolean;
 }
 
 /** The colour to draw for a stored `profiles.name_color`: null when unset, unknown, or gold on an account that is not an admin. A paid colour stays shown (it was checked when it was stored). */
 export const shownNameColor = (stored: string | null | undefined, admin: boolean): string | null =>
 	isNickColorId(stored) && (stored !== NICK_GOLD || admin) ? stored : null;
 
-/** Validates a colour a player asks for (null = back to the default): one of the twelve needs the unlock (or admin), gold needs admin. */
+/** Validates a colour a player asks for (null = back to the default): a plain colour needs the Name colours unlock, the rainbow needs its own unlock, gold needs admin; an admin may have any. */
 export const checkNameColor = (input: unknown, access: NameColorAccess): { ok: true; nameColor: string | null } | { ok: false; error: string } => {
 	if (input === null) return { ok: true, nameColor: null };
 	if (!isNickColorId(input)) return { ok: false, error: 'Pick one of the colours.' };
 	if (input === NICK_GOLD) return access.admin ? { ok: true, nameColor: input } : { ok: false, error: 'That colour is not for sale.' };
+	if (input === NICK_RAINBOW) return access.admin || access.rainbow ? { ok: true, nameColor: input } : { ok: false, error: 'Unlock the rainbow name first.' };
 	if (!access.admin && !access.unlocked) return { ok: false, error: 'Unlock name colours in the Gem shop first.' };
 	return { ok: true, nameColor: input };
 };

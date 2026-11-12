@@ -181,6 +181,21 @@ test('Name colours: a one-time purchase of 1000 gems, a second one is refused an
 	assert.equal(short.reason, 'short_balance');
 });
 
+test('Rainbow name: a separate one-time purchase of 500 gems that leaves Name colours alone', async () => {
+	const { m } = await started();
+	const ledger = m.ledgers.get(ID)!;
+	m.ledgers.set(ID, { ...ledger, gems: 700 });
+	const bought = ok(await gems(m, { action: 'spend', itemId: 'name_rainbow' }, T0 + STEP));
+	assert.equal(bought.ok, true);
+	assert.equal(bought.paid, 500);
+	assert.equal(bought.gems, 200);
+	assert.equal(bought.bought.name_rainbow, 1);
+	assert.equal(bought.bought.name_colors, undefined);
+	const again = ok(await gems(m, { action: 'spend', itemId: 'name_rainbow' }, T0 + STEP + 1000));
+	assert.equal(again.reason, 'already_owned');
+	assert.equal(m.ledgers.get(ID)!.gems, 200);
+});
+
 test('a short balance refuses and charges nothing', async () => {
 	const { m } = await started();
 	const ledger = m.ledgers.get(ID)!;

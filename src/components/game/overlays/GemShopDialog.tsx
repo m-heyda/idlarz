@@ -68,11 +68,7 @@ const GemShopDialog: React.FC = () => {
 
 	/** The state of an item for the row: its price now, and why it cannot be bought (null = it can). */
 	const stateOf = (item: GemItem): { price: number; blocked: string | null } => {
-		const price = item.id === 'attr_respec' && info?.freeRespec ? 0 : item.id === 'name_colors' && admin ? 0 : item.price;
-		if (item.id === 'name_colors') {
-			if (admin) return { price, blocked: 'Included for admin accounts' };
-			if ((info?.bought?.[item.id] ?? 0) > 0) return { price, blocked: 'Owned: open the name window from your Character' };
-		}
+		const price = item.id === 'attr_respec' && info?.freeRespec ? 0 : item.price;
 		if (item.id === 'name_change' && info?.nameChangedAt) {
 			const left = info.nameChangedAt + item.cooldownSec - nowSec;
 			if (left > 0) return { price, blocked: `Again in ${waitText(left)}` };
@@ -80,6 +76,9 @@ const GemShopDialog: React.FC = () => {
 		if (balance < price) return { price, blocked: `${formatNumber(price - balance)} more gems needed` };
 		return { price, blocked: null };
 	};
+
+	/** A one-time item the account already has (bought, or included for an admin account): the row shows MAX and is dimmed */
+	const ownedOf = (item: GemItem): boolean => item.kind === 'once' && (admin || (info?.bought?.[item.id] ?? 0) > 0);
 
 	const buy = async (item: GemItem, value?: string) => {
 		setConfirm(null);
@@ -121,21 +120,28 @@ const GemShopDialog: React.FC = () => {
 				{items.length > 0 && (
 					<ul className='flex flex-col gap-2' data-testid={`gem-${tab}`}>
 						{items.map((item) => {
-							const { price, blocked } = stateOf(item);
+							const owned = ownedOf(item);
+							const { price, blocked } = owned ? { price: item.price, blocked: null } : stateOf(item);
 							const needsConfirm = price > GEM_CONFIRM_ABOVE;
 							const asking = confirm === item.id;
 							return (
-								<li key={item.id} className='ds-listrow'>
+								<li key={item.id} className='ds-listrow' data-owned={owned}>
 									<div className='flex items-center justify-between gap-3'>
 										<div className='min-w-0 flex-1'>
 											<div className='font-semibold'>{item.name}</div>
 											<div className='text-xs text-[#a89878]'>{item.blurb}</div>
 										</div>
 										<div className='flex flex-col items-end gap-1 shrink-0'>
-											<span className='flex items-center gap-1 tabular-nums text-[#ffe27a]'>
-												{price === 0 ? 'Free' : formatNumber(price)} {price > 0 && <GemIcon />}
-											</span>
-											{item.id === 'class_change' ? (
+											{owned ? (
+												<Button tone='purple' className='ds-btn-max' aria-disabled='true' tabIndex={-1} title='You have this'>
+													MAX
+												</Button>
+											) : (
+												<span className='flex items-center gap-1 tabular-nums text-[#ffe27a]'>
+													{price === 0 ? 'Free' : formatNumber(price)} {price > 0 && <GemIcon />}
+												</span>
+											)}
+											{owned ? null : item.id === 'class_change' ? (
 												<Button
 													disabled={busy || blocked !== null}
 													onClick={() => {

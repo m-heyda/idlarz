@@ -85,19 +85,23 @@ export const AvatarFrame: React.FC<{ src: string; size?: number; onClick?: () =>
 );
 
 /**
- * A nickname in its colour: `color` is a CSS colour, or the word `gold` for the special admin nickname (a moving gold shine with glowing stars). No colour = the text colour around it.
+ * A nickname in its colour: `color` is a CSS colour, or the word `gold` for the special admin nickname (a moving gold shine with glowing stars), or `rainbow` for the animated rainbow. No colour = the text colour around it.
  * The one place a name gets its colour, so the game, the landing page and the rankings look the same.
  */
 export const NickName: React.FC<{ children: React.ReactNode; color?: string | null; className?: string }> = ({ children, color, className }) =>
-	color === 'gold' ? (
-		<span className={`ds-nick ds-nick-gold ${className ?? ''}`}>
+	color === 'gold' || color === 'rainbow' ? (
+		<span className={`ds-nick ds-nick-${color} ${className ?? ''}`}>
 			<span className='ds-nick-text'>{children}</span>
-			<i className='ds-nick-star' aria-hidden='true' />
-			<i className='ds-nick-star' aria-hidden='true' />
-			<i className='ds-nick-star' aria-hidden='true' />
+			{color === 'gold' && (
+				<>
+					<i className='ds-nick-star' aria-hidden='true' />
+					<i className='ds-nick-star' aria-hidden='true' />
+					<i className='ds-nick-star' aria-hidden='true' />
+				</>
+			)}
 		</span>
 	) : (
-		<span className={`ds-nick ${className ?? ''}`} style={color ? { color, textShadow: `0 0 8px ${color}55` } : undefined}>
+		<span className={`ds-nick ${className ?? ''}`} style={color ? { color, textShadow: `0 0 6px ${color}cc, 0 0 14px ${color}88` } : undefined}>
 			{children}
 		</span>
 	);

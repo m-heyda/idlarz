@@ -6,7 +6,7 @@ export type GemShopTab = 'identity' | 'upgrades' | 'once';
 /** How an item is sold: a `service` can be bought again and again, a `leveled` upgrade has levels (each costs more), a `once` purchase is bought one time and kept. Today every item is a service. */
 export type GemItemKind = 'service' | 'leveled' | 'once';
 
-export type GemItemId = 'class_change' | 'name_change' | 'attr_respec' | 'name_colors';
+export type GemItemId = 'class_change' | 'name_change' | 'attr_respec' | 'name_colors' | 'name_rainbow';
 
 export interface GemItem {
 	id: GemItemId;
@@ -33,6 +33,8 @@ export const DAY_SEC = 86_400;
  * - **Attribute respec** (300): gives back every attribute point outside a rebirth (a rebirth does it free). **The first respec of an account is free** (a mistake with the new server-held allocation is forgiven once).
  *
  * - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
+ *
+ * - **Rainbow name** (500, once): unlocks the animated rainbow nickname, a separate purchase on top of the plain colours; also bought from the name window.
  *
  * Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
  *
@@ -63,8 +65,17 @@ export const GEM_SHOP: readonly GemItem[] = [
 		tab: 'identity',
 		kind: 'once',
 		name: 'Name colours',
-		blurb: 'Unlock the colour picker: twelve colours for your nickname in the game, the landing page and the rankings.',
+		blurb: 'Unlock the colour picker: fourteen colours for your nickname in the game, the landing page and the rankings.',
 		price: 1000,
+		cooldownSec: 0,
+	},
+	{
+		id: 'name_rainbow',
+		tab: 'identity',
+		kind: 'once',
+		name: 'Rainbow name',
+		blurb: 'An animated rainbow nickname that shifts through every colour. Bought once, on top of Name colours.',
+		price: 500,
 		cooldownSec: 0,
 	},
 ];

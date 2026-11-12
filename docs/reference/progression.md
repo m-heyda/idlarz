@@ -1011,9 +1011,10 @@ See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](prog
 
 ### `NICK_COLORS` <small>const</small>
 
-Source: [`src/config/nickColors.ts:16`](../../src/config/nickColors.ts)
+Source: [`src/config/nickColors.ts:17`](../../src/config/nickColors.ts)
 
-The twelve colours of the picker, in the order the swatches are drawn. Bought once for the whole account in the Gem shop ("Name colours", `NICK_COLORS_ITEM`); stored on `profiles.name_color`.
+The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). Bought once for the whole account in the Gem shop ("Name colours", `NICK_COLORS_ITEM`); stored on `profiles.name_color`.
+The animated **Rainbow** (`NICK_RAINBOW`) is a separate purchase (`NICK_RAINBOW_ITEM`) and the gold nickname with stars (`NICK_GOLD`) is for admin accounts only.
 
 <a id="badgeoptions"></a>
 

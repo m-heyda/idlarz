@@ -1785,7 +1785,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </code></pre>
 </article><h2>Gems</h2><article><p><a id="gem-shop"></a></p>
 <h3><code>GEM_SHOP</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:43</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:45</code></a></p>
 <p>The gem shop&#39;s price book: what each service costs and how often it can be bought.</p>
 <ul>
 <li><p><strong>Class change</strong> (500): never during a fight; writes the profile&#39;s class (server only); the passives of the new class apply at once. An avatar that does not fit the new class is swapped for its starter.</p>
@@ -1795,6 +1795,8 @@ level = min(level on the tile, level the account remembers for the biome)
 <li><p><strong>Attribute respec</strong> (300): gives back every attribute point outside a rebirth (a rebirth does it free). <strong>The first respec of an account is free</strong> (a mistake with the new server-held allocation is forgiven once).</p>
 </li>
 <li><p><strong>Name colours</strong> (1000, once): unlocks the nickname colour picker (twelve colours, <code>config/nickColors.ts</code>) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.</p>
+</li>
+<li><p><strong>Rainbow name</strong> (500, once): unlocks the animated rainbow nickname, a separate purchase on top of the plain colours; also bought from the name window.</p>
 </li>
 </ul>
 <p>Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.</p>
@@ -1835,12 +1837,19 @@ level = min(level on the tile, level the account remembers for the biome)
 <td>identity</td>
 <td>1000</td>
 <td>none</td>
-<td>Unlock the colour picker: twelve colours for your nickname in the game, the landing page and the rankings.</td>
+<td>Unlock the colour picker: fourteen colours for your nickname in the game, the landing page and the rankings.</td>
+</tr>
+<tr>
+<td>Rainbow name</td>
+<td>identity</td>
+<td>500</td>
+<td>none</td>
+<td>An animated rainbow nickname that shifts through every colour. Bought once, on top of Name colours.</td>
 </tr>
 </tbody></table>
 </article><article><p><a id="daily-bonus-gems"></a></p>
 <h3><code>DAILY_BONUS_GEMS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:82</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:93</code></a></p>
 <p>The daily first-login bonus: gems per day of the streak. A claim is once per <strong>UTC day</strong> (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.</p>
 <p><strong>Daily first-login bonus by day of the streak</strong> <em>(computed from the code)</em></p>
 <table>
@@ -5565,8 +5574,9 @@ account&#39;s progress has arrived; a target that is not on screen shows the bub
 <p>See also: <a href="#applytutorial"><code>applyTutorial</code></a>, <a href="#buildnumbers"><code>buildNumbers</code></a>, <a href="#guidevisiblefor"><code>guideVisibleFor</code></a></p>
 </article><h2>Badges</h2><article><p><a id="nick-colors"></a></p>
 <h3><code>NICK_COLORS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/nickColors.ts"><code>src/config/nickColors.ts:16</code></a></p>
-<p>The twelve colours of the picker, in the order the swatches are drawn. Bought once for the whole account in the Gem shop (&quot;Name colours&quot;, <code>NICK_COLORS_ITEM</code>); stored on <code>profiles.name_color</code>.</p>
+<p>Source: <a href="../../src/config/nickColors.ts"><code>src/config/nickColors.ts:17</code></a></p>
+<p>The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). Bought once for the whole account in the Gem shop (&quot;Name colours&quot;, <code>NICK_COLORS_ITEM</code>); stored on <code>profiles.name_color</code>.
+The animated <strong>Rainbow</strong> (<code>NICK_RAINBOW</code>) is a separate purchase (<code>NICK_RAINBOW_ITEM</code>) and the gold nickname with stars (<code>NICK_GOLD</code>) is for admin accounts only.</p>
 </article><article><p><a id="badgeoptions"></a></p>
 <h3><code>badgeOptions</code> <small>function</small></h3>
 <p>Source: <a href="../../src/catalog/badges.ts"><code>src/catalog/badges.ts:27</code></a></p>
@@ -6312,7 +6322,7 @@ paid[r] = floor(rate[r] x elapsed x efficiency)                    efficiency = 
 </code></pre>
 </article><article><p><a id="awayblockof"></a></p>
 <h3><code>awayBlockOf</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/away.ts"><code>src/lib/offline/away.ts:22</code></a></p>
+<p>Source: <a href="../../src/lib/offline/away.ts"><code>src/lib/offline/away.ts:23</code></a></p>
 <p>The read-only <code>away</code> block of <code>GET /api/auth/me</code>: gap = now minus the later of the ledger anchor and the last accepted save (as <code>claimOffline</code> measures it), with the cap and efficiency the last
 save stored (<code>derived.offlineCapSec</code> / <code>offlineEfficiency</code>, the base limits when an older row lacks them). <code>null</code> with no save, an unreadable time, or a gap under <code>offlineMinGapSec</code> (nothing to show).
 It never claims anything and never touches the ledger.</p>

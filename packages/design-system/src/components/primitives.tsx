@@ -45,7 +45,7 @@ export const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children
 export const Divider: React.FC<{ flourish?: boolean }> = ({ flourish }) => <div className={cx('ds-divider', flourish && 'ds-divider-flourish')} />;
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	tone?: 'stone' | 'gold' | 'wood' | 'dark' | 'danger';
+	tone?: 'stone' | 'gold' | 'wood' | 'dark' | 'danger' | 'purple';
 	/** `sm` is the compact button used in rows and queues */
 	size?: 'md' | 'sm';
 }
