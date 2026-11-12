@@ -4233,3 +4233,15 @@ button.ds-income-head:hover {
 .ds-modal .ds-frame {
 	overflow-x: hidden;
 }
+
+/* an action bar pinned to the bottom of a scrolling window body */
+.ds-sticky-foot {
+	position: sticky;
+	bottom: 0;
+	z-index: 2;
+	display: flex;
+	justify-content: flex-end;
+	margin: 8px -4px -4px;
+	padding: 10px 8px;
+	background: linear-gradient(transparent, #0a0c12 40%);
+}

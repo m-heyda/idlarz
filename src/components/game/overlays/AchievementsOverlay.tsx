@@ -73,21 +73,21 @@ export const AchievementList: React.FC<{ report: AchievementViewInput; busy?: st
 	const claimAll = () => useAchievementStore.getState().claimAll();
 	return (
 		<div className='text-sm space-y-2'>
-			<div className='flex items-center justify-between gap-2 text-[#d8c8a0]'>
-				<span>
-					{count} of {ACHIEVEMENTS.length} earned · {claimable.length} to claim
-				</span>
-				{claimable.length >= 2 && onClaim && (
-					<Button tone='gold' size='sm' disabled={busy !== null} onClick={() => void claimAll()}>
-						Claim all
-					</Button>
-				)}
+			<div className='ds-dim' style={{ padding: '2px 2px 4px' }}>
+				{count} of {ACHIEVEMENTS.length} earned · {claimable.length} to claim
 			</div>
 			<ul className='space-y-1'>
 				{states.map(({ def, state }) => (
 					<AchievementRow key={def.id} def={def} state={state} busy={busy !== null} onClaim={onClaim ? () => onClaim(def.id) : undefined} />
 				))}
 			</ul>
+			{claimable.length >= 2 && onClaim && (
+				<div className='ds-sticky-foot'>
+					<Button tone='gold' disabled={busy !== null} onClick={() => void claimAll()}>
+						Claim all ({claimable.length})
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 };
