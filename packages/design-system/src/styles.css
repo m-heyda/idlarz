@@ -3585,3 +3585,28 @@
 	flex: 1;
 	min-width: 0;
 }
+
+/* Hero window: the armor and jewelry rows stretch their six slots to the full width of the panel (no gap at the right edge); hands and skills use a slightly bigger slot too */
+.ds-hero-left .ds-equip {
+	--ds-slot-size: 52px;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) {
+	align-items: stretch;
+	width: 100%;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) .ds-eqgrid {
+	grid-template-columns: repeat(6, 1fr) !important;
+	width: 100%;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) .ds-slot {
+	width: 100%;
+	height: auto;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) .ds-slot img {
+	width: 62%;
+	height: 62%;
+}
