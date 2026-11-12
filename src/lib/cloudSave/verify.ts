@@ -3,11 +3,13 @@ import { CASTLE_UPGRADE } from '@/config/castle';
 import { buildingUpgradeDuration } from '@/lib/buildings';
 import { idolDef } from '@/catalog/idols';
 import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES } from '@/config/merchant';
-import { HARD_LIMITS } from '@/config/limits';
 import type { GrantTotals } from '@/lib/offline/ledger';
 import type { Resources } from '@/types/game';
 import type { SaveSummary } from './summary';
 import { settleXp } from './xpModel';
+
+/** The Lighthouse level the sale check allows for (Idol levels have no design limit, so the check no longer follows the hard limit; raise it with the Idol level cap). */
+const IDOL_SELL_CHECK_LEVEL = 10;
 
 /**
  * Plausibility checks between two consecutive saves of one player, run on the SERVER with the SERVER's clock, from the
@@ -31,7 +33,7 @@ export const VERIFY = {
 	/** The share of the previous balance a save may add on top (a rich account has bigger legitimate bursts, a poor one almost none). */
 	goldFloorShare: 0.02,
 	/** The best a maxed Haggler plus the Lighthouse at its hard ceiling pay on a sale (+30 % and +20 %): stock sold at the merchant is judged at this multiple of the base price. */
-	sellBonusMax: 1 + MERCHANT_UPGRADES.haggler.maxLevel * MERCHANT_UPGRADES.haggler.effectPerLevel + (HARD_LIMITS.idolMaxLevel * IDOL_RULES.perLevel) / 100,
+	sellBonusMax: 1 + MERCHANT_UPGRADES.haggler.maxLevel * MERCHANT_UPGRADES.haggler.effectPerLevel + (IDOL_SELL_CHECK_LEVEL * IDOL_RULES.perLevel) / 100,
 	/** Relative slack on the comparison itself: past 2^53 a double cannot tell neighbouring balances apart (IDL-112). */
 	relativeTolerance: 1e-9,
 	/** Without a previous save the whole balance has to be explained by the current income over the play time. */

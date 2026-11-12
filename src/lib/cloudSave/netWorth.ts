@@ -1,6 +1,6 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { CASTLE_UPGRADE } from '@/config/castle';
-import { builtBuildings, buildingTotalCost } from '@/lib/buildings';
+import { builtBuildings, buildingMinGold } from '@/lib/buildings';
 import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
 import { MAX_OWNED_TILES } from '@/utils/world';
 import { calculateTileCost } from '@/utils/game/costs';
@@ -54,7 +54,7 @@ export const merchantGoldSpent = (upgrades: Record<string, number> | undefined):
  * A floor like the tile prices above, so only a forged map full of high-level buildings stands out.
  */
 export const buildingGoldSpent = (state: PersistedGame): number =>
-	BUILDINGS_FLAG.enabled ? builtBuildings(state.tiles).reduce((sum, b) => sum + (buildingTotalCost(b.level, 1).gold ?? 0), 0) : 0;
+	BUILDINGS_FLAG.enabled ? builtBuildings(state.tiles).reduce((sum, b) => sum + buildingMinGold(b.level), 0) : 0;
 
 /** Gold the owned land and castle cost at least (gold part of each price only). */
 export const minimumSpend = (state: PersistedGame): number => {

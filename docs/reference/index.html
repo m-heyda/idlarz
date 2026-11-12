@@ -1681,21 +1681,23 @@ An Idol&#39;s level is kept across rebirths (the building is not): see <a href="
 </tbody></table>
 </article><article><p><a id="buildinglevelcost"></a></p>
 <h3><code>buildingLevelCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:58</code></a></p>
+<p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:59</code></a></p>
 <p>The price of reaching <code>level</code> (1 = building it): <code>tilePrices</code> times the price of the next tile at the current tile count (counted up to <code>priceTileCap</code>), times <code>levelGrowth</code> per level above 1. Gold, wood and stone like a tile.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">cost(level) = floor(tilePrice(min(owned tiles, priceTileCap)) x tilePrices x levelGrowth^(level - 1))   per resource
+<pre><code class="language-text">cost(level) = floor(tilePrice(min(max(owned tiles, floor(level)), priceTileCap)) x tilePrices x levelGrowth^(level - 1))   per resource
+floor(level) = IDOL_RULES.floorTiles[level - 1], then +floorStepTiles per level (Idols only; other buildings have no floor)
 </code></pre>
 </article><article><p><a id="idol-rules"></a></p>
 <h3><code>IDOL_RULES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/buildings.ts"><code>src/config/buildings.ts:55</code></a></p>
+<p>Source: <a href="../../src/config/buildings.ts"><code>src/config/buildings.ts:57</code></a></p>
 <p>The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.</p>
 <ul>
 <li><code>perLevel</code>: each level adds +2 % of its effect (level 5 = +10 %); <code>luckPerLevel</code>: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).</li>
 <li><code>buildTimeCap</code>: the most the Dwarf Statue and the Ember shop&#39;s Master Builders can shorten a timer together (60 %).</li>
 <li><strong>Levels are the account&#39;s, the building is the run&#39;s</strong>: an Idol&#39;s level is kept across rebirths (the server remembers it in the ledger, <code>legacy.idols</code>) and the map&#39;s building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
 An upgrade is bought during a run: resources, a timer on the shared builder, and the castle gate (<code>min(5, castle level)</code>); from level 3 it also needs <code>t3PerLevel</code> x 2^(level - 3) of the biome&#39;s T3 extract (where the biome has one).
-The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember shop&#39;s Idol Mastery.</li>
+The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember shop&#39;s Idol Mastery; levels above it keep scaling without a limit (price, extract and timer all grow exponentially).</li>
+<li><code>floorTiles</code>: the <strong>price floor</strong>. Buying Idol level <code>L</code> is priced as if the player owned at least <code>floorTiles[L - 1]</code> tiles (20, 40, 60, 80, 100), so a rebirth (9 tiles) does not make levels cheap again. Above the table the floor grows <code>floorStepTiles</code> (40) per level; the price tile count never exceeds <code>priceTileCap</code>.</li>
 </ul>
 <p><strong>All Idols at one level, next to the Embers</strong> <em>(computed from the code)</em></p>
 <table>
@@ -1775,6 +1777,77 @@ The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember s
 </tr>
 </tbody></table>
 <p>For scale, the income bonus of the Embers ever earned (<code>emberIncomeBonus</code>, every resource but XP): 10 Embers +39.8 %, 25 Embers +69 %, 50 Embers +105 %, 100 Embers +158 %. No Idol touches the income: the largest Idol bonus is +10 % at level 5, on one number each. The Dwarf Statue and Master Builders together never cut a timer by more than 60 %.</p>
+<p><strong>Idol price floor: what each level costs on a small map (9 tiles) and its timer</strong> <em>(computed from the code)</em></p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Floor (tiles)</th>
+<th>Price at 9 tiles</th>
+<th>Timer from the level below</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>20</td>
+<td>wood 2,016, stone 1,344, gold 6,748</td>
+<td>built at once</td>
+</tr>
+<tr>
+<td>2</td>
+<td>40</td>
+<td>wood 15.7 K, stone 10.4 K, coal 10.4 K, food 5,208, gold 52.2 K</td>
+<td>10 min</td>
+</tr>
+<tr>
+<td>3</td>
+<td>60</td>
+<td>wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 200</td>
+<td>45 min</td>
+</tr>
+<tr>
+<td>4</td>
+<td>80</td>
+<td>wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 400</td>
+<td>3 h</td>
+</tr>
+<tr>
+<td>5</td>
+<td>100</td>
+<td>wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 800</td>
+<td>8 h</td>
+</tr>
+<tr>
+<td>6</td>
+<td>140</td>
+<td>wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 1,600</td>
+<td>10.8 h</td>
+</tr>
+<tr>
+<td>7</td>
+<td>180</td>
+<td>wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 3,200</td>
+<td>14.58 h</td>
+</tr>
+<tr>
+<td>8</td>
+<td>220</td>
+<td>wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 6,400</td>
+<td>19.68 h</td>
+</tr>
+<tr>
+<td>9</td>
+<td>260</td>
+<td>wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 12.8 K</td>
+<td>1.11 d</td>
+</tr>
+<tr>
+<td>10</td>
+<td>300</td>
+<td>wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 25.6 K</td>
+<td>1.49 d</td>
+</tr>
+</tbody></table>
 </article><article><p><a id="idoleconomy"></a></p>
 <h3><code>idolEconomy</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/idolEconomy.ts"><code>src/lib/idolEconomy.ts:80</code></a></p>
@@ -4089,7 +4162,7 @@ Steward and set bonuses the away efficiency). <code>HARD_LIMITS</code> is the mo
 <tr>
 <td><code>idolMaxLevel</code></td>
 <td>5</td>
-<td>10</td>
+<td>100</td>
 <td>nothing yet</td>
 </tr>
 </tbody></table>
@@ -5955,7 +6028,7 @@ Test accounts: a save through a non-production server marks the account <code>te
 Ranking eligibility (<code>trusted</code>): the first save was a young game (&lt;= 900 s of play) and no poison flag was ever raised (<a href="#poison-flags"><code>POISON_FLAGS</code></a>).</p>
 </article><article><p><a id="flag-policy"></a></p>
 <h3><code>FLAG_POLICY</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:94</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:96</code></a></p>
 <p>The flags and what the server does with each. Meaning of each flag:</p>
 <ul>
 <li><code>baseline_rich</code>: the first save holds more gold than its rates and play time explain.</li>
@@ -6113,7 +6186,7 @@ best rebirth the game can pay.</li>
 <p>Saves from one player are accepted at most this often (an honest client sends every ~90 s).</p>
 </article><article><p><a id="verifytransition"></a></p>
 <h3><code>verifyTransition</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:245</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:247</code></a></p>
 <p>Runs every plausibility check between two consecutive saves and returns the flags that fired; see <a href="#flag-policy"><code>FLAG_POLICY</code></a> for what each one means and does.</p>
 </article><article><p><a id="isnonproduction"></a></p>
 <h3><code>isNonProduction</code> <small>function</small></h3>
@@ -6136,7 +6209,7 @@ Everything else is cut back to the trusted level, so an edited save cannot grant
 </code></pre>
 </article><article><p><a id="poison-flags"></a></p>
 <h3><code>POISON_FLAGS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:153</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:155</code></a></p>
 <p>Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.</p>
 </article><article><p><a id="losesprogress"></a></p>
 <h3><code>losesProgress</code> <small>function</small></h3>
@@ -6145,7 +6218,7 @@ Everything else is cut back to the trusted level, so an edited save cannot grant
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game&#39;s (<code>PINNED_KEEP</code>).</p>
 </article><article><p><a id="enforcement"></a></p>
 <h3><code>ENFORCEMENT</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:138</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:140</code></a></p>
 <p>The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
 accounts have been read (<code>check-live-saves</code>), no honest account is among them, and someone flips <code>enabled</code>. Only flags that are <code>reject</code>
 in <code>FLAG_POLICY</code> AND listed here refuse a save, so one noisy check can be taken out without touching the others.</p>
@@ -7051,7 +7124,7 @@ option to point at another user.</p>
 reload bring the same map back. Not covered yet (IDL-124 keeps these open): the monster growth badge, the battle queue markers and the Next strip, opening the Rebirth dialog, the offline report.</p>
 </article><article><p><a id="turning-enforcement-and-the-server-run-rebirth-on-together"></a></p>
 <h3>Turning enforcement and the server-run rebirth on together</h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:113</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:115</code></a></p>
 <p><strong>Turning enforcement on: <code>ENFORCEMENT.enabled</code> and <code>EMBER_MODEL.requireServerRebirth</code> together (IDL-208, IDL-211, IDL-209).</strong>
 Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:</p>
 <ol>

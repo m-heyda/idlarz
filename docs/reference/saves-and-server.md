@@ -313,7 +313,7 @@ Ranking eligibility (`trusted`): the first save was a young game (<= 900 s of pl
 
 ### `FLAG_POLICY` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:94`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:96`](../../src/lib/cloudSave/verify.ts)
 
 The flags and what the server does with each. Meaning of each flag:
 
@@ -442,7 +442,7 @@ Saves from one player are accepted at most this often (an honest client sends ev
 
 ### `verifyTransition` <small>function</small>
 
-Source: [`src/lib/cloudSave/verify.ts:245`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:247`](../../src/lib/cloudSave/verify.ts)
 
 Runs every plausibility check between two consecutive saves and returns the flags that fired; see [`FLAG_POLICY`](saves-and-server.md#flag-policy) for what each one means and does.
 
@@ -481,7 +481,7 @@ accepted[biome] = trusted                              when claimed <= trusted
 
 ### `POISON_FLAGS` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:153`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:155`](../../src/lib/cloudSave/verify.ts)
 
 Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
 
@@ -498,7 +498,7 @@ resets level and tiles, so a higher rebirth count never counts). The replaced sa
 
 ### `ENFORCEMENT` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:138`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:140`](../../src/lib/cloudSave/verify.ts)
 
 The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
 accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`

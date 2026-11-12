@@ -14,6 +14,8 @@ import { buildingDef } from '../../src/catalog/buildings';
 import { TUTORIAL_LESSONS } from '../../src/catalog/tutorial';
 import {
 	buildingLevelCost,
+	idolFloorTiles,
+	levelOfTile,
 	buildingUpgradeDuration,
 	buildTimeReduction,
 	completeUpgrade,
@@ -96,11 +98,11 @@ test('the catalog: twelve Idols, one per biome, with art, a unique id and an eff
 	assert.equal(new Set(IDOLS.map((i) => i.effect)).size, 12, 'twelve different effects');
 });
 
-test('idolMaxLevel is a limit: 5 base, 10 hard, read through limitOf', () => {
+test('idolMaxLevel is a limit: 5 base, 100 hard, read through limitOf', () => {
 	assert.equal(LIMITS.idolMaxLevel, 5);
-	assert.equal(HARD_LIMITS.idolMaxLevel, 10);
+	assert.equal(HARD_LIMITS.idolMaxLevel, 100);
 	assert.equal(limitOf('idolMaxLevel'), 5);
-	assert.equal(limitOf('idolMaxLevel', { hardCap: true }), 10);
+	assert.equal(limitOf('idolMaxLevel', { hardCap: true }), 100);
 });
 
 // ---- the effects -------------------------------------------------------------------------------------------------------------------------------
@@ -170,7 +172,7 @@ test('the first Idol is paid, the level is remembered, and the cap is the castle
 	assert.equal(upgradeCapOf(idolDef('idol_forest') && buildingDef('idol_forest'), 3), 3);
 	assert.equal(upgradeCapOf(buildingDef('idol_forest'), 10), 5, 'the base cap is 5');
 	assert.equal(upgradeCapOf(buildingDef('idol_forest'), 10, 8), 8, 'a raised cap lifts it, past the castle gate');
-	assert.equal(upgradeCapOf(buildingDef('idol_forest'), 10, 99), 10, 'never past the hard limit');
+	assert.equal(upgradeCapOf(buildingDef('idol_forest'), 10, 999), 100, 'never past the hard limit');
 });
 
 const ctxOf = () => {
@@ -482,7 +484,7 @@ test('through the save pipeline: the ledger remembers a built Idol, refuses a fo
 	const { ledgers, ledgerRepo } = memoryLedgers();
 	const T = 1_800_000_000_000;
 	const [a] = gameWith('forest', 1, 2, 6);
-	setResources({ gold: 12_000, wood: 800, stone: 800, coal: 0, food: 0, hide: 0 });
+	setResources({ gold: 150_000, wood: 20_000, stone: 20_000, coal: 12_000, food: 6_000, hide: 0 });
 	store.setState({ playSeconds: 100_000 } as never);
 	// 1: a game with nothing
 	await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 0, T, false, ledgerRepo);
@@ -606,3 +608,47 @@ const effectiveStatsMaxHp = (): number => {
 	const s = api();
 	return Math.round(playerProfile({ characterStats: s.characterStats, equipment: s.equipment, resources: s.resources } as never).maxHp);
 };
+
+// ---- the price floor: a rebirth does not make Idol levels cheap again -----------------------------------------------------------------------
+
+test('Idol price floor: a small map pays at least the floor tile count, a big one is unchanged, other buildings have none', () => {
+	const def = buildingDef('idol_forest');
+	const quarry = buildingDef('quarry');
+	for (const level of [2, 3, 4, 5]) {
+		const small = buildingLevelCost(level, 9, def).gold ?? 0;
+		const atFloor = buildingLevelCost(level, idolFloorTiles(level), def).gold ?? 0;
+		assert.equal(small, atFloor, `level ${level} at 9 tiles is priced at the floor`);
+		assert.ok(small > (buildingLevelCost(level, 9, quarry).gold ?? 0), 'the floor is above the unfloored price');
+	}
+	assert.equal(buildingLevelCost(3, 300, def).gold, buildingLevelCost(3, 300, quarry).gold, 'at 300 tiles the floor changes nothing');
+	assert.ok((buildingLevelCost(3, 9, def).gold ?? 0) > 100_000, 'level 3 costs a six-figure sum even right after a rebirth');
+});
+
+test('Idol floor table grows, is capped at the price tile cap, and levels above the table keep doubling', () => {
+	const cap = BUILDING_RULES.cost.priceTileCap;
+	let prev = 0;
+	for (let l = 1; l <= 30; l++) {
+		const f = idolFloorTiles(l);
+		assert.ok(f >= prev && f <= cap, `level ${l}`);
+		prev = f;
+	}
+	assert.equal(idolFloorTiles(5), 100);
+	assert.equal(idolFloorTiles(6), 140);
+	assert.equal(idolFloorTiles(40), cap);
+	const def = buildingDef('idol_forest');
+	assert.ok((buildingLevelCost(30, 9, def).gold ?? 0) >= (buildingLevelCost(29, 9, def).gold ?? 0) * 2);
+});
+
+test('after a rebirth a level-3 Idol is rebuilt free but its next level is not cheap', () => {
+	const [a] = gameWith('forest', 1, 5);
+	store.setState({ idolLevels: { forest: 3 } });
+	assert.equal(api().buildBuilding(a.x, a.y, 'idol_forest'), true, 'free re-placement');
+	setResources({ gold: 50_000, wood: 50_000, stone: 50_000, sap: 5000 });
+	assert.equal(api().upgradeBuilding(a.x, a.y), false, 'level 4 needs millions, not 50k');
+});
+
+test('levels above the old hard limit of 10 are valid in a save', () => {
+	assert.ok(HARD_LIMITS.idolMaxLevel >= 50);
+	assert.equal(levelOfTile({ building: 'idol_forest', buildingLevel: 50 }), 50);
+	assert.equal(upgradeCapOf(buildingDef('idol_forest'), 10, 50), 50);
+});

@@ -546,7 +546,7 @@
   "kind": "const",
   "category": "Economy/Buildings",
   "file": "src/config/buildings.ts",
-  "line": 55,
+  "line": 57,
   "summary": "The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.",
   "see": []
  },
@@ -1192,7 +1192,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 58,
+  "line": 59,
   "summary": "The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.",
   "see": []
  },
@@ -1426,7 +1426,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 94,
+  "line": 96,
   "summary": "The flags and what the server does with each. Meaning of each flag:",
   "see": []
  },
@@ -1436,7 +1436,7 @@
   "kind": "topic",
   "category": "Ops/Operator guides",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 113,
+  "line": 115,
   "summary": "**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).** Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:",
   "see": [
    "ENFORCEMENT",
@@ -1450,7 +1450,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 138,
+  "line": 140,
   "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
   "see": []
  },
@@ -1461,7 +1461,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 153,
+  "line": 155,
   "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
   "see": []
  },
@@ -1472,7 +1472,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 245,
+  "line": 247,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },

@@ -62,5 +62,6 @@ export const HARD_LIMITS = {
 	craftQueueSlots: 5,
 	craftOfflineHours: 72,
 	craftSpeed: 4,
-	idolMaxLevel: 10,
+	/** Idol levels have no design limit (price and timers grow exponentially); 100 is what a save and the ledger may hold */
+	idolMaxLevel: 100,
 } as const;

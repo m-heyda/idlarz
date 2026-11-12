@@ -8,6 +8,7 @@ import {
 	buildingLevelCost,
 	buildingOutput,
 	buildingUpgradeDuration,
+	idolFloorTiles,
 	levelOfTile,
 	ownedOfBiome,
 	producerBonus,
@@ -172,6 +173,9 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 							<>
 								<div className='bw-label'>Upgrade to level {nextLevel}</div>
 								<CostList cost={cost} className='build-cost' />
+								{def.kind === 'idol' && ownedTiles < idolFloorTiles(nextLevel) && (
+									<div className='bw-note'>Priced as if you owned at least {idolFloorTiles(nextLevel)} tiles.</div>
+								)}
 								<div className='bw-foot'>
 									<span className='bw-time'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct))}</span>
 									<Button tone='gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
