@@ -457,7 +457,7 @@ The junk a kill drops, as consumable drops (a stack holds 1,000). Cheap junk: on
 **Formula**
 
 ```text
-cheap qty   = max(1, round(gold x 0.2 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
+cheap qty   = max(1, round(gold x 0.15 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
 rare chance = base x (1 + 0.005 x Luck)
 boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
 ```
