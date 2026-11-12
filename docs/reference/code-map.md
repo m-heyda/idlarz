@@ -95,6 +95,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/offline/route.ts) — ~ An idempotency key:
 
+**src/app/api/pets/**
+
+- [`route.ts`](../../src/app/api/pets/route.ts) — ~ The cosmetic pets:
+
 **src/app/api/rebirth/**
 
 - [`route.ts`](../../src/app/api/rebirth/route.ts) — ~ The server runs the player's rebirth:
@@ -184,6 +188,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`mastery.ts`](../../src/catalog/mastery.ts) — Bestiary mastery as data (IDL-309, decided 2026-11-12: the hybrid ladder). A monster type has the same ladder of kill tiers; reaching a tier lets the player claim it. Appending a tier later (the
 - [`monsters.ts`](../../src/catalog/monsters.ts) — ~ The monster roster:
 - [`perkCaps.ts`](../../src/catalog/perkCaps.ts) — ~ The stat families whose gear bucket is capped (IDL-149 / IDL-252).
+- [`pets.ts`](../../src/catalog/pets.ts) — ~ Path of the pixel icon under `public/` (reuse pool, `public/pixel/reuse/pets/`)
 - [`rarity.ts`](../../src/catalog/rarity.ts) — ~ Everything the game knows about a rarity, in one place:
 - [`recipes.ts`](../../src/catalog/recipes.ts) — Crafting recipes (docs/plan/crafting-v0.md).
 - [`resourceArt.ts`](../../src/catalog/resourceArt.ts) — The resource art roster:
@@ -305,6 +310,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/**
 
 - [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ Whether the away-time hint (Night Watch, Steward) is worth showing:
+- [`PetWelcomeDialog.tsx`](../../src/components/game/overlays/PetWelcomeDialog.tsx) — ~ The welcome letter of a special pet:
 - [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ Rebirth and the Ember shop.
 - [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
@@ -316,6 +322,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`TutorialDialog.tsx`](../../src/components/game/overlays/TutorialDialog.tsx) — ~ Brother Alder's journal:
 - [`farmGeometry.ts`](../../src/components/game/overlays/farmGeometry.ts) — Geometry of the farm pasture: an isometric fenced pen on an endless repeating meadow, shown at a whole-pixel zoom and centred in the Farm window.
 - [`farmLayout.ts`](../../src/components/game/overlays/farmLayout.ts) — Lays out the farm's loose parts (public/pixel/farm/*.png, made by scripts/pixel/farm_parts.py) as a list of props on the ground plane: the fence round the pen
+
+**src/components/game/pets/**
+
+- [`PetSprite.tsx`](../../src/components/game/pets/PetSprite.tsx) — ~ A pet walking around the castle, drawn inside the castle tile:
 
 **src/components/game/tutorial/**
 
@@ -509,6 +519,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
 - [`mastery.ts`](../../src/lib/offline/mastery.ts) — ~ The gems the tiers `from` (exclusive) to `to` (inclusive, 1-based) pay.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
+- [`petLetters.ts`](../../src/lib/offline/petLetters.ts) — SERVER ONLY. The welcome letters that come with a special pet. They are kept out of `src/catalog/pets.ts` (which is in the browser bundle for everyone) so the text reaches only the account it is for: `applyPets` puts a letter in the answer for the account that was granted the pet, nobody else.
+- [`pets.ts`](../../src/lib/offline/pets.ts) — ~ The pets this account owns (ids of the catalog)
 - [`placement.ts`](../../src/lib/offline/placement.ts) — ~ What the rules depend on:
 - [`profile.ts`](../../src/lib/offline/profile.ts) — ~ The character's stats with every derived number worked out again (a save only holds the attributes).
 - [`reconcile.ts`](../../src/lib/offline/reconcile.ts) — ~ What changed on the map:
@@ -533,6 +545,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.ts`](../../src/lib/offlineClient.ts) — ~ The browser side of /api/offline.
 - [`offlineFlow.ts`](../../src/lib/offlineFlow.ts) — ~ 'done':
 - [`offlineRoute.ts`](../../src/lib/offlineRoute.ts) — ~ The shared shell of the signed-in game routes (/api/spawn, /api/chest, /api/kill):
+- [`pets.ts`](../../src/lib/pets.ts) — The pet on the map: where it steps and what it says. Pure (the caller passes the random source), so it is tested without a browser; the sprite only draws the result.
 - [`planPicture.ts`](../../src/lib/planPicture.ts) — ~ The hero's HP, the monster's HP and the hero's mana `elapsedSec` after the server's picture, read off the plan it sent (straight lines between the samples, the last sample held once the fight is over).
 - [`playRoute.ts`](../../src/lib/playRoute.ts) — The route of the game itself (the gate in front of it, then the game).
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
@@ -618,6 +631,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gameStore.ts`](../../src/stores/gameStore.ts) — ~ The whole store:
 - [`gemStore.ts`](../../src/stores/gemStore.ts) — ~ The last answer of the server (null until it has been asked)
 - [`labStore.ts`](../../src/stores/labStore.ts) — ~ The map lab's world:
+- [`petStore.ts`](../../src/stores/petStore.ts) — ~ The pets the account owns (ids of the catalog); empty until the server answered
 - [`rewardPendingStore.ts`](../../src/stores/rewardPendingStore.ts) — ~ How many rewards are on their way from the server (a chest being opened, a won fight whose result is not shown yet).
 - [`settingsStore.ts`](../../src/stores/settingsStore.ts)
 - [`tutorialStore.ts`](../../src/stores/tutorialStore.ts) — ~ How long to wait before asking again when the server could not confirm a step yet (its last saved copy lags the browser's) or could not be reached.
@@ -913,6 +927,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.
 - [`offlineServer.test.ts`](../../tests/server/offlineServer.test.ts)
+- [`pets.test.ts`](../../tests/server/pets.test.ts) — ~ A random source that walks through a fixed list, then repeats it.
 - [`playerReset.test.ts`](../../tests/server/playerReset.test.ts) — ~ A tiny in-memory app_settings table behind the two calls season.ts makes
 - [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)

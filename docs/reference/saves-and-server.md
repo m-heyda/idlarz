@@ -510,7 +510,7 @@ in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken 
 
 ### `Ledger` <small>interface</small>
 
-Source: [`src/lib/offline/ledger.ts:146`](../../src/lib/offline/ledger.ts)
+Source: [`src/lib/offline/ledger.ts:158`](../../src/lib/offline/ledger.ts)
 
 The ledger: one row per player, written only by the server (`player_ledger`; the only SQL logic is the atomic save function, the compare-and-swap on `ver` is in TypeScript). It holds the run id and rebirth count, the away-time anchor,
 the **ticket bank** (timers and waiting chests and monsters), the kill and chest counters that seal the rolls, `granted` and `grantedSeen` (what the server paid), the gem balance, the last idempotency key and result,
@@ -631,6 +631,7 @@ and its gold is paid in the browser.
 | `/api/inventory` | POST | `src/app/api/inventory/route.ts` |
 | `/api/mastery` | POST | `src/app/api/mastery/route.ts` |
 | `/api/offline` | POST | `src/app/api/offline/route.ts` |
+| `/api/pets` | POST | `src/app/api/pets/route.ts` |
 | `/api/rebirth` | POST | `src/app/api/rebirth/route.ts` |
 | `/api/rebirths` | GET | `src/app/api/rebirths/route.ts` |
 | `/api/save` | GET, DELETE, POST | `src/app/api/save/route.ts` |

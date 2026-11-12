@@ -85,6 +85,7 @@ import { useSpawnSync } from '@/hooks/useSpawnSync';
 import OfflineDialog from '@/components/game/overlays/OfflineDialog';
 import DailyBonusDialog from '@/components/game/overlays/DailyBonusDialog';
 import TutorialGuide from '@/components/game/tutorial/TutorialGuide';
+import PetWelcomeDialog from '@/components/game/overlays/PetWelcomeDialog';
 
 interface GameAppProps {
 	/** The account's name and hero, given to a brand-new game only (never to one that has been played). */
@@ -206,6 +207,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<DailyBonusDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<TutorialDialog />
 			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
+			<PetWelcomeDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<ConfirmDialogs />
 			<BuildModal />
 			<BuildingModal />
