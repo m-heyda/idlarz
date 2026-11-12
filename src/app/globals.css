@@ -1090,27 +1090,23 @@ body {
 
 .away-bar-track {
 	position: relative;
-	height: 28px;
-	border: 8px solid transparent;
-	border-image: url('/pixel/ui/bar_frame.png') 4 / 8px round;
-	background: #0a0706;
-	background-clip: padding-box;
-	image-rendering: pixelated;
+	height: 16px;
+	overflow: hidden;
+	background: #07080d;
+	border: 1px solid #05060a;
+	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.3);
 }
 
 .away-bar-fill {
 	position: absolute;
 	inset: 0 auto 0 0;
 	width: calc(var(--pct, 0) * 1%);
-	background: url('/pixel/ui/bar_fill.png') 0 0 / 16px 12px repeat-x;
-	image-rendering: pixelated;
-	box-shadow:
-		2px 0 0 rgba(212, 255, 150, 0.9),
-		0 0 8px rgba(130, 255, 90, 0.55);
+	background: linear-gradient(#ffe08a, #c58d28);
+	box-shadow: 0 0 8px rgba(255, 210, 100, 0.6);
 }
 
 .away-bar.is-capped .away-bar-fill {
-	filter: sepia(1) saturate(2.2) hue-rotate(-18deg);
+	background: linear-gradient(#ffb060, #c0561c);
 }
 
 .away-bar-capped {

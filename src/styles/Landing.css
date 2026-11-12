@@ -52,7 +52,7 @@
 	justify-content: center;
 	gap: 36px;
 	height: 100%;
-	padding: clamp(190px, 24vh, 300px) 32px 58px; /* the logo of the picture stays free above the frames */
+	padding: clamp(190px, 24vh, 300px) 32px 92px; /* the logo of the picture stays free above the frames */
 }
 
 .ld-col {
@@ -69,6 +69,11 @@
 .ld-col-account {
 	width: min(430px, 29vw);
 	min-width: 320px;
+	align-items: center; /* the window is as tall as its content and sits in the middle of the column */
+}
+
+.ld-col-account .ld-frame {
+	flex: 0 1 auto;
 }
 
 .ld-frame {

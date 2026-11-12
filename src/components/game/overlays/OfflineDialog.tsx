@@ -7,7 +7,8 @@ import AwayBar from '../AwayBar';
 import { useGameStore } from '@/stores/gameStore';
 import { offlineBar } from '@/lib/offlineBar';
 import type { Resources } from '@/types/game';
-import { Button } from '../../../../packages/design-system/src/components/primitives';
+import { Button, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
+import { RESOURCES } from '@/catalog';
 
 const ORDER: (keyof Resources)[] = ['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool', 'xp'];
 
@@ -30,62 +31,61 @@ const OfflineDialog: React.FC = () => {
 	const earned = ORDER.filter((key) => grant.resources[key] > 0);
 
 	return (
-		<GameModal title='Welcome back!' size='md' onClose={close}>
-			<div className='flex flex-col gap-5 px-3 pb-2 pt-1 text-base'>
-				<div className='text-center'>
-					<div className='text-[#a89878]'>While you were away</div>
-					<div className='text-3xl text-[#f0d27a] tabular-nums mt-1'>{hours(grant.gapSec)}</div>
-				</div>
-
-				<AwayBar gapSec={grant.gapSec} capSec={grant.capSec} efficiency={grant.efficiency} countDown />
-				<div className='text-center text-sm text-[#7a6a52] -mt-2'>
-					Your kingdom earns {offlineBar(grant).efficiencyPct}% of its income while you are away
-					{showsAwayHint(rebirths) && <div className='text-[#a89878]'>Night Watch and Steward (Ember shop) raise the cap and the pay</div>}
+		<GameModal title='Welcome back!' width={600} onClose={close}>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+				<div className='ds-listrow' style={{ alignItems: 'center', textAlign: 'center' }}>
+					<SectionLabel>While you were away</SectionLabel>
+					<div className='wb-hours'>{hours(grant.gapSec)}</div>
+					<AwayBar gapSec={grant.gapSec} capSec={grant.capSec} efficiency={grant.efficiency} countDown />
+					<div className='ds-dim' style={{ fontSize: 12 }}>
+						Your kingdom earns {offlineBar(grant).efficiencyPct}% of its income while you are away
+						{showsAwayHint(rebirths) && <div>Night Watch and Steward (Ember shop) raise the cap and the pay</div>}
+					</div>
 				</div>
 
 				{earned.length > 0 && (
-					<div>
-						<div className='text-[#a89878] mb-1'>Your kingdom earned</div>
-						<div className='grid grid-cols-2 gap-x-4 gap-y-1'>
+					<div className='ds-listrow'>
+						<SectionLabel>Your kingdom earned</SectionLabel>
+						<div className='wb-earned'>
 							{earned.map((key) => (
-								<div key={key} className='flex items-center justify-between gap-2'>
-									<span className='inline-flex items-center gap-1 text-[#d8c8a0]'>
-										<ResourceIcon resource={key} /> {key === 'xp' ? 'XP' : key}
+								<div key={key} className='wb-earned-row'>
+									<span className='wb-res'>
+										<ResourceIcon resource={key} /> {key === 'xp' ? 'XP' : (RESOURCES[key]?.label ?? key)}
 									</span>
-									<span className='tabular-nums text-green-300'>+{formatNumber(grant.resources[key])}</span>
+									<span className='wb-gain'>+{formatNumber(grant.resources[key])}</span>
 								</div>
 							))}
 						</div>
 					</div>
 				)}
 
-				<ul className='flex flex-col gap-1.5 text-center text-[#ecdcb4]'>
+				<ul className='ds-listrow wb-events'>
 					{report.levelsGained > 0 && (
 						<li>
-							You reached <span className='text-[#f0d27a]'>level +{report.levelsGained}</span> (stat points to spend)
+							You reached <b>level +{report.levelsGained}</b> (stat points to spend)
 						</li>
 					)}
 					{report.castleReached !== null && (
 						<li>
-							The castle upgrade finished: <span className='text-[#f0d27a]'>level {report.castleReached}</span>
+							The castle upgrade finished: <b>level {report.castleReached}</b>
 						</li>
 					)}
 					{report.chestsPlaced > 0 && (
 						<li>
-							<span className='text-[#f0d27a]'>{report.chestsPlaced}</span> chest{report.chestsPlaced === 1 ? '' : 's'} appeared on your land
+							<b>{report.chestsPlaced}</b> chest{report.chestsPlaced === 1 ? '' : 's'} appeared on your land
 						</li>
 					)}
 					{report.monstersPlaced > 0 && (
 						<li>
-							<span className='text-[#f0d27a]'>{report.monstersPlaced}</span> monster{report.monstersPlaced === 1 ? '' : 's'} arrived (the strongest is level{' '}
+							<b>{report.monstersPlaced}</b> monster{report.monstersPlaced === 1 ? '' : 's'} arrived (the strongest is level{' '}
 							{formatCompact(report.strongestMonster)}), and the ones already there grew stronger
 						</li>
 					)}
-					{report.monstersPlaced === 0 && <li className='text-[#a89878]'>The monsters on your land grew stronger while you were away</li>}
+					{report.monstersPlaced === 0 && <li className='ds-dim'>The monsters on your land grew stronger while you were away</li>}
 				</ul>
 
-				<div className='flex justify-center'>
-					<Button tone='gold' onClick={close}>
+				<div style={{ display: 'flex', justifyContent: 'center' }}>
+					<Button tone='gold' style={{ minWidth: 200, minHeight: 44 }} onClick={close}>
 						Continue
 					</Button>
 				</div>
