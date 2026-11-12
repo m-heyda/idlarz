@@ -38,7 +38,7 @@ test('hasGlow: every rarity above common glows', () => {
 test('compact short numbers', () => {
 	assert.equal(compact(950), '950');
 	assert.equal(compact(1500), '1.5K');
-	assert.equal(compact(2_800_000), '2.80M');
+	assert.equal(compact(2_800_000), '2.8M');
 });
 
 test('clamp: an empty range keeps the minimum', () => {

@@ -3943,3 +3943,51 @@ button.ds-income-head:hover {
 .ds-queue[data-stacked='true'] .ds-queue-head {
 	margin-bottom: 8px;
 }
+
+/* ===== Merchant: red Sell and green Buy, the chosen one outlined; the typed amount as tall as its buttons ===== */
+.ds-mode-sell,
+.ds-mode-buy {
+	color: #fff;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+	opacity: 0.72;
+}
+
+.ds-mode-sell {
+	background: linear-gradient(#d4604f, #8e2a1d);
+	border-color: #4a120a;
+}
+
+.ds-mode-buy {
+	background: linear-gradient(#4cb35f, #1f6c33);
+	border-color: #0d3a1a;
+}
+
+.ds-mode-sell[data-selected='true'],
+.ds-mode-buy[data-selected='true'] {
+	opacity: 1;
+	outline: 2px solid #fff3c4;
+	outline-offset: 1px;
+}
+
+.ds-mode-sell:disabled,
+.ds-mode-buy:disabled {
+	opacity: 0.35;
+}
+
+.ds-amount-row {
+	align-items: stretch;
+}
+
+.ds-amount-row .ds-amount-label {
+	align-self: center;
+}
+
+.ds-amount-chip,
+.ds-amount-field {
+	box-sizing: border-box;
+	height: 32px;
+}
+
+.ds-amount-field {
+	min-width: 0;
+}

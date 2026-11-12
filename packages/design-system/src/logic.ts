@@ -27,12 +27,15 @@ export type UpgradeState = 'maxed' | 'ready' | 'short';
 export const upgradeState = (level: number, max: number, cost: number, have: number): UpgradeState =>
 	level >= max ? 'maxed' : have >= cost ? 'ready' : 'short';
 
-/** Short number format used in the mocks: 1.2K, 3.40M. */
+/** Drops the zeros a fixed-decimals number carries at the end: "7.00" is "7", "1.50K" is "1.5K", "1.00M" is "1M". */
+export const tidy = (text: string): string => text.replace(/(\.\d*?)0+(?=\D|$)/, '$1').replace(/\.(?=\D|$)/, '');
+
+/** Short number format: 1.2K, 3.4M, 1K (never 1.0K or 3.40M). */
 export const compact = (n: number): string => {
 	const abs = Math.abs(n);
-	if (abs >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
-	if (abs >= 1e6) return `${(n / 1e6).toFixed(2)}M`;
-	if (abs >= 1e3) return `${(n / 1e3).toFixed(abs >= 1e5 ? 0 : 1)}K`;
+	if (abs >= 1e9) return `${tidy((n / 1e9).toFixed(2))}B`;
+	if (abs >= 1e6) return `${tidy((n / 1e6).toFixed(2))}M`;
+	if (abs >= 1e3) return `${tidy((n / 1e3).toFixed(abs >= 1e5 ? 0 : 1))}K`;
 	return String(Math.round(n));
 };
 

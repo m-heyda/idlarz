@@ -3,7 +3,6 @@ import { ResourceChip, Tabs } from '../../../../packages/design-system/src/compo
 import { compact } from '../../../../packages/design-system/src/logic';
 import { MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
 import { CLICK_LADDER } from '@/config/economy';
-import { MERCHANT_PORTRAIT, npcPortraitUrl } from '@/config/npcPortraits';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -35,7 +34,7 @@ const useAffordableUpgrades = (): number =>
 	});
 
 /**
- * The Merchant window (design system `WindowShell`, window id `merchant`): tabs along the top with the merchant's face and the gold purse. Resources is the new ledger and trade ticket; Goods, Upgrades, Quests and Gambling keep their own
+ * The Merchant window (design system `WindowShell`, window id `merchant`): tabs along the top and the gold purse. Resources is the new ledger and trade ticket; Goods, Upgrades, Quests and Gambling keep their own
  * look inside the new window until they are rebuilt, one tab at a time.
  */
 const MerchantWindow: React.FC = () => {
@@ -50,15 +49,11 @@ const MerchantWindow: React.FC = () => {
 			width={1100}
 			height={720}
 			bar={
-				<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img src={npcPortraitUrl(MERCHANT_PORTRAIT[tab])} alt='' width={40} height={40} style={{ imageRendering: 'pixelated' }} />
-					<Tabs
-						active={tab}
-						onChange={(id) => setTab(id as MerchantTab)}
-						items={TABS.map((t) => ({ id: t.id, label: t.label, title: t.title, badge: t.id === 'upgrades' && waiting > 0 ? waiting : undefined }))}
-					/>
-				</div>
+				<Tabs
+					active={tab}
+					onChange={(id) => setTab(id as MerchantTab)}
+					items={TABS.map((t) => ({ id: t.id, label: t.label, title: t.title, badge: t.id === 'upgrades' && waiting > 0 ? waiting : undefined }))}
+				/>
 			}
 			barRight={<ResourceChip icon={pixelIconSrc('gold')} value={compact(Math.floor(gold))} title='Your gold' />}
 		>

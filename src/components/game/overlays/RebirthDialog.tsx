@@ -8,7 +8,7 @@ import { castleModifier } from '@/utils/game/castle';
 import { economyTiles } from '@/utils/game/tiles';
 import { emberGain, emberIncomeBonus, emberIncomeMultiplier, emberUpgradeCost } from '@/utils/game/rebirth';
 import { castleLevelOf } from '@/lib/castleWard';
-import { formatHeaderAmount, formatNumber, formatPercent } from '@/utils/formatters';
+import { formatHeaderAmount, formatNumber, formatPercent, tidy } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { askServerRebirth } from '@/lib/serverRebirth';
 import { rebirthRunSummary, rebirthUnlockIntro, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
@@ -18,7 +18,7 @@ import RebirthUnlockModal from './RebirthUnlockModal';
 import PixelIcon from '../PixelIcon';
 import EmberIcon from '../EmberIcon';
 
-const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercent(n * 100) : `${(n * 100).toFixed(digits)}%`);
+const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercent(n * 100) : `${tidy((n * 100).toFixed(digits))}%`);
 
 const shopText: Record<EmberUpgradeId, (levels: number) => string> = {
 	thrift: (n) =>

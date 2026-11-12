@@ -14,7 +14,7 @@ import { SKILLS } from '@/catalog/skills';
 import { LIMITS } from '@/config/limits';
 import { RARITIES, RARITY_ORDER, SETS } from '@/catalog';
 import { BIOME_PIXEL_ICONS, PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
-import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
+import { formatCompact, formatNumber, formatTime, tidy } from '@/utils/formatters';
 import { castleModifier } from '@/utils/game/castle';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
@@ -23,7 +23,7 @@ import ResourceIcon from '../ResourceIcon';
  * The in-game guide. Every number is read from the game config (or the stat config), so this text can
  * never drift away from the rules again: change a constant and the tutorial changes with it.
  */
-const pct = (n: number, digits = 0) => `${(n * 100).toFixed(digits)}%`;
+const pct = (n: number, digits = 0) => `${tidy((n * 100).toFixed(digits))}%`;
 const rate = (n: number) => (Math.round(n * 100) / 100).toString();
 // 500.0 -> 500, 10.00K -> 10K
 const short = (n: number) => formatNumber(n).replace(/[.]0+(?=[KMBT]?$)/, '');

@@ -23,7 +23,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import type { CharacterStats, Resources } from '@/types/game';
 import audioManager from '@/utils/audioManager';
-import { formatCompact, formatNumber, formatPercent, formatRate } from '@/utils/formatters';
+import { formatCompact, formatNumber, formatPercent, formatRate, tidy } from '@/utils/formatters';
 import { getStatDescriptionGroups } from '@/utils/game/character';
 import { calculateResourceBreakdown, type ResourceBreakdownEntry } from '@/utils/game/income';
 import RebirthsPanel from '../overlays/RebirthsPanel';
@@ -49,7 +49,7 @@ const INCOME_COLS: { id: IncomeCol; label: string }[] = [
 	{ id: 'hour', label: 'Per hour' },
 ];
 
-const pct = (value: number, digits = 0) => (Math.abs(value) >= 5000 ? formatPercent(value) : `${value.toFixed(digits)}%`);
+const pct = (value: number, digits = 0) => (Math.abs(value) >= 5000 ? formatPercent(value) : `${tidy(value.toFixed(digits))}%`);
 const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 const I = PAPER_INK;
 

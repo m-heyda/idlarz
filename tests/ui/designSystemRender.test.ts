@@ -62,7 +62,7 @@ test('AmountInput: a typed amount wins over a preset, unknown text is invalid, t
 	const bad = html(h(AmountInput, { ...base, text: '12x' }));
 	assert.match(bad, /data-invalid="true"/);
 	assert.match(bad, /ds-amount-error/);
-	assert.match(html(h(AmountInput, { ...base, text: '', onSlider: () => undefined })), /1\.0K \/ 5\.0K/);
+	assert.match(html(h(AmountInput, { ...base, text: '', onSlider: () => undefined })), /1K \/ 5K/);
 });
 
 test('tooltip lines: diffs colour by better or worse, costs by affordable or not, an unexplored tile lists its cost', () => {

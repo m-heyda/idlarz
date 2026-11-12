@@ -11,7 +11,7 @@ import { effectiveStats } from '@/lib/effectiveStats';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
-import { formatInt, formatTime, parseAmount } from '@/utils/formatters';
+import { formatInt, formatTime, parseAmount, tidy } from '@/utils/formatters';
 import { componentIconUrl, outputName, recipeIconUrl, resourceIconUrl } from './recipeUi';
 
 const I = PAPER_INK;
@@ -80,7 +80,7 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 				{odds.rarities.map((row) => (
 					<span key={row.id} className='ds-odds-row'>
 						<i style={{ background: RARITIES[row.id as keyof typeof RARITIES]?.color }} />
-						{RARITIES[row.id as keyof typeof RARITIES]?.label ?? row.id} {(row.chance * 100).toFixed(row.chance < 0.1 ? 1 : 0)}%
+						{RARITIES[row.id as keyof typeof RARITIES]?.label ?? row.id} {tidy((row.chance * 100).toFixed(row.chance < 0.1 ? 1 : 0))}%
 					</span>
 				))}
 			</div>
@@ -88,7 +88,7 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 			<div className='ds-paper-note'>
 				Quality leans up +{Math.round(odds.qualityBias * 100)}% (Intelligence)
 				{odds.pityMultiplier > 1 && best
-					? `, bad luck bonus x${odds.pityMultiplier.toFixed(2)} on ${RARITIES[best.id as keyof typeof RARITIES]?.label ?? best.id}`
+					? `, bad luck bonus x${tidy(odds.pityMultiplier.toFixed(2))} on ${RARITIES[best.id as keyof typeof RARITIES]?.label ?? best.id}`
 					: ''}
 			</div>
 			<div className='ds-paper-note'>You choose the grade and the slot; the piece is random. It goes to your bag, marked Crafted.</div>

@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { monsterNameOf } from '@/stores/bestiaryStore';
-import { formatCompact, formatNumber } from '@/utils/formatters';
+import { formatCompact, formatNumber, tidy } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
@@ -377,7 +377,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 							))}
 						</span>
 					)}
-					{fight && fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {fight.stunLeft.toFixed(1)} s</div>}
+					{fight && fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {tidy(fight.stunLeft.toFixed(1))} s</div>}
 					{p.slashes?.map((fx) => (
 						<span
 							key={fx.id}

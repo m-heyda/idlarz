@@ -6,7 +6,7 @@ import { MERCHANT_BUYABLE, MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_INFO, MERC
 import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
 import { useGameStore } from '@/stores/gameStore';
 import { MERCHANT_CUSTOM_MAX, useUiStore } from '@/stores/uiStore';
-import { formatNumber, formatRate, parseAmount } from '@/utils/formatters';
+import { formatNumber, formatRate, parseAmount, tidy } from '@/utils/formatters';
 import { buyCost, sellMultiplier, sellPayout } from '@/utils/game/merchant';
 
 type ResourceKey = keyof typeof MERCHANT_RESOURCE_PRICES;
@@ -121,9 +121,9 @@ const MerchantResourcesTab: React.FC = () => {
 								</span>
 								<span>{compact(Math.floor(resources[key]))}</span>
 								<span style={{ color: r ? GREEN : '#8a7a5a' }}>{r ? `+${Math.round(r)}/s` : '—'}</span>
-								<span>{(MERCHANT_RESOURCE_PRICES[key] * haggle).toFixed(2)}</span>
+								<span>{tidy((MERCHANT_RESOURCE_PRICES[key] * haggle).toFixed(2))}</span>
 								<span style={{ color: rowBuyable ? BLUE : '#8a7a5a' }}>
-									{rowBuyable ? (MERCHANT_RESOURCE_PRICES[key] * MERCHANT_BUY_MULTIPLIER).toFixed(2) : 'not sold'}
+									{rowBuyable ? tidy((MERCHANT_RESOURCE_PRICES[key] * MERCHANT_BUY_MULTIPLIER).toFixed(2)) : 'not sold'}
 								</span>
 							</button>
 						);
@@ -147,10 +147,10 @@ const MerchantResourcesTab: React.FC = () => {
 					</div>
 				</div>
 				<div style={{ display: 'flex', gap: 6 }}>
-					<Button tone={mode === 'sell' || !canBuy ? 'gold' : 'dark'} style={{ flex: 1 }} onClick={() => setMode('sell')}>
+					<Button className='ds-mode-sell' data-selected={!buying} style={{ flex: 1 }} onClick={() => setMode('sell')}>
 						Sell
 					</Button>
-					<Button tone={buying ? 'gold' : 'dark'} style={{ flex: 1 }} disabled={!canBuy} onClick={() => setMode('buy')}>
+					<Button className='ds-mode-buy' data-selected={buying} style={{ flex: 1 }} disabled={!canBuy} onClick={() => setMode('buy')}>
 						Buy
 					</Button>
 				</div>
@@ -173,7 +173,7 @@ const MerchantResourcesTab: React.FC = () => {
 				<Inset style={{ fontSize: 13 }}>
 					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
 						<span className='ds-dim'>
-							{formatNumber(units)} × {(buying ? price * MERCHANT_BUY_MULTIPLIER : price).toFixed(2)} gold
+							{formatNumber(units)} × {tidy((buying ? price * MERCHANT_BUY_MULTIPLIER : price).toFixed(2))} gold
 						</span>
 						<span>{compact(base)}</span>
 					</div>

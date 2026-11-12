@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Rarity } from '../logic';
+import { tidy, type Rarity } from '../logic';
 import { HoverTip, ResourceChip } from './primitives';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -53,7 +53,7 @@ export const TipDiff: React.FC<{ value: React.ReactNode; diff?: number; lowerIsB
 				<span className='ds-tip-diff' data-tone={good ? 'green' : 'red'}>
 					{' '}
 					({diff! > 0 ? '+' : ''}
-					{diff!.toFixed(digits)})
+					{tidy(diff!.toFixed(digits))})
 				</span>
 			) : null}
 		</span>

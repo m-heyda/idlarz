@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { biomeArtUrl } from '@/config/biomeArt';
 import { biomeColor } from '@/config/biomePalette';
-import { formatHeaderAmount, formatInt, formatNumber, formatTime } from '@/utils/formatters';
+import { formatHeaderAmount, formatInt, formatNumber, formatTime, tidy } from '@/utils/formatters';
 import type { RebirthRunSummary, RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import PixelModal from '../PixelModal';
 import ResourceIcon from '../ResourceIcon';
 import EmberIcon from '../EmberIcon';
 
-const pct = (fraction: number) => `${(fraction * 100).toFixed(fraction >= 1 ? 0 : 1)}%`;
+const pct = (fraction: number) => `${tidy((fraction * 100).toFixed(fraction >= 1 ? 0 : 1))}%`;
 
 const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
 	<div className='flex items-baseline justify-between gap-3 border-b px-rule py-1 last:border-b-0'>

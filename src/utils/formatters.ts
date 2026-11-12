@@ -1,14 +1,20 @@
 // Suffixes for large numbers: thousand steps from K (the first at 10,000), then M, B, T, Qa, Qi, Sx; beyond that scientific
 const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx'];
 
+/**
+ * Drops the zeros a fixed-decimals number carries at the end: "7.00" is "7", "1.50K" is "1.5K", "0.90" is "0.9", "1.00M" is "1M" (a number with no decimal point is left alone). Every number the game shows goes through this, so a value
+ * never reads as 1.0K or 7.00.
+ */
+export const tidy = (text: string): string => text.replace(/(\.\d*?)0+(?=\D|$)/, '$1').replace(/\.(?=\D|$)/, '');
+
 /** "1.23M"-style text for |n| >= 1,000,000 up to the largest suffix, "1.23e24" past it; below 1e6 returns null. */
 const compact = (n: number): string | null => {
 	const abs = Math.abs(n);
 	if (abs < 1_000_000) return null;
 	if (!Number.isFinite(n)) return n > 0 ? '∞' : '-∞';
 	const tier = Math.floor(Math.log10(abs) / 3);
-	if (tier >= SUFFIXES.length) return n.toExponential(2).replace('e+', 'e');
-	return `${(n / Math.pow(1000, tier)).toFixed(2)}${SUFFIXES[tier]}`;
+	if (tier >= SUFFIXES.length) return tidy(n.toExponential(2).replace('e+', 'e'));
+	return `${tidy((n / Math.pow(1000, tier)).toFixed(2))}${SUFFIXES[tier]}`;
 };
 
 /**
@@ -31,11 +37,11 @@ export const formatNumber = (num: number | undefined): string => {
 	// Format large numbers with suffix - only apply to numbers > 10,000
 	const big = compact(num);
 	if (big !== null) return big;
-	if (Math.abs(num) >= 10_000) return `${(num / 1_000).toFixed(2)}K`;
+	if (Math.abs(num) >= 10_000) return `${tidy((num / 1_000).toFixed(2))}K`;
 
 	// Normal formatting for small numbers
 	const decimalPlaces = Math.abs(num) < 100 ? 2 : Math.abs(num) < 1000 ? 1 : 0;
-	return num.toFixed(decimalPlaces);
+	return tidy(num.toFixed(decimalPlaces));
 };
 
 /**
@@ -51,15 +57,15 @@ export const formatHeaderAmount = (num: number | undefined): string => {
 	if (abs < 1000) return `${sign}${Math.floor(abs)}`;
 
 	let tier = Math.floor(Math.log10(abs) / 3);
-	if (tier >= SUFFIXES.length) return `${sign}${abs.toExponential(1).replace('e+', 'e')}`;
+	if (tier >= SUFFIXES.length) return `${sign}${tidy(abs.toExponential(1).replace('e+', 'e'))}`;
 	let text = (abs / Math.pow(1000, tier)).toPrecision(3);
 	if (Number(text) >= 1000) {
 		// 999.96K rounds to "1000": carry into the next suffix instead
 		tier += 1;
-		if (tier >= SUFFIXES.length) return `${sign}${abs.toExponential(1).replace('e+', 'e')}`;
+		if (tier >= SUFFIXES.length) return `${sign}${tidy(abs.toExponential(1).replace('e+', 'e'))}`;
 		text = (abs / Math.pow(1000, tier)).toPrecision(3);
 	}
-	return `${sign}${text}${SUFFIXES[tier]}`;
+	return `${sign}${tidy(text)}${SUFFIXES[tier]}`;
 };
 
 /**
@@ -85,7 +91,7 @@ export const formatRateAuto = (perSecond: number | undefined): string | null => 
 /** A percentage in the same short style as the numbers: 450%, 4.93K%, 1.20M% (short from 5,000) */
 export const formatPercent = (pct: number): string => {
 	if (!Number.isFinite(pct) || Math.abs(pct) < 5000) return `${Math.round(pct)}%`;
-	return `${compact(pct) ?? `${(pct / 1_000).toFixed(2)}K`}%`;
+	return `${compact(pct) ?? `${tidy((pct / 1_000).toFixed(2))}K`}%`;
 };
 
 const trimmed = (n: number, decimals: number): string => String(Math.round(n * 10 ** decimals) / 10 ** decimals);
@@ -125,9 +131,9 @@ export const formatRate = (rate: number): string => {
 	// Format large rates with suffix - only apply to rates > 10,000
 	const big = compact(rate);
 	if (big !== null) return `${sign}${big}/s`;
-	if (Math.abs(rate) >= 10_000) return `${sign}${(rate / 1_000).toFixed(2)}K/s`;
+	if (Math.abs(rate) >= 10_000) return `${sign}${tidy((rate / 1_000).toFixed(2))}K/s`;
 
-	return `${sign}${rate.toFixed(2)}/s`;
+	return `${sign}${tidy(rate.toFixed(2))}/s`;
 };
 
 // Format time to display in the appropriate units

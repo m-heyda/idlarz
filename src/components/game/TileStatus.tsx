@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { BiomeType } from '@/types/game';
+import { tidy } from '@/utils/formatters';
 import { BIOMES } from '@/config/biomes';
 import { calculateTileCost, canAffordBundle, tileCostAsResources } from '@/utils/game/costs';
 import { effectiveTileDiscount } from '@/utils/game/rebirth';
@@ -40,7 +41,7 @@ export const TileStatus = memo(
 					<div className='flex flex-wrap items-center gap-1 mb-2'>
 						<span className={canAfford ? 'text-green-400' : 'text-red-400'}>Cost:</span>
 						<CostList cost={tileCostAsResources(cost)} />
-						{discount > 0 && <span className='text-amber-400 text-xs ml-1'>(-{discount.toFixed(2)}%)</span>}
+						{discount > 0 && <span className='text-amber-400 text-xs ml-1'>(-{tidy(discount.toFixed(2))}%)</span>}
 					</div>
 					<div className='px-tip-muted text-xs text-center'>Click to explore</div>
 				</div>
