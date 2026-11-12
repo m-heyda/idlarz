@@ -21,7 +21,9 @@
 			}
 		],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@idlarz/design-system": ["./packages/design-system/src/index.ts"],
+			"@idlarz/design-system/*": ["./packages/design-system/src/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
