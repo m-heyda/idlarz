@@ -41,7 +41,7 @@
   "category": "Saves & Server/Endpoints",
   "file": "src/app/api/rankings/route.ts",
   "line": 18,
-  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
+  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
   "see": []
  },
  {
@@ -122,7 +122,7 @@
   "kind": "function",
   "category": "Progression/Badges",
   "file": "src/catalog/badges.ts",
-  "line": 27,
+  "line": 49,
   "summary": "Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement. The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.",
   "see": []
  },
@@ -1007,7 +1007,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 251,
+  "line": 252,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -1018,7 +1018,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 266,
+  "line": 267,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },
@@ -2198,7 +2198,7 @@
   "kind": "function",
   "category": "Saves & Server/Away time",
   "file": "src/lib/offline/away.ts",
-  "line": 22,
+  "line": 23,
   "summary": "The read-only `away` block of `GET /api/auth/me`: gap = now minus the later of the ledger anchor and the last accepted save (as `claimOffline` measures it), with the cap and efficiency the last save stored (`derived.offlineCapSec` / `offlineEfficiency`, the base limits when an older row lacks them). `null` with no save, an unreadable time, or a gap under `offlineMinGapSec` (nothing to show). It never claims anything and never touches the ledger.",
   "see": []
  },
@@ -2764,7 +2764,7 @@
   "kind": "const",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 39,
+  "line": 40,
   "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).",
   "see": []
  },
@@ -2775,7 +2775,7 @@
   "kind": "function",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 86,
+  "line": 92,
   "summary": "The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.",
   "see": []
  },

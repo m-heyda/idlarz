@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { offlineCapSec, offlineEfficiency, offlineMinGapSec } from '@/lib/offline/limits';
 import { shownIdentity, type ShownIdentity } from '@/catalog/badges';
+import { ADMIN_UNLOCK } from '@/catalog/avatars';
 
 /** The landing card's away bar: how long the player has been gone, the cap that counts and the share of income paid. Numbers only, the same ones the claim will use. */
 export interface AwayBlock {
@@ -67,6 +68,8 @@ export const loadShownIdentity = async (supabase: SupabaseClient, userId: string
 		]);
 		if (earned.error || choice.error) return null;
 		const held = (earned.data ?? []).map((row) => String(row.achievement_id));
+		// the admin's account also holds the pseudo id of the admin-only badge, title and avatar (same rule as `loadEarnedAchievements`)
+		if (choice.data?.is_admin === true) held.push(ADMIN_UNLOCK);
 		const shown = shownIdentity(
 			{
 				badgeId: typeof choice.data?.badge_id === 'string' ? choice.data.badge_id : null,

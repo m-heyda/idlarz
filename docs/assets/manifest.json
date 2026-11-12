@@ -21484,6 +21484,21 @@
 	},
 	{
 		"usedBy": [
+			"src/components/game/RankingsWindow.tsx"
+		],
+		"name": "rank_trophy",
+		"category": "ui",
+		"subcategory": "rank",
+		"src": "/pixel/icons/rank_trophy.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"src/components/game/overlays/CombatWidget.tsx"
 		],
 		"name": "skull",

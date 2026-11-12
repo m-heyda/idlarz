@@ -13,6 +13,7 @@ import {
 	type RankingEntry,
 	type RankingProfile,
 } from '../../src/lib/rankings';
+import { BASELINE_EPOCH, GAME_EPOCH } from '../../src/config/epoch';
 import { CRAFTING } from '../../src/config/crafting';
 import { MAX_LEVEL } from '../../src/config/character';
 import { craftCumulativeXp, craftLevelOf } from '../../src/lib/crafting';
@@ -53,7 +54,12 @@ test('movement: a smaller rank is up, a larger one is down, no earlier place is 
 });
 
 test('the database gets the live caps from the config, never its own copy', () => {
-	assert.deepEqual(refreshArgs(), { p_level_cap: MAX_LEVEL, p_craft_max_xp: craftCumulativeXp(CRAFTING.maxLevel) });
+	assert.deepEqual(refreshArgs(), {
+		p_level_cap: MAX_LEVEL,
+		p_craft_max_xp: craftCumulativeXp(CRAFTING.maxLevel),
+		p_epoch: GAME_EPOCH,
+		p_baseline: BASELINE_EPOCH,
+	});
 	assert.equal(craftLevelOf(refreshArgs().p_craft_max_xp).level, CRAFTING.maxLevel, 'that much crafting XP is exactly the maximum level');
 });
 

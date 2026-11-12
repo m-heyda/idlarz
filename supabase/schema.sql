@@ -333,8 +333,8 @@ alter table public.ranking_meta enable row level security;
 revoke all on table public.player_rankings, public.ranking_meta from anon, authenticated, public;
 grant select, insert, update, delete on public.player_rankings, public.ranking_meta to service_role;
 
--- p_level_cap: the maximum character level; p_craft_max_xp: the crafting XP of the maximum crafting level (both from the game's config)
-create or replace function public.refresh_rankings(p_level_cap integer, p_craft_max_xp numeric)
+-- p_level_cap: the maximum character level; p_craft_max_xp: the crafting XP of the maximum crafting level; p_epoch / p_baseline: the game's data epoch and the epoch of an account that has none (all from the game's config)
+create or replace function public.refresh_rankings(p_level_cap integer, p_craft_max_xp numeric, p_epoch integer, p_baseline integer)
 returns boolean
 language plpgsql
 set search_path = ''
@@ -350,8 +350,12 @@ begin
     return false;
   end if;
 
+  -- who is ranked: every account of the current chapter (profiles.epoch, null = the baseline epoch) that is not a test account. An old chapter's world never counts; a flag raised
+  -- earlier (player_saves.ever_flagged) no longer hides a player, the chapter reset is the clean start.
   delete from public.player_rankings r
-   where not exists (select 1 from public.player_stats s where s.user_id = r.user_id and s.trusted);
+   where not exists (
+     select 1 from public.player_saves p join public.profiles pr on pr.id = p.user_id
+      where p.user_id = r.user_id and not p.test_account and coalesce(pr.epoch, p_baseline) >= p_epoch);
 
   update public.player_rankings set
     prev_rank_level = rank_level, prev_rank_rebirths = rank_rebirths, prev_rank_crafting = rank_crafting, prev_rank_tiles = rank_tiles,
@@ -369,9 +373,10 @@ begin
                     where e.value ~ '^[0-9]+$'), 0)::bigint,
          now()
     from public.player_stats s
-    left join public.player_saves p on p.user_id = s.user_id
+    join public.player_saves p on p.user_id = s.user_id
+    join public.profiles pr on pr.id = s.user_id
     left join public.player_ledger l on l.user_id = s.user_id
-   where s.trusted
+   where not p.test_account and coalesce(pr.epoch, p_baseline) >= p_epoch
   on conflict (user_id) do update set
     level = excluded.level, xp = excluded.xp,
     level_maxed_at = case when excluded.level_maxed_at is null then null else coalesce(public.player_rankings.level_maxed_at, excluded.level_maxed_at) end,
@@ -396,5 +401,5 @@ begin
   return true;
 end;
 $$;
-revoke execute on function public.refresh_rankings(integer, numeric) from public, anon, authenticated;
-grant execute on function public.refresh_rankings(integer, numeric) to service_role;
+revoke execute on function public.refresh_rankings(integer, numeric, integer, integer) from public, anon, authenticated;
+grant execute on function public.refresh_rankings(integer, numeric, integer, integer) to service_role;

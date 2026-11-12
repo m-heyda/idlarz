@@ -219,7 +219,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/**
 
-- [`AchievementBadge.tsx`](../../src/components/game/AchievementBadge.tsx) — ~ One achievement's badge picture, shown next to a name (the Character window) and in the badge picker.
+- [`AchievementBadge.tsx`](../../src/components/game/AchievementBadge.tsx) — ~ One badge picture, shown next to a name (the Character window) and in the badge picker:
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
 - [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
 - [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window.
@@ -1035,6 +1035,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
 - [`player_rankings.sql`](../../supabase/migrations/player_rankings.sql)
+- [`player_rankings_eligibility.sql`](../../supabase/migrations/player_rankings_eligibility.sql)
+- [`player_rankings_eligibility_rollback.sql`](../../supabase/migrations/player_rankings_eligibility_rollback.sql)
 - [`player_rankings_kills.sql`](../../supabase/migrations/player_rankings_kills.sql)
 - [`player_rankings_kills_rollback.sql`](../../supabase/migrations/player_rankings_kills_rollback.sql)
 - [`player_rankings_rollback.sql`](../../supabase/migrations/player_rankings_rollback.sql)

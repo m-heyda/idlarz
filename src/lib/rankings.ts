@@ -1,5 +1,6 @@
 import { fitAvatar } from '@/catalog/avatars';
 import { shownIdentity } from '@/catalog/badges';
+import { BASELINE_EPOCH, GAME_EPOCH } from '@/config/epoch';
 import { CRAFTING } from '@/config/crafting';
 import { MAX_LEVEL } from '@/config/character';
 import { DEFAULT_PLAYER_CLASS, PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
@@ -25,7 +26,7 @@ export interface RankingBoardInfo {
 /**
  * The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
  *
- * Every board lists the first 50 places of the trusted players, plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
+ * Every board lists the first 50 places of the players on the current chapter (test accounts never), plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
  * Ties are broken in this order:
  * - Level: level, then lifetime XP, then who reached the level cap first.
  * - Rebirths: rebirths, then Embers ever earned.
@@ -57,8 +58,13 @@ export const RANKING_LIMIT = 50;
 /** The ranking is rebuilt at most this often (`refresh_rankings()` does nothing inside it) */
 export const RANKING_REFRESH_MS = 24 * 3600_000;
 
-/** The arguments of `refresh_rankings()`: the maximum character level and the crafting XP of the maximum crafting level (the database has no copy of the game's config) */
-export const refreshArgs = () => ({ p_level_cap: MAX_LEVEL, p_craft_max_xp: craftCumulativeXp(CRAFTING.maxLevel) });
+/** The arguments of `refresh_rankings()`: the maximum character level and the crafting XP of the maximum crafting level and the data epoch: only accounts on the current chapter are ranked (the database has no copy of the game's config) */
+export const refreshArgs = () => ({
+	p_level_cap: MAX_LEVEL,
+	p_craft_max_xp: craftCumulativeXp(CRAFTING.maxLevel),
+	p_epoch: GAME_EPOCH,
+	p_baseline: BASELINE_EPOCH,
+});
 
 /**
  * The paragon level of a character: 0 until paragon exists (the maximum level is 100 and nothing goes past it yet, docs/plan/13). The window already shows a paragon mark for a value above 0, so

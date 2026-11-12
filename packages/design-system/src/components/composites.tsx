@@ -109,16 +109,17 @@ export const NickName: React.FC<{ children: React.ReactNode; color?: string | nu
 /** The animated nickname looks the design system draws (`.ds-nick-<id>`): the gold admin one and the effects of the Gem shop. A colour that is a CSS value is drawn plain. */
 const NICK_EFFECT_IDS = ['gold', 'rainbow', 'aurora', 'ember', 'frost', 'void', 'galaxy'];
 
-/**
- * The game admin's mark: a small animated creature (an 8 frame sprite sheet, `src`, 32 px frames) that stands by the name of the admin account, for everyone to see in the game, on the landing page and in the rankings.
- * It is not part of the player's choices and cannot be hidden. Draw it wherever a name is shown for an account with `profiles.is_admin` (`ShownIdentity.admin`).
- */
-export const AdminMark: React.FC<{ src?: string; size?: number }> = ({ src = '/pixel/new_assets/admin/admin_mark.png', size = 28 }) => (
+/** The admin octopus badge: an 8 frame sprite sheet (`src`, square frames of `size` px) that plays in a loop. It is the Dev badge the game admin's account can pick (`ADMIN_BADGE`), drawn wherever a badge is. */
+export const AdminMark: React.FC<{ src?: string; size?: number; label?: string }> = ({
+	src = '/pixel/new_assets/admin/admin_mark.png',
+	size = 28,
+	label = 'Dev',
+}) => (
 	<span
 		className='ds-admin-mark'
 		role='img'
-		aria-label='Game admin'
-		title='Game admin'
+		aria-label={label}
+		title={label}
 		style={{
 			width: size,
 			height: size,
@@ -129,6 +130,14 @@ export const AdminMark: React.FC<{ src?: string; size?: number }> = ({ src = '/p
 	/>
 );
 
+/** A badge picture of any kind: the medal of an achievement (a still image) or the animated admin octopus (its sheet is told by the file name). The one place a badge becomes pixels. */
+export const BadgePic: React.FC<{ src: string; size?: number; label?: string; className?: string }> = ({ src, size = 24, label = '', className }) =>
+	src.endsWith('/admin_mark.png') ? (
+		<AdminMark src={src} size={size} label={label || 'Dev'} />
+	) : (
+		<img className={className ?? 'pixelated'} src={src} alt={label} title={label || undefined} width={size} height={size} draggable={false} />
+	);
+
 /** Name line of a hero: avatar (click to change), name, the chosen badge, the chosen title and the class. The name, badge and title are buttons too (they open the name colour, badge and title picker). */
 export const HeroIdentity: React.FC<{
 	avatar: string;
@@ -138,8 +147,6 @@ export const HeroIdentity: React.FC<{
 	title?: string | null;
 	/** The nickname colour (a CSS colour or `gold`, see {@link NickName}); clicking the name runs `onBadge` */
 	nameColor?: string | null;
-	/** Draws the admin mark by the name (the game admin's account) */
-	admin?: boolean;
 	onAvatar?: () => void;
 	onBadge?: () => void;
 	avatarTitle?: string;
@@ -148,7 +155,7 @@ export const HeroIdentity: React.FC<{
 	/** Makes the class line a button (the class picker) and says what it gives on hover */
 	onClass?: () => void;
 	classTitle?: string;
-}> = ({ avatar, name, classLabel, badge, title, nameColor, admin, onAvatar, onBadge, onClass, classTitle, avatarTitle, badgeTitle = 'Customize' }) => (
+}> = ({ avatar, name, classLabel, badge, title, nameColor, onAvatar, onBadge, onClass, classTitle, avatarTitle, badgeTitle = 'Customize' }) => (
 	<div className='ds-identity'>
 		<AvatarFrame src={avatar} size={61} onClick={onAvatar} title={avatarTitle} />
 		<div className='ds-identity-text'>
@@ -158,7 +165,6 @@ export const HeroIdentity: React.FC<{
 						<NickName color={nameColor}>{name}</NickName>
 					</button>
 				</HoverTip>
-				{admin && <AdminMark />}
 				{/* the title and the badge only show when there is one: the name opens the same window to pick them */}
 				{title && (
 					<button type='button' className='ds-identity-title' title={badgeTitle} onClick={onBadge}>
@@ -167,7 +173,7 @@ export const HeroIdentity: React.FC<{
 				)}
 				{badge && (
 					<button type='button' className='ds-identity-badge' title={badgeTitle} onClick={onBadge}>
-						<img src={badge} alt='' />
+						<BadgePic src={badge} size={24} />
 					</button>
 				)}
 			</div>

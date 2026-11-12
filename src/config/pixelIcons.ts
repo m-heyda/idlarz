@@ -65,6 +65,7 @@ const BASE_ICON_SIZES = {
 	menu_gems_pouch: [64, 64],
 	menu_bag_scroll: [64, 64],
 	menu_bestiary: [64, 64], // the stone slab with a stag silhouette (the Bestiary button)
+	rank_trophy: [64, 64], // the gold trophy of the Rankings: first place as it is, second and third place recoloured to silver and bronze with CSS (`.ds-rank-trophy`)
 	menu_rankings: [64, 64], // the stone slab with the red and gold medal (the Rankings button): the clean slab of the other menu buttons with the medal on it
 	comp_glass_vial: [40, 40],
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)

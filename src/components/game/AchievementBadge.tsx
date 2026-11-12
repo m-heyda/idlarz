@@ -1,18 +1,10 @@
 import React from 'react';
-import type { AchievementDef } from '@/catalog/achievements';
+import { BadgePic } from '../../../packages/design-system/src/components/composites';
+import { badgePicSrc, type BadgeInfo } from '@/catalog/badges';
 
-/** One achievement's badge picture, shown next to a name (the Character window) and in the badge picker. */
-const AchievementBadge: React.FC<{ achievement: AchievementDef; size?: number }> = ({ achievement, size = 24 }) => (
-	// eslint-disable-next-line @next/next/no-img-element
-	<img
-		className='early-tester-badge pixelated'
-		src={`/pixel/new_assets/achievements/${achievement.badge}.png`}
-		alt={achievement.title}
-		title={achievement.title}
-		width={size}
-		height={size}
-		draggable={false}
-	/>
+/** One badge picture, shown next to a name (the Character window) and in the badge picker: an achievement's medal, or the admin's animated octopus. */
+const AchievementBadge: React.FC<{ achievement: BadgeInfo; size?: number }> = ({ achievement, size = 24 }) => (
+	<BadgePic src={badgePicSrc(achievement.badge)} size={size} label={achievement.title} className='early-tester-badge pixelated' />
 );
 
 export default AchievementBadge;

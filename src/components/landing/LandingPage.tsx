@@ -9,7 +9,7 @@ import AvatarArt from '@/components/game/AvatarArt';
 import AwayBar from '@/components/game/AwayBar';
 import { resolveAvatar } from '@/catalog/avatars';
 import { nickColorValue } from '@/config/nickColors';
-import type { ShownIdentity } from '@/catalog/badges';
+import { badgePicSrc, type ShownIdentity } from '@/catalog/badges';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
 import { LANDING_BG } from '@/config/landing';
@@ -23,7 +23,7 @@ import { fetchMe, logout, type AwayInfo, type Profile, type ProfileStats, type U
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@idlarz/design-system';
 import { Button, Frame, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
-import { AdminMark, NickName } from '../../../packages/design-system/src/components/composites';
+import { BadgePic, NickName } from '../../../packages/design-system/src/components/composites';
 import '@/styles/Landing.css';
 
 type Visitor =
@@ -191,20 +191,8 @@ const MemberCard: React.FC<{
 			</div>
 			<p className='ld-continue-name'>
 				<NickName color={nickColorValue(identity?.nameColor)}>{profile.characterName}</NickName>
-				{identity?.admin && <AdminMark />}
 				{identity?.title && <span className='ld-continue-title'> ({identity.title})</span>}
-				{identity?.badge && (
-					// eslint-disable-next-line @next/next/no-img-element
-					<img
-						className='early-tester-badge pixelated'
-						src={`/pixel/new_assets/achievements/${identity.badge}.png`}
-						alt={identity.badgeName ?? ''}
-						title={identity.badgeName ?? undefined}
-						width={26}
-						height={26}
-						draggable={false}
-					/>
-				)}
+				{identity?.badge && <BadgePic src={badgePicSrc(identity.badge)} size={30} label={identity.badgeName ?? ''} className='early-tester-badge pixelated' />}
 			</p>
 			<p className='ld-continue-class'>
 				{info.race} {info.label}
