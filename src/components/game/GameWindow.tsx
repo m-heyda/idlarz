@@ -66,7 +66,15 @@ const GameWindow: React.FC<GameWindowProps> = ({ id, title, icon, width = 820, h
 		return () => window.removeEventListener('keydown', onKey);
 	}, [isFront, closeWindow, id]);
 
-	const size = stored ?? { w: width, h: height ?? DEFAULT_HEIGHT };
+	const wanted = stored ?? { w: width, h: height ?? DEFAULT_HEIGHT };
+	// a window never reaches past the screen edges from where it sits (a tall window on a short screen shrinks to the room it has)
+	const size =
+		typeof window === 'undefined'
+			? wanted
+			: {
+					w: Math.max(MIN_SIZE.w, Math.min(wanted.w, window.innerWidth - pos.x - 8)),
+					h: Math.max(MIN_SIZE.h, Math.min(wanted.h, window.innerHeight - pos.y - 8)),
+				};
 
 	// a window left near an edge of a bigger screen is pulled back in when the screen got smaller
 	useLayoutEffect(() => {

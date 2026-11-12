@@ -184,6 +184,8 @@ export interface ItemTooltipProps {
 	onDrink?: () => void;
 	/** The key hints line ("Dbl-click equip - Shift + click sell") */
 	hints?: string;
+	/** Anything more, drawn after the set changes (the gained and lost set bonuses, the net change) */
+	extra?: React.ReactNode;
 	footer?: Footer;
 }
 
@@ -212,6 +214,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 	compare,
 	onDrink,
 	hints,
+	extra,
 	footer,
 }) => (
 	<Tooltip rarity={rarity} icon={icon} title={name} subtitle={type} footer={footer}>
@@ -255,6 +258,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 				{c.label} {c.from} → {c.to} / {c.size}
 			</TipLine>
 		))}
+		{extra}
 		{set ? <TipSetBlock {...set} /> : null}
 		{onDrink ? (
 			<button type='button' className='ds-btn ds-btn-sm' onClick={onDrink}>

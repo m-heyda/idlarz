@@ -6,7 +6,7 @@ import '@idlarz/design-system';
 import PixelWindow from '../PixelWindow';
 import PixelIcon from '../PixelIcon';
 import CastleUpgradeDialog from '../CastleUpgradeDialog';
-import CharacterOverlay from './CharacterOverlay';
+import HeroWindow from '../hero/HeroWindow';
 import StatisticsOverlay from './StatisticsOverlay';
 import MerchantOverlay from './Merchant/MerchantOverlay';
 import FarmOverlay from './FarmOverlay';
@@ -33,11 +33,9 @@ const GameWindows: React.FC = () => {
 	return (
 		<>
 			{open.includes('equipment') && (
-				<PixelWindow id='equipment' title='Equipment' icon={<PixelIcon name='menu_equipment' alt='' />} width={1040} height={720}>
-					<WindowErrorBoundary name='Equipment'>
-						<CharacterOverlay />
-					</WindowErrorBoundary>
-				</PixelWindow>
+				<WindowErrorBoundary name='Hero'>
+					<HeroWindow />
+				</WindowErrorBoundary>
 			)}
 			{open.includes('character') && (
 				<PixelWindow id='character' title='Character' icon={<PixelIcon name='menu_stats' alt='' />} width={1180}>

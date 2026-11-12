@@ -73,6 +73,8 @@ export interface TabItem {
 	disabled?: boolean;
 	/** Hover text (why a tab is locked) */
 	title?: string;
+	/** A tutorial anchor (`data-tutorial`) for the game's guide to point at */
+	anchor?: string;
 }
 /** A row of wooden tabs, the active one in gold. */
 export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: string) => void }> = ({ items, active, onChange }) => (
@@ -87,6 +89,7 @@ export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: 
 				className='ds-tab'
 				disabled={t.disabled}
 				title={t.title}
+				data-tutorial={t.anchor}
 				onClick={() => !t.disabled && onChange?.(t.id)}
 			>
 				{t.label}
@@ -157,6 +160,8 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 	locked?: boolean;
 	/** The item is worn (drawn with a gold corner mark) */
 	equipped?: boolean;
+	/** The piece would be sold by Sell junk (a small brown mark in the top right corner) */
+	junk?: boolean;
 	large?: boolean;
 	/** Marks the slot as the selected one (recipe picker) */
 	active?: boolean;
@@ -169,7 +174,7 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
  * An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. It is a plain button: every native attribute and handler (onClick, onDoubleClick,
  * onContextMenu, draggable, onDragStart, onDrop, aria-*, data-*) passes through, so the game keeps its own click, drag and drop logic.
  */
-export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, equipped, large, active, label, sub, className, style, ...rest }) => {
+export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, equipped, junk, large, active, label, sub, className, style, ...rest }) => {
 	const glow = rarity && rarity !== 'common';
 	return (
 		<button
@@ -191,6 +196,7 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 				</span>
 			) : null}
 			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
+			{junk ? <i className='ds-slot-junk' aria-hidden /> : null}
 		</button>
 	);
 };

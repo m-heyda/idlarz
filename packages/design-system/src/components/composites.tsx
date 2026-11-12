@@ -93,7 +93,23 @@ export const HeroIdentity: React.FC<{
 	noTitleLabel?: string;
 	avatarTitle?: string;
 	badgeTitle?: string;
-}> = ({ avatar, name, classLabel, badge, title, onAvatar, onBadge, noTitleLabel = 'No title', avatarTitle, badgeTitle = 'Change badge and title' }) => (
+	/** Makes the class line a button (the class picker) and says what it gives on hover */
+	onClass?: () => void;
+	classTitle?: string;
+}> = ({
+	avatar,
+	name,
+	classLabel,
+	badge,
+	title,
+	onAvatar,
+	onBadge,
+	onClass,
+	classTitle,
+	noTitleLabel = 'No title',
+	avatarTitle,
+	badgeTitle = 'Change badge and title',
+}) => (
 	<div className='ds-identity'>
 		<AvatarFrame src={avatar} size={61} onClick={onAvatar} title={avatarTitle} />
 		<div className='ds-identity-text'>
@@ -106,9 +122,15 @@ export const HeroIdentity: React.FC<{
 					{badge ? <img src={badge} alt='' /> : <span className='ds-dim'>＋</span>}
 				</button>
 			</div>
-			<div className='ds-caps ds-dim' style={{ fontSize: 11 }}>
-				{classLabel}
-			</div>
+			{onClass ? (
+				<button type='button' className='ds-caps ds-dim ds-identity-class' title={classTitle} onClick={onClass}>
+					{classLabel}
+				</button>
+			) : (
+				<div className='ds-caps ds-dim' style={{ fontSize: 11 }} title={classTitle}>
+					{classLabel}
+				</div>
+			)}
 		</div>
 	</div>
 );

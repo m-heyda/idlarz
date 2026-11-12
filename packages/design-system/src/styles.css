@@ -3548,3 +3548,29 @@
 	margin-left: 0;
 	align-items: center;
 }
+
+/* ===== Hero window wiring (IDL-323): the junk mark of a bag slot, the class line as a button ===== */
+.ds-slot-junk {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 8px;
+	height: 8px;
+	background: #8a5a2a;
+	border: 1px solid var(--ds-gold-lt);
+	pointer-events: none;
+}
+
+.ds-identity-class {
+	font: inherit;
+	font-size: 11px;
+	padding: 0;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	text-align: left;
+}
+
+.ds-identity-class:hover {
+	color: var(--ds-gold-lt);
+}

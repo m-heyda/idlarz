@@ -29,7 +29,7 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `comp_glass_vial` | <img src="../../public/pixel/icons/comp_glass_vial.png" width="80" alt="comp_glass_vial"> | 40x40 | used | src/components/game/CraftStash.tsx, src/components/game/overlays/CraftingOverlay.tsx | `pixel/icons/comp_glass_vial.png` |
+| `comp_glass_vial` | <img src="../../public/pixel/icons/comp_glass_vial.png" width="80" alt="comp_glass_vial"> | 40x40 | used | src/components/game/CraftStash.tsx, src/components/game/hero/HeroWindow.tsx, src/components/game/overlays/CraftingOverlay.tsx | `pixel/icons/comp_glass_vial.png` |
 
 ## currency
 

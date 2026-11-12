@@ -16,7 +16,6 @@ const icon = (name: PixelIconName) => pixelIconSrc(name);
 
 /** The windows in the dock, in order. The stone tiles are the ones the game already had (IDL-326 reworks them); Farm and Crafting keep their buttons until the Hero window takes over crafting. */
 const WINDOWS: { id: WinId; label: string; icon: PixelIconName; tutorial: string }[] = [
-	{ id: 'equipment', label: 'Equip', icon: 'menu_equipment', tutorial: 'tab-equipment' },
 	{ id: 'merchant', label: 'Merchant', icon: 'menu_merchant', tutorial: 'tab-merchant' },
 	{ id: 'farm', label: 'Farm', icon: 'menu_farm', tutorial: 'tab-farm' },
 	{ id: 'crafting', label: 'Crafting', icon: 'menu_crafting', tutorial: 'tab-crafting' },
@@ -56,17 +55,17 @@ const HudDock: React.FC = () => {
 		<div data-hud-dock style={{ position: 'fixed', left: '50%', bottom: 6, transform: 'translateX(-50%)', zIndex: 39 }}>
 			<div className='ds-root'>
 				<Dock>
-					{/* the hero's portrait opens the character screen; the badge counts unspent stat points. No tooltip */}
+					{/* the hero's portrait opens the Hero window (bag, gear, stats); the badge counts unspent stat points. No tooltip */}
 					<IconButton
 						icon=''
 						art={<CharacterPortrait variant='bust' scale={1.25} />}
 						label={`Lv ${level}`}
 						aria-label={`Character, level ${level}`}
 						badge={pointsWaiting ? points : undefined}
-						active={order.includes('character')}
-						aria-pressed={order.includes('character')}
-						data-tutorial='tab-character'
-						onClick={() => toggleWindow('character')}
+						active={order.includes('equipment')}
+						aria-pressed={order.includes('equipment')}
+						data-tutorial='tab-equipment'
+						onClick={() => toggleWindow('equipment')}
 					/>
 					{WINDOWS.map(({ id, label, icon: name, tutorial }) => (
 						<IconButton

@@ -45,3 +45,16 @@ test('a size the player dragged to wins over the default, and a window behind an
 	assert.match(out, /height:500px/);
 	assert.match(out, /data-active="false"/);
 });
+
+test('the Hero window draws the new bag with the hero card, gear, skills, footer buttons and the tabs', async () => {
+	const { default: HeroWindow } = await import('../../src/components/game/hero/HeroWindow');
+	reset();
+	put({ order: ['equipment'] });
+	const out = renderToStaticMarkup(h(HeroWindow));
+	assert.match(out, /aria-label="Hero"/);
+	for (const word of ['Bag', 'Stats', 'Crafting', 'Crafting bag', 'Armor', 'Jewelry', 'Hands', 'Skills', 'slots used', 'Organise', 'Sell junk']) {
+		assert.ok(out.includes(word), `the window shows "${word}"`);
+	}
+	assert.match(out, /ds-baggrid/);
+	assert.match(out, /ds-hero-left/);
+});
