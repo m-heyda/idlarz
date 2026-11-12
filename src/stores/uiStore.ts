@@ -38,6 +38,9 @@ interface ContextMenuState {
 
 let toastId = 0;
 let chestNoticeId = 0;
+let achievementNoticeId = 0;
+/** How long the reward card of an earned achievement stays up (ms) */
+const ACHIEVEMENT_NOTICE_MS = 7000;
 const noticeTimers = new Map<number, ReturnType<typeof setTimeout>>();
 let flashTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -159,6 +162,10 @@ interface UiState {
 	/** Chest rewards, stacked: opening chests quickly queues one notice per chest */
 	chestNotices: ChestNotice[];
 	pushChestNotice: (loot: ChestNoticeLoot) => void;
+	/** The reward card of an earned achievement (badge, Congratulations, fanfare): one per achievement, at most a few on screen */
+	achievementNotices: { id: number; achievementId: string }[];
+	pushAchievementNotice: (achievementId: string) => void;
+	dismissAchievementNotice: (id: number) => void;
 	dismissChestNotice: (id: number) => void;
 	/** Remembered view options (localStorage, see lib/uiPrefs): the minimap, the compact header and the folded panels */
 	showMinimap: boolean;
@@ -264,6 +271,21 @@ export const useUiStore = create<UiState>((set, get) => ({
 	},
 	dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 	chestNotices: [],
+	achievementNotices: [],
+	pushAchievementNotice: (achievementId) => {
+		const id = ++achievementNoticeId;
+		const next = [...get().achievementNotices, { id, achievementId }];
+		const dropped = next.splice(0, Math.max(0, next.length - 3));
+		dropped.forEach((n) => {
+			const timer = noticeTimers.get(-1_000_000 - n.id);
+			if (timer) clearTimeout(timer);
+			noticeTimers.delete(-1_000_000 - n.id);
+		});
+		set({ achievementNotices: next });
+		// keys below -1,000,000 keep these timers apart from the chest and toast timers in the same map
+		schedule(-1_000_000 - id, ACHIEVEMENT_NOTICE_MS, () => get().dismissAchievementNotice(id));
+	},
+	dismissAchievementNotice: (id) => set((state) => ({ achievementNotices: state.achievementNotices.filter((n) => n.id !== id) })),
 	pushChestNotice: (loot) => {
 		const id = ++chestNoticeId;
 		const next = [...get().chestNotices, { id, loot }];

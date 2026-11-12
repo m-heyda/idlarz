@@ -271,6 +271,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/overlays/**
 
+- [`AchievementNotification.tsx`](../../src/components/game/overlays/AchievementNotification.tsx) — ~ The reward moment for an earned achievement (IDL-332):
 - [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
 - [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What a building makes, in plain words:
 - [`BuildingModal.tsx`](../../src/components/game/overlays/BuildingModal.tsx) — ~ "+1.2K" per hour for each resource of an output (per second in, per hour out).
@@ -633,6 +634,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`audioManager.ts`](../../src/utils/audioManager.ts) — Audio manager for handling game sound effects
 - [`biomeRules.ts`](../../src/utils/biomeRules.ts) — ~ Whether a biome may turn up on one tile, and why not.
 - [`cluster.ts`](../../src/utils/cluster.ts) — ~ The connected area of one biome around (x, y):
+- [`fanfare.ts`](../../src/utils/fanfare.ts) — ~ The fanfare plays once per burst:
 - [`formatters.ts`](../../src/utils/formatters.ts) — Suffixes for large numbers: thousand steps from K (the first at 10,000), then M, B, T, Qa, Qi, Sx; beyond that scientific
 
 **src/utils/game/**

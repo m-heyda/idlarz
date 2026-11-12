@@ -66,8 +66,9 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
 		}));
 		if (typeof r.gemsTotal === 'number') useGameStore.setState({ gems: r.gemsTotal });
 		for (const unlock of r.fresh) {
-			const title = achievementById(unlock.id)?.title ?? unlock.id;
-			useUiStore.getState().showToast(`Achievement earned: ${title}. Claim it in the Achievements window.`);
+			// the reward card (badge, Congratulations!, fanfare); an id the catalog does not know falls back to the plain message
+			if (achievementById(unlock.id)) useUiStore.getState().pushAchievementNotice(unlock.id);
+			else useUiStore.getState().showToast(`Achievement earned: ${unlock.id}.`);
 		}
 	},
 	claim: async (id) => {
