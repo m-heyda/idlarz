@@ -232,7 +232,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from, shown as their portraits.
 - [`CollapsibleSection.tsx`](../../src/components/game/CollapsibleSection.tsx) — ~ A titled block whose header toggles the body; the open/closed choice is remembered per `id` (localStorage).
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
-- [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu.
+- [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu, drawn by the design system's `ContextMenu`.
 - [`CostList.tsx`](../../src/components/game/CostList.tsx) — ~ A bundle of resource costs; each entry is green when affordable and red when not.
 - [`CraftStash.tsx`](../../src/components/game/CraftStash.tsx) — ~ The bag's Crafting tab:
 - [`DailyBoard.tsx`](../../src/components/game/DailyBoard.tsx) — ~ The line under the board's title:

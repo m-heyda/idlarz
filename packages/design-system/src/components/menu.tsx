@@ -16,7 +16,7 @@ export interface MenuItem {
 	/** Hover text (why an entry is disabled, what it does) */
 	tooltip?: string;
 	/** A hint that changes while the menu is open (a countdown); redrawn once a second */
-	liveHint?: () => string;
+	liveHint?: () => string | undefined;
 	/** A submenu: choosing the entry opens these in place, with a Back entry that returns */
 	children?: MenuItem[];
 	onSelect: () => void;
@@ -30,9 +30,16 @@ export interface MenuState {
 
 /**
  * The right-click menu, shaped like the game's (title, entries with hints, a rule before the destructive one). The caller owns `menu` (null = closed): set it from a slot's `onContextMenu` with
- * the pointer position and the entries. It sits in a portal on top of everything, stays inside the screen and closes on Escape, an outside press, a scroll, a resize or losing focus.
+ * the pointer position and the entries. It sits in a portal on top of everything, stays inside the screen and closes on Escape, an outside press, a scroll, a resize or losing focus (`anchorSelector` exempts the opening button from the outside press).
  */
-export const ContextMenu: React.FC<{ menu: MenuState | null; onClose: () => void }> = ({ menu: opened, onClose }) => {
+export const ContextMenu: React.FC<{
+	menu: MenuState | null;
+	onClose: () => void;
+	/** A press on an element matching this selector does not close the menu (the button that opened it closes it itself on its click) */
+	anchorSelector?: string;
+	/** Called for every entry that is pressed (the game plays its click sound here) */
+	onItemPress?: (item: MenuItem) => void;
+}> = ({ menu: opened, onClose, anchorSelector, onItemPress }) => {
 	const ref = useRef<HTMLDivElement>(null);
 	// a submenu replaces the entries in place; opening another menu starts from its own entries again
 	const [sub, setSub] = useState<MenuState | null>(null);
@@ -59,7 +66,10 @@ export const ContextMenu: React.FC<{ menu: MenuState | null; onClose: () => void
 	useEffect(() => {
 		if (!menu) return;
 		const key = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-		const down = (e: PointerEvent) => ref.current && !ref.current.contains(e.target as Node) && onClose();
+		const down = (e: PointerEvent) => {
+			const target = e.target as HTMLElement;
+			if (ref.current && !ref.current.contains(target) && !(anchorSelector && target.closest?.(anchorSelector))) onClose();
+		};
 		window.addEventListener('keydown', key);
 		window.addEventListener('pointerdown', down, true);
 		window.addEventListener('wheel', onClose, { passive: true });
@@ -72,7 +82,7 @@ export const ContextMenu: React.FC<{ menu: MenuState | null; onClose: () => void
 			window.removeEventListener('resize', onClose);
 			window.removeEventListener('blur', onClose);
 		};
-	}, [menu, onClose]);
+	}, [menu, onClose, anchorSelector]);
 	if (!menu || typeof document === 'undefined') return null;
 	return createPortal(
 		<div
@@ -96,6 +106,7 @@ export const ContextMenu: React.FC<{ menu: MenuState | null; onClose: () => void
 						disabled={it.disabled}
 						title={it.tooltip ?? (it.disabled ? it.hint : undefined)}
 						onClick={() => {
+							onItemPress?.(it);
 							if (it.children) {
 								const parent = menu;
 								setSub({
