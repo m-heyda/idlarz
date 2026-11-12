@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BADGE_NONE, badgeOptions, checkBadgeChoice, shownBadge, shownTitle, titleOptions } from '../../src/catalog/badges';
+import { BADGE_NONE, badgeOptions, checkBadgeChoice, shownBadge, shownIdentity, shownTitle, titleOptions } from '../../src/catalog/badges';
 
 const earned = ['early_tester', 'first_rebirth'];
 
@@ -50,4 +50,14 @@ test('only the short badge list can be worn: an earned achievement outside it is
 	);
 	assert.equal(shownBadge('chicken_keeper_1', all), null);
 	assert.equal(checkBadgeChoice({ badgeId: 'chicken_keeper_1', titleId: null }, all).ok, false);
+});
+
+test('shownIdentity is the one rule for badge and title by a name (character window, landing, rankings)', () => {
+	assert.deepEqual(shownIdentity({ badgeId: 'first_rebirth', titleId: 'early-tester' }, earned), {
+		badge: shownBadge('first_rebirth', earned)?.badge,
+		badgeName: shownBadge('first_rebirth', earned)?.title,
+		title: 'Early tester',
+	});
+	assert.deepEqual(shownIdentity({ badgeId: BADGE_NONE, titleId: null }, earned), { badge: null, badgeName: null, title: null });
+	assert.equal(shownIdentity({ badgeId: null, titleId: 'early-tester' }, []).title, null);
 });

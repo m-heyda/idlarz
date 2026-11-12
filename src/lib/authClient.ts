@@ -3,6 +3,7 @@ import type { BootSnapshot } from '@/lib/offline/types';
 import { scoped } from '@/lib/storageScope';
 import type { AvatarSendResult } from '@/lib/avatarPick';
 import { epochFetch } from '@/lib/epochFetch';
+import type { ShownIdentity } from '@/catalog/badges';
 
 /** The browser side of /api/auth/*: the page only ever talks to our own routes, never to Supabase. */
 export interface Profile {
@@ -39,7 +40,7 @@ export type AuthResult =
 			stats?: ProfileStats;
 			game?: BootSnapshot;
 			away?: AwayInfo;
-			earlyTester?: boolean;
+			identity?: ShownIdentity;
 	  }
 	| { status: 'guest' } // no session (a clean 401)
 	| { status: 'unavailable'; reason: UnavailableReason } // outage, missing env, network: never treated as "logged out"
@@ -62,7 +63,7 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			stats?: { level?: unknown; rebirths?: unknown } | null;
 			game?: { inv?: unknown; craft?: unknown; serverNowSec?: unknown } | null;
 			away?: { gapSec?: unknown; capSec?: unknown; efficiency?: unknown } | null;
-			earlyTester?: unknown;
+			identity?: { badge?: unknown; badgeName?: unknown; title?: unknown } | null;
 		};
 		if (response.ok) {
 			const epoch = typeof body.epoch === 'number' && Number.isInteger(body.epoch) && body.epoch >= 1 ? { epoch: body.epoch } : {};
@@ -83,8 +84,10 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 				Number.isFinite(gapSec + capSec + efficiency)
 					? { away: { gapSec, capSec, efficiency } }
 					: {};
-			const earlyTester = body.earlyTester === true ? { earlyTester: true } : {};
-			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats, ...game, ...away, ...earlyTester };
+			const text = (value: unknown): string | null => (typeof value === 'string' && value !== '' ? value : null);
+			const shown = { badge: text(body.identity?.badge), badgeName: text(body.identity?.badgeName), title: text(body.identity?.title) };
+			const identity = shown.badge || shown.title ? { identity: shown } : {};
+			return { status: 'ok', userId: body.user?.id ?? '', profile: body.profile ?? null, ...epoch, ...needsReset, ...stats, ...game, ...away, ...identity };
 		}
 		if (response.status === 503 || response.status >= 500 || body.unavailable) {
 			return { status: 'unavailable', reason: body.reason === 'not_configured' ? 'not_configured' : 'outage' };

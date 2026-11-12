@@ -219,7 +219,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ 1 until it has run, then counts down to 0; stays at 0 for a player who asked for reduced motion.
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
 - [`BestiaryWindow.tsx`](../../src/components/game/BestiaryWindow.tsx) — ~ The Bestiary:
-- [`BetaTesterBadge.tsx`](../../src/components/game/BetaTesterBadge.tsx) — ~ Who wears the tester medal:
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx) — ~ The body of a tile card (the caller wraps it in the design-system Tooltip):
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).

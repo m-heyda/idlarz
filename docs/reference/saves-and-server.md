@@ -670,7 +670,7 @@ paid[r] = floor(rate[r] x elapsed x efficiency)                    efficiency = 
 
 ### `awayBlockOf` <small>function</small>
 
-Source: [`src/lib/offline/away.ts:21`](../../src/lib/offline/away.ts)
+Source: [`src/lib/offline/away.ts:22`](../../src/lib/offline/away.ts)
 
 The read-only `away` block of `GET /api/auth/me`: gap = now minus the later of the ledger anchor and the last accepted save (as `claimOffline` measures it), with the cap and efficiency the last
 save stored (`derived.offlineCapSec` / `offlineEfficiency`, the base limits when an older row lacks them). `null` with no save, an unreadable time, or a gap under `offlineMinGapSec` (nothing to show).

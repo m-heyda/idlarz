@@ -40,6 +40,19 @@ export const shownBadge = (choice: string | null | undefined, earned: readonly s
 export const shownTitle = (titleId: string | null | undefined, earned: readonly string[]): string | null =>
 	titleOptions(earned).find((t) => t.id === titleId)?.name ?? null;
 
+/** What is drawn by a name: the badge picture (`/pixel/new_assets/achievements/<badge>.png`) with its name, and the title text; each null when not shown. */
+export interface ShownIdentity {
+	badge: string | null;
+	badgeName: string | null;
+	title: string | null;
+}
+
+/** The badge and title to show for a stored choice (`profiles.badge_id` / `title_id`) and the earned achievements: the one rule the Character window, the landing and later the rankings share. */
+export const shownIdentity = (choice: { badgeId: string | null; titleId: string | null }, earned: readonly string[]): ShownIdentity => {
+	const badge = shownBadge(choice.badgeId, earned);
+	return { badge: badge?.badge ?? null, badgeName: badge?.title ?? null, title: shownTitle(choice.titleId, earned) };
+};
+
 /** Validates what a player asks for: a badge id is `BADGE_NONE`, null (default) or an earned achievement; a title id is null or an earned title. */
 export const checkBadgeChoice = (
 	input: { badgeId: unknown; titleId: unknown },
