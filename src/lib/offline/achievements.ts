@@ -1,8 +1,8 @@
-import { ACHIEVEMENTS, achievementById, type AchievementDef } from '@/catalog/achievements';
+import { ACHIEVEMENTS, DEEDS, achievementById, type AchievementDef } from '@/catalog/achievements';
 import { GEMS_CAP } from '@/config/economy';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
-import { conditionHolds, type DeedFacts } from '@/lib/deeds';
+import { conditionHolds, conditionProgress, deedPoints, type DeedFacts } from '@/lib/deeds';
 import { guideLive } from '@/lib/tutorial/live';
 
 // SERVER ONLY. Achievements (IDL-73, gem rewards IDL-194): pure functions of numbers the server already holds. Nothing here reads a request; the browser cannot name an
@@ -88,6 +88,37 @@ export const claimAchievement = (ledger: Ledger, id: string, nowMs: number): Cla
 	};
 };
 
+export type ClaimAllOutcome = { ok: true; ledger: Ledger; gems: number; claimed: string[] } | { ok: false; reason: 'nothing_to_claim' };
+
+/**
+ * Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP`
+ * (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.
+ *
+ * @category Progression/Deeds
+ * @order 3
+ */
+export const claimAllAchievements = (ledger: Ledger, nowMs: number): ClaimAllOutcome => {
+	const base = withClaimMode(ledger);
+	const done = new Set(base.stats.claimed!);
+	const waiting = base.stats.achievements.filter((id) => !done.has(id) && !!achievementById(id));
+	if (waiting.length === 0) return { ok: false, reason: 'nothing_to_claim' };
+	const owed = waiting.reduce((sum, id) => sum + achievementById(id)!.rewards.gems, 0);
+	const gems = Math.min(GEMS_CAP, base.gems + owed) - base.gems;
+	const claimedAt = { ...base.stats.claimedAt };
+	for (const id of waiting) claimedAt[id] = nowMs;
+	return {
+		ok: true,
+		gems,
+		claimed: waiting,
+		ledger: {
+			...base,
+			gems: base.gems + gems,
+			granted: addTotals(base.granted, { gems }),
+			stats: { ...base.stats, claimed: [...base.stats.claimed!, ...waiting], claimedAt },
+		},
+	};
+};
+
 /**
  * The manual achievements (the testers) are granted outside the lazy evaluator and live in `player_achievements`. This merges them into the ledger once (`stats.manualSynced`), so they show in the Achievements window and can be claimed;
  * an achievement that is granted `withAchievement` another one (the Beta tester comes with the Early tester) is added too. `mirror` lists the ids that were not in the table yet (to record them there).
@@ -141,17 +172,44 @@ export interface AchievementReport {
 	claimedAt: Record<string, number>;
 	/** The gem balance, so the header can follow */
 	gemsTotal: number;
+	/** Deed points of the claimed tiers (derived, never stored) and how many earned tiers wait for Claim */
+	points: number;
+	claimable: number;
+	/** What the "bonus from deeds" line says. A placeholder until the bonus model exists (IDL-310): no stat bonus is applied. */
+	bonusText: string;
+	/** The player's number towards each deed (deed id -> `cur`, as the Hall of Deeds bar reads it). Present when the last accepted save is known. */
+	progress?: Record<string, number>;
 }
 
-export const reportOf = (ledger: Ledger, fresh: AchievementUnlock[]): AchievementReport => ({
-	fresh,
-	earned: [...ledger.stats.achievements],
+/** The placeholder the window shows for the bonus the deeds will give. */
+export const DEED_BONUS_PLACEHOLDER = 'Bonus from deeds: coming soon';
+
+/** Each deed's current number, from the same facts the conditions read. */
+export const deedProgressOf = (facts: AchievementFacts): Record<string, number> => {
+	const out: Record<string, number> = {};
+	for (const deed of DEEDS) {
+		const first = achievementById(deed.tiers[0]);
+		if (first && first.when.kind !== 'manual') out[deed.id] = Math.floor(conditionProgress(first.when, facts).cur);
+	}
+	return out;
+};
+
+export const reportOf = (ledger: Ledger, fresh: AchievementUnlock[], summary?: StoredSave['summary']): AchievementReport => {
 	// a ledger from before claiming existed paid everything at once
-	claimed: [...(ledger.stats.claimed ?? ledger.stats.achievements)],
-	earnedAt: { ...ledger.stats.earnedAt },
-	claimedAt: { ...ledger.stats.claimedAt },
-	gemsTotal: ledger.gems,
-});
+	const claimed = [...(ledger.stats.claimed ?? ledger.stats.achievements)];
+	return {
+		fresh,
+		earned: [...ledger.stats.achievements],
+		claimed,
+		earnedAt: { ...ledger.stats.earnedAt },
+		claimedAt: { ...ledger.stats.claimedAt },
+		gemsTotal: ledger.gems,
+		points: deedPoints(claimed),
+		claimable: ledger.stats.achievements.filter((id) => !claimed.includes(id)).length,
+		bonusText: DEED_BONUS_PLACEHOLDER,
+		...(summary ? { progress: deedProgressOf(factsOf(ledger, summary)) } : {}),
+	};
+};
 
 /** Where the earned ids are mirrored: `player_achievements`, written by the server only. */
 export interface AchievementRepo {

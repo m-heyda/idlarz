@@ -72,12 +72,8 @@ export const AchievementList: React.FC<{ report: AchievementViewInput; busy?: st
 		report,
 		ACHIEVEMENTS.map((a) => a.id),
 	);
-	const claimAll = async () => {
-		for (const id of claimable) {
-			// each claim is its own request; stop at the first refusal (the store has toasted why)
-			if (!(await useAchievementStore.getState().claim(id))) break;
-		}
-	};
+	// one request for every waiting tier (all or nothing); the store has toasted why when the server refuses
+	const claimAll = () => useAchievementStore.getState().claimAll();
 	return (
 		<div className='text-sm space-y-2'>
 			<div className='flex items-center justify-between gap-2 text-[#d8c8a0]'>

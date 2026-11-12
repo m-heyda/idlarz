@@ -78,6 +78,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `chestIntervalSec` | Economy / Chests and Luck | [`src/lib/luck.ts:16`](../../src/lib/luck.ts) | Seconds between two chests: |
 | `chestSpots` | Economy / Chests and Luck | [`src/lib/chests.ts:28`](../../src/lib/chests.ts) | The tiles a chest could go on, with their weights. |
 | `claimAchievement` | Progression / Achievements | [`src/lib/offline/achievements.ts:72`](../../src/lib/offline/achievements.ts) | The Claim button: |
+| `claimAllAchievements` | Progression / Deeds | [`src/lib/offline/achievements.ts:100`](../../src/lib/offline/achievements.ts) | Claim all: |
 | `CLASS_AVATARS` | Progression / Avatars | [`src/catalog/avatars.ts:104`](../../src/catalog/avatars.ts) | The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: |
 | `classPassives` | Progression / Class passives | [`src/lib/classPassives.ts:24`](../../src/lib/classPassives.ts) | The passives of a hero class (`CLASS_PASSIVES`, `src/config/playerClasses.ts`): |
 | `classXpBucket` | Progression / Class passives | [`src/lib/classPassives.ts:46`](../../src/lib/classPassives.ts) | The gear's XP bucket with the class's XP added, held under the XP perk-family cap: |
@@ -238,7 +239,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Season restart (reset-players) | Ops / Operator guides | [`scripts/reset-players.ts:1`](../../scripts/reset-players.ts) | Season restart: |
 | `sellPayout` | Economy / Merchant | [`src/utils/game/merchant.ts:62`](../../src/utils/game/merchant.ts) | Gold for selling `qty` of something worth `unit` each. |
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
-| `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:122`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
+| `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:153`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
 | `settleIdols` | Saves & Server / Accepting a save | [`src/lib/cloudSave/idolTrust.ts:19`](../../src/lib/cloudSave/idolTrust.ts) | The server's say over the Idol levels (the account's `idolLevels`). |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
 | `SKILLS` | Combat / Potions and skills | [`src/catalog/skills.ts:34`](../../src/catalog/skills.ts) | Potions and skills. |

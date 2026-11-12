@@ -19,7 +19,12 @@ export interface GemShop {
 	pending: PendingIdentity | null;
 }
 
-export type GemsRequest = { action: 'status' } | { action: 'daily' } | { action: 'claim'; id: string } | { action: 'spend'; itemId: string; value?: string };
+export type GemsRequest =
+	| { action: 'status' }
+	| { action: 'daily' }
+	| { action: 'claim'; id: string }
+	| { action: 'claimAll' }
+	| { action: 'spend'; itemId: string; value?: string };
 
 export interface DailyInfo {
 	/** Whether today's bonus can be claimed now */
@@ -63,6 +68,8 @@ export interface GemsReply {
 	characterName?: string;
 	/** Gems the request charged (0 for a free respec) or the daily bonus paid */
 	paid?: number;
+	/** The achievement ids a `claimAll` paid, in the order they were claimed */
+	claimedIds?: string[];
 	attrs?: Attrs;
 	/** The achievements as they stand after a claim (every online answer may carry it: the achievement store takes it) */
 	achievements?: AchievementReport;

@@ -2027,13 +2027,24 @@
   "see": []
  },
  {
+  "id": "claimallachievements",
+  "name": "claimAllAchievements",
+  "symbol": "claimAllAchievements",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/lib/offline/achievements.ts",
+  "line": 100,
+  "summary": "Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP` (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.",
+  "see": []
+ },
+ {
   "id": "settleachievements",
   "name": "settleAchievements",
   "symbol": "settleAchievements",
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 122,
+  "line": 153,
   "summary": "Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
   "see": [
    "achievementsDue",

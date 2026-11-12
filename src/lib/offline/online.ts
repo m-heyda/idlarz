@@ -32,7 +32,7 @@ import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
-import { claimAchievement, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
+import { claimAchievement, claimAllAchievements, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
 import { bestiaryOf } from '@/lib/offline/stats';
 import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
 
@@ -67,11 +67,11 @@ const withInventory = <T>(value: T, inv: Inventory | null, invVer: number | unde
  * The answer with the achievements attached when this request paid one (the toast) or when the caller wants the full list (the spawn poll the browser starts from).
  * Every online reply can carry it, so a payout is never missed whichever request found it.
  */
-const withAchievements = <T>(value: T, ledger: Ledger, fresh: AchievementUnlock[], list: boolean): T => {
+const withAchievements = <T>(value: T, ledger: Ledger, fresh: AchievementUnlock[], list: boolean, summary: StoredSave['summary']): T => {
 	if (!(fresh.length > 0 || list) || typeof value !== 'object' || value === null) return value;
 	// the answer was made before the payout: a gem balance in it is brought up to date, so nothing in the browser sets the older number over the new one
 	const gems = fresh.length > 0 && 'gemsTotal' in value ? { gemsTotal: ledger.gems } : {};
-	return { ...value, ...gems, achievements: reportOf(ledger, fresh) };
+	return { ...value, ...gems, achievements: reportOf(ledger, fresh, summary) };
 };
 
 /** The answer with the player's monster discoveries and kill counts attached (a few dozen small numbers; the browser shows silhouettes until a type is in `seen`). */
@@ -109,7 +109,7 @@ const onlineStep = async <T>(
 		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
 		const settled = settleAchievements(out.ledger, stored.summary, nowMs);
 		unlocked = settled.unlocked;
-		const value = withBestiary(withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements), settled.ledger);
+		const value = withBestiary(withAchievements(out.value, settled.ledger, settled.unlocked, listAchievements, stored.summary), settled.ledger);
 		// a poll (no key) keeps the record of the last keyed request: its answer may still have to be replayed for a retry
 		return {
 			ledger: { ...settled.ledger, anchorAt: nowMs, ...(key ? { lastKey: key, lastResult: value } : {}) },
@@ -377,7 +377,21 @@ export const gemsStep = (
 				);
 			return {
 				ledger: claimed.ledger,
-				value: { ...gemsView(claimed.ledger, ctx.nowSec, identity), paid: claimed.gems, achievements: reportOf(claimed.ledger, []) },
+				value: { ...gemsView(claimed.ledger, ctx.nowSec, identity), paid: claimed.gems, achievements: reportOf(claimed.ledger, [], ctx.stored.summary) },
+			};
+		}
+		if (request.action === 'claimAll') {
+			// Claim all of the Hall of Deeds: every earned tier that is waiting, paid in this one request
+			const claimedAll = claimAllAchievements(ledger, nowMs);
+			if (!claimedAll.ok) return refused('not_earned', 'There is nothing to claim.');
+			return {
+				ledger: claimedAll.ledger,
+				value: {
+					...gemsView(claimedAll.ledger, ctx.nowSec, identity),
+					paid: claimedAll.gems,
+					claimedIds: claimedAll.claimed,
+					achievements: reportOf(claimedAll.ledger, [], ctx.stored.summary),
+				},
 			};
 		}
 		if (!identity) return refused('no_profile', 'There is no hero to change yet.');

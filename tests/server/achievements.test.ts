@@ -13,9 +13,11 @@ import { GEMS_CAP, STARTING_GEMS } from '../../src/config/economy';
 import {
 	achievementsDue,
 	claimAchievement,
+	claimAllAchievements,
 	conditionHolds,
 	earnAchievements,
 	mergeManual,
+	reportOf,
 	settleAchievements,
 	type AchievementFacts,
 } from '../../src/lib/offline/achievements';
@@ -322,4 +324,81 @@ test('finishing the end of the tutorial path earns the first achievement, once',
 test('every achievement names a badge that exists in the asset library', async () => {
 	const { existsSync } = await import('node:fs');
 	for (const a of ACHIEVEMENTS) assert.ok(existsSync(`public/pixel/new_assets/achievements/${a.badge}.png`), `${a.id}: ${a.badge}`);
+});
+
+// IDL-308: the Hall of Deeds flow (tiers are achievements, so earning and claiming work per tier)
+
+test('several tiers of one deed can be earned in a single settle', () => {
+	const f = facts({}, { kills: { thistleBoar: 600 } });
+	assert.deepEqual(ids(f), ['first_fight', 'slayer_100', 'slayer_500']);
+	const earned = earnAchievements(newLedger(T0), ids(f), T0 + 1);
+	assert.deepEqual(earned.ledger.stats.earnedAt.slayer_100, T0 + 1);
+	assert.deepEqual(earned.ledger.stats.earnedAt.slayer_500, T0 + 1);
+});
+
+test('Claim all pays every waiting tier in one write, records each id, and refuses when nothing waits', () => {
+	const ledger = earnAchievements(newLedger(T0), ['first_tile', 'castle_10', 'slayer_100'], T0 + 5).ledger;
+	const all = claimAllAchievements(ledger, T0 + 20);
+	assert.ok(all.ok);
+	if (!all.ok) return;
+	assert.equal(all.gems, 25 + 100 + 25);
+	assert.deepEqual(all.claimed, ['first_tile', 'castle_10', 'slayer_100']);
+	assert.equal(all.ledger.gems, STARTING_GEMS + 150);
+	assert.equal(all.ledger.granted.gems, 150);
+	assert.deepEqual(all.ledger.stats.claimed, ['first_tile', 'castle_10', 'slayer_100']);
+	assert.equal(all.ledger.stats.claimedAt.castle_10, T0 + 20);
+	assert.deepEqual(claimAllAchievements(all.ledger, T0 + 30), { ok: false, reason: 'nothing_to_claim' });
+	assert.deepEqual(claimAllAchievements(newLedger(T0), T0), { ok: false, reason: 'nothing_to_claim' });
+});
+
+test('Claim all skips what was claimed one by one, and the gem cap holds for the whole batch', () => {
+	const earned = earnAchievements(newLedger(T0), ['first_tile', 'castle_10', 'slayer_100'], T0 + 5).ledger;
+	const one = claimAchievement(earned, 'castle_10', T0 + 6);
+	assert.ok(one.ok);
+	if (!one.ok) return;
+	const rest = claimAllAchievements(one.ledger, T0 + 7);
+	assert.ok(rest.ok && rest.claimed.join() === 'first_tile,slayer_100');
+	const rich: Ledger = { ...earned, gems: GEMS_CAP - 30 };
+	const capped = claimAllAchievements(rich, T0);
+	assert.ok(capped.ok && capped.gems === 30 && capped.ledger.gems === GEMS_CAP && capped.ledger.granted.gems === 30);
+});
+
+test('Claim all on a ledger from before claiming existed pays nothing it already paid', () => {
+	const old: Ledger = { ...newLedger(T0), stats: { ...emptyStats(), achievements: ['first_tile'], claimed: null } };
+	assert.deepEqual(claimAllAchievements(old, T0), { ok: false, reason: 'nothing_to_claim' });
+});
+
+test('the report carries deed points of the claimed tiers, the waiting count, the placeholder bonus and per-deed progress', () => {
+	const ledger = earnAchievements(newLedger(T0), ['slayer_100', 'slayer_500'], T0).ledger;
+	const claimed = claimAchievement(ledger, 'slayer_100', T0 + 1);
+	assert.ok(claimed.ok);
+	if (!claimed.ok) return;
+	const withKills: Ledger = { ...claimed.ledger, stats: { ...claimed.ledger.stats, kills: { thistleBoar: 642 } } };
+	const summary = { castleLevel: 3, rebirths: 0 } as Parameters<typeof reportOf>[2];
+	const report = reportOf(withKills, [], summary);
+	assert.equal(report.points, 10);
+	assert.equal(report.claimable, 1);
+	assert.equal(report.bonusText, 'Bonus from deeds: coming soon');
+	assert.equal(report.progress?.slayer, 642);
+	assert.equal(report.progress?.castle, 3);
+	assert.equal(reportOf(withKills, []).progress, undefined, 'no save known: no progress');
+});
+
+test('a Claim all request over the wire pays once and replays on the same key', async () => {
+	const m = await player();
+	ok(await syncTickets(m.deps, 'u1', T0 + 1000));
+	count(m, { chests: 1, golden: 1 });
+	ok(await syncTickets(m.deps, 'u1', T0 + 2000));
+	const before = m.ledgers.get('u1')!.gems;
+	const first = ok(await gemsStep(m.deps, 'u1', 'claimall-key-001', { action: 'claimAll' }, T0 + 3000, null));
+	assert.equal(first.ok, true);
+	assert.equal(first.paid, 75);
+	assert.deepEqual(first.claimedIds, ['first_chest', 'golden_kill']);
+	assert.equal(first.gems, before + 75);
+	assert.deepEqual(first.achievements?.claimed, ['first_chest', 'golden_kill']);
+	const replay = ok(await gemsStep(m.deps, 'u1', 'claimall-key-001', { action: 'claimAll' }, T0 + 3001, null));
+	assert.deepEqual(replay, first);
+	const again = ok(await gemsStep(m.deps, 'u1', 'claimall-key-002', { action: 'claimAll' }, T0 + 4000, null));
+	assert.equal(again.ok, false);
+	assert.equal(m.ledgers.get('u1')!.gems, before + 75);
 });

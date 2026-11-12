@@ -17,7 +17,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
-- Deeds: [Deeds](#deeds)
+- Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
 - Badges: [`badgeOptions`](#badgeoptions)
 
 ## Levels
@@ -652,7 +652,7 @@ bow and a staff take both hands). Their damage per second matches the sword's, s
 
 ### `settleAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:122`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:153`](../../src/lib/offline/achievements.ts)
 
 Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing).
 The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
@@ -836,6 +836,15 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideVisibleFor`](progression.md#guidevisiblefor)
 
 ## Deeds
+
+<a id="claimallachievements"></a>
+
+### `claimAllAchievements` <small>function</small>
+
+Source: [`src/lib/offline/achievements.ts:100`](../../src/lib/offline/achievements.ts)
+
+Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP`
+(what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.
 
 <a id="deeds"></a>
 
