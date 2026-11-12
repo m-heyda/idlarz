@@ -9,7 +9,7 @@ import {
 	type PaperRowData,
 } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip } from '../../../../packages/design-system/src/components/tooltips';
-import { RESOURCES } from '@/catalog';
+import { COMBAT_NAMES, RESOURCES } from '@/catalog';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
 import { describeClassPassives } from '@/lib/classPassives';
@@ -180,14 +180,14 @@ const HeroStats: React.FC = () => {
 		{ label: 'Damage', value: `${formatCompact(fx.damage)} per hit`, color: I.gold },
 		{ label: 'Physical ATK', value: `+${pct(characterStats.physicalAtk, 1)}`, color: I.gold },
 		{ label: 'Magic ATK', value: `+${pct(characterStats.magicAtk, 1)}`, color: I.purple },
-		{ label: 'Crit chance', value: pct(fx.critChance, 1), color: I.gold },
+		{ label: COMBAT_NAMES.critChance, value: pct(fx.critChance, 1), color: I.gold },
 		{ label: 'Crit damage', value: `x${formatCompact(fx.critMultiplier, 2)}`, color: I.gold },
 		{ label: 'Super crit chance', value: `${pct(fx.superCritChance, 1)} of crits`, color: I.purple },
 		{ label: 'Super crit damage', value: `x${formatCompact(fx.superCritMultiplier, 2)}`, color: I.purple },
 		{ label: 'DEF (armor)', value: `${formatCompact(fx.armor)} (-${pct(fx.armorReduction, 0)} damage taken)`, color: I.plain },
 		{ label: 'Dodge', value: pct(fx.dodge, 1), color: I.blue },
-		{ label: 'HP regen', value: `${formatCompact(fx.hpRegen)}/s`, color: I.green },
-		{ label: 'ATK speed', value: `${formatCompact(fx.attacksPerSecond, 2)}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`, color: I.blue },
+		{ label: COMBAT_NAMES.hpRegen, value: `${formatCompact(fx.hpRegen)}/s`, color: I.green },
+		{ label: COMBAT_NAMES.attackSpeed, value: `${formatCompact(fx.attacksPerSecond, 2)}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`, color: I.blue },
 		{ label: 'Life leech', value: pct(fx.lifeLeech, 1), color: I.red },
 	];
 
@@ -199,8 +199,8 @@ const HeroStats: React.FC = () => {
 		{ label: 'Golden monster chance', value: pct(fx.goldenMonsterChance, 1), color: I.gold },
 		{ label: 'Gold find', value: pct(fx.goldFind, 1), color: I.gold },
 		{ label: `Class (${PLAYER_CLASSES[playerClass]?.label ?? 'Hero'})`, value: [...classLines.combat, ...classLines.economy].join(', '), color: I.gold },
-		{ label: 'Mana regen', value: `${formatCompact(fx.manaRegen, 2)}/s`, color: I.blue },
-		{ label: 'Spell power', value: pct(fx.spellPower, 1), color: I.purple },
+		{ label: COMBAT_NAMES.mpRegen, value: `${formatCompact(fx.manaRegen, 2)}/s`, color: I.blue },
+		{ label: COMBAT_NAMES.spellPower, value: pct(fx.spellPower, 1), color: I.purple },
 		{ label: 'XP gain', value: pct(fx.xpGain, 2), color: I.green },
 		{ label: 'Tile discount', value: pct(fx.tileDiscount, 2), color: I.blue },
 		...(fx.gearIncome > 0 ? [{ label: 'Income (set bonus)', value: `+${pct(fx.gearIncome, 0)}`, color: I.green }] : []),

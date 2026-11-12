@@ -167,7 +167,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `LEGENDARY_PERK_TIERS` | Economy / Perk caps | [`src/catalog/perkCaps.ts:30`](../../src/catalog/perkCaps.ts) | The magnitude of a legendary perk by tier, in percent of its family (IDL-149: |
 | `levelAtAge` | Monsters / Level scaling | [`src/lib/monsters.ts:93`](../../src/lib/monsters.ts) | The level of a monster of this age: |
 | `LEVELING` | Progression / Levels | [`src/config/character.ts:55`](../../src/config/character.ts) | Character level 1-100 (`maxLevel`). |
-| `levelScale` | Loot / Items | [`src/catalog/stats.ts:211`](../../src/catalog/stats.ts) | Power multiplier of an item level (1 at level 1). |
+| `levelScale` | Loot / Items | [`src/catalog/stats.ts:213`](../../src/catalog/stats.ts) | Power multiplier of an item level (1 at level 1). |
 | `lifeLeechPercent` | Combat / Player numbers | [`src/lib/combat.ts:202`](../../src/lib/combat.ts) | The Life Leech in %, the gear's and the merchant's together, never above the cap. |
 | `limitOf` | Progression / Limits | [`src/lib/limits.ts:40`](../../src/lib/limits.ts) | The current value of a limit: |
 | `LIMITS` | Progression / Limits | [`src/config/limits.ts:14`](../../src/config/limits.ts) | Limits that upgrades raise. |
@@ -294,7 +294,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:154`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
 | `upgradeBody` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:52`](../../src/lib/saveUpgrade.ts) | Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |
-| `valueCurve` | Loot / Items | [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |
+| `valueCurve` | Loot / Items | [`src/catalog/stats.ts:186`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |
 | `verifyTransition` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:245`](../../src/lib/cloudSave/verify.ts) | Runs every plausibility check between two consecutive saves and returns the flags that fired; |
 | `WEAPON_ATTACK_SPEED` | Combat / Player numbers | [`src/catalog/weapons.ts:13`](../../src/catalog/weapons.ts) | Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; |
 | `WEAPON_LEGENDARY_DAMAGE_TOP` | Economy / Perk caps | [`src/catalog/perkCaps.ts:44`](../../src/catalog/perkCaps.ts) | The top damage tier of a WEAPON legendary: |

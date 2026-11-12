@@ -3435,7 +3435,7 @@ The uniques are the three legendary weapons, one per boss from the hardest down 
 </tbody></table>
 </article><article><p><a id="levelscale"></a></p>
 <h3><code>levelScale</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:211</code></a></p>
+<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:213</code></a></p>
 <p>Power multiplier of an item level (1 at level 1).</p>
 <p>Item power grows linearly with item level: each level adds 7% of the level-1 power (1 at level 1, 1.63 at 10, 7.9 at 100). Gear is authored at its own <code>minItemLevel</code>; an instance of level L has
 <code>baseStats x levelScale(L) / levelScale(minItemLevel)</code>, then the quality roll (+/-8%). Affix values use the same curve. Boss stats use it too (<a href="#monsterstats"><code>monsterStats</code></a>).</p>
@@ -3445,7 +3445,7 @@ stats(instance) = baseStats x levelScale(L) / levelScale(minItemLevel) x (1 + (q
 </code></pre>
 </article><article><p><a id="valuecurve"></a></p>
 <h3><code>valueCurve</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:184</code></a></p>
+<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:186</code></a></p>
 <p>Value multiplier of an item level (1 at level 1).</p>
 <p>What gear is worth in gold follows its own curve, because the economy grows far faster than gear power: steep up to the knee (level 10), flatter after it.</p>
 <p><strong>Formula</strong></p>

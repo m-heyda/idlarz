@@ -6,6 +6,8 @@ import { formatNumber } from '@/utils/formatters';
  */
 export interface StatDef {
 	label: string;
+	/** The short name shown in cards, tables and bonus lines where room is tight (`statLabel` returns it); `label` stays the full name for docs and prose */
+	short?: string;
 	/** Printed right after the number: '+8% Crit Chance', '+1/s HP Regen' */
 	unit?: string;
 	/** Decimal places the tooltip shows */
@@ -33,15 +35,15 @@ export const STAT_DEFS = {
 	damage: { label: 'Damage', integer: true },
 	armor: { label: 'Armor', integer: true },
 	maxHp: { label: 'Max HP', integer: true },
-	critChance: { label: 'Crit Chance', unit: '%', levelShare: 0.3 }, // chance in % that a hit crits (x2 damage), added to the character's own
+	critChance: { label: 'Crit Chance', short: 'CRIT CH', unit: '%', levelShare: 0.3 }, // chance in % that a hit crits (x2 damage), added to the character's own
 	superCrit: { label: 'Super Crit', unit: '%', levelShare: 0.3 }, // chance in % that a crit becomes a super crit (x5), on top of the base chance
-	regen: { label: 'HP Regen', unit: '/s', decimals: 1, levelShare: 0.6 }, // HP per second, in and out of fights
+	regen: { label: 'HP Regen', short: 'HP REG', unit: '/s', decimals: 1, levelShare: 0.6 }, // HP per second, in and out of fights
 	luck: { label: 'Luck', integer: true, levelShare: 0.5 }, // adds to the Luck of the character: better chest and kill gold and rarer chest finds
 	goldFind: { label: 'Gold Find', unit: '%', levelShare: 0.5 }, // % more gold from kills and chests
 	dodge: { label: 'Dodge', unit: '%', decimals: 1, levelShare: 0.3 }, // chance in % that a monster's hit misses (capped by COMBAT.maxDodge)
 	maxMana: { label: 'Max Mana', integer: true, levelShare: 0.7 }, // added to the character's mana pool (skills spend it)
-	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
-	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
+	manaRegen: { label: 'Mana Regen', short: 'MP REG', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
+	spellPower: { label: 'Spell Power', short: 'SPELL PWR', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
 
 	// ---- belt-only stats: the potion belt (IDL-138 / IDL-153). Nothing but a belt carries them; see lib/potionBelt.ts ----------
@@ -254,7 +256,21 @@ export const sumStats = (...blocks: (ItemStats | undefined)[]): StatTotals => {
 	return total;
 };
 
-export const statLabel = (key: string): string => (STAT_DEFS as Record<string, StatDef>)[key]?.label ?? key;
+/** The names of the derived combat numbers that are not an item stat, in the same short style as `StatDef.short` (item cards, the Stats tab and the Hero window use them). */
+export const COMBAT_NAMES = {
+	dps: 'DPS',
+	attackSpeed: 'ATK SPD',
+	critChance: 'CRIT CH',
+	hpRegen: 'HP REG',
+	mpRegen: 'MP REG',
+	spellPower: 'SPELL PWR',
+} as const;
+
+/** What a stat is called on the screen: its short name when it has one (CRIT CH, HP REG), else its label. */
+export const statLabel = (key: string): string => {
+	const def = (STAT_DEFS as Record<string, StatDef>)[key];
+	return def?.short ?? def?.label ?? key;
+};
 
 /** A stat value for a tooltip: plain up to 9,999, then 12.34K / M / B / T like every other number in the game */
 const statText = (value: number, decimals?: number): string =>
@@ -264,14 +280,14 @@ const statText = (value: number, decimals?: number): string =>
 export const formatStat = (key: string, value: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
 	const num = statText(value, def?.decimals);
-	return `+${num}${def?.unit ?? ''} ${def?.label ?? key}`;
+	return `+${num}${def?.unit ?? ''} ${def?.short ?? def?.label ?? key}`;
 };
 
 /** '+2 Armor', '-1 Damage', '+0.5/s HP Regen': a signed change, for comparing two items */
 export const formatStatDelta = (key: string, delta: number): string => {
 	const def = (STAT_DEFS as Record<string, StatDef>)[key];
 	const num = statText(Math.abs(delta), def?.decimals);
-	return `${delta < 0 ? '-' : '+'}${num}${def?.unit ?? ''} ${def?.label ?? key}`;
+	return `${delta < 0 ? '-' : '+'}${num}${def?.unit ?? ''} ${def?.short ?? def?.label ?? key}`;
 };
 
 /** '+3 Damage, +4 Max HP' */

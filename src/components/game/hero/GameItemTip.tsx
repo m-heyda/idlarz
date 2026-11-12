@@ -4,6 +4,7 @@ import { ItemTooltip, TipLine, TipSection } from '../../../../packages/design-sy
 import type { TipRow } from '../../../../packages/design-system/src/components/tooltips';
 import { toRarity } from '../../../../packages/design-system/src/logic';
 import {
+	COMBAT_NAMES,
 	EQUIPMENT_SLOT_LABEL,
 	ITEM_CATALOG,
 	RARITIES,
@@ -133,7 +134,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 				...(swing && swing.speed.delta
 					? [
 							{
-								label: 'Attacks per second',
+								label: COMBAT_NAMES.attackSpeed,
 								value: `${swing.speed.delta > 0 ? '+' : '-'}${formatCompact(Math.abs(swing.speed.delta), 2)}`,
 								tone: gain(swing.speed.delta),
 							},
@@ -142,7 +143,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 				...(swing && swing.dps.delta
 					? [
 							{
-								label: 'Weapon damage per second',
+								label: COMBAT_NAMES.dps,
 								value: `${swing.dps.delta > 0 ? '+' : '-'}${formatCompact(Math.abs(swing.dps.delta), 2)}`,
 								tone: gain(swing.dps.delta),
 							},
@@ -186,9 +187,9 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			speed={
 				def.kind === 'weapon' && def.attackSpeed
 					? [
-							{ label: 'Attacks per second', value: String(def.attackSpeed), diff: withDiff && swing ? swing.speed.delta : undefined },
+							{ label: COMBAT_NAMES.attackSpeed, value: String(def.attackSpeed), diff: withDiff && swing ? swing.speed.delta : undefined },
 							{
-								label: 'Weapon damage per second',
+								label: COMBAT_NAMES.dps,
 								value: formatCompact(weaponDps({ stats, attackSpeed: def.attackSpeed }), 2),
 								diff: withDiff && swing ? swing.dps.delta : undefined,
 							},

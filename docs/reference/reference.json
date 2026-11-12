@@ -397,7 +397,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 184,
+  "line": 186,
   "summary": "Value multiplier of an item level (1 at level 1).",
   "see": []
  },
@@ -408,7 +408,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 211,
+  "line": 213,
   "summary": "Power multiplier of an item level (1 at level 1).",
   "see": []
  },

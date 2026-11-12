@@ -78,7 +78,7 @@ test('the Stats tab keeps every figure of the old Character window: attributes, 
 	]) {
 		assert.ok(out.includes(word), `the tab shows "${word}"`);
 	}
-	for (const line of ['Crit chance', 'Super crit damage', 'Life leech', 'Luck', 'Gold find', 'Offline progress', 'Per second', 'Crafting level']) {
+	for (const line of ['CRIT CH', 'Super crit damage', 'Life leech', 'Luck', 'Gold find', 'Offline progress', 'Per second', 'Crafting level']) {
 		assert.ok(out.includes(line), `the tab lists "${line}"`);
 	}
 	assert.match(out, /Respec/, 'at 0 points the corner holds the red Respec button');

@@ -62,10 +62,10 @@ The combat plate: percent damage and HP, armor, crits and a slow regeneration.
 | Pieces worn | Bonus | Total so far |
 |---|---|---|
 | 3 | +6% Damage, +6 Armor | +6 Armor, +6% Damage |
-| 6 | +10% Max HP, +4% Crit Chance | +6 Armor, +4% Crit Chance, +6% Damage, +10% Max HP |
-| 9 | +12% Damage, +8 Armor, +2.0/s HP Regen | +14 Armor, +4% Crit Chance, +2.0/s HP Regen, +18% Damage, +10% Max HP |
-| 12 | +10% Damage, +8% Max HP, +4% Crit Chance, +6 Armor | +20 Armor, +8% Crit Chance, +2.0/s HP Regen, +28% Damage, +18% Max HP |
-| 14 | +10% Damage, +7% Max HP, +4% Crit Chance, +2.0/s HP Regen, +10% Kill Rewards, +4 Armor | +24 Armor, +12% Crit Chance, +4.0/s HP Regen, +38% Damage, +25% Max HP, +10% Kill Rewards |
+| 6 | +10% Max HP, +4% CRIT CH | +6 Armor, +4% CRIT CH, +6% Damage, +10% Max HP |
+| 9 | +12% Damage, +8 Armor, +2.0/s HP REG | +14 Armor, +4% CRIT CH, +2.0/s HP REG, +18% Damage, +10% Max HP |
+| 12 | +10% Damage, +8% Max HP, +4% CRIT CH, +6 Armor | +20 Armor, +8% CRIT CH, +2.0/s HP REG, +28% Damage, +18% Max HP |
+| 14 | +10% Damage, +7% Max HP, +4% CRIT CH, +2.0/s HP REG, +10% Kill Rewards, +4 Armor | +24 Armor, +12% CRIT CH, +4.0/s HP REG, +38% Damage, +25% Max HP, +10% Kill Rewards |
 
 Pieces: ashen_warlords_visor, warlords_bulwark, ashen_plate, warlords_gauntlets, warlords_cuisses, warlords_sabatons, medal_of_the_fallen, warlords_banner_cloak, warlords_signet, war_medal_charm, warden_plate_belt, ashen_warlords_greataxe, ashen_tower_shield
 
@@ -76,10 +76,10 @@ The caster and leech set: the strongest raw power, fragile (no armor, no max HP)
 | Pieces worn | Bonus | Total so far |
 |---|---|---|
 | 3 | +8% Damage, +3 Luck | +3 Luck, +8% Damage |
-| 6 | +3.0% Life Leech, +4% Crit Chance | +4% Crit Chance, +3 Luck, +3.0% Life Leech, +8% Damage |
-| 9 | +12% Damage, +5 Luck, +4% Super Crit | +4% Crit Chance, +4% Super Crit, +8 Luck, +3.0% Life Leech, +20% Damage |
-| 12 | +10% Damage, +2.0% Life Leech, +3% Crit Chance, +4 Luck | +7% Crit Chance, +4% Super Crit, +12 Luck, +5.0% Life Leech, +30% Damage |
-| 14 | +10% Damage, +3.0% Life Leech, +3% Crit Chance, +3 Luck, +6% Super Crit | +10% Crit Chance, +10% Super Crit, +15 Luck, +8.0% Life Leech, +40% Damage |
+| 6 | +3.0% Life Leech, +4% CRIT CH | +4% CRIT CH, +3 Luck, +3.0% Life Leech, +8% Damage |
+| 9 | +12% Damage, +5 Luck, +4% Super Crit | +4% CRIT CH, +4% Super Crit, +8 Luck, +3.0% Life Leech, +20% Damage |
+| 12 | +10% Damage, +2.0% Life Leech, +3% CRIT CH, +4 Luck | +7% CRIT CH, +4% Super Crit, +12 Luck, +5.0% Life Leech, +30% Damage |
+| 14 | +10% Damage, +3.0% Life Leech, +3% CRIT CH, +3 Luck, +6% Super Crit | +10% CRIT CH, +10% Super Crit, +15 Luck, +8.0% Life Leech, +40% Damage |
 
 Pieces: blightbound_cowl, shroud_mantle, blightbound_robe, shroud_claws, blightbound_leggings, shroud_treads, ichor_locket, blightbound_shroud, ichor_ring, core_charm, hunter_trophy_belt, blight_staff, blight_orb
 
@@ -93,53 +93,53 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Obsidian Helm | `obsidian_helm` | armor | 3 | base | 8-100 | +6 Armor, +6 Max HP |  | general pool |
 | Obsidian Shoulderpads | `obsidian_pauldrons` | armor | 3 | base | 8-100 | +5 Armor, +5 Max HP |  | general pool |
 | Obsidian Cuirass | `obsidian_cuirass` | armor | 3 | base | 8-100 | +10 Armor, +12 Max HP |  | general pool |
-| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% Crit Chance |  | general pool |
+| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% CRIT CH |  | general pool |
 | Obsidian Greaves | `obsidian_greaves` | armor | 3 | base | 8-100 | +7 Armor, +8 Max HP |  | general pool |
 | Obsidian Sabatons | `obsidian_sabatons` | armor | 3 | base | 8-100 | +4 Armor, +4 Max HP |  | general pool |
-| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | base | 8-100 | +2 Armor, +8 Max HP, +1.5% Crit Chance, +6% Gold Find |  | general pool |
+| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | base | 8-100 | +2 Armor, +8 Max HP, +1.5% CRIT CH, +6% Gold Find |  | general pool |
 | Obsidian Cloak | `obsidian_cloak` | accessory | 3 | base | 8-100 | +3 Armor, +5 Max HP, +2.0% Dodge |  | general pool |
-| Obsidian Ring | `obsidian_ring` | accessory | 3 | base | 8-100 | +6 Max HP, +1.5% Crit Chance |  | general pool |
+| Obsidian Ring | `obsidian_ring` | accessory | 3 | base | 8-100 | +6 Max HP, +1.5% CRIT CH |  | general pool |
 | Obsidian Charm | `obsidian_charm` | accessory | 3 | base | 8-100 | +1 Armor, +7 Max HP, +1% Super Crit |  | general pool |
 | Obsidian Belt | `obsidian_belt` | accessory | 3 | base | 55-100 | +7 Armor, +13 Max HP |  | general pool |
 | Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +61 Armor, +61 Max HP |  | general pool |
 | Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +50 Armor, +50 Max HP |  | general pool |
 | Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +101 Armor, +121 Max HP |  | general pool |
-| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +30 Armor, +30 Max HP, +7.68% Crit Chance |  | general pool |
+| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +30 Armor, +30 Max HP, +7.68% CRIT CH |  | general pool |
 | Sunhoney Skirt | `sunhoney_skirt` | armor | 5 | base | 100-100 | +71 Armor, +80 Max HP |  | general pool |
 | Sunhoney Slippers | `sunhoney_slippers` | armor | 5 | base | 100-100 | +40 Armor, +40 Max HP |  | general pool |
-| Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +20 Armor, +80 Max HP, +7.68% Crit Chance, +12% Gold Find |  | general pool |
+| Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +20 Armor, +80 Max HP, +7.68% CRIT CH, +12% Gold Find |  | general pool |
 | Sunhoney Cape | `sunhoney_cape` | accessory | 5 | base | 100-100 | +30 Armor, +50 Max HP, +4.0% Dodge |  | general pool |
-| Honeycomb Ring | `honeycomb_ring` | accessory | 5 | base | 100-100 | +61 Max HP, +7.68% Crit Chance |  | general pool |
+| Honeycomb Ring | `honeycomb_ring` | accessory | 5 | base | 100-100 | +61 Max HP, +7.68% CRIT CH |  | general pool |
 | Hive Charm | `hive_charm` | accessory | 5 | base | 100-100 | +10 Armor, +71 Max HP, +5.12% Super Crit |  | general pool |
 | Sunforged Cincture | `sunforged_cincture` | accessory | 5 | base | 100-100 | +20 Armor, +40 Max HP |  | general pool |
 | Honeycomb Scepter | `honeycomb_scepter` | weapon (mace) | 5 | base | 100-100 | +278 Damage |  | general pool |
-| Golden Ledger | `golden_ledger` | offhand (tome) | 5 | base | 100-100 | +61 Max HP, +10.7/s HP Regen, +24 Max Mana, +3.24/s Mana Regen, +23.62% Spell Power |  | general pool |
+| Golden Ledger | `golden_ledger` | offhand (tome) | 5 | base | 100-100 | +61 Max HP, +10.7/s HP REG, +24 Max Mana, +3.24/s MP REG, +23.62% SPELL PWR |  | general pool |
 | Ashen Warlord's Visor | `ashen_warlords_visor` | armor | 5 | base | 100-100 | +77 Armor, +77 Max HP |  | general pool |
 | Warlord's Bulwark | `warlords_bulwark` | armor | 5 | base | 100-100 | +64 Armor, +64 Max HP |  | general pool |
 | Ashen Plate | `ashen_plate` | armor | 5 | base | 100-100 | +128 Armor, +154 Max HP |  | general pool |
-| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +39 Armor, +39 Max HP, +9.78% Crit Chance |  | general pool |
+| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +39 Armor, +39 Max HP, +9.78% CRIT CH |  | general pool |
 | Warlord's Cuisses | `warlords_cuisses` | armor | 5 | base | 100-100 | +90 Armor, +102 Max HP |  | general pool |
 | Warlord's Sabatons | `warlords_sabatons` | armor | 5 | base | 100-100 | +51 Armor, +51 Max HP |  | general pool |
-| Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +26 Armor, +102 Max HP, +9.78% Crit Chance, +12% Gold Find |  | general pool |
+| Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +26 Armor, +102 Max HP, +9.78% CRIT CH, +12% Gold Find |  | general pool |
 | Warlord's Banner Cloak | `warlords_banner_cloak` | accessory | 5 | base | 100-100 | +39 Armor, +64 Max HP, +4.0% Dodge |  | general pool |
-| Warlord's Signet | `warlords_signet` | accessory | 5 | base | 100-100 | +77 Max HP, +9.78% Crit Chance |  | general pool |
+| Warlord's Signet | `warlords_signet` | accessory | 5 | base | 100-100 | +77 Max HP, +9.78% CRIT CH |  | general pool |
 | War Medal Charm | `war_medal_charm` | accessory | 5 | base | 100-100 | +13 Armor, +90 Max HP, +6.52% Super Crit |  | general pool |
 | Warden Plate Belt | `warden_plate_belt` | accessory | 5 | base | 100-100 | +26 Armor, +51 Max HP |  | general pool |
-| Ashen Warlord's Greataxe | `ashen_warlords_greataxe` | weapon (axe) | 5 | base | 100-100 | +269 Damage, +9.31% Crit Chance |  | general pool |
+| Ashen Warlord's Greataxe | `ashen_warlords_greataxe` | weapon (axe) | 5 | base | 100-100 | +269 Damage, +9.31% CRIT CH |  | general pool |
 | Ashen Tower Shield | `ashen_tower_shield` | offhand (shield) | 5 | base | 100-100 | +141 Armor, +154 Max HP |  | general pool |
 | Blightbound Cowl | `blightbound_cowl` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Shroud Mantle | `shroud_mantle` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Blightbound Robe | `blightbound_robe` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck |  | general pool |
+| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% CRIT CH, +10 Luck |  | general pool |
 | Blightbound Leggings | `blightbound_leggings` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Shroud Treads | `shroud_treads` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +12% Gold Find, +10 Luck |  | general pool |
+| Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% CRIT CH, +12% Gold Find, +10 Luck |  | general pool |
 | Blightbound Shroud | `blightbound_shroud` | accessory | 5 | base | 100-100 | +4.0% Dodge, +10 Luck |  | general pool |
-| Ichor Ring | `ichor_ring` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck |  | general pool |
+| Ichor Ring | `ichor_ring` | accessory | 5 | base | 100-100 | +11.17% CRIT CH, +10 Luck |  | general pool |
 | Core Charm | `core_charm` | accessory | 5 | base | 100-100 | +7.45% Super Crit, +10 Luck |  | general pool |
 | Hunter Trophy Belt | `hunter_trophy_belt` | accessory | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Blight Staff | `blight_staff` | weapon (staff) | 5 | base | 100-100 | +291 Damage, +11.2/s HP Regen, +33 Max Mana, +30.13% Spell Power |  | general pool |
-| Blight Orb | `blight_orb` | offhand (tome) | 5 | base | 100-100 | +15.6/s HP Regen, +35 Max Mana, +4.71/s Mana Regen, +34.35% Spell Power, +10 Luck |  | general pool |
+| Blight Staff | `blight_staff` | weapon (staff) | 5 | base | 100-100 | +291 Damage, +11.2/s HP REG, +33 Max Mana, +30.13% SPELL PWR |  | general pool |
+| Blight Orb | `blight_orb` | offhand (tome) | 5 | base | 100-100 | +15.6/s HP REG, +35 Max Mana, +4.71/s MP REG, +34.35% SPELL PWR, +10 Luck |  | general pool |
 
 ## Affixes
 
