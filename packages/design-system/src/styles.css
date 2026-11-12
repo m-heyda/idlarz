@@ -3725,7 +3725,7 @@
 	grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
 	gap: 2px 12px;
 	font-size: 13px;
-	max-width: 640px;
+	width: 100%;
 }
 
 .ds-income-table > span {
@@ -3766,4 +3766,33 @@
 	.ds-paper-cols-flow {
 		grid-template-columns: minmax(0, 1fr);
 	}
+}
+
+/* the income table's headers are buttons that sort the rows */
+button.ds-income-head {
+	font: inherit;
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #6a4b24;
+	background: none;
+	border: 0;
+	border-bottom: 1px solid #c8ad74;
+	padding: 0 0 2px;
+	text-align: right;
+	cursor: pointer;
+}
+
+button.ds-income-head.ds-income-name {
+	text-align: left;
+}
+
+button.ds-income-head:hover {
+	color: #2b1d0e;
+}
+
+.ds-sort-mark {
+	margin-left: 4px;
+	font-style: normal;
+	font-size: 9px;
 }

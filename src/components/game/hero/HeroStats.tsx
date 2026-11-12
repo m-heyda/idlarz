@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Inset, Panel } from '../../../../packages/design-system/src/components/primitives';
+import React, { useMemo, useState } from 'react';
+import { Panel } from '../../../../packages/design-system/src/components/primitives';
 import {
 	AttributeStrip,
 	PAPER_INK,
@@ -28,7 +28,6 @@ import { getStatDescriptionGroups } from '@/utils/game/character';
 import { calculateResourceBreakdown, type ResourceBreakdownEntry } from '@/utils/game/income';
 import { emberIncomeBonus } from '@/utils/game/rebirth';
 import { countOwnedTiles } from '@/utils/game/tiles';
-import RebirthsPanel from '../overlays/RebirthsPanel';
 
 const BASE_STATS = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 /** The ink each attribute is written in on the paper */
@@ -39,6 +38,15 @@ const ATTR_INK: Record<(typeof BASE_STATS)[number], string> = {
 	vitality: PAPER_INK.gold,
 	charisma: PAPER_INK.purple,
 };
+
+type IncomeCol = 'name' | 'sec' | 'min' | 'hour';
+/** The columns of the income table: the first click sorts a number column from the biggest down (a name from A to Z), the next one flips it. */
+const INCOME_COLS: { id: IncomeCol; label: string }[] = [
+	{ id: 'name', label: 'Resource' },
+	{ id: 'sec', label: 'Per second' },
+	{ id: 'min', label: 'Per minute' },
+	{ id: 'hour', label: 'Per hour' },
+];
 
 const pct = (value: number, digits = 0) => (Math.abs(value) >= 5000 ? formatPercent(value) : `${value.toFixed(digits)}%`);
 const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -129,6 +137,7 @@ const HeroStats: React.FC = () => {
 	const playerClass = useGameStore((state) => state.playerClass);
 	const idolLevels = useGameStore((state) => state.idolLevels);
 	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
+	const [sort, setSort] = useState<{ col: IncomeCol; dir: 1 | -1 } | null>(null);
 
 	const idol = idolEconomy(tiles, idolLevels);
 	const classLines = describeClassPassives(playerClass);
@@ -244,27 +253,43 @@ const HeroStats: React.FC = () => {
 				</Block>
 
 				<Block id='resource-income' title='Resource income'>
-					<div className='ds-income-table'>
-						<span className='ds-income-head ds-income-name'>Resource</span>
-						<span className='ds-income-head'>Per second</span>
-						<span className='ds-income-head'>Per minute</span>
-						<span className='ds-income-head'>Per hour</span>
-						{resourceKeys.map((key) => {
-							const rate = resourceRates.total[key];
-							const color = rate > 0 ? I.green : I.muted;
-							const icon = resourceIcon(key);
-							return (
-								<React.Fragment key={key}>
-									<span className='ds-income-name'>
-										{icon ? <img src={icon} alt='' /> : null}
-										{labelOf(key)}
-									</span>
-									<span style={{ color }}>{formatRate(rate)}</span>
-									<span style={{ color }}>{formatNumber(rate * 60)}</span>
-									<span style={{ color }}>{formatNumber(rate * 3600)}</span>
-								</React.Fragment>
-							);
-						})}
+					<div className='ds-income-table' role='table'>
+						{INCOME_COLS.map(({ id, label }) => (
+							<button
+								key={id}
+								type='button'
+								role='columnheader'
+								className={`ds-income-head${id === 'name' ? ' ds-income-name' : ''}`}
+								aria-sort={sort?.col === id ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}
+								title={`Sort by ${label.toLowerCase()}`}
+								onClick={() => setSort((now) => (now?.col === id ? { col: id, dir: now.dir === 1 ? -1 : 1 } : { col: id, dir: id === 'name' ? 1 : -1 }))}
+							>
+								{label}
+								{sort?.col === id ? <i className='ds-sort-mark'>{sort.dir === 1 ? '▲' : '▼'}</i> : null}
+							</button>
+						))}
+						{[...resourceKeys]
+							.sort((x, y) => {
+								if (!sort) return 0;
+								const byName = labelOf(x).localeCompare(labelOf(y));
+								return sort.col === 'name' ? sort.dir * byName : sort.dir * (resourceRates.total[x] - resourceRates.total[y]) || byName;
+							})
+							.map((key) => {
+								const rate = resourceRates.total[key];
+								const color = rate > 0 ? I.green : I.muted;
+								const icon = resourceIcon(key);
+								return (
+									<React.Fragment key={key}>
+										<span className='ds-income-name'>
+											{icon ? <img src={icon} alt='' /> : null}
+											{labelOf(key)}
+										</span>
+										<span style={{ color }}>{formatRate(rate)}</span>
+										<span style={{ color }}>{formatNumber(rate * 60)}</span>
+										<span style={{ color }}>{formatNumber(rate * 3600)}</span>
+									</React.Fragment>
+								);
+							})}
 					</div>
 				</Block>
 
@@ -299,12 +324,6 @@ const HeroStats: React.FC = () => {
 							</Block>
 						);
 					})}
-				</Block>
-
-				<Block id='rebirth-history' title='Rebirths' defaultOpen={false}>
-					<Inset>
-						<RebirthsPanel />
-					</Inset>
 				</Block>
 			</div>
 		</Panel>

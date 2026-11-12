@@ -59,7 +59,7 @@ test('the Hero window draws the new bag with the hero card, gear, skills, footer
 	assert.match(out, /ds-hero-left/);
 });
 
-test('the Stats tab keeps every figure of the old Character window: attributes, overview, combat, bonuses, income and the rebirth history', async () => {
+test('the Stats tab keeps every figure of the old Character window: attributes, overview, combat, bonuses and income', async () => {
 	const { default: HeroStats } = await import('../../src/components/game/hero/HeroStats');
 	reset();
 	const out = renderToStaticMarkup(h(HeroStats));
