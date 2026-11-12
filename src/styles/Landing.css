@@ -403,6 +403,11 @@
 
 .ld-root[data-wide='true'] .ld-col-account {
 	width: min(860px, 60vw);
+	align-items: stretch; /* as tall as the changelog was */
+}
+
+.ld-root[data-wide='true'] .ld-col-account .ld-frame {
+	flex: 1;
 }
 
 .ld-log-inner {
