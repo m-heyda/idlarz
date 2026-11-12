@@ -552,7 +552,7 @@ export const HeroWindowView: React.FC<{ initialTab?: 'bag' | 'stats' | 'craft' }
 			<WindowShell
 				title='Hero'
 				width={1100}
-				height={700}
+				height={800}
 				bar={
 					<Tabs
 						active={tab}
