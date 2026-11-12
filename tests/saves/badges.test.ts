@@ -1,8 +1,13 @@
+import { ADMIN_UNLOCK } from '../../src/catalog/avatars';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { NICK_COLORS, NICK_EFFECTS, inkOn, nickColorValue } from '../../src/config/nickColors';
 import {
 	BADGE_NONE,
+	ADMIN_BADGE,
+	ADMIN_BADGE_PIC,
+	ADMIN_TITLE_ID,
+	badgePicSrc,
 	badgeOptions,
 	checkBadgeChoice,
 	checkNameColor,
@@ -137,4 +142,27 @@ test('every name effect is its own purchase: owning one opens only that one, an 
 test('shownIdentity carries the admin flag, which is never part of the choice', () => {
 	assert.equal(shownIdentity({ badgeId: null, titleId: null }, [], true).admin, true);
 	assert.equal(shownIdentity({ badgeId: null, titleId: null }, []).admin, false);
+});
+
+test('the Dev title and the octopus badge exist for the admin account only (its pseudo id), and are checked like any other choice', () => {
+	const adminEarned = ['early_tester', ADMIN_UNLOCK];
+	assert.ok(badgeOptions(adminEarned).some((b) => b.id === ADMIN_BADGE));
+	assert.ok(titleOptions(adminEarned).some((t) => t.id === ADMIN_TITLE_ID && t.name === 'Dev'));
+	assert.equal(
+		badgeOptions(['early_tester']).some((b) => b.id === ADMIN_BADGE),
+		false,
+	);
+	assert.equal(
+		titleOptions(['early_tester']).some((t) => t.id === ADMIN_TITLE_ID),
+		false,
+	);
+	assert.equal(checkBadgeChoice({ badgeId: ADMIN_BADGE, titleId: ADMIN_TITLE_ID }, adminEarned).ok, true);
+	assert.equal(checkBadgeChoice({ badgeId: ADMIN_BADGE, titleId: null }, ['early_tester']).ok, false, 'not for a player');
+	assert.equal(checkBadgeChoice({ badgeId: null, titleId: ADMIN_TITLE_ID }, ['early_tester']).ok, false, 'not for a player');
+	assert.equal(shownBadge(ADMIN_BADGE, ['early_tester']), null);
+	assert.equal(shownBadge(ADMIN_BADGE, adminEarned)?.badge, ADMIN_BADGE);
+	assert.equal(shownBadge(null, adminEarned)?.id, 'early_tester', 'the octopus is never a default: it is picked');
+	assert.equal(shownIdentity({ badgeId: ADMIN_BADGE, titleId: ADMIN_TITLE_ID }, adminEarned, true).title, 'Dev');
+	assert.equal(badgePicSrc(ADMIN_BADGE), ADMIN_BADGE_PIC);
+	assert.equal(badgePicSrc('early_tester'), '/pixel/new_assets/achievements/early_tester.png');
 });

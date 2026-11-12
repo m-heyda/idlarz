@@ -4860,10 +4860,10 @@ button.ds-income-head:hover {
 
 .ds-rank-row {
 	display: grid;
-	grid-template-columns: 40px 64px minmax(0, 1fr) 48px 96px 58px;
+	grid-template-columns: 40px 84px minmax(0, 1fr) 96px 64px;
 	align-items: center;
 	gap: 12px;
-	min-height: 76px;
+	min-height: 96px;
 	border-width: 0 0 1px;
 }
 
@@ -4909,8 +4909,8 @@ button.ds-income-head:hover {
 .ds-rank-name {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	font-size: 19px;
+	gap: 10px;
+	font-size: 23px;
 	white-space: nowrap;
 }
 
@@ -4923,8 +4923,32 @@ button.ds-income-head:hover {
 }
 
 .ds-rank-nobadge {
-	width: 40px;
-	height: 40px;
+	width: 48px;
+	height: 48px;
+}
+
+/* the trophy column at the right end of the row (empty after the third place) */
+.ds-rank-podium {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 2px;
+}
+
+/* the places on the podium: one gold trophy, the second and third place recoloured with filters (no extra pictures) */
+.ds-rank-trophy {
+	display: block;
+	margin: 0 auto;
+	image-rendering: pixelated;
+}
+
+.ds-rank-trophy[data-place='2'] {
+	filter: grayscale(1) brightness(1.3) contrast(1.05);
+}
+
+.ds-rank-trophy[data-place='3'] {
+	filter: sepia(1) saturate(1.3) hue-rotate(-24deg) brightness(0.62) contrast(1.1);
 }
 
 .ds-rank-value {
@@ -4945,7 +4969,7 @@ button.ds-income-head:hover {
 
 .ds-rank-move {
 	font-size: 12px;
-	text-align: right;
+	text-align: center;
 	color: var(--ds-dim, #9aa0b4);
 }
 
@@ -4981,8 +5005,8 @@ button.ds-income-head:hover {
 }
 
 .ds-rank-sk-art {
-	width: 56px;
-	height: 56px;
+	width: 72px;
+	height: 72px;
 }
 
 .ds-rank-sk-name {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
 import { chooseBadge, chooseNameColor, fetchBadges } from '@/lib/authClient';
-import { BADGE_NONE, badgeOptions, shownBadge, shownTitle, titleOptions } from '@/catalog/badges';
+import { BADGE_NONE, badgeOptions, badgePicSrc, shownBadge, shownTitle, titleOptions } from '@/catalog/badges';
 import { NICK_COLORS, NICK_EFFECTS, NICK_GOLD, inkOn, nickColorValue, nickEffectById } from '@/config/nickColors';
 import { gemItemById } from '@/config/gemShop';
 import { useGemStore } from '@/stores/gemStore';
@@ -11,7 +11,7 @@ import GemIcon from './GemIcon';
 import audioManager from '@/utils/audioManager';
 import GameModal from './GameModal';
 import { Button, SectionLabel } from '../../../packages/design-system/src/components/primitives';
-import { NickName } from '../../../packages/design-system/src/components/composites';
+import { BadgePic, NickName } from '../../../packages/design-system/src/components/composites';
 import AchievementBadge from './AchievementBadge';
 
 /** Loads the badge choice into the store once per session (the Character window and this dialog both call it). */
@@ -129,10 +129,7 @@ const BadgeDialog: React.FC = () => {
 				<div className='ds-nick-preview'>
 					<NickName color={nickColorValue(previewColor)}>{playerName}</NickName>
 					{title && <span className='ds-nick-preview-title'>({title})</span>}
-					{shown && (
-						// eslint-disable-next-line @next/next/no-img-element
-						<img src={`/pixel/new_assets/achievements/${shown.badge}.png`} alt={shown.title} width={28} height={28} className='pixelated' />
-					)}
+					{shown && <BadgePic src={badgePicSrc(shown.badge)} size={34} label={shown.title} />}
 				</div>
 			</div>
 

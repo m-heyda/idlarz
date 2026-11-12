@@ -19,7 +19,7 @@ import { HintTooltip, TipRows, Tooltip } from '../../../../packages/design-syste
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
 import { avatarArtUrl, resolveAvatar } from '@/catalog/avatars';
-import { shownBadge, shownTitle } from '@/catalog/badges';
+import { badgePicSrc, shownBadge, shownTitle } from '@/catalog/badges';
 import { COMPONENTS } from '@/catalog/recipes';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
@@ -180,10 +180,9 @@ const HeroLeft: React.FC = () => {
 				avatar={avatarArtUrl(resolveAvatar(avatarId, playerClass))}
 				name={playerName}
 				classLabel={`${info.race} ${info.label}`}
-				badge={badge ? `/pixel/new_assets/achievements/${badge.badge}.png` : undefined}
+				badge={badge ? badgePicSrc(badge.badge) : undefined}
 				title={title}
 				nameColor={nickColorValue(choice.nameColor)}
-				admin={choice.admin}
 				onAvatar={openAvatarDialog}
 				onBadge={openBadgeDialog}
 				onClass={openClassDialog}

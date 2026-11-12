@@ -542,11 +542,11 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### The boards
 
-Source: [`src/lib/rankings.ts:39`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:40`](../../src/lib/rankings.ts)
 
 The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
 
-Every board lists the first 50 places of the trusted players, plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
+Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:
 - Level: level, then lifetime XP, then who reached the level cap first.
 - Rebirths: rebirths, then Embers ever earned.
@@ -558,7 +558,7 @@ Ties are broken in this order:
 
 ### Movement arrows
 
-Source: [`src/lib/rankings.ts:86`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:92`](../../src/lib/rankings.ts)
 
 The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
 
@@ -1056,7 +1056,7 @@ Stored on `profiles.name_color` like a plain colour; the look of each is the `.d
 
 ### `badgeOptions` <small>function</small>
 
-Source: [`src/catalog/badges.ts:27`](../../src/catalog/badges.ts)
+Source: [`src/catalog/badges.ts:49`](../../src/catalog/badges.ts)
 
 Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
 The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.

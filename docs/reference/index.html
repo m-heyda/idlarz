@@ -4233,9 +4233,9 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 <p>What the Crafting window&#39;s odds panel shows for a recipe: the rarity chances at the player&#39;s Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll&#39;s own loot trace (<code>generateLoot</code> with a fixed rng), so the panel is the real odds and cannot drift from the roll.</p>
 </article><h2>Rankings</h2><article><p><a id="ranking-boards"></a></p>
 <h3>The boards</h3>
-<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:39</code></a></p>
+<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:40</code></a></p>
 <p>The tabs of the Rankings window, in order. A board with <code>soon</code> is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).</p>
-<p>Every board lists the first 50 places of the trusted players, plus the asking player&#39;s own place below it. The places are rebuilt once per 24 hours (<code>refresh_rankings()</code>, run by the first request after that), and each row shows the change since the rebuild before.
+<p>Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player&#39;s own place below it. The places are rebuilt once per 24 hours (<code>refresh_rankings()</code>, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:</p>
 <ul>
 <li>Level: level, then lifetime XP, then who reached the level cap first.</li>
@@ -4246,7 +4246,7 @@ Ties are broken in this order:</p>
 </ul>
 </article><article><p><a id="movement"></a></p>
 <h3>Movement arrows</h3>
-<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:86</code></a></p>
+<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:92</code></a></p>
 <p>The change since the refresh before: a lower number is a better place, so a smaller rank is <code>up</code>; no earlier place is <code>new</code>.</p>
 </article><h2>Avatars</h2><article><p><a id="unlockedavatarids"></a></p>
 <h3><code>unlockedAvatarIds</code> <small>function</small></h3>
@@ -5636,7 +5636,7 @@ The animated <strong>Rainbow</strong> (<code>NICK_RAINBOW</code>) is a separate 
 Stored on <code>profiles.name_color</code> like a plain colour; the look of each is the <code>.ds-nick-&lt;id&gt;</code> class of the design system.</p>
 </article><article><p><a id="badgeoptions"></a></p>
 <h3><code>badgeOptions</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/badges.ts"><code>src/catalog/badges.ts:27</code></a></p>
+<p>Source: <a href="../../src/catalog/badges.ts"><code>src/catalog/badges.ts:49</code></a></p>
 <p>Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the <code>titleId</code> of an earned achievement.
 The choice lives on the profile (<code>badge_id</code>, <code>title_id</code>, written by the server after <code>checkBadgeChoice</code>): <code>null</code> badge = the default, <code>BADGE_NONE</code> = hidden.</p>
 </article><h2>Deeds</h2><article><p><a id="claimallachievements"></a></p>
@@ -6367,7 +6367,7 @@ and its gold is paid in the browser.</p>
 <h3>GET /api/rankings</h3>
 <p>Source: <a href="../../src/app/api/rankings/route.ts"><code>src/app/api/rankings/route.ts:18</code></a></p>
 <p>The Rankings: <code>GET /api/rankings?board=level|rebirths|crafting|tiles|kills</code>. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
-asking player&#39;s own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (<code>refresh_rankings()</code>, a single
+asking player&#39;s own place when it is further down. Every non-test account of the current chapter is ranked (<code>refresh_rankings()</code>), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (<code>refresh_rankings()</code>, a single
 SQL call, so no scheduled job is needed); the cosmetics are read live. The <code>quests</code> and <code>deeds</code> boards are not built and are a 400.</p>
 </article><h2>Away time</h2><article><p><a id="computeofflinegrant"></a></p>
 <h3><code>computeOfflineGrant</code> <small>function</small></h3>
@@ -6390,7 +6390,7 @@ paid[r] = floor(rate[r] x elapsed x efficiency)                    efficiency = 
 </code></pre>
 </article><article><p><a id="awayblockof"></a></p>
 <h3><code>awayBlockOf</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/away.ts"><code>src/lib/offline/away.ts:22</code></a></p>
+<p>Source: <a href="../../src/lib/offline/away.ts"><code>src/lib/offline/away.ts:23</code></a></p>
 <p>The read-only <code>away</code> block of <code>GET /api/auth/me</code>: gap = now minus the later of the ledger anchor and the last accepted save (as <code>claimOffline</code> measures it), with the cap and efficiency the last
 save stored (<code>derived.offlineCapSec</code> / <code>offlineEfficiency</code>, the base limits when an older row lacks them). <code>null</code> with no save, an unreadable time, or a gap under <code>offlineMinGapSec</code> (nothing to show).
 It never claims anything and never touches the ledger.</p>
@@ -6560,11 +6560,11 @@ unlocked&quot; window shows them (<code>RebirthUnlockModal</code>); the other vi
 The file name is <code>biome_&lt;name&gt;.png</code>; change the value here to use another one.</p>
 </article><article><p><a id="animal-pixel-icons"></a></p>
 <h3><code>ANIMAL_PIXEL_ICONS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:251</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:252</code></a></p>
 <p>Farm animal id -&gt; its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is <a href="#animalicon"><code>animalIcon</code></a>.</p>
 </article><article><p><a id="animalicon"></a></p>
 <h3><code>animalIcon</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:266</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:267</code></a></p>
 <p>The sprite one animal wears: a stable pick among its kind&#39;s looks from a hash of <code>seed</code> (the farm uses the animal&#39;s key, e.g. <code>chicken-3</code>),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind&#39;s first look (shop cards, tutorial).
 Pure: no random numbers.</p>

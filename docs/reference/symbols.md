@@ -13,8 +13,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:243`](../../src/lib/inventory.ts) | The one place gear is summed: |
 | `allocatePoints` | Progression / Levels | [`src/lib/offline/attrs.ts:107`](../../src/lib/offline/attrs.ts) | Puts points into attributes: |
-| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:251`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
-| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:266`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
+| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:252`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
+| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:267`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyPets` | Progression / Pets | [`src/lib/offline/pets.ts:28`](../../src/lib/offline/pets.ts) | Applies one pets request to the ledger. |
@@ -30,8 +30,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `autoUse` | Combat / Potions and skills | [`src/lib/offline/fightSteps.ts:74`](../../src/lib/offline/fightSteps.ts) | Auto-use's rules for one tick: |
 | `autoUseUnlocked` | Combat / A fight | [`src/lib/combat.ts:55`](../../src/lib/combat.ts) | Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: |
 | Avatars | Progression / Avatars | [`src/catalog/avatars.ts:18`](../../src/catalog/avatars.ts) | Avatars (IDL-71, class lock IDL-269): |
-| `awayBlockOf` | Saves & Server / Away time | [`src/lib/offline/away.ts:22`](../../src/lib/offline/away.ts) | The read-only `away` block of `GET /api/auth/me`: |
-| `badgeOptions` | Progression / Badges | [`src/catalog/badges.ts:27`](../../src/catalog/badges.ts) | Badges and titles of a profile. |
+| `awayBlockOf` | Saves & Server / Away time | [`src/lib/offline/away.ts:23`](../../src/lib/offline/away.ts) | The read-only `away` block of `GET /api/auth/me`: |
+| `badgeOptions` | Progression / Badges | [`src/catalog/badges.ts:49`](../../src/catalog/badges.ts) | Badges and titles of a profile. |
 | `bandOf` | Monsters / Spawning | [`src/lib/distance.ts:13`](../../src/lib/distance.ts) | The band a castle distance falls in. |
 | `BASE_GENERATION_RATES` | Economy / Income | [`src/config/economy.ts:158`](../../src/config/economy.ts) | Income of the realm itself, per second, before any tile: |
 | `BASELINE_EPOCH` | Saves & Server / Epoch | [`src/config/epoch.ts:13`](../../src/config/epoch.ts) | The data epoch: |
@@ -193,7 +193,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:232`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
 | `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:454`](../../src/config/combatConfig.ts) | The roster: |
 | `monsterStats` | Monsters / Level scaling | [`src/lib/monsters.ts:117`](../../src/lib/monsters.ts) | HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). |
-| Movement arrows | Progression / Rankings | [`src/lib/rankings.ts:86`](../../src/lib/rankings.ts) | The change since the refresh before: |
+| Movement arrows | Progression / Rankings | [`src/lib/rankings.ts:92`](../../src/lib/rankings.ts) | The change since the refresh before: |
 | `nextWanderStep` | Progression / Pets | [`src/lib/pets.ts:29`](../../src/lib/pets.ts) | The pet's next step: |
 | `NICK_COLORS` | Progression / Badges | [`src/config/nickColors.ts:17`](../../src/config/nickColors.ts) | The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). |
 | `NICK_EFFECTS` | Progression / Badges | [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts) | The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): |
@@ -271,7 +271,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:167`](../../src/lib/combat.ts) | One swing: |
 | `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
 | The /play route and its redirects | Architecture / Routes | [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts) | The front door's routes (IDL-61). |
-| The boards | Progression / Rankings | [`src/lib/rankings.ts:39`](../../src/lib/rankings.ts) | The tabs of the Rankings window, in order. |
+| The boards | Progression / Rankings | [`src/lib/rankings.ts:40`](../../src/lib/rankings.ts) | The tabs of the Rankings window, in order. |
 | The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |
 | The browser's half of the data epoch | Saves & Server / Browser state | [`src/lib/epochGuard.ts:10`](../../src/lib/epochGuard.ts) | The browser's half of the data epoch. |
 | The class picker acceptance | Pacing / The sim | [`scripts/sim-classes.ts:1`](../../scripts/sim-classes.ts) | `npm run sim:classes`: |

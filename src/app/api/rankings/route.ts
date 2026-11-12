@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
- * asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single
+ * asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single
  * SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.
  *
  * @category Saves & Server/Endpoints
@@ -22,8 +22,8 @@ export async function GET(request: Request) {
 		const board = new URL(request.url).searchParams.get('board') ?? 'level';
 		if (!isLiveBoard(board)) return fail('That ranking is not available yet.', 400);
 		const answer = await loadBoard(createSupabaseAdmin(), board, player.userId);
-		// the answer is the same for every viewer but their own row, and changes at most daily: let the browser keep it for five minutes
-		return NextResponse.json(answer, { headers: { 'Cache-Control': 'private, max-age=300' } });
+		// the answer is the same for every viewer but their own row, and changes at most daily: let the browser keep it for a minute (the places only change at the daily rebuild, but a rebuild or a new player must show soon)
+		return NextResponse.json(answer, { headers: { 'Cache-Control': 'private, max-age=60' } });
 	} catch {
 		return unavailable();
 	}

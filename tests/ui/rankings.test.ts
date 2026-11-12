@@ -56,7 +56,17 @@ test('a loaded board lists the places with the name, title, value and the move a
 		refreshedAt: '2026-11-12T10:00:00Z',
 		mine: row({ rank: 77, name: 'Mine', me: true, move: { dir: 'new', by: 0 } }),
 		rows: [
-			row({ rank: 1, name: 'Alpha', title: 'The Brave', value: 100, move: { dir: 'up', by: 3 }, admin: true, nameColor: 'gold' }),
+			row({
+				rank: 1,
+				name: 'Alpha',
+				title: 'The Brave',
+				value: 100,
+				move: { dir: 'up', by: 3 },
+				admin: true,
+				nameColor: 'gold',
+				badge: 'admin',
+				badgeName: 'Dev',
+			}),
 			row({ rank: 2, name: 'Beta', value: 99, move: { dir: 'down', by: 2 } }),
 			row({ rank: 3, name: 'Gamma', value: 98, paragon: 4 }),
 		],
@@ -66,7 +76,9 @@ test('a loaded board lists the places with the name, title, value and the move a
 	assert.match(html, /Lv 100/);
 	assert.match(html, /▲ 3/);
 	assert.match(html, /▼ 2/);
-	assert.match(html, /ds-admin-mark/);
+	assert.match(html, /ds-admin-mark/, 'the admin badge is the animated octopus');
+	assert.equal((html.match(/ds-rank-trophy/g) ?? []).length, 3, 'a trophy for each of the first three places');
+	assert.match(html, /data-place="2"/);
 	assert.match(html, /ds-nick-gold/);
 	assert.match(html, /✦ 4/, 'a paragon mark shows when a row has a paragon level');
 	assert.match(html, /data-me="true"/);
