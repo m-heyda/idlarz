@@ -1668,7 +1668,7 @@
 
 /* ===== container queries: slots scale with the window; columns stack when narrow ===== */
 
-@container ds-win (max-width: 900px), ds-win (max-height: 620px) {
+@container ds-win (max-width: 900px) or (max-height: 620px) {
 	.ds-baggrid {
 		--ds-slot-size: 44px;
 	}
@@ -1680,7 +1680,7 @@
 	}
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-baggrid {
 		--ds-slot-size: 32px;
 	}
@@ -1738,7 +1738,7 @@
 	min-height: 0;
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-doll {
 		flex: none;
 		height: 340px;
@@ -1754,7 +1754,7 @@
 
 /* Short or narrow window: drop the silhouette and lay the equipment slots out in its place, two rows of squares, with the bars and hands below */
 
-@container ds-win (max-height: 780px), ds-win (max-width: 720px) {
+@container ds-win (max-height: 780px) or (max-width: 720px) {
 	.ds-doll {
 		display: flex;
 		flex-direction: column;
@@ -2309,13 +2309,13 @@
 	border-width: 1px;
 }
 
-@container ds-win (max-width: 900px), ds-win (max-height: 620px) {
+@container ds-win (max-width: 900px) or (max-height: 620px) {
 	.ds-equip {
 		--ds-slot-size: 40px;
 	}
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-equip {
 		--ds-slot-size: 32px;
 	}
@@ -2518,13 +2518,13 @@
 	display: none;
 }
 
-@container ds-win (max-width: 900px), ds-win (max-height: 620px) {
+@container ds-win (max-width: 900px) or (max-height: 620px) {
 	.ds-equip {
 		--ds-slot-size: 40px;
 	}
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-equip {
 		--ds-slot-size: 32px;
 	}
