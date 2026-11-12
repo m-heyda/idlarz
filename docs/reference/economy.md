@@ -664,7 +664,7 @@ cost = ceil(units x sell price x 2)
 
 ### `MERCHANT_BUY_MULTIPLIER` <small>const</small>
 
-Source: [`src/config/merchant.ts:221`](../../src/config/merchant.ts)
+Source: [`src/config/merchant.ts:224`](../../src/config/merchant.ts)
 
 The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).
 
@@ -725,7 +725,7 @@ paid refresh price = min(1e9, 10,000 x 2^(paid refreshes so far))
 
 ### `sellResource` <small>function</small>
 
-Source: [`src/lib/offline/trade.ts:63`](../../src/lib/offline/trade.ts)
+Source: [`src/lib/offline/trade.ts:69`](../../src/lib/offline/trade.ts)
 
 Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime
 `unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.
@@ -743,7 +743,7 @@ the next grade stays a reward for fights and chests until the player has worn th
 
 ### `buyResource` <small>function</small>
 
-Source: [`src/lib/offline/trade.ts:88`](../../src/lib/offline/trade.ts)
+Source: [`src/lib/offline/trade.ts:94`](../../src/lib/offline/trade.ts)
 
 Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the
 spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.

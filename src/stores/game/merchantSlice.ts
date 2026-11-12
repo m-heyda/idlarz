@@ -1,7 +1,14 @@
 // merchantSlice.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
-import { MERCHANT_BUYABLE, MERCHANT_RESOURCE_PRICES, MERCHANT_SHOP_ITEMS, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
+import {
+	MERCHANT_BUYABLE,
+	MERCHANT_MAX_TRADE_QTY,
+	MERCHANT_RESOURCE_PRICES,
+	MERCHANT_SHOP_ITEMS,
+	MERCHANT_UPGRADES,
+	type MerchantUpgradeId,
+} from '@/config/merchant';
 import { RESOURCE_CAP } from '@/config/economy';
 import { calculateResourceRates } from '@/utils/game/income';
 import { buyCost, merchantLevel, merchantUpgradeCost, sellPayout } from '@/utils/game/merchant';
@@ -21,9 +28,11 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 
 	return {
 		// Sell resources to the merchant for gold. Gold and XP cannot be sold.
-		sellResources: (resource: keyof Resources, amount: number) => {
+		sellResources: (resource: keyof Resources, requested: number) => {
 			if (!(resource in MERCHANT_RESOURCE_PRICES)) return false;
-			if (!isPositiveNumber(amount)) return false;
+			if (!isPositiveNumber(requested)) return false;
+			// a Max over the server's limit sells the limit (the rest can be sold with the next click)
+			const amount = Math.min(requested, MERCHANT_MAX_TRADE_QTY);
 
 			const state = get();
 			if (state.resources[resource] < amount) return false;
@@ -172,10 +181,10 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 		buyResource: (resource: keyof Resources, amount: number) => {
 			if (!(resource in MERCHANT_RESOURCE_PRICES) || !(MERCHANT_BUYABLE as readonly string[]).includes(resource)) return false;
 			if (!isPositiveNumber(amount)) return false;
-			const units = Math.floor(amount);
-			if (units < 1) return false;
-
 			const state = get();
+			// only what the stock can still hold is bought (and charged): the preview credits all of it, so a refusal takes back exactly that
+			const units = Math.min(Math.floor(amount), MERCHANT_MAX_TRADE_QTY, Math.floor(RESOURCE_CAP - state.resources[resource]));
+			if (units < 1) return false;
 			const price = buyCost(resource as keyof typeof MERCHANT_RESOURCE_PRICES, units);
 			if (state.resources.gold < price) return false;
 

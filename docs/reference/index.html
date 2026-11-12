@@ -1009,7 +1009,7 @@ The count is never reset, not even by a rebirth.</li>
 </code></pre>
 </article><article><p><a id="merchant-buy-multiplier"></a></p>
 <h3><code>MERCHANT_BUY_MULTIPLIER</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:221</code></a></p>
+<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:224</code></a></p>
 <p>The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).</p>
 </article><article><p><a id="merchantupgradecost"></a></p>
 <h3><code>merchantUpgradeCost</code> <small>function</small></h3>
@@ -1040,7 +1040,7 @@ The count is never reset, not even by a rebirth.</li>
 </code></pre>
 </article><article><p><a id="sellresource"></a></p>
 <h3><code>sellResource</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:63</code></a></p>
+<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:69</code></a></p>
 <p>Sells <code>qty</code> units of <code>resource</code> to the merchant: the gold is <code>sellPayout</code> with the save&#39;s Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime
 <code>unitsSold</code> / <code>goldFromSales</code> counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.</p>
 </article><article><p><a id="bestworngrade"></a></p>
@@ -1050,7 +1050,7 @@ The count is never reset, not even by a rebirth.</li>
 the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).</p>
 </article><article><p><a id="buyresource"></a></p>
 <h3><code>buyResource</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:88</code></a></p>
+<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:94</code></a></p>
 <p>Buys <code>qty</code> whole units of a resource the merchant sells (<code>MERCHANT_BUYABLE</code>) for <code>buyCost</code>, rounded up in the merchant&#39;s favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the
 spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.</p>
 </article><h2>Clicks</h2><article><p><a id="click-ladder"></a></p>

@@ -137,6 +137,7 @@ const Bag: React.FC<{ onNotice: (message: string) => void }> = ({ onNotice }) =>
 							{...slotProps(slot)}
 							draggable
 							compare
+							hints='bag'
 							onDragStart={() => setDrag({ kind: 'bag', index: i })}
 							onDrop={() => drop(i)}
 							onClick={(e) => e.shiftKey && shiftSell(i)}

@@ -207,6 +207,9 @@ export const MERCHANT_GOODS = {
 	centreAboveAverage: 3,
 } as const;
 
+/** The most units one merchant trade may move (a sanity bound the server and the browser share: the browser cuts a Max over it down to this). */
+export const MERCHANT_MAX_TRADE_QTY = 1e12;
+
 // What can be bought back (as resource packs): the basics and the four farm products (eggs, milk, hide and wool, since IDL-312). A farm still earns them; the merchant sells them at the same multiple as the rest.
 export const MERCHANT_BUYABLE = ['wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool'] as const;
 

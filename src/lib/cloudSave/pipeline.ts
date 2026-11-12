@@ -365,6 +365,8 @@ export const acceptSave = async (
 		restored.derived.xpBase = summary.derived.xpBase;
 		summary = trustedEconomy(baseline?.summary ?? null, restored, worth.ratio, baseline ? Math.max(0, nowMs - baseline.serverSavedAt) / 1000 : 0);
 	}
+	// the deeds read the land and farm facts of the stored summary: a flagged save does not get to raise them (the save before it keeps its facts)
+	if (flags.length > 0) summary.derived.deedWorld = current?.summary.derived.deedWorld;
 	const newRun = !!(ledger && current && (summary.rebirths > current.summary.rebirths || flags.includes('playtime_regress')));
 
 	// Starting over (New Game), or a browser re-basing its game over an account save that is further along (client `resolveConflict`) must not

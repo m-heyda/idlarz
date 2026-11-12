@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { RESOURCES, RESOURCE_TIERS, resourcesInTier, type ResourceKey, type ResourceTier } from '@/catalog';
 import { RESOURCE_ICONS } from '@/config/resources';
@@ -94,19 +95,37 @@ const ResourceGroup: React.FC<GroupProps> = ({ tier, rows, showNumbers, align, o
 			{rows.map((row) => {
 				const isEmbers = row.key === 'embers';
 				const isGems = row.key === 'gems';
+				// a chip opens the Merchant only for what it has a row for (gold opens the Upgrades tab); an extract the merchant does not buy keeps the plain pin behaviour
+				const opensMerchant = !isEmbers && !isGems && (row.key === 'gold' || row.key in MERCHANT_RESOURCE_PRICES);
+				const actionable = isEmbers || isGems || opensMerchant;
+				const act = () => (isGems ? onOpenGems() : isEmbers ? onOpenEmbers() : onOpenMerchant(row.key));
 				return (
 					<span
 						key={row.key}
-						className='hdr-chip is-link'
+						className={cn('hdr-chip', actionable && 'is-link')}
 						data-tutorial={`res-${row.key}`}
-						title={isGems ? 'Gems: open the Gem shop' : isEmbers ? RESOURCES[row.key].label : `${RESOURCES[row.key].label}: open the Merchant`}
-						onClick={(event) => {
-							// the pin toggle stays on the group (its padding and the Enter / Space key); a chip does what it says
-							event.stopPropagation();
-							if (isGems) onOpenGems();
-							else if (isEmbers) onOpenEmbers();
-							else onOpenMerchant(row.key);
-						}}
+						title={isGems ? 'Gems: open the Gem shop' : opensMerchant ? `${RESOURCES[row.key].label}: open the Merchant` : RESOURCES[row.key].label}
+						role={actionable ? 'button' : undefined}
+						tabIndex={actionable ? 0 : undefined}
+						onClick={
+							actionable
+								? (event) => {
+										// the pin toggle stays on the group (its padding and the Enter / Space key on the group); a chip does what it says
+										event.stopPropagation();
+										act();
+									}
+								: undefined
+						}
+						onKeyDown={
+							actionable
+								? (event) => {
+										if (event.key !== 'Enter' && event.key !== ' ') return;
+										event.preventDefault();
+										event.stopPropagation();
+										act();
+									}
+								: undefined
+						}
 					>
 						{iconOf(row.key)}
 						{showNumbers && <StableNumber value={formatHeaderAmount(row.amount)} minWidth={AMOUNT_SLOT} className='font-semibold text-[11px] text-[#f1e6c8]' />}

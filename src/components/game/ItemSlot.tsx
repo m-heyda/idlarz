@@ -31,6 +31,8 @@ interface ItemSlotProps {
 	compare?: boolean;
 	/** On the merchant's shelf: the hover card says what it costs instead of what it sells for */
 	buyPrice?: number;
+	/** Which key hints the hover card shows (the Bag and the Merchant's grid do different things on a click); none when left out */
+	hints?: 'bag' | 'merchant';
 	onClick?: (event: React.MouseEvent) => void;
 	onDoubleClick?: () => void;
 	/** A potion in the bag: the hover card shows a Drink button that calls this */
@@ -94,6 +96,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 	onClick,
 	onDoubleClick,
 	onDrink,
+	hints,
 	onContextMenu,
 	onDragStart,
 	onDrop,
@@ -199,7 +202,7 @@ const ItemSlot: React.FC<ItemSlotProps> = ({
 				createPortal(
 					<FloatingTip anchor={tip} onPointerEnter={cancelClose} onPointerLeave={scheduleClose}>
 						{def ? (
-							<ItemTooltipStack item={item ?? undefined} itemId={itemId ?? undefined} compare={compare} buyPrice={buyPrice} onDrink={onDrink} />
+							<ItemTooltipStack item={item ?? undefined} itemId={itemId ?? undefined} compare={compare} buyPrice={buyPrice} onDrink={onDrink} hints={hints} />
 						) : (
 							<div className='px-tooltip'>
 								<div className='px-tip-muted text-sm'>{label}</div>

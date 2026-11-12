@@ -305,3 +305,22 @@ test('a refused purchase returns the gold only for the units that are still ther
 		globalThis.fetch = realFetch;
 	}
 });
+
+test('a Max over the limit is cut to it, and a purchase only buys what the stock can still hold (review)', async () => {
+	const { MERCHANT_MAX_TRADE_QTY } = await import('../../src/config/merchant');
+	const { RESOURCE_CAP } = await import('../../src/config/economy');
+	const realFetch = globalThis.fetch;
+	globalThis.fetch = (() => new Promise<Response>(() => undefined)) as typeof fetch;
+	try {
+		freshGame({ gold: 0, wood: MERCHANT_MAX_TRADE_QTY * 3 });
+		assert.equal(api().sellResources('wood', MERCHANT_MAX_TRADE_QTY * 3), true);
+		assert.equal(api().resources.wood, MERCHANT_MAX_TRADE_QTY * 2, 'only the limit was sold');
+		freshGame({ gold: 1e15, wood: RESOURCE_CAP - 1e6 });
+		assert.equal(api().buyResource('wood', 1e7), true);
+		assert.equal(api().resources.wood, RESOURCE_CAP, 'the stock is full');
+		assert.ok(1e15 - api().resources.gold < 3e6, 'and only the units that fit were charged, not all ten million');
+		assert.equal(api().buyResource('wood', 5), false, 'a full stock buys nothing');
+	} finally {
+		globalThis.fetch = realFetch;
+	}
+});

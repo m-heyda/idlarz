@@ -63,8 +63,8 @@ interface BodyProps {
 	buyPrice?: number;
 	/** Shows a Drink button under the effects (a potion in the bag) */
 	onDrink?: () => void;
-	/** Shows the key hints line (Dbl-click equip, Shift + click sell): the item is in the bag or on the merchant's bag grid */
-	hints?: boolean;
+	/** Shows the key hints line for where the card is drawn: the Bag (double-click equips or drinks, shift + click sells the stack) or the Merchant's bag grid (click sells one, shift + click the stack) */
+	hints?: 'bag' | 'merchant';
 }
 
 /**
@@ -76,7 +76,10 @@ interface BodyProps {
 const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink, hints }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	// what the merchant really pays: the Haggler and Idol bonuses are in the number, the base value is in its title
-	const sellCtx = useGameStore(useShallow((state) => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige })));
+	// the same inputs a sale uses (`sellItem` passes the whole state), so the Lighthouse is in the number too
+	const sellCtx = useGameStore(
+		useShallow((state) => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige, tiles: state.tiles, idolLevels: state.idolLevels })),
+	);
 	const fighting = useGameStore((state) => !!state.combat.fight);
 	const resolved = item ? resolveItem(item) : null;
 	const def = resolved?.def ?? (itemId ? ITEM_CATALOG[itemId] : undefined);
@@ -257,7 +260,14 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 			</div>
 			{hints && buyPrice === undefined && !wornLabel && (
 				<div className='px-tip-muted text-xs'>
-					{[item ? 'Dbl-click equip' : hasEffects(def) ? 'Dbl-click drink' : '', fighting ? '' : 'Shift + click sell'].filter(Boolean).join(' · ')}
+					{(hints === 'bag'
+						? [item ? 'Dbl-click equip' : hasEffects(def) ? 'Dbl-click drink' : '', fighting ? '' : 'Shift + click sell']
+						: fighting
+							? []
+							: ['Click sell one', 'Shift + click sell all']
+					)
+						.filter(Boolean)
+						.join(' · ')}
 				</div>
 			)}
 		</div>
@@ -268,19 +278,20 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
  * The hover card of an item. With `compare` (the bag) and a piece worn in the same slot it becomes two cards side by side:
  * the worn piece (marked Equipped) and the hovered one with every number set against it.
  */
-const ItemTooltipStack: React.FC<{ item?: ItemInstance; itemId?: string; compare?: boolean; buyPrice?: number; onDrink?: () => void }> = ({
-	item,
-	itemId,
-	compare,
-	buyPrice,
-	onDrink,
-}) => {
+const ItemTooltipStack: React.FC<{
+	item?: ItemInstance;
+	itemId?: string;
+	compare?: boolean;
+	buyPrice?: number;
+	onDrink?: () => void;
+	hints?: 'bag' | 'merchant';
+}> = ({ item, itemId, compare, buyPrice, onDrink, hints }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	const comparison = compare && item ? compareDetailed(item, equipment) : null;
 	return (
 		<div className='flex items-start gap-2'>
 			<div className='px-tooltip'>
-				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} onDrink={onDrink} hints={compare} />
+				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} onDrink={onDrink} hints={hints} />
 			</div>
 			{comparison?.equipped && (
 				<div className='px-tooltip px-tooltip-worn'>
