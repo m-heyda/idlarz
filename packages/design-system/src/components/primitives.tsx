@@ -1,0 +1,204 @@
+import React from 'react';
+import { gemStates, type Rarity } from '../logic';
+
+const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
+
+/** Wrap anything in this once so the design-system styles and tokens apply. */
+export const DsRoot: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...rest }) => <div className={cx('ds-root', className)} {...rest} />;
+
+/** The big window frame: stone rim, gold line, corner studs, slate fill. */
+export const Frame: React.FC<{ variant?: 'a' | 'b'; className?: string; style?: React.CSSProperties; children?: React.ReactNode }> = ({
+	variant = 'a',
+	className,
+	style,
+	children,
+}) => (
+	<div className={cx('ds-frame', variant === 'b' && 'ds-frame-b', className)} style={style}>
+		<div className='ds-frame-body'>{children}</div>
+	</div>
+);
+
+/** An inner panel with a thinner gold frame. `parchment` swaps the slate fill for paper (ledgers, tickets). */
+export const Panel: React.FC<{ parchment?: boolean; className?: string; style?: React.CSSProperties; children?: React.ReactNode }> = ({
+	parchment,
+	className,
+	style,
+	children,
+}) => (
+	<div className={cx('ds-panel', parchment && 'ds-parch', className)} style={style}>
+		{children}
+	</div>
+);
+
+/** A dark recessed area (grids, lists) with a faint gold hairline. */
+export const Inset: React.FC<{ className?: string; style?: React.CSSProperties; children?: React.ReactNode }> = ({ className, style, children }) => (
+	<div className={cx('ds-inset', className)} style={style}>
+		{children}
+	</div>
+);
+
+/** Small gold section heading ("ECONOMY", "AMOUNT"). */
+export const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => <h4 className='ds-section-label'>{children}</h4>;
+
+/** Gold rule between groups; `flourish` adds the scrolled centre. */
+export const Divider: React.FC<{ flourish?: boolean }> = ({ flourish }) => <div className={cx('ds-divider', flourish && 'ds-divider-flourish')} />;
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+	tone?: 'stone' | 'gold' | 'wood' | 'dark';
+}
+/** Plate button. `gold` is the primary action, `stone` the default, `dark` for the disabled "need more" state. */
+export const Button: React.FC<ButtonProps> = ({ tone = 'stone', className, ...rest }) => (
+	<button type='button' className={cx('ds-btn', tone !== 'stone' && `ds-btn-${tone}`, className)} {...rest} />
+);
+
+/** The red X in a window corner. */
+export const CloseButton: React.FC<{ onClick?: () => void }> = ({ onClick }) => (
+	<button type='button' className='ds-close' aria-label='Close' onClick={onClick}>
+		✕
+	</button>
+);
+
+/** Little red counter ("1 new"). */
+export const Badge: React.FC<{ count: number; floating?: boolean }> = ({ count, floating }) => (
+	<span className={cx('ds-badge', floating && 'ds-badge-float')}>{count}</span>
+);
+
+export interface TabItem {
+	id: string;
+	label: string;
+	badge?: number;
+}
+/** A row of wooden tabs, the active one in gold. */
+export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: string) => void }> = ({ items, active, onChange }) => (
+	<div className='ds-tabs' role='tablist'>
+		{items.map((t) => (
+			<button
+				key={t.id}
+				type='button'
+				role='tab'
+				aria-selected={t.id === active}
+				data-active={t.id === active}
+				className='ds-tab'
+				onClick={() => onChange?.(t.id)}
+			>
+				{t.label}
+				{t.badge ? <Badge count={t.badge} /> : null}
+			</button>
+		))}
+	</div>
+);
+
+/** A resource in the top bar: icon, amount, optional income per second. */
+export const ResourceChip: React.FC<{ icon: string; value: string; rate?: string; title?: string }> = ({ icon, value, rate, title }) => (
+	<span className='ds-chip' title={title}>
+		<img src={icon} alt='' />
+		<span>{value}</span>
+		{rate ? <span className='ds-chip-rate'>{rate}</span> : null}
+	</span>
+);
+
+/** HP / MP / XP bar with an optional centred label. */
+export const ProgressBar: React.FC<{ value: number; max: number; tone?: 'hp' | 'mana' | 'xp' | 'gold'; label?: string; height?: number }> = ({
+	value,
+	max,
+	tone = 'hp',
+	label,
+	height,
+}) => (
+	<div className='ds-bar' style={height ? { height } : undefined}>
+		<div className='ds-bar-fill' data-tone={tone} style={{ width: `${Math.max(0, Math.min(1, value / (max || 1))) * 100}%` }} />
+		{label ? <span className='ds-bar-label'>{label}</span> : null}
+	</div>
+);
+
+/** A label with a big number under it (Damage 106.6). */
+export const Stat: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+	<div className='ds-stat'>
+		<span className='ds-stat-label'>{label}</span>
+		<span className='ds-stat-value'>{value}</span>
+	</div>
+);
+
+export interface SlotProps {
+	icon?: string;
+	rarity?: Rarity;
+	count?: number;
+	/** Show a faded placeholder icon for an empty equipment slot */
+	empty?: boolean;
+	locked?: boolean;
+	large?: boolean;
+	title?: string;
+	onClick?: () => void;
+}
+/** An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. */
+export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, large, title, onClick }) => {
+	const glow = rarity && rarity !== 'common';
+	return (
+		<button
+			type='button'
+			className={cx('ds-slot', large && 'ds-slot-lg')}
+			data-rarity={glow ? rarity : undefined}
+			style={glow ? ({ '--ds-rarity': `var(--ds-r-${rarity})` } as React.CSSProperties) : undefined}
+			data-empty={empty}
+			data-locked={locked}
+			title={title}
+			onClick={onClick}
+		>
+			{icon ? <img src={icon} alt='' /> : null}
+			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
+		</button>
+	);
+};
+
+/** A stone menu icon with a caption (the middle bar of the HUD). */
+export const IconButton: React.FC<{ icon: string; label: string; badge?: number; small?: boolean; onClick?: () => void }> = ({
+	icon,
+	label,
+	badge,
+	small,
+	onClick,
+}) => (
+	<button type='button' className={cx('ds-iconbtn', small && 'ds-iconbtn-sm')} onClick={onClick}>
+		<img src={icon} alt='' />
+		{badge ? <Badge count={badge} floating /> : null}
+		<span>{label}</span>
+	</button>
+);
+
+/** Diamond-shaped level gems: yellow for levels bought, dim for the rest, purple once the upgrade is maxed. */
+export const DiamondLevel: React.FC<{ level: number; max: number }> = ({ level, max }) => (
+	<span className='ds-gems' role='img' aria-label={`Level ${level} of ${max}`}>
+		{gemStates(level, max).map((s, i) => (
+			<i key={i} className='ds-gem' data-state={s} />
+		))}
+	</span>
+);
+
+/** The window: frame, hanging wooden title plaque, close button, a tab/head bar and a body. Only presentational: the caller owns open/close and tab state. */
+export const WindowShell: React.FC<{
+	title: string;
+	width?: number;
+	height?: number;
+	bar?: React.ReactNode;
+	barRight?: React.ReactNode;
+	onClose?: () => void;
+	children: React.ReactNode;
+}> = ({ title, width = 1100, height = 640, bar, barRight, onClose, children }) => (
+	<div className='ds-root' style={{ width, height, position: 'relative' }}>
+		<div className='ds-window-title'>{title}</div>
+		<CloseButton onClick={onClose} />
+		<Frame style={{ width: '100%', height: '100%' }}>
+			<div className='ds-window'>
+				{bar ? (
+					<div className='ds-window-head'>
+						<div className='ds-window-bar'>
+							{bar}
+							<span style={{ marginLeft: 'auto' }}>{barRight}</span>
+						</div>
+					</div>
+				) : null}
+				<div className='ds-window-body'>{children}</div>
+			</div>
+		</Frame>
+	</div>
+);

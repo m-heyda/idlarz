@@ -12,6 +12,8 @@ const compat = new FlatCompat({
 const eslintConfig = [
 	{ ignores: ['.next/**', 'node_modules/**', 'public/**', 'scripts/pixel/**', 'storybook-static/**', 'next-env.d.ts'] },
 	...compat.extends('next/core-web-vitals', 'next/typescript'),
+	// The design-system package is plain pixel-art <img>, shown in Storybook only (no next/image there)
+	{ files: ['packages/design-system/**'], rules: { '@next/next/no-img-element': 'off' } },
 ];
 
 export default eslintConfig;
