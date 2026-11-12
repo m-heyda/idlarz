@@ -1,4 +1,6 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { sellPayout } from '@/utils/game/merchant';
 import { useGameStore } from '@/stores/gameStore';
 import {
 	EQUIPMENT_SLOT_LABEL,
@@ -61,6 +63,8 @@ interface BodyProps {
 	buyPrice?: number;
 	/** Shows a Drink button under the effects (a potion in the bag) */
 	onDrink?: () => void;
+	/** Shows the key hints line (Dbl-click equip, Shift + click sell): the item is in the bag or on the merchant's bag grid */
+	hints?: boolean;
 }
 
 /**
@@ -69,8 +73,11 @@ interface BodyProps {
  * `comparison` every number carries its change against the worn piece, stats the worn piece has and this one lacks are
  * listed as lost, and the set block shows the state after the swap.
  */
-const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink }) => {
+const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLabel, buyPrice, onDrink, hints }) => {
 	const equipment = useGameStore((state) => state.equipment);
+	// what the merchant really pays: the Haggler and Idol bonuses are in the number, the base value is in its title
+	const sellCtx = useGameStore(useShallow((state) => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige })));
+	const fighting = useGameStore((state) => !!state.combat.fight);
 	const resolved = item ? resolveItem(item) : null;
 	const def = resolved?.def ?? (itemId ? ITEM_CATALOG[itemId] : undefined);
 	if (!def) return null;
@@ -78,7 +85,8 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 	const rarity = RARITIES[(resolved?.instance.rarity ?? def.rarity) as keyof typeof RARITIES];
 	const color = rarity?.color ?? RARITY_COLOR.common;
 	const title = resolved?.name ?? def.name;
-	const sellPrice = item ? sellValueOf(item) : def.sellValue;
+	const baseSell = item ? sellValueOf(item) : def.sellValue;
+	const sellPrice = sellPayout(baseSell, 1, sellCtx);
 
 	const slotLabel = def.slot ? slotName(def.slot) : 'Consumable';
 	// With a comparison the set block previews the swap, so the hovered piece already counts as worn
@@ -239,9 +247,14 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 			)}
 
 			{def.description && <div className='px-tip-flavor'>{def.description}</div>}
-			<div className='px-tip-sell'>
+			<div className='px-tip-sell' title={buyPrice === undefined && sellPrice !== baseSell ? `Base value ${formatNumber(baseSell)}` : undefined}>
 				{buyPrice !== undefined ? 'Costs' : 'Sells for'} {formatNumber(buyPrice ?? sellPrice)} <ResourceIcon resource='gold' />
 			</div>
+			{hints && buyPrice === undefined && !wornLabel && (
+				<div className='px-tip-muted text-xs'>
+					{[item ? 'Dbl-click equip' : hasEffects(def) ? 'Dbl-click drink' : '', fighting ? '' : 'Shift + click sell'].filter(Boolean).join(' · ')}
+				</div>
+			)}
 		</div>
 	);
 };
@@ -262,7 +275,7 @@ const ItemTooltipStack: React.FC<{ item?: ItemInstance; itemId?: string; compare
 	return (
 		<div className='flex items-start gap-2'>
 			<div className='px-tooltip'>
-				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} onDrink={onDrink} />
+				<ItemTooltipBody item={item} itemId={itemId} comparison={comparison} buyPrice={buyPrice} onDrink={onDrink} hints={compare} />
 			</div>
 			{comparison?.equipped && (
 				<div className='px-tooltip px-tooltip-worn'>
