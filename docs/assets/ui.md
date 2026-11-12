@@ -144,10 +144,10 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `menu_farm` | <img src="../../public/pixel/icons/menu_farm.png" width="96" alt="menu_farm"> | 64x64 | used | src/components/game/hud/HudDock.tsx | `pixel/icons/menu_farm.png` |
 | `menu_gems_pouch` | <img src="../../public/pixel/icons/menu_gems_pouch.png" width="96" alt="menu_gems_pouch"> | 64x64 | used | src/components/game/hud/HudDock.tsx, src/components/game/merchant/MerchantPlaceholders.tsx | `pixel/icons/menu_gems_pouch.png` |
 | `menu_glossary` | <img src="../../public/pixel/icons/menu_glossary.png" width="96" alt="menu_glossary"> | 64x64 | unused |  | `pixel/icons/menu_glossary.png` |
-| `menu_legacy` | <img src="../../public/pixel/icons/menu_legacy.png" width="96" alt="menu_legacy"> | 64x64 | used | src/components/game/hud/HudDock.tsx, src/components/game/overlays/RebirthDialog.tsx | `pixel/icons/menu_legacy.png` |
+| `menu_legacy` | <img src="../../public/pixel/icons/menu_legacy.png" width="96" alt="menu_legacy"> | 64x64 | used | src/components/game/hud/HudDock.tsx | `pixel/icons/menu_legacy.png` |
 | `menu_main` | <img src="../../public/pixel/icons/menu_main.png" width="80" alt="menu_main"> | 40x40 | unused |  | `pixel/icons/menu_main.png` |
 | `menu_merchant` | <img src="../../public/pixel/icons/menu_merchant.png" width="96" alt="menu_merchant"> | 64x64 | used | src/components/game/hud/HudDock.tsx | `pixel/icons/menu_merchant.png` |
-| `menu_settings` | <img src="../../public/pixel/icons/menu_settings.png" width="96" alt="menu_settings"> | 64x64 | used | src/components/game/overlays/SettingsDialog.tsx | `pixel/icons/menu_settings.png` |
+| `menu_settings` | <img src="../../public/pixel/icons/menu_settings.png" width="96" alt="menu_settings"> | 64x64 | unused |  | `pixel/icons/menu_settings.png` |
 | `menu_stats` | <img src="../../public/pixel/icons/menu_stats.png" width="80" alt="menu_stats"> | 40x40 | unused |  | `pixel/icons/menu_stats.png` |
 
 ## skull

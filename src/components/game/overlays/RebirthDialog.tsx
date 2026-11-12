@@ -14,9 +14,8 @@ import { askServerRebirth } from '@/lib/serverRebirth';
 import { rebirthRunSummary, rebirthUnlockIntro, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import { useBestiaryStore } from '@/stores/bestiaryStore';
 import GameModal from '../GameModal';
-import { Button, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
+import { Button, DiamondLevel, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
 import RebirthUnlockModal from './RebirthUnlockModal';
-import PixelIcon from '../PixelIcon';
 import EmberIcon from '../EmberIcon';
 
 const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercent(n * 100) : `${tidy((n * 100).toFixed(digits))}%`);
@@ -116,7 +115,7 @@ const RebirthDialog: React.FC = () => {
 	);
 
 	return (
-		<GameModal title='Rebirth' size='md' icon={<PixelIcon name='menu_legacy' alt='' />} onClose={handleClose}>
+		<GameModal title='Rebirth' size='md' onClose={handleClose}>
 			<div className='ds-listrow' style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', textAlign: 'center', marginBottom: 10 }}>
 				<div>
 					<div className='text-[#a89878]'>Rebirths</div>
@@ -190,19 +189,20 @@ const RebirthDialog: React.FC = () => {
 						const affordable = prestige.legacyPoints >= cost;
 						return (
 							<div key={id} className='ds-listrow ds-listrow-line'>
-								<div>
-									<div className='text-[#ecdcb4]'>
-										{def.label}{' '}
-										<span className='text-[#a89878]'>
-											({level}/{def.maxLevel})
+								<div style={{ minWidth: 0, flex: 1 }}>
+									<div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+										<span>{def.label}</span>
+										<span title={`Level ${level} of ${def.maxLevel}`}>
+											<DiamondLevel level={level} max={def.maxLevel} small />
 										</span>
 									</div>
-									<div className='text-xs text-[#a89878]'>{shopText[id](level)}</div>
+									<div className='ds-dim' style={{ fontSize: 12, marginTop: 2 }}>
+										{shopText[id](level)}
+									</div>
 								</div>
 								<Button
-									size='sm'
 									tone={maxed || !affordable ? 'dark' : 'gold'}
-									style={{ flexShrink: 0 }}
+									style={{ flexShrink: 0, minWidth: 92, minHeight: 36 }}
 									disabled={maxed || !affordable}
 									onClick={() => {
 										if (buyEmberUpgrade(id)) audioManager.playSound('purchase');

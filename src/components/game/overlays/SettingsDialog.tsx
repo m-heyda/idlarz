@@ -5,7 +5,6 @@ import audioManager from '@/utils/audioManager';
 import { Button } from '../../../../packages/design-system/src/components/primitives';
 import { Slider } from '../../../../packages/design-system/src/components/composites';
 import GameModal from '../GameModal';
-import PixelIcon from '../PixelIcon';
 
 const Row: React.FC<{ label: string; hint?: string; children: React.ReactNode }> = ({ label, hint, children }) => (
 	<div className='ds-listrow ds-listrow-line'>
@@ -37,14 +36,14 @@ const SettingsDialog: React.FC = () => {
 	if (!open) return null;
 
 	return (
-		<GameModal title='Settings' size='sm' icon={<PixelIcon name='menu_settings' alt='' scale={0.5} />} onClose={close}>
+		<GameModal title='Settings' width={560} onClose={close}>
 			<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 				<Row label='Sound effects'>
 					<Toggle on={soundEnabled} onChange={setSoundEnabled} />
 				</Row>
 
-				<Row label='Volume'>
-					<div style={{ width: 170 }} onMouseUp={() => audioManager.playSound('click')}>
+				<Row label={`Volume ${Math.round(volume * 100)}%`}>
+					<div style={{ width: 240 }} onMouseUp={() => audioManager.playSound('click')}>
 						<Slider
 							value={Math.round(volume * 100)}
 							max={100}

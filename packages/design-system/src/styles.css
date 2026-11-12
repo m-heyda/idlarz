@@ -4219,3 +4219,17 @@ button.ds-income-head:hover {
 .ds-tip-lucky {
 	filter: sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.15) drop-shadow(0 0 4px #ffd54a);
 }
+
+/* sliders never push their row wider than the window */
+.ds-slider {
+	min-width: 0;
+}
+
+.ds-range {
+	min-width: 0;
+	width: 100%;
+}
+
+.ds-modal .ds-frame {
+	overflow-x: hidden;
+}

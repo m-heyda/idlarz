@@ -251,3 +251,55 @@
 	min-height: 40px;
 	font-size: 0.85rem;
 }
+
+/* Build here, new layout: art, a short card, and the action on the right */
+.ds-listrow.bh-row {
+	display: grid;
+	grid-template-columns: 96px minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 16px;
+	padding: 14px;
+}
+.bh-row .build-art {
+	width: 96px;
+	height: 96px;
+}
+.bh-row .build-art img {
+	width: 88px;
+	height: 88px;
+}
+.bh-info {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 0.85rem;
+}
+.bh-info .build-blurb {
+	margin: 0;
+}
+.bh-key {
+	font-size: 0.95rem;
+}
+.bh-key-more {
+	font-size: 0.8rem;
+	color: #9aa4bd;
+}
+.bh-info .build-foot {
+	margin-top: 4px;
+	gap: 14px;
+}
+.bh-side {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 6px;
+}
+.bh-details {
+	display: block;
+	text-align: center;
+	font-size: 0.75rem;
+	color: #7a7f90;
+	cursor: help;
+	text-decoration: underline dotted;
+}

@@ -21368,8 +21368,7 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/hud/HudDock.tsx",
-			"src/components/game/overlays/RebirthDialog.tsx"
+			"src/components/game/hud/HudDock.tsx"
 		],
 		"name": "menu_legacy",
 		"category": "ui",
@@ -21411,14 +21410,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/components/game/overlays/SettingsDialog.tsx"
-		],
+		"usedBy": [],
 		"name": "menu_settings",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_settings.png",
-		"status": "used",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			64,
