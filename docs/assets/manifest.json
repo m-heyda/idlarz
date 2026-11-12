@@ -21842,14 +21842,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:upgrades"
-		],
+		"usedBy": [],
 		"name": "portrait_blacksmith",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_blacksmith.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,
@@ -21935,14 +21933,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:gambling"
-		],
+		"usedBy": [],
 		"name": "portrait_jester",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_jester.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,
@@ -21950,15 +21946,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:resources",
-			"merchant:goods"
-		],
+		"usedBy": [],
 		"name": "portrait_merchant",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_merchant.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,
@@ -21966,14 +21959,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:quests"
-		],
+		"usedBy": [],
 		"name": "portrait_quest_giver",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_quest_giver.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,

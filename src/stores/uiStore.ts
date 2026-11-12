@@ -44,9 +44,6 @@ const ACHIEVEMENT_NOTICE_MS = 7000;
 const noticeTimers = new Map<number, ReturnType<typeof setTimeout>>();
 let flashTimer: ReturnType<typeof setTimeout> | null = null;
 
-export type CharacterTab = 'combat' | 'income' | 'rebirths';
-const CHARACTER_TABS: readonly CharacterTab[] = ['combat', 'income', 'rebirths'];
-
 /** How much one Sell / Buy click moves in the Merchant window: a preset number of units, or all of it */
 type MerchantAmount = number | 'max';
 const MERCHANT_PRESETS: readonly MerchantAmount[] = [1_000, 1_000_000, 1_000_000_000, 'max'];
@@ -177,9 +174,6 @@ interface UiState {
 	farmAnimalsOpen: boolean;
 	farmHudOpen: boolean;
 	farmUpgradesOpen: boolean;
-	/** The Character window's lower tab: its combat figures, the income, or the rebirth history */
-	characterTab: CharacterTab;
-	setCharacterTab: (tab: CharacterTab) => void;
 	/** The Merchant window remembers its tab and the amount you set (also across visits): the typed value is not lost when you switch windows */
 	merchantTab: MerchantTab;
 	setMerchantTab: (tab: MerchantTab) => void;
@@ -300,11 +294,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 		schedule(-id, CHEST_NOTICE_MS, () => get().dismissChestNotice(id));
 	},
 	dismissChestNotice: (id) => set((state) => ({ chestNotices: state.chestNotices.filter((n) => n.id !== id) })),
-	characterTab: 'combat',
-	setCharacterTab: (tab) => {
-		writeStringPref('characterTab', tab);
-		set({ characterTab: tab });
-	},
 	merchantTab: 'resources',
 	setMerchantTab: (tab) => {
 		writeStringPref('merchantTab', tab);
@@ -337,7 +326,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 	// read after mount (the server render has no localStorage): keeps hydration identical
 	loadPrefs: () =>
 		set({
-			characterTab: CHARACTER_TABS.find((tab) => tab === readStringPref('characterTab')) ?? 'combat',
 			merchantTab: readMerchantTab(),
 			merchantPreset: readMerchantPreset(),
 			merchantCustom: (readStringPref('merchantCustom') ?? '').slice(0, MERCHANT_CUSTOM_MAX),

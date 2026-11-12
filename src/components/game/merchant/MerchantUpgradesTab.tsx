@@ -29,8 +29,7 @@ interface Entry {
 const power = (p: number) => formatPercent(p * 100);
 
 /**
- * The Upgrades tab: the permanent bonuses in their groups (Economy, Combat, Rebirth), each as a tile with diamond level gems, what it gives now and at the next level, and its price. Inside a group the ones you can afford come first and the
- * maxed ones last. Click Power (the gold-per-click ladder) is the first Economy tile. A purchase is announced by the shared toast, as before.
+ * The Upgrades tab: the permanent bonuses in their groups (Economy, Combat, Rebirth), each as a tile with diamond level gems, what it gives now and at the next level, and its price. The tiles never move: each stays in its place whatever you can afford, so a quick run of purchases cannot shuffle them. Click Power (the gold-per-click ladder) is the first Economy tile. A purchase is announced by the shared toast, as before.
  */
 const MerchantUpgradesTab: React.FC = () => {
 	const gold = useGameStore((state) => state.resources.gold);
@@ -75,20 +74,17 @@ const MerchantUpgradesTab: React.FC = () => {
 		});
 	}
 
-	// inside a group: not maxed before maxed, then what you can afford before what you cannot
-	const rank = (e: Entry) => Number(e.level >= e.maxLevel) * 2 + Number(e.cost > gold);
-
 	return (
 		<div className='ds-ups'>
 			{GROUPS.map((group) => {
-				const list = entries.filter((e) => e.group === group).sort((a, b) => rank(a) - rank(b));
+				const list = entries.filter((e) => e.group === group);
 				if (list.length === 0) return null;
 				return (
 					<div key={group}>
 						<div className='ds-ups-head'>
 							<SectionLabel>{MERCHANT_UPGRADE_GROUPS[group]}</SectionLabel>
 							<span className='ds-dim' style={{ fontSize: 12 }}>
-								Permanent. Sorted by what you can afford first.
+								Permanent. Always in the same place.
 							</span>
 						</div>
 						<div className='ds-ups-grid'>
