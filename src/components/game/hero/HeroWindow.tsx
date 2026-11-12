@@ -25,7 +25,6 @@ import { healAmount } from '@/lib/skills';
 import { useGameStore } from '@/stores/gameStore';
 import { selectStock, useCraftStore } from '@/stores/craftStore';
 import { useUiStore } from '@/stores/uiStore';
-import { useWindowStore } from '@/stores/windowStore';
 import type { BagSlot, EquipmentSlot, ItemInstance } from '@/types/game';
 import { formatCompact, formatNumber, formatPct } from '@/utils/formatters';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/game/merchant';
@@ -37,6 +36,7 @@ import { LevelUpTimer } from '../LevelUpTimer';
 import GameWindow from '../GameWindow';
 import { activateBagSlot, dropOnBagSlot, dropOnEquipment, openBagMenu, shiftSellBagSlot, takeOffSlot } from './bagActions';
 import { GameItemTip } from './GameItemTip';
+import HeroCrafting from './HeroCrafting';
 import HeroStats from './HeroStats';
 
 /** A bag slot as the design system draws it: the picture, the rarity glow and the stack count of the item in it. */
@@ -435,28 +435,14 @@ const BagTab: React.FC = () => {
 	);
 };
 
-/** The Stats and Crafting tabs are still the game's own windows (they move into this window next): a short note with a button that opens each. */
-const ComingTab: React.FC<{ text: string; action: string; onOpen: () => void }> = ({ text, action, onOpen }) => (
-	<Inset style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start', padding: 16 }}>
-		<p className='ds-dim' style={{ margin: 0, fontSize: 13 }}>
-			{text}
-		</p>
-		<Button tone='gold' onClick={onOpen}>
-			{action}
-		</Button>
-	</Inset>
-);
-
 type HeroTab = 'bag' | 'stats' | 'craft';
 
 /**
- * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting still open the game's own
- * Character and Crafting windows until they are rebuilt here. A click on the avatar in the dock opens it on the Bag tab.
+ * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting are the new tabs. A click on the avatar in the dock opens it on the Bag tab.
  */
 const HeroWindow: React.FC = () => {
 	const [tab, setTab] = useState<HeroTab>('bag');
 	const points = useGameStore((state) => state.characterStats.availablePoints);
-	const openWindow = useWindowStore((state) => state.openWindow);
 	return (
 		<GameWindow
 			id='equipment'
@@ -477,19 +463,7 @@ const HeroWindow: React.FC = () => {
 		>
 			<div className='ds-hero'>
 				<HeroLeft />
-				<Panel className='ds-hero-right'>
-					{tab === 'bag' ? (
-						<BagTab />
-					) : tab === 'stats' ? (
-						<HeroStats />
-					) : (
-						<ComingTab
-							text='Recipes and the crafting queue still live in the Crafting window while they are rebuilt here.'
-							action='Open the Crafting window'
-							onOpen={() => openWindow('crafting')}
-						/>
-					)}
-				</Panel>
+				<Panel className='ds-hero-right'>{tab === 'bag' ? <BagTab /> : tab === 'stats' ? <HeroStats /> : <HeroCrafting />}</Panel>
 			</div>
 		</GameWindow>
 	);

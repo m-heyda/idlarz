@@ -84,3 +84,14 @@ test('the Stats tab keeps every figure of the old Character window: attributes, 
 	assert.match(out, /Respec/, 'at 0 points the corner holds the red Respec button');
 	assert.match(out, /data-tutorial="stat-add"/, 'the guide can point at the first + button');
 });
+
+test('the Crafting tab shows the level bar, the queue, the recipe groups and the ticket with its Queue button', async () => {
+	const { default: HeroCrafting } = await import('../../src/components/game/hero/HeroCrafting');
+	reset();
+	const out = renderToStaticMarkup(h(HeroCrafting));
+	for (const word of ['Crafting level', 'Queue 0', 'Components', 'Potions', 'Cost', 'Amount', 'XP']) {
+		assert.ok(out.includes(word), `the tab shows "${word}"`);
+	}
+	assert.match(out, /ds-craft-ticket/);
+	assert.match(out, /Amount to craft/, 'the typed amount field is there');
+});

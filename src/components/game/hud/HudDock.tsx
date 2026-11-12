@@ -18,7 +18,6 @@ const icon = (name: PixelIconName) => pixelIconSrc(name);
 const WINDOWS: { id: WinId; label: string; icon: PixelIconName; tutorial: string }[] = [
 	{ id: 'merchant', label: 'Merchant', icon: 'menu_merchant', tutorial: 'tab-merchant' },
 	{ id: 'farm', label: 'Farm', icon: 'menu_farm', tutorial: 'tab-farm' },
-	{ id: 'crafting', label: 'Crafting', icon: 'menu_crafting', tutorial: 'tab-crafting' },
 ];
 
 /**

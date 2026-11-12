@@ -3796,3 +3796,44 @@ button.ds-income-head:hover {
 	font-style: normal;
 	font-size: 9px;
 }
+
+/* ===== Crafting tab of the Hero window ===== */
+.ds-paper-input {
+	width: 6.5em;
+	height: 26px;
+	padding: 0 6px;
+	font: inherit;
+	font-size: 13px;
+	text-align: right;
+	color: #2b1d0e;
+	background: rgba(255, 255, 255, 0.45);
+	border: 1px solid #a9894f;
+}
+
+.ds-paper-input:disabled {
+	opacity: 0.5;
+}
+
+.ds-odds-rows {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	padding: 6px 0 2px;
+	font-size: 13px;
+}
+
+.ds-odds-row {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ds-odds-row i {
+	width: 10px;
+	height: 10px;
+	border: 1px solid #2b1d0e;
+}
+
+.ds-craft-top .ds-xp {
+	flex: 1;
+}

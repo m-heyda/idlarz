@@ -11375,9 +11375,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/CraftStash.tsx",
 			"src/components/game/hero/HeroWindow.tsx",
-			"src/components/game/overlays/CraftingOverlay.tsx"
+			"src/components/game/hero/recipeUi.ts"
 		],
 		"name": "comp_glass_vial",
 		"category": "resources",
@@ -21256,6 +21255,7 @@
 	{
 		"usedBy": [
 			"src/components/game/hero/HeroWindow.tsx",
+			"src/components/game/hero/recipeUi.ts",
 			"src/components/game/hud/HudTopBar.tsx"
 		],
 		"name": "menu_bag_scroll",
@@ -21286,16 +21286,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/components/game/hud/HudDock.tsx",
-			"src/components/game/overlays/CraftingOverlay.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
-		],
+		"usedBy": [],
 		"name": "menu_crafting",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_crafting.png",
-		"status": "used",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			64,

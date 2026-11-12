@@ -498,7 +498,7 @@ const STASH_TITLES: Record<StashEntry['kind'], string> = { component: 'Component
 export const CraftStash: React.FC<{
 	entries: StashEntry[];
 	onTake?: (id: string, n: number) => void;
-	labels?: { empty?: string; stack?: string; forRecipes?: string; keptSafe?: string; groups?: Partial<Record<StashEntry['kind'], string>> };
+	labels?: { empty?: string; stack?: string; all?: string; forRecipes?: string; keptSafe?: string; groups?: Partial<Record<StashEntry['kind'], string>> };
 }> = ({ entries, onTake, labels }) => {
 	const shown = entries.filter((e) => e.qty > 0);
 	if (shown.length === 0)
@@ -524,6 +524,7 @@ export const CraftStash: React.FC<{
 									<>
 										<Button onClick={() => onTake?.(e.id, 1)}>1</Button>
 										<Button onClick={() => onTake?.(e.id, Math.min(e.qty, e.stack ?? 20))}>{labels?.stack ?? 'Stack'}</Button>
+										<Button onClick={() => onTake?.(e.id, e.qty)}>{labels?.all ?? 'All'}</Button>
 									</>
 								) : (
 									<span className='ds-dim ds-stash-note'>
