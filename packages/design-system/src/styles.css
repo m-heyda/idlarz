@@ -25,7 +25,6 @@
 	--ds-img: url('./assets/tex-slate.png');
 	font-family: var(--ds-font);
 	color: var(--ds-text);
-	image-rendering: pixelated;
 	-webkit-font-smoothing: antialiased;
 }
 .ds-root *,
@@ -33,8 +32,45 @@
 .ds-root *::after {
 	box-sizing: border-box;
 }
-.ds-root img {
+.ds-chip img,
+.ds-slot img,
+.ds-iconbtn img,
+.ds-upgrade-icon,
+.ds-tip-head img,
+.ds-cost img,
+.ds-hero-sil {
 	image-rendering: pixelated;
+}
+.ds-topbar,
+.ds-slate,
+.ds-wood,
+.ds-parch {
+	image-rendering: pixelated;
+}
+/* Textures sit on a ::before layer so they stay crisp (pixelated) while the 9-slice frame art on the same element scales smoothly */
+.ds-frame,
+.ds-panel,
+.ds-window-bar,
+.ds-dock {
+	position: relative;
+	isolation: isolate;
+}
+.ds-window-title {
+	isolation: isolate;
+}
+.ds-frame::before,
+.ds-panel::before,
+.ds-window-bar::before,
+.ds-window-title::before,
+.ds-dock::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: var(--tex);
+	background-size: var(--tex-size);
+	image-rendering: pixelated;
+	pointer-events: none;
 }
 .ds-caps {
 	text-transform: uppercase;
@@ -60,7 +96,7 @@
 }
 .ds-wood {
 	background: url('./assets/tex-wood-dark.png') var(--ds-wood-dk);
-	background-size: 82px 94px;
+	background-size: 96px 96px;
 }
 .ds-parch {
 	background: url('./assets/tex-parchment.png') var(--ds-parch);
@@ -73,9 +109,9 @@
 	position: relative;
 	border: 30px solid transparent;
 	border-image: url('./assets/frame-stone.png') 15 / 30px round;
-	background: url('./assets/tex-slate.png') var(--ds-slate);
-	background-size: 64px 64px;
-	background-clip: padding-box;
+	background: var(--ds-slate);
+	--tex: url('./assets/tex-slate.png');
+	--tex-size: 64px 64px;
 	filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55));
 }
 .ds-frame-b {
@@ -89,17 +125,17 @@
 	position: relative;
 	border: 16px solid transparent;
 	border-image: url('./assets/frame-panel.png') 11 / 16px round;
-	background: url('./assets/tex-slate.png') var(--ds-slate-2);
-	background-size: 64px 64px;
-	background-clip: padding-box;
+	background: var(--ds-slate-2);
+	--tex: url('./assets/tex-slate.png');
+	--tex-size: 64px 64px;
 }
 .ds-panel-b {
 	border-image-source: url('./assets/frame-panel-b.png');
 }
 .ds-panel.ds-parch {
-	background: url('./assets/tex-parchment.png') var(--ds-parch);
-	background-size: 184px 164px;
-	background-clip: padding-box;
+	background: var(--ds-parch);
+	--tex: url('./assets/tex-parchment.png');
+	--tex-size: 184px 164px;
 }
 .ds-inset {
 	background: rgba(6, 8, 14, 0.55);
@@ -131,9 +167,9 @@
 	padding: 0 30px;
 	border: 10px solid transparent;
 	border-image: url('./assets/plaque-wood-ornate.png') 8 12 8 12 / 10px 16px stretch;
-	background: url('./assets/tex-wood.png') #5a3a1d;
-	background-size: 82px 94px;
-	background-clip: padding-box;
+	background: #5a3a1d;
+	--tex: url('./assets/tex-wood.png');
+	--tex-size: 64px 32px;
 	font-size: 20px;
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
@@ -158,9 +194,9 @@
 	padding: 4px 8px;
 	border: 8px solid transparent;
 	border-image: url('./assets/plaque-wood.png') 6 10 6 10 / 8px 12px stretch;
-	background: url('./assets/tex-wood.png') #4a2f17;
-	background-size: 82px 94px;
-	background-clip: padding-box;
+	background: #4a2f17;
+	--tex: url('./assets/tex-wood.png');
+	--tex-size: 64px 32px;
 }
 .ds-window-body {
 	flex: 1;
@@ -357,27 +393,29 @@
 /* ---------- slots ---------- */
 .ds-slot {
 	position: relative;
-	width: 52px;
-	height: 52px;
+	width: 60px;
+	height: 60px;
 	padding: 0;
 	display: grid;
 	place-items: center;
-	border: 6px solid transparent;
-	border-image: url('./assets/frame-slot.png') 5 / 6px stretch;
-	background: #0f121b;
-	background-clip: padding-box;
+	border: 0;
+	background: #0d1019;
+	box-shadow:
+		inset 0 0 0 2px #05060a,
+		inset 0 0 0 3px rgba(224, 169, 58, 0.55);
 	cursor: pointer;
 	--ds-rarity: transparent;
 }
 .ds-slot img {
-	width: 32px;
-	height: 32px;
+	width: 36px;
+	height: 36px;
 }
 .ds-slot[data-rarity] {
 	box-shadow:
-		0 0 0 2px var(--ds-rarity),
-		0 0 12px 1px var(--ds-rarity);
-	background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--ds-rarity) 28%, #0f121b), #0f121b 75%);
+		inset 0 0 0 2px #05060a,
+		inset 0 0 0 3px var(--ds-rarity),
+		0 0 5px color-mix(in srgb, var(--ds-rarity) 45%, transparent);
+	background: color-mix(in srgb, var(--ds-rarity) 9%, #0d1019);
 }
 .ds-slot[data-empty='true'] img {
 	opacity: 0.3;
@@ -399,12 +437,12 @@
 		0 -1px 0 #000;
 }
 .ds-slot-lg {
-	width: 64px;
-	height: 64px;
+	width: 68px;
+	height: 68px;
 }
 .ds-slot-lg img {
-	width: 40px;
-	height: 40px;
+	width: 44px;
+	height: 44px;
 }
 .ds-iconbtn {
 	position: relative;
@@ -445,9 +483,21 @@
 
 /* ---------- ornaments ---------- */
 .ds-divider {
-	height: 13px;
+	position: relative;
+	height: 9px;
 	margin: 6px 0;
-	background: url('./assets/divider-gold.png') center / 100% 100% no-repeat;
+	background: linear-gradient(90deg, transparent, var(--ds-gold-dk) 12%, var(--ds-gold) 50%, var(--ds-gold-dk) 88%, transparent) center / 100% 1px no-repeat;
+}
+.ds-divider::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 7px;
+	height: 7px;
+	transform: translate(-50%, -50%) rotate(45deg);
+	background: var(--ds-gold);
+	box-shadow: 0 0 0 2px var(--ds-slate);
 }
 .ds-divider-flourish {
 	height: 26px;
@@ -503,13 +553,13 @@
 	box-shadow:
 		inset 0 0 0 2px #090b11,
 		inset 0 0 0 3px var(--ds-gold),
-		0 0 14px rgba(224, 169, 58, 0.25);
+		0 0 6px rgba(224, 169, 58, 0.25);
 }
 .ds-upgrade[data-state='maxed'] {
 	box-shadow:
 		inset 0 0 0 2px #090b11,
 		inset 0 0 0 3px var(--ds-r-epic),
-		0 0 14px rgba(176, 92, 245, 0.3);
+		0 0 6px rgba(176, 92, 245, 0.3);
 }
 .ds-upgrade-head {
 	display: flex;
@@ -570,52 +620,25 @@
 		0 8px 18px rgba(0, 0, 0, 0.6),
 		inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
-.ds-tip::before,
-.ds-tip::after {
-	content: '';
-	position: absolute;
-	width: 8px;
-	height: 8px;
-	background: var(--ds-rim);
-	box-shadow: 0 0 6px var(--ds-glow);
-}
-.ds-tip::before {
-	top: -4px;
-	left: -4px;
-}
-.ds-tip::after {
-	right: -4px;
-	bottom: -4px;
-}
 .ds-tip[data-rarity='common'] {
 	--ds-rim: var(--ds-r-common);
 	--ds-glow: transparent;
 }
 .ds-tip[data-rarity='uncommon'] {
 	--ds-rim: var(--ds-r-uncommon);
-	--ds-glow: rgba(85, 194, 100, 0.35);
+	--ds-glow: rgba(85, 194, 100, 0.25);
 }
 .ds-tip[data-rarity='rare'] {
 	--ds-rim: var(--ds-r-rare);
-	--ds-glow: rgba(95, 134, 255, 0.55);
+	--ds-glow: rgba(95, 134, 255, 0.4);
 }
 .ds-tip[data-rarity='epic'] {
 	--ds-rim: var(--ds-r-epic);
-	--ds-glow: rgba(176, 92, 245, 0.6);
+	--ds-glow: rgba(176, 92, 245, 0.42);
 }
 .ds-tip[data-rarity='legendary'] {
 	--ds-rim: var(--ds-r-legendary);
-	--ds-glow: rgba(244, 169, 60, 0.7);
-	animation: ds-pulse 2.4s ease-in-out infinite;
-}
-@keyframes ds-pulse {
-	50% {
-		box-shadow:
-			0 0 0 2px #05060a,
-			0 0 28px 5px var(--ds-glow),
-			0 8px 18px rgba(0, 0, 0, 0.6),
-			inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-	}
+	--ds-glow: rgba(244, 169, 60, 0.45);
 }
 .ds-tip-head {
 	display: flex;
@@ -628,7 +651,7 @@
 	width: 40px;
 	height: 40px;
 	background: #0b0d14;
-	border: 2px solid var(--ds-rim);
+	border: 1px solid var(--ds-rim);
 	padding: 2px;
 }
 .ds-tip-title {
@@ -674,9 +697,8 @@
 }
 .ds-tip-compare {
 	margin-top: 6px;
-	padding: 6px 8px;
+	padding: 2px 8px 6px;
 	background: rgba(255, 255, 255, 0.04);
-	border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .ds-tip-foot {
 	display: flex;
@@ -709,7 +731,7 @@
 	height: 56px;
 	padding: 0 14px;
 	background: url('./assets/tex-wood.png') #4a2f17;
-	background-size: 82px 94px;
+	background-size: 64px 32px;
 	border-bottom: 4px solid #1d1007;
 	box-shadow:
 		inset 0 -2px 0 var(--ds-gold-dk),
@@ -721,16 +743,487 @@
 	padding: 8px 12px 6px;
 	border: 14px solid transparent;
 	border-image: url('./assets/frame-panel.png') 11 / 14px round;
-	background: url('./assets/tex-wood.png') #4a2f17;
-	background-size: 82px 94px;
-	background-clip: padding-box;
+	background: #4a2f17;
+	--tex: url('./assets/tex-wood.png');
+	--tex-size: 64px 32px;
 }
 
 .ds-slots-sm .ds-slot {
-	width: 44px;
-	height: 44px;
+	width: 52px;
+	height: 52px;
 }
 .ds-slots-sm .ds-slot img {
-	width: 26px;
-	height: 26px;
+	width: 32px;
+	height: 32px;
+}
+
+/* ===== New Chapter look: warm-black flat panels, hairline borders, the game's simple stone+gold frame, flanked titles, flat segmented tabs ===== */
+.ds-root {
+	--ds-line: #3a2c1c;
+	--ds-line-dk: #2a2118;
+	--ds-accent: #e0a040;
+	--ds-fill: rgba(0, 0, 0, 0.45);
+}
+.ds-frame {
+	border: 24px solid transparent;
+	border-image: url('./assets/frame-modal.png') 12 / 24px round;
+	background: radial-gradient(ellipse at 50% 0%, #17110c, #0a0807 70%);
+	--tex: none;
+}
+.ds-frame > .ds-frame-body {
+	margin: -8px;
+}
+.ds-panel {
+	border: 1px solid var(--ds-line);
+	border-image: none;
+	padding: 12px;
+	background: var(--ds-fill);
+	--tex: none;
+}
+.ds-panel.ds-parch {
+	background: var(--ds-parch);
+	border-color: #7a5a2a;
+	--tex: url('./assets/tex-parchment.png');
+	--tex-size: 184px 164px;
+}
+.ds-inset {
+	background: rgba(0, 0, 0, 0.4);
+	box-shadow: none;
+	border: 1px solid var(--ds-line-dk);
+}
+.ds-window-head {
+	margin-top: 44px;
+}
+.ds-window-title {
+	top: 24px;
+	left: 0;
+	right: 0;
+	transform: none;
+	min-width: 0;
+	height: auto;
+	padding: 0 56px;
+	gap: 16px;
+	border: 0;
+	border-image: none;
+	background: none;
+	--tex: none;
+	font-size: 22px;
+	letter-spacing: 0.16em;
+	text-shadow: 0 2px 0 #000;
+}
+.ds-window-title::before,
+.ds-window-title::after {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, var(--ds-gold-dk) 40%, var(--ds-gold));
+}
+.ds-window-title::before {
+	position: static;
+	inset: auto;
+	z-index: auto;
+}
+.ds-window-title::after {
+	transform: scaleX(-1);
+}
+.ds-close {
+	top: 26px;
+	right: 26px;
+	width: 30px;
+	height: 30px;
+	font-size: 15px;
+}
+.ds-window-bar {
+	border: 1px solid var(--ds-line);
+	border-image: none;
+	padding: 4px;
+	background: var(--ds-fill);
+	--tex: none;
+}
+.ds-tabs {
+	gap: 6px;
+	padding: 4px;
+	background: var(--ds-fill);
+	border: 1px solid var(--ds-line);
+}
+.ds-window-bar .ds-tabs {
+	padding: 0;
+	background: none;
+	border: 0;
+}
+.ds-tab {
+	--accent: var(--ds-accent);
+	height: 38px;
+	padding: 0 18px;
+	border: 0;
+	border-image: none;
+	background: transparent;
+	color: #f1e6c8;
+	text-shadow: none;
+	transition: background-color 0.15s;
+}
+.ds-tab::after {
+	content: '';
+	position: absolute;
+	left: 14%;
+	right: 14%;
+	bottom: 3px;
+	height: 3px;
+	background: var(--accent);
+	transform: scaleX(0);
+	transition: transform 0.18s steps(4);
+}
+.ds-tab:hover {
+	filter: none;
+	background: rgba(255, 255, 255, 0.05);
+}
+.ds-tab[data-active='true'] {
+	border-image: none;
+	background: color-mix(in srgb, var(--accent) 16%, rgba(14, 9, 5, 0.9));
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 70%, transparent);
+	color: var(--accent);
+	text-shadow: none;
+}
+.ds-tab[data-active='true']::after {
+	transform: scaleX(1);
+}
+.ds-btn {
+	min-height: 34px;
+	padding: 0 16px;
+	border: 1px solid #4a5062;
+	border-image: none;
+	background: linear-gradient(#323746, #232733);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.ds-btn-gold {
+	border-color: #5a3b0c;
+	background: linear-gradient(#efc25a, #c58d28);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.ds-btn-wood {
+	border-color: #1d1007;
+	background: linear-gradient(#7a4f29, #573619);
+}
+.ds-btn-dark {
+	border-color: var(--ds-line-dk);
+	background: #12141b;
+	box-shadow: none;
+}
+.ds-section-label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.ds-section-label::after {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background: linear-gradient(90deg, var(--ds-gold-dk), transparent);
+}
+
+/* ===== Frames rendered smaller: less chunky, the art is downscaled smoothly instead of blown up ===== */
+.ds-frame {
+	border-width: 18px;
+	border-image: url('./assets/frame-modal.png') 12 / 18px round;
+}
+.ds-frame.ds-frame-b {
+	border-width: 16px;
+	border-image: url('./assets/frame-stone-b.png') 15 / 16px round;
+}
+.ds-frame > .ds-frame-body {
+	margin: -4px;
+}
+.ds-frame.ds-frame-b > .ds-frame-body {
+	margin: -2px;
+}
+.ds-window-head {
+	margin-top: 38px;
+}
+.ds-window-title {
+	top: 18px;
+}
+.ds-close {
+	top: 20px;
+	right: 20px;
+}
+.ds-dock {
+	border-width: 10px;
+	border-image: url('./assets/frame-panel.png') 11 / 10px round;
+}
+.ds-panel.ds-panel-b {
+	border: 10px solid transparent;
+	border-image: url('./assets/frame-panel-b.png') 11 / 10px round;
+}
+
+/* ===== HUD: compact grouped chips, wood buttons, orange glowing badges ===== */
+.ds-topbar {
+	height: 46px;
+	gap: 8px;
+}
+.ds-chipgroup {
+	display: inline-flex;
+	gap: 2px;
+	padding: 2px;
+	background: rgba(8, 4, 2, 0.55);
+	border: 1px solid #1d1007;
+	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.22);
+}
+.ds-chipgroup .ds-chip {
+	height: 28px;
+	padding: 0 8px 0 5px;
+	gap: 5px;
+	font-size: 13px;
+	background: none;
+	border: 0;
+	box-shadow: none;
+}
+.ds-chipgroup .ds-chip + .ds-chip {
+	border-left: 1px solid rgba(224, 169, 58, 0.18);
+}
+.ds-chipgroup .ds-chip img {
+	width: 20px;
+	height: 20px;
+}
+.ds-glyphbtn {
+	position: relative;
+	isolation: isolate;
+	width: 34px;
+	height: 34px;
+	display: grid;
+	place-items: center;
+	padding: 0;
+	font: inherit;
+	font-size: 19px;
+	line-height: 1;
+	color: #2a1608;
+	background: #4a2f17;
+	border: 1px solid #1d1007;
+	box-shadow:
+		inset 0 1px 0 rgba(255, 210, 150, 0.25),
+		inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+	cursor: pointer;
+	text-shadow:
+		0 1px 0 rgba(255, 200, 130, 0.4),
+		0 -1px 0 rgba(0, 0, 0, 0.55);
+}
+.ds-glyphbtn::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: url('./assets/tex-wood.png') 0 0 / 64px 32px;
+	image-rendering: pixelated;
+	filter: brightness(0.8);
+}
+.ds-glyphbtn:hover {
+	filter: brightness(1.2);
+}
+.ds-badge {
+	min-width: 20px;
+	height: 20px;
+	padding: 0 5px;
+	font-size: 12px;
+	line-height: 1;
+	color: #2a0f00;
+	background: radial-gradient(circle at 35% 30%, #ffd27a, #ff9a2e 55%, #e0650f);
+	box-shadow:
+		0 0 0 2px #3a1b06,
+		0 0 8px 2px rgba(255, 150, 40, 0.75);
+	text-shadow: 0 1px 0 rgba(255, 235, 190, 0.55);
+}
+.ds-badge-float {
+	top: 0;
+	right: calc(50% - 40px);
+}
+.ds-dock {
+	padding: 0 8px;
+	border-width: 10px;
+	gap: 4px;
+}
+.ds-dock .ds-iconbtn {
+	width: 84px;
+	padding: 2px 4px 0;
+}
+.ds-dock .ds-iconbtn img {
+	width: 66px;
+	height: 66px;
+}
+
+/* ===== HUD round 2: black cut-out resource trays, small brown glyph buttons, stone dock ===== */
+.ds-chipgroup {
+	background: #07060a;
+	border: 2px solid #1d1007;
+	box-shadow:
+		inset 0 0 0 1px rgba(224, 169, 58, 0.18),
+		inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+.ds-glyphbtn {
+	width: 28px;
+	height: 28px;
+	font-size: 14px;
+	color: #b57a3e;
+	text-shadow:
+		0 -1px 0 rgba(0, 0, 0, 0.7),
+		0 1px 0 rgba(255, 210, 150, 0.18);
+}
+.ds-dock {
+	background: #4a443c;
+	--tex: url('./assets/tex-stone.png');
+	--tex-size: 48px 48px;
+}
+
+/* ===== HUD round 3: smaller trays with air around them, gold glyph buttons, tighter stone dock ===== */
+.ds-topbar {
+	height: 48px;
+}
+.ds-chipgroup {
+	padding: 1px;
+	border-width: 1px;
+}
+.ds-chipgroup .ds-chip {
+	height: 22px;
+	padding: 0 6px 0 4px;
+	gap: 4px;
+	font-size: 12px;
+}
+.ds-chipgroup .ds-chip img {
+	width: 16px;
+	height: 16px;
+}
+.ds-glyphbtn {
+	width: 28px;
+	height: 28px;
+	font-size: 14px;
+	color: #4a2a05;
+	background: linear-gradient(#efc25a, #c58d28);
+	border: 1px solid #5a3b0c;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+	text-shadow: 0 1px 0 rgba(255, 235, 170, 0.6);
+}
+.ds-glyphbtn::before {
+	display: none;
+}
+.ds-glyphbtn:hover {
+	filter: brightness(1.12);
+}
+.ds-dock {
+	gap: 2px;
+	--tex-size: 64px 64px;
+}
+.ds-dock .ds-iconbtn {
+	width: 72px;
+}
+.ds-dock .ds-iconbtn img {
+	width: 60px;
+	height: 60px;
+}
+.ds-dock .ds-badge-float {
+	right: calc(50% - 37px);
+}
+
+/* Dock frame rendered smaller so the gold edge stays sharp */
+.ds-dock {
+	border-width: 6px;
+	border-image: url('./assets/frame-panel.png') 11 / 6px round;
+}
+
+/* ===== reusable pieces: glyph button tones, top bar right slot, hover tips, minimap overlay ===== */
+.ds-glyphbtn[data-tone='wood'] {
+	color: #b57a3e;
+	background: #4a2f17;
+	border-color: #1d1007;
+	box-shadow:
+		inset 0 0 0 0 transparent,
+		inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+	text-shadow:
+		0 -1px 0 rgba(0, 0, 0, 0.7),
+		0 1px 0 rgba(255, 210, 150, 0.18);
+}
+.ds-glyphbtn[data-tone='stone'] {
+	color: #e9e4d6;
+	background: linear-gradient(#4a4e5c, #2f3340);
+	border-color: #171a22;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+.ds-topbar-right {
+	margin-left: auto;
+	display: flex;
+	gap: 6px;
+}
+.ds-hovertip {
+	position: relative;
+	display: inline-flex;
+}
+.ds-hovertip-pop {
+	position: absolute;
+	z-index: 60;
+	left: 0;
+	display: none;
+	pointer-events: none;
+}
+.ds-hovertip[data-align='center'] .ds-hovertip-pop {
+	left: 50%;
+	transform: translateX(-50%);
+}
+.ds-hovertip[data-placement='below'] .ds-hovertip-pop {
+	top: calc(100% + 8px);
+}
+.ds-hovertip[data-placement='above'] .ds-hovertip-pop {
+	bottom: calc(100% + 8px);
+}
+.ds-hovertip:hover .ds-hovertip-pop,
+.ds-hovertip:focus-within .ds-hovertip-pop {
+	display: block;
+}
+.ds-minimap {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid #0b0d14;
+	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.3);
+}
+.ds-minimap-stats {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	justify-content: space-between;
+	padding: 12px 8px 4px;
+	font-size: 11px;
+	background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+}
+
+/* Compact tooltip (header resources): narrower, smaller type, tighter rows */
+.ds-tip-compact {
+	width: 210px;
+	padding: 7px 9px;
+	font-size: 12px;
+}
+.ds-tip-compact .ds-tip-head {
+	gap: 8px;
+	padding-bottom: 6px;
+}
+.ds-tip-compact .ds-tip-title {
+	font-size: 14px;
+}
+.ds-tip-compact .ds-tip-sub {
+	font-size: 10px;
+	margin-top: 2px;
+}
+.ds-tip-compact .ds-tip-rows {
+	padding: 5px 0 1px;
+	gap: 2px;
+}
+.ds-tip-compact .ds-tip-row {
+	font-size: 11.5px;
+}
+.ds-tip-compact .ds-tip-section {
+	margin: 5px 0 2px;
+	font-size: 10px;
+}
+.ds-tip-compact .ds-tip-foot {
+	margin-top: 5px;
+	padding-top: 4px;
+	font-size: 10px;
 }

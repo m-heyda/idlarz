@@ -1,6 +1,14 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
+	ChipGroup,
+	Dock,
+	GlyphButton,
+	HoverTip,
+	MiniMap,
+	NotifyBadge,
+	ResourceTooltip,
+	TopBar,
 	Badge,
 	Button,
 	DiamondLevel,
@@ -209,5 +217,82 @@ export const Window: Story = {
 				<Panel style={{ height: '100%' }}>Body</Panel>
 			</WindowShell>
 		</div>
+	),
+};
+
+/** The orange glowing notification counter, on its own and pinned to an icon button. */
+export const NotificationBadge: Story = {
+	render: () => (
+		<div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+			<NotifyBadge count={1} />
+			<NotifyBadge count={8} />
+			<NotifyBadge count={24} />
+			<div style={{ position: 'relative' }}>
+				<IconButton icon={I('menu_merchant')} label='Merchant' badge={8} />
+			</div>
+		</div>
+	),
+};
+
+/** Glyph buttons in every tone. */
+export const GlyphButtons: Story = {
+	render: () => (
+		<div style={{ display: 'flex', gap: 12 }}>
+			<GlyphButton glyph='★' label='Deeds' />
+			<GlyphButton glyph='⚙' label='Settings' tone='wood' />
+			<GlyphButton glyph='✕' label='Close' tone='stone' />
+		</div>
+	),
+};
+
+/** The wooden top bar with cut-out resource groups, hover a chip for its tooltip. */
+export const TopBarWithGroups: Story = {
+	render: () => (
+		<TopBar
+			right={
+				<>
+					<GlyphButton glyph='★' label='Deeds' />
+					<GlyphButton glyph='⚙' label='Settings' />
+				</>
+			}
+		>
+			<ChipGroup>
+				<HoverTip tip={<ResourceTooltip icon={I('gold')} name='Gold' rows={[{ label: 'Stock', value: '102,000' }]} />}>
+					<ResourceChip icon={I('gold')} value='102K' />
+				</HoverTip>
+				<ResourceChip icon={I('diamond')} value='2.80K' />
+			</ChipGroup>
+			<ChipGroup>
+				<ResourceChip icon='/pixel/resources/wood.png' value='487K' />
+				<ResourceChip icon='/pixel/resources/stone.png' value='560K' />
+			</ChipGroup>
+		</TopBar>
+	),
+};
+
+/** The stone dock with its gold frame. */
+export const MenuDock: Story = {
+	render: () => (
+		<Dock>
+			<IconButton icon={I('menu_equipment')} label='Hero' badge={1} />
+			<IconButton icon={I('menu_merchant')} label='Merchant' badge={8} />
+			<IconButton icon={I('menu_farm')} label='Realm' />
+		</Dock>
+	),
+};
+
+/** Minimap with the counters laid over the map. */
+export const MiniMapStory: Story = {
+	name: 'MiniMap',
+	render: () => (
+		<MiniMap
+			stats={[
+				{ tone: 'bad', text: '▮ 10' },
+				{ tone: 'gold', text: '▮ 1' },
+				{ tone: 'dim', text: '350 tiles' },
+			]}
+		>
+			<div style={{ height: '100%', background: 'linear-gradient(#e8f1f8 0 40%, #4f9a4c 40%)' }} />
+		</MiniMap>
 	),
 };

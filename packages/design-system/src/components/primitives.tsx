@@ -58,8 +58,8 @@ export const CloseButton: React.FC<{ onClick?: () => void }> = ({ onClick }) => 
 	</button>
 );
 
-/** Little red counter ("1 new"). */
-export const Badge: React.FC<{ count: number; floating?: boolean }> = ({ count, floating }) => (
+/** The orange glowing counter for something new here (unseen items, claimable deeds); `floating` pins it to the top-right of an icon button. Was: little red counter ("1 new"). */
+export const NotifyBadge: React.FC<{ count: number; floating?: boolean }> = ({ count, floating }) => (
 	<span className={cx('ds-badge', floating && 'ds-badge-float')}>{count}</span>
 );
 
@@ -202,3 +202,62 @@ export const WindowShell: React.FC<{
 		</Frame>
 	</div>
 );
+
+/** A group of resource chips sharing one dark tray, so tiers (money, base materials, farm goods) read as sets. */
+export const ChipGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => <span className='ds-chipgroup'>{children}</span>;
+
+export type GlyphTone = 'gold' | 'wood' | 'stone';
+/** A small square button with one engraved character (Deeds, Settings). Tones: `gold` (the default plate), `wood`, `stone`. */
+export const GlyphButton: React.FC<{ glyph: string; label: string; tone?: GlyphTone; onClick?: () => void }> = ({ glyph, label, tone = 'gold', onClick }) => (
+	<button type='button' className='ds-glyphbtn' data-tone={tone} aria-label={label} title={label} onClick={onClick}>
+		<span>{glyph}</span>
+	</button>
+);
+
+/** The wooden bar across the top of the game screen; `right` is pushed to the far edge (buttons). Children are usually ChipGroups. */
+export const TopBar: React.FC<{ right?: React.ReactNode; children: React.ReactNode }> = ({ right, children }) => (
+	<div className='ds-topbar'>
+		{children}
+		{right ? <span className='ds-topbar-right'>{right}</span> : null}
+	</div>
+);
+
+/** The stone bar of menu icons along the bottom of the game screen, framed in gold. Children are IconButtons. */
+export const Dock: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className='ds-dock'>{children}</div>;
+
+/** Shows `tip` under (or above) the wrapped element while it is hovered or focused. Purely presentational; the tip is any node, usually a Tooltip. */
+export const HoverTip: React.FC<{ tip: React.ReactNode; placement?: 'below' | 'above'; align?: 'start' | 'center'; children: React.ReactNode }> = ({
+	tip,
+	placement = 'below',
+	align = 'start',
+	children,
+}) => (
+	<span className='ds-hovertip' data-placement={placement} data-align={align}>
+		{children}
+		<span className='ds-hovertip-pop' role='presentation'>
+			{tip}
+		</span>
+	</span>
+);
+
+/** A map preview with its event counters and tile count laid over the bottom of the map itself (saves the strip underneath). */
+export const MiniMap: React.FC<{ stats: { tone: 'bad' | 'gold' | 'dim'; text: string }[]; width?: number; height?: number; children?: React.ReactNode }> = ({
+	stats,
+	width = 190,
+	height = 120,
+	children,
+}) => (
+	<div className='ds-minimap' style={{ width, height }}>
+		{children}
+		<div className='ds-minimap-stats'>
+			{stats.map((st, i) => (
+				<span key={i} className={st.tone === 'bad' ? 'ds-bad' : st.tone === 'gold' ? 'ds-gold-text' : 'ds-dim'}>
+					{st.text}
+				</span>
+			))}
+		</div>
+	</div>
+);
+
+/** Alias of NotifyBadge. */
+export const Badge = NotifyBadge;

@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Button,
+	ChipGroup,
+	GlyphButton,
+	TopBar,
+	Dock,
+	ResourceStat,
+	MiniMap,
+	compact,
 	DsRoot,
 	IconButton,
 	Inset,
@@ -27,57 +34,200 @@ import {
 const I = (name: string) => `/pixel/icons/${name}.png`;
 const R = (name: string) => `/pixel/resources/${name}.png`;
 
-/** Mock top-bar resources: only resources live up there, plus achievements and settings on the right. */
-const RESOURCES = [
-	{ icon: I('gold'), value: '102K' },
-	{ icon: I('diamond'), value: '2.80K' },
-	{ icon: R('wood'), value: '487K', rate: '+299/s' },
-	{ icon: R('stone'), value: '560K', rate: '+148/s' },
-	{ icon: R('coal'), value: '68.5K', rate: '+831/s' },
-	{ icon: R('food'), value: '5.82M', rate: '+937/s' },
-	{ icon: R('meat'), value: '4.41M', rate: '+899/s' },
-	{ icon: R('eggs'), value: '124K' },
-	{ icon: R('milk'), value: '229K' },
-	{ icon: R('hide'), value: '1.11M' },
+interface MockRes {
+	id: string;
+	name: string;
+	icon: string;
+	amount: number;
+	/** income per second; 0 for things that do not accrue */
+	rate: number;
+	sources: { label: string; value: string }[];
+	sell?: string;
+}
+const GROUPS: MockRes[][] = [
+	[
+		{
+			id: 'gold',
+			name: 'Gold',
+			icon: I('gold'),
+			amount: 102000,
+			rate: 295.5,
+			sources: [
+				{ label: 'Tiles', value: '+240.0' },
+				{ label: 'Haggler +9%', value: '+55.5' },
+			],
+		},
+		{ id: 'gems', name: 'Gems', icon: I('diamond'), amount: 2800, rate: 0, sources: [{ label: 'Chests, deeds', value: 'rare' }] },
+	],
+	[
+		{
+			id: 'wood',
+			name: 'Wood',
+			icon: R('wood'),
+			amount: 487210,
+			rate: 299.8,
+			sell: '0.82',
+			sources: [
+				{ label: '12 Lumber camps', value: '+240.0' },
+				{ label: 'Foreman +3%', value: '+8.6' },
+				{ label: 'Set bonus +6%', value: '+17.2' },
+			],
+		},
+		{
+			id: 'stone',
+			name: 'Stone',
+			icon: R('stone'),
+			amount: 560400,
+			rate: 148,
+			sell: '0.98',
+			sources: [
+				{ label: '6 Quarries', value: '+130.0' },
+				{ label: 'Foreman +3%', value: '+4.0' },
+			],
+		},
+		{
+			id: 'coal',
+			name: 'Coal',
+			icon: R('coal'),
+			amount: 68500,
+			rate: 831,
+			sell: '1.20',
+			sources: [
+				{ label: '9 Coal pits', value: '+790.0' },
+				{ label: 'Foreman +3%', value: '+23.7' },
+			],
+		},
+		{
+			id: 'food',
+			name: 'Food',
+			icon: R('food'),
+			amount: 5820000,
+			rate: 937.8,
+			sell: '0.44',
+			sources: [
+				{ label: '14 Farms', value: '+900.0' },
+				{ label: 'Foreman +3%', value: '+27.0' },
+			],
+		},
+		{
+			id: 'meat',
+			name: 'Meat',
+			icon: R('meat'),
+			amount: 4410000,
+			rate: 899.9,
+			sell: '1.09',
+			sources: [
+				{ label: '10 Ranches', value: '+860.0' },
+				{ label: 'Skinner +10%', value: '+30.0' },
+			],
+		},
+	],
+	[
+		{ id: 'eggs', name: 'Eggs', icon: R('eggs'), amount: 124000, rate: 0, sources: [{ label: 'Chickens', value: 'farm' }] },
+		{ id: 'milk', name: 'Milk', icon: R('milk'), amount: 229000, rate: 0, sources: [{ label: 'Cows', value: 'farm' }] },
+		{ id: 'hide', name: 'Hide', icon: R('hide'), amount: 1110000, rate: 0, sources: [{ label: 'Hunting', value: 'monsters' }] },
+	],
 ];
 
+/** Counts up the mock stock once a second, so the tooltips can show income that really moves. */
+const useLiveAmounts = (): Record<string, number> => {
+	const [t, setT] = useState(0);
+	useEffect(() => {
+		const id = setInterval(() => setT((v) => v + 1), 1000);
+		return () => clearInterval(id);
+	}, []);
+	return Object.fromEntries(GROUPS.flat().map((r) => [r.id, r.amount + r.rate * t]));
+};
+
+const fmtInt = (n: number) => Math.floor(n).toLocaleString('en-US');
+
 /**
- * The game screen: a clean top bar with resources only and Deeds + Settings on the right, the map filling the middle, a stone icon dock for the windows along the bottom, a minimap
- * at the right. The character sheet that used to sit on the left is a window now.
+ * The game screen: a clean top bar with resources only (hover one for stock, live income and sources) and Deeds + Settings on the right, the map filling the middle, a stone icon dock
+ * for the windows along the bottom, a minimap with its counters laid over the map. The character sheet that used to sit on the left is a window now.
  */
-export const GameHudView: React.FC<{ width?: number; height?: number }> = ({ width = 1280, height = 720 }) => (
-	<DsRoot style={{ width, height, position: 'relative', overflow: 'hidden', background: 'radial-gradient(circle at 50% 45%, #2f6b3a, #1b4a2a 55%, #0d2a18)' }}>
-		<div className='ds-topbar'>
-			{RESOURCES.map((r, i) => (
-				<ResourceChip key={i} icon={r.icon} value={r.value} rate={r.rate} />
-			))}
-			<span style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-				<IconButton small icon={I('menu_achievements')} label='Deeds' />
-				<IconButton small icon={I('menu_settings')} label='Settings' />
-			</span>
-		</div>
-		<div style={{ position: 'absolute', left: '50%', bottom: 10, transform: 'translateX(-50%)' }}>
-			<div className='ds-dock'>
-				<IconButton icon={I('menu_character')} label='Hero' badge={1} />
-				<IconButton icon={I('menu_merchant')} label='Merchant' badge={8} />
-				<IconButton icon={I('menu_farm')} label='Realm' />
-				<IconButton icon={I('menu_equipment')} label='Fight' />
-				<IconButton icon={I('menu_glossary')} label='Bestiary' />
-				<IconButton icon={I('menu_achievements')} label='Deeds' badge={8} />
-				<IconButton icon={I('menu_legacy')} label='Rebirth' />
+export const GameHudView: React.FC<{ width?: number; height?: number }> = ({ width = 1280, height = 720 }) => {
+	const live = useLiveAmounts();
+	return (
+		<DsRoot
+			style={{ width, height, position: 'relative', overflow: 'hidden', background: 'radial-gradient(circle at 50% 45%, #2f6b3a, #1b4a2a 55%, #0d2a18)' }}
+		>
+			<TopBar
+				right={
+					<>
+						<GlyphButton glyph='★' label='Deeds' />
+						<GlyphButton glyph='⚙' label='Settings' />
+					</>
+				}
+			>
+				{GROUPS.map((g, gi) => (
+					<ChipGroup key={gi}>
+						{g.map((r) => (
+							<ResourceStat
+								key={r.id}
+								icon={r.icon}
+								name={r.name}
+								value={compact(live[r.id])}
+								rows={[
+									{ label: 'Stock', value: fmtInt(live[r.id]) },
+									{ label: 'Income', value: r.rate ? <span className='ds-good'>+{r.rate.toFixed(1)}/s</span> : 'none' },
+									...(r.rate ? [{ label: 'Per hour', value: compact(r.rate * 3600) }] : []),
+								]}
+								sources={r.rate ? r.sources : undefined}
+								footer={[r.sell ? `Sells for ${r.sell}` : r.sources[0].label, 'Click to open Merchant']}
+							/>
+						))}
+					</ChipGroup>
+				))}
+			</TopBar>
+			<div style={{ position: 'absolute', left: '50%', bottom: 2, transform: 'translateX(-50%)' }}>
+				<Dock>
+					<IconButton icon={I('menu_equipment')} label='Hero' badge={1} />
+					<IconButton icon={I('menu_merchant')} label='Merchant' badge={8} />
+					<IconButton icon={I('menu_farm')} label='Realm' />
+					<IconButton icon={I('menu_crafting')} label='Fight' />
+					<IconButton icon={I('menu_glossary')} label='Bestiary' />
+					<IconButton icon={I('menu_achievements')} label='Deeds' badge={8} />
+					<IconButton icon={I('menu_legacy')} label='Rebirth' />
+				</Dock>
 			</div>
-		</div>
-		<div style={{ position: 'absolute', right: 14, bottom: 14, width: 190 }}>
-			<Panel>
-				<div style={{ height: 96, background: 'linear-gradient(#e8f1f8 0 40%, #4f9a4c 40%)', boxShadow: 'inset 0 0 0 2px #0b0d14' }} />
-				<div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginTop: 6 }}>
-					<span className='ds-bad'>▮ 10</span>
-					<span className='ds-gold-text'>▮ 1</span>
-					<span className='ds-dim'>350 tiles</span>
-				</div>
-			</Panel>
-		</div>
-	</DsRoot>
+			<div style={{ position: 'absolute', right: 14, bottom: 14 }}>
+				<MiniMap
+					width={200}
+					height={128}
+					stats={[
+						{ tone: 'bad', text: '▮ 10' },
+						{ tone: 'gold', text: '▮ 1' },
+						{ tone: 'dim', text: '350 tiles' },
+					]}
+				>
+					<div style={{ height: '100%', background: 'linear-gradient(#e8f1f8 0 40%, #4f9a4c 40%)' }} />
+				</MiniMap>
+			</div>
+		</DsRoot>
+	);
+};
+
+/** Placeholder hero figure: a dark human silhouette on a soft vignette, until class art is chosen. */
+const Silhouette: React.FC = () => (
+	<div
+		style={{
+			height: 210,
+			display: 'grid',
+			placeItems: 'end center',
+			overflow: 'hidden',
+			background: 'radial-gradient(ellipse at 50% 35%, #1d1a24, #0a0809 75%)',
+			border: '1px solid #3a2c1c',
+		}}
+	>
+		<svg viewBox='0 0 100 130' width='150' height='195' aria-label='Hero silhouette'>
+			<path
+				d='M50 6c-9 0-15 7-15 17 0 7 3 12 7 15v5c-14 3-26 8-30 22l-4 30c0 4 3 6 6 6h10l3 25h46l3-25h10c3 0 6-2 6-6l-4-30c-4-14-16-19-30-22v-5c4-3 7-8 7-15 0-10-6-17-15-17z'
+				fill='#07060a'
+				stroke='#241f2c'
+				strokeWidth='1.5'
+			/>
+		</svg>
+	</div>
 );
 
 const EQUIP_LEFT = ['head', 'neck', 'shoulder', 'hands', 'chest', 'legs'];
@@ -142,11 +292,7 @@ export const HeroWindowView: React.FC = () => {
 								))}
 							</div>
 							<div>
-								<img
-									src={I('hero_paladin')}
-									alt=''
-									style={{ width: '100%', height: 210, objectFit: 'contain', background: 'linear-gradient(#1b2547, #0e1226)', border: '3px solid #8a5f16' }}
-								/>
+								<Silhouette />
 								<div style={{ display: 'grid', gap: 4, marginTop: 6 }}>
 									<ProgressBar value={278} max={278} label='HP 278 / 278' />
 									<ProgressBar value={101} max={101} tone='mana' label='MP 101 / 101' />
@@ -176,7 +322,17 @@ export const HeroWindowView: React.FC = () => {
 						</Inset>
 					</Panel>
 					<Panel style={{ display: 'flex', flexDirection: 'column' }}>
-						<Inset style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(12, 52px)', gridAutoRows: 52, gap: 6, alignContent: 'start' }}>
+						<Inset
+							style={{
+								flex: 1,
+								display: 'grid',
+								gridTemplateColumns: 'repeat(10, 60px)',
+								gridAutoRows: 60,
+								justifyContent: 'space-evenly',
+								gap: 6,
+								alignContent: 'start',
+							}}
+						>
 							{Array.from({ length: 40 }, (_, i) => {
 								const it = bagItems[i];
 								return <Slot key={i} icon={it?.icon} rarity={it?.rarity} count={it?.count} />;

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Rarity } from '../logic';
+import { HoverTip, ResourceChip } from './primitives';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -85,7 +86,7 @@ export const ResourceTooltip: React.FC<{ icon: string; name: string; rows: TipRo
 	sources,
 	footer,
 }) => (
-	<Tooltip rarity='uncommon' icon={icon} title={name} subtitle='Base material' footer={footer}>
+	<Tooltip rarity='common' className='ds-tip-compact' icon={icon} title={name} subtitle='Base material' footer={footer}>
 		<TipRows rows={rows} />
 		{sources ? (
 			<>
@@ -144,4 +145,18 @@ export const HintTooltip: React.FC<{ title: string; text?: string; tone?: 'norma
 			</div>
 		) : null}
 	</div>
+);
+
+/** A top-bar resource: the chip plus its hover tooltip (stock, income, sources). Props only; the caller supplies the live numbers. */
+export const ResourceStat: React.FC<{ icon: string; name: string; value: string; rows: TipRow[]; sources?: TipRow[]; footer?: Footer }> = ({
+	icon,
+	name,
+	value,
+	rows,
+	sources,
+	footer,
+}) => (
+	<HoverTip tip={<ResourceTooltip icon={icon} name={name} rows={rows} sources={sources} footer={footer} />}>
+		<ResourceChip icon={icon} value={value} />
+	</HoverTip>
 );
