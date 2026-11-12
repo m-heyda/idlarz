@@ -17,7 +17,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/api/auth/badge/**
 
-- [`route.ts`](../../src/app/api/auth/badge/route.ts) — ~ The badge and title the profile shows (`null` badge = the default, `"none"` = hidden) and the achievements it has earned, which decide what it may pick.
+- [`route.ts`](../../src/app/api/auth/badge/route.ts) — ~ The badge, title and nickname colour the profile shows (`null` badge = the default, `"none"` = hidden), the achievements it has earned (they decide what it may pick), and what the colour picker allows:
 
 **src/app/api/auth/epoch/**
 
@@ -98,6 +98,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/app/api/pets/**
 
 - [`route.ts`](../../src/app/api/pets/route.ts) — ~ The cosmetic pets:
+
+**src/app/api/rankings/**
+
+- [`route.ts`](../../src/app/api/rankings/route.ts) — ~ The Rankings:
 
 **src/app/api/rebirth/**
 
@@ -200,6 +204,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`tutorial.ts`](../../src/catalog/tutorial.ts) — The guided tutorial as data: Brother Alder's intro, the starter path and the milestone lessons. Order is data: a step is inserted between two others by
 - [`weapons.ts`](../../src/catalog/weapons.ts) — ~ Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; an item can override it with `attackSpeed`).
 
+**src/components/**
+
+- [`QueryProvider.tsx`](../../src/components/QueryProvider.tsx) — ~ Gives the game's windows the shared read cache (`lib/queryClient.ts`).
+
 **src/components/auth/**
 
 - [`AuthForm.tsx`](../../src/components/auth/AuthForm.tsx) — ~ Which form opens first.
@@ -214,12 +222,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AchievementBadge.tsx`](../../src/components/game/AchievementBadge.tsx) — ~ One achievement's badge picture, shown next to a name (the Character window) and in the badge picker.
 - [`AmbientLife.tsx`](../../src/components/game/AmbientLife.tsx) — ~ Sprite sheets of every ambient critter (2 frames each:
 - [`AvatarArt.tsx`](../../src/components/game/AvatarArt.tsx) — ~ Avatar id, drawn exactly as given (no class lock); null/unknown shows the default avatar of `playerClass`.
-- [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window:
+- [`AvatarDialog.tsx`](../../src/components/game/AvatarDialog.tsx) — ~ The avatar picker of the character window.
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
 - [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ 1 until it has run, then counts down to 0; stays at 0 for a player who asked for reduced motion.
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
 - [`BestiaryWindow.tsx`](../../src/components/game/BestiaryWindow.tsx) — ~ The Bestiary:
-- [`BetaTesterBadge.tsx`](../../src/components/game/BetaTesterBadge.tsx) — ~ Who wears the tester medal:
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx) — ~ The body of a tile card (the caller wraps it in the design-system Tooltip):
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
@@ -253,6 +260,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`PixelIcon.tsx`](../../src/components/game/PixelIcon.tsx) — ~ A one-row sprite sheet from the icon set (its size is the whole sheet)
 - [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
+- [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The number of a row:
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
@@ -261,7 +269,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`TileMonster.tsx`](../../src/components/game/TileMonster.tsx) — ~ The monster on the map with its growth shown:
 - [`TileStatus.tsx`](../../src/components/game/TileStatus.tsx) — ~ More card content under the tile's own lines (the building on the tile)
 - [`TileTooltip.tsx`](../../src/components/game/TileTooltip.tsx) — ~ Hover card of a monster, the design system's MonsterTooltip with the game's numbers:
-- [`Toast.tsx`](../../src/components/game/Toast.tsx) — ~ Short messages ("Game saved") under the header; `showToast` in the ui store puts one up for a couple of seconds, and several stack.
+- [`Toast.tsx`](../../src/components/game/Toast.tsx) — ~ Short messages ("Game saved", and in red a refusal such as "You need 490 more gems") at the top of the screen under the header; `showToast(text, tone?)` in the ui store puts one up for a couple of seconds, and several stack.
 - [`WaterLayer.tsx`](../../src/components/game/WaterLayer.tsx) — ~ Visible tile range (inclusive-exclusive), so only the ripples on screen are in the DOM
 - [`WindowErrorBoundary.tsx`](../../src/components/game/WindowErrorBoundary.tsx) — ~ Keeps one window's crash from blanking the whole game:
 
@@ -276,6 +284,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/components/game/hud/**
 
+- [`BuildTimers.tsx`](../../src/components/game/hud/BuildTimers.tsx) — ~ More rows than this fold into one "+N more" line, so a long queue never covers the map.
 - [`HudDock.tsx`](../../src/components/game/hud/HudDock.tsx) — ~ The windows in the dock, in order.
 - [`HudTopBar.tsx`](../../src/components/game/hud/HudTopBar.tsx) — ~ The picture of a resource for the design-system chip (a resource with no sprite falls back to the scroll icon).
 
@@ -375,6 +384,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`limits.ts`](../../src/config/limits.ts) — Bounds and caps that later upgrades and the rebirth system are meant to raise (more bag room, longer monster growth, a bigger
 - [`merchant.ts`](../../src/config/merchant.ts) — The merchant: resource prices, upgrades, shop goods.
 - [`monsterArtSize.ts`](../../src/config/monsterArtSize.ts) — How big a roster monster's picture is drawn on the map, in px (a tile is TILE_SIZE = 48 wide).
+- [`nickColors.ts`](../../src/config/nickColors.ts) — The colours a player can give their nickname. A leaf module: pure data, imported by the server (`catalog/badges.ts`) and by every window that draws a name.
 - [`npcPortraits.ts`](../../src/config/npcPortraits.ts) — ~ Served URL of an NPC portrait
 - [`pixelIcons.ts`](../../src/config/pixelIcons.ts) — Pixel-art sprite set (generated by scripts/pixel/build.py, rules in scripts/pixel/reference/STYLE.md).
 - [`playerClasses.ts`](../../src/config/playerClasses.ts) — Hero classes the player can pick (double-click the character). Each gives two passives (CLASS_PASSIVES below) and has its own
@@ -409,10 +419,12 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`authRoute.ts`](../../src/lib/authRoute.ts) — ~ The auth service cannot be reached or is not set up:
 - [`authValidation.ts`](../../src/lib/authValidation.ts) — ~ Same limit as the in-game name (applyProfileToFreshGame) and the `profiles.character_name` check constraint.
 - [`avatarPick.ts`](../../src/lib/avatarPick.ts) — What the server said to an avatar change:
+- [`avatarQuery.ts`](../../src/lib/avatarQuery.ts) — ~ The hero's class and the avatars the account may pick, read once and kept (`GET /api/auth/avatar`).
 - [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
-- [`badgeServer.ts`](../../src/lib/badgeServer.ts) — ~ The stored choice of this account; a missing row is "nothing chosen".
+- [`badgeServer.ts`](../../src/lib/badgeServer.ts) — ~ `profiles.is_admin`:
 - [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
+- [`buildTimers.ts`](../../src/lib/buildTimers.ts) — ~ One running construction as the bottom-left timer list shows it.
 - [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ The entries of the tile menu for the building system (only called while `BUILDINGS_FLAG` is on, see `tileMenuItems`):
 - [`buildingOutput.ts`](../../src/lib/buildingOutput.ts) — ~ The Producer's bonus from the size of its biome, as a fraction (0.5 = +50 %):
 - [`buildingText.ts`](../../src/lib/buildingText.ts) — ~ The plain-language lines of a Producer or Extractor card in the Build window; every number comes from `BUILDING_RULES` and the output formulas (`lib/buildingOutput.ts`).
@@ -494,6 +506,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`merchant.ts`](../../src/lib/merchant.ts) — ~ What a piece of gear costs at the merchant:
 - [`minimap.ts`](../../src/lib/minimap.ts) — ~ The minimap:
 - [`monsters.ts`](../../src/lib/monsters.ts) — ~ Reduces the damage of every hit the player lands (same curve as the player's armor)
+- [`notices.ts`](../../src/lib/notices.ts) — ~ THE way to tell the player something short:
 
 **src/lib/offline/**
 
@@ -559,6 +572,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`playerRoute.ts`](../../src/lib/playerRoute.ts) — ~ The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip):
 - [`potionBelt.ts`](../../src/lib/potionBelt.ts) — ~ The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
+- [`queryClient.ts`](../../src/lib/queryClient.ts) — ~ The browser's one cache for server reads that several windows share (TanStack Query).
+- [`rankings.ts`](../../src/lib/rankings.ts) — ~ The boards that have data
+- [`rankingsQuery.ts`](../../src/lib/rankingsQuery.ts) — ~ One board of the Rankings (`GET /api/rankings?board=…`); null on any failure or a body of the wrong shape, so the window shows its error state rather than a half-drawn list.
+- [`rankingsServer.ts`](../../src/lib/rankingsServer.ts) — ~ What a board orders by:
 - [`rateLimit.ts`](../../src/lib/rateLimit.ts) — A small in-memory sliding-window limiter for routes that must not be hammered (password reset requests).
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
@@ -643,7 +660,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`rewardPendingStore.ts`](../../src/stores/rewardPendingStore.ts) — ~ How many rewards are on their way from the server (a chest being opened, a won fight whose result is not shown yet).
 - [`settingsStore.ts`](../../src/stores/settingsStore.ts)
 - [`tutorialStore.ts`](../../src/stores/tutorialStore.ts) — ~ How long to wait before asking again when the server could not confirm a step yet (its last saved copy lags the browser's) or could not be reached.
-- [`uiStore.ts`](../../src/stores/uiStore.ts) — ~ Red entry for something destructive
+- [`uiStore.ts`](../../src/stores/uiStore.ts) — ~ The badge, title and nickname colour choice of the account with what the pickers allow (see `BadgeState` in `lib/authClient.ts`); `loaded` once the server has answered.
 - [`viewStore.ts`](../../src/stores/viewStore.ts) — ~ Where the map is on the screen (pan and zoom).
 - [`windowStore.ts`](../../src/stores/windowStore.ts) — ~ The game's windows:
 
@@ -906,6 +923,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`localSaveAccount.test.ts`](../../tests/saves/localSaveAccount.test.ts)
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
 - [`passwordReset.test.ts`](../../tests/saves/passwordReset.test.ts)
+- [`rankings.test.ts`](../../tests/saves/rankings.test.ts)
 - [`saveEvents.test.ts`](../../tests/saves/saveEvents.test.ts)
 - [`saveFixtures.test.ts`](../../tests/saves/saveFixtures.test.ts) — The guard for every future PR: every frozen fixture in tests/fixtures/saves/ (one per released shape, made from the code of that release by
 - [`saveStorage.test.ts`](../../tests/saves/saveStorage.test.ts) — ~ A played game with a chest, gear and a monster, as a plain persisted slice.
@@ -957,6 +975,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`avatarPick.test.ts`](../../tests/ui/avatarPick.test.ts) — ~ A fake client store and server:
 - [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
+- [`buildTimers.test.ts`](../../tests/ui/buildTimers.test.ts)
 - [`buildingText.test.ts`](../../tests/ui/buildingText.test.ts)
 - [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
@@ -970,8 +989,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
 - [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
+- [`notices.test.ts`](../../tests/ui/notices.test.ts)
 - [`offlineBar.test.ts`](../../tests/ui/offlineBar.test.ts)
 - [`playRoute.test.ts`](../../tests/ui/playRoute.test.ts)
+- [`rankings.test.ts`](../../tests/ui/rankings.test.ts)
 - [`rebirthResult.test.ts`](../../tests/ui/rebirthResult.test.ts)
 - [`tipPlacement.test.ts`](../../tests/ui/tipPlacement.test.ts)
 - [`tutorial.test.ts`](../../tests/ui/tutorial.test.ts)
@@ -1013,8 +1034,14 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`new_chapter_columns_rollback.sql`](../../supabase/migrations/new_chapter_columns_rollback.sql)
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
+- [`player_rankings.sql`](../../supabase/migrations/player_rankings.sql)
+- [`player_rankings_kills.sql`](../../supabase/migrations/player_rankings_kills.sql)
+- [`player_rankings_kills_rollback.sql`](../../supabase/migrations/player_rankings_kills_rollback.sql)
+- [`player_rankings_rollback.sql`](../../supabase/migrations/player_rankings_rollback.sql)
 - [`profile_badge_title.sql`](../../supabase/migrations/profile_badge_title.sql)
 - [`profile_badge_title_rollback.sql`](../../supabase/migrations/profile_badge_title_rollback.sql)
+- [`profile_name_color.sql`](../../supabase/migrations/profile_name_color.sql)
+- [`profile_name_color_rollback.sql`](../../supabase/migrations/profile_name_color_rollback.sql)
 - [`profiles_server_columns.sql`](../../supabase/migrations/profiles_server_columns.sql)
 - [`rebirth_history.sql`](../../supabase/migrations/rebirth_history.sql)
 - [`season_reset.sql`](../../supabase/migrations/season_reset.sql)

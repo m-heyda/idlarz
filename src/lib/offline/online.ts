@@ -365,6 +365,7 @@ const gemsView = (ledger: Ledger, nowSec: number, identity: IdentityInfo | null)
 	daily: dailyInfo(ledger.gemShop, nowSec),
 	freeRespec: !(ledger.attrs?.freeUsed ?? false),
 	lastAt: ledger.gemShop.lastAt,
+	bought: ledger.gemShop.bought,
 	nameChangedAt: identity?.nameChangedAtSec ?? null,
 	serverNowSec: nowSec,
 });

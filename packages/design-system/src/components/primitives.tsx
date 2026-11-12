@@ -45,7 +45,7 @@ export const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children
 export const Divider: React.FC<{ flourish?: boolean }> = ({ flourish }) => <div className={cx('ds-divider', flourish && 'ds-divider-flourish')} />;
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	tone?: 'stone' | 'gold' | 'wood' | 'dark' | 'danger';
+	tone?: 'stone' | 'gold' | 'wood' | 'dark' | 'danger' | 'purple';
 	/** `sm` is the compact button used in rows and queues */
 	size?: 'md' | 'sm';
 }
@@ -78,7 +78,14 @@ export interface TabItem {
 }
 /** A row of wooden tabs, the active one in gold. */
 export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: string) => void }> = ({ items, active, onChange }) => (
-	<div className='ds-tabs' role='tablist'>
+	<div
+		className='ds-tabs'
+		role='tablist'
+		// a mouse wheel scrolls tabs that do not fit sideways
+		onWheel={(e) => {
+			if (e.currentTarget.scrollWidth > e.currentTarget.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) e.currentTarget.scrollLeft += e.deltaY;
+		}}
+	>
 		{items.map((t) => (
 			<button
 				key={t.id}

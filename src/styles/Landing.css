@@ -282,6 +282,11 @@
 	color: var(--ds-gold-lt, #f4d57e);
 }
 
+.ld-continue-title {
+	font-size: 0.85rem;
+	color: #b9bdc9;
+}
+
 .ld-away {
 	max-width: 320px;
 	margin-top: 4px;

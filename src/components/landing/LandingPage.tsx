@@ -7,8 +7,9 @@ import { useRouter } from 'next/navigation';
 import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import AvatarArt from '@/components/game/AvatarArt';
 import AwayBar from '@/components/game/AwayBar';
-import BetaTesterBadge from '@/components/game/BetaTesterBadge';
 import { resolveAvatar } from '@/catalog/avatars';
+import { nickColorValue } from '@/config/nickColors';
+import type { ShownIdentity } from '@/catalog/badges';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
 import { LANDING_BG } from '@/config/landing';
@@ -22,6 +23,7 @@ import { fetchMe, logout, type AwayInfo, type Profile, type ProfileStats, type U
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@idlarz/design-system';
 import { Button, Frame, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
+import { AdminMark, NickName } from '../../../packages/design-system/src/components/composites';
 import '@/styles/Landing.css';
 
 type Visitor =
@@ -34,7 +36,7 @@ type Visitor =
 			game: GameSummary | null;
 			asks: boolean;
 			away: AwayInfo | null;
-			earlyTester: boolean;
+			identity: ShownIdentity | null;
 	  }
 	| { name: 'unavailable'; reason: UnavailableReason };
 
@@ -165,9 +167,9 @@ const MemberCard: React.FC<{
 	game: GameSummary | null;
 	asks: boolean;
 	away: AwayInfo | null;
-	earlyTester: boolean;
+	identity: ShownIdentity | null;
 	onLogout: () => void;
-}> = ({ profile, stats, game, asks, away, earlyTester, onLogout }) => {
+}> = ({ profile, stats, game, asks, away, identity, onLogout }) => {
 	if (!profile) {
 		return (
 			<div className='ld-continue'>
@@ -188,8 +190,21 @@ const MemberCard: React.FC<{
 				<AvatarArt id={resolveAvatar(profile.avatarId, profile.playerClass).id} playerClass={profile.playerClass} scale={2} />
 			</div>
 			<p className='ld-continue-name'>
-				{profile.characterName}
-				{earlyTester && <BetaTesterBadge size={26} />}
+				<NickName color={nickColorValue(identity?.nameColor)}>{profile.characterName}</NickName>
+				{identity?.admin && <AdminMark />}
+				{identity?.title && <span className='ld-continue-title'> ({identity.title})</span>}
+				{identity?.badge && (
+					// eslint-disable-next-line @next/next/no-img-element
+					<img
+						className='early-tester-badge pixelated'
+						src={`/pixel/new_assets/achievements/${identity.badge}.png`}
+						alt={identity.badgeName ?? ''}
+						title={identity.badgeName ?? undefined}
+						width={26}
+						height={26}
+						draggable={false}
+					/>
+				)}
 			</p>
 			<p className='ld-continue-class'>
 				{info.race} {info.label}
@@ -239,7 +254,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 				game = savedGameSummary(local, cloud);
 				asks = !skipsHub(planStart(local, cloud, readLink(), me.userId), local);
 			}
-			// the away bar and the early tester badge follow the same stale-epoch rule as the stats: an older chapter's numbers are not shown
+			// the away bar and the badge and title follow the same stale-epoch rule as the stats: an older chapter's numbers are not shown
 			setVisitor({
 				name: 'member',
 				profile: me.profile,
@@ -247,7 +262,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 				game,
 				asks,
 				away: stale ? null : (me.away ?? null),
-				earlyTester: !stale && me.earlyTester === true,
+				identity: stale ? null : (me.identity ?? null),
 			});
 		} else if (me.status === 'guest') setVisitor({ name: 'guest' });
 		else setVisitor({ name: 'unavailable', reason: me.status === 'unavailable' ? me.reason : 'outage' });
@@ -307,7 +322,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 										game={visitor.game}
 										asks={visitor.asks}
 										away={visitor.away}
-										earlyTester={visitor.earlyTester}
+										identity={visitor.identity}
 										onLogout={() => void leave()}
 									/>
 								</div>

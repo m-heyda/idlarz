@@ -10,6 +10,7 @@ import MerchantWindow from '../merchant/MerchantWindow';
 import FarmOverlay from './FarmOverlay';
 import AchievementsOverlay from './AchievementsOverlay';
 import BestiaryWindow from '../BestiaryWindow';
+import RankingsWindow from '../RankingsWindow';
 import WindowErrorBoundary from '../WindowErrorBoundary';
 
 /**
@@ -57,6 +58,11 @@ const GameWindows: React.FC = () => {
 			{open.includes('bestiary') && (
 				<WindowErrorBoundary name='Bestiary'>
 					<BestiaryWindow />
+				</WindowErrorBoundary>
+			)}
+			{open.includes('rankings') && (
+				<WindowErrorBoundary name='Rankings'>
+					<RankingsWindow />
 				</WindowErrorBoundary>
 			)}
 			{open.includes('castle') && <CastleUpgradeDialog />}

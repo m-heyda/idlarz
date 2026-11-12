@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { newClaimId } from '@/lib/offlineClient';
 import type { GemsReply, GemsRequest } from '@/lib/offline/gemTypes';
 import { requestGems } from '@/lib/rewardsClient';
+import { QUERY_KEYS, invalidate } from '@/lib/queryClient';
+import { notify } from '@/lib/notices';
 import { signalNeedClaim } from '@/lib/serverSession';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -14,7 +16,7 @@ interface GemStoreState {
 	info: GemsReply | null;
 	/** A request is on its way: the shop disables its buttons until the answer is here */
 	busy: boolean;
-	/** Why the last request was refused, for the shop to show */
+	/** Why the last request was refused (it is also shown as an error notice) */
 	message: string | null;
 	refresh: () => Promise<void>;
 	claimDaily: () => Promise<GemsReply | null>;
@@ -26,6 +28,7 @@ interface GemStoreState {
 const applyReply = (reply: GemsReply) => {
 	const game = useGameStore.getState();
 	useGameStore.setState({ gems: reply.gems });
+	if (reply.playerClass) invalidate(QUERY_KEYS.avatars); // another class has other starter faces
 	if (reply.playerClass) game.setPlayerClass(reply.playerClass as Parameters<typeof game.setPlayerClass>[0]);
 	if (reply.characterName) useGameStore.setState({ playerName: reply.characterName });
 	if (reply.attrs) game.applyServerAttrs(reply.attrs);
@@ -40,14 +43,19 @@ export const useGemStore = create<GemStoreState>((set, get) => {
 			if (reply.status === 'need_claim') {
 				signalNeedClaim();
 				set({ message: 'Collect your time away first, then try again.' });
+				notify('Collect your time away first, then try again.', 'error');
 				return null;
 			}
 			if (reply.status !== 'ok') {
 				set({ message: 'Could not reach the server. Nothing was charged.' });
+				notify('Could not reach the server. Nothing was charged.', 'error');
 				return null;
 			}
 			applyReply(reply.value);
-			set({ info: reply.value, message: reply.value.ok ? null : (reply.value.message ?? 'The server did not do that.') });
+			const refused = reply.value.ok ? null : (reply.value.message ?? 'The server did not do that.');
+			set({ info: reply.value, message: refused });
+			// a refusal ("You need 490 more gems") is a red notice at the top of the screen, whichever window asked
+			if (refused) notify(refused, 'error');
 			return reply.value;
 		} finally {
 			set({ busy: false });

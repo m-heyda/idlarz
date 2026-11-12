@@ -631,6 +631,17 @@
 	padding: 7px 10px;
 }
 
+/* the compact one-line tip for small controls (`.ds-tip-mini` is the small icon in a tooltip row, a different thing) */
+.ds-tip-label {
+	width: max-content;
+	max-width: none;
+	padding: 3px 8px;
+	font-size: 12px;
+	line-height: 1.2;
+	color: #f1e6c8;
+	white-space: nowrap;
+}
+
 /* ---------- map hud pieces ---------- */
 
 .ds-slots-sm .ds-slot {
@@ -721,6 +732,28 @@
 	padding: 0;
 	background: none;
 	border: 0;
+	/* a window dragged narrower than its tabs scrolls them sideways instead of letting them overlap; the top padding keeps room for the diamond of the active tab */
+	min-width: 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding: 8px 0 2px;
+	margin: -8px 0 -2px;
+	scrollbar-width: thin;
+}
+
+.ds-window-bar .ds-tab {
+	flex: 0 0 auto;
+}
+
+.ds-window-bar > :first-child {
+	min-width: 0;
+	flex: 0 1 auto;
+}
+
+/* the bar and the head are flex items too: without min-width 0 they grow with the tabs and the scroll above never starts */
+.ds-window-bar,
+.ds-window-head {
+	min-width: 0;
 }
 
 .ds-tab::after {
@@ -1120,6 +1153,23 @@
 	box-shadow:
 		inset 0 0 0 2px #05060a,
 		inset 0 0 0 3px var(--ds-gold);
+}
+
+/* an item the player already has at its top: a purple plate that is not clickable, and its row looks a little quiet */
+.ds-btn-max {
+	pointer-events: none;
+	letter-spacing: 0.12em;
+}
+
+.ds-listrow[data-owned='true'] {
+	opacity: 0.72;
+}
+
+.ds-btn-purple {
+	border-color: #2b1450;
+	background: linear-gradient(#a56bf0, #6a34b8);
+	color: #fff;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .ds-btn-danger {
@@ -1891,6 +1941,218 @@
 
 .ds-identity-name .ds-identity-badge {
 	align-self: center;
+}
+
+.ds-identity-nick {
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.ds-identity-nick:hover .ds-nick {
+	filter: brightness(1.15);
+}
+
+/* a nickname in its colour; the gold one (admin) shines and has stars that twinkle around it */
+.ds-nick {
+	position: relative;
+	display: inline-block;
+}
+
+.ds-nick-gold .ds-nick-text {
+	background: linear-gradient(100deg, #a8741a 0%, #ffd866 22%, #fff7d1 38%, #ffd866 55%, #a8741a 78%, #ffd866 100%);
+	background-size: 220% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+	filter: drop-shadow(0 0 4px rgba(255, 207, 90, 0.95)) drop-shadow(0 0 11px rgba(255, 184, 60, 0.7));
+	animation: ds-nick-shine 3.2s linear infinite;
+}
+
+/* the animated nickname effects of the Gem shop: gradient text that moves (--fx), plus a glow; none is gold and none has stars */
+.ds-nick-rainbow .ds-nick-text,
+.ds-nick-aurora .ds-nick-text,
+.ds-nick-frost .ds-nick-text,
+.ds-nick-ember .ds-nick-text {
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+}
+
+.ds-nick-rainbow .ds-nick-text {
+	background-image: linear-gradient(90deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
+	filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.45)) drop-shadow(0 0 11px rgba(168, 120, 255, 0.6));
+	animation: ds-nick-flow 4s linear infinite;
+}
+
+.ds-nick-aurora .ds-nick-text {
+	background-image: linear-gradient(90deg, #2de2b0, #3aa0ff, #9b5cff, #3aa0ff, #2de2b0);
+	filter: drop-shadow(0 0 4px rgba(45, 226, 176, 0.7)) drop-shadow(0 0 12px rgba(100, 120, 255, 0.55));
+	animation: ds-nick-flow 7s linear infinite;
+}
+
+.ds-nick-ember .ds-nick-text {
+	background-image: linear-gradient(180deg, #fff1a8 0%, #ffb347 35%, #ff5a1f 70%, #b81d0a 100%);
+	background-size: 100% 100%;
+	filter: drop-shadow(0 0 4px rgba(255, 110, 30, 0.85)) drop-shadow(0 0 10px rgba(255, 70, 20, 0.55));
+	animation: ds-nick-flicker 1.1s ease-in-out infinite alternate;
+}
+
+.ds-nick-frost .ds-nick-text {
+	background-image: linear-gradient(100deg, #8fd3ff 0%, #d9f3ff 30%, #ffffff 42%, #d9f3ff 54%, #8fd3ff 70%, #5fb4ff 100%);
+	filter: drop-shadow(0 0 4px rgba(140, 215, 255, 0.85)) drop-shadow(0 0 10px rgba(90, 170, 255, 0.5));
+	animation: ds-nick-flow 3.4s linear infinite;
+}
+
+/* Galaxy: a starry purple and blue sky inside the letters (a clipped background of star dots over a nebula gradient) that drifts, with a soft violet glow; quieter than the gold admin name */
+.ds-nick-galaxy .ds-nick-text {
+	background-image: radial-gradient(circle at 5px 6px, #fff 0, #fff 1.1px, transparent 1.7px),
+		radial-gradient(circle at 17px 19px, #fff 0, #fff 1.3px, transparent 1.9px), radial-gradient(circle at 11px 13px, #fff 0, #fff 0.9px, transparent 1.5px),
+		radial-gradient(circle at 26px 4px, #e8dcff 0, #e8dcff 1px, transparent 1.6px), radial-gradient(ellipse 60% 80% at 20% 30%, #ff5fd2aa, transparent 70%),
+		radial-gradient(ellipse 60% 80% at 80% 70%, #3a6bffcc, transparent 70%), linear-gradient(120deg, #4b24c2, #8a3dff 50%, #3a4fd8);
+	background-size:
+		22px 26px,
+		30px 24px,
+		18px 20px,
+		34px 30px,
+		100% 100%,
+		100% 100%,
+		100% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+	filter: drop-shadow(0 0 3px rgba(140, 100, 255, 0.55));
+	animation: ds-nick-galaxy 12s linear infinite;
+}
+
+@keyframes ds-nick-galaxy {
+	to {
+		background-position:
+			-22px 26px,
+			-30px 24px,
+			18px -20px,
+			-34px -30px,
+			0 0,
+			0 0,
+			0 0;
+	}
+}
+
+.ds-nick-void {
+	color: #eadcff;
+	animation: ds-nick-void 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes ds-nick-flicker {
+	from {
+		filter: drop-shadow(0 0 3px rgba(255, 110, 30, 0.7)) drop-shadow(0 0 8px rgba(255, 70, 20, 0.4)) brightness(0.95);
+	}
+	to {
+		filter: drop-shadow(0 0 6px rgba(255, 140, 40, 1)) drop-shadow(0 0 14px rgba(255, 80, 20, 0.7)) brightness(1.12);
+	}
+}
+
+@keyframes ds-nick-void {
+	from {
+		text-shadow:
+			0 0 4px #7a3cff,
+			0 0 10px #4a1fb0;
+	}
+	to {
+		text-shadow:
+			0 0 6px #a56bff,
+			0 0 16px #6a2fe0,
+			0 0 26px #3a1590;
+	}
+}
+
+/* the admin mark: an 8 frame sprite sheet played in place (--ds-mark-end is minus the sheet width) */
+.ds-admin-mark {
+	display: inline-block;
+	flex: none;
+	align-self: center;
+	margin: -4px 0;
+	image-rendering: pixelated;
+	background-repeat: no-repeat;
+	animation: ds-admin-mark 0.9s steps(8) infinite;
+}
+
+@keyframes ds-admin-mark {
+	to {
+		background-position-x: var(--ds-mark-end);
+	}
+}
+
+.ds-nick-star {
+	position: absolute;
+	width: 9px;
+	height: 9px;
+	pointer-events: none;
+	background: #fff7d1;
+	clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+	opacity: 0;
+	animation: ds-nick-twinkle 2.4s ease-in-out infinite;
+}
+
+.ds-nick-star:nth-of-type(1) {
+	top: -4px;
+	left: 8%;
+}
+
+.ds-nick-star:nth-of-type(2) {
+	top: 30%;
+	left: 52%;
+	animation-delay: 0.8s;
+}
+
+.ds-nick-star:nth-of-type(3) {
+	bottom: -3px;
+	right: 6%;
+	animation-delay: 1.6s;
+}
+
+@keyframes ds-nick-flow {
+	to {
+		background-position: -200% 0;
+	}
+}
+
+@keyframes ds-nick-shine {
+	to {
+		background-position: -220% 0;
+	}
+}
+
+@keyframes ds-nick-twinkle {
+	0%,
+	100% {
+		opacity: 0;
+		transform: scale(0.3) rotate(0deg);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.15) rotate(35deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-nick-fx .ds-nick-text,
+	.ds-nick-void,
+	.ds-admin-mark,
+	.ds-nick-star {
+		animation: none;
+	}
+	.ds-nick-star {
+		opacity: 0.9;
+	}
 }
 
 .ds-identity-title {
@@ -4072,6 +4334,181 @@ button.ds-income-head:hover {
 	min-width: 0;
 }
 
+/* the name, badge and title window: a preview of the name on top, the colour picker on the left and title and badge on the right */
+.ds-nick-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin: 2px 0 6px;
+	font-size: 28px;
+	line-height: 1.2;
+}
+
+.ds-nick-preview-title {
+	font-size: 14px;
+	color: var(--ds-gold-lt);
+}
+
+/* the name preview: a black stage with a gold frame (like the resource chips of the top bar) and a slow galaxy behind the name */
+.ds-nick-stage {
+	position: relative;
+	overflow: hidden;
+	margin: 0 auto 16px;
+	max-width: 520px;
+	background: #000;
+	border: 2px solid var(--ds-gold, #e0a93a);
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 14px rgba(224, 169, 58, 0.25),
+		inset 0 0 18px rgba(0, 0, 0, 0.9);
+}
+
+.ds-nick-stage .ds-nick-preview {
+	position: relative;
+	z-index: 1;
+	margin: 0;
+	padding: 14px 16px;
+	min-height: 64px;
+}
+
+.ds-badge-cols {
+	display: grid;
+	grid-template-columns: 372px minmax(0, 1fr);
+	gap: 32px;
+	align-items: stretch;
+}
+
+/* a thin line between the two columns */
+.ds-badge-cols > section + section {
+	padding-left: 32px;
+	border-left: 1px solid rgba(224, 169, 58, 0.22);
+}
+
+.ds-swatch-grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 6px;
+	margin-top: 6px;
+}
+
+/* a palette tile: filled with its colour, the name on it in the ink that reads best (--swatch, --ink) */
+.ds-swatch {
+	position: relative;
+	display: grid;
+	place-items: center;
+	height: 38px;
+	padding: 0 4px;
+	font-family: inherit;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--ink, #fff);
+	cursor: pointer;
+	background: var(--swatch, #222);
+	border: 0;
+}
+
+/* hover: a grey frame; chosen: an orange one (no tick) */
+.ds-swatch:hover:not([data-selected='true']) {
+	outline: 2px solid #8a8d96;
+	outline-offset: 1px;
+}
+
+.ds-swatch[data-selected='true'] {
+	outline: 2px solid var(--ds-gold, #e0a93a);
+	outline-offset: 1px;
+}
+
+/* not unlocked yet: it still previews, but looks quiet */
+.ds-swatch[aria-disabled='true'] {
+	opacity: 0.6;
+}
+
+.ds-swatch[aria-disabled='true'][data-selected='true'] {
+	outline-style: dashed;
+}
+
+.ds-swatch-default {
+	color: #d7ceb8;
+	background: repeating-linear-gradient(135deg, #14161d 0 6px, #1c1f29 6px 12px);
+	border: 1px dashed #7a7566;
+}
+
+/* an effect tile: the effect's own look, moving; locked ones are quiet like the plain colours */
+.ds-swatch-fx {
+	color: #fff;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+	background-size: 200% 100%;
+	animation: ds-nick-flow 5s linear infinite;
+}
+
+.ds-swatch-rainbow {
+	background-image: linear-gradient(100deg, #ff5f6d, #ffc371, #fff36b, #7ee8a0, #56b6f7, #a371f7, #ff5fd2, #ff5f6d);
+}
+
+.ds-swatch-aurora {
+	background-image: linear-gradient(100deg, #1fbf93, #3a8fe8, #8a52e8, #3a8fe8, #1fbf93);
+}
+
+.ds-swatch-ember {
+	background-image: linear-gradient(100deg, #8a1c0a, #ff5a1f, #ffb347, #ff5a1f, #8a1c0a);
+}
+
+.ds-swatch-frost {
+	color: #10344f;
+	text-shadow: none;
+	background-image: linear-gradient(100deg, #8fd3ff, #e8f8ff, #ffffff, #e8f8ff, #8fd3ff);
+}
+
+.ds-swatch-galaxy {
+	background-image: radial-gradient(1px 1px at 8px 9px, #fff, transparent 60%), radial-gradient(1px 1px at 22px 20px, #fff, transparent 60%),
+		linear-gradient(120deg, #4b24c2, #a43dff 50%, #e056c8);
+	background-size:
+		30px 28px,
+		30px 28px,
+		100% 100%;
+	animation: none;
+}
+
+.ds-swatch-void {
+	background-image: radial-gradient(circle at 50% 50%, #5a2aa8 0%, #2a1050 55%, #12061f 100%);
+	background-size: 100% 100%;
+	box-shadow: inset 0 0 12px rgba(150, 90, 255, 0.55);
+	animation: none;
+}
+
+.ds-swatch-gold {
+	color: #2a1a05;
+	background: linear-gradient(100deg, #a8741a, #ffd866 40%, #fff7d1 55%, #ffd866 70%, #a8741a);
+	box-shadow: 0 0 10px rgba(255, 207, 90, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-swatch-fx {
+		animation: none;
+	}
+}
+
+.ds-lock-banner button {
+	flex: none;
+	white-space: nowrap;
+}
+
+.ds-lock-banner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 6px 0;
+	padding: 8px 10px;
+	font-size: 12px;
+	color: #d9c89c;
+	background: rgba(224, 169, 58, 0.08);
+	border: 1px dashed var(--ds-gold-dk, #7a5a1c);
+}
+
 /* picker cards (badge and title): dark tiles with a gold rim when chosen */
 .ds-pick-grid {
 	display: grid;
@@ -4101,7 +4538,18 @@ button.ds-income-head:hover {
 }
 
 .ds-pick:hover {
-	filter: brightness(1.2);
+	border-color: #8a8d96;
+}
+
+/* a title card: one short line, tighter than a badge card */
+.ds-pick-compact {
+	min-height: 34px;
+	padding: 5px 10px;
+}
+
+.ds-pick-grid[data-compact='true'] {
+	grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+	gap: 6px;
 }
 
 .ds-pick[data-selected='true'] {
@@ -4135,6 +4583,16 @@ button.ds-income-head:hover {
 	box-shadow:
 		0 0 0 1px #05060a,
 		0 0 14px rgba(224, 169, 58, 0.3),
+		0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+/* a refusal: the same plate with a red frame */
+.ds-toast[data-tone='error'] {
+	border-color: #c7503f;
+	color: #ffb3a6;
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 14px rgba(229, 96, 79, 0.35),
 		0 6px 14px rgba(0, 0, 0, 0.55);
 }
 
@@ -4389,4 +4847,146 @@ button.ds-income-head:hover {
 /* the login and register tabs of the landing page sit in the middle */
 .ld-form-tabs .ds-tabs {
 	justify-content: center;
+}
+
+/* ===== Rankings: a zebra list (rank, avatar, name with title, badge, value, move since the daily rebuild) ===== */
+.ds-rank-list {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ds-rank-row {
+	display: grid;
+	grid-template-columns: 40px 64px minmax(0, 1fr) 48px 96px 58px;
+	align-items: center;
+	gap: 12px;
+	min-height: 76px;
+	border-width: 0 0 1px;
+}
+
+/* the zebra stripes: every second place on a lighter inset */
+.ds-rank-list > .ds-rank-row:nth-child(even) {
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.ds-rank-row[data-me='true'] {
+	box-shadow: inset 3px 0 0 var(--ds-gold, #e0a93a);
+	background: rgba(224, 169, 58, 0.14);
+}
+
+.ds-rank-pos {
+	font-weight: 700;
+	text-align: center;
+	color: var(--ds-dim, #9aa0b4);
+}
+
+.ds-rank-row[data-top='1'] .ds-rank-pos {
+	color: #ffd45a;
+}
+
+.ds-rank-row[data-top='2'] .ds-rank-pos {
+	color: #d6dbe6;
+}
+
+.ds-rank-row[data-top='3'] .ds-rank-pos {
+	color: #d89a62;
+}
+
+.ds-rank-avatar {
+	justify-self: center;
+}
+
+.ds-rank-who {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.ds-rank-name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 19px;
+	white-space: nowrap;
+}
+
+.ds-rank-title {
+	font-size: 12px;
+	color: var(--ds-dim, #9aa0b4);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ds-rank-nobadge {
+	width: 40px;
+	height: 40px;
+}
+
+.ds-rank-value {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	font-weight: 700;
+	font-size: 16px;
+	text-align: right;
+	color: var(--ds-accent, #f0a53a);
+}
+
+.ds-rank-paragon {
+	font-size: 11px;
+	color: #c58bff;
+}
+
+.ds-rank-move {
+	font-size: 12px;
+	text-align: right;
+	color: var(--ds-dim, #9aa0b4);
+}
+
+.ds-rank-move[data-dir='up'] {
+	color: var(--ds-good);
+}
+
+.ds-rank-move[data-dir='down'] {
+	color: var(--ds-bad);
+}
+
+.ds-rank-move[data-dir='new'] {
+	color: var(--ds-gold, #e0a93a);
+}
+
+/* the player's own place when it is further down: set apart from the list */
+.ds-rank-mine {
+	margin-top: 8px;
+	border-top: 2px solid var(--ds-line-dk, #2a2118);
+}
+
+.ds-rank-foot,
+.ds-rank-empty {
+	margin: 12px 0 0;
+	font-size: 12px;
+	text-align: center;
+}
+
+.ds-rank-sk-pos {
+	width: 20px;
+	height: 14px;
+	justify-self: center;
+}
+
+.ds-rank-sk-art {
+	width: 56px;
+	height: 56px;
+}
+
+.ds-rank-sk-name {
+	grid-column: 3 / -1;
+	width: 40%;
+	height: 14px;
 }

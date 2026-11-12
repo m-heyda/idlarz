@@ -1478,21 +1478,6 @@ body {
 	pointer-events: none;
 }
 
-/* the header chip of the same timer: click to find the castle */
-.hdr-castle-timer {
-	display: flex;
-	align-items: center;
-	gap: 2px;
-	padding: 0 6px;
-	height: 28px;
-	font-size: 11px;
-	color: #f0d27a;
-	background: rgba(24, 16, 8, 0.85);
-	border: 1px solid #8a6a2a;
-	cursor: pointer;
-	white-space: nowrap;
-}
-
 /* --- Notify dot: universal, understated "needs attention" marker, pinned to the top-right of a positioned parent --- */
 .notify-dot {
 	position: absolute;

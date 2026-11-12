@@ -1,4 +1,7 @@
-# 15 · Rankings and "preview map" (design draft, nothing built)
+# 15 · Rankings and "preview map" (the Rankings window is built; the preview map is still a draft)
+
+> **Built (migration `player_rankings`):** the Rankings window with the Level, Rebirths, Crafting and Tiles boards (Quests and Deeds are coming-soon tabs). It differs from the draft below in two ways: there is no `player_stats_daily` table; a `player_rankings` row per player keeps the rank and the previous rank, and `refresh_rankings()` (one SQL call, run by the first `GET /api/rankings` after 24 hours, no cron) rebuilds them; and the Tiles board uses `player_stats.best_tiles`, the most tiles ever owned. Rules: `src/lib/rankings.ts` (docs: Progression/Rankings). Not built yet: gold per hour, the `listed` opt-out, paragon, the preview map.
+
 
 Players see each other's name, avatar and a few numbers in rankings, and can peek at another player's generated world (biome layout and castle location only).
 

@@ -1,4 +1,5 @@
 import { ACHIEVEMENTS, achievementById, type AchievementDef } from '@/catalog/achievements';
+import { NICK_GOLD, isNickColorId, nickEffectById } from '@/config/nickColors';
 
 /** The stored `profiles.badge_id` that hides the badge completely (null = the default). */
 export const BADGE_NONE = 'none';
@@ -39,6 +40,60 @@ export const shownBadge = (choice: string | null | undefined, earned: readonly s
 /** The title text for a stored title id, or null when it is not set or not earned. */
 export const shownTitle = (titleId: string | null | undefined, earned: readonly string[]): string | null =>
 	titleOptions(earned).find((t) => t.id === titleId)?.name ?? null;
+
+/** What is drawn by a name: the badge picture (`/pixel/new_assets/achievements/<badge>.png`) with its name, and the title text; each null when not shown. */
+export interface ShownIdentity {
+	badge: string | null;
+	badgeName: string | null;
+	title: string | null;
+	/** The nickname colour id (`config/nickColors.ts`, or `gold`); null = the default colour */
+	nameColor: string | null;
+	/** The game admin's account (`profiles.is_admin`): the animated admin mark is drawn by the name, for everyone to see, and the player cannot hide it */
+	admin: boolean;
+}
+
+/**
+ * What decides which nickname colours an account may use: the admin flag (`profiles.is_admin`), whether the Name colours item was bought (`unlocked`: the fourteen plain colours)
+ * and which effect items were bought (`effects`), both from `ledger.gemShop.bought`. An admin has all of them.
+ */
+export interface NameColorAccess {
+	admin: boolean;
+	unlocked: boolean;
+	/** The ids of the animated effects bought (`NICK_EFFECTS`) */
+	effects: readonly string[];
+}
+
+/** The colour to draw for a stored `profiles.name_color`: null when unset, unknown, or gold on an account that is not an admin. A paid colour stays shown (it was checked when it was stored). */
+export const shownNameColor = (stored: string | null | undefined, admin: boolean): string | null =>
+	isNickColorId(stored) && (stored !== NICK_GOLD || admin) ? stored : null;
+
+/** Validates a colour a player asks for (null = back to the default): a plain colour needs the Name colours unlock, an effect needs its own unlock, gold needs admin; an admin may have any. */
+export const checkNameColor = (input: unknown, access: NameColorAccess): { ok: true; nameColor: string | null } | { ok: false; error: string } => {
+	if (input === null) return { ok: true, nameColor: null };
+	if (!isNickColorId(input)) return { ok: false, error: 'Pick one of the colours.' };
+	if (input === NICK_GOLD) return access.admin ? { ok: true, nameColor: input } : { ok: false, error: 'That colour is not for sale.' };
+	const effect = nickEffectById(input);
+	if (effect)
+		return access.admin || access.effects.includes(effect.id) ? { ok: true, nameColor: input } : { ok: false, error: `Unlock the ${effect.name} name first.` };
+	if (!access.admin && !access.unlocked) return { ok: false, error: 'Unlock name colours in the Gem shop first.' };
+	return { ok: true, nameColor: input };
+};
+
+/** The badge, title and nickname colour to show for a stored choice (`profiles.badge_id` / `title_id` / `name_color`) and the earned achievements: the one rule the Character window, the landing and later the rankings share. */
+export const shownIdentity = (
+	choice: { badgeId: string | null; titleId: string | null; nameColor?: string | null },
+	earned: readonly string[],
+	admin = false,
+): ShownIdentity => {
+	const badge = shownBadge(choice.badgeId, earned);
+	return {
+		badge: badge?.badge ?? null,
+		badgeName: badge?.title ?? null,
+		title: shownTitle(choice.titleId, earned),
+		nameColor: shownNameColor(choice.nameColor, admin),
+		admin,
+	};
+};
 
 /** Validates what a player asks for: a badge id is `BADGE_NONE`, null (default) or an earned achievement; a title id is null or an earned title. */
 export const checkBadgeChoice = (

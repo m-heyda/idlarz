@@ -65,6 +65,7 @@ const refuse = (reason: GemsRefusal, message: string): SpendOutcome => ({ ok: fa
  * - **Class change**: not during a fight, to another class of the four.
  * - **Name change**: `value` is the new name, already checked against the name rules and the unique index by the caller (the cooldown is the profile's, checked by the caller too).
  * - **Attribute respec**: not during a fight; refused when nothing is spent; the first one of an account is free.
+ * - **A one-time item** (`kind: 'once'`, Name colours): refused when already owned; the purchase count in `bought` is the record of ownership.
  *
  * @category Economy/Gems
  * @order 4
@@ -75,6 +76,7 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 	if (ledger.gemShop.pending) return refuse('pending', 'A change is still being finished. Try again in a moment.');
 	const last = ledger.gemShop.lastAt[item.id] ?? 0;
 	if (item.cooldownSec > 0 && last > 0 && facts.nowSec - last < item.cooldownSec) return refuse('cooldown', 'You have to wait before buying that again.');
+	if (item.kind === 'once' && (ledger.gemShop.bought[item.id] ?? 0) > 0) return refuse('already_owned', 'You already own that.');
 	const price = priceFor(item, ledger.attrs);
 	if (ledger.gems < price) return refuse('short_balance', `You need ${price - ledger.gems} more gems.`);
 
@@ -88,7 +90,7 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 	} else if (item.id === 'name_change') {
 		if (!value) return refuse('bad_value', 'Enter a name.');
 		pending = { kind: 'name', value, price };
-	} else {
+	} else if (item.kind !== 'once') {
 		if (facts.inFight) return refuse('in_fight', 'Finish the fight first.');
 		if (spentOf(facts.attrs.alloc) === 0) return refuse('nothing_to_respec', 'You have no attribute points to take back.');
 		attrs = respecAttrs(facts.attrs);
@@ -100,7 +102,7 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 			...ledger,
 			gems: ledger.gems - price,
 			attrs,
-			stats: item.id === 'class_change' || item.id === 'name_change' ? ledger.stats : recordRespec(ledger.stats),
+			stats: item.id === 'attr_respec' ? recordRespec(ledger.stats) : ledger.stats,
 			gemShop: {
 				...ledger.gemShop,
 				bought: { ...ledger.gemShop.bought, [item.id]: (ledger.gemShop.bought[item.id] ?? 0) + 1 },

@@ -37,7 +37,7 @@ export const CATEGORIES: CategoryDef[] = [
 		name: 'Progression',
 		slug: 'progression',
 		blurb: 'Levels, attributes, skills, rebirth, Embers, limits and gems.',
-		sections: ['Levels', 'Attributes', 'Rebirth', 'Ember shop', 'Limits', 'Gems', 'Crafting'],
+		sections: ['Levels', 'Attributes', 'Rebirth', 'Ember shop', 'Limits', 'Gems', 'Crafting', 'Rankings'],
 	},
 	{
 		name: 'Saves & Server',
@@ -49,7 +49,7 @@ export const CATEGORIES: CategoryDef[] = [
 		name: 'Architecture',
 		slug: 'architecture',
 		blurb: 'Stack, state, the tick loop, the map, rendering and the art pipeline.',
-		sections: ['The loop', 'State', 'Rendering', 'Art'],
+		sections: ['The loop', 'State', 'Rendering', 'Notifications', 'Art'],
 	},
 	{ name: 'Pacing', slug: 'pacing', blurb: 'The pace the economy is tuned for, and the bot simulation that checks it.', sections: ['Targets', 'Magnitude targets', 'The sim'] },
 	{ name: 'Ops', slug: 'ops', blurb: 'Commands, CI, the pacing guard, season resets and the E2E test account.', sections: ['Commands', 'CI', 'Operator guides'] },

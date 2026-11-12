@@ -134,10 +134,12 @@ const walk = (dir: string): string[] =>
 /** Source files of src/ (path relative to src, text) outside the icon-size table, to see which code mentions an icon name */
 const srcFiles = (() => {
 	const files = (dir: string): string[] =>
-		readdirSync(dir).flatMap((n) => {
-			const f = join(dir, n);
-			return statSync(f).isDirectory() ? files(f) : /\.(ts|tsx|css)$/.test(n) ? [f] : [];
-		});
+		readdirSync(dir)
+			.sort() // the same order on every platform (Linux lists a directory unsorted), so the "used by" lists do not differ between machines and CI
+			.flatMap((n) => {
+				const f = join(dir, n);
+				return statSync(f).isDirectory() ? files(f) : /\.(ts|tsx|css)$/.test(n) ? [f] : [];
+			});
 	return files(join(ROOT, 'src')).map((f) => {
 		const t = readFileSync(f, 'utf8');
 		return {
@@ -516,6 +518,18 @@ export const buildManifest = (): AssetEntry[] => {
 				src: url(f),
 				status: 'reuse',
 				source: 'new_assets/achievements',
+			});
+	// the admin mark: an 8 frame sprite sheet (32 px frames) drawn by the name of the game admin (`AdminMark` in the design system)
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'admin')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'ui',
+				subcategory: 'admin mark (8 frame sprite sheet)',
+				src: url(f),
+				status: 'used',
+				usedBy: ['AdminMark'],
+				source: 'new_assets/admin',
 			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'wireframe')))
 		if (f.endsWith('.png'))

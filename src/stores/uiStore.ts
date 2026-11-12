@@ -7,6 +7,18 @@ import { connectedCluster } from '@/utils/cluster';
 import { getTile, type World } from '@/utils/world';
 import type { ChestLoot } from '@/lib/chests';
 
+/** The badge, title and nickname colour choice of the account with what the pickers allow (see `BadgeState` in `lib/authClient.ts`); `loaded` once the server has answered. */
+export interface UiBadge {
+	badgeId: string | null;
+	titleId: string | null;
+	nameColor: string | null;
+	colorsUnlocked: boolean;
+	effectsUnlocked: readonly string[];
+	admin: boolean;
+	earned: readonly string[];
+	loaded: boolean;
+}
+
 export interface ContextMenuItem {
 	id: string;
 	label: string;
@@ -72,11 +84,16 @@ interface ChestNotice {
 	id: number;
 	loot: ChestNoticeLoot;
 }
+/** How a notice looks: `info` (gold frame, the default) or `error` (red frame). */
+export type ToastTone = 'info' | 'error';
+
 interface ToastMessage {
 	id: number;
 	text: string;
 	/** The same message repeated in a row (a rapid sale) is one line with a counter */
 	count: number;
+	/** `error` draws the notice with a red frame (a refused purchase, "not enough gems") */
+	tone: ToastTone;
 }
 
 function schedule(id: number, ms: number, remove: () => void) {
@@ -100,9 +117,9 @@ interface UiState {
 	/** The account's chosen avatar (`catalog/avatars.ts`, from the profile; null = none yet): the header and the character window show it. Not part of the save. */
 	avatarId: string | null;
 	setAvatarId: (id: string | null) => void;
-	/** The badge and title the account shows (`profiles.badge_id`: null = default, 'none' = hidden; `title_id`) and the achievements it holds. Loaded from the server once; not part of the save. */
-	badge: { badgeId: string | null; titleId: string | null; earned: readonly string[]; loaded: boolean };
-	setBadge: (badge: { badgeId: string | null; titleId: string | null; earned: readonly string[] }) => void;
+	/** The badge, title and nickname colour the account shows (`profiles.badge_id`: null = default, 'none' = hidden; `title_id`; `name_color`) and the achievements it holds. Loaded from the server once; not part of the save. */
+	badge: UiBadge;
+	setBadge: (badge: Omit<UiBadge, 'loaded'>) => void;
 	badgeDialogOpen: boolean;
 	openBadgeDialog: () => void;
 	closeBadgeDialog: () => void;
@@ -151,7 +168,8 @@ interface UiState {
 	flashCluster: (world: World, x: number, y: number) => void;
 	/** Short messages, stacked under the header (a new one never replaces one still showing) */
 	toasts: ToastMessage[];
-	showToast: (text: string) => void;
+	/** A short notice at the top of the screen (`tone` `error` draws a red frame). Call it through `notify` in `lib/notices.ts`, which says when to use it. */
+	showToast: (text: string, tone?: ToastTone) => void;
 	dismissToast: (id: number) => void;
 	/** Chest rewards, stacked: opening chests quickly queues one notice per chest */
 	chestNotices: ChestNotice[];
@@ -193,7 +211,7 @@ export const useUiStore = create<UiState>((set, get) => ({
 	classDialogOpen: false,
 	avatarId: null,
 	setAvatarId: (id) => set({ avatarId: id }),
-	badge: { badgeId: null, titleId: null, earned: [], loaded: false },
+	badge: { badgeId: null, titleId: null, nameColor: null, colorsUnlocked: false, effectsUnlocked: [], admin: false, earned: [], loaded: false },
 	setBadge: (badge) => set({ badge: { ...badge, loaded: true } }),
 	badgeDialogOpen: false,
 	openBadgeDialog: () => set({ badgeDialogOpen: true }),
@@ -244,16 +262,16 @@ export const useUiStore = create<UiState>((set, get) => ({
 		flashTimer = setTimeout(() => set({ highlight: null }), HIGHLIGHT_MS);
 	},
 	toasts: [],
-	showToast: (text) => {
+	showToast: (text, tone = 'info') => {
 		const last = get().toasts[get().toasts.length - 1];
-		if (last && last.text === text) {
+		if (last && last.text === text && last.tone === tone) {
 			// the same message again: one line with a counter, its time restarted
 			set((state) => ({ toasts: state.toasts.map((t) => (t.id === last.id ? { ...t, count: t.count + 1 } : t)) }));
 			schedule(last.id, TOAST_MS, () => get().dismissToast(last.id));
 			return;
 		}
 		const id = ++toastId;
-		const next = [...get().toasts, { id, text, count: 1 }];
+		const next = [...get().toasts, { id, text, count: 1, tone }];
 		const dropped = next.splice(0, Math.max(0, next.length - MAX_NOTICES));
 		dropped.forEach((t) => noticeTimers.delete(t.id));
 		set({ toasts: next });

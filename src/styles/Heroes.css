@@ -149,6 +149,49 @@
 	opacity: 0.55;
 }
 
+/* the loading grid: the same card size as a loaded one (60 px picture, name line, one "how" line), so the window does not jump when the unlocks arrive */
+.avatar-card-skeleton {
+	min-height: 112px;
+	cursor: progress;
+	pointer-events: none;
+}
+
+.sk {
+	display: block;
+	background: linear-gradient(100deg, rgba(255, 255, 255, 0.04) 30%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.04) 70%);
+	background-size: 220% 100%;
+	animation: sk-shimmer 1.4s linear infinite;
+}
+
+.sk-art {
+	width: 60px;
+	height: 60px;
+}
+
+.sk-name {
+	width: 56%;
+	height: 11px;
+	margin-top: 6px;
+}
+
+.sk-how {
+	width: 78%;
+	height: 8px;
+	margin-top: 4px;
+}
+
+@keyframes sk-shimmer {
+	to {
+		background-position: -220% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sk {
+		animation: none;
+	}
+}
+
 .avatar-card-soon {
 	cursor: default;
 	color: #5c5040;

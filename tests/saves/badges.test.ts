@@ -1,6 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BADGE_NONE, badgeOptions, checkBadgeChoice, shownBadge, shownTitle, titleOptions } from '../../src/catalog/badges';
+import { NICK_COLORS, NICK_EFFECTS, inkOn, nickColorValue } from '../../src/config/nickColors';
+import {
+	BADGE_NONE,
+	badgeOptions,
+	checkBadgeChoice,
+	checkNameColor,
+	shownBadge,
+	shownIdentity,
+	shownNameColor,
+	shownTitle,
+	titleOptions,
+} from '../../src/catalog/badges';
 
 const earned = ['early_tester', 'first_rebirth'];
 
@@ -50,4 +61,80 @@ test('only the short badge list can be worn: an earned achievement outside it is
 	);
 	assert.equal(shownBadge('chicken_keeper_1', all), null);
 	assert.equal(checkBadgeChoice({ badgeId: 'chicken_keeper_1', titleId: null }, all).ok, false);
+});
+
+test('shownIdentity is the one rule for badge and title by a name (character window, landing, rankings)', () => {
+	assert.deepEqual(shownIdentity({ badgeId: 'first_rebirth', titleId: 'early-tester' }, earned), {
+		badge: shownBadge('first_rebirth', earned)?.badge,
+		badgeName: shownBadge('first_rebirth', earned)?.title,
+		title: 'Early tester',
+		nameColor: null,
+		admin: false,
+	});
+	assert.deepEqual(shownIdentity({ badgeId: BADGE_NONE, titleId: null }, earned), { badge: null, badgeName: null, title: null, nameColor: null, admin: false });
+	assert.equal(shownIdentity({ badgeId: null, titleId: 'early-tester' }, []).title, null);
+});
+
+test('name colours: plain ones need the unlock, the rainbow its own, gold needs admin, null is always fine', () => {
+	const locked = { admin: false, unlocked: false, effects: [] };
+	const bought = { admin: false, unlocked: true, effects: [] };
+	const rainbow = { admin: false, unlocked: false, effects: ['rainbow'] };
+	const admin = { admin: true, unlocked: false, effects: [] };
+	assert.deepEqual(checkNameColor(null, locked), { ok: true, nameColor: null });
+	assert.equal(checkNameColor('crimson', locked).ok, false);
+	assert.deepEqual(checkNameColor('crimson', bought), { ok: true, nameColor: 'crimson' });
+	assert.deepEqual(checkNameColor('crimson', admin), { ok: true, nameColor: 'crimson' });
+	assert.deepEqual(checkNameColor('mint', bought), { ok: true, nameColor: 'mint' });
+	assert.equal(checkNameColor('rainbow', bought).ok, false, 'the plain unlock does not include the rainbow');
+	assert.deepEqual(checkNameColor('rainbow', rainbow), { ok: true, nameColor: 'rainbow' });
+	assert.equal(checkNameColor('crimson', rainbow).ok, false, 'the rainbow does not include the plain colours');
+	assert.deepEqual(checkNameColor('rainbow', admin), { ok: true, nameColor: 'rainbow' });
+	assert.equal(checkNameColor('gold', bought).ok, false);
+	assert.equal(checkNameColor('gold', rainbow).ok, false);
+	assert.deepEqual(checkNameColor('gold', admin), { ok: true, nameColor: 'gold' });
+	assert.equal(checkNameColor('hotpink', admin).ok, false);
+	assert.equal(checkNameColor(7, admin).ok, false);
+});
+
+test('the palette has fourteen distinct plain colours, and the rainbow and gold are not among them', () => {
+	assert.equal(NICK_COLORS.length, 14);
+	assert.equal(new Set(NICK_COLORS.map((c) => c.id)).size, 14);
+	assert.ok(!NICK_COLORS.some((c) => c.id === 'rainbow' || c.id === 'gold'));
+	assert.equal(nickColorValue('rainbow'), 'rainbow');
+	assert.equal(nickColorValue('gold'), 'gold');
+	assert.equal(nickColorValue('teal'), '#2dd4bf');
+	assert.equal(nickColorValue(null), undefined);
+	assert.equal(inkOn('#e8e46a'), '#1a1208');
+	assert.equal(inkOn('#4f8df5'), '#ffffff');
+});
+
+test('a stored gold nickname is only shown for an admin; shownIdentity carries the colour', () => {
+	assert.equal(shownNameColor('gold', false), null);
+	assert.equal(shownNameColor('gold', true), 'gold');
+	assert.equal(shownNameColor('teal', false), 'teal');
+	assert.equal(shownNameColor('nope', true), null);
+	assert.equal(shownIdentity({ badgeId: null, titleId: null, nameColor: 'teal' }, []).nameColor, 'teal');
+	assert.equal(shownIdentity({ badgeId: null, titleId: null, nameColor: 'gold' }, []).nameColor, null);
+});
+
+test('every name effect is its own purchase: owning one opens only that one, an admin has all, none is gold', () => {
+	assert.deepEqual(
+		NICK_EFFECTS.map((e) => e.id),
+		['rainbow', 'aurora', 'ember', 'frost', 'void', 'galaxy'],
+	);
+	for (const effect of NICK_EFFECTS) {
+		assert.equal(effect.item, `name_${effect.id}`);
+		assert.notEqual(effect.id, 'gold');
+		const own = { admin: false, unlocked: false, effects: [effect.id] };
+		assert.deepEqual(checkNameColor(effect.id, own), { ok: true, nameColor: effect.id });
+		for (const other of NICK_EFFECTS.filter((o) => o.id !== effect.id))
+			assert.equal(checkNameColor(other.id, own).ok, false, `${effect.id} does not open ${other.id}`);
+		assert.deepEqual(checkNameColor(effect.id, { admin: true, unlocked: false, effects: [] }), { ok: true, nameColor: effect.id });
+		assert.equal(nickColorValue(effect.id), effect.id);
+	}
+});
+
+test('shownIdentity carries the admin flag, which is never part of the choice', () => {
+	assert.equal(shownIdentity({ badgeId: null, titleId: null }, [], true).admin, true);
+	assert.equal(shownIdentity({ badgeId: null, titleId: null }, []).admin, false);
 });

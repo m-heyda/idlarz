@@ -2,26 +2,38 @@ import { createSupabaseAdmin } from '@/lib/supabase/admin';
 import { fail, json, readBody, unavailable } from '@/lib/authRoute';
 import { requirePlayer } from '@/lib/playerRoute';
 import { loadEarnedAchievements } from '@/lib/avatarServer';
-import { loadBadgeChoice, writeBadgeChoice } from '@/lib/badgeServer';
-import { checkBadgeChoice, titleOptions } from '@/catalog/badges';
+import { loadBadgeChoice, loadNameColorAccess, writeBadgeChoice, writeNameColor } from '@/lib/badgeServer';
+import { checkBadgeChoice, checkNameColor, shownNameColor, titleOptions } from '@/catalog/badges';
 import { isRecord } from '@/lib/isRecord';
 
 export const dynamic = 'force-dynamic';
 
-/** The badge and title the profile shows (`null` badge = the default, `"none"` = hidden) and the achievements it has earned, which decide what it may pick. */
+/** The badge, title and nickname colour the profile shows (`null` badge = the default, `"none"` = hidden), the achievements it has earned (they decide what it may pick), and what the colour picker allows: `colorsUnlocked` and `effectsUnlocked` (the effect ids; bought in the Gem shop, or admin) and `admin` (gold). */
 export async function GET() {
 	try {
 		const player = await requirePlayer();
 		if (!player.userId) return player.response;
 		const admin = createSupabaseAdmin();
-		const [choice, earned] = await Promise.all([loadBadgeChoice(admin, player.userId), loadEarnedAchievements(admin, player.userId)]);
-		return json({ ...choice, earned });
+		const stored = await loadBadgeChoice(admin, player.userId);
+		const [earned, access] = await Promise.all([loadEarnedAchievements(admin, player.userId), loadNameColorAccess(admin, player.userId, stored.admin)]);
+		return json({
+			badgeId: stored.badgeId,
+			titleId: stored.titleId,
+			nameColor: shownNameColor(stored.nameColor, access.admin),
+			colorsUnlocked: access.unlocked,
+			effectsUnlocked: access.effects,
+			admin: access.admin,
+			earned,
+		});
 	} catch {
 		return unavailable();
 	}
 }
 
-/** Changes the badge and the title: `{ badgeId, titleId }`, each `null` (or left out to keep it), or (badge) `"none"` to hide it. A badge or title that is not earned is a 400 and nothing is written. */
+/**
+ * Changes the badge, the title and the nickname colour: `{ badgeId, titleId, nameColor }`, each `null` (or left out to keep it), or (badge) `"none"` to hide it. A badge or title that is not earned, a colour that is not unlocked (Gem shop, or `profiles.is_admin`)
+ * and the gold nickname on a non-admin account are a 400 and nothing is written. A request that only sends `nameColor` leaves the badge and title untouched.
+ */
 export async function POST(request: Request) {
 	try {
 		const player = await requirePlayer(request);
@@ -29,9 +41,15 @@ export async function POST(request: Request) {
 		const body = await readBody(request);
 		if (!isRecord(body)) return fail('Pick a badge and a title.', 400);
 		const admin = createSupabaseAdmin();
+		const stored = await loadBadgeChoice(admin, player.userId);
+		if ('nameColor' in body) {
+			const color = checkNameColor(body.nameColor ?? null, await loadNameColorAccess(admin, player.userId, stored.admin));
+			if (!color.ok) return fail(color.error, 400);
+			await writeNameColor(admin, player.userId, color.nameColor);
+			if (!('badgeId' in body) && !('titleId' in body)) return json({ ok: true, nameColor: color.nameColor });
+		}
 		const earned = await loadEarnedAchievements(admin, player.userId);
 		// a field the request leaves out keeps what is stored (a badge pick must not fail on an old title, and the other way round)
-		const stored = await loadBadgeChoice(admin, player.userId);
 		const keptTitle = titleOptions(earned).some((t) => t.id === stored.titleId) ? stored.titleId : null;
 		const checked = checkBadgeChoice(
 			{ badgeId: 'badgeId' in body ? (body.badgeId ?? null) : stored.badgeId, titleId: 'titleId' in body ? (body.titleId ?? null) : keptTitle },

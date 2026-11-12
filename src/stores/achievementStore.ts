@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { achievementById } from '@/catalog/achievements';
 import type { AchievementReport } from '@/lib/offline/achievements';
 import { newClaimId } from '@/lib/offlineClient';
+import { QUERY_KEYS, invalidate } from '@/lib/queryClient';
 import { provideAchievementSink, requestGems } from '@/lib/rewardsClient';
 import { signalNeedClaim } from '@/lib/serverSession';
 import { useGameStore } from '@/stores/gameStore';
@@ -65,6 +66,8 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
 			progress: r.progress ?? state.progress,
 		}));
 		if (typeof r.gemsTotal === 'number') useGameStore.setState({ gems: r.gemsTotal });
+		// a new unlock can open an avatar: the cached avatar list is stale
+		if (r.fresh.length > 0) invalidate(QUERY_KEYS.avatars);
 		for (const unlock of r.fresh) {
 			// the reward card (badge, Congratulations!, fanfare); an id the catalog does not know falls back to the plain message
 			if (achievementById(unlock.id)) useUiStore.getState().pushAchievementNotice(unlock.id);

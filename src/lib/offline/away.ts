@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { offlineCapSec, offlineEfficiency, offlineMinGapSec } from '@/lib/offline/limits';
+import { shownIdentity, type ShownIdentity } from '@/catalog/badges';
 
 /** The landing card's away bar: how long the player has been gone, the cap that counts and the share of income paid. Numbers only, the same ones the claim will use. */
 export interface AwayBlock {
@@ -54,16 +55,29 @@ export const loadAway = async (supabase: SupabaseClient, userId: string, nowMs: 
 	}
 };
 
-/** Whether the landing shows the Early tester badge: the player holds the achievement (`player_achievements`, their own row through RLS) and has not hidden it or picked a badge that is not a tester medal (`profiles.badge_id`); a failed read is "no". */
-export const loadEarlyTester = async (supabase: SupabaseClient, userId: string): Promise<boolean> => {
+/**
+ * The badge, title and nickname colour the landing shows by the name: the same stored choice as the Character window (`profiles.badge_id` / `title_id` / `name_color`, the one place rankings will read too), checked against the
+ * achievements the account holds (`player_achievements`, their own rows through RLS) with `shownIdentity`. A failed read is "nothing shown".
+ */
+export const loadShownIdentity = async (supabase: SupabaseClient, userId: string): Promise<ShownIdentity | null> => {
 	try {
 		const [earned, choice] = await Promise.all([
-			supabase.from('player_achievements').select('achievement_id').eq('user_id', userId).eq('achievement_id', 'early_tester').maybeSingle(),
-			supabase.from('profiles').select('badge_id').eq('id', userId).maybeSingle(),
+			supabase.from('player_achievements').select('achievement_id').eq('user_id', userId),
+			supabase.from('profiles').select('badge_id, title_id, name_color, is_admin').eq('id', userId).maybeSingle(),
 		]);
-		const badgeId = typeof choice.data?.badge_id === 'string' ? choice.data.badge_id : null;
-		return !earned.error && !!earned.data && (badgeId === null || badgeId === 'early_tester' || badgeId === 'beta_tester');
+		if (earned.error || choice.error) return null;
+		const held = (earned.data ?? []).map((row) => String(row.achievement_id));
+		const shown = shownIdentity(
+			{
+				badgeId: typeof choice.data?.badge_id === 'string' ? choice.data.badge_id : null,
+				titleId: typeof choice.data?.title_id === 'string' ? choice.data.title_id : null,
+				nameColor: typeof choice.data?.name_color === 'string' ? choice.data.name_color : null,
+			},
+			held,
+			choice.data?.is_admin === true,
+		);
+		return shown.badge || shown.title || shown.nameColor || shown.admin ? shown : null;
 	} catch {
-		return false;
+		return null;
 	}
 };

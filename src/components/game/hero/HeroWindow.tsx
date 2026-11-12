@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import GameModal from '../GameModal';
+import { nickColorValue } from '@/config/nickColors';
 import {
 	AddSlot,
 	Button,
@@ -181,6 +182,8 @@ const HeroLeft: React.FC = () => {
 				classLabel={`${info.race} ${info.label}`}
 				badge={badge ? `/pixel/new_assets/achievements/${badge.badge}.png` : undefined}
 				title={title}
+				nameColor={nickColorValue(choice.nameColor)}
+				admin={choice.admin}
 				onAvatar={openAvatarDialog}
 				onBadge={openBadgeDialog}
 				onClass={openClassDialog}

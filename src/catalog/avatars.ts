@@ -30,6 +30,8 @@ export interface AvatarInfo {
 	portrait: string;
 	/** One or two lines about this face (the creation screens and the Avatar window) */
 	bio: string;
+	/** Only for the game admin's account (`profiles.is_admin`): the Avatar window does not show it to anyone else, not even as a locked card */
+	adminOnly?: boolean;
 }
 
 const starter = (id: string, name: string, classId: PlayerClassId, portrait: string, bio: string): AvatarInfo => ({
@@ -49,6 +51,9 @@ const unlock = (id: string, name: string, unlockedBy: string, how: string, portr
 	portrait,
 	bio,
 });
+
+/** The pseudo achievement id the server adds to the earned list of an admin account (`loadEarnedAchievements`): the one thing that unlocks the Admin avatar. No player can earn it. */
+export const ADMIN_UNLOCK = 'admin';
 
 export const AVATARS: readonly AvatarInfo[] = [
 	starter('knight', 'Knight', 'warrior', 'avatar_red_haired_knight', 'Red-haired and stubborn, sworn to the first banner they ever saw.'),
@@ -92,6 +97,10 @@ export const AVATARS: readonly AvatarInfo[] = [
 		'avatar_beta_tester',
 		'A hologram of the realm, left behind by the first testers.',
 	),
+	{
+		...unlock('admin', 'Admin', ADMIN_UNLOCK, 'Only for the game admin', 'avatar_admin', 'The game itself, keeping an eye on the realm.'),
+		adminOnly: true,
+	},
 ];
 
 /**

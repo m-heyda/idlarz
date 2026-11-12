@@ -13,14 +13,15 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`craftXpOf`](#craftxpof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
+- Rankings: [The boards](#ranking-boards), [Movement arrows](#movement)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Pets: [`PetDef`](#petdef), [`nextWanderStep`](#nextwanderstep), [`pickPetPhrase`](#pickpetphrase), [`applyPets`](#applypets)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
 - Mastery: [`claimMastery`](#claimmastery), [`claimAllMastery`](#claimallmastery), [Bestiary mastery](#mastery-tiers)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
+- Badges: [`NICK_COLORS`](#nick-colors), [`NICK_EFFECTS`](#nick-effects), [`badgeOptions`](#badgeoptions)
 - Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
-- Badges: [`badgeOptions`](#badgeoptions)
 
 ## Levels
 
@@ -535,13 +536,39 @@ Source: [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts)
 
 What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.
 
+## Rankings
+
+<a id="ranking-boards"></a>
+
+### The boards
+
+Source: [`src/lib/rankings.ts:39`](../../src/lib/rankings.ts)
+
+The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
+
+Every board lists the first 50 places of the trusted players, plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
+Ties are broken in this order:
+- Level: level, then lifetime XP, then who reached the level cap first.
+- Rebirths: rebirths, then Embers ever earned.
+- Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.
+- Tiles: the most tiles the player ever owned in one run (`player_stats.best_tiles`), so a rebirth does not lower it.
+- Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).
+
+<a id="movement"></a>
+
+### Movement arrows
+
+Source: [`src/lib/rankings.ts:86`](../../src/lib/rankings.ts)
+
+The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
+
 ## Avatars
 
 <a id="unlockedavatarids"></a>
 
 ### `unlockedAvatarIds` <small>function</small>
 
-Source: [`src/catalog/avatars.ts:154`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:163`](../../src/catalog/avatars.ts)
 
 The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.
 
@@ -559,7 +586,7 @@ Used by register, `POST /api/auth/profile`, `POST /api/auth/avatar` and the new-
 
 ### `CLASS_AVATARS` <small>const</small>
 
-Source: [`src/catalog/avatars.ts:104`](../../src/catalog/avatars.ts)
+Source: [`src/catalog/avatars.ts:113`](../../src/catalog/avatars.ts)
 
 The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class.
 Only that class can wear them (`checkAvatar`). The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).
@@ -1005,6 +1032,35 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 
 See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideVisibleFor`](progression.md#guidevisiblefor)
 
+## Badges
+
+<a id="nick-colors"></a>
+
+### `NICK_COLORS` <small>const</small>
+
+Source: [`src/config/nickColors.ts:17`](../../src/config/nickColors.ts)
+
+The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). Bought once for the whole account in the Gem shop ("Name colours", `NICK_COLORS_ITEM`); stored on `profiles.name_color`.
+The animated **Rainbow** (`NICK_RAINBOW`) is a separate purchase (`NICK_RAINBOW_ITEM`) and the gold nickname with stars (`NICK_GOLD`) is for admin accounts only.
+
+<a id="nick-effects"></a>
+
+### `NICK_EFFECTS` <small>const</small>
+
+Source: [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts)
+
+The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost, Void and Galaxy. None looks like the gold admin nickname (no gold, no stars).
+Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.
+
+<a id="badgeoptions"></a>
+
+### `badgeOptions` <small>function</small>
+
+Source: [`src/catalog/badges.ts:27`](../../src/catalog/badges.ts)
+
+Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
+The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.
+
 ## Deeds
 
 <a id="claimallachievements"></a>
@@ -1026,14 +1082,3 @@ The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the 
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).
 
 See also: `deedState`, `deedPoints`
-
-## Badges
-
-<a id="badgeoptions"></a>
-
-### `badgeOptions` <small>function</small>
-
-Source: [`src/catalog/badges.ts:26`](../../src/catalog/badges.ts)
-
-Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
-The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.

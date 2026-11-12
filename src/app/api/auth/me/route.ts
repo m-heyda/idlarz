@@ -3,7 +3,7 @@ import { GAME_EPOCH, needsResetFor } from '@/config/epoch';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseAdmin, adminConfigured } from '@/lib/supabase/admin';
 import { loadBootSnapshot, sendsBootSnapshot } from '@/lib/offline/bootSnapshot';
-import { loadAway, loadEarlyTester } from '@/lib/offline/away';
+import { loadAway, loadShownIdentity } from '@/lib/offline/away';
 import { fail, guardConfigured, isOutage, json, loadProfile, unavailable } from '@/lib/authRoute';
 
 export const dynamic = 'force-dynamic';
@@ -35,13 +35,13 @@ export async function GET(request: Request) {
 		const wantsGame =
 			sendsBootSnapshot({ wanted: new URL(request.url).searchParams.get('game') === '1', hasProfile: profile !== null, needsReset }) && adminConfigured();
 		// the leaderboard row (level, rebirths) for the landing's Continue card and the game snapshot: both best effort (a failed or missing read is just "nothing" and never blocks the answer), read side by side
-		// `away` (the landing's away bar) and `earlyTester` (the badge by the name) are read-only extras of the same kind, never for a stale epoch
+		// `away` (the landing's away bar) and `identity` (the badge and title by the name, from `profiles.badge_id` / `title_id`) are read-only extras of the same kind, never for a stale epoch
 		const nowMs = Date.now();
-		const [stats, game, away, earlyTester] = await Promise.all([
+		const [stats, game, away, identity] = await Promise.all([
 			profile ? loadStats(supabase, data.user.id) : null,
 			wantsGame ? loadBootSnapshot(createSupabaseAdmin(), data.user.id, nowMs) : null,
 			profile && !needsReset ? loadAway(supabase, data.user.id, nowMs) : null,
-			profile && !needsReset ? loadEarlyTester(supabase, data.user.id) : false,
+			profile && !needsReset ? loadShownIdentity(supabase, data.user.id) : null,
 		]);
 		// `epoch`: the data epoch the server is on; `needsReset`: this account's game is on an older one and has to go through the new chapter screen (both dark while the epoch is the baseline)
 		return json({
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
 			needsReset,
 			...(game ? { game } : {}),
 			...(away ? { away } : {}),
-			...(earlyTester ? { earlyTester: true } : {}),
+			...(identity ? { identity } : {}),
 		});
 	} catch {
 		return unavailable();

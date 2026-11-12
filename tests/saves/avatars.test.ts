@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+	ADMIN_UNLOCK,
 	AVATARS,
 	CLASS_AVATARS,
 	CLASS_DEFAULT_AVATAR,
@@ -15,11 +16,11 @@ import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-test('the catalog has 8 starters and the 5 unlockables, each with its portrait file', () => {
+test('the catalog has 8 starters and the 5 unlockables plus the admin-only Admin avatar, each with its portrait file', () => {
 	assert.equal(STARTER_AVATAR_IDS.length, 8);
 	assert.deepEqual(
 		AVATARS.filter((a) => a.kind === 'unlock').map((a) => a.id),
-		['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester'],
+		['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester', 'admin'],
 	);
 	assert.equal(new Set(AVATARS.map((a) => a.id)).size, AVATARS.length);
 	for (const avatar of AVATARS) {
@@ -125,4 +126,15 @@ test("a stored avatar that no longer fits the class falls back to the new class'
 	assert.equal(fitAvatar('architect', 'mage', ['castle_10']).id, 'architect', 'an earned reward stays');
 	assert.equal(fitAvatar('architect', 'mage', []).id, 'druid', 'a reward that is not earned does not');
 	assert.equal(resolveAvatar('knight', 'paladin').id, 'alchemist');
+});
+
+test('the Admin avatar is only ever unlocked by the admin pseudo achievement, and only that account earns it', () => {
+	const admin = AVATARS.find((a) => a.id === 'admin');
+	assert.ok(admin?.adminOnly);
+	assert.equal(admin?.unlockedBy, ADMIN_UNLOCK);
+	assert.equal(checkAvatar('admin', 'mage', ['castle_10', 'beta_tester', 'early_tester']).ok, false, 'no achievement opens it');
+	assert.deepEqual(checkAvatar('admin', 'mage', [ADMIN_UNLOCK]), { ok: true, value: 'admin' });
+	assert.ok(!unlockedAvatarIds([]).includes('admin'));
+	assert.ok(unlockedAvatarIds([ADMIN_UNLOCK]).includes('admin'));
+	for (const cls of PLAYER_CLASS_ORDER) assert.ok(classAvatarIds(cls, [ADMIN_UNLOCK]).includes('admin'), 'any class may wear it once granted');
 });

@@ -91,6 +91,13 @@ const HudDock: React.FC = () => {
 							onClick={() => toggleWindow('achievements')}
 						/>
 					)}
+					<IconButton
+						icon={icon('menu_rankings')}
+						label='Rankings'
+						active={order.includes('rankings')}
+						aria-pressed={order.includes('rankings')}
+						onClick={() => toggleWindow('rankings')}
+					/>
 					<HoverTip
 						placement='above'
 						align='center'

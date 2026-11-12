@@ -47,6 +47,7 @@ export type GemsRefusal =
 	| 'name_taken'
 	| 'nothing_to_respec'
 	| 'pending'
+	| 'already_owned'
 	| 'already_claimed'
 	| 'not_earned'
 	| 'no_profile';
@@ -63,6 +64,8 @@ export interface GemsReply {
 	freeRespec: boolean;
 	/** Epoch seconds of the last purchase by item id (the ledger's) */
 	lastAt: Record<string, number>;
+	/** Purchases by item id (the ledger's): a `once` item is owned when its count is above 0 */
+	bought: Record<string, number>;
 	/** Epoch seconds of the last name change (the profile's), null = never */
 	nameChangedAt: number | null;
 	/** The profile as it stands after an identity change */

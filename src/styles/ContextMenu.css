@@ -113,7 +113,8 @@
 	top: calc(var(--header-h, 76px) + 20px);
 	left: 50%;
 	transform: translateX(-50%);
-	z-index: 90;
+	/* above every window, dialog and tooltip (the modal backdrop is 100, a tooltip 10000): a notice must never hide behind what the player just did */
+	z-index: 100000;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

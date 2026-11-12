@@ -162,6 +162,59 @@ test('the first attribute respec is free, the next costs 300', async () => {
 	assert.equal(paid.gems, STARTING_GEMS - 300);
 });
 
+test('Name colours: a one-time purchase of 1000 gems, a second one is refused and costs nothing', async () => {
+	const { m } = await started();
+	const ledger = m.ledgers.get(ID)!;
+	m.ledgers.set(ID, { ...ledger, gems: 1500 });
+	const first = ok(await gems(m, { action: 'spend', itemId: 'name_colors' }, T0 + STEP));
+	assert.equal(first.ok, true);
+	assert.equal(first.paid, 1000);
+	assert.equal(first.gems, 500);
+	assert.equal(first.bought.name_colors, 1);
+	const again = ok(await gems(m, { action: 'spend', itemId: 'name_colors' }, T0 + STEP + 1000));
+	assert.equal(again.ok, false);
+	assert.equal(again.reason, 'already_owned');
+	assert.equal(m.ledgers.get(ID)!.gems, 500);
+	// too few gems: refused before anything is taken
+	m.ledgers.set(ID, { ...m.ledgers.get(ID)!, gemShop: { ...m.ledgers.get(ID)!.gemShop, bought: {} }, gems: 999 });
+	const short = ok(await gems(m, { action: 'spend', itemId: 'name_colors' }, T0 + STEP + 2000));
+	assert.equal(short.reason, 'short_balance');
+});
+
+test('Rainbow name: a separate one-time purchase of 500 gems that leaves Name colours alone', async () => {
+	const { m } = await started();
+	const ledger = m.ledgers.get(ID)!;
+	m.ledgers.set(ID, { ...ledger, gems: 700 });
+	const bought = ok(await gems(m, { action: 'spend', itemId: 'name_rainbow' }, T0 + STEP));
+	assert.equal(bought.ok, true);
+	assert.equal(bought.paid, 500);
+	assert.equal(bought.gems, 200);
+	assert.equal(bought.bought.name_rainbow, 1);
+	assert.equal(bought.bought.name_colors, undefined);
+	const again = ok(await gems(m, { action: 'spend', itemId: 'name_rainbow' }, T0 + STEP + 1000));
+	assert.equal(again.reason, 'already_owned');
+	assert.equal(m.ledgers.get(ID)!.gems, 200);
+});
+
+test('every other name effect is also a separate 500 gem one-time purchase', async () => {
+	for (const id of ['name_aurora', 'name_ember', 'name_frost', 'name_void', 'name_galaxy']) {
+		const { m } = await started();
+		const ledger = m.ledgers.get(ID)!;
+		m.ledgers.set(ID, { ...ledger, gems: 600 });
+		const bought = ok(await gems(m, { action: 'spend', itemId: id }, T0 + STEP));
+		assert.equal(bought.ok, true, id);
+		assert.equal(bought.paid, 500, id);
+		assert.equal(bought.gems, 100, id);
+		assert.equal(
+			Object.keys(bought.bought)
+				.filter((key) => key.startsWith('name_'))
+				.join(),
+			id,
+		);
+		assert.equal(ok(await gems(m, { action: 'spend', itemId: id }, T0 + STEP + 1000)).reason, 'already_owned', id);
+	}
+});
+
 test('a short balance refuses and charges nothing', async () => {
 	const { m } = await started();
 	const ledger = m.ledgers.get(ID)!;

@@ -6,6 +6,7 @@ import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber } from '@/utils/formatters';
 import GameModal from '../GameModal';
+import { useBadgeChoice } from '../BadgeDialog';
 import { Button, Tabs } from '../../../../packages/design-system/src/components/primitives';
 import GemIcon from '../GemIcon';
 import DailyBoard from '../DailyBoard';
@@ -47,8 +48,9 @@ const GemShopDialog: React.FC = () => {
 	const openClassDialog = useUiStore((state) => state.openClassDialog);
 	const info = useGemStore((state) => state.info);
 	const busy = useGemStore((state) => state.busy);
-	const message = useGemStore((state) => state.message);
 	const gems = useGameStore((state) => state.gems);
+	const admin = useUiStore((state) => state.badge.admin);
+	useBadgeChoice();
 	const playerName = useGameStore((state) => state.playerName);
 	const [name, setName] = useState('');
 	const [confirm, setConfirm] = useState<string | null>(null);
@@ -73,6 +75,9 @@ const GemShopDialog: React.FC = () => {
 		if (balance < price) return { price, blocked: `${formatNumber(price - balance)} more gems needed` };
 		return { price, blocked: null };
 	};
+
+	/** A one-time item the account already has (bought, or included for an admin account): the row shows MAX and is dimmed */
+	const ownedOf = (item: GemItem): boolean => item.kind === 'once' && (admin || (info?.bought?.[item.id] ?? 0) > 0);
 
 	const buy = async (item: GemItem, value?: string) => {
 		setConfirm(null);
@@ -114,21 +119,28 @@ const GemShopDialog: React.FC = () => {
 				{items.length > 0 && (
 					<ul className='flex flex-col gap-2' data-testid={`gem-${tab}`}>
 						{items.map((item) => {
-							const { price, blocked } = stateOf(item);
+							const owned = ownedOf(item);
+							const { price, blocked } = owned ? { price: item.price, blocked: null } : stateOf(item);
 							const needsConfirm = price > GEM_CONFIRM_ABOVE;
 							const asking = confirm === item.id;
 							return (
-								<li key={item.id} className='ds-listrow'>
+								<li key={item.id} className='ds-listrow' data-owned={owned}>
 									<div className='flex items-center justify-between gap-3'>
 										<div className='min-w-0 flex-1'>
 											<div className='font-semibold'>{item.name}</div>
 											<div className='text-xs text-[#a89878]'>{item.blurb}</div>
 										</div>
 										<div className='flex flex-col items-end gap-1 shrink-0'>
-											<span className='flex items-center gap-1 tabular-nums text-[#ffe27a]'>
-												{price === 0 ? 'Free' : formatNumber(price)} {price > 0 && <GemIcon />}
-											</span>
-											{item.id === 'class_change' ? (
+											{owned ? (
+												<Button tone='purple' className='ds-btn-max' aria-disabled='true' tabIndex={-1} title='You have this'>
+													MAX
+												</Button>
+											) : (
+												<span className='flex items-center gap-1 tabular-nums text-[#ffe27a]'>
+													{price === 0 ? 'Free' : formatNumber(price)} {price > 0 && <GemIcon />}
+												</span>
+											)}
+											{owned ? null : item.id === 'class_change' ? (
 												<Button
 													disabled={busy || blocked !== null}
 													onClick={() => {
@@ -170,12 +182,6 @@ const GemShopDialog: React.FC = () => {
 							);
 						})}
 					</ul>
-				)}
-
-				{message && (
-					<p className='text-sm text-center text-[#d98a6a]' role='status'>
-						{message}
-					</p>
 				)}
 			</div>
 		</GameModal>

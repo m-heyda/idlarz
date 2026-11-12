@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Button, Frame, HoverTip } from './primitives';
 import { compact, parseAmountText } from '../logic';
+import { MiniTip } from './tooltips';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -66,61 +67,109 @@ export const Modal: React.FC<{
 	);
 };
 
-/** A hero face in a gold frame; the whole thing is a button with a small pencil, so it reads as "click to change". */
+/** A hero face in a gold frame; the whole thing is a button with a small pencil, so it reads as "click to change". Hovering it shows a compact tip (`title`). */
 export const AvatarFrame: React.FC<{ src: string; size?: number; onClick?: () => void; title?: string }> = ({
 	src,
 	size = 64,
 	onClick,
 	title = 'Change avatar',
 }) => (
-	<button type='button' className='ds-avatar' style={{ width: size, height: size }} title={title} onClick={onClick}>
-		<img src={src} alt='' />
-		<span className='ds-avatar-edit' aria-hidden='true'>
-			✎
-		</span>
-	</button>
+	<HoverTip tip={<MiniTip>{title}</MiniTip>} placement='above' align='start'>
+		<button type='button' className='ds-avatar' style={{ width: size, height: size }} aria-label={title} onClick={onClick}>
+			<img src={src} alt='' />
+			<span className='ds-avatar-edit' aria-hidden='true'>
+				✎
+			</span>
+		</button>
+	</HoverTip>
 );
 
-/** Name line of a hero: avatar (click to change), name, the chosen badge, the chosen title and the class. Badge and title are buttons too (they open the badge and title picker). */
+/**
+ * A nickname in its colour: `color` is a CSS colour, or the word `gold` for the special admin nickname (a moving gold shine with glowing stars), or `rainbow` for the animated rainbow. No colour = the text colour around it.
+ * The one place a name gets its colour, so the game, the landing page and the rankings look the same.
+ */
+export const NickName: React.FC<{ children: React.ReactNode; color?: string | null; className?: string }> = ({ children, color, className }) =>
+	color && NICK_EFFECT_IDS.includes(color) ? (
+		<span className={`ds-nick ds-nick-fx ds-nick-${color} ${className ?? ''}`}>
+			<span className='ds-nick-text'>{children}</span>
+			{color === 'gold' && (
+				<>
+					<i className='ds-nick-star' aria-hidden='true' />
+					<i className='ds-nick-star' aria-hidden='true' />
+					<i className='ds-nick-star' aria-hidden='true' />
+				</>
+			)}
+		</span>
+	) : (
+		<span className={`ds-nick ${className ?? ''}`} style={color ? { color, textShadow: `0 0 6px ${color}cc, 0 0 14px ${color}88` } : undefined}>
+			{children}
+		</span>
+	);
+
+/** The animated nickname looks the design system draws (`.ds-nick-<id>`): the gold admin one and the effects of the Gem shop. A colour that is a CSS value is drawn plain. */
+const NICK_EFFECT_IDS = ['gold', 'rainbow', 'aurora', 'ember', 'frost', 'void', 'galaxy'];
+
+/**
+ * The game admin's mark: a small animated creature (an 8 frame sprite sheet, `src`, 32 px frames) that stands by the name of the admin account, for everyone to see in the game, on the landing page and in the rankings.
+ * It is not part of the player's choices and cannot be hidden. Draw it wherever a name is shown for an account with `profiles.is_admin` (`ShownIdentity.admin`).
+ */
+export const AdminMark: React.FC<{ src?: string; size?: number }> = ({ src = '/pixel/new_assets/admin/admin_mark.png', size = 28 }) => (
+	<span
+		className='ds-admin-mark'
+		role='img'
+		aria-label='Game admin'
+		title='Game admin'
+		style={{
+			width: size,
+			height: size,
+			backgroundImage: `url(${src})`,
+			backgroundSize: `${size * 8}px ${size}px`,
+			['--ds-mark-end' as string]: `-${size * 8}px`,
+		}}
+	/>
+);
+
+/** Name line of a hero: avatar (click to change), name, the chosen badge, the chosen title and the class. The name, badge and title are buttons too (they open the name colour, badge and title picker). */
 export const HeroIdentity: React.FC<{
 	avatar: string;
 	name: string;
 	classLabel: string;
 	badge?: string;
 	title?: string | null;
+	/** The nickname colour (a CSS colour or `gold`, see {@link NickName}); clicking the name runs `onBadge` */
+	nameColor?: string | null;
+	/** Draws the admin mark by the name (the game admin's account) */
+	admin?: boolean;
 	onAvatar?: () => void;
 	onBadge?: () => void;
-	noTitleLabel?: string;
 	avatarTitle?: string;
+	/** What hovering the name says (it opens the name, badge and title window) */
 	badgeTitle?: string;
 	/** Makes the class line a button (the class picker) and says what it gives on hover */
 	onClass?: () => void;
 	classTitle?: string;
-}> = ({
-	avatar,
-	name,
-	classLabel,
-	badge,
-	title,
-	onAvatar,
-	onBadge,
-	onClass,
-	classTitle,
-	noTitleLabel = 'No title',
-	avatarTitle,
-	badgeTitle = 'Change badge and title',
-}) => (
+}> = ({ avatar, name, classLabel, badge, title, nameColor, admin, onAvatar, onBadge, onClass, classTitle, avatarTitle, badgeTitle = 'Customize' }) => (
 	<div className='ds-identity'>
 		<AvatarFrame src={avatar} size={61} onClick={onAvatar} title={avatarTitle} />
 		<div className='ds-identity-text'>
 			<div className='ds-identity-name'>
-				<span>{name}</span>
-				<button type='button' className='ds-identity-title' title={badgeTitle} onClick={onBadge}>
-					({title ?? noTitleLabel})
-				</button>
-				<button type='button' className='ds-identity-badge' title={badgeTitle} onClick={onBadge}>
-					{badge ? <img src={badge} alt='' /> : <span className='ds-dim'>＋</span>}
-				</button>
+				<HoverTip tip={<MiniTip>{badgeTitle}</MiniTip>} placement='above' align='start'>
+					<button type='button' className='ds-identity-nick' aria-label={`${name}: ${badgeTitle}`} onClick={onBadge}>
+						<NickName color={nameColor}>{name}</NickName>
+					</button>
+				</HoverTip>
+				{admin && <AdminMark />}
+				{/* the title and the badge only show when there is one: the name opens the same window to pick them */}
+				{title && (
+					<button type='button' className='ds-identity-title' title={badgeTitle} onClick={onBadge}>
+						({title})
+					</button>
+				)}
+				{badge && (
+					<button type='button' className='ds-identity-badge' title={badgeTitle} onClick={onBadge}>
+						<img src={badge} alt='' />
+					</button>
+				)}
 			</div>
 			{onClass ? (
 				<button type='button' className='ds-caps ds-dim ds-identity-class' title={classTitle} onClick={onClass}>

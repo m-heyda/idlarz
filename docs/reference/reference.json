@@ -26,12 +26,23 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 120,
+  "line": 121,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
    "SAVE_SCHEMA"
   ]
+ },
+ {
+  "id": "get",
+  "name": "GET /api/rankings",
+  "symbol": "GET",
+  "kind": "function",
+  "category": "Saves & Server/Endpoints",
+  "file": "src/app/api/rankings/route.ts",
+  "line": 18,
+  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
+  "see": []
  },
  {
   "id": "map-lab",
@@ -89,7 +100,7 @@
   "kind": "const",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 104,
+  "line": 113,
   "summary": "The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class. Only that class can wear them (`checkAvatar`). The first of the two is the class's **default avatar** (`CLASS_DEFAULT_AVATAR`).",
   "see": []
  },
@@ -100,7 +111,7 @@
   "kind": "function",
   "category": "Progression/Avatars",
   "file": "src/catalog/avatars.ts",
-  "line": 154,
+  "line": 163,
   "summary": "The avatar ids an account may use: every starter plus each unlockable whose achievement is in `earned`. Unknown achievement ids are ignored.",
   "see": []
  },
@@ -111,7 +122,7 @@
   "kind": "function",
   "category": "Progression/Badges",
   "file": "src/catalog/badges.ts",
-  "line": 26,
+  "line": 27,
   "summary": "Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement. The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.",
   "see": []
  },
@@ -874,7 +885,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 41,
+  "line": 55,
   "summary": "The gem shop's price book: what each service costs and how often it can be bought.",
   "see": []
  },
@@ -885,7 +896,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 71,
+  "line": 148,
   "summary": "The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.",
   "see": []
  },
@@ -947,6 +958,28 @@
   "see": []
  },
  {
+  "id": "nick-colors",
+  "name": "NICK_COLORS",
+  "symbol": "NICK_COLORS",
+  "kind": "const",
+  "category": "Progression/Badges",
+  "file": "src/config/nickColors.ts",
+  "line": 17,
+  "summary": "The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). Bought once for the whole account in the Gem shop (\"Name colours\", `NICK_COLORS_ITEM`); stored on `profiles.name_color`. The animated **Rainbow** (`NICK_RAINBOW`) is a separate purchase (`NICK_RAINBOW_ITEM`) and the gold nickname with stars (`NICK_GOLD`) is for admin accounts only.",
+  "see": []
+ },
+ {
+  "id": "nick-effects",
+  "name": "NICK_EFFECTS",
+  "symbol": "NICK_EFFECTS",
+  "kind": "const",
+  "category": "Progression/Badges",
+  "file": "src/config/nickColors.ts",
+  "line": 59,
+  "summary": "The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): Rainbow, Aurora, Ember, Frost, Void and Galaxy. None looks like the gold admin nickname (no gold, no stars). Stored on `profiles.name_color` like a plain colour; the look of each is the `.ds-nick-<id>` class of the design system.",
+  "see": []
+ },
+ {
   "id": "npc-portraits",
   "name": "NPC_PORTRAITS",
   "symbol": "NPC_PORTRAITS",
@@ -974,7 +1007,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 250,
+  "line": 251,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -985,7 +1018,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 265,
+  "line": 266,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },
@@ -2088,6 +2121,17 @@
   "see": []
  },
  {
+  "id": "notify",
+  "name": "Short notices (notify)",
+  "symbol": "notify",
+  "kind": "function",
+  "category": "Architecture/Notifications",
+  "file": "src/lib/notices.ts",
+  "line": 14,
+  "summary": "THE way to tell the player something short: a small notice at the top of the screen under the header for a couple of seconds (\"Game saved\", and in red a refusal such as \"You need 490 more gems\"). Several stack, and the same text twice in a row is one line with a counter. Call it from a component, a store or plain code alike (it reads the ui store, no hook needed).",
+  "see": []
+ },
+ {
   "id": "claimachievement",
   "name": "claimAchievement",
   "symbol": "claimAchievement",
@@ -2154,7 +2198,7 @@
   "kind": "function",
   "category": "Saves & Server/Away time",
   "file": "src/lib/offline/away.ts",
-  "line": 21,
+  "line": 22,
   "summary": "The read-only `away` block of `GET /api/auth/me`: gap = now minus the later of the ledger anchor and the last accepted save (as `claimOffline` measures it), with the cap and efficiency the last save stored (`derived.offlineCapSec` / `offlineEfficiency`, the base limits when an older row lacks them). `null` with no save, an unreadable time, or a gap under `offlineMinGapSec` (nothing to show). It never claims anything and never touches the ledger.",
   "see": []
  },
@@ -2351,7 +2395,7 @@
   "kind": "function",
   "category": "Economy/Gems",
   "file": "src/lib/offline/gems.ts",
-  "line": 72,
+  "line": 73,
   "summary": "One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.",
   "see": []
  },
@@ -2711,6 +2755,28 @@
   "file": "src/lib/pushLock.ts",
   "line": 19,
   "summary": "One upload at a time per browser. Everything that reads the link, uploads and writes the new link back runs inside this lock, so a second tab (a tab that took the game over from the first, or a browser without the game-owner lock) waits for the upload in flight and then reads the revision it left, instead of sending the one it read before. Without Web Locks the work simply runs (graceful fallback), and a conflict that still happens is resolved by `resolveConflict`. The lock dies with the page, so a closing tab never holds it up.",
+  "see": []
+ },
+ {
+  "id": "ranking-boards",
+  "name": "The boards",
+  "symbol": "RANKING_BOARDS",
+  "kind": "const",
+  "category": "Progression/Rankings",
+  "file": "src/lib/rankings.ts",
+  "line": 39,
+  "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).",
+  "see": []
+ },
+ {
+  "id": "movement",
+  "name": "Movement arrows",
+  "symbol": "movement",
+  "kind": "function",
+  "category": "Progression/Rankings",
+  "file": "src/lib/rankings.ts",
+  "line": 86,
+  "summary": "The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.",
   "see": []
  },
  {
